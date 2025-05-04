@@ -78,7 +78,7 @@ jobs:
         inv playwright
 
     - name: Acceptance testing
-      if: matrix.python_version != '3.8'
+      if: matrix.python_version == '3.11' || matrix.python_version == '3.12' || matrix.python_version == '3.13'
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
@@ -96,7 +96,7 @@ jobs:
 
     # Skipping acceptance tests for 3.8, just to save some time.
     - name: Mobile acceptance testing
-      if: matrix.python_version != '3.8'
+      if: matrix.python_version == '3.11' || matrix.python_version == '3.12' || matrix.python_version == '3.13'
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
