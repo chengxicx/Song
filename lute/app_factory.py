@@ -8,6 +8,7 @@ import os
 import json
 import platform
 import traceback
+import mimetypes
 from flask import (
     Flask,
     render_template,
@@ -377,6 +378,7 @@ def _init_parser_plugins(plugin_data_path, outfunc):
     for _, v in supported_parsers():
         outfunc(f"  * {v.name()}")
 
+mimetypes.add_type('text/css', '.css')
 
 def create_app(
     app_config_path=None,
