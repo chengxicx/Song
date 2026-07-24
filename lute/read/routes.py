@@ -186,6 +186,17 @@ def start_reading(bookid, pagenum):
     return render_template("read/page_content.html", paragraphs=paragraphs)
 
 
+@bp.route("/update_start_date/<int:bookid>/<int:pagenum>", methods=["GET"])
+def update_start_date(bookid, pagenum):
+    "Lightweight update of text.start_date, called beforeunload."
+    book = _find_book(bookid)
+    if book is None:
+        return ""
+    service = Service(db.session)
+    service.update_start_date(book, pagenum)
+    return ""
+
+
 @bp.route("/refresh_page/<int:bookid>/<int:pagenum>", methods=["GET"])
 def refresh_page(bookid, pagenum):
     "Refreshes the page content, but doesn't set the text's start_date."
