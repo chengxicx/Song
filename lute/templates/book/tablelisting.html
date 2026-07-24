@@ -523,9 +523,10 @@
     if (dt == null) {
       return '';
     }
-    const djs = dayjs(dt);
+    const djs = dayjs(dt + 'Z');
     const txt = djs.fromNow();
-    return `<span title="${dt}">${txt}</span>`;
+    const localStr = djs.format('YYYY-MM-DD HH:mm:ss');
+    return `<span title="${localStr}">${txt}</span>`;
   };
 
   let render_book_actions = function ( data, type, row, meta ) {
