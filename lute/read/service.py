@@ -80,6 +80,15 @@ class Service:
     def __init__(self, session):
         self.session = session
 
+    def update_start_date(self, book, pagenum):
+        "Lightweight update of text.start_date."
+        text = book.text_at_page(pagenum)
+        text.start_date = datetime.now()
+        book.current_tx_id = text.id
+        self.session.add(text)
+        self.session.add(book)
+        self.session.commit()
+
     def mark_page_read(self, bookid, pagenum, mark_rest_as_known):
         "Mark page as read, record stats, rest as known."
         br = BookRepository(self.session)

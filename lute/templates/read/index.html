@@ -293,6 +293,8 @@
     };
   };
 
+  var luteStartReadingDone = false;
+
   $(document).ready(function () {
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
       if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
@@ -330,9 +332,18 @@
       $('div.audio-player-container').show();
     }
 
-    window.addEventListener("beforeunload", function() {
-      LutePopups.close_all_popups();
-    });
+  window.addEventListener("beforeunload", function() {
+    if (!luteStartReadingDone) {
+      var bookid = $('#book_id').val();
+      var pageNum = $('#page_num').val();
+      if (bookid && pageNum) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/read/update_start_date/' + bookid + '/' + pageNum, false);
+        try { xhr.send(); } catch(e) {}
+      }
+    }
+    LutePopups.close_all_popups();
+  });
 
     goto_relative_page(0, true);
   });
@@ -470,6 +481,7 @@
    * to the ajax "success" function worked.  ???
    */
   function goto_relative_page(p, initial_page_load = false) {
+    luteStartReadingDone = false;
     reset_cursor();
     const bookid = $('#book_id').val();
     const actualPage = getActualPage(p);
@@ -485,6 +497,7 @@
     $.get(
       url,
       function(data, status) {
+        luteStartReadingDone = true;
         $('#thetext').html(data);
         add_status_classes();
         start_hover_mode();
