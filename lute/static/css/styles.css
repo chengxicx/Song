@@ -554,6 +554,18 @@ span.hamburger {
     border-color: #40916c;
 }
 
+.tts-player-active #tts-player-toggle::after,
+.tts-sentence-buttons-active #tts-sentence-buttons-toggle::after {
+    transform: translate(100%, 0);
+    background-color: #ffffff;
+}
+
+.tts-player-active #tts-player-toggle,
+.tts-sentence-buttons-active #tts-sentence-buttons-toggle {
+    background-color: #40916c;
+    border-color: #40916c;
+}
+
 #tap_sets_status-container label,
 #tap_sets_status-container input {
   display: inline-block;
