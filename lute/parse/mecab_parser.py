@@ -201,18 +201,27 @@ class JapaneseParser(AbstractParser):
                     lines.append(n.feature)
 
         lines = [
-            n.strip().split("\t") for n in lines if n is not None and n.strip() != ""
+            n.strip().split("\t", 2)
+            for n in lines
+            if n is not None and n.strip() != ""
         ]
 
         # Production bug: JP parsing with MeCab would sometimes return a line
         # "0\t4" before an end-of-paragraph "EOP\t3\t7", reasons unknown.  These
         # "0\t4" tokens don't have any function, and cause problems in subsequent
         # steps of the processing in line_to_token(), so just remove them.
-        lines = [n for n in lines if len(n) == 3]
+        #
+        # Note: we split with maxsplit=2 (i.e. take only the first two tabs)
+        # because the third field (%h = hinshi id in IPADIC, but a longer
+        # comma-separated string in Unidic) may itself contain tabs or just
+        # be longer than one field.  We only need %m (surface) and %t
+        # (char_type); the third value is only used for the EOP sentinel
+        # check, where an exact match of "7" is expected.
+        lines = [n for n in lines if len(n) >= 3]
 
         def line_to_token(lin):
             "Convert parsed line to a ParsedToken."
-            term, node_type, third = lin
+            term, node_type, third = lin[0], lin[1], lin[2] if len(lin) > 2 else ""
             is_eos = term in language.regexp_split_sentences
             if term == "EOP" and third == "7":
                 term = "¶"
@@ -257,11 +266,13 @@ class JapaneseParser(AbstractParser):
 
         readings = []
         if dict_type == "unidic":
-            # Unidic: reading (読み) is at feature field index 8.
+            # Unidic: "語彙素読み" (lemma reading, corresponds to
+            # IPADIC's "読み" / -O yomi output) is at feature field
+            # index 6.
             #
             # We use the default MeCab output format (surface TAB
-            # comma-separated-features) instead of %f[8], because
-            # %f[8] raises "index out of range" for symbol/unknown
+            # comma-separated-features) instead of %f[6], because
+            # %f[N] raises "index out of range" for symbol/unknown
             # tokens that don't have a full feature set (e.g.
             # zero-width space).  Parsing the default output is
             # more robust: we can safely check the field count and
@@ -278,7 +289,7 @@ class JapaneseParser(AbstractParser):
                     continue
                 surface = parts[0]
                 features = parts[1].split(",")
-                reading = features[8].strip() if len(features) > 8 else ""
+                reading = features[6].strip() if len(features) > 6 else ""
                 if reading and reading != "*":
                     readings.append(reading)
                 else:
