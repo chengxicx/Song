@@ -176,3 +176,38 @@ def test_get_reading_with_unidic_returns_reading(app_context):
     # the actual dictionary installed.
     result = p.get_reading("強い")
     assert result is None or isinstance(result, str)
+
+
+def test_get_lemma_basic_form_returns_none(app_context):
+    "For words already in dictionary form, get_lemma returns None."
+    p = JapaneseParser()
+    # 強い is already the basic/dictionary form.
+    result = p.get_lemma("強い")
+    assert result is None
+
+
+def test_get_lemma_inflected_form_returns_base(app_context):
+    "For inflected verbs/adjectives, get_lemma returns the base form."
+    p = JapaneseParser()
+    # 広がっ (te-form) -> 広がる (base form)
+    result = p.get_lemma("広がっ")
+    assert result == "広がる"
+
+
+def test_get_lemma_hiragana_returns_none(app_context):
+    "For all-hiragana text, get_lemma returns None."
+    p = JapaneseParser()
+    result = p.get_lemma("わたし")
+    assert result is None
+
+
+def test_get_lemma_unidic_mode_does_not_crash(app_context):
+    "When set to unidic mode, get_lemma doesn't crash."
+    current_settings["japanese_dict"] = "unidic"
+    JapaneseParser._dict_type = None
+    JapaneseParser._old_dict_setting = None
+    p = JapaneseParser()
+    # With IPADIC this may return None or a wrong value, but
+    # should not throw an exception.
+    result = p.get_lemma("広がっ")
+    assert result is None or isinstance(result, str)

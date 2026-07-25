@@ -309,3 +309,44 @@ class JapaneseParser(AbstractParser):
         if jp_reading_setting == "alphabet":
             return jaconv.kata2alphabet(ret)
         raise RuntimeError(f"Bad reading type {jp_reading_setting}")
+
+    def get_lemma(self, text: str):
+        """
+        Get the dictionary/lemma form of the given text.
+
+        For Japanese, returns the basic form (辞書形) of verbs,
+        adjectives, and other inflected words.  Returns None if
+        the text is already in its base form or can't be determined.
+        """
+        if self._string_is_hiragana(text):
+            return None
+
+        dict_type = self._detect_dict_type()
+
+        # Lemma field position differs between dictionaries:
+        #   IPADIC: index 6 (基本形)
+        #   Unidic: index 7 (語彙素 / lemma)
+        lemma_index = 7 if dict_type == "unidic" else 6
+
+        lemmas = []
+        with MeCab() as nm:
+            raw = nm.parse(text)
+        for line in raw.split("\n"):
+            line = line.strip()
+            if not line or line == "EOS":
+                continue
+            parts = line.split("\t", 1)
+            if len(parts) < 2:
+                continue
+            surface = parts[0]
+            features = parts[1].split(",")
+            lemma = features[lemma_index].strip() if len(features) > lemma_index else ""
+            if lemma and lemma != "*":
+                lemmas.append(lemma)
+            else:
+                lemmas.append(surface)
+
+        ret = "".join(lemmas).strip()
+        if ret in ("", text):
+            return None
+        return ret

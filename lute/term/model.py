@@ -187,6 +187,10 @@ class Repository:
         t.romanization = spec.language.parser.get_reading(text)
         t.original_text = spec.text
 
+        lemma = spec.language.parser.get_lemma(text)
+        if lemma and lemma != spec.text:
+            t.parents = [lemma]
+
         # TODO verify_identity_map_comment
         # Adding the term to the map, even though it's new.
         self._add_to_identity_map(t)

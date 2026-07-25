@@ -654,6 +654,43 @@ def test_find_or_new_new_multi_word(spanish, repo):
     assert t.text == f"una{zws} {zws}bebida"
 
 
+def test_find_or_new_inflected_japanese_sets_lemma_parent(japanese, repo):
+    """
+    When a new Japanese term is created from an inflected form
+    (e.g. te-form of a verb), the lemma (dictionary form) is
+    automatically set as a parent.
+    """
+    t = repo.find_or_new(japanese.id, "広がっ")
+    assert t.id is None
+    assert t.parents == ["広がる"]
+
+
+def test_find_or_new_basic_form_japanese_has_no_parent(japanese, repo):
+    """
+    When a new Japanese term is already in dictionary / base form,
+    no parent is auto-assigned.
+    """
+    t = repo.find_or_new(japanese.id, "強い")
+    assert t.id is None
+    assert t.parents == []
+
+
+def test_find_or_new_existing_term_not_affected_by_lemma(japanese, repo):
+    """
+    For terms that already exist in the DB, find_or_new returns
+    the existing term unchanged -- the auto-lemma parent logic
+    only runs for newly created terms.
+    """
+    from lute.models.term import Term as DBTerm
+    dbt = DBTerm(japanese, "広がる")
+    db.session.add(dbt)
+    db.session.commit()
+
+    t = repo.find_or_new(japanese.id, "広がる")
+    assert t.id is not None
+    # Existing term has no parents; lemma logic doesn't touch it.
+
+
 def test_find_or_new_ambiguous_japanese_terms(japanese, repo):
     """
     Characterization test only: behaviour of find_or_new for

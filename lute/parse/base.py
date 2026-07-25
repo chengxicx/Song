@@ -113,6 +113,13 @@ class AbstractParser(ABC):
         """
         return None
 
+    def get_lemma(self, text: str):  # pylint: disable=unused-argument
+        """
+        Get the dictionary/lemma form of the given text.
+        For most languages, this returns the text as-is.
+        """
+        return None
+
     def get_lowercase(self, text: str):
         """
         Return the lowcase text.
