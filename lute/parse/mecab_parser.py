@@ -255,12 +255,16 @@ class JapaneseParser(AbstractParser):
 
         readings = []
         if dict_type == "unidic":
-            # Unidic: "語彙素読み" (lemma reading, corresponds to
-            # IPADIC's "読み" / -O yomi output) is at feature field
-            # index 6.
+            # Unidic: the reading of the surface form (i.e. how the
+            # token is actually pronounced in its conjugated form,
+            # equivalent to IPADIC's "読み" / -O yomi output) is at
+            # feature field index 9 (仮名形 / kana form of the
+            # surface).  Field 6 is "語彙素読み" (lemma reading),
+            # which gives the dictionary-form reading (e.g. ヒロガル
+            # for 広がっ), which is NOT what we want.
             #
             # We use the default MeCab output format (surface TAB
-            # comma-separated-features) instead of %f[6], because
+            # comma-separated-features) instead of %f[9], because
             # %f[N] raises "index out of range" for symbol/unknown
             # tokens that don't have a full feature set (e.g.
             # zero-width space).  Parsing the default output is
@@ -278,7 +282,7 @@ class JapaneseParser(AbstractParser):
                     continue
                 surface = parts[0]
                 features = parts[1].split(",")
-                reading = features[6].strip() if len(features) > 6 else ""
+                reading = features[9].strip() if len(features) > 9 else ""
                 if reading and reading != "*":
                     readings.append(reading)
                 else:
