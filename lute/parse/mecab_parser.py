@@ -31,10 +31,20 @@ class JapaneseParser(AbstractParser):
     be able to find mecab automatically; if it can't,
     you may need to set the MECAB_PATH env variable,
     managed by UserSettingRepository.set_value("mecab_path", p)
+
+    Supports two MeCab dictionary types:
+    - IPADIC (default, older, widely used)
+    - Unidic (newer, more accurate for modern Japanese)
+
+    The dictionary type is detected automatically by probing
+    the format of a known word, but can also be set explicitly
+    via the "japanese_dict" user setting.
     """
 
     _is_supported = None
     _old_mecab_path = None
+    _dict_type = None
+    _old_dict_setting = None
 
     @classmethod
     def is_supported(cls):
@@ -99,7 +109,75 @@ class JapaneseParser(AbstractParser):
 
         JapaneseParser._old_mecab_path = mecab_path
         JapaneseParser._is_supported = mecab_works
+
+        # Reset cached dict type so it will be re-detected with
+        # the (possibly changed) mecab binary.
+        JapaneseParser._dict_type = None
+        JapaneseParser._old_dict_setting = None
+
         return mecab_works
+
+    @classmethod
+    def _detect_dict_type(cls):
+        """
+        Detect which MeCab dictionary is currently in use.
+
+        Strategy: parse a known word ("強い") with a custom node
+        format that tries to read the Unidic "読み" field at
+        feature position 8.  If that field is populated with a
+        valid katakana reading, it's Unidic; otherwise we fall
+        back to IPADIC.
+
+        Returns "unidic" or "ipadic".
+        """
+        # Cache key: the user's dict setting + mecab path.
+        dict_setting = current_settings.get("japanese_dict", "auto") or "auto"
+        dict_setting = dict_setting.strip().lower()
+        mecab_path = current_settings.get("mecab_path", "") or ""
+        cache_key = f"{dict_setting}|{mecab_path}"
+
+        if (
+            JapaneseParser._dict_type is not None
+            and JapaneseParser._old_dict_setting == cache_key
+        ):
+            return JapaneseParser._dict_type
+
+        # If user set it explicitly, trust them.
+        if dict_setting == "ipadic":
+            JapaneseParser._dict_type = "ipadic"
+            JapaneseParser._old_dict_setting = cache_key
+            return "ipadic"
+        if dict_setting == "unidic":
+            JapaneseParser._dict_type = "unidic"
+            JapaneseParser._old_dict_setting = cache_key
+            return "unidic"
+
+        # Auto-detect from the dictionary file path.
+        # Unidic dictionaries are always installed under a path
+        # containing "unidic" (e.g. mecab-unidic, unidic-ipadic),
+        # while IPADIC paths contain "ipadic".  This is far more
+        # reliable than probing feature field positions, because
+        # both dictionaries have a "読み" field at position 8, so
+        # %f[8] alone can't tell them apart.
+        detected = "ipadic"
+        try:
+            with MeCab() as nm:
+                for d in nm.dicts:
+                    path = (d.filepath or "").lower()
+                    if "unidic" in path:
+                        detected = "unidic"
+                        break
+                    if "ipadic" in path:
+                        detected = "ipadic"
+                        break
+        except:  # pylint: disable=bare-except
+            # If anything goes wrong during detection, stay with
+            # the safe default (ipadic).
+            detected = "ipadic"
+
+        JapaneseParser._dict_type = detected
+        JapaneseParser._old_dict_setting = cache_key
+        return detected
 
     @classmethod
     def name(cls):
@@ -175,11 +253,45 @@ class JapaneseParser(AbstractParser):
             # Don't set reading if nothing specified.
             return None
 
-        flags = r"-O yomi"
+        dict_type = self._detect_dict_type()
+
         readings = []
-        with MeCab(flags) as nm:
-            for n in nm.parse(text, as_nodes=True):
-                readings.append(n.feature)
+        if dict_type == "unidic":
+            # Unidic: reading (読み) is at feature field index 8.
+            #
+            # We use the default MeCab output format (surface TAB
+            # comma-separated-features) instead of %f[8], because
+            # %f[8] raises "index out of range" for symbol/unknown
+            # tokens that don't have a full feature set (e.g.
+            # zero-width space).  Parsing the default output is
+            # more robust: we can safely check the field count and
+            # fall back to the surface form for tokens without a
+            # readable reading.
+            with MeCab() as nm:
+                raw = nm.parse(text)
+            for line in raw.split("\n"):
+                line = line.strip()
+                if not line or line == "EOS":
+                    continue
+                parts = line.split("\t", 1)
+                if len(parts) < 2:
+                    continue
+                surface = parts[0]
+                features = parts[1].split(",")
+                reading = features[8].strip() if len(features) > 8 else ""
+                if reading and reading != "*":
+                    readings.append(reading)
+                else:
+                    # Match IPADIC -O yomi behaviour: non-reading
+                    # tokens (symbols, punctuation) pass through as
+                    # their surface form.
+                    readings.append(surface)
+        else:
+            # IPADIC: use the built-in "yomi" output format.
+            flags = r"-O yomi"
+            with MeCab(flags) as nm:
+                for n in nm.parse(text, as_nodes=True):
+                    readings.append(n.feature)
         readings = [r.strip() for r in readings if r is not None and r.strip() != ""]
 
         ret = "".join(readings).strip()

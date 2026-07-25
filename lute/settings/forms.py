@@ -47,6 +47,12 @@ class UserSettingsForm(FlaskForm):
     term_popup_show_components = BooleanField("Show component terms")
 
     mecab_path = StringField("MECAB_PATH environment variable")
+    dict_choices = [
+        ("auto", "Auto-detect"),
+        ("ipadic", "IPADIC"),
+        ("unidic", "Unidic"),
+    ]
+    japanese_dict = SelectField("MeCab dictionary", choices=dict_choices)
     reading_choices = [
         ("katakana", "Katakana"),
         ("hiragana", "Hiragana"),
