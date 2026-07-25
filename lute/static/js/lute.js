@@ -239,8 +239,20 @@ function _hide_term_edit_form() {
 function show_multiword_term_edit_form(selected) {
   if (selected.length == 0)
     return;
+  // Zero-width space: matches the separator Lute uses internally
+  // (see lute.models.term.Term) to mark token boundaries in
+  // multiword terms.
+  const ZWS = '\u200B';
   const textparts = selected.toArray().map((el) => $(el).text());
-  const text = textparts.join('').trim();
+  // Join with ZWS, not '', so the exact tokens the parser already
+  // produced for this sentence (i.e., the ones currently rendered
+  // on screen) are preserved and sent to the backend as-is, instead
+  // of being collapsed into a flat string that then has to be
+  // re-parsed out of context. Context-sensitive parsers (e.g. MeCab
+  // for Japanese) can tokenize an isolated substring differently
+  // than they tokenize it within its original sentence, which was
+  // causing newly-created multiword terms to not match when reading.
+  const text = textparts.join(ZWS).trim();
   if (text == "")
     return;
   const lid = parseInt(selected.eq(0).data('lang-id'));
