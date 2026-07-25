@@ -194,6 +194,20 @@ def test_get_lemma_inflected_form_returns_base(app_context):
     assert result == "広がる"
 
 
+def test_get_lemma_multi_token_returns_first_verb_base(app_context):
+    "For multi-token inflected verbs, get_lemma returns only the first verb's base form."
+    p = JapaneseParser()
+    result = p.get_lemma("広がっている")
+    assert result == "広がる"
+
+
+def test_get_lemma_auxiliary_verb_only_returns_none(app_context):
+    "For text with only auxiliary verbs, get_lemma returns None."
+    p = JapaneseParser()
+    result = p.get_lemma("ました")
+    assert result is None
+
+
 def test_get_lemma_hiragana_returns_none(app_context):
     "For all-hiragana text, get_lemma returns None."
     p = JapaneseParser()
