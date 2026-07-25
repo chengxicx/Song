@@ -187,55 +187,44 @@ class JapaneseParser(AbstractParser):
         "Parse the string using MeCab."
         text = re.sub(r"[ \t]+", " ", text).strip()
 
-        lines = []
+        tokens = []
 
-        # If the string contains a "\n", MeCab appears to silently
-        # remove it.  Splitting it works (ref test_JapaneseParser).
-        # Flags: ref https://github.com/buruzaemon/natto-py:
-        #    -F = node format
-        #    -U = unknown format
-        #    -E = EOP format
-        with MeCab(r"-F %m\t%t\t%h\n -U %m\t%t\t%h\n -E EOP\t3\t7\n") as nm:
+        # Use node attributes directly (surface, char_type, posid)
+        # instead of a custom format string, because the format
+        # string fields (%t, %h) behave differently between IPADIC
+        # and Unidic -- Unidic %h expands to the full feature string
+        # rather than a single numeric ID, which breaks tab parsing.
+        #
+        # Node attribute reference:
+        #   n.surface  = surface form (表層系)
+        #   n.char_type = character type (文字種別, 2=kanji etc.)
+        #   n.stat     = node status (0=normal, 1=unknown, 2=BOS/EOS)
+        #   n.posid    = part-of-speech id
+        #
+        # We still need an EOP (end-of-paragraph) sentinel, so we
+        # append a fake EOP token after each paragraph.
+        with MeCab() as nm:
             for para in text.split("\n"):
                 for n in nm.parse(para, as_nodes=True):
-                    lines.append(n.feature)
+                    # Skip BOS/EOS nodes
+                    if n.stat == 2 or n.surface is None or n.surface == "":
+                        continue
+                    term = n.surface
+                    node_type = str(n.char_type)
+                    is_eos = term in language.regexp_split_sentences
+                    # Node type values ref
+                    # https://github.com/buruzaemon/natto-py/wiki/
+                    #    Node-Parsing-char_type
+                    #
+                    # The repeat character is sometimes returned as a
+                    # "symbol" (node type = 3), so handle that
+                    # specifically.
+                    is_word = node_type in "2678" or term == "々"
+                    tokens.append(ParsedToken(term, is_word, is_eos))
+                # End-of-paragraph sentinel, matches the old
+                # "EOP\t3\t7" format where third==7 marks it.
+                tokens.append(ParsedToken("¶", False, True))
 
-        lines = [
-            n.strip().split("\t", 2)
-            for n in lines
-            if n is not None and n.strip() != ""
-        ]
-
-        # Production bug: JP parsing with MeCab would sometimes return a line
-        # "0\t4" before an end-of-paragraph "EOP\t3\t7", reasons unknown.  These
-        # "0\t4" tokens don't have any function, and cause problems in subsequent
-        # steps of the processing in line_to_token(), so just remove them.
-        #
-        # Note: we split with maxsplit=2 (i.e. take only the first two tabs)
-        # because the third field (%h = hinshi id in IPADIC, but a longer
-        # comma-separated string in Unidic) may itself contain tabs or just
-        # be longer than one field.  We only need %m (surface) and %t
-        # (char_type); the third value is only used for the EOP sentinel
-        # check, where an exact match of "7" is expected.
-        lines = [n for n in lines if len(n) >= 3]
-
-        def line_to_token(lin):
-            "Convert parsed line to a ParsedToken."
-            term, node_type, third = lin[0], lin[1], lin[2] if len(lin) > 2 else ""
-            is_eos = term in language.regexp_split_sentences
-            if term == "EOP" and third == "7":
-                term = "¶"
-
-            # Node type values ref
-            # https://github.com/buruzaemon/natto-py/wiki/
-            #    Node-Parsing-char_type
-            #
-            # The repeat character is sometimes returned as a "symbol"
-            # (node type = 3), so handle that specifically.
-            is_word = node_type in "2678" or term == "々"
-            return ParsedToken(term, is_word, is_eos or term == "¶")
-
-        tokens = [line_to_token(lin) for lin in lines]
         return tokens
 
     # Hiragana is Unicode code block U+3040 - U+309F
