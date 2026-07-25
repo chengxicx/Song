@@ -182,6 +182,29 @@
       </td>
     </tr>
     <tr>
+      <td>
+        {{ form.japanese_dict.label }}
+        <img
+          id="about_japanese_dict" style="margin-right:10px;"
+          src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+          title="Click for details"
+          onclick="$('#japanese_dict_help').toggle();"
+          />
+        <blockquote id="japanese_dict_help" style="width:60%; display: none;">
+          <p>Lute supports two MeCab dictionary types:
+            <b>IPADIC</b> (older, widely used, default) and
+            <b>Unidic</b> (newer, more accurate for modern Japanese).</p>
+          <p>Set to &quot;Auto-detect&quot; and Lute will figure it out
+            automatically based on your installed MeCab dictionary.
+            Only set it explicitly if auto-detection is wrong.</p>
+          <p>Changing this only affects how <i>readings</i> (pronunciation)
+            are extracted.  Tokenization always works regardless of
+            dictionary type.</p>
+        </blockquote>
+      </td>
+      <td>{{ form.japanese_dict }}</td>
+    </tr>
+    <tr>
       <td>{{ form.japanese_reading.label }}</td>
       <td>{{ form.japanese_reading }}</td>
     </tr>
