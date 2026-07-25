@@ -1,4 +1,4 @@
-# Lute v3 speak
+# Lute v3 listen
 
 # 1.TTS Speech Synthesis & Automatic Translation
  <img width="1230" height="884" alt="image" src="https://github.com/user-attachments/assets/61e72b5e-8a03-4173-809c-1ff736d2805c" />
