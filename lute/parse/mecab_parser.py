@@ -314,21 +314,22 @@ class JapaneseParser(AbstractParser):
         """
         Get the dictionary/lemma form of the given text.
 
-        For Japanese, returns the basic form (辞書形) of verbs,
-        adjectives, and other inflected words.  Returns None if
-        the text is already in its base form or can't be determined.
+        For Japanese, returns the basic form (辞書形) of the first
+        content word (verb, adjective) in the text.  Skips auxiliary
+        verbs, particles, and other functional words.  Returns None
+        if no inflectable content word is found or the text is
+        already in its base form.
         """
         if self._string_is_hiragana(text):
             return None
 
         dict_type = self._detect_dict_type()
 
-        # Lemma field position differs between dictionaries:
-        #   IPADIC: index 6 (基本形)
-        #   Unidic: index 7 (語彙素 / lemma)
         lemma_index = 7 if dict_type == "unidic" else 6
 
-        lemmas = []
+        content_pos = {"動詞", "形容詞"}
+
+        lemma = None
         with MeCab() as nm:
             raw = nm.parse(text)
         for line in raw.split("\n"):
@@ -338,15 +339,15 @@ class JapaneseParser(AbstractParser):
             parts = line.split("\t", 1)
             if len(parts) < 2:
                 continue
-            surface = parts[0]
             features = parts[1].split(",")
-            lemma = features[lemma_index].strip() if len(features) > lemma_index else ""
-            if lemma and lemma != "*":
-                lemmas.append(lemma)
-            else:
-                lemmas.append(surface)
+            pos = features[0].strip() if len(features) > 0 else ""
+            if pos in content_pos:
+                if len(features) > lemma_index:
+                    candidate = features[lemma_index].strip()
+                    if candidate and candidate != "*":
+                        lemma = candidate
+                        break
 
-        ret = "".join(lemmas).strip()
-        if ret in ("", text):
+        if lemma in (None, "", text):
             return None
-        return ret
+        return lemma
