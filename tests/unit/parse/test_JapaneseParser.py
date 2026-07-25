@@ -160,11 +160,11 @@ def test_dict_type_cache_invalidates_on_setting_change(app_context):
 
 def test_get_reading_with_unidic_returns_reading(app_context):
     """
-    When set to unidic mode, get_reading uses %f[8] to extract
-    the reading.  With an actual Unidic install this would be the
-    proper reading; with IPADIC %f[8] is not the right field, so
-    we just verify the code path doesn't crash and returns None
-    or a string.
+    When set to unidic mode, get_reading uses feature field index 9
+    (仮名形 / kana form of the surface) to extract the reading.
+    With an actual Unidic install this would be the proper reading;
+    with IPADIC field 9 is not the right field, so we just verify
+    the code path doesn't crash and returns None or a string.
     """
     current_settings["japanese_dict"] = "unidic"
     current_settings["japanese_reading"] = "hiragana"
