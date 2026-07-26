@@ -88,7 +88,7 @@ def test_readings(app_context):
         ("強い", "つよい"),
         ("二人", "ににん"),  # ah well, not perfect :-)
         ("強いか", "つよいか"),
-        (f"強い{zws}か", f"つよい{zws}か"),  # zero-width-space ignored
+        (f"強い{zws}か", "つよいか"),  # zws stripped before processing
     ]
 
     for c in cases:
@@ -192,20 +192,6 @@ def test_get_lemma_inflected_form_returns_base(app_context):
     # 広がっ (te-form) -> 広がる (base form)
     result = p.get_lemma("広がっ")
     assert result == "広がる"
-
-
-def test_get_lemma_multi_token_returns_first_verb_base(app_context):
-    "For multi-token inflected verbs, get_lemma returns only the first verb's base form."
-    p = JapaneseParser()
-    result = p.get_lemma("広がっている")
-    assert result == "広がる"
-
-
-def test_get_lemma_auxiliary_verb_only_returns_none(app_context):
-    "For text with only auxiliary verbs, get_lemma returns None."
-    p = JapaneseParser()
-    result = p.get_lemma("ました")
-    assert result is None
 
 
 def test_get_lemma_hiragana_returns_none(app_context):

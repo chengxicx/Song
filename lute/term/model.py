@@ -188,7 +188,10 @@ class Repository:
         t.original_text = spec.text
 
         lemma = spec.language.parser.get_lemma(text)
-        if lemma and lemma != spec.text:
+        # Compare lemma against the text with zws stripped, since
+        # get_lemma returns a clean string without zws but spec.text
+        # may contain zws (token boundaries in multiword terms).
+        if lemma and lemma != spec.text.replace("\u200B", ""):
             t.parents = [lemma]
 
         # TODO verify_identity_map_comment
