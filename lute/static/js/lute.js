@@ -243,7 +243,16 @@ function show_multiword_term_edit_form(selected) {
   // (see lute.models.term.Term) to mark token boundaries in
   // multiword terms.
   const ZWS = '\u200B';
-  const textparts = selected.toArray().map((el) => $(el).text());
+  // Use data('text') instead of text() to preserve the internal ZWS
+  // boundaries of multiword token spans. Each span's displayed text
+  // has ZWS stripped (see TextItem.html_display_text), but data-text
+  // holds the raw text with ZWS intact. Using text() would lose those
+  // internal boundaries, causing the created term's token_count to
+  // not match the actual parsed tokens on the page.
+  // Example: "すれば" displayed on screen may actually be stored as
+  // "すれ\u200Bば" (2 tokens). Using text() gives "すれば" (1 token),
+  // but data('text') gives "すれ\u200Bば" (2 tokens, correct).
+  const textparts = selected.toArray().map((el) => $(el).data('text') || $(el).text());
   // Join with ZWS, not '', so the exact tokens the parser already
   // produced for this sentence (i.e., the ones currently rendered
   // on screen) are preserved and sent to the backend as-is, instead
