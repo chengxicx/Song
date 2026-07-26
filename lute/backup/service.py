@@ -77,6 +77,20 @@ class Service:
     def __init__(self, session):
         self.session = session
 
+    def create_pre_restore_backup(self, app_config, settings):
+        """
+        Create a pre-restore backup for rollback purposes.
+
+        This is a proper backup stored in the backup directory
+        (unlike the safety copy which is just a plain db file next
+        to the current db). This backup shows up in the backup list
+        and can be used to roll back if the restore causes problems.
+
+        Returns the filename of the created backup.
+        """
+        suffix = "pre_restore_" + datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        return self.create_backup(app_config, settings, is_manual=False, suffix=suffix)
+
     def create_backup(self, app_config, settings, is_manual=False, suffix=None):
         """
         Create backup using current app config, settings.

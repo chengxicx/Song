@@ -19,7 +19,7 @@
       <th>Backup File</th>
       <th>Size</th>
       <th>Last Modified</th>
-      <th></th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -28,7 +28,16 @@
       <td>{{ backup.name }}</td>
       <td>{{ backup.size }}</td>
       <td>{{ backup.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-      <td><a href="/backup/download/{{ backup.name }}">Download</a></td>
+      <td>
+        <a href="/backup/download/{{ backup.name }}">Download</a>
+        &nbsp;|&nbsp;
+        <form method="POST" action="{{ url_for('backup.restore_backup_from_file', filename=backup.name) }}"
+              style="display: inline;"
+              onsubmit="return confirm('Are you sure you want to restore from this backup?\n\nYour current database will be replaced.\nA pre-restore backup will be created first for rollback purposes.');">
+          <button type="submit" class="btn btn-sm btn-warning"
+                  style="padding: 2px 8px; font-size: 12px;">Restore</button>
+        </form>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
@@ -38,16 +47,16 @@
 
 <br />
 
-<h3>Restore from backup</h3>
+<h3>Restore from uploaded file</h3>
 <p style="color: #dc3545;"><strong>Warning:</strong> Restoring a backup will replace your current database.
-A safety copy of your current database will be created before restoring.</p>
+A pre-restore backup will be created first for rollback purposes, and a safety copy will also be kept.</p>
 
 <form method="POST" action="{{ url_for('backup.restore_backup') }}"
       enctype="multipart/form-data"
-      onsubmit="return confirm('Are you sure you want to restore from this backup?\nYour current database will be replaced (a safety copy will be kept).');">
+      onsubmit="return confirm('Are you sure you want to restore from this backup?\n\nYour current database will be replaced.\nA pre-restore backup will be created first for rollback purposes.');">
   <input type="file" name="backup_file" required />
   <br /><br />
-  <button type="submit" class="btn btn-primary">Restore Backup</button>
+  <button type="submit" class="btn btn-primary">Restore from file</button>
 </form>
 
 <br />

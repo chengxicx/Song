@@ -104,6 +104,30 @@ def handle_skip_this_backup():
     return redirect("/", 302)
 
 
+def _do_restore(filepath):
+    """
+    Common restore logic used by both upload-restore and list-restore.
+    """
+    c = current_app.env_config
+    settings = _get_settings()
+    service = Service(db.session)
+
+    pre_restore_backup = service.create_pre_restore_backup(c, settings)
+
+    safety_copy = service.restore_backup(c, filepath)
+
+    flash(
+        f"Backup restored successfully! "
+        f"A pre-restore backup was created: {pre_restore_backup} "
+        f"(and a safety copy of your previous database was saved as: "
+        f"{os.path.basename(safety_copy)}). "
+        f"Note: The restored database has its own backup settings. "
+        f"Please check Settings → Backup directory to make sure it's correct.",
+        "notice",
+    )
+    return redirect("/")
+
+
 @bp.route("/restore", methods=["POST"])
 def restore_backup():
     """
@@ -125,27 +149,30 @@ def restore_backup():
     filepath = os.path.join(temp_dir, filename)
     f.save(filepath)
 
-    c = current_app.env_config
-    service = Service(db.session)
     try:
-        safety_copy = service.restore_backup(c, filepath)
-
-        # Database connections were already closed and engine disposed
-        # inside restore_backup(). We do NOT use db.session after this
-        # point. The next request will automatically create new connections.
-
-        flash(
-            f"Backup restored successfully! A safety copy of your previous "
-            f"database was saved as: {safety_copy}. "
-            f"Note: The restored database has its own backup settings. "
-            f"Please check Settings → Backup directory to make sure it's correct.",
-            "notice",
-        )
-        return redirect("/")
-    except Exception as e:  # pylint: disable=broad-exception-caught
+        return _do_restore(filepath)
+    except Exception as e:  # pylint: disable=broad-except-caught
         flash(f"Restore failed: {str(e)}", "error")
         return redirect("/backup/index")
     finally:
         # Clean up temp file
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
+
+
+@bp.route("/restore_file/<filename>", methods=["POST"])
+def restore_backup_from_file(filename):
+    """
+    Restore from a backup file in the backup directory.
+    """
+    settings = _get_settings()
+    filepath = os.path.join(settings.backup_dir, filename)
+    if not os.path.exists(filepath):
+        flash(f"Backup file not found: {filename}", "error")
+        return redirect("/backup/index")
+
+    try:
+        return _do_restore(filepath)
+    except Exception as e:  # pylint: disable=broad-except-caught
+        flash(f"Restore failed: {str(e)}", "error")
+        return redirect("/backup/index")
