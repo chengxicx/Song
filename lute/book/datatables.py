@@ -23,6 +23,7 @@ def get_data_tables_list(parameters, is_archived, session):
         c.distinctterms as DistinctCount,
         c.distinctunknowns as UnknownCount,
         c.unknownpercent as UnknownPercent,
+        c.new_word_percent as NewWordPercent,
         c.status_distribution as StatusDistribution,
         case when completed_books.BkID is null then 0 else 1 end as IsCompleted
 
@@ -83,6 +84,16 @@ def get_data_tables_list(parameters, is_archived, session):
             f"where t2.T2Text = '{tag}'"
             f")"
         )
+
+    new_word_filter = parameters.get("filtNewWord")
+    if new_word_filter and new_word_filter.strip():
+        level = new_word_filter.strip().upper()
+        if level == 'EASY':
+            base_sql += " and (c.new_word_percent is null or c.new_word_percent < 10)"
+        elif level == 'CHAL':
+            base_sql += " and c.new_word_percent >= 10 and c.new_word_percent <= 20"
+        elif level == 'HARD':
+            base_sql += " and c.new_word_percent > 20"
 
     connection = session.connection()
     return DataTablesSqliteQuery.get_data(base_sql, parameters, connection)
