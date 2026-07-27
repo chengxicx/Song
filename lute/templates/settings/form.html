@@ -47,16 +47,11 @@
         {{ form.current_theme.label }}
       </td>
       <td>
-        {{ form.current_theme }}
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>
-        <div id="theme-actions" style="display: flex; gap: 0.5rem; margin-top: 5px;">
-          <button type="button" class="btn" onclick="downloadTheme();">Download Theme</button>
-          <button type="button" class="btn" onclick="document.getElementById('theme_upload').click();">Upload Theme</button>
-          <button type="button" class="btn" onclick="deleteUploadedTheme();">Delete Uploaded</button>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          {{ form.current_theme }}
+          <button type="button" class="btn" onclick="downloadTheme();">Download</button>
+          <button type="button" class="btn" onclick="document.getElementById('theme_upload').click();">Upload</button>
+          <button type="button" class="btn" onclick="deleteUploadedTheme();">Delete</button>
           <input type="file" id="theme_upload" accept=".css" style="display: none;" onchange="handleThemeUpload(this);">
         </div>
         <div id="theme_action_result" style="margin-top: 5px; color: green;"></div>
