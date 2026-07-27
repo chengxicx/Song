@@ -168,7 +168,22 @@
       processing: true,
       serverSide: true,
       stateSave: true,
-      stateDuration: 0,  /* never expire saved state. */
+      stateDuration: 0,
+      stateSaveCallback: function(settings, data) {
+        data.version = 2;
+        localStorage.setItem('booklisting_datatables_state', JSON.stringify(data));
+      },
+      stateLoadCallback: function(settings) {
+        var saved = localStorage.getItem('booklisting_datatables_state');
+        if (saved) {
+          var data = JSON.parse(saved);
+          if (data.version !== 2) {
+            return null;
+          }
+          return data;
+        }
+        return null;
+      },
       search: { search: initial_search },
       columns: [
         { name: "BkTitle", title: "Title", width: "28%", data: "BkTitle", render: render_book_title },
@@ -511,6 +526,9 @@
   };
 
   let render_new_word = function(percent) {
+    if (percent == null || percent === undefined || percent === '') {
+      return `<div class="new-word-badge new-word-easy">EASY 0%</div>`;
+    }
     let level = 'EASY';
     let colorClass = 'new-word-easy';
     if (percent >= 10 && percent <= 20) {
