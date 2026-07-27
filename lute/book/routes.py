@@ -231,6 +231,7 @@ def table_stats(bookid):
         "distinctterms": stats.distinctterms,
         "distinctunknowns": stats.distinctunknowns,
         "unknownpercent": stats.unknownpercent,
+        "new_word_percent": stats.new_word_percent,
         "status_distribution": stats.status_distribution,
     }
     return jsonify(ret)

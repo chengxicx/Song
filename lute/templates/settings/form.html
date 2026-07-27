@@ -51,6 +51,18 @@
       </td>
     </tr>
     <tr>
+      <td></td>
+      <td>
+        <div id="theme-actions" style="display: flex; gap: 0.5rem; margin-top: 5px;">
+          <button type="button" class="btn" onclick="downloadTheme();">Download Theme</button>
+          <button type="button" class="btn" onclick="document.getElementById('theme_upload').click();">Upload Theme</button>
+          <button type="button" class="btn" onclick="deleteUploadedTheme();">Delete Uploaded</button>
+          <input type="file" id="theme_upload" accept=".css" style="display: none;" onchange="handleThemeUpload(this);">
+        </div>
+        <div id="theme_action_result" style="margin-top: 5px; color: green;"></div>
+      </td>
+    </tr>
+    <tr>
       <td>
         {{ form.custom_styles.label }}
         <img
@@ -236,6 +248,81 @@
 
 
 <script>
+  function downloadTheme() {
+    const themeSelect = document.getElementById('current_theme');
+    const themeName = themeSelect.value;
+    if (themeName === '-') {
+      alert('Please select a theme to download.');
+      return;
+    }
+    const url = '/theme/download/' + encodeURIComponent(themeName);
+    window.location.href = url;
+  }
+
+  function handleThemeUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('/theme/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      const resultEl = document.getElementById('theme_action_result');
+      if (data.success) {
+        resultEl.textContent = 'Theme uploaded successfully: ' + data.filename;
+        resultEl.style.color = 'green';
+        location.reload();
+      } else {
+        resultEl.textContent = 'Error: ' + data.error;
+        resultEl.style.color = 'red';
+      }
+    })
+    .catch(error => {
+      document.getElementById('theme_action_result').textContent = 'Upload failed: ' + error;
+      document.getElementById('theme_action_result').style.color = 'red';
+    });
+
+    input.value = '';
+  }
+
+  function deleteUploadedTheme() {
+    const themeSelect = document.getElementById('current_theme');
+    const themeName = themeSelect.value;
+    if (themeName === '-') {
+      alert('Please select a theme to delete.');
+      return;
+    }
+
+    if (!confirm('Are you sure you want to delete this theme?')) {
+      return;
+    }
+
+    fetch('/theme/delete/' + encodeURIComponent(themeName), {
+      method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+      const resultEl = document.getElementById('theme_action_result');
+      if (data.success) {
+        resultEl.textContent = 'Theme deleted successfully.';
+        resultEl.style.color = 'green';
+        location.reload();
+      } else {
+        resultEl.textContent = 'Error: ' + data.error + ' (Only user-uploaded themes can be deleted)';
+        resultEl.style.color = 'red';
+      }
+    })
+    .catch(error => {
+      document.getElementById('theme_action_result').textContent = 'Delete failed: ' + error;
+      document.getElementById('theme_action_result').style.color = 'red';
+    });
+  }
+
   function test_mecab_setup() {
     let mecab_path = $('#mecab_path').val()
 

@@ -230,6 +230,33 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     background-repeat: no-repeat;
 }
 
+.new-word-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.new-word-easy {
+    background-color: #72da88;
+    color: #1a5f2a;
+}
+
+.new-word-chal {
+    background-color: #ffd43b;
+    color: #7a6000;
+}
+
+.new-word-hard {
+    background-color: #ff6b6b;
+    color: #8b1a1a;
+}
+
 .book-action-dropdown {
     position: relative;
     display: inline-block;

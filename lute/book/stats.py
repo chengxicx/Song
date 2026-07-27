@@ -112,16 +112,23 @@ class Service:
         "Calc stats for the book using the status distribution."
         status_distribution = self.calc_status_distribution(book)
         unknowns = status_distribution[0]
+        new_words = unknowns + status_distribution[1]
         allunique = sum(status_distribution.values())
 
         percent = 0
         if allunique > 0:  # In case not parsed.
             percent = round(100.0 * unknowns / allunique)
 
+        new_word_percent = 0
+        if allunique > 0:
+            new_word_percent = round(100.0 * new_words / allunique)
+
         return {
             "allunique": allunique,
             "unknowns": unknowns,
+            "new_words": new_words,
             "percent": percent,
+            "new_word_percent": new_word_percent,
             "distribution": json.dumps(status_distribution),
         }
 
@@ -133,6 +140,7 @@ class Service:
         s.distinctterms = stats["allunique"]
         s.distinctunknowns = stats["unknowns"]
         s.unknownpercent = stats["percent"]
+        s.new_word_percent = stats["new_word_percent"]
         s.status_distribution = stats["distribution"]
         self.session.add(s)
         self.session.commit()
