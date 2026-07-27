@@ -462,27 +462,45 @@
 
   /* Ajax called from createdRow datatables hook. */
   let ajax_in_book_stats = function(row, data, dataIndex) {
-    var cell = $(row).find('.book-stats-ajax-cell');
-    var newWordCell = $(row).find('.new-word-ajax-cell');
-    cell.html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
-    newWordCell.html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
+    var table = book_listing_table;
+    var newWordCol = table.column('NewWord:name');
+    var statsCol = table.column('UnknownPercent:name');
+    
+    var newWordCellNode = newWordCol.visible() ? table.cell(dataIndex, newWordCol.index()).node() : null;
+    var statsCellNode = statsCol.visible() ? table.cell(dataIndex, statsCol.index()).node() : null;
+    
+    if (newWordCellNode) {
+      $(newWordCellNode).html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
+    }
+    if (statsCellNode) {
+      $(statsCellNode).html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
+    }
+    
     $.ajax({
       url: '/book/table_stats/' + data['BkID'],
       method: 'GET',
       success: function(response) {
-        cell.removeClass("refreshed");
-        newWordCell.removeClass("refreshed");
-        const result = JSON.parse(response.status_distribution);
-        const graph = render_stats_graph(result);
-        cell.html(graph);
-        const newWordHtml = render_new_word(response.new_word_percent);
-        newWordCell.html(newWordHtml);
+        if (statsCellNode) {
+          $(statsCellNode).removeClass("refreshed");
+          const result = JSON.parse(response.status_distribution);
+          const graph = render_stats_graph(result);
+          $(statsCellNode).html(graph);
+        }
+        if (newWordCellNode) {
+          $(newWordCellNode).removeClass("refreshed");
+          const newWordHtml = render_new_word(response.new_word_percent);
+          $(newWordCellNode).html(newWordHtml);
+        }
       },
       error: function() {
-        cell.text('Error loading data');
-        newWordCell.text('Error');
-        cell.removeClass("refreshed");
-        newWordCell.removeClass("refreshed");
+        if (statsCellNode) {
+          $(statsCellNode).text('Error loading data');
+          $(statsCellNode).removeClass("refreshed");
+        }
+        if (newWordCellNode) {
+          $(newWordCellNode).text('Error');
+          $(newWordCellNode).removeClass("refreshed");
+        }
       }
     });
   };
