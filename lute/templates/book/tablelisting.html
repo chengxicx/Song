@@ -222,7 +222,7 @@
         { name: "TagList", title: "Tags", width: "16%", data: "TagList", render: render_tag_list },
         { name: "WordCount", title: "Word count", width: "8%", data: "WordCount" },
         { name: "UnknownPercent", title: "Status", width: "12%", data: "UnknownPercent", searchable: false, render: render_book_stats_graph_placeholder },
-        { name: "NewWord", title: "New word", width: "12%", data: "NewWordPercent", searchable: false, orderable: true, render: render_new_word_placeholder },
+        { name: "NewWordPercent", title: "New word", width: "12%", data: "NewWordPercent", searchable: false, orderable: true, render: render_new_word_placeholder },
         { name: "LastOpenedDate", title: "Last read", width: "10%", data: "LastOpenedDate", searchable: false, render: render_last_opened_date },
         { name: "Actions", title: "Actions", width: "6%", data: null, searchable: false, orderable: false, render: render_book_actions },
       ],
@@ -519,7 +519,7 @@
     var table = book_listing_table;
     var rowIdx = table.row(row).index();
     
-    var newWordColIdx = table.column('NewWord:name').index();
+    var newWordColIdx = table.column('NewWordPercent:name').index();
     var statsColIdx = table.column('UnknownPercent:name').index();
     
     var newWordColVisible = table.column(newWordColIdx).visible();
