@@ -380,4 +380,5 @@ class BookStats(db.Model):
     distinctterms = db.Column(db.Integer)
     distinctunknowns = db.Column(db.Integer)
     unknownpercent = db.Column(db.Integer)
+    new_word_percent = db.Column(db.Integer)
     status_distribution = db.Column(db.String, nullable=True)

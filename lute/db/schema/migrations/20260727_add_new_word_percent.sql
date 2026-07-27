@@ -1,0 +1,1 @@
+alter table bookstats add new_word_percent INTEGER NULL;
