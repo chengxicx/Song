@@ -74,6 +74,42 @@
       processing: true,
       serverSide: true,
       stateSave: true,
+      stateDuration: 0,
+      stateSaveCallback: function(settings, data) {
+        var stateKey = 'bookmarks_{{book.id}}';
+        var stateJson = JSON.stringify(data);
+        localStorage.setItem('bookmarks_datatables_state_{{book.id}}', stateJson);
+        try {
+          $.ajax({
+            url: '/settings/datatables_state/save',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ key: stateKey, value: stateJson }),
+            xhrFields: { withCredentials: true }
+          }).fail(function() {});
+        } catch(e) {}
+      },
+      stateLoadCallback: function(settings, callback) {
+        var stateKey = 'bookmarks_{{book.id}}';
+        $.ajax({
+          url: '/settings/datatables_state/load/' + encodeURIComponent(stateKey),
+          method: 'GET',
+          dataType: 'json',
+          success: function(resp) {
+            if (resp && resp.value) {
+              localStorage.setItem('bookmarks_datatables_state_{{book.id}}', resp.value);
+              callback(JSON.parse(resp.value));
+              return;
+            }
+            var saved = localStorage.getItem('bookmarks_datatables_state_{{book.id}}');
+            callback(saved ? JSON.parse(saved) : null);
+          },
+          error: function() {
+            var saved = localStorage.getItem('bookmarks_datatables_state_{{book.id}}');
+            callback(saved ? JSON.parse(saved) : null);
+          }
+        });
+      },
       searching: true,
       search: { search: initial_search },
       ajax: {

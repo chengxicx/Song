@@ -160,3 +160,41 @@ def edit_shortcuts():
         setting_descs=hotkey_descriptions(),
         categorized_settings=categorized_settings,
     )
+
+
+@bp.route("/datatables_state/save", methods=["POST"])
+def save_datatables_state():
+    """
+    Save a datatables state (e.g. column visibility) to the user settings.
+    Payload: { "key": "<state_key>", "value": "<json_string>" }
+    """
+    payload = request.get_json(silent=True) or request.form
+    key = payload.get("key")
+    value = payload.get("value")
+    if not key:
+        return jsonify({"result": "failure", "message": "Missing key"}), 400
+    if value is None:
+        return jsonify({"result": "failure", "message": "Missing value"}), 400
+    repo = UserSettingRepository(db.session)
+    try:
+        # Prefix the key to avoid collisions with known setting keys.
+        repo.set_dynamic_value(f"dt_state_{key}", value)
+        db.session.commit()
+        return jsonify({"result": "success", "message": "OK"})
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        return jsonify({"result": "failure", "message": f"{type(e).__name__}: {str(e)}"}), 500
+
+
+@bp.route("/datatables_state/load/<path:key>", methods=["GET"])
+def load_datatables_state(key):
+    """
+    Load a datatables state from the user settings.
+    Returns { "value": "<json_string>" } or 404 if not found.
+    """
+    if not key:
+        return jsonify({"result": "failure", "message": "Missing key"}), 400
+    repo = UserSettingRepository(db.session)
+    value = repo.get_dynamic_value(f"dt_state_{key}")
+    if value is None:
+        return jsonify({"value": None}), 200
+    return jsonify({"value": value})

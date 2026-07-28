@@ -326,12 +326,39 @@
       processing: true,
       serverSide: true,
       stateSave: true,
+      stateDuration: 0,
       stateSaveCallback: function(settings, data) {
-        localStorage.setItem(table_state_key, JSON.stringify(data));
+        var stateJson = JSON.stringify(data);
+        localStorage.setItem(table_state_key, stateJson);
+        try {
+          $.ajax({
+            url: '/settings/datatables_state/save',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ key: 'term_' + table_state_key, value: stateJson }),
+            xhrFields: { withCredentials: true }
+          }).fail(function() {});
+        } catch(e) {}
       },
-      stateLoadCallback: function(settings) {
-        const state = localStorage.getItem(table_state_key);
-        return state ? JSON.parse(state) : null;
+      stateLoadCallback: function(settings, callback) {
+        $.ajax({
+          url: '/settings/datatables_state/load/' + encodeURIComponent('term_' + table_state_key),
+          method: 'GET',
+          dataType: 'json',
+          success: function(resp) {
+            if (resp && resp.value) {
+              localStorage.setItem(table_state_key, resp.value);
+              callback(JSON.parse(resp.value));
+              return;
+            }
+            const state = localStorage.getItem(table_state_key);
+            callback(state ? JSON.parse(state) : null);
+          },
+          error: function() {
+            const state = localStorage.getItem(table_state_key);
+            callback(state ? JSON.parse(state) : null);
+          }
+        });
       },
       select: {
         style: 'multi',

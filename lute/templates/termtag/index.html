@@ -37,6 +37,40 @@
       processing: true,
       serverSide: true,
       stateSave: true,
+      stateDuration: 0,
+      stateSaveCallback: function(settings, data) {
+        var stateJson = JSON.stringify(data);
+        localStorage.setItem('termtag_datatables_state', stateJson);
+        try {
+          $.ajax({
+            url: '/settings/datatables_state/save',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ key: 'termtag', value: stateJson }),
+            xhrFields: { withCredentials: true }
+          }).fail(function() {});
+        } catch(e) {}
+      },
+      stateLoadCallback: function(settings, callback) {
+        $.ajax({
+          url: '/settings/datatables_state/load/termtag',
+          method: 'GET',
+          dataType: 'json',
+          success: function(resp) {
+            if (resp && resp.value) {
+              localStorage.setItem('termtag_datatables_state', resp.value);
+              callback(JSON.parse(resp.value));
+              return;
+            }
+            var saved = localStorage.getItem('termtag_datatables_state');
+            callback(saved ? JSON.parse(saved) : null);
+          },
+          error: function() {
+            var saved = localStorage.getItem('termtag_datatables_state');
+            callback(saved ? JSON.parse(saved) : null);
+          }
+        });
+      },
       columns: [
         { name: "TgText", render: render_tag_text },
         { name: "TgComment", data: "TgComment" },

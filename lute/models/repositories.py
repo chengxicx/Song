@@ -83,10 +83,41 @@ class UserSettingRepository(SettingRepositoryBase):
 
     def key_exists_precheck(self, keyname):
         """
-        User keys must exist.
+        User keys must exist for standard settings.
+        Dynamic keys (e.g. datatables states) bypass this via set_dynamic_value/get_dynamic_value.
         """
         if not self.key_exists(keyname):
             raise MissingUserSettingKeyException(keyname)
+
+    def set_dynamic_value(self, keyname, keyvalue):
+        """
+        Set a user setting without requiring the key to pre-exist.
+        Used for dynamic settings such as datatables column visibility states.
+        """
+        s = (
+            self.session.query(self.classtype)
+            .filter(self.classtype.key == keyname)
+            .first()
+        )
+        if s is None:
+            s = self.classtype()
+            s.key = keyname
+        s.value = keyvalue
+        self.session.add(s)
+
+    def get_dynamic_value(self, keyname):
+        """
+        Get a user setting without requiring the key to pre-exist.
+        Returns None if the key doesn't exist.
+        """
+        s = (
+            self.session.query(self.classtype)
+            .filter(self.classtype.key == keyname)
+            .first()
+        )
+        if s is None:
+            return None
+        return s.value
 
     def get_backup_settings(self):
         "Convenience method."

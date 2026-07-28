@@ -72,6 +72,40 @@
       searching: true,
       processing: true,
       stateSave: true,
+      stateDuration: 0,
+      stateSaveCallback: function(settings, data) {
+        var stateJson = JSON.stringify(data);
+        localStorage.setItem('language_datatables_state', stateJson);
+        try {
+          $.ajax({
+            url: '/settings/datatables_state/save',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ key: 'language', value: stateJson }),
+            xhrFields: { withCredentials: true }
+          }).fail(function() {});
+        } catch(e) {}
+      },
+      stateLoadCallback: function(settings, callback) {
+        $.ajax({
+          url: '/settings/datatables_state/load/language',
+          method: 'GET',
+          dataType: 'json',
+          success: function(resp) {
+            if (resp && resp.value) {
+              localStorage.setItem('language_datatables_state', resp.value);
+              callback(JSON.parse(resp.value));
+              return;
+            }
+            var saved = localStorage.getItem('language_datatables_state');
+            callback(saved ? JSON.parse(saved) : null);
+          },
+          error: function() {
+            var saved = localStorage.getItem('language_datatables_state');
+            callback(saved ? JSON.parse(saved) : null);
+          }
+        });
+      },
     });
   }; // end setup_lang_datatable
 

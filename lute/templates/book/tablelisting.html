@@ -202,18 +202,52 @@
       stateDuration: 0,
       stateSaveCallback: function(settings, data) {
         data.version = 3;
-        localStorage.setItem('booklisting_datatables_state', JSON.stringify(data));
+        var stateJson = JSON.stringify(data);
+        // Always save to localStorage as instant fallback.
+        localStorage.setItem('booklisting_datatables_state', stateJson);
+        // Also save to backend so it persists across browsers / computers.
+        try {
+          $.ajax({
+            url: '/settings/datatables_state/save',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ key: 'booklisting', value: stateJson }),
+            xhrFields: { withCredentials: true }
+          }).fail(function() { /* swallow, localStorage already has it */ });
+        } catch(e) {}
       },
-      stateLoadCallback: function(settings) {
-        var saved = localStorage.getItem('booklisting_datatables_state');
-        if (saved) {
-          var data = JSON.parse(saved);
-          if (data.version !== 3) {
-            return null;
+      stateLoadCallback: function(settings, callback) {
+        // Try server first for cross-browser state.
+        $.ajax({
+          url: '/settings/datatables_state/load/booklisting',
+          method: 'GET',
+          dataType: 'json',
+          success: function(resp) {
+            if (resp && resp.value) {
+              var data = JSON.parse(resp.value);
+              if (data && data.version === 3) {
+                localStorage.setItem('booklisting_datatables_state', resp.value);
+                callback(data);
+                return;
+              }
+            }
+            // Fallback to localStorage.
+            var saved = localStorage.getItem('booklisting_datatables_state');
+            if (saved) {
+              var d = JSON.parse(saved);
+              if (d.version === 3) { callback(d); return; }
+            }
+            callback(null);
+          },
+          error: function() {
+            var saved = localStorage.getItem('booklisting_datatables_state');
+            if (saved) {
+              var d = JSON.parse(saved);
+              if (d.version === 3) { callback(d); return; }
+            }
+            callback(null);
           }
-          return data;
-        }
-        return null;
+        });
       },
       search: { search: initial_search },
       columns: [
