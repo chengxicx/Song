@@ -137,37 +137,49 @@ body {
 }
 
 /* ---------------------------------------------------------
-   3. 核心修复：将 下拉框 + Search 嵌入顶栏
-   - 使用 absolute 而非 fixed：锚定在 .menu-bar（position:relative）上，
-     因此页面滚动时控件跟随页面一起滚动，不会产生 sticky 遮挡。
+   3. 顶栏语言选择器 + 搜索占位容器
+   - 控件本身已经通过 JS (Toolbar Mover) 真正移动进了
+     .menu-bar > #top-toolbar-placeholder DOM 里，因此不需要
+     再用 position: fixed / absolute 跨层级 "飞" 过去。
+   - 下面的样式只负责两个控件的大小/间距视觉统一，以及
+     清空原来的顶栏布局行（里面的控件都被搬走了）。
    --------------------------------------------------------- */
+
+/* DataTables 原来的顶部布局行：里面的语言/搜索都已被搬走，直接隐藏不留空白 */
 .dt-container .dt-layout-row:first-child,
 div.dt-container div.dt-layout-row:first-child {
-  position: absolute !important;
-  top: 12px !important;             /* 对应 52px 顶栏的垂直居中 */
-  left: 240px !important;           /* 给 Logo + "Lute" 标题留足右边间距 */
-  z-index: 1001 !important;          /* 高于顶栏背景，低于下拉菜单 */
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  width: auto !important;
-  height: 28px !important;
+  display: none !important;
 }
 
+/* 这些 layout cell 只在 DataTables 内部第一行才有意义，既然已隐藏就清空 */
 .dt-container .dt-layout-cell,
 .dt-container .dt-layout-start,
 .dt-container .dt-layout-end {
-  display: flex !important;
-  align-items: center !important;
   padding: 0 !important;
   margin: 0 !important;
-  width: auto !important;
   background: transparent !important;
+}
+
+/* 顶栏中间的工具栏占位容器（与 menu-bar 同高，垂直居中） */
+#top-toolbar-placeholder {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 0 0 24px !important; /* Logo + "Lute" 标题右侧留白 24px */
+  padding: 0 !important;
+  height: 100% !important; /* 占满整个 52px 菜单栏高度 */
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* 若屏幕太窄，占位容器也可以允许换行 */
+@media (max-width: 720px) {
+  #top-toolbar-placeholder {
+    margin-left: 12px !important;
+    gap: 8px !important;
+  }
 }
 
 /* 语言下拉框 —— Apple 简洁风格 */

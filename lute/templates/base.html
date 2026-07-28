@@ -75,6 +75,9 @@
         </h1>
       </div>
     </div>
+    {# # 中间工具栏占位容器（语言选择器 + 搜索放大镜）。由 JS 从 DataTables 工具栏中把对应元素搬移到这里，
+          这样可以保证它们在 menu-bar 里随页面自然滚动，同时和 Logo/菜单一起在同一行，不再需要 position: fixed/absolute。 #}
+    <div id="top-toolbar-placeholder" style="display:flex;align-items:center;gap:10px;margin-left:24px;flex:1 1 auto;min-width:0;"></div>
     <div class="menu">
       {% if not hide_homelink %}
       <div class="menu-item">
@@ -289,6 +292,101 @@
   } catch (_) {
     // 旧浏览器不支持 MutationObserver 时退化为轮询
     setInterval(scan, 1200);
+  }
+})();
+</script>
+
+<script>
+/* ========================================================
+   Toolbar Mover —— 将 DataTables 工具栏里的语言选择器和搜索
+   真正移动到 .menu-bar 内的 #top-toolbar-placeholder，
+   这样它们在 DOM 层面就位于顶栏中间，用正常流即可对齐，
+   且不会再出现 fixed / absolute 跨 DOM 层级定位导致的错位。
+   ======================================================== */
+(function () {
+  var PLACEHOLDER_ID = "top-toolbar-placeholder";
+  var LANG_SELECT_ID = "defaultLanguageSelect";
+  var MOVED_FLAG = "data-toolbarMoved";
+
+  /**
+   * 把一个元素移动到顶栏占位容器末尾。
+   * 已经在 menu-bar 里的跳过。
+   */
+  function moveToPlaceholder(el) {
+    if (!el) return;
+    var ph = document.getElementById(PLACEHOLDER_ID);
+    if (!ph) return;
+    if (el.parentNode && el.parentNode === ph) return;
+    if (el.getAttribute(MOVED_FLAG) === "1") {
+      // 已搬移过但被某种原因移出去了（例如 DataTables 重绘），再次 append 即可
+    }
+    el.setAttribute(MOVED_FLAG, "1");
+    ph.appendChild(el);
+  }
+
+  function hideEmptyLayoutTopRow() {
+    // 搬移完后，DT 顶部那个原本放语言/搜索的 layout 行就空了，
+    // 直接隐藏，避免上面多出一条空白行（否则用户页面会多出一行空白）。
+    var rows = document.querySelectorAll(
+      ".dt-container > .dt-layout-row:first-child, div.dt-container > div.dt-layout-row:first-child"
+    );
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var hasAny = false;
+      var cells = r.querySelectorAll(
+        ".dt-layout-cell, .dt-layout-start, .dt-layout-end"
+      );
+      for (var j = 0; j < cells.length; j++) {
+        var c = cells[j];
+        // 只要里面还有任何实际元素（非纯空白文本）就不隐藏
+        if (c && c.children && c.children.length > 0) {
+          hasAny = true;
+          break;
+        }
+      }
+      if (!hasAny) {
+        r.style.display = "none";
+      }
+    }
+  }
+
+  function runOnce() {
+    var ph = document.getElementById(PLACEHOLDER_ID);
+    if (!ph) return;
+    // 1) 语言选择器（只在书籍列表页存在）
+    var lang = document.getElementById(LANG_SELECT_ID);
+    if (lang) moveToPlaceholder(lang);
+    // 2) 每个 DataTables 搜索框
+    var searches = document.querySelectorAll(".dt-search");
+    for (var i = 0; i < searches.length; i++) moveToPlaceholder(searches[i]);
+    // 3) 清理空的顶部布局行
+    hideEmptyLayoutTopRow();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      runOnce();
+      setTimeout(runOnce, 250);
+      setTimeout(runOnce, 900);
+    });
+  } else {
+    runOnce();
+    setTimeout(runOnce, 250);
+    setTimeout(runOnce, 900);
+  }
+
+  try {
+    var mo = new MutationObserver(function () {
+      // 节流：每次 DOM 变化只运行一次
+      if (runOnce._t) return;
+      runOnce._t = setTimeout(function () {
+        runOnce._t = null;
+        runOnce();
+      }, 120);
+    });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  } catch (_) {
+    setInterval(runOnce, 1500);
   }
 })();
 </script>
