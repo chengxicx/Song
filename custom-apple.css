@@ -1,0 +1,557 @@
+/* =========================================================
+   LUTE THEME: Apple Books Style (强行并入顶栏经典布局)
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. 全局 Apple Books 纸质色调 (Sepia Paper)
+   --------------------------------------------------------- */
+body {
+  /* 生词状态色彩 */
+  --status-0-color: #007aff;        
+  --status-1-color: #f7d2cf;        
+  --status-2-color: #fce8b3;        
+  --status-3-color: #d1ebd8;        
+  --status-4-color: #d2e4f7;        
+  --status-5-color: #e5d7f2;        
+  --status-learned-bg: #e5dfd5;     
+  --status-learned-color: #726e67;  
+  --status-99-color: transparent;
+
+  --background-color: #f7f3ea;      
+  --panel-bg: #ffffff;            
+  --font-color: #2c2a29;           
+
+  background-color: var(--background-color) !important;
+  color: var(--font-color) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "PingFang SC", sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------
+   2. 顶栏 (.menu-bar) —— 保留导航空间并提升层级
+   --------------------------------------------------------- */
+.menu-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 52px !important;
+  padding: 0 24px !important;
+  background-color: rgba(247, 243, 234, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  position: relative !important;
+  z-index: 1000 !important; /* 保证顶栏及下拉菜单高于所有内容 */
+}
+
+/* Logo 区 */
+.menu-bar .header {
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 0 !important;
+  flex-shrink: 0;
+}
+
+.lutelogo {
+  height: 24px !important;
+  width: auto !important;
+  opacity: 0.85;
+}
+
+#luteTitle {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #1c1c1e !important;
+  margin: 0 0 0 8px !important;
+  letter-spacing: -0.01em;
+}
+
+/* 右侧菜单区 (BOOKS, TERMS...) 
+   往右彻底推开，给中部的搜索框留出充足空间！ */
+.menu-bar .menu {
+  display: flex !important;
+  align-items: center !important;
+  margin-left: auto !important; /* 强制靠最右 */
+  gap: 20px !important;
+}
+
+.menu-item {
+  position: relative !important;
+  margin: 0 !important;
+  padding: 14px 0 !important;
+  cursor: pointer;
+}
+
+.menu-item > span {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #8e8e93 !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.menu-item:hover > span {
+  color: #007aff !important;
+}
+
+/* 下拉菜单 (BOOKS 下拉框等) —— Apple 悬浮卡片 */
+.sub-menu {
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  left: auto !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+  padding: 6px !important;
+  min-width: 160px !important;
+  z-index: 10001 !important;
+  list-style: none !important;
+}
+
+.sub-menu li a {
+  display: block !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  color: #1c1c1e !important;
+  border-radius: 6px !important;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sub-menu li a:hover {
+  background-color: #007aff !important;
+  color: #ffffff !important;
+}
+
+.sub-menu hr {
+  border: none !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+  margin: 4px 0 !important;
+}
+
+/* ---------------------------------------------------------
+   3. 核心修复：将 下拉框 + Search 嵌入顶栏
+   - 使用 absolute 而非 fixed：锚定在 .menu-bar（position:relative）上，
+     因此页面滚动时控件跟随页面一起滚动，不会产生 sticky 遮挡。
+   --------------------------------------------------------- */
+.dt-container .dt-layout-row:first-child,
+div.dt-container div.dt-layout-row:first-child {
+  position: absolute !important;
+  top: 12px !important;             /* 对应 52px 顶栏的垂直居中 */
+  left: 240px !important;           /* 给 Logo + "Lute" 标题留足右边间距 */
+  z-index: 1001 !important;          /* 高于顶栏背景，低于下拉菜单 */
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto !important;
+  height: 28px !important;
+}
+
+.dt-container .dt-layout-cell,
+.dt-container .dt-layout-start,
+.dt-container .dt-layout-end {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  background: transparent !important;
+}
+
+/* 语言下拉框 —— Apple 简洁风格 */
+#defaultLanguageSelect {
+  height: 28px !important;
+  line-height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #1c1c1e !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 6px !important;
+  outline: none;
+  cursor: pointer;
+}
+
+/* =========================================================
+   搜索框 —— Apple 风格放大镜折叠式
+   - 默认状态：只显示 🔍 圆形按钮
+   - 展开状态：显示搜索框输入，点击按钮/回车激活
+   ========================================================= */
+.dt-search {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  position: relative !important;
+}
+
+.dt-search label {
+  display: none !important; /* 隐藏 "Search:" 文本标签，由 🔍 按钮替代 */
+}
+
+/* —— 放大镜按钮（取代原 label） —— */
+.dt-search__toggle {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  color: #8e8e93 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  transition: all 0.2s ease;
+}
+.dt-search__toggle:hover {
+  color: #007aff !important;
+  background-color: #ffffff !important;
+  border-color: #007aff !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12) !important;
+}
+
+/* —— 折叠态：默认隐藏搜索输入框 —— */
+.dt-search input,
+#dt-search-0 {
+  height: 28px !important;
+  line-height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #1c1c1e !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 6px !important;
+  outline: none;
+  width: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  opacity: 0 !important;
+  transform: scaleX(0) !important;
+  transform-origin: right center !important;
+  transition: all 0.25s ease;
+  pointer-events: none !important;
+}
+
+/* —— 展开态：显示搜索输入框（宽度 180px） —— */
+.dt-search.dt-search--expanded input,
+.dt-search.dt-search--expanded #dt-search-0 {
+  width: 180px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.12) !important;
+  opacity: 1 !important;
+  transform: scaleX(1) !important;
+  pointer-events: auto !important;
+}
+
+#defaultLanguageSelect:focus,
+.dt-search input:focus {
+  background-color: #ffffff !important;
+  border-color: #007aff !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+}
+
+/* =========================================================
+   7. 底部控件布局对齐（修复底部分页/条目数/列可见性错位）
+   ========================================================= */
+.dt-container div.dt-layout-row:last-child,
+div.dt-container div.dt-layout-row:last-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
+  gap: 16px !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+/* 左下：pageLength + config widget + info + buttons（列可见性） */
+.dt-container div.dt-layout-row:last-child > .dt-layout-start,
+.dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-start {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  height: auto !important;
+}
+
+/* 右下：分页按钮 */
+.dt-container div.dt-layout-row:last-child > .dt-layout-end,
+.dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-end {
+  display: flex !important;
+  align-items: center !important;
+  gap: 2px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+}
+
+/* pageLength & info inline 同高对齐 */
+div.dt-container .dt-length,
+div.dt-container .dt-info {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 13px !important;
+  color: #636366 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  white-space: nowrap !important;
+}
+
+div.dt-container .dt-length select {
+  height: 28px !important;
+  padding: 0 6px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background: #fff !important;
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+  vertical-align: middle !important;
+}
+
+/* 列可见性按钮（dt-buttons 通用） */
+div.dt-container .dt-buttons {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 32px !important;
+}
+div.dt-container .dt-buttons button.dt-button,
+div.dt-container .dt-buttons button {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 28px !important;
+  padding: 0 10px !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #1c1c1e !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+div.dt-container .dt-buttons button.dt-button:hover {
+  background: #fff !important;
+  border-color: #007aff !important;
+  color: #007aff !important;
+}
+
+/* 设置齿轮小图标 inline */
+#datatables_config_widget {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 32px !important;
+  padding: 0 2px !important;
+  margin: 0 !important;
+}
+#datatables_config_widget img {
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+  vertical-align: middle !important;
+}
+
+/* —— 分页按钮（DataTables 2.x）统一 Apple 胶囊样式 —— */
+div.dt-container .dt-paging {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 32px !important;
+}
+div.dt-container .dt-paging button.dt-paging-button,
+div.dt-container .dt-paging .paginate_button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border: 1px solid rgba(0, 0, 0, 0.10) !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #1c1c1e !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+div.dt-container .dt-paging button.dt-paging-button:hover:not(.disabled):not(.current),
+div.dt-container .dt-paging .paginate_button:hover:not(.disabled):not(.current) {
+  background: #fff !important;
+  border-color: #007aff !important;
+  color: #007aff !important;
+}
+div.dt-container .dt-paging button.dt-paging-button.current,
+div.dt-container .dt-paging .paginate_button.current {
+  background: #007aff !important;
+  border-color: #007aff !important;
+  color: #fff !important;
+  box-shadow: 0 1px 3px rgba(0,122,255,0.30) !important;
+}
+div.dt-container .dt-paging button.dt-paging-button.disabled,
+div.dt-container .dt-paging .paginate_button.disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+/* 小宽度屏幕：避免底部分页/控件换行错位严重 */
+@media (max-width: 820px) {
+  .dt-container div.dt-layout-row:last-child,
+  div.dt-container div.dt-layout-row:last-child {
+    flex-wrap: wrap !important;
+  }
+  .dt-container div.dt-layout-row:last-child > .dt-layout-start,
+  .dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-start {
+    flex-basis: 100% !important;
+    justify-content: flex-start !important;
+  }
+  .dt-container div.dt-layout-row:last-child > .dt-layout-end,
+  .dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-end {
+    flex-basis: 100% !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   4. NEW WORD 胶囊色彩
+   --------------------------------------------------------- */
+.new-word-badge {
+  display: inline-block !important;
+  padding: 3px 10px !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.new-word-easy {
+  background-color: #a7d8b9 !important;
+  color: #1b432a !important;
+}
+
+.new-word-chal {
+  background-color: #f7d382 !important;
+  color: #523b05 !important;
+}
+
+.new-word-hard {
+  background-color: #f09595 !important;
+  color: #4a1111 !important;
+}
+
+/* ---------------------------------------------------------
+   5. 表格卡片 (Apple 精装书页 Card)
+   --------------------------------------------------------- */
+.dt-container, div.dt-container {
+  margin-top: 16px !important;
+  padding: 0 24px !important;
+}
+
+table.dataTable, table {
+  background-color: #ffffff !important;
+  color: var(--font-color) !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important;
+  width: 100% !important;
+}
+
+th {
+  background-color: #faf7f2 !important;
+  color: #636366 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  padding: 12px 16px !important;
+}
+
+td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+}
+
+tr:last-child td {
+  border-bottom: none !important;
+}
+
+a, a:link, a:visited {
+  color: #007aff !important;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------
+   6. 阅读模式样式 (Apple Books 经典衬线体)
+   --------------------------------------------------------- */
+div#thetext p { 
+  line-height: 1.8; 
+  font-size: 18px;
+  font-family: "Georgia", "New York", "Songti SC", "Source Han Serif SC", serif !important;
+}
+
+span.textitem {
+  font-family: "Georgia", "New York", serif !important;
+}
+
+span.status0 { background-color: transparent; color: var(--status-0-color); font-weight: 600; }
+span.status1 { background-color: var(--status-1-color); border-radius: 3px; padding: 1px 3px; }
+span.status2 { background-color: var(--status-2-color); border-radius: 3px; padding: 1px 3px; }
+span.status3 { background-color: var(--status-3-color); border-radius: 3px; padding: 1px 3px; }
+span.status4 { background-color: var(--status-4-color); border-radius: 3px; padding: 1px 3px; }
+span.status5 { background-color: var(--status-5-color); border-radius: 3px; padding: 1px 3px; }
+
+span.status98, span.status99 { 
+  background-color: transparent; 
+  color: inherit; 
+}
