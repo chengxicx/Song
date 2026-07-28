@@ -23,6 +23,22 @@
 
 <div style="margin-top:20px;">
   <p>2026-07-29: Fix Japanese MeCab Unidic dictionary compatibility — skip auxiliary verbs/particles in lemma generation, normalize Unidic orthography, and dynamically detect kana reading field index.</p>
+
+  <p>2026-07-29: Listing page (books/terms/termtags/bookmarks/languages) UI fixes and polish for the custom-apple theme:
+    <ol style="margin-top:6px;margin-bottom:0;">
+      <li><b>Sticky / 滚动遮挡彻底修复：</b>custom-apple.css 中顶部语言下拉 + 搜索栏原本使用 <code>position: fixed</code>，导致滚动时控件"钉"在视口顶部、与表头/内容重叠。现改为 <code>position: absolute</code> 锚定在 <code>.menu-bar</code> 上，随页面一起自然滚动；同时继续在 5 个 DataTables 配置上显式 <code>stickyHeader: false</code>，双重保证不再产生粘连遮挡。</li>
+      <li><b>pageLength（每页条目数）回到底部：</b>在所有 5 个列表页的 DataTables <code>layout.bottomStart</code> 中统一放置 <code>pageLength</code>，不再出现在顶部。</li>
+      <li><b>底部分页 / 条目数 / 列可见性按钮对齐修复：</b>在 custom-apple.css 新增第 7 节样式，强制最后一行控件使用 flex + <code>align-items:center</code>，并为 <code>.dt-length / .dt-info / .dt-buttons / .dt-paging</code> 统一高度、边距、圆角、对齐；DataTables 分页按钮统一重绘为 Apple 风格胶囊按钮（当前页高亮蓝色边框）。小于 820px 时自动换行，左右两组都保留独立对齐。</li>
+      <li><b>搜索框改为 🔍 放大镜折叠按钮：</b>
+        <ul style="margin-top:4px;margin-bottom:0;">
+          <li>在 <code>base.html</code> 末尾注入增强器脚本（兼容 DataTables 延迟渲染 + MutationObserver 动态监听），会自动为页面上每个 <code>.dt-search</code> 插入圆形 SVG 🔍 按钮作为触发器。</li>
+          <li>默认状态隐藏搜索输入框，只显示 🔍；点击按钮展开 180px 宽度的搜索框并聚焦；失焦时若搜索词为空则自动收起。按 Esc 清空搜索词并折叠。</li>
+          <li>若 DataTables 状态保存中已有搜索词，页面加载时自动保持展开状态，不吞掉已输入的关键词。</li>
+        </ul>
+      </li>
+      <li><b>顶栏语言 / 搜索向右偏移：</b>custom-apple.css 中将语言选择器 + 放大镜按钮的左侧定位从 <code>left: 140px</code> 放宽到 <code>left: 240px</code>，给 Logo + "Lute" 标题右侧留出足够空白，避免与 Logo 文字挤在一起。</li>
+    </ol>
+  </p>
 </div>
 
 

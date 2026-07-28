@@ -156,4 +156,141 @@
   });
 </script>
 
+<script>
+/* ========================================================
+   Collapsible Magnifier Search Enhancer
+   - 目标：为每个 .dt-search 注入 🔍 圆形按钮
+   - 默认：只显示按钮（输入框由 CSS 折叠隐藏）
+   - 点击按钮 / 输入值存在：展开输入框并聚焦
+   - 输入框失焦且为空：自动折叠回 🔍
+   ======================================================== */
+(function () {
+  /**
+   * 给单个 .dt-search 容器注入切换按钮 + 绑定事件
+   * @param {HTMLElement} container - 必须是 .dt-search 元素
+   */
+  function enhance(container) {
+    if (!container || container.dataset.searchEnhanced === "1") return;
+    container.dataset.searchEnhanced = "1";
+
+    // 1) 插入放大镜按钮（放在最前面）
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "dt-search__toggle";
+    btn.setAttribute("aria-label", "Search");
+    btn.setAttribute("title", "Search");
+    // SVG magnifier — crisp 16x16, no extra asset dependency
+    btn.innerHTML =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" ' +
+      'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<circle cx="11" cy="11" r="7"></circle>' +
+      '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
+      "</svg>";
+    container.insertBefore(btn, container.firstChild);
+
+    // 2) 找到内部 <input>
+    var input = container.querySelector('input[type="search"], input');
+
+    // 3) 根据输入值是否有内容决定初始是否展开（例如保留搜索词时）
+    if (input && input.value && input.value.trim() !== "") {
+      container.classList.add("dt-search--expanded");
+    }
+
+    // 4) 点击放大镜：切换展开状态，展开后聚焦
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var expanded = container.classList.toggle("dt-search--expanded");
+      if (expanded && input) {
+        setTimeout(function () {
+          input.focus();
+          // 将光标定位到文字末尾
+          if (input.setSelectionRange && input.value) {
+            try {
+              input.setSelectionRange(input.value.length, input.value.length);
+            } catch (_) {}
+          }
+        }, 10);
+      }
+    });
+
+    // 5) 失去焦点时：若输入为空，收起
+    if (input) {
+      input.addEventListener("blur", function () {
+        if (!input.value || input.value.trim() === "") {
+          container.classList.remove("dt-search--expanded");
+        }
+      });
+      // 键盘 Esc 时：清空并收起
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          input.value = "";
+          // 触发一次 input 事件以通知 DataTables 搜索重置
+          try {
+            var ev = new Event("input", { bubbles: true });
+            input.dispatchEvent(ev);
+            var chev = new Event("change", { bubbles: true });
+            input.dispatchEvent(chev);
+          } catch (_) {}
+          container.classList.remove("dt-search--expanded");
+          input.blur();
+        }
+      });
+    }
+  }
+
+  /**
+   * 在整个文档树里寻找所有尚未处理的 .dt-search 并增强
+   */
+  function scan(root) {
+    var scope = root || document;
+    var list = scope.querySelectorAll
+      ? scope.querySelectorAll(".dt-search")
+      : [];
+    for (var i = 0; i < list.length; i++) enhance(list[i]);
+  }
+
+  // 首次 DOM Ready + 短暂延迟（等 DataTables 初始化完毕）
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      scan();
+      setTimeout(scan, 250);
+      setTimeout(scan, 800);
+    });
+  } else {
+    scan();
+    setTimeout(scan, 250);
+    setTimeout(scan, 800);
+  }
+
+  // MutationObserver：持续监听 DOM，若后续有新的 .dt-search 被插入（切换页、重绘等）
+  try {
+    var mo = new MutationObserver(function (mutations) {
+      var touched = false;
+      for (var i = 0; i < mutations.length; i++) {
+        var added = mutations[i].addedNodes;
+        for (var j = 0; j < added.length; j++) {
+          var node = added[j];
+          if (node.nodeType !== 1) continue;
+          if (node.classList && node.classList.contains("dt-search")) {
+            enhance(node);
+            touched = true;
+          }
+          if (node.querySelectorAll) {
+            var nested = node.querySelectorAll(".dt-search");
+            for (var k = 0; k < nested.length; k++) enhance(nested[k]);
+            if (nested.length) touched = true;
+          }
+        }
+      }
+    });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  } catch (_) {
+    // 旧浏览器不支持 MutationObserver 时退化为轮询
+    setInterval(scan, 1200);
+  }
+})();
+</script>
+
 </html>
