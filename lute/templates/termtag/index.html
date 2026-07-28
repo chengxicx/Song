@@ -28,6 +28,12 @@
   
   let setup_datatable = function() {
     var table = $('#termtagtable').DataTable({
+      layout: {
+        topStart: [],
+        topEnd: 'search',
+        bottomStart: ['pageLength', 'info'],
+        bottomEnd: 'paging'
+      },
       responsive: true,
       select: false,
       lengthMenu: [ 10, 25, 50 ],
@@ -36,6 +42,7 @@
       searching: true,
       processing: true,
       serverSide: true,
+      stickyHeader: false,
       stateSave: true,
       stateDuration: 0,
       stateSaveCallback: function(settings, data) {

@@ -36,11 +36,12 @@
   let setup_bookmark_datatable = function(initial_search) {
     bookmark_listing_table = $('#bookmarkstable').DataTable({
       layout: {
-        topStart: 'pageLength',
+        topStart: [],
         topEnd: [
           'search'
         ],
         bottomStart: [
+          'pageLength',
           function() {
             return $('#datatables_config_widget');
           },
@@ -73,6 +74,7 @@
       info: true,
       processing: true,
       serverSide: true,
+      stickyHeader: false,
       stateSave: true,
       stateDuration: 0,
       stateSaveCallback: function(settings, data) {

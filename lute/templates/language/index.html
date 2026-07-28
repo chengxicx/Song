@@ -63,6 +63,12 @@
 <script>
   let setup_lang_datatable = function() {
     lang_listing_table = $('#languagetable').DataTable({
+      layout: {
+        topStart: [],
+        topEnd: 'search',
+        bottomStart: ['pageLength', 'info'],
+        bottomEnd: 'paging'
+      },
       responsive: true,
       select: false,
       lengthMenu: [ 10, 25, 50 ],
@@ -71,6 +77,7 @@
       info: true,
       searching: true,
       processing: true,
+      stickyHeader: false,
       stateSave: true,
       stateDuration: 0,
       stateSaveCallback: function(settings, data) {
