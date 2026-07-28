@@ -301,9 +301,9 @@
 
     table = $('#termtable').DataTable({
       layout: {
-        topStart: 'pageLength',
+        topStart: [],
         topEnd: 'search',
-        bottomStart: ['info', 'buttons'],
+        bottomStart: ['pageLength', 'info', 'buttons'],
         bottomEnd: 'paging'
       },
       responsive: true,
@@ -325,6 +325,7 @@
       searching: true,
       processing: true,
       serverSide: true,
+      stickyHeader: false,
       stateSave: true,
       stateDuration: 0,
       stateSaveCallback: function(settings, data) {

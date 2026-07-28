@@ -155,14 +155,14 @@
   let setup_book_datatable = function(initial_search) {
     book_listing_table = $('#booktable').DataTable({
       layout: {
-        topStart: 'pageLength',
-        topEnd: [
+        topStart: [
           function() {
             return $('#defaultLanguageSelect');
-          },
-          'search'
+          }
         ],
+        topEnd: 'search',
         bottomStart: [
+          'pageLength',
           function() {
             return $('#datatables_config_widget');
           },
@@ -198,6 +198,7 @@
       searching: true,
       processing: true,
       serverSide: true,
+      stickyHeader: false,
       stateSave: true,
       stateDuration: 0,
       stateSaveCallback: function(settings, data) {
