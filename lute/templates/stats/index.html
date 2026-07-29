@@ -316,6 +316,19 @@
 <script>
   const HEATMAP_COLORS = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
 
+  function getCssVar(name, fallback) {
+    const val = getComputedStyle(document.body).getPropertyValue(name).trim();
+    return val || fallback;
+  }
+
+  const CHART_COLORS = {
+    tick: getCssVar('--chart-tick-color', '#6c757d'),
+    tickMajor: getCssVar('--chart-tick-major-color', '#343a40'),
+    grid: getCssVar('--chart-grid-color', 'rgba(0,0,0,0.08)'),
+    title: getCssVar('--chart-title-color', '#6c757d'),
+    cardBg: getCssVar('--chart-card-bg', '#fff'),
+  };
+
   let currentPeriod = '7days';
   let currentLang = document.getElementById('ov-lang').value;
   let newTermsChart = null;
@@ -527,7 +540,7 @@
       time: { unit: timeUnit },
       grid: { display: false },
       ticks: {
-        color: '#8e8e93',
+        color: CHART_COLORS.tick,
       }
     };
     if (currentPeriod === '7days') {
@@ -556,8 +569,12 @@
           x: xScale,
           y: {
             beginAtZero: true,
-            ticks: { precision: 0, callback: function(v) { return v.toLocaleString(); } },
-            grid: { color: '#f1f3f5' }
+            ticks: {
+              precision: 0,
+              color: CHART_COLORS.tick,
+              callback: function(v) { return v.toLocaleString(); }
+            },
+            grid: { color: CHART_COLORS.grid }
           }
         },
         plugins: {
@@ -612,26 +629,26 @@
             type: 'time',
             display: true,
             time: { unit: 'day' },
-            title: { display: true, text: 'Date', color: '#8e8e93' },
+            title: { display: true, text: 'Date', color: CHART_COLORS.title },
             ticks: {
               major: { enabled: true },
-              color: '#8e8e93',
+              color: CHART_COLORS.tick,
               font: function(context) {
                 if (context.tick && context.tick.major) {
-                  return { weight: 'bold', color: '#f2f2f7' };
+                  return { weight: 'bold', color: CHART_COLORS.tickMajor };
                 }
-                return { color: '#8e8e93' };
+                return { color: CHART_COLORS.tick };
               }
             },
-            grid: { color: 'rgba(255,255,255,0.08)' }
+            grid: { color: CHART_COLORS.grid }
           },
           total: {
             position: 'right',
-            title: { display: true, text: 'total', color: '#8e8e93' },
+            title: { display: true, text: 'total', color: CHART_COLORS.title },
             grid: { display: false },
             ticks: {
               beginAtZero: true,
-              color: '#8e8e93',
+              color: CHART_COLORS.tick,
               callback: function(value) {
                 return value.toLocaleString();
               }
