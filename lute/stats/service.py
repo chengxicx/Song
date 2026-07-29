@@ -12,7 +12,7 @@ def _get_data_per_lang(session):
     sql = """
     select lang, dt, sum(WrWordCount) as count
     from (
-      select LgName as lang, strftime('%Y-%m-%d', WrReadDate) as dt, WrWordCount
+      select LgName as lang, strftime('%Y-%m-%d', WrReadDate, 'localtime') as dt, WrWordCount
       from wordsread
       inner join languages on LgID = WrLgID and LgIsActive = 1
     ) raw
@@ -99,7 +99,7 @@ def get_table_data(session):
 def get_reading_streak(session):
     "Calculates the current reading streak in days."
     sql = """
-    SELECT DISTINCT strftime('%Y-%m-%d', WrReadDate) as dt
+    SELECT DISTINCT strftime('%Y-%m-%d', WrReadDate, 'localtime') as dt
     FROM wordsread
     WHERE WrLgID IN (SELECT LgID FROM languages WHERE LgIsActive = 1)
     ORDER BY dt DESC
@@ -167,7 +167,7 @@ def _daily_counts(session, date_col, lang_id, status_filter=None):
     where_clause = "where " + " and ".join(where)
 
     sql = (
-        f"select strftime('%Y-%m-%d', {date_col}) as dt, count(*) as cnt "
+        f"select strftime('%Y-%m-%d', {date_col}, 'localtime') as dt, count(*) as cnt "
         f"from words {where_clause} "
         "group by dt order by dt"
     )
@@ -310,7 +310,7 @@ def get_term_summary(session, lang_id, period="7days"):
     recent_params["start_date"] = recent_start
     recent_params["end_date"] = recent_end
 
-    recent_where = where_clause + " and date(WoCreated) >= :start_date and date(WoCreated) <= :end_date"
+    recent_where = where_clause + " and date(WoCreated, 'localtime') >= :start_date and date(WoCreated, 'localtime') <= :end_date"
     recent_sql = (
         f"select WoStatus, count(*) from words {recent_where} "
         "group by WoStatus"
