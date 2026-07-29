@@ -376,8 +376,8 @@
     for (const k in recentMap) { recentTotal += recentMap[k]; }
 
     function classifyStatus(status) {
-      if (status == 1) return 'unknown';
-      if (status >= 2 && status <= 5) return 'vague';
+      if (status == 0) return 'unknown';
+      if (status >= 1 && status <= 5) return 'vague';
       if (status == 99) return 'mastered';
       if (status == 98) return 'ignored';
       return 'other';
