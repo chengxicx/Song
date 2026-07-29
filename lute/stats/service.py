@@ -259,11 +259,11 @@ def get_last_read_language_id(session):
     return int(row[0]) if row else None
 
 
-def get_term_summary(session, lang_id):
+def get_term_summary(session, lang_id, period="7days"):
     """
     Summary data for the summary panel:
       - total_terms: total number of terms
-      - today_by_status: {status_code: count} of terms created today
+      - recent_by_status: {status_code: count} of terms created in current period
       - cumulative_by_status: {status_code: count} of all terms by status
     Only counts terms from active (non-frozen) languages.
     """
@@ -280,17 +280,30 @@ def get_term_summary(session, lang_id):
     total_sql = f"select count(*) from words {where_clause}"
     total = session.execute(text(total_sql), params).scalar() or 0
 
-    today_where = where_clause
-    if today_where:
-        today_where += " and date(WoCreated) = date('now', 'localtime')"
+    # Use Python date comparison instead of SQLite date('now', 'localtime')
+    # to avoid timezone mismatches between SQLite and the application.
+    today = datetime.now().date()
+    if period == "7days":
+        cutoff = today - timedelta(days=6)
+        recent_start = cutoff.isoformat()
+        recent_end = today.isoformat()
     else:
-        today_where = "where date(WoCreated) = date('now', 'localtime')"
-    today_sql = (
-        f"select WoStatus, count(*) from words {today_where} "
+        # monthly: last 12 months of new terms
+        cutoff = today - timedelta(days=365)
+        recent_start = cutoff.isoformat()
+        recent_end = today.isoformat()
+
+    recent_params = dict(params)
+    recent_params["start_date"] = recent_start
+    recent_params["end_date"] = recent_end
+
+    recent_where = where_clause + " and date(WoCreated) >= :start_date and date(WoCreated) <= :end_date"
+    recent_sql = (
+        f"select WoStatus, count(*) from words {recent_where} "
         "group by WoStatus"
     )
-    today_rows = session.execute(text(today_sql), params).all()
-    today_by_status = {int(r[0]): int(r[1]) for r in today_rows}
+    recent_rows = session.execute(text(recent_sql), recent_params).all()
+    recent_by_status = {int(r[0]): int(r[1]) for r in recent_rows}
 
     cum_sql = f"select WoStatus, count(*) from words {where_clause} group by WoStatus"
     cum_rows = session.execute(text(cum_sql), params).all()
@@ -298,6 +311,7 @@ def get_term_summary(session, lang_id):
 
     return {
         "total_terms": int(total),
-        "today_by_status": today_by_status,
+        "recent_by_status": recent_by_status,
+        "recent_label": "Last 7 days" if period == "7days" else "Last 12 months",
         "cumulative_by_status": cumulative_by_status,
     }
