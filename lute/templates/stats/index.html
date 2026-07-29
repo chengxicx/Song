@@ -188,6 +188,24 @@
   .chart-wrap { position: relative; height: 240px; flex: 1; }
   .empty-msg { color: #adb5bd; font-style: italic; font-size: 13px; padding: 20px 0; text-align: center; }
   .chart-loading { color: #adb5bd; font-style: italic; font-size: 13px; padding: 40px 0; text-align: center; }
+
+  /* Words read table alignment */
+  .statsWordsRead {
+    width: 100%;
+    table-layout: fixed;
+    margin-bottom: 16px;
+  }
+  .statsWordsRead th,
+  .statsWordsRead td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px 12px;
+  }
+  .statsWordsRead th:first-child,
+  .statsWordsRead td:first-child {
+    text-align: left;
+    width: 20%;
+  }
 </style>
 
 <!-- Filter controls -->
@@ -212,7 +230,19 @@
 
 <!-- 2x2 term charts grid -->
 <div class="term-charts-grid">
-  <!-- Top-left: Summary -->
+  <!-- Top-left: New terms -->
+  <div class="chart-card">
+    <h3>New terms</h3>
+    <div class="chart-wrap"><canvas id="newTermsChart"></canvas></div>
+  </div>
+
+  <!-- Top-right: Mastered terms -->
+  <div class="chart-card">
+    <h3>Fully mastered terms</h3>
+    <div class="chart-wrap"><canvas id="masteredTermsChart"></canvas></div>
+  </div>
+
+  <!-- Bottom-left: Summary -->
   <div class="chart-card">
     <h3>Summary</h3>
     <div class="summary-panel" id="summary-panel">
@@ -220,7 +250,7 @@
     </div>
   </div>
 
-  <!-- Top-right: Heatmap -->
+  <!-- Bottom-right: Heatmap -->
   <div class="chart-card">
     <h3>Term activity</h3>
     <div class="heatmap-container">
@@ -248,18 +278,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Bottom-left: New terms -->
-  <div class="chart-card">
-    <h3>New terms</h3>
-    <div class="chart-wrap"><canvas id="newTermsChart"></canvas></div>
-  </div>
-
-  <!-- Bottom-right: Mastered terms -->
-  <div class="chart-card">
-    <h3>Fully mastered terms</h3>
-    <div class="chart-wrap"><canvas id="masteredTermsChart"></canvas></div>
   </div>
 </div>
 
@@ -323,7 +341,7 @@
       .then(function(data) {
         renderSummary(data.summary);
         renderHeatmap(data.heatmap);
-        renderBarChart('newTermsChart', data.new_terms, '#228be6', 'New terms');
+        renderBarChart('newTermsChart', data.new_terms, '#e03131', 'New terms');
         renderBarChart('masteredTermsChart', data.mastered_terms, '#37b24d', 'Mastered terms');
       })
       .catch(function(err) {
@@ -504,6 +522,21 @@
       window[canvasId + '_instance'] = null;
     }
     const timeUnit = currentPeriod === 'monthly' ? 'month' : 'day';
+    const xScale = {
+      type: 'time',
+      time: { unit: timeUnit },
+      grid: { display: false },
+      ticks: {
+        color: '#8e8e93',
+      }
+    };
+    if (currentPeriod === '7days') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const sixDaysAgo = new Date(today.getTime() - 6 * 86400000);
+      xScale.min = sixDaysAgo;
+      xScale.max = today;
+    }
     const chart = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -520,11 +553,7 @@
         maintainAspectRatio: false,
         responsive: true,
         scales: {
-          x: {
-            type: 'time',
-            time: { unit: timeUnit },
-            grid: { display: false }
-          },
+          x: xScale,
           y: {
             beginAtZero: true,
             ticks: { precision: 0, callback: function(v) { return v.toLocaleString(); } },
@@ -583,23 +612,26 @@
             type: 'time',
             display: true,
             time: { unit: 'day' },
-            title: { display: true, text: 'Date' },
+            title: { display: true, text: 'Date', color: '#8e8e93' },
             ticks: {
               major: { enabled: true },
-              color: (context) => context.tick && context.tick.major && '#FF0000',
+              color: '#8e8e93',
               font: function(context) {
                 if (context.tick && context.tick.major) {
-                  return { weight: 'bold' };
+                  return { weight: 'bold', color: '#f2f2f7' };
                 }
+                return { color: '#8e8e93' };
               }
-            }
+            },
+            grid: { color: 'rgba(255,255,255,0.08)' }
           },
           total: {
             position: 'right',
-            title: { display: true, text: 'total' },
+            title: { display: true, text: 'total', color: '#8e8e93' },
             grid: { display: false },
             ticks: {
               beginAtZero: true,
+              color: '#8e8e93',
               callback: function(value) {
                 return value.toLocaleString();
               }
