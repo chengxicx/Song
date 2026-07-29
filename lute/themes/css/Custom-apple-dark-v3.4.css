@@ -744,7 +744,13 @@ canvas + svg text {
 }
 
 .chart-card canvas {
-  filter: contrast(150%) brightness(1.6) !important;
+  filter: none !important;
+}
+
+/* Term charts: ensure proper contrast on dark background */
+#newTermsChart,
+#masteredTermsChart {
+  background-color: transparent !important;
 }
 
 .chart-card .chart-axis-label {
