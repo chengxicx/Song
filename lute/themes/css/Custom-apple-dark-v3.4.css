@@ -1,0 +1,746 @@
+/* =========================================================
+   LUTE THEME: Apple Books Dark Style (深色模式全套样式)
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. 全局 Apple Books 深色调 (Dark Theme)
+   --------------------------------------------------------- */
+body {
+  /* 生词状态色彩 (深色模式下降低饱和度，防止刺眼) */
+  --status-0-color: #0a84ff;        
+  --status-1-color: #722c2b;        
+  --status-2-color: #6e5218;        
+  --status-3-color: #245838;        
+  --status-4-color: #214368;        
+  --status-5-color: #482f63;        
+  --status-learned-bg: #3a3a3c;     
+  --status-learned-color: #8e8e93;  
+  --status-99-color: transparent;
+
+  --background-color: #1c1c1e;      /* Apple 界面暗黑背景色 */
+  --panel-bg: #2c2c2e;            /* 悬浮卡片/表格底色 */
+  --font-color: #e5e5ea;           /* 文本亮灰/白 */
+
+  background-color: var(--background-color) !important;
+  color: var(--font-color) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "PingFang SC", sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------
+   2. 顶栏 (.menu-bar) —— 深色毛玻璃特效
+   --------------------------------------------------------- */
+.menu-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 52px !important;
+  padding: 0 24px !important;
+  background-color: rgba(28, 28, 30, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  position: relative !important;
+  z-index: 1000 !important;
+}
+
+/* Logo 区 */
+.menu-bar .header {
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 0 !important;
+  flex-shrink: 0;
+}
+
+.lutelogo {
+  height: 24px !important;
+  width: auto !important;
+  opacity: 0.9;
+  filter: invert(1) brightness(1.8); /* 适配反色为白色 logo */
+}
+
+#luteTitle {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #f2f2f7 !important;
+  margin: 0 0 0 8px !important;
+  letter-spacing: -0.01em;
+}
+
+/* 右侧菜单区 (BOOKS, TERMS...) */
+.menu-bar .menu {
+  display: flex !important;
+  align-items: center !important;
+  margin-left: auto !important;
+  gap: 20px !important;
+}
+
+.menu-item {
+  position: relative !important;
+  margin: 0 !important;
+  padding: 14px 0 !important;
+  cursor: pointer;
+}
+
+.menu-item > span {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #8e8e93 !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.menu-item:hover > span {
+  color: #0a84ff !important;
+}
+
+/* 下拉菜单 —— 暗黑悬浮卡片 */
+.sub-menu {
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  left: auto !important;
+  background: rgba(44, 44, 46, 0.95) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  padding: 6px !important;
+  min-width: 160px !important;
+  z-index: 10001 !important;
+  list-style: none !important;
+}
+
+.sub-menu li a {
+  display: block !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  color: #f2f2f7 !important;
+  border-radius: 6px !important;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sub-menu li a:hover {
+  background-color: #0a84ff !important;
+  color: #ffffff !important;
+}
+
+.sub-menu hr {
+  border: none !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin: 4px 0 !important;
+}
+
+/* ---------------------------------------------------------
+   3. 控件嵌入顶栏
+   --------------------------------------------------------- */
+.dt-container .dt-layout-row:first-child,
+div.dt-container div.dt-layout-row:first-child {
+  position: absolute !important;
+  top: 12px !important;
+  left: 240px !important;
+  z-index: 1001 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto !important;
+  height: 28px !important;
+}
+
+.dt-container .dt-layout-cell,
+.dt-container .dt-layout-start,
+.dt-container .dt-layout-end {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  background: transparent !important;
+}
+
+/* 语言下拉框 */
+#defaultLanguageSelect {
+  height: 28px !important;
+  line-height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 6px !important;
+  outline: none;
+  cursor: pointer;
+}
+
+#defaultLanguageSelect option {
+  background-color: #2c2c2e;
+  color: #f2f2f7;
+}
+
+/* 搜索框 —— 暗黑放大镜折叠式 */
+.dt-search {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  position: relative !important;
+}
+
+.dt-search label {
+  display: none !important;
+}
+
+.dt-search__toggle {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #8e8e93 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  transition: all 0.2s ease;
+}
+
+.dt-search__toggle:hover {
+  color: #0a84ff !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: #0a84ff !important;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25) !important;
+}
+
+.dt-search input,
+#dt-search-0 {
+  height: 28px !important;
+  line-height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 6px !important;
+  outline: none;
+  width: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  opacity: 0 !important;
+  transform: scaleX(0) !important;
+  transform-origin: right center !important;
+  transition: all 0.25s ease;
+  pointer-events: none !important;
+}
+
+.dt-search.dt-search--expanded input,
+.dt-search.dt-search--expanded #dt-search-0 {
+  width: 180px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+  opacity: 1 !important;
+  transform: scaleX(1) !important;
+  pointer-events: auto !important;
+}
+
+#defaultLanguageSelect:focus,
+.dt-search input:focus {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: #0a84ff !important;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25) !important;
+}
+
+/* ---------------------------------------------------------
+   4. NEW WORD 胶囊色彩
+   --------------------------------------------------------- */
+.new-word-badge {
+  display: inline-block !important;
+  padding: 3px 10px !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.new-word-easy {
+  background-color: #1e3a29 !important;
+  color: #a7d8b9 !important;
+}
+
+.new-word-chal {
+  background-color: #423213 !important;
+  color: #f7d382 !important;
+}
+
+.new-word-hard {
+  background-color: #451b1b !important;
+  color: #f09595 !important;
+}
+
+/* ---------------------------------------------------------
+   5. 表格卡片 (暗黑书页 Card)
+   --------------------------------------------------------- */
+.dt-container, div.dt-container {
+  margin-top: 16px !important;
+  padding: 0 24px !important;
+}
+
+table.dataTable, table {
+  background-color: #2c2c2e !important;
+  color: var(--font-color) !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  width: 100% !important;
+}
+
+th {
+  background-color: #242426 !important;
+  color: #8e8e93 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 12px 16px !important;
+}
+
+td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+}
+
+tr:last-child td {
+  border-bottom: none !important;
+}
+
+a, a:link, a:visited {
+  color: #0a84ff !important;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------
+   6. 阅读模式样式 (Apple Books 暗黑衬线体 + 紧凑行距)
+   --------------------------------------------------------- */
+div#thetext p { 
+  line-height: 1.4 !important;
+  margin: 0.4em 0 !important;
+  font-size: 18px;
+  color: #e5e5ea !important;
+  font-family: "Georgia", "New York", "Songti SC", "Source Han Serif SC", serif !important;
+}
+
+span.textitem {
+  font-family: "Georgia", "New York", serif !important;
+}
+
+span.status0 { background-color: transparent; color: var(--status-0-color); font-weight: 600; }
+span.status1 { background-color: var(--status-1-color); color: #ffd7d5; border-radius: 3px; padding: 1px 3px; }
+span.status2 { background-color: var(--status-2-color); color: #ffe8b3; border-radius: 3px; padding: 1px 3px; }
+span.status3 { background-color: var(--status-3-color); color: #d1ebd8; border-radius: 3px; padding: 1px 3px; }
+span.status4 { background-color: var(--status-4-color); color: #d2e4f7; border-radius: 3px; padding: 1px 3px; }
+span.status5 { background-color: var(--status-5-color); color: #e5d7f2; border-radius: 3px; padding: 1px 3px; }
+
+span.status98, span.status99 { 
+  background-color: transparent; 
+  color: inherit; 
+}
+
+/* ---------------------------------------------------------
+   7. 底部控件布局对齐
+   --------------------------------------------------------- */
+.dt-container div.dt-layout-row:last-child,
+div.dt-container div.dt-layout-row:last-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
+  gap: 16px !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.dt-container div.dt-layout-row:last-child > .dt-layout-start,
+.dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-start {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  height: auto !important;
+}
+
+.dt-container div.dt-layout-row:last-child > .dt-layout-end,
+.dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-end {
+  display: flex !important;
+  align-items: center !important;
+  gap: 2px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+}
+
+div.dt-container .dt-length,
+div.dt-container .dt-info {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 13px !important;
+  color: #8e8e93 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  white-space: nowrap !important;
+}
+
+div.dt-container .dt-length select {
+  height: 28px !important;
+  padding: 0 6px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: #2c2c2e !important;
+  color: #f2f2f7 !important;
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+  vertical-align: middle !important;
+}
+
+div.dt-container .dt-buttons {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 32px !important;
+}
+
+div.dt-container .dt-buttons button.dt-button,
+div.dt-container .dt-buttons button {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 28px !important;
+  padding: 0 10px !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #f2f2f7 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+div.dt-container .dt-buttons button.dt-button:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: #0a84ff !important;
+  color: #0a84ff !important;
+}
+
+#datatables_config_widget {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 32px !important;
+  padding: 0 2px !important;
+  margin: 0 !important;
+}
+
+#datatables_config_widget img {
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+  vertical-align: middle !important;
+  filter: invert(0.8);
+}
+
+div.dt-container .dt-paging {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 32px !important;
+}
+
+div.dt-container .dt-paging button.dt-paging-button,
+div.dt-container .dt-paging .paginate_button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #f2f2f7 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+div.dt-container .dt-paging button.dt-paging-button:hover:not(.disabled):not(.current),
+div.dt-container .dt-paging .paginate_button:hover:not(.disabled):not(.current) {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: #0a84ff !important;
+  color: #0a84ff !important;
+}
+
+div.dt-container .dt-paging button.dt-paging-button.current,
+div.dt-container .dt-paging .paginate_button.current {
+  background: #0a84ff !important;
+  border-color: #0a84ff !important;
+  color: #fff !important;
+  box-shadow: 0 1px 3px rgba(10,132,255,0.4) !important;
+}
+
+div.dt-container .dt-paging button.dt-paging-button.disabled,
+div.dt-container .dt-paging .paginate_button.disabled {
+  opacity: 0.3 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 820px) {
+  .dt-container div.dt-layout-row:last-child,
+  div.dt-container div.dt-layout-row:last-child {
+    flex-wrap: wrap !important;
+  }
+  .dt-container div.dt-layout-row:last-child > .dt-layout-start,
+  .dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-start {
+    flex-basis: 100% !important;
+    justify-content: flex-start !important;
+  }
+  .dt-container div.dt-layout-row:last-child > .dt-layout-end,
+  .dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-end {
+    flex-basis: 100% !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   8. TTS 播放器样式适配
+   --------------------------------------------------------- */
+#lute-tts-panel {
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  color: #f2f2f7 !important;
+}
+
+#btn-lute-playpause,
+#lute-tts-panel button {
+  background-color: #0a84ff !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  border: none !important;
+  transition: background-color 0.15s ease;
+}
+
+#btn-lute-playpause:hover,
+#lute-tts-panel button:hover {
+  background-color: #409cff !important;
+}
+
+#lute-tts-panel select {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 6px !important;
+  outline: none;
+}
+
+#lute-tts-panel select option {
+  background-color: #2c2c2e !important;
+  color: #f2f2f7 !important;
+}
+
+#lute-tts-panel div[style*="border-left"] {
+  border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+#lute-tts-panel input[type="range"] {
+  accent-color: #0a84ff !important;
+}
+
+/* ---------------------------------------------------------
+   9. STATS 页面适配 (Summary 白框、对齐与图表色彩)
+   --------------------------------------------------------- */
+
+/* 上方筛选控制栏 */
+#ov-controls,
+.ov-controls {
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  color: #f2f2f7 !important;
+  padding: 12px 16px !important;
+  margin-bottom: 20px !important;
+}
+
+#ov-controls button,
+.ov-controls button {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 6px !important;
+  padding: 4px 12px !important;
+}
+
+#ov-controls button.active,
+#ov-controls button.selected,
+.ov-controls button.active,
+.ov-controls button.selected {
+  background-color: #0a84ff !important;
+  border-color: #0a84ff !important;
+  color: #ffffff !important;
+}
+
+#ov-controls select,
+.ov-controls select {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 6px !important;
+}
+
+#ov-controls select option,
+.ov-controls select option {
+  background-color: #2c2c2e !important;
+  color: #f2f2f7 !important;
+}
+
+/* 统计卡片面板 (.chart-card) */
+.chart-card {
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  color: #f2f2f7 !important;
+  padding: 20px !important;
+}
+
+.chart-card h3 {
+  color: #f2f2f7 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding-bottom: 10px !important;
+  margin-top: 0 !important;
+}
+
+/* 修复 Summary 里的 8 个小方块（改为暗色透底） */
+.summary-level-item {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+}
+
+.summary-level-num {
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.summary-level-name,
+.summary-section-title,
+.summary-total {
+  color: #a1a1a6 !important;
+}
+
+/* New terms chart uses red color directly (#e03131), no hue-rotate needed */
+
+/* ---------------------------------------------------------
+   10. WORDS READ 表格对齐与底栏日期刻度优化
+   --------------------------------------------------------- */
+
+/* Words Read 表格均分与垂直居中对齐 */
+.words-read-table, 
+table[id*="read"], 
+.chart-card table,
+.statsWordsRead {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.words-read-table th, 
+.words-read-table td,
+.chart-card table th,
+.chart-card table td,
+.statsWordsRead th,
+.statsWordsRead td {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 8px 12px !important;
+}
+
+.words-read-table th:first-child,
+.words-read-table td:first-child,
+.chart-card table th:first-child,
+.chart-card table td:first-child,
+.statsWordsRead th:first-child,
+.statsWordsRead td:first-child {
+  text-align: left !important;
+  width: 20% !important;
+}
+
+/* Words read 图表背景与对比度 */
+#wordCountChart {
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 12px !important;
+}
+
+/* 底部 Date 日期刻度高亮显示 */
+.chart-card svg text,
+canvas + svg text {
+  color: #f2f2f7 !important;
+  fill: #e5e5ea !important;
+}
+
+.chart-card canvas {
+  filter: contrast(150%) brightness(1.6) !important;
+}
+
+.chart-card .chart-axis-label {
+  color: #a1a1a6 !important;
+  font-weight: 500 !important;
+}

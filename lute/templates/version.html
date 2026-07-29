@@ -22,6 +22,16 @@
 </div>
 
 <div style="margin-top:20px;">
+  <p>2026-07-30: Statistics page UI fixes and dark theme improvements:
+    <ol style="margin-top:6px;margin-bottom:0;">
+      <li><b>New terms / Fully mastered terms 置顶：</b>将 New terms 和 Fully mastered terms 图表移到顶部行（Top-left / Top-right），Summary 和 Term activity（Heatmap）移到底部行。</li>
+      <li><b>7 Days 时间范围正确显示：</b>选择 "7 days" 时，New terms 和 Fully mastered terms 图表的 X 轴现在强制限定为最近 7 天范围（6 天前至今天），即使某天无数据也能正确显示 7 天刻度。</li>
+      <li><b>New terms 改为红色：</b>New terms 柱状图颜色从蓝色 (#228be6) 改为红色 (#e03131)，同时移除了 dark theme 中的 hue-rotate CSS filter hack。</li>
+      <li><b>Words Read 表格对齐：</b>为 .statsWordsRead 添加了完整的对齐样式（居中对齐、垂直居中、均分列宽），dark theme 也同步适配。</li>
+      <li><b>Words Read 图表日期可见性：</b>修复了 Word Count Chart 日期刻度在 dark theme 下不可见的问题，将红色 (#FF0000) 改为浅灰 (#8e8e93/#f2f2f7)，并添加了 Y 轴刻度颜色与网格线颜色适配。</li>
+    </ol>
+  </p>
+
   <p>2026-07-29: Fix Japanese MeCab Unidic dictionary compatibility — skip auxiliary verbs/particles in lemma generation, normalize Unidic orthography, and dynamically detect kana reading field index.</p>
 
   <p>2026-07-29: Listing page (books/terms/termtags/bookmarks/languages) UI fixes and polish for the custom-apple theme:
