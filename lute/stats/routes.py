@@ -60,7 +60,7 @@ def get_term_data():
 
     return jsonify(
         {
-            "summary": get_term_summary(db.session, lang_id),
+            "summary": get_term_summary(db.session, lang_id, period),
             "new_terms": get_new_terms(db.session, period, lang_id),
             "mastered_terms": get_mastered_terms(db.session, period, lang_id),
             "heatmap": get_heatmap_data(db.session, lang_id),

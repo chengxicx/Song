@@ -367,11 +367,12 @@
   function renderSummary(summary) {
     const panel = document.getElementById('summary-panel');
     const total = summary.total_terms || 0;
-    const todayMap = summary.today_by_status || {};
+    const recentMap = summary.recent_by_status || {};
     const cumMap = summary.cumulative_by_status || {};
+    const recentLabel = summary.recent_label || 'Recent';
 
-    let todayTotal = 0;
-    for (const k in todayMap) { todayTotal += todayMap[k]; }
+    let recentTotal = 0;
+    for (const k in recentMap) { recentTotal += recentMap[k]; }
 
     function classifyStatus(status) {
       if (status == 1) return 'unknown';
@@ -384,9 +385,9 @@
     const groups = {
       unknown: 0, vague: 0, mastered: 0, ignored: 0, other: 0
     };
-    for (const s in todayMap) {
+    for (const s in recentMap) {
       const g = classifyStatus(parseInt(s));
-      groups[g] = (groups[g] || 0) + todayMap[s];
+      groups[g] = (groups[g] || 0) + recentMap[s];
     }
     const cumGroups = {
       unknown: 0, vague: 0, mastered: 0, ignored: 0, other: 0
@@ -420,7 +421,7 @@
         '<span class="summary-total-num">' + total.toLocaleString() + '</span>' +
         '<span class="summary-total-label">total terms</span>' +
       '</div>' +
-      '<div class="summary-section-title">Today new (' + todayTotal + ')</div>' +
+      '<div class="summary-section-title">' + recentLabel + ' (' + recentTotal + ')</div>' +
       '<div class="summary-levels">' + groupHtml(groups) + '</div>' +
       '<div class="summary-section-title">Cumulative</div>' +
       '<div class="summary-levels">' + groupHtml(cumGroups) + '</div>';
