@@ -184,6 +184,12 @@ def _filter_days(daily_data, days):
     return [d for d in daily_data if cutoff_str <= d["date"] <= today_str]
 
 
+def _filter_today(daily_data):
+    "Return only today's data."
+    today_str = datetime.now().date().isoformat()
+    return [d for d in daily_data if d["date"] == today_str]
+
+
 def _monthly_aggregate(daily_data, months=12):
     "Aggregate daily data into monthly buckets, keeping last N months."
     if not daily_data:
@@ -201,6 +207,8 @@ def _monthly_aggregate(daily_data, months=12):
 def get_new_terms(session, period, lang_id):
     "New terms trend grouped by creation date."
     daily = _daily_counts(session, "WoCreated", lang_id)
+    if period == "today":
+        return _filter_today(daily)
     if period == "7days":
         return _filter_days(daily, 7)
     if period == "monthly":
@@ -211,6 +219,8 @@ def get_new_terms(session, period, lang_id):
 def get_mastered_terms(session, period, lang_id):
     "Fully-mastered (status 99) terms grouped by status-changed date."
     daily = _daily_counts(session, "WoStatusChanged", lang_id, status_filter=99)
+    if period == "today":
+        return _filter_today(daily)
     if period == "7days":
         return _filter_days(daily, 7)
     if period == "monthly":
@@ -283,7 +293,10 @@ def get_term_summary(session, lang_id, period="7days"):
     # Use Python date comparison instead of SQLite date('now', 'localtime')
     # to avoid timezone mismatches between SQLite and the application.
     today = datetime.now().date()
-    if period == "7days":
+    if period == "today":
+        recent_start = today.isoformat()
+        recent_end = today.isoformat()
+    elif period == "7days":
         cutoff = today - timedelta(days=6)
         recent_start = cutoff.isoformat()
         recent_end = today.isoformat()
@@ -312,6 +325,6 @@ def get_term_summary(session, lang_id, period="7days"):
     return {
         "total_terms": int(total),
         "recent_by_status": recent_by_status,
-        "recent_label": "Last 7 days" if period == "7days" else "Last 12 months",
+        "recent_label": "Today" if period == "today" else ("Last 7 days" if period == "7days" else "Last 12 months"),
         "cumulative_by_status": cumulative_by_status,
     }

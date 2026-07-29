@@ -12,9 +12,9 @@ from lute.stats.service import (
     get_heatmap_data,
     get_term_languages,
     get_term_summary,
-    get_last_read_language_id,
 )
 from lute.db import db
+import lute.utils.formutils
 
 bp = Blueprint("stats", __name__, url_prefix="/stats")
 
@@ -25,7 +25,7 @@ def index():
     read_table_data = get_table_data(db.session)
     reading_streak = get_reading_streak(db.session)
     term_languages = get_term_languages(db.session)
-    default_lang_id = get_last_read_language_id(db.session)
+    default_lang_id = lute.utils.formutils.valid_current_language_id(db.session)
     return render_template(
         "stats/index.html",
         hide_homelink=True,
@@ -47,7 +47,7 @@ def get_data():
 def get_term_data():
     "Ajax call for term-related charts."
     period = request.args.get("period", "7days")
-    if period not in ("7days", "monthly"):
+    if period not in ("today", "7days", "monthly"):
         period = "7days"
 
     lang_param = request.args.get("lang_id", "")

@@ -213,6 +213,7 @@
   <div>
     <label>Period</label>
     <span class="ov-period-btns" id="ov-period-btns">
+      <button data-period="today">Today</button>
       <button data-period="7days" class="active">7 days</button>
       <button data-period="monthly">Monthly</button>
     </span>
@@ -549,6 +550,11 @@
       today.setHours(0, 0, 0, 0);
       const sixDaysAgo = new Date(today.getTime() - 6 * 86400000);
       xScale.min = sixDaysAgo;
+      xScale.max = today;
+    } else if (currentPeriod === 'today') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      xScale.min = today;
       xScale.max = today;
     }
     const chart = new Chart(ctx, {
