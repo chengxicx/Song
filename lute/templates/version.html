@@ -22,6 +22,8 @@
 </div>
 
 <div style="margin-top:20px;">
+  <p>2026-07-31: PWA fixes for installability. Manifest is now served with correct <code>application/manifest+json</code> MIME type via <code>/manifest.webmanifest</code> and loaded with <code>crossorigin=&quot;use-credentials&quot;</code> (compatible with BasicAuth-protected sites). Service worker registration now unregisters any stale SWs registered on credential-containing URLs, then registers cleanly against the real origin. Also added richer manifest fields (id, display_override, shortcuts, maskable icons), plus additional meta tags for iOS/Android home screen installation.</p>
+
   <p>2026-07-31: Add PWA (Progressive Web App) support. Lute can now be installed to the home screen on mobile and desktop, with offline caching of static assets and pages for reading without a network connection. Added web manifest, service worker, and theme color metadata.</p>
 
   <p>2026-07-31: Edit book now allows editing the entire article text. The Edit Book form (accessible from the home page Actions menu) now includes a full text area pre-populated with the book's content, along with text file upload, split-by, and words-per-page controls. Changing the text re-parses and re-paginates the book; if the text is unchanged, existing pages and reading progress are preserved.</p>

@@ -12,8 +12,12 @@
   {% endif %}
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
+  <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials" />
   <meta name="theme-color" content="#2563eb" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="Lute" />
+  <meta name="apple-mobile-web-app-title" content="Lute" />
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon-57x57.png') }}" />
   <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='img/apple-touch-icon-72x72.png') }}" />
   <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='img/apple-touch-icon-114x114.png') }}" />
@@ -165,10 +169,35 @@
   // PWA service worker registration
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js', { scope: '/' })
-        .catch(function(err) {
-          console.warn('SW registration failed:', err);
+      // Clean up any stale registrations with mismatched origin/scope
+      // (e.g. when BasicAuth credentials were embedded in the URL).
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        var expectedPrefix = location.origin + '/';
+        var needsFresh = false;
+        regs.forEach(function(r) {
+          var scriptOrigin = '';
+          try {
+            scriptOrigin = new URL(r.active ? r.active.scriptURL : (r.scope), location.href).origin;
+          } catch(e) {}
+          if (scriptOrigin && scriptOrigin !== location.origin) {
+            try { r.unregister(); } catch(e) {}
+            needsFresh = true;
+          }
+          if (needsFresh) {
+            try { r.unregister(); } catch(e) {}
+          }
         });
+        // Register service worker at the site root; scope is broadened via
+        // the Service-Worker-Allowed header.
+        return navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      }).catch(function(err) {
+        // Some older browsers may not support getRegistrations() fully;
+        // try a direct registration anyway.
+        return navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .catch(function(e2) {
+            console.warn('SW registration failed:', err || e2);
+          });
+      });
     });
   }
 </script>
