@@ -123,10 +123,28 @@ class NewBookForm(FlaskForm):
 
 class EditBookForm(FlaskForm):
     """
-    Edit existing book.  Only a few fields can be changed.
+    Edit existing book.  Title, source, tags, audio, and text can be changed.
     """
 
     title = StringField("Title", validators=[DataRequired(), Length(max=255)])
+    text = TextAreaField("Text")
+    textfile = FileField(
+        "Text file",
+        validators=[
+            FileAllowed(
+                ["txt", "epub", "pdf", "srt", "vtt"],
+                "Please upload a valid text (txt, epub, pdf, srt, vtt)",
+            )
+        ],
+    )
+    split_by = SelectField(
+        "Split by", choices=[("paragraphs", "Paragraphs"), ("sentences", "Sentences")]
+    )
+    threshold_page_tokens = IntegerField(
+        "Words per page",
+        validators=[NumberRange(min=1, max=1500)],
+        default=250,
+    )
     source_uri = StringField("Source URI", validators=[Length(max=1000)])
     book_tags = StringField("Tags")
     audiofile = FileField(
@@ -159,6 +177,11 @@ class EditBookForm(FlaskForm):
         "Call the populate_obj method from the parent class, then mine."
         super().populate_obj(obj)
         obj.book_tags = _tag_values(self.book_tags.data)
+
+        tfd = self.textfile.data
+        if tfd:
+            obj.text_stream = tfd.stream
+            obj.text_stream_filename = tfd.filename
 
         afd = self.audiofile.data
         if afd:

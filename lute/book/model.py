@@ -205,6 +205,26 @@ class Repository:
                 _ = DBText(b, page, index + 1)
         else:
             b = self.book_repo.find(book.id)
+            # If the text has been changed, re-split the pages.
+            # Reading progress, bookmarks, and sentences for the old
+            # pages are lost; they are re-created on the new pages.
+            if book.text is not None:
+                current_text = self._get_full_text(b)
+                new_text = book.text
+                # Normalize line endings and strip for comparison so
+                # that minor whitespace differences don't trigger a
+                # re-parse.
+                norm_current = current_text.replace("\r\n", "\n").replace("\r", "\n").strip()
+                norm_new = new_text.replace("\r\n", "\n").replace("\r", "\n").strip()
+                if norm_new != norm_current:
+                    # Remove existing pages; cascade deletes sentences
+                    # and bookmarks.  WordsRead rows have their tx_id
+                    # set to NULL (ondelete="SET NULL").
+                    b.texts = []
+                    self.session.flush()
+                    pages = self._split_pages(book, lang)
+                    for index, page in enumerate(pages):
+                        _ = DBText(b, page, index + 1)
 
         b.title = book.title
         b.source_uri = book.source_uri
@@ -222,6 +242,10 @@ class Repository:
 
         return b
 
+    def _get_full_text(self, dbbook):
+        "Join all page texts into a single string, separated by page breaks."
+        return "\n\n---\n\n".join(t.text for t in dbbook.texts)
+
     def _build_business_book(self, dbbook):
         "Convert db book to Book."
         b = Book()
@@ -229,7 +253,7 @@ class Repository:
         b.language_id = dbbook.language.id
         b.language_name = dbbook.language.name
         b.title = dbbook.title
-        b.text = None  # Not returning this for now
+        b.text = self._get_full_text(dbbook)
         b.source_uri = dbbook.source_uri
         b.audio_filename = dbbook.audio_filename
         b.audio_current_pos = dbbook.audio_current_pos
