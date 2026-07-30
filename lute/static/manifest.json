@@ -1,0 +1,35 @@
+{
+  "name": "Lute - Learning Using Texts",
+  "short_name": "Lute",
+  "description": "Learning Using Texts - read foreign language texts with smart word tracking.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/static/img/apple-touch-icon-57x57.png",
+      "sizes": "57x57",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/img/apple-touch-icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/img/apple-touch-icon-114x114.png",
+      "sizes": "114x114",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/img/lute.png",
+      "sizes": "349x273",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

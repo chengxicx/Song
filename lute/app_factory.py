@@ -257,6 +257,15 @@ def _add_base_routes(app, app_config):
         ] = "no-store, no-cache, must-revalidate, max-age=0"
         return response
 
+    @app.route("/sw.js")
+    def service_worker():
+        "Serve the PWA service worker from root scope."
+        response = make_response(send_from_directory("static", "sw.js"))
+        response.headers["Content-Type"] = "application/javascript"
+        response.headers["Cache-Control"] = "no-cache"
+        response.headers["Service-Worker-Allowed"] = "/"
+        return response
+
     @app.errorhandler(500)
     def _internal_server_error(e):  # pylint: disable=unused-argument
         """

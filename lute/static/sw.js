@@ -1,0 +1,107 @@
+/* Lute Service Worker - PWA offline support */
+const CACHE_NAME = 'lute-v3.10.3.1';
+
+const STATIC_ASSETS = [
+  '/',
+  '/static/css/styles.css',
+  '/static/css/player-styles.css',
+  '/static/vendor/jquery/jquery.js',
+  '/static/vendor/jquery/jquery-ui.min.js',
+  '/static/vendor/jquery/jquery-ui.css',
+  '/static/vendor/jquery/jquery.scrollTo.min.js',
+  '/static/vendor/jquery/jquery.jeditable.mini.js',
+  '/static/vendor/jquery/jquery.hoverIntent.js',
+  '/static/vendor/tagify/tagify.min.js',
+  '/static/vendor/tagify/tagify.polyfills.min.js',
+  '/static/vendor/tagify/tagify.css',
+  '/static/vendor/tagify/tagify_overrides.css',
+  '/static/vendor/datatables/datatables.min.js',
+  '/static/vendor/datatables/datatables.min.css',
+  '/static/vendor/datatables/datatables.button.download.js',
+  '/static/vendor/dayjs/dayjs.min.js',
+  '/static/vendor/dayjs/relativeTime.js',
+  '/static/img/lute.png',
+  '/static/img/apple-touch-icon-57x57.png',
+  '/static/img/apple-touch-icon-72x72.png',
+  '/static/img/apple-touch-icon-114x114.png',
+  '/static/favicon.ico',
+  '/static/manifest.json',
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache =>
+      cache.addAll(STATIC_ASSETS).catch(err => {
+        console.warn('SW: some assets failed to cache on install', err);
+      })
+    )
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      )
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+
+  // Only handle same-origin requests
+  if (url.origin !== self.location.origin) return;
+
+  // Skip theme and custom styles (they are dynamic per-user)
+  if (url.pathname.startsWith('/theme/')) return;
+
+  // Skip never-cache JS (always fresh)
+  if (url.pathname.startsWith('/static/js/never_cache/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Cache-first for static assets
+  if (url.pathname.startsWith('/static/')) {
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        if (cached) return cached;
+        return fetch(event.request).then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
+          return response;
+        });
+      })
+    );
+    return;
+  }
+
+  // Network-first for pages, fallback to cache when offline
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        if (response.ok && response.type === 'basic') {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(() => {
+        return caches.match(event.request).then(cached => {
+          return cached || caches.match('/');
+        });
+      })
+  );
+});
