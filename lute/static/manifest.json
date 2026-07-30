@@ -22,8 +22,8 @@
       "url": "/",
       "icons": [
         {
-          "src": "/static/img/apple-touch-icon-114x114.png",
-          "sizes": "114x114",
+          "src": "/static/img/icon-192.png",
+          "sizes": "192x192",
           "type": "image/png"
         }
       ]
@@ -34,25 +34,65 @@
       "src": "/static/img/apple-touch-icon-57x57.png",
       "sizes": "57x57",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/static/img/apple-touch-icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/static/img/apple-touch-icon-114x114.png",
       "sizes": "114x114",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/static/img/lute.png",
-      "sizes": "349x273",
+      "src": "/static/img/icon-144.png",
+      "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/static/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/img/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/static/img/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/static/img/lute-screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Lute - Learning Using Texts"
+    },
+    {
+      "src": "/static/img/lute-screenshot-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Lute - Learning Using Texts"
     }
   ]
 }
