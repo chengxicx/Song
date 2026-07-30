@@ -12,6 +12,8 @@
   {% endif %}
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
+  <meta name="theme-color" content="#2563eb" />
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon-57x57.png') }}" />
   <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='img/apple-touch-icon-72x72.png') }}" />
   <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='img/apple-touch-icon-114x114.png') }}" />
@@ -157,6 +159,18 @@
       $("#anki_export_index").css('display', 'none');
     }
   });
+</script>
+
+<script>
+  // PWA service worker registration
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .catch(function(err) {
+          console.warn('SW registration failed:', err);
+        });
+    });
+  }
 </script>
 
 <script>
