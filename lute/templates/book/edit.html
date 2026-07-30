@@ -11,7 +11,8 @@
 {% endfor %}
 {% endfor %}
 
-<p style="width: 50%; margin-bottom: 20px;">Note: you can't change the language or text of a book after it has been created.  If you need to do that, please create a new book instead, and delete the old one.</p>
+<p style="width: 50%; margin-bottom: 20px;">Note: you can't change the language of a book after it has been created.
+  If you change the text, all pages will be re-parsed and reading progress will be reset.</p>
 
 <form method="POST" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
@@ -22,6 +23,28 @@
     <tr>
       <td>{{ form.title.label }}</td>
       <td>{{ form.title(class="form-control", dir=title_direction) }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.text.label }}</td>
+      <td>{{ form.text(class="form-largetextarea", dir=title_direction) }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.textfile.label }}<br />
+        <span class="formfieldcomment">txt, epub, pdf, srt, vtt</span>
+      </td>
+      <td>{{ form.textfile() }}</td>
+    </tr>
+
+    <tr>
+      <td> {{ form.split_by.label }}</td>
+      <td> {{ form.split_by(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td> {{ form.threshold_page_tokens.label }}</td>
+      <td> {{ form.threshold_page_tokens(class="form-control") }}</td>
     </tr>
 
     <tr>

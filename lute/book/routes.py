@@ -152,17 +152,20 @@ def new():
 
 @bp.route("/edit/<int:bookid>", methods=["GET", "POST"])
 def edit(bookid):
-    "Edit a book - can only change a few fields."
+    "Edit a book - title, text, source, tags, and audio can be changed."
     repo = Repository(db.session)
     b = repo.load(bookid)
     form = EditBookForm(obj=b)
 
     if form.validate_on_submit():
-        form.populate_obj(b)
-        svc = BookService()
-        svc.import_book(b, db.session)
-        flash(f"{b.title} updated.")
-        return redirect("/", 302)
+        try:
+            form.populate_obj(b)
+            svc = BookService()
+            svc.import_book(b, db.session)
+            flash(f"{b.title} updated.")
+            return redirect("/", 302)
+        except BookImportException as e:
+            flash(e.message, "notice")
 
     lang_repo = LanguageRepository(db.session)
     lang = lang_repo.find(b.language_id)
