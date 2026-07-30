@@ -2,28 +2,51 @@
   "name": "Lute - Learning Using Texts",
   "short_name": "Lute",
   "description": "Learning Using Texts - read foreign language texts with smart word tracking.",
-  "start_url": "/",
+  "start_url": "/?utm_source=pwa",
   "scope": "/",
+  "id": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "any",
+  "lang": "en",
+  "dir": "ltr",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
-  "categories": ["education", "productivity"],
+  "categories": ["education", "productivity", "books"],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Home",
+      "short_name": "Home",
+      "description": "Go to Lute home page",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/static/img/apple-touch-icon-114x114.png",
+          "sizes": "114x114",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
   "icons": [
     {
       "src": "/static/img/apple-touch-icon-57x57.png",
       "sizes": "57x57",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/static/img/apple-touch-icon-72x72.png",
       "sizes": "72x72",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/static/img/apple-touch-icon-114x114.png",
       "sizes": "114x114",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/static/img/lute.png",

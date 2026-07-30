@@ -1,8 +1,9 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.3.1';
+const CACHE_NAME = 'lute-v3.10.3.2';
 
 const STATIC_ASSETS = [
   '/',
+  '/manifest.webmanifest',
   '/static/css/styles.css',
   '/static/css/player-styles.css',
   '/static/vendor/jquery/jquery.js',
@@ -20,12 +21,23 @@ const STATIC_ASSETS = [
   '/static/vendor/datatables/datatables.button.download.js',
   '/static/vendor/dayjs/dayjs.min.js',
   '/static/vendor/dayjs/relativeTime.js',
+  '/static/vendor/chartjs/chart.umd.js',
+  '/static/vendor/chartjs/chartjs-adapter-date-fns.js',
+  '/static/js/resize.js',
+  '/static/js/player.js',
+  '/static/js/dict-tabs.js',
+  '/static/js/text-options.js',
+  '/static/js/tts.js',
+  '/static/js/lute-tagify-utils.js',
+  '/static/js/lute-hotkey-utils.js',
+  '/static/js/lute-popups.js',
+  '/static/js/lute.js',
+  '/static/js/lute-anki.js',
   '/static/img/lute.png',
   '/static/img/apple-touch-icon-57x57.png',
   '/static/img/apple-touch-icon-72x72.png',
   '/static/img/apple-touch-icon-114x114.png',
   '/static/favicon.ico',
-  '/static/manifest.json',
 ];
 
 self.addEventListener('install', event => {
