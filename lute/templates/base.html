@@ -183,22 +183,24 @@
   // PWA service worker registration
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-      // Clean up any stale registrations with mismatched origin/scope
-      // (e.g. when BasicAuth credentials were embedded in the URL).
-      // We must unregister ALL stale SWs before registering a fresh one,
-      // otherwise the stale SW may block registration or interfere with fetch.
+      // Clean up any stale registrations:
+      // 1. SWs whose script URL contains BasicAuth credentials (username/password)
+      // 2. SWs whose scope does not match the current origin
+      // We must unregister ALL stale SWs before registering a fresh one.
       var origin = location.origin;
       navigator.serviceWorker.getRegistrations().then(function(regs) {
         var unregisterPromises = [];
         regs.forEach(function(r) {
           var url = r.active ? r.active.scriptURL : r.scope;
           try {
-            var scriptOrigin = new URL(url, location.href).origin;
-            if (scriptOrigin !== origin) {
+            var parsed = new URL(url, location.href);
+            var hasCredentials = !!(parsed.username || parsed.password);
+            var originMismatch = parsed.origin !== origin;
+            if (hasCredentials || originMismatch) {
               unregisterPromises.push(r.unregister());
             }
           } catch(e) {
-            // If we can't parse the URL, it's definitely stale
+            // If we can't parse the URL, unregister to be safe
             unregisterPromises.push(r.unregister());
           }
         });
