@@ -22,6 +22,8 @@
 </div>
 
 <div style="margin-top:20px;">
+  <p>2026-07-31: PWA installability fixes (v3.10.3.3). Added required 144×144, 192×192, and 512×512 PNG icons with <code>purpose: &quot;any&quot;</code>; separate <code>purpose: &quot;maskable&quot;</code> icons added (no more discouraged &quot;any maskable&quot; combined purpose). Added desktop and mobile PWA screenshots with correct <code>form_factor</code>. SW registration script now has <code>data-cfasync=&quot;false&quot;</code> to prevent Cloudflare Rocket Loader from deferring it. Manifest route serves with correct MIME type; cache bumped to v3.10.3.3.</p>
+
   <p>2026-07-31: PWA fixes for installability. Manifest is now served with correct <code>application/manifest+json</code> MIME type via <code>/manifest.webmanifest</code> and loaded with <code>crossorigin=&quot;use-credentials&quot;</code> (compatible with BasicAuth-protected sites). Service worker registration now unregisters any stale SWs registered on credential-containing URLs, then registers cleanly against the real origin. Also added richer manifest fields (id, display_override, shortcuts, maskable icons), plus additional meta tags for iOS/Android home screen installation.</p>
 
   <p>2026-07-31: Add PWA (Progressive Web App) support. Lute can now be installed to the home screen on mobile and desktop, with offline caching of static assets and pages for reading without a network connection. Added web manifest, service worker, and theme color metadata.</p>

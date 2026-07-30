@@ -1,5 +1,5 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.3.2';
+const CACHE_NAME = 'lute-v3.10.3.3';
 
 const STATIC_ASSETS = [
   '/',
@@ -37,6 +37,13 @@ const STATIC_ASSETS = [
   '/static/img/apple-touch-icon-57x57.png',
   '/static/img/apple-touch-icon-72x72.png',
   '/static/img/apple-touch-icon-114x114.png',
+  '/static/img/icon-144.png',
+  '/static/img/icon-192.png',
+  '/static/img/icon-512.png',
+  '/static/img/maskable-192.png',
+  '/static/img/maskable-512.png',
+  '/static/img/lute-screenshot-desktop.png',
+  '/static/img/lute-screenshot-mobile.png',
   '/static/favicon.ico',
 ];
 

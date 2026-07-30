@@ -270,17 +270,7 @@ def _add_base_routes(app, app_config):
     @app.route("/manifest.json")
     def pwa_manifest():
         "Serve the PWA web manifest with the correct MIME type."
-        manifest_path = os.path.join(app.static_folder or os.path.join("lute", "static"), "manifest.json")
-        try:
-            with open(manifest_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except FileNotFoundError:
-            data = {}
-        data.setdefault("name", "Lute")
-        data.setdefault("short_name", "Lute")
-        data.setdefault("start_url", "/")
-        data.setdefault("scope", "/")
-        response = make_response(json.dumps(data, ensure_ascii=False))
+        response = make_response(send_from_directory("static", "manifest.json"))
         response.headers["Content-Type"] = "application/manifest+json; charset=utf-8"
         response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
         return response
