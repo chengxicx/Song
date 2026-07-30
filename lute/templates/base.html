@@ -18,6 +18,20 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="application-name" content="Lute" />
   <meta name="apple-mobile-web-app-title" content="Lute" />
+
+  <!-- Normalize URLs: strip BasicAuth credentials before any other resource loads -->
+  <script>
+    (function() {
+      try {
+        var a = document.createElement('a');
+        a.href = window.location.href;
+        if (a.username || a.password) {
+          var clean = a.protocol + '//' + a.host + a.pathname + a.search + a.hash;
+          window.location.replace(clean);
+        }
+      } catch(e) {}
+    })();
+  </script>
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon-57x57.png') }}" />
   <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='img/apple-touch-icon-72x72.png') }}" />
   <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='img/apple-touch-icon-114x114.png') }}" />
