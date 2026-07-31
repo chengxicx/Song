@@ -619,11 +619,6 @@ div.dt-container .dt-paging .paginate_button.disabled {
     margin-left: 0 !important;
   }
 
-  #theme-mode-toggle {
-    order: 4;
-    flex: 0 0 auto !important;
-  }
-
   /* Sticky pinned DT top row (defined earlier in this file) doesn't
      apply on mobile because the toolbar placeholder takes its own row. */
   .dt-container .dt-layout-row:first-child,

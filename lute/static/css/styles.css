@@ -94,6 +94,11 @@ p.version {
     display: flex;
     justify-content: space-between;
     gap: 2.2rem;
+    /* Push the nav menu to the far right of the menu-bar, so the
+       theme toggle button stays right next to the magnifier search
+       instead of being pushed away by the toolbar placeholder's
+       flex-grow. (custom-apple themes override with !important.) */
+    margin-left: auto;
 }
 
 .menu-item {
@@ -2660,19 +2665,13 @@ div#termimagesearch span img {
         margin-right: 6px;
     }
 
-    /* The middle toolbar (language + search) shares a row with the
-       theme toggle: toolbar grows, toggle stays fixed. */
+    /* The middle toolbar (language + search + theme toggle) takes its
+       own row, full width, so the magnifier has room to expand. */
     #top-toolbar-placeholder {
         order: 3;
         flex: 1 1 auto;
         margin-left: 0 !important;
         min-width: 0;
-    }
-
-    /* Theme toggle stays next to the toolbar on its row. */
-    #theme-mode-toggle {
-        order: 4;
-        flex: 0 0 auto;
     }
 
     /* Nav menu goes to its own row, wraps if needed. */

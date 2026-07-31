@@ -964,6 +964,28 @@ function next_theme() {
 
 }
 
+/* Toggle between the paired light and dark custom-apple themes,
+   then reload the page. Used by the reading sidebar menu item. */
+function toggle_dark_theme() {
+  $.ajax({
+    url: '/theme/toggle_dark',
+    type: 'post',
+    dataType: 'JSON',
+    contentType: 'application/json',
+    success: function(response) {
+      location.reload();
+    },
+    error: function(response, status, err) {
+      const msg = {
+        response: response,
+        status: status,
+        error: err
+      };
+      console.log(`failed: ${JSON.stringify(msg, null, 2)}`);
+    }
+  });
+}
+
 function toggleFocus() {
   const focusChk = document.getElementById("focus");
   const event = new Event("change");
