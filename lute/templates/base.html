@@ -95,31 +95,33 @@
         </h1>
       </div>
     </div>
-    {# # 中间工具栏占位容器（语言选择器 + 搜索放大镜）。由 JS 从 DataTables 工具栏中把对应元素搬移到这里，
-          这样可以保证它们在 menu-bar 里随页面自然滚动，同时和 Logo/菜单一起在同一行，不再需要 position: fixed/absolute。 #}
-    <div id="top-toolbar-placeholder" style="display:flex;align-items:center;gap:10px;margin-left:24px;flex:1 1 auto;min-width:0;"></div>
-    {# Dark / light mode toggle button. Sits to the right of the magnifier search. #}
-    <button id="theme-mode-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"
-            data-is-dark="{% if current_theme == 'Custom-apple-dark-v3.4.css' %}1{% else %}0{% endif %}">
-      <span class="theme-mode-icon theme-mode-icon--sun">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="4"></circle>
-          <line x1="12" y1="2" x2="12" y2="5"></line>
-          <line x1="12" y1="19" x2="12" y2="22"></line>
-          <line x1="2" y1="12" x2="5" y2="12"></line>
-          <line x1="19" y1="12" x2="22" y2="12"></line>
-          <line x1="4.5" y1="4.5" x2="6.5" y2="6.5"></line>
-          <line x1="17.5" y1="17.5" x2="19.5" y2="19.5"></line>
-          <line x1="4.5" y1="19.5" x2="6.5" y2="17.5"></line>
-          <line x1="17.5" y1="6.5" x2="19.5" y2="4.5"></line>
-        </svg>
-      </span>
-      <span class="theme-mode-icon theme-mode-icon--moon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </span>
-    </button>
+    {# # 中间工具栏占位容器（语言选择器 + 搜索放大镜 + 主题切换按钮）。由 JS 从 DataTables 工具栏中把对应元素搬移到这里，
+          这样可以保证它们在 menu-bar 里随页面自然滚动，同时和 Logo/菜单一起在同一行，不再需要 position: fixed/absolute。
+          主题切换按钮也放在这里，紧跟在搜索放大镜右侧。 #}
+    <div id="top-toolbar-placeholder" style="display:flex;align-items:center;gap:10px;margin-left:24px;flex:0 1 auto;min-width:0;">
+      {# Dark / light mode toggle button. Sits to the right of the magnifier search. #}
+      <button id="theme-mode-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"
+              data-is-dark="{% if current_theme == 'Custom-apple-dark-v3.4.css' %}1{% else %}0{% endif %}">
+        <span class="theme-mode-icon theme-mode-icon--sun">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <line x1="12" y1="2" x2="12" y2="5"></line>
+            <line x1="12" y1="19" x2="12" y2="22"></line>
+            <line x1="2" y1="12" x2="5" y2="12"></line>
+            <line x1="19" y1="12" x2="22" y2="12"></line>
+            <line x1="4.5" y1="4.5" x2="6.5" y2="6.5"></line>
+            <line x1="17.5" y1="17.5" x2="19.5" y2="19.5"></line>
+            <line x1="4.5" y1="19.5" x2="6.5" y2="17.5"></line>
+            <line x1="17.5" y1="6.5" x2="19.5" y2="4.5"></line>
+          </svg>
+        </span>
+        <span class="theme-mode-icon theme-mode-icon--moon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </span>
+      </button>
+    </div>
     <div class="menu">
       {% if not hide_homelink %}
       <div class="menu-item">
@@ -451,7 +453,12 @@
     // 2) 每个 DataTables 搜索框
     var searches = document.querySelectorAll(".dt-search");
     for (var i = 0; i < searches.length; i++) moveToPlaceholder(searches[i]);
-    // 3) 清理空的顶部布局行
+    // 3) 主题切换按钮保持在占位容器末尾（紧跟搜索放大镜右侧）
+    var toggle = document.getElementById("theme-mode-toggle");
+    if (toggle && ph.contains(toggle)) {
+      ph.appendChild(toggle);
+    }
+    // 4) 清理空的顶部布局行
     hideEmptyLayoutTopRow();
   }
 
