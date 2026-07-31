@@ -39,6 +39,30 @@ def set_next_theme():
     return jsonify("ok")
 
 
+# Paired light/dark themes used by the home dark-mode toggle button.
+LIGHT_THEME = "custom-apple.css"
+DARK_THEME = "Custom-apple-dark-v3.4.css"
+
+
+@bp.route("/toggle_dark", methods=["POST"])
+def toggle_dark_theme():
+    """
+    Toggle between the paired light and dark custom-apple themes.
+
+    - If the current theme is the dark one, switch to the light one.
+    - Otherwise (any light theme, default, or unknown), switch to dark.
+
+    Returns JSON with the new theme filename so the client can update
+    its icon without a full reload if desired.
+    """
+    repo = UserSettingRepository(db.session)
+    current = repo.get_value("current_theme")
+    new_theme = LIGHT_THEME if current == DARK_THEME else DARK_THEME
+    repo.set_value("current_theme", new_theme)
+    db.session.commit()
+    return jsonify({"theme": new_theme, "is_dark": new_theme == DARK_THEME})
+
+
 @bp.route("/toggle_highlight", methods=["POST"])
 def toggle_highlight():
     "Fix the highlight."

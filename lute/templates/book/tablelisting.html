@@ -553,23 +553,32 @@
   let ajax_in_book_stats = function(row, data, dataIndex) {
     var table = book_listing_table;
     var rowIdx = table.row(row).index();
-    
+
     var newWordColIdx = table.column('NewWordPercent:name').index();
     var statsColIdx = table.column('UnknownPercent:name').index();
-    
+
     var newWordColVisible = table.column(newWordColIdx).visible();
     var statsColVisible = table.column(statsColIdx).visible();
-    
+
     var newWordCellNode = newWordColVisible ? table.cell(rowIdx, newWordColIdx).node() : null;
     var statsCellNode = statsColVisible ? table.cell(rowIdx, statsColIdx).node() : null;
-    
+
+    // If both the Status and New Word columns are hidden, skip the AJAX
+    // call entirely — the server-side stats computation is wasted work
+    // when nothing will be rendered. The DataTables colvis widget lets
+    // users toggle these columns off, so this guard avoids N wasted
+    // /book/table_stats/<id> requests per page redraw.
+    if (!newWordCellNode && !statsCellNode) {
+      return;
+    }
+
     if (newWordCellNode) {
       $(newWordCellNode).html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
     }
     if (statsCellNode) {
       $(statsCellNode).html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
     }
-    
+
     $.ajax({
       url: '/book/table_stats/' + data['BkID'],
       method: 'GET',
