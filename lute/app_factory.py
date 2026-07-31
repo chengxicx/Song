@@ -132,6 +132,7 @@ def _add_base_routes(app, app_config):
             "backup_time_since": bs.time_since_last_backup,
             "user_settings": json.dumps(current_settings),
             "user_hotkeys": json.dumps(current_hotkeys),
+            "current_theme": us_repo.get_value("current_theme"),
         }
         return ret
 

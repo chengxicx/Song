@@ -98,6 +98,28 @@
     {# # 中间工具栏占位容器（语言选择器 + 搜索放大镜）。由 JS 从 DataTables 工具栏中把对应元素搬移到这里，
           这样可以保证它们在 menu-bar 里随页面自然滚动，同时和 Logo/菜单一起在同一行，不再需要 position: fixed/absolute。 #}
     <div id="top-toolbar-placeholder" style="display:flex;align-items:center;gap:10px;margin-left:24px;flex:1 1 auto;min-width:0;"></div>
+    {# Dark / light mode toggle button. Sits to the right of the magnifier search. #}
+    <button id="theme-mode-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"
+            data-is-dark="{% if current_theme == 'Custom-apple-dark-v3.4.css' %}1{% else %}0{% endif %}">
+      <span class="theme-mode-icon theme-mode-icon--sun">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <line x1="12" y1="2" x2="12" y2="5"></line>
+          <line x1="12" y1="19" x2="12" y2="22"></line>
+          <line x1="2" y1="12" x2="5" y2="12"></line>
+          <line x1="19" y1="12" x2="22" y2="12"></line>
+          <line x1="4.5" y1="4.5" x2="6.5" y2="6.5"></line>
+          <line x1="17.5" y1="17.5" x2="19.5" y2="19.5"></line>
+          <line x1="4.5" y1="19.5" x2="6.5" y2="17.5"></line>
+          <line x1="17.5" y1="6.5" x2="19.5" y2="4.5"></line>
+        </svg>
+      </span>
+      <span class="theme-mode-icon theme-mode-icon--moon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </span>
+    </button>
     <div class="menu">
       {% if not hide_homelink %}
       <div class="menu-item">
@@ -182,43 +204,48 @@
 <script data-cfasync="false">
   // PWA service worker registration
   if ('serviceWorker' in navigator) {
+    // On first load, aggressively clear ALL existing SW registrations.
+    // This ensures no stale BasicAuth-credentialed SWs remain to intercept fetches.
     window.addEventListener('load', function() {
-      // Clean up any stale registrations:
-      // 1. SWs whose script URL contains BasicAuth credentials (username/password)
-      // 2. SWs whose scope does not match the current origin
-      // We must unregister ALL stale SWs before registering a fresh one.
       var origin = location.origin;
       navigator.serviceWorker.getRegistrations().then(function(regs) {
         var unregisterPromises = [];
         regs.forEach(function(r) {
+          // Always unregister if the script URL has credentials or origin mismatch
           var url = r.active ? r.active.scriptURL : r.scope;
           try {
             var parsed = new URL(url, location.href);
-            var hasCredentials = !!(parsed.username || parsed.password);
-            var originMismatch = parsed.origin !== origin;
-            if (hasCredentials || originMismatch) {
+            var stale = !!(parsed.username || parsed.password) || parsed.origin !== origin;
+            if (stale) {
               unregisterPromises.push(r.unregister());
             }
           } catch(e) {
-            // If we can't parse the URL, unregister to be safe
             unregisterPromises.push(r.unregister());
           }
         });
         return Promise.all(unregisterPromises);
       }).then(function() {
-        // Register service worker at the site root; scope is broadened via
-        // the Service-Worker-Allowed header.
+        // Also check if any active SW has credentials in its URL
+        // and force-clear it by unregistering all
+        return navigator.serviceWorker.getRegistrations();
+      }).then(function(regs) {
+        var stillStale = false;
+        regs.forEach(function(r) {
+          var url = r.active ? r.active.scriptURL : r.scope;
+          try {
+            var parsed = new URL(url, location.href);
+            if (parsed.username || parsed.password || parsed.origin !== origin) {
+              stillStale = true;
+            }
+          } catch(e) { stillStale = true; }
+        });
+        if (stillStale) {
+          return Promise.all(regs.map(function(r) { return r.unregister(); }));
+        }
+      }).then(function() {
         return navigator.serviceWorker.register('/sw.js', { scope: '/' });
       }).catch(function(err) {
         console.warn('SW registration failed:', err);
-        // Last resort: try to unregister everything and register again
-        return navigator.serviceWorker.getRegistrations().then(function(regs) {
-          return Promise.all(regs.map(function(r) { return r.unregister(); }));
-        }).then(function() {
-          return navigator.serviceWorker.register('/sw.js', { scope: '/' });
-        }).catch(function(e2) {
-          console.warn('SW retry failed:', e2);
-        });
       });
     });
   }
@@ -453,6 +480,62 @@
   } catch (_) {
     setInterval(runOnce, 1500);
   }
+})();
+</script>
+
+<script>
+/* ========================================================
+   Dark / Light mode toggle
+   - Posts to /theme/toggle_dark, which switches between the paired
+     custom-apple light and dark themes (Custom-apple-dark-v3.4.css
+     <-> custom-apple.css).
+   - The button carries data-is-dark="1"|"0" set on the server, so the
+     initial icon matches the active theme.
+   - After toggling, the page is reloaded so all theme CSS (player,
+     charts, etc.) re-renders cleanly.
+   ======================================================== */
+(function () {
+  function updateIcon(btn) {
+    var isDark = btn.getAttribute("data-is-dark") === "1";
+    var sun = btn.querySelector(".theme-mode-icon--sun");
+    var moon = btn.querySelector(".theme-mode-icon--moon");
+    if (sun) sun.style.display = isDark ? "inline-flex" : "none";
+    if (moon) moon.style.display = isDark ? "none" : "inline-flex";
+  }
+
+  function init() {
+    var btn = document.getElementById("theme-mode-toggle");
+    if (!btn || btn.dataset.bound === "1") return;
+    btn.dataset.bound = "1";
+    updateIcon(btn);
+    btn.addEventListener("click", function () {
+      btn.disabled = true;
+      fetch("/theme/toggle_dark", {
+        method: "POST",
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        credentials: "same-origin",
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          // Reload so all themed assets (CSS via /theme/current, player,
+          // charts, etc.) are re-applied. Use location.replace so the
+          // back button doesn't land on the pre-toggle state.
+          window.location.reload();
+        })
+        .catch(function (err) {
+          console.warn("Theme toggle failed:", err);
+          btn.disabled = false;
+        });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+  // Safety net: re-init if the button is added later.
+  setTimeout(init, 500);
 })();
 </script>
 

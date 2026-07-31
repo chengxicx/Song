@@ -151,9 +151,121 @@ div#divbooktable {
 }
 
 div.dt-search {
-    /* Change to inline so that it's shown on the same line as the #defaultLanguageSelect. */
-    display: inline;
+    /* Collapsible magnifier search container.
+       Display flex so the toggle button + input align horizontally.
+       Theme files (custom-apple, Custom-apple-dark) override with !important
+       for their own color palette; this base rule ensures the collapse/expand
+       behavior works even for themes that don't ship a magnifier style
+       (e.g. Apple_Books, Night, Dusk, default). */
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
 }
+
+.dt-search label {
+    display: none; /* hidden, replaced by the magnifier toggle button */
+}
+
+/* Magnifier toggle button (injected by JS in base.html). */
+.dt-search__toggle {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--form-border-color, #ccc);
+    border-radius: 50%;
+    background-color: var(--background-color, #fff);
+    color: var(--font-color, #555);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.dt-search__toggle:hover {
+    color: #007aff;
+    border-color: #007aff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+/* Collapsed state: hide the input. */
+.dt-search input,
+.dt-search #dt-search-0 {
+    height: 28px;
+    line-height: 28px;
+    font-size: 12px;
+    background-color: var(--background-color, #fff);
+    color: var(--font-color, #000);
+    border: 1px solid var(--form-border-color, #ccc);
+    border-radius: 6px;
+    outline: none;
+    width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    border-left: none;
+    border-right: none;
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: all 0.25s ease;
+    pointer-events: none;
+}
+
+/* Expanded state: reveal the input. */
+.dt-search.dt-search--expanded input,
+.dt-search.dt-search--expanded #dt-search-0 {
+    width: 180px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-left: 1px solid var(--form-border-color, #ccc);
+    border-right: 1px solid var(--form-border-color, #ccc);
+    opacity: 1;
+    transform: scaleX(1);
+    pointer-events: auto;
+}
+
+.dt-search input:focus {
+    border-color: #007aff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+/* Dark / light mode toggle button (next to the magnifier search). */
+#theme-mode-toggle {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--form-border-color, #ccc);
+    border-radius: 50%;
+    background-color: var(--background-color, #fff);
+    color: var(--font-color, #555);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+#theme-mode-toggle:hover {
+    color: #007aff;
+    border-color: #007aff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+.theme-mode-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Only one icon is visible at a time; JS toggles inline display. */
 
 #datatables_config_widget {
     display: inline;
@@ -2518,4 +2630,118 @@ div#termimagesearch span img {
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+/* =========================================================
+   Home / menu-bar mobile responsiveness
+   On narrow screens, the menu bar (logo + language + search +
+   theme toggle + nav menu) no longer fits on a single row.
+   Strategy:
+     - Stack into two rows: first row = logo + nav menu,
+       second row = language select + search + theme toggle.
+     - Allow the nav menu itself to wrap to a third row on
+       very narrow screens instead of overflowing.
+   ========================================================= */
+
+@media screen and (max-width: 980px) {
+    .menu-bar {
+        flex-wrap: wrap;
+        padding: 0.6rem 0.5rem;
+        gap: 0.4rem 0.6rem;
+    }
+
+    /* Logo + title: keep tight, no horizontal stretching. */
+    .menu-bar .header {
+        flex: 0 0 auto;
+    }
+
+    .lutelogo {
+        height: 1.8em;
+        margin-right: 6px;
+    }
+
+    /* The middle toolbar (language + search) shares a row with the
+       theme toggle: toolbar grows, toggle stays fixed. */
+    #top-toolbar-placeholder {
+        order: 3;
+        flex: 1 1 auto;
+        margin-left: 0 !important;
+        min-width: 0;
+    }
+
+    /* Theme toggle stays next to the toolbar on its row. */
+    #theme-mode-toggle {
+        order: 4;
+        flex: 0 0 auto;
+    }
+
+    /* Nav menu goes to its own row, wraps if needed. */
+    .menu-bar .menu {
+        order: 2;
+        margin-left: auto;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .menu-item > span {
+        font-size: 0.8rem;
+    }
+
+    .sub-menu {
+        /* Anchored to the right edge of the viewport so it doesn't
+           overflow horizontally on narrow screens. */
+        right: 0;
+        left: auto;
+        min-width: 140px;
+    }
+
+    /* Container fills the viewport on phones. */
+    .container {
+        width: 100%;
+        padding: 0 0.5rem;
+        box-sizing: border-box;
+    }
+
+    /* Book table: use full width and allow horizontal scroll for the
+       many columns (Title / Language / Tags / Word count / ...). */
+    div#divbooktable {
+        width: 100% !important;
+    }
+
+    .dt-container,
+    div.dt-container {
+        padding: 0 4px !important;
+    }
+
+    /* Make the magnifier expand narrower on phones so it fits. */
+    .dt-search.dt-search--expanded input,
+    .dt-search.dt-search--expanded #dt-search-0 {
+        width: 130px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .menu-bar {
+        padding: 0.4rem 0.3rem;
+    }
+
+    .lutelogo {
+        height: 1.5em;
+    }
+
+    .menu-bar .menu {
+        gap: 0.6rem;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .menu-item > span {
+        font-size: 0.7rem;
+    }
+
+    .dt-search.dt-search--expanded input,
+    .dt-search.dt-search--expanded #dt-search-0 {
+        width: 110px;
+    }
 }

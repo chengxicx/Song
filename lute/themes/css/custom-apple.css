@@ -284,6 +284,33 @@ div.dt-container div.dt-layout-row:first-child {
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
 }
 
+/* —— Dark / light mode toggle button (next to magnifier) —— */
+#theme-mode-toggle {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 50% !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #8e8e93 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+  transition: all 0.2s ease;
+}
+
+#theme-mode-toggle:hover {
+  color: #007aff !important;
+  background-color: #ffffff !important;
+  border-color: #007aff !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12) !important;
+}
+
 /* =========================================================
    7. 底部控件布局对齐（修复底部分页/条目数/列可见性错位）
    ========================================================= */
@@ -461,6 +488,60 @@ div.dt-container .dt-paging .paginate_button.disabled {
   .dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-end {
     flex-basis: 100% !important;
     justify-content: flex-end !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   3b. MOBILE / menu-bar responsiveness
+   The light theme pins .menu-bar to height:52px with !important,
+   which would prevent the wrapped rows from showing. Override
+   on narrow screens so the menu stacks cleanly.
+   --------------------------------------------------------- */
+@media screen and (max-width: 980px) {
+  .menu-bar {
+    height: auto !important;
+    flex-wrap: wrap !important;
+    padding: 0.6rem 0.5rem !important;
+    gap: 0.4rem 0.6rem !important;
+  }
+
+  .menu-bar .menu {
+    margin-left: auto !important;
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+
+  #top-toolbar-placeholder {
+    order: 3;
+    flex: 1 1 auto !important;
+    margin-left: 0 !important;
+  }
+
+  #theme-mode-toggle {
+    order: 4;
+    flex: 0 0 auto !important;
+  }
+
+  /* The pinned DT top row (set earlier in this file) shouldn't apply
+     on mobile, since the toolbar placeholder takes its own row. */
+  .dt-container .dt-layout-row:first-child,
+  div.dt-container div.dt-layout-row:first-child {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    z-index: auto !important;
+    width: auto !important;
+    height: auto !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .menu-bar .menu {
+    gap: 0.6rem !important;
+  }
+  .menu-item > span {
+    font-size: 0.7rem !important;
   }
 }
 
