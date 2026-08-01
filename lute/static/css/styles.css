@@ -412,6 +412,19 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     display: block;
 }
 
+/* For the last few rows of the table, open the dropdown UPWARD instead of
+   downward. The DataTables scroll container (dt-scroll-body) has overflow:auto
+   for scrollX, which clips any dropdown that extends below the last row.
+   Opening upward avoids the clipping entirely. 3 rows covers the ~90px menu. */
+#booktable tbody tr:last-child .book-action-dropdown-content,
+#booktable tbody tr:nth-last-child(2) .book-action-dropdown-content,
+#booktable tbody tr:nth-last-child(3) .book-action-dropdown-content {
+    bottom: 100%;
+    top: auto;
+    margin-bottom: 2px;
+    box-shadow: 0px -8px 16px 0px rgba(0,0,0,0.2);
+}
+
 /* End book listing */
 
 div.dt-buttons>.dt-button {
