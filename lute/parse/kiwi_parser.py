@@ -8,25 +8,30 @@ Includes classes:
 
 - KoreanParser
 
-Korean is a space-delimited language: words (어절) are separated by
-spaces, and each word may consist of multiple morphemes (e.g. 먹었다 =
-먹 + 었 + 다).  This parser splits text at the word level using the
-language's word_characters, preserving spaces naturally.  Kiwi is
-used internally for lemma (dictionary form) extraction, so that
-inflected forms like 먹었다 resolve to the dictionary form 먹다.
+Korean text is analyzed morpheme-by-morpheme using Kiwi, similar to how
+MeCab analyzes Japanese.  Each morpheme (예상, 하, 었, 는데, etc.) becomes
+a separate clickable token.  Spaces between 어절 are preserved as
+non-word tokens so the original text layout is maintained.
+
+Kiwi's `lemma` attribute is used for dictionary-form extraction, so that
+inflected forms resolve to their base form for parent/term linking.
 """
 
-from lute.parse.space_delimited_parser import SpaceDelimitedParser
+import re
+from typing import List
+
+from lute.parse.base import ParsedToken, AbstractParser
 from lute.settings.current import current_settings
 
 
-class KoreanParser(SpaceDelimitedParser):
+class KoreanParser(AbstractParser):
     """
     Korean parser using kiwipiepy for morphological analysis.
 
-    Text is split at the word level (space-delimited), preserving
-    Korean word boundaries and spacing.  Kiwi is used internally
-    for lemma extraction (e.g. 먹었다 → 먹다).
+    Text is split into individual morphemes using Kiwi, similar to how
+    MeCab splits Japanese text.  Each content morpheme (noun, verb,
+    particle, ending, etc.) becomes a separate clickable word token.
+    Punctuation and symbols are non-word tokens.
 
     This is only supported if kiwipiepy is installed.
     """
@@ -72,29 +77,49 @@ class KoreanParser(SpaceDelimitedParser):
     def name(cls):
         return "Korean"
 
-    # ---- POS helpers (used by get_lemma) ----
+    # ---- POS helpers ----
 
-    # Kiwi POS tags (subset relevant for content-word detection).
-    # Full list: https://github.com/bab2min/kiwipiepy#pos-tags
-    # Content words (자립어): NNG, NNP, NNB, NR, NP, VV, VA, VX, VCP, VCN,
-    #   MM, MAG, MAJ, IC, SN, SH, SL, etc.
-    # Bound morphemes (의존 명사/조사/어미): J*, E*, SP, SE, SF, SS, etc.
+    # Kiwi POS tags that represent punctuation/symbols (non-word tokens).
+    # Full tag list: https://github.com/bab2min/kiwipiepy#pos-tags
+    _SYMBOL_TAGS = frozenset({
+        "SF",  # Sentence-ending punctuation (. ! ?)
+        "SP",  # Space
+        "SS",  # Brackets / quotes
+        "SC",  # Comma / colon / etc.
+        "SE",  # Ellipsis
+        "SO",  # Connector (dash, etc.)
+        "SY",  # Other symbols
+        "SW",  # Other symbols / emojis
+    })
+
+    # POS tag prefixes for bound morphemes (조사/어미) that are skipped
+    # during lemma extraction.
     _BOUND_POS_PREFIXES = (
         "J",   # 조사 (particles): JKS, JKC, JKG, JKO, JKB, JKV, JKQ, JX, JC
         "E",   # 어미 (endings): EP, EF, EC, ETN, ETM
-        "SP",  # Space
-        "SE",  # Ellipsis
-        "SF",  # Sentence-ending punctuation (. ! ?)
-        "SS",  # Brackets / quotes
-        "SC",  # Comma / colon / etc.
-        "SO",  # Connector (dash, etc.)
-        "SY",  # Other symbols
+        "SP", "SE", "SF", "SS", "SC", "SO", "SY", "SW",
     )
+
+    # Sentence-ending punctuation tags.
+    _SENTENCE_END_TAGS = frozenset({"SF"})
+
+    def _is_word_morph(self, morph) -> bool:
+        """
+        True if the morpheme should be a clickable word.
+
+        All morphemes are words except punctuation/symbols.
+        This is consistent with how MeCab handles Japanese (all
+        morphemes are words except symbols).
+        """
+        tag = morph.tag
+        if not tag:
+            return True
+        return tag not in self._SYMBOL_TAGS
 
     def _is_content_morph(self, morph) -> bool:
         """
-        True if the morpheme represents a content morpheme worth
-        keeping for lemma extraction.
+        True if the morpheme is a content morpheme worth keeping
+        for lemma extraction (skips particles, endings, symbols).
         """
         tag = morph.tag
         if not tag:
@@ -102,9 +127,61 @@ class KoreanParser(SpaceDelimitedParser):
         for prefix in self._BOUND_POS_PREFIXES:
             if tag.startswith(prefix):
                 return False
-        if tag == "SW":
-            return False
         return True
+
+    # ---- tokenization ----
+
+    def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
+        """
+        Parse text into morpheme-level tokens using Kiwi.
+
+        Each morpheme (예상, 하, 었, 는데, etc.) becomes a separate
+        ParsedToken.  Spaces between 어절 are preserved as non-word
+        tokens to maintain the original text layout.
+        """
+        text = re.sub(r"[ \t]+", " ", text).strip()
+
+        # Build the set of sentence-ending characters from language settings.
+        splitchar = ""
+        if language and language.regexp_split_sentences:
+            splitchar = language.regexp_split_sentences.strip()
+        if not splitchar:
+            splitchar = ".!?。？！"
+
+        kiwi = self._get_kiwi()
+        tokens = []
+
+        for para in text.split("\n"):
+            para = para.strip()
+            if para:
+                morphs = kiwi.tokenize(para)
+
+                prev_end = 0
+                for m in morphs:
+                    # Insert a space token if there's a gap between
+                    # the end of the previous morpheme's surface form
+                    # and the start of this morpheme.  Overlapping
+                    # morphemes (same 어절) don't get a space.
+                    if m.start > prev_end:
+                        tokens.append(ParsedToken(" ", False, False))
+
+                    form = m.form
+                    is_word = self._is_word_morph(m)
+                    is_eos = m.tag in self._SENTENCE_END_TAGS or any(
+                        c in splitchar for c in form
+                    )
+                    tokens.append(ParsedToken(form, is_word, is_eos))
+
+                    # Advance prev_end, but never go backwards
+                    # (handles overlapping morphemes).
+                    new_end = m.start + m.len
+                    if new_end > prev_end:
+                        prev_end = new_end
+
+            # End-of-paragraph sentinel.
+            tokens.append(ParsedToken("¶", False, True))
+
+        return tokens
 
     # ---- reading ----
 
@@ -119,7 +196,6 @@ class KoreanParser(SpaceDelimitedParser):
         ko_reading_setting = current_settings.get("korean_reading", "").strip()
         if ko_reading_setting == "":
             return None
-        # Reserved for future romanization support.
         return None
 
     # ---- lemma ----
@@ -128,24 +204,32 @@ class KoreanParser(SpaceDelimitedParser):
         """
         Get the dictionary/lemma form of the given text.
 
-        Kiwi's `lemma` attribute returns the dictionary form for
-        inflected words (e.g. 먹었어 → 먹다).  Only content
-        morphemes are considered; particles and endings are skipped.
+        With morpheme-level splitting, this is typically called for
+        individual morphemes.  Kiwi's `lemma` attribute returns the
+        dictionary form for inflected words (e.g. 먹었어 → 먹다).
+        For multi-morpheme text (e.g. multi-word terms), content
+        morpheme lemmas are joined.
+
+        Returns None if the text is already in its base form, is a
+        grammatical morpheme, or can't be determined.
         """
         zws = "\u200B"
         text = text.replace(zws, "")
 
+        if not text.strip():
+            return None
+
         kiwi = self._get_kiwi()
         result = kiwi.tokenize(text)
+
+        if not result:
+            return None
 
         lemmas = []
         for m in result:
             if not self._is_content_morph(m):
                 continue
             surface = m.form
-            # m.lemma gives the dictionary form for inflected words.
-            # For non-inflected words (nouns, etc.), lemma == form.
-            # Use getattr for safety across kiwipiepy versions.
             lemma = getattr(m, "lemma", None) or surface
             if lemma and lemma != "*":
                 lemmas.append(lemma)
