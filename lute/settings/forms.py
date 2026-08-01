@@ -60,6 +60,23 @@ class UserSettingsForm(FlaskForm):
     ]
     japanese_reading = SelectField("Pronunciation characters", choices=reading_choices)
 
+    sudachi_dict_choices = [
+        ("small", "Small"),
+        ("core", "Core"),
+        ("full", "Full"),
+    ]
+    japanese_sudachi_dict = SelectField(
+        "Sudachi dictionary", choices=sudachi_dict_choices, default="core"
+    )
+    sudachi_mode_choices = [
+        ("A", "A (shortest)"),
+        ("B", "B (middle)"),
+        ("C", "C (longest)"),
+    ]
+    japanese_sudachi_mode = SelectField(
+        "Sudachi split mode", choices=sudachi_mode_choices, default="C"
+    )
+
     use_ankiconnect = BooleanField("Enable export using AnkiConnect")
     ankiconnect_url = StringField("AnkiConnect URL", validators=[InputRequired()])
 

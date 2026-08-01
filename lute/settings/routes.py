@@ -21,6 +21,7 @@ from lute.settings.current import refresh_global_settings
 from lute.settings.hotkey_data import categorized_hotkeys, hotkey_descriptions
 from lute.db import db
 from lute.parse.mecab_parser import JapaneseParser
+from lute.parse.sudachi_parser import JapaneseSudachiParser
 
 
 bp = Blueprint("settings", __name__, url_prefix="/settings")
@@ -104,6 +105,32 @@ def test_parse():
         result = {"result": "failure", "message": message}
     finally:
         repo.set_value("mecab_path", old_setting)
+
+    return jsonify(result)
+
+
+@bp.route("/test_sudachi", methods=["GET"])
+def test_sudachi():
+    """
+    Do a test parse for the JapaneseSudachiParser using the
+    current Sudachi settings.
+
+    Returns { 'result': 'success', 'message': msg }, or
+            { 'result': 'failure', 'message': msg }
+    """
+    result = {"result": "failure", "message": "tbd"}
+    try:
+        # Parsing requires a language, even if it's a dummy.
+        lang = Language()
+        p = JapaneseSudachiParser()
+        src = "私は元気です"
+        toks = p.get_parsed_tokens(src, lang)
+        toks = [tok.token for tok in toks if tok.token != "¶"]
+        message = f"{src} parsed to [{ ', '.join(toks) }]"
+        result = {"result": "success", "message": message}
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        message = f"{type(e).__name__}: { str(e) }"
+        result = {"result": "failure", "message": message}
 
     return jsonify(result)
 
