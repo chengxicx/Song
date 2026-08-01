@@ -218,6 +218,69 @@
 
     <tr>
       <td>
+        <h3>Sudachi (alternative Japanese parser)</h3>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {{ form.japanese_sudachi_dict.label }}
+        <img
+          id="about_japanese_sudachi_dict" style="margin-right:10px;"
+          src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+          title="Click for details"
+          onclick="$('#japanese_sudachi_dict_help').toggle();"
+          />
+        <blockquote id="japanese_sudachi_dict_help" style="width:60%; display: none;">
+          <p><b>SudachiPy</b> is an alternative Japanese morphological
+            analyzer, independent of MeCab.  It offers three dictionary
+            sizes: <b>Small</b> (fastest, basic vocabulary),
+            <b>Core</b> (balanced, recommended), and
+            <b>Full</b> (largest, most coverage).</p>
+          <p>To use Sudachi, install the <code>sudachipy</code> and
+            <code>sudachidict_&lt;size&gt;</code> packages, then select
+            "Japanese (Sudachi)" as the parser type for your Japanese
+            language.</p>
+          <p>These settings do <i>not</i> affect the MeCab parser.</p>
+        </blockquote>
+      </td>
+      <td>{{ form.japanese_sudachi_dict }}</td>
+    </tr>
+    <tr>
+      <td>
+        {{ form.japanese_sudachi_mode.label }}
+        <img
+          id="about_japanese_sudachi_mode" style="margin-right:10px;"
+          src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+          title="Click for details"
+          onclick="$('#japanese_sudachi_mode_help').toggle();"
+          />
+        <blockquote id="japanese_sudachi_mode_help" style="width:60%; display: none;">
+          <p>Sudachi split modes control how aggressively text is
+            segmented:</p>
+          <ul>
+            <li><b>A (shortest)</b> — finest granularity, breaks
+              compounds into smallest units.</li>
+            <li><b>B (middle)</b> — balanced, good for general use.</li>
+            <li><b>C (longest)</b> — coarsest, keeps compounds intact
+              (recommended for language learners).</li>
+          </ul>
+        </blockquote>
+      </td>
+      <td>{{ form.japanese_sudachi_mode }}</td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <button id="test_sudachi_btn" onclick="test_sudachi_setup(); return false;">
+          Test my Sudachi configuration
+        </button>
+        <div style="margin-top: 5px" id="sudachi_result"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
         <h2>TTS (Text-to-Speech)</h2>
       </td>
     </tr>
@@ -365,6 +428,32 @@
         el.css('border', `2px solid red`);
         $("#use_ankiconnect").prop("checked", false);
       });
+  }
+
+  function test_sudachi_setup() {
+    $.ajax({
+      type: "GET",
+      url: '/settings/test_sudachi',
+      dataType: "json",
+      success: function(data) {
+        const r = data['result'];
+        let msg = `${r}: ${data['message']}`
+        let color = 'red';
+        if (r == 'success') {
+          color = 'green';
+        }
+        else {
+          msg += "<br/><br/>Ensure you have installed 'sudachipy' and a 'sudachidict_*' package.";
+        }
+
+        el = $('#sudachi_result');
+        el.html(msg);
+        el.css('border', `2px solid ${color}`);
+      },
+      error: function() {
+        alert('Error occured');
+      }
+    });
   }
 
 </script>
