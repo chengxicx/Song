@@ -62,14 +62,113 @@
       </td>
     </tr>
 
+    {% set _kiwi_fields = ('kiwi_tokenizer_mode', 'kiwi_stemming', 'kiwi_filter_particles', 'kiwi_join_compound_nouns') %}
     {% for field in form %}
-    {% if field.name not in ('name', 'csrf_token', 'dictionaries') %}
+    {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields %}
     <tr>
       <td>{{ field.label(class="form-control-label") }}</td>
       <td>{{ field(class="form-control") }}</td>
     </tr>
     {% endif %}
     {% endfor %}
+
+    {# --- Korean / Kiwi-specific section. ----------------------------------
+       Only shown when the language's parser_type is 'korean'.
+       Toggled live by the `parser_type` dropdown's change event.
+       Uses data-kiwi attribute on rows for easy selector-based toggling.
+    ---------------------------------------------------------------------- #}
+    {% set _kiwi_visible = (form.parser_type.data == 'korean') %}
+    <tr data-kiwi-row style="display:{% if _kiwi_visible %}table-row{% else %}none{% endif %};">
+      <td colspan="2">
+        <h3 style="margin-top:14px; margin-bottom:6px;">한국어 Kiwi 切词设置 / Korean Kiwi Tokenizer</h3>
+      </td>
+    </tr>
+
+    <tr data-kiwi-row style="display:{% if _kiwi_visible %}table-row{% else %}none{% endif %};">
+      <td>
+        {{ form.kiwi_tokenizer_mode.label(class="form-control-label") }}
+        <img
+          id="about_kiwi_tokenizer_mode" style="margin-right:10px;"
+          src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+          title="Click for details"
+          onclick="document.getElementById('kiwi_tokenizer_mode_help').style.display = document.getElementById('kiwi_tokenizer_mode_help').style.display === 'none' ? 'block' : 'none';"
+          />
+        <blockquote id="kiwi_tokenizer_mode_help" style="width:60%; display: none;">
+          <p>控制韩语切词的粒度：</p>
+          <ul>
+            <li><b>细粒度 / Morpheme</b> — 每个形态素单独切分，例如 <code>예상했었는데</code> → <code>예상 + 하 + 었었 + 는데</code>。适合初学者掌握语法形态。</li>
+            <li><b>中粒度 / Lemma</b> — 动词/形容词还原为词典原形，例如 <code>예상했었는데</code> → <code>예상하다 + 는데</code>。兼顾语法学习与词汇收录。</li>
+            <li><b>粗粒度 / 어절</b> — 整段 어절（空格词块）作为一个词，不做形态素切分。</li>
+          </ul>
+        </blockquote>
+      </td>
+      <td>{{ form.kiwi_tokenizer_mode(class="form-control") }}</td>
+    </tr>
+
+    <tr data-kiwi-row style="display:{% if _kiwi_visible %}table-row{% else %}none{% endif %};">
+      <td colspan="2" style="padding-top: 6px;">
+        <details id="kiwi_advanced">
+          <summary style="cursor:pointer;">高级选项 (Advanced Controls)</summary>
+          <div style="padding-left:18px; margin-top:4px;">
+            <table style="border-collapse: collapse;">
+            <tbody>
+              <tr>
+                <td style="padding: 4px 0;">
+                  {{ form.kiwi_stemming.label(class="form-control-label") }}
+                  <img
+                    id="about_kiwi_stemming" style="margin-right:10px;"
+                    src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+                    title="Click for details"
+                    onclick="document.getElementById('kiwi_stemming_help').style.display = document.getElementById('kiwi_stemming_help').style.display === 'none' ? 'block' : 'none';"
+                    />
+                  <blockquote id="kiwi_stemming_help" style="width:55%; display: none;">
+                    开启时，点击生词弹出的词条会自动把 <code>먹었어</code>、<code>예상했었는데</code> 等变形形式还原成词典原形 <code>먹다</code> / <code>예상하다</code>，以便作为父词收录。
+                  </blockquote>
+                </td>
+                <td style="padding: 4px 0;">
+                  {{ form.kiwi_stemming() }}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0;">
+                  {{ form.kiwi_filter_particles.label(class="form-control-label") }}
+                  <img
+                    id="about_kiwi_filter_particles" style="margin-right:10px;"
+                    src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+                    title="Click for details"
+                    onclick="document.getElementById('kiwi_filter_particles_help').style.display = document.getElementById('kiwi_filter_particles_help').style.display === 'none' ? 'block' : 'none';"
+                    />
+                  <blockquote id="kiwi_filter_particles_help" style="width:55%; display: none;">
+                    开启后，조사 (은/는, 이/가, 을/를, 에서 …) 和 어미 (았, 었, 다, 는데 …) 仍然显示在正文中，但不会作为独立的可点击词出现，避免录入语法词。
+                  </blockquote>
+                </td>
+                <td style="padding: 4px 0;">
+                  {{ form.kiwi_filter_particles() }}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0;">
+                  {{ form.kiwi_join_compound_nouns.label(class="form-control-label") }}
+                  <img
+                    id="about_kiwi_join_compound_nouns" style="margin-right:10px;"
+                    src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+                    title="Click for details"
+                    onclick="document.getElementById('kiwi_join_compound_nouns_help').style.display = document.getElementById('kiwi_join_compound_nouns_help').style.display === 'none' ? 'block' : 'none';"
+                    />
+                  <blockquote id="kiwi_join_compound_nouns_help" style="width:55%; display: none;">
+                    开启后，相邻的名词形态素会被合并为一个复合名词 token，例如 <code>독도+이슈</code> → <code>독도이슈</code>。
+                  </blockquote>
+                </td>
+                <td style="padding: 4px 0;">
+                  {{ form.kiwi_join_compound_nouns() }}
+                </td>
+              </tr>
+            </tbody>
+            </table>
+          </div>
+        </details>
+      </td>
+    </tr>
 
   </tbody>
   </table>
@@ -79,6 +178,20 @@
 
 <script>
   $(document).ready(function() {
+    // --- Show/hide the Kiwi section when the parser dropdown changes.
+    var parserSel = document.querySelector("select#parser_type");
+    function toggleKiwiRows() {
+      var isKorean = parserSel && parserSel.value === "korean";
+      var rows = document.querySelectorAll("tr[data-kiwi-row]");
+      rows.forEach(function(r) { r.style.display = isKorean ? "table-row" : "none"; });
+    }
+    if (parserSel) {
+      parserSel.addEventListener("change", function() {
+        toggleKiwiRows();
+        dirty = true;
+      });
+    }
+
     // Add leave page confirmation
     let dirty = false;
     function confirm_leave_page(event) {
