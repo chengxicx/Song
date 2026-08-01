@@ -21,6 +21,13 @@ def _render_book_page(book, pagenum, track_page_open=True):
     """
     Render a particular book page.
     """
+    if not book.texts:
+        flash(
+            f"Book {book.title} has no pages (possibly the parser failed "
+            f"to split text at creation time)."
+        )
+        return redirect("/", 302)
+
     lang = book.language
     show_highlights = current_settings["show_highlights"]
     lang_repo = LanguageRepository(db.session)
@@ -69,7 +76,7 @@ def read(bookid):
     text = book.texts[0]
     if book.current_tx_id:
         text = db.session.get(Text, book.current_tx_id)
-        if text is None or text.book_id != book.id:
+        if text is None or text.bk_id != book.id:
             # Stored current_tx_id points to a non-existent / wrong Text
             # (e.g. pages were regenerated with a different parser).
             # Fall back to the first page.
