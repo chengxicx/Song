@@ -8,39 +8,31 @@ Includes classes:
 
 - KoreanParser
 
-Kiwi provides:
-- Morphological analysis with part-of-speech tagging
-- Lemma (dictionary form) extraction
-- Pronunciation/reading via the `form` and `orig` attributes
-
-Korean word characters include Hangul syllables (가-힣), Jamo,
-and Korean punctuation.  Korean is space-delimited but also
-requires morphological analysis for proper tokenization, since
-many particles and endings are written without spaces.
+Korean is a space-delimited language: words (어절) are separated by
+spaces, and each word may consist of multiple morphemes (e.g. 먹었다 =
+먹 + 었 + 다).  This parser splits text at the word level using the
+language's word_characters, preserving spaces naturally.  Kiwi is
+used internally for lemma (dictionary form) extraction, so that
+inflected forms like 먹었다 resolve to the dictionary form 먹다.
 """
 
-import re
-from typing import List
-
-from lute.parse.base import ParsedToken, AbstractParser
+from lute.parse.space_delimited_parser import SpaceDelimitedParser
 from lute.settings.current import current_settings
 
 
-class KoreanParser(AbstractParser):
+class KoreanParser(SpaceDelimitedParser):
     """
-    Korean parser using kiwipiepy.
+    Korean parser using kiwipiepy for morphological analysis.
+
+    Text is split at the word level (space-delimited), preserving
+    Korean word boundaries and spacing.  Kiwi is used internally
+    for lemma extraction (e.g. 먹었다 → 먹다).
 
     This is only supported if kiwipiepy is installed.
-
-    Configuration via UserSettings:
-      - korean_reading: "" | "hangul" (empty = no reading)
-        Currently readings are not automated beyond what Kiwi
-        provides; the setting is reserved for future use.
     """
 
     _is_supported = None
     _instance = None
-    _instance_key = None
 
     # ---- support detection ----
 
@@ -73,7 +65,6 @@ class KoreanParser(AbstractParser):
             return KoreanParser._instance
 
         kiwi = Kiwi()
-        # Load default model.  Kiwi ships with a built-in model.
         KoreanParser._instance = kiwi
         return kiwi
 
@@ -81,32 +72,7 @@ class KoreanParser(AbstractParser):
     def name(cls):
         return "Korean"
 
-    # ---- parsing ----
-
-    def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
-        "Parse the string using Kiwi."
-        text = re.sub(r"[ \t]+", " ", text).strip()
-
-        kiwi = self._get_kiwi()
-        tokens = []
-
-        for para in text.split("\n"):
-            # split_into_sents=True returns a list of (sentence, tokens) tuples.
-            # We use tokenize() directly for per-paragraph analysis.
-            result = kiwi.tokenize(para)
-            for m in result:
-                surface = m.form
-                if surface == "":
-                    continue
-                is_word = self._is_content_morph(m)
-                is_eos = surface in language.regexp_split_sentences
-                tokens.append(ParsedToken(surface, is_word, is_eos))
-            # End-of-paragraph sentinel.
-            tokens.append(ParsedToken("¶", False, True))
-
-        return tokens
-
-    # ---- POS helpers ----
+    # ---- POS helpers (used by get_lemma) ----
 
     # Kiwi POS tags (subset relevant for content-word detection).
     # Full list: https://github.com/bab2min/kiwipiepy#pos-tags
@@ -125,25 +91,17 @@ class KoreanParser(AbstractParser):
         "SY",  # Other symbols
     )
 
-    # 의존 명사 (bound nouns) - start with "NNB" but some are independent.
-    # We keep NNB as content words because Korean learners often want to
-    # learn bound nouns like 것, 수, 때 as separate vocabulary.
-
     def _is_content_morph(self, morph) -> bool:
         """
         True if the morpheme represents a content morpheme worth
-        keeping as a learnable token.
+        keeping for lemma extraction.
         """
         tag = morph.tag
         if not tag:
             return False
-        # Check if the tag starts with any bound prefix.
         for prefix in self._BOUND_POS_PREFIXES:
             if tag.startswith(prefix):
                 return False
-        # SN (number), SL (foreign language letter), SH (Chinese char)
-        # are content tokens.
-        # SW is "other symbol" — skip it.
         if tag == "SW":
             return False
         return True
@@ -156,7 +114,7 @@ class KoreanParser(AbstractParser):
 
         Korean pronunciation is largely phonetic from the Hangul
         itself, so for now we return None.  This can be extended
-        later with a pronunciation rules engine if needed.
+        later with a romanization engine if needed.
         """
         ko_reading_setting = current_settings.get("korean_reading", "").strip()
         if ko_reading_setting == "":
@@ -170,9 +128,9 @@ class KoreanParser(AbstractParser):
         """
         Get the dictionary/lemma form of the given text.
 
-        Kiwi's `lemma` attribute on TokenizedObject returns the
-        dictionary form for verbs/adjectives (e.g. 먹었어 → 먹다).
-        Only content morphemes are considered.
+        Kiwi's `lemma` attribute returns the dictionary form for
+        inflected words (e.g. 먹었어 → 먹다).  Only content
+        morphemes are considered; particles and endings are skipped.
         """
         zws = "\u200B"
         text = text.replace(zws, "")
