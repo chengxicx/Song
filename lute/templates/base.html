@@ -454,8 +454,14 @@
     var searches = document.querySelectorAll(".dt-search");
     for (var i = 0; i < searches.length; i++) moveToPlaceholder(searches[i]);
     // 3) 主题切换按钮保持在占位容器末尾（紧跟搜索放大镜右侧）
+    //    仅在按钮不在 ph 里或不在末尾时才 appendChild，否则每次
+    //    runOnce 都会移除并重新插入节点 → MutationObserver 循环触发
+    //    → 按钮每 120ms 被重建一次，导致 hover 闪烁和点击丢失。
     var toggle = document.getElementById("theme-mode-toggle");
-    if (toggle && ph.contains(toggle)) {
+    if (toggle && toggle.parentNode !== ph) {
+      ph.appendChild(toggle);
+    } else if (toggle && ph.lastElementChild !== toggle) {
+      // 已在 ph 中但不在末尾，移动到末尾（仅在需要时）
       ph.appendChild(toggle);
     }
     // 4) 清理空的顶部布局行
