@@ -1,5 +1,5 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.3.8';
+const CACHE_NAME = 'lute-v3.10.3.9';
 
 const STATIC_ASSETS = [
   '/',

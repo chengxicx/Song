@@ -20,11 +20,12 @@
   <meta name="apple-mobile-web-app-title" content="Lute" />
 
   <!-- Normalize URLs: strip BasicAuth credentials by reloading the clean URL.
-       data-cfasync="false" bypasses Cloudflare Rocket Loader so this runs immediately,
-       before the preload scanner can fire sub-resource requests against the credentialed
-       URL (which browsers block for security, breaking all .js/.css).
-       The browser caches BasicAuth credentials per-origin, so the reload reuses them
-       without prompting the user. -->
+       data-cfasync="false" bypasses Cloudflare Rocket Loader so this runs immediately.
+       Browsers block sub-resource requests whose URL contains embedded credentials
+       (https://user:pass@host/...). The preload scanner fires these requests BEFORE
+       this script runs, so we call window.stop() to abort them, then navigate to the
+       clean URL. The browser caches BasicAuth credentials per-origin, so the reload
+       reuses them without prompting the user. -->
   <script data-cfasync="false">
     (function() {
       try {
@@ -32,9 +33,10 @@
         a.href = window.location.href;
         if (a.username || a.password) {
           var clean = a.protocol + '//' + a.host + a.pathname + a.search + a.hash;
-          // location.replace (not history.replaceState) is required: replaceState only
-          // updates the URL bar but does not stop the preload scanner from issuing
-          // credentialed sub-resource requests that get blocked by the browser.
+          // Abort all in-flight credentialed sub-resource requests that the preload
+          // scanner already fired (they would fail with net::ERR_FAILED and pollute
+          // the console with $ is not defined / dayjs is not defined errors).
+          try { window.stop(); } catch(e) {}
           window.location.replace(clean);
         }
       } catch(e) {}
