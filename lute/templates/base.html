@@ -19,8 +19,12 @@
   <meta name="application-name" content="Lute" />
   <meta name="apple-mobile-web-app-title" content="Lute" />
 
-  <!-- Normalize URLs: strip BasicAuth credentials without reloading the page.
-       data-cfasync="false" bypasses Cloudflare Rocket Loader so this runs immediately. -->
+  <!-- Normalize URLs: strip BasicAuth credentials by reloading the clean URL.
+       data-cfasync="false" bypasses Cloudflare Rocket Loader so this runs immediately,
+       before the preload scanner can fire sub-resource requests against the credentialed
+       URL (which browsers block for security, breaking all .js/.css).
+       The browser caches BasicAuth credentials per-origin, so the reload reuses them
+       without prompting the user. -->
   <script data-cfasync="false">
     (function() {
       try {
@@ -28,9 +32,10 @@
         a.href = window.location.href;
         if (a.username || a.password) {
           var clean = a.protocol + '//' + a.host + a.pathname + a.search + a.hash;
-          // Use replaceState instead of location.replace to avoid a page reload
-          // that would disrupt AJAX content loading and CSS/JS initialization.
-          window.history.replaceState(null, '', clean);
+          // location.replace (not history.replaceState) is required: replaceState only
+          // updates the URL bar but does not stop the preload scanner from issuing
+          // credentialed sub-resource requests that get blocked by the browser.
+          window.location.replace(clean);
         }
       } catch(e) {}
     })();
