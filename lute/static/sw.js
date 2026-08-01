@@ -1,5 +1,5 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.3.3';
+const CACHE_NAME = 'lute-v3.10.3.6';
 
 const STATIC_ASSETS = [
   '/',
@@ -25,7 +25,6 @@ const STATIC_ASSETS = [
   '/static/vendor/chartjs/chartjs-adapter-date-fns.js',
   '/static/js/resize.js',
   '/static/js/player.js',
-  '/static/js/dict-tabs.js',
   '/static/js/text-options.js',
   '/static/js/tts.js',
   '/static/js/lute-tagify-utils.js',
