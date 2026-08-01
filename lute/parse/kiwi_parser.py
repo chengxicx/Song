@@ -126,11 +126,22 @@ class KoreanParser(AbstractParser):
 
     # Tags that are 'predicate heads' -> when lemma mode is on, we replace
     # the predicate morpheme surface with its lemma form.
-    # Includes verbs (VV), adjectives (VA), light verbs (XSV), etc.
+    # Includes verbs (VV), adjectives (VA), light verbs (XSV/XR하 compounds),
+    # etc.  XR alone (e.g. 독립 in 독립하다) is NOT a predicate head, but if
+    # followed immediately by XSV (하) or XSA (되/하) it forms a predicate
+    # compound together, so we treat the (XR/NNG + XSV/XSA) pair as a single
+    # logical predicate head.
     _PREDICATE_TAGS = frozenset({
         "VV", "VA", "VX", "VCP", "VCN",  # verbs / adjectives / copulas
-        "XSV", "XSA",                     # verbal / adjectival suffixes
-        "XR",                             # roots (used before 하다 compounds)
+        "XSV", "XSA",                     # verbal / adjectival suffixes (하되…)
+    })
+
+    # Morphs that, when they appear immediately BEFORE an XSV/XSA, merge with
+    # it to form a dictionary-form compound verb (e.g. 예상/NNG + 하/XSV + E*
+    # → 예상하다).
+    _LIGHT_VERB_NOUN_PRE_TAGS = frozenset({
+        "XR",   # 依存名词 / Chinese character roots (e.g. 예상 -> 豫想)
+        "NNG",  # general nouns used before 하다 (독립 + 하다 = 독립하다)
     })
 
     # Sentence-ending punctuation tags.
@@ -170,6 +181,26 @@ class KoreanParser(AbstractParser):
 
     def _is_predicate_morph(self, morph) -> bool:
         return (morph.tag or "") in self._PREDICATE_TAGS
+
+    @staticmethod
+    def _normalise_predicate_lemma(lemma: str) -> str:
+        """
+        Normalise a predicate lemma so that it ends with -다/-하다/-되다
+        consistently.  Kiwi sometimes returns the stem without the final
+        '-다' for light-verb suffixes: e.g. 하/XSV has lemma='하' not '하다'.
+        We append '다' so that:
+            하   → 하다
+            되   → 되다
+            하   → 하다  (after 하/XSA from '행복하다')
+            가다 → 가다  (already a proper verb, untouched)
+        """
+        if not lemma:
+            return lemma
+        # Short predicate stems (single syllable) that haven't got -다 yet.
+        # Common cases: 하(다), 되(다), 이(다: copula), 아니(다).
+        if len(lemma) <= 2 and not lemma.endswith("다"):
+            return lemma + "다"
+        return lemma
 
     def _is_word_morph(self, morph, filter_particles: bool) -> bool:
         """
@@ -255,18 +286,28 @@ class KoreanParser(AbstractParser):
                     i += 1
                     continue
 
-                # 2) If this morph is a predicate head, gather the whole
-                #    predicate phrase (head + following bound E* morphemes)
-                #    and emit the lemma form (e.g. 예상했다 → 예상하다).
-                if self._is_predicate_morph(m):
-                    # Find all morphemes in the same 어절 that belong to
-                    # the same predicate chain: up to (but not including)
-                    # the next non-predicate / non-E* morpheme.
-                    start = i
-                    # predicate chain = head + E morphemes
-                    j = i  # last index that is part of the predicate
-                    # Already include the head, walk forward while it's
-                    # either another predicate suffix or an ending.
+                # 2) Predicate head detection:
+                #    - Case A: VV/VA/VX/… → the morph itself is a predicate.
+                #      Walk forward through predicate suffixes + endings
+                #      to build the inflected part; emit lemma of head.
+                #    - Case B: XR/NNG immediately followed by XSV/XSA
+                #      (light-verb compounds: 독립+하다 / 행복+하다 / 예상+하다).
+                #      In this case we merge the preceding noun + light-verb
+                #      suffix into a dictionary-form surface and walk all
+                #      following endings into the same logical token.
+
+                # ---- Case B (light-verb compound) first ----------------
+                if ((m.tag or "") in self._LIGHT_VERB_NOUN_PRE_TAGS
+                        and i + 1 < n
+                        and (morphs[i + 1].tag or "") in ("XSV", "XSA")):
+                    noun_morph = m
+                    lv_suffix = morphs[i + 1]
+                    # Predicate chain starts at the noun index i, but the
+                    # logical head for walking endings is the light-verb
+                    # suffix index i+1.
+                    chain_start = i
+                    j = i + 1  # current last-in-chain index
+                    # Walk forward: extra predicate suffixes or endings.
                     while j + 1 < n:
                         nxt = morphs[j + 1]
                         if (self._is_predicate_morph(nxt)
@@ -274,36 +315,39 @@ class KoreanParser(AbstractParser):
                             j += 1
                         else:
                             break
-                    # Concatenate all surface forms to get the full
-                    # predicative expression surface (e.g. 했었는데).
-                    # The lemma comes from the first predicate head.
+                    # Build the combined dictionary-form surface:
+                    #   noun_lemma + light_verb_suffix_normalised
+                    noun_lemma = getattr(noun_morph, "lemma", None) or noun_morph.form
+                    noun_lemma = noun_lemma if noun_lemma != "*" else noun_morph.form
+                    lv_lemma = getattr(lv_suffix, "lemma", None) or lv_suffix.form
+                    lv_lemma = lv_lemma if lv_lemma != "*" else lv_suffix.form
+                    lv_lemma = self._normalise_predicate_lemma(lv_lemma)
+                    surface = noun_lemma + lv_lemma
+
+                    rep_tag = morphs[j]
+                    # The lemma-representative for light-verb compounds is
+                    # the light-verb suffix so we always normalise to 하다.
+                    out.append((surface, rep_tag, lv_suffix))
+                    i = j + 1
+                    continue
+
+                # ---- Case A (standalone predicate) --------------------
+                if self._is_predicate_morph(m):
+                    start = i
+                    j = i
+                    while j + 1 < n:
+                        nxt = morphs[j + 1]
+                        if (self._is_predicate_morph(nxt)
+                                or (nxt.tag or "").startswith("E")):
+                            j += 1
+                        else:
+                            break
                     head_lemma = getattr(m, "lemma", None) or m.form
                     head_lemma = head_lemma if head_lemma != "*" else m.form
-
-                    surface_chunks = []
-                    # For the very first head, use the lemma form of the
-                    # head instead of its surface if the head was inflected
-                    # in a weird way.  For predicate/ending morphemes
-                    # AFTER the head, we only attach them if they are NOT
-                    # endings (E*), because endings are inflection and the
-                    # dictionary form already contains the -다 suffix.
-                    #
-                    # Simpler rule that matches most Lute use-cases:
-                    #   predicate token surface = lemma of head verb.
-                    # This is what the user asked for: 예상했었는데 → 예상하다.
+                    head_lemma = self._normalise_predicate_lemma(head_lemma)
                     surface = head_lemma
-                    if surface == m.form and j == start:
-                        # no inflection detected and single-head predicate,
-                        # still render as lemma form to keep the user's
-                        # mental model consistent ("dictionary form").
-                        surface = head_lemma
-
-                    # The representative morph for EOS/symbol purposes is
-                    # the last morpheme in the chain so that sentence-end
-                    # endings (EF/SF) correctly trigger EOS.
                     rep_tag = morphs[j]
-                    rep_lemma = m  # lemma representative is always the head
-                    out.append((surface, rep_tag, rep_lemma))
+                    out.append((surface, rep_tag, m))
                     i = j + 1
                     continue
 
@@ -444,15 +488,41 @@ class KoreanParser(AbstractParser):
             return None
 
         lemmas = []
-        for m in result:
+        i = 0
+        n = len(result)
+        while i < n:
+            m = result[i]
+
+            # Light-verb compound: XR/NNG + XSV/XSA → merge + normalise 하→하다 etc.
+            if ((m.tag or "") in self._LIGHT_VERB_NOUN_PRE_TAGS
+                    and i + 1 < n
+                    and (result[i + 1].tag or "") in ("XSV", "XSA")):
+                noun_lemma = getattr(m, "lemma", None) or m.form
+                noun_lemma = noun_lemma if noun_lemma != "*" else m.form
+                lv_suffix = result[i + 1]
+                lv_lemma = getattr(lv_suffix, "lemma", None) or lv_suffix.form
+                lv_lemma = lv_lemma if lv_lemma != "*" else lv_suffix.form
+                lv_lemma = self._normalise_predicate_lemma(lv_lemma)
+                lemmas.append(noun_lemma + lv_lemma)
+                i += 2
+                continue
+
             if not self._is_content_morph(m):
+                i += 1
                 continue
             surface = m.form
             lemma = getattr(m, "lemma", None) or surface
             if lemma and lemma != "*":
+                # If it's a standalone light-verb suffix, normalise it.
+                if (m.tag or "") in ("XSV", "XSA"):
+                    lemma = self._normalise_predicate_lemma(lemma)
+                # Standalone predicate tags that sometimes miss -다: VV/VA/etc.
+                elif self._is_predicate_morph(m):
+                    lemma = self._normalise_predicate_lemma(lemma)
                 lemmas.append(lemma)
             else:
                 lemmas.append(surface)
+            i += 1
 
         if not lemmas:
             return None
