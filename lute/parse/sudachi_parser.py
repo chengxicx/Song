@@ -162,14 +162,30 @@ class JapaneseSudachiParser(AbstractParser):
         tokens = []
         for para in text.split("\n"):
             result = tok.tokenize(para, mode=split_mode)
+            prev_end = 0
             for m in result:
                 surface = m.surface()
                 if surface == "":
                     continue
+                # Insert any gap text (spaces, punctuation that Sudachi
+                # didn't return as a morpheme) between the previous
+                # token and this one as a non-word token, so that
+                # word spacing is preserved in the rendered text.
+                m_begin = m.begin()
+                if m_begin > prev_end:
+                    gap = para[prev_end:m_begin]
+                    if gap:
+                        tokens.append(ParsedToken(gap, False, False))
                 pos = m.part_of_speech()
                 is_word = self._is_content_token(pos, surface)
                 is_eos = surface in language.regexp_split_sentences
                 tokens.append(ParsedToken(surface, is_word, is_eos))
+                prev_end = m.end()
+            # Trailing gap.
+            if prev_end < len(para):
+                gap = para[prev_end:]
+                if gap:
+                    tokens.append(ParsedToken(gap, False, False))
             # End-of-paragraph sentinel.
             tokens.append(ParsedToken("¶", False, True))
 
