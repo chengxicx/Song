@@ -492,14 +492,16 @@
 
 <script>
 /* ========================================================
-   Dark / Light mode toggle
-   - Posts to /theme/toggle_dark, which switches between the paired
-     custom-apple light and dark themes (Custom-apple-dark-v3.4.css
-     <-> custom-apple.css).
-   - The button carries data-is-dark="1"|"0" set on the server, so the
-     initial icon matches the active theme.
-   - After toggling, the page is reloaded so all theme CSS (player,
-     charts, etc.) re-renders cleanly.
+   Dark / Light mode toggle (home menu bar)
+   - Uses the global toggle_dark_theme() function from lute.js
+     (loaded site-wide via base.html), which POSTs to
+     /theme/toggle_dark via jQuery $.ajax and reloads the page.
+     This is the exact same code path as the reading sidebar
+     menu item, ensuring consistent behavior.
+   - The button carries data-is-dark="1"|"0" set on the server,
+     so updateIcon() shows the correct sun/moon icon initially.
+     After the toggle + reload, the server re-renders the correct
+     icon, so no client-side icon toggle is needed on click.
    ======================================================== */
 (function () {
   function updateIcon(btn) {
@@ -516,23 +518,17 @@
     btn.dataset.bound = "1";
     updateIcon(btn);
     btn.addEventListener("click", function () {
-      btn.disabled = true;
-      fetch("/theme/toggle_dark", {
-        method: "POST",
-        headers: { "X-Requested-With": "XMLHttpRequest" },
-        credentials: "same-origin",
-      })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          // Reload so all themed assets (CSS via /theme/current, player,
-          // charts, etc.) are re-applied. Use location.replace so the
-          // back button doesn't land on the pre-toggle state.
-          window.location.reload();
-        })
-        .catch(function (err) {
-          console.warn("Theme toggle failed:", err);
-          btn.disabled = false;
-        });
+      // toggle_dark_theme() is defined in lute.js (loaded globally).
+      // It uses $.ajax (not fetch), matching the reading sidebar.
+      if (typeof toggle_dark_theme === "function") {
+        toggle_dark_theme();
+      } else {
+        // Fallback if lute.js hasn't loaded yet.
+        console.warn("toggle_dark_theme not available, retrying...");
+        setTimeout(function () {
+          if (typeof toggle_dark_theme === "function") toggle_dark_theme();
+        }, 200);
+      }
     });
   }
 
