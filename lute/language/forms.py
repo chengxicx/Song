@@ -67,6 +67,29 @@ class LanguageForm(FlaskForm):
         "Word characters (default: all Unicode letters and marks)"
     )
 
+    # --- Korean / Kiwi-specific settings.
+    # These fields are only rendered when the parser_type is 'korean'.
+
+    kiwi_tokenizer_mode_choices = [
+        ("morpheme", "Fine-grained / Morpheme (예상 + 하 + 었 + 는데"),
+        ("lemma", "Medium / Dictionary form (예상하다)"),
+        ("eojeol", "Coarse / Whole 어절 (예상했었는데)"),
+    ]
+    kiwi_tokenizer_mode = SelectField(
+        "切词模式 (Tokenizer Mode)",
+        choices=kiwi_tokenizer_mode_choices,
+        default="morpheme",
+    )
+    kiwi_stemming = BooleanField(
+        "自动提取词典原形 (Stemming / Lemmatization)"
+    )
+    kiwi_filter_particles = BooleanField(
+        "过滤语法助词 (Filter Particles: 은/는, 이/가…)"
+    )
+    kiwi_join_compound_nouns = BooleanField(
+        "合并复合名词 (Join Compound Nouns)"
+    )
+
     def validate_dictionaries(self, field):  # pylint: disable=unused-argument
         "Dictionaries must be valid."
 

@@ -55,6 +55,13 @@ class Language(
     parser_type = db.Column("LgParserType", db.String(20))
     is_active = db.Column("LgIsActive", db.Boolean, default=True)
 
+    # Kiwi (Korean) parser settings.
+    # These columns only have meaning when LgParserType = 'korean'.
+    kiwi_tokenizer_mode = db.Column("LgKiwiTokenizerMode", db.String(20), default="morpheme")
+    kiwi_stemming = db.Column("LgKiwiStemming", db.Boolean, default=True)
+    kiwi_filter_particles = db.Column("LgKiwiFilterParticles", db.Boolean, default=False)
+    kiwi_join_compound_nouns = db.Column("LgKiwiJoinCompoundNouns", db.Boolean, default=False)
+
     def __init__(self):
         self.character_substitutions = "´='|`='|’='|‘='|...=…|..=‥"
         self.regexp_split_sentences = ".!?"
@@ -65,6 +72,10 @@ class Language(
         self.parser_type = "spacedel"
         self.dictionaries = []
         self.is_active = True
+        self.kiwi_tokenizer_mode = "morpheme"
+        self.kiwi_stemming = True
+        self.kiwi_filter_particles = False
+        self.kiwi_join_compound_nouns = False
 
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"
