@@ -104,6 +104,8 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
     @property
     def status_class(self):
         "Status class to apply."
+        if self.is_word == 0:
+            return ""
         if self.wo_id is None:
             return "status0"
         return f"status{self.wo_status}"

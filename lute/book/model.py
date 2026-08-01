@@ -172,15 +172,35 @@ class Repository:
         "Split fulltext into pages, respecting sentences."
 
         pages = []
-        for segment in self._split_text_at_page_breaks(book.text):
-            tokens = language.parser.get_parsed_tokens(segment, language)
-            for toks in token_group_generator(
-                tokens, book.split_by, book.threshold_page_tokens
-            ):
-                s = "".join([t.token for t in toks])
-                s = s.replace("\r", "").replace("¶", "\n")
-                pages.append(s.strip())
+        try:
+            for segment in self._split_text_at_page_breaks(book.text):
+                tokens = language.parser.get_parsed_tokens(segment, language)
+                for toks in token_group_generator(
+                    tokens, book.split_by, book.threshold_page_tokens
+                ):
+                    s = "".join([t.token for t in toks])
+                    s = s.replace("\r", "").replace("¶", "\n")
+                    pages.append(s.strip())
+        except Exception as e:  # pylint: disable=broad-except
+            pname = getattr(language.parser, "name", lambda: "unknown")()
+            msg = (
+                f"Failed to split book '{book.title}' into pages using parser "
+                f"'{pname}' for language '{language.name}': {e}"
+            )
+            from lute.book.service import BookImportException  # pylint: disable=import-outside-toplevel, cyclic-import
+
+            raise BookImportException(message=msg, cause=e) from e
+
         pages = [p for p in pages if p.strip() != ""]
+
+        if not pages:
+            pname = getattr(language.parser, "name", lambda: "unknown")()
+            from lute.book.service import BookImportException  # pylint: disable=import-outside-toplevel, cyclic-import
+
+            raise BookImportException(
+                f"Parser '{pname}' for language '{language.name}' produced no pages "
+                f"for book '{book.title}' (book text may be empty, or the parser failed)."
+            )
 
         return pages
 
