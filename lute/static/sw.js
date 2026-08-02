@@ -1,5 +1,5 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.4.0';
+const CACHE_NAME = 'lute-v3.10.4.1';
 
 const STATIC_ASSETS = [
   '/',
@@ -73,30 +73,38 @@ self.addEventListener('activate', event => {
 });
 
 /**
- * Strip BasicAuth credentials (user:pass@) from a request URL.
+ * Strip BasicAuth credentials (user:pass@) from a URL string.
  * Browsers block sub-resource requests whose URL contains embedded
  * credentials (https://user:pass@host/...).  When the page is loaded
  * with a credentialed URL, the SW intercepts the sub-resource requests
  * which also carry credentials.  We strip them here and use the clean
- * URL for both cache lookups and network fetches, so resources load
- * correctly regardless of how the page URL was entered.
+ * URL for both cache lookups and network fetches.
+ *
+ * Note: we use URL strings (not Request objects) throughout to avoid
+ * issues with `new Request(url, originalRequest)` — specifically, the
+ * Fetch spec forbids constructing a Request with mode 'navigate', and
+ * copying certain init properties from the original request can cause
+ * unexpected "Failed to fetch" errors in some browsers.
  */
-function cleanRequest(originalRequest) {
-  const url = new URL(originalRequest.url);
-  if (url.username || url.password) {
-    url.username = '';
-    url.password = '';
-    return new Request(url.toString(), originalRequest);
+function cleanUrl(originalUrl) {
+  try {
+    const u = new URL(originalUrl);
+    if (u.username || u.password) {
+      u.username = '';
+      u.password = '';
+    }
+    return u.toString();
+  } catch (e) {
+    return originalUrl;
   }
-  return originalRequest;
 }
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
-  // Strip credentials from the request URL before doing anything.
-  const request = cleanRequest(event.request);
-  const url = new URL(request.url);
+  // Strip credentials from the request URL.
+  const urlStr = cleanUrl(event.request.url);
+  const url = new URL(urlStr);
 
   // Only handle same-origin requests
   if (url.origin !== self.location.origin) return;
@@ -106,19 +114,19 @@ self.addEventListener('fetch', event => {
 
   // Skip never-cache JS (always fresh)
   if (url.pathname.startsWith('/static/js/never_cache/')) {
-    event.respondWith(fetch(request));
+    event.respondWith(fetch(urlStr));
     return;
   }
 
   // Cache-first for static assets
   if (url.pathname.startsWith('/static/')) {
     event.respondWith(
-      caches.match(request).then(cached => {
+      caches.match(urlStr).then(cached => {
         if (cached) return cached;
-        return fetch(request).then(response => {
+        return fetch(urlStr).then(response => {
           if (response.ok) {
             const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+            caches.open(CACHE_NAME).then(cache => cache.put(urlStr, clone));
           }
           return response;
         });
@@ -129,16 +137,16 @@ self.addEventListener('fetch', event => {
 
   // Network-first for pages, fallback to cache when offline
   event.respondWith(
-    fetch(request)
+    fetch(urlStr)
       .then(response => {
         if (response.ok && response.type === 'basic') {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          caches.open(CACHE_NAME).then(cache => cache.put(urlStr, clone));
         }
         return response;
       })
       .catch(() => {
-        return caches.match(request).then(cached => {
+        return caches.match(urlStr).then(cached => {
           return cached || caches.match('/');
         });
       })

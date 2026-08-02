@@ -359,6 +359,71 @@ def _create_app(app_config, extra_config):
     from lute.backup.service import Service as _BackupServiceClass
 
     @app.before_request
+    def _redirect_credentialed_url():
+        """
+        Redirect BasicAuth page loads to a clean URL.
+
+        When the site is accessed via a credentialed URL
+        (https://user:pass@host/...), browsers block all sub-resource
+        requests that carry credentials in the URL (CSS, JS, images).
+        The server-side redirect below ensures the browser navigates to
+        the clean URL before any HTML is rendered, so all sub-resource
+        requests use the clean origin.
+
+        We detect BasicAuth by the Authorization header (Nginx strips
+        URL credentials before forwarding to Flask).  A cookie prevents
+        redirect loops on subsequent requests.
+        """
+        # Only redirect GET navigation requests
+        if request.method != "GET":
+            return
+
+        # Only redirect when BasicAuth is used
+        auth = request.headers.get("Authorization", "")
+        if not auth.startswith("Basic "):
+            return
+
+        # Skip if already redirected (cookie present)
+        if request.cookies.get("lute_authed"):
+            return
+
+        # Only redirect page loads (HTML), not AJAX or static resources
+        accept = request.headers.get("Accept", "")
+        if "text/html" not in accept:
+            return
+
+        # Skip AJAX requests
+        if request.headers.get("X-Requested-With"):
+            return
+
+        # Skip static files
+        if request.path.startswith("/static/"):
+            return
+
+        # Build the clean URL (no credentials)
+        _xfp = request.headers.get("X-Forwarded-Proto", "")
+        _proto = (
+            "https"
+            if (app.config.get("ENV") == "prod" or _xfp == "https")
+            else request.scheme
+        )
+        clean_url = f"{_proto}://{request.host}{request.full_path}"
+        # full_path includes trailing '?' even without query string
+        if clean_url.endswith("?"):
+            clean_url = clean_url[:-1]
+
+        response = redirect(clean_url, 302)
+        response.set_cookie(
+            "lute_authed",
+            "1",
+            httponly=True,
+            secure=True,
+            samesite="Lax",
+            max_age=86400 * 30,  # 30 days
+        )
+        return response
+
+    @app.before_request
     def _before_request():
         """
         Reset engine and refresh settings after a backup restore.
