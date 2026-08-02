@@ -3,6 +3,14 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <title>{% block title %}LUTE{% endblock %}</title>
 
+  {# Base URL — MUST be the first element in <head> so the browser's preload
+     scanner resolves all relative sub-resource URLs (CSS, JS, images) against
+     this clean URL. When the page is loaded with BasicAuth credentials in the
+     URL (https://user:pass@host/...), the preload scanner would otherwise
+     resolve sub-resources to credentialed URLs, which browsers block. The
+     <base> tag ensures all sub-resources use the clean origin. #}
+  <base href="{% set _xfp = request.headers.get('X-Forwarded-Proto', '') %}{% set _proto = 'https' if (config.ENV == 'prod' or _xfp == 'https') else request.scheme %}{{ _proto }}://{{ request.host }}{{ request.path }}{% if request.query_string %}?{{ request.query_string.decode() }}{% endif %}">
+
   {% if config.ENV == 'dev' %}
   <link rel="icon" href="{{ url_for('static', filename='favicon_dev.ico') }}" type="image/x-icon"/>
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon_dev.ico') }}" type="image/x-icon"/>
@@ -19,25 +27,18 @@
   <meta name="application-name" content="Lute" />
   <meta name="apple-mobile-web-app-title" content="Lute" />
 
-  <!-- Normalize URLs: strip BasicAuth credentials by reloading the clean URL.
-       data-cfasync="false" bypasses Cloudflare Rocket Loader so this runs immediately.
-       Browsers block sub-resource requests whose URL contains embedded credentials
-       (https://user:pass@host/...). The preload scanner fires these requests BEFORE
-       this script runs, so we call window.stop() to abort them, then navigate to the
-       clean URL. The browser caches BasicAuth credentials per-origin, so the reload
-       reuses them without prompting the user. -->
+  {# Clean the address bar: if the URL contains BasicAuth credentials, replace
+     the URL in the history (no reload). The <base> tag above already ensures
+     sub-resources load from the clean URL, and the Service Worker also strips
+     credentials, so we only need to clean what the user sees in the address bar. #}
   <script data-cfasync="false">
     (function() {
       try {
-        var a = document.createElement('a');
-        a.href = window.location.href;
-        if (a.username || a.password) {
-          var clean = a.protocol + '//' + a.host + a.pathname + a.search + a.hash;
-          // Abort all in-flight credentialed sub-resource requests that the preload
-          // scanner already fired (they would fail with net::ERR_FAILED and pollute
-          // the console with $ is not defined / dayjs is not defined errors).
-          try { window.stop(); } catch(e) {}
-          window.location.replace(clean);
+        var u = new URL(window.location.href);
+        if (u.username || u.password) {
+          u.username = '';
+          u.password = '';
+          window.history.replaceState(null, '', u.toString());
         }
       } catch(e) {}
     })();
