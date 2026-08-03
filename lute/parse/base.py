@@ -100,6 +100,18 @@ class AbstractParser(ABC):
         Parser name, for displaying in UI.
         """
 
+    @classmethod
+    def languages(cls):
+        """
+        Return a set of language names this parser is designed for, or
+        None if the parser works for any language (generic).
+
+        Used to filter the "Parse as" dropdown in the language edit
+        form so that e.g. a Japanese language only offers Japanese
+        parsers (MeCab / Sudachi), not Turkish or other languages.
+        """
+        return None
+
     @abstractmethod
     def get_parsed_tokens(self, text: str, language) -> List:
         """

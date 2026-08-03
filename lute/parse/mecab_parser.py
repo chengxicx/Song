@@ -212,7 +212,11 @@ class JapaneseParser(AbstractParser):
 
     @classmethod
     def name(cls):
-        return "Japanese"
+        return "Japanese (MeCab)"
+
+    @classmethod
+    def languages(cls):
+        return {"japanese"}
 
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
         "Parse the string using MeCab."
