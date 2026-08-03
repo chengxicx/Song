@@ -7,6 +7,19 @@ from lute.utils.data_tables import DataTablesSqliteQuery, supported_parser_type_
 
 def get_data_tables_list(parameters, is_archived, session):
     "Book json data for datatables."
+
+    # Default sort: Last read (LastOpenedDate) descending, so the most
+    # recently opened books appear first on the home page.  This is
+    # applied when the frontend request carries no explicit order
+    # (first visit, or state was cleared).  We look up the column
+    # index by name so reordering the columns array in the template
+    # won't silently break the default.
+    if not parameters.get("order"):
+        for col in parameters.get("columns", []):
+            if col.get("name") == "LastOpenedDate" and col.get("orderable"):
+                parameters["order"] = [{"column": col["index"], "dir": "desc"}]
+                break
+
     archived = "true" if is_archived else "false"
 
     base_sql = f"""
