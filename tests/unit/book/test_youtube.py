@@ -127,10 +127,41 @@ JP_MERGE_SRT = """1
 今日は晴れています。
 """
 
-# One long cue (>8s) containing two sentences separated by 。
+# One long cue (>7s) containing two sentences separated by 。
 JP_SPLIT_SRT = """1
 00:00:01,000 --> 00:00:12,000
 今日はいい天気ですね。明日は雨が降るそうです。
+"""
+
+# Previous cue ends with です (blocklist) -> must NOT merge, even with
+# a tiny gap.
+JP_END_BLOCKLIST_SRT = """1
+00:00:01,000 --> 00:00:03,000
+これはペンです
+
+2
+00:00:03,100 --> 00:00:05,000
+あれは消しゴムです
+"""
+
+# Next cue starts with はい (start blocklist) -> must NOT merge.
+JP_START_BLOCKLIST_SRT = """1
+00:00:01,000 --> 00:00:03,000
+今日は暑いですね
+
+2
+00:00:03,100 --> 00:00:05,000
+はい、本当に暑いです
+"""
+
+# Text cleaning: reduplicated kana tail + fragmented katakana.
+JP_CLEAN_SRT = """1
+00:00:01,000 --> 00:00:03,000
+わかったたた
+
+2
+00:00:03,100 --> 00:00:05,000
+キ キネが見えた
 """
 
 
@@ -148,7 +179,7 @@ def test_parse_srt_japanese_merges_mid_sentence(japanese):
 
 
 def test_parse_srt_japanese_splits_long_cue(japanese):
-    "A merged cue longer than 8s is split at the strong terminator 。"
+    "A merged cue longer than 7s is split at the strong terminator 。"
     text, cues_json = parse_subtitle_file(
         "jp.srt", io.BytesIO(JP_SPLIT_SRT.encode()), language=japanese
     )
@@ -159,6 +190,42 @@ def test_parse_srt_japanese_splits_long_cue(japanese):
     # Time spans the original range.
     assert cues[0]["start"] == 1.0
     assert cues[1]["end"] == 12.0
+
+
+def test_parse_srt_japanese_end_blocklist_prevents_merge(japanese):
+    "A cue ending with です (blocklist) is not merged with the next."
+    text, cues_json = parse_subtitle_file(
+        "jp.srt", io.BytesIO(JP_END_BLOCKLIST_SRT.encode()), language=japanese
+    )
+    cues = json.loads(cues_json)
+    assert len(cues) == 2
+    assert cues[0]["text"] == "これはペンです"
+    assert cues[1]["text"] == "あれは消しゴムです"
+
+
+def test_parse_srt_japanese_start_blocklist_prevents_merge(japanese):
+    "A cue starting with はい (start blocklist) is not merged with the prev."
+    text, cues_json = parse_subtitle_file(
+        "jp.srt", io.BytesIO(JP_START_BLOCKLIST_SRT.encode()), language=japanese
+    )
+    cues = json.loads(cues_json)
+    assert len(cues) == 2
+    assert cues[0]["text"] == "今日は暑いですね"
+    assert cues[1]["text"] == "はい、本当に暑いです"
+
+
+def test_parse_srt_japanese_text_cleaning(japanese):
+    "Reduplicated kana tails are compressed and キ キネ normalised to キツネ."
+    text, cues_json = parse_subtitle_file(
+        "jp.srt", io.BytesIO(JP_CLEAN_SRT.encode()), language=japanese
+    )
+    cues = json.loads(cues_json)
+    # わかったたた -> わかった,  キ キネ -> キツネ
+    # The two cues have a 100ms gap and the first doesn't end with a
+    # blocklist word, so they merge.
+    merged_text = cues[0]["text"]
+    assert "たた" not in merged_text  # reduplication compressed
+    assert "キツネ" in merged_text     # katakana fragment fixed
 
 
 def test_parse_srt_non_japanese_unchanged(japanese):

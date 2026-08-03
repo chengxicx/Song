@@ -296,6 +296,8 @@
         const re_marked = $(`#${marked_id}`);
         re_marked.removeClass('kwordmarked');
         re_marked.addClass('wordhover');
+        // Notify the YouTube player to refresh subtitle word colors.
+        window.dispatchEvent(new Event('lute:status-updated'));
       });
     };
   };

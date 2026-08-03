@@ -9,31 +9,68 @@ each cue roughly corresponds to one Japanese sentence.
 
 Rules (applied only when the book language is Japanese):
 
+Text cleaning (applied to every cue text before merge/split):
+  - compress redupicated kana tails (たたた → た, ててて → て);
+  - normalize fragmented katakana compounds (キ キネ → キツネ).
+
 Merge adjacent cues when:
+  - the next cue starts with a response/interjection word
+    (はい, うん, いいえ, あ, ほう, なるほど, えっと) -> never merge;
+  - the previous cue ends with a sentence-ending blocklist word
+    (か, のか, ましたか, よ, ね, な, ました, です) -> never merge;
+  - the previous cue ends with a strong terminator (。！？) -> never merge;
+  - the previous cue ends with a final particle (終助詞) -> never merge;
   - the previous cue ends with a continuative particle (接続助詞) or
     attributive modifier (連体詞) -> force merge, regardless of gap;
-  - otherwise, when the gap between them is < 400ms AND the previous
-    cue does not end with a strong terminator (。！？) or a final
-    particle (終助詞).
+  - otherwise, merge when the gap between them is < 400ms.
 
-Split a merged cue whose duration > 8s, in priority order:
+Split a merged cue whose duration > MAX_DURATION (7s), in priority order:
   1. strong terminator 。！？ -- always split;
   2. spoken final particle (終助詞) -- split into shorter sentences;
-  3. comma 「、」 -- split when both sides have >= 6 characters and each
-     resulting segment is >= 2.5s;
-  4. long continuative word (接続詞) -- auxiliary split before the word.
+  3. filler / interjection word (えっと, あの, うん, そうですね, ほう)
+     -- split *before* the word;
+  4. long continuative word (接続詞) -- split before the word;
+  5. comma 「、」 -- split when both sides have enough characters and
+     each resulting segment is long enough (de-emphasized: real
+     subtitle material rarely contains commas).
+
+After splitting, any segment shorter than MIN_DURATION (2.5s) is merged
+back into its neighbour.  Any segment still longer than MAX_DURATION
+after all levels gets re-split at the earliest available boundary.
+
+Time distribution across segments uses character weights:
+  kanji = 2, hiragana/katakana = 1, punctuation/space = 0.5.
 """
 
 import re
 
+# ---------------------------------------------------------------------------
+# Word lists
+# ---------------------------------------------------------------------------
+
 # Strong sentence terminators (full-width and half-width).
 _STRONG_TERMINATORS = "。！？!?…"
 
-# Final particles (終助詞).  Ordered longest-first so the compiled
-# regex prefers the longest match at a given position.  Combined
-# forms (でしょうか, だろうか, ...) are included so that adjacent
-# particle matches (でしょう + か) don't get split into a stray
-# single-character segment.
+# Sentence-ending blocklist: if the previous cue ends with any of these,
+# do NOT merge with the next cue.  These signal a complete sentence /
+# predicate boundary even without 。
+_END_BLOCKLIST = (
+    "ましたか", "のですか", "のか",
+    "ました", "です", "ます",
+    "か", "よ", "ね", "な",
+)
+
+# Sentence-start blocklist: if the next cue starts with any of these
+# response / interjection words, never merge regardless of gap.
+_START_BLOCKLIST = (
+    "なるほど", "えっと",
+    "はい", "いいえ",
+    "うん",
+    "ほう", "あ",
+)
+
+# Final particles (終助詞) for merge-blocking and level-2 splitting.
+# Ordered longest-first so the compiled regex prefers the longest match.
 _FINAL_PARTICLES = (
     "でしょうか", "だろうか", "でしょうね", "だろうね",
     "でしょうよ", "だろうよ",
@@ -57,6 +94,12 @@ _RENTAI_WORDS = (
     "あらゆる", "いわゆる", "きたる", "かかる",
 )
 
+# Filler / interjection words for level-3 splitting.  Split *before*
+# these so they begin the new segment.
+_FILLER_WORDS = (
+    "そうですね", "えっと", "あの", "うん", "ほう",
+)
+
 # Long continuative words (接続詞) for level-4 splitting.  Split
 # *before* these so they begin the new segment.
 _LONG_CONJUNCTIVES = (
@@ -67,9 +110,17 @@ _LONG_CONJUNCTIVES = (
     "それとも", "あるいは", "なぜなら", "というのは",
 )
 
-_MAX_DURATION = 8.0          # split cues longer than this (seconds)
-_MIN_SEGMENT_DURATION = 2.5  # comma-split segments must be at least this
+# ---------------------------------------------------------------------------
+# Durations (seconds)
+# ---------------------------------------------------------------------------
+
+_MAX_DURATION = 7.0           # split cues longer than this
+_MIN_DURATION = 2.5          # merge segments shorter than this
 _MIN_COMMA_SIDE_CHARS = 6    # both sides of a comma split need this many chars
+
+# ---------------------------------------------------------------------------
+# Regex compilation
+# ---------------------------------------------------------------------------
 
 
 def _compile_word_matcher(words):
@@ -79,7 +130,59 @@ def _compile_word_matcher(words):
 
 
 _FINAL_PARTICLE_RE = _compile_word_matcher(_FINAL_PARTICLES)
+_FILLER_RE = _compile_word_matcher(_FILLER_WORDS)
 _LONG_CONJUNCTIVE_RE = _compile_word_matcher(_LONG_CONJUNCTIVES)
+_START_BLOCKLIST_RE = _compile_word_matcher(_START_BLOCKLIST)
+
+# Repeated kana tail: 3+ repetitions of the same hiragana/katakana char.
+_REDUP_RE = re.compile(r"([\u3040-\u30FF])\1{2,}")
+
+# Fragmented katakana compounds: "キ キネ" -> "キツネ".  This is a
+# narrow fix for MeCab/tokenisation artefacts where ツ gets dropped.
+_KITSUNE_FIX = re.compile(r"キ\s*キネ")
+_KITSUNE_FIX2 = re.compile(r"キ\s*ツネ")
+
+# ---------------------------------------------------------------------------
+# Character classification (for weighted time allocation)
+# ---------------------------------------------------------------------------
+
+_KANJI_RE = re.compile(r"[\u4e00-\u9fff\u3400-\u4dbf]")
+_KANA_RE = re.compile(r"[\u3040-\u30ff]")
+
+
+def _char_weight(ch):
+    """Weight of a single character for time distribution."""
+    if _KANJI_RE.match(ch):
+        return 2.0
+    if _KANA_RE.match(ch):
+        return 1.0
+    return 0.5
+
+
+def _text_weight(text):
+    """Total weight of a text string."""
+    return sum(_char_weight(ch) for ch in text)
+
+
+# ---------------------------------------------------------------------------
+# Text cleaning
+# ---------------------------------------------------------------------------
+
+
+def _clean_text(text):
+    """Normalise subtitle text: compress reduplicated kana tails and
+    fix fragmented katakana compounds."""
+    # キ キネ → キツネ  (two passes for ordering variants)
+    text = _KITSUNE_FIX.sub("キツネ", text)
+    text = _KITSUNE_FIX2.sub("キツネ", text)
+    # たたた → た, ててて → て  (3+ same kana → single)
+    text = _REDUP_RE.sub(r"\1", text)
+    return text
+
+
+# ---------------------------------------------------------------------------
+# Ending / starting checks
+# ---------------------------------------------------------------------------
 
 
 def _clean_ending(text):
@@ -118,6 +221,22 @@ def _ends_with_rentai(text):
     return _ends_with_any(text, _RENTAI_WORDS)
 
 
+def _ends_with_blocklist(text):
+    return _ends_with_any(text, _END_BLOCKLIST)
+
+
+def _starts_with_blocklist(text):
+    s = text.strip()
+    if not s:
+        return False
+    return bool(_START_BLOCKLIST_RE.match(s))
+
+
+# ---------------------------------------------------------------------------
+# Joining
+# ---------------------------------------------------------------------------
+
+
 def _join_texts(a, b):
     """Join two cue texts.  Japanese needs no space, but if both
     boundary characters are ASCII alphanumerics, insert a space so
@@ -136,6 +255,11 @@ def _join_texts(a, b):
     return a + b
 
 
+# ---------------------------------------------------------------------------
+# Merge pass
+# ---------------------------------------------------------------------------
+
+
 def _merge_cues(cues):
     """Merge adjacent cues per the Japanese sentence-continuation rules."""
     if not cues:
@@ -144,15 +268,28 @@ def _merge_cues(cues):
     for cur in cues[1:]:
         prev = merged[-1]
         prev_text = prev["text"]
+        cur_text = cur["text"]
         gap = cur["start"] - prev["end"]
-        if _ends_with_continuative(prev_text) or _ends_with_rentai(prev_text):
-            do_merge = True
+
+        # Rule 1: next cue starts with a response/interjection -> never merge
+        if _starts_with_blocklist(cur_text):
+            do_merge = False
+        # Rule 2: previous cue ends with a blocklist word -> never merge
+        elif _ends_with_blocklist(prev_text):
+            do_merge = False
+        # Rule 3: strong terminator -> never merge
         elif _ends_with_strong_terminator(prev_text):
             do_merge = False
+        # Rule 4: final particle -> never merge
         elif _ends_with_final_particle(prev_text):
             do_merge = False
+        # Rule 5: continuative particle or attributive -> force merge
+        elif _ends_with_continuative(prev_text) or _ends_with_rentai(prev_text):
+            do_merge = True
+        # Rule 6: default -- merge if gap is short
         else:
             do_merge = gap < 0.4
+
         if do_merge:
             prev["end"] = cur["end"]
             prev["text"] = _join_texts(prev_text, cur["text"])
@@ -161,32 +298,52 @@ def _merge_cues(cues):
     return merged
 
 
+# ---------------------------------------------------------------------------
+# Split pass
+# ---------------------------------------------------------------------------
+
+
 def _find_split_indices(text, level):
     """Return sorted character indices where a new segment should start,
     for the given priority level."""
     indices = set()
     if level == 1:
+        # Strong terminators 。！？ -- always split after.
         for i, ch in enumerate(text):
             if ch in _STRONG_TERMINATORS:
                 idx = i + 1
                 if 0 < idx < len(text):
                     indices.add(idx)
     elif level == 2:
+        # Final particles (終助詞) -- split after.
         for m in _FINAL_PARTICLE_RE.finditer(text):
             idx = m.end()
             if not (0 < idx < len(text)):
                 continue
             # Single-char final particles (か, よ, ね, ...) are
-            # ambiguous: the same kana appears inside longer words
-            # (e.g. か inside しかし).  Only treat them as a clause
-            # boundary when the next character is NOT hiragana -- a
-            # real new clause usually starts with a kanji/katakana
-            # content word or punctuation.  Multi-char particles are
-            # specific enough to trust as-is.
+            # ambiguous: the same kana appears inside longer words.
+            # Only treat them as a clause boundary when the next
+            # character is NOT hiragana -- a real new clause usually
+            # starts with a kanji/katakana content word or punctuation.
+            # Multi-char particles are specific enough to trust as-is.
             if len(m.group()) == 1 and _is_hiragana(text[idx]):
                 continue
             indices.add(idx)
     elif level == 3:
+        # Filler / interjection words -- split *before*.
+        for m in _FILLER_RE.finditer(text):
+            idx = m.start()
+            if 0 < idx < len(text):
+                indices.add(idx)
+    elif level == 4:
+        # Long continuative words (接続詞) -- split *before*.
+        for m in _LONG_CONJUNCTIVE_RE.finditer(text):
+            idx = m.start()
+            if 0 < idx < len(text):
+                indices.add(idx)
+    elif level == 5:
+        # Comma 「、」 -- de-emphasized: only split when both sides have
+        # enough characters (real subtitle material rarely has commas).
         for i, ch in enumerate(text):
             if ch in "、,":
                 left = text[:i]
@@ -198,40 +355,35 @@ def _find_split_indices(text, level):
                     idx = i + 1
                     if 0 < idx < len(text):
                         indices.add(idx)
-    elif level == 4:
-        for m in _LONG_CONJUNCTIVE_RE.finditer(text):
-            idx = m.start()
-            if 0 < idx < len(text):
-                indices.add(idx)
     return sorted(indices)
 
 
 def _distribute_time(start, end, raw_texts, apply_min_duration):
     """Given a list of text segments, distribute [start, end] across them
-    proportionally by character count.  When apply_min_duration is set,
-    segments shorter than the minimum are merged into the previous one."""
-    # Drop empty segments but remember their share of characters is 0.
-    char_counts = [len(t) for t in raw_texts]
-    total_chars = sum(char_counts)
+    proportionally by character *weight* (kanji=2, kana=1, punct=0.5).
+    When apply_min_duration is set, segments shorter than the minimum
+    are merged into the previous one."""
+    weights = [_text_weight(t) for t in raw_texts]
+    total_weight = sum(weights)
     total_dur = end - start
-    if total_chars == 0 or total_dur <= 0:
+    if total_weight == 0 or total_dur <= 0:
         return [(start, end, "".join(raw_texts))]
 
     segments = []
     cur_time = start
-    for i, (t, n) in enumerate(zip(raw_texts, char_counts)):
+    for i, (t, w) in enumerate(zip(raw_texts, weights)):
         if i == len(raw_texts) - 1:
             seg_start = cur_time
             seg_end = end
         else:
-            frac = n / total_chars
+            frac = w / total_weight
             seg_end = cur_time + total_dur * frac
             seg_start = cur_time
         segments.append((seg_start, seg_end, t))
         cur_time = seg_end
 
     if apply_min_duration:
-        segments = _merge_short_segments(segments, _MIN_SEGMENT_DURATION)
+        segments = _merge_short_segments(segments, _MIN_DURATION)
     return segments
 
 
@@ -253,14 +405,26 @@ def _merge_short_segments(segments, min_duration):
     return result
 
 
+def _split_segment_by_level(start, end, text, level):
+    """Split one segment using the rules of a single level."""
+    indices = _find_split_indices(text, level)
+    if not indices:
+        return [(start, end, text)]
+    boundaries = sorted(set([0] + indices + [len(text)]))
+    raw_texts = [text[boundaries[i] : boundaries[i + 1]] for i in range(len(boundaries) - 1)]
+    apply_min = level == 5  # comma level applies min-duration merge
+    return _distribute_time(start, end, raw_texts, apply_min)
+
+
 def _split_cue(cue):
-    """Split a single cue (>8s) using the priority rules.  Returns a
-    list of (start, end, text) tuples."""
+    """Split a single cue (>MAX_DURATION) using the priority rules.
+    Returns a list of (start, end, text) tuples."""
     text = cue["text"]
     segments = [(cue["start"], cue["end"], text)]
-    # Apply split levels in priority order.  Each level only operates
-    # on segments that are still longer than the max duration.
-    for level in (1, 2, 3, 4):
+    # Apply split levels in priority order: 1=terminator, 2=particle,
+    # 3=filler, 4=conjunctive, 5=comma.  Each level only operates on
+    # segments that are still longer than the max duration.
+    for level in (1, 2, 3, 4, 5):
         next_segments = []
         for (s, e, t) in segments:
             if (e - s) <= _MAX_DURATION:
@@ -272,28 +436,32 @@ def _split_cue(cue):
     return segments
 
 
-def _split_segment_by_level(start, end, text, level):
-    """Split one segment using the rules of a single level."""
-    indices = _find_split_indices(text, level)
-    if not indices:
-        return [(start, end, text)]
-    boundaries = sorted(set([0] + indices + [len(text)]))
-    raw_texts = [text[boundaries[i] : boundaries[i + 1]] for i in range(len(boundaries) - 1)]
-    apply_min = level == 3
-    return _distribute_time(start, end, raw_texts, apply_min)
-
-
 def _split_long_cues(cues):
+    """Split cues longer than MAX_DURATION.
+
+    Within each split result, segments shorter than MIN_DURATION are
+    merged back into their neighbours so we don't produce tiny
+    fragments.  Cues that were already within the duration limit are
+    left untouched.
+    """
     result = []
     for cue in cues:
         if (cue["end"] - cue["start"]) > _MAX_DURATION:
-            for (s, e, t) in _split_cue(cue):
+            split_segs = _split_cue(cue)
+            # Enforce min-duration only within the split segments.
+            split_segs = _merge_short_segments(split_segs, _MIN_DURATION)
+            for (s, e, t) in split_segs:
                 t = t.strip()
                 if t:
                     result.append({"start": s, "end": e, "text": t})
         else:
             result.append(cue)
     return result
+
+
+# ---------------------------------------------------------------------------
+# Public entry point
+# ---------------------------------------------------------------------------
 
 
 def refine_japanese_cues(cues):
@@ -306,6 +474,14 @@ def refine_japanese_cues(cues):
     """
     if not cues:
         return []
-    merged = _merge_cues(cues)
+
+    # Text cleaning pass.
+    cleaned = []
+    for c in cues:
+        c = dict(c)
+        c["text"] = _clean_text(c.get("text", ""))
+        cleaned.append(c)
+
+    merged = _merge_cues(cleaned)
     refined = _split_long_cues(merged)
     return refined

@@ -244,6 +244,8 @@ def handle_term_form(
         form.populate_obj(term)
         repo.add(term)
         repo.commit()
+        from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
+        invalidate_yt_subtitle_cache()
         return return_on_success
 
     # Note: on validation, form.duplicated_term may be set.
@@ -393,6 +395,12 @@ def bulk_update_status():
             term.status = new_status
             repo.add(term)
     repo.commit()
+
+    # Invalidate the YouTube subtitle word cache so subtitle colors
+    # refresh with the updated term statuses.
+    from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
+    invalidate_yt_subtitle_cache()
+
     return jsonify("ok")
 
 
@@ -406,6 +414,10 @@ def bulk_delete():
         term = repo.load(int(tid))
         repo.delete(term)
     repo.commit()
+
+    from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
+    invalidate_yt_subtitle_cache()
+
     return jsonify("ok")
 
 
@@ -418,4 +430,6 @@ def delete(termid):
     term = repo.load(termid)
     repo.delete(term)
     repo.commit()
+    from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
+    invalidate_yt_subtitle_cache()
     return redirect("/term/index", 302)
