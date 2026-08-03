@@ -95,6 +95,10 @@ class KoreanParser(AbstractParser):
     def name(cls):
         return "Korean"
 
+    @classmethod
+    def languages(cls):
+        return {"korean"}
+
     # ---- POS helpers ----
 
     # Kiwi POS tags that represent punctuation/symbols (non-word tokens).

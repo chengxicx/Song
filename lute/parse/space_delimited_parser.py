@@ -263,6 +263,10 @@ class TurkishParser(SpaceDelimitedParser):
     def name(cls):
         return "Turkish"
 
+    @classmethod
+    def languages(cls):
+        return {"turkish"}
+
     def get_lowercase(self, text):
         "Handle the funny turkish i variants."
         for caps, lower in {"İ": "i", "I": "ı"}.items():
