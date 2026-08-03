@@ -164,7 +164,15 @@ class Service:
     def _get_reading_data(self, dbbook, pagenum, track_page_open=False):
         "Get paragraphs, set text.start_date if needed."
         text = dbbook.text_at_page(pagenum)
-        text.load_sentences()
+
+        # Only load sentences if they don't already exist.
+        # load_sentences() re-parses the full text with the language
+        # parser (e.g. MeCab), which is expensive and redundant on
+        # every page load.  The reading page rendering uses TextItems
+        # from get_paragraphs(), not Sentence objects — sentences are
+        # only needed by Anki export and term detail views.
+        if not text.sentences:
+            text.load_sentences()
 
         svc = StatsService(self.session)
         svc.mark_stale(dbbook)

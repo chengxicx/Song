@@ -54,6 +54,20 @@ def _subtitle_words_html(book):
     join_text = "\n".join((c.get("text") or "").replace("\n", " ") for c in cues)
     textitems = render_service.get_textitems(join_text, lang)
 
+    # Save new status-0 terms created during subtitle tokenization.
+    # Without this, every page load re-creates (and re-parses readings
+    # for) the same terms, and subtitle words lack data-wid attributes
+    # (causing the NaN/edit_term bug).
+    new_terms = [
+        ti.term for ti in textitems
+        if ti.is_word and ti.term is not None
+        and ti.term.id is None and ti.term.status == 0
+    ]
+    if new_terms:
+        for t in new_terms:
+            db.session.add(t)
+        db.session.commit()
+
     chunks = []
     curr = []
     for ti in textitems:
