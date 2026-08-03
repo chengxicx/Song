@@ -385,6 +385,11 @@ function jumpToBookmark(oper) {
 window.addEventListener("keydown", function (e) {
   // console.log(e.code);
   if (e.code == "Space") {
+    // Only handle space when the audio player is actually shown.
+    // On youtube books the audio player is hidden and the youtube
+    // player owns the space key.
+    if (playerContainer.getAttribute("style") == "display: none")
+      return;
     // prevent scrolling when space is pressed
     // and it seems this fixes the issue where there's flashing
     // where one keydown event continuously makes the button play and pause

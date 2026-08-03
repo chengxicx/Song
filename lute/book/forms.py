@@ -157,6 +157,21 @@ class EditBookForm(FlaskForm):
         ],
     )
 
+    # YouTube video book fields.
+    book_type = SelectField(
+        "Type",
+        choices=[("", "Text"), ("youtube", "YouTube video")],
+    )
+    youtube_srt = FileField(
+        "YouTube subtitle file (SRT)",
+        validators=[
+            FileAllowed(
+                ["srt", "vtt"],
+                "Please upload a valid subtitle file (srt, vtt)",
+            )
+        ],
+    )
+
     # The current audio_filename can be removed from the current book.
     audio_filename = HiddenField("Audio filename")
 
@@ -178,6 +193,11 @@ class EditBookForm(FlaskForm):
         super().populate_obj(obj)
         obj.book_tags = _tag_values(self.book_tags.data)
 
+        # If the type was changed away from youtube, clear the youtube data.
+        if obj.book_type != "youtube":
+            obj.srt_data = None
+            obj.video_current_pos = None
+
         tfd = self.textfile.data
         if tfd:
             obj.text_stream = tfd.stream
@@ -189,3 +209,14 @@ class EditBookForm(FlaskForm):
             obj.audio_stream_filename = afd.filename
             obj.audio_bookmarks = None
             obj.audio_current_pos = None
+
+        yfd = self.youtube_srt.data
+        if yfd:
+            # Re-parse the subtitle file, updating both the book text
+            # (for reading) and the cue timing data (for the player).
+            from lute.book.service import parse_subtitle_file  # pylint: disable=import-outside-toplevel, cyclic-import
+
+            text, cues_json = parse_subtitle_file(yfd.filename, yfd.stream)
+            obj.text = text
+            obj.srt_data = cues_json
+            obj.book_type = "youtube"

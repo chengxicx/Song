@@ -2,19 +2,82 @@
 /read endpoints.
 """
 
+import json
 from flask import Blueprint, flash, request, render_template, redirect, jsonify
 from lute.read.service import Service
+from lute.read.render.service import Service as RenderService
 from lute.read.forms import TextForm
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
 from lute.settings.current import current_settings
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
+from lute.book.service import youtube_video_id
 from lute.tts.routes import get_lang_code
 from lute.db import db
 
 
 bp = Blueprint("read", __name__, url_prefix="/read")
+
+
+def _fmt_seconds(secs):
+    "Format seconds as m:ss or h:mm:ss."
+    secs = max(0, int(round(secs or 0)))
+    h = secs // 3600
+    m = (secs % 3600) // 60
+    s = secs % 60
+    if h > 0:
+        return f"{h}:{m:02d}:{s:02d}"
+    return f"{m}:{s:02d}"
+
+
+def _subtitle_words_html(book):
+    """
+    Render word-by-word HTML for each subtitle cue, so the scrolling
+    subtitle line can reuse the exact reading-page tokenization and
+    click behavior.
+
+    The book text is the cues joined by newlines, so tokenizing the
+    joined text and splitting on the end-of-paragraph sentinel (¶)
+    yields one chunk per cue.  Returns a list of HTML strings aligned
+    with book.cues.
+    """
+    if (book.book_type or "") != "youtube":
+        return []
+    cues = list(book.cues)
+    if not cues:
+        return []
+    lang = book.language
+    render_service = RenderService(db.session)
+    # Internal newlines in a single cue are replaced with a space so
+    # each cue maps to exactly one paragraph (and therefore one chunk).
+    join_text = "\n".join((c.get("text") or "").replace("\n", " ") for c in cues)
+    textitems = render_service.get_textitems(join_text, lang)
+
+    chunks = []
+    curr = []
+    for ti in textitems:
+        if ti.text == "¶":
+            if curr:
+                chunks.append(curr)
+                curr = []
+        else:
+            curr.append(ti)
+    if curr:
+        chunks.append(curr)
+
+    rendered = []
+    for i, chunk in enumerate(chunks):
+        snum = i + 1
+        parts = []
+        for ti in chunk:
+            ti.sentence_number = snum
+            parts.append(render_template("read/textitem.html", item=ti))
+        rendered.append("".join(parts))
+    # Pad/truncate so the list aligns with the cues.
+    while len(rendered) < len(cues):
+        rendered.append("")
+    return rendered[: len(cues)]
 
 
 def _render_book_page(book, pagenum, track_page_open=True):
@@ -33,6 +96,19 @@ def _render_book_page(book, pagenum, track_page_open=True):
     lang_repo = LanguageRepository(db.session)
     term_dicts = lang_repo.all_dictionaries()[lang.id]["term"]
 
+    book_type = book.book_type or ""
+    yt_video_id = None
+    if book_type == "youtube":
+        yt_video_id = youtube_video_id(book.source_uri)
+    srt_cues = []
+    srt_words = []
+    if book_type == "youtube":
+        srt_cues = list(book.cues)
+        for c in srt_cues:
+            c["start_str"] = _fmt_seconds(c.get("start", 0))
+            c["end_str"] = _fmt_seconds(c.get("end", 0))
+        srt_words = _subtitle_words_html(book)
+
     return render_template(
         "read/index.html",
         hide_top_menu=True,
@@ -47,6 +123,12 @@ def _render_book_page(book, pagenum, track_page_open=True):
         lang_code=get_lang_code(lang.name),
         track_page_open=track_page_open,
         term_dicts=term_dicts,
+        book_type=book_type,
+        youtube_video_id=yt_video_id,
+        srt_cues=srt_cues,
+        srt_cues_json=book.srt_data or "[]",
+        srt_words_json=json.dumps(srt_words, ensure_ascii=False),
+        video_current_pos=book.video_current_pos or 0,
     )
 
 
@@ -185,6 +267,18 @@ def save_player_data():
     book = _find_book(bookid)
     book.audio_current_pos = float(data.get("position"))
     book.audio_bookmarks = data.get("bookmarks")
+    db.session.add(book)
+    db.session.commit()
+    return jsonify("ok")
+
+
+@bp.route("/save_youtube_player_data", methods=["post"])
+def save_youtube_player_data():
+    "Save current YouTube video position.  Called on a loop by the player."
+    data = request.json
+    bookid = int(data.get("bookid"))
+    book = _find_book(bookid)
+    book.video_current_pos = float(data.get("position", 0))
     db.session.add(book)
     db.session.commit()
     return jsonify("ok")

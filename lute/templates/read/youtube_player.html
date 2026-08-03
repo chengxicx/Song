@@ -1,0 +1,70 @@
+<div class="youtube-player-container" id="yt-player-container">
+  <script type="text/javascript">
+    window.LUTE_YT_DATA = window.LUTE_YT_DATA || {};
+    window.LUTE_YT_DATA.videoId = {{ youtube_video_id | tojson }};
+    window.LUTE_YT_DATA.cues = {{ srt_cues_json | safe }};
+    window.LUTE_YT_DATA.words = {{ srt_words_json | safe }};
+    window.LUTE_YT_DATA.bookId = {{ book.id }};
+    window.LUTE_YT_DATA.startPos = {{ video_current_pos }};
+    window.LUTE_YT_DATA.langId = {{ lang_id }};
+
+    // Define the IFrame API callback before the api script loads, and
+    // queue any callbacks registered after it has already loaded.
+    window.YT_READY_CALLBACKS = window.YT_READY_CALLBACKS || [];
+    window.onYouTubeIframeAPIReady = function () {
+      window.YT_IS_READY = true;
+      (window.YT_READY_CALLBACKS || []).forEach(function (cb) {
+        try { cb(); } catch (e) { console.error(e); }
+      });
+      window.YT_READY_CALLBACKS = [];
+    };
+  </script>
+  <script type="text/javascript" src="https://www.youtube.com/iframe_api" async></script>
+
+  <div class="yt-player-video-wrap">
+    <div id="yt-player"></div>
+    <div class="yt-player-loading" id="yt-player-loading">Loading player...</div>
+  </div>
+
+  <div class="yt-player-controls">
+    <button id="yt-play-btn" class="audio-button yt-play-btn" title="Play / pause">
+      <svg viewBox="0 0 24 24" class="yt-icn yt-icn-play"><path d="M8 5v14l11-7z"></path></svg>
+      <svg viewBox="0 0 24 24" class="yt-icn yt-icn-pause"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>
+    </button>
+    <div class="yt-timeline-wrap">
+      <input type="range" class="timeline" id="yt-timeline" max="1000" value="0" step="0.1" />
+      <div class="yt-time-display">
+        <span id="yt-current-time">0:00</span>
+        <span>/</span>
+        <span id="yt-duration">0:00</span>
+      </div>
+    </div>
+    <div class="yt-control-buttons">
+      <div id="yt-playback-rate-container" title="Playback rate. Click the indicator to reset">
+        <button id="yt-rate-dec" class="audio-button rate-btn"><span>-</span></button>
+        <div id="yt-rate-indicator">1.0</div>
+        <button id="yt-rate-inc" class="audio-button rate-btn"><span>+</span></button>
+      </div>
+      <button id="yt-loop-btn" class="yt-toggle-btn" title="Loop current sentence">
+        <svg viewBox="0 0 24 24" class="yt-icn"><path d="M17 2l4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
+        <span class="yt-toggle-label">Loop</span>
+      </button>
+      <button id="yt-autopause-btn" class="yt-toggle-btn" title="Auto-pause at the end of each sentence">
+        <svg viewBox="0 0 24 24" class="yt-icn"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path><path d="M9 9h2v6H9zM13 9h2v6h-2z"></path></svg>
+        <span class="yt-toggle-label">Auto-pause</span>
+      </button>
+      <button id="yt-fullscreen-btn" class="yt-toggle-btn" title="Fullscreen">
+        <svg viewBox="0 0 24 24" class="yt-icn"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg>
+      </button>
+      <button id="yt-transcript-btn" class="yt-transcript-btn">Transcript</button>
+    </div>
+  </div>
+
+  <div class="yt-scrolling-subtitle" id="yt-scrolling-subtitle">
+    <div class="yt-scrolling-subtitle-inner" id="yt-scrolling-subtitle-inner" dir="{{ 'rtl' if is_rtl else 'ltr' }}"></div>
+  </div>
+
+  <div class="yt-transcript" id="yt-transcript" style="display: none">
+    <div class="yt-transcript-list" id="yt-transcript-list"></div>
+  </div>
+</div>

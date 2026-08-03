@@ -5,6 +5,9 @@
 {% block body %}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
+{% if book_type == "youtube" %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}" charset="utf-8" defer></script>
+{% endif %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="/static/js/never_cache/dict-tabs.js" charset="utf-8"></script>
@@ -92,6 +95,10 @@
   </div>
 
   {% include "read/audio_player.html" %}
+
+  {% if book_type == "youtube" %}
+  {% include "read/youtube_player.html" %}
+  {% endif %}
 
   <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>

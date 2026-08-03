@@ -20,21 +20,40 @@
   <table id="book">
   <tbody>
 
-    <tr>
+    <tr id="bookTypeRow">
+      <td>{{ form.book_type.label }}</td>
+      <td>{{ form.book_type(class="form-control", id="book_type") }}</td>
+    </tr>
+
+    <tr id="titleRow">
       <td>{{ form.title.label }}</td>
       <td>{{ form.title(class="form-control", dir=title_direction) }}</td>
     </tr>
 
-    <tr>
+    <tr id="textRow">
       <td>{{ form.text.label }}</td>
       <td>{{ form.text(class="form-largetextarea", dir=title_direction) }}</td>
     </tr>
 
-    <tr>
+    <tr id="textfileRow">
       <td>{{ form.textfile.label }}<br />
         <span class="formfieldcomment">txt, epub, pdf, srt, vtt</span>
       </td>
       <td>{{ form.textfile() }}</td>
+    </tr>
+
+    <tr id="youtubeSrtRow" style="display: none;">
+      <td>{{ form.youtube_srt.label }}<br />
+        <span class="formfieldcomment">srt, vtt</span>
+      </td>
+      <td>
+        {{ form.youtube_srt() }}
+        {% if book.srt_data %}
+        <div style="margin-top: 5px;">
+          <span class="smallfilename">Subtitles loaded ({{ book.cues | length }} lines). Upload a new file to replace them.</span>
+        </div>
+        {% endif %}
+      </td>
     </tr>
 
     <tr>
@@ -47,9 +66,9 @@
       <td> {{ form.threshold_page_tokens(class="form-control") }}</td>
     </tr>
 
-    <tr>
+    <tr id="sourceUriRow">
       <td>{{ form.source_uri.label }}</td>
-      <td>{{ form.source_uri(class="form-control") }}</td>
+      <td>{{ form.source_uri(class="form-control", id="source_uri") }}</td>
     </tr>
 
     <tr>
@@ -100,6 +119,15 @@
   $(document).ready(function () {
     var tagslist = document.getElementById('book_tags');
     var tags_tagify = setup_book_tags_tagify(tagslist);
+
+    var setupTypeFields = function () {
+      var isYoutube = $('#book_type').val() === 'youtube';
+      $('#youtubeSrtRow').toggle(isYoutube);
+      // Relabel the source uri field for youtube books.
+      $('#source_uri').closest('tr').find('td').first().text(isYoutube ? 'YouTube video URL' : 'Source URI');
+    };
+    $('#book_type').on('change', setupTypeFields);
+    setupTypeFields();
   });
 
   function confirm_delete(el) {

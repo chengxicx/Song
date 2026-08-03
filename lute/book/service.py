@@ -2,7 +2,9 @@
 book helper routines.
 """
 
+import json
 import os
+import re
 import shutil
 from io import StringIO, TextIOWrapper, BytesIO
 from datetime import datetime
@@ -35,6 +37,75 @@ class BookDataFromUrl:
     title: str = None
     source_uri: str = None
     text: str = None
+
+
+def youtube_video_id(url):
+    """
+    Extract the YouTube video id from a URL, or return None.
+
+    Handles watch, youtu.be, embed, and shorts URLs.
+    """
+    if not url:
+        return None
+    patterns = [
+        r"youtube\.com/watch\?[^#\s]*v=([A-Za-z0-9_-]{11})",
+        r"youtu\.be/([A-Za-z0-9_-]{11})",
+        r"youtube\.com/embed/([A-Za-z0-9_-]{11})",
+        r"youtube\.com/shorts/([A-Za-z0-9_-]{11})",
+        r"youtube\.com/live/([A-Za-z0-9_-]{11})",
+    ]
+    for p in patterns:
+        m = re.search(p, url)
+        if m:
+            return m.group(1)
+    return None
+
+
+def parse_subtitle_file(filename, filestream):
+    """
+    Parse an srt/vtt subtitle file.
+
+    Returns (text, cues_json), where text is the subtitle texts joined
+    by newlines, and cues_json is a JSON string of
+    [{"start": secs, "end": secs, "text": str}, ...].
+    """
+    _, ext = os.path.splitext(filename)
+    ext = (ext or "").lower()
+
+    fte = FileTextExtraction()
+    content = fte._get_text_stream_content(filestream, "utf-8-sig")
+
+    parser = None
+    if ext == ".vtt":
+        # YouTube vtt files have "Kind:" and "Language:" header lines
+        # (and sometimes a blank line) between the WEBVTT header and
+        # the first cue that the WebVttParser chokes on; drop them.
+        lines = content.split("\n")
+        drop_count = 0
+        for line in lines[1:]:
+            s = line.strip()
+            if s == "" or s.startswith("Kind:") or s.startswith("Language:"):
+                drop_count += 1
+            else:
+                break
+        if drop_count:
+            content = "\n".join([lines[0]] + lines[1 + drop_count :])
+        parser = WebVttParser(StringIO(content))
+    else:
+        parser = SrtParser(StringIO(content))
+    parser.parse()
+
+    subtitles = parser.subtitles
+    text = "\n".join(s.text for s in subtitles)
+    cues = [
+        {
+            "start": s.start / 1000.0,
+            "end": s.end / 1000.0,
+            "text": s.text,
+        }
+        for s in subtitles
+    ]
+    return text, json.dumps(cues, ensure_ascii=False)
 
 
 class FileTextExtraction:
@@ -161,10 +232,19 @@ class FileTextExtraction:
         content = ""
         try:
             vtt_content = self._get_text_stream_content(filestream, "utf-8-sig")
-            # Check if it is from YouTube
+            # Check if it is from YouTube, and drop the "Kind:" /
+            # "Language:" metadata lines (and any blank line) between
+            # the WEBVTT header and the first cue.
             lines = vtt_content.split("\n")
-            if lines[1].startswith("Kind:") and lines[2].startswith("Language:"):
-                vtt_content = "\n".join(lines[:1] + lines[3:])
+            drop_count = 0
+            for line in lines[1:]:
+                s = line.strip()
+                if s == "" or s.startswith("Kind:") or s.startswith("Language:"):
+                    drop_count += 1
+                else:
+                    break
+            if drop_count:
+                vtt_content = "\n".join([lines[0]] + lines[1 + drop_count :])
             parser = WebVttParser(StringIO(vtt_content))
             parser.parse()
             content = "\n".join(subtitle.text for subtitle in parser.subtitles)
@@ -187,6 +267,29 @@ class Service:
         ext = (ext or "").lower()
         newfilename = uuid.uuid4().hex
         return f"{formatted_datetime}_{newfilename}{ext}"
+
+    def youtube_title(self, url):
+        """
+        Best-effort title lookup for a YouTube video.
+
+        Uses the YouTube oEmbed endpoint (no API key required), and
+        falls back to a title based on the video id.
+        """
+        vid = youtube_video_id(url)
+        fallback = f"YouTube video ({vid})" if vid else "YouTube video"
+        if vid is None:
+            return fallback
+        try:
+            oembed = f"https://www.youtube.com/oembed?url={url}&format=json"
+            response = requests.get(oembed, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            title = data.get("title", "").strip()
+            if title:
+                return title[:200]
+        except (requests.exceptions.RequestException, ValueError):
+            pass
+        return fallback
 
     def save_audio_file(self, audio_file_field_data):
         """

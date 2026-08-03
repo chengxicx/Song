@@ -3,6 +3,7 @@
 """
 
 import json
+import urllib.parse
 from flask import (
     Blueprint,
     request,
@@ -16,6 +17,8 @@ from lute.book.service import (
     Service as BookService,
     BookImportException,
     BookDataFromUrl,
+    parse_subtitle_file,
+    youtube_video_id,
 )
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm, ALLOWED_AUDIO_EXTENSIONS
@@ -137,7 +140,14 @@ def new():
     # Don't set the current language before submit.
     usrepo = UserSettingRepository(db.session)
     current_language_id = int(usrepo.get_value("current_language_id"))
-    form.language_id.data = current_language_id
+    requested_language_id = request.args.get("language_id")
+    if requested_language_id:
+        try:
+            form.language_id.data = int(requested_language_id)
+        except ValueError:
+            form.language_id.data = current_language_id
+    else:
+        form.language_id.data = current_language_id
 
     return render_template(
         "book/create_new.html",
@@ -181,7 +191,77 @@ def edit(bookid):
 
 @bp.route("/import_webpage", methods=["GET", "POST"])
 def import_webpage():
-    return render_template("book/import_webpage.html")
+    "Import a web page, or a YouTube video with subtitles."
+    if request.method == "POST":
+        import_type = request.form.get("import_type", "webpage")
+        if import_type == "youtube":
+            return _import_youtube_video()
+        return _redirect_to_new_book_form()
+
+    usrepo = UserSettingRepository(db.session)
+    current_language_id = int(usrepo.get_value("current_language_id"))
+    language_choices = lute.utils.formutils.language_choices(db.session)
+    return render_template(
+        "book/import_webpage.html",
+        language_choices=language_choices,
+        current_language_id=current_language_id,
+    )
+
+
+def _redirect_to_new_book_form():
+    "Redirect to the normal new-book form with the import url pre-filled."
+    import_url = request.form.get("importurl", "").strip()
+    url = "/book/new?importurl=" + urllib.parse.quote(import_url)
+    language_id = request.form.get("language_id")
+    if language_id:
+        url += f"&language_id={language_id}"
+    return redirect(url, 302)
+
+
+def _import_youtube_video():
+    "Create a youtube book from the form data."
+    url = request.form.get("youtube_url", "").strip()
+    tag = request.form.get("youtube_tag", "").strip() or "youtube"
+    language_id = request.form.get("language_id")
+    srt_file = request.files.get("srt_file")
+
+    if youtube_video_id(url) is None:
+        flash("Please enter a valid YouTube video URL.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if srt_file is None or srt_file.filename == "":
+        flash("Please upload an SRT subtitle file.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    try:
+        text, cues_json = parse_subtitle_file(srt_file.filename, srt_file.stream)
+    except Exception as e:  # pylint: disable=broad-except
+        msg = f"Could not parse subtitle file {srt_file.filename} (error: {str(e)})"
+        flash(msg, "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if text.strip() == "":
+        flash("The subtitle file contains no text.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    b = Book()
+    b.language_id = int(language_id) if language_id else None
+    b.title = BookService().youtube_title(url)
+    b.source_uri = url
+    b.text = text
+    b.srt_data = cues_json
+    b.book_type = "youtube"
+    b.book_tags = [tag]
+    b.threshold_page_tokens = 250
+    b.split_by = "paragraphs"
+
+    svc = BookService()
+    try:
+        book = svc.import_book(b, db.session)
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+    return redirect(f"/read/{book.id}/page/1", 302)
 
 
 def _find_book(bookid):
