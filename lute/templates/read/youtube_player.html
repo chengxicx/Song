@@ -27,23 +27,31 @@
   </div>
 
   <div class="yt-player-controls">
-    <button id="yt-play-btn" class="audio-button yt-play-btn" title="Play / pause">
-      <svg viewBox="0 0 24 24" class="yt-icn yt-icn-play"><path d="M8 5v14l11-7z"></path></svg>
-      <svg viewBox="0 0 24 24" class="yt-icn yt-icn-pause"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>
-    </button>
+    <div class="yt-controls-left">
+      <button id="yt-prev-cue-btn" class="audio-button yt-cue-btn" title="Previous subtitle">
+        <svg viewBox="0 0 24 24" class="yt-icn"><path d="M7 6h2v12H7zM20 6l-8.5 6 8.5 6z"></path></svg>
+      </button>
+      <button id="yt-play-btn" class="audio-button yt-play-btn" title="Play / pause">
+        <svg viewBox="0 0 24 24" class="yt-icn yt-icn-play"><path d="M8 5v14l11-7z"></path></svg>
+        <svg viewBox="0 0 24 24" class="yt-icn yt-icn-pause"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>
+      </button>
+      <button id="yt-next-cue-btn" class="audio-button yt-cue-btn" title="Next subtitle">
+        <svg viewBox="0 0 24 24" class="yt-icn"><path d="M15 6h2v12h-2zM4 6l8.5 6L4 18z"></path></svg>
+      </button>
+    </div>
     <div class="yt-timeline-wrap">
-      <input type="range" class="timeline" id="yt-timeline" max="1000" value="0" step="0.1" />
+      <input type="range" class="yt-timeline" id="yt-timeline" max="1000" value="0" step="0.1" />
       <div class="yt-time-display">
         <span id="yt-current-time">0:00</span>
         <span>/</span>
         <span id="yt-duration">0:00</span>
       </div>
     </div>
-    <div class="yt-control-buttons">
-      <div id="yt-playback-rate-container" title="Playback rate. Click the indicator to reset">
-        <button id="yt-rate-dec" class="audio-button rate-btn"><span>-</span></button>
-        <div id="yt-rate-indicator">1.0</div>
-        <button id="yt-rate-inc" class="audio-button rate-btn"><span>+</span></button>
+    <div class="yt-controls-right">
+      <div id="yt-playback-rate-container" title="Playback rate. Click the number to reset">
+        <button id="yt-rate-dec" class="audio-button yt-rate-btn"><span>−</span></button>
+        <div id="yt-rate-indicator">1</div>
+        <button id="yt-rate-inc" class="audio-button yt-rate-btn"><span>+</span></button>
       </div>
       <button id="yt-loop-btn" class="yt-toggle-btn" title="Loop current sentence">
         <svg viewBox="0 0 24 24" class="yt-icn"><path d="M17 2l4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
@@ -54,7 +62,8 @@
         <span class="yt-toggle-label">Auto-pause</span>
       </button>
       <button id="yt-fullscreen-btn" class="yt-toggle-btn" title="Fullscreen">
-        <svg viewBox="0 0 24 24" class="yt-icn"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg>
+        <svg viewBox="0 0 24 24" class="yt-icn yt-icn-expand"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg>
+        <svg viewBox="0 0 24 24" class="yt-icn yt-icn-collapse"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg>
       </button>
       <button id="yt-transcript-btn" class="yt-transcript-btn">Transcript</button>
     </div>

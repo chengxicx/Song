@@ -196,6 +196,16 @@ function _show_wordframe_url(url) {
 
 function show_term_edit_form(el) {
   const wid = parseInt(el.data('wid'));
+  if (isNaN(wid)) {
+    // The term hasn't been saved to the DB yet (status 0 with no ID).
+    // Fall back to the "create new term" form using the element's text.
+    const text = el.data('text') || el.text();
+    const lid = parseInt(el.data('lang-id'));
+    if (isNaN(lid)) return;
+    const sendtext = text.replace(/\//g, "LUTESLASH");
+    _show_wordframe_url(`/read/termform/${lid}/${sendtext}`);
+    return;
+  }
   _show_wordframe_url(`/read/edit_term/${wid}`);
 }
 
