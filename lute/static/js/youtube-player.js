@@ -187,8 +187,15 @@
 
   function ytActivateCue(idx) {
     // Single-line scrolling subtitle, reusing the reading-page word spans.
+    // If the word HTML hasn't been loaded yet (WORDS is empty), fall
+    // back to the plain cue text so the user sees something immediately.
     if (ytSubtitle) {
-      ytSubtitle.innerHTML = WORDS[idx] || "";
+      var html = WORDS[idx];
+      if (!html) {
+        var cue = CUES[idx];
+        html = cue ? ytEscapeHtml(cue.text || "") : "";
+      }
+      ytSubtitle.innerHTML = html;
       ytSubtitle.scrollLeft = 0;
       ytIsRtl = ytSubtitle.getAttribute("dir") === "rtl";
       var overflow = ytSubtitle.scrollWidth - ytSubtitle.clientWidth;
@@ -461,6 +468,36 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Lazy-load subtitle word HTML                                       */
+  /* ------------------------------------------------------------------ */
+
+  function ytEscapeHtml(s) {
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // Fetch the tokenized word HTML for all cues.  This is deferred so
+  // the expensive MeCab tokenization doesn't block the initial page
+  // render.  While loading, the subtitle shows plain cue text.
+  function ytLoadSubtitleWords() {
+    if (!BOOK_ID) return;
+    $.ajax({
+      url: "/read/youtube_subtitle_words/" + BOOK_ID,
+      method: "GET",
+      dataType: "json",
+    }).done(function (data) {
+      if (Array.isArray(data) && data.length) {
+        WORDS.length = 0;
+        WORDS.push.apply(WORDS, data);
+        // Re-activate the current cue so the subtitle updates from
+        // plain text to clickable word spans.
+        if (ytCueIndex >= 0) ytActivateCue(ytCueIndex);
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Keyboard + init                                                     */
   /* ------------------------------------------------------------------ */
 
@@ -487,6 +524,7 @@
     bindControls();
     bindSubtitleInteractions();
     bindKeys();
+    ytLoadSubtitleWords();
 
     // Create the player when the IFrame API is ready.
     var create = function () { createYoutubePlayer(); };
