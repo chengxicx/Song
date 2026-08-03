@@ -29,6 +29,19 @@ bp = Blueprint("read", __name__, url_prefix="/read")
 _yt_subtitle_words_cache = {}
 
 
+def invalidate_yt_subtitle_cache(book_id=None):
+    """Clear the subtitle word-HTML cache.
+
+    Called after term status updates so the subtitle re-renders with
+    fresh data-status-class values.  If book_id is given, only that
+    book's entry is cleared; otherwise the entire cache is wiped.
+    """
+    if book_id is not None:
+        _yt_subtitle_words_cache.pop(book_id, None)
+    else:
+        _yt_subtitle_words_cache.clear()
+
+
 def _fmt_seconds(secs):
     "Format seconds as m:ss or h:mm:ss."
     secs = max(0, int(round(secs or 0)))

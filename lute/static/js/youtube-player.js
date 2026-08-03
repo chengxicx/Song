@@ -485,16 +485,13 @@
   /* ------------------------------------------------------------------ */
 
   // Apply status color classes to the scrolling-subtitle word spans.
-  // Mirrors lute.js add_status_classes(): when the show_highlights
-  // setting is on, every word gets its data-status-class painted on;
-  // otherwise colors are revealed on hover (see bindSubtitleInteractions).
+  // The subtitle ALWAYS shows word colors, regardless of the
+  // show_highlights setting, so the user can see at a glance which
+  // words they know (status 1-5), which are unknown (status 0), and
+  // which are ignored/well-known (status 98/99, no color).
   function ytApplySubtitleStatusColors() {
     if (!ytSubtitle) return;
-    if (typeof _show_highlights !== "function" ||
-        typeof apply_status_class !== "function") {
-      return;
-    }
-    if (!_show_highlights()) return;
+    if (typeof apply_status_class !== "function") return;
     $(ytSubtitle).find("span.word").each(function () {
       apply_status_class($(this));
     });
@@ -510,21 +507,9 @@
       word_clicked($(this), e);
     });
 
-    // When show_highlights is off, the reading page reveals a word's
-    // status color on hover and clears it on mouseout.  Mirror that
-    // for the scrolling subtitle so it inherits the same color
-    // behavior as the main text.
-    if (typeof _show_highlights === "function" &&
-        typeof apply_status_class === "function" &&
-        typeof remove_status_highlights === "function" &&
-        !_show_highlights()) {
-      t.on("mouseover", ".word", function () {
-        apply_status_class($(this));
-      });
-      t.on("mouseout", ".word", function () {
-        remove_status_highlights();
-      });
-    }
+    // Status colors are always applied (see ytApplySubtitleStatusColors),
+    // so we do NOT bind the hover-based add/remove that the main text
+    // uses when show_highlights is off.
 
     if (typeof tooltip_textitem_hover_content === "function" &&
         typeof _get_tooltip_pos === "function") {
@@ -617,6 +602,14 @@
           "Unable to load the YouTube player. The transcript below is still available.";
       }
     }, 15000);
+
+    // After a term status update, lute.js reloads #thetext.  The
+    // server-side subtitle cache is invalidated at the same time, so
+    // re-fetch the subtitle words to pick up fresh data-status-class
+    // values and re-apply colors.
+    window.addEventListener("lute:status-updated", function () {
+      ytLoadSubtitleWords();
+    });
   }
 
   if (document.readyState === "loading") {
