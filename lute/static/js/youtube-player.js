@@ -36,7 +36,10 @@
   var ytIsRtl = false;
 
   var ytContainer = document.getElementById("yt-player-container");
+  var ytVideoWrap = document.querySelector(".yt-player-video-wrap");
   var ytPlayBtn = document.getElementById("yt-play-btn");
+  var ytPrevCueBtn = document.getElementById("yt-prev-cue-btn");
+  var ytNextCueBtn = document.getElementById("yt-next-cue-btn");
   var ytTimeline = document.getElementById("yt-timeline");
   var ytCurTimeEl = document.getElementById("yt-current-time");
   var ytDurationEl = document.getElementById("yt-duration");
@@ -257,22 +260,35 @@
       row.appendChild(ts);
       row.appendChild(txt);
       row.addEventListener("click", function () {
-        ytSeekToCue(i);
+        ytSeekToCue(i, true);
       });
       ytTranscriptList.appendChild(row);
     });
   }
 
   // Transcript -> video: jump the playhead to the cue start.
-  function ytSeekToCue(i) {
+  function ytSeekToCue(i, autoplay) {
     if (!ytPlayerReady || !ytPlayer || !CUES[i]) return;
     var cue = CUES[i];
     ytPlayer.seekTo(cue.start, true);
     ytCueIndex = i;
     ytActivateCue(i);
-    if (ytPlayer.getPlayerState() !== window.YT.PlayerState.PLAYING) {
+    // When jumping from the transcript list, resume playback;
+    // for prev/next buttons keep the current play state so the user
+    // can scrub through subtitles without forcing play.
+    if (autoplay && ytPlayer.getPlayerState() !== window.YT.PlayerState.PLAYING) {
       ytPlayer.playVideo();
     }
+  }
+
+  // Prev/next subtitle jump used by the cue buttons.
+  function ytJumpCue(delta) {
+    if (!ytPlayerReady || !ytPlayer || !CUES.length) return;
+    var n = CUES.length;
+    var target = ytCueIndex < 0 ? 0 : ytCueIndex + delta;
+    if (target < 0) target = 0;
+    if (target >= n) target = n - 1;
+    ytSeekToCue(target, false);
   }
 
   /* ------------------------------------------------------------------ */
@@ -324,6 +340,12 @@
     if (ytPlayBtn) {
       ytPlayBtn.addEventListener("click", ytTogglePlay);
     }
+    if (ytPrevCueBtn) {
+      ytPrevCueBtn.addEventListener("click", function () { ytJumpCue(-1); });
+    }
+    if (ytNextCueBtn) {
+      ytNextCueBtn.addEventListener("click", function () { ytJumpCue(1); });
+    }
     if (ytTimeline) {
       ytTimeline.addEventListener("pointerdown", function () {
         ytDragging = true;
@@ -359,13 +381,16 @@
       });
     }
     if (ytFullscreenBtn) {
-      ytFullscreenBtn.addEventListener("click", function () {
-        if (!ytPlayerReady || !ytPlayer) return;
-        var iframe = ytPlayer.getIframe();
-        if (iframe.requestFullscreen) iframe.requestFullscreen();
-        else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
-      });
+      ytFullscreenBtn.addEventListener("click", ytToggleFullscreen);
     }
+    // Keep the fullscreen button state in sync with the browser,
+    // e.g. when the user presses Esc to exit fullscreen.
+    var fsHandler = function () {
+      var isFs = document.fullscreenElement || document.webkitFullscreenElement;
+      if (ytFullscreenBtn) ytFullscreenBtn.classList.toggle("on", !!isFs);
+    };
+    document.addEventListener("fullscreenchange", fsHandler);
+    document.addEventListener("webkitfullscreenchange", fsHandler);
     if (ytTranscriptBtn) {
       ytTranscriptBtn.addEventListener("click", function () {
         var isOpen = ytTranscript.style.display !== "none";
@@ -378,7 +403,7 @@
           // Center the current line when the panel is opened.
           if (ytCueIndex >= 0 && ytTranscriptList) {
             var row = ytTranscriptList.querySelector(
-              ".yt-transcript-row-" + ytCueIndex
+              "#yt-transcript-row-" + ytCueIndex
             );
             if (row) {
               var target =
@@ -389,6 +414,22 @@
           }
         }
       });
+    }
+  }
+
+  // Fullscreen the video wrapper (more reliable than the iframe,
+  // which needs its own allowfullscreen attribute). The iframe fills
+  // the wrapper, so the video scales up correctly.
+  function ytToggleFullscreen() {
+    var el = ytVideoWrap || ytContainer;
+    if (!el) return;
+    var isFs = document.fullscreenElement || document.webkitFullscreenElement;
+    if (isFs) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    } else {
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     }
   }
 

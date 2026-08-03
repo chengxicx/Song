@@ -438,10 +438,10 @@
   border-radius: 5px;
   padding: 0.9rem;
   background-color: var(--audio-color-3);
-  width: 80%;
+  width: 100%;
   margin: 0 auto;
   margin-bottom: 1.6rem;
-  min-width: fit-content;
+  min-width: 0;
   box-sizing: border-box;
   z-index: 999;
 
@@ -484,11 +484,27 @@
 }
 
 .yt-player-controls {
-  display: grid;
-  grid-template-columns: min-content 2.2fr min-content;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.9rem;
+  gap: 0.6rem;
   margin-top: 0.6rem;
+}
+
+.yt-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+}
+
+.yt-controls-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-left: auto;
 }
 
 .yt-play-btn {
@@ -497,8 +513,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: var(--yt-color-4);
+  color: #fff;
+}
+
+.yt-cue-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #fff;
   color: #333;
+}
+
+.yt-cue-btn .yt-icn {
+  width: 16px;
+  height: 16px;
 }
 
 .yt-play-btn .yt-icn-play {
@@ -523,7 +554,25 @@
   fill: currentColor;
 }
 
+/* Fullscreen icon swap. */
+.yt-toggle-btn .yt-icn-expand {
+  display: block;
+}
+
+.yt-toggle-btn .yt-icn-collapse {
+  display: none;
+}
+
+.yt-toggle-btn.on .yt-icn-expand {
+  display: none;
+}
+
+.yt-toggle-btn.on .yt-icn-collapse {
+  display: block;
+}
+
 .yt-timeline-wrap {
+  flex: 1 1 180px;
   min-width: 0;
   padding: 0.2rem 0.5rem;
   background-color: var(--yt-color-5);
@@ -539,12 +588,54 @@
   margin-top: 0.2rem;
 }
 
-.yt-control-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+/* YouTube seek bar. Self-contained (does not share the audio .timeline
+   class, whose thumb is intentionally hidden). */
+.yt-timeline {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 0.6rem;
+  margin: 0;
+  background-color: #fff;
+  border-radius: 999px;
+  box-sizing: border-box;
+  background-size: 0% 100%;
+  background-image: linear-gradient(var(--yt-color-1), var(--yt-color-1));
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.yt-timeline::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  box-shadow: none;
+  border: none;
+  border-radius: 999px;
+}
+
+.yt-timeline::-moz-range-track {
+  box-shadow: none;
+  border: none;
+  border-radius: 999px;
+}
+
+.yt-timeline::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--yt-color-4);
+  border: 2px solid #fff;
+  margin-top: -4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.yt-timeline::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--yt-color-4);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 #yt-playback-rate-container {
@@ -554,6 +645,22 @@
   background-color: var(--yt-color-5);
   border-radius: 5px;
   padding: 0.25rem 0.4rem;
+}
+
+.yt-rate-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--yt-color-4);
+  color: #fff;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.yt-rate-btn span {
+  pointer-events: none;
 }
 
 #yt-rate-indicator {
@@ -619,16 +726,28 @@
   border-radius: 5px;
   background-color: #fff;
   overflow: hidden;
-  min-height: 2.2rem;
+  min-height: 3.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #yt-scrolling-subtitle-inner {
-  white-space: nowrap;
+  white-space: normal;
   overflow-x: hidden;
-  padding: 0.5rem 0.7rem;
-  font-size: 1.15rem;
-  line-height: 1.4;
+  padding: 0.7rem 1rem;
+  font-size: 1.5rem;
+  line-height: 1.6;
+  text-align: center;
   box-sizing: border-box;
+  max-height: 7rem;
+  overflow-y: auto;
+  width: 100%;
+}
+
+#yt-scrolling-subtitle-inner:empty::before {
+  content: "—";
+  color: #bcccdc;
 }
 
 #yt-scrolling-subtitle-inner .word {
@@ -689,22 +808,33 @@
 }
 
 @media screen and (max-width: 980px) {
-  .youtube-player-container {
-    width: 100%;
-  }
-
-  .yt-player-controls {
-    grid-template-columns: min-content 1fr;
-  }
-
-  .yt-control-buttons {
-    grid-column: 1 / -1;
+  /* On narrow screens, stack the control groups so the seek bar gets
+     a full row and the buttons wrap below it cleanly. */
+  .yt-controls-right {
+    flex-basis: 100%;
+    justify-content: center;
+    margin-left: 0;
   }
 }
 
 @media screen and (max-width: 480px) {
   .youtube-player-container {
     padding: 0.4rem;
+  }
+
+  .yt-play-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .yt-cue-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  #yt-scrolling-subtitle-inner {
+    font-size: 1.2rem;
+    padding: 0.5rem 0.6rem;
   }
 
   .yt-toggle-label {

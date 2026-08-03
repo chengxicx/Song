@@ -46,6 +46,33 @@ class JapaneseParser(AbstractParser):
     _dict_type = None
     _old_dict_setting = None
 
+    # Cached MeCab instances.  MeCab() initialization loads the
+    # dictionary files (~18ms each) and was previously re-done on
+    # every parse/reading/lemma call, causing severe slowdowns on
+    # Japanese pages with many new words.
+    _mecab_instance = None       # default MeCab()
+    _mecab_yomi_instance = None  # MeCab(r"-O yomi") for IPADIC readings
+
+    @classmethod
+    def _get_mecab(cls):
+        """Return the cached default MeCab instance, creating if needed."""
+        if cls._mecab_instance is None:
+            cls._mecab_instance = MeCab()
+        return cls._mecab_instance
+
+    @classmethod
+    def _get_mecab_yomi(cls):
+        """Return the cached MeCab instance with -O yomi flag."""
+        if cls._mecab_yomi_instance is None:
+            cls._mecab_yomi_instance = MeCab(r"-O yomi")
+        return cls._mecab_yomi_instance
+
+    @classmethod
+    def _invalidate_mecab_cache(cls):
+        """Invalidate cached MeCab instances (called when path changes)."""
+        cls._mecab_instance = None
+        cls._mecab_yomi_instance = None
+
     @classmethod
     def is_supported(cls):
         """
@@ -70,6 +97,10 @@ class JapaneseParser(AbstractParser):
         path_unchanged = mecab_path == JapaneseParser._old_mecab_path
         if path_unchanged and JapaneseParser._is_supported is not None:
             return JapaneseParser._is_supported
+
+        # Path changed — invalidate cached MeCab instances so they
+        # get recreated with the new library/dictionary.
+        JapaneseParser._invalidate_mecab_cache()
 
         # Natto uses the MECAB_PATH env key if it's set.
         env_key = "MECAB_PATH"
@@ -161,15 +192,15 @@ class JapaneseParser(AbstractParser):
         # %f[8] alone can't tell them apart.
         detected = "ipadic"
         try:
-            with MeCab() as nm:
-                for d in nm.dicts:
-                    path = (d.filepath or "").lower()
-                    if "unidic" in path:
-                        detected = "unidic"
-                        break
-                    if "ipadic" in path:
-                        detected = "ipadic"
-                        break
+            nm = cls._get_mecab()
+            for d in nm.dicts:
+                path = (d.filepath or "").lower()
+                if "unidic" in path:
+                    detected = "unidic"
+                    break
+                if "ipadic" in path:
+                    detected = "ipadic"
+                    break
         except:  # pylint: disable=bare-except
             # If anything goes wrong during detection, stay with
             # the safe default (ipadic).
@@ -203,27 +234,27 @@ class JapaneseParser(AbstractParser):
         #
         # We still need an EOP (end-of-paragraph) sentinel, so we
         # append a fake EOP token after each paragraph.
-        with MeCab() as nm:
-            for para in text.split("\n"):
-                for n in nm.parse(para, as_nodes=True):
-                    # Skip BOS/EOS nodes
-                    if n.stat == 2 or n.surface is None or n.surface == "":
-                        continue
-                    term = n.surface
-                    node_type = str(n.char_type)
-                    is_eos = term in language.regexp_split_sentences
-                    # Node type values ref
-                    # https://github.com/buruzaemon/natto-py/wiki/
-                    #    Node-Parsing-char_type
-                    #
-                    # The repeat character is sometimes returned as a
-                    # "symbol" (node type = 3), so handle that
-                    # specifically.
-                    is_word = node_type in "2678" or term == "々"
-                    tokens.append(ParsedToken(term, is_word, is_eos))
-                # End-of-paragraph sentinel, matches the old
-                # "EOP\t3\t7" format where third==7 marks it.
-                tokens.append(ParsedToken("¶", False, True))
+        nm = self._get_mecab()
+        for para in text.split("\n"):
+            for n in nm.parse(para, as_nodes=True):
+                # Skip BOS/EOS nodes
+                if n.stat == 2 or n.surface is None or n.surface == "":
+                    continue
+                term = n.surface
+                node_type = str(n.char_type)
+                is_eos = term in language.regexp_split_sentences
+                # Node type values ref
+                # https://github.com/buruzaemon/natto-py/wiki/
+                #    Node-Parsing-char_type
+                #
+                # The repeat character is sometimes returned as a
+                # "symbol" (node type = 3), so handle that
+                # specifically.
+                is_word = node_type in "2678" or term == "々"
+                tokens.append(ParsedToken(term, is_word, is_eos))
+            # End-of-paragraph sentinel, matches the old
+            # "EOP\t3\t7" format where third==7 marks it.
+            tokens.append(ParsedToken("¶", False, True))
 
         return tokens
 
@@ -310,8 +341,8 @@ class JapaneseParser(AbstractParser):
             # more robust: we can safely check the field count and
             # fall back to the surface form for tokens without a
             # readable reading.
-            with MeCab() as nm:
-                raw = nm.parse(text)
+            nm = self._get_mecab()
+            raw = nm.parse(text)
             for line in raw.split("\n"):
                 line = line.strip()
                 if not line or line == "EOS":
@@ -332,10 +363,9 @@ class JapaneseParser(AbstractParser):
                     readings.append(surface)
         else:
             # IPADIC: use the built-in "yomi" output format.
-            flags = r"-O yomi"
-            with MeCab(flags) as nm:
-                for n in nm.parse(text, as_nodes=True):
-                    readings.append(n.feature)
+            nm = self._get_mecab_yomi()
+            for n in nm.parse(text, as_nodes=True):
+                readings.append(n.feature)
         readings = [r.strip() for r in readings if r is not None and r.strip() != ""]
 
         ret = "".join(readings).strip()
@@ -502,8 +532,8 @@ class JapaneseParser(AbstractParser):
         lemma_index = 7 if dict_type == "unidic" else 6
 
         lemmas = []
-        with MeCab() as nm:
-            raw = nm.parse(text)
+        nm = self._get_mecab()
+        raw = nm.parse(text)
         for line in raw.split("\n"):
             line = line.strip()
             if not line or line == "EOS":

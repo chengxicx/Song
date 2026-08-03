@@ -449,6 +449,7 @@ def _create_app(app_config, extra_config):
             from lute.parse.mecab_parser import JapaneseParser
             JapaneseParser._is_supported = None
             JapaneseParser._old_mecab_path = None
+            JapaneseParser._invalidate_mecab_cache()
         except Exception:  # pylint: disable=broad-exception-caught
             pass
 
