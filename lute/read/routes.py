@@ -19,6 +19,15 @@ from lute.db import db
 
 bp = Blueprint("read", __name__, url_prefix="/read")
 
+# Module-level cache for subtitle word HTML, keyed by book id.
+# The tokenization of all cues (MeCab parse + term lookup + Jinja
+# render per word) is expensive (10-20s for long videos).  The result
+# is deterministic for a given set of cues + terms, so we compute it
+# once and reuse it on subsequent page loads.  Each gunicorn worker
+# has its own cache; that's fine — the first request per worker pays
+# the cost, the rest are instant.
+_yt_subtitle_words_cache = {}
+
 
 def _fmt_seconds(secs):
     "Format seconds as m:ss or h:mm:ss."
@@ -41,9 +50,14 @@ def _subtitle_words_html(book):
     joined text and splitting on the end-of-paragraph sentinel (¶)
     yields one chunk per cue.  Returns a list of HTML strings aligned
     with book.cues.
+
+    Results are cached per book id (see _yt_subtitle_words_cache).
     """
     if (book.book_type or "") != "youtube":
         return []
+    cached = _yt_subtitle_words_cache.get(book.id)
+    if cached is not None:
+        return cached
     cues = list(book.cues)
     if not cues:
         return []
@@ -91,7 +105,9 @@ def _subtitle_words_html(book):
     # Pad/truncate so the list aligns with the cues.
     while len(rendered) < len(cues):
         rendered.append("")
-    return rendered[: len(cues)]
+    result = rendered[: len(cues)]
+    _yt_subtitle_words_cache[book.id] = result
+    return result
 
 
 def _render_book_page(book, pagenum, track_page_open=True):
@@ -115,13 +131,15 @@ def _render_book_page(book, pagenum, track_page_open=True):
     if book_type == "youtube":
         yt_video_id = youtube_video_id(book.source_uri)
     srt_cues = []
-    srt_words = []
     if book_type == "youtube":
         srt_cues = list(book.cues)
         for c in srt_cues:
             c["start_str"] = _fmt_seconds(c.get("start", 0))
             c["end_str"] = _fmt_seconds(c.get("end", 0))
-        srt_words = _subtitle_words_html(book)
+        # Subtitle word HTML is loaded lazily via AJAX
+        # (/read/youtube_subtitle_words/<id>) to avoid blocking the
+        # initial page render — tokenizing all cues with MeCab can
+        # take 10-20s for long videos.
 
     return render_template(
         "read/index.html",
@@ -141,7 +159,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         youtube_video_id=yt_video_id,
         srt_cues=srt_cues,
         srt_cues_json=book.srt_data or "[]",
-        srt_words_json=json.dumps(srt_words, ensure_ascii=False),
+        srt_words_json="[]",
         video_current_pos=book.video_current_pos or 0,
     )
 
@@ -296,6 +314,21 @@ def save_youtube_player_data():
     db.session.add(book)
     db.session.commit()
     return jsonify("ok")
+
+
+@bp.route("/youtube_subtitle_words/<int:bookid>", methods=["GET"])
+def youtube_subtitle_words(bookid):
+    """Return tokenized word HTML for every subtitle cue as JSON.
+
+    Called lazily by the YouTube player after the page loads, so the
+    expensive MeCab tokenization doesn't block the initial render.
+    Results are cached per book (see _yt_subtitle_words_cache).
+    """
+    book = _find_book(bookid)
+    if book is None:
+        return jsonify([])
+    words = _subtitle_words_html(book)
+    return jsonify(words)
 
 
 @bp.route("/start_reading/<int:bookid>/<int:pagenum>", methods=["GET"])
