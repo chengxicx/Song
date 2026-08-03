@@ -199,10 +199,12 @@
       processing: true,
       serverSide: true,
       stickyHeader: false,
+      // Default sort: Last read (column 6 = LastOpenedDate), newest first.
+      order: [[6, 'desc']],
       stateSave: true,
       stateDuration: 0,
       stateSaveCallback: function(settings, data) {
-        data.version = 3;
+        data.version = 4;
         var stateJson = JSON.stringify(data);
         // Always save to localStorage as instant fallback.
         localStorage.setItem('booklisting_datatables_state', stateJson);
@@ -226,7 +228,7 @@
           success: function(resp) {
             if (resp && resp.value) {
               var data = JSON.parse(resp.value);
-              if (data && data.version === 3) {
+              if (data && data.version === 4) {
                 localStorage.setItem('booklisting_datatables_state', resp.value);
                 callback(data);
                 return;
@@ -236,7 +238,7 @@
             var saved = localStorage.getItem('booklisting_datatables_state');
             if (saved) {
               var d = JSON.parse(saved);
-              if (d.version === 3) { callback(d); return; }
+              if (d.version === 4) { callback(d); return; }
             }
             callback(null);
           },
@@ -244,7 +246,7 @@
             var saved = localStorage.getItem('booklisting_datatables_state');
             if (saved) {
               var d = JSON.parse(saved);
-              if (d.version === 3) { callback(d); return; }
+              if (d.version === 4) { callback(d); return; }
             }
             callback(null);
           }

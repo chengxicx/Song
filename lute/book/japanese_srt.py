@@ -14,29 +14,33 @@ Text cleaning (applied to every cue text before merge/split):
   - normalize fragmented katakana compounds (キ キネ → キツネ).
 
 Merge adjacent cues when:
-  - the next cue starts with a response/interjection word
-    (はい, うん, いいえ, あ, ほう, なるほど, えっと) -> never merge;
-  - the previous cue ends with a sentence-ending blocklist word
-    (か, のか, ましたか, よ, ね, な, ました, です) -> never merge;
+  - PRIORITY 1: the next cue starts with a response/interjection word
+    (うん, はい, いいえ, ええ, えっと, ほう, なるほど, あ) -> never merge,
+    regardless of gap;
   - the previous cue ends with a strong terminator (。！？) -> never merge;
-  - the previous cue ends with a final particle (終助詞) -> never merge;
+  - the previous cue ends with a sentence-ending blocklist word
+    (ました, ましたか, のですか, です, ます, ...) -> never merge.  Only
+    multi-character unambiguous endings are blocked; bare ambiguous
+    particles (か, な) are NOT blocked so verb stems like 連れていか
+    merge with a following ない;
   - the previous cue ends with a continuative particle (接続助詞) or
-    attributive modifier (連体詞) -> force merge, regardless of gap;
+    attributive modifier (連体詞) AND the gap is < 400ms -> force merge;
   - otherwise, merge when the gap between them is < 400ms.
 
-Split a merged cue whose duration > MAX_DURATION (7s), in priority order:
+Split a merged cue whose duration > MAX_DURATION (8s), in priority order:
   1. strong terminator 。！？ -- always split;
   2. spoken final particle (終助詞) -- split into shorter sentences;
-  3. filler / interjection word (えっと, あの, うん, そうですね, ほう)
-     -- split *before* the word;
+  3. filler / interjection word (えっと, あの, うん, そうですね, ほう,
+     なるほど) -- split *before* the word;
   4. long continuative word (接続詞) -- split before the word;
   5. comma 「、」 -- split when both sides have enough characters and
      each resulting segment is long enough (de-emphasized: real
      subtitle material rarely contains commas).
 
-After splitting, any segment shorter than MIN_DURATION (2.5s) is merged
-back into its neighbour.  Any segment still longer than MAX_DURATION
-after all levels gets re-split at the earliest available boundary.
+After splitting, segments are kept in the 2.5s..8s band: any segment
+shorter than MIN_DURATION (2.5s) is merged back into its neighbour, and
+any segment still longer than MAX_DURATION (8s) after all levels gets
+re-split at the earliest available boundary.
 
 Time distribution across segments uses character weights:
   kanji = 2, hiragana/katakana = 1, punctuation/space = 0.5.
@@ -54,23 +58,38 @@ _STRONG_TERMINATORS = "。！？!?…"
 # Sentence-ending blocklist: if the previous cue ends with any of these,
 # do NOT merge with the next cue.  These signal a complete sentence /
 # predicate boundary even without 。
+#
+# Only MULTI-character, unambiguous endings are listed here.  Bare
+# single-char particles (か, な, ...) are intentionally excluded because
+# they collide with verb stems -- e.g. 連れていか + ない must merge into
+# 連れていかない, so the trailing か of a verb stem must NOT be treated as
+# the question particle か.  Bare final particles are still used as
+# split points for over-long cues (see _FINAL_PARTICLES).
 _END_BLOCKLIST = (
-    "ましたか", "のですか", "のか",
-    "ました", "です", "ます",
-    "か", "よ", "ね", "な",
+    # 4-char question / predicate endings
+    "ましたか", "ませんか", "のですか", "でしたか",
+    # 3-char predicate endings + particle combos
+    "ました", "ません", "のです", "だろう", "でしょう", "でした",
+    "ですよ", "ですね", "ますよ", "ますね",
+    # 2-char copula / polite + unambiguous particle combos
+    "です", "ます", "のか", "だね", "だよ", "だな", "だろ",
+    "よね", "なあ", "ねえ",
 )
 
 # Sentence-start blocklist: if the next cue starts with any of these
-# response / interjection words, never merge regardless of gap.
+# response / interjection words, never merge regardless of gap.  This
+# check has the HIGHEST priority among all merge conditions.
 _START_BLOCKLIST = (
-    "なるほど", "えっと",
+    "なるほど", "えっと", "ええ",
     "はい", "いいえ",
     "うん",
     "ほう", "あ",
 )
 
-# Final particles (終助詞) for merge-blocking and level-2 splitting.
+# Final particles (終助詞) for level-2 splitting of over-long cues.
 # Ordered longest-first so the compiled regex prefers the longest match.
+# NOTE: these are used ONLY for splitting, not for merge-blocking -- bare
+# か here does not prevent 連れていか + ない from merging.
 _FINAL_PARTICLES = (
     "でしょうか", "だろうか", "でしょうね", "だろうね",
     "でしょうよ", "だろうよ",
@@ -97,7 +116,7 @@ _RENTAI_WORDS = (
 # Filler / interjection words for level-3 splitting.  Split *before*
 # these so they begin the new segment.
 _FILLER_WORDS = (
-    "そうですね", "えっと", "あの", "うん", "ほう",
+    "そうですね", "なるほど", "えっと", "あの", "うん", "ほう",
 )
 
 # Long continuative words (接続詞) for level-4 splitting.  Split
@@ -114,8 +133,8 @@ _LONG_CONJUNCTIVES = (
 # Durations (seconds)
 # ---------------------------------------------------------------------------
 
-_MAX_DURATION = 7.0           # split cues longer than this
-_MIN_DURATION = 2.5          # merge segments shorter than this
+_MAX_DURATION = 8.0           # split cues longer than this (>8000ms)
+_MIN_DURATION = 2.5          # merge segments shorter than this (<2500ms)
 _MIN_COMMA_SIDE_CHARS = 6    # both sides of a comma split need this many chars
 
 # ---------------------------------------------------------------------------
@@ -202,15 +221,15 @@ def _ends_with_strong_terminator(text):
 
 
 def _ends_with_any(text, words):
-    """True if the cleaned text ends with any of the given word strings."""
+    """True if the cleaned text ends with any of the given word strings.
+
+    Full-suffix matching (``str.endswith``) -- never truncates the tail,
+    so 4-character endings such as ましたか / のですか are recognised
+    exactly instead of being collapsed to their last two kana."""
     s = _clean_ending(text)
     if not s:
         return False
     return any(s.endswith(w) for w in words)
-
-
-def _ends_with_final_particle(text):
-    return _ends_with_any(text, _FINAL_PARTICLES)
 
 
 def _ends_with_continuative(text):
@@ -271,22 +290,30 @@ def _merge_cues(cues):
         cur_text = cur["text"]
         gap = cur["start"] - prev["end"]
 
-        # Rule 1: next cue starts with a response/interjection -> never merge
+        # Priority 1: next cue starts with a response/interjection word
+        # (うん/はい/いいえ/ええ/えっと/ほう/なるほど/...) -> never merge,
+        # regardless of the gap.  This is checked first so a new turn is
+        # always opened as its own cue.
         if _starts_with_blocklist(cur_text):
             do_merge = False
-        # Rule 2: previous cue ends with a blocklist word -> never merge
-        elif _ends_with_blocklist(prev_text):
-            do_merge = False
-        # Rule 3: strong terminator -> never merge
+        # Previous cue ends with a strong terminator 。！？ -> never merge
         elif _ends_with_strong_terminator(prev_text):
             do_merge = False
-        # Rule 4: final particle -> never merge
-        elif _ends_with_final_particle(prev_text):
+        # Previous cue ends with a sentence-ending blocklist word
+        # (ました/ましたか/です/ます/のですか/...) -> never merge.  Bare
+        # ambiguous single-char particles (か/な) are NOT here, so a verb
+        # stem like 連れていか + ない still merges.
+        elif _ends_with_blocklist(prev_text):
             do_merge = False
-        # Rule 5: continuative particle or attributive -> force merge
-        elif _ends_with_continuative(prev_text) or _ends_with_rentai(prev_text):
+        # Fragment merge: short gap (<400ms) AND the previous cue ends
+        # with a continuative particle (で/から/ので/が/...) or an
+        # attributive modifier (この/...) -> force merge to repair cues
+        # that YouTube split mid-sentence.
+        elif gap < 0.4 and (
+            _ends_with_continuative(prev_text) or _ends_with_rentai(prev_text)
+        ):
             do_merge = True
-        # Rule 6: default -- merge if gap is short
+        # Default: merge when the gap is short (<400ms).
         else:
             do_merge = gap < 0.4
 

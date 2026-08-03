@@ -127,7 +127,7 @@ JP_MERGE_SRT = """1
 今日は晴れています。
 """
 
-# One long cue (>7s) containing two sentences separated by 。
+# One long cue (>8s) containing two sentences separated by 。
 JP_SPLIT_SRT = """1
 00:00:01,000 --> 00:00:12,000
 今日はいい天気ですね。明日は雨が降るそうです。
@@ -179,7 +179,7 @@ def test_parse_srt_japanese_merges_mid_sentence(japanese):
 
 
 def test_parse_srt_japanese_splits_long_cue(japanese):
-    "A merged cue longer than 7s is split at the strong terminator 。"
+    "A merged cue longer than 8s is split at the strong terminator 。"
     text, cues_json = parse_subtitle_file(
         "jp.srt", io.BytesIO(JP_SPLIT_SRT.encode()), language=japanese
     )
@@ -226,6 +226,63 @@ def test_parse_srt_japanese_text_cleaning(japanese):
     merged_text = cues[0]["text"]
     assert "たた" not in merged_text  # reduplication compressed
     assert "キツネ" in merged_text     # katakana fragment fixed
+
+
+# ---------------------------------------------------------------------
+# refine_japanese_cues -- regression cases for YouTube mis-segmentation
+# ---------------------------------------------------------------------
+
+def test_refine_japanese_blocklist_ending_plus_interjection_start():
+    "ました ending AND うん start -> two independent cues, never merged."
+    from lute.book.japanese_srt import refine_japanese_cues
+
+    cues = [
+        {"text": "世界が終わる夢を見ました", "start": 0.0, "end": 3.0},
+        {"text": "うんでその夢の中でタタは何をしましたか", "start": 3.2, "end": 6.6},
+    ]
+    out = refine_japanese_cues(cues)
+    assert len(out) == 2
+    assert out[0]["text"] == "世界が終わる夢を見ました"
+    assert out[1]["text"] == "うんでその夢の中でタタは何をしましたか"
+
+
+def test_refine_japanese_verb_stem_ka_merges_with_nai():
+    "連れていか (verb-stem か) + ない -> one merged cue (bare か is not a blocker)."
+    from lute.book.japanese_srt import refine_japanese_cues
+
+    cues = [
+        {"text": "森にどうして家族を連れていか", "start": 4.0, "end": 6.0},
+        {"text": "ないんですか旅は危険", "start": 6.2, "end": 8.5},
+    ]
+    out = refine_japanese_cues(cues)
+    assert len(out) == 1
+    assert out[0]["text"] == "森にどうして家族を連れていかないんですか旅は危険"
+    assert out[0]["start"] == 4.0
+    assert out[0]["end"] == 8.5
+
+
+def test_refine_japanese_overlong_question_is_split_into_band():
+    "A >8s sticky question is auto-split into 2.5s..8s pieces."
+    from lute.book.japanese_srt import refine_japanese_cues
+
+    cues = [
+        {
+            "text": (
+                "うんでその夢の中でタタは何をしましたか"
+                "森にどうして家族を連れていかなかったのですか"
+                "旅は危険ですから気をつけて"
+            ),
+            "start": 0.0,
+            "end": 15.0,
+        }
+    ]
+    out = refine_japanese_cues(cues)
+    assert len(out) >= 2
+    for c in out:
+        dur = c["end"] - c["start"]
+        assert 2.5 <= dur <= 8.0
+    assert out[0]["start"] == 0.0
+    assert out[-1]["end"] == 15.0
 
 
 def test_parse_srt_non_japanese_unchanged(japanese):
