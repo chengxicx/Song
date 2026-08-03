@@ -168,7 +168,10 @@ JP_CLEAN_SRT = """1
 def test_parse_srt_japanese_merges_mid_sentence(japanese):
     "Cues ending with a continuative particle (て) are force-merged."
     text, cues_json = parse_subtitle_file(
-        "jp.srt", io.BytesIO(JP_MERGE_SRT.encode()), language=japanese
+        "jp.srt",
+        io.BytesIO(JP_MERGE_SRT.encode()),
+        language=japanese,
+        resplit_sentences=True,
     )
     cues = json.loads(cues_json)
     # Cue 1 (ends with て) and cue 2 merge into one; cue 3 stays separate
@@ -181,7 +184,10 @@ def test_parse_srt_japanese_merges_mid_sentence(japanese):
 def test_parse_srt_japanese_splits_long_cue(japanese):
     "A merged cue longer than 8s is split at the strong terminator 。"
     text, cues_json = parse_subtitle_file(
-        "jp.srt", io.BytesIO(JP_SPLIT_SRT.encode()), language=japanese
+        "jp.srt",
+        io.BytesIO(JP_SPLIT_SRT.encode()),
+        language=japanese,
+        resplit_sentences=True,
     )
     cues = json.loads(cues_json)
     assert len(cues) == 2
@@ -195,7 +201,10 @@ def test_parse_srt_japanese_splits_long_cue(japanese):
 def test_parse_srt_japanese_end_blocklist_prevents_merge(japanese):
     "A cue ending with です (blocklist) is not merged with the next."
     text, cues_json = parse_subtitle_file(
-        "jp.srt", io.BytesIO(JP_END_BLOCKLIST_SRT.encode()), language=japanese
+        "jp.srt",
+        io.BytesIO(JP_END_BLOCKLIST_SRT.encode()),
+        language=japanese,
+        resplit_sentences=True,
     )
     cues = json.loads(cues_json)
     assert len(cues) == 2
@@ -206,7 +215,10 @@ def test_parse_srt_japanese_end_blocklist_prevents_merge(japanese):
 def test_parse_srt_japanese_start_blocklist_prevents_merge(japanese):
     "A cue starting with はい (start blocklist) is not merged with the prev."
     text, cues_json = parse_subtitle_file(
-        "jp.srt", io.BytesIO(JP_START_BLOCKLIST_SRT.encode()), language=japanese
+        "jp.srt",
+        io.BytesIO(JP_START_BLOCKLIST_SRT.encode()),
+        language=japanese,
+        resplit_sentences=True,
     )
     cues = json.loads(cues_json)
     assert len(cues) == 2
@@ -217,7 +229,10 @@ def test_parse_srt_japanese_start_blocklist_prevents_merge(japanese):
 def test_parse_srt_japanese_text_cleaning(japanese):
     "Reduplicated kana tails are compressed and キ キネ normalised to キツネ."
     text, cues_json = parse_subtitle_file(
-        "jp.srt", io.BytesIO(JP_CLEAN_SRT.encode()), language=japanese
+        "jp.srt",
+        io.BytesIO(JP_CLEAN_SRT.encode()),
+        language=japanese,
+        resplit_sentences=True,
     )
     cues = json.loads(cues_json)
     # わかったたた -> わかった,  キ キネ -> キツネ
@@ -294,6 +309,62 @@ def test_parse_srt_non_japanese_unchanged(japanese):
     cues = json.loads(cues_json)
     assert len(cues) == 3
     assert cues[0]["text"] == "Hello world."
+
+
+def test_parse_srt_japanese_no_resplit_by_default(japanese):
+    "Without resplit_sentences, Japanese cues are kept as-is."
+    text, cues_json = parse_subtitle_file(
+        "jp.srt", io.BytesIO(JP_MERGE_SRT.encode()), language=japanese
+    )
+    cues = json.loads(cues_json)
+    assert len(cues) == 3, "default is no re-splitting / merging"
+    assert cues[0]["text"] == "昨日は友達に会って"
+    assert cues[1]["text"] == "楽しく話しました"
+
+
+def test_parse_vtt_with_cue_settings_and_metadata():
+    "Real YouTube VTT (align settings + X-TIMESTAMP-MAP) parses fine."
+    yt_vtt = """WEBVTT
+Kind: captions
+Language: en
+
+X-TIMESTAMP-MAP=LOCAL:00:00:00.000,MPEGTS:0
+
+1
+00:00:01.000 --> 00:00:04.200 align:start position:0%
+Hello world.
+
+2
+00:00:05.000 --> 00:00:08.500 align:start position:0%
+This is a test subtitle.
+"""
+    text, cues_json = parse_subtitle_file(
+        "sub.vtt", io.BytesIO(yt_vtt.encode())
+    )
+    assert text == "Hello world.\nThis is a test subtitle."
+    cues = json.loads(cues_json)
+    assert len(cues) == 2
+    assert cues[0]["start"] == 1.0
+    assert cues[0]["end"] == 4.2
+    assert cues[1]["text"] == "This is a test subtitle."
+
+
+def test_cues_to_srt_text_round_trip():
+    "cues -> SRT text -> parse yields the same cues."
+    from lute.book.service import cues_to_srt_text, parse_subtitle_content
+
+    cues = [
+        {"start": 1.0, "end": 4.2, "text": "Hello world."},
+        {"start": 5.5, "end": 65.75, "text": "This is a test subtitle."},
+    ]
+    srt_text = cues_to_srt_text(cues)
+    assert "00:00:01,000 --> 00:00:04,200" in srt_text
+    assert "00:01:05,750" in srt_text
+
+    text, cues_json = parse_subtitle_content(srt_text, ext=".srt")
+    assert text == "Hello world.\nThis is a test subtitle."
+    reparsed = json.loads(cues_json)
+    assert reparsed == cues
 
 
 # ---------------------------------------------------------------------
@@ -540,11 +611,24 @@ def test_edit_book_preserves_type(app, app_context, english, client):
     assert resp.status_code == 200
     content = resp.get_data(as_text=True)
     assert "youtube" in content
+    # The text field holds the SRT original with timestamps (the ">"
+    # is HTML-escaped in the rendered textarea).
+    assert "00:00:01,000 --&gt; 00:00:04,200" in content
 
-    # POST the edit form, keeping the same data.
+    # POST the edit form, keeping the same (SRT) data.
     form_data = {
         "title": "Route YouTube Book",
-        "text": "Hello world.\nThis is a test subtitle.\nGoodbye!",
+        "text": (
+            "1\n"
+            "00:00:01,000 --> 00:00:04,200\n"
+            "Hello world.\n\n"
+            "2\n"
+            "00:00:05,000 --> 00:00:08,500\n"
+            "This is a test subtitle.\n\n"
+            "3\n"
+            "00:00:10,000 --> 00:00:13,000\n"
+            "Goodbye!"
+        ),
         "split_by": "paragraphs",
         "threshold_page_tokens": "250",
         "source_uri": "https://www.youtube.com/watch?v=J7BXhKSqH6o",
@@ -558,3 +642,37 @@ def test_edit_book_preserves_type(app, app_context, english, client):
     book = repo.find(dbbook.id)
     assert book.book_type == "youtube"
     assert len(book.cues) == 3
+
+
+def test_edit_book_updates_cues_from_srt_text(app, app_context, english, client):
+    "Editing the SRT text in the edit page updates the cues on save."
+    dbbook = _make_youtube_book(app, app_context, english)
+
+    form_data = {
+        "title": "Route YouTube Book",
+        "text": (
+            "1\n"
+            "00:00:01,000 --> 00:00:04,200\n"
+            "Hello world.\n\n"
+            "2\n"
+            "00:00:05,000 --> 00:00:08,500\n"
+            "This text was edited.\n\n"
+            "3\n"
+            "00:00:10,000 --> 00:00:13,000\n"
+            "Brand new line."
+        ),
+        "split_by": "paragraphs",
+        "threshold_page_tokens": "250",
+        "source_uri": "https://www.youtube.com/watch?v=J7BXhKSqH6o",
+        "book_tags": '[{"value": "youtube"}]',
+        "book_type": "youtube",
+    }
+    resp = client.post(f"/book/edit/{dbbook.id}", data=form_data, follow_redirects=False)
+    assert resp.status_code == 302
+
+    repo = BookRepository(db.session)
+    book = repo.find(dbbook.id)
+    assert len(book.cues) == 3
+    assert book.cues[1]["text"] == "This text was edited."
+    assert book.cues[2]["text"] == "Brand new line."
+    assert book.cues[2]["start"] == 10.0

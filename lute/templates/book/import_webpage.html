@@ -35,7 +35,7 @@
 </form>
 
 <form id="youtube-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p>Import a YouTube video with its subtitle (SRT) file. The subtitles
+  <p>Import a YouTube video with its subtitle (SRT / VTT) file. The subtitles
   become the book text, so you can read and look up words while the video plays.</p>
 
   <br />
@@ -54,8 +54,16 @@
   <label for="youtube_tag">Tag:</label>
   <input type="text" id="youtube_tag" name="youtube_tag" class="form-text" value="youtube"><br><br>
 
-  <label for="srt_file">Subtitle file (SRT):</label>
+  <label for="srt_file">Subtitle file (SRT / VTT):</label>
   <input type="file" id="srt_file" name="srt_file" accept=".srt,.vtt"><br><br>
+
+  <label>
+    <input type="checkbox" id="resplit_sentences" name="resplit_sentences">
+    Re-split subtitles into sentences (Japanese)
+  </label>
+  <br>
+  <span class="formfieldcomment">Merge/split subtitle cues into sentence units (recommended for Japanese). Off by default.</span>
+  <br><br>
 
   <input type="hidden" name="import_type" value="youtube">
   <input type="submit" id="youtube-import" value="Import">
