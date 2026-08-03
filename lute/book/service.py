@@ -61,13 +61,17 @@ def youtube_video_id(url):
     return None
 
 
-def parse_subtitle_file(filename, filestream):
+def parse_subtitle_file(filename, filestream, language=None):
     """
     Parse an srt/vtt subtitle file.
 
     Returns (text, cues_json), where text is the subtitle texts joined
     by newlines, and cues_json is a JSON string of
     [{"start": secs, "end": secs, "text": str}, ...].
+
+    When language is Japanese, the cues are also refined: mid-sentence
+    breaks are merged and over-long cues are split so each cue roughly
+    corresponds to one sentence (see lute.book.japanese_srt).
     """
     _, ext = os.path.splitext(filename)
     ext = (ext or "").lower()
@@ -96,7 +100,6 @@ def parse_subtitle_file(filename, filestream):
     parser.parse()
 
     subtitles = parser.subtitles
-    text = "\n".join(s.text for s in subtitles)
     cues = [
         {
             "start": s.start / 1000.0,
@@ -105,7 +108,23 @@ def parse_subtitle_file(filename, filestream):
         }
         for s in subtitles
     ]
+
+    if _is_japanese(language):
+        from lute.book.japanese_srt import refine_japanese_cues  # pylint: disable=import-outside-toplevel
+
+        cues = refine_japanese_cues(cues)
+
+    text = "\n".join(c["text"] for c in cues)
     return text, json.dumps(cues, ensure_ascii=False)
+
+
+def _is_japanese(language):
+    """True if the given language (a lute.models.Language) is Japanese."""
+    if language is None:
+        return False
+    name = (getattr(language, "name", "") or "").strip().lower()
+    ptype = (getattr(language, "parser_type", "") or "").strip().lower()
+    return name == "japanese" or ptype == "japanese"
 
 
 class FileTextExtraction:

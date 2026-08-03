@@ -215,8 +215,20 @@ class EditBookForm(FlaskForm):
             # Re-parse the subtitle file, updating both the book text
             # (for reading) and the cue timing data (for the player).
             from lute.book.service import parse_subtitle_file  # pylint: disable=import-outside-toplevel, cyclic-import
+            from lute.db import db  # pylint: disable=import-outside-toplevel
+            from lute.models.repositories import (  # pylint: disable=import-outside-toplevel
+                LanguageRepository,
+            )
 
-            text, cues_json = parse_subtitle_file(yfd.filename, yfd.stream)
+            # Load the language so language-specific cue refinement
+            # (e.g. Japanese sentence merging/splitting) is applied.
+            lang = None
+            if getattr(obj, "language_id", None):
+                lang = LanguageRepository(db.session).find(obj.language_id)
+
+            text, cues_json = parse_subtitle_file(
+                yfd.filename, yfd.stream, language=lang
+            )
             obj.text = text
             obj.srt_data = cues_json
             obj.book_type = "youtube"

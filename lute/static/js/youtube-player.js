@@ -159,26 +159,52 @@
         break;
       }
     }
+
+    // Single-sentence loop / auto-pause.
+    //
+    // This MUST be checked BEFORE updating ytCueIndex: once t crosses
+    // cue.end, the loop above already picks up the next cue (or none),
+    // so checking the *new* cue.end would never trigger.  We compare
+    // against the cue the user is currently watching (ytCueIndex).
+    //
+    // Loop takes precedence over auto-pause: when both are on, the
+    // sentence keeps looping instead of pausing.  When auto-pause
+    // fires, we seek back to the cue start and pause, so pressing play
+    // replays the same sentence; turning on loop at that point resumes
+    // the loop.
+    if (ytPlaying && ytCueIndex >= 0) {
+      var curCue = CUES[ytCueIndex];
+      if (curCue && t >= curCue.end) {
+        if (ytLoop) {
+          ytPlayer.seekTo(curCue.start, true);
+          ytUpdateMarquee(curCue.start);
+          _ytMaybeSavePosition(curCue.start);
+          return;
+        } else if (ytAutoPause) {
+          ytPlayer.pauseVideo();
+          ytPlayer.seekTo(curCue.start, true);
+          ytUpdateMarquee(curCue.start);
+          _ytMaybeSavePosition(curCue.start);
+          return;
+        }
+      }
+    }
+
     if (idx !== ytCueIndex) {
       ytCueIndex = idx;
       if (idx >= 0) ytActivateCue(idx);
       else ytDeactivateCue();
     }
 
-    // Single-sentence loop / auto-pause.
-    if (ytPlaying && ytCueIndex >= 0) {
-      var cue = CUES[ytCueIndex];
-      if (ytAutoPause && t >= cue.end) {
-        ytPlayer.pauseVideo();
-        ytPlayer.seekTo(cue.start, true);
-      } else if (ytLoop && t >= cue.end) {
-        ytPlayer.seekTo(cue.start, true);
-      }
-    }
-
     ytUpdateMarquee(t);
 
-    // Save position roughly every 2 seconds.
+    _ytMaybeSavePosition(t);
+  }
+
+  // Save position roughly every 2 seconds.  Called from the main poll
+  // loop and from the early-return loop / auto-pause branches so the
+  // position is still persisted when playback is paused at a cue end.
+  function _ytMaybeSavePosition(t) {
     if (t - ytLastSavedT >= 2) {
       ytLastSavedT = t;
       ytSavePosition(t);
@@ -200,6 +226,13 @@
       ytIsRtl = ytSubtitle.getAttribute("dir") === "rtl";
       var overflow = ytSubtitle.scrollWidth - ytSubtitle.clientWidth;
       ytMarqueeOverflow = ytIsRtl ? 0 : Math.max(0, overflow);
+      // Inherit the reading-page word status colors.  The subtitle
+      // word spans are injected after add_status_classes() has already
+      // run for the page, so they'd otherwise render without their
+      // status background.  Mirror lute.js: when show_highlights is on,
+      // paint every word; otherwise leave it to the hover handlers
+      // (bound in bindSubtitleInteractions) to reveal the color.
+      ytApplySubtitleStatusColors();
     }
 
     // Transcript highlight + smooth scroll to the center.
@@ -379,6 +412,13 @@
       ytLoopBtn.addEventListener("click", function () {
         ytLoop = !ytLoop;
         ytLoopBtn.classList.toggle("on", ytLoop);
+        // "Press loop to keep looping": if the video is currently
+        // paused (e.g. auto-paused at the end of a sentence), turning
+        // the loop on resumes playback so the sentence starts looping
+        // immediately.  Turning it off does not pause.
+        if (ytLoop && ytPlayerReady && ytPlayer && !ytPlaying) {
+          ytPlayer.playVideo();
+        }
       });
     }
     if (ytAutoPauseBtn) {
@@ -444,6 +484,22 @@
   /* Subtitle word interactions (same as the reading text)              */
   /* ------------------------------------------------------------------ */
 
+  // Apply status color classes to the scrolling-subtitle word spans.
+  // Mirrors lute.js add_status_classes(): when the show_highlights
+  // setting is on, every word gets its data-status-class painted on;
+  // otherwise colors are revealed on hover (see bindSubtitleInteractions).
+  function ytApplySubtitleStatusColors() {
+    if (!ytSubtitle) return;
+    if (typeof _show_highlights !== "function" ||
+        typeof apply_status_class !== "function") {
+      return;
+    }
+    if (!_show_highlights()) return;
+    $(ytSubtitle).find("span.word").each(function () {
+      apply_status_class($(this));
+    });
+  }
+
   function bindSubtitleInteractions() {
     if (!ytSubtitle) return;
     var t = $(ytSubtitle);
@@ -453,6 +509,22 @@
       e.stopPropagation();
       word_clicked($(this), e);
     });
+
+    // When show_highlights is off, the reading page reveals a word's
+    // status color on hover and clears it on mouseout.  Mirror that
+    // for the scrolling subtitle so it inherits the same color
+    // behavior as the main text.
+    if (typeof _show_highlights === "function" &&
+        typeof apply_status_class === "function" &&
+        typeof remove_status_highlights === "function" &&
+        !_show_highlights()) {
+      t.on("mouseover", ".word", function () {
+        apply_status_class($(this));
+      });
+      t.on("mouseout", ".word", function () {
+        remove_status_highlights();
+      });
+    }
 
     if (typeof tooltip_textitem_hover_content === "function" &&
         typeof _get_tooltip_pos === "function") {

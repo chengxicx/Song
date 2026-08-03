@@ -110,6 +110,69 @@ def test_parse_vtt_file_with_youtube_header():
 
 
 # ---------------------------------------------------------------------
+# parse_subtitle_file -- Japanese cue refinement
+# ---------------------------------------------------------------------
+
+# Two cues split mid-sentence (prev ends with て, gap < 400ms).
+JP_MERGE_SRT = """1
+00:00:01,000 --> 00:00:03,000
+昨日は友達に会って
+
+2
+00:00:03,200 --> 00:00:06,000
+楽しく話しました
+
+3
+00:00:07,000 --> 00:00:09,000
+今日は晴れています。
+"""
+
+# One long cue (>8s) containing two sentences separated by 。
+JP_SPLIT_SRT = """1
+00:00:01,000 --> 00:00:12,000
+今日はいい天気ですね。明日は雨が降るそうです。
+"""
+
+
+def test_parse_srt_japanese_merges_mid_sentence(japanese):
+    "Cues ending with a continuative particle (て) are force-merged."
+    text, cues_json = parse_subtitle_file(
+        "jp.srt", io.BytesIO(JP_MERGE_SRT.encode()), language=japanese
+    )
+    cues = json.loads(cues_json)
+    # Cue 1 (ends with て) and cue 2 merge into one; cue 3 stays separate
+    # (ends with 。).
+    assert len(cues) == 2
+    assert cues[0]["text"] == "昨日は友達に会って楽しく話しました"
+    assert cues[1]["text"] == "今日は晴れています。"
+
+
+def test_parse_srt_japanese_splits_long_cue(japanese):
+    "A merged cue longer than 8s is split at the strong terminator 。"
+    text, cues_json = parse_subtitle_file(
+        "jp.srt", io.BytesIO(JP_SPLIT_SRT.encode()), language=japanese
+    )
+    cues = json.loads(cues_json)
+    assert len(cues) == 2
+    assert cues[0]["text"].endswith("ですね。")
+    assert cues[1]["text"].startswith("明日は")
+    # Time spans the original range.
+    assert cues[0]["start"] == 1.0
+    assert cues[1]["end"] == 12.0
+
+
+def test_parse_srt_non_japanese_unchanged(japanese):
+    "Non-Japanese languages get no refinement (3 cues stay 3)."
+    # Use the English sample; passing a Japanese language should not
+    # change English text, but here we pass language=None to confirm
+    # the default path is untouched.
+    text, cues_json = parse_subtitle_file("sub.srt", io.BytesIO(SAMPLE_SRT.encode()))
+    cues = json.loads(cues_json)
+    assert len(cues) == 3
+    assert cues[0]["text"] == "Hello world."
+
+
+# ---------------------------------------------------------------------
 # Book creation / import
 # ---------------------------------------------------------------------
 

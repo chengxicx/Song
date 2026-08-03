@@ -233,8 +233,14 @@ def _import_youtube_video():
         flash("Please upload an SRT subtitle file.", "notice")
         return redirect("/book/import_webpage", 302)
 
+    # Load the language so parse_subtitle_file can apply language-
+    # specific cue refinement (e.g. Japanese sentence merging/splitting).
+    lang = None
+    if language_id:
+        lang = LanguageRepository(db.session).find(int(language_id))
+
     try:
-        text, cues_json = parse_subtitle_file(srt_file.filename, srt_file.stream)
+        text, cues_json = parse_subtitle_file(srt_file.filename, srt_file.stream, language=lang)
     except Exception as e:  # pylint: disable=broad-except
         msg = f"Could not parse subtitle file {srt_file.filename} (error: {str(e)})"
         flash(msg, "notice")
