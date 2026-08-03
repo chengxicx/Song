@@ -19,7 +19,7 @@ from lute.db import db
 
 bp = Blueprint("read", __name__, url_prefix="/read")
 
-# Module-level cache for subtitle word HTML, keyed by book id.
+# Module-level cache for subtitle word HTML, keyed by (book id, srt_data).
 # The tokenization of all cues (parser parse + term lookup + Jinja
 # render per word) is expensive (10-20s for long videos).  The result
 # is deterministic for a given set of cues + terms, so we compute it
@@ -34,10 +34,11 @@ def invalidate_yt_subtitle_cache(book_id=None):
 
     Called after term status updates so the subtitle re-renders with
     fresh data-status-class values.  If book_id is given, only that
-    book's entry is cleared; otherwise the entire cache is wiped.
+    book's entries are cleared; otherwise the entire cache is wiped.
     """
     if book_id is not None:
-        _yt_subtitle_words_cache.pop(book_id, None)
+        for k in [k for k in _yt_subtitle_words_cache if k[0] == book_id]:
+            _yt_subtitle_words_cache.pop(k, None)
     else:
         _yt_subtitle_words_cache.clear()
 
@@ -64,11 +65,14 @@ def _subtitle_words_html(book):
     yields one chunk per cue.  Returns a list of HTML strings aligned
     with book.cues.
 
-    Results are cached per book id (see _yt_subtitle_words_cache).
+    Results are cached per book, keyed by (book id, srt_data) so that
+    subtitle changes produce a fresh render (see
+    _yt_subtitle_words_cache).
     """
     if (book.book_type or "") != "youtube":
         return []
-    cached = _yt_subtitle_words_cache.get(book.id)
+    cache_key = (book.id, book.srt_data)
+    cached = _yt_subtitle_words_cache.get(cache_key)
     if cached is not None:
         return cached
     cues = list(book.cues)
@@ -119,7 +123,7 @@ def _subtitle_words_html(book):
     while len(rendered) < len(cues):
         rendered.append("")
     result = rendered[: len(cues)]
-    _yt_subtitle_words_cache[book.id] = result
+    _yt_subtitle_words_cache[cache_key] = result
     return result
 
 
