@@ -1190,7 +1190,13 @@ function post_bulk_update(updates) {
     const pagenum = $('#page_num').val();
     const url = `/read/refresh_page/${bookid}/${pagenum}`;
     const repel = $('#thetext');
-    repel.load(url, re_mark_selected_ids);
+    repel.load(url, function() {
+      re_mark_selected_ids();
+      // Notify the YouTube player (if present) to refresh subtitle
+      // word colors — the server-side subtitle cache was invalidated
+      // by the bulk_update_status endpoint.
+      window.dispatchEvent(new Event('lute:status-updated'));
+    });
   };
 
   $.ajax({
