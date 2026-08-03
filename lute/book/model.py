@@ -2,6 +2,8 @@
 Book domain objects.
 """
 
+import json
+
 from lute.models.book import BookTag, Book as DBBook, Text as DBText
 from lute.models.repositories import (
     BookRepository,
@@ -100,6 +102,21 @@ class Book:  # pylint: disable=too-many-instance-attributes
 
     def __repr__(self):
         return f"<Book (id={self.id}, title='{self.title}')>"
+
+    @property
+    def cues(self):
+        """
+        Return the parsed subtitle cues as a list of dicts.
+
+        Each cue is {"start": secs, "end": secs, "text": str}.
+        Returns [] if there is no subtitle data.
+        """
+        if not self.srt_data:
+            return []
+        try:
+            return json.loads(self.srt_data)
+        except (ValueError, TypeError):
+            return []
 
     def add_tag(self, tag):
         self.book_tags.append(tag)

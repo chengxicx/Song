@@ -50,9 +50,13 @@
         {{ form.youtube_srt() }}
         {% if book.srt_data %}
         <div style="margin-top: 5px;">
-          <span class="smallfilename">Subtitles loaded ({{ book.cues | length }} lines). Upload a new file to replace them.</span>
+          <span class="smallfilename">Subtitles loaded ({{ book.cues | length }} lines). Edit the SRT text above, or upload a new file to replace them.</span>
         </div>
         {% endif %}
+        <div style="margin-top: 8px;">
+          {{ form.resplit_sentences() }} {{ form.resplit_sentences.label }}
+          <div class="formfieldcomment">Merge/split subtitle cues into sentence units when parsing (recommended for Japanese). Off by default.</div>
+        </div>
       </td>
     </tr>
 
@@ -125,6 +129,8 @@
       $('#youtubeSrtRow').toggle(isYoutube);
       // Relabel the source uri field for youtube books.
       $('#source_uri').closest('tr').find('td').first().text(isYoutube ? 'YouTube video URL' : 'Source URI');
+      // The text field holds the SRT subtitles for youtube books.
+      $('#textRow').find('td').first().text(isYoutube ? 'Subtitle text (SRT, editable)' : 'Text');
     };
     $('#book_type').on('change', setupTypeFields);
     setupTypeFields();

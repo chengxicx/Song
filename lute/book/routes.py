@@ -18,6 +18,7 @@ from lute.book.service import (
     BookImportException,
     BookDataFromUrl,
     parse_subtitle_file,
+    cues_to_srt_text,
     youtube_video_id,
 )
 from lute.book.datatables import get_data_tables_list
@@ -167,6 +168,11 @@ def edit(bookid):
     b = repo.load(bookid)
     form = EditBookForm(obj=b)
 
+    # For youtube books the text field holds the SRT original (with
+    # timestamps) so it can be edited directly.
+    if request.method == "GET" and (b.book_type or "") == "youtube":
+        form.text.data = cues_to_srt_text(b.cues)
+
     if form.validate_on_submit():
         try:
             form.populate_obj(b)
@@ -224,13 +230,14 @@ def _import_youtube_video():
     tag = request.form.get("youtube_tag", "").strip() or "youtube"
     language_id = request.form.get("language_id")
     srt_file = request.files.get("srt_file")
+    resplit = bool(request.form.get("resplit_sentences"))
 
     if youtube_video_id(url) is None:
         flash("Please enter a valid YouTube video URL.", "notice")
         return redirect("/book/import_webpage", 302)
 
     if srt_file is None or srt_file.filename == "":
-        flash("Please upload an SRT subtitle file.", "notice")
+        flash("Please upload an SRT or VTT subtitle file.", "notice")
         return redirect("/book/import_webpage", 302)
 
     # Load the language so parse_subtitle_file can apply language-
@@ -240,7 +247,12 @@ def _import_youtube_video():
         lang = LanguageRepository(db.session).find(int(language_id))
 
     try:
-        text, cues_json = parse_subtitle_file(srt_file.filename, srt_file.stream, language=lang)
+        text, cues_json = parse_subtitle_file(
+            srt_file.filename,
+            srt_file.stream,
+            language=lang,
+            resplit_sentences=resplit,
+        )
     except Exception as e:  # pylint: disable=broad-except
         msg = f"Could not parse subtitle file {srt_file.filename} (error: {str(e)})"
         flash(msg, "notice")

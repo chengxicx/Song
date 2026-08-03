@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 from flask import current_app, flash
 from openepub import Epub, EpubError
 from pypdf import PdfReader
-from subtitle_parser import SrtParser, WebVttParser
+from subtitle_parser import SrtParser
 from lute.book.model import Repository
 
 
@@ -61,7 +61,9 @@ def youtube_video_id(url):
     return None
 
 
-def parse_subtitle_file(filename, filestream, language=None):
+def parse_subtitle_file(
+    filename, filestream, language=None, resplit_sentences=False
+):
     """
     Parse an srt/vtt subtitle file.
 
@@ -69,9 +71,10 @@ def parse_subtitle_file(filename, filestream, language=None):
     by newlines, and cues_json is a JSON string of
     [{"start": secs, "end": secs, "text": str}, ...].
 
-    When language is Japanese, the cues are also refined: mid-sentence
-    breaks are merged and over-long cues are split so each cue roughly
-    corresponds to one sentence (see lute.book.japanese_srt).
+    When language is Japanese and resplit_sentences is True, the cues
+    are also refined: mid-sentence breaks are merged and over-long cues
+    are split so each cue roughly corresponds to one sentence (see
+    lute.book.japanese_srt).  resplit_sentences defaults to False.
     """
     _, ext = os.path.splitext(filename)
     ext = (ext or "").lower()
@@ -79,43 +82,133 @@ def parse_subtitle_file(filename, filestream, language=None):
     fte = FileTextExtraction()
     content = fte._get_text_stream_content(filestream, "utf-8-sig")
 
-    parser = None
-    if ext == ".vtt":
-        # YouTube vtt files have "Kind:" and "Language:" header lines
-        # (and sometimes a blank line) between the WEBVTT header and
-        # the first cue that the WebVttParser chokes on; drop them.
-        lines = content.split("\n")
-        drop_count = 0
-        for line in lines[1:]:
-            s = line.strip()
-            if s == "" or s.startswith("Kind:") or s.startswith("Language:"):
-                drop_count += 1
-            else:
-                break
-        if drop_count:
-            content = "\n".join([lines[0]] + lines[1 + drop_count :])
-        parser = WebVttParser(StringIO(content))
-    else:
-        parser = SrtParser(StringIO(content))
-    parser.parse()
+    return parse_subtitle_content(
+        content,
+        language=language,
+        resplit_sentences=resplit_sentences,
+        ext=ext,
+    )
 
-    subtitles = parser.subtitles
-    cues = [
-        {
-            "start": s.start / 1000.0,
-            "end": s.end / 1000.0,
-            "text": s.text,
-        }
-        for s in subtitles
-    ]
 
-    if _is_japanese(language):
+def parse_subtitle_content(content, language=None, resplit_sentences=False, ext=".srt"):
+    """
+    Parse srt/vtt subtitle content (a string).
+
+    Returns (text, cues_json), where text is the subtitle texts joined
+    by newlines, and cues_json is a JSON string of cue dicts.
+    """
+    cues = _parse_cues(content, ext)
+    if resplit_sentences and _is_japanese(language):
         from lute.book.japanese_srt import refine_japanese_cues  # pylint: disable=import-outside-toplevel
 
         cues = refine_japanese_cues(cues, language)
-
     text = "\n".join(c["text"] for c in cues)
     return text, json.dumps(cues, ensure_ascii=False)
+
+
+def _parse_cues(content, ext):
+    "Parse srt/vtt content into a list of cue dicts."
+    if ext == ".vtt":
+        return _parse_vtt_cues(content)
+    return _parse_srt_cues(content)
+
+
+def _parse_srt_cues(content):
+    "Parse SRT content into a list of cue dicts."
+    parser = SrtParser(StringIO(content))
+    parser.parse()
+    return [
+        {"start": s.start / 1000.0, "end": s.end / 1000.0, "text": s.text}
+        for s in parser.subtitles
+    ]
+
+
+def _timecode_to_secs(tc):
+    """
+    Convert an SRT/VTT timestamp (HH:MM:SS.mmm or HH:MM:SS,mmm) to seconds.
+    """
+    tc = tc.strip().replace(",", ".")
+    parts = tc.split(":")
+    if len(parts) == 2:
+        parts = ["0"] + parts
+    if len(parts) != 3:
+        raise BookImportException(f"Invalid timestamp {tc!r}")
+    try:
+        hours, minutes, seconds = int(parts[0]), int(parts[1]), float(parts[2])
+    except ValueError as e:
+        raise BookImportException(f"Invalid timestamp {tc!r}") from e
+    return hours * 3600 + minutes * 60 + seconds
+
+
+def _parse_vtt_cues(content):
+    """
+    Parse WebVTT content into a list of cue dicts.
+
+    This is a small hand-rolled parser because the subtitle_parser
+    WebVttParser chokes on real-world (YouTube) VTT exports:
+      - cue timing lines carry trailing settings, e.g.
+        "00:00:04.200 --> 00:00:07.000 align:start position:0%",
+      - metadata lines like "X-TIMESTAMP-MAP=..." appear between the
+        WEBVTT header and the first cue,
+      - cue identifiers are not always numeric.
+    """
+    lines = content.split("\n")
+    cues = []
+    i = 0
+    n = len(lines)
+    while i < n:
+        line = lines[i].strip()
+        if "-->" not in line:
+            # Skip header / metadata / NOTE / STYLE lines until a cue.
+            i += 1
+            continue
+        m = re.search(r"(\S+)\s+-->\s+(\S+)", line)
+        if not m:
+            i += 1
+            continue
+        start = _timecode_to_secs(m.group(1))
+        end = _timecode_to_secs(m.group(2))
+        i += 1
+        text_lines = []
+        while i < n:
+            cur = lines[i].strip()
+            if cur == "" or "-->" in cur:
+                break
+            text_lines.append(cur)
+            i += 1
+        text = "\n".join(text_lines)
+        if text:
+            cues.append({"start": start, "end": end, "text": text})
+        while i < n and lines[i].strip() == "":
+            i += 1
+    return cues
+
+
+def _format_srt_timestamp(secs):
+    "Format seconds as HH:MM:SS,mmm for SRT output."
+    total_ms = max(0, int(round(float(secs or 0) * 1000)))
+    hours = total_ms // 3600000
+    minutes = (total_ms % 3600000) // 60000
+    seconds = (total_ms % 60000) // 1000
+    millis = total_ms % 1000
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d},{millis:03d}"
+
+
+def cues_to_srt_text(cues):
+    """
+    Convert a list of cues ({start, end, text}) to SRT-formatted text
+    with timestamps, so it can be edited directly.
+    """
+    lines = []
+    for i, c in enumerate(cues, start=1):
+        lines.append(str(i))
+        lines.append(
+            f"{_format_srt_timestamp(c.get('start', 0))} --> "
+            f"{_format_srt_timestamp(c.get('end', 0))}"
+        )
+        lines.append(c.get("text") or "")
+        lines.append("")
+    return "\n".join(lines).rstrip()
 
 
 def _is_japanese(language):
@@ -233,12 +326,9 @@ class FileTextExtraction:
         """
         Get the content of the srt as a single string.
         """
-        content = ""
         try:
             srt_content = self._get_text_stream_content(filestream, "utf-8-sig")
-            parser = SrtParser(StringIO(srt_content))
-            parser.parse()
-            content = "\n".join(subtitle.text for subtitle in parser.subtitles)
+            content, _ = parse_subtitle_content(srt_content, ext=".srt")
             return content
         except Exception as e:
             msg = f"Could not parse {filename} (error: {str(e)})"
@@ -248,25 +338,9 @@ class FileTextExtraction:
         """
         Get the content of the vtt as a single string.
         """
-        content = ""
         try:
             vtt_content = self._get_text_stream_content(filestream, "utf-8-sig")
-            # Check if it is from YouTube, and drop the "Kind:" /
-            # "Language:" metadata lines (and any blank line) between
-            # the WEBVTT header and the first cue.
-            lines = vtt_content.split("\n")
-            drop_count = 0
-            for line in lines[1:]:
-                s = line.strip()
-                if s == "" or s.startswith("Kind:") or s.startswith("Language:"):
-                    drop_count += 1
-                else:
-                    break
-            if drop_count:
-                vtt_content = "\n".join([lines[0]] + lines[1 + drop_count :])
-            parser = WebVttParser(StringIO(vtt_content))
-            parser.parse()
-            content = "\n".join(subtitle.text for subtitle in parser.subtitles)
+            content, _ = parse_subtitle_content(vtt_content, ext=".vtt")
             return content
         except Exception as e:
             msg = f"Could not parse {filename} (error: {str(e)})"

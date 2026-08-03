@@ -5,6 +5,7 @@ Book create/edit forms.
 import json
 from flask import request
 from wtforms import StringField, SelectField, TextAreaField, IntegerField, HiddenField
+from wtforms import BooleanField
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
@@ -163,13 +164,17 @@ class EditBookForm(FlaskForm):
         choices=[("", "Text"), ("youtube", "YouTube video")],
     )
     youtube_srt = FileField(
-        "YouTube subtitle file (SRT)",
+        "YouTube subtitle file (SRT / VTT)",
         validators=[
             FileAllowed(
                 ["srt", "vtt"],
                 "Please upload a valid subtitle file (srt, vtt)",
             )
         ],
+    )
+    resplit_sentences = BooleanField(
+        "Re-split subtitles into sentences (Japanese)",
+        default=False,
     )
 
     # The current audio_filename can be removed from the current book.
@@ -210,25 +215,73 @@ class EditBookForm(FlaskForm):
             obj.audio_bookmarks = None
             obj.audio_current_pos = None
 
-        yfd = self.youtube_srt.data
-        if yfd:
-            # Re-parse the subtitle file, updating both the book text
-            # (for reading) and the cue timing data (for the player).
-            from lute.book.service import parse_subtitle_file  # pylint: disable=import-outside-toplevel, cyclic-import
-            from lute.db import db  # pylint: disable=import-outside-toplevel
-            from lute.models.repositories import (  # pylint: disable=import-outside-toplevel
-                LanguageRepository,
-            )
+        if obj.book_type == "youtube":
+            self._parse_youtube_subtitles(obj)
 
-            # Load the language so language-specific cue refinement
-            # (e.g. Japanese sentence merging/splitting) is applied.
-            lang = None
-            if getattr(obj, "language_id", None):
-                lang = LanguageRepository(db.session).find(obj.language_id)
+    def _parse_youtube_subtitles(self, obj):
+        """
+        Parse subtitle data for a youtube book.
 
-            text, cues_json = parse_subtitle_file(
-                yfd.filename, yfd.stream, language=lang
+        Precedence: an uploaded youtube_srt file wins over the SRT text
+        in the text field.  The text field holds the SRT original (with
+        timestamps), so it can be edited directly; it is parsed back
+        into cues on save.  The re-split-sentences option (Japanese)
+        merges/splits cues into sentence units when set.
+        """
+        from lute.book.service import (  # pylint: disable=import-outside-toplevel, cyclic-import
+            parse_subtitle_file,
+            parse_subtitle_content,
+            BookImportException,
+        )
+        from lute.db import db  # pylint: disable=import-outside-toplevel
+        from lute.models.repositories import (  # pylint: disable=import-outside-toplevel
+            LanguageRepository,
+        )
+
+        # Load the language so language-specific cue refinement
+        # (e.g. Japanese sentence merging/splitting) is applied.
+        lang = None
+        if getattr(obj, "language_id", None):
+            lang = LanguageRepository(db.session).find(obj.language_id)
+
+        resplit = bool(
+            getattr(self, "resplit_sentences", None)
+            and self.resplit_sentences.data
+        )
+
+        try:
+            yfd = self.youtube_srt.data
+            if yfd:
+                # Re-parse the subtitle file, updating both the book
+                # text (for reading) and the cue timing data (for the
+                # player).
+                text, cues_json = parse_subtitle_file(
+                    yfd.filename,
+                    yfd.stream,
+                    language=lang,
+                    resplit_sentences=resplit,
+                )
+                obj.text = text
+                obj.srt_data = cues_json
+                return
+
+            srt_text = (self.text.data or "").strip()
+            if "-->" not in srt_text:
+                raise BookImportException(
+                    "The subtitle text must be SRT formatted with "
+                    "timestamps, e.g. '00:00:01,000 --> 00:00:04,200'."
+                )
+            text, cues_json = parse_subtitle_content(
+                srt_text,
+                language=lang,
+                resplit_sentences=resplit,
+                ext=".srt",
             )
             obj.text = text
             obj.srt_data = cues_json
-            obj.book_type = "youtube"
+        except BookImportException:
+            raise
+        except Exception as e:  # pylint: disable=broad-except
+            raise BookImportException(
+                f"Could not parse subtitle data: {e}", cause=e
+            ) from e
