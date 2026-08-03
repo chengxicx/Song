@@ -77,6 +77,11 @@ class Book:  # pylint: disable=too-many-instance-attributes
         self.audio_bookmarks = None
         self.book_tags = []
 
+        # YouTube video book fields.
+        self.book_type = ""
+        self.srt_data = None
+        self.video_current_pos = None
+
         self.threshold_page_tokens = 250
         self.split_by = "paragraphs"
 
@@ -252,6 +257,10 @@ class Repository:
         b.audio_current_pos = book.audio_current_pos
         b.audio_bookmarks = book.audio_bookmarks
 
+        b.book_type = book.book_type
+        b.srt_data = book.srt_data
+        b.video_current_pos = book.video_current_pos
+
         btr = BookTagRepository(self.session)
         booktags = []
         for s in book.book_tags:
@@ -278,5 +287,8 @@ class Repository:
         b.audio_filename = dbbook.audio_filename
         b.audio_current_pos = dbbook.audio_current_pos
         b.audio_bookmarks = dbbook.audio_bookmarks
+        b.book_type = dbbook.book_type
+        b.srt_data = dbbook.srt_data
+        b.video_current_pos = dbbook.video_current_pos
         b.book_tags = [t.text for t in dbbook.book_tags]
         return b

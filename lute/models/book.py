@@ -2,6 +2,7 @@
 Book entity.
 """
 
+import json
 import sqlite3
 from contextlib import closing
 from lute.db import db
@@ -52,6 +53,13 @@ class Book(
     audio_filename = db.Column("BkAudioFilename", db.String)
     audio_current_pos = db.Column("BkAudioCurrentPos", db.Float)
     audio_bookmarks = db.Column("BkAudioBookmarks", db.String)
+
+    # YouTube video book fields.
+    # book_type is '' for regular books, 'youtube' for YouTube video books.
+    book_type = db.Column("BkBookType", db.String, default="")
+    # srt_data is a JSON array of subtitle cues (start/end/text), see migration.
+    srt_data = db.Column("BkSrtData", db.String)
+    video_current_pos = db.Column("BkVideoCurrentPos", db.Float)
 
     language = db.relationship("Language")
     texts = db.relationship(
@@ -137,6 +145,21 @@ class Book(
     def is_supported(self):
         "True if the book's language's parser is supported."
         return self.language.is_supported
+
+    @property
+    def cues(self):
+        """
+        Return the parsed subtitle cues as a list of dicts.
+
+        Each cue is {"start": secs, "end": secs, "text": str}.
+        Returns [] if there is no subtitle data.
+        """
+        if not self.srt_data:
+            return []
+        try:
+            return json.loads(self.srt_data)
+        except (ValueError, TypeError):
+            return []
 
 
 # TODO zzfuture fix: rename class and table to Page/pages
