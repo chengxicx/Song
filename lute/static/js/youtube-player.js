@@ -535,7 +535,7 @@
   }
 
   // Fetch the tokenized word HTML for all cues.  This is deferred so
-  // the expensive MeCab tokenization doesn't block the initial page
+  // the expensive tokenization doesn't block the initial page
   // render.  While loading, the subtitle shows plain cue text.
   function ytLoadSubtitleWords() {
     if (!BOOK_ID) return;

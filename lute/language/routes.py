@@ -89,9 +89,47 @@ def _add_hidden_dictionary_template_entry(form):
     form.dictionaries.append_entry({"dicturi": "__TEMPLATE__"})
 
 
-def _dropdown_parser_choices():
-    "Get dropdown list of parser type name to name."
-    return [(a[0], a[1].name()) for a in supported_parsers()]
+def _dropdown_parser_choices(language=None):
+    """
+    Get dropdown list of parser type name to name.
+
+    When a language is given, only parsers relevant to that language
+    are offered: language-specific parsers (e.g. Japanese MeCab /
+    Sudachi for Japanese, Turkish for Turkish) plus the generic
+    space-delimited parser as fallback.  Parsers for *other* languages
+    (e.g. Turkish while editing Japanese) are hidden.
+    """
+    if language is None:
+        return [(a[0], a[1].name()) for a in supported_parsers()]
+
+    lang_name = (language.name or "").strip().lower()
+    lang_type = (getattr(language, "parser_type", "") or "").strip().lower()
+
+    def _matches(key, klass):
+        langs = klass.languages()
+        if not langs:
+            return False
+        if key == lang_type:
+            return True
+        return any(l in lang_name for l in langs)
+
+    matched = [(k, v.name()) for k, v in supported_parsers() if _matches(k, v)]
+    if matched:
+        # Keep the currently-selected parser visible even if the
+        # language name doesn't match it (e.g. a custom-named
+        # language), so the current value never disappears.
+        if lang_type and not any(k == lang_type for k, _ in matched):
+            matched.extend((k, v.name()) for k, v in supported_parsers() if k == lang_type)
+        return matched
+
+    # No language-specific parser applies; only offer generic parsers
+    # (Space Delimited and any plugin parsers that don't declare a
+    # language).
+    return [
+        (k, v.name())
+        for k, v in supported_parsers()
+        if v.languages() is None
+    ]
 
 
 @bp.route("/edit/<int:langid>", methods=["GET", "POST"])
@@ -106,7 +144,7 @@ def edit(langid):
         return redirect(url_for("language.index"))
 
     form = LanguageForm(obj=language)
-    form.parser_type.choices = _dropdown_parser_choices()
+    form.parser_type.choices = _dropdown_parser_choices(language)
 
     if _handle_form(language, form):
         return redirect("/")
@@ -131,7 +169,7 @@ def new(langname):
             language = candidates[0]
 
     form = LanguageForm(obj=language)
-    form.parser_type.choices = _dropdown_parser_choices()
+    form.parser_type.choices = _dropdown_parser_choices(language)
 
     if _handle_form(language, form):
         # New language, so show everything b/c user should re-choose

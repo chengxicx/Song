@@ -20,7 +20,7 @@ from lute.db import db
 bp = Blueprint("read", __name__, url_prefix="/read")
 
 # Module-level cache for subtitle word HTML, keyed by book id.
-# The tokenization of all cues (MeCab parse + term lookup + Jinja
+# The tokenization of all cues (parser parse + term lookup + Jinja
 # render per word) is expensive (10-20s for long videos).  The result
 # is deterministic for a given set of cues + terms, so we compute it
 # once and reuse it on subsequent page loads.  Each gunicorn worker
@@ -151,8 +151,8 @@ def _render_book_page(book, pagenum, track_page_open=True):
             c["end_str"] = _fmt_seconds(c.get("end", 0))
         # Subtitle word HTML is loaded lazily via AJAX
         # (/read/youtube_subtitle_words/<id>) to avoid blocking the
-        # initial page render — tokenizing all cues with MeCab can
-        # take 10-20s for long videos.
+        # initial page render — tokenizing all cues can take 10-20s
+        # for long videos.
 
     return render_template(
         "read/index.html",
@@ -334,7 +334,7 @@ def youtube_subtitle_words(bookid):
     """Return tokenized word HTML for every subtitle cue as JSON.
 
     Called lazily by the YouTube player after the page loads, so the
-    expensive MeCab tokenization doesn't block the initial render.
+    expensive tokenization doesn't block the initial render.
     Results are cached per book (see _yt_subtitle_words_cache).
     """
     book = _find_book(bookid)

@@ -25,6 +25,10 @@ class ClassicalChineseParser(AbstractParser):
     def name(cls):
         return "Classical Chinese"
 
+    @classmethod
+    def languages(cls):
+        return {"classical chinese"}
+
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:
         """
         Returns ParsedToken array for given language.

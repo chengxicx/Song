@@ -112,7 +112,7 @@ def parse_subtitle_file(filename, filestream, language=None):
     if _is_japanese(language):
         from lute.book.japanese_srt import refine_japanese_cues  # pylint: disable=import-outside-toplevel
 
-        cues = refine_japanese_cues(cues)
+        cues = refine_japanese_cues(cues, language)
 
     text = "\n".join(c["text"] for c in cues)
     return text, json.dumps(cues, ensure_ascii=False)
@@ -124,7 +124,7 @@ def _is_japanese(language):
         return False
     name = (getattr(language, "name", "") or "").strip().lower()
     ptype = (getattr(language, "parser_type", "") or "").strip().lower()
-    return name == "japanese" or ptype == "japanese"
+    return name == "japanese" or ptype in ("japanese", "japanese_sudachi")
 
 
 class FileTextExtraction:

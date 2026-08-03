@@ -148,6 +148,10 @@ class JapaneseSudachiParser(AbstractParser):
     def name(cls):
         return "Japanese (Sudachi)"
 
+    @classmethod
+    def languages(cls):
+        return {"japanese"}
+
     # ---- parsing ----
 
     def get_parsed_tokens(self, text: str, language) -> List[ParsedToken]:

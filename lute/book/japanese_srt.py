@@ -7,13 +7,15 @@ linguistic boundaries.  This module merges cues that belong to the
 same sentence and splits cues that became too long after merging, so
 each cue roughly corresponds to one Japanese sentence.
 
-PRIMARY ENGINE (MeCab-aware, authoritative when MeCab is installed):
-  Text cleaning -> tokenize via MeCab -> merge using POS/conjugation
-  info -> re-tokenize merged long cues and split at clause boundaries
-  detected from morpheme-level sentence-ending predicate + new-sentence
-  starter patterns -> enforce 2.5s..8s duration band.
+PRIMARY ENGINE (uses the language's configured Japanese parser --
+MeCab or Sudachi -- authoritative when one is available):
+  Text cleaning -> tokenize via the configured parser -> merge using
+  POS/conjugation info -> re-tokenize merged long cues and split at
+  clause boundaries detected from morpheme-level sentence-ending
+  predicate + new-sentence starter patterns -> enforce the 2.5s..8s
+  duration band.
 
-FALLBACK ENGINE (graceful when MeCab cannot be loaded):
+FALLBACK ENGINE (graceful when no Japanese tokenizer can be loaded):
   Original regex-only suffix/prefix rules.  Works for obvious cases but
   cannot disambiguate e.g. a bare か verb-stem tail vs the sentence
   particle か, so it is more conservative about merge-blocking and less
@@ -149,7 +151,8 @@ def _clean_text(text):
 
 
 # ===================================================================== #
-#  MECAB LAYER  --  authoritative when MeCab is installed              #
+#  TOKENIZER LAYER  -- MeCab or Sudachi, chosen by the language's       #
+#  configured parser.  Authoritative when one is available.             #
 # ===================================================================== #
 
 def _get_mecab_instance():
@@ -159,8 +162,8 @@ def _get_mecab_instance():
     per process.  We do NOT use the settings-backed JapaneseParser
     class here because (1) the settings stack is not initialised during
     pytest runs on non-Japanese fixtures and (2) all we need is a raw
-    natto MeCab instance with its default dictionary, which matches
-    what the rest of the application will eventually use."""
+    natto MeCab instance with its default dictionary, used when the
+    language is configured with the MeCab parser."""
     global _MECAB
     if _MECAB is None:  # not yet probed
         try:
@@ -214,7 +217,95 @@ def _tokenize_mecab(text):
     return tokens
 
 
-# ----------  MeCab POS/conjugation helpers  ---------------------------
+def _tokenizer_backend(language):
+    """'mecab' or 'sudachi', based on the language's configured parser.
+
+    Japanese languages configured with the Sudachi parser use Sudachi
+    here; everything else (including language=None) uses MeCab so the
+    long-standing behaviour is preserved when no language is passed.
+    """
+    if language is None:
+        return "mecab"
+    ptype = (getattr(language, "parser_type", "") or "").strip().lower()
+    if ptype == "japanese_sudachi":
+        return "sudachi"
+    return "mecab"
+
+
+def _get_sudachi_tokenizer():
+    """Return the shared SudachiPy tokenizer (cached by the parser)."""
+    from lute.parse.sudachi_parser import (  # pylint: disable=import-outside-toplevel
+        JapaneseSudachiParser,
+    )
+
+    dict_type = JapaneseSudachiParser._get_dict_setting()
+    return JapaneseSudachiParser._build_tokenizer(dict_type)
+
+
+def _tokenize_sudachi(text):
+    """Tokenize text with SudachiPy.  Returns [] if unavailable.
+
+    Returns the same token-dict shape as _tokenize_mecab():
+      surface, pos0, pos1, conj_type, conj_form, start, end.
+    """
+    try:
+        from lute.parse.sudachi_parser import (  # pylint: disable=import-outside-toplevel
+            JapaneseSudachiParser,
+        )
+
+        tok = _get_sudachi_tokenizer()
+        mode = JapaneseSudachiParser._get_mode_setting()
+        split_mode = JapaneseSudachiParser._get_split_mode(mode)
+    except Exception:  # pylint: disable=broad-except
+        return []
+    tokens = []
+    paras = text.split("\n")
+    para_offset = 0
+    try:
+        for pi, para in enumerate(paras):
+            if pi > 0:
+                para_offset += 1  # the newline character
+            result = tok.tokenize(para, mode=split_mode)
+            for m in result:
+                surface = m.surface()
+                if surface == "":
+                    continue
+                pos = m.part_of_speech()
+                pos0 = pos[0] if len(pos) > 0 else "*"
+                pos1 = pos[1] if len(pos) > 1 else "*"
+                # Sudachi's POS tuple is
+                # (pos1, pos2, pos3, conj_type, conj_form), e.g.
+                # ("動詞", "一般", "*", "五段-カ行", "終止形-一般").
+                conj_type = pos[3] if len(pos) > 3 else "*"
+                conj_form = pos[4] if len(pos) > 4 else "*"
+                tokens.append({
+                    "surface": surface,
+                    "pos0": pos0 or "*",
+                    "pos1": pos1 or "*",
+                    "conj_type": conj_type or "*",
+                    "conj_form": conj_form or "*",
+                    "start": para_offset + m.begin(),
+                    "end": para_offset + m.end(),
+                })
+            para_offset += len(para)
+    except Exception:  # pylint: disable=broad-except
+        # Sudachi is best-effort; fall back for this call.
+        return []
+    return tokens
+
+
+def _tokenize(text, language):
+    """Tokenize text with the language's configured Japanese parser.
+
+    Returns a list of token dicts, or [] if the parser isn't available
+    (callers then fall back to the regex engine).
+    """
+    if _tokenizer_backend(language) == "sudachi":
+        return _tokenize_sudachi(text)
+    return _tokenize_mecab(text)
+
+
+# ----------  POS/conjugation helpers  ---------------------------------
 
 # Conjugation forms that represent a COMPLETE predicate (sentence can
 # end here).  In both IPADIC and Unidic, 活用形 starts with one of
@@ -248,10 +339,11 @@ def _first_meaningful_token(tokens, start_from=0):
     return None
 
 
-# ----------  MeCab-based merge decision primitives ---------------------
+# ----------  Parser-based merge decision primitives ---------------------
 
-def _mecab_sentence_complete(text):
-    """True if MeCab analysis says text ends with a complete sentence.
+def _sentence_complete(text, language):
+    """True if morphological analysis says text ends with a complete
+    sentence.
 
     A sentence is complete when the last meaningful token is:
       - a 助動詞, 動詞, 形容詞, or 形状詞 in 終止形/連体形/仮定形/命令形
@@ -261,9 +353,10 @@ def _mecab_sentence_complete(text):
         handled implicitly via _終止形 match.
     When text ends with an incomplete conjugation (未然形, 連用形) it is
     NEVER complete.
-    Returns None if MeCab unavailable (caller falls back to regex).
+    Returns None if the tokenizer is unavailable (caller falls back to
+    regex).
     """
-    toks = _tokenize_mecab(text)
+    toks = _tokenize(text, language)
     if not toks:
         return None
     last = _last_meaningful_token(toks)
@@ -291,16 +384,17 @@ def _mecab_sentence_complete(text):
     return None  # ambiguous: caller falls back to regex.
 
 
-def _mecab_sentence_incomplete(text):
-    """True if MeCab analysis says text MUST continue (merge with next).
+def _sentence_incomplete(text, language):
+    """True if morphological analysis says text MUST continue (merge
+    with next).
 
     Cases:
       - last meaningful token has 未然形 or 連用形 conjugation
       - last meaningful token is 助詞-接続助詞 (で, て, から, ので, が...)
       - last meaningful token is 連体詞 (must modify a following noun)
-    Returns None if MeCab unavailable or inconclusive.
+    Returns None if the tokenizer is unavailable or inconclusive.
     """
-    toks = _tokenize_mecab(text)
+    toks = _tokenize(text, language)
     if not toks:
         return None
     last = _last_meaningful_token(toks)
@@ -318,15 +412,16 @@ def _mecab_sentence_incomplete(text):
     return None
 
 
-def _mecab_starts_new_sentence(text):
-    """True if MeCab analysis says text starts with a new-sentence marker.
+def _starts_new_sentence(text, language):
+    """True if morphological analysis says text starts with a
+    new-sentence marker.
 
     A new-sentence starter is:
       - 感動詞 (うん, はい, えっと, なるほど…)
       - 接続詞 (で, だから, しかし, それで…)
-    Returns None if MeCab unavailable or inconclusive.
+    Returns None if the tokenizer is unavailable or inconclusive.
     """
-    toks = _tokenize_mecab(text)
+    toks = _tokenize(text, language)
     if not toks:
         return None
     first = _first_meaningful_token(toks, 0)
@@ -340,7 +435,7 @@ def _mecab_starts_new_sentence(text):
     return None
 
 
-# ----------  MeCab-based clause-boundary finder (for split pass) --------
+# ----------  Parser-based clause-boundary finder (for split pass) ------
 
 def _next_meaningful_idx(tokens, from_idx):
     """Index of first meaningful token with index > from_idx, or None."""
@@ -352,7 +447,7 @@ def _next_meaningful_idx(tokens, from_idx):
     return None
 
 
-def _mecab_token_is_predicate_terminal(tok):
+def _token_is_predicate_terminal(tok):
     """True if tok represents a potential sentence-final predicate."""
     cf = tok["conj_form"] or ""
     p0, p1 = tok["pos0"], tok["pos1"]
@@ -367,7 +462,7 @@ def _mecab_token_is_predicate_terminal(tok):
     return False
 
 
-def _mecab_token_is_sentence_starter(tok):
+def _token_is_sentence_starter(tok):
     """True if tok typically begins a new sentence/clause.
 
     Conservative — false-positives here would break valid phrase merges
@@ -384,19 +479,22 @@ def _mecab_token_is_sentence_starter(tok):
     # Filler / interjection words list match.
     if surf in _FILLER_WORDS or surf in _START_BLOCKLIST:
         return True
+    # 代名詞: MeCab reports it as the top-level POS; Sudachi reports it
+    # as 名詞/代名詞.
+    is_daimeishi = (p0 == "代名詞" or (p0 == "名詞" and p1 == "代名詞"))
     # Wh-question pronouns definitely begin a new question clause.
-    if p0 == "代名詞" and surf in ("何", "どこ", "いつ", "誰", "どうして",
-                                     "なぜ", "どう", "どれ", "どちら",
-                                     "なんで", "なに"):
+    if is_daimeishi and surf in ("何", "どこ", "いつ", "誰", "どうして",
+                                 "なぜ", "どう", "どれ", "どちら",
+                                 "なんで", "なに"):
         return True
     # Demonstrative determiners (この/その/あの/こんな/そんな…) always
     # introduce a new noun phrase.
     if p0 == "連体詞":
         return True
     # Demonstrative pronouns/adverbs typically start a new sentence.
-    if p0 == "代名詞" and surf in ("それ", "これ", "あれ", "ここ", "そこ",
-                                   "あそこ", "どこ", "どれ", "こちら",
-                                   "そちら", "あちら", "どちら"):
+    if is_daimeishi and surf in ("それ", "これ", "あれ", "ここ", "そこ",
+                                 "あそこ", "どこ", "どれ", "こちら",
+                                 "そちら", "あちら", "どちら"):
         return True
     if p0 == "副詞" and surf in ("そう", "ああ", "こう", "どう", "はたして",
                                  "まだ", "もう", "また", "さらに", "それでも",
@@ -405,9 +503,9 @@ def _mecab_token_is_sentence_starter(tok):
     return False
 
 
-def _mecab_clause_boundaries(text):
+def _clause_boundaries(text, language):
     """Return a list of character-offsets (split start positions) found
-    by MeCab clause-boundary analysis.
+    by morphological clause-boundary analysis.
 
     A split point is recorded AFTER token[i] when:
       (A) token[i] is a predicate-terminal AND the next meaningful token
@@ -423,7 +521,7 @@ def _mecab_clause_boundaries(text):
     Offsets are returned in sorted order, unique.  The caller must still
     apply min-side-weight and duration checks.
     """
-    tokens = _tokenize_mecab(text)
+    tokens = _tokenize(text, language)
     if not tokens:
         return []
 
@@ -435,7 +533,7 @@ def _mecab_clause_boundaries(text):
         split_here = False
 
         # --- Case A/B: terminal predicate or sentence-ending particle ---
-        if _mecab_token_is_predicate_terminal(tok):
+        if _token_is_predicate_terminal(tok):
             j = _next_meaningful_idx(tokens, i)
             if j is None:
                 continue
@@ -468,7 +566,7 @@ def _mecab_clause_boundaries(text):
 
             if not attr_blocked:
                 # A) followed by a new-sentence starter
-                if _mecab_token_is_sentence_starter(next_tok):
+                if _token_is_sentence_starter(next_tok):
                     split_here = True
                 # B) terminal particle followed by content word.
                 elif tok["pos1"] == "終助詞" or "終助詞" in tok["pos1"]:
@@ -495,7 +593,7 @@ def _mecab_clause_boundaries(text):
         # We only need this for long conjunctions / fillers that may not
         # be caught by the "previous token was terminal" heuristic above
         # (e.g. the previous token was an incomplete noun phrase).
-        if i > 0 and _mecab_token_is_sentence_starter(tok):
+        if i > 0 and _token_is_sentence_starter(tok):
             surf = tok["surface"]
             # Only big enough markers count as split-worthy (a single
             # 「あ」 or 「うん」 at the beginning inside a clause is too
@@ -514,11 +612,11 @@ def _mecab_clause_boundaries(text):
 
 
 # ===================================================================== #
-#  END OF MECAB LAYER                                                   #
+#  END OF TOKENIZER LAYER                                               #
 # ===================================================================== #
 
 
-# ----------  Fallback regex helpers (for no-Mecab environments) ---------
+# ----------  Fallback regex helpers (no tokenizer available) -----------
 
 def _clean_ending(text):
     return text.strip()
@@ -564,29 +662,30 @@ def _starts_with_blocklist(text):
 
 
 # ----------  Composite merge decision primitives  ------------------------
-#  Each uses MeCab when available, otherwise falls back to regex.
+#  Each uses the configured tokenizer when available, otherwise falls
+#  back to regex.
 
-def _composite_sentence_complete(text):
+def _composite_sentence_complete(text, language):
     """Authoritative merge-block check for the end of the previous cue."""
     if _ends_with_strong_terminator(text):
         return True
-    r = _mecab_sentence_complete(text)
+    r = _sentence_complete(text, language)
     if r is not None:
         return r
     return _ends_with_blocklist(text)
 
 
-def _composite_starts_new(text):
+def _composite_starts_new(text, language):
     """Authoritative merge-block check for the start of the next cue."""
-    r = _mecab_starts_new_sentence(text)
+    r = _starts_new_sentence(text, language)
     if r is not None:
         return r
     return _starts_with_blocklist(text)
 
 
-def _composite_incomplete(text):
+def _composite_incomplete(text, language):
     """Authoritative force-merge check for the end of the previous cue."""
-    r = _mecab_sentence_incomplete(text)
+    r = _sentence_incomplete(text, language)
     if r is not None:
         return r
     return _ends_with_continuative(text) or _ends_with_rentai(text)
@@ -607,8 +706,8 @@ def _join_texts(a, b):
 # Merge pass
 # ---------------------------------------------------------------------------
 
-def _merge_cues(cues):
-    """Merge adjacent cues based on MeCab + fallback regex analysis."""
+def _merge_cues(cues, language):
+    """Merge adjacent cues based on parser + fallback regex analysis."""
     if not cues:
         return []
     merged = [dict(cues[0])]
@@ -620,25 +719,25 @@ def _merge_cues(cues):
 
         # Priority 1: next cue begins with a brand-new sentence
         # (interjection or conjunction) → never merge regardless of gap.
-        if _composite_starts_new(cur_text):
+        if _composite_starts_new(cur_text, language):
             do_merge = False
         # Previous cue has a sentence-terminator mark.
         elif _ends_with_strong_terminator(prev_text):
             do_merge = False
         # Previous cue ends with a complete sentence (terminal predicate
-        # or sentence-ending particle) — identified by MeCab or
+        # or sentence-ending particle) — identified by the tokenizer or
         # END_BLOCKLIST fallback.
-        elif _composite_sentence_complete(prev_text):
+        elif _composite_sentence_complete(prev_text, language):
             do_merge = False
         # Force-merge: previous cue is syntactically incomplete (verb
         # stem, te-form without end, continuative particle, rentaishi)
         # AND gap is short enough that these two cues clearly were
         # split mid-sentence by YouTube.
-        elif gap < 0.4 and _composite_incomplete(prev_text):
+        elif gap < 0.4 and _composite_incomplete(prev_text, language):
             do_merge = True
         # Default: merge on short gaps.  For Japanese conversational
         # material with small raw cue sizes this still merges frequently,
-        # but the split pass (with MeCab clause boundaries) will re-cut
+        # but the split pass (with parser clause boundaries) will re-cut
         # anything that became too long.
         else:
             do_merge = gap < 0.4
@@ -655,15 +754,15 @@ def _merge_cues(cues):
 # Split pass
 # ---------------------------------------------------------------------------
 
-def _find_split_indices(text, level):
+def _find_split_indices(text, level, language):
     """Regex fallback split-index helper.  Same priority levels as before,
-    plus a new LEVEL 0.5 that uses MeCab clause boundaries when possible.
+    plus a new LEVEL 0 that uses parser clause boundaries when possible.
     """
     indices = set()
     if level == 0:
-        # New MeCab-based clause boundaries (highest priority after
-        # strong terminators).  Inserted BEFORE level 2 particles.
-        for idx in _mecab_clause_boundaries(text):
+        # Parser-based clause boundaries (highest priority after strong
+        # terminators).  Inserted BEFORE level 2 particles.
+        for idx in _clause_boundaries(text, language):
             indices.add(idx)
         return sorted(indices)
     if level == 1:
@@ -673,11 +772,12 @@ def _find_split_indices(text, level):
                 if 0 < idx < len(text):
                     indices.add(idx)
     elif level == 2:
-        # Final particles (終助詞) — regex fallback when MeCab is absent.
+        # Final particles (終助詞) — regex fallback when no tokenizer
+        # is available.
         # CRITICAL: only MULTI-character particles are allowed to split.
         # Single-character particles (か/よ/ね/な/の/さ/わ/ぞ/ぜ/や) are
         # vastly too ambiguous and butcher noun phrases like 多々の冒険
-        # ("の" = attributive, NOT sentence end).  MeCab Level 0 handles
+        # ("の" = attributive, NOT sentence end).  Level 0 handles
         # real single-particle boundaries with proper POS context.
         for m in _FINAL_PARTICLE_RE.finditer(text):
             idx = m.end()
@@ -774,19 +874,19 @@ def _split_segment_by_indices(start, end, text, indices,
                             apply_min_duration=apply_min_duration)
 
 
-def _split_cue(cue):
-    """Split a single >8s cue using MeCab first, then regex levels."""
+def _split_cue(cue, language):
+    """Split a single >8s cue using the parser first, then regex levels."""
     text = cue["text"]
     segments = [(cue["start"], cue["end"], text)]
 
     # Priority order:
     # 1. Strong terminators (。！？) — always works, punctuation-based.
-    # 0. NEW: MeCab clause boundaries — finds real sentence boundaries
+    # 0. NEW: parser clause boundaries — finds real sentence boundaries
     #    even without punctuation.  This is the heavy lifter for the
     #    typical YouTube-captions case of 20-character clauses jammed
     #    together with zero punctuation.
     # 2. Final particles (終助詞, regex fallback) — kept as a fallback
-    #    when MeCab is unavailable or misses a boundary.
+    #    when no tokenizer is available or it misses a boundary.
     # 3. Filler / interjection words — split before.
     # 4. Long conjunctive words — split before.
     # 5. Comma 「、」 — de-emphasized.
@@ -798,7 +898,7 @@ def _split_cue(cue):
             if (e - s) <= _MAX_DURATION:
                 next_segments.append((s, e, t))
                 continue
-            indices = _find_split_indices(t, level)
+            indices = _find_split_indices(t, level, language)
             parts = _split_segment_by_indices(s, e, t, indices)
             next_segments.extend(parts)
         segments = next_segments
@@ -806,11 +906,11 @@ def _split_cue(cue):
     return segments
 
 
-def _split_long_cues(cues):
+def _split_long_cues(cues, language):
     result = []
     for cue in cues:
         if (cue["end"] - cue["start"]) > _MAX_DURATION:
-            split_segs = _split_cue(cue)
+            split_segs = _split_cue(cue, language)
             split_segs = _merge_short_segments(split_segs, _MIN_DURATION)
             for (s, e, t) in split_segs:
                 t = t.strip()
@@ -825,12 +925,15 @@ def _split_long_cues(cues):
 # Public entry point
 # ---------------------------------------------------------------------------
 
-def refine_japanese_cues(cues):
+def refine_japanese_cues(cues, language=None):
     """
     Refine Japanese subtitle cues: merge mid-sentence breaks and split
     over-long merged cues.
 
     cues: list of {"start": float, "end": float, "text": str}
+    language: optional lute.models.Language.  Its configured Japanese
+        parser (MeCab or Sudachi) drives the merge/split decisions.
+        When None, MeCab is used if available, else the regex fallback.
     Returns a new list of cues with the same shape.
     """
     if not cues:
@@ -842,8 +945,8 @@ def refine_japanese_cues(cues):
         c["text"] = _clean_text(c.get("text", ""))
         cleaned.append(c)
 
-    merged = _merge_cues(cleaned)
-    refined = _split_long_cues(merged)
+    merged = _merge_cues(cleaned, language)
+    refined = _split_long_cues(merged, language)
 
     # Safety rebalance: any cue still >MAX_DURATION is split at the best
     # clause boundary whose left weight most closely matches MAX_DURATION
@@ -863,7 +966,7 @@ def refine_japanese_cues(cues):
         # These are the *semantically meaningful* positions; we never split
         # mid-morpheme.
         candidate_ends = set()
-        for idx in _mecab_clause_boundaries(t):
+        for idx in _clause_boundaries(t, language):
             candidate_ends.add(idx)
         for i, ch in enumerate(t):
             if ch in _STRONG_TERMINATORS and 0 < i + 1 < len(t):
@@ -880,7 +983,7 @@ def refine_japanese_cues(cues):
 
         cands = sorted(candidate_ends)
         if not cands:
-            tokens = _tokenize_mecab(t)
+            tokens = _tokenize(t, language)
             if tokens:
                 cands = sorted(set(
                     tk["end"] for tk in tokens
