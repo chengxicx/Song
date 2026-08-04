@@ -887,6 +887,25 @@
     const toggle = document.getElementById("tts-player-toggle");
     if (!toggle) return;
 
+    // Detect YouTube / MP3 books: they render a dedicated
+    // .youtube-player-container player and the #book_audio_file hidden
+    // input is explicitly left empty (the Jinja template sets it to
+    // the empty string for youtube/mp3 types).
+    var isYouTubeOrMp3 = function () {
+      if (document.querySelector(".youtube-player-container")) return true;
+      var audioInput = document.getElementById("book_audio_file");
+      if (audioInput && (audioInput.value || "").trim() === "") {
+        // Only treat a blank audio file as a YouTube/MP3 signal when
+        // there's also a #ytContainer or the cues array is defined
+        // (a signal that youtube-player.js has been injected).  We
+        // don't want to hide the TTS panel for a regular book where
+        // the user just hasn't uploaded an audio file yet.
+        if (document.getElementById("ytContainer")) return true;
+        if (typeof window.CUES !== "undefined") return true;
+      }
+      return false;
+    };
+
     let saved = null;
     try {
       saved = localStorage.getItem("ttsPlayerVisible");
@@ -895,6 +914,11 @@
     var initialVisible;
     if (saved !== null) {
       initialVisible = saved !== "0";
+    } else if (isYouTubeOrMp3()) {
+      // User has never set a preference: on a YouTube/MP3 page the
+      // built-in TTS panel is redundant with the transcript/subtitle
+      // player, so default it to hidden.
+      initialVisible = false;
     } else {
       initialVisible = SETTINGS.showControlPanel;
     }
