@@ -375,11 +375,16 @@
     }
     var row = rows[idx];
     if (row && ytTranscript && ytTranscript.style.display !== "none") {
-      var target =
-        row.offsetTop - ytTranscriptList.clientHeight / 2 +
-        row.offsetHeight / 2;
+      // Use getBoundingClientRect (not offsetTop) because the list
+      // container has position:static so offsetTop is relative to BODY.
+      var rowRect = row.getBoundingClientRect();
+      var listRect = ytTranscriptList.getBoundingClientRect();
+      var rowTopInList = rowRect.top - listRect.top + ytTranscriptList.scrollTop;
+      var containerH = ytTranscriptList.clientHeight;
+      var target = rowTopInList - containerH / 2 + rowRect.height / 2;
+      target = Math.max(0, Math.min(target, ytTranscriptList.scrollHeight - containerH));
       ytTranscriptList.scrollTo({
-        top: Math.max(0, target),
+        top: target,
         behavior: "smooth",
       });
     }
