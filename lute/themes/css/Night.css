@@ -158,3 +158,115 @@ span.hamburger {
 .volume {
   background-color: #444;
 }
+
+/* ---------------------------------------------------------
+   YouTube / MP3 player (reading page) — Night theme
+   --------------------------------------------------------- */
+.youtube-player-container {
+  --yt-color-1: #59c7fa;   /* timeline fill */
+  --yt-color-2: #ff5c5c;
+  --yt-color-3: #1e1e1e;   /* container background */
+  --yt-color-4: #2a4a6e;   /* primary accent (play / transcript btn) */
+  --yt-color-5: #1a2a3a;   /* secondary panel (timeline wrap, rate) */
+  border-color: #333 !important;
+  background-color: var(--yt-color-3) !important;
+}
+
+.yt-play-btn {
+  background-color: var(--yt-color-4) !important;
+  color: #F3F4F4 !important;
+}
+
+.yt-cue-btn {
+  background-color: #2a2a2a !important;
+  color: var(--light-grey) !important;
+}
+
+.yt-toggle-btn {
+  background-color: #2a2a2a !important;
+  border-color: #444 !important;
+  color: var(--light-grey) !important;
+}
+.yt-toggle-btn:hover { filter: brightness(115%); }
+
+.yt-toggle-btn.on {
+  background-color: #38924c !important;
+  border-color: #38924c !important;
+  color: #fff !important;
+}
+
+.yt-transcript-btn {
+  background-color: var(--yt-color-4) !important;
+  color: #fff !important;
+}
+.yt-transcript-btn.on {
+  background-color: #38924c !important;
+}
+
+.yt-timeline-wrap,
+#yt-playback-rate-container {
+  background-color: var(--yt-color-5) !important;
+}
+
+.yt-time-display {
+  color: var(--light-grey) !important;
+}
+
+.yt-timeline {
+  background-color: #2a2a2a !important;
+}
+.yt-timeline::-webkit-slider-thumb {
+  background-color: var(--yt-color-1) !important;
+  border-color: #1e1e1e !important;
+}
+.yt-timeline::-moz-range-thumb {
+  background-color: var(--yt-color-1) !important;
+  border-color: #1e1e1e !important;
+}
+
+.yt-rate-btn {
+  background-color: var(--yt-color-4) !important;
+  color: #fff !important;
+}
+
+#yt-rate-indicator {
+  color: var(--light-grey) !important;
+}
+
+/* Scrolling subtitle */
+.yt-scrolling-subtitle {
+  background-color: #1e1e1e !important;
+  border-color: #333 !important;
+}
+
+#yt-scrolling-subtitle-inner {
+  color: #F3F4F4 !important;
+}
+
+#yt-scrolling-subtitle-inner:empty::before {
+  color: #444 !important;
+}
+
+/* Transcript panel */
+.yt-transcript {
+  background-color: #1e1e1e !important;
+  border-color: #333 !important;
+}
+
+.yt-transcript-row {
+  border-bottom-color: #2a2a2a !important;
+}
+.yt-transcript-row:hover {
+  background-color: var(--yt-color-5) !important;
+}
+.yt-transcript-row.active {
+  background-color: #3a2e0a !important; /* warm dim highlight */
+}
+
+.yt-transcript-ts {
+  color: var(--yt-color-1) !important;
+}
+
+.yt-transcript-text {
+  color: var(--light-grey) !important;
+}

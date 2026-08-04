@@ -313,8 +313,16 @@
       ytSubtitle.innerHTML = html;
       ytSubtitle.scrollLeft = 0;
       ytIsRtl = ytSubtitle.getAttribute("dir") === "rtl";
-      var overflow = ytSubtitle.scrollWidth - ytSubtitle.clientWidth;
-      ytMarqueeOverflow = ytIsRtl ? 0 : Math.max(0, overflow);
+      // Defer measurement until the next frame so the browser has laid
+      // out the freshly-injected word spans.  Measuring synchronously
+      // right after innerHTML = ... often reports zero overflow (or
+      // stale numbers from the previous cue) because style/layout is
+      // still pending, which causes the marquee to start at the wrong
+      // size and visually "jump" once the layout finally settles.
+      window.requestAnimationFrame(function () {
+        var overflow = ytSubtitle.scrollWidth - ytSubtitle.clientWidth;
+        ytMarqueeOverflow = ytIsRtl ? 0 : Math.max(0, overflow);
+      });
       // Inherit the reading-page word status colors.  The subtitle
       // word spans are injected after add_status_classes() has already
       // run for the page, so they'd otherwise render without their
@@ -550,17 +558,25 @@
           ytTranscript.style.display = "block";
           ytTranscriptBtn.classList.add("on");
           // Center the current line when the panel is opened.
-          if (ytCueIndex >= 0 && ytTranscriptList) {
-            var row = ytTranscriptList.querySelector(
-              "#yt-transcript-row-" + ytCueIndex
-            );
-            if (row) {
-              var target =
-                row.offsetTop - ytTranscriptList.clientHeight / 2 +
-                row.offsetHeight / 2;
-              ytTranscriptList.scrollTo({ top: Math.max(0, target) });
+          // Defer one frame so the container has a layout before we
+          // measure clientHeight / offsetTop (the display:block change
+          // above changed the geometry mid-task).
+          window.requestAnimationFrame(function () {
+            if (ytCueIndex >= 0 && ytTranscriptList) {
+              var row = ytTranscriptList.querySelector(
+                "#yt-transcript-row-" + ytCueIndex
+              );
+              if (row) {
+                var target =
+                  row.offsetTop - ytTranscriptList.clientHeight / 2 +
+                  row.offsetHeight / 2;
+                ytTranscriptList.scrollTo({
+                  top: Math.max(0, target),
+                  behavior: "smooth",
+                });
+              }
             }
-          }
+          });
         }
       });
     }

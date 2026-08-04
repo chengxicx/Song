@@ -909,3 +909,139 @@ canvas + svg text {
   color: #a1a1a6 !important;
   font-weight: 500 !important;
 }
+
+/* ---------------------------------------------------------
+   11. YOUTUBE / MP3 PLAYER — Apple Books 深色模式适配
+   原始样式定义在 player-styles.css，默认是浅色 (aliceblue / #fff)，
+   这里覆盖为 Apple 深色配色，与整体暗黑风格统一。
+   --------------------------------------------------------- */
+.youtube-player-container {
+  --yt-color-1: #0a84ff !important;   /* timeline / accent fill */
+  --yt-color-2: #ff453a !important;
+  --yt-color-3: #1c1c1e !important;   /* container bg (matches body bg) */
+  --yt-color-4: #0a84ff !important;   /* primary accent button color */
+  --yt-color-5: #2c2c2e !important;   /* secondary panel bg (timeline/rate) */
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background-color: var(--yt-color-3) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Play button */
+.yt-play-btn {
+  background-color: var(--yt-color-4) !important;
+  color: #fff !important;
+}
+
+/* Prev / next cue buttons */
+.yt-cue-btn {
+  background-color: #2c2c2e !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Loop / autopause / fullscreen toggle buttons */
+.yt-toggle-btn {
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #f2f2f7 !important;
+  border-radius: 8px !important;
+}
+.yt-toggle-btn:hover {
+  background-color: rgba(10, 132, 255, 0.15) !important;
+  border-color: rgba(10, 132, 255, 0.35) !important;
+}
+.yt-toggle-btn.on {
+  background-color: #30d158 !important;   /* Apple green accent */
+  border-color: #30d158 !important;
+  color: #fff !important;
+}
+
+/* Transcript button */
+.yt-transcript-btn {
+  background-color: var(--yt-color-4) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+}
+.yt-transcript-btn:hover {
+  filter: brightness(110%);
+}
+.yt-transcript-btn.on {
+  background-color: #30d158 !important;
+}
+
+/* Timeline + rate wrap panels */
+.yt-timeline-wrap,
+#yt-playback-rate-container {
+  background-color: var(--yt-color-5) !important;
+  border-radius: 8px !important;
+}
+
+/* Time display text */
+.yt-time-display {
+  color: #8e8e93 !important;
+}
+
+/* Seek bar track + thumb */
+.yt-timeline {
+  background-color: #1c1c1e !important;
+}
+.yt-timeline::-webkit-slider-thumb {
+  background-color: var(--yt-color-4) !important;
+  border-color: #2c2c2e !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+.yt-timeline::-moz-range-thumb {
+  background-color: var(--yt-color-4) !important;
+  border-color: #2c2c2e !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Playback rate controls */
+.yt-rate-btn {
+  background-color: var(--yt-color-4) !important;
+  color: #fff !important;
+}
+#yt-rate-indicator {
+  color: #f2f2f7 !important;
+}
+
+/* ----- Scrolling subtitle ----- */
+.yt-scrolling-subtitle {
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+}
+
+#yt-scrolling-subtitle-inner {
+  color: #e5e5ea !important;
+}
+
+#yt-scrolling-subtitle-inner:empty::before {
+  color: #48484a !important;
+}
+
+/* ----- Transcript panel ----- */
+.yt-transcript {
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+}
+
+.yt-transcript-row {
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+.yt-transcript-row:hover {
+  background-color: rgba(10, 132, 255, 0.12) !important;
+}
+.yt-transcript-row.active {
+  background-color: rgba(10, 132, 255, 0.22) !important;
+}
+
+.yt-transcript-ts {
+  color: var(--yt-color-1) !important;
+}
+
+.yt-transcript-text {
+  color: #e5e5ea !important;
+}
