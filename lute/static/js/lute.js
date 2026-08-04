@@ -429,7 +429,17 @@ let get_selected_in_range = function(start_el, end_el) {
   let tmp_end = _get_order(end_el);
   // Javascript sorts numbers as strings.  wtf.
   const [startord, endord] = [tmp_start, tmp_end].sort((a, b) => a - b);
-  const selected = $('span.textitem').filter(function() {
+  // Scope the search to the same container as the start element.
+  // YouTube book pages render two independent sets of textitem spans
+  // on the same page -- #thetext (the main reading text) and
+  // #yt-scrolling-subtitle-inner (the scrolling subtitle) -- that share
+  // the same data-order values because both are tokenized from the
+  // same cue text.  Without scoping, a drag-selection in one area
+  // picks up duplicate spans from the other, causing the created
+  // multiword term's text to be doubled (e.g. "取って取って").
+  const container = start_el.closest('#thetext, #yt-scrolling-subtitle-inner');
+  const search_root = container.length ? container : $(document);
+  const selected = search_root.find('span.textitem').filter(function() {
     const ord = _get_order($(this));
     return ord >= startord && ord <= endord;
   });

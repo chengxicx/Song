@@ -216,6 +216,11 @@
     // If the word HTML hasn't been loaded yet (WORDS is empty), fall
     // back to the plain cue text so the user sees something immediately.
     if (ytSubtitle) {
+      // Clear any in-progress drag-selection: the old word spans are
+      // about to be replaced, so selection_start_el would point to a
+      // detached element.
+      if (typeof clear_newmultiterm_elements === "function")
+        clear_newmultiterm_elements();
       var html = WORDS[idx];
       if (!html) {
         var cue = CUES[idx];
@@ -262,6 +267,8 @@
       rows[r].classList.remove("active");
     }
     if (ytSubtitle) {
+      if (typeof clear_newmultiterm_elements === "function")
+        clear_newmultiterm_elements();
       ytSubtitle.innerHTML = "";
       ytMarqueeOverflow = 0;
     }
@@ -502,10 +509,23 @@
     var t = $(ytSubtitle);
     if (typeof word_clicked !== "function") return;
 
-    t.on("click", ".word", function (e) {
-      e.stopPropagation();
-      word_clicked($(this), e);
-    });
+    // Bind the same interaction model as the main text (#thetext) so
+    // the subtitle supports both single-word clicks and drag-select
+    // multiword term creation.  select_ended() handles the single-
+    // click case (same start/end element) by calling word_clicked,
+    // so no separate "click" handler is needed.
+    if (typeof _isUserUsingMobile === "function" && _isUserUsingMobile()) {
+      // Mobile: long-press to start/end a multiword selection.
+      t.on("touchstart", ".word", touch_started);
+      t.on("touchend", ".word", touch_ended);
+    } else {
+      // Desktop: mouse drag to select a range.
+      t.on("mousedown", ".word", handle_select_started);
+      t.on("mouseover", ".word", handle_select_over);
+      t.on("mouseup", ".word", handle_select_ended);
+      t.on("mouseover", ".word", hover_over);
+      t.on("mouseout", ".word", hover_out);
+    }
 
     // Status colors are always applied (see ytApplySubtitleStatusColors),
     // so we do NOT bind the hover-based add/remove that the main text
