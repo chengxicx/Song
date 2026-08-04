@@ -649,13 +649,17 @@
             var row = ytTranscriptList.querySelector("#yt-transcript-row-" + idx);
             console.log("[YouTube Player] row:", row, "idx:", idx, "CUES length:", CUES.length);
             if (row) {
-                  var target =
-                    row.offsetTop - containerHeight / 2 +
-                    row.offsetHeight / 2;
+                  // offsetTop is relative to offsetParent (BODY when
+                  // the list has position:static), so use
+                  // getBoundingClientRect to get the row's position
+                  // within the scrollable list instead.
+                  var rowRect = row.getBoundingClientRect();
+                  var listRect = ytTranscriptList.getBoundingClientRect();
+                  var rowTopInList = rowRect.top - listRect.top + ytTranscriptList.scrollTop;
+                  var target = rowTopInList - containerHeight / 2 + rowRect.height / 2;
                   // Clamp target to valid scroll range
                   target = Math.max(0, Math.min(target, ytTranscriptList.scrollHeight - containerHeight));
                   ytTranscriptList.scrollTop = target;
-                  console.log("[YouTube Player] scrollTop set to", target, "(row.offsetTop:", row.offsetTop, "containerHeight:", containerHeight + ")");
             } else if (attempt < 3) {
               // Row not found yet — retry after 100ms
               console.log("[YouTube Player] row not found, retrying...");
