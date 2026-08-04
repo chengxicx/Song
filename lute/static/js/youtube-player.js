@@ -89,10 +89,12 @@
   function LuteAudioPlayer(audioEl, handlers) {
     var ready = false;
     var fakeState = PS.PAUSED;
+    var pollTimer = null;
 
     function fireReady() {
       if (ready) return;
       ready = true;
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
       if (typeof handlers.onReady === "function") handlers.onReady();
     }
 
@@ -101,25 +103,57 @@
       if (typeof handlers.onStateChange === "function") handlers.onStateChange({ data: s });
     }
 
+    function checkReady() {
+      if (ready) {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        return;
+      }
+      // readyState >= 1 means HAVE_METADATA (duration is available).
+      if ((isFinite(audioEl.duration) && audioEl.duration > 0) || audioEl.readyState >= 1) {
+        fireReady();
+      }
+    }
+
     audioEl.addEventListener("loadedmetadata", fireReady);
     audioEl.addEventListener("durationchange", fireReady);
-    audioEl.addEventListener("play", function () { fireStateChange(PS.PLAYING); });
+    audioEl.addEventListener("play", function () {
+      // If somehow onReady hasn't fired when the user plays, fire it now.
+      checkReady();
+      fireStateChange(PS.PLAYING);
+    });
     audioEl.addEventListener("pause", function () { fireStateChange(PS.PAUSED); });
     audioEl.addEventListener("ended", function () { fireStateChange(PS.ENDED); });
+    audioEl.addEventListener("canplay", fireReady);
     audioEl.addEventListener("error", function () {
       if (typeof handlers.onError === "function") handlers.onError();
     });
 
     return {
       // The audio element might already have its metadata cached; in
-      // that case loadedmetadata won't fire again, so check on init.
+      // that case loadedmetadata won't fire again, so check on init
+      // and keep polling for a short while to be safe.
       _maybeFireReady: function () {
-        if (!ready && isFinite(audioEl.duration) && audioEl.duration > 0) {
-          fireReady();
+        checkReady();
+        if (!ready && !pollTimer) {
+          // Poll up to ~5 seconds (250ms * 20) to catch slow metadata loads.
+          var attempts = 0;
+          pollTimer = setInterval(function () {
+            attempts += 1;
+            checkReady();
+            if (ready || attempts >= 20) {
+              if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+            }
+          }, 250);
         }
       },
       load: function () { audioEl.load(); },
-      playVideo: function () { var p = audioEl.play(); if (p && p.catch) p.catch(function () {}); },
+      playVideo: function () {
+        // Before playing, be sure onReady has fired (it initializes
+        // the timeline max, duration display, and starts ytPoll).
+        checkReady();
+        var p = audioEl.play();
+        if (p && p.catch) p.catch(function () {});
+      },
       pauseVideo: function () { audioEl.pause(); },
       getCurrentTime: function () { return audioEl.currentTime || 0; },
       getDuration: function () { return audioEl.duration || 0; },
@@ -586,15 +620,26 @@
             console.log("[YouTube Player] containerHeight after reflow:", containerHeight);
 
             var idx = ytCueIndex;
-            // Only infer idx from currentTime if we're playing or have a valid current time
-            // If ytPlaying is false and currentTime is 0, we can't determine which cue should be shown
-            if (idx < 0 && ytPlaying && ytPlayer) {
-              var t = ytPlayer.getCurrentTime() || 0;
-              console.log("[YouTube Player] ytCueIndex < 0 but ytPlaying is true, currentTime:", t, "CUES length:", CUES.length);
-              for (var k = CUES.length - 1; k >= 0; k--) {
-                if ((CUES[k].start || 0) <= t) {
-                  idx = k;
-                  break;
+            // If no cue is active yet, infer from the best available position:
+            //   1. If audio element exists, use its currentTime (could be set via START_POS seek)
+            //   2. Otherwise fall back to START_POS (saved playback position from last visit)
+            if (idx < 0) {
+              var t = 0;
+              if (ytPlayer && typeof ytPlayer.getCurrentTime === "function") {
+                t = ytPlayer.getCurrentTime() || 0;
+              }
+              // If player reports t=0 (freshly loaded or haven't seeked yet),
+              // try the saved START_POS since the user may be returning.
+              if (t <= 0 && START_POS > 0) {
+                t = START_POS;
+              }
+              if (t > 0) {
+                console.log("[YouTube Player] ytCueIndex < 0, inferring idx from position t=", t, "CUES length:", CUES.length);
+                for (var k = CUES.length - 1; k >= 0; k--) {
+                  if ((CUES[k].start || 0) <= t) {
+                    idx = k;
+                    break;
+                  }
                 }
               }
               if (idx < 0) idx = 0;
