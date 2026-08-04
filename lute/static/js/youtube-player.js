@@ -118,6 +118,7 @@
           fireReady();
         }
       },
+      load: function () { audioEl.load(); },
       playVideo: function () { var p = audioEl.play(); if (p && p.catch) p.catch(function () {}); },
       pauseVideo: function () { audioEl.pause(); },
       getCurrentTime: function () { return audioEl.currentTime || 0; },
@@ -426,7 +427,18 @@
   /* ------------------------------------------------------------------ */
 
   function ytTogglePlay() {
-    if (!ytPlayerReady || !ytPlayer) return;
+    if (!ytPlayer) return;
+    // For the audio backend, allow playback even before ytPlayerReady is
+    // set (loadedmetadata may not fire until play/load is called).  This
+    // breaks the deadlock where the user clicks play but nothing happens
+    // because the metadata hasn't loaded yet.
+    if (!ytPlayerReady) {
+      if (USE_AUDIO_BACKEND) {
+        try { if (typeof ytPlayer.load === "function") ytPlayer.load(); } catch (e) { /* ignore */ }
+      } else {
+        return;
+      }
+    }
     if (ytPlaying) ytPlayer.pauseVideo();
     else ytPlayer.playVideo();
   }
@@ -664,7 +676,7 @@
 
   function bindKeys() {
     window.addEventListener("keydown", function (e) {
-      if (e.code === "Space" && !ytPlayerReady) return;
+      if (e.code === "Space" && !ytPlayerReady && !USE_AUDIO_BACKEND) return;
       if (e.code === "Space" &&
           e.target &&
           (e.target.tagName === "INPUT" ||
@@ -674,7 +686,7 @@
       }
       if (e.code === "Space") {
         e.preventDefault();
-        if (ytPlayerReady) ytTogglePlay();
+        if (ytPlayer) ytTogglePlay();
       }
     });
   }
