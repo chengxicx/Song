@@ -594,15 +594,12 @@
             var row = ytTranscriptList.querySelector("#yt-transcript-row-" + idx);
             console.log("[YouTube Player] row:", row, "idx:", idx, "CUES length:", CUES.length);
             if (row) {
-              var target =
-                row.offsetTop - containerHeight / 2 +
-                row.offsetHeight / 2;
               console.log("[YouTube Player] row.offsetTop:", row.offsetTop, "containerHeight:", containerHeight, "row.offsetHeight:", row.offsetHeight, "target:", target);
-              ytTranscriptList.scrollTo({
-                top: Math.max(0, target),
-                behavior: "smooth",
-              });
-              console.log("[YouTube Player] scrollTo called");
+              // Use scrollIntoView with block: center for more reliable scrolling.
+              // This method automatically calculates the correct scroll position
+              // based on the element's position relative to the viewport.
+              row.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+              console.log("[YouTube Player] scrollIntoView called with block: center");
             } else if (attempt < 3) {
               // Row not found yet — retry after 100ms
               console.log("[YouTube Player] row not found, retrying...");
