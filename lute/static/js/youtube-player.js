@@ -666,6 +666,13 @@
               console.warn("[YouTube Player] Failed to find row #" + idx + " after 3 attempts, CUES length:", CUES.length);
             }
           };
+          // Wait for layout to settle after display:none -> block,
+          // then scroll the active row into view.
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              tryScroll(0);
+            });
+          });
         }  // close else
       });  // close addEventListener
     }  // close if (ytTranscriptBtn)
