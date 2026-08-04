@@ -52,8 +52,8 @@
   <label for="youtube_url">YouTube video URL:</label>
   <input type="text" id="youtube_url" name="youtube_url" class="form-text" style="width:75%;" placeholder="https://www.youtube.com/watch?v=..."><br><br>
 
-  <label for="youtube_tag">Tag:</label>
-  <input type="text" id="youtube_tag" name="youtube_tag" class="form-text" value="youtube"><br><br>
+  <label for="youtube_tag">Tags:</label>
+  <input type="text" id="youtube_tag" name="youtube_tag" class="form-control" value='[{"value":"youtube"}]'><br><br>
 
   <label for="srt_file">Subtitle file (SRT / VTT):</label>
   <input type="file" id="srt_file" name="srt_file" accept=".srt,.vtt"><br><br>
@@ -93,8 +93,8 @@
   <label for="mp3_srt_file">Subtitle file (SRT / VTT):</label>
   <input type="file" id="mp3_srt_file" name="srt_file" accept=".srt,.vtt" required><br><br>
 
-  <label for="mp3_tag">Tag:</label>
-  <input type="text" id="mp3_tag" name="mp3_tag" class="form-text" value="mp3"><br><br>
+  <label for="mp3_tag">Tags:</label>
+  <input type="text" id="mp3_tag" name="mp3_tag" class="form-control" value='[{"value":"mp3"}]'><br><br>
 
   <label>
     <input type="checkbox" id="mp3_resplit_sentences" name="resplit_sentences">
@@ -109,11 +109,29 @@
 </form>
 
 <script type="text/javascript">
+  var EXISTING_TAGS = {{ existing_tags | tojson }};
+
+  // Shared Tagify config for the youtube / mp3 tag inputs.
+  function setupTagsTagify(input) {
+    return new Tagify(input, {
+      placeholder: 'Tags (press Enter or comma to add)',
+      editTags: true,
+      autoComplete: { rightKey: true, tabKey: true },
+      dropdown: { enabled: 1 },
+      enforceWhitelist: false,
+      whitelist: EXISTING_TAGS
+    });
+  }
+
   $(document).ready(function () {
     const typeSel = $('#import_type');
     const webpageForm = $('#webpage-form');
     const youtubeForm = $('#youtube-form');
     const mp3Form = $('#mp3-form');
+
+    // Init Tagify on both tag inputs.
+    var ytTagify = setupTagsTagify(document.getElementById('youtube_tag'));
+    var mp3Tagify = setupTagsTagify(document.getElementById('mp3_tag'));
 
     const updateForms = function () {
       const t = typeSel.val();

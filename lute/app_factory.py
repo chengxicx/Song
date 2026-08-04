@@ -331,6 +331,10 @@ def _create_app(app_config, extra_config):
         # ref https://stackoverflow.com/questions/5207160/
         #   what-is-a-csrf-token-what-is-its-importance-and-how-does-it-work
         "WTF_CSRF_ENABLED": False,
+        # Allow large uploads (MP3 audio + subtitle files for youtube/mp3
+        # book imports).  200 MB matches the Nginx client_max_body_size
+        # on the production server.
+        "MAX_CONTENT_LENGTH": 200 * 1024 * 1024,
     }
 
     final_config = {**config, **extra_config}
