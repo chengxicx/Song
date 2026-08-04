@@ -442,13 +442,21 @@
     // because the metadata hasn't loaded yet.
     if (!ytPlayerReady) {
       if (USE_AUDIO_BACKEND) {
-        try { if (typeof ytPlayer.load === "function") ytPlayer.load(); } catch (e) { /* ignore */ }
+        try {
+          if (typeof ytPlayer.load === "function") ytPlayer.load();
+          // For audio backend, load() triggers loadedmetadata which sets ytPlayerReady to true
+          // Once ready, we can play immediately
+          if (typeof ytPlayer.playVideo === "function") {
+            ytPlayer.playVideo();
+          }
+        } catch (e) { /* ignore */ }
       } else {
         return;
       }
+    } else {
+      if (ytPlaying) ytPlayer.pauseVideo();
+      else ytPlayer.playVideo();
     }
-    if (ytPlaying) ytPlayer.pauseVideo();
-    else ytPlayer.playVideo();
   }
 
   function ytUpdatePlayBtn() {
@@ -564,7 +572,7 @@
           //   3) Retry up to 3 times over 500ms to handle slow DOM rendering.
           //   4) Log a debug message if scrolling fails so we can investigate.
           var tryScroll = function (attempt) {
-            console.log("[YouTube Player] tryScroll attempt", attempt, "ytCueIndex:", ytCueIndex);
+            console.log("[YouTube Player] tryScroll attempt", attempt, "ytCueIndex:", ytCueIndex, "ytPlaying:", ytPlaying);
             if (!ytTranscriptList) {
               console.warn("[YouTube Player] ytTranscriptList not found on attempt", attempt);
               return;
@@ -576,11 +584,13 @@
             void ytTranscriptList.offsetHeight; // Trigger reflow
             containerHeight = ytTranscriptList.clientHeight;
             console.log("[YouTube Player] containerHeight after reflow:", containerHeight);
-            
+
             var idx = ytCueIndex;
-            if (idx < 0 && ytPlayer) {
+            // Only infer idx from currentTime if we're playing or have a valid current time
+            // If ytPlaying is false and currentTime is 0, we can't determine which cue should be shown
+            if (idx < 0 && ytPlaying && ytPlayer) {
               var t = ytPlayer.getCurrentTime() || 0;
-              console.log("[YouTube Player] ytCueIndex < 0, currentTime:", t, "CUES length:", CUES.length);
+              console.log("[YouTube Player] ytCueIndex < 0 but ytPlaying is true, currentTime:", t, "CUES length:", CUES.length);
               for (var k = CUES.length - 1; k >= 0; k--) {
                 if ((CUES[k].start || 0) <= t) {
                   idx = k;
