@@ -461,6 +461,14 @@
   overflow: hidden;
 }
 
+/* MP3 audio book: the <audio> element has no controls attribute and
+   is invisible; this wrap collapses to zero height so the player UI
+   (controls + scrolling subtitle) shows up just like the YouTube
+   variant, minus the video area. */
+.yt-player-audio-wrap {
+  display: none;
+}
+
 .yt-player-video-wrap #yt-player {
   position: absolute;
   inset: 0;

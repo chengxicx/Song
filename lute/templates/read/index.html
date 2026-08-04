@@ -5,7 +5,7 @@
 {% block body %}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}" charset="utf-8" defer></script>
-{% if book_type == "youtube" %}
+{% if book_type in ("youtube", "mp3") %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}" charset="utf-8" defer></script>
 {% endif %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}" charset="utf-8" defer></script>
@@ -17,7 +17,7 @@
   <pre>
     lang_is_rtl: <input id="lang_is_rtl" value="{{ is_rtl }}">
     book_id: <input id="book_id" value="{{ book.id }}">
-    book_audio: <input id="book_audio_file" value="{{ book.audio_filename or '' }}">
+    book_audio: <input id="book_audio_file" value="{% if book_type not in ('youtube', 'mp3') %}{{ book.audio_filename or '' }}{% endif %}">
     book_audio_current_pos: <input id="book_audio_current_pos" value="{{ book.audio_current_pos or 0 }}">
     book_audio_bookmarks: <input id="book_audio_bookmarks" value="{{ book.audio_bookmarks or '' }}">
     page_num: <input id="page_num" value="{{ page_num }}">
@@ -96,7 +96,7 @@
 
   {% include "read/audio_player.html" %}
 
-  {% if book_type == "youtube" %}
+  {% if book_type in ("youtube", "mp3") %}
   {% include "read/youtube_player.html" %}
   {% endif %}
 

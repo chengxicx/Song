@@ -69,7 +69,7 @@ def _subtitle_words_html(book):
     subtitle changes produce a fresh render (see
     _yt_subtitle_words_cache).
     """
-    if (book.book_type or "") != "youtube":
+    if (book.book_type or "") not in ("youtube", "mp3"):
         return []
     cache_key = (book.id, book.srt_data)
     cached = _yt_subtitle_words_cache.get(cache_key)
@@ -148,7 +148,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
     if book_type == "youtube":
         yt_video_id = youtube_video_id(book.source_uri)
     srt_cues = []
-    if book_type == "youtube":
+    if book_type in ("youtube", "mp3"):
         srt_cues = list(book.cues)
         for c in srt_cues:
             c["start_str"] = _fmt_seconds(c.get("start", 0))
@@ -157,6 +157,12 @@ def _render_book_page(book, pagenum, track_page_open=True):
         # (/read/youtube_subtitle_words/<id>) to avoid blocking the
         # initial page render — tokenizing all cues can take 10-20s
         # for long videos.
+
+    # MP3 books stream the uploaded audio through the same useraudio
+    # endpoint as the regular audio player.
+    mp3_audio_url = None
+    if book_type == "mp3" and book.audio_filename:
+        mp3_audio_url = f"/useraudio/stream/{book.id}"
 
     return render_template(
         "read/index.html",
@@ -174,6 +180,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         term_dicts=term_dicts,
         book_type=book_type,
         youtube_video_id=yt_video_id,
+        mp3_audio_url=mp3_audio_url,
         srt_cues=srt_cues,
         srt_cues_json=book.srt_data or "[]",
         srt_words_json="[]",
