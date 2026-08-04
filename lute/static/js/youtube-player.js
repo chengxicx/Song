@@ -558,13 +558,36 @@
           ytTranscript.style.display = "block";
           ytTranscriptBtn.classList.add("on");
           // Center the current line when the panel is opened.
-          // Defer one frame so the container has a layout before we
-          // measure clientHeight / offsetTop (the display:block change
-          // above changed the geometry mid-task).
+          // We need TWO frames of delay here because:
+          //   1) The container just switched from display:none -> block,
+          //      so in the same task clientHeight is still 0.
+          //   2) A single requestAnimationFrame is NOT sufficient — in
+          //      Chromium/WebKit the layout pass for block change runs
+          //      AFTER the first rAF callback fires, so we still read 0
+          //      for clientHeight / offsetTop.
+          // Double-rAF (nesting) pushes the measurement past the next
+          // style recalc, so the geometry values are guaranteed fresh.
           window.requestAnimationFrame(function () {
-            if (ytCueIndex >= 0 && ytTranscriptList) {
+            window.requestAnimationFrame(function () {
+              if (!ytTranscriptList) return;
+              // If no cue has been activated yet (ytCueIndex < 0) try
+              // to infer the "current" line from the actual playback
+              // time; otherwise fall back to row 0 so the user at
+              // least sees something focused when they open the panel.
+              var idx = ytCueIndex;
+              if (idx < 0 && ytPlayer) {
+                var t = ytPlayer.getCurrentTime() || 0;
+                for (var k = CUES.length - 1; k >= 0; k--) {
+                  if ((CUES[k].start || 0) <= t) {
+                    idx = k;
+                    break;
+                  }
+                }
+                if (idx < 0) idx = 0;
+              }
+              if (idx < 0) idx = 0;
               var row = ytTranscriptList.querySelector(
-                "#yt-transcript-row-" + ytCueIndex
+                "#yt-transcript-row-" + idx
               );
               if (row) {
                 var target =
@@ -575,7 +598,7 @@
                   behavior: "smooth",
                 });
               }
-            }
+            });
           });
         }
       });

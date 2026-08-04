@@ -736,7 +736,7 @@
   overflow: hidden;
   min-height: 3.4rem;
   display: flex;
-  align-items: stretch;
+  align-items: center;
   justify-content: stretch;
 }
 
@@ -752,10 +752,10 @@
   overflow-y: auto;
   width: 100%;
   flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  /* IMPORTANT: keep inline layout here. A flex column layout would
+     stack <span class="word"> blocks vertically (竖排). Inline flow
+     lets them wrap horizontally like normal text. */
+  display: block;
   /* Prevent a visual "jump" when lazy-loaded word spans (with
      different white-space behavior) replace the initial plain-text
      cue during playback start. */
@@ -766,18 +766,17 @@
 #yt-scrolling-subtitle-inner:empty::before {
   content: "—";
   color: #bcccdc;
-}
-
-#yt-scrolling-subtitle-inner > * {
-  /* All inline content (plain text or .word spans) inherits the
-     subtitle font size so switching between plain-text fallback and
-     tokenized HTML does not change the visual size. */
-  font-size: inherit;
-  line-height: inherit;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
 }
 
 #yt-scrolling-subtitle-inner .word {
   cursor: pointer;
+  /* Explicitly set inline to guard against any CSS that may try to
+     turn .word spans into block elements on this page, which would
+     cause 竖排 (vertical stacking). */
+  display: inline;
   font-size: inherit;
   line-height: inherit;
 }
