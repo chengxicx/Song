@@ -10,6 +10,7 @@
   <select id="import_type" name="import_type" class="form-control" style="width: auto;">
     <option value="webpage" selected>Web page</option>
     <option value="youtube">YouTube video</option>
+    <option value="mp3">MP3 audio</option>
   </select>
 </div>
 
@@ -69,20 +70,73 @@
   <input type="submit" id="youtube-import" value="Import">
 </form>
 
+<form id="mp3-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
+  <p>Import an MP3 audio file with its subtitle (SRT / VTT) file. The subtitles
+  become the book text, so you can read and look up words while the audio plays.</p>
+
+  <br />
+
+  <label for="mp3-language">Language (used for subtitle parsing):</label>
+  <select id="mp3-language" name="language_id" class="form-control" style="width: auto;">
+    {% for id, name in language_choices %}
+    <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+    {% endfor %}
+  </select>
+  <br /><br />
+
+  <label for="mp3_title">Title:</label>
+  <input type="text" id="mp3_title" name="mp3_title" class="form-text" style="width:75%;" placeholder="Leave blank to use the MP3 file name"><br><br>
+
+  <label for="mp3_file">MP3 audio file:</label>
+  <input type="file" id="mp3_file" name="mp3_file" accept=".mp3" required><br><br>
+
+  <label for="mp3_srt_file">Subtitle file (SRT / VTT):</label>
+  <input type="file" id="mp3_srt_file" name="srt_file" accept=".srt,.vtt" required><br><br>
+
+  <label for="mp3_tag">Tag:</label>
+  <input type="text" id="mp3_tag" name="mp3_tag" class="form-text" value="mp3"><br><br>
+
+  <label>
+    <input type="checkbox" id="mp3_resplit_sentences" name="resplit_sentences">
+    Re-split subtitles into sentences (Japanese)
+  </label>
+  <br>
+  <span class="formfieldcomment">Merge/split subtitle cues into sentence units (recommended for Japanese). Off by default.</span>
+  <br><br>
+
+  <input type="hidden" name="import_type" value="mp3">
+  <input type="submit" id="mp3-import" value="Import">
+</form>
+
 <script type="text/javascript">
   $(document).ready(function () {
     const typeSel = $('#import_type');
     const webpageForm = $('#webpage-form');
     const youtubeForm = $('#youtube-form');
+    const mp3Form = $('#mp3-form');
 
     const updateForms = function () {
-      const isYoutube = typeSel.val() === 'youtube';
-      webpageForm.toggle(!isYoutube);
-      youtubeForm.toggle(isYoutube);
+      const t = typeSel.val();
+      webpageForm.toggle(t === 'webpage');
+      youtubeForm.toggle(t === 'youtube');
+      mp3Form.toggle(t === 'mp3');
     };
 
     typeSel.on('change', updateForms);
     updateForms();
+
+    // Auto-fill the title from the MP3 file name if the title field is empty.
+    const getFilenameWithoutExtension = function (filename) {
+      return filename.split('.').slice(0, -1).join('.');
+    };
+    $('#mp3_file').on('change', function () {
+      var f = $(this).prop('files')[0];
+      if (!f) return;
+      var titleField = $('#mp3_title');
+      if (titleField.val() === '') {
+        titleField.val(getFilenameWithoutExtension(f.name));
+      }
+    });
   });
 </script>
 

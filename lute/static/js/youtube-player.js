@@ -1,26 +1,41 @@
-/* YouTube video player for lute reading pages (book_type == "youtube").
+/* Media player for lute reading pages (book_type == "youtube" or "mp3").
+
+   Supports two backends that share the same UI (controls, scrolling
+   subtitle, transcript panel):
+   - YouTube IFrame API player, for book_type == "youtube"
+   - HTML5 <audio> element, for book_type == "mp3"
 
    Provides:
    - play/pause, seek timeline, playback rate controls
    - single-sentence loop and auto-pause-at-end-of-sentence
-   - a single-line scrolling subtitle synced to the video, whose words
+   - a single-line scrolling subtitle synced to the media, whose words
      reuse the reading-page tokenization and click-to-lookup behavior
    - a Transcript panel with bidirectional control:
-       video -> transcript: highlight + smooth-center the current line
-       transcript -> video: clicking a line/timestamp seeks to its start
+       media -> transcript: highlight + smooth-center the current line
+       transcript -> media: clicking a line/timestamp seeks to its start
 
-   Data (videoId, cues, words, ...) is injected by
+   Data (videoId / audioUrl, cues, words, ...) is injected by
    templates/read/youtube_player.html via window.LUTE_YT_DATA.
 */
 
 (function () {
   "use strict";
 
+  // Mirror of window.YT.PlayerState, used by the HTML5 audio backend
+  // when the YouTube IFrame API script is not loaded (MP3 books).
+  var PS = window.YT && window.YT.PlayerState
+    ? window.YT.PlayerState
+    : { UNSTARTED: -1, ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3, CUED: 5 };
+
   var YT_DATA = window.LUTE_YT_DATA || {};
   var CUES = Array.isArray(YT_DATA.cues) ? YT_DATA.cues : [];
   var WORDS = Array.isArray(YT_DATA.words) ? YT_DATA.words : [];
   var BOOK_ID = YT_DATA.bookId;
   var START_POS = parseFloat(YT_DATA.startPos) || 0;
+
+  // True when this is an MP3 audio book (no YouTube video id).  The
+  // player backend is selected based on this flag.
+  var USE_AUDIO_BACKEND = !YT_DATA.videoId && !!YT_DATA.audioUrl;
 
   var ytPlayer = null;
   var ytPlayerReady = false;
@@ -65,11 +80,76 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Backend abstraction                                                 */
+  /* ------------------------------------------------------------------ */
+
+  // Wrap an HTML5 <audio> element to look like a YT.Player instance,
+  // so the rest of this file (which was written for the YT IFrame API)
+  // can drive an MP3 audio book unchanged.
+  function LuteAudioPlayer(audioEl, handlers) {
+    var ready = false;
+    var fakeState = PS.PAUSED;
+
+    function fireReady() {
+      if (ready) return;
+      ready = true;
+      if (typeof handlers.onReady === "function") handlers.onReady();
+    }
+
+    function fireStateChange(s) {
+      fakeState = s;
+      if (typeof handlers.onStateChange === "function") handlers.onStateChange({ data: s });
+    }
+
+    audioEl.addEventListener("loadedmetadata", fireReady);
+    audioEl.addEventListener("durationchange", fireReady);
+    audioEl.addEventListener("play", function () { fireStateChange(PS.PLAYING); });
+    audioEl.addEventListener("pause", function () { fireStateChange(PS.PAUSED); });
+    audioEl.addEventListener("ended", function () { fireStateChange(PS.ENDED); });
+    audioEl.addEventListener("error", function () {
+      if (typeof handlers.onError === "function") handlers.onError();
+    });
+
+    return {
+      // The audio element might already have its metadata cached; in
+      // that case loadedmetadata won't fire again, so check on init.
+      _maybeFireReady: function () {
+        if (!ready && isFinite(audioEl.duration) && audioEl.duration > 0) {
+          fireReady();
+        }
+      },
+      playVideo: function () { var p = audioEl.play(); if (p && p.catch) p.catch(function () {}); },
+      pauseVideo: function () { audioEl.pause(); },
+      getCurrentTime: function () { return audioEl.currentTime || 0; },
+      getDuration: function () { return audioEl.duration || 0; },
+      seekTo: function (t) { try { audioEl.currentTime = t; } catch (e) { /* ignore */ } },
+      getPlaybackRate: function () { return audioEl.playbackRate || 1; },
+      setPlaybackRate: function (r) { try { audioEl.playbackRate = r; } catch (e) { /* ignore */ } },
+      getPlayerState: function () { return fakeState; },
+    };
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Player creation                                                    */
   /* ------------------------------------------------------------------ */
 
   function createYoutubePlayer() {
-    if (!window.YT || !window.YT.Player || ytPlayer) return;
+    if (ytPlayer) return;
+    if (USE_AUDIO_BACKEND) {
+      var audioEl = document.getElementById("yt-audio-player");
+      if (!audioEl) return;
+      ytPlayer = LuteAudioPlayer(audioEl, {
+        onReady: ytOnReady,
+        onStateChange: ytOnStateChange,
+        onError: ytOnError,
+      });
+      // Some browsers cache metadata for fast loads; ensure onReady
+      // fires in that case too.
+      ytPlayer._maybeFireReady();
+      return;
+    }
+
+    if (!window.YT || !window.YT.Player) return;
     if (!YT_DATA.videoId) {
       if (ytLoading) {
         ytLoading.textContent =
@@ -109,16 +189,16 @@
   }
 
   function ytOnStateChange(event) {
-    ytPlaying = event.data === window.YT.PlayerState.PLAYING;
+    ytPlaying = event.data === PS.PLAYING;
     ytUpdatePlayBtn();
-    if (event.data === window.YT.PlayerState.PLAYING) {
+    if (event.data === PS.PLAYING) {
       // The API resets the rate on (re)load; restore our setting.
       try {
         if (Math.abs(ytPlayer.getPlaybackRate() - ytRate) > 0.01)
           ytPlayer.setPlaybackRate(ytRate);
       } catch (e) { /* ignore */ }
     }
-    if (event.data === window.YT.PlayerState.PAUSED) {
+    if (event.data === PS.PAUSED) {
       ytSavePosition();
     }
   }
@@ -126,7 +206,10 @@
   function ytOnError() {
     if (ytLoading) {
       ytLoading.textContent =
-        "Unable to play this video. The transcript below is still available.";
+        USE_AUDIO_BACKEND
+          ? "Unable to play this audio file. The transcript below is still available."
+          : "Unable to play this video. The transcript below is still available.";
+      ytLoading.style.display = "block";
     }
   }
 
@@ -151,7 +234,7 @@
     }
     ytCurTimeEl.textContent = ytFmtTime(t);
 
-    // Video -> transcript/subtitle: find the active cue.
+    // Media -> transcript/subtitle: find the active cue.
     var idx = -1;
     for (var i = 0; i < CUES.length; i++) {
       if (t >= CUES[i].start && t < CUES[i].end) {
@@ -313,7 +396,7 @@
     });
   }
 
-  // Transcript -> video: jump the playhead to the cue start.
+  // Transcript -> media: jump the playhead to the cue start.
   function ytSeekToCue(i, autoplay) {
     if (!ytPlayerReady || !ytPlayer || !CUES[i]) return;
     var cue = CUES[i];
@@ -323,7 +406,7 @@
     // When jumping from the transcript list, resume playback;
     // for prev/next buttons keep the current play state so the user
     // can scrub through subtitles without forcing play.
-    if (autoplay && ytPlayer.getPlayerState() !== window.YT.PlayerState.PLAYING) {
+    if (autoplay && ytPlayer.getPlayerState() !== PS.PLAYING) {
       ytPlayer.playVideo();
     }
   }
@@ -419,7 +502,7 @@
       ytLoopBtn.addEventListener("click", function () {
         ytLoop = !ytLoop;
         ytLoopBtn.classList.toggle("on", ytLoop);
-        // "Press loop to keep looping": if the video is currently
+        // "Press loop to keep looping": if the media is currently
         // paused (e.g. auto-paused at the end of a sentence), turning
         // the loop on resumes playback so the sentence starts looping
         // immediately.  Turning it off does not pause.
@@ -473,7 +556,8 @@
 
   // Fullscreen the video wrapper (more reliable than the iframe,
   // which needs its own allowfullscreen attribute). The iframe fills
-  // the wrapper, so the video scales up correctly.
+  // the wrapper, so the video scales up correctly.  Only used for
+  // YouTube books -- the fullscreen button isn't rendered for MP3.
   function ytToggleFullscreen() {
     var el = ytVideoWrap || ytContainer;
     if (!el) return;
@@ -603,23 +687,31 @@
     bindKeys();
     ytLoadSubtitleWords();
 
-    // Create the player when the IFrame API is ready.
-    var create = function () { createYoutubePlayer(); };
-    if (window.YT_IS_READY) {
-      create();
-    } else if (window.YT_READY_CALLBACKS) {
-      window.YT_READY_CALLBACKS.push(create);
+    // Create the player immediately for the audio backend (the
+    // <audio> element is already in the DOM); for YouTube, wait for
+    // the IFrame API to be ready.
+    if (USE_AUDIO_BACKEND) {
+      createYoutubePlayer();
     } else {
-      // The api script hasn't defined the callback (e.g. blocked);
-      // try once more after a delay.
-      window.setTimeout(create, 1500);
+      var create = function () { createYoutubePlayer(); };
+      if (window.YT_IS_READY) {
+        create();
+      } else if (window.YT_READY_CALLBACKS) {
+        window.YT_READY_CALLBACKS.push(create);
+      } else {
+        // The api script hasn't defined the callback (e.g. blocked);
+        // try once more after a delay.
+        window.setTimeout(create, 1500);
+      }
     }
 
     // Fallback message if the player never becomes ready.
     window.setTimeout(function () {
       if (ytLoading && !ytPlayerReady) {
-        ytLoading.textContent =
-          "Unable to load the YouTube player. The transcript below is still available.";
+        ytLoading.textContent = USE_AUDIO_BACKEND
+          ? "Unable to load the audio player. The transcript below is still available."
+          : "Unable to load the YouTube player. The transcript below is still available.";
+        ytLoading.style.display = "block";
       }
     }, 15000);
 

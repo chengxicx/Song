@@ -2,6 +2,7 @@
   <script type="text/javascript">
     window.LUTE_YT_DATA = window.LUTE_YT_DATA || {};
     window.LUTE_YT_DATA.videoId = {{ youtube_video_id | tojson }};
+    window.LUTE_YT_DATA.audioUrl = {{ mp3_audio_url | tojson }};
     window.LUTE_YT_DATA.cues = {{ srt_cues_json | safe }};
     window.LUTE_YT_DATA.words = {{ srt_words_json | safe }};
     window.LUTE_YT_DATA.bookId = {{ book.id }};
@@ -10,6 +11,8 @@
 
     // Define the IFrame API callback before the api script loads, and
     // queue any callbacks registered after it has already loaded.
+    // Only used for YouTube books; for MP3 books the api script is not
+    // loaded at all.
     window.YT_READY_CALLBACKS = window.YT_READY_CALLBACKS || [];
     window.onYouTubeIframeAPIReady = function () {
       window.YT_IS_READY = true;
@@ -19,12 +22,20 @@
       window.YT_READY_CALLBACKS = [];
     };
   </script>
+  {% if book_type == "youtube" %}
   <script type="text/javascript" src="https://www.youtube.com/iframe_api" async></script>
 
   <div class="yt-player-video-wrap">
     <div id="yt-player"></div>
     <div class="yt-player-loading" id="yt-player-loading">Loading player...</div>
   </div>
+  {% else %}
+  {# MP3 audio book: render an HTML5 audio element instead of the YouTube iframe. #}
+  <div class="yt-player-audio-wrap">
+    <audio id="yt-audio-player" preload="metadata" src="{{ mp3_audio_url or '' }}"></audio>
+    <div class="yt-player-loading" id="yt-player-loading" style="display: none;">Loading audio...</div>
+  </div>
+  {% endif %}
 
   <div class="yt-player-controls">
     <div class="yt-controls-left">
@@ -61,10 +72,12 @@
         <svg viewBox="0 0 24 24" class="yt-icn"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path><path d="M9 9h2v6H9zM13 9h2v6h-2z"></path></svg>
         <span class="yt-toggle-label">Auto-pause</span>
       </button>
+      {% if book_type == "youtube" %}
       <button id="yt-fullscreen-btn" class="yt-toggle-btn" title="Fullscreen">
         <svg viewBox="0 0 24 24" class="yt-icn yt-icn-expand"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg>
         <svg viewBox="0 0 24 24" class="yt-icn yt-icn-collapse"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg>
       </button>
+      {% endif %}
       <button id="yt-transcript-btn" class="yt-transcript-btn">Transcript</button>
     </div>
   </div>

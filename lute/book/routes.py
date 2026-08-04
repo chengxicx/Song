@@ -168,9 +168,9 @@ def edit(bookid):
     b = repo.load(bookid)
     form = EditBookForm(obj=b)
 
-    # For youtube books the text field holds the SRT original (with
+    # For youtube/mp3 books the text field holds the SRT original (with
     # timestamps) so it can be edited directly.
-    if request.method == "GET" and (b.book_type or "") == "youtube":
+    if request.method == "GET" and (b.book_type or "") in ("youtube", "mp3"):
         form.text.data = cues_to_srt_text(b.cues)
 
     if form.validate_on_submit():
@@ -197,11 +197,13 @@ def edit(bookid):
 
 @bp.route("/import_webpage", methods=["GET", "POST"])
 def import_webpage():
-    "Import a web page, or a YouTube video with subtitles."
+    "Import a web page, a YouTube video, or an MP3 audio with subtitles."
     if request.method == "POST":
         import_type = request.form.get("import_type", "webpage")
         if import_type == "youtube":
             return _import_youtube_video()
+        if import_type == "mp3":
+            return _import_mp3_audio()
         return _redirect_to_new_book_form()
 
     usrepo = UserSettingRepository(db.session)
@@ -275,6 +277,82 @@ def _import_youtube_video():
 
     svc = BookService()
     try:
+        book = svc.import_book(b, db.session)
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+    return redirect(f"/read/{book.id}/page/1", 302)
+
+
+def _import_mp3_audio():
+    "Create an mp3 book from the form data (mp3 + subtitle file)."
+    mp3_file = request.files.get("mp3_file")
+    srt_file = request.files.get("srt_file")
+    tag = request.form.get("mp3_tag", "").strip() or "mp3"
+    language_id = request.form.get("language_id")
+    title = (request.form.get("mp3_title") or "").strip()
+    resplit = bool(request.form.get("resplit_sentences"))
+
+    if mp3_file is None or mp3_file.filename == "":
+        flash("Please upload an MP3 audio file.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    # Validate the MP3 extension (case-insensitive).  We don't use the
+    # form validators here because this is a dedicated import route.
+    fname = (mp3_file.filename or "").lower()
+    if not fname.endswith(".mp3"):
+        flash("Please upload a valid MP3 file (.mp3).", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if srt_file is None or srt_file.filename == "":
+        flash("Please upload an SRT or VTT subtitle file.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    # Load the language so parse_subtitle_file can apply language-
+    # specific cue refinement (e.g. Japanese sentence merging/splitting).
+    lang = None
+    if language_id:
+        lang = LanguageRepository(db.session).find(int(language_id))
+
+    try:
+        text, cues_json = parse_subtitle_file(
+            srt_file.filename,
+            srt_file.stream,
+            language=lang,
+            resplit_sentences=resplit,
+        )
+    except Exception as e:  # pylint: disable=broad-except
+        msg = f"Could not parse subtitle file {srt_file.filename} (error: {str(e)})"
+        flash(msg, "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if text.strip() == "":
+        flash("The subtitle file contains no text.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    # Derive a title from the MP3 file name if not provided.
+    if not title:
+        base = mp3_file.filename or "MP3 audio"
+        title = ".".join(base.split(".")[:-1]) or base
+    title = title[:200]
+
+    b = Book()
+    b.language_id = int(language_id) if language_id else None
+    b.title = title
+    b.source_uri = mp3_file.filename
+    b.text = text
+    b.srt_data = cues_json
+    b.book_type = "mp3"
+    b.book_tags = [tag]
+    b.threshold_page_tokens = 250
+    b.split_by = "paragraphs"
+
+    # Save the MP3 to the user-audio directory and wire up the filename
+    # so /useraudio/stream/<book_id> serves it on the reading page.
+    svc = BookService()
+    try:
+        b.audio_stream = mp3_file.stream
+        b.audio_stream_filename = mp3_file.filename
         book = svc.import_book(b, db.session)
     except BookImportException as e:
         flash(e.message, "notice")
