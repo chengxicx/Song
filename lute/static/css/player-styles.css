@@ -736,8 +736,8 @@
   overflow: hidden;
   min-height: 3.4rem;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
 }
 
 #yt-scrolling-subtitle-inner {
@@ -751,6 +751,16 @@
   max-height: 7rem;
   overflow-y: auto;
   width: 100%;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* Prevent a visual "jump" when lazy-loaded word spans (with
+     different white-space behavior) replace the initial plain-text
+     cue during playback start. */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 #yt-scrolling-subtitle-inner:empty::before {
@@ -758,8 +768,18 @@
   color: #bcccdc;
 }
 
+#yt-scrolling-subtitle-inner > * {
+  /* All inline content (plain text or .word spans) inherits the
+     subtitle font size so switching between plain-text fallback and
+     tokenized HTML does not change the visual size. */
+  font-size: inherit;
+  line-height: inherit;
+}
+
 #yt-scrolling-subtitle-inner .word {
   cursor: pointer;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 /* Transcript panel. */
