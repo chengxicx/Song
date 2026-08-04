@@ -668,6 +668,11 @@
               console.warn("[YouTube Player] Failed to find row #" + idx + " after 3 attempts, CUES length:", CUES.length);
             }
           };
+        }  // close else
+      });  // close addEventListener
+    }  // close if (ytTranscriptBtn)
+  }  // close bindControls
+
   // Fullscreen the video wrapper (more reliable than the iframe,
   // which needs its own allowfullscreen attribute). The iframe fills
   // the wrapper, so the video scales up correctly.  Only used for
