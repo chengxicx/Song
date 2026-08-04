@@ -564,6 +564,7 @@
           //   3) Retry up to 3 times over 500ms to handle slow DOM rendering.
           //   4) Log a debug message if scrolling fails so we can investigate.
           var tryScroll = function (attempt) {
+            console.log("[YouTube Player] tryScroll attempt", attempt, "ytCueIndex:", ytCueIndex);
             if (!ytTranscriptList) {
               console.warn("[YouTube Player] ytTranscriptList not found on attempt", attempt);
               return;
@@ -571,6 +572,7 @@
             var idx = ytCueIndex;
             if (idx < 0 && ytPlayer) {
               var t = ytPlayer.getCurrentTime() || 0;
+              console.log("[YouTube Player] ytCueIndex < 0, currentTime:", t, "CUES length:", CUES.length);
               for (var k = CUES.length - 1; k >= 0; k--) {
                 if ((CUES[k].start || 0) <= t) {
                   idx = k;
@@ -578,19 +580,24 @@
                 }
               }
               if (idx < 0) idx = 0;
+              console.log("[YouTube Player] inferred idx:", idx);
             }
             if (idx < 0) idx = 0;
             var row = ytTranscriptList.querySelector("#yt-transcript-row-" + idx);
+            console.log("[YouTube Player] row:", row, "idx:", idx, "CUES length:", CUES.length);
             if (row) {
               var target =
                 row.offsetTop - ytTranscriptList.clientHeight / 2 +
                 row.offsetHeight / 2;
+              console.log("[YouTube Player] row.offsetTop:", row.offsetTop, "clientHeight:", ytTranscriptList.clientHeight, "row.offsetHeight:", row.offsetHeight, "target:", target);
               ytTranscriptList.scrollTo({
                 top: Math.max(0, target),
                 behavior: "smooth",
               });
+              console.log("[YouTube Player] scrollTo called");
             } else if (attempt < 3) {
               // Row not found yet — retry after 100ms
+              console.log("[YouTube Player] row not found, retrying...");
               setTimeout(function () {
                 tryScroll(attempt + 1);
               }, 100);
