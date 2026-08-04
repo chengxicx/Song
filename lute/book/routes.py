@@ -209,11 +209,46 @@ def import_webpage():
     usrepo = UserSettingRepository(db.session)
     current_language_id = int(usrepo.get_value("current_language_id"))
     language_choices = lute.utils.formutils.language_choices(db.session)
+    repo = Repository(db.session)
+    existing_tags = repo.get_book_tags()
     return render_template(
         "book/import_webpage.html",
         language_choices=language_choices,
         current_language_id=current_language_id,
+        existing_tags=existing_tags,
     )
+
+
+def _parse_tagify_tags(raw, default_tag):
+    """
+    Parse a Tagify JSON value (e.g. '[{"value":"mp3"},{"value":"music"}]')
+    into a list of non-empty tag strings.  Falls back to [default_tag]
+    when the result is empty, so a book always has at least one tag.
+    Also accepts a plain comma-separated string for backwards compat.
+    """
+    import json as _json
+
+    tags = []
+    raw = (raw or "").strip()
+    if raw:
+        # Tagify submits JSON; handle that first.
+        if raw.startswith("["):
+            try:
+                items = _json.loads(raw)
+                tags = [
+                    (i.get("value") or "").strip()
+                    for i in items
+                    if isinstance(i, dict)
+                ]
+            except (ValueError, TypeError):
+                pass
+        else:
+            # Plain comma- or space-separated string (legacy fallback).
+            tags = [t.strip() for t in raw.replace(",", " ").split()]
+    tags = [t for t in tags if t]
+    if not tags:
+        tags = [default_tag]
+    return tags
 
 
 def _redirect_to_new_book_form():
@@ -229,7 +264,7 @@ def _redirect_to_new_book_form():
 def _import_youtube_video():
     "Create a youtube book from the form data."
     url = request.form.get("youtube_url", "").strip()
-    tag = request.form.get("youtube_tag", "").strip() or "youtube"
+    tags = _parse_tagify_tags(request.form.get("youtube_tag", ""), "youtube")
     language_id = request.form.get("language_id")
     srt_file = request.files.get("srt_file")
     resplit = bool(request.form.get("resplit_sentences"))
@@ -271,7 +306,7 @@ def _import_youtube_video():
     b.text = text
     b.srt_data = cues_json
     b.book_type = "youtube"
-    b.book_tags = [tag]
+    b.book_tags = tags
     b.threshold_page_tokens = 250
     b.split_by = "paragraphs"
 
@@ -288,7 +323,7 @@ def _import_mp3_audio():
     "Create an mp3 book from the form data (mp3 + subtitle file)."
     mp3_file = request.files.get("mp3_file")
     srt_file = request.files.get("srt_file")
-    tag = request.form.get("mp3_tag", "").strip() or "mp3"
+    tags = _parse_tagify_tags(request.form.get("mp3_tag", ""), "mp3")
     language_id = request.form.get("language_id")
     title = (request.form.get("mp3_title") or "").strip()
     resplit = bool(request.form.get("resplit_sentences"))
@@ -343,7 +378,7 @@ def _import_mp3_audio():
     b.text = text
     b.srt_data = cues_json
     b.book_type = "mp3"
-    b.book_tags = [tag]
+    b.book_tags = tags
     b.threshold_page_tokens = 250
     b.split_by = "paragraphs"
 
