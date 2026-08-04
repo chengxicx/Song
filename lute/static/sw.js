@@ -1,8 +1,7 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.4.2';
+const CACHE_NAME = 'lute-v3.10.4.3';
 
 const STATIC_ASSETS = [
-  '/',
   '/manifest.webmanifest',
   '/static/css/styles.css',
   '/static/css/player-styles.css',
@@ -46,13 +45,52 @@ const STATIC_ASSETS = [
   '/static/favicon.ico',
 ];
 
+// Last-resort document served when the network is unreachable AND no page
+// is cached yet.  Guarantees the SW never calls respondWith(undefined),
+// which would abort the navigation with net::ERR_FAILED.
+const OFFLINE_HTML =
+  '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">' +
+  '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+  '<title>Lute offline</title></head>' +
+  '<body style="font-family:system-ui,-apple-system,sans-serif;text-align:center;' +
+  'padding:2rem;color:#444">' +
+  '<h1>Lute is offline</h1>' +
+  '<p>Not connected to your Lute server.</p>' +
+  '<p><a href="/">Try again</a></p>' +
+  '</body></html>';
+
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache =>
-      cache.addAll(STATIC_ASSETS).catch(err => {
-        console.warn('SW: some assets failed to cache on install', err);
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        // Cache every static asset independently: one failing file must not
+        // wipe out the whole offline cache (Cache.addAll is all-or-nothing).
+        return Promise.all(
+          STATIC_ASSETS.map(url =>
+            fetch(url)
+              .then(resp => {
+                if (resp.ok) return cache.put(url, resp);
+              })
+              .catch(() => {})
+          )
+        );
       })
-    )
+      .then(() => {
+        // Pre-cache the homepage for offline use, but only when it renders
+        // directly.  The root path can 302 to /backup/backup when an
+        // auto-backup is due; that redirected (backup) page must NOT be
+        // stored under '/'.
+        return fetch('/')
+          .then(resp => {
+            if (resp.ok && resp.type === 'basic' && !resp.redirected) {
+              return caches.open(CACHE_NAME).then(cache => cache.put('/', resp));
+            }
+          })
+          .catch(() => {});
+      })
+      .catch(err => {
+        console.warn('SW: install caching failed', err);
+      })
   );
   self.skipWaiting();
 });
@@ -99,6 +137,31 @@ function cleanUrl(originalUrl) {
   }
 }
 
+/**
+ * Guaranteed fallback for network-first requests.  Never returns
+ * undefined: serving a cached page, the cached homepage, or a minimal
+ * offline document is always better than ERR_FAILED.
+ */
+function cacheFallback(urlStr, isNavigation) {
+  return caches.match(urlStr).then(cached => {
+    if (cached) return cached;
+    return caches.match('/').then(home => {
+      if (home) return home;
+      if (isNavigation) {
+        return new Response(OFFLINE_HTML, {
+          status: 503,
+          statusText: 'Service Unavailable',
+          headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-store',
+          },
+        });
+      }
+      return Response.error();
+    });
+  });
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
@@ -114,7 +177,7 @@ self.addEventListener('fetch', event => {
 
   // Skip never-cache JS (always fresh)
   if (url.pathname.startsWith('/static/js/never_cache/')) {
-    event.respondWith(fetch(urlStr));
+    event.respondWith(fetch(urlStr).catch(() => Response.error()));
     return;
   }
 
@@ -135,20 +198,34 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Network-first for pages, fallback to cache when offline
+  // Network-first for pages.  The root path can 302 to /backup/backup
+  // when an auto-backup is due; a redirect (or a broken redirect chain)
+  // must never abort the navigation — fall back to cache instead.
+  const isNavigation = event.request.mode === 'navigate';
   event.respondWith(
     fetch(urlStr)
       .then(response => {
-        if (response.ok && response.type === 'basic') {
+        // 3xx / opaque / error responses cannot be handed to the browser
+        // as a navigation document without risking ERR_FAILED.  Followed
+        // redirects normally land on a 200 here, but if we ever see one,
+        // fall back to a cached page.
+        const unusable =
+          response.type === 'opaqueredirect' ||
+          response.type === 'error' ||
+          (response.status >= 300 && response.status < 400);
+        if (unusable) {
+          return cacheFallback(urlStr, isNavigation);
+        }
+        // Cache the page for offline use, but never cache a redirect
+        // target under the original URL (e.g. the backup page under '/').
+        if (response.ok && response.type === 'basic' && !response.redirected) {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(urlStr, clone));
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put(urlStr, clone))
+            .catch(() => {});
         }
         return response;
       })
-      .catch(() => {
-        return caches.match(urlStr).then(cached => {
-          return cached || caches.match('/');
-        });
-      })
+      .catch(() => cacheFallback(urlStr, isNavigation))
   );
 });
