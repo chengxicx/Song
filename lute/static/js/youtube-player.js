@@ -558,46 +558,49 @@
           ytTranscript.style.display = "block";
           ytTranscriptBtn.classList.add("on");
           // Center the current line when the panel is opened.
-          // We need TWO frames of delay here because:
-          //   1) The container just switched from display:none -> block,
-          //      so in the same task clientHeight is still 0.
-          //   2) A single requestAnimationFrame is NOT sufficient — in
-          //      Chromium/WebKit the layout pass for block change runs
-          //      AFTER the first rAF callback fires, so we still read 0
-          //      for clientHeight / offsetTop.
-          // Double-rAF (nesting) pushes the measurement past the next
-          // style recalc, so the geometry values are guaranteed fresh.
-          window.requestAnimationFrame(function () {
-            window.requestAnimationFrame(function () {
-              if (!ytTranscriptList) return;
-              // If no cue has been activated yet (ytCueIndex < 0) try
-              // to infer the "current" line from the actual playback
-              // time; otherwise fall back to row 0 so the user at
-              // least sees something focused when they open the panel.
-              var idx = ytCueIndex;
-              if (idx < 0 && ytPlayer) {
-                var t = ytPlayer.getCurrentTime() || 0;
-                for (var k = CUES.length - 1; k >= 0; k--) {
-                  if ((CUES[k].start || 0) <= t) {
-                    idx = k;
-                    break;
-                  }
+          // Strategy:
+          //   1) Use double-rAF to wait for layout after display:none -> block.
+          //   2) If ytCueIndex < 0 (no playback yet), infer from currentTime.
+          //   3) Retry up to 3 times over 500ms to handle slow DOM rendering.
+          //   4) Log a debug message if scrolling fails so we can investigate.
+          var tryScroll = function (attempt) {
+            if (!ytTranscriptList) {
+              console.warn("[YouTube Player] ytTranscriptList not found on attempt", attempt);
+              return;
+            }
+            var idx = ytCueIndex;
+            if (idx < 0 && ytPlayer) {
+              var t = ytPlayer.getCurrentTime() || 0;
+              for (var k = CUES.length - 1; k >= 0; k--) {
+                if ((CUES[k].start || 0) <= t) {
+                  idx = k;
+                  break;
                 }
-                if (idx < 0) idx = 0;
               }
               if (idx < 0) idx = 0;
-              var row = ytTranscriptList.querySelector(
-                "#yt-transcript-row-" + idx
-              );
-              if (row) {
-                var target =
-                  row.offsetTop - ytTranscriptList.clientHeight / 2 +
-                  row.offsetHeight / 2;
-                ytTranscriptList.scrollTo({
-                  top: Math.max(0, target),
-                  behavior: "smooth",
-                });
-              }
+            }
+            if (idx < 0) idx = 0;
+            var row = ytTranscriptList.querySelector("#yt-transcript-row-" + idx);
+            if (row) {
+              var target =
+                row.offsetTop - ytTranscriptList.clientHeight / 2 +
+                row.offsetHeight / 2;
+              ytTranscriptList.scrollTo({
+                top: Math.max(0, target),
+                behavior: "smooth",
+              });
+            } else if (attempt < 3) {
+              // Row not found yet — retry after 100ms
+              setTimeout(function () {
+                tryScroll(attempt + 1);
+              }, 100);
+            } else {
+              console.warn("[YouTube Player] Failed to find row #" + idx + " after 3 attempts, CUES length:", CUES.length);
+            }
+          };
+          window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(function () {
+              tryScroll(1);
             });
           });
         }
