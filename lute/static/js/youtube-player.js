@@ -594,12 +594,15 @@
             var row = ytTranscriptList.querySelector("#yt-transcript-row-" + idx);
             console.log("[YouTube Player] row:", row, "idx:", idx, "CUES length:", CUES.length);
             if (row) {
-              console.log("[YouTube Player] row.offsetTop:", row.offsetTop, "containerHeight:", containerHeight, "row.offsetHeight:", row.offsetHeight, "target:", target);
-              // Use scrollIntoView with block: center for more reliable scrolling.
-              // This method automatically calculates the correct scroll position
-              // based on the element's position relative to the viewport.
-              row.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
-              console.log("[YouTube Player] scrollIntoView called with block: center");
+                  var target =
+                    row.offsetTop - containerHeight / 2 +
+                    row.offsetHeight / 2;
+                  console.log("[YouTube Player] row.offsetTop:", row.offsetTop, "containerHeight:", containerHeight, "row.offsetHeight:", row.offsetHeight, "target:", target);
+                  // Use scrollIntoView with block: center for more reliable scrolling.
+                  // This method automatically calculates the correct scroll position
+                  // based on the element's position relative to the viewport.
+                  row.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+                  console.log("[YouTube Player] scrollIntoView called with block: center");
             } else if (attempt < 3) {
               // Row not found yet — retry after 100ms
               console.log("[YouTube Player] row not found, retrying...");
@@ -610,16 +613,6 @@
               console.warn("[YouTube Player] Failed to find row #" + idx + " after 3 attempts, CUES length:", CUES.length);
             }
           };
-          window.requestAnimationFrame(function () {
-            window.requestAnimationFrame(function () {
-              tryScroll(1);
-            });
-          });
-        }
-      });
-    }
-  }
-
   // Fullscreen the video wrapper (more reliable than the iframe,
   // which needs its own allowfullscreen attribute). The iframe fills
   // the wrapper, so the video scales up correctly.  Only used for
