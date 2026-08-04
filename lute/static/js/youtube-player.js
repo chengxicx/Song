@@ -569,6 +569,14 @@
               console.warn("[YouTube Player] ytTranscriptList not found on attempt", attempt);
               return;
             }
+            // Force a reflow to ensure display:none -> block has completed layout.
+            // Without this, clientHeight can still be 0 even after double-rAF.
+            var containerHeight = ytTranscriptList.clientHeight;
+            console.log("[YouTube Player] containerHeight before reflow:", containerHeight);
+            void ytTranscriptList.offsetHeight; // Trigger reflow
+            containerHeight = ytTranscriptList.clientHeight;
+            console.log("[YouTube Player] containerHeight after reflow:", containerHeight);
+            
             var idx = ytCueIndex;
             if (idx < 0 && ytPlayer) {
               var t = ytPlayer.getCurrentTime() || 0;
@@ -587,9 +595,9 @@
             console.log("[YouTube Player] row:", row, "idx:", idx, "CUES length:", CUES.length);
             if (row) {
               var target =
-                row.offsetTop - ytTranscriptList.clientHeight / 2 +
+                row.offsetTop - containerHeight / 2 +
                 row.offsetHeight / 2;
-              console.log("[YouTube Player] row.offsetTop:", row.offsetTop, "clientHeight:", ytTranscriptList.clientHeight, "row.offsetHeight:", row.offsetHeight, "target:", target);
+              console.log("[YouTube Player] row.offsetTop:", row.offsetTop, "containerHeight:", containerHeight, "row.offsetHeight:", row.offsetHeight, "target:", target);
               ytTranscriptList.scrollTo({
                 top: Math.max(0, target),
                 behavior: "smooth",
