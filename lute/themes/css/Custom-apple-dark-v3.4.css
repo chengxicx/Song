@@ -972,7 +972,8 @@ canvas + svg text {
 
 /* Timeline + rate wrap panels */
 .yt-timeline-wrap,
-#yt-playback-rate-container {
+#yt-playback-rate-container,
+#tts-playback-rate-container {
   background-color: var(--yt-color-5) !important;
   border-radius: 8px !important;
 }
@@ -1002,7 +1003,8 @@ canvas + svg text {
   background-color: var(--yt-color-4) !important;
   color: #fff !important;
 }
-#yt-rate-indicator {
+#yt-rate-indicator,
+#tts-rate-indicator {
   color: #f2f2f7 !important;
 }
 
