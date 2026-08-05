@@ -161,7 +161,7 @@ class EditBookForm(FlaskForm):
     # YouTube video / MP3 audio book fields.
     book_type = SelectField(
         "Type",
-        choices=[("", "Text"), ("youtube", "YouTube video"), ("mp3", "MP3 audio")],
+        choices=[("", "Text"), ("youtube", "YouTube video"), ("mp3", "MP3 / M4A audio")],
     )
     youtube_srt = FileField(
         "Subtitle file (SRT / VTT)",

@@ -10,7 +10,7 @@
   <select id="import_type" name="import_type" class="form-control" style="width: auto;">
     <option value="webpage" selected>Web page</option>
     <option value="youtube">YouTube video</option>
-    <option value="mp3">MP3 audio</option>
+    <option value="mp3">MP3 / M4A audio</option>
   </select>
 </div>
 
@@ -71,8 +71,9 @@
 </form>
 
 <form id="mp3-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p>Import an MP3 audio file with its subtitle (SRT / VTT) file. The subtitles
-  become the book text, so you can read and look up words while the audio plays.</p>
+  <p>Import an MP3 or M4A audio file with its subtitle (SRT / VTT) file. The
+  subtitles become the book text, so you can read and look up words while the
+  audio plays.</p>
 
   <br />
 
@@ -85,10 +86,10 @@
   <br /><br />
 
   <label for="mp3_title">Title:</label>
-  <input type="text" id="mp3_title" name="mp3_title" class="form-text" style="width:75%;" placeholder="Leave blank to use the MP3 file name"><br><br>
+  <input type="text" id="mp3_title" name="mp3_title" class="form-text" style="width:75%;" placeholder="Leave blank to use the audio file name"><br><br>
 
-  <label for="mp3_file">MP3 audio file:</label>
-  <input type="file" id="mp3_file" name="mp3_file" accept=".mp3" required><br><br>
+  <label for="mp3_file">Audio file (MP3 / M4A):</label>
+  <input type="file" id="mp3_file" name="mp3_file" accept=".mp3,.m4a" required><br><br>
 
   <label for="mp3_srt_file">Subtitle file (SRT / VTT):</label>
   <input type="file" id="mp3_srt_file" name="srt_file" accept=".srt,.vtt" required><br><br>
@@ -143,7 +144,7 @@
     typeSel.on('change', updateForms);
     updateForms();
 
-    // Auto-fill the title from the MP3 file name if the title field is empty.
+    // Auto-fill the title from the audio file name if the title field is empty.
     const getFilenameWithoutExtension = function (filename) {
       return filename.split('.').slice(0, -1).join('.');
     };
