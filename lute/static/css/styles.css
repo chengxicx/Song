@@ -651,8 +651,8 @@ span.hamburger {
 
 #focus-container,
 #tap_sets_status-container,
-#tts-player-container,
-#tts-sentence-buttons-container {
+#tts-toggle-container,
+#tts-sentence-buttons-toggle-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -681,8 +681,8 @@ span.hamburger {
 
 #focus-container label,
 #tap_sets_status-container label,
-#tts-player-container label,
-#tts-sentence-buttons-container label {
+#tts-toggle-container label,
+#tts-sentence-buttons-toggle-container label {
     font-weight: bold;
     min-width: 110px;
     text-align: right;
