@@ -457,6 +457,22 @@ def _create_app(app_config, extra_config):
         except Exception:  # pylint: disable=broad-exception-caught
             pass
 
+    @app.after_request
+    def _no_cache_dynamic_pages(response):
+        """
+        Prevent caching of dynamic HTML pages under /read/ and /term/.
+
+        These pages change on every request (term statuses, form data,
+        rendered text).  If Cloudflare or the browser caches them,
+        users see stale data after saving a term -- e.g. the form
+        still shows the old status when the word is clicked again.
+        """
+        if request.method == "GET" and request.path.startswith(("/read/", "/term/")):
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+        return response
+
     app.register_blueprint(language_bp)
     app.register_blueprint(anki_bp)
     app.register_blueprint(book_bp)
