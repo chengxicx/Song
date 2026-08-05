@@ -512,7 +512,14 @@
   justify-content: flex-end;
   gap: 0.4rem;
   flex-wrap: wrap;
-  margin-left: auto;
+  /* Force the right-side controls (rate / loop / autopause / transcript)
+     onto their own row, below the left controls + timeline, matching
+     the YouTube reference layout at /read/51.  Without this, the right
+     controls squeeze onto row 1 when they're narrow enough (e.g. MP3
+     player which has no Fullscreen button), producing an inconsistent
+     layout across player types. */
+  flex-basis: 100%;
+  margin-left: 0;
 }
 
 .yt-play-btn {
@@ -838,12 +845,11 @@
 }
 
 @media screen and (max-width: 980px) {
-  /* On narrow screens, stack the control groups so the seek bar gets
-     a full row and the buttons wrap below it cleanly. */
+  /* On narrow screens, center the right-side controls instead of
+     right-aligning them (flex-basis:100% is already set in the base
+     rule above). */
   .yt-controls-right {
-    flex-basis: 100%;
     justify-content: center;
-    margin-left: 0;
   }
 }
 
