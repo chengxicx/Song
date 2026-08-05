@@ -744,6 +744,18 @@ let _show_element_message_tooltip = function(element, title, message, remove_aft
 
 let _hide_element_message_tooltips = function() {
   $('.manual-tooltip').remove();
+  // Hide all jQuery UI tooltips (term detail popups).
+  // Pages can have multiple tooltip containers (#thetext,
+  // #yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner),
+  // each with their own tooltip instance, so we close every
+  // initialized tooltip widget and remove any stray tooltip DOM.
+  $('#thetext, #yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner').each(function() {
+    const $this = $(this);
+    if ($this.data('ui-tooltip')) {
+      try { $this.tooltip('close'); } catch (_) {}
+    }
+  });
+  $('.ui-tooltip').hide().remove();
 };
 
 
