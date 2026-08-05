@@ -860,7 +860,8 @@
     height: 30px;
   }
 
-  #yt-scrolling-subtitle-inner {
+  #yt-scrolling-subtitle-inner,
+  #tts-scrolling-subtitle-inner {
     font-size: 1.2rem;
     padding: 0.5rem 0.6rem;
   }
@@ -881,5 +882,136 @@
   .yt-transcript-ts {
     min-width: 2.8rem;
     font-size: 0.75rem;
+  }
+
+  .tts-voice-label {
+    display: none;
+  }
+}
+
+/* ============================================================
+   TTS player (text books)
+   Shares the .youtube-player-container / .yt-* styles above so the
+   visual design, sizing, layout and responsive behaviour match the
+   YouTube / MP3 player exactly.  The .tts-mode modifier only adds
+   the voice-selection button styling and hides the empty video area
+   (which doesn't exist for TTS).
+   ============================================================ */
+
+.tts-mode {
+  /* No video / audio wrap is rendered for TTS, so the controls
+     appear at the top of the container -- same as the MP3 variant. */
+}
+
+/* The scrolling subtitle inner selector is shared between the YouTube
+   and TTS players; mirror the #yt-scrolling-subtitle-inner rules so
+   the TTS subtitle has the same look (font size, padding, marquee). */
+#tts-scrolling-subtitle-inner {
+  white-space: normal;
+  overflow-x: hidden;
+  padding: 0.7rem 1rem;
+  font-size: 1.5rem;
+  line-height: 1.6;
+  text-align: center;
+  box-sizing: border-box;
+  max-height: 7rem;
+  overflow-y: auto;
+  width: 100%;
+  flex: 1 1 auto;
+  display: block;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+#tts-scrolling-subtitle-inner:empty::before {
+  content: "—";
+  color: #bcccdc;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+}
+
+#tts-scrolling-subtitle-inner .word {
+  cursor: pointer;
+  display: inline;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Voice selection button + dropdown.
+   The button reuses .yt-toggle-btn for the chrome (border, padding,
+   hover, .on state) so it visually matches the Loop / Auto-pause
+   buttons.  The dropdown is a lightweight absolutely-positioned
+   list, styled to match the .yt-toggle-btn colour palette. */
+.tts-voice-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.tts-voice-btn {
+  /* Inherits .yt-toggle-btn chrome; just tighten the gap. */
+  gap: 0.3rem;
+  max-width: 11rem;
+}
+
+.tts-voice-btn .yt-icn {
+  flex: 0 0 auto;
+}
+
+.tts-voice-label {
+  font-size: 0.78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 7rem;
+}
+
+.tts-voice-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 1000;
+  min-width: 16rem;
+  max-width: 22rem;
+  max-height: 18rem;
+  overflow-y: auto;
+  background-color: #fff;
+  border: 1px solid #b9d6ef;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.2rem;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: #333;
+}
+
+.tts-voice-dropdown[hidden] {
+  display: none;
+}
+
+.tts-voice-option {
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tts-voice-option:hover {
+  background-color: var(--yt-color-5, #d6edff);
+}
+
+.tts-voice-option.selected {
+  background-color: #4cbb17;
+  color: #fff;
+}
+
+@media screen and (max-width: 980px) {
+  /* On narrow screens the voice dropdown can overflow on the right;
+     let it shrink and wrap. */
+  .tts-voice-dropdown {
+    min-width: 12rem;
+    max-width: 80vw;
   }
 }

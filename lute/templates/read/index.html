@@ -98,6 +98,11 @@
 
   {% if book_type in ("youtube", "mp3") %}
   {% include "read/youtube_player.html" %}
+  {% else %}
+  {# TTS player for text books: same UI / CSS classes as the YouTube / MP3
+     player so the visual style, layout and responsive behaviour match.
+     Visibility is controlled by the TTS Player toggle (reading_menu). #}
+  {% include "read/tts_player.html" %}
   {% endif %}
 
   <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>

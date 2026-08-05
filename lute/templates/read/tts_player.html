@@ -1,0 +1,69 @@
+{# TTS player for text books (book_type not in youtube/mp3).
+   Mirrors the YouTube / MP3 player markup (same CSS classes) so the
+   visual style, layout and responsive behaviour are identical.
+   The voice-selection button lives in the leftmost control area, before
+   the prev / play / next cue buttons (per spec). #}
+<div class="youtube-player-container tts-mode" id="tts-player-container"
+     data-book-id="{{ book.id }}" data-lang-code="{{ lang_code }}"
+     {% if is_rtl %}dir="rtl"{% endif %}>
+  <div class="yt-player-controls">
+    <div class="yt-controls-left">
+      {# Voice selection button (leftmost area, opens a dropdown). #}
+      <div class="tts-voice-wrap">
+        <button id="tts-voice-btn" class="yt-toggle-btn tts-voice-btn"
+                type="button" title="Select voice">
+          <svg viewBox="0 0 24 24" class="yt-icn" aria-hidden="true">
+            <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path>
+            <path d="M19 11a7 7 0 0 1-14 0"></path>
+            <path d="M12 18v3"></path>
+          </svg>
+          <span class="tts-voice-label">Voice</span>
+        </button>
+        <div id="tts-voice-dropdown" class="tts-voice-dropdown" role="listbox" hidden></div>
+      </div>
+      <button id="tts-prev-cue-btn" class="audio-button yt-cue-btn" title="Previous sentence">
+        <svg viewBox="0 0 24 24" class="yt-icn"><path d="M7 6h2v12H7zM20 6l-8.5 6 8.5 6z"></path></svg>
+      </button>
+      <button id="tts-play-btn" class="audio-button yt-play-btn" title="Play / pause">
+        <svg viewBox="0 0 24 24" class="yt-icn yt-icn-play"><path d="M8 5v14l11-7z"></path></svg>
+        <svg viewBox="0 0 24 24" class="yt-icn yt-icn-pause"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>
+      </button>
+      <button id="tts-next-cue-btn" class="audio-button yt-cue-btn" title="Next sentence">
+        <svg viewBox="0 0 24 24" class="yt-icn"><path d="M15 6h2v12h-2zM4 6l8.5 6L4 18z"></path></svg>
+      </button>
+    </div>
+    <div class="yt-timeline-wrap">
+      <input type="range" class="yt-timeline" id="tts-timeline" max="1000" value="0" step="0.1" />
+      <div class="yt-time-display">
+        <span id="tts-current-time">0:00</span>
+        <span>/</span>
+        <span id="tts-duration">0:00</span>
+      </div>
+    </div>
+    <div class="yt-controls-right">
+      <div id="tts-playback-rate-container" title="Playback rate. Click the number to reset">
+        <button id="tts-rate-dec" class="audio-button yt-rate-btn"><span>−</span></button>
+        <div id="tts-rate-indicator">1</div>
+        <button id="tts-rate-inc" class="audio-button yt-rate-btn"><span>+</span></button>
+      </div>
+      <button id="tts-loop-btn" class="yt-toggle-btn" title="Loop current sentence">
+        <svg viewBox="0 0 24 24" class="yt-icn"><path d="M17 2l4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
+        <span class="yt-toggle-label">Loop</span>
+      </button>
+      <button id="tts-autopause-btn" class="yt-toggle-btn" title="Auto-pause at the end of each sentence">
+        <svg viewBox="0 0 24 24" class="yt-icn"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path><path d="M9 9h2v6H9zM13 9h2v6h-2z"></path></svg>
+        <span class="yt-toggle-label">Auto-pause</span>
+      </button>
+      <button id="tts-transcript-btn" class="yt-transcript-btn">Transcript</button>
+    </div>
+  </div>
+
+  <div class="yt-scrolling-subtitle" id="tts-scrolling-subtitle">
+    <div class="yt-scrolling-subtitle-inner" id="tts-scrolling-subtitle-inner"
+         dir="{{ 'rtl' if is_rtl else 'ltr' }}"></div>
+  </div>
+
+  <div class="yt-transcript" id="tts-transcript" style="display: none">
+    <div class="yt-transcript-list" id="tts-transcript-list"></div>
+  </div>
+</div>
