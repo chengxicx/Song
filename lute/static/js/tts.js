@@ -2,12 +2,21 @@
  * Edge-TTS + SpeechSynthesis voice synthesis and Google auto-translation
  * integration for the Lute reading page.
  *
- * Primary TTS:  browser SpeechSynthesis API (like the working userscript)
- * Fallback TTS: backend /tts/<lang>/<text> endpoint (edge-tts)
- * Translate:    backend /api/translate/<sl>/<tl>/<text> endpoint
+ * The TTS player mirrors the YouTube / MP3 player UI and behaviour:
+ *   - play / pause, prev / next sentence, seek timeline, playback rate
+ *   - single-sentence loop and auto-pause-at-end-of-sentence
+ *   - a single-line scrolling subtitle synced to the speech, reusing
+ *     the reading-page tokenization and click-to-lookup behavior
+ *   - a Transcript panel with bidirectional control:
+ *       speech -> transcript: highlight + smooth-center the current line
+ *       transcript -> speech: clicking a line seeks playback to its start
+ *   - a voice-selection button placed in the leftmost control area
  *
- * Features:
- *   - Top-bar control panel (play all / pause / stop / speed slider).
+ * Audio backend: browser SpeechSynthesis API (primary) with a fallback
+ * to the backend /tts/<lang>/<text> endpoint (edge-tts) when the
+ * browser does not expose SpeechSynthesis.
+ *
+ * Auxiliary features retained from the previous TTS module:
  *   - Sentence-level 🔊 buttons at each paragraph / sentence row.
  *   - Word hover pronunciation (200 ms delay) via event delegation.
  *   - Auto-translation: when a term edit form opens with an empty
@@ -44,25 +53,6 @@
   // Read TL from: navigator.language -> shared cache -> default
   globalCache.tl = navigator.language || globalCache.tl || "zh-CN";
   let TL = globalCache.tl;
-
-  const LANG_NAME_MAP = {
-    japanese: "ja", japan: "ja",
-    spanish: "es", espanol: "es",
-    french: "fr", francais: "fr",
-    german: "de", deutsch: "de",
-    english: "en",
-    chinese: "zh", mandarin: "zh",
-    korean: "ko",
-    russian: "ru",
-    arabic: "ar",
-    turkish: "tr", turkce: "tr",
-    czech: "cs", cesky: "cs",
-    sanskrit: "sa",
-    hindi: "hi",
-    indonesian: "id",
-    portuguese: "pt",
-    italian: "it",
-  };
 
   // Cached language detection – only runs once per page load.
   let _cachedLang = null;
@@ -130,11 +120,8 @@
   //    fallback: backend /tts/ endpoint)
   // ------------------------------------------------------------------
 
-  let currentUtterance = null;
-  let currentAudio = null;
   let globalSpeed = 1.0;
   let hoverTimer = null;
-  let isPaused = false;
 
   function selectBestVoiceForLang(voices, targetLang) {
     if (!voices || voices.length === 0) return null;
@@ -160,11 +147,11 @@
   function getSelectedVoice() {
     if (!("speechSynthesis" in window)) return null;
 
-    const voiceSelect = document.getElementById("lute-voice-select");
-    if (voiceSelect && voiceSelect.value) {
+    const voiceSelect = document.getElementById("tts-voice-btn");
+    if (voiceSelect && voiceSelect.dataset.voiceName) {
       const voices = window.speechSynthesis.getVoices();
       const found = voices.find(function (v) {
-        return v.name === voiceSelect.value;
+        return v.name === voiceSelect.dataset.voiceName;
       });
       if (found) return found;
     }
@@ -180,13 +167,13 @@
     return null;
   }
 
-  function speakText(text, isFullText) {
+  // Lightweight speak used by hover / click pronunciation and the
+  // auto-translation flow (single short utterance, no player state).
+  function speakText(text) {
     let cleanText = text.replace(/[#＃]/g, "").trim();
     if (!cleanText) return;
 
     if ("speechSynthesis" in window) {
-      if (!isFullText && window.speechSynthesis.speaking && currentUtterance)
-        return;
       try {
         window.speechSynthesis.cancel();
       } catch (_) {}
@@ -210,22 +197,9 @@
       }
 
       utterance.rate = globalSpeed;
-      if (isFullText) {
-        currentUtterance = utterance;
-        isPaused = false;
-        utterance.onend = function () {
-          currentUtterance = null;
-          isPaused = false;
-          updatePlayPauseButton();
-        };
-      }
 
       setTimeout(function () {
         window.speechSynthesis.speak(utterance);
-        if (isFullText) {
-          isPaused = false;
-          updatePlayPauseButton();
-        }
       }, 20);
       return;
     }
@@ -235,73 +209,7 @@
     const url = "/tts/" + lang + "/" + encodeURIComponent(cleanText);
     const audio = new Audio(url);
     audio.playbackRate = globalSpeed;
-    if (isFullText) {
-      currentAudio = audio;
-      isPaused = false;
-      audio.play().catch(function () {});
-      currentUtterance = {
-        stop: function () {
-          audio.pause();
-          audio.removeAttribute("src");
-          audio.load();
-        },
-      };
-      audio.addEventListener("ended", function () {
-        currentAudio = null;
-        currentUtterance = null;
-        isPaused = false;
-        updatePlayPauseButton();
-      });
-      updatePlayPauseButton();
-    } else {
-      audio.play().catch(function () {});
-    }
-  }
-
-  function getPlaybackState() {
-    if (isPaused) return "stopped";
-    if ("speechSynthesis" in window) {
-      if (window.speechSynthesis.speaking) return "playing";
-    }
-    if (currentAudio && !currentAudio.paused) return "playing";
-    if (currentUtterance || currentAudio) return "playing";
-    return "stopped";
-  }
-
-  function stopFullText() {
-    if ("speechSynthesis" in window) {
-      try {
-        window.speechSynthesis.cancel();
-      } catch (_) {}
-    }
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.removeAttribute("src");
-      currentAudio.load();
-      currentAudio = null;
-    }
-    if (currentUtterance && currentUtterance.stop) currentUtterance.stop();
-    currentUtterance = null;
-    isPaused = false;
-    updatePlayPauseButton();
-  }
-
-  function updatePlayPauseButton() {
-    const btn =
-      document.getElementById("btn-lute-playpause") ||
-      document.getElementById("btn-lute-play") ||
-      document.getElementById("tts-play");
-    if (!btn) return;
-    const state = getPlaybackState();
-    if (state === "playing") {
-      btn.innerHTML = "⏹";
-      btn.title = "Stop";
-      btn.style.background = "#fa5252";
-    } else {
-      btn.innerHTML = "▶";
-      btn.title = "Play";
-      btn.style.background = "#228be6";
-    }
+    audio.play().catch(function () {});
   }
 
   // ------------------------------------------------------------------
@@ -313,41 +221,6 @@
       .replace(/[#＃]/g, "")
       .replace(/\s+/g, " ")
       .trim();
-  }
-
-  function getCleanFullText() {
-    const textDiv = document.getElementById("thetext");
-    if (!textDiv) return "";
-    const rows = textDiv.querySelectorAll(".textsentence");
-    if (rows.length === 0) {
-      const pRows = textDiv.querySelectorAll(".textrow, p");
-      if (pRows.length === 0) {
-        return cleanSentenceText(textDiv.innerText || textDiv.textContent || "");
-      }
-      let segments = [];
-      pRows.forEach(function (row) {
-        const clone = row.cloneNode(true);
-        const icons = clone.querySelectorAll(".lute-sentence-play-btn");
-        icons.forEach(function (icon) { icon.remove(); });
-        let rowText = clone.innerText || clone.textContent || "";
-        if (rowText.trim()) segments.push(rowText.trim());
-      });
-      return cleanSentenceText(segments.join("\n"));
-    }
-    let segments = [];
-    rows.forEach(function (row) {
-      const clone = row.cloneNode(true);
-      const icons = clone.querySelectorAll(".lute-sentence-play-btn");
-      icons.forEach(function (icon) { icon.remove(); });
-      let rowText = clone.innerText || clone.textContent || "";
-      if (rowText.trim()) segments.push(rowText.trim());
-    });
-    return cleanSentenceText(segments.join("\n"));
-  }
-
-  function playFullText() {
-    const fullText = getCleanFullText();
-    if (fullText) speakText(fullText, true);
   }
 
   // ------------------------------------------------------------------
@@ -408,10 +281,9 @@
         if (!cleanText) return;
         clearTimeout(hoverTimer);
         hoverTimer = setTimeout(function () {
-          if (
-            !(window.speechSynthesis && window.speechSynthesis.speaking &&
-              currentUtterance)
-          ) {
+          // Don't fire hover pronunciation while the TTS player is
+          // playing a full-text stream -- it would interrupt it.
+          if (!ttsPlaying) {
             speakText(cleanText);
           }
         }, 200);
@@ -425,7 +297,8 @@
       });
     }
 
-    // Sentence play button click
+    // Sentence play button click -- plays just that sentence through
+    // the lightweight speakText() (does not engage the full player).
     textDiv.addEventListener("click", function (e) {
       const btn = e.target.closest(".lute-sentence-play-btn");
       if (!btn) return;
@@ -442,7 +315,9 @@
         tempRow.innerText || tempRow.textContent || ""
       );
       if (cleanSentence) {
-        if (currentUtterance) stopFullText();
+        // Stop the full player if it's running so the hover/sentence
+        // utterance isn't drowned out by the active cue.
+        if (ttsPlaying) ttsStop();
         speakText(cleanSentence);
       }
     });
@@ -644,193 +519,944 @@
     }, 150);
   }
 
-  // ------------------------------------------------------------------
-  // 7. Control panel (injected or existing)
-  // ------------------------------------------------------------------
+  /* ================================================================
+     7. TTS PLAYER (mirrors the YouTube / MP3 player UI and behaviour)
+     ================================================================ */
 
-  function injectControlPanel() {
-    const existingPanel = document.getElementById("tts-control-panel");
-    if (existingPanel) {
-      wirePanelEvents(existingPanel);
-      updateVoiceList();
-      return;
-    }
+  // Player state (mirrors youtube-player.js).
+  let ttsContainer = null;
+  let ttsPlayBtn = null;
+  let ttsPrevCueBtn = null;
+  let ttsNextCueBtn = null;
+  let ttsTimeline = null;
+  let ttsCurTimeEl = null;
+  let ttsDurationEl = null;
+  let ttsRateInd = null;
+  let ttsLoopBtn = null;
+  let ttsAutoPauseBtn = null;
+  let ttsTranscriptBtn = null;
+  let ttsTranscript = null;
+  let ttsTranscriptList = null;
+  let ttsSubtitle = null;
+  let ttsVoiceBtn = null;
+  let ttsVoiceDropdown = null;
+  let ttsVoiceLabel = null;
 
-    const targetContainer =
-      document.querySelector(".book-header") ||
-      (document.getElementById("thetext") &&
-        document.getElementById("thetext").parentElement);
-    if (!targetContainer) return;
+  // Cue data: built from #thetext sentences.
+  //   { text, html, start, end, duration, actualDuration }
+  // `start` / `end` are virtual times in seconds, accumulated across
+  // all cues. `duration` is the initial estimate (character-based),
+  // `actualDuration` is filled in once the cue has played through.
+  let ttsCues = [];
+  let ttsCueIndex = -1;
+  let ttsPlaying = false;
+  let ttsPaused = false;
+  let ttsLoop = false;
+  let ttsAutoPause = false;
+  let ttsRate = 1.0;
+  let ttsDragging = false;
+  let ttsTotalDuration = 0;
+  let ttsVirtualTime = 0;          // current virtual playhead (seconds)
+  let ttsCueStartedAt = 0;         // performance.now() when current cue started
+  let ttsCurrentUtterance = null;
+  let ttsPollTimer = null;
+  let ttsMarqueeOverflow = 0;
+  let ttsIsRtl = false;
 
-    if (!document.getElementById("lute-tts-panel")) {
-      const panel = document.createElement("div");
-      panel.id = "lute-tts-panel";
-      panel.style.cssText =
-        "display:inline-flex;align-items:center;background:#f1f3f5;" +
-        "padding:6px 12px;margin:10px 0;border-radius:8px;" +
-        "border:1px solid #dee2e6;gap:10px;font-family:sans-serif;" +
-        "flex-wrap:wrap;z-index:9999;";
-      panel.innerHTML =
-        '<button id="btn-lute-playpause" title="Play" ' +
-        'style="padding:5px 14px;background:#228be6;color:#fff;border:none;' +
-        'border-radius:4px;cursor:pointer;font-size:14px;line-height:1;min-width:42px;">▶</button>' +
-        '<div style="display:flex;align-items:center;gap:4px;' +
-        'border-left:1px solid #ccc;padding-left:8px;">' +
-        '<span title="Voice" style="font-size:14px;">🗣️</span>' +
-        '<select id="lute-voice-select" style="padding:2px 4px;font-size:12px;' +
-        'border-radius:4px;max-width:160px;border:1px solid #ccc;' +
-        'background:#fff;color:#333;"></select>' +
-        "</div>" +
-        '<div style="display:flex;align-items:center;gap:4px;' +
-        'border-left:1px solid #ccc;padding-left:8px;">' +
-        '<span title="Speed" style="font-size:14px;">⚡</span>' +
-        '<input id="lute-speed-slider" type="range" min="0.5" max="2.0" ' +
-        'step="0.05" value="' + globalSpeed +
-        '" style="width:70px;cursor:pointer;vertical-align:middle;" />' +
-        '<span id="lute-speed-val" style="font-size:11px;font-weight:bold;' +
-        'color:#228be6;min-width:32px;">' + globalSpeed.toFixed(2) + "x</span>" +
-        "</div>";
-      targetContainer.insertBefore(panel, targetContainer.firstChild);
-      wirePanelEvents(panel);
-      updateVoiceList();
-    }
+  // Estimated seconds-per-character for duration guessing, split by
+  // script class. The numbers are conservative so the timeline doesn't
+  // jump backwards once real timing arrives.
+  const CHAR_RATE_CJK = 0.18;   // ~360 chars/min for Japanese/Korean/Chinese
+  const CHAR_RATE_OTHER = 0.07; // ~85 wpm for latin scripts (avg 5 chars/word)
+
+  function ttsFmtTime(secs) {
+    if (!isFinite(secs) || secs < 0) secs = 0;
+    secs = Math.floor(secs);
+    var h = Math.floor(secs / 3600);
+    var m = Math.floor((secs % 3600) / 60);
+    var s = secs % 60;
+    var mm = m < 10 ? "0" + m : "" + m;
+    var ss = s < 10 ? "0" + s : "" + s;
+    return h > 0 ? h + ":" + mm + ":" + ss : m + ":" + ss;
   }
 
-  function wirePanelEvents(panel) {
-    const playPauseBtn = panel.querySelector("#btn-lute-playpause") || panel.querySelector("#btn-lute-play") || panel.querySelector("#tts-play");
-    const stopBtn = panel.querySelector("#btn-lute-stop") || panel.querySelector("#tts-stop");
-    const speedSlider = panel.querySelector("#lute-speed-slider") || panel.querySelector("#tts-rate");
-    const speedVal = panel.querySelector("#lute-speed-val") || panel.querySelector("#tts-rate-val");
-
-    if (playPauseBtn && !playPauseBtn.dataset.wired) {
-      playPauseBtn.dataset.wired = "true";
-      playPauseBtn.addEventListener("click", function () {
-        const state = getPlaybackState();
-        if (state === "playing") {
-          stopFullText();
-        } else {
-          playFullText();
-        }
-        setTimeout(updatePlayPauseButton, 60);
-      });
-    }
-    if (stopBtn && !stopBtn.dataset.wired) {
-      stopBtn.dataset.wired = "true";
-      stopBtn.addEventListener("click", stopFullText);
-    }
-    if (speedSlider && !speedSlider.dataset.wired) {
-      speedSlider.dataset.wired = "true";
-      speedSlider.addEventListener("input", function (e) {
-        const val = parseFloat(e.target.value);
-        globalSpeed = val;
-        if (speedVal) speedVal.innerText = val.toFixed(2) + "x";
-      });
-    }
-    const voiceSel = panel.querySelector("#lute-voice-select") || panel.querySelector("#tts-voice-select");
-    if (voiceSel && !voiceSel.dataset.wired) {
-      voiceSel.dataset.wired = "true";
-      voiceSel.addEventListener("change", function (e) {
-        globalCache.selectedVoice = e.target.value;
-      });
-    }
+  function ttsEstimateDuration(text, rate) {
+    if (!text) return 0.5;
+    const cjk = (text.match(/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF]/g) || []).length;
+    const other = text.length - cjk;
+    // The SpeechSynthesis rate scales roughly linearly; clamp so very
+    // slow rates don't blow the timeline up to hours.
+    const effRate = Math.max(0.5, rate || 1.0);
+    return Math.max(0.5, (cjk * CHAR_RATE_CJK + other * CHAR_RATE_OTHER) / effRate);
   }
 
-  function updateVoiceList() {
-    const voiceSelect = document.getElementById("lute-voice-select");
-    if (!voiceSelect || !("speechSynthesis" in window)) return;
-    let voices = window.speechSynthesis.getVoices();
-    if (voices.length === 0) return;
+  // Build the cue list from the .textsentence elements in #thetext.
+  // Each cue's `html` is the sentence's innerHTML (textitem spans
+  // included), so the scrolling subtitle reuses the reading-page
+  // tokenization and click-to-lookup behaviour -- no extra backend
+  // request needed.
+  function ttsBuildCues() {
+    ttsCues = [];
+    ttsTotalDuration = 0;
+    ttsCueIndex = -1;
+    ttsVirtualTime = 0;
 
-    const previousSelected = voiceSelect.value;
-    voiceSelect.innerHTML = "";
-    voices.sort(function (a, b) { return a.lang.localeCompare(b.lang); });
-
-    const detectedLang = getCurrentLangCode();
-    const recommendedVoice = selectBestVoiceForLang(voices, detectedLang);
-
-    voices.forEach(function (voice) {
-      const option = document.createElement("option");
-      option.value = voice.name;
-      option.textContent = "[" + voice.lang + "] " + voice.name;
-      if (previousSelected && voices.some(function (v) { return v.name === previousSelected; })) {
-        if (previousSelected === voice.name) option.selected = true;
-      } else if (recommendedVoice && voice.name === recommendedVoice.name) {
-        option.selected = true;
-      }
-      voiceSelect.appendChild(option);
-    });
-
-    if (voiceSelect.value) {
-      globalCache.selectedVoice = voiceSelect.value;
-    }
-  }
-
-  // ------------------------------------------------------------------
-  // 8. Lightweight observers (optimized for performance)
-  // ------------------------------------------------------------------
-
-  // UI observer: only watches #thetext for top-level child changes.
-  // Does NOT use subtree:true — that was the main bottleneck on
-  // Japanese pages with hundreds of word spans.
-  let _uiObserver = null;
-  let _uiDebounceTimer = null;
-  function startUIObserver() {
-    if (_uiObserver) return;
     const textDiv = document.getElementById("thetext");
     if (!textDiv) return;
 
-    _uiObserver = new MutationObserver(function (mutations) {
-      let needsUpdate = false;
-      for (const m of mutations) {
-        if (m.addedNodes.length > 0) { needsUpdate = true; break; }
+    const sentences = textDiv.querySelectorAll(".textsentence");
+    let acc = 0;
+    sentences.forEach(function (s) {
+      // Clone so we can strip the 🔊 button without mutating the page.
+      const clone = s.cloneNode(true);
+      clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
+        b.remove();
+      });
+      const text = cleanSentenceText(
+        clone.innerText || clone.textContent || ""
+      );
+      if (!text) return;
+      const html = clone.innerHTML;
+      const dur = ttsEstimateDuration(text, ttsRate);
+      ttsCues.push({
+        text: text,
+        html: html,
+        start: acc,
+        end: acc + dur,
+        duration: dur,
+        actualDuration: null,
+      });
+      acc += dur;
+    });
+
+    ttsTotalDuration = acc;
+    if (ttsDurationEl) ttsDurationEl.textContent = ttsFmtTime(ttsTotalDuration);
+    if (ttsTimeline) ttsTimeline.max = ttsTotalDuration || 1000;
+    ttsBuildTranscript();
+  }
+
+  // Recompute cue start/end times after a rate change or after a cue
+  // learns its real duration. Keeps the timeline consistent without
+  // rebuilding the cue list (which would wipe actualDuration).
+  function ttsRecomputeTimeline() {
+    let acc = 0;
+    ttsCues.forEach(function (c) {
+      c.start = acc;
+      const dur = c.actualDuration != null ? c.actualDuration : c.duration;
+      c.end = acc + dur;
+      acc = c.end;
+    });
+    ttsTotalDuration = acc;
+    if (ttsDurationEl) ttsDurationEl.textContent = ttsFmtTime(ttsTotalDuration);
+    if (ttsTimeline) ttsTimeline.max = ttsTotalDuration || 1000;
+  }
+
+  /* ------------------------------------------------------------------
+   * Playback engine (SpeechSynthesis with edge-tts fallback)
+   * ------------------------------------------------------------------ */
+
+  function ttsCancelSpeech() {
+    if ("speechSynthesis" in window) {
+      try { window.speechSynthesis.cancel(); } catch (_) {}
+    }
+    ttsCurrentUtterance = null;
+  }
+
+  // Play a single cue through SpeechSynthesis. Sets up boundary / end
+  // handlers that drive the virtual playhead and advance to the next
+  // cue when finished.
+  function ttsPlayCue(idx) {
+    if (idx < 0 || idx >= ttsCues.length) {
+      ttsStop();
+      return;
+    }
+    const cue = ttsCues[idx];
+    if (!cue) return;
+
+    ttsCueIndex = idx;
+    ttsActivateCue(idx);
+
+    const cleanText = cue.text.replace(/[#＃]/g, "").trim();
+    if (!cleanText) {
+      // Skip empty cue (shouldn't happen, but be safe) and advance.
+      ttsAdvance();
+      return;
+    }
+
+    ttsCueStartedAt = performance.now();
+    ttsVirtualTime = cue.start;
+
+    if ("speechSynthesis" in window) {
+      ttsCancelSpeech();
+      const utterance = new SpeechSynthesisUtterance();
+      utterance.text = cleanText;
+
+      let activeVoice = getSelectedVoice();
+      const voices = window.speechSynthesis.getVoices();
+      const detectedLang = getCurrentLangCode();
+      if (!activeVoice && voices.length > 0) {
+        activeVoice = selectBestVoiceForLang(voices, detectedLang);
       }
-      if (!needsUpdate) return;
+      if (activeVoice) {
+        utterance.voice = activeVoice;
+        utterance.lang = activeVoice.lang;
+      } else {
+        utterance.lang = detectedLang;
+      }
+      utterance.rate = ttsRate;
 
-      // Debounce: wait 100ms before processing, so multiple rapid
-      // mutations (e.g., from add_status_classes + start_hover_mode)
-      // only trigger one call.
-      if (_uiDebounceTimer) clearTimeout(_uiDebounceTimer);
-      _uiDebounceTimer = setTimeout(function () {
-        _uiDebounceTimer = null;
-        if (SETTINGS.showSentenceButtons) injectSentencePlayButtons();
-        setupEventDelegation();
-      }, 100);
+      // boundary events give us word-level progress within a cue.
+      // Not all browsers fire them (Chrome does, Safari partial, FF
+      // not at all), so we also poll elapsed time as a fallback.
+      utterance.onboundary = function (ev) {
+        if (ttsCueIndex !== idx) return; // stale event
+        if (ev.name === "word" || ev.name === "sentence") {
+          // Use the charIndex to estimate progress through the cue.
+          const total = cleanText.length || 1;
+          const frac = Math.min(1, Math.max(0, (ev.charIndex || 0) / total));
+          const cueDur = cue.actualDuration != null
+            ? cue.actualDuration
+            : cue.duration;
+          ttsVirtualTime = cue.start + frac * cueDur;
+        }
+      };
+      utterance.onend = function () {
+        if (ttsCueIndex !== idx) return; // stale event (user jumped)
+        // Record the real duration so the timeline is accurate on
+        // subsequent plays and after rate changes.
+        const elapsed = (performance.now() - ttsCueStartedAt) / 1000;
+        if (elapsed > 0.3 && isFinite(elapsed)) {
+          cue.actualDuration = elapsed;
+          ttsRecomputeTimeline();
+        }
+        ttsVirtualTime = cue.end;
+        ttsAdvance();
+      };
+      utterance.onerror = function () {
+        if (ttsCueIndex !== idx) return;
+        ttsAdvance();
+      };
+
+      ttsCurrentUtterance = utterance;
+      // Small delay (matches the previous module) avoids a Chrome bug
+      // where rapid cancel() + speak() can leave synthesis stuck.
+      setTimeout(function () {
+        if (ttsCueIndex !== idx) return; // user jumped while we waited
+        try { window.speechSynthesis.speak(utterance); }
+        catch (e) { ttsAdvance(); }
+      }, 20);
+      return;
+    }
+
+    // --- Fallback: backend /tts/ endpoint ---
+    const lang = getCurrentLangCode();
+    const url = "/tts/" + lang + "/" + encodeURIComponent(cleanText);
+    const audio = new Audio(url);
+    audio.playbackRate = ttsRate;
+    ttsCurrentUtterance = {
+      _audio: audio,
+      stop: function () {
+        audio.pause();
+        audio.removeAttribute("src");
+        audio.load();
+      },
+    };
+    audio.addEventListener("timeupdate", function () {
+      if (ttsCueIndex !== idx) return;
+      ttsVirtualTime = cue.start + (audio.currentTime || 0);
     });
-
-    // Only observe childList (no subtree) — top-level changes only.
-    // This catches $('#thetext').html(data) without firing on every
-    // individual word span modification.
-    _uiObserver.observe(textDiv, { childList: true });
+    audio.addEventListener("ended", function () {
+      if (ttsCueIndex !== idx) return;
+      cue.actualDuration = audio.duration || cue.duration;
+      ttsRecomputeTimeline();
+      ttsVirtualTime = cue.end;
+      ttsAdvance();
+    });
+    audio.addEventListener("error", function () {
+      if (ttsCueIndex !== idx) return;
+      ttsAdvance();
+    });
+    audio.play().catch(function () { ttsAdvance(); });
   }
 
-  // Form observer: lightweight — only fires on body childList changes
-  // (e.g., when Lute opens a term form iframe).  No attribute watching.
-  let _formObserver = null;
-  function startFormObserver() {
-    if (_formObserver) return;
-    _formObserver = new MutationObserver(function () {
-      debouncedFormCheck();
-    });
+  // Decide what to play after the current cue ends.
+  function ttsAdvance() {
+    if (!ttsPlaying) return;
+    const curIdx = ttsCueIndex;
+    const curCue = ttsCues[curIdx];
 
-    // Only observe childList (not attributes) to reduce overhead.
-    _formObserver.observe(document.body, { childList: true, subtree: false });
+    // Loop takes precedence over auto-pause (same as YouTube player).
+    if (ttsLoop && curCue) {
+      ttsPlayCue(curIdx);
+      return;
+    }
+    if (ttsAutoPause) {
+      // Pause at the end of the current sentence and seek back to its
+      // start so pressing play replays it.
+      if (curCue) {
+        ttsVirtualTime = curCue.start;
+      }
+      ttsPaused = true;
+      ttsPlaying = false;
+      ttsUpdatePlayBtn();
+      if (ttsTimeline && curCue) ttsTimeline.value = curCue.start;
+      if (ttsCurTimeEl) ttsCurTimeEl.textContent = ttsFmtTime(ttsVirtualTime);
+      return;
+    }
+    const next = curIdx + 1;
+    if (next >= ttsCues.length) {
+      // End of stream.
+      ttsStop();
+      return;
+    }
+    ttsPlayCue(next);
   }
 
-  // ------------------------------------------------------------------
-  // 9. TTS toggles (sidebar quick controls)
-  // ------------------------------------------------------------------
+  function ttsTogglePlay() {
+    if (ttsPlaying && !ttsPaused) {
+      // Pause: cancel speech but remember position.
+      ttsPaused = true;
+      ttsPlaying = false;
+      ttsCancelSpeech();
+      ttsUpdatePlayBtn();
+      return;
+    }
+    if (ttsPaused) {
+      // Resume from the start of the current cue (SpeechSynthesis
+      // doesn't support resume-from-offset, so replay the cue).
+      ttsPaused = false;
+      ttsPlaying = true;
+      ttsUpdatePlayBtn();
+      const idx = ttsCueIndex >= 0 ? ttsCueIndex : 0;
+      ttsPlayCue(idx);
+      return;
+    }
+    // Fresh start.
+    if (ttsCues.length === 0) ttsBuildCues();
+    if (ttsCues.length === 0) return;
+    ttsPlaying = true;
+    ttsPaused = false;
+    // If the playhead is at the end, restart from the beginning.
+    let startIdx = ttsCueIndex >= 0 ? ttsCueIndex : 0;
+    if (ttsVirtualTime >= ttsTotalDuration - 0.1) startIdx = 0;
+    ttsPlayCue(startIdx);
+  }
+
+  function ttsStop() {
+    ttsCancelSpeech();
+    ttsPlaying = false;
+    ttsPaused = false;
+    ttsCueIndex = -1;
+    ttsVirtualTime = 0;
+    if (ttsTimeline) ttsTimeline.value = 0;
+    if (ttsCurTimeEl) ttsCurTimeEl.textContent = ttsFmtTime(0);
+    ttsDeactivateCue();
+    ttsUpdatePlayBtn();
+  }
+
+  function ttsUpdatePlayBtn() {
+    if (!ttsPlayBtn) return;
+    ttsPlayBtn.classList.toggle("playing", ttsPlaying && !ttsPaused);
+  }
+
+  function ttsJumpCue(delta) {
+    if (!ttsCues.length) return;
+    let target = ttsCueIndex < 0 ? 0 : ttsCueIndex + delta;
+    if (target < 0) target = 0;
+    if (target >= ttsCues.length) target = ttsCues.length - 1;
+    ttsSeekToCue(target, false);
+  }
+
+  // Jump the playhead to a cue start. If `autoplay` is true (clicked
+  // from the transcript), playback resumes; otherwise the current
+  // play/pause state is preserved.
+  function ttsSeekToCue(i, autoplay) {
+    if (!ttsCues[i]) return;
+    const cue = ttsCues[i];
+    const wasPlaying = ttsPlaying && !ttsPaused;
+    ttsCancelSpeech();
+    ttsCueIndex = i;
+    ttsVirtualTime = cue.start;
+    if (ttsTimeline) ttsTimeline.value = cue.start;
+    if (ttsCurTimeEl) ttsCurTimeEl.textContent = ttsFmtTime(cue.start);
+    ttsActivateCue(i);
+    if (autoplay && !wasPlaying) {
+      ttsPlaying = true;
+      ttsPaused = false;
+      ttsUpdatePlayBtn();
+    }
+    if (wasPlaying || autoplay) {
+      ttsPlayCue(i);
+    }
+  }
+
+  // Seek to an arbitrary virtual time (used by the timeline drag).
+  function ttsSeekToTime(t) {
+    if (!ttsCues.length) return;
+    let idx = -1;
+    for (let i = 0; i < ttsCues.length; i++) {
+      if (t >= ttsCues[i].start && t < ttsCues[i].end) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx < 0) {
+      // After the last cue end -> clamp to the last cue.
+      if (t >= ttsTotalDuration) idx = ttsCues.length - 1;
+      else idx = 0;
+    }
+    const wasPlaying = ttsPlaying && !ttsPaused;
+    ttsCancelSpeech();
+    ttsCueIndex = idx;
+    ttsVirtualTime = t;
+    if (ttsTimeline) ttsTimeline.value = t;
+    if (ttsCurTimeEl) ttsCurTimeEl.textContent = ttsFmtTime(t);
+    ttsActivateCue(idx);
+    if (wasPlaying) ttsPlayCue(idx);
+  }
+
+  function ttsSetRate(delta) {
+    const newRate = Math.min(2, Math.max(0.5, +(ttsRate + delta).toFixed(2)));
+    if (newRate === ttsRate) return;
+    ttsRate = newRate;
+    globalSpeed = ttsRate;
+    // Re-estimate durations for cues that haven't been measured yet.
+    ttsCues.forEach(function (c) {
+      if (c.actualDuration == null) {
+        c.duration = ttsEstimateDuration(c.text, ttsRate);
+      }
+    });
+    ttsRecomputeTimeline();
+    if (ttsRateInd) {
+      let label = ttsRate.toFixed(2).replace(/\.?0+$/, "");
+      if (label === "") label = "1";
+      ttsRateInd.textContent = label;
+    }
+    // If we're playing, restart the current cue at the new rate so
+    // SpeechSynthesis picks it up.
+    if (ttsPlaying && !ttsPaused && ttsCueIndex >= 0) {
+      ttsPlayCue(ttsCueIndex);
+    }
+  }
+
+  function ttsResetRate() {
+    ttsRate = 1.0;
+    globalSpeed = ttsRate;
+    ttsCues.forEach(function (c) {
+      if (c.actualDuration == null) {
+        c.duration = ttsEstimateDuration(c.text, ttsRate);
+      }
+    });
+    ttsRecomputeTimeline();
+    if (ttsRateInd) ttsRateInd.textContent = "1";
+    if (ttsPlaying && !ttsPaused && ttsCueIndex >= 0) {
+      ttsPlayCue(ttsCueIndex);
+    }
+  }
+
+  /* ------------------------------------------------------------------
+   * Poll loop: drive the virtual playhead, timeline, subtitle scroll
+   * ------------------------------------------------------------------ */
+
+  function ttsPoll() {
+    if (!ttsCues.length) return;
+    // If we're playing and have a current cue, advance the virtual
+    // playhead based on elapsed wall-clock time. boundary events
+    // (when available) give finer-grained updates; this is the
+    // fallback for browsers that don't fire them.
+    if (ttsPlaying && !ttsPaused && ttsCueIndex >= 0) {
+      const cue = ttsCues[ttsCueIndex];
+      if (cue) {
+        const elapsed = (performance.now() - ttsCueStartedAt) / 1000;
+        const cueDur = cue.actualDuration != null ? cue.actualDuration : cue.duration;
+        const frac = Math.min(1, Math.max(0, elapsed / cueDur));
+        // Only advance virtual time -- never move it backwards (the
+        // boundary handler may have set a more accurate value).
+        const proposed = cue.start + frac * cueDur;
+        if (proposed > ttsVirtualTime) ttsVirtualTime = proposed;
+      }
+    }
+
+    if (!ttsDragging) {
+      if (ttsTimeline) {
+        ttsTimeline.value = ttsVirtualTime;
+        const pct = ttsTotalDuration > 0
+          ? (ttsVirtualTime / ttsTotalDuration) * 100
+          : 0;
+        ttsTimeline.style.backgroundSize = pct + "% 100%";
+      }
+      if (ttsCurTimeEl) ttsCurTimeEl.textContent = ttsFmtTime(ttsVirtualTime);
+    }
+    ttsUpdateMarquee(ttsVirtualTime);
+  }
+
+  /* ------------------------------------------------------------------
+   * Subtitle + transcript rendering
+   * ------------------------------------------------------------------ */
+
+  function ttsEscapeHtml(s) {
+    const d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // Inject the current cue's word HTML into the scrolling subtitle,
+  // apply status colors, and measure marquee overflow for the
+  // horizontal scroll animation.
+  function ttsActivateCue(idx) {
+    if (ttsSubtitle) {
+      if (typeof clear_newmultiterm_elements === "function")
+        clear_newmultiterm_elements();
+      const cue = ttsCues[idx];
+      const html = cue ? cue.html : "";
+      ttsSubtitle.innerHTML = html || "";
+      ttsSubtitle.scrollLeft = 0;
+      ttsIsRtl = ttsSubtitle.getAttribute("dir") === "rtl";
+      window.requestAnimationFrame(function () {
+        const overflow = ttsSubtitle.scrollWidth - ttsSubtitle.clientWidth;
+        ttsMarqueeOverflow = ttsIsRtl ? 0 : Math.max(0, overflow);
+      });
+      ttsApplySubtitleStatusColors();
+    }
+
+    // Transcript highlight + smooth scroll to center.
+    const rows = ttsTranscriptList
+      ? ttsTranscriptList.querySelectorAll(".yt-transcript-row")
+      : [];
+    for (let r = 0; r < rows.length; r++) {
+      rows[r].classList.toggle("active", r === idx);
+    }
+    const row = rows[idx];
+    if (row && ttsTranscript && ttsTranscript.style.display !== "none") {
+      const rowRect = row.getBoundingClientRect();
+      const listRect = ttsTranscriptList.getBoundingClientRect();
+      const rowTopInList = rowRect.top - listRect.top + ttsTranscriptList.scrollTop;
+      const containerH = ttsTranscriptList.clientHeight;
+      let target = rowTopInList - containerH / 2 + rowRect.height / 2;
+      target = Math.max(0, Math.min(target, ttsTranscriptList.scrollHeight - containerH));
+      ttsTranscriptList.scrollTo({ top: target, behavior: "smooth" });
+    }
+  }
+
+  function ttsDeactivateCue() {
+    const rows = ttsTranscriptList
+      ? ttsTranscriptList.querySelectorAll(".yt-transcript-row")
+      : [];
+    for (let r = 0; r < rows.length; r++) {
+      rows[r].classList.remove("active");
+    }
+    if (ttsSubtitle) {
+      if (typeof clear_newmultiterm_elements === "function")
+        clear_newmultiterm_elements();
+      ttsSubtitle.innerHTML = "";
+      ttsMarqueeOverflow = 0;
+    }
+  }
+
+  function ttsUpdateMarquee(t) {
+    if (ttsCueIndex < 0 || ttsMarqueeOverflow <= 0 || !ttsSubtitle) return;
+    const cue = ttsCues[ttsCueIndex];
+    if (!cue) return;
+    const dur = Math.max(0.5, (cue.end || 0) - (cue.start || 0));
+    const progress = Math.min(1, Math.max(0, (t - cue.start) / dur));
+    ttsSubtitle.scrollLeft = ttsMarqueeOverflow * progress;
+  }
+
+  // Apply status color classes to the subtitle word spans (same as
+  // the YouTube player, so the subtitle always shows word colors).
+  function ttsApplySubtitleStatusColors() {
+    if (!ttsSubtitle) return;
+    if (typeof apply_status_class !== "function") return;
+    $(ttsSubtitle).find("span.word").each(function () {
+      apply_status_class($(this));
+    });
+  }
+
+  function ttsBindSubtitleInteractions() {
+    if (!ttsSubtitle) return;
+    if (typeof word_clicked !== "function") return;
+    const t = $(ttsSubtitle);
+
+    if (typeof _isUserUsingMobile === "function" && _isUserUsingMobile()) {
+      t.on("touchstart", ".word", touch_started);
+      t.on("touchend", ".word", touch_ended);
+    } else {
+      t.on("mousedown", ".word", handle_select_started);
+      t.on("mouseover", ".word", handle_select_over);
+      t.on("mouseup", ".word", handle_select_ended);
+      t.on("mouseover", ".word", hover_over);
+      t.on("mouseout", ".word", hover_out);
+    }
+
+    if (typeof tooltip_textitem_hover_content === "function" &&
+        typeof _get_tooltip_pos === "function") {
+      t.tooltip({
+        position: _get_tooltip_pos(),
+        items: ".word",
+        show: { easing: "easeOutCirc" },
+        content: function (setContent) {
+          tooltip_textitem_hover_content($(this), setContent);
+        },
+      });
+    }
+  }
+
+  function ttsBuildTranscript() {
+    if (!ttsTranscriptList) return;
+    ttsTranscriptList.innerHTML = "";
+    ttsCues.forEach(function (cue, i) {
+      const row = document.createElement("div");
+      row.className = "yt-transcript-row";
+      row.id = "tts-transcript-row-" + i;
+
+      const ts = document.createElement("span");
+      ts.className = "yt-transcript-ts";
+      ts.textContent = ttsFmtTime(cue.start);
+      ts.title = "Jump to " + ttsFmtTime(cue.start);
+
+      const txt = document.createElement("span");
+      txt.className = "yt-transcript-text";
+      txt.textContent = cue.text || "";
+
+      row.appendChild(ts);
+      row.appendChild(txt);
+      row.addEventListener("click", function () {
+        ttsSeekToCue(i, true);
+      });
+      ttsTranscriptList.appendChild(row);
+    });
+  }
+
+  /* ------------------------------------------------------------------
+   * Voice selection dropdown
+   * ------------------------------------------------------------------ */
+
+  function ttsPopulateVoiceList() {
+    if (!ttsVoiceDropdown || !("speechSynthesis" in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) return;
+
+    const detectedLang = getCurrentLangCode();
+    const recommended = selectBestVoiceForLang(voices, detectedLang);
+    const currentName =
+      (ttsVoiceBtn && ttsVoiceBtn.dataset.voiceName) ||
+      globalCache.selectedVoice ||
+      (recommended && recommended.name) ||
+      "";
+
+    // Group voices by language for easier scanning.
+    voices.sort(function (a, b) { return a.lang.localeCompare(b.lang); });
+
+    ttsVoiceDropdown.innerHTML = "";
+    voices.forEach(function (voice) {
+      const opt = document.createElement("div");
+      opt.className = "tts-voice-option";
+      opt.setAttribute("role", "option");
+      opt.dataset.voiceName = voice.name;
+      opt.textContent = "[" + voice.lang + "] " + voice.name;
+      if (voice.name === currentName) opt.classList.add("selected");
+      opt.addEventListener("click", function (e) {
+        e.stopPropagation();
+        ttsSelectVoice(voice);
+      });
+      ttsVoiceDropdown.appendChild(opt);
+    });
+
+    // Make sure the label reflects the current voice.
+    if (currentName && ttsVoiceLabel) {
+      ttsVoiceLabel.textContent = ttsShortVoiceName(currentName);
+    }
+  }
+
+  function ttsShortVoiceName(fullName) {
+    if (!fullName) return "Voice";
+    // Trim common noise: "Microsoft ... Online (Natural) ..." -> "...".
+    let s = fullName
+      .replace(/\s*\(Natural\)\s*/gi, " ")
+      .replace(/\s+Online\s*-\s*/g, " ")
+      .replace(/Microsoft\s+/gi, "")
+      .replace(/Google\s+/gi, "")
+      .trim();
+    if (s.length > 18) s = s.slice(0, 16) + "…";
+    return s || "Voice";
+  }
+
+  function ttsSelectVoice(voice) {
+    if (!voice) return;
+    if (ttsVoiceBtn) {
+      ttsVoiceBtn.dataset.voiceName = voice.name;
+      if (ttsVoiceLabel) ttsVoiceLabel.textContent = ttsShortVoiceName(voice.name);
+    }
+    globalCache.selectedVoice = voice.name;
+    // Update dropdown selected state.
+    if (ttsVoiceDropdown) {
+      ttsVoiceDropdown.querySelectorAll(".tts-voice-option").forEach(function (opt) {
+        opt.classList.toggle("selected", opt.dataset.voiceName === voice.name);
+      });
+    }
+    // Hide the dropdown.
+    if (ttsVoiceDropdown) ttsVoiceDropdown.hidden = true;
+    // If we're playing, restart the current cue with the new voice.
+    if (ttsPlaying && !ttsPaused && ttsCueIndex >= 0) {
+      ttsPlayCue(ttsCueIndex);
+    }
+  }
+
+  function ttsToggleVoiceDropdown() {
+    if (!ttsVoiceDropdown) return;
+    const willOpen = ttsVoiceDropdown.hidden;
+    ttsVoiceDropdown.hidden = !willOpen;
+    if (willOpen) {
+      // Repopulate in case voices loaded late.
+      ttsPopulateVoiceList();
+    }
+  }
+
+  // Close the voice dropdown when the user clicks outside of it.
+  function ttsSetupVoiceDismiss() {
+    document.addEventListener("click", function (e) {
+      if (!ttsVoiceDropdown || ttsVoiceDropdown.hidden) return;
+      const wrap = e.target.closest(".tts-voice-wrap");
+      if (!wrap) ttsVoiceDropdown.hidden = true;
+    });
+  }
+
+  /* ------------------------------------------------------------------
+   * Controls wiring
+   * ------------------------------------------------------------------ */
+
+  function ttsBindControls() {
+    if (ttsPlayBtn) ttsPlayBtn.addEventListener("click", ttsTogglePlay);
+    if (ttsPrevCueBtn) ttsPrevCueBtn.addEventListener("click", function () { ttsJumpCue(-1); });
+    if (ttsNextCueBtn) ttsNextCueBtn.addEventListener("click", function () { ttsJumpCue(1); });
+
+    if (ttsTimeline) {
+      ttsTimeline.addEventListener("pointerdown", function () { ttsDragging = true; });
+      ttsTimeline.addEventListener("input", function () {
+        if (ttsCurTimeEl) ttsCurTimeEl.textContent = ttsFmtTime(Number(ttsTimeline.value));
+      });
+      ttsTimeline.addEventListener("pointerup", function () {
+        ttsDragging = false;
+        ttsSeekToTime(Number(ttsTimeline.value));
+      });
+      ttsTimeline.addEventListener("keyup", function () {
+        ttsSeekToTime(Number(ttsTimeline.value));
+      });
+    }
+
+    const incBtn = document.getElementById("tts-rate-inc");
+    const decBtn = document.getElementById("tts-rate-dec");
+    if (incBtn) incBtn.addEventListener("click", function () { ttsSetRate(0.25); });
+    if (decBtn) decBtn.addEventListener("click", function () { ttsSetRate(-0.25); });
+    if (ttsRateInd) ttsRateInd.addEventListener("click", ttsResetRate);
+
+    if (ttsLoopBtn) {
+      ttsLoopBtn.addEventListener("click", function () {
+        ttsLoop = !ttsLoop;
+        ttsLoopBtn.classList.toggle("on", ttsLoop);
+        // "Press loop to keep looping": if the player is currently
+        // paused at the end of a sentence (auto-pause fired), turning
+        // loop on resumes playback so the sentence starts looping.
+        if (ttsLoop && ttsPaused && ttsCueIndex >= 0) {
+          ttsPaused = false;
+          ttsPlaying = true;
+          ttsUpdatePlayBtn();
+          ttsPlayCue(ttsCueIndex);
+        }
+      });
+    }
+    if (ttsAutoPauseBtn) {
+      ttsAutoPauseBtn.addEventListener("click", function () {
+        ttsAutoPause = !ttsAutoPause;
+        ttsAutoPauseBtn.classList.toggle("on", ttsAutoPause);
+      });
+    }
+    if (ttsTranscriptBtn) {
+      ttsTranscriptBtn.addEventListener("click", function () {
+        const isOpen = ttsTranscript.style.display !== "none";
+        if (isOpen) {
+          ttsTranscript.style.display = "none";
+          ttsTranscriptBtn.classList.remove("on");
+        } else {
+          ttsTranscript.style.display = "block";
+          ttsTranscriptBtn.classList.add("on");
+          // Center the current line when the panel opens.
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              const idx = ttsCueIndex >= 0 ? ttsCueIndex : 0;
+              ttsActivateCue(idx);
+            });
+          });
+        }
+      });
+    }
+    if (ttsVoiceBtn) {
+      ttsVoiceBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        ttsToggleVoiceDropdown();
+      });
+    }
+  }
+
+  function ttsBindKeys() {
+    window.addEventListener("keydown", function (e) {
+      if (e.code !== "Space") return;
+      if (!ttsContainer) return;
+      if (e.target &&
+          (e.target.tagName === "INPUT" ||
+           e.target.tagName === "TEXTAREA" ||
+           e.target.isContentEditable)) {
+        return;
+      }
+      // Don't hijack Space when the focus is inside the right pane
+      // (term form / dictionaries) -- let it scroll there.
+      if (e.target && e.target.closest && e.target.closest("#read_pane_right")) {
+        return;
+      }
+      e.preventDefault();
+      ttsTogglePlay();
+    });
+  }
+
+  /* ------------------------------------------------------------------
+   * Init / boot for the TTS player
+   * ------------------------------------------------------------------ */
+
+  function ttsCacheElements() {
+    ttsContainer = document.getElementById("tts-player-container");
+    if (!ttsContainer) return false;
+    ttsPlayBtn = document.getElementById("tts-play-btn");
+    ttsPrevCueBtn = document.getElementById("tts-prev-cue-btn");
+    ttsNextCueBtn = document.getElementById("tts-next-cue-btn");
+    ttsTimeline = document.getElementById("tts-timeline");
+    ttsCurTimeEl = document.getElementById("tts-current-time");
+    ttsDurationEl = document.getElementById("tts-duration");
+    ttsRateInd = document.getElementById("tts-rate-indicator");
+    ttsLoopBtn = document.getElementById("tts-loop-btn");
+    ttsAutoPauseBtn = document.getElementById("tts-autopause-btn");
+    ttsTranscriptBtn = document.getElementById("tts-transcript-btn");
+    ttsTranscript = document.getElementById("tts-transcript");
+    ttsTranscriptList = document.getElementById("tts-transcript-list");
+    ttsSubtitle = document.getElementById("tts-scrolling-subtitle-inner");
+    ttsVoiceBtn = document.getElementById("tts-voice-btn");
+    ttsVoiceDropdown = document.getElementById("tts-voice-dropdown");
+    ttsVoiceLabel = ttsVoiceBtn
+      ? ttsVoiceBtn.querySelector(".tts-voice-label")
+      : null;
+    return true;
+  }
+
+  function ttsInitPlayer() {
+    if (!ttsCacheElements()) return;
+    // The container is rendered by the template but its visibility
+    // is controlled by the TTS Player toggle (reading_menu).  The
+    // element itself is always present in the DOM so JS can find it.
+    ttsBindControls();
+    ttsBindSubtitleInteractions();
+    ttsBindKeys();
+    ttsSetupVoiceDismiss();
+
+    // Build the cue list from the current page content.  This is
+    // deferred until #thetext has its real content -- on initial load
+    // it's ajaxed in by goto_relative_page().
+    ttsBuildCuesWhenReady();
+
+    // Drive the virtual playhead.
+    if (ttsPollTimer) clearInterval(ttsPollTimer);
+    ttsPollTimer = setInterval(ttsPoll, 250);
+
+    // SpeechSynthesis voices may load asynchronously.
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = ttsPopulateVoiceList;
+      // Some browsers don't fire onvoiceschanged reliably -- try a
+      // few times shortly after init.
+      [200, 600, 1500].forEach(function (ms) {
+        setTimeout(ttsPopulateVoiceList, ms);
+      });
+    }
+
+    // Pick up the recommended voice for the current language if the
+    // user hasn't chosen one yet.
+    if (!globalCache.selectedVoice && "speechSynthesis" in window) {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length) {
+        const rec = selectBestVoiceForLang(voices, getCurrentLangCode());
+        if (rec) ttsSelectVoice(rec);
+      }
+    }
+  }
+
+  // Wait until #thetext has real sentence spans before building cues.
+  // On initial page load #thetext contains "..." (a placeholder) and
+  // is filled in by goto_relative_page() -> /read/start_reading ajax.
+  function ttsBuildCuesWhenReady() {
+    const textDiv = document.getElementById("thetext");
+    if (textDiv && textDiv.querySelector(".textsentence")) {
+      ttsBuildCues();
+      return;
+    }
+    // Retry for up to ~10 seconds.
+    let attempts = 0;
+    const t = setInterval(function () {
+      const div = document.getElementById("thetext");
+      if (div && div.querySelector(".textsentence")) {
+        clearInterval(t);
+        ttsBuildCues();
+      } else if (++attempts > 40) {
+        clearInterval(t);
+      }
+    }, 250);
+  }
+
+  /* ------------------------------------------------------------------
+   * Re-build cues when the page text changes (ajax navigation).
+   * ------------------------------------------------------------------ */
+
+  let _textObserver = null;
+  function ttsStartTextObserver() {
+    const textDiv = document.getElementById("thetext");
+    if (!textDiv || _textObserver) return;
+    _textObserver = new MutationObserver(function (mutations) {
+      let needsRebuild = false;
+      for (const m of mutations) {
+        if (m.addedNodes.length > 0) { needsRebuild = true; break; }
+      }
+      if (!needsRebuild) return;
+      // Debounce -- goto_relative_page does multiple DOM writes.
+      if (ttsStartTextObserver._t) clearTimeout(ttsStartTextObserver._t);
+      ttsStartTextObserver._t = setTimeout(function () {
+        ttsStartTextObserver._t = null;
+        // Stop any playback before rebuilding -- the old cue indices
+        // are stale after #thetext is replaced.
+        ttsCancelSpeech();
+        ttsPlaying = false;
+        ttsPaused = false;
+        ttsCueIndex = -1;
+        ttsVirtualTime = 0;
+        ttsUpdatePlayBtn();
+        ttsBuildCues();
+        // Re-apply status colours to the new subtitle word spans.
+        ttsApplySubtitleStatusColors();
+      }, 150);
+    });
+    _textObserver.observe(textDiv, { childList: true });
+  }
+
+  /* ================================================================
+     8. TTS toggles (sidebar quick controls)
+     ================================================================ */
 
   let ttsPlayerVisible = true;
   let ttsSentenceButtonsVisible = true;
 
   function setTtsPlayerVisible(visible) {
     ttsPlayerVisible = visible;
-    const panel = document.getElementById("lute-tts-panel");
     const toggle = document.getElementById("tts-player-toggle");
     const container = document.body;
 
-    if (panel) {
-      panel.style.display = visible ? "" : "none";
+    if (ttsContainer) {
+      ttsContainer.style.display = visible ? "" : "none";
     }
     if (toggle) {
       toggle.checked = visible;
@@ -851,6 +1477,11 @@
     try {
       fetch("/settings/set/tts_show_control_panel/" + val, { method: "POST" });
     } catch (_) {}
+
+    // Stop playback when the player is hidden mid-stream.
+    if (!visible && (ttsPlaying || ttsPaused)) {
+      ttsStop();
+    }
   }
 
   function setTtsSentenceButtonsVisible(visible) {
@@ -892,14 +1523,13 @@
     // input is explicitly left empty (the Jinja template sets it to
     // the empty string for youtube/mp3 types).
     var isYouTubeOrMp3 = function () {
-      if (document.querySelector(".youtube-player-container")) return true;
+      // The YouTube player is included for youtube/mp3 books; the TTS
+      // player is included for everything else.  When the YouTube
+      // player is present we hide the TTS player by default to avoid
+      // having two competing players on screen.
+      if (document.getElementById("yt-player-container")) return true;
       var audioInput = document.getElementById("book_audio_file");
       if (audioInput && (audioInput.value || "").trim() === "") {
-        // Only treat a blank audio file as a YouTube/MP3 signal when
-        // there's also a #ytContainer or the cues array is defined
-        // (a signal that youtube-player.js has been injected).  We
-        // don't want to hide the TTS panel for a regular book where
-        // the user just hasn't uploaded an audio file yet.
         if (document.getElementById("ytContainer")) return true;
         if (typeof window.CUES !== "undefined") return true;
       }
@@ -915,9 +1545,6 @@
     if (saved !== null) {
       initialVisible = saved !== "0";
     } else if (isYouTubeOrMp3()) {
-      // User has never set a preference: on a YouTube/MP3 page the
-      // built-in TTS panel is redundant with the transcript/subtitle
-      // player, so default it to hidden.
       initialVisible = false;
     } else {
       initialVisible = SETTINGS.showControlPanel;
@@ -929,6 +1556,9 @@
       document.body.classList.add("tts-player-active");
     } else {
       document.body.classList.remove("tts-player-active");
+    }
+    if (ttsContainer) {
+      ttsContainer.style.display = initialVisible ? "" : "none";
     }
 
     toggle.addEventListener("change", function () {
@@ -965,17 +1595,47 @@
     });
   }
 
-  // Override inject functions to respect toggle states
-  const _origInjectControlPanel = injectControlPanel;
-  injectControlPanel = function () {
-    if (!SETTINGS.showControlPanel) return;
-    _origInjectControlPanel();
-    const panel = document.getElementById("lute-tts-panel");
-    if (panel && !ttsPlayerVisible) {
-      panel.style.display = "none";
-    }
-  };
+  /* ------------------------------------------------------------------
+   * 9. Lightweight UI observer (sentence buttons + event delegation)
+   * ------------------------------------------------------------------ */
 
+  let _uiObserver = null;
+  let _uiDebounceTimer = null;
+  function startUIObserver() {
+    if (_uiObserver) return;
+    const textDiv = document.getElementById("thetext");
+    if (!textDiv) return;
+
+    _uiObserver = new MutationObserver(function (mutations) {
+      let needsUpdate = false;
+      for (const m of mutations) {
+        if (m.addedNodes.length > 0) { needsUpdate = true; break; }
+      }
+      if (!needsUpdate) return;
+
+      if (_uiDebounceTimer) clearTimeout(_uiDebounceTimer);
+      _uiDebounceTimer = setTimeout(function () {
+        _uiDebounceTimer = null;
+        if (SETTINGS.showSentenceButtons) injectSentencePlayButtons();
+        setupEventDelegation();
+      }, 100);
+    });
+
+    _uiObserver.observe(textDiv, { childList: true });
+  }
+
+  // Form observer: lightweight — only fires on body childList changes
+  // (e.g., when Lute opens a term form iframe).
+  let _formObserver = null;
+  function startFormObserver() {
+    if (_formObserver) return;
+    _formObserver = new MutationObserver(function () {
+      debouncedFormCheck();
+    });
+    _formObserver.observe(document.body, { childList: true, subtree: false });
+  }
+
+  // Override inject functions to respect toggle states.
   const _origInjectSentenceButtons = injectSentencePlayButtons;
   injectSentencePlayButtons = function () {
     if (!SETTINGS.showSentenceButtons) return;
@@ -987,33 +1647,37 @@
     }
   };
 
-  // ------------------------------------------------------------------
-  // 10. Boot
-  // ------------------------------------------------------------------
+  /* ------------------------------------------------------------------
+   * 10. Boot
+   * ------------------------------------------------------------------ */
 
   function boot() {
     setupTtsPlayerToggle();
     setupTtsSentenceButtonsToggle();
 
-    // Initial setup — only on the main reading page.
+    // Initialise the full TTS player if its container is on the page.
+    // (For YouTube / MP3 books the container isn't rendered and we
+    // fall back to the legacy small panel behaviour.)
+    if (document.getElementById("tts-player-container")) {
+      ttsInitPlayer();
+      ttsStartTextObserver();
+    }
+
     if (document.getElementById("thetext")) {
-      if (SETTINGS.showControlPanel) injectControlPanel();
       if (SETTINGS.showSentenceButtons) injectSentencePlayButtons();
       setupEventDelegation();
       startUIObserver();
     }
 
-    // Start lightweight form observer (detects term form iframe open)
     startFormObserver();
-
-    // Check for existing term form immediately
     processTranslationFlow();
 
-    // SpeechSynthesis voices — only load on main page, not iframe
-    if (document.getElementById("thetext") && "speechSynthesis" in window) {
-      window.speechSynthesis.getVoices();
-      window.speechSynthesis.onvoiceschanged = updateVoiceList;
-    }
+    // After a term status update, lute.js reloads #thetext.  The cue
+    // list rebuild is handled by the #thetext MutationObserver, but
+    // we also re-apply status colours to the subtitle.
+    window.addEventListener("lute:status-updated", function () {
+      ttsApplySubtitleStatusColors();
+    });
   }
 
   if (document.readyState === "loading") {

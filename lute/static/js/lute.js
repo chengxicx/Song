@@ -437,7 +437,10 @@ let get_selected_in_range = function(start_el, end_el) {
   // same cue text.  Without scoping, a drag-selection in one area
   // picks up duplicate spans from the other, causing the created
   // multiword term's text to be doubled (e.g. "取って取って").
-  const container = start_el.closest('#thetext, #yt-scrolling-subtitle-inner');
+  // The TTS player's scrolling subtitle (#tts-scrolling-subtitle-inner)
+  // has the same concern on text-book pages where #thetext and the
+  // subtitle share identical data-order values.
+  const container = start_el.closest('#thetext, #yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner');
   const search_root = container.length ? container : $(document);
   const selected = search_root.find('span.textitem').filter(function() {
     const ord = _get_order($(this));
