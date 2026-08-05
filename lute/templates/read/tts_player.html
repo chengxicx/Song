@@ -1,26 +1,13 @@
 {# TTS player for text books (book_type not in youtube/mp3).
    Mirrors the YouTube / MP3 player markup (same CSS classes) so the
    visual style, layout and responsive behaviour are identical.
-   The voice-selection button lives in the leftmost control area, before
-   the prev / play / next cue buttons (per spec). #}
+   The voice-selection button sits on the right-side controls row,
+   immediately to the left of the playback-rate controls. #}
 <div class="youtube-player-container tts-mode" id="tts-player-container"
      data-book-id="{{ book.id }}" data-lang-code="{{ lang_code }}"
      {% if is_rtl %}dir="rtl"{% endif %}>
   <div class="yt-player-controls">
     <div class="yt-controls-left">
-      {# Voice selection button (leftmost area, opens a dropdown).
-         Icon-only to match the compact prev/play/next cue buttons. #}
-      <div class="tts-voice-wrap">
-        <button id="tts-voice-btn" class="audio-button yt-cue-btn tts-voice-btn"
-                type="button" title="Select voice">
-          <svg viewBox="0 0 24 24" class="yt-icn" aria-hidden="true">
-            <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path>
-            <path d="M19 11a7 7 0 0 1-14 0"></path>
-            <path d="M12 18v3"></path>
-          </svg>
-        </button>
-        <div id="tts-voice-dropdown" class="tts-voice-dropdown" role="listbox" hidden></div>
-      </div>
       <button id="tts-prev-cue-btn" class="audio-button yt-cue-btn" title="Previous sentence">
         <svg viewBox="0 0 24 24" class="yt-icn"><path d="M7 6h2v12H7zM20 6l-8.5 6 8.5 6z"></path></svg>
       </button>
@@ -41,6 +28,19 @@
       </div>
     </div>
     <div class="yt-controls-right">
+      {# Voice selection button, immediately to the left of the playback
+         rate container (matches the MP3/YouTube right-side controls row). #}
+      <div class="tts-voice-wrap">
+        <button id="tts-voice-btn" class="audio-button yt-cue-btn tts-voice-btn"
+                type="button" title="Select voice">
+          <svg viewBox="0 0 24 24" class="yt-icn" aria-hidden="true">
+            <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path>
+            <path d="M19 11a7 7 0 0 1-14 0"></path>
+            <path d="M12 18v3"></path>
+          </svg>
+        </button>
+        <div id="tts-voice-dropdown" class="tts-voice-dropdown" role="listbox" hidden></div>
+      </div>
       <div id="tts-playback-rate-container" title="Playback rate. Click the number to reset">
         <button id="tts-rate-dec" class="audio-button yt-rate-btn"><span>−</span></button>
         <div id="tts-rate-indicator">1</div>

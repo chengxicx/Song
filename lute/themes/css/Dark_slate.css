@@ -159,7 +159,8 @@ span.hamburger {
 }
 
 .yt-timeline-wrap,
-#yt-playback-rate-container {
+#yt-playback-rate-container,
+#tts-playback-rate-container {
   background-color: var(--yt-color-5) !important;
 }
 
@@ -184,7 +185,8 @@ span.hamburger {
   color: #fff !important;
 }
 
-#yt-rate-indicator {
+#yt-rate-indicator,
+#tts-rate-indicator {
   color: var(--font-color) !important;
 }
 
