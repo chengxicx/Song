@@ -20,6 +20,26 @@ def get_data_tables_list(parameters, is_archived, session):
                 parameters["order"] = [{"column": col["index"], "dir": "desc"}]
                 break
 
+    # Newly-created books have never been opened, so their LastOpenedDate
+    # (max(TxStartDate)) is NULL.  Treat NULL as "most recently added":
+    # when sorting by Last read descending, such books should rank at the
+    # top (newest) instead of the bottom where SQLite normally puts NULLs.
+    # We replace the sort field with an explicit null-aware expression;
+    # descending sorts NULLs first, ascending sorts NULLs last.
+    for order in parameters.get("order", []):
+        col_index = int(order["column"])
+        columns = parameters.get("columns", [])
+        if col_index >= len(columns):
+            continue
+        col = columns[col_index]
+        if col.get("name") != "LastOpenedDate":
+            continue
+        if order.get("dir") == "desc":
+            col["name"] = "LastOpenedDate is null desc, LastOpenedDate"
+        else:
+            col["name"] = "LastOpenedDate is null, LastOpenedDate"
+        break
+
     archived = "true" if is_archived else "false"
 
     base_sql = f"""

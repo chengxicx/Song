@@ -57,6 +57,58 @@ def test_book_query_only_returns_supported_language_books(app_context, _dt_param
     assert len(d["data"]) == 0, "no books should be active"
 
 
+def _dt_params_sorted_by_last_opened(dir):
+    "Params that sort by the LastOpenedDate column (index 6)."
+    columns = [
+        {"data": "0", "name": "BkTitle", "searchable": True, "orderable": True},
+        {"data": "1", "name": "LgName", "searchable": True, "orderable": True},
+        {"data": "2", "name": "TagList", "searchable": True, "orderable": True},
+        {"data": "3", "name": "WordCount", "searchable": True, "orderable": True},
+        {"data": "4", "name": "UnknownPercent", "searchable": False, "orderable": True},
+        {"data": "5", "name": "NewWordPercent", "searchable": False, "orderable": True},
+        {"data": "6", "name": "LastOpenedDate", "searchable": False, "orderable": True},
+        {"data": "7", "name": "IsCompleted", "searchable": False, "orderable": False},
+    ]
+    return {
+        "draw": "1",
+        "columns": columns,
+        "order": [{"column": "6", "dir": dir}],
+        "start": "0",
+        "length": "10",
+        "search": {"value": "", "regex": False},
+        "filtLanguage": "0",
+    }
+
+
+def test_new_book_with_no_last_read_sorts_first_when_desc(app_context, english):
+    "A newly-created book (NULL last read) ranks first on 'Last read' desc."
+    keep = make_book("old book", "Kept.", english)
+    keep.texts[0].start_date = datetime(2020, 1, 1)
+    fresh = make_book("new book", "Fresh.", english)  # no start date set
+    db.session.add(keep)
+    db.session.add(fresh)
+    db.session.commit()
+
+    d = get_data_tables_list(_dt_params_sorted_by_last_opened("desc"), False, db.session)
+    titles = [r["BkTitle"] for r in d["data"]]
+    assert titles[0] == "new book", "NULL last-read must sort as newest (top)"
+    assert titles.index("old book") > titles.index("new book")
+
+
+def test_new_book_sorts_last_when_asc(app_context, english):
+    "Ascending sort keeps never-read books at the bottom."
+    keep = make_book("old book", "Kept.", english)
+    keep.texts[0].start_date = datetime(2020, 1, 1)
+    fresh = make_book("new book", "Fresh.", english)  # no start date set
+    db.session.add(keep)
+    db.session.add(fresh)
+    db.session.commit()
+
+    d = get_data_tables_list(_dt_params_sorted_by_last_opened("asc"), False, db.session)
+    titles = [r["BkTitle"] for r in d["data"]]
+    assert titles.index("new book") > titles.index("old book")
+
+
 def test_book_data_says_completed_if_last_page_has_been_read(
     app_context, _dt_params, english
 ):
