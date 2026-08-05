@@ -885,10 +885,6 @@
     min-width: 2.8rem;
     font-size: 0.75rem;
   }
-
-  .tts-voice-label {
-    display: none;
-  }
 }
 
 /* ============================================================
@@ -903,31 +899,6 @@
 .tts-mode {
   /* No video / audio wrap is rendered for TTS, so the controls
      appear at the top of the container -- same as the MP3 variant. */
-}
-
-/* On wide screens, force the entire control bar into a single row
-   (the default .yt-player-controls uses flex-wrap: wrap which causes
-   the rate buttons / loop / autopause to wrap onto a second row when
-   the voice button is present).  On narrow screens the standard
-   responsive breakpoint (@max-width 980px) takes over and lets the
-   right-side controls wrap below the timeline cleanly. */
-.tts-mode .yt-player-controls {
-  flex-wrap: nowrap;
-}
-
-.tts-mode .yt-controls-right {
-  flex-wrap: nowrap;
-  /* On very narrow widths (before the 980px breakpoint fires) let the
-     timeline shrink aggressively so the right-side buttons can all
-     fit on one row. */
-  flex-shrink: 0;
-}
-
-.tts-mode .yt-timeline-wrap {
-  /* Allow the timeline to squeeze smaller than its default 180px
-     base so the control bar can keep everything on one row. */
-  flex-basis: 120px;
-  min-width: 80px;
 }
 
 /* The scrolling subtitle inner selector is shared between the YouTube
@@ -966,31 +937,20 @@
 }
 
 /* Voice selection button + dropdown.
-   The button reuses .yt-toggle-btn for the chrome (border, padding,
-   hover, .on state) so it visually matches the Loop / Auto-pause
-   buttons.  The dropdown is a lightweight absolutely-positioned
-   list, styled to match the .yt-toggle-btn colour palette. */
+   The button reuses .audio-button .yt-cue-btn (same as prev/play/next
+   cue buttons) so it's a compact 34x34 icon-only square that matches
+   the other left-side controls.  The dropdown is a lightweight
+   absolutely-positioned list. */
 .tts-voice-wrap {
   position: relative;
   flex: 0 0 auto;
 }
 
-.tts-voice-btn {
-  /* Inherits .yt-toggle-btn chrome; just tighten the gap. */
-  gap: 0.3rem;
-  max-width: 11rem;
-}
-
+/* .tts-voice-btn inherits .yt-cue-btn chrome (34x34, white bg, icon).
+   No extra styling needed -- it's the same as the prev/next buttons. */
 .tts-voice-btn .yt-icn {
-  flex: 0 0 auto;
-}
-
-.tts-voice-label {
-  font-size: 0.78rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 7rem;
+  width: 16px;
+  height: 16px;
 }
 
 .tts-voice-dropdown {

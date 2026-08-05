@@ -1162,9 +1162,11 @@
       ttsVoiceDropdown.appendChild(opt);
     });
 
-    // Make sure the label reflects the current voice.
-    if (currentName && ttsVoiceLabel) {
-      ttsVoiceLabel.textContent = ttsShortVoiceName(currentName);
+    // Make sure the button title reflects the current voice (the
+    // button is icon-only, so the title tooltip is the only place
+    // the voice name is shown).
+    if (currentName && ttsVoiceBtn) {
+      ttsVoiceBtn.title = "Voice: " + ttsShortVoiceName(currentName);
     }
   }
 
