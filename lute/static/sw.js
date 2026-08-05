@@ -1,5 +1,5 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.4.3';
+const CACHE_NAME = 'lute-v3.10.4.4';
 
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
@@ -174,6 +174,14 @@ self.addEventListener('fetch', event => {
 
   // Skip theme and custom styles (they are dynamic per-user)
   if (url.pathname.startsWith('/theme/')) return;
+
+  // Skip dynamic pages that must never be cached (term forms,
+  // reading pages, term API routes).  These change on every request
+  // and caching them causes stale data after term status updates.
+  if (url.pathname.startsWith('/read/') || url.pathname.startsWith('/term/')) {
+    event.respondWith(fetch(urlStr).catch(() => Response.error()));
+    return;
+  }
 
   // Skip never-cache JS (always fresh)
   if (url.pathname.startsWith('/static/js/never_cache/')) {

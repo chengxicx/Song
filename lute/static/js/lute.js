@@ -1213,11 +1213,14 @@ function post_bulk_update(updates) {
   let reload_text_div = function() {
     const bookid = $('#book_id').val();
     const pagenum = $('#page_num').val();
-    const url = `/read/refresh_page/${bookid}/${pagenum}`;
+    const url = `/read/refresh_page/${bookid}/${pagenum}?_=${Date.now()}`;
     const repel = $('#thetext');
     repel.load(url, function() {
+      if (typeof add_status_classes === "function") {
+        add_status_classes();
+      }
       re_mark_selected_ids();
-      // Notify the YouTube player (if present) to refresh subtitle
+      // Notify the YouTube / TTS player (if present) to refresh subtitle
       // word colors — the server-side subtitle cache was invalidated
       // by the bulk_update_status endpoint.
       window.dispatchEvent(new Event('lute:status-updated'));
