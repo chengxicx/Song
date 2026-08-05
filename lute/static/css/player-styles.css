@@ -646,7 +646,8 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
-#yt-playback-rate-container {
+#yt-playback-rate-container,
+#tts-playback-rate-container {
   display: flex;
   gap: 0.3rem;
   align-items: center;
@@ -671,7 +672,8 @@
   pointer-events: none;
 }
 
-#yt-rate-indicator {
+#yt-rate-indicator,
+#tts-rate-indicator {
   font-size: 0.85rem;
   min-width: 1.6rem;
   text-align: center;
@@ -901,6 +903,31 @@
 .tts-mode {
   /* No video / audio wrap is rendered for TTS, so the controls
      appear at the top of the container -- same as the MP3 variant. */
+}
+
+/* On wide screens, force the entire control bar into a single row
+   (the default .yt-player-controls uses flex-wrap: wrap which causes
+   the rate buttons / loop / autopause to wrap onto a second row when
+   the voice button is present).  On narrow screens the standard
+   responsive breakpoint (@max-width 980px) takes over and lets the
+   right-side controls wrap below the timeline cleanly. */
+.tts-mode .yt-player-controls {
+  flex-wrap: nowrap;
+}
+
+.tts-mode .yt-controls-right {
+  flex-wrap: nowrap;
+  /* On very narrow widths (before the 980px breakpoint fires) let the
+     timeline shrink aggressively so the right-side buttons can all
+     fit on one row. */
+  flex-shrink: 0;
+}
+
+.tts-mode .yt-timeline-wrap {
+  /* Allow the timeline to squeeze smaller than its default 180px
+     base so the control bar can keep everything on one row. */
+  flex-basis: 120px;
+  min-width: 80px;
 }
 
 /* The scrolling subtitle inner selector is shared between the YouTube
