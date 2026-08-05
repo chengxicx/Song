@@ -320,7 +320,7 @@ def _import_youtube_video():
 
 
 def _import_mp3_audio():
-    "Create an mp3 book from the form data (mp3 + subtitle file)."
+    "Create an audio book (mp3/m4a) from the form data (audio + subtitle file)."
     mp3_file = request.files.get("mp3_file")
     srt_file = request.files.get("srt_file")
     tags = _parse_tagify_tags(request.form.get("mp3_tag", ""), "mp3")
@@ -329,14 +329,14 @@ def _import_mp3_audio():
     resplit = bool(request.form.get("resplit_sentences"))
 
     if mp3_file is None or mp3_file.filename == "":
-        flash("Please upload an MP3 audio file.", "notice")
+        flash("Please upload an audio file (MP3 or M4A).", "notice")
         return redirect("/book/import_webpage", 302)
 
-    # Validate the MP3 extension (case-insensitive).  We don't use the
+    # Validate the audio extension (case-insensitive).  We don't use the
     # form validators here because this is a dedicated import route.
     fname = (mp3_file.filename or "").lower()
-    if not fname.endswith(".mp3"):
-        flash("Please upload a valid MP3 file (.mp3).", "notice")
+    if not fname.endswith((".mp3", ".m4a")):
+        flash("Please upload a valid audio file (.mp3 or .m4a).", "notice")
         return redirect("/book/import_webpage", 302)
 
     if srt_file is None or srt_file.filename == "":
