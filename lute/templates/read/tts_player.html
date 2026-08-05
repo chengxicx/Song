@@ -8,16 +8,16 @@
      {% if is_rtl %}dir="rtl"{% endif %}>
   <div class="yt-player-controls">
     <div class="yt-controls-left">
-      {# Voice selection button (leftmost area, opens a dropdown). #}
+      {# Voice selection button (leftmost area, opens a dropdown).
+         Icon-only to match the compact prev/play/next cue buttons. #}
       <div class="tts-voice-wrap">
-        <button id="tts-voice-btn" class="yt-toggle-btn tts-voice-btn"
+        <button id="tts-voice-btn" class="audio-button yt-cue-btn tts-voice-btn"
                 type="button" title="Select voice">
           <svg viewBox="0 0 24 24" class="yt-icn" aria-hidden="true">
             <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path>
             <path d="M19 11a7 7 0 0 1-14 0"></path>
             <path d="M12 18v3"></path>
           </svg>
-          <span class="tts-voice-label">Voice</span>
         </button>
         <div id="tts-voice-dropdown" class="tts-voice-dropdown" role="listbox" hidden></div>
       </div>
