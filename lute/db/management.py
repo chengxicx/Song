@@ -94,7 +94,7 @@ def add_default_user_settings(session, default_user_backup_path):
         "mecab_path": None,
         "japanese_dict": "auto",
         "japanese_reading": "hiragana",
-        "current_theme": "-",
+        "current_theme": "Default.css",
         "custom_styles": "/* Custom css to modify Lute's appearance. */",
         "show_highlights": True,
         "current_language_id": 0,

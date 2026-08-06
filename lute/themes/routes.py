@@ -47,15 +47,15 @@ def set_next_theme():
     return jsonify("ok")
 
 
-# Paired light/dark themes used by the home dark-mode toggle button.
-LIGHT_THEME = "custom-apple.css"
-DARK_THEME = "Custom-apple-dark-v3.4.css"
+# Default paired light/dark themes used by the home dark-mode toggle button.
+LIGHT_THEME = "Default.css"
+DARK_THEME = "Default-Dark.css"
 
 
 @bp.route("/toggle_dark", methods=["POST"])
 def toggle_dark_theme():
     """
-    Toggle between the paired light and dark custom-apple themes.
+    Toggle between the paired Default (light) and Default-Dark themes.
 
     - If the current theme is the dark one, switch to the light one.
     - Otherwise (any light theme, default, or unknown), switch to dark.
