@@ -19,12 +19,12 @@ def test_list_themes(app_context):
     assert ("Apple_Books.css", "Apple Books") in lst
 
 
-def test_default_theme_is_blank_css(app_context):
-    "UserSetting starts off with blank css."
+def test_default_theme_is_default_css(app_context):
+    "UserSetting starts off with the Default.css theme."
     repo = UserSettingRepository(db.session)
-    assert repo.get_value("current_theme") == "-"
+    assert repo.get_value("current_theme") == "Default.css"
     svc = Service(db.session)
-    assert svc.get_current_css() == "", "Default = empty string."
+    assert "Default (Light)" in svc.get_current_css(), "Default = Default.css content."
 
 
 def test_bad_setting_returns_blank_css(app_context):
@@ -53,9 +53,10 @@ def test_next_theme_cycles_themes(app_context):
     svc = Service(db.session)
     lst = svc.list_themes()
     repo = UserSettingRepository(db.session)
-    assert repo.get_value("current_theme") == lst[0][0]
+    idx = [t[0] for t in lst].index("Default.css")
+    assert repo.get_value("current_theme") == lst[idx][0]
     svc.next_theme()
-    assert repo.get_value("current_theme") == lst[1][0]
+    assert repo.get_value("current_theme") == lst[idx + 1][0]
     for _ in range(0, len(lst) + 10):  # pylint: disable=consider-using-enumerate
         svc.next_theme()
         svc.next_theme()
