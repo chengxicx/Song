@@ -181,7 +181,7 @@ class JapaneseSudachiParser(AbstractParser):
                     if gap:
                         tokens.append(ParsedToken(gap, False, False))
                 pos = m.part_of_speech()
-                is_word = self._is_content_token(pos, surface)
+                is_word = self._is_selectable_token(pos, surface)
                 is_eos = surface in language.regexp_split_sentences
                 tokens.append(ParsedToken(surface, is_word, is_eos))
                 prev_end = m.end()
@@ -200,17 +200,53 @@ class JapaneseSudachiParser(AbstractParser):
     # Sudachi POS tuple is (pos1, pos2, pos3, pos4, pos5).
     # pos1 values: 名詞, 動詞, 形容詞, 形状詞, 副詞, 連体詞, 接続詞,
     #              感動詞, 助動詞, 助詞, 補助記号, 記号, 接頭辞, 接尾辞, ...
+    #
+    # Two different "word" notions are used:
+    #
+    # - _BOUND_POS1: bound grammatical morphemes whose *lemmas* must be
+    #   skipped during get_lemma(), otherwise conjugated forms resolve to
+    #   broken parents like 来るた or 置くて.  This is only a lemma
+    #   filter -- it does NOT make the tokens unclickable.
+    #
+    # - _SYMBOL_POS1: pos1 categories that are punctuation/symbols and
+    #   should not be independently selectable on the reading page.
     _BOUND_POS1 = {"助詞", "助動詞", "記号", "補助記号", "接尾辞", "接頭辞"}
+    _SYMBOL_POS1 = {"記号", "補助記号"}
 
     def _is_content_token(self, pos: tuple, surface: str) -> bool:
         """
-        True if the token represents a content word (自立語) worth
-        keeping as a learnable token.
+        True if the token is a content word whose lemma should be kept
+        when building a parent/lemma form.
+
+        Particles (助詞) and auxiliary verbs (助動詞) are excluded so
+        that conjugated forms don't resolve to broken parents (e.g.
+        来た -> 来るた, 置いて -> 置くて).
         """
         if not pos:
             return False
         pos1 = pos[0] if len(pos) > 0 else ""
         if pos1 in self._BOUND_POS1:
+            return False
+        # Whitespace / blank tokens.
+        if surface.strip() == "":
+            return False
+        return True
+
+    def _is_selectable_token(self, pos: tuple, surface: str) -> bool:
+        """
+        True if the token should be clickable/selectable on the reading
+        page (i.e. rendered with the `word` class so a popup opens).
+
+        Only punctuation/symbols (記号/補助記号) and blank tokens are
+        non-selectable.  Particles, auxiliary verbs, prefixes and
+        suffixes remain selectable so learners can look them up -- this
+        matches the MeCab parser, which makes hiragana morphemes
+        clickable (e.g. 溺れてく's て・く, or って in 平気だよって).
+        """
+        if not pos:
+            return False
+        pos1 = pos[0] if len(pos) > 0 else ""
+        if pos1 in self._SYMBOL_POS1:
             return False
         # Whitespace / blank tokens.
         if surface.strip() == "":
