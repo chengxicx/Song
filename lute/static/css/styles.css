@@ -97,7 +97,7 @@ p.version {
     /* Push the nav menu to the far right of the menu-bar, so the
        theme toggle button stays right next to the magnifier search
        instead of being pushed away by the toolbar placeholder's
-       flex-grow. (custom-apple themes override with !important.) */
+       flex-grow. (Default themes override with !important.) */
     margin-left: auto;
 }
 
@@ -158,7 +158,7 @@ div#divbooktable {
 div.dt-search {
     /* Collapsible magnifier search container.
        Display flex so the toggle button + input align horizontally.
-       Theme files (custom-apple, Custom-apple-dark) override with !important
+       Theme files (Default, Default-Dark) override with !important
        for their own color palette; this base rule ensures the collapse/expand
        behavior works even for themes that don't ship a magnifier style
        (e.g. Apple_Books, Night, Dusk, default). */
