@@ -1,0 +1,1049 @@
+/* =========================================================
+   LUTE THEME: Default (Light) — Apple Books 亮色风格
+   与 Default-Dark 的设计完全一致，仅配色不同。
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. 全局 Apple Books 纸质色调 (Sepia Paper)
+   --------------------------------------------------------- */
+body {
+  /* 生词状态色彩 */
+  --status-0-color: #007aff;        
+  --status-1-color: #f7d2cf;        
+  --status-2-color: #fce8b3;        
+  --status-3-color: #d1ebd8;        
+  --status-4-color: #d2e4f7;        
+  --status-5-color: #e5d7f2;        
+  --status-learned-bg: #e5dfd5;     
+  --status-learned-color: #726e67;  
+  --status-99-color: transparent;
+
+  --background-color: #f7f3ea;      /* Apple 界面纸质暖白背景色 */
+  --panel-bg: #ffffff;            /* 悬浮卡片/表格底色 */
+  --font-color: #2c2a29;           /* 文本深色 */
+
+  /* Chart.js 图表适配颜色 */
+  --chart-tick-color: #636366;
+  --chart-tick-major-color: #1c1c1e;
+  --chart-grid-color: rgba(0, 0, 0, 0.08);
+  --chart-title-color: #636366;
+  --chart-card-bg: #ffffff;
+
+  background-color: var(--background-color) !important;
+  color: var(--font-color) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "PingFang SC", sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------
+   2. 顶栏 (.menu-bar) —— 亮色毛玻璃特效
+   --------------------------------------------------------- */
+.menu-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  height: 52px !important;
+  padding: 0 24px !important;
+  background-color: rgba(247, 243, 234, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  position: relative !important;
+  z-index: 1000 !important;
+}
+
+/* Logo 区 */
+.menu-bar .header {
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 0 !important;
+  flex-shrink: 0;
+}
+
+.lutelogo {
+  height: 24px !important;
+  width: auto !important;
+  opacity: 0.85;
+}
+
+#luteTitle {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #1c1c1e !important;
+  margin: 0 0 0 8px !important;
+  letter-spacing: -0.01em;
+}
+
+/* 右侧菜单区 (BOOKS, TERMS...) */
+.menu-bar .menu {
+  display: flex !important;
+  align-items: center !important;
+  margin-left: auto !important;
+  gap: 20px !important;
+}
+
+.menu-item {
+  position: relative !important;
+  margin: 0 !important;
+  padding: 14px 0 !important;
+  cursor: pointer;
+}
+
+.menu-item > span {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #8e8e93 !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.menu-item:hover > span {
+  color: #007aff !important;
+}
+
+/* 下拉菜单 —— 亮色悬浮卡片 */
+.sub-menu {
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  left: auto !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+  padding: 6px !important;
+  min-width: 160px !important;
+  z-index: 10001 !important;
+  list-style: none !important;
+}
+
+.sub-menu li a {
+  display: block !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  color: #1c1c1e !important;
+  border-radius: 6px !important;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sub-menu li a:hover {
+  background-color: #007aff !important;
+  color: #ffffff !important;
+}
+
+.sub-menu hr {
+  border: none !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+  margin: 4px 0 !important;
+}
+
+/* ---------------------------------------------------------
+   3. 控件嵌入顶栏
+   --------------------------------------------------------- */
+.dt-container .dt-layout-row:first-child,
+div.dt-container div.dt-layout-row:first-child {
+  position: absolute !important;
+  top: 12px !important;
+  left: 240px !important;
+  z-index: 1001 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto !important;
+  height: 28px !important;
+}
+
+.dt-container .dt-layout-cell,
+.dt-container .dt-layout-start,
+.dt-container .dt-layout-end {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  background: transparent !important;
+}
+
+/* 语言下拉框 */
+#defaultLanguageSelect {
+  height: 28px !important;
+  line-height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #1c1c1e !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 6px !important;
+  outline: none;
+  cursor: pointer;
+}
+
+#defaultLanguageSelect option {
+  background-color: #ffffff;
+  color: #1c1c1e;
+}
+
+/* 搜索框 —— 亮色放大镜折叠式 */
+.dt-search {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  position: relative !important;
+}
+
+.dt-search label {
+  display: none !important;
+}
+
+.dt-search__toggle {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  color: #8e8e93 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  transition: all 0.2s ease;
+}
+
+.dt-search__toggle:hover {
+  color: #007aff !important;
+  background-color: #ffffff !important;
+  border-color: #007aff !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+}
+
+.dt-search input,
+#dt-search-0 {
+  height: 28px !important;
+  line-height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #1c1c1e !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 6px !important;
+  outline: none;
+  width: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  opacity: 0 !important;
+  transform: scaleX(0) !important;
+  transform-origin: right center !important;
+  transition: all 0.25s ease;
+  pointer-events: none !important;
+}
+
+.dt-search.dt-search--expanded input,
+.dt-search.dt-search--expanded #dt-search-0 {
+  width: 180px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.12) !important;
+  opacity: 1 !important;
+  transform: scaleX(1) !important;
+  pointer-events: auto !important;
+}
+
+#defaultLanguageSelect:focus,
+.dt-search input:focus {
+  background-color: #ffffff !important;
+  border-color: #007aff !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+}
+
+/* —— Dark / light mode toggle button (next to magnifier) —— */
+#theme-mode-toggle {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 50% !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #8e8e93 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+  transition: all 0.2s ease;
+}
+
+#theme-mode-toggle:hover {
+  color: #007aff !important;
+  background-color: #ffffff !important;
+  border-color: #007aff !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+}
+
+/* ---------------------------------------------------------
+   4. NEW WORD 胶囊色彩
+   --------------------------------------------------------- */
+.new-word-badge {
+  display: inline-block !important;
+  padding: 3px 10px !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.new-word-easy {
+  background-color: #a7d8b9 !important;
+  color: #1b432a !important;
+}
+
+.new-word-chal {
+  background-color: #f7d382 !important;
+  color: #523b05 !important;
+}
+
+.new-word-hard {
+  background-color: #f09595 !important;
+  color: #4a1111 !important;
+}
+
+/* ---------------------------------------------------------
+   5. 表格卡片 (亮色书页 Card)
+   --------------------------------------------------------- */
+.dt-container, div.dt-container {
+  margin-top: 16px !important;
+  padding: 0 24px !important;
+}
+
+table.dataTable, table {
+  background-color: #ffffff !important;
+  color: var(--font-color) !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important;
+  width: 100% !important;
+}
+
+th {
+  background-color: #faf7f2 !important;
+  color: #636366 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  padding: 12px 16px !important;
+}
+
+td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+}
+
+tr:last-child td {
+  border-bottom: none !important;
+}
+
+a, a:link, a:visited {
+  color: #007aff !important;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------
+   6. 阅读模式样式 (Apple Books 衬线体 + 紧凑行距)
+   --------------------------------------------------------- */
+div#thetext p { 
+  line-height: 1.4 !important;
+  margin: 0.4em 0 !important;
+  font-size: 18px;
+  color: #2c2a29 !important;
+  font-family: "Georgia", "New York", "Songti SC", "Source Han Serif SC", serif !important;
+}
+
+span.textitem {
+  font-family: "Georgia", "New York", serif !important;
+}
+
+span.status0 { background-color: transparent; color: var(--status-0-color); font-weight: 600; }
+span.status1 { background-color: var(--status-1-color); color: #7c2d2b; border-radius: 3px; padding: 1px 3px; }
+span.status2 { background-color: var(--status-2-color); color: #7a5c14; border-radius: 3px; padding: 1px 3px; }
+span.status3 { background-color: var(--status-3-color); color: #1e5c3c; border-radius: 3px; padding: 1px 3px; }
+span.status4 { background-color: var(--status-4-color); color: #1b4a7a; border-radius: 3px; padding: 1px 3px; }
+span.status5 { background-color: var(--status-5-color); color: #4b2a6e; border-radius: 3px; padding: 1px 3px; }
+
+span.status98, span.status99 { 
+  background-color: transparent; 
+  color: inherit; 
+}
+
+/* ---------------------------------------------------------
+   7. 底部控件布局对齐
+   --------------------------------------------------------- */
+.dt-container div.dt-layout-row:last-child,
+div.dt-container div.dt-layout-row:last-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
+  gap: 16px !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.dt-container div.dt-layout-row:last-child > .dt-layout-start,
+.dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-start {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  height: auto !important;
+}
+
+.dt-container div.dt-layout-row:last-child > .dt-layout-end,
+.dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-end {
+  display: flex !important;
+  align-items: center !important;
+  gap: 2px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+}
+
+div.dt-container .dt-length,
+div.dt-container .dt-info {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 13px !important;
+  color: #636366 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  white-space: nowrap !important;
+}
+
+div.dt-container .dt-length select {
+  height: 28px !important;
+  padding: 0 6px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background: #ffffff !important;
+  color: #1c1c1e !important;
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+  vertical-align: middle !important;
+}
+
+div.dt-container .dt-buttons {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 32px !important;
+}
+
+div.dt-container .dt-buttons button.dt-button,
+div.dt-container .dt-buttons button {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 28px !important;
+  padding: 0 10px !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #1c1c1e !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+div.dt-container .dt-buttons button.dt-button:hover {
+  background: #ffffff !important;
+  border-color: #007aff !important;
+  color: #007aff !important;
+}
+
+#datatables_config_widget {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 32px !important;
+  padding: 0 2px !important;
+  margin: 0 !important;
+}
+
+#datatables_config_widget img {
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+  vertical-align: middle !important;
+  filter: none;
+}
+
+div.dt-container .dt-paging {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 32px !important;
+}
+
+div.dt-container .dt-paging button.dt-paging-button,
+div.dt-container .dt-paging .paginate_button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border: 1px solid rgba(0, 0, 0, 0.10) !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #1c1c1e !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+div.dt-container .dt-paging button.dt-paging-button:hover:not(.disabled):not(.current),
+div.dt-container .dt-paging .paginate_button:hover:not(.disabled):not(.current) {
+  background: #ffffff !important;
+  border-color: #007aff !important;
+  color: #007aff !important;
+}
+
+div.dt-container .dt-paging button.dt-paging-button.current,
+div.dt-container .dt-paging .paginate_button.current {
+  background: #007aff !important;
+  border-color: #007aff !important;
+  color: #fff !important;
+  box-shadow: 0 1px 3px rgba(0,122,255,0.3) !important;
+}
+
+div.dt-container .dt-paging button.dt-paging-button.disabled,
+div.dt-container .dt-paging .paginate_button.disabled {
+  opacity: 0.3 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 820px) {
+  .dt-container div.dt-layout-row:last-child,
+  div.dt-container div.dt-layout-row:last-child {
+    flex-wrap: wrap !important;
+  }
+  .dt-container div.dt-layout-row:last-child > .dt-layout-start,
+  .dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-start {
+    flex-basis: 100% !important;
+    justify-content: flex-start !important;
+  }
+  .dt-container div.dt-layout-row:last-child > .dt-layout-end,
+  .dt-container div.dt-layout-row:last-child > .dt-layout-cell.dt-end {
+    flex-basis: 100% !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   8c. MOBILE / menu-bar responsiveness
+   The light theme pins .menu-bar to height:52px with !important,
+   which would prevent the wrapped rows from showing. Override
+   on narrow screens so the menu stacks cleanly.
+   --------------------------------------------------------- */
+@media screen and (max-width: 980px) {
+  .menu-bar {
+    height: auto !important;
+    flex-wrap: wrap !important;
+    padding: 0.6rem 0.5rem !important;
+    gap: 0.4rem 0.6rem !important;
+  }
+
+  .menu-bar .menu {
+    margin-left: auto !important;
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+
+  /* The toolbar (language + search) goes on its own row. */
+  #top-toolbar-placeholder {
+    order: 3;
+    flex: 1 1 auto !important;
+    margin-left: 0 !important;
+  }
+
+  /* Sticky pinned DT top row (defined earlier in this file) doesn't
+     apply on mobile because the toolbar placeholder takes its own row. */
+  .dt-container .dt-layout-row:first-child,
+  div.dt-container div.dt-layout-row:first-child {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    z-index: auto !important;
+    width: auto !important;
+    height: auto !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .menu-bar .menu {
+    gap: 0.6rem !important;
+  }
+  .menu-item > span {
+    font-size: 0.7rem !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   8. TTS 播放器样式适配
+   --------------------------------------------------------- */
+#lute-tts-panel {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  color: #1c1c1e !important;
+}
+
+#btn-lute-playpause,
+#lute-tts-panel button {
+  background-color: #007aff !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  border: none !important;
+  transition: background-color 0.15s ease;
+}
+
+#btn-lute-playpause:hover,
+#lute-tts-panel button:hover {
+  background-color: #409cff !important;
+}
+
+#lute-tts-panel select {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  color: #1c1c1e !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 6px !important;
+  outline: none;
+}
+
+#lute-tts-panel select option {
+  background-color: #ffffff !important;
+  color: #1c1c1e !important;
+}
+
+#lute-tts-panel div[style*="border-left"] {
+  border-left: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+#lute-tts-panel input[type="range"] {
+  accent-color: #007aff !important;
+}
+
+/* ---------------------------------------------------------
+   8b. AUDIO PLAYER (reading page) —— 适配亮色模式
+   原始样式定义在 player-styles.css，使用 --audio-color-* 变量，
+   这里显式覆盖为亮色以与整体风格统一。
+   --------------------------------------------------------- */
+.audio-player-container {
+  --audio-color-1: #007aff !important;   /* timeline / volume fill */
+  --audio-color-2: #ff5252 !important;
+  --audio-color-3: #ffffff !important;   /* container background */
+  --audio-color-4: #007aff !important;  /* button accent */
+  --audio-color-5: #f2f2f7 !important;  /* central / bookmark container bg */
+  border: 2px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: var(--audio-color-3) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* timeline container */
+.audio-player-timeline-container {
+  background-color: var(--audio-color-3) !important;
+}
+
+/* central area + bookmark button container */
+.audio-player-central-container,
+.bookmark-buttons-container {
+  background-color: var(--audio-color-5) !important;
+}
+
+/* rewind container */
+.rewind-container {
+  background-color: var(--audio-color-5) !important;
+}
+
+/* the rewind option select dropdown */
+#rewind-option {
+  background-color: #ffffff !important;
+  color: #1c1c1e !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+#rewind-option option {
+  background-color: #ffffff !important;
+  color: #1c1c1e !important;
+}
+
+/* play / skip / rewind / ff / bookmark buttons */
+.audio-button {
+  background-color: #ffffff !important;
+}
+
+/* rate buttons */
+.rate-btn {
+  background-color: #007aff !important;
+  color: #ffffff !important;
+}
+
+#playback-rate-indicator {
+  color: #1c1c1e !important;
+}
+
+/* timeline + volume range tracks (hardcoded #fff in player-styles.css) */
+.timeline,
+.volume {
+  background-color: #f7f3ea !important;
+}
+
+/* sticky player overlay (covers full width on small screens) */
+.sticky-player .audio-player-container {
+  background-color: var(--audio-color-3) !important;
+}
+
+/* duration text */
+.duration-container {
+  color: #2c2a29 !important;
+}
+
+/* ---------------------------------------------------------
+   9. STATS 页面适配 (Summary 白框、对齐与图表色彩)
+   --------------------------------------------------------- */
+
+/* 上方筛选控制栏 */
+#ov-controls,
+.ov-controls {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+  color: #1c1c1e !important;
+  padding: 12px 16px !important;
+  margin-bottom: 20px !important;
+}
+
+#ov-controls button,
+.ov-controls button {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: #1c1c1e !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 6px !important;
+  padding: 4px 12px !important;
+}
+
+#ov-controls button.active,
+#ov-controls button.selected,
+.ov-controls button.active,
+.ov-controls button.selected {
+  background-color: #007aff !important;
+  border-color: #007aff !important;
+  color: #ffffff !important;
+}
+
+#ov-controls select,
+.ov-controls select {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: #1c1c1e !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 6px !important;
+}
+
+#ov-controls select option,
+.ov-controls select option {
+  background-color: #ffffff !important;
+  color: #1c1c1e !important;
+}
+
+/* 统计卡片面板 (.chart-card) */
+.chart-card {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  color: #1c1c1e !important;
+  padding: 20px !important;
+}
+
+.chart-card h3 {
+  color: #1c1c1e !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  padding-bottom: 10px !important;
+  margin-top: 0 !important;
+}
+
+/* 修复 Summary 里的 8 个小方块（改为亮色透底） */
+.summary-level-item {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 8px !important;
+}
+
+.summary-level-num {
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.summary-level-name,
+.summary-section-title,
+.summary-total {
+  color: #636366 !important;
+}
+
+/* New terms chart uses red color directly (#e03131), no hue-rotate needed */
+
+/* ---------------------------------------------------------
+   10. WORDS READ 表格对齐与底栏日期刻度优化
+   --------------------------------------------------------- */
+
+/* Words Read 表格均分与垂直居中对齐 */
+.words-read-table, 
+table[id*="read"], 
+.chart-card table,
+.statsWordsRead {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.words-read-table th, 
+.words-read-table td,
+.chart-card table th,
+.chart-card table td,
+.statsWordsRead th,
+.statsWordsRead td {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 8px 12px !important;
+}
+
+.words-read-table th:first-child,
+.words-read-table td:first-child,
+.chart-card table th:first-child,
+.chart-card table td:first-child,
+.statsWordsRead th:first-child,
+.statsWordsRead td:first-child {
+  text-align: left !important;
+  width: 20% !important;
+}
+
+/* Words read 图表背景与对比度 */
+#wordCountChart {
+  background-color: var(--chart-card-bg) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 12px !important;
+}
+
+/* 底部 Date 日期刻度高亮显示 */
+.chart-card svg text,
+canvas + svg text {
+  color: #1c1c1e !important;
+  fill: #2c2a29 !important;
+}
+
+.chart-card canvas {
+  filter: none !important;
+}
+
+/* Term charts: ensure proper contrast on light background */
+#newTermsChart,
+#masteredTermsChart {
+  background-color: transparent !important;
+}
+
+.chart-card .chart-axis-label {
+  color: #636366 !important;
+  font-weight: 500 !important;
+}
+
+/* ---------------------------------------------------------
+   11. YOUTUBE / MP3 PLAYER — Apple Books 亮色模式适配
+   原始样式定义在 player-styles.css，默认是浅色 (aliceblue / #fff)，
+   这里显式覆盖为亮色，与整体风格统一。
+   --------------------------------------------------------- */
+.youtube-player-container {
+  --yt-color-1: #007aff !important;   /* timeline / accent fill */
+  --yt-color-2: #ff453a !important;
+  --yt-color-3: #f7f3ea !important;   /* container bg (matches body bg) */
+  --yt-color-4: #007aff !important;   /* primary accent button color */
+  --yt-color-5: #ffffff !important;   /* secondary panel bg (timeline/rate) */
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: var(--yt-color-3) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Play button */
+.yt-play-btn {
+  background-color: var(--yt-color-4) !important;
+  color: #fff !important;
+}
+
+/* Prev / next cue buttons */
+.yt-cue-btn {
+  background-color: #ffffff !important;
+  color: #1c1c1e !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Loop / autopause / fullscreen toggle buttons */
+.yt-toggle-btn {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  color: #1c1c1e !important;
+  border-radius: 8px !important;
+}
+.yt-toggle-btn:hover {
+  background-color: rgba(0, 122, 255, 0.1) !important;
+  border-color: rgba(0, 122, 255, 0.35) !important;
+}
+.yt-toggle-btn.on {
+  background-color: #30d158 !important;   /* Apple green accent */
+  border-color: #30d158 !important;
+  color: #fff !important;
+}
+
+/* Transcript button */
+.yt-transcript-btn {
+  background-color: var(--yt-color-4) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+}
+.yt-transcript-btn:hover {
+  filter: brightness(110%);
+}
+.yt-transcript-btn.on {
+  background-color: #30d158 !important;
+}
+
+/* Timeline + rate wrap panels */
+.yt-timeline-wrap,
+#yt-playback-rate-container,
+#tts-playback-rate-container {
+  background-color: var(--yt-color-5) !important;
+  border-radius: 8px !important;
+}
+
+/* Time display text */
+.yt-time-display {
+  color: #8e8e93 !important;
+}
+
+/* Seek bar track + thumb */
+.yt-timeline {
+  background-color: #f7f3ea !important;
+}
+.yt-timeline::-webkit-slider-thumb {
+  background-color: var(--yt-color-4) !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+}
+.yt-timeline::-moz-range-thumb {
+  background-color: var(--yt-color-4) !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Playback rate controls */
+.yt-rate-btn {
+  background-color: var(--yt-color-4) !important;
+  color: #fff !important;
+}
+#yt-rate-indicator,
+#tts-rate-indicator {
+  color: #1c1c1e !important;
+}
+
+/* ----- Scrolling subtitle ----- */
+.yt-scrolling-subtitle {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 8px !important;
+}
+
+#yt-scrolling-subtitle-inner {
+  color: #2c2a29 !important;
+}
+
+#yt-scrolling-subtitle-inner:empty::before {
+  color: #c7c7cc !important;
+}
+
+/* ----- Transcript panel ----- */
+.yt-transcript {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 8px !important;
+}
+
+.yt-transcript-row {
+  border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+}
+.yt-transcript-row:hover {
+  background-color: rgba(0, 122, 255, 0.08) !important;
+}
+.yt-transcript-row.active {
+  background-color: rgba(0, 122, 255, 0.15) !important;
+}
+
+.yt-transcript-ts {
+  color: var(--yt-color-1) !important;
+}
+
+.yt-transcript-text {
+  color: #2c2a29 !important;
+}

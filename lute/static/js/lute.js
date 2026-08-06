@@ -999,7 +999,7 @@ function next_theme() {
 
 }
 
-/* Toggle between the paired light and dark custom-apple themes,
+/* Toggle between the paired Default (light) and Default-Dark themes,
    then reload the page. Used by the reading sidebar menu item. */
 function toggle_dark_theme() {
   $.ajax({
