@@ -10,13 +10,21 @@ from lute.db import db
 bp = Blueprint("themes", __name__, url_prefix="/theme")
 
 
+def _never_cache(response):
+    "Prevent browsers/CDN heuristically caching this dynamic per-user response."
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 @bp.route("/current", methods=["GET"])
 def current_theme():
     "Return current css."
     service = Service(db.session)
     response = Response(service.get_current_css(), 200)
     response.content_type = "text/css; charset=utf-8"
-    return response
+    return _never_cache(response)
 
 
 @bp.route("/custom_styles", methods=["GET"])
@@ -28,7 +36,7 @@ def custom_styles():
     css = repo.get_value("custom_styles")
     response = Response(css, 200)
     response.content_type = "text/css; charset=utf-8"
-    return response
+    return _never_cache(response)
 
 
 @bp.route("/next", methods=["POST"])
