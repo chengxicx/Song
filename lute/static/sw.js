@@ -141,12 +141,18 @@ function cleanUrl(originalUrl) {
  * Guaranteed fallback for network-first requests.  Never returns
  * undefined: serving a cached page, the cached homepage, or a minimal
  * offline document is always better than ERR_FAILED.
+ *
+ * If a fallbackResponse is supplied (e.g. a server page we deliberately
+ * don't hand to the visitor but that came from a healthy server), use it
+ * when the cache is completely empty so a first-time visitor still sees a
+ * real document instead of the offline stub.
  */
-function cacheFallback(urlStr, isNavigation) {
+function cacheFallback(urlStr, isNavigation, fallbackResponse) {
   return caches.match(urlStr).then(cached => {
     if (cached) return cached;
     return caches.match('/').then(home => {
       if (home) return home;
+      if (fallbackResponse) return fallbackResponse;
       if (isNavigation) {
         return new Response(OFFLINE_HTML, {
           status: 503,
@@ -207,8 +213,9 @@ self.addEventListener('fetch', event => {
   }
 
   // Network-first for pages.  The root path can 302 to /backup/backup
-  // when an auto-backup is due; a redirect (or a broken redirect chain)
-  // must never abort the navigation — fall back to cache instead.
+  // when an auto-backup is due.  fetch() follows that redirect, so the
+  // "Backing up..." page arrives here as a "redirected" 200 — never hand
+  // it to the visitor as the homepage; serve a cached homepage instead.
   const isNavigation = event.request.mode === 'navigate';
   event.respondWith(
     fetch(urlStr)
@@ -221,8 +228,15 @@ self.addEventListener('fetch', event => {
           response.type === 'opaqueredirect' ||
           response.type === 'error' ||
           (response.status >= 300 && response.status < 400);
-        if (unusable) {
-          return cacheFallback(urlStr, isNavigation);
+        // Auto-backup due: the root path is 302'd to the backup page.
+        // Block that forced redirect — show the cached homepage instead
+        // (or the fetched page itself when nothing is cached yet).
+        const forcedToBackup =
+          url.pathname === '/' &&
+          response.redirected &&
+          response.url.includes('/backup/backup');
+        if (unusable || forcedToBackup) {
+          return cacheFallback(urlStr, isNavigation, response);
         }
         // Cache the page for offline use, but never cache a redirect
         // target under the original URL (e.g. the backup page under '/').
