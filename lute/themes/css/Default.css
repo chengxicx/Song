@@ -345,7 +345,6 @@ table.dataTable, table {
   border-collapse: separate !important;
   border-spacing: 0 !important;
   border-radius: 12px !important;
-  overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.06) !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important;
   width: 100% !important;
@@ -504,22 +503,6 @@ div.dt-container .dt-buttons button.dt-button:hover {
   background: #ffffff !important;
   border-color: #007aff !important;
   color: #007aff !important;
-}
-
-#datatables_config_widget {
-  display: inline-flex !important;
-  align-items: center !important;
-  height: 32px !important;
-  padding: 0 2px !important;
-  margin: 0 !important;
-}
-
-#datatables_config_widget img {
-  width: 18px !important;
-  height: 18px !important;
-  display: block !important;
-  vertical-align: middle !important;
-  filter: none;
 }
 
 div.dt-container .dt-paging {
@@ -1046,4 +1029,47 @@ canvas + svg text {
 
 .yt-transcript-text {
   color: #2c2a29 !important;
+}
+
+/* ---------------------------------------------------------
+   12. COL VIS 列显隐下拉菜单 — 亮色主题适配
+   --------------------------------------------------------- */
+.config-widget-top {
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.config-widget-top:hover {
+  background-color: #ffffff !important;
+  border-color: #007aff !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+}
+
+.config-widget-top img {
+  filter: none;
+  opacity: 0.6;
+}
+
+.config-widget-top:hover img {
+  opacity: 1;
+}
+
+.colvis-menu {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+}
+
+.colvis-menu .colvis-item {
+  color: #1c1c1e !important;
+}
+
+.colvis-menu .colvis-item:hover {
+  background-color: rgba(0, 122, 255, 0.08) !important;
+}
+
+.colvis-menu .colvis-item input[type="checkbox"] {
+  accent-color: #007aff !important;
 }
