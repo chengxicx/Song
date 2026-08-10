@@ -363,6 +363,11 @@ def start_reading(bookid, pagenum):
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
     service = Service(db.session)
+    if (book.book_type or "") == "manga":
+        ctx = service.manga_page_context(book, pagenum, True)
+        if ctx is None:
+            return render_template("read/page_content.html", paragraphs=[])
+        return render_template("read/manga_page.html", **ctx)
     paragraphs = service.start_reading(book, pagenum)
     return render_template("read/page_content.html", paragraphs=paragraphs)
 
@@ -386,6 +391,11 @@ def refresh_page(bookid, pagenum):
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
     service = Service(db.session)
+    if (book.book_type or "") == "manga":
+        ctx = service.manga_page_context(book, pagenum, False)
+        if ctx is None:
+            return render_template("read/page_content.html", paragraphs=[])
+        return render_template("read/manga_page.html", **ctx)
     paragraphs = service.get_paragraphs(book, pagenum)
     return render_template("read/page_content.html", paragraphs=paragraphs)
 

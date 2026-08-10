@@ -98,7 +98,7 @@
 
   {% if book_type in ("youtube", "mp3") %}
   {% include "read/youtube_player.html" %}
-  {% else %}
+  {% elif book_type != "manga" %}
   {# TTS player for text books: same UI / CSS classes as the YouTube / MP3
      player so the visual style, layout and responsive behaviour match.
      Visibility is controlled by the TTS Player toggle (reading_menu). #}
@@ -106,7 +106,7 @@
   {% endif %}
 
   <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
-  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}>
+  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %} class="{% if book_type == 'manga' %}manga-text-container{% endif %}">
     ...
   </div>
 

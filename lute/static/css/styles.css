@@ -1073,6 +1073,65 @@ span.textitem {
     border-bottom: 1px solid transparent;
 }
 
+/* ========================================= */
+/* Mokuro manga reading pane.
+
+   The page image is the flow child of .manga-page, so the container
+   is exactly the displayed image size; text blocks positioned in %
+   map 1:1 onto the image pixels.  The block font-size is set in cqw
+   (container query) units by the template so the text scales with
+   the responsive image. */
+div.thetext.manga-text-container,
+div#thetext.manga-text-container {
+    padding: 0 0.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.manga-page {
+    position: relative;
+    container-type: inline-size;
+}
+
+.manga-page-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.manga-text-block {
+    position: absolute;
+    overflow: visible;
+    /* On a busy page the words need a bit of contrast to stay
+       readable over the art.  Status backgrounds keep their colors. */
+    background-color: transparent;
+}
+
+.manga-text-line {
+    font-size: 16px; /* fallback if container query units unsupported */
+    line-height: 1.35;
+}
+
+.manga-text-block.manga-vertical .manga-text-line {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    line-height: 1.3;
+}
+
+/* Words inside manga blocks follow the block font size, not the
+   reading-pane default of 16px, and use white + outline for
+   legibility over the art while keeping the term status colors. */
+.manga-text-block span.textitem {
+    font-size: inherit;
+    color: #fff;
+    text-shadow:
+        0 0 2px #000,
+        0 0 2px #000,
+        0 0 3px #000;
+}
+
 /* .click */
 /* { */
     /* cursor: pointer; */

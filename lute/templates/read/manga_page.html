@@ -1,0 +1,43 @@
+{# Render one Mokuro manga page: the page image with text blocks
+   overlaid, so the words are clickable like a normal Lute reading page.
+   The blocks use absolute positioning in % of the page image, and the
+   font-size is scaled with cqw (container query units) so the text
+   stays proportionally aligned as the image is resized responsively. #}
+<div class="manga-page"
+     data-page-width="{{ img_width }}"
+     data-page-height="{{ img_height }}">
+  <img
+    class="manga-page-img"
+    src="{{ img_url }}"
+    alt="Manga page {{ page_num }}"
+    loading="eager"
+    decoding="async"
+  />
+
+  {% for block in blocks %}
+  {% set x1 = block.box[0] %}
+  {% set y1 = block.box[1] %}
+  {% set x2 = block.box[2] %}
+  {% set y2 = block.box[3] %}
+  {% set left = x1 / img_width * 100 %}
+  {% set top = y1 / img_height * 100 %}
+  {% set width = (x2 - x1) / img_width * 100 %}
+  {% set height = (y2 - y1) / img_height * 100 %}
+  {% set fs = block.font_size * 100 / img_width %}
+  <div class="manga-text-block{% if block.vertical %} manga-vertical{% endif %}"
+       style="left: {{ '%.3f'|format(left) }}%; top: {{ '%.3f'|format(top) }}%; width: {{ '%.3f'|format(width) }}%; height: {{ '%.3f'|format(height) }}%;">
+    {% for line_items in block.line_items %}
+    <div class="manga-text-line" style="font-size: {{ '%.3f'|format(fs) }}cqw;">
+      {% for item in line_items %}{% include 'read/textitem.html' %}{% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+  // Defined in lute.js: restore the current cursor/hover marker and
+  // apply term status classes, exactly like read/page_content.html.
+  parent.reset_cursor_marker();
+  parent.add_status_classes();
+</script>

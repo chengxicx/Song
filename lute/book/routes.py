@@ -204,6 +204,8 @@ def import_webpage():
             return _import_youtube_video()
         if import_type == "mp3":
             return _import_mp3_audio()
+        if import_type == "manga":
+            return _import_mokuro_manga()
         return _redirect_to_new_book_form()
 
     usrepo = UserSettingRepository(db.session)
@@ -399,6 +401,47 @@ def _find_book(bookid):
     "Find book from db."
     br = BookRepository(db.session)
     return br.find(bookid)
+
+
+def _import_mokuro_manga():
+    "Create a Mokuro manga book from an uploaded .zip/.cbz archive."
+    manga_file = request.files.get("manga_file")
+    tags = _parse_tagify_tags(request.form.get("manga_tag", ""), "Manga")
+    language_id = request.form.get("language_id")
+    title = (request.form.get("manga_title") or "").strip()
+
+    if manga_file is None or manga_file.filename == "":
+        flash("Please upload a Mokuro manga archive (.zip or .cbz).", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    fname = (manga_file.filename or "").lower()
+    if not fname.endswith((".zip", ".cbz")):
+        flash("Please upload a valid Mokuro manga archive (.zip or .cbz).", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if not title:
+        base = manga_file.filename or "Mokuro manga"
+        title = ".".join(base.split(".")[:-1]) or base
+    title = title[:200]
+
+    b = Book()
+    b.language_id = int(language_id) if language_id else None
+    b.title = title
+    b.source_uri = manga_file.filename
+    b.book_type = "manga"
+    b.book_tags = tags
+    b.threshold_page_tokens = 250
+    b.split_by = "paragraphs"
+
+    svc = BookService()
+    try:
+        b.manga_stream = manga_file.stream
+        b.manga_stream_filename = manga_file.filename
+        book = svc.import_book(b, db.session)
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+    return redirect(f"/read/{book.id}/page/1", 302)
 
 
 @bp.route("/archive/<int:bookid>", methods=["POST"])
