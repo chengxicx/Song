@@ -6,9 +6,10 @@ import json
 import os
 import re
 import shutil
+import uuid
+import zipfile
 from io import StringIO, TextIOWrapper, BytesIO
 from datetime import datetime
-import uuid
 from dataclasses import dataclass
 from tempfile import TemporaryFile
 import requests
@@ -361,6 +362,71 @@ class Service:
         newfilename = uuid.uuid4().hex
         return f"{formatted_datetime}_{newfilename}{ext}"
 
+    def extract_manga(self, filename, filestream):
+        """
+        Extract a Mokuro manga archive (zip/cbz) into static/manga/{uuid}/.
+
+        Returns (manga_path, mokuro_dict), where manga_path is the
+        relative directory under the static folder (e.g.
+        "manga/<uuid>"), and mokuro_dict is the parsed .mokuro JSON.
+
+        Raises BookImportException on invalid archives.
+        """
+        _, ext = os.path.splitext(filename)
+        ext = (ext or "").lower()
+        if ext not in (".zip", ".cbz"):
+            raise BookImportException(
+                f"Unsupported manga file extension '{ext}'; use .zip or .cbz."
+            )
+
+        manga_root = os.path.join(current_app.static_folder, "manga")
+        manga_uuid = uuid.uuid4().hex
+        target_dir = os.path.join(manga_root, manga_uuid)
+        os.makedirs(target_dir, exist_ok=True)
+
+        mokuro_name = None
+        try:
+            with zipfile.ZipFile(BytesIO(filestream.read())) as zf:
+                names = zf.namelist()
+                mokuro_candidates = [
+                    n for n in names if n.lower().endswith(".mokuro")
+                ]
+                if not mokuro_candidates:
+                    raise BookImportException(
+                        "Archive contains no .mokuro file; "
+                        "ensure it is a Mokuro manga archive."
+                    )
+                mokuro_name = mokuro_candidates[0]
+                # Extract members safely: reject names that would escape
+                # the target directory (zip-slip protection).
+                for member in names:
+                    target = os.path.join(target_dir, member)
+                    if not os.path.realpath(target).startswith(
+                        os.path.realpath(target_dir) + os.sep
+                    ):
+                        shutil.rmtree(target_dir, ignore_errors=True)
+                        raise BookImportException(
+                            f"Archive member '{member}' would escape the "
+                            "extraction directory; aborting import."
+                        )
+                zf.extractall(target_dir)
+        except zipfile.BadZipFile as e:
+            shutil.rmtree(target_dir, ignore_errors=True)
+            msg = f"Could not unzip {filename} (error: {str(e)})"
+            raise BookImportException(message=msg, cause=e) from e
+
+        # Parse the .mokuro JSON and store it on the book.
+        mokuro_path = os.path.join(target_dir, mokuro_name)
+        try:
+            with open(mokuro_path, "r", encoding="utf-8") as mf:
+                mokuro = json.load(mf)
+        except (ValueError, OSError) as e:
+            shutil.rmtree(target_dir, ignore_errors=True)
+            msg = f"Could not parse mokuro file {mokuro_name} (error: {str(e)})"
+            raise BookImportException(message=msg, cause=e) from e
+
+        return f"manga/{manga_uuid}", mokuro
+
     def youtube_title(self, url):
         """
         Best-effort title lookup for a YouTube video.
@@ -473,6 +539,14 @@ class Service:
                 ):  # Read the stream in chunks (e.g., 8 KB)
                     fcopy.write(chunk)
             book.audio_filename = newname
+
+        if book.manga_stream:
+            _raise_if_none(book.manga_stream_filename, "manga_stream_filename")
+            manga_path, mokuro = self.extract_manga(
+                book.manga_stream_filename, book.manga_stream
+            )
+            book.manga_path = manga_path
+            book.manga_data = json.dumps(mokuro, ensure_ascii=False)
 
         repo = Repository(session)
         dbbook = repo.add(book)

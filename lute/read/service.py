@@ -97,7 +97,9 @@ class Service:
         d = datetime.utcnow()
         text.read_date = d
 
-        w = WordsRead(text, d, text.word_count)
+        # Manga books have empty page text, so word_count is None; use
+        # 0 so the WordsRead row satisfies its NOT NULL constraint.
+        w = WordsRead(text, d, text.word_count or 0)
         self.session.add(text)
         self.session.add(w)
         self.session.commit()
@@ -200,6 +202,98 @@ class Service:
     def start_reading(self, dbbook, pagenum):
         "Start reading a page in the book, getting paragraphs."
         return self._get_reading_data(dbbook, pagenum, True)
+
+    def manga_page_context(self, dbbook, pagenum, track_page_open=False):
+        """
+        Build the render context for one Mokuro manga page: the image URL
+        and the text blocks with tokenized text items.
+
+        Returns None if the book has no manga data, or the page is out
+        of range.
+        """
+        manga = getattr(dbbook, "manga", None) or {}
+        pages = manga.get("pages") or []
+        if not 1 <= pagenum <= len(pages):
+            return None
+        page = pages[pagenum - 1]
+
+        # Track page open / current position, same as text books.
+        text = dbbook.text_at_page(pagenum)
+        if track_page_open:
+            text.start_date = datetime.utcnow()
+            dbbook.current_tx_id = text.id
+        self.session.add(dbbook)
+        self.session.add(text)
+        self.session.commit()
+
+        manga_path = (dbbook.manga_path or "").strip("/")
+        img_path = (page.get("img_path") or "").lstrip("/").replace("\\", "/")
+        img_url = f"/static/{manga_path}/{img_path}"
+
+        rs = RenderService(self.session)
+        lang = dbbook.language
+        blocks = []
+        order = 0
+        for bi, block in enumerate(page.get("blocks") or []):
+            box = block.get("box") or [0, 0, 0, 0]
+            line_items = []
+            for li, line in enumerate(block.get("lines") or []):
+                items = rs.get_textitems(line, lang)
+                for it in items:
+                    it.paragraph_number = bi + 1
+                    it.sentence_number = li + 1
+                    it.index = order
+                    order += 1
+                line_items.append(items)
+            blocks.append(
+                {
+                    "box": box,
+                    "vertical": bool(block.get("vertical")),
+                    "font_size": block.get("font_size") or 0,
+                    "line_items": line_items,
+                }
+            )
+
+        # Save new status-0 terms so the words have data-wid on the
+        # next page load (mirrors _save_new_status_0_terms).
+        self._save_new_manga_terms(blocks)
+
+        return {
+            "page_num": pagenum,
+            "img_url": img_url,
+            "img_width": page.get("img_width") or 100,
+            "img_height": page.get("img_height") or 100,
+            "blocks": blocks,
+        }
+
+    def _save_new_manga_terms(self, blocks):
+        """
+        Add status-0 terms found in manga text blocks.
+
+        Each line is tokenized with its own get_textitems() call, so a
+        word repeated within a page can produce several distinct,
+        unsaved Term objects for the same text; de-duplicate them by
+        (language, text_lc) before committing to avoid UNIQUE
+        constraint violations on words.WoLgID + words.WoTextLC.
+        """
+        seen = set()
+        new_terms = []
+        for block in blocks:
+            for line_items in block["line_items"]:
+                for ti in line_items:
+                    if (
+                        ti.is_word
+                        and ti.term is not None
+                        and ti.term.id is None
+                        and ti.term.status == 0
+                    ):
+                        key = (ti.term.language.id, ti.term.text_lc)
+                        if key not in seen:
+                            seen.add(key)
+                            new_terms.append(ti.term)
+        for t in new_terms:
+            self.session.add(t)
+        self.session.commit()
 
     def _sort_components(self, term, components):
         "Sort components by min position in string and length."

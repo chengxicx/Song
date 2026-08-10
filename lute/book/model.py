@@ -84,6 +84,13 @@ class Book:  # pylint: disable=too-many-instance-attributes
         self.srt_data = None
         self.video_current_pos = None
 
+        # Mokuro manga book fields.
+        # manga_path is the relative directory under the static folder where
+        # the extracted manga files live, e.g. "manga/<uuid>".
+        # manga_data is the full .mokuro JSON (pages, blocks, image paths).
+        self.manga_path = None
+        self.manga_data = None
+
         self.threshold_page_tokens = 250
         self.split_by = "paragraphs"
 
@@ -99,6 +106,10 @@ class Book:  # pylint: disable=too-many-instance-attributes
 
         self.audio_stream = None
         self.audio_stream_filename = None
+
+        # The source archive used for Mokuro manga (zip/cbz).
+        self.manga_stream = None
+        self.manga_stream_filename = None
 
     def __repr__(self):
         return f"<Book (id={self.id}, title='{self.title}')>"
@@ -117,6 +128,20 @@ class Book:  # pylint: disable=too-many-instance-attributes
             return json.loads(self.srt_data)
         except (ValueError, TypeError):
             return []
+
+    @property
+    def parsed_manga_data(self):
+        """
+        Return the parsed Mokuro manga JSON as a dict.
+
+        Returns None if there is no manga data.
+        """
+        if not self.manga_data:
+            return None
+        try:
+            return json.loads(self.manga_data)
+        except (ValueError, TypeError):
+            return None
 
     def add_tag(self, tag):
         self.book_tags.append(tag)
@@ -241,10 +266,21 @@ class Repository:
 
         b = None
         if book.id is None:
-            pages = self._split_pages(book, lang)
-            b = DBBook(book.title, lang)
-            for index, page in enumerate(pages):
-                _ = DBText(b, page, index + 1)
+            if book.book_type == "manga":
+                # Manga books have no plain text; create one (empty)
+                # page per Mokuro page.  The mokuro JSON is stored on
+                # the book, and the reading screen renders the images
+                # with overlaid text blocks.
+                manga = book.parsed_manga_data or {}
+                pages = manga.get("pages", []) or []
+                b = DBBook(book.title, lang)
+                for index, _page in enumerate(pages):
+                    _ = DBText(b, "", index + 1)
+            else:
+                pages = self._split_pages(book, lang)
+                b = DBBook(book.title, lang)
+                for index, page in enumerate(pages):
+                    _ = DBText(b, page, index + 1)
         else:
             b = self.book_repo.find(book.id)
             # If the text has been changed, re-split the pages.
@@ -277,6 +313,8 @@ class Repository:
         b.book_type = book.book_type
         b.srt_data = book.srt_data
         b.video_current_pos = book.video_current_pos
+        b.manga_path = book.manga_path
+        b.manga_data = book.manga_data
 
         btr = BookTagRepository(self.session)
         booktags = []
@@ -307,5 +345,7 @@ class Repository:
         b.book_type = dbbook.book_type
         b.srt_data = dbbook.srt_data
         b.video_current_pos = dbbook.video_current_pos
+        b.manga_path = dbbook.manga_path
+        b.manga_data = dbbook.manga_data
         b.book_tags = [t.text for t in dbbook.book_tags]
         return b
