@@ -425,6 +425,89 @@ class Service:
             msg = f"Could not parse mokuro file {mokuro_name} (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
 
+        # Fix up img_path entries so they point to actual extracted files.
+        # Mokuro archives may have the .mokuro JSON at the zip root but
+        # images inside a volume/ subdirectory (e.g. volume "Foo" with
+        # img_path "001.jpg" means the file is "Foo/001.jpg").  We also
+        # support the case where the img_path already contains the right
+        # relative path, or where the files live directly next to the
+        # .mokuro file.
+        mokuro_dir = os.path.dirname(mokuro_path) or target_dir
+
+        def _find_rel_image(rel_candidate):
+            "Return True if rel_candidate resolves to an existing file under target_dir."
+            abs_path = os.path.normpath(os.path.join(target_dir, rel_candidate))
+            if not os.path.realpath(abs_path).startswith(
+                os.path.realpath(target_dir) + os.sep
+            ):
+                return False
+            return os.path.isfile(abs_path)
+
+        # Build a lookup: basename -> list of (rel_path_from_target_dir)
+        # for every regular file extracted under target_dir.
+        basename_index = {}
+        for root, _dirs, files in os.walk(target_dir):
+            for f in files:
+                abs_f = os.path.join(root, f)
+                try:
+                    rel_f = os.path.relpath(abs_f, target_dir).replace("\\", "/")
+                except ValueError:
+                    continue
+                basename_index.setdefault(os.path.basename(f).lower(), []).append(rel_f)
+
+        volume = (mokuro.get("volume") or "").strip().replace("\\", "/")
+
+        for page in mokuro.get("pages") or []:
+            raw = (page.get("img_path") or "").replace("\\", "/")
+            if not raw:
+                continue
+
+            candidates = []
+            # 1) As written, relative to the extracted root.
+            candidates.append(raw)
+            # 2) Relative to the .mokuro file's directory.
+            mokuro_rel = os.path.relpath(
+                os.path.normpath(os.path.join(mokuro_dir, raw)), target_dir
+            ).replace("\\", "/")
+            candidates.append(mokuro_rel)
+            # 3) Under the volume/ subdirectory (mokuro default layout).
+            if volume:
+                candidates.append(f"{volume.rstrip('/')}/{raw.lstrip('/')}")
+                # Volume directory next to the .mokuro file.
+                vol_abs = os.path.normpath(os.path.join(mokuro_dir, volume, raw))
+                try:
+                    candidates.append(
+                        os.path.relpath(vol_abs, target_dir).replace("\\", "/")
+                    )
+                except ValueError:
+                    pass
+            # 4) Just the basename in any subdirectory (fallback scan).
+            base = os.path.basename(raw)
+            matches = basename_index.get(base.lower()) or []
+            # Prefer matches whose path contains the volume name if any.
+            if volume:
+                sorted_matches = sorted(
+                    matches,
+                    key=lambda p: (0 if volume.lower() in p.lower() else 1, len(p)),
+                )
+            else:
+                sorted_matches = sorted(matches, key=len)
+            candidates.extend(sorted_matches)
+
+            resolved = None
+            seen = set()
+            for cand in candidates:
+                cand = cand.replace("\\", "/").lstrip("./")
+                if cand in seen:
+                    continue
+                seen.add(cand)
+                if _find_rel_image(cand):
+                    resolved = cand
+                    break
+
+            if resolved is not None:
+                page["img_path"] = resolved
+
         return f"manga/{manga_uuid}", mokuro
 
     def youtube_title(self, url):

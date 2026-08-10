@@ -2,9 +2,11 @@
 Reading helpers.
 """
 
+import os
 from collections import defaultdict
 from datetime import datetime
 import functools
+from flask import current_app
 from lute.models.term import Term, Status
 from lute.models.book import Text, WordsRead
 from lute.models.repositories import BookRepository, UserSettingRepository
@@ -227,8 +229,59 @@ class Service:
         self.session.commit()
 
         manga_path = (dbbook.manga_path or "").strip("/")
-        img_path = (page.get("img_path") or "").lstrip("/").replace("\\", "/")
-        img_url = f"/static/{manga_path}/{img_path}"
+        raw_img_path = (page.get("img_path") or "").lstrip("/").replace("\\", "/")
+
+        # Runtime fallback: resolve the image path against the actual
+        # extracted files on disk.  Mokuro-generated zips commonly
+        # place images under a volume/ subdirectory while the .mokuro
+        # JSON records just the basename in img_path.  New imports fix
+        # this up during extract_manga(), but already-imported books
+        # need a runtime lookup.
+        resolved_img_path = raw_img_path
+        if manga_path and raw_img_path:
+            manga_abs = os.path.join(current_app.static_folder, manga_path)
+            if os.path.isdir(manga_abs):
+                raw_abs = os.path.normpath(os.path.join(manga_abs, raw_img_path))
+                if not os.path.isfile(raw_abs):
+                    # Try volume subdir, then basename scan.
+                    volume = ((manga.get("volume") or "").strip()
+                              .replace("\\", "/"))
+                    candidates = []
+                    if volume:
+                        candidates.append(
+                            os.path.normpath(
+                                os.path.join(manga_abs, volume, raw_img_path)
+                            )
+                        )
+                    # Fallback: walk the manga directory and match by
+                    # basename, preferring paths that mention volume.
+                    base = os.path.basename(raw_img_path).lower()
+                    matches = []
+                    for root, _dirs, files in os.walk(manga_abs):
+                        for f in files:
+                            if os.path.basename(f).lower() == base:
+                                matches.append(os.path.join(root, f))
+                    if matches:
+                        def _match_key(p):
+                            has_vol = (
+                                bool(volume)
+                                and volume.lower() in p.lower()
+                            )
+                            return (0 if has_vol else 1, len(p))
+                        matches.sort(key=_match_key)
+                        candidates.insert(0, matches[0])
+                    for c in candidates:
+                        if os.path.isfile(c) and os.path.realpath(c).startswith(
+                            os.path.realpath(manga_abs) + os.sep
+                        ):
+                            try:
+                                rel = os.path.relpath(c, manga_abs)
+                                resolved_img_path = rel.replace("\\", "/")
+                                break
+                            except ValueError:
+                                continue
+
+        img_url = f"/static/{manga_path}/{resolved_img_path.lstrip('/')}"
 
         rs = RenderService(self.session)
         lang = dbbook.language
