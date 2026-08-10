@@ -55,11 +55,20 @@ class Book(
     audio_bookmarks = db.Column("BkAudioBookmarks", db.String)
 
     # YouTube video book fields.
-    # book_type is '' for regular books, 'youtube' for YouTube video books.
+    # book_type is '' for regular books, 'youtube' for YouTube video books,
+    # 'manga' for Mokuro manga books.
     book_type = db.Column("BkBookType", db.String, default="")
     # srt_data is a JSON array of subtitle cues (start/end/text), see migration.
     srt_data = db.Column("BkSrtData", db.String)
     video_current_pos = db.Column("BkVideoCurrentPos", db.Float)
+
+    # Mokuro manga book fields (see migration 20260811_add_manga_fields.sql).
+    # manga_path is the relative directory under the static folder where the
+    #   extracted manga files live, e.g. "manga/<uuid>".
+    # manga_data is the full .mokuro JSON (pages, blocks, image paths), so
+    #   the reading screen can render images + overlaid text blocks.
+    manga_path = db.Column("BkMangaPath", db.String)
+    manga_data = db.Column("BkMangaData", db.String)
 
     language = db.relationship("Language")
     texts = db.relationship(
@@ -160,6 +169,20 @@ class Book(
             return json.loads(self.srt_data)
         except (ValueError, TypeError):
             return []
+
+    @property
+    def manga(self):
+        """
+        Return the parsed Mokuro manga JSON as a dict.
+
+        Returns None if there is no manga data.
+        """
+        if not self.manga_data:
+            return None
+        try:
+            return json.loads(self.manga_data)
+        except (ValueError, TypeError):
+            return None
 
 
 # TODO zzfuture fix: rename class and table to Page/pages
