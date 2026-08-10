@@ -53,8 +53,6 @@
     />
 </div>
 
-<div id="datatables_config_items" style="display: none;"></div>
-
 {# Hidden form for archive, unarchive, delete. #}
 <form id="actionposter" method="post" action="">
 </form>
@@ -163,25 +161,16 @@
         topEnd: 'search',
         bottomStart: [
           'pageLength',
-          function() {
-            return $('#datatables_config_widget');
-          },
           {
             info: {
               callback: function (s, start, end, max, total, result) {
                 return `${start} to ${end} of ${max}`;
               }
             }
-          },
-          'buttons'
+          }
         ],
         bottomEnd: 'paging'
       },
-      buttons: [
-        {
-          extend: 'colvis'
-        }
-      ],
       {% if status != 'Archived' %}
       "language": {
             "emptyTable": "No books available. <a href='/book/new'>Create one?</a>"
@@ -360,16 +349,6 @@
     });
   }
 
-  let move_datatables_controls_to_config_widget = function() {
-    const widget = $('#datatables_config_items');
-    const append_children = [ '.dt-buttons', '.dt-length' ];
-    for (let c of append_children) {
-      const el = $(`div${c}`);
-      el.css({ padding: '0.2rem', margin: '0rem', display: 'inline' });
-      widget.append(el);
-    }
-  }
-
   var _pageshow_first_load = true;
   window.addEventListener('pageshow', function(e) {
     if (_pageshow_first_load) {
@@ -388,10 +367,94 @@
     setup_language_filter(current_language_id);
     setup_book_datatable("{{ initial_search or '' }}");
 
-    move_datatables_controls_to_config_widget();
+    // 顶部齿轮图标 — 弹出自定义列显隐菜单（不再依赖 DataTables colvis 的隐藏按钮，
+    // 避免弹窗被滚动容器裁剪）。菜单用 position:fixed 定位，和 Action 菜单同一套逻辑。
+    function buildColvisMenu() {
+      var menu = document.getElementById('colvis-menu');
+      if (!menu || !book_listing_table) return;
+      menu.innerHTML = '';
+      var ths = document.querySelectorAll('#booktable thead th');
+      for (var i = 0; i < ths.length; i++) {
+        var title = ths[i].textContent.trim();
+        if (title === 'Actions') continue;
+        (function(idx) {
+          var label = document.createElement('label');
+          label.className = 'colvis-item';
+          var cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.checked = book_listing_table.column(idx).visible();
+          var span = document.createElement('span');
+          span.textContent = title;
+          label.appendChild(cb);
+          label.appendChild(span);
+          label.addEventListener('change', function() {
+            book_listing_table.column(idx).visible(cb.checked);
+          });
+          menu.appendChild(label);
+        })(i);
+      }
+    }
 
-    $("#datatables_config_toggle").click(function() {
-      $("#datatables_config_items").toggle();
+    function positionColvisMenu() {
+      var menu = document.getElementById('colvis-menu');
+      var gear = document.getElementById('datatables_config_widget_top');
+      if (!menu || !gear) return;
+      // .menu-bar 有 backdrop-filter，会使内部的 position:fixed 被限制在
+      // 52px 高的顶栏内（containing block），导致菜单被“吞掉”看不到。
+      // 因此把菜单重新挂到 document.body 下，确保 fixed 相对视口定位。
+      if (menu.parentNode !== document.body) {
+        document.body.appendChild(menu);
+      }
+      menu.style.display = 'block';
+      var rect = gear.getBoundingClientRect();
+      var menuH = menu.offsetHeight;
+      var winH = window.innerHeight;
+      var winW = window.innerWidth;
+      var menuW = menu.offsetWidth;
+      var top = rect.bottom + 6;
+      if (top + menuH > winH - 8) top = rect.top - menuH - 6;
+      var left = rect.left;
+      if (left + menuW > winW - 8) left = winW - menuW - 8;
+      menu.style.top = Math.max(4, top) + 'px';
+      menu.style.left = Math.max(4, left) + 'px';
+    }
+
+    function hideColvisMenu() {
+      var menu = document.getElementById('colvis-menu');
+      if (menu) menu.style.display = 'none';
+    }
+
+    $(document).on('click', '#datatables_config_toggle_top', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var menu = document.getElementById('colvis-menu');
+      if (menu && menu.style.display === 'block') {
+        hideColvisMenu();
+      } else {
+        // 即使构建菜单时出错，也要保证菜单弹出来
+        try { buildColvisMenu(); } catch (err) { console.error('buildColvisMenu:', err); }
+        positionColvisMenu();
+      }
+    });
+
+    // 点击其他区域关闭列显隐菜单（菜单被挂到 body 下，需同时识别菜单自身区域）
+    $(document).on('click', function(e) {
+      if (!$(e.target).closest('#datatables_config_widget_top, #colvis-menu').length) {
+        hideColvisMenu();
+      }
+    });
+
+    // 底栏旧齿轮保持兼容（已被隐藏，仅防意外使用）
+    $("#datatables_config_toggle").click(function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var menu = document.getElementById('colvis-menu');
+      if (menu && menu.style.display === 'block') {
+        hideColvisMenu();
+      } else {
+        buildColvisMenu();
+        positionColvisMenu();
+      }
     });
 
     // Click tag pill to filter by that tag
@@ -476,6 +539,44 @@
       if (e.target.id === 'statusModalOverlay') {
         $(this).hide();
       }
+    });
+
+    // Action 下拉菜单 fixed 定位，避免被 dt-scroll-body 遮挡
+    $(document).on('mouseenter', '.book-action-dropdown', function() {
+      var $dropdown = $(this).find('.book-action-dropdown-content');
+      var $trigger = $(this).find('span');
+      if (!$dropdown.length || !$trigger.length) return;
+      var offset = $trigger.offset();
+      var ddHeight = $dropdown.outerHeight();
+      var ddWidth = $dropdown.outerWidth();
+      var winH = $(window).height();
+      var winW = $(window).width();
+      // 默认显示在 trigger 下方
+      var top = offset.top + $trigger.outerHeight() + 4;
+      var left = offset.left;
+      // 底部空间不够 -> 向上展开
+      if (top + ddHeight > winH - 10) {
+        top = offset.top - ddHeight - 4;
+      }
+      // 右侧空间不够 -> 向左对齐
+      if (left + ddWidth > winW - 10) {
+        left = winW - ddWidth - 10;
+      }
+      $dropdown.css({
+        position: 'fixed',
+        top: top + 'px',
+        left: Math.max(4, left) + 'px',
+        display: 'block'
+      });
+    });
+    $(document).on('mouseleave', '.book-action-dropdown', function() {
+      var $dropdown = $(this).find('.book-action-dropdown-content');
+      $dropdown.css({
+        position: '',
+        top: '',
+        left: '',
+        display: ''
+      });
     });
   });
 

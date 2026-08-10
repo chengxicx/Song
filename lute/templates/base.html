@@ -132,6 +132,14 @@
           </svg>
         </span>
       </button>
+      {# Column visibility gear icon — moved to the top toolbar by JS.
+         Custom dropdown menu shown/hidden by the gear click handler in
+         tablelisting.html. Positioned with position:fixed so it is never
+         clipped by the DataTables scroll container. #}
+      <span id="datatables_config_widget_top" class="config-widget-top" style="display:none;">
+        <img src="{{ url_for('static', filename='icn/settings-gear-icon.svg') }}" title="Columns" id="datatables_config_toggle_top" class="config-gear-top" />
+        <div id="colvis-menu" class="colvis-menu" style="display:none;"></div>
+      </span>
     </div>
     <div class="menu">
       {% if not hide_homelink %}
@@ -464,18 +472,31 @@
     // 2) 每个 DataTables 搜索框
     var searches = document.querySelectorAll(".dt-search");
     for (var i = 0; i < searches.length; i++) moveToPlaceholder(searches[i]);
-    // 3) 主题切换按钮保持在占位容器末尾（紧跟搜索放大镜右侧）
-    //    仅在按钮不在 ph 里或不在末尾时才 appendChild，否则每次
-    //    runOnce 都会移除并重新插入节点 → MutationObserver 循环触发
-    //    → 按钮每 120ms 被重建一次，导致 hover 闪烁和点击丢失。
+    // 3) 主题切换按钮 + 列显隐齿轮：最终顺序固定为 [..., 搜索框, 黑白按钮, 齿轮]，
+    //    且两者位于容器末尾。
+    //    注意：不能每次运行都无条件移动——那会让按钮/齿轮交替挪动，反复触发
+    //    MutationObserver，造成“齿轮一直闪烁、点击丢失”的问题。这里只在顺序
+    //    不正确时一次性修正，之后即为稳定状态。
     var toggle = document.getElementById("theme-mode-toggle");
-    if (toggle && toggle.parentNode !== ph) {
-      ph.appendChild(toggle);
-    } else if (toggle && ph.lastElementChild !== toggle) {
-      // 已在 ph 中但不在末尾，移动到末尾（仅在需要时）
-      ph.appendChild(toggle);
+    var gearTop = document.getElementById("datatables_config_widget_top");
+    var hasDt = document.querySelector(".dt-container") !== null;
+    if (gearTop) {
+      gearTop.style.display = hasDt ? "inline-flex" : "none";
     }
-    // 4) 清理空的顶部布局行
+    // “顺序正确”= 齿轮在容器中、紧跟在按钮之后、且是最后一个子元素。
+    // 满足即不动任何元素。
+    var orderOk = false;
+    if (toggle && gearTop) {
+      orderOk = gearTop.parentNode === ph &&
+                gearTop.previousElementSibling === toggle &&
+                gearTop.nextElementSibling === null;
+    }
+    if (!orderOk) {
+      // 一次性修正：先把按钮放末尾，再把齿轮放它后面。
+      if (toggle) ph.appendChild(toggle);
+      if (gearTop) ph.appendChild(gearTop);
+    }
+    // 5) 清理空的顶部布局行
     hideEmptyLayoutTopRow();
   }
 
@@ -507,18 +528,34 @@
 })();
 </script>
 
+<style>
+/* Theme toggle button spin animation */
+#theme-mode-toggle.animating {
+  animation: theme-toggle-pop 0.25s ease;
+}
+@keyframes theme-toggle-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.75); }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+#theme-mode-toggle.animating .theme-mode-icon {
+  animation: theme-icon-flip 0.25s ease;
+}
+@keyframes theme-icon-flip {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
 <script>
 /* ========================================================
    Dark / Light mode toggle (home menu bar)
    - Uses the global toggle_dark_theme() function from lute.js
      (loaded site-wide via base.html), which POSTs to
      /theme/toggle_dark via jQuery $.ajax and reloads the page.
-     This is the exact same code path as the reading sidebar
-     menu item, ensuring consistent behavior.
-   - The button carries data-is-dark="1"|"0" set on the server,
-     so updateIcon() shows the correct sun/moon icon initially.
-     After the toggle + reload, the server re-renders the correct
-     icon, so no client-side icon toggle is needed on click.
+   - On click, immediately flips the icon + plays a pop animation
+     so the user sees instant feedback before the AJAX + reload.
    ======================================================== */
 (function () {
   function updateIcon(btn) {
@@ -535,12 +572,19 @@
     btn.dataset.bound = "1";
     updateIcon(btn);
     btn.addEventListener("click", function () {
-      // toggle_dark_theme() is defined in lute.js (loaded globally).
-      // It uses $.ajax (not fetch), matching the reading sidebar.
+      // Immediately flip the icon for visual feedback
+      var wasDark = btn.getAttribute("data-is-dark") === "1";
+      btn.setAttribute("data-is-dark", wasDark ? "0" : "1");
+      updateIcon(btn);
+      // Add animation class
+      btn.classList.remove("animating");
+      // Force reflow so the animation restarts
+      void btn.offsetWidth;
+      btn.classList.add("animating");
+
       if (typeof toggle_dark_theme === "function") {
         toggle_dark_theme();
       } else {
-        // Fallback if lute.js hasn't loaded yet.
         console.warn("toggle_dark_theme not available, retrying...");
         setTimeout(function () {
           if (typeof toggle_dark_theme === "function") toggle_dark_theme();
@@ -554,7 +598,6 @@
   } else {
     init();
   }
-  // Safety net: re-init if the button is added later.
   setTimeout(init, 500);
 })();
 </script>
