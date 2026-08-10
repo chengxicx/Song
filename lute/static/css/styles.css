@@ -392,7 +392,7 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     background-color: #f9f9f9;
     min-width: 120px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1001;
+    z-index: 10001;
     border-radius: 5px;
     padding: 5px;
 }
@@ -412,24 +412,83 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     display: block;
 }
 
-/* For the last few rows of the table, open the dropdown UPWARD instead of
-   downward. The DataTables scroll container (dt-scroll-body) has overflow:auto
-   for scrollX, which clips any dropdown that extends below the last row.
-   Opening upward avoids the clipping entirely. 3 rows covers the ~90px menu. */
-#booktable tbody tr:last-child .book-action-dropdown-content,
-#booktable tbody tr:nth-last-child(2) .book-action-dropdown-content,
-#booktable tbody tr:nth-last-child(3) .book-action-dropdown-content {
-    bottom: 100%;
-    top: auto;
-    margin-bottom: 2px;
-    box-shadow: 0px -8px 16px 0px rgba(0,0,0,0.2);
-}
-
 /* End book listing */
 
-div.dt-buttons>.dt-button {
-    padding: 3px !important;
-    margin: 5px 0 0 10px !important;
+/* 隐藏底栏齿轮图标（已移到顶栏） */
+#datatables_config_widget {
+    display: none !important;
+}
+
+/* 列显隐齿轮图标（顶栏） */
+.config-widget-top {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border: 1px solid var(--form-border-color, #ccc);
+    border-radius: 50%;
+    background-color: var(--background-color, #fff);
+    color: var(--font-color, #555);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+.config-widget-top:hover {
+    color: #007aff;
+    border-color: #007aff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+.config-widget-top img {
+    width: 14px;
+    height: 14px;
+    display: block;
+    opacity: 0.7;
+}
+.config-widget-top:hover img {
+    opacity: 1;
+}
+
+/* 自定义列显隐菜单（齿轮点击弹出）—— 用 position:fixed 避免被滚动容器裁剪 */
+.colvis-menu {
+    position: fixed;
+    z-index: 10002;
+    min-width: 180px;
+    max-width: 260px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 6px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+.colvis-menu .colvis-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.15s ease;
+    user-select: none;
+    white-space: nowrap;
+}
+.colvis-menu .colvis-item:hover {
+    background-color: rgba(0,122,255,0.08);
+}
+.colvis-menu .colvis-item input[type="checkbox"] {
+    margin: 0;
+    accent-color: #007aff;
+    flex-shrink: 0;
+}
+.colvis-menu .colvis-item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 
