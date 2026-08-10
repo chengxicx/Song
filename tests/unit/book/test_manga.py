@@ -135,6 +135,60 @@ def test_extract_manga_cbz(app_context):
     assert parsed["pages"] == mokuro["pages"]
 
 
+def test_extract_manga_volume_subdir_layout(app_context):
+    """
+    Mokuro's default layout puts images inside a volume/ subdirectory
+    while the .mokuro JSON records only the basename (e.g. "001.jpg")
+    in img_path.  The extractor must rewrite img_path to include the
+    volume subdirectory, so the reading screen can find the files.
+    """
+    from flask import current_app
+
+    volume = "-Zombie-Sagashitemasu-01"
+    mokuro = {
+        "version": "0.2.0-beta.6",
+        "title": "#Zombie Sagashitemasu",
+        "volume": volume,
+        "pages": [
+            {
+                "version": "0.1.6",
+                "img_path": "001.jpg",
+                "img_width": 1080,
+                "img_height": 1530,
+                "blocks": [{"box": [53, 461, 552, 568], "vertical": False,
+                            "font_size": 32, "lines": ["テスト"]}],
+            },
+            {
+                "version": "0.1.6",
+                "img_path": "002.jpg",
+                "img_width": 1080,
+                "img_height": 1530,
+                "blocks": [],
+            },
+        ],
+    }
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        # .mokuro at zip root
+        zf.writestr(f"{volume}.mokuro", json.dumps(mokuro, ensure_ascii=False))
+        # images inside volume/ subdirectory (mokuro default)
+        for p in mokuro["pages"]:
+            zf.writestr(f"{volume}/{p['img_path']}", PNG_1PX)
+    buf.seek(0)
+
+    manga_path, parsed = BookService().extract_manga("book.zip", buf)
+    target = os.path.join(current_app.static_folder, manga_path)
+
+    # Files extracted where expected.
+    assert os.path.isdir(os.path.join(target, volume))
+    assert os.path.exists(os.path.join(target, volume, "001.jpg"))
+    assert os.path.exists(os.path.join(target, volume, "002.jpg"))
+
+    # img_path rewritten to include the volume subdirectory.
+    assert parsed["pages"][0]["img_path"] == f"{volume}/001.jpg"
+    assert parsed["pages"][1]["img_path"] == f"{volume}/002.jpg"
+
+
 def test_extract_manga_rejects_bad_extension(app_context):
     "An invalid extension is rejected before any extraction."
     stream, _ = make_archive(".cbz")
