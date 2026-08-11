@@ -11,6 +11,11 @@ from lute.models.repositories import UserSettingRepository
 
 # from lute.utils.debug_helpers import DebugTimer
 
+# Manga texts can contain thousands of lines; the status distribution is
+# derived from a sample, matching how regular books sample a few pages
+# (see _get_sample_texts).
+MANGA_STATS_SAMPLE_LINES = 1000
+
 
 class Service:
     "Service."
@@ -72,10 +77,12 @@ class Service:
 
         if book.book_type == "manga":
             # For manga books, extract text directly from the mokuro JSON.
+            # Rendering every line separately is extremely slow (each
+            # get_textitems call re-parses and re-queries terms), so
+            # sample the text and render it in a single call.
             lines = self._get_manga_text_lines(book)
-            textitems = []
-            for line in lines:
-                textitems.extend(service.get_textitems(line, book.language, mw))
+            lines = lines[:MANGA_STATS_SAMPLE_LINES]
+            textitems = service.get_textitems("\n".join(lines), book.language, mw)
         else:
             texts = self._get_sample_texts(book)
             textitems = []
@@ -110,13 +117,16 @@ class Service:
         """
         if book.book_type != "manga":
             return None
-        service = RenderService(self.session)
-        mw = service.get_multiword_indexer(book.language)
         lines = self._get_manga_text_lines(book)
+        # Parse the lines in batches: MeCab is much faster when it
+        # receives a large chunk at once than when called once per line
+        # (measured ~100x slower line by line), and pure tokenization
+        # skips the expensive term lookups done by get_textitems().
         total = 0
-        for line in lines:
-            items = service.get_textitems(line, book.language, mw)
-            total += len([ti for ti in items if ti.is_word])
+        for i in range(0, len(lines), 500):
+            chunk = "\n".join(lines[i : i + 500])
+            tokens = book.language.get_parsed_tokens(chunk)
+            total += sum(1 for tk in tokens if tk.is_word)
         return total
 
     def refresh_stats(self):
