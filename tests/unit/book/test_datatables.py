@@ -2,12 +2,14 @@
 Book tests.
 """
 
+import json
 from datetime import datetime
 import pytest
 from lute.models.language import Language
 from lute.book.datatables import get_data_tables_list
 from lute.db import db
 from lute.db.demo import Service as DemoService
+from lute.book.stats import Service as StatsService
 from tests.utils import make_book
 
 
@@ -129,3 +131,41 @@ def test_book_data_says_completed_if_last_page_has_been_read(
     actual = d["data"][0]
     assert actual["BkID"] == b.id, "correct book"
     assert actual["IsCompleted"] == 1, "completed"
+
+
+def test_manga_book_word_count_in_datatables(app_context, empty_db, _dt_params):
+    "Manga books show WordCount from manga_word_count, not textcounts.wc."
+    from lute.models.book import Book
+    from lute.language.service import Service as LanguageService
+
+    lang_svc = LanguageService(db.session)
+    j = lang_svc.get_language_def("Japanese").language
+    db.session.add(j)
+    db.session.commit()
+
+    book = Book()
+    book.language = j
+    book.title = "Manga DataTables"
+    book.book_type = "manga"
+    book.manga_data = json.dumps({
+        "version": "0.2.1",
+        "pages": [
+            {
+                "blocks": [
+                    {"lines": ["こんにちは世界"]}
+                ]
+            }
+        ]
+    })
+    db.session.add(book)
+    db.session.commit()
+
+    # Calculate and cache stats so manga_word_count is set.
+    svc = StatsService(db.session)
+    svc.refresh_stats()
+
+    d = get_data_tables_list(_dt_params, False, db.session)
+    rows = [r for r in d["data"] if r["BkTitle"] == "Manga DataTables"]
+    assert len(rows) == 1
+    wc = rows[0]["WordCount"]
+    assert wc is not None and wc > 0
