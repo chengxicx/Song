@@ -686,16 +686,32 @@
       url: '/book/table_stats/' + data['BkID'],
       method: 'GET',
       success: function(response) {
-        if (statsCellNode) {
-          $(statsCellNode).removeClass("refreshed");
-          const result = JSON.parse(response.status_distribution);
-          const graph = render_stats_graph(result);
-          $(statsCellNode).html(graph);
-        }
-        if (newWordCellNode) {
-          $(newWordCellNode).removeClass("refreshed");
-          const newWordHtml = render_new_word(response.new_word_percent);
-          $(newWordCellNode).html(newWordHtml);
+        try {
+          if (statsCellNode) {
+            $(statsCellNode).removeClass("refreshed");
+            if (response.status_distribution) {
+              const result = JSON.parse(response.status_distribution);
+              const graph = render_stats_graph(result);
+              $(statsCellNode).html(graph);
+            } else {
+              $(statsCellNode).text('No data');
+            }
+          }
+          if (newWordCellNode) {
+            $(newWordCellNode).removeClass("refreshed");
+            const newWordHtml = render_new_word(response.new_word_percent);
+            $(newWordCellNode).html(newWordHtml);
+          }
+        } catch (e) {
+          console.error('table_stats error:', e);
+          if (statsCellNode) {
+            $(statsCellNode).text('Error loading data');
+            $(statsCellNode).removeClass("refreshed");
+          }
+          if (newWordCellNode) {
+            $(newWordCellNode).text('Error');
+            $(newWordCellNode).removeClass("refreshed");
+          }
         }
       },
       error: function() {
@@ -734,7 +750,7 @@
     delete countsCopy['98'];
     const totalcount = Object.values(countsCopy).reduce((acc, val) => acc + val, 0);
     if (totalcount == 0) {
-      return empty_stats;
+      return '<div class="status-bar-container" style="cursor:default;"><div class="status-bar-empty" style="flex:1;text-align:center;font-size:11px;color:#adb5bd;">—</div></div>';
     }
     const statuspct = {};
     Object.entries(countsCopy).forEach(([key, value]) => {
