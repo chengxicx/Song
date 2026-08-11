@@ -40,4 +40,20 @@
   // apply term status classes, exactly like read/page_content.html.
   parent.reset_cursor_marker();
   parent.add_status_classes();
+
+  // Click behavior, mirroring the mokuro reference: hovering a text box
+  // shows its text (CSS :hover), and clicking a box keeps the text
+  // visible until the user clicks elsewhere.  Clicking a box that is
+  // already pinned keeps it pinned.  A click on a word inside a box
+  // still triggers the normal term lookup (its handlers use mousedown,
+  // so the two coexist).  The .off()/.on() namespacing prevents the
+  // handlers from stacking up as pages are loaded one after another.
+  parent.$(document).off('click.mangaToggle').on('click.mangaToggle', function (e) {
+    var block = e.target.closest ? e.target.closest('.manga-text-block') : null;
+    // Unpin everything, then re-pin the clicked box (if any).  This is
+    // a mokuro-style "click a box to keep its text visible" behavior.
+    parent.$('.manga-text-block').removeClass('hovered');
+    if (block)
+      parent.$(block).addClass('hovered');
+  });
 </script>

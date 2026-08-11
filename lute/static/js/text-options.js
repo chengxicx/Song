@@ -29,7 +29,14 @@ addClickHandler(".column-two", setColumnCount, 2);
 
 
 function incrementFontSize(delta) {
-  const textItems = document.querySelectorAll("span.textitem");
+  // Manga text items size themselves with container-query units (cqw)
+  // against the page image; the reading-pane font controls must not
+  // override those, so exclude any item inside a manga block.
+  const textItems = Array.from(document.querySelectorAll("span.textitem"))
+    .filter((item) => !item.closest(".manga-text-block"));
+  if (textItems.length === 0)
+    return;
+
   const s = window.getComputedStyle(textItems[0]);
   const fontDefault = parseFloat(s.fontSize);
   const STORAGE_KEY = "fontSize";
@@ -53,6 +60,8 @@ function convertPixelsToRem(sizePx) {
 
 function incrementLineHeight(delta) {
   const paras = document.querySelectorAll("#thetext p");
+  if (paras.length === 0)
+    return; // e.g. manga pages have no paragraphs.
   const s = window.getComputedStyle(paras[0]);
   const lhDefault = parseFloat(s.getPropertyValue('line-height'));
 
