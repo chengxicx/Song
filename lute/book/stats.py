@@ -3,6 +3,7 @@ Book statistics.
 """
 
 import json
+import re
 from sqlalchemy import select, text
 from lute.read.render.service import Service as RenderService
 from lute.models.book import Book, BookStats
@@ -23,6 +24,24 @@ class Service:
         end_index = txindex + n
         texts = book.texts[start_index:end_index]
         return texts[-n:]
+
+    def _get_manga_text_lines(self, book):
+        """
+        Extract all text lines from a manga book's mokuro data.
+
+        Returns a flat list of text strings, one per physical line
+        (split on ¶, \\r, \\n), suitable for tokenization.
+        """
+        manga = book.manga or {}
+        pages = manga.get("pages") or []
+        lines = []
+        for page in pages:
+            for block in page.get("blocks") or []:
+                for line in block.get("lines") or []:
+                    for phys in re.split(r"[¶\r\n]+", line):
+                        if phys.strip():
+                            lines.append(phys.strip())
+        return lines
 
     def _get_sample_texts(self, book):
         "Get texts to use as sample."
@@ -48,15 +67,20 @@ class Service:
 
         # DebugTimer.clear_total_summary()
         # dt = DebugTimer("get_status_distribution", display=False)
-        texts = self._get_sample_texts(book)
-
-        # Getting the individual paragraphs per page, and then combining,
-        # is much faster than combining all pages into one giant page.
         service = RenderService(self.session)
         mw = service.get_multiword_indexer(book.language)
-        textitems = []
-        for tx in texts:
-            textitems.extend(service.get_textitems(tx.text, book.language, mw))
+
+        if book.book_type == "manga":
+            # For manga books, extract text directly from the mokuro JSON.
+            lines = self._get_manga_text_lines(book)
+            textitems = []
+            for line in lines:
+                textitems.extend(service.get_textitems(line, book.language, mw))
+        else:
+            texts = self._get_sample_texts(book)
+            textitems = []
+            for tx in texts:
+                textitems.extend(service.get_textitems(tx.text, book.language, mw))
         # # Old slower code:
         # text_sample = "\n".join([t.text for t in texts])
         # paras = get_paragraphs(text_sample, book.language) ... etc.
@@ -78,6 +102,23 @@ class Service:
 
         return stats
 
+    def calc_manga_word_count(self, book):
+        """
+        Count total words (tokens) in a manga book's mokuro text data.
+
+        Returns None if the book is not a manga type or has no manga data.
+        """
+        if book.book_type != "manga":
+            return None
+        service = RenderService(self.session)
+        mw = service.get_multiword_indexer(book.language)
+        lines = self._get_manga_text_lines(book)
+        total = 0
+        for line in lines:
+            items = service.get_textitems(line, book.language, mw)
+            total += len([ti for ti in items if ti.is_word])
+        return total
+
     def refresh_stats(self):
         "Refresh stats for all books requiring update."
         sql = "delete from bookstats where status_distribution is null"
@@ -87,7 +128,7 @@ class Service:
         books_to_update = (
             self.session.query(Book).filter(~Book.id.in_(book_ids_with_stats)).all()
         )
-        books = [b for b in books_to_update if b.is_supported]
+        books = [b for b in books_to_update if b.is_supported or b.book_type == "manga"]
         for book in books:
             stats = self._calculate_stats(book)
             self._update_stats(book, stats)
@@ -123,6 +164,8 @@ class Service:
         if allunique > 0:
             new_word_percent = round(100.0 * new_words / allunique)
 
+        manga_wc = self.calc_manga_word_count(book)
+
         return {
             "allunique": allunique,
             "unknowns": unknowns,
@@ -130,6 +173,7 @@ class Service:
             "percent": percent,
             "new_word_percent": new_word_percent,
             "distribution": json.dumps(status_distribution),
+            "manga_word_count": manga_wc,
         }
 
     def _update_stats(self, book, stats):
@@ -142,5 +186,6 @@ class Service:
         s.unknownpercent = stats["percent"]
         s.new_word_percent = stats["new_word_percent"]
         s.status_distribution = stats["distribution"]
+        s.manga_word_count = stats["manga_word_count"]
         self.session.add(s)
         self.session.commit()
