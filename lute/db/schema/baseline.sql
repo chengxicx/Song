@@ -54,6 +54,11 @@ INSERT INTO _migrations VALUES('20241221_clean_up_missing_relationships.sql');
 INSERT INTO _migrations VALUES('20250102_add_TxStartDate.sql');
 INSERT INTO _migrations VALUES('20241220_fix_for_wordsread_table_load.sql');
 INSERT INTO _migrations VALUES('20250206_create_srsexportspecs.sql');
+INSERT INTO _migrations VALUES('20260811_add_manga_fields.sql');
+INSERT INTO _migrations VALUES('20260802_add_kiwi_settings.sql');
+INSERT INTO _migrations VALUES('20260803_add_book_youtube_fields.sql');
+INSERT INTO _migrations VALUES('20250724_add_LgIsActive.sql');
+INSERT INTO _migrations VALUES('20250727_add_new_word_percent.sql');
 CREATE TABLE IF NOT EXISTS "statuses" (
 	"StID" INTEGER NOT NULL  ,
 	"StText" VARCHAR(20) NOT NULL  ,
@@ -161,6 +166,11 @@ CREATE TABLE IF NOT EXISTS "books" (
         BkAudioFilename TEXT NULL,
         BkAudioCurrentPos REAL NULL,
         BkAudioBookmarks TEXT NULL,
+        BkBookType TEXT NOT NULL DEFAULT '',
+        BkSrtData TEXT NULL,
+        BkVideoCurrentPos FLOAT NULL,
+        BkMangaPath TEXT NULL,
+        BkMangaData TEXT NULL,
 	PRIMARY KEY ("BkID"),
 	FOREIGN KEY("BkLgID") REFERENCES "languages" ("LgID") ON UPDATE NO ACTION ON DELETE CASCADE
 );
@@ -169,7 +179,9 @@ CREATE TABLE IF NOT EXISTS "bookstats" (
 	"distinctterms" INTEGER NULL  ,
 	"distinctunknowns" INTEGER NULL  ,
 	"unknownpercent" INTEGER NULL  ,
+	new_word_percent INTEGER NULL,
         status_distribution VARCHAR(100) NULL,
+        manga_word_count INTEGER NULL,
 	PRIMARY KEY ("BkID"),
 	FOREIGN KEY("BkID") REFERENCES "books" ("BkID") ON UPDATE NO ACTION ON DELETE CASCADE
 );
@@ -194,6 +206,11 @@ CREATE TABLE IF NOT EXISTS "languages" (
 	"LgRightToLeft" TINYINT NOT NULL  ,
 	"LgShowRomanization" TINYINT NOT NULL DEFAULT '0' ,
 	"LgParserType" VARCHAR(20) NOT NULL DEFAULT 'spacedel' ,
+	"LgIsActive" TINYINT NOT NULL DEFAULT 1,
+	"LgKiwiTokenizerMode" TEXT NOT NULL DEFAULT 'morpheme',
+	"LgKiwiStemming" INTEGER NOT NULL DEFAULT 1,
+	"LgKiwiFilterParticles" INTEGER NOT NULL DEFAULT 0,
+	"LgKiwiJoinCompoundNouns" INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY ("LgID")
 );
 CREATE TABLE textbookmarks (

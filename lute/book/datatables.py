@@ -52,7 +52,10 @@ def get_data_tables_list(parameters, is_archived, session):
         booklastopened.lastopeneddate AS LastOpenedDate,
         BkArchived,
         tags.taglist AS TagList,
-        textcounts.wc AS WordCount,
+        COALESCE(
+            CASE WHEN b.BkBookType = 'manga' THEN c.manga_word_count ELSE textcounts.wc END,
+            0
+        ) AS WordCount,
         c.distinctterms as DistinctCount,
         c.distinctunknowns as UnknownCount,
         c.unknownpercent as UnknownPercent,
@@ -63,10 +66,10 @@ def get_data_tables_list(parameters, is_archived, session):
     FROM books b
     INNER JOIN languages ON LgID = b.BkLgID
     LEFT OUTER JOIN texts currtext ON currtext.TxID = BkCurrentTxID
-    INNER JOIN (
+    LEFT OUTER JOIN (
         select TxBkID, max(TxStartDate) as lastopeneddate from texts group by TxBkID
     ) booklastopened on booklastopened.TxBkID = b.BkID
-    INNER JOIN (
+    LEFT OUTER JOIN (
         SELECT TxBkID, SUM(TxWordCount) as wc, COUNT(TxID) AS pagecount
         FROM texts
         GROUP BY TxBkID
@@ -96,7 +99,8 @@ def get_data_tables_list(parameters, is_archived, session):
     ) completed_books on completed_books.BkID = b.BkID
 
     WHERE b.BkArchived = {archived}
-      and languages.LgParserType in ({ supported_parser_type_criteria() })
+      and (languages.LgParserType in ({ supported_parser_type_criteria() })
+           or b.BkBookType = 'manga')
     """
 
     # Add "where" criteria for all the filters.

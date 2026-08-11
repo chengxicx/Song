@@ -2,6 +2,7 @@
 Book stats tests.
 """
 
+import json
 import pytest
 from sqlalchemy.sql import text
 
@@ -147,6 +148,100 @@ def test_stats_smoke_test(service, _test_book, spanish):
     assert_stats(
         ["4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"]
     )
+
+
+@pytest.fixture(name="_manga_book")
+def fixture_manga_book(empty_db):
+    "Create a manga book with mock mokuro data."
+    from lute.models.book import Book
+    from lute.language.service import Service as LanguageService
+
+    # Re-create Japanese language after empty_db wipes the db.
+    lang_svc = LanguageService(db.session)
+    j = lang_svc.get_language_def("Japanese").language
+    db.session.add(j)
+    db.session.commit()
+
+    book = Book()
+    book.language = j
+    book.title = "Manga Test"
+    book.book_type = "manga"
+    book.manga_data = json.dumps({
+        "version": "0.2.1",
+        "pages": [
+            {
+                "blocks": [
+                    {
+                        "lines": ["こんにちは世界", "私は猫が好きです"]
+                    }
+                ]
+            }
+        ]
+    })
+    db.session.add(book)
+    db.session.commit()
+    return book
+
+
+def test_manga_calc_status_distribution(_manga_book):
+    "Manga status distribution is calculated from mokuro text."
+    svc = Service(db.session)
+    stats = svc.calc_status_distribution(_manga_book)
+    assert isinstance(stats, dict)
+    total = sum(stats.values())
+    assert total > 0, "manga text should produce tokens"
+
+
+def test_manga_calc_word_count(_manga_book):
+    "Manga word count returns a positive integer."
+    svc = Service(db.session)
+    wc = svc.calc_manga_word_count(_manga_book)
+    assert wc is not None
+    assert isinstance(wc, int)
+    assert wc > 0
+
+
+def test_manga_calc_word_count_non_manga(_test_book):
+    "Non-manga books return None for manga word count."
+    svc = Service(db.session)
+    wc = svc.calc_manga_word_count(_test_book)
+    assert wc is None
+
+
+def test_manga_stats_refresh_and_cache(service, _manga_book):
+    "Manga stats are cached with manga_word_count."
+    svc = Service(db.session)
+    svc.refresh_stats()
+    sql = "select distinctterms, manga_word_count from bookstats"
+    result = db.session.execute(text(sql)).fetchone()
+    assert result.distinctterms > 0
+    assert result.manga_word_count is not None and result.manga_word_count > 0
+
+
+def test_manga_empty_pages(service, empty_db):
+    "Manga with no pages produces zero counts."
+    from lute.models.book import Book
+    from lute.language.service import Service as LanguageService
+
+    lang_svc = LanguageService(db.session)
+    j = lang_svc.get_language_def("Japanese").language
+    db.session.add(j)
+    db.session.commit()
+
+    book = Book()
+    book.language = j
+    book.title = "Empty Manga"
+    book.book_type = "manga"
+    book.manga_data = json.dumps({"version": "0.2.1", "pages": []})
+    db.session.add(book)
+    db.session.commit()
+
+    svc = Service(db.session)
+    wc = svc.calc_manga_word_count(book)
+    assert wc == 0
+
+    dist = svc.calc_status_distribution(book)
+    assert all(v == 0 for v in dist.values())
 
 
 def test_get_stats_calculates_and_caches_stats(service, _test_book, spanish):
