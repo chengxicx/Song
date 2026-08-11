@@ -55,6 +55,7 @@ INSERT INTO _migrations VALUES('20250102_add_TxStartDate.sql');
 INSERT INTO _migrations VALUES('20241220_fix_for_wordsread_table_load.sql');
 INSERT INTO _migrations VALUES('20250206_create_srsexportspecs.sql');
 INSERT INTO _migrations VALUES('20260811_add_manga_fields.sql');
+INSERT INTO _migrations VALUES('20260812_add_manga_word_count.sql');
 INSERT INTO _migrations VALUES('20260802_add_kiwi_settings.sql');
 INSERT INTO _migrations VALUES('20260803_add_book_youtube_fields.sql');
 INSERT INTO _migrations VALUES('20250724_add_LgIsActive.sql');

@@ -7,6 +7,6 @@
 ALTER TABLE books ADD COLUMN BkMangaPath TEXT;
 ALTER TABLE books ADD COLUMN BkMangaData TEXT;
 
--- Store pre-computed word count for manga books (computed from mokuro
--- JSON text lines).  Regular books use SUM(TxWordCount) instead.
-ALTER TABLE bookstats ADD COLUMN manga_word_count INTEGER;
+-- Note: manga_word_count on bookstats is added by the separate migration
+-- 20260812_add_manga_word_count.sql, so databases that already applied this
+-- file (before that column existed) still get the column.
