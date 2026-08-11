@@ -414,6 +414,50 @@ def test_refresh_page_renders_manga_page(app, app_context, japanese, client):
     assert "manga-text-block" in content
 
 
+def test_manga_context_filters_paragraph_marker(app, app_context, japanese):
+    """
+    mokuro lines may contain newlines, which the parser turns into the
+    "¶" end-of-paragraph marker.  It must not be rendered as visible
+    text, otherwise the text block misaligns with the page image.
+    """
+    from lute.book.model import Book
+    from lute.read.service import Service as ReadService
+
+    pages = [{
+        "version": "0.2.1",
+        "img_path": "page.jpg",
+        "img_width": 848,
+        "img_height": 1264,
+        "blocks": [
+            {
+                "box": [10, 10, 100, 100],
+                "vertical": False,
+                "font_size": 25,
+                "lines": ["一行目\n二行目", "まとめ"],
+            },
+        ],
+    }]
+
+    book = Book()
+    book.language_id = japanese.id
+    book.title = "Pilcrow filter"
+    book.book_type = "manga"
+    book.manga_path = "manga/test-nonexistent"
+    book.manga_data = json.dumps({"version": "0.2.1", "pages": pages}, ensure_ascii=False)
+    dbbook = BookService().import_book(book, db.session)
+
+    ctx = ReadService(db.session).manga_page_context(dbbook, 1, track_page_open=False)
+    line_items = ctx["blocks"][0]["line_items"]
+    assert len(line_items) == 2, "one line of items per source line"
+
+    all_items = [it for line in line_items for it in line]
+    assert all_items, "lines produced items"
+    assert not any(it.text == "¶" for it in all_items), "¶ marker is filtered out"
+    rendered_texts = [it.text for it in all_items]
+    assert "一行目" in "".join(rendered_texts)
+    assert "まとめ" in "".join(rendered_texts)
+
+
 def test_manga_words_get_data_wid_after_page_load(app, app_context, japanese, client):
     "Terms created during tokenization are saved, so words carry data-wid."
     book = _import_and_get_book(app, app_context, japanese, client)

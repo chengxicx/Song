@@ -292,12 +292,18 @@ class Service:
             line_items = []
             for li, line in enumerate(block.get("lines") or []):
                 items = rs.get_textitems(line, lang)
+                kept = []
                 for it in items:
+                    # "¶" is Lute's end-of-paragraph marker (mokuro lines
+                    # may contain newlines); it must not be rendered.
+                    if it.text == "¶":
+                        continue
                     it.paragraph_number = bi + 1
                     it.sentence_number = li + 1
                     it.index = order
                     order += 1
-                line_items.append(items)
+                    kept.append(it)
+                line_items.append(kept)
             blocks.append(
                 {
                     "box": box,
