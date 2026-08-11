@@ -1,5 +1,5 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.4.4';
+const CACHE_NAME = 'lute-v3.10.4.5';
 
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
@@ -186,6 +186,13 @@ self.addEventListener('fetch', event => {
   // and caching them causes stale data after term status updates.
   if (url.pathname.startsWith('/read/') || url.pathname.startsWith('/term/')) {
     event.respondWith(fetch(urlStr).catch(() => Response.error()));
+    return;
+  }
+
+  // Skip redirect-only utility endpoints — let the browser handle
+  // the 302 redirect natively instead of returning a redirected
+  // response via the SW, which can cause ERR_FAILED in the browser.
+  if (url.pathname === '/refresh_all_stats') {
     return;
   }
 
