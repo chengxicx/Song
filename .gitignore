@@ -148,3 +148,6 @@ dmypy.json
 cython_debug/
 
 .DS_Store
+
+# Generated manga assets (user-imported ZIP/CBZ content; regenerated on demand)
+lute/static/manga/
