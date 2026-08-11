@@ -3,6 +3,7 @@ Reading helpers.
 """
 
 import os
+import re
 from collections import defaultdict
 from datetime import datetime
 import functools
@@ -291,19 +292,26 @@ class Service:
             box = block.get("box") or [0, 0, 0, 0]
             line_items = []
             for li, line in enumerate(block.get("lines") or []):
-                items = rs.get_textitems(line, lang)
-                kept = []
-                for it in items:
-                    # "¶" is Lute's end-of-paragraph marker (mokuro lines
-                    # may contain newlines); it must not be rendered.
-                    if it.text == "¶":
+                # A mokuro "line" can hold several physical text rows
+                # joined by newlines or the "¶" paragraph marker; split
+                # them so each row renders on its own line in the box
+                # instead of a single unbroken row.
+                for phys in re.split(r"[¶\r\n]+", line):
+                    if not phys.strip():
                         continue
-                    it.paragraph_number = bi + 1
-                    it.sentence_number = li + 1
-                    it.index = order
-                    order += 1
-                    kept.append(it)
-                line_items.append(kept)
+                    items = rs.get_textitems(phys, lang)
+                    kept = []
+                    for it in items:
+                        # Guard against paragraph markers leaking through
+                        # from the parser.
+                        if it.text == "¶":
+                            continue
+                        it.paragraph_number = bi + 1
+                        it.sentence_number = li + 1
+                        it.index = order
+                        order += 1
+                        kept.append(it)
+                    line_items.append(kept)
             blocks.append(
                 {
                     "box": box,

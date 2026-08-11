@@ -416,9 +416,9 @@ def test_refresh_page_renders_manga_page(app, app_context, japanese, client):
 
 def test_manga_context_filters_paragraph_marker(app, app_context, japanese):
     """
-    mokuro lines may contain newlines, which the parser turns into the
-    "¶" end-of-paragraph marker.  It must not be rendered as visible
-    text, otherwise the text block misaligns with the page image.
+    mokuro lines may join several physical text rows with newlines or
+    the "¶" paragraph marker.  Each row must render on its own line in
+    the box; the marker itself must not appear as visible text.
     """
     from lute.book.model import Book
     from lute.read.service import Service as ReadService
@@ -433,7 +433,7 @@ def test_manga_context_filters_paragraph_marker(app, app_context, japanese):
                 "box": [10, 10, 100, 100],
                 "vertical": False,
                 "font_size": 25,
-                "lines": ["一行目\n二行目", "まとめ"],
+                "lines": ["一行目\n二行目", "まとめ¶あとがき"],
             },
         ],
     }]
@@ -448,14 +448,14 @@ def test_manga_context_filters_paragraph_marker(app, app_context, japanese):
 
     ctx = ReadService(db.session).manga_page_context(dbbook, 1, track_page_open=False)
     line_items = ctx["blocks"][0]["line_items"]
-    assert len(line_items) == 2, "one line of items per source line"
 
     all_items = [it for line in line_items for it in line]
     assert all_items, "lines produced items"
     assert not any(it.text == "¶" for it in all_items), "¶ marker is filtered out"
-    rendered_texts = [it.text for it in all_items]
-    assert "一行目" in "".join(rendered_texts)
-    assert "まとめ" in "".join(rendered_texts)
+    lines = ["".join(it.text for it in line) for line in line_items]
+    assert lines == ["一行目", "二行目", "まとめ", "あとがき"], (
+        "each physical row renders on its own line"
+    )
 
 
 def test_manga_words_get_data_wid_after_page_load(app, app_context, japanese, client):
