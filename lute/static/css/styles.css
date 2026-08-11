@@ -1123,6 +1123,11 @@ div#thetext.manga-text-container {
     display: none;
     font-size: 16px; /* fallback if container query units unsupported */
     line-height: 1.1;
+    /* mokuro's .textBox p uses 0.1em letter-spacing; the box
+       coordinates in the .mokuro data were generated with it, so we
+       keep it here too or the text would not cover the original art
+       text. */
+    letter-spacing: 0.1em;
     white-space: nowrap;
     /* Shrink-to-fit white backdrop so the words are legible over the
        art, exactly like mokuro's revealed .textBox p.  The manga pane
@@ -1145,9 +1150,17 @@ div#thetext.manga-text-container {
     z-index: 999;
 }
 
-.manga-text-block.manga-vertical .manga-text-line {
+/* Vertical (right-to-left) text blocks.  Like mokuro, the
+   writing-mode lives on the block, not on each line: the revealed
+   lines then become columns flowing right-to-left, and whole-box
+   content matches the original image text.  (Putting writing-mode on
+   each line made rows stack top-to-bottom and overflow the box.) */
+.manga-text-block.manga-vertical {
     writing-mode: vertical-rl;
     text-orientation: mixed;
+}
+
+.manga-text-block.manga-vertical .manga-text-line {
     line-height: 1.1;
     padding: 2px 0;
 }
