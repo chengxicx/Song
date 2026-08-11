@@ -1107,29 +1107,53 @@ div#thetext.manga-text-container {
     /* On a busy page the words need a bit of contrast to stay
        readable over the art.  Status backgrounds keep their colors. */
     background-color: transparent;
+    cursor: pointer;
+    z-index: 1;
+}
+
+/* Text blocks are invisible until the user hovers the page (a faint
+   dashed outline shows where the boxes are) or hovers/clicks a block.
+   Hidden by default, like mokuro's .textBox: the text only appears on
+   hover or after a click toggles the .hovered class. */
+.manga-page:hover .manga-text-block {
+    border: 1px dashed rgba(200, 30, 30, 0.4);
 }
 
 .manga-text-line {
+    display: none;
     font-size: 16px; /* fallback if container query units unsupported */
-    line-height: 1.35;
+    line-height: 1.1;
+    white-space: nowrap;
+    /* Shrink-to-fit white backdrop so the words are legible over the
+       art, exactly like mokuro's revealed .textBox p. */
+    background-color: #fff;
+    border-radius: 2px;
+    padding: 0 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.manga-text-block:hover .manga-text-line,
+.manga-text-block.hovered .manga-text-line {
+    display: table;
+}
+
+.manga-text-block:hover,
+.manga-text-block.hovered {
+    z-index: 999;
 }
 
 .manga-text-block.manga-vertical .manga-text-line {
     writing-mode: vertical-rl;
     text-orientation: mixed;
-    line-height: 1.3;
+    line-height: 1.1;
+    padding: 2px 0;
 }
 
-/* Words inside manga blocks follow the block font size, not the
-   reading-pane default of 16px, and use white + outline for
-   legibility over the art while keeping the term status colors. */
+/* Words inside revealed manga blocks follow the block font size, not
+   the reading-pane default of 16px.  They use the normal theme text
+   color (on the white backdrop) while keeping the term status colors. */
 .manga-text-block span.textitem {
     font-size: inherit;
-    color: #fff;
-    text-shadow:
-        0 0 2px #000,
-        0 0 2px #000,
-        0 0 3px #000;
 }
 
 /* .click */
