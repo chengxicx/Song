@@ -388,7 +388,10 @@
       };
       book_listing_table.columns().every(function() {
         var colIdx = this.index();
-        var colName = this.name();
+        // DataTables 2.0.2 的 column API 没有 .name() 方法，
+        // 改用 settings().init().columns[colIdx].name 获取列名。
+        var colSettings = book_listing_table.settings().init();
+        var colName = colSettings.columns[colIdx].name;
         var title = columnLabels[colName] || colName;
         if (title === 'Actions') return;
         var label = document.createElement('label');
