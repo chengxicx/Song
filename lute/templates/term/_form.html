@@ -1,7 +1,7 @@
 {# This form is "included" into other .html files. #}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/lute-popups.js') }}" charset="utf-8"></script>
-<script type="text/javascript" src="/static/js/never_cache/dict-tabs.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/never_cache/dict-tabs.js?v={{ lute_version }}" charset="utf-8"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/lute-hotkey-utils.js') }}" charset="utf-8"></script>
 <script type="text/javascript">
   /**
@@ -98,7 +98,7 @@
 </div>
 
 
-<script type="text/javascript" src="/static/js/never_cache/lute-tagify-utils.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/never_cache/lute-tagify-utils.js?v={{ lute_version }}" charset="utf-8"></script>
 
 
 <script type="text/javascript">

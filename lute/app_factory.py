@@ -30,6 +30,7 @@ from lute.db.management import add_default_user_settings
 from lute.db.data_cleanup import clean_data
 from lute.backup.service import Service as BackupService
 from lute.db.demo import Service as DemoService
+import lute
 import lute.utils.formutils
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
@@ -133,6 +134,7 @@ def _add_base_routes(app, app_config):
             "user_settings": json.dumps(current_settings),
             "user_hotkeys": json.dumps(current_hotkeys),
             "current_theme": us_repo.get_value("current_theme"),
+            "lute_version": lute.__version__,
         }
         return ret
 
@@ -250,12 +252,13 @@ def _add_base_routes(app, app_config):
     @app.route("/static/js/never_cache/<path:filename>")
     def custom_js(filename):
         """
-        Some files should never be cached.
+        Serve JS files with long-term cache headers.
+        Cache busting is handled by the ?v= query parameter.
         """
         response = make_response(send_from_directory("static/js", filename))
-        response.headers[
-            "Cache-Control"
-        ] = "no-store, no-cache, must-revalidate, max-age=0"
+        # Versioned URLs (?v=...) handle cache busting, so we can
+        # safely cache these files for a long time.
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
         return response
 
     @app.route("/sw.js")
