@@ -373,15 +373,23 @@
       var menu = document.getElementById('colvis-menu');
       if (!menu || !book_listing_table) return;
       menu.innerHTML = '';
-      // 遍历所有 DataTables 列（而非 DOM <th>），确保列索引完全匹配。
-      // 用 DataTables column 的 index() 取回索引，再用该索引从 DOM 中
-      // 读取 <th> 的标题文本作为标签名，避免 scrollX 模式下 DOM 与 DataTables
-      // 内部列顺序不一致导致的标签错位。
+      // DataTables 隐藏列时会从 DOM 中移除对应的 <th>，导致通过 DOM
+      // 索引取标签名会错位。因此这里用硬编码的列名 → 标签映射，
+      // 完全脱离 DOM，确保标签与列索引一一对应。
+      var columnLabels = {
+        BkTitle: 'Title',
+        LgName: 'Language',
+        TagList: 'Tags',
+        WordCount: 'Word count',
+        UnknownPercent: 'Status',
+        NewWordPercent: 'New word',
+        LastOpenedDate: 'Last read',
+        Actions: 'Actions'
+      };
       book_listing_table.columns().every(function() {
         var colIdx = this.index();
-        var th = document.querySelector('#booktable thead th:nth-child(' + (colIdx + 1) + ')');
-        if (!th) return;
-        var title = th.textContent.trim();
+        var colName = this.name();
+        var title = columnLabels[colName] || colName;
         if (title === 'Actions') return;
         var label = document.createElement('label');
         label.className = 'colvis-item';
@@ -392,7 +400,6 @@
         span.textContent = title;
         label.appendChild(cb);
         label.appendChild(span);
-        // 监听 input 的 change 事件，比 label 更可靠
         cb.addEventListener('change', function() {
           book_listing_table.column(colIdx).visible(cb.checked);
         });
