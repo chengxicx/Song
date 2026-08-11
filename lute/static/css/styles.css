@@ -1148,6 +1148,12 @@ div#thetext.manga-text-container {
 .manga-text-block:hover,
 .manga-text-block.hovered {
     z-index: 999;
+    /* Solid, opaque backdrop covering the whole box so the original
+       art text underneath is hidden while reading, like mokuro's
+       hovered .textBox.  Without this the shrink-to-fit line backdrop
+       can leave parts of the image text visible. */
+    background-color: #fff;
+    border-radius: 2px;
 }
 
 /* Vertical (right-to-left) text blocks.  Like mokuro, the
