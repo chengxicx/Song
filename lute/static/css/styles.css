@@ -1125,8 +1125,11 @@ div#thetext.manga-text-container {
     line-height: 1.1;
     white-space: nowrap;
     /* Shrink-to-fit white backdrop so the words are legible over the
-       art, exactly like mokuro's revealed .textBox p. */
+       art, exactly like mokuro's revealed .textBox p.  The manga pane
+       overlays a fixed image, so it keeps its light appearance in dark
+       mode: dark text on the white backdrop no matter the theme. */
     background-color: #fff;
+    color: #000;
     border-radius: 2px;
     padding: 0 2px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
@@ -1150,10 +1153,40 @@ div#thetext.manga-text-container {
 }
 
 /* Words inside revealed manga blocks follow the block font size, not
-   the reading-pane default of 16px.  They use the normal theme text
-   color (on the white backdrop) while keeping the term status colors. */
+   the reading-pane default of 16px.  They keep the dark text color
+   (on the white backdrop) while retaining the term status colors. */
 .manga-text-block span.textitem {
     font-size: inherit;
+    color: #000;
+}
+
+/* Term status colors inside manga blocks are fixed to the light-theme
+   pastels: in dark mode the theme re-styles status spans for dark
+   backgrounds, which would be unreadable on the manga's white backdrop /
+   page image.  Wording in the manga pane must stay theme-independent. */
+.manga-text-block span.status0 {
+    background-color: #D5FFFF;
+    color: #000;
+}
+.manga-text-block span.status1 {
+    background-color: #F5B8A9;
+    color: #000;
+}
+.manga-text-block span.status2 {
+    background-color: #F5CCA9;
+    color: #000;
+}
+.manga-text-block span.status3 {
+    background-color: #F5E1A9;
+    color: #000;
+}
+.manga-text-block span.status4 {
+    background-color: #F5F3A9;
+    color: #000;
+}
+.manga-text-block span.status5 {
+    background-color: #DDFFDD;
+    color: #000;
 }
 
 /* .click */
