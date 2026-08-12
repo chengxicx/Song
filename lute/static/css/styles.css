@@ -3006,11 +3006,11 @@ div#termimagesearch span img {
         width: 100% !important;
     }
 
-    /* --- Card rows --- */
+    /* --- Card rows (CSS Grid for precise row control) --- */
     #booktable tbody tr {
-        display: flex !important;
-        flex-wrap: wrap;
-        align-items: center;
+        display: grid !important;
+        grid-template-columns: 1fr auto;
+        gap: 6px 0;
         width: 100% !important;
         padding: 16px 14px;
         margin-bottom: 12px;
@@ -3032,10 +3032,10 @@ div#termimagesearch span img {
         vertical-align: middle;
     }
 
-    /* --- Row 1: Title (full width) --- */
+    /* Row 1: Title — spans both columns, full width */
     #booktable td.col-title {
-        flex: 0 0 100%;
-        margin-bottom: 6px;
+        grid-column: 1 / -1;
+        grid-row: 1;
     }
     #booktable td.col-title a.book-title {
         font-size: 1.05rem;
@@ -3043,10 +3043,10 @@ div#termimagesearch span img {
         display: inline;
     }
 
-    /* --- Row 2: Tags (left) + New-word badge (right) --- */
+    /* Row 2: Tags (col 1, left) + New-word badge (col 2, right) */
     #booktable td.col-tags {
-        flex: 1 1 auto;
-        min-width: 0;
+        grid-column: 1;
+        grid-row: 2;
     }
     #booktable td.col-tags .book-tag-list {
         flex-wrap: wrap;
@@ -3058,8 +3058,9 @@ div#termimagesearch span img {
         padding: 2px 0;
     }
     #booktable td.col-newword {
-        flex: 0 0 auto;
-        margin-left: auto;
+        grid-column: 2;
+        grid-row: 2;
+        justify-self: end;
         padding-left: 10px !important;
     }
     #booktable td.col-newword .new-word-badge {
@@ -3068,19 +3069,18 @@ div#termimagesearch span img {
         cursor: pointer;
     }
 
-    /* --- Row 3: Last read (left) + Actions (right) --- */
+    /* Row 3: Last read (col 1, left) + Actions (col 2, right) */
     #booktable td.col-lastread {
-        flex: 1 1 auto;
-        margin-top: 6px;
-        min-width: 0;
+        grid-column: 1;
+        grid-row: 3;
     }
     #booktable td.col-lastread span {
         font-size: 0.95rem;
     }
     #booktable td.col-actions {
-        flex: 0 0 auto;
-        margin-top: 6px;
-        margin-left: auto;
+        grid-column: 2;
+        grid-row: 3;
+        justify-self: end;
     }
     #booktable td.col-actions .book-action-dropdown > span {
         font-size: 1.5rem;
