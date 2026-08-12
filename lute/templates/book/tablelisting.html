@@ -752,7 +752,7 @@
       level = 'HARD';
       colorClass = 'new-word-hard';
     }
-    const tip = `难度来源：🟢EASY≤9% 🟡CHAL=10~20% 🔴HARD>20%`;
+    const tip = '🟢EASY≤9% 🟡CHAL=10~20% 🔴HARD>20%';
     return `<div class="new-word-badge ${colorClass}" data-level="${level}" onclick="setNewWordFilter('${level}')" title="${tip}">${level} ${percent}%</div>`;
   };
 
