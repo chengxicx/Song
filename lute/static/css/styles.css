@@ -2962,10 +2962,9 @@ div#termimagesearch span img {
 /* =========================================================
    Mobile (< 768px): transform book table rows into vertical
    card layout for better touch interaction.
-   Uses data-dt-column attribute (DataTable 2 adds this to
-   each <td> with the original column index) instead of
-   nth-child, because column visibility state changes the
-   DOM index order.
+   Uses column className (col-title, col-tags, etc.) added
+   via DataTable columns[].className in the JS, which is
+   immune to column visibility state reordering.
    ========================================================= */
 @media screen and (max-width: 767px) {
     /* Override DataTable scroll container so the table can flow naturally */
@@ -2990,10 +2989,10 @@ div#termimagesearch span img {
         display: none !important;
     }
 
-    /* Hide columns: Language (1), Word count (3), Status bar (4) */
-    #booktable td[data-dt-column="1"],
-    #booktable td[data-dt-column="3"],
-    #booktable td[data-dt-column="4"] {
+    /* Hide columns: Language, Words, Status */
+    #booktable td.col-lang,
+    #booktable td.col-words,
+    #booktable td.col-status {
         display: none !important;
     }
 
@@ -3033,64 +3032,62 @@ div#termimagesearch span img {
         vertical-align: middle;
     }
 
-    /* --- Row 1: Title (full width, column 0) --- */
-    #booktable td[data-dt-column="0"] {
+    /* --- Row 1: Title (full width) --- */
+    #booktable td.col-title {
         flex: 0 0 100%;
         margin-bottom: 6px;
     }
-    #booktable td[data-dt-column="0"] a.book-title {
+    #booktable td.col-title a.book-title {
         font-size: 1.05rem;
         font-weight: 700;
         display: inline;
     }
 
-    /* --- Row 2: Tags (left, column 2) + New-word badge (right, column 5) --- */
-    #booktable td[data-dt-column="2"] {
+    /* --- Row 2: Tags (left) + New-word badge (right) --- */
+    #booktable td.col-tags {
         flex: 1 1 auto;
         min-width: 0;
     }
-    /* Tags wrap naturally */
-    #booktable td[data-dt-column="2"] .book-tag-list {
+    #booktable td.col-tags .book-tag-list {
         flex-wrap: wrap;
         max-width: 100%;
     }
-    #booktable td[data-dt-column="2"] .book-tag {
+    #booktable td.col-tags .book-tag {
         max-width: none;
         font-size: 0.95rem;
         padding: 2px 0;
     }
-    /* New-word badge */
-    #booktable td[data-dt-column="5"] {
+    #booktable td.col-newword {
         flex: 0 0 auto;
         margin-left: auto;
         padding-left: 10px !important;
     }
-    #booktable td[data-dt-column="5"] .new-word-badge {
+    #booktable td.col-newword .new-word-badge {
         font-size: 0.9rem;
         padding: 6px 12px;
         cursor: pointer;
     }
 
-    /* --- Row 3: Last read (left, column 6) + Actions (right, column 7) --- */
-    #booktable td[data-dt-column="6"] {
+    /* --- Row 3: Last read (left) + Actions (right) --- */
+    #booktable td.col-lastread {
         flex: 1 1 auto;
         margin-top: 6px;
         min-width: 0;
     }
-    #booktable td[data-dt-column="6"] span {
+    #booktable td.col-lastread span {
         font-size: 0.95rem;
     }
-    #booktable td[data-dt-column="7"] {
+    #booktable td.col-actions {
         flex: 0 0 auto;
         margin-top: 6px;
         margin-left: auto;
     }
-    /* Larger action button for touch */
-    #booktable td[data-dt-column="7"] .book-action-dropdown > span {
+    #booktable td.col-actions .book-action-dropdown > span {
         font-size: 1.5rem;
         padding: 6px 10px;
         cursor: pointer;
     }
+
     /* Action dropdown menu items larger for touch */
     .book-action-dropdown-content a {
         padding: 10px 14px;
