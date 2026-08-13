@@ -346,6 +346,10 @@ def _create_app(app_config, extra_config):
     # Attach the app_config to app so it's available at runtime.
     app.env_config = app_config
 
+    # Force template auto-reload so that template changes are picked up
+    # without needing to restart the server (especially in prod env).
+    app.jinja_env.auto_reload = True
+
     db.init_app(app)
 
     @listens_for(Pool, "connect")
