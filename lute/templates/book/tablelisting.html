@@ -252,9 +252,15 @@
         { name: "LastOpenedDate", className: "col-lastread", width: "10%", data: "LastOpenedDate", searchable: false, render: render_last_opened_date },
         { name: "Actions", className: "col-actions", width: "6%", data: null, searchable: false, orderable: false, render: render_book_actions },
       ],
-      createdRow: function(row, data, dataIndex) { ajax_in_book_stats(row, data, dataIndex); },
+      // Load all visible rows' stats in a single batched request instead
+      // of one /book/table_stats/<id> request per row. This dramatically
+      // reduces DB connection-pool pressure and load on page draw.
+      drawCallback: function(settings) {
+        ajax_in_book_stats(settings);
+      },
       initComplete: function() {
         enable_column_resize();
+        ajax_in_book_stats(null);
       },
       ajax: {
         url: "/book/datatables/{{ status or 'active' }}",
@@ -667,10 +673,14 @@
     return `<span class="new-word-ajax-cell"><img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." /></span>`;
   };
 
-  /* Ajax called from createdRow datatables hook. */
-  let ajax_in_book_stats = function(row, data, dataIndex) {
+  /* Fetch stats for all visible rows in one batched request, instead of
+     one /book/table_stats/<id> request per row. Called from drawCallback
+     and initComplete. This reduces DB connection-pool pressure and load. */
+  let ajax_in_book_stats = function(settings) {
     var table = book_listing_table;
-    var rowIdx = table.row(row).index();
+    if (!table) {
+      return;
+    }
 
     var newWordColIdx = table.column('NewWordPercent:name').index();
     var statsColIdx = table.column('UnknownPercent:name').index();
@@ -678,66 +688,96 @@
     var newWordColVisible = table.column(newWordColIdx).visible();
     var statsColVisible = table.column(statsColIdx).visible();
 
-    var newWordCellNode = newWordColVisible ? table.cell(rowIdx, newWordColIdx).node() : null;
-    var statsCellNode = statsColVisible ? table.cell(rowIdx, statsColIdx).node() : null;
-
     // If both the Status and New Word columns are hidden, skip the AJAX
-    // call entirely — the server-side stats computation is wasted work
-    // when nothing will be rendered. The DataTables colvis widget lets
-    // users toggle these columns off, so this guard avoids N wasted
-    // /book/table_stats/<id> requests per page redraw.
-    if (!newWordCellNode && !statsCellNode) {
+    // call entirely — nothing would be rendered. The DataTables colvis
+    // widget lets users toggle these columns off, so this guard avoids
+    // a wasted batched /book/table_stats request per page redraw.
+    if (!newWordColVisible && !statsColVisible) {
       return;
     }
 
-    if (newWordCellNode) {
-      $(newWordCellNode).html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
-    }
-    if (statsCellNode) {
-      $(statsCellNode).html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
+    // Collect the books currently on this page and their cell nodes.
+    var book_ids = [];
+    var cellNodes = {};
+    table.rows({ page: 'current' }).every(function(rowIdx, tableLoop, rowLoop) {
+      var data = this.data();
+      var bid = data['BkID'];
+      if (bid === undefined || bid === null) {
+        return;
+      }
+      book_ids.push(bid);
+      cellNodes[bid] = {
+        newWord: newWordColVisible ? table.cell(rowIdx, newWordColIdx).node() : null,
+        stats: statsColVisible ? table.cell(rowIdx, statsColIdx).node() : null,
+      };
+      if (cellNodes[bid].newWord) {
+        $(cellNodes[bid].newWord).html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
+      }
+      if (cellNodes[bid].stats) {
+        $(cellNodes[bid].stats).html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
+      }
+    });
+
+    if (book_ids.length === 0) {
+      return;
     }
 
     $.ajax({
-      url: '/book/table_stats/' + data['BkID'],
-      method: 'GET',
+      url: '/book/table_stats',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ book_ids: book_ids }),
       success: function(response) {
-        try {
-          if (statsCellNode) {
-            $(statsCellNode).removeClass("refreshed");
-            if (response.status_distribution) {
-              const result = JSON.parse(response.status_distribution);
-              const graph = render_stats_graph(result);
-              $(statsCellNode).html(graph);
-            } else {
-              $(statsCellNode).text('No data');
+        Object.keys(response).forEach(function(bid) {
+          var nodes = cellNodes[bid];
+          if (!nodes) {
+            return;
+          }
+          var stats = response[bid];
+          try {
+            if (nodes.stats) {
+              $(nodes.stats).removeClass("refreshed");
+              if (stats.status_distribution) {
+                const result = JSON.parse(stats.status_distribution);
+                const graph = render_stats_graph(result);
+                $(nodes.stats).html(graph);
+              } else {
+                $(nodes.stats).text('No data');
+              }
+            }
+            if (nodes.newWord) {
+              $(nodes.newWord).removeClass("refreshed");
+              const newWordHtml = render_new_word(stats.new_word_percent);
+              $(nodes.newWord).html(newWordHtml);
+            }
+          } catch (e) {
+            console.error('table_stats error for book ' + bid + ':', e);
+            if (nodes.stats) {
+              $(nodes.stats).text('Error loading data');
+              $(nodes.stats).removeClass("refreshed");
+            }
+            if (nodes.newWord) {
+              $(nodes.newWord).text('Error');
+              $(nodes.newWord).removeClass("refreshed");
             }
           }
-          if (newWordCellNode) {
-            $(newWordCellNode).removeClass("refreshed");
-            const newWordHtml = render_new_word(response.new_word_percent);
-            $(newWordCellNode).html(newWordHtml);
-          }
-        } catch (e) {
-          console.error('table_stats error:', e);
-          if (statsCellNode) {
-            $(statsCellNode).text('Error loading data');
-            $(statsCellNode).removeClass("refreshed");
-          }
-          if (newWordCellNode) {
-            $(newWordCellNode).text('Error');
-            $(newWordCellNode).removeClass("refreshed");
-          }
-        }
+        });
       },
       error: function() {
-        if (statsCellNode) {
-          $(statsCellNode).text('Error loading data');
-          $(statsCellNode).removeClass("refreshed");
-        }
-        if (newWordCellNode) {
-          $(newWordCellNode).text('Error');
-          $(newWordCellNode).removeClass("refreshed");
-        }
+        book_ids.forEach(function(bid) {
+          var nodes = cellNodes[bid];
+          if (!nodes) {
+            return;
+          }
+          if (nodes.stats) {
+            $(nodes.stats).text('Error loading data');
+            $(nodes.stats).removeClass("refreshed");
+          }
+          if (nodes.newWord) {
+            $(nodes.newWord).text('Error');
+            $(nodes.newWord).removeClass("refreshed");
+          }
+        });
       }
     });
   };
