@@ -262,9 +262,9 @@
         enable_column_resize();
         ajax_in_book_stats(null);
         // DataTables 2 中，column.visible() 不会触发 drawCallback，
-        // 因此 column-visibility.dt 事件需要额外触发统计加载。
-        // 否则切换列显隐后 status 列会一直显示 skeleton。
-        book_listing_table.on('column-visibility.dt', function() {
+        // 因此需要监听 column-visibility 事件来触发统计加载。
+        // 注意：DataTables API on() 使用不带 .dt 命名空间的事件名。
+        book_listing_table.on('column-visibility', function() {
           ajax_in_book_stats(null);
         });
       },
