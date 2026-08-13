@@ -343,8 +343,42 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
 }
 
 .refreshed {
-    background-image: url("../icn/waiting2.gif");
-    background-repeat: no-repeat;
+    background-image: none;
+    position: relative;
+}
+
+.refreshed::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border: 2px solid #ddd;
+    border-top-color: #666;
+    border-radius: 50%;
+    animation: refresh-spin 0.7s linear infinite;
+}
+
+@keyframes refresh-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Skeleton screen loading placeholder for AJAX table cells */
+.skeleton-loading {
+    display: inline-block;
+    width: 80px;
+    height: 16px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 .new-word-badge {
