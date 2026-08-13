@@ -666,10 +666,26 @@
 
   /* Replaced by the status graph after the ajax call kicked off by createdRow. */
   let render_book_stats_graph_placeholder = function(data, type, row, meta) {
+    if (type === 'display' || type === 'filter') {
+      const sd = row['StatusDistribution'];
+      if (sd) {
+        try {
+          const result = JSON.parse(sd);
+          return render_stats_graph(result);
+        } catch (e) {
+          // fall through to skeleton
+        }
+      }
+    }
     return `<span class="book-stats-ajax-cell"><span class="skeleton-loading"></span></span>`;
   };
 
   let render_new_word_placeholder = function(data, type, row, meta) {
+    if (type === 'display' || type === 'filter') {
+      if (data !== null && data !== undefined && data !== '') {
+        return render_new_word(parseInt(data));
+      }
+    }
     return `<span class="new-word-ajax-cell"><span class="skeleton-loading"></span></span>`;
   };
 
