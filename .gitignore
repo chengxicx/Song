@@ -151,3 +151,11 @@ cython_debug/
 
 # Generated manga assets (user-imported ZIP/CBZ content; regenerated on demand)
 lute/static/manga/
+
+# Server runtime data (not part of source)
+deploy.sh
+requirements.txt
+lute.db
+lute.log
+lute_run.log
+lute_data/
