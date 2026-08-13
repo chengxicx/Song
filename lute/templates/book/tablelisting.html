@@ -666,11 +666,11 @@
 
   /* Replaced by the status graph after the ajax call kicked off by createdRow. */
   let render_book_stats_graph_placeholder = function(data, type, row, meta) {
-    return `<span class="book-stats-ajax-cell"><img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." /></span>`;
+    return `<span class="book-stats-ajax-cell"><span class="skeleton-loading"></span></span>`;
   };
 
   let render_new_word_placeholder = function(data, type, row, meta) {
-    return `<span class="new-word-ajax-cell"><img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." /></span>`;
+    return `<span class="new-word-ajax-cell"><span class="skeleton-loading"></span></span>`;
   };
 
   /* Fetch stats for all visible rows in one batched request, instead of
@@ -711,10 +711,10 @@
         stats: statsColVisible ? table.cell(rowIdx, statsColIdx).node() : null,
       };
       if (cellNodes[bid].newWord) {
-        $(cellNodes[bid].newWord).html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
+        $(cellNodes[bid].newWord).html(`<span class="skeleton-loading"></span>`);
       }
       if (cellNodes[bid].stats) {
-        $(cellNodes[bid].stats).html(`<img src="{{ url_for('static', filename='icn/waiting2.gif') }}" title="Calculating ..." />`);
+        $(cellNodes[bid].stats).html(`<span class="skeleton-loading"></span>`);
       }
     });
 
