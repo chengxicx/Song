@@ -418,6 +418,9 @@
         label.appendChild(span);
         cb.addEventListener('change', function() {
           book_listing_table.column(colIdx).visible(cb.checked);
+          // 直接触发统计加载，不依赖 column-visibility 事件（某些 DataTables 2 版本
+          // 在 checkbox 触发的 column.visible() 调用中可能不会冒泡该事件）。
+          ajax_in_book_stats(null);
         });
         menu.appendChild(label);
       });
