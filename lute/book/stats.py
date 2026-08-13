@@ -197,5 +197,5 @@ class Service:
         s.new_word_percent = stats["new_word_percent"]
         s.status_distribution = stats["distribution"]
         s.manga_word_count = stats["manga_word_count"]
-        self.session.add(s)
+        self.session.merge(s)
         self.session.commit()
