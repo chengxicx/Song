@@ -81,16 +81,16 @@
   ],
   "screenshots": [
     {
-      "src": "/static/img/lute-screenshot-desktop.png",
+      "src": "/static/img/lute-screenshot-desktop.webp",
       "sizes": "1280x720",
-      "type": "image/png",
+      "type": "image/webp",
       "form_factor": "wide",
       "label": "Lute - Learning Using Texts"
     },
     {
-      "src": "/static/img/lute-screenshot-mobile.png",
+      "src": "/static/img/lute-screenshot-mobile.webp",
       "sizes": "750x1334",
-      "type": "image/png",
+      "type": "image/webp",
       "form_factor": "narrow",
       "label": "Lute - Learning Using Texts"
     }
