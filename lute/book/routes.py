@@ -493,3 +493,39 @@ def table_stats(bookid):
         "status_distribution": stats.status_distribution,
     }
     return jsonify(ret)
+
+
+def _stats_to_dict(stats):
+    "Convert a BookStats object to the dict shape expected by the frontend."
+    return {
+        "distinctterms": stats.distinctterms,
+        "distinctunknowns": stats.distinctunknowns,
+        "unknownpercent": stats.unknownpercent,
+        "new_word_percent": stats.new_word_percent,
+        "status_distribution": stats.status_distribution,
+    }
+
+
+@bp.route("/table_stats", methods=["POST"])
+def table_stats_batch():
+    """
+    Get stats for a batch of books in one request.
+
+    The frontend book listing previously issued one /table_stats/<id>
+    request per visible row (25+ requests per page). This batches those
+    into a single request to reduce DB connection-pool pressure and load.
+    """
+    data = request.get_json(silent=True) or {}
+    book_ids = data.get("book_ids") or []
+    svc = StatsService(db.session)
+    ret = {}
+    for book_id in book_ids:
+        b = _find_book(book_id)
+        if b is None or b.language is None:
+            continue
+        try:
+            stats = svc.get_stats(b)
+        except Exception:  # noqa: BLE001 - one bad book shouldn't fail the batch
+            continue
+        ret[book_id] = _stats_to_dict(stats)
+    return jsonify(ret)
