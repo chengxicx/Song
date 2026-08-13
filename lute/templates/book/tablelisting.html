@@ -262,9 +262,10 @@
         enable_column_resize();
         ajax_in_book_stats(null);
         // DataTables 2 中，column.visible() 不会触发 drawCallback，
-        // 因此需要监听表元素的 column-visibility.dt 事件来触发统计加载。
-        // 这里使用 jQuery 事件绑定到 table 元素，而不是 DataTables API。
-        $('#booktable').on('column-visibility.dt', function() {
+        // 因此需要监听 column-visibility 事件来触发统计加载。
+        // 注意：必须使用 DataTables API on() 方法（不是 jQuery on），
+        // 事件名不带 .dt 命名空间。
+        book_listing_table.on('column-visibility', function() {
           ajax_in_book_stats(null);
         });
       },
