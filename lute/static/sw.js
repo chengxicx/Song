@@ -31,7 +31,7 @@ const STATIC_ASSETS = [
   '/static/js/lute-popups.js',
   '/static/js/lute.js',
   '/static/js/lute-anki.js',
-  '/static/img/lute.png',
+  '/static/img/lute.webp',
   '/static/img/apple-touch-icon-57x57.png',
   '/static/img/apple-touch-icon-72x72.png',
   '/static/img/apple-touch-icon-114x114.png',
@@ -40,8 +40,8 @@ const STATIC_ASSETS = [
   '/static/img/icon-512.png',
   '/static/img/maskable-192.png',
   '/static/img/maskable-512.png',
-  '/static/img/lute-screenshot-desktop.png',
-  '/static/img/lute-screenshot-mobile.png',
+  '/static/img/lute-screenshot-desktop.webp',
+  '/static/img/lute-screenshot-mobile.webp',
   '/static/favicon.ico',
 ];
 
