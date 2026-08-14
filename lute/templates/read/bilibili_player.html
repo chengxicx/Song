@@ -12,12 +12,14 @@
 
   <div class="yt-player-video-wrap">
     <!-- src is set by bilibili-player.js after the load listener is
-         attached, so the iframe's load event is always captured. -->
+         attached, so the iframe's load event is always captured.
+         NOTE: do NOT add loading="lazy" here -- it prevents the
+         dynamically-set src from actually loading the Bilibili player,
+         leaving the iframe blank. -->
     <iframe id="bili-player" class="bili-player-frame"
             allowfullscreen="allowfullscreen"
             scrolling="no"
-            frameborder="no"
-            loading="lazy"></iframe>
+            frameborder="no"></iframe>
     <div class="yt-player-loading" id="yt-player-loading">Loading player...</div>
   </div>
 
