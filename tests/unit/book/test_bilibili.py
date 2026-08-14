@@ -301,3 +301,44 @@ def test_edit_book_preserves_bilibili_type(app, app_context, english, client):
     book = repo.find(dbbook.id)
     assert book.book_type == "bilibili"
     assert len(book.cues) == 3
+
+
+# ---------------------------------------------------------------------
+# stream_info uses the selected page's duration, not the whole collection
+# ---------------------------------------------------------------------
+
+
+def test_stream_info_uses_selected_page_duration():
+    "The reported duration is the page's own duration, not the collection total."
+    from lute.read import bilibili_stream
+
+    view = {
+        "code": 0,
+        "data": {
+            # Top-level duration is the whole collection's total.
+            "duration": 7200,
+            "pages": [
+                {"cid": 101, "duration": 120},
+                {"cid": 202, "duration": 300},
+                {"cid": 303, "duration": 180},
+            ],
+        },
+    }
+    play = {
+        "code": 0,
+        "data": {
+            "dash": {
+                "video": [{"bandwidth": 1000, "baseUrl": "v.mp4",
+                           "SegmentBase": {"Initialization": "init",
+                                           "indexRange": "0-99"}}],
+                "audio": [{"bandwidth": 500, "baseUrl": "a.m4a",
+                           "SegmentBase": {"Initialization": "init",
+                                           "indexRange": "0-99"}}],
+            }
+        },
+    }
+    with patch.object(bilibili_stream, "_fetch_view", return_value=view["data"]), \
+         patch.object(bilibili_stream, "_fetch_playurl", return_value=play["data"]):
+        info = bilibili_stream.stream_info("BV1xx411c7mD", page=2)
+    assert info["duration"] == 300
+    assert info["cid"] == 202
