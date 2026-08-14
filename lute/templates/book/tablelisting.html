@@ -209,43 +209,39 @@
         } catch(e) {}
       },
       stateLoadCallback: function(settings, callback) {
-        // Read the local snapshot first (synchronous, always reflects the
-        // most recent actions in this browser).  The server copy is then
-        // merged in, preferring whichever has the newer timestamp so a
-        // stale server state can't resurrect a column the user hid.
-        var localData = null;
+        // Always prefer the local snapshot (synchronous, always reflects
+        // the most recent actions in this browser).  The server copy is
+        // only used as a fallback when there is no local state, so that
+        // a stale server state can't resurrect a column the user hid.
         var saved = localStorage.getItem('booklisting_datatables_state');
         if (saved) {
           try {
             var ld = JSON.parse(saved);
-            if (ld && ld.version === 4) localData = ld;
+            if (ld && ld.version === 4) {
+              callback(ld);
+              return;
+            }
           } catch (err) { /* ignore malformed state */ }
         }
+        // No local state — try the server as a fallback.
         $.ajax({
           url: '/settings/datatables_state/load/booklisting',
           method: 'GET',
           dataType: 'json',
           success: function(resp) {
-            var serverData = null;
             if (resp && resp.value) {
               try {
                 var sd = JSON.parse(resp.value);
-                if (sd && sd.version === 4) serverData = sd;
+                if (sd && sd.version === 4) {
+                  localStorage.setItem('booklisting_datatables_state', resp.value);
+                  callback(sd);
+                  return;
+                }
               } catch (err) { /* ignore malformed state */ }
-            }
-            var chosen = localData;
-            if (serverData && (!chosen || serverData.time > chosen.time)) {
-              chosen = serverData;
-            }
-            if (chosen) {
-              localStorage.setItem('booklisting_datatables_state', JSON.stringify(chosen));
-              callback(chosen);
-              return;
             }
             callback(null);
           },
           error: function() {
-            if (localData) { callback(localData); return; }
             callback(null);
           }
         });
