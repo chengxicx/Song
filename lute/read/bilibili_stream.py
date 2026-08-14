@@ -92,7 +92,10 @@ def stream_info(bvid, page=1):
     if not pages or page < 1 or page > len(pages):
         raise ValueError("Video page not found")
     cid = pages[page - 1]["cid"]
-    duration = view.get("duration") or 0
+    # The view API's top-level "duration" sums all pages of a multi-part
+    # video (the whole collection).  Use the selected page's own
+    # duration so the progress bar reflects just this one episode.
+    duration = pages[page - 1].get("duration") or view.get("duration") or 0
 
     play = _fetch_playurl(bvid, cid)
     dash = play.get("dash") or {}
