@@ -906,6 +906,12 @@
   document.querySelector(".refresh").addEventListener("click", function(e) {
     e.target.classList.add("refreshed");
     e.stopPropagation();
+    // Force refresh of stats columns when refresh button is clicked
+    if (book_listing_table) {
+      book_listing_table.draw();
+      // Also trigger stats loading explicitly
+      ajax_in_book_stats(null);
+    }
   });
 
   /**
