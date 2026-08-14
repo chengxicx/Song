@@ -209,34 +209,43 @@
         } catch(e) {}
       },
       stateLoadCallback: function(settings, callback) {
-        // Try server first for cross-browser state.
+        // Read the local snapshot first (synchronous, always reflects the
+        // most recent actions in this browser).  The server copy is then
+        // merged in, preferring whichever has the newer timestamp so a
+        // stale server state can't resurrect a column the user hid.
+        var localData = null;
+        var saved = localStorage.getItem('booklisting_datatables_state');
+        if (saved) {
+          try {
+            var ld = JSON.parse(saved);
+            if (ld && ld.version === 4) localData = ld;
+          } catch (err) { /* ignore malformed state */ }
+        }
         $.ajax({
           url: '/settings/datatables_state/load/booklisting',
           method: 'GET',
           dataType: 'json',
           success: function(resp) {
+            var serverData = null;
             if (resp && resp.value) {
-              var data = JSON.parse(resp.value);
-              if (data && data.version === 4) {
-                localStorage.setItem('booklisting_datatables_state', resp.value);
-                callback(data);
-                return;
-              }
+              try {
+                var sd = JSON.parse(resp.value);
+                if (sd && sd.version === 4) serverData = sd;
+              } catch (err) { /* ignore malformed state */ }
             }
-            // Fallback to localStorage.
-            var saved = localStorage.getItem('booklisting_datatables_state');
-            if (saved) {
-              var d = JSON.parse(saved);
-              if (d.version === 4) { callback(d); return; }
+            var chosen = localData;
+            if (serverData && (!chosen || serverData.time > chosen.time)) {
+              chosen = serverData;
+            }
+            if (chosen) {
+              localStorage.setItem('booklisting_datatables_state', JSON.stringify(chosen));
+              callback(chosen);
+              return;
             }
             callback(null);
           },
           error: function() {
-            var saved = localStorage.getItem('booklisting_datatables_state');
-            if (saved) {
-              var d = JSON.parse(saved);
-              if (d.version === 4) { callback(d); return; }
-            }
+            if (localData) { callback(localData); return; }
             callback(null);
           }
         });
@@ -903,15 +912,23 @@
   };
 
   // added class is used for changing static image to rotating arrow animation
-  document.querySelector(".refresh").addEventListener("click", function(e) {
-    e.target.classList.add("refreshed");
+  // The refresh <a> must not navigate (no default action): navigating to
+  // /refresh_all_stats reloads the whole page and leaves every stats cell
+  // on a skeleton while all books re-calculate.  Instead mark all books
+  // stale via AJAX, then reload the visible stats columns in place.
+  $(document).on('click', 'a.refresh', function(e) {
+    e.preventDefault();
     e.stopPropagation();
-    // Force refresh of stats columns when refresh button is clicked
-    if (book_listing_table) {
-      book_listing_table.draw();
-      // Also trigger stats loading explicitly
-      ajax_in_book_stats(null);
-    }
+    $(e.currentTarget).addClass('refreshed');
+    if (!book_listing_table) return;
+    $.ajax({
+      url: '/refresh_all_stats',
+      method: 'POST',
+      success: function() {
+        book_listing_table.draw();
+        ajax_in_book_stats(null);
+      }
+    });
   });
 
   /**
