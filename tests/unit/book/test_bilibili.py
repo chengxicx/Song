@@ -10,6 +10,7 @@ from lute.db import db
 from lute.book.service import (
     bilibili_video_id,
     bilibili_embed_url,
+    bilibili_page,
     Service as BookService,
 )
 from lute.read.routes import _subtitle_words_html
@@ -71,6 +72,30 @@ def test_bilibili_embed_url_av():
 
 def test_bilibili_embed_url_invalid():
     assert bilibili_embed_url("https://example.com/not-bilibili") is None
+
+
+def test_bilibili_page_defaults_to_one_when_absent():
+    assert bilibili_page("https://www.bilibili.com/video/BV1xx411c7mD") == 1
+    assert bilibili_page("") == 1
+    assert bilibili_page(None) == 1
+
+
+def test_bilibili_page_parses_p_parameter():
+    assert bilibili_page("https://www.bilibili.com/video/BV1xx411c7mD?p=3") == 3
+    assert bilibili_page("https://www.bilibili.com/video/BV1xx411c7mD?p=1") == 1
+    assert bilibili_page("https://www.bilibili.com/video/BV1xx411c7mD?foo=1&p=4") == 4
+
+
+def test_bilibili_page_ignores_invalid_p():
+    assert bilibili_page("https://www.bilibili.com/video/BV1xx411c7mD?p=abc") == 1
+    assert bilibili_page("https://www.bilibili.com/video/BV1xx411c7mD?p=0") == 1
+
+
+def test_bilibili_embed_url_uses_selected_page():
+    assert bilibili_embed_url("https://www.bilibili.com/video/BV1xx411c7mD?p=3") == (
+        "https://player.bilibili.com/player.html"
+        "?bvid=BV1xx411c7mD&page=3&high_quality=1&danmaku=0"
+    )
 
 
 # ---------------------------------------------------------------------
