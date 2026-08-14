@@ -5,6 +5,7 @@ Tests for the Bilibili video book feature.
 import io
 import json
 from unittest.mock import patch
+import requests
 from lute.db import db
 from lute.book.service import (
     bilibili_video_id,
@@ -70,6 +71,58 @@ def test_bilibili_embed_url_av():
 
 def test_bilibili_embed_url_invalid():
     assert bilibili_embed_url("https://example.com/not-bilibili") is None
+
+
+# ---------------------------------------------------------------------
+# bilibili_title
+# ---------------------------------------------------------------------
+
+
+def _fake_response(payload):
+    class _Resp:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return payload
+
+    return _Resp()
+
+
+def test_bilibili_title_uses_view_api_bv(app, app_context):
+    "The real title is fetched from the view API for a BV id."
+    payload = {
+        "code": 0,
+        "data": {"title": "A Real Bilibili Title"},
+    }
+    with patch("lute.book.service.requests.get", return_value=_fake_response(payload)):
+        svc = BookService()
+        title = svc.bilibili_title("https://www.bilibili.com/video/BV1xx411c7mD")
+    assert title == "A Real Bilibili Title"
+
+
+def test_bilibili_title_uses_view_api_av(app, app_context):
+    "The view API is called with the av id for legacy videos."
+    payload = {
+        "code": 0,
+        "data": {"title": "Legacy Title"},
+    }
+    with patch("lute.book.service.requests.get", return_value=_fake_response(payload)) as m:
+        svc = BookService()
+        title = svc.bilibili_title("https://www.bilibili.com/video/av123456")
+    assert title == "Legacy Title"
+    assert "aid=123456" in m.call_args.args[0]
+
+
+def test_bilibili_title_fallbacks_to_id_on_error(app, app_context):
+    "If the API fails, the title falls back to the video id."
+    with patch(
+        "lute.book.service.requests.get",
+        side_effect=requests.exceptions.RequestException("boom"),
+    ):
+        svc = BookService()
+        title = svc.bilibili_title("https://www.bilibili.com/video/BV1xx411c7mD")
+    assert title == "Bilibili video (BV1xx411c7mD)"
 
 
 # ---------------------------------------------------------------------
