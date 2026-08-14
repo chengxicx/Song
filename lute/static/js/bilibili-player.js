@@ -280,12 +280,17 @@
     });
     // The Bilibili embed posts a "playerInitDone" message once it is
     // ready, but fall back to the iframe's DOM load event so the loading
-    // overlay is cleared even if postMessage events are missed.
+    // overlay is cleared even if postMessage events are missed.  The src
+    // is set here (not in the HTML) so the load listener is attached
+    // before the iframe starts loading; otherwise the load event would
+    // fire before we attach the listener and the player would never be
+    // marked ready.
     iframeEl.addEventListener("load", function () {
       if (ytPlayer && typeof ytPlayer._onIframeLoad === "function") {
         ytPlayer._onIframeLoad();
       }
     });
+    iframeEl.src = BILI_URL;
     ytPlayer._maybeFireReady();
   }
 
