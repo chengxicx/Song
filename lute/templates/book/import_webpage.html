@@ -10,6 +10,7 @@
   <select id="import_type" name="import_type" class="form-control" style="width: auto;">
     <option value="webpage" selected>Web page</option>
     <option value="youtube">YouTube video</option>
+    <option value="bilibili">Bilibili video</option>
     <option value="mp3">MP3 / M4A audio</option>
     <option value="manga">Mokuro Manga</option>
   </select>
@@ -69,6 +70,41 @@
 
   <input type="hidden" name="import_type" value="youtube">
   <input type="submit" id="youtube-import" value="Import">
+</form>
+
+<form id="bilibili-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
+  <p>Import a Bilibili video with its subtitle (SRT / VTT) file. The subtitles
+  become the book text, so you can read and look up words while the video plays.</p>
+
+  <br />
+
+  <label for="bilibili-language">Language (used for subtitle parsing):</label>
+  <select id="bilibili-language" name="language_id" class="form-control" style="width: auto;">
+    {% for id, name in language_choices %}
+    <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+    {% endfor %}
+  </select>
+  <br /><br />
+
+  <label for="bilibili_url">Bilibili video URL:</label>
+  <input type="text" id="bilibili_url" name="bilibili_url" class="form-text" style="width:75%;" placeholder="https://www.bilibili.com/video/BV..."><br><br>
+
+  <label for="bilibili_tag">Tags:</label>
+  <input type="text" id="bilibili_tag" name="bilibili_tag" class="form-control" value='[{"value":"bilibili"}]'><br><br>
+
+  <label for="srt_file">Subtitle file (SRT / VTT):</label>
+  <input type="file" id="srt_file" name="srt_file" accept=".srt,.vtt"><br><br>
+
+  <label>
+    <input type="checkbox" id="bilibili_resplit_sentences" name="resplit_sentences">
+    Re-split subtitles into sentences (Japanese)
+  </label>
+  <br>
+  <span class="formfieldcomment">Merge/split subtitle cues into sentence units (recommended for Japanese). Off by default.</span>
+  <br><br>
+
+  <input type="hidden" name="import_type" value="bilibili">
+  <input type="submit" id="bilibili-import" value="Import">
 </form>
 
 <form id="mp3-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
@@ -143,7 +179,7 @@
 <script type="text/javascript">
   var EXISTING_TAGS = {{ existing_tags | tojson }};
 
-  // Shared Tagify config for the youtube / mp3 tag inputs.
+  // Shared Tagify config for the youtube / bilibili / mp3 tag inputs.
   function setupTagsTagify(input) {
     return new Tagify(input, {
       placeholder: 'Tags (press Enter or comma to add)',
@@ -159,11 +195,13 @@
     const typeSel = $('#import_type');
     const webpageForm = $('#webpage-form');
     const youtubeForm = $('#youtube-form');
+    const bilibiliForm = $('#bilibili-form');
     const mp3Form = $('#mp3-form');
     const mangaForm = $('#manga-form');
 
     // Init Tagify on all tag inputs.
     var ytTagify = setupTagsTagify(document.getElementById('youtube_tag'));
+    var biliTagify = setupTagsTagify(document.getElementById('bilibili_tag'));
     var mp3Tagify = setupTagsTagify(document.getElementById('mp3_tag'));
     var mangaTagify = setupTagsTagify(document.getElementById('manga_tag'));
 
@@ -171,6 +209,7 @@
       const t = typeSel.val();
       webpageForm.toggle(t === 'webpage');
       youtubeForm.toggle(t === 'youtube');
+      bilibiliForm.toggle(t === 'bilibili');
       mp3Form.toggle(t === 'mp3');
       mangaForm.toggle(t === 'manga');
     };

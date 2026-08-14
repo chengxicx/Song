@@ -62,6 +62,47 @@ def youtube_video_id(url):
     return None
 
 
+def bilibili_video_id(url):
+    """
+    Extract the Bilibili video id from a URL.
+
+    Returns a tuple (bvid, aid): exactly one of the two is a non-None
+    string.  Bilibili uses "BV" ids for modern videos and "av" ids for
+    legacy uploads.  bilibili.com/video/BV... and
+    bilibili.com/video/av... URLs are supported.
+    """
+    if not url:
+        return (None, None)
+    m = re.search(r"bilibili\.com/video/(BV[0-9A-Za-z]+)", url)
+    if m:
+        return (m.group(1), None)
+    m = re.search(r"bilibili\.com/video/av(\d+)", url)
+    if m:
+        return (None, m.group(1))
+    return (None, None)
+
+
+def bilibili_embed_url(url):
+    """
+    Build the Bilibili iframe player embed URL for a video URL, or None.
+
+    The player accepts either a bvid or an aid parameter, so both
+    modern BV and legacy av videos are supported.
+    """
+    bvid, aid = bilibili_video_id(url)
+    if bvid:
+        return (
+            "https://player.bilibili.com/player.html"
+            f"?bvid={bvid}&page=1&high_quality=1&danmaku=0"
+        )
+    if aid:
+        return (
+            "https://player.bilibili.com/player.html"
+            f"?aid={aid}&page=1&high_quality=1&danmaku=0"
+        )
+    return None
+
+
 def parse_subtitle_file(
     filename, filestream, language=None, resplit_sentences=False
 ):
@@ -523,6 +564,33 @@ class Service:
             return fallback
         try:
             oembed = f"https://www.youtube.com/oembed?url={url}&format=json"
+            response = requests.get(oembed, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            title = data.get("title", "").strip()
+            if title:
+                return title[:200]
+        except (requests.exceptions.RequestException, ValueError):
+            pass
+        return fallback
+
+    def bilibili_title(self, url):
+        """
+        Best-effort title lookup for a Bilibili video.
+
+        Uses the Bilibili oEmbed endpoint (no API key required), and
+        falls back to a title based on the video id.
+        """
+        bvid, aid = bilibili_video_id(url)
+        fallback = "Bilibili video"
+        if bvid:
+            fallback = f"Bilibili video ({bvid})"
+        elif aid:
+            fallback = f"Bilibili video (av{aid})"
+        if bvid is None and aid is None:
+            return fallback
+        try:
+            oembed = f"https://bilibili.com/oembed?url={url}&format=json"
             response = requests.get(oembed, timeout=10)
             response.raise_for_status()
             data = response.json()

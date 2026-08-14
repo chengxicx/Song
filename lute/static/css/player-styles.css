@@ -476,6 +476,16 @@
   height: 100%;
 }
 
+/* Bilibili embed iframe fills the same video wrap as the YouTube
+   player. */
+.yt-player-video-wrap .bili-player-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .yt-player-loading {
   position: absolute;
   inset: 0;

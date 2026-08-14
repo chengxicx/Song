@@ -20,6 +20,7 @@ from lute.book.service import (
     parse_subtitle_file,
     cues_to_srt_text,
     youtube_video_id,
+    bilibili_video_id,
 )
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm, ALLOWED_AUDIO_EXTENSIONS
@@ -168,9 +169,9 @@ def edit(bookid):
     b = repo.load(bookid)
     form = EditBookForm(obj=b)
 
-    # For youtube/mp3 books the text field holds the SRT original (with
-    # timestamps) so it can be edited directly.
-    if request.method == "GET" and (b.book_type or "") in ("youtube", "mp3"):
+    # For youtube/bilibili/mp3 books the text field holds the SRT original
+    # (with timestamps) so it can be edited directly.
+    if request.method == "GET" and (b.book_type or "") in ("youtube", "bilibili", "mp3"):
         form.text.data = cues_to_srt_text(b.cues)
 
     if form.validate_on_submit():
@@ -202,6 +203,8 @@ def import_webpage():
         import_type = request.form.get("import_type", "webpage")
         if import_type == "youtube":
             return _import_youtube_video()
+        if import_type == "bilibili":
+            return _import_bilibili_video()
         if import_type == "mp3":
             return _import_mp3_audio()
         if import_type == "manga":
@@ -308,6 +311,65 @@ def _import_youtube_video():
     b.text = text
     b.srt_data = cues_json
     b.book_type = "youtube"
+    b.book_tags = tags
+    b.threshold_page_tokens = 250
+    b.split_by = "paragraphs"
+
+    svc = BookService()
+    try:
+        book = svc.import_book(b, db.session)
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+    return redirect(f"/read/{book.id}/page/1", 302)
+
+
+def _import_bilibili_video():
+    "Create a bilibili book from the form data."
+    url = request.form.get("bilibili_url", "").strip()
+    tags = _parse_tagify_tags(request.form.get("bilibili_tag", ""), "bilibili")
+    language_id = request.form.get("language_id")
+    srt_file = request.files.get("srt_file")
+    resplit = bool(request.form.get("resplit_sentences"))
+
+    bvid, aid = bilibili_video_id(url)
+    if bvid is None and aid is None:
+        flash("Please enter a valid Bilibili video URL.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if srt_file is None or srt_file.filename == "":
+        flash("Please upload an SRT or VTT subtitle file.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    # Load the language so parse_subtitle_file can apply language-
+    # specific cue refinement (e.g. Japanese sentence merging/splitting).
+    lang = None
+    if language_id:
+        lang = LanguageRepository(db.session).find(int(language_id))
+
+    try:
+        text, cues_json = parse_subtitle_file(
+            srt_file.filename,
+            srt_file.stream,
+            language=lang,
+            resplit_sentences=resplit,
+        )
+    except Exception as e:  # pylint: disable=broad-except
+        msg = f"Could not parse subtitle file {srt_file.filename} (error: {str(e)})"
+        flash(msg, "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if text.strip() == "":
+        flash("The subtitle file contains no text.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    b = Book()
+    b.language_id = int(language_id) if language_id else None
+    b.title = BookService().bilibili_title(url)
+    b.source_uri = url
+    b.text = text
+    b.srt_data = cues_json
+    b.book_type = "bilibili"
     b.book_tags = tags
     b.threshold_page_tokens = 250
     b.split_by = "paragraphs"

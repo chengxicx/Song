@@ -7,6 +7,8 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}?v=20260805f" charset="utf-8" defer></script>
 {% if book_type in ("youtube", "mp3") %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260805f" charset="utf-8" defer></script>
+{% elif book_type == "bilibili" %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/bilibili-player.js') }}?v=20260805f" charset="utf-8" defer></script>
 {% endif %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}?v=20260805f" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}?v=20260805f" charset="utf-8" defer></script>
@@ -98,6 +100,8 @@
 
   {% if book_type in ("youtube", "mp3") %}
   {% include "read/youtube_player.html" %}
+  {% elif book_type == "bilibili" %}
+  {% include "read/bilibili_player.html" %}
   {% elif book_type != "manga" %}
   {# TTS player for text books: same UI / CSS classes as the YouTube / MP3
      player so the visual style, layout and responsive behaviour match.
