@@ -578,7 +578,21 @@
     });
 
     // Action 下拉菜单 fixed 定位，避免被 dt-scroll-body 遮挡
+    // 菜单被改成 fixed 后脱离了父容器的 hover 区域，鼠标从 "…" 触发点
+    // 移到菜单时会经过一段空隙触发 mouseleave 导致菜单提前消失。
+    // 因此隐藏时加一个延时，并在鼠标进入触发器或菜单时取消，让鼠标
+    // 能顺利跨过空隙到达菜单。
+    var actionDropdownHideTimer = null;
+    var hideActionDropdown = function($dropdown) {
+      $dropdown.css({
+        position: '',
+        top: '',
+        left: '',
+        display: ''
+      });
+    };
     $(document).on('mouseenter', '.book-action-dropdown', function() {
+      clearTimeout(actionDropdownHideTimer);
       var $dropdown = $(this).find('.book-action-dropdown-content');
       var $trigger = $(this).find('span');
       if (!$dropdown.length || !$trigger.length) return;
@@ -607,12 +621,22 @@
     });
     $(document).on('mouseleave', '.book-action-dropdown', function() {
       var $dropdown = $(this).find('.book-action-dropdown-content');
-      $dropdown.css({
-        position: '',
-        top: '',
-        left: '',
-        display: ''
-      });
+      clearTimeout(actionDropdownHideTimer);
+      actionDropdownHideTimer = setTimeout(function() {
+        hideActionDropdown($dropdown);
+      }, 200);
+    });
+    // 菜单是 position:fixed 的子元素，悬停它本身不会触发父容器事件，
+    // 因此单独监听菜单的进入/离开来取消或触发隐藏。
+    $(document).on('mouseenter', '.book-action-dropdown-content', function() {
+      clearTimeout(actionDropdownHideTimer);
+    });
+    $(document).on('mouseleave', '.book-action-dropdown-content', function() {
+      var $dropdown = $(this);
+      clearTimeout(actionDropdownHideTimer);
+      actionDropdownHideTimer = setTimeout(function() {
+        hideActionDropdown($dropdown);
+      }, 150);
     });
   });
 
