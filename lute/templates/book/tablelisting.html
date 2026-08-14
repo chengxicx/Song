@@ -796,11 +796,11 @@
             return;
           }
           if (nodes.stats) {
-            $(nodes.stats).text('Error loading data');
+            $(nodes.stats).html('<span class="skeleton-loading"></span>');
             $(nodes.stats).removeClass("refreshed");
           }
           if (nodes.newWord) {
-            $(nodes.newWord).text('Error');
+            $(nodes.newWord).html('<span class="skeleton-loading"></span>');
             $(nodes.newWord).removeClass("refreshed");
           }
         });
