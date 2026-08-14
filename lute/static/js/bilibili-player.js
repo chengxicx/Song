@@ -105,9 +105,12 @@
     }
 
     function post(msg) {
-      if (!win) return;
+      // Use the live window so a reload of the iframe's document doesn't
+      // leave us talking to a stale window.
+      var w = iframeEl && iframeEl.contentWindow;
+      if (!w) return;
       try {
-        win.postMessage(JSON.stringify(msg), "*");
+        w.postMessage(JSON.stringify(msg), "*");
       } catch (e) { /* ignore */ }
     }
 
@@ -124,17 +127,48 @@
       }
     }
 
+    // The Bilibili embed player posts its events as JSON.  It signals
+    // that it is initialized and ready to accept commands with a
+    // "playerInitDone" message (some builds also post "ready").  We treat
+    // either — or any playback/duration/time message, which can only
+    // arrive once the player is live — as the ready trigger, so the
+    // loading overlay is cleared as soon as the player is usable.
+    function looksReady(d) {
+      return d.type === "playerInitDone" ||
+        d.type === "ready" ||
+        d.type === "playing" ||
+        d.type === "play" ||
+        d.type === "duration" ||
+        d.type === "timeupdate";
+    }
+
+    function numFrom(d, keys) {
+      for (var i = 0; i < keys.length; i++) {
+        var v = d[keys[i]];
+        if (typeof v === "number") return v;
+      }
+      if (d.data && typeof d.data === "object") {
+        for (var j = 0; j < keys.length; j++) {
+          var v2 = d.data[keys[j]];
+          if (typeof v2 === "number") return v2;
+        }
+      }
+      return null;
+    }
+
     function handleMessage(ev) {
-      if (ev.source !== win) return;
+      if (ev.source !== win && ev.source !== (iframeEl && iframeEl.contentWindow)) {
+        return;
+      }
       var d = ev.data;
       if (typeof d === "string") {
         try { d = JSON.parse(d); } catch (e) { return; }
       }
       if (!d || typeof d.type !== "string") return;
+
+      if (looksReady(d)) fireReady();
+
       switch (d.type) {
-        case "ready":
-          fireReady();
-          break;
         case "playing":
         case "play":
           playing = true;
@@ -150,14 +184,17 @@
           fireStateChange(PS.ENDED);
           break;
         case "timeupdate":
-          if (typeof d.value === "number") currentT = d.value;
-          else if (typeof d.currentTime === "number") currentT = d.currentTime;
+        case "time":
+          var t = numFrom(d, ["value", "currentTime", "time"]);
+          if (t !== null) currentT = t;
           break;
         case "duration":
-          if (typeof d.value === "number") duration = d.value;
+          var dur = numFrom(d, ["value", "duration"]);
+          if (dur !== null) duration = dur;
           break;
         case "playbackRateChange":
-          if (typeof d.value === "number") rate = d.value;
+          var r = numFrom(d, ["value"]);
+          if (r !== null) rate = r;
           break;
         case "error":
           if (typeof handlers.onError === "function") handlers.onError(d.value);
@@ -187,9 +224,10 @@
 
     return {
       _maybeFireReady: function () {
-        // Nothing to do: readiness comes from the iframe "ready" /
-        // playing messages.  Kept for interface parity.
+        // Nothing to do: readiness comes from the iframe postMessage
+        // events.  Kept for interface parity.
       },
+      _onIframeLoad: fireReady,
       load: function () { post({ type: "reload" }); },
       playVideo: function () {
         post({ type: "play" });
@@ -239,6 +277,14 @@
       onReady: ytOnReady,
       onStateChange: ytOnStateChange,
       onError: ytOnError,
+    });
+    // The Bilibili embed posts a "playerInitDone" message once it is
+    // ready, but fall back to the iframe's DOM load event so the loading
+    // overlay is cleared even if postMessage events are missed.
+    iframeEl.addEventListener("load", function () {
+      if (ytPlayer && typeof ytPlayer._onIframeLoad === "function") {
+        ytPlayer._onIframeLoad();
+      }
     });
     ytPlayer._maybeFireReady();
   }
