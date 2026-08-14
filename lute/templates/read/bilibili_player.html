@@ -11,8 +11,9 @@
   </script>
 
   <div class="yt-player-video-wrap">
+    <!-- src is set by bilibili-player.js after the load listener is
+         attached, so the iframe's load event is always captured. -->
     <iframe id="bili-player" class="bili-player-frame"
-            src="{{ bilibili_url or '' }}"
             allowfullscreen="allowfullscreen"
             scrolling="no"
             frameborder="no"
