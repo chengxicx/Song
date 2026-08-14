@@ -39,6 +39,7 @@
   var BOOK_ID = YT_DATA.bookId;
   var START_POS = parseFloat(YT_DATA.startPos) || 0;
   var BILI_URL = YT_DATA.bilibiliUrl || "";
+  var MPD_URL = YT_DATA.mpdUrl || "";
 
   var ytPlayer = null;
   var ytPlayerReady = false;
@@ -83,41 +84,25 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Backend: Bilibili iframe over postMessage                           */
+  /* Backend: HTML5 <video> driven by dash.js (direct DASH stream)      */
   /* ------------------------------------------------------------------ */
 
-  // Wrap the Bilibili iframe so it looks like a YT.Player instance,
-  // letting the shared player logic below drive it unchanged.  The
-  // Bilibili embed player (player.bilibili.com/player.html) is remote
-  // and cross-origin, so we control it exclusively via postMessage and
-  // track its state from the messages it posts back to us.
-  function LuteBilibiliPlayer(iframeEl, handlers) {
+  // Wrap an HTML5 <video> element so it looks like a YT.Player instance,
+  // letting the shared player logic below drive it unchanged.  Instead of
+  // embedding Bilibili's official iframe player (which refuses to load on
+  // non-whitelisted domains), we play the video's raw DASH stream via
+  // dash.js.  The stream is served through our own proxy endpoints
+  // (see lute/read/bilibili_stream.py), so the browser never talks to
+  // Bilibili directly and the domain-whitelist restriction is bypassed.
+  function LuteBilibiliPlayer(videoEl, handlers) {
     var ready = false;
-    var currentT = 0;
-    var duration = 0;
     var playing = false;
-    var rate = 1;
-    var win = null;
-    var pollTimer = null;
-
-    if (iframeEl && iframeEl.contentWindow) {
-      win = iframeEl.contentWindow;
-    }
-
-    function post(msg) {
-      // Use the live window so a reload of the iframe's document doesn't
-      // leave us talking to a stale window.
-      var w = iframeEl && iframeEl.contentWindow;
-      if (!w) return;
-      try {
-        w.postMessage(JSON.stringify(msg), "*");
-      } catch (e) { /* ignore */ }
-    }
+    var player = null; // dashjs.MediaPlayer
+    var pendingSeek = START_POS;
 
     function fireReady() {
       if (ready) return;
       ready = true;
-      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
       if (typeof handlers.onReady === "function") handlers.onReady();
     }
 
@@ -127,134 +112,80 @@
       }
     }
 
-    // The Bilibili embed player posts its events as JSON.  It signals
-    // that it is initialized and ready to accept commands with a
-    // "playerInitDone" message (some builds also post "ready").  We treat
-    // either — or any playback/duration/time message, which can only
-    // arrive once the player is live — as the ready trigger, so the
-    // loading overlay is cleared as soon as the player is usable.
-    function looksReady(d) {
-      return d.type === "playerInitDone" ||
-        d.type === "ready" ||
-        d.type === "playing" ||
-        d.type === "play" ||
-        d.type === "duration" ||
-        d.type === "timeupdate";
+    function onPlay() {
+      playing = true;
+      fireStateChange(PS.PLAYING);
+    }
+    function onPause() {
+      playing = false;
+      fireStateChange(PS.PAUSED);
+    }
+    function onEnded() {
+      playing = false;
+      fireStateChange(PS.ENDED);
     }
 
-    function numFrom(d, keys) {
-      for (var i = 0; i < keys.length; i++) {
-        var v = d[keys[i]];
-        if (typeof v === "number") return v;
-      }
-      if (d.data && typeof d.data === "object") {
-        for (var j = 0; j < keys.length; j++) {
-          var v2 = d.data[keys[j]];
-          if (typeof v2 === "number") return v2;
+    function bindVideo() {
+      videoEl.addEventListener("play", onPlay);
+      videoEl.addEventListener("pause", onPause);
+      videoEl.addEventListener("ended", onEnded);
+      videoEl.addEventListener("loadedmetadata", function () {
+        if (pendingSeek > 0 && isFinite(videoEl.duration)) {
+          try { videoEl.currentTime = pendingSeek; } catch (e) { /* ignore */ }
         }
-      }
-      return null;
+      });
     }
 
-    function handleMessage(ev) {
-      if (ev.source !== win && ev.source !== (iframeEl && iframeEl.contentWindow)) {
+    function init() {
+      bindVideo();
+      if (typeof dashjs === "undefined" || typeof dashjs.MediaPlayer === "undefined") {
+        if (typeof handlers.onError === "function") {
+          handlers.onError("dashjs failed to load");
+        }
         return;
       }
-      var d = ev.data;
-      if (typeof d === "string") {
-        try { d = JSON.parse(d); } catch (e) { return; }
+      try {
+        player = dashjs.MediaPlayer().create();
+        player.on("error", function () {
+          if (typeof handlers.onError === "function") handlers.onError();
+        });
+        player.initialize(videoEl, MPD_URL, false);
+        // Mark the player ready as soon as dash.js has attached itself;
+        // duration is filled in by the poll loop once the manifest loads.
+        fireReady();
+      } catch (e) {
+        if (typeof handlers.onError === "function") handlers.onError(e);
       }
-      if (!d || typeof d.type !== "string") return;
-
-      if (looksReady(d)) fireReady();
-
-      switch (d.type) {
-        case "playing":
-        case "play":
-          playing = true;
-          fireStateChange(PS.PLAYING);
-          break;
-        case "pause":
-        case "paused":
-          playing = false;
-          fireStateChange(PS.PAUSED);
-          break;
-        case "ended":
-          playing = false;
-          fireStateChange(PS.ENDED);
-          break;
-        case "timeupdate":
-        case "time":
-          var t = numFrom(d, ["value", "currentTime", "time"]);
-          if (t !== null) currentT = t;
-          break;
-        case "duration":
-          var dur = numFrom(d, ["value", "duration"]);
-          if (dur !== null) duration = dur;
-          break;
-        case "playbackRateChange":
-          var r = numFrom(d, ["value"]);
-          if (r !== null) rate = r;
-          break;
-        case "error":
-          if (typeof handlers.onError === "function") handlers.onError(d.value);
-          break;
-      }
-    }
-
-    window.addEventListener("message", handleMessage);
-
-    // Poll until the iframe signals ready (the player posts a "ready"
-    // message once the video is loaded).  Also nudge the remote player
-    // to report its current time / duration so the timeline fills in.
-    if (win) {
-      pollTimer = setInterval(function () {
-        if (ready) {
-          if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-          return;
-        }
-        post({ type: "getCurrentTime" });
-        post({ type: "getDuration" });
-      }, 250);
-      // Give up after ~15s so the loading overlay falls back.
-      window.setTimeout(function () {
-        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-      }, 15000);
     }
 
     return {
-      _maybeFireReady: function () {
-        // Nothing to do: readiness comes from the iframe postMessage
-        // events.  Kept for interface parity.
-      },
+      _maybeFireReady: fireReady,
       _onIframeLoad: fireReady,
-      load: function () { post({ type: "reload" }); },
+      load: function () {
+        if (player) player.initialize(videoEl, MPD_URL, false);
+      },
       playVideo: function () {
-        post({ type: "play" });
+        var p = videoEl.play();
+        if (p && typeof p.catch === "function") p.catch(function () { /* ignore */ });
       },
       pauseVideo: function () {
-        post({ type: "pause" });
+        videoEl.pause();
       },
       getCurrentTime: function () {
-        post({ type: "getCurrentTime" });
-        return currentT;
+        return videoEl.currentTime || 0;
       },
       getDuration: function () {
-        post({ type: "getDuration" });
-        return duration;
+        return videoEl.duration || 0;
       },
       seekTo: function (t) {
-        currentT = t;
-        post({ type: "seek", value: t });
+        videoEl.currentTime = t;
       },
-      getPlaybackRate: function () { return rate; },
-      setPlaybackRate: function (r) {
-        rate = r;
-        post({ type: "setPlaybackRate", value: r });
-      },
+      getPlaybackRate: function () { return videoEl.playbackRate; },
+      setPlaybackRate: function (r) { videoEl.playbackRate = r; },
       getPlayerState: function () {
         return playing ? PS.PLAYING : PS.PAUSED;
       },
+      _init: init,
     };
   }
 
@@ -264,34 +195,21 @@
 
   function createYoutubePlayer() {
     if (ytPlayer) return;
-    if (!BILI_URL) {
+    var videoEl = document.getElementById("bili-player");
+    if (!videoEl) return;
+    if (!MPD_URL) {
       if (ytLoading) {
         ytLoading.textContent =
-          "Unable to load the Bilibili player: no video URL.";
+          "Unable to load the Bilibili player: no video stream available.";
       }
       return;
     }
-    var iframeEl = document.getElementById("bili-player");
-    if (!iframeEl) return;
-    ytPlayer = LuteBilibiliPlayer(iframeEl, {
+    ytPlayer = LuteBilibiliPlayer(videoEl, {
       onReady: ytOnReady,
       onStateChange: ytOnStateChange,
       onError: ytOnError,
     });
-    // The Bilibili embed posts a "playerInitDone" message once it is
-    // ready, but fall back to the iframe's DOM load event so the loading
-    // overlay is cleared even if postMessage events are missed.  The src
-    // is set here (not in the HTML) so the load listener is attached
-    // before the iframe starts loading; otherwise the load event would
-    // fire before we attach the listener and the player would never be
-    // marked ready.
-    iframeEl.addEventListener("load", function () {
-      if (ytPlayer && typeof ytPlayer._onIframeLoad === "function") {
-        ytPlayer._onIframeLoad();
-      }
-    });
-    iframeEl.src = BILI_URL;
-    ytPlayer._maybeFireReady();
+    ytPlayer._init();
   }
 
   function ytOnReady() {
