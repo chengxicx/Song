@@ -711,10 +711,14 @@
   /* Fetch stats for all visible rows in one batched request, instead of
      one /book/table_stats/<id> request per row. Called from drawCallback
      and initComplete. This reduces DB connection-pool pressure and load. */
+  // Returns a jQuery promise/jqXHR that resolves when the stats request
+  // (if any) settles, so callers can chain .always() (e.g. to stop the
+  // refresh button spinner). Resolves immediately when there is nothing
+  // to fetch.
   let ajax_in_book_stats = function(settings) {
     var table = book_listing_table;
     if (!table) {
-      return;
+      return $.Deferred().resolve();
     }
 
     var newWordColIdx = table.column('NewWordPercent:name').index();
@@ -728,7 +732,7 @@
     // widget lets users toggle these columns off, so this guard avoids
     // a wasted batched /book/table_stats request per page redraw.
     if (!newWordColVisible && !statsColVisible) {
-      return;
+      return $.Deferred().resolve();
     }
 
     // Collect the books currently on this page and their cell nodes.
@@ -763,10 +767,10 @@
     });
 
     if (book_ids.length === 0) {
-      return;
+      return $.Deferred().resolve();
     }
 
-    $.ajax({
+    return $.ajax({
       url: '/book/table_stats',
       method: 'POST',
       contentType: 'application/json',
@@ -940,7 +944,11 @@
         // and New word columns during the slow recalc. Instead reload the
         // stats for the current page in place, keeping the existing values
         // visible until fresh ones arrive.
-        ajax_in_book_stats(null);
+        var req = ajax_in_book_stats(null);
+        // Stop the spinner once the stats request settles.
+        $.when(req).always(function() {
+          $(e.currentTarget).removeClass('refreshed');
+        });
       }
     });
   });
