@@ -82,23 +82,47 @@ def bilibili_video_id(url):
     return (None, None)
 
 
+def bilibili_page(url):
+    """
+    Extract the page (episode) number from a Bilibili video URL.
+
+    Multi-part Bilibili videos use a ``?p=N`` query parameter to select an
+    episode (each ``p`` is one lesson in the collection).  Returns the
+    integer page number, or 1 if the parameter is absent or not a valid
+    positive integer.
+    """
+    if not url:
+        return 1
+    m = re.search(r"[?&]p=(\d+)", url)
+    if m:
+        try:
+            p = int(m.group(1))
+            if p >= 1:
+                return p
+        except ValueError:
+            pass
+    return 1
+
+
 def bilibili_embed_url(url):
     """
     Build the Bilibili iframe player embed URL for a video URL, or None.
 
     The player accepts either a bvid or an aid parameter, so both
-    modern BV and legacy av videos are supported.
+    modern BV and legacy av videos are supported.  The ``page`` reflects
+    the selected episode (``?p=N``) so the right lesson is loaded.
     """
     bvid, aid = bilibili_video_id(url)
+    page = bilibili_page(url)
     if bvid:
         return (
             "https://player.bilibili.com/player.html"
-            f"?bvid={bvid}&page=1&high_quality=1&danmaku=0"
+            f"?bvid={bvid}&page={page}&high_quality=1&danmaku=0"
         )
     if aid:
         return (
             "https://player.bilibili.com/player.html"
-            f"?aid={aid}&page=1&high_quality=1&danmaku=0"
+            f"?aid={aid}&page={page}&high_quality=1&danmaku=0"
         )
     return None
 
