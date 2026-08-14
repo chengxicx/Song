@@ -158,10 +158,15 @@ class EditBookForm(FlaskForm):
         ],
     )
 
-    # YouTube video / MP3 audio book fields.
+    # YouTube video / Bilibili video / MP3 audio book fields.
     book_type = SelectField(
         "Type",
-        choices=[("", "Text"), ("youtube", "YouTube video"), ("mp3", "MP3 / M4A audio")],
+        choices=[
+            ("", "Text"),
+            ("youtube", "YouTube video"),
+            ("bilibili", "Bilibili video"),
+            ("mp3", "MP3 / M4A audio"),
+        ],
     )
     youtube_srt = FileField(
         "Subtitle file (SRT / VTT)",
@@ -198,9 +203,9 @@ class EditBookForm(FlaskForm):
         super().populate_obj(obj)
         obj.book_tags = _tag_values(self.book_tags.data)
 
-        # If the type was changed away from youtube/mp3, clear the
+        # If the type was changed away from youtube/bilibili/mp3, clear the
         # subtitle data.
-        if obj.book_type not in ("youtube", "mp3"):
+        if obj.book_type not in ("youtube", "bilibili", "mp3"):
             obj.srt_data = None
             obj.video_current_pos = None
 
@@ -216,12 +221,12 @@ class EditBookForm(FlaskForm):
             obj.audio_bookmarks = None
             obj.audio_current_pos = None
 
-        if obj.book_type in ("youtube", "mp3"):
+        if obj.book_type in ("youtube", "bilibili", "mp3"):
             self._parse_youtube_subtitles(obj)
 
     def _parse_youtube_subtitles(self, obj):
         """
-        Parse subtitle data for a youtube or mp3 book.
+        Parse subtitle data for a youtube, bilibili, or mp3 book.
 
         Precedence: an uploaded youtube_srt file wins over the SRT text
         in the text field.  The text field holds the SRT original (with

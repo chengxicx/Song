@@ -12,7 +12,7 @@ from lute.term.routes import handle_term_form
 from lute.settings.current import current_settings
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
-from lute.book.service import youtube_video_id
+from lute.book.service import youtube_video_id, bilibili_embed_url
 from lute.tts.routes import get_lang_code
 from lute.db import db
 
@@ -69,7 +69,7 @@ def _subtitle_words_html(book):
     subtitle changes produce a fresh render (see
     _yt_subtitle_words_cache).
     """
-    if (book.book_type or "") not in ("youtube", "mp3"):
+    if (book.book_type or "") not in ("youtube", "bilibili", "mp3"):
         return []
     cache_key = (book.id, book.srt_data)
     cached = _yt_subtitle_words_cache.get(cache_key)
@@ -147,8 +147,11 @@ def _render_book_page(book, pagenum, track_page_open=True):
     yt_video_id = None
     if book_type == "youtube":
         yt_video_id = youtube_video_id(book.source_uri)
+    bilibili_url = None
+    if book_type == "bilibili":
+        bilibili_url = bilibili_embed_url(book.source_uri)
     srt_cues = []
-    if book_type in ("youtube", "mp3"):
+    if book_type in ("youtube", "bilibili", "mp3"):
         srt_cues = list(book.cues)
         for c in srt_cues:
             c["start_str"] = _fmt_seconds(c.get("start", 0))
@@ -180,6 +183,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         term_dicts=term_dicts,
         book_type=book_type,
         youtube_video_id=yt_video_id,
+        bilibili_url=bilibili_url,
         mp3_audio_url=mp3_audio_url,
         srt_cues=srt_cues,
         srt_cues_json=book.srt_data or "[]",
