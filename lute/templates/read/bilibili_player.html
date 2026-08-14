@@ -2,7 +2,7 @@
   <script type="text/javascript">
     window.LUTE_YT_DATA = window.LUTE_YT_DATA || {};
     window.LUTE_YT_DATA.bilibiliUrl = {{ bilibili_url | tojson }};
-    window.LUTE_YT_DATA.mpdUrl = {% if bilibili_bvid %}{{ url_for('read.bilibili_mpd', bvid=bilibili_bvid) | tojson }}{% else %}null{% endif %};
+    window.LUTE_YT_DATA.mpdUrl = {% if bilibili_bvid %}{{ url_for('read.bilibili_mpd', bvid=bilibili_bvid, page=bilibili_page_num) | tojson }}{% else %}null{% endif %};
     window.LUTE_YT_DATA.audioUrl = null;
     window.LUTE_YT_DATA.cues = {{ srt_cues_json | safe }};
     window.LUTE_YT_DATA.words = {{ srt_words_json | safe }};

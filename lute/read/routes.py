@@ -17,6 +17,7 @@ from lute.book.service import (
     youtube_video_id,
     bilibili_embed_url,
     bilibili_video_id,
+    bilibili_page,
 )
 from lute.tts.routes import get_lang_code
 from lute.db import db
@@ -154,9 +155,11 @@ def _render_book_page(book, pagenum, track_page_open=True):
         yt_video_id = youtube_video_id(book.source_uri)
     bilibili_url = None
     bvid = None
+    bilibili_page_num = 1
     if book_type == "bilibili":
         bilibili_url = bilibili_embed_url(book.source_uri)
         bvid, _aid = bilibili_video_id(book.source_uri)
+        bilibili_page_num = bilibili_page(book.source_uri)
     srt_cues = []
     if book_type in ("youtube", "bilibili", "mp3"):
         srt_cues = list(book.cues)
@@ -192,6 +195,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         youtube_video_id=yt_video_id,
         bilibili_url=bilibili_url,
         bilibili_bvid=bvid,
+        bilibili_page_num=bilibili_page_num,
         mp3_audio_url=mp3_audio_url,
         srt_cues=srt_cues,
         srt_cues_json=book.srt_data or "[]",
