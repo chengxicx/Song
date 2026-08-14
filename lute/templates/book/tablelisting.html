@@ -745,10 +745,19 @@
         newWord: newWordColVisible ? table.cell(rowIdx, newWordColIdx).node() : null,
         stats: statsColVisible ? table.cell(rowIdx, statsColIdx).node() : null,
       };
-      if (cellNodes[bid].newWord) {
+      // Only show a skeleton when the cell has no rendered content yet.
+      // Otherwise existing values stay visible while fresh stats load, so
+      // a refresh that marks many books stale (slow recalc) doesn't blank
+      // out the Status / New word columns.
+      var needsSkeleton = function(node) {
+        if (!node) return false;
+        var html = node.innerHTML.trim();
+        return html === '' || html.indexOf('skeleton-loading') !== -1;
+      };
+      if (cellNodes[bid].newWord && needsSkeleton(cellNodes[bid].newWord)) {
         $(cellNodes[bid].newWord).html(`<span class="skeleton-loading"></span>`);
       }
-      if (cellNodes[bid].stats) {
+      if (cellNodes[bid].stats && needsSkeleton(cellNodes[bid].stats)) {
         $(cellNodes[bid].stats).html(`<span class="skeleton-loading"></span>`);
       }
     });
@@ -925,7 +934,12 @@
       url: '/refresh_all_stats',
       method: 'POST',
       success: function() {
-        book_listing_table.draw();
+        // Don't redraw the table: a draw re-fetches the rows from the
+        // server, and since every book was just marked stale the server
+        // returns rows with no status data, which would blank the Status
+        // and New word columns during the slow recalc. Instead reload the
+        // stats for the current page in place, keeping the existing values
+        // visible until fresh ones arrive.
         ajax_in_book_stats(null);
       }
     });
