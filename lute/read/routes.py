@@ -3,16 +3,21 @@
 """
 
 import json
-from flask import Blueprint, flash, request, render_template, redirect, jsonify
+from flask import Blueprint, flash, request, render_template, redirect, jsonify, Response, url_for
 from lute.read.service import Service
 from lute.read.render.service import Service as RenderService
 from lute.read.forms import TextForm
+from lute.read import bilibili_stream
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form
 from lute.settings.current import current_settings
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
-from lute.book.service import youtube_video_id, bilibili_embed_url
+from lute.book.service import (
+    youtube_video_id,
+    bilibili_embed_url,
+    bilibili_video_id,
+)
 from lute.tts.routes import get_lang_code
 from lute.db import db
 
@@ -148,8 +153,10 @@ def _render_book_page(book, pagenum, track_page_open=True):
     if book_type == "youtube":
         yt_video_id = youtube_video_id(book.source_uri)
     bilibili_url = None
+    bvid = None
     if book_type == "bilibili":
         bilibili_url = bilibili_embed_url(book.source_uri)
+        bvid, _aid = bilibili_video_id(book.source_uri)
     srt_cues = []
     if book_type in ("youtube", "bilibili", "mp3"):
         srt_cues = list(book.cues)
@@ -184,6 +191,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         book_type=book_type,
         youtube_video_id=yt_video_id,
         bilibili_url=bilibili_url,
+        bilibili_bvid=bvid,
         mp3_audio_url=mp3_audio_url,
         srt_cues=srt_cues,
         srt_cues_json=book.srt_data or "[]",
@@ -342,6 +350,51 @@ def save_youtube_player_data():
     db.session.add(book)
     db.session.commit()
     return jsonify("ok")
+
+
+@bp.route("/bilibili/stream/mpd/<bvid>", methods=["GET"])
+def bilibili_mpd(bvid):
+    """Return the on-demand DASH manifest for a Bilibili video.
+
+    The manifest's BaseURLs point at our own proxy endpoints so the
+    browser never talks to Bilibili directly (which would be blocked by
+    CORS / anti-leeching).  ``page`` selects a multi-part video page.
+    """
+    page = request.args.get("page", 1, type=int)
+    try:
+        info = bilibili_stream.stream_info(bvid, page)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    video_proxy = url_for(
+        "read.bilibili_proxy", bvid=bvid, stream_type="video", page=page
+    )
+    audio_proxy = url_for(
+        "read.bilibili_proxy", bvid=bvid, stream_type="audio", page=page
+    )
+    mpd = bilibili_stream.build_mpd(info, video_proxy, audio_proxy)
+    return Response(mpd, mimetype="application/dash+xml")
+
+
+@bp.route("/bilibili/stream/proxy/<bvid>/<stream_type>", methods=["GET"])
+def bilibili_proxy(bvid, stream_type):
+    """Proxy a range request for a Bilibili DASH segment to the CDN.
+
+    ``stream_type`` is "video" or "audio".  Adds the Referer / UA headers
+    the CDN requires and relays the byte range the player asked for.
+    """
+    if stream_type not in ("video", "audio"):
+        return jsonify({"error": "invalid stream type"}), 400
+    page = request.args.get("page", 1, type=int)
+    range_header = request.headers.get("Range")
+    try:
+        info = bilibili_stream.stream_info(bvid, page)
+        stream = info[stream_type]
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    status, headers, content = bilibili_stream.proxy_stream(
+        stream["baseUrl"], range_header
+    )
+    return Response(content, status=status, headers=headers)
 
 
 @bp.route("/youtube_subtitle_words/<int:bookid>", methods=["GET"])
