@@ -578,23 +578,36 @@ class Service:
         """
         Best-effort title lookup for a Bilibili video.
 
-        Uses the Bilibili oEmbed endpoint (no API key required), and
-        falls back to a title based on the video id.
+        Uses the Bilibili view API (no API key required, and far more
+        reliable than oEmbed) to fetch the real title, and falls back to
+        a title based on the video id if the API is unreachable.
         """
         bvid, aid = bilibili_video_id(url)
         fallback = "Bilibili video"
+        video_id = bvid or (f"av{aid}" if aid else None)
         if bvid:
             fallback = f"Bilibili video ({bvid})"
         elif aid:
             fallback = f"Bilibili video (av{aid})"
-        if bvid is None and aid is None:
+        if video_id is None:
             return fallback
         try:
-            oembed = f"https://bilibili.com/oembed?url={url}&format=json"
-            response = requests.get(oembed, timeout=10)
+            headers = {
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/124.0.0.0 Safari/537.36"
+                ),
+                "Referer": "https://www.bilibili.com",
+            }
+            if bvid:
+                api = f"https://api.bilibili.com/x/web-interface/view?bvid={bvid}"
+            else:
+                api = f"https://api.bilibili.com/x/web-interface/view?aid={aid}"
+            response = requests.get(api, timeout=10, headers=headers)
             response.raise_for_status()
             data = response.json()
-            title = data.get("title", "").strip()
+            title = (data.get("data") or {}).get("title", "").strip()
             if title:
                 return title[:200]
         except (requests.exceptions.RequestException, ValueError):
