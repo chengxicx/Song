@@ -2,6 +2,7 @@
   <script type="text/javascript">
     window.LUTE_YT_DATA = window.LUTE_YT_DATA || {};
     window.LUTE_YT_DATA.bilibiliUrl = {{ bilibili_url | tojson }};
+    window.LUTE_YT_DATA.mpdUrl = {% if bilibili_bvid %}{{ url_for('read.bilibili_mpd', bvid=bilibili_bvid) | tojson }}{% else %}null{% endif %};
     window.LUTE_YT_DATA.audioUrl = null;
     window.LUTE_YT_DATA.cues = {{ srt_cues_json | safe }};
     window.LUTE_YT_DATA.words = {{ srt_words_json | safe }};
@@ -11,15 +12,11 @@
   </script>
 
   <div class="yt-player-video-wrap">
-    <!-- src is set by bilibili-player.js after the load listener is
-         attached, so the iframe's load event is always captured.
-         NOTE: do NOT add loading="lazy" here -- it prevents the
-         dynamically-set src from actually loading the Bilibili player,
-         leaving the iframe blank. -->
-    <iframe id="bili-player" class="bili-player-frame"
-            allowfullscreen="allowfullscreen"
-            scrolling="no"
-            frameborder="no"></iframe>
+    <!-- HTML5 video driven by dash.js.  The video stream for Bilibili is
+         served through our own proxy endpoints (see bilibili.js), so the
+         browser never talks to Bilibili directly and the official embed
+         player's domain-whitelist restriction is bypassed entirely. -->
+    <video id="bili-player" class="bili-player-frame" playsinline></video>
     <div class="yt-player-loading" id="yt-player-loading">Loading player...</div>
   </div>
 
