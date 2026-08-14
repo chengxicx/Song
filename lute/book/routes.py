@@ -514,27 +514,18 @@ def table_stats_batch():
     The frontend book listing previously issued one /table_stats/<id>
     request per visible row (25+ requests per page). This batches those
     into a single request to reduce DB connection-pool pressure and load.
-
-    Defensive: roll back any broken session state (e.g. PendingRollbackError
-    from a previous failed flush) before processing, so that subsequent
-    queries like _find_book don't 500 the entire batch.
     """
     data = request.get_json(silent=True) or {}
     book_ids = data.get("book_ids") or []
     svc = StatsService(db.session)
     ret = {}
     for book_id in book_ids:
-        try:
-            b = _find_book(book_id)
-        except Exception:  # noqa: BLE001
-            db.session.rollback()
-            continue
+        b = _find_book(book_id)
         if b is None or b.language is None:
             continue
         try:
             stats = svc.get_stats(b)
         except Exception:  # noqa: BLE001 - one bad book shouldn't fail the batch
-            db.session.rollback()
             continue
         ret[book_id] = _stats_to_dict(stats)
     return jsonify(ret)

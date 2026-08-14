@@ -187,12 +187,16 @@ def _add_base_routes(app, app_config):
         )
         return response
 
-    @app.route("/refresh_all_stats")
+    @app.route("/refresh_all_stats", methods=["GET", "POST"])
     def refresh_all_stats():
         books_to_update = db.session.query(Book).filter(Book.archived == 0).all()
         svc = StatsService(db.session)
         for book in books_to_update:
             svc.mark_stale(book)
+        # When called via AJAX the frontend refreshes the stats columns in
+        # place (no redirect), so return JSON instead of navigating away.
+        if request.method == "POST":
+            return jsonify({"ok": True})
         return redirect("/", 302)
 
     @app.route("/wipe_database")
