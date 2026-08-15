@@ -706,14 +706,23 @@
       ytLoadSubtitleWords(false);
       $(ytSubtitle).find("span.word").each(function () {
         var wid = $(this).data("wid");
-        if (wid) {
-          var src = $("#thetext").find('[data-wid="' + wid + '"]');
-          if (src.length) {
-            $(this).attr("data-status-class", src.attr("data-status-class"));
-          }
-        }
+        if (!wid) return;
+        var src = $("#thetext").find('[data-wid="' + wid + '"]');
+        if (!src.length) return;
+        var newStatus = src.attr("data-status-class") || "";
+        // Update the jQuery data cache as well: apply_status_class() reads
+        // the status via .data("status-class"), which is cached on first
+        // read.  Setting only the data-status-class attribute would leave
+        // the stale pre-save status in the cache, so the color never changes.
+        $(this).data("status-class", newStatus);
+        // Drop the previously-applied status class before adding the new one
+        // so a change between non-adjacent statuses (e.g. 5 -> 0) doesn't
+        // leave the old background color behind.
+        $(this).removeClass(function (i, cls) {
+          return (cls.match(/\bstatus\d+\b/g) || []).join(" ");
+        });
+        if (newStatus) $(this).addClass(newStatus);
       });
-      ytApplySubtitleStatusColors();
     });
   }
 
