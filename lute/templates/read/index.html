@@ -4,9 +4,9 @@
 
 {% block body %}
 
-<script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}?v=20260805f" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/player.js') }}?v=20260816b" charset="utf-8" defer></script>
 {% if book_type in ("youtube", "mp3") %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260805f" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260816b" charset="utf-8" defer></script>
 {% elif book_type == "bilibili" %}
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/dash.all.min.js') }}?v=20260816" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/bilibili-player.js') }}?v=20260816" charset="utf-8" defer></script>
