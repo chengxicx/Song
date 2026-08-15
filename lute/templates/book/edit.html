@@ -53,10 +53,6 @@
           <span class="smallfilename">Subtitles loaded ({{ book.cues | length }} lines). Edit the SRT text above, or upload a new file to replace them.</span>
         </div>
         {% endif %}
-        <div style="margin-top: 8px;">
-          {{ form.resplit_sentences() }} {{ form.resplit_sentences.label }}
-          <div class="formfieldcomment">Merge/split subtitle cues into sentence units when parsing (recommended for Japanese). Off by default.</div>
-        </div>
       </td>
     </tr>
 
