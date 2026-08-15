@@ -5,7 +5,6 @@ Book create/edit forms.
 import json
 from flask import request
 from wtforms import StringField, SelectField, TextAreaField, IntegerField, HiddenField
-from wtforms import BooleanField
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
@@ -177,10 +176,6 @@ class EditBookForm(FlaskForm):
             )
         ],
     )
-    resplit_sentences = BooleanField(
-        "Re-split subtitles into sentences (Japanese)",
-        default=False,
-    )
 
     # The current audio_filename can be removed from the current book.
     audio_filename = HiddenField("Audio filename")
@@ -231,28 +226,12 @@ class EditBookForm(FlaskForm):
         Precedence: an uploaded youtube_srt file wins over the SRT text
         in the text field.  The text field holds the SRT original (with
         timestamps), so it can be edited directly; it is parsed back
-        into cues on save.  The re-split-sentences option (Japanese)
-        merges/splits cues into sentence units when set.
+        into cues on save.
         """
         from lute.book.service import (  # pylint: disable=import-outside-toplevel, cyclic-import
             parse_subtitle_file,
             parse_subtitle_content,
             BookImportException,
-        )
-        from lute.db import db  # pylint: disable=import-outside-toplevel
-        from lute.models.repositories import (  # pylint: disable=import-outside-toplevel
-            LanguageRepository,
-        )
-
-        # Load the language so language-specific cue refinement
-        # (e.g. Japanese sentence merging/splitting) is applied.
-        lang = None
-        if getattr(obj, "language_id", None):
-            lang = LanguageRepository(db.session).find(obj.language_id)
-
-        resplit = bool(
-            getattr(self, "resplit_sentences", None)
-            and self.resplit_sentences.data
         )
 
         try:
@@ -264,8 +243,6 @@ class EditBookForm(FlaskForm):
                 text, cues_json = parse_subtitle_file(
                     yfd.filename,
                     yfd.stream,
-                    language=lang,
-                    resplit_sentences=resplit,
                 )
                 obj.text = text
                 obj.srt_data = cues_json
@@ -279,8 +256,6 @@ class EditBookForm(FlaskForm):
                 )
             text, cues_json = parse_subtitle_content(
                 srt_text,
-                language=lang,
-                resplit_sentences=resplit,
                 ext=".srt",
             )
             obj.text = text

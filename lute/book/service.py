@@ -127,20 +127,13 @@ def bilibili_embed_url(url):
     return None
 
 
-def parse_subtitle_file(
-    filename, filestream, language=None, resplit_sentences=False
-):
+def parse_subtitle_file(filename, filestream):
     """
     Parse an srt/vtt subtitle file.
 
     Returns (text, cues_json), where text is the subtitle texts joined
     by newlines, and cues_json is a JSON string of
     [{"start": secs, "end": secs, "text": str}, ...].
-
-    When language is Japanese and resplit_sentences is True, the cues
-    are also refined: mid-sentence breaks are merged and over-long cues
-    are split so each cue roughly corresponds to one sentence (see
-    lute.book.japanese_srt).  resplit_sentences defaults to False.
     """
     _, ext = os.path.splitext(filename)
     ext = (ext or "").lower()
@@ -148,15 +141,10 @@ def parse_subtitle_file(
     fte = FileTextExtraction()
     content = fte._get_text_stream_content(filestream, "utf-8-sig")
 
-    return parse_subtitle_content(
-        content,
-        language=language,
-        resplit_sentences=resplit_sentences,
-        ext=ext,
-    )
+    return parse_subtitle_content(content, ext=ext)
 
 
-def parse_subtitle_content(content, language=None, resplit_sentences=False, ext=".srt"):
+def parse_subtitle_content(content, ext=".srt"):
     """
     Parse srt/vtt subtitle content (a string).
 
@@ -164,10 +152,6 @@ def parse_subtitle_content(content, language=None, resplit_sentences=False, ext=
     by newlines, and cues_json is a JSON string of cue dicts.
     """
     cues = _parse_cues(content, ext)
-    if resplit_sentences and _is_japanese(language):
-        from lute.book.japanese_srt import refine_japanese_cues  # pylint: disable=import-outside-toplevel
-
-        cues = refine_japanese_cues(cues, language)
     text = "\n".join(c["text"] for c in cues)
     return text, json.dumps(cues, ensure_ascii=False)
 
@@ -275,15 +259,6 @@ def cues_to_srt_text(cues):
         lines.append(c.get("text") or "")
         lines.append("")
     return "\n".join(lines).rstrip()
-
-
-def _is_japanese(language):
-    """True if the given language (a lute.models.Language) is Japanese."""
-    if language is None:
-        return False
-    name = (getattr(language, "name", "") or "").strip().lower()
-    ptype = (getattr(language, "parser_type", "") or "").strip().lower()
-    return name == "japanese" or ptype in ("japanese", "japanese_sudachi")
 
 
 class FileTextExtraction:
