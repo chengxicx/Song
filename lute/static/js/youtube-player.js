@@ -854,36 +854,18 @@
       }
     }, 15000);
 
-    // After a term status update, lute.js reloads #thetext with fresh
-    // data-status-class attributes.  Instead of re-fetching all subtitle
-    // word HTML (which requires a server round-trip + replaces the entire
-    // subtitle DOM, causing a brief visual font change), we update the
-    // status class on the existing subtitle word spans in-place using
-    // the already-reloaded #thetext as the source of truth, and refresh
-    // the WORDS cache in the background (without re-rendering) so future
-    // cues also pick up the new status classes.
+    // After a term status update, lute.js reloads #thetext and the server
+    // invalidates its subtitle word-HTML cache.  The subtitle words are
+    // tokenized from the media cues, which is a DIFFERENT text from the
+    // page content (#thetext), so their data-wid values don't exist in
+    // #thetext and we can't copy status classes from there.  Instead,
+    // re-fetch the subtitle word HTML and re-render the current cue so
+    // the new status classes appear.  (Re-rendering is safe now: the
+    // font-resize observer in text-options.js no longer stamps subtitle
+    // words with the reading-pane font size.)
     window.addEventListener("lute:status-updated", function () {
       if (!ytSubtitle) return;
-      ytLoadSubtitleWords(false);
-      $(ytSubtitle).find("span.word").each(function () {
-        var wid = $(this).data("wid");
-        if (!wid) return;
-        var src = $("#thetext").find('[data-wid="' + wid + '"]');
-        if (!src.length) return;
-        var newStatus = src.attr("data-status-class") || "";
-        // Update the jQuery data cache as well: apply_status_class() reads
-        // the status via .data("status-class"), which is cached on first
-        // read.  Setting only the data-status-class attribute would leave
-        // the stale pre-save status in the cache, so the color never changes.
-        $(this).data("status-class", newStatus);
-        // Drop the previously-applied status class before adding the new one
-        // so a change between non-adjacent statuses (e.g. 5 -> 0) doesn't
-        // leave the old background color behind.
-        $(this).removeClass(function (i, cls) {
-          return (cls.match(/\bstatus\d+\b/g) || []).join(" ");
-        });
-        if (newStatus) $(this).addClass(newStatus);
-      });
+      ytLoadSubtitleWords(true);
     });
   }
 
