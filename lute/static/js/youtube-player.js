@@ -774,7 +774,15 @@
   // Fetch the tokenized word HTML for all cues.  This is deferred so
   // the expensive tokenization doesn't block the initial page
   // render.  While loading, the subtitle shows plain cue text.
-  function ytLoadSubtitleWords() {
+  //
+  // The `reactivate` argument: when true (the default), re-inject the
+  // current cue's word spans after the data arrives (needed on the
+  // initial load to switch from plain text to word spans).  Pass false
+  // after a term status update: the current cue already shows word
+  // spans, and re-rendering it would replace the whole subtitle DOM
+  // (causing a brief visual font change).  Only the WORDS cache needs
+  // refreshing so future cues pick up the new status classes.
+  function ytLoadSubtitleWords(reactivate) {
     if (!BOOK_ID) return;
     $.ajax({
       url: "/read/youtube_subtitle_words/" + BOOK_ID,
@@ -784,9 +792,7 @@
       if (Array.isArray(data) && data.length) {
         WORDS.length = 0;
         WORDS.push.apply(WORDS, data);
-        // Re-activate the current cue so the subtitle updates from
-        // plain text to clickable word spans.
-        if (ytCueIndex >= 0) ytActivateCue(ytCueIndex);
+        if (reactivate !== false && ytCueIndex >= 0) ytActivateCue(ytCueIndex);
       }
     });
   }
@@ -848,12 +854,27 @@
       }
     }, 15000);
 
-    // After a term status update, lute.js reloads #thetext.  The
-    // server-side subtitle cache is invalidated at the same time, so
-    // re-fetch the subtitle words to pick up fresh data-status-class
-    // values and re-apply colors.
+    // After a term status update, lute.js reloads #thetext with fresh
+    // data-status-class attributes.  Instead of re-fetching all subtitle
+    // word HTML (which requires a server round-trip + replaces the entire
+    // subtitle DOM, causing a brief visual font change), we update the
+    // status class on the existing subtitle word spans in-place using
+    // the already-reloaded #thetext as the source of truth, and refresh
+    // the WORDS cache in the background (without re-rendering) so future
+    // cues also pick up the new status classes.
     window.addEventListener("lute:status-updated", function () {
-      ytLoadSubtitleWords();
+      if (!ytSubtitle) return;
+      ytLoadSubtitleWords(false);
+      $(ytSubtitle).find("span.word").each(function () {
+        var wid = $(this).data("wid");
+        if (wid) {
+          var src = $("#thetext").find('[data-wid="' + wid + '"]');
+          if (src.length) {
+            $(this).attr("data-status-class", src.attr("data-status-class"));
+          }
+        }
+      });
+      ytApplySubtitleStatusColors();
     });
   }
 
