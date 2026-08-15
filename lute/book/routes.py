@@ -272,7 +272,7 @@ def _import_youtube_video():
     tags = _parse_tagify_tags(request.form.get("youtube_tag", ""), "youtube")
     language_id = request.form.get("language_id")
     srt_file = request.files.get("srt_file")
-    resplit = bool(request.form.get("resplit_sentences"))
+    
 
     if youtube_video_id(url) is None:
         flash("Please enter a valid YouTube video URL.", "notice")
@@ -282,18 +282,10 @@ def _import_youtube_video():
         flash("Please upload an SRT or VTT subtitle file.", "notice")
         return redirect("/book/import_webpage", 302)
 
-    # Load the language so parse_subtitle_file can apply language-
-    # specific cue refinement (e.g. Japanese sentence merging/splitting).
-    lang = None
-    if language_id:
-        lang = LanguageRepository(db.session).find(int(language_id))
-
     try:
         text, cues_json = parse_subtitle_file(
             srt_file.filename,
             srt_file.stream,
-            language=lang,
-            resplit_sentences=resplit,
         )
     except Exception as e:  # pylint: disable=broad-except
         msg = f"Could not parse subtitle file {srt_file.filename} (error: {str(e)})"
@@ -330,7 +322,7 @@ def _import_bilibili_video():
     tags = _parse_tagify_tags(request.form.get("bilibili_tag", ""), "bilibili")
     language_id = request.form.get("language_id")
     srt_file = request.files.get("srt_file")
-    resplit = bool(request.form.get("resplit_sentences"))
+    
 
     bvid, aid = bilibili_video_id(url)
     if bvid is None and aid is None:
@@ -341,18 +333,10 @@ def _import_bilibili_video():
         flash("Please upload an SRT or VTT subtitle file.", "notice")
         return redirect("/book/import_webpage", 302)
 
-    # Load the language so parse_subtitle_file can apply language-
-    # specific cue refinement (e.g. Japanese sentence merging/splitting).
-    lang = None
-    if language_id:
-        lang = LanguageRepository(db.session).find(int(language_id))
-
     try:
         text, cues_json = parse_subtitle_file(
             srt_file.filename,
             srt_file.stream,
-            language=lang,
-            resplit_sentences=resplit,
         )
     except Exception as e:  # pylint: disable=broad-except
         msg = f"Could not parse subtitle file {srt_file.filename} (error: {str(e)})"
@@ -390,7 +374,7 @@ def _import_mp3_audio():
     tags = _parse_tagify_tags(request.form.get("mp3_tag", ""), "mp3")
     language_id = request.form.get("language_id")
     title = (request.form.get("mp3_title") or "").strip()
-    resplit = bool(request.form.get("resplit_sentences"))
+    
 
     if mp3_file is None or mp3_file.filename == "":
         flash("Please upload an audio file (MP3 or M4A).", "notice")
@@ -407,18 +391,10 @@ def _import_mp3_audio():
         flash("Please upload an SRT or VTT subtitle file.", "notice")
         return redirect("/book/import_webpage", 302)
 
-    # Load the language so parse_subtitle_file can apply language-
-    # specific cue refinement (e.g. Japanese sentence merging/splitting).
-    lang = None
-    if language_id:
-        lang = LanguageRepository(db.session).find(int(language_id))
-
     try:
         text, cues_json = parse_subtitle_file(
             srt_file.filename,
             srt_file.stream,
-            language=lang,
-            resplit_sentences=resplit,
         )
     except Exception as e:  # pylint: disable=broad-except
         msg = f"Could not parse subtitle file {srt_file.filename} (error: {str(e)})"
