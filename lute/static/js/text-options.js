@@ -32,8 +32,14 @@ function incrementFontSize(delta) {
   // Manga text items size themselves with container-query units (cqw)
   // against the page image; the reading-pane font controls must not
   // override those, so exclude any item inside a manga block.
+  // Subtitle word spans (YouTube/MP3/Bilibili and TTS players) are also
+  // excluded: they must inherit the fixed subtitle size (1.5rem) rather
+  // than being stamped with the reading-pane font size, which would
+  // otherwise shrink them whenever #thetext is reloaded (e.g. on a term
+  // status save) and never restore them.
   const textItems = Array.from(document.querySelectorAll("span.textitem"))
-    .filter((item) => !item.closest(".manga-text-block"));
+    .filter((item) => !item.closest(".manga-text-block"))
+    .filter((item) => !item.closest(".yt-scrolling-subtitle-inner"));
   if (textItems.length === 0)
     return;
 
