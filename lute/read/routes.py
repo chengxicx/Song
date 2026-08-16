@@ -133,6 +133,80 @@ def _subtitle_words_html(book):
     return result
 
 
+def _sync_media_page_text_to_cues(book, original_text, new_text):
+    """
+    Propagate an edited page's text back into the subtitle cue texts.
+
+    For media books (youtube / bilibili / mp3) the reading text is derived
+    from the subtitle cues: each page is a contiguous run of cue lines, and
+    the player's subtitles are rendered from ``book.cues`` (stored in
+    ``book.srt_data``).  ``edit_page`` only updates the page's Text record,
+    so without this the player would keep showing the old subtitle text.
+
+    We locate the edited page's lines within the full cue line stream,
+    then write the new lines back into the corresponding cues.  Only the
+    common single-line-per-cue case is handled; if the alignment isn't
+    clean (e.g. multi-line cues, or a different number of lines after the
+    edit) we leave the cues untouched rather than risk corrupting them.
+
+    Returns True if ``book.srt_data`` was updated, False otherwise.
+    """
+    if (book.book_type or "") not in ("youtube", "bilibili", "mp3"):
+        return False
+    cues = list(book.cues)
+    if not cues:
+        return False
+
+    original_text = original_text or ""
+    new_text = new_text or ""
+    orig_lines = original_text.split("\n")
+    new_lines = new_text.split("\n")
+    if not orig_lines or not new_lines:
+        return False
+
+    # The full cue line stream is exactly how book.text is built
+    # ("\n".join(cue text)).  Each line maps back to its owning cue, so
+    # cues that themselves contain internal newlines stay aligned.
+    full_lines = []
+    line_to_cue = []
+    for idx, cue in enumerate(cues):
+        segs = (cue.get("text") or "").split("\n")
+        full_lines.extend(segs)
+        line_to_cue.extend([idx] * len(segs))
+
+    # Locate the edited page's lines as a contiguous block in the stream.
+    n = len(orig_lines)
+    start = None
+    for i in range(len(full_lines) - n + 1):
+        if full_lines[i : i + n] == orig_lines:
+            start = i
+            break
+    if start is None:
+        return False
+
+    covered = line_to_cue[start : start + n]
+    cue_start = covered[0]
+    # Only handle the clean single-line-cue case (the norm for subtitles),
+    # where the covered cues are exactly one cue per line.
+    if covered != list(range(cue_start, cue_start + n)):
+        return False
+    if len(new_lines) != n:
+        return False
+
+    changed = False
+    for offset, line in enumerate(new_lines):
+        k = cue_start + offset
+        if cues[k]["text"] != line:
+            cues[k]["text"] = line
+            changed = True
+    if not changed:
+        return False
+
+    book.srt_data = json.dumps(cues, ensure_ascii=False)
+    invalidate_yt_subtitle_cache(book.id)
+    return True
+
+
 def _render_book_page(book, pagenum, track_page_open=True):
     """
     Render a particular book page.
@@ -546,11 +620,16 @@ def edit_page(bookid, pagenum):
     text = book.text_at_page(pagenum)
     if text is None:
         return redirect("/", 302)
+    original_text = text.text
     form = TextForm(obj=text)
 
     if form.validate_on_submit():
         form.populate_obj(text)
         db.session.add(text)
+        # For media books the reading text is driven by the subtitle cues;
+        # propagate the edit back into the cues so the player subtitles
+        # reflect the change.
+        _sync_media_page_text_to_cues(book, original_text, text.text)
         db.session.commit()
         return redirect(f"/read/{book.id}", 302)
 
