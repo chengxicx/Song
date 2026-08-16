@@ -350,6 +350,31 @@ def test_import_youtube_video_route(app, app_context, english, client):
         assert [t.text for t in book.book_tags] == ["my-tag"]
 
 
+def test_edit_page_propagates_text_to_cues(app, app_context, english, client):
+    "Editing a page of a media book updates the subtitle cues used by the player."
+    dbbook = _make_youtube_book(app, app_context, english)
+    assert len(dbbook.cues) == 3
+    assert dbbook.cues[1]["text"] == "This is a test subtitle."
+
+    new_text = "Hello world.\nThis line was edited.\nGoodbye!"
+    resp = client.post(
+        f"/read/editpage/{dbbook.id}/1",
+        data={"text": new_text},
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+
+    repo = BookRepository(db.session)
+    book = repo.find(dbbook.id)
+    assert len(book.cues) == 3
+    assert book.cues[0]["text"] == "Hello world."
+    assert book.cues[1]["text"] == "This line was edited."
+    assert book.cues[2]["text"] == "Goodbye!"
+    # Timing data is untouched.
+    assert book.cues[1]["start"] == 5.0
+    assert book.cues[2]["end"] == 13.0
+
+
 def test_save_youtube_player_data(app, app_context, english, client):
     "The player position is saved via the ajax route."
     dbbook = _make_youtube_book(app, app_context, english)
