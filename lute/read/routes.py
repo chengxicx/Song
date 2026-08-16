@@ -157,10 +157,13 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
     if not cues:
         return False
 
-    original_text = original_text or ""
-    new_text = new_text or ""
-    orig_lines = original_text.split("\n")
-    new_lines = new_text.split("\n")
+    def _norm(s):
+        # The page text may carry CRLF/CR line endings (or stray \r) while
+        # cue texts split on "\n" only, so normalize before comparing.
+        return (s or "").replace("\r", "")
+
+    orig_lines = [_norm(x) for x in (original_text or "").split("\n")]
+    new_lines = [_norm(x) for x in (new_text or "").split("\n")]
     if not orig_lines or not new_lines:
         return False
 
@@ -170,19 +173,24 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
     full_lines = []
     line_to_cue = []
     for idx, cue in enumerate(cues):
-        segs = (cue.get("text") or "").split("\n")
+        segs = _norm(cue.get("text") or "").split("\n")
         full_lines.extend(segs)
         line_to_cue.extend([idx] * len(segs))
 
-    # Locate the edited page's lines as a contiguous block in the stream.
+    # Locate the edited page's lines by best alignment: pick the stream
+    # offset whose block shares the most lines with the page, tolerating a
+    # few lines that were already edited/drifted without giving up entirely.
     n = len(orig_lines)
-    start = None
+    best_index = None
+    best_score = -1
     for i in range(len(full_lines) - n + 1):
-        if full_lines[i : i + n] == orig_lines:
-            start = i
-            break
-    if start is None:
+        score = sum(1 for k in range(n) if full_lines[i + k] == orig_lines[k])
+        if score > best_score:
+            best_score = score
+            best_index = i
+    if best_index is None or best_score <= 0:
         return False
+    start = best_index
 
     covered = line_to_cue[start : start + n]
     cue_start = covered[0]
