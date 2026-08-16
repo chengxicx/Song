@@ -375,6 +375,53 @@ def test_edit_page_propagates_text_to_cues(app, app_context, english, client):
     assert book.cues[2]["end"] == 13.0
 
 
+def test_sync_media_page_text_crlf_line_endings(app, app_context, english):
+    "Page text with CRLF line endings still syncs to the cues (mp3 books)."
+    from lute.read.routes import _sync_media_page_text_to_cues
+
+    dbbook = _make_youtube_book(app, app_context, english)
+    # Stored page text uses CRLF line endings; cue lines split on \n only.
+    original_text = "Hello world.\r\nThis is a test subtitle.\r\nGoodbye!"
+    new_text = "Hello world.\r\nThis line was edited.\r\nGoodbye!"
+    assert _sync_media_page_text_to_cues(dbbook, original_text, new_text) is True
+
+    book = BookRepository(db.session).find(dbbook.id)
+    assert book.cues[0]["text"] == "Hello world."
+    assert book.cues[1]["text"] == "This line was edited."
+    assert book.cues[2]["text"] == "Goodbye!"
+
+
+def test_sync_media_page_text_drifted_line(app, app_context, english):
+    "A page line that already drifted from the cue is still located via best alignment."
+    from lute.read.routes import _sync_media_page_text_to_cues
+
+    dbbook = _make_youtube_book(app, app_context, english)
+    # Cue 1 is "This is a test subtitle.", but the page already carries an
+    # edited (drifted) version of that line.  Best-position alignment must
+    # still find the page block and apply an edit made on another line.
+    original_text = "Hello world.\nThis is a drifted line.\nGoodbye!"
+    new_text = "Hello world.\nThis is a drifted line.\nGoodbye again!"
+    assert _sync_media_page_text_to_cues(dbbook, original_text, new_text) is True
+
+    book = BookRepository(db.session).find(dbbook.id)
+    assert book.cues[0]["text"] == "Hello world."
+    # The drifted line is synced to match the page, and the new edit landed.
+    assert book.cues[1]["text"] == "This is a drifted line."
+    assert book.cues[2]["text"] == "Goodbye again!"
+
+
+def test_sync_media_page_text_no_match_does_nothing(app, app_context, english):
+    "When the page shares no lines with the cues, the cues are left alone."
+    from lute.read.routes import _sync_media_page_text_to_cues
+
+    dbbook = _make_youtube_book(app, app_context, english)
+    before = json.loads(dbbook.srt_data)
+    original_text = "Completely\nUnrelated\nLines"
+    new_text = "Completely\nUnrelated\nChange"
+    assert _sync_media_page_text_to_cues(dbbook, original_text, new_text) is False
+    assert json.loads(dbbook.srt_data) == before
+
+
 def test_save_youtube_player_data(app, app_context, english, client):
     "The player position is saved via the ajax route."
     dbbook = _make_youtube_book(app, app_context, english)
