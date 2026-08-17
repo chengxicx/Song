@@ -224,9 +224,14 @@ self.addEventListener('fetch', event => {
         // 3xx / opaque / error responses cannot be handed to the browser
         // as a navigation document without risking ERR_FAILED.  Followed
         // redirects normally land on a 200 here, but if we ever see one,
-        // fall back to a cached page.
+        // fall back to a cached page.  Opaque responses happen when the
+        // server uses Cloudflare Access (Zero Trust) and the session has
+        // expired — the fetch follows the cross-origin redirect to the
+        // Cloudflare Access login page, returning an opaque response that
+        // the browser cannot render for navigation.
         const unusable =
           response.type === 'opaqueredirect' ||
+          response.type === 'opaque' ||
           response.type === 'error' ||
           (response.status >= 300 && response.status < 400);
         // Auto-backup due: the root path is 302'd to the backup page.
@@ -237,7 +242,11 @@ self.addEventListener('fetch', event => {
           response.redirected &&
           response.url.includes('/backup/backup');
         if (unusable || forcedToBackup) {
-          return cacheFallback(urlStr, isNavigation, response);
+          // Don't pass opaque responses as fallback — the browser cannot
+          // render them for navigation (e.g. Cloudflare Access cross-origin
+          // redirects).  Fall through to cached/offline page instead.
+          const fallback = (response.type === 'opaque') ? undefined : response;
+          return cacheFallback(urlStr, isNavigation, fallback);
         }
         // Cache the page for offline use, but never cache a redirect
         // target under the original URL (e.g. the backup page under '/').
