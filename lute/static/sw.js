@@ -1,5 +1,5 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.4.5';
+const CACHE_NAME = 'lute-v3.10.4.6';
 
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
@@ -69,19 +69,6 @@ self.addEventListener('install', event => {
           )
         );
       })
-      .then(() => {
-        // Pre-cache the homepage for offline use, but only when it renders
-        // directly.  The root path can 302 to /backup/backup when an
-        // auto-backup is due; that redirected (backup) page must NOT be
-        // stored under '/'.
-        return fetch('/')
-          .then(resp => {
-            if (resp.ok && resp.type === 'basic' && !resp.redirected) {
-              return caches.open(CACHE_NAME).then(cache => cache.put('/', resp));
-            }
-          })
-          .catch(() => {});
-      })
       .catch(err => {
         console.warn('SW: install caching failed', err);
       })
@@ -142,23 +129,25 @@ function cleanUrl(originalUrl) {
  * real document instead of the offline stub.
  */
 function cacheFallback(urlStr, isNavigation, fallbackResponse) {
+  // NOTE: we deliberately do NOT fall back to a cached home page here.
+  // The home page (and all pages) embed dynamic per-user state such as
+  // current_language_id; serving a stale cached copy makes user settings
+  // appear to reset.  Static assets are served cache-first above, so
+  // this fallback only matters for page navigations.
   return caches.match(urlStr).then(cached => {
     if (cached) return cached;
-    return caches.match('/').then(home => {
-      if (home) return home;
-      if (fallbackResponse) return fallbackResponse;
-      if (isNavigation) {
-        return new Response(OFFLINE_HTML, {
-          status: 503,
-          statusText: 'Service Unavailable',
-          headers: {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'no-store',
-          },
-        });
-      }
-      return Response.error();
-    });
+    if (fallbackResponse) return fallbackResponse;
+    if (isNavigation) {
+      return new Response(OFFLINE_HTML, {
+        status: 503,
+        statusText: 'Service Unavailable',
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+    return Response.error();
   });
 }
 
@@ -248,14 +237,13 @@ self.addEventListener('fetch', event => {
           const fallback = (response.type === 'opaque') ? undefined : response;
           return cacheFallback(urlStr, isNavigation, fallback);
         }
-        // Cache the page for offline use, but never cache a redirect
-        // target under the original URL (e.g. the backup page under '/').
-        if (response.ok && response.type === 'basic' && !response.redirected) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => cache.put(urlStr, clone))
-            .catch(() => {});
-        }
+        // Do NOT cache page responses.  Pages (including the home page)
+        // are dynamic: they embed user-specific state such as
+        // current_language_id.  Caching them and later serving the stale
+        // copy as a network fallback makes settings appear to reset (e.g.
+        // the language dropdown reverting after clicking Home).  If the
+        // network request fails or returns an opaque/redirect response we
+        // fall through to the offline placeholder below instead.
         return response;
       })
       .catch(() => cacheFallback(urlStr, isNavigation))
