@@ -29,6 +29,8 @@ def valid_current_language_id(session):
     """
     Get the current language id from UserSetting, ensuring
     it's still valid.  If not, change it.
+    Only invalidates if the language doesn't exist or isn't active,
+    allows inactive or unsupported parsers (user may just be installing dependencies).
     """
     repo = UserSettingRepository(session)
     try:
@@ -49,11 +51,18 @@ def valid_current_language_id(session):
 
     current_language_id = int(current_language_id)
 
-    valid_language_ids = [int(p[0]) for p in language_choices(session)]
-    if current_language_id in valid_language_ids:
+    # Check if the language id actually exists and is active.
+    # We only filter out languages that don't exist or are not active.
+    # Even if the parser is not supported (parser dependencies missing),
+    # keep the user's selection because they might be in the process
+    # of installing dependencies and expect selecting to stick.
+    lang = session.query(Language).filter(Language.id == current_language_id).first()
+    if lang is not None and lang.is_active:
         return current_language_id
 
-    current_language_id = valid_language_ids[0]
+    # If the selected current_language_id is invalid, fall back to the first active language.
+    valid_language_ids = [int(p[0]) for p in language_choices(session)]
+    current_language_id = valid_language_ids[0] if valid_language_ids else 0
     try:
         repo.set_value("current_language_id", current_language_id)
         session.commit()
