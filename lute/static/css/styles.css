@@ -1753,6 +1753,19 @@ form input[type="file"]:focus {
     padding: 0.25rem 0.7rem;
 }
 
+/* Buttons laid out in a horizontal row at the bottom of edit forms. */
+.form-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 20px;
+}
+.form-action-row form {
+    display: inline-block;
+    margin: 0;
+}
+
 /* TABLE STYLES */
 th, td {
     padding: 2px;
