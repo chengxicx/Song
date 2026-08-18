@@ -1,5 +1,5 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.4.6';
+const CACHE_NAME = 'lute-v3.10.4.7';
 
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
@@ -128,6 +128,25 @@ function cleanUrl(originalUrl) {
  * when the cache is completely empty so a first-time visitor still sees a
  * real document instead of the offline stub.
  */
+function isRedirectedResponse(resp) {
+  return resp.redirected || resp.type === 'opaqueredirect';
+}
+
+/**
+ * Reconstruct a response as a fresh non-redirected response.
+ * The browser rejects redirected navigation responses served via
+ * event.respondWith() with ERR_FAILED.  This is needed when the
+ * SW's fetch() follows a server redirect (e.g. / -> /backup/backup)
+ * and we want to hand the final body to the browser anyway.
+ */
+function cloneResponse(resp) {
+  return new Response(resp.body, {
+    status: resp.status,
+    statusText: resp.statusText || 'OK',
+    headers: resp.headers,
+  });
+}
+
 function cacheFallback(urlStr, isNavigation, fallbackResponse) {
   // NOTE: we deliberately do NOT fall back to a cached home page here.
   // The home page (and all pages) embed dynamic per-user state such as
@@ -136,7 +155,12 @@ function cacheFallback(urlStr, isNavigation, fallbackResponse) {
   // this fallback only matters for page navigations.
   return caches.match(urlStr).then(cached => {
     if (cached) return cached;
-    if (fallbackResponse) return fallbackResponse;
+    if (fallbackResponse) {
+      // De-redirect the response if needed — see isRedirectedResponse.
+      return isRedirectedResponse(fallbackResponse)
+        ? cloneResponse(fallbackResponse)
+        : fallbackResponse;
+    }
     if (isNavigation) {
       return new Response(OFFLINE_HTML, {
         status: 503,
