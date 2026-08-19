@@ -1168,6 +1168,26 @@
     if (currentName && ttsVoiceBtn) {
       ttsVoiceBtn.title = "Voice: " + ttsShortVoiceName(currentName);
     }
+
+    // Whenever the list is (re)built, center the currently-used voice.
+    // onvoiceschanged + the delayed populate timers rebuild the list
+    // after initial load, which would otherwise reset the scroll; so we
+    // re-apply the scroll here rather than only on the toggle click.
+    if (!ttsVoiceDropdown.hidden) {
+      ttsScrollToSelectedVoice();
+    }
+  }
+
+  // Scroll the voice dropdown so the currently-used voice is centered,
+  // so the user doesn't have to hunt for it by scrolling.
+  function ttsScrollToSelectedVoice() {
+    if (!ttsVoiceDropdown || ttsVoiceDropdown.hidden) return;
+    const selected = ttsVoiceDropdown.querySelector(".tts-voice-option.selected");
+    if (!selected) return;
+    ttsVoiceDropdown.scrollTop = 0;
+    const optTop = selected.offsetTop - ttsVoiceDropdown.offsetTop;
+    ttsVoiceDropdown.scrollTop =
+      optTop - ttsVoiceDropdown.clientHeight / 2 + selected.offsetHeight / 2;
   }
 
   function ttsShortVoiceName(fullName) {
@@ -1211,15 +1231,8 @@
     if (willOpen) {
       // Repopulate in case voices loaded late.
       ttsPopulateVoiceList();
-      // Jump straight to the currently-used voice so the user doesn't
-      // have to scroll down to find it.
-      const selected = ttsVoiceDropdown.querySelector(".tts-voice-option.selected");
-      if (selected) {
-        ttsVoiceDropdown.scrollTop = 0;
-        const optTop = selected.offsetTop - ttsVoiceDropdown.offsetTop;
-        ttsVoiceDropdown.scrollTop =
-          optTop - ttsVoiceDropdown.clientHeight / 2 + selected.offsetHeight / 2;
-      }
+      // Jump straight to the currently-used voice.
+      ttsScrollToSelectedVoice();
     }
   }
 
