@@ -18,6 +18,7 @@ from flask import (
 from lute.models.language import Language
 from lute.models.term import Status
 from lute.models.repositories import (
+    BookRepository,
     LanguageRepository,
     TermRepository,
     UserSettingRepository,
@@ -379,6 +380,7 @@ def bulk_update_status():
 
     json:
     {
+      book_id: 123,   // optional, used to mark book stats stale
       updates: [ { new_status: 1, termids: [ 42, ] }, ... }, ]
     }
     """
@@ -387,14 +389,27 @@ def bulk_update_status():
     data = request.get_json()
     updates = data.get("updates")
 
+    status_changed = False
     for u in updates:
         new_status = int(u.get("new_status"))
         termids = u.get("termids")
         for tidstring in termids:
             term = repo.load(int(tidstring))
+            if term.status == new_status:
+                continue
             term.status = new_status
             repo.add(term)
+            status_changed = True
     repo.commit()
+
+    # If statuses actually changed, mark the book's stats stale so the
+    # home screen keeps showing the last-known values until recomputed.
+    book_id = data.get("book_id")
+    if status_changed and book_id:
+        from lute.book.stats import Service as StatsService  # pylint: disable=import-outside-toplevel
+        book = BookRepository(db.session).find(int(book_id))
+        if book is not None:
+            StatsService(db.session).mark_stale(book)
 
     # Invalidate the YouTube subtitle word cache so subtitle colors
     # refresh with the updated term statuses.
