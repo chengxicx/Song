@@ -1199,7 +1199,10 @@ function post_bulk_update(updates) {
   const first_status = updates[0].new_status;
   const selected_ids = $('span.kwordmarked').toArray().map(el => $(el).attr('id'));
 
-  data = JSON.stringify({ updates: updates });
+  // Include the current book id so the server can mark its stats stale
+  // (only recomputed on demand), keeping the home screen fast.
+  let book_id = parseInt($('#book_id').val(), 10) || 0;
+  data = JSON.stringify({ book_id: book_id, updates: updates });
 
   let re_mark_selected_ids = function() {
     for (let i = 0; i < selected_ids.length; i++) {
