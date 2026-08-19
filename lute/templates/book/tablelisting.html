@@ -596,6 +596,13 @@
       var $dropdown = $(this).find('.book-action-dropdown-content');
       var $trigger = $(this).find('span');
       if (!$dropdown.length || !$trigger.length) return;
+      // Hide any other open action menu before showing this one, so
+      // hovering another row's "…" doesn't leave old menus on screen.
+      $('.book-action-dropdown-content').not($dropdown).each(function() {
+        if ($(this).css('display') === 'block') {
+          hideActionDropdown($(this));
+        }
+      });
       var offset = $trigger.offset();
       var ddHeight = $dropdown.outerHeight();
       var ddWidth = $dropdown.outerWidth();
