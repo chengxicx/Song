@@ -265,7 +265,10 @@
       },
       initComplete: function() {
         enable_column_resize();
-        ajax_in_book_stats(null);
+        // Note: ajax_in_book_stats is deliberately NOT called here — the
+        // drawCallback above already fires on the initial draw, so calling
+        // it here too would double every /book/table_stats request (a real
+        // slowdown when stats are stale and must be recomputed).
         // DataTables 2 中，column.visible() 不会触发 drawCallback，
         // 因此需要监听 column-visibility 事件来触发统计加载。
         // 注意：必须使用 DataTables API on() 方法（不是 jQuery on），
