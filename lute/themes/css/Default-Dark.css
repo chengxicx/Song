@@ -1074,3 +1074,63 @@ canvas + svg text {
 .colvis-menu .colvis-item input[type="checkbox"] {
   accent-color: #0a84ff !important;
 }
+
+/* ---------------------------------------------------------
+   12b. BOOK ACTION 下拉菜单（… 三点菜单）— 深色主题适配
+   与 colvis-menu / sub-menu 使用同款暗黑悬浮卡片风格。
+   --------------------------------------------------------- */
+.book-action-dropdown-content {
+  background: rgba(44, 44, 46, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-radius: 10px !important;
+  padding: 6px !important;
+  min-width: 120px !important;
+}
+
+.book-action-dropdown-content a {
+  color: #f2f2f7 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+}
+
+.book-action-dropdown-content a:hover {
+  background-color: #0a84ff !important;
+  color: #ffffff !important;
+}
+
+/* ---------------------------------------------------------
+   12c. 刷新图标（Status / New word 列标题）— 深色主题适配
+   原始 reload.png 是深色图标，深色背景上几乎不可见，
+   用 invert 反白显示。
+   --------------------------------------------------------- */
+a.refresh {
+  filter: invert(0.85);
+  opacity: 0.75;
+}
+
+a.refresh:hover {
+  filter: invert(1);
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+a.refresh:active {
+  filter: invert(1);
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 刷新中的旋转动画：去掉 invert 滤镜，改用亮色 spinner，
+   否则滤镜会把 spinner 压暗到深色背景上看不见。 */
+a.refresh.refreshed {
+  filter: none;
+  opacity: 1;
+}
+
+a.refresh.refreshed::after {
+  border-color: rgba(255, 255, 255, 0.25);
+  border-top-color: #f2f2f7;
+}
