@@ -134,9 +134,16 @@ class Service:
         sql = "delete from bookstats where status_distribution is null"
         self.session.execute(text(sql))
         self.session.commit()
-        book_ids_with_stats = select(BookStats.BkID).scalar_subquery()
+        fresh_ids = (
+            select(BookStats.BkID).where(BookStats.stale.is_(False)).scalar_subquery()
+        )
+        stale_ids = (
+            select(BookStats.BkID).where(BookStats.stale.is_(True)).scalar_subquery()
+        )
         books_to_update = (
-            self.session.query(Book).filter(~Book.id.in_(book_ids_with_stats)).all()
+            self.session.query(Book)
+            .filter((~Book.id.in_(fresh_ids)) | (Book.id.in_(stale_ids)))
+            .all()
         )
         books = [b for b in books_to_update if b.is_supported or b.book_type == "manga"]
         for book in books:
@@ -144,16 +151,24 @@ class Service:
             self._update_stats(book, stats)
 
     def mark_stale(self, book):
-        "Mark a book's stats as stale to force refresh."
+        "Mark a book's stats as stale; keep last-known values for display."
         bk_id = book.id
-        self.session.query(BookStats).filter_by(BkID=bk_id).delete()
+        s = self.session.query(BookStats).filter_by(BkID=bk_id).first()
+        if s is None:
+            s = BookStats(BkID=bk_id)
+            self.session.add(s)
+        s.stale = True
         self.session.commit()
 
     def get_stats(self, book):
         "Gets stats from the cache if available, or calculates."
         bk_id = book.id
         stats = self.session.query(BookStats).filter_by(BkID=bk_id).first()
-        if stats is None or stats.status_distribution is None:
+        if (
+            stats is None
+            or stats.status_distribution is None
+            or stats.stale
+        ):
             newstats = self._calculate_stats(book)
             self._update_stats(book, newstats)
             stats = self.session.query(BookStats).filter_by(BkID=bk_id).first()
@@ -197,5 +212,6 @@ class Service:
         s.new_word_percent = stats["new_word_percent"]
         s.status_distribution = stats["distribution"]
         s.manga_word_count = stats["manga_word_count"]
+        s.stale = False
         self.session.merge(s)
         self.session.commit()

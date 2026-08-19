@@ -429,3 +429,4 @@ class BookStats(db.Model):
     new_word_percent = db.Column(db.Integer)
     status_distribution = db.Column(db.String, nullable=True)
     manga_word_count = db.Column(db.Integer, nullable=True)
+    stale = db.Column("BkStatsStale", db.Boolean, nullable=False, default=False)

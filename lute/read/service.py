@@ -139,6 +139,13 @@ class Service:
         # Commit any remaining.
         self.session.commit()
 
+        # Mark the book's stats stale only when statuses actually changed,
+        # so the home page recomputes the status distribution.  (Marking
+        # stale on every page open made returning home re-calculate the
+        # whole sample synchronously, which was slow for long books.)
+        if unknowns:
+            StatsService(self.session).mark_stale(text.book)
+
     def bulk_status_update(self, text: Text, terms_text_array, new_status):
         """
         Given a text and list of terms, update or create new terms
@@ -179,8 +186,11 @@ class Service:
         if not text.sentences:
             text.load_sentences()
 
-        svc = StatsService(self.session)
-        svc.mark_stale(dbbook)
+        # Opening a page doesn't change any term statuses, so we do NOT
+        # mark the book's stats stale here — that would force the home
+        # screen to re-calculate synchronously on return (slow for long
+        # books).  Stats are only marked stale when statuses actually
+        # change, e.g. via set_unknowns_to_known / bulk_update_status.
 
         if track_page_open:
             text.start_date = datetime.utcnow()
