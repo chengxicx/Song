@@ -471,14 +471,17 @@ def _create_app(app_config, extra_config):
     @app.after_request
     def _no_cache_dynamic_pages(response):
         """
-        Prevent caching of dynamic HTML pages under /read/ and /term/.
+        Prevent caching of dynamic HTML pages.
 
-        These pages change on every request (term statuses, form data,
-        rendered text).  If Cloudflare or the browser caches them,
-        users see stale data after saving a term -- e.g. the form
-        still shows the old status when the word is clicked again.
+        Every Lute page embeds per-user state (flash messages, term
+        statuses, language settings, rendered text).  If Cloudflare or
+        the browser caches the HTML, CDNs serve a stale copy after a
+        change -- e.g. toggling a language Active updates the DB but a
+        cached /language/index still shows "Frozen".  So all text/html
+        page responses are marked no-store.  Static assets (CSS/JS/
+        images), which are not text/html, keep their long cache headers.
         """
-        if request.method == "GET" and request.path.startswith(("/read/", "/term/")):
+        if request.method == "GET" and response.mimetype == "text/html":
             response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"
