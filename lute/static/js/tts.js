@@ -836,6 +836,7 @@
     if (ttsCues.length === 0) return;
     ttsPlaying = true;
     ttsPaused = false;
+    ttsUpdatePlayBtn();
     // If the playhead is at the end, restart from the beginning.
     let startIdx = ttsCueIndex >= 0 ? ttsCueIndex : 0;
     if (ttsVirtualTime >= ttsTotalDuration - 0.1) startIdx = 0;
