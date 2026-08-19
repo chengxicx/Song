@@ -1211,6 +1211,15 @@
     if (willOpen) {
       // Repopulate in case voices loaded late.
       ttsPopulateVoiceList();
+      // Jump straight to the currently-used voice so the user doesn't
+      // have to scroll down to find it.
+      const selected = ttsVoiceDropdown.querySelector(".tts-voice-option.selected");
+      if (selected) {
+        ttsVoiceDropdown.scrollTop = 0;
+        const optTop = selected.offsetTop - ttsVoiceDropdown.offsetTop;
+        ttsVoiceDropdown.scrollTop =
+          optTop - ttsVoiceDropdown.clientHeight / 2 + selected.offsetHeight / 2;
+      }
     }
   }
 
