@@ -172,26 +172,107 @@ let _get_tooltip_pos = function() {
 }
 
 /**
- * Build the html content for jquery-ui tooltip.
+ * Term-popup content for the jquery-ui tooltip.
+ *
+ * Content is fetched with HTMX and cached: the first hover on a word
+ * issues one HTMX GET that is swapped into the hidden #termpopup-cache
+ * container; the response is stored and handed to the tooltip via its
+ * setContent callback.  Hovering the same word again is served instantly
+ * from the cache with no network request.
  */
 let tooltip_textitem_hover_content = function (el, setContent) {
-  elid = parseInt(el.data('wid'));
-  $.ajax({
-    url: `/read/termpopup/${elid}`,
-    type: 'get',
-    success: function(response) {
-      // The hovered word may have been re-rendered/replaced while the
-      // AJAX was in flight (e.g. the TTS subtitle is rebuilt on each
-      // loop iteration, or the page navigated).  Calling setContent on
-      // a detached element makes jquery-ui resurrect a stray tooltip,
-      // pinned at the document top-left corner, that never disappears.
-      // Bail if the target word is no longer in the document.
-      const node = el && el[0];
-      if (!node || !node.isConnected) return;
-      setContent(response);
-    }
+  const elid = parseInt(el.data('wid'), 10);
+  if (isNaN(elid)) {
+    // Not saved to the DB yet (e.g. status 0 with no word id).
+    setContent('');
+    return;
+  }
+  _termpopup_get(elid, el, setContent);
+}
+
+// Cached term-popup HTML, keyed by word id.
+const _termpopup_cache = {};
+// setContent callbacks waiting for a fetch: word id -> { el, cb }.
+const _termpopup_pending = {};
+// Queue of word ids whose popup has not been fetched yet.  Fetches are
+// serialized (one HTMX request at a time) so the htmx:afterSwap handler
+// below knows which cache slot to fill.
+const _termpopup_queue = [];
+let _termpopup_fetching = false;
+let _termpopup_fetching_wid = null;
+
+// Deliver cached HTML to a waiting tooltip, guarding against the word
+// having been re-rendered/replaced while the request was in flight (e.g.
+// the TTS subtitle is rebuilt on each loop iteration, or the page
+// navigated).  Calling setContent on a detached element makes jquery-ui
+// resurrect a stray tooltip pinned at the document top-left corner.
+function _termpopup_deliver(elid) {
+  const p = _termpopup_pending[elid];
+  if (!p) return;
+  delete _termpopup_pending[elid];
+  const node = p.el && p.el[0];
+  if (!node || !node.isConnected) return;
+  p.cb(_termpopup_cache[elid]);
+}
+
+// Start the next queued fetch, if any.
+function _termpopup_pump() {
+  if (_termpopup_fetching || _termpopup_queue.length === 0) return;
+  const elid = _termpopup_queue.shift();
+  if (_termpopup_cache[elid] !== undefined) {
+    _termpopup_deliver(elid);
+    _termpopup_pump();
+    return;
+  }
+  _termpopup_fetching = true;
+  _termpopup_fetching_wid = elid;
+  htmx.ajax('GET', `/read/termpopup/${elid}`, {
+    target: '#termpopup-cache',
+    swap: 'innerHTML',
   });
 }
+
+// Fetch (or reuse) the popup HTML for a word id, then hand it to the
+// tooltip's setContent callback if one was provided.
+function _termpopup_get(elid, el, setContent) {
+  if (setContent) _termpopup_pending[elid] = { el: el, cb: setContent };
+  if (_termpopup_cache[elid] !== undefined) {
+    _termpopup_deliver(elid);
+    return;
+  }
+  if (_termpopup_queue.indexOf(elid) === -1) {
+    _termpopup_queue.push(elid);
+  }
+  _termpopup_pump();
+}
+
+// Cache the HTMX term-popup response and hand it to any waiting tooltip.
+// htmx:afterRequest fires on success AND error (afterSwap only on success),
+// so a failed fetch cannot stall the queue.  The path check keeps this
+// handler from reacting to the page-navigation / status-update requests
+// that also run through HTMX on the reading page.
+document.addEventListener('htmx:afterRequest', function (e) {
+  const detail = e.detail || {};
+  const path = (detail.pathInfo && detail.pathInfo.requestPath) || '';
+  if (path.indexOf('/read/termpopup/') === -1) return;
+  if (!_termpopup_fetching) return;
+  const elid = _termpopup_fetching_wid;
+  _termpopup_fetching = false;
+  _termpopup_fetching_wid = null;
+  if (elid === null) return;
+  _termpopup_cache[elid] = detail.successful && detail.target ? detail.target.innerHTML : '';
+  _termpopup_deliver(elid);
+  _termpopup_pump();
+});
+
+// Prefetch the popup as soon as the pointer lands on a word, so the
+// tooltip (which opens a moment later) usually finds its content cached.
+$(document).on('mouseenter', '.word', function () {
+  if (_isUserUsingMobile()) return;
+  const $el = $(this);
+  const elid = parseInt($el.data('wid'), 10);
+  if (!isNaN(elid)) _termpopup_get(elid, $el, null);
+});
 
 
 /* ========================================= */
@@ -1208,59 +1289,57 @@ function post_bulk_update(updates) {
   const selected_ids = $('span.kwordmarked').toArray().map(el => $(el).attr('id'));
 
   // Include the current book id so the server can mark its stats stale
-  // (only recomputed on demand), keeping the home screen fast.
+  // (only recomputed on demand), keeping the home screen fast, and the
+  // current page number so the server can return the refreshed fragment.
   let book_id = parseInt($('#book_id').val(), 10) || 0;
-  data = JSON.stringify({ book_id: book_id, updates: updates });
+  let pagenum = parseInt($('#page_num').val(), 10) || 0;
+  const payload = { book_id: book_id, pagenum: pagenum, updates: updates };
 
-  let re_mark_selected_ids = function() {
-    for (let i = 0; i < selected_ids.length; i++) {
-      let el = $(`#${selected_ids[i]}`);
+  // HTMX: POST the status update and swap the refreshed page fragment
+  // into #thetext in a single round-trip.  Post-swap bookkeeping (re-mark
+  // selected words, refresh the term form and player colors) is done in
+  // the htmx:afterSwap listener below.
+  _pendingStatusUpdate = {
+    selected_ids: selected_ids,
+    elements: elements,
+    firstel: firstel,
+    first_status: first_status,
+  };
+  htmx.ajax('POST', '/term/bulk_update_status', {
+    target: '#thetext',
+    swap: 'innerHTML',
+    values: payload,
+  });
+}
+
+
+/**
+ * Re-mark selected words and refresh dependent UI after a bulk status
+ * update has swapped in the new page fragment (#thetext).
+ */
+let _pendingStatusUpdate = null;
+document.addEventListener('htmx:afterSwap', function (e) {
+  if (e.target && e.target.id === 'thetext' && _pendingStatusUpdate) {
+    const ps = _pendingStatusUpdate;
+    _pendingStatusUpdate = null;
+
+    for (let i = 0; i < ps.selected_ids.length; i++) {
+      let el = $(`#${ps.selected_ids[i]}`);
       el.addClass('kwordmarked');
     }
-    if (selected_ids.length > 0)
+    if (ps.selected_ids.length > 0)
       $('span.wordhover').removeClass('wordhover');
-  };
 
-  let reload_text_div = function() {
-    const bookid = $('#book_id').val();
-    const pagenum = $('#page_num').val();
-    const url = `/read/refresh_page/${bookid}/${pagenum}?_=${Date.now()}`;
-    const repel = $('#thetext');
-    repel.load(url, function() {
-      if (typeof add_status_classes === "function") {
-        add_status_classes();
-      }
-      re_mark_selected_ids();
-      // Notify the YouTube / TTS player (if present) to refresh subtitle
-      // word colors — the server-side subtitle cache was invalidated
-      // by the bulk_update_status endpoint.
-      window.dispatchEvent(new Event('lute:status-updated'));
-    });
-  };
-
-  $.ajax({
-    url: '/term/bulk_update_status',
-    type: 'post',
-    data: data,
-    dataType: 'JSON',
-    contentType: 'application/json',
-    success: function(response) {
-      reload_text_div();
-      if (elements.length == 1) {
-        update_term_form(firstel, first_status);
-      }
-    },
-    error: function(response, status, err) {
-      const msg = {
-        response: response,
-        status: status,
-        error: err
-      };
-      console.log(`failed: ${JSON.stringify(msg, null, 2)}`);
+    if (ps.elements.length == 1) {
+      update_term_form(ps.firstel, ps.first_status);
     }
-  });
 
-}
+    // Notify the YouTube / TTS player (if present) to refresh subtitle
+    // word colors — the server-side subtitle cache was invalidated
+    // by the bulk_update_status endpoint.
+    window.dispatchEvent(new Event('lute:status-updated'));
+  }
+});
 
 
 /**
