@@ -89,7 +89,7 @@ Feature: Books and stats are available
         Given I visit "/"
         When I set the book table filter to "Hola"
         Then the book table contains:
-            Hola; Spanish; ; 4;
+            Hola; Spanish; ; 4; ; HARD 100%
 
     # Dealing with production bug.
     Scenario: Japanese book with multiple paragraphs works.

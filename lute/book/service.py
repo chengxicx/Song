@@ -231,6 +231,10 @@ def _parse_vtt_cues(content):
             cues.append({"start": start, "end": end, "text": text})
         while i < n and lines[i].strip() == "":
             i += 1
+    if not cues and content.strip():
+        # Non-blank content that never produced a cue timing line (e.g.
+        # a plain text file renamed to .vtt) is not a valid VTT file.
+        raise BookImportException("No VTT subtitle cues found in content")
     return cues
 
 
