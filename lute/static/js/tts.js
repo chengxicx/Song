@@ -603,6 +603,10 @@
   let ttsPollTimer = null;
   let ttsMarqueeOverflow = 0;
   let ttsIsRtl = false;
+  // HTML last injected into the subtitle. Used to skip redundant
+  // rebuilds when the same cue repeats (e.g. single-sentence loop), so
+  // that a hovered word and its open tooltip are left untouched.
+  let ttsLastSubtitleHtml = null;
 
   // Estimated seconds-per-character for duration guessing, split by
   // script class. The numbers are conservative so the timeline doesn't
@@ -1047,19 +1051,29 @@
   // horizontal scroll animation.
   function ttsActivateCue(idx) {
     if (ttsSubtitle) {
-      if (typeof clear_newmultiterm_elements === "function")
-        clear_newmultiterm_elements();
-      // Close any open term-detail tooltip BEFORE rebuilding the
-      // subtitle.  Replacing innerHTML while the cursor is over a
-      // word detaches the tooltip's target (e.g. during loop
-      // playback), so the tooltip loses its mouseleave event and a
-      // stray popup is left floating at the word or at the document
-      // top-left corner.
-      if (typeof _hide_element_message_tooltips === "function")
-        _hide_element_message_tooltips();
       const cue = ttsCues[idx];
       const html = cue ? cue.html : "";
-      ttsSubtitle.innerHTML = html || "";
+      const unchanged = html === ttsLastSubtitleHtml;
+      // Skip a redundant rebuild when the cue is unchanged (most commonly
+      // a single-sentence loop replaying the same cue).
+      // Rebuilding innerHTML detaches the hovered .word element, which
+      // closes its open term-detail tooltip; the freshly created element
+      // then immediately re-fires mouseenter and reopens it, so the popup
+      // flickers (disappear → reappear) even though the mouse never moved.
+      // Only reset the last-known HTML when we actually redraw.
+      if (!unchanged) {
+        if (typeof clear_newmultiterm_elements === "function")
+          clear_newmultiterm_elements();
+        // Close any open term-detail tooltip BEFORE rebuilding the
+        // subtitle.  Replacing innerHTML while the cursor is over a
+        // word detaches the tooltip's target, so the tooltip loses its
+        // mouseleave event and a stray popup is left floating at the
+        // word or at the document top-left corner.
+        if (typeof _hide_element_message_tooltips === "function")
+          _hide_element_message_tooltips();
+        ttsSubtitle.innerHTML = html || "";
+        ttsLastSubtitleHtml = html;
+      }
       ttsSubtitle.scrollLeft = 0;
       ttsIsRtl = ttsSubtitle.getAttribute("dir") === "rtl";
       window.requestAnimationFrame(function () {
@@ -1104,6 +1118,9 @@
       if (typeof _hide_element_message_tooltips === "function")
         _hide_element_message_tooltips();
       ttsSubtitle.innerHTML = "";
+      // Reset the change-tracking so the next activation of an equal
+      // cue always redraws (we just cleared the subtitle).
+      ttsLastSubtitleHtml = null;
       ttsMarqueeOverflow = 0;
     }
   }
