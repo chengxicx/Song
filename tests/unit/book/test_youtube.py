@@ -260,6 +260,48 @@ def test_subtitle_words_html_pads_missing_chunks(app, app_context, english):
     assert words[1] != ""
 
 
+def test_subtitle_words_html_rebuilds_when_term_status_changes(
+    app, app_context, english
+):
+    "A cached subtitle render must not keep serving a stale status."
+    import re
+
+    from lute.book.model import Book
+    from lute.models.term import Term
+    from lute.read.routes import _subtitle_words_html
+
+    b = Book()
+    b.title = "YT_STALE"
+    b.language_id = english.id
+    b.text = "Hello world."
+    b.book_type = "youtube"
+    b.srt_data = json.dumps([{"start": 1.0, "end": 4.0, "text": "Hello world."}])
+
+    svc = BookService()
+    dbbook = svc.import_book(b, db.session)
+
+    # Build the cache while the term is unknown (status 0).
+    first = _subtitle_words_html(dbbook)
+    assert "status0" in first[0]
+
+    # Simulate a status change applied directly to the shared DB by
+    # another worker (i.e. this worker's in-memory cache was NOT
+    # invalidated by the status-update POST).
+    wid = int(re.search(r'data-wid="(\d+)"', first[0]).group(1))
+    term = db.session.get(Term, wid)
+    assert term is not None
+    term.status = 2
+    db.session.add(term)
+    db.session.commit()
+
+    # The stale cache entry must be detected and rebuilt with the new
+    # status instead of serving the old status0 HTML.
+    second = _subtitle_words_html(dbbook)
+    hello_span = re.search(r"<span[^>]*>Hello</span>", second[0]).group(0)
+    assert 'data-status-class="status2"' in hello_span
+    assert 'data-status-class="status0"' not in hello_span
+
+
 # ---------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------
