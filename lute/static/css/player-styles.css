@@ -1005,6 +1005,19 @@
   background-color: var(--yt-color-5, #d6edff);
 }
 
+/* Shown only while speechSynthesis has not yet reported its voices (common
+   on mobile). Gives the opened menu a visible "waiting" row instead of a
+   blank, near-invisible box. */
+.tts-voice-option.tts-voice-placeholder {
+  color: #6b7787;
+  font-style: italic;
+  cursor: default;
+}
+
+.tts-voice-option.tts-voice-placeholder:hover {
+  background-color: transparent;
+}
+
 .tts-voice-option.selected {
   background-color: #4cbb17;
   color: #fff;
