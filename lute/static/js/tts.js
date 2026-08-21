@@ -1206,7 +1206,20 @@
   function ttsPopulateVoiceList() {
     if (!ttsVoiceDropdown || !("speechSynthesis" in window)) return;
     const voices = window.speechSynthesis.getVoices();
-    if (!voices.length) return;
+
+    // getVoices() loads asynchronously and on mobile browsers it is
+    // frequently still empty when the user first opens the voice menu
+    // (Chromium only populates it lazily, sometimes not until a gesture,
+    // and occasionally never). If we just returned here the dropdown
+    // would stay an empty ~0-height box, so opening the gear appears to
+    // do nothing and no voice can be selected. Show a placeholder instead;
+    // it is replaced automatically once voices arrive (the voiceschanged
+    // listener and the delayed repopulate timers call this function again
+    // and rebuild the real list over it).
+    if (!voices.length) {
+      ensureVoicePlaceholder();
+      return;
+    }
 
     const detectedLang = getCurrentLangCode();
     const recommended = selectBestVoiceForLang(voices, detectedLang);
@@ -1262,6 +1275,19 @@
     if (!ttsVoiceDropdown.hidden) {
       ttsScrollToSelectedVoice();
     }
+  }
+
+  // Renders a "loading voices" row when speechSynthesis hasn't reported
+  // its voices yet. Without it the menu opens as an empty (invisible) box
+  // on mobile; once voices load they overwrite the placeholder.
+  function ensureVoicePlaceholder() {
+    if (!ttsVoiceDropdown) return;
+    if (ttsVoiceDropdown.childElementCount > 0) return; // already has content
+    const placeholder = document.createElement("div");
+    placeholder.className = "tts-voice-option tts-voice-placeholder";
+    placeholder.setAttribute("role", "status");
+    placeholder.textContent = "Loading voices\u2026";
+    ttsVoiceDropdown.appendChild(placeholder);
   }
 
   // Scroll the voice dropdown so the currently-used voice is centered,
