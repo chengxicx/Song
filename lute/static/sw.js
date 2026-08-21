@@ -1,5 +1,5 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.4.8';
+const CACHE_NAME = 'lute-v3.10.4.9';
 
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
@@ -20,6 +20,8 @@ const STATIC_ASSETS = [
   '/static/vendor/datatables/datatables.button.download.js',
   '/static/vendor/dayjs/dayjs.min.js',
   '/static/vendor/dayjs/relativeTime.js',
+  '/static/vendor/htmx/htmx.min.js',
+  '/static/vendor/alpine/alpine.min.js',
   '/static/vendor/chartjs/chart.umd.js',
   '/static/vendor/chartjs/chartjs-adapter-date-fns.js',
   '/static/js/resize.js',
@@ -192,14 +194,34 @@ self.addEventListener('fetch', event => {
   // reading pages, term API routes).  These change on every request
   // and caching them causes stale data after term status updates.
   if (url.pathname.startsWith('/read/') || url.pathname.startsWith('/term/')) {
-    event.respondWith(fetch(urlStr).catch(() => Response.error()));
+    event.respondWith(
+      fetch(urlStr)
+        .then(response => {
+          // Some GET endpoints 302 to a reading page (e.g.
+          // /read/delete_page/<id>/<n> -> /read/<id>).  fetch() follows the
+          // redirect, and handing the resulting "redirected" response to a
+          // navigation via respondWith() makes Chrome fail the load with
+          // net::ERR_FAILED.  Reconstruct it as a fresh non-redirected
+          // response so the final body is served to the browser.
+          if (isRedirectedResponse(response)) {
+            return cloneResponse(response);
+          }
+          return response;
+        })
+        .catch(() => Response.error())
+    );
     return;
   }
 
   // Skip redirect-only utility endpoints — let the browser handle
   // the 302 redirect natively instead of returning a redirected
   // response via the SW, which can cause ERR_FAILED in the browser.
-  if (url.pathname === '/refresh_all_stats') {
+  // This includes the dev_api endpoints used by acceptance tests,
+  // which 302 to "/" to report a flash message.
+  if (
+    url.pathname === '/refresh_all_stats' ||
+    url.pathname.startsWith('/dev_api/')
+  ) {
     return;
   }
 

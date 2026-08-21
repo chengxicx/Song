@@ -67,6 +67,13 @@
   <script type="text/javascript" src="{{ url_for('static', filename='vendor/datatables/datatables.button.download.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.hoverIntent.js') }}" charset="utf-8"></script>
 
+  <!-- HTMX + Alpine.js: progressive enhancement for partial-page interactions
+       and reactive UI state. Loaded before the custom scripts so they can use
+       htmx.* / Alpine. They coexist with jQuery (used by DataTables, tooltips,
+       jPlayer, etc.). -->
+  <script type="text/javascript" src="{{ url_for('static', filename='vendor/htmx/htmx.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='vendor/alpine/alpine.min.js') }}" defer charset="utf-8"></script>
+
   <!-- Versioned JS files: cache busting via ?v={{ lute_version }} -->
   <script type="text/javascript" src="/static/js/never_cache/lute-hotkey-utils.js?v={{ lute_version }}" charset="utf-8"></script>
   <script type="text/javascript" src="/static/js/never_cache/lute-popups.js?v={{ lute_version }}" charset="utf-8"></script>

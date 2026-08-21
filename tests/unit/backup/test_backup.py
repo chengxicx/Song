@@ -112,11 +112,12 @@ def test_timestamp_added_to_db_name(testconfig, bkp_dir, backup_settings):
     assert len(dbfile) == 1, "db found"
 
 
-def test_backup_fails_if_missing_output_dir(testconfig, backup_settings):
-    backup_settings.backup_dir = "some_missing_dir"
+def test_backup_creates_missing_output_dir(testconfig, backup_settings, tmp_path):
+    missing_dir = str(tmp_path / "does_not_exist")
+    backup_settings.backup_dir = missing_dir
     service = Service(db.session)
-    with pytest.raises(BackupException, match="Missing directory some_missing_dir"):
-        service.create_backup(testconfig, backup_settings)
+    service.create_backup(testconfig, backup_settings)
+    assert os.path.isdir(missing_dir), "missing dir is auto-created"
 
 
 def test_user_can_configure_rolling_backup_count(testconfig, bkp_dir, backup_settings):

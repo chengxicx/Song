@@ -14,7 +14,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}?v=20260805f" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}?v=20260816c" charset="utf-8" defer></script>
 <script type="text/javascript" src="/static/js/never_cache/dict-tabs.js?v={{ lute_version }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260821d" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260821e" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -38,7 +38,9 @@
 </script>
 
 
-<div id="read_pane_container">
+<div id="read_pane_container"
+     x-data="readState()"
+     :class="{ 'focus-mode-active': focusMode, 'tap_sets_status-active': tapSetsStatus }">
 
 <div id="read_pane_left">
 
@@ -114,6 +116,11 @@
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %} class="{% if book_type == 'manga' %}manga-text-container{% endif %}">
     ...
   </div>
+
+  {# Hidden HTMX swap target for term-popup prefetch (see lute.js
+     tooltip_textitem_hover_content).  HTMX swaps the fetched popup HTML
+     here so it can be cached and reused without further requests. #}
+  <div id="termpopup-cache" style="display:none"></div>
 
   <div id="reading-footer" style="text-align: center">
     <p>
@@ -212,8 +219,6 @@
   const readPaneRight = document.getElementById("read_pane_right");
   const btmMarginCont = document.querySelector(".btm-margin-container");
   const theText = document.getElementById("thetext");
-  const focusChk = document.getElementById("focus");
-  const tap_sets_statusChk = document.getElementById("tap_sets_status");
 
   // Fixes a dev-only "bug" where the right pane doesn't translate up
   // to zero, due to the inline transform property, if it's first
@@ -238,16 +243,30 @@
     scrollYBeforeReload = window.scrollY;
   });
 
-  focusChk.addEventListener("change", () => {
-    const book_id = $('#book_id').val();
-    readPaneContainer.classList.toggle("focus-mode-active");
-    localStorage.setItem(`focusMode-book${book_id}`, `${focusChk.checked}`)
-  })
-
-  tap_sets_statusChk.addEventListener("change", () => {
-    readPaneContainer.classList.toggle("tap_sets_status-active");
-    localStorage.setItem("tap_sets_status", `${tap_sets_statusChk.checked}`)
-  })
+  /**
+   * Alpine state for the reading-page UI toggles (focus mode, quick-set
+   * status).  Replaces the previous jQuery change handlers and the
+   * $(document).ready localStorage restore block.  The checkboxes in
+   * reading_menu.html bind with x-model; the container's :class binding
+   * applies the effect classes, and $watch persists each toggle.
+   */
+  function readState() {
+    const bookEl = document.getElementById("book_id");
+    const bookId = bookEl ? (parseInt(bookEl.value, 10) || 0) : 0;
+    const isTablet = window.matchMedia("(max-width: 980px)").matches;
+    return {
+      focusMode: !isTablet && localStorage.getItem(`focusMode-book${bookId}`) === "true",
+      tapSetsStatus: isTablet && localStorage.getItem("tap_sets_status") === "true",
+      init() {
+        this.$watch("focusMode", (v) => {
+          localStorage.setItem(`focusMode-book${bookId}`, v ? "true" : "false");
+        });
+        this.$watch("tapSetsStatus", (v) => {
+          localStorage.setItem("tap_sets_status", v ? "true" : "false");
+        });
+      },
+    };
+  }
 
   let _close_slide_in_menu_on_click_away = function(event) {
     const tgt = event.target;
@@ -289,7 +308,7 @@
     if (event.data.event === "LuteTermFormPosted") {
       const bookid = $('#book_id').val();
       const pagenum = $('#page_num').val();
-      const url = `/read/refresh_page/${bookid}/${pagenum}?_=${Date.now()}`;
+      const url = `/read/refresh_page/${bookid}/${pagenum}`;
       const marked = $('.kwordmarked');
       let marked_id = "nomatches"
       if (marked.length != 0) {
@@ -302,16 +321,10 @@
 
       $(".dictcontainer").css('display', 'none');
 
-      $('#thetext').load(url, function() {
-        if (typeof add_status_classes === "function") {
-          add_status_classes();
-        }
-        const re_marked = $(`#${marked_id}`);
-        re_marked.removeClass('kwordmarked');
-        re_marked.addClass('wordhover');
-        // Notify the YouTube / TTS player to refresh subtitle word colors.
-        window.dispatchEvent(new Event('lute:status-updated'));
-      });
+      // HTMX: swap the refreshed fragment into #thetext.  Re-marking of
+      // the previously-marked word happens in the htmx:afterSwap handler.
+      _pendingTermFormReload = marked_id;
+      htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
     };
   };
 
@@ -319,6 +332,9 @@
   var _lastStartDateUpdate = 0;
 
   function _updateStartDateIfNeeded() {
+    // Peeking at a page (track_page_open=false) must NOT set the current
+    // page or start date — that would move the reader's place in the book.
+    if ($("#track_page_open").val() == "false") return;
     var now = Date.now();
     if (now - _lastStartDateUpdate < 5000) return;
     _lastStartDateUpdate = now;
@@ -347,23 +363,6 @@
     });
     
     theTextReloadObs.observe(theText, {childList: true, subtree: true});
-
-    // do not load focus state if in tablet mode
-    if (!mediaTablet.matches) {
-      const book_id = $('#book_id').val();
-      const focusVal = localStorage.getItem(`focusMode-book${book_id}`);
-      if (focusVal === "true") {
-        readPaneContainer.classList.add("focus-mode-active");
-        focusChk.checked = true;
-      }
-    }
-
-    if (mediaTablet.matches) {
-      if (localStorage.getItem("tap_sets_status") === "true") {
-        readPaneContainer.classList.add("tap_sets_status-active");
-        tap_sets_statusChk.checked = true;
-      }
-    }
 
     createLookupButtons();
     $(document).click(_close_slide_in_menu_on_click_away);
@@ -517,6 +516,10 @@
    * while the page content is being ajax'd in.  This makes
    * _NO SENSE AT ALL_ but moving the player source loading
    * to the ajax "success" function worked.  ???
+   *
+   * Page content is fetched with HTMX (htmx.ajax) and swapped into
+   * #thetext; the htmx:afterSwap listener below runs the post-swap
+   * bookkeeping (status classes, nav state, page fraction, etc).
    */
   function goto_relative_page(p, initial_page_load = false) {
     luteStartReadingDone = false;
@@ -532,32 +535,65 @@
     const url = `/read/${read_action}/${bookid}/${actualPage}`;
     // console.log(`go to page ${url}`);
 
-    $.get(
-      url,
-      function(data, status) {
-        luteStartReadingDone = true;
-        $('#thetext').html(data);
-        add_status_classes();
-        start_hover_mode();
-        $('#page_num').val(actualPage);
-        enable_page_nav_links();
-        set_page_fraction();
-        set_footer_control_visibility();
-        show_hide_title(actualPage);
-        $("html, body").animate({ scrollTop: 0 });
-
-        if (initial_page_load) {
-          prepareTextInteractions();
-        }
-
-        // Magic hack for player source to load consistently
-        // in Firefox.
-        if (initial_page_load && have_audio_file()) {
-          load_player_source();
-        }
-      }
-    );
+    // Remember which page we asked for so the afterSwap handler can
+    // update the UI without parsing the URL.
+    _pendingNav = { actualPage: actualPage, initial: initial_page_load };
+    htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
   }
+
+  // Pending page-navigation state, consumed by the htmx:afterSwap handler.
+  let _pendingNav = null;
+
+  // Post-swap bookkeeping for the reading text.  Also used by HTMX-driven
+  // status updates (see lute.js post_bulk_update).
+  function _finishPageSwap(actualPage, initial) {
+    luteStartReadingDone = true;
+    add_status_classes();
+    start_hover_mode();
+    $('#page_num').val(actualPage);
+    enable_page_nav_links();
+    set_page_fraction();
+    set_footer_control_visibility();
+    show_hide_title(actualPage);
+    $("html, body").animate({ scrollTop: 0 });
+
+    if (initial) {
+      prepareTextInteractions();
+    }
+
+    // Magic hack for player source to load consistently
+    // in Firefox.
+    if (initial && have_audio_file()) {
+      load_player_source();
+    }
+  }
+
+  // Pending term-form reload state, consumed by the htmx:afterSwap handler.
+  let _pendingTermFormReload = null;
+
+  document.body.addEventListener('htmx:afterSwap', function (e) {
+    if (!e.target || e.target.id !== 'thetext') return;
+
+    // Page navigation (goto_relative_page).
+    if (_pendingNav) {
+      _finishPageSwap(_pendingNav.actualPage, _pendingNav.initial);
+      _pendingNav = null;
+    }
+
+    // Reload after a term form was posted (updated/deleted).
+    if (_pendingTermFormReload !== null) {
+      const marked_id = _pendingTermFormReload;
+      _pendingTermFormReload = null;
+      if (typeof add_status_classes === "function") {
+        add_status_classes();
+      }
+      const re_marked = $(`#${marked_id}`);
+      re_marked.removeClass('kwordmarked');
+      re_marked.addClass('wordhover');
+      // Notify the YouTube / TTS player to refresh subtitle word colors.
+      window.dispatchEvent(new Event('lute:status-updated'));
+    }
+  });
 
   function closeMenu() {
     $(".reading-menu-sublist.active").removeClass("active");
