@@ -122,6 +122,9 @@
 
   let globalSpeed = 1.0;
   let hoverTimer = null;
+  // Guards the "wait for voices to load" retry so it only runs once.
+  let _voicesWaitActive = false;
+  let _pendingWaitText = null;
 
   function selectBestVoiceForLang(voices, targetLang) {
     if (!voices || voices.length === 0) return null;
@@ -167,6 +170,37 @@
     return null;
   }
 
+  // Speak a single short utterance now, picking the best available
+  // voice for the current language (never the default mechanical one
+  // when a suitable voice exists).
+  function speakNow(cleanText) {
+    let activeVoice = getSelectedVoice();
+    const voices = window.speechSynthesis.getVoices();
+    const detectedLang = getCurrentLangCode();
+
+    if (!activeVoice && voices.length > 0) {
+      activeVoice = selectBestVoiceForLang(voices, detectedLang);
+    }
+
+    const utterance = new SpeechSynthesisUtterance();
+    utterance.text = cleanText;
+    if (activeVoice) {
+      utterance.voice = activeVoice;
+      utterance.lang = activeVoice.lang;
+    } else {
+      utterance.lang = detectedLang;
+    }
+    utterance.rate = globalSpeed;
+
+    try {
+      window.speechSynthesis.cancel();
+    } catch (_) {}
+
+    setTimeout(function () {
+      window.speechSynthesis.speak(utterance);
+    }, 20);
+  }
+
   // Lightweight speak used by hover / click pronunciation and the
   // auto-translation flow (single short utterance, no player state).
   function speakText(text) {
@@ -174,33 +208,40 @@
     if (!cleanText) return;
 
     if ("speechSynthesis" in window) {
-      try {
-        window.speechSynthesis.cancel();
-      } catch (_) {}
-
-      const utterance = new SpeechSynthesisUtterance();
-      utterance.text = cleanText;
-
-      let activeVoice = getSelectedVoice();
       const voices = window.speechSynthesis.getVoices();
-      const detectedLang = getCurrentLangCode();
+      const hasVoice =
+        getSelectedVoice() || (voices && voices.length > 0);
 
-      if (!activeVoice && voices.length > 0) {
-        activeVoice = selectBestVoiceForLang(voices, detectedLang);
+      if (!hasVoice) {
+        if (_voicesWaitActive) {
+          // A wait is already running; just remember the latest text
+          // so the natural voice speaks the word the user most recently
+          // hovered.
+          _pendingWaitText = cleanText;
+          return;
+        }
+        // getVoices() populates asynchronously in Chromium/Edge. If
+        // they aren't ready yet, wait briefly for onvoiceschanged so
+        // the very first pronunciation doesn't fall back to the
+        // default mechanical voice.
+        _voicesWaitActive = true;
+        _pendingWaitText = cleanText;
+        const start = Date.now();
+        const timer = setInterval(function () {
+          const v = window.speechSynthesis.getVoices();
+          const ready = getSelectedVoice() || (v && v.length > 0);
+          if (ready || Date.now() - start > 1500) {
+            clearInterval(timer);
+            _voicesWaitActive = false;
+            const t = _pendingWaitText || cleanText;
+            _pendingWaitText = null;
+            speakNow(t);
+          }
+        }, 100);
+        return;
       }
 
-      if (activeVoice) {
-        utterance.voice = activeVoice;
-        utterance.lang = activeVoice.lang;
-      } else {
-        utterance.lang = detectedLang;
-      }
-
-      utterance.rate = globalSpeed;
-
-      setTimeout(function () {
-        window.speechSynthesis.speak(utterance);
-      }, 20);
+      speakNow(cleanText);
       return;
     }
 
@@ -1139,6 +1180,20 @@
 
     const detectedLang = getCurrentLangCode();
     const recommended = selectBestVoiceForLang(voices, detectedLang);
+
+    // getVoices() loads asynchronously in Chromium/Edge, so the
+    // init-time selection in ttsInitPlayer() often finds an empty list
+    // and the recommended voice is never stored. Auto-select it here
+    // (once voices exist) so the FIRST hover pronunciation uses the
+    // natural voice instead of the default mechanical one.
+    if (
+      !globalCache.selectedVoice &&
+      !(ttsVoiceBtn && ttsVoiceBtn.dataset.voiceName) &&
+      recommended
+    ) {
+      ttsSelectVoice(recommended);
+    }
+
     const currentName =
       (ttsVoiceBtn && ttsVoiceBtn.dataset.voiceName) ||
       globalCache.selectedVoice ||
