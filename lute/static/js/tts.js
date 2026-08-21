@@ -601,6 +601,12 @@
   let ttsCueStartedAt = 0;         // performance.now() when current cue started
   let ttsCurrentUtterance = null;
   let ttsPollTimer = null;
+  // Voice-list load detection. On mobile browsers getVoices() can stay
+  // empty for a long time (chromium populates it lazily), and
+  // onvoiceschanged may never fire. Track the empty->non-empty
+  // transition so we rebuild the dropdown the moment voices arrive.
+  let _voicesEmpty = true;
+  let _voicePollTimer = null;
   let ttsMarqueeOverflow = 0;
   let ttsIsRtl = false;
   // HTML last injected into the subtitle. Used to skip redundant
@@ -749,6 +755,11 @@
         utterance.lang = detectedLang;
       }
       utterance.rate = ttsRate;
+
+      // Play is a user gesture -- on mobile this is often what finally
+      // makes getVoices() populate. Re-check right away so the voice
+      // dropdown updates instead of staying on "Loading voices…".
+      ttsPollVoices();
 
       // boundary events give us word-level progress within a cue.
       // Not all browsers fire them (Chrome does, Safari partial, FF
@@ -1343,8 +1354,61 @@
     if (willOpen) {
       // Repopulate in case voices loaded late.
       ttsPopulateVoiceList();
+      // Opening the gear IS a user gesture. On mobile Chromium this
+      // coaxes getVoices() to populate, so poll hard a few times in
+      // case the async load is triggered by this very tap.
+      ttsCoaxVoicesByGesture();
       // Jump straight to the currently-used voice.
       ttsScrollToSelectedVoice();
+    }
+  }
+
+  // Poll getVoices() a handful of times right after a user gesture
+  // (gear tap). Some mobile browsers only populate the voice list
+  // after an interaction; this gives the async load a chance to land.
+  function ttsCoaxVoicesByGesture() {
+    if (!("speechSynthesis" in window)) return;
+    let tries = 0;
+    const timer = setInterval(function () {
+      tries++;
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length) {
+        clearInterval(timer);
+        ttsPopulateVoiceList();
+      } else if (tries >= 12) {
+        // ~3 seconds; stop and let the persistent poller take over.
+        clearInterval(timer);
+      }
+    }, 250);
+  }
+
+  // Lightweight, always-on poll that (re)builds the voice dropdown the
+  // moment getVoices() finally reports voices. This is what rescues the
+  // mobile case where onvoiceschanged never fires and the placeholder
+  // would otherwise show forever.
+  function ttsPollVoices() {
+    if (!ttsVoiceDropdown || !("speechSynthesis" in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    const nowEmpty = voices.length === 0;
+
+    // Empty -> non-empty transition: voices just landed.
+    if (_voicesEmpty && !nowEmpty) {
+      _voicesEmpty = false;
+      ttsPopulateVoiceList();
+      return;
+    }
+    _voicesEmpty = nowEmpty;
+
+    // Menu open: keep a (re)built list or a visible placeholder in sync.
+    if (!ttsVoiceDropdown.hidden) {
+      if (nowEmpty) {
+        ensureVoicePlaceholder();
+      } else if (
+        ttsVoiceDropdown.childElementCount === 1 &&
+        ttsVoiceDropdown.querySelector(".tts-voice-placeholder")
+      ) {
+        ttsPopulateVoiceList();
+      }
     }
   }
 
@@ -1503,6 +1567,7 @@
 
     // SpeechSynthesis voices may load asynchronously.
     if ("speechSynthesis" in window) {
+      _voicesEmpty = window.speechSynthesis.getVoices().length === 0;
       window.speechSynthesis.getVoices();
       window.speechSynthesis.onvoiceschanged = ttsPopulateVoiceList;
       // Some browsers don't fire onvoiceschanged reliably -- try a
@@ -1510,6 +1575,11 @@
       [200, 600, 1500].forEach(function (ms) {
         setTimeout(ttsPopulateVoiceList, ms);
       });
+      // Always-on poller: rescues mobile browsers where getVoices()
+      // stays empty / onvoiceschanged never fires. Rebuilds the
+      // dropdown the instant voices arrive.
+      if (_voicePollTimer) clearInterval(_voicePollTimer);
+      _voicePollTimer = setInterval(ttsPollVoices, 400);
     }
 
     // Pick up the recommended voice for the current language if the

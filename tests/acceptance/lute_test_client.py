@@ -323,6 +323,20 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         # Clear any filters
         self.page.click("#showHideFilters")
 
+        # The term table is server-side DataTables; wait for the ajax load
+        # to finish before reading rows, otherwise we can catch a
+        # mid-render row with a single cell (IndexError below).
+        # Either the "No data" message (1 cell) or a full row (7 cells).
+        self.page.wait_for_function(
+            """() => {
+                const rows = document.querySelectorAll('#termtable tbody tr');
+                if (rows.length === 0) return false;
+                const tds = rows[0].querySelectorAll('td');
+                return tds.length === 1 || tds.length >= 7;
+            }"""
+        )
+        time.sleep(0.2)  # hack
+
         # The last column ("date added") is skipped, as in Splinter version
         rows = self.page.query_selector_all("#termtable tbody tr")
 

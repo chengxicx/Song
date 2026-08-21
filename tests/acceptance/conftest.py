@@ -277,7 +277,14 @@ def given_book_table_wait(luteclient, title):
 @when(parsers.parse('I set the book table filter to "{filt}"'))
 def when_set_book_table_filter(luteclient, filt):
     "Set the filter, wait a sec."
-    luteclient.page.locator("input").first.fill(filt)
+    p = luteclient.page
+    srch = p.locator(".dt-search input").first
+    # The search box is collapsed (width 0) until the magnifier toggle is
+    # clicked; Playwright fill() needs a visible element, so expand it first.
+    if not srch.is_visible():
+        p.locator(".dt-search__toggle").first.click()
+        time.sleep(0.1)
+    srch.fill(filt)
     time.sleep(0.2)
 
 
@@ -521,7 +528,9 @@ def when_click_word_press_hotkey(luteclient, word, hotkey):
 @when(parsers.parse('I hover over "{word}"'))
 def when_hover(luteclient, word):
     "Hover over a term."
-    els = luteclient.page.locator(f"text={word}")
+    # Filter to visible elements: the hidden TTS transcript duplicates
+    # reading text, which would otherwise cause false matches.
+    els = luteclient.page.locator(f"text={word} >> visible=true")
     assert els.count() == 1, f'have single "{word}"'
     els.first.hover()
 
