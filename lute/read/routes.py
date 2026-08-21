@@ -13,6 +13,7 @@ from lute.term.routes import handle_term_form
 from lute.settings.current import current_settings
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
+from lute.models.term import Term
 from lute.book.service import (
     youtube_video_id,
     bilibili_embed_url,
@@ -79,8 +80,8 @@ def _subtitle_words_html(book):
         return []
     cache_key = (book.id, book.srt_data)
     cached = _yt_subtitle_words_cache.get(cache_key)
-    if cached is not None:
-        return cached
+    if cached is not None and _subtitle_cache_is_fresh(cached):
+        return cached["html"]
     cues = list(book.cues)
     if not cues:
         return []
@@ -129,8 +130,43 @@ def _subtitle_words_html(book):
     while len(rendered) < len(cues):
         rendered.append("")
     result = rendered[: len(cues)]
-    _yt_subtitle_words_cache[cache_key] = result
+
+    # Record the term statuses that were baked into the rendered HTML so
+    # later requests served by *other* gunicorn workers can detect when
+    # the cache has gone stale (see _subtitle_cache_is_fresh).
+    statuses = {
+        ti.wo_id: ti.wo_status
+        for chunk in chunks
+        for ti in chunk
+        if ti.wo_id is not None
+    }
+    _yt_subtitle_words_cache[cache_key] = {"html": result, "statuses": statuses}
     return result
+
+
+def _subtitle_cache_is_fresh(entry):
+    """True if the cached subtitle HTML still matches current term statuses.
+
+    ``_yt_subtitle_words_cache`` is an in-memory per-gunicorn-worker dict.
+    A status update only clears the cache of the worker that handled the
+    POST, so other workers can keep serving stale ``data-status-class``
+    values even after a full page reload.  Rather than relying on the
+    in-memory invalidation to reach every worker, this re-reads the
+    current statuses of the rendered word ids from the shared database and
+    returns False (forcing a rebuild) when any of them differ from what
+    was baked into the cached HTML.
+    """
+    statuses = entry["statuses"]
+    if not statuses:
+        return True
+    wids = list(statuses.keys())
+    rows = (
+        db.session.query(Term.id, Term.status)
+        .filter(Term.id.in_(wids))
+        .all()
+    )
+    current = dict(rows)
+    return all(current.get(wid) == status for wid, status in statuses.items())
 
 
 def _sync_media_page_text_to_cues(book, original_text, new_text):
@@ -493,9 +529,20 @@ def youtube_subtitle_words(bookid):
     """
     book = _find_book(bookid)
     if book is None:
-        return jsonify([])
-    words = _subtitle_words_html(book)
-    return jsonify(words)
+        resp = jsonify([])
+    else:
+        words = _subtitle_words_html(book)
+        resp = jsonify(words)
+
+    # This JSON carries per-user term statuses that change on every status
+    # update.  It is not text/html, so the app-wide no-store hook skips it,
+    # and an origin/Cloudflare default (max-age) would otherwise cache it
+    # for hours -- causing stale subtitle colors that a soft refresh can't
+    # clear.  Force no-store so browser + CDN always re-fetch fresh data.
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp
 
 
 @bp.route("/start_reading/<int:bookid>/<int:pagenum>", methods=["GET"])
