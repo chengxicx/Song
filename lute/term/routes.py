@@ -373,6 +373,14 @@ def sentences(langid, text):
     )
 
 
+def _coerce_form_value(v):
+    "Parse a form value as JSON if possible, else return the raw string."
+    try:
+        return json.loads(v)
+    except (json.JSONDecodeError, TypeError):
+        return v
+
+
 @bp.route("/bulk_update_status", methods=["POST"])
 def bulk_update_status():
     """
@@ -386,8 +394,21 @@ def bulk_update_status():
     """
     repo = Repository(db.session)
 
-    data = request.get_json()
+    # HTMX (htmx.ajax) sends the body as form-urlencoded, with nested
+    # objects arriving as JSON strings and arrays arriving as multiple
+    # same-named fields.  Other callers send real JSON.  Accept both
+    # formats so the reading screen updates in a single round-trip
+    # (POST + swap).
+    data = request.get_json(silent=True)
+    if data is None:
+        data = {}
+        for k in request.form.keys():
+            vals = request.form.getlist(k)
+            parsed = [_coerce_form_value(v) for v in vals]
+            data[k] = parsed[0] if len(parsed) == 1 else parsed
     updates = data.get("updates")
+    if isinstance(updates, dict):
+        updates = [updates]
 
     status_changed = False
     for u in updates:
@@ -416,7 +437,25 @@ def bulk_update_status():
     from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
     invalidate_yt_subtitle_cache()
 
+    # HTMX request: return the refreshed reading-text fragment so the
+    # reading screen updates in a single round-trip (POST + swap) instead
+    # of a POST followed by a separate GET.  Regular JSON callers keep
+    # the "ok" response.
+    if request.headers.get("HX-Request"):
+        return _page_fragment_after_update(book_id, data.get("pagenum"))
+
     return jsonify("ok")
+
+
+def _page_fragment_after_update(book_id, pagenum):
+    "Render the reading page fragment after a bulk status update."
+    if not book_id or not pagenum:
+        return ""
+    book = BookRepository(db.session).find(int(book_id))
+    if book is None:
+        return ""
+    from lute.read.routes import render_page_fragment  # pylint: disable=import-outside-toplevel
+    return render_page_fragment(book, int(pagenum), track_page_open=False)
 
 
 @bp.route("/bulk_delete", methods=["POST"])

@@ -580,9 +580,20 @@ def refresh_page(bookid, pagenum):
     if book is None:
         flash(f"No book matching id {bookid}")
         return redirect("/", 302)
+    return render_page_fragment(book, pagenum, track_page_open=False)
+
+
+def render_page_fragment(book, pagenum, track_page_open=False):
+    """
+    Render the reading-text fragment for a book page.
+
+    Used by the /read/refresh_page route and by the HTMX status-update
+    flow (term bulk_update_status returns this fragment for HX-Request
+    calls) so the reading screen updates in a single round-trip.
+    """
     service = Service(db.session)
     if (book.book_type or "") == "manga":
-        ctx = service.manga_page_context(book, pagenum, False)
+        ctx = service.manga_page_context(book, pagenum, track_page_open)
         if ctx is None:
             return render_template("read/page_content.html", paragraphs=[])
         return render_template("read/manga_page.html", **ctx)
