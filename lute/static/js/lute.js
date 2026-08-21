@@ -180,6 +180,14 @@ let tooltip_textitem_hover_content = function (el, setContent) {
     url: `/read/termpopup/${elid}`,
     type: 'get',
     success: function(response) {
+      // The hovered word may have been re-rendered/replaced while the
+      // AJAX was in flight (e.g. the TTS subtitle is rebuilt on each
+      // loop iteration, or the page navigated).  Calling setContent on
+      // a detached element makes jquery-ui resurrect a stray tooltip,
+      // pinned at the document top-left corner, that never disappears.
+      // Bail if the target word is no longer in the document.
+      const node = el && el[0];
+      if (!node || !node.isConnected) return;
       setContent(response);
     }
   });
