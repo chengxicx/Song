@@ -1049,6 +1049,14 @@
     if (ttsSubtitle) {
       if (typeof clear_newmultiterm_elements === "function")
         clear_newmultiterm_elements();
+      // Close any open term-detail tooltip BEFORE rebuilding the
+      // subtitle.  Replacing innerHTML while the cursor is over a
+      // word detaches the tooltip's target (e.g. during loop
+      // playback), so the tooltip loses its mouseleave event and a
+      // stray popup is left floating at the word or at the document
+      // top-left corner.
+      if (typeof _hide_element_message_tooltips === "function")
+        _hide_element_message_tooltips();
       const cue = ttsCues[idx];
       const html = cue ? cue.html : "";
       ttsSubtitle.innerHTML = html || "";
@@ -1090,6 +1098,11 @@
     if (ttsSubtitle) {
       if (typeof clear_newmultiterm_elements === "function")
         clear_newmultiterm_elements();
+      // Close any open term-detail tooltip before emptying the
+      // subtitle, so a popup opened over the cleared content can't
+      // linger.
+      if (typeof _hide_element_message_tooltips === "function")
+        _hide_element_message_tooltips();
       ttsSubtitle.innerHTML = "";
       ttsMarqueeOverflow = 0;
     }
