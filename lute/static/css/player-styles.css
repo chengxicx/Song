@@ -1014,6 +1014,15 @@
   cursor: default;
 }
 
+/* After a short wait with no voices this row switches from "Loading…
+   to a clear "no voices found" message and becomes tappable to retry. */
+.tts-voice-option.tts-voice-placeholder.tts-voice-retry {
+  color: #8a5a00;
+  font-style: normal;
+  cursor: pointer;
+  font-weight: 600;
+}
+
 .tts-voice-option.tts-voice-placeholder:hover {
   background-color: transparent;
 }
