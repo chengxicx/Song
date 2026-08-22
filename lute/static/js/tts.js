@@ -659,6 +659,18 @@
     return Math.max(0.5, (cjk * CHAR_RATE_CJK + other * CHAR_RATE_OTHER) / effRate);
   }
 
+  // Extract a sentence's playable text: clone so we can strip the 🔊
+  // button without mutating the page, then collapse whitespace. Shared
+  // by cue building and the #thetext swap check so the comparison is
+  // always against exactly what the cues contain.
+  function ttsSentenceText(s) {
+    const clone = s.cloneNode(true);
+    clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
+      b.remove();
+    });
+    return cleanSentenceText(clone.innerText || clone.textContent || "");
+  }
+
   // Build the cue list from the .textsentence elements in #thetext.
   // Each cue's `html` is the sentence's innerHTML (textitem spans
   // included), so the scrolling subtitle reuses the reading-page
@@ -676,15 +688,13 @@
     const sentences = textDiv.querySelectorAll(".textsentence");
     let acc = 0;
     sentences.forEach(function (s) {
+      const text = ttsSentenceText(s);
+      if (!text) return;
       // Clone so we can strip the 🔊 button without mutating the page.
       const clone = s.cloneNode(true);
       clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
         b.remove();
       });
-      const text = cleanSentenceText(
-        clone.innerText || clone.textContent || ""
-      );
-      if (!text) return;
       const html = clone.innerHTML;
       const dur = ttsEstimateDuration(text, ttsRate);
       ttsCues.push({
@@ -1755,6 +1765,49 @@
       if (ttsStartTextObserver._t) clearTimeout(ttsStartTextObserver._t);
       ttsStartTextObserver._t = setTimeout(function () {
         ttsStartTextObserver._t = null;
+
+        const textDiv = document.getElementById("thetext");
+        const newSentences = textDiv
+          ? Array.prototype.map
+              .call(textDiv.querySelectorAll(".textsentence"), ttsSentenceText)
+              .filter(Boolean)
+          : [];
+
+        // A term status update swaps #thetext with the *same* sentences
+        // (only word status classes change), so playback should keep
+        // going. Only a real page navigation -- different sentence
+        // content -- should stop the player and reset its position.
+        const sameText =
+          newSentences.length > 0 &&
+          newSentences.length === ttsCues.length &&
+          newSentences.every(function (t, i) {
+            return t === ttsCues[i].text;
+          });
+
+        if (sameText) {
+          // Preserve the playhead across the rebuild so the current
+          // utterance keeps looping / playing from where it was.
+          const keepIndex = ttsCueIndex;
+          const keepTime = ttsVirtualTime;
+          const oldActual = ttsCues.map(function (c) {
+            return c.actualDuration;
+          });
+          ttsBuildCues();
+          // Keep measured durations so the timeline doesn't jump.
+          ttsCues.forEach(function (c, i) {
+            if (oldActual[i] != null) c.actualDuration = oldActual[i];
+          });
+          if (keepIndex >= 0 && keepIndex < ttsCues.length) {
+            ttsCueIndex = keepIndex;
+            const cue = ttsCues[keepIndex];
+            ttsVirtualTime = Math.min(keepTime, cue ? cue.end : keepTime);
+            ttsActivateCue(keepIndex);
+          }
+          // Re-apply status colours to the new subtitle word spans.
+          ttsApplySubtitleStatusColors();
+          return;
+        }
+
         // Stop any playback before rebuilding -- the old cue indices
         // are stale after #thetext is replaced.
         ttsCancelSpeech();
