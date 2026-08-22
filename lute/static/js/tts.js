@@ -1341,20 +1341,11 @@
   }
 
   // Manual Retry for the "no voices" row. Resets the wait clock and re-
-  // coaxes speechSynthesis as if the user just tapped the gear (some
+  // primes the speech engine as if the user just tapped the gear (some
   // mobile engines only populate voices from inside a user gesture).
   function ttsRetryVoiceLoad() {
     _voiceWaitStart = Date.now();
     _voicesEmpty = true;
-    if ("speechSynthesis" in window) {
-      // Cancel + resume nudges some engines to repopulate the list.
-      try {
-        window.speechSynthesis.cancel();
-        if (typeof window.speechSynthesis.resume === "function") {
-          window.speechSynthesis.resume();
-        }
-      } catch (_) {}
-    }
     ttsCoaxVoicesByGesture();
     ensureVoicePlaceholder();
   }
@@ -1410,11 +1401,13 @@
     const willOpen = ttsVoiceDropdown.hidden;
     ttsVoiceDropdown.hidden = !willOpen;
     if (willOpen) {
-      // Repopulate in case voices loaded late.
+      // Opening the gear IS a user gesture. Prime the synthesis engine
+      // (silent speak) FIRST -- on Edge Android the voice list only fills
+      // in after the engine has run a real speak(), and reading it too
+      // early can leave it empty. Then populate + poll to pick it up.
+      ttsPrimeVoiceEngine();
       ttsPopulateVoiceList();
-      // Opening the gear IS a user gesture. On mobile Chromium this
-      // coaxes getVoices() to populate, so poll hard a few times in
-      // case the async load is triggered by this very tap.
+      // Coax getVoices() to populate with a few polls right after the tap.
       ttsCoaxVoicesByGesture();
       // Jump straight to the currently-used voice.
       ttsScrollToSelectedVoice();
@@ -1426,6 +1419,11 @@
   // after an interaction; this gives the async load a chance to land.
   function ttsCoaxVoicesByGesture() {
     if (!("speechSynthesis" in window)) return;
+    // On Edge (Android) the voice list only appears once the synthesis
+    // engine has truly been initialized via speak() -- and a premature
+    // getVoices() call can keep it broken until reload. Prime the engine
+    // (silent speak) from inside this user gesture first, then poll.
+    ttsPrimeVoiceEngine();
     let tries = 0;
     const timer = setInterval(function () {
       tries++;
@@ -1438,6 +1436,36 @@
         clearInterval(timer);
       }
     }, 250);
+  }
+
+  // Force the speechSynthesis engine to initialize. On mobile Edge /
+  // Chromium the getVoices() list only ever fills in AFTER the engine has
+  // run a real speak(), and until then it reports no voices (and can even
+  // stay broken if getVoices() is called too early). Speaking a silent
+  // (volume 0, empty) utterance from inside a user gesture boots the engine
+  // without making any sound, after which getVoices() returns the real list.
+  function ttsPrimeVoiceEngine() {
+    if (!("speechSynthesis" in window)) return;
+    // Voices are live already -- nothing to warm up.
+    if (window.speechSynthesis.getVoices().length > 0) return;
+    // Engine is speaking or has queued speech; it's initialized and the
+    // running utterance is the user's playback. Never cancel that.
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) return;
+    try {
+      const warmup = new SpeechSynthesisUtterance("");
+      warmup.volume = 0;
+      warmup.rate = 10;
+      // Idle, so a cancel here is safe and also clears a wedged queue.
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(warmup);
+      // Cancel shortly after so a zero-length warmup can't wedge the speech
+      // queue on engines that keep a "pending" utterance around, then refresh
+      // the dropdown in case voices just appeared.
+      setTimeout(function () {
+        try { window.speechSynthesis.cancel(); } catch (_) {}
+        ttsPollVoices();
+      }, 300);
+    } catch (_) {}
   }
 
   // Lightweight, always-on poll that (re)builds the voice dropdown the
