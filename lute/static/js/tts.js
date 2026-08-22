@@ -607,6 +607,14 @@
   // transition so we rebuild the dropdown the moment voices arrive.
   let _voicesEmpty = true;
   let _voicePollTimer = null;
+  // How long to keep showing "Loading voices\u2026" on mobile before we
+  // assume this device simply has no system TTS voices. On many mobile
+  // browsers getVoices() stays empty forever (and onvoiceschanged never
+  // fires), so without this the gear would spin forever.
+  const VOICE_TIMEOUT_MS = 4000;
+  // Timestamp of when we first began waiting for voices; null until the
+  // placeholder is first shown. Reset when voices actually arrive.
+  let _voiceWaitStart = null;
   let ttsMarqueeOverflow = 0;
   let ttsIsRtl = false;
   // HTML last injected into the subtitle. Used to skip redundant
@@ -1231,6 +1239,9 @@
       ensureVoicePlaceholder();
       return;
     }
+    // Voices landed (eventually): clear the timeout clock and drop any
+    // leftover placeholder state so the real list renders below.
+    _voiceWaitStart = null;
 
     const detectedLang = getCurrentLangCode();
     const recommended = selectBestVoiceForLang(voices, detectedLang);
@@ -1291,14 +1302,61 @@
   // Renders a "loading voices" row when speechSynthesis hasn't reported
   // its voices yet. Without it the menu opens as an empty (invisible) box
   // on mobile; once voices load they overwrite the placeholder.
+  // Repeatedly called by the voices poller, so it is also responsible for
+  // retiring the "Loading voices…" state: if voices never arrive within
+  // VOICE_TIMEOUT_MS we stop waiting forever and tell the user no system
+  // voices exist on this device, with a tappable Retry for browsers that
+  // only populate voices after another user gesture.
   function ensureVoicePlaceholder() {
     if (!ttsVoiceDropdown) return;
-    if (ttsVoiceDropdown.childElementCount > 0) return; // already has content
-    const placeholder = document.createElement("div");
-    placeholder.className = "tts-voice-option tts-voice-placeholder";
-    placeholder.setAttribute("role", "status");
-    placeholder.textContent = "Loading voices\u2026";
-    ttsVoiceDropdown.appendChild(placeholder);
+    let el = ttsVoiceDropdown.querySelector(".tts-voice-placeholder");
+    if (!el) {
+      // If the menu already holds a real voice list, never add a placeholder.
+      if (ttsVoiceDropdown.childElementCount > 0) return;
+      el = document.createElement("div");
+      el.className = "tts-voice-option tts-voice-placeholder";
+      el.setAttribute("role", "status");
+      ttsVoiceDropdown.appendChild(el);
+      // Bind the retry affordance once. The row acts as a manual button
+      // only after voices have timed out, so tap/cancel noise is harmless.
+      el.addEventListener("click", function (e) {
+        e.stopPropagation();
+        ttsRetryVoiceLoad();
+      });
+    }
+    if (_voiceWaitStart == null) _voiceWaitStart = Date.now();
+    const waited = Date.now() - _voiceWaitStart;
+    if (waited < VOICE_TIMEOUT_MS) {
+      el.textContent = "Loading voices\u2026";
+      el.classList.remove("tts-voice-retry");
+      el.setAttribute("role", "status");
+    } else {
+      // Voices never landed. On some mobile browsers they only appear
+      // after a fresh interaction, so show the real state + Retry instead
+      // of an eternal spinner.
+      el.textContent = "No system text-to-speech voices found on this device. Tap to retry.";
+      el.classList.add("tts-voice-retry");
+      el.setAttribute("role", "button");
+    }
+  }
+
+  // Manual Retry for the "no voices" row. Resets the wait clock and re-
+  // coaxes speechSynthesis as if the user just tapped the gear (some
+  // mobile engines only populate voices from inside a user gesture).
+  function ttsRetryVoiceLoad() {
+    _voiceWaitStart = Date.now();
+    _voicesEmpty = true;
+    if ("speechSynthesis" in window) {
+      // Cancel + resume nudges some engines to repopulate the list.
+      try {
+        window.speechSynthesis.cancel();
+        if (typeof window.speechSynthesis.resume === "function") {
+          window.speechSynthesis.resume();
+        }
+      } catch (_) {}
+    }
+    ttsCoaxVoicesByGesture();
+    ensureVoicePlaceholder();
   }
 
   // Scroll the voice dropdown so the currently-used voice is centered,
