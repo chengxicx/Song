@@ -615,6 +615,16 @@
   // Timestamp of when we first began waiting for voices; null until the
   // placeholder is first shown. Reset when voices actually arrive.
   let _voiceWaitStart = null;
+  // Pseudo voice offered when getVoices() never populates (Android
+  // Edge/Chromium bug: speak() works fine with the system default voice
+  // while getVoices() stays empty forever). Selecting it means "don't
+  // set utterance.voice", which is exactly how working playback already
+  // sounds on those browsers.
+  const DEVICE_DEFAULT_VOICE = {
+    name: "Device default voice",
+    lang: "",
+    synthetic: true,
+  };
   let ttsMarqueeOverflow = 0;
   let ttsIsRtl = false;
   // HTML last injected into the subtitle. Used to skip redundant
@@ -1334,9 +1344,32 @@
       // Voices never landed. On some mobile browsers they only appear
       // after a fresh interaction, so show the real state + Retry instead
       // of an eternal spinner.
-      el.textContent = "No system text-to-speech voices found on this device. Tap to retry.";
+      el.textContent =
+        "Voice list unavailable on this browser. Tap to retry.";
       el.classList.add("tts-voice-retry");
       el.setAttribute("role", "button");
+
+      // Android Edge/Chromium quirk: getVoices() stays empty forever
+      // even though speak() works with the system default voice (that is
+      // why playback sounds fine). Offer that default as an explicit,
+      // selectable entry so the menu is usable instead of a dead end.
+      let def = ttsVoiceDropdown.querySelector(".tts-voice-device-default");
+      if (!def) {
+        def = document.createElement("div");
+        def.className = "tts-voice-option tts-voice-device-default";
+        def.setAttribute("role", "option");
+        def.dataset.voiceName = DEVICE_DEFAULT_VOICE.name;
+        def.textContent = "[default] Use device default voice";
+        def.addEventListener("click", function (e) {
+          e.stopPropagation();
+          ttsSelectVoice(DEVICE_DEFAULT_VOICE);
+        });
+        ttsVoiceDropdown.appendChild(def);
+      }
+      const usingDefault =
+        globalCache.selectedVoice === DEVICE_DEFAULT_VOICE.name ||
+        (ttsVoiceBtn && ttsVoiceBtn.dataset.voiceName) === DEVICE_DEFAULT_VOICE.name;
+      def.classList.toggle("selected", !!usingDefault);
     }
   }
 
@@ -1364,6 +1397,7 @@
 
   function ttsShortVoiceName(fullName) {
     if (!fullName) return "Voice";
+    if (fullName === DEVICE_DEFAULT_VOICE.name) return "Device default";
     // Trim common noise: "Microsoft ... Online (Natural) ..." -> "...".
     let s = fullName
       .replace(/\s*\(Natural\)\s*/gi, " ")
@@ -1452,7 +1486,9 @@
     // running utterance is the user's playback. Never cancel that.
     if (window.speechSynthesis.speaking || window.speechSynthesis.pending) return;
     try {
-      const warmup = new SpeechSynthesisUtterance("");
+      // Non-empty text: some engines silently ignore zero-length
+      // utterances, which would leave the engine un-primed forever.
+      const warmup = new SpeechSynthesisUtterance(".");
       warmup.volume = 0;
       warmup.rate = 10;
       // Idle, so a cancel here is safe and also clears a wedged queue.
