@@ -16,7 +16,7 @@ body {
   --status-5-color: #482f63;        
   --status-learned-bg: #3a3a3c;     
   --status-learned-color: #8e8e93;  
-  --status-99-color: transparent;
+  --status-99-color: #38924c;
 
   --background-color: #1c1c1e;      /* Apple 界面暗黑背景色 */
   --panel-bg: #2c2c2e;            /* 悬浮卡片/表格底色 */
@@ -407,6 +407,24 @@ span.status5 { background-color: var(--status-5-color); color: #e5d7f2; border-r
 span.status98, span.status99 { 
   background-color: transparent; 
   color: inherit; 
+}
+
+/* 单词状态按钮（1-5 / Wkn / Ign）暗黑模式适配：
+   Wkn、Ign 图标默认为黑色，需反白才可见 */
+#status {
+  --status-select-color: #d7dce2;
+  --status-hover-color: rgba(255, 255, 255, 0.3);
+}
+
+#status label[for="status-5"]::after,
+#status label[for="status-6"]::after,
+#status #status-5:checked + label::after,
+#status #status-6:checked + label::after {
+    filter: invert(1);
+}
+
+#status label[for="status-6"]:hover {
+    background-color: #bc6b60;
 }
 
 /* ---------------------------------------------------------
