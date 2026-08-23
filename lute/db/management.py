@@ -114,6 +114,7 @@ def add_default_user_settings(session, default_user_backup_path):
         # TTS:
         "tts_enabled": True,
         "tts_hover_pronunciation": True,
+        "tts_hover_delay": 200,
         "tts_click_pronunciation": True,
         "tts_show_control_panel": True,
         "tts_show_sentence_buttons": True,
