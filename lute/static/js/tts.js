@@ -18,7 +18,8 @@
  *
  * Auxiliary features retained from the previous TTS module:
  *   - Sentence-level 🔊 buttons at each paragraph / sentence row.
- *   - Word hover pronunciation (200 ms delay) via event delegation.
+ *   - Word hover pronunciation (configurable delay, 0-300 ms) via
+ *     event delegation.
  *   - Auto-translation: when a term edit form opens with an empty
  *     #translation, the translation is fetched and auto-filled.
  */
@@ -114,6 +115,11 @@
     showControlPanel: getSetting("tts_show_control_panel", true),
     showSentenceButtons: getSetting("tts_show_sentence_buttons", true),
   };
+
+  // Hover delay (ms) before speaking a hovered word, configurable 0-300.
+  SETTINGS.hoverDelay = parseInt(getSetting("tts_hover_delay", 200), 10);
+  if (!Number.isFinite(SETTINGS.hoverDelay)) SETTINGS.hoverDelay = 200;
+  SETTINGS.hoverDelay = Math.min(300, Math.max(0, SETTINGS.hoverDelay));
 
   // ------------------------------------------------------------------
   // 1. Speech synthesis (primary: browser SpeechSynthesis,
@@ -327,7 +333,7 @@
           if (!ttsPlaying) {
             speakText(cleanText);
           }
-        }, 200);
+        }, SETTINGS.hoverDelay);
       });
 
       textDiv.addEventListener("mouseout", function (e) {

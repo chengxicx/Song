@@ -80,7 +80,22 @@ class UserSettingsForm(FlaskForm):
     use_ankiconnect = BooleanField("Enable export using AnkiConnect")
     ankiconnect_url = StringField("AnkiConnect URL", validators=[InputRequired()])
 
-    tts_hover_pronunciation = BooleanField("Pronounce word on hover (200ms delay)")
+    tts_hover_pronunciation = BooleanField("Pronounce word on hover")
+    tts_hover_delay = IntegerField(
+        "Hover pronunciation delay (ms)",
+        default=200,
+        validators=[
+            InputRequired(),
+            NumberRange(min=0, max=300),
+        ],
+        render_kw={
+            "type": "number",
+            "min": "0",
+            "max": "300",
+            "step": "25",
+            "title": "Delay before pronouncing a hovered word (0-300 ms)",
+        },
+    )
     tts_click_pronunciation = BooleanField("Pronounce word when clicked (term form opens)")
     tts_show_control_panel = BooleanField("Show TTS Player")
     tts_show_sentence_buttons = BooleanField("Show 🔊 button on each sentence")
