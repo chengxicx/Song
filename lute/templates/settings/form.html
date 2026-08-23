@@ -295,6 +295,10 @@
       <td>{{ f(class="form-control") }}</td>
     </tr>
     {% endfor %}
+    <tr>
+      <td>{{ form.tts_hover_delay.label }}</td>
+      <td>{{ form.tts_hover_delay(class="form-control") }} <span class="muted">ms</span></td>
+    </tr>
 
   </table>
 
