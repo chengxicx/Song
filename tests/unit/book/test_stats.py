@@ -8,10 +8,44 @@ from sqlalchemy.sql import text
 
 from lute.db import db
 from lute.term.model import Term, Repository
-from lute.book.stats import Service
+from lute.book.stats import Service, get_difficulty_label, difficulty_filter_sql
 
 from tests.utils import make_text, make_book
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
+
+
+def test_difficulty_label_default_thresholds():
+    "Difficulty bands follow the shared 10 / 20 thresholds."
+    assert get_difficulty_label(None) == (
+        "EASY",
+        "new-word-easy",
+        "Easy: under 10% of words are new.",
+    )
+    assert get_difficulty_label(0)[0] == "EASY"
+    assert get_difficulty_label(9)[0] == "EASY"
+    assert get_difficulty_label(10)[0] == "CHAL"
+    assert get_difficulty_label(20)[0] == "CHAL"
+    assert get_difficulty_label(21)[0] == "HARD"
+    # Colour class tracks the label.
+    labels = {v[0]: v[1] for v in [get_difficulty_label(p) for p in (5, 15, 25)]}
+    assert labels == {"EASY": "new-word-easy", "CHAL": "new-word-chal", "HARD": "new-word-hard"}
+
+
+def test_difficulty_filter_sql_thresholds():
+    "Filter SQL is generated from the same thresholds as the label."
+    assert (
+        difficulty_filter_sql("c.new_word_percent", "easy")
+        == "(c.new_word_percent IS NULL OR c.new_word_percent < 10)"
+    )
+    assert (
+        difficulty_filter_sql("c.new_word_percent", "CHAL")
+        == "(c.new_word_percent >= 10 AND c.new_word_percent <= 20)"
+    )
+    assert (
+        difficulty_filter_sql("c.new_word_percent", "hard")
+        == "(c.new_word_percent > 20)"
+    )
+    assert difficulty_filter_sql("x", "bogus") is None
 
 
 def add_term(lang, s, status):

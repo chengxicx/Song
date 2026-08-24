@@ -7,14 +7,110 @@ import re
 from sqlalchemy import select, text
 from lute.read.render.service import Service as RenderService
 from lute.models.book import Book, BookStats
-from lute.models.repositories import UserSettingRepository
 
 # from lute.utils.debug_helpers import DebugTimer
 
 # Manga texts can contain thousands of lines; the status distribution is
 # derived from a sample, matching how regular books sample a few pages
-# (see _get_sample_texts).
+# (see _get_uniform_sample_texts).
 MANGA_STATS_SAMPLE_LINES = 1000
+
+# For regular (non-manga) books the difficulty estimate is based on a
+# sample spread evenly across the whole book (see _get_uniform_sample_texts).
+SAMPLE_PAGE_COUNT = 15
+
+# Difficulty thresholds for the "New word" percentage.  A book is banded as
+#   * EASY: new_word_percent < NEW_WORD_EASY_PERCENT
+#   * CHAL: NEW_WORD_EASY_PERCENT <= new_word_percent <= NEW_WORD_CHAL_PERCENT
+#   * HARD: new_word_percent > NEW_WORD_CHAL_PERCENT
+# These single source of truth is shared by the book list filtering
+# (lute/book/datatables.py) and the frontend display, so they never drift.
+NEW_WORD_EASY_PERCENT = 10
+NEW_WORD_CHAL_PERCENT = 20
+
+
+def get_difficulty_label(new_word_percent):
+    """
+    Map a book's new-word percentage to its difficulty band.
+
+    Returns a (label, color_class, description) tuple:
+      - label: one of 'EASY' / 'CHAL' / 'HARD'
+      - color_class: the CSS class used to colour the badge
+        ('new-word-easy' / 'new-word-chal' / 'new-word-hard')
+      - description: a human-readable explanation for tooltips.
+
+    A null percentage (book not yet parsed) is treated as EASY.
+    """
+    if new_word_percent is None or new_word_percent < NEW_WORD_EASY_PERCENT:
+        return (
+            "EASY",
+            "new-word-easy",
+            f"Easy: under {NEW_WORD_EASY_PERCENT}% of words are new.",
+        )
+    if new_word_percent <= NEW_WORD_CHAL_PERCENT:
+        return (
+            "CHAL",
+            "new-word-chal",
+            f"Challenging: {NEW_WORD_EASY_PERCENT}-{NEW_WORD_CHAL_PERCENT}% of words are new.",
+        )
+    return (
+        "HARD",
+        "new-word-hard",
+        f"Hard: over {NEW_WORD_CHAL_PERCENT}% of words are new.",
+    )
+
+
+def difficulty_sql_case(column):
+    """
+    Build the SQL CASE fragments that map `column` (a SQL new-word-percent
+    expression) to its difficulty label, CSS colour class and description.
+
+    Used by datatables.py so the book list computes the difficulty columns
+    without duplicating the thresholds.
+    """
+    easy = NEW_WORD_EASY_PERCENT
+    chal = NEW_WORD_CHAL_PERCENT
+    return {
+        "label": f"""
+        CASE
+            WHEN {column} IS NULL OR {column} < {easy} THEN 'EASY'
+            WHEN {column} <= {chal} THEN 'CHAL'
+            ELSE 'HARD'
+        END""",
+        "color": f"""
+        CASE
+            WHEN {column} IS NULL OR {column} < {easy} THEN 'new-word-easy'
+            WHEN {column} <= {chal} THEN 'new-word-chal'
+            ELSE 'new-word-hard'
+        END""",
+        "description": f"""
+        CASE
+            WHEN {column} IS NULL OR {column} < {easy}
+                THEN 'Easy: under {easy}% of words are new.'
+            WHEN {column} <= {chal}
+                THEN 'Challenging: {easy}-{chal}% of words are new.'
+            ELSE 'Hard: over {chal}% of words are new.'
+        END""",
+    }
+
+
+def difficulty_filter_sql(column, level):
+    """
+    Return the SQL WHERE fragment that selects books in the given
+    difficulty band, or None if `level` is not a known band.
+
+    `column` is a SQL new-word-percent expression.
+    """
+    easy = NEW_WORD_EASY_PERCENT
+    chal = NEW_WORD_CHAL_PERCENT
+    level = level.upper()
+    if level == "EASY":
+        return f"({column} IS NULL OR {column} < {easy})"
+    if level == "CHAL":
+        return f"({column} >= {easy} AND {column} <= {chal})"
+    if level == "HARD":
+        return f"({column} > {chal})"
+    return None
 
 
 class Service:
@@ -23,12 +119,27 @@ class Service:
     def __init__(self, session):
         self.session = session
 
-    def _last_n_pages(self, book, txindex, n):
-        "Get next n pages, or at least n pages."
-        start_index = max(0, txindex - n)
-        end_index = txindex + n
-        texts = book.texts[start_index:end_index]
-        return texts[-n:]
+    def _get_uniform_sample_texts(self, book):
+        """
+        Get a representative sample of pages spread evenly across the whole
+        book.
+
+        The total sampled pages is capped at SAMPLE_PAGE_COUNT.  When the
+        book has fewer pages than that, every page is sampled.  Otherwise
+        ~SAMPLE_PAGE_COUNT evenly spaced positions are chosen from the whole
+        book (start, middle and end all get coverage), so the difficulty
+        estimate reflects the entire book rather than only the region around
+        the current reading position.
+        """
+        page_count = len(book.texts)
+        if page_count == 0:
+            return []
+        if page_count <= SAMPLE_PAGE_COUNT:
+            return list(book.texts)
+        # Evenly distribute sample positions across the whole book.
+        step = (page_count - 1) / (SAMPLE_PAGE_COUNT - 1)
+        indexes = sorted({round(step * i) for i in range(SAMPLE_PAGE_COUNT)})
+        return [book.texts[i] for i in indexes]
 
     def _get_manga_text_lines(self, book):
         """
@@ -50,17 +161,7 @@ class Service:
 
     def _get_sample_texts(self, book):
         "Get texts to use as sample."
-        txindex = 0
-        if (book.current_tx_id or 0) != 0:
-            for t in book.texts:
-                if t.id == book.current_tx_id:
-                    break
-                txindex += 1
-
-        repo = UserSettingRepository(self.session)
-        sample_size = int(repo.get_value("stats_calc_sample_size") or 5)
-        texts = self._last_n_pages(book, txindex, sample_size)
-        return texts
+        return self._get_uniform_sample_texts(book)
 
     def calc_status_distribution(self, book):
         """
@@ -85,9 +186,16 @@ class Service:
             textitems = service.get_textitems("\n".join(lines), book.language, mw)
         else:
             texts = self._get_sample_texts(book)
+            # Render the sampled pages in batches: calling get_textitems()
+            # once per page is slow (each call re-parses and re-queries
+            # terms), but a single giant call would be unbounded.  Joining
+            # pages and processing ~500 lines per batch mirrors the manga
+            # handling above for good throughput with bounded memory.
+            lines = [t.text for t in texts if t.text]
             textitems = []
-            for tx in texts:
-                textitems.extend(service.get_textitems(tx.text, book.language, mw))
+            for i in range(0, len(lines), 500):
+                chunk = "\n".join(lines[i : i + 500])
+                textitems.extend(service.get_textitems(chunk, book.language, mw))
         # # Old slower code:
         # text_sample = "\n".join([t.text for t in texts])
         # paras = get_paragraphs(text_sample, book.language) ... etc.

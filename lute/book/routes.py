@@ -25,6 +25,7 @@ from lute.book.service import (
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm, ALLOWED_AUDIO_EXTENSIONS
 from lute.book.stats import Service as StatsService
+from lute.book.stats import get_difficulty_label
 import lute.utils.formutils
 from lute.db import db
 from lute.models.language import Language
@@ -523,23 +524,20 @@ def table_stats(bookid):
         return jsonify({})
     svc = StatsService(db.session)
     stats = svc.get_stats(b)
-    ret = {
-        "distinctterms": stats.distinctterms,
-        "distinctunknowns": stats.distinctunknowns,
-        "unknownpercent": stats.unknownpercent,
-        "new_word_percent": stats.new_word_percent,
-        "status_distribution": stats.status_distribution,
-    }
-    return jsonify(ret)
+    return jsonify(_stats_to_dict(stats))
 
 
 def _stats_to_dict(stats):
     "Convert a BookStats object to the dict shape expected by the frontend."
+    label, color, description = get_difficulty_label(stats.new_word_percent)
     return {
         "distinctterms": stats.distinctterms,
         "distinctunknowns": stats.distinctunknowns,
         "unknownpercent": stats.unknownpercent,
         "new_word_percent": stats.new_word_percent,
+        "difficulty_label": label,
+        "difficulty_color": color,
+        "difficulty_description": description,
         "status_distribution": stats.status_distribution,
     }
 
