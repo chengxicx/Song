@@ -289,10 +289,11 @@ def _render_book_page(book, pagenum, track_page_open=True):
         # initial page render — tokenizing all cues can take 10-20s
         # for long videos.
 
-    # MP3 books stream the uploaded audio through the same useraudio
-    # endpoint as the regular audio player.
+    # Books with an audio file -- mp3-type books and legacy text books
+    # that have an audio file attached -- stream through the useraudio
+    # endpoint and are played by the unified media player.
     mp3_audio_url = None
-    if book_type == "mp3" and book.audio_filename:
+    if book.audio_filename and book_type in ("mp3", ""):
         mp3_audio_url = f"/useraudio/stream/{book.id}"
 
     return render_template(
@@ -318,7 +319,10 @@ def _render_book_page(book, pagenum, track_page_open=True):
         srt_cues=srt_cues,
         srt_cues_json=book.srt_data or "[]",
         srt_words_json="[]",
-        video_current_pos=book.video_current_pos or 0,
+        # For books that previously used the removed legacy audio player
+        # the position was stored in audio_current_pos; fall back to it so
+        # the unified player resumes from the same place.
+        video_current_pos=book.video_current_pos or book.audio_current_pos or 0,
     )
 
 
