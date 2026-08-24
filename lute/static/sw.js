@@ -25,7 +25,6 @@ const STATIC_ASSETS = [
   '/static/vendor/chartjs/chart.umd.js',
   '/static/vendor/chartjs/chartjs-adapter-date-fns.js',
   '/static/js/resize.js',
-  '/static/js/player.js',
   '/static/js/text-options.js',
   '/static/js/tts.js',
   '/static/js/lute-tagify-utils.js',
