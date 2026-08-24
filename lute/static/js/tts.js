@@ -1944,6 +1944,11 @@
     } else {
       document.body.classList.remove("tts-player-active");
     }
+    // ttsContainer is cached by ttsCacheElements() (called from
+    // ttsInitPlayer()), which runs after this in boot().  Look it up
+    // here so the container is hidden on first paint even when the
+    // media player is present.
+    if (!ttsContainer) ttsContainer = document.getElementById("tts-player-container");
     if (ttsContainer) {
       ttsContainer.style.display = initialVisible ? "" : "none";
     }
