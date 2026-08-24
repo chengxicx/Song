@@ -731,8 +731,17 @@
 
   let render_new_word_placeholder = function(data, type, row, meta) {
     if (type === 'display' || type === 'filter') {
-      if (data !== null && data !== undefined && data !== '') {
-        return render_new_word(parseInt(data));
+      // Difficulty band + colour come from the server (data columns
+      // DifficultyLabel / DifficultyColor / DifficultyDescription), so the
+      // thresholds live in one place (lute/book/stats.py).
+      const level = row['DifficultyLabel'];
+      if (level) {
+        return render_new_word(
+          data,
+          level,
+          row['DifficultyColor'],
+          row['DifficultyDescription']
+        );
       }
     }
     return `<span class="new-word-ajax-cell"><span class="skeleton-loading"></span></span>`;
@@ -825,7 +834,12 @@
             }
             if (nodes.newWord) {
               $(nodes.newWord).removeClass("refreshed");
-              const newWordHtml = render_new_word(stats.new_word_percent);
+              const newWordHtml = render_new_word(
+                stats.new_word_percent,
+                stats.difficulty_label,
+                stats.difficulty_color,
+                stats.difficulty_description
+              );
               $(nodes.newWord).html(newWordHtml);
             }
           } catch (e) {
@@ -860,18 +874,12 @@
     });
   };
 
-  let render_new_word = function(percent) {
-    let level = 'EASY';
-    let colorClass = 'new-word-easy';
-    if (percent >= 10 && percent <= 20) {
-      level = 'CHAL';
-      colorClass = 'new-word-chal';
-    } else if (percent > 20) {
-      level = 'HARD';
-      colorClass = 'new-word-hard';
-    }
-    const tip = '🟢EASY≤9% 🟡CHAL=10~20% 🔴HARD>20%';
-    return `<div class="new-word-badge ${colorClass}" data-level="${level}" onclick="setNewWordFilter('${level}')" title="${tip}">${level} ${percent}%</div>`;
+  // The difficulty band, colour and tooltip are supplied by the server
+  // (computed from the shared thresholds in lute/book/stats.py), so the
+  // frontend no longer hardcodes any threshold logic.
+  let render_new_word = function(percent, level, colorClass, tip) {
+    const pct = (percent === null || percent === undefined || percent === '') ? '' : percent + '%';
+    return `<div class="new-word-badge ${colorClass}" data-level="${level}" onclick="setNewWordFilter('${level}')" title="${tip}">${level} ${pct}</div>`;
   };
 
   /* Generate stats graph <div> from statuscounts JSON. */

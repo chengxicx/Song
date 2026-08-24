@@ -3,6 +3,7 @@ Show books in datatables.
 """
 
 from lute.utils.data_tables import DataTablesSqliteQuery, supported_parser_type_criteria
+from lute.book.stats import difficulty_filter_sql, difficulty_sql_case
 
 
 def get_data_tables_list(parameters, is_archived, session):
@@ -42,6 +43,11 @@ def get_data_tables_list(parameters, is_archived, session):
 
     archived = "true" if is_archived else "false"
 
+    # Difficulty is banded from the cached NewWordPercent using the shared
+    # thresholds (see lute/book/stats.py), so it is always in sync with the
+    # frontend badge and the difficulty filter below.
+    difficulty_col = difficulty_sql_case("c.new_word_percent")
+
     base_sql = f"""
     SELECT
         b.BkID As BkID,
@@ -61,6 +67,9 @@ def get_data_tables_list(parameters, is_archived, session):
         c.unknownpercent as UnknownPercent,
         c.new_word_percent as NewWordPercent,
         c.status_distribution as StatusDistribution,
+        {difficulty_col["label"]} AS DifficultyLabel,
+        {difficulty_col["color"]} AS DifficultyColor,
+        {difficulty_col["description"]} AS DifficultyDescription,
         case when completed_books.BkID is null then 0 else 1 end as IsCompleted
 
     FROM books b
@@ -125,12 +134,9 @@ def get_data_tables_list(parameters, is_archived, session):
     new_word_filter = parameters.get("filtNewWord")
     if new_word_filter and new_word_filter.strip():
         level = new_word_filter.strip().upper()
-        if level == 'EASY':
-            base_sql += " and (c.new_word_percent is null or c.new_word_percent < 10)"
-        elif level == 'CHAL':
-            base_sql += " and c.new_word_percent >= 10 and c.new_word_percent <= 20"
-        elif level == 'HARD':
-            base_sql += " and c.new_word_percent > 20"
+        sql_frag = difficulty_filter_sql("c.new_word_percent", level)
+        if sql_frag:
+            base_sql += f" and {sql_frag}"
 
     connection = session.connection()
     return DataTablesSqliteQuery.get_data(base_sql, parameters, connection)
