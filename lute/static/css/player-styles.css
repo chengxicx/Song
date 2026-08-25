@@ -438,9 +438,11 @@
   border-radius: 5px;
   padding: 0.9rem;
   background-color: var(--audio-color-3);
-  width: 100%;
-  margin: 0 auto;
-  margin-bottom: 1.6rem;
+  /* Inset evenly so the player box does not touch the reading-pane
+     divider or the left edge.  calc() keeps the margins from pushing a
+     width:100% box past the pane (overflow). */
+  width: calc(100% - 2rem);
+  margin: 0 1rem 1.6rem;
   min-width: 0;
   box-sizing: border-box;
   z-index: 999;
