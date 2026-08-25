@@ -427,8 +427,10 @@
     };
     set_enable('#navPrev', pagenum > 1);
     set_enable('#navNext', pagenum < maxpage);
-    $('#navSidePrev').toggleClass('hide', !(pagenum > 1));
-    $('#navSideNext').toggleClass('hide', !(pagenum < maxpage));
+    // Side arrows are kept visible for all book types (text, MP3, TTS),
+    // so the previous/next navigation is always available.  Navigation
+    // clamps at the first/last page in goto_relative_page(), so doing
+    // nothing at the boundaries is safe.
   };
 
   // Show/hide footer controls.
@@ -449,16 +451,13 @@
 
 
   let show_hide_title = function(p) {
+    // Always show the title in the reader header (above the progress bar),
+    // matching how book titles appear consistently regardless of book type
+    // or current page.  The large in-content title is no longer shown.
     const t = $('#thetexttitle');
     const h = $('#headertexttitle');
-    if (p == 1) {
-      t.removeClass('hide');
-      h.addClass('hide');
-    }
-    else {
-      t.addClass('hide');
-      h.removeClass('hide');
-    }
+    t.addClass('hide');
+    h.removeClass('hide');
   };
 
   // for the reading page return the main container to full width
