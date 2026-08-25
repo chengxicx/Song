@@ -9,6 +9,7 @@ from lute.stats.service import (
     get_table_data,
     get_reading_streak,
     get_jlpt_data,
+    get_jlpt_words,
 )
 from tests.utils import make_text
 
@@ -170,3 +171,62 @@ def test_jlpt_data_endpoint_requires_lang_id(app_context, client):
     assert resp.status_code == 400
     resp = client.get("/stats/jlpt_data?lang_id=abc")
     assert resp.status_code == 400
+
+
+def test_get_jlpt_words_filters(japanese, app_context):
+    "Drilldown word lists respect the unmastered/mastered/notseen filters."
+    _save_jp_term(japanese, "食べる", 99)   # mastered
+    _save_jp_term(japanese, "水", 3)        # unmastered
+    _save_jp_term(japanese, "任意存在しない単語", 99)  # not in list
+
+    unmastered = get_jlpt_words(db.session, japanese.id, "N5", "unmastered")
+    mastered = get_jlpt_words(db.session, japanese.id, "N5", "mastered")
+    notseen = get_jlpt_words(db.session, japanese.id, "N5", "notseen")
+    all_words = get_jlpt_words(db.session, japanese.id, "N5", "all")
+
+    assert [w["word"] for w in unmastered] == ["水"]
+    assert unmastered[0]["status_text"] == "Learning (3)"
+
+    assert [w["word"] for w in mastered] == ["食べる"]
+    assert mastered[0]["status_text"] == "Well Known"
+
+    notseen_words = [w["word"] for w in notseen]
+    assert "あさって" in notseen_words
+    assert "食べる" not in notseen_words
+    assert all(w["id"] is None for w in notseen)
+
+    all_map = {w["word"]: w for w in all_words}
+    assert set(all_map.keys()) == {"食べる", "水"} | set(notseen_words)
+
+
+def test_jlpt_words_endpoint(japanese, app_context, client):
+    "The /stats/jlpt_words endpoint returns paged words."
+    _save_jp_term(japanese, "水", 3)
+    resp = client.get(f"/stats/jlpt_words?lang_id={japanese.id}&level=N5&filter=unmastered&page=1")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] >= 1
+    assert any(w["word"] == "水" for w in data["words"])
+
+    resp = client.get(f"/stats/jlpt_words?lang_id={japanese.id}&level=N5&filter=bogus")
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/jlpt_words?lang_id={japanese.id}&level=all")
+    assert resp.status_code == 400
+
+
+def test_jlpt_export_endpoint(japanese, app_context, client):
+    "The /stats/jlpt_export endpoint returns CSV content."
+    _save_jp_term(japanese, "食べる", 99)
+    resp = client.get(f"/stats/jlpt_export?lang_id={japanese.id}&level=N5&filter=mastered")
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/csv"
+    body = resp.get_data(as_text=True)
+    lines = body.strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("食べる" in ln for ln in lines[1:])
+
+    resp = client.get(f"/stats/jlpt_export?lang_id={japanese.id}&level=all&filter=all")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "N5," in body
+    assert "N1," in body

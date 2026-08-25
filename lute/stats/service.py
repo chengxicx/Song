@@ -330,6 +330,71 @@ def get_jlpt_data(session, lang_id):
     }
 
 
+def _status_texts(session):
+    "Map of status id to the official status text used across Lute."
+    rows = session.execute(text("select StID, StText from statuses")).all()
+    return {r[0]: r[1] for r in rows}
+
+
+def get_jlpt_words(session, lang_id, level, word_filter):
+    """
+    All words for a JLPT level and filter, sorted by word.
+
+    word_filter: "unmastered" (status 1-5), "mastered" (status 99),
+    or "notseen" (in the OpenJLPT list but never learned in Lute).
+    """
+    from lute.stats.jlpt_data import level_words, jlpt_level
+
+    sql = """
+        select WoID, WoText, WoRomanization, WoTranslation, WoStatus
+        from words
+        where WoLgID = :lid
+          and WoStatus in (1,2,3,4,5,99)
+    """
+    rows = session.execute(text(sql), {"lid": lang_id}).all()
+    status_names = _status_texts(session)
+
+    db_by_word = {}
+    for wid, wtext, roman, trans, status in rows:
+        key = _normalize_jp(wtext)
+        if jlpt_level(key) != level:
+            continue
+        db_by_word[key] = {
+            "id": wid,
+            "word": wtext,
+            "reading": roman or "",
+            "meaning": trans or "",
+            "status": status,
+            "status_text": status_names.get(status, str(status)),
+        }
+
+    seen_words = set(db_by_word.keys())
+    notseen = [
+        {
+            "id": None,
+            "word": entry.get("word") or "",
+            "reading": entry.get("reading") or "",
+            "meaning": "; ".join(entry.get("meanings") or []),
+            "status": None,
+            "status_text": None,
+        }
+        for entry in level_words(level)
+        if _normalize_jp(entry.get("word") or "") not in seen_words
+    ]
+
+    if word_filter == "mastered":
+        words = [w for w in db_by_word.values() if w["status"] == 99]
+    elif word_filter == "unmastered":
+        words = [w for w in db_by_word.values() if w["status"] != 99]
+    elif word_filter == "all":
+        words = list(db_by_word.values()) + notseen
+    else:  # notseen: in the word list but never learned in Lute
+        words = notseen
+
+    words.sort(key=lambda w: w["word"])
+    return words
+
+
 def get_last_read_language_id(session):
     "Language ID of the most recently read book, or None."
     sql = (
