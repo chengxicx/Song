@@ -111,13 +111,6 @@
     ...
   </div>
 
-  <div id="navSidePrev" class="side-page-nav hide" onclick="goto_relative_page(-1)" title="Go to previous page">
-    <svg viewBox="0 0 30 30" width="30" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>
-  </div>
-  <div id="navSideNext" class="side-page-nav hide" onclick="handle_page_done(false, 1)" title="Mark page as read, then go to next page">
-    <svg viewBox="0 0 30 30" width="30" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
-  </div>
-
   {# Hidden HTMX swap target for term-popup prefetch (see lute.js
      tooltip_textitem_hover_content).  HTMX swaps the fetched popup HTML
      here so it can be cached and reused without further requests. #}
@@ -207,6 +200,13 @@
   </div>
 </div>
 
+</div>
+
+<div id="navSidePrev" class="side-page-nav hide" onclick="goto_relative_page(-1)" title="Go to previous page">
+  <svg viewBox="0 0 30 30" width="30" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>
+</div>
+<div id="navSideNext" class="side-page-nav hide" onclick="handle_page_done(false, 1)" title="Mark page as read, then go to next page">
+  <svg viewBox="0 0 30 30" width="30" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
 </div>
 
 <script>
@@ -370,8 +370,12 @@
     createLookupButtons();
     $(document).click(_close_slide_in_menu_on_click_away);
 
-    if (window.matchMedia("(hover: hover)").matches)
+    if (window.matchMedia("(hover: hover)").matches) {
       $(".hamburger-btn").on("mouseenter", openMenu);
+      $(".hamburger-btn").on("mouseleave", _schedule_hover_menu_close);
+      $("#reading_menu").on("mouseenter", function() { clearTimeout(_menuHoverCloseTimer); });
+      $("#reading_menu").on("mouseleave", _schedule_hover_menu_close);
+    }
 
     window.addEventListener("message", _lute_form_event_handler);
 
@@ -560,22 +564,41 @@
     }
   });
 
-  let _menuHoverOpenedAt = 0;
+  let _menuOpenedByHover = false;
+  let _menuHoverCloseTimer = null;
 
   function openMenu() {
-    $("#reading_menu").addClass("open-menu");
-    _menuHoverOpenedAt = Date.now();
+    clearTimeout(_menuHoverCloseTimer);
+    if (!$("#reading_menu").hasClass("open-menu")) {
+      $("#reading_menu").addClass("open-menu");
+      _menuOpenedByHover = true;
+    }
   }
 
   function closeMenu() {
+    clearTimeout(_menuHoverCloseTimer);
+    _menuOpenedByHover = false;
     $(".reading-menu-sublist.active").removeClass("active");
     $("#reading_menu").removeClass("open-menu");
   }
 
+  function _schedule_hover_menu_close() {
+    if (!_menuOpenedByHover) return;
+    clearTimeout(_menuHoverCloseTimer);
+    _menuHoverCloseTimer = setTimeout(closeMenu, 300);
+  }
+
   function toggleMenu() {
-    if ($("#reading_menu").hasClass("open-menu") && Date.now() - _menuHoverOpenedAt < 500)
+    clearTimeout(_menuHoverCloseTimer);
+    if ($("#reading_menu").hasClass("open-menu")) {
+      if (_menuOpenedByHover)
+        _menuOpenedByHover = false;
+      else
+        closeMenu();
       return;
-    $("#reading_menu").toggleClass("open-menu");
+    }
+    _menuOpenedByHover = false;
+    $("#reading_menu").addClass("open-menu");
   }
 
   function closeRightPane() {
