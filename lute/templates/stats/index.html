@@ -34,6 +34,54 @@
     padding: 5px 8px; border-radius: 4px; border: 1px solid #ced4da; font-size: 13px;
   }
 
+  /* JLPT progress panel */
+  .jlpt-btn { margin-left: 10px; cursor: pointer; background: #fff; font-weight: 600; }
+  .jlpt-btn:hover { background: #f1f3f5; }
+  .jlpt-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+  .jlpt-sub { font-size: 12px; color: #6c757d; }
+  .jlpt-section {
+    font-size: 12px; color: #6c757d; font-weight: bold;
+    margin: 14px 0 10px 0; text-transform: uppercase; letter-spacing: .03em;
+  }
+  .jlpt-macro { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .jlpt-macro-card {
+    background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px;
+  }
+  .jlpt-macro-label {
+    font-size: 12px; color: #6c757d; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  .jlpt-macro-hero {
+    font-size: 40px; line-height: 1.1; font-weight: 600; color: #228be6;
+    margin: 6px 0; font-variant-numeric: tabular-nums;
+  }
+  .jlpt-macro-detail { font-size: 12px; color: #6c757d; }
+  .jlpt-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .jlpt-badge {
+    width: 44px; flex: 0 0 44px; text-align: center; font-weight: 600; font-size: 12px;
+    color: #fff; border-radius: 999px; padding: 4px 0;
+  }
+  .jlpt-track {
+    position: relative; flex: 1; height: 14px; border-radius: 999px;
+    background: #e9ecef; overflow: visible; cursor: help;
+  }
+  .jlpt-fill { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 999px; opacity: .38; }
+  .jlpt-done { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 999px; }
+  .jlpt-tip {
+    display: none; position: absolute; bottom: calc(100% + 8px); left: 0;
+    background: #fff; border: 1px solid #dee2e6; border-radius: 6px;
+    padding: 8px 12px; font-size: 12px; color: #343a40;
+    box-shadow: 0 2px 6px rgba(0,0,0,.1); white-space: nowrap; z-index: 5;
+  }
+  .jlpt-tip div { line-height: 1.5; }
+  .jlpt-tip div span { font-variant-numeric: tabular-nums; color: #495057; margin-left: 10px; float: right; }
+  .jlpt-track:hover .jlpt-tip { display: block; }
+  .jlpt-track::after { content: "hover"; position: absolute; right: 0; top: calc(100% + 4px); font-size: 11px; color: #adb5bd; }
+  .jlpt-nums { flex: 0 0 96px; text-align: right; font-size: 13px; color: #343a40; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .jlpt-nums em { font-style: normal; color: #6c757d; }
+  .jlpt-foot { font-size: 12px; color: #6c757d; margin-top: 8px; border-top: 1px solid #e9ecef; padding-top: 8px; }
+  .jlpt-loading { color: #adb5bd; font-style: italic; font-size: 13px; padding: 20px 0; text-align: center; }
+
   .term-charts-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -223,9 +271,39 @@
     <select id="ov-lang" class="ov-lang-select">
       <option value="all">All languages</option>
       {% for lang in term_languages %}
-      <option value="{{ lang.id }}" {% if lang.id == default_lang_id %}selected{% endif %}>{{ lang.name }} ({{ lang.count }})</option>
+      <option value="{{ lang.id }}" {% if lang.id == default_lang_id %}selected{% endif %} data-jp="{{ '1' if lang.is_japanese else '0' }}">{{ lang.name }} ({{ lang.count }})</option>
       {% endfor %}
     </select>
+    <button type="button" id="jlpt-btn" class="ov-lang-select jlpt-btn" style="display:none;">JLPT</button>
+  </div>
+</div>
+
+<!-- JLPT progress report (inline expandable panel) -->
+<div id="jlpt-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">JLPT Progress</h3>
+      <span class="jlpt-sub">Japanese · data: OpenJLPT</span>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="jlpt-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="jlpt-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="jlpt-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="jlpt-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By level</h4>
+    <div id="jlpt-levels"></div>
+
+    <div class="jlpt-foot">Dark = Mastered (status 99), light = Seen (status 1–5), empty = unseen.</div>
   </div>
 </div>
 
@@ -346,8 +424,84 @@
 
   document.getElementById('ov-lang').addEventListener('change', function(e) {
     currentLang = e.target.value;
+    updateJpButton();
     loadTermData();
   });
+
+  // --- JLPT progress panel ---
+  const JLPT_COLORS = { N5: '#1dc981', N4: '#22a5f7', N3: '#f2b705', N2: '#f87454', N1: '#e8463a' };
+  const jlptBtn = document.getElementById('jlpt-btn');
+  const jlptPanel = document.getElementById('jlpt-panel');
+
+  function updateJpButton() {
+    const sel = document.getElementById('ov-lang');
+    const opt = sel.options[sel.selectedIndex];
+    const isJp = opt && opt.dataset.jp === '1';
+    jlptBtn.style.display = isJp ? '' : 'none';
+    if (!isJp) { jlptPanel.style.display = 'none'; }
+  }
+
+  jlptBtn.addEventListener('click', function() {
+    const open = jlptPanel.style.display !== 'none';
+    jlptPanel.style.display = open ? 'none' : '';
+    if (!open && currentLang !== 'all') { loadJlpt(); }
+  });
+
+  function loadJlpt() {
+    document.getElementById('jlpt-levels').innerHTML =
+      '<div class="jlpt-loading">Loading...</div>';
+    fetch('/stats/jlpt_data?lang_id=' + currentLang)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.error) { throw new Error(data.error); }
+        renderJlpt(data);
+      })
+      .catch(function(err) {
+        document.getElementById('jlpt-levels').innerHTML =
+          '<div class="jlpt-loading">Failed to load data.</div>';
+        console.error('Failed to load JLPT data:', err);
+      });
+  }
+
+  function pct(part, total) {
+    if (!total) return 0;
+    return Math.round((part / total) * 1000) / 10;
+  }
+
+  function renderJlpt(data) {
+    const total = data.total || 0;
+    const masteredPct = pct(data.total_mastered, total);
+    const seenPct = pct(data.total_seen, total);
+    document.getElementById('jlpt-mastered-pct').textContent = masteredPct + '%';
+    document.getElementById('jlpt-mastered-detail').textContent =
+      data.total_mastered.toLocaleString() + ' / ' + total.toLocaleString();
+    document.getElementById('jlpt-seen-pct').textContent = seenPct + '%';
+    document.getElementById('jlpt-seen-detail').textContent =
+      data.total_seen.toLocaleString() + ' / ' + total.toLocaleString();
+
+    let h = '';
+    (data.levels || []).forEach(function(lv) {
+      const color = JLPT_COLORS[lv.level] || '#228be6';
+      const seenW = lv.total ? (lv.seen / lv.total * 100) : 0;
+      const doneW = lv.total ? (lv.mastered / lv.total * 100) : 0;
+      h +=
+        '<div class="jlpt-row">' +
+          '<span class="jlpt-badge" style="background:' + color + '">' + lv.level + '</span>' +
+          '<div class="jlpt-track">' +
+            '<div class="jlpt-tip">' +
+              '<div>Mastered <span>' + pct(lv.mastered, lv.total) + '%</span></div>' +
+              '<div>Seen <span>' + pct(lv.seen, lv.total) + '%</span></div>' +
+            '</div>' +
+            '<div class="jlpt-fill" style="width:' + seenW + '%;background:' + color + '"></div>' +
+            '<div class="jlpt-done" style="width:' + doneW + '%;background:' + color + '"></div>' +
+          '</div>' +
+          '<div class="jlpt-nums">' + lv.seen.toLocaleString() + ' <em>/ ' + lv.total.toLocaleString() + '</em></div>' +
+        '</div>';
+    });
+    document.getElementById('jlpt-levels').innerHTML = h;
+  }
+
+  updateJpButton();
 
   function loadTermData() {
     fetch('/stats/term_data?period=' + currentPeriod + '&lang_id=' + currentLang)
