@@ -203,10 +203,10 @@
 </div>
 
 <div id="navSidePrev" class="side-page-nav hide" onclick="goto_relative_page(-1)" title="Go to previous page">
-  <svg viewBox="0 0 30 30" width="30" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>
+  <svg viewBox="7.5 3.5 15 25" width="18" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>
 </div>
 <div id="navSideNext" class="side-page-nav hide" onclick="handle_page_done(false, 1)" title="Mark page as read, then go to next page">
-  <svg viewBox="0 0 30 30" width="30" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
+  <svg viewBox="7.5 3.5 15 25" width="18" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
 </div>
 
 <script>
@@ -222,6 +222,15 @@
   const readPaneContainer = document.getElementById("read_pane_container");
   const btmMarginCont = document.querySelector(".btm-margin-container");
   const theText = document.getElementById("thetext");
+  const navSidePrev = document.getElementById("navSidePrev");
+  const navSideNext = document.getElementById("navSideNext");
+
+  function _layout_side_nav() {
+    if (!navSidePrev || !navSideNext) return;
+    const r = readPaneLeft.getBoundingClientRect();
+    navSidePrev.style.left = `${Math.round(r.left + 8)}px`;
+    navSideNext.style.left = `${Math.round(r.right - navSideNext.offsetWidth - 8)}px`;
+  }
 
   // Fixes a dev-only "bug" where the right pane doesn't translate up
   // to zero, due to the inline transform property, if it's first
@@ -376,6 +385,15 @@
       $("#reading_menu").on("mouseenter", function() { clearTimeout(_menuHoverCloseTimer); });
       $("#reading_menu").on("mouseleave", _schedule_hover_menu_close);
     }
+
+    if ("ResizeObserver" in window)
+      new ResizeObserver(_layout_side_nav).observe(readPaneLeft);
+    window.addEventListener("resize", _layout_side_nav);
+    new MutationObserver(_layout_side_nav).observe(readPaneContainer, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+    _layout_side_nav();
 
     window.addEventListener("message", _lute_form_event_handler);
 
