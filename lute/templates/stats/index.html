@@ -95,18 +95,23 @@
   .jlpt-tab.on { background: #228be6; border-color: #228be6; color: #fff; font-weight: 600; }
   .jlpt-export-cur { font-size: 12px; font-weight: 600; padding: 4px 12px; border: 1px solid #228be6; border-radius: 6px; background: transparent; color: #228be6; cursor: pointer; }
   .jlpt-export-cur:hover { background: var(--chart-grid-color, rgba(34,139,230,.08)); }
-  .jlpt-w-head, .jlpt-w-row { display: grid; grid-template-columns: 120px 110px 1fr 110px 46px; gap: 12px; align-items: center; }
-  .jlpt-w-head { padding: 0 8px 8px 8px; border-bottom: 1px solid var(--chart-grid-color, #dee2e6); font-size: 12px; font-weight: 600; color: var(--chart-tick-color, #6c757d); }
-  .jlpt-w-row { padding: 7px 8px; border-bottom: 1px solid var(--chart-grid-color, #e9ecef); }
-  .jlpt-w-row:hover { background: var(--chart-grid-color, rgba(0,0,0,.03)); }
-  .jlpt-w-word { font-size: 13px; font-weight: 600; color: var(--chart-tick-major-color, #343a40); }
-  .jlpt-w-read { font-size: 12px; color: var(--chart-tick-color, #6c757d); }
-  .jlpt-w-mean { font-size: 12px; color: var(--chart-tick-color, #6c757d); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .jlpt-w-st { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--chart-tick-major-color, #343a40); }
-  .jlpt-w-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: 0 0 10px; }
-  .jlpt-w-edit { font-size: 12px; font-weight: 600; color: #228be6; text-decoration: none; text-align: right; }
-  .jlpt-w-edit:hover { text-decoration: underline; }
-  .jlpt-w-none { color: var(--chart-tick-color, #adb5bd); font-size: 12px; }
+  .jlpt-w-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 5px; }
+  .jlpt-w-cell {
+    position: relative; padding: 5px 6px; border-radius: 6px; text-align: center; cursor: default;
+    font-size: 13px; font-weight: 600; color: var(--chart-tick-major-color, #343a40);
+    background: var(--chart-card-bg, #fff); border: 1px solid var(--chart-grid-color, #dee2e6);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .jlpt-w-cell.ns { color: var(--chart-tick-color, #868e96); font-weight: 400; background: transparent; border-style: dashed; }
+  .jlpt-w-cell:hover { border-color: #228be6; overflow: visible; z-index: 3; }
+  .jlpt-w-cell .jlpt-tip {
+    display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: var(--chart-card-bg, #fff); border: 1px solid var(--chart-grid-color, #dee2e6); border-radius: 6px;
+    padding: 6px 10px; font-size: 12px; font-weight: 400; color: var(--chart-tick-major-color, #343a40);
+    box-shadow: 0 2px 6px rgba(0,0,0,.15); white-space: normal; max-width: 260px; text-align: left; z-index: 5;
+  }
+  .jlpt-w-cell .jlpt-tip div { line-height: 1.5; }
+  .jlpt-w-cell:hover .jlpt-tip { display: block; }
   .jlpt-pager { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
   .jlpt-pg-btn { font-size: 12px; padding: 4px 12px; border: 1px solid var(--chart-grid-color, #ced4da); border-radius: 6px; background: transparent; color: var(--chart-tick-major-color, #343a40); cursor: pointer; }
   .jlpt-pg-btn:disabled { opacity: .4; cursor: default; }
@@ -336,7 +341,7 @@
     <h4 class="jlpt-section">By level</h4>
     <div id="jlpt-levels"></div>
 
-    <div class="jlpt-foot">Dark = Mastered (status 99), light = Seen (status 1–5), empty = unseen.</div>
+    <div class="jlpt-foot">Hover a word for reading and meaning · Dashed cells = Not seen (from the OpenJLPT list) · Click a level bar to drill down.</div>
   </div>
 </div>
 
@@ -471,7 +476,13 @@
     const opt = sel.options[sel.selectedIndex];
     const isJp = opt && opt.dataset.jp === '1';
     jlptBtn.style.display = isJp ? '' : 'none';
-    if (!isJp) { jlptPanel.style.display = 'none'; }
+    if (!isJp) {
+      jlptPanel.style.display = 'none';
+      closeDrilldown();
+    } else if (jlptPanel.style.display === 'none' || !jlptData) {
+      jlptPanel.style.display = '';
+      loadJlpt();
+    }
   }
 
   jlptBtn.addEventListener('click', function() {
@@ -539,7 +550,6 @@
   }
 
   // --- JLPT drilldown ---
-  const JLPT_ST_COLORS = { 1: '#e8463a', 2: '#f87454', 3: '#f2b705', 4: '#8fce5a', 5: '#1dc981', 99: '#228be6' };
   const JLPT_TABS = ['unmastered', 'notseen', 'mastered'];
   let jlptData = null;
   let ddState = null; // { level, filter, page, total }
@@ -584,8 +594,7 @@
         '</div>' +
         '<button type="button" class="jlpt-export-cur">Export CSV</button>' +
       '</div>' +
-      '<div class="jlpt-w-head"><span>Word</span><span>Reading</span><span>Meaning</span><span>Status</span><span></span></div>' +
-      '<div class="jlpt-w-list"><div class="jlpt-loading">Loading...</div></div>' +
+      '<div class="jlpt-w-list jlpt-w-grid"><div class="jlpt-loading">Loading...</div></div>' +
       '<div class="jlpt-pager">' +
         '<button type="button" class="jlpt-pg-btn" data-pg="prev">← Prev</button>' +
         '<button type="button" class="jlpt-pg-btn" data-pg="next">Next →</button>' +
@@ -607,18 +616,20 @@
     dd.querySelector('.jlpt-pager').addEventListener('click', function(e) {
       const b = e.target.closest('[data-pg]');
       if (!b) return;
-      const pages = Math.max(1, Math.ceil(ddState.total / 20));
+      const pages = Math.max(1, Math.ceil(ddState.total / JLPT_PER_PAGE));
       if (b.dataset.pg === 'prev' && ddState.page > 1) { ddState.page--; loadDrillWords(); }
       if (b.dataset.pg === 'next' && ddState.page < pages) { ddState.page++; loadDrillWords(); }
     });
     loadDrillWords();
   }
 
+  const JLPT_PER_PAGE = 60;
+
   function loadDrillWords() {
     const dd = document.getElementById('jlpt-dd');
     const listEl = dd.querySelector('.jlpt-w-list');
     listEl.innerHTML = '<div class="jlpt-loading">Loading...</div>';
-    fetch('/stats/jlpt_words?lang_id=' + currentLang + '&level=' + ddState.level + '&filter=' + ddState.filter + '&page=' + ddState.page)
+    fetch('/stats/jlpt_words?lang_id=' + currentLang + '&level=' + ddState.level + '&filter=' + ddState.filter + '&page=' + ddState.page + '&per_page=' + JLPT_PER_PAGE)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data.error) { throw new Error(data.error); }
@@ -635,22 +646,13 @@
     const pages = Math.max(1, Math.ceil(data.total / data.per_page));
     let h = '';
     (data.words || []).forEach(function(w) {
-      let stCell, editCell;
-      if (w.status === null) {
-        stCell = '<span class="jlpt-w-none">—</span>';
-        editCell = '<span class="jlpt-w-none"></span>';
-      } else {
-        const c = JLPT_ST_COLORS[w.status] || '#adb5bd';
-        stCell = '<span class="jlpt-w-st"><span class="jlpt-w-dot" style="background:' + c + '"></span>' + w.status_text + '</span>';
-        editCell = '<a class="jlpt-w-edit" href="/term/edit/' + w.id + '">Edit</a>';
-      }
-      h +=
-        '<div class="jlpt-w-row">' +
-          '<span class="jlpt-w-word">' + escapeHtml(w.word) + '</span>' +
-          '<span class="jlpt-w-read">' + escapeHtml(w.reading) + '</span>' +
-          '<span class="jlpt-w-mean">' + escapeHtml(w.meaning) + '</span>' +
-          stCell + editCell +
-        '</div>';
+      const ns = w.status === null ? ' ns' : '';
+      let tip = '';
+      if (w.reading) { tip += '<div>' + escapeHtml(w.reading) + '</div>'; }
+      if (w.meaning) { tip += '<div>' + escapeHtml(w.meaning) + '</div>'; }
+      h += '<div class="jlpt-w-cell' + ns + '">' + escapeHtml(w.word) +
+           (tip ? '<div class="jlpt-tip">' + tip + '</div>' : '') +
+           '</div>';
     });
     if (!data.words || !data.words.length) {
       h = '<div class="jlpt-loading">No words.</div>';
