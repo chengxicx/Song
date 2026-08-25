@@ -12,8 +12,8 @@ from lute.stats.service import (
     get_heatmap_data,
     get_term_languages,
     get_term_summary,
-    get_jlpt_data,
 )
+from lute.stats.service import get_jlpt_data as _get_jlpt_data
 from lute.db import db
 import lute.utils.formutils
 
@@ -78,5 +78,5 @@ def get_jlpt_data():
     except (TypeError, ValueError):
         return jsonify({"error": "lang_id required"}), 400
 
-    data = get_jlpt_data(db.session, lang_id)
+    data = _get_jlpt_data(db.session, lang_id)
     return jsonify(data)
