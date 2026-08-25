@@ -1024,7 +1024,7 @@ div#reading-footer span {
 #thetexttitle,
 div#thetext {
     box-sizing: border-box;
-    padding: 0 3.4rem;
+    padding: 0 3.4rem 1.5rem;
     width: 100%;
     /* Fill the remaining space below the header/player.  Text content is
        re-flowed into screen groups so it never scrolls here; only the
@@ -2528,8 +2528,7 @@ input[name='status']:disabled + label {
 
     #thetexttitle,
     div#thetext {
-        padding: 0 1rem;
-        padding: 0 1rem;
+        padding: 0 1rem 1rem;
     }
 
     div#reading-footer span {
