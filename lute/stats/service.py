@@ -253,6 +253,8 @@ def get_term_languages(session):
             "name": r[1],
             "count": int(r[3]),
             "is_japanese": r[2] in _JAPANESE_PARSERS,
+            "is_korean": r[2] == "korean",
+            "is_english": str(r[1] or "").strip().lower() == "english",
         }
         for r in rows
     ]
@@ -393,6 +395,172 @@ def get_jlpt_words(session, lang_id, level, word_filter):
 
     words.sort(key=lambda w: w["word"])
     return words
+
+
+# ---------------------------------------------------------------------------
+# CEFR (English) and TOPIK (Korean) progress reports.
+#
+# These mirror the JLPT report but are driven by a per-language level
+# matcher so the same count/word/filter logic is reused for all three.
+# ---------------------------------------------------------------------------
+
+def _level_progress(session, lang_id, levels, level_fn, totals):
+    "Attribute seen/mastered term counts to the given levels."
+    sql = """
+        select WoText, WoStatus
+        from words
+        where WoLgID = :lid
+          and WoStatus in (1,2,3,4,5,98,99)
+    """
+    rows = session.execute(text(sql), {"lid": lang_id}).all()
+
+    seen_counts = {level: 0 for level in levels}
+    mastered_counts = {level: 0 for level in levels}
+    total_seen = 0
+    total_mastered = 0
+
+    for word_text, status in rows:
+        if not (word_text or "").strip():
+            continue
+        level = level_fn(word_text)
+        if level is None:
+            continue
+        if status == 99:
+            mastered_counts[level] += 1
+            total_mastered += 1
+        if status in _SEEN_STATUSES:
+            seen_counts[level] += 1
+            total_seen += 1
+
+    levels_out = [
+        {
+            "level": level,
+            "total": totals[level],
+            "seen": seen_counts[level],
+            "mastered": mastered_counts[level],
+        }
+        for level in levels
+    ]
+    return {
+        "levels": levels_out,
+        "total": sum(totals.values()),
+        "total_seen": total_seen,
+        "total_mastered": total_mastered,
+    }
+
+
+def get_cefr_data(session, lang_id):
+    "CEFR (A1-C2) progress for the given English language."
+    from lute.stats.cefr_data import LEVELS, cefr_level, level_totals
+    return _level_progress(session, lang_id, LEVELS, cefr_level, level_totals())
+
+
+def get_topik_data(session, lang_id):
+    "TOPIK (A/B/C) progress for the given Korean language."
+    from lute.stats.topik_data import LEVELS, topik_level, level_totals
+    return _level_progress(session, lang_id, LEVELS, topik_level, level_totals())
+
+
+def _level_words(session, lang_id, level, word_filter, norm, level_fn, level_words, headwords_fn=None):
+    """
+    Words for one level and filter (shared by CEFR/TOPIK drilldowns).
+
+    word_filter: "unmastered", "mastered", "notseen" (in the word list but
+    never learned), or "all".  When a term's stored form only matches a
+    headword via morphological expansion (e.g. English), headwords_fn maps a
+    stored term to the headwords it represents so "notseen" stays accurate.
+    """
+    sql = """
+        select WoID, WoText, WoRomanization, WoTranslation, WoStatus
+        from words
+        where WoLgID = :lid
+          and WoStatus in (1,2,3,4,5,99)
+    """
+    rows = session.execute(text(sql), {"lid": lang_id}).all()
+    status_names = _status_texts(session)
+
+    db_by_word = {}
+    known_headwords = set()
+    for wid, wtext, roman, trans, status in rows:
+        key = norm(wtext)
+        if not key or level_fn(key) != level:
+            continue
+        db_by_word[key] = {
+            "id": wid,
+            "word": wtext,
+            "reading": roman or "",
+            "meaning": trans or "",
+            "status": status,
+            "status_text": status_names.get(status, str(status)),
+        }
+        if headwords_fn is not None:
+            known_headwords |= headwords_fn(key)
+
+    seen_words = set(db_by_word.keys())
+    notseen = []
+    for entry in level_words(level):
+        ek = norm(entry.get("word") or "")
+        if not ek or ek in seen_words:
+            continue
+        if headwords_fn is not None and ek in known_headwords:
+            continue
+        notseen.append(
+            {
+                "id": None,
+                "word": entry.get("word") or "",
+                "reading": entry.get("reading") or "",
+                "meaning": "; ".join(entry.get("meanings") or []),
+                "status": None,
+                "status_text": None,
+            }
+        )
+
+    if word_filter == "mastered":
+        words = [w for w in db_by_word.values() if w["status"] == 99]
+    elif word_filter == "unmastered":
+        words = [w for w in db_by_word.values() if w["status"] != 99]
+    elif word_filter == "all":
+        words = list(db_by_word.values()) + notseen
+    else:  # notseen: in the word list but never learned in Lute
+        words = notseen
+
+    words.sort(key=lambda w: w["word"])
+    return words
+
+
+def _norm_en(word):
+    "Normalize an English term for matching."
+    return (word or "").strip().lower()
+
+
+def _cefr_headwords(word):
+    "CEFR headwords a stored English term expands to (for 'not seen')."
+    from lute.stats.cefr_data import base_forms_for
+    return base_forms_for(word)
+
+
+def get_cefr_words(session, lang_id, level, word_filter):
+    "All words for a CEFR level and filter."
+    from lute.stats.cefr_data import level_words, cefr_level
+    return _level_words(
+        session, lang_id, level, word_filter,
+        _norm_en, cefr_level, level_words, _cefr_headwords,
+    )
+
+
+def get_topik_words(session, lang_id, level, word_filter):
+    "All words for a TOPIK level and filter."
+    from lute.stats.topik_data import level_words, topik_level
+    return _level_words(
+        session, lang_id, level, word_filter,
+        _norm_ko, topik_level, level_words,
+    )
+
+
+def _norm_ko(word):
+    "Normalize a Korean term for matching."
+    from lute.stats.topik_data import _normalize_ko
+    return _normalize_ko(word)
 
 
 def get_last_read_language_id(session):

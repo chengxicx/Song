@@ -1,0 +1,6106 @@
+[
+  {
+    "word": "가게",
+    "reading": "",
+    "meanings": [
+      "에 가다"
+    ]
+  },
+  {
+    "word": "가깝다",
+    "reading": "",
+    "meanings": [
+      "거리가"
+    ]
+  },
+  {
+    "word": "가끔",
+    "reading": "",
+    "meanings": [
+      "가끔 보다"
+    ]
+  },
+  {
+    "word": "가다01",
+    "reading": "",
+    "meanings": [
+      "학교에"
+    ]
+  },
+  {
+    "word": "가르치다01",
+    "reading": "",
+    "meanings": [
+      "한국어를"
+    ]
+  },
+  {
+    "word": "가방01",
+    "reading": "",
+    "meanings": [
+      "~을 메다"
+    ]
+  },
+  {
+    "word": "가볍다",
+    "reading": "",
+    "meanings": [
+      "짐이"
+    ]
+  },
+  {
+    "word": "가수11",
+    "reading": "歌手",
+    "meanings": [
+      "직업"
+    ]
+  },
+  {
+    "word": "가슴01",
+    "reading": "",
+    "meanings": [
+      "신체"
+    ]
+  },
+  {
+    "word": "가운데",
+    "reading": "",
+    "meanings": [
+      "가운데 자리"
+    ]
+  },
+  {
+    "word": "가을01",
+    "reading": "",
+    "meanings": [
+      "계절"
+    ]
+  },
+  {
+    "word": "가장01",
+    "reading": "",
+    "meanings": [
+      "가장 빠르다"
+    ]
+  },
+  {
+    "word": "가져오다",
+    "reading": "",
+    "meanings": [
+      "학교로"
+    ]
+  },
+  {
+    "word": "가족01",
+    "reading": "家族",
+    "meanings": [
+      "식구"
+    ]
+  },
+  {
+    "word": "가지다",
+    "reading": "",
+    "meanings": [
+      "돈을"
+    ]
+  },
+  {
+    "word": "간호사",
+    "reading": "看護師",
+    "meanings": [
+      "로 일하다"
+    ]
+  },
+  {
+    "word": "갈비01",
+    "reading": "",
+    "meanings": [
+      "를 먹다"
+    ]
+  },
+  {
+    "word": "감기04",
+    "reading": "感氣",
+    "meanings": [
+      "에 걸리다"
+    ]
+  },
+  {
+    "word": "감사08",
+    "reading": "感謝",
+    "meanings": [
+      "감사 인사"
+    ]
+  },
+  {
+    "word": "감사하다05",
+    "reading": "感謝-",
+    "meanings": []
+  },
+  {
+    "word": "갑자기",
+    "reading": "",
+    "meanings": [
+      "갑자기 나타나다"
+    ]
+  },
+  {
+    "word": "값",
+    "reading": "",
+    "meanings": [
+      "을 깎다"
+    ]
+  },
+  {
+    "word": "강01",
+    "reading": "江",
+    "meanings": [
+      "을 건너다"
+    ]
+  },
+  {
+    "word": "같다",
+    "reading": "",
+    "meanings": [
+      "서로 같다"
+    ]
+  },
+  {
+    "word": "같이",
+    "reading": "",
+    "meanings": [
+      "같이 살다"
+    ]
+  },
+  {
+    "word": "개03",
+    "reading": "",
+    "meanings": [
+      "동물"
+    ]
+  },
+  {
+    "word": "개월",
+    "reading": "個月",
+    "meanings": [
+      "삼 개월"
+    ]
+  },
+  {
+    "word": "거01",
+    "reading": "",
+    "meanings": [
+      "것"
+    ]
+  },
+  {
+    "word": "거기01",
+    "reading": "",
+    "meanings": [
+      "거기에 있다"
+    ]
+  },
+  {
+    "word": "거리01",
+    "reading": "",
+    "meanings": [
+      "길~; 로 나가다"
+    ]
+  },
+  {
+    "word": "거울01",
+    "reading": "",
+    "meanings": [
+      "을 보다"
+    ]
+  },
+  {
+    "word": "걱정",
+    "reading": "",
+    "meanings": [
+      "이 되다"
+    ]
+  },
+  {
+    "word": "걱정하다",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "건강03",
+    "reading": "健康",
+    "meanings": [
+      "이 나빠지다"
+    ]
+  },
+  {
+    "word": "건강하다02",
+    "reading": "健康-",
+    "meanings": []
+  },
+  {
+    "word": "건물03",
+    "reading": "建物",
+    "meanings": [
+      "을 짓다"
+    ]
+  },
+  {
+    "word": "걷다02",
+    "reading": "",
+    "meanings": [
+      "길을; 느릿느릿 ~"
+    ]
+  },
+  {
+    "word": "걸다02",
+    "reading": "",
+    "meanings": [
+      "그림을; 옷을 ~"
+    ]
+  },
+  {
+    "word": "걸어가다",
+    "reading": "",
+    "meanings": [
+      "학교에"
+    ]
+  },
+  {
+    "word": "걸어오다01",
+    "reading": "",
+    "meanings": [
+      "집까지 ~; 집에"
+    ]
+  },
+  {
+    "word": "검은색",
+    "reading": "-色",
+    "meanings": [
+      "색깔"
+    ]
+  },
+  {
+    "word": "것01",
+    "reading": "",
+    "meanings": [
+      "먹을 것"
+    ]
+  },
+  {
+    "word": "게임",
+    "reading": "",
+    "meanings": [
+      "game; 컴퓨터 게임"
+    ]
+  },
+  {
+    "word": "겨울",
+    "reading": "",
+    "meanings": [
+      "계절"
+    ]
+  },
+  {
+    "word": "결혼",
+    "reading": "結婚",
+    "meanings": [
+      "을 하다"
+    ]
+  },
+  {
+    "word": "결혼식",
+    "reading": "結婚式",
+    "meanings": [
+      "을 올리다"
+    ]
+  },
+  {
+    "word": "결혼하다",
+    "reading": "結婚-",
+    "meanings": []
+  },
+  {
+    "word": "경복궁",
+    "reading": "景福宮",
+    "meanings": []
+  },
+  {
+    "word": "경주",
+    "reading": "慶州",
+    "meanings": []
+  },
+  {
+    "word": "경찰04",
+    "reading": "警察",
+    "meanings": [
+      "경찰 조사(기관)"
+    ]
+  },
+  {
+    "word": "경찰관",
+    "reading": "警察官",
+    "meanings": [
+      "교통 경찰관"
+    ]
+  },
+  {
+    "word": "경찰서",
+    "reading": "警察署",
+    "meanings": [
+      "에 신고하다"
+    ]
+  },
+  {
+    "word": "경치02",
+    "reading": "景致",
+    "meanings": [
+      "가 좋다"
+    ]
+  },
+  {
+    "word": "계란",
+    "reading": "鷄卵",
+    "meanings": [
+      "을 먹다"
+    ]
+  },
+  {
+    "word": "계속04",
+    "reading": "繼續",
+    "meanings": [
+      "계속 달리다"
+    ]
+  },
+  {
+    "word": "계시다",
+    "reading": "",
+    "meanings": [
+      "한국에"
+    ]
+  },
+  {
+    "word": "계절01",
+    "reading": "季節",
+    "meanings": [
+      "이 바뀌다"
+    ]
+  },
+  {
+    "word": "계획01",
+    "reading": "計劃",
+    "meanings": [
+      "을 세우다"
+    ]
+  },
+  {
+    "word": "고기01",
+    "reading": "",
+    "meanings": [
+      "를 먹다"
+    ]
+  },
+  {
+    "word": "고등학교",
+    "reading": "高等學校",
+    "meanings": [
+      "에 입학하다"
+    ]
+  },
+  {
+    "word": "고등학생",
+    "reading": "高等學生",
+    "meanings": [
+      "이 되다"
+    ]
+  },
+  {
+    "word": "고맙다01",
+    "reading": "",
+    "meanings": [
+      "마음이"
+    ]
+  },
+  {
+    "word": "고양이",
+    "reading": "",
+    "meanings": [
+      "를 기르다"
+    ]
+  },
+  {
+    "word": "고프다",
+    "reading": "",
+    "meanings": [
+      "배가"
+    ]
+  },
+  {
+    "word": "고향02",
+    "reading": "故鄕",
+    "meanings": [
+      "에 가다"
+    ]
+  },
+  {
+    "word": "곧01",
+    "reading": "",
+    "meanings": [
+      "곧 가다"
+    ]
+  },
+  {
+    "word": "곳01",
+    "reading": "",
+    "meanings": [
+      "어느 곳"
+    ]
+  },
+  {
+    "word": "공01",
+    "reading": "",
+    "meanings": [
+      "을 굴리다; 축구~"
+    ]
+  },
+  {
+    "word": "공부01",
+    "reading": "工夫",
+    "meanings": [
+      "를 하다"
+    ]
+  },
+  {
+    "word": "공부하다",
+    "reading": "工夫-",
+    "meanings": []
+  },
+  {
+    "word": "공원03",
+    "reading": "公園",
+    "meanings": [
+      "에서 놀다"
+    ]
+  },
+  {
+    "word": "공중전화",
+    "reading": "公衆電話",
+    "meanings": [
+      "공중전화 박스"
+    ]
+  },
+  {
+    "word": "공책01",
+    "reading": "空冊",
+    "meanings": [
+      "에 쓰다"
+    ]
+  },
+  {
+    "word": "공항02",
+    "reading": "空港",
+    "meanings": [
+      "공항 터미널"
+    ]
+  },
+  {
+    "word": "공휴일",
+    "reading": "公休日",
+    "meanings": [
+      "로 정하다"
+    ]
+  },
+  {
+    "word": "과10",
+    "reading": "課",
+    "meanings": [
+      "과의 직원"
+    ]
+  },
+  {
+    "word": "과일01",
+    "reading": "",
+    "meanings": [
+      "을 깎다"
+    ]
+  },
+  {
+    "word": "과자02",
+    "reading": "菓子",
+    "meanings": [
+      "를 먹다"
+    ]
+  },
+  {
+    "word": "괜찮다",
+    "reading": "",
+    "meanings": [
+      "성격이"
+    ]
+  },
+  {
+    "word": "교과서",
+    "reading": "敎科書",
+    "meanings": [
+      "에서 배우다"
+    ]
+  },
+  {
+    "word": "교수06",
+    "reading": "敎授",
+    "meanings": [
+      "대학 교수"
+    ]
+  },
+  {
+    "word": "교실",
+    "reading": "敎室",
+    "meanings": [
+      "에 들어가다"
+    ]
+  },
+  {
+    "word": "교통01",
+    "reading": "交通",
+    "meanings": [
+      "교통 수단"
+    ]
+  },
+  {
+    "word": "교회02",
+    "reading": "敎會",
+    "meanings": [
+      "기독교"
+    ]
+  },
+  {
+    "word": "구01",
+    "reading": "九",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "구경01",
+    "reading": "",
+    "meanings": [
+      "을 다니다"
+    ]
+  },
+  {
+    "word": "구두01",
+    "reading": "",
+    "meanings": [
+      "를 신다"
+    ]
+  },
+  {
+    "word": "구름01",
+    "reading": "",
+    "meanings": [
+      "이 끼다"
+    ]
+  },
+  {
+    "word": "구십",
+    "reading": "九十",
+    "meanings": [
+      "구십 살"
+    ]
+  },
+  {
+    "word": "구월02",
+    "reading": "九月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "군인",
+    "reading": "軍人",
+    "meanings": [
+      "직업 군인"
+    ]
+  },
+  {
+    "word": "권01",
+    "reading": "卷",
+    "meanings": [
+      "책 한 권"
+    ]
+  },
+  {
+    "word": "귀01",
+    "reading": "",
+    "meanings": [
+      "로 듣다"
+    ]
+  },
+  {
+    "word": "그01",
+    "reading": "",
+    "meanings": [
+      "그 사람"
+    ]
+  },
+  {
+    "word": "그거",
+    "reading": "",
+    "meanings": [
+      "그것"
+    ]
+  },
+  {
+    "word": "그것",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "그곳",
+    "reading": "",
+    "meanings": [
+      "에 가다"
+    ]
+  },
+  {
+    "word": "그날",
+    "reading": "",
+    "meanings": [
+      "그날 일"
+    ]
+  },
+  {
+    "word": "그동안",
+    "reading": "",
+    "meanings": [
+      "그동안 잘 지내다"
+    ]
+  },
+  {
+    "word": "그때",
+    "reading": "",
+    "meanings": [
+      "그때 그시절"
+    ]
+  },
+  {
+    "word": "그래01",
+    "reading": "",
+    "meanings": [
+      "대답"
+    ]
+  },
+  {
+    "word": "그래서",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "그러나",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "그러니까",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "그러면",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "그런데",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "그럼01",
+    "reading": "",
+    "meanings": [
+      "'그러면'의 준말"
+    ]
+  },
+  {
+    "word": "그렇다",
+    "reading": "",
+    "meanings": [
+      "사정이"
+    ]
+  },
+  {
+    "word": "그렇지만",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "그릇01",
+    "reading": "",
+    "meanings": [
+      "에 담다"
+    ]
+  },
+  {
+    "word": "그리고",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "그리다02",
+    "reading": "",
+    "meanings": [
+      "그림을 ~"
+    ]
+  },
+  {
+    "word": "그림01",
+    "reading": "",
+    "meanings": [
+      "을 그리다"
+    ]
+  },
+  {
+    "word": "그분",
+    "reading": "",
+    "meanings": [
+      "을 만나다"
+    ]
+  },
+  {
+    "word": "그쪽",
+    "reading": "",
+    "meanings": [
+      "으로 가다"
+    ]
+  },
+  {
+    "word": "극장",
+    "reading": "劇場",
+    "meanings": [
+      "에서 상영하다"
+    ]
+  },
+  {
+    "word": "근처",
+    "reading": "近處",
+    "meanings": [
+      "집 근처"
+    ]
+  },
+  {
+    "word": "금요일",
+    "reading": "金曜日",
+    "meanings": [
+      "요일"
+    ]
+  },
+  {
+    "word": "급04",
+    "reading": "級",
+    "meanings": []
+  },
+  {
+    "word": "기다리다",
+    "reading": "",
+    "meanings": [
+      "버스를"
+    ]
+  },
+  {
+    "word": "기분01",
+    "reading": "氣分",
+    "meanings": [
+      "이 좋다"
+    ]
+  },
+  {
+    "word": "기숙사",
+    "reading": "寄宿舍",
+    "meanings": [
+      "에서 살다"
+    ]
+  },
+  {
+    "word": "기차01",
+    "reading": "汽車",
+    "meanings": [
+      "를 타다"
+    ]
+  },
+  {
+    "word": "길01",
+    "reading": "",
+    "meanings": [
+      "도로; 이 막히다"
+    ]
+  },
+  {
+    "word": "길다02",
+    "reading": "",
+    "meanings": [
+      "다리가; 밤이 ~"
+    ]
+  },
+  {
+    "word": "김밥",
+    "reading": "",
+    "meanings": [
+      "을 싸다"
+    ]
+  },
+  {
+    "word": "김치01",
+    "reading": "",
+    "meanings": [
+      "를 담그다"
+    ]
+  },
+  {
+    "word": "깎다",
+    "reading": "",
+    "meanings": [
+      "사과를"
+    ]
+  },
+  {
+    "word": "깨끗하다",
+    "reading": "",
+    "meanings": [
+      "옷이"
+    ]
+  },
+  {
+    "word": "꼭03",
+    "reading": "",
+    "meanings": [
+      "꼭 필요하다; 반드시"
+    ]
+  },
+  {
+    "word": "꽃01",
+    "reading": "",
+    "meanings": [
+      "이 피다"
+    ]
+  },
+  {
+    "word": "꿈01",
+    "reading": "",
+    "meanings": [
+      "을 꾸다"
+    ]
+  },
+  {
+    "word": "끄다01",
+    "reading": "",
+    "meanings": [
+      "불을 ~"
+    ]
+  },
+  {
+    "word": "끝01",
+    "reading": "",
+    "meanings": [
+      "시작"
+    ]
+  },
+  {
+    "word": "끝나다",
+    "reading": "",
+    "meanings": [
+      "수업이"
+    ]
+  },
+  {
+    "word": "끝내다",
+    "reading": "",
+    "meanings": [
+      "일을"
+    ]
+  },
+  {
+    "word": "나03",
+    "reading": "",
+    "meanings": [
+      "나와 너"
+    ]
+  },
+  {
+    "word": "나가다",
+    "reading": "",
+    "meanings": [
+      "밖으로"
+    ]
+  },
+  {
+    "word": "나다01",
+    "reading": "",
+    "meanings": [
+      "수염이"
+    ]
+  },
+  {
+    "word": "나라01",
+    "reading": "",
+    "meanings": [
+      "우리 나라"
+    ]
+  },
+  {
+    "word": "나무01",
+    "reading": "",
+    "meanings": [
+      "를 심다"
+    ]
+  },
+  {
+    "word": "나쁘다01",
+    "reading": "",
+    "meanings": [
+      "공기가"
+    ]
+  },
+  {
+    "word": "나오다",
+    "reading": "",
+    "meanings": [
+      "밖에"
+    ]
+  },
+  {
+    "word": "나이01",
+    "reading": "",
+    "meanings": [
+      "가 많다"
+    ]
+  },
+  {
+    "word": "나중01",
+    "reading": "",
+    "meanings": [
+      "에 깨닫다"
+    ]
+  },
+  {
+    "word": "날01",
+    "reading": "",
+    "meanings": [
+      "마지막 날; 어느 ~"
+    ]
+  },
+  {
+    "word": "날다01",
+    "reading": "",
+    "meanings": [
+      "새가"
+    ]
+  },
+  {
+    "word": "날씨01",
+    "reading": "",
+    "meanings": [
+      "가 좋다"
+    ]
+  },
+  {
+    "word": "날짜01",
+    "reading": "",
+    "meanings": [
+      "를 정하다"
+    ]
+  },
+  {
+    "word": "남녀",
+    "reading": "男女",
+    "meanings": [
+      "남녀 평등"
+    ]
+  },
+  {
+    "word": "남대문",
+    "reading": "南大門",
+    "meanings": []
+  },
+  {
+    "word": "남대문시장",
+    "reading": "南大門市場",
+    "meanings": []
+  },
+  {
+    "word": "남동생",
+    "reading": "男-",
+    "meanings": [
+      "을 돌보다"
+    ]
+  },
+  {
+    "word": "남자02",
+    "reading": "男子",
+    "meanings": [
+      "여자"
+    ]
+  },
+  {
+    "word": "남쪽",
+    "reading": "南-",
+    "meanings": [
+      "북쪽"
+    ]
+  },
+  {
+    "word": "남편01",
+    "reading": "男便",
+    "meanings": [
+      "아내"
+    ]
+  },
+  {
+    "word": "남학생",
+    "reading": "男學生",
+    "meanings": [
+      "여학생"
+    ]
+  },
+  {
+    "word": "낮",
+    "reading": "",
+    "meanings": [
+      "밤"
+    ]
+  },
+  {
+    "word": "낮다",
+    "reading": "",
+    "meanings": [
+      "산이"
+    ]
+  },
+  {
+    "word": "내년",
+    "reading": "來年",
+    "meanings": [
+      "내년 여름"
+    ]
+  },
+  {
+    "word": "내다02",
+    "reading": "",
+    "meanings": [
+      "길을 ~; 문제를"
+    ]
+  },
+  {
+    "word": "내려가다",
+    "reading": "",
+    "meanings": [
+      "아래로"
+    ]
+  },
+  {
+    "word": "내려오다",
+    "reading": "",
+    "meanings": [
+      "아래로"
+    ]
+  },
+  {
+    "word": "내리다01",
+    "reading": "",
+    "meanings": [
+      "눈이 ~; 비가"
+    ]
+  },
+  {
+    "word": "내일",
+    "reading": "來日",
+    "meanings": [
+      "로 미루다"
+    ]
+  },
+  {
+    "word": "냉면",
+    "reading": "冷麵",
+    "meanings": [
+      "을 먹다"
+    ]
+  },
+  {
+    "word": "냉장고",
+    "reading": "冷藏庫",
+    "meanings": [
+      "에 넣다"
+    ]
+  },
+  {
+    "word": "너01",
+    "reading": "",
+    "meanings": [
+      "나"
+    ]
+  },
+  {
+    "word": "너무01",
+    "reading": "",
+    "meanings": [
+      "너무 심하다"
+    ]
+  },
+  {
+    "word": "넓다",
+    "reading": "",
+    "meanings": [
+      "집이"
+    ]
+  },
+  {
+    "word": "넣다",
+    "reading": "",
+    "meanings": [
+      "책을"
+    ]
+  },
+  {
+    "word": "네02",
+    "reading": "",
+    "meanings": [
+      "숫자(4)"
+    ]
+  },
+  {
+    "word": "넥타이",
+    "reading": "",
+    "meanings": [
+      "necktie; 를 매다"
+    ]
+  },
+  {
+    "word": "넷01",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "넷째",
+    "reading": "",
+    "meanings": [
+      "넷째 시간"
+    ]
+  },
+  {
+    "word": "년02",
+    "reading": "年",
+    "meanings": [
+      "2015년"
+    ]
+  },
+  {
+    "word": "노란색",
+    "reading": "-色",
+    "meanings": [
+      "색깔"
+    ]
+  },
+  {
+    "word": "노래01",
+    "reading": "",
+    "meanings": [
+      "를 부르다"
+    ]
+  },
+  {
+    "word": "노래하다",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "노트02",
+    "reading": "",
+    "meanings": [
+      "note; 에 쓰다"
+    ]
+  },
+  {
+    "word": "놀다01",
+    "reading": "",
+    "meanings": [
+      "친구와 놀다"
+    ]
+  },
+  {
+    "word": "놀라다",
+    "reading": "",
+    "meanings": [
+      "깜짝 놀라다"
+    ]
+  },
+  {
+    "word": "높다",
+    "reading": "",
+    "meanings": [
+      "산이"
+    ]
+  },
+  {
+    "word": "놓다01",
+    "reading": "",
+    "meanings": [
+      "펜을"
+    ]
+  },
+  {
+    "word": "누구",
+    "reading": "",
+    "meanings": [
+      "거기 누구 계세요?"
+    ]
+  },
+  {
+    "word": "누나01",
+    "reading": "",
+    "meanings": [
+      "사촌 누나"
+    ]
+  },
+  {
+    "word": "눈01",
+    "reading": "",
+    "meanings": [
+      "신체의 일부; 이 작다"
+    ]
+  },
+  {
+    "word": "눈물01",
+    "reading": "",
+    "meanings": [
+      "이 흐르다"
+    ]
+  },
+  {
+    "word": "뉴스",
+    "reading": "",
+    "meanings": [
+      "news; 를 보다"
+    ]
+  },
+  {
+    "word": "늦다",
+    "reading": "",
+    "meanings": [
+      "시계가"
+    ]
+  },
+  {
+    "word": "다03",
+    "reading": "",
+    "meanings": [
+      "모두"
+    ]
+  },
+  {
+    "word": "다녀오다",
+    "reading": "",
+    "meanings": [
+      "학교에"
+    ]
+  },
+  {
+    "word": "다니다",
+    "reading": "",
+    "meanings": [
+      "회사에"
+    ]
+  },
+  {
+    "word": "다르다01",
+    "reading": "",
+    "meanings": [
+      "모양이"
+    ]
+  },
+  {
+    "word": "다른",
+    "reading": "",
+    "meanings": [
+      "다른 나라"
+    ]
+  },
+  {
+    "word": "다리01",
+    "reading": "",
+    "meanings": [
+      "가 길다; 신체의 일부"
+    ]
+  },
+  {
+    "word": "다섯",
+    "reading": "",
+    "meanings": [
+      "다섯 개"
+    ]
+  },
+  {
+    "word": "다섯째",
+    "reading": "",
+    "meanings": [
+      "다섯째 사람"
+    ]
+  },
+  {
+    "word": "다시01",
+    "reading": "",
+    "meanings": [
+      "다시 시작하다"
+    ]
+  },
+  {
+    "word": "다음01",
+    "reading": "",
+    "meanings": [
+      "다음 날"
+    ]
+  },
+  {
+    "word": "닦다01",
+    "reading": "",
+    "meanings": [
+      "구두를"
+    ]
+  },
+  {
+    "word": "단어",
+    "reading": "單語",
+    "meanings": [
+      "를 외우다"
+    ]
+  },
+  {
+    "word": "닫다02",
+    "reading": "",
+    "meanings": [
+      "문을"
+    ]
+  },
+  {
+    "word": "달05",
+    "reading": "",
+    "meanings": [
+      "다음 달"
+    ]
+  },
+  {
+    "word": "달다07",
+    "reading": "",
+    "meanings": [
+      "맛이"
+    ]
+  },
+  {
+    "word": "달러",
+    "reading": "",
+    "meanings": [
+      "dollar; 로 바꾸다"
+    ]
+  },
+  {
+    "word": "달력",
+    "reading": "-曆",
+    "meanings": [
+      "을 걸다"
+    ]
+  },
+  {
+    "word": "닭",
+    "reading": "",
+    "meanings": [
+      "을 키우다"
+    ]
+  },
+  {
+    "word": "닭고기",
+    "reading": "",
+    "meanings": [
+      "를 볶다"
+    ]
+  },
+  {
+    "word": "담배",
+    "reading": "",
+    "meanings": [
+      "를 피우다"
+    ]
+  },
+  {
+    "word": "대답",
+    "reading": "對答",
+    "meanings": [
+      "을 기다리다"
+    ]
+  },
+  {
+    "word": "대답하다",
+    "reading": "對答-",
+    "meanings": []
+  },
+  {
+    "word": "대사관",
+    "reading": "大使館",
+    "meanings": [
+      "미국 대사관"
+    ]
+  },
+  {
+    "word": "대학01",
+    "reading": "大學",
+    "meanings": [
+      "에 들어가다"
+    ]
+  },
+  {
+    "word": "대학교",
+    "reading": "大學校",
+    "meanings": [
+      "에 입학하다"
+    ]
+  },
+  {
+    "word": "대학생",
+    "reading": "大學生",
+    "meanings": [
+      "이 되다"
+    ]
+  },
+  {
+    "word": "대화06",
+    "reading": "對話",
+    "meanings": [
+      "를 나누다"
+    ]
+  },
+  {
+    "word": "댁01",
+    "reading": "宅",
+    "meanings": [
+      "선생님 댁"
+    ]
+  },
+  {
+    "word": "더01",
+    "reading": "",
+    "meanings": [
+      "하나 더"
+    ]
+  },
+  {
+    "word": "덥다01",
+    "reading": "",
+    "meanings": [
+      "날씨가"
+    ]
+  },
+  {
+    "word": "도서관",
+    "reading": "圖書館",
+    "meanings": [
+      "에서 공부하다"
+    ]
+  },
+  {
+    "word": "도시03",
+    "reading": "都市",
+    "meanings": [
+      "를 건설하다"
+    ]
+  },
+  {
+    "word": "도와주다",
+    "reading": "",
+    "meanings": [
+      "일을"
+    ]
+  },
+  {
+    "word": "도착01",
+    "reading": "到着",
+    "meanings": [
+      "도착 시간"
+    ]
+  },
+  {
+    "word": "도착하다01",
+    "reading": "到着-",
+    "meanings": []
+  },
+  {
+    "word": "독일",
+    "reading": "獨逸",
+    "meanings": []
+  },
+  {
+    "word": "돈01",
+    "reading": "",
+    "meanings": [
+      "을 벌다"
+    ]
+  },
+  {
+    "word": "돌아가다",
+    "reading": "",
+    "meanings": [
+      "바퀴가"
+    ]
+  },
+  {
+    "word": "돌아오다",
+    "reading": "",
+    "meanings": [
+      "학교에서"
+    ]
+  },
+  {
+    "word": "돕다",
+    "reading": "",
+    "meanings": [
+      "아버지를"
+    ]
+  },
+  {
+    "word": "동물",
+    "reading": "動物",
+    "meanings": [
+      "을 키우다"
+    ]
+  },
+  {
+    "word": "동생01",
+    "reading": "",
+    "meanings": [
+      "이 태어나다"
+    ]
+  },
+  {
+    "word": "동안01",
+    "reading": "",
+    "meanings": [
+      "며칠 동안; 시간의 길이"
+    ]
+  },
+  {
+    "word": "동쪽",
+    "reading": "東-",
+    "meanings": [
+      "방향"
+    ]
+  },
+  {
+    "word": "돼지",
+    "reading": "",
+    "meanings": [
+      "를 기르다"
+    ]
+  },
+  {
+    "word": "돼지고기",
+    "reading": "",
+    "meanings": [
+      "를 먹다"
+    ]
+  },
+  {
+    "word": "되다01",
+    "reading": "",
+    "meanings": [
+      "배우가; 어른이 ~"
+    ]
+  },
+  {
+    "word": "두01",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "둘01",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "둘째",
+    "reading": "",
+    "meanings": [
+      "둘째 딸"
+    ]
+  },
+  {
+    "word": "뒤01",
+    "reading": "",
+    "meanings": [
+      "에 있다"
+    ]
+  },
+  {
+    "word": "드리다01",
+    "reading": "",
+    "meanings": [
+      "용돈을; 인사를 ~"
+    ]
+  },
+  {
+    "word": "듣다01",
+    "reading": "",
+    "meanings": [
+      "소리를 ~; 음악을"
+    ]
+  },
+  {
+    "word": "들다01",
+    "reading": "",
+    "meanings": [
+      "돈이; 여관에 ~"
+    ]
+  },
+  {
+    "word": "들어가다01",
+    "reading": "",
+    "meanings": [
+      "방으로"
+    ]
+  },
+  {
+    "word": "들어오다",
+    "reading": "",
+    "meanings": [
+      "학교로"
+    ]
+  },
+  {
+    "word": "등산",
+    "reading": "登山",
+    "meanings": [
+      "을 가다"
+    ]
+  },
+  {
+    "word": "따뜻하다",
+    "reading": "",
+    "meanings": [
+      "방 안이"
+    ]
+  },
+  {
+    "word": "딸01",
+    "reading": "",
+    "meanings": [
+      "아들"
+    ]
+  },
+  {
+    "word": "딸기",
+    "reading": "",
+    "meanings": [
+      "과일"
+    ]
+  },
+  {
+    "word": "때01",
+    "reading": "",
+    "meanings": [
+      "시간; 어릴 때"
+    ]
+  },
+  {
+    "word": "때문",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "떠나다",
+    "reading": "",
+    "meanings": [
+      "어디론가"
+    ]
+  },
+  {
+    "word": "떡01",
+    "reading": "",
+    "meanings": [
+      "음식"
+    ]
+  },
+  {
+    "word": "또",
+    "reading": "",
+    "meanings": [
+      "또 생기다"
+    ]
+  },
+  {
+    "word": "똑같다",
+    "reading": "",
+    "meanings": [
+      "모양이"
+    ]
+  },
+  {
+    "word": "똑바로",
+    "reading": "",
+    "meanings": [
+      "똑바로 가다"
+    ]
+  },
+  {
+    "word": "뛰다01",
+    "reading": "",
+    "meanings": [
+      "빨리 뛰다; 심장이 ~"
+    ]
+  },
+  {
+    "word": "뜨겁다",
+    "reading": "",
+    "meanings": [
+      "국물이"
+    ]
+  },
+  {
+    "word": "라디오",
+    "reading": "",
+    "meanings": [
+      "radio; 를 켜다"
+    ]
+  },
+  {
+    "word": "라면01",
+    "reading": "",
+    "meanings": [
+      "&일ramen; 음식"
+    ]
+  },
+  {
+    "word": "러시아",
+    "reading": "",
+    "meanings": [
+      "Russia"
+    ]
+  },
+  {
+    "word": "마리01",
+    "reading": "",
+    "meanings": [
+      "한 마리"
+    ]
+  },
+  {
+    "word": "마시다",
+    "reading": "",
+    "meanings": [
+      "물을"
+    ]
+  },
+  {
+    "word": "마음01",
+    "reading": "",
+    "meanings": [
+      "이 따뜻하다"
+    ]
+  },
+  {
+    "word": "마지막",
+    "reading": "",
+    "meanings": [
+      "마지막 경기"
+    ]
+  },
+  {
+    "word": "마흔",
+    "reading": "",
+    "meanings": [
+      "마흔 개"
+    ]
+  },
+  {
+    "word": "만06",
+    "reading": "萬",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "만나다",
+    "reading": "",
+    "meanings": [
+      "친구를"
+    ]
+  },
+  {
+    "word": "만들다",
+    "reading": "",
+    "meanings": [
+      "음식을"
+    ]
+  },
+  {
+    "word": "많다",
+    "reading": "",
+    "meanings": [
+      "돈이"
+    ]
+  },
+  {
+    "word": "많이",
+    "reading": "",
+    "meanings": [
+      "많이 사다"
+    ]
+  },
+  {
+    "word": "말01",
+    "reading": "",
+    "meanings": [
+      "~과 글; 을 하다"
+    ]
+  },
+  {
+    "word": "말다03",
+    "reading": "",
+    "meanings": [
+      "걱정을; 그만두다"
+    ]
+  },
+  {
+    "word": "말씀",
+    "reading": "",
+    "meanings": [
+      "이 없다"
+    ]
+  },
+  {
+    "word": "말씀하다",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "말하다",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "맑다01",
+    "reading": "",
+    "meanings": [
+      "공기가"
+    ]
+  },
+  {
+    "word": "맛01",
+    "reading": "",
+    "meanings": [
+      "이 달다"
+    ]
+  },
+  {
+    "word": "맛없다",
+    "reading": "",
+    "meanings": [
+      "음식이"
+    ]
+  },
+  {
+    "word": "맛있다",
+    "reading": "",
+    "meanings": [
+      "음식이"
+    ]
+  },
+  {
+    "word": "매우01",
+    "reading": "",
+    "meanings": [
+      "매우 좋다"
+    ]
+  },
+  {
+    "word": "매일",
+    "reading": "每日",
+    "meanings": [
+      "매일 만나다"
+    ]
+  },
+  {
+    "word": "맥주",
+    "reading": "麥酒",
+    "meanings": [
+      "를 마시다"
+    ]
+  },
+  {
+    "word": "맵다",
+    "reading": "",
+    "meanings": [
+      "고추가"
+    ]
+  },
+  {
+    "word": "머리01",
+    "reading": "",
+    "meanings": [
+      "가 크다"
+    ]
+  },
+  {
+    "word": "먹다02",
+    "reading": "",
+    "meanings": [
+      "밥을 ~"
+    ]
+  },
+  {
+    "word": "먼저",
+    "reading": "",
+    "meanings": [
+      "먼저 가다"
+    ]
+  },
+  {
+    "word": "멀다02",
+    "reading": "",
+    "meanings": [
+      "갈 길이 ~; 거리가"
+    ]
+  },
+  {
+    "word": "메뉴",
+    "reading": "",
+    "meanings": [
+      "menu; 를 고르다"
+    ]
+  },
+  {
+    "word": "며칠",
+    "reading": "",
+    "meanings": [
+      "이 걸리다"
+    ]
+  },
+  {
+    "word": "명03",
+    "reading": "名",
+    "meanings": [
+      "한 ~; 한 명"
+    ]
+  },
+  {
+    "word": "몇",
+    "reading": "",
+    "meanings": [
+      "몇 개"
+    ]
+  },
+  {
+    "word": "모두01",
+    "reading": "",
+    "meanings": [
+      "모두 함께"
+    ]
+  },
+  {
+    "word": "모든",
+    "reading": "",
+    "meanings": [
+      "모든 사람"
+    ]
+  },
+  {
+    "word": "모르다",
+    "reading": "",
+    "meanings": [
+      "규칙을"
+    ]
+  },
+  {
+    "word": "모자08",
+    "reading": "帽子",
+    "meanings": [
+      "를 쓰다"
+    ]
+  },
+  {
+    "word": "목01",
+    "reading": "",
+    "meanings": [
+      "이 길다"
+    ]
+  },
+  {
+    "word": "목요일",
+    "reading": "木曜日",
+    "meanings": [
+      "요일"
+    ]
+  },
+  {
+    "word": "목욕",
+    "reading": "沐浴",
+    "meanings": [
+      "을 하다"
+    ]
+  },
+  {
+    "word": "몸01",
+    "reading": "",
+    "meanings": [
+      "이 건강하다"
+    ]
+  },
+  {
+    "word": "못04",
+    "reading": "",
+    "meanings": [
+      "못 마시다"
+    ]
+  },
+  {
+    "word": "못하다",
+    "reading": "",
+    "meanings": [
+      "노래를"
+    ]
+  },
+  {
+    "word": "무겁다",
+    "reading": "",
+    "meanings": [
+      "짐이"
+    ]
+  },
+  {
+    "word": "무슨",
+    "reading": "",
+    "meanings": [
+      "무슨 요일"
+    ]
+  },
+  {
+    "word": "무엇",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "문05",
+    "reading": "門",
+    "meanings": []
+  },
+  {
+    "word": "문제06",
+    "reading": "問題",
+    "meanings": [
+      "를 풀다"
+    ]
+  },
+  {
+    "word": "묻다03",
+    "reading": "",
+    "meanings": [
+      "길을 ~"
+    ]
+  },
+  {
+    "word": "물01",
+    "reading": "",
+    "meanings": [
+      "바닷~; 을 마시다"
+    ]
+  },
+  {
+    "word": "물건",
+    "reading": "物件",
+    "meanings": [
+      "을 사다"
+    ]
+  },
+  {
+    "word": "물론01",
+    "reading": "勿論",
+    "meanings": [
+      "물론 그렇다"
+    ]
+  },
+  {
+    "word": "물어보다",
+    "reading": "",
+    "meanings": [
+      "길을"
+    ]
+  },
+  {
+    "word": "뭐",
+    "reading": "",
+    "meanings": [
+      "뭐라고 말하다"
+    ]
+  },
+  {
+    "word": "미국",
+    "reading": "美國",
+    "meanings": []
+  },
+  {
+    "word": "미안하다",
+    "reading": "未安-",
+    "meanings": []
+  },
+  {
+    "word": "미터02",
+    "reading": "",
+    "meanings": [
+      "meter; 백 미터"
+    ]
+  },
+  {
+    "word": "밑01",
+    "reading": "",
+    "meanings": [
+      "에 두다"
+    ]
+  },
+  {
+    "word": "바꾸다",
+    "reading": "",
+    "meanings": [
+      "달러를 원화로"
+    ]
+  },
+  {
+    "word": "바나나",
+    "reading": "",
+    "meanings": [
+      "banana; 과일"
+    ]
+  },
+  {
+    "word": "바다",
+    "reading": "",
+    "meanings": [
+      "를 건너다"
+    ]
+  },
+  {
+    "word": "바람01",
+    "reading": "",
+    "meanings": [
+      "~이 불다"
+    ]
+  },
+  {
+    "word": "바로02",
+    "reading": "",
+    "meanings": [
+      "바로 시작하다"
+    ]
+  },
+  {
+    "word": "바쁘다",
+    "reading": "",
+    "meanings": [
+      "일이"
+    ]
+  },
+  {
+    "word": "바지01",
+    "reading": "",
+    "meanings": [
+      "를 입다"
+    ]
+  },
+  {
+    "word": "박물관",
+    "reading": "博物館",
+    "meanings": [
+      "을 구경하다"
+    ]
+  },
+  {
+    "word": "밖",
+    "reading": "",
+    "meanings": [
+      "안"
+    ]
+  },
+  {
+    "word": "반07",
+    "reading": "半",
+    "meanings": [
+      "사과 반"
+    ]
+  },
+  {
+    "word": "반갑다",
+    "reading": "",
+    "meanings": [
+      "손님이"
+    ]
+  },
+  {
+    "word": "받다01",
+    "reading": "",
+    "meanings": [
+      "선물을 ~"
+    ]
+  },
+  {
+    "word": "발01",
+    "reading": "",
+    "meanings": [
+      "신체의 일부; 이 크다"
+    ]
+  },
+  {
+    "word": "발음01",
+    "reading": "發音",
+    "meanings": [
+      "이 좋다"
+    ]
+  },
+  {
+    "word": "밝다",
+    "reading": "",
+    "meanings": [
+      "불빛이"
+    ]
+  },
+  {
+    "word": "밤01",
+    "reading": "",
+    "meanings": [
+      "어두운 때; 이 깊다"
+    ]
+  },
+  {
+    "word": "밥01",
+    "reading": "",
+    "meanings": [
+      "~을 먹다; 을 하다"
+    ]
+  },
+  {
+    "word": "방07",
+    "reading": "房",
+    "meanings": [
+      "이 넓다"
+    ]
+  },
+  {
+    "word": "방학",
+    "reading": "放學",
+    "meanings": [
+      "겨울 방학"
+    ]
+  },
+  {
+    "word": "배01",
+    "reading": "",
+    "meanings": [
+      "신체의 일부"
+    ]
+  },
+  {
+    "word": "배고프다",
+    "reading": "",
+    "meanings": [
+      "배고프고 목마르다"
+    ]
+  },
+  {
+    "word": "배부르다",
+    "reading": "",
+    "meanings": [
+      "배부르게 먹다"
+    ]
+  },
+  {
+    "word": "배우다01",
+    "reading": "",
+    "meanings": [
+      "글을"
+    ]
+  },
+  {
+    "word": "백05",
+    "reading": "百",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "백화점",
+    "reading": "百貨店",
+    "meanings": [
+      "에서 사다"
+    ]
+  },
+  {
+    "word": "버리다01",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "버스02",
+    "reading": "",
+    "meanings": [
+      "bus; 를 타다"
+    ]
+  },
+  {
+    "word": "번04",
+    "reading": "番",
+    "meanings": [
+      "첫째 번"
+    ]
+  },
+  {
+    "word": "번호02",
+    "reading": "番號",
+    "meanings": [
+      "를 매기다"
+    ]
+  },
+  {
+    "word": "벌써",
+    "reading": "",
+    "meanings": [
+      "벌써 가다"
+    ]
+  },
+  {
+    "word": "벗다",
+    "reading": "",
+    "meanings": [
+      "모자를"
+    ]
+  },
+  {
+    "word": "별01",
+    "reading": "",
+    "meanings": [
+      "이 빛나다"
+    ]
+  },
+  {
+    "word": "병04",
+    "reading": "病",
+    "meanings": [
+      "에 걸리다"
+    ]
+  },
+  {
+    "word": "병원02",
+    "reading": "病院",
+    "meanings": [
+      "에 가다"
+    ]
+  },
+  {
+    "word": "보내다",
+    "reading": "",
+    "meanings": [
+      "편지를"
+    ]
+  },
+  {
+    "word": "보다01",
+    "reading": "",
+    "meanings": [
+      "신문을"
+    ]
+  },
+  {
+    "word": "보통",
+    "reading": "普通",
+    "meanings": [
+      "이 넘다"
+    ]
+  },
+  {
+    "word": "복잡하다",
+    "reading": "複雜-",
+    "meanings": [
+      "생각이"
+    ]
+  },
+  {
+    "word": "볼펜02",
+    "reading": "",
+    "meanings": [
+      "ball pen; 으로 쓰다"
+    ]
+  },
+  {
+    "word": "봄01",
+    "reading": "",
+    "meanings": [
+      "계절"
+    ]
+  },
+  {
+    "word": "부르다01",
+    "reading": "",
+    "meanings": [
+      "이름을 ~; 친구를"
+    ]
+  },
+  {
+    "word": "부모01",
+    "reading": "父母",
+    "meanings": [
+      "를 공경하다"
+    ]
+  },
+  {
+    "word": "부모님",
+    "reading": "父母-",
+    "meanings": [
+      "께 효도하다"
+    ]
+  },
+  {
+    "word": "부부03",
+    "reading": "夫婦",
+    "meanings": [
+      "부부 싸움"
+    ]
+  },
+  {
+    "word": "부산",
+    "reading": "釜山",
+    "meanings": []
+  },
+  {
+    "word": "부엌",
+    "reading": "",
+    "meanings": [
+      "에서 요리하다"
+    ]
+  },
+  {
+    "word": "부인01",
+    "reading": "夫人",
+    "meanings": [
+      "아내"
+    ]
+  },
+  {
+    "word": "북쪽",
+    "reading": "北-",
+    "meanings": [
+      "방향"
+    ]
+  },
+  {
+    "word": "분01",
+    "reading": "",
+    "meanings": [
+      "아는 분; 한 ~"
+    ]
+  },
+  {
+    "word": "불01",
+    "reading": "",
+    "meanings": [
+      "을 피우다"
+    ]
+  },
+  {
+    "word": "불고기",
+    "reading": "",
+    "meanings": [
+      "음식"
+    ]
+  },
+  {
+    "word": "불다01",
+    "reading": "",
+    "meanings": [
+      "바람이 ~"
+    ]
+  },
+  {
+    "word": "비01",
+    "reading": "",
+    "meanings": [
+      "~가 내리다; 가 그치다"
+    ]
+  },
+  {
+    "word": "비누",
+    "reading": "",
+    "meanings": [
+      "로 씻다"
+    ]
+  },
+  {
+    "word": "비디오",
+    "reading": "",
+    "meanings": [
+      "video; 비디오 두 편"
+    ]
+  },
+  {
+    "word": "비빔밥",
+    "reading": "",
+    "meanings": [
+      "음식"
+    ]
+  },
+  {
+    "word": "비슷하다02",
+    "reading": "",
+    "meanings": [
+      "성격이"
+    ]
+  },
+  {
+    "word": "비싸다",
+    "reading": "",
+    "meanings": [
+      "값이"
+    ]
+  },
+  {
+    "word": "비행기",
+    "reading": "飛行機",
+    "meanings": [
+      "를 타다"
+    ]
+  },
+  {
+    "word": "빠르다",
+    "reading": "",
+    "meanings": [
+      "걸음이"
+    ]
+  },
+  {
+    "word": "빨간색",
+    "reading": "-色",
+    "meanings": [
+      "색깔"
+    ]
+  },
+  {
+    "word": "빨리",
+    "reading": "",
+    "meanings": [
+      "빨리 걷다"
+    ]
+  },
+  {
+    "word": "빵01",
+    "reading": "",
+    "meanings": [
+      "을 먹다"
+    ]
+  },
+  {
+    "word": "사11",
+    "reading": "四",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "사과05",
+    "reading": "沙果",
+    "meanings": [
+      "과일"
+    ]
+  },
+  {
+    "word": "사다",
+    "reading": "",
+    "meanings": [
+      "물건을"
+    ]
+  },
+  {
+    "word": "사람",
+    "reading": "",
+    "meanings": [
+      "이 살다"
+    ]
+  },
+  {
+    "word": "사랑01",
+    "reading": "",
+    "meanings": [
+      "연인 간의"
+    ]
+  },
+  {
+    "word": "사랑하다",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "사무실",
+    "reading": "事務室",
+    "meanings": [
+      "에 출근하다"
+    ]
+  },
+  {
+    "word": "사십",
+    "reading": "四十",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "사용하다03",
+    "reading": "使用-",
+    "meanings": []
+  },
+  {
+    "word": "사월02",
+    "reading": "四月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "사이01",
+    "reading": "",
+    "meanings": [
+      "에 놓다"
+    ]
+  },
+  {
+    "word": "사장15",
+    "reading": "社長",
+    "meanings": [
+      "이 되다"
+    ]
+  },
+  {
+    "word": "사전22",
+    "reading": "辭典",
+    "meanings": [
+      "을 찾다"
+    ]
+  },
+  {
+    "word": "사진07",
+    "reading": "寫眞",
+    "meanings": []
+  },
+  {
+    "word": "사탕02",
+    "reading": "沙糖",
+    "meanings": [
+      "을 먹다"
+    ]
+  },
+  {
+    "word": "산01",
+    "reading": "山",
+    "meanings": [
+      "에 오르다"
+    ]
+  },
+  {
+    "word": "산책",
+    "reading": "散策",
+    "meanings": [
+      "을 나가다"
+    ]
+  },
+  {
+    "word": "살04",
+    "reading": "",
+    "meanings": [
+      "세 살; 한 ~"
+    ]
+  },
+  {
+    "word": "살다01",
+    "reading": "",
+    "meanings": [
+      "오래"
+    ]
+  },
+  {
+    "word": "삼06",
+    "reading": "三",
+    "meanings": [
+      "삼 년"
+    ]
+  },
+  {
+    "word": "삼십",
+    "reading": "三十",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "삼월",
+    "reading": "三月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "새03",
+    "reading": "",
+    "meanings": [
+      "날짐승; 동물"
+    ]
+  },
+  {
+    "word": "색03",
+    "reading": "色",
+    "meanings": [
+      "색깔"
+    ]
+  },
+  {
+    "word": "색깔",
+    "reading": "色-",
+    "meanings": [
+      "이 진하다"
+    ]
+  },
+  {
+    "word": "샌드위치",
+    "reading": "",
+    "meanings": [
+      "sandwich; 음식"
+    ]
+  },
+  {
+    "word": "생각01",
+    "reading": "",
+    "meanings": [
+      "에 빠지다"
+    ]
+  },
+  {
+    "word": "생각하다",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "생기다",
+    "reading": "",
+    "meanings": [
+      "건물이"
+    ]
+  },
+  {
+    "word": "생선",
+    "reading": "生鮮",
+    "meanings": [
+      "을 굽다"
+    ]
+  },
+  {
+    "word": "생일02",
+    "reading": "生日",
+    "meanings": [
+      "파티"
+    ]
+  },
+  {
+    "word": "생활",
+    "reading": "生活",
+    "meanings": [
+      "직장 생활"
+    ]
+  },
+  {
+    "word": "샤워",
+    "reading": "",
+    "meanings": [
+      "shower; 를 하다"
+    ]
+  },
+  {
+    "word": "서다01",
+    "reading": "",
+    "meanings": [
+      "똑바로 서다"
+    ]
+  },
+  {
+    "word": "서로01",
+    "reading": "",
+    "meanings": [
+      "서로 믿다"
+    ]
+  },
+  {
+    "word": "서른",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "서울",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "서울역",
+    "reading": "-驛",
+    "meanings": []
+  },
+  {
+    "word": "서점03",
+    "reading": "書店",
+    "meanings": [
+      "책방"
+    ]
+  },
+  {
+    "word": "서쪽",
+    "reading": "西-",
+    "meanings": [
+      "방향"
+    ]
+  },
+  {
+    "word": "선물03",
+    "reading": "膳物",
+    "meanings": [
+      "을 받다"
+    ]
+  },
+  {
+    "word": "선물하다",
+    "reading": "膳物-",
+    "meanings": []
+  },
+  {
+    "word": "선생01",
+    "reading": "先生",
+    "meanings": []
+  },
+  {
+    "word": "선생님",
+    "reading": "先生-",
+    "meanings": [
+      "국어 선생님"
+    ]
+  },
+  {
+    "word": "설명",
+    "reading": "說明",
+    "meanings": [
+      "을 듣다"
+    ]
+  },
+  {
+    "word": "설명하다",
+    "reading": "說明-",
+    "meanings": []
+  },
+  {
+    "word": "설악산",
+    "reading": "雪嶽山",
+    "meanings": []
+  },
+  {
+    "word": "설탕",
+    "reading": "雪糖",
+    "meanings": [
+      "을 넣다"
+    ]
+  },
+  {
+    "word": "세01",
+    "reading": "",
+    "meanings": [
+      "~ 권; 숫자"
+    ]
+  },
+  {
+    "word": "세수04",
+    "reading": "洗手",
+    "meanings": [
+      "얼굴"
+    ]
+  },
+  {
+    "word": "세탁기",
+    "reading": "洗濯機",
+    "meanings": [
+      "를 돌리다"
+    ]
+  },
+  {
+    "word": "센티미터",
+    "reading": "",
+    "meanings": [
+      "centimeter; 단위"
+    ]
+  },
+  {
+    "word": "셋",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "셋째",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "소개하다01",
+    "reading": "紹介-",
+    "meanings": []
+  },
+  {
+    "word": "소금01",
+    "reading": "",
+    "meanings": [
+      "이 짜다"
+    ]
+  },
+  {
+    "word": "소파06",
+    "reading": "",
+    "meanings": [
+      "sofa; 가구"
+    ]
+  },
+  {
+    "word": "소풍02",
+    "reading": "逍風",
+    "meanings": [
+      "을 가다"
+    ]
+  },
+  {
+    "word": "속01",
+    "reading": "",
+    "meanings": [
+      "주머니 속"
+    ]
+  },
+  {
+    "word": "손01",
+    "reading": "",
+    "meanings": [
+      "신체의 일부"
+    ]
+  },
+  {
+    "word": "손가락",
+    "reading": "",
+    "meanings": [
+      "신체"
+    ]
+  },
+  {
+    "word": "손님",
+    "reading": "",
+    "meanings": [
+      "이 없다"
+    ]
+  },
+  {
+    "word": "쇠고기",
+    "reading": "",
+    "meanings": [
+      "를 굽다"
+    ]
+  },
+  {
+    "word": "쇼핑",
+    "reading": "",
+    "meanings": [
+      "shopping; 을 가다"
+    ]
+  },
+  {
+    "word": "수02",
+    "reading": "",
+    "meanings": [
+      "방법"
+    ]
+  },
+  {
+    "word": "수건",
+    "reading": "手巾",
+    "meanings": [
+      "으로 닦다"
+    ]
+  },
+  {
+    "word": "수박01",
+    "reading": "",
+    "meanings": [
+      "과일; 을 먹다"
+    ]
+  },
+  {
+    "word": "수업04",
+    "reading": "授業",
+    "meanings": [
+      "을 받다"
+    ]
+  },
+  {
+    "word": "수영02",
+    "reading": "水泳",
+    "meanings": [
+      "을 배우다"
+    ]
+  },
+  {
+    "word": "수영장",
+    "reading": "水泳場",
+    "meanings": [
+      "에 다니다"
+    ]
+  },
+  {
+    "word": "수요일",
+    "reading": "水曜日",
+    "meanings": [
+      "요일"
+    ]
+  },
+  {
+    "word": "숙제03",
+    "reading": "宿題",
+    "meanings": [
+      "를 하다"
+    ]
+  },
+  {
+    "word": "숟가락",
+    "reading": "",
+    "meanings": [
+      "을 들다"
+    ]
+  },
+  {
+    "word": "술01",
+    "reading": "",
+    "meanings": [
+      "~을 먹다; 을 마시다"
+    ]
+  },
+  {
+    "word": "쉬다03",
+    "reading": "",
+    "meanings": [
+      "그늘에서; 편안히 ~"
+    ]
+  },
+  {
+    "word": "쉰",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "쉽다",
+    "reading": "",
+    "meanings": [
+      "문제가"
+    ]
+  },
+  {
+    "word": "슈퍼마켓",
+    "reading": "",
+    "meanings": [
+      "supermarket; 에서 사다"
+    ]
+  },
+  {
+    "word": "스무",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "스물",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "스키",
+    "reading": "",
+    "meanings": [
+      "ski; 를 신다"
+    ]
+  },
+  {
+    "word": "스트레스",
+    "reading": "",
+    "meanings": [
+      "stress; 를 풀다"
+    ]
+  },
+  {
+    "word": "스포츠",
+    "reading": "",
+    "meanings": [
+      "sports; 스포츠 경기"
+    ]
+  },
+  {
+    "word": "슬프다",
+    "reading": "",
+    "meanings": [
+      "마음이"
+    ]
+  },
+  {
+    "word": "시06",
+    "reading": "市",
+    "meanings": [
+      "서울시"
+    ]
+  },
+  {
+    "word": "시간04",
+    "reading": "時間",
+    "meanings": [
+      "이 걸리다"
+    ]
+  },
+  {
+    "word": "시계01",
+    "reading": "時計",
+    "meanings": []
+  },
+  {
+    "word": "시원하다",
+    "reading": "",
+    "meanings": [
+      "공기가"
+    ]
+  },
+  {
+    "word": "시월01",
+    "reading": "十月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "시작01",
+    "reading": "始作",
+    "meanings": [
+      "끝"
+    ]
+  },
+  {
+    "word": "시작되다01",
+    "reading": "始作-",
+    "meanings": []
+  },
+  {
+    "word": "시작하다01",
+    "reading": "始作-",
+    "meanings": []
+  },
+  {
+    "word": "시장04",
+    "reading": "市場",
+    "meanings": [
+      "에 가다"
+    ]
+  },
+  {
+    "word": "시험03",
+    "reading": "試驗",
+    "meanings": [
+      "을 보다"
+    ]
+  },
+  {
+    "word": "식당",
+    "reading": "食堂",
+    "meanings": [
+      "에서 식사하다"
+    ]
+  },
+  {
+    "word": "식사03",
+    "reading": "食事",
+    "meanings": [
+      "를 하다"
+    ]
+  },
+  {
+    "word": "식사하다02",
+    "reading": "食事-",
+    "meanings": []
+  },
+  {
+    "word": "식탁",
+    "reading": "食卓",
+    "meanings": [
+      "을 차리다"
+    ]
+  },
+  {
+    "word": "신다",
+    "reading": "",
+    "meanings": [
+      "양말을"
+    ]
+  },
+  {
+    "word": "신문10",
+    "reading": "新聞",
+    "meanings": [
+      "을 읽다"
+    ]
+  },
+  {
+    "word": "신발",
+    "reading": "",
+    "meanings": [
+      "을 신다"
+    ]
+  },
+  {
+    "word": "실례01",
+    "reading": "失禮",
+    "meanings": [
+      "가 되다"
+    ]
+  },
+  {
+    "word": "실례하다",
+    "reading": "失禮-",
+    "meanings": []
+  },
+  {
+    "word": "싫다01",
+    "reading": "",
+    "meanings": [
+      "일이"
+    ]
+  },
+  {
+    "word": "싫어하다",
+    "reading": "",
+    "meanings": [
+      "몹시 싫어하다"
+    ]
+  },
+  {
+    "word": "십",
+    "reading": "十",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "십이월",
+    "reading": "十二月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "십일월",
+    "reading": "十一月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "싶다",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "싸다05",
+    "reading": "",
+    "meanings": [
+      "가격이; 집값이 ~"
+    ]
+  },
+  {
+    "word": "싸우다",
+    "reading": "",
+    "meanings": [
+      "친구와"
+    ]
+  },
+  {
+    "word": "쓰다01",
+    "reading": "",
+    "meanings": [
+      "글씨를 ~; 글자를"
+    ]
+  },
+  {
+    "word": "쓰레기",
+    "reading": "",
+    "meanings": [
+      "를 줍다"
+    ]
+  },
+  {
+    "word": "씨07",
+    "reading": "氏",
+    "meanings": [
+      "마이클 씨"
+    ]
+  },
+  {
+    "word": "씻다",
+    "reading": "",
+    "meanings": [
+      "손을"
+    ]
+  },
+  {
+    "word": "아02",
+    "reading": "",
+    "meanings": [
+      "아, 그래요?"
+    ]
+  },
+  {
+    "word": "아기01",
+    "reading": "",
+    "meanings": [
+      "가 울다"
+    ]
+  },
+  {
+    "word": "아내01",
+    "reading": "",
+    "meanings": [
+      "남편"
+    ]
+  },
+  {
+    "word": "아니01",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "아니다",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "아니요",
+    "reading": "",
+    "meanings": [
+      "대답"
+    ]
+  },
+  {
+    "word": "아들",
+    "reading": "",
+    "meanings": [
+      "을 낳다"
+    ]
+  },
+  {
+    "word": "아래01",
+    "reading": "",
+    "meanings": [
+      "위치"
+    ]
+  },
+  {
+    "word": "아름답다",
+    "reading": "",
+    "meanings": [
+      "모습이"
+    ]
+  },
+  {
+    "word": "아마01",
+    "reading": "",
+    "meanings": [
+      "아마 -을 것이다"
+    ]
+  },
+  {
+    "word": "아무01",
+    "reading": "",
+    "meanings": [
+      "아무도/아무 데도"
+    ]
+  },
+  {
+    "word": "아버지",
+    "reading": "",
+    "meanings": [
+      "가족"
+    ]
+  },
+  {
+    "word": "아빠",
+    "reading": "",
+    "meanings": [
+      "가족"
+    ]
+  },
+  {
+    "word": "아이01",
+    "reading": "",
+    "meanings": [
+      "어른"
+    ]
+  },
+  {
+    "word": "아이스크림",
+    "reading": "",
+    "meanings": [
+      "ice-cream; 을 먹다"
+    ]
+  },
+  {
+    "word": "아저씨",
+    "reading": "",
+    "meanings": [
+      "아주머니"
+    ]
+  },
+  {
+    "word": "아주01",
+    "reading": "",
+    "meanings": [
+      "아주 쉽다"
+    ]
+  },
+  {
+    "word": "아주머니",
+    "reading": "",
+    "meanings": [
+      "아저씨"
+    ]
+  },
+  {
+    "word": "아줌마",
+    "reading": "",
+    "meanings": [
+      "아주머니"
+    ]
+  },
+  {
+    "word": "아직01",
+    "reading": "",
+    "meanings": [
+      "아직 없다"
+    ]
+  },
+  {
+    "word": "아침",
+    "reading": "",
+    "meanings": [
+      "이 되다"
+    ]
+  },
+  {
+    "word": "아파트",
+    "reading": "",
+    "meanings": [
+      "apartment; 에 살다"
+    ]
+  },
+  {
+    "word": "아프다",
+    "reading": "",
+    "meanings": [
+      "다리가"
+    ]
+  },
+  {
+    "word": "아홉",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "아흔",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "안01",
+    "reading": "",
+    "meanings": [
+      "밖; 집 ~"
+    ]
+  },
+  {
+    "word": "안경03",
+    "reading": "眼鏡",
+    "meanings": [
+      "을 쓰다"
+    ]
+  },
+  {
+    "word": "안녕",
+    "reading": "安寧",
+    "meanings": [
+      "친구야! 안녕."
+    ]
+  },
+  {
+    "word": "안녕하다",
+    "reading": "安寧-",
+    "meanings": []
+  },
+  {
+    "word": "안녕히",
+    "reading": "安寧-",
+    "meanings": [
+      "안녕히 계세요"
+    ]
+  },
+  {
+    "word": "안다01",
+    "reading": "",
+    "meanings": [
+      "아기를"
+    ]
+  },
+  {
+    "word": "안되다01",
+    "reading": "",
+    "meanings": [
+      "공부가 ~"
+    ]
+  },
+  {
+    "word": "앉다",
+    "reading": "",
+    "meanings": [
+      "의자에"
+    ]
+  },
+  {
+    "word": "않다",
+    "reading": "",
+    "meanings": [
+      "세수를"
+    ]
+  },
+  {
+    "word": "알다",
+    "reading": "",
+    "meanings": [
+      "사실을"
+    ]
+  },
+  {
+    "word": "앞",
+    "reading": "",
+    "meanings": [
+      "으로 나가다"
+    ]
+  },
+  {
+    "word": "야구02",
+    "reading": "野球",
+    "meanings": [
+      "축구"
+    ]
+  },
+  {
+    "word": "약07",
+    "reading": "藥",
+    "meanings": [
+      "을 먹다"
+    ]
+  },
+  {
+    "word": "약국02",
+    "reading": "藥局",
+    "meanings": [
+      "에 가다"
+    ]
+  },
+  {
+    "word": "약속",
+    "reading": "約束",
+    "meanings": [
+      "을 지키다"
+    ]
+  },
+  {
+    "word": "약속하다",
+    "reading": "約束-",
+    "meanings": []
+  },
+  {
+    "word": "양말01",
+    "reading": "洋襪",
+    "meanings": [
+      "을 신다"
+    ]
+  },
+  {
+    "word": "양복01",
+    "reading": "洋服",
+    "meanings": [
+      "을 입다"
+    ]
+  },
+  {
+    "word": "얘기",
+    "reading": "",
+    "meanings": [
+      "를 들려주다; 이야기"
+    ]
+  },
+  {
+    "word": "얘기하다",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "어02",
+    "reading": "",
+    "meanings": [
+      "어, 이게 뭐야?"
+    ]
+  },
+  {
+    "word": "어깨01",
+    "reading": "",
+    "meanings": [
+      "신체"
+    ]
+  },
+  {
+    "word": "어느01",
+    "reading": "",
+    "meanings": [
+      "어느 나라"
+    ]
+  },
+  {
+    "word": "어디01",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "어떠하다",
+    "reading": "",
+    "meanings": [
+      "생각이"
+    ]
+  },
+  {
+    "word": "어떤",
+    "reading": "",
+    "meanings": [
+      "어떤 느낌"
+    ]
+  },
+  {
+    "word": "어떻다",
+    "reading": "",
+    "meanings": [
+      "마음이"
+    ]
+  },
+  {
+    "word": "어렵다",
+    "reading": "",
+    "meanings": [
+      "문제가"
+    ]
+  },
+  {
+    "word": "어른01",
+    "reading": "",
+    "meanings": [
+      "이 되다"
+    ]
+  },
+  {
+    "word": "어린이01",
+    "reading": "",
+    "meanings": [
+      "사람"
+    ]
+  },
+  {
+    "word": "어머니01",
+    "reading": "",
+    "meanings": [
+      "가족"
+    ]
+  },
+  {
+    "word": "어서01",
+    "reading": "",
+    "meanings": [
+      "어서 일어나"
+    ]
+  },
+  {
+    "word": "어제01",
+    "reading": "",
+    "meanings": [
+      "어저께; 오늘"
+    ]
+  },
+  {
+    "word": "언니",
+    "reading": "",
+    "meanings": [
+      "가족"
+    ]
+  },
+  {
+    "word": "언제01",
+    "reading": "",
+    "meanings": [
+      "언제예요?"
+    ]
+  },
+  {
+    "word": "언제나",
+    "reading": "",
+    "meanings": [
+      "언제나 함께"
+    ]
+  },
+  {
+    "word": "얼굴01",
+    "reading": "",
+    "meanings": [
+      "신체"
+    ]
+  },
+  {
+    "word": "얼마",
+    "reading": "",
+    "meanings": [
+      "얼마예요?"
+    ]
+  },
+  {
+    "word": "얼마나",
+    "reading": "",
+    "meanings": [
+      "얼마나 예쁜지"
+    ]
+  },
+  {
+    "word": "엄마",
+    "reading": "",
+    "meanings": [
+      "가족"
+    ]
+  },
+  {
+    "word": "없다01",
+    "reading": "",
+    "meanings": [
+      "재미가"
+    ]
+  },
+  {
+    "word": "에어컨",
+    "reading": "",
+    "meanings": [
+      "air conditioner; 을 켜다"
+    ]
+  },
+  {
+    "word": "여권02",
+    "reading": "旅券",
+    "meanings": [
+      "을 발급하다"
+    ]
+  },
+  {
+    "word": "여기01",
+    "reading": "",
+    "meanings": [
+      "장소"
+    ]
+  },
+  {
+    "word": "여덟",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "여동생",
+    "reading": "女同生",
+    "meanings": [
+      "가족"
+    ]
+  },
+  {
+    "word": "여든",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "여러",
+    "reading": "",
+    "meanings": [
+      "여러 나라"
+    ]
+  },
+  {
+    "word": "여러분",
+    "reading": "",
+    "meanings": [
+      "국민 여러분"
+    ]
+  },
+  {
+    "word": "여름01",
+    "reading": "",
+    "meanings": [
+      "계절"
+    ]
+  },
+  {
+    "word": "여보세요",
+    "reading": "",
+    "meanings": [
+      "전화"
+    ]
+  },
+  {
+    "word": "여섯",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "여자02",
+    "reading": "女子",
+    "meanings": [
+      "남자"
+    ]
+  },
+  {
+    "word": "여학생",
+    "reading": "女學生",
+    "meanings": [
+      "남학생"
+    ]
+  },
+  {
+    "word": "여행02",
+    "reading": "旅行",
+    "meanings": [
+      "을 가다"
+    ]
+  },
+  {
+    "word": "여행하다01",
+    "reading": "旅行-",
+    "meanings": []
+  },
+  {
+    "word": "역14",
+    "reading": "驛",
+    "meanings": [
+      "에 내리다"
+    ]
+  },
+  {
+    "word": "역사04",
+    "reading": "歷史",
+    "meanings": [
+      "한국의"
+    ]
+  },
+  {
+    "word": "연습03",
+    "reading": "練習",
+    "meanings": [
+      "피아노 연습"
+    ]
+  },
+  {
+    "word": "연습하다03",
+    "reading": "練習-",
+    "meanings": []
+  },
+  {
+    "word": "연필",
+    "reading": "鉛筆",
+    "meanings": [
+      "로 쓰다"
+    ]
+  },
+  {
+    "word": "열03",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "열다02",
+    "reading": "",
+    "meanings": [
+      "문을 ~"
+    ]
+  },
+  {
+    "word": "열쇠",
+    "reading": "",
+    "meanings": [
+      "로 열다"
+    ]
+  },
+  {
+    "word": "열심히",
+    "reading": "熱心-",
+    "meanings": [
+      "열심히 공부하다"
+    ]
+  },
+  {
+    "word": "영국",
+    "reading": "英國",
+    "meanings": []
+  },
+  {
+    "word": "영어02",
+    "reading": "英語",
+    "meanings": [
+      "언어"
+    ]
+  },
+  {
+    "word": "영화01",
+    "reading": "映畵",
+    "meanings": [
+      "를 보다"
+    ]
+  },
+  {
+    "word": "옆",
+    "reading": "",
+    "meanings": [
+      "오른쪽 옆"
+    ]
+  },
+  {
+    "word": "예06",
+    "reading": "",
+    "meanings": [
+      "대답"
+    ]
+  },
+  {
+    "word": "예쁘다",
+    "reading": "",
+    "meanings": [
+      "얼굴이"
+    ]
+  },
+  {
+    "word": "예순",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "옛날",
+    "reading": "",
+    "meanings": [
+      "먼 옛날"
+    ]
+  },
+  {
+    "word": "오04",
+    "reading": "五",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "오늘",
+    "reading": "",
+    "meanings": [
+      "시간"
+    ]
+  },
+  {
+    "word": "오다01",
+    "reading": "",
+    "meanings": [
+      "한국에"
+    ]
+  },
+  {
+    "word": "오래02",
+    "reading": "",
+    "meanings": [
+      "오래 쓰다"
+    ]
+  },
+  {
+    "word": "오래간만",
+    "reading": "",
+    "meanings": [
+      "오래간만에 만나다"
+    ]
+  },
+  {
+    "word": "오랜만",
+    "reading": "",
+    "meanings": [
+      "오랜만에 만나다"
+    ]
+  },
+  {
+    "word": "오렌지",
+    "reading": "",
+    "meanings": [
+      "orange; 과일"
+    ]
+  },
+  {
+    "word": "오르다",
+    "reading": "",
+    "meanings": [
+      "값이"
+    ]
+  },
+  {
+    "word": "오른쪽",
+    "reading": "",
+    "meanings": [
+      "왼쪽"
+    ]
+  },
+  {
+    "word": "오빠",
+    "reading": "",
+    "meanings": [
+      "가족"
+    ]
+  },
+  {
+    "word": "오십",
+    "reading": "五十",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "오월01",
+    "reading": "五月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "오전02",
+    "reading": "午前",
+    "meanings": [
+      "오후"
+    ]
+  },
+  {
+    "word": "오후02",
+    "reading": "午後",
+    "meanings": [
+      "오전"
+    ]
+  },
+  {
+    "word": "올라가다",
+    "reading": "",
+    "meanings": [
+      "나무에"
+    ]
+  },
+  {
+    "word": "올해",
+    "reading": "",
+    "meanings": [
+      "시간"
+    ]
+  },
+  {
+    "word": "옷01",
+    "reading": "",
+    "meanings": [
+      "을 입다"
+    ]
+  },
+  {
+    "word": "왜02",
+    "reading": "",
+    "meanings": [
+      "왜 그래?"
+    ]
+  },
+  {
+    "word": "왜냐하면",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "외국02",
+    "reading": "外國",
+    "meanings": [
+      "에 가다"
+    ]
+  },
+  {
+    "word": "외국어",
+    "reading": "外國語",
+    "meanings": [
+      "로 말하다"
+    ]
+  },
+  {
+    "word": "외국인",
+    "reading": "外國人",
+    "meanings": [
+      "을 만나다"
+    ]
+  },
+  {
+    "word": "왼쪽",
+    "reading": "",
+    "meanings": [
+      "오른쪽"
+    ]
+  },
+  {
+    "word": "요리05",
+    "reading": "料理",
+    "meanings": [
+      "방법"
+    ]
+  },
+  {
+    "word": "요리하다02",
+    "reading": "料理-",
+    "meanings": []
+  },
+  {
+    "word": "요일",
+    "reading": "曜日",
+    "meanings": [
+      "시간"
+    ]
+  },
+  {
+    "word": "요즈음",
+    "reading": "",
+    "meanings": [
+      "요즈음 유행이다"
+    ]
+  },
+  {
+    "word": "요즘",
+    "reading": "",
+    "meanings": [
+      "시간"
+    ]
+  },
+  {
+    "word": "우리03",
+    "reading": "",
+    "meanings": [
+      "우리 가족"
+    ]
+  },
+  {
+    "word": "우리나라",
+    "reading": "",
+    "meanings": [
+      "우리나라 사람"
+    ]
+  },
+  {
+    "word": "우산01",
+    "reading": "雨傘",
+    "meanings": [
+      "을 쓰다"
+    ]
+  },
+  {
+    "word": "우유02",
+    "reading": "牛乳",
+    "meanings": [
+      "를 마시다"
+    ]
+  },
+  {
+    "word": "우체국",
+    "reading": "郵遞局",
+    "meanings": [
+      "에 가다"
+    ]
+  },
+  {
+    "word": "운동02",
+    "reading": "運動",
+    "meanings": [
+      "운동 시설"
+    ]
+  },
+  {
+    "word": "운동장",
+    "reading": "運動場",
+    "meanings": [
+      "을 뛰다"
+    ]
+  },
+  {
+    "word": "운동하다",
+    "reading": "運動-",
+    "meanings": []
+  },
+  {
+    "word": "운동화",
+    "reading": "運動靴",
+    "meanings": [
+      "를 신다"
+    ]
+  },
+  {
+    "word": "운전02",
+    "reading": "運轉",
+    "meanings": [
+      "초보 운전"
+    ]
+  },
+  {
+    "word": "운전하다",
+    "reading": "運轉-",
+    "meanings": []
+  },
+  {
+    "word": "울다01",
+    "reading": "",
+    "meanings": [
+      "아기가; 울음을 ~"
+    ]
+  },
+  {
+    "word": "웃다",
+    "reading": "",
+    "meanings": [
+      "활짝 웃다"
+    ]
+  },
+  {
+    "word": "원01",
+    "reading": "",
+    "meanings": [
+      "천 원; 화폐 단위"
+    ]
+  },
+  {
+    "word": "월02",
+    "reading": "月",
+    "meanings": [
+      "몇 월"
+    ]
+  },
+  {
+    "word": "월요일",
+    "reading": "月曜日",
+    "meanings": [
+      "요일"
+    ]
+  },
+  {
+    "word": "위01",
+    "reading": "",
+    "meanings": [
+      "~아래"
+    ]
+  },
+  {
+    "word": "위험",
+    "reading": "危險",
+    "meanings": [
+      "이 닥치다"
+    ]
+  },
+  {
+    "word": "위험하다",
+    "reading": "危險-",
+    "meanings": []
+  },
+  {
+    "word": "유명하다01",
+    "reading": "有名-",
+    "meanings": []
+  },
+  {
+    "word": "유월01",
+    "reading": "六月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "육02",
+    "reading": "六",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "육십",
+    "reading": "六十",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "은행02",
+    "reading": "銀行",
+    "meanings": [
+      "에 입금하다"
+    ]
+  },
+  {
+    "word": "음식",
+    "reading": "飮食",
+    "meanings": [
+      "을 먹다"
+    ]
+  },
+  {
+    "word": "음악01",
+    "reading": "音樂",
+    "meanings": [
+      "을 듣다"
+    ]
+  },
+  {
+    "word": "의사12",
+    "reading": "醫師",
+    "meanings": [
+      "치과 의사"
+    ]
+  },
+  {
+    "word": "의자03",
+    "reading": "椅子",
+    "meanings": [
+      "에 앉다"
+    ]
+  },
+  {
+    "word": "이03",
+    "reading": "",
+    "meanings": [
+      "를 닦다; 신체"
+    ]
+  },
+  {
+    "word": "이거01",
+    "reading": "",
+    "meanings": [
+      "이것"
+    ]
+  },
+  {
+    "word": "이것",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "이곳",
+    "reading": "",
+    "meanings": [
+      "장소"
+    ]
+  },
+  {
+    "word": "이때",
+    "reading": "",
+    "meanings": [
+      "를 놓치다"
+    ]
+  },
+  {
+    "word": "이런01",
+    "reading": "",
+    "meanings": [
+      "이런 일"
+    ]
+  },
+  {
+    "word": "이렇다",
+    "reading": "",
+    "meanings": [
+      "결과가"
+    ]
+  },
+  {
+    "word": "이름",
+    "reading": "",
+    "meanings": [
+      "을 묻다"
+    ]
+  },
+  {
+    "word": "이번01",
+    "reading": "-番",
+    "meanings": [
+      "이번 주"
+    ]
+  },
+  {
+    "word": "이분01",
+    "reading": "",
+    "meanings": [
+      "그분"
+    ]
+  },
+  {
+    "word": "이십",
+    "reading": "二十",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "이야기",
+    "reading": "",
+    "meanings": [
+      "를 들려주다"
+    ]
+  },
+  {
+    "word": "이야기하다",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "이월01",
+    "reading": "二月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "이제01",
+    "reading": "",
+    "meanings": [
+      "이제부터"
+    ]
+  },
+  {
+    "word": "이쪽02",
+    "reading": "",
+    "meanings": [
+      "으로 향하다"
+    ]
+  },
+  {
+    "word": "이해하다02",
+    "reading": "理解-",
+    "meanings": []
+  },
+  {
+    "word": "인사01",
+    "reading": "人士",
+    "meanings": []
+  },
+  {
+    "word": "인사하다",
+    "reading": "人事-",
+    "meanings": []
+  },
+  {
+    "word": "인천",
+    "reading": "仁川",
+    "meanings": []
+  },
+  {
+    "word": "일01",
+    "reading": "",
+    "meanings": [
+      "이 쌓이다"
+    ]
+  },
+  {
+    "word": "일곱",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "일본",
+    "reading": "日本",
+    "meanings": []
+  },
+  {
+    "word": "일본어",
+    "reading": "日本語",
+    "meanings": [
+      "로 말하다"
+    ]
+  },
+  {
+    "word": "일어나다",
+    "reading": "",
+    "meanings": [
+      "일찍 일어나다"
+    ]
+  },
+  {
+    "word": "일요일",
+    "reading": "日曜日",
+    "meanings": [
+      "요일"
+    ]
+  },
+  {
+    "word": "일월01",
+    "reading": "一月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "일주일",
+    "reading": "一週日",
+    "meanings": [
+      "이 걸리다"
+    ]
+  },
+  {
+    "word": "일찍",
+    "reading": "",
+    "meanings": [
+      "일찍 일어나다"
+    ]
+  },
+  {
+    "word": "일하다",
+    "reading": "",
+    "meanings": []
+  },
+  {
+    "word": "일흔",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "읽다",
+    "reading": "",
+    "meanings": [
+      "책을"
+    ]
+  },
+  {
+    "word": "잃다",
+    "reading": "",
+    "meanings": [
+      "물건을"
+    ]
+  },
+  {
+    "word": "잃어버리다",
+    "reading": "",
+    "meanings": [
+      "물건을"
+    ]
+  },
+  {
+    "word": "입",
+    "reading": "",
+    "meanings": [
+      "을 열다"
+    ]
+  },
+  {
+    "word": "입다01",
+    "reading": "",
+    "meanings": [
+      "옷을 ~"
+    ]
+  },
+  {
+    "word": "있다01",
+    "reading": "",
+    "meanings": [
+      "집에"
+    ]
+  },
+  {
+    "word": "잊다01",
+    "reading": "",
+    "meanings": [
+      "번호를"
+    ]
+  },
+  {
+    "word": "잊어버리다",
+    "reading": "",
+    "meanings": [
+      "번호를"
+    ]
+  },
+  {
+    "word": "잎01",
+    "reading": "",
+    "meanings": [
+      "이 떨어지다"
+    ]
+  },
+  {
+    "word": "자다01",
+    "reading": "",
+    "meanings": [
+      "잠을"
+    ]
+  },
+  {
+    "word": "자동차",
+    "reading": "自動車",
+    "meanings": [
+      "를 운전하다"
+    ]
+  },
+  {
+    "word": "자리01",
+    "reading": "",
+    "meanings": [
+      "~가 없다; 에 앉다"
+    ]
+  },
+  {
+    "word": "자장면",
+    "reading": "",
+    "meanings": [
+      "&중Zhajiangmian; 음식"
+    ]
+  },
+  {
+    "word": "자전거",
+    "reading": "自轉車",
+    "meanings": [
+      "를 타다"
+    ]
+  },
+  {
+    "word": "자주01",
+    "reading": "",
+    "meanings": [
+      "자주 만나다"
+    ]
+  },
+  {
+    "word": "작년",
+    "reading": "昨年",
+    "meanings": [
+      "시간"
+    ]
+  },
+  {
+    "word": "작다01",
+    "reading": "",
+    "meanings": [
+      "얼굴이"
+    ]
+  },
+  {
+    "word": "잔03",
+    "reading": "盞",
+    "meanings": [
+      "커피 잔"
+    ]
+  },
+  {
+    "word": "잘02",
+    "reading": "",
+    "meanings": [
+      "잘 알다"
+    ]
+  },
+  {
+    "word": "잘하다",
+    "reading": "",
+    "meanings": [
+      "외국어를"
+    ]
+  },
+  {
+    "word": "잠01",
+    "reading": "",
+    "meanings": [
+      "을 자다"
+    ]
+  },
+  {
+    "word": "잠깐",
+    "reading": "",
+    "meanings": [
+      "잠깐 기다리다"
+    ]
+  },
+  {
+    "word": "잠시",
+    "reading": "暫時",
+    "meanings": [
+      "잠시 기다리다"
+    ]
+  },
+  {
+    "word": "잠자다",
+    "reading": "",
+    "meanings": [
+      "새근새근 잠자다"
+    ]
+  },
+  {
+    "word": "잡다01",
+    "reading": "",
+    "meanings": [
+      "손을"
+    ]
+  },
+  {
+    "word": "잡수시다",
+    "reading": "",
+    "meanings": [
+      "진지를"
+    ]
+  },
+  {
+    "word": "잡지",
+    "reading": "雜誌",
+    "meanings": [
+      "를 보다"
+    ]
+  },
+  {
+    "word": "장22",
+    "reading": "張",
+    "meanings": [
+      "종이 한 ~"
+    ]
+  },
+  {
+    "word": "장미05",
+    "reading": "薔薇",
+    "meanings": [
+      "꽃"
+    ]
+  },
+  {
+    "word": "장소05",
+    "reading": "場所",
+    "meanings": [
+      "를 정하다"
+    ]
+  },
+  {
+    "word": "재미01",
+    "reading": "",
+    "meanings": [
+      "가 있다"
+    ]
+  },
+  {
+    "word": "재미없다",
+    "reading": "",
+    "meanings": [
+      "이야기가"
+    ]
+  },
+  {
+    "word": "재미있다",
+    "reading": "",
+    "meanings": [
+      "이야기가"
+    ]
+  },
+  {
+    "word": "저03",
+    "reading": "",
+    "meanings": [
+      "사람(1인칭); 일인칭 대명사"
+    ]
+  },
+  {
+    "word": "저거01",
+    "reading": "",
+    "meanings": [
+      "저것"
+    ]
+  },
+  {
+    "word": "저것",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "저곳",
+    "reading": "",
+    "meanings": [
+      "장소"
+    ]
+  },
+  {
+    "word": "저기01",
+    "reading": "",
+    "meanings": [
+      "장소"
+    ]
+  },
+  {
+    "word": "저녁",
+    "reading": "",
+    "meanings": [
+      "이 되다"
+    ]
+  },
+  {
+    "word": "저쪽",
+    "reading": "",
+    "meanings": [
+      "방향"
+    ]
+  },
+  {
+    "word": "적다01",
+    "reading": "",
+    "meanings": [
+      "답을 ~; 이름을"
+    ]
+  },
+  {
+    "word": "전08",
+    "reading": "前",
+    "meanings": [
+      "오래 전"
+    ]
+  },
+  {
+    "word": "전화07",
+    "reading": "電話",
+    "meanings": [
+      "를 걸다"
+    ]
+  },
+  {
+    "word": "전화번호",
+    "reading": "電話番號",
+    "meanings": [
+      "를 묻다"
+    ]
+  },
+  {
+    "word": "전화하다02",
+    "reading": "電話-",
+    "meanings": []
+  },
+  {
+    "word": "점심",
+    "reading": "點心",
+    "meanings": [
+      "에 만나다"
+    ]
+  },
+  {
+    "word": "점심시간",
+    "reading": "點心時間",
+    "meanings": [
+      "이 되다"
+    ]
+  },
+  {
+    "word": "젓가락",
+    "reading": "",
+    "meanings": [
+      "을 쓰다"
+    ]
+  },
+  {
+    "word": "정류장",
+    "reading": "停留場",
+    "meanings": [
+      "버스 정류장"
+    ]
+  },
+  {
+    "word": "정말01",
+    "reading": "正-",
+    "meanings": [
+      "정말 좋다"
+    ]
+  },
+  {
+    "word": "제일04",
+    "reading": "第一",
+    "meanings": [
+      "제일 좋아하다"
+    ]
+  },
+  {
+    "word": "제주도",
+    "reading": "濟州島",
+    "meanings": []
+  },
+  {
+    "word": "조금01",
+    "reading": "",
+    "meanings": [
+      "조금 먹다"
+    ]
+  },
+  {
+    "word": "조용하다01",
+    "reading": "",
+    "meanings": [
+      "집이"
+    ]
+  },
+  {
+    "word": "졸업",
+    "reading": "卒業",
+    "meanings": [
+      "입학"
+    ]
+  },
+  {
+    "word": "졸업하다",
+    "reading": "卒業-",
+    "meanings": []
+  },
+  {
+    "word": "좀02",
+    "reading": "",
+    "meanings": [
+      "조금; 좀 비싸다"
+    ]
+  },
+  {
+    "word": "종이01",
+    "reading": "",
+    "meanings": [
+      "에 쓰다"
+    ]
+  },
+  {
+    "word": "좋다01",
+    "reading": "",
+    "meanings": [
+      "날씨가"
+    ]
+  },
+  {
+    "word": "좋아하다",
+    "reading": "",
+    "meanings": [
+      "꽃을"
+    ]
+  },
+  {
+    "word": "죄송하다",
+    "reading": "罪悚-",
+    "meanings": [
+      "마음이"
+    ]
+  },
+  {
+    "word": "주26",
+    "reading": "週",
+    "meanings": [
+      "이번 주"
+    ]
+  },
+  {
+    "word": "주다01",
+    "reading": "",
+    "meanings": [
+      "선물을"
+    ]
+  },
+  {
+    "word": "주말02",
+    "reading": "週末",
+    "meanings": [
+      "을 보내다"
+    ]
+  },
+  {
+    "word": "주소01",
+    "reading": "住所",
+    "meanings": [
+      "를 적다"
+    ]
+  },
+  {
+    "word": "주스",
+    "reading": "",
+    "meanings": [
+      "juice; 를 마시다"
+    ]
+  },
+  {
+    "word": "주인01",
+    "reading": "主人",
+    "meanings": [
+      "가게 주인"
+    ]
+  },
+  {
+    "word": "죽다01",
+    "reading": "",
+    "meanings": [
+      "굶어 ~; 사람이"
+    ]
+  },
+  {
+    "word": "준비",
+    "reading": "準備",
+    "meanings": [
+      "출근 준비"
+    ]
+  },
+  {
+    "word": "준비하다",
+    "reading": "準備-",
+    "meanings": []
+  },
+  {
+    "word": "중국",
+    "reading": "中國",
+    "meanings": []
+  },
+  {
+    "word": "중국어",
+    "reading": "中國語",
+    "meanings": [
+      "로 말하다"
+    ]
+  },
+  {
+    "word": "중요하다02",
+    "reading": "重要-",
+    "meanings": []
+  },
+  {
+    "word": "중학교",
+    "reading": "中學校",
+    "meanings": [
+      "에 입학하다"
+    ]
+  },
+  {
+    "word": "중학생",
+    "reading": "中學生",
+    "meanings": [
+      "이 되다"
+    ]
+  },
+  {
+    "word": "즐겁다",
+    "reading": "",
+    "meanings": [
+      "마음이"
+    ]
+  },
+  {
+    "word": "지갑03",
+    "reading": "紙匣",
+    "meanings": [
+      "에 넣다"
+    ]
+  },
+  {
+    "word": "지금03",
+    "reading": "只今",
+    "meanings": [
+      "지금부터"
+    ]
+  },
+  {
+    "word": "지난달",
+    "reading": "",
+    "meanings": [
+      "시간"
+    ]
+  },
+  {
+    "word": "지난주",
+    "reading": "-週",
+    "meanings": [
+      "시간"
+    ]
+  },
+  {
+    "word": "지내다01",
+    "reading": "",
+    "meanings": [
+      "잘 지내다"
+    ]
+  },
+  {
+    "word": "지도03",
+    "reading": "地圖",
+    "meanings": [
+      "를 보다"
+    ]
+  },
+  {
+    "word": "지우개",
+    "reading": "",
+    "meanings": [
+      "로 지우다"
+    ]
+  },
+  {
+    "word": "지우다01",
+    "reading": "",
+    "meanings": [
+      "낙서를 ~; 지우개로"
+    ]
+  },
+  {
+    "word": "지하",
+    "reading": "地下",
+    "meanings": [
+      "로 내려가다"
+    ]
+  },
+  {
+    "word": "지하철",
+    "reading": "地下鐵",
+    "meanings": [
+      "을 타다"
+    ]
+  },
+  {
+    "word": "질문",
+    "reading": "質問",
+    "meanings": [
+      "에 답하다"
+    ]
+  },
+  {
+    "word": "질문하다",
+    "reading": "質問-",
+    "meanings": []
+  },
+  {
+    "word": "집01",
+    "reading": "",
+    "meanings": [
+      "에 살다"
+    ]
+  },
+  {
+    "word": "짜다03",
+    "reading": "",
+    "meanings": [
+      "맛이; 음식이 ~"
+    ]
+  },
+  {
+    "word": "짧다",
+    "reading": "",
+    "meanings": [
+      "다리가"
+    ]
+  },
+  {
+    "word": "쪽05",
+    "reading": "",
+    "meanings": [
+      "방향"
+    ]
+  },
+  {
+    "word": "찌개01",
+    "reading": "",
+    "meanings": [
+      "를 끓이다"
+    ]
+  },
+  {
+    "word": "찍다02",
+    "reading": "",
+    "meanings": [
+      "서류에 도장을 ~"
+    ]
+  },
+  {
+    "word": "차06",
+    "reading": "車",
+    "meanings": []
+  },
+  {
+    "word": "참01",
+    "reading": "",
+    "meanings": [
+      "참 좋다; 참으로"
+    ]
+  },
+  {
+    "word": "창문",
+    "reading": "窓門",
+    "meanings": [
+      "을 열다"
+    ]
+  },
+  {
+    "word": "찾다",
+    "reading": "",
+    "meanings": [
+      "지갑을"
+    ]
+  },
+  {
+    "word": "책01",
+    "reading": "冊",
+    "meanings": [
+      "을 읽다"
+    ]
+  },
+  {
+    "word": "책상01",
+    "reading": "冊床",
+    "meanings": [
+      "가구"
+    ]
+  },
+  {
+    "word": "처음",
+    "reading": "",
+    "meanings": [
+      "처음 시작하다"
+    ]
+  },
+  {
+    "word": "천03",
+    "reading": "千",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "천천히",
+    "reading": "",
+    "meanings": [
+      "천천히 가다"
+    ]
+  },
+  {
+    "word": "첫째",
+    "reading": "",
+    "meanings": [
+      "첫째 시간"
+    ]
+  },
+  {
+    "word": "청바지",
+    "reading": "靑-",
+    "meanings": [
+      "를 입다"
+    ]
+  },
+  {
+    "word": "청소06",
+    "reading": "淸掃",
+    "meanings": [
+      "화장실 청소"
+    ]
+  },
+  {
+    "word": "청소하다03",
+    "reading": "淸掃-",
+    "meanings": []
+  },
+  {
+    "word": "초대06",
+    "reading": "招待",
+    "meanings": [
+      "를 하다"
+    ]
+  },
+  {
+    "word": "초대하다02",
+    "reading": "招待-",
+    "meanings": []
+  },
+  {
+    "word": "초등학교",
+    "reading": "初等學校",
+    "meanings": [
+      "에 입학하다"
+    ]
+  },
+  {
+    "word": "초콜릿",
+    "reading": "",
+    "meanings": [
+      "chocolate; 을 먹다"
+    ]
+  },
+  {
+    "word": "추다02",
+    "reading": "",
+    "meanings": [
+      "춤을 ~"
+    ]
+  },
+  {
+    "word": "축구04",
+    "reading": "蹴球",
+    "meanings": [
+      "운동"
+    ]
+  },
+  {
+    "word": "축하하다",
+    "reading": "祝賀-",
+    "meanings": []
+  },
+  {
+    "word": "출발하다",
+    "reading": "出發-",
+    "meanings": []
+  },
+  {
+    "word": "춤01",
+    "reading": "",
+    "meanings": [
+      "을 추다"
+    ]
+  },
+  {
+    "word": "춤추다",
+    "reading": "",
+    "meanings": [
+      "가수들이"
+    ]
+  },
+  {
+    "word": "춥다",
+    "reading": "",
+    "meanings": [
+      "날씨가"
+    ]
+  },
+  {
+    "word": "취미04",
+    "reading": "趣味",
+    "meanings": [
+      "취미 생활"
+    ]
+  },
+  {
+    "word": "층02",
+    "reading": "層",
+    "meanings": [
+      "10층 건물"
+    ]
+  },
+  {
+    "word": "치다02",
+    "reading": "",
+    "meanings": [
+      "얼굴을 ~; 책상을"
+    ]
+  },
+  {
+    "word": "치마01",
+    "reading": "",
+    "meanings": [
+      "를 입다"
+    ]
+  },
+  {
+    "word": "치약",
+    "reading": "齒藥",
+    "meanings": [
+      "을 짜다"
+    ]
+  },
+  {
+    "word": "친구02",
+    "reading": "親舊",
+    "meanings": [
+      "를 만나다"
+    ]
+  },
+  {
+    "word": "친절하다",
+    "reading": "親切-",
+    "meanings": []
+  },
+  {
+    "word": "칠01",
+    "reading": "七",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "칠십",
+    "reading": "七十",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "칠월",
+    "reading": "七月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "칠판",
+    "reading": "漆板",
+    "meanings": [
+      "에 쓰다"
+    ]
+  },
+  {
+    "word": "침대02",
+    "reading": "寢臺",
+    "meanings": [
+      "가구"
+    ]
+  },
+  {
+    "word": "칫솔",
+    "reading": "齒-",
+    "meanings": [
+      "로 이를 닦다"
+    ]
+  },
+  {
+    "word": "카드",
+    "reading": "",
+    "meanings": [
+      "card; 를 쓰다"
+    ]
+  },
+  {
+    "word": "카메라",
+    "reading": "",
+    "meanings": [
+      "camera; 로 찍다"
+    ]
+  },
+  {
+    "word": "칼01",
+    "reading": "",
+    "meanings": [
+      "로 자르다; 베는 도구"
+    ]
+  },
+  {
+    "word": "캐나다",
+    "reading": "",
+    "meanings": [
+      "Canada"
+    ]
+  },
+  {
+    "word": "커피",
+    "reading": "",
+    "meanings": [
+      "coffee; 를 마시다"
+    ]
+  },
+  {
+    "word": "컴퓨터",
+    "reading": "",
+    "meanings": [
+      "computer; 컴퓨터 게임"
+    ]
+  },
+  {
+    "word": "컵",
+    "reading": "",
+    "meanings": [
+      "cup; 을 닦다"
+    ]
+  },
+  {
+    "word": "켜다01",
+    "reading": "",
+    "meanings": [
+      "불을; 성냥을 ~"
+    ]
+  },
+  {
+    "word": "코01",
+    "reading": "",
+    "meanings": [
+      "가 높다"
+    ]
+  },
+  {
+    "word": "콜라",
+    "reading": "",
+    "meanings": [
+      "cola; 를 마시다"
+    ]
+  },
+  {
+    "word": "크다01",
+    "reading": "",
+    "meanings": [
+      "크기가"
+    ]
+  },
+  {
+    "word": "크리스마스",
+    "reading": "",
+    "meanings": [
+      "Christmas; 크리스마스 트리"
+    ]
+  },
+  {
+    "word": "키01",
+    "reading": "",
+    "meanings": [
+      "신장; 키가 큰 사람"
+    ]
+  },
+  {
+    "word": "타다02",
+    "reading": "",
+    "meanings": [
+      "버스에 ~; 차에"
+    ]
+  },
+  {
+    "word": "태권도",
+    "reading": "跆拳道",
+    "meanings": [
+      "를 배우다"
+    ]
+  },
+  {
+    "word": "태어나다",
+    "reading": "",
+    "meanings": [
+      "아이가"
+    ]
+  },
+  {
+    "word": "택시",
+    "reading": "",
+    "meanings": [
+      "taxi; 를 타다"
+    ]
+  },
+  {
+    "word": "테니스",
+    "reading": "",
+    "meanings": [
+      "tennis; 를 치다"
+    ]
+  },
+  {
+    "word": "테이블",
+    "reading": "",
+    "meanings": [
+      "table; 에 놓다"
+    ]
+  },
+  {
+    "word": "텔레비전",
+    "reading": "",
+    "meanings": [
+      "television; 을 보다"
+    ]
+  },
+  {
+    "word": "토요일",
+    "reading": "土曜日",
+    "meanings": [
+      "요일"
+    ]
+  },
+  {
+    "word": "티브이",
+    "reading": "",
+    "meanings": [
+      "TV"
+    ]
+  },
+  {
+    "word": "팀01",
+    "reading": "",
+    "meanings": [
+      "team; 을 이루다"
+    ]
+  },
+  {
+    "word": "파란색",
+    "reading": "-色",
+    "meanings": [
+      "색깔"
+    ]
+  },
+  {
+    "word": "파티",
+    "reading": "",
+    "meanings": [
+      "party; 를 열다"
+    ]
+  },
+  {
+    "word": "팔01",
+    "reading": "",
+    "meanings": [
+      "신체의 일부"
+    ]
+  },
+  {
+    "word": "팔다",
+    "reading": "",
+    "meanings": [
+      "책을"
+    ]
+  },
+  {
+    "word": "팔십",
+    "reading": "八十",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "팔월",
+    "reading": "八月",
+    "meanings": [
+      "달(월)"
+    ]
+  },
+  {
+    "word": "퍼센트",
+    "reading": "",
+    "meanings": [
+      "percent; 백 퍼센트"
+    ]
+  },
+  {
+    "word": "편지02",
+    "reading": "便紙",
+    "meanings": [
+      "를 쓰다"
+    ]
+  },
+  {
+    "word": "포도06",
+    "reading": "葡萄",
+    "meanings": [
+      "과일"
+    ]
+  },
+  {
+    "word": "표04",
+    "reading": "票",
+    "meanings": [
+      "를 끊다"
+    ]
+  },
+  {
+    "word": "프랑스",
+    "reading": "",
+    "meanings": [
+      "France"
+    ]
+  },
+  {
+    "word": "피곤하다",
+    "reading": "疲困-",
+    "meanings": []
+  },
+  {
+    "word": "피아노01",
+    "reading": "",
+    "meanings": [
+      "piano; 를 치다"
+    ]
+  },
+  {
+    "word": "피우다01",
+    "reading": "",
+    "meanings": [
+      "꽃을"
+    ]
+  },
+  {
+    "word": "피자",
+    "reading": "",
+    "meanings": [
+      "&이pizza; 를 주문하다"
+    ]
+  },
+  {
+    "word": "필요",
+    "reading": "必要",
+    "meanings": [
+      "를 충족하다"
+    ]
+  },
+  {
+    "word": "필요하다",
+    "reading": "必要-",
+    "meanings": []
+  },
+  {
+    "word": "하나",
+    "reading": "",
+    "meanings": [
+      "숫자"
+    ]
+  },
+  {
+    "word": "하늘01",
+    "reading": "",
+    "meanings": [
+      "이 높다"
+    ]
+  },
+  {
+    "word": "하다01",
+    "reading": "",
+    "meanings": [
+      "운동을"
+    ]
+  },
+  {
+    "word": "하지만",
+    "reading": "",
+    "meanings": [
+      "−"
+    ]
+  },
+  {
+    "word": "학교",
+    "reading": "學校",
+    "meanings": [
+      "에 다니다"
+    ]
+  },
+  {
+    "word": "학년",
+    "reading": "學年",
+    "meanings": [
+      "새 학년"
+    ]
+  },
+  {
+    "word": "학생",
+    "reading": "學生",
+    "meanings": [
+      "을 가르치다"
+    ]
+  },
+  {
+    "word": "한01",
+    "reading": "",
+    "meanings": [
+      "한 명"
+    ]
+  },
+  {
+    "word": "한강",
+    "reading": "漢江",
+    "meanings": []
+  },
+  {
+    "word": "한국",
+    "reading": "韓國",
+    "meanings": []
+  },
+  {
+    "word": "한국말",
+    "reading": "韓國-",
+    "meanings": [
+      "로 말하다"
+    ]
+  },
+  {
+    "word": "한국어",
+    "reading": "韓國語",
+    "meanings": [
+      "를 말하다"
+    ]
+  },
+  {
+    "word": "한글01",
+    "reading": "",
+    "meanings": [
+      "을 쓰다"
+    ]
+  },
+  {
+    "word": "한번",
+    "reading": "-番",
+    "meanings": [
+      "한번 해 보다"
+    ]
+  },
+  {
+    "word": "한복",
+    "reading": "韓服",
+    "meanings": [
+      "을 입다"
+    ]
+  },
+  {
+    "word": "한자02",
+    "reading": "漢字",
+    "meanings": [
+      "로 쓰다"
+    ]
+  },
+  {
+    "word": "할머니",
+    "reading": "",
+    "meanings": [
+      "가족"
+    ]
+  },
+  {
+    "word": "할아버지",
+    "reading": "",
+    "meanings": [
+      "가족"
+    ]
+  },
+  {
+    "word": "함께",
+    "reading": "",
+    "meanings": [
+      "함께 놀다"
+    ]
+  },
+  {
+    "word": "항상",
+    "reading": "恒常",
+    "meanings": [
+      "항상 같다"
+    ]
+  },
+  {
+    "word": "해01",
+    "reading": "",
+    "meanings": [
+      "가 뜨다"
+    ]
+  },
+  {
+    "word": "핸드폰",
+    "reading": "",
+    "meanings": [
+      "hand phone"
+    ]
+  },
+  {
+    "word": "햄버거",
+    "reading": "",
+    "meanings": [
+      "hamburger; 를 먹다"
+    ]
+  },
+  {
+    "word": "허리01",
+    "reading": "",
+    "meanings": [
+      "신체"
+    ]
+  },
+  {
+    "word": "형01",
+    "reading": "兄",
+    "meanings": [
+      "가족"
+    ]
+  },
+  {
+    "word": "호14",
+    "reading": "號",
+    "meanings": [
+      "사월 호 잡지"
+    ]
+  },
+  {
+    "word": "호주",
+    "reading": "濠洲",
+    "meanings": []
+  },
+  {
+    "word": "호텔",
+    "reading": "",
+    "meanings": [
+      "hotel; 에 묵다"
+    ]
+  },
+  {
+    "word": "혼자01",
+    "reading": "",
+    "meanings": [
+      "살다"
+    ]
+  },
+  {
+    "word": "화06",
+    "reading": "",
+    "meanings": [
+      "~를 내다; 가 나다"
+    ]
+  },
+  {
+    "word": "화요일",
+    "reading": "火曜日",
+    "meanings": [
+      "요일"
+    ]
+  },
+  {
+    "word": "화장실",
+    "reading": "化粧室",
+    "meanings": [
+      "에 가다"
+    ]
+  },
+  {
+    "word": "환자03",
+    "reading": "患者",
+    "meanings": [
+      "을 돌보다"
+    ]
+  },
+  {
+    "word": "회사04",
+    "reading": "會社",
+    "meanings": [
+      "에 다니다"
+    ]
+  },
+  {
+    "word": "회의04",
+    "reading": "會議",
+    "meanings": [
+      "가 열리다"
+    ]
+  },
+  {
+    "word": "후08",
+    "reading": "後",
+    "meanings": [
+      "오 분 후"
+    ]
+  },
+  {
+    "word": "휴일",
+    "reading": "休日",
+    "meanings": [
+      "에 쉬다"
+    ]
+  },
+  {
+    "word": "휴지02",
+    "reading": "休紙",
+    "meanings": [
+      "를 줍다"
+    ]
+  },
+  {
+    "word": "휴지통",
+    "reading": "休紙桶",
+    "meanings": [
+      "에 버리다"
+    ]
+  },
+  {
+    "word": "흰색",
+    "reading": "-色",
+    "meanings": [
+      "색깔"
+    ]
+  },
+  {
+    "word": "힘01",
+    "reading": "",
+    "meanings": [
+      "이 세다"
+    ]
+  },
+  {
+    "word": "힘들다",
+    "reading": "",
+    "meanings": [
+      "일이"
+    ]
+  }
+]
