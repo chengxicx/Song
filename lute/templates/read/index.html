@@ -75,11 +75,11 @@
           <div class="read-slide-container">
             <div class="read_page_nav read_page_disabled"
               id="navPrev"
-              onclick="goto_relative_page(-1)">◀</div>
+              onclick="navigatePrev()">◀</div>
             <input type="range" id="read-slider" class="read_page_disabled" max="{{ page_count - 1 }}" value="{{ page_num }}" step="1">
             <div class="read_page_nav read_page_disabled"
               id="navNext"
-              onclick="goto_relative_page(1)">▶</div>
+              onclick="navigateNext()">▶</div>
           </div>
         </div>
     </div>
@@ -116,62 +116,12 @@
      here so it can be cached and reused without further requests. #}
   <div id="termpopup-cache" style="display:none"></div>
 
-  <div id="reading-footer" style="text-align: center">
-    <p>
-      <span
-        id="footerMarkRestAsKnownNextPage"
-        style="cursor: pointer; color: #4CBB17;"
-        onclick="handle_page_done(true, 1)"
-        title="Mark rest as known, mark page as read, then go to next page">
-        &#x2714;
-      </span>
-
-      <span
-        id="footerNextPage"
-        style="cursor: pointer; font-size: 1.5em; font-weight: bold;"
-        onclick="handle_page_done(false, 1)"
-        title="Mark page as read, then go to next page">
-        &#8250;
-      </span>
-    </p>
-
-    <div id="final_page_controls" class="hide">
-      <p>
-        <span
-          id="footerMarkRestAsKnown"
-          style="cursor: pointer; color: #4CBB17;"
-          onclick="handle_page_done(true, 0)"
-          title="Mark rest as known, mark page as read">
-          &#x2714;
-        </span>
-
-        <span
-          id="footerDone"
-          style="cursor: pointer;"
-          onclick="handle_page_done(false, 0)"
-          title="Mark page as read">
-          &#x2714;
-        </span>
-      </p>
-
-      <h2>&#127881;</h2>
-      <p>
-        <a
-          href=""
-          tabindex="-1"
-          onclick="$('#actionposter').submit(); return false;"
-          >Archive book</a>
-        |
-        <a href="/" tabindex="-1">Home</a>
-      </p>
-
-      <form
-        id="actionposter"
-        method="post"
-        action="/book/archive/{{ book.id }}"
-        ></form>
-    </div>
-
+  <div id="reading-end-controls" class="hide">
+    <button type="button" class="mark-known-btn"
+            onclick="handle_page_done(true, 0)"
+            title="Mark the remaining words as known and finish the book">
+      Mark rest as known
+    </button>
   </div>
   <div class="btm-margin-container"></div>
 </div>
@@ -202,10 +152,10 @@
 
 </div>
 
-<div id="navSidePrev" class="side-page-nav hide" onclick="goto_relative_page(-1)" title="Go to previous page">
+<div id="navSidePrev" class="side-page-nav hide" onclick="navigatePrev()" title="Go to previous page">
   <svg viewBox="7.5 3.5 15 25" width="18" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>
 </div>
-<div id="navSideNext" class="side-page-nav hide" onclick="handle_page_done(false, 1)" title="Mark page as read, then go to next page">
+<div id="navSideNext" class="side-page-nav hide" onclick="navigateNext()" title="Go to next page">
   <svg viewBox="7.5 3.5 15 25" width="18" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
 </div>
 
@@ -448,20 +398,12 @@
     $('#navSideNext').removeClass('hide');
   };
 
-  // Show/hide footer controls.
+  // Show/hide footer controls.  The end-of-book "Mark rest as known"
+  // button is shown only on the very last screen by the fit-to-screen
+  // renderer (_renderScreen); this hook just keeps it hidden until then.
   let set_footer_control_visibility = function() {
-    const pagenum = parseInt($('#page_num').val());
-    const maxpage = parseInt($('#page_count').val());
-    if (pagenum == maxpage) {
-      $('#final_page_controls').removeClass("hide");
-      $('#footerMarkRestAsKnownNextPage').addClass("hide");
-      $('#footerNextPage').addClass("hide");
-    }
-    else {
-      $('#final_page_controls').addClass("hide");
-      $('#footerMarkRestAsKnownNextPage').removeClass("hide");
-      $('#footerNextPage').removeClass("hide");
-    }
+    const ec = document.getElementById("reading-end-controls");
+    if (ec) ec.classList.add("hide");
   };
 
 
@@ -566,6 +508,10 @@
     show_hide_title(actualPage);
     $("html, body").animate({ scrollTop: 0 });
 
+    // Re-flow the page into screen-height groups now that the content
+    // is swapped in and laid out (fonts/status classes are applied above).
+    requestAnimationFrame(_splitToScreens);
+
     if (initial) {
       prepareTextInteractions();
     }
@@ -647,6 +593,113 @@
     const bookid = $('#book_id').val();
     const pagenum = parseInt($('#page_num').val());
     location.href = `/read/editpage/${bookid}/${pagenum}`;
+  }
+
+  // ---- Fit-to-screen sub-pagination ---------------------------------
+  // Text (and audio/dictionary) books fill the fixed, non-scrolling
+  // pane.  The current logical page is measured and split into
+  // one-screen groups; only the current group is displayed and the side
+  // arrows step through these screens before crossing to the next Lute
+  // page.  Manga keeps its own full-page image and is not split.
+  let subScreens = [];
+  let curScreen = 0;
+
+  const _isMangaReader = () => {
+    const t = document.getElementById("thetext");
+    return !!t && t.classList.contains("manga-text-container");
+  };
+
+  function _splitToScreens() {
+    const wrap = theText;
+    const endBtn = document.getElementById("reading-end-controls");
+    if (!wrap) return;
+    if (_isMangaReader()) {
+      subScreens = [];
+      curScreen = 0;
+      if (endBtn) endBtn.classList.add("hide");
+      return;
+    }
+    const paras = Array.from(wrap.querySelectorAll(":scope > p"));
+    subScreens = [];
+    curScreen = 0;
+    if (endBtn) endBtn.classList.add("hide");
+    if (paras.length === 0) return;
+
+    const pagenum = parseInt($("#page_num").val());
+    const maxpage = parseInt($("#page_count").val());
+    const lastPage = pagenum >= maxpage;
+    wrap.classList.toggle("last-screen", lastPage);
+
+    // Show everything so the heights can be measured, then split.
+    paras.forEach((p) => (p.style.display = ""));
+
+    const wrapRect = wrap.getBoundingClientRect();
+    const padBottom =
+      parseFloat(getComputedStyle(wrap).paddingBottom) || 0;
+    const screenH = wrapRect.height - padBottom;
+
+    let groups = [];
+    let cur = [];
+    let curTop = 0;
+    for (let i = 0; i < paras.length; i++) {
+      const r = paras[i].getBoundingClientRect();
+      const top = r.top - wrapRect.top;
+      if (cur.length > 0 && top - curTop >= screenH - 1) {
+        groups.push(cur);
+        cur = [];
+      }
+      if (cur.length === 0) curTop = top;
+      cur.push(paras[i]);
+    }
+    if (cur.length) groups.push(cur);
+
+    subScreens = groups;
+    _renderScreen();
+  }
+
+  function _renderScreen() {
+    const wrap = theText;
+    const endBtn = document.getElementById("reading-end-controls");
+    if (!wrap || subScreens.length === 0) {
+      if (endBtn) endBtn.classList.add("hide");
+      return;
+    }
+    subScreens.forEach((group, gi) => {
+      const show = gi === curScreen;
+      group.forEach((p) => (p.style.display = show ? "" : "none"));
+    });
+    if (wrap.scrollTop) wrap.scrollTop = 0;
+
+    const pagenum = parseInt($("#page_num").val());
+    const maxpage = parseInt($("#page_count").val());
+    const isLast =
+      curScreen === subScreens.length - 1 && pagenum >= maxpage;
+    wrap.classList.toggle("last-screen", isLast);
+    if (endBtn) endBtn.classList.toggle("hide", !isLast);
+  }
+
+  // Move backward/forward; within a page prefer sub-screens before
+  // crossing to the neighbouring Lute page.
+  function navigatePrev() {
+    if (!_isMangaReader() && subScreens.length && curScreen > 0) {
+      curScreen--;
+      _renderScreen();
+      return;
+    }
+    goto_relative_page(-1);
+  }
+
+  function navigateNext() {
+    if (
+      !_isMangaReader() &&
+      subScreens.length &&
+      curScreen < subScreens.length - 1
+    ) {
+      curScreen++;
+      _renderScreen();
+      return;
+    }
+    handle_page_done(false, 1);
   }
 
   // Handle green checkmark in footer.
