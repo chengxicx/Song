@@ -428,9 +428,12 @@
     set_enable('#navPrev', pagenum > 1);
     set_enable('#navNext', pagenum < maxpage);
     // Side arrows are kept visible for all book types (text, MP3, TTS),
-    // so the previous/next navigation is always available.  Navigation
+    // so the previous/next navigation is always available.  They start
+    // hidden in the markup, so clear the hide class here.  Navigation
     // clamps at the first/last page in goto_relative_page(), so doing
     // nothing at the boundaries is safe.
+    $('#navSidePrev').removeClass('hide');
+    $('#navSideNext').removeClass('hide');
   };
 
   // Show/hide footer controls.
