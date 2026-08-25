@@ -684,46 +684,31 @@
     });
     colLefts.sort((a, b) => a - b);
     if (colLefts.length > 1) {
-      const colLeft0 = colLefts[0];
-      const trackPitch = colLefts[1] - colLefts[0];
-      const colsPerScreen = Math.max(
-        1,
-        Math.round(wrap.clientWidth / trackPitch)
-      );
-
-      // On a fixed-height multi-column box, CSS multicol silently
-      // overflows into extra columns beyond the pane when the content is
-      // too tall for the requested columns.  Build each screen as the
-      // largest consecutive set of paragraphs that really fits, verifying
-      // against the actual layout and trimming the tail until nothing
-      // spills (each isolated screen flows from the first column, so a
-      // trimmed screen renders as clean, non-overflowing columns).
-      const heights = paras.map((p) => p.getBoundingClientRect().height);
-      const heightLimit = colsPerScreen * screenH * 0.75;
-      const fits = (items) => {
-        paras.forEach((p) => (p.style.display = "none"));
-        items.forEach((p) => (p.style.display = ""));
-        const ok = wrap.scrollWidth <= wrap.clientWidth + 1;
-        paras.forEach((p) => (p.style.display = ""));
-        return ok;
-      };
-
+      // A fixed-height multi-column box balances paragraphs across the
+      // requested columns; content that exceeds that box spills into an
+      // extra column past the pane's right edge.  Build each screen
+      // greedily: add consecutive paragraphs until the box would start to
+      // overflow, then start the next screen at the offending paragraph.
+      // This fills every screen up to the pane's real two-column capacity
+      // instead of leaving the pane mostly blank with tiny screen groups.
       let idx = 0;
       while (idx < paras.length) {
         let cand = [];
-        let filled = 0;
         for (let i = idx; i < paras.length; i++) {
-          if (cand.length > 0 && filled + heights[i] > heightLimit) break;
           cand.push(paras[i]);
-          filled += heights[i];
+          paras.forEach((p) => (p.style.display = "none"));
+          cand.forEach((p) => (p.style.display = ""));
+          if (wrap.scrollWidth > wrap.clientWidth + 1) {
+            cand.pop(); // this paragraph overflowed into the next column
+            break;
+          }
         }
-        // Trim the tail until the candidate really renders without
-        // horizontal overflow.
-        while (cand.length > 1 && !fits(cand)) cand.pop();
         // A lone paragraph taller than a screen is kept as-is (rare).
+        if (cand.length === 0) cand.push(paras[idx]);
         groups.push(cand);
         idx += cand.length;
       }
+      paras.forEach((p) => (p.style.display = ""));
     } else {
       let cur = [];
       let curTop = 0;
