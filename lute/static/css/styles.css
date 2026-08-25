@@ -566,9 +566,11 @@ div#read_pane_left {
     width: 50%;
     height: 100%;
     box-sizing: border-box;
+    position: relative;
     /* Keep the reading content inside the window: the header stays fixed at
        the top and the text area fills the remaining viewport height, so the
-       page itself never scrolls.  Long pages scroll inside the text area. */
+       page itself never scrolls.  Text content is re-flowed into screen
+       groups (see index.html's fit-to-screen pagination). */
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -1022,15 +1024,23 @@ div#reading-footer span {
 #thetexttitle,
 div#thetext {
     padding: 0 3.4rem;
-    /* Fill the remaining space below the header/player and scroll
-       internally so the page itself stays fixed in the window. */
+    /* Fill the remaining space below the header/player.  Text content is
+       re-flowed into screen groups so it never scrolls here; only the
+       current screen group is visible. */
     flex: 1 1 auto;
-    overflow-y: auto;
+    overflow: hidden;
     min-height: 0;
+}
+
+/* On the very last screen of the book, reserve a strip at the bottom for
+   the "Mark rest as known" button so it does not cover the text. */
+div#thetext.last-screen {
+    padding: 0 3.4rem 56px;
 }
 
 div#thetext.manga-text-container {
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 div#thetext p {
@@ -1038,6 +1048,40 @@ div#thetext p {
     margin-top: 1em;
     margin-bottom: 1em;
     font-size: 0;
+}
+
+/* End-of-book "Mark rest as known" button: a centre strip over the
+   reserved bottom padding of the last screen.  Hidden unless the last
+   screen of the last page is showing. */
+#reading-end-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-align: center;
+    padding: 10px 0;
+    z-index: 6;
+    pointer-events: none;
+}
+
+#reading-end-controls .mark-known-btn {
+    pointer-events: auto;
+    display: inline-block;
+    padding: 9px 22px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    background: #fff;
+    color: #4CBB17;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+#reading-end-controls .mark-known-btn:hover {
+    background: #4CBB17;
+    color: #fff;
+    border-color: #4CBB17;
 }
 
 span.drag-handle {
