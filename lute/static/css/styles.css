@@ -959,6 +959,36 @@ span.hamburger {
     cursor: default;
 }
 
+.side-page-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 500;
+    padding: 0.75rem 0.4rem;
+    border-radius: 8px;
+    color: var(--font-color);
+    opacity: 0.45;
+    cursor: pointer;
+    user-select: none;
+}
+
+.side-page-nav:hover {
+    opacity: 1;
+    background-color: rgba(128, 128, 128, 0.15);
+}
+
+.side-page-nav svg {
+    display: block;
+}
+
+#navSidePrev {
+    left: 0.3rem;
+}
+
+#navSideNext {
+    right: 0.3rem;
+}
+
 div#reading-footer span {
     margin: 5px;
 }
@@ -2589,6 +2619,11 @@ input[name='status']:disabled + label {
 
     .read_page_nav {
         font-size: 1.5rem;
+    }
+
+    .side-page-nav svg {
+        width: 24px;
+        height: 24px;
     }
 
     #page_indicator,
