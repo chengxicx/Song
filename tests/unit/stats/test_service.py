@@ -2,8 +2,14 @@
 
 from datetime import datetime, timedelta
 from lute.models.book import WordsRead
+from lute.models.term import Term
 from lute.db import db
-from lute.stats.service import get_chart_data, get_table_data, get_reading_streak
+from lute.stats.service import (
+    get_chart_data,
+    get_table_data,
+    get_reading_streak,
+    get_jlpt_data,
+)
 from tests.utils import make_text
 
 
@@ -105,3 +111,41 @@ def test_get_reading_streak(spanish, app_context):
 
     make_read_text(spanish, "Otro text.", day_before_yesterday)
     assert get_reading_streak(db.session) == 3
+
+
+def _save_jp_term(lang, text, status):
+    "Save a Japanese term with a given status."
+    t = Term.create_term_no_parsing(lang, text)
+    t.status = status
+    db.session.add(t)
+    db.session.commit()
+
+
+def test_get_jlpt_data_counts_by_level(japanese, app_context):
+    "Seen/mastered counts attributed to JLPT levels."
+    # N5 words (from OpenJLPT)
+    _save_jp_term(japanese, "食べる", 99)   # mastered
+    _save_jp_term(japanese, "水", 3)        # seen (not mastered)
+    _save_jp_term(japanese, "空", 98)       # ignored -> not seen
+    # N1 word
+    _save_jp_term(japanese, "赴く", 5)      # seen
+    # not in word list
+    _save_jp_term(japanese, "任意存在しない単語", 99)
+
+    data = get_jlpt_data(db.session, japanese.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert lv["N5"]["total"] == 662
+    assert lv["N5"]["mastered"] == 1
+    assert lv["N5"]["seen"] == 2  # 食べる + 水
+    assert lv["N1"]["seen"] == 1
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 3
+
+
+def test_get_jlpt_data_empty_custom_word(japanese, app_context):
+    "Words not in the JLPT list are ignored."
+    _save_jp_term(japanese, "任意存在しない単語", 99)
+    data = get_jlpt_data(db.session, japanese.id)
+    assert data["total_mastered"] == 0
+    assert data["total_seen"] == 0
