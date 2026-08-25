@@ -232,6 +232,18 @@
     navSideNext.style.right = "auto";
     navSidePrev.style.left = `${Math.round(r.left + 8)}px`;
     navSideNext.style.left = `${Math.round(r.right - navSideNext.offsetWidth - 8)}px`;
+
+    // Vertically center the arrows on the reading article (#thetext),
+    // not on the screen.  The article sits below the header/player, so
+    // its middle differs from the viewport middle.
+    if (theText) {
+      const tr = theText.getBoundingClientRect();
+      const mid = Math.round(tr.top + tr.height / 2);
+      navSidePrev.style.transform = "none";
+      navSideNext.style.transform = "none";
+      navSidePrev.style.top = `${mid - navSidePrev.offsetHeight / 2}px`;
+      navSideNext.style.top = `${mid - navSideNext.offsetHeight / 2}px`;
+    }
   }
 
   // Fixes a dev-only "bug" where the right pane doesn't translate up
