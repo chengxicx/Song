@@ -256,6 +256,17 @@ def test_get_cefr_data_counts_by_level(english, app_context):
     assert data["total_seen"] == 3
 
 
+def test_cefr_short_inflected_words(english, app_context):
+    "Short words like red/ring must not crash expansion and match directly."
+    _save_jp_term(english, "red", 99)
+    _save_jp_term(english, "ring", 3)
+
+    data = get_cefr_data(db.session, english.id)
+    lv = {l["level"]: l for l in data["levels"]}
+    assert lv["A1"]["mastered"] == 1
+    assert lv["A1"]["seen"] == 2
+
+
 def test_cefr_data_endpoint(english, app_context, client):
     "The /stats/cefr_data endpoint returns level data for an English language."
     _save_jp_term(english, "run", 99)
