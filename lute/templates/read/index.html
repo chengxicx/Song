@@ -690,22 +690,40 @@
         1,
         Math.round(wrap.clientWidth / trackPitch)
       );
-      let curCol = [];
-      let curPage = -1;
-      for (let i = 0; i < paras.length; i++) {
-        const colIdx = Math.round(
-          (paras[i].getBoundingClientRect().left - colLeft0) / trackPitch
-        );
-        const page = Math.floor(colIdx / colsPerScreen);
-        if (page !== curPage) {
-          if (curCol.length) groups.push(curCol);
-          curCol = [paras[i]];
-          curPage = page;
-        } else {
-          curCol.push(paras[i]);
+
+      // On a fixed-height multi-column box, CSS multicol silently
+      // overflows into extra columns beyond the pane when the content is
+      // too tall for the requested columns.  Build each screen as the
+      // largest consecutive set of paragraphs that really fits, verifying
+      // against the actual layout and trimming the tail until nothing
+      // spills (each isolated screen flows from the first column, so a
+      // trimmed screen renders as clean, non-overflowing columns).
+      const heights = paras.map((p) => p.getBoundingClientRect().height);
+      const heightLimit = colsPerScreen * screenH * 0.75;
+      const fits = (items) => {
+        paras.forEach((p) => (p.style.display = "none"));
+        items.forEach((p) => (p.style.display = ""));
+        const ok = wrap.scrollWidth <= wrap.clientWidth + 1;
+        paras.forEach((p) => (p.style.display = ""));
+        return ok;
+      };
+
+      let idx = 0;
+      while (idx < paras.length) {
+        let cand = [];
+        let filled = 0;
+        for (let i = idx; i < paras.length; i++) {
+          if (cand.length > 0 && filled + heights[i] > heightLimit) break;
+          cand.push(paras[i]);
+          filled += heights[i];
         }
+        // Trim the tail until the candidate really renders without
+        // horizontal overflow.
+        while (cand.length > 1 && !fits(cand)) cand.pop();
+        // A lone paragraph taller than a screen is kept as-is (rare).
+        groups.push(cand);
+        idx += cand.length;
       }
-      if (curCol.length) groups.push(curCol);
     } else {
       let cur = [];
       let curTop = 0;
