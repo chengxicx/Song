@@ -1023,6 +1023,7 @@ div#reading-footer span {
 
 #thetexttitle,
 div#thetext {
+    box-sizing: border-box;
     padding: 0 3.4rem;
     width: 100%;
     /* Fill the remaining space below the header/player.  Text content is
@@ -1040,8 +1041,7 @@ div#thetext.last-screen {
 }
 
 div#thetext.manga-text-container {
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 div#thetext p {
@@ -1217,6 +1217,7 @@ div#thetext.manga-text-container {
 .manga-page {
     position: relative;
     container-type: inline-size;
+    transform-origin: top center;
 }
 
 .manga-page-img {

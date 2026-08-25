@@ -512,6 +512,15 @@
     // is swapped in and laid out (fonts/status classes are applied above).
     requestAnimationFrame(_splitToScreens);
 
+    // Manga pages are image-based: scale the whole page so it fits the
+    // reading area without a scrollbar, then re-fit once the image
+    // finishes decoding (its intrinsic height is 0 until then).
+    if (_isMangaReader()) {
+      const img = theText?.querySelector(".manga-page-img");
+      if (img) img.addEventListener("load", () => _fitMangaPage(), { once: true });
+      requestAnimationFrame(_fitMangaPage);
+    }
+
     if (initial) {
       prepareTextInteractions();
     }
@@ -609,6 +618,24 @@
     return !!t && t.classList.contains("manga-text-container");
   };
 
+  // Scale a manga page so the whole image (art + text overlays) fits the
+  // reading area vertically, keeping it horizontally centered.  Both the
+  // image and the %-positioned text blocks live in the same .manga-page
+  // box, so scaling the box scales them together and they stay aligned.
+  function _fitMangaPage() {
+    const wrap = theText;
+    if (!wrap || !wrap.classList.contains("manga-text-container")) return;
+    const page = wrap.querySelector(".manga-page");
+    const img = wrap.querySelector(".manga-page-img");
+    if (!page || !img) return;
+    page.style.transform = "none";
+    const screenH = wrap.clientHeight;
+    const natH = img.getBoundingClientRect().height || 0;
+    if (natH <= 0) return; // image not decoded yet; retried on load
+    const scale = Math.min(1, screenH / natH);
+    page.style.transform = scale < 1 ? `scale(${scale})` : "none";
+  }
+
   function _splitToScreens() {
     const wrap = theText;
     const endBtn = document.getElementById("reading-end-controls");
@@ -644,7 +671,11 @@
     for (let i = 0; i < paras.length; i++) {
       const r = paras[i].getBoundingClientRect();
       const top = r.top - wrapRect.top;
-      if (cur.length > 0 && top - curTop >= screenH - 1) {
+      const bottom = r.bottom - wrapRect.top;
+      // A paragraph joins the current group only if its bottom edge still
+      // fits within the screen; otherwise start a new screen so nothing
+      // gets clipped at the lower edge of the text area.
+      if (cur.length > 0 && bottom - curTop > screenH) {
         groups.push(cur);
         cur = [];
       }
