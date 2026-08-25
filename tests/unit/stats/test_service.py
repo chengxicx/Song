@@ -149,3 +149,24 @@ def test_get_jlpt_data_empty_custom_word(japanese, app_context):
     data = get_jlpt_data(db.session, japanese.id)
     assert data["total_mastered"] == 0
     assert data["total_seen"] == 0
+
+
+def test_jlpt_data_endpoint(japanese, app_context, client):
+    "The /stats/jlpt_data endpoint returns level data for a Japanese language."
+    _save_jp_term(japanese, "食べる", 99)
+
+    resp = client.get(f"/stats/jlpt_data?lang_id={japanese.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] > 0
+    assert len(data["levels"]) == 5
+    n5 = next(l for l in data["levels"] if l["level"] == "N5")
+    assert n5["mastered"] == 1
+
+
+def test_jlpt_data_endpoint_requires_lang_id(app_context, client):
+    "Missing or invalid lang_id returns 400."
+    resp = client.get("/stats/jlpt_data")
+    assert resp.status_code == 400
+    resp = client.get("/stats/jlpt_data?lang_id=abc")
+    assert resp.status_code == 400
