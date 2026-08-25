@@ -10,6 +10,10 @@ from lute.stats.service import (
     get_reading_streak,
     get_jlpt_data,
     get_jlpt_words,
+    get_cefr_data,
+    get_cefr_words,
+    get_topik_data,
+    get_topik_words,
 )
 from tests.utils import make_text
 
@@ -230,3 +234,181 @@ def test_jlpt_export_endpoint(japanese, app_context, client):
     body = resp.get_data(as_text=True)
     assert "N5," in body
     assert "N1," in body
+
+
+def test_get_cefr_data_counts_by_level(english, app_context):
+    "Seen/mastered counts attributed to CEFR levels, incl. inflection expansion."
+    _save_jp_term(english, "run", 99)           # mastered (A1)
+    _save_jp_term(english, "running", 3)        # expands to run -> seen (A1)
+    _save_jp_term(english, "dogs", 98)          # ignored -> not seen
+    _save_jp_term(english, "extraordinary", 5)  # seen (B1)
+    _save_jp_term(english, "zzzqqqxyz", 99)     # not in word list
+
+    data = get_cefr_data(db.session, english.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert len(lv) == 6
+    assert lv["A1"]["mastered"] == 1
+    assert lv["A1"]["seen"] == 1   # run ("dogs" ignored)
+    assert lv["A2"]["seen"] == 1   # running is its own A2 headword
+    assert lv["B1"]["seen"] == 1   # extraordinary
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 3
+
+
+def test_cefr_data_endpoint(english, app_context, client):
+    "The /stats/cefr_data endpoint returns level data for an English language."
+    _save_jp_term(english, "run", 99)
+
+    resp = client.get(f"/stats/cefr_data?lang_id={english.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] > 0
+    assert len(data["levels"]) == 6
+    a1 = next(l for l in data["levels"] if l["level"] == "A1")
+    assert a1["mastered"] == 1
+
+    resp = client.get("/stats/cefr_data")
+    assert resp.status_code == 400
+    resp = client.get("/stats/cefr_data?lang_id=abc")
+    assert resp.status_code == 400
+
+
+def test_get_cefr_words_filters(english, app_context):
+    "Drilldown respects filters; expanded headwords excluded from notseen."
+    _save_jp_term(english, "run", 99)
+    _save_jp_term(english, "running", 3)
+    _save_jp_term(english, "zzzqqqxyz", 99)
+
+    unmastered = get_cefr_words(db.session, english.id, "A1", "unmastered")
+    a2_unmastered = get_cefr_words(db.session, english.id, "A2", "unmastered")
+    mastered = get_cefr_words(db.session, english.id, "A1", "mastered")
+    notseen = get_cefr_words(db.session, english.id, "A1", "notseen")
+    all_words = get_cefr_words(db.session, english.id, "A1", "all")
+
+    assert [w["word"] for w in unmastered] == []
+    assert [w["word"] for w in a2_unmastered] == ["running"]
+    assert [w["word"] for w in mastered] == ["run"]
+    assert mastered[0]["status_text"] == "Well Known"
+
+    notseen_words = [w["word"] for w in notseen]
+    assert "water" in notseen_words
+    assert "dog" in notseen_words  # dogs was ignored -> dog still unseen
+    assert "run" not in notseen_words
+    assert all(w["id"] is None for w in notseen)
+
+    all_map = {w["word"]: w for w in all_words}
+    assert set(all_map.keys()) == {"run"} | set(notseen_words)
+
+
+def test_cefr_words_and_export_endpoints(english, app_context, client):
+    "The cefr_words and cefr_export endpoints behave like the JLPT ones."
+    _save_jp_term(english, "run", 99)
+    _save_jp_term(english, "running", 3)
+
+    resp = client.get(f"/stats/cefr_words?lang_id={english.id}&level=A2&filter=unmastered&page=1")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] >= 1
+
+    resp = client.get(f"/stats/cefr_words?lang_id={english.id}&level=A1&filter=bogus")
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/cefr_words?lang_id={english.id}&level=all")
+    assert resp.status_code == 400
+
+    resp = client.get(f"/stats/cefr_export?lang_id={english.id}&level=A1&filter=mastered")
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/csv"
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("run" in ln for ln in lines[1:])
+
+    resp = client.get(f"/stats/cefr_export?lang_id={english.id}&level=all&filter=all")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "A1," in body
+    assert "C2," in body
+
+
+def test_get_topik_data_counts_by_level(korean, app_context):
+    "Seen/mastered counts attributed to TOPIK A/B/C bands."
+    _save_jp_term(korean, "가게", 99)   # mastered (A)
+    _save_jp_term(korean, "한국", 3)    # seen (A)
+    _save_jp_term(korean, "가난", 98)   # ignored -> not seen (band C)
+    _save_jp_term(korean, "임의단어zzz", 99)  # not in word list
+
+    data = get_topik_data(db.session, korean.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert len(lv) == 3
+    assert lv["A"]["mastered"] == 1
+    assert lv["A"]["seen"] == 2
+    assert lv["C"]["seen"] == 0
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 2
+
+
+def test_topik_data_endpoint(korean, app_context, client):
+    "The /stats/topik_data endpoint returns band data for a Korean language."
+    _save_jp_term(korean, "가게", 99)
+
+    resp = client.get(f"/stats/topik_data?lang_id={korean.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] > 0
+    assert len(data["levels"]) == 3
+    a = next(l for l in data["levels"] if l["level"] == "A")
+    assert a["mastered"] == 1
+
+    resp = client.get("/stats/topik_data")
+    assert resp.status_code == 400
+    resp = client.get("/stats/topik_data?lang_id=abc")
+    assert resp.status_code == 400
+
+
+def test_get_topik_words_filters(korean, app_context):
+    "Drilldown respects the unmastered/mastered/notseen filters."
+    _save_jp_term(korean, "가게", 99)
+    _save_jp_term(korean, "한국", 3)
+    _save_jp_term(korean, "임의단어zzz", 99)
+
+    unmastered = get_topik_words(db.session, korean.id, "A", "unmastered")
+    mastered = get_topik_words(db.session, korean.id, "A", "mastered")
+    notseen = get_topik_words(db.session, korean.id, "A", "notseen")
+
+    assert [w["word"] for w in unmastered] == ["한국"]
+    assert [w["word"] for w in mastered] == ["가게"]
+
+    notseen_words = [w["word"] for w in notseen]
+    assert all(w["id"] is None for w in notseen)
+    assert "가게" not in notseen_words
+    assert "한국" not in notseen_words
+
+
+def test_topik_words_and_export_endpoints(korean, app_context, client):
+    "The topik_words and topik_export endpoints behave like the JLPT ones."
+    _save_jp_term(korean, "가게", 99)
+    _save_jp_term(korean, "한국", 3)
+
+    resp = client.get(f"/stats/topik_words?lang_id={korean.id}&level=A&filter=unmastered&page=1")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] >= 1
+
+    resp = client.get(f"/stats/topik_words?lang_id={korean.id}&level=A&filter=bogus")
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/topik_words?lang_id={korean.id}&level=all")
+    assert resp.status_code == 400
+
+    resp = client.get(f"/stats/topik_export?lang_id={korean.id}&level=A&filter=mastered")
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/csv"
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("가게" in ln for ln in lines[1:])
+
+    resp = client.get(f"/stats/topik_export?lang_id={korean.id}&level=all&filter=all")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "A," in body
+    assert "C," in body
