@@ -99,4 +99,10 @@ function setColumnCount(num) {
   }
   theText.style.columnCount = columnCount;
   localStorage.setItem("columnCount", columnCount);
+  // Re-flow the page into fresh screens for the new column count;
+  // otherwise the previously-computed screen groups are kept and the
+  // reading pane stays sparse after switching single <-> double column.
+  if (typeof _splitToScreens === "function") {
+    requestAnimationFrame(_splitToScreens);
+  }
 }
