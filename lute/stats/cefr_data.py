@@ -105,14 +105,14 @@ def base_candidates(word):
         base = w[:-2]
         cands.add(base)                  # walked -> walk
         cands.add(base + "e")            # loved -> love
-        if base and base[-1] == base[-2]:
-            cands.add(base[:-1])         # stopped -> stpp -> stop
+        if len(base) > 1 and base[-1] == base[-2]:
+            cands.add(base[:-1])         # stopped -> stop
     if w.endswith("ing"):
         base = w[:-3]
-        cands.add(base)                  # making -> mak + e covered below
+        cands.add(base)
         cands.add(base + "e")            # making -> make
-        if base and base[-1] == base[-2] and len(base) > 1:
-            cands.add(base[:-1])         # running -> runn -> run
+        if len(base) > 1 and base[-1] == base[-2]:
+            cands.add(base[:-1])         # running -> run
 
     return cands
 
