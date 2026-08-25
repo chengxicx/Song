@@ -17,6 +17,20 @@ LEVELS = ["N5", "N4", "N3", "N2", "N1"]
 
 _JLPT_DIR = Path(__file__).parent / "jlpt_data"
 _CACHE = None
+_LEVEL_WORDS_CACHE = {}
+
+
+def level_words(level):
+    "Return the raw vocab entries for a level, cached."
+    if level in _LEVEL_WORDS_CACHE:
+        return _LEVEL_WORDS_CACHE[level]
+    path = _JLPT_DIR / f"vocab-{level.lower()}.json"
+    entries = []
+    if path.exists():
+        with path.open("r", encoding="utf-8") as fh:
+            entries = json.load(fh)
+    _LEVEL_WORDS_CACHE[level] = entries
+    return entries
 
 
 def _load_words():
