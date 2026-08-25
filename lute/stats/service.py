@@ -129,6 +129,9 @@ def get_reading_streak(session):
 # Term statistics (for overview charts)
 # ---------------------------------------------------------------------------
 
+# All registered Japanese parser types (see lute.parse.registry).
+_JAPANESE_PARSERS = ("japanese", "japanese_sudachi")
+
 STATUS_LABELS = {
     0: "Unknown",
     1: "Level 1",
@@ -249,7 +252,7 @@ def get_term_languages(session):
             "id": r[0],
             "name": r[1],
             "count": int(r[3]),
-            "is_japanese": r[2] == "japanese",
+            "is_japanese": r[2] in _JAPANESE_PARSERS,
         }
         for r in rows
     ]
