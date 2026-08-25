@@ -236,15 +236,95 @@ def get_heatmap_data(session, lang_id):
 def get_term_languages(session):
     "Active languages that have at least one term, for the selector."
     sql = (
-        "select l.LgID, l.LgName, count(w.WoID) as cnt "
+        "select l.LgID, l.LgName, l.LgParserType, count(w.WoID) as cnt "
         "from languages l "
         "inner join words w on w.WoLgID = l.LgID "
         "where l.LgIsActive = 1 "
-        "group by l.LgID, l.LgName "
+        "group by l.LgID, l.LgName, l.LgParserType "
         "order by l.LgName"
     )
     rows = session.execute(text(sql)).all()
-    return [{"id": r[0], "name": r[1], "count": int(r[2])} for r in rows]
+    return [
+        {
+            "id": r[0],
+            "name": r[1],
+            "count": int(r[3]),
+            "is_japanese": r[2] == "japanese",
+        }
+        for r in rows
+    ]
+
+
+# ---------------------------------------------------------------------------
+# JLPT progress report
+# ---------------------------------------------------------------------------
+
+# Excel/text table won't handle the load; match by normalized term text.
+# "Seen" = WoStatus in {1,2,3,4,5,99}; "Mastered" = WoStatus == 99.
+_SEEN_STATUSES = (1, 2, 3, 4, 5, 99)
+
+
+def _normalize_jp(text):
+    "Normalize a Japanese term for matching against the JLPT word list."
+    return (text or "").strip().lower()
+
+
+def get_jlpt_data(session, lang_id):
+    """
+    JLPT progress for the given Japanese language.
+
+    Returns counts per JLPT level against the OpenJLPT vocab list:
+      - levels: [{level, total, seen, mastered}, ...] ordered N5..N1
+      - total: total N5-N1 vocab size
+      - total_seen / total_mastered: aggregate counts
+    """
+    from lute.stats.jlpt_data import LEVELS, jlpt_level, level_totals, vocab_total
+
+    # For active words in the JLPT list, attribute by level.
+    sql = """
+        select WoText, WoStatus
+        from words
+        where WoLgID = :lid
+          and WoStatus in (1,2,3,4,5,98,99)
+    """
+    rows = session.execute(text(sql), {"lid": lang_id}).all()
+
+    seen_counts = {level: 0 for level in LEVELS}
+    mastered_counts = {level: 0 for level in LEVELS}
+    total_seen = 0
+    total_mastered = 0
+
+    for word_text, status in rows:
+        word = _normalize_jp(word_text)
+        if not word:
+            continue
+        level = jlpt_level(word)
+        if level is None:
+            continue
+        if status == 99:
+            mastered_counts[level] += 1
+            total_mastered += 1
+        if status in _SEEN_STATUSES:
+            seen_counts[level] += 1
+            total_seen += 1
+
+    totals = level_totals()
+    levels = []
+    for level in LEVELS:
+        levels.append(
+            {
+                "level": level,
+                "total": totals[level],
+                "seen": seen_counts[level],
+                "mastered": mastered_counts[level],
+            }
+        )
+    return {
+        "levels": levels,
+        "total": vocab_total(),
+        "total_seen": total_seen,
+        "total_mastered": total_mastered,
+    }
 
 
 def get_last_read_language_id(session):

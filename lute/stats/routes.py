@@ -12,6 +12,7 @@ from lute.stats.service import (
     get_heatmap_data,
     get_term_languages,
     get_term_summary,
+    get_jlpt_data,
 )
 from lute.db import db
 import lute.utils.formutils
@@ -66,3 +67,16 @@ def get_term_data():
             "heatmap": get_heatmap_data(db.session, lang_id),
         }
     )
+
+
+@bp.route("/jlpt_data")
+def get_jlpt_data():
+    "Ajax call for the JLPT progress report for a Japanese language."
+    lang_param = request.args.get("lang_id", "")
+    try:
+        lang_id = int(lang_param)
+    except (TypeError, ValueError):
+        return jsonify({"error": "lang_id required"}), 400
+
+    data = get_jlpt_data(db.session, lang_id)
+    return jsonify(data)
