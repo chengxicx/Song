@@ -383,7 +383,7 @@
   <div class="chart-card">
     <div class="jlpt-head">
       <h3 style="margin:0;">TOPIK Progress</h3>
-      <span class="jlpt-sub">Korean · bands: A = TOPIK 1–2, B = 3–4, C = 5–6 · data: julienshim combined vocabulary list</span>
+      <span class="jlpt-sub">Korean · data: julienshim combined vocabulary list</span>
       <button type="button" id="topik-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
     </div>
 
@@ -748,6 +748,7 @@
     const btn = document.getElementById(cfg.btn);
     const panel = document.getElementById(cfg.panel);
     const levelsEl = document.getElementById(cfg.levelsEl);
+    const dispLabel = l => (cfg.levelLabel ? cfg.levelLabel(l) : l);
     const TAB_LABELS = { unmastered: 'Unmastered', notseen: 'Not seen', mastered: 'Mastered' };
     const state = { data: null, level: null, filter: 'unmastered', page: 1, total: 0 };
     let ddEl = null;
@@ -799,7 +800,7 @@
         h +=
           '<div class="jlpt-row" data-level="' + lv.level + '">' +
             '<span class="jlpt-chev">▶</span>' +
-            '<span class="jlpt-badge" style="background:' + color + '">' + lv.level + '</span>' +
+            '<span class="jlpt-badge" style="background:' + color + '">' + dispLabel(lv.level) + '</span>' +
             '<div class="jlpt-track">' +
               '<div class="jlpt-tip">' +
                 '<div>Mastered <span>' + pct(lv.mastered, lv.total) + '%</span></div>' +
@@ -866,7 +867,7 @@
       ddEl.className = 'jlpt-dd';
       ddEl.innerHTML =
         '<div class="jlpt-dd-head">' +
-          '<span class="jlpt-dd-title">' + level + ' words</span>' +
+          '<span class="jlpt-dd-title">' + dispLabel(level) + ' words</span>' +
           '<div class="jlpt-tabs">' +
             ['unmastered', 'notseen', 'mastered'].map(function(t) {
               return '<button type="button" class="jlpt-tab' + (t === 'unmastered' ? ' on' : '') + '" data-tab="' + t + '">' + TAB_LABELS[t] + ' (' + counts[t].toLocaleString() + ')</button>';
@@ -950,6 +951,7 @@
   const topikReport = createLevelReport({
     langKey: 'ko', btn: 'topik-btn', panel: 'topik-panel', levelsEl: 'topik-levels',
     exportAll: 'topik-export-all', colors: TOPIK_COLORS, perPage: 60,
+    levelLabel: function(l) { return { A: '1-2', B: '3-4', C: '5-6' }[l] || l; },
     ids: { masteredPct: 'topik-mastered-pct', masteredDetail: 'topik-mastered-detail', seenPct: 'topik-seen-pct', seenDetail: 'topik-seen-detail' },
     urls: { data: '/stats/topik_data', words: '/stats/topik_words', export: '/stats/topik_export' },
   });
