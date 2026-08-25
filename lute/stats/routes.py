@@ -22,6 +22,10 @@ from lute.stats.service import (
 )
 from lute.stats.service import get_jlpt_data as _get_jlpt_data
 from lute.stats.service import get_jlpt_words as _get_jlpt_words
+from lute.stats.service import get_cefr_data as _get_cefr_data
+from lute.stats.service import get_cefr_words as _get_cefr_words
+from lute.stats.service import get_topik_data as _get_topik_data
+from lute.stats.service import get_topik_words as _get_topik_words
 from lute.db import db
 import lute.utils.formutils
 
@@ -164,3 +168,125 @@ def jlpt_export():
         mimetype="text/csv",
         headers={"Content-Disposition": f"attachment; filename={filename}"},
     )
+
+
+@bp.route("/cefr_data")
+def cefr_data():
+    "Ajax call for the CEFR progress report for an English language."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return jsonify({"error": "lang_id required"}), 400
+    return jsonify(_get_cefr_data(db.session, lang_id))
+
+
+@bp.route("/topik_data")
+def topik_data():
+    "Ajax call for the TOPIK progress report for a Korean language."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return jsonify({"error": "lang_id required"}), 400
+    return jsonify(_get_topik_data(db.session, lang_id))
+
+
+def _request_lang_id():
+    "Parse and validate the lang_id request param."
+    try:
+        return int(request.args.get("lang_id", ""))
+    except (TypeError, ValueError):
+        return None
+
+
+def _level_request_params(valid_levels):
+    "Parse and validate lang_id/level/filter params for level-report endpoints."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return None
+    level = request.args.get("level", "")
+    word_filter = request.args.get("filter", "unmastered")
+    if word_filter not in ("unmastered", "notseen", "mastered", "all"):
+        return None
+    if level != "all" and level not in valid_levels:
+        return None
+    return lang_id, level, word_filter
+
+
+def _level_words_response(getter, valid_levels):
+    "Paged word list response for one level + filter."
+    params = _level_request_params(valid_levels)
+    if params is None:
+        return jsonify({"error": "invalid parameters"}), 400
+    lang_id, level, word_filter = params
+    if level == "all":
+        return jsonify({"error": "level required"}), 400
+    try:
+        page = max(1, int(request.args.get("page", 1)))
+        per_page = min(100, max(1, int(request.args.get("per_page", 20))))
+    except (TypeError, ValueError):
+        return jsonify({"error": "invalid pagination"}), 400
+
+    words = getter(db.session, lang_id, level, word_filter)
+    start = (page - 1) * per_page
+    return jsonify(
+        {
+            "total": len(words),
+            "page": page,
+            "per_page": per_page,
+            "words": words[start : start + per_page],
+        }
+    )
+
+
+def _level_export_response(getter, valid_levels, label):
+    "CSV export of words for a level+filter, or all levels."
+    import csv
+    import io
+
+    params = _level_request_params(valid_levels)
+    if params is None:
+        return jsonify({"error": "invalid parameters"}), 400
+    lang_id, level, word_filter = params
+
+    levels = valid_levels if level == "all" else [level]
+    out = io.StringIO()
+    writer = csv.writer(out)
+    writer.writerow(["Level", "Word", "Reading", "Meaning", "Status"])
+    for lvl in levels:
+        for w in getter(db.session, lang_id, lvl, word_filter):
+            writer.writerow(
+                [lvl, w["word"], w["reading"], w["meaning"], w["status_text"] or ""]
+            )
+    out.seek(0)
+    filename = f"{label}_{level}_{word_filter}.csv"
+    return Response(
+        stream_with_context(iter([out.getvalue()])),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+
+
+@bp.route("/cefr_words")
+def cefr_words():
+    "Paged word list for one CEFR level and filter."
+    from lute.stats.cefr_data import LEVELS
+    return _level_words_response(_get_cefr_words, LEVELS)
+
+
+@bp.route("/topik_words")
+def topik_words():
+    "Paged word list for one TOPIK level and filter."
+    from lute.stats.topik_data import LEVELS
+    return _level_words_response(_get_topik_words, LEVELS)
+
+
+@bp.route("/cefr_export")
+def cefr_export():
+    "CSV export of CEFR words for a level+filter, or all levels."
+    from lute.stats.cefr_data import LEVELS
+    return _level_export_response(_get_cefr_words, LEVELS, "CEFR")
+
+
+@bp.route("/topik_export")
+def topik_export():
+    "CSV export of TOPIK words for a level+filter, or all levels."
+    from lute.stats.topik_data import LEVELS
+    return _level_export_response(_get_topik_words, LEVELS, "TOPIK")
