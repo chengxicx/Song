@@ -964,29 +964,21 @@ span.hamburger {
     top: 50%;
     transform: translateY(-50%);
     z-index: 500;
-    padding: 0.75rem 0.4rem;
-    border-radius: 8px;
+    padding: 0.9rem 0.12rem;
+    border-radius: 10px;
     color: var(--font-color);
-    opacity: 0.45;
+    opacity: 0.35;
     cursor: pointer;
     user-select: none;
 }
 
 .side-page-nav:hover {
     opacity: 1;
-    background-color: rgba(128, 128, 128, 0.15);
+    background-color: rgba(128, 128, 128, 0.14);
 }
 
 .side-page-nav svg {
     display: block;
-}
-
-#navSidePrev {
-    left: 0.3rem;
-}
-
-#navSideNext {
-    right: 0.3rem;
 }
 
 div#reading-footer span {
@@ -1012,8 +1004,7 @@ div#reading-footer span {
 
 #thetexttitle,
 div#thetext {
-    padding: 0 2.2rem;
-    padding: 0 2.2rem;
+    padding: 0 3.4rem;
 }
 
 div#thetext p {
@@ -2622,8 +2613,8 @@ input[name='status']:disabled + label {
     }
 
     .side-page-nav svg {
-        width: 24px;
-        height: 24px;
+        width: 15px;
+        height: 25px;
     }
 
     #page_indicator,
