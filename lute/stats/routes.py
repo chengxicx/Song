@@ -2,7 +2,14 @@
 /stats endpoints.
 """
 
-from flask import Blueprint, render_template, jsonify, request
+from flask import (
+    Blueprint,
+    render_template,
+    jsonify,
+    request,
+    Response,
+    stream_with_context,
+)
 from lute.stats.service import (
     get_chart_data,
     get_table_data,
@@ -14,6 +21,7 @@ from lute.stats.service import (
     get_term_summary,
 )
 from lute.stats.service import get_jlpt_data as _get_jlpt_data
+from lute.stats.service import get_jlpt_words as _get_jlpt_words
 from lute.db import db
 import lute.utils.formutils
 
@@ -80,3 +88,79 @@ def get_jlpt_data():
 
     data = _get_jlpt_data(db.session, lang_id)
     return jsonify(data)
+
+
+def _jlpt_request_params():
+    "Parse and validate lang_id/level/filter params for JLPT endpoints."
+    from lute.stats.jlpt_data import LEVELS
+
+    try:
+        lang_id = int(request.args.get("lang_id", ""))
+    except (TypeError, ValueError):
+        return None
+    level = request.args.get("level", "")
+    word_filter = request.args.get("filter", "unmastered")
+    if word_filter not in ("unmastered", "notseen", "mastered", "all"):
+        return None
+    if level != "all" and level not in LEVELS:
+        return None
+    return lang_id, level, word_filter
+
+
+@bp.route("/jlpt_words")
+def jlpt_words():
+    "Paged word list for one JLPT level and filter."
+    params = _jlpt_request_params()
+    if params is None:
+        return jsonify({"error": "invalid parameters"}), 400
+    lang_id, level, word_filter = params
+    if level == "all":
+        return jsonify({"error": "level required"}), 400
+    try:
+        page = max(1, int(request.args.get("page", 1)))
+        per_page = min(100, max(1, int(request.args.get("per_page", 20))))
+    except (TypeError, ValueError):
+        return jsonify({"error": "invalid pagination"}), 400
+
+    words = _get_jlpt_words(db.session, lang_id, level, word_filter)
+    start = (page - 1) * per_page
+    return jsonify(
+        {
+            "total": len(words),
+            "page": page,
+            "per_page": per_page,
+            "words": words[start : start + per_page],
+        }
+    )
+
+
+@bp.route("/jlpt_export")
+def jlpt_export():
+    "CSV export of JLPT words for a level+filter, or all levels."
+    import csv
+    import io
+
+    from lute.stats.jlpt_data import LEVELS
+    from lute.stats.service import get_jlpt_words
+
+    params = _jlpt_request_params()
+    if params is None:
+        return jsonify({"error": "invalid parameters"}), 400
+    lang_id, level, word_filter = params
+
+    levels = LEVELS if level == "all" else [level]
+    out = io.StringIO()
+    writer = csv.writer(out)
+    writer.writerow(["Level", "Word", "Reading", "Meaning", "Status"])
+    for lvl in levels:
+        for w in get_jlpt_words(db.session, lang_id, lvl, word_filter):
+            writer.writerow(
+                [lvl, w["word"], w["reading"], w["meaning"], w["status_text"] or ""]
+            )
+    out.seek(0)
+    filename = f"JLPT_{level}_{word_filter}.csv"
+    return Response(
+        stream_with_context(iter([out.getvalue()])),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
