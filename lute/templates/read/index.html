@@ -54,14 +54,6 @@
             <span class="hamburger"></span>
             <span class="hamburger"></span>
           </div>
-	  <a href="/">
-		<img
-		  src="{{ url_for('static', filename='img/lute.webp') }}"
-		  class="lutelogo_small"
-		  style="cursor: pointer"
-		  title="Home"
-		/>
-	  </a>
         </div>
         <div class="reading_header_mid">
         <div class="reading_header_mid_top">
@@ -117,6 +109,13 @@
   <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
   <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %} class="{% if book_type == 'manga' %}manga-text-container{% endif %}">
     ...
+  </div>
+
+  <div id="navSidePrev" class="side-page-nav hide" onclick="goto_relative_page(-1)" title="Go to previous page">
+    <svg viewBox="0 0 30 30" width="30" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>
+  </div>
+  <div id="navSideNext" class="side-page-nav hide" onclick="handle_page_done(false, 1)" title="Mark page as read, then go to next page">
+    <svg viewBox="0 0 30 30" width="30" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
   </div>
 
   {# Hidden HTMX swap target for term-popup prefetch (see lute.js
@@ -371,6 +370,9 @@
     createLookupButtons();
     $(document).click(_close_slide_in_menu_on_click_away);
 
+    if (window.matchMedia("(hover: hover)").matches)
+      $(".hamburger-btn").on("mouseenter", openMenu);
+
     window.addEventListener("message", _lute_form_event_handler);
 
   window.addEventListener("beforeunload", function() {
@@ -401,6 +403,8 @@
     };
     set_enable('#navPrev', pagenum > 1);
     set_enable('#navNext', pagenum < maxpage);
+    $('#navSidePrev').toggleClass('hide', !(pagenum > 1));
+    $('#navSideNext').toggleClass('hide', !(pagenum < maxpage));
   };
 
   // Show/hide footer controls.
@@ -556,12 +560,21 @@
     }
   });
 
+  let _menuHoverOpenedAt = 0;
+
+  function openMenu() {
+    $("#reading_menu").addClass("open-menu");
+    _menuHoverOpenedAt = Date.now();
+  }
+
   function closeMenu() {
     $(".reading-menu-sublist.active").removeClass("active");
     $("#reading_menu").removeClass("open-menu");
   }
 
   function toggleMenu() {
+    if ($("#reading_menu").hasClass("open-menu") && Date.now() - _menuHoverOpenedAt < 500)
+      return;
     $("#reading_menu").toggleClass("open-menu");
   }
 
