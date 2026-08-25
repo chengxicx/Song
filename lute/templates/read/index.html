@@ -228,6 +228,8 @@
   function _layout_side_nav() {
     if (!navSidePrev || !navSideNext) return;
     const r = readPaneLeft.getBoundingClientRect();
+    navSidePrev.style.right = "auto";
+    navSideNext.style.right = "auto";
     navSidePrev.style.left = `${Math.round(r.left + 8)}px`;
     navSideNext.style.left = `${Math.round(r.right - navSideNext.offsetWidth - 8)}px`;
   }
