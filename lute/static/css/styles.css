@@ -1024,6 +1024,7 @@ div#reading-footer span {
 #thetexttitle,
 div#thetext {
     padding: 0 3.4rem;
+    width: 100%;
     /* Fill the remaining space below the header/player.  Text content is
        re-flowed into screen groups so it never scrolls here; only the
        current screen group is visible. */
