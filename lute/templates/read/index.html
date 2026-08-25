@@ -391,11 +391,12 @@
     set_enable('#navNext', pagenum < maxpage);
     // Side arrows are kept visible for all book types (text, MP3, TTS),
     // so the previous/next navigation is always available.  They start
-    // hidden in the markup, so clear the hide class here.  Navigation
-    // clamps at the first/last page in goto_relative_page(), so doing
-    // nothing at the boundaries is safe.
+    // hidden in the markup, so clear the hide class here.  Re-layout
+    // afterwards: while hidden their offsetWidth is 0, which would clamp
+    // them to the pane edge and let them overlap the divider.
     $('#navSidePrev').removeClass('hide');
     $('#navSideNext').removeClass('hide');
+    _layout_side_nav();
   };
 
   // Show/hide footer controls.  The end-of-book "Mark rest as known"
