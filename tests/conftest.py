@@ -129,6 +129,11 @@ def fixture_japanese(app_context):
     return _get_test_language("Japanese")
 
 
+@pytest.fixture(name="korean")
+def fixture_korean(app_context):
+    return _get_test_language("Korean")
+
+
 @pytest.fixture(name="turkish")
 def fixture_turkish(app_context):
     return _get_test_language("Turkish")

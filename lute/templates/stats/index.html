@@ -35,8 +35,8 @@
   }
 
   /* JLPT progress panel */
-  .jlpt-btn { margin-left: 10px; cursor: pointer; background: var(--chart-card-bg, #fff); color: var(--chart-tick-major-color, #212529); font-weight: 600; }
-  .jlpt-btn:hover { background: var(--chart-grid-color, #f1f3f5); }
+  .jlpt-btn, .cefr-btn, .topik-btn { margin-left: 10px; cursor: pointer; background: var(--chart-card-bg, #fff); color: var(--chart-tick-major-color, #212529); font-weight: 600; }
+  .jlpt-btn:hover, .cefr-btn:hover, .topik-btn:hover { background: var(--chart-grid-color, #f1f3f5); }
   .jlpt-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
   .jlpt-sub { font-size: 12px; color: var(--chart-tick-color, #6c757d); }
   .jlpt-section {
@@ -108,7 +108,8 @@
     display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
     background: var(--chart-card-bg, #fff); border: 1px solid var(--chart-grid-color, #dee2e6); border-radius: 6px;
     padding: 6px 10px; font-size: 12px; font-weight: 400; color: var(--chart-tick-major-color, #343a40);
-    box-shadow: 0 2px 6px rgba(0,0,0,.15); white-space: normal; max-width: 260px; text-align: left; z-index: 5;
+    box-shadow: 0 2px 6px rgba(0,0,0,.15); white-space: normal; width: max-content; max-width: min(560px, 80vw);
+    text-align: left; z-index: 30;
   }
   .jlpt-w-cell .jlpt-tip div { line-height: 1.5; }
   .jlpt-w-cell:hover .jlpt-tip { display: block; }
@@ -308,10 +309,12 @@
     <select id="ov-lang" class="ov-lang-select">
       <option value="all">All languages</option>
       {% for lang in term_languages %}
-      <option value="{{ lang.id }}" {% if lang.id == default_lang_id %}selected{% endif %} data-jp="{{ '1' if lang.is_japanese else '0' }}">{{ lang.name }} ({{ lang.count }})</option>
+      <option value="{{ lang.id }}" {% if lang.id == default_lang_id %}selected{% endif %} data-jp="{{ '1' if lang.is_japanese else '0' }}" data-en="{{ '1' if lang.is_english else '0' }}" data-ko="{{ '1' if lang.is_korean else '0' }}">{{ lang.name }} ({{ lang.count }})</option>
       {% endfor %}
     </select>
     <button type="button" id="jlpt-btn" class="ov-lang-select jlpt-btn" style="display:none;">JLPT</button>
+    <button type="button" id="cefr-btn" class="ov-lang-select cefr-btn" style="display:none;">CEFR</button>
+    <button type="button" id="topik-btn" class="ov-lang-select topik-btn" style="display:none;">TOPIK</button>
   </div>
 </div>
 
@@ -342,6 +345,66 @@
     <div id="jlpt-levels"></div>
 
     <div class="jlpt-foot">Hover a word for reading and meaning · Dashed cells = Not seen (from the OpenJLPT list) · Click a level bar to drill down.</div>
+  </div>
+</div>
+
+<!-- CEFR progress report -->
+<div id="cefr-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">CEFR Progress</h3>
+      <span class="jlpt-sub">English · A1–C2 · data: katherine-welbourne CEFR word list</span>
+      <button type="button" id="cefr-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="cefr-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="cefr-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="cefr-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="cefr-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By level</h4>
+    <div id="cefr-levels"></div>
+
+    <div class="jlpt-foot">Dashed cells = Not seen (from the CEFR list) · Inflected forms are matched to their base word · Click a level bar to drill down.</div>
+  </div>
+</div>
+
+<!-- TOPIK progress report -->
+<div id="topik-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">TOPIK Progress</h3>
+      <span class="jlpt-sub">Korean · bands: A = TOPIK 1–2, B = 3–4, C = 5–6 · data: julienshim combined vocabulary list</span>
+      <button type="button" id="topik-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="topik-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="topik-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="topik-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="topik-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By level</h4>
+    <div id="topik-levels"></div>
+
+    <div class="jlpt-foot">Hover a word for hanja and meaning · Dashed cells = Not seen (from the TOPIK list) · Click a level bar to drill down.</div>
   </div>
 </div>
 
@@ -649,7 +712,8 @@
       const ns = w.status === null ? ' ns' : '';
       let tip = '';
       if (w.reading) { tip += '<div>' + escapeHtml(w.reading) + '</div>'; }
-      if (w.meaning) { tip += '<div>' + escapeHtml(w.meaning) + '</div>'; }
+      const meaning = String(w.meaning || '').replace(/\s*\n+\s*/g, '; ').trim();
+      if (meaning) { tip += '<div>' + escapeHtml(meaning) + '</div>'; }
       h += '<div class="jlpt-w-cell' + ns + '">' + escapeHtml(w.word) +
            (tip ? '<div class="jlpt-tip">' + tip + '</div>' : '') +
            '</div>';
@@ -678,6 +742,224 @@
   document.getElementById('jlpt-export-all').addEventListener('click', function() {
     window.location = '/stats/jlpt_export?lang_id=' + currentLang + '&level=all&filter=all';
   });
+
+  // --- Generic level-report engine (CEFR / TOPIK), mirrors the JLPT panel ---
+  function createLevelReport(cfg) {
+    const btn = document.getElementById(cfg.btn);
+    const panel = document.getElementById(cfg.panel);
+    const levelsEl = document.getElementById(cfg.levelsEl);
+    const TAB_LABELS = { unmastered: 'Unmastered', notseen: 'Not seen', mastered: 'Mastered' };
+    const state = { data: null, level: null, filter: 'unmastered', page: 1, total: 0 };
+    let ddEl = null;
+
+    function closeDrilldown() {
+      if (ddEl) { ddEl.remove(); ddEl = null; }
+      state.level = null;
+    }
+
+    function countsFor(level) {
+      const empty = { unmastered: 0, notseen: 0, mastered: 0 };
+      if (!state.data) return empty;
+      const lv = state.data.levels.find(l => l.level === level);
+      if (!lv) return empty;
+      return { unmastered: lv.seen - lv.mastered, notseen: lv.total - lv.seen, mastered: lv.mastered };
+    }
+
+    function load() {
+      closeDrilldown();
+      state.data = null;
+      levelsEl.innerHTML = '<div class="jlpt-loading">Loading...</div>';
+      fetch(cfg.urls.data + '?lang_id=' + currentLang)
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.error) { throw new Error(d.error); }
+          state.data = d;
+          renderOverview(d);
+        })
+        .catch(function(err) {
+          levelsEl.innerHTML = '<div class="jlpt-loading">Failed to load data.</div>';
+          console.error('Failed to load report:', err);
+        });
+    }
+
+    function renderOverview(data) {
+      const total = data.total || 0;
+      document.getElementById(cfg.ids.masteredPct).textContent = pct(data.total_mastered, total) + '%';
+      document.getElementById(cfg.ids.masteredDetail).textContent =
+        data.total_mastered.toLocaleString() + ' / ' + total.toLocaleString();
+      document.getElementById(cfg.ids.seenPct).textContent = pct(data.total_seen, total) + '%';
+      document.getElementById(cfg.ids.seenDetail).textContent =
+        data.total_seen.toLocaleString() + ' / ' + total.toLocaleString();
+
+      let h = '';
+      (data.levels || []).forEach(function(lv) {
+        const color = cfg.colors[lv.level] || '#228be6';
+        const seenW = lv.total ? (lv.seen / lv.total * 100) : 0;
+        const doneW = lv.total ? (lv.mastered / lv.total * 100) : 0;
+        h +=
+          '<div class="jlpt-row" data-level="' + lv.level + '">' +
+            '<span class="jlpt-chev">▶</span>' +
+            '<span class="jlpt-badge" style="background:' + color + '">' + lv.level + '</span>' +
+            '<div class="jlpt-track">' +
+              '<div class="jlpt-tip">' +
+                '<div>Mastered <span>' + pct(lv.mastered, lv.total) + '%</span></div>' +
+                '<div>Seen <span>' + pct(lv.seen, lv.total) + '%</span></div>' +
+              '</div>' +
+              '<div class="jlpt-fill" style="width:' + seenW + '%;background:' + color + '"></div>' +
+              '<div class="jlpt-done" style="width:' + doneW + '%;background:' + color + '"></div>' +
+            '</div>' +
+            '<div class="jlpt-nums">' + lv.seen.toLocaleString() + ' <em>/ ' + lv.total.toLocaleString() + '</em></div>' +
+          '</div>';
+      });
+      levelsEl.innerHTML = h;
+    }
+
+    function loadWords() {
+      const listEl = ddEl.querySelector('.jlpt-w-list');
+      listEl.innerHTML = '<div class="jlpt-loading">Loading...</div>';
+      fetch(cfg.urls.words + '?lang_id=' + currentLang + '&level=' + state.level + '&filter=' + state.filter + '&page=' + state.page + '&per_page=' + cfg.perPage)
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.error) { throw new Error(d.error); }
+          state.total = d.total;
+          renderWords(listEl, d);
+        })
+        .catch(function(err) {
+          listEl.innerHTML = '<div class="jlpt-loading">Failed to load words.</div>';
+          console.error('Failed to load words:', err);
+        });
+    }
+
+    function renderWords(listEl, d) {
+      const pages = Math.max(1, Math.ceil(d.total / d.per_page));
+      let h = '';
+      (d.words || []).forEach(function(w) {
+        const ns = w.status === null ? ' ns' : '';
+        let tip = '';
+        if (w.reading) { tip += '<div>' + escapeHtml(w.reading) + '</div>'; }
+        const meaning = String(w.meaning || '').replace(/\s*\n+\s*/g, '; ').trim();
+        if (meaning) { tip += '<div>' + escapeHtml(meaning) + '</div>'; }
+        h += '<div class="jlpt-w-cell' + ns + '">' + escapeHtml(w.word) +
+             (tip ? '<div class="jlpt-tip">' + tip + '</div>' : '') +
+             '</div>';
+      });
+      if (!d.words || !d.words.length) {
+        h = '<div class="jlpt-loading">No words.</div>';
+      }
+      listEl.innerHTML = h;
+      ddEl.querySelector('.jlpt-pg-info').textContent = 'Page ' + d.page + ' of ' + pages + ' · ' + d.total.toLocaleString() + ' words';
+      ddEl.querySelector('[data-pg="prev"]').disabled = d.page <= 1;
+      ddEl.querySelector('[data-pg="next"]').disabled = d.page >= pages;
+    }
+
+    function toggleDrilldown(row) {
+      const level = row.dataset.level;
+      if (state.level === level && ddEl) { closeDrilldown(); return; }
+      closeDrilldown();
+      row.classList.add('sel');
+      state.level = level;
+      state.filter = 'unmastered';
+      state.page = 1;
+
+      const counts = countsFor(level);
+      ddEl = document.createElement('div');
+      ddEl.className = 'jlpt-dd';
+      ddEl.innerHTML =
+        '<div class="jlpt-dd-head">' +
+          '<span class="jlpt-dd-title">' + level + ' words</span>' +
+          '<div class="jlpt-tabs">' +
+            ['unmastered', 'notseen', 'mastered'].map(function(t) {
+              return '<button type="button" class="jlpt-tab' + (t === 'unmastered' ? ' on' : '') + '" data-tab="' + t + '">' + TAB_LABELS[t] + ' (' + counts[t].toLocaleString() + ')</button>';
+            }).join('') +
+          '</div>' +
+          '<button type="button" class="jlpt-export-cur">Export CSV</button>' +
+        '</div>' +
+        '<div class="jlpt-w-list jlpt-w-grid"><div class="jlpt-loading">Loading...</div></div>' +
+        '<div class="jlpt-pager">' +
+          '<button type="button" class="jlpt-pg-btn" data-pg="prev">← Prev</button>' +
+          '<button type="button" class="jlpt-pg-btn" data-pg="next">Next →</button>' +
+          '<span class="jlpt-pg-info"></span>' +
+        '</div>';
+      row.after(ddEl);
+
+      ddEl.querySelector('.jlpt-tabs').addEventListener('click', function(e) {
+        const b = e.target.closest('.jlpt-tab');
+        if (!b) return;
+        state.filter = b.dataset.tab;
+        state.page = 1;
+        ddEl.querySelectorAll('.jlpt-tab').forEach(t => t.classList.toggle('on', t === b));
+        loadWords();
+      });
+      ddEl.querySelector('.jlpt-export-cur').addEventListener('click', function() {
+        window.location = cfg.urls.export + '?lang_id=' + currentLang + '&level=' + state.level + '&filter=' + state.filter;
+      });
+      ddEl.querySelector('.jlpt-pager').addEventListener('click', function(e) {
+        const b = e.target.closest('[data-pg]');
+        if (!b) return;
+        const pages = Math.max(1, Math.ceil(state.total / cfg.perPage));
+        if (b.dataset.pg === 'prev' && state.page > 1) { state.page--; loadWords(); }
+        if (b.dataset.pg === 'next' && state.page < pages) { state.page++; loadWords(); }
+      });
+      loadWords();
+    }
+
+    levelsEl.addEventListener('click', function(e) {
+      const row = e.target.closest('.jlpt-row');
+      if (row) { toggleDrilldown(row); }
+    });
+
+    document.getElementById(cfg.exportAll).addEventListener('click', function() {
+      window.location = cfg.urls.export + '?lang_id=' + currentLang + '&level=all&filter=all';
+    });
+
+    btn.addEventListener('click', function() {
+      const open = panel.style.display !== 'none';
+      panel.style.display = open ? 'none' : '';
+      if (!open && currentLang !== 'all') { load(); }
+    });
+
+    function sync() {
+      const sel = document.getElementById('ov-lang');
+      const opt = sel.options[sel.selectedIndex];
+      const active = opt && opt.dataset[cfg.langKey] === '1';
+      btn.style.display = active ? '' : 'none';
+      if (!active) {
+        panel.style.display = 'none';
+        closeDrilldown();
+        return;
+      }
+      if (panel.style.display === 'none' || !state.data) {
+        panel.style.display = '';
+        if (currentLang !== 'all') { load(); }
+      }
+    }
+
+    return { sync: sync };
+  }
+
+  const CEFR_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
+  const TOPIK_COLORS = { A: '#1dc981', B: '#f2b705', C: '#e8463a' };
+
+  const cefrReport = createLevelReport({
+    langKey: 'en', btn: 'cefr-btn', panel: 'cefr-panel', levelsEl: 'cefr-levels',
+    exportAll: 'cefr-export-all', colors: CEFR_COLORS, perPage: 60,
+    ids: { masteredPct: 'cefr-mastered-pct', masteredDetail: 'cefr-mastered-detail', seenPct: 'cefr-seen-pct', seenDetail: 'cefr-seen-detail' },
+    urls: { data: '/stats/cefr_data', words: '/stats/cefr_words', export: '/stats/cefr_export' },
+  });
+
+  const topikReport = createLevelReport({
+    langKey: 'ko', btn: 'topik-btn', panel: 'topik-panel', levelsEl: 'topik-levels',
+    exportAll: 'topik-export-all', colors: TOPIK_COLORS, perPage: 60,
+    ids: { masteredPct: 'topik-mastered-pct', masteredDetail: 'topik-mastered-detail', seenPct: 'topik-seen-pct', seenDetail: 'topik-seen-detail' },
+    urls: { data: '/stats/topik_data', words: '/stats/topik_words', export: '/stats/topik_export' },
+  });
+
+  const origUpdateJpButton = updateJpButton;
+  updateJpButton = function() {
+    origUpdateJpButton();
+    cefrReport.sync();
+    topikReport.sync();
+  };
 
   updateJpButton();
 
