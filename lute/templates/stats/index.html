@@ -35,27 +35,27 @@
   }
 
   /* JLPT progress panel */
-  .jlpt-btn { margin-left: 10px; cursor: pointer; background: #fff; font-weight: 600; }
-  .jlpt-btn:hover { background: #f1f3f5; }
+  .jlpt-btn { margin-left: 10px; cursor: pointer; background: var(--chart-card-bg, #fff); color: var(--chart-tick-major-color, #212529); font-weight: 600; }
+  .jlpt-btn:hover { background: var(--chart-grid-color, #f1f3f5); }
   .jlpt-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
-  .jlpt-sub { font-size: 12px; color: #6c757d; }
+  .jlpt-sub { font-size: 12px; color: var(--chart-tick-color, #6c757d); }
   .jlpt-section {
-    font-size: 12px; color: #6c757d; font-weight: bold;
+    font-size: 12px; color: var(--chart-tick-color, #6c757d); font-weight: bold;
     margin: 14px 0 10px 0; text-transform: uppercase; letter-spacing: .03em;
   }
   .jlpt-macro { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .jlpt-macro-card {
-    background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px;
+    background: var(--chart-grid-color, #f8f9fa); border: 1px solid var(--chart-grid-color, #e9ecef); border-radius: 8px; padding: 16px;
   }
   .jlpt-macro-label {
-    font-size: 12px; color: #6c757d; font-weight: 600;
+    font-size: 12px; color: var(--chart-tick-color, #6c757d); font-weight: 600;
     text-transform: uppercase; letter-spacing: .04em;
   }
   .jlpt-macro-hero {
     font-size: 40px; line-height: 1.1; font-weight: 600; color: #228be6;
     margin: 6px 0; font-variant-numeric: tabular-nums;
   }
-  .jlpt-macro-detail { font-size: 12px; color: #6c757d; }
+  .jlpt-macro-detail { font-size: 12px; color: var(--chart-tick-color, #6c757d); }
   .jlpt-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
   .jlpt-badge {
     width: 44px; flex: 0 0 44px; text-align: center; font-weight: 600; font-size: 12px;
@@ -63,24 +63,23 @@
   }
   .jlpt-track {
     position: relative; flex: 1; height: 14px; border-radius: 999px;
-    background: #e9ecef; overflow: visible; cursor: help;
+    background: var(--chart-grid-color, #e9ecef); overflow: visible; cursor: help;
   }
   .jlpt-fill { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 999px; opacity: .38; }
   .jlpt-done { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 999px; }
   .jlpt-tip {
     display: none; position: absolute; bottom: calc(100% + 8px); left: 0;
-    background: #fff; border: 1px solid #dee2e6; border-radius: 6px;
-    padding: 8px 12px; font-size: 12px; color: #343a40;
+    background: var(--chart-card-bg, #fff); border: 1px solid var(--chart-grid-color, #dee2e6); border-radius: 6px;
+    padding: 8px 12px; font-size: 12px; color: var(--chart-tick-major-color, #343a40);
     box-shadow: 0 2px 6px rgba(0,0,0,.1); white-space: nowrap; z-index: 5;
   }
   .jlpt-tip div { line-height: 1.5; }
-  .jlpt-tip div span { font-variant-numeric: tabular-nums; color: #495057; margin-left: 10px; float: right; }
+  .jlpt-tip div span { font-variant-numeric: tabular-nums; color: var(--chart-tick-color, #495057); margin-left: 10px; float: right; }
   .jlpt-track:hover .jlpt-tip { display: block; }
-  .jlpt-track::after { content: "hover"; position: absolute; right: 0; top: calc(100% + 4px); font-size: 11px; color: #adb5bd; }
-  .jlpt-nums { flex: 0 0 96px; text-align: right; font-size: 13px; color: #343a40; font-weight: 500; font-variant-numeric: tabular-nums; }
-  .jlpt-nums em { font-style: normal; color: #6c757d; }
-  .jlpt-foot { font-size: 12px; color: #6c757d; margin-top: 8px; border-top: 1px solid #e9ecef; padding-top: 8px; }
-  .jlpt-loading { color: #adb5bd; font-style: italic; font-size: 13px; padding: 20px 0; text-align: center; }
+  .jlpt-nums { flex: 0 0 96px; text-align: right; font-size: 13px; color: var(--chart-tick-major-color, #343a40); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .jlpt-nums em { font-style: normal; color: var(--chart-tick-color, #6c757d); }
+  .jlpt-foot { font-size: 12px; color: var(--chart-tick-color, #6c757d); margin-top: 8px; border-top: 1px solid var(--chart-grid-color, #e9ecef); padding-top: 8px; }
+  .jlpt-loading { color: var(--chart-tick-color, #adb5bd); font-style: italic; font-size: 13px; padding: 20px 0; text-align: center; }
 
   .term-charts-grid {
     display: grid;
