@@ -656,6 +656,7 @@
       h = '<div class="jlpt-loading">No words.</div>';
     }
     listEl.innerHTML = h;
+    const dd = document.getElementById('jlpt-dd');
     dd.querySelector('.jlpt-pg-info').textContent = 'Page ' + data.page + ' of ' + pages + ' · ' + data.total.toLocaleString() + ' words';
     dd.querySelector('[data-pg="prev"]').disabled = data.page <= 1;
     dd.querySelector('[data-pg="next"]').disabled = data.page >= pages;
