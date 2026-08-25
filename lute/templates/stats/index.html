@@ -81,6 +81,39 @@
   .jlpt-foot { font-size: 12px; color: var(--chart-tick-color, #6c757d); margin-top: 8px; border-top: 1px solid var(--chart-grid-color, #e9ecef); padding-top: 8px; }
   .jlpt-loading { color: var(--chart-tick-color, #adb5bd); font-style: italic; font-size: 13px; padding: 20px 0; text-align: center; }
 
+  /* JLPT drilldown (word list under a clicked level row) */
+  .jlpt-row { cursor: pointer; border-radius: 8px; padding: 2px 8px; margin-left: -8px; margin-right: -8px; }
+  .jlpt-row:hover { background: var(--chart-grid-color, rgba(0,0,0,.04)); }
+  .jlpt-row.sel { background: var(--chart-grid-color, rgba(0,0,0,.04)); }
+  .jlpt-chev { flex: 0 0 14px; text-align: center; font-size: 11px; color: var(--chart-tick-color, #adb5bd); transition: transform .12s ease; }
+  .jlpt-row.sel .jlpt-chev { transform: rotate(90deg); }
+  .jlpt-dd { border: 1px solid var(--chart-grid-color, #dee2e6); border-radius: 8px; background: var(--chart-grid-color, #f8f9fa); padding: 14px 16px; margin: 4px 0 14px 0; }
+  .jlpt-dd-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .jlpt-dd-title { font-size: 14px; font-weight: 600; color: var(--chart-tick-major-color, #343a40); }
+  .jlpt-tabs { display: flex; gap: 4px; margin-left: auto; }
+  .jlpt-tab { font-size: 12px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--chart-grid-color, #ced4da); background: transparent; color: var(--chart-tick-color, #6c757d); cursor: pointer; }
+  .jlpt-tab.on { background: #228be6; border-color: #228be6; color: #fff; font-weight: 600; }
+  .jlpt-export-cur { font-size: 12px; font-weight: 600; padding: 4px 12px; border: 1px solid #228be6; border-radius: 6px; background: transparent; color: #228be6; cursor: pointer; }
+  .jlpt-export-cur:hover { background: var(--chart-grid-color, rgba(34,139,230,.08)); }
+  .jlpt-w-head, .jlpt-w-row { display: grid; grid-template-columns: 120px 110px 1fr 110px 46px; gap: 12px; align-items: center; }
+  .jlpt-w-head { padding: 0 8px 8px 8px; border-bottom: 1px solid var(--chart-grid-color, #dee2e6); font-size: 12px; font-weight: 600; color: var(--chart-tick-color, #6c757d); }
+  .jlpt-w-row { padding: 7px 8px; border-bottom: 1px solid var(--chart-grid-color, #e9ecef); }
+  .jlpt-w-row:hover { background: var(--chart-grid-color, rgba(0,0,0,.03)); }
+  .jlpt-w-word { font-size: 13px; font-weight: 600; color: var(--chart-tick-major-color, #343a40); }
+  .jlpt-w-read { font-size: 12px; color: var(--chart-tick-color, #6c757d); }
+  .jlpt-w-mean { font-size: 12px; color: var(--chart-tick-color, #6c757d); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .jlpt-w-st { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--chart-tick-major-color, #343a40); }
+  .jlpt-w-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: 0 0 10px; }
+  .jlpt-w-edit { font-size: 12px; font-weight: 600; color: #228be6; text-decoration: none; text-align: right; }
+  .jlpt-w-edit:hover { text-decoration: underline; }
+  .jlpt-w-none { color: var(--chart-tick-color, #adb5bd); font-size: 12px; }
+  .jlpt-pager { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .jlpt-pg-btn { font-size: 12px; padding: 4px 12px; border: 1px solid var(--chart-grid-color, #ced4da); border-radius: 6px; background: transparent; color: var(--chart-tick-major-color, #343a40); cursor: pointer; }
+  .jlpt-pg-btn:disabled { opacity: .4; cursor: default; }
+  .jlpt-pg-info { font-size: 12px; color: var(--chart-tick-color, #6c757d); margin-left: auto; }
+  .jlpt-export-all { margin-left: auto; font-size: 12px; font-weight: 600; padding: 4px 12px; border: 1px solid var(--chart-grid-color, #ced4da); border-radius: 6px; background: transparent; color: var(--chart-tick-major-color, #343a40); cursor: pointer; }
+  .jlpt-export-all:hover { background: var(--chart-grid-color, #f1f3f5); }
+
   .term-charts-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -283,6 +316,7 @@
     <div class="jlpt-head">
       <h3 style="margin:0;">JLPT Progress</h3>
       <span class="jlpt-sub">Japanese · data: OpenJLPT</span>
+      <button type="button" id="jlpt-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
     </div>
 
     <h4 class="jlpt-section">Overview</h4>
@@ -447,6 +481,8 @@
   });
 
   function loadJlpt() {
+    closeDrilldown();
+    jlptData = null;
     document.getElementById('jlpt-levels').innerHTML =
       '<div class="jlpt-loading">Loading...</div>';
     fetch('/stats/jlpt_data?lang_id=' + currentLang)
@@ -468,6 +504,7 @@
   }
 
   function renderJlpt(data) {
+    jlptData = data;
     const total = data.total || 0;
     const masteredPct = pct(data.total_mastered, total);
     const seenPct = pct(data.total_seen, total);
@@ -484,7 +521,8 @@
       const seenW = lv.total ? (lv.seen / lv.total * 100) : 0;
       const doneW = lv.total ? (lv.mastered / lv.total * 100) : 0;
       h +=
-        '<div class="jlpt-row">' +
+        '<div class="jlpt-row" data-level="' + lv.level + '">' +
+          '<span class="jlpt-chev">▶</span>' +
           '<span class="jlpt-badge" style="background:' + color + '">' + lv.level + '</span>' +
           '<div class="jlpt-track">' +
             '<div class="jlpt-tip">' +
@@ -499,6 +537,144 @@
     });
     document.getElementById('jlpt-levels').innerHTML = h;
   }
+
+  // --- JLPT drilldown ---
+  const JLPT_ST_COLORS = { 1: '#e8463a', 2: '#f87454', 3: '#f2b705', 4: '#8fce5a', 5: '#1dc981', 99: '#228be6' };
+  const JLPT_TABS = ['unmastered', 'notseen', 'mastered'];
+  let jlptData = null;
+  let ddState = null; // { level, filter, page, total }
+
+  function jlptCounts(level) {
+    if (!jlptData) return { unmastered: 0, notseen: 0, mastered: 0 };
+    const lv = jlptData.levels.find(l => l.level === level);
+    if (!lv) return { unmastered: 0, notseen: 0, mastered: 0 };
+    return {
+      unmastered: lv.seen - lv.mastered,
+      notseen: lv.total - lv.seen,
+      mastered: lv.mastered
+    };
+  }
+
+  function closeDrilldown() {
+    const dd = document.getElementById('jlpt-dd');
+    if (dd) dd.remove();
+    document.querySelectorAll('.jlpt-row.sel').forEach(r => r.classList.remove('sel'));
+    ddState = null;
+  }
+
+  function toggleDrilldown(row) {
+    const level = row.dataset.level;
+    if (ddState && ddState.level === level) { closeDrilldown(); return; }
+    closeDrilldown();
+    row.classList.add('sel');
+    ddState = { level: level, filter: 'unmastered', page: 1, total: 0 };
+
+    const counts = jlptCounts(level);
+    const dd = document.createElement('div');
+    dd.className = 'jlpt-dd';
+    dd.id = 'jlpt-dd';
+    dd.innerHTML =
+      '<div class="jlpt-dd-head">' +
+        '<span class="jlpt-dd-title">' + level + ' words</span>' +
+        '<div class="jlpt-tabs">' +
+          JLPT_TABS.map(function(t) {
+            const labels = { unmastered: 'Unmastered', notseen: 'Not seen', mastered: 'Mastered' };
+            return '<button type="button" class="jlpt-tab' + (t === 'unmastered' ? ' on' : '') + '" data-tab="' + t + '">' + labels[t] + ' (' + counts[t].toLocaleString() + ')</button>';
+          }).join('') +
+        '</div>' +
+        '<button type="button" class="jlpt-export-cur">Export CSV</button>' +
+      '</div>' +
+      '<div class="jlpt-w-head"><span>Word</span><span>Reading</span><span>Meaning</span><span>Status</span><span></span></div>' +
+      '<div class="jlpt-w-list"><div class="jlpt-loading">Loading...</div></div>' +
+      '<div class="jlpt-pager">' +
+        '<button type="button" class="jlpt-pg-btn" data-pg="prev">← Prev</button>' +
+        '<button type="button" class="jlpt-pg-btn" data-pg="next">Next →</button>' +
+        '<span class="jlpt-pg-info"></span>' +
+      '</div>';
+    row.after(dd);
+
+    dd.querySelector('.jlpt-tabs').addEventListener('click', function(e) {
+      const b = e.target.closest('.jlpt-tab');
+      if (!b) return;
+      ddState.filter = b.dataset.tab;
+      ddState.page = 1;
+      dd.querySelectorAll('.jlpt-tab').forEach(t => t.classList.toggle('on', t === b));
+      loadDrillWords();
+    });
+    dd.querySelector('.jlpt-export-cur').addEventListener('click', function() {
+      window.location = '/stats/jlpt_export?lang_id=' + currentLang + '&level=' + ddState.level + '&filter=' + ddState.filter;
+    });
+    dd.querySelector('.jlpt-pager').addEventListener('click', function(e) {
+      const b = e.target.closest('[data-pg]');
+      if (!b) return;
+      const pages = Math.max(1, Math.ceil(ddState.total / 20));
+      if (b.dataset.pg === 'prev' && ddState.page > 1) { ddState.page--; loadDrillWords(); }
+      if (b.dataset.pg === 'next' && ddState.page < pages) { ddState.page++; loadDrillWords(); }
+    });
+    loadDrillWords();
+  }
+
+  function loadDrillWords() {
+    const dd = document.getElementById('jlpt-dd');
+    const listEl = dd.querySelector('.jlpt-w-list');
+    listEl.innerHTML = '<div class="jlpt-loading">Loading...</div>';
+    fetch('/stats/jlpt_words?lang_id=' + currentLang + '&level=' + ddState.level + '&filter=' + ddState.filter + '&page=' + ddState.page)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.error) { throw new Error(data.error); }
+        ddState.total = data.total;
+        renderDrillWords(listEl, data);
+      })
+      .catch(function(err) {
+        listEl.innerHTML = '<div class="jlpt-loading">Failed to load words.</div>';
+        console.error('Failed to load JLPT words:', err);
+      });
+  }
+
+  function renderDrillWords(listEl, data) {
+    const pages = Math.max(1, Math.ceil(data.total / data.per_page));
+    let h = '';
+    (data.words || []).forEach(function(w) {
+      let stCell, editCell;
+      if (w.status === null) {
+        stCell = '<span class="jlpt-w-none">—</span>';
+        editCell = '<span class="jlpt-w-none"></span>';
+      } else {
+        const c = JLPT_ST_COLORS[w.status] || '#adb5bd';
+        stCell = '<span class="jlpt-w-st"><span class="jlpt-w-dot" style="background:' + c + '"></span>' + w.status_text + '</span>';
+        editCell = '<a class="jlpt-w-edit" href="/term/edit/' + w.id + '">Edit</a>';
+      }
+      h +=
+        '<div class="jlpt-w-row">' +
+          '<span class="jlpt-w-word">' + escapeHtml(w.word) + '</span>' +
+          '<span class="jlpt-w-read">' + escapeHtml(w.reading) + '</span>' +
+          '<span class="jlpt-w-mean">' + escapeHtml(w.meaning) + '</span>' +
+          stCell + editCell +
+        '</div>';
+    });
+    if (!data.words || !data.words.length) {
+      h = '<div class="jlpt-loading">No words.</div>';
+    }
+    listEl.innerHTML = h;
+    dd.querySelector('.jlpt-pg-info').textContent = 'Page ' + data.page + ' of ' + pages + ' · ' + data.total.toLocaleString() + ' words';
+    dd.querySelector('[data-pg="prev"]').disabled = data.page <= 1;
+    dd.querySelector('[data-pg="next"]').disabled = data.page >= pages;
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  document.getElementById('jlpt-levels').addEventListener('click', function(e) {
+    const row = e.target.closest('.jlpt-row');
+    if (row) { toggleDrilldown(row); }
+  });
+
+  document.getElementById('jlpt-export-all').addEventListener('click', function() {
+    window.location = '/stats/jlpt_export?lang_id=' + currentLang + '&level=all&filter=all';
+  });
 
   updateJpButton();
 
