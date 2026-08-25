@@ -551,6 +551,10 @@
       re_marked.addClass('wordhover');
       // Notify the YouTube / TTS player to refresh subtitle word colors.
       window.dispatchEvent(new Event('lute:status-updated'));
+      // The swapped-in paragraph set has no pagination state.  Re-flow
+      // the screen so multi-column books stay within the pane instead of
+      // spilling into overflowing columns after a save.
+      requestAnimationFrame(_splitToScreens);
     }
   });
 
@@ -667,23 +671,60 @@
     const screenH = wrapRect.height - padBottom;
 
     let groups = [];
-    let cur = [];
-    let curTop = 0;
-    for (let i = 0; i < paras.length; i++) {
-      const r = paras[i].getBoundingClientRect();
-      const top = r.top - wrapRect.top;
-      const bottom = r.bottom - wrapRect.top;
-      // A paragraph joins the current group only if its bottom edge still
-      // fits within the screen; otherwise start a new screen so nothing
-      // gets clipped at the lower edge of the text area.
-      if (cur.length > 0 && bottom - curTop > screenH) {
-        groups.push(cur);
-        cur = [];
+    // Column-aware grouping: on a fixed-height multi-column box, CSS
+    // multicol overflows into extra columns that spill past the pane's
+    // right edge (a "third column").  Split paragraphs into pages of
+    // columns that fill the box width (a 2-column book -> 2-column
+    // pages) so each screen renders cleanly within the pane instead of
+    // showing a clipped overflowing column.
+    const colLefts = [];
+    paras.forEach((p) => {
+      const l = p.getBoundingClientRect().left;
+      if (colLefts.every((c) => Math.abs(c - l) > 2)) colLefts.push(l);
+    });
+    colLefts.sort((a, b) => a - b);
+    if (colLefts.length > 1) {
+      const colLeft0 = colLefts[0];
+      const trackPitch = colLefts[1] - colLefts[0];
+      const colsPerScreen = Math.max(
+        1,
+        Math.round(wrap.clientWidth / trackPitch)
+      );
+      let curCol = [];
+      let curPage = -1;
+      for (let i = 0; i < paras.length; i++) {
+        const colIdx = Math.round(
+          (paras[i].getBoundingClientRect().left - colLeft0) / trackPitch
+        );
+        const page = Math.floor(colIdx / colsPerScreen);
+        if (page !== curPage) {
+          if (curCol.length) groups.push(curCol);
+          curCol = [paras[i]];
+          curPage = page;
+        } else {
+          curCol.push(paras[i]);
+        }
       }
-      if (cur.length === 0) curTop = top;
-      cur.push(paras[i]);
+      if (curCol.length) groups.push(curCol);
+    } else {
+      let cur = [];
+      let curTop = 0;
+      for (let i = 0; i < paras.length; i++) {
+        const r = paras[i].getBoundingClientRect();
+        const top = r.top - wrapRect.top;
+        const bottom = r.bottom - wrapRect.top;
+        // A paragraph joins the current group only if its bottom edge
+        // still fits within the screen; otherwise start a new screen so
+        // nothing gets clipped at the lower edge of the text area.
+        if (cur.length > 0 && bottom - curTop > screenH) {
+          groups.push(cur);
+          cur = [];
+        }
+        if (cur.length === 0) curTop = top;
+        cur.push(paras[i]);
+      }
+      if (cur.length) groups.push(cur);
     }
-    if (cur.length) groups.push(cur);
 
     subScreens = groups;
     _renderScreen();
