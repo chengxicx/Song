@@ -564,6 +564,8 @@ div#term_form_right {
 
 div#read_pane_left {
     width: 50%;
+    height: 100%;
+    box-sizing: border-box;
     /* Keep the reading content inside the window: the header stays fixed at
        the top and the text area fills the remaining viewport height, so the
        page itself never scrolls.  Long pages scroll inside the text area. */
@@ -1028,7 +1030,7 @@ div#thetext {
 }
 
 div#thetext.manga-text-container {
-    overflow: visible;
+    overflow-y: auto;
 }
 
 div#thetext p {
