@@ -404,6 +404,21 @@ def page_done():
     return jsonify("ok")
 
 
+@bp.route("/screen_done", methods=["post"])
+def screen_done():
+    "Handle POST when a reading sub-screen is finished."
+    data = request.json
+    bookid = int(data.get("bookid"))
+    wordids = data.get("wordids") or []
+
+    br = BookRepository(db.session)
+    book = br.find(bookid)
+
+    service = Service(db.session)
+    count = service.set_terms_to_known(wordids, book)
+    return jsonify({ "updated": count })
+
+
 @bp.route("/delete_page/<int:bookid>/<int:pagenum>", methods=["GET"])
 def delete_page(bookid, pagenum):
     """

@@ -235,6 +235,7 @@
       tapSetsStatus: isTablet && localStorage.getItem("tap_sets_status") === "true",
       arrowMarksKnown: localStorage.getItem("arrow_marks_known") === "true",
       init() {
+        if (typeof update_arrow_titles === "function") update_arrow_titles();
         this.$watch("focusMode", (v) => {
           localStorage.setItem(`focusMode-book${bookId}`, v ? "true" : "false");
         });
@@ -243,6 +244,7 @@
         });
         this.$watch("arrowMarksKnown", (v) => {
           localStorage.setItem("arrow_marks_known", v ? "true" : "false");
+          if (typeof update_arrow_titles === "function") update_arrow_titles();
         });
       },
     };
@@ -799,18 +801,59 @@
   }
 
   function navigateNext() {
+    const arrowMarksKnown =
+      localStorage.getItem("arrow_marks_known") === "true";
     if (
       !_isMangaReader() &&
       subScreens.length &&
       curScreen < subScreens.length - 1
     ) {
+      if (arrowMarksKnown) mark_current_screen_known();
       curScreen++;
       _renderScreen();
       return;
     }
-    const arrowMarksKnown =
-      localStorage.getItem("arrow_marks_known") === "true";
     handle_page_done(arrowMarksKnown, 1);
+  }
+
+  // With the arrow_marks_known toggle on, moving forward from a
+  // sub-screen marks only that screen's unknown words as known;
+  // later screens are untouched.
+  function mark_current_screen_known() {
+    const group = subScreens[curScreen] || [];
+    const ids = new Set();
+    const elements = [];
+    group.forEach((p) => {
+      p.querySelectorAll(".textitem.status0").forEach((el) => {
+        const m = el.className.match(/word(\d+)/);
+        if (!m) return;
+        ids.add(parseInt(m[1], 10));
+        elements.push(el);
+      });
+    });
+    if (ids.size === 0) return;
+    $.ajax({
+      type: "post",
+      url: "/read/screen_done",
+      data: JSON.stringify({
+        bookid: $("#book_id").val(),
+        wordids: Array.from(ids),
+      }),
+      contentType: "application/json; charset=utf-8",
+    }).done(function () {
+      elements.forEach((el) => el.classList.replace("status0", "status99"));
+    });
+  }
+
+  function update_arrow_titles() {
+    const on = localStorage.getItem("arrow_marks_known") === "true";
+    const t = on
+      ? "Mark this screen as known and continue"
+      : "Go to next page";
+    ["navSideNext", "navNext"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.title = t;
+    });
   }
 
   // Handle green checkmark in footer.
