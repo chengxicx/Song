@@ -186,6 +186,47 @@ class Service:
         if i > 0:
             StatsService(self.session).mark_stale(book)
 
+    def set_terms_to_known(self, wordids, book=None):
+        """
+        Set the given term ids to Well-Known, skipping any that are
+        not currently unknown.  Used when a sub-screen is finished.
+        """
+        seen = set()
+        ids = []
+        for w in wordids or []:
+            try:
+                i = int(w)
+            except (TypeError, ValueError):
+                continue
+            if i > 0 and i not in seen:
+                seen.add(i)
+                ids.append(i)
+        if not ids:
+            return 0
+
+        batch_size = 100
+        i = 0
+
+        terms = (
+            self.session.query(Term)
+            .filter(Term.id.in_(ids), Term.status == Status.UNKNOWN)
+            .all()
+        )
+        for t in terms:
+            t.status = Status.WELLKNOWN
+            self.session.add(t)
+            i += 1
+            if i % batch_size == 0:
+                self.session.commit()
+
+        # Commit any remaining.
+        self.session.commit()
+
+        if i > 0 and book is not None:
+            StatsService(self.session).mark_stale(book)
+
+        return i
+
     def bulk_status_update(self, text: Text, terms_text_array, new_status):
         """
         Given a text and list of terms, update or create new terms

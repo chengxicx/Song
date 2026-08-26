@@ -124,6 +124,48 @@ def test_mark_page_read_with_rest_of_book_known(english, app_context):
     assert_record_count_equals(sql_wordsread, 1, "one wordsread record")
 
 
+def test_set_terms_to_known_only_updates_unknowns(english, app_context):
+    "Only unknown terms become well-known; other statuses untouched."
+    dbbook = _create_two_page_book(db.session, english)
+    service = Service(db.session)
+    service.start_reading(dbbook, 1)
+
+    learning = Term(english, "big")
+    learning.status = 1
+    db.session.add(learning)
+    db.session.commit()
+
+    ids = [
+        t.id
+        for t in db.session.query(Term)
+        .filter(Term.text_lc.in_(["fast", "runs", "big"]))
+        .all()
+    ]
+    count = service.set_terms_to_known(ids, dbbook)
+
+    sql = "select WoTextLC, WoStatus from words order by WoText"
+    assert count == 2, "only the two unknown terms were updated"
+    assert_sql_result(
+        sql,
+        ["big; 1", "dog; 1", "fast; 99", "runs; 99"],
+        "unknown -> known, learning untouched",
+    )
+
+
+def test_set_terms_to_known_ignores_invalid_ids(english, app_context):
+    "Empty or non-numeric ids are skipped safely."
+    dbbook = _create_two_page_book(db.session, english)
+    service = Service(db.session)
+
+    assert service.set_terms_to_known([], dbbook) == 0
+    assert service.set_terms_to_known(["x", None, -3], dbbook) == 0
+
+    sql = "select WoTextLC, WoStatus from words order by WoText"
+    assert_sql_result(
+        sql, ["dog; 1"], "no changes made for invalid input"
+    )
+
+
 def test_smoke_start_reading(english, app_context):
     "Smoke test book."
     b = Book()
