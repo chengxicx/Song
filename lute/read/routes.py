@@ -397,9 +397,10 @@ def page_done():
     bookid = int(data.get("bookid"))
     pagenum = int(data.get("pagenum"))
     restknown = data.get("restknown")
+    allpages = bool(data.get("allpages", False))
 
     service = Service(db.session)
-    service.mark_page_read(bookid, pagenum, restknown)
+    service.mark_page_read(bookid, pagenum, restknown, allpages)
     return jsonify("ok")
 
 

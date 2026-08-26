@@ -92,7 +92,9 @@ class Service:
         self.session.add(book)
         self.session.commit()
 
-    def mark_page_read(self, bookid, pagenum, mark_rest_as_known):
+    def mark_page_read(
+        self, bookid, pagenum, mark_rest_as_known, mark_rest_of_book_known=False
+    ):
         "Mark page as read, record stats, rest as known."
         br = BookRepository(self.session)
         book = br.find(bookid)
@@ -106,7 +108,9 @@ class Service:
         self.session.add(text)
         self.session.add(w)
         self.session.commit()
-        if mark_rest_as_known:
+        if mark_rest_of_book_known:
+            self.set_book_unknowns_to_known(book)
+        elif mark_rest_as_known:
             self.set_unknowns_to_known(text)
 
     def set_unknowns_to_known(self, text: Text):
@@ -145,6 +149,42 @@ class Service:
         # whole sample synchronously, which was slow for long books.)
         if unknowns:
             StatsService(self.session).mark_stale(text.book)
+
+    def set_book_unknowns_to_known(self, book):
+        """
+        Given a book, create new Terms with status Well-Known for any
+        new Terms on every page of the book.
+        """
+        rs = RenderService(self.session)
+        batch_size = 100
+        i = 0
+
+        for text in book.texts:
+            paragraphs = rs.get_paragraphs(text.text, text.book.language)
+            self._save_new_status_0_terms(paragraphs)
+
+            unknowns = [
+                ti.term
+                for para in paragraphs
+                for sentence in para
+                for ti in sentence
+                if ti.is_word and ti.term.status == 0
+            ]
+
+            for t in unknowns:
+                t.status = Status.WELLKNOWN
+                self.session.add(t)
+                i += 1
+                if i % batch_size == 0:
+                    self.session.commit()
+
+        # Commit any remaining.
+        self.session.commit()
+
+        # Mark the book's stats stale only when statuses actually changed,
+        # so the home page recomputes the status distribution.
+        if i > 0:
+            StatsService(self.session).mark_stale(book)
 
     def bulk_status_update(self, text: Text, terms_text_array, new_status):
         """
