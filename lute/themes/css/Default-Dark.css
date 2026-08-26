@@ -972,6 +972,20 @@ canvas + svg text {
   background-color: #30d158 !important;
 }
 
+/* Gear / settings dropdown (audio-only mode) */
+.yt-settings-dropdown {
+  background-color: #2c2c2e !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  color: #f2f2f7 !important;
+}
+.yt-settings-option {
+  color: #f2f2f7 !important;
+}
+.yt-settings-option:hover {
+  background-color: rgba(10, 132, 255, 0.15) !important;
+}
+
 /* Timeline + rate wrap panels */
 .yt-timeline-wrap,
 #yt-playback-rate-container,
