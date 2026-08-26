@@ -658,10 +658,17 @@
     return !!t && t.classList.contains("manga-text-container");
   };
 
-  // Scale a manga page so the whole image (art + text overlays) fits the
-  // reading area vertically, keeping it horizontally centered.  Both the
-  // image and the %-positioned text blocks live in the same .manga-page
-  // box, so scaling the box scales them together and they stay aligned.
+  // Fit a manga page (art + text overlays) into the reading area while
+  // keeping it horizontally centered.  The page is given explicit pixel
+  // dimensions and the image fills that box, so the %-positioned text
+  // blocks resolve against exactly the rendered image box.
+  //
+  // We deliberately do NOT use `transform: scale()` for this fit: a
+  // transformed .manga-page inside an overflow:hidden ancestor causes the
+  // paint position of the lower (farther-from-origin) text blocks to go
+  // stale in some browsers (notably Edge), leaving those OCR boxes laid
+  // out at the correct place but rendered off-target, so their hover /
+  // click hit areas stop lining up with the image text.
   function _fitMangaPage() {
     const wrap = theText;
     if (!wrap || !wrap.classList.contains("manga-text-container")) return;
@@ -669,11 +676,19 @@
     const img = wrap.querySelector(".manga-page-img");
     if (!page || !img) return;
     page.style.transform = "none";
-    const screenH = wrap.clientHeight;
-    const natH = img.getBoundingClientRect().height || 0;
-    if (natH <= 0) return; // image not decoded yet; retried on load
-    const scale = Math.min(1, screenH / natH);
-    page.style.transform = scale < 1 ? `scale(${scale})` : "none";
+    const availW = wrap.clientWidth;
+    const availH = wrap.clientHeight;
+    const natW = img.naturalWidth;
+    const natH = img.naturalHeight;
+    if (!natW || !natH) return; // image not decoded yet; retried on load
+    const scale = Math.min(1, availW / natW, availH / natH) || 1;
+    const w = Math.max(10, Math.floor(natW * scale));
+    const h = Math.max(10, Math.floor(natH * scale));
+    page.style.width = `${w}px`;
+    page.style.height = `${h}px`;
+    page.style.margin = "0 auto";
+    img.style.width = "100%";
+    img.style.height = "100%";
   }
 
   function _splitToScreens() {
