@@ -832,10 +832,10 @@
     bindKeys();
     ytLoadSubtitleWords();
 
-    // Create the player immediately for the audio backend (the
-    // <audio> element is already in the DOM); for YouTube, wait for
-    // the IFrame API to be ready.
-    if (USE_AUDIO_BACKEND) {
+    // Create the player immediately for the media backends (the
+    // <audio>/<video> element is already in the DOM); for YouTube, wait
+    // for the IFrame API to be ready.
+    if (USE_AUDIO_BACKEND || USE_VIDEO_BACKEND) {
       createYoutubePlayer();
     } else {
       var create = function () { createYoutubePlayer(); };
@@ -855,7 +855,9 @@
       if (ytLoading && !ytPlayerReady) {
         ytLoading.textContent = USE_AUDIO_BACKEND
           ? "Unable to load the audio player. The transcript below is still available."
-          : "Unable to load the YouTube player. The transcript below is still available.";
+          : (USE_VIDEO_BACKEND
+            ? "Unable to load the video player. The transcript below is still available."
+            : "Unable to load the YouTube player. The transcript below is still available.");
         ytLoading.style.display = "block";
       }
     }, 15000);

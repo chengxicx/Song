@@ -8,6 +8,7 @@ larger media streamed from the remote URL) and online subtitle parsing.
 """
 
 import io
+import json
 from unittest.mock import patch
 
 from lute.db import db
@@ -214,3 +215,37 @@ def test_mp3_online_url_creates_mp3_book(app, app_context, client, english):
     assert book is not None
     assert book.book_type == "mp3"
     assert book.media_url == "https://a.example.com/song.mp3"
+
+
+def _make_video_book(app, app_context, english, media_url="https://v.example.com/clip.mp4"):
+    from lute.book.model import Book
+    from lute.book.service import Service as BookService
+
+    b = Book()
+    b.title = "Video Book"
+    b.language_id = english.id
+    b.text = "Hello world.\nGoodbye!"
+    b.book_type = "video"
+    b.media_url = media_url
+    b.source_uri = media_url
+    b.srt_data = json.dumps(
+        [
+            {"start": 1.0, "end": 4.2, "text": "Hello world."},
+            {"start": 5.0, "end": 8.5, "text": "Goodbye!"},
+        ]
+    )
+    b.book_tags = ["video"]
+    return BookService().import_book(b, db.session)
+
+
+def test_read_page_renders_video_backend(app, app_context, client, english):
+    "Reading a video book renders the HTML5 video player with the media URL."
+    dbbook = _make_video_book(app, app_context, english)
+    resp = client.get(f"/read/{dbbook.id}/page/1")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+
+    # Unified player uses the "video" backend and an HTML5 <video> element.
+    assert '"video"' in content  # LUTE_YT_DATA.backend
+    assert 'id="yt-video-player"' in content
+    assert "https://v.example.com/clip.mp4" in content
