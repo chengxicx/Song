@@ -4,8 +4,8 @@
 
 {% block body %}
 
-{% if book_type in ("youtube", "mp3") %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260816c" charset="utf-8" defer></script>
+{% if book_type in ("youtube", "mp3", "video") %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260827a" charset="utf-8" defer></script>
 {% elif book_type == "bilibili" %}
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/dash.all.min.js') }}?v=20260816" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/bilibili-player.js') }}?v=20260816c" charset="utf-8" defer></script>
@@ -88,7 +88,7 @@
 
   </div>
 
-  {% if book_type in ("youtube", "mp3") %}
+  {% if book_type in ("youtube", "mp3", "video") %}
   {% include "read/youtube_player.html" %}
   {% elif book_type == "bilibili" %}
   {% include "read/bilibili_player.html" %}

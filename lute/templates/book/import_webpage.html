@@ -12,6 +12,7 @@
     <option value="youtube">YouTube video</option>
     <option value="bilibili">Bilibili video</option>
     <option value="mp3">MP3 / M4A audio</option>
+    <option value="video">Online video</option>
     <option value="manga">Mokuro Manga</option>
   </select>
 </div>
@@ -92,9 +93,9 @@
 </form>
 
 <form id="mp3-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p>Import an MP3 or M4A audio file with its subtitle (SRT / VTT) file. The
+  <p>Import an MP3 or M4A audio file with its subtitle (SRT / VTT / TXT) file. The
   subtitles become the book text, so you can read and look up words while the
-  audio plays.</p>
+  audio plays. You can upload the files or provide online URLs.</p>
 
   <br />
 
@@ -107,19 +108,62 @@
   <br /><br />
 
   <label for="mp3_title">Title:</label>
-  <input type="text" id="mp3_title" name="mp3_title" class="form-text" style="width:75%;" placeholder="Leave blank to use the audio file name"><br><br>
+  <input type="text" id="mp3_title" name="mp3_title" class="form-text" style="width:75%;" placeholder="Leave blank to use the audio file name or URL"><br><br>
 
   <label for="mp3_file">Audio file (MP3 / M4A):</label>
-  <input type="file" id="mp3_file" name="mp3_file" accept=".mp3,.m4a" required><br><br>
+  <input type="file" id="mp3_file" name="mp3_file" accept=".mp3,.m4a"><br><br>
 
-  <label for="mp3_srt_file">Subtitle file (SRT / VTT):</label>
-  <input type="file" id="mp3_srt_file" name="srt_file" accept=".srt,.vtt" required><br><br>
+  <label for="mp3_url">…or online audio URL:</label>
+  <input type="text" id="mp3_url" name="mp3_url" class="form-text" style="width:75%;" placeholder="https://example.com/audio.mp3 (files under 20 MB are stored locally, larger are streamed)"><br><br>
+
+  <label for="mp3_srt_file">Subtitle file (SRT / VTT / TXT):</label>
+  <input type="file" id="mp3_srt_file" name="srt_file" accept=".srt,.vtt,.txt"><br><br>
+
+  <label for="mp3_srt_url">…or online subtitle URL:</label>
+  <input type="text" id="mp3_srt_url" name="mp3_srt_url" class="form-text" style="width:75%;" placeholder="https://example.com/subtitle.srt (downloaded locally)"><br><br>
 
   <label for="mp3_tag">Tags:</label>
   <input type="text" id="mp3_tag" name="mp3_tag" class="form-control" value='[{"value":"mp3"}]'><br><br>
 
   <input type="hidden" name="import_type" value="mp3">
   <input type="submit" id="mp3-import" value="Import">
+</form>
+
+<form id="video-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
+  <p>Import an online video with its subtitle (SRT / VTT / TXT) file. The
+  subtitles become the book text, so you can read and look up words while the
+  video plays. You can upload the files or provide online URLs.</p>
+
+  <br />
+
+  <label for="video-language">Language (used for subtitle parsing):</label>
+  <select id="video-language" name="language_id" class="form-control" style="width: auto;">
+    {% for id, name in language_choices %}
+    <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+    {% endfor %}
+  </select>
+  <br /><br />
+
+  <label for="video_title">Title:</label>
+  <input type="text" id="video_title" name="video_title" class="form-text" style="width:75%;" placeholder="Leave blank to use the video file name or URL"><br><br>
+
+  <label for="video_file">Video file (MP4 / WebM / MOV):</label>
+  <input type="file" id="video_file" name="video_file" accept=".mp4,.webm,.mov,.ogv,.ogg,.m4v"><br><br>
+
+  <label for="video_url">…or online video URL:</label>
+  <input type="text" id="video_url" name="video_url" class="form-text" style="width:75%;" placeholder="https://example.com/video.mp4 (files under 20 MB are stored locally, larger are streamed)"><br><br>
+
+  <label for="video_srt_file">Subtitle file (SRT / VTT / TXT):</label>
+  <input type="file" id="video_srt_file" name="video_srt_file" accept=".srt,.vtt,.txt"><br><br>
+
+  <label for="video_srt_url">…or online subtitle URL:</label>
+  <input type="text" id="video_srt_url" name="video_srt_url" class="form-text" style="width:75%;" placeholder="https://example.com/subtitle.srt (always downloaded locally)"><br><br>
+
+  <label for="video_tag">Tags:</label>
+  <input type="text" id="video_tag" name="video_tag" class="form-control" value='[{"value":"video"}]'><br><br>
+
+  <input type="hidden" name="import_type" value="video">
+  <input type="submit" id="video-import" value="Import">
 </form>
 
 <form id="manga-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
@@ -173,12 +217,14 @@
     const youtubeForm = $('#youtube-form');
     const bilibiliForm = $('#bilibili-form');
     const mp3Form = $('#mp3-form');
+    const videoForm = $('#video-form');
     const mangaForm = $('#manga-form');
 
     // Init Tagify on all tag inputs.
     var ytTagify = setupTagsTagify(document.getElementById('youtube_tag'));
     var biliTagify = setupTagsTagify(document.getElementById('bilibili_tag'));
     var mp3Tagify = setupTagsTagify(document.getElementById('mp3_tag'));
+    var videoTagify = setupTagsTagify(document.getElementById('video_tag'));
     var mangaTagify = setupTagsTagify(document.getElementById('manga_tag'));
 
     const updateForms = function () {
@@ -187,6 +233,7 @@
       youtubeForm.toggle(t === 'youtube');
       bilibiliForm.toggle(t === 'bilibili');
       mp3Form.toggle(t === 'mp3');
+      videoForm.toggle(t === 'video');
       mangaForm.toggle(t === 'manga');
     };
 
@@ -209,6 +256,14 @@
       var f = $(this).prop('files')[0];
       if (!f) return;
       var titleField = $('#manga_title');
+      if (titleField.val() === '') {
+        titleField.val(getFilenameWithoutExtension(f.name));
+      }
+    });
+    $('#video_file').on('change', function () {
+      var f = $(this).prop('files')[0];
+      if (!f) return;
+      var titleField = $('#video_title');
       if (titleField.val() === '') {
         titleField.val(getFilenameWithoutExtension(f.name));
       }

@@ -2,10 +2,12 @@
 book helper routines.
 """
 
+import contextlib
 import json
 import os
 import re
 import shutil
+import urllib.parse
 import uuid
 import zipfile
 from io import StringIO, TextIOWrapper, BytesIO
@@ -30,6 +32,14 @@ class BookImportException(Exception):
         self.cause = cause
         self.message = message
         super().__init__(message)
+
+
+# When a video / audio book is imported from an online URL, files
+# under this many bytes are downloaded and stored locally so the player
+# does not depend on a flaky remote host.  Larger files are streamed
+# directly from their remote URL.  Online *subtitle* URLs are always
+# downloaded locally (they are small and needed for word lookups).
+MEDIA_LOCAL_MAX_BYTES = 20 * 1024 * 1024  # 20 MB
 
 
 @dataclass
@@ -236,6 +246,136 @@ def _parse_vtt_cues(content):
         # a plain text file renamed to .vtt) is not a valid VTT file.
         raise BookImportException("No VTT subtitle cues found in content")
     return cues
+
+
+def parse_subtitle_content_any(name, content, ext=None):
+    """
+    Parse srt/vtt/txt subtitle content.
+
+    For srt/vtt this behaves exactly like parse_subtitle_content.  For
+    txt it is lenient: if the text contains SRT-style timestamps it is
+    parsed as SRT; otherwise it is treated as a plain transcript text
+    (returned with empty cue timing, "[]").
+    """
+    if ext is None:
+        _, ext = os.path.splitext(name)
+        ext = (ext or "").lower()
+    if ext == ".vtt":
+        return parse_subtitle_content(content, ".vtt")
+    if ext == ".txt":
+        return _parse_txt_subtitle(content)
+    return parse_subtitle_content(content, ".srt")
+
+
+def _parse_txt_subtitle(content):
+    """
+    Parse a .txt subtitle/-ish file.
+
+    Returns (text, cues_json).  If the text contains SRT-style cues
+    ("-->"), parse and return them; otherwise return the whole text as
+    a plain transcript with no cue timing ("[]").
+    """
+    if "-->" in content:
+        return parse_subtitle_content(content, ".srt")
+    return content.strip(), "[]"
+
+
+def _url_extension(url, default):
+    """
+    Guess a file extension from a URL path (e.g. ".mp4", ".srt"), or
+    return default when the path has no recognised extension.
+    """
+    known = {
+        ".srt", ".vtt", ".txt", ".mp3", ".m4a", ".m4b", ".mp4", ".webm",
+        ".mov", ".ogv", ".ogg", ".flac", ".wav", ".aac", ".opus",
+    }
+    try:
+        path = urllib.parse.urlparse(url).path or ""
+    except ValueError:
+        path = ""
+    _, ext = os.path.splitext(path)
+    ext = (ext or "").lower()
+    return ext if ext in known else default
+
+
+def parse_subtitle_from_url(url):
+    """
+    Download an online subtitle (srt/vtt/txt) and parse it.
+
+    Returns (text, cues_json) — the subtitle is always downloaded to
+    local, per the import spec.
+    """
+    ext = _url_extension(url, ".srt")
+    try:
+        resp = requests.get(url, timeout=30, allow_redirects=True)
+        resp.raise_for_status()
+        raw = resp.content
+    except requests.exceptions.RequestException as e:
+        raise BookImportException(
+            f"Could not download subtitle {url} (error: {str(e)})"
+        ) from e
+    try:
+        content = raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        content = raw.decode("latin-1", errors="replace")
+    return parse_subtitle_content_any(url, content, ext=ext)
+
+
+def _url_content_length(url):
+    """
+    Return the Content-Length of a URL in bytes, or None if unknown.
+
+    Used to decide (before a full download) whether an online video /
+    audio URL is small enough to store locally.
+    """
+    try:
+        resp = requests.head(url, timeout=15, allow_redirects=True)
+        length = resp.headers.get("Content-Length")
+        if length and length.isdigit():
+            return int(length)
+    except requests.exceptions.RequestException:
+        return None
+    return None
+
+
+def download_url_to_file(url, dest_dir, max_bytes=None):
+    """
+    Download url into dest_dir with a unique datetime-uuid filename.
+
+    Returns the local filename.  Raises BookImportException if the
+    download exceeds max_bytes (when given) or fails.
+    """
+    ext = _url_extension(url, ".bin")
+    filename = (
+        f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex}{ext}"
+    )
+    fp = os.path.join(dest_dir, filename)
+    try:
+        with requests.get(url, timeout=60, stream=True, allow_redirects=True) as resp:
+            resp.raise_for_status()
+            total = 0
+            with open(fp, "wb") as f:
+                for chunk in resp.iter_content(65536):
+                    if not chunk:
+                        continue
+                    total += len(chunk)
+                    if max_bytes is not None and total > max_bytes:
+                        raise BookImportException(
+                            "Remote media is larger than "
+                            f"{max_bytes // (1024 * 1024)}MB; left remote."
+                        )
+                    f.write(chunk)
+    except BookImportException:
+        with contextlib.suppress(OSError):
+            os.remove(fp)
+        raise
+    except requests.exceptions.RequestException as e:
+        with contextlib.suppress(OSError):
+            os.remove(fp)
+        raise BookImportException(
+            f"Could not download {url} (error: {str(e)})"
+        ) from e
+    return filename
 
 
 def _format_srt_timestamp(secs):
