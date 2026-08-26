@@ -5,7 +5,7 @@
 {% block body %}
 
 {% if book_type in ("youtube", "mp3", "video") %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260827b" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260827c" charset="utf-8" defer></script>
 {% elif book_type == "bilibili" %}
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/dash.all.min.js') }}?v=20260816" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/bilibili-player.js') }}?v=20260816c" charset="utf-8" defer></script>
