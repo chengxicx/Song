@@ -743,6 +743,19 @@ span.hamburger {
   border-radius: 5px;
 }
 
+/* Manga zoom row: span both grid columns and center the two buttons. */
+#reading_menu .manga-zoom-btn-container {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+/* Only meaningful for manga books; hide it in text-book hamburgers. */
+#reading_menu.not-manga .manga-zoom-btn-container {
+  display: none;
+}
+
 .reading_header_left {
   display: flex;
   align-items: center;
@@ -801,6 +814,14 @@ span.hamburger {
     font-weight: bold;
     min-width: 110px;
     text-align: right;
+}
+
+/* "Mark rest known" is longer than the other toggle labels; shrink it so
+   it stays on one line within the shared min-width and the switch on the
+   right keeps aligning with the toggles above. */
+#arrow_marks_known-container label {
+    font-size: 13px;
+    line-height: 1.15;
 }
 
 #focus::after,
@@ -1047,7 +1068,9 @@ div#thetext.last-screen {
 }
 
 div#thetext.manga-text-container {
-    overflow: hidden;
+    /* auto so a zoomed-in (enlarged) manga page can scroll instead of
+       being clipped; a page the default fit always stays within bounds. */
+    overflow: auto;
 }
 
 div#thetext p {
@@ -1590,6 +1613,14 @@ div.code pre {
 
 .column-two {
     background-image: url("/static/icn/text-column-two.svg");
+}
+
+.manga-zoom-in {
+    background-image: url("/static/icn/manga-zoom-in.svg");
+}
+
+.manga-zoom-out {
+    background-image: url("/static/icn/manga-zoom-out.svg");
 }
 
 /*********************************
