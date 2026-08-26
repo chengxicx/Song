@@ -3,6 +3,7 @@
 """
 
 import json
+import os
 import urllib.parse
 from flask import (
     Blueprint,
@@ -11,6 +12,7 @@ from flask import (
     render_template,
     redirect,
     flash,
+    current_app,
 )
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.book.service import (
@@ -18,9 +20,13 @@ from lute.book.service import (
     BookImportException,
     BookDataFromUrl,
     parse_subtitle_file,
+    parse_subtitle_from_url,
     cues_to_srt_text,
     youtube_video_id,
     bilibili_video_id,
+    _url_content_length,
+    download_url_to_file,
+    MEDIA_LOCAL_MAX_BYTES,
 )
 from lute.book.datatables import get_data_tables_list
 from lute.book.forms import NewBookForm, EditBookForm, ALLOWED_AUDIO_EXTENSIONS
@@ -170,9 +176,14 @@ def edit(bookid):
     b = repo.load(bookid)
     form = EditBookForm(obj=b)
 
-    # For youtube/bilibili/mp3 books the text field holds the SRT original
-    # (with timestamps) so it can be edited directly.
-    if request.method == "GET" and (b.book_type or "") in ("youtube", "bilibili", "mp3"):
+    # For youtube/bilibili/mp3/video books the text field holds the SRT
+    # original (with timestamps) so it can be edited directly.
+    if request.method == "GET" and (b.book_type or "") in (
+        "youtube",
+        "bilibili",
+        "mp3",
+        "video",
+    ):
         form.text.data = cues_to_srt_text(b.cues)
 
     if form.validate_on_submit():
@@ -199,7 +210,7 @@ def edit(bookid):
 
 @bp.route("/import_webpage", methods=["GET", "POST"])
 def import_webpage():
-    "Import a web page, a YouTube video, or an MP3 audio with subtitles."
+    "Import a web page, a YouTube video, an MP3 audio, an online video, or subtitles."
     if request.method == "POST":
         import_type = request.form.get("import_type", "webpage")
         if import_type == "youtube":
@@ -208,6 +219,8 @@ def import_webpage():
             return _import_bilibili_video()
         if import_type == "mp3":
             return _import_mp3_audio()
+        if import_type == "video":
+            return _import_online_video()
         if import_type == "manga":
             return _import_mokuro_manga()
         return _redirect_to_new_book_form()
@@ -265,6 +278,31 @@ def _redirect_to_new_book_form():
     if language_id:
         url += f"&language_id={language_id}"
     return redirect(url, 302)
+
+
+def _resolve_remote_media(url):
+    """
+    Decide whether an online media URL should be stored locally.
+
+    Per the import spec, video / audio from an online URL is downloaded
+    and stored locally when it is under 20 MB; larger files are streamed
+    directly from their remote URL.  Returns (audio_filename, media_url):
+    exactly one is set.
+    """
+    size = _url_content_length(url)
+    if size is not None and size > MEDIA_LOCAL_MAX_BYTES:
+        return None, url
+    try:
+        fname = download_url_to_file(
+            url,
+            current_app.env_config.useraudiopath,
+            max_bytes=MEDIA_LOCAL_MAX_BYTES,
+        )
+        return fname, None
+    except BookImportException:
+        # Too large to download, or the download failed; fall back to
+        # streaming from the remote URL.
+        return None, url
 
 
 def _import_youtube_video():
@@ -369,53 +407,64 @@ def _import_bilibili_video():
 
 
 def _import_mp3_audio():
-    "Create an audio book (mp3/m4a) from the form data (audio + subtitle file)."
+    "Create an audio book (mp3/m4a) from an uploaded file OR an online URL, plus subtitles."
     mp3_file = request.files.get("mp3_file")
+    mp3_url = (request.form.get("mp3_url") or "").strip()
     srt_file = request.files.get("srt_file")
+    srt_url = (request.form.get("mp3_srt_url") or "").strip()
     tags = _parse_tagify_tags(request.form.get("mp3_tag", ""), "mp3")
     language_id = request.form.get("language_id")
     title = (request.form.get("mp3_title") or "").strip()
-    
 
-    if mp3_file is None or mp3_file.filename == "":
-        flash("Please upload an audio file (MP3 or M4A).", "notice")
+    # --- Audio source: an uploaded file OR an online URL. ---
+    audio_filename = None
+    media_url = None
+    source_uri = None
+    if mp3_file and mp3_file.filename:
+        fname = (mp3_file.filename or "").lower()
+        if not fname.endswith((".mp3", ".m4a")):
+            flash("Please upload a valid audio file (.mp3 or .m4a).", "notice")
+            return redirect("/book/import_webpage", 302)
+        source_uri = mp3_file.filename
+        if not title:
+            base = mp3_file.filename or "MP3 audio"
+            title = ".".join(base.split(".")[:-1]) or base
+    elif mp3_url:
+        audio_filename, media_url = _resolve_remote_media(mp3_url)
+        source_uri = mp3_url
+        if not title:
+            base = os.path.basename(urllib.parse.urlparse(mp3_url).path)
+            title = base or "MP3 audio"
+    else:
+        flash("Please provide an audio file (upload or an online URL).", "notice")
         return redirect("/book/import_webpage", 302)
 
-    # Validate the audio extension (case-insensitive).  We don't use the
-    # form validators here because this is a dedicated import route.
-    fname = (mp3_file.filename or "").lower()
-    if not fname.endswith((".mp3", ".m4a")):
-        flash("Please upload a valid audio file (.mp3 or .m4a).", "notice")
-        return redirect("/book/import_webpage", 302)
-
-    if srt_file is None or srt_file.filename == "":
-        flash("Please upload an SRT or VTT subtitle file.", "notice")
-        return redirect("/book/import_webpage", 302)
-
+    # --- Subtitles: an uploaded file OR an online subtitle URL. ---
     try:
-        text, cues_json = parse_subtitle_file(
-            srt_file.filename,
-            srt_file.stream,
-        )
+        if srt_file and srt_file.filename:
+            text, cues_json = parse_subtitle_file(srt_file.filename, srt_file.stream)
+        elif srt_url:
+            text, cues_json = parse_subtitle_from_url(srt_url)
+        else:
+            text, cues_json = "", None
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
     except Exception as e:  # pylint: disable=broad-except
-        msg = f"Could not parse subtitle file {srt_file.filename} (error: {str(e)})"
+        msg = f"Could not parse subtitle (error: {str(e)})"
         flash(msg, "notice")
         return redirect("/book/import_webpage", 302)
 
-    if text.strip() == "":
-        flash("The subtitle file contains no text.", "notice")
+    if not (text and text.strip()):
+        flash("Please provide subtitles (upload a file or an online URL).", "notice")
         return redirect("/book/import_webpage", 302)
 
-    # Derive a title from the MP3 file name if not provided.
-    if not title:
-        base = mp3_file.filename or "MP3 audio"
-        title = ".".join(base.split(".")[:-1]) or base
     title = title[:200]
 
     b = Book()
     b.language_id = int(language_id) if language_id else None
     b.title = title
-    b.source_uri = mp3_file.filename
+    b.source_uri = source_uri
     b.text = text
     b.srt_data = cues_json
     b.book_type = "mp3"
@@ -423,12 +472,105 @@ def _import_mp3_audio():
     b.threshold_page_tokens = 250
     b.split_by = "paragraphs"
 
-    # Save the MP3 to the user-audio directory and wire up the filename
-    # so /useraudio/stream/<book_id> serves it on the reading page.
     svc = BookService()
     try:
-        b.audio_stream = mp3_file.stream
-        b.audio_stream_filename = mp3_file.filename
+        if mp3_file and mp3_file.filename:
+            b.audio_stream = mp3_file.stream
+            b.audio_stream_filename = mp3_file.filename
+        elif audio_filename:
+            b.audio_filename = audio_filename
+        elif media_url:
+            b.media_url = media_url
+        book = svc.import_book(b, db.session)
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+    return redirect(f"/read/{book.id}/page/1", 302)
+
+
+def _import_online_video():
+    """
+    Create an online video book.
+
+    The media is either an uploaded video file or an online video URL
+    (< 20 MB is downloaded and stored locally).  The subtitles are
+    either an uploaded file or an online subtitle URL (srt/vtt/txt), and
+    are always downloaded to local.  Playback uses the unified media
+    player (HTML5 <video>) with the subtitle cues, like the MP3 reader.
+    """
+    video_file = request.files.get("video_file")
+    video_url = (request.form.get("video_url") or "").strip()
+    srt_file = request.files.get("video_srt_file")
+    srt_url = (request.form.get("video_srt_url") or "").strip()
+    tags = _parse_tagify_tags(request.form.get("video_tag", ""), "video")
+    language_id = request.form.get("language_id")
+    title = (request.form.get("video_title") or "").strip()
+
+    # --- Subtitles: uploaded file OR online subtitle URL (always local). ---
+    try:
+        if srt_file and srt_file.filename:
+            text, cues_json = parse_subtitle_file(srt_file.filename, srt_file.stream)
+        elif srt_url:
+            text, cues_json = parse_subtitle_from_url(srt_url)
+        else:
+            text, cues_json = "", None
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+    except Exception as e:  # pylint: disable=broad-except
+        msg = f"Could not parse subtitle (error: {str(e)})"
+        flash(msg, "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if not (text and text.strip()):
+        flash("Please provide subtitles (upload a file or an online URL).", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    # --- Media: uploaded video file OR online video URL. ---
+    source_uri = None
+    audio_filename = None
+    media_url = None
+    svc = BookService()
+    if video_file and video_file.filename:
+        fname = (video_file.filename or "").lower()
+        if not fname.endswith((".mp4", ".webm", ".mov", ".ogv", ".ogg", ".m4v")):
+            flash(
+                "Please upload a valid video file (.mp4, .webm, .mov, .ogv, .ogg).",
+                "notice",
+            )
+            return redirect("/book/import_webpage", 302)
+        audio_filename = svc.save_audio_file(video_file)
+        source_uri = video_file.filename
+        if not title:
+            title = ".".join(video_file.filename.split(".")[:-1]) or video_file.filename
+    elif video_url:
+        audio_filename, media_url = _resolve_remote_media(video_url)
+        source_uri = video_url
+        if not title:
+            base = os.path.basename(urllib.parse.urlparse(video_url).path)
+            title = base or "Online video"
+    else:
+        flash("Please provide a video (upload a file or an online URL).", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    title = title[:200]
+
+    b = Book()
+    b.language_id = int(language_id) if language_id else None
+    b.title = title
+    b.source_uri = source_uri
+    b.text = text
+    b.srt_data = cues_json
+    b.book_type = "video"
+    b.book_tags = tags
+    b.threshold_page_tokens = 250
+    b.split_by = "paragraphs"
+    if audio_filename:
+        b.audio_filename = audio_filename
+    if media_url:
+        b.media_url = media_url
+
+    try:
         book = svc.import_book(b, db.session)
     except BookImportException as e:
         flash(e.message, "notice")

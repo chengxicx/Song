@@ -35,7 +35,8 @@
 
   // True when this is an MP3 audio book (no YouTube video id).  The
   // player backend is selected based on this flag.
-  var USE_AUDIO_BACKEND = !YT_DATA.videoId && !!YT_DATA.audioUrl;
+  var USE_AUDIO_BACKEND = YT_DATA.backend === "audio";
+  var USE_VIDEO_BACKEND = YT_DATA.backend === "video";
 
   var ytPlayer = null;
   var ytPlayerReady = false;
@@ -170,10 +171,15 @@
 
   function createYoutubePlayer() {
     if (ytPlayer) return;
-    if (USE_AUDIO_BACKEND) {
-      var audioEl = document.getElementById("yt-audio-player");
-      if (!audioEl) return;
-      ytPlayer = LuteAudioPlayer(audioEl, {
+    if (USE_AUDIO_BACKEND || USE_VIDEO_BACKEND) {
+      // Both the audio and video backends wrap an HTML5 media element
+      // (<audio> / <video>), which share the same HTMLMediaElement API,
+      // so LuteAudioPlayer drives them both unchanged.
+      var mediaEl = USE_VIDEO_BACKEND
+        ? document.getElementById("yt-video-player")
+        : document.getElementById("yt-audio-player");
+      if (!mediaEl) return;
+      ytPlayer = LuteAudioPlayer(mediaEl, {
         onReady: ytOnReady,
         onStateChange: ytOnStateChange,
         onError: ytOnError,

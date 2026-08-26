@@ -61,6 +61,11 @@ class Book(
     # srt_data is a JSON array of subtitle cues (start/end/text), see migration.
     srt_data = db.Column("BkSrtData", db.String)
     video_current_pos = db.Column("BkVideoCurrentPos", db.Float)
+    # media_url holds the original online URL for a "video" book whose
+    # media was NOT downloaded locally (< 20 MB downloads use
+    # audio_filename instead).  The player falls back to this URL when
+    # there is no local audio file.
+    media_url = db.Column("BkMediaURL", db.String)
 
     # Mokuro manga book fields (see migration 20260811_add_manga_fields.sql).
     # manga_path is the relative directory under the static folder where the

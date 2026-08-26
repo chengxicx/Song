@@ -157,7 +157,7 @@ class EditBookForm(FlaskForm):
         ],
     )
 
-    # YouTube video / Bilibili video / MP3 audio book fields.
+    # YouTube video / Bilibili video / MP3 audio / Online video book fields.
     book_type = SelectField(
         "Type",
         choices=[
@@ -165,6 +165,7 @@ class EditBookForm(FlaskForm):
             ("youtube", "YouTube video"),
             ("bilibili", "Bilibili video"),
             ("mp3", "MP3 / M4A audio"),
+            ("video", "Online video"),
         ],
     )
     youtube_srt = FileField(
@@ -198,9 +199,9 @@ class EditBookForm(FlaskForm):
         super().populate_obj(obj)
         obj.book_tags = _tag_values(self.book_tags.data)
 
-        # If the type was changed away from youtube/bilibili/mp3, clear the
-        # subtitle data.
-        if obj.book_type not in ("youtube", "bilibili", "mp3"):
+        # If the type was changed away from youtube/bilibili/mp3/video,
+        # clear the subtitle data.
+        if obj.book_type not in ("youtube", "bilibili", "mp3", "video"):
             obj.srt_data = None
             obj.video_current_pos = None
 
@@ -216,7 +217,7 @@ class EditBookForm(FlaskForm):
             obj.audio_bookmarks = None
             obj.audio_current_pos = None
 
-        if obj.book_type in ("youtube", "bilibili", "mp3"):
+        if obj.book_type in ("youtube", "bilibili", "mp3", "video"):
             self._parse_youtube_subtitles(obj)
 
     def _parse_youtube_subtitles(self, obj):

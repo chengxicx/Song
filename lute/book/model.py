@@ -83,6 +83,9 @@ class Book:  # pylint: disable=too-many-instance-attributes
         self.book_type = ""
         self.srt_data = None
         self.video_current_pos = None
+        # media_url holds the original online URL for a "video" book whose
+        # media was NOT downloaded locally; the player streams from it.
+        self.media_url = None
 
         # Mokuro manga book fields.
         # manga_path is the relative directory under the static folder where
@@ -313,6 +316,7 @@ class Repository:
         b.book_type = book.book_type
         b.srt_data = book.srt_data
         b.video_current_pos = book.video_current_pos
+        b.media_url = book.media_url
         b.manga_path = book.manga_path
         b.manga_data = book.manga_data
 
@@ -345,6 +349,7 @@ class Repository:
         b.book_type = dbbook.book_type
         b.srt_data = dbbook.srt_data
         b.video_current_pos = dbbook.video_current_pos
+        b.media_url = dbbook.media_url
         b.manga_path = dbbook.manga_path
         b.manga_data = dbbook.manga_data
         b.book_tags = [t.text for t in dbbook.book_tags]

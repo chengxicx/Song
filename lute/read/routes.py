@@ -76,7 +76,7 @@ def _subtitle_words_html(book):
     subtitle changes produce a fresh render (see
     _yt_subtitle_words_cache).
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3"):
+    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "video"):
         return []
     cache_key = (book.id, book.srt_data)
     cached = _yt_subtitle_words_cache.get(cache_key)
@@ -187,7 +187,7 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
 
     Returns True if ``book.srt_data`` was updated, False otherwise.
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3"):
+    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "video"):
         return False
     cues = list(book.cues)
     if not cues:
@@ -279,7 +279,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         bvid, _aid = bilibili_video_id(book.source_uri)
         bilibili_page_num = bilibili_page(book.source_uri)
     srt_cues = []
-    if book_type in ("youtube", "bilibili", "mp3"):
+    if book_type in ("youtube", "bilibili", "mp3", "video"):
         srt_cues = list(book.cues)
         for c in srt_cues:
             c["start_str"] = _fmt_seconds(c.get("start", 0))
@@ -289,12 +289,26 @@ def _render_book_page(book, pagenum, track_page_open=True):
         # initial page render — tokenizing all cues can take 10-20s
         # for long videos.
 
-    # Books with an audio file -- mp3-type books and legacy text books
-    # that have an audio file attached -- stream through the useraudio
-    # endpoint and are played by the unified media player.
+    # Books with a media file -- mp3-type books, legacy text books with
+    # an audio file, and online "video" books -- play through the unified
+    # media player.  Locally-stored files stream via /useraudio/stream;
+    # a "video" book whose media was not downloaded (< 20 MB rule) plays
+    # directly from its remote media_url.
     mp3_audio_url = None
-    if book.audio_filename and book_type in ("mp3", ""):
+    if book_type == "video":
+        if book.audio_filename:
+            mp3_audio_url = f"/useraudio/stream/{book.id}"
+        elif book.media_url:
+            mp3_audio_url = book.media_url
+    elif book.audio_filename and book_type in ("mp3", ""):
         mp3_audio_url = f"/useraudio/stream/{book.id}"
+
+    # The unified player backend: youtube = iframe, video = HTML5 video,
+    # audio = HTML5 audio.  Bilibili books use their own template.
+    media_backend = (
+        "youtube" if book_type == "youtube"
+        else ("video" if book_type == "video" else "audio")
+    )
 
     return render_template(
         "read/index.html",
@@ -316,6 +330,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         bilibili_bvid=bvid,
         bilibili_page_num=bilibili_page_num,
         mp3_audio_url=mp3_audio_url,
+        media_backend=media_backend,
         srt_cues=srt_cues,
         srt_cues_json=book.srt_data or "[]",
         srt_words_json="[]",
