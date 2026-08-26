@@ -3,6 +3,7 @@
     window.LUTE_YT_DATA = window.LUTE_YT_DATA || {};
     window.LUTE_YT_DATA.videoId = {{ youtube_video_id | tojson }};
     window.LUTE_YT_DATA.audioUrl = {{ mp3_audio_url | tojson }};
+    window.LUTE_YT_DATA.backend = {{ media_backend | tojson }};
     window.LUTE_YT_DATA.cues = {{ srt_cues_json | safe }};
     window.LUTE_YT_DATA.words = {{ srt_words_json | safe }};
     window.LUTE_YT_DATA.bookId = {{ book.id }};
@@ -11,8 +12,8 @@
 
     // Define the IFrame API callback before the api script loads, and
     // queue any callbacks registered after it has already loaded.
-    // Only used for YouTube books; for MP3 books the api script is not
-    // loaded at all.
+    // Only used for YouTube books; for MP3/video books the api script
+    // is not loaded at all.
     window.YT_READY_CALLBACKS = window.YT_READY_CALLBACKS || [];
     window.onYouTubeIframeAPIReady = function () {
       window.YT_IS_READY = true;
@@ -28,6 +29,14 @@
   <div class="yt-player-video-wrap">
     <div id="yt-player"></div>
     <div class="yt-player-loading" id="yt-player-loading">Loading player...</div>
+  </div>
+  {% elif book_type == "video" %}
+  {# Online video book: render an HTML5 <video> element instead of the
+     YouTube iframe.  The unified player drives it via the media backend. #}
+  <div class="yt-player-video-wrap">
+    <video id="yt-video-player" preload="metadata" playsinline
+           src="{{ mp3_audio_url or '' }}"></video>
+    <div class="yt-player-loading" id="yt-player-loading">Loading video...</div>
   </div>
   {% else %}
   {# MP3 audio book: render an HTML5 audio element instead of the YouTube iframe. #}
