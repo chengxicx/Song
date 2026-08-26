@@ -8,34 +8,48 @@
   .import-type-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
   .import-type-bar .import-type-select {
     font-size: .95rem; padding: .4rem .7rem; border-radius: 6px;
-    border: 1px solid #ccc; background: #fff; color: #333;
+    border: 1px solid var(--form-border-color, #ccc);
+    background: var(--panel-bg, #fff); color: var(--font-color, #333);
   }
-  .import-type-bar label { font-weight: 600; color: #444; }
+  .import-type-bar label { font-weight: 600; color: var(--font-color, #444); }
 
   .import-form {
-    max-width: 720px; background: #fff; border: 1px solid #e3e8ef;
+    max-width: 720px; background: var(--panel-bg, #fff);
+    border: 1px solid var(--form-border-color, #e3e8ef);
     border-radius: 10px; padding: 1.25rem 1.4rem; margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(20,40,80,.05);
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    color: var(--font-color, #222);
   }
-  .import-form .import-desc { margin-top: 0; margin-bottom: 1.1rem; font-size: .92rem; color: #555; line-height: 1.5; }
+  .import-form .import-desc { margin-top: 0; margin-bottom: 1.1rem; font-size: .92rem; color: var(--font-color, #555); opacity: .8; line-height: 1.5; }
 
   .iform { display: flex; flex-direction: column; gap: .95rem; }
   .irow { display: grid; grid-template-columns: minmax(110px,150px) 1fr; gap: .9rem 1rem; align-items: center; }
-  .irow .ilbl { font-weight: 600; color: #2a2a2a; font-size: .92rem; }
-  .ictrl select, .ictrl input[type=text], .ictrl input[type=url], .ictrl input[type=file] {
+  .irow .ilbl { font-weight: 600; color: var(--font-color, #2a2a2a); font-size: .92rem; }
+  .ictrl { min-width: 0; } /* allow children to shrink and avoid overflow */
+
+  .ictrl select, .ictrl input[type=text], .ictrl input[type=url] {
     width: 100%; box-sizing: border-box; font-size: .92rem;
+    color-scheme: light dark;
   }
-  .ictrl select { padding: .4rem .5rem; border: 1px solid #ccc; border-radius: 6px; background: #fff; }
+  .ictrl select {
+    padding: .4rem .5rem; border: 1px solid var(--form-border-color, #ccc);
+    border-radius: 6px; background: var(--panel-bg, #fff); color: var(--font-color, #333);
+  }
   .ictrl input[type=text], .ictrl input[type=url] {
-    padding: .45rem .6rem; border: 1px solid #ccc; border-radius: 6px;
+    padding: .45rem .6rem; border: 1px solid var(--form-border-color, #ccc);
+    border-radius: 6px; background: var(--panel-bg, #fff); color: var(--font-color, #333);
   }
   .ictrl input[type=text]:focus, .ictrl input[type=url]:focus { border-color: #6da9e9; outline: none; }
+
+  /* File + URL share one row: the file picker keeps its natural width and
+     the URL field stretches to fill the remaining space without overflowing. */
   .isource { display: flex; gap: .6rem; align-items: center; }
-  .isource input[type=file] { flex: 0 0 auto; }
-  .isource input[type=url] { flex: 1 1 auto; min-width: 0; }
-  .isource .ior { flex: 0 0 auto; color: #999; font-size: .82rem; }
+  .isource input[type=file] { flex: 0 0 auto; width: auto; max-width: 58%; color-scheme: light dark; }
+  .isource input[type=url] { flex: 1 1 auto; width: auto; min-width: 0; }
+  .isource .ior { flex: 0 0 auto; color: var(--font-color, #999); opacity: .55; font-size: .82rem; }
+
   .import-actions { margin-top: 1.2rem; display: flex; align-items: center; gap: .6rem; }
-  .import-actions .hint { color: #888; font-size: .8rem; }
+  .import-actions .hint { color: var(--font-color, #888); opacity: .7; font-size: .8rem; }
 </style>
 
 <div class="import-type-bar">
