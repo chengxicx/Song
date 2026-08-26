@@ -95,6 +95,17 @@ function setTextWidth(factor) {
 }
 
 function setColumnCount(num) {
+  // A manga page is a single full-page image with %-positioned text
+  // overlays.  CSS multicol -- even column-count: 1 -- makes #thetext a
+  // fragmentation/fragmentainer context: once the zoomed page grows taller
+  // than the pane, every OCR box past the first ~pane-height boundary is
+  // painted ~one pane-height too high (layout correct, paint/hit off),
+  // so the lower boxes stop lining up with / become unclickable after
+  // zooming and scrolling.  Manga must never run in a multicol container.
+  if (theText && theText.classList.contains("manga-text-container")) {
+    theText.style.columnCount = "auto";
+    return;
+  }
   let columnCount = num;
   if (columnCount == null) {
     const s = window.getComputedStyle(theText);
