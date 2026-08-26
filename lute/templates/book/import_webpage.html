@@ -4,10 +4,43 @@
 {% block header %}Import{% endblock %}
 
 {% block body %}
+<style>
+  .import-type-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+  .import-type-bar .import-type-select {
+    font-size: .95rem; padding: .4rem .7rem; border-radius: 6px;
+    border: 1px solid #ccc; background: #fff; color: #333;
+  }
+  .import-type-bar label { font-weight: 600; color: #444; }
 
-<div id="import-type-selector" style="margin-bottom: 1.5rem;">
-  <label for="import_type">Type:</label>
-  <select id="import_type" name="import_type" class="form-control" style="width: auto;">
+  .import-form {
+    max-width: 720px; background: #fff; border: 1px solid #e3e8ef;
+    border-radius: 10px; padding: 1.25rem 1.4rem; margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(20,40,80,.05);
+  }
+  .import-form .import-desc { margin-top: 0; margin-bottom: 1.1rem; font-size: .92rem; color: #555; line-height: 1.5; }
+
+  .iform { display: flex; flex-direction: column; gap: .95rem; }
+  .irow { display: grid; grid-template-columns: minmax(110px,150px) 1fr; gap: .9rem 1rem; align-items: center; }
+  .irow .ilbl { font-weight: 600; color: #2a2a2a; font-size: .92rem; }
+  .ictrl select, .ictrl input[type=text], .ictrl input[type=url], .ictrl input[type=file] {
+    width: 100%; box-sizing: border-box; font-size: .92rem;
+  }
+  .ictrl select { padding: .4rem .5rem; border: 1px solid #ccc; border-radius: 6px; background: #fff; }
+  .ictrl input[type=text], .ictrl input[type=url] {
+    padding: .45rem .6rem; border: 1px solid #ccc; border-radius: 6px;
+  }
+  .ictrl input[type=text]:focus, .ictrl input[type=url]:focus { border-color: #6da9e9; outline: none; }
+  .isource { display: flex; gap: .6rem; align-items: center; }
+  .isource input[type=file] { flex: 0 0 auto; }
+  .isource input[type=url] { flex: 1 1 auto; min-width: 0; }
+  .isource .ior { flex: 0 0 auto; color: #999; font-size: .82rem; }
+  .import-actions { margin-top: 1.2rem; display: flex; align-items: center; gap: .6rem; }
+  .import-actions .hint { color: #888; font-size: .8rem; }
+</style>
+
+<div class="import-type-bar">
+  <label for="import_type">Import type:</label>
+  <select id="import_type" name="import_type" class="import-type-select">
     <option value="webpage" selected>Web page</option>
     <option value="youtube">YouTube video</option>
     <option value="bilibili">Bilibili video</option>
@@ -17,183 +50,242 @@
   </select>
 </div>
 
-<form id="webpage-form" action="/book/import_webpage" method="post">
-  <p>This import is very primitive -- it grabs <i>all</i> the headings
-  and text from an HTML page.<br/>  This likely includes stuff you don't
-  want, so edit the textbox of the Book form when it is displayed!</p>
-
-  <br />
-
-  <label for="webpage-language">Language:</label>
-  <select id="webpage-language" name="language_id" class="form-control" style="width: auto;">
-    {% for id, name in language_choices %}
-    <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
-    {% endfor %}
-  </select>
-  <br /><br />
-
-  <label for="importurl">Import URL:</label>
-  <input type="text" id="importurl" name="importurl" class="form-text" style="width:75%;" autofocus><br><br>
-  <input type="hidden" name="import_type" value="webpage">
-  <input type="submit" id="import" value="Import">
+<form id="webpage-form" class="import-form" action="/book/import_webpage" method="post">
+  <p class="import-desc">This import is primitive — it grabs all the headings and text from an HTML page, so edit the Book form afterwards to trim it.</p>
+  <div class="iform">
+    <div class="irow">
+      <label class="ilbl" for="webpage-language">Language</label>
+      <div class="ictrl">
+        <select id="webpage-language" name="language_id">
+          {% for id, name in language_choices %}
+          <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="importurl">URL</label>
+      <div class="ictrl">
+        <input type="url" id="importurl" name="importurl" placeholder="https://example.com/article" autofocus>
+      </div>
+    </div>
+  </div>
+  <div class="import-actions">
+    <input type="hidden" name="import_type" value="webpage">
+    <button type="submit" id="import" class="btn btn-primary">Import</button>
+  </div>
 </form>
 
-<form id="youtube-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p>Import a YouTube video with its subtitle (SRT / VTT) file. The subtitles
-  become the book text, so you can read and look up words while the video plays.</p>
-
-  <br />
-
-  <label for="youtube-language">Language (used for subtitle parsing):</label>
-  <select id="youtube-language" name="language_id" class="form-control" style="width: auto;">
-    {% for id, name in language_choices %}
-    <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
-    {% endfor %}
-  </select>
-  <br /><br />
-
-  <label for="youtube_url">YouTube video URL:</label>
-  <input type="text" id="youtube_url" name="youtube_url" class="form-text" style="width:75%;" placeholder="https://www.youtube.com/watch?v=..."><br><br>
-
-  <label for="youtube_tag">Tags:</label>
-  <input type="text" id="youtube_tag" name="youtube_tag" class="form-control" value='[{"value":"youtube"}]'><br><br>
-
-  <label for="srt_file">Subtitle file (SRT / VTT):</label>
-  <input type="file" id="srt_file" name="srt_file" accept=".srt,.vtt"><br><br>
-
-  <input type="hidden" name="import_type" value="youtube">
-  <input type="submit" id="youtube-import" value="Import">
+<form id="youtube-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
+  <p class="import-desc">Import a YouTube video with its subtitle (SRT / VTT). The subtitles become the book text so you can look up words while the video plays.</p>
+  <div class="iform">
+    <div class="irow">
+      <label class="ilbl" for="youtube-language">Language</label>
+      <div class="ictrl">
+        <select id="youtube-language" name="language_id">
+          {% for id, name in language_choices %}
+          <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="youtube_url">Video URL</label>
+      <div class="ictrl">
+        <input type="url" id="youtube_url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=...">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="srt_file">Subtitles</label>
+      <div class="ictrl">
+        <input type="file" id="srt_file" name="srt_file" accept=".srt,.vtt">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="youtube_tag">Tags</label>
+      <div class="ictrl">
+        <input type="text" id="youtube_tag" name="youtube_tag" class="form-control" value='[{"value":"youtube"}]'>
+      </div>
+    </div>
+  </div>
+  <div class="import-actions">
+    <input type="hidden" name="import_type" value="youtube">
+    <button type="submit" id="youtube-import" class="btn btn-primary">Import</button>
+  </div>
 </form>
 
-<form id="bilibili-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p>Import a Bilibili video with its subtitle (SRT / VTT) file. The subtitles
-  become the book text, so you can read and look up words while the video plays.</p>
-
-  <br />
-
-  <label for="bilibili-language">Language (used for subtitle parsing):</label>
-  <select id="bilibili-language" name="language_id" class="form-control" style="width: auto;">
-    {% for id, name in language_choices %}
-    <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
-    {% endfor %}
-  </select>
-  <br /><br />
-
-  <label for="bilibili_url">Bilibili video URL:</label>
-  <input type="text" id="bilibili_url" name="bilibili_url" class="form-text" style="width:75%;" placeholder="https://www.bilibili.com/video/BV..."><br><br>
-
-  <label for="bilibili_tag">Tags:</label>
-  <input type="text" id="bilibili_tag" name="bilibili_tag" class="form-control" value='[{"value":"bilibili"}]'><br><br>
-
-  <label for="srt_file">Subtitle file (SRT / VTT):</label>
-  <input type="file" id="srt_file" name="srt_file" accept=".srt,.vtt"><br><br>
-
-  <input type="hidden" name="import_type" value="bilibili">
-  <input type="submit" id="bilibili-import" value="Import">
+<form id="bilibili-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
+  <p class="import-desc">Import a Bilibili video with its subtitle (SRT / VTT). The subtitles become the book text so you can look up words while the video plays.</p>
+  <div class="iform">
+    <div class="irow">
+      <label class="ilbl" for="bilibili-language">Language</label>
+      <div class="ictrl">
+        <select id="bilibili-language" name="language_id">
+          {% for id, name in language_choices %}
+          <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="bilibili_url">Video URL</label>
+      <div class="ictrl">
+        <input type="url" id="bilibili_url" name="bilibili_url" placeholder="https://www.bilibili.com/video/BV...">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="srt_file">Subtitles</label>
+      <div class="ictrl">
+        <input type="file" id="srt_file" name="srt_file" accept=".srt,.vtt">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="bilibili_tag">Tags</label>
+      <div class="ictrl">
+        <input type="text" id="bilibili_tag" name="bilibili_tag" class="form-control" value='[{"value":"bilibili"}]'>
+      </div>
+    </div>
+  </div>
+  <div class="import-actions">
+    <input type="hidden" name="import_type" value="bilibili">
+    <button type="submit" id="bilibili-import" class="btn btn-primary">Import</button>
+  </div>
 </form>
 
-<form id="mp3-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p>Import an MP3 or M4A audio file with its subtitle (SRT / VTT / TXT) file. The
-  subtitles become the book text, so you can read and look up words while the
-  audio plays. You can upload the files or provide online URLs.</p>
-
-  <br />
-
-  <label for="mp3-language">Language (used for subtitle parsing):</label>
-  <select id="mp3-language" name="language_id" class="form-control" style="width: auto;">
-    {% for id, name in language_choices %}
-    <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
-    {% endfor %}
-  </select>
-  <br /><br />
-
-  <label for="mp3_title">Title:</label>
-  <input type="text" id="mp3_title" name="mp3_title" class="form-text" style="width:75%;" placeholder="Leave blank to use the audio file name or URL"><br><br>
-
-  <label for="mp3_file">Audio file (MP3 / M4A):</label>
-  <input type="file" id="mp3_file" name="mp3_file" accept=".mp3,.m4a"><br><br>
-
-  <label for="mp3_url">…or online audio URL:</label>
-  <input type="text" id="mp3_url" name="mp3_url" class="form-text" style="width:75%;" placeholder="https://example.com/audio.mp3 (files under 20 MB are stored locally, larger are streamed)"><br><br>
-
-  <label for="mp3_srt_file">Subtitle file (SRT / VTT / TXT):</label>
-  <input type="file" id="mp3_srt_file" name="srt_file" accept=".srt,.vtt,.txt"><br><br>
-
-  <label for="mp3_srt_url">…or online subtitle URL:</label>
-  <input type="text" id="mp3_srt_url" name="mp3_srt_url" class="form-text" style="width:75%;" placeholder="https://example.com/subtitle.srt (downloaded locally)"><br><br>
-
-  <label for="mp3_tag">Tags:</label>
-  <input type="text" id="mp3_tag" name="mp3_tag" class="form-control" value='[{"value":"mp3"}]'><br><br>
-
-  <input type="hidden" name="import_type" value="mp3">
-  <input type="submit" id="mp3-import" value="Import">
+<form id="mp3-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
+  <p class="import-desc">Import audio with subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and audio under 20&#8202;MB is stored locally.</p>
+  <div class="iform">
+    <div class="irow">
+      <label class="ilbl" for="mp3-language">Language</label>
+      <div class="ictrl">
+        <select id="mp3-language" name="language_id">
+          {% for id, name in language_choices %}
+          <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="mp3_title">Title</label>
+      <div class="ictrl">
+        <input type="text" id="mp3_title" name="mp3_title" placeholder="Optional, defaults to file / URL name">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="mp3_file">Audio</label>
+      <div class="ictrl isource">
+        <input type="file" id="mp3_file" name="mp3_file" accept=".mp3,.m4a">
+        <span class="ior">or</span>
+        <input type="url" id="mp3_url" name="mp3_url" placeholder="Paste an audio URL">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="mp3_srt_file">Subtitles</label>
+      <div class="ictrl isource">
+        <input type="file" id="mp3_srt_file" name="srt_file" accept=".srt,.vtt,.txt">
+        <span class="ior">or</span>
+        <input type="url" id="mp3_srt_url" name="mp3_srt_url" placeholder="Paste an SRT / VTT / TXT URL">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="mp3_tag">Tags</label>
+      <div class="ictrl">
+        <input type="text" id="mp3_tag" name="mp3_tag" class="form-control" value='[{"value":"mp3"}]'>
+      </div>
+    </div>
+  </div>
+  <div class="import-actions">
+    <input type="hidden" name="import_type" value="mp3">
+    <button type="submit" id="mp3-import" class="btn btn-primary">Import</button>
+  </div>
 </form>
 
-<form id="video-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p>Import an online video with its subtitle (SRT / VTT / TXT) file. The
-  subtitles become the book text, so you can read and look up words while the
-  video plays. You can upload the files or provide online URLs.</p>
-
-  <br />
-
-  <label for="video-language">Language (used for subtitle parsing):</label>
-  <select id="video-language" name="language_id" class="form-control" style="width: auto;">
-    {% for id, name in language_choices %}
-    <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
-    {% endfor %}
-  </select>
-  <br /><br />
-
-  <label for="video_title">Title:</label>
-  <input type="text" id="video_title" name="video_title" class="form-text" style="width:75%;" placeholder="Leave blank to use the video file name or URL"><br><br>
-
-  <label for="video_file">Video file (MP4 / WebM / MOV):</label>
-  <input type="file" id="video_file" name="video_file" accept=".mp4,.webm,.mov,.ogv,.ogg,.m4v"><br><br>
-
-  <label for="video_url">…or online video URL:</label>
-  <input type="text" id="video_url" name="video_url" class="form-text" style="width:75%;" placeholder="https://example.com/video.mp4 (files under 20 MB are stored locally, larger are streamed)"><br><br>
-
-  <label for="video_srt_file">Subtitle file (SRT / VTT / TXT):</label>
-  <input type="file" id="video_srt_file" name="video_srt_file" accept=".srt,.vtt,.txt"><br><br>
-
-  <label for="video_srt_url">…or online subtitle URL:</label>
-  <input type="text" id="video_srt_url" name="video_srt_url" class="form-text" style="width:75%;" placeholder="https://example.com/subtitle.srt (always downloaded locally)"><br><br>
-
-  <label for="video_tag">Tags:</label>
-  <input type="text" id="video_tag" name="video_tag" class="form-control" value='[{"value":"video"}]'><br><br>
-
-  <input type="hidden" name="import_type" value="video">
-  <input type="submit" id="video-import" value="Import">
+<form id="video-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
+  <p class="import-desc">Import a video with its subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and video under 20&#8202;MB is stored locally.</p>
+  <div class="iform">
+    <div class="irow">
+      <label class="ilbl" for="video-language">Language</label>
+      <div class="ictrl">
+        <select id="video-language" name="language_id">
+          {% for id, name in language_choices %}
+          <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="video_title">Title</label>
+      <div class="ictrl">
+        <input type="text" id="video_title" name="video_title" placeholder="Optional, defaults to file / URL name">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="video_file">Video</label>
+      <div class="ictrl isource">
+        <input type="file" id="video_file" name="video_file" accept=".mp4,.webm,.mov,.ogv,.ogg,.m4v">
+        <span class="ior">or</span>
+        <input type="url" id="video_url" name="video_url" placeholder="Paste a video URL">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="video_srt_file">Subtitles</label>
+      <div class="ictrl isource">
+        <input type="file" id="video_srt_file" name="video_srt_file" accept=".srt,.vtt,.txt">
+        <span class="ior">or</span>
+        <input type="url" id="video_srt_url" name="video_srt_url" placeholder="Paste an SRT / VTT / TXT URL">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="video_tag">Tags</label>
+      <div class="ictrl">
+        <input type="text" id="video_tag" name="video_tag" class="form-control" value='[{"value":"video"}]'>
+      </div>
+    </div>
+  </div>
+  <div class="import-actions">
+    <input type="hidden" name="import_type" value="video">
+    <button type="submit" id="video-import" class="btn btn-primary">Import</button>
+  </div>
 </form>
 
-<form id="manga-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p>Import a Mokuro manga archive (generated with
-  <a href="https://github.com/kha-white/mokuro" target="_blank" rel="noreferrer">mokuro</a>)
-  as a .zip or .cbz file. The comic pages are shown with the extracted text
-  blocks overlaid, so you can look up words exactly like in a normal book.
-  (Sample: <code>hanabira_manga_01.mokuro</code> packaged as a zip.)</p>
-
-  <br />
-
-  <label for="manga-language">Language:</label>
-  <select id="manga-language" name="language_id" class="form-control" style="width: auto;">
-    {% for id, name in language_choices %}
-    <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
-    {% endfor %}
-  </select>
-  <br /><br />
-
-  <label for="manga_title">Title:</label>
-  <input type="text" id="manga_title" name="manga_title" class="form-text" style="width:75%;" placeholder="Leave blank to use the archive file name"><br><br>
-
-  <label for="manga_file">Mokuro manga archive (.zip / .cbz):</label>
-  <input type="file" id="manga_file" name="manga_file" accept=".zip,.cbz" required><br><br>
-
-  <label for="manga_tag">Tags:</label>
-  <input type="text" id="manga_tag" name="manga_tag" class="form-control" value='[{"value":"Manga"}]'><br><br>
-
-  <input type="hidden" name="import_type" value="manga">
-  <input type="submit" id="manga-import" value="Import">
+<form id="manga-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
+  <p class="import-desc">Import a Mokuro manga archive — generated with
+    <a href="https://github.com/kha-white/mokuro" target="_blank" rel="noreferrer">mokuro</a> —
+    as a .zip / .cbz file. (Sample: <code>hanabira_manga_01.mokuro</code> packaged as a zip.)</p>
+  <div class="iform">
+    <div class="irow">
+      <label class="ilbl" for="manga-language">Language</label>
+      <div class="ictrl">
+        <select id="manga-language" name="language_id">
+          {% for id, name in language_choices %}
+          <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="manga_title">Title</label>
+      <div class="ictrl">
+        <input type="text" id="manga_title" name="manga_title" placeholder="Optional, defaults to archive name">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="manga_file">Archive</label>
+      <div class="ictrl">
+        <input type="file" id="manga_file" name="manga_file" accept=".zip,.cbz">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="manga_tag">Tags</label>
+      <div class="ictrl">
+        <input type="text" id="manga_tag" name="manga_tag" class="form-control" value='[{"value":"Manga"}]'>
+      </div>
+    </div>
+  </div>
+  <div class="import-actions">
+    <input type="hidden" name="import_type" value="manga">
+    <button type="submit" id="manga-import" class="btn btn-primary">Import</button>
+  </div>
 </form>
 
 <script type="text/javascript">
