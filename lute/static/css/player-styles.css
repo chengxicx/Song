@@ -478,6 +478,19 @@
   height: 100%;
 }
 
+/* Online video book: the HTML5 <video> fills the aspect-ratio wrapper.
+   Without this it renders at its native size and, once the divider is
+   dragged wider than the video, the black area around the fixed-size
+   video is covered by the player box instead of the video scaling up. */
+.yt-player-video-wrap #yt-video-player {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #000;
+}
+
 /* Bilibili embed iframe fills the same video wrap as the YouTube
    player. */
 .yt-player-video-wrap .bili-player-frame {
@@ -746,6 +759,67 @@
 
 .yt-transcript-btn.on {
   background-color: #4cbb17;
+}
+
+/* Gear / settings dropdown for online video books.  The gear button
+   reuses .audio-button .yt-cue-btn (same 34x34 icon square as the
+   prev/play/next buttons); the dropdown is an absolutely-positioned
+   menu mirroring the TTS voice dropdown. */
+.yt-settings-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.yt-settings-btn .yt-icn {
+  width: 16px;
+  height: 16px;
+}
+
+.yt-settings-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 1000;
+  min-width: 13rem;
+  max-width: 80vw;
+  background-color: #fff;
+  border: 1px solid #b9d6ef;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.2rem;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: #333;
+}
+
+.yt-settings-dropdown[hidden] {
+  display: none;
+}
+
+.yt-settings-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.yt-settings-option:hover {
+  background-color: var(--yt-color-5, #d6edff);
+}
+
+.yt-settings-option input {
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Audio-only mode for online video books: hides the video area so the
+   reading screen matches an MP3 book (controls + scrolling subtitle).
+   The hidden <video> keeps playing its audio track. */
+.yt-audio-mode .yt-player-video-wrap {
+  display: none;
 }
 
 /* Single-line scrolling subtitle. */
