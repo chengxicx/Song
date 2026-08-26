@@ -13,7 +13,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}?v=20260805f" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}?v=20260826b" charset="utf-8" defer></script>
 <script type="text/javascript" src="/static/js/never_cache/dict-tabs.js?v={{ lute_version }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260825a" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260826a" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -556,6 +556,35 @@
       // spilling into overflowing columns after a save.
       requestAnimationFrame(_splitToScreens);
     }
+  });
+
+  // tts.js fires this when the TTS player or the sentence 🔊 buttons
+  // are shown/hidden, which changes the height available to #thetext
+  // (the player is a flex sibling; the buttons add inline width).
+  // Re-flow the screen groups so the freed/lost space is used, keep
+  // the reader anchored on the same text instead of jumping back to
+  // the first sub-screen, and re-centre the side arrows on the text.
+  window.addEventListener("lute:tts-ui-changed", function () {
+    requestAnimationFrame(function () {
+      let anchor = null;
+      if (theText) {
+        for (const p of theText.querySelectorAll(":scope > p")) {
+          if (p.style.display !== "none") {
+            anchor = p;
+            break;
+          }
+        }
+      }
+      _splitToScreens();
+      if (anchor) {
+        const gi = subScreens.findIndex((g) => g.includes(anchor));
+        if (gi >= 0) {
+          curScreen = gi;
+          _renderScreen();
+        }
+      }
+      _layout_side_nav();
+    });
   });
 
   let _menuOpenedByHover = false;
