@@ -1068,9 +1068,17 @@ div#thetext.last-screen {
 }
 
 div#thetext.manga-text-container {
-    /* auto so a zoomed-in (enlarged) manga page can scroll instead of
-       being clipped; a page the default fit always stays within bounds. */
+    /* auto so a zoomed-in (enlarged) manga page can scroll to pan around;
+       the default fit stays within bounds.  Scrollbars are hidden so they
+       don't disrupt the page view -- you still scroll with the mouse
+       wheel / trackpad, the overflow is simply not surfaced visually. */
     overflow: auto;
+    scrollbar-width: none;          /* Firefox */
+    -ms-overflow-style: none;       /* old Edge/IE */
+}
+
+div#thetext.manga-text-container::-webkit-scrollbar {
+    display: none;                  /* Chrome/Safari/Edge */
 }
 
 div#thetext p {
@@ -1621,6 +1629,10 @@ div.code pre {
 
 .manga-zoom-out {
     background-image: url("/static/icn/manga-zoom-out.svg");
+}
+
+.manga-zoom-fit {
+    background-image: url("/static/icn/manga-zoom-fit.svg");
 }
 
 /*********************************
