@@ -37,7 +37,7 @@
 
 <div id="read_pane_container"
      x-data="readState()"
-     :class="{ 'focus-mode-active': focusMode, 'tap_sets_status-active': tapSetsStatus }">
+     :class="{ 'focus-mode-active': focusMode, 'tap_sets_status-active': tapSetsStatus, 'arrow_marks_known-active': arrowMarksKnown }">
 
 <div id="read_pane_left">
 
@@ -233,12 +233,16 @@
     return {
       focusMode: !isTablet && localStorage.getItem(`focusMode-book${bookId}`) === "true",
       tapSetsStatus: isTablet && localStorage.getItem("tap_sets_status") === "true",
+      arrowMarksKnown: localStorage.getItem("arrow_marks_known") === "true",
       init() {
         this.$watch("focusMode", (v) => {
           localStorage.setItem(`focusMode-book${bookId}`, v ? "true" : "false");
         });
         this.$watch("tapSetsStatus", (v) => {
           localStorage.setItem("tap_sets_status", v ? "true" : "false");
+        });
+        this.$watch("arrowMarksKnown", (v) => {
+          localStorage.setItem("arrow_marks_known", v ? "true" : "false");
         });
       },
     };
@@ -804,7 +808,9 @@
       _renderScreen();
       return;
     }
-    handle_page_done(false, 1);
+    const arrowMarksKnown =
+      localStorage.getItem("arrow_marks_known") === "true";
+    handle_page_done(arrowMarksKnown, 1);
   }
 
   // Handle green checkmark in footer.
