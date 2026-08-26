@@ -717,6 +717,14 @@
     _fitMangaPage();
   }
 
+  // Global handler for the "Fit page to screen" button: reset zoom to 1
+  // (i.e. the pane-fit default) and re-fit.
+  function resetMangaZoom() {
+    if (!_isMangaReader()) return;
+    localStorage.setItem(MANGA_ZOOM_STORAGE, "1");
+    _fitMangaPage();
+  }
+
   function _splitToScreens() {
     const wrap = theText;
     const endBtn = document.getElementById("reading-end-controls");
