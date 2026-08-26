@@ -764,7 +764,8 @@ span.hamburger {
 #focus-container,
 #tap_sets_status-container,
 #tts-toggle-container,
-#tts-sentence-buttons-toggle-container {
+#tts-sentence-buttons-toggle-container,
+#arrow_marks_known-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -778,7 +779,8 @@ span.hamburger {
 #focus,
 #tap_sets_status,
 #tts-player-toggle,
-#tts-sentence-buttons-toggle {
+#tts-sentence-buttons-toggle,
+#arrow_marks_known {
     appearance: none;
     display: block;
     background-color: #ffffff;
@@ -794,7 +796,8 @@ span.hamburger {
 #focus-container label,
 #tap_sets_status-container label,
 #tts-toggle-container label,
-#tts-sentence-buttons-toggle-container label {
+#tts-sentence-buttons-toggle-container label,
+#arrow_marks_known-container label {
     font-weight: bold;
     min-width: 110px;
     text-align: right;
@@ -803,7 +806,8 @@ span.hamburger {
 #focus::after,
 #tap_sets_status::after,
 #tts-player-toggle::after,
-#tts-sentence-buttons-toggle::after {
+#tts-sentence-buttons-toggle::after,
+#arrow_marks_known::after {
     content: "";
     display: block;
     background-color: #616161;
@@ -817,7 +821,8 @@ span.hamburger {
 .focus-mode-active #focus::after,
 .tap_sets_status-active #tap_sets_status::after,
 .tts-player-active #tts-player-toggle::after,
-.tts-sentence-buttons-active #tts-sentence-buttons-toggle::after {
+.tts-sentence-buttons-active #tts-sentence-buttons-toggle::after,
+.arrow_marks_known-active #arrow_marks_known::after {
     transform: translate(100%, 0);
     background-color: #ffffff;
 }
@@ -825,7 +830,8 @@ span.hamburger {
 .focus-mode-active #focus,
 .tap_sets_status-active #tap_sets_status,
 .tts-player-active #tts-player-toggle,
-.tts-sentence-buttons-active #tts-sentence-buttons-toggle {
+.tts-sentence-buttons-active #tts-sentence-buttons-toggle,
+.arrow_marks_known-active #arrow_marks_known {
     background-color: #40916c;
     border-color: #40916c;
 }
