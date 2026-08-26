@@ -1865,6 +1865,10 @@
       fetch("/settings/set/tts_show_control_panel/" + val, { method: "POST" });
     } catch (_) {}
 
+    try {
+      window.dispatchEvent(new Event("lute:tts-ui-changed"));
+    } catch (_) {}
+
     // Stop playback when the player is hidden mid-stream.
     if (!visible && (ttsPlaying || ttsPaused)) {
       ttsStop();
@@ -1873,6 +1877,10 @@
 
   function setTtsSentenceButtonsVisible(visible) {
     ttsSentenceButtonsVisible = visible;
+    SETTINGS.showSentenceButtons = visible;
+    if (visible && document.getElementById("thetext")) {
+      injectSentencePlayButtons();
+    }
     const btns = document.querySelectorAll(".lute-sentence-play-btn");
     const toggle = document.getElementById("tts-sentence-buttons-toggle");
     const container = document.body;
@@ -1898,6 +1906,10 @@
     var val = visible ? "1" : "0";
     try {
       fetch("/settings/set/tts_show_sentence_buttons/" + val, { method: "POST" });
+    } catch (_) {}
+
+    try {
+      window.dispatchEvent(new Event("lute:tts-ui-changed"));
     } catch (_) {}
   }
 
