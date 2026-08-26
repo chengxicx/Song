@@ -68,6 +68,10 @@
   var ytTranscriptList = document.getElementById("yt-transcript-list");
   var ytSubtitle = document.getElementById("yt-scrolling-subtitle-inner");
   var ytLoading = document.getElementById("yt-player-loading");
+  var ytSettingsBtn = document.getElementById("yt-settings-btn");
+  var ytSettingsDropdown = document.getElementById("yt-settings-dropdown");
+  var ytAudioModeCb = document.getElementById("yt-audio-mode-cb");
+  var AUDIO_MODE_STORAGE_KEY = "ytAudioMode";
 
   function ytFmtTime(secs) {
     if (!isFinite(secs) || secs < 0) secs = 0;
@@ -593,6 +597,33 @@
     if (ytFullscreenBtn) {
       ytFullscreenBtn.addEventListener("click", ytToggleFullscreen);
     }
+    // Audio-only mode toggle + settings dropdown (online video books).
+    if (ytAudioModeCb) {
+      if (USE_VIDEO_BACKEND) {
+        ytAudioModeCb.checked =
+          localStorage.getItem(AUDIO_MODE_STORAGE_KEY) === "1";
+        ytAudioModeCb.addEventListener("change", ytApplyAudioMode);
+        // Apply the persisted mode on load so a returning video book
+        // opens as an audio-only screen immediately.
+        ytApplyAudioMode();
+      } else {
+        // Not a video backend; keep the setting hidden/irrelevant.
+        ytAudioModeCb.disabled = true;
+      }
+    }
+    if (ytSettingsBtn && ytSettingsDropdown) {
+      ytSettingsBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        ytSettingsDropdown.hidden = !ytSettingsDropdown.hidden;
+      });
+      // Close the settings menu when clicking anywhere outside it.
+      document.addEventListener("click", function (e) {
+        var wrap = document.querySelector(".yt-settings-wrap");
+        if (wrap && !wrap.contains(e.target)) {
+          ytSettingsDropdown.hidden = true;
+        }
+      });
+    }
     // Keep the fullscreen button state in sync with the browser,
     // e.g. when the user presses Esc to exit fullscreen.
     var fsHandler = function () {
@@ -708,6 +739,26 @@
       if (el.requestFullscreen) el.requestFullscreen();
       else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     }
+  }
+
+  // Audio-only mode for online video books (the gear button menu).
+  // Hides the video area so the reading screen matches an MP3 book:
+  // controls + scrolling subtitle, no video picture.  The hidden
+  // <video> element keeps playing its audio track.  Persists per browser.
+  function ytApplyAudioMode() {
+    if (!ytVideoWrap || !ytAudioModeCb) return;
+    var on = !!ytAudioModeCb.checked;
+    if (!USE_VIDEO_BACKEND) on = false;
+    ytContainer.classList.toggle("yt-audio-mode", on);
+    localStorage.setItem(AUDIO_MODE_STORAGE_KEY, on ? "1" : "0");
+    // Hiding/showing the video changes the height available to the text
+    // area (#thetext), so re-flow the fit-to-screen groups and re-centre
+    // the side navigation instead of leaving them sized for the old
+    // layout.  Deferred to the next frame so the DOM has settled.
+    requestAnimationFrame(function () {
+      if (typeof _splitToScreens === "function") _splitToScreens();
+      if (typeof _layout_side_nav === "function") _layout_side_nav();
+    });
   }
 
   /* ------------------------------------------------------------------ */
