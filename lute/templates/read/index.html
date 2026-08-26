@@ -559,8 +559,11 @@
       window.dispatchEvent(new Event('lute:status-updated'));
       // The swapped-in paragraph set has no pagination state.  Re-flow
       // the screen so multi-column books stay within the pane instead of
-      // spilling into overflowing columns after a save.
-      requestAnimationFrame(_splitToScreens);
+      // spilling into overflowing columns after a save.  Keep the reader
+      // anchored on the paragraph containing the saved word rather than
+      // jumping back to the first sub-screen.
+      const anchor = re_marked.length ? re_marked.closest('p')[0] : null;
+      requestAnimationFrame(() => _splitToScreens(anchor));
     }
   });
 
@@ -725,7 +728,10 @@
     _fitMangaPage();
   }
 
-  function _splitToScreens() {
+  // anchor, when given, is a <p> already inside the (re-swapped) #thetext
+  // that should stay on screen: after re-splitting, curScreen is restored
+  // to the group containing it instead of jumping back to screen 0.
+  function _splitToScreens(anchor) {
     const wrap = theText;
     const endBtn = document.getElementById("reading-end-controls");
     if (!wrap) return;
@@ -734,6 +740,19 @@
       curScreen = 0;
       if (endBtn) endBtn.classList.add("hide");
       return;
+    }
+    // The reader must not jump back to sub-screen 0 on every re-flow.
+    // `anchor`, when given, is a <p> already inside #thetext that should
+    // stay on screen (e.g. the paragraph holding a just-saved word).
+    // Re-splits that pass no element (requestAnimationFrame hands the
+    // callback a timestamp; the MutationObserver / TTS / column-count
+    // reflows pass nothing) fall back to remembering the first paragraph
+    // currently visible, preserving the sub-screen instead of resetting.
+    if (!(anchor && anchor.nodeType === Node.ELEMENT_NODE)) {
+      anchor =
+        Array.from(wrap.querySelectorAll(":scope > p")).find(
+          (p) => p.style.display !== "none"
+        ) || null;
     }
     const paras = Array.from(wrap.querySelectorAll(":scope > p"));
     subScreens = [];
@@ -814,6 +833,12 @@
     }
 
     subScreens = groups;
+    if (anchor && anchor.nodeType === Node.ELEMENT_NODE) {
+      const gi = subScreens.findIndex((g) => g.includes(anchor));
+      if (gi >= 0) {
+        curScreen = gi;
+      }
+    }
     _renderScreen();
   }
 
