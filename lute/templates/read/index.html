@@ -41,7 +41,7 @@
 
 <div id="read_pane_left">
 
-  <div id="reading_menu">
+  <div id="reading_menu"{% if book_type != 'manga' %} class="not-manga"{% endif %}>
     {% include "read/reading_menu.html" %}
   </div>
 
@@ -681,7 +681,12 @@
     const natW = img.naturalWidth;
     const natH = img.naturalHeight;
     if (!natW || !natH) return; // image not decoded yet; retried on load
-    const scale = Math.min(1, availW / natW, availH / natH) || 1;
+    // Fit the page to the pane, then multiply by the user's zoom factor
+    // (1 = just fits); zoom > 1 enlarges the page (it then scrolls in the
+    // auto-overflow manga container), zoom < 1 shrinks it.
+    const fit = Math.min(1, availW / natW, availH / natH) || 1;
+    const zoom = _getMangaZoom();
+    const scale = fit * zoom;
     const w = Math.max(10, Math.floor(natW * scale));
     const h = Math.max(10, Math.floor(natH * scale));
     page.style.width = `${w}px`;
@@ -689,6 +694,27 @@
     page.style.margin = "0 auto";
     img.style.width = "100%";
     img.style.height = "100%";
+  }
+
+  const MANGA_ZOOM_STORAGE = "mangaZoom";
+  const MANGA_ZOOM_MIN = 0.5;
+  const MANGA_ZOOM_MAX = 2.5;
+
+  function _getMangaZoom() {
+    const raw = parseFloat(localStorage.getItem(MANGA_ZOOM_STORAGE));
+    if (!Number.isFinite(raw) || raw <= 0) return 1;
+    return clamp(raw, MANGA_ZOOM_MIN, MANGA_ZOOM_MAX);
+  }
+
+  // Global handler wired up by text-options.js buttons (only meaningful on
+  // manga pages, where .manga-text-container is present).  delta is +1 for
+  // zoom-in, -1 for zoom-out; each step scales by ~1.2x.
+  function setMangaZoom(delta) {
+    if (!_isMangaReader()) return;
+    const zoom = clamp(_getMangaZoom() * Math.pow(1.2, delta),
+                       MANGA_ZOOM_MIN, MANGA_ZOOM_MAX);
+    localStorage.setItem(MANGA_ZOOM_STORAGE, String(Math.round(zoom * 100) / 100));
+    _fitMangaPage();
   }
 
   function _splitToScreens() {

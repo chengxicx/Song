@@ -26,6 +26,8 @@ addClickHandler(".width-plus", setTextWidth, 1.05);
 addClickHandler(".width-minus", setTextWidth, 0.95);
 addClickHandler(".column-one", setColumnCount, 1);
 addClickHandler(".column-two", setColumnCount, 2);
+addClickHandler(".manga-zoom-in", setMangaZoom, 1);
+addClickHandler(".manga-zoom-out", setMangaZoom, -1);
 
 
 function incrementFontSize(delta) {
