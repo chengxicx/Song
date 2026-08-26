@@ -30,6 +30,11 @@
   <input type="checkbox" name="tap_sets_status" id="tap_sets_status" x-model="tapSetsStatus">
 </div>
 
+<div id="arrow_marks_known-container">
+  <label for="arrow_marks_known">Next arrow marks rest as known</label>
+  <input type="checkbox" name="arrow_marks_known" id="arrow_marks_known" x-model="arrowMarksKnown">
+</div>
+
 <div class="text-options-container">
   <div class="text-options-btn-container">
     <button class="text-options-button font-minus" title="Decrease font size"></button>
@@ -57,12 +62,6 @@
     </a>
   </li>
   {% endif %}
-  <li>
-    <a id="markRestKnownNextPage" class="reading-menu-item" href="" onclick="closeMenu(); handle_page_done(true, 1); return false;" title="Mark the rest of the current page as known and go to the next page">
-      <svg viewBox="7.5 3.5 15 25" width="11" height="17" style="vertical-align: -3px; margin-right: 0.4rem"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
-      Mark rest as known, next page
-    </a>
-  </li>
   <li id="page-operations-li" class="reading-menu-item reading-menu-top-level-li">
     <span id="page-operations-title" class="reading-menu-top-level">Edit</span>
     <div id="page-operations-menu" class="reading-menu-sublist">
