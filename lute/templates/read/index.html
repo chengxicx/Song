@@ -887,6 +887,18 @@
       _renderScreen();
       return;
     }
+    // We've left the sub-screens behind; before crossing to the next
+    // Lute page, check we aren't already at the very end of the book.
+    const pagenum = parseInt($("#page_num").val());
+    const maxpage = parseInt($("#page_count").val());
+    const atLastSubscreen =
+      _isMangaReader() ||
+      subScreens.length === 0 ||
+      curScreen === subScreens.length - 1;
+    // On the last page's final screen this is the end of the reading.
+    // Without this guard goto_relative_page(1) clamps back to maxpage and
+    // re-loads the page, wrapping around to its first sub-screen.
+    if (pagenum >= maxpage && atLastSubscreen) return;
     handle_page_done(arrowMarksKnown, 1);
   }
 
