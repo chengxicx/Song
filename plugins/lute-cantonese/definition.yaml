@@ -16,4 +16,6 @@ parser_type: lute_cantonese
 # character_substitutions:
 split_sentences: .!?。！？
 # split_sentence_exceptions:
-word_chars: 一-龥
+word_chars: 㐀-鿿
+# 㐀-鿿 = U+3400-U+9FFF: CJK Unified Ideographs plus Extension A,
+# which holds common Cantonese characters like 㗎 (U+35CE).
