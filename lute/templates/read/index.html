@@ -576,26 +576,37 @@
   // the first sub-screen, and re-centre the side arrows on the text.
   window.addEventListener("lute:tts-ui-changed", function () {
     requestAnimationFrame(function () {
-      let anchor = null;
-      if (theText) {
-        for (const p of theText.querySelectorAll(":scope > p")) {
-          if (p.style.display !== "none") {
-            anchor = p;
-            break;
-          }
-        }
-      }
       _splitToScreens();
-      if (anchor) {
-        const gi = subScreens.findIndex((g) => g.includes(anchor));
-        if (gi >= 0) {
-          curScreen = gi;
-          _renderScreen();
-        }
-      }
       _layout_side_nav();
     });
   });
+
+  // Safety net for any other change of #thetext's box size (window
+  // resize, browser zoom, devtools, pane width drag, ...) that fires no
+  // event: groups computed for the old size are stale and paragraphs
+  // spill into an overflowing multicol column whose edge peeks into the
+  // pane.  Re-split synchronously -- RO callbacks run after layout but
+  // before paint, so no stale frame is shown.  The flex-fixed border
+  // box is unaffected by _renderScreen's display/padding changes, so
+  // this cannot loop with itself.
+  if (theText && "ResizeObserver" in window) {
+    let _lastTextW = 0;
+    let _lastTextH = 0;
+    new ResizeObserver(function (entries) {
+      const e = entries[entries.length - 1];
+      const r = e.target.getBoundingClientRect();
+      const w = Math.round(r.width);
+      const h = Math.round(r.height);
+      if (!w || !h || (w === _lastTextW && h === _lastTextH)) return;
+      const _had = _lastTextW !== 0 || _lastTextH !== 0;
+      _lastTextW = w;
+      _lastTextH = h;
+      if (_had) {
+        _splitToScreens();
+        _layout_side_nav();
+      }
+    }).observe(theText);
+  }
 
   let _menuOpenedByHover = false;
   let _menuHoverCloseTimer = null;

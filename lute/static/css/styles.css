@@ -1061,6 +1061,14 @@ div#thetext {
     min-height: 0;
 }
 
+/* CSS multicol paints overflowing columns inside the padding box, so
+   overflow:hidden alone still shows a sliver of the next column's text
+   at the pane's right edge.  Clip at the content-box edge instead; the
+   scrolling variants below reset this so their content can pan freely. */
+div#thetext {
+    clip-path: inset(0 3.4rem);
+}
+
 /* On the very last screen of the book, reserve a strip at the bottom for
    the "Mark rest as known" button so it does not cover the text. */
 div#thetext.last-screen {
@@ -1095,6 +1103,7 @@ div#thetext.manga-text-container {
 div#thetext.video-scroll-mode {
     flex: 1 0 auto;
     overflow: visible;
+    clip-path: none;
 }
 
 div#thetext.manga-text-container::-webkit-scrollbar {
@@ -2598,6 +2607,10 @@ input[name='status']:disabled + label {
     #thetexttitle,
     div#thetext {
         padding: 0 1rem 1rem;
+    }
+
+    div#thetext {
+        clip-path: inset(0 1rem);
     }
 
     div#reading-footer span {
