@@ -34,6 +34,7 @@ dependencies = [
   "openepub>=0.0.9,<1",
   "pyparsing>=3.1.4",
   "pypdf>=3.17.4",
+  "pdfminer.six>=20221105",
   "subtitle-parser>=1.3.0",
   "ahocorapy>=1.6.2",
   "edge-tts>=6.1.0"

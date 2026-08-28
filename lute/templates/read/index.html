@@ -14,15 +14,15 @@
    window.pdfjsLib with a shared module worker and fires "pdfjs-ready";
    the deferred pdf-reader.js below runs after it, in document order. #}
 <script type="module">
-  import * as pdfjsLib from "{{ url_for('static', filename='js/vendor/pdfjs/pdf.module.js') }}";
+  import * as pdfjsLib from "{{ url_for('static', filename='js/vendor/pdfjs/pdf.module.js') }}?v=20260829";
   pdfjsLib.GlobalWorkerOptions.workerPort = new Worker(
-    "{{ url_for('static', filename='js/vendor/pdfjs/pdf.worker.module.js') }}",
+    "{{ url_for('static', filename='js/vendor/pdfjs/pdf.worker.module.js') }}?v=20260829",
     { type: "module" }
   );
   window.pdfjsLib = pdfjsLib;
   window.dispatchEvent(new Event("pdfjs-ready"));
 </script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/pdf-reader.js') }}?v=20260828" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/pdf-reader.js') }}?v=20260829" charset="utf-8" defer></script>
 {% endif %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}?v=20260805f" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}?v=20260826c" charset="utf-8" defer></script>
