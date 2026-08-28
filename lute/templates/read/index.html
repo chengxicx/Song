@@ -32,6 +32,7 @@
   // The sentence dictionaries configured for the language.  This var
   // is used in lute.js.
   var LUTE_SENTENCE_LOOKUP_DICTS = {{ sentence_dict_uris|safe }};
+  var LUTE_BOOK_TYPE = {{ book_type|tojson }};
 </script>
 
 
@@ -652,13 +653,26 @@
   // pane.  The current logical page is measured and split into
   // one-screen groups; only the current group is displayed and the side
   // arrows step through these screens before crossing to the next Lute
-  // page.  Manga keeps its own full-page image and is not split.
+  // page.  Manga keeps its own full-page image and is not split, and
+  // video / YouTube books scroll normally unless audio-only mode is on
+  // (only audio-only uses the arrow paging).
   let subScreens = [];
   let curScreen = 0;
 
   const _isMangaReader = () => {
     const t = document.getElementById("thetext");
     return !!t && t.classList.contains("manga-text-container");
+  };
+
+  // Video / YouTube books read in a plain scrolling pane by default;
+  // the fit-to-screen arrow paging is used only while audio-only mode
+  // is active (the player toggles .yt-audio-mode on its container).
+  const _videoScrollMode = () => {
+    if (typeof LUTE_BOOK_TYPE === "undefined") return false;
+    if (LUTE_BOOK_TYPE !== "youtube" && LUTE_BOOK_TYPE !== "video")
+      return false;
+    const c = document.querySelector(".youtube-player-container");
+    return !c || !c.classList.contains("yt-audio-mode");
   };
 
   // Fit a manga page (art + text overlays) into the reading area while
@@ -741,6 +755,22 @@
       if (endBtn) endBtn.classList.add("hide");
       return;
     }
+    if (_videoScrollMode()) {
+      // Scrolling mode: show every paragraph and let #thetext scroll
+      // (see the .video-scroll-mode CSS rule).  The reading-end
+      // controls still appear on the book's last page.
+      wrap.classList.add("video-scroll-mode");
+      wrap.querySelectorAll(":scope > p").forEach((p) => (p.style.display = ""));
+      subScreens = [];
+      curScreen = 0;
+      const pagenum = parseInt($("#page_num").val());
+      const maxpage = parseInt($("#page_count").val());
+      const lastPage = pagenum >= maxpage;
+      wrap.classList.toggle("last-screen", lastPage);
+      if (endBtn) endBtn.classList.toggle("hide", !lastPage);
+      return;
+    }
+    wrap.classList.remove("video-scroll-mode");
     // The reader must not jump back to sub-screen 0 on every re-flow.
     // `anchor`, when given, is a <p> already inside #thetext that should
     // stay on screen (e.g. the paragraph holding a just-saved word).
