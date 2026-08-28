@@ -104,6 +104,21 @@ def test_no_word_token_contains_sentence_punctuation(cantonese):
             assert not any(c in cantonese.regexp_split_sentences for c in t.token), t
 
 
+def test_extension_a_characters_are_word_tokens(cantonese):
+    """
+    CJK Extension A characters (e.g. 㗎 U+35CE, common in Cantonese)
+    are word chars: "我哋唔應該笑人㗎" must not leave 㗎 as an
+    unselectable non-word token.
+    """
+    import re
+
+    assert re.match(f"[{cantonese.word_characters}]", "㗎"), cantonese.word_characters
+    tokens = CantoneseParser().get_parsed_tokens("我哋唔應該笑人㗎", cantonese)
+    ga = [t for t in tokens if t.token == "㗎"]
+    assert len(ga) == 1, [t.token for t in tokens]
+    assert ga[0].is_word is True, ga[0]
+
+
 def test_carriage_returns_treated_as_reverse_p_character(cantonese):
     """
     Returns need to be marked with the backwards P for rendering etc.
