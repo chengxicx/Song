@@ -11,6 +11,7 @@ from lute.language.service import Service
 from lute.language.forms import LanguageForm
 from lute.db import db
 from lute.parse.registry import supported_parsers
+from lute.parse.plugin_installer import ensure_parser_available
 
 bp = Blueprint("language", __name__, url_prefix="/language")
 
@@ -235,9 +236,11 @@ def delete(langid):
 
 @bp.route("/list_predefined", methods=["GET"])
 def list_predefined():
-    "Show supported predefined languages that are not already in the db."
+    "Show predefined languages that are not already in the db."
     service = Service(db.session)
-    predefined = service.supported_predefined_languages()
+    # Languages whose parser plugin isn't installed yet are listed too:
+    # loading one auto-installs the plugin (ref plugin_installer).
+    predefined = service.listable_predefined_languages()
     existing_langs = db.session.query(Language).all()
     existing_names = [l.name for l in existing_langs]
     new_langs = [p for p in predefined if p.name not in existing_names]
@@ -248,6 +251,13 @@ def list_predefined():
 def load_predefined(langname):
     "Load a predefined language and its stories."
     service = Service(db.session)
+    lang_def = service.get_language_def(langname)
+    ok, message = ensure_parser_available(lang_def.language.parser_type)
+    if not ok:
+        flash(f"Could not load {langname}: {message}", "error")
+        return redirect(url_for("language.list_predefined"))
+    if message != "already installed":
+        flash(message)
     lang_id = service.load_language_def(langname)
     repo = UserSettingRepository(db.session)
     repo.set_value("current_language_id", lang_id)
