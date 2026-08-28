@@ -34,7 +34,9 @@ addClickHandler(".manga-zoom-fit", resetMangaZoom);
 function incrementFontSize(delta) {
   // Manga text items size themselves with container-query units (cqw)
   // against the page image; the reading-pane font controls must not
-  // override those, so exclude any item inside a manga block.
+  // override those, so exclude any item inside a manga block.  PDF page
+  // words fill their % boxes, so the font controls are meaningless for
+  // them too.
   // Subtitle word spans (YouTube/MP3/Bilibili and TTS players) are also
   // excluded: they must inherit the fixed subtitle size (1.5rem) rather
   // than being stamped with the reading-pane font size, which would
@@ -42,6 +44,7 @@ function incrementFontSize(delta) {
   // status save) and never restore them.
   const textItems = Array.from(document.querySelectorAll("span.textitem"))
     .filter((item) => !item.closest(".manga-text-block"))
+    .filter((item) => !item.closest(".pdf-word"))
     .filter((item) => !item.closest(".yt-scrolling-subtitle-inner"));
   if (textItems.length === 0)
     return;
@@ -104,14 +107,16 @@ function setTextWidth(factor) {
 }
 
 function setColumnCount(num) {
-  // A manga page is a single full-page image with %-positioned text
+  // A manga or PDF page is one fixed page with %-positioned word
   // overlays.  CSS multicol -- even column-count: 1 -- makes #thetext a
   // fragmentation/fragmentainer context: once the zoomed page grows taller
-  // than the pane, every OCR box past the first ~pane-height boundary is
-  // painted ~one pane-height too high (layout correct, paint/hit off),
+  // than the pane, every overlay box past the first ~pane-height boundary
+  // is painted ~one pane-height too high (layout correct, paint/hit off),
   // so the lower boxes stop lining up with / become unclickable after
-  // zooming and scrolling.  Manga must never run in a multicol container.
-  if (theText && theText.classList.contains("manga-text-container")) {
+  // zooming and scrolling.  Fixed-page readers must never run in a
+  // multicol container.
+  if (theText && (theText.classList.contains("manga-text-container")
+               || theText.classList.contains("pdf-text-container"))) {
     theText.style.columnCount = "auto";
     return;
   }

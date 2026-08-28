@@ -223,6 +223,8 @@ def import_webpage():
             return _import_online_video()
         if import_type == "manga":
             return _import_mokuro_manga()
+        if import_type == "pdf":
+            return _import_pdf()
         return _redirect_to_new_book_form()
 
     usrepo = UserSettingRepository(db.session)
@@ -618,6 +620,47 @@ def _import_mokuro_manga():
     try:
         b.manga_stream = manga_file.stream
         b.manga_stream_filename = manga_file.filename
+        book = svc.import_book(b, db.session)
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+    return redirect(f"/read/{book.id}/page/1", 302)
+
+
+def _import_pdf():
+    "Create a PDF book from an uploaded .pdf file."
+    pdf_file = request.files.get("pdf_file")
+    tags = _parse_tagify_tags(request.form.get("pdf_tag", ""), "PDF")
+    language_id = request.form.get("language_id")
+    title = (request.form.get("pdf_title") or "").strip()
+
+    if pdf_file is None or pdf_file.filename == "":
+        flash("Please upload a PDF file.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    fname = (pdf_file.filename or "").lower()
+    if not fname.endswith(".pdf"):
+        flash("Please upload a valid PDF file (.pdf).", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if not title:
+        base = pdf_file.filename or "PDF book"
+        title = ".".join(base.split(".")[:-1]) or base
+    title = title[:200]
+
+    b = Book()
+    b.language_id = int(language_id) if language_id else None
+    b.title = title
+    b.source_uri = pdf_file.filename
+    b.book_type = "pdf"
+    b.book_tags = tags
+    b.threshold_page_tokens = 250
+    b.split_by = "paragraphs"
+
+    svc = BookService()
+    try:
+        b.pdf_stream = pdf_file.stream
+        b.pdf_stream_filename = pdf_file.filename
         book = svc.import_book(b, db.session)
     except BookImportException as e:
         flash(e.message, "notice")

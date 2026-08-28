@@ -753,6 +753,9 @@
     if (USE_AUDIO_BACKEND) on = false;
     ytContainer.classList.toggle("yt-audio-mode", on);
     localStorage.setItem(AUDIO_MODE_STORAGE_KEY, on ? "1" : "0");
+    // Close the gear menu: the change event comes from a click inside
+    // the dropdown, so the outside-click closer never fires.
+    if (ytSettingsDropdown) ytSettingsDropdown.hidden = true;
     // Hiding/showing the video changes the height available to the text
     // area (#thetext), so re-flow the fit-to-screen groups and re-centre
     // the side navigation instead of leaving them sized for the old
