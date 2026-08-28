@@ -55,13 +55,28 @@ class CantoneseParser(AbstractParser):
         lines = text.split("\n")
         for i, line in enumerate(lines):
             for word in pycantonese.segment(line):
-                is_word_char = re.match(pattern, word) is not None
-                is_end_of_sentence = word in language.regexp_split_sentences
-                tokens.append(ParsedToken(word, is_word_char, is_end_of_sentence))
+                # Some pycantonese versions may group sentence
+                # punctuation into a word token (e.g. "吃饭了吗？现在是").
+                # Split each token into runs of word chars and runs of
+                # punctuation so end-of-sentence chars always stand alone.
+                for piece in self._split_token(word, language):
+                    is_word_char = re.match(pattern, piece) is not None
+                    is_end_of_sentence = piece in language.regexp_split_sentences
+                    tokens.append(ParsedToken(piece, is_word_char, is_end_of_sentence))
             if i < len(lines) - 1:
                 tokens.append(ParsedToken("¶", False, True))
 
         return tokens
+
+    @staticmethod
+    def _split_token(word, language):
+        """
+        Split a segmented token into alternating runs of word
+        characters and non-word characters.
+        """
+        return re.findall(
+            f"[{language.word_characters}]+|[^{language.word_characters}]+", word
+        )
 
     def get_reading(self, text: str):
         """
