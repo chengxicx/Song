@@ -5,7 +5,7 @@
 {% block body %}
 
 {% if book_type in ("youtube", "mp3", "video") %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260827c" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260828a" charset="utf-8" defer></script>
 {% elif book_type == "bilibili" %}
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/dash.all.min.js') }}?v=20260816" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/bilibili-player.js') }}?v=20260816c" charset="utf-8" defer></script>
@@ -756,10 +756,14 @@
       return;
     }
     if (_videoScrollMode()) {
-      // Scrolling mode: show every paragraph and let #thetext scroll
-      // (see the .video-scroll-mode CSS rule).  The reading-end
-      // controls still appear on the book's last page.
+      // Scrolling mode: show every paragraph and let the whole page
+      // scroll naturally (see the .video-scroll-mode CSS rules).  The
+      // reading-end controls still appear on the book's last page.
       wrap.classList.add("video-scroll-mode");
+      ["read_pane_container", "read_pane_left"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add("video-scroll-mode");
+      });
       wrap.querySelectorAll(":scope > p").forEach((p) => (p.style.display = ""));
       subScreens = [];
       curScreen = 0;
@@ -771,6 +775,10 @@
       return;
     }
     wrap.classList.remove("video-scroll-mode");
+    ["read_pane_container", "read_pane_left"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove("video-scroll-mode");
+    });
     // The reader must not jump back to sub-screen 0 on every re-flow.
     // `anchor`, when given, is a <p> already inside #thetext that should
     // stay on screen (e.g. the paragraph holding a just-saved word).
