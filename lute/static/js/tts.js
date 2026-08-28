@@ -142,12 +142,29 @@
 
   function selectBestVoiceForLang(voices, targetLang) {
     if (!voices || voices.length === 0) return null;
+    const normLang = function (s) { return (s || "").toLowerCase(); };
+    const target = normLang(targetLang);
+    if (!target) return null;
+    // Cantonese alias: devices disagree on the tag. macOS voices are
+    // keyed "yue-HK" (Sinji) while the language TTS setting uses
+    // "zh-HK" (the edge-tts voices are all keyed zh-HK), and iOS /
+    // Windows expose their Cantonese voice as "zh-HK". When one side
+    // is missing, match the other so a real Cantonese voice is picked
+    // instead of falling through to the device default.
+    const isZhHk = function (s) { return /^zh(-hant)?-hk/.test(s); };
+    const isYue = function (s) { return /^yue/.test(s); };
     let matched = voices.filter(function (v) {
-      return v.lang.toLowerCase().startsWith(targetLang);
+      return normLang(v.lang).startsWith(target);
     });
-    if (matched.length === 0 && targetLang === "sa") {
+    if (matched.length === 0 && isZhHk(target)) {
+      matched = voices.filter(function (v) { return isYue(normLang(v.lang)); });
+    }
+    if (matched.length === 0 && isYue(target)) {
+      matched = voices.filter(function (v) { return isZhHk(normLang(v.lang)); });
+    }
+    if (matched.length === 0 && target === "sa") {
       matched = voices.filter(function (v) {
-        return v.lang.toLowerCase().startsWith("hi");
+        return normLang(v.lang).startsWith("hi");
       });
     }
     if (matched.length === 0) return null;
@@ -1283,6 +1300,42 @@
    * Voice selection dropdown
    * ------------------------------------------------------------------ */
 
+  // Resolve which voice the player is currently using, and keep that
+  // choice stored: explicit button choice > saved per-language choice >
+  // recommended voice for the current language. A saved name that this
+  // device no longer offers is dropped so the recommendation can take
+  // over instead of leaving the dropdown without a highlighted row.
+  // Returns the effective current voice name ("" when none).
+  function ttsResolveCurrentVoice(voices) {
+    let name =
+      (ttsVoiceBtn && ttsVoiceBtn.dataset.voiceName) ||
+      globalCache.selectedVoice ||
+      "";
+    if (
+      name &&
+      name !== DEVICE_DEFAULT_VOICE.name &&
+      !voices.some(function (v) { return v.name === name; })
+    ) {
+      name = "";
+      globalCache.selectedVoice = "";
+      if (ttsVoiceBtn) delete ttsVoiceBtn.dataset.voiceName;
+      try { localStorage.removeItem("ttsVoice:" + SL); } catch (_) {}
+    }
+    // getVoices() loads asynchronously in Chromium/Edge, so the
+    // init-time recommendation often finds an empty list. Auto-select
+    // the recommended voice here (once voices exist) so playback and
+    // hover pronunciation use a natural voice, and so the dropdown has
+    // a row to highlight and scroll to.
+    if (!name) {
+      const recommended = selectBestVoiceForLang(voices, getCurrentLangCode());
+      if (recommended) {
+        ttsSelectVoice(recommended);
+        name = recommended.name;
+      }
+    }
+    return name;
+  }
+
   function ttsPopulateVoiceList() {
     if (!ttsVoiceDropdown || !("speechSynthesis" in window)) return;
     const voices = window.speechSynthesis.getVoices();
@@ -1304,27 +1357,7 @@
     // leftover placeholder state so the real list renders below.
     _voiceWaitStart = null;
 
-    const detectedLang = getCurrentLangCode();
-    const recommended = selectBestVoiceForLang(voices, detectedLang);
-
-    // getVoices() loads asynchronously in Chromium/Edge, so the
-    // init-time selection in ttsInitPlayer() often finds an empty list
-    // and the recommended voice is never stored. Auto-select it here
-    // (once voices exist) so the FIRST hover pronunciation uses the
-    // natural voice instead of the default mechanical one.
-    if (
-      !globalCache.selectedVoice &&
-      !(ttsVoiceBtn && ttsVoiceBtn.dataset.voiceName) &&
-      recommended
-    ) {
-      ttsSelectVoice(recommended);
-    }
-
-    const currentName =
-      (ttsVoiceBtn && ttsVoiceBtn.dataset.voiceName) ||
-      globalCache.selectedVoice ||
-      (recommended && recommended.name) ||
-      "";
+    const currentName = ttsResolveCurrentVoice(voices);
 
     // Group voices by language for easier scanning.
     voices.sort(function (a, b) { return a.lang.localeCompare(b.lang); });
@@ -1340,6 +1373,7 @@
       opt.addEventListener("click", function (e) {
         e.stopPropagation();
         ttsSelectVoice(voice);
+        ttsVoiceDropdown.hidden = true;
       });
       ttsVoiceDropdown.appendChild(opt);
     });
@@ -1414,6 +1448,7 @@
         def.addEventListener("click", function (e) {
           e.stopPropagation();
           ttsSelectVoice(DEVICE_DEFAULT_VOICE);
+          ttsVoiceDropdown.hidden = true;
         });
         ttsVoiceDropdown.appendChild(def);
       }
@@ -1440,10 +1475,13 @@
     if (!ttsVoiceDropdown || ttsVoiceDropdown.hidden) return;
     const selected = ttsVoiceDropdown.querySelector(".tts-voice-option.selected");
     if (!selected) return;
+    // The options are static children of the (absolutely positioned)
+    // dropdown, so offsetTop is already relative to the dropdown itself.
     ttsVoiceDropdown.scrollTop = 0;
-    const optTop = selected.offsetTop - ttsVoiceDropdown.offsetTop;
     ttsVoiceDropdown.scrollTop =
-      optTop - ttsVoiceDropdown.clientHeight / 2 + selected.offsetHeight / 2;
+      selected.offsetTop -
+      ttsVoiceDropdown.clientHeight / 2 +
+      selected.offsetHeight / 2;
   }
 
   function ttsShortVoiceName(fullName) {
@@ -1467,14 +1505,16 @@
       if (ttsVoiceLabel) ttsVoiceLabel.textContent = ttsShortVoiceName(voice.name);
     }
     globalCache.selectedVoice = voice.name;
+    // Remember the choice per book language, so re-opening the player
+    // (or another book in the same language) starts with the same voice
+    // and the dropdown can highlight it again.
+    try { localStorage.setItem("ttsVoice:" + SL, voice.name); } catch (_) {}
     // Update dropdown selected state.
     if (ttsVoiceDropdown) {
       ttsVoiceDropdown.querySelectorAll(".tts-voice-option").forEach(function (opt) {
         opt.classList.toggle("selected", opt.dataset.voiceName === voice.name);
       });
     }
-    // Hide the dropdown.
-    if (ttsVoiceDropdown) ttsVoiceDropdown.hidden = true;
     // If we're playing, restart the current cue with the new voice.
     if (ttsPlaying && !ttsPaused && ttsCueIndex >= 0) {
       ttsPlayCue(ttsCueIndex);
@@ -1721,6 +1761,15 @@
 
   function ttsInitPlayer() {
     if (!ttsCacheElements()) return;
+    // Restore the voice chosen for this book language in a previous
+    // session, so playback uses it immediately and the dropdown has a
+    // row to highlight / scroll to when the gear is opened.
+    if (!globalCache.selectedVoice) {
+      try {
+        const savedVoice = localStorage.getItem("ttsVoice:" + SL);
+        if (savedVoice) globalCache.selectedVoice = savedVoice;
+      } catch (_) {}
+    }
     // The container is rendered by the template but its visibility
     // is controlled by the TTS Player toggle (reading_menu).  The
     // element itself is always present in the DOM so JS can find it.
