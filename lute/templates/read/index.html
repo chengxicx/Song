@@ -27,7 +27,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}?v=20260805f" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}?v=20260826c" charset="utf-8" defer></script>
 <script type="text/javascript" src="/static/js/never_cache/dict-tabs.js?v={{ lute_version }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260828a" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260829a" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -39,6 +39,7 @@
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
     track_page_open: <input id="track_page_open" value="{{ track_page_open|lower }}">
     tts_lang: <input id="tts_lang" value="{{ lang_code }}">
+    tts_target_lang: <input id="tts_target_lang" value="{{ translate_target_lang or '' }}">
   </pre>
 </div>
 

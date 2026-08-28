@@ -13,7 +13,7 @@ from wtforms import (
     Form,
     ValidationError,
 )
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional, Regexp
 from lute.models.language import LanguageDictionary
 
 
@@ -65,6 +65,32 @@ class LanguageForm(FlaskForm):
     exceptions_split_sentences = StringField("Split sentence exceptions")
     word_characters = StringField(
         "Word characters (default: all Unicode letters and marks)"
+    )
+
+    # --- Optional per-language TTS / translation overrides.
+    # Rendered by the generic field loop in _form.html.
+    _lang_tag_regex = r"^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$"
+    tts_lang = StringField(
+        "TTS 语言代码 (TTS Language Tag)",
+        validators=[
+            Optional(),
+            Regexp(
+                _lang_tag_regex,
+                message='格式应为 BCP-47 标签，如 "zh-HK"、"yue"、"ja-JP"',
+            ),
+        ],
+        render_kw={"placeholder": "例如 zh-HK / yue / ja-JP，留空则按语言名自动推断"},
+    )
+    translate_target_lang = StringField(
+        "Google 翻译目标语言 (Translate Target)",
+        validators=[
+            Optional(),
+            Regexp(
+                _lang_tag_regex,
+                message='格式应为语言代码，如 "zh-CN"、"en"',
+            ),
+        ],
+        render_kw={"placeholder": "例如 zh-CN，留空则使用浏览器语言"},
     )
 
     # --- Korean / Kiwi-specific settings.

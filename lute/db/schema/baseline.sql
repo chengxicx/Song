@@ -58,6 +58,7 @@ INSERT INTO _migrations VALUES('20260811_add_manga_fields.sql');
 INSERT INTO _migrations VALUES('20260812_add_manga_word_count.sql');
 INSERT INTO _migrations VALUES('20260802_add_kiwi_settings.sql');
 INSERT INTO _migrations VALUES('20260803_add_book_youtube_fields.sql');
+INSERT INTO _migrations VALUES('20260829_add_language_tts_translate.sql');
 INSERT INTO _migrations VALUES('20250724_add_LgIsActive.sql');
 INSERT INTO _migrations VALUES('20250727_add_new_word_percent.sql');
 CREATE TABLE IF NOT EXISTS "statuses" (
@@ -212,6 +213,8 @@ CREATE TABLE IF NOT EXISTS "languages" (
 	"LgKiwiStemming" INTEGER NOT NULL DEFAULT 1,
 	"LgKiwiFilterParticles" INTEGER NOT NULL DEFAULT 0,
 	"LgKiwiJoinCompoundNouns" INTEGER NOT NULL DEFAULT 0,
+	"LgTTSLang" TEXT,
+	"LgTranslateTargetLang" TEXT,
 	PRIMARY KEY ("LgID")
 );
 CREATE TABLE textbookmarks (
