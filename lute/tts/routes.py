@@ -133,6 +133,20 @@ def get_lang_code(lang_name):
     return LANG_NAME_TO_CODE.get(lang_name.lower(), DEFAULT_LANG_TAG)
 
 
+def get_lang_code_for(language):
+    """
+    Get the BCP-47 language tag for a Lute Language entity.
+
+    The language's custom tts_lang setting (set on the language edit
+    screen) takes precedence; otherwise the tag is derived from the
+    language name via LANG_NAME_TO_CODE.
+    """
+    custom = getattr(language, "tts_lang", None)
+    if custom and custom.strip():
+        return custom.strip()
+    return get_lang_code(language.name if language is not None else None)
+
+
 def primary_subtag(tag):
     """
     Return the primary language subtag of a BCP-47 tag, e.g.
@@ -227,7 +241,11 @@ def translate(sl, tl, text):
     if not translation:
         translation = _translate_via_mymemory(sl, tl, text)
 
-    trans_cache[cache_key] = translation
+    # Only cache successful translations, so API error messages
+    # (e.g. MyMemory's "PLEASE SELECT TWO DISTINCT LANGUAGES")
+    # never get served from the cache.
+    if translation:
+        trans_cache[cache_key] = translation
     return jsonify({"translation": translation})
 
 
@@ -250,10 +268,36 @@ def _translate_via_google(sl, tl, text):
     return ""
 
 
+# MyMemory returns its error messages (HTTP 403 etc.) as
+# responseData.translatedText with a 200 response body; never let
+# these strings through as "translations".
+_MYMEMORY_ERROR_PREFIXES = (
+    "PLEASE SELECT",
+    "MYMEMORY WARNING",
+    "QUERY LENGTH LIMIT EXCEEDED",
+    "INVALID SOURCE OR TARGET LANGUAGE",
+    "INVALID LANGUAGE PAIR",
+)
+
+
+def _is_mymemory_error(result):
+    """True if a MyMemory result string is actually an error message."""
+    upper = (result or "").strip().upper()
+    return any(upper.startswith(p) for p in _MYMEMORY_ERROR_PREFIXES)
+
+
 def _translate_via_mymemory(sl, tl, text):
     """Try MyMemory free translate API.  Returns '' on failure."""
     # MyMemory expects plain language codes, not full BCP-47 tags.
-    langpair = f"{primary_subtag(sl)}|{primary_subtag(tl)}"
+    sl_primary, tl_primary = primary_subtag(sl), primary_subtag(tl)
+    if not sl_primary or not tl_primary:
+        return ""
+    if sl_primary == tl_primary:
+        # Same primary language (e.g. zh-HK -> zh-CN): MyMemory rejects
+        # the pair with a 403 error message, and Google above already
+        # handles these pairs, so don't bother calling it.
+        return ""
+    langpair = f"{sl_primary}|{tl_primary}"
     url = (
         "https://api.mymemory.translated.net/get"
         f"?q={urllib.parse.quote(text)}"
@@ -262,10 +306,19 @@ def _translate_via_mymemory(sl, tl, text):
     try:
         resp = requests.get(url, timeout=8)
         data = resp.json()
+        status = data.get("responseStatus", 200)
+        try:
+            status_ok = int(status) == 200
+        except (TypeError, ValueError):
+            status_ok = False
+        if not status_ok:
+            return ""
         if data and data.get("responseData") and data["responseData"].get("translatedText"):
             result = data["responseData"]["translatedText"]
             # If result is identical to input, treat as failed translation
             if result and result.lower() == text.lower():
+                return ""
+            if _is_mymemory_error(result):
                 return ""
             return result
     except Exception as e:  # pylint: disable=broad-exception-caught

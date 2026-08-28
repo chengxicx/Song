@@ -96,3 +96,30 @@ def test_lang_to_dict_from_dict_returns_same_thing(app_context):
     e_from_dict = Language.from_dict(e_dict)
     e_back_to_dict = e_from_dict.to_dict()
     assert e_dict == e_back_to_dict, "Same thing returned"
+
+
+def test_tts_and_translate_fields_roundtrip(app_context):
+    """
+    The custom tts_lang and translate_target_lang settings persist,
+    and are included in the to_dict/from_dict serialization.
+    """
+    demosvc = DemoService(db.session)
+    demosvc.load_demo_data()
+    repo = LanguageRepository(db.session)
+    e = repo.find_by_name("English")
+    e.tts_lang = "en-GB"
+    e.translate_target_lang = "zh-CN"
+    db.session.add(e)
+    db.session.commit()
+
+    e2 = repo.find_by_name("English")
+    assert e2.tts_lang == "en-GB"
+    assert e2.translate_target_lang == "zh-CN"
+
+    d = e2.to_dict()
+    assert d["tts_lang"] == "en-GB"
+    assert d["translate_target_lang"] == "zh-CN"
+
+    e3 = Language.from_dict(d)
+    assert e3.tts_lang == "en-GB"
+    assert e3.translate_target_lang == "zh-CN"

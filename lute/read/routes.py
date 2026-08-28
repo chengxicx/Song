@@ -20,7 +20,7 @@ from lute.book.service import (
     bilibili_video_id,
     bilibili_page,
 )
-from lute.tts.routes import get_lang_code
+from lute.tts.routes import get_lang_code_for
 from lute.db import db
 
 
@@ -321,7 +321,8 @@ def _render_book_page(book, pagenum, track_page_open=True):
         page_count=book.page_count,
         show_highlights=show_highlights,
         lang_id=lang.id,
-        lang_code=get_lang_code(lang.name),
+        lang_code=get_lang_code_for(lang),
+        translate_target_lang=(lang.translate_target_lang or ""),
         track_page_open=track_page_open,
         term_dicts=term_dicts,
         book_type=book_type,
