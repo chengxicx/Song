@@ -20,6 +20,9 @@
         <a href="/language/load_predefined/{{ language.name }}">
           {{ language.name }}
         </a>
+        {% if not language.is_supported %}
+        <small>(parser plugin will be installed on first load)</small>
+        {% endif %}
       </td>
     </tr>
     {% endfor %}
