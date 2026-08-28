@@ -1,5 +1,7 @@
 /* Lute Service Worker - PWA offline support */
-const CACHE_NAME = 'lute-v3.10.5.4';
+// NOTE: bump this name whenever shipped static assets change, so all
+// clients drop the old offline cache and re-precache fresh copies.
+const CACHE_NAME = 'lute-v3.10.5.4.20260828';
 
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
@@ -27,6 +29,9 @@ const STATIC_ASSETS = [
   '/static/js/resize.js',
   '/static/js/text-options.js',
   '/static/js/tts.js',
+  '/static/js/pdf-reader.js',
+  '/static/js/vendor/pdfjs/pdf.module.js',
+  '/static/js/vendor/pdfjs/pdf.worker.module.js',
   '/static/js/lute-tagify-utils.js',
   '/static/js/lute-hotkey-utils.js',
   '/static/js/lute-popups.js',
@@ -230,19 +235,24 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Cache-first for static assets
+  // Network-first for static assets: a deploy must take effect on the
+  // next load without manual cache invalidation (a stale cached
+  // styles.css breaks new reader layouts).  The offline cache stays
+  // as the fallback when the network is unreachable, and every
+  // successful fetch refreshes the cached copy.
   if (url.pathname.startsWith('/static/')) {
     event.respondWith(
-      caches.match(urlStr).then(cached => {
-        if (cached) return cached;
-        return fetch(urlStr).then(response => {
+      fetch(urlStr)
+        .then(response => {
           if (response.ok) {
             const clone = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(urlStr, clone));
           }
           return response;
-        });
-      })
+        })
+        .catch(() =>
+          caches.match(urlStr).then(cached => cached || Response.error())
+        )
     );
     return;
   }

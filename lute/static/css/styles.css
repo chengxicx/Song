@@ -1453,6 +1453,19 @@ div#thetext.pdf-text-container {
     color: transparent;
 }
 
+/* Themes and the generic word styles add padding, margins, radius or
+   shadows to .statusN spans; inside a PDF overlay box any extra box
+   metrics would shift the highlight off the printed word, so pin the
+   overlay boxes down (borders stay: .wordhover/.kwordmarked use them). */
+.pdf-word,
+.pdf-word .pdf-word-seg,
+.pdf-word span.textitem {
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
 /* Words with no highlight yet get a faint hint on hover so they still
    feel clickable. */
 .pdf-text-container span.textitem:not(.status0):not(.status1):not(.status2):not(.status3):not(.status4):not(.status5):hover {
