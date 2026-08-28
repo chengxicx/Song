@@ -1935,13 +1935,23 @@
       return false;
     };
 
+    // PDF books are fixed-page readers: the player UI would cover the
+    // page, so it starts hidden on every PDF load (the reading_menu
+    // toggle can still show it for the session).
+    var isPdfBook = function () {
+      if (window.LUTE_BOOK_TYPE === "pdf") return true;
+      return !!document.querySelector("#thetext.pdf-text-container");
+    };
+
     let saved = null;
     try {
       saved = localStorage.getItem("ttsPlayerVisible");
     } catch (_) {}
 
     var initialVisible;
-    if (saved !== null) {
+    if (isPdfBook()) {
+      initialVisible = false;
+    } else if (saved !== null) {
       initialVisible = saved !== "0";
     } else if (isYouTubeOrMp3()) {
       initialVisible = false;
