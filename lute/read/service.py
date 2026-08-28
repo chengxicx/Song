@@ -2,14 +2,12 @@
 Reading helpers.
 """
 
-import math
 import os
 import re
 from collections import defaultdict
 from datetime import datetime
 import functools
 from flask import current_app
-from pypdf import PdfReader
 from lute.models.term import Term, Status
 from lute.models.book import Text, WordsRead
 from lute.models.repositories import BookRepository, UserSettingRepository
@@ -26,31 +24,15 @@ from lute.term.model import Repository
 _pdf_page_words_cache = {}
 
 
-def _pdf_char_width(ch, fs):
-    "Estimated glyph width in PDF units, for hotspot boxes."
-    o = ord(ch)
-    if (
-        0x2E80 <= o <= 0x9FFF  # CJK radicals through unified ideographs
-        or 0xAC00 <= o <= 0xD7AF  # Hangul syllables
-        or 0xF900 <= o <= 0xFAFF  # CJK compatibility ideographs
-        or 0xFF00 <= o <= 0xFF60  # Fullwidth forms
-    ):
-        return fs
-    if ch == " ":
-        return fs * 0.3
-    if ch.isupper():
-        return fs * 0.67
-    return fs * 0.5
-
-
 def _extract_pdf_page_words(pdf_abs_path, pagenum):
     """
     Extract the reading-order words of one PDF page (1-based).
 
-    Uses pypdf's visitor_text to capture text runs with their baseline
-    positions, groups the runs into lines, and splits lines into words.
-    Boxes are estimates; the reading screen's JavaScript refines them
-    against pdf.js's exact glyph geometry after rendering.
+    Uses pdfminer's layout analysis: it decodes CID-keyed fonts (CJK
+    text in PDFs often has no ToUnicode map) and reports exact
+    per-character boxes, so words are real text and the boxes match
+    the rendered glyphs.  The reading screen's JavaScript still refines
+    left/width against pdf.js's geometry after rendering.
 
     Returns (page_width, page_height, words), coordinates in PDF points
     with top-left origin, each word
@@ -60,86 +42,54 @@ def _extract_pdf_page_words(pdf_abs_path, pagenum):
     if key in _pdf_page_words_cache:
         return _pdf_page_words_cache[key]
 
-    reader = PdfReader(pdf_abs_path)
-    page = reader.pages[pagenum - 1]
-    pw = float(page.mediabox.width)
-    ph = float(page.mediabox.height)
+    # Imported lazily: pdfminer's startup cost is not worth paying for
+    # every request, and only PDF pages need it.
+    from pdfminer.high_level import extract_pages
+    from pdfminer.layout import LTChar, LTTextContainer, LTTextLine
 
-    runs = []
-
-    def _visit(text, cm, tm, font_dict, font_size):
-        if not text or not text.strip():
-            return
-        # Trailing newlines are pypdf artifacts of move-text-position
-        # operators, not glyphs.
-        clean = text.replace("\r", "").replace("\n", "")
-        if not clean.strip():
-            return
-        tf = float(font_size) if font_size and float(font_size) > 0 else 10.0
-        # The Tf size is not always the rendered size: generators such as
-        # the one behind the Erin manga PDF write "/F1 1 Tf" and do the
-        # real scaling in the text matrix (Tm).  Take the vertical scale
-        # of the combined CTM x Tm matrices as the font size so line
-        # boxes match the rendered glyphs.
-        tm_sy = math.sqrt((tm[2] ** 2) + (tm[3] ** 2)) if tm else 0.0
-        if tm_sy < 1e-6 and tm:
-            tm_sy = math.sqrt((tm[0] ** 2) + (tm[1] ** 2))
-        cm_sy = math.sqrt((cm[2] ** 2) + (cm[3] ** 2)) if cm else 0.0
-        if cm_sy < 1e-6 and cm:
-            cm_sy = math.sqrt((cm[0] ** 2) + (cm[1] ** 2))
-        fs = tf * (tm_sy or 1.0) * (cm_sy or 1.0)
-        if fs <= 0:
-            fs = 10.0
-        # Device position = CTM (cm) applied to the text matrix (tm).
-        x = cm[0] * tm[4] + cm[2] * tm[5] + cm[4]
-        y = cm[1] * tm[4] + cm[3] * tm[5] + cm[5]
-        runs.append({"text": clean, "x": x, "y": y, "fs": fs})
-
-    page.extract_text(visitor_text=_visit)
-
-    # Group runs into lines by baseline y, top to bottom, then order
-    # each line's runs left to right.
-    runs.sort(key=lambda r: (-r["y"], r["x"]))
-    lines = []
-    for run in runs:
-        placed = False
-        for line in lines:
-            if abs(run["y"] - line["y"]) <= max(run["fs"] * 0.5, 2.0):
-                line["runs"].append(run)
-                line["fs"] = max(line["fs"], run["fs"])
-                placed = True
-                break
-        if not placed:
-            lines.append({"y": run["y"], "fs": run["fs"], "runs": [run]})
-    lines.sort(key=lambda l: -l["y"])
+    pages = list(extract_pages(pdf_abs_path, page_numbers=[pagenum - 1]))
+    if not pages:
+        return (0, 0, [])
+    page = pages[0]
+    pw = float(page.width)
+    ph = float(page.height)
 
     words = []
-    for li, line in enumerate(lines):
-        line["runs"].sort(key=lambda r: r["x"])
-        fs = line["fs"]
-        top = ph - line["y"] - fs * 0.86
-        height = fs * 1.08
-        # Split each run's own text into words: every run starts at its
-        # own baseline x, so offsets must not span concatenated runs.
-        for run in line["runs"]:
-            for match in re.finditer(r"\S+", run["text"]):
-                est_width = sum(
-                    _pdf_char_width(c, fs)
-                    for c in run["text"][match.start() : match.end()]
-                )
-                x_before = sum(
-                    _pdf_char_width(c, fs) for c in run["text"][: match.start()]
-                )
+    li = 0
+    for el in page:
+        if not isinstance(el, LTTextContainer):
+            continue
+        for line in el:
+            if not isinstance(line, LTTextLine):
+                continue
+            chars = [c for c in line if isinstance(c, LTChar)]
+            if not chars:
+                continue
+            chars.sort(key=lambda c: c.x0)
+            line_text = "".join(c.get_text() for c in chars)
+            ink_top = ph - max(c.y1 for c in chars)
+            ink_bottom = ph - min(c.y0 for c in chars)
+            ink_height = ink_bottom - ink_top
+            fs = max(c.size for c in chars)
+            # Keep the familiar line-box feel: at least one em tall,
+            # with the ink vertically centered in the box.
+            height = max(ink_height, fs)
+            top = ink_top - (height - ink_height) / 2
+            for match in re.finditer(r"\S+", line_text):
+                seg = chars[match.start() : match.end()]
+                x0 = min(c.x0 for c in seg)
+                x1 = max(c.x1 for c in seg)
                 words.append(
                     {
                         "text": match.group(0),
-                        "x": run["x"] + x_before,
+                        "x": x0,
                         "y": top,
-                        "width": est_width,
+                        "width": max(x1 - x0, 1),
                         "height": height,
                         "line": li,
                     }
                 )
+            li += 1
 
     result = (pw, ph, words)
     if len(_pdf_page_words_cache) > 100:
