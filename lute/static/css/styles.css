@@ -1407,17 +1407,26 @@ div#thetext.manga-text-container {
    The page is drawn by pdf.js onto a canvas filling .pdf-page, with
    absolutely positioned word overlays on top (boxes in % of the page).
    The printed glyphs are part of the canvas image, so the overlay text
-   is transparent; term status colors act as highlighter marks via
-   mix-blend-mode: multiply, which keeps the printed text visible
-   underneath, like a real highlighter pen.  The page keeps its white,
-   paper-like appearance in dark mode, so the status colors are fixed
-   to the light-theme pastels (like the manga pane). */
+   is transparent; term status colors act as translucent highlighter
+   tints that let the printed text show through underneath.  The page
+   keeps its white, paper-like appearance in dark mode, so the status
+   colors are fixed translucent pastels (like the manga pane). */
 div#thetext.pdf-text-container {
     padding: 10px 0;
     max-width: 1000px;
     margin: 0 auto;
-    overflow-y: auto;
+    /* auto on both axes so a zoomed-in page can scroll to pan around
+       (same as the manga container); scrollbars are hidden -- you pan
+       with the mouse wheel / trackpad or by dragging the paper. */
+    overflow: auto;
+    clip-path: none;
+    scrollbar-width: none;          /* Firefox */
+    -ms-overflow-style: none;       /* old Edge/IE */
     background-color: #555;
+}
+
+div#thetext.pdf-text-container::-webkit-scrollbar {
+    display: none;                  /* Chrome/Safari/Edge */
 }
 
 .pdf-page {
@@ -1432,6 +1441,11 @@ div#thetext.pdf-text-container {
     display: block;
     width: 100%;
     height: 100%;
+    cursor: grab;
+}
+
+.pdf-page-canvas:active {
+    cursor: grabbing;
 }
 
 .pdf-word {
@@ -1470,7 +1484,31 @@ div#thetext.pdf-text-container {
    feel clickable. */
 .pdf-text-container span.textitem:not(.status0):not(.status1):not(.status2):not(.status3):not(.status4):not(.status5):hover {
     background-color: rgba(120, 120, 120, 0.35);
-    mix-blend-mode: multiply;
+}
+
+/* Highlighter marks: translucent fixed tints (like the manga pane's
+   fixed palette, but with alpha).  The printed glyphs live on the
+   canvas UNDER the overlay, so the tint must let them show through --
+   an opaque background (or mix-blend-mode, which gets isolated by the
+   overlay's stacking context) would hide the text completely.
+   !important: themes restyle span.statusN with ID selectors. */
+.pdf-text-container span.textitem.status0 {
+    background-color: rgba(213, 255, 255, 0.42) !important;
+}
+.pdf-text-container span.textitem.status1 {
+    background-color: rgba(245, 184, 169, 0.42) !important;
+}
+.pdf-text-container span.textitem.status2 {
+    background-color: rgba(245, 204, 169, 0.42) !important;
+}
+.pdf-text-container span.textitem.status3 {
+    background-color: rgba(245, 225, 169, 0.42) !important;
+}
+.pdf-text-container span.textitem.status4 {
+    background-color: rgba(245, 243, 169, 0.42) !important;
+}
+.pdf-text-container span.textitem.status5 {
+    background-color: rgba(221, 255, 221, 0.42) !important;
 }
 
 .pdf-text-container span.textitem.status0,
@@ -1479,26 +1517,7 @@ div#thetext.pdf-text-container {
 .pdf-text-container span.textitem.status3,
 .pdf-text-container span.textitem.status4,
 .pdf-text-container span.textitem.status5 {
-    mix-blend-mode: multiply;
     color: transparent;
-}
-.pdf-text-container span.textitem.status0 {
-    background-color: #D5FFFF;
-}
-.pdf-text-container span.textitem.status1 {
-    background-color: #F5B8A9;
-}
-.pdf-text-container span.textitem.status2 {
-    background-color: #F5CCA9;
-}
-.pdf-text-container span.textitem.status3 {
-    background-color: #F5E1A9;
-}
-.pdf-text-container span.textitem.status4 {
-    background-color: #F5F3A9;
-}
-.pdf-text-container span.textitem.status5 {
-    background-color: #DDFFDD;
 }
 
 /* .click */

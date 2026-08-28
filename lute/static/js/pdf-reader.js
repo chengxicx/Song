@@ -68,6 +68,41 @@
     return perDoc[pageNum];
   }
 
+  // Drag-to-pan: a zoomed page overflows the pane, and dragging the
+  // paper scrolls it (like a PDF reader's hand tool).  Dragging that
+  // starts on a word is excluded -- it feeds lute.js's multi-word
+  // selection.  Bound once: #thetext itself survives page swaps.
+  function _installPanHandler(el) {
+    const scroller = el.closest(".pdf-text-container") || el;
+    if (scroller.dataset.panBound) {
+      return;
+    }
+    scroller.dataset.panBound = "1";
+    let pan = null;
+    el.addEventListener("mousedown", (e) => {
+      if (e.button !== 0 || e.target.closest(".pdf-word")) {
+        return;
+      }
+      pan = {
+        x: e.clientX,
+        y: e.clientY,
+        sl: scroller.scrollLeft,
+        st: scroller.scrollTop,
+      };
+      e.preventDefault();
+    });
+    window.addEventListener("mousemove", (e) => {
+      if (!pan) {
+        return;
+      }
+      scroller.scrollLeft = pan.sl - (e.clientX - pan.x);
+      scroller.scrollTop = pan.st - (e.clientY - pan.y);
+    });
+    window.addEventListener("mouseup", () => {
+      pan = null;
+    });
+  }
+
   // Entry point, called by the pdf_page.html fragment script after
   // every page swap.
   function load() {
@@ -81,6 +116,7 @@
       window.addEventListener("pdfjs-ready", load, { once: true });
       return;
     }
+    _installPanHandler(el);
     if (_resizeObserver) {
       _resizeObserver.disconnect();
     }
