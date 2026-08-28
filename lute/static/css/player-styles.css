@@ -937,6 +937,17 @@
   .yt-controls-right {
     justify-content: center;
   }
+
+  /* The gear button is the leftmost control of the centered row, so a
+     right-anchored dropdown (min-width 13rem) extends past the screen's
+     left edge and the "Audio only" label is clipped off-screen.  Anchor
+     it to the button's left edge so it opens to the right, over the
+     rest of the controls row. */
+  .yt-settings-dropdown {
+    left: 0;
+    right: auto;
+    max-width: calc(100vw - 2rem);
+  }
 }
 
 @media screen and (max-width: 480px) {
