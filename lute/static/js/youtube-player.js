@@ -597,9 +597,10 @@
     if (ytFullscreenBtn) {
       ytFullscreenBtn.addEventListener("click", ytToggleFullscreen);
     }
-    // Audio-only mode toggle + settings dropdown (online video books).
+    // Audio-only mode toggle + settings dropdown (online video and
+    // YouTube books).
     if (ytAudioModeCb) {
-      if (USE_VIDEO_BACKEND) {
+      if (!USE_AUDIO_BACKEND) {
         ytAudioModeCb.checked =
           localStorage.getItem(AUDIO_MODE_STORAGE_KEY) === "1";
         ytAudioModeCb.addEventListener("change", ytApplyAudioMode);
@@ -741,24 +742,27 @@
     }
   }
 
-  // Audio-only mode for online video books (the gear button menu).
-  // Hides the video area so the reading screen matches an MP3 book:
-  // controls + scrolling subtitle, no video picture.  The hidden
-  // <video> element keeps playing its audio track.  Persists per browser.
+  // Audio-only mode for online video and YouTube books (the gear
+  // button menu).  Hides the video area so the reading screen matches
+  // an MP3 book: controls + scrolling subtitle, no video picture.
+  // The hidden <video> element / YouTube iframe keeps playing its
+  // audio track.  Persists per browser.
   function ytApplyAudioMode() {
     if (!ytVideoWrap || !ytAudioModeCb) return;
     var on = !!ytAudioModeCb.checked;
-    if (!USE_VIDEO_BACKEND) on = false;
+    if (USE_AUDIO_BACKEND) on = false;
     ytContainer.classList.toggle("yt-audio-mode", on);
     localStorage.setItem(AUDIO_MODE_STORAGE_KEY, on ? "1" : "0");
     // Hiding/showing the video changes the height available to the text
     // area (#thetext), so re-flow the fit-to-screen groups and re-centre
     // the side navigation instead of leaving them sized for the old
-    // layout.  Deferred to the next frame so the DOM has settled.
-    requestAnimationFrame(function () {
+    // layout.  A short timeout instead of requestAnimationFrame: rAF
+    // callbacks are suspended in occluded / background windows, which
+    // would leave the reflow undone until the tab is focused again.
+    setTimeout(function () {
       if (typeof _splitToScreens === "function") _splitToScreens();
       if (typeof _layout_side_nav === "function") _layout_side_nav();
-    });
+    }, 50);
   }
 
   /* ------------------------------------------------------------------ */

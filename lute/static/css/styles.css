@@ -1077,11 +1077,24 @@ div#thetext.manga-text-container {
     -ms-overflow-style: none;       /* old Edge/IE */
 }
 
-/* Video / YouTube books outside audio-only mode: scroll the reading
-   area like a normal page instead of the fit-to-screen arrow paging
-   (the .video-scroll-mode class is managed by _splitToScreens). */
+/* Video / YouTube books outside audio-only mode: the whole page scrolls
+   naturally (video on top, text flowing below) instead of the fixed
+   viewport used by the fit-to-screen arrow paging.  The class is managed
+   by _splitToScreens on the containers and #thetext. */
+#read_pane_container.video-scroll-mode {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+}
+
+#read_pane_left.video-scroll-mode {
+    height: auto;
+    min-height: 100vh;
+}
+
 div#thetext.video-scroll-mode {
-    overflow-y: auto;
+    flex: 1 0 auto;
+    overflow: visible;
 }
 
 div#thetext.manga-text-container::-webkit-scrollbar {
@@ -2635,6 +2648,12 @@ input[name='status']:disabled + label {
     #read_pane_left {
         width: unset !important;
         margin-top: 4rem;
+    }
+
+    /* Account for the fixed 4rem header above the pane, so a short text
+       still ends exactly at the bottom of the screen when scrolling. */
+    #read_pane_left.video-scroll-mode {
+        min-height: calc(100vh - 4rem);
     }
 
     .reading_header_container {
