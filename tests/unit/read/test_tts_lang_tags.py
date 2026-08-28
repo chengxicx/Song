@@ -18,8 +18,8 @@ def test_get_lang_code_returns_bcp47_tags():
         "Mandarin Chinese": "zh-CN",
         "Traditional Chinese": "zh-TW",
         "Simplified Chinese": "zh-CN",
-        "Cantonese Chinese": "yue",
-        "Cantonese": "yue",
+        "Cantonese Chinese": "zh-HK",
+        "Cantonese": "zh-HK",
         "Portuguese": "pt-BR",
         "Latin": "la",
     }
@@ -44,9 +44,11 @@ def test_primary_subtag():
 
 def test_voice_for_tag_exact_match():
     "Tags with an exact voice entry use it."
-    assert voice_for_tag("yue") == "zh-HK-HiuMaanNeural"
+    assert voice_for_tag("zh-HK") == "zh-HK-HiuMaanNeural"
     assert voice_for_tag("zh-TW") == "zh-TW-HsiaoChenNeural"
     assert voice_for_tag("zh-CN") == "zh-CN-XiaoxiaoNeural"
+    # "yue" is kept as an alias for previously cached /tts/yue/ URLs.
+    assert voice_for_tag("yue") == "zh-HK-HiuMaanNeural"
 
 
 def test_voice_for_tag_falls_back_to_primary_subtag():

@@ -59,6 +59,7 @@ VOICE_MAP = {
     "hr": "hr-HR-GabrijelaNeural",
     "zh-CN": "zh-CN-XiaoxiaoNeural",
     "zh-TW": "zh-TW-HsiaoChenNeural",
+    "zh-HK": "zh-HK-HiuMaanNeural",
     "yue": "zh-HK-HiuMaanNeural",
 }
 DEFAULT_VOICE = "en-US-AvaNeural"
@@ -68,7 +69,10 @@ DEFAULT_VOICE = "en-US-AvaNeural"
 # language tag to the reading template.
 #
 # Tags carry the regional/script variety of the TTS voice used for that
-# language (e.g. "ja-JP" for the ja-JP voice, "yue" for Cantonese).
+# language (e.g. "ja-JP" for the ja-JP voice, "zh-HK" for Cantonese).
+# Cantonese is tagged zh-HK rather than yue because the voices it needs
+# (edge-tts and browser SpeechSynthesis natural voices) are all keyed
+# under the zh-HK locale; a "yue" tag misses them in voice matching.
 # Consumers resolve the full tag, falling back to the primary language
 # subtag as needed (see voice_for_tag and _translate_via_mymemory).
 LANG_NAME_TO_CODE = {
@@ -83,8 +87,8 @@ LANG_NAME_TO_CODE = {
     "traditional chinese": "zh-TW",
     "mandarin": "zh-CN",
     "mandarin chinese": "zh-CN",
-    "cantonese": "yue",
-    "cantonese chinese": "yue",
+    "cantonese": "zh-HK",
+    "cantonese chinese": "zh-HK",
     "italian": "it-IT",
     "portuguese": "pt-BR",
     "russian": "ru-RU",
