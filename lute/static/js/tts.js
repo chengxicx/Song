@@ -51,8 +51,16 @@
   }
   let SL = globalCache.sl || "en";
 
-  // Read TL from: navigator.language -> shared cache -> default
-  globalCache.tl = navigator.language || globalCache.tl || "zh-CN";
+  // Read TL from: per-language setting -> navigator.language -> shared cache -> default
+  var TL_INPUT =
+    (window.top && window.top.document &&
+      window.top.document.getElementById("tts_target_lang")) ||
+    document.getElementById("tts_target_lang");
+  if (TL_INPUT && TL_INPUT.value) {
+    globalCache.tl = TL_INPUT.value;
+  } else {
+    globalCache.tl = navigator.language || globalCache.tl || "zh-CN";
+  }
   let TL = globalCache.tl;
 
   // Cached language detection – only runs once per page load.
@@ -424,6 +432,24 @@
     }).catch(function () { return ""; });
   }
 
+  // MyMemory returns its error messages (HTTP 403 etc.) as
+  // responseData.translatedText; never show those as translations.
+  var MYMEMORY_ERROR_PREFIXES = [
+    "PLEASE SELECT",
+    "MYMEMORY WARNING",
+    "QUERY LENGTH LIMIT EXCEEDED",
+    "INVALID SOURCE OR TARGET LANGUAGE",
+    "INVALID LANGUAGE PAIR"
+  ];
+
+  function isMyMemoryError(result) {
+    var upper = (result || "").replace(/^\s+|\s+$/g, "").toUpperCase();
+    for (var i = 0; i < MYMEMORY_ERROR_PREFIXES.length; i++) {
+      if (upper.indexOf(MYMEMORY_ERROR_PREFIXES[i]) === 0) return true;
+    }
+    return false;
+  }
+
   function translateViaMyMemory(sl, tl, text) {
     var langpair = sl + "|" + tl;
     var url =
@@ -434,9 +460,12 @@
       fetch(url).then(function (r) { return r.json(); }),
       8000
     ).then(function (data) {
+      var status = parseInt(data && data.responseStatus, 10);
+      if (!isNaN(status) && status !== 200) return "";
       if (data && data.responseData && data.responseData.translatedText) {
         var result = data.responseData.translatedText;
         if (result && result.toLowerCase() === text.toLowerCase()) return "";
+        if (isMyMemoryError(result)) return "";
         return result;
       }
       return "";
@@ -456,6 +485,12 @@
   }
 
   function translateText(sl, tl, text) {
+    // Same full language tag: nothing to translate (e.g. reading
+    // language equals the browser UI language).  Distinct tags such
+    // as zh-HK -> zh-CN are still translated.
+    if (sl && tl && sl.toLowerCase() === tl.toLowerCase()) {
+      return Promise.resolve("");
+    }
     return translateViaGoogle(sl, tl, text).then(function (result) {
       if (result) return result;
       return translateViaMyMemory(sl, tl, text);

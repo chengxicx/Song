@@ -62,6 +62,12 @@ class Language(
     kiwi_filter_particles = db.Column("LgKiwiFilterParticles", db.Boolean, default=False)
     kiwi_join_compound_nouns = db.Column("LgKiwiJoinCompoundNouns", db.Boolean, default=False)
 
+    # Optional per-language overrides for TTS and term translation.
+    # When empty, the TTS tag is derived from the language name, and
+    # the translation target falls back to the browser UI language.
+    tts_lang = db.Column("LgTTSLang", db.String(20))
+    translate_target_lang = db.Column("LgTranslateTargetLang", db.String(20))
+
     def __init__(self):
         self.character_substitutions = "´='|`='|’='|‘='|...=…|..=‥"
         self.regexp_split_sentences = ".!?"
@@ -153,6 +159,8 @@ class Language(
         ret["split_sentences"] = self.regexp_split_sentences
         ret["split_sentence_exceptions"] = self.exceptions_split_sentences
         ret["word_chars"] = self.word_characters
+        ret["tts_lang"] = self.tts_lang
+        ret["translate_target_lang"] = self.translate_target_lang
         return ret
 
     @staticmethod
@@ -183,6 +191,8 @@ class Language(
             "split_sentences": "regexp_split_sentences",
             "split_sentence_exceptions": "exceptions_split_sentences",
             "word_chars": "word_characters",
+            "tts_lang": "tts_lang",
+            "translate_target_lang": "translate_target_lang",
         }
 
         for key in d.keys():
