@@ -6,6 +6,7 @@ from glob import glob
 import yaml
 from lute.models.language import Language
 from lute.book.model import Book, Repository
+from lute.parse import plugin_installer
 
 # from lute.utils.debug_helpers import DebugTimer
 
@@ -102,6 +103,21 @@ class Service:
         ret = [ld for ld in self.lang_defs_cache if ld.language.is_supported]
         ret.sort(key=lambda x: x.language_name)
         return ret
+
+    def listable_predefined_languages(self):
+        """
+        Predefined languages that may be offered for loading: those
+        with a working parser, plus those whose missing parser plugin
+        can be auto-installed on load (ref lute.parse.plugin_installer).
+        """
+        ret = [
+            ld
+            for ld in self.lang_defs_cache
+            if ld.language.is_supported
+            or plugin_installer.is_auto_installable(ld.language.parser_type)
+        ]
+        ret.sort(key=lambda x: x.language_name)
+        return [d.language for d in ret]
 
     def supported_predefined_languages(self):
         "Supported Languages defined in yaml files."
