@@ -2,6 +2,7 @@
 Reading helpers.
 """
 
+import math
 import os
 import re
 from collections import defaultdict
@@ -74,7 +75,21 @@ def _extract_pdf_page_words(pdf_abs_path, pagenum):
         clean = text.replace("\r", "").replace("\n", "")
         if not clean.strip():
             return
-        fs = float(font_size) if font_size and float(font_size) > 0 else 10.0
+        tf = float(font_size) if font_size and float(font_size) > 0 else 10.0
+        # The Tf size is not always the rendered size: generators such as
+        # the one behind the Erin manga PDF write "/F1 1 Tf" and do the
+        # real scaling in the text matrix (Tm).  Take the vertical scale
+        # of the combined CTM x Tm matrices as the font size so line
+        # boxes match the rendered glyphs.
+        tm_sy = math.sqrt((tm[2] ** 2) + (tm[3] ** 2)) if tm else 0.0
+        if tm_sy < 1e-6 and tm:
+            tm_sy = math.sqrt((tm[0] ** 2) + (tm[1] ** 2))
+        cm_sy = math.sqrt((cm[2] ** 2) + (cm[3] ** 2)) if cm else 0.0
+        if cm_sy < 1e-6 and cm:
+            cm_sy = math.sqrt((cm[0] ** 2) + (cm[1] ** 2))
+        fs = tf * (tm_sy or 1.0) * (cm_sy or 1.0)
+        if fs <= 0:
+            fs = 10.0
         # Device position = CTM (cm) applied to the text matrix (tm).
         x = cm[0] * tm[4] + cm[2] * tm[5] + cm[4]
         y = cm[1] * tm[4] + cm[3] * tm[5] + cm[5]
