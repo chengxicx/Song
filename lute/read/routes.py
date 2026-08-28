@@ -593,6 +593,11 @@ def start_reading(bookid, pagenum):
         if ctx is None:
             return render_template("read/page_content.html", paragraphs=[])
         return render_template("read/manga_page.html", **ctx)
+    if (book.book_type or "") == "pdf":
+        ctx = service.pdf_page_context(book, pagenum, True)
+        if ctx is None:
+            return render_template("read/page_content.html", paragraphs=[])
+        return render_template("read/pdf_page.html", **ctx)
     paragraphs = service.start_reading(book, pagenum)
     return render_template("read/page_content.html", paragraphs=paragraphs)
 
@@ -632,6 +637,11 @@ def render_page_fragment(book, pagenum, track_page_open=False):
         if ctx is None:
             return render_template("read/page_content.html", paragraphs=[])
         return render_template("read/manga_page.html", **ctx)
+    if (book.book_type or "") == "pdf":
+        ctx = service.pdf_page_context(book, pagenum, track_page_open)
+        if ctx is None:
+            return render_template("read/page_content.html", paragraphs=[])
+        return render_template("read/pdf_page.html", **ctx)
     paragraphs = service.get_paragraphs(book, pagenum)
     return render_template("read/page_content.html", paragraphs=paragraphs)
 

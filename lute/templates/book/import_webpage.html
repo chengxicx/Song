@@ -61,6 +61,7 @@
     <option value="mp3">MP3 / M4A audio</option>
     <option value="video">Online video</option>
     <option value="manga">Mokuro Manga</option>
+    <option value="pdf">PDF</option>
   </select>
 </div>
 
@@ -302,6 +303,44 @@
   </div>
 </form>
 
+<form id="pdf-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
+  <p class="import-desc">Import a PDF file. The original PDF is shown unchanged, but the words become clickable so you can look them up and highlight them while reading.</p>
+  <div class="iform">
+    <div class="irow">
+      <label class="ilbl" for="pdf-language">Language</label>
+      <div class="ictrl">
+        <select id="pdf-language" name="language_id">
+          {% for id, name in language_choices %}
+          <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="pdf_title">Title</label>
+      <div class="ictrl">
+        <input type="text" id="pdf_title" name="pdf_title" placeholder="Optional, defaults to file name">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="pdf_file">PDF file</label>
+      <div class="ictrl">
+        <input type="file" id="pdf_file" name="pdf_file" accept=".pdf">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="pdf_tag">Tags</label>
+      <div class="ictrl">
+        <input type="text" id="pdf_tag" name="pdf_tag" class="form-control" value='[{"value":"PDF"}]'>
+      </div>
+    </div>
+  </div>
+  <div class="import-actions">
+    <input type="hidden" name="import_type" value="pdf">
+    <button type="submit" id="pdf-import" class="btn btn-primary">Import</button>
+  </div>
+</form>
+
 <script type="text/javascript">
   var EXISTING_TAGS = {{ existing_tags | tojson }};
 
@@ -325,6 +364,7 @@
     const mp3Form = $('#mp3-form');
     const videoForm = $('#video-form');
     const mangaForm = $('#manga-form');
+    const pdfForm = $('#pdf-form');
 
     // Init Tagify on all tag inputs.
     var ytTagify = setupTagsTagify(document.getElementById('youtube_tag'));
@@ -332,6 +372,7 @@
     var mp3Tagify = setupTagsTagify(document.getElementById('mp3_tag'));
     var videoTagify = setupTagsTagify(document.getElementById('video_tag'));
     var mangaTagify = setupTagsTagify(document.getElementById('manga_tag'));
+    var pdfTagify = setupTagsTagify(document.getElementById('pdf_tag'));
 
     const updateForms = function () {
       const t = typeSel.val();
@@ -341,6 +382,7 @@
       mp3Form.toggle(t === 'mp3');
       videoForm.toggle(t === 'video');
       mangaForm.toggle(t === 'manga');
+      pdfForm.toggle(t === 'pdf');
     };
 
     typeSel.on('change', updateForms);
@@ -362,6 +404,14 @@
       var f = $(this).prop('files')[0];
       if (!f) return;
       var titleField = $('#manga_title');
+      if (titleField.val() === '') {
+        titleField.val(getFilenameWithoutExtension(f.name));
+      }
+    });
+    $('#pdf_file').on('change', function () {
+      var f = $(this).prop('files')[0];
+      if (!f) return;
+      var titleField = $('#pdf_title');
       if (titleField.val() === '') {
         titleField.val(getFilenameWithoutExtension(f.name));
       }

@@ -8,6 +8,7 @@ from collections import defaultdict
 from datetime import datetime
 import functools
 from flask import current_app
+from pypdf import PdfReader
 from lute.models.term import Term, Status
 from lute.models.book import Text, WordsRead
 from lute.models.repositories import BookRepository, UserSettingRepository
@@ -17,6 +18,119 @@ from lute.read.render.calculate_textitems import get_string_indexes
 from lute.term.model import Repository
 
 # from lute.utils.debug_helpers import DebugTimer
+
+# Extracted PDF page word boxes, keyed by (abs path, page number).
+# Extraction is not cheap and users flip between pages often.  The
+# cache holds only positions, never terms or session objects.
+_pdf_page_words_cache = {}
+
+
+def _pdf_char_width(ch, fs):
+    "Estimated glyph width in PDF units, for hotspot boxes."
+    o = ord(ch)
+    if (
+        0x2E80 <= o <= 0x9FFF  # CJK radicals through unified ideographs
+        or 0xAC00 <= o <= 0xD7AF  # Hangul syllables
+        or 0xF900 <= o <= 0xFAFF  # CJK compatibility ideographs
+        or 0xFF00 <= o <= 0xFF60  # Fullwidth forms
+    ):
+        return fs
+    if ch == " ":
+        return fs * 0.3
+    if ch.isupper():
+        return fs * 0.67
+    return fs * 0.5
+
+
+def _extract_pdf_page_words(pdf_abs_path, pagenum):
+    """
+    Extract the reading-order words of one PDF page (1-based).
+
+    Uses pypdf's visitor_text to capture text runs with their baseline
+    positions, groups the runs into lines, and splits lines into words.
+    Boxes are estimates; the reading screen's JavaScript refines them
+    against pdf.js's exact glyph geometry after rendering.
+
+    Returns (page_width, page_height, words), coordinates in PDF points
+    with top-left origin, each word
+    {"text", "x", "y", "width", "height", "line"}.
+    """
+    key = (os.path.abspath(pdf_abs_path), pagenum)
+    if key in _pdf_page_words_cache:
+        return _pdf_page_words_cache[key]
+
+    reader = PdfReader(pdf_abs_path)
+    page = reader.pages[pagenum - 1]
+    pw = float(page.mediabox.width)
+    ph = float(page.mediabox.height)
+
+    runs = []
+
+    def _visit(text, cm, tm, font_dict, font_size):
+        if not text or not text.strip():
+            return
+        # Trailing newlines are pypdf artifacts of move-text-position
+        # operators, not glyphs.
+        clean = text.replace("\r", "").replace("\n", "")
+        if not clean.strip():
+            return
+        fs = float(font_size) if font_size and float(font_size) > 0 else 10.0
+        # Device position = CTM (cm) applied to the text matrix (tm).
+        x = cm[0] * tm[4] + cm[2] * tm[5] + cm[4]
+        y = cm[1] * tm[4] + cm[3] * tm[5] + cm[5]
+        runs.append({"text": clean, "x": x, "y": y, "fs": fs})
+
+    page.extract_text(visitor_text=_visit)
+
+    # Group runs into lines by baseline y, top to bottom, then order
+    # each line's runs left to right.
+    runs.sort(key=lambda r: (-r["y"], r["x"]))
+    lines = []
+    for run in runs:
+        placed = False
+        for line in lines:
+            if abs(run["y"] - line["y"]) <= max(run["fs"] * 0.5, 2.0):
+                line["runs"].append(run)
+                line["fs"] = max(line["fs"], run["fs"])
+                placed = True
+                break
+        if not placed:
+            lines.append({"y": run["y"], "fs": run["fs"], "runs": [run]})
+    lines.sort(key=lambda l: -l["y"])
+
+    words = []
+    for li, line in enumerate(lines):
+        line["runs"].sort(key=lambda r: r["x"])
+        fs = line["fs"]
+        top = ph - line["y"] - fs * 0.86
+        height = fs * 1.08
+        # Split each run's own text into words: every run starts at its
+        # own baseline x, so offsets must not span concatenated runs.
+        for run in line["runs"]:
+            for match in re.finditer(r"\S+", run["text"]):
+                est_width = sum(
+                    _pdf_char_width(c, fs)
+                    for c in run["text"][match.start() : match.end()]
+                )
+                x_before = sum(
+                    _pdf_char_width(c, fs) for c in run["text"][: match.start()]
+                )
+                words.append(
+                    {
+                        "text": match.group(0),
+                        "x": run["x"] + x_before,
+                        "y": top,
+                        "width": est_width,
+                        "height": height,
+                        "line": li,
+                    }
+                )
+
+    result = (pw, ph, words)
+    if len(_pdf_page_words_cache) > 100:
+        _pdf_page_words_cache.clear()
+    _pdf_page_words_cache[key] = result
+    return result
 
 
 class TermPopup:
@@ -449,6 +563,109 @@ class Service:
                         if key not in seen:
                             seen.add(key)
                             new_terms.append(ti.term)
+        for t in new_terms:
+            self.session.add(t)
+        self.session.commit()
+
+    def pdf_page_context(self, dbbook, pagenum, track_page_open=False):
+        """
+        Build the render context for one PDF book page: the pdf URL,
+        page dimensions, and the ordered words with tokenized text items.
+
+        Returns None if the book has no pdf file, or the page is out of
+        range.
+        """
+        pdf_path = (dbbook.pdf_path or "").strip("/")
+        if not pdf_path or not 1 <= pagenum <= dbbook.page_count:
+            return None
+
+        # Track page open / current position, same as text books.
+        text = dbbook.text_at_page(pagenum)
+        if track_page_open:
+            text.start_date = datetime.utcnow()
+            dbbook.current_tx_id = text.id
+        self.session.add(dbbook)
+        self.session.add(text)
+        self.session.commit()
+
+        pdf_abs = os.path.join(current_app.static_folder, pdf_path)
+        if not os.path.isfile(pdf_abs):
+            return None
+
+        page_width, page_height, words = _extract_pdf_page_words(pdf_abs, pagenum)
+
+        rs = RenderService(self.session)
+        lang = dbbook.language
+        word_contexts = []
+        order = 0
+        for word in words:
+            items = rs.get_textitems(word["text"], lang)
+            kept = []
+            for it in items:
+                # Guard against paragraph markers leaking through
+                # from the parser.
+                if it.text == "¶":
+                    continue
+                it.paragraph_number = word["line"] + 1
+                it.sentence_number = word["line"] + 1
+                it.index = order
+                order += 1
+                kept.append(it)
+            if not kept:
+                continue
+            # Estimated box in % of the page.  JavaScript refines this
+            # against pdf.js geometry after rendering; without it the
+            # words are still usable in roughly the right places.
+            box = [
+                word["x"] / page_width * 100,
+                word["y"] / page_height * 100,
+                max(word["width"], 1) / page_width * 100,
+                max(word["height"], 1) / page_height * 100,
+            ]
+            word_contexts.append(
+                {
+                    "box": box,
+                    "items": kept,
+                    "char_lens": [len(it.text) for it in kept],
+                }
+            )
+
+        # Save new status-0 terms so the words have data-wid on the
+        # next page load (mirrors _save_new_manga_terms).
+        self._save_new_pdf_terms(word_contexts)
+
+        return {
+            "page_num": pagenum,
+            "pdf_url": f"/static/{pdf_path}",
+            "page_width": page_width,
+            "page_height": page_height,
+            "words": word_contexts,
+        }
+
+    def _save_new_pdf_terms(self, word_contexts):
+        """
+        Add status-0 terms found in PDF page words.
+
+        Each word is tokenized with its own get_textitems() call, so a
+        word repeated within a page can produce several distinct,
+        unsaved Term objects for the same text; de-duplicate them by
+        (language, text_lc) before committing to avoid UNIQUE
+        constraint violations on words.WoLgID + words.WoTextLC.
+        """
+        seen = set()
+        new_terms = []
+        for word in word_contexts:
+            for ti in word["items"]:
+                if (
+                    ti.is_word
+                    and ti.term is not None
+                    and ti.term.id is None
+                    and ti.term.status == 0
+                ):
+                    key = (ti.term.language.id, ti.term.text_lc)
+                    if key not in seen:
+                        seen.add(key)
+                        new_terms.append(ti.term)
         for t in new_terms:
             self.session.add(t)
         self.session.commit()
