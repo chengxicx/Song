@@ -59,6 +59,12 @@ function incrementFontSize(delta) {
   });
 
   localStorage.setItem(STORAGE_KEY, newSize);
+  // The screen groups were measured for the old font size; re-flow so
+  // paragraphs don't spill into an overflowing multicol column.
+  // (delta === 0 is the post-reload re-apply, which re-splits anyway.)
+  if (delta !== 0 && typeof _splitToScreens === "function") {
+    requestAnimationFrame(_splitToScreens);
+  }
 }
 
 function convertPixelsToRem(sizePx) {
@@ -81,6 +87,9 @@ function incrementLineHeight(delta) {
 
   paras.forEach((p) => { p.style.lineHeight = new_h; });
   localStorage.setItem(STORAGE_KEY, new_h);
+  if (delta !== 0 && typeof _splitToScreens === "function") {
+    requestAnimationFrame(_splitToScreens);
+  }
 }
 
 function setTextWidth(factor) {
