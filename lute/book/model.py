@@ -94,6 +94,14 @@ class Book:  # pylint: disable=too-many-instance-attributes
         self.manga_path = None
         self.manga_data = None
 
+        # PDF book fields.
+        # pdf_path is the relative path under the static folder of the
+        # imported PDF file, e.g. "pdf/<uuid>/file.pdf".
+        # pdf_page_count is transient, filled during import from the
+        # saved file, and used to create one empty page per PDF page.
+        self.pdf_path = None
+        self.pdf_page_count = None
+
         self.threshold_page_tokens = 250
         self.split_by = "paragraphs"
 
@@ -113,6 +121,10 @@ class Book:  # pylint: disable=too-many-instance-attributes
         # The source archive used for Mokuro manga (zip/cbz).
         self.manga_stream = None
         self.manga_stream_filename = None
+
+        # The source file used for PDF books.
+        self.pdf_stream = None
+        self.pdf_stream_filename = None
 
     def __repr__(self):
         return f"<Book (id={self.id}, title='{self.title}')>"
@@ -279,6 +291,14 @@ class Repository:
                 b = DBBook(book.title, lang)
                 for index, _page in enumerate(pages):
                     _ = DBText(b, "", index + 1)
+            elif book.book_type == "pdf":
+                # PDF books have no plain text; create one (empty)
+                # page per PDF page.  The reading screen renders the
+                # original PDF and overlays clickable word hotspots.
+                page_count = book.pdf_page_count or 1
+                b = DBBook(book.title, lang)
+                for index in range(page_count):
+                    _ = DBText(b, "", index + 1)
             else:
                 pages = self._split_pages(book, lang)
                 b = DBBook(book.title, lang)
@@ -319,6 +339,7 @@ class Repository:
         b.media_url = book.media_url
         b.manga_path = book.manga_path
         b.manga_data = book.manga_data
+        b.pdf_path = book.pdf_path
 
         btr = BookTagRepository(self.session)
         booktags = []
@@ -352,5 +373,6 @@ class Repository:
         b.media_url = dbbook.media_url
         b.manga_path = dbbook.manga_path
         b.manga_data = dbbook.manga_data
+        b.pdf_path = dbbook.pdf_path
         b.book_tags = [t.text for t in dbbook.book_tags]
         return b
