@@ -39,7 +39,14 @@
 
   function _getDoc(url) {
     if (!_docs[url]) {
-      _docs[url] = _lib().getDocument(url).promise;
+      // cmaps/standard_fonts are vendored next to pdf.module.js; CJK
+      // CID-keyed fonts need the packed cmaps to render and extract text.
+      _docs[url] = _lib().getDocument({
+        url,
+        cMapUrl: "/static/js/vendor/pdfjs/cmaps/",
+        cMapPacked: true,
+        standardFontDataUrl: "/static/js/vendor/pdfjs/standard_fonts/",
+      }).promise;
     }
     return _docs[url];
   }
