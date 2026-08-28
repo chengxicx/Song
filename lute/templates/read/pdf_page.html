@@ -1,0 +1,35 @@
+{# Render one PDF book page: the page canvas drawn by pdf.js, with
+   the tokenized words overlaid as absolutely positioned, clickable
+   highlight boxes.  Box positions are % of the page, estimated by the
+   server from pypdf geometry; pdf-reader.js refines left/width against
+   pdf.js's exact text layout after rendering. #}
+<div class="pdf-page"
+     data-pdf-url="{{ pdf_url }}"
+     data-page-num="{{ page_num }}"
+     data-page-width="{{ page_width }}"
+     data-page-height="{{ page_height }}">
+  <canvas class="pdf-page-canvas"></canvas>
+
+  {% for word in words %}
+  <div class="pdf-word"
+       style="left: {{ '%.3f'|format(word['box'][0]) }}%; top: {{ '%.3f'|format(word['box'][1]) }}%; width: {{ '%.3f'|format(word['box'][2]) }}%; height: {{ '%.3f'|format(word['box'][3]) }}%;">
+    {# Each token gets a flex slot sized by its character count, so
+       the token spans together cover the word box. #}
+    {% for item in word['items'] %}
+    <span class="pdf-word-seg" style="flex: {{ word['char_lens'][loop.index0] }} 1 0px;">{% include 'read/textitem.html' %}</span>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+  // Defined in lute.js: restore the current cursor/hover marker and
+  // apply term status classes, exactly like read/page_content.html.
+  parent.reset_cursor_marker();
+  parent.add_status_classes();
+
+  // Draw the page canvas and refine the word boxes (pdf-reader.js).
+  if (window.PdfReaderPage) {
+    window.PdfReaderPage.load();
+  }
+</script>

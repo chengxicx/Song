@@ -9,6 +9,20 @@
 {% elif book_type == "bilibili" %}
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/dash.all.min.js') }}?v=20260816" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/bilibili-player.js') }}?v=20260816c" charset="utf-8" defer></script>
+{% elif book_type == "pdf" %}
+{# Vendored pdf.js (Mozilla, Apache 2.0).  The inline module exposes
+   window.pdfjsLib with a shared module worker and fires "pdfjs-ready";
+   the deferred pdf-reader.js below runs after it, in document order. #}
+<script type="module">
+  import * as pdfjsLib from "{{ url_for('static', filename='js/vendor/pdfjs/pdf.module.js') }}";
+  pdfjsLib.GlobalWorkerOptions.workerPort = new Worker(
+    "{{ url_for('static', filename='js/vendor/pdfjs/pdf.worker.module.js') }}",
+    { type: "module" }
+  );
+  window.pdfjsLib = pdfjsLib;
+  window.dispatchEvent(new Event("pdfjs-ready"));
+</script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/pdf-reader.js') }}?v=20260828" charset="utf-8" defer></script>
 {% endif %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}?v=20260805f" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}?v=20260826c" charset="utf-8" defer></script>
@@ -42,7 +56,7 @@
 
 <div id="read_pane_left">
 
-  <div id="reading_menu"{% if book_type != 'manga' %} class="not-manga"{% endif %}>
+  <div id="reading_menu"{% if book_type not in ('manga', 'pdf') %} class="not-manga"{% endif %}>
     {% include "read/reading_menu.html" %}
   </div>
 
@@ -108,7 +122,7 @@
   {% endif %}
 
   <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
-  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %} class="{% if book_type == 'manga' %}manga-text-container{% endif %}">
+  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %} class="{% if book_type == 'manga' %}manga-text-container{% elif book_type == 'pdf' %}pdf-text-container{% endif %}">
     ...
   </div>
 
@@ -520,9 +534,10 @@
     // is swapped in and laid out (fonts/status classes are applied above).
     requestAnimationFrame(_splitToScreens);
 
-    // Manga pages are image-based: scale the whole page so it fits the
-    // reading area without a scrollbar, then re-fit once the image
-    // finishes decoding (its intrinsic height is 0 until then).
+    // Manga / PDF pages are fixed pages with %-positioned overlays:
+    // scale the whole page so it fits the reading area, then re-fit once
+    // the image finishes decoding (manga: its intrinsic height is 0
+    // until then) or once the canvas renders (PDF).
     if (_isMangaReader()) {
       const img = theText?.querySelector(".manga-page-img");
       if (img) img.addEventListener("load", () => _fitMangaPage(), { once: true });
@@ -670,9 +685,13 @@
   let subScreens = [];
   let curScreen = 0;
 
+  // True for the manga and PDF readers: both show one fixed page with
+  // %-positioned word overlays (no sub-screen splitting; the fit and
+  // zoom controls apply).
   const _isMangaReader = () => {
     const t = document.getElementById("thetext");
-    return !!t && t.classList.contains("manga-text-container");
+    return !!t && (t.classList.contains("manga-text-container")
+                || t.classList.contains("pdf-text-container"));
   };
 
   // Video / YouTube books read in a plain scrolling pane by default;
@@ -686,10 +705,10 @@
     return !c || !c.classList.contains("yt-audio-mode");
   };
 
-  // Fit a manga page (art + text overlays) into the reading area while
-  // keeping it horizontally centered.  The page is given explicit pixel
-  // dimensions and the image fills that box, so the %-positioned text
-  // blocks resolve against exactly the rendered image box.
+  // Fit a manga page (art + text overlays) or a PDF page (canvas +
+  // text overlays) into the reading area while keeping it horizontally
+  // centered.  The page is given explicit pixel dimensions, so the
+  // %-positioned word boxes resolve against exactly that rendered box.
   //
   // We deliberately do NOT use `transform: scale()` for this fit: a
   // transformed .manga-page inside an overflow:hidden ancestor causes the
@@ -699,20 +718,34 @@
   // click hit areas stop lining up with the image text.
   function _fitMangaPage() {
     const wrap = theText;
-    if (!wrap || !wrap.classList.contains("manga-text-container")) return;
-    const page = wrap.querySelector(".manga-page");
-    const img = wrap.querySelector(".manga-page-img");
-    if (!page || !img) return;
+    if (!wrap) return;
+    const isPdf = wrap.classList.contains("pdf-text-container");
+    if (!isPdf && !wrap.classList.contains("manga-text-container")) return;
+    const page = wrap.querySelector(isPdf ? ".pdf-page" : ".manga-page");
+    if (!page) return;
+    let natW, natH;
+    let media = null;
+    if (isPdf) {
+      // PDF pages know their natural size from the document itself.
+      natW = parseFloat(page.dataset.pageWidth);
+      natH = parseFloat(page.dataset.pageHeight);
+    } else {
+      media = wrap.querySelector(".manga-page-img");
+      if (!media) return;
+      natW = media.naturalWidth;
+      natH = media.naturalHeight;
+    }
+    if (!natW || !natH) return; // dimensions not known yet; retried later
     page.style.transform = "none";
     const availW = wrap.clientWidth;
     const availH = wrap.clientHeight;
-    const natW = img.naturalWidth;
-    const natH = img.naturalHeight;
-    if (!natW || !natH) return; // image not decoded yet; retried on load
     // Fit the page to the pane, then multiply by the user's zoom factor
     // (1 = just fits); zoom > 1 enlarges the page (it then scrolls in the
-    // auto-overflow manga container), zoom < 1 shrinks it.
-    const fit = Math.min(1, availW / natW, availH / natH) || 1;
+    // auto-overflow container), zoom < 1 shrinks it.  A PDF page only
+    // fits the width and scrolls vertically, like a normal PDF reader.
+    const fit = isPdf
+      ? Math.min(1, availW / natW) || 1
+      : Math.min(1, availW / natW, availH / natH) || 1;
     const zoom = _getMangaZoom();
     const scale = fit * zoom;
     const w = Math.max(10, Math.floor(natW * scale));
@@ -720,28 +753,39 @@
     page.style.width = `${w}px`;
     page.style.height = `${h}px`;
     page.style.margin = "0 auto";
-    img.style.width = "100%";
-    img.style.height = "100%";
+    if (media) {
+      media.style.width = "100%";
+      media.style.height = "100%";
+    }
   }
 
   const MANGA_ZOOM_STORAGE = "mangaZoom";
+  const PDF_ZOOM_STORAGE = "pdfZoom";
   const MANGA_ZOOM_MIN = 0.5;
   const MANGA_ZOOM_MAX = 2.5;
 
+  // Manga and PDF keep independent zoom levels.
+  function _zoomStorageKey() {
+    const t = theText;
+    return t && t.classList.contains("pdf-text-container")
+      ? PDF_ZOOM_STORAGE
+      : MANGA_ZOOM_STORAGE;
+  }
+
   function _getMangaZoom() {
-    const raw = parseFloat(localStorage.getItem(MANGA_ZOOM_STORAGE));
+    const raw = parseFloat(localStorage.getItem(_zoomStorageKey()));
     if (!Number.isFinite(raw) || raw <= 0) return 1;
     return clamp(raw, MANGA_ZOOM_MIN, MANGA_ZOOM_MAX);
   }
 
   // Global handler wired up by text-options.js buttons (only meaningful on
-  // manga pages, where .manga-text-container is present).  delta is +1 for
-  // zoom-in, -1 for zoom-out; each step scales by ~1.2x.
+  // manga / PDF pages, where a fixed-page container is present).  delta is
+  // +1 for zoom-in, -1 for zoom-out; each step scales by ~1.2x.
   function setMangaZoom(delta) {
     if (!_isMangaReader()) return;
     const zoom = clamp(_getMangaZoom() * Math.pow(1.2, delta),
                        MANGA_ZOOM_MIN, MANGA_ZOOM_MAX);
-    localStorage.setItem(MANGA_ZOOM_STORAGE, String(Math.round(zoom * 100) / 100));
+    localStorage.setItem(_zoomStorageKey(), String(Math.round(zoom * 100) / 100));
     _fitMangaPage();
   }
 
@@ -749,7 +793,7 @@
   // (i.e. the pane-fit default) and re-fit.
   function resetMangaZoom() {
     if (!_isMangaReader()) return;
-    localStorage.setItem(MANGA_ZOOM_STORAGE, "1");
+    localStorage.setItem(_zoomStorageKey(), "1");
     _fitMangaPage();
   }
 

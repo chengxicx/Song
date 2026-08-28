@@ -75,6 +75,11 @@ class Book(
     manga_path = db.Column("BkMangaPath", db.String)
     manga_data = db.Column("BkMangaData", db.String)
 
+    # PDF book fields (see migration 20260828_add_book_pdf_field.sql).
+    # pdf_path is the relative path under the static folder of the
+    #   imported PDF file, e.g. "pdf/<uuid>/file.pdf".
+    pdf_path = db.Column("BkPdfPath", db.String)
+
     language = db.relationship("Language")
     texts = db.relationship(
         "Text",
