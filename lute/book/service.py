@@ -694,6 +694,43 @@ class Service:
 
         return f"manga/{manga_uuid}", mokuro
 
+    def extract_pdf(self, filename, filestream):
+        """
+        Save an uploaded PDF into static/pdf/{uuid}/file.pdf.
+
+        Returns (pdf_path, page_count), where pdf_path is the relative
+        path under the static folder (e.g. "pdf/<uuid>/file.pdf") and
+        page_count is the number of pages in the PDF.
+
+        Raises BookImportException on invalid files.
+        """
+        _, ext = os.path.splitext(filename)
+        ext = (ext or "").lower()
+        if ext != ".pdf":
+            raise BookImportException(
+                f"Unsupported pdf file extension '{ext}'; use .pdf."
+            )
+
+        pdf_root = os.path.join(current_app.static_folder, "pdf")
+        pdf_uuid = uuid.uuid4().hex
+        target_dir = os.path.join(pdf_root, pdf_uuid)
+        os.makedirs(target_dir, exist_ok=True)
+        target_file = os.path.join(target_dir, "file.pdf")
+
+        try:
+            with open(target_file, "wb") as fcopy:
+                fcopy.write(filestream.read())
+            reader = PdfReader(target_file)
+            page_count = len(reader.pages)
+            if page_count == 0:
+                raise ValueError("PDF has no pages")
+        except Exception as e:
+            shutil.rmtree(target_dir, ignore_errors=True)
+            msg = f"Could not read PDF {filename} (error: {str(e)})"
+            raise BookImportException(message=msg, cause=e) from e
+
+        return f"pdf/{pdf_uuid}/file.pdf", page_count
+
     def youtube_title(self, url):
         """
         Best-effort title lookup for a YouTube video.
@@ -854,6 +891,14 @@ class Service:
             )
             book.manga_path = manga_path
             book.manga_data = json.dumps(mokuro, ensure_ascii=False)
+
+        if book.pdf_stream:
+            _raise_if_none(book.pdf_stream_filename, "pdf_stream_filename")
+            pdf_path, page_count = self.extract_pdf(
+                book.pdf_stream_filename, book.pdf_stream
+            )
+            book.pdf_path = pdf_path
+            book.pdf_page_count = page_count
 
         repo = Repository(session)
         dbbook = repo.add(book)

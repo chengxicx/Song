@@ -152,6 +152,9 @@ cython_debug/
 # Generated manga assets (user-imported ZIP/CBZ content; regenerated on demand)
 lute/static/manga/
 
+# Generated PDF assets (user-imported PDF content)
+lute/static/pdf/
+
 # Server runtime data (not part of source)
 deploy.sh
 requirements.txt
