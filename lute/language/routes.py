@@ -75,6 +75,18 @@ def _handle_form(language, form) -> bool:
     return result
 
 
+def _ensure_tag_choices_include_current(form, language):
+    """
+    Keep a stored tag value selectable in the TTS / translate target
+    dropdowns even if it isn't in the standard tag list (e.g. "yue").
+    Assigns a new list so the shared class-level choices are untouched.
+    """
+    for field in (form.tts_lang, form.translate_target_lang):
+        val = getattr(language, field.name, None)
+        if val and val.strip() and val not in [c[0] for c in field.choices]:
+            field.choices = field.choices + [(val, f"{val} -- (current setting)")]
+
+
 def _add_hidden_dictionary_template_entry(form):
     "Add a dummy placeholder dictionary to be used as a template."
     # Add a dummy dictionary entry with dicturi __TEMPLATE__.
@@ -146,6 +158,7 @@ def edit(langid):
 
     form = LanguageForm(obj=language)
     form.parser_type.choices = _dropdown_parser_choices(language)
+    _ensure_tag_choices_include_current(form, language)
 
     if _handle_form(language, form):
         return redirect("/")
@@ -171,6 +184,7 @@ def new(langname):
 
     form = LanguageForm(obj=language)
     form.parser_type.choices = _dropdown_parser_choices(language)
+    _ensure_tag_choices_include_current(form, language)
 
     if _handle_form(language, form):
         # New language, so show everything b/c user should re-choose

@@ -13,7 +13,8 @@ from wtforms import (
     Form,
     ValidationError,
 )
-from wtforms.validators import DataRequired, Optional, Regexp
+from wtforms.validators import DataRequired
+from lute.language.langtags import tag_choices
 from lute.models.language import LanguageDictionary
 
 
@@ -69,28 +70,15 @@ class LanguageForm(FlaskForm):
 
     # --- Optional per-language TTS / translation overrides.
     # Rendered by the generic field loop in _form.html.
-    _lang_tag_regex = r"^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$"
-    tts_lang = StringField(
-        "TTS 语言代码 (TTS Language Tag)",
-        validators=[
-            Optional(),
-            Regexp(
-                _lang_tag_regex,
-                message='格式应为 BCP-47 标签，如 "zh-HK"、"yue"、"ja-JP"',
-            ),
-        ],
-        render_kw={"placeholder": "例如 zh-HK / yue / ja-JP，留空则按语言名自动推断"},
+    tts_lang = SelectField(
+        "TTS Language",
+        choices=tag_choices("auto-detect from language name"),
+        default="",
     )
-    translate_target_lang = StringField(
-        "Google 翻译目标语言 (Translate Target)",
-        validators=[
-            Optional(),
-            Regexp(
-                _lang_tag_regex,
-                message='格式应为语言代码，如 "zh-CN"、"en"',
-            ),
-        ],
-        render_kw={"placeholder": "例如 zh-CN，留空则使用浏览器语言"},
+    translate_target_lang = SelectField(
+        "Google Translate Target",
+        choices=tag_choices("browser language"),
+        default="",
     )
 
     # --- Korean / Kiwi-specific settings.
