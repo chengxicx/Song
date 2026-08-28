@@ -1077,6 +1077,13 @@ div#thetext.manga-text-container {
     -ms-overflow-style: none;       /* old Edge/IE */
 }
 
+/* Video / YouTube books outside audio-only mode: scroll the reading
+   area like a normal page instead of the fit-to-screen arrow paging
+   (the .video-scroll-mode class is managed by _splitToScreens). */
+div#thetext.video-scroll-mode {
+    overflow-y: auto;
+}
+
 div#thetext.manga-text-container::-webkit-scrollbar {
     display: none;                  /* Chrome/Safari/Edge */
 }
