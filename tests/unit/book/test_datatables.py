@@ -11,6 +11,7 @@ from lute.db import db
 from lute.db.demo import Service as DemoService
 from lute.book.stats import Service as StatsService
 from tests.utils import make_book
+from lute.book.model import Book as ServiceBook, Repository as ServiceRepository
 
 
 @pytest.fixture(name="_dt_params")
@@ -169,3 +170,129 @@ def test_manga_book_word_count_in_datatables(app_context, empty_db, _dt_params):
     assert len(rows) == 1
     wc = rows[0]["WordCount"]
     assert wc is not None and wc > 0
+
+
+# ======================================================================
+# Series aggregation (books collapsed by configured "series tag").
+# ======================================================================
+
+from lute.models.repositories import UserSettingRepository
+
+
+def _set_series_setting(session, tags):
+    "Configure the comma-separated book_series_tags setting."
+    UserSettingRepository(session).set_value("book_series_tags", ",".join(tags))
+    session.commit()
+
+
+def _mk_tagged_book(title, tags, language, read=False):
+    "Create a book with the given tags via the service layer."
+    svcbook = ServiceBook()
+    svcbook.language_id = language.id
+    svcbook.title = title
+    svcbook.text = f"{title} text."
+    svcbook.book_tags = tags
+    repo = ServiceRepository(db.session)
+    dbbook = repo.add(svcbook)
+    repo.commit()
+    if read:
+        dbbook.texts[0].read_date = datetime.now()
+        db.session.add(dbbook)
+        db.session.commit()
+    return dbbook
+
+
+@pytest.fixture(name="_series_books")
+def fixture_series_books(english):
+    "Three books tagged Erin (one read), one tagged only Video, one untagged."
+    _mk_tagged_book("Erin-01-adv", ["Erin", "Video"], english)
+    _mk_tagged_book("Erin-01-ba", ["Erin", "Video"], english)
+    _mk_tagged_book("Erin-02-ba", ["Erin"], english, read=True)
+    _mk_tagged_book("Other Book", ["Video"], english)
+    _mk_tagged_book("Standalone", [], english)
+
+
+def test_series_tags_setting_default_exists(app_context):
+    "The book_series_tags setting key is created with the app defaults."
+    assert UserSettingRepository(db.session).get_value("book_series_tags") == ""
+
+
+def test_series_aggregation_collapses_tagged_books(
+    app_context, _dt_params, _series_books
+):
+    "Tagged books become one row; untagged books stay individual."
+    _set_series_setting(db.session, ["Erin"])
+    d = get_data_tables_list(_dt_params, False, db.session)
+    assert d["recordsTotal"] == 3, "1 series row + 2 standalone books"
+
+    series = [r for r in d["data"] if r["SeriesTag"]]
+    assert len(series) == 1
+    s = series[0]
+    assert s["BkTitle"] == "Erin"
+    assert s["BkID"] is None, "series rows have no book id"
+    assert s["SeriesBookCount"] == 3
+    assert s["SeriesReadCount"] == 1, "one episode read"
+    assert s["WordCount"] > 0, "word counts summed"
+    assert s["IsCompleted"] == 0, "not all episodes read"
+
+    flats = [r["BkTitle"] for r in d["data"] if not r["SeriesTag"]]
+    assert sorted(flats) == ["Other Book", "Standalone"]
+
+
+def test_series_book_with_two_series_tags_grouped_once(
+    app_context, _dt_params, english
+):
+    "A book carrying two configured series tags appears in one group only."
+    _mk_tagged_book("dual", ["aaa", "bbb"], english)
+    _mk_tagged_book("bbb-book", ["bbb"], english)
+    _set_series_setting(db.session, ["aaa", "bbb"])
+
+    d = get_data_tables_list(_dt_params, False, db.session)
+    groups = {r["BkTitle"]: r["SeriesBookCount"] for r in d["data"] if r["SeriesTag"]}
+    assert groups == {"aaa": 1, "bbb": 1}, "dual book only under first tag (aaa)"
+
+
+def test_series_aggregation_flat_when_searching(
+    app_context, _dt_params, _series_books
+):
+    "An active search disables aggregation so all books are findable."
+    _set_series_setting(db.session, ["Erin"])
+    _dt_params["search"] = {"value": "Erin", "regex": False}
+    d = get_data_tables_list(_dt_params, False, db.session)
+    titles = sorted(r["BkTitle"] for r in d["data"])
+    assert titles == ["Erin-01-adv", "Erin-01-ba", "Erin-02-ba"]
+    assert all(r["SeriesTag"] is None for r in d["data"])
+
+
+def test_series_aggregation_flat_when_tag_filtered(
+    app_context, _dt_params, _series_books
+):
+    "An active tag filter disables aggregation."
+    _set_series_setting(db.session, ["Erin"])
+    _dt_params["filtTag"] = "Erin"
+    d = get_data_tables_list(_dt_params, False, db.session)
+    assert d["recordsTotal"] == 3, "flat list of the tagged books"
+    assert all(r["SeriesTag"] is None for r in d["data"])
+
+
+def test_series_aggregation_no_tags_configured(
+    app_context, _dt_params, _series_books
+):
+    "No aggregation when the setting is empty."
+    _set_series_setting(db.session, [])
+    d = get_data_tables_list(_dt_params, False, db.session)
+    assert d["recordsTotal"] == 5
+
+
+def test_series_aggregation_respects_language_filter(
+    app_context, _dt_params, _series_books, english
+):
+    "Language filtering applies to series rows and standalone books alike."
+    _set_series_setting(db.session, ["Erin"])
+    _dt_params["filtLanguage"] = str(english.id)
+    d = get_data_tables_list(_dt_params, False, db.session)
+    assert d["recordsTotal"] == 3
+
+    _dt_params["filtLanguage"] = "999999"
+    d = get_data_tables_list(_dt_params, False, db.session)
+    assert d["recordsTotal"] == 0

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Series: {{ tag }}{% endblock %}
+
+{% block header %}Series: {{ tag }}{% endblock %}
+
+{% block body %}
+
+<div class="series-summary">
+  <div class="series-summary-title">
+    {{ tag }}
+    <span class="series-summary-lang">tag series</span>
+  </div>
+  <div class="series-summary-stat">
+    {% if book_count == total_count %}{{ total_count }} books{% else %}{{ book_count }} books (+{{ total_count - book_count }} archived){% endif %}
+    &middot; {{ "{:,}".format(total_words) }} words
+  </div>
+  <div class="series-summary-stat">
+    <b>{{ read_count }}/{{ book_count }}</b> read{% if total_count > 0 %} ({{ ((read_count * 100 / book_count) | round | int) }}%){% endif %}
+  </div>
+  <div class="series-summary-stat">
+    avg new-word
+    {% if avg_new_word_percent is not none %}{{ avg_new_word_percent }}%{% else %}&mdash;{% endif %}
+    <span class="new-word-badge {{ difficulty_color }}" title="{{ difficulty_description }}">{{ difficulty_label }}</span>
+  </div>
+  <div class="series-summary-continue">
+    <a class="series-continue-btn" href="/read/{{ continue_id }}" title="Open the first unread book in this series">&#9654; Continue: {{ continue_title }}</a>
+  </div>
+</div>
+
+<table class="table dataTable stripe" id="seriestable">
+  <thead>
+    <tr>
+      <th style="text-align: left">Title</th>
+      <th style="text-align: left">Word count</th>
+      <th style="text-align: left">Status</th>
+      <th style="text-align: left">New word</th>
+      <th style="text-align: left">Last read</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for b in books %}
+    <tr class="{{ 'series-book-archived' if b.archived else '' }}">
+      <td>
+        <a class="book-title {{ 'completed_book' if b.is_completed else '' }}" href="/read/{{ b.id }}">{{ b.title }}</a>
+        {% if b.archived %}<span class="series-book-archived-note">(archived)</span>{% endif %}
+        {% if b.progress and not b.is_completed %}<span class="series-book-progress">{{ b.progress }}</span>{% endif %}
+      </td>
+      <td>{{ "{:,}".format(b.word_count) }}</td>
+      <td>{{ b.status_bar_html | safe }}</td>
+      <td>
+        <span class="new-word-badge {{ b.difficulty_color }}" title="{{ b.difficulty_description }}">
+          {{ b.difficulty_label }}{% if b.new_word_percent is not none %} {{ b.new_word_percent }}%{% endif %}
+        </span>
+      </td>
+      <td>{% if b.last_read %}{{ b.last_read }}{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
