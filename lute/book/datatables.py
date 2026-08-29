@@ -87,6 +87,7 @@ def _flat_base_sql(archived, extra_where=""):
         {difficulty_col["color"]} AS DifficultyColor,
         {difficulty_col["description"]} AS DifficultyDescription,
         case when completed_books.BkID is null then 0 else 1 end as IsCompleted,
+        b.BkBookType AS BookType,
         NULL as SeriesTag,
         NULL as SeriesBookCount,
         NULL as SeriesReadCount
@@ -156,6 +157,9 @@ def _series_union_base_sql(archived, series_tags):
         {difficulty_col["color"]} AS DifficultyColor,
         {difficulty_col["description"]} AS DifficultyDescription,
         CASE WHEN agg.readcount >= agg.bookcount THEN 1 ELSE 0 END AS IsCompleted,
+        /* Series aggregate rows report 'series' so the frontend renders
+           the aggregation icon in the Type column. */
+        'series' AS BookType,
         agg.tagtext AS SeriesTag,
         agg.bookcount AS SeriesBookCount,
         agg.readcount AS SeriesReadCount
