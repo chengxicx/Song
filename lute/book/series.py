@@ -24,7 +24,8 @@ SELECT
     c.new_word_percent AS NewWordPercent,
     c.unknownpercent AS UnknownPercent,
     c.status_distribution AS StatusDistribution,
-    CASE WHEN completed_books.BkID IS NULL THEN 0 ELSE 1 END AS IsCompleted
+    CASE WHEN completed_books.BkID IS NULL THEN 0 ELSE 1 END AS IsCompleted,
+    b.BkBookType AS BookType
 FROM books b
 INNER JOIN languages ON LgID = b.BkLgID
 LEFT OUTER JOIN texts currtext ON currtext.TxID = BkCurrentTxID
@@ -127,6 +128,7 @@ def get_series_overview(session, tagtext):
                 "DifficultyColor": color_class,
                 "DifficultyDescription": description,
                 "IsCompleted": 1 if is_completed else 0,
+                "BookType": r.BookType or "",
                 "BkArchived": 1 if r.BkArchived else 0,
                 "PageNum": pagenum,
                 "PageCount": pagecount,
