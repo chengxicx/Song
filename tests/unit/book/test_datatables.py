@@ -212,6 +212,33 @@ def fixture_series_books(english):
     _mk_tagged_book("Standalone", [], english)
 
 
+def test_book_type_exposed_for_flat_and_series_rows(
+    app_context, _dt_params, english
+):
+    "Flat rows carry the book's type; aggregated series rows say 'series'."
+    svcbook = ServiceBook()
+    svcbook.language_id = english.id
+    svcbook.title = "yt book"
+    svcbook.text = "yt book text."
+    svcbook.book_type = "youtube"
+    svcbook.book_tags = ["Erin"]
+    repo = ServiceRepository(db.session)
+    repo.add(svcbook)
+    repo.commit()
+
+    _set_series_setting(db.session, [])
+    d = get_data_tables_list(_dt_params, False, db.session)
+    flats = [r for r in d["data"] if r["BkTitle"] == "yt book"]
+    assert len(flats) == 1
+    assert flats[0]["BookType"] == "youtube"
+
+    _set_series_setting(db.session, ["Erin"])
+    d = get_data_tables_list(_dt_params, False, db.session)
+    series = [r for r in d["data"] if r["SeriesTag"]]
+    assert len(series) == 1
+    assert series[0]["BookType"] == "series"
+
+
 def test_series_tags_setting_default_exists(app_context):
     "The book_series_tags setting key is created with the app defaults."
     assert UserSettingRepository(db.session).get_value("book_series_tags") == ""

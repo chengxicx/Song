@@ -11,12 +11,10 @@
     {{ tag }}
     <span class="series-summary-lang">tag series</span>
     <a class="series-settings-gear" href="/book/settings" title="Configure book series tags">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-        <line x1="10" y1="9" x2="16" y2="9"></line>
-        <line x1="10" y1="12" x2="16" y2="12"></line>
-        <line x1="10" y1="15" x2="13" y2="15"></line>
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4c6ef5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path>
+        <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path>
+        <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path>
       </svg>
     </a>
   </div>
@@ -40,6 +38,7 @@
 <table id="booktable" class="table dataTable stripe">
   <thead>
     <tr>
+      <th style="text-align: left">Type</th>
       <th style="text-align: left">Title</th>
       <th style="text-align: left">Language</th>
       <th style="text-align: left">Tags</th>
@@ -125,11 +124,11 @@
       // page follows the home page's column setup; the search term is
       // not part of the saved state, so the two pages don't leak
       // searches into each other.
-      order: [[0, 'asc']],
+      order: [[1, 'asc']],
       stateSave: true,
       stateDuration: 0,
       stateSaveCallback: function(settings, data) {
-        data.version = 4;
+        data.version = 5;
         data.search = { search: "", regex: false, smart: true };
         data.columns.forEach(function(c) { c.search = { search: "", regex: false, smart: true }; });
         var stateJson = JSON.stringify(data);
@@ -148,8 +147,8 @@
         var saved = localStorage.getItem('booklisting_datatables_state');
         if (saved) {
           try {
-            var ld = JSON.parse(saved);
-            if (ld && ld.version === 4) {
+              var ld = JSON.parse(saved);
+              if (ld && ld.version === 5) {
               ld.search = { search: "", regex: false, smart: true };
               callback(ld);
               return;
@@ -164,7 +163,7 @@
             if (resp && resp.value) {
               try {
                 var sd = JSON.parse(resp.value);
-                if (sd && sd.version === 4) {
+                if (sd && sd.version === 5) {
                   localStorage.setItem('booklisting_datatables_state', resp.value);
                   sd.search = { search: "", regex: false, smart: true };
                   callback(sd);
@@ -191,9 +190,10 @@
         enable_column_resize();
       },
       columns: [
-        { name: "BkTitle", className: "col-title", width: "28%", data: "BkTitle", render: render_book_title },
+        { name: "BookType", className: "col-type", width: "4%", data: "BookType", searchable: false, render: render_book_type },
+        { name: "BkTitle", className: "col-title", width: "24%", data: "BkTitle", render: render_book_title },
         { name: "LgName", className: "col-lang", width: "8%", data: "LgName" },
-        { name: "TagList", className: "col-tags", width: "16%", data: "TagList", render: render_tag_list },
+        { name: "TagList", className: "col-tags", width: "15%", data: "TagList", render: render_tag_list },
         { name: "WordCount", className: "col-words", width: "8%", data: "WordCount" },
         { name: "UnknownPercent", className: "col-status", width: "12%", data: "UnknownPercent", searchable: false, render: render_book_stats_graph_placeholder },
         { name: "NewWordPercent", className: "col-newword", width: "12%", data: "NewWordPercent", searchable: false, orderable: true, render: render_new_word_placeholder },
@@ -209,6 +209,7 @@
       if (!menu || !book_listing_table) return;
       menu.innerHTML = '';
       var columnLabels = {
+        BookType: 'Type',
         BkTitle: 'Title',
         LgName: 'Language',
         TagList: 'Tags',
