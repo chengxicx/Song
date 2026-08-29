@@ -179,12 +179,12 @@ def test_direct_import_redirects_to_series_page(app, app_context, english):
 
 
 def test_import_page_renders_with_epub_type(app, app_context, english):
-    "The import page includes the EPUB type and preview controls."
+    "The import page includes the EPUB type and the preview checkbox (checked by default)."
     client = app.test_client()
     resp = client.get("/book/import_webpage")
     assert resp.status_code == 200
     assert b'<option value="epub">' in resp.data
-    assert b'id="epub-preview"' in resp.data
+    assert b'id="epub_preview_toggle" checked' in resp.data
     assert b'id="epub-preview-panel"' in resp.data
 
 

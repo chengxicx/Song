@@ -50,6 +50,10 @@
 
   .import-actions { margin-top: 1.2rem; display: flex; align-items: center; gap: .6rem; }
   .import-actions .hint { color: var(--font-color, #888); opacity: .7; font-size: .8rem; }
+  .import-actions .epub-preview-toggle {
+    display: flex; align-items: center; gap: .35rem;
+    font-size: .85rem; color: var(--font-color, #444); cursor: pointer; user-select: none;
+  }
 
   .epub-preview-meta { font-size: .92rem; color: var(--font-color, #222); margin-bottom: .8rem; }
   .epub-chapter-tools { display: flex; align-items: center; gap: 1rem; margin-bottom: .4rem; }
@@ -359,7 +363,7 @@
 </form>
 
 <form id="epub-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import an EPUB as a series — each chapter becomes its own book, tagged "EPUB" plus the book title, and shown as one aggregated row on the home page. Use "Preview &amp; confirm" to review and select chapters before importing.</p>
+  <p class="import-desc">Import an EPUB as a series — each chapter becomes its own book, tagged "EPUB" plus the book title, and shown as one aggregated row on the home page. Leave "Preview &amp; confirm" checked to review and select chapters before importing.</p>
   <div class="iform">
     <div class="irow">
       <label class="ilbl" for="epub-language">Language</label>
@@ -393,7 +397,7 @@
   <div class="import-actions">
     <input type="hidden" name="import_type" value="epub">
     <button type="submit" id="epub-import" class="btn btn-primary">Import</button>
-    <button type="button" id="epub-preview" class="btn">Preview &amp; confirm</button>
+    <label class="epub-preview-toggle"><input type="checkbox" id="epub_preview_toggle" checked> Preview &amp; confirm</label>
     <span class="hint" id="epub-preview-status"></span>
   </div>
 </form>
@@ -519,15 +523,21 @@
       });
     };
 
-    // Preview & confirm: parse the EPUB (no DB write) and list chapters.
-    $('#epub-preview').on('click', function () {
+    // When "Preview & confirm" is checked, Import opens the chapter
+    // preview instead of posting the form; unchecked, the plain POST
+    // imports every chapter.
+    epubForm.on('submit', function (e) {
+      if (!$('#epub_preview_toggle').prop('checked')) {
+        return;
+      }
+      e.preventDefault();
       const fileInput = document.getElementById('epub_file');
       const status = $('#epub-preview-status');
       if (!fileInput.files || !fileInput.files[0]) {
         status.text('Please choose an EPUB file first.').css('color', 'red');
         return;
       }
-      const btn = $(this);
+      const btn = $('#epub-import');
       btn.prop('disabled', true);
       status.text('Parsing…').css('color', '');
       const fd = new FormData();
@@ -588,7 +598,7 @@
       }
       const btn = $(this);
       btn.prop('disabled', true);
-      $('#epub-preview').prop('disabled', true);
+      $('#epub-import').prop('disabled', true);
       $('#epub-confirm-status').text('Importing ' + selected.length + ' chapter(s)…').css('color', '');
       const fd = new FormData();
       fd.append('epub_file', fileInput.files[0]);
@@ -600,7 +610,7 @@
         .then(r => r.json())
         .then(data => {
           btn.prop('disabled', false);
-          $('#epub-preview').prop('disabled', false);
+          $('#epub-import').prop('disabled', false);
           if (!data.success) {
             $('#epub-confirm-status').text(data.error || 'Import failed.').css('color', 'red');
             return;
@@ -614,7 +624,7 @@
         })
         .catch(() => {
           btn.prop('disabled', false);
-          $('#epub-preview').prop('disabled', false);
+          $('#epub-import').prop('disabled', false);
           $('#epub-confirm-status').text('Import failed.').css('color', 'red');
         });
     });
