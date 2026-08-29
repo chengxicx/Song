@@ -293,31 +293,11 @@ div.toolbar {
     margin-right: 1rem;
 }
 
-/* blank space to hang completed_book bullets while maintaining proper justification on the whole column */
-a.book-title:before {
-    content: '';
-    display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
-}
 /* flex fixes wrapping issue */
 .book-title {
     display: inline-flex;
     gap: 0.5rem;
     align-items: flex-start;
-}
-
-/* show a check mark for completed books */
-a.completed_book:before {
-    content: url('/static/icn/tick.png');
-}
-
-/**
-  *  when the books list contains NO completed books, get rid of the awkward indent
-  */
-table#booktable:not(:has(a.completed_book)) a.book-title:before {
-    display: none;
 }
 
 .refresh {
@@ -3498,19 +3478,6 @@ div#termimagesearch span img {
     font-size: 0.82em;
     color: #66707d;
     margin-top: 2px;
-}
-/* Track the book-title hanging indent: when the table has completed
-   books, every title text is pushed in by the 1rem check-mark spacer
-   plus the 0.5rem flex gap; mirror that so the subtitle stays aligned
-   with the title text in both states. */
-.series-sub:before {
-    content: '';
-    display: inline-block;
-    width: 1rem;
-    margin-right: 0.5rem;
-}
-table#booktable:not(:has(a.completed_book)) .series-sub:before {
-    display: none;
 }
 .series-settings-gear {
     display: inline-flex;
