@@ -136,6 +136,8 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     def make_book_from_url(self, url, langname):
         "Create a book with title, content from url, and languagename."
         self.visit("book/import_webpage")
+        # "Text" is the default import type; switch to the web page form.
+        self.page.select_option("#import_type", "webpage")
         self.page.fill("#importurl", url)
         self.page.locator("#import").click()
         time.sleep(0.1)  # hack
