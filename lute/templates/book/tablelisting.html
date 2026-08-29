@@ -9,7 +9,15 @@
   <thead>
     <tr>
       <th style="text-align: left">Title
-        <a class="series-settings-gear" href="/book/settings" title="Configure book series tags" onclick="event.stopPropagation();"><img src="{{ url_for('static', filename='icn/settings-gear-icon.svg') }}" alt="Configure book series"></a>
+        <a class="series-settings-gear" href="/book/settings" title="Configure book series tags" onclick="event.stopPropagation();">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            <line x1="10" y1="9" x2="16" y2="9"></line>
+            <line x1="10" y1="12" x2="16" y2="12"></line>
+            <line x1="10" y1="15" x2="13" y2="15"></line>
+          </svg>
+        </a>
       </th>
       <th style="text-align: left">Language</th>
       <th style="text-align: left">
