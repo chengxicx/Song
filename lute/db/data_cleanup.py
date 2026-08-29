@@ -7,8 +7,13 @@ These cleanup routines will be called by the app_factory.
 
 from sqlalchemy import select, text as sqltext
 from lute.models.language import Language
-from lute.models.book import Text, Sentence
+from lute.models.book import Book, Text, Sentence
 from lute.models.term import TermImage
+from lute.models.repositories import UserSettingRepository
+
+# User setting marking that the one-time pdf page word-count backfill
+# has run (see _set_pdf_texts_word_count).
+_PDF_WC_BACKFILL_FLAG = "pdf_page_word_counts_backfilled"
 
 
 class ProgressReporter:
@@ -31,6 +36,54 @@ class ProgressReporter:
             return
         self.output_func(f"  {self.current} of {self.total_count}")
         self.last_output = self.current
+
+
+def _set_pdf_texts_word_count(session, output_function):
+    """
+    One-time backfill of pdf books' page word counts.
+
+    Pdf books store one empty text per PDF page, so counts cannot be
+    derived from the page text.  Books imported before per-page counts
+    existed have all-zero counts: their empty texts were zeroed by
+    _set_texts_word_count on earlier startups.  Recompute every pdf
+    book's counts from the stored PDF file.
+
+    The user-setting flag marks completion.  Books whose language has
+    no working parser are skipped, and the flag stays unset so they
+    are retried on the next startup after the parser is fixed.
+    """
+    from lute.book.service import Service as BookService  # pylint: disable=import-outside-toplevel
+
+    repo = UserSettingRepository(session)
+    if (repo.get_dynamic_value(_PDF_WC_BACKFILL_FLAG) or "") == "1":
+        return
+
+    books = session.query(Book).filter(Book.book_type == "pdf").all()
+    if not books:
+        repo.set_dynamic_value(_PDF_WC_BACKFILL_FLAG, "1")
+        session.commit()
+        return
+
+    output_function(f"Fixing word counts for {len(books)} PDF books.")
+    pr = ProgressReporter(len(books), output_function)
+    svc = BookService()
+    skipped = 0
+    for b in books:
+        if b.language is None or not b.language.is_supported:
+            skipped += 1
+            continue
+        try:
+            svc.set_pdf_page_word_counts(b, force=True)
+            session.add(b)
+            pr.increment()
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            skipped += 1
+            output_function(f"  Could not extract text from PDF book '{b.title}': {e}")
+    session.commit()
+    if skipped == 0:
+        repo.set_dynamic_value(_PDF_WC_BACKFILL_FLAG, "1")
+        session.commit()
+    output_function("Done.")
 
 
 def _set_texts_word_count(session, output_function):
@@ -186,6 +239,7 @@ def _update_term_images(session, output_function):
 
 def clean_data(session, output_function):
     "Clean all data as required, sending messages to output_function."
+    _set_pdf_texts_word_count(session, output_function)
     _set_texts_word_count(session, output_function)
     _load_sentence_textlc(session, output_function)
     _update_term_images(session, output_function)
