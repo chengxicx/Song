@@ -173,6 +173,12 @@
           }
         });
       },
+      // Column-width resize handles must be added after DataTables
+      // finishes building the scroll structure; with the async state
+      // load the constructor returns while the table is detached.
+      initComplete: function() {
+        enable_column_resize();
+      },
       columns: [
         { name: "BkTitle", className: "col-title", width: "28%", data: "BkTitle", render: render_book_title },
         { name: "LgName", className: "col-lang", width: "8%", data: "LgName" },
