@@ -119,6 +119,43 @@ def test_chapter_book_title_pads_position():
     assert chapter_book_title("My Book", 12, "Fin", 12) == "My Book 12 - Fin"
 
 
+def test_ruby_furigana_dropped_and_words_stay_intact():
+    """
+    Japanese ruby: the base text stays one word, the rt readings are
+    dropped, and stray inline anchors do not split words.
+    """
+    content = (
+        "<html><body>"
+        "<p>「<ruby>彩<rt>いろ</rt>葉<rt>は</rt></ruby>！」</p>"
+        "<p>声が<ruby>鼓<rt>こ</rt>膜<rt>まく</rt></ruby>を打った。</p>"
+        '<p>見逃した<a id="p1"/>りはしない。</p>'
+        "<p>Hello <b>bold</b> world.</p>"
+        "</body></html>"
+    )
+    epub = make_epub({"OEBPS/ch1.xhtml": content}, [("ch1", "ch1.xhtml")])
+    data = parse_epub(io.BytesIO(epub))
+    text = data.chapters[0].text
+    assert "「彩葉！」" in text
+    assert "声が鼓膜を打った。" in text
+    assert "見逃したりはしない。" in text
+    assert "Hello bold world." in text
+    assert "いろ" not in text
+    assert "まく" not in text
+
+
+def test_ruby_in_heading_title():
+    "Heading-fallback chapter titles drop furigana and keep base text."
+    content = (
+        "<html><body>"
+        "<h2><ruby>序<rt>じょ</rt>章<rt>しょう</rt></ruby></h2>"
+        "<p>text</p>"
+        "</body></html>"
+    )
+    epub = make_epub({"OEBPS/ch1.xhtml": content}, [("ch1", "ch1.xhtml")])
+    data = parse_epub(io.BytesIO(epub))
+    assert [c.title for c in data.chapters] == ["序章"]
+
+
 def test_real_sample_file_hola_epub():
     "The checked-in sample EPUB parses and contains the expected text."
     thisdir = os.path.dirname(os.path.realpath(__file__))
