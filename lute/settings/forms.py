@@ -81,20 +81,17 @@ class UserSettingsForm(FlaskForm):
     ankiconnect_url = StringField("AnkiConnect URL", validators=[InputRequired()])
 
     tts_hover_pronunciation = BooleanField("Pronounce word on hover")
-    tts_hover_delay = IntegerField(
+    tts_hover_delay_choices = [
+        ("200", "Default (200 ms)"),
+        ("0", "0 ms (no delay)"),
+        ("100", "100 ms"),
+        ("300", "300 ms"),
+        ("500", "500 ms"),
+    ]
+    tts_hover_delay = SelectField(
         "Hover pronunciation delay (ms)",
-        default=200,
-        validators=[
-            InputRequired(),
-            NumberRange(min=0, max=300),
-        ],
-        render_kw={
-            "type": "number",
-            "min": "0",
-            "max": "300",
-            "step": "25",
-            "title": "Delay before pronouncing a hovered word (0-300 ms)",
-        },
+        choices=tts_hover_delay_choices,
+        default="200",
     )
     tts_click_pronunciation = BooleanField("Pronounce word when clicked (term form opens)")
     tts_show_control_panel = BooleanField("Show TTS Player")
