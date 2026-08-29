@@ -30,7 +30,18 @@ from lute.book.service import (
 )
 from lute.book.datatables import get_data_tables_list
 from lute.book.series import get_series_overview
-from lute.book.forms import NewBookForm, EditBookForm, BookSettingsForm, ALLOWED_AUDIO_EXTENSIONS
+from lute.book.epub_parser import parse_epub
+from lute.book.epub_import import (
+    import_epub_chapters,
+    language_id_from,
+    selected_chapter_indices,
+)
+from lute.book.forms import (
+    NewBookForm,
+    EditBookForm,
+    BookSettingsForm,
+    ALLOWED_AUDIO_EXTENSIONS,
+)
 from lute.book.stats import Service as StatsService
 from lute.book.stats import get_difficulty_label
 import lute.utils.formutils
@@ -99,8 +110,6 @@ def archived():
 def datatables_archived_source():
     "Datatables data for archived books."
     return datatables_source(True)
-
-
 
 
 @bp.route("/settings", methods=["GET", "POST"])
@@ -258,6 +267,8 @@ def import_webpage():
             return _import_mokuro_manga()
         if import_type == "pdf":
             return _import_pdf()
+        if import_type == "epub":
+            return _import_epub_direct()
         return _redirect_to_new_book_form()
 
     usrepo = UserSettingRepository(db.session)
@@ -290,9 +301,7 @@ def _parse_tagify_tags(raw, default_tag):
             try:
                 items = _json.loads(raw)
                 tags = [
-                    (i.get("value") or "").strip()
-                    for i in items
-                    if isinstance(i, dict)
+                    (i.get("value") or "").strip() for i in items if isinstance(i, dict)
                 ]
             except (ValueError, TypeError):
                 pass
@@ -346,7 +355,6 @@ def _import_youtube_video():
     tags = _parse_tagify_tags(request.form.get("youtube_tag", ""), "youtube")
     language_id = request.form.get("language_id")
     srt_file = request.files.get("srt_file")
-    
 
     if youtube_video_id(url) is None:
         flash("Please enter a valid YouTube video URL.", "notice")
@@ -396,7 +404,6 @@ def _import_bilibili_video():
     tags = _parse_tagify_tags(request.form.get("bilibili_tag", ""), "bilibili")
     language_id = request.form.get("language_id")
     srt_file = request.files.get("srt_file")
-    
 
     bvid, aid = bilibili_video_id(url)
     if bvid is None and aid is None:
@@ -699,6 +706,113 @@ def _import_pdf():
         flash(e.message, "notice")
         return redirect("/book/import_webpage", 302)
     return redirect(f"/read/{book.id}/page/1", 302)
+
+
+@bp.route("/import/epub/preview", methods=["POST"])
+def import_epub_preview():
+    """
+    Parse an uploaded EPUB and return its metadata and chapter titles.
+
+    This is the "preview and confirm" step: nothing is written to the
+    database; the client re-uploads the file on confirmation.
+    """
+    epub_file = _epub_file_from_request()
+    if epub_file is None:
+        return jsonify(
+            {"success": False, "error": "Please upload a valid EPUB file (.epub)."}
+        )
+    try:
+        data = parse_epub(epub_file.stream)
+    except BookImportException as e:
+        return jsonify({"success": False, "error": e.message})
+    return jsonify(
+        {
+            "success": True,
+            "title": data.title,
+            "author": data.author,
+            "chapters": [{"index": c.index, "title": c.title} for c in data.chapters],
+        }
+    )
+
+
+@bp.route("/import/epub", methods=["POST"])
+def import_epub():
+    """
+    Create one book per chapter from the uploaded EPUB.
+
+    Used by the preview flow (JSON response); the client re-uploads the
+    file along with the selected chapter indices.
+    """
+    epub_file = _epub_file_from_request()
+    if epub_file is None:
+        return jsonify(
+            {"success": False, "error": "Please upload a valid EPUB file (.epub)."}
+        )
+    language_id = language_id_from(request.form.get("language_id"))
+    if language_id is None:
+        return jsonify({"success": False, "error": "Please select a language."})
+    tags = _parse_tagify_tags(request.form.get("epub_tag", ""), "EPUB")
+    title = (request.form.get("epub_title") or "").strip()
+    selected = selected_chapter_indices(request.form.get("chapters"))
+    try:
+        imported, failed, book_title, last_error = import_epub_chapters(
+            epub_file, title, language_id, tags, selected
+        )
+    except BookImportException as e:
+        return jsonify({"success": False, "error": e.message})
+    if imported == 0:
+        msg = "No chapters were imported."
+        if last_error:
+            msg += f" Last error: {last_error}"
+        return jsonify({"success": False, "error": msg})
+    return jsonify(
+        {
+            "success": True,
+            "imported": imported,
+            "failed": failed,
+            "series_tag": book_title,
+        }
+    )
+
+
+def _import_epub_direct():
+    "Form-post EPUB import: create books for all chapters, then redirect."
+    epub_file = _epub_file_from_request()
+    if epub_file is None:
+        flash("Please upload a valid EPUB file (.epub).", "notice")
+        return redirect("/book/import_webpage", 302)
+    language_id = language_id_from(request.form.get("language_id"))
+    if language_id is None:
+        flash("Please select a language.", "notice")
+        return redirect("/book/import_webpage", 302)
+    tags = _parse_tagify_tags(request.form.get("epub_tag", ""), "EPUB")
+    title = (request.form.get("epub_title") or "").strip()
+    try:
+        imported, failed, book_title, last_error = import_epub_chapters(
+            epub_file, title, language_id, tags, None
+        )
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+    if imported == 0:
+        msg = "No chapters were imported."
+        if last_error:
+            msg += f" Last error: {last_error}"
+        flash(msg, "notice")
+        return redirect("/book/import_webpage", 302)
+    if failed:
+        flash(f"{failed} chapter(s) could not be imported.", "notice")
+    return redirect(f"/book/series/{urllib.parse.quote(book_title)}", 302)
+
+
+def _epub_file_from_request():
+    "Get the uploaded EPUB file field, or None when missing/invalid."
+    f = request.files.get("epub_file")
+    if f is None or f.filename == "":
+        return None
+    if not (f.filename or "").lower().endswith(".epub"):
+        return None
+    return f
 
 
 @bp.route("/archive/<int:bookid>", methods=["POST"])
