@@ -277,11 +277,21 @@ def import_webpage():
     language_choices = lute.utils.formutils.language_choices(db.session)
     repo = Repository(db.session)
     existing_tags = repo.get_book_tags()
+
+    # The "Text" import type embeds the regular new-book form.
+    form = NewBookForm(obj=Book())
+    form.language_id.choices = language_choices
+    form.language_id.data = current_language_id
+
     return render_template(
         "book/import_webpage.html",
         language_choices=language_choices,
         current_language_id=current_language_id,
         existing_tags=existing_tags,
+        form=form,
+        tags=repo.get_book_tags(),
+        rtl_map=json.dumps(_language_is_rtl_map()),
+        show_language_selector=True,
     )
 
 

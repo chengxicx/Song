@@ -116,15 +116,14 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     page.once("dialog", lambda dialog: dialog.accept())
     page.get_by_role("link", name="Archive book").click()
 
-    # Make a new book
+    # Make a new book.  The merged "Create new book" page has several
+    # "Title" labels (one per import type), so locate fields by id.
     _print("New book.")
     page.locator("#menu_books").hover()
     page.locator("#book_new").click()
     page.locator("#language_id").select_option("4")
-    page.get_by_label("Title").click()
-    page.get_by_label("Title").fill("Hello")
-    page.get_by_label("Text", exact=True).click()
-    page.get_by_label("Text", exact=True).fill("Hello there.")
+    page.locator("#title").fill("Hello")
+    page.locator("#text").fill("Hello there.")
     page.get_by_role("button", name="Save").click()
 
     # Edit a term.
@@ -228,8 +227,9 @@ def run(p: Playwright) -> None:  # pylint: disable=too-many-statements
     # Import web page.
     _print("Import web page.")
     page.locator("#menu_books").hover()
-    page.get_by_role("link", name="Import web page").click()
-    page.get_by_label("Import URL").fill(
+    page.get_by_role("link", name="Create new book").click()
+    page.locator("#import_type").select_option("webpage")
+    page.locator("#importurl").fill(
         "http://localhost:5001/dev_api/fake_story.html"
     )
     page.get_by_role("button", name="Import").click()

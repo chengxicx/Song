@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Import{% endblock %}
-{% block header %}Import{% endblock %}
+{% block title %}Create new book{% endblock %}
+{% block header %}Create new book{% endblock %}
 
 {% block body %}
 <style>
@@ -75,7 +75,8 @@
 <div class="import-type-bar">
   <label for="import_type">Import type:</label>
   <select id="import_type" name="import_type" class="import-type-select">
-    <option value="webpage" selected>Web page</option>
+    <option value="text" selected>Text</option>
+    <option value="webpage">Web page</option>
     <option value="youtube">YouTube video</option>
     <option value="bilibili">Bilibili video</option>
     <option value="mp3">MP3 / M4A audio</option>
@@ -86,7 +87,11 @@
   </select>
 </div>
 
-<form id="webpage-form" class="import-form" action="/book/import_webpage" method="post">
+<div id="text-form">
+  {% include 'book/_new_book_form.html' %}
+</div>
+
+<form id="webpage-form" class="import-form" action="/book/import_webpage" method="post" style="display: none;">
   <p class="import-desc">This import is primitive — it grabs all the headings and text from an HTML page, so edit the Book form afterwards to trim it.</p>
   <div class="iform">
     <div class="irow">
@@ -434,6 +439,7 @@
 
   $(document).ready(function () {
     const typeSel = $('#import_type');
+    const textForm = $('#text-form');
     const webpageForm = $('#webpage-form');
     const youtubeForm = $('#youtube-form');
     const bilibiliForm = $('#bilibili-form');
@@ -455,6 +461,7 @@
 
     const updateForms = function () {
       const t = typeSel.val();
+      textForm.toggle(t === 'text');
       webpageForm.toggle(t === 'webpage');
       youtubeForm.toggle(t === 'youtube');
       bilibiliForm.toggle(t === 'bilibili');
