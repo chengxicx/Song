@@ -17,18 +17,19 @@ text.  No new dependencies are introduced.
 """
 
 import posixpath
+import re
 import zipfile
 from io import BytesIO
 from urllib.parse import quote, unquote
 from xml.etree import ElementTree
 
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 
 from lute.book.service import BookImportException
 
 # Tags rendered as one paragraph/line of output; containers recurse
-# into; everything else (b, i, span, a, ...) is inline text glued to
-# the surrounding stray text.
+# into; everything else (b, i, span, a, ruby, ...) is inline text glued
+# to the surrounding stray text.
 _TEXT_TAGS = ["p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "figcaption", "pre"]
 _CONTAINER_TAGS = [
     "html",
@@ -56,6 +57,21 @@ _SKIP_TAGS = ["script", "style", "head", "template", "svg", "iframe", "noscript"
 
 _CONTENT_MEDIA_TYPES = ("application/xhtml+xml", "text/html")
 _NCX_MEDIA_TYPE = "application/x-dtbncx+xml"
+
+# Runs of ASCII whitespace collapse to a single space, like browser
+# rendering.  The ideographic space (U+3000) is real Japanese text and
+# is left alone.
+_ASCII_WS_RE = re.compile(r"[ \t\r\n\f\v]+")
+
+
+def _flattened_text(el):
+    """
+    The rendered text of an element: strings concatenated as browsers
+    render them, with no separator injected between inline elements --
+    ruby splits a word into several text nodes, and a space there
+    would corrupt the word (「彩葉」 must not become 「彩 葉」).
+    """
+    return _ASCII_WS_RE.sub(" ", el.get_text("")).strip()
 
 
 class EpubChapter:
@@ -187,7 +203,9 @@ def _manifest_and_spine(opf):
     return manifest, refs, toc
 
 
-def _toc_map(zf, manifest, spine_toc, opf_dir, zip_names):  # pylint: disable=too-many-locals
+def _toc_map(
+    zf, manifest, spine_toc, opf_dir, zip_names
+):  # pylint: disable=too-many-locals
     """
     Map zip-relative content path -> [(fragment, title), ...] in TOC
     order.  Prefers the EPUB 3 nav document; falls back to the EPUB 2
@@ -235,10 +253,11 @@ def _toc_map(zf, manifest, spine_toc, opf_dir, zip_names):  # pylint: disable=to
 def _nav_entries(content):
     "EPUB 3 nav document -> [(href, title)]; None when no links."
     soup = BeautifulSoup(content, "html.parser")
+    _prep_soup(soup)
     ret = []
     for a in soup.find_all("a"):
         href = a.get("href")
-        text = a.get_text(" ", strip=True)
+        text = _flattened_text(a)
         if href and text:
             ret.append((href, text))
     return ret or None
@@ -279,6 +298,7 @@ def _chapters(
         if content is None:
             continue
         soup = BeautifulSoup(content, "html.parser")
+        _prep_soup(soup)
         text = _extract_text(soup)
         if not text:
             # Covers and blank pages produce no text; they cannot be
@@ -288,6 +308,17 @@ def _chapters(
         title = _chapter_title(soup, zip_path, frag, toc_map, len(chapters))
         chapters.append(EpubChapter(len(chapters), title, text))
     return chapters
+
+
+def _prep_soup(soup):
+    """
+    Remove nodes that never contribute to the extracted text: scripts,
+    styles, and ruby annotations (rt = furigana reading, rp = fallback
+    parentheses).  Dropping rt/rp here keeps the readings out of the
+    text regardless of the bs4 version.
+    """
+    for tag in soup(_SKIP_TAGS + ["rt", "rp"]):
+        tag.decompose()
 
 
 def _chapter_title(soup, zip_path, frag, toc_map, position):
@@ -306,7 +337,7 @@ def _chapter_title(soup, zip_path, frag, toc_map, position):
     for tag in ("h1", "h2", "h3"):
         el = soup.find(tag)
         if el is not None:
-            text = el.get_text(" ", strip=True)
+            text = _flattened_text(el)
             if text:
                 return text
     return f"Chapter {position + 1}"
@@ -339,10 +370,9 @@ def _read_zip(zf, path, zip_names):
 def _extract_text(soup):
     """
     Extract the text of an xhtml document, one line per block element
-    (paragraph structure), joining inline content with spaces.
+    (paragraph structure), with inline content concatenated as it
+    would render.
     """
-    for t in soup(_SKIP_TAGS):
-        t.decompose()
     root = soup.body or soup
     lines = []
     _collect_lines(root, lines)
@@ -356,30 +386,36 @@ def _collect_lines(el, lines):
 
     def flush():
         if pending:
-            text = " ".join(pending).strip()
+            text = _ASCII_WS_RE.sub(" ", "".join(pending)).strip()
             if text:
                 lines.append(text)
             pending.clear()
 
     for child in el.children:
+        if isinstance(child, Comment):
+            continue
         if isinstance(child, NavigableString):
-            text = str(child).strip()
-            if text:
-                pending.append(text)
+            # Kept as-is: any whitespace the source carries between
+            # inline elements is meaningful (word gaps in western
+            # text) and gets collapsed only once, at flush time.
+            pending.append(str(child))
         elif isinstance(child, Tag):
             name = (child.name or "").lower()
             if name in _SKIP_TAGS:
                 continue
             if name in _TEXT_TAGS:
                 flush()
-                text = child.get_text(" ", strip=True)
+                text = _flattened_text(child)
                 if text:
                     lines.append(text)
             elif name in _CONTAINER_TAGS:
                 flush()
                 _collect_lines(child, lines)
             else:
-                text = child.get_text(" ", strip=True)
+                if name == "br":
+                    pending.append("\n")
+                    continue
+                text = child.get_text("")
                 if text:
                     pending.append(text)
     flush()
