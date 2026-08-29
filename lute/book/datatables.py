@@ -90,7 +90,8 @@ def _flat_base_sql(archived, extra_where=""):
         b.BkBookType AS BookType,
         NULL as SeriesTag,
         NULL as SeriesBookCount,
-        NULL as SeriesReadCount
+        NULL as SeriesReadCount,
+        NULL as SeriesStatsPending
 
     FROM books b
     INNER JOIN languages ON LgID = b.BkLgID
@@ -162,7 +163,13 @@ def _series_union_base_sql(archived, series_tags):
         'series' AS BookType,
         agg.tagtext AS SeriesTag,
         agg.bookcount AS SeriesBookCount,
-        agg.readcount AS SeriesReadCount
+        agg.readcount AS SeriesReadCount,
+        /* Member book ids whose stats are missing or stale.  The frontend
+           batch-fetches these (see ajax_in_book_stats) because books hidden
+           behind a series row never appear as flat rows, so without this
+           their stats would never be calculated.  Aggregates recompute on
+           the reload that follows. */
+        agg.statspending AS SeriesStatsPending
     FROM (
         SELECT
             st.seriestag AS tagtext,
@@ -178,7 +185,13 @@ def _series_union_base_sql(archived, series_tags):
             SUM(COALESCE(c.distinctunknowns, 0)) AS unknowncount,
             /* Rounded to integers to match the per-book display. */
             CAST(ROUND(AVG(c.unknownpercent), 0) AS INTEGER) AS unknownpercent,
-            CAST(ROUND(AVG(c.new_word_percent), 0) AS INTEGER) AS newwordpercent
+            CAST(ROUND(AVG(c.new_word_percent), 0) AS INTEGER) AS newwordpercent,
+            GROUP_CONCAT(
+                CASE WHEN c.BkID IS NULL
+                      OR c.status_distribution IS NULL
+                      OR c.BkStatsStale = 1
+                     THEN b.BkID END
+            ) AS statspending
         FROM books b
         INNER JOIN (
             /* Each book is grouped under exactly one series tag. */

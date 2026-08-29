@@ -183,6 +183,13 @@
           row.classList.add('series-row');
         }
       },
+      // Load all visible rows' stats in one batched request (shared with
+      // the home table).  Without this, chapter books whose stats were
+      // never calculated (e.g. imported but never opened) would show
+      // placeholder cells forever.
+      drawCallback: function(settings) {
+        ajax_in_book_stats(settings);
+      },
       // Column-width resize handles must be added after DataTables
       // finishes building the scroll structure; with the async state
       // load the constructor returns while the table is detached.
