@@ -442,9 +442,9 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     background-color: #f0f0f0;
 }
 
-.book-action-dropdown:hover .book-action-dropdown-content {
-    display: block;
-}
+/* The dropdown content is shown/hidden only by the JS handler
+   (position: fixed); a CSS :hover rule here would fight the JS menu
+   and make the last table row shift while hovering. */
 
 /* End book listing */
 
@@ -3479,6 +3479,19 @@ div#termimagesearch span img {
     font-size: 0.82em;
     color: #66707d;
     margin-top: 2px;
+}
+/* Track the book-title hanging indent: when the table has completed
+   books, every title text is pushed in by the 1rem check-mark spacer
+   plus the 0.5rem flex gap; mirror that so the subtitle stays aligned
+   with the title text in both states. */
+.series-sub:before {
+    content: '';
+    display: inline-block;
+    width: 1rem;
+    margin-right: 0.5rem;
+}
+table#booktable:not(:has(a.completed_book)) .series-sub:before {
+    display: none;
 }
 .series-settings-gear {
     display: inline-flex;
