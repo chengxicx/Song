@@ -77,7 +77,7 @@ def test_preview_rejects_non_epub_file(app, app_context, english):
 
 
 def test_import_creates_one_book_per_chapter_with_tags(app, app_context, english):
-    "Each chapter becomes a book tagged EPUB + book title."
+    "Each chapter becomes a book tagged with the book title (series tag)."
     client = app.test_client()
     resp = _post(
         client,
@@ -102,7 +102,7 @@ def test_import_creates_one_book_per_chapter_with_tags(app, app_context, english
         "My Book 03 - Third",
     ]
     tag_texts = sorted(t.text for t in books[0].book_tags)
-    assert tag_texts == ["EPUB", "My Book"]
+    assert tag_texts == ["My Book"]
     # Chapter text was imported and split into pages.
     assert "Chapter one text." in books[0].texts[0].text
 
