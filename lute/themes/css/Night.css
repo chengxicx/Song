@@ -18,6 +18,7 @@ body {
 
 .flash-notice {
   background-color: #7a3d58; /* pink highlight */
+  color: #F3F4F4; /* keep light text on dark notice bg */
 }
 
 .menu-item > span {
