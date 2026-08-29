@@ -232,13 +232,15 @@ let render_last_opened_date = function ( data, type, row, meta ) {
 };
 
 let render_book_actions = function ( data, type, row, meta ) {
-  // Series rows link to the series overview page.
+  // Series rows: the title itself links to the series overview page,
+  // so the menu only offers the listing settings and bulk delete.
   if (row['SeriesTag']) {
     const tag = encodeURIComponent(row['SeriesTag']);
+    const n = parseInt(row['SeriesBookCount']) || 0;
     return `<div class="book-action-dropdown"><span>&hellip;</span>
       <div class="book-action-dropdown-content">
-        <a href="/book/series/${tag}">Open series page</a>
-        <a href="/book/settings">Configure series</a>
+        <a href="/book/settings">Configure</a>
+        <a href="#" data-seriestag="${tag}" data-count="${n}" onclick="confirm_delete_series(this)">Delete</a>
       </div>
     </div>`;
   }
@@ -300,6 +302,17 @@ function confirm_delete(el) {
     return;
   }
   do_action_post('delete', bookid);
+}
+
+function confirm_delete_series(el) {
+  const seriestag = decodeURIComponent($(el).data('seriestag'));
+  const count = $(el).data('count');
+  if (!confirm(`Deleting all ${count} books in series "${seriestag}".  Click OK to proceed, or Cancel.`)) {
+    return;
+  }
+  let f = $('#actionposter');
+  f.attr('action', `/book/delete_series/${encodeURIComponent(seriestag)}`);
+  f.submit();
 }
 
 function showStatusModal(content) {

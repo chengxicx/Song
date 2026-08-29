@@ -54,6 +54,7 @@ from lute.models.repositories import (
     LanguageRepository,
 )
 from lute.book.model import Book, Repository
+from lute.models.book import Book as DBBook, BookTag
 
 
 bp = Blueprint("book", __name__, url_prefix="/book")
@@ -841,6 +842,22 @@ def delete(bookid):
     b = _find_book(bookid)
     db.session.delete(b)
     db.session.commit()
+    return redirect("/", 302)
+
+
+@bp.route("/delete_series/<tagtext>", methods=["POST"])
+def delete_series(tagtext):
+    "Delete every book carrying the given series tag."
+    books = (
+        db.session.query(DBBook)
+        .join(DBBook.book_tags)
+        .filter(BookTag.text == tagtext)
+        .all()
+    )
+    for b in books:
+        db.session.delete(b)
+    db.session.commit()
+    flash(f'Deleted {len(books)} book(s) in series "{tagtext}"', "notice")
     return redirect("/", 302)
 
 
