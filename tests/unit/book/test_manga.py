@@ -96,7 +96,7 @@ def _import_manga(client, language_id, ext=".cbz", num_pages=2, **extra):
         "import_type": "manga",
         "language_id": str(language_id),
         "manga_title": "Test Manga",
-        "manga_tag": extra.get("manga_tag", '[{"value":"Manga"}]'),
+        "manga_tag": extra.get("manga_tag", ""),
         "manga_file": (stream, f"hanabira_manga_01{ext}"),
     }
     resp = client.post(
@@ -284,7 +284,7 @@ def test_import_page_has_manga_option(app, app_context, client):
 
 
 def test_import_manga_zip_route(app, app_context, japanese, client):
-    "POSTing a .zip import creates a manga book with default Manga tag."
+    "POSTing a .zip import creates a manga book with no tag unless given."
     resp, mokuro = _import_manga(client, japanese.id, ".zip")
     assert resp.status_code == 302
     assert "/read/" in resp.headers["Location"]
@@ -294,7 +294,7 @@ def test_import_manga_zip_route(app, app_context, japanese, client):
     assert book is not None
     assert book.book_type == "manga"
     assert book.manga_path.startswith("manga/")
-    assert [t.text for t in book.book_tags] == ["Manga"]
+    assert [t.text for t in book.book_tags] == []
     assert book.manga is not None, "manga JSON is stored"
     assert len(book.manga["pages"]) == len(mokuro["pages"])
     assert book.page_count == len(mokuro["pages"]), "one empty page per mokuro page"
@@ -330,7 +330,7 @@ def test_import_manga_db_path_matches_filesystem(app, app_context, japanese, cli
 
 
 def test_import_manga_custom_tags(app, app_context, japanese, client):
-    "Custom tags replace the default Manga tag."
+    "Tags entered in the form are applied as given."
     resp, _ = _import_manga(
         client, japanese.id, ".zip",
         manga_tag='[{"value":"Manga"},{"value":"reading"}]',

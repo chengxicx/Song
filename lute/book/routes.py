@@ -295,11 +295,11 @@ def import_webpage():
     )
 
 
-def _parse_tagify_tags(raw, default_tag):
+def _parse_tagify_tags(raw):
     """
     Parse a Tagify JSON value (e.g. '[{"value":"mp3"},{"value":"music"}]')
-    into a list of non-empty tag strings.  Falls back to [default_tag]
-    when the result is empty, so a book always has at least one tag.
+    into a list of non-empty tag strings.  Returns [] when nothing was
+    entered, so imported books only carry tags the user typed.
     Also accepts a plain comma-separated string for backwards compat.
     """
     import json as _json
@@ -319,10 +319,7 @@ def _parse_tagify_tags(raw, default_tag):
         else:
             # Plain comma- or space-separated string (legacy fallback).
             tags = [t.strip() for t in raw.replace(",", " ").split()]
-    tags = [t for t in tags if t]
-    if not tags:
-        tags = [default_tag]
-    return tags
+    return [t for t in tags if t]
 
 
 def _redirect_to_new_book_form():
@@ -363,7 +360,7 @@ def _resolve_remote_media(url):
 def _import_youtube_video():
     "Create a youtube book from the form data."
     url = request.form.get("youtube_url", "").strip()
-    tags = _parse_tagify_tags(request.form.get("youtube_tag", ""), "youtube")
+    tags = _parse_tagify_tags(request.form.get("youtube_tag", ""))
     language_id = request.form.get("language_id")
     srt_file = request.files.get("srt_file")
 
@@ -412,7 +409,7 @@ def _import_youtube_video():
 def _import_bilibili_video():
     "Create a bilibili book from the form data."
     url = request.form.get("bilibili_url", "").strip()
-    tags = _parse_tagify_tags(request.form.get("bilibili_tag", ""), "bilibili")
+    tags = _parse_tagify_tags(request.form.get("bilibili_tag", ""))
     language_id = request.form.get("language_id")
     srt_file = request.files.get("srt_file")
 
@@ -465,7 +462,7 @@ def _import_mp3_audio():
     mp3_url = (request.form.get("mp3_url") or "").strip()
     srt_file = request.files.get("srt_file")
     srt_url = (request.form.get("mp3_srt_url") or "").strip()
-    tags = _parse_tagify_tags(request.form.get("mp3_tag", ""), "mp3")
+    tags = _parse_tagify_tags(request.form.get("mp3_tag", ""))
     language_id = request.form.get("language_id")
     title = (request.form.get("mp3_title") or "").strip()
 
@@ -555,7 +552,7 @@ def _import_online_video():
     video_url = (request.form.get("video_url") or "").strip()
     srt_file = request.files.get("video_srt_file")
     srt_url = (request.form.get("video_srt_url") or "").strip()
-    tags = _parse_tagify_tags(request.form.get("video_tag", ""), "video")
+    tags = _parse_tagify_tags(request.form.get("video_tag", ""))
     language_id = request.form.get("language_id")
     title = (request.form.get("video_title") or "").strip()
 
@@ -640,7 +637,7 @@ def _find_book(bookid):
 def _import_mokuro_manga():
     "Create a Mokuro manga book from an uploaded .zip/.cbz archive."
     manga_file = request.files.get("manga_file")
-    tags = _parse_tagify_tags(request.form.get("manga_tag", ""), "Manga")
+    tags = _parse_tagify_tags(request.form.get("manga_tag", ""))
     language_id = request.form.get("language_id")
     title = (request.form.get("manga_title") or "").strip()
 
@@ -681,7 +678,7 @@ def _import_mokuro_manga():
 def _import_pdf():
     "Create a PDF book from an uploaded .pdf file."
     pdf_file = request.files.get("pdf_file")
-    tags = _parse_tagify_tags(request.form.get("pdf_tag", ""), "PDF")
+    tags = _parse_tagify_tags(request.form.get("pdf_tag", ""))
     language_id = request.form.get("language_id")
     title = (request.form.get("pdf_title") or "").strip()
 
@@ -762,7 +759,7 @@ def import_epub():
     language_id = language_id_from(request.form.get("language_id"))
     if language_id is None:
         return jsonify({"success": False, "error": "Please select a language."})
-    tags = _parse_tagify_tags(request.form.get("epub_tag", ""), "EPUB")
+    tags = _parse_tagify_tags(request.form.get("epub_tag", ""))
     title = (request.form.get("epub_title") or "").strip()
     selected = selected_chapter_indices(request.form.get("chapters"))
     try:
@@ -796,7 +793,7 @@ def _import_epub_direct():
     if language_id is None:
         flash("Please select a language.", "notice")
         return redirect("/book/import_webpage", 302)
-    tags = _parse_tagify_tags(request.form.get("epub_tag", ""), "EPUB")
+    tags = _parse_tagify_tags(request.form.get("epub_tag", ""))
     title = (request.form.get("epub_title") or "").strip()
     try:
         imported, failed, book_title, last_error = import_epub_chapters(

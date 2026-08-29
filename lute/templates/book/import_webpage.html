@@ -5,7 +5,9 @@
 
 {% block body %}
 <style>
-  .import-type-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+  /* Top margin keeps the select (and its focus ring) clear of the
+     compact theme menu-bar, which stacks above the content. */
+  .import-type-bar { display: flex; align-items: center; gap: 10px; margin: 1rem 0 1.25rem; }
   .import-type-bar .import-type-select {
     font-size: .95rem; padding: .4rem .7rem; border-radius: 6px;
     border: 1px solid var(--form-border-color, #ccc);
@@ -145,7 +147,7 @@
     <div class="irow">
       <label class="ilbl" for="youtube_tag">Tags</label>
       <div class="ictrl">
-        <input type="text" id="youtube_tag" name="youtube_tag" class="form-control" value='[{"value":"youtube"}]'>
+        <input type="text" id="youtube_tag" name="youtube_tag" class="form-control">
       </div>
     </div>
   </div>
@@ -183,7 +185,7 @@
     <div class="irow">
       <label class="ilbl" for="bilibili_tag">Tags</label>
       <div class="ictrl">
-        <input type="text" id="bilibili_tag" name="bilibili_tag" class="form-control" value='[{"value":"bilibili"}]'>
+        <input type="text" id="bilibili_tag" name="bilibili_tag" class="form-control">
       </div>
     </div>
   </div>
@@ -231,7 +233,7 @@
     <div class="irow">
       <label class="ilbl" for="mp3_tag">Tags</label>
       <div class="ictrl">
-        <input type="text" id="mp3_tag" name="mp3_tag" class="form-control" value='[{"value":"mp3"}]'>
+        <input type="text" id="mp3_tag" name="mp3_tag" class="form-control">
       </div>
     </div>
   </div>
@@ -279,7 +281,7 @@
     <div class="irow">
       <label class="ilbl" for="video_tag">Tags</label>
       <div class="ictrl">
-        <input type="text" id="video_tag" name="video_tag" class="form-control" value='[{"value":"video"}]'>
+        <input type="text" id="video_tag" name="video_tag" class="form-control">
       </div>
     </div>
   </div>
@@ -319,7 +321,7 @@
     <div class="irow">
       <label class="ilbl" for="manga_tag">Tags</label>
       <div class="ictrl">
-        <input type="text" id="manga_tag" name="manga_tag" class="form-control" value='[{"value":"Manga"}]'>
+        <input type="text" id="manga_tag" name="manga_tag" class="form-control">
       </div>
     </div>
   </div>
@@ -357,7 +359,7 @@
     <div class="irow">
       <label class="ilbl" for="pdf_tag">Tags</label>
       <div class="ictrl">
-        <input type="text" id="pdf_tag" name="pdf_tag" class="form-control" value='[{"value":"PDF"}]'>
+        <input type="text" id="pdf_tag" name="pdf_tag" class="form-control">
       </div>
     </div>
   </div>
@@ -368,7 +370,7 @@
 </form>
 
 <form id="epub-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import an EPUB as a series — each chapter becomes its own book, tagged "EPUB" plus the book title, and shown as one aggregated row on the home page. Leave "Preview &amp; confirm" checked to review and select chapters before importing.</p>
+  <p class="import-desc">Import an EPUB as a series — each chapter becomes its own book, tagged with the book title, and shown as one aggregated row on the home page. Leave "Preview &amp; confirm" checked to review and select chapters before importing.</p>
   <div class="iform">
     <div class="irow">
       <label class="ilbl" for="epub-language">Language</label>
@@ -395,7 +397,7 @@
     <div class="irow">
       <label class="ilbl" for="epub_tag">Tags</label>
       <div class="ictrl">
-        <input type="text" id="epub_tag" name="epub_tag" class="form-control" value='[{"value":"EPUB"}]'>
+        <input type="text" id="epub_tag" name="epub_tag" class="form-control">
       </div>
     </div>
   </div>
