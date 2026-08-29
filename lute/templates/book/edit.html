@@ -121,15 +121,19 @@
 
     var setupTypeFields = function () {
       var t = $('#book_type').val();
-      var hasSubtitles = (t === 'youtube' || t === 'bilibili' || t === 'mp3');
+      var hasSubtitles = (t === 'youtube' || t === 'bilibili' || t === 'mp3' || t === 'video');
       $('#youtubeSrtRow').toggle(hasSubtitles);
+      // The generic "Text file" upload would replace the reading text
+      // without updating the player's cue timings, so hide it for
+      // subtitle books.
+      $('#textfileRow').toggle(!hasSubtitles);
       // Relabel the source uri field for youtube / bilibili / mp3 books.
       var srcLabel = 'Source URI';
       if (t === 'youtube') srcLabel = 'YouTube video URL';
       else if (t === 'bilibili') srcLabel = 'Bilibili video URL';
       else if (t === 'mp3') srcLabel = 'Audio file name';
       $('#source_uri').closest('tr').find('td').first().text(srcLabel);
-      // The text field holds the SRT subtitles for youtube / bilibili / mp3 books.
+      // The text field holds the SRT subtitles for youtube / bilibili / mp3 / video books.
       $('#textRow').find('td').first().text(hasSubtitles ? 'Subtitle text (SRT, editable)' : 'Text');
     };
     $('#book_type').on('change', setupTypeFields);
