@@ -244,6 +244,54 @@ def test_series_tags_setting_default_exists(app_context):
     assert UserSettingRepository(db.session).get_value("book_series_tags") == ""
 
 
+def test_book_type_filter_flat_rows(app_context, _dt_params, english):
+    "filtType keeps only matching books; 'text' matches the default '' type."
+    def _mk_typed_book(title, btype):
+        svcbook = ServiceBook()
+        svcbook.language_id = english.id
+        svcbook.title = title
+        svcbook.text = f"{title} text."
+        svcbook.book_type = btype
+        repo = ServiceRepository(db.session)
+        repo.add(svcbook)
+        repo.commit()
+
+    _mk_typed_book("yt book", "youtube")
+    _mk_typed_book("plain book", "")
+
+    _dt_params["filtType"] = "youtube"
+    d = get_data_tables_list(_dt_params, False, db.session)
+    assert [r["BkTitle"] for r in d["data"]] == ["yt book"]
+
+    _dt_params["filtType"] = "text"
+    d = get_data_tables_list(_dt_params, False, db.session)
+    titles = [r["BkTitle"] for r in d["data"]]
+    assert "plain book" in titles
+    assert "yt book" not in titles
+
+    # Unknown values are ignored (the value is SQL-interpolated, so the
+    # whitelist in datatables.py is what keeps it safe).
+    _dt_params["filtType"] = "bogus"
+    d = get_data_tables_list(_dt_params, False, db.session)
+    assert len(d["data"]) == 2
+
+
+def test_book_type_filter_with_series_rows(app_context, _dt_params, _series_books):
+    "filtType='series' keeps only aggregate rows; other types exclude them."
+    _set_series_setting(db.session, ["Erin"])
+
+    _dt_params["filtType"] = "series"
+    d = get_data_tables_list(_dt_params, False, db.session)
+    assert d["recordsTotal"] == 1
+    assert d["data"][0]["SeriesTag"] == "Erin"
+
+    _dt_params["filtType"] = "text"
+    d = get_data_tables_list(_dt_params, False, db.session)
+    assert all(r["SeriesTag"] is None for r in d["data"])
+    titles = sorted(r["BkTitle"] for r in d["data"])
+    assert titles == ["Other Book", "Standalone"]
+
+
 def test_series_aggregation_collapses_tagged_books(
     app_context, _dt_params, _series_books
 ):
