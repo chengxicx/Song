@@ -66,6 +66,7 @@ def _load_term_custom_filters(request_form, parameters):
         "filtLanguage",
         "filtTag",
         "filtNewWord",
+        "filtType",
     ]
     request_params = request_form.to_dict(flat=True)
     for p in filter_param_names:
