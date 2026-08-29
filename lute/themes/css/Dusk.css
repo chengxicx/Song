@@ -28,6 +28,7 @@ span.status5 {
 
 .flash-notice {
   background-color: #b46b7a;
+  color: #eff1f2; /* keep light text on dark notice bg */
 }
 
 .menu-item > span {
