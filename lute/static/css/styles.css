@@ -1661,7 +1661,8 @@ ul.sentencelist {
     user-select: none;
 }
 
-#activeTagFilter {
+#activeTagFilter,
+#activeTypeFilter {
     display: inline-block;
     margin-left: 8px;
     font-size: inherit;
@@ -1669,15 +1670,18 @@ ul.sentencelist {
     font-family: inherit;
     color: inherit;
     vertical-align: baseline;
+    white-space: nowrap;
 }
 
-#activeTagFilter #clearTagFilter {
+#activeTagFilter #clearTagFilter,
+#activeTypeFilter #clearTypeFilter {
     margin-left: 6px;
     color: #212529;
     text-decoration: none;
 }
 
-#activeTagFilter #clearTagFilter:hover {
+#activeTagFilter #clearTagFilter:hover,
+#activeTypeFilter #clearTypeFilter:hover {
     color: #e03131;
 }
 
@@ -3452,6 +3456,7 @@ div#termimagesearch span img {
     height: 24px;
     border-radius: 6px;
     vertical-align: middle;
+    cursor: pointer;
 }
 .type-chip svg {
     display: block;
@@ -3468,6 +3473,11 @@ div#termimagesearch span img {
     border-radius: 999px;
     white-space: nowrap;
     vertical-align: middle;
+    cursor: pointer;
+}
+.type-chip:hover,
+.type-chip-text:hover {
+    opacity: 0.75;
 }
 /* The icon/text toggle button in the Type column header. */
 .type-display-toggle {
@@ -3511,6 +3521,7 @@ div#termimagesearch span img {
 .series-settings-gear {
     display: inline-flex;
     align-items: center;
+    vertical-align: middle;
     opacity: 0.7;
     margin-left: 6px;
     color: inherit;

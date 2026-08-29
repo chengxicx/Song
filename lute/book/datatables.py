@@ -20,6 +20,20 @@ def _configured_series_tags(session):
     return [t.strip() for t in raw.split(",") if t.strip()]
 
 
+# Book types the frontend Type chips can filter by.  The value is
+# interpolated into the SQL below, so anything outside this list is
+# ignored.  "text" books store BkBookType = '', "series" is the alias
+# the series-aggregation branch reports for aggregate rows.
+_KNOWN_BOOK_TYPES = ("", "text", "youtube", "bilibili", "mp3", "video", "manga", "pdf", "series")
+
+
+def _book_type_filter_sql(column, type_filter):
+    "WHERE fragment filtering the given (aliased) book type column."
+    if type_filter == "text":
+        return f"COALESCE({column}, '') = ''"
+    return f"{column} = '{type_filter}'"
+
+
 # The LEFT OUTER JOIN subqueries shared by the flat listing and the
 # series aggregation, kept in one place so they can't drift apart.
 _TEXTCOUNTS_SQL = """
@@ -289,9 +303,16 @@ def get_data_tables_list(parameters, is_archived, session):
         if sql_frag:
             new_word_sql = f" and {sql_frag}"
 
+    type_filter = (parameters.get("filtType") or "").strip().lower()
+    if type_filter not in _KNOWN_BOOK_TYPES:
+        type_filter = ""
+    type_sql = ""
+    if type_filter:
+        type_sql = f" and {_book_type_filter_sql('BookType', type_filter)}"
+
     if use_series_aggregation:
         base_sql = _series_union_base_sql(archived, series_tags)
-        base_sql += language_filter + new_word_sql
+        base_sql += language_filter + new_word_sql + type_sql
     else:
         base_sql = _flat_base_sql(archived)
         # The flat query filters on the joined columns directly.
@@ -302,6 +323,8 @@ def get_data_tables_list(parameters, is_archived, session):
             sql_frag = difficulty_filter_sql("c.new_word_percent", level)
             if sql_frag:
                 base_sql += f" and {sql_frag}"
+        if type_filter:
+            base_sql += f" and {_book_type_filter_sql('b.BkBookType', type_filter)}"
         if tag_filter:
             tag = tag_filter.replace("'", "''")
             base_sql += (
