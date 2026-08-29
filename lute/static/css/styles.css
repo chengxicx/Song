@@ -3455,16 +3455,35 @@ div#termimagesearch span img {
 }
 
 /* ============================================================
+   Book type column (icon chips, see render_book_type in
+   book-listing-shared.js).  Each chip is the type color at 12%
+   alpha behind a 16px glyph; series rows get the stack icon.
+   ============================================================ */
+#booktable td.col-type,
+#booktable th.col-type {
+    white-space: nowrap;
+}
+.type-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    vertical-align: middle;
+}
+.type-chip svg {
+    display: block;
+}
+
+/* ============================================================
    Book series (tag-based aggregation).
    Books carrying a configured "series tag" collapse into one
    row on the Books page, linking to /book/series/<tag>.
    ============================================================ */
 
-#booktable tr.series-row > td {
-    /* Semi-transparent so the tint works on light and dark themes. */
-    background-color: rgba(96, 144, 216, 0.15) !important;
-    border-top: 2px solid rgba(96, 144, 216, 0.5);
-}
+/* Series rows use the same row styling as every other book (no tinted
+   background); the Type column's stack icon is what marks them. */
 #booktable tr.series-row .col-title {
     padding-top: 8px;
     padding-bottom: 8px;
