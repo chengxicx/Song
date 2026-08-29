@@ -731,6 +731,50 @@ class Service:
 
         return f"pdf/{pdf_uuid}/file.pdf", page_count
 
+    def set_pdf_page_word_counts(self, dbbook, force=False):
+        """
+        Set word counts on a pdf book's empty page texts.
+
+        Pdf books store one empty text per PDF page (the reading screen
+        renders the original PDF and overlays word hotspots), so page
+        word counts cannot be derived from the page text the way they
+        are for normal books.  Extract each page's text with pypdf and
+        count the language's parsed word tokens.
+
+        Only texts without a count yet are filled in unless `force` is
+        set (used by the one-time data cleanup backfill).  Pages whose
+        text can't be extracted get 0.  No-op for non-pdf books or when
+        the stored pdf file is missing.
+        """
+        if (dbbook.book_type or "") != "pdf":
+            return
+        pdf_rel = (dbbook.pdf_path or "").strip("/")
+        if not pdf_rel:
+            return
+        if dbbook.language is None or not dbbook.language.is_supported:
+            return
+        if not force and all(t.word_count is not None for t in dbbook.texts):
+            return
+        pdf_abs = os.path.join(current_app.static_folder, pdf_rel)
+        if not os.path.isfile(pdf_abs):
+            return
+
+        reader = PdfReader(pdf_abs)
+        lang = dbbook.language
+        for idx, text in enumerate(dbbook.texts):
+            if not force and text.word_count is not None:
+                continue
+            if idx >= len(reader.pages):
+                break
+            count = 0
+            try:
+                page_text = reader.pages[idx].extract_text() or ""
+                toks = lang.get_parsed_tokens(page_text)
+                count = sum(1 for tk in toks if tk.is_word)
+            except Exception:  # pylint: disable=broad-exception-caught
+                count = 0
+            text.word_count = count
+
     def youtube_title(self, url):
         """
         Best-effort title lookup for a YouTube video.
@@ -839,7 +883,7 @@ class Service:
         b.text = "\n\n".join(extracted_text)
         return b
 
-    def import_book(self, book, session):
+    def import_book(self, book, session):  # pylint: disable=too-many-locals
         """
         Save the book as a dbbook, parsing and saving files as needed.
         Returns new book created.
@@ -902,5 +946,10 @@ class Service:
 
         repo = Repository(session)
         dbbook = repo.add(book)
+        if book.book_type == "pdf":
+            # Pdf page texts are empty by design; count each page's
+            # words from the extracted PDF text so the book listing
+            # word counts are correct.
+            self.set_pdf_page_word_counts(dbbook)
         repo.commit()
         return dbbook
