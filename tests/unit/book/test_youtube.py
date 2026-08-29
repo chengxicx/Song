@@ -359,7 +359,7 @@ def test_import_webpage_form_renders_youtube_fields(app, app_context, english, c
     assert 'value="youtube"' in content
     assert 'id="youtube_url"' in content
     assert 'id="youtube_tag"' in content
-    assert 'value="youtube"' in content, "tag defaults to youtube"
+    assert '[{"value":"youtube"}]' not in content, "no default tag preset"
     assert 'id="srt_file"' in content
 
 
