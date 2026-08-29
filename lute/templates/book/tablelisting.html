@@ -8,7 +8,16 @@
 <table id="booktable" class="table dataTable stripe">
   <thead>
     <tr>
-      <th style="text-align: left">Type
+      <th style="text-align: left">
+        <span id="typeHeaderLabel">Type</span>
+        <span id="activeTypeFilter" style="display:none;vertical-align:middle;">
+          <span id="activeTypeName"></span><a href="#" id="clearTypeFilter" style="margin-left:6px;text-decoration:none;vertical-align:middle;display:inline-flex;align-items:center;" title="Clear type filter">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </a>
+        </span>
         <a href="#" id="typeDisplayToggle" class="type-display-toggle" title="Show text labels" onclick="toggle_book_type_display(event)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4c6ef5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="2" y="6.5" width="20" height="11" rx="5.5"></rect>
@@ -146,6 +155,31 @@
     if (book_listing_table) {
       book_listing_table.draw();
     }
+  }
+
+  function setTypeFilter(btype) {
+    currentTypeFilter = btype || "";
+    const pill = document.getElementById('activeTypeFilter');
+    const nameSpan = document.getElementById('activeTypeName');
+    const headerLabel = document.getElementById('typeHeaderLabel');
+    // The icon/text toggle is hidden while the filter pill shows, so
+    // both fit on one line in the narrow Type column.
+    const toggle = document.getElementById('typeDisplayToggle');
+    if (currentTypeFilter) {
+      const m = BOOK_TYPE_META[currentTypeFilter];
+      if (nameSpan) nameSpan.textContent = (m && m.short) || currentTypeFilter;
+      if (pill) pill.style.display = 'inline-block';
+      if (headerLabel) headerLabel.style.display = 'none';
+      if (toggle) toggle.style.display = 'none';
+    } else {
+      if (pill) pill.style.display = 'none';
+      if (headerLabel) headerLabel.style.display = '';
+      if (toggle) toggle.style.display = '';
+    }
+    if (book_listing_table) {
+      book_listing_table.draw();
+    }
+    apply_book_type_width();
   }
 
   let setup_book_datatable = function(initial_search) {
@@ -292,6 +326,7 @@
           filtLanguage: () => $("#defaultLanguageSelect").val(),
           filtTag: () => currentTagFilter,
           filtNewWord: () => currentNewWordFilter,
+          filtType: () => currentTypeFilter,
         },
 
         type: "POST",
@@ -469,6 +504,13 @@
       e.preventDefault();
       e.stopPropagation();
       setNewWordFilter('');
+    });
+
+    // Click clear link in header to clear type filter
+    $(document).on('click', '#clearTypeFilter', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      setTypeFilter('');
     });
 
   });
