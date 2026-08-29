@@ -2,6 +2,10 @@
 Utility methods for tests.
 """
 
+import io
+import posixpath
+import zipfile
+
 from lute.models.term import Term
 from lute.models.book import Book, Text
 from lute.read.render.service import Service
@@ -74,6 +78,109 @@ def assert_rendered_text_equals(text, expected, msg=""):
     assert actual == "/<PARA>/".join(expected), msg
 
 
+def make_epub_xhtml(paragraphs, heading=None):
+    "Build a minimal xhtml chapter document."
+    body = ""
+    if heading:
+        body += f"<h2>{heading}</h2>"
+    for p in paragraphs:
+        body += f"<p>{p}</p>"
+    return f"<html><head><title>chapter</title></head><body>{body}</body></html>"
+
+
+def make_epub(
+    chapter_files,
+    spine,
+    title="Test Book",
+    author="Test Author",
+    nav_href=None,
+    nav_entries=None,
+    ncx_href=None,
+    ncx_entries=None,
+):
+    """
+    Build a minimal EPUB file in memory, returning the bytes.
+
+    chapter_files: dict of zip path -> xhtml content (str).
+    spine: list of (manifest id, href) in reading order.
+    nav_href / nav_entries: EPUB 3 nav document and [(href, title)].
+    ncx_href / ncx_entries: EPUB 2 toc.ncx and [(src, title)].
+    """
+    manifest_items = []
+    for cid, href in spine:
+        manifest_items.append(
+            f'<item id="{cid}" href="{href}" media-type="application/xhtml+xml"/>'
+        )
+    if nav_href:
+        manifest_items.append(
+            f'<item id="nav" href="{nav_href}" '
+            'media-type="application/xhtml+xml" properties="nav"/>'
+        )
+    if ncx_href:
+        manifest_items.append(
+            f'<item id="ncx" href="{ncx_href}" media-type="application/x-dtbncx+xml"/>'
+        )
+    spine_attrs = ' toc="ncx"' if ncx_href else ""
+    spine_xml = "".join(f'<itemref idref="{cid}"/>' for cid, _ in spine)
+
+    opf = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        '<package xmlns="http://www.idpf.org/2007/opf" version="3.0" '
+        'unique-identifier="bid">'
+        '<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">'
+        f"<dc:title>{title}</dc:title>"
+        f"<dc:creator>{author}</dc:creator>"
+        "</metadata>"
+        f"<manifest>{''.join(manifest_items)}</manifest>"
+        f"<spine{spine_attrs}>{spine_xml}</spine>"
+        "</package>"
+    )
+    container = (
+        '<?xml version="1.0"?>'
+        '<container version="1.0" '
+        'xmlns="urn:oasis:names:tc:opendocument:xmlns:container">'
+        "<rootfiles>"
+        '<rootfile full-path="OEBPS/content.opf" '
+        'media-type="application/oebps-package+xml"/>'
+        "</rootfiles>"
+        "</container>"
+    )
+
+    files = {
+        "mimetype": "application/epub+zip",
+        "META-INF/container.xml": container,
+        "OEBPS/content.opf": opf,
+    }
+    files.update(chapter_files)
+    if nav_href:
+        links = "".join(
+            f'<li><a href="{h}">{t}</a></li>' for h, t in (nav_entries or [])
+        )
+        files[
+            posixpath.join("OEBPS", nav_href)
+        ] = f"<html><body><nav><ol>{links}</ol></nav></body></html>"
+    if ncx_href:
+        points = "".join(
+            '<navPoint id="np{}"><navLabel><text>{}</text></navLabel>'
+            '<content src="{}"/></navPoint>'.format(i, t, s)
+            for i, (s, t) in enumerate(ncx_entries or [])
+        )
+        files[posixpath.join("OEBPS", ncx_href)] = (
+            '<?xml version="1.0" encoding="utf-8"?>'
+            '<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">'
+            f"<head/><docTitle><text>{title}</text></docTitle>"
+            f"<navMap>{points}</navMap></ncx>"
+        )
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        for name, content in files.items():
+            if isinstance(content, str):
+                content = content.encode("utf-8")
+            zf.writestr(name, content)
+    return buf.getvalue()
+
+
 def make_pdf_bytes(page_texts):
     """
     Build a minimal valid PDF (bytes) with one page per string in
@@ -96,8 +203,11 @@ def make_pdf_bytes(page_texts):
             f"/Resources << /Font << /F1 {font_id} 0 R >> >> >>"
         )
         objs[page_id + 1] = (
-            b"<< /Length " + str(len(stream)).encode() + b" >>\nstream\n"
-            + stream + b"\nendstream"
+            b"<< /Length "
+            + str(len(stream)).encode()
+            + b" >>\nstream\n"
+            + stream
+            + b"\nendstream"
         )
 
     out = b"%PDF-1.4\n"
