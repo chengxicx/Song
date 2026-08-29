@@ -4,11 +4,12 @@ Book create/edit forms.
 
 import json
 from flask import request
-from wtforms import StringField, SelectField, TextAreaField, IntegerField, HiddenField
+from wtforms import StringField, SelectField, TextAreaField, IntegerField, HiddenField, SelectMultipleField
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
+from wtforms.widgets import ListWidget, CheckboxInput
 
 # Global configuration for allowed audio files
 ALLOWED_AUDIO_EXTENSIONS = [
@@ -267,3 +268,19 @@ class EditBookForm(FlaskForm):
             raise BookImportException(
                 f"Could not parse subtitle data: {e}", cause=e
             ) from e
+
+
+class BookSettingsForm(FlaskForm):
+    """
+    Book listing behaviour (home page series aggregation).
+
+    book_series_tags is stored comma-separated in the settings table;
+    choices are filled in by the route from the existing book tags.
+    """
+
+    book_series_tags = SelectMultipleField(
+        "Book series tags",
+        choices=[],
+        widget=ListWidget(prefix_label=False),
+        option_widget=CheckboxInput(),
+    )
