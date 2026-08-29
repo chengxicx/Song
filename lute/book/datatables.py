@@ -172,8 +172,9 @@ def _series_union_base_sql(archived, series_tags):
             MAX(booklastopened.lastopeneddate) AS lastopened,
             SUM(COALESCE(c.distinctterms, 0)) AS distinctcount,
             SUM(COALESCE(c.distinctunknowns, 0)) AS unknowncount,
-            AVG(c.unknownpercent) AS unknownpercent,
-            AVG(c.new_word_percent) AS newwordpercent
+            /* Rounded to integers to match the per-book display. */
+            CAST(ROUND(AVG(c.unknownpercent), 0) AS INTEGER) AS unknownpercent,
+            CAST(ROUND(AVG(c.new_word_percent), 0) AS INTEGER) AS newwordpercent
         FROM books b
         INNER JOIN (
             /* Each book is grouped under exactly one series tag. */

@@ -3461,12 +3461,21 @@ div#termimagesearch span img {
    ============================================================ */
 
 #booktable tr.series-row > td {
-    background-color: #eef3f9;
-    border-top: 2px solid #c8d6e8;
+    /* Semi-transparent so the tint works on light and dark themes. */
+    background-color: rgba(96, 144, 216, 0.15) !important;
+    border-top: 2px solid rgba(96, 144, 216, 0.5);
 }
 #booktable tr.series-row .col-title {
     padding-top: 8px;
     padding-bottom: 8px;
+}
+.series-titlebox {
+    min-width: 0;
+}
+.series-titlerow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 .series-title {
     font-weight: bold;
@@ -3480,6 +3489,20 @@ div#termimagesearch span img {
     font-size: 0.82em;
     color: #66707d;
     margin-top: 2px;
+    /* Align under the series name (after the caret). */
+    margin-left: calc(1.1em + 6px);
+}
+.series-settings-gear {
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.55;
+}
+.series-settings-gear:hover {
+    opacity: 1;
+}
+.series-settings-gear img {
+    width: 14px;
+    height: 14px;
 }
 .series-progress {
     height: 14px;

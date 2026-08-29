@@ -30,10 +30,11 @@ from lute.book.service import (
 )
 from lute.book.datatables import get_data_tables_list
 from lute.book.series import get_series_overview
-from lute.book.forms import NewBookForm, EditBookForm, ALLOWED_AUDIO_EXTENSIONS
+from lute.book.forms import NewBookForm, EditBookForm, BookSettingsForm, ALLOWED_AUDIO_EXTENSIONS
 from lute.book.stats import Service as StatsService
 from lute.book.stats import get_difficulty_label
 import lute.utils.formutils
+from lute.utils.formutils import book_tag_choices
 from lute.db import db
 from lute.models.language import Language
 from lute.models.repositories import (
@@ -98,6 +99,27 @@ def archived():
 def datatables_archived_source():
     "Datatables data for archived books."
     return datatables_source(True)
+
+
+
+
+@bp.route("/settings", methods=["GET", "POST"])
+def book_settings():
+    "Book listing behaviour (series aggregation), from the Books menu."
+    repo = UserSettingRepository(db.session)
+    form = BookSettingsForm()
+    form.book_series_tags.choices = book_tag_choices(db.session)
+
+    if form.validate_on_submit():
+        tags = ",".join(form.book_series_tags.data or [])
+        repo.set_dynamic_value("book_series_tags", tags)
+        db.session.commit()
+        flash("Book settings updated", "success")
+        return redirect("/", 302)
+
+    current = repo.get_dynamic_value("book_series_tags") or ""
+    form.book_series_tags.data = [t for t in current.split(",") if t]
+    return render_template("book/settings.html", form=form)
 
 
 @bp.route("/series/<tagtext>", methods=["GET"])
