@@ -50,6 +50,22 @@
 
   .import-actions { margin-top: 1.2rem; display: flex; align-items: center; gap: .6rem; }
   .import-actions .hint { color: var(--font-color, #888); opacity: .7; font-size: .8rem; }
+
+  .epub-preview-meta { font-size: .92rem; color: var(--font-color, #222); margin-bottom: .8rem; }
+  .epub-chapter-tools { display: flex; align-items: center; gap: 1rem; margin-bottom: .4rem; }
+  .epub-chapter-list {
+    max-height: 320px; overflow-y: auto; border: 1px solid var(--form-border-color, #e3e8ef);
+    border-radius: 6px; padding: .4rem .6rem; color-scheme: light dark;
+  }
+  .epub-chapter-list label {
+    display: flex; align-items: baseline; gap: .5rem; padding: .12rem .2rem;
+    font-size: .88rem; color: var(--font-color, #222); cursor: pointer; border-radius: 4px;
+  }
+  .epub-chapter-list label:hover { background: rgba(109, 169, 233, 0.08); }
+  .epub-chapter-list .chapnum {
+    flex: 0 0 auto; min-width: 2.2rem; text-align: right;
+    color: var(--font-color, #999); font-variant-numeric: tabular-nums;
+  }
 </style>
 
 <div class="import-type-bar">
@@ -62,6 +78,7 @@
     <option value="video">Online video</option>
     <option value="manga">Mokuro Manga</option>
     <option value="pdf">PDF</option>
+    <option value="epub">EPUB</option>
   </select>
 </div>
 
@@ -341,6 +358,61 @@
   </div>
 </form>
 
+<form id="epub-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
+  <p class="import-desc">Import an EPUB as a series — each chapter becomes its own book, tagged "EPUB" plus the book title, and shown as one aggregated row on the home page. Use "Preview &amp; confirm" to review and select chapters before importing.</p>
+  <div class="iform">
+    <div class="irow">
+      <label class="ilbl" for="epub-language">Language</label>
+      <div class="ictrl">
+        <select id="epub-language" name="language_id">
+          {% for id, name in language_choices %}
+          <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="epub_title">Title</label>
+      <div class="ictrl">
+        <input type="text" id="epub_title" name="epub_title" placeholder="Optional, defaults to EPUB metadata or file name">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="epub_file">EPUB file</label>
+      <div class="ictrl">
+        <input type="file" id="epub_file" name="epub_file" accept=".epub">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="epub_tag">Tags</label>
+      <div class="ictrl">
+        <input type="text" id="epub_tag" name="epub_tag" class="form-control" value='[{"value":"EPUB"}]'>
+      </div>
+    </div>
+  </div>
+  <div class="import-actions">
+    <input type="hidden" name="import_type" value="epub">
+    <button type="submit" id="epub-import" class="btn btn-primary">Import</button>
+    <button type="button" id="epub-preview" class="btn">Preview &amp; confirm</button>
+    <span class="hint" id="epub-preview-status"></span>
+  </div>
+</form>
+
+<div id="epub-preview-panel" class="import-form" style="display: none;">
+  <p class="import-desc" style="margin-bottom: .6rem;">Preview — check the chapters to import (all selected by default), then confirm. The file is re-uploaded on confirm; nothing is saved until then.</p>
+  <div id="epub-preview-meta" class="epub-preview-meta"></div>
+  <div class="epub-chapter-tools">
+    <label><input type="checkbox" id="epub-select-all" checked> Select all</label>
+    <span class="hint" id="epub-chapter-count"></span>
+  </div>
+  <div id="epub-chapter-list" class="epub-chapter-list"></div>
+  <div class="import-actions">
+    <button type="button" id="epub-confirm" class="btn btn-primary">Confirm import</button>
+    <button type="button" id="epub-cancel" class="btn">Cancel</button>
+    <span class="hint" id="epub-confirm-status"></span>
+  </div>
+</div>
+
 <script type="text/javascript">
   var EXISTING_TAGS = {{ existing_tags | tojson }};
 
@@ -365,6 +437,8 @@
     const videoForm = $('#video-form');
     const mangaForm = $('#manga-form');
     const pdfForm = $('#pdf-form');
+    const epubForm = $('#epub-form');
+    const epubPreviewPanel = $('#epub-preview-panel');
 
     // Init Tagify on all tag inputs.
     var ytTagify = setupTagsTagify(document.getElementById('youtube_tag'));
@@ -373,6 +447,7 @@
     var videoTagify = setupTagsTagify(document.getElementById('video_tag'));
     var mangaTagify = setupTagsTagify(document.getElementById('manga_tag'));
     var pdfTagify = setupTagsTagify(document.getElementById('pdf_tag'));
+    var epubTagify = setupTagsTagify(document.getElementById('epub_tag'));
 
     const updateForms = function () {
       const t = typeSel.val();
@@ -383,6 +458,10 @@
       videoForm.toggle(t === 'video');
       mangaForm.toggle(t === 'manga');
       pdfForm.toggle(t === 'pdf');
+      epubForm.toggle(t === 'epub');
+      if (t !== 'epub') {
+        epubPreviewPanel.hide();
+      }
     };
 
     typeSel.on('change', updateForms);
@@ -423,6 +502,121 @@
       if (titleField.val() === '') {
         titleField.val(getFilenameWithoutExtension(f.name));
       }
+    });
+    $('#epub_file').on('change', function () {
+      var f = $(this).prop('files')[0];
+      if (!f) return;
+      var titleField = $('#epub_title');
+      if (titleField.val() === '') {
+        titleField.val(getFilenameWithoutExtension(f.name));
+      }
+    });
+
+    // Escape text from the parse response before inserting into HTML.
+    const escapeHtml = function (s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    };
+
+    // Preview & confirm: parse the EPUB (no DB write) and list chapters.
+    $('#epub-preview').on('click', function () {
+      const fileInput = document.getElementById('epub_file');
+      const status = $('#epub-preview-status');
+      if (!fileInput.files || !fileInput.files[0]) {
+        status.text('Please choose an EPUB file first.').css('color', 'red');
+        return;
+      }
+      const btn = $(this);
+      btn.prop('disabled', true);
+      status.text('Parsing…').css('color', '');
+      const fd = new FormData();
+      fd.append('epub_file', fileInput.files[0]);
+      fetch('/book/import/epub/preview', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(data => {
+          btn.prop('disabled', false);
+          if (!data.success) {
+            status.text(data.error || 'Could not parse the EPUB file.').css('color', 'red');
+            return;
+          }
+          status.text('');
+          if (data.title) {
+            $('#epub_title').val(data.title);
+          }
+          $('#epub-preview-meta').html(
+            '<div class="epub-meta-line"><strong>Title:</strong> ' + escapeHtml(data.title || '(unknown)') + '</div>' +
+            '<div class="epub-meta-line"><strong>Author:</strong> ' + escapeHtml(data.author || '(unknown)') + '</div>'
+          );
+          const list = $('#epub-chapter-list').empty();
+          data.chapters.forEach(ch => {
+            list.append(
+              '<label><input type="checkbox" class="epub-chapter-check" value="' + ch.index + '" checked>' +
+              '<span class="chapnum">' + (ch.index + 1) + '</span><span>' + escapeHtml(ch.title) + '</span></label>'
+            );
+          });
+          $('#epub-chapter-count').text(data.chapters.length + ' chapter(s) found');
+          $('#epub-select-all').prop('checked', true);
+          $('#epub-confirm-status').text('');
+          epubPreviewPanel.show();
+        })
+        .catch(() => {
+          btn.prop('disabled', false);
+          status.text('Could not parse the EPUB file.').css('color', 'red');
+        });
+    });
+
+    $('#epub-select-all').on('change', function () {
+      $('.epub-chapter-check').prop('checked', this.checked);
+    });
+
+    $('#epub-cancel').on('click', function () {
+      epubPreviewPanel.hide();
+      $('#epub-preview-status').text('');
+    });
+
+    // Confirm: re-upload the file with the selected chapter indices.
+    $('#epub-confirm').on('click', function () {
+      const fileInput = document.getElementById('epub_file');
+      const selected = [];
+      $('.epub-chapter-check:checked').each(function () {
+        selected.push(parseInt(this.value, 10));
+      });
+      if (selected.length === 0) {
+        $('#epub-confirm-status').text('Please select at least one chapter.').css('color', 'red');
+        return;
+      }
+      const btn = $(this);
+      btn.prop('disabled', true);
+      $('#epub-preview').prop('disabled', true);
+      $('#epub-confirm-status').text('Importing ' + selected.length + ' chapter(s)…').css('color', '');
+      const fd = new FormData();
+      fd.append('epub_file', fileInput.files[0]);
+      fd.append('language_id', $('#epub-language').val());
+      fd.append('epub_title', $('#epub_title').val());
+      fd.append('epub_tag', $('#epub_tag').val() || '');
+      fd.append('chapters', JSON.stringify(selected));
+      fetch('/book/import/epub', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(data => {
+          btn.prop('disabled', false);
+          $('#epub-preview').prop('disabled', false);
+          if (!data.success) {
+            $('#epub-confirm-status').text(data.error || 'Import failed.').css('color', 'red');
+            return;
+          }
+          let msg = 'Imported ' + data.imported + ' chapter(s).';
+          if (data.failed) {
+            msg += ' ' + data.failed + ' failed.';
+          }
+          $('#epub-confirm-status').text(msg).css('color', 'green');
+          window.location.href = '/book/series/' + encodeURIComponent(data.series_tag);
+        })
+        .catch(() => {
+          btn.prop('disabled', false);
+          $('#epub-preview').prop('disabled', false);
+          $('#epub-confirm-status').text('Import failed.').css('color', 'red');
+        });
     });
   });
 </script>
