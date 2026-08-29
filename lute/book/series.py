@@ -15,11 +15,14 @@ SELECT
     b.BkID AS BkID,
     b.BkTitle AS BkTitle,
     b.BkArchived AS BkArchived,
+    LgName,
+    tags.taglist AS TagList,
     COALESCE(textcounts.pagecount, 1) AS PageCount,
     currtext.TxOrder AS PageNum,
     textcounts.wc AS WordCount,
     booklastopened.lastopeneddate AS LastOpenedDate,
     c.new_word_percent AS NewWordPercent,
+    c.unknownpercent AS UnknownPercent,
     c.status_distribution AS StatusDistribution,
     CASE WHEN completed_books.BkID IS NULL THEN 0 ELSE 1 END AS IsCompleted
 FROM books b
@@ -34,6 +37,17 @@ LEFT OUTER JOIN (
     GROUP BY TxBkID
 ) textcounts on textcounts.TxBkID = b.BkID
 LEFT OUTER JOIN bookstats c on c.BkID = b.BkID
+LEFT OUTER JOIN (
+    SELECT BtBkID as BkID, GROUP_CONCAT(T2Text, ', ') AS taglist
+    FROM
+    (
+        SELECT BtBkID, T2Text
+        FROM booktags bt
+        INNER JOIN tags2 t2 ON t2.T2ID = bt.BtT2ID
+        ORDER BY T2Text
+    ) tagssrc
+    GROUP BY BtBkID
+) AS tags ON tags.BkID = b.BkID
 LEFT OUTER JOIN (
     select texts.TxBkID as BkID
     from texts
@@ -50,55 +64,14 @@ WHERE b.BkID in (
 ORDER BY b.BkArchived, b.BkTitle COLLATE NOCASE
 """
 
-_STATUS_LABELS = {
-    "0": "Unknown",
-    "1": "Level 1",
-    "2": "Level 2",
-    "3": "Level 3",
-    "4": "Level 4",
-    "5": "Level 5",
-    "99": "Well Known or Ignored",
-}
-
-_STATUS_ORDER = ["0", "1", "2", "3", "4", "5", "99"]
-
-
-def _status_bar_html(status_distribution):
-    """
-    Server-rendered status distribution bar, mirroring the
-    render_stats_graph() output used in the book table.
-    """
-    if not status_distribution:
-        return '<div class="status-bar-container"><div class="status-bar-empty">—</div></div>'
-    try:
-        counts = dict(json.loads(status_distribution))
-    except (ValueError, TypeError):
-        return '<div class="status-bar-container"><div class="status-bar-empty">—</div></div>'
-
-    counts["99"] = counts.get("98", 0) + counts.get("99", 0)
-    counts.pop("98", None)
-    total = sum(counts.values())
-    if total == 0:
-        return '<div class="status-bar-container"><div class="status-bar-empty">—</div></div>'
-
-    parts = []
-    for key in _STATUS_ORDER:
-        if key not in counts:
-            continue
-        pct = counts[key] * 100.0 / total
-        display = "inline-flex" if pct >= 1 else "none"
-        label = _STATUS_LABELS[key]
-        title = f"{label}: {pct:.0f}% ({counts[key]} words)"
-        parts.append(
-            f'<div class="status-bar{key} status-bar" title="{title}" '
-            f'style="flex: {pct}; display: {display}"></div>'
-        )
-    return '<div class="status-bar-container">' + "".join(parts) + "</div>"
-
 
 def get_series_overview(session, tagtext):
     """
     View model for the series page, or None if no books carry the tag.
+
+    Each entry in `books` doubles as a row for the client-side
+    DataTable on the overview page (BkID/BkTitle/... keys, mirroring
+    the home book table's row shape), plus a few display-only fields.
     """
     rows = session.execute(
         db.text(_SERIES_BOOKS_SQL), {"tagtext": tagtext}
@@ -119,11 +92,6 @@ def get_series_overview(session, tagtext):
         pagecount = r.PageCount or 1
         is_completed = bool(r.IsCompleted)
         label, color_class, description = get_difficulty_label(r.NewWordPercent)
-        progress = (
-            "✓"
-            if is_completed
-            else (f"({pagenum}/{pagecount})" if pagenum > 1 else "")
-        )
 
         if not r.BkArchived:
             active_count += 1
@@ -144,28 +112,37 @@ def get_series_overview(session, tagtext):
 
         books.append(
             {
-                "id": r.BkID,
-                "title": r.BkTitle,
+                # Keys used by the client-side DataTable (same shape as
+                # the home book listing rows).
+                "BkID": r.BkID,
+                "BkTitle": r.BkTitle,
+                "LgName": r.LgName,
+                "TagList": r.TagList or "",
+                "WordCount": wordcount,
+                "UnknownPercent": r.UnknownPercent,
+                "NewWordPercent": r.NewWordPercent,
+                "LastOpenedDate": r.LastOpenedDate,
+                "StatusDistribution": r.StatusDistribution,
+                "DifficultyLabel": label,
+                "DifficultyColor": color_class,
+                "DifficultyDescription": description,
+                "IsCompleted": 1 if is_completed else 0,
+                "BkArchived": 1 if r.BkArchived else 0,
+                "PageNum": pagenum,
+                "PageCount": pagecount,
+                # Display-only fields for the template fallback rows.
                 "archived": bool(r.BkArchived),
-                "word_count": wordcount,
-                "progress": progress,
                 "is_completed": is_completed,
-                "last_read": r.LastOpenedDate,
-                "new_word_percent": r.NewWordPercent,
-                "difficulty_label": label,
-                "difficulty_color": color_class,
-                "difficulty_description": description,
-                "status_bar_html": _status_bar_html(r.StatusDistribution),
             }
         )
 
     # The continue target falls back to the first book when every
     # episode has been read.
     if continue_book is None:
-        continue_book = {"id": books[0]["id"], "title": books[0]["title"]}
+        continue_book = {"id": books[0]["BkID"], "title": books[0]["BkTitle"]}
 
     avg_new_word = (
-        round(sum(new_word_pcts) / len(new_word_pcts), 1) if new_word_pcts else None
+        int(round(sum(new_word_pcts) / len(new_word_pcts))) if new_word_pcts else None
     )
     label, color_class, description = get_difficulty_label(avg_new_word)
 

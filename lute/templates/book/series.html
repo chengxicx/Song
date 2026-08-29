@@ -10,13 +10,16 @@
   <div class="series-summary-title">
     {{ tag }}
     <span class="series-summary-lang">tag series</span>
+    <a class="series-settings-gear" href="/book/settings" title="Configure book series tags">
+      <img src="{{ url_for('static', filename='icn/settings-gear-icon.svg') }}" alt="configure series">
+    </a>
   </div>
   <div class="series-summary-stat">
     {% if book_count == total_count %}{{ total_count }} books{% else %}{{ book_count }} books (+{{ total_count - book_count }} archived){% endif %}
     &middot; {{ "{:,}".format(total_words) }} words
   </div>
   <div class="series-summary-stat">
-    <b>{{ read_count }}/{{ book_count }}</b> read{% if total_count > 0 %} ({{ ((read_count * 100 / book_count) | round | int) }}%){% endif %}
+    <b>{{ read_count }}/{{ book_count }}</b> read{% if book_count > 0 %} ({{ ((read_count * 100 / book_count) | round | int) }}%){% endif %}
   </div>
   <div class="series-summary-stat">
     avg new-word
@@ -28,35 +31,242 @@
   </div>
 </div>
 
-<table class="table dataTable stripe" id="seriestable">
+<table id="booktable" class="table dataTable stripe">
   <thead>
     <tr>
       <th style="text-align: left">Title</th>
+      <th style="text-align: left">Language</th>
+      <th style="text-align: left">Tags</th>
       <th style="text-align: left">Word count</th>
       <th style="text-align: left">Status</th>
       <th style="text-align: left">New word</th>
       <th style="text-align: left">Last read</th>
+      <th style="text-align: left">Actions</th>
     </tr>
   </thead>
-  <tbody>
-    {% for b in books %}
-    <tr class="{{ 'series-book-archived' if b.archived else '' }}">
-      <td>
-        <a class="book-title {{ 'completed_book' if b.is_completed else '' }}" href="/read/{{ b.id }}">{{ b.title }}</a>
-        {% if b.archived %}<span class="series-book-archived-note">(archived)</span>{% endif %}
-        {% if b.progress and not b.is_completed %}<span class="series-book-progress">{{ b.progress }}</span>{% endif %}
-      </td>
-      <td>{{ "{:,}".format(b.word_count) }}</td>
-      <td>{{ b.status_bar_html | safe }}</td>
-      <td>
-        <span class="new-word-badge {{ b.difficulty_color }}" title="{{ b.difficulty_description }}">
-          {{ b.difficulty_label }}{% if b.new_word_percent is not none %} {{ b.new_word_percent }}%{% endif %}
-        </span>
-      </td>
-      <td>{% if b.last_read %}{{ b.last_read }}{% endif %}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
 </table>
+
+{# Hidden form for archive, unarchive, delete. #}
+<form id="actionposter" method="post" action="">
+</form>
+
+{# Status detail modal #}
+<div id="statusModalOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:9999;justify-content:center;align-items:center;">
+  <div id="statusModal" style="background:#fff;border-radius:8px;padding:20px;min-width:320px;max-width:420px;box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div id="statusModalTitle" style="font-weight:bold;font-size:15px;"></div>
+      <button onclick="document.getElementById('statusModalOverlay').style.display='none'"
+              style="background:none;border:none;font-size:18px;cursor:pointer;color:#adb5bd;padding:0 4px;">&times;</button>
+    </div>
+    <div id="statusModalBody"></div>
+  </div>
+</div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/dayjs/dayjs.min.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/dayjs/relativeTime.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/book-listing-shared.js') }}?v={{ lute_version }}" charset="utf-8"></script>
+<script>
+  var series_books = {{ books | tojson }};
+
+  var thresholds = [
+  { l: 's', r: 1 },
+  { l: 'm', r: 1 },
+  { l: 'mm', r: 55, d: 'minute' },
+  { l: 'h', r: 1 },
+  { l: 'hh', r: 22, d: 'hour' },
+  { l: 'd', r: 1 },
+  { l: 'dd', r: 25, d: 'day' },
+  { l: 'M', r: 1 },
+  { l: 'MM', r: 11, d: 'month' },
+  { l: 'y', r: 1 },
+  { l: 'yy', d: 'year' }
+  ];
+  dayjs.extend(dayjs_plugin_relativeTime, { thresholds: thresholds });
+
+  var book_listing_table;
+
+  $(document).ready(function () {
+    book_listing_table = $('#booktable').DataTable({
+      layout: {
+        topStart: null,
+        topEnd: 'search',
+        bottomStart: [
+          'pageLength',
+          {
+            info: {
+              callback: function (s, start, end, max, total, result) {
+                return `${start} to ${end} of ${max}`;
+              }
+            }
+          }
+        ],
+        bottomEnd: 'paging'
+      },
+      responsive: false,
+      scrollX: true,
+      autoWidth: false,
+      select: false,
+      lengthMenu: [ 10, 25, 50, 100 ],
+      pageLength: 25,
+      paging: true,
+      info: true,
+      searching: true,
+      processing: false,
+      serverSide: false,
+      data: series_books,
+      // Default: title order.  The column-visibility and sort state are
+      // SHARED with the home book table (same state key below), so this
+      // page follows the home page's column setup; the search term is
+      // not part of the saved state, so the two pages don't leak
+      // searches into each other.
+      order: [[0, 'asc']],
+      stateSave: true,
+      stateDuration: 0,
+      stateSaveCallback: function(settings, data) {
+        data.version = 4;
+        data.search = { search: "", regex: false, smart: true };
+        data.columns.forEach(function(c) { c.search = { search: "", regex: false, smart: true }; });
+        var stateJson = JSON.stringify(data);
+        localStorage.setItem('booklisting_datatables_state', stateJson);
+        try {
+          $.ajax({
+            url: '/settings/datatables_state/save',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ key: 'booklisting', value: stateJson }),
+            xhrFields: { withCredentials: true }
+          }).fail(function() { /* swallow, localStorage already has it */ });
+        } catch(e) {}
+      },
+      stateLoadCallback: function(settings, callback) {
+        var saved = localStorage.getItem('booklisting_datatables_state');
+        if (saved) {
+          try {
+            var ld = JSON.parse(saved);
+            if (ld && ld.version === 4) {
+              ld.search = { search: "", regex: false, smart: true };
+              callback(ld);
+              return;
+            }
+          } catch (err) { /* ignore malformed state */ }
+        }
+        $.ajax({
+          url: '/settings/datatables_state/load/booklisting',
+          method: 'GET',
+          dataType: 'json',
+          success: function(resp) {
+            if (resp && resp.value) {
+              try {
+                var sd = JSON.parse(resp.value);
+                if (sd && sd.version === 4) {
+                  localStorage.setItem('booklisting_datatables_state', resp.value);
+                  sd.search = { search: "", regex: false, smart: true };
+                  callback(sd);
+                  return;
+                }
+              } catch (err) { /* ignore malformed state */ }
+            }
+            callback(null);
+          },
+          error: function() {
+            callback(null);
+          }
+        });
+      },
+      columns: [
+        { name: "BkTitle", className: "col-title", width: "28%", data: "BkTitle", render: render_book_title },
+        { name: "LgName", className: "col-lang", width: "8%", data: "LgName" },
+        { name: "TagList", className: "col-tags", width: "16%", data: "TagList", render: render_tag_list },
+        { name: "WordCount", className: "col-words", width: "8%", data: "WordCount" },
+        { name: "UnknownPercent", className: "col-status", width: "12%", data: "UnknownPercent", searchable: false, render: render_book_stats_graph_placeholder },
+        { name: "NewWordPercent", className: "col-newword", width: "12%", data: "NewWordPercent", searchable: false, orderable: true, render: render_new_word_placeholder },
+        { name: "LastOpenedDate", className: "col-lastread", width: "10%", data: "LastOpenedDate", searchable: false, render: render_last_opened_date },
+        { name: "Actions", className: "col-actions", width: "6%", data: null, searchable: false, orderable: false, render: render_book_actions },
+      ],
+    });
+
+    // Column show/hide via the gear in the menu bar (same as home page;
+    // base.html only shows the gear when a .dt-container exists).
+    function buildColvisMenu() {
+      var menu = document.getElementById('colvis-menu');
+      if (!menu || !book_listing_table) return;
+      menu.innerHTML = '';
+      var columnLabels = {
+        BkTitle: 'Title',
+        LgName: 'Language',
+        TagList: 'Tags',
+        WordCount: 'Word count',
+        UnknownPercent: 'Status',
+        NewWordPercent: 'New word',
+        LastOpenedDate: 'Last read',
+        Actions: 'Actions'
+      };
+      book_listing_table.columns().every(function() {
+        var colIdx = this.index();
+        var colSettings = book_listing_table.settings().init();
+        var colName = colSettings.columns[colIdx].name;
+        var title = columnLabels[colName] || colName;
+        if (title === 'Actions') return;
+        var label = document.createElement('label');
+        label.className = 'colvis-item';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = this.visible();
+        var span = document.createElement('span');
+        span.textContent = title;
+        label.appendChild(cb);
+        label.appendChild(span);
+        cb.addEventListener('change', function() {
+          book_listing_table.column(colIdx).visible(cb.checked);
+        });
+        menu.appendChild(label);
+      });
+    }
+
+    function positionColvisMenu() {
+      var menu = document.getElementById('colvis-menu');
+      var gear = document.getElementById('datatables_config_widget_top');
+      if (!menu || !gear) return;
+      if (menu.parentNode !== document.body) {
+        document.body.appendChild(menu);
+      }
+      menu.style.display = 'block';
+      var rect = gear.getBoundingClientRect();
+      var menuH = menu.offsetHeight;
+      var winH = window.innerHeight;
+      var winW = window.innerWidth;
+      var menuW = menu.offsetWidth;
+      var top = rect.bottom + 6;
+      if (top + menuH > winH - 8) top = rect.top - menuH - 6;
+      var left = rect.left;
+      if (left + menuW > winW - 8) left = winW - menuW - 8;
+      menu.style.top = Math.max(4, top) + 'px';
+      menu.style.left = Math.max(4, left) + 'px';
+    }
+
+    function hideColvisMenu() {
+      var menu = document.getElementById('colvis-menu');
+      if (menu) menu.style.display = 'none';
+    }
+
+    $(document).on('click', '#datatables_config_toggle_top', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var menu = document.getElementById('colvis-menu');
+      if (menu && menu.style.display === 'block') {
+        hideColvisMenu();
+      } else {
+        try { buildColvisMenu(); } catch (err) { console.error('buildColvisMenu:', err); }
+        positionColvisMenu();
+      }
+    });
+
+    $(document).on('click', function(e) {
+      if (!$(e.target).closest('#datatables_config_widget_top, #colvis-menu').length) {
+        hideColvisMenu();
+      }
+    });
+  });
+</script>
 
 {% endblock %}

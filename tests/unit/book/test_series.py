@@ -43,14 +43,13 @@ def test_overview_counts_and_order(app_context, _erin_books):
     b1, b2, _other = _erin_books
     vm = get_series_overview(db.session, "Erin")
     assert vm is not None
-    assert [b["title"] for b in vm["books"]] == ["Erin-01", "Erin-02"]
+    assert [b["BkTitle"] for b in vm["books"]] == ["Erin-01", "Erin-02"]
     assert vm["total_count"] == 2
     assert vm["book_count"] == 2
     assert vm["read_count"] == 1
     assert vm["continue_id"] == b2.id, "continue points at first unread"
     assert vm["books"][0]["is_completed"] is True
-    assert "status-bar-container" in vm["books"][0]["status_bar_html"]
-    assert vm["books"][1]["status_bar_html"].count("status-bar") > 0
+    assert vm["books"][0]["StatusDistribution"] is None, "stats not calculated yet"
 
 
 def test_overview_returns_none_for_unknown_tag(app_context, _erin_books):

@@ -1,5 +1,5 @@
 """
-Tests for the book_series_tags setting round-trip through the settings form.
+Tests for the book_series_tags setting round-trip through /book/settings.
 """
 
 from lute.db import db
@@ -18,44 +18,22 @@ def _mk_tagged_book(title, tags, language):
     repo.commit()
 
 
-def _settings_post_data(series_tags=None):
-    "Minimal valid payload for the settings form (all fields must validate)."
-    data = {
-        "backup_dir": "",
-        "backup_count": "5",
-        "current_theme": "Default.css",
-        "custom_styles": "",
-        "show_highlights": "1",
-        "stats_calc_sample_size": "5",
-        "mecab_path": "",
-        "japanese_dict": "auto",
-        "japanese_reading": "katakana",
-        "japanese_sudachi_dict": "core",
-        "japanese_sudachi_mode": "C",
-        "ankiconnect_url": "http://127.0.0.1:8765",
-        "tts_hover_delay": "200",
-    }
-    if series_tags:
-        data["book_series_tags"] = series_tags
-    return data
-
-
 def test_series_tags_roundtrip(app, app_context, client, english):
-    "Saving the settings form stores selected tags comma-separated."
+    "Saving /book/settings stores selected tags comma-separated."
     _mk_tagged_book("Erin-01", ["Erin", "Video"], english)
 
-    resp = client.get("/settings/index")
+    resp = client.get("/book/settings")
     assert resp.status_code == 200
     assert b"Book series tags" in resp.data
     assert b"Erin (1 book)" in resp.data
     assert b"Video (1 book)" in resp.data
 
-    resp = client.post("/settings/index", data=_settings_post_data(["Erin"]))
+    resp = client.post("/book/settings", data={"book_series_tags": ["Erin"]})
     assert resp.status_code == 302
     assert UserSettingRepository(db.session).get_value("book_series_tags") == "Erin"
 
     # Reloading the form re-checks the saved tags.
-    resp = client.get("/settings/index")
+    resp = client.get("/book/settings")
     html = resp.data.decode("utf-8")
     import re
 
@@ -71,8 +49,15 @@ def test_series_tags_empty_save(app, app_context, client, english):
     "Posting no selections clears the setting."
     _mk_tagged_book("Erin-01", ["Erin"], english)
     repo = UserSettingRepository(db.session)
-    repo.set_value("book_series_tags", "Erin")
+    repo.set_dynamic_value("book_series_tags", "Erin")
     db.session.commit()
 
-    client.post("/settings/index", data=_settings_post_data())
+    client.post("/book/settings", data={})
     assert repo.get_value("book_series_tags") == ""
+
+
+def test_series_tags_not_on_general_settings_page(app, app_context, client):
+    "The general settings page no longer hosts the series-tags field."
+    resp = client.get("/settings/index")
+    assert resp.status_code == 200
+    assert b"Book series tags" not in resp.data
