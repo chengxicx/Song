@@ -41,45 +41,59 @@ let render_tag_list = function(data, type, row, meta) {
 const BOOK_TYPE_META = {
   text: {
     label: 'Text',
+    short: 'Text',
     color: '#3b82f6',
     paths: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>'
   },
   youtube: {
     label: 'YouTube',
+    short: 'YouTube',
     color: '#FF0000',
     filled: '<path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>'
   },
   bilibili: {
     label: 'Bilibili',
+    short: 'Bilibili',
     color: '#00A1D6',
     filled: '<path d="M8.2 2.2 11 6M15.8 2.2 13 6" stroke="#00A1D6" stroke-width="2" stroke-linecap="round" fill="none"/><rect x="3" y="6.6" width="18" height="13.8" rx="3.2" fill="#00A1D6"/><circle cx="9" cy="12.4" r="1.7" fill="#fff"/><circle cx="15" cy="12.4" r="1.7" fill="#fff"/>'
   },
   mp3: {
     label: 'Audio (MP3)',
+    short: 'MP3',
     color: '#2f9e44',
     paths: '<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>'
   },
   video: {
     label: 'Video',
+    short: 'Video',
     color: '#845ef7',
     paths: '<path d="M10 7.75a.75.75 0 0 1 1.142-.638l3.664 2.249a.75.75 0 0 1 0 1.278l-3.664 2.25a.75.75 0 0 1-1.142-.64z"/><path d="M12 17v4"/><path d="M8 21h8"/><rect x="2" y="3" width="20" height="14" rx="2"/>'
   },
   manga: {
     label: 'Manga',
+    short: 'Manga',
     color: '#f76707',
     paths: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>'
   },
   pdf: {
     label: 'PDF',
+    short: 'PDF',
     color: '#e03131',
     paths: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>'
   },
   series: {
     label: 'Book series',
+    short: 'Series',
     color: '#4c6ef5',
     paths: '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>'
   }
 };
+
+/* Type column display mode: 'icon' (tinted chips) or 'text' (colored
+   pill labels).  Only the home page loads the saved preference and
+   shows the toggle button in the Type header; other pages sharing this
+   renderer (the series overview) always show icons. */
+var book_type_display_mode = 'icon';
 
 let render_book_type = function(data, type, row, meta) {
   const btype = row['SeriesTag'] ? 'series' : (row['BookType'] || 'text');
@@ -90,12 +104,96 @@ let render_book_type = function(data, type, row, meta) {
   const r = parseInt(m.color.slice(1, 3), 16);
   const g = parseInt(m.color.slice(3, 5), 16);
   const b = parseInt(m.color.slice(5, 7), 16);
+  if (book_type_display_mode === 'text') {
+    return `<span class="type-chip-text" style="color:${m.color};background:rgba(${r},${g},${b},0.12)" ` +
+      `title="Type: ${m.label}">${m.short}</span>`;
+  }
   const inner = m.filled ||
     `<g fill="none" stroke="${m.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${m.paths}</g>`;
   return `<span class="type-chip" style="background:rgba(${r},${g},${b},0.12)" ` +
     `title="Type: ${m.label}">` +
     `<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">${inner}</svg></span>`;
 };
+
+/* The Type header needs ~92px on one line (label + toggle button +
+   sort arrows), the text pills ~96px ("YouTube" pill + padding).
+   Enforce these as minimums only, so columns the user dragged wider
+   are left alone. */
+let apply_book_type_width = function() {
+  if (typeof book_listing_table === 'undefined' || !book_listing_table) return;
+  const need = (book_type_display_mode === 'text') ? 96 : 92;
+  const col = book_listing_table.column('BookType:name');
+  if (!col || !col.visible()) return;
+  const idx = col.index();
+  const $wrapper = $('#booktable').closest('.dt-container');
+  if (!$wrapper.length) return;
+  $wrapper.find('table').each(function() {
+    const $t = $(this);
+    const $cg = $t.find('colgroup col');
+    if ($cg.length > idx) {
+      const el = $cg.eq(idx)[0];
+      // Compare the inline style ("4%", "120px", or unset) against the
+      // minimum; computed styles on <col> are unreliable.
+      const cur = parseFloat(el.style.width);
+      if (!cur || cur < need) {
+        el.style.width = need + 'px';
+      }
+    }
+    const $th = $t.find('thead th').eq(idx);
+    if ($th.length) {
+      const thEl = $th[0];
+      const curTh = parseFloat(thEl.style.width);
+      if (!curTh || curTh < need) {
+        thEl.style.width = need + 'px';
+      }
+    }
+  });
+};
+
+/* Same async-wrapper dance as enable_column_resize: with an async
+   DataTables state load the scroll structure may not exist yet. */
+let apply_book_type_width_when_ready = function() {
+  let tries = 0;
+  const wait = function() {
+    const $wrapper = $('#booktable').closest('.dt-container');
+    if ($wrapper.length === 0 || $wrapper.find('thead th').length === 0) {
+      if (++tries < 50) setTimeout(wait, 100);
+      return;
+    }
+    apply_book_type_width();
+  };
+  wait();
+};
+
+/* Flip the Type column between icon chips and text pills (the small
+   button in the home table's Type header).  Rewrites only the visible
+   cells in place: no ajax refetch, no skeleton flash in the stats
+   columns. */
+function toggle_book_type_display(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  book_type_display_mode = (book_type_display_mode === 'text') ? 'icon' : 'text';
+  try {
+    localStorage.setItem('booklisting_type_display', book_type_display_mode);
+  } catch (err) { /* private mode etc. — session-only toggle still works */ }
+  const btn = document.getElementById('typeDisplayToggle');
+  if (btn) {
+    btn.title = (book_type_display_mode === 'text') ? 'Show icons' : 'Show text labels';
+  }
+  if (typeof book_listing_table === 'undefined' || !book_listing_table) return;
+  const col = book_listing_table.column('BookType:name');
+  if (!col || !col.visible()) return;
+  col.nodes().to$().each(function() {
+    const $td = $(this);
+    const data = book_listing_table.row($td.closest('tr')).data();
+    if (data) {
+      $td.html(render_book_type(data['BookType'], 'display', data));
+    }
+  });
+  apply_book_type_width();
+}
 
 let render_book_title = function ( data, type, row, meta ) {
   // Series aggregate row: link to the series overview page.

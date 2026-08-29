@@ -3440,7 +3440,8 @@ div#termimagesearch span img {
    alpha behind a 16px glyph; series rows get the stack icon.
    ============================================================ */
 #booktable td.col-type,
-#booktable th.col-type {
+#booktable th.col-type,
+.dt-scroll-headInner thead th.col-type {
     white-space: nowrap;
 }
 .type-chip {
@@ -3454,6 +3455,34 @@ div#termimagesearch span img {
 }
 .type-chip svg {
     display: block;
+}
+/* Text display mode (toggle in the Type header): same tinted style as
+   the icon chip, but a rounded label with the type's short name. */
+.type-chip-text {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 5px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+/* The icon/text toggle button in the Type column header. */
+.type-display-toggle {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 5px;
+    vertical-align: middle;
+    text-decoration: none;
+    opacity: 0.75;
+}
+.type-display-toggle:hover {
+    opacity: 1;
+}
+.type-display-toggle:focus {
+    outline: none;
 }
 
 /* ============================================================
