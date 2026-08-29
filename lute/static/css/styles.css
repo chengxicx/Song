@@ -3453,3 +3453,92 @@ div#termimagesearch span img {
         font-size: 0.95rem;
     }
 }
+
+/* ============================================================
+   Book series (tag-based aggregation).
+   Books carrying a configured "series tag" collapse into one
+   row on the Books page, linking to /book/series/<tag>.
+   ============================================================ */
+
+#booktable tr.series-row > td {
+    background-color: #eef3f9;
+    border-top: 2px solid #c8d6e8;
+}
+#booktable tr.series-row .col-title {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+.series-title {
+    font-weight: bold;
+}
+.series-caret {
+    display: inline-block;
+    width: 1.1em;
+    color: #4a6ea9;
+}
+.series-sub {
+    font-size: 0.82em;
+    color: #66707d;
+    margin-top: 2px;
+}
+.series-progress {
+    height: 14px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+    overflow: hidden;
+}
+.series-progress-fill {
+    height: 100%;
+    background-color: #72da88;
+}
+
+/* Series overview page (/book/series/<tag>). */
+.series-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    align-items: center;
+    background-color: var(--panel-bg, #eef3f9);
+    border: 1px solid #c8d6e8;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 8px 0 14px;
+}
+.series-summary-title {
+    font-size: 1.05em;
+    font-weight: bold;
+}
+.series-summary-lang {
+    font-weight: normal;
+    color: #66707d;
+}
+.series-summary-continue {
+    margin-left: auto;
+}
+/* Double class selector beats the themes' `a:link` color override. */
+.series-summary a.series-continue-btn,
+a.series-continue-btn:link,
+a.series-continue-btn:visited {
+    display: inline-block;
+    background-color: #2b6cb0;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+}
+.series-summary a.series-continue-btn:hover,
+a.series-continue-btn:hover {
+    background-color: #2c5282;
+    color: #fff;
+    text-decoration: none;
+}
+.series-book-archived td {
+    opacity: 0.6;
+}
+.series-book-archived-note,
+.series-book-progress {
+    color: #66707d;
+    font-size: 0.85em;
+    margin-left: 6px;
+}

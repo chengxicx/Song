@@ -696,6 +696,16 @@
   // each row in the table is a json dict, the keys are the SQL column names.
 
   let render_book_title = function ( data, type, row, meta ) {
+    // Series aggregate row: link to the series overview page.
+    if (row['SeriesTag']) {
+      const tag = encodeURIComponent(row['SeriesTag']);
+      const n = parseInt(row['SeriesBookCount']);
+      const r = parseInt(row['SeriesReadCount']);
+      return `<a class="book-title series-title" href="/book/series/${tag}">` +
+        `<span class="series-caret">&#9656;</span>${row['SeriesTag']}</a>` +
+        `<div class="series-sub">${n} eps &middot; ${r}/${n} read</div>`;
+    }
+
     const bkid = parseInt(row['BkID']);
     const pgnum = parseInt(row['PageNum']);
     const pgcount = parseInt(row['PageCount']);
@@ -716,6 +726,15 @@
   /* Replaced by the status graph after the ajax call kicked off by createdRow. */
   let render_book_stats_graph_placeholder = function(data, type, row, meta) {
     if (type === 'display' || type === 'filter') {
+      // Series rows show a read-progress bar instead of a status
+      // distribution (aggregated stats aren't loaded via ajax).
+      if (row['SeriesTag']) {
+        const n = parseInt(row['SeriesBookCount']) || 0;
+        const r = parseInt(row['SeriesReadCount']) || 0;
+        const pct = n > 0 ? Math.round(r * 100 / n) : 0;
+        return `<div class="series-progress" title="${r} of ${n} episodes read">` +
+          `<div class="series-progress-fill" style="width:${pct}%"></div></div>`;
+      }
       const sd = row['StatusDistribution'];
       if (sd) {
         try {
@@ -937,6 +956,16 @@
   };
 
   let render_book_actions = function ( data, type, row, meta ) {
+    // Series rows link to the series overview page.
+    if (row['SeriesTag']) {
+      const tag = encodeURIComponent(row['SeriesTag']);
+      return `<div class="book-action-dropdown"><span>&hellip;</span>
+        <div class="book-action-dropdown-content">
+          <a href="/book/series/${tag}">Open series page</a>
+        </div>
+      </div>`;
+    }
+
     // TODO zzfuture fix: security - add CSRF token
     const bkid = row['BkID'];
     const bktitle = encodeURIComponent(row['BkTitle']);

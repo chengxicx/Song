@@ -90,6 +90,33 @@
 
     <tr>
       <td>
+        <h2>Home page</h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {{ form.book_series_tags.label }}
+        <img
+          id="about_book_series_tags" style="margin-right:10px;"
+          src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+          title="Click for details"
+          onclick="$('#book_series_tags_help').toggle();"
+          />
+        <blockquote id="book_series_tags_help" style="width:60%; display: none;">
+          <p>Books carrying any of these tags collapse into a single
+          row on the Books page, showing the series progress.  Clicking
+          the row opens a series overview with a
+          &quot;continue&quot; button for the next unread book.</p>
+          <p>Leave a tag unchecked to keep its books listed
+          individually.  Searching or filtering the book list always
+          shows all books.</p>
+        </blockquote>
+      </td>
+      <td>{{ form.book_series_tags() }}</td>
+    </tr>
+
+    <tr>
+      <td>
         <h2>Behaviour</h2>
       </td>
     </tr>

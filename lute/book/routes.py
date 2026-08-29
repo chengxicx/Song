@@ -29,6 +29,7 @@ from lute.book.service import (
     MEDIA_LOCAL_MAX_BYTES,
 )
 from lute.book.datatables import get_data_tables_list
+from lute.book.series import get_series_overview
 from lute.book.forms import NewBookForm, EditBookForm, ALLOWED_AUDIO_EXTENSIONS
 from lute.book.stats import Service as StatsService
 from lute.book.stats import get_difficulty_label
@@ -97,6 +98,16 @@ def archived():
 def datatables_archived_source():
     "Datatables data for archived books."
     return datatables_source(True)
+
+
+@bp.route("/series/<tagtext>", methods=["GET"])
+def series(tagtext):
+    "Series overview: all books carrying the given tag."
+    data = get_series_overview(db.session, tagtext)
+    if data is None:
+        flash(f"No books found with tag '{tagtext}'", "notice")
+        return redirect("/", 302)
+    return render_template("book/series.html", **data)
 
 
 def _book_from_url(url):

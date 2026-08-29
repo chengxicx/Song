@@ -100,6 +100,8 @@ def add_default_user_settings(session, default_user_backup_path):
         "custom_styles": "/* Custom css to modify Lute's appearance. */",
         "show_highlights": True,
         "current_language_id": 0,
+        # Home page series aggregation:
+        "book_series_tags": "",
         # Behaviour:
         "open_popup_in_new_tab": False,
         "stop_audio_on_term_form_open": True,
