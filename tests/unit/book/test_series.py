@@ -8,6 +8,7 @@ import pytest
 
 from lute.db import db
 from lute.book.series import get_series_overview
+from lute.models.book import Book as DBBook
 from tests.utils import make_book
 from lute.book.model import Book as ServiceBook, Repository as ServiceRepository
 
@@ -81,3 +82,28 @@ def test_series_page_excludes_other_tags(app, app_context, _erin_books):
     assert resp.status_code == 200
     assert b"Other" in resp.data
     assert b"Erin-02" not in resp.data
+
+
+def test_delete_series_route_deletes_all_books(app, app_context, _erin_books):
+    "POST /book/delete_series/<tag> deletes every book carrying the tag."
+    _b1, _b2, _other = _erin_books
+    client = app.test_client()
+    resp = client.post("/book/delete_series/Erin")
+    assert resp.status_code == 302
+    db.session.expire_all()
+    remaining = {b.title for b in db.session.query(DBBook).all()}
+    assert remaining == {"Other"}
+
+
+def test_delete_series_route_includes_archived_books(app, app_context, english):
+    "Archived books in the series are deleted too."
+    b1 = _mk_tagged_book("Erin-01", ["Erin"], english)
+    b2 = _mk_tagged_book("Erin-02", ["Erin"], english)
+    b2.archived = True
+    db.session.add(b2)
+    db.session.commit()
+    client = app.test_client()
+    resp = client.post("/book/delete_series/Erin")
+    assert resp.status_code == 302
+    db.session.expire_all()
+    assert db.session.query(DBBook).count() == 0, "archived series book deleted"
