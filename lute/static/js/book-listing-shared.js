@@ -39,12 +39,7 @@ let render_book_title = function ( data, type, row, meta ) {
     const n = parseInt(row['SeriesBookCount']);
     const r = parseInt(row['SeriesReadCount']);
     return `<div class="series-titlebox">` +
-      `<div class="series-titlerow">` +
-      `<span class="series-caret">&#9656;</span>` +
       `<a class="book-title series-title" href="/book/series/${tag}">${row['SeriesTag']}</a>` +
-      `<a class="series-settings-gear" href="/book/settings" title="Configure book series tags">` +
-      `<img src="/static/icn/settings-gear-icon.svg" alt="configure series"></a>` +
-      `</div>` +
       `<div class="series-sub">${n} eps &middot; ${r}/${n} read</div>` +
       `</div>`;
   }
@@ -340,17 +335,19 @@ $(document).on('mouseenter', '.book-action-dropdown', function() {
       hideActionDropdown($(this));
     }
   });
-  var offset = $trigger.offset();
+  // Viewport coordinates (position:fixed is viewport-relative;
+  // offset() is document-relative and drifts with page scroll).
+  var rect = $trigger[0].getBoundingClientRect();
   var ddHeight = $dropdown.outerHeight();
   var ddWidth = $dropdown.outerWidth();
   var winH = $(window).height();
   var winW = $(window).width();
   // 默认显示在 trigger 下方
-  var top = offset.top + $trigger.outerHeight() + 4;
-  var left = offset.left;
+  var top = rect.bottom + 4;
+  var left = rect.left;
   // 底部空间不够 -> 向上展开
   if (top + ddHeight > winH - 10) {
-    top = offset.top - ddHeight - 4;
+    top = rect.top - ddHeight - 4;
   }
   // 右侧空间不够 -> 向左对齐
   if (left + ddWidth > winW - 10) {
@@ -389,3 +386,75 @@ $(document).on('click', '.book-tag', function(e) {
   const tag = $(this).data('tag');
   setTagFilter(tag);
 });
+
+
+/* Draggable column-width handles for the book table(s).  Shared by the
+   home listing and the series overview. */
+let enable_column_resize = function() {
+  // With an async DataTables state load (first visit, empty
+  // localStorage) the table is detached while the scroll structure is
+  // rebuilt, so the wrapper may not be reachable yet: retry briefly.
+  var tries = 0;
+  var apply_when_ready = function() {
+    var $wrapper = $('#booktable').closest('.dt-container');
+    if ($wrapper.length === 0 || $wrapper.find('thead th').length === 0) {
+      if (++tries < 50) setTimeout(apply_when_ready, 100);
+      return;
+    }
+    apply_resizable();
+    $('#booktable').on('draw.dt', function() {
+      apply_resizable();
+    });
+  };
+
+  function apply_resizable() {
+      var $wrapper = $('#booktable').closest('.dt-container');
+      if (!$wrapper.length) return;
+      $wrapper.find('table').each(function() {
+          var $table = $(this);
+          var $ths = $table.find('thead th');
+          $ths.each(function() {
+              var $th = $(this);
+              if ($th.find('.resize-handle').length > 0) return;
+              var $handle = $('<div class="resize-handle"></div>');
+              $th.append($handle);
+          });
+      });
+
+      $wrapper.find('.resize-handle').each(function() {
+          var $handle = $(this);
+          if ($handle.data('resize-bound')) return;
+          $handle.data('resize-bound', true);
+
+          $handle.on('mousedown', function(e) {
+              e.preventDefault();
+              var $th = $handle.closest('th');
+              var startX = e.pageX;
+              var startWidth = $th.outerWidth();
+              var colIndex = $th.index();
+
+              $(document).on('mousemove.colresize', function(ev) {
+                  var newWidth = Math.max(40, startWidth + (ev.pageX - startX));
+
+                  $wrapper.find('table').each(function() {
+                      var $t = $(this);
+                      var $cg = $t.find('colgroup col');
+                      if ($cg.length > colIndex) {
+                          $cg.eq(colIndex).css('width', newWidth + 'px');
+                      }
+                      var $ths2 = $t.find('thead th');
+                      if ($ths2.length > colIndex) {
+                          $ths2.eq(colIndex).css('width', newWidth + 'px');
+                      }
+                  });
+              });
+
+              $(document).on('mouseup.colresize', function() {
+                  $(document).off('mousemove.colresize mouseup.colresize');
+              });
+          });
+      });
+  }
+
+  apply_when_ready();
+};
