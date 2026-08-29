@@ -114,16 +114,7 @@ let render_book_title = function ( data, type, row, meta ) {
   const pgcount = parseInt(row['PageCount']);
   let pgfraction = '';
 
-  const completed = (parseInt(row['IsCompleted']) == 1);
-  let book_title_classes = ['book-title'];
-  if (completed) {
-    book_title_classes.push('completed_book');
-  }
-  if (pgnum > 1) {
-    pgfraction = ` (${pgnum}/${pgcount})`;
-  }
-
-  return `<a class="${book_title_classes.join(' ')}" href="/read/${bkid}">${row['BkTitle']}${pgfraction}</a>`;
+  return `<a class="book-title" href="/read/${bkid}">${row['BkTitle']}${pgfraction}</a>`;
 };
 
 /* Replaced by the status graph after the ajax call kicked off by createdRow. */
