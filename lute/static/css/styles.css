@@ -3568,13 +3568,14 @@ div#termimagesearch span img {
 .series-summary-continue {
     margin-left: auto;
 }
-/* Double class selector beats the themes' `a:link` color override. */
+/* !important is required: the themes' `a:link` color override also uses
+   it (e.g. Default-Dark's #0a84ff), which turned the label blue-on-blue. */
 .series-summary a.series-continue-btn,
 a.series-continue-btn:link,
 a.series-continue-btn:visited {
     display: inline-block;
     background-color: #2b6cb0;
-    color: #fff;
+    color: #fff !important;
     padding: 8px 16px;
     border-radius: 6px;
     text-decoration: none;
@@ -3583,8 +3584,8 @@ a.series-continue-btn:visited {
 .series-summary a.series-continue-btn:hover,
 a.series-continue-btn:hover {
     background-color: #2c5282;
-    color: #fff;
-    text-decoration: none;
+    color: #fff !important;
+    text-decoration: none !important;
 }
 .series-book-archived td {
     opacity: 0.6;
