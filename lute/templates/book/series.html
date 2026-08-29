@@ -173,6 +173,11 @@
           }
         });
       },
+      createdRow: function(row, data, dataIndex) {
+        if (data['SeriesTag']) {
+          row.classList.add('series-row');
+        }
+      },
       // Column-width resize handles must be added after DataTables
       // finishes building the scroll structure; with the async state
       // load the constructor returns while the table is detached.
