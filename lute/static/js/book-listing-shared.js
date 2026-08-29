@@ -527,3 +527,171 @@ let enable_column_resize = function() {
 
   apply_when_ready();
 };
+
+
+/* Fetch stats for all visible rows in one batched request, instead of
+   one /book/table_stats/<id> request per row. Shared by the home book
+   table (tablelisting.html) and the series overview (series.html); both
+   call it from their drawCallback. This reduces DB connection-pool
+   pressure and load.
+
+   Series aggregate rows (BkID null) carry SeriesStatsPending: the ids of
+   member books whose stats are missing or stale.  Those books never
+   appear as flat rows on the home table, so without collecting them here
+   their stats would never be calculated and the series New word average
+   would stay empty.
+
+   Returns a jQuery promise/jqXHR that resolves when the stats request
+   (if any) settles, so callers can chain .always() (e.g. to stop the
+   refresh button spinner). Resolves immediately when there is nothing
+   to fetch. */
+var _last_series_pending_fetched = null;
+let ajax_in_book_stats = function(settings) {
+  var table = book_listing_table;
+  if (!table) {
+    return $.Deferred().resolve();
+  }
+
+  var newWordColIdx = table.column('NewWordPercent:name').index();
+  var statsColIdx = table.column('UnknownPercent:name').index();
+
+  var newWordColVisible = table.column(newWordColIdx).visible();
+  var statsColVisible = table.column(statsColIdx).visible();
+
+  // If both the Status and New Word columns are hidden, skip the AJAX
+  // call entirely — nothing would be rendered. The DataTables colvis
+  // widget lets users toggle these columns off, so this guard avoids
+  // a wasted batched /book/table_stats request per page redraw.
+  if (!newWordColVisible && !statsColVisible) {
+    return $.Deferred().resolve();
+  }
+
+  // Collect the books currently on this page and their cell nodes.
+  var book_ids = [];
+  var cellNodes = {};
+  var series_pending_ids = [];
+  table.rows({ page: 'current' }).every(function(rowIdx, tableLoop, rowLoop) {
+    var data = this.data();
+    var bid = data['BkID'];
+    if (bid === undefined || bid === null) {
+      // Series row: queue its members that need stats calculated.
+      var pending = data['SeriesStatsPending'];
+      if (pending) {
+        String(pending).split(',').forEach(function(id) {
+          var n = parseInt(id);
+          if (!isNaN(n) && book_ids.indexOf(n) === -1) {
+            book_ids.push(n);
+            series_pending_ids.push(n);
+          }
+        });
+      }
+      return;
+    }
+    if (book_ids.indexOf(bid) === -1) {
+      book_ids.push(bid);
+    }
+    cellNodes[bid] = {
+      newWord: newWordColVisible ? table.cell(rowIdx, newWordColIdx).node() : null,
+      stats: statsColVisible ? table.cell(rowIdx, statsColIdx).node() : null,
+    };
+    // Only show a skeleton when the cell has no rendered content yet.
+    // Otherwise existing values stay visible while fresh stats load, so
+    // a refresh that marks many books stale (slow recalc) doesn't blank
+    // out the Status / New word columns.
+    var needsSkeleton = function(node) {
+      if (!node) return false;
+      var html = node.innerHTML.trim();
+      return html === '' || html.indexOf('skeleton-loading') !== -1;
+    };
+    if (cellNodes[bid].newWord && needsSkeleton(cellNodes[bid].newWord)) {
+      $(cellNodes[bid].newWord).html(`<span class="skeleton-loading"></span>`);
+    }
+    if (cellNodes[bid].stats && needsSkeleton(cellNodes[bid].stats)) {
+      $(cellNodes[bid].stats).html(`<span class="skeleton-loading"></span>`);
+    }
+  });
+
+  if (book_ids.length === 0) {
+    return $.Deferred().resolve();
+  }
+
+  return $.ajax({
+    url: '/book/table_stats',
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({ book_ids: book_ids }),
+    success: function(response) {
+      Object.keys(response).forEach(function(bid) {
+        var nodes = cellNodes[bid];
+        if (!nodes) {
+          return;
+        }
+        var stats = response[bid];
+        try {
+          if (nodes.stats) {
+            $(nodes.stats).removeClass("refreshed");
+            if (stats.status_distribution) {
+              const result = JSON.parse(stats.status_distribution);
+              const graph = render_stats_graph(result);
+              $(nodes.stats).html(graph);
+            } else {
+              $(nodes.stats).text('No data');
+            }
+          }
+          if (nodes.newWord) {
+            $(nodes.newWord).removeClass("refreshed");
+            const newWordHtml = render_new_word(
+              stats.new_word_percent,
+              stats.difficulty_label,
+              stats.difficulty_color,
+              stats.difficulty_description
+            );
+            $(nodes.newWord).html(newWordHtml);
+          }
+        } catch (e) {
+          console.error('table_stats error for book ' + bid + ':', e);
+          if (nodes.stats) {
+            $(nodes.stats).text('Error loading data');
+            $(nodes.stats).removeClass("refreshed");
+          }
+          if (nodes.newWord) {
+            $(nodes.newWord).text('Error');
+            $(nodes.newWord).removeClass("refreshed");
+          }
+        }
+      });
+
+      // Series members were just calculated: reload the (home) table so
+      // the series aggregates recompute.  Only fires while the pending
+      // set keeps changing, so a book whose stats fail to calculate
+      // can't cause a reload loop; series pages have no ajax url and no
+      // series rows, so they never reload here.
+      if (series_pending_ids.length > 0 &&
+          table.ajax.url && table.ajax.url()) {
+        var key = series_pending_ids.join(',');
+        if (key !== _last_series_pending_fetched) {
+          _last_series_pending_fetched = key;
+          table.ajax.reload(null, false);
+        }
+      } else {
+        _last_series_pending_fetched = null;
+      }
+    },
+    error: function() {
+      book_ids.forEach(function(bid) {
+        var nodes = cellNodes[bid];
+        if (!nodes) {
+          return;
+        }
+        if (nodes.stats) {
+          $(nodes.stats).html('<span class="skeleton-loading"></span>');
+          $(nodes.stats).removeClass("refreshed");
+        }
+        if (nodes.newWord) {
+          $(nodes.newWord).html('<span class="skeleton-loading"></span>');
+          $(nodes.newWord).removeClass("refreshed");
+        }
+      });
+    }
+  });
+};

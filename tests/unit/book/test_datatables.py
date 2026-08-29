@@ -323,3 +323,38 @@ def test_series_aggregation_respects_language_filter(
     _dt_params["filtLanguage"] = "999999"
     d = get_data_tables_list(_dt_params, False, db.session)
     assert d["recordsTotal"] == 0
+
+
+def test_series_stats_pending_lists_members_missing_or_stale_stats(
+    app_context, _dt_params, english
+):
+    """
+    Series rows carry SeriesStatsPending: the member book ids whose stats
+    are missing or stale, so the frontend can batch-calculate them (books
+    behind a series row never appear as flat rows, so nothing else would
+    calculate their stats).
+    """
+    b1 = _mk_tagged_book("Pen-01", ["Pen"], english)
+    b2 = _mk_tagged_book("Pen-02", ["Pen"], english)
+    _set_series_setting(db.session, ["Pen"])
+
+    def _pending_ids():
+        d = get_data_tables_list(_dt_params, False, db.session)
+        series = [r for r in d["data"] if r["SeriesTag"]]
+        assert len(series) == 1
+        flats = [r for r in d["data"] if not r["SeriesTag"]]
+        for f in flats:
+            assert f["SeriesStatsPending"] is None, "flat rows carry no pending ids"
+        raw = series[0]["SeriesStatsPending"]
+        return sorted(int(x) for x in raw.split(",")) if raw else []
+
+    # New books have no stats yet.
+    assert _pending_ids() == sorted([b1.id, b2.id])
+
+    # Calculated stats drop a book out of the pending list.
+    StatsService(db.session).get_stats(b1)
+    assert _pending_ids() == [b2.id]
+
+    # Stale stats put it back.
+    StatsService(db.session).mark_stale(b1)
+    assert _pending_ids() == sorted([b1.id, b2.id])
