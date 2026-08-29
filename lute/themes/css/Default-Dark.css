@@ -1166,3 +1166,16 @@ a.refresh.refreshed::after {
   border-color: rgba(255, 255, 255, 0.25);
   border-top-color: #f2f2f7;
 }
+
+/* ---------------------------------------------------------
+   13. FLASH 提示条 — 深色主题适配
+   基础样式（styles.css）是浅黄底深字；在深色模式下改为
+   暗琥珀底 + 浅琥珀字，与 NEW WORD 胶囊警告色一致。
+   --------------------------------------------------------- */
+.flash-notice,
+.flash-notice-narrow,
+.small-flash-notice {
+  background-color: #423213 !important;
+  border-color: #6e5218 !important;
+  color: #f7d382 !important;
+}
