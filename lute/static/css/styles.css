@@ -526,12 +526,15 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
 }
 
 
+/* The yellow notice backgrounds are light in every theme, so the text
+   must always be dark; dark themes otherwise inherit near-white text. */
 .flash-notice {
     margin: 1rem;
     margin-bottom: 2rem;
     padding: 0.5rem;
     background-color: #fff3cd;
     border-color: #ffeeba;
+    color: #212529;
 }
 
 .flash-notice-narrow {
@@ -539,6 +542,7 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     padding: 2px;
     background-color: #fff3cd;
     border-color: #ffeeba;
+    color: #212529;
 }
 
 .small-flash-notice {
@@ -546,6 +550,7 @@ table#booktable:not(:has(a.completed_book)) a.book-title:before {
     padding: 3px;
     background-color: #fff3cd;
     border-color: #ffeeba;
+    color: #212529;
 }
 
 /* Screen layouts - two columns ************************/
