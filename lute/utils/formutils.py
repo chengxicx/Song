@@ -4,6 +4,7 @@ Common form methods.
 
 from lute.models.language import Language
 from lute.models.repositories import UserSettingRepository
+from lute.db import db
 
 
 def language_choices(session, dummy_entry_placeholder="-", include_inactive=False):
@@ -69,3 +70,22 @@ def valid_current_language_id(session):
     except Exception:  # pylint: disable=broad-exception-caught
         pass
     return current_language_id
+
+
+def book_tag_choices(session):
+    """
+    All book tags with their book counts, for the series-tags setting
+    and book tag dropdowns.
+    """
+    rows = session.execute(
+        db.text(
+            """
+            SELECT t2.T2Text, COUNT(bt.BtBkID) AS n
+            FROM tags2 t2
+            LEFT OUTER JOIN booktags bt ON bt.BtT2ID = t2.T2ID
+            GROUP BY t2.T2Text
+            ORDER BY t2.T2Text COLLATE NOCASE
+            """
+        )
+    ).fetchall()
+    return [(r[0], f"{r[0]} ({r[1]} book{'s' if r[1] != 1 else ''})") for r in rows]
