@@ -27,24 +27,6 @@ from lute.parse.sudachi_parser import JapaneseSudachiParser
 bp = Blueprint("settings", __name__, url_prefix="/settings")
 
 
-def _book_tag_choices(session):
-    """
-    All book tags with their book counts, for the series-tags setting.
-    """
-    rows = session.execute(
-        db.text(
-            """
-            SELECT t2.T2Text, COUNT(bt.BtBkID) AS n
-            FROM tags2 t2
-            LEFT OUTER JOIN booktags bt ON bt.BtT2ID = t2.T2ID
-            GROUP BY t2.T2Text
-            ORDER BY t2.T2Text COLLATE NOCASE
-            """
-        )
-    ).fetchall()
-    return [(r[0], f"{r[0]} ({r[1]} book{'s' if r[1] != 1 else ''})") for r in rows]
-
-
 @bp.route("/index", methods=["GET", "POST"])
 def edit_settings():
     "Edit settings."
@@ -53,7 +35,6 @@ def edit_settings():
     with current_app.app_context():
         svc = ThemeService(db.session)
         form.current_theme.choices = svc.list_themes()
-        form.book_series_tags.choices = _book_tag_choices(db.session)
 
     ac = current_app.env_config
     if ac.is_docker:
@@ -70,8 +51,6 @@ def edit_settings():
                 val = field.data
                 if isinstance(field, BooleanField):
                     val = "1" if val else "0"
-                if field.id == "book_series_tags":
-                    val = ",".join(val or [])
                 repo.set_value(field.id, val)
         db.session.commit()
         refresh_global_settings(db.session)
@@ -89,10 +68,6 @@ def edit_settings():
                 # Setting doesn't exist yet (e.g. restored from older version),
                 # leave the default from the form.
                 pass
-        if field.id == "book_series_tags":
-            # Stored comma-separated; the checkbox list wants a list.
-            val = field.data if isinstance(field.data, list) else (field.data or "")
-            field.data = [t for t in val.split(",") if t] if isinstance(val, str) else val
         if isinstance(field, BooleanField):
             # Hack: set boolean settings to ints, otherwise they're always checked.
             true_vals = {"1", "true", "True", "yes", "Yes", "on"}

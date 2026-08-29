@@ -4,10 +4,9 @@ Settings form.
 
 import os
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, IntegerField, TextAreaField, SelectField, SelectMultipleField
+from wtforms import BooleanField, StringField, IntegerField, TextAreaField, SelectField
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
-from wtforms.widgets import ListWidget, CheckboxInput
 
 
 class UserSettingsForm(FlaskForm):
@@ -32,17 +31,6 @@ class UserSettingsForm(FlaskForm):
     current_theme = SelectField("Theme")
     custom_styles = TextAreaField("Custom styles")
     show_highlights = BooleanField("Highlight terms by status")
-
-    # Book tags whose books collapse into a single series row on the
-    # Books page.  Stored comma-separated in the settings table;
-    # choices are filled in by the settings route from the existing
-    # book tags.
-    book_series_tags = SelectMultipleField(
-        "Book series tags",
-        choices=[],
-        widget=ListWidget(prefix_label=False),
-        option_widget=CheckboxInput(),
-    )
 
     open_popup_in_new_tab = BooleanField("Open popup in new tab")
     stop_audio_on_term_form_open = BooleanField("Stop audio on term form open")
