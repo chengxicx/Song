@@ -6,15 +6,17 @@
  * which the status-modal handler below relies on.
  */
 
-/* Tag / new-word filter state; the home page's setTagFilter /
-   setNewWordFilter keep these updated.  Defined here so the shared
-   renderers work on pages without the filter header. */
+/* Tag / new-word / type filter state; the home page's setTagFilter /
+   setNewWordFilter / setTypeFilter keep these updated.  Defined here so
+   the shared renderers work on pages without the filter header. */
 var currentTagFilter = "";
 var currentNewWordFilter = "";
+var currentTypeFilter = "";
 
-/* No-op defaults; the home page overrides both. */
+/* No-op defaults; the home page overrides all of these. */
 function setTagFilter(tag) {}
 function setNewWordFilter(filter) {}
+function setTypeFilter(btype) {}
 
 let render_tag_list = function(data, type, row, meta) {
   if (!data) return '';
@@ -106,22 +108,24 @@ let render_book_type = function(data, type, row, meta) {
   const b = parseInt(m.color.slice(5, 7), 16);
   if (book_type_display_mode === 'text') {
     return `<span class="type-chip-text" style="color:${m.color};background:rgba(${r},${g},${b},0.12)" ` +
-      `title="Type: ${m.label}">${m.short}</span>`;
+      `data-type="${btype}" title="Click to filter by this type (${m.label})">${m.short}</span>`;
   }
   const inner = m.filled ||
     `<g fill="none" stroke="${m.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${m.paths}</g>`;
   return `<span class="type-chip" style="background:rgba(${r},${g},${b},0.12)" ` +
-    `title="Type: ${m.label}">` +
+    `data-type="${btype}" title="Click to filter by this type (${m.label})">` +
     `<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">${inner}</svg></span>`;
 };
 
 /* The Type header needs ~92px on one line (label + toggle button +
    sort arrows), the text pills ~96px ("YouTube" pill + padding).
-   Enforce these as minimums only, so columns the user dragged wider
-   are left alone. */
+   While a type filter pill is shown the toggle button is hidden but
+   the pill + clear X need more room.  Enforce these as minimums only,
+   so columns the user dragged wider are left alone. */
 let apply_book_type_width = function() {
   if (typeof book_listing_table === 'undefined' || !book_listing_table) return;
-  const need = (book_type_display_mode === 'text') ? 96 : 92;
+  let need = (book_type_display_mode === 'text') ? 96 : 92;
+  if (currentTypeFilter) need = 128;
   const col = book_listing_table.column('BookType:name');
   if (!col || !col.visible()) return;
   const idx = col.index();
@@ -151,7 +155,10 @@ let apply_book_type_width = function() {
 };
 
 /* Same async-wrapper dance as enable_column_resize: with an async
-   DataTables state load the scroll structure may not exist yet. */
+   DataTables state load the scroll structure may not exist yet.
+   Re-applied on every draw as well: an ajax draw (e.g. after applying
+   the type filter) resets the colgroup widths from the column's
+   configured percentage width. */
 let apply_book_type_width_when_ready = function() {
   let tries = 0;
   const wait = function() {
@@ -161,6 +168,9 @@ let apply_book_type_width_when_ready = function() {
       return;
     }
     apply_book_type_width();
+    $('#booktable').on('draw.dt', function() {
+      apply_book_type_width();
+    });
   };
   wait();
 };
@@ -552,6 +562,14 @@ $(document).on('click', '.book-tag', function(e) {
   e.stopPropagation();
   const tag = $(this).data('tag');
   setTagFilter(tag);
+});
+
+// Click a Type chip/pill to filter by that book type; clicking the
+// active one again clears the filter (home page header shows the pill).
+$(document).on('click', '.type-chip, .type-chip-text', function(e) {
+  e.stopPropagation();
+  const btype = $(this).data('type');
+  setTypeFilter(currentTypeFilter === btype ? '' : btype);
 });
 
 
