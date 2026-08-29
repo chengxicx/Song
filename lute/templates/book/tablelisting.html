@@ -8,7 +8,14 @@
 <table id="booktable" class="table dataTable stripe">
   <thead>
     <tr>
-      <th style="text-align: left">Type</th>
+      <th style="text-align: left">Type
+        <a href="#" id="typeDisplayToggle" class="type-display-toggle" title="Show text labels" onclick="toggle_book_type_display(event)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4c6ef5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="6.5" width="20" height="11" rx="5.5"></rect>
+            <circle cx="7.5" cy="12" r="2.4" fill="#4c6ef5" stroke="none"></circle>
+          </svg>
+        </a>
+      </th>
       <th style="text-align: left">Title
         <a class="series-settings-gear" href="/book/settings" title="Configure book series tags" onclick="event.stopPropagation();">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4c6ef5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -263,6 +270,7 @@
       },
       initComplete: function() {
         enable_column_resize();
+        apply_book_type_width_when_ready();
         // Note: ajax_in_book_stats is deliberately NOT called here — the
         // drawCallback above already fires on the initial draw, so calling
         // it here too would double every /book/table_stats request (a real
@@ -322,6 +330,18 @@
   });
 
   $(document).ready(function () {
+    // Type display mode must be set before the table's first draw so the
+    // renderers pick it up.  Only this page reads the saved preference
+    // (the header toggle lives here); the series overview stays icons.
+    try {
+      if (localStorage.getItem('booklisting_type_display') === 'text') {
+        book_type_display_mode = 'text';
+      }
+    } catch (err) { /* ignore */ }
+    const typeToggle = document.getElementById('typeDisplayToggle');
+    if (typeToggle && book_type_display_mode === 'text') {
+      typeToggle.title = 'Show icons';
+    }
     const current_language_id = {{ current_language_id }};
     // Language filter is set up first, because its value
     // is used during the initial datatable draw.
@@ -404,7 +424,7 @@
       if (menu) menu.style.display = 'none';
     }
 
-    $(document).on('click', '#datatables_config_toggle_top', function(e) {
+    $(document).on('click', '#datatables_config_widget_top', function(e) {
       e.preventDefault();
       e.stopPropagation();
       var menu = document.getElementById('colvis-menu');
