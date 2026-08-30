@@ -10,7 +10,7 @@
   <p>No languages defined.</p>
 {% else %}
 
-<div style="width: 70%">
+<div class="languagetable-wrap">
 <table id="languagetable" class="table dataTable no-footer" style="margin: 0;">
   <thead>
     <tr>
@@ -69,6 +69,9 @@
         bottomStart: ['pageLength', 'info'],
         bottomEnd: 'paging'
       },
+      // NOTE: the vendored datatables bundle has no Responsive
+      // extension, so this is inert; mobile handling for this
+      // table lives in the styles.css <767px block.
       responsive: true,
       select: false,
       lengthMenu: [ 10, 25, 50 ],
