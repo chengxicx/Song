@@ -35,8 +35,8 @@
   }
 
   /* JLPT progress panel */
-  .jlpt-btn, .cefr-btn, .topik-btn { margin-left: 10px; cursor: pointer; background: var(--chart-card-bg, #fff); color: var(--chart-tick-major-color, #212529); font-weight: 600; }
-  .jlpt-btn:hover, .cefr-btn:hover, .topik-btn:hover { background: var(--chart-grid-color, #f1f3f5); }
+  .jlpt-btn, .cefr-btn, .topik-btn, .dele-btn { margin-left: 10px; cursor: pointer; background: var(--chart-card-bg, #fff); color: var(--chart-tick-major-color, #212529); font-weight: 600; }
+  .jlpt-btn:hover, .cefr-btn:hover, .topik-btn:hover, .dele-btn:hover { background: var(--chart-grid-color, #f1f3f5); }
   .jlpt-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
   .jlpt-sub { font-size: 12px; color: var(--chart-tick-color, #6c757d); }
   .jlpt-section {
@@ -342,12 +342,13 @@
     <select id="ov-lang" class="ov-lang-select">
       <option value="all">All languages</option>
       {% for lang in term_languages %}
-      <option value="{{ lang.id }}" {% if lang.id == default_lang_id %}selected{% endif %} data-jp="{{ '1' if lang.is_japanese else '0' }}" data-en="{{ '1' if lang.is_english else '0' }}" data-ko="{{ '1' if lang.is_korean else '0' }}">{{ lang.name }} ({{ lang.count }})</option>
+      <option value="{{ lang.id }}" {% if lang.id == default_lang_id %}selected{% endif %} data-jp="{{ '1' if lang.is_japanese else '0' }}" data-en="{{ '1' if lang.is_english else '0' }}" data-ko="{{ '1' if lang.is_korean else '0' }}" data-es="{{ '1' if lang.is_spanish else '0' }}">{{ lang.name }} ({{ lang.count }})</option>
       {% endfor %}
     </select>
     <button type="button" id="jlpt-btn" class="ov-lang-select jlpt-btn" style="display:none;">JLPT</button>
     <button type="button" id="cefr-btn" class="ov-lang-select cefr-btn" style="display:none;">CEFR</button>
     <button type="button" id="topik-btn" class="ov-lang-select topik-btn" style="display:none;">TOPIK</button>
+    <button type="button" id="dele-btn" class="ov-lang-select dele-btn" style="display:none;">DELE</button>
   </div>
 </div>
 
@@ -438,6 +439,36 @@
     <div id="topik-levels"></div>
 
     <div class="jlpt-foot">Hover a word for hanja and meaning · Dashed cells = Not seen (from the TOPIK list) · Click a level bar to drill down.</div>
+  </div>
+</div>
+
+<!-- DELE progress report -->
+<div id="dele-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">DELE Progress</h3>
+      <span class="jlpt-sub">Spanish · A1–C2 · DELE vocabulary list</span>
+      <button type="button" id="dele-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="dele-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="dele-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="dele-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="dele-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By level</h4>
+    <div id="dele-levels"></div>
+
+    <div class="jlpt-foot">Hover a word for meaning · Dashed cells = Not seen (from the DELE list) · Inflected forms are matched to their base word · Click a level bar to drill down.</div>
   </div>
 </div>
 
@@ -973,6 +1004,7 @@
 
   const CEFR_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
   const TOPIK_COLORS = { A: '#1dc981', B: '#f2b705', C: '#e8463a' };
+  const DELE_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
 
   const cefrReport = createLevelReport({
     langKey: 'en', btn: 'cefr-btn', panel: 'cefr-panel', levelsEl: 'cefr-levels',
@@ -989,11 +1021,19 @@
     urls: { data: '/stats/topik_data', words: '/stats/topik_words', export: '/stats/topik_export' },
   });
 
+  const deleReport = createLevelReport({
+    langKey: 'es', btn: 'dele-btn', panel: 'dele-panel', levelsEl: 'dele-levels',
+    exportAll: 'dele-export-all', colors: DELE_COLORS, perPage: 60,
+    ids: { masteredPct: 'dele-mastered-pct', masteredDetail: 'dele-mastered-detail', seenPct: 'dele-seen-pct', seenDetail: 'dele-seen-detail' },
+    urls: { data: '/stats/dele_data', words: '/stats/dele_words', export: '/stats/dele_export' },
+  });
+
   const origUpdateJpButton = updateJpButton;
   updateJpButton = function() {
     origUpdateJpButton();
     cefrReport.sync();
     topikReport.sync();
+    deleReport.sync();
   };
 
   updateJpButton();

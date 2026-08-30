@@ -26,6 +26,8 @@ from lute.stats.service import get_cefr_data as _get_cefr_data
 from lute.stats.service import get_cefr_words as _get_cefr_words
 from lute.stats.service import get_topik_data as _get_topik_data
 from lute.stats.service import get_topik_words as _get_topik_words
+from lute.stats.service import get_dele_data as _get_dele_data
+from lute.stats.service import get_dele_words as _get_dele_words
 from lute.db import db
 import lute.utils.formutils
 
@@ -188,6 +190,15 @@ def topik_data():
     return jsonify(_get_topik_data(db.session, lang_id))
 
 
+@bp.route("/dele_data")
+def dele_data():
+    "Ajax call for the DELE progress report for a Spanish language."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return jsonify({"error": "lang_id required"}), 400
+    return jsonify(_get_dele_data(db.session, lang_id))
+
+
 def _request_lang_id():
     "Parse and validate the lang_id request param."
     try:
@@ -290,3 +301,17 @@ def topik_export():
     "CSV export of TOPIK words for a level+filter, or all levels."
     from lute.stats.topik_data import LEVELS
     return _level_export_response(_get_topik_words, LEVELS, "TOPIK")
+
+
+@bp.route("/dele_words")
+def dele_words():
+    "Paged word list for one DELE level and filter."
+    from lute.stats.dele_data import LEVELS
+    return _level_words_response(_get_dele_words, LEVELS)
+
+
+@bp.route("/dele_export")
+def dele_export():
+    "CSV export of DELE words for a level+filter, or all levels."
+    from lute.stats.dele_data import LEVELS
+    return _level_export_response(_get_dele_words, LEVELS, "DELE")
