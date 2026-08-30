@@ -60,17 +60,8 @@
 
       <div>{{ form.parentslist(class="form-control") }}</div>
   
-      <div class="pron-row" {% if hide_pronunciation %}style="display:none;"{% endif %}>
+      <div {% if hide_pronunciation %}style="display:none;"{% endif %}>
         {{ form.romanization(class="form-control") }}
-        <button type="button" id="pron-speak-btn" class="pron-speak-btn"
-                title="Speak the term (click to pronounce once)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M11 4.702a.7.7 0 0 0-1.204-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.7.7 0 0 0 11 19.298z"/>
-            <path d="M16 9a5 5 0 0 1 0 6"/>
-            <path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>
-          </svg>
-        </button>
       </div>
 
       <div id="translation-container">
@@ -90,6 +81,15 @@
           {{ form.sync_status(class="form-control", disabled=True) }}
           <label for="sync_status">Link to parent</label>
         </div>
+        <button type="button" id="term-speak-btn" class="term-speak-btn"
+                title="Speak the term (click to pronounce once)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 4.702a.7.7 0 0 0-1.204-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.7.7 0 0 0 11 19.298z"/>
+            <path d="M16 9a5 5 0 0 1 0 6"/>
+            <path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>
+          </svg>
+        </button>
       </div>
 
       <div style="display: none">{{ form.current_image(class="form-control") }}</div>
@@ -112,13 +112,13 @@
 
 <script type="text/javascript">
 
-  // Pronunciation-row speaker button: click once to pronounce the
+  // Status-row speaker button (far right): click once to pronounce the
   // term once.  Bound on DOMContentLoaded (ready) because tts.js --
   // which provides window.luteTtsSpeak -- is loaded with defer.
   // Standalone term pages (/term/new, /term/edit) don't load tts.js,
   // so the button is hidden there rather than dead.
   $(document).ready(function () {
-    const pron_btn = document.getElementById("pron-speak-btn");
+    const pron_btn = document.getElementById("term-speak-btn");
     if (!pron_btn) return;
     if (typeof window.luteTtsSpeak !== "function") {
       pron_btn.style.display = "none";
