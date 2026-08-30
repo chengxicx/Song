@@ -1,7 +1,7 @@
 /* Lute Service Worker - PWA offline support */
 // NOTE: bump this name whenever shipped static assets change, so all
 // clients drop the old offline cache and re-precache fresh copies.
-const CACHE_NAME = 'lute-v3.10.5.4.20260829b';
+const CACHE_NAME = 'lute-v3.10.5.4.20260830a';
 
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
@@ -29,6 +29,7 @@ const STATIC_ASSETS = [
   '/static/js/resize.js',
   '/static/js/text-options.js',
   '/static/js/tts.js',
+  '/static/js/player-dock.js',
   '/static/js/pdf-reader.js',
   '/static/js/vendor/pdfjs/pdf.module.js',
   '/static/js/vendor/pdfjs/pdf.worker.module.js',

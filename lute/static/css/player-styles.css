@@ -1127,3 +1127,241 @@
     max-width: 80vw;
   }
 }
+
+/* ============================================================
+   Mobile bottom mini-player (<= 980px)
+
+   On phones the whole player box at the top of the reading pane
+   is out of thumb reach.  Two dock layouts, chosen by whether a
+   video picture is visible:
+
+   - Audio-style books (MP3, TTS, and video books in audio-only
+     mode): the entire container docks to the bottom as a compact
+     mini bar -- one line of scrolling subtitle above a row of
+     prev / play / next + slim timeline + expand chevron.
+
+   - Video books (YouTube / online video / Bilibili): the video
+     stays in the reading flow; only the .yt-player-controls row
+     docks (the subtitle box stays under the video).
+
+   The chevron (or a tap outside / Escape) expands the docked bar
+   into a floating bottom sheet with the subtitle box and the full
+   control row (rate / loop / auto-pause / transcript).  All rules
+   live in this media query; desktop keeps the inline top player.
+
+   NOTE: no !important on "display" anywhere here -- tts.js hides
+   the TTS container with an inline display:none that must keep
+   winning.  border / border-radius / box-shadow / background-color
+   DO carry !important because the theme files set them with
+   !important (e.g. Default-Dark.css).
+   ============================================================ */
+
+.player-expand-btn {
+  /* Desktop: the player stays inline at the top, no chevron. */
+  display: none;
+}
+
+@media screen and (max-width: 980px) {
+
+  /* ---------- collapsed mini bar ---------- */
+
+  /* Audio-style players: whole container docks to the bottom. */
+  .youtube-player-container:is(:not(:has(.yt-player-video-wrap)), .yt-audio-mode) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    margin: 0;
+    border: none !important;
+    border-radius: 14px 14px 0 0 !important;
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.45) !important;
+    padding: 0.45rem 0.8rem calc(0.45rem + env(safe-area-inset-bottom));
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  /* Video books: only the controls row docks; the video and the
+     subtitle box stay in the reading flow. */
+  .youtube-player-container:has(.yt-player-video-wrap):not(.yt-audio-mode) .yt-player-controls {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    background-color: var(--yt-color-3, var(--audio-color-3, #f0f8ff));
+    border-radius: 14px 14px 0 0;
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.45);
+    padding: 0.45rem 0.8rem calc(0.45rem + env(safe-area-inset-bottom));
+    z-index: 1000;
+  }
+
+  /* The scrolling subtitle becomes the mini-bar one-liner
+     (full-dock variant only). */
+  .youtube-player-container:is(:not(:has(.yt-player-video-wrap)), .yt-audio-mode) .yt-scrolling-subtitle {
+    order: -1;
+    min-height: 0;
+    margin: 0;
+  }
+
+  .youtube-player-container:is(:not(:has(.yt-player-video-wrap)), .yt-audio-mode) :is(#yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner) {
+    font-size: 1.05rem;
+    padding: 0.15rem 0.2rem;
+    max-height: none;
+    overflow-y: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* A transcript left open when the sheet collapses would render
+     inside the mini bar; hide it while collapsed.  Needs !important
+     to beat the inline display tts.js / youtube-player.js set. */
+  .youtube-player-container:is(:not(:has(.yt-player-video-wrap)), .yt-audio-mode):not(.player-sheet-open) .yt-transcript {
+    display: none !important;
+  }
+
+  /* Compact control row, both dock variants. */
+  .youtube-player-container .yt-player-controls {
+    margin-top: 0;
+    flex-wrap: nowrap;
+    gap: 0.55rem;
+  }
+
+  .youtube-player-container .yt-controls-right {
+    display: none;
+  }
+
+  .youtube-player-container .yt-play-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .youtube-player-container .yt-cue-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .youtube-player-container .yt-timeline {
+    height: 5px;
+  }
+
+  .youtube-player-container .yt-time-display {
+    font-size: 0.68rem;
+    margin-top: 2px;
+  }
+
+  /* Expand chevron, right end of the mini-bar row. */
+  .youtube-player-container .player-expand-btn {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--yt-color-5, #d6edff);
+    color: var(--yt-color-4, #79b7e7);
+    cursor: pointer;
+  }
+
+  .player-expand-btn svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s;
+  }
+
+  .player-sheet-open .player-expand-btn svg {
+    transform: rotate(180deg);
+  }
+
+  /* Dim the page behind the expanded sheet.  Below the player
+     (1000), the fixed header (1001) and the term-popup pane
+     (1003), so those stay interactive above the backdrop. */
+  body.lute-player-sheet-open::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+
+  /* Keep the docked bar from covering the end of the text
+     (player-dock.js toggles the body class as players show/hide),
+     and keep the term-popup offset roughly right. */
+  body.lute-player-docked #read_pane_left {
+    padding-bottom: 120px;
+  }
+
+  body.lute-player-docked #read_pane_container {
+    --player-height: 110px;
+  }
+
+  /* The dictionary pane's drag handles sit just above the pane's top
+     edge; with the pane closed (translateY(100%)) they land exactly on
+     the docked mini bar's corners and swallow its taps.  Lift them
+     above the bar while the player is docked and the pane is closed.
+     (Pane open = .open-dict: its top edge is at the top of the screen,
+     so the handles are off-screen as usual.) */
+  body.lute-player-docked #read_pane_right:not(.open-dict)::before {
+    transform: translate(0, calc(-100% - 104px));
+  }
+
+  body.lute-player-docked #read_pane_right:not(.open-dict)::after {
+    display: none;
+  }
+
+  body.lute-player-docked #read_pane_right:not(.open-dict) .read-pane-right-close-btn {
+    transform: translateY(calc(-100% - 104px));
+  }
+
+  /* ---------- expanded bottom sheet ---------- */
+
+  .youtube-player-container.player-sheet-open:is(:not(:has(.yt-player-video-wrap)), .yt-audio-mode) {
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 12px;
+    border-radius: 14px !important;
+    padding: 0.55rem 0.8rem 0.7rem;
+    gap: 0.55rem;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.55) !important;
+  }
+
+  .youtube-player-container:has(.yt-player-video-wrap):not(.yt-audio-mode).player-sheet-open .yt-player-controls {
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 12px;
+    border-radius: 14px;
+    padding: 0.55rem 0.8rem 0.7rem;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Subtitle box returns to full size inside the sheet.  Placed
+     after the collapsed rules: equal specificity, later wins. */
+  .youtube-player-container.player-sheet-open .yt-scrolling-subtitle {
+    min-height: 3.4rem;
+  }
+
+  .youtube-player-container.player-sheet-open :is(#yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner) {
+    font-size: 1.35rem;
+    padding: 0.5rem 0.6rem;
+    max-height: 7rem;
+    overflow-y: auto;
+    white-space: normal;
+  }
+
+  .youtube-player-container.player-sheet-open .yt-controls-right {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Transcript inside the floating sheet: cap it so the sheet
+     stays on screen. */
+  .youtube-player-container.player-sheet-open .yt-transcript-list {
+    max-height: 28vh;
+  }
+}
