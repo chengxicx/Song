@@ -2148,25 +2148,15 @@ div.help-text {
     width: 100%;
 }
 
-/* Pronunciation row: field + circular speak button (click = one
-   utterance of the term text). */
-.pron-row {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.pron-row #romanization {
-    width: auto;
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-.pron-speak-btn {
+/* Status-row speak button (far right of the status radios): click =
+   one utterance of the term text.  Always shown, independent of the
+   pronunciation field's visibility. */
+.term-speak-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
+    margin-left: auto;
     width: 27px;
     height: 27px;
     padding: 0;
@@ -2177,11 +2167,11 @@ div.help-text {
     cursor: pointer;
 }
 
-.pron-speak-btn:hover {
+.term-speak-btn:hover {
     background: rgba(151, 83, 31, 0.28);
 }
 
-.pron-speak-btn svg {
+.term-speak-btn svg {
     display: block;
 }
 
