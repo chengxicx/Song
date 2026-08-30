@@ -81,9 +81,18 @@ function incrementLineHeight(delta) {
   if (paras.length === 0)
     return; // e.g. manga pages have no paragraphs.
   const s = window.getComputedStyle(paras[0]);
-  const lhDefault = parseFloat(s.getPropertyValue('line-height'));
+  // getComputedStyle returns the line-height in pixels; convert it to a
+  // unitless multiplier (line-height / font-size) so the stored value and
+  // the +/- 0.1 steps are consistent multipliers, not px.
+  const lhPx = parseFloat(s.getPropertyValue('line-height'));
+  const fsPx = parseFloat(s.fontSize);
+  const lhDefault = fsPx > 0 ? lhPx / fsPx : 1.3;
 
-  const STORAGE_KEY = "paraLineHeight";
+  // Key bumped (paraLineHeight -> paraLineHeight2) because the old key
+  // may hold a px-derived value (e.g. 5) persisted by the pre-fix code
+  // that read the computed line-height in px; applying that as a unitless
+  // multiplier would render the text at an absurd 5x spacing.
+  const STORAGE_KEY = "paraLineHeight2";
   let current_h = getFromLocalStorage(STORAGE_KEY, lhDefault);
   current_h = Number(current_h.toPrecision(2));
   let new_h = clamp(current_h + delta, 1.3, 5);
