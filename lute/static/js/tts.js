@@ -337,37 +337,57 @@
   // 5. Event delegation (word hover + sentence click)
   // ------------------------------------------------------------------
 
+  // Shared hover-pronunciation engine. Debounced: the word must stay
+  // hovered for SETTINGS.hoverDelay ms before it is spoken, and the
+  // isPlaying predicate is checked at hover time and again when the
+  // delay fires, so a hover that runs into playback never interrupts
+  // the media audio. Also used by the media-player subtitles
+  // (youtube-player.js / bilibili-player.js), which resolve the
+  // window.* globals at event time because tts.js loads after them.
+  function luteHoverSpeakStart(rawText, isPlayingFn) {
+    if (!SETTINGS.hoverPronunciation) return;
+    if (isPlayingFn && isPlayingFn()) return;
+    const cleanText = (rawText || "").replace(/[#＃]/g, "").trim();
+    if (!cleanText) return;
+    clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(function () {
+      if (!(isPlayingFn && isPlayingFn())) {
+        speakText(cleanText);
+      }
+    }, SETTINGS.hoverDelay);
+  }
+
+  function luteHoverSpeakCancel() {
+    clearTimeout(hoverTimer);
+  }
+
+  window.luteHoverSpeakStart = luteHoverSpeakStart;
+  window.luteHoverSpeakCancel = luteHoverSpeakCancel;
+  // Direct one-shot speak for UI buttons, e.g. the term form's
+  // pronunciation-row speaker button (click once = one utterance).
+  window.luteTtsSpeak = speakText;
+
   function setupEventDelegation() {
     const textDiv = document.getElementById("thetext");
     if (!textDiv || textDiv.dataset.delegated === "true") return;
     textDiv.dataset.delegated = "true";
 
     // Word hover pronunciation
-    if (SETTINGS.hoverPronunciation) {
-      textDiv.addEventListener("mouseover", function (e) {
-        const wordSpan = e.target.closest("span.word, span[id^=\"w\"]");
-        if (!wordSpan) return;
-        const text =
-          wordSpan.innerText || wordSpan.textContent || "";
-        const cleanText = text.replace(/[#＃]/g, "").trim();
-        if (!cleanText) return;
-        clearTimeout(hoverTimer);
-        hoverTimer = setTimeout(function () {
-          // Don't fire hover pronunciation while the TTS player is
-          // playing a full-text stream -- it would interrupt it.
-          if (!ttsPlaying) {
-            speakText(cleanText);
-          }
-        }, SETTINGS.hoverDelay);
-      });
+    textDiv.addEventListener("mouseover", function (e) {
+      const wordSpan = e.target.closest("span.word, span[id^=\"w\"]");
+      if (!wordSpan) return;
+      luteHoverSpeakStart(
+        wordSpan.innerText || wordSpan.textContent || "",
+        function () { return ttsPlaying; }
+      );
+    });
 
-      textDiv.addEventListener("mouseout", function (e) {
-        const wordSpan = e.target.closest("span.word, span[id^=\"w\"]");
-        if (wordSpan && !wordSpan.contains(e.relatedTarget)) {
-          clearTimeout(hoverTimer);
-        }
-      });
-    }
+    textDiv.addEventListener("mouseout", function (e) {
+      const wordSpan = e.target.closest("span.word, span[id^=\"w\"]");
+      if (wordSpan && !wordSpan.contains(e.relatedTarget)) {
+        luteHoverSpeakCancel();
+      }
+    });
 
     // Sentence play button click -- plays just that sentence through
     // the lightweight speakText() (does not engage the full player).
@@ -1255,6 +1275,18 @@
       t.on("mouseup", ".word", handle_select_ended);
       t.on("mouseover", ".word", hover_over);
       t.on("mouseout", ".word", hover_out);
+      // Hover pronunciation, same as the main text (#thetext): speak
+      // the hovered word while playback is stopped or paused, never
+      // while the player is reading a cue.
+      t.on("mouseover", ".word", function () {
+        luteHoverSpeakStart(
+          this.innerText || this.textContent || "",
+          function () { return ttsPlaying; }
+        );
+      });
+      t.on("mouseout", ".word", function () {
+        luteHoverSpeakCancel();
+      });
     }
 
     if (typeof tooltip_textitem_hover_content === "function" &&
