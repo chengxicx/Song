@@ -14,6 +14,8 @@ from lute.stats.service import (
     get_cefr_words,
     get_topik_data,
     get_topik_words,
+    get_dele_data,
+    get_dele_words,
 )
 from tests.utils import make_text
 
@@ -423,3 +425,95 @@ def test_topik_words_and_export_endpoints(korean, app_context, client):
     body = resp.get_data(as_text=True)
     assert "A," in body
     assert "C," in body
+
+
+def test_get_dele_data_counts_by_level(spanish, app_context):
+    "Seen/mastered counts attributed to DELE levels, incl. inflection expansion."
+    _save_jp_term(spanish, "hablar", 99)  # mastered (A1)
+    _save_jp_term(spanish, "casas", 3)  # expands to casa -> seen (A1)
+    _save_jp_term(spanish, "felices", 98)  # ignored -> not seen (B1)
+    _save_jp_term(spanish, "zzzqqqxyz", 99)  # not in word list
+
+    data = get_dele_data(db.session, spanish.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert len(lv) == 6
+    assert lv["A1"]["mastered"] == 1
+    assert lv["A1"]["seen"] == 2  # hablar + casas
+    assert lv["B1"]["seen"] == 0  # felices ignored
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 2
+
+
+def test_dele_data_endpoint(spanish, app_context, client):
+    "The /stats/dele_data endpoint returns level data for a Spanish language."
+    _save_jp_term(spanish, "hablar", 99)
+
+    resp = client.get(f"/stats/dele_data?lang_id={spanish.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] > 0
+    assert len(data["levels"]) == 6
+    a1 = next(l for l in data["levels"] if l["level"] == "A1")
+    assert a1["mastered"] == 1
+
+    resp = client.get("/stats/dele_data")
+    assert resp.status_code == 400
+    resp = client.get("/stats/dele_data?lang_id=abc")
+    assert resp.status_code == 400
+
+
+def test_get_dele_words_filters(spanish, app_context):
+    "Drilldown respects filters; expanded headwords excluded from notseen."
+    _save_jp_term(spanish, "hablar", 99)
+    _save_jp_term(spanish, "casas", 3)
+
+    unmastered = get_dele_words(db.session, spanish.id, "A1", "unmastered")
+    mastered = get_dele_words(db.session, spanish.id, "A1", "mastered")
+    notseen = get_dele_words(db.session, spanish.id, "A1", "notseen")
+    all_words = get_dele_words(db.session, spanish.id, "A1", "all")
+
+    assert [w["word"] for w in unmastered] == ["casas"]
+    assert [w["word"] for w in mastered] == ["hablar"]
+    assert mastered[0]["status_text"] == "Well Known"
+
+    notseen_words = [w["word"] for w in notseen]
+    assert "abrir" in notseen_words  # in the DELE list, never learned
+    assert "hablar" not in notseen_words
+    assert all(w["id"] is None for w in notseen)
+
+    all_map = {w["word"]: w for w in all_words}
+    assert set(all_map.keys()) == {"casas", "hablar"} | set(notseen_words)
+
+
+def test_dele_words_and_export_endpoints(spanish, app_context, client):
+    "The dele_words and dele_export endpoints behave like the JLPT ones."
+    _save_jp_term(spanish, "hablar", 99)
+    _save_jp_term(spanish, "casas", 3)
+
+    resp = client.get(
+        f"/stats/dele_words?lang_id={spanish.id}&level=A1&filter=unmastered&page=1"
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] >= 1
+
+    resp = client.get(f"/stats/dele_words?lang_id={spanish.id}&level=A1&filter=bogus")
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/dele_words?lang_id={spanish.id}&level=all")
+    assert resp.status_code == 400
+
+    resp = client.get(
+        f"/stats/dele_export?lang_id={spanish.id}&level=A1&filter=mastered"
+    )
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/csv"
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("hablar" in ln for ln in lines[1:])
+
+    resp = client.get(f"/stats/dele_export?lang_id={spanish.id}&level=all&filter=all")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "A1," in body
+    assert "C2," in body

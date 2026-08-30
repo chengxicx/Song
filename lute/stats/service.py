@@ -255,6 +255,7 @@ def get_term_languages(session):
             "is_japanese": r[2] in _JAPANESE_PARSERS,
             "is_korean": r[2] == "korean",
             "is_english": str(r[1] or "").strip().lower() == "english",
+            "is_spanish": str(r[1] or "").strip().lower() == "spanish",
         }
         for r in rows
     ]
@@ -461,6 +462,12 @@ def get_topik_data(session, lang_id):
     return _level_progress(session, lang_id, LEVELS, topik_level, level_totals())
 
 
+def get_dele_data(session, lang_id):
+    "DELE (A1-C2) progress for the given Spanish language."
+    from lute.stats.dele_data import LEVELS, dele_level, level_totals
+    return _level_progress(session, lang_id, LEVELS, dele_level, level_totals())
+
+
 def _level_words(session, lang_id, level, word_filter, norm, level_fn, level_words, headwords_fn=None):
     """
     Words for one level and filter (shared by CEFR/TOPIK drilldowns).
@@ -561,6 +568,26 @@ def _norm_ko(word):
     "Normalize a Korean term for matching."
     from lute.stats.topik_data import _normalize_ko
     return _normalize_ko(word)
+
+
+def _norm_es(word):
+    "Normalize a Spanish term for matching."
+    return (word or "").strip().lower()
+
+
+def _dele_headwords(word):
+    "DELE headwords a stored Spanish term expands to (for 'not seen')."
+    from lute.stats.dele_data import base_forms_for
+    return base_forms_for(word)
+
+
+def get_dele_words(session, lang_id, level, word_filter):
+    "All words for a DELE level and filter."
+    from lute.stats.dele_data import level_words, dele_level
+    return _level_words(
+        session, lang_id, level, word_filter,
+        _norm_es, dele_level, level_words, _dele_headwords,
+    )
 
 
 def get_last_read_language_id(session):
