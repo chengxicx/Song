@@ -609,6 +609,20 @@
       t.on("mouseup", ".word", handle_select_ended);
       t.on("mouseover", ".word", hover_over);
       t.on("mouseout", ".word", hover_out);
+      // Hover pronunciation (same as the main text #thetext): speak
+      // the hovered word while playback is stopped or paused.  The
+      // shared engine in tts.js is resolved at event time because
+      // tts.js loads after this script.
+      t.on("mouseover", ".word", function () {
+        if (window.luteHoverSpeakStart)
+          window.luteHoverSpeakStart(
+            this.innerText || this.textContent || "",
+            function () { return ytPlaying; }
+          );
+      });
+      t.on("mouseout", ".word", function () {
+        if (window.luteHoverSpeakCancel) window.luteHoverSpeakCancel();
+      });
     }
     if (typeof tooltip_textitem_hover_content === "function" &&
         typeof _get_tooltip_pos === "function") {
