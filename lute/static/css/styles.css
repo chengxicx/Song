@@ -3623,3 +3623,87 @@ a.series-continue-btn:hover {
     font-size: 0.85em;
     margin-left: 6px;
 }
+
+/* =========================================================
+   Mobile (< 768px): stats / terms / settings / languages
+   pages.  Their content areas had no responsive rules, so
+   fixed widths (settingstable's 20rem label column, the
+   language table's 70% wrapper, the bulk-edit form's 50%)
+   broke the layout on phones.
+   ========================================================= */
+
+/* Languages page: table wrapper is 70% wide on desktop
+   (class replaces the old inline style). */
+.languagetable-wrap {
+    width: 70%;
+}
+
+@media screen and (max-width: 767px) {
+    .languagetable-wrap {
+        width: 100%;
+    }
+
+    /* Settings (and book settings): stack each label cell above
+       its field.  !important beats the table's fixed 20rem label
+       column and the inline style="width: 60%" on the help
+       blockquotes. */
+    .settingstable {
+        width: 100% !important;
+    }
+    .settingstable td {
+        display: block;
+        width: auto !important;
+        box-sizing: border-box;
+    }
+    .settingstable td:first-child {
+        width: auto !important;
+    }
+    .settingstable blockquote {
+        width: auto !important;
+    }
+    .settingstable .theme-btn-row {
+        flex-wrap: wrap;
+    }
+
+    /* Terms page: bulk-edit form and filters span the viewport. */
+    #bulkEditDiv {
+        width: 100% !important;
+    }
+    #filterControls {
+        margin-left: 0 !important;
+    }
+
+    /* Terms and language tables: the vendored datatables bundle has
+       no Responsive extension, so on phones the tables simply
+       overflow the page.  Drop DT's fixed column widths, hide the
+       low-value term columns, and let the wrapper scroll sideways
+       if the content is still too wide. */
+    #termtable_wrapper,
+    #languagetable_wrapper {
+        overflow-x: auto;
+    }
+    /* ".dt-container table" pins table-layout: fixed (even column
+       widths); auto lets the browser fit the remaining columns. */
+    #termtable_wrapper table.dataTable,
+    #languagetable_wrapper table.dataTable {
+        table-layout: auto;
+    }
+    #termtable_wrapper colgroup,
+    #languagetable_wrapper colgroup,
+    #termtable_wrapper col,
+    #languagetable_wrapper col {
+        display: none !important;
+    }
+    #termtable th:nth-child(3), #termtable td:nth-child(3),
+    #termtable th:nth-child(5), #termtable td:nth-child(5),
+    #termtable th:nth-child(7), #termtable td:nth-child(7),
+    #termtable th:nth-child(8), #termtable td:nth-child(8) {
+        /* Parents, Tags, Language, Added */
+        display: none;
+    }
+    #termtable td:nth-child(2) {
+        /* Term: CJK text min-content is a single character, so the
+           browser would collapse the column without a floor. */
+        min-width: 90px;
+    }
+}
