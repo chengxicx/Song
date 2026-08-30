@@ -385,7 +385,9 @@ a:hover {
    6. 阅读模式样式 (Apple Books 衬线体 + 紧凑行距)
    --------------------------------------------------------- */
 div#thetext p { 
-  line-height: 1.4 !important;
+  /* No !important on line-height: the reading-pane text controls
+     (lh-plus / lh-minus) override it with an inline style. */
+  line-height: 1.4;
   margin: 0.4em 0 !important;
   font-size: 18px;
   color: #2c2a29 !important;
