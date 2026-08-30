@@ -2157,18 +2157,24 @@ div.help-text {
     justify-content: center;
     flex: 0 0 auto;
     margin-left: auto;
-    width: 27px;
-    height: 27px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     border: none;
     border-radius: 50%;
-    background: rgba(151, 83, 31, 0.12);
-    color: #97531f;
+    background: #97531f;
+    color: #fff;
     cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: background 0.15s ease, transform 0.1s ease;
 }
 
 .term-speak-btn:hover {
-    background: rgba(151, 83, 31, 0.28);
+    background: #7c4318;
+}
+
+.term-speak-btn:active {
+    transform: scale(0.92);
 }
 
 .term-speak-btn svg {
@@ -2236,10 +2242,44 @@ input[type="checkbox"][disabled] + label {
 
 #term-button-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-items: center;
-    gap: 0.2rem;
+    gap: 0.6rem;
     margin-top: 0.6rem;
+}
+
+/* Apple-style term form buttons: capsule shape, filled blue Save,
+   red-tinted destructive Delete. */
+#term-button-container .btn {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.32rem 1.2rem;
+    border: none;
+    border-radius: 980px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+#term-button-container .btn:active {
+    transform: scale(0.96);
+}
+
+#term-button-container #btnsubmit {
+    background: #007aff;
+    color: #fff;
+}
+
+#term-button-container #btnsubmit:hover {
+    background: #0071e3;
+}
+
+#term-button-container #delete {
+    background: rgba(255, 59, 48, 0.12);
+    color: #ff3b30;
+}
+
+#term-button-container #delete:hover {
+    background: rgba(255, 59, 48, 0.22);
 }
 
 .zoomableTermImage {
