@@ -306,6 +306,9 @@
         bottomStart: ['pageLength', 'info', 'buttons'],
         bottomEnd: 'paging'
       },
+      // NOTE: the vendored datatables bundle has no Responsive
+      // extension, so this is inert; mobile column handling for
+      // this table lives in the styles.css <767px block.
       responsive: true,
       select: false,
       lengthMenu: [ 25, 50, 100, 500, 1000 ],
