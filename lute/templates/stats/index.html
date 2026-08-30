@@ -135,6 +135,12 @@
     display: flex;
     flex-direction: column;
     min-height: 340px;
+    /* Grid items refuse to shrink below content width by default;
+       the Chart.js canvases would keep the 1fr track ~540px wide. */
+    min-width: 0;
+  }
+  .chart-wrap canvas {
+    max-width: 100%;
   }
   .chart-card h3 {
     margin: 0 0 10px 0;
@@ -291,6 +297,33 @@
   .statsWordsRead td:first-child {
     text-align: left;
     width: 20%;
+  }
+
+  /* Mobile: stack the fixed two-column grids and tighten the
+     words-read table so nothing overflows on phones. */
+  @media (max-width: 767px) {
+    .term-charts-grid,
+    .jlpt-macro {
+      grid-template-columns: 1fr;
+    }
+    .summary-levels {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .chart-card {
+      min-height: 280px;
+    }
+    .statsWordsRead th,
+    .statsWordsRead td {
+      padding: 8px 4px;
+      font-size: 12px;
+    }
+    .statsWordsRead th:first-child,
+    .statsWordsRead td:first-child {
+      width: 22%;
+    }
+    .wordcount-chart-wrap {
+      aspect-ratio: 2 !important;
+    }
   }
 </style>
 
@@ -485,7 +518,7 @@
   {% endfor %}
 </table>
 
-<div style="position: relative; aspect-ratio: 3">
+<div class="wordcount-chart-wrap" style="position: relative; aspect-ratio: 3">
   <canvas id="wordCountChart"></canvas>
 </div>
 
