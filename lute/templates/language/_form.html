@@ -292,7 +292,7 @@
       var popup = window.open('', '_blank', 'width=600,height=600,top=50,left=50');
       const content = `<html>
 <head>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}?v={{ lute_version }}" />
 <title>Dictionary test</title>
 </head>
 
