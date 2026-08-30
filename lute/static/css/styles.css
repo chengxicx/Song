@@ -2148,6 +2148,43 @@ div.help-text {
     width: 100%;
 }
 
+/* Pronunciation row: field + circular speak button (click = one
+   utterance of the term text). */
+.pron-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.pron-row #romanization {
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.pron-speak-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 27px;
+    height: 27px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(151, 83, 31, 0.12);
+    color: #97531f;
+    cursor: pointer;
+}
+
+.pron-speak-btn:hover {
+    background: rgba(151, 83, 31, 0.28);
+}
+
+.pron-speak-btn svg {
+    display: block;
+}
+
 #translation {
     height: 50px;
     min-height: 50px;
