@@ -1,4 +1,5 @@
-# Lute v3 speak
+# Song(颂) — based on Lute
+
 
 # 1.TTS Speech Synthesis & Automatic Translation
  <img width="1230" height="884" alt="image" src="https://github.com/user-attachments/assets/61e72b5e-8a03-4173-809c-1ff736d2805c" />
