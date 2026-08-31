@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Lute info{% endblock %}
-{% block header %}About Lute{% endblock %}
+{% block title %}About Song{% endblock %}
+{% block header %}About Song{% endblock %}
 
 {% block body %}
 
-<p>Lute listen</p>
+<p>Song(颂) — based on Lute</p>
 
 <div style="margin-top:20px;">
   <p>Version: {{ version }}</p>
@@ -20,48 +20,5 @@
   <p>Repository: <a href="https://github.com/LuteOrg/lute-v3">lute-v3</a></p>
   <p>Lute is released under the MIT License.</p>
 </div>
-
-<div style="margin-top:20px;">
-  <p>2026-07-31: PWA installability fixes (v3.10.3.5). URL normalization: BasicAuth-credentialed URLs are automatically redirected to clean URLs before any resources load. SW cleanup now detects stale registrations by checking for embedded username/password (not just origin, which the URL API normalizes away). Ensures exactly one active SW per origin with no credentialed interference.</p>
-
-  <p>2026-07-31: PWA installability fixes (v3.10.3.4). Robust SW cleanup that waits for stale SW unregistration before re-registering. Ensures only one active SW per origin. All PWA icons now use separate &quot;any&quot; and &quot;maskable&quot; purposes (no more discouraged combined purpose). Desktop and mobile screenshots with correct form_factors. SW script marked with <code>data-cfasync=&quot;false&quot;</code> to prevent Cloudflare Rocket Loader interference.</p>
-
-  <p>2026-07-31: PWA installability fixes (v3.10.3.3). Added required 144×144, 192×192, and 512×512 PNG icons with <code>purpose: &quot;any&quot;</code>; separate <code>purpose: &quot;maskable&quot;</code> icons added (no more discouraged &quot;any maskable&quot; combined purpose). Added desktop and mobile PWA screenshots with correct <code>form_factor</code>. SW registration script now has <code>data-cfasync=&quot;false&quot;</code> to prevent Cloudflare Rocket Loader from deferring it. Manifest route serves with correct MIME type; cache bumped to v3.10.3.3.</p>
-
-  <p>2026-07-31: PWA fixes for installability. Manifest is now served with correct <code>application/manifest+json</code> MIME type via <code>/manifest.webmanifest</code> and loaded with <code>crossorigin=&quot;use-credentials&quot;</code> (compatible with BasicAuth-protected sites). Service worker registration now unregisters any stale SWs registered on credential-containing URLs, then registers cleanly against the real origin. Also added richer manifest fields (id, display_override, shortcuts, maskable icons), plus additional meta tags for iOS/Android home screen installation.</p>
-
-  <p>2026-07-31: Add PWA (Progressive Web App) support. Lute can now be installed to the home screen on mobile and desktop, with offline caching of static assets and pages for reading without a network connection. Added web manifest, service worker, and theme color metadata.</p>
-
-  <p>2026-07-31: Edit book now allows editing the entire article text. The Edit Book form (accessible from the home page Actions menu) now includes a full text area pre-populated with the book's content, along with text file upload, split-by, and words-per-page controls. Changing the text re-parses and re-paginates the book; if the text is unchanged, existing pages and reading progress are preserved.</p>
-
-  <p>2026-07-30: Statistics page UI fixes and dark theme improvements:
-    <ol style="margin-top:6px;margin-bottom:0;">
-      <li><b>New terms / Fully mastered terms 置顶：</b>将 New terms 和 Fully mastered terms 图表移到顶部行（Top-left / Top-right），Summary 和 Term activity（Heatmap）移到底部行。</li>
-      <li><b>7 Days 时间范围正确显示：</b>选择 "7 days" 时，New terms 和 Fully mastered terms 图表的 X 轴现在强制限定为最近 7 天范围（6 天前至今天），即使某天无数据也能正确显示 7 天刻度。</li>
-      <li><b>New terms 改为红色：</b>New terms 柱状图颜色从蓝色 (#228be6) 改为红色 (#e03131)，同时移除了 dark theme 中的 hue-rotate CSS filter hack。</li>
-      <li><b>Words Read 表格对齐：</b>为 .statsWordsRead 添加了完整的对齐样式（居中对齐、垂直居中、均分列宽），dark theme 也同步适配。</li>
-      <li><b>Words Read 图表日期可见性：</b>修复了 Word Count Chart 日期刻度在 dark theme 下不可见的问题，将红色 (#FF0000) 改为浅灰 (#8e8e93/#f2f2f7)，并添加了 Y 轴刻度颜色与网格线颜色适配。</li>
-    </ol>
-  </p>
-
-  <p>2026-07-29: Fix Japanese MeCab Unidic dictionary compatibility — skip auxiliary verbs/particles in lemma generation, normalize Unidic orthography, and dynamically detect kana reading field index.</p>
-
-  <p>2026-07-29: Listing page (books/terms/termtags/bookmarks/languages) UI fixes and polish for the custom-apple theme:
-    <ol style="margin-top:6px;margin-bottom:0;">
-      <li><b>Sticky / 滚动遮挡彻底修复：</b>custom-apple.css 中顶部语言下拉 + 搜索栏原本使用 <code>position: fixed</code>，导致滚动时控件"钉"在视口顶部、与表头/内容重叠。现改为 <code>position: absolute</code> 锚定在 <code>.menu-bar</code> 上，随页面一起自然滚动；同时继续在 5 个 DataTables 配置上显式 <code>stickyHeader: false</code>，双重保证不再产生粘连遮挡。</li>
-      <li><b>pageLength（每页条目数）回到底部：</b>在所有 5 个列表页的 DataTables <code>layout.bottomStart</code> 中统一放置 <code>pageLength</code>，不再出现在顶部。</li>
-      <li><b>底部分页 / 条目数 / 列可见性按钮对齐修复：</b>在 custom-apple.css 新增第 7 节样式，强制最后一行控件使用 flex + <code>align-items:center</code>，并为 <code>.dt-length / .dt-info / .dt-buttons / .dt-paging</code> 统一高度、边距、圆角、对齐；DataTables 分页按钮统一重绘为 Apple 风格胶囊按钮（当前页高亮蓝色边框）。小于 820px 时自动换行，左右两组都保留独立对齐。</li>
-      <li><b>搜索框改为 🔍 放大镜折叠按钮：</b>
-        <ul style="margin-top:4px;margin-bottom:0;">
-          <li>在 <code>base.html</code> 末尾注入增强器脚本（兼容 DataTables 延迟渲染 + MutationObserver 动态监听），会自动为页面上每个 <code>.dt-search</code> 插入圆形 SVG 🔍 按钮作为触发器。</li>
-          <li>默认状态隐藏搜索输入框，只显示 🔍；点击按钮展开 180px 宽度的搜索框并聚焦；失焦时若搜索词为空则自动收起。按 Esc 清空搜索词并折叠。</li>
-          <li>若 DataTables 状态保存中已有搜索词，页面加载时自动保持展开状态，不吞掉已输入的关键词。</li>
-        </ul>
-      </li>
-      <li><b>顶栏语言 / 搜索向右偏移：</b>custom-apple.css 中将语言选择器 + 放大镜按钮的左侧定位从 <code>left: 140px</code> 放宽到 <code>left: 240px</code>，给 Logo + "Lute" 标题右侧留出足够空白，避免与 Logo 文字挤在一起。</li>
-    </ol>
-  </p>
-</div>
-
 
 {% endblock %}
