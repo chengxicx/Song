@@ -1,7 +1,7 @@
 <!doctype html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>{% block title %}LUTE{% endblock %}</title>
+  <title>{% block title %}Song{% endblock %}</title>
 
   {# Base URL — MUST be the first element in <head> so the browser's preload
      scanner resolves all relative sub-resource URLs (CSS, JS, images) against
@@ -100,11 +100,11 @@
         <img src="{{ url_for('static', filename='img/lute.webp') }}" class="lutelogo" alt="LUTE Logo">
       </a>
       <div class="title-container">
-        <h1 id="luteTitle" title="Learning Using Texts">
+        <h1 id="luteTitle" title="Song(颂) — based on Lute">
           {% if self.header() | trim %}
           {% block header %}{% endblock %}
           {% else %}
-          Lute
+          Song
           {% endif %}
         </h1>
       </div>
@@ -196,7 +196,7 @@
       <div class="menu-item">
         <span id="menu_about">About</span>
         <ul class="sub-menu last-sub-menu">
-          <li><a href="/version">Version and software info</a></li>
+          <li><a href="/version">About Song</a></li>
           <li><a href="/stats/">Statistics</a></li>
           <li><a href="https://luteorg.github.io/lute-manual/" target="_blank">Docs</a></li>
           <li><a href="https://discord.gg/CzFUQP5m8u" target="_blank">Discord</a></li>
