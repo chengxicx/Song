@@ -156,11 +156,11 @@
           </svg>
         </a>
         <ul class="sub-menu backup-sub-menu">
-          <li><a id="backup_manual" href="/backup/backup?type=manual">手动备份</a></li>
-          <li><a id="backup_index" href="/backup/index">查看备份</a></li>
+          <li><a id="backup_manual" href="/backup/backup?type=manual">Backup now</a></li>
+          <li><a id="backup_index" href="/backup/index">Backups</a></li>
           {% if backup_last_display_date is not none %}
           {% if backup_time_since is not none %}
-          <li>上次备份于 {{ backup_time_since }}。</li>
+          <li>Last backup was {{ backup_time_since }}.</li>
           {% endif %}
           <li>{{ backup_last_display_date | format }}</li>
           {% endif %}
