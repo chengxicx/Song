@@ -485,11 +485,12 @@ div.toolbar {
 .backup-disk-widget-top:hover svg {
     opacity: 1;
 }
-/* 相对 backup-widget 定位，悬停时显现；菜单显示在按钮右侧 */
+/* 相对 backup-widget 定位，悬停时显现；菜单显示在按钮右侧。
+   用 !important 覆盖深色主题对 .sub-menu 的 right/left 强制右对齐。 */
 .backup-widget .backup-sub-menu {
-    top: 100%;
-    left: 0;
-    right: auto;
+    top: 100% !important;
+    left: 0 !important;
+    right: auto !important;
     margin-left: 0;
     min-width: 170px;
 }
