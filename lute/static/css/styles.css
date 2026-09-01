@@ -466,15 +466,11 @@ div.toolbar {
     opacity: 1;
 }
 
-/* 顶栏备份磁盘图标（在列显隐齿轮右侧） */
-.backup-disk-widget-top {
+/* 顶栏备份磁盘图标（在列显隐齿轮右侧）。悬停弹出“手动备份/查看备份”菜单 */
+.backup-widget {
+    position: relative; /* Required for sub-menu positioning */
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    text-decoration: none;
     margin-left: 6px;
-    color: var(--font-color, #555) !important;
 }
 .backup-disk-widget-top svg {
     width: 14px;
@@ -488,6 +484,13 @@ div.toolbar {
 }
 .backup-disk-widget-top:hover svg {
     opacity: 1;
+}
+.backup-sub-menu {
+    /* 相对 backup-widget 定位，悬停时显现；覆盖子菜单的 li 位置 */
+    margin-left: -8px;
+}
+.backup-widget:hover .backup-sub-menu {
+    display: block;
 }
 
 /* 自定义列显隐菜单（齿轮点击弹出）—— 用 position:fixed 避免被滚动容器裁剪 */
