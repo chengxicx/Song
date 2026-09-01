@@ -49,8 +49,8 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tagify/tagify.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tagify/tagify_overrides.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/datatables/datatables.min.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}?v={{ lute_version }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/player-styles.css') }}?v={{ lute_version }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}?v={{ asset_cache_bust }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/player-styles.css') }}?v={{ asset_cache_bust }}" />
 
   <link rel="stylesheet" type="text/css" href="/theme/current?v={{ current_theme }}">
   <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ current_theme }}">
@@ -143,6 +143,30 @@
         <img src="{{ url_for('static', filename='icn/settings-gear-icon.svg') }}" id="datatables_config_toggle_top" class="config-gear-top" />
         <div id="colvis-menu" class="colvis-menu" style="display:none;"></div>
       </span>
+      {# Backup quick-access disk icon, positioned immediately to the right
+         of the columns gear icon. Hovering reveals manual-backup / view-backup
+         options. #}
+      {% if backup_enabled and backup_directory != '' %}
+      <span id="home_backup_icon" class="backup-widget" title="Backup">
+        <a href="/backup/backup?type=manual" class="config-widget-top backup-disk-widget-top" title="Backup">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+        </a>
+        <ul class="sub-menu backup-sub-menu">
+          <li><a id="backup_manual" href="/backup/backup?type=manual">Backup now</a></li>
+          <li><a id="backup_index" href="/backup/index">Backups</a></li>
+          {% if backup_last_display_date is not none %}
+          {% if backup_time_since is not none %}
+          <li class="backup-meta">Last backup was {{ backup_time_since }}.</li>
+          {% endif %}
+          <li class="backup-meta-date">{{ backup_last_display_date | format }}</li>
+          {% endif %}
+        </ul>
+      </span>
+      {% endif %}
     </div>
     <div class="menu">
       {% if not hide_homelink %}
@@ -152,15 +176,15 @@
       {% endif %}
       {% if have_languages %}
       <div class="menu-item">
-        <span id="menu_books">Books</span>
+        <span id="menu_books">Book</span>
         <ul class="sub-menu">
-          <li><a id="book_new" href="/book/import_webpage">Create new book</a></li>
-          <li><a href="/book/archived">Book archive</a></li>
-          <li><a href="/book/settings">Book settings</a></li>
+          <li><a id="book_new" href="/book/import_webpage">Create new</a></li>
+          <li><a href="/book/settings">Group into Set</a></li>
+          <li><a href="/book/archived">Archive</a></li>
         </ul>
       </div>
       <div class="menu-item">
-        <span id="menu_terms">Terms</span>
+        <span id="menu_terms">Term</span>
         <ul class="sub-menu">
           <li><a id="term_index" href="/term/index">Terms</a></li>
           <li><a id="term_import_index" href="/termimport/index">Import Terms</a></li>
@@ -169,7 +193,7 @@
       </div>
       {% endif %}
       <div class="menu-item">
-        <span id="menu_settings">Settings</span>
+        <span id="menu_settings">Setting</span>
         <ul class="sub-menu">
           <li><a id="lang_index" href="/language/index">Languages</a></li>
           <li><a href="/settings/index">Settings</a></li>
@@ -177,27 +201,17 @@
           <li><a id="anki_export_index" href="/ankiexport/index">Anki exports</a></li>
         </ul>
       </div>
-      {% if backup_enabled and backup_directory != '' %}
       <div class="menu-item">
-        <span>Backup</span>
-        <ul class="sub-menu last-sub-menu">
-          {% if backup_last_display_date is not none %}
-          {% if backup_time_since is not none %}
-          <li>Last backup was {{ backup_time_since }}.</li>
-          {% endif %}
-          <li>{{ backup_last_display_date | format }}</li>
-          <hr>
-          {% endif %}
-          <li><a id="backup_index" href="/backup/index">Backups</a></li>
-          <li><a href="/backup/backup?type=manual">Create backup</a></li>
+        <span>Insight</span>
+        <ul class="sub-menu">
+          <li><a href="/stats/">Statistics</a></li>
         </ul>
       </div>
-      {% endif %}
       <div class="menu-item">
         <span id="menu_about">About</span>
         <ul class="sub-menu last-sub-menu">
           <li><a href="/version">About Song</a></li>
-          <li><a href="/stats/">Statistics</a></li>
+          <li><a href="https://song.canny.io/" target="_blank">Feedback</a></li>
           <li><a href="https://luteorg.github.io/lute-manual/" target="_blank">Docs</a></li>
           <li><a href="https://discord.gg/CzFUQP5m8u" target="_blank">Discord</a></li>
         </ul>
@@ -482,22 +496,26 @@
     //    不正确时一次性修正，之后即为稳定状态。
     var toggle = document.getElementById("theme-mode-toggle");
     var gearTop = document.getElementById("datatables_config_widget_top");
+    var backupIcon = document.getElementById("home_backup_icon");
     var hasDt = document.querySelector(".dt-container") !== null;
     if (gearTop) {
       gearTop.style.display = hasDt ? "inline-flex" : "none";
     }
-    // “顺序正确”= 齿轮在容器中、紧跟在按钮之后、且是最后一个子元素。
-    // 满足即不动任何元素。
+    // “顺序正确”= 齿轮在容器中、紧跟在按钮之后、next 是备份磁盘图标（若存在）。
+    // 若存在备份图标，则它必须是最后一个子元素；否则齿轮须是最后一个。满足即不动。
     var orderOk = false;
     if (toggle && gearTop) {
       orderOk = gearTop.parentNode === ph &&
                 gearTop.previousElementSibling === toggle &&
-                gearTop.nextElementSibling === null;
+                (backupIcon
+                  ? gearTop.nextElementSibling === backupIcon && backupIcon.nextElementSibling === null
+                  : gearTop.nextElementSibling === null);
     }
     if (!orderOk) {
-      // 一次性修正：先把按钮放末尾，再把齿轮放它后面。
+      // 一次性修正：先把按钮放末尾，再把齿轮放它后面，最后（若有）放备份磁盘图标。
       if (toggle) ph.appendChild(toggle);
       if (gearTop) ph.appendChild(gearTop);
+      if (backupIcon) ph.appendChild(backupIcon);
     }
     // 5) 清理空的顶部布局行
     hideEmptyLayoutTopRow();
