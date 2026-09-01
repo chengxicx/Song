@@ -35,6 +35,44 @@ let render_tag_list = function(data, type, row, meta) {
 };
 
 /*
+ * Progress column: how much of the book has been read, as a bar plus a
+ * percentage.  The number comes from the server (ProgressPercent) so the
+ * home table can sort on it in SQL; series aggregate rows report the
+ * share of their episodes that have been read.
+ *
+ * Like render_last_opened_date, only the 'display' request gets HTML —
+ * sort/type/filter get the bare number, otherwise DataTables would sort
+ * the column as markup.
+ */
+let render_book_progress = function (data, type, row, meta) {
+  let pct = parseInt(row['ProgressPercent'], 10);
+  if (isNaN(pct)) pct = 0;
+  pct = Math.max(0, Math.min(100, pct));
+  if (type !== 'display') {
+    return pct;
+  }
+
+  let tip;
+  if (row['SeriesTag']) {
+    const n = parseInt(row['SeriesBookCount']) || 0;
+    const r = parseInt(row['SeriesReadCount']) || 0;
+    tip = `${r} of ${n} books read`;
+  } else {
+    const p = parseInt(row['PageNum']) || 1;
+    const n = parseInt(row['PageCount']) || 0;
+    tip = n > 0 ? `page ${p} of ${n}` : 'no pages';
+  }
+
+  const fillClass = pct >= 100 ? ' book-progress-fill-complete' : '';
+  return `<div class="book-progress" title="${tip}">` +
+    `<div class="book-progress-track">` +
+      `<div class="book-progress-fill${fillClass}" style="width:${pct}%"></div>` +
+    `</div>` +
+    `<span class="book-progress-pct">${pct}%</span>` +
+  `</div>`;
+};
+
+/*
  * Type column: one small colored icon per book type, on a tinted
  * rounded-square chip.  Brand marks (YouTube, Bilibili) are inline SVG
  * fills; everything else is a stroke-drawn Lucide-style glyph.
@@ -84,8 +122,8 @@ const BOOK_TYPE_META = {
     paths: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>'
   },
   series: {
-    label: 'Book series',
-    short: 'Series',
+    label: 'Book Sets',
+    short: 'Sets',
     color: '#4c6ef5',
     paths: '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>'
   }
@@ -323,6 +361,15 @@ let render_last_opened_date = function ( data, type, row, meta ) {
   const dt = row["LastOpenedDate"];
   if (dt == null) {
     return '';
+  }
+  // The sort/type/filter keys must be the raw timestamp, not the
+  // display HTML.  Returning the rendered span for every orthogonal
+  // request makes DataTables detect the column as HTML and sort by
+  // the "x days ago" text, which is not chronological.  The raw value
+  // is a fixed-width "YYYY-MM-DD HH:mm:ss" string, so its lexical
+  // order equals chronological order.
+  if (type === 'sort' || type === 'type' || type === 'filter') {
+    return dt;
   }
   const djs = dayjs(dt + 'Z');
   const txt = djs.fromNow();

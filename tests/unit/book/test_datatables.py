@@ -134,6 +134,61 @@ def test_book_data_says_completed_if_last_page_has_been_read(
     assert actual["IsCompleted"] == 1, "completed"
 
 
+def _progress_by_title(params):
+    "ProgressPercent per book title, for the current query."
+    d = get_data_tables_list(params, False, db.session)
+    return {r["BkTitle"]: r["ProgressPercent"] for r in d["data"]}
+
+
+def test_progress_percent_is_zero_for_unopened_book(app_context, _dt_params, english):
+    "A book that was never opened has no progress."
+    db.session.add(make_book("fresh", "One page.", english))
+    db.session.add(make_book("fresh2", ["p1.", "p2.", "p3.", "p4."], english))
+    db.session.commit()
+    p = _progress_by_title(_dt_params)
+    assert p["fresh"] == 0
+    assert p["fresh2"] == 0, "on page 1 of 4, nothing read yet"
+
+
+def test_progress_percent_uses_pages_read_or_current_page(
+    app_context, _dt_params, english
+):
+    """
+    Progress is the greater of "pages marked read" and "pages before the
+    current one": navigating marks pages read, but jumping straight to a
+    page only moves the current page.
+    """
+    read_2 = make_book("read-2", ["p1.", "p2.", "p3.", "p4."], english)
+    jumped = make_book("jumped", ["p1.", "p2.", "p3.", "p4."], english)
+    db.session.add(read_2)
+    db.session.add(jumped)
+    db.session.commit()
+
+    for t in read_2.texts[:2]:
+        t.read_date = datetime.now()
+    read_2.current_tx_id = read_2.texts[2].id  # sitting on page 3
+    jumped.current_tx_id = jumped.texts[2].id  # page 3, nothing marked read
+    db.session.add(read_2)
+    db.session.add(jumped)
+    db.session.commit()
+
+    p = _progress_by_title(_dt_params)
+    assert p["read-2"] == 50, "2 of 4 pages read"
+    assert p["jumped"] == 50, "page 3 of 4"
+
+
+def test_progress_percent_is_100_when_last_page_read(app_context, _dt_params, english):
+    "Reading the last page marks the whole book done, wherever the reader is."
+    b = make_book("done", ["p1.", "p2.", "p3.", "p4."], english)
+    db.session.add(b)
+    db.session.commit()
+    b.texts[3].read_date = datetime.now()
+    b.current_tx_id = b.texts[0].id  # re-opened an earlier page
+    db.session.add(b)
+    db.session.commit()
+    assert _progress_by_title(_dt_params)["done"] == 100
+
+
 def test_manga_book_word_count_in_datatables(app_context, empty_db, _dt_params):
     "Manga books show WordCount from manga_word_count, not textcounts.wc."
     from lute.models.book import Book
@@ -307,6 +362,7 @@ def test_series_aggregation_collapses_tagged_books(
     assert s["BkID"] is None, "series rows have no book id"
     assert s["SeriesBookCount"] == 3
     assert s["SeriesReadCount"] == 1, "one episode read"
+    assert s["ProgressPercent"] == 33, "1 of 3 episodes read"
     assert s["WordCount"] > 0, "word counts summed"
     assert s["IsCompleted"] == 0, "not all episodes read"
 
