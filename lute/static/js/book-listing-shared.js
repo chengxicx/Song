@@ -324,6 +324,15 @@ let render_last_opened_date = function ( data, type, row, meta ) {
   if (dt == null) {
     return '';
   }
+  // The sort/type/filter keys must be the raw timestamp, not the
+  // display HTML.  Returning the rendered span for every orthogonal
+  // request makes DataTables detect the column as HTML and sort by
+  // the "x days ago" text, which is not chronological.  The raw value
+  // is a fixed-width "YYYY-MM-DD HH:mm:ss" string, so its lexical
+  // order equals chronological order.
+  if (type === 'sort' || type === 'type' || type === 'filter') {
+    return dt;
+  }
   const djs = dayjs(dt + 'Z');
   const txt = djs.fromNow();
   const localStr = djs.format('YYYY-MM-DD HH:mm:ss');
