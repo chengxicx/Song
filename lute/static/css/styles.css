@@ -466,6 +466,30 @@ div.toolbar {
     opacity: 1;
 }
 
+/* 顶栏备份磁盘图标（在列显隐齿轮右侧） */
+.backup-disk-widget-top {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: 6px;
+    color: var(--font-color, #555) !important;
+}
+.backup-disk-widget-top svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0.7;
+}
+.backup-disk-widget-top:hover {
+    color: #007aff !important;
+    border-color: #007aff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+.backup-disk-widget-top:hover svg {
+    opacity: 1;
+}
+
 /* 自定义列显隐菜单（齿轮点击弹出）—— 用 position:fixed 避免被滚动容器裁剪 */
 .colvis-menu {
     position: fixed;
