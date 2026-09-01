@@ -71,6 +71,10 @@
   var ytTranscriptList = document.getElementById("yt-transcript-list");
   var ytSubtitle = document.getElementById("yt-scrolling-subtitle-inner");
   var ytLoading = document.getElementById("yt-player-loading");
+  var ytSettingsBtn = document.getElementById("yt-settings-btn");
+  var ytSettingsDropdown = document.getElementById("yt-settings-dropdown");
+  var ytAudioModeCb = document.getElementById("yt-audio-mode-cb");
+  var AUDIO_MODE_STORAGE_KEY = "ytAudioMode";
 
   function ytFmtTime(secs) {
     if (!isFinite(secs) || secs < 0) secs = 0;
@@ -527,6 +531,29 @@
     if (ytFullscreenBtn) {
       ytFullscreenBtn.addEventListener("click", ytToggleFullscreen);
     }
+    // Audio-only mode toggle + settings dropdown (same as the YouTube /
+    // online-video players).
+    if (ytAudioModeCb) {
+      ytAudioModeCb.checked =
+        localStorage.getItem(AUDIO_MODE_STORAGE_KEY) === "1";
+      ytAudioModeCb.addEventListener("change", ytApplyAudioMode);
+      // Apply the persisted mode on load so a returning video book
+      // opens as an audio-only screen immediately.
+      ytApplyAudioMode();
+    }
+    if (ytSettingsBtn && ytSettingsDropdown) {
+      ytSettingsBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        ytSettingsDropdown.hidden = !ytSettingsDropdown.hidden;
+      });
+      // Close the settings menu when clicking anywhere outside it.
+      document.addEventListener("click", function (e) {
+        var wrap = document.querySelector(".yt-settings-wrap");
+        if (wrap && !wrap.contains(e.target)) {
+          ytSettingsDropdown.hidden = true;
+        }
+      });
+    }
     var fsHandler = function () {
       var isFs = document.fullscreenElement || document.webkitFullscreenElement;
       if (ytFullscreenBtn) ytFullscreenBtn.classList.toggle("on", !!isFs);
@@ -582,6 +609,30 @@
       if (el.requestFullscreen) el.requestFullscreen();
       else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     }
+  }
+
+  // Audio-only mode (the gear button menu), mirroring youtube-player.js:
+  // hide the video area so the reading screen matches an MP3 book
+  // (controls + scrolling subtitle), while the hidden <video> keeps
+  // playing its audio track.  Persists per browser.
+  function ytApplyAudioMode() {
+    if (!ytVideoWrap || !ytAudioModeCb) return;
+    var on = !!ytAudioModeCb.checked;
+    ytContainer.classList.toggle("yt-audio-mode", on);
+    localStorage.setItem(AUDIO_MODE_STORAGE_KEY, on ? "1" : "0");
+    // Close the gear menu: the change event comes from a click inside
+    // the dropdown, so the outside-click closer never fires.
+    if (ytSettingsDropdown) ytSettingsDropdown.hidden = true;
+    // Hiding/showing the video changes the height available to the text
+    // area (#thetext), so re-flow the fit-to-screen groups and re-centre
+    // the side navigation instead of leaving them sized for the old
+    // layout.  A short timeout instead of requestAnimationFrame: rAF
+    // callbacks are suspended in occluded / background windows, which
+    // would leave the reflow undone until the tab is focused again.
+    setTimeout(function () {
+      if (typeof _splitToScreens === "function") _splitToScreens();
+      if (typeof _layout_side_nav === "function") _layout_side_nav();
+    }, 50);
   }
 
   /* ------------------------------------------------------------------ */
