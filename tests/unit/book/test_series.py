@@ -53,6 +53,43 @@ def test_overview_counts_and_order(app_context, _erin_books):
     assert vm["books"][0]["StatusDistribution"] is None, "stats not calculated yet"
 
 
+def test_overview_reports_reading_progress(app_context, english):
+    """
+    Each book carries ProgressPercent (0-100), the same figure the home
+    table shows in its Progress column.
+    """
+    svcbook = ServiceBook()
+    svcbook.language_id = english.id
+    svcbook.title = "Erin-long"
+    svcbook.text = "Page one.\n---\nPage two.\n---\nPage three.\n---\nPage four."
+    svcbook.book_tags = ["Erin"]
+    repo = ServiceRepository(db.session)
+    b = repo.add(svcbook)
+    repo.commit()
+
+    def _progress():
+        vm = get_series_overview(db.session, "Erin")
+        return vm["books"][0]["ProgressPercent"]
+
+    assert _progress() == 0, "never opened"
+
+    # Sitting on page 3 with pages 1-2 marked read: 2 of 4 done.
+    for t in b.texts[:2]:
+        t.read_date = datetime.now()
+    b.current_tx_id = b.texts[2].id
+    db.session.add(b)
+    db.session.commit()
+    assert _progress() == 50
+
+    # Reading the last page finishes the book, even when an earlier page
+    # is the one currently open.
+    b.texts[3].read_date = datetime.now()
+    b.current_tx_id = b.texts[0].id
+    db.session.add(b)
+    db.session.commit()
+    assert _progress() == 100
+
+
 def test_overview_returns_none_for_unknown_tag(app_context, _erin_books):
     assert get_series_overview(db.session, "no-such-tag") is None
 

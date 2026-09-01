@@ -3543,6 +3543,16 @@ div#termimagesearch span img {
         cursor: pointer;
     }
 
+    /* Row 4: Progress — full-width bar under the card's meta line */
+    #booktable td.col-progress {
+        grid-column: 1 / -1;
+        grid-row: 4;
+        padding-top: 8px !important;
+    }
+    #booktable td.col-progress .book-progress-pct {
+        font-size: 0.85rem;
+    }
+
     /* Action dropdown menu items larger for touch */
     .book-action-dropdown-content a {
         padding: 10px 14px;
@@ -3655,6 +3665,46 @@ div#termimagesearch span img {
 .series-progress-fill {
     height: 100%;
     background-color: #72da88;
+}
+
+/* ============================================================
+   Progress column (share of a book or series read).
+   The bar colour follows the app accent; finished items turn
+   green.  Track and label use theme-relative colours so the
+   column survives the dark themes.
+   ============================================================ */
+#booktable td.col-progress,
+#booktable th.col-progress,
+.dt-scroll-headInner thead th.col-progress {
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.book-progress {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.book-progress-track {
+    flex: 1 1 auto;
+    min-width: 30px;
+    height: 8px;
+    border-radius: 999px;
+    background-color: rgba(128, 128, 128, 0.22);
+    overflow: hidden;
+}
+.book-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background-color: #4c6ef5;
+}
+.book-progress-fill-complete {
+    background-color: #2f9e44;
+}
+.book-progress-pct {
+    flex: 0 0 auto;
+    font-size: 11px;
+    opacity: 0.7;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Series overview page (/book/series/<tag>). */
