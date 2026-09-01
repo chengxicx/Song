@@ -279,7 +279,7 @@ class BookSettingsForm(FlaskForm):
     """
 
     book_series_tags = SelectMultipleField(
-        "Book series tags",
+        "Book Sets tags",
         choices=[],
         widget=ListWidget(prefix_label=False),
         option_widget=CheckboxInput(),
