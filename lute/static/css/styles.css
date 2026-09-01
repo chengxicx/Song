@@ -485,9 +485,26 @@ div.toolbar {
 .backup-disk-widget-top:hover svg {
     opacity: 1;
 }
-.backup-sub-menu {
-    /* 相对 backup-widget 定位，悬停时显现；覆盖子菜单的 li 位置 */
-    margin-left: -8px;
+/* 相对 backup-widget 定位，悬停时显现；菜单显示在按钮右侧 */
+.backup-widget .backup-sub-menu {
+    top: 100%;
+    left: 0;
+    right: auto;
+    margin-left: 0;
+    min-width: 170px;
+}
+/* “Last backup was …” 等元信息：小号、弱化，排版美观 */
+.backup-sub-menu .backup-meta {
+    font-size: 0.78em;
+    color: #888;
+    margin: 2px 0;
+    line-height: 1.3;
+}
+.backup-sub-menu .backup-meta-date {
+    font-size: 0.78em;
+    color: #a0a0a0;
+    margin: 2px 0 4px;
+    line-height: 1.3;
 }
 .backup-widget:hover .backup-sub-menu {
     display: block;
