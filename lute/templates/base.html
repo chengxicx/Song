@@ -144,17 +144,28 @@
         <div id="colvis-menu" class="colvis-menu" style="display:none;"></div>
       </span>
       {# Backup quick-access disk icon, positioned immediately to the right
-         of the columns gear icon. Links to the backup page. #}
+         of the columns gear icon. Hovering reveals manual-backup / view-backup
+         options. #}
       {% if backup_enabled and backup_directory != '' %}
-      <a id="home_backup_icon" class="config-widget-top backup-disk-widget-top"
-         href="/backup/backup?type=manual"
-         title="Backup">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-          <path d="M3 5v6c0 1.66 4.03 3 9 3s9-1.34 9-3V5"></path>
-          <path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6"></path>
-        </svg>
-      </a>
+      <span id="home_backup_icon" class="backup-widget" title="Backup">
+        <a href="/backup/backup?type=manual" class="config-widget-top backup-disk-widget-top" title="Backup">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+        </a>
+        <ul class="sub-menu backup-sub-menu">
+          <li><a id="backup_manual" href="/backup/backup?type=manual">手动备份</a></li>
+          <li><a id="backup_index" href="/backup/index">查看备份</a></li>
+          {% if backup_last_display_date is not none %}
+          {% if backup_time_since is not none %}
+          <li>上次备份于 {{ backup_time_since }}。</li>
+          {% endif %}
+          <li>{{ backup_last_display_date | format }}</li>
+          {% endif %}
+        </ul>
+      </span>
       {% endif %}
     </div>
     <div class="menu">
@@ -194,15 +205,6 @@
         <span>Insight</span>
         <ul class="sub-menu">
           <li><a href="/stats/">Statistics</a></li>
-          {% if backup_enabled and backup_directory != '' %}
-          <li><a id="backup_index" href="/backup/index">Backups</a></li>
-          {% if backup_last_display_date is not none %}
-          {% if backup_time_since is not none %}
-          <li>Last backup was {{ backup_time_since }}.</li>
-          {% endif %}
-          <li>{{ backup_last_display_date | format }}</li>
-          {% endif %}
-          {% endif %}
         </ul>
       </div>
       <div class="menu-item">
