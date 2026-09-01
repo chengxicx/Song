@@ -125,7 +125,7 @@ def book_settings():
         tags = ",".join(form.book_series_tags.data or [])
         repo.set_dynamic_value("book_series_tags", tags)
         db.session.commit()
-        flash("Book settings updated", "success")
+        flash("Group into Set updated", "success")
         return redirect("/", 302)
 
     current = repo.get_dynamic_value("book_series_tags") or ""
