@@ -160,9 +160,9 @@
           <li><a id="backup_index" href="/backup/index">Backups</a></li>
           {% if backup_last_display_date is not none %}
           {% if backup_time_since is not none %}
-          <li>Last backup was {{ backup_time_since }}.</li>
+          <li class="backup-meta">Last backup was {{ backup_time_since }}.</li>
           {% endif %}
-          <li>{{ backup_last_display_date | format }}</li>
+          <li class="backup-meta-date">{{ backup_last_display_date | format }}</li>
           {% endif %}
         </ul>
       </span>
