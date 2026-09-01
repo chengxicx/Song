@@ -42,6 +42,7 @@
       <th style="text-align: left">Title</th>
       <th style="text-align: left">Language</th>
       <th style="text-align: left">Tags</th>
+      <th style="text-align: left">Progress</th>
       <th style="text-align: left">Word count</th>
       <th style="text-align: left">Status</th>
       <th style="text-align: left">New word</th>
@@ -128,7 +129,10 @@
       stateSave: true,
       stateDuration: 0,
       stateSaveCallback: function(settings, data) {
-        data.version = 5;
+        // Version must match the home book table (the state is shared):
+        // it stores column visibility/order by index, so it has to be
+        // invalidated whenever a column is added or moved.
+        data.version = 6;
         data.search = { search: "", regex: false, smart: true };
         data.columns.forEach(function(c) { c.search = { search: "", regex: false, smart: true }; });
         var stateJson = JSON.stringify(data);
@@ -148,7 +152,7 @@
         if (saved) {
           try {
               var ld = JSON.parse(saved);
-              if (ld && ld.version === 5) {
+              if (ld && ld.version === 6) {
               ld.search = { search: "", regex: false, smart: true };
               callback(ld);
               return;
@@ -163,7 +167,7 @@
             if (resp && resp.value) {
               try {
                 var sd = JSON.parse(resp.value);
-                if (sd && sd.version === 5) {
+                if (sd && sd.version === 6) {
                   localStorage.setItem('booklisting_datatables_state', resp.value);
                   sd.search = { search: "", regex: false, smart: true };
                   callback(sd);
@@ -201,6 +205,7 @@
         { name: "BkTitle", className: "col-title", width: "24%", data: "BkTitle", render: render_book_title },
         { name: "LgName", className: "col-lang", width: "8%", data: "LgName" },
         { name: "TagList", className: "col-tags", width: "15%", data: "TagList", render: render_tag_list },
+        { name: "ProgressPercent", className: "col-progress", width: "8%", data: "ProgressPercent", searchable: false, render: render_book_progress },
         { name: "WordCount", className: "col-words", width: "8%", data: "WordCount" },
         { name: "UnknownPercent", className: "col-status", width: "12%", data: "UnknownPercent", searchable: false, render: render_book_stats_graph_placeholder },
         { name: "NewWordPercent", className: "col-newword", width: "12%", data: "NewWordPercent", searchable: false, orderable: true, render: render_new_word_placeholder },
@@ -220,6 +225,7 @@
         BkTitle: 'Title',
         LgName: 'Language',
         TagList: 'Tags',
+        ProgressPercent: 'Progress',
         WordCount: 'Word count',
         UnknownPercent: 'Status',
         NewWordPercent: 'New word',

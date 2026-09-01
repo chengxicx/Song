@@ -46,6 +46,7 @@
           </a>
         </span>
       </th>
+      <th style="text-align: left">Progress</th>
       <th style="text-align: left">Word count</th>
       <th style="text-align: left">Status
         <a href="/refresh_all_stats" class="refresh" title="Refresh stats for all books"></a>
@@ -220,13 +221,18 @@
       processing: true,
       serverSide: true,
       stickyHeader: false,
-      // Default sort: Last read (column 7 = LastOpenedDate), newest first.
+      // Default sort: Last read (column 8 = LastOpenedDate), newest first.
       // (Column 0 is the Type icon column.)
-      order: [[7, 'desc']],
+      order: [[8, 'desc']],
       stateSave: true,
       stateDuration: 0,
       stateSaveCallback: function(settings, data) {
-        data.version = 5;
+        // The saved state holds column visibility/order by index, so it
+        // only matches one column layout: bump this whenever a column is
+        // added, removed or reordered.  Otherwise a returning visitor
+        // gets the old layout's visibility applied to the wrong columns.
+        // (v6 = the Progress column added between Tags and Word count.)
+        data.version = 6;
         var stateJson = JSON.stringify(data);
         // Always save to localStorage as instant fallback.
         localStorage.setItem('booklisting_datatables_state', stateJson);
@@ -250,7 +256,7 @@
         if (saved) {
           try {
             var ld = JSON.parse(saved);
-            if (ld && ld.version === 5) {
+            if (ld && ld.version === 6) {
               callback(ld);
               return;
             }
@@ -265,7 +271,7 @@
             if (resp && resp.value) {
               try {
                 var sd = JSON.parse(resp.value);
-                if (sd && sd.version === 5) {
+                if (sd && sd.version === 6) {
                   localStorage.setItem('booklisting_datatables_state', resp.value);
                   callback(sd);
                   return;
@@ -285,6 +291,7 @@
         { name: "BkTitle", className: "col-title", width: "24%", data: "BkTitle", render: render_book_title },
         { name: "LgName", className: "col-lang", width: "8%", data: "LgName" },
         { name: "TagList", className: "col-tags", width: "15%", data: "TagList", render: render_tag_list },
+        { name: "ProgressPercent", className: "col-progress", width: "8%", data: "ProgressPercent", searchable: false, render: render_book_progress },
         { name: "WordCount", className: "col-words", width: "8%", data: "WordCount" },
         { name: "UnknownPercent", className: "col-status", width: "12%", data: "UnknownPercent", searchable: false, render: render_book_stats_graph_placeholder },
         { name: "NewWordPercent", className: "col-newword", width: "12%", data: "NewWordPercent", searchable: false, orderable: true, render: render_new_word_placeholder },
@@ -397,6 +404,7 @@
         BkTitle: 'Title',
         LgName: 'Language',
         TagList: 'Tags',
+        ProgressPercent: 'Progress',
         WordCount: 'Word count',
         UnknownPercent: 'Status',
         NewWordPercent: 'New word',

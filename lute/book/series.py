@@ -19,6 +19,7 @@ SELECT
     tags.taglist AS TagList,
     COALESCE(textcounts.pagecount, 1) AS PageCount,
     currtext.TxOrder AS PageNum,
+    COALESCE(readpages.readpagecount, 0) AS ReadPageCount,
     textcounts.wc AS WordCount,
     booklastopened.lastopeneddate AS LastOpenedDate,
     c.new_word_percent AS NewWordPercent,
@@ -37,6 +38,12 @@ LEFT OUTER JOIN (
     FROM texts
     GROUP BY TxBkID
 ) textcounts on textcounts.TxBkID = b.BkID
+LEFT OUTER JOIN (
+    select TxBkID as BkID,
+           sum(case when TxReadDate is null then 0 else 1 end) as readpagecount
+    from texts
+    group by TxBkID
+) readpages on readpages.BkID = b.BkID
 LEFT OUTER JOIN bookstats c on c.BkID = b.BkID
 LEFT OUTER JOIN (
     SELECT BtBkID as BkID, GROUP_CONCAT(T2Text, ', ') AS taglist
@@ -66,6 +73,24 @@ ORDER BY b.BkArchived, b.BkTitle COLLATE NOCASE
 """
 
 
+def progress_percent(page_num, page_count, read_page_count, is_completed):
+    """
+    Percentage of a book that has been read, 0-100.
+
+    Mirrors the SQL expression the home book table uses
+    (lute/book/datatables.py): a book is 100% as soon as its last page
+    carries a read date, otherwise it's the greater of "pages marked
+    read" and "pages before the current one" — navigating with the
+    arrows marks pages read, but jumping straight to a page only moves
+    the current page.
+    """
+    pages = max(1, page_count or 1)
+    if is_completed:
+        return 100
+    done = max(read_page_count or 0, (page_num or 1) - 1)
+    return min(100, max(0, int(done * 100 / pages)))
+
+
 def get_series_overview(session, tagtext):
     """
     View model for the series page, or None if no books carry the tag.
@@ -92,6 +117,7 @@ def get_series_overview(session, tagtext):
         pagenum = r.PageNum or 1
         pagecount = r.PageCount or 1
         is_completed = bool(r.IsCompleted)
+        progress = progress_percent(pagenum, pagecount, r.ReadPageCount, is_completed)
         label, color_class, description = get_difficulty_label(r.NewWordPercent)
 
         if not r.BkArchived:
@@ -128,6 +154,7 @@ def get_series_overview(session, tagtext):
                 "DifficultyColor": color_class,
                 "DifficultyDescription": description,
                 "IsCompleted": 1 if is_completed else 0,
+                "ProgressPercent": progress,
                 "BookType": r.BookType or "",
                 "BkArchived": 1 if r.BkArchived else 0,
                 "PageNum": pagenum,

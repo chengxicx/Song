@@ -62,6 +62,48 @@ _COMPLETED_SQL = """
     ) completed_books on completed_books.BkID = b.BkID
 """
 
+# Pages explicitly marked read (the checkmark in the reading pane, which
+# is also what the next-page arrow triggers).  Used by the Progress
+# column: it's the app's own notion of "read", but it stays at 0 for
+# books the user navigated without marking (e.g. jumping to a page), so
+# the ProgressPercent expression below takes the greater of this and the
+# current page position.
+_READPAGES_SQL = """
+    left outer join (
+      select TxBkID as BkID,
+             sum(case when TxReadDate is null then 0 else 1 end) as readpagecount
+      from texts
+      group by TxBkID
+    ) readpages on readpages.BkID = b.BkID
+"""
+
+# Percentage of a book that has been read, 0-100.
+#
+# A book is 100% when its last page carries a read date (completed_books);
+# otherwise the greater of "pages marked read" and "pages before the
+# current one" over the page count.  Both are needed: navigating with the
+# arrows marks pages read, so the two agree, but jumping straight to page
+# 8 of 10 only moves the current page, while re-opening an earlier page
+# after finishing the book would drop the pages-read count back down.
+# COALESCE() everywhere because SQLite's scalar max()/min() return NULL
+# if any argument is NULL.
+_BOOK_PROGRESS_SQL = """
+    case
+      when COALESCE(textcounts.pagecount, 0) <= 0 then 0
+      when completed_books.BkID is not null then 100
+      else min(
+        100,
+        cast(
+          max(
+            COALESCE(readpages.readpagecount, 0),
+            case when currtext.TxID is null then 0
+                 else COALESCE(currtext.TxOrder, 1) - 1 end
+          ) * 100.0 / textcounts.pagecount as integer
+        )
+      )
+    end
+"""
+
 _PARSER_CRITERIA_SQL = f"""
       and (languages.LgParserType in ({ supported_parser_type_criteria() })
            or b.BkBookType = 'manga')
@@ -101,6 +143,7 @@ def _flat_base_sql(archived, extra_where=""):
         {difficulty_col["color"]} AS DifficultyColor,
         {difficulty_col["description"]} AS DifficultyDescription,
         case when completed_books.BkID is null then 0 else 1 end as IsCompleted,
+        {_BOOK_PROGRESS_SQL} AS ProgressPercent,
         b.BkBookType AS BookType,
         NULL as SeriesTag,
         NULL as SeriesBookCount,
@@ -113,6 +156,7 @@ def _flat_base_sql(archived, extra_where=""):
     {_LASTOPENED_SQL}
     {_TEXTCOUNTS_SQL}
     LEFT OUTER JOIN bookstats c on c.BkID = b.BkID
+    {_READPAGES_SQL}
 
     LEFT OUTER JOIN (
         SELECT BtBkID as BkID, GROUP_CONCAT(T2Text, ', ') AS taglist
@@ -172,6 +216,11 @@ def _series_union_base_sql(archived, series_tags):
         {difficulty_col["color"]} AS DifficultyColor,
         {difficulty_col["description"]} AS DifficultyDescription,
         CASE WHEN agg.readcount >= agg.bookcount THEN 1 ELSE 0 END AS IsCompleted,
+        /* Percentage of the series' episodes read (readcount counts the
+           books whose last page carries a read date). */
+        CASE WHEN COALESCE(agg.bookcount, 0) <= 0 THEN 0
+             ELSE CAST(COALESCE(agg.readcount, 0) * 100.0 / agg.bookcount AS INTEGER)
+        END AS ProgressPercent,
         /* Series aggregate rows report 'series' so the frontend renders
            the aggregation icon in the Type column. */
         'series' AS BookType,
