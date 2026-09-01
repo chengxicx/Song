@@ -104,7 +104,14 @@ _BOOK_PROGRESS_SQL = """
     end
 """
 
-_PARSER_CRITERIA_SQL = f"""
+# NOTE: this must be built at request time, not at module import.
+# The app factory imports this module before init_parser_plugins() runs,
+# so a module-level f-string would freeze the parser list *without* any
+# plugin parsers (e.g. lute_cantonese), and their books would silently
+# disappear from the home page listing.
+def _parser_criteria_sql():
+    "SQL fragment restricting the listing to books of supported parsers."
+    return f"""
       and (languages.LgParserType in ({ supported_parser_type_criteria() })
            or b.BkBookType = 'manga')
 """
@@ -173,7 +180,7 @@ def _flat_base_sql(archived, extra_where=""):
     {_COMPLETED_SQL}
     WHERE b.BkArchived = {archived}
     {extra_where}
-    {_PARSER_CRITERIA_SQL}
+    {_parser_criteria_sql()}
     """
 
 
@@ -270,7 +277,7 @@ def _series_union_base_sql(archived, series_tags):
         LEFT OUTER JOIN bookstats c on c.BkID = b.BkID
         {_COMPLETED_SQL}
         WHERE b.BkArchived = {archived}
-        {_PARSER_CRITERIA_SQL}
+        {_parser_criteria_sql()}
         GROUP BY st.seriestag, b.BkLgID
     ) agg
     INNER JOIN languages L ON L.LgID = agg.lgid
