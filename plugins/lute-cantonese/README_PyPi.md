@@ -1,7 +1,7 @@
 # `lute3-cantonese`
 
 A Cantonese parser for Lute (`lute3`) using the
-[pycantonese](https://pycantonese.github.io/pycantonese/) library.
+[pycantonese](https://pycantonese.org) library.
 
 ## Installation
 
