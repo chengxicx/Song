@@ -135,6 +135,7 @@ def _add_base_routes(app, app_config):
             "user_hotkeys": json.dumps(current_hotkeys),
             "current_theme": us_repo.get_value("current_theme"),
             "lute_version": lute.__version__,
+            "asset_cache_bust": lute.ASSET_CACHE_BUST,
         }
         return ret
 
