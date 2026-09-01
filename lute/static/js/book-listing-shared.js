@@ -35,6 +35,44 @@ let render_tag_list = function(data, type, row, meta) {
 };
 
 /*
+ * Progress column: how much of the book has been read, as a bar plus a
+ * percentage.  The number comes from the server (ProgressPercent) so the
+ * home table can sort on it in SQL; series aggregate rows report the
+ * share of their episodes that have been read.
+ *
+ * Like render_last_opened_date, only the 'display' request gets HTML —
+ * sort/type/filter get the bare number, otherwise DataTables would sort
+ * the column as markup.
+ */
+let render_book_progress = function (data, type, row, meta) {
+  let pct = parseInt(row['ProgressPercent'], 10);
+  if (isNaN(pct)) pct = 0;
+  pct = Math.max(0, Math.min(100, pct));
+  if (type !== 'display') {
+    return pct;
+  }
+
+  let tip;
+  if (row['SeriesTag']) {
+    const n = parseInt(row['SeriesBookCount']) || 0;
+    const r = parseInt(row['SeriesReadCount']) || 0;
+    tip = `${r} of ${n} books read`;
+  } else {
+    const p = parseInt(row['PageNum']) || 1;
+    const n = parseInt(row['PageCount']) || 0;
+    tip = n > 0 ? `page ${p} of ${n}` : 'no pages';
+  }
+
+  const fillClass = pct >= 100 ? ' book-progress-fill-complete' : '';
+  return `<div class="book-progress" title="${tip}">` +
+    `<div class="book-progress-track">` +
+      `<div class="book-progress-fill${fillClass}" style="width:${pct}%"></div>` +
+    `</div>` +
+    `<span class="book-progress-pct">${pct}%</span>` +
+  `</div>`;
+};
+
+/*
  * Type column: one small colored icon per book type, on a tinted
  * rounded-square chip.  Brand marks (YouTube, Bilibili) are inline SVG
  * fills; everything else is a stroke-drawn Lucide-style glyph.
