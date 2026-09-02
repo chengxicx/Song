@@ -1,8 +1,8 @@
 # README
 
-The Lute Cantonese parser, using the
-[pycantonese](https://pycantonese.org) library
-for word segmentation and Jyutping readings.
+The Lute Korean parser, using the
+[kiwipiepy](https://github.com/bab2min/kiwipiepy) library
+for morphological analysis and lemmatization.
 
 See [the wiki](https://github.com/LuteOrg/lute-v3/wiki/Developing-language-parser-plugins) for development notes.
 
