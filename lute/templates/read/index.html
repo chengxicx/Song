@@ -322,14 +322,17 @@
         marked_id = $(marked[0]).attr('id');
       }
 
-      // Properly close the term-detail tooltip widget(s) before the
-      // swap, instead of only removing their DOM.  Just calling
-      // `$('div.ui-tooltip').remove()` left jquery-ui's internal
-      // "open" state stale, so the freshly-rendered (just-saved) word
-      // wouldn't pop its tooltip on hover until a full reload.  Mirrors
-      // what the page-navigation path does via
-      // start_hover_mode() -> _hide_element_message_tooltips().
-      _hide_element_message_tooltips();
+      // Force remove the old popup.
+      // ref https://stackoverflow.com/questions/19266886/tooltip-not-disappearing
+      $('div.ui-tooltip').remove();
+
+      // The term was just saved/edited/deleted on the server, so any
+      // cached popup HTML for it -- typically fetched moments earlier,
+      // before the save, when the term still had no translation and its
+      // popup rendered empty -- is now stale.  Invalidate the whole
+      // term-popup cache so the next hover re-fetches and shows the
+      // newly saved content instead of an empty tooltip.
+      clear_termpopup_cache();
 
       $(".dictcontainer").css('display', 'none');
 

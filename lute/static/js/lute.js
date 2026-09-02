@@ -246,6 +246,22 @@ function _termpopup_get(elid, el, setContent) {
   _termpopup_pump();
 }
 
+// Invalidate the cached term-popup HTML (and pending/queue/fetch state).
+// Term saves/edits/deletes change a term's popup content server-side;
+// without this, hovering a just-saved word keeps serving the stale
+// (often empty) popup fetched before the save, until a full reload.
+function clear_termpopup_cache() {
+  for (const k of Object.keys(_termpopup_cache)) {
+    delete _termpopup_cache[k];
+  }
+  for (const k of Object.keys(_termpopup_pending)) {
+    delete _termpopup_pending[k];
+  }
+  _termpopup_queue.length = 0;
+  _termpopup_fetching = false;
+  _termpopup_fetching_wid = null;
+}
+
 // Cache the HTMX term-popup response and hand it to any waiting tooltip.
 // htmx:afterRequest fires on success AND error (afterSwap only on success),
 // so a failed fetch cannot stall the queue.  The path check keeps this
