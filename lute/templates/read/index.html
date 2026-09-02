@@ -331,6 +331,7 @@
     if (event.data.event === "LuteTermFormPosted") {
       const bookid = $('#book_id').val();
       const pagenum = $('#page_num').val();
+      const savedTermText = event.data.term_text || null;
       const url = `/read/refresh_page/${bookid}/${pagenum}`;
       const marked = $('.kwordmarked');
       let marked_id = "nomatches"
@@ -376,7 +377,7 @@
 
       // HTMX: swap the refreshed fragment into #thetext.  Re-marking of
       // the previously-marked word happens in the htmx:afterSwap handler.
-      _pendingTermFormReload = { marked_id, anchorOrdinal };
+      _pendingTermFormReload = { marked_id, anchorOrdinal, term_text: savedTermText };
       htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
     };
   };
@@ -657,7 +658,15 @@
       re_marked.removeClass('kwordmarked');
       re_marked.addClass('wordhover');
       // Notify the YouTube / TTS player to refresh subtitle word colors.
-      window.dispatchEvent(new Event('lute:status-updated'));
+      // bookId lets players of other books ignore the event; termText
+      // lets them re-render just the affected cues instead of the whole
+      // book (deleted terms post without a term_text).
+      window.dispatchEvent(new CustomEvent('lute:status-updated', {
+        detail: {
+          bookId: Number($('#book_id').val()) || null,
+          termText: state.term_text || null,
+        },
+      }));
       // The swapped-in paragraph set has no pagination state.  Re-flow
       // the screen so multi-column books stay within the pane instead of
       // spilling into overflowing columns after a save.  Keep the reader

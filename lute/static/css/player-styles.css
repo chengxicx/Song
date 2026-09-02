@@ -639,8 +639,13 @@
   background-color: #fff;
   border-radius: 999px;
   box-sizing: border-box;
-  background-size: 0% 100%;
-  background-image: linear-gradient(var(--yt-color-1), var(--yt-color-1));
+  /* Two layers, both anchored left: played (opaque, on top) and the
+     lighter buffered band behind it (painted by the player JS from the
+     media element's buffered ranges / YT getVideoLoadedFraction). */
+  background-size: 0% 100%, 0% 100%;
+  background-image:
+    linear-gradient(var(--yt-color-1), var(--yt-color-1)),
+    linear-gradient(var(--yt-color-5), var(--yt-color-5));
   background-repeat: no-repeat;
   cursor: pointer;
 }

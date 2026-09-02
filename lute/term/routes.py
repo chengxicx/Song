@@ -293,8 +293,23 @@ def handle_term_form(
         # New terms don't get the new DB id back in the business object
         # otherwise; the AJAX save response needs it.
         term.id = dbterm.id
-        from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
-        invalidate_yt_subtitle_cache()
+        from lute.read.routes import (  # pylint: disable=import-outside-toplevel
+            invalidate_yt_subtitle_cache,
+            patch_yt_subtitle_caches_for_term,
+        )
+        if (dbterm.token_count or 1) > 1:
+            # Multiword terms change how texts tokenize, so cached
+            # subtitle renders must be rebuilt from scratch.
+            invalidate_yt_subtitle_cache()
+        else:
+            # Single-word saves only change statuses/translations, so
+            # re-render just the affected cues in place (see
+            # read.routes.patch_yt_subtitle_caches_for_term).  The
+            # player picks the fresh HTML up via its incremental
+            # subtitle refresh.
+            patch_yt_subtitle_caches_for_term(
+                [term.text] + list(term.parents or [])
+            )
         return return_on_success() if callable(return_on_success) else return_on_success
 
     # Note: on validation, form.duplicated_term may be set.
@@ -487,10 +502,18 @@ def bulk_update_status():
         if book is not None:
             StatsService(db.session).mark_stale(book)
 
-    # Invalidate the YouTube subtitle word cache so subtitle colors
-    # refresh with the updated term statuses.
-    from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
-    invalidate_yt_subtitle_cache()
+    # Status changes don't alter how texts tokenize, so instead of
+    # invalidating the whole subtitle cache (which would force a full
+    # 10-20s rebuild on the next fetch), re-render just the cues that
+    # contain the updated terms, in place.
+    from lute.read.routes import patch_yt_subtitle_caches_for_term  # pylint: disable=import-outside-toplevel
+    updated_texts = []
+    for u in updates:
+        for tidstring in u.get("termids"):
+            t = repo.load(int(tidstring))
+            if t is not None:
+                updated_texts.append(t.text)
+    patch_yt_subtitle_caches_for_term(updated_texts)
 
     # HTMX request: return the refreshed reading-text fragment so the
     # reading screen updates in a single round-trip (POST + swap) instead
