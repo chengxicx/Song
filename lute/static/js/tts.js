@@ -737,23 +737,107 @@
     return Math.max(0.5, (cjk * CHAR_RATE_CJK + other * CHAR_RATE_OTHER) / effRate);
   }
 
-  // Extract a sentence's playable text: clone so we can strip the 🔊
-  // button without mutating the page, then collapse whitespace. Shared
-  // by cue building and the #thetext swap check so the comparison is
-  // always against exactly what the cues contain.
-  function ttsSentenceText(s) {
-    const clone = s.cloneNode(true);
+  // Split a long .textsentence into multiple sub-cues at comma
+  // boundaries so each cue fits within the subtitle's max-height
+  // (~7rem) without a vertical scrollbar. Short sentences are
+  // returned as a single-cue array. Each sub-cue preserves the
+  // reading-page tokenization (span.textitem spans) so hover,
+  // click-to-lookup and status colours continue to work in the
+  // subtitle, and SpeechSynthesis pauses naturally between adjacent
+  // utterances (the onend -> ttsAdvance() -> speak() flow leaves a
+  // ~20 ms gap that reads as a comma break).
+  //
+  // Splitting rules:
+  //   - Only split when the sentence's clean text length exceeds
+  //     LONG_SENTENCE_CHARS (~140). Short sentences stay whole.
+  //   - A split point is a child whose text contains an ASCII comma
+  //     "," or fullwidth "，". Whitespace-only text nodes are skipped.
+  //   - We require the running text length to reach MIN_SUBCUE_CHARS
+  //     before we'll split, so the first sub-cue isn't a tiny
+  //     fragment when the only comma comes very early on.
+  //   - A sentence with no usable commas at all stays as one cue
+  //     (better a scrollable cue than no split point).
+  function ttsSplitSentenceIntoCues(sentenceEl) {
+    const clone = sentenceEl.cloneNode(true);
     clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
       b.remove();
     });
-    return cleanSentenceText(clone.innerText || clone.textContent || "");
+
+    const fullText = cleanSentenceText(clone.textContent || "");
+    if (!fullText) return [];
+
+    const LONG_SENTENCE_CHARS = 140;
+    const MIN_SUBCUE_CHARS = 40;
+
+    if (fullText.length <= LONG_SENTENCE_CHARS) {
+      return [{ text: fullText, html: clone.innerHTML }];
+    }
+
+    const allChildren = Array.from(clone.childNodes);
+
+    // First pass: locate split indices over the original child order.
+    // runningLen accumulates non-whitespace text length so a sentence
+    // with quoted phrases or smart punctuation doesn't trigger splits
+    // purely on whitespace.
+    const splitIndices = [];
+    let runningLen = 0;
+    for (let i = 0; i < allChildren.length; i++) {
+      const c = allChildren[i];
+      const t = c.nodeType === 3
+        ? (c.textContent || "").replace(/\s+/g, "")
+        : ((c.textContent || "").replace(/\s+/g, ""));
+      runningLen += t.length;
+      if (/[,，]/.test(c.textContent || "") && runningLen >= MIN_SUBCUE_CHARS) {
+        splitIndices.push(i);
+        runningLen = 0;
+      }
+    }
+
+    // No split points found -- return the sentence whole. The user
+    // will still see the scrollbar on this one, but that's the only
+    // honest choice when there are no natural break points.
+    if (splitIndices.length === 0) {
+      return [{ text: fullText, html: clone.innerHTML }];
+    }
+
+    // Second pass: build sub-cues by slicing the original children.
+    // Slicing off the original order (not the cloned one) keeps the
+    // existing span IDs / status classes intact.
+    const out = [];
+    let prev = 0;
+    for (let k = 0; k < splitIndices.length; k++) {
+      const end = splitIndices[k];
+      if (end < prev) continue;
+      const tmp = document.createElement("span");
+      allChildren.slice(prev, end + 1).forEach(function (c) {
+        tmp.appendChild(c.cloneNode(true));
+      });
+      out.push({
+        text: cleanSentenceText(tmp.textContent || ""),
+        html: tmp.innerHTML,
+      });
+      prev = end + 1;
+    }
+    if (prev < allChildren.length) {
+      const tmp = document.createElement("span");
+      allChildren.slice(prev).forEach(function (c) {
+        tmp.appendChild(c.cloneNode(true));
+      });
+      out.push({
+        text: cleanSentenceText(tmp.textContent || ""),
+        html: tmp.innerHTML,
+      });
+    }
+    return out;
   }
 
   // Build the cue list from the .textsentence elements in #thetext.
   // Each cue's `html` is the sentence's innerHTML (textitem spans
   // included), so the scrolling subtitle reuses the reading-page
   // tokenization and click-to-lookup behaviour -- no extra backend
-  // request needed.
+  // request needed. Long sentences are split at comma boundaries via
+  // ttsSplitSentenceIntoCues() so the long text doesn't overflow the
+  // subtitle's max-height and produce a vertical scrollbar.
   function ttsBuildCues() {
     ttsCues = [];
     ttsTotalDuration = 0;
@@ -766,24 +850,22 @@
     const sentences = textDiv.querySelectorAll(".textsentence");
     let acc = 0;
     sentences.forEach(function (s) {
-      const text = ttsSentenceText(s);
-      if (!text) return;
-      // Clone so we can strip the 🔊 button without mutating the page.
-      const clone = s.cloneNode(true);
-      clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
-        b.remove();
+      // Each .textsentence yields 1..N sub-cues; long sentences are
+      // split at comma boundaries (see ttsSplitSentenceIntoCues).
+      const subCues = ttsSplitSentenceIntoCues(s);
+      subCues.forEach(function (sub) {
+        if (!sub.text) return;
+        const dur = ttsEstimateDuration(sub.text, ttsRate);
+        ttsCues.push({
+          text: sub.text,
+          html: sub.html,
+          start: acc,
+          end: acc + dur,
+          duration: dur,
+          actualDuration: null,
+        });
+        acc += dur;
       });
-      const html = clone.innerHTML;
-      const dur = ttsEstimateDuration(text, ttsRate);
-      ttsCues.push({
-        text: text,
-        html: html,
-        start: acc,
-        end: acc + dur,
-        duration: dur,
-        actualDuration: null,
-      });
-      acc += dur;
     });
 
     ttsTotalDuration = acc;
@@ -1889,10 +1971,21 @@
         ttsStartTextObserver._t = null;
 
         const textDiv = document.getElementById("thetext");
-        const newSentences = textDiv
-          ? Array.prototype.map
-              .call(textDiv.querySelectorAll(".textsentence"), ttsSentenceText)
-              .filter(Boolean)
+        // Use the same splitter that built ttsCues: a single sentence
+        // may now expand to multiple sub-cues, so a naive 1-per-sentence
+        // map will mismatch on every term-status update.
+        const newCueTexts = textDiv
+          ? Array.prototype.reduce.call(
+              textDiv.querySelectorAll(".textsentence"),
+              function (acc, s) {
+                return acc.concat(
+                  ttsSplitSentenceIntoCues(s).map(function (sub) {
+                    return sub.text;
+                  })
+                );
+              },
+              []
+            ).filter(Boolean)
           : [];
 
         // A term status update swaps #thetext with the *same* sentences
@@ -1900,9 +1993,9 @@
         // going. Only a real page navigation -- different sentence
         // content -- should stop the player and reset its position.
         const sameText =
-          newSentences.length > 0 &&
-          newSentences.length === ttsCues.length &&
-          newSentences.every(function (t, i) {
+          newCueTexts.length > 0 &&
+          newCueTexts.length === ttsCues.length &&
+          newCueTexts.every(function (t, i) {
             return t === ttsCues[i].text;
           });
 
@@ -2204,8 +2297,15 @@
 
     // After a term status update, lute.js reloads #thetext.  The cue
     // list rebuild is handled by the #thetext MutationObserver, but
-    // we also re-apply status colours to the subtitle.
-    window.addEventListener("lute:status-updated", function () {
+    // we also re-apply status colours to the subtitle.  Skip events
+    // that another book's player triggered (bookId mismatch).
+    window.addEventListener("lute:status-updated", function (e) {
+      var detail = e.detail || {};
+      var pageBookId = Number($("#book_id").val()) || null;
+      if (detail.bookId && pageBookId &&
+          Number(detail.bookId) !== pageBookId) {
+        return;
+      }
       ttsApplySubtitleStatusColors();
     });
   }

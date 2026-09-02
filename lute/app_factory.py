@@ -540,10 +540,18 @@ def _init_parser_plugins(plugin_data_path, outfunc):
 
 mimetypes.add_type("text/css", ".css")
 # Audio books store uploaded files by their original extension and stream
-# them via /useraudio/stream/<book_id>.  Register the common audio types so
-# browsers play them (MP3 / M4A in particular).
+# them via /useraudio/stream/<book_id>.  Register the audio types the
+# upload form allows (see book.forms.ALLOWED_AUDIO_EXTENSIONS) so
+# browsers play them instead of falling back to application/octet-stream.
 mimetypes.add_type("audio/mpeg", ".mp3")
 mimetypes.add_type("audio/mp4", ".m4a")
+mimetypes.add_type("audio/mp4", ".m4b")
+mimetypes.add_type("audio/x-wav", ".wav")
+mimetypes.add_type("audio/ogg", ".ogg")
+mimetypes.add_type("audio/ogg", ".opus")
+mimetypes.add_type("audio/aac", ".aac")
+mimetypes.add_type("audio/flac", ".flac")
+mimetypes.add_type("audio/webm", ".webm")
 
 
 def create_app(
