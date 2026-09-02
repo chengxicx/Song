@@ -3,7 +3,9 @@ Book statistics.
 """
 
 import json
+import os
 import re
+from flask import current_app
 from sqlalchemy import select, text
 from lute.read.render.service import Service as RenderService
 from lute.models.book import Book, BookStats
@@ -163,6 +165,61 @@ class Service:
         "Get texts to use as sample."
         return self._get_uniform_sample_texts(book)
 
+    def _get_pdf_sample_lines(self, book):
+        """
+        Extract a sample of text lines from a pdf book's file, spread
+        evenly across the book.
+
+        Pdf pages keep an *empty* page text by design -- their words are
+        read out of the original PDF when the page is opened (see
+        BookService.set_pdf_page_word_counts) -- so the plain-text
+        sampler finds nothing.  Extract the words of a small number of
+        pages straight from the file instead, mirroring how the manga
+        handling below reads its text out of the mokuro data.
+        """
+        pdf_rel = (book.pdf_path or "").strip("/")
+        if not pdf_rel:
+            return []
+        try:
+            pdf_abs = os.path.join(current_app.static_folder, pdf_rel)
+        except Exception:  # pylint: disable=broad-exception-caught
+            # Outside a request (e.g. an admin shell) there is no static
+            # folder to resolve against, so there is nothing to sample.
+            return []
+        if not os.path.isfile(pdf_abs):
+            return []
+
+        page_count = book.page_count
+        if page_count == 0:
+            return []
+        # Evenly distribute sample positions across the whole book.
+        if page_count <= SAMPLE_PAGE_COUNT:
+            pagenums = list(range(1, page_count + 1))
+        else:
+            step = (page_count - 1) / (SAMPLE_PAGE_COUNT - 1)
+            pagenums = sorted({round(step * i) + 1 for i in range(SAMPLE_PAGE_COUNT)})
+
+        # Imported lazily: lute.read.service imports lute.book.stats, so
+        # a module-level import here would be circular.
+        from lute.read.service import (  # pylint: disable=import-outside-toplevel
+            _extract_pdf_page_words,
+        )
+
+        lines = []
+        for pagenum in pagenums:
+            try:
+                _width, _height, words = _extract_pdf_page_words(pdf_abs, pagenum)
+            except Exception:  # pylint: disable=broad-exception-caught
+                # A page the extractor chokes on contributes nothing;
+                # the remaining sampled pages still give a usable
+                # distribution.
+                continue
+            for word in words:
+                word_text = (word.get("text") or "").strip()
+                if word_text:
+                    lines.append(word_text)
+        return lines
+
     def calc_status_distribution(self, book):
         """
         Calculate statuses and count of unique words per status.
@@ -180,22 +237,27 @@ class Service:
             # For manga books, extract text directly from the mokuro JSON.
             # Rendering every line separately is extremely slow (each
             # get_textitems call re-parses and re-queries terms), so
-            # sample the text and render it in a single call.
+            # sample the text and render it in batches below.
             lines = self._get_manga_text_lines(book)
             lines = lines[:MANGA_STATS_SAMPLE_LINES]
-            textitems = service.get_textitems("\n".join(lines), book.language, mw)
+        elif book.book_type == "pdf":
+            # Pdf pages keep an empty page text (their words come from
+            # the pdf file), so sample pages straight out of the file,
+            # like the manga handling above.
+            lines = self._get_pdf_sample_lines(book)
         else:
             texts = self._get_sample_texts(book)
-            # Render the sampled pages in batches: calling get_textitems()
-            # once per page is slow (each call re-parses and re-queries
-            # terms), but a single giant call would be unbounded.  Joining
-            # pages and processing ~500 lines per batch mirrors the manga
-            # handling above for good throughput with bounded memory.
             lines = [t.text for t in texts if t.text]
-            textitems = []
-            for i in range(0, len(lines), 500):
-                chunk = "\n".join(lines[i : i + 500])
-                textitems.extend(service.get_textitems(chunk, book.language, mw))
+
+        # Render the sampled lines in batches: calling get_textitems()
+        # once per page is slow (each call re-parses and re-queries
+        # terms), but a single giant call would be unbounded.  Joining
+        # lines and processing ~500 lines per batch keeps throughput
+        # good with bounded memory.
+        textitems = []
+        for i in range(0, len(lines), 500):
+            chunk = "\n".join(lines[i : i + 500])
+            textitems.extend(service.get_textitems(chunk, book.language, mw))
         # # Old slower code:
         # text_sample = "\n".join([t.text for t in texts])
         # paras = get_paragraphs(text_sample, book.language) ... etc.
