@@ -135,7 +135,8 @@
 
   <div id="reading-end-controls" class="hide">
     <button type="button" class="mark-known-btn"
-            onclick="handle_page_done(true, 0, true)"
+            id="endMarkRestAsKnown"
+            onclick="handle_page_done(true, 0, END_OF_BOOK_MARKS_ALL_PAGES)"
             title="Mark the remaining words on all pages of the book as known and finish the book">
       Mark rest as known
     </button>
@@ -191,6 +192,21 @@
   const theText = document.getElementById("thetext");
   const navSidePrev = document.getElementById("navSidePrev");
   const navSideNext = document.getElementById("navSideNext");
+
+  // Text books' end-of-book button marks every remaining page's words as
+  // known.  Manga / pdf pages hold no text of their own (the words are
+  // read back out of the image / pdf file), so scanning the whole book
+  // would mean re-extracting every page; the button finishes the current
+  // page instead -- the only one left at the end of the book.
+  const END_OF_BOOK_MARKS_ALL_PAGES = !(
+    LUTE_BOOK_TYPE === "manga" || LUTE_BOOK_TYPE === "pdf"
+  );
+  const endMarkRestAsKnown = document.getElementById("endMarkRestAsKnown");
+  if (endMarkRestAsKnown) {
+    endMarkRestAsKnown.title = END_OF_BOOK_MARKS_ALL_PAGES
+      ? "Mark the remaining words on all pages of the book as known and finish the book"
+      : "Mark the remaining words on this page as known and finish the page";
+  }
 
   function _layout_side_nav() {
     if (!navSidePrev || !navSideNext) return;
@@ -853,8 +869,11 @@
     }
     if (!natW || !natH) return; // dimensions not known yet; retried later
     page.style.transform = "none";
+    // clientHeight includes the container's padding; the last screen
+    // reserves a bottom strip for the end-of-book button.
+    const padBottom = parseFloat(getComputedStyle(wrap).paddingBottom) || 0;
     const availW = wrap.clientWidth;
-    const availH = wrap.clientHeight;
+    const availH = wrap.clientHeight - padBottom;
     // Fit the page to the pane, then multiply by the user's zoom factor
     // (1 = just fits); zoom > 1 enlarges the page (it then scrolls in the
     // auto-overflow container), zoom < 1 shrinks it.  A PDF page only
@@ -923,7 +942,15 @@
     if (_isMangaReader()) {
       subScreens = [];
       curScreen = 0;
-      if (endBtn) endBtn.classList.add("hide");
+      // Manga / pdf pages are single fixed pages, so there is nothing to
+      // split -- but the end-of-book button still belongs on the last
+      // page, where the next arrow stops navigating.  The last-screen
+      // class reserves the bottom strip it sits in.
+      const _pn = parseInt($("#page_num").val());
+      const _mp = parseInt($("#page_count").val());
+      const _lastPage = _pn >= _mp;
+      wrap.classList.toggle("last-screen", _lastPage);
+      if (endBtn) endBtn.classList.toggle("hide", !_lastPage);
       return;
     }
     if (_videoScrollMode()) {
