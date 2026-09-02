@@ -493,7 +493,12 @@
     }
 
     form_changed = false;
-    window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
+    // The form stays open and the term's text is unchanged, so the
+    // dictionary area's current content is still accurate: tell the
+    // parent to keep it visible (it hides the dicts on deletes and
+    // navigations away from the form).
+    window.parent.postMessage(
+      { event: "LuteTermFormPosted", formKeptOpen: true }, "*");
   }
 
 
