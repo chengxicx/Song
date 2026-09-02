@@ -13,7 +13,7 @@
     <option value="{{ p.name }}">{{ p.name }}</option>
     {% endfor %}
   </select>
-  <button onclick="location.href='/language/new/' + document.getElementById('predefined').value;">go</button>
+  <button class="btn btn-primary" onclick="location.href='/language/new/' + document.getElementById('predefined').value;">go</button>
 </div>
 
 {% include "language/_form.html" %}

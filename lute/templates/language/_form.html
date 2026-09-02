@@ -360,13 +360,13 @@ if not, change the type to "Pop-up window".</p>
 <div class="form-action-row">
   <button id="submit" type="submit" class="btn btn-primary" form="edit-lang">Save</button>
   <form id="delete-lang" method="post" action="/language/delete/{{ language.id }}">
-    <button type="submit" class="btn">Delete</button>
+    <button type="submit" class="btn btn-danger">Delete</button>
   </form>
-  <button type="button" class="btn" onclick="window.location = '{{ url_for('language.index') }}'">Cancel</button>
+  <button type="button" class="btn btn-secondary" onclick="window.location = '{{ url_for('language.index') }}'">Cancel</button>
 </div>
 {% else %}
 <div class="form-action-row">
   <button id="submit" type="submit" class="btn btn-primary" form="edit-lang">Save</button>
-  <button type="button" class="btn" onclick="window.location = '{{ url_for('language.index') }}'">Cancel</button>
+  <button type="button" class="btn btn-secondary" onclick="window.location = '{{ url_for('language.index') }}'">Cancel</button>
 </div>
 {% endif %}
