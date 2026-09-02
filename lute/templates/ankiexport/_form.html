@@ -72,12 +72,14 @@
   </tbody>
   </table>
 
-  <button type="submit" class="btn btn-primary" onclick="set_anksettings_field(); return true;">Save</button>
-  <button id="btnCancel" class="btn" onclick="window.location = '{{ url_for('ankiexport.anki_index') }}'; return false;">Cancel</button>
+  <div class="form-action-row">
+    <button type="submit" class="btn btn-primary" onclick="set_anksettings_field(); return true;">Save</button>
+    <button id="btnCancel" class="btn btn-secondary" onclick="window.location = '{{ url_for('ankiexport.anki_index') }}'; return false;">Cancel</button>
 
-  {% if spec.id %}
-  <button id="btnDelete" class="btn" onclick="confirm_delete({{ spec.id }}); return false;">Delete</button>
-  {% endif %}
+    {% if spec.id %}
+    <button id="btnDelete" class="btn btn-danger" onclick="confirm_delete({{ spec.id }}); return false;">Delete</button>
+    {% endif %}
+  </div>
 
 </form>
 

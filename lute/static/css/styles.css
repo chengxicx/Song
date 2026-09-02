@@ -25,6 +25,10 @@ body {
     --form-border-color: #ddd;
     --form-border-radius: 3px;
 
+    /* Accent used by all form action buttons (Save / Cancel / Import ...). */
+    --btn-accent: #007aff;
+    --btn-accent-hover: #0071e3;
+
     background-color: var(--background-color);
     color: var(--font-color);
 
@@ -2075,9 +2079,90 @@ form input[type="file"]:focus {
     opacity: 1;
 }
 
-.btn {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.7rem;
+/* Unified capsule buttons.
+   Every form action button on the site (Save / Cancel / Import / Restore ...)
+   shares this look, so Book, Term, Settings, Backup, Language and the
+   reading page all match.  Primary actions are filled, secondary actions
+   are outlined.
+   a.btn / button.btn is used in the main selector so that on <a> elements
+   the colour beats the global a:link / a:visited rules (same 0,1,1
+   specificity, source order wins). */
+a.btn, button.btn,
+.btn-primary,
+.btn-secondary,
+.btn-warning,
+.btn-danger,
+.btn-info {
+    display: inline-block;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.35;
+    padding: 0.32rem 1.2rem;
+    border: 1px solid var(--btn-accent);
+    border-radius: 980px;
+    background: var(--btn-accent);
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn:hover,
+.btn-primary:hover,
+.btn-warning:hover,
+.btn-danger:hover,
+.btn-info:hover {
+    background: var(--btn-accent-hover);
+    border-color: var(--btn-accent-hover);
+    color: #fff;
+}
+
+.btn:active,
+.btn-primary:active,
+.btn-secondary:active,
+.btn-warning:active,
+.btn-danger:active,
+.btn-info:active {
+    transform: scale(0.96);
+}
+
+/* Secondary actions (Cancel, Back, Clear all): outlined, not filled.
+   Uses tag-qualified selector so specificity matches a.btn / button.btn
+   in the main rule above. */
+a.btn-secondary, button.btn-secondary,
+.btn.btn-secondary {
+    background: transparent;
+    color: var(--btn-accent);
+}
+a.btn-secondary:hover, button.btn-secondary:hover,
+.btn.btn-secondary:hover {
+    background: rgba(0, 122, 255, 0.1);
+    border-color: var(--btn-accent);
+    color: var(--btn-accent);
+}
+
+/* The active theme (theme/current) forces every <a> to blue with
+   !important.  Override that for any anchor that is acting as a button,
+   so its text matches its filled blue background. */
+a.btn, a.btn:link, a.btn:visited,
+button.btn, button.btn:link, button.btn:visited,
+a.btn-primary, a.btn-primary:link, a.btn-primary:visited,
+a.btn-warning, a.btn-warning:link, a.btn-warning:visited,
+a.btn-danger, a.btn-danger:link, a.btn-danger:visited {
+    color: #fff !important;
+}
+a.btn-secondary, a.btn-secondary:link, a.btn-secondary:visited,
+button.btn-secondary, button.btn-secondary:link, button.btn-secondary:visited {
+    color: var(--btn-accent) !important;
+}
+
+/* Small variant, e.g. the per-row Restore button on the backup list. */
+.btn-sm {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.18rem 0.8rem;
 }
 
 /* Buttons laid out in a horizontal row at the bottom of edit forms. */
@@ -2293,39 +2378,8 @@ input[type="checkbox"][disabled] + label {
     margin-top: 0.6rem;
 }
 
-/* Apple-style term form buttons: capsule shape, filled blue Save,
-   red-tinted destructive Delete. */
-#term-button-container .btn {
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 0.32rem 1.2rem;
-    border: none;
-    border-radius: 980px;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.1s ease;
-}
-
-#term-button-container .btn:active {
-    transform: scale(0.96);
-}
-
-#term-button-container #btnsubmit {
-    background: #007aff;
-    color: #fff;
-}
-
-#term-button-container #btnsubmit:hover {
-    background: #0071e3;
-}
-
-#term-button-container #delete {
-    background: #007aff;
-    color: #fff;
-}
-
-#term-button-container #delete:hover {
-    background: #0071e3;
-}
+/* Button styling now comes from the shared .btn rules above; this container
+   only handles the horizontal layout. */
 
 .zoomableTermImage {
     transition: transform 0.2s; /* Animation */
@@ -2799,7 +2853,6 @@ input[name='status']:disabled + label {
 #japanese_reading, 
 #backup_count,
 #stats_calc_sample_size,
-#test_mecab_btn,
 #parser_type,
 #language_id,
 #txtSetParent,
@@ -3193,11 +3246,17 @@ table#termtable .translationDiv:hover {
 }
 
 .term-action-button {
-    background-color: #04AA6D;
-    color: white;
-    padding: 8px;
-    font-size: 16px;
-    border: none;
+    background-color: var(--btn-accent);
+    color: #fff;
+    padding: 0.32rem 1.2rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.35;
+    border: 1px solid var(--btn-accent);
+    border-radius: 980px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 /* Dropdown Content (Hidden by Default) */
@@ -3229,7 +3288,8 @@ table#termtable .translationDiv:hover {
     display: block;
 }
 .term-action-dropdown:hover .term-action-button {
-    background-color: #3e8e41;
+    background-color: var(--btn-accent-hover);
+    border-color: var(--btn-accent-hover);
 }
 
 div#termtable_wrapper div.dt-buttons {
