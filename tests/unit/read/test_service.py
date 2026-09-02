@@ -2,12 +2,19 @@
 Read service tests.
 """
 
+import io
+import json
+import os
+import shutil
+
 from lute.models.term import Term
 from lute.book.model import Book, Repository
+from lute.book.service import Service as BookService
 from lute.read.service import Service
 from lute.db import db
 
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
+from tests.utils import make_pdf_bytes
 
 
 def test_mark_page_read(english, app_context):
@@ -216,3 +223,142 @@ def test_start_reading_creates_Terms_for_unknown_words(english, app_context):
         len(textitems) == 0
     ), f"All text items should have a term, but got {textitems}"
     assert_sql_result(sql, ["cat", "dog"], "after start")
+
+
+def _make_pdf_book(app, english, page_texts):
+    "Import a pdf book built from page_texts; return (dbbook, pdf_dir)."
+    b = Book()
+    b.title = "PDF book"
+    b.language_id = english.id
+    b.book_type = "pdf"
+    b.threshold_page_tokens = 250
+    b.split_by = "paragraphs"
+    b.pdf_stream = io.BytesIO(make_pdf_bytes(page_texts))
+    b.pdf_stream_filename = "test.pdf"
+    book = BookService().import_book(b, db.session)
+    pdf_dir = os.path.join(
+        app.static_folder, os.path.dirname(book.pdf_path.strip("/"))
+    )
+    return book, pdf_dir
+
+
+def test_pdf_mark_page_read_marks_page_unknowns_known(app, app_context, english):
+    "Mark rest as known sets the rendered pdf page's unknowns to well-known."
+    book, pdf_dir = _make_pdf_book(app, english, ["Hello cat dog", "one two"])
+    try:
+        svc = Service(db.session)
+
+        # Rendering a page creates its status-0 terms, exactly as the
+        # reading screen does before the reader clicks the next arrow.
+        assert svc.pdf_page_context(book, 1, True) is not None
+
+        sql = "select WoTextLC, WoStatus from words order by WoTextLC"
+        assert_sql_result(sql, ["cat; 0", "dog; 0", "hello; 0"], "page 1 words")
+
+        svc.mark_page_read(book.id, 1, True)
+
+        assert_sql_result(
+            sql, ["cat; 99", "dog; 99", "hello; 99"], "page 1 marked known"
+        )
+
+        # Page 2's words are untouched.
+        svc.pdf_page_context(book, 2, True)
+        assert_sql_result(
+            sql,
+            ["cat; 99", "dog; 99", "hello; 99", "one; 0", "two; 0"],
+            "page 2 still unknown",
+        )
+    finally:
+        shutil.rmtree(pdf_dir, ignore_errors=True)
+
+
+MANGA_PAGES = [
+    {
+        "img_path": "page_01.jpg",
+        "img_width": 100,
+        "img_height": 100,
+        "blocks": [
+            {
+                "box": [0, 0, 10, 10],
+                "vertical": False,
+                "font_size": 10,
+                "lines": ["猫が好き"],
+            }
+        ],
+    },
+    {
+        "img_path": "page_02.jpg",
+        "img_width": 100,
+        "img_height": 100,
+        "blocks": [
+            {
+                "box": [0, 0, 10, 10],
+                "vertical": False,
+                "font_size": 10,
+                "lines": ["犬も好き"],
+            }
+        ],
+    },
+]
+
+
+def _term_statuses():
+    "All terms as 'text; status', sorted."
+    return sorted(f"{t.text_lc}; {t.status}" for t in db.session.query(Term).all())
+
+
+def test_manga_mark_page_read_marks_page_unknowns_known(app_context, japanese):
+    "Mark rest as known sets the rendered manga page's unknowns to well-known."
+    b = Book()
+    b.title = "Manga book"
+    b.language_id = japanese.id
+    b.book_type = "manga"
+    b.manga_data = json.dumps(
+        {"version": "0.2.1", "title": "t", "pages": MANGA_PAGES},
+        ensure_ascii=False,
+    )
+    r = Repository(db.session)
+    dbbook = r.add(b)
+    r.commit()
+
+    svc = Service(db.session)
+
+    # Rendering creates the page's status-0 terms.
+    assert svc.manga_page_context(dbbook, 1, True) is not None
+    page1 = _term_statuses()
+    assert len(page1) > 0, "page 1 words created"
+    assert all(s.endswith("; 0") for s in page1), "all unknown before"
+
+    svc.mark_page_read(dbbook.id, 1, True)
+    assert all(s.endswith("; 99") for s in _term_statuses()), "page 1 marked known"
+
+    # Page 2's words are untouched.
+    svc.manga_page_context(dbbook, 2, True)
+    assert any(s.endswith("; 0") for s in _term_statuses()), "page 2 still unknown"
+
+
+def test_pdf_page_done_route_marks_page_known(app, client, app_context, english):
+    "POST /read/page_done marks the rendered pdf page's words as known."
+    book, pdf_dir = _make_pdf_book(app, english, ["Hello cat dog", "one two"])
+    try:
+        resp = client.get(f"/read/{book.id}")
+        assert resp.status_code == 200, "reading page renders"
+        body = resp.get_data(as_text=True)
+        assert "END_OF_BOOK_MARKS_ALL_PAGES = !(" in body, "end-of-book flag"
+
+        # The words are loaded (and their terms created) by the page route.
+        resp = client.get(f"/read/start_reading/{book.id}/1")
+        assert resp.status_code == 200, "page renders"
+        assert "pdf-word" in resp.get_data(as_text=True), "pdf words"
+
+        sql = "select WoTextLC, WoStatus from words order by WoTextLC"
+        assert_sql_result(sql, ["cat; 0", "dog; 0", "hello; 0"], "before")
+
+        resp = client.post(
+            "/read/page_done",
+            json={"bookid": book.id, "pagenum": 1, "restknown": True},
+        )
+        assert resp.status_code == 200, "page_done ok"
+        assert_sql_result(sql, ["cat; 99", "dog; 99", "hello; 99"], "after")
+    finally:
+        shutil.rmtree(pdf_dir, ignore_errors=True)
