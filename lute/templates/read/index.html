@@ -368,6 +368,10 @@
       // newly saved content instead of an empty tooltip.
       clear_termpopup_cache();
 
+      // Same for the term form data prefetched while hovering: the
+      // just-saved term's form data has changed.
+      luteClearTermFormPrefetchCache();
+
       $(".dictcontainer").css('display', 'none');
 
       // HTMX: swap the refreshed fragment into #thetext.  Re-marking of
