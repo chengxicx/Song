@@ -162,7 +162,7 @@ div#divbooktable {
 div.dt-search {
     /* Collapsible magnifier search container.
        Display flex so the toggle button + input align horizontally.
-       Theme files (Default, Default-Dark) override with !important
+       Theme files (Default, Default-Light) override with !important
        for their own color palette; this base rule ensures the collapse/expand
        behavior works even for themes that don't ship a magnifier style
        (e.g. Apple_Books, Night, Dusk, default). */
@@ -3824,7 +3824,7 @@ div#termimagesearch span img {
     margin-left: auto;
 }
 /* !important is required: the themes' `a:link` color override also uses
-   it (e.g. Default-Dark's #0a84ff), which turned the label blue-on-blue. */
+   it (e.g. Default's #0a84ff), which turned the label blue-on-blue. */
 .series-summary a.series-continue-btn,
 a.series-continue-btn:link,
 a.series-continue-btn:visited {
