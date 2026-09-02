@@ -9,7 +9,7 @@ from lute.read.render.service import Service as RenderService
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
 from lute.term.model import Repository
-from lute.term.routes import handle_term_form
+from lute.term.routes import handle_term_form, serialize_term_form_data
 from lute.settings.current import current_settings
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
@@ -653,6 +653,36 @@ def empty():
     return ""
 
 
+def _term_form_action(term):
+    "The URL a term form POST goes back to, for the given term."
+    if term.id:
+        return f"/read/edit_term/{term.id}"
+    sendtext = (term.original_text or term.text or "").replace("/", "LUTESLASH")
+    return f"/read/termform/{term.language_id}/{sendtext}"
+
+
+def _term_form_json_or_form(term, repo, form_template_name, embedded=True):
+    "GET ?format=json returns the form's data; otherwise render the form page."
+    if request.args.get("format") == "json":
+        data = serialize_term_form_data(term, repo, db.session, _term_form_action(term))
+        return jsonify(data)
+    return handle_term_form(
+        term,
+        repo,
+        db.session,
+        form_template_name,
+        lambda: _term_form_saved_response(term),
+        embedded_in_reading_frame=embedded,
+    )
+
+
+def _term_form_saved_response(term):
+    "Response after a term form post succeeds, AJAX or regular."
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return jsonify({"status": "ok", "term_id": term.id, "term_text": term.text})
+    return render_template("/read/updated.html", term_text=term.text)
+
+
 @bp.route("/termform/<int:langid>/<text>", methods=["GET", "POST"])
 def term_form(langid, text):
     """
@@ -663,14 +693,7 @@ def term_form(langid, text):
     term = repo.find_or_new(langid, usetext)
     if term.status == 0:
         term.status = 1
-    return handle_term_form(
-        term,
-        repo,
-        db.session,
-        "/read/term_edit_form.html",
-        render_template("/read/updated.html", term_text=term.text),
-        embedded_in_reading_frame=True,
-    )
+    return _term_form_json_or_form(term, repo, "/read/term_edit_form.html")
 
 
 @bp.route("/edit_term/<int:term_id>", methods=["GET", "POST"])
@@ -683,14 +706,7 @@ def edit_term_form(term_id):
     # print(f"editing term {term_id}", flush=True)
     if term.status == 0:
         term.status = 1
-    return handle_term_form(
-        term,
-        repo,
-        db.session,
-        "/read/term_edit_form.html",
-        render_template("/read/updated.html", term_text=term.text),
-        embedded_in_reading_frame=True,
-    )
+    return _term_form_json_or_form(term, repo, "/read/term_edit_form.html")
 
 
 @bp.route("/term_bulk_edit_form", methods=["GET"])

@@ -283,19 +283,95 @@ document.addEventListener('htmx:afterRequest', function (e) {
 
 // Prefetch the popup as soon as the pointer lands on a word, so the
 // tooltip (which opens a moment later) usually finds its content cached.
+// While the term form is loaded in the wordframe, also prefetch that
+// word's form data, so clicking it can populate the form with no
+// network wait.
 $(document).on('mouseenter', '.word', function () {
   if (_isUserUsingMobile()) return;
   const $el = $(this);
   const elid = parseInt($el.data('wid'), 10);
-  if (!isNaN(elid)) _termpopup_get(elid, $el, null);
+  if (!isNaN(elid)) {
+    _termpopup_get(elid, $el, null);
+    if (_wordframe_can_populate())
+      _prefetch_term_form_data(`/read/edit_term/${elid}`);
+  }
 });
 
 
 /* ========================================= */
 /** Showing the edit form. */
 
+// Prefetched term form data (hover → click optimization), keyed by
+// the form URL.  Only used while the term form is already loaded in
+// the wordframe; entries expire after a few seconds so a term changed
+// by other actions (hotkey status updates, saves) is re-fetched.
+const _termFormDataCache = new Map();
+const _TERM_FORM_PREFETCH_TTL = 4000;  // ms
+
+function luteClearTermFormPrefetchCache() {
+  _termFormDataCache.clear();
+}
+
+function _prefetch_term_form_data(url) {
+  if (_termFormDataCache.has(url)) return;
+  _termFormDataCache.set(url, {
+    ts: Date.now(),
+    promise: fetch(url + "?format=json", { cache: "no-store" }).then((r) => {
+      if (!r.ok) throw new Error("bad response " + r.status);
+      return r.json();
+    }),
+  });
+}
+
+function _get_term_form_data(url) {
+  const entry = _termFormDataCache.get(url);
+  if (!entry) return null;
+  _termFormDataCache.delete(url);
+  if (Date.now() - entry.ts > _TERM_FORM_PREFETCH_TTL) return null;
+  return entry.promise;
+}
+
+function _wordframe_can_populate() {
+  const f = top.frames.wordframe;
+  try {
+    return !!(
+      f &&
+      f.document &&
+      typeof f.LuteTermForm_populate === "function" &&
+      f.document.getElementById("term-form-container")
+    );
+  } catch (e) {
+    return false;  // frame not ready or not same-origin
+  }
+}
+
+let _termFormPopulateSeq = 0;
+
 function _show_wordframe_url(url) {
-  top.frames.wordframe.location.href = url;
+  if (_wordframe_can_populate()) {
+    // Fast path: the term form is already loaded in the frame, so
+    // fetch just this term's data and update the form in place
+    // instead of reloading the whole frame document.
+    const seq = ++_termFormPopulateSeq;
+    const cached = _get_term_form_data(url);
+    const fetchFresh = () =>
+      fetch(url + "?format=json", { cache: "no-store" }).then((r) => {
+        if (!r.ok) throw new Error("bad response " + r.status);
+        return r.json();
+      });
+    (cached || fetchFresh())
+      .then((data) => {
+        if (seq !== _termFormPopulateSeq) return;  // newer click won
+        top.frames.wordframe.LuteTermForm_populate(data);
+      })
+      .catch(() => {
+        if (seq !== _termFormPopulateSeq) return;
+        if (_wordframe_can_populate())
+          top.frames.wordframe.location.href = url;  // full-load fallback
+      });
+  } else {
+    top.frames.wordframe.location.href = url;
+  }
   applyInitialPaneSizes();  // in resize.js
 }
 

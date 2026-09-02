@@ -135,6 +135,15 @@
 
 <script type="text/javascript">
 
+  // True when this form lives in the reading screen's wordframe
+  // iframe; gates the in-place populate / AJAX save logic below.
+  const EMBEDDED_IN_READING_FRAME = ("{{ embedded_in_reading_frame }}" == "True");
+
+  // The term currently shown in the form.  Updated when the reading
+  // frame's form is re-populated in place (LuteTermForm_populate) or
+  // after an AJAX save creates a term.
+  let _current_term_id = {{ term.id or 'null' }};
+
   /** TERM IMAGE. ***************/
 
   var term_image = null;
@@ -236,7 +245,7 @@
           return;
       }
 
-      const in_reading_frame = ("{{ embedded_in_reading_frame }}" == "True");
+      const in_reading_frame = EMBEDDED_IN_READING_FRAME;
       let url = `/term/editbytext/${langid}/${clickedTagText}`;
       if (in_reading_frame) {
         url = `/read/termform/${langid}/${clickedTagText}`;
@@ -296,7 +305,196 @@
     window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
 
     enable_disable_sync_status_checkbox();
+
+    // ---------------------------------------------------------
+    // In-place form updates (reading frame only).  lute.js's fast
+    // path fetches a term's form data as JSON (?format=json) and
+    // calls this instead of navigating the frame to a fresh form
+    // page, so switching words doesn't reload the whole document.
+
+    window.LuteTermForm_populate = function (data) {
+      const form = document.getElementById("term-form");
+      if (!form || !parents_tagify || !termtags_tagify) return;
+
+      _current_term_id = data.term_id || null;
+      form.action = data.form_action;
+
+      // Hidden original_text + visible #text (the text input shows
+      // original_text, matching the server-rendered template).
+      $("#original_text").val(data.original_text || "");
+      $("#text").val(data.original_text || "");
+
+      // Parents/tags.  addTags fires the add/remove listeners above,
+      // so the status radio and sync checkbox are (re)set explicitly
+      // further down.
+      parents_tagify.removeAllTags();
+      if (data.parents && data.parents.length)
+        parents_tagify.addTags(data.parents);
+      termtags_tagify.removeAllTags();
+      if (data.tags && data.tags.length)
+        termtags_tagify.addTags(data.tags);
+      termtags_tagify.settings.whitelist = data.term_tags_whitelist || [];
+
+      $("#romanization").val(data.romanization || "");
+      $("#romanization").closest("div").toggle(!data.hide_pronunciation);
+
+      $("#translation").val(data.translation || "");
+      const img = $("#term_image");
+      if (data.current_image) {
+        img.attr("src", "/userimages/" + (data.language_id || 0) + "/" + data.current_image);
+        img.attr("style", "grid-column: -1; display: block");
+        $("#current_image").val(data.current_image);
+      } else {
+        img.attr("src", "");
+        img.removeAttr("style");
+        $("#current_image").val("");
+      }
+
+      let status_matched = false;
+      document.getElementsByName("status").forEach(function (r) {
+        r.checked = r.value == data.status;
+        if (r.checked) status_matched = true;
+      });
+
+      $("#sync_status").prop("checked", !!data.sync_status);
+      enable_disable_sync_status_checkbox();
+
+      ensure_delete_button();
+      update_flash_message_notice(data.flash_message);
+
+      // Clear any "updated" flash from a previous AJAX save.
+      const saved_flash = document.getElementById("term-saved-flash");
+      if (saved_flash) saved_flash.remove();
+
+      form_changed = false;
+      $("#text").focus();
+
+      // Tell the parent screen: re-points the dict lookup buttons at
+      // this form and reloads the dictionaries for the new term.
+      window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
+    };
+
+    // Reading frame: intercept the submit so the form is posted via
+    // fetch and stays loaded.  Skipped while
+    // convert_pending_parent_tags is mid-conversion (it resubmits via
+    // submitTermFormViaAjax once the pending tag is added).
+    if (EMBEDDED_IN_READING_FRAME) {
+      $("#term-form").on("submit", function (e) {
+        if (window._lute_pending_tag_convert) return;
+        e.preventDefault();
+        submitTermFormViaAjax();
+      });
+    }
   });  // end $(document).ready
+
+
+  // =============================
+  // In-place form updates (reading frame only).
+
+  // The Delete button only exists on server-rendered edit forms.  When
+  // the reading frame's form is re-populated in place (or a newly
+  // saved term switches the form into edit mode), add/remove it to
+  // match the form's current term.
+  function ensure_delete_button() {
+    const btn_container = document.getElementById("term-button-container");
+    if (!btn_container) return;
+    let del = document.getElementById("delete");
+    if (_current_term_id && !del) {
+      del = document.createElement("button");
+      del.id = "delete";
+      del.type = "button";
+      del.className = "btn btn-danger";
+      del.setAttribute("onclick", "deleteTerm()");
+      del.textContent = "Delete";
+      btn_container.appendChild(del);
+    } else if (!_current_term_id && del) {
+      del.remove();
+    }
+  }
+
+
+  // Show/hide the term's import flash message above the form.
+  function update_flash_message_notice(message) {
+    const container = document.getElementById("term-form-container");
+    if (!container) return;
+    let notice = document.getElementById("term-flash-notice");
+    if (message) {
+      if (!notice) {
+        notice = document.createElement("p");
+        notice.id = "term-flash-notice";
+        notice.className = "small-flash-notice";
+        container.parentNode.insertBefore(notice, container);
+      }
+      notice.textContent = message;
+    } else if (notice) {
+      notice.remove();
+    }
+  }
+
+
+  // Reading frame: post the form with fetch instead of a normal page
+  // submit, so the form stays loaded and the next word can be shown
+  // without a full page reload.
+  function submitTermFormViaAjax() {
+    const form = document.getElementById("term-form");
+    if (!form) return;
+    const submit_btn = document.getElementById("btnsubmit");
+    if (submit_btn) submit_btn.disabled = true;
+    fetch(form.action || window.location.href, {
+      method: "POST",
+      body: new FormData(form),
+      headers: { "X-Requested-With": "XMLHttpRequest" },
+    })
+      .then((r) => r.json())
+      .then((resp) => {
+        if (resp.status === "ok") {
+          _on_term_form_saved(resp);
+        } else {
+          // Validation failed: the response carries the re-rendered
+          // form page (with error banners).  Replace the document with
+          // it; its scripts re-initialize the form.
+          document.open();
+          document.write(resp.html);
+          document.close();
+        }
+      })
+      .catch(() => {
+        // Non-JSON response or network error: fall back to a regular
+        // form post (bypasses the submit listeners).
+        form.submit();
+      })
+      .finally(() => {
+        if (submit_btn) submit_btn.disabled = false;
+      });
+  }
+
+
+  // Reading frame: after a successful AJAX save.  Switches a newly
+  // created term's form into edit mode (so saving again updates it
+  // instead of creating a duplicate), and tells the parent screen to
+  // refresh the reading text.
+  function _on_term_form_saved(resp) {
+    _current_term_id = resp.term_id;
+    const form = document.getElementById("term-form");
+    if (form) form.action = "/read/edit_term/" + resp.term_id;
+    ensure_delete_button();
+
+    const container = document.getElementById("term-form-container");
+    if (container) {
+      let flash = document.getElementById("term-saved-flash");
+      if (!flash) {
+        flash = document.createElement("p");
+        flash.id = "term-saved-flash";
+        flash.className = "small-flash-notice";
+        container.parentNode.insertBefore(flash, container);
+      }
+      flash.textContent = '"' + resp.term_text + '" updated.';
+      $(flash).show().delay(1000).fadeOut();
+    }
+
+    form_changed = false;
+    window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
+  }
 
 
   // =============================
@@ -318,6 +516,10 @@
     // called.
     parents_tagify.on('add', onFinalTagAdded);
 
+    // Tell the AJAX submit listener (reading frame) to skip this
+    // submit: it will be issued by onFinalTagAdded once the tag is in.
+    window._lute_pending_tag_convert = true;
+
     // Add the pending tag, and suppress the actual submit.
     parents_tagify.addTags([pending_tag], true, false);
     event.preventDefault();
@@ -333,8 +535,13 @@
     // We still have to wait for data to be fully processed :-(
     const DELAY = 150;  // ms
     setTimeout(function() {
-      const form = $('#term-form');
-      form[0].submit();
+      window._lute_pending_tag_convert = false;
+      if (EMBEDDED_IN_READING_FRAME)
+        submitTermFormViaAjax();
+      else {
+        const form = $('#term-form');
+        form[0].submit();
+      }
     }, DELAY);
 
     parents_tagify.off('add', onFinalTagAdded);  // clean up listener.
@@ -350,8 +557,8 @@
     if (!confirm(msg))
       return;
 
-    $.post("/term/delete/{{ term.id }}", function( data ) {
-      if ("{{ embedded_in_reading_frame }}" == "True") {
+    $.post("/term/delete/" + _current_term_id, function( data ) {
+      if (EMBEDDED_IN_READING_FRAME) {
         window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
         window.parent.document.getElementById('wordframeid').src = 'about:blank';
       }
