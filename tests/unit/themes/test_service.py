@@ -20,11 +20,11 @@ def test_list_themes(app_context):
 
 
 def test_default_theme_is_default_css(app_context):
-    "UserSetting starts off with the Default.css theme."
+    "UserSetting starts off with the Default.css theme, which is the dark palette."
     repo = UserSettingRepository(db.session)
     assert repo.get_value("current_theme") == "Default.css"
     svc = Service(db.session)
-    assert "Default (Light)" in svc.get_current_css(), "Default = Default.css content."
+    assert "深色风格" in svc.get_current_css(), "Default = dark palette content."
 
 
 def test_bad_setting_returns_blank_css(app_context):
@@ -34,6 +34,15 @@ def test_bad_setting_returns_blank_css(app_context):
     db.session.commit()
     svc = Service(db.session)
     assert svc.get_current_css() == "", "Missing = empty string."
+
+
+def test_legacy_dark_theme_name_maps_to_dark_palette(app_context):
+    "Old DBs storing the pre-rename Default-Dark.css get the dark palette."
+    repo = UserSettingRepository(db.session)
+    repo.set_value("current_theme", "Default-Dark.css")
+    db.session.commit()
+    svc = Service(db.session)
+    assert "深色风格" in svc.get_current_css(), "Legacy name = dark palette."
 
 
 def test_setting_a_theme_returns_its_css(app_context):

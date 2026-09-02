@@ -1153,7 +1153,7 @@
    the TTS container with an inline display:none that must keep
    winning.  border / border-radius / box-shadow / background-color
    DO carry !important because the theme files set them with
-   !important (e.g. Default-Dark.css).
+   !important (e.g. Default.css).
    ============================================================ */
 
 .player-expand-btn {

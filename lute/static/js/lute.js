@@ -1180,8 +1180,8 @@ function next_theme() {
 
 }
 
-/* Toggle between the paired Default (light) and Default-Dark themes,
-   then reload the page. Used by the reading sidebar menu item. */
+/* Toggle between the paired Default (dark) and Default-Light (light) themes,
+   then reload the page. Used by the dark/light mode toggle button. */
 function toggle_dark_theme() {
   $.ajax({
     url: '/theme/toggle_dark',

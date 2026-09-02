@@ -47,18 +47,20 @@ def set_next_theme():
     return jsonify("ok")
 
 
-# Default paired light/dark themes used by the home dark-mode toggle button.
-LIGHT_THEME = "Default.css"
-DARK_THEME = "Default-Dark.css"
+# Default paired themes used by the dark/light toggle button.
+# The dark palette lives in Default.css so it is the initial default;
+# Default-Light.css holds the light palette.
+LIGHT_THEME = "Default-Light.css"
+DARK_THEME = "Default.css"
 
 
 @bp.route("/toggle_dark", methods=["POST"])
 def toggle_dark_theme():
     """
-    Toggle between the paired Default (light) and Default-Dark themes.
+    Toggle between the paired Default (dark) and Default-Light (light) themes.
 
-    - If the current theme is the dark one, switch to the light one.
-    - Otherwise (any light theme, default, or unknown), switch to dark.
+    - If the current theme is the light Default-Light.css, switch to Default.css (dark).
+    - Otherwise (any theme, default, or unknown), switch to Default-Light.css (light).
 
     Returns JSON with the new theme filename so the client can update
     its icon without a full reload if desired.
