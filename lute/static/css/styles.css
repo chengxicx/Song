@@ -25,6 +25,10 @@ body {
     --form-border-color: #ddd;
     --form-border-radius: 3px;
 
+    /* Accent used by all form action buttons (Save / Cancel / Import ...). */
+    --btn-accent: #007aff;
+    --btn-accent-hover: #0071e3;
+
     background-color: var(--background-color);
     color: var(--font-color);
 
@@ -158,7 +162,7 @@ div#divbooktable {
 div.dt-search {
     /* Collapsible magnifier search container.
        Display flex so the toggle button + input align horizontally.
-       Theme files (Default, Default-Dark) override with !important
+       Theme files (Default, Default-Light) override with !important
        for their own color palette; this base rule ensures the collapse/expand
        behavior works even for themes that don't ship a magnifier style
        (e.g. Apple_Books, Night, Dusk, default). */
@@ -804,6 +808,31 @@ span.hamburger {
   box-sizing: border-box;
 }
 
+/* Logo + dark/light toggle sit together on the left of the menu header;
+   the close button stays pinned to the right via space-between. */
+.reading_menu_logo_left {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+/* The menu header strip stays light (aliceblue) in every theme, so keep
+   the toggle on the light-theme appearance instead of inheriting the
+   dark menu-bar's translucent white styling, which vanishes on it. */
+.reading_menu_logo_container #theme-mode-toggle {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  color: #8e8e93 !important;
+}
+
+.reading_menu_logo_container #theme-mode-toggle:hover {
+  color: #007aff !important;
+  background-color: #ffffff !important;
+  border-color: #007aff !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+}
+
 #focus-container,
 #tap_sets_status-container,
 #tts-toggle-container,
@@ -1281,9 +1310,11 @@ span.textsentence {
     font-size: 0%;
 }
 
-/* A word shown in the reading pane. */
+/* A word shown in the reading pane.  This is also the first-run default:
+   text-options.js reads the computed size of the first word and treats it
+   as the baseline, so users who never touched the +/- controls see this. */
 span.textitem {
-    font-size: 16px;
+    font-size: 20px;
     color: var(--font-color);
 
     /* disallow select, only allow mouse-down-drag-up to define multiword
@@ -1395,7 +1426,7 @@ div#thetext.manga-text-container {
 }
 
 /* Words inside revealed manga blocks follow the block font size, not
-   the reading-pane default of 16px.  They keep the dark text color
+   the reading-pane default.  They keep the dark text color
    (on the white backdrop) while retaining the term status colors. */
 .manga-text-block span.textitem {
     font-size: inherit;
@@ -2075,9 +2106,96 @@ form input[type="file"]:focus {
     opacity: 1;
 }
 
-.btn {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.7rem;
+/* Unified capsule buttons.
+   Every form action button on the site (Save / Cancel / Import / Restore ...)
+   shares this look, so Book, Term, Settings, Backup, Language and the
+   reading page all match.  Primary actions are filled, secondary actions
+   are outlined.
+   a.btn / button.btn is used in the main selector so that on <a> elements
+   the colour beats the global a:link / a:visited rules (same 0,1,1
+   specificity, source order wins). */
+a.btn, button.btn,
+.btn-primary,
+.btn-secondary,
+.btn-warning,
+.btn-danger,
+.btn-info {
+    display: inline-block;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.35;
+    padding: 0.32rem 1.2rem;
+    border: 1px solid var(--btn-accent);
+    border-radius: 980px;
+    background: var(--btn-accent);
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn:hover,
+.btn-primary:hover,
+.btn-warning:hover,
+.btn-info:hover {
+    background: var(--btn-accent-hover);
+    border-color: var(--btn-accent-hover);
+    color: #fff;
+}
+
+.btn:active,
+.btn-primary:active,
+.btn-secondary:active,
+.btn-warning:active,
+.btn-danger:active,
+.btn-info:active {
+    transform: scale(0.96);
+}
+
+/* Outlined (not filled) actions: secondary ones (Cancel, Back, Clear all)
+   and destructive ones (Delete).  Keeping Delete outlined leaves Save as
+   the only filled button in a form row.
+   Tag-qualified selectors so specificity matches a.btn / button.btn in
+   the main rule above. */
+a.btn-secondary, button.btn-secondary,
+.btn.btn-secondary,
+a.btn-danger, button.btn-danger,
+.btn.btn-danger {
+    background: transparent;
+    color: var(--btn-accent);
+}
+a.btn-secondary:hover, button.btn-secondary:hover,
+.btn.btn-secondary:hover,
+a.btn-danger:hover, button.btn-danger:hover,
+.btn.btn-danger:hover {
+    background: rgba(0, 122, 255, 0.1);
+    border-color: var(--btn-accent);
+    color: var(--btn-accent);
+}
+
+/* The active theme (theme/current) forces every <a> to blue with
+   !important.  Override that for any anchor that is acting as a button,
+   so its text matches its filled blue background. */
+a.btn, a.btn:link, a.btn:visited,
+button.btn, button.btn:link, button.btn:visited,
+a.btn-primary, a.btn-primary:link, a.btn-primary:visited,
+a.btn-warning, a.btn-warning:link, a.btn-warning:visited {
+    color: #fff !important;
+}
+a.btn-secondary, a.btn-secondary:link, a.btn-secondary:visited,
+button.btn-secondary, button.btn-secondary:link, button.btn-secondary:visited,
+a.btn-danger, a.btn-danger:link, a.btn-danger:visited,
+button.btn-danger, button.btn-danger:link, button.btn-danger:visited {
+    color: var(--btn-accent) !important;
+}
+
+/* Small variant, e.g. the per-row Restore button on the backup list. */
+.btn-sm {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.18rem 0.8rem;
 }
 
 /* Buttons laid out in a horizontal row at the bottom of edit forms. */
@@ -2293,39 +2411,8 @@ input[type="checkbox"][disabled] + label {
     margin-top: 0.6rem;
 }
 
-/* Apple-style term form buttons: capsule shape, filled blue Save,
-   red-tinted destructive Delete. */
-#term-button-container .btn {
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 0.32rem 1.2rem;
-    border: none;
-    border-radius: 980px;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.1s ease;
-}
-
-#term-button-container .btn:active {
-    transform: scale(0.96);
-}
-
-#term-button-container #btnsubmit {
-    background: #007aff;
-    color: #fff;
-}
-
-#term-button-container #btnsubmit:hover {
-    background: #0071e3;
-}
-
-#term-button-container #delete {
-    background: rgba(255, 59, 48, 0.12);
-    color: #ff3b30;
-}
-
-#term-button-container #delete:hover {
-    background: rgba(255, 59, 48, 0.22);
-}
+/* Button styling now comes from the shared .btn rules above; this container
+   only handles the horizontal layout. */
 
 .zoomableTermImage {
     transition: transform 0.2s; /* Animation */
@@ -2799,7 +2886,6 @@ input[name='status']:disabled + label {
 #japanese_reading, 
 #backup_count,
 #stats_calc_sample_size,
-#test_mecab_btn,
 #parser_type,
 #language_id,
 #txtSetParent,
@@ -3193,11 +3279,17 @@ table#termtable .translationDiv:hover {
 }
 
 .term-action-button {
-    background-color: #04AA6D;
-    color: white;
-    padding: 8px;
-    font-size: 16px;
-    border: none;
+    background-color: var(--btn-accent);
+    color: #fff;
+    padding: 0.32rem 1.2rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.35;
+    border: 1px solid var(--btn-accent);
+    border-radius: 980px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 /* Dropdown Content (Hidden by Default) */
@@ -3229,7 +3321,8 @@ table#termtable .translationDiv:hover {
     display: block;
 }
 .term-action-dropdown:hover .term-action-button {
-    background-color: #3e8e41;
+    background-color: var(--btn-accent-hover);
+    border-color: var(--btn-accent-hover);
 }
 
 div#termtable_wrapper div.dt-buttons {
@@ -3731,7 +3824,7 @@ div#termimagesearch span img {
     margin-left: auto;
 }
 /* !important is required: the themes' `a:link` color override also uses
-   it (e.g. Default-Dark's #0a84ff), which turned the label blue-on-blue. */
+   it (e.g. Default's #0a84ff), which turned the label blue-on-blue. */
 .series-summary a.series-continue-btn,
 a.series-continue-btn:link,
 a.series-continue-btn:visited {

@@ -27,7 +27,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}?v=20260805f" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}?v=20260830b" charset="utf-8" defer></script>
 <script type="text/javascript" src="/static/js/never_cache/dict-tabs.js?v={{ lute_version }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260830a" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260902a" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/player-dock.js') }}?v=20260830a" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
@@ -135,7 +135,8 @@
 
   <div id="reading-end-controls" class="hide">
     <button type="button" class="mark-known-btn"
-            onclick="handle_page_done(true, 0, true)"
+            id="endMarkRestAsKnown"
+            onclick="handle_page_done(true, 0, END_OF_BOOK_MARKS_ALL_PAGES)"
             title="Mark the remaining words on all pages of the book as known and finish the book">
       Mark rest as known
     </button>
@@ -191,6 +192,21 @@
   const theText = document.getElementById("thetext");
   const navSidePrev = document.getElementById("navSidePrev");
   const navSideNext = document.getElementById("navSideNext");
+
+  // Text books' end-of-book button marks every remaining page's words as
+  // known.  Manga / pdf pages hold no text of their own (the words are
+  // read back out of the image / pdf file), so scanning the whole book
+  // would mean re-extracting every page; the button finishes the current
+  // page instead -- the only one left at the end of the book.
+  const END_OF_BOOK_MARKS_ALL_PAGES = !(
+    LUTE_BOOK_TYPE === "manga" || LUTE_BOOK_TYPE === "pdf"
+  );
+  const endMarkRestAsKnown = document.getElementById("endMarkRestAsKnown");
+  if (endMarkRestAsKnown) {
+    endMarkRestAsKnown.title = END_OF_BOOK_MARKS_ALL_PAGES
+      ? "Mark the remaining words on all pages of the book as known and finish the book"
+      : "Mark the remaining words on this page as known and finish the page";
+  }
 
   function _layout_side_nav() {
     if (!navSidePrev || !navSideNext) return;
@@ -315,6 +331,7 @@
     if (event.data.event === "LuteTermFormPosted") {
       const bookid = $('#book_id').val();
       const pagenum = $('#page_num').val();
+      const savedTermText = event.data.term_text || null;
       const url = `/read/refresh_page/${bookid}/${pagenum}`;
       const marked = $('.kwordmarked');
       let marked_id = "nomatches"
@@ -322,15 +339,45 @@
         marked_id = $(marked[0]).attr('id');
       }
 
+      // Remember which paragraph the reader is anchored on BEFORE the
+      // refresh swaps in the new DOM: the paragraph holding the
+      // just-saved word, or (when nothing is marked -- e.g. after a
+      // drag selection that creates a multi-word term, which clears
+      // .kwordmarked before the form opens) the first paragraph of the
+      // current sub-screen.  Paragraphs are stable across a term-save
+      // refresh -- only the word spans inside them change, and a
+      // multi-word save merges the selected token spans into one new
+      // span whose DOM id didn't exist before the save -- so after the
+      // swap the same paragraph is re-located by its ordinal and the
+      // screen is re-flowed around it instead of jumping back to
+      // sub-screen 0.
+      const parasBefore = Array.from(theText.querySelectorAll(':scope > p'));
+      const anchorEl = marked.length != 0
+        ? $(marked[0]).closest('p')[0]
+        : (parasBefore.find((p) => p.style.display !== 'none') || null);
+      const anchorOrdinal = anchorEl ? parasBefore.indexOf(anchorEl) : -1;
+
       // Force remove the old popup.
       // ref https://stackoverflow.com/questions/19266886/tooltip-not-disappearing
       $('div.ui-tooltip').remove();
+
+      // The term was just saved/edited/deleted on the server, so any
+      // cached popup HTML for it -- typically fetched moments earlier,
+      // before the save, when the term still had no translation and its
+      // popup rendered empty -- is now stale.  Invalidate the whole
+      // term-popup cache so the next hover re-fetches and shows the
+      // newly saved content instead of an empty tooltip.
+      clear_termpopup_cache();
+
+      // Same for the term form data prefetched while hovering: the
+      // just-saved term's form data has changed.
+      luteClearTermFormPrefetchCache();
 
       $(".dictcontainer").css('display', 'none');
 
       // HTMX: swap the refreshed fragment into #thetext.  Re-marking of
       // the previously-marked word happens in the htmx:afterSwap handler.
-      _pendingTermFormReload = marked_id;
+      _pendingTermFormReload = { marked_id, anchorOrdinal, term_text: savedTermText };
       htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
     };
   };
@@ -508,7 +555,7 @@
    * #thetext; the htmx:afterSwap listener below runs the post-swap
    * bookkeeping (status classes, nav state, page fraction, etc).
    */
-  function goto_relative_page(p, initial_page_load = false) {
+  function goto_relative_page(p, initial_page_load = false, extra = null) {
     luteStartReadingDone = false;
     reset_cursor();
     const bookid = $('#book_id').val();
@@ -524,12 +571,21 @@
 
     // Remember which page we asked for so the afterSwap handler can
     // update the UI without parsing the URL.
-    _pendingNav = { actualPage: actualPage, initial: initial_page_load };
+    _pendingNav = { actualPage: actualPage, initial: initial_page_load, ...(extra || {}) };
     htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
   }
 
   // Pending page-navigation state, consumed by the htmx:afterSwap handler.
   let _pendingNav = null;
+
+  // Logical pages the reader has LEFT forward from their last sub-screen
+  // (via the right arrow).  When the reader crosses back to such a page
+  // with the left arrow, they expect to land on the sub-screen they left
+  // (its last one); without this, a backward page crossing always falls
+  // on the destination page's first sub-screen, losing the reader's place.
+  // Entries are removed once restored (a page returned to is no longer
+  // "pending").
+  const _fwdFromPages = new Set();
 
   // Post-swap bookkeeping for the reading text.  Also used by HTMX-driven
   // status updates (see lute.js post_bulk_update).
@@ -571,13 +627,29 @@
 
     // Page navigation (goto_relative_page).
     if (_pendingNav) {
-      _finishPageSwap(_pendingNav.actualPage, _pendingNav.initial);
+      const nav = _pendingNav;
+      _finishPageSwap(nav.actualPage, nav.initial);
+      // Backward crossing onto a page the reader previously left forward:
+      // _finishPageSwap's rAF splits the page (curScreen = 0); this second
+      // rAF runs right after it and restores the last sub-screen, so the
+      // left arrow returns the reader to where they were instead of the
+      // destination page's first sub-screen.
+      if (nav.landOnLast) {
+        requestAnimationFrame(() => {
+          if (subScreens.length) {
+            curScreen = subScreens.length - 1;
+            _renderScreen();
+          }
+          _fwdFromPages.delete(nav.actualPage);
+        });
+      }
       _pendingNav = null;
     }
 
     // Reload after a term form was posted (updated/deleted).
     if (_pendingTermFormReload !== null) {
-      const marked_id = _pendingTermFormReload;
+      const state = _pendingTermFormReload;
+      const marked_id = state.marked_id;
       _pendingTermFormReload = null;
       if (typeof add_status_classes === "function") {
         add_status_classes();
@@ -586,13 +658,32 @@
       re_marked.removeClass('kwordmarked');
       re_marked.addClass('wordhover');
       // Notify the YouTube / TTS player to refresh subtitle word colors.
-      window.dispatchEvent(new Event('lute:status-updated'));
+      // bookId lets players of other books ignore the event; termText
+      // lets them re-render just the affected cues instead of the whole
+      // book (deleted terms post without a term_text).
+      window.dispatchEvent(new CustomEvent('lute:status-updated', {
+        detail: {
+          bookId: Number($('#book_id').val()) || null,
+          termText: state.term_text || null,
+        },
+      }));
       // The swapped-in paragraph set has no pagination state.  Re-flow
       // the screen so multi-column books stay within the pane instead of
       // spilling into overflowing columns after a save.  Keep the reader
       // anchored on the paragraph containing the saved word rather than
       // jumping back to the first sub-screen.
-      const anchor = re_marked.length ? re_marked.closest('p')[0] : null;
+      //
+      // A single-word save keeps the word span's id, so #marked_id
+      // usually resolves after the swap.  A multi-word save merges the
+      // selected token spans into one new span (and nothing was marked
+      // when the form was posted), so fall back to the paragraph ordinal
+      // captured before the swap -- otherwise the anchor is lost and the
+      // re-flow snaps the reader back to sub-screen 0.
+      let anchor = re_marked.length ? re_marked.closest('p')[0] : null;
+      if (!anchor && state.anchorOrdinal >= 0) {
+        const paras = Array.from(theText.querySelectorAll(':scope > p'));
+        anchor = paras[state.anchorOrdinal] || null;
+      }
       requestAnimationFrame(() => _splitToScreens(anchor));
     }
   });
@@ -791,8 +882,11 @@
     }
     if (!natW || !natH) return; // dimensions not known yet; retried later
     page.style.transform = "none";
+    // clientHeight includes the container's padding; the last screen
+    // reserves a bottom strip for the end-of-book button.
+    const padBottom = parseFloat(getComputedStyle(wrap).paddingBottom) || 0;
     const availW = wrap.clientWidth;
-    const availH = wrap.clientHeight;
+    const availH = wrap.clientHeight - padBottom;
     // Fit the page to the pane, then multiply by the user's zoom factor
     // (1 = just fits); zoom > 1 enlarges the page (it then scrolls in the
     // auto-overflow container), zoom < 1 shrinks it.  A PDF page only
@@ -861,7 +955,15 @@
     if (_isMangaReader()) {
       subScreens = [];
       curScreen = 0;
-      if (endBtn) endBtn.classList.add("hide");
+      // Manga / pdf pages are single fixed pages, so there is nothing to
+      // split -- but the end-of-book button still belongs on the last
+      // page, where the next arrow stops navigating.  The last-screen
+      // class reserves the bottom strip it sits in.
+      const _pn = parseInt($("#page_num").val());
+      const _mp = parseInt($("#page_count").val());
+      const _lastPage = _pn >= _mp;
+      wrap.classList.toggle("last-screen", _lastPage);
+      if (endBtn) endBtn.classList.toggle("hide", !_lastPage);
       return;
     }
     if (_videoScrollMode()) {
@@ -1027,7 +1129,11 @@
       _renderScreen();
       return;
     }
-    goto_relative_page(-1);
+    const target = getActualPage(-1);
+    // Crossing back onto a page the reader had left forward: land on its
+    // last sub-screen (where they were) instead of its first.
+    const landOnLast = _fwdFromPages.has(target);
+    goto_relative_page(-1, false, { landOnLast });
   }
 
   function navigateNext() {
@@ -1055,6 +1161,11 @@
     // Without this guard goto_relative_page(1) clamps back to maxpage and
     // re-loads the page, wrapping around to its first sub-screen.
     if (pagenum >= maxpage && atLastSubscreen) return;
+    // Leaving this page forward from its last sub-screen: remember it so
+    // a later left-arrow crossing back restores the last sub-screen.
+    if (!_isMangaReader() && subScreens.length) {
+      _fwdFromPages.add(pagenum);
+    }
     handle_page_done(arrowMarksKnown, 1);
   }
 

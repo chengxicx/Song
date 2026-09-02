@@ -1,33 +1,33 @@
 /* =========================================================
-   LUTE THEME: Default (Light) — Apple Books 亮色风格
-   与 Default-Dark 的设计完全一致，仅配色不同。
+   LUTE THEME: Default — Apple Books 深色风格（默认主题为暗色）
+   与 Default-Light 的设计完全一致，仅配色不同。
    ========================================================= */
 
 /* ---------------------------------------------------------
-   1. 全局 Apple Books 纸质色调 (Sepia Paper)
+   1. 全局 Apple Books 深色调 (Dark Theme)
    --------------------------------------------------------- */
 body {
-  /* 生词状态色彩 */
-  --status-0-color: #007aff;        
-  --status-1-color: #f7d2cf;        
-  --status-2-color: #fce8b3;        
-  --status-3-color: #d1ebd8;        
-  --status-4-color: #d2e4f7;        
-  --status-5-color: #e5d7f2;        
-  --status-learned-bg: #e5dfd5;     
-  --status-learned-color: #726e67;  
-  --status-99-color: transparent;
+  /* 生词状态色彩 (深色模式下降低饱和度，防止刺眼) */
+  --status-0-color: #0a84ff;        
+  --status-1-color: #722c2b;        
+  --status-2-color: #6e5218;        
+  --status-3-color: #245838;        
+  --status-4-color: #214368;        
+  --status-5-color: #482f63;        
+  --status-learned-bg: #3a3a3c;     
+  --status-learned-color: #8e8e93;  
+  --status-99-color: #38924c;
 
-  --background-color: #f7f3ea;      /* Apple 界面纸质暖白背景色 */
-  --panel-bg: #ffffff;            /* 悬浮卡片/表格底色 */
-  --font-color: #2c2a29;           /* 文本深色 */
+  --background-color: #1c1c1e;      /* Apple 界面暗黑背景色 */
+  --panel-bg: #2c2c2e;            /* 悬浮卡片/表格底色 */
+  --font-color: #e5e5ea;           /* 文本亮灰/白 */
 
   /* Chart.js 图表适配颜色 */
-  --chart-tick-color: #636366;
-  --chart-tick-major-color: #1c1c1e;
-  --chart-grid-color: rgba(0, 0, 0, 0.08);
-  --chart-title-color: #636366;
-  --chart-card-bg: #ffffff;
+  --chart-tick-color: #8e8e93;
+  --chart-tick-major-color: #f2f2f7;
+  --chart-grid-color: rgba(255, 255, 255, 0.08);
+  --chart-title-color: #8e8e93;
+  --chart-card-bg: #2c2c2e;
 
   background-color: var(--background-color) !important;
   color: var(--font-color) !important;
@@ -38,7 +38,7 @@ body {
 }
 
 /* ---------------------------------------------------------
-   2. 顶栏 (.menu-bar) —— 亮色毛玻璃特效
+   2. 顶栏 (.menu-bar) —— 深色毛玻璃特效
    --------------------------------------------------------- */
 .menu-bar {
   display: flex !important;
@@ -46,10 +46,10 @@ body {
   justify-content: flex-start !important;
   height: 52px !important;
   padding: 0 24px !important;
-  background-color: rgba(247, 243, 234, 0.95) !important;
+  background-color: rgba(28, 28, 30, 0.85) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
   position: relative !important;
   z-index: 1000 !important;
 }
@@ -65,13 +65,14 @@ body {
 .lutelogo {
   height: 24px !important;
   width: auto !important;
-  opacity: 0.85;
+  opacity: 0.9;
+  filter: invert(1) brightness(1.8); /* 适配反色为白色 logo */
 }
 
 #luteTitle {
   font-size: 15px !important;
   font-weight: 600 !important;
-  color: #1c1c1e !important;
+  color: #f2f2f7 !important;
   margin: 0 0 0 8px !important;
   letter-spacing: -0.01em;
 }
@@ -101,21 +102,21 @@ body {
 }
 
 .menu-item:hover > span {
-  color: #007aff !important;
+  color: #0a84ff !important;
 }
 
-/* 下拉菜单 —— 亮色悬浮卡片 */
+/* 下拉菜单 —— 暗黑悬浮卡片 */
 .sub-menu {
   position: absolute !important;
   top: 100% !important;
   right: 0 !important;
   left: auto !important;
-  background: rgba(255, 255, 255, 0.98) !important;
+  background: rgba(44, 44, 46, 0.95) !important;
   backdrop-filter: blur(25px) !important;
   -webkit-backdrop-filter: blur(25px) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 10px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
   padding: 6px !important;
   min-width: 160px !important;
   z-index: 10001 !important;
@@ -126,20 +127,20 @@ body {
   display: block !important;
   padding: 8px 12px !important;
   font-size: 13px !important;
-  color: #1c1c1e !important;
+  color: #f2f2f7 !important;
   border-radius: 6px !important;
   text-decoration: none !important;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .sub-menu li a:hover {
-  background-color: #007aff !important;
+  background-color: #0a84ff !important;
   color: #ffffff !important;
 }
 
 .sub-menu hr {
   border: none !important;
-  border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
   margin: 4px 0 !important;
 }
 
@@ -182,20 +183,20 @@ div.dt-container div.dt-layout-row:first-child {
   padding: 0 8px !important;
   font-size: 12px !important;
   font-weight: 500 !important;
-  background-color: rgba(255, 255, 255, 0.85) !important;
-  color: #1c1c1e !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 6px !important;
   outline: none;
   cursor: pointer;
 }
 
 #defaultLanguageSelect option {
-  background-color: #ffffff;
-  color: #1c1c1e;
+  background-color: #2c2c2e;
+  color: #f2f2f7;
 }
 
-/* 搜索框 —— 亮色放大镜折叠式 */
+/* 搜索框 —— 暗黑放大镜折叠式 */
 .dt-search {
   display: flex !important;
   align-items: center !important;
@@ -215,8 +216,8 @@ div.dt-container div.dt-layout-row:first-child {
   margin: 0 !important;
   border: none !important;
   border-radius: 50% !important;
-  background-color: rgba(255, 255, 255, 0.85) !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   color: #8e8e93 !important;
   cursor: pointer !important;
   display: inline-flex !important;
@@ -228,10 +229,10 @@ div.dt-container div.dt-layout-row:first-child {
 }
 
 .dt-search__toggle:hover {
-  color: #007aff !important;
-  background-color: #ffffff !important;
-  border-color: #007aff !important;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+  color: #0a84ff !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: #0a84ff !important;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25) !important;
 }
 
 .dt-search input,
@@ -240,9 +241,9 @@ div.dt-container div.dt-layout-row:first-child {
   line-height: 28px !important;
   padding: 0 8px !important;
   font-size: 12px !important;
-  background-color: rgba(255, 255, 255, 0.85) !important;
-  color: #1c1c1e !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 6px !important;
   outline: none;
   width: 0 !important;
@@ -262,8 +263,8 @@ div.dt-container div.dt-layout-row:first-child {
   width: 180px !important;
   padding-left: 8px !important;
   padding-right: 8px !important;
-  border-left: 1px solid rgba(0, 0, 0, 0.12) !important;
-  border-right: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
   opacity: 1 !important;
   transform: scaleX(1) !important;
   pointer-events: auto !important;
@@ -271,9 +272,9 @@ div.dt-container div.dt-layout-row:first-child {
 
 #defaultLanguageSelect:focus,
 .dt-search input:focus {
-  background-color: #ffffff !important;
-  border-color: #007aff !important;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: #0a84ff !important;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25) !important;
 }
 
 /* —— Dark / light mode toggle button (next to magnifier) —— */
@@ -283,9 +284,9 @@ div.dt-container div.dt-layout-row:first-child {
   min-width: 28px !important;
   padding: 0 !important;
   margin: 0 !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 50% !important;
-  background-color: rgba(255, 255, 255, 0.85) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
   color: #8e8e93 !important;
   cursor: pointer !important;
   display: inline-flex !important;
@@ -297,10 +298,10 @@ div.dt-container div.dt-layout-row:first-child {
 }
 
 #theme-mode-toggle:hover {
-  color: #007aff !important;
-  background-color: #ffffff !important;
-  border-color: #007aff !important;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+  color: #0a84ff !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: #0a84ff !important;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25) !important;
 }
 
 /* ---------------------------------------------------------
@@ -313,26 +314,26 @@ div.dt-container div.dt-layout-row:first-child {
   font-size: 11px !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .new-word-easy {
-  background-color: #a7d8b9 !important;
-  color: #1b432a !important;
+  background-color: #1e3a29 !important;
+  color: #a7d8b9 !important;
 }
 
 .new-word-chal {
-  background-color: #f7d382 !important;
-  color: #523b05 !important;
+  background-color: #423213 !important;
+  color: #f7d382 !important;
 }
 
 .new-word-hard {
-  background-color: #f09595 !important;
-  color: #4a1111 !important;
+  background-color: #451b1b !important;
+  color: #f09595 !important;
 }
 
 /* ---------------------------------------------------------
-   5. 表格卡片 (亮色书页 Card)
+   5. 表格卡片 (暗黑书页 Card)
    --------------------------------------------------------- */
 .dt-container, div.dt-container {
   margin-top: 16px !important;
@@ -340,29 +341,29 @@ div.dt-container div.dt-layout-row:first-child {
 }
 
 table.dataTable, table {
-  background-color: #ffffff !important;
+  background-color: #2c2c2e !important;
   color: var(--font-color) !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
   border-radius: 12px !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
   width: 100% !important;
 }
 
 th {
-  background-color: #faf7f2 !important;
-  color: #636366 !important;
+  background-color: #242426 !important;
+  color: #8e8e93 !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   padding: 12px 16px !important;
 }
 
 td {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
   padding: 12px 16px !important;
   font-size: 14px !important;
 }
@@ -372,7 +373,7 @@ tr:last-child td {
 }
 
 a, a:link, a:visited {
-  color: #007aff !important;
+  color: #0a84ff !important;
   text-decoration: none;
   font-weight: 500;
 }
@@ -382,7 +383,7 @@ a:hover {
 }
 
 /* ---------------------------------------------------------
-   6. 阅读模式样式 (Apple Books 衬线体 + 紧凑行距)
+   6. 阅读模式样式 (Apple Books 暗黑衬线体 + 紧凑行距)
    --------------------------------------------------------- */
 div#thetext p { 
   /* No !important on line-height: the reading-pane text controls
@@ -390,7 +391,7 @@ div#thetext p {
   line-height: 1.4;
   margin: 0.4em 0 !important;
   font-size: 18px;
-  color: #2c2a29 !important;
+  color: #e5e5ea !important;
   font-family: "Georgia", "New York", "Songti SC", "Source Han Serif SC", serif !important;
 }
 
@@ -399,15 +400,33 @@ span.textitem {
 }
 
 span.status0 { background-color: transparent; color: var(--status-0-color); font-weight: 600; }
-span.status1 { background-color: var(--status-1-color); color: #7c2d2b; border-radius: 3px; padding: 1px 3px; }
-span.status2 { background-color: var(--status-2-color); color: #7a5c14; border-radius: 3px; padding: 1px 3px; }
-span.status3 { background-color: var(--status-3-color); color: #1e5c3c; border-radius: 3px; padding: 1px 3px; }
-span.status4 { background-color: var(--status-4-color); color: #1b4a7a; border-radius: 3px; padding: 1px 3px; }
-span.status5 { background-color: var(--status-5-color); color: #4b2a6e; border-radius: 3px; padding: 1px 3px; }
+span.status1 { background-color: var(--status-1-color); color: #ffd7d5; border-radius: 3px; padding: 1px 3px; }
+span.status2 { background-color: var(--status-2-color); color: #ffe8b3; border-radius: 3px; padding: 1px 3px; }
+span.status3 { background-color: var(--status-3-color); color: #d1ebd8; border-radius: 3px; padding: 1px 3px; }
+span.status4 { background-color: var(--status-4-color); color: #d2e4f7; border-radius: 3px; padding: 1px 3px; }
+span.status5 { background-color: var(--status-5-color); color: #e5d7f2; border-radius: 3px; padding: 1px 3px; }
 
 span.status98, span.status99 { 
   background-color: transparent; 
   color: inherit; 
+}
+
+/* 单词状态按钮（1-5 / Wkn / Ign）暗黑模式适配：
+   Wkn、Ign 图标默认为黑色，需反白才可见 */
+#status {
+  --status-select-color: #d7dce2;
+  --status-hover-color: rgba(255, 255, 255, 0.3);
+}
+
+#status label[for="status-5"]::after,
+#status label[for="status-6"]::after,
+#status #status-5:checked + label::after,
+#status #status-6:checked + label::after {
+    filter: invert(1);
+}
+
+#status label[for="status-6"]:hover {
+    background-color: #bc6b60;
 }
 
 /* ---------------------------------------------------------
@@ -455,7 +474,7 @@ div.dt-container .dt-info {
   display: inline-flex !important;
   align-items: center !important;
   font-size: 13px !important;
-  color: #636366 !important;
+  color: #8e8e93 !important;
   margin: 0 !important;
   padding: 0 !important;
   height: 32px !important;
@@ -467,9 +486,9 @@ div.dt-container .dt-length select {
   height: 28px !important;
   padding: 0 6px !important;
   border-radius: 6px !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
-  background: #ffffff !important;
-  color: #1c1c1e !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: #2c2c2e !important;
+  color: #f2f2f7 !important;
   margin-left: 4px !important;
   margin-right: 4px !important;
   vertical-align: middle !important;
@@ -492,9 +511,9 @@ div.dt-container .dt-buttons button {
   padding: 0 10px !important;
   font-size: 12px !important;
   border-radius: 6px !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
-  background: rgba(255, 255, 255, 0.85) !important;
-  color: #1c1c1e !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #f2f2f7 !important;
   cursor: pointer !important;
   transition: all 0.15s ease;
   margin: 0 !important;
@@ -502,9 +521,9 @@ div.dt-container .dt-buttons button {
 }
 
 div.dt-container .dt-buttons button.dt-button:hover {
-  background: #ffffff !important;
-  border-color: #007aff !important;
-  color: #007aff !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: #0a84ff !important;
+  color: #0a84ff !important;
 }
 
 div.dt-container .dt-paging {
@@ -526,10 +545,10 @@ div.dt-container .dt-paging .paginate_button {
   padding: 0 8px !important;
   font-size: 12px !important;
   font-weight: 500 !important;
-  border: 1px solid rgba(0, 0, 0, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 6px !important;
-  background: rgba(255, 255, 255, 0.85) !important;
-  color: #1c1c1e !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #f2f2f7 !important;
   cursor: pointer !important;
   box-shadow: none !important;
   margin: 0 !important;
@@ -539,17 +558,17 @@ div.dt-container .dt-paging .paginate_button {
 
 div.dt-container .dt-paging button.dt-paging-button:hover:not(.disabled):not(.current),
 div.dt-container .dt-paging .paginate_button:hover:not(.disabled):not(.current) {
-  background: #ffffff !important;
-  border-color: #007aff !important;
-  color: #007aff !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: #0a84ff !important;
+  color: #0a84ff !important;
 }
 
 div.dt-container .dt-paging button.dt-paging-button.current,
 div.dt-container .dt-paging .paginate_button.current {
-  background: #007aff !important;
-  border-color: #007aff !important;
+  background: #0a84ff !important;
+  border-color: #0a84ff !important;
   color: #fff !important;
-  box-shadow: 0 1px 3px rgba(0,122,255,0.3) !important;
+  box-shadow: 0 1px 3px rgba(10,132,255,0.4) !important;
 }
 
 div.dt-container .dt-paging button.dt-paging-button.disabled,
@@ -578,7 +597,7 @@ div.dt-container .dt-paging .paginate_button.disabled {
 
 /* ---------------------------------------------------------
    8c. MOBILE / menu-bar responsiveness
-   The light theme pins .menu-bar to height:52px with !important,
+   The dark theme pins .menu-bar to height:52px with !important,
    which would prevent the wrapped rows from showing. Override
    on narrow screens so the menu stacks cleanly.
    --------------------------------------------------------- */
@@ -630,16 +649,16 @@ div.dt-container .dt-paging .paginate_button.disabled {
    8. TTS 播放器样式适配
    --------------------------------------------------------- */
 #lute-tts-panel {
-  background-color: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 8px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
-  color: #1c1c1e !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  color: #f2f2f7 !important;
 }
 
 #btn-lute-playpause,
 #lute-tts-panel button {
-  background-color: #007aff !important;
+  background-color: #0a84ff !important;
   color: #ffffff !important;
   border-radius: 6px !important;
   border: none !important;
@@ -652,40 +671,40 @@ div.dt-container .dt-paging .paginate_button.disabled {
 }
 
 #lute-tts-panel select {
-  background-color: rgba(255, 255, 255, 0.85) !important;
-  color: #1c1c1e !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 6px !important;
   outline: none;
 }
 
 #lute-tts-panel select option {
-  background-color: #ffffff !important;
-  color: #1c1c1e !important;
+  background-color: #2c2c2e !important;
+  color: #f2f2f7 !important;
 }
 
 #lute-tts-panel div[style*="border-left"] {
-  border-left: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 #lute-tts-panel input[type="range"] {
-  accent-color: #007aff !important;
+  accent-color: #0a84ff !important;
 }
 
 /* ---------------------------------------------------------
-   8b. AUDIO PLAYER (reading page) —— 适配亮色模式
-   原始样式定义在 player-styles.css，使用 --audio-color-* 变量，
-   这里显式覆盖为亮色以与整体风格统一。
+   8b. AUDIO PLAYER (reading page) —— 适配深色模式
+   原始样式定义在 player-styles.css，使用 --audio-color-* 变量
+   且默认值是浅色（aliceblue / #fff 等），这里覆盖为暗色。
    --------------------------------------------------------- */
 .audio-player-container {
-  --audio-color-1: #007aff !important;   /* timeline / volume fill */
+  --audio-color-1: #0a84ff !important;   /* timeline / volume fill */
   --audio-color-2: #ff5252 !important;
-  --audio-color-3: #ffffff !important;   /* container background */
-  --audio-color-4: #007aff !important;  /* button accent */
-  --audio-color-5: #f2f2f7 !important;  /* central / bookmark container bg */
-  border: 2px solid rgba(0, 0, 0, 0.12) !important;
+  --audio-color-3: #2c2c2e !important;   /* container background (was aliceblue) */
+  --audio-color-4: #0a84ff !important;  /* button accent */
+  --audio-color-5: #3a3a3c !important;  /* central / bookmark container bg */
+  border: 2px solid rgba(255, 255, 255, 0.12) !important;
   background-color: var(--audio-color-3) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* timeline container */
@@ -699,42 +718,42 @@ div.dt-container .dt-paging .paginate_button.disabled {
   background-color: var(--audio-color-5) !important;
 }
 
-/* rewind container */
+/* rewind container (was aliceblue) */
 .rewind-container {
   background-color: var(--audio-color-5) !important;
 }
 
 /* the rewind option select dropdown */
 #rewind-option {
-  background-color: #ffffff !important;
-  color: #1c1c1e !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: #2c2c2e !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 #rewind-option option {
-  background-color: #ffffff !important;
-  color: #1c1c1e !important;
+  background-color: #2c2c2e !important;
+  color: #f2f2f7 !important;
 }
 
-/* play / skip / rewind / ff / bookmark buttons */
+/* play / skip / rewind / ff / bookmark buttons: white → dark */
 .audio-button {
-  background-color: #ffffff !important;
+  background-color: #2c2c2e !important;
 }
 
 /* rate buttons */
 .rate-btn {
-  background-color: #007aff !important;
+  background-color: #0a84ff !important;
   color: #ffffff !important;
 }
 
 #playback-rate-indicator {
-  color: #1c1c1e !important;
+  color: #f2f2f7 !important;
 }
 
 /* timeline + volume range tracks (hardcoded #fff in player-styles.css) */
 .timeline,
 .volume {
-  background-color: #f7f3ea !important;
+  background-color: #1c1c1e !important;
 }
 
 /* sticky player overlay (covers full width on small screens) */
@@ -744,7 +763,7 @@ div.dt-container .dt-paging .paginate_button.disabled {
 
 /* duration text */
 .duration-container {
-  color: #2c2a29 !important;
+  color: #e5e5ea !important;
 }
 
 /* ---------------------------------------------------------
@@ -754,19 +773,19 @@ div.dt-container .dt-paging .paginate_button.disabled {
 /* 上方筛选控制栏 */
 #ov-controls,
 .ov-controls {
-  background-color: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 12px !important;
-  color: #1c1c1e !important;
+  color: #f2f2f7 !important;
   padding: 12px 16px !important;
   margin-bottom: 20px !important;
 }
 
 #ov-controls button,
 .ov-controls button {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-  color: #1c1c1e !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 6px !important;
   padding: 4px 12px !important;
 }
@@ -775,46 +794,46 @@ div.dt-container .dt-paging .paginate_button.disabled {
 #ov-controls button.selected,
 .ov-controls button.active,
 .ov-controls button.selected {
-  background-color: #007aff !important;
-  border-color: #007aff !important;
+  background-color: #0a84ff !important;
+  border-color: #0a84ff !important;
   color: #ffffff !important;
 }
 
 #ov-controls select,
 .ov-controls select {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-  color: #1c1c1e !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 6px !important;
 }
 
 #ov-controls select option,
 .ov-controls select option {
-  background-color: #ffffff !important;
-  color: #1c1c1e !important;
+  background-color: #2c2c2e !important;
+  color: #f2f2f7 !important;
 }
 
 /* 统计卡片面板 (.chart-card) */
 .chart-card {
-  background-color: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 12px !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
-  color: #1c1c1e !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  color: #f2f2f7 !important;
   padding: 20px !important;
 }
 
 .chart-card h3 {
-  color: #1c1c1e !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #f2f2f7 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   padding-bottom: 10px !important;
   margin-top: 0 !important;
 }
 
-/* 修复 Summary 里的 8 个小方块（改为亮色透底） */
+/* 修复 Summary 里的 8 个小方块（改为暗色透底） */
 .summary-level-item {
-  background-color: rgba(0, 0, 0, 0.03) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 8px !important;
 }
 
@@ -826,7 +845,7 @@ div.dt-container .dt-paging .paginate_button.disabled {
 .summary-level-name,
 .summary-section-title,
 .summary-total {
-  color: #636366 !important;
+  color: #a1a1a6 !important;
 }
 
 /* New terms chart uses red color directly (#e03131), no hue-rotate needed */
@@ -868,7 +887,7 @@ table[id*="read"],
 /* Words read 图表背景与对比度 */
 #wordCountChart {
   background-color: var(--chart-card-bg) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 12px !important;
   padding: 12px !important;
 }
@@ -876,40 +895,40 @@ table[id*="read"],
 /* 底部 Date 日期刻度高亮显示 */
 .chart-card svg text,
 canvas + svg text {
-  color: #1c1c1e !important;
-  fill: #2c2a29 !important;
+  color: #f2f2f7 !important;
+  fill: #e5e5ea !important;
 }
 
 .chart-card canvas {
   filter: none !important;
 }
 
-/* Term charts: ensure proper contrast on light background */
+/* Term charts: ensure proper contrast on dark background */
 #newTermsChart,
 #masteredTermsChart {
   background-color: transparent !important;
 }
 
 .chart-card .chart-axis-label {
-  color: #636366 !important;
+  color: #a1a1a6 !important;
   font-weight: 500 !important;
 }
 
 /* ---------------------------------------------------------
-   11. YOUTUBE / MP3 PLAYER — Apple Books 亮色模式适配
+   11. YOUTUBE / MP3 PLAYER — Apple Books 深色模式适配
    原始样式定义在 player-styles.css，默认是浅色 (aliceblue / #fff)，
-   这里显式覆盖为亮色，与整体风格统一。
+   这里覆盖为 Apple 深色配色，与整体暗黑风格统一。
    --------------------------------------------------------- */
 .youtube-player-container {
-  --yt-color-1: #007aff !important;   /* timeline / accent fill */
+  --yt-color-1: #0a84ff !important;   /* timeline / accent fill */
   --yt-color-2: #ff453a !important;
-  --yt-color-3: #f7f3ea !important;   /* container bg (matches body bg) */
-  --yt-color-4: #007aff !important;   /* primary accent button color */
-  --yt-color-5: #ffffff !important;   /* secondary panel bg (timeline/rate) */
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  --yt-color-3: #1c1c1e !important;   /* container bg (matches body bg) */
+  --yt-color-4: #0a84ff !important;   /* primary accent button color */
+  --yt-color-5: #2c2c2e !important;   /* secondary panel bg (timeline/rate) */
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   background-color: var(--yt-color-3) !important;
   border-radius: 12px !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Play button */
@@ -920,21 +939,21 @@ canvas + svg text {
 
 /* Prev / next cue buttons */
 .yt-cue-btn {
-  background-color: #ffffff !important;
-  color: #1c1c1e !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background-color: #2c2c2e !important;
+  color: #f2f2f7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Loop / autopause / fullscreen toggle buttons */
 .yt-toggle-btn {
-  background-color: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
-  color: #1c1c1e !important;
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #f2f2f7 !important;
   border-radius: 8px !important;
 }
 .yt-toggle-btn:hover {
-  background-color: rgba(0, 122, 255, 0.1) !important;
-  border-color: rgba(0, 122, 255, 0.35) !important;
+  background-color: rgba(10, 132, 255, 0.15) !important;
+  border-color: rgba(10, 132, 255, 0.35) !important;
 }
 .yt-toggle-btn.on {
   background-color: #30d158 !important;   /* Apple green accent */
@@ -955,6 +974,20 @@ canvas + svg text {
   background-color: #30d158 !important;
 }
 
+/* Gear / settings dropdown (audio-only mode) */
+.yt-settings-dropdown {
+  background-color: #2c2c2e !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  color: #f2f2f7 !important;
+}
+.yt-settings-option {
+  color: #f2f2f7 !important;
+}
+.yt-settings-option:hover {
+  background-color: rgba(10, 132, 255, 0.15) !important;
+}
+
 /* Timeline + rate wrap panels */
 .yt-timeline-wrap,
 #yt-playback-rate-container,
@@ -970,17 +1003,17 @@ canvas + svg text {
 
 /* Seek bar track + thumb */
 .yt-timeline {
-  background-color: #f7f3ea !important;
+  background-color: #1c1c1e !important;
 }
 .yt-timeline::-webkit-slider-thumb {
   background-color: var(--yt-color-4) !important;
-  border-color: #ffffff !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+  border-color: #2c2c2e !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 }
 .yt-timeline::-moz-range-thumb {
   background-color: var(--yt-color-4) !important;
-  border-color: #ffffff !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+  border-color: #2c2c2e !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Playback rate controls */
@@ -990,39 +1023,39 @@ canvas + svg text {
 }
 #yt-rate-indicator,
 #tts-rate-indicator {
-  color: #1c1c1e !important;
+  color: #f2f2f7 !important;
 }
 
 /* ----- Scrolling subtitle ----- */
 .yt-scrolling-subtitle {
-  background-color: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 8px !important;
 }
 
 #yt-scrolling-subtitle-inner {
-  color: #2c2a29 !important;
+  color: #e5e5ea !important;
 }
 
 #yt-scrolling-subtitle-inner:empty::before {
-  color: #c7c7cc !important;
+  color: #48484a !important;
 }
 
 /* ----- Transcript panel ----- */
 .yt-transcript {
-  background-color: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  background-color: #2c2c2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 8px !important;
 }
 
 .yt-transcript-row {
-  border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
 }
 .yt-transcript-row:hover {
-  background-color: rgba(0, 122, 255, 0.08) !important;
+  background-color: rgba(10, 132, 255, 0.12) !important;
 }
 .yt-transcript-row.active {
-  background-color: rgba(0, 122, 255, 0.15) !important;
+  background-color: rgba(10, 132, 255, 0.22) !important;
 }
 
 .yt-transcript-ts {
@@ -1030,26 +1063,26 @@ canvas + svg text {
 }
 
 .yt-transcript-text {
-  color: #2c2a29 !important;
+  color: #e5e5ea !important;
 }
 
 /* ---------------------------------------------------------
-   12. COL VIS 列显隐下拉菜单 — 亮色主题适配
+   12. COL VIS 列显隐下拉菜单 — 深色主题适配
    --------------------------------------------------------- */
 .config-widget-top {
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
-  background-color: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 .config-widget-top:hover {
-  background-color: #ffffff !important;
-  border-color: #007aff !important;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: #0a84ff !important;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25) !important;
 }
 
 .config-widget-top img {
-  filter: none;
-  opacity: 0.6;
+  filter: invert(0.8);
+  opacity: 0.7;
 }
 
 .config-widget-top:hover img {
@@ -1057,21 +1090,94 @@ canvas + svg text {
 }
 
 .colvis-menu {
-  background: rgba(255, 255, 255, 0.98) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+  background: rgba(44, 44, 46, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
   backdrop-filter: blur(25px) !important;
   -webkit-backdrop-filter: blur(25px) !important;
 }
 
 .colvis-menu .colvis-item {
-  color: #1c1c1e !important;
+  color: #f2f2f7 !important;
 }
 
 .colvis-menu .colvis-item:hover {
-  background-color: rgba(0, 122, 255, 0.08) !important;
+  background-color: rgba(10, 132, 255, 0.15) !important;
 }
 
 .colvis-menu .colvis-item input[type="checkbox"] {
-  accent-color: #007aff !important;
+  accent-color: #0a84ff !important;
+}
+
+/* ---------------------------------------------------------
+   12b. BOOK ACTION 下拉菜单（… 三点菜单）— 深色主题适配
+   与 colvis-menu / sub-menu 使用同款暗黑悬浮卡片风格。
+   --------------------------------------------------------- */
+.book-action-dropdown-content {
+  background: rgba(44, 44, 46, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border-radius: 10px !important;
+  padding: 6px !important;
+  min-width: 120px !important;
+}
+
+.book-action-dropdown-content a {
+  color: #f2f2f7 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+}
+
+.book-action-dropdown-content a:hover {
+  background-color: #0a84ff !important;
+  color: #ffffff !important;
+}
+
+/* ---------------------------------------------------------
+   12c. 刷新图标（Status / New word 列标题）— 深色主题适配
+   原始 reload.png 是深色图标，深色背景上几乎不可见，
+   用 invert 反白显示。
+   --------------------------------------------------------- */
+a.refresh {
+  filter: invert(0.85);
+  opacity: 0.75;
+}
+
+a.refresh:hover {
+  filter: invert(1);
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+a.refresh:active {
+  filter: invert(1);
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 刷新中的旋转动画：去掉 invert 滤镜，改用亮色 spinner，
+   否则滤镜会把 spinner 压暗到深色背景上看不见。 */
+a.refresh.refreshed {
+  filter: none;
+  opacity: 1;
+}
+
+a.refresh.refreshed::after {
+  border-color: rgba(255, 255, 255, 0.25);
+  border-top-color: #f2f2f7;
+}
+
+/* ---------------------------------------------------------
+   13. FLASH 提示条 — 深色主题适配
+   基础样式（styles.css）是浅黄底深字；在深色模式下改为
+   暗琥珀底 + 浅琥珀字，与 NEW WORD 胶囊警告色一致。
+   --------------------------------------------------------- */
+.flash-notice,
+.flash-notice-narrow,
+.small-flash-notice {
+  background-color: #423213 !important;
+  border-color: #6e5218 !important;
+  color: #f7d382 !important;
 }
