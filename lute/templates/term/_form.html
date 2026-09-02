@@ -316,6 +316,10 @@
       const form = document.getElementById("term-form");
       if (!form || !parents_tagify || !termtags_tagify) return;
 
+      // Re-show the form: it's hidden after a save, but stays loaded
+      // in the frame for exactly this in-place update.
+      $("#term-form-container").show();
+
       _current_term_id = data.term_id || null;
       form.action = data.form_action;
 
@@ -469,10 +473,11 @@
   }
 
 
-  // Reading frame: after a successful AJAX save.  Switches a newly
-  // created term's form into edit mode (so saving again updates it
-  // instead of creating a duplicate), and tells the parent screen to
-  // refresh the reading text.
+  // Reading frame: after a successful AJAX save.  Shows a brief
+  // "updated" flash and hides the form -- the old flow's post-save
+  // look (updated.html flash page, dicts hidden by the parent).  The
+  // form stays loaded in the frame though, so the next word click
+  // can populate it in place (fast path) instead of a full reload.
   function _on_term_form_saved(resp) {
     _current_term_id = resp.term_id;
     const form = document.getElementById("term-form");
@@ -490,15 +495,11 @@
       }
       flash.textContent = '"' + resp.term_text + '" updated.';
       $(flash).show().delay(1000).fadeOut();
+      container.style.display = "none";
     }
 
     form_changed = false;
-    // The form stays open and the term's text is unchanged, so the
-    // dictionary area's current content is still accurate: tell the
-    // parent to keep it visible (it hides the dicts on deletes and
-    // navigations away from the form).
-    window.parent.postMessage(
-      { event: "LuteTermFormPosted", formKeptOpen: true }, "*");
+    window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
   }
 
 
