@@ -1285,9 +1285,11 @@ span.textsentence {
     font-size: 0%;
 }
 
-/* A word shown in the reading pane. */
+/* A word shown in the reading pane.  This is also the first-run default:
+   text-options.js reads the computed size of the first word and treats it
+   as the baseline, so users who never touched the +/- controls see this. */
 span.textitem {
-    font-size: 16px;
+    font-size: 20px;
     color: var(--font-color);
 
     /* disallow select, only allow mouse-down-drag-up to define multiword
@@ -1399,7 +1401,7 @@ div#thetext.manga-text-container {
 }
 
 /* Words inside revealed manga blocks follow the block font size, not
-   the reading-pane default of 16px.  They keep the dark text color
+   the reading-pane default.  They keep the dark text color
    (on the white backdrop) while retaining the term status colors. */
 .manga-text-block span.textitem {
     font-size: inherit;
