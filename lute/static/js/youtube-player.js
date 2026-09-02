@@ -50,6 +50,11 @@
   var ytLastSavedT = -10;
   var ytMarqueeOverflow = 0;
   var ytIsRtl = false;
+  // Debounce timers / flags for the incremental subtitle refresh (see
+  // the lute:status-updated listener at the bottom of this file).
+  var ytStatusRefreshTimer = null;
+  var ytPauseRefreshTimer = null;
+  var ytNeedsFullSubtitleRefresh = false;
 
   var ytContainer = document.getElementById("yt-player-container");
   var ytVideoWrap = document.querySelector(".yt-player-video-wrap");
@@ -126,9 +131,22 @@
       checkReady();
       fireStateChange(PS.PLAYING);
     });
+    audioEl.addEventListener("playing", function () {
+      // Playback is actually flowing again after a stall/buffer.
+      checkReady();
+      fireStateChange(PS.PLAYING);
+    });
     audioEl.addEventListener("pause", function () { fireStateChange(PS.PAUSED); });
     audioEl.addEventListener("ended", function () { fireStateChange(PS.ENDED); });
     audioEl.addEventListener("canplay", fireReady);
+    audioEl.addEventListener("waiting", function () {
+      // Not enough buffered data ahead: surface the buffering state so
+      // the UI can show feedback instead of a frozen progress bar.
+      fireStateChange(PS.BUFFERING);
+    });
+    audioEl.addEventListener("stalled", function () {
+      fireStateChange(PS.BUFFERING);
+    });
     audioEl.addEventListener("error", function () {
       if (typeof handlers.onError === "function") handlers.onError();
     });
@@ -166,6 +184,18 @@
       getPlaybackRate: function () { return audioEl.playbackRate || 1; },
       setPlaybackRate: function (r) { try { audioEl.playbackRate = r; } catch (e) { /* ignore */ } },
       getPlayerState: function () { return fakeState; },
+      getLoadedFraction: function () {
+        // Fraction of the media buffered ahead, for the timeline's
+        // buffered band.
+        var d = audioEl.duration;
+        if (!isFinite(d) || d <= 0) return 0;
+        var b = audioEl.buffered;
+        var end = 0;
+        for (var i = 0; i < b.length; i++) {
+          if (b.end(i) > end) end = b.end(i);
+        }
+        return Math.min(1, end / d);
+      },
     };
   }
 
@@ -233,9 +263,29 @@
     window.setInterval(ytPoll, 250);
   }
 
+  // Buffering feedback: while the media is buffering (weak network,
+  // seek past the buffered range), show the loading overlay so the
+  // frozen timeline isn't mistaken for a crash.  Only after onReady —
+  // before that, the overlay already shows "Loading player...".
+  var ytBufferingVisible = false;
+  function ytShowBuffering(show) {
+    if (!ytLoading) return;
+    if (show) {
+      if (!ytBufferingVisible && ytPlayerReady) {
+        ytBufferingVisible = true;
+        ytLoading.textContent = "Buffering...";
+        ytLoading.style.display = "block";
+      }
+    } else if (ytBufferingVisible) {
+      ytBufferingVisible = false;
+      ytLoading.style.display = "none";
+    }
+  }
+
   function ytOnStateChange(event) {
     ytPlaying = event.data === PS.PLAYING;
     ytUpdatePlayBtn();
+    ytShowBuffering(event.data === PS.BUFFERING);
     if (event.data === PS.PLAYING) {
       // The API resets the rate on (re)load; restore our setting.
       try {
@@ -245,6 +295,22 @@
     }
     if (event.data === PS.PAUSED) {
       ytSavePosition();
+      // If subtitle colors may be out of sync across cues (bulk status
+      // update or cache invalidation — see ytApplySubtitlePatch), pull
+      // a full refresh once the media is paused: the refetch is large
+      // and the server rebuild can be slow, so keep it off the path
+      // that competes with the audio stream.  Skipped when playback
+      // resumed within the delay.
+      if (ytNeedsFullSubtitleRefresh) {
+        if (ytPauseRefreshTimer) clearTimeout(ytPauseRefreshTimer);
+        ytPauseRefreshTimer = setTimeout(function () {
+          ytPauseRefreshTimer = null;
+          if (!ytPlaying && ytNeedsFullSubtitleRefresh) {
+            ytNeedsFullSubtitleRefresh = false;
+            ytLoadSubtitleWords(true);
+          }
+        }, 2000);
+      }
     }
   }
 
@@ -262,6 +328,20 @@
   /* Poll loop: sync timeline, subtitle, transcript, loop / auto-pause  */
   /* ------------------------------------------------------------------ */
 
+  // Fraction of the media buffered (0..1).  The HTML5 backends expose
+  // getLoadedFraction on the wrapper; the YouTube IFrame API player
+  // provides getVideoLoadedFraction natively.
+  function ytLoadedFraction() {
+    if (!ytPlayer) return 0;
+    try {
+      if (typeof ytPlayer.getLoadedFraction === "function")
+        return ytPlayer.getLoadedFraction() || 0;
+      if (typeof ytPlayer.getVideoLoadedFraction === "function")
+        return ytPlayer.getVideoLoadedFraction() || 0;
+    } catch (e) { /* ignore */ }
+    return 0;
+  }
+
   function ytPoll() {
     if (!ytPlayerReady || !ytPlayer) return;
     var t = ytPlayer.getCurrentTime() || 0;
@@ -274,8 +354,9 @@
 
     if (!ytDragging) {
       ytTimeline.value = t;
+      var bufferedPct = Math.round(ytLoadedFraction() * 100);
       ytTimeline.style.backgroundSize =
-        (dur > 0 ? (t / dur) * 100 : 0) + "% 100%";
+        (dur > 0 ? (t / dur) * 100 : 0) + "% 100%, " + bufferedPct + "% 100%";
     }
     ytCurTimeEl.textContent = ytFmtTime(t);
 
@@ -329,11 +410,14 @@
     _ytMaybeSavePosition(t);
   }
 
-  // Save position roughly every 2 seconds.  Called from the main poll
+  // Save position at most every 15 seconds.  Called from the main poll
   // loop and from the early-return loop / auto-pause branches so the
   // position is still persisted when playback is paused at a cue end.
+  // The pause handler and the pagehide/visibilitychange beacon cover
+  // the rest, so a crash loses at most ~15s of progress while saving
+  // far fewer round-trips (and SQLite commits) than the old 2s loop.
   function _ytMaybeSavePosition(t) {
-    if (t - ytLastSavedT >= 2) {
+    if (t - ytLastSavedT >= 15) {
       ytLastSavedT = t;
       ytSavePosition(t);
     }
@@ -541,6 +625,22 @@
       data: JSON.stringify({ bookid: BOOK_ID, position: pos }),
       contentType: "application/json; charset=utf-8",
     });
+  }
+
+  // Final save when the page is hidden or closed.  Regular ajax calls
+  // are dropped mid-flight on unload; fetch with keepalive survives it.
+  function ytSavePositionBeacon() {
+    if (!ytPlayerReady || !ytPlayer || !BOOK_ID) return;
+    var pos = ytPlayer.getCurrentTime() || 0;
+    if (pos <= 0) return;
+    try {
+      fetch("/read/save_youtube_player_data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({ bookid: BOOK_ID, position: pos }),
+        keepalive: true,
+      }).catch(function () { /* best effort */ });
+    } catch (e) { /* ignore */ }
   }
 
   function bindControls() {
@@ -875,6 +975,71 @@
     });
   }
 
+  // Patch WORDS in place with a {"cues": {index: html}, "patched": bool}
+  // incremental response, then re-inject the current cue when it was
+  // touched (or when asked to).  A "patched: false" response means the
+  // server had no cached entry for the book, so our WORDS copy may be
+  // wholly out of sync — schedule a full refresh for the next pause.
+  function ytApplySubtitlePatch(data, reactivate) {
+    if (!data || Array.isArray(data)) return false;
+    var cues = data.cues;
+    if (!cues) return false;
+    var touchedCurrent = false;
+    for (var k in cues) {
+      if (!Object.prototype.hasOwnProperty.call(cues, k)) continue;
+      var i = Number(k);
+      if (!isFinite(i) || i < 0 || i >= WORDS.length) continue;
+      WORDS[i] = cues[k];
+      if (i === ytCueIndex) touchedCurrent = true;
+    }
+    if (data.patched === false) ytNeedsFullSubtitleRefresh = true;
+    if ((reactivate || touchedCurrent) && ytCueIndex >= 0)
+      ytActivateCue(ytCueIndex);
+    return true;
+  }
+
+  // Incremental refresh after a term save: the server re-renders just
+  // the cues containing the term (patching its own cache) and returns
+  // their HTML — a few hundred bytes instead of the multi-megabyte
+  // full refetch, with no full-book re-tokenization while the audio
+  // is streaming.  Falls back to re-rendering the current cue alone,
+  // then to a full reload.
+  function ytRefreshSubtitleForTerm(termText) {
+    if (!BOOK_ID) return;
+    var fetchCurrentCue = function () {
+      if (ytCueIndex < 0) {
+        ytLoadSubtitleWords(true);
+        return;
+      }
+      $.ajax({
+        url: "/read/youtube_subtitle_words/" + BOOK_ID,
+        data: { cue: ytCueIndex },
+        method: "GET",
+        dataType: "json",
+      })
+        .done(function (data) {
+          if (!ytApplySubtitlePatch(data, true)) ytLoadSubtitleWords(true);
+        })
+        .fail(function () {
+          ytLoadSubtitleWords(true);
+        });
+    };
+    if (termText) {
+      $.ajax({
+        url: "/read/youtube_subtitle_words/" + BOOK_ID,
+        data: { term: termText },
+        method: "GET",
+        dataType: "json",
+      })
+        .done(function (data) {
+          if (!ytApplySubtitlePatch(data, true)) fetchCurrentCue();
+        })
+        .fail(fetchCurrentCue);
+    } else {
+      fetchCurrentCue();
+    }
+  }
+
   /* ------------------------------------------------------------------ */
   /* Keyboard + init                                                     */
   /* ------------------------------------------------------------------ */
@@ -894,6 +1059,14 @@
         if (ytPlayer) ytTogglePlay();
       }
     });
+
+    // Persist the position when the page goes away (tab to background,
+    // navigation, close) -- the 15s polling throttle alone could lose
+    // up to 15s of progress.
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) ytSavePositionBeacon();
+    });
+    window.addEventListener("pagehide", ytSavePositionBeacon);
   }
 
   function init() {
@@ -934,18 +1107,30 @@
       }
     }, 15000);
 
-    // After a term status update, lute.js reloads #thetext and the server
-    // invalidates its subtitle word-HTML cache.  The subtitle words are
-    // tokenized from the media cues, which is a DIFFERENT text from the
-    // page content (#thetext), so their data-wid values don't exist in
-    // #thetext and we can't copy status classes from there.  Instead,
-    // re-fetch the subtitle word HTML and re-render the current cue so
-    // the new status classes appear.  (Re-rendering is safe now: the
-    // font-resize observer in text-options.js no longer stamps subtitle
-    // words with the reading-pane font size.)
-    window.addEventListener("lute:status-updated", function () {
+    // After a term status update, lute.js reloads #thetext and dispatches
+    // lute:status-updated with {bookId, termText} in the event detail.
+    // The subtitle words are tokenized from the media cues, which is a
+    // DIFFERENT text from the page content (#thetext), so their data-wid
+    // values don't exist in #thetext and we can't copy status classes
+    // from there.  Instead, re-render just the affected cues:
+    //  - with a termText, the server re-renders the cues containing it
+    //    (its cache is patched in place by the save itself);
+    //  - without one (bulk updates, deletions), fall back to the current
+    //    cue, and flag a full refresh for the next pause, when the
+    //    refetch doesn't compete with the audio stream for bandwidth.
+    window.addEventListener("lute:status-updated", function (e) {
       if (!ytSubtitle) return;
-      ytLoadSubtitleWords(true);
+      var detail = e.detail || {};
+      if (detail.bookId && BOOK_ID &&
+          Number(detail.bookId) !== Number(BOOK_ID)) {
+        return;
+      }
+      if (ytStatusRefreshTimer) clearTimeout(ytStatusRefreshTimer);
+      var termText = detail.termText || null;
+      ytStatusRefreshTimer = setTimeout(function () {
+        ytStatusRefreshTimer = null;
+        ytRefreshSubtitleForTerm(termText);
+      }, 300);
     });
   }
 

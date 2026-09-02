@@ -218,6 +218,50 @@ def export_terms():
     return send_file(outfile, as_attachment=True, download_name="Terms.csv")
 
 
+def _ajax_requested():
+    "True if the request came from the reading screen's fetch-based form code."
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+
+def serialize_term_form_data(term, repo, session, form_action):
+    """
+    Serialize the term form's initial field values as a JSON dict.
+
+    The TermForm is built the same way handle_term_form builds it for
+    HTML rendering, so populating the reading frame's form in place
+    with this data shows exactly what a full page load would show.
+    """
+    form = TermForm(obj=term, session=session)
+
+    # Flash messages get added on things like term imports.
+    # The user opening the form is treated as an acknowledgement.
+    flash_message = term.flash_message
+    term.flash_message = None
+
+    language_repo = LanguageRepository(session)
+    term_language = language_repo.find(term.language_id or -1)
+    hide_pronunciation = term_language is not None and not term_language.show_romanization
+
+    return {
+        "term_id": term.id,
+        "is_new": term.id is None,
+        "language_id": term.language_id,
+        "text": term.text,
+        "original_text": term.original_text or term.text,
+        "romanization": form.romanization.data or "",
+        "translation": form.translation.data or "",
+        "status": str(form.status.data) if form.status.data else str(term.status),
+        "parents": list(term.parents or []),
+        "tags": list(term.term_tags or []),
+        "term_tags_whitelist": repo.get_term_tags(),
+        "current_image": term.current_image,
+        "sync_status": bool(term.sync_status),
+        "hide_pronunciation": hide_pronunciation,
+        "flash_message": flash_message,
+        "form_action": form_action,
+    }
+
+
 def handle_term_form(
     term,
     repo,
@@ -231,7 +275,8 @@ def handle_term_form(
 
     This is used here and in read.routes -- read.routes.term_form
     lives in an iframe in the reading frames and returns a different
-    template on success.
+    template on success.  return_on_success may be a response, or a
+    zero-arg callable returning one (called only on successful posts).
     """
     form = TermForm(obj=term, session=session)
 
@@ -243,11 +288,29 @@ def handle_term_form(
 
     if form.validate_on_submit():
         form.populate_obj(term)
-        repo.add(term)
+        dbterm = repo.add(term)
         repo.commit()
-        from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
-        invalidate_yt_subtitle_cache()
-        return return_on_success
+        # New terms don't get the new DB id back in the business object
+        # otherwise; the AJAX save response needs it.
+        term.id = dbterm.id
+        from lute.read.routes import (  # pylint: disable=import-outside-toplevel
+            invalidate_yt_subtitle_cache,
+            patch_yt_subtitle_caches_for_term,
+        )
+        if (dbterm.token_count or 1) > 1:
+            # Multiword terms change how texts tokenize, so cached
+            # subtitle renders must be rebuilt from scratch.
+            invalidate_yt_subtitle_cache()
+        else:
+            # Single-word saves only change statuses/translations, so
+            # re-render just the affected cues in place (see
+            # read.routes.patch_yt_subtitle_caches_for_term).  The
+            # player picks the fresh HTML up via its incremental
+            # subtitle refresh.
+            patch_yt_subtitle_caches_for_term(
+                [term.text] + list(term.parents or [])
+            )
+        return return_on_success() if callable(return_on_success) else return_on_success
 
     # Note: on validation, form.duplicated_term may be set.
     # See DUPLICATE_TERM_CHECK comments in other files.
@@ -272,7 +335,7 @@ def handle_term_form(
         current_language_id = int(us_repo.get_value("current_language_id"))
         form.language_id.data = current_language_id
 
-    return render_template(
+    rendered = render_template(
         form_template_name,
         form=form,
         term=term,
@@ -282,6 +345,13 @@ def handle_term_form(
         tags=repo.get_term_tags(),
         embedded_in_reading_frame=embedded_in_reading_frame,
     )
+
+    # Failed post from the reading frame's in-place form: hand the
+    # re-rendered form back as data so the frame can show it.
+    if request.method == "POST" and _ajax_requested():
+        return jsonify({"status": "invalid", "html": rendered})
+
+    return rendered
 
 
 def _handle_form(term, repo, redirect_to="/term/index"):
@@ -432,10 +502,18 @@ def bulk_update_status():
         if book is not None:
             StatsService(db.session).mark_stale(book)
 
-    # Invalidate the YouTube subtitle word cache so subtitle colors
-    # refresh with the updated term statuses.
-    from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
-    invalidate_yt_subtitle_cache()
+    # Status changes don't alter how texts tokenize, so instead of
+    # invalidating the whole subtitle cache (which would force a full
+    # 10-20s rebuild on the next fetch), re-render just the cues that
+    # contain the updated terms, in place.
+    from lute.read.routes import patch_yt_subtitle_caches_for_term  # pylint: disable=import-outside-toplevel
+    updated_texts = []
+    for u in updates:
+        for tidstring in u.get("termids"):
+            t = repo.load(int(tidstring))
+            if t is not None:
+                updated_texts.append(t.text)
+    patch_yt_subtitle_caches_for_term(updated_texts)
 
     # HTMX request: return the refreshed reading-text fragment so the
     # reading screen updates in a single round-trip (POST + swap) instead

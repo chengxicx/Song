@@ -232,6 +232,21 @@ def _extract_pdf_page_words_pypdf(pdf_abs_path, pagenum):
     return (pw, ph, words)
 
 
+def _pdf_page_items(word_contexts):
+    "The TextItems of a tokenized pdf page (see Service._pdf_word_contexts)."
+    return [ti for word in word_contexts for ti in word["items"]]
+
+
+def _manga_page_items(blocks):
+    "The TextItems of a tokenized manga page (see Service._manga_page_blocks)."
+    return [
+        ti
+        for block in blocks
+        for line_items in block["line_items"]
+        for ti in line_items
+    ]
+
+
 class TermPopup:
     "Popup data for a term."
 
@@ -324,7 +339,75 @@ class Service:
         if mark_rest_of_book_known:
             self.set_book_unknowns_to_known(book)
         elif mark_rest_as_known:
-            self.set_unknowns_to_known(text)
+            self.set_page_unknowns_to_known(book, text, pagenum)
+
+    def set_page_unknowns_to_known(self, book, text, pagenum):
+        """
+        Mark the unknown words of one page as Well-Known, for any book
+        type.
+
+        Manga and pdf books keep an *empty* page text (their words come
+        from the image / pdf file), so the plain text path finds nothing
+        to mark; those pages are re-tokenized from their source instead.
+        """
+        btype = (book.book_type or "").lower()
+        if btype == "pdf":
+            return self.set_pdf_page_unknowns_to_known(book, pagenum)
+        if btype == "manga":
+            return self.set_manga_page_unknowns_to_known(book, pagenum)
+        return self.set_unknowns_to_known(text)
+
+    def _mark_rendered_page_unknowns_known(self, dbbook, items):
+        """
+        Mark the unknown words of an externally rendered page (manga /
+        pdf) as Well-Known.
+
+        `items` are the page's TextItems, exactly as built for the
+        reading screen.  New terms are created by the render path
+        (_save_new_manga_terms / _save_new_pdf_terms) before this runs,
+        so matching on the page's word texts finds them.
+
+        Returns the number of terms updated.
+        """
+        texts_lc = []
+        seen = set()
+        for ti in items:
+            if not ti.is_word or ti.term is None:
+                continue
+            lc = ti.term.text_lc
+            if lc in seen:
+                continue
+            seen.add(lc)
+            texts_lc.append(lc)
+        if not texts_lc:
+            return 0
+
+        # Chunked: a dense page can hold more distinct words than the
+        # sqlite variable limit allows in one IN (...) clause.
+        updated = 0
+        batch_size = 500
+        for i in range(0, len(texts_lc), batch_size):
+            chunk = texts_lc[i : i + batch_size]
+            terms = (
+                self.session.query(Term)
+                .filter(
+                    Term.language_id == dbbook.language_id,
+                    Term.text_lc.in_(chunk),
+                    Term.status == Status.UNKNOWN,
+                )
+                .all()
+            )
+            for t in terms:
+                t.status = Status.WELLKNOWN
+                self.session.add(t)
+            updated += len(terms)
+
+        self.session.commit()
+
+        if updated:
+            StatsService(self.session).mark_stale(dbbook)
+
+        return updated
 
     def set_unknowns_to_known(self, text: Text):
         """
@@ -363,11 +446,23 @@ class Service:
         if unknowns:
             StatsService(self.session).mark_stale(text.book)
 
+        return len(unknowns)
+
     def set_book_unknowns_to_known(self, book):
         """
         Given a book, create new Terms with status Well-Known for any
         new Terms on every page of the book.
         """
+        # Manga / pdf pages have no text of their own; every page has to
+        # be re-tokenized from the source file.
+        if (book.book_type or "") in ("manga", "pdf"):
+            updated = 0
+            for pagenum in range(1, book.page_count + 1):
+                updated += self.set_page_unknowns_to_known(
+                    book, book.text_at_page(pagenum), pagenum
+                )
+            return updated
+
         rs = RenderService(self.session)
         batch_size = 100
         i = 0
@@ -398,6 +493,8 @@ class Service:
         # so the home page recomputes the status distribution.
         if i > 0:
             StatsService(self.session).mark_stale(book)
+
+        return i
 
     def set_terms_to_known(self, wordids, book=None):
         """
@@ -533,6 +630,32 @@ class Service:
         self.session.add(text)
         self.session.commit()
 
+        blocks = self._manga_page_blocks(dbbook, pagenum)
+        if blocks is None:
+            return None
+
+        img_url, _resolved_img_path = self._manga_page_image_url(dbbook, pagenum)
+
+        # Save new status-0 terms so the words have data-wid on the
+        # next page load (mirrors _save_new_status_0_terms).
+        self._save_new_rendered_terms(_manga_page_items(blocks))
+
+        return {
+            "page_num": pagenum,
+            "img_url": img_url,
+            "img_width": page.get("img_width") or 100,
+            "img_height": page.get("img_height") or 100,
+            "blocks": blocks,
+        }
+
+    def _manga_page_image_url(self, dbbook, pagenum):
+        """
+        Resolve the image URL for one manga page, returning
+        (img_url, resolved_img_path).
+        """
+        manga = getattr(dbbook, "manga", None) or {}
+        pages = manga.get("pages") or []
+        page = pages[pagenum - 1]
         manga_path = (dbbook.manga_path or "").strip("/")
         raw_img_path = (page.get("img_path") or "").lstrip("/").replace("\\", "/")
 
@@ -586,7 +709,23 @@ class Service:
                             except ValueError:
                                 continue
 
-        img_url = f"/static/{manga_path}/{resolved_img_path.lstrip('/')}"
+        return f"/static/{manga_path}/{resolved_img_path.lstrip('/')}", resolved_img_path
+
+    def _manga_page_blocks(self, dbbook, pagenum):
+        """
+        Tokenize one manga page's OCR text blocks, as the reading screen
+        needs them.
+
+        Returns the blocks list, or None if the book has no manga data
+        or the page is out of range.  Shared by the renderer and by
+        "mark rest as known": a manga page's words only exist in the
+        .mokuro OCR data, not in the (empty) page text.
+        """
+        manga = getattr(dbbook, "manga", None) or {}
+        pages = manga.get("pages") or []
+        if not 1 <= pagenum <= len(pages):
+            return None
+        page = pages[pagenum - 1]
 
         rs = RenderService(self.session)
         lang = dbbook.language
@@ -625,46 +764,21 @@ class Service:
                 }
             )
 
-        # Save new status-0 terms so the words have data-wid on the
-        # next page load (mirrors _save_new_status_0_terms).
-        self._save_new_manga_terms(blocks)
+        return blocks
 
-        return {
-            "page_num": pagenum,
-            "img_url": img_url,
-            "img_width": page.get("img_width") or 100,
-            "img_height": page.get("img_height") or 100,
-            "blocks": blocks,
-        }
-
-    def _save_new_manga_terms(self, blocks):
+    def set_manga_page_unknowns_to_known(self, dbbook, pagenum):
         """
-        Add status-0 terms found in manga text blocks.
+        Mark the words rendered on one manga page as Well-Known.
 
-        Each line is tokenized with its own get_textitems() call, so a
-        word repeated within a page can produce several distinct,
-        unsaved Term objects for the same text; de-duplicate them by
-        (language, text_lc) before committing to avoid UNIQUE
-        constraint violations on words.WoLgID + words.WoTextLC.
+        The page's text is empty (the words come from the mokuro OCR
+        data), so the words are read back out of the manga data.
         """
-        seen = set()
-        new_terms = []
-        for block in blocks:
-            for line_items in block["line_items"]:
-                for ti in line_items:
-                    if (
-                        ti.is_word
-                        and ti.term is not None
-                        and ti.term.id is None
-                        and ti.term.status == 0
-                    ):
-                        key = (ti.term.language.id, ti.term.text_lc)
-                        if key not in seen:
-                            seen.add(key)
-                            new_terms.append(ti.term)
-        for t in new_terms:
-            self.session.add(t)
-        self.session.commit()
+        blocks = self._manga_page_blocks(dbbook, pagenum)
+        if blocks is None:
+            return 0
+        items = _manga_page_items(blocks)
+        self._save_new_rendered_terms(items)
+        return self._mark_rendered_page_unknowns_known(dbbook, items)
 
     def pdf_page_context(self, dbbook, pagenum, track_page_open=False):
         """
@@ -686,6 +800,37 @@ class Service:
         self.session.add(dbbook)
         self.session.add(text)
         self.session.commit()
+
+        ctx = self._pdf_word_contexts(dbbook, pagenum)
+        if ctx is None:
+            return None
+        page_width, page_height, word_contexts = ctx
+
+        # Save new status-0 terms so the words have data-wid on the
+        # next page load (mirrors _save_new_status_0_terms).
+        self._save_new_rendered_terms(_pdf_page_items(word_contexts))
+
+        return {
+            "page_num": pagenum,
+            "pdf_url": f"/static/{pdf_path}",
+            "page_width": page_width,
+            "page_height": page_height,
+            "words": word_contexts,
+        }
+
+    def _pdf_word_contexts(self, dbbook, pagenum):
+        """
+        Extract and tokenize one PDF page, as the reading screen needs
+        it.
+
+        Returns (page_width, page_height, word_contexts), or None if the
+        book has no pdf file or the page is out of range.  Shared by the
+        renderer and by "mark rest as known": a pdf page's words only
+        exist in the pdf file, not in the (empty) page text.
+        """
+        pdf_path = (dbbook.pdf_path or "").strip("/")
+        if not pdf_path or not 1 <= pagenum <= dbbook.page_count:
+            return None
 
         pdf_abs = os.path.join(current_app.static_folder, pdf_path)
         if not os.path.isfile(pdf_abs):
@@ -729,42 +874,48 @@ class Service:
                 }
             )
 
-        # Save new status-0 terms so the words have data-wid on the
-        # next page load (mirrors _save_new_manga_terms).
-        self._save_new_pdf_terms(word_contexts)
+        return page_width, page_height, word_contexts
 
-        return {
-            "page_num": pagenum,
-            "pdf_url": f"/static/{pdf_path}",
-            "page_width": page_width,
-            "page_height": page_height,
-            "words": word_contexts,
-        }
-
-    def _save_new_pdf_terms(self, word_contexts):
+    def set_pdf_page_unknowns_to_known(self, dbbook, pagenum):
         """
-        Add status-0 terms found in PDF page words.
+        Mark the words rendered on one pdf page as Well-Known.
 
-        Each word is tokenized with its own get_textitems() call, so a
-        word repeated within a page can produce several distinct,
+        The page's text is empty by design (see
+        BookService.set_pdf_page_word_counts), so the words are read
+        back out of the pdf itself.
+        """
+        ctx = self._pdf_word_contexts(dbbook, pagenum)
+        if ctx is None:
+            return 0
+        _page_width, _page_height, word_contexts = ctx
+        items = _pdf_page_items(word_contexts)
+        self._save_new_rendered_terms(items)
+        return self._mark_rendered_page_unknowns_known(dbbook, items)
+
+    def _save_new_rendered_terms(self, items):
+        """
+        Add status-0 terms found in the TextItems of an externally
+        rendered page (manga / pdf).
+
+        Each line / word is tokenized with its own get_textitems() call,
+        so a word repeated within a page can produce several distinct,
         unsaved Term objects for the same text; de-duplicate them by
         (language, text_lc) before committing to avoid UNIQUE
         constraint violations on words.WoLgID + words.WoTextLC.
         """
         seen = set()
         new_terms = []
-        for word in word_contexts:
-            for ti in word["items"]:
-                if (
-                    ti.is_word
-                    and ti.term is not None
-                    and ti.term.id is None
-                    and ti.term.status == 0
-                ):
-                    key = (ti.term.language.id, ti.term.text_lc)
-                    if key not in seen:
-                        seen.add(key)
-                        new_terms.append(ti.term)
+        for ti in items:
+            if (
+                ti.is_word
+                and ti.term is not None
+                and ti.term.id is None
+                and ti.term.status == 0
+            ):
+                key = (ti.term.language.id, ti.term.text_lc)
+                if key not in seen:
+                    seen.add(key)
+                    new_terms.append(ti.term)
         for t in new_terms:
             self.session.add(t)
         self.session.commit()

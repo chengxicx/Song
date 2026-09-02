@@ -2,6 +2,7 @@
 Tests for the YouTube video book feature.
 """
 
+import gzip
 import io
 import json
 from unittest.mock import patch
@@ -327,6 +328,177 @@ def _make_youtube_book(app, app_context, english):
     svc = BookService()
     dbbook = svc.import_book(b, db.session)
     return dbbook
+
+
+# ---------------------------------------------------------------------
+# Incremental subtitle refresh (?term= / ?cue=)
+# ---------------------------------------------------------------------
+
+
+def _make_three_cue_book(english, title):
+    "A 3-cue youtube book whose cue 0 contains 'Hello'."
+    from lute.book.model import Book
+
+    b = Book()
+    b.title = title
+    b.language_id = english.id
+    b.text = "Hello world.\nThis is a test subtitle.\nGoodbye!"
+    b.book_type = "youtube"
+    b.srt_data = json.dumps(
+        [
+            {"start": 1.0, "end": 4.2, "text": "Hello world."},
+            {"start": 5.0, "end": 8.5, "text": "This is a test subtitle."},
+            {"start": 10.0, "end": 13.0, "text": "Goodbye!"},
+        ]
+    )
+    return BookService().import_book(b, db.session)
+
+
+def _save_term(language, text, status):
+    "Create/update a term through the repository, as a term save would."
+    from lute.term.model import Repository
+
+    repo = Repository(db.session)
+    term = repo.find_or_new(language.id, text)
+    term.status = status
+    repo.add(term)
+    repo.commit()
+    return term
+
+
+def test_incremental_term_patch_updates_cache_in_place(app, app_context, english):
+    "GET ?term= re-renders just the cues containing the term; cache stays."
+    import re
+
+    from lute.read.routes import (
+        _subtitle_words_html,
+        _yt_subtitle_words_cache,
+    )
+
+    dbbook = _make_three_cue_book(english, "YT_INCR")
+    _subtitle_words_html(dbbook)  # build the cache with unknown words
+    term = _save_term(english, "Hello", 2)
+
+    client = app.test_client()
+    resp = client.get(
+        f"/read/youtube_subtitle_words/{dbbook.id}",
+        query_string={"term": term.text},
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["patched"] is True, "a cache entry existed and was updated"
+    assert list(data["cues"].keys()) == ["0"], "only cue 0 contains 'Hello'"
+    hello_span = re.search(r"<span[^>]*>Hello</span>", data["cues"]["0"]).group(0)
+    assert 'data-status-class="status2"' in hello_span
+
+    # The cache entry was patched in place, not dropped: a later full
+    # fetch reuses it (with the fresh status) instead of re-tokenizing.
+    keys = [k for k in _yt_subtitle_words_cache if k[0] == dbbook.id]
+    assert keys, "cache entry must survive the patch"
+    full = _subtitle_words_html(dbbook)
+    assert 'data-status-class="status2"' in re.search(
+        r"<span[^>]*>Hello</span>", full[0]
+    ).group(0)
+
+
+def test_incremental_cue_param_rerenders_single_cue(app, app_context, english):
+    "GET ?cue=N returns just that cue's HTML."
+    from lute.read.routes import _subtitle_words_html
+
+    dbbook = _make_three_cue_book(english, "YT_CUE")
+    _subtitle_words_html(dbbook)
+
+    client = app.test_client()
+    resp = client.get(f"/read/youtube_subtitle_words/{dbbook.id}?cue=2")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert list(data["cues"].keys()) == ["2"]
+    assert "Goodbye" in data["cues"]["2"]
+
+
+def test_incremental_reports_patched_false_after_invalidate(
+    app, app_context, english
+):
+    "After an invalidation the player learns it needs a full refresh."
+    from lute.read.routes import _subtitle_words_html, invalidate_yt_subtitle_cache
+
+    dbbook = _make_three_cue_book(english, "YT_INVALIDATED")
+    _subtitle_words_html(dbbook)
+    invalidate_yt_subtitle_cache()
+
+    client = app.test_client()
+    resp = client.get(f"/read/youtube_subtitle_words/{dbbook.id}?cue=0")
+    data = resp.get_json()
+    assert data["patched"] is False
+    assert "Hello" in data["cues"]["0"]
+
+
+def test_incremental_term_patch_strips_zero_width_spaces(
+    app, app_context, english
+):
+    "Multiword term text carries ZWS; matching must still hit cue text."
+    from lute.read.routes import _subtitle_words_html
+
+    dbbook = _make_three_cue_book(english, "YT_ZWS")
+    _subtitle_words_html(dbbook)
+    term = _save_term(english, "Hello world", 3)
+    assert "\u200b" in term.text, "multiword terms contain zero-width spaces"
+
+    client = app.test_client()
+    resp = client.get(
+        f"/read/youtube_subtitle_words/{dbbook.id}",
+        query_string={"term": term.text},
+    )
+    data = resp.get_json()
+    assert list(data["cues"].keys()) == ["0"], "ZWS-stripped needle matches cue 0"
+
+
+def test_bulk_update_status_patches_subtitle_cache(app, app_context, english):
+    "Bulk status changes patch the cache in place instead of clearing it."
+    import re
+
+    from lute.read.routes import (
+        _subtitle_words_html,
+        _yt_subtitle_words_cache,
+    )
+
+    dbbook = _make_three_cue_book(english, "YT_BULK")
+    _save_term(english, "Hello", 1)
+    first = _subtitle_words_html(dbbook)
+    wid = int(re.search(r'data-wid="(\d+)"', first[0]).group(1))
+
+    client = app.test_client()
+    resp = client.post(
+        "/term/bulk_update_status",
+        json={"updates": [{"new_status": 5, "termids": [str(wid)]}]},
+    )
+    assert resp.status_code == 200
+
+    keys = [k for k in _yt_subtitle_words_cache if k[0] == dbbook.id]
+    assert keys, "bulk update must patch, not clear, the cache"
+    full = _subtitle_words_html(dbbook)
+    hello_span = re.search(r"<span[^>]*>Hello</span>", full[0]).group(0)
+    assert 'data-status-class="status5"' in hello_span
+
+
+def test_subtitle_words_gzip_response(app, app_context, english):
+    "The endpoint gzips its body when the client accepts gzip."
+    dbbook = _make_three_cue_book(english, "YT_GZIP")
+    _subtitle_words_html(dbbook)
+
+    client = app.test_client()
+    gzipped = client.get(
+        f"/read/youtube_subtitle_words/{dbbook.id}",
+        headers={"Accept-Encoding": "gzip"},
+    )
+    assert gzipped.status_code == 200
+    assert gzipped.headers.get("Content-Encoding") == "gzip"
+    words = json.loads(gzip.decompress(gzipped.data))
+    assert words[0] != ""
+
+    plain = client.get(f"/read/youtube_subtitle_words/{dbbook.id}")
+    assert plain.headers.get("Content-Encoding") is None
+    assert plain.get_json()[0] != ""
 
 
 def test_read_page_passes_youtube_data(app, app_context, english, client):

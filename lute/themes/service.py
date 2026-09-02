@@ -11,6 +11,10 @@ from lute.models.repositories import UserSettingRepository
 
 default_entry = ("-", "(default)")
 
+# DBs from before the dark-by-default rename may still store the old
+# dark theme name; map it to the file that now carries the dark palette.
+LEGACY_THEME_MAP = {"Default-Dark.css": "Default.css"}
+
 
 class Service:
     "Service."
@@ -57,6 +61,7 @@ class Service:
         """
         repo = UserSettingRepository(self.session)
         current_theme = repo.get_value("current_theme")
+        current_theme = LEGACY_THEME_MAP.get(current_theme, current_theme)
         if current_theme == default_entry[0]:
             return ""
 
