@@ -322,6 +322,24 @@
         marked_id = $(marked[0]).attr('id');
       }
 
+      // Remember which paragraph the reader is anchored on BEFORE the
+      // refresh swaps in the new DOM: the paragraph holding the
+      // just-saved word, or (when nothing is marked -- e.g. after a
+      // drag selection that creates a multi-word term, which clears
+      // .kwordmarked before the form opens) the first paragraph of the
+      // current sub-screen.  Paragraphs are stable across a term-save
+      // refresh -- only the word spans inside them change, and a
+      // multi-word save merges the selected token spans into one new
+      // span whose DOM id didn't exist before the save -- so after the
+      // swap the same paragraph is re-located by its ordinal and the
+      // screen is re-flowed around it instead of jumping back to
+      // sub-screen 0.
+      const parasBefore = Array.from(theText.querySelectorAll(':scope > p'));
+      const anchorEl = marked.length != 0
+        ? $(marked[0]).closest('p')[0]
+        : (parasBefore.find((p) => p.style.display !== 'none') || null);
+      const anchorOrdinal = anchorEl ? parasBefore.indexOf(anchorEl) : -1;
+
       // Force remove the old popup.
       // ref https://stackoverflow.com/questions/19266886/tooltip-not-disappearing
       $('div.ui-tooltip').remove();
@@ -338,7 +356,7 @@
 
       // HTMX: swap the refreshed fragment into #thetext.  Re-marking of
       // the previously-marked word happens in the htmx:afterSwap handler.
-      _pendingTermFormReload = marked_id;
+      _pendingTermFormReload = { marked_id, anchorOrdinal };
       htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
     };
   };
@@ -585,7 +603,8 @@
 
     // Reload after a term form was posted (updated/deleted).
     if (_pendingTermFormReload !== null) {
-      const marked_id = _pendingTermFormReload;
+      const state = _pendingTermFormReload;
+      const marked_id = state.marked_id;
       _pendingTermFormReload = null;
       if (typeof add_status_classes === "function") {
         add_status_classes();
@@ -600,7 +619,18 @@
       // spilling into overflowing columns after a save.  Keep the reader
       // anchored on the paragraph containing the saved word rather than
       // jumping back to the first sub-screen.
-      const anchor = re_marked.length ? re_marked.closest('p')[0] : null;
+      //
+      // A single-word save keeps the word span's id, so #marked_id
+      // usually resolves after the swap.  A multi-word save merges the
+      // selected token spans into one new span (and nothing was marked
+      // when the form was posted), so fall back to the paragraph ordinal
+      // captured before the swap -- otherwise the anchor is lost and the
+      // re-flow snaps the reader back to sub-screen 0.
+      let anchor = re_marked.length ? re_marked.closest('p')[0] : null;
+      if (!anchor && state.anchorOrdinal >= 0) {
+        const paras = Array.from(theText.querySelectorAll(':scope > p'));
+        anchor = paras[state.anchorOrdinal] || null;
+      }
       requestAnimationFrame(() => _splitToScreens(anchor));
     }
   });
