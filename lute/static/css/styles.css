@@ -2112,7 +2112,6 @@ a.btn, button.btn,
 .btn:hover,
 .btn-primary:hover,
 .btn-warning:hover,
-.btn-danger:hover,
 .btn-info:hover {
     background: var(--btn-accent-hover);
     border-color: var(--btn-accent-hover);
@@ -2128,16 +2127,22 @@ a.btn, button.btn,
     transform: scale(0.96);
 }
 
-/* Secondary actions (Cancel, Back, Clear all): outlined, not filled.
-   Uses tag-qualified selector so specificity matches a.btn / button.btn
-   in the main rule above. */
+/* Outlined (not filled) actions: secondary ones (Cancel, Back, Clear all)
+   and destructive ones (Delete).  Keeping Delete outlined leaves Save as
+   the only filled button in a form row.
+   Tag-qualified selectors so specificity matches a.btn / button.btn in
+   the main rule above. */
 a.btn-secondary, button.btn-secondary,
-.btn.btn-secondary {
+.btn.btn-secondary,
+a.btn-danger, button.btn-danger,
+.btn.btn-danger {
     background: transparent;
     color: var(--btn-accent);
 }
 a.btn-secondary:hover, button.btn-secondary:hover,
-.btn.btn-secondary:hover {
+.btn.btn-secondary:hover,
+a.btn-danger:hover, button.btn-danger:hover,
+.btn.btn-danger:hover {
     background: rgba(0, 122, 255, 0.1);
     border-color: var(--btn-accent);
     color: var(--btn-accent);
@@ -2149,12 +2154,13 @@ a.btn-secondary:hover, button.btn-secondary:hover,
 a.btn, a.btn:link, a.btn:visited,
 button.btn, button.btn:link, button.btn:visited,
 a.btn-primary, a.btn-primary:link, a.btn-primary:visited,
-a.btn-warning, a.btn-warning:link, a.btn-warning:visited,
-a.btn-danger, a.btn-danger:link, a.btn-danger:visited {
+a.btn-warning, a.btn-warning:link, a.btn-warning:visited {
     color: #fff !important;
 }
 a.btn-secondary, a.btn-secondary:link, a.btn-secondary:visited,
-button.btn-secondary, button.btn-secondary:link, button.btn-secondary:visited {
+button.btn-secondary, button.btn-secondary:link, button.btn-secondary:visited,
+a.btn-danger, a.btn-danger:link, a.btn-danger:visited,
+button.btn-danger, button.btn-danger:link, button.btn-danger:visited {
     color: var(--btn-accent) !important;
 }
 
