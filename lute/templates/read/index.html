@@ -534,7 +534,7 @@
    * #thetext; the htmx:afterSwap listener below runs the post-swap
    * bookkeeping (status classes, nav state, page fraction, etc).
    */
-  function goto_relative_page(p, initial_page_load = false) {
+  function goto_relative_page(p, initial_page_load = false, extra = null) {
     luteStartReadingDone = false;
     reset_cursor();
     const bookid = $('#book_id').val();
@@ -550,12 +550,21 @@
 
     // Remember which page we asked for so the afterSwap handler can
     // update the UI without parsing the URL.
-    _pendingNav = { actualPage: actualPage, initial: initial_page_load };
+    _pendingNav = { actualPage: actualPage, initial: initial_page_load, ...(extra || {}) };
     htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
   }
 
   // Pending page-navigation state, consumed by the htmx:afterSwap handler.
   let _pendingNav = null;
+
+  // Logical pages the reader has LEFT forward from their last sub-screen
+  // (via the right arrow).  When the reader crosses back to such a page
+  // with the left arrow, they expect to land on the sub-screen they left
+  // (its last one); without this, a backward page crossing always falls
+  // on the destination page's first sub-screen, losing the reader's place.
+  // Entries are removed once restored (a page returned to is no longer
+  // "pending").
+  const _fwdFromPages = new Set();
 
   // Post-swap bookkeeping for the reading text.  Also used by HTMX-driven
   // status updates (see lute.js post_bulk_update).
@@ -597,7 +606,22 @@
 
     // Page navigation (goto_relative_page).
     if (_pendingNav) {
-      _finishPageSwap(_pendingNav.actualPage, _pendingNav.initial);
+      const nav = _pendingNav;
+      _finishPageSwap(nav.actualPage, nav.initial);
+      // Backward crossing onto a page the reader previously left forward:
+      // _finishPageSwap's rAF splits the page (curScreen = 0); this second
+      // rAF runs right after it and restores the last sub-screen, so the
+      // left arrow returns the reader to where they were instead of the
+      // destination page's first sub-screen.
+      if (nav.landOnLast) {
+        requestAnimationFrame(() => {
+          if (subScreens.length) {
+            curScreen = subScreens.length - 1;
+            _renderScreen();
+          }
+          _fwdFromPages.delete(nav.actualPage);
+        });
+      }
       _pendingNav = null;
     }
 
@@ -1065,7 +1089,11 @@
       _renderScreen();
       return;
     }
-    goto_relative_page(-1);
+    const target = getActualPage(-1);
+    // Crossing back onto a page the reader had left forward: land on its
+    // last sub-screen (where they were) instead of its first.
+    const landOnLast = _fwdFromPages.has(target);
+    goto_relative_page(-1, false, { landOnLast });
   }
 
   function navigateNext() {
@@ -1093,6 +1121,11 @@
     // Without this guard goto_relative_page(1) clamps back to maxpage and
     // re-loads the page, wrapping around to its first sub-screen.
     if (pagenum >= maxpage && atLastSubscreen) return;
+    // Leaving this page forward from its last sub-screen: remember it so
+    // a later left-arrow crossing back restores the last sub-screen.
+    if (!_isMangaReader() && subScreens.length) {
+      _fwdFromPages.add(pagenum);
+    }
     handle_page_done(arrowMarksKnown, 1);
   }
 
