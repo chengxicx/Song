@@ -808,6 +808,31 @@ span.hamburger {
   box-sizing: border-box;
 }
 
+/* Logo + dark/light toggle sit together on the left of the menu header;
+   the close button stays pinned to the right via space-between. */
+.reading_menu_logo_left {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+/* The menu header strip stays light (aliceblue) in every theme, so keep
+   the toggle on the light-theme appearance instead of inheriting the
+   dark menu-bar's translucent white styling, which vanishes on it. */
+.reading_menu_logo_container #theme-mode-toggle {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  color: #8e8e93 !important;
+}
+
+.reading_menu_logo_container #theme-mode-toggle:hover {
+  color: #007aff !important;
+  background-color: #ffffff !important;
+  border-color: #007aff !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15) !important;
+}
+
 #focus-container,
 #tap_sets_status-container,
 #tts-toggle-container,
