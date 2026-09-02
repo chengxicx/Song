@@ -1200,16 +1200,17 @@
   }
 
   /* The scrolling subtitle becomes the mini-bar one-liner
-     (full-dock variant only). */
+     (full-dock variant only).  A fixed min-height keeps the line
+     breathing instead of hugging the text. */
   .youtube-player-container:is(:not(:has(.yt-player-video-wrap)), .yt-audio-mode) .yt-scrolling-subtitle {
     order: -1;
-    min-height: 0;
+    min-height: 2.75rem;
     margin: 0;
   }
 
   .youtube-player-container:is(:not(:has(.yt-player-video-wrap)), .yt-audio-mode) :is(#yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner) {
-    font-size: 1.05rem;
-    padding: 0.15rem 0.2rem;
+    font-size: 1.15rem;
+    padding: 0.3rem 0.4rem;
     max-height: none;
     overflow-y: hidden;
     white-space: nowrap;
@@ -1294,11 +1295,11 @@
      (player-dock.js toggles the body class as players show/hide),
      and keep the term-popup offset roughly right. */
   body.lute-player-docked #read_pane_left {
-    padding-bottom: 120px;
+    padding-bottom: 130px;
   }
 
   body.lute-player-docked #read_pane_container {
-    --player-height: 110px;
+    --player-height: 120px;
   }
 
   /* The dictionary pane's drag handles sit just above the pane's top
@@ -1308,7 +1309,7 @@
      (Pane open = .open-dict: its top edge is at the top of the screen,
      so the handles are off-screen as usual.) */
   body.lute-player-docked #read_pane_right:not(.open-dict)::before {
-    transform: translate(0, calc(-100% - 104px));
+    transform: translate(0, calc(-100% - 114px));
   }
 
   body.lute-player-docked #read_pane_right:not(.open-dict)::after {
@@ -1316,7 +1317,7 @@
   }
 
   body.lute-player-docked #read_pane_right:not(.open-dict) .read-pane-right-close-btn {
-    transform: translateY(calc(-100% - 104px));
+    transform: translateY(calc(-100% - 114px));
   }
 
   /* ---------- expanded bottom sheet ---------- */
