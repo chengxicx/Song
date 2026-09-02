@@ -499,7 +499,9 @@
     }
 
     form_changed = false;
-    window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
+    // term_text lets the player's subtitle refresh re-render just the
+    // cues containing this term instead of refetching the whole book.
+    window.parent.postMessage({ event: "LuteTermFormPosted", term_text: resp.term_text || null }, "*");
   }
 
 

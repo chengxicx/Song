@@ -53,6 +53,9 @@
   var ytLastSavedT = -10;
   var ytMarqueeOverflow = 0;
   var ytIsRtl = false;
+  // Debounce timer for the incremental subtitle refresh (see the
+  // lute:status-updated listener at the bottom of this file).
+  var ytStatusRefreshTimer = null;
 
   var ytContainer = document.getElementById("yt-player-container");
   var ytVideoWrap = document.querySelector(".yt-player-video-wrap");
@@ -128,11 +131,17 @@
       playing = false;
       fireStateChange(PS.ENDED);
     }
+    function onBuffering() {
+      fireStateChange(PS.BUFFERING);
+    }
 
     function bindVideo() {
       videoEl.addEventListener("play", onPlay);
       videoEl.addEventListener("pause", onPause);
       videoEl.addEventListener("ended", onEnded);
+      videoEl.addEventListener("playing", onPlay);
+      videoEl.addEventListener("waiting", onBuffering);
+      videoEl.addEventListener("stalled", onBuffering);
       videoEl.addEventListener("loadedmetadata", function () {
         if (pendingSeek > 0 && isFinite(videoEl.duration)) {
           try { videoEl.currentTime = pendingSeek; } catch (e) { /* ignore */ }
@@ -189,6 +198,18 @@
       getPlayerState: function () {
         return playing ? PS.PLAYING : PS.PAUSED;
       },
+      getLoadedFraction: function () {
+        // Fraction of the media buffered ahead, for the timeline's
+        // buffered band.
+        var d = videoEl.duration;
+        if (!isFinite(d) || d <= 0) return 0;
+        var b = videoEl.buffered;
+        var end = 0;
+        for (var i = 0; i < b.length; i++) {
+          if (b.end(i) > end) end = b.end(i);
+        }
+        return Math.min(1, end / d);
+      },
       _init: init,
     };
   }
@@ -229,9 +250,28 @@
     window.setInterval(ytPoll, 250);
   }
 
+  // Buffering feedback: while the video buffers (weak network, seek
+  // past the buffered range), show the loading overlay so the frozen
+  // timeline isn't mistaken for a crash.
+  var ytBufferingVisible = false;
+  function ytShowBuffering(show) {
+    if (!ytLoading || !ytPlayerReady) return;
+    if (show) {
+      if (!ytBufferingVisible) {
+        ytBufferingVisible = true;
+        ytLoading.textContent = "Buffering...";
+        ytLoading.style.display = "block";
+      }
+    } else if (ytBufferingVisible) {
+      ytBufferingVisible = false;
+      ytLoading.style.display = "none";
+    }
+  }
+
   function ytOnStateChange(event) {
     ytPlaying = event.data === PS.PLAYING;
     ytUpdatePlayBtn();
+    ytShowBuffering(event.data === PS.BUFFERING);
     if (event.data === PS.PLAYING) {
       // The remote player may reset the rate on load; restore ours.
       try {
@@ -268,8 +308,11 @@
 
     if (!ytDragging) {
       ytTimeline.value = t;
+      var bufferedPct = 0;
+      try { bufferedPct = Math.round((ytPlayer.getLoadedFraction() || 0) * 100); }
+      catch (e) { /* ignore */ }
       ytTimeline.style.backgroundSize =
-        (dur > 0 ? (t / dur) * 100 : 0) + "% 100%";
+        (dur > 0 ? (t / dur) * 100 : 0) + "% 100%, " + bufferedPct + "% 100%";
     }
     ytCurTimeEl.textContent = ytFmtTime(t);
 
@@ -766,9 +809,49 @@
     // the already-reloaded #thetext as the source of truth, and refresh
     // the WORDS cache in the background (without re-rendering) so future
     // cues also pick up the new status classes.
-    window.addEventListener("lute:status-updated", function () {
+    //
+    // With a termText in the event detail (single-word term saves), the
+    // server can re-render just the cues containing that term instead of
+    // the whole book, so patch WORDS incrementally and skip the
+    // multi-megabyte background refetch.  bookId lets players of other
+    // books ignore the event.
+    window.addEventListener("lute:status-updated", function (e) {
       if (!ytSubtitle) return;
-      ytLoadSubtitleWords(false);
+      var detail = e.detail || {};
+      if (detail.bookId && BOOK_ID &&
+          Number(detail.bookId) !== Number(BOOK_ID)) {
+        return;
+      }
+      var termText = detail.termText || null;
+      if (ytStatusRefreshTimer) clearTimeout(ytStatusRefreshTimer);
+      ytStatusRefreshTimer = setTimeout(function () {
+        ytStatusRefreshTimer = null;
+        if (termText) {
+          $.ajax({
+            url: "/read/youtube_subtitle_words/" + BOOK_ID,
+            data: { term: termText },
+            method: "GET",
+            dataType: "json",
+          }).done(function (data) {
+            if (data && !Array.isArray(data) && data.cues) {
+              for (var k in data.cues) {
+                if (!Object.prototype.hasOwnProperty.call(data.cues, k)) continue;
+                var i = Number(k);
+                if (isFinite(i) && i >= 0 && i < WORDS.length)
+                  WORDS[i] = data.cues[k];
+              }
+              // "patched: false" means the server had no cached entry
+              // (e.g. a multiword-term save invalidated it), so cues
+              // beyond the patched ones may be out of sync too.
+              if (data.patched === false) ytLoadSubtitleWords(false);
+              return;
+            }
+            ytLoadSubtitleWords(false);
+          });
+        } else {
+          ytLoadSubtitleWords(false);
+        }
+      }, 300);
       $(ytSubtitle).find("span.word").each(function () {
         var wid = $(this).data("wid");
         if (!wid) return;

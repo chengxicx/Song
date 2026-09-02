@@ -2,8 +2,20 @@
 /read endpoints.
 """
 
+import gzip
 import json
-from flask import Blueprint, flash, request, render_template, redirect, jsonify, Response, url_for
+import os
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    request,
+    render_template,
+    redirect,
+    jsonify,
+    Response,
+    url_for,
+)
 from lute.read.service import Service
 from lute.read.render.service import Service as RenderService
 from lute.read.forms import TextForm
@@ -48,6 +60,38 @@ def invalidate_yt_subtitle_cache(book_id=None):
             _yt_subtitle_words_cache.pop(k, None)
     else:
         _yt_subtitle_words_cache.clear()
+
+
+def patch_yt_subtitle_caches_for_term(texts):
+    """
+    Re-render cues containing any of *texts* in every cached book.
+
+    Called after a single-word term save.  Such a save doesn't change
+    how texts tokenize, so patching the rendered HTML in place keeps
+    every book's cache correct without the full-book re-tokenization
+    (10-20s for long books) that invalidation would force on the next
+    fetch.  Multiword terms still need invalidate_yt_subtitle_cache().
+    """
+    needles = [
+        (t or "").replace("\u200b", "").strip().lower()
+        for t in (texts or [])
+    ]
+    needles = [n for n in needles if n]
+    if not needles:
+        return
+    br = BookRepository(db.session)
+    for book_id, srt_data in list(_yt_subtitle_words_cache.keys()):
+        haystack = (srt_data or "").lower()
+        if not any(n in haystack for n in needles):
+            continue
+        book = br.find(book_id)
+        if book is None:
+            continue
+        cues = list(book.cues)
+        indices = []
+        for n in needles:
+            indices.extend(_cue_indices_matching_term(cues, n))
+        _rerender_subtitle_cues(book, indices)
 
 
 def _fmt_seconds(secs):
@@ -96,15 +140,7 @@ def _subtitle_words_html(book):
     # Without this, every page load re-creates (and re-parses readings
     # for) the same terms, and subtitle words lack data-wid attributes
     # (causing the NaN/edit_term bug).
-    new_terms = [
-        ti.term for ti in textitems
-        if ti.is_word and ti.term is not None
-        and ti.term.id is None and ti.term.status == 0
-    ]
-    if new_terms:
-        for t in new_terms:
-            db.session.add(t)
-        db.session.commit()
+    _save_new_subtitle_terms(textitems)
 
     chunks = []
     curr = []
@@ -141,6 +177,78 @@ def _subtitle_words_html(book):
         if ti.wo_id is not None
     }
     _yt_subtitle_words_cache[cache_key] = {"html": result, "statuses": statuses}
+    return result
+
+
+def _save_new_subtitle_terms(textitems):
+    "Save status-0 terms created while tokenizing subtitle text."
+    new_terms = [
+        ti.term for ti in textitems
+        if ti.is_word and ti.term is not None
+        and ti.term.id is None and ti.term.status == 0
+    ]
+    if new_terms:
+        for t in new_terms:
+            db.session.add(t)
+        db.session.commit()
+
+
+def _cue_indices_matching_term(cues, term_text):
+    """
+    Indices of cues whose text contains term_text (case-insensitive).
+
+    Multiword term text carries zero-width spaces between tokens, which
+    the raw cue text never has, so they are stripped before matching.
+    Over-matching (a cue containing a longer word) is harmless: those
+    cues simply get re-rendered to identical HTML.
+    """
+    ZWS = "\u200b"
+    needle = (term_text or "").replace(ZWS, "").strip().lower()
+    if not needle:
+        return []
+    return [
+        i for i, c in enumerate(cues)
+        if needle in (c.get("text") or "").lower()
+    ]
+
+
+def _rerender_subtitle_cues(book, indices):
+    """
+    Re-render the given cue indices and patch the cached entry in place,
+    so a term save only re-tokenizes the affected cues instead of the
+    whole book.  Returns {cue_index: html}.
+
+    If no cached entry exists for the book yet, the cues are still
+    rendered fresh but the cache is left untouched -- writing a partial
+    list would corrupt the full-render path, which expects html aligned
+    with every cue.
+    """
+    cues = list(book.cues)
+    valid = sorted({i for i in indices if 0 <= i < len(cues)})
+    if not valid:
+        return {}
+    lang = book.language
+    render_service = RenderService(db.session)
+    cache_key = (book.id, book.srt_data)
+    cached = _yt_subtitle_words_cache.get(cache_key)
+    result = {}
+    for i in valid:
+        cue_text = (cues[i].get("text") or "").replace("\n", " ")
+        textitems = render_service.get_textitems(cue_text, lang)
+        _save_new_subtitle_terms(textitems)
+        parts = []
+        for ti in textitems:
+            if ti.text == "¶":
+                continue
+            ti.sentence_number = i + 1
+            parts.append(render_template("read/textitem.html", item=ti))
+        html = "".join(parts)
+        result[i] = html
+        if cached is not None:
+            cached["html"][i] = html
+            for ti in textitems:
+                if ti.wo_id is not None:
+                    cached["statuses"][ti.wo_id] = ti.wo_status
     return result
 
 
@@ -294,14 +402,29 @@ def _render_book_page(book, pagenum, track_page_open=True):
     # media player.  Locally-stored files stream via /useraudio/stream;
     # a "video" book whose media was not downloaded (< 20 MB rule) plays
     # directly from its remote media_url.
+    #
+    # The stream URL is versioned with the file's mtime so the browser
+    # can cache the audio (private, max-age) without ever serving a
+    # stale file: replacing the audio changes its mtime, which changes
+    # the URL, which bypasses the old cache entry.
+    def _versioned_audio_url():
+        fname = os.path.join(
+            current_app.env_config.useraudiopath, book.audio_filename
+        )
+        try:
+            version = int(os.stat(fname).st_mtime)
+        except OSError:
+            version = 0
+        return f"/useraudio/stream/{book.id}?v={version}"
+
     mp3_audio_url = None
     if book_type == "video":
         if book.audio_filename:
-            mp3_audio_url = f"/useraudio/stream/{book.id}"
+            mp3_audio_url = _versioned_audio_url()
         elif book.media_url:
             mp3_audio_url = book.media_url
     elif book.audio_filename and book_type in ("mp3", ""):
-        mp3_audio_url = f"/useraudio/stream/{book.id}"
+        mp3_audio_url = _versioned_audio_url()
 
     # The unified player backend: youtube = iframe, video = HTML5 video,
     # audio = HTML5 audio.  Bilibili books use their own template.
@@ -555,6 +678,28 @@ def bilibili_proxy(bvid, stream_type):
     return Response(content, status=status, headers=headers)
 
 
+def _gzip_if_accepted(resp):
+    """
+    gzip the response body when the client advertises support.
+
+    The full-book subtitle word JSON can run to several MB of highly
+    repetitive HTML; gzipping it cuts the transfer to a fraction, which
+    matters when the server's uplink also carries the audio stream.
+    Only applied to this JSON endpoint -- never to the audio/video
+    streams, which are already-compressed media.
+    """
+    accept = request.headers.get("Accept-Encoding", "")
+    encodings = [e.strip().split(";")[0].lower() for e in accept.split(",")]
+    if "gzip" not in encodings or resp.headers.get("Content-Encoding"):
+        return resp
+    body = gzip.compress(resp.get_data(), compresslevel=5)
+    resp.set_data(body)
+    resp.headers["Content-Encoding"] = "gzip"
+    resp.headers["Content-Length"] = str(len(body))
+    resp.headers["Vary"] = "Accept-Encoding"
+    return resp
+
+
 @bp.route("/youtube_subtitle_words/<int:bookid>", methods=["GET"])
 def youtube_subtitle_words(bookid):
     """Return tokenized word HTML for every subtitle cue as JSON.
@@ -562,9 +707,35 @@ def youtube_subtitle_words(bookid):
     Called lazily by the YouTube player after the page loads, so the
     expensive tokenization doesn't block the initial render.
     Results are cached per book (see _yt_subtitle_words_cache).
+
+    With ``?term=<text>`` (or ``?cue=<index>``) only the affected cues
+    are re-rendered and the cached entry is patched in place; the
+    response is then {"cues": {cue_index: html}, "patched": bool}
+    instead of a full list.  This keeps term saves cheap: no full-book
+    re-tokenization and no multi-megabyte payload while the audio is
+    playing.  ``patched`` is false when no cached entry existed, telling
+    the player its WORDS copy may be wholly out of sync (e.g. after the
+    invalidation from a multiword-term save) and it should do a full
+    refresh once the media is paused.
     """
     book = _find_book(bookid)
-    if book is None:
+    term_text = request.args.get("term")
+    cue_arg = request.args.get("cue")
+    if book is not None and (term_text is not None or cue_arg is not None):
+        cues = list(book.cues)
+        if term_text is not None:
+            indices = _cue_indices_matching_term(cues, term_text)
+        elif cue_arg.isdigit():
+            indices = [int(cue_arg)]
+        else:
+            indices = []
+        patched = (book.id, book.srt_data) in _yt_subtitle_words_cache
+        result = _rerender_subtitle_cues(book, indices)
+        resp = jsonify({
+            "cues": {str(i): h for i, h in result.items()},
+            "patched": patched,
+        })
+    elif book is None:
         resp = jsonify([])
     else:
         words = _subtitle_words_html(book)
@@ -578,7 +749,7 @@ def youtube_subtitle_words(bookid):
     resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     resp.headers["Pragma"] = "no-cache"
     resp.headers["Expires"] = "0"
-    return resp
+    return _gzip_if_accepted(resp)
 
 
 @bp.route("/start_reading/<int:bookid>/<int:pagenum>", methods=["GET"])
