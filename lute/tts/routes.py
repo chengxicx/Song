@@ -181,8 +181,9 @@ def tts_speak(lang, text):
     Generate speech for *text* using edge-tts, returning an mp3.
 
     Audio files are cached on disk in DATAPATH/tts_cache, keyed by the
-    MD5 of ``f"{lang}_{text}"`` so repeated requests are served
-    instantly.
+    MD5 of ``f"{lang}_{voice}_{text}"`` so repeated requests are served
+    instantly.  The voice is part of the key: changing a language's TTS
+    voice setting must produce new audio, not the old cached file.
     """
     voice = voice_for_tag(lang)
 
@@ -191,14 +192,20 @@ def tts_speak(lang, text):
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)
 
-    key = f"{lang}_{text}"
+    key = f"{lang}_{voice}_{text}"
     filename = hashlib.md5(key.encode("utf-8")).hexdigest() + ".mp3"
     filepath = os.path.join(cache_dir, filename)
 
     if not os.path.exists(filepath):
         _generate_audio(text, voice, filepath)
 
-    return send_file(filepath, mimetype="audio/mpeg")
+    # The URL carries lang + text, the voice comes from the (lang,
+    # voice, text) key, and the file never changes once generated: the
+    # response is content-addressed, so cache it aggressively.
+    # send_file also sets ETag/Last-Modified and handles Range requests.
+    resp = send_file(filepath, mimetype="audio/mpeg", max_age=31536000)
+    resp.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    return resp
 
 
 def _generate_audio(text, voice, filepath):

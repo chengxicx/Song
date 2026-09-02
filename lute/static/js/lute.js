@@ -1427,9 +1427,12 @@ document.addEventListener('htmx:afterSwap', function (e) {
     }
 
     // Notify the YouTube / TTS player (if present) to refresh subtitle
-    // word colors — the server-side subtitle cache was invalidated
-    // by the bulk_update_status endpoint.
-    window.dispatchEvent(new Event('lute:status-updated'));
+    // word colors — the server-side subtitle cache was patched in place
+    // by the bulk_update_status endpoint.  bookId lets players of other
+    // books ignore the event.
+    window.dispatchEvent(new CustomEvent('lute:status-updated', {
+      detail: { bookId: Number($('#book_id').val()) || null, termText: null },
+    }));
   }
 });
 

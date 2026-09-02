@@ -2297,8 +2297,15 @@
 
     // After a term status update, lute.js reloads #thetext.  The cue
     // list rebuild is handled by the #thetext MutationObserver, but
-    // we also re-apply status colours to the subtitle.
-    window.addEventListener("lute:status-updated", function () {
+    // we also re-apply status colours to the subtitle.  Skip events
+    // that another book's player triggered (bookId mismatch).
+    window.addEventListener("lute:status-updated", function (e) {
+      var detail = e.detail || {};
+      var pageBookId = Number($("#book_id").val()) || null;
+      if (detail.bookId && pageBookId &&
+          Number(detail.bookId) !== pageBookId) {
+        return;
+      }
       ttsApplySubtitleStatusColors();
     });
   }
