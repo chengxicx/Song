@@ -372,11 +372,7 @@
       // just-saved term's form data has changed.
       luteClearTermFormPrefetchCache();
 
-      // A kept-open AJAX save leaves the term's text unchanged, so
-      // the dict area's content is still valid -- keep it visible.
-      // Deletes and navigations away from the form hide it as before.
-      if (!event.data.formKeptOpen)
-        $(".dictcontainer").css('display', 'none');
+      $(".dictcontainer").css('display', 'none');
 
       // HTMX: swap the refreshed fragment into #thetext.  Re-marking of
       // the previously-marked word happens in the htmx:afterSwap handler.
