@@ -358,3 +358,95 @@ def test_stats_updated_if_field_empty(service, _test_book, spanish):
     assert_stats(
         ["4; 2; 50; {'0': 2, '1': 2, '2': 0, '3': 0, '4': 0, '5': 0, '98': 0, '99': 0}"]
     )
+
+
+@pytest.fixture(name="_pdf_book")
+def fixture_pdf_book(app, english):
+    "Import a small English pdf book; yield (book, pdf_dir)."
+    import io
+    import os
+    import shutil
+    from lute.book.model import Book
+    from lute.book.service import Service as BookService
+    from tests.utils import make_pdf_bytes
+
+    b = Book()
+    b.title = "PDF stats book"
+    b.language_id = english.id
+    b.book_type = "pdf"
+    b.pdf_stream = io.BytesIO(make_pdf_bytes(["Hello cat dog", "one two"]))
+    b.pdf_stream_filename = "test.pdf"
+    book = BookService().import_book(b, db.session)
+    pdf_dir = os.path.join(
+        app.static_folder, os.path.dirname(book.pdf_path.strip("/"))
+    )
+    yield book
+    shutil.rmtree(pdf_dir, ignore_errors=True)
+
+
+def test_pdf_calc_status_distribution_reflects_terms(app_context, english, _pdf_book):
+    """
+    Pdf status distribution is sampled from the pdf file itself, and
+    reacts to term statuses.
+
+    Pdf pages store empty text by design (their words live in the pdf),
+    so before the file-based sampling was added every pdf book reported
+    an all-zero distribution and a 0% New word figure.
+    """
+    book = _pdf_book
+    svc = Service(db.session)
+
+    # Opening the pages creates their status-0 terms, exactly as the
+    # reading screen does before the reader clicks the next arrow.
+    from lute.read.service import Service as ReadService
+
+    read_svc = ReadService(db.session)
+    assert read_svc.pdf_page_context(book, 1, True) is not None
+    assert read_svc.pdf_page_context(book, 2, True) is not None
+
+    sql = "select WoTextLC, WoStatus from words order by WoTextLC"
+    assert_sql_result(
+        sql,
+        ["cat; 0", "dog; 0", "hello; 0", "one; 0", "two; 0"],
+        "page words created on open",
+    )
+
+    dist = svc.calc_status_distribution(book)
+    assert sum(dist.values()) == 5, "hello cat dog one two"
+    assert dist[0] == 5, "all words still unknown"
+
+    # Mark two words known; the distribution must follow.
+    db.session.execute(
+        text("update words set WoStatus = 4 where WoTextLC = 'cat'")
+    )
+    db.session.execute(
+        text("update words set WoStatus = 3 where WoTextLC = 'one'")
+    )
+    db.session.commit()
+
+    dist2 = svc.calc_status_distribution(book)
+    assert dist2[0] == 3, "cat/one no longer unknown"
+    assert dist2[3] == 1, "one known"
+    assert dist2[4] == 1, "cat well known"
+
+    # The cached stats row reflects the real content too.
+    stats = svc.get_stats(book)
+    assert stats.distinctterms == 5
+    assert stats.distinctunknowns == 3
+    assert stats.new_word_percent == 60
+
+
+def test_pdf_stats_refresh_and_cache(app_context, english, _pdf_book):
+    "Pdf book stats are calculated and cached like any other book's."
+    book = _pdf_book
+    svc = Service(db.session)
+    svc.refresh_stats()
+    sql = (
+        "select distinctterms, distinctunknowns, "
+        "unknownpercent, new_word_percent from bookstats"
+    )
+    row = db.session.execute(text(sql)).fetchone()
+    assert row is not None, "stats cached for pdf book"
+    assert row.distinctterms > 0
+    assert row.distinctunknowns > 0
+    assert row.new_word_percent is not None
