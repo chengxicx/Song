@@ -106,11 +106,6 @@ span.status99 { background-color: transparent; } /* transparent */
   color: var(--background-color);
 }
 
-#read-slider {
-  -webkit-appearence: none;
-  background-color: #5e5e5e;
-}
-
 span.hamburger {
   background-color: #F3F4F4;
 }

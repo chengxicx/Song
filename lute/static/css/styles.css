@@ -662,6 +662,22 @@ div#read_pane_right {
 #page_indicator {
     font-weight: 500;
     font-size: 0.9rem;
+    /* Percentage / "x/y" / "n/m" all fit without reflowing the row. */
+    min-width: 3.4rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Sub-page mode: the label is clickable (percentage <-> sub-screen
+   count) and hovering previews the parent-page position. */
+#page_indicator.subpage-mode {
+    cursor: pointer;
+    color: var(--read-slider-color, #79b7e7);
+    transition: opacity 0.15s ease;
+}
+
+#page_indicator.subpage-mode:hover {
+    opacity: 0.72;
 }
 
 .reading_header_mid_top {
@@ -1904,54 +1920,79 @@ div.code pre {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 0.5rem;
+    height: 6px;
     margin: 0;
-    background-color: #d7d7d7;
-    border-radius: 3px;
+    background-color: color-mix(in srgb, var(--font-color, #888) 18%, transparent);
+    border-radius: 999px;
     box-sizing: border-box;
     background-size: 0% 100%;
-    background-image: linear-gradient(var(--read-slider-color), var(--read-slider-color));
+    background-image: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--read-slider-color) 72%, #000),
+        var(--read-slider-color)
+    );
     background-repeat: no-repeat;
 }
 
 #read-slider::-moz-range-thumb {
-    width: 30px;
-    height: 0.5rem;
-    border: 2px solid var(--read-slider-color);
-    background-size: 80%;
-    border-radius: 5px;
+    width: 10px;
+    height: 10px;
+    border: none;
+    border-radius: 50%;
     background-color: #fff;
-    background-size: 60%;
-  
-    background-position: center;
-    background-repeat: no-repeat;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     padding: 0;
     box-sizing: border-box;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 #read-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 30px;
-    height: 0.5rem;
-    border: 2px solid var(--read-slider-color);
-    background-size: 80%;
-    border-radius: 5px;
+    width: 10px;
+    height: 10px;
+    border: none;
+    border-radius: 50%;
     background-color: #fff;
-    background-size: 60%;
-  
-    background-position: center;
-    background-repeat: no-repeat;
-
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     padding: 0;
     box-sizing: border-box;
+    /* Centre the 10px dot on the 6px track. */
+    margin-top: -2px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Replace the loud default focus ring (keyboard users only) with a thin
+   accent outline that follows the pill shape. */
+#read-slider:focus-visible {
+    outline: 2px solid var(--read-slider-color);
+    outline-offset: 3px;
+}
+
+/* Grow the dot and cast a soft accent halo while interacting. */
+#read-slider:hover::-moz-range-thumb,
+#read-slider:active::-moz-range-thumb {
+    transform: scale(1.25);
+    box-shadow:
+        0 0 0 6px color-mix(in srgb, var(--read-slider-color) 25%, transparent),
+        0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+#read-slider:hover::-webkit-slider-thumb,
+#read-slider:active::-webkit-slider-thumb {
+    transform: scale(1.25);
+    box-shadow:
+        0 0 0 6px color-mix(in srgb, var(--read-slider-color) 25%, transparent),
+        0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 #read-slider.read_page_disabled::-moz-range-thumb {
-    border: 2px solid #d7d7d7;
+    background-color: color-mix(in srgb, var(--font-color, #888) 35%, transparent);
+    box-shadow: none;
 }
 
 #read-slider.read_page_disabled::-webkit-slider-thumb {
-    border: 2px solid #d7d7d7;
+    background-color: color-mix(in srgb, var(--font-color, #888) 35%, transparent);
+    box-shadow: none;
 }
 
 #read-slider::-webkit-slider-runnable-track {
@@ -3057,17 +3098,19 @@ input[name='status']:disabled + label {
     }
 
     #read-slider {
-        height: 0.5rem;
+        height: 6px;
     }
 
     #read-slider::-moz-range-thumb {
-        width: 2.2rem;
-        height: 0.5rem;
+        width: 12px;
+        height: 12px;
+        margin-top: -3px;
     }
 
     #read-slider::-webkit-slider-thumb {
-        width: 2.2rem;
-        height: 0.5rem;
+        width: 12px;
+        height: 12px;
+        margin-top: -3px;
     }
 
     .reading_header_mid_top {
