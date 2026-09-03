@@ -28,11 +28,12 @@
   <div class="pl-card">
     <h2>Install a plugin</h2>
     <div class="pl-muted">
-      Enter a pip spec — a PyPI package (e.g. <code>lute3-storygen</code>), a local
-      source directory path (a folder containing <code>pyproject.toml</code>), or a
-      pip URL — then press Install. Reinstalling a plugin with the same name
-      overwrites/updates it. The plugin takes effect after you restart Lute.
-      You can also pick a local folder with <b>Browse…</b>.
+      Install from a PyPI package name (e.g. <code>lute3-storygen</code>), a pip
+      URL, a path on this server, or by uploading a local folder with
+      <b>Browse…</b> (the folder is uploaded to this server and installed
+      there — this is the way to install when Lute runs on a remote host).
+      Reinstalling a plugin with the same name overwrites/updates it. The
+      plugin takes effect after you restart Lute.
     </div>
     <div class="pl-install-row">
       <input id="pl_spec" type="text" class="form-control"
@@ -133,34 +134,34 @@
       }).catch(function (e) { showMsg(false, 'Request failed: ' + e); });
     }
 
-    // Folder picker: Chromium gives the absolute path via the non-standard
-    // File.path; other browsers only expose webkitRelativePath, so we then
-    // ask the server to locate the folder name in common locations.
+    // Folder picker: upload the chosen folder to the server, which then
+    // pip-installs it. This works even when Lute runs on a remote host —
+    // the browser never needs a server-visible path.
     browseBtn.addEventListener('click', function () { folderEl.click(); });
     folderEl.addEventListener('change', function () {
       if (!folderEl.files || !folderEl.files.length) return;
-      var f = folderEl.files[0];
-      if (f.path) {
-        specEl.value = f.path;
-        showMsg(true, 'Selected: ' + f.path);
-        return;
-      }
-      var name = (f.webkitRelativePath || '').split('/')[0];
-      showMsg(true, 'Locating folder "' + name + '"…');
-      fetch('/_feature/locate?name=' + encodeURIComponent(name))
+      var files = Array.prototype.slice.call(folderEl.files);
+      var fd = new FormData();
+      files.forEach(function (f) {
+        var rel = (f.webkitRelativePath || f.name || '').replace(/\\/g, '/');
+        if (!rel || rel.indexOf('..') === 0) return;
+        // Skip build artifacts and VCS junk.
+        if (/__pycache__|\.pyc$|\.git|node_modules|\.venv|dist\/|build\//.test(rel)) return;
+        fd.append('files', f, rel);
+      });
+      if (!fd.has('files')) { showMsg(false, 'No files selected.'); return; }
+      btn.disabled = true;
+      showMsg(true, 'Uploading folder (' + files.length + ' files)…');
+      fetch('/_feature/upload_install', { method: 'POST', body: fd })
         .then(function (r) { return r.json(); }).then(function (d) {
-          if (d.ok && d.path) {
-            specEl.value = d.path;
-            showMsg(true, 'Found: ' + d.path);
-          } else {
-            specEl.value = name;
-            showMsg(false, 'Could not auto-locate "' + name +
-              '". Please enter the full path manually.');
-          }
-        }).catch(function () {
-          specEl.value = name;
-          showMsg(false, 'Could not auto-locate the folder. Please enter the full path manually.');
+          btn.disabled = false;
+          showMsg(d.ok, d.message + (d.ok ? ' Restart Lute to activate it.' : ''));
+          return refresh();
+        }).catch(function (e) {
+          btn.disabled = false;
+          showMsg(false, 'Upload/install failed: ' + e);
         });
+      folderEl.value = '';
     });
 
     refresh();
