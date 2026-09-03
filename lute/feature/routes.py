@@ -103,3 +103,22 @@ def uninstall():
         )
     ok, message = installer.uninstall_feature_plugin(name)
     return jsonify({"ok": ok, "message": message})
+
+
+@bp.get("/locate")
+def locate():
+    """
+    Find the absolute path of a plugin folder picked via the browser.
+
+    Browsers only expose a relative path (``webkitRelativePath``), so we
+    search common locations on the server for a directory with that name.
+    """
+    name = (request.args.get("name") or "").strip()
+    if not name:
+        return jsonify({"ok": False, "path": None})
+    from . import locator
+
+    path = locator.find_plugin_dir(name)
+    if path:
+        return jsonify({"ok": True, "path": path})
+    return jsonify({"ok": False, "path": None})
