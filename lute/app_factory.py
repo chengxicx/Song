@@ -34,6 +34,8 @@ import lute
 import lute.utils.formutils
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
+from lute.feature.routes import bp as feature_bp
+from lute.feature import load_feature_plugins
 
 from lute.models.book import Book
 from lute.models.language import Language
@@ -507,6 +509,13 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(tts_bp)
     if app_config.is_test_db:
         app.register_blueprint(dev_api_bp)
+
+    # Feature plugin support.
+    # - feature_bp always serves empty fragments unless plugins add items.
+    # - load_feature_plugins discovers installed plugins and wires up any
+    #   blueprints / menu items / settings tiles they register.
+    app.register_blueprint(feature_bp)
+    load_feature_plugins(app)
 
     return app
 
