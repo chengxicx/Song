@@ -177,7 +177,10 @@
       {% if have_languages %}
       <div class="menu-item">
         <span id="menu_books">Book</span>
-        <ul class="sub-menu">
+        <ul class="sub-menu" id="lute-feature-menu-book"
+            hx-get="{{ url_for('lute_feature.menu_fragment', parent='book') }}"
+            hx-trigger="load once"
+            hx-swap="beforeend">
           <li><a id="book_new" href="/book/import_webpage">Create new</a></li>
           <li><a href="/book/settings">Group into Set</a></li>
           <li><a href="/book/archived">Archive</a></li>
@@ -199,6 +202,7 @@
           <li><a href="/settings/index">Settings</a></li>
           <li><a href="/settings/shortcuts">Keyboard shortcuts</a></li>
           <li><a id="anki_export_index" href="/ankiexport/index">Anki exports</a></li>
+          <li><a id="feature_panel" href="/_feature/panel">Plugin</a></li>
         </ul>
       </div>
       <div class="menu-item">
