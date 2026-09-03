@@ -850,7 +850,15 @@ def delete(bookid):
     b = _find_book(bookid)
     db.session.delete(b)
     db.session.commit()
-    return redirect("/", 302)
+    return redirect(_action_return_target(), 302)
+
+
+def _action_return_target():
+    "Return the page to go back to after an action; default to home."
+    nxt = request.form.get("next", "")
+    if nxt.startswith("/") and not nxt.startswith("//"):
+        return nxt
+    return "/"
 
 
 @bp.route("/delete_series/<tagtext>", methods=["POST"])
