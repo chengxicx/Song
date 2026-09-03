@@ -447,12 +447,59 @@
     goto_relative_page(0, true);
   });
 
-  // Set "page X/Y" in page nav.
+  // Set the page nav indicator.  Books using fit-to-screen sub-pagination
+  // (see subScreens below) replace the bare parent-page "x/y" with the
+  // reader's preferred display: the whole-book percentage refined by the
+  // sub-screen position (default), or the sub-screen count "n/m" after a
+  // click on the label.  Hovering always reveals the underlying parent
+  // "x/y"; books without sub-screens keep the plain "x/y".
+  let _bookHasSubscreens = false;
+  let _indicatorHovered = false;
+
   let set_page_fraction = function() {
     const pagenum = parseInt($('#page_num').val());
     const maxpage = parseInt($('#page_count').val());
-    $('#page_indicator').text(`${pagenum}/${maxpage}`);
+    const el = $('#page_indicator');
+    const inSubMode = _bookHasSubscreens && subScreens.length > 0;
+    el.toggleClass('subpage-mode', inSubMode);
+    if (!inSubMode || _indicatorHovered) {
+      el.text(`${pagenum}/${maxpage}`);
+      return;
+    }
+    if (localStorage.getItem('readPageIndicatorMode') === 'subpage') {
+      el.text(`${curScreen + 1}/${subScreens.length}`);
+      return;
+    }
+    // Whole-book progress with sub-screen granularity; a page that fits
+    // in a single screen counts as one whole page step.
+    const pageFrac = subScreens.length > 1 ? (curScreen + 1) / subScreens.length : 1;
+    el.text(`${Math.min(Math.round(((pagenum - 1) + pageFrac) / maxpage * 100), 100)}%`);
   };
+
+  // Hover previews the parent-page position, click toggles the preferred
+  // display between percentage and sub-screen count.  Both only act in
+  // sub-page mode (the subpage-mode class also gates the pointer cursor).
+  $('#page_indicator')
+    .on('mouseenter', function() {
+      _indicatorHovered = true;
+      set_page_fraction();
+    })
+    .on('mouseleave', function() {
+      _indicatorHovered = false;
+      set_page_fraction();
+    })
+    .on('click', function() {
+      if (!_bookHasSubscreens || subScreens.length === 0) return;
+      const next =
+        localStorage.getItem('readPageIndicatorMode') === 'subpage'
+          ? 'percent'
+          : 'subpage';
+      localStorage.setItem('readPageIndicatorMode', next);
+      // The click always happens while hovered; clear the hover preview so
+      // the newly selected display shows up immediately.
+      _indicatorHovered = false;
+      set_page_fraction();
+    });
 
   // Enable page nav links, depending on page num.
   let enable_page_nav_links = function() {
@@ -508,24 +555,51 @@
   const maxpage = parseInt($('#page_count').val());
   // disable read slider if there's only 1 page
   if (maxpage > 1) document.getElementById("read-slider").classList.remove("read_page_disabled");
+  // Sub-page books park the thumb at fractional (sub-page-refined)
+  // positions; the default step=1 would snap those back to whole pages.
+  readSlider.step = "any";
 
   readSlider.addEventListener("input", function() {
     const pagenum = parseInt($('#page_num').val());
-    const p = Number(readSlider.value) + 1 - pagenum;
+    // The thumb tracks the pointer continuously; keep the fill glued to
+    // it and preview the target parent page (rounded).
+    const frac = maxpage > 1 ? Number(readSlider.value) / (maxpage - 1) : 0;
+    readSlider.style.backgroundSize = `${frac * 100}% 100%`;
+    const p = Math.round(Number(readSlider.value)) + 1 - pagenum;
     const actualPage = getActualPage(p);
-    updateReadSlider(actualPage);
     document.getElementById("page_indicator").textContent = `${actualPage}/${maxpage}`;
   })
-  
-  readSlider.addEventListener("change", function() { 
+
+  readSlider.addEventListener("change", function() {
     const pagenum = parseInt($('#page_num').val());
-    const p = Number(readSlider.value) + 1 - pagenum;
+    const p = Math.round(Number(readSlider.value)) + 1 - pagenum;
+    if (p === 0) {
+      // Released on the current page (e.g. a keyboard nudge of the
+      // step=any scrubber): just re-seat the thumb, no page reload.
+      _updateSliderProgress();
+      return;
+    }
     goto_relative_page(p);
   })
 
   function updateReadSlider(p) {
     readSlider.value = p - 1;
     readSlider.style.backgroundSize = `${100 / (maxpage - 1) * readSlider.value}% 100%`;
+  }
+
+  // For sub-page books, park the thumb and fill at the same whole-book
+  // percentage the page indicator shows (parent pages refined by the
+  // current sub-screen), so the bar reads as a true progress bar.  The
+  // value stays fractional only as a visual resting position: the input/
+  // change handlers round it back to whole pages.  Plain books keep the
+  // page-start mapping from updateReadSlider().
+  function _updateSliderProgress() {
+    if (!_bookHasSubscreens || subScreens.length === 0) return;
+    const pagenum = parseInt($('#page_num').val());
+    const pageFrac = subScreens.length > 1 ? (curScreen + 1) / subScreens.length : 1;
+    const overall = ((pagenum - 1) + pageFrac) / maxpage;
+    readSlider.value = overall * (maxpage - 1);
+    readSlider.style.backgroundSize = `${overall * 100}% 100%`;
   }
   
   function getActualPage(p) {
@@ -1113,6 +1187,7 @@
     }
 
     subScreens = groups;
+    if (groups.length > 1) _bookHasSubscreens = true;
     if (anchor && anchor.nodeType === Node.ELEMENT_NODE) {
       const gi = subScreens.findIndex((g) => g.includes(anchor));
       if (gi >= 0) {
@@ -1142,6 +1217,8 @@
     wrap.classList.toggle("last-screen", isLast);
     if (endBtn) endBtn.classList.toggle("hide", !isLast);
     _updateSideArrows();
+    set_page_fraction();
+    _updateSliderProgress();
   }
 
   // Move backward/forward; within a page prefer sub-screens before
