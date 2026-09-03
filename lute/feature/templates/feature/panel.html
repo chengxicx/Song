@@ -133,13 +133,19 @@
       }).catch(function (e) { showMsg(false, 'Request failed: ' + e); });
     }
 
-    // Folder picker: browsers won't hand us an absolute path, so once the
-    // user picks a folder we send its name to the server, which searches
-    // common locations for the matching directory and fills the input.
+    // Folder picker: Chromium gives the absolute path via the non-standard
+    // File.path; other browsers only expose webkitRelativePath, so we then
+    // ask the server to locate the folder name in common locations.
     browseBtn.addEventListener('click', function () { folderEl.click(); });
     folderEl.addEventListener('change', function () {
       if (!folderEl.files || !folderEl.files.length) return;
-      var name = folderEl.files[0].webkitRelativePath.split('/')[0];
+      var f = folderEl.files[0];
+      if (f.path) {
+        specEl.value = f.path;
+        showMsg(true, 'Selected: ' + f.path);
+        return;
+      }
+      var name = (f.webkitRelativePath || '').split('/')[0];
       showMsg(true, 'Locating folder "' + name + '"…');
       fetch('/_feature/locate?name=' + encodeURIComponent(name))
         .then(function (r) { return r.json(); }).then(function (d) {
