@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Plugins{% endblock %}
+{% block header %}Plugins{% endblock %}
+
+{% block body %}
+
+<style>
+  .pl { margin: 0 auto; max-width: 760px; }
+  .pl-card { border: 1px solid var(--form-border-color, #ddd); border-radius: 6px; padding: 16px; margin: 12px 0; }
+  .pl-card h2 { margin: 0 0 6px; font-size: 1.15em; }
+  .pl-muted { opacity: .7; font-size: .85em; }
+  .pl-install-row { display: flex; gap: 8px; margin-top: 8px; }
+  .pl-install-row .form-control { flex: 1; }
+  .pl-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid
+            var(--form-border-color, #ddd); flex-wrap: wrap; }
+  .pl-row:last-child { border-bottom: none; }
+  .pl-state { font-size: .75em; padding: 1px 8px; border-radius: 3px; }
+  .pl-state.loaded { background: var(--btn-accent, #007aff); color: #fff; }
+  .pl-state.pending { border: 1px solid var(--form-border-color, #ddd); color: var(--amber-color, #b45309); }
+  .pl-msg { margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: .85em; }
+  .pl-msg.ok { background: rgba(0,180,0,.12); border: 1px solid #2a9d4f; }
+  .pl-msg.err { background: rgba(220,50,50,.12); border: 1px solid #c94545; }
+</style>
+
+<div class="pl">
+
+  <div class="pl-card">
+    <h2>Install a plugin</h2>
+    <div class="pl-muted">
+      Enter a pip spec — a PyPI package (e.g. <code>lute3-storygen</code>), a local
+      source directory path, or a pip URL — then press Install. Reinstalling a
+      plugin with the same name overwrites/updates it. The plugin takes effect
+      after you restart Lute.
+    </div>
+    <div class="pl-install-row">
+      <input id="pl_spec" type="text" class="form-control"
+             placeholder="lute3-storygen  or  /path/to/lute-storygen" />
+      <button id="pl_install_btn" class="btn btn-primary">Install</button>
+    </div>
+    <div id="pl_install_msg" class="pl-msg" style="display:none;"></div>
+  </div>
+
+  <div class="pl-card">
+    <h2>Installed plugins</h2>
+    <div id="pl_list"></div>
+  </div>
+
+</div>
+
+<script>
+  (function () {
+    var listEl = document.getElementById('pl_list');
+    var specEl = document.getElementById('pl_spec');
+    var btn = document.getElementById('pl_install_btn');
+    var msgEl = document.getElementById('pl_install_msg');
+
+    function stateTag(name, loaded) {
+      return loaded
+        ? '<span class="pl-state loaded">loaded</span>'
+        : '<span class="pl-state pending">needs restart</span>';
+    }
+
+    function render(payload) {
+      var pkgs = payload.packages || {};
+      var loaded = payload.loaded || [];
+      var names = payload.installed || [];
+      if (!names.length) {
+        listEl.innerHTML = '<div class="pl-muted">No feature plugins found.</div>';
+        return;
+      }
+      var html = '';
+      names.forEach(function (name) {
+        var isDemo = (name === '_demo');
+        html +=
+          '<div class="pl-row">' +
+            '<strong>' + name + '</strong>' + stateTag(name, loaded.indexOf(name) >= 0) +
+            (pkgs[name] && pkgs[name] !== name ? '<span class="pl-muted">(' + pkgs[name] + ')</span>' : '') +
+            '<span style="flex:1"></span>' +
+            (isDemo ? '<span class="pl-state" style="opacity:.6">built-in</span>'
+                    : '<button class="btn" data-uninstall="' + name + '">Remove</button>') +
+          '</div>';
+      });
+      listEl.innerHTML = html;
+      listEl.querySelectorAll('[data-uninstall]').forEach(function (b) {
+        b.addEventListener('click', function () { doUninstall(b.getAttribute('data-uninstall')); });
+      });
+    }
+
+    function showMsg(ok, text) {
+      msgEl.className = 'pl-msg ' + (ok ? 'ok' : 'err');
+      msgEl.textContent = text;
+      msgEl.style.display = 'block';
+    }
+
+    function refresh() {
+      return fetch('/_feature/installed').then(function (r) { return r.json(); }).then(render);
+    }
+
+    btn.addEventListener('click', function () {
+      var spec = specEl.value.trim();
+      if (!spec) { showMsg(false, 'Please enter a pip spec.'); return; }
+      btn.disabled = true;
+      showMsg(true, 'Installing <code>' + spec + '</code>…');
+      fetch('/_feature/install', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ spec: spec })
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        btn.disabled = false;
+        showMsg(d.ok, d.message + (d.ok ? ' Restart Lute to activate it.' : ''));
+        if (d.ok) { specEl.value = ''; }
+        return refresh();
+      }).catch(function (e) { btn.disabled = false; showMsg(false, 'Request failed: ' + e); });
+    });
+
+    function doUninstall(name) {
+      if (!confirm('Remove plugin "' + name + '"? This requires a restart to take effect.')) return;
+      showMsg(true, 'Removing ' + name + '…');
+      fetch('/_feature/uninstall', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ name: name })
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        showMsg(d.ok, d.message);
+        refresh();
+      }).catch(function (e) { showMsg(false, 'Request failed: ' + e); });
+    }
+
+    refresh();
+  })();
+</script>
+{% endblock %}

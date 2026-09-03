@@ -120,6 +120,12 @@ venv.bak/
 # VS Code config
 .vscode/
 
+# Locally-installed feature/parser plugins (e.g. lute-storygen,
+# lute-cantonese) are private to this machine and must NOT be pushed.
+# Only the shipped language-template stays tracked.
+plugins/*
+!plugins/_template_/
+
 # Spyder project settings
 .spyderproject
 .spyproject
