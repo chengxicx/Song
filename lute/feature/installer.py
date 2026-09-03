@@ -1,54 +1,66 @@
 """
-On-demand installation of feature plugins from the Settings page.
+On-demand installation of plugins from the Settings page.
 
-Mirrors ``lute.parse.plugin_installer`` so feature plugins use the
-familiar path: a pip spec (PyPI package name, or a local source-checkout
-path) entered in the Settings "功能插件" panel.
+Handles both plugin kinds:
+
+* feature plugins (``lute.plugin.feature``) — UI modules like the story
+  generator, installed from a pip spec (PyPI name, local path, URL);
+* parser plugins (``lute.plugin.parse``) — language parsers such as
+  lute3-cantonese / lute3-thai, which Lute installs on demand when a
+  predefined language is added.
 
 Installing makes the entry point importable via ``importlib.metadata``,
 but the running process only discovers entry points once at startup, so a
-restart is required for a freshly-installed plugin's menu/routes to appear.
+restart is required for a freshly-installed plugin to appear in the UI.
 """
 
 import os
 import subprocess
 import sys
 
-from .loader import _iter_feature_entry_points
+from .loader import _iter_entry_points
 
 PIP_TIMEOUT_SECONDS = 300
 
+# parser_type -> PyPI package name (mirrors lute.parse.plugin_installer).
+PARSER_PACKAGES = {
+    "lute_mandarin": "lute3-mandarin",
+    "lute_thai": "lute3-thai",
+    "lute_khmer": "lute3-khmer",
+    "lute_cantonese": "lute3-cantonese",
+}
 
-def installed_feature_packages():
+
+def _package_name_for(ep):
+    """Best-guess pip distribution name for an entry point."""
+    try:
+        if ep.dist is not None and ep.dist.metadata:
+            dist_name = ep.dist.metadata.get("Name")
+            if dist_name:
+                return dist_name
+    except Exception:  # pylint: disable=broad-except
+        pass
+    try:
+        return ep.value.split(":")[0].split(".")[0]
+    except Exception:  # pylint: disable=broad-except
+        return ep.name
+
+
+def installed_plugin_packages():
     """
-    Return a dict of entry_point_name -> pip package name (distribution).
-
-    Covers same-name "覆盖更新": reinstalling the same package simply
-    replaces it, so install always overwrites.  The package name lets a
-    user uninstall a plugin whose distribution was installed from.
+    Return ``{name: {"type": "feature"|"parser", "package": dist}}`` for
+    every discovered plugin entry point.
     """
     out = {}
-    for ep in _iter_feature_entry_points():
-        pkg = None
-        try:
-            pkg = ep.value.split(":")[0].split(".")[0]  # module, best guess
-        except Exception:  # pylint: disable=broad-except
-            pkg = None
-        # Prefer the declared distribution name when available.
-        try:
-            if ep.dist is not None and ep.dist.metadata:
-                dist_name = ep.dist.metadata.get("Name")
-                if dist_name:
-                    pkg = dist_name
-        except Exception:  # pylint: disable=broad-except
-            pass
-        out[ep.name] = pkg or ep.name
+    for kind, group in (("feature", "lute.plugin.feature"), ("parser", "lute.plugin.parse")):
+        for ep in _iter_entry_points(group):
+            out[ep.name] = {"type": kind, "package": _package_name_for(ep)}
     return out
 
 
 def package_for_entry_point(name):
-    """pip distribution name for an entry-point name, or None if unknown."""
-    return installed_feature_packages().get(name)
+    """pip distribution name for a plugin entry-point name, or None."""
+    return installed_plugin_packages().get(name, {}).get("package")
 
 
 def _local_plugins_dirs():
@@ -66,9 +78,13 @@ def _local_plugins_dirs():
     return [d for d in dirs if os.path.isdir(d)]
 
 
-def installed_feature_names():
-    """Entry-point names currently discovered for 'lute.plugin.feature'."""
-    return sorted(ep.name for ep in _iter_feature_entry_points())
+def installed_plugin_names():
+    """Entry-point names currently discovered for both plugin groups."""
+    names = set()
+    for group in ("lute.plugin.feature", "lute.plugin.parse"):
+        for ep in _iter_entry_points(group):
+            names.add(ep.name)
+    return sorted(names)
 
 
 def _normalize_spec(spec):
@@ -95,18 +111,25 @@ def _normalize_spec(spec):
     return spec
 
 
-def install_feature_plugin(spec):
+def install_plugin(spec):
     """
-    Install a feature plugin from a pip ``spec``.
-
-    ``spec`` may be a PyPI package name (e.g. 'lute3-storygen'), a local
-    source directory path, a file:// URL, or a pip URL.
+    Install a plugin from a pip ``spec`` (PyPI name, local dir, file:// URL,
+    or pip URL).  Parser plugins (lute3-cantonese, lute3-thai, ...) are
+    detected by name and installed through the parser installer so they get
+    registered immediately; anything else is treated as a feature plugin.
 
     Returns (ok, message).
     """
     spec = _normalize_spec(spec)
     if not spec:
         return False, "请输入 pip 包名或本地插件路径"
+
+    # Detect a parser plugin by its PyPI name or local source-dir name.
+    parser_type = _parser_type_for_spec(spec)
+    if parser_type:
+        from lute.parse import plugin_installer as pi
+
+        return pi.ensure_parser_available(parser_type)
 
     # If the spec is a local path that exists, hand pip the directory
     # (pip installs from source dirs directly).
@@ -138,13 +161,42 @@ def install_feature_plugin(spec):
     return True, f"安装成功：" + pip_arg
 
 
-def uninstall_feature_plugin(name):
+def _parser_type_for_spec(spec):
     """
-    Uninstall a feature plugin by its entry-point name.
+    Return the parser_type (e.g. 'lute_cantonese') for a spec if it names a
+    known parser plugin, else None.
 
-    Returns (ok, message).  A restart is required for the UI to update.
+    Accepts the PyPI name (lute3-cantonese) or the local source-dir name
+    (lute-cantonese), as a path or bare name.
     """
-    package = package_for_entry_point(name)
+    base = os.path.basename(spec.rstrip("/")) if spec else ""
+    pypi = spec if "/" not in spec else base
+    for parser_type, package in PARSER_PACKAGES.items():
+        if pypi in (package, package.replace("lute3-", "lute-")):
+            return parser_type
+    return None
+
+
+def install_feature_plugin(spec):
+    """Backwards-compatible alias for :func:`install_plugin`."""
+    return install_plugin(spec)
+
+
+def uninstall_plugin(name, kind="feature"):
+    """
+    Uninstall a plugin by its entry-point name.
+
+    ``kind`` is 'feature' or 'parser'; it selects how the entry point maps
+    to a pip distribution.  Returns (ok, message).  A restart is required
+    for the UI to update.
+    """
+    packages = installed_plugin_packages()
+    info = packages.get(name)
+    if info:
+        package = info.get("package")
+    else:
+        # Fall back to the parser mapping by name.
+        package = _pypi_name_for_parser(name)
     if not package:
         return False, f"未找到插件 '{name}' 对应的包"
 
@@ -165,3 +217,16 @@ def uninstall_feature_plugin(name):
         return False, f"pip uninstall 失败：\n{output.strip()[-1500:]}"
 
     return True, f"已卸载 {package}，请重启 Lute 生效"
+
+
+def _pypi_name_for_parser(name):
+    """PyPI package name for a parser entry-point name, or None."""
+    for parser_type, package in PARSER_PACKAGES.items():
+        if name == parser_type or name == package.replace("lute3-", "lute-"):
+            return package
+    return None
+
+
+def uninstall_feature_plugin(name):
+    """Backwards-compatible alias for :func:`uninstall_plugin`."""
+    return uninstall_plugin(name, kind="feature")
