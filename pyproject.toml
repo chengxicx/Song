@@ -45,6 +45,16 @@ dependencies = [
 [project.scripts]
 lute = "lute.main:start"
 
+# Feature plugin entry point group.
+# External plugins (e.g. lute3-storygen) declare themselves under this
+# group so lute's feature loader (lute/feature/loader.py) discovers and
+# wires them up at startup.  Lute itself ships one empty marker (_demo)
+# so the wiring is always exercised even with no plugins installed.
+# Real feature plugins live in separate packages that are NOT part of
+# this repo.
+[project.entry-points."lute.plugin.feature"]
+_demo = "lute.feature._demo:register"
+
 [package_data]
 lute.config = ["config/config.yml"]
 
