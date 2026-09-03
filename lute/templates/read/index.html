@@ -475,6 +475,7 @@
     $('#navSidePrev').removeClass('hide');
     $('#navSideNext').removeClass('hide');
     _layout_side_nav();
+    _updateSideArrows();
     // Media books in scrolling mode override the unhide above: their
     // arrows appear only once the page is scrolled to the bottom.
     if (typeof _updateScrollModeArrows === "function")
@@ -829,9 +830,27 @@
     const doc = document.documentElement;
     const maxScroll = Math.max(0, doc.scrollHeight - window.innerHeight);
     const atBottom = window.scrollY >= maxScroll - 60;
-    navSidePrev.classList.toggle("hide", !atBottom);
+    const pagenum = parseInt($("#page_num").val());
     navSideNext.classList.toggle("hide", !atBottom);
+    // The book's first page has no earlier page, so the left arrow is
+    // dead even at the bottom (same rule as the fit-to-screen arrows).
+    navSidePrev.classList.toggle("hide", !atBottom || pagenum <= 1);
     if (atBottom) _layout_side_nav();
+  }
+
+  // The book's very first screen (page 1, first sub-screen) has nothing
+  // before it, so the left arrow is a dead control there: hide it.  On
+  // later screens / pages it still works (sub-screen or page crossing),
+  // so it is shown again.  Scrolling mode owns both arrows itself and
+  // skips this helper.
+  function _updateSideArrows() {
+    if (!navSidePrev || !navSideNext) return;
+    if (typeof _videoScrollMode === "function" && _videoScrollMode()) return;
+    const pagenum = parseInt($("#page_num").val());
+    const atFirstScreen =
+      pagenum <= 1 && (subScreens.length === 0 || curScreen === 0);
+    navSidePrev.classList.toggle("hide", atFirstScreen);
+    if (!atFirstScreen) _layout_side_nav();
   }
 
   // Keep the bottom-of-page arrow state in sync while the reader
@@ -996,9 +1015,12 @@
       if (el) el.classList.remove("video-scroll-mode");
     });
     // Leaving scrolling mode (e.g. audio-only toggled off): restore the
-    // always-visible arrows used by the fit-to-screen paging.
+    // always-visible arrows used by the fit-to-screen paging.  The left
+    // arrow's first-screen rule is re-applied here and by _renderScreen
+    // below.
     navSidePrev?.classList.remove("hide");
     navSideNext?.classList.remove("hide");
+    _updateSideArrows();
     // The reader must not jump back to sub-screen 0 on every re-flow.
     // `anchor`, when given, is a <p> already inside #thetext that should
     // stay on screen (e.g. the paragraph holding a just-saved word).
@@ -1119,6 +1141,7 @@
       curScreen === subScreens.length - 1 && pagenum >= maxpage;
     wrap.classList.toggle("last-screen", isLast);
     if (endBtn) endBtn.classList.toggle("hide", !isLast);
+    _updateSideArrows();
   }
 
   // Move backward/forward; within a page prefer sub-screens before
