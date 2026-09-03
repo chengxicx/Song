@@ -416,9 +416,17 @@ let render_book_actions = function ( data, type, row, meta ) {
   </div>`;
 };
 
-function do_action_post(action, bookid) {
+function do_action_post(action, bookid, redirect) {
   let f = $('#actionposter');
   f.attr('action', `/book/${action}/${bookid}`);
+  if (redirect) {
+    let h = f.find('input[name="next"]');
+    if (!h.length) {
+      h = $('<input type="hidden" name="next" value="">');
+      f.append(h);
+    }
+    h.val(redirect);
+  }
   f.submit();
 }
 
@@ -447,7 +455,9 @@ function confirm_delete(el) {
   if (!confirm(`Deleting "${booktitle}".  Click OK to proceed, or Cancel.`)) {
     return;
   }
-  do_action_post('delete', bookid);
+  // Stay on the current page (e.g. a book set overview) after deleting
+  // instead of being sent back to the home book listing.
+  do_action_post('delete', bookid, window.location.pathname);
 }
 
 function confirm_delete_series(el) {
