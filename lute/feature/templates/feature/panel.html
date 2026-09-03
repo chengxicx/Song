@@ -21,6 +21,14 @@
   .pl-msg { margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: .85em; }
   .pl-msg.ok { background: rgba(0,180,0,.12); border: 1px solid #2a9d4f; }
   .pl-msg.err { background: rgba(220,50,50,.12); border: 1px solid #c94545; }
+  .pl-import { position: relative; }
+  .pl-import-menu {
+    position: absolute; top: calc(100% + 4px); right: 0; z-index: 10;
+    display: flex; flex-direction: column; gap: 4px; min-width: 160px;
+    background: var(--form-bg, #fff); border: 1px solid var(--form-border-color, #ddd);
+    border-radius: 6px; padding: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  }
+  .pl-import-menu .btn { white-space: nowrap; text-align: left; }
 </style>
 
 <div class="pl">
@@ -40,18 +48,23 @@
         <li><strong>Path on this server</strong> — a source directory containing
           <code>pyproject.toml</code>, e.g. <code>/opt/plugins/lute-storygen</code>.</li>
       </ul>
-      <p><strong>Upload</strong> — for remote hosts, pick one of the buttons below
-      instead of typing a path: <b>Folder…</b> uploads a whole source folder,
-      <b>Zip…</b> uploads a <code>.zip</code> archive of the plugin package.
-      The upload is installed on this server; no server-side path is needed.</p>
+      <p><strong>Import</strong> — for remote hosts, use the <b>Import…</b> button
+      instead of typing a path: it lets you pick a whole source folder or a
+      <code>.zip</code> archive of the plugin package. The selection is staged,
+      then installed when you press <b>Install</b>. No server-side path is needed.</p>
       <p>Reinstalling a plugin with the same name overwrites/updates it. The
       plugin takes effect after you restart Lute.</p>
     </div>
     <div class="pl-install-row">
       <input id="pl_spec" type="text" class="form-control"
              placeholder="lute3-storygen  or  /path/to/lute-storygen" />
-      <button id="pl_browse_btn" class="btn">Folder…</button>
-      <button id="pl_zip_btn" class="btn">Zip…</button>
+      <div class="pl-import">
+        <button id="pl_import_btn" class="btn" type="button">Import…</button>
+        <div id="pl_import_menu" class="pl-import-menu" hidden>
+          <button class="btn" type="button" data-pick="folder">Choose folder…</button>
+          <button class="btn" type="button" data-pick="zip">Choose zip…</button>
+        </div>
+      </div>
       <button id="pl_install_btn" class="btn btn-primary">Install</button>
     </div>
     <input type="file" id="pl_folder" webkitdirectory directory multiple
@@ -73,11 +86,13 @@
     var listEl = document.getElementById('pl_list');
     var specEl = document.getElementById('pl_spec');
     var btn = document.getElementById('pl_install_btn');
-    var browseBtn = document.getElementById('pl_browse_btn');
-    var zipBtn = document.getElementById('pl_zip_btn');
+    var importBtn = document.getElementById('pl_import_btn');
+    var importMenu = document.getElementById('pl_import_menu');
     var folderEl = document.getElementById('pl_folder');
     var zipEl = document.getElementById('pl_zip');
     var msgEl = document.getElementById('pl_install_msg');
+    // A folder/zip selection is staged here, then installed on Install.
+    var staged = null;
 
     function stateTag(name, loaded) {
       return loaded
@@ -132,8 +147,15 @@
     }
 
     btn.addEventListener('click', function () {
+      // A picked folder/zip takes priority over a typed spec.
+      if (staged) {
+        var s = staged;
+        staged = null;
+        uploadFormData(s.fd, 'Installing ' + s.label + '…');
+        return;
+      }
       var spec = specEl.value.trim();
-      if (!spec) { showMsg(false, 'Please enter a pip spec.'); return; }
+      if (!spec) { showMsg(false, 'Please enter a pip spec or pick a plugin to import.'); return; }
       btn.disabled = true;
       showMsg(true, 'Installing <code>' + spec + '</code>…');
       fetch('/_feature/install', {
@@ -175,10 +197,24 @@
         });
     }
 
+    // One Import… button opens a small menu for picking a folder or a zip.
+    // Either choice only stages the selection; Install does the install.
+    importBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      importMenu.hidden = !importMenu.hidden;
+    });
+    document.addEventListener('click', function () { importMenu.hidden = true; });
+    importMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+    importMenu.querySelectorAll('[data-pick]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        importMenu.hidden = true;
+        (b.getAttribute('data-pick') === 'folder' ? folderEl : zipEl).click();
+      });
+    });
+
     // Folder picker: upload the chosen folder to the server, which then
     // pip-installs it. This works even when Lute runs on a remote host —
     // the browser never needs a server-visible path.
-    browseBtn.addEventListener('click', function () { folderEl.click(); });
     folderEl.addEventListener('change', function () {
       if (!folderEl.files || !folderEl.files.length) return;
       var files = Array.prototype.slice.call(folderEl.files);
@@ -191,18 +227,20 @@
         fd.append('files', f, rel);
       });
       if (!fd.has('files')) { showMsg(false, 'No files selected.'); return; }
-      uploadFormData(fd, 'Uploading folder (' + files.length + ' files)…');
+      var name = (files[0].webkitRelativePath || files[0].name || 'folder').split('/')[0] || 'folder';
+      staged = { fd: fd, label: 'folder "' + name + '" (' + files.length + ' files)' };
+      showMsg(true, 'Ready to install: ' + staged.label + '. Click Install.');
       folderEl.value = '';
     });
 
     // Zip picker: upload a single .zip archive of the plugin package.
-    zipBtn.addEventListener('click', function () { zipEl.click(); });
     zipEl.addEventListener('change', function () {
       if (!zipEl.files || !zipEl.files.length) return;
       var f = zipEl.files[0];
       var fd = new FormData();
       fd.append('files', f, f.name);
-      uploadFormData(fd, 'Uploading archive ' + f.name + '…');
+      staged = { fd: fd, label: 'archive ' + f.name };
+      showMsg(true, 'Ready to install: ' + staged.label + '. Click Install.');
       zipEl.value = '';
     });
 
