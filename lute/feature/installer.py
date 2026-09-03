@@ -71,22 +71,54 @@ def installed_feature_names():
     return sorted(ep.name for ep in _iter_feature_entry_points())
 
 
+def _normalize_spec(spec):
+    """
+    Tolerate the ways a user might paste a local plugin location:
+
+    * file:///path/to/plugin        → /path/to/plugin
+    * file:///path/to/pyproject.toml → /path/to           (pip needs the dir)
+    * /path/to/pyproject.toml       → /path/to
+    * /path/to/setup.py             → /path/to
+    * /path/to/plugin               → unchanged (dir or built artifact)
+    * lute3-storygen                → unchanged (PyPI name)
+    """
+    spec = (spec or "").strip()
+    if not spec:
+        return spec
+    if spec.startswith("file://"):
+        spec = spec[len("file://"):]
+    # strip trailing slashes
+    spec = spec.rstrip("/")
+    base = os.path.basename(spec)
+    if base in ("pyproject.toml", "setup.py", "setup.cfg"):
+        spec = os.path.dirname(spec) or spec
+    return spec
+
+
 def install_feature_plugin(spec):
     """
     Install a feature plugin from a pip ``spec``.
 
-    ``spec`` may be a PyPI package name (e.g. 'lute3-storygen') or a
-    local source-checkout path.
+    ``spec`` may be a PyPI package name (e.g. 'lute3-storygen'), a local
+    source directory path, a file:// URL, or a pip URL.
 
     Returns (ok, message).
     """
-    spec = (spec or "").strip()
+    spec = _normalize_spec(spec)
     if not spec:
         return False, "请输入 pip 包名或本地插件路径"
 
+    # If the spec is a local path that exists, hand pip the directory
+    # (pip installs from source dirs directly).
+    pip_arg = spec
+    if not spec.startswith(("http://", "https://", "git+")):
+        candidate = os.path.abspath(os.path.expanduser(spec))
+        if os.path.isdir(candidate):
+            pip_arg = candidate
+
     try:
         proc = subprocess.run(
-            [sys.executable, "-m", "pip", "install", spec, "--quiet"],
+            [sys.executable, "-m", "pip", "install", pip_arg, "--quiet"],
             capture_output=True,
             text=True,
             timeout=PIP_TIMEOUT_SECONDS,
@@ -103,7 +135,7 @@ def install_feature_plugin(spec):
     # The installed plugin is now importable, but won't be wired into the
     # running app until the user restarts Lute (entry points are scanned
     # once at startup).
-    return True, f"安装成功：" + spec
+    return True, f"安装成功：" + pip_arg
 
 
 def uninstall_feature_plugin(name):
