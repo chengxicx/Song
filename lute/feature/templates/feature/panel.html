@@ -29,15 +29,19 @@
     <h2>Install a plugin</h2>
     <div class="pl-muted">
       Enter a pip spec — a PyPI package (e.g. <code>lute3-storygen</code>), a local
-      source directory path, or a pip URL — then press Install. Reinstalling a
-      plugin with the same name overwrites/updates it. The plugin takes effect
-      after you restart Lute.
+      source directory path (a folder containing <code>pyproject.toml</code>), or a
+      pip URL — then press Install. Reinstalling a plugin with the same name
+      overwrites/updates it. The plugin takes effect after you restart Lute.
+      You can also pick a local folder with <b>Browse…</b>.
     </div>
     <div class="pl-install-row">
       <input id="pl_spec" type="text" class="form-control"
              placeholder="lute3-storygen  or  /path/to/lute-storygen" />
+      <button id="pl_browse_btn" class="btn">Browse…</button>
       <button id="pl_install_btn" class="btn btn-primary">Install</button>
     </div>
+    <input type="file" id="pl_folder" webkitdirectory directory multiple
+           style="display:none;" />
     <div id="pl_install_msg" class="pl-msg" style="display:none;"></div>
   </div>
 
@@ -53,6 +57,8 @@
     var listEl = document.getElementById('pl_list');
     var specEl = document.getElementById('pl_spec');
     var btn = document.getElementById('pl_install_btn');
+    var browseBtn = document.getElementById('pl_browse_btn');
+    var folderEl = document.getElementById('pl_folder');
     var msgEl = document.getElementById('pl_install_msg');
 
     function stateTag(name, loaded) {
@@ -126,6 +132,30 @@
         refresh();
       }).catch(function (e) { showMsg(false, 'Request failed: ' + e); });
     }
+
+    // Folder picker: browsers won't hand us an absolute path, so once the
+    // user picks a folder we send its name to the server, which searches
+    // common locations for the matching directory and fills the input.
+    browseBtn.addEventListener('click', function () { folderEl.click(); });
+    folderEl.addEventListener('change', function () {
+      if (!folderEl.files || !folderEl.files.length) return;
+      var name = folderEl.files[0].webkitRelativePath.split('/')[0];
+      showMsg(true, 'Locating folder "' + name + '"…');
+      fetch('/_feature/locate?name=' + encodeURIComponent(name))
+        .then(function (r) { return r.json(); }).then(function (d) {
+          if (d.ok && d.path) {
+            specEl.value = d.path;
+            showMsg(true, 'Found: ' + d.path);
+          } else {
+            specEl.value = name;
+            showMsg(false, 'Could not auto-locate "' + name +
+              '". Please enter the full path manually.');
+          }
+        }).catch(function () {
+          specEl.value = name;
+          showMsg(false, 'Could not auto-locate the folder. Please enter the full path manually.');
+        });
+    });
 
     refresh();
   })();
