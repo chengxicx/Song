@@ -65,7 +65,7 @@ def panel():
     """Render the standalone Plugin management page (Setting > Plugin)."""
     registry = get_registry()
     tiles = registry.sorted_settings_tiles()
-    packages = installer.installed_feature_packages()
+    packages = installer.installed_plugin_packages()
     return render_template(
         "feature/panel.html",
         tiles=tiles,
@@ -76,12 +76,16 @@ def panel():
 
 @bp.get("/installed")
 def installed_json():
-    """JSON list of discovered feature entry points, status, and packages."""
+    """JSON list of discovered plugin entry points, status, and packages."""
     registry = get_registry()
+    pkgs = installer.installed_plugin_packages()
     return jsonify(
         {
-            "installed": installer.installed_feature_names(),
-            "packages": installer.installed_feature_packages(),
+            "installed": installer.installed_plugin_names(),
+            "packages": {
+                name: info.get("package") for name, info in pkgs.items()
+            },
+            "types": {name: info.get("type") for name, info in pkgs.items()},
             "loaded": registry.loaded_plugins,
         }
     )
@@ -89,9 +93,11 @@ def installed_json():
 
 @bp.post("/install")
 def install():
-    """Install or update a feature plugin from a pip spec.
+    """Install or update a plugin from a pip spec.
 
-    Reinstalling a plugin with the same name overwrites/updates it.
+    Parser plugins (lute3-cantonese, lute3-thai, ...) are detected by name
+    and installed through the parser installer; anything else is treated as
+    a feature plugin.  Reinstalling with the same name overwrites/updates.
     """
     spec = (request.form.get("spec") or "").strip()
     if not spec:
@@ -101,13 +107,13 @@ def install():
             ),
             400,
         )
-    ok, message = installer.install_feature_plugin(spec)
+    ok, message = installer.install_plugin(spec)
     return jsonify({"ok": ok, "message": message})
 
 
 @bp.post("/uninstall")
 def uninstall():
-    """Uninstall a feature plugin by its entry-point name."""
+    """Uninstall a plugin by its entry-point name."""
     name = (request.form.get("name") or "").strip()
     if not name:
         return jsonify({"ok": False, "message": "Missing plugin name."}), 400
@@ -121,19 +127,20 @@ def uninstall():
             ),
             400,
         )
-    ok, message = installer.uninstall_feature_plugin(name)
+    kind = (request.form.get("kind") or "feature").strip()
+    ok, message = installer.uninstall_plugin(name, kind=kind)
     return jsonify({"ok": ok, "message": message})
 
 
 @bp.post("/upload_install")
 def upload_install():
-    """Install a feature plugin by uploading its source folder.
+    """Install a plugin by uploading its source.
 
-    The browser sends every file of the chosen folder as multipart data;
-    each file's name is its ``webkitRelativePath``. We write them to a
-    temp dir on the server (guarding against path traversal) and then pip
-    install that dir. This is how a local plugin folder gets onto a remote
-    Lute host.
+    Accepts either a whole source folder (browser sends every file, each
+    named by its ``webkitRelativePath``) or a single ``.zip`` archive of
+    the plugin package.  Files are written to a temp dir on the server
+    (guarding against path traversal / zip-slip) and then installed from
+    there.  This is how a local plugin folder gets onto a remote Lute host.
     """
     files = request.files.getlist("files")
     if not files:
@@ -142,9 +149,11 @@ def upload_install():
     import os
     import shutil
     import tempfile
+    import zipfile
 
     tmp = tempfile.mkdtemp(prefix="lute_plugin_")
     try:
+        saved_zip = None
         for f in files:
             rel = (f.filename or "").replace("\\", "/").lstrip("/")
             if not rel or rel.startswith("..") or "/.." in rel or ".." == rel:
@@ -154,11 +163,41 @@ def upload_install():
                 continue
             os.makedirs(os.path.dirname(dest), exist_ok=True)
             f.save(dest)
+            if rel.lower().endswith(".zip"):
+                saved_zip = dest
+
+        if saved_zip:
+            extract_dir = os.path.join(tmp, "_unpacked")
+            os.makedirs(extract_dir, exist_ok=True)
+            try:
+                with zipfile.ZipFile(saved_zip) as zf:
+                    for member in zf.namelist():
+                        # Zip-slip guard.
+                        norm = os.path.normpath(member)
+                        if norm.startswith(("..", "/")):
+                            continue
+                        target = os.path.join(extract_dir, norm)
+                        if not os.path.realpath(target).startswith(
+                            os.path.realpath(extract_dir)
+                        ):
+                            continue
+                        if member.endswith("/"):
+                            os.makedirs(target, exist_ok=True)
+                            continue
+                        os.makedirs(os.path.dirname(target), exist_ok=True)
+                        with zf.open(member) as src, open(target, "wb") as out:
+                            shutil.copyfileobj(src, out)
+            except zipfile.BadZipFile:
+                return (
+                    jsonify({"ok": False, "message": "Uploaded file is not a valid .zip."}),
+                    400,
+                )
 
         # The browser uploads the folder contents under its top-level name
         # (e.g. lute-storygen/pyproject.toml), so locate the actual package
         # root before installing.
-        pkg_root = _find_package_root(tmp)
+        search_dir = os.path.join(tmp, "_unpacked") if saved_zip else tmp
+        pkg_root = _find_package_root(search_dir)
         if pkg_root is None:
             return jsonify(
                 {
@@ -168,7 +207,7 @@ def upload_install():
                     ),
                 }
             )
-        ok, message = installer.install_feature_plugin(pkg_root)
+        ok, message = installer.install_plugin(pkg_root)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
