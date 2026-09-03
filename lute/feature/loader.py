@@ -21,8 +21,8 @@ from .registry import get_registry
 _log = logging.getLogger(__name__)
 
 
-def _iter_feature_entry_points():
-    """Yield entry points in the 'lute.plugin.feature' group.
+def _iter_entry_points(group):
+    """Yield entry points in the given group.
 
     Compatible with Python 3.8+ (entry_points API differences).
     """
@@ -31,13 +31,13 @@ def _iter_feature_entry_points():
 
     if vmaj == 3 and vmin in (8, 9, 10, 11):
         eps = entry_points()
-        custom_eps = eps.get("lute.plugin.feature") or []
+        custom_eps = eps.get(group) or []
     elif (vmaj == 3 and vmin >= 12) or (vmaj >= 4):
         eps = entry_points()
-        custom_eps = list(eps.select(group="lute.plugin.feature"))
+        custom_eps = list(eps.select(group=group))
     else:
         _log.warning(
-            "Unable to load feature plugins for python %s.%s; "
+            "Unable to load plugins for python %s.%s; "
             "please upgrade to 3.8+",
             vmaj,
             vmin,
@@ -45,6 +45,11 @@ def _iter_feature_entry_points():
         return []
 
     return list(custom_eps)
+
+
+def _iter_feature_entry_points():
+    """Yield entry points in the 'lute.plugin.feature' group."""
+    return _iter_entry_points("lute.plugin.feature")
 
 
 def load_feature_plugins(app):
