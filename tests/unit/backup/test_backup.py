@@ -21,15 +21,16 @@ utc = timezone.utc
 
 
 @pytest.fixture(name="bkp_dir")
-def fixture_backup_directory(testconfig):
+def fixture_backup_directory(testconfig, tmp_path):
     "Create clean backup dir."
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-    backup_dir = os.path.join(base_dir, "zz_bkp")
-    if not os.path.exists(backup_dir):
-        os.mkdir(backup_dir)
+    # Use a tmp_path-based dir: cleanup must stay under the system temp
+    # directory, as sandboxed environments may block os.remove() on
+    # project files (e.g. WorkBuddy's safe-delete shim), which would
+    # cascade session-poisoning failures across the whole test run.
+    backup_dir = os.path.join(str(tmp_path), "bkp")
+    os.mkdir(backup_dir)
 
     # Cleanup prior to test.
-    cleanup_directory(backup_dir)
     cleanup_directory(testconfig.userimagespath)
 
     yield backup_dir
