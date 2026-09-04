@@ -462,6 +462,20 @@ def _create_app(app_config, extra_config):
         _BackupServiceClass._engine_needs_reset = False
         try:
             db.session.remove()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        # Run any pending schema migrations on the restored database.
+        # A backup restored from an older schema (e.g. made by upstream
+        # Lute) may be missing Song-specific columns (LgKiwi*, manga/
+        # pdf/srt book fields, etc.).  setup_db no-ops quickly if the
+        # schema is already current.
+        try:
+            setup_db(current_app.env_config)
+        except Exception:  # pylint: disable=broad-exception-caught
+            current_app.logger.error(
+                "Running migrations after restore failed.", exc_info=True
+            )
+        try:
             db.engine.dispose()
         except Exception:  # pylint: disable=broad-exception-caught
             pass
