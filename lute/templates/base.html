@@ -45,34 +45,36 @@
   </script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
     
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/jquery/jquery-ui.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tagify/tagify.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tagify/tagify_overrides.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/datatables/datatables.min.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}?v={{ asset_cache_bust }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/player-styles.css') }}?v={{ asset_cache_bust }}" />
+  {# vstatic() = url_for('static', ...) + ?v=<content hash>, so these
+     immutable-cached assets are re-fetched exactly when they change. #}
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/jquery/jquery-ui.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/tagify/tagify.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/tagify/tagify_overrides.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/datatables/datatables.min.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('css/player-styles.css') }}" />
 
   <link rel="stylesheet" type="text/css" href="/theme/current?v={{ current_theme }}">
   <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ current_theme }}">
 
   {% block preloadassets %}{% endblock %}
 
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery-ui.min.js') }}"  charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.jeditable.mini.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/tagify/tagify.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/tagify/tagify.polyfills.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/datatables/datatables.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/datatables/datatables.button.download.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.hoverIntent.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery-ui.min.js') }}"  charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.jeditable.mini.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.polyfills.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/datatables/datatables.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/datatables/datatables.button.download.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.hoverIntent.js') }}" charset="utf-8"></script>
 
   <!-- HTMX + Alpine.js: progressive enhancement for partial-page interactions
        and reactive UI state. Loaded before the custom scripts so they can use
        htmx.* / Alpine. They coexist with jQuery (used by DataTables, tooltips,
        jPlayer, etc.). -->
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/htmx/htmx.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/alpine/alpine.min.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/htmx/htmx.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/alpine/alpine.min.js') }}" defer charset="utf-8"></script>
 
   <!-- Versioned JS files: cache busting via ?v={{ lute_version }} -->
   <script type="text/javascript" src="/static/js/never_cache/lute-hotkey-utils.js?v={{ lute_version }}" charset="utf-8"></script>
