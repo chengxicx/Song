@@ -19,6 +19,7 @@ from flask import (
     make_response,
     send_from_directory,
     jsonify,
+    url_for,
 )
 from sqlalchemy.event import listens_for
 from sqlalchemy.pool import Pool
@@ -32,6 +33,7 @@ from lute.backup.service import Service as BackupService
 from lute.db.demo import Service as DemoService
 import lute
 import lute.utils.formutils
+from lute.utils import static_assets
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
 from lute.feature.routes import bp as feature_bp
@@ -356,6 +358,14 @@ def _create_app(app_config, extra_config):
     # Force template auto-reload so that template changes are picked up
     # without needing to restart the server (especially in prod env).
     app.jinja_env.auto_reload = True
+
+    # vstatic(): url_for('static', ...) plus a content-hash ?v= param, so
+    # vendored assets (served immutable for a year) are re-fetched exactly
+    # when their content changes.  ref lute/utils/static_assets.py
+    app.jinja_env.globals["vstatic"] = static_assets.make_vstatic(
+        app.static_folder,
+        lambda filename: url_for("static", filename=filename),
+    )
 
     db.init_app(app)
 

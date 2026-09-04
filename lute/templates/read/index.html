@@ -7,16 +7,16 @@
 {% if book_type in ("youtube", "mp3", "video") %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260830a" charset="utf-8" defer></script>
 {% elif book_type == "bilibili" %}
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/dash.all.min.js') }}?v=20260816" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('vendor/dash.all.min.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/bilibili-player.js') }}?v=20260902a" charset="utf-8" defer></script>
 {% elif book_type == "pdf" %}
 {# Vendored pdf.js (Mozilla, Apache 2.0).  The inline module exposes
    window.pdfjsLib with a shared module worker and fires "pdfjs-ready";
    the deferred pdf-reader.js below runs after it, in document order. #}
 <script type="module">
-  import * as pdfjsLib from "{{ url_for('static', filename='js/vendor/pdfjs/pdf.module.js') }}?v=20260829";
+  import * as pdfjsLib from "{{ vstatic('js/vendor/pdfjs/pdf.module.js') }}";
   pdfjsLib.GlobalWorkerOptions.workerPort = new Worker(
-    "{{ url_for('static', filename='js/vendor/pdfjs/pdf.worker.module.js') }}?v=20260829",
+    "{{ vstatic('js/vendor/pdfjs/pdf.worker.module.js') }}",
     { type: "module" }
   );
   window.pdfjsLib = pdfjsLib;
