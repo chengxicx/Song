@@ -3978,3 +3978,12 @@ a.series-continue-btn:hover {
         min-width: 90px;
     }
 }
+
+/* On touch-primary (mobile/tablet) devices, hide the prev/next arrows;
+   page turning is done via left/right swipe gestures instead. */
+@media (hover: none) and (pointer: coarse) {
+    #navPrev,
+    #navNext {
+        display: none;
+    }
+}
