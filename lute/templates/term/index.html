@@ -62,7 +62,7 @@
         <select id="filtBook">
           <option value="0">(all)</option>
           {% for b in book_options %}
-          <option value="{{ b[0] }}">{{ b[1] }}</option>
+          <option value="{{ b[0] }}" data-lang="{{ b[2] }}">{{ b[1] }}</option>
           {% endfor %}
         </select>
       </td>
@@ -73,7 +73,7 @@
         <select id="filtBookSet">
           <option value="">(all)</option>
           {% for s in bookset_options %}
-          <option value="{{ s[0] }}">{{ s[1] }}</option>
+          <option value="{{ s[0] }}" data-langs="{{ s[2]|join(',') }}">{{ s[1] }}</option>
           {% endfor %}
         </select>
       </td>
@@ -679,6 +679,52 @@
     fetch_book_termids_and_draw();
   };
 
+  /**
+   * Restrict the Book / Book set dropdown options to those belonging to
+   * the currently selected language.  A language of 0 shows all.
+   */
+  let apply_book_language_filter = function() {
+    const lang = parseInt($('#filtLanguage').val() || '0');
+
+    $('#filtBook option').each(function() {
+      const opt = $(this);
+      const optLang = parseInt(opt.attr('data-lang') || '0');
+      opt.css('display', (lang === 0 || optLang === lang) ? '' : 'none');
+    });
+
+    $('#filtBookSet option').each(function() {
+      const opt = $(this);
+      const langs = (opt.attr('data-langs') || '')
+        .split(',').map(x => parseInt(x)).filter(x => !isNaN(x));
+      opt.css('display', (lang === 0 || langs.includes(lang)) ? '' : 'none');
+    });
+
+    // If the current selection no longer matches the language, clear it
+    // so the active filter stays consistent with the visible options.
+    const bookVal = $('#filtBook').val();
+    if (bookVal !== '0' &&
+        !$('#filtBook option').filter(function() {
+          return $(this).val() === bookVal && $(this).css('display') !== 'none';
+        }).length) {
+      $('#filtBook').val(0);
+      fetch_book_termids_and_draw();
+      return;
+    }
+    const setVal = $('#filtBookSet').val();
+    if (setVal !== '' &&
+        !$('#filtBookSet option').filter(function() {
+          return $(this).val() === setVal && $(this).css('display') !== 'none';
+        }).length) {
+      $('#filtBookSet').val('');
+      fetch_book_termids_and_draw();
+    }
+  };
+
+  let handle_language_filter_change = function() {
+    apply_book_language_filter();
+    handle_filter_update();
+  };
+
   let handle_filter_update = function() {
     update_filter_storage();
     $('#termtable').DataTable().draw();
@@ -762,7 +808,7 @@
   $(document).ready(function () {
     // Handlers.
     $('#showHideFilters').click(handle_show_hide_filter_click);
-    $('#filtLanguage').change(handle_filter_update);
+    $('#filtLanguage').change(handle_language_filter_change);
     $('#filtParentsOnly').change(handle_filter_update);
     $('#filtAgeMin').keyup(handle_filter_update);
     $('#filtAgeMax').keyup(handle_filter_update);
@@ -794,6 +840,9 @@
     }
 
     load_filters_from_storage();
+
+    // Restrict Book / Book set options to the restored language.
+    apply_book_language_filter();
 
     // Setting up the datatable now, so the filters are
     // taken into account.
