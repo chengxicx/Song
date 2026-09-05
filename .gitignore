@@ -168,3 +168,7 @@ lute.db
 lute.log
 lute_run.log
 lute_data/
+
+# Local tool / agent working dirs (not part of source)
+.workbuddy/
+.zcode/
