@@ -235,13 +235,12 @@ def get_heatmap_data(session, lang_id):
 
 
 def get_term_languages(session):
-    "Active languages that have at least one term, for the selector."
+    "Active languages for the stats selector, with term counts."
     sql = (
-        "select l.LgID, l.LgName, l.LgParserType, count(w.WoID) as cnt "
+        "select l.LgID, l.LgName, l.LgParserType, "
+        "(select count(w.WoID) from words w where w.WoLgID = l.LgID) as cnt "
         "from languages l "
-        "inner join words w on w.WoLgID = l.LgID "
         "where l.LgIsActive = 1 "
-        "group by l.LgID, l.LgName, l.LgParserType "
         "order by l.LgName"
     )
     rows = session.execute(text(sql)).all()
@@ -260,7 +259,7 @@ def get_term_languages(session):
             "is_french": str(r[1] or "").strip().lower() == "french",
             "is_arabic": str(r[1] or "").strip().lower() == "arabic",
             "is_chinese": str(r[1] or "").strip().lower()
-            in ("chinese", "mandarin chinese"),
+            in ("chinese", "mandarin chinese", "mandarin"),
         }
         for r in rows
     ]
@@ -731,9 +730,16 @@ def _thai_headwords(word):
 def get_thai_words(session, lang_id, level, word_filter):
     "All words for a Thai frequency bucket and filter."
     from lute.stats.thai_data import level_words, thai_level
+
     return _level_words(
-        session, lang_id, level, word_filter,
-        _norm_th, thai_level, level_words, _thai_headwords,
+        session,
+        lang_id,
+        level,
+        word_filter,
+        _norm_th,
+        thai_level,
+        level_words,
+        _thai_headwords,
     )
 
 
@@ -741,9 +747,11 @@ def get_thai_words(session, lang_id, level, word_filter):
 # French CEFR report (hyunahparc/bienvenue-au-croissant).
 # ---------------------------------------------------------------------------
 
+
 def get_french_data(session, lang_id):
     "French CEFR (A1-C2) progress for the given French language."
     from lute.stats.french_data import LEVELS, french_level, level_totals
+
     return _level_progress(session, lang_id, LEVELS, french_level, level_totals())
 
 
@@ -755,15 +763,23 @@ def _norm_fr(word):
 def _french_headwords(word):
     "French headwords a stored term expands to (for 'not seen')."
     from lute.stats.french_data import base_forms_for
+
     return base_forms_for(word)
 
 
 def get_french_words(session, lang_id, level, word_filter):
     "All words for a French CEFR level and filter."
     from lute.stats.french_data import level_words, french_level
+
     return _level_words(
-        session, lang_id, level, word_filter,
-        _norm_fr, french_level, level_words, _french_headwords,
+        session,
+        lang_id,
+        level,
+        word_filter,
+        _norm_fr,
+        french_level,
+        level_words,
+        _french_headwords,
     )
 
 
@@ -771,60 +787,105 @@ def get_french_words(session, lang_id, level, word_filter):
 # Arabic CEFR report (kotoshu/frequency-list-kelly).
 # ---------------------------------------------------------------------------
 
+
 def get_arabic_data(session, lang_id):
     "Arabic CEFR (A1-C2) progress for the given Arabic language."
     from lute.stats.arabic_data import LEVELS, arabic_level, level_totals
+
     return _level_progress(session, lang_id, LEVELS, arabic_level, level_totals())
 
 
 def _norm_ar(word):
     "Normalize an Arabic term for matching (strip diacritics, alef variants)."
     from lute.stats.arabic_data import normalize
+
     return normalize(word)
 
 
 def _arabic_headwords(word):
     "Arabic headwords a stored term expands to (for 'not seen')."
     from lute.stats.arabic_data import base_forms_for
+
     return base_forms_for(word)
 
 
 def get_arabic_words(session, lang_id, level, word_filter):
     "All words for an Arabic CEFR level and filter."
     from lute.stats.arabic_data import level_words, arabic_level
+
     return _level_words(
-        session, lang_id, level, word_filter,
-        _norm_ar, arabic_level, level_words, _arabic_headwords,
+        session,
+        lang_id,
+        level,
+        word_filter,
+        _norm_ar,
+        arabic_level,
+        level_words,
+        _arabic_headwords,
     )
 
 
 # ---------------------------------------------------------------------------
-# HSK (Mandarin Chinese) report (tomcumming/hsk-word-list).
+# HSK (Mandarin Chinese) reports: 2.0 (levels 1-6) and 3.0 (levels 1-9,
+# shown as 1-7 with 7 = the 7-9 band).
 # ---------------------------------------------------------------------------
 
-def get_hsk_data(session, lang_id):
-    "HSK (1-6) progress for the given Mandarin Chinese language."
-    from lute.stats.hsk_data import LEVELS, hsk_level, level_totals
-    return _level_progress(session, lang_id, LEVELS, hsk_level, level_totals())
+
+def get_hsk2_data(session, lang_id):
+    "HSK 2.0 (1-6) progress for the given Mandarin Chinese language."
+    from lute.stats import hsk_data
+
+    return _level_progress(
+        session,
+        lang_id,
+        hsk_data.LEVELS2,
+        hsk_data.hsk2_level,
+        hsk_data.level_totals("2"),
+    )
 
 
-def _norm_hsk(word):
-    "Normalize a Mandarin term for matching (strip whitespace only)."
-    return (word or "").strip()
+def get_hsk2_words(session, lang_id, level, word_filter):
+    "All words for an HSK 2.0 level and filter."
+    from lute.stats import hsk_data
 
-
-def _hsk_headwords(word):
-    "HSK headwords a stored term expands to (itself, if present)."
-    from lute.stats.hsk_data import base_forms_for
-    return base_forms_for(word)
-
-
-def get_hsk_words(session, lang_id, level, word_filter):
-    "All words for an HSK level and filter."
-    from lute.stats.hsk_data import level_words, hsk_level
     return _level_words(
-        session, lang_id, level, word_filter,
-        _norm_hsk, hsk_level, level_words, _hsk_headwords,
+        session,
+        lang_id,
+        level,
+        word_filter,
+        hsk_data.normalize,
+        hsk_data.hsk2_level,
+        lambda lv: hsk_data.level_words("2", lv),
+        hsk_data.hsk2_headwords,
+    )
+
+
+def get_hsk3_data(session, lang_id):
+    "HSK 3.0 (1-7, 7 = 7-9) progress for the given Mandarin Chinese language."
+    from lute.stats import hsk_data
+
+    return _level_progress(
+        session,
+        lang_id,
+        hsk_data.LEVELS3,
+        hsk_data.hsk3_level,
+        hsk_data.level_totals("3"),
+    )
+
+
+def get_hsk3_words(session, lang_id, level, word_filter):
+    "All words for an HSK 3.0 level and filter."
+    from lute.stats import hsk_data
+
+    return _level_words(
+        session,
+        lang_id,
+        level,
+        word_filter,
+        hsk_data.normalize,
+        hsk_data.hsk3_level,
+        lambda lv: hsk_data.level_words("3", lv),
+        hsk_data.hsk3_headwords,
     )
 
 

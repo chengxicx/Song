@@ -38,8 +38,10 @@ from lute.stats.service import get_french_data as _get_french_data
 from lute.stats.service import get_french_words as _get_french_words
 from lute.stats.service import get_arabic_data as _get_arabic_data
 from lute.stats.service import get_arabic_words as _get_arabic_words
-from lute.stats.service import get_hsk_data as _get_hsk_data
-from lute.stats.service import get_hsk_words as _get_hsk_words
+from lute.stats.service import get_hsk2_data as _get_hsk2_data
+from lute.stats.service import get_hsk2_words as _get_hsk2_words
+from lute.stats.service import get_hsk3_data as _get_hsk3_data
+from lute.stats.service import get_hsk3_words as _get_hsk3_words
 from lute.db import db
 import lute.utils.formutils
 
@@ -406,6 +408,7 @@ def thai_words():
 def thai_export():
     "CSV export of Thai words for a bucket+filter, or all buckets."
     from lute.stats.thai_data import LEVELS
+
     return _level_export_response(_get_thai_words, LEVELS, "Thai")
 
 
@@ -422,6 +425,7 @@ def french_data():
 def french_words():
     "Paged word list for one French CEFR level and filter."
     from lute.stats.french_data import LEVELS
+
     return _level_words_response(_get_french_words, LEVELS)
 
 
@@ -429,6 +433,7 @@ def french_words():
 def french_export():
     "CSV export of French words for a level+filter, or all levels."
     from lute.stats.french_data import LEVELS
+
     return _level_export_response(_get_french_words, LEVELS, "French")
 
 
@@ -445,6 +450,7 @@ def arabic_data():
 def arabic_words():
     "Paged word list for one Arabic CEFR level and filter."
     from lute.stats.arabic_data import LEVELS
+
     return _level_words_response(_get_arabic_words, LEVELS)
 
 
@@ -452,27 +458,55 @@ def arabic_words():
 def arabic_export():
     "CSV export of Arabic words for a level+filter, or all levels."
     from lute.stats.arabic_data import LEVELS
+
     return _level_export_response(_get_arabic_words, LEVELS, "Arabic")
 
 
-@bp.route("/hsk_data")
-def hsk_data():
-    "Ajax call for the HSK progress report for a Mandarin Chinese language."
+@bp.route("/hsk2_data")
+def hsk2_data():
+    "Ajax call for the HSK 2.0 progress report for a Mandarin language."
     lang_id = _request_lang_id()
     if lang_id is None:
         return jsonify({"error": "lang_id required"}), 400
-    return jsonify(_get_hsk_data(db.session, lang_id))
+    return jsonify(_get_hsk2_data(db.session, lang_id))
 
 
-@bp.route("/hsk_words")
-def hsk_words():
-    "Paged word list for one HSK level and filter."
-    from lute.stats.hsk_data import LEVELS
-    return _level_words_response(_get_hsk_words, LEVELS)
+@bp.route("/hsk2_words")
+def hsk2_words():
+    "Paged word list for one HSK 2.0 level and filter."
+    from lute.stats.hsk_data import LEVELS2
+
+    return _level_words_response(_get_hsk2_words, LEVELS2)
 
 
-@bp.route("/hsk_export")
-def hsk_export():
-    "CSV export of HSK words for a level+filter, or all levels."
-    from lute.stats.hsk_data import LEVELS
-    return _level_export_response(_get_hsk_words, LEVELS, "HSK")
+@bp.route("/hsk2_export")
+def hsk2_export():
+    "CSV export of HSK 2.0 words for a level+filter, or all levels."
+    from lute.stats.hsk_data import LEVELS2
+
+    return _level_export_response(_get_hsk2_words, LEVELS2, "HSK 2.0")
+
+
+@bp.route("/hsk3_data")
+def hsk3_data():
+    "Ajax call for the HSK 3.0 progress report for a Mandarin language."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return jsonify({"error": "lang_id required"}), 400
+    return jsonify(_get_hsk3_data(db.session, lang_id))
+
+
+@bp.route("/hsk3_words")
+def hsk3_words():
+    "Paged word list for one HSK 3.0 level and filter."
+    from lute.stats.hsk_data import LEVELS3
+
+    return _level_words_response(_get_hsk3_words, LEVELS3)
+
+
+@bp.route("/hsk3_export")
+def hsk3_export():
+    "CSV export of HSK 3.0 words for a level+filter, or all levels."
+    from lute.stats.hsk_data import LEVELS3
+
+    return _level_export_response(_get_hsk3_words, LEVELS3, "HSK 3.0")
