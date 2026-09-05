@@ -248,6 +248,46 @@
     }
   })
 
+  // Swipe left/right on the reading text to turn pages (mobile only),
+  // mirroring the (hidden on mobile) prev/next arrow buttons.
+  let _swipe_start_x = null;
+  let _swipe_start_y = null;
+  const _swipe_turn_threshold_px = 40;
+
+  let _handle_swipe_start = function(event) {
+    const t = event.touches[0];
+    if (!t) return;
+    _swipe_start_x = t.clientX;
+    _swipe_start_y = t.clientY;
+  };
+
+  let _handle_swipe_end = function(event) {
+    if (_swipe_start_x == null) return;
+    const t = event.changedTouches[0];
+    const dX = t.clientX - _swipe_start_x;
+    const dY = t.clientY - _swipe_start_y;
+    _swipe_start_x = null;
+    _swipe_start_y = null;
+
+    // Only turn pages on a decisive horizontal swipe; ignore
+    // vertical scrolls and small movements (e.g. taps).
+    if (Math.abs(dX) < _swipe_turn_threshold_px) return;
+    if (Math.abs(dX) <= Math.abs(dY) * 1.5) return;
+
+    if (dX < 0) {
+      goto_relative_page(1);   // swipe left -> next page
+    } else {
+      goto_relative_page(-1);  // swipe right -> previous page
+    }
+  };
+
+  // Mirror the CSS @media (hover: none) and (pointer: coarse) check:
+  // only enable swipe page-turning on touch-primary devices.
+  if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+    theText.addEventListener("touchstart", _handle_swipe_start, { passive: true });
+    theText.addEventListener("touchend", _handle_swipe_end, { passive: true });
+  }
+
   // Display the term form when a multi-word term is created on
   // mobile. This must be "pointerup", and not "click", because the
   // "touchend" event cancels the click event.
