@@ -7,6 +7,7 @@ from lute.db import db
 from lute.stats.service import (
     get_chart_data,
     get_table_data,
+    get_term_languages,
     get_reading_streak,
     get_jlpt_data,
     get_jlpt_words,
@@ -26,8 +27,10 @@ from lute.stats.service import (
     get_french_words,
     get_arabic_data,
     get_arabic_words,
-    get_hsk_data,
-    get_hsk_words,
+    get_hsk2_data,
+    get_hsk2_words,
+    get_hsk3_data,
+    get_hsk3_words,
 )
 from tests.utils import make_text
 
@@ -1041,15 +1044,16 @@ def test_arabic_words_and_export_endpoints(arabic, app_context, client):
     assert "C2," in body
 
 
-def test_get_hsk_data_counts_by_level(mandarin, app_context):
-    "Seen/mastered counts attributed to HSK levels."
+def test_get_hsk2_data_counts_by_level(mandarin, app_context):
+    "Seen/mastered counts attributed to HSK 2.0 levels."
+    # HSK 2.0 levels: 猫=1, 运动=2, 环境=3, 成熟=4.
     _save_jp_term(mandarin, "猫", 99)  # mastered (1)
     _save_jp_term(mandarin, "运动", 3)  # seen, not mastered (2)
     _save_jp_term(mandarin, "环境", 98)  # ignored -> not seen (3)
     _save_jp_term(mandarin, "成熟", 5)  # seen (4)
     _save_jp_term(mandarin, "不存在的词zzz", 99)  # not in list
 
-    data = get_hsk_data(db.session, mandarin.id)
+    data = get_hsk2_data(db.session, mandarin.id)
 
     lv = {l["level"]: l for l in data["levels"]}
     assert len(lv) == 6
@@ -1062,64 +1066,99 @@ def test_get_hsk_data_counts_by_level(mandarin, app_context):
     assert data["total_seen"] == 3
 
 
-def test_hsk_data_endpoint(mandarin, app_context, client):
-    "The /stats/hsk_data endpoint returns level data for a Mandarin language."
-    _save_jp_term(mandarin, "猫", 99)
+def test_get_hsk3_data_counts_and_7():
+    "HSK 3.0 reports levels 1-9 as 1-7 with 7 = the 7-9 band."
+    from lute.stats import hsk_data
 
-    resp = client.get(f"/stats/hsk_data?lang_id={mandarin.id}")
+    word_levels = hsk_data.level_totals("3")
+    assert list(word_levels.keys()) == ["1", "2", "3", "4", "5", "6", "7"]
+    assert word_levels["7"] > 0  # the 7-9 band has entries
+
+
+def test_get_hsk3_data_counts_by_level(mandarin, app_context):
+    "HSK 3.0 level attribution on stored terms."
+    # HSK 3.0 levels: 爱=1, 运动=2, 安全=3, 性格=4.
+    _save_jp_term(mandarin, "爱", 99)
+    _save_jp_term(mandarin, "运动", 3)
+    _save_jp_term(mandarin, "不存在的词zzz", 99)
+
+    data = get_hsk3_data(db.session, mandarin.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert len(lv) == 7
+    assert lv["1"]["mastered"] == 1
+    assert lv["1"]["seen"] == 1
+    assert lv["2"]["seen"] == 1
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 2
+
+
+def test_hsk_data_endpoint(mandarin, app_context, client):
+    "The hsk2_data/hsk3_data endpoints return level data for a Mandarin language."
+    _save_jp_term(mandarin, "猫", 99)
+    _save_jp_term(mandarin, "爱", 99)
+
+    resp = client.get(f"/stats/hsk2_data?lang_id={mandarin.id}")
     assert resp.status_code == 200
     data = resp.get_json()
     assert data["total"] > 0
     assert len(data["levels"]) == 6
     l1 = next(l for l in data["levels"] if l["level"] == "1")
-    assert l1["mastered"] == 1
+    assert l1["mastered"] == 2  # 猫 and 爱 are both HSK 2.0 level 1
 
-    resp = client.get("/stats/hsk_data")
+    resp = client.get(f"/stats/hsk3_data?lang_id={mandarin.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert len(data["levels"]) == 7
+    l1 = next(l for l in data["levels"] if l["level"] == "1")
+    assert l1["mastered"] == 1  # only 爱 is HSK 3.0 level 1 (猫 is level 2)
+
+    resp = client.get("/stats/hsk2_data")
     assert resp.status_code == 400
-    resp = client.get("/stats/hsk_data?lang_id=abc")
+    resp = client.get("/stats/hsk3_data?lang_id=abc")
     assert resp.status_code == 400
 
 
-def test_get_hsk_words_filters(mandarin, app_context):
-    "Drilldown respects the unmastered/mastered/notseen filters."
-    _save_jp_term(mandarin, "猫", 99)
+def test_get_hsk3_words_filters(mandarin, app_context):
+    "HSK 3.0 drilldown respects the unmastered/mastered/notseen filters."
+    _save_jp_term(mandarin, "爱", 99)
     _save_jp_term(mandarin, "运动", 3)
 
-    unmastered = get_hsk_words(db.session, mandarin.id, "1", "unmastered")
-    mastered = get_hsk_words(db.session, mandarin.id, "1", "mastered")
-    l2_unmastered = get_hsk_words(db.session, mandarin.id, "2", "unmastered")
-    notseen = get_hsk_words(db.session, mandarin.id, "1", "notseen")
+    mastered = get_hsk3_words(db.session, mandarin.id, "1", "mastered")
+    unmastered_l2 = get_hsk3_words(db.session, mandarin.id, "2", "unmastered")
+    notseen = get_hsk3_words(db.session, mandarin.id, "1", "notseen")
 
-    assert [w["word"] for w in unmastered] == []
-    assert [w["word"] for w in mastered] == ["猫"]
+    # HSK 3.0 level 1 contains 爱 (mastered) and many unseen words; 猫 is level 2.
+    assert {w["word"] for w in mastered} == {"爱"}
     assert mastered[0]["status_text"] == "Well Known"
-    assert [w["word"] for w in l2_unmastered] == ["运动"]
+    assert [w["word"] for w in unmastered_l2] == ["运动"]
 
-    notseen_words = [w["word"] for w in notseen]
-    assert "狗" in notseen_words  # in the HSK 1 list, never learned
-    assert "猫" not in notseen_words
+    notseen_words = {w["word"] for w in notseen}
+    assert "爱" not in notseen_words
     assert all(w["id"] is None for w in notseen)
 
 
 def test_hsk_words_and_export_endpoints(mandarin, app_context, client):
-    "The hsk_words and hsk_export endpoints behave like the JLPT ones."
+    "The hsk2_* and hsk3_* endpoint groups behave like the JLPT ones."
     _save_jp_term(mandarin, "猫", 99)
+    _save_jp_term(mandarin, "爱", 99)
     _save_jp_term(mandarin, "运动", 3)
 
+    # HSK 2.0
     resp = client.get(
-        f"/stats/hsk_words?lang_id={mandarin.id}&level=2&filter=unmastered&page=1"
+        f"/stats/hsk2_words?lang_id={mandarin.id}&level=2&filter=unmastered&page=1"
     )
     assert resp.status_code == 200
     data = resp.get_json()
     assert data["total"] >= 1
 
-    resp = client.get(f"/stats/hsk_words?lang_id={mandarin.id}&level=1&filter=bogus")
+    resp = client.get(f"/stats/hsk2_words?lang_id={mandarin.id}&level=1&filter=bogus")
     assert resp.status_code == 400
-    resp = client.get(f"/stats/hsk_words?lang_id={mandarin.id}&level=all")
+    resp = client.get(f"/stats/hsk2_words?lang_id={mandarin.id}&level=all")
     assert resp.status_code == 400
 
     resp = client.get(
-        f"/stats/hsk_export?lang_id={mandarin.id}&level=1&filter=mastered"
+        f"/stats/hsk2_export?lang_id={mandarin.id}&level=1&filter=mastered"
     )
     assert resp.status_code == 200
     assert resp.mimetype == "text/csv"
@@ -1127,8 +1166,53 @@ def test_hsk_words_and_export_endpoints(mandarin, app_context, client):
     assert lines[0] == "Level,Word,Reading,Meaning,Status"
     assert any("猫" in ln for ln in lines[1:])
 
-    resp = client.get(f"/stats/hsk_export?lang_id={mandarin.id}&level=all&filter=all")
+    resp = client.get(f"/stats/hsk2_export?lang_id={mandarin.id}&level=all&filter=all")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
     assert "1," in body
     assert "6," in body
+
+    # HSK 3.0
+    resp = client.get(
+        f"/stats/hsk3_words?lang_id={mandarin.id}&level=1&filter=mastered&page=1"
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] >= 1
+    words = {w["word"] for w in data["words"]}
+    assert "爱" in words
+
+    resp = client.get(f"/stats/hsk3_words?lang_id={mandarin.id}&level=2&filter=bogus")
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/hsk3_words?lang_id={mandarin.id}&level=9")
+    assert resp.status_code == 400  # level must be 1-7
+
+    resp = client.get(
+        f"/stats/hsk3_export?lang_id={mandarin.id}&level=1&filter=mastered"
+    )
+    assert resp.status_code == 200
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("爱" in ln for ln in lines[1:])
+
+    resp = client.get(f"/stats/hsk3_export?lang_id={mandarin.id}&level=all&filter=all")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "7," in body
+
+
+def test_get_term_languages_includes_zero_word_languages(
+    mandarin, classical_chinese, app_context
+):
+    "Every active language appears in the selector, even with no words yet."
+    langs = get_term_languages(db.session)
+    by_name = {l["name"].lower(): l for l in langs}
+
+    # Mandarin Chinese appears with count 0 and is flagged for HSK.
+    mand = by_name["mandarin chinese"]
+    assert mand["count"] == 0
+    assert mand["is_chinese"] is True
+
+    # Classical Chinese must NOT be treated as the modern HSK language.
+    cls = by_name["classical chinese"]
+    assert cls["is_chinese"] is False
