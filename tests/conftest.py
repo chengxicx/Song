@@ -145,6 +145,36 @@ def fixture_korean(app_context):
     return _get_test_language("Korean")
 
 
+@pytest.fixture(name="german")
+def fixture_german(app_context):
+    return _get_test_language("German")
+
+
+@pytest.fixture(name="thai")
+def fixture_thai(app_context):
+    return _get_test_language("Thai")
+
+
+@pytest.fixture(name="russian")
+def fixture_russian(app_context):
+    return _get_test_language("Russian")
+
+
+@pytest.fixture(name="french")
+def fixture_french(app_context):
+    return _get_test_language("French")
+
+
+@pytest.fixture(name="arabic")
+def fixture_arabic(app_context):
+    return _get_test_language("Arabic")
+
+
+@pytest.fixture(name="mandarin")
+def fixture_mandarin(app_context):
+    return _get_test_language("Mandarin Chinese")
+
+
 @pytest.fixture(name="turkish")
 def fixture_turkish(app_context):
     return _get_test_language("Turkish")
@@ -153,11 +183,6 @@ def fixture_turkish(app_context):
 @pytest.fixture(name="classical_chinese")
 def fixture_cl_chinese(app_context):
     return _get_test_language("Classical Chinese")
-
-
-@pytest.fixture(name="german")
-def fixture_german(app_context):
-    return _get_test_language("German")
 
 
 @pytest.fixture(name="hindi")

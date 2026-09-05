@@ -1,0 +1,4453 @@
+[
+  {
+    "word": "авторизовать",
+    "reading": "",
+    "meanings": [
+      "authorize"
+    ]
+  },
+  {
+    "word": "авторизоваться",
+    "reading": "",
+    "meanings": [
+      "authorize"
+    ]
+  },
+  {
+    "word": "анализировать",
+    "reading": "",
+    "meanings": [
+      "analyse"
+    ]
+  },
+  {
+    "word": "аплодировать",
+    "reading": "",
+    "meanings": [
+      "applaud",
+      "cheer"
+    ]
+  },
+  {
+    "word": "беспокоить",
+    "reading": "",
+    "meanings": [
+      "upset"
+    ]
+  },
+  {
+    "word": "беспокоиться",
+    "reading": "",
+    "meanings": [
+      "worry"
+    ]
+  },
+  {
+    "word": "блеснуть",
+    "reading": "",
+    "meanings": [
+      "shine",
+      "glitter"
+    ]
+  },
+  {
+    "word": "блестеть",
+    "reading": "",
+    "meanings": [
+      "shine",
+      "glitter"
+    ]
+  },
+  {
+    "word": "бодрствовать",
+    "reading": "",
+    "meanings": [
+      "be / stay awake",
+      "keep awake / vigil"
+    ]
+  },
+  {
+    "word": "бороть",
+    "reading": "",
+    "meanings": [
+      "to fight",
+      "to defeat"
+    ]
+  },
+  {
+    "word": "бороться",
+    "reading": "",
+    "meanings": [
+      "fight (with, against)"
+    ]
+  },
+  {
+    "word": "бояться",
+    "reading": "",
+    "meanings": [
+      "be afraid (of)",
+      "fear"
+    ]
+  },
+  {
+    "word": "бронировать",
+    "reading": "",
+    "meanings": [
+      "reserve",
+      "book"
+    ]
+  },
+  {
+    "word": "бывать",
+    "reading": "",
+    "meanings": [
+      "be",
+      "be present"
+    ]
+  },
+  {
+    "word": "вдохнуть",
+    "reading": "",
+    "meanings": [
+      "inhale",
+      "breathe in"
+    ]
+  },
+  {
+    "word": "вдыхать",
+    "reading": "",
+    "meanings": [
+      "inhale",
+      "breathe in"
+    ]
+  },
+  {
+    "word": "вертеть",
+    "reading": "",
+    "meanings": [
+      "turn (round and round)",
+      "twirl"
+    ]
+  },
+  {
+    "word": "вешать",
+    "reading": "",
+    "meanings": [
+      "hang (up)"
+    ]
+  },
+  {
+    "word": "взвесить",
+    "reading": "",
+    "meanings": [
+      "weigh",
+      "consider"
+    ]
+  },
+  {
+    "word": "взвешивать",
+    "reading": "",
+    "meanings": [
+      "weigh",
+      "consider"
+    ]
+  },
+  {
+    "word": "взволноваться",
+    "reading": "",
+    "meanings": [
+      "get excited",
+      "get worried"
+    ]
+  },
+  {
+    "word": "вздорожать",
+    "reading": "",
+    "meanings": [
+      "rise in price",
+      "go up (in price)"
+    ]
+  },
+  {
+    "word": "взлетать",
+    "reading": "",
+    "meanings": [
+      "fly up",
+      "soar"
+    ]
+  },
+  {
+    "word": "взлететь",
+    "reading": "",
+    "meanings": [
+      "fly up",
+      "soar"
+    ]
+  },
+  {
+    "word": "взорвать",
+    "reading": "",
+    "meanings": [
+      "blow up",
+      "detonate"
+    ]
+  },
+  {
+    "word": "взорваться",
+    "reading": "",
+    "meanings": [
+      "blow up",
+      "burst"
+    ]
+  },
+  {
+    "word": "взрослеть",
+    "reading": "",
+    "meanings": [
+      "become adult",
+      "mature"
+    ]
+  },
+  {
+    "word": "взрывать",
+    "reading": "",
+    "meanings": [
+      "blow up",
+      "detonate"
+    ]
+  },
+  {
+    "word": "взрываться",
+    "reading": "",
+    "meanings": [
+      "blow up",
+      "burst"
+    ]
+  },
+  {
+    "word": "влюбиться",
+    "reading": "",
+    "meanings": [
+      "fall in love (with)"
+    ]
+  },
+  {
+    "word": "влюбляться",
+    "reading": "",
+    "meanings": [
+      "fall in love (with)"
+    ]
+  },
+  {
+    "word": "внести",
+    "reading": "",
+    "meanings": [
+      "carry in",
+      "bring in"
+    ]
+  },
+  {
+    "word": "вносить",
+    "reading": "",
+    "meanings": [
+      "carry in",
+      "bring in"
+    ]
+  },
+  {
+    "word": "воевать",
+    "reading": "",
+    "meanings": [
+      "wage war (on, with)"
+    ]
+  },
+  {
+    "word": "возвратить",
+    "reading": "",
+    "meanings": [
+      "return",
+      "give back"
+    ]
+  },
+  {
+    "word": "возвратиться",
+    "reading": "",
+    "meanings": [
+      "return",
+      "make back"
+    ]
+  },
+  {
+    "word": "возвращать",
+    "reading": "",
+    "meanings": [
+      "return",
+      "give back"
+    ]
+  },
+  {
+    "word": "возвращаться",
+    "reading": "",
+    "meanings": [
+      "return",
+      "make back"
+    ]
+  },
+  {
+    "word": "возражать",
+    "reading": "",
+    "meanings": [
+      "object (to)",
+      "raise an objection (to)"
+    ]
+  },
+  {
+    "word": "возразить",
+    "reading": "",
+    "meanings": [
+      "object (to)",
+      "raise an objection (to)"
+    ]
+  },
+  {
+    "word": "волновать",
+    "reading": "",
+    "meanings": [
+      "agitate",
+      "trouble"
+    ]
+  },
+  {
+    "word": "волноваться",
+    "reading": "",
+    "meanings": [
+      "be agitated",
+      "be in agitation"
+    ]
+  },
+  {
+    "word": "воскликнуть",
+    "reading": "",
+    "meanings": [
+      "exclaim",
+      "cry"
+    ]
+  },
+  {
+    "word": "восклицать",
+    "reading": "",
+    "meanings": [
+      "exclaim",
+      "cry"
+    ]
+  },
+  {
+    "word": "воспалиться",
+    "reading": "",
+    "meanings": [
+      "become",
+      "get inflamed",
+      "be inflamed (with)"
+    ]
+  },
+  {
+    "word": "воспаляться",
+    "reading": "",
+    "meanings": [
+      "become",
+      "get inflamed",
+      "be inflamed (with)"
+    ]
+  },
+  {
+    "word": "вращать",
+    "reading": "",
+    "meanings": [
+      "turn, roll",
+      "rotate"
+    ]
+  },
+  {
+    "word": "вскипятить",
+    "reading": "",
+    "meanings": [
+      "boil"
+    ]
+  },
+  {
+    "word": "вспоминать",
+    "reading": "",
+    "meanings": [
+      "remember",
+      "recall"
+    ]
+  },
+  {
+    "word": "вспомнить",
+    "reading": "",
+    "meanings": [
+      "remember",
+      "recall"
+    ]
+  },
+  {
+    "word": "вспотеть",
+    "reading": "",
+    "meanings": [
+      "sweat",
+      "perspire"
+    ]
+  },
+  {
+    "word": "выбегать",
+    "reading": "",
+    "meanings": [
+      "run out"
+    ]
+  },
+  {
+    "word": "выбежать",
+    "reading": "",
+    "meanings": [
+      "run out"
+    ]
+  },
+  {
+    "word": "выглядеть",
+    "reading": "",
+    "meanings": [
+      "find",
+      "discover"
+    ]
+  },
+  {
+    "word": "выдавать",
+    "reading": "",
+    "meanings": [
+      "give (out)",
+      "pay (out)"
+    ]
+  },
+  {
+    "word": "выдать",
+    "reading": "",
+    "meanings": [
+      "give (out)",
+      "pay (out)"
+    ]
+  },
+  {
+    "word": "выделить",
+    "reading": "",
+    "meanings": [
+      "pick out",
+      "choose"
+    ]
+  },
+  {
+    "word": "выделять",
+    "reading": "",
+    "meanings": [
+      "pick out",
+      "choose"
+    ]
+  },
+  {
+    "word": "выдохнуть",
+    "reading": "",
+    "meanings": [
+      "breathe out"
+    ]
+  },
+  {
+    "word": "выдыхать",
+    "reading": "",
+    "meanings": [
+      "breathe out"
+    ]
+  },
+  {
+    "word": "выздоравливать",
+    "reading": "",
+    "meanings": [
+      "get better / well",
+      "recover"
+    ]
+  },
+  {
+    "word": "выздороветь",
+    "reading": "",
+    "meanings": [
+      "get better / well",
+      "recover"
+    ]
+  },
+  {
+    "word": "выиграть",
+    "reading": "",
+    "meanings": [
+      "win",
+      "gain"
+    ]
+  },
+  {
+    "word": "выигрывать",
+    "reading": "",
+    "meanings": [
+      "win",
+      "gain"
+    ]
+  },
+  {
+    "word": "выпадать",
+    "reading": "",
+    "meanings": [
+      "fall out",
+      "drop out"
+    ]
+  },
+  {
+    "word": "выпасть",
+    "reading": "",
+    "meanings": [
+      "fall out",
+      "drop out"
+    ]
+  },
+  {
+    "word": "выполнить",
+    "reading": "",
+    "meanings": [
+      "carry out",
+      "fulfil"
+    ]
+  },
+  {
+    "word": "выполняться",
+    "reading": "",
+    "meanings": [
+      "carry out",
+      "fulfil"
+    ]
+  },
+  {
+    "word": "выпрямиться",
+    "reading": "",
+    "meanings": [
+      "become straight",
+      "erect oneself"
+    ]
+  },
+  {
+    "word": "выпрямляться",
+    "reading": "",
+    "meanings": [
+      "become straight",
+      "erect oneself"
+    ]
+  },
+  {
+    "word": "выражать",
+    "reading": "",
+    "meanings": [
+      "express",
+      "show"
+    ]
+  },
+  {
+    "word": "выразить",
+    "reading": "",
+    "meanings": [
+      "express",
+      "show"
+    ]
+  },
+  {
+    "word": "выругаться",
+    "reading": "",
+    "meanings": [
+      "swear",
+      "curse"
+    ]
+  },
+  {
+    "word": "выступать",
+    "reading": "",
+    "meanings": [
+      "step forth / forward come forward"
+    ]
+  },
+  {
+    "word": "выступить",
+    "reading": "",
+    "meanings": [
+      "step forth / forward come forward"
+    ]
+  },
+  {
+    "word": "высушить",
+    "reading": "",
+    "meanings": [
+      "dry",
+      "dry out"
+    ]
+  },
+  {
+    "word": "вытекать",
+    "reading": "",
+    "meanings": [
+      "flow out",
+      "run out"
+    ]
+  },
+  {
+    "word": "вытечь",
+    "reading": "",
+    "meanings": [
+      "flow out",
+      "run out"
+    ]
+  },
+  {
+    "word": "вытягивать",
+    "reading": "",
+    "meanings": [
+      "draw out",
+      "extract"
+    ]
+  },
+  {
+    "word": "вытянуть",
+    "reading": "",
+    "meanings": [
+      "draw out",
+      "extract"
+    ]
+  },
+  {
+    "word": "вычеркивать",
+    "reading": "",
+    "meanings": [
+      "strike out",
+      "obliterate"
+    ]
+  },
+  {
+    "word": "вычеркнуть",
+    "reading": "",
+    "meanings": [
+      "strike out",
+      "obliterate"
+    ]
+  },
+  {
+    "word": "гасить",
+    "reading": "",
+    "meanings": [
+      "extinguish",
+      "put / blow out"
+    ]
+  },
+  {
+    "word": "глядеть",
+    "reading": "",
+    "meanings": [
+      "look (at)",
+      "peer (at)"
+    ]
+  },
+  {
+    "word": "голодать",
+    "reading": "",
+    "meanings": [
+      "hunger",
+      "starve"
+    ]
+  },
+  {
+    "word": "голосовать",
+    "reading": "",
+    "meanings": [
+      "vote (for, against)"
+    ]
+  },
+  {
+    "word": "гордиться",
+    "reading": "",
+    "meanings": [
+      "be proud (of)",
+      "take pride (in)"
+    ]
+  },
+  {
+    "word": "готовиться",
+    "reading": "",
+    "meanings": [
+      "get ready",
+      "prepare (for)"
+    ]
+  },
+  {
+    "word": "греметь",
+    "reading": "",
+    "meanings": [
+      "thunder",
+      "peal"
+    ]
+  },
+  {
+    "word": "греть",
+    "reading": "",
+    "meanings": [
+      "give out warmth"
+    ]
+  },
+  {
+    "word": "давить",
+    "reading": "",
+    "meanings": [
+      "weigh (upon)",
+      "lie heavy (on)"
+    ]
+  },
+  {
+    "word": "двигать",
+    "reading": "",
+    "meanings": [
+      "move",
+      "set in motion"
+    ]
+  },
+  {
+    "word": "двигаться",
+    "reading": "",
+    "meanings": [
+      "move",
+      "advance"
+    ]
+  },
+  {
+    "word": "двинуть",
+    "reading": "",
+    "meanings": [
+      "move",
+      "set in motion"
+    ]
+  },
+  {
+    "word": "двинуться",
+    "reading": "",
+    "meanings": [
+      "move",
+      "advance"
+    ]
+  },
+  {
+    "word": "дежурить",
+    "reading": "",
+    "meanings": [
+      "be on duty"
+    ]
+  },
+  {
+    "word": "держаться",
+    "reading": "",
+    "meanings": [
+      "hold on (to)"
+    ]
+  },
+  {
+    "word": "дешеветь",
+    "reading": "",
+    "meanings": [
+      "cheapen",
+      "become cheaper"
+    ]
+  },
+  {
+    "word": "длиться",
+    "reading": "",
+    "meanings": [
+      "last"
+    ]
+  },
+  {
+    "word": "добавить",
+    "reading": "",
+    "meanings": [
+      "add (to)"
+    ]
+  },
+  {
+    "word": "добавлять",
+    "reading": "",
+    "meanings": [
+      "add (to)"
+    ]
+  },
+  {
+    "word": "добираться",
+    "reading": "",
+    "meanings": [
+      "get to",
+      "reach"
+    ]
+  },
+  {
+    "word": "добраться",
+    "reading": "",
+    "meanings": [
+      "get to",
+      "reach"
+    ]
+  },
+  {
+    "word": "догнать",
+    "reading": "",
+    "meanings": [
+      "drive to",
+      "bring to"
+    ]
+  },
+  {
+    "word": "договариваться",
+    "reading": "",
+    "meanings": [
+      "come (to)",
+      "talk (to the point of)"
+    ]
+  },
+  {
+    "word": "договориться",
+    "reading": "",
+    "meanings": [
+      "come (to)",
+      "talk (to the point of)"
+    ]
+  },
+  {
+    "word": "догонять",
+    "reading": "",
+    "meanings": [
+      "catch up",
+      "overtake"
+    ]
+  },
+  {
+    "word": "докладывать",
+    "reading": "",
+    "meanings": [
+      "report (on)",
+      "give a report (on)"
+    ]
+  },
+  {
+    "word": "доложить",
+    "reading": "",
+    "meanings": [
+      "report (on)",
+      "give a report (on)"
+    ]
+  },
+  {
+    "word": "дорожать",
+    "reading": "",
+    "meanings": [
+      "rise in price",
+      "go up (in price)"
+    ]
+  },
+  {
+    "word": "доставать",
+    "reading": "",
+    "meanings": [
+      "reach",
+      "touch"
+    ]
+  },
+  {
+    "word": "доставить",
+    "reading": "",
+    "meanings": [
+      "deliver",
+      "convey"
+    ]
+  },
+  {
+    "word": "доставлять",
+    "reading": "",
+    "meanings": [
+      "deliver",
+      "convey"
+    ]
+  },
+  {
+    "word": "достать",
+    "reading": "",
+    "meanings": [
+      "reach",
+      "touch"
+    ]
+  },
+  {
+    "word": "драться",
+    "reading": "",
+    "meanings": [
+      "fight",
+      "scuffle"
+    ]
+  },
+  {
+    "word": "жалеть",
+    "reading": "",
+    "meanings": [
+      "pity",
+      "feel sorry (for)"
+    ]
+  },
+  {
+    "word": "жаловаться",
+    "reading": "",
+    "meanings": [
+      "complain (of, about)"
+    ]
+  },
+  {
+    "word": "жевать",
+    "reading": "",
+    "meanings": [
+      "chew",
+      "masticate"
+    ]
+  },
+  {
+    "word": "забронировать",
+    "reading": "",
+    "meanings": [
+      "reserve",
+      "book"
+    ]
+  },
+  {
+    "word": "завидовать",
+    "reading": "",
+    "meanings": [
+      "envy",
+      "be envious / jealous (of)"
+    ]
+  },
+  {
+    "word": "зависеть",
+    "reading": "",
+    "meanings": [
+      "depend (on)",
+      "be up to"
+    ]
+  },
+  {
+    "word": "завязать",
+    "reading": "",
+    "meanings": [
+      "tie (up)",
+      "bind (up)"
+    ]
+  },
+  {
+    "word": "завязывать",
+    "reading": "",
+    "meanings": [
+      "tie (up)",
+      "bind (up)"
+    ]
+  },
+  {
+    "word": "заговаривать",
+    "reading": "",
+    "meanings": [
+      "begin / start / try to talk / speak"
+    ]
+  },
+  {
+    "word": "заговорить",
+    "reading": "",
+    "meanings": [
+      "begin to speak"
+    ]
+  },
+  {
+    "word": "загорать",
+    "reading": "",
+    "meanings": [
+      "to sunbathe",
+      "to lie in the sun"
+    ]
+  },
+  {
+    "word": "загореть",
+    "reading": "",
+    "meanings": [
+      "to get tanned",
+      "to get a (sun)tan"
+    ]
+  },
+  {
+    "word": "зажечь",
+    "reading": "",
+    "meanings": [
+      "set fire (to)",
+      "light"
+    ]
+  },
+  {
+    "word": "зажигать",
+    "reading": "",
+    "meanings": [
+      "set fire (to)",
+      "light"
+    ]
+  },
+  {
+    "word": "зазубрить",
+    "reading": "",
+    "meanings": [
+      "serrate",
+      "notch"
+    ]
+  },
+  {
+    "word": "заинтересовать",
+    "reading": "",
+    "meanings": [
+      "interest in",
+      "awake / rouse smb.'s interest in"
+    ]
+  },
+  {
+    "word": "заинтересоваться",
+    "reading": "",
+    "meanings": [
+      "be(come) interested (in)"
+    ]
+  },
+  {
+    "word": "зайти",
+    "reading": "",
+    "meanings": [
+      "go / come (to)",
+      "call (on)"
+    ]
+  },
+  {
+    "word": "заканчиваться",
+    "reading": "",
+    "meanings": [
+      "end",
+      "be over"
+    ]
+  },
+  {
+    "word": "закончиться",
+    "reading": "",
+    "meanings": [
+      "end",
+      "be over"
+    ]
+  },
+  {
+    "word": "закуривать",
+    "reading": "",
+    "meanings": [
+      "light (up)",
+      "begin to smoke"
+    ]
+  },
+  {
+    "word": "закурить",
+    "reading": "",
+    "meanings": [
+      "light (up)",
+      "begin to smoke"
+    ]
+  },
+  {
+    "word": "залюбоваться",
+    "reading": "",
+    "meanings": [
+      "admire",
+      "feast one's eyes (upon)"
+    ]
+  },
+  {
+    "word": "заменить",
+    "reading": "",
+    "meanings": [
+      "replace (by)",
+      "substitute (for)"
+    ]
+  },
+  {
+    "word": "заменять",
+    "reading": "",
+    "meanings": [
+      "replace (by)",
+      "substitute (for)"
+    ]
+  },
+  {
+    "word": "замерзнуть",
+    "reading": "",
+    "meanings": [
+      "freeze",
+      "congeal"
+    ]
+  },
+  {
+    "word": "заметить",
+    "reading": "",
+    "meanings": [
+      "notice",
+      "mark"
+    ]
+  },
+  {
+    "word": "замечать",
+    "reading": "",
+    "meanings": [
+      "notice",
+      "mark"
+    ]
+  },
+  {
+    "word": "записаться",
+    "reading": "",
+    "meanings": [
+      "enroll (in)",
+      "register (in)"
+    ]
+  },
+  {
+    "word": "записываться",
+    "reading": "",
+    "meanings": [
+      "enroll (in)",
+      "register (in)"
+    ]
+  },
+  {
+    "word": "запланировать",
+    "reading": "",
+    "meanings": [
+      "plan"
+    ]
+  },
+  {
+    "word": "запрограммировать",
+    "reading": "",
+    "meanings": [
+      "programme"
+    ]
+  },
+  {
+    "word": "зарабатывать",
+    "reading": "",
+    "meanings": [
+      "earn"
+    ]
+  },
+  {
+    "word": "заработать",
+    "reading": "",
+    "meanings": [
+      "begin to work",
+      "start working"
+    ]
+  },
+  {
+    "word": "засветить",
+    "reading": "",
+    "meanings": [
+      "strike",
+      "hit smb"
+    ]
+  },
+  {
+    "word": "засветиться",
+    "reading": "",
+    "meanings": [
+      "light up"
+    ]
+  },
+  {
+    "word": "застраховать",
+    "reading": "",
+    "meanings": [
+      "insure (against)",
+      "safeguard (against)"
+    ]
+  },
+  {
+    "word": "застраховывать",
+    "reading": "",
+    "meanings": [
+      "insure (against)",
+      "safeguard (against)"
+    ]
+  },
+  {
+    "word": "затормозить",
+    "reading": "",
+    "meanings": [
+      "apply the brake",
+      "brake"
+    ]
+  },
+  {
+    "word": "затошнить",
+    "reading": "",
+    "meanings": [
+      "feel sick"
+    ]
+  },
+  {
+    "word": "заходить",
+    "reading": "",
+    "meanings": [
+      "go / come (to)",
+      "call (on)"
+    ]
+  },
+  {
+    "word": "захотеться",
+    "reading": "",
+    "meanings": [
+      "want",
+      "like"
+    ]
+  },
+  {
+    "word": "звать",
+    "reading": "",
+    "meanings": [
+      "call"
+    ]
+  },
+  {
+    "word": "зубрить",
+    "reading": "",
+    "meanings": [
+      "cram",
+      "learn by rote"
+    ]
+  },
+  {
+    "word": "избирать",
+    "reading": "",
+    "meanings": [
+      "choose (as, for)"
+    ]
+  },
+  {
+    "word": "избрать",
+    "reading": "",
+    "meanings": [
+      "choose (as, for)"
+    ]
+  },
+  {
+    "word": "извинять",
+    "reading": "",
+    "meanings": [
+      "excuse",
+      "pardon"
+    ]
+  },
+  {
+    "word": "измениться",
+    "reading": "",
+    "meanings": [
+      "modify",
+      "change"
+    ]
+  },
+  {
+    "word": "изменяться",
+    "reading": "",
+    "meanings": [
+      "modify",
+      "change"
+    ]
+  },
+  {
+    "word": "измерить",
+    "reading": "",
+    "meanings": [
+      "measure"
+    ]
+  },
+  {
+    "word": "измерять",
+    "reading": "",
+    "meanings": [
+      "measure"
+    ]
+  },
+  {
+    "word": "изучать",
+    "reading": "",
+    "meanings": [
+      "study",
+      "learn"
+    ]
+  },
+  {
+    "word": "изучить",
+    "reading": "",
+    "meanings": [
+      "study",
+      "learn"
+    ]
+  },
+  {
+    "word": "иметься",
+    "reading": "",
+    "meanings": [
+      "be at / in / on hand",
+      "have"
+    ]
+  },
+  {
+    "word": "интересовать",
+    "reading": "",
+    "meanings": [
+      "interest"
+    ]
+  },
+  {
+    "word": "интересоваться",
+    "reading": "",
+    "meanings": [
+      "be(come) interested",
+      "take an interest in"
+    ]
+  },
+  {
+    "word": "исключать",
+    "reading": "",
+    "meanings": [
+      "exclude",
+      "leave out"
+    ]
+  },
+  {
+    "word": "исключить",
+    "reading": "",
+    "meanings": [
+      "exclude",
+      "leave out"
+    ]
+  },
+  {
+    "word": "использовать",
+    "reading": "",
+    "meanings": [
+      "use",
+      "utilize"
+    ]
+  },
+  {
+    "word": "испортить",
+    "reading": "",
+    "meanings": [
+      "spoil",
+      "mar"
+    ]
+  },
+  {
+    "word": "испортиться",
+    "reading": "",
+    "meanings": [
+      "deteriorate",
+      "go bad"
+    ]
+  },
+  {
+    "word": "испытать",
+    "reading": "",
+    "meanings": [
+      "try",
+      "test"
+    ]
+  },
+  {
+    "word": "испытывать",
+    "reading": "",
+    "meanings": [
+      "try",
+      "test"
+    ]
+  },
+  {
+    "word": "кататься",
+    "reading": "",
+    "meanings": [
+      "go for a drive"
+    ]
+  },
+  {
+    "word": "кивать",
+    "reading": "",
+    "meanings": [
+      "nod",
+      "beckon"
+    ]
+  },
+  {
+    "word": "кивнуть",
+    "reading": "",
+    "meanings": [
+      "nod",
+      "beckon"
+    ]
+  },
+  {
+    "word": "кипеть",
+    "reading": "",
+    "meanings": [
+      "boil",
+      "seethe"
+    ]
+  },
+  {
+    "word": "кипятить",
+    "reading": "",
+    "meanings": [
+      "boil"
+    ]
+  },
+  {
+    "word": "клеить",
+    "reading": "",
+    "meanings": [
+      "glue",
+      "paste"
+    ]
+  },
+  {
+    "word": "коллекционировать",
+    "reading": "",
+    "meanings": [
+      "collect"
+    ]
+  },
+  {
+    "word": "консультировать",
+    "reading": "",
+    "meanings": [
+      "advise (on, about)"
+    ]
+  },
+  {
+    "word": "консультироваться",
+    "reading": "",
+    "meanings": [
+      "consult (with)"
+    ]
+  },
+  {
+    "word": "контролировать",
+    "reading": "",
+    "meanings": [
+      "control",
+      "check"
+    ]
+  },
+  {
+    "word": "кончать",
+    "reading": "",
+    "meanings": [
+      "finish",
+      "end"
+    ]
+  },
+  {
+    "word": "кончить",
+    "reading": "",
+    "meanings": [
+      "finish",
+      "end"
+    ]
+  },
+  {
+    "word": "лаять",
+    "reading": "",
+    "meanings": [
+      "bark",
+      "bay"
+    ]
+  },
+  {
+    "word": "лечь",
+    "reading": "",
+    "meanings": [
+      "lie (down)"
+    ]
+  },
+  {
+    "word": "лить",
+    "reading": "",
+    "meanings": [
+      "pour",
+      "shed"
+    ]
+  },
+  {
+    "word": "любоваться",
+    "reading": "",
+    "meanings": [
+      "admire",
+      "feast one's eyes (upon)"
+    ]
+  },
+  {
+    "word": "махать",
+    "reading": "",
+    "meanings": [
+      "wave",
+      "wag"
+    ]
+  },
+  {
+    "word": "махнуть",
+    "reading": "",
+    "meanings": [
+      "rush",
+      "leap"
+    ]
+  },
+  {
+    "word": "мерзнуть",
+    "reading": "",
+    "meanings": [
+      "freeze",
+      "be cold / numb"
+    ]
+  },
+  {
+    "word": "мерить",
+    "reading": "",
+    "meanings": [
+      "measure"
+    ]
+  },
+  {
+    "word": "мочить",
+    "reading": "",
+    "meanings": [
+      "to wet",
+      "to moisten"
+    ]
+  },
+  {
+    "word": "наградить",
+    "reading": "",
+    "meanings": [
+      "reward (with)",
+      "decorate (with)"
+    ]
+  },
+  {
+    "word": "награждать",
+    "reading": "",
+    "meanings": [
+      "reward (with)",
+      "decorate (with)"
+    ]
+  },
+  {
+    "word": "надеяться",
+    "reading": "",
+    "meanings": [
+      "hope",
+      "expect"
+    ]
+  },
+  {
+    "word": "надоедать",
+    "reading": "",
+    "meanings": [
+      "bother",
+      "pester"
+    ]
+  },
+  {
+    "word": "надоесть",
+    "reading": "",
+    "meanings": [
+      "bother",
+      "pester"
+    ]
+  },
+  {
+    "word": "нажать",
+    "reading": "",
+    "meanings": [
+      "press",
+      "push"
+    ]
+  },
+  {
+    "word": "нажимать",
+    "reading": "",
+    "meanings": [
+      "press",
+      "push"
+    ]
+  },
+  {
+    "word": "назначать",
+    "reading": "",
+    "meanings": [
+      "appoint",
+      "designate"
+    ]
+  },
+  {
+    "word": "назначить",
+    "reading": "",
+    "meanings": [
+      "appoint",
+      "designate"
+    ]
+  },
+  {
+    "word": "наклониться",
+    "reading": "",
+    "meanings": [
+      "stoop",
+      "bend"
+    ]
+  },
+  {
+    "word": "наклоняться",
+    "reading": "",
+    "meanings": [
+      "stoop",
+      "bend"
+    ]
+  },
+  {
+    "word": "напоминать",
+    "reading": "",
+    "meanings": [
+      "remind (of)",
+      "dun (of)"
+    ]
+  },
+  {
+    "word": "напомнить",
+    "reading": "",
+    "meanings": [
+      "remind (of)",
+      "dun (of)"
+    ]
+  },
+  {
+    "word": "напугать",
+    "reading": "",
+    "meanings": [
+      "frighten",
+      "scare"
+    ]
+  },
+  {
+    "word": "нарушать",
+    "reading": "",
+    "meanings": [
+      "disturb",
+      "break"
+    ]
+  },
+  {
+    "word": "нарушить",
+    "reading": "",
+    "meanings": [
+      "disturb",
+      "break"
+    ]
+  },
+  {
+    "word": "наставать",
+    "reading": "",
+    "meanings": [
+      "come",
+      "begin"
+    ]
+  },
+  {
+    "word": "настать",
+    "reading": "",
+    "meanings": [
+      "come",
+      "begin"
+    ]
+  },
+  {
+    "word": "наступать",
+    "reading": "",
+    "meanings": [
+      "tread / step (on)"
+    ]
+  },
+  {
+    "word": "наступить",
+    "reading": "",
+    "meanings": [
+      "tread / step (on)"
+    ]
+  },
+  {
+    "word": "натренировать",
+    "reading": "",
+    "meanings": [
+      "train",
+      "coach"
+    ]
+  },
+  {
+    "word": "нюхать",
+    "reading": "",
+    "meanings": [
+      "smell",
+      "scent"
+    ]
+  },
+  {
+    "word": "обеспокоиться",
+    "reading": "",
+    "meanings": [
+      "become anxious",
+      "uneasy",
+      "be worried",
+      "disturbed"
+    ]
+  },
+  {
+    "word": "обещать",
+    "reading": "",
+    "meanings": [
+      "promise"
+    ]
+  },
+  {
+    "word": "обидеться",
+    "reading": "",
+    "meanings": [
+      "take offence / umbrage (at)",
+      "be offended (by)"
+    ]
+  },
+  {
+    "word": "обижаться",
+    "reading": "",
+    "meanings": [
+      "take offence",
+      "umbrage (at)",
+      "be offended (by)"
+    ]
+  },
+  {
+    "word": "обмануть",
+    "reading": "",
+    "meanings": [
+      "deceive",
+      "cheat"
+    ]
+  },
+  {
+    "word": "обманывать",
+    "reading": "",
+    "meanings": [
+      "deceive",
+      "cheat"
+    ]
+  },
+  {
+    "word": "обменивать",
+    "reading": "",
+    "meanings": [
+      "exchange (for smth., with smb.)"
+    ]
+  },
+  {
+    "word": "обменять",
+    "reading": "",
+    "meanings": [
+      "exchange",
+      "barter (for)"
+    ]
+  },
+  {
+    "word": "обойти",
+    "reading": "",
+    "meanings": [
+      "go / pass / walk (a)round",
+      "round"
+    ]
+  },
+  {
+    "word": "обратиться",
+    "reading": "",
+    "meanings": [
+      "turn (to, into)"
+    ]
+  },
+  {
+    "word": "обращаться",
+    "reading": "",
+    "meanings": [
+      "turn (to, into)"
+    ]
+  },
+  {
+    "word": "обсудить",
+    "reading": "",
+    "meanings": [
+      "discuss",
+      "consider"
+    ]
+  },
+  {
+    "word": "обсуждать",
+    "reading": "",
+    "meanings": [
+      "discuss",
+      "consider"
+    ]
+  },
+  {
+    "word": "обсуждаться",
+    "reading": "",
+    "meanings": [
+      "be on the floor",
+      "be on the table"
+    ]
+  },
+  {
+    "word": "обучаться",
+    "reading": "",
+    "meanings": [
+      "learn",
+      "be taught"
+    ]
+  },
+  {
+    "word": "обучиться",
+    "reading": "",
+    "meanings": [
+      "learn",
+      "be taught"
+    ]
+  },
+  {
+    "word": "обходить",
+    "reading": "",
+    "meanings": [
+      "go / pass / walk (a)round",
+      "round"
+    ]
+  },
+  {
+    "word": "общаться",
+    "reading": "",
+    "meanings": [
+      "communicate with",
+      "associate (with)"
+    ]
+  },
+  {
+    "word": "объявить",
+    "reading": "",
+    "meanings": [
+      "declare",
+      "tell"
+    ]
+  },
+  {
+    "word": "объявлять",
+    "reading": "",
+    "meanings": [
+      "declare",
+      "tell"
+    ]
+  },
+  {
+    "word": "одалживать",
+    "reading": "",
+    "meanings": [
+      "lend",
+      "borrow (from)"
+    ]
+  },
+  {
+    "word": "одевать",
+    "reading": "",
+    "meanings": [
+      "dress (in)",
+      "clothe (in)"
+    ]
+  },
+  {
+    "word": "одеть",
+    "reading": "",
+    "meanings": [
+      "dress (in)",
+      "clothe (in)"
+    ]
+  },
+  {
+    "word": "одолжить",
+    "reading": "",
+    "meanings": [
+      "lend",
+      "borrow (from)"
+    ]
+  },
+  {
+    "word": "ожидать",
+    "reading": "",
+    "meanings": [
+      "wait (for)",
+      "expect"
+    ]
+  },
+  {
+    "word": "описать",
+    "reading": "",
+    "meanings": [
+      "describe",
+      "depict"
+    ]
+  },
+  {
+    "word": "описывать",
+    "reading": "",
+    "meanings": [
+      "describe",
+      "depict"
+    ]
+  },
+  {
+    "word": "оплатить",
+    "reading": "",
+    "meanings": [
+      "pay (for)",
+      "pay"
+    ]
+  },
+  {
+    "word": "оплачивать",
+    "reading": "",
+    "meanings": [
+      "pay (for)",
+      "pay"
+    ]
+  },
+  {
+    "word": "оставить",
+    "reading": "",
+    "meanings": [
+      "leave",
+      "leave alone"
+    ]
+  },
+  {
+    "word": "оставлять",
+    "reading": "",
+    "meanings": [
+      "leave",
+      "leave alone"
+    ]
+  },
+  {
+    "word": "останавливать",
+    "reading": "",
+    "meanings": [
+      "stop",
+      "bring to a stop"
+    ]
+  },
+  {
+    "word": "остановить",
+    "reading": "",
+    "meanings": [
+      "stop",
+      "bring to a stop"
+    ]
+  },
+  {
+    "word": "остричь",
+    "reading": "",
+    "meanings": [
+      "cut",
+      "clip"
+    ]
+  },
+  {
+    "word": "остудить",
+    "reading": "",
+    "meanings": [
+      "cool"
+    ]
+  },
+  {
+    "word": "остужать",
+    "reading": "",
+    "meanings": [
+      "cool"
+    ]
+  },
+  {
+    "word": "отвернуться",
+    "reading": "",
+    "meanings": [
+      "come unscrewed"
+    ]
+  },
+  {
+    "word": "отвертываться",
+    "reading": "",
+    "meanings": [
+      "come unscrewed"
+    ]
+  },
+  {
+    "word": "отказать",
+    "reading": "",
+    "meanings": [
+      "refuse (smth. to smb.)",
+      "deny (a pers. smth.)"
+    ]
+  },
+  {
+    "word": "отказаться",
+    "reading": "",
+    "meanings": [
+      "refuse",
+      "decline"
+    ]
+  },
+  {
+    "word": "отказывать",
+    "reading": "",
+    "meanings": [
+      "refuse (smth. to smb.)",
+      "deny (a pers. smth.)"
+    ]
+  },
+  {
+    "word": "отказываться",
+    "reading": "",
+    "meanings": [
+      "refuse",
+      "decline"
+    ]
+  },
+  {
+    "word": "отключать",
+    "reading": "",
+    "meanings": [
+      "cut off",
+      "disconnect"
+    ]
+  },
+  {
+    "word": "отключить",
+    "reading": "",
+    "meanings": [
+      "cut off",
+      "disconnect"
+    ]
+  },
+  {
+    "word": "отменить",
+    "reading": "",
+    "meanings": [
+      "abolish"
+    ]
+  },
+  {
+    "word": "отменять",
+    "reading": "",
+    "meanings": [
+      "abolish"
+    ]
+  },
+  {
+    "word": "отметить",
+    "reading": "",
+    "meanings": [
+      "mark",
+      "note"
+    ]
+  },
+  {
+    "word": "отмечать",
+    "reading": "",
+    "meanings": [
+      "mark",
+      "note"
+    ]
+  },
+  {
+    "word": "оторвать",
+    "reading": "",
+    "meanings": [
+      "tear / pull / turn off / away"
+    ]
+  },
+  {
+    "word": "отпраздновать",
+    "reading": "",
+    "meanings": [
+      "celebrate"
+    ]
+  },
+  {
+    "word": "отремонтировать",
+    "reading": "",
+    "meanings": [
+      "repair",
+      "refit"
+    ]
+  },
+  {
+    "word": "отрывать",
+    "reading": "",
+    "meanings": [
+      "tear / pull / turn off / away"
+    ]
+  },
+  {
+    "word": "отставать",
+    "reading": "",
+    "meanings": [
+      "lag / fall / remain behind"
+    ]
+  },
+  {
+    "word": "отстать",
+    "reading": "",
+    "meanings": [
+      "lag / fall / remain behind"
+    ]
+  },
+  {
+    "word": "отсутствовать",
+    "reading": "",
+    "meanings": [
+      "be absent",
+      "be lacking"
+    ]
+  },
+  {
+    "word": "оформить",
+    "reading": "",
+    "meanings": [
+      "form",
+      "shape"
+    ]
+  },
+  {
+    "word": "оформлять",
+    "reading": "",
+    "meanings": [
+      "form",
+      "shape"
+    ]
+  },
+  {
+    "word": "охранить",
+    "reading": "",
+    "meanings": [
+      "guard / protect (from, against)"
+    ]
+  },
+  {
+    "word": "охранять",
+    "reading": "",
+    "meanings": [
+      "guard / protect (from, against)"
+    ]
+  },
+  {
+    "word": "очистить",
+    "reading": "",
+    "meanings": [
+      "clean",
+      "clear"
+    ]
+  },
+  {
+    "word": "очищать",
+    "reading": "",
+    "meanings": [
+      "clean",
+      "clear"
+    ]
+  },
+  {
+    "word": "пахнуть",
+    "reading": "",
+    "meanings": [
+      "smell (of)",
+      "reck (of)"
+    ]
+  },
+  {
+    "word": "передавать",
+    "reading": "",
+    "meanings": [
+      "pass",
+      "hand (over)"
+    ]
+  },
+  {
+    "word": "передать",
+    "reading": "",
+    "meanings": [
+      "pass",
+      "hand (over)"
+    ]
+  },
+  {
+    "word": "передвигать",
+    "reading": "",
+    "meanings": [
+      "move",
+      "shift"
+    ]
+  },
+  {
+    "word": "передвинуть",
+    "reading": "",
+    "meanings": [
+      "move",
+      "shift"
+    ]
+  },
+  {
+    "word": "перекусить",
+    "reading": "",
+    "meanings": [
+      "cut / bite through"
+    ]
+  },
+  {
+    "word": "перекусывать",
+    "reading": "",
+    "meanings": [
+      "cut / bite through"
+    ]
+  },
+  {
+    "word": "перенести",
+    "reading": "",
+    "meanings": [
+      "transfer",
+      "carry"
+    ]
+  },
+  {
+    "word": "переносить",
+    "reading": "",
+    "meanings": [
+      "transfer",
+      "carry"
+    ]
+  },
+  {
+    "word": "переставать",
+    "reading": "",
+    "meanings": [
+      "stop",
+      "cease"
+    ]
+  },
+  {
+    "word": "перестать",
+    "reading": "",
+    "meanings": [
+      "stop",
+      "cease"
+    ]
+  },
+  {
+    "word": "перетерпеть",
+    "reading": "",
+    "meanings": [
+      "suffer",
+      "endure"
+    ]
+  },
+  {
+    "word": "печатать",
+    "reading": "",
+    "meanings": [
+      "print",
+      "type"
+    ]
+  },
+  {
+    "word": "планировать",
+    "reading": "",
+    "meanings": [
+      "plan"
+    ]
+  },
+  {
+    "word": "победить",
+    "reading": "",
+    "meanings": [
+      "be victorious (over)",
+      "win (a victory) (over)"
+    ]
+  },
+  {
+    "word": "побеждать",
+    "reading": "",
+    "meanings": [
+      "be victorious (over)",
+      "win (a victory) (over)"
+    ]
+  },
+  {
+    "word": "повезти",
+    "reading": "",
+    "meanings": [
+      "convey",
+      "carry"
+    ]
+  },
+  {
+    "word": "повернуться",
+    "reading": "",
+    "meanings": [
+      "turn",
+      "swing"
+    ]
+  },
+  {
+    "word": "повесить",
+    "reading": "",
+    "meanings": [
+      "hang (up)"
+    ]
+  },
+  {
+    "word": "повзрослеть",
+    "reading": "",
+    "meanings": [
+      "become adult",
+      "mature"
+    ]
+  },
+  {
+    "word": "поворачиваться",
+    "reading": "",
+    "meanings": [
+      "turn",
+      "swing"
+    ]
+  },
+  {
+    "word": "повысить",
+    "reading": "",
+    "meanings": [
+      "raise",
+      "heighten"
+    ]
+  },
+  {
+    "word": "повыситься",
+    "reading": "",
+    "meanings": [
+      "rise",
+      "improve"
+    ]
+  },
+  {
+    "word": "повышать",
+    "reading": "",
+    "meanings": [
+      "raise",
+      "heighten"
+    ]
+  },
+  {
+    "word": "повышаться",
+    "reading": "",
+    "meanings": [
+      "rise",
+      "improve"
+    ]
+  },
+  {
+    "word": "погасить",
+    "reading": "",
+    "meanings": [
+      "extinguish",
+      "put / blow out"
+    ]
+  },
+  {
+    "word": "поглядеть",
+    "reading": "",
+    "meanings": [
+      "look (at)",
+      "peer (at)"
+    ]
+  },
+  {
+    "word": "подавать",
+    "reading": "",
+    "meanings": [
+      "give (to)",
+      "proffer (to)"
+    ]
+  },
+  {
+    "word": "подать",
+    "reading": "",
+    "meanings": [
+      "tax",
+      "duty"
+    ]
+  },
+  {
+    "word": "подвигаться",
+    "reading": "",
+    "meanings": [
+      "move (a little)"
+    ]
+  },
+  {
+    "word": "подвинуться",
+    "reading": "",
+    "meanings": [
+      "move",
+      "advance"
+    ]
+  },
+  {
+    "word": "подготавливать",
+    "reading": "",
+    "meanings": [
+      "prepare (for)",
+      "make ready (for)"
+    ]
+  },
+  {
+    "word": "подготовить",
+    "reading": "",
+    "meanings": [
+      "prepare (for)",
+      "make ready (for)"
+    ]
+  },
+  {
+    "word": "подешеветь",
+    "reading": "",
+    "meanings": [
+      "cheapen",
+      "become cheaper"
+    ]
+  },
+  {
+    "word": "подраться",
+    "reading": "",
+    "meanings": [
+      "fight",
+      "scuffle (with)"
+    ]
+  },
+  {
+    "word": "подсказать",
+    "reading": "",
+    "meanings": [
+      "prompt (to)",
+      "suggest (to)"
+    ]
+  },
+  {
+    "word": "подсказывать",
+    "reading": "",
+    "meanings": [
+      "prompt (to)",
+      "suggest (to)"
+    ]
+  },
+  {
+    "word": "подчеркивать",
+    "reading": "",
+    "meanings": [
+      "underline",
+      "underscore"
+    ]
+  },
+  {
+    "word": "подчеркнуть",
+    "reading": "",
+    "meanings": [
+      "underline",
+      "underscore"
+    ]
+  },
+  {
+    "word": "пожаловаться",
+    "reading": "",
+    "meanings": [
+      "complain (of, about)"
+    ]
+  },
+  {
+    "word": "пожать",
+    "reading": "",
+    "meanings": [
+      "press",
+      "squeeze"
+    ]
+  },
+  {
+    "word": "пожевать",
+    "reading": "",
+    "meanings": [
+      "chew",
+      "masticate"
+    ]
+  },
+  {
+    "word": "пожимать",
+    "reading": "",
+    "meanings": [
+      "press",
+      "squeeze"
+    ]
+  },
+  {
+    "word": "позавидовать",
+    "reading": "",
+    "meanings": [
+      "envy",
+      "be envious / jealous (of)"
+    ]
+  },
+  {
+    "word": "позвать",
+    "reading": "",
+    "meanings": [
+      "call"
+    ]
+  },
+  {
+    "word": "поймать",
+    "reading": "",
+    "meanings": [
+      "(try to) catch"
+    ]
+  },
+  {
+    "word": "пользоваться",
+    "reading": "",
+    "meanings": [
+      "(make) use (of)",
+      "profit (by)"
+    ]
+  },
+  {
+    "word": "поменять",
+    "reading": "",
+    "meanings": [
+      "exchange",
+      "barter (for)"
+    ]
+  },
+  {
+    "word": "понадеяться",
+    "reading": "",
+    "meanings": [
+      "hope",
+      "expect"
+    ]
+  },
+  {
+    "word": "понюхать",
+    "reading": "",
+    "meanings": [
+      "smell",
+      "scent"
+    ]
+  },
+  {
+    "word": "пообещать",
+    "reading": "",
+    "meanings": [
+      "promise"
+    ]
+  },
+  {
+    "word": "портить",
+    "reading": "",
+    "meanings": [
+      "spoil",
+      "mar"
+    ]
+  },
+  {
+    "word": "портиться",
+    "reading": "",
+    "meanings": [
+      "deteriorate",
+      "go bad"
+    ]
+  },
+  {
+    "word": "последовать",
+    "reading": "",
+    "meanings": [
+      "follow",
+      "go (after)"
+    ]
+  },
+  {
+    "word": "посоветоваться",
+    "reading": "",
+    "meanings": [
+      "consult",
+      "deliberate"
+    ]
+  },
+  {
+    "word": "постараться",
+    "reading": "",
+    "meanings": [
+      "endeavo(u)r",
+      "try (hard)"
+    ]
+  },
+  {
+    "word": "потеряться",
+    "reading": "",
+    "meanings": [
+      "be lost",
+      "get lost"
+    ]
+  },
+  {
+    "word": "потеть",
+    "reading": "",
+    "meanings": [
+      "вспотеть",
+      "sweat"
+    ]
+  },
+  {
+    "word": "потребоваться",
+    "reading": "",
+    "meanings": [
+      "need",
+      "require"
+    ]
+  },
+  {
+    "word": "похвалить",
+    "reading": "",
+    "meanings": [
+      "compliment (for)",
+      "praise"
+    ]
+  },
+  {
+    "word": "поцеловаться",
+    "reading": "",
+    "meanings": [
+      "kiss"
+    ]
+  },
+  {
+    "word": "починить",
+    "reading": "",
+    "meanings": [
+      "repair",
+      "mend"
+    ]
+  },
+  {
+    "word": "почитать",
+    "reading": "",
+    "meanings": [
+      "esteem",
+      "respect"
+    ]
+  },
+  {
+    "word": "почтить",
+    "reading": "",
+    "meanings": [
+      "honour (by)",
+      "pay / do homage (to by)"
+    ]
+  },
+  {
+    "word": "праздновать",
+    "reading": "",
+    "meanings": [
+      "celebrate"
+    ]
+  },
+  {
+    "word": "практиковаться",
+    "reading": "",
+    "meanings": [
+      "practise"
+    ]
+  },
+  {
+    "word": "представить",
+    "reading": "",
+    "meanings": [
+      "present",
+      "offer"
+    ]
+  },
+  {
+    "word": "представлять",
+    "reading": "",
+    "meanings": [
+      "present",
+      "offer"
+    ]
+  },
+  {
+    "word": "предупредить",
+    "reading": "",
+    "meanings": [
+      "give notice (of)",
+      "let know beforehand (about)"
+    ]
+  },
+  {
+    "word": "предупреждать",
+    "reading": "",
+    "meanings": [
+      "give notice (of)",
+      "let know beforehand (about)"
+    ]
+  },
+  {
+    "word": "прекратить",
+    "reading": "",
+    "meanings": [
+      "stop",
+      "cease"
+    ]
+  },
+  {
+    "word": "прекратиться",
+    "reading": "",
+    "meanings": [
+      "end",
+      "cease"
+    ]
+  },
+  {
+    "word": "прекращать",
+    "reading": "",
+    "meanings": [
+      "stop",
+      "cease"
+    ]
+  },
+  {
+    "word": "прекращаться",
+    "reading": "",
+    "meanings": [
+      "end",
+      "cease"
+    ]
+  },
+  {
+    "word": "прибегать",
+    "reading": "",
+    "meanings": [
+      "come running"
+    ]
+  },
+  {
+    "word": "прибежать",
+    "reading": "",
+    "meanings": [
+      "come running"
+    ]
+  },
+  {
+    "word": "прибивать",
+    "reading": "",
+    "meanings": [
+      "fasten",
+      "nail (down)"
+    ]
+  },
+  {
+    "word": "прибить",
+    "reading": "",
+    "meanings": [
+      "fasten",
+      "nail (down)"
+    ]
+  },
+  {
+    "word": "приветствовать",
+    "reading": "",
+    "meanings": [
+      "greet",
+      "salute"
+    ]
+  },
+  {
+    "word": "приготовиться",
+    "reading": "",
+    "meanings": [
+      "get ready",
+      "prepare (for)"
+    ]
+  },
+  {
+    "word": "придумать",
+    "reading": "",
+    "meanings": [
+      "think out",
+      "devise"
+    ]
+  },
+  {
+    "word": "придумывать",
+    "reading": "",
+    "meanings": [
+      "think out",
+      "devise"
+    ]
+  },
+  {
+    "word": "прикрепить",
+    "reading": "",
+    "meanings": [
+      "fasten (to)",
+      "attach (to)"
+    ]
+  },
+  {
+    "word": "прикреплять",
+    "reading": "",
+    "meanings": [
+      "fasten (to)",
+      "attach (to)"
+    ]
+  },
+  {
+    "word": "применить",
+    "reading": "",
+    "meanings": [
+      "apply",
+      "use"
+    ]
+  },
+  {
+    "word": "примениться",
+    "reading": "",
+    "meanings": [
+      "adapt oneself (to)",
+      "conform (to)"
+    ]
+  },
+  {
+    "word": "применять",
+    "reading": "",
+    "meanings": [
+      "apply",
+      "use"
+    ]
+  },
+  {
+    "word": "применяться",
+    "reading": "",
+    "meanings": [
+      "adapt oneself (to)",
+      "conform (to)"
+    ]
+  },
+  {
+    "word": "принадлежать",
+    "reading": "",
+    "meanings": [
+      "belong (to)",
+      "pertain (to)"
+    ]
+  },
+  {
+    "word": "принимать",
+    "reading": "",
+    "meanings": [
+      "accept",
+      "take"
+    ]
+  },
+  {
+    "word": "принять",
+    "reading": "",
+    "meanings": [
+      "accept",
+      "take"
+    ]
+  },
+  {
+    "word": "присниться",
+    "reading": "",
+    "meanings": [
+      "dream"
+    ]
+  },
+  {
+    "word": "присутствовать",
+    "reading": "",
+    "meanings": [
+      "be present (at)",
+      "assist (at)"
+    ]
+  },
+  {
+    "word": "проводить",
+    "reading": "",
+    "meanings": [
+      "see (off)",
+      "accompany"
+    ]
+  },
+  {
+    "word": "провожать",
+    "reading": "",
+    "meanings": [
+      "see (off)",
+      "accompany"
+    ]
+  },
+  {
+    "word": "проглатывать",
+    "reading": "",
+    "meanings": [
+      "swallow",
+      "gulp"
+    ]
+  },
+  {
+    "word": "проглотить",
+    "reading": "",
+    "meanings": [
+      "swallow",
+      "gulp"
+    ]
+  },
+  {
+    "word": "проголосовать",
+    "reading": "",
+    "meanings": [
+      "vote (for, against)"
+    ]
+  },
+  {
+    "word": "программировать",
+    "reading": "",
+    "meanings": [
+      "programme"
+    ]
+  },
+  {
+    "word": "прогреметь",
+    "reading": "",
+    "meanings": [
+      "thunder",
+      "peal"
+    ]
+  },
+  {
+    "word": "продлевать",
+    "reading": "",
+    "meanings": [
+      "prolong",
+      "extend"
+    ]
+  },
+  {
+    "word": "продлить",
+    "reading": "",
+    "meanings": [
+      "prolong",
+      "extend"
+    ]
+  },
+  {
+    "word": "продлиться",
+    "reading": "",
+    "meanings": [
+      "last"
+    ]
+  },
+  {
+    "word": "продолжаться",
+    "reading": "",
+    "meanings": [
+      "last",
+      "continue"
+    ]
+  },
+  {
+    "word": "продолжиться",
+    "reading": "",
+    "meanings": [
+      "last",
+      "continue"
+    ]
+  },
+  {
+    "word": "проживать",
+    "reading": "",
+    "meanings": [
+      "live",
+      "reside"
+    ]
+  },
+  {
+    "word": "прожить",
+    "reading": "",
+    "meanings": [
+      "live",
+      "reside"
+    ]
+  },
+  {
+    "word": "проиграть",
+    "reading": "",
+    "meanings": [
+      "lose"
+    ]
+  },
+  {
+    "word": "проигрывать",
+    "reading": "",
+    "meanings": [
+      "lose"
+    ]
+  },
+  {
+    "word": "произвести",
+    "reading": "",
+    "meanings": [
+      "make",
+      "carry out"
+    ]
+  },
+  {
+    "word": "производить",
+    "reading": "",
+    "meanings": [
+      "make",
+      "carry out"
+    ]
+  },
+  {
+    "word": "проконсультировать",
+    "reading": "",
+    "meanings": [
+      "advise (on, about)"
+    ]
+  },
+  {
+    "word": "проконсультироваться",
+    "reading": "",
+    "meanings": [
+      "consult (with)"
+    ]
+  },
+  {
+    "word": "проконтролировать",
+    "reading": "",
+    "meanings": [
+      "control",
+      "check"
+    ]
+  },
+  {
+    "word": "промалчивать",
+    "reading": "",
+    "meanings": [
+      "be / keep silent",
+      "say nothing (for a while)"
+    ]
+  },
+  {
+    "word": "промолчать",
+    "reading": "",
+    "meanings": [
+      "be / keep silent",
+      "say nothing (for a while)"
+    ]
+  },
+  {
+    "word": "прописать",
+    "reading": "",
+    "meanings": [
+      "prescribe",
+      "order"
+    ]
+  },
+  {
+    "word": "прописывать",
+    "reading": "",
+    "meanings": [
+      "prescribe",
+      "order"
+    ]
+  },
+  {
+    "word": "прорабатывать",
+    "reading": "",
+    "meanings": [
+      "work (for some time)"
+    ]
+  },
+  {
+    "word": "проработать",
+    "reading": "",
+    "meanings": [
+      "work (for some time)"
+    ]
+  },
+  {
+    "word": "простить",
+    "reading": "",
+    "meanings": [
+      "excuse",
+      "pardon"
+    ]
+  },
+  {
+    "word": "простудиться",
+    "reading": "",
+    "meanings": [
+      "catch a cold",
+      "catch / take a chill"
+    ]
+  },
+  {
+    "word": "простужаться",
+    "reading": "",
+    "meanings": [
+      "catch a cold",
+      "catch / take a chill"
+    ]
+  },
+  {
+    "word": "прощать",
+    "reading": "",
+    "meanings": [
+      "forgive",
+      "excuse"
+    ]
+  },
+  {
+    "word": "прятать",
+    "reading": "",
+    "meanings": [
+      "hide",
+      "conceal"
+    ]
+  },
+  {
+    "word": "радоваться",
+    "reading": "",
+    "meanings": [
+      "rejoice",
+      "be glad / pleased / happy"
+    ]
+  },
+  {
+    "word": "разбивать",
+    "reading": "",
+    "meanings": [
+      "break (to pieces)",
+      "crash"
+    ]
+  },
+  {
+    "word": "разбиваться",
+    "reading": "",
+    "meanings": [
+      "break",
+      "get / be broken"
+    ]
+  },
+  {
+    "word": "разбить",
+    "reading": "",
+    "meanings": [
+      "break (to pieces)",
+      "crash"
+    ]
+  },
+  {
+    "word": "разбиться",
+    "reading": "",
+    "meanings": [
+      "break",
+      "get / be broken"
+    ]
+  },
+  {
+    "word": "развернуть",
+    "reading": "",
+    "meanings": [
+      "unfold",
+      "unroll"
+    ]
+  },
+  {
+    "word": "развесить",
+    "reading": "",
+    "meanings": [
+      "weigh (out)"
+    ]
+  },
+  {
+    "word": "развешивать",
+    "reading": "",
+    "meanings": [
+      "weigh (out)"
+    ]
+  },
+  {
+    "word": "разворачивать",
+    "reading": "",
+    "meanings": [
+      "unfold",
+      "unroll"
+    ]
+  },
+  {
+    "word": "развязать",
+    "reading": "",
+    "meanings": [
+      "untie",
+      "unbind"
+    ]
+  },
+  {
+    "word": "развязывать",
+    "reading": "",
+    "meanings": [
+      "untie",
+      "unbind"
+    ]
+  },
+  {
+    "word": "раздавать",
+    "reading": "",
+    "meanings": [
+      "distribute (to, among)"
+    ]
+  },
+  {
+    "word": "раздавить",
+    "reading": "",
+    "meanings": [
+      "crush"
+    ]
+  },
+  {
+    "word": "раздать",
+    "reading": "",
+    "meanings": [
+      "distribute (to, among)"
+    ]
+  },
+  {
+    "word": "разменивать",
+    "reading": "",
+    "meanings": [
+      "change (for)"
+    ]
+  },
+  {
+    "word": "разменять",
+    "reading": "",
+    "meanings": [
+      "change (for)"
+    ]
+  },
+  {
+    "word": "размешать",
+    "reading": "",
+    "meanings": [
+      "stir (up)"
+    ]
+  },
+  {
+    "word": "размешивать",
+    "reading": "",
+    "meanings": [
+      "stir (up)"
+    ]
+  },
+  {
+    "word": "разрезать",
+    "reading": "",
+    "meanings": [
+      "cut (up)",
+      "slit"
+    ]
+  },
+  {
+    "word": "разрешаться",
+    "reading": "",
+    "meanings": [
+      "be (re)solved"
+    ]
+  },
+  {
+    "word": "разрешиться",
+    "reading": "",
+    "meanings": [
+      "be (re)solved"
+    ]
+  },
+  {
+    "word": "рассердиться",
+    "reading": "",
+    "meanings": [
+      "become / get angry (with)"
+    ]
+  },
+  {
+    "word": "расслабить",
+    "reading": "",
+    "meanings": [
+      "weaken",
+      "enfeeble"
+    ]
+  },
+  {
+    "word": "расслабляться",
+    "reading": "",
+    "meanings": [
+      "relax"
+    ]
+  },
+  {
+    "word": "расставить",
+    "reading": "",
+    "meanings": [
+      "place",
+      "arrange"
+    ]
+  },
+  {
+    "word": "расставлять",
+    "reading": "",
+    "meanings": [
+      "place",
+      "arrange"
+    ]
+  },
+  {
+    "word": "ревновать",
+    "reading": "",
+    "meanings": [
+      "be jealous (of)"
+    ]
+  },
+  {
+    "word": "рекламировать",
+    "reading": "",
+    "meanings": [
+      "advertise",
+      "publicize"
+    ]
+  },
+  {
+    "word": "ремонтировать",
+    "reading": "",
+    "meanings": [
+      "repair",
+      "refit"
+    ]
+  },
+  {
+    "word": "решать",
+    "reading": "",
+    "meanings": [
+      "solve",
+      "settle"
+    ]
+  },
+  {
+    "word": "решить",
+    "reading": "",
+    "meanings": [
+      "solve",
+      "settle"
+    ]
+  },
+  {
+    "word": "рисовать",
+    "reading": "",
+    "meanings": [
+      "draw",
+      "paint"
+    ]
+  },
+  {
+    "word": "родить",
+    "reading": "",
+    "meanings": [
+      "give birth (to)"
+    ]
+  },
+  {
+    "word": "рожать",
+    "reading": "",
+    "meanings": [
+      "give birth (to)",
+      "bear"
+    ]
+  },
+  {
+    "word": "рождаться",
+    "reading": "",
+    "meanings": [
+      "be born"
+    ]
+  },
+  {
+    "word": "ругаться",
+    "reading": "",
+    "meanings": [
+      "swear",
+      "curse"
+    ]
+  },
+  {
+    "word": "светить",
+    "reading": "",
+    "meanings": [
+      "shine"
+    ]
+  },
+  {
+    "word": "светиться",
+    "reading": "",
+    "meanings": [
+      "shine"
+    ]
+  },
+  {
+    "word": "сгибать",
+    "reading": "",
+    "meanings": [
+      "bend",
+      "curve"
+    ]
+  },
+  {
+    "word": "сердиться",
+    "reading": "",
+    "meanings": [
+      "be(come) angry (with)",
+      "be cross (with)"
+    ]
+  },
+  {
+    "word": "скатить",
+    "reading": "",
+    "meanings": [
+      "roll / slide down"
+    ]
+  },
+  {
+    "word": "скачивать",
+    "reading": "",
+    "meanings": [
+      "download"
+    ]
+  },
+  {
+    "word": "складывать",
+    "reading": "",
+    "meanings": [
+      "put together / up / down"
+    ]
+  },
+  {
+    "word": "склеить",
+    "reading": "",
+    "meanings": [
+      "stick / glue / paste together"
+    ]
+  },
+  {
+    "word": "следовать",
+    "reading": "",
+    "meanings": [
+      "follow",
+      "go (after)"
+    ]
+  },
+  {
+    "word": "сложить",
+    "reading": "",
+    "meanings": [
+      "put together / up / down"
+    ]
+  },
+  {
+    "word": "смерить",
+    "reading": "",
+    "meanings": [
+      "measure"
+    ]
+  },
+  {
+    "word": "смешать",
+    "reading": "",
+    "meanings": [
+      "mix (up)",
+      "mingle"
+    ]
+  },
+  {
+    "word": "смешивать",
+    "reading": "",
+    "meanings": [
+      "mix (up)",
+      "mingle"
+    ]
+  },
+  {
+    "word": "собирать",
+    "reading": "",
+    "meanings": [
+      "gather",
+      "collect"
+    ]
+  },
+  {
+    "word": "соблюдать",
+    "reading": "",
+    "meanings": [
+      "observe",
+      "obey"
+    ]
+  },
+  {
+    "word": "соблюсти",
+    "reading": "",
+    "meanings": [
+      "observe",
+      "obey"
+    ]
+  },
+  {
+    "word": "собрать",
+    "reading": "",
+    "meanings": [
+      "gather",
+      "collect"
+    ]
+  },
+  {
+    "word": "советоваться",
+    "reading": "",
+    "meanings": [
+      "consult",
+      "deliberate"
+    ]
+  },
+  {
+    "word": "согласиться",
+    "reading": "",
+    "meanings": [
+      "agree (to)",
+      "consent (to)"
+    ]
+  },
+  {
+    "word": "соглашаться",
+    "reading": "",
+    "meanings": [
+      "agree (to)",
+      "consent (to)"
+    ]
+  },
+  {
+    "word": "согнуть",
+    "reading": "",
+    "meanings": [
+      "совер."
+    ]
+  },
+  {
+    "word": "создавать",
+    "reading": "",
+    "meanings": [
+      "create",
+      "found"
+    ]
+  },
+  {
+    "word": "создать",
+    "reading": "",
+    "meanings": [
+      "create",
+      "found"
+    ]
+  },
+  {
+    "word": "сойти",
+    "reading": "",
+    "meanings": [
+      "go / come down (from)",
+      "descend"
+    ]
+  },
+  {
+    "word": "сократить",
+    "reading": "",
+    "meanings": [
+      "shorten",
+      "curtail"
+    ]
+  },
+  {
+    "word": "сокращать",
+    "reading": "",
+    "meanings": [
+      "shorten",
+      "curtail"
+    ]
+  },
+  {
+    "word": "сомневаться",
+    "reading": "",
+    "meanings": [
+      "doubt",
+      "have one's doubts (as to)"
+    ]
+  },
+  {
+    "word": "сообщать",
+    "reading": "",
+    "meanings": [
+      "communicate (to)",
+      "report (to)"
+    ]
+  },
+  {
+    "word": "сообщить",
+    "reading": "",
+    "meanings": [
+      "communicate (to)",
+      "report (to)"
+    ]
+  },
+  {
+    "word": "состояться",
+    "reading": "",
+    "meanings": [
+      "take place",
+      "happen"
+    ]
+  },
+  {
+    "word": "сохранить",
+    "reading": "",
+    "meanings": [
+      "keep",
+      "preserve"
+    ]
+  },
+  {
+    "word": "сохранять",
+    "reading": "",
+    "meanings": [
+      "keep",
+      "preserve"
+    ]
+  },
+  {
+    "word": "спасать",
+    "reading": "",
+    "meanings": [
+      "save",
+      "rescue"
+    ]
+  },
+  {
+    "word": "спасаться",
+    "reading": "",
+    "meanings": [
+      "save oneself",
+      "escape"
+    ]
+  },
+  {
+    "word": "спасти",
+    "reading": "",
+    "meanings": [
+      "save",
+      "rescue"
+    ]
+  },
+  {
+    "word": "спастись",
+    "reading": "",
+    "meanings": [
+      "save oneself",
+      "escape"
+    ]
+  },
+  {
+    "word": "спешить",
+    "reading": "",
+    "meanings": [
+      "dismount"
+    ]
+  },
+  {
+    "word": "спланировать",
+    "reading": "",
+    "meanings": [
+      "plan"
+    ]
+  },
+  {
+    "word": "спрятать",
+    "reading": "",
+    "meanings": [
+      "hide",
+      "conceal"
+    ]
+  },
+  {
+    "word": "спускаться",
+    "reading": "",
+    "meanings": [
+      "go down",
+      "come down"
+    ]
+  },
+  {
+    "word": "спуститься",
+    "reading": "",
+    "meanings": [
+      "go / come down",
+      "descend"
+    ]
+  },
+  {
+    "word": "сравнивать",
+    "reading": "",
+    "meanings": [
+      "compare (with)",
+      "compare (to)"
+    ]
+  },
+  {
+    "word": "сравнить",
+    "reading": "",
+    "meanings": [
+      "compare (with)",
+      "compare (to)"
+    ]
+  },
+  {
+    "word": "стараться",
+    "reading": "",
+    "meanings": [
+      "endeavo(u)r",
+      "try (hard)"
+    ]
+  },
+  {
+    "word": "страдать",
+    "reading": "",
+    "meanings": [
+      "suffer (from)",
+      "be subject (to)"
+    ]
+  },
+  {
+    "word": "страховать",
+    "reading": "",
+    "meanings": [
+      "insure (against)"
+    ]
+  },
+  {
+    "word": "стрелять",
+    "reading": "",
+    "meanings": [
+      "shoot (at)",
+      "fire (at)"
+    ]
+  },
+  {
+    "word": "стричь",
+    "reading": "",
+    "meanings": [
+      "cut",
+      "shear"
+    ]
+  },
+  {
+    "word": "суметь",
+    "reading": "",
+    "meanings": [
+      "be able",
+      "know how"
+    ]
+  },
+  {
+    "word": "сушить",
+    "reading": "",
+    "meanings": [
+      "dry",
+      "air"
+    ]
+  },
+  {
+    "word": "сходить",
+    "reading": "",
+    "meanings": [
+      "go / come down (from)",
+      "descend"
+    ]
+  },
+  {
+    "word": "сшить",
+    "reading": "",
+    "meanings": [
+      "sew"
+    ]
+  },
+  {
+    "word": "съездить",
+    "reading": "",
+    "meanings": [
+      "go",
+      "fetch"
+    ]
+  },
+  {
+    "word": "сэкономить",
+    "reading": "",
+    "meanings": [
+      "economize",
+      "use sparingly"
+    ]
+  },
+  {
+    "word": "терпеть",
+    "reading": "",
+    "meanings": [
+      "suffer",
+      "endure"
+    ]
+  },
+  {
+    "word": "теряться",
+    "reading": "",
+    "meanings": [
+      "be lost",
+      "get lost"
+    ]
+  },
+  {
+    "word": "торговать",
+    "reading": "",
+    "meanings": [
+      "deal (in)",
+      "trade"
+    ]
+  },
+  {
+    "word": "тормозить",
+    "reading": "",
+    "meanings": [
+      "apply the brake",
+      "brake"
+    ]
+  },
+  {
+    "word": "тошнить",
+    "reading": "",
+    "meanings": [
+      "feel sick"
+    ]
+  },
+  {
+    "word": "требоваться",
+    "reading": "",
+    "meanings": [
+      "need",
+      "require"
+    ]
+  },
+  {
+    "word": "тренировать",
+    "reading": "",
+    "meanings": [
+      "train",
+      "coach"
+    ]
+  },
+  {
+    "word": "трогать",
+    "reading": "",
+    "meanings": [
+      "touch"
+    ]
+  },
+  {
+    "word": "тронуть",
+    "reading": "",
+    "meanings": [
+      "touch"
+    ]
+  },
+  {
+    "word": "убивать",
+    "reading": "",
+    "meanings": [
+      "kill",
+      "murder"
+    ]
+  },
+  {
+    "word": "убить",
+    "reading": "",
+    "meanings": [
+      "kill",
+      "murder"
+    ]
+  },
+  {
+    "word": "увезти",
+    "reading": "",
+    "meanings": [
+      "drive / take away"
+    ]
+  },
+  {
+    "word": "увести",
+    "reading": "",
+    "meanings": [
+      "take away",
+      "lead away"
+    ]
+  },
+  {
+    "word": "увлекаться",
+    "reading": "",
+    "meanings": [
+      "take great interest in",
+      "be carried away"
+    ]
+  },
+  {
+    "word": "увлечься",
+    "reading": "",
+    "meanings": [
+      "take great interest in",
+      "be carried away"
+    ]
+  },
+  {
+    "word": "уводить",
+    "reading": "",
+    "meanings": [
+      "take away",
+      "lead away"
+    ]
+  },
+  {
+    "word": "увозить",
+    "reading": "",
+    "meanings": [
+      "drive / take away"
+    ]
+  },
+  {
+    "word": "уволить",
+    "reading": "",
+    "meanings": [
+      "discharge",
+      "dismiss"
+    ]
+  },
+  {
+    "word": "увольнять",
+    "reading": "",
+    "meanings": [
+      "discharge",
+      "dismiss"
+    ]
+  },
+  {
+    "word": "угадать",
+    "reading": "",
+    "meanings": [
+      "guess (right)",
+      "divine"
+    ]
+  },
+  {
+    "word": "угадывать",
+    "reading": "",
+    "meanings": [
+      "guess (right)",
+      "divine"
+    ]
+  },
+  {
+    "word": "уговаривать",
+    "reading": "",
+    "meanings": [
+      "persuade",
+      "talk"
+    ]
+  },
+  {
+    "word": "уговорить",
+    "reading": "",
+    "meanings": [
+      "persuade",
+      "talk"
+    ]
+  },
+  {
+    "word": "угостить",
+    "reading": "",
+    "meanings": [
+      "entertain (to, at)"
+    ]
+  },
+  {
+    "word": "угощать",
+    "reading": "",
+    "meanings": [
+      "entertain (to, at)"
+    ]
+  },
+  {
+    "word": "ударить",
+    "reading": "",
+    "meanings": [
+      "strike",
+      "hit"
+    ]
+  },
+  {
+    "word": "ударять",
+    "reading": "",
+    "meanings": [
+      "strike",
+      "hit"
+    ]
+  },
+  {
+    "word": "удивить",
+    "reading": "",
+    "meanings": [
+      "astonish",
+      "surprise"
+    ]
+  },
+  {
+    "word": "удивиться",
+    "reading": "",
+    "meanings": [
+      "wonder at",
+      "be astonished",
+      "surprised",
+      "amazed at"
+    ]
+  },
+  {
+    "word": "удивлять",
+    "reading": "",
+    "meanings": [
+      "astonish",
+      "surprise"
+    ]
+  },
+  {
+    "word": "удивляться",
+    "reading": "",
+    "meanings": [
+      "wonder at",
+      "be astonished",
+      "surprised",
+      "amazed at"
+    ]
+  },
+  {
+    "word": "удочерить",
+    "reading": "",
+    "meanings": [
+      "adopt"
+    ]
+  },
+  {
+    "word": "удочерять",
+    "reading": "",
+    "meanings": [
+      "adopt"
+    ]
+  },
+  {
+    "word": "указать",
+    "reading": "",
+    "meanings": [
+      "show",
+      "indicate"
+    ]
+  },
+  {
+    "word": "указывать",
+    "reading": "",
+    "meanings": [
+      "show",
+      "indicate"
+    ]
+  },
+  {
+    "word": "украсить",
+    "reading": "",
+    "meanings": [
+      "adorn",
+      "embellish"
+    ]
+  },
+  {
+    "word": "украшать",
+    "reading": "",
+    "meanings": [
+      "adorn",
+      "embellish"
+    ]
+  },
+  {
+    "word": "улучшать",
+    "reading": "",
+    "meanings": [
+      "improve",
+      "make better"
+    ]
+  },
+  {
+    "word": "улучшить",
+    "reading": "",
+    "meanings": [
+      "improve",
+      "make better"
+    ]
+  },
+  {
+    "word": "употребить",
+    "reading": "",
+    "meanings": [
+      "use",
+      "make use (of)"
+    ]
+  },
+  {
+    "word": "употреблять",
+    "reading": "",
+    "meanings": [
+      "use",
+      "make use (of)"
+    ]
+  },
+  {
+    "word": "управлять",
+    "reading": "",
+    "meanings": [
+      "govern",
+      "rule (over)"
+    ]
+  },
+  {
+    "word": "усиливать",
+    "reading": "",
+    "meanings": [
+      "strengthen",
+      "reinforce"
+    ]
+  },
+  {
+    "word": "усиливаться",
+    "reading": "",
+    "meanings": [
+      "become stronger",
+      "intensify"
+    ]
+  },
+  {
+    "word": "усилить",
+    "reading": "",
+    "meanings": [
+      "strengthen",
+      "reinforce"
+    ]
+  },
+  {
+    "word": "усилиться",
+    "reading": "",
+    "meanings": [
+      "become stronger",
+      "intensify"
+    ]
+  },
+  {
+    "word": "усомниться",
+    "reading": "",
+    "meanings": [
+      "doubt",
+      "feel a doubt"
+    ]
+  },
+  {
+    "word": "успевать",
+    "reading": "",
+    "meanings": [
+      "have time"
+    ]
+  },
+  {
+    "word": "успеть",
+    "reading": "",
+    "meanings": [
+      "have time"
+    ]
+  },
+  {
+    "word": "успокаивать",
+    "reading": "",
+    "meanings": [
+      "calm",
+      "quiet"
+    ]
+  },
+  {
+    "word": "успокаиваться",
+    "reading": "",
+    "meanings": [
+      "calm / quiet / settle down",
+      "abate"
+    ]
+  },
+  {
+    "word": "успокоить",
+    "reading": "",
+    "meanings": [
+      "calm",
+      "quiet"
+    ]
+  },
+  {
+    "word": "успокоиться",
+    "reading": "",
+    "meanings": [
+      "calm / quiet / settle down",
+      "abate"
+    ]
+  },
+  {
+    "word": "устанавливать",
+    "reading": "",
+    "meanings": [
+      "place",
+      "mount"
+    ]
+  },
+  {
+    "word": "устанавливаться",
+    "reading": "",
+    "meanings": [
+      "be settled",
+      "be formed / fixed"
+    ]
+  },
+  {
+    "word": "установить",
+    "reading": "",
+    "meanings": [
+      "place",
+      "mount"
+    ]
+  },
+  {
+    "word": "установиться",
+    "reading": "",
+    "meanings": [
+      "be settled",
+      "be formed / fixed"
+    ]
+  },
+  {
+    "word": "ухаживать",
+    "reading": "",
+    "meanings": [
+      "nurse",
+      "tend"
+    ]
+  },
+  {
+    "word": "ухудшаться",
+    "reading": "",
+    "meanings": [
+      "become worse",
+      "deteriorate"
+    ]
+  },
+  {
+    "word": "ухудшиться",
+    "reading": "",
+    "meanings": [
+      "become worse",
+      "deteriorate"
+    ]
+  },
+  {
+    "word": "участвовать",
+    "reading": "",
+    "meanings": [
+      "take part (in)",
+      "participate (in)"
+    ]
+  },
+  {
+    "word": "хвалить",
+    "reading": "",
+    "meanings": [
+      "compliment (for)",
+      "praise"
+    ]
+  },
+  {
+    "word": "хватать",
+    "reading": "",
+    "meanings": [
+      "snatch",
+      "catch hold (of)"
+    ]
+  },
+  {
+    "word": "хранить",
+    "reading": "",
+    "meanings": [
+      "keep"
+    ]
+  },
+  {
+    "word": "храниться",
+    "reading": "",
+    "meanings": [
+      "be kept"
+    ]
+  },
+  {
+    "word": "целоваться",
+    "reading": "",
+    "meanings": [
+      "kiss"
+    ]
+  },
+  {
+    "word": "чинить",
+    "reading": "",
+    "meanings": [
+      "repair",
+      "mend"
+    ]
+  },
+  {
+    "word": "читаться",
+    "reading": "",
+    "meanings": [
+      "read"
+    ]
+  },
+  {
+    "word": "шагать",
+    "reading": "",
+    "meanings": [
+      "step",
+      "walk"
+    ]
+  },
+  {
+    "word": "шагнуть",
+    "reading": "",
+    "meanings": [
+      "step",
+      "walk"
+    ]
+  },
+  {
+    "word": "шить",
+    "reading": "",
+    "meanings": [
+      "sew"
+    ]
+  },
+  {
+    "word": "шуметь",
+    "reading": "",
+    "meanings": [
+      "make a noise",
+      "be noisy"
+    ]
+  },
+  {
+    "word": "экономить",
+    "reading": "",
+    "meanings": [
+      "economize",
+      "use sparingly"
+    ]
+  },
+  {
+    "word": "явиться",
+    "reading": "",
+    "meanings": [
+      "appear",
+      "present"
+    ]
+  },
+  {
+    "word": "являться",
+    "reading": "",
+    "meanings": [
+      "appear",
+      "present"
+    ]
+  }
+]
