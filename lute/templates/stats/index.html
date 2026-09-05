@@ -349,12 +349,13 @@
     <button type="button" id="cefr-btn" class="ov-lang-select cefr-btn" style="display:none;">CEFR</button>
     <button type="button" id="topik-btn" class="ov-lang-select topik-btn" style="display:none;">TOPIK</button>
     <button type="button" id="dele-btn" class="ov-lang-select dele-btn" style="display:none;">DELE</button>
-    <button type="button" id="rus-btn" class="ov-lang-select rus-btn" style="display:none;">Russian</button>
-    <button type="button" id="ger-btn" class="ov-lang-select ger-btn" style="display:none;">German</button>
-    <button type="button" id="th-btn" class="ov-lang-select th-btn" style="display:none;">Thai</button>
-    <button type="button" id="fr-btn" class="ov-lang-select fr-btn" style="display:none;">French</button>
-    <button type="button" id="ar-btn" class="ov-lang-select ar-btn" style="display:none;">Arabic</button>
-    <button type="button" id="zh-btn" class="ov-lang-select zh-btn" style="display:none;">HSK</button>
+    <button type="button" id="rus-btn" class="ov-lang-select rus-btn" style="display:none;">Russian CEFR</button>
+    <button type="button" id="ger-btn" class="ov-lang-select ger-btn" style="display:none;">German CEFR</button>
+    <button type="button" id="th-btn" class="ov-lang-select th-btn" style="display:none;">Thai Freq</button>
+    <button type="button" id="fr-btn" class="ov-lang-select fr-btn" style="display:none;">French CEFR</button>
+    <button type="button" id="ar-btn" class="ov-lang-select ar-btn" style="display:none;">Arabic CEFR</button>
+    <button type="button" id="zh2-btn" class="ov-lang-select zh-btn" style="display:none;">HSK 2.0</button>
+    <button type="button" id="zh3-btn" class="ov-lang-select zh-btn" style="display:none;">HSK 3.0</button>
   </div>
 </div>
 
@@ -628,33 +629,63 @@
   </div>
 </div>
 
-<!-- HSK progress report (inline expandable panel) -->
-<div id="zh-panel" style="display:none;">
+<!-- HSK 2.0 progress report (inline expandable panel) -->
+<div id="zh2-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">Mandarin Vocabulary Progress</h3>
-      <span class="jlpt-sub">Chinese · HSK 1–6 · data: tomcumming/hsk-word-list</span>
-      <button type="button" id="zh-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">Mandarin Vocabulary Progress · HSK 2.0</h3>
+      <span class="jlpt-sub">Chinese · HSK 2.0 levels 1–6 · data: tomcumming/hsk-word-list</span>
+      <button type="button" id="zh2-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
     </div>
 
     <h4 class="jlpt-section">Overview</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
         <div class="jlpt-macro-label">Mastered</div>
-        <div class="jlpt-macro-hero"><span id="zh-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="zh-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-hero"><span id="zh2-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="zh2-mastered-detail">–</span> terms</div>
       </div>
       <div class="jlpt-macro-card">
         <div class="jlpt-macro-label">Seen</div>
-        <div class="jlpt-macro-hero"><span id="zh-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="zh-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-hero"><span id="zh2-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="zh2-seen-detail">–</span> terms</div>
       </div>
     </div>
 
     <h4 class="jlpt-section">By level</h4>
-    <div id="zh-levels"></div>
+    <div id="zh2-levels"></div>
 
-    <div class="jlpt-foot">Click a level bar to drill down · Terms are matched by surface word · Data: HSK 1-6 (tomcumming/hsk-word-list).</div>
+    <div class="jlpt-foot">Click a level bar to drill down · Terms are matched by surface word · Data: HSK 2.0 1-6 (tomcumming/hsk-word-list).</div>
+  </div>
+</div>
+
+<!-- HSK 3.0 progress report (inline expandable panel) -->
+<div id="zh3-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">Mandarin Vocabulary Progress · HSK 3.0</h3>
+      <span class="jlpt-sub">Chinese · HSK 3.0 levels 1–9 (7 = 7–9) · data: drkameleon/complete-hsk-vocabulary</span>
+      <button type="button" id="zh3-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="zh3-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="zh3-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="zh3-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="zh3-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By level</h4>
+    <div id="zh3-levels"></div>
+
+    <div class="jlpt-foot">Click a level bar to drill down · Terms are matched by surface word · Data: HSK 3.0 1-9 (drkameleon/complete-hsk-vocabulary).</div>
   </div>
 </div>
 
@@ -1179,6 +1210,7 @@
         closeDrilldown();
         return;
       }
+      if (cfg.manualOpen) { return; } // button only; user opens via click
       if (panel.style.display === 'none' || !state.data) {
         panel.style.display = '';
         if (currentLang !== 'all') { load(); }
@@ -1195,7 +1227,7 @@
   const GER_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
   const FR_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
   const AR_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
-  const HSK_COLORS = { '1': '#1dc981', '2': '#22a5f7', '3': '#f2b705', '4': '#f87454', '5': '#e8463a', '6': '#9c36b5' };
+  const HSK_COLORS = { '1': '#1dc981', '2': '#22a5f7', '3': '#f2b705', '4': '#f87454', '5': '#e8463a', '6': '#9c36b5', '7': '#7048e8' };
   const THAI_COLORS = {
     '1-500': '#1dc981', '501-1000': '#22a5f7', '1001-2000': '#f2b705',
     '2001-5000': '#f87454', '5001-10000': '#9c36b5'
@@ -1258,12 +1290,29 @@
     urls: { data: '/stats/arabic_data', words: '/stats/arabic_words', export: '/stats/arabic_export' },
   });
 
-  const zhReport = createLevelReport({
-    langKey: 'zh', btn: 'zh-btn', panel: 'zh-panel', levelsEl: 'zh-levels',
-    exportAll: 'zh-export-all', colors: HSK_COLORS, perPage: 60,
+  const zh2Report = createLevelReport({
+    langKey: 'zh', btn: 'zh2-btn', panel: 'zh2-panel', levelsEl: 'zh2-levels',
+    exportAll: 'zh2-export-all', colors: HSK_COLORS, perPage: 60,
     levelLabel: function(l) { return 'HSK ' + l; },
-    ids: { masteredPct: 'zh-mastered-pct', masteredDetail: 'zh-mastered-detail', seenPct: 'zh-seen-pct', seenDetail: 'zh-seen-detail' },
-    urls: { data: '/stats/hsk_data', words: '/stats/hsk_words', export: '/stats/hsk_export' },
+    manualOpen: true,
+    ids: { masteredPct: 'zh2-mastered-pct', masteredDetail: 'zh2-mastered-detail', seenPct: 'zh2-seen-pct', seenDetail: 'zh2-seen-detail' },
+    urls: { data: '/stats/hsk2_data', words: '/stats/hsk2_words', export: '/stats/hsk2_export' },
+  });
+
+  const zh3Report = createLevelReport({
+    langKey: 'zh', btn: 'zh3-btn', panel: 'zh3-panel', levelsEl: 'zh3-levels',
+    exportAll: 'zh3-export-all', colors: HSK_COLORS, perPage: 60,
+    levelLabel: function(l) { return l === '7' ? 'HSK 7-9' : 'HSK ' + l; },
+    ids: { masteredPct: 'zh3-mastered-pct', masteredDetail: 'zh3-mastered-detail', seenPct: 'zh3-seen-pct', seenDetail: 'zh3-seen-detail' },
+    urls: { data: '/stats/hsk3_data', words: '/stats/hsk3_words', export: '/stats/hsk3_export' },
+  });
+
+  // The two HSK reports are mutually exclusive side-by-side panels.
+  zh2Report.btn.addEventListener('click', function() {
+    zh3Report.panel.style.display = 'none';
+  });
+  zh3Report.btn.addEventListener('click', function() {
+    zh2Report.panel.style.display = 'none';
   });
 
   const origUpdateJpButton = updateJpButton;
@@ -1277,7 +1326,8 @@
     thaiReport.sync();
     frReport.sync();
     arReport.sync();
-    zhReport.sync();
+    zh2Report.sync();
+    zh3Report.sync();
   };
 
   updateJpButton();
