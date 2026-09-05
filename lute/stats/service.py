@@ -158,9 +158,7 @@ def _daily_counts(session, date_col, lang_id, status_filter=None):
     """
     params = {}
     where = []
-    where.append(
-        "WoLgID in (select LgID from languages where LgIsActive = 1)"
-    )
+    where.append("WoLgID in (select LgID from languages where LgIsActive = 1)")
     if lang_id is not None:
         where.append("WoLgID = :lid")
         params["lid"] = lang_id
@@ -256,6 +254,13 @@ def get_term_languages(session):
             "is_korean": r[2] == "korean",
             "is_english": str(r[1] or "").strip().lower() == "english",
             "is_spanish": str(r[1] or "").strip().lower() == "spanish",
+            "is_russian": str(r[1] or "").strip().lower() == "russian",
+            "is_german": str(r[1] or "").strip().lower() == "german",
+            "is_thai": str(r[1] or "").strip().lower() == "thai",
+            "is_french": str(r[1] or "").strip().lower() == "french",
+            "is_arabic": str(r[1] or "").strip().lower() == "arabic",
+            "is_chinese": str(r[1] or "").strip().lower()
+            in ("chinese", "mandarin chinese"),
         }
         for r in rows
     ]
@@ -405,6 +410,7 @@ def get_jlpt_words(session, lang_id, level, word_filter):
 # matcher so the same count/word/filter logic is reused for all three.
 # ---------------------------------------------------------------------------
 
+
 def _level_progress(session, lang_id, levels, level_fn, totals):
     "Attribute seen/mastered term counts to the given levels."
     sql = """
@@ -453,22 +459,27 @@ def _level_progress(session, lang_id, levels, level_fn, totals):
 def get_cefr_data(session, lang_id):
     "CEFR (A1-C2) progress for the given English language."
     from lute.stats.cefr_data import LEVELS, cefr_level, level_totals
+
     return _level_progress(session, lang_id, LEVELS, cefr_level, level_totals())
 
 
 def get_topik_data(session, lang_id):
     "TOPIK (A/B/C) progress for the given Korean language."
     from lute.stats.topik_data import LEVELS, topik_level, level_totals
+
     return _level_progress(session, lang_id, LEVELS, topik_level, level_totals())
 
 
 def get_dele_data(session, lang_id):
     "DELE (A1-C2) progress for the given Spanish language."
     from lute.stats.dele_data import LEVELS, dele_level, level_totals
+
     return _level_progress(session, lang_id, LEVELS, dele_level, level_totals())
 
 
-def _level_words(session, lang_id, level, word_filter, norm, level_fn, level_words, headwords_fn=None):
+def _level_words(
+    session, lang_id, level, word_filter, norm, level_fn, level_words, headwords_fn=None
+):
     """
     Words for one level and filter (shared by CEFR/TOPIK drilldowns).
 
@@ -543,30 +554,45 @@ def _norm_en(word):
 def _cefr_headwords(word):
     "CEFR headwords a stored English term expands to (for 'not seen')."
     from lute.stats.cefr_data import base_forms_for
+
     return base_forms_for(word)
 
 
 def get_cefr_words(session, lang_id, level, word_filter):
     "All words for a CEFR level and filter."
     from lute.stats.cefr_data import level_words, cefr_level
+
     return _level_words(
-        session, lang_id, level, word_filter,
-        _norm_en, cefr_level, level_words, _cefr_headwords,
+        session,
+        lang_id,
+        level,
+        word_filter,
+        _norm_en,
+        cefr_level,
+        level_words,
+        _cefr_headwords,
     )
 
 
 def get_topik_words(session, lang_id, level, word_filter):
     "All words for a TOPIK level and filter."
     from lute.stats.topik_data import level_words, topik_level
+
     return _level_words(
-        session, lang_id, level, word_filter,
-        _norm_ko, topik_level, level_words,
+        session,
+        lang_id,
+        level,
+        word_filter,
+        _norm_ko,
+        topik_level,
+        level_words,
     )
 
 
 def _norm_ko(word):
     "Normalize a Korean term for matching."
     from lute.stats.topik_data import _normalize_ko
+
     return _normalize_ko(word)
 
 
@@ -578,15 +604,227 @@ def _norm_es(word):
 def _dele_headwords(word):
     "DELE headwords a stored Spanish term expands to (for 'not seen')."
     from lute.stats.dele_data import base_forms_for
+
     return base_forms_for(word)
 
 
 def get_dele_words(session, lang_id, level, word_filter):
     "All words for a DELE level and filter."
     from lute.stats.dele_data import level_words, dele_level
+
+    return _level_words(
+        session,
+        lang_id,
+        level,
+        word_filter,
+        _norm_es,
+        dele_level,
+        level_words,
+        _dele_headwords,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Russian CEFR report (CoreRussianVerbs verb list).
+# ---------------------------------------------------------------------------
+
+
+def get_russian_data(session, lang_id):
+    "Russian CEFR (A1-C2) progress for the given Russian language."
+    from lute.stats.russian_data import LEVELS, russian_level, level_totals
+
+    return _level_progress(session, lang_id, LEVELS, russian_level, level_totals())
+
+
+def _norm_ru(word):
+    "Normalize a Russian term for matching."
+    return (word or "").strip().lower()
+
+
+def _russian_headwords(word):
+    "Russian headwords a stored term expands to (for 'not seen')."
+    from lute.stats.russian_data import base_forms_for
+
+    return base_forms_for(word)
+
+
+def get_russian_words(session, lang_id, level, word_filter):
+    "All words for a Russian CEFR level and filter."
+    from lute.stats.russian_data import level_words, russian_level
+
+    return _level_words(
+        session,
+        lang_id,
+        level,
+        word_filter,
+        _norm_ru,
+        russian_level,
+        level_words,
+        _russian_headwords,
+    )
+
+
+# ---------------------------------------------------------------------------
+# German CEFR report (Goethe A1-C2 vocabulary).
+# ---------------------------------------------------------------------------
+
+
+def get_german_data(session, lang_id):
+    "German CEFR (A1-C2) progress for the given German language."
+    from lute.stats.german_data import LEVELS, german_level, level_totals
+
+    return _level_progress(session, lang_id, LEVELS, german_level, level_totals())
+
+
+def _norm_de(word):
+    "Normalize a German term for matching."
+    return (word or "").strip().lower()
+
+
+def _german_headwords(word):
+    "German headwords a stored term expands to (for 'not seen')."
+    from lute.stats.german_data import base_forms_for
+
+    return base_forms_for(word)
+
+
+def get_german_words(session, lang_id, level, word_filter):
+    "All words for a German CEFR level and filter."
+    from lute.stats.german_data import level_words, german_level
+
+    return _level_words(
+        session,
+        lang_id,
+        level,
+        word_filter,
+        _norm_de,
+        german_level,
+        level_words,
+        _german_headwords,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Thai frequency-bucket report (PyThaiNLP Phupha word frequencies).
+# ---------------------------------------------------------------------------
+
+
+def get_thai_data(session, lang_id):
+    "Thai frequency-bucket progress for the given Thai language."
+    from lute.stats.thai_data import LEVELS, thai_level, level_totals
+
+    return _level_progress(session, lang_id, LEVELS, thai_level, level_totals())
+
+
+def _norm_th(word):
+    "Normalize a Thai term for matching."
+    return (word or "").strip()
+
+
+def _thai_headwords(word):
+    "Thai headwords a stored term expands to (for 'not seen')."
+    from lute.stats.thai_data import base_forms_for
+
+    return base_forms_for(word)
+
+
+def get_thai_words(session, lang_id, level, word_filter):
+    "All words for a Thai frequency bucket and filter."
+    from lute.stats.thai_data import level_words, thai_level
     return _level_words(
         session, lang_id, level, word_filter,
-        _norm_es, dele_level, level_words, _dele_headwords,
+        _norm_th, thai_level, level_words, _thai_headwords,
+    )
+
+
+# ---------------------------------------------------------------------------
+# French CEFR report (hyunahparc/bienvenue-au-croissant).
+# ---------------------------------------------------------------------------
+
+def get_french_data(session, lang_id):
+    "French CEFR (A1-C2) progress for the given French language."
+    from lute.stats.french_data import LEVELS, french_level, level_totals
+    return _level_progress(session, lang_id, LEVELS, french_level, level_totals())
+
+
+def _norm_fr(word):
+    "Normalize a French term for matching."
+    return (word or "").strip().lower()
+
+
+def _french_headwords(word):
+    "French headwords a stored term expands to (for 'not seen')."
+    from lute.stats.french_data import base_forms_for
+    return base_forms_for(word)
+
+
+def get_french_words(session, lang_id, level, word_filter):
+    "All words for a French CEFR level and filter."
+    from lute.stats.french_data import level_words, french_level
+    return _level_words(
+        session, lang_id, level, word_filter,
+        _norm_fr, french_level, level_words, _french_headwords,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Arabic CEFR report (kotoshu/frequency-list-kelly).
+# ---------------------------------------------------------------------------
+
+def get_arabic_data(session, lang_id):
+    "Arabic CEFR (A1-C2) progress for the given Arabic language."
+    from lute.stats.arabic_data import LEVELS, arabic_level, level_totals
+    return _level_progress(session, lang_id, LEVELS, arabic_level, level_totals())
+
+
+def _norm_ar(word):
+    "Normalize an Arabic term for matching (strip diacritics, alef variants)."
+    from lute.stats.arabic_data import normalize
+    return normalize(word)
+
+
+def _arabic_headwords(word):
+    "Arabic headwords a stored term expands to (for 'not seen')."
+    from lute.stats.arabic_data import base_forms_for
+    return base_forms_for(word)
+
+
+def get_arabic_words(session, lang_id, level, word_filter):
+    "All words for an Arabic CEFR level and filter."
+    from lute.stats.arabic_data import level_words, arabic_level
+    return _level_words(
+        session, lang_id, level, word_filter,
+        _norm_ar, arabic_level, level_words, _arabic_headwords,
+    )
+
+
+# ---------------------------------------------------------------------------
+# HSK (Mandarin Chinese) report (tomcumming/hsk-word-list).
+# ---------------------------------------------------------------------------
+
+def get_hsk_data(session, lang_id):
+    "HSK (1-6) progress for the given Mandarin Chinese language."
+    from lute.stats.hsk_data import LEVELS, hsk_level, level_totals
+    return _level_progress(session, lang_id, LEVELS, hsk_level, level_totals())
+
+
+def _norm_hsk(word):
+    "Normalize a Mandarin term for matching (strip whitespace only)."
+    return (word or "").strip()
+
+
+def _hsk_headwords(word):
+    "HSK headwords a stored term expands to (itself, if present)."
+    from lute.stats.hsk_data import base_forms_for
+    return base_forms_for(word)
+
+
+def get_hsk_words(session, lang_id, level, word_filter):
+    "All words for an HSK level and filter."
+    from lute.stats.hsk_data import level_words, hsk_level
+    return _level_words(
+        session, lang_id, level, word_filter,
+        _norm_hsk, hsk_level, level_words, _hsk_headwords,
     )
 
 
@@ -621,9 +859,7 @@ def get_term_summary(session, lang_id, period="7days"):
     Only counts terms from active (non-frozen) languages.
     """
     params = {}
-    where_parts = [
-        "WoLgID in (select LgID from languages where LgIsActive = 1)"
-    ]
+    where_parts = ["WoLgID in (select LgID from languages where LgIsActive = 1)"]
     if lang_id is not None:
         where_parts.append("WoLgID = :lid")
         params["lid"] = lang_id
@@ -653,10 +889,12 @@ def get_term_summary(session, lang_id, period="7days"):
     recent_params["start_date"] = recent_start
     recent_params["end_date"] = recent_end
 
-    recent_where = where_clause + " and date(WoCreated, 'localtime') >= :start_date and date(WoCreated, 'localtime') <= :end_date"
+    recent_where = (
+        where_clause
+        + " and date(WoCreated, 'localtime') >= :start_date and date(WoCreated, 'localtime') <= :end_date"
+    )
     recent_sql = (
-        f"select WoStatus, count(*) from words {recent_where} "
-        "group by WoStatus"
+        f"select WoStatus, count(*) from words {recent_where} " "group by WoStatus"
     )
     recent_rows = session.execute(text(recent_sql), recent_params).all()
     recent_by_status = {int(r[0]): int(r[1]) for r in recent_rows}
@@ -668,6 +906,8 @@ def get_term_summary(session, lang_id, period="7days"):
     return {
         "total_terms": int(total),
         "recent_by_status": recent_by_status,
-        "recent_label": "Today" if period == "today" else ("Last 7 days" if period == "7days" else "Last 12 months"),
+        "recent_label": "Today"
+        if period == "today"
+        else ("Last 7 days" if period == "7days" else "Last 12 months"),
         "cumulative_by_status": cumulative_by_status,
     }
