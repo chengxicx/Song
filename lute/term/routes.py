@@ -17,12 +17,14 @@ from flask import (
 )
 from lute.models.language import Language
 from lute.models.term import Status
+from lute.models.book import Book as DBBook, BookTag
 from lute.models.repositories import (
     BookRepository,
     LanguageRepository,
     TermRepository,
     UserSettingRepository,
 )
+from lute.read.render.service import Service as RenderService
 from lute.utils.data_tables import DataTablesFlaskParamParser
 from lute.term.datatables import get_data_tables_list
 from lute.term.model import Repository, Term, ReferencesRepository
@@ -55,6 +57,21 @@ def index(search):
         s for s in all_statuses if s.id == Status.IGNORED
     ]
     r = Repository(db.session)
+    books = (
+        db.session.query(DBBook)
+        .filter(DBBook.archived == False)  # noqa: E712 - match bool column
+        .order_by(DBBook.title)
+        .all()
+    )
+    book_options = [(b.id, b.title) for b in books]
+    bookset_rows = (
+        db.session.query(BookTag.text)
+        .join(DBBook.book_tags)
+        .distinct()
+        .order_by(BookTag.text)
+        .all()
+    )
+    bookset_options = [(row[0], row[0]) for row in bookset_rows]
     return render_template(
         "term/index.html",
         initial_search=search,
@@ -62,6 +79,8 @@ def index(search):
         filter_statuses=filter_statuses,
         update_statuses=update_statuses,
         tags=r.get_term_tags(),
+        book_options=book_options,
+        bookset_options=bookset_options,
         in_term_index_listing=True,
     )
 
@@ -90,6 +109,73 @@ def datatables_active_source():
     _load_term_custom_filters(request.form, parameters)
     data = get_data_tables_list(parameters, db.session)
     return jsonify(data)
+
+
+def _term_ids_for_books(session, books):
+    """
+    Return the set of term (word) ids appearing in the given books.
+
+    Lute does not store a term-to-book relationship directly; a book's
+    terms are the words matched when its text is parsed.  Reuse the read
+    rendering service to parse the books' pages in batches and collect
+    the matched term ids.
+    """
+    term_ids = set()
+    by_language = {}
+    for book in books:
+        lang = getattr(book, "language", None)
+        if lang is None or not book.is_supported:
+            continue
+        by_language.setdefault(lang.id, []).append(book)
+
+    chunk_size = 500
+    for lang_id, lang_books in by_language.items():
+        language = lang_books[0].language
+        render_service = RenderService(session)
+        mw = render_service.get_multiword_indexer(language)
+        texts = [
+            t.text
+            for book in lang_books
+            for t in book.texts
+            if (t.text or "").strip()
+        ]
+        for i in range(0, len(texts), chunk_size):
+            chunk = "\n".join(texts[i : i + chunk_size])
+            try:
+                items = render_service.get_textitems(chunk, language, mw)
+            except Exception:  # noqa: BLE001 - a bad page shouldn't fail the filter
+                continue
+            for ti in items:
+                if ti.wo_id:
+                    term_ids.add(ti.wo_id)
+    return term_ids
+
+
+@bp.route("/book_terms", methods=["POST"])
+def book_terms():
+    """
+    Term (word) ids appearing in a single book or a book set.
+
+    A book set is a group of books sharing the same series tag.  The
+    frontend uses these ids to filter the term listing via filtTermIDs.
+    """
+    data = request.get_json(silent=True) or request.form
+    books = []
+    book_id = data.get("book_id")
+    bookset_tag = data.get("bookset_tag")
+    if book_id:
+        book = BookRepository(db.session).find(int(book_id))
+        if book is not None:
+            books.append(book)
+    elif bookset_tag:
+        books = (
+            db.session.query(DBBook)
+            .join(DBBook.book_tags)
+            .filter(BookTag.text == bookset_tag)
+            .all()
+        )
+    term_ids = sorted(_term_ids_for_books(db.session, books))
+    return jsonify({"termids": term_ids})
 
 
 def get_bulk_update_from_form(form):
