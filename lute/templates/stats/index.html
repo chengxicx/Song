@@ -33,6 +33,9 @@
   .ov-lang-select {
     padding: 5px 8px; border-radius: 4px; border: 1px solid #ced4da; font-size: 13px;
   }
+  .ov-lang-select.active {
+    background: #228be6; color: #fff; border-color: #228be6;
+  }
 
   /* JLPT progress panel */
   .jlpt-btn, .cefr-btn, .topik-btn, .dele-btn, .rus-btn, .ger-btn, .th-btn, .fr-btn, .ar-btn, .zh-btn { margin-left: 10px; cursor: pointer; background: var(--chart-card-bg, #fff); color: var(--chart-tick-major-color, #212529); font-weight: 600; }
@@ -1197,6 +1200,7 @@
     btn.addEventListener('click', function() {
       const open = panel.style.display !== 'none';
       panel.style.display = open ? 'none' : '';
+      btn.classList.toggle('active', !open);
       if (!open && currentLang !== 'all') { load(); }
     });
 
@@ -1207,6 +1211,7 @@
       btn.style.display = active ? '' : 'none';
       if (!active) {
         panel.style.display = 'none';
+        btn.classList.remove('active');
         closeDrilldown();
         return;
       }
@@ -1215,6 +1220,7 @@
         panel.style.display = '';
         if (currentLang !== 'all') { load(); }
       }
+      btn.classList.toggle('active', panel.style.display !== 'none');
     }
 
     return { sync: sync };
@@ -1309,10 +1315,14 @@
 
   // The two HSK reports are mutually exclusive side-by-side panels.
   document.getElementById('zh2-btn').addEventListener('click', function() {
-    document.getElementById('zh3-panel').style.display = 'none';
+    const p = document.getElementById('zh3-panel');
+    p.style.display = 'none';
+    document.getElementById('zh3-btn').classList.remove('active');
   });
   document.getElementById('zh3-btn').addEventListener('click', function() {
-    document.getElementById('zh2-panel').style.display = 'none';
+    const p = document.getElementById('zh2-panel');
+    p.style.display = 'none';
+    document.getElementById('zh2-btn').classList.remove('active');
   });
 
   const origUpdateJpButton = updateJpButton;
