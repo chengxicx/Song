@@ -825,16 +825,19 @@
     jlptBtn.style.display = isJp ? '' : 'none';
     if (!isJp) {
       jlptPanel.style.display = 'none';
+      jlptBtn.classList.remove('active');
       closeDrilldown();
     } else if (jlptPanel.style.display === 'none' || !jlptData) {
       jlptPanel.style.display = '';
       loadJlpt();
+      jlptBtn.classList.add('active');
     }
   }
 
   jlptBtn.addEventListener('click', function() {
     const open = jlptPanel.style.display !== 'none';
     jlptPanel.style.display = open ? 'none' : '';
+    jlptBtn.classList.toggle('active', !open);
     if (!open && currentLang !== 'all') { loadJlpt(); }
   });
 
