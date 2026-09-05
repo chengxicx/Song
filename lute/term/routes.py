@@ -63,15 +63,20 @@ def index(search):
         .order_by(DBBook.title)
         .all()
     )
-    book_options = [(b.id, b.title) for b in books]
+    book_options = [(b.id, b.title, b.language_id) for b in books]
     bookset_rows = (
-        db.session.query(BookTag.text)
+        db.session.query(BookTag.text, DBBook.language_id)
         .join(DBBook.book_tags)
-        .distinct()
-        .order_by(BookTag.text)
+        .order_by(BookTag.text, DBBook.language_id)
         .all()
     )
-    bookset_options = [(row[0], row[0]) for row in bookset_rows]
+    # Aggregate the distinct member-book languages per book set (tag).
+    bookset_langs = {}
+    for text, lgid in bookset_rows:
+        bookset_langs.setdefault(text, set()).add(lgid)
+    bookset_options = [
+        (text, text, sorted(bookset_langs[text])) for text in bookset_langs
+    ]
     return render_template(
         "term/index.html",
         initial_search=search,
