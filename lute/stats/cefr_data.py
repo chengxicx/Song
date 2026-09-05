@@ -91,9 +91,6 @@ def base_candidates(word):
 
     if w.endswith("ies") and n > 4:
         cands.add(w[:-3] + "y")          # cities -> city
-    if w.endswith("ers") and n > 4:
-        cands.add(w[:-3] + "")           # workers -> worker (via ...)
-        cands.add(w[:-2])                # workers -> worker
     if w.endswith("es") and n > 4 and not w.endswith("sses"):
         cands.add(w[:-2])                # boxes -> box, watches -> watch
     if w.endswith("s") and n > 3 and not w.endswith(("ss", "us")):
