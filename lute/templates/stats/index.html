@@ -1308,11 +1308,11 @@
   });
 
   // The two HSK reports are mutually exclusive side-by-side panels.
-  zh2Report.btn.addEventListener('click', function() {
-    zh3Report.panel.style.display = 'none';
+  document.getElementById('zh2-btn').addEventListener('click', function() {
+    document.getElementById('zh3-panel').style.display = 'none';
   });
-  zh3Report.btn.addEventListener('click', function() {
-    zh2Report.panel.style.display = 'none';
+  document.getElementById('zh3-btn').addEventListener('click', function() {
+    document.getElementById('zh2-panel').style.display = 'none';
   });
 
   const origUpdateJpButton = updateJpButton;
