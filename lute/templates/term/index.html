@@ -56,6 +56,28 @@
         <input id="filtIncludeIgnored" type="checkbox" />
       </td>
     </tr>
+    <tr>
+      <td>Book</td>
+      <td>
+        <select id="filtBook">
+          <option value="0">(all)</option>
+          {% for b in book_options %}
+          <option value="{{ b[0] }}">{{ b[1] }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Book set</td>
+      <td>
+        <select id="filtBookSet">
+          <option value="">(all)</option>
+          {% for s in bookset_options %}
+          <option value="{{ s[0] }}">{{ s[1] }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
     <tr id="filtTermIDs_row" style="display: none">
       <td>Term IDs</td>
       <td>
@@ -583,6 +605,8 @@
       filtStatusMin: $('#filtStatusMin').val(),
       filtStatusMax: $('#filtStatusMax').val(),
       filtIncludeIgnored: $('#filtIncludeIgnored').prop('checked'),
+      filtBook: $('#filtBook').val(),
+      filtBookSet: $('#filtBookSet').val(),
       filtTermIDs: $('#filtTermIDs').val(),
     };
     // console.log('saving: ' + JSON.stringify(store));
@@ -597,9 +621,62 @@
     $('#filtStatusMin').val(1);
     $('#filtStatusMax').val(99);
     $('#filtIncludeIgnored').prop('checked', false);
+    $('#filtBook').val(0);
+    $('#filtBookSet').val('');
     $('#filtTermIDs').val('');
     $('#filtTermIDs_row').css('display', 'none');
     update_filter_storage();
+  };
+
+  /**
+   * Fetch the term ids for the currently selected book / book set, then
+   * apply them as the filtTermIDs filter and redraw the table.
+   */
+  let fetch_book_termids_and_draw = function() {
+    const book_id = $('#filtBook').val();
+    const bookset_tag = $('#filtBookSet').val();
+    const active = (book_id !== '0') || (bookset_tag !== '');
+    if (!active) {
+      $('#filtTermIDs').val('');
+      $('#filtTermIDs_row').css('display', 'none');
+      update_filter_storage();
+      $('#termtable').DataTable().draw();
+      return;
+    }
+    const payload = (book_id !== '0')
+      ? { book_id: parseInt(book_id) }
+      : { bookset_tag: bookset_tag };
+    $('#termtable').DataTable().processing(true);
+    $.ajax({
+      url: '/term/book_terms',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(payload),
+      success: function(resp) {
+        const termids = (resp.termids || []).join(',');
+        $('#filtTermIDs').val(termids);
+        if (termids) {
+          $('#filtTermIDs_row').css('display', 'table-row');
+          $('#filtTermIDs_message').text('(Filtered by book / book set)');
+        }
+        update_filter_storage();
+        $('#termtable').DataTable().draw();
+      },
+      error: function() {
+        $('#filtTermIDs').val('');
+        update_filter_storage();
+        $('#termtable').DataTable().draw();
+      }
+    });
+  };
+
+  let handle_book_filter_change = function() {
+    // Only one of the two selectors may be active at a time.
+    if ($(this).attr('id') === 'filtBook')
+      $('#filtBookSet').val('');
+    if ($(this).attr('id') === 'filtBookSet')
+      $('#filtBook').val(0);
+    fetch_book_termids_and_draw();
   };
 
   let handle_filter_update = function() {
@@ -634,10 +711,16 @@
     $('#filtStatusMin').val(parseInt(store.filtStatusMin ?? '1'));
     $('#filtStatusMax').val(parseInt(store.filtStatusMax ?? '99'));
     $('#filtIncludeIgnored').prop('checked', store.filtIncludeIgnored);
+    $('#filtBook').val(store.filtBook ?? '0');
+    $('#filtBookSet').val(store.filtBookSet ?? '');
     if ((store.filtTermIDs ?? '') != '') {
       $('#filtTermIDs').val(store.filtTermIDs);
       $('#filtTermIDs_row').css('display', 'table-row');
-      $('#filtTermIDs_message').text('(Filtered from reading pane)');
+      const bookFilter =
+        (store.filtBook ?? '0') !== '0' || (store.filtBookSet ?? '') !== '';
+      $('#filtTermIDs_message').text(
+        bookFilter ? '(Filtered by book / book set)' : '(Filtered from reading pane)'
+      );
     }
   };
 
@@ -686,6 +769,8 @@
     $('#filtStatusMin').change(handle_filter_update);
     $('#filtStatusMax').change(handle_filter_update);
     $('#filtIncludeIgnored').change(handle_filter_update);
+    $('#filtBook').change(handle_book_filter_change);
+    $('#filtBookSet').change(handle_book_filter_change);
     // filtTermIDs are not interactive, no handler needed.
     $('#clearFilters').click(handle_clear_filters);
 
