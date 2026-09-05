@@ -35,8 +35,8 @@
   }
 
   /* JLPT progress panel */
-  .jlpt-btn, .cefr-btn, .topik-btn, .dele-btn { margin-left: 10px; cursor: pointer; background: var(--chart-card-bg, #fff); color: var(--chart-tick-major-color, #212529); font-weight: 600; }
-  .jlpt-btn:hover, .cefr-btn:hover, .topik-btn:hover, .dele-btn:hover { background: var(--chart-grid-color, #f1f3f5); }
+  .jlpt-btn, .cefr-btn, .topik-btn, .dele-btn, .rus-btn, .ger-btn, .th-btn, .fr-btn, .ar-btn, .zh-btn { margin-left: 10px; cursor: pointer; background: var(--chart-card-bg, #fff); color: var(--chart-tick-major-color, #212529); font-weight: 600; }
+  .jlpt-btn:hover, .cefr-btn:hover, .topik-btn:hover, .dele-btn:hover, .rus-btn:hover, .ger-btn:hover, .th-btn:hover, .fr-btn:hover, .ar-btn:hover, .zh-btn:hover { background: var(--chart-grid-color, #f1f3f5); }
   .jlpt-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
   .jlpt-sub { font-size: 12px; color: var(--chart-tick-color, #6c757d); }
   .jlpt-section {
@@ -342,13 +342,19 @@
     <select id="ov-lang" class="ov-lang-select">
       <option value="all">All languages</option>
       {% for lang in term_languages %}
-      <option value="{{ lang.id }}" {% if lang.id == default_lang_id %}selected{% endif %} data-jp="{{ '1' if lang.is_japanese else '0' }}" data-en="{{ '1' if lang.is_english else '0' }}" data-ko="{{ '1' if lang.is_korean else '0' }}" data-es="{{ '1' if lang.is_spanish else '0' }}">{{ lang.name }} ({{ lang.count }})</option>
+      <option value="{{ lang.id }}" {% if lang.id == default_lang_id %}selected{% endif %} data-jp="{{ '1' if lang.is_japanese else '0' }}" data-en="{{ '1' if lang.is_english else '0' }}" data-ko="{{ '1' if lang.is_korean else '0' }}" data-es="{{ '1' if lang.is_spanish else '0' }}" data-ru="{{ '1' if lang.is_russian else '0' }}" data-de="{{ '1' if lang.is_german else '0' }}" data-th="{{ '1' if lang.is_thai else '0' }}" data-fr="{{ '1' if lang.is_french else '0' }}" data-ar="{{ '1' if lang.is_arabic else '0' }}" data-zh="{{ '1' if lang.is_chinese else '0' }}">{{ lang.name }} ({{ lang.count }})</option>
       {% endfor %}
     </select>
     <button type="button" id="jlpt-btn" class="ov-lang-select jlpt-btn" style="display:none;">JLPT</button>
     <button type="button" id="cefr-btn" class="ov-lang-select cefr-btn" style="display:none;">CEFR</button>
     <button type="button" id="topik-btn" class="ov-lang-select topik-btn" style="display:none;">TOPIK</button>
     <button type="button" id="dele-btn" class="ov-lang-select dele-btn" style="display:none;">DELE</button>
+    <button type="button" id="rus-btn" class="ov-lang-select rus-btn" style="display:none;">Russian</button>
+    <button type="button" id="ger-btn" class="ov-lang-select ger-btn" style="display:none;">German</button>
+    <button type="button" id="th-btn" class="ov-lang-select th-btn" style="display:none;">Thai</button>
+    <button type="button" id="fr-btn" class="ov-lang-select fr-btn" style="display:none;">French</button>
+    <button type="button" id="ar-btn" class="ov-lang-select ar-btn" style="display:none;">Arabic</button>
+    <button type="button" id="zh-btn" class="ov-lang-select zh-btn" style="display:none;">HSK</button>
   </div>
 </div>
 
@@ -469,6 +475,186 @@
     <div id="dele-levels"></div>
 
     <div class="jlpt-foot">Hover a word for meaning · Dashed cells = Not seen (from the DELE list) · Inflected forms are matched to their base word · Click a level bar to drill down.</div>
+  </div>
+</div>
+
+<!-- Russian verbs progress report -->
+<div id="rus-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">Russian Verbs Progress</h3>
+      <span class="jlpt-sub">Russian · A1–C2 · data: StorkST CoreRussianVerbs</span>
+      <button type="button" id="rus-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="rus-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="rus-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="rus-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="rus-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By level</h4>
+    <div id="rus-levels"></div>
+
+    <div class="jlpt-foot">Hover a word for meaning · Dashed cells = Not seen (from the Russian list) · Inflected forms are matched to their infinitive · Click a level bar to drill down.</div>
+  </div>
+</div>
+
+<!-- German CEFR progress report -->
+<div id="ger-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">German Vocabulary Progress</h3>
+      <span class="jlpt-sub">German · CEFR A1–C2 · data: IamHamud German-Language-Community + Goethe C2</span>
+      <button type="button" id="ger-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="ger-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="ger-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="ger-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="ger-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By level</h4>
+    <div id="ger-levels"></div>
+
+    <div class="jlpt-foot">Hover a word for meaning · Dashed cells = Not seen (from the German list) · Inflected forms are matched to their base word · Click a level bar to drill down.</div>
+  </div>
+</div>
+
+<!-- Thai frequency-bucket progress report -->
+<div id="th-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">Thai Vocabulary Progress</h3>
+      <span class="jlpt-sub">Thai · by frequency rank · data: PyThaiNLP Phupha Word-Freq (CC0)</span>
+      <button type="button" id="th-export-all" class="jlpt-export-all">Export all buckets (CSV)</button>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="th-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="th-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="th-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="th-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By frequency bucket</h4>
+    <div id="th-levels"></div>
+
+    <div class="jlpt-foot">Hover a word for meaning · Dashed cells = Not seen (from the Thai list) · Buckets are by frequency rank (Common Crawl) · Click a level bar to drill down.</div>
+  </div>
+</div>
+
+<!-- French CEFR progress report -->
+<div id="fr-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">French Vocabulary Progress</h3>
+      <span class="jlpt-sub">French · CEFR A1–C2 · data: hyunahparc/bienvenue-au-croissant</span>
+      <button type="button" id="fr-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="fr-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="fr-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="fr-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="fr-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By level</h4>
+    <div id="fr-levels"></div>
+
+    <div class="jlpt-foot">Click a level bar to drill down · Inflected forms are matched to their base word · Data: French-Korean CEFR word lists.</div>
+  </div>
+</div>
+
+<!-- Arabic CEFR progress report -->
+<div id="ar-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">Arabic Vocabulary Progress</h3>
+      <span class="jlpt-sub">Arabic · CEFR A1–C2 · data: KELLY Project</span>
+      <button type="button" id="ar-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="ar-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="ar-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="ar-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="ar-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By level</h4>
+    <div id="ar-levels"></div>
+
+    <div class="jlpt-foot">Click a level bar to drill down · Diacritics are ignored and forms are matched to their base word · Data: KELLY (Leeds &amp; Gothenburg).</div>
+  </div>
+</div>
+
+<!-- HSK progress report (inline expandable panel) -->
+<div id="zh-panel" style="display:none;">
+  <div class="chart-card">
+    <div class="jlpt-head">
+      <h3 style="margin:0;">Mandarin Vocabulary Progress</h3>
+      <span class="jlpt-sub">Chinese · HSK 1–6 · data: tomcumming/hsk-word-list</span>
+      <button type="button" id="zh-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+    </div>
+
+    <h4 class="jlpt-section">Overview</h4>
+    <div class="jlpt-macro">
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-hero"><span id="zh-mastered-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="zh-mastered-detail">–</span> terms</div>
+      </div>
+      <div class="jlpt-macro-card">
+        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-hero"><span id="zh-seen-pct">–</span></div>
+        <div class="jlpt-macro-detail"><span id="zh-seen-detail">–</span> terms</div>
+      </div>
+    </div>
+
+    <h4 class="jlpt-section">By level</h4>
+    <div id="zh-levels"></div>
+
+    <div class="jlpt-foot">Click a level bar to drill down · Terms are matched by surface word · Data: HSK 1-6 (tomcumming/hsk-word-list).</div>
   </div>
 </div>
 
@@ -1005,6 +1191,15 @@
   const CEFR_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
   const TOPIK_COLORS = { A: '#1dc981', B: '#f2b705', C: '#e8463a' };
   const DELE_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
+  const RUS_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
+  const GER_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
+  const FR_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
+  const AR_COLORS = { A1: '#1dc981', A2: '#22a5f7', B1: '#f2b705', B2: '#f87454', C1: '#e8463a', C2: '#9c36b5' };
+  const HSK_COLORS = { '1': '#1dc981', '2': '#22a5f7', '3': '#f2b705', '4': '#f87454', '5': '#e8463a', '6': '#9c36b5' };
+  const THAI_COLORS = {
+    '1-500': '#1dc981', '501-1000': '#22a5f7', '1001-2000': '#f2b705',
+    '2001-5000': '#f87454', '5001-10000': '#9c36b5'
+  };
 
   const cefrReport = createLevelReport({
     langKey: 'en', btn: 'cefr-btn', panel: 'cefr-panel', levelsEl: 'cefr-levels',
@@ -1028,12 +1223,61 @@
     urls: { data: '/stats/dele_data', words: '/stats/dele_words', export: '/stats/dele_export' },
   });
 
+  const rusReport = createLevelReport({
+    langKey: 'ru', btn: 'rus-btn', panel: 'rus-panel', levelsEl: 'rus-levels',
+    exportAll: 'rus-export-all', colors: RUS_COLORS, perPage: 60,
+    ids: { masteredPct: 'rus-mastered-pct', masteredDetail: 'rus-mastered-detail', seenPct: 'rus-seen-pct', seenDetail: 'rus-seen-detail' },
+    urls: { data: '/stats/russian_data', words: '/stats/russian_words', export: '/stats/russian_export' },
+  });
+
+  const gerReport = createLevelReport({
+    langKey: 'de', btn: 'ger-btn', panel: 'ger-panel', levelsEl: 'ger-levels',
+    exportAll: 'ger-export-all', colors: GER_COLORS, perPage: 60,
+    ids: { masteredPct: 'ger-mastered-pct', masteredDetail: 'ger-mastered-detail', seenPct: 'ger-seen-pct', seenDetail: 'ger-seen-detail' },
+    urls: { data: '/stats/german_data', words: '/stats/german_words', export: '/stats/german_export' },
+  });
+
+  const thaiReport = createLevelReport({
+    langKey: 'th', btn: 'th-btn', panel: 'th-panel', levelsEl: 'th-levels',
+    exportAll: 'th-export-all', colors: THAI_COLORS, perPage: 60,
+    ids: { masteredPct: 'th-mastered-pct', masteredDetail: 'th-mastered-detail', seenPct: 'th-seen-pct', seenDetail: 'th-seen-detail' },
+    urls: { data: '/stats/thai_data', words: '/stats/thai_words', export: '/stats/thai_export' },
+  });
+
+  const frReport = createLevelReport({
+    langKey: 'fr', btn: 'fr-btn', panel: 'fr-panel', levelsEl: 'fr-levels',
+    exportAll: 'fr-export-all', colors: FR_COLORS, perPage: 60,
+    ids: { masteredPct: 'fr-mastered-pct', masteredDetail: 'fr-mastered-detail', seenPct: 'fr-seen-pct', seenDetail: 'fr-seen-detail' },
+    urls: { data: '/stats/french_data', words: '/stats/french_words', export: '/stats/french_export' },
+  });
+
+  const arReport = createLevelReport({
+    langKey: 'ar', btn: 'ar-btn', panel: 'ar-panel', levelsEl: 'ar-levels',
+    exportAll: 'ar-export-all', colors: AR_COLORS, perPage: 60,
+    ids: { masteredPct: 'ar-mastered-pct', masteredDetail: 'ar-mastered-detail', seenPct: 'ar-seen-pct', seenDetail: 'ar-seen-detail' },
+    urls: { data: '/stats/arabic_data', words: '/stats/arabic_words', export: '/stats/arabic_export' },
+  });
+
+  const zhReport = createLevelReport({
+    langKey: 'zh', btn: 'zh-btn', panel: 'zh-panel', levelsEl: 'zh-levels',
+    exportAll: 'zh-export-all', colors: HSK_COLORS, perPage: 60,
+    levelLabel: function(l) { return 'HSK ' + l; },
+    ids: { masteredPct: 'zh-mastered-pct', masteredDetail: 'zh-mastered-detail', seenPct: 'zh-seen-pct', seenDetail: 'zh-seen-detail' },
+    urls: { data: '/stats/hsk_data', words: '/stats/hsk_words', export: '/stats/hsk_export' },
+  });
+
   const origUpdateJpButton = updateJpButton;
   updateJpButton = function() {
     origUpdateJpButton();
     cefrReport.sync();
     topikReport.sync();
     deleReport.sync();
+    rusReport.sync();
+    gerReport.sync();
+    thaiReport.sync();
+    frReport.sync();
+    arReport.sync();
+    zhReport.sync();
   };
 
   updateJpButton();

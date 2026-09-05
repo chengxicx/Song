@@ -1,0 +1,1087 @@
+[
+  {
+    "word": "一",
+    "reading": "yī",
+    "meanings": [
+      "one",
+      "once",
+      "first",
+      "structural word between two of the same verb",
+      "as soon as",
+      "throughout"
+    ]
+  },
+  {
+    "word": "七",
+    "reading": "qī",
+    "meanings": [
+      "seven"
+    ]
+  },
+  {
+    "word": "三",
+    "reading": "sān",
+    "meanings": [
+      "three"
+    ]
+  },
+  {
+    "word": "上午",
+    "reading": "shàng wǔ",
+    "meanings": [
+      "morning"
+    ]
+  },
+  {
+    "word": "下",
+    "reading": "xià",
+    "meanings": [
+      "down",
+      "below"
+    ]
+  },
+  {
+    "word": "下午",
+    "reading": "xià wǔ",
+    "meanings": [
+      "afternoon"
+    ]
+  },
+  {
+    "word": "下雨",
+    "reading": "xià yǔ",
+    "meanings": [
+      "rain"
+    ]
+  },
+  {
+    "word": "不",
+    "reading": "bù",
+    "meanings": [
+      "not",
+      "no"
+    ]
+  },
+  {
+    "word": "不客气",
+    "reading": "bú kè qi",
+    "meanings": [
+      "you're welcome",
+      "impolite"
+    ]
+  },
+  {
+    "word": "东西",
+    "reading": "dōng xi",
+    "meanings": [
+      "thing"
+    ]
+  },
+  {
+    "word": "个",
+    "reading": "gè",
+    "meanings": [
+      "individual",
+      "[general measure word]"
+    ]
+  },
+  {
+    "word": "中午",
+    "reading": "zhōng wǔ",
+    "meanings": [
+      "midday"
+    ]
+  },
+  {
+    "word": "中国",
+    "reading": "zhōng guó",
+    "meanings": [
+      "China"
+    ]
+  },
+  {
+    "word": "九",
+    "reading": "jiǔ",
+    "meanings": [
+      "nine"
+    ]
+  },
+  {
+    "word": "书",
+    "reading": "shū",
+    "meanings": [
+      "book"
+    ]
+  },
+  {
+    "word": "买",
+    "reading": "mǎi",
+    "meanings": [
+      "buy"
+    ]
+  },
+  {
+    "word": "了",
+    "reading": "le",
+    "meanings": [
+      "[makes an exclamation]"
+    ]
+  },
+  {
+    "word": "二",
+    "reading": "èr",
+    "meanings": [
+      "two"
+    ]
+  },
+  {
+    "word": "五",
+    "reading": "wǔ",
+    "meanings": [
+      "five"
+    ]
+  },
+  {
+    "word": "些",
+    "reading": "xiē",
+    "meanings": [
+      "some"
+    ]
+  },
+  {
+    "word": "人",
+    "reading": "rén",
+    "meanings": [
+      "person",
+      "people"
+    ]
+  },
+  {
+    "word": "什么",
+    "reading": "shén me",
+    "meanings": [
+      "what?"
+    ]
+  },
+  {
+    "word": "今天",
+    "reading": "jīn tiān",
+    "meanings": [
+      "today"
+    ]
+  },
+  {
+    "word": "他",
+    "reading": "tā",
+    "meanings": [
+      "he",
+      "him"
+    ]
+  },
+  {
+    "word": "会",
+    "reading": "huì",
+    "meanings": [
+      "to know how to",
+      "can",
+      "meeting"
+    ]
+  },
+  {
+    "word": "住",
+    "reading": "zhù",
+    "meanings": [
+      "to live",
+      "stay (a number of nights)"
+    ]
+  },
+  {
+    "word": "你",
+    "reading": "nǐ",
+    "meanings": [
+      "you"
+    ]
+  },
+  {
+    "word": "做",
+    "reading": "zuò",
+    "meanings": [
+      "to do",
+      "to be",
+      "become (an occupation)"
+    ]
+  },
+  {
+    "word": "儿子",
+    "reading": "ér zi",
+    "meanings": [
+      "son"
+    ]
+  },
+  {
+    "word": "先生",
+    "reading": "xiān sheng",
+    "meanings": [
+      "Mr",
+      "Sir"
+    ]
+  },
+  {
+    "word": "八",
+    "reading": "bā",
+    "meanings": [
+      "eight"
+    ]
+  },
+  {
+    "word": "六",
+    "reading": "liù",
+    "meanings": [
+      "six"
+    ]
+  },
+  {
+    "word": "再见",
+    "reading": "zài jiàn",
+    "meanings": [
+      "goodbye"
+    ]
+  },
+  {
+    "word": "写",
+    "reading": "xiě",
+    "meanings": [
+      "to write"
+    ]
+  },
+  {
+    "word": "冷",
+    "reading": "lěng",
+    "meanings": [
+      "cold"
+    ]
+  },
+  {
+    "word": "出租车",
+    "reading": "chū zū chē",
+    "meanings": [
+      "taxi"
+    ]
+  },
+  {
+    "word": "分钟",
+    "reading": "fēn zhōng",
+    "meanings": [
+      "minute"
+    ]
+  },
+  {
+    "word": "前面",
+    "reading": "qián miàn",
+    "meanings": [
+      "front"
+    ]
+  },
+  {
+    "word": "北京",
+    "reading": "běi jīng",
+    "meanings": [
+      "Beijing"
+    ]
+  },
+  {
+    "word": "医生",
+    "reading": "yī shēng",
+    "meanings": [
+      "doctor"
+    ]
+  },
+  {
+    "word": "医院",
+    "reading": "yī yuàn",
+    "meanings": [
+      "hospital"
+    ]
+  },
+  {
+    "word": "十",
+    "reading": "shí",
+    "meanings": [
+      "ten"
+    ]
+  },
+  {
+    "word": "去",
+    "reading": "qù",
+    "meanings": [
+      "to go"
+    ]
+  },
+  {
+    "word": "叫",
+    "reading": "jiào",
+    "meanings": [
+      "to call",
+      "to be named"
+    ]
+  },
+  {
+    "word": "吃",
+    "reading": "chī",
+    "meanings": [
+      "to eat"
+    ]
+  },
+  {
+    "word": "同学",
+    "reading": "tóng xué",
+    "meanings": [
+      "schoolmate",
+      "classmate"
+    ]
+  },
+  {
+    "word": "名字",
+    "reading": "míng zi",
+    "meanings": [
+      "given name"
+    ]
+  },
+  {
+    "word": "吗",
+    "reading": "ma",
+    "meanings": [
+      "[makes a yes",
+      "no question]"
+    ]
+  },
+  {
+    "word": "听",
+    "reading": "tīng",
+    "meanings": [
+      "to listen",
+      "hear"
+    ]
+  },
+  {
+    "word": "呢",
+    "reading": "ne",
+    "meanings": [
+      "[returns",
+      "forwards a question]"
+    ]
+  },
+  {
+    "word": "和",
+    "reading": "hé",
+    "meanings": [
+      "and"
+    ]
+  },
+  {
+    "word": "哪",
+    "reading": "nǎ",
+    "meanings": [
+      "which?"
+    ]
+  },
+  {
+    "word": "哪儿",
+    "reading": "nǎ er",
+    "meanings": [
+      "where?"
+    ]
+  },
+  {
+    "word": "商店",
+    "reading": "shāng diàn",
+    "meanings": [
+      "shop"
+    ]
+  },
+  {
+    "word": "喂",
+    "reading": "wèi",
+    "meanings": [
+      "hello"
+    ]
+  },
+  {
+    "word": "喜欢",
+    "reading": "xǐ huan",
+    "meanings": [
+      "to like"
+    ]
+  },
+  {
+    "word": "喝",
+    "reading": "hē",
+    "meanings": [
+      "to drink"
+    ]
+  },
+  {
+    "word": "四",
+    "reading": "sì",
+    "meanings": [
+      "four"
+    ]
+  },
+  {
+    "word": "回",
+    "reading": "huí",
+    "meanings": [
+      "to return"
+    ]
+  },
+  {
+    "word": "在",
+    "reading": "zài",
+    "meanings": [
+      "in",
+      "at",
+      "on"
+    ]
+  },
+  {
+    "word": "坐",
+    "reading": "zuò",
+    "meanings": [
+      "to sit"
+    ]
+  },
+  {
+    "word": "块",
+    "reading": "kuài",
+    "meanings": [
+      "lump",
+      "piece"
+    ]
+  },
+  {
+    "word": "多",
+    "reading": "duō",
+    "meanings": [
+      "much/many",
+      "how [+adjective]"
+    ]
+  },
+  {
+    "word": "多少",
+    "reading": "duō shǎo",
+    "meanings": [
+      "how much/many?"
+    ]
+  },
+  {
+    "word": "大",
+    "reading": "dà",
+    "meanings": [
+      "big"
+    ]
+  },
+  {
+    "word": "天气",
+    "reading": "tiān qì",
+    "meanings": [
+      "weather"
+    ]
+  },
+  {
+    "word": "太",
+    "reading": "tài",
+    "meanings": [
+      "very"
+    ]
+  },
+  {
+    "word": "女儿",
+    "reading": "nǚ ér",
+    "meanings": [
+      "daughter"
+    ]
+  },
+  {
+    "word": "她",
+    "reading": "tā",
+    "meanings": [
+      "she",
+      "her"
+    ]
+  },
+  {
+    "word": "好",
+    "reading": "hǎo",
+    "meanings": [
+      "good"
+    ]
+  },
+  {
+    "word": "妈妈",
+    "reading": "mā ma",
+    "meanings": [
+      "mother"
+    ]
+  },
+  {
+    "word": "字",
+    "reading": "zì",
+    "meanings": [
+      "(Chinese) character"
+    ]
+  },
+  {
+    "word": "学习",
+    "reading": "xué xí",
+    "meanings": [
+      "to learn",
+      "to study"
+    ]
+  },
+  {
+    "word": "学校",
+    "reading": "xué xiào",
+    "meanings": [
+      "school"
+    ]
+  },
+  {
+    "word": "学生",
+    "reading": "xué sheng",
+    "meanings": [
+      "student"
+    ]
+  },
+  {
+    "word": "家",
+    "reading": "jiā",
+    "meanings": [
+      "family",
+      "home"
+    ]
+  },
+  {
+    "word": "对不起",
+    "reading": "duì bu qǐ",
+    "meanings": [
+      "sorry"
+    ]
+  },
+  {
+    "word": "小",
+    "reading": "xiǎo",
+    "meanings": [
+      "small"
+    ]
+  },
+  {
+    "word": "小姐",
+    "reading": "xiǎo jiě",
+    "meanings": [
+      "Miss",
+      "young lady"
+    ]
+  },
+  {
+    "word": "少",
+    "reading": "shǎo",
+    "meanings": [
+      "few"
+    ]
+  },
+  {
+    "word": "岁",
+    "reading": "suì",
+    "meanings": [
+      "year (of crop harvests)"
+    ]
+  },
+  {
+    "word": "工作",
+    "reading": "gōng zuò",
+    "meanings": [
+      "job",
+      "work"
+    ]
+  },
+  {
+    "word": "年",
+    "reading": "nián",
+    "meanings": [
+      "year"
+    ]
+  },
+  {
+    "word": "开",
+    "reading": "kāi",
+    "meanings": [
+      "to switch on",
+      "open"
+    ]
+  },
+  {
+    "word": "很",
+    "reading": "hěn",
+    "meanings": [
+      "very"
+    ]
+  },
+  {
+    "word": "怎么",
+    "reading": "zěn me",
+    "meanings": [
+      "how?"
+    ]
+  },
+  {
+    "word": "怎么样",
+    "reading": "zěn me yàng",
+    "meanings": [
+      "how about it"
+    ]
+  },
+  {
+    "word": "想",
+    "reading": "xiǎng",
+    "meanings": [
+      "to want",
+      "to think"
+    ]
+  },
+  {
+    "word": "我",
+    "reading": "wǒ",
+    "meanings": [
+      "I",
+      "me"
+    ]
+  },
+  {
+    "word": "我们",
+    "reading": "wǒ men",
+    "meanings": [
+      "we",
+      "us"
+    ]
+  },
+  {
+    "word": "打电话",
+    "reading": "dǎ diàn huà",
+    "meanings": [
+      "to make a telephone call"
+    ]
+  },
+  {
+    "word": "日",
+    "reading": "rì",
+    "meanings": [
+      "day [date]",
+      "sun"
+    ]
+  },
+  {
+    "word": "时候",
+    "reading": "shí hou",
+    "meanings": [
+      "[duration of] time"
+    ]
+  },
+  {
+    "word": "明天",
+    "reading": "míng tiān",
+    "meanings": [
+      "tomorrow"
+    ]
+  },
+  {
+    "word": "星期",
+    "reading": "xīng qī",
+    "meanings": [
+      "week"
+    ]
+  },
+  {
+    "word": "昨天",
+    "reading": "zuó tiān",
+    "meanings": [
+      "yesterday"
+    ]
+  },
+  {
+    "word": "是",
+    "reading": "shì",
+    "meanings": [
+      "to be"
+    ]
+  },
+  {
+    "word": "月",
+    "reading": "yuè",
+    "meanings": [
+      "month",
+      "moon"
+    ]
+  },
+  {
+    "word": "有",
+    "reading": "yǒu",
+    "meanings": [
+      "to have"
+    ]
+  },
+  {
+    "word": "朋友",
+    "reading": "péng you",
+    "meanings": [
+      "friend"
+    ]
+  },
+  {
+    "word": "本",
+    "reading": "běn",
+    "meanings": [
+      "root",
+      "[measure word for books]"
+    ]
+  },
+  {
+    "word": "来",
+    "reading": "lái",
+    "meanings": [
+      "to come"
+    ]
+  },
+  {
+    "word": "杯子",
+    "reading": "bēi zi",
+    "meanings": [
+      "cup",
+      "glass",
+      "mug"
+    ]
+  },
+  {
+    "word": "桌子",
+    "reading": "zhuō zi",
+    "meanings": [
+      "table"
+    ]
+  },
+  {
+    "word": "椅子",
+    "reading": "yǐ zi",
+    "meanings": [
+      "chair"
+    ]
+  },
+  {
+    "word": "水",
+    "reading": "shuǐ",
+    "meanings": [
+      "water"
+    ]
+  },
+  {
+    "word": "汉语",
+    "reading": "hàn yǔ",
+    "meanings": [
+      "Standard Chinese language"
+    ]
+  },
+  {
+    "word": "没",
+    "reading": "méi",
+    "meanings": [
+      "not (have)"
+    ]
+  },
+  {
+    "word": "没关系",
+    "reading": "méi guān xi",
+    "meanings": [
+      "no problem"
+    ]
+  },
+  {
+    "word": "漂亮",
+    "reading": "piào liang",
+    "meanings": [
+      "beautiful"
+    ]
+  },
+  {
+    "word": "火车站",
+    "reading": "huǒ chē zhàn",
+    "meanings": [
+      "railway station"
+    ]
+  },
+  {
+    "word": "点",
+    "reading": "diǎn",
+    "meanings": [
+      "o’clock",
+      "spot",
+      "dot"
+    ]
+  },
+  {
+    "word": "热",
+    "reading": "rè",
+    "meanings": [
+      "hot"
+    ]
+  },
+  {
+    "word": "爱",
+    "reading": "ài",
+    "meanings": [
+      "to love"
+    ]
+  },
+  {
+    "word": "爸爸",
+    "reading": "bà ba",
+    "meanings": [
+      "father"
+    ]
+  },
+  {
+    "word": "狗",
+    "reading": "gǒu",
+    "meanings": [
+      "dog"
+    ]
+  },
+  {
+    "word": "猫",
+    "reading": "māo",
+    "meanings": [
+      "cat"
+    ]
+  },
+  {
+    "word": "现在",
+    "reading": "xiàn zài",
+    "meanings": [
+      "now"
+    ]
+  },
+  {
+    "word": "电影",
+    "reading": "diàn yǐng",
+    "meanings": [
+      "film",
+      "movie"
+    ]
+  },
+  {
+    "word": "电视",
+    "reading": "diàn shì",
+    "meanings": [
+      "TV"
+    ]
+  },
+  {
+    "word": "电脑",
+    "reading": "diàn nǎo",
+    "meanings": [
+      "computer"
+    ]
+  },
+  {
+    "word": "的",
+    "reading": "de",
+    "meanings": [
+      "of"
+    ]
+  },
+  {
+    "word": "看见",
+    "reading": "kàn jiàn",
+    "meanings": [
+      "see"
+    ]
+  },
+  {
+    "word": "睡觉",
+    "reading": "shuì jiào",
+    "meanings": [
+      "to go to bed",
+      "to sleep"
+    ]
+  },
+  {
+    "word": "米饭",
+    "reading": "mǐ fàn",
+    "meanings": [
+      "rice [cooked",
+      "boiled]"
+    ]
+  },
+  {
+    "word": "老师",
+    "reading": "lǎo shī",
+    "meanings": [
+      "teacher"
+    ]
+  },
+  {
+    "word": "能",
+    "reading": "néng",
+    "meanings": [
+      "to be able to",
+      "can"
+    ]
+  },
+  {
+    "word": "苹果",
+    "reading": "píng guǒ",
+    "meanings": [
+      "apple"
+    ]
+  },
+  {
+    "word": "茶",
+    "reading": "chá",
+    "meanings": [
+      "tea"
+    ]
+  },
+  {
+    "word": "菜",
+    "reading": "cài",
+    "meanings": [
+      "vegetable"
+    ]
+  },
+  {
+    "word": "衣服",
+    "reading": "yī fu",
+    "meanings": [
+      "clothes"
+    ]
+  },
+  {
+    "word": "认识",
+    "reading": "rèn shi",
+    "meanings": [
+      "to know [be familiar with]"
+    ]
+  },
+  {
+    "word": "说话",
+    "reading": "shuō huà",
+    "meanings": [
+      "speak"
+    ]
+  },
+  {
+    "word": "请",
+    "reading": "qǐng",
+    "meanings": [
+      "to invite",
+      "please"
+    ]
+  },
+  {
+    "word": "读",
+    "reading": "dú",
+    "meanings": [
+      "read aloud"
+    ]
+  },
+  {
+    "word": "谁",
+    "reading": "shéi",
+    "meanings": [
+      "who?"
+    ]
+  },
+  {
+    "word": "谢谢",
+    "reading": "xiè xie",
+    "meanings": [
+      "thank you"
+    ]
+  },
+  {
+    "word": "这",
+    "reading": "zhè",
+    "meanings": [
+      "this"
+    ]
+  },
+  {
+    "word": "这儿",
+    "reading": "zhè er",
+    "meanings": [
+      "here"
+    ]
+  },
+  {
+    "word": "那",
+    "reading": "nà",
+    "meanings": [
+      "that"
+    ]
+  },
+  {
+    "word": "那儿",
+    "reading": "nà er",
+    "meanings": [
+      "there"
+    ]
+  },
+  {
+    "word": "都",
+    "reading": "dōu",
+    "meanings": [
+      "both",
+      "all"
+    ]
+  },
+  {
+    "word": "里",
+    "reading": "lǐ",
+    "meanings": [
+      "in"
+    ]
+  },
+  {
+    "word": "钱",
+    "reading": "qián",
+    "meanings": [
+      "money"
+    ]
+  },
+  {
+    "word": "零",
+    "reading": "líng",
+    "meanings": [
+      "zero"
+    ]
+  },
+  {
+    "word": "飞机",
+    "reading": "fēi jī",
+    "meanings": [
+      "plane"
+    ]
+  },
+  {
+    "word": "饭馆",
+    "reading": "fàn guǎn",
+    "meanings": [
+      "restaurant"
+    ]
+  },
+  {
+    "word": "高兴",
+    "reading": "gāo xìng",
+    "meanings": [
+      "pleased",
+      "happy"
+    ]
+  }
+]

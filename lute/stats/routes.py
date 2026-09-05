@@ -28,6 +28,18 @@ from lute.stats.service import get_topik_data as _get_topik_data
 from lute.stats.service import get_topik_words as _get_topik_words
 from lute.stats.service import get_dele_data as _get_dele_data
 from lute.stats.service import get_dele_words as _get_dele_words
+from lute.stats.service import get_russian_data as _get_russian_data
+from lute.stats.service import get_russian_words as _get_russian_words
+from lute.stats.service import get_german_data as _get_german_data
+from lute.stats.service import get_german_words as _get_german_words
+from lute.stats.service import get_thai_data as _get_thai_data
+from lute.stats.service import get_thai_words as _get_thai_words
+from lute.stats.service import get_french_data as _get_french_data
+from lute.stats.service import get_french_words as _get_french_words
+from lute.stats.service import get_arabic_data as _get_arabic_data
+from lute.stats.service import get_arabic_words as _get_arabic_words
+from lute.stats.service import get_hsk_data as _get_hsk_data
+from lute.stats.service import get_hsk_words as _get_hsk_words
 from lute.db import db
 import lute.utils.formutils
 
@@ -199,6 +211,15 @@ def dele_data():
     return jsonify(_get_dele_data(db.session, lang_id))
 
 
+@bp.route("/russian_data")
+def russian_data():
+    "Ajax call for the Russian CEFR progress report for a Russian language."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return jsonify({"error": "lang_id required"}), 400
+    return jsonify(_get_russian_data(db.session, lang_id))
+
+
 def _request_lang_id():
     "Parse and validate the lang_id request param."
     try:
@@ -279,6 +300,7 @@ def _level_export_response(getter, valid_levels, label):
 def cefr_words():
     "Paged word list for one CEFR level and filter."
     from lute.stats.cefr_data import LEVELS
+
     return _level_words_response(_get_cefr_words, LEVELS)
 
 
@@ -286,6 +308,7 @@ def cefr_words():
 def topik_words():
     "Paged word list for one TOPIK level and filter."
     from lute.stats.topik_data import LEVELS
+
     return _level_words_response(_get_topik_words, LEVELS)
 
 
@@ -293,6 +316,7 @@ def topik_words():
 def cefr_export():
     "CSV export of CEFR words for a level+filter, or all levels."
     from lute.stats.cefr_data import LEVELS
+
     return _level_export_response(_get_cefr_words, LEVELS, "CEFR")
 
 
@@ -300,6 +324,7 @@ def cefr_export():
 def topik_export():
     "CSV export of TOPIK words for a level+filter, or all levels."
     from lute.stats.topik_data import LEVELS
+
     return _level_export_response(_get_topik_words, LEVELS, "TOPIK")
 
 
@@ -307,6 +332,7 @@ def topik_export():
 def dele_words():
     "Paged word list for one DELE level and filter."
     from lute.stats.dele_data import LEVELS
+
     return _level_words_response(_get_dele_words, LEVELS)
 
 
@@ -314,4 +340,139 @@ def dele_words():
 def dele_export():
     "CSV export of DELE words for a level+filter, or all levels."
     from lute.stats.dele_data import LEVELS
+
     return _level_export_response(_get_dele_words, LEVELS, "DELE")
+
+
+@bp.route("/russian_words")
+def russian_words():
+    "Paged word list for one Russian CEFR level and filter."
+    from lute.stats.russian_data import LEVELS
+
+    return _level_words_response(_get_russian_words, LEVELS)
+
+
+@bp.route("/russian_export")
+def russian_export():
+    "CSV export of Russian words for a level+filter, or all levels."
+    from lute.stats.russian_data import LEVELS
+
+    return _level_export_response(_get_russian_words, LEVELS, "Russian")
+
+
+@bp.route("/german_data")
+def german_data():
+    "Ajax call for the German CEFR progress report for a German language."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return jsonify({"error": "lang_id required"}), 400
+    return jsonify(_get_german_data(db.session, lang_id))
+
+
+@bp.route("/german_words")
+def german_words():
+    "Paged word list for one German CEFR level and filter."
+    from lute.stats.german_data import LEVELS
+
+    return _level_words_response(_get_german_words, LEVELS)
+
+
+@bp.route("/german_export")
+def german_export():
+    "CSV export of German words for a level+filter, or all levels."
+    from lute.stats.german_data import LEVELS
+
+    return _level_export_response(_get_german_words, LEVELS, "German")
+
+
+@bp.route("/thai_data")
+def thai_data():
+    "Ajax call for the Thai frequency-bucket progress report."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return jsonify({"error": "lang_id required"}), 400
+    return jsonify(_get_thai_data(db.session, lang_id))
+
+
+@bp.route("/thai_words")
+def thai_words():
+    "Paged word list for one Thai frequency bucket and filter."
+    from lute.stats.thai_data import LEVELS
+
+    return _level_words_response(_get_thai_words, LEVELS)
+
+
+@bp.route("/thai_export")
+def thai_export():
+    "CSV export of Thai words for a bucket+filter, or all buckets."
+    from lute.stats.thai_data import LEVELS
+    return _level_export_response(_get_thai_words, LEVELS, "Thai")
+
+
+@bp.route("/french_data")
+def french_data():
+    "Ajax call for the French CEFR progress report for a French language."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return jsonify({"error": "lang_id required"}), 400
+    return jsonify(_get_french_data(db.session, lang_id))
+
+
+@bp.route("/french_words")
+def french_words():
+    "Paged word list for one French CEFR level and filter."
+    from lute.stats.french_data import LEVELS
+    return _level_words_response(_get_french_words, LEVELS)
+
+
+@bp.route("/french_export")
+def french_export():
+    "CSV export of French words for a level+filter, or all levels."
+    from lute.stats.french_data import LEVELS
+    return _level_export_response(_get_french_words, LEVELS, "French")
+
+
+@bp.route("/arabic_data")
+def arabic_data():
+    "Ajax call for the Arabic CEFR progress report for an Arabic language."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return jsonify({"error": "lang_id required"}), 400
+    return jsonify(_get_arabic_data(db.session, lang_id))
+
+
+@bp.route("/arabic_words")
+def arabic_words():
+    "Paged word list for one Arabic CEFR level and filter."
+    from lute.stats.arabic_data import LEVELS
+    return _level_words_response(_get_arabic_words, LEVELS)
+
+
+@bp.route("/arabic_export")
+def arabic_export():
+    "CSV export of Arabic words for a level+filter, or all levels."
+    from lute.stats.arabic_data import LEVELS
+    return _level_export_response(_get_arabic_words, LEVELS, "Arabic")
+
+
+@bp.route("/hsk_data")
+def hsk_data():
+    "Ajax call for the HSK progress report for a Mandarin Chinese language."
+    lang_id = _request_lang_id()
+    if lang_id is None:
+        return jsonify({"error": "lang_id required"}), 400
+    return jsonify(_get_hsk_data(db.session, lang_id))
+
+
+@bp.route("/hsk_words")
+def hsk_words():
+    "Paged word list for one HSK level and filter."
+    from lute.stats.hsk_data import LEVELS
+    return _level_words_response(_get_hsk_words, LEVELS)
+
+
+@bp.route("/hsk_export")
+def hsk_export():
+    "CSV export of HSK words for a level+filter, or all levels."
+    from lute.stats.hsk_data import LEVELS
+    return _level_export_response(_get_hsk_words, LEVELS, "HSK")

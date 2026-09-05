@@ -16,6 +16,18 @@ from lute.stats.service import (
     get_topik_words,
     get_dele_data,
     get_dele_words,
+    get_russian_data,
+    get_russian_words,
+    get_german_data,
+    get_german_words,
+    get_thai_data,
+    get_thai_words,
+    get_french_data,
+    get_french_words,
+    get_arabic_data,
+    get_arabic_words,
+    get_hsk_data,
+    get_hsk_words,
 )
 from tests.utils import make_text
 
@@ -131,11 +143,11 @@ def _save_jp_term(lang, text, status):
 def test_get_jlpt_data_counts_by_level(japanese, app_context):
     "Seen/mastered counts attributed to JLPT levels."
     # N5 words (from OpenJLPT)
-    _save_jp_term(japanese, "食べる", 99)   # mastered
-    _save_jp_term(japanese, "水", 3)        # seen (not mastered)
-    _save_jp_term(japanese, "空", 98)       # ignored -> not seen
+    _save_jp_term(japanese, "食べる", 99)  # mastered
+    _save_jp_term(japanese, "水", 3)  # seen (not mastered)
+    _save_jp_term(japanese, "空", 98)  # ignored -> not seen
     # N1 word
-    _save_jp_term(japanese, "赴く", 5)      # seen
+    _save_jp_term(japanese, "赴く", 5)  # seen
     # not in word list
     _save_jp_term(japanese, "任意存在しない単語", 99)
 
@@ -181,8 +193,8 @@ def test_jlpt_data_endpoint_requires_lang_id(app_context, client):
 
 def test_get_jlpt_words_filters(japanese, app_context):
     "Drilldown word lists respect the unmastered/mastered/notseen filters."
-    _save_jp_term(japanese, "食べる", 99)   # mastered
-    _save_jp_term(japanese, "水", 3)        # unmastered
+    _save_jp_term(japanese, "食べる", 99)  # mastered
+    _save_jp_term(japanese, "水", 3)  # unmastered
     _save_jp_term(japanese, "任意存在しない単語", 99)  # not in list
 
     unmastered = get_jlpt_words(db.session, japanese.id, "N5", "unmastered")
@@ -208,7 +220,9 @@ def test_get_jlpt_words_filters(japanese, app_context):
 def test_jlpt_words_endpoint(japanese, app_context, client):
     "The /stats/jlpt_words endpoint returns paged words."
     _save_jp_term(japanese, "水", 3)
-    resp = client.get(f"/stats/jlpt_words?lang_id={japanese.id}&level=N5&filter=unmastered&page=1")
+    resp = client.get(
+        f"/stats/jlpt_words?lang_id={japanese.id}&level=N5&filter=unmastered&page=1"
+    )
     assert resp.status_code == 200
     data = resp.get_json()
     assert data["total"] >= 1
@@ -223,7 +237,9 @@ def test_jlpt_words_endpoint(japanese, app_context, client):
 def test_jlpt_export_endpoint(japanese, app_context, client):
     "The /stats/jlpt_export endpoint returns CSV content."
     _save_jp_term(japanese, "食べる", 99)
-    resp = client.get(f"/stats/jlpt_export?lang_id={japanese.id}&level=N5&filter=mastered")
+    resp = client.get(
+        f"/stats/jlpt_export?lang_id={japanese.id}&level=N5&filter=mastered"
+    )
     assert resp.status_code == 200
     assert resp.mimetype == "text/csv"
     body = resp.get_data(as_text=True)
@@ -240,20 +256,20 @@ def test_jlpt_export_endpoint(japanese, app_context, client):
 
 def test_get_cefr_data_counts_by_level(english, app_context):
     "Seen/mastered counts attributed to CEFR levels, incl. inflection expansion."
-    _save_jp_term(english, "run", 99)           # mastered (A1)
-    _save_jp_term(english, "running", 3)        # expands to run -> seen (A1)
-    _save_jp_term(english, "dogs", 98)          # ignored -> not seen
+    _save_jp_term(english, "run", 99)  # mastered (A1)
+    _save_jp_term(english, "running", 3)  # expands to run -> seen (A1)
+    _save_jp_term(english, "dogs", 98)  # ignored -> not seen
     _save_jp_term(english, "extraordinary", 5)  # seen (B1)
-    _save_jp_term(english, "zzzqqqxyz", 99)     # not in word list
+    _save_jp_term(english, "zzzqqqxyz", 99)  # not in word list
 
     data = get_cefr_data(db.session, english.id)
 
     lv = {l["level"]: l for l in data["levels"]}
     assert len(lv) == 6
     assert lv["A1"]["mastered"] == 1
-    assert lv["A1"]["seen"] == 1   # run ("dogs" ignored)
-    assert lv["A2"]["seen"] == 1   # running is its own A2 headword
-    assert lv["B1"]["seen"] == 1   # extraordinary
+    assert lv["A1"]["seen"] == 1  # run ("dogs" ignored)
+    assert lv["A2"]["seen"] == 1  # running is its own A2 headword
+    assert lv["B1"]["seen"] == 1  # extraordinary
     assert data["total_mastered"] == 1
     assert data["total_seen"] == 3
 
@@ -319,7 +335,9 @@ def test_cefr_words_and_export_endpoints(english, app_context, client):
     _save_jp_term(english, "run", 99)
     _save_jp_term(english, "running", 3)
 
-    resp = client.get(f"/stats/cefr_words?lang_id={english.id}&level=A2&filter=unmastered&page=1")
+    resp = client.get(
+        f"/stats/cefr_words?lang_id={english.id}&level=A2&filter=unmastered&page=1"
+    )
     assert resp.status_code == 200
     data = resp.get_json()
     assert data["total"] >= 1
@@ -329,7 +347,9 @@ def test_cefr_words_and_export_endpoints(english, app_context, client):
     resp = client.get(f"/stats/cefr_words?lang_id={english.id}&level=all")
     assert resp.status_code == 400
 
-    resp = client.get(f"/stats/cefr_export?lang_id={english.id}&level=A1&filter=mastered")
+    resp = client.get(
+        f"/stats/cefr_export?lang_id={english.id}&level=A1&filter=mastered"
+    )
     assert resp.status_code == 200
     assert resp.mimetype == "text/csv"
     lines = resp.get_data(as_text=True).strip().splitlines()
@@ -345,9 +365,9 @@ def test_cefr_words_and_export_endpoints(english, app_context, client):
 
 def test_get_topik_data_counts_by_level(korean, app_context):
     "Seen/mastered counts attributed to TOPIK A/B/C bands."
-    _save_jp_term(korean, "가게", 99)   # mastered (A)
-    _save_jp_term(korean, "한국", 3)    # seen (A)
-    _save_jp_term(korean, "가난", 98)   # ignored -> not seen (band C)
+    _save_jp_term(korean, "가게", 99)  # mastered (A)
+    _save_jp_term(korean, "한국", 3)  # seen (A)
+    _save_jp_term(korean, "가난", 98)  # ignored -> not seen (band C)
     _save_jp_term(korean, "임의단어zzz", 99)  # not in word list
 
     data = get_topik_data(db.session, korean.id)
@@ -403,7 +423,9 @@ def test_topik_words_and_export_endpoints(korean, app_context, client):
     _save_jp_term(korean, "가게", 99)
     _save_jp_term(korean, "한국", 3)
 
-    resp = client.get(f"/stats/topik_words?lang_id={korean.id}&level=A&filter=unmastered&page=1")
+    resp = client.get(
+        f"/stats/topik_words?lang_id={korean.id}&level=A&filter=unmastered&page=1"
+    )
     assert resp.status_code == 200
     data = resp.get_json()
     assert data["total"] >= 1
@@ -413,7 +435,9 @@ def test_topik_words_and_export_endpoints(korean, app_context, client):
     resp = client.get(f"/stats/topik_words?lang_id={korean.id}&level=all")
     assert resp.status_code == 400
 
-    resp = client.get(f"/stats/topik_export?lang_id={korean.id}&level=A&filter=mastered")
+    resp = client.get(
+        f"/stats/topik_export?lang_id={korean.id}&level=A&filter=mastered"
+    )
     assert resp.status_code == 200
     assert resp.mimetype == "text/csv"
     lines = resp.get_data(as_text=True).strip().splitlines()
@@ -517,3 +541,594 @@ def test_dele_words_and_export_endpoints(spanish, app_context, client):
     body = resp.get_data(as_text=True)
     assert "A1," in body
     assert "C2," in body
+
+
+def test_get_russian_data_counts_by_level(russian, app_context):
+    "Seen/mastered counts attributed to Russian CEFR levels."
+    _save_jp_term(russian, "брать", 99)  # mastered (A1)
+    _save_jp_term(russian, "верить", 3)  # seen, not mastered (A2)
+    _save_jp_term(russian, "бояться", 98)  # ignored -> not seen (B1)
+    _save_jp_term(russian, "ввести", 5)  # seen (C1)
+    _save_jp_term(russian, "xyzпроизвольныйглаголzzz", 99)  # not in list
+
+    data = get_russian_data(db.session, russian.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert len(lv) == 6
+    assert lv["A1"]["mastered"] == 1
+    assert lv["A1"]["seen"] == 1
+    assert lv["A2"]["seen"] == 1
+    assert lv["B1"]["seen"] == 0  # бояться ignored
+    assert lv["C1"]["seen"] == 1
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 3
+
+
+def test_get_russian_data_inflected_form(russian, app_context):
+    "A conjugated stored form expands to its infinitive headword."
+    _save_jp_term(russian, "думает", 99)  # думает -> думать (A1)
+
+    data = get_russian_data(db.session, russian.id)
+    lv = {l["level"]: l for l in data["levels"]}
+    assert lv["A1"]["mastered"] == 1
+
+
+def test_russian_data_endpoint(russian, app_context, client):
+    "The /stats/russian_data endpoint returns level data for a Russian language."
+    _save_jp_term(russian, "брать", 99)
+
+    resp = client.get(f"/stats/russian_data?lang_id={russian.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] > 0
+    assert len(data["levels"]) == 6
+    a1 = next(l for l in data["levels"] if l["level"] == "A1")
+    assert a1["mastered"] == 1
+
+    resp = client.get("/stats/russian_data")
+    assert resp.status_code == 400
+    resp = client.get("/stats/russian_data?lang_id=abc")
+    assert resp.status_code == 400
+
+
+def test_get_russian_words_filters(russian, app_context):
+    "Drilldown respects the unmastered/mastered/notseen filters."
+    _save_jp_term(russian, "брать", 99)
+    _save_jp_term(russian, "верить", 3)
+
+    unmastered = get_russian_words(db.session, russian.id, "A1", "unmastered")
+    mastered = get_russian_words(db.session, russian.id, "A1", "mastered")
+    a2_unmastered = get_russian_words(db.session, russian.id, "A2", "unmastered")
+    notseen = get_russian_words(db.session, russian.id, "A1", "notseen")
+
+    assert [w["word"] for w in unmastered] == []
+    assert [w["word"] for w in mastered] == ["брать"]
+    assert mastered[0]["status_text"] == "Well Known"
+    assert [w["word"] for w in a2_unmastered] == ["верить"]
+
+    notseen_words = [w["word"] for w in notseen]
+    assert "писать" in notseen_words  # in the A1 list, never learned
+    assert "брать" not in notseen_words
+    assert all(w["id"] is None for w in notseen)
+
+
+def test_russian_words_and_export_endpoints(russian, app_context, client):
+    "The russian_words and russian_export endpoints behave like the JLPT ones."
+    _save_jp_term(russian, "брать", 99)
+    _save_jp_term(russian, "верить", 3)
+
+    resp = client.get(
+        f"/stats/russian_words?lang_id={russian.id}&level=A2&filter=unmastered&page=1"
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] >= 1
+
+    resp = client.get(
+        f"/stats/russian_words?lang_id={russian.id}&level=A1&filter=bogus"
+    )
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/russian_words?lang_id={russian.id}&level=all")
+    assert resp.status_code == 400
+
+    resp = client.get(
+        f"/stats/russian_export?lang_id={russian.id}&level=A1&filter=mastered"
+    )
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/csv"
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("брать" in ln for ln in lines[1:])
+
+    resp = client.get(
+        f"/stats/russian_export?lang_id={russian.id}&level=all&filter=all"
+    )
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "A1," in body
+    assert "C2," in body
+
+
+def test_get_german_data_counts_by_level(german, app_context):
+    "Seen/mastered counts attributed to German CEFR levels."
+    _save_jp_term(german, "machen", 99)  # mastered (A1)
+    _save_jp_term(german, "Behörde", 3)  # seen, not mastered (B1)
+    _save_jp_term(german, "Melancholie", 98)  # ignored -> not seen (C2)
+    _save_jp_term(german, "xyzfakegermanwordzzz", 99)  # not in list
+
+    data = get_german_data(db.session, german.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert len(lv) == 6
+    assert lv["A1"]["mastered"] == 1
+    assert lv["A1"]["seen"] == 1
+    assert lv["B1"]["seen"] == 1
+    assert lv["C1"]["seen"] == 0
+    assert lv["C2"]["seen"] == 0  # Melancholie ignored
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 2
+
+
+def test_get_german_data_inflected_form(german, app_context):
+    "A conjugated stored form expands to its base-word headword."
+    _save_jp_term(german, "machst", 99)  # machst -> machen (A1)
+
+    data = get_german_data(db.session, german.id)
+    lv = {l["level"]: l for l in data["levels"]}
+    assert lv["A1"]["mastered"] == 1
+
+
+def test_german_data_endpoint(german, app_context, client):
+    "The /stats/german_data endpoint returns level data for a German language."
+    _save_jp_term(german, "machen", 99)
+
+    resp = client.get(f"/stats/german_data?lang_id={german.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] > 0
+    assert len(data["levels"]) == 6
+    a1 = next(l for l in data["levels"] if l["level"] == "A1")
+    assert a1["mastered"] == 1
+
+    resp = client.get("/stats/german_data")
+    assert resp.status_code == 400
+    resp = client.get("/stats/german_data?lang_id=abc")
+    assert resp.status_code == 400
+
+
+def test_get_german_words_filters(german, app_context):
+    "Drilldown respects the unmastered/mastered/notseen filters."
+    _save_jp_term(german, "machen", 99)
+
+    unmastered = get_german_words(db.session, german.id, "A1", "unmastered")
+    mastered = get_german_words(db.session, german.id, "A1", "mastered")
+    notseen = get_german_words(db.session, german.id, "A1", "notseen")
+
+    assert [w["word"] for w in unmastered] == []
+    assert [w["word"] for w in mastered] == ["machen"]
+    assert mastered[0]["status_text"] == "Well Known"
+
+    notseen_words = [w["word"] for w in notseen]
+    assert "frei" in notseen_words  # in the A1 list, never learned
+    assert "machen" not in notseen_words
+    assert all(w["id"] is None for w in notseen)
+
+
+def test_german_words_and_export_endpoints(german, app_context, client):
+    "The german_words and german_export endpoints behave like the JLPT ones."
+    _save_jp_term(german, "machen", 99)
+
+    resp = client.get(
+        f"/stats/german_words?lang_id={german.id}&level=A1&filter=mastered&page=1"
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] >= 1
+
+    resp = client.get(f"/stats/german_words?lang_id={german.id}&level=A1&filter=bogus")
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/german_words?lang_id={german.id}&level=all")
+    assert resp.status_code == 400
+
+    resp = client.get(
+        f"/stats/german_export?lang_id={german.id}&level=A1&filter=mastered"
+    )
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/csv"
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("machen" in ln for ln in lines[1:])
+
+    resp = client.get(f"/stats/german_export?lang_id={german.id}&level=all&filter=all")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "A1," in body
+    assert "C2," in body
+
+
+def test_get_thai_data_counts_by_level(thai, app_context):
+    "Seen/mastered counts attributed to Thai frequency buckets."
+    _save_jp_term(thai, "และ", 99)  # mastered (1-500)
+    _save_jp_term(thai, "ภาษา", 3)  # seen, not mastered (501-1000)
+    _save_jp_term(thai, "ขอบคุณ", 98)  # ignored -> not seen (1001-2000)
+    _save_jp_term(thai, "zzzเฟคคำzzz", 99)  # not in any bucket
+
+    data = get_thai_data(db.session, thai.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert len(lv) == 5
+    assert lv["1-500"]["mastered"] == 1
+    assert lv["1-500"]["seen"] == 1
+    assert lv["501-1000"]["seen"] == 1
+    assert lv["1001-2000"]["seen"] == 0  # ขอบคุณ ignored
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 2
+
+
+def test_thai_data_endpoint(thai, app_context, client):
+    "The /stats/thai_data endpoint returns bucket data for a Thai language."
+    _save_jp_term(thai, "และ", 99)
+
+    resp = client.get(f"/stats/thai_data?lang_id={thai.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] > 0
+    assert len(data["levels"]) == 5
+    b = next(l for l in data["levels"] if l["level"] == "1-500")
+    assert b["mastered"] == 1
+
+    resp = client.get("/stats/thai_data")
+    assert resp.status_code == 400
+    resp = client.get("/stats/thai_data?lang_id=abc")
+    assert resp.status_code == 400
+
+
+def test_get_thai_words_filters(thai, app_context):
+    "Drilldown respects the unmastered/mastered/notseen filters."
+    _save_jp_term(thai, "และ", 99)
+    _save_jp_term(thai, "ภาษา", 3)
+
+    unmastered = get_thai_words(db.session, thai.id, "1-500", "unmastered")
+    mastered = get_thai_words(db.session, thai.id, "1-500", "mastered")
+    b_unmastered = get_thai_words(db.session, thai.id, "501-1000", "unmastered")
+    notseen = get_thai_words(db.session, thai.id, "1-500", "notseen")
+
+    assert [w["word"] for w in unmastered] == []
+    assert [w["word"] for w in mastered] == ["และ"]
+    assert mastered[0]["status_text"] == "Well Known"
+    assert [w["word"] for w in b_unmastered] == ["ภาษา"]
+
+    notseen_words = [w["word"] for w in notseen]
+    assert "การ" in notseen_words  # in the 1-500 bucket, never learned
+    assert "และ" not in notseen_words
+    assert all(w["id"] is None for w in notseen)
+
+
+def test_thai_words_and_export_endpoints(thai, app_context, client):
+    "The thai_words and thai_export endpoints behave like the JLPT ones."
+    _save_jp_term(thai, "และ", 99)
+    _save_jp_term(thai, "ภาษา", 3)
+
+    resp = client.get(
+        f"/stats/thai_words?lang_id={thai.id}&level=501-1000&filter=unmastered&page=1"
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] == 1
+
+    resp = client.get(f"/stats/thai_words?lang_id={thai.id}&level=1-500&filter=bogus")
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/thai_words?lang_id={thai.id}&level=all")
+    assert resp.status_code == 400
+
+    resp = client.get(
+        f"/stats/thai_export?lang_id={thai.id}&level=1-500&filter=mastered"
+    )
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/csv"
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("และ" in ln for ln in lines[1:])
+
+    resp = client.get(f"/stats/thai_export?lang_id={thai.id}&level=all&filter=all")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "1-500," in body
+    assert "5001-10000," in body
+
+
+def test_get_french_data_counts_by_level(french, app_context):
+    "Seen/mastered counts attributed to French CEFR levels."
+    _save_jp_term(french, "accent", 99)  # mastered (A1)
+    _save_jp_term(french, "abricot", 3)  # seen, not mastered (A2)
+    _save_jp_term(french, "abbé", 98)  # ignored -> not seen (B1)
+    _save_jp_term(french, "abaisser", 5)  # seen (B2)
+    _save_jp_term(french, "zzzazertyzzz", 99)  # not in list
+
+    data = get_french_data(db.session, french.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert len(lv) == 6
+    assert lv["A1"]["mastered"] == 1
+    assert lv["A1"]["seen"] == 1
+    assert lv["A2"]["seen"] == 1
+    assert lv["B1"]["seen"] == 0  # abbé ignored
+    assert lv["B2"]["seen"] == 1
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 3
+
+
+def test_get_french_data_elided_form(french, app_context):
+    "An elided stored form expands to its noun headword."
+    _save_jp_term(french, "l'homme", 99)  # l'homme -> homme (A1)
+
+    data = get_french_data(db.session, french.id)
+    lv = {l["level"]: l for l in data["levels"]}
+    assert lv["A1"]["mastered"] == 1
+
+
+def test_french_data_endpoint(french, app_context, client):
+    "The /stats/french_data endpoint returns level data for a French language."
+    _save_jp_term(french, "accent", 99)
+
+    resp = client.get(f"/stats/french_data?lang_id={french.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] > 0
+    assert len(data["levels"]) == 6
+    a1 = next(l for l in data["levels"] if l["level"] == "A1")
+    assert a1["mastered"] == 1
+
+    resp = client.get("/stats/french_data")
+    assert resp.status_code == 400
+    resp = client.get("/stats/french_data?lang_id=abc")
+    assert resp.status_code == 400
+
+
+def test_get_french_words_filters(french, app_context):
+    "Drilldown respects the unmastered/mastered/notseen filters."
+    _save_jp_term(french, "accent", 99)
+    _save_jp_term(french, "abricot", 3)
+
+    unmastered = get_french_words(db.session, french.id, "A1", "unmastered")
+    mastered = get_french_words(db.session, french.id, "A1", "mastered")
+    a2_unmastered = get_french_words(db.session, french.id, "A2", "unmastered")
+    notseen = get_french_words(db.session, french.id, "A1", "notseen")
+
+    assert [w["word"] for w in unmastered] == []
+    assert [w["word"] for w in mastered] == ["accent"]
+    assert mastered[0]["status_text"] == "Well Known"
+    assert [w["word"] for w in a2_unmastered] == ["abricot"]
+
+    notseen_words = [w["word"] for w in notseen]
+    assert "accepter" in notseen_words  # in the A1 list, never learned
+    assert "accent" not in notseen_words
+    assert all(w["id"] is None for w in notseen)
+
+
+def test_french_words_and_export_endpoints(french, app_context, client):
+    "The french_words and french_export endpoints behave like the JLPT ones."
+    _save_jp_term(french, "accent", 99)
+    _save_jp_term(french, "abricot", 3)
+
+    resp = client.get(
+        f"/stats/french_words?lang_id={french.id}&level=A2&filter=unmastered&page=1"
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] >= 1
+
+    resp = client.get(f"/stats/french_words?lang_id={french.id}&level=A1&filter=bogus")
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/french_words?lang_id={french.id}&level=all")
+    assert resp.status_code == 400
+
+    resp = client.get(
+        f"/stats/french_export?lang_id={french.id}&level=A1&filter=mastered"
+    )
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/csv"
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("accent" in ln for ln in lines[1:])
+
+    resp = client.get(f"/stats/french_export?lang_id={french.id}&level=all&filter=all")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "A1," in body
+    assert "C2," in body
+
+
+def test_get_arabic_data_counts_by_level(arabic, app_context):
+    "Seen/mastered counts attributed to Arabic CEFR levels."
+    _save_jp_term(arabic, "أب", 99)  # mastered (A1)
+    _save_jp_term(arabic, "آلة", 3)  # seen, not mastered (A2)
+    _save_jp_term(arabic, "آثار", 98)  # ignored -> not seen (B1)
+    _save_jp_term(arabic, "آثم", 5)  # seen (B2)
+    _save_jp_term(arabic, "فهدققزززzzz", 99)  # not in list
+
+    data = get_arabic_data(db.session, arabic.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert len(lv) == 6
+    assert lv["A1"]["mastered"] == 1
+    assert lv["A1"]["seen"] == 1
+    assert lv["A2"]["seen"] == 1
+    assert lv["B1"]["seen"] == 0  # آثار ignored
+    assert lv["B2"]["seen"] == 1
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 3
+
+
+def test_get_arabic_data_prefixed_form(arabic, app_context):
+    "A definite-article prefixed form expands to its bare headword."
+    _save_jp_term(arabic, "الكتاب", 99)  # الكتاب -> كتاب (A1)
+
+    data = get_arabic_data(db.session, arabic.id)
+    lv = {l["level"]: l for l in data["levels"]}
+    assert lv["A1"]["mastered"] == 1
+
+
+def test_arabic_data_endpoint(arabic, app_context, client):
+    "The /stats/arabic_data endpoint returns level data for an Arabic language."
+    _save_jp_term(arabic, "أب", 99)
+
+    resp = client.get(f"/stats/arabic_data?lang_id={arabic.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] > 0
+    assert len(data["levels"]) == 6
+    a1 = next(l for l in data["levels"] if l["level"] == "A1")
+    assert a1["mastered"] == 1
+
+    resp = client.get("/stats/arabic_data")
+    assert resp.status_code == 400
+    resp = client.get("/stats/arabic_data?lang_id=abc")
+    assert resp.status_code == 400
+
+
+def test_get_arabic_words_filters(arabic, app_context):
+    "Drilldown respects the unmastered/mastered/notseen filters."
+    _save_jp_term(arabic, "أب", 99)
+    _save_jp_term(arabic, "آلة", 3)
+
+    unmastered = get_arabic_words(db.session, arabic.id, "A1", "unmastered")
+    mastered = get_arabic_words(db.session, arabic.id, "A1", "mastered")
+    a2_unmastered = get_arabic_words(db.session, arabic.id, "A2", "unmastered")
+    notseen = get_arabic_words(db.session, arabic.id, "A1", "notseen")
+
+    assert [w["word"] for w in unmastered] == []
+    assert [w["word"] for w in mastered] == ["أب"]
+    assert mastered[0]["status_text"] == "Well Known"
+    assert [w["word"] for w in a2_unmastered] == ["آلة"]
+
+    notseen_words = [w["word"] for w in notseen]
+    assert "مدرسة" in notseen_words  # in the A1 list, never learned
+    assert "أب" not in notseen_words
+    assert all(w["id"] is None for w in notseen)
+
+
+def test_arabic_words_and_export_endpoints(arabic, app_context, client):
+    "The arabic_words and arabic_export endpoints behave like the JLPT ones."
+    _save_jp_term(arabic, "أب", 99)
+    _save_jp_term(arabic, "آلة", 3)
+
+    resp = client.get(
+        f"/stats/arabic_words?lang_id={arabic.id}&level=A2&filter=unmastered&page=1"
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] >= 1
+
+    resp = client.get(f"/stats/arabic_words?lang_id={arabic.id}&level=A1&filter=bogus")
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/arabic_words?lang_id={arabic.id}&level=all")
+    assert resp.status_code == 400
+
+    resp = client.get(
+        f"/stats/arabic_export?lang_id={arabic.id}&level=A1&filter=mastered"
+    )
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/csv"
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("أب" in ln for ln in lines[1:])
+
+    resp = client.get(f"/stats/arabic_export?lang_id={arabic.id}&level=all&filter=all")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "A1," in body
+    assert "C2," in body
+
+
+def test_get_hsk_data_counts_by_level(mandarin, app_context):
+    "Seen/mastered counts attributed to HSK levels."
+    _save_jp_term(mandarin, "猫", 99)  # mastered (1)
+    _save_jp_term(mandarin, "运动", 3)  # seen, not mastered (2)
+    _save_jp_term(mandarin, "环境", 98)  # ignored -> not seen (3)
+    _save_jp_term(mandarin, "成熟", 5)  # seen (4)
+    _save_jp_term(mandarin, "不存在的词zzz", 99)  # not in list
+
+    data = get_hsk_data(db.session, mandarin.id)
+
+    lv = {l["level"]: l for l in data["levels"]}
+    assert len(lv) == 6
+    assert lv["1"]["mastered"] == 1
+    assert lv["1"]["seen"] == 1
+    assert lv["2"]["seen"] == 1
+    assert lv["3"]["seen"] == 0  # 环境 ignored
+    assert lv["4"]["seen"] == 1
+    assert data["total_mastered"] == 1
+    assert data["total_seen"] == 3
+
+
+def test_hsk_data_endpoint(mandarin, app_context, client):
+    "The /stats/hsk_data endpoint returns level data for a Mandarin language."
+    _save_jp_term(mandarin, "猫", 99)
+
+    resp = client.get(f"/stats/hsk_data?lang_id={mandarin.id}")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] > 0
+    assert len(data["levels"]) == 6
+    l1 = next(l for l in data["levels"] if l["level"] == "1")
+    assert l1["mastered"] == 1
+
+    resp = client.get("/stats/hsk_data")
+    assert resp.status_code == 400
+    resp = client.get("/stats/hsk_data?lang_id=abc")
+    assert resp.status_code == 400
+
+
+def test_get_hsk_words_filters(mandarin, app_context):
+    "Drilldown respects the unmastered/mastered/notseen filters."
+    _save_jp_term(mandarin, "猫", 99)
+    _save_jp_term(mandarin, "运动", 3)
+
+    unmastered = get_hsk_words(db.session, mandarin.id, "1", "unmastered")
+    mastered = get_hsk_words(db.session, mandarin.id, "1", "mastered")
+    l2_unmastered = get_hsk_words(db.session, mandarin.id, "2", "unmastered")
+    notseen = get_hsk_words(db.session, mandarin.id, "1", "notseen")
+
+    assert [w["word"] for w in unmastered] == []
+    assert [w["word"] for w in mastered] == ["猫"]
+    assert mastered[0]["status_text"] == "Well Known"
+    assert [w["word"] for w in l2_unmastered] == ["运动"]
+
+    notseen_words = [w["word"] for w in notseen]
+    assert "狗" in notseen_words  # in the HSK 1 list, never learned
+    assert "猫" not in notseen_words
+    assert all(w["id"] is None for w in notseen)
+
+
+def test_hsk_words_and_export_endpoints(mandarin, app_context, client):
+    "The hsk_words and hsk_export endpoints behave like the JLPT ones."
+    _save_jp_term(mandarin, "猫", 99)
+    _save_jp_term(mandarin, "运动", 3)
+
+    resp = client.get(
+        f"/stats/hsk_words?lang_id={mandarin.id}&level=2&filter=unmastered&page=1"
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] >= 1
+
+    resp = client.get(f"/stats/hsk_words?lang_id={mandarin.id}&level=1&filter=bogus")
+    assert resp.status_code == 400
+    resp = client.get(f"/stats/hsk_words?lang_id={mandarin.id}&level=all")
+    assert resp.status_code == 400
+
+    resp = client.get(
+        f"/stats/hsk_export?lang_id={mandarin.id}&level=1&filter=mastered"
+    )
+    assert resp.status_code == 200
+    assert resp.mimetype == "text/csv"
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    assert lines[0] == "Level,Word,Reading,Meaning,Status"
+    assert any("猫" in ln for ln in lines[1:])
+
+    resp = client.get(f"/stats/hsk_export?lang_id={mandarin.id}&level=all&filter=all")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "1," in body
+    assert "6," in body
