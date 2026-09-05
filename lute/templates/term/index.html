@@ -689,11 +689,17 @@
     $('#filtBook option').each(function() {
       const opt = $(this);
       const optLang = parseInt(opt.attr('data-lang') || '0');
-      opt.css('display', (lang === 0 || optLang === lang) ? '' : 'none');
+      // The "(all)" option (no data-lang) is always available.
+      opt.css('display', (optLang === 0 || lang === 0 || optLang === lang) ? '' : 'none');
     });
 
     $('#filtBookSet option').each(function() {
       const opt = $(this);
+      // The "(all)" option is always available.
+      if (opt.val() === '') {
+        opt.css('display', '');
+        return;
+      }
       const langs = (opt.attr('data-langs') || '')
         .split(',').map(x => parseInt(x)).filter(x => !isNaN(x));
       opt.css('display', (lang === 0 || langs.includes(lang)) ? '' : 'none');
