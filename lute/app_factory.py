@@ -36,6 +36,7 @@ import lute.utils.formutils
 from lute.utils import static_assets
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
+from lute.parse import plugin_installer
 from lute.feature.routes import bp as feature_bp
 from lute.feature import load_feature_plugins
 
@@ -544,10 +545,22 @@ def _create_app(app_config, extra_config):
     return app
 
 
-def _init_parser_plugins(plugin_data_path, outfunc):
+def _init_parser_plugins(app, plugin_data_path, outfunc):
     "Load and init plugins."
     outfunc("Initializing parsers from plugins ...")
     init_parser_plugins()
+
+    # Auto-install missing whitelisted parser plugins for languages that
+    # already exist in the DB (e.g. Korean created before its parser was
+    # pluginized).  These never hit the install-on-predefined-load path,
+    # so without this step users would be stuck with an unusable parser.
+    outfunc("Checking parser plugins for existing languages ...")
+    with app.app_context():
+        for name, ok, message in plugin_installer.ensure_existing_language_parsers(
+            db.session
+        ):
+            status = "OK" if ok else "FAILED"
+            outfunc(f"  * {name}: {status} - {message}")
 
     parsers = supported_parsers()
     parsers_with_extra_data = [
@@ -621,7 +634,7 @@ def create_app(
     app = _create_app(app_config, extra_config)
 
     # Plugins are loaded after the app, as they may use settings etc.
-    _init_parser_plugins(app_config.plugin_datapath, outfunc)
+    _init_parser_plugins(app, app_config.plugin_datapath, outfunc)
 
     return app
 
