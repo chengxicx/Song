@@ -82,7 +82,7 @@ class LanguageForm(FlaskForm):
     )
 
     # --- Korean / Kiwi-specific settings.
-    # These fields are only rendered when the parser_type is 'korean'.
+    # These fields are only rendered when the parser_type is 'lute_korean'.
 
     kiwi_tokenizer_mode_choices = [
         ("morpheme", "Fine-grained / Morpheme (예상 + 하 + 었 + 는데"),

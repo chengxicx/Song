@@ -59,7 +59,7 @@ brew install mecab mecab-ipadic
 sudo apt-get install mecab libmecab-dev mecab-ipadic-utf8
 ```
 
-Korean needs no extra setup — the `kiwipiepy` parser ships as a core dependency.  
+Korean uses the `kiwipiepy` parser, provided by the `lute3-korean` plugin and auto-installed on demand when you load the Korean predefined language.  
 All other languages, plus TTS (`edge-tts`), are pure Python and need nothing extra.
 
 The default branch is `song`; `all-features-combine` is the day-to-day development branch with the same content.

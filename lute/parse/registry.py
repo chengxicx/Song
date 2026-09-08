@@ -11,7 +11,6 @@ from lute.parse.base import AbstractParser
 from lute.parse.space_delimited_parser import SpaceDelimitedParser, TurkishParser
 from lute.parse.mecab_parser import JapaneseParser
 from lute.parse.sudachi_parser import JapaneseSudachiParser
-from lute.parse.kiwi_parser import KoreanParser
 from lute.parse.character_parser import ClassicalChineseParser
 
 
@@ -20,7 +19,6 @@ __LUTE_PARSERS__ = {
     "turkish": TurkishParser,
     "japanese": JapaneseParser,
     "japanese_sudachi": JapaneseSudachiParser,
-    "korean": KoreanParser,
     "classicalchinese": ClassicalChineseParser,
 }
 

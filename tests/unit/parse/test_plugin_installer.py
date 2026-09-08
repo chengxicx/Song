@@ -15,6 +15,7 @@ def test_plugin_package_mapping():
     "Known parser types map to their pip packages."
     assert pi.plugin_package_for("lute_cantonese") == "lute3-cantonese"
     assert pi.plugin_package_for("lute_mandarin") == "lute3-mandarin"
+    assert pi.plugin_package_for("lute_korean") == "lute3-korean"
     assert pi.plugin_package_for("spacedel") is None
     assert pi.plugin_package_for(None) is None
 
