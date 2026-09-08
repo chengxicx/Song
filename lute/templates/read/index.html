@@ -27,7 +27,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}?v=20260805f" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}?v=20260830b" charset="utf-8" defer></script>
 <script type="text/javascript" src="/static/js/never_cache/dict-tabs.js?v={{ lute_version }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260902a" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260908a" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/player-dock.js') }}?v=20260830a" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
@@ -739,6 +739,16 @@
 
   document.body.addEventListener('htmx:afterSwap', function (e) {
     if (!e.target || e.target.id !== 'thetext') return;
+
+    // The TTS sentence 🔊 buttons are not part of the swapped-in HTML; the
+    // debounced tts.js observer re-adds them ~100ms later.  Re-inject them
+    // synchronously NOW so _splitToScreens (rAF, below) measures paragraph
+    // heights with the buttons already in place.  Injecting late makes the
+    // sentences reflow after the screen is rendered, making the reading pane
+    // visibly jump on every term-save.  No-op when sentence buttons are off.
+    if (typeof window.luteInjectSentenceButtons === "function") {
+      window.luteInjectSentenceButtons();
+    }
 
     // Page navigation (goto_relative_page).
     if (_pendingNav) {
