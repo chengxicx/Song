@@ -304,10 +304,15 @@
     if (!textDiv) return;
 
     function hasReadableText(el) {
-      // Skip empty "ghost" sentences (e.g. a trailing blank sentence
-      // holding only whitespace / zero-width spaces). Injecting a play
-      // button there renders a stray 🔊 after the previous sentence.
-      return cleanSentenceText(el.textContent || "") !== "";
+      // Skip "ghost" sentences that carry nothing speakable: blank text
+      // (whitespace / zero-width spaces) or only punctuation (e.g. a
+      // lone closing quote "」" split into its own sentence). Injecting
+      // a play button there renders a stray 🔊 with no speech to read.
+      const text = cleanSentenceText(el.textContent || "");
+      if (text === "") return false;
+      // Require at least one letter or digit; purely-punctuation
+      // sentences ("」", "。」"...) have no readable content.
+      return /[\p{L}\p{N}]/u.test(text);
     }
 
     const sentences = textDiv.querySelectorAll(".textsentence");
