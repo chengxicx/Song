@@ -27,6 +27,19 @@ PLUGIN_PACKAGES = {
     "lute_korean": "lute3-korean",
 }
 
+# Language names (lowercased) served by each auto-installable parser plugin.
+# Mirrors the `languages()` classmethod each parser plugin declares, so that
+# startup can heal a language that fell back to a generic parser (e.g.
+# Korean saved as "spacedel") even though its parser_type no longer names the
+# plugin directly.
+PLUGIN_LANGUAGE_NAMES = {
+    "lute_mandarin": {"mandarin", "mandarin chinese", "官话", "官話", "普通话", "普通話", "中文", "汉语", "漢語"},
+    "lute_thai": {"thai", "ไทย", "泰语", "泰語"},
+    "lute_khmer": {"khmer", "크메르어", "高棉语", "高棉語"},
+    "lute_cantonese": {"cantonese", "cantonese chinese", "廣東話", "广东话", "粤语", "粵語"},
+    "lute_korean": {"korean", "한국어", "한국말", "韩语", "韓語"},
+}
+
 PIP_TIMEOUT_SECONDS = 300
 
 
@@ -119,6 +132,20 @@ def ensure_parser_available(parser_type):
     return True, f"Installed {package} from {source}"
 
 
+def _plugin_for_language_name(lang_name):
+    """
+    Return the parser_type of the plugin that serves the given language
+    name, or None if none match.
+    """
+    nl = (lang_name or "").strip().lower()
+    if not nl:
+        return None
+    for pt, names in PLUGIN_LANGUAGE_NAMES.items():
+        if nl in names:
+            return pt
+    return None
+
+
 def ensure_existing_language_parsers(session):
     """
     Install missing whitelisted parser plugins for languages already in the DB.
@@ -128,13 +155,39 @@ def ensure_existing_language_parsers(session):
     install option, so those languages would otherwise be stuck with an
     unusable parser.  Called at startup so existing languages heal
     automatically.  Returns a list of (language_name, ok, message).
+
+    Two situations are handled:
+
+    * The language's parser_type already names a whitelisted plugin that
+      isn't installed (normal auto-install path).  The plugin is installed.
+
+    * The language fell back to a generic placeholder parser (empty or
+      "spacedel") yet its name matches a known plugin (e.g. Korean saved as
+      "spacedel").  The plugin is installed AND the language's parser_type is
+      restored to point at it, so it becomes usable again without manual
+      re-selection.
     """
     # Imported inside the function to avoid a circular import at module load.
     from lute.models.language import Language
 
     results = []
+    touched_parser = False
     for lang in session.query(Language).all():
         pt = (lang.parser_type or "").strip()
+        # Normal path: the language already names a whitelisted plugin.
         if pt and is_auto_installable(pt):
             results.append((lang.name, *ensure_parser_available(pt)))
+            continue
+        # Heal path: a generic/placeholder parser whose name maps to a plugin.
+        matched = None
+        if pt in ("", "spacedel"):
+            matched = _plugin_for_language_name(lang.name)
+        if matched:
+            ok, message = ensure_parser_available(matched)
+            results.append((lang.name, ok, message))
+            if ok and lang.parser_type != matched:
+                lang.parser_type = matched
+                touched_parser = True
+    if touched_parser:
+        session.commit()
     return results
