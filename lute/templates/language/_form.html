@@ -180,7 +180,7 @@
     // --- Show/hide the Kiwi section when the parser dropdown changes.
     var parserSel = document.querySelector("select#parser_type");
     function toggleKiwiRows() {
-      var isKorean = parserSel && parserSel.value === "korean";
+      var isKorean = parserSel && parserSel.value === "lute_korean";
       var rows = document.querySelectorAll("tr[data-kiwi-row]");
       rows.forEach(function(r) { r.style.display = isKorean ? "table-row" : "none"; });
     }
