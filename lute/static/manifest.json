@@ -1,7 +1,7 @@
 {
-  "name": "Lute - Learning Using Texts",
-  "short_name": "Lute",
-  "description": "Learning Using Texts - read foreign language texts with smart word tracking.",
+  "name": "Song",
+  "short_name": "Song",
+  "description": "Song - read foreign language texts with smart word tracking.",
   "start_url": "/?utm_source=pwa",
   "scope": "/",
   "id": "/",
