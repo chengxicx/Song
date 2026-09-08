@@ -117,3 +117,24 @@ def ensure_parser_available(parser_type):
             "a restart may be needed",
         )
     return True, f"Installed {package} from {source}"
+
+
+def ensure_existing_language_parsers(session):
+    """
+    Install missing whitelisted parser plugins for languages already in the DB.
+
+    A language created before its parser was pluginized (e.g. Korean) never
+    triggers the install-on-predefined-load path, and there is no manual
+    install option, so those languages would otherwise be stuck with an
+    unusable parser.  Called at startup so existing languages heal
+    automatically.  Returns a list of (language_name, ok, message).
+    """
+    # Imported inside the function to avoid a circular import at module load.
+    from lute.models.language import Language
+
+    results = []
+    for lang in session.query(Language).all():
+        pt = (lang.parser_type or "").strip()
+        if pt and is_auto_installable(pt):
+            results.append((lang.name, *ensure_parser_available(pt)))
+    return results
