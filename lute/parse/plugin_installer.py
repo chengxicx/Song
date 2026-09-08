@@ -24,6 +24,7 @@ PLUGIN_PACKAGES = {
     "lute_thai": "lute3-thai",
     "lute_khmer": "lute3-khmer",
     "lute_cantonese": "lute3-cantonese",
+    "lute_korean": "lute3-korean",
 }
 
 PIP_TIMEOUT_SECONDS = 300

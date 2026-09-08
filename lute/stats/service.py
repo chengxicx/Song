@@ -250,7 +250,7 @@ def get_term_languages(session):
             "name": r[1],
             "count": int(r[3]),
             "is_japanese": r[2] in _JAPANESE_PARSERS,
-            "is_korean": r[2] == "korean",
+            "is_korean": r[2] == "lute_korean",
             "is_english": str(r[1] or "").strip().lower() == "english",
             "is_spanish": str(r[1] or "").strip().lower() == "spanish",
             "is_russian": str(r[1] or "").strip().lower() == "russian",
