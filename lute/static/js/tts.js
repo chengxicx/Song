@@ -2270,6 +2270,17 @@
     }
   };
 
+  // Synchronous re-inject hook for the reading page (read/index.html).  When
+  // a term-save or page-turn swap replaces #thetext, the screen splitter
+  // (_splitToScreens) measures paragraph heights before the debounced
+  // MutationObserver below re-adds the sentence 🔊 buttons.  Because each
+  // button adds inline width, the late re-injection reflows sentences / can
+  // push wrapping, so paragraphs measured without the buttons end up too tall
+  // and the reading area visibly jumps.  The page calls this hook right after
+  // the swap -- before the split measures -- so the buttons are present for
+  // that single measurement and no reflow happens afterwards.
+  window.luteInjectSentenceButtons = injectSentencePlayButtons;
+
   /* ------------------------------------------------------------------
    * 10. Boot
    * ------------------------------------------------------------------ */
