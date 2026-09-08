@@ -904,7 +904,7 @@ class Service:
                 extracted_text.append(element.text)
 
         title_node = soup.find("title")
-        orig_title = title_node.string if title_node else url
+        orig_title = (title_node.string if title_node else url) or url
 
         short_title = orig_title[:150]
         if len(orig_title) > 150:
