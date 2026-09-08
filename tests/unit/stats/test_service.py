@@ -52,14 +52,19 @@ def make_read_text(lang, content, readdate):
 
 def test_get_chart_data(spanish, english, app_context):
     "Smoke test."
+    # Expected dates use the local clock; seeded readdates are stored in
+    # UTC (mirroring production datetime.utcnow()) because _get_data_per_lang
+    # decodes them back to local via SQLite 'localtime'.
     today = datetime.now()
+    seed_today = datetime.utcnow()
     yesterday = today - timedelta(days=1)
+    seed_yesterday = seed_today - timedelta(days=1)
     daybefore = today - timedelta(days=2)
 
-    make_read_text(spanish, "Yo tengo un gato.", today)
-    make_read_text(spanish, "Ella esta aqui.", yesterday)
+    make_read_text(spanish, "Yo tengo un gato.", seed_today)
+    make_read_text(spanish, "Ella esta aqui.", seed_yesterday)
     make_read_text(spanish, "Nuevo text no leido.", None)
-    make_read_text(english, "Yo yo.", today)
+    make_read_text(english, "Yo yo.", seed_today)
 
     expected = {
         "Spanish": [
@@ -90,12 +95,14 @@ def test_get_chart_data(spanish, english, app_context):
 def test_get_table_data(spanish, english, app_context):
     "Smoke test."
     today = datetime.now()
+    seed_today = datetime.utcnow()
     yesterday = today - timedelta(days=1)
+    seed_yesterday = seed_today - timedelta(days=1)
 
-    make_read_text(spanish, "Yo tengo un gato.", today)
-    make_read_text(spanish, "Ella esta aqui.", yesterday)
+    make_read_text(spanish, "Yo tengo un gato.", seed_today)
+    make_read_text(spanish, "Ella esta aqui.", seed_yesterday)
     make_read_text(spanish, "Nuevo text no leido.", None)
-    make_read_text(english, "Yo yo.", today)
+    make_read_text(english, "Yo yo.", seed_today)
 
     expected = [
         {
