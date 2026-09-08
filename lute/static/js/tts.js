@@ -303,10 +303,18 @@
     const textDiv = document.getElementById("thetext");
     if (!textDiv) return;
 
+    function hasReadableText(el) {
+      // Skip empty "ghost" sentences (e.g. a trailing blank sentence
+      // holding only whitespace / zero-width spaces). Injecting a play
+      // button there renders a stray 🔊 after the previous sentence.
+      return cleanSentenceText(el.textContent || "") !== "";
+    }
+
     const sentences = textDiv.querySelectorAll(".textsentence");
     if (sentences.length > 0) {
       sentences.forEach(function (s) {
         if (s.querySelector(".lute-sentence-play-btn")) return;
+        if (!hasReadableText(s)) return;
         const btn = document.createElement("span");
         btn.className = "lute-sentence-play-btn";
         btn.innerText = "🔊";
@@ -322,6 +330,7 @@
     const rows = textDiv.querySelectorAll(".textrow, p");
     rows.forEach(function (row) {
       if (row.querySelector(".lute-sentence-play-btn")) return;
+      if (!hasReadableText(row)) return;
       const btn = document.createElement("span");
       btn.className = "lute-sentence-play-btn";
       btn.innerText = "🔊";
