@@ -56,7 +56,7 @@ class Language(
     is_active = db.Column("LgIsActive", db.Boolean, default=True)
 
     # Kiwi (Korean) parser settings.
-    # These columns only have meaning when LgParserType = 'korean'.
+    # These columns only have meaning when LgParserType = 'lute_korean'.
     kiwi_tokenizer_mode = db.Column("LgKiwiTokenizerMode", db.String(20), default="morpheme")
     kiwi_stemming = db.Column("LgKiwiStemming", db.Boolean, default=True)
     kiwi_filter_particles = db.Column("LgKiwiFilterParticles", db.Boolean, default=False)
