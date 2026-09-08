@@ -22,13 +22,22 @@
   .pl-msg.ok { background: rgba(0,180,0,.12); border: 1px solid #2a9d4f; }
   .pl-msg.err { background: rgba(220,50,50,.12); border: 1px solid #c94545; }
   .pl-import { position: relative; }
+  .pl-import-btn::after { content: '\25be'; margin-left: 5px; font-size: .8em; opacity: .6; }
   .pl-import-menu {
-    position: absolute; top: calc(100% + 4px); right: 0; z-index: 10;
-    display: flex; flex-direction: column; gap: 4px; min-width: 160px;
-    background: var(--form-bg, #fff); border: 1px solid var(--form-border-color, #ddd);
-    border-radius: 6px; padding: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    position: absolute; top: calc(100% + 6px); right: 0; z-index: 10;
+    min-width: 172px;
+    background: var(--background-color, #fff);
+    border: 1px solid var(--form-border-color, #ddd);
+    border-radius: 6px; padding: 4px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.14);
   }
-  .pl-import-menu .btn { white-space: nowrap; text-align: left; }
+  .pl-import-menu .pl-pick {
+    display: block; width: 100%; padding: 8px 12px;
+    border: 0; background: none; border-radius: 4px;
+    font-size: .9em; text-align: left; white-space: nowrap;
+    color: var(--font-color, #000); cursor: pointer;
+  }
+  .pl-import-menu .pl-pick:hover { background: var(--btn-accent, #007aff); color: #fff; }
 </style>
 
 <div class="pl">
@@ -48,8 +57,8 @@
         <li><strong>Path on this server</strong> — a source directory containing
           <code>pyproject.toml</code>, e.g. <code>/opt/plugins/lute-storygen</code>.</li>
       </ul>
-      <p><strong>Import</strong> — for remote hosts, use the <b>Import…</b> button
-      instead of typing a path: it lets you pick a whole source folder or a
+      <p><strong>Import</strong> — for remote hosts, use the <b>Import</b> button
+      instead of typing a path: hover it to pick a whole source folder or a
       <code>.zip</code> archive of the plugin package. The selection is staged,
       then installed when you press <b>Install</b>. No server-side path is needed.</p>
       <p>Reinstalling a plugin with the same name overwrites/updates it. The
@@ -59,10 +68,10 @@
       <input id="pl_spec" type="text" class="form-control"
              placeholder="lute3-storygen  or  /path/to/lute-storygen" />
       <div class="pl-import">
-        <button id="pl_import_btn" class="btn" type="button">Import…</button>
+        <button id="pl_import_btn" class="btn pl-import-btn" type="button">Import</button>
         <div id="pl_import_menu" class="pl-import-menu" hidden>
-          <button class="btn" type="button" data-pick="folder">Choose folder…</button>
-          <button class="btn" type="button" data-pick="zip">Choose zip…</button>
+          <button class="pl-pick" type="button" data-pick="folder">Choose folder…</button>
+          <button class="pl-pick" type="button" data-pick="zip">Choose zip…</button>
         </div>
       </div>
       <button id="pl_install_btn" class="btn btn-primary">Install</button>
@@ -197,16 +206,37 @@
         });
     }
 
-    // One Import… button opens a small menu for picking a folder or a zip.
+    // One Import button: hover reveals a small menu for picking a folder or
+    // a zip. Clicking the button also toggles it (touch / keyboard fallback).
     // Either choice only stages the selection; Install does the install.
+    var wrapEl = importBtn.parentElement;
+    var showTimer = null, hideTimer = null;
+    function delayShow() {
+      clearTimeout(hideTimer); hideTimer = null;
+      if (showTimer) return;
+      showTimer = setTimeout(function () { showTimer = null; importMenu.hidden = false; }, 80);
+    }
+    function delayHide() {
+      clearTimeout(showTimer); showTimer = null;
+      if (hideTimer) return;
+      hideTimer = setTimeout(function () { hideTimer = null; importMenu.hidden = true; }, 150);
+    }
+    function clearTimers() {
+      clearTimeout(showTimer); showTimer = null;
+      clearTimeout(hideTimer); hideTimer = null;
+    }
+    wrapEl.addEventListener('mouseenter', delayShow);
+    wrapEl.addEventListener('mouseleave', delayHide);
     importBtn.addEventListener('click', function (e) {
       e.stopPropagation();
+      clearTimers();
       importMenu.hidden = !importMenu.hidden;
     });
     document.addEventListener('click', function () { importMenu.hidden = true; });
     importMenu.addEventListener('click', function (e) { e.stopPropagation(); });
     importMenu.querySelectorAll('[data-pick]').forEach(function (b) {
       b.addEventListener('click', function () {
+        clearTimers();
         importMenu.hidden = true;
         (b.getAttribute('data-pick') === 'folder' ? folderEl : zipEl).click();
       });
