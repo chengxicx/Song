@@ -756,6 +756,31 @@ function touch_ended(e) {
   const is_double_click = (this_id === _last_touched_element_id);
   _last_touched_element_id = null;  // Already checked in is_double_click.
 
+  if (_quick_set_status_active()) {
+    // Quick Set Status Mode: reassign the gestures so marking a word's
+    // status never forces the on-screen keyboard open.
+    //
+    //   single tap  -> term popup (same as desktop hover)
+    //   double tap  -> cycle status 1 -> 3 -> well known(99) -> 1
+    //   long press  -> term edit form
+    if (is_long_touch) {
+      show_term_edit_form(el);
+    }
+    else if (is_double_click) {
+      $("#thetext").tooltip("close");
+      _quick_cycle_status(el);
+    }
+    else if (selection_start_el != null) {
+      select_over(el, e);
+      select_ended(el, e);
+    }
+    else {
+      _quick_show_popup(el);
+      _last_touched_element_id = this_id;
+    }
+    return;
+  }
+
   if (is_long_touch) {
     _tap_hold(el, e);
   }
@@ -818,6 +843,43 @@ function _single_tap(el, e) {
   else {
     show_term_edit_form(el);
   }
+}
+
+
+/* ========================================= */
+/** Quick Set Status Mode (mobile) helpers. */
+
+// Whether the "Quick Set Status Mode" toggle is on (set from the
+// reading menu; persisted in localStorage).
+function _quick_set_status_active() {
+  return localStorage.getItem('tap_sets_status') === 'true';
+}
+
+// Single tap in Quick Set Status Mode: show the term popup for the
+// word, the same way a desktop hover does.  Reuses the jquery-ui
+// tooltip widget already attached to #thetext, so the popup content,
+// positioning and close handlers match the hover experience exactly.
+function _quick_show_popup(el) {
+  // Words that aren't saved to the DB yet (status 0, no wid) have no
+  // popup to show.
+  if (isNaN(parseInt(el.data('wid'), 10))) return;
+  // Close any tooltip left open from a previous tap: closing clears the
+  // word's ui-tooltip-id, so the same word can be shown again.
+  $("#thetext").tooltip("close");
+  $("#thetext").tooltip("open", { target: el[0], type: "open" });
+}
+
+// Double tap in Quick Set Status Mode: cycle a single word's status
+// through 1 -> 3 -> well known(99) -> 1.  Status 2/4/5 are skipped so
+// the gesture is a predictable three-way toggle.
+function _quick_cycle_status(el) {
+  const CYCLE = [1, 3, 99];
+  const cur = parseInt((el.data("status-class") || "status0").replace(/\D/g, ""), 10);
+  let idx = CYCLE.indexOf(cur);
+  const next = idx === -1 ? CYCLE[0] : CYCLE[(idx + 1) % CYCLE.length];
+  if (next === cur) return;
+  el.addClass('kwordmarked');
+  update_status_for_marked_elements(next);
 }
 
 
