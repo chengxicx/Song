@@ -597,7 +597,7 @@ def test_sync_media_page_text_crlf_line_endings(app, app_context, english):
     # Stored page text uses CRLF line endings; cue lines split on \n only.
     original_text = "Hello world.\r\nThis is a test subtitle.\r\nGoodbye!"
     new_text = "Hello world.\r\nThis line was edited.\r\nGoodbye!"
-    assert _sync_media_page_text_to_cues(dbbook, original_text, new_text) is True
+    assert _sync_media_page_text_to_cues(dbbook, 1, original_text, new_text) == "updated"
 
     book = BookRepository(db.session).find(dbbook.id)
     assert book.cues[0]["text"] == "Hello world."
@@ -615,7 +615,7 @@ def test_sync_media_page_text_drifted_line(app, app_context, english):
     # still find the page block and apply an edit made on another line.
     original_text = "Hello world.\nThis is a drifted line.\nGoodbye!"
     new_text = "Hello world.\nThis is a drifted line.\nGoodbye again!"
-    assert _sync_media_page_text_to_cues(dbbook, original_text, new_text) is True
+    assert _sync_media_page_text_to_cues(dbbook, 1, original_text, new_text) == "updated"
 
     book = BookRepository(db.session).find(dbbook.id)
     assert book.cues[0]["text"] == "Hello world."
@@ -632,8 +632,89 @@ def test_sync_media_page_text_no_match_does_nothing(app, app_context, english):
     before = json.loads(dbbook.srt_data)
     original_text = "Completely\nUnrelated\nLines"
     new_text = "Completely\nUnrelated\nChange"
-    assert _sync_media_page_text_to_cues(dbbook, original_text, new_text) is False
+    assert _sync_media_page_text_to_cues(dbbook, 1, original_text, new_text) == "mismatch"
     assert json.loads(dbbook.srt_data) == before
+
+
+_FIVE_LINES = ["Line one.", "Line two.", "Line three.", "Line four.", "Line five."]
+
+
+def _make_five_cue_book(app, app_context, english):
+    "A 5-cue youtube book, one cue per page line."
+    from lute.book.model import Book
+
+    b = Book()
+    b.title = "Five cue book"
+    b.language_id = english.id
+    b.text = "\n".join(_FIVE_LINES)
+    b.book_type = "youtube"
+    b.srt_data = json.dumps(
+        [
+            {"start": float(i), "end": float(i) + 0.8, "text": t}
+            for i, t in enumerate(_FIVE_LINES)
+        ]
+    )
+    b.source_uri = "https://www.youtube.com/watch?v=J7BXhKSqH6o"
+    b.book_tags = ["youtube"]
+    return BookService().import_book(b, db.session)
+
+
+def test_sync_media_page_text_refuses_to_shift_a_drifted_page(app, app_context, english):
+    """
+    A page whose text has drifted by a line is never re-anchored to a
+    neighbouring run of cues.
+
+    Regression: matching the page anywhere in the book let a page that had
+    lost a line (two lines merged) bind to the cues one slot later, and the
+    page's lines were then written there -- overwriting the correct cue
+    texts, so every subtitle in that run showed the previous line.
+    """
+    from lute.read.routes import _sync_media_page_text_to_cues
+
+    dbbook = _make_five_cue_book(app, app_context, english)
+    before = json.loads(dbbook.srt_data)
+    assert [c["text"] for c in before] == _FIVE_LINES
+
+    # The page carries a merged line: 4 page lines for 5 cues.  (Such an
+    # edit changed the line count, so the sync refused to apply it and the
+    # page kept the merged text.)
+    page_text = "Line one.\nLine two. Line three.\nLine four.\nLine five."
+    assert _sync_media_page_text_to_cues(dbbook, 1, page_text, page_text) == "mismatch"
+    assert json.loads(dbbook.srt_data) == before
+
+    # An edit made on that drifted page is refused as well -- never guess.
+    edited = "Line one.\nLine two. Line three.\nLine four.\nLine five edited."
+    assert _sync_media_page_text_to_cues(dbbook, 1, page_text, edited) == "mismatch"
+    assert json.loads(dbbook.srt_data) == before
+
+
+def test_sync_media_page_text_anchors_to_the_page_position(app, app_context, english):
+    """
+    Page N's lines go to the cues at page N's own position, not to the cues
+    that happen to look most similar earlier in the book.
+    """
+    from lute.models.book import Text
+    from lute.read.routes import _sync_media_page_text_to_cues
+
+    dbbook = _make_five_cue_book(app, app_context, english)
+    # Split the single page into two: page 2 starts at cue line 2.
+    dbbook.texts[0].text = "Line one.\nLine two."
+    db.session.add(Text(dbbook, "Line three.\nLine four.\nLine five.", 2))
+    db.session.commit()
+
+    edited = "Line three.\nLine four changed.\nLine five."
+    assert _sync_media_page_text_to_cues(
+        dbbook, 2, "Line three.\nLine four.\nLine five.", edited
+    ) == "updated"
+
+    book = BookRepository(db.session).find(dbbook.id)
+    assert [c["text"] for c in book.cues] == [
+        "Line one.",
+        "Line two.",
+        "Line three.",
+        "Line four changed.",
+        "Line five.",
+    ]
 
 
 def test_save_youtube_player_data(app, app_context, english, client):
