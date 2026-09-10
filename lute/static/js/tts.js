@@ -139,6 +139,7 @@
   // Guards the "wait for voices to load" retry so it only runs once.
   let _voicesWaitActive = false;
   let _pendingWaitText = null;
+  let _pendingWaitOnStarted = null;
 
   function selectBestVoiceForLang(voices, targetLang) {
     if (!voices || voices.length === 0) return null;
@@ -204,7 +205,7 @@
   // Speak a single short utterance now, picking the best available
   // voice for the current language (never the default mechanical one
   // when a suitable voice exists).
-  function speakNow(cleanText) {
+  function speakNow(cleanText, onStarted) {
     let activeVoice = getSelectedVoice();
     const voices = window.speechSynthesis.getVoices();
     const detectedLang = getCurrentLangCode();
@@ -223,6 +224,15 @@
     }
     utterance.rate = globalSpeed;
 
+    // onStarted lets the caller (the sentence 🔊 button) drop its
+    // "waiting" marker the moment sound actually begins, instead of
+    // guessing how long the engine will take to warm up.
+    if (typeof onStarted === "function") {
+      utterance.onstart = function () {
+        try { onStarted(); } catch (_) {}
+      };
+    }
+
     try {
       window.speechSynthesis.cancel();
     } catch (_) {}
@@ -234,7 +244,7 @@
 
   // Lightweight speak used by hover / click pronunciation and the
   // auto-translation flow (single short utterance, no player state).
-  function speakText(text) {
+  function speakText(text, onStarted) {
     let cleanText = text.replace(/[#＃]/g, "").trim();
     if (!cleanText) return;
 
@@ -249,6 +259,7 @@
           // so the natural voice speaks the word the user most recently
           // hovered.
           _pendingWaitText = cleanText;
+          _pendingWaitOnStarted = onStarted || null;
           return;
         }
         // getVoices() populates asynchronously in Chromium/Edge. If
@@ -257,6 +268,7 @@
         // default mechanical voice.
         _voicesWaitActive = true;
         _pendingWaitText = cleanText;
+        _pendingWaitOnStarted = onStarted || null;
         const start = Date.now();
         const timer = setInterval(function () {
           const v = window.speechSynthesis.getVoices();
@@ -266,13 +278,15 @@
             _voicesWaitActive = false;
             const t = _pendingWaitText || cleanText;
             _pendingWaitText = null;
-            speakNow(t);
+            const cb = _pendingWaitOnStarted;
+            _pendingWaitOnStarted = null;
+            speakNow(t, cb);
           }
         }, 100);
         return;
       }
 
-      speakNow(cleanText);
+      speakNow(cleanText, onStarted);
       return;
     }
 
@@ -281,7 +295,20 @@
     const url = "/tts/" + lang + "/" + encodeURIComponent(cleanText);
     const audio = new Audio(url);
     audio.playbackRate = globalSpeed;
-    audio.play().catch(function () {});
+    // This path really does wait on the network, so report both success
+    // (playback began) and failure as "the wait is over" -- otherwise a
+    // blocked autoplay would leave the caller's marker up until its own
+    // safety timeout.
+    let notified = false;
+    const notifyStarted = function () {
+      if (notified) return;
+      notified = true;
+      if (typeof onStarted === "function") {
+        try { onStarted(); } catch (_) {}
+      }
+    };
+    audio.addEventListener("playing", notifyStarted, { once: true });
+    audio.play().catch(notifyStarted);
   }
 
   // ------------------------------------------------------------------
@@ -381,10 +408,42 @@
   // pronunciation-row speaker button (click once = one utterance).
   window.luteTtsSpeak = speakText;
 
+  // Tap markers (press / ack / pending) are implemented once in lute.js
+  // and published as window.luteTapFeedback -- see the "Tap feedback"
+  // section there.  Resolved at call time because tts.js is also loaded
+  // on the term form page, which has no lute.js.  When it is missing the
+  // button simply behaves as before.
+  function tapFx() {
+    return window.luteTapFeedback || null;
+  }
+
   function setupEventDelegation() {
     const textDiv = document.getElementById("thetext");
     if (!textDiv || textDiv.dataset.delegated === "true") return;
     textDiv.dataset.delegated = "true";
+
+    // Sentence 🔊 press feedback.  Pointer events cover mouse and touch
+    // with one handler, so the button answers the finger the instant it
+    // lands -- before the click, which the browser only fires on release.
+    textDiv.addEventListener("pointerdown", function (e) {
+      const btn = e.target.closest(".lute-sentence-play-btn");
+      const fx = tapFx();
+      if (btn && fx) fx.press(btn);
+    });
+
+    textDiv.addEventListener("pointerup", function (e) {
+      const btn = e.target.closest(".lute-sentence-play-btn");
+      const fx = tapFx();
+      if (btn && fx) fx.release(btn);
+    });
+
+    // Touch stolen (scroll started, browser gesture, notification pulled
+    // down): no click is coming, so don't leave the button marked.
+    textDiv.addEventListener("pointercancel", function (e) {
+      const btn = e.target.closest(".lute-sentence-play-btn");
+      const fx = tapFx();
+      if (btn && fx) fx.clear(btn);
+    });
 
     // Word hover pronunciation
     textDiv.addEventListener("mouseover", function (e) {
@@ -424,7 +483,22 @@
         // Stop the full player if it's running so the hover/sentence
         // utterance isn't drowned out by the active cue.
         if (ttsPlaying) ttsStop();
-        speakText(cleanSentence);
+
+        const fx = tapFx();
+        if (!fx) {
+          speakText(cleanSentence);
+          return;
+        }
+
+        // Acknowledge the click right away, then keep the 🔊 marked while
+        // the speech engine warms up / the /tts/ endpoint is fetched --
+        // exactly the "did it register?" gap this button used to have.
+        // The marker is dropped the moment sound actually starts (see
+        // the onStarted hook in speakText), or by lute.js's own safety
+        // timeout if that never fires.
+        fx.ack(btn, false);
+        fx.pending(btn, fx.ACK_MS);
+        speakText(cleanSentence, function () { fx.clear(btn); });
       }
     });
   }
