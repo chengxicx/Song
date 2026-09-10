@@ -277,7 +277,7 @@ def _subtitle_cache_is_fresh(entry):
     return all(current.get(wid) == status for wid, status in statuses.items())
 
 
-def _sync_media_page_text_to_cues(book, original_text, new_text):
+def _sync_media_page_text_to_cues(book, pagenum, original_text, new_text):
     """
     Propagate an edited page's text back into the subtitle cue texts.
 
@@ -287,19 +287,29 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
     ``book.srt_data``).  ``edit_page`` only updates the page's Text record,
     so without this the player would keep showing the old subtitle text.
 
-    We locate the edited page's lines within the full cue line stream,
-    then write the new lines back into the corresponding cues.  Only the
-    common single-line-per-cue case is handled; if the alignment isn't
-    clean (e.g. multi-line cues, or a different number of lines after the
-    edit) we leave the cues untouched rather than risk corrupting them.
+    The page is *anchored to its own position* in the cue line stream -- the
+    cumulative line count of the pages before it -- and its lines are
+    written to exactly those cues.  Anchoring matters.  Locating the page by
+    best content match *anywhere* in the book is ambiguous: a page whose
+    text has drifted by one line (e.g. two lines were merged, so the page
+    has one line fewer than the cues it covers) matches a neighbouring run
+    of cues much better than its own, and writing the page there silently
+    shifts/duplicates whole subtitles.  Subtitle sync for book 270 was
+    destroyed exactly that way.
 
-    Returns True if ``book.srt_data`` was updated, False otherwise.
+    Only the clean single-line-per-cue case is handled.  When anything
+    doesn't line up (a line was added/removed/merged, multi-line cues, or
+    the page text has drifted from the cues) the cues are left untouched
+    and the caller is told, rather than guessing and corrupting them.
+
+    Returns "updated" (srt_data written), "unchanged" (nothing to do), or
+    "mismatch" (page text and cues don't line up; cues left alone).
     """
     if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "video"):
-        return False
+        return "unchanged"
     cues = list(book.cues)
     if not cues:
-        return False
+        return "unchanged"
 
     def _norm(s):
         # The page text may carry CRLF/CR line endings (or stray \r) while
@@ -309,7 +319,7 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
     orig_lines = [_norm(x) for x in (original_text or "").split("\n")]
     new_lines = [_norm(x) for x in (new_text or "").split("\n")]
     if not orig_lines or not new_lines:
-        return False
+        return "unchanged"
 
     # The full cue line stream is exactly how book.text is built
     # ("\n".join(cue text)).  Each line maps back to its owning cue, so
@@ -321,29 +331,35 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
         full_lines.extend(segs)
         line_to_cue.extend([idx] * len(segs))
 
-    # Locate the edited page's lines by best alignment: pick the stream
-    # offset whose block shares the most lines with the page, tolerating a
-    # few lines that were already edited/drifted without giving up entirely.
     n = len(orig_lines)
-    best_index = None
-    best_score = -1
-    for i in range(len(full_lines) - n + 1):
-        score = sum(1 for k in range(n) if full_lines[i + k] == orig_lines[k])
-        if score > best_score:
-            best_score = score
-            best_index = i
-    if best_index is None or best_score <= 0:
-        return False
-    start = best_index
+    # A changed line count means the page no longer maps one line per cue
+    # (a line was added, removed, merged or split); don't guess.
+    if len(new_lines) != n:
+        return "mismatch"
 
-    covered = line_to_cue[start : start + n]
+    # The page's first line sits at the cumulative line count of the pages
+    # before it: pages are contiguous runs of "\n".join(cue text).
+    anchor = 0
+    for t in book.texts:
+        if t.order < pagenum:
+            anchor += len(_norm(t.text).split("\n"))
+    if anchor + n > len(full_lines):
+        return "mismatch"
+
+    covered = line_to_cue[anchor : anchor + n]
     cue_start = covered[0]
     # Only handle the clean single-line-cue case (the norm for subtitles),
     # where the covered cues are exactly one cue per line.
     if covered != list(range(cue_start, cue_start + n)):
-        return False
-    if len(new_lines) != n:
-        return False
+        return "mismatch"
+
+    # The page text must still agree with the cues it claims to cover: a
+    # couple of drifted lines are tolerated (users fix lines out of band),
+    # but a wholesale mismatch means the text and the subtitles have already
+    # drifted apart, and writing here would corrupt the cues.
+    score = sum(1 for k in range(n) if full_lines[anchor + k] == orig_lines[k])
+    if score < n - 2:
+        return "mismatch"
 
     changed = False
     for offset, line in enumerate(new_lines):
@@ -352,11 +368,11 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
             cues[k]["text"] = line
             changed = True
     if not changed:
-        return False
+        return "unchanged"
 
     book.srt_data = json.dumps(cues, ensure_ascii=False)
     invalidate_yt_subtitle_cache(book.id)
-    return True
+    return "updated"
 
 
 def _render_book_page(book, pagenum, track_page_open=True):
@@ -928,8 +944,17 @@ def edit_page(bookid, pagenum):
         # For media books the reading text is driven by the subtitle cues;
         # propagate the edit back into the cues so the player subtitles
         # reflect the change.
-        _sync_media_page_text_to_cues(book, original_text, text.text)
+        status = _sync_media_page_text_to_cues(book, pagenum, original_text, text.text)
         db.session.commit()
+        if status == "mismatch":
+            flash(
+                "Saved, but the subtitles were not updated: this page no "
+                "longer has the same number of lines as the subtitle cues "
+                "it covers (a line was added, removed, merged or split), or "
+                "its text has drifted from the subtitles.  Keep one line "
+                "per subtitle line, or re-import the subtitle file.",
+                "notice",
+            )
         return redirect(f"/read/{book.id}", 302)
 
     text_dir = "rtl" if book.language.right_to_left else "ltr"
