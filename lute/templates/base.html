@@ -24,8 +24,12 @@
   <meta name="theme-color" content="#2563eb" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="application-name" content="Lute" />
-  <meta name="apple-mobile-web-app-title" content="Lute" />
+  <meta name="application-name" content="Song" />
+  <meta name="apple-mobile-web-app-title" content="Song" />
+  {# iOS "Add to Home Screen" prefers apple-touch-icon over manifest icons;
+     without it Safari falls back to a page screenshot (showing the old
+     Lute header logo). #}
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/img/icon-192.png" />
 
   {# Clean the address bar: if the URL contains BasicAuth credentials, replace
      the URL in the history (no reload). The <base> tag above already ensures
