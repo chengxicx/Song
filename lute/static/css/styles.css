@@ -853,7 +853,8 @@ span.hamburger {
 #tap_sets_status-container,
 #tts-toggle-container,
 #tts-sentence-buttons-toggle-container,
-#arrow_marks_known-container {
+#arrow_marks_known-container,
+#tap_haptics-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -868,7 +869,8 @@ span.hamburger {
 #tap_sets_status,
 #tts-player-toggle,
 #tts-sentence-buttons-toggle,
-#arrow_marks_known {
+#arrow_marks_known,
+#tap_haptics {
     appearance: none;
     display: block;
     background-color: #ffffff;
@@ -885,7 +887,8 @@ span.hamburger {
 #tap_sets_status-container label,
 #tts-toggle-container label,
 #tts-sentence-buttons-toggle-container label,
-#arrow_marks_known-container label {
+#arrow_marks_known-container label,
+#tap_haptics-container label {
     font-weight: bold;
     min-width: 110px;
     text-align: right;
@@ -903,7 +906,8 @@ span.hamburger {
 #tap_sets_status::after,
 #tts-player-toggle::after,
 #tts-sentence-buttons-toggle::after,
-#arrow_marks_known::after {
+#arrow_marks_known::after,
+#tap_haptics::after {
     content: "";
     display: block;
     background-color: #616161;
@@ -918,7 +922,8 @@ span.hamburger {
 .tap_sets_status-active #tap_sets_status::after,
 .tts-player-active #tts-player-toggle::after,
 .tts-sentence-buttons-active #tts-sentence-buttons-toggle::after,
-.arrow_marks_known-active #arrow_marks_known::after {
+.arrow_marks_known-active #arrow_marks_known::after,
+.tap_haptics-active #tap_haptics::after {
     transform: translate(100%, 0);
     background-color: #ffffff;
 }
@@ -927,7 +932,8 @@ span.hamburger {
 .tap_sets_status-active #tap_sets_status,
 .tts-player-active #tts-player-toggle,
 .tts-sentence-buttons-active #tts-sentence-buttons-toggle,
-.arrow_marks_known-active #arrow_marks_known {
+.arrow_marks_known-active #arrow_marks_known,
+.tap_haptics-active #tap_haptics {
     background-color: #40916c;
     border-color: #40916c;
 }
@@ -945,7 +951,9 @@ span.hamburger {
 }
 
 #tap_sets_status-container label,
-#tap_sets_status-container input {
+#tap_sets_status-container input,
+#tap_haptics-container label,
+#tap_haptics-container input {
   display: inline-block;
   vertical-align: middle;
 }
@@ -1653,6 +1661,165 @@ img
 .newmultiterm
 {
     background: yellow !important;
+}
+
+
+/* ========================================= */
+/* Tap feedback on interactive text.
+
+   On a touch screen there is no hover, so a tap used to produce no
+   visible change at all until the server answered -- and on a cold
+   term-popup fetch that is a full network round-trip.  Users re-tapped
+   "to make sure", which the double-tap handler then read as a double
+   tap.  Four markers give every tap an immediate answer:
+
+     .tap-pressed  finger is down right now (touchstart -> touchend)
+     .tap-ack      tap received: one short flash        (+ buzz)
+     .tap-double   double tap received: two-beat pulse  (+ double buzz)
+     .tap-pending  request/speech in flight: pulsing dashed outline
+
+   Two kinds of element carry them:
+
+     span.textitem          a word in the reading pane
+     .lute-sentence-play-btn  the per-sentence 🔊 injected by tts.js
+
+   For words everything is outline / box-shadow only: they are inline
+   spans, so changing padding, margin or border width would reflow the
+   line and make the text jump under the reader's finger, and changing
+   the background would fight the per-status colours.  The 🔊 button is
+   inline-block with its own box, so it may also take a filled tint.
+
+   The JS that adds/removes these lives in lute.js (search "_tap_press",
+   and window.luteTapFeedback for the tts.js bridge); the durations
+   there must stay in sync with the animations below.
+   -------------------------------------------------------------------- */
+
+@media (pointer: coarse) {
+  span.textitem,
+  .lute-sentence-play-btn {
+    /* Drop the browser's own grey tap flash: it is inconsistent across
+       browsers and easy to miss.  The classes below replace it. */
+    -webkit-tap-highlight-color: transparent;
+    /* Disable double-tap-to-zoom.  Without this the browser waits
+       ~300ms after the first tap to see if a zoom is coming, which is
+       most of the double-tap window and makes the gesture feel
+       unreliable.  Panning still works, so page swipes are unaffected. */
+    touch-action: manipulation;
+  }
+}
+
+/* The rings are drawn in the element's own text colour (currentColor ==
+   var(--font-color) for a word), so they stay readable in every theme --
+   the light, dark, e-ink and paper themes define very different fonts
+   and backgrounds, and there is no shared accent variable to lean on.
+   --tap-glow-color thins it out for the softer expanding ring; the
+   @supports block just upgrades the fixed fallback when color-mix()
+   is available (every current browser). */
+span.textitem,
+.lute-sentence-play-btn {
+    --tap-glow-color: rgba(127, 127, 127, 0.45);
+}
+@supports (color: color-mix(in srgb, currentColor, transparent)) {
+  span.textitem,
+  .lute-sentence-play-btn {
+    --tap-glow-color: color-mix(in srgb, currentColor 38%, transparent);
+  }
+}
+
+/* The 🔊 button is a real box, so it also gets a filled "pressed" tint
+   on top of the ring -- a bare outline around a 14px glyph is easy to
+   miss.  (Words deliberately don't: their background is the word's
+   status colour.) */
+.lute-sentence-play-btn.tap-pressed,
+.lute-sentence-play-btn.tap-ack,
+.lute-sentence-play-btn.tap-pending {
+    background-color: rgba(127, 127, 127, 0.25);
+}
+
+/* Finger (or mouse button) is down on the element right now. */
+span.textitem.tap-pressed,
+.lute-sentence-play-btn.tap-pressed {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+    border-radius: 3px;
+}
+
+/* Tap registered. */
+span.textitem.tap-ack,
+.lute-sentence-play-btn.tap-ack {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+    border-radius: 3px;
+    animation: tap-ack-flash 0.4s ease-out 1 forwards;
+}
+
+@keyframes tap-ack-flash {
+    from { outline-color: currentColor; }
+    to   { outline-color: transparent; }
+}
+
+/* Double tap registered: two distinct beats so it never reads as two
+   single taps.  The expanding ring is a box-shadow, which -- like
+   outline -- is painted outside the box and cannot reflow the text. */
+span.textitem.tap-double,
+.lute-sentence-play-btn.tap-double {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+    border-radius: 3px;
+    animation: tap-double-flash 0.55s ease-out 1 forwards;
+}
+
+@keyframes tap-double-flash {
+    0% {
+        outline-color: currentColor;
+        box-shadow: 0 0 0 0 var(--tap-glow-color);
+    }
+    45% {
+        outline-color: transparent;
+        box-shadow: 0 0 0 9px transparent;
+    }
+    55% {
+        outline-color: currentColor;
+        box-shadow: 0 0 0 0 var(--tap-glow-color);
+    }
+    100% {
+        outline-color: transparent;
+        box-shadow: 0 0 0 11px transparent;
+    }
+}
+
+/* Waiting on the server / on the speech engine: a dashed outline that
+   breathes until the answer lands (or the safety timeout in lute.js
+   fires).  Static fallback for the e-ink theme, which sets
+   animation: none globally. */
+span.textitem.tap-pending,
+.lute-sentence-play-btn.tap-pending {
+    outline: 2px dashed currentColor;
+    outline-offset: 1px;
+    border-radius: 3px;
+    animation: tap-pending-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes tap-pending-pulse {
+    0%, 100% { outline-color: currentColor; }
+    50%      { outline-color: transparent; }
+}
+
+/* Respect "reduce motion": keep the markers, drop the movement. */
+@media (prefers-reduced-motion: reduce) {
+    span.textitem.tap-ack,
+    .lute-sentence-play-btn.tap-ack,
+    span.textitem.tap-pending,
+    .lute-sentence-play-btn.tap-pending {
+        animation: none;
+    }
+    /* .tap-double's base rule has no outline of its own (the animation
+       supplies it), so give it a static one here. */
+    span.textitem.tap-double,
+    .lute-sentence-play-btn.tap-double {
+        animation: none;
+        outline: 3px solid currentColor;
+    }
 }
 
 #termtags

@@ -61,6 +61,14 @@
   <input type="checkbox" name="arrow_marks_known" id="arrow_marks_known" x-model="arrowMarksKnown">
 </div>
 
+{# Vibration is only reachable from the touch handlers in lute.js, so
+   hide the toggle on devices with no touch screen.  style="display:none"
+   keeps it from flashing before Alpine boots. #}
+<div id="tap_haptics-container" x-show="isTouch" style="display: none;">
+  <label for="tap_haptics">Tap vibration</label>
+  <input type="checkbox" name="tap_haptics" id="tap_haptics" x-model="tapHaptics">
+</div>
+
 <div class="text-options-container">
   <div class="text-options-btn-container">
     <button class="text-options-button font-minus" title="Decrease font size"></button>

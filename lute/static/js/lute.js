@@ -141,6 +141,7 @@ function _add_mobile_interactions() {
   const t = $('#thetext');
   t.on('touchstart', '.word', touch_started);
   t.on('touchend', '.word', touch_ended);
+  t.on('touchcancel', '.word', touch_cancelled);
 }
 
 
@@ -158,6 +159,12 @@ function _add_desktop_interactions() {
     t.on('mouseover', '.word', hover_over_add_status_class);
     t.on('mouseout', '.word', remove_status_highlights);
   }
+  // Touch laptops report as "desktop" but still deserve the press
+  // feedback.  Released here rather than in handle_select_ended so a
+  // drag that ends outside the text (or a cancelled drag) still clears.
+  $(document).on('mouseup', function () {
+    $('span.tap-pressed').removeClass('tap-pressed');
+  });
 }
 
 /* ========================================= */
@@ -213,6 +220,10 @@ function _termpopup_deliver(elid) {
   const node = p.el && p.el[0];
   if (!node || !node.isConnected) return;
   p.cb(_termpopup_cache[elid]);
+  // The popup the reader was waiting for is on screen.  Only reachable
+  // with a real setContent callback, so desktop hover prefetches (which
+  // pass none) don't clear anything.
+  _clear_tap_feedback();
 }
 
 // Start the next queued fetch, if any.
@@ -279,6 +290,8 @@ document.addEventListener('htmx:afterRequest', function (e) {
   _termpopup_cache[elid] = detail.successful && detail.target ? detail.target.innerHTML : '';
   _termpopup_deliver(elid);
   _termpopup_pump();
+  // Whether it succeeded or failed, the wait is over.
+  _clear_tap_feedback();
 });
 
 // Prefetch the popup as soon as the pointer lands on a word, so the
@@ -593,6 +606,10 @@ let clear_newmultiterm_elements = function() {
 }
 
 function handle_select_started(e) {
+  // Immediate "pressed" answer on mouse-down / touch-down.  Not in
+  // select_started() itself: that is also called by the mobile
+  // long-press (tap-hold) path, where the finger is already up.
+  _tap_press($(this));
   select_started($(this), e);
 }
 
@@ -667,6 +684,183 @@ function select_ended(el, e) {
   selection_start_el = null;
   selection_start_shift_held = false;
 }
+
+
+/* ========================================= */
+/** Tap feedback: visual + haptic.
+
+    On a touch screen a tap used to produce no visible change until the
+    server answered, so readers re-tapped "to be sure" -- and the second
+    tap was then read as a double     tap.  Four CSS markers fix that (see
+    styles.css, "Tap feedback on interactive text"):
+
+      tap-pressed  finger is down right now
+      tap-ack      tap received (flash + short buzz)
+      tap-double   double tap received (two-beat pulse + double buzz)
+      tap-pending  a request / the speech engine is in flight
+
+    Two kinds of element carry them: words in the reading pane (wired up
+    below, in touch_ended / handle_select_started) and the sentence 🔊
+    buttons injected by tts.js, which reach these helpers through the
+    window.luteTapFeedback bridge at the end of this section.
+
+    The durations below must stay in sync with the matching animations
+    in styles.css.
+*/
+
+// Keep in sync with the tap-ack / tap-double animations in styles.css.
+const _tap_ack_ms = 420;
+const _tap_double_ms = 580;
+
+// Everything that can carry a tap marker.  The sentence 🔊 buttons are
+// wired up in tts.js through the window.luteTapFeedback bridge at the
+// bottom of this section, but their markers live in the same classes so
+// a single "clear everything" pass covers both.
+const _tap_feedback_selector = 'span.textitem, .lute-sentence-play-btn';
+
+// Longest a word can stay "pending" if no completion event ever arrives
+// (a request that failed without firing htmx:afterRequest, a term form
+// that never opened, ...).  Long enough to cover a slow mobile round
+// trip, short enough that a stuck marker is never mistaken for a hang.
+const _tap_pending_max_ms = 2500;
+
+let _tap_pending_timer = null;
+let _tap_pending_start_timer = null;
+// The element the two timers above belong to (see _clear_tap_feedback).
+let _tap_pending_el = null;
+
+/**
+ * Haptic feedback.
+ *
+ * Only Android Chrome/Firefox implement the Vibration API -- iOS Safari
+ * has no navigator.vibrate at all, so this is a silent no-op there and
+ * the visual markers carry the feedback on their own.
+ */
+function _tap_buzz(pattern) {
+  if (localStorage.getItem('tap_haptics') === 'false')
+    return;
+  try {
+    if (typeof navigator.vibrate === 'function')
+      navigator.vibrate(pattern);
+  } catch (err) {
+    // Throws in some browsers when called outside a user gesture.
+  }
+}
+
+/** Drop every tap marker.  Pass an element to limit it to that one. */
+function _clear_tap_feedback(el) {
+  const target = $(el || _tap_feedback_selector);
+  // The "pending" bookkeeping is global (one marker at a time), so it
+  // may only be dropped when the element it belongs to is the one being
+  // cleared.  Without this guard, clearing sentence 🔊 A when its speech
+  // starts would also cancel the safety timeout that keeps sentence 🔊
+  // B's marker from sticking on screen for ever.
+  if (!el || (_tap_pending_el && _tap_pending_el[0] === target[0])) {
+    if (_tap_pending_timer != null) {
+      clearTimeout(_tap_pending_timer);
+      _tap_pending_timer = null;
+    }
+    if (_tap_pending_start_timer != null) {
+      clearTimeout(_tap_pending_start_timer);
+      _tap_pending_start_timer = null;
+    }
+    _tap_pending_el = null;
+  }
+  target.removeClass('tap-pressed tap-ack tap-double tap-pending');
+}
+
+/** Finger / mouse button went down on el: answer immediately. */
+function _tap_press(el) {
+  // A new touch supersedes whatever the previous one was waiting for.
+  _clear_tap_feedback();
+  $(el).addClass('tap-pressed');
+}
+
+/** Finger / mouse button came up (or the touch was cancelled). */
+function _tap_release(el) {
+  $(el).removeClass('tap-pressed');
+}
+
+/**
+ * "Got it": flash the word and buzz, so the reader knows the gesture was
+ * received even if the answer takes another second.  is_double gets a
+ * visibly different two-beat pulse so a double tap never feels like two
+ * single taps.
+ */
+function _tap_acknowledge(el, is_double) {
+  const $el = $(el);
+  if ($el.length === 0) return;
+  const cls = is_double ? 'tap-double' : 'tap-ack';
+  $el.removeClass('tap-ack tap-double');
+  // Force a reflow: without it, re-adding the class on the same element
+  // does not restart the CSS animation.
+  void $el[0].offsetWidth;
+  $el.addClass(cls);
+  setTimeout(function () { $el.removeClass(cls); },
+             is_double ? _tap_double_ms : _tap_ack_ms);
+  _tap_buzz(is_double ? [14, 45, 22] : 14);
+}
+
+/**
+ * "Working": mark the word until _clear_tap_feedback() runs.  Only used
+ * when the tap actually triggers a server round trip.
+ *
+ * Pass the ack duration as delay_ms so the two markers play in sequence
+ * instead of fighting: .tap-ack/.tap-double and .tap-pending both drive
+ * `outline`, and with equal CSS specificity the later rule wins outright,
+ * so showing them together would hide the "tap received" flash -- the
+ * very thing this is all for.  Fast responses (a cached term popup, a
+ * local status swap) finish inside the delay and never show the marker.
+ */
+function _tap_mark_pending(el, delay_ms) {
+  const $el = $(el);
+  if ($el.length === 0) return;
+  if (_tap_pending_start_timer != null) clearTimeout(_tap_pending_start_timer);
+  if (_tap_pending_timer != null) clearTimeout(_tap_pending_timer);
+  $(_tap_feedback_selector + '.tap-pending').not($el).removeClass('tap-pending');
+  _tap_pending_el = $el;
+
+  const start = function () {
+    _tap_pending_start_timer = null;
+    if ($el.length === 0 || !$el[0].isConnected) return;
+    $el.addClass('tap-pending');
+    _tap_pending_timer = setTimeout(function () { _clear_tap_feedback(); },
+                                    _tap_pending_max_ms);
+  };
+
+  if (delay_ms > 0) {
+    _tap_pending_start_timer = setTimeout(start, delay_ms);
+  } else {
+    start();
+  }
+}
+
+/**
+ * Bridge for the other reading-page scripts (currently tts.js, for the
+ * sentence 🔊 buttons).  They live in their own file/IIFE and cannot
+ * reach into this one, so the marker API is published here rather than
+ * duplicated: one implementation, one set of timings, one CSS contract.
+ */
+window.luteTapFeedback = {
+  press: _tap_press,
+  release: _tap_release,
+  ack: _tap_acknowledge,
+  pending: _tap_mark_pending,
+  clear: _clear_tap_feedback,
+  buzz: _tap_buzz,
+  ACK_MS: _tap_ack_ms,
+  DOUBLE_MS: _tap_double_ms,
+};
+
+// Clear "pending" as soon as the thing we were waiting for shows up.
+// The term form posts a message when it has rendered, and the reading
+// text is re-swapped on every status update; either way the wait is over.
+window.addEventListener('message', function (event) {
+  const d = event.data;
+  if (d && (d.event === 'LuteTermFormOpened' || d.event === 'LuteTermFormPosted')) {
+    _clear_tap_feedback();
+  }
+});
 
 
 /********************************************/
@@ -755,19 +949,28 @@ function _swipe_distance(e) {
 function touch_started(e) {
   _touch_start_coords = _get_coords(e.originalEvent.touches[0]);
   _touch_start_time = Date.now();
+  // Answer the finger the instant it lands: everything below can wait
+  // for touchend (long-press detection) or for the server.
+  _tap_press($(this));
+}
+
+// The touch was stolen (incoming call, pull-down notification, browser
+// gesture, ...): no tap happened, so don't leave the word marked.
+function touch_cancelled(e) {
+  _clear_tap_feedback($(this));
 }
 
 function touch_ended(e) {
+  const el = $(this);
+  _tap_release(el);
+
   if (_swipe_distance(e) >= _swipe_min_threshold_pixels) {
     // Do nothing else if this was a swipe.
     _cancel_pending_popup();
+    _clear_tap_feedback(el);
     return;
   }
 
-  // The touch_ended handler is attached with t.on in
-  // prepareTextInteractions, so the clicked element is just
-  // $(this).
-  const el = $(this);
   const this_id = el.attr("id")
 
   $('span.kwordmarked').removeClass('kwordmarked');
@@ -789,17 +992,24 @@ function touch_ended(e) {
     //   long press  -> term edit form
     _cancel_pending_popup();
     if (is_long_touch) {
+      _tap_acknowledge(el, false);
+      _tap_mark_pending(el, _tap_ack_ms);
       show_term_edit_form(el);
     }
     else if (is_double_click) {
       _close_all_term_popups();
+      _tap_acknowledge(el, true);
+      _tap_mark_pending(el, _tap_double_ms);
       _quick_cycle_status(el);
     }
     else if (selection_start_el != null) {
+      _tap_acknowledge(el, false);
       select_over(el, e);
       select_ended(el, e);
     }
     else {
+      _tap_acknowledge(el, false);
+      _tap_mark_pending(el, _tap_ack_ms);
       // Delay the popup by the double-tap window: if a second tap
       // arrives in time, _cancel_pending_popup() above drops it and
       // the status cycles without the card ever appearing.
@@ -814,17 +1024,25 @@ function touch_ended(e) {
   }
 
   if (is_long_touch) {
+    _tap_acknowledge(el, false);
     _tap_hold(el, e);
   }
   else if (selection_start_el != null) {
+    _tap_acknowledge(el, false);
     select_over(el, e);
     select_ended(el, e);
   }
   else if (is_double_click) {
+    _tap_acknowledge(el, true);
+    _tap_mark_pending(el, _tap_double_ms);
     _double_tap(el);
   }
   else {
-    _single_tap(el);
+    // _single_tap only does something (and only talks to the server)
+    // for status-0 words; only then is a "pending" marker honest.
+    const acted = _single_tap(el, e);
+    _tap_acknowledge(el, false);
+    if (acted) _tap_mark_pending(el, _tap_ack_ms);
     _last_touched_element_id = this_id;
     _last_touched_time = now;
     el.addClass('kwordmarked');
@@ -855,13 +1073,17 @@ function _double_tap(el, e) {
 
 /**
  * Mobile handler, single tap.
+ *
+ * Returns true if the tap started something that talks to the server -- a
+ * status update or a term form load -- so the caller knows whether to
+ * show the "pending" marker.
  **/
 function _single_tap(el, e) {
   clear_newmultiterm_elements();
 
   const term_is_status_0 = (el.data("status-class") == "status0");
   if (!term_is_status_0) {
-    return;
+    return false;
   }
 
   const _tap_sets_status = () => {
@@ -876,6 +1098,7 @@ function _single_tap(el, e) {
   else {
     show_term_edit_form(el);
   }
+  return true;
 }
 
 
@@ -910,10 +1133,16 @@ function _close_all_term_popups() {
 function _quick_show_popup(el) {
   // The popup is scheduled, so the word may have been replaced by a
   // page/fragment swap while waiting.
-  if (el.length === 0 || !el[0].isConnected) return;
+  if (el.length === 0 || !el[0].isConnected) {
+    _clear_tap_feedback();
+    return;
+  }
   // Words that aren't saved to the DB yet (status 0, no wid) have no
-  // popup to show.
-  if (isNaN(parseInt(el.data('wid'), 10))) return;
+  // popup to show, so nothing is coming: drop the pending marker.
+  if (isNaN(parseInt(el.data('wid'), 10))) {
+    _clear_tap_feedback();
+    return;
+  }
   // Close any tooltip left open from a previous tap: closing clears the
   // word's ui-tooltip-id, so the same word can be shown again.
   $("#thetext").tooltip("close");
@@ -1540,6 +1769,11 @@ document.addEventListener('htmx:afterSwap', function (e) {
   if (e.target && e.target.id === 'thetext' && _pendingStatusUpdate) {
     const ps = _pendingStatusUpdate;
     _pendingStatusUpdate = null;
+
+    // The text was re-rendered, so whatever the reader was waiting for
+    // has landed.  The old spans are gone anyway; this also clears any
+    // marker that survived on a span outside #thetext.
+    _clear_tap_feedback();
 
     // The swap removed the words any open term popup was attached to;
     // clear the leftover floating cards.
