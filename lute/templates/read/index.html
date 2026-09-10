@@ -27,7 +27,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}?v=20260805f" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}?v=20260830b" charset="utf-8" defer></script>
 <script type="text/javascript" src="/static/js/never_cache/dict-tabs.js?v={{ lute_version }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260908a" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260910a" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/player-dock.js') }}?v=20260830a" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
@@ -54,7 +54,7 @@
 
 <div id="read_pane_container"
      x-data="readState()"
-     :class="{ 'focus-mode-active': focusMode, 'tap_sets_status-active': tapSetsStatus, 'arrow_marks_known-active': arrowMarksKnown }">
+     :class="{ 'focus-mode-active': focusMode, 'tap_sets_status-active': tapSetsStatus, 'arrow_marks_known-active': arrowMarksKnown, 'tap_haptics-active': tapHaptics }">
 
 <div id="read_pane_left">
 
@@ -315,6 +315,10 @@
       focusMode: !isTablet && localStorage.getItem(`focusMode-book${bookId}`) === "true",
       tapSetsStatus: isTablet && localStorage.getItem("tap_sets_status") === "true",
       arrowMarksKnown: localStorage.getItem("arrow_marks_known") === "true",
+      isTouch: window.matchMedia("(hover: none) and (pointer: coarse)").matches,
+      // Haptics default on; iOS has no Vibration API so this is
+      // silently ignored there (see _tap_buzz in lute.js).
+      tapHaptics: localStorage.getItem("tap_haptics") !== "false",
       init() {
         if (typeof update_arrow_titles === "function") update_arrow_titles();
         this.$watch("focusMode", (v) => {
@@ -326,6 +330,9 @@
         this.$watch("arrowMarksKnown", (v) => {
           localStorage.setItem("arrow_marks_known", v ? "true" : "false");
           if (typeof update_arrow_titles === "function") update_arrow_titles();
+        });
+        this.$watch("tapHaptics", (v) => {
+          localStorage.setItem("tap_haptics", v ? "true" : "false");
         });
       },
     };
