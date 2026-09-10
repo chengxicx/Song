@@ -428,11 +428,16 @@
     // If the word HTML hasn't been loaded yet (WORDS is empty), fall
     // back to the plain cue text so the user sees something immediately.
     if (ytSubtitle) {
-      // Clear any in-progress drag-selection: the old word spans are
+      // Close any in-progress drag-selection: the old word spans are
       // about to be replaced, so selection_start_el would point to a
       // detached element.
       if (typeof clear_newmultiterm_elements === "function")
         clear_newmultiterm_elements();
+      // Same for an open term popup anchored to one of those spans: the
+      // innerHTML write below detaches the word, and a card left over
+      // from it would stay on screen (one more block per cue).
+      if (typeof _hide_element_message_tooltips === "function")
+        _hide_element_message_tooltips();
       var html = WORDS[idx];
       if (!html) {
         var cue = CUES[idx];
@@ -494,6 +499,10 @@
     if (ytSubtitle) {
       if (typeof clear_newmultiterm_elements === "function")
         clear_newmultiterm_elements();
+      // The word spans are about to go: close the popup of whichever of
+      // them has one open, or it would float on over the empty subtitle.
+      if (typeof _hide_element_message_tooltips === "function")
+        _hide_element_message_tooltips();
       ytSubtitle.innerHTML = "";
       ytMarqueeOverflow = 0;
     }

@@ -5,10 +5,10 @@
 {% block body %}
 
 {% if book_type in ("youtube", "mp3", "video") %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260830a" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260910b" charset="utf-8" defer></script>
 {% elif book_type == "bilibili" %}
 <script type="text/javascript" src="{{ vstatic('vendor/dash.all.min.js') }}" charset="utf-8" defer></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/bilibili-player.js') }}?v=20260902a" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/bilibili-player.js') }}?v=20260910b" charset="utf-8" defer></script>
 {% elif book_type == "pdf" %}
 {# Vendored pdf.js (Mozilla, Apache 2.0).  The inline module exposes
    window.pdfjsLib with a shared module worker and fires "pdfjs-ready";
