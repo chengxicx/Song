@@ -696,9 +696,10 @@ function select_ended(el, e) {
 // clicks were never fast enough to be distinguishable.  For that
 // reason, instead of using click time differences to distinguish
 // between single and double clicks, the code tracks the
-// _last_touched_element: if the second tap is the same as the first,
-// it's treated as a double tap, regardless of the duration.  This is
-// fine for Lute since the first tap only opens the term pop-up.
+// _last_touched_element: if the second tap is on the same element as
+// the first AND happens within _double_tap_max_interval_ms, it's
+// treated as a double tap.  The time window keeps a slow
+// tap ... (pause) ... tap on the same word from being misjudged.
 //
 // 3. Scroll/swipe
 //
@@ -710,8 +711,13 @@ function select_ended(el, e) {
 let _touch_start_time;
 const _long_touch_min_duration_ms = 500;
 
-// Tracking if double-click.
+// Tracking if double-click: same element AND re-tapped within
+// _double_tap_max_interval_ms.  Without the time window, a single tap
+// followed by a much later tap on the same word was misjudged as a
+// double tap.
 let _last_touched_element_id = null;
+let _last_touched_time = 0;
+const _double_tap_max_interval_ms = 400;
 
 // Tracking if swipe.
 let _touch_start_coords = null;
@@ -753,7 +759,9 @@ function touch_ended(e) {
 
   const touch_duration = Date.now() - _touch_start_time;
   const is_long_touch = (touch_duration >= _long_touch_min_duration_ms);
-  const is_double_click = (this_id === _last_touched_element_id);
+  const now = Date.now();
+  const is_double_click = (this_id === _last_touched_element_id &&
+    (now - _last_touched_time) <= _double_tap_max_interval_ms);
   _last_touched_element_id = null;  // Already checked in is_double_click.
 
   if (_quick_set_status_active()) {
@@ -767,7 +775,7 @@ function touch_ended(e) {
       show_term_edit_form(el);
     }
     else if (is_double_click) {
-      $("#thetext").tooltip("close");
+      _close_all_term_popups();
       _quick_cycle_status(el);
     }
     else if (selection_start_el != null) {
@@ -777,6 +785,7 @@ function touch_ended(e) {
     else {
       _quick_show_popup(el);
       _last_touched_element_id = this_id;
+      _last_touched_time = now;
     }
     return;
   }
@@ -794,6 +803,7 @@ function touch_ended(e) {
   else {
     _single_tap(el);
     _last_touched_element_id = this_id;
+    _last_touched_time = now;
     el.addClass('kwordmarked');
   }
 }
@@ -853,6 +863,21 @@ function _single_tap(el, e) {
 // reading menu; persisted in localStorage).
 function _quick_set_status_active() {
   return localStorage.getItem('tap_sets_status') === 'true';
+}
+
+// Close the term popup and destroy any orphaned tooltip elements left in
+// the DOM.  When a status update swaps the #thetext fragment via HTMX, the
+// word a tooltip was attached to disappears, so tooltip("close") can no
+// longer find it and the floating card stays on screen.  Removing every
+// .ui-tooltip clears those leftovers; the tooltip widget recreates its
+// element on the next open.
+function _close_all_term_popups() {
+  try {
+    $("#thetext").tooltip("close");
+  } catch (err) {
+    // Tooltip widget not initialized yet -- nothing to close.
+  }
+  $(".ui-tooltip").remove();
 }
 
 // Single tap in Quick Set Status Mode: show the term popup for the
@@ -1476,6 +1501,10 @@ document.addEventListener('htmx:afterSwap', function (e) {
   if (e.target && e.target.id === 'thetext' && _pendingStatusUpdate) {
     const ps = _pendingStatusUpdate;
     _pendingStatusUpdate = null;
+
+    // The swap removed the words any open term popup was attached to;
+    // clear the leftover floating cards.
+    _close_all_term_popups();
 
     for (let i = 0; i < ps.selected_ids.length; i++) {
       let el = $(`#${ps.selected_ids[i]}`);
