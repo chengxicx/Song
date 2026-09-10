@@ -179,6 +179,55 @@ let _get_tooltip_pos = function() {
 }
 
 /**
+ * The containers that own a term-popup tooltip widget.
+ *
+ * Every reading container binds its own jquery-ui tooltip instance:
+ * #thetext here in lute.js, and each player subtitle in
+ * youtube-player.js / bilibili-player.js / tts.js.  A word's popup is
+ * therefore owned by the widget of the container that word sits in, so
+ * "close the term popup" always has to mean "close it in all of them".
+ */
+const _term_popup_containers =
+  '#thetext, #yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner';
+
+/**
+ * Close every term popup that is currently open, wherever its word
+ * lives (main text or a player subtitle).
+ *
+ * tooltip("close") reads the element to close from event.currentTarget:
+ * called with no argument it falls back to the widget element itself,
+ * and a word is never that element, so for word popups it silently does
+ * nothing.  Walk the widget's own registry instead and hand each entry
+ * back to close() -- that is also the only path that clears the word's
+ * ui-tooltip-id and drops the registry entry, which is what makes the
+ * word openable again later: jquery-ui's open() refuses a word that
+ * still carries a ui-tooltip-id, so a popup that was taken off screen
+ * with a plain $('.ui-tooltip').remove() would never come back.
+ *
+ * Detached words are closed on purpose: they are the leftovers this
+ * exists for.  A fragment swap or a subtitle rebuild replaced the word,
+ * so nothing else will ever close the card it left behind.
+ */
+function _close_term_popups() {
+  $(_term_popup_containers).each(function () {
+    const widget = $(this).data('ui-tooltip');
+    if (!widget || !widget.tooltips) return;
+    Object.keys(widget.tooltips).forEach(function (id) {
+      const entry = widget.tooltips[id];
+      const el = entry && entry.element && entry.element[0];
+      if (!el) return;
+      const ev = $.Event('close');
+      ev.currentTarget = el;
+      try {
+        widget.close(ev);
+      } catch (err) {
+        // The widget was torn down under us: nothing left to close.
+      }
+    });
+  });
+}
+
+/**
  * Term-popup content for the jquery-ui tooltip.
  *
  * Content is fetched with HTMX and cached: the first hover on a word
@@ -997,7 +1046,7 @@ function touch_ended(e) {
       show_term_edit_form(el);
     }
     else if (is_double_click) {
-      _close_all_term_popups();
+      _close_term_popups();
       _tap_acknowledge(el, true);
       _tap_mark_pending(el, _tap_double_ms);
       _quick_cycle_status(el);
@@ -1111,26 +1160,22 @@ function _quick_set_status_active() {
   return localStorage.getItem('tap_sets_status') === 'true';
 }
 
-// Close the term popup and destroy any orphaned tooltip elements left in
-// the DOM.  When a status update swaps the #thetext fragment via HTMX, the
-// word a tooltip was attached to disappears, so tooltip("close") can no
-// longer find it and the floating card stays on screen.  Removing every
-// .ui-tooltip clears those leftovers; the tooltip widget recreates its
-// element on the next open.
-function _close_all_term_popups() {
-  try {
-    $("#thetext").tooltip("close");
-  } catch (err) {
-    // Tooltip widget not initialized yet -- nothing to close.
-  }
-  $(".ui-tooltip").remove();
-}
-
 // Single tap in Quick Set Status Mode: show the term popup for the
 // word, the same way a desktop hover does.  Reuses the jquery-ui
-// tooltip widget already attached to #thetext, so the popup content,
-// positioning and close handlers match the hover experience exactly.
+// tooltip widget the word's own container already has, so the popup
+// content, positioning and close handlers match the hover experience
+// exactly -- including for a word in a player subtitle, which carries
+// its own widget instead of #thetext's.
 function _quick_show_popup(el) {
+  // Only one term popup may be on screen at a time.  These popups are
+  // opened programmatically, and jquery-ui only wires auto-close
+  // handlers (mouseleave / focusout) for real mouseover / focusin
+  // opens -- see _registerCloseHandlers -- so nothing would ever close
+  // one on its own.  Without this, every tap left its card behind and
+  // the next tap stacked another on top: in the main text a wall of
+  // popups, and over the player subtitle a pile of stray blocks.
+  _close_term_popups();
+
   // The popup is scheduled, so the word may have been replaced by a
   // page/fragment swap while waiting.
   if (el.length === 0 || !el[0].isConnected) {
@@ -1143,10 +1188,13 @@ function _quick_show_popup(el) {
     _clear_tap_feedback();
     return;
   }
-  // Close any tooltip left open from a previous tap: closing clears the
-  // word's ui-tooltip-id, so the same word can be shown again.
-  $("#thetext").tooltip("close");
-  $("#thetext").tooltip("open", { target: el[0], type: "open" });
+
+  // Open through the widget of the container the word actually lives
+  // in: #thetext for the reading pane, the subtitle's own widget for a
+  // word in the player.
+  const container = el.closest(_term_popup_containers);
+  const scope = container.length ? container : $('#thetext');
+  scope.tooltip("open", { target: el[0], type: "open" });
 }
 
 // Double tap in Quick Set Status Mode: cycle a single word's status
@@ -1267,18 +1315,13 @@ let _show_element_message_tooltip = function(element, title, message, remove_aft
 
 let _hide_element_message_tooltips = function() {
   $('.manual-tooltip').remove();
-  // Hide all jQuery UI tooltips (term detail popups).
-  // Pages can have multiple tooltip containers (#thetext,
-  // #yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner),
-  // each with their own tooltip instance, so we close every
-  // initialized tooltip widget and remove any stray tooltip DOM.
-  $('#thetext, #yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner').each(function() {
-    const $this = $(this);
-    if ($this.data('ui-tooltip')) {
-      try { $this.tooltip('close'); } catch (_) {}
-    }
-  });
-  $('.ui-tooltip').hide().remove();
+  // Hide all jQuery UI tooltips (term detail popups).  Pages can have
+  // multiple tooltip containers (#thetext and the two player subtitles),
+  // each with its own widget instance -- one helper closes them all.
+  // It has to go through the widgets (see _close_term_popups): a bare
+  // $('.ui-tooltip').remove() hides the card but leaves the word marked
+  // as described-by, and jquery-ui then refuses to open that word again.
+  _close_term_popups();
 };
 
 
@@ -1777,7 +1820,7 @@ document.addEventListener('htmx:afterSwap', function (e) {
 
     // The swap removed the words any open term popup was attached to;
     // clear the leftover floating cards.
-    _close_all_term_popups();
+    _close_term_popups();
 
     // Re-flow the fit-to-screen sub-screens: the swapped-in paragraphs
     // have no pagination state, so without this the reader lands back on

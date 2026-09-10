@@ -368,6 +368,11 @@
     if (ytSubtitle) {
       if (typeof clear_newmultiterm_elements === "function")
         clear_newmultiterm_elements();
+      // An open term popup is anchored to one of the word spans the
+      // innerHTML write below detaches; close it first or its card stays
+      // on screen as one more stray block.
+      if (typeof _hide_element_message_tooltips === "function")
+        _hide_element_message_tooltips();
       var html = WORDS[idx];
       if (!html) {
         var cue = CUES[idx];
@@ -414,6 +419,10 @@
     if (ytSubtitle) {
       if (typeof clear_newmultiterm_elements === "function")
         clear_newmultiterm_elements();
+      // The word spans are about to go: close the popup of whichever of
+      // them has one open, or it would float on over the empty subtitle.
+      if (typeof _hide_element_message_tooltips === "function")
+        _hide_element_message_tooltips();
       ytSubtitle.innerHTML = "";
       ytMarqueeOverflow = 0;
     }
