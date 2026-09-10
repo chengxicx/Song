@@ -717,7 +717,22 @@ const _long_touch_min_duration_ms = 500;
 // double tap.
 let _last_touched_element_id = null;
 let _last_touched_time = 0;
-const _double_tap_max_interval_ms = 400;
+const _double_tap_max_interval_ms = 350;
+
+// Quick Set Status Mode: the single-tap popup is scheduled instead of
+// shown immediately, so the second tap of a double tap cancels it and
+// the popup never flashes while cycling a word's status.  The delay
+// must be >= the double-tap window above.
+const _quick_popup_delay_ms = _double_tap_max_interval_ms + 30;
+let _quick_pending_popup_timer = null;
+
+/** Cancel a popup that was scheduled by a previous tap. */
+function _cancel_pending_popup() {
+  if (_quick_pending_popup_timer != null) {
+    clearTimeout(_quick_pending_popup_timer);
+    _quick_pending_popup_timer = null;
+  }
+}
 
 // Tracking if swipe.
 let _touch_start_coords = null;
@@ -745,6 +760,7 @@ function touch_started(e) {
 function touch_ended(e) {
   if (_swipe_distance(e) >= _swipe_min_threshold_pixels) {
     // Do nothing else if this was a swipe.
+    _cancel_pending_popup();
     return;
   }
 
@@ -771,6 +787,7 @@ function touch_ended(e) {
     //   single tap  -> term popup (same as desktop hover)
     //   double tap  -> cycle status 1 -> 3 -> well known(99) -> 1
     //   long press  -> term edit form
+    _cancel_pending_popup();
     if (is_long_touch) {
       show_term_edit_form(el);
     }
@@ -783,7 +800,13 @@ function touch_ended(e) {
       select_ended(el, e);
     }
     else {
-      _quick_show_popup(el);
+      // Delay the popup by the double-tap window: if a second tap
+      // arrives in time, _cancel_pending_popup() above drops it and
+      // the status cycles without the card ever appearing.
+      _quick_pending_popup_timer = setTimeout(() => {
+        _quick_pending_popup_timer = null;
+        _quick_show_popup(el);
+      }, _quick_popup_delay_ms);
       _last_touched_element_id = this_id;
       _last_touched_time = now;
     }
@@ -885,6 +908,9 @@ function _close_all_term_popups() {
 // tooltip widget already attached to #thetext, so the popup content,
 // positioning and close handlers match the hover experience exactly.
 function _quick_show_popup(el) {
+  // The popup is scheduled, so the word may have been replaced by a
+  // page/fragment swap while waiting.
+  if (el.length === 0 || !el[0].isConnected) return;
   // Words that aren't saved to the DB yet (status 0, no wid) have no
   // popup to show.
   if (isNaN(parseInt(el.data('wid'), 10))) return;
