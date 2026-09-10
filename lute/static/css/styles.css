@@ -1805,6 +1805,29 @@ span.textitem.tap-pending,
     50%      { outline-color: transparent; }
 }
 
+/* The sentence 🔊 ring is drawn *inside* the button's own box rather
+   than around it.
+
+   Outlines are painted after all inline content of the stacking
+   context, so a ring that spills outwards is drawn on top of whatever
+   sits next to it.  For a word that is fine: consecutive words are
+   separated by a space (measured ~4.8px here), so the 3px the shared
+   rules spill (1px offset + 2px width) still clears the neighbours.
+   The 🔊 button has only the 4px margin tts.js gives it and an 18px
+   box, and the first character of the sentence follows immediately --
+   the ring landed right on that character's left stroke and read as if
+   it were clipping it.
+
+   Inset, the ring cannot reach the text whatever the font size, emoji
+   width or locale.  This block must stay after the shared rules above:
+   the specificity is identical, so source order decides. */
+.lute-sentence-play-btn.tap-pressed,
+.lute-sentence-play-btn.tap-ack,
+.lute-sentence-play-btn.tap-double,
+.lute-sentence-play-btn.tap-pending {
+    outline-offset: -2px;
+}
+
 /* Respect "reduce motion": keep the markers, drop the movement. */
 @media (prefers-reduced-motion: reduce) {
     span.textitem.tap-ack,
