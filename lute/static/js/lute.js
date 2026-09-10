@@ -1500,6 +1500,17 @@ function post_bulk_update(updates) {
   let pagenum = parseInt($('#page_num').val(), 10) || 0;
   const payload = { book_id: book_id, pagenum: pagenum, updates: updates };
 
+  // The swap replaces #thetext's paragraphs, which also wipes the
+  // fit-to-screen sub-screen pagination (which paragraphs are hidden,
+  // and curScreen).  Remember the paragraph holding the updated word so
+  // it can be re-located after the swap and the screens re-flowed around
+  // it -- otherwise the reader snaps back to sub-screen 0 on every
+  // status change (same anchoring trick as the term-save reload).
+  const paras_before = Array.from(document.querySelectorAll('#thetext > p'));
+  const anchor_el = $(elements[0]).closest('p')[0] || null;
+  const anchor_ordinal = anchor_el ? paras_before.indexOf(anchor_el) : -1;
+  const anchor_id = $(elements[0]).attr('id') || null;
+
   // HTMX: POST the status update and swap the refreshed page fragment
   // into #thetext in a single round-trip.  Post-swap bookkeeping (re-mark
   // selected words, refresh the term form and player colors) is done in
@@ -1509,6 +1520,8 @@ function post_bulk_update(updates) {
     elements: elements,
     firstel: firstel,
     first_status: first_status,
+    anchor_ordinal: anchor_ordinal,
+    anchor_id: anchor_id,
   };
   htmx.ajax('POST', '/term/bulk_update_status', {
     target: '#thetext',
@@ -1531,6 +1544,21 @@ document.addEventListener('htmx:afterSwap', function (e) {
     // The swap removed the words any open term popup was attached to;
     // clear the leftover floating cards.
     _close_all_term_popups();
+
+    // Re-flow the fit-to-screen sub-screens: the swapped-in paragraphs
+    // have no pagination state, so without this the reader lands back on
+    // the first sub-screen after every status change.  Anchor on the
+    // paragraph holding the updated word (word span ids survive a status
+    // update; the pre-swap ordinal is the fallback).
+    if (typeof _splitToScreens === 'function') {
+      const by_id = ps.anchor_id ? $(document.getElementById(ps.anchor_id)) : $([]);
+      let anchor = by_id.length ? by_id.closest('p')[0] : null;
+      if (!anchor && ps.anchor_ordinal >= 0) {
+        const paras = Array.from(document.querySelectorAll('#thetext > p'));
+        anchor = paras[ps.anchor_ordinal] || null;
+      }
+      requestAnimationFrame(() => _splitToScreens(anchor));
+    }
 
     for (let i = 0; i < ps.selected_ids.length; i++) {
       let el = $(`#${ps.selected_ids[i]}`);
