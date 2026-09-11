@@ -831,6 +831,16 @@ def data_initialization(session, output_func=None):
 
     outfunc = output_func or _null_print
 
+    # Multi-user mode: no single-user demo db; run the per-user
+    # housekeeping under each user's scope instead.  (All callers --
+    # lute.main and devstart.py -- go through here, so the mode check
+    # lives in this one place.)
+    if mu_store.enabled():
+        for userinfo in mu_store.users():
+            with mu_context.user_scope(userinfo["username"]):
+                clean_data(session, outfunc)
+        return
+
     demosvc = DemoService(session)
     if demosvc.should_load_demo_data():
         outfunc("Loading demo data.")
