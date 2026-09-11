@@ -733,6 +733,9 @@
         position: _get_tooltip_pos(),
         items: ".word",
         show: { easing: "easeOutCirc" },
+        // Close with no fade: a fading card stays clickable over the
+        // subtitle line below it (see lute.js / styles.css).
+        hide: false,
         content: function (setContent) {
           tooltip_textitem_hover_content($(this), setContent);
         },
