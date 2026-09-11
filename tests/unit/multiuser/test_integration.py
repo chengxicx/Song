@@ -223,8 +223,14 @@ def test_restart_while_multiuser_enabled(mu_datapath):
 
     switching.enable_fresh(app1.env_config.base_config, "admin", "pass1234")
 
-    # "Restart": boot a fresh app from the same datapath, mode on.
+    # "Restart": boot a fresh app from the same datapath, mode on,
+    # and run the full startup sequence (create_app +
+    # data_initialization, as main.py / devstart.py do).
     app2 = create_app(cfgfile, extra_config={"TESTING": True})
+    with app2.app_context():
+        from lute.app_factory import data_initialization
+
+        data_initialization(db.session)
 
     client = app2.test_client()
     resp = client.get("/")
