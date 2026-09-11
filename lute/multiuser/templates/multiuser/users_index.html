@@ -2,13 +2,15 @@
 
 {% block title %}Users{% endblock %}
 
-{% block header %}Users{% endblock %}
+{% block header %}{% if me_only %}Your account{% else %}Users{% endif %}{% endblock %}
 
 {% block body %}
 
+{% if is_admin %}
 <p style="margin-top: 0;">
   <a href="/users/new"><button style="padding:6px 14px;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer;">New User</button></a>
 </p>
+{% endif %}
 
 <table class="table dataTable no-footer" style="margin: 0;">
   <thead>
@@ -26,12 +28,16 @@
       <td>{{ u.role }}</td>
       <td>{{ u.created_at }}</td>
       <td>
+        {% if me_only %}
+        <a href="/users/me/password">Change password</a>
+        {% else %}
         <a href="/users/{{ u.username }}/password" style="margin-right: 12px;">Change password</a>
         {% if not (u.role == 'admin' and users|selectattr('role','equalto','admin')|list|length <= 1) %}
         <form method="POST" action="/users/delete/{{ u.username }}" style="display:inline;"
               onsubmit="return confirm('Delete {{ u.username }} and ALL their data (books, terms, audio, images)? This cannot be undone.');">
           <button type="submit" style="padding:2px 8px;background:#e03131;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;">Delete</button>
         </form>
+        {% endif %}
         {% endif %}
       </td>
     </tr>

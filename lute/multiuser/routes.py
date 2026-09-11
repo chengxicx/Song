@@ -161,10 +161,24 @@ def logout():
 
 
 @bp.route("/users/index")
-@admin_required
 def users_index():
-    "List accounts."
-    return render_template("multiuser/users_index.html", users=store.users())
+    """
+    Account page.
+
+    Admins get the full account-management list; other users see only
+    their own account, with a change-password action.
+    """
+    if not store.enabled():
+        flash("Multi-user mode is off.")
+        return redirect("/")
+    username = session.get("user")
+    if not username or not store.get_user(username):
+        return redirect("/login")
+    if store.is_admin(username):
+        return render_template("multiuser/users_index.html", users=store.users())
+    return render_template(
+        "multiuser/users_index.html", users=[store.get_user(username)], me_only=True
+    )
 
 
 @bp.route("/users/new", methods=["GET", "POST"])
