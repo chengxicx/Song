@@ -26,8 +26,18 @@
     .login-card h1 {
       text-align: center;
       font-size: 26px;
-      margin: 0 0 6px;
+      margin: 8px 0 6px;
       color: #7aa2f7;
+    }
+    .login-card .logo {
+      display: block;
+      margin: 0 auto;
+      height: 64px;
+      width: auto;
+      opacity: 0.9;
+      /* The source logo is black-on-transparent; invert it for the
+         dark card, same as the dark theme does for the menu bar. */
+      filter: invert(1) brightness(1.8);
     }
     .login-card p.sub {
       text-align: center;
@@ -82,6 +92,7 @@
 </head>
 <body>
   <div class="login-card">
+    <img src="/static/img/lute.webp" class="logo" alt="Lute logo" />
     <h1>Song</h1>
     <p class="sub">Log in to continue</p>
     {% with messages = get_flashed_messages() %}
