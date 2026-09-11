@@ -180,12 +180,139 @@ function _add_desktop_interactions() {
 /* ========================================= */
 /** Tooltip (term detail hover). */
 
+/** Narrow screens get the card above the word, wide ones below it. */
+function _tooltip_is_above() {
+  return window.matchMedia("(max-width: 980px)").matches;
+}
+
 let _get_tooltip_pos = function() {
   let ret = {my: 'left top+10', at: 'left bottom', collision: 'flipfit flip'};
-  if (window.matchMedia("(max-width: 980px)").matches) {
+  if (_tooltip_is_above()) {
     ret = {my: 'center bottom', at: 'center top-10', collision: 'flipfit flip'};
   }
+  // jquery-ui fills `of` in with the word element and lays the card out
+  // from that -- see _term_popup_fragment for why the element alone is
+  // not good enough.  `using` runs once it has worked out its own
+  // answer, and is handed the target element, so that is where we take
+  // over and place the card ourselves.
+  ret.using = function (css, feedback) {
+    const pos = _place_term_popup($(this), feedback);
+    if (pos) $(this).offset(pos);
+    else $(this).css(css);
+  };
   return ret;
+}
+
+// Where the pointer last entered a word, in viewport coordinates.
+// Picks which of the word's line fragments the popup hangs off (see
+// _term_popup_fragment) and is recorded on the document so it covers
+// every reading container: #thetext here plus the player subtitles,
+// which are wired up in their own files.
+//
+// It is read when the card is positioned, which happens after its
+// content arrives -- i.e. always later than this event, so the widget's
+// own mouseover handler, which runs first and starts the fetch, cannot
+// make us look at a stale value.
+let _term_popup_pointer = null;
+$(document).on('mouseover', '.word', function (e) {
+  _term_popup_pointer = { x: e.clientX, y: e.clientY };
+});
+// Same for a tap, so the touch modes (Quick Set Status) hang the card
+// off the fragment that was actually touched.
+$(document).on('touchstart', '.word', function (e) {
+  const touch = e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0];
+  if (touch) _term_popup_pointer = { x: touch.clientX, y: touch.clientY };
+});
+
+/**
+ * The line fragment of a word that the pointer is on.
+ *
+ * A `.word` span that wraps at the end of a line has one client rect per
+ * line.  getClientRects() returns them in reading order, but
+ * getBoundingClientRect() -- and so offset(), which is what jquery-ui
+ * measures the target with -- returns their UNION: for a wrapped word
+ * that union starts at the column's left edge and is two lines tall.
+ * Positioning the card against it threw the card hundreds of pixels away
+ * from the pointer, to the far left of the column (or flipped it above
+ * the word once the tall card no longer fitted below that union).
+ * Words that do not wrap have a single fragment, so for them this is
+ * exactly the element box and nothing changes.
+ */
+function _term_popup_fragment(el) {
+  if (!el || !el.getClientRects) return null;
+  const frags = Array.prototype.filter.call(el.getClientRects(), function (r) {
+    return r.width || r.height;
+  });
+  if (frags.length === 0) return null;
+
+  const pointer = _term_popup_pointer;
+  if (pointer) {
+    const hit = Array.prototype.find.call(frags, function (r) {
+      return pointer.x >= r.left - 1 && pointer.x <= r.right + 1 &&
+             pointer.y >= r.top - 1 && pointer.y <= r.bottom + 1;
+    });
+    if (hit) return hit;
+  }
+  // Opened without a pointer of its own -- a tap on a word whose content
+  // was already cached, say.  The first fragment is where the reader
+  // starts reading the word.
+  return frags[0];
+}
+
+/**
+ * Where the term popup goes: just below the word's line fragment on wide
+ * screens, centered above it on narrow ones, kept on screen.
+ *
+ * Called through jquery-ui's `position.using` hook, which runs after it
+ * has worked out its own answer and hands us the target element.  We
+ * ignore that answer and place the card from the fragment instead.
+ *
+ * Doing the placement here rather than handing jquery-ui a point to
+ * anchor on keeps the flip decision honest: whether the card fits below
+ * the word depends on the word's own height, which a point anchor does
+ * not carry, and without it a word near the top of a narrow screen got
+ * its card on top of itself instead of flipping to below.
+ *
+ * Returns null when the word has no fragments to speak of, leaving
+ * jquery-ui's own placement in place.
+ */
+function _place_term_popup(card, feedback) {
+  const target = feedback && feedback.target && feedback.target.element;
+  const frag = _term_popup_fragment(target && target[0]);
+  if (!frag) return null;
+
+  const cardW = card.outerWidth();
+  const cardH = card.outerHeight();
+  const gap = 10;
+  const pageX = window.pageXOffset;
+  const pageY = window.pageYOffset;
+  const viewW = window.innerWidth;
+  const viewH = window.innerHeight;
+
+  let left, top;
+  if (_tooltip_is_above()) {
+    left = pageX + frag.left + frag.width / 2 - cardW / 2;
+    top = pageY + frag.top - gap - cardH;
+    if (top < pageY) {
+      // No room above: flip below the word, or pin to the top.
+      const below = pageY + frag.bottom + gap;
+      top = below + cardH <= pageY + viewH ? below : pageY;
+    }
+  } else {
+    left = pageX + frag.left;
+    top = pageY + frag.bottom + gap;
+    if (top + cardH > pageY + viewH) {
+      // No room below: flip above the word, or pin to the bottom.
+      const above = pageY + frag.top - gap - cardH;
+      top = above >= pageY ? above : pageY + viewH - cardH;
+    }
+  }
+  // Keep it inside the window horizontally.  A card wider than the
+  // window has nowhere left to go, so it is left where it is.
+  if (cardW + 8 <= viewW) {
+    left = Math.min(Math.max(left, pageX + 4), pageX + viewW - cardW - 4);
+  }
+  return {left: left, top: top};
 }
 
 /**
