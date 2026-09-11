@@ -132,6 +132,16 @@ function prepareTextInteractions() {
     position: _get_tooltip_pos(),
     items: '.word',
     show: { easing: 'easeOutCirc' },
+    // Close immediately, with no fade-out.  jQuery UI's default hide
+    // animation keeps the card in the DOM -- visible and clickable -- for
+    // ~450ms after it has been closed, and the card is 400px wide and sits
+    // just below the word, over the next line.  Any word in that strip was
+    // then swallowed by the fading card instead of being selected, which
+    // is exactly the "some words intermittently can't be clicked" report.
+    // It also left a stale card on screen at the previous word's position
+    // while the next word's card opened, which reads as "the popup is not
+    // next to the mouse".  See also div.ui-tooltip in styles.css.
+    hide: false,
     content: function (setContent) { tooltip_textitem_hover_content($(this), setContent); }
   });
 }
@@ -341,37 +351,6 @@ document.addEventListener('htmx:afterRequest', function (e) {
   _termpopup_pump();
   // Whether it succeeded or failed, the wait is over.
   _clear_tap_feedback();
-});
-
-// HTMX 1.9.x bug: the internal requestCount counter can underflow below 0
-// (or get stuck positive with no live request), leaving htmx-request on
-// the trigger element permanently.  When that element is <body> -- which
-// is what htmx.ajax() defaults to when no trigger element is supplied --
-// the stuck class stops all click/mousedown interactions on the reading
-// page, because body-level CSS and pointer events can behave oddly with
-// this marker present.  Every htmx:afterRequest gives us a chance to
-// reconcile: if the counter says "no active requests" but the class is
-// still there, clear both.
-document.addEventListener('htmx:afterRequest', function () {
-  document.querySelectorAll('.htmx-request').forEach(function (el) {
-    const data = el['htmx-internal-data'];
-    if (data && typeof data.requestCount === 'number' && data.requestCount <= 0) {
-      el.classList.remove('htmx-request');
-      data.requestCount = 0;
-    }
-  });
-});
-
-// Same safety net on page load: a previous session's partial request
-// might have left the class stranded on <body>.
-$(document).ready(function () {
-  const body = document.body;
-  const data = body['htmx-internal-data'];
-  if (body.classList.contains('htmx-request') &&
-      (!data || typeof data.requestCount !== 'number' || data.requestCount <= 0)) {
-    body.classList.remove('htmx-request');
-    if (data) data.requestCount = 0;
-  }
 });
 
 // Prefetch the popup as soon as the pointer lands on a word, so the
