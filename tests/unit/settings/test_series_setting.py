@@ -24,7 +24,7 @@ def test_series_tags_roundtrip(app, app_context, client, english):
 
     resp = client.get("/book/settings")
     assert resp.status_code == 200
-    assert b"Book series tags" in resp.data
+    assert b"Book Sets tags" in resp.data
     assert b"Erin (1 book)" in resp.data
     assert b"Video (1 book)" in resp.data
 
@@ -37,12 +37,12 @@ def test_series_tags_roundtrip(app, app_context, client, english):
     html = resp.data.decode("utf-8")
     import re
 
-    assert re.search(r'<input[^>]*checked[^>]*value="Erin"', html), (
-        "Erin checkbox re-checked on load"
-    )
-    assert not re.search(r'<input[^>]*checked[^>]*value="Video"', html), (
-        "Video stays unchecked"
-    )
+    assert re.search(
+        r'<input[^>]*checked[^>]*value="Erin"', html
+    ), "Erin checkbox re-checked on load"
+    assert not re.search(
+        r'<input[^>]*checked[^>]*value="Video"', html
+    ), "Video stays unchecked"
 
 
 def test_series_tags_empty_save(app, app_context, client, english):
