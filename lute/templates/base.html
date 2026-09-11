@@ -208,15 +208,7 @@
           <li><a href="/settings/index">Settings</a></li>
           <li><a href="/settings/shortcuts">Keyboard shortcuts</a></li>
           {% if multiuser_enabled %}
-          <li><a href="/users/me/password">Change password</a></li>
-          {% if is_admin %}
           <li><a href="/users/index">Users</a></li>
-          {% endif %}
-          <li>
-            <form method="POST" action="/logout" style="margin: 0;">
-              <button type="submit" style="background:none;border:none;color:inherit;font:inherit;cursor:pointer;padding:0;width:100%;text-align:left;">Log out ({{ current_username }})</button>
-            </form>
-          </li>
           {% endif %}
           <li><a id="anki_export_index" href="/ankiexport/index">Anki exports</a></li>
           <li><a id="feature_panel" href="/_feature/panel">Plugin</a></li>
@@ -235,6 +227,13 @@
           <li><a href="https://song.canny.io/" target="_blank">Feedback</a></li>
           <li><a href="https://luteorg.github.io/lute-manual/" target="_blank">Docs</a></li>
           <li><a href="https://discord.gg/CzFUQP5m8u" target="_blank">Discord</a></li>
+          {% if multiuser_enabled %}
+          <li>
+            <form method="POST" action="/logout" id="logout-form" style="margin: 0;">
+              <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">Log out ({{ current_username }})</a>
+            </form>
+          </li>
+          {% endif %}
         </ul>
       </div>
     </div>
