@@ -118,8 +118,8 @@ def test_per_user_settings_isolation(mu_client, mu_enabled_app):
     assert admin_val != mei_val, "settings are per user"
 
 
-def test_users_management_admin_only(mu_client):
-    "Non-admins cannot manage users."
+def test_users_page_shows_own_account_to_non_admin(mu_client):
+    "Non-admins see their own account page; management stays admin-only."
     mu_client.login("admin", "pass1234")
     mu_client.post(
         "/users/new",
@@ -129,12 +129,29 @@ def test_users_management_admin_only(mu_client):
     mu_client.post("/logout")
     mu_client.login("mei", "meipass1")
 
-    resp = mu_client.get("/users/index", follow_redirects=True)
-    assert b"Only an admin" in resp.data, "users page blocked"
+    # Non-admins see only their own account (change-password lives
+    # here now), with no management actions.
+    resp = mu_client.get("/users/index")
+    assert resp.status_code == 200
+    html = resp.get_data(as_text=True)
+    assert "mei" in html, "own account shown"
+    assert "New User" not in html, "no New User button"
+    assert "/users/admin/password" not in html, "other users' rows hidden"
 
+    # Management routes stay admin-only.
     resp = mu_client.post("/users/delete/mei", follow_redirects=True)
     assert b"Only an admin" in resp.data
     assert store.user_exists("mei"), "account not deleted"
+
+
+def test_menu_placement(mu_client):
+    "Log out lives in the About menu; Setting menu has Users only."
+    mu_client.login("admin", "pass1234")
+    resp = mu_client.get("/")
+    html = resp.get_data(as_text=True)
+    assert "Log out (admin)" in html, "logout in menu"
+    assert 'href="/users/index"' in html, "Users menu item present"
+    assert "/users/me/password" not in html, "no Change password menu item"
 
 
 def test_delete_user_removes_data(mu_client, mu_enabled_app):
