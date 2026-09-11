@@ -23,6 +23,7 @@ from lute.read import bilibili_stream
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form, serialize_term_form_data
 from lute.settings.current import current_settings
+from lute.multiuser.context import current_scope_key
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
 from lute.models.term import Term
@@ -48,15 +49,24 @@ bp = Blueprint("read", __name__, url_prefix="/read")
 _yt_subtitle_words_cache = {}
 
 
+def _subtitle_cache_key(book_id, srt_data):
+    "Cache key scoped per user: book ids differ between user dbs."
+    return (current_scope_key(), book_id, srt_data)
+
+
 def invalidate_yt_subtitle_cache(book_id=None):
     """Clear the subtitle word-HTML cache.
 
     Called after term status updates so the subtitle re-renders with
-    fresh data-status-class values.  If book_id is given, only that
-    book's entries are cleared; otherwise the entire cache is wiped.
+    fresh data-status-class values.  If book_id is given, only the
+    current user's entry for that book is cleared; otherwise the
+    entire cache is wiped.
     """
     if book_id is not None:
-        for k in [k for k in _yt_subtitle_words_cache if k[0] == book_id]:
+        scope = current_scope_key()
+        for k in [
+            k for k in _yt_subtitle_words_cache if k[0] == scope and k[1] == book_id
+        ]:
             _yt_subtitle_words_cache.pop(k, None)
     else:
         _yt_subtitle_words_cache.clear()
@@ -72,15 +82,16 @@ def patch_yt_subtitle_caches_for_term(texts):
     (10-20s for long books) that invalidation would force on the next
     fetch.  Multiword terms still need invalidate_yt_subtitle_cache().
     """
-    needles = [
-        (t or "").replace("\u200b", "").strip().lower()
-        for t in (texts or [])
-    ]
+    needles = [(t or "").replace("\u200b", "").strip().lower() for t in (texts or [])]
     needles = [n for n in needles if n]
     if not needles:
         return
     br = BookRepository(db.session)
-    for book_id, srt_data in list(_yt_subtitle_words_cache.keys()):
+    scope = current_scope_key()
+    for entry_scope, book_id, srt_data in list(_yt_subtitle_words_cache.keys()):
+        if entry_scope != scope:
+            # Another user's cached book: not visible from this db.
+            continue
         haystack = (srt_data or "").lower()
         if not any(n in haystack for n in needles):
             continue
@@ -122,7 +133,7 @@ def _subtitle_words_html(book):
     """
     if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "video"):
         return []
-    cache_key = (book.id, book.srt_data)
+    cache_key = _subtitle_cache_key(book.id, book.srt_data)
     cached = _yt_subtitle_words_cache.get(cache_key)
     if cached is not None and _subtitle_cache_is_fresh(cached):
         return cached["html"]
@@ -183,9 +194,12 @@ def _subtitle_words_html(book):
 def _save_new_subtitle_terms(textitems):
     "Save status-0 terms created while tokenizing subtitle text."
     new_terms = [
-        ti.term for ti in textitems
-        if ti.is_word and ti.term is not None
-        and ti.term.id is None and ti.term.status == 0
+        ti.term
+        for ti in textitems
+        if ti.is_word
+        and ti.term is not None
+        and ti.term.id is None
+        and ti.term.status == 0
     ]
     if new_terms:
         for t in new_terms:
@@ -206,10 +220,7 @@ def _cue_indices_matching_term(cues, term_text):
     needle = (term_text or "").replace(ZWS, "").strip().lower()
     if not needle:
         return []
-    return [
-        i for i, c in enumerate(cues)
-        if needle in (c.get("text") or "").lower()
-    ]
+    return [i for i, c in enumerate(cues) if needle in (c.get("text") or "").lower()]
 
 
 def _rerender_subtitle_cues(book, indices):
@@ -229,7 +240,7 @@ def _rerender_subtitle_cues(book, indices):
         return {}
     lang = book.language
     render_service = RenderService(db.session)
-    cache_key = (book.id, book.srt_data)
+    cache_key = _subtitle_cache_key(book.id, book.srt_data)
     cached = _yt_subtitle_words_cache.get(cache_key)
     result = {}
     for i in valid:
@@ -268,11 +279,7 @@ def _subtitle_cache_is_fresh(entry):
     if not statuses:
         return True
     wids = list(statuses.keys())
-    rows = (
-        db.session.query(Term.id, Term.status)
-        .filter(Term.id.in_(wids))
-        .all()
-    )
+    rows = db.session.query(Term.id, Term.status).filter(Term.id.in_(wids)).all()
     current = dict(rows)
     return all(current.get(wid) == status for wid, status in statuses.items())
 
@@ -387,7 +394,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         return redirect("/", 302)
 
     lang = book.language
-    show_highlights = current_settings["show_highlights"]
+    show_highlights = current_settings()["show_highlights"]
     lang_repo = LanguageRepository(db.session)
     term_dicts = lang_repo.all_dictionaries()[lang.id]["term"]
 
@@ -424,9 +431,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
     # stale file: replacing the audio changes its mtime, which changes
     # the URL, which bypasses the old cache entry.
     def _versioned_audio_url():
-        fname = os.path.join(
-            current_app.env_config.useraudiopath, book.audio_filename
-        )
+        fname = os.path.join(current_app.env_config.useraudiopath, book.audio_filename)
         try:
             version = int(os.stat(fname).st_mtime)
         except OSError:
@@ -445,7 +450,8 @@ def _render_book_page(book, pagenum, track_page_open=True):
     # The unified player backend: youtube = iframe, video = HTML5 video,
     # audio = HTML5 audio.  Bilibili books use their own template.
     media_backend = (
-        "youtube" if book_type == "youtube"
+        "youtube"
+        if book_type == "youtube"
         else ("video" if book_type == "video" else "audio")
     )
 
@@ -501,7 +507,9 @@ def read(bookid):
 
     page_num = 1
     if not book.texts:
-        flash(f"Book {book.title} has no pages (possibly the parser failed to split text).")
+        flash(
+            f"Book {book.title} has no pages (possibly the parser failed to split text)."
+        )
         return redirect("/", 302)
 
     text = book.texts[0]
@@ -571,7 +579,7 @@ def screen_done():
 
     service = Service(db.session)
     count = service.set_terms_to_known(wordids, book)
-    return jsonify({ "updated": count })
+    return jsonify({"updated": count})
 
 
 @bp.route("/delete_page/<int:bookid>/<int:pagenum>", methods=["GET"])
@@ -745,12 +753,16 @@ def youtube_subtitle_words(bookid):
             indices = [int(cue_arg)]
         else:
             indices = []
-        patched = (book.id, book.srt_data) in _yt_subtitle_words_cache
+        patched = (
+            _subtitle_cache_key(book.id, book.srt_data) in _yt_subtitle_words_cache
+        )
         result = _rerender_subtitle_cues(book, indices)
-        resp = jsonify({
-            "cues": {str(i): h for i, h in result.items()},
-            "patched": patched,
-        })
+        resp = jsonify(
+            {
+                "cues": {str(i): h for i, h in result.items()},
+                "patched": patched,
+            }
+        )
     elif book is None:
         resp = jsonify([])
     else:

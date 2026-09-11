@@ -50,7 +50,7 @@ class JapaneseParser(AbstractParser):
     # dictionary files (~18ms each) and was previously re-done on
     # every parse/reading/lemma call, causing severe slowdowns on
     # Japanese pages with many new words.
-    _mecab_instance = None       # default MeCab()
+    _mecab_instance = None  # default MeCab()
     _mecab_yomi_instance = None  # MeCab(r"-O yomi") for IPADIC readings
 
     @classmethod
@@ -80,7 +80,7 @@ class JapaneseParser(AbstractParser):
         otherwise false.
         """
 
-        mecab_path = current_settings.get("mecab_path", "") or ""
+        mecab_path = current_settings().get("mecab_path", "") or ""
         mecab_path = mecab_path.strip()
 
         # If the saved path doesn't exist, try to find a working one.
@@ -162,9 +162,9 @@ class JapaneseParser(AbstractParser):
         Returns "unidic" or "ipadic".
         """
         # Cache key: the user's dict setting + mecab path.
-        dict_setting = current_settings.get("japanese_dict", "auto") or "auto"
+        dict_setting = current_settings().get("japanese_dict", "auto") or "auto"
         dict_setting = dict_setting.strip().lower()
-        mecab_path = current_settings.get("mecab_path", "") or ""
+        mecab_path = current_settings().get("mecab_path", "") or ""
         cache_key = f"{dict_setting}|{mecab_path}"
 
         if (
@@ -319,7 +319,7 @@ class JapaneseParser(AbstractParser):
         if self._string_is_hiragana(text):
             return None
 
-        jp_reading_setting = current_settings.get("japanese_reading", "").strip()
+        jp_reading_setting = current_settings().get("japanese_reading", "").strip()
         if jp_reading_setting == "":
             # Don't set reading if nothing specified.
             return None
@@ -392,8 +392,8 @@ class JapaneseParser(AbstractParser):
         "為": "す",
         "居る": "いる",
         "来る": "来る",  # keep as-is (also common orthography)
-        "為さ": "し",    # 為さ (mizen) -> する stem
-        "為れ": "す",    # 為れ (izen) -> する stem
+        "為さ": "し",  # 為さ (mizen) -> する stem
+        "為れ": "す",  # 為れ (izen) -> する stem
     }
 
     # POS (and sub-POS) categories that mark a token as a *bound*
@@ -489,9 +489,18 @@ class JapaneseParser(AbstractParser):
         # A few "sub" tags *always* mean the word is a bound morpheme
         # regardless of top-level POS.
         strong_bound_hints = {
-            "助詞", "助動詞", "接尾", "助数詞", "接続助詞",
-            "格助詞", "副助詞", "終助詞", "準助詞",
-            "非自立", "非自立可能", "準助動詞",
+            "助詞",
+            "助動詞",
+            "接尾",
+            "助数詞",
+            "接続助詞",
+            "格助詞",
+            "副助詞",
+            "終助詞",
+            "準助詞",
+            "非自立",
+            "非自立可能",
+            "準助動詞",
         }
         for sub in sub_positions:
             if sub in strong_bound_hints:
