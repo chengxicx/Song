@@ -343,6 +343,37 @@ document.addEventListener('htmx:afterRequest', function (e) {
   _clear_tap_feedback();
 });
 
+// HTMX 1.9.x bug: the internal requestCount counter can underflow below 0
+// (or get stuck positive with no live request), leaving htmx-request on
+// the trigger element permanently.  When that element is <body> -- which
+// is what htmx.ajax() defaults to when no trigger element is supplied --
+// the stuck class stops all click/mousedown interactions on the reading
+// page, because body-level CSS and pointer events can behave oddly with
+// this marker present.  Every htmx:afterRequest gives us a chance to
+// reconcile: if the counter says "no active requests" but the class is
+// still there, clear both.
+document.addEventListener('htmx:afterRequest', function () {
+  document.querySelectorAll('.htmx-request').forEach(function (el) {
+    const data = el['htmx-internal-data'];
+    if (data && typeof data.requestCount === 'number' && data.requestCount <= 0) {
+      el.classList.remove('htmx-request');
+      data.requestCount = 0;
+    }
+  });
+});
+
+// Same safety net on page load: a previous session's partial request
+// might have left the class stranded on <body>.
+$(document).ready(function () {
+  const body = document.body;
+  const data = body['htmx-internal-data'];
+  if (body.classList.contains('htmx-request') &&
+      (!data || typeof data.requestCount !== 'number' || data.requestCount <= 0)) {
+    body.classList.remove('htmx-request');
+    if (data) data.requestCount = 0;
+  }
+});
+
 // Prefetch the popup as soon as the pointer lands on a word, so the
 // tooltip (which opens a moment later) usually finds its content cached.
 // While the term form is loaded in the wordframe, also prefetch that
