@@ -1889,6 +1889,14 @@ div.ui-tooltip {
     max-width: 400px !important;
     z-index: 1000; /*higher than audio because of words on the bottom, but lower than header and side menu */
     word-wrap: break-word;
+    /* The term popup is purely informational (no links or buttons), but
+       it is a 400px-wide card that sits right over the line below the
+       hovered word.  Without this, it swallows clicks on the words it
+       covers -- intermittently, whenever the card is still on screen
+       (e.g. during the close animation).  Let every click through to the
+       text; hover-open/close is driven by the word's own events, so the
+       popup itself never needs to receive pointer events. */
+    pointer-events: none;
 }
 
 .tooltip-image {
