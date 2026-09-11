@@ -130,8 +130,8 @@ def bing_search(langid, text, searchstring):
 
 def _get_dir_and_filename(langid, text):
     "Make a directory if needed, return [dir, filename]"
-    datapath = current_app.config["DATAPATH"]
-    image_dir = os.path.join(datapath, "userimages", langid)
+    # env_config is the user-scoped proxy (multi-user isolation).
+    image_dir = os.path.join(current_app.env_config.userimagespath, langid)
     if not os.path.exists(image_dir):
         os.makedirs(image_dir)
 

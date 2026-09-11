@@ -75,7 +75,7 @@ class JapaneseSudachiParser(AbstractParser):
 
     @classmethod
     def _get_dict_setting(cls) -> str:
-        v = current_settings.get("japanese_sudachi_dict", "core") or "core"
+        v = current_settings().get("japanese_sudachi_dict", "core") or "core"
         v = v.strip().lower()
         if v not in ("small", "core", "full"):
             v = "core"
@@ -83,7 +83,7 @@ class JapaneseSudachiParser(AbstractParser):
 
     @classmethod
     def _get_mode_setting(cls) -> str:
-        v = current_settings.get("japanese_sudachi_mode", "C") or "C"
+        v = current_settings().get("japanese_sudachi_mode", "C") or "C"
         v = v.strip().upper()
         if v not in ("A", "B", "C"):
             v = "C"
@@ -275,7 +275,7 @@ class JapaneseSudachiParser(AbstractParser):
         if self._string_is_hiragana(text):
             return None
 
-        jp_reading_setting = current_settings.get("japanese_reading", "").strip()
+        jp_reading_setting = current_settings().get("japanese_reading", "").strip()
         if jp_reading_setting == "":
             return None
 

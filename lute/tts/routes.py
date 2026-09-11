@@ -17,6 +17,7 @@ from flask import Blueprint, current_app, send_file, jsonify
 
 try:
     import edge_tts
+
     _EDGE_TTS_AVAILABLE = True
 except ImportError:
     _EDGE_TTS_AVAILABLE = False
@@ -187,7 +188,8 @@ def tts_speak(lang, text):
     """
     voice = voice_for_tag(lang)
 
-    datapath = current_app.config["DATAPATH"]
+    # env_config is the user-scoped proxy: per-user tts cache.
+    datapath = current_app.env_config.datapath
     cache_dir = os.path.join(datapath, "tts_cache")
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)
@@ -320,7 +322,11 @@ def _translate_via_mymemory(sl, tl, text):
             status_ok = False
         if not status_ok:
             return ""
-        if data and data.get("responseData") and data["responseData"].get("translatedText"):
+        if (
+            data
+            and data.get("responseData")
+            and data["responseData"].get("translatedText")
+        ):
             result = data["responseData"]["translatedText"]
             # If result is identical to input, treat as failed translation
             if result and result.lower() == text.lower():
