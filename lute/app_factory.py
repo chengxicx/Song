@@ -413,13 +413,20 @@ def _create_app(app_config, extra_config):
         Open a raw connection to the CURRENT scope's database.
 
         Multi-user mode: each user gets their own sqlite file, resolved
-        per connection checkout from the request's user scope.
+        per connection checkout from the request's user scope.  A db
+        touch without a user scope is a bug -- failing loudly here
+        beats silently creating an empty base db file.
         Single-user mode: this is the base db file, as before.
         """
         if mu_store.enabled():
             username = mu_context.get_current_user()
             if username:
                 return sqlite3.connect(mu_paths.user_dbfilename(app_config, username))
+            raise RuntimeError(
+                "Multi-user mode is on, but no user scope is set for this "
+                "database access.  Boot-time code must run inside "
+                "multiuser.context.user_scope(username)."
+            )
         return sqlite3.connect(app_config.dbfilename)
 
     config = {
@@ -708,12 +715,19 @@ def _init_parser_plugins(app, plugin_data_path, outfunc):
     # pluginized).  These never hit the install-on-predefined-load path,
     # so without this step users would be stuck with an unusable parser.
     outfunc("Checking parser plugins for existing languages ...")
-    with app.app_context():
-        for name, ok, message in plugin_installer.ensure_existing_language_parsers(
-            db.session
-        ):
-            status = "OK" if ok else "FAILED"
-            outfunc(f"  * {name}: {status} - {message}")
+    # Multi-user mode: every user's db has its own languages, so run
+    # the check per user.  Single-user mode: one pass on the base db.
+    if mu_store.enabled():
+        scopes = [u["username"] for u in mu_store.users()]
+    else:
+        scopes = [None]
+    for username in scopes:
+        with mu_context.user_scope(username), app.app_context():
+            for name, ok, message in plugin_installer.ensure_existing_language_parsers(
+                db.session
+            ):
+                status = "OK" if ok else "FAILED"
+                outfunc(f"  * {name}: {status} - {message}")
 
     parsers = supported_parsers()
     parsers_with_extra_data = [

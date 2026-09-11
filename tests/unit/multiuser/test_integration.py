@@ -6,6 +6,7 @@ auth gate, per-user data isolation, user management permissions.
 import os
 
 from lute.db import db
+from lute.app_factory import create_app
 from lute.models.book import Book as BookModel
 from lute.book.model import Book as ServiceBook, Repository as ServiceRepository
 from lute.models.repositories import UserSettingRepository
@@ -204,3 +205,34 @@ def test_single_user_mode_has_no_gate(mu_app):
     client = mu_app.test_client()
     resp = client.get("/")
     assert resp.status_code == 200, "no auth gate in single-user mode"
+
+
+def test_restart_while_multiuser_enabled(mu_datapath):
+    """
+    Regression: the app must boot when the server restarts with
+    multi-user mode already on (users.db present, data migrated).
+
+    Boot-time code (parser plugin check etc.) runs without a request
+    scope; it crashed with "no such table: languages" before the
+    per-user boot scopes were added.
+    """
+    cfgfile, datapath = mu_datapath
+
+    app1 = create_app(cfgfile, extra_config={"TESTING": True})
+    from lute.multiuser import switching
+
+    switching.enable_fresh(app1.env_config.base_config, "admin", "pass1234")
+
+    # "Restart": boot a fresh app from the same datapath, mode on.
+    app2 = create_app(cfgfile, extra_config={"TESTING": True})
+
+    client = app2.test_client()
+    resp = client.get("/")
+    assert resp.status_code == 302, "auth gate active after restart"
+
+    # A stray empty base db must not have been created at the root.
+    import os
+
+    assert not os.path.exists(
+        os.path.join(datapath, "test_mu.db")
+    ), "no stray base db in multi-user mode"
