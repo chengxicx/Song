@@ -76,11 +76,11 @@ def toggle_dark_theme():
 @bp.route("/toggle_highlight", methods=["POST"])
 def toggle_highlight():
     "Fix the highlight."
-    new_setting = not current_settings["show_highlights"]
+    new_setting = not current_settings()["show_highlights"]
     repo = UserSettingRepository(db.session)
     repo.set_value("show_highlights", new_setting)
     db.session.commit()
-    current_settings["show_highlights"] = new_setting
+    current_settings()["show_highlights"] = new_setting
     return jsonify("ok")
 
 
