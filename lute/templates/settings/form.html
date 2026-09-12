@@ -336,8 +336,14 @@
           <div id="netease_qr_status" style="margin-top: 5px;"></div>
         </div>
         <details style="margin-top: 10px;">
-          <summary>Or paste a cookie manually</summary>
+          <summary>Or log in on the NetEase site and paste the cookie</summary>
           <div style="margin-top: 6px;">
+            <p style="margin: 4px 0;">
+              1. <a href="https://music.163.com/#/login" target="_blank">Open music.163.com and log in</a>
+              (complete any slider / verification there).<br>
+              2. Press F12 &rarr; Application (Storage) &rarr; Cookies &rarr; https://music.163.com.<br>
+              3. Copy the value of the <code>MUSIC_U</code> cookie and paste it below.
+            </p>
             <input type="text" id="netease_cookie_input" class="form-control" placeholder="MUSIC_U=... (or the whole cookie header)" style="width: 60%;">
             <button class="btn btn-secondary" style="margin-top: 6px;" onclick="netease_save_cookie(); return false;">Save cookie</button>
           </div>
@@ -508,7 +514,9 @@
   /* NetEase Cloud Music QR login. */
 
   var neteaseQrKey = null;
+  var neteaseQrCookies = null;
   var neteasePollTimer = null;
+  var neteaseVerifyPolls = 0;
 
   function netease_set_status(loggedIn, nickname, vip) {
     const el = document.getElementById('netease_status_line');
@@ -556,6 +564,8 @@
           return;
         }
         neteaseQrKey = d.key;
+        neteaseQrCookies = d.cookies || {};
+        neteaseVerifyPolls = 0;
         imgHost.innerHTML = d.qr_svg;
         const svg = imgHost.querySelector('svg');
         if (svg) {
@@ -570,7 +580,11 @@
   }
 
   function netease_poll_qr() {
-    fetch('/netease/login/qr/check?key=' + encodeURIComponent(neteaseQrKey))
+    const params = new URLSearchParams({
+      key: neteaseQrKey || '',
+      cookies: JSON.stringify(neteaseQrCookies || {})
+    });
+    fetch('/netease/login/qr/check?' + params.toString())
       .then(r => r.json())
       .then(d => {
         const statusEl = document.getElementById('netease_qr_status');
@@ -583,6 +597,22 @@
         } else if (d.state === 'scanned') {
           statusEl.textContent = 'Scanned — confirm in the NetEase app.';
           neteasePollTimer = setTimeout(netease_poll_qr, 2000);
+        } else if (d.state === 'verify') {
+          // Risk control blocked the login; the slider is NOT shown on
+          // the phone.  Poll a few more times in case it clears on its
+          // own, then point at the alternatives (retry / cookie paste).
+          neteaseVerifyPolls += 1;
+          if (neteaseVerifyPolls <= 6) {
+            statusEl.textContent =
+              'NetEase risk control blocked this login (no prompt appears ' +
+              'on the phone).  Retrying…';
+            neteasePollTimer = setTimeout(netease_poll_qr, 2500);
+          } else {
+            statusEl.textContent =
+              'NetEase keeps blocking the QR login (risk control).  Click ' +
+              '"Scan QR to log in" to try again — or use the cookie steps ' +
+              'below, which always work.';
+          }
         } else if (d.state === 'expired') {
           netease_start_qr();  // Show a fresh QR when this one expires.
         } else if (d.state === 'confirmed') {

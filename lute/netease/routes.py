@@ -5,6 +5,8 @@ The login state (MUSIC_U cookie) is stored per user and is used by the
 "NetEase Cloud Music" book import (and its song fetches) automatically.
 """
 
+import json
+
 from flask import Blueprint, jsonify, request
 
 from lute.book.service import BookImportException
@@ -19,21 +21,35 @@ from lute.netease.service import (
 bp = Blueprint("netease", __name__, url_prefix="/netease")
 
 
+def _cookies_from_param(raw):
+    "Parse the QR-login session cookies echoed back by the page."
+    if not raw:
+        return None
+    try:
+        parsed = json.loads(raw)
+    except ValueError:
+        return None
+    return parsed if isinstance(parsed, dict) else None
+
+
 @bp.route("/login/qr", methods=["GET"])
 def login_qr():
-    "Start a QR login: return the unikey and the QR code SVG."
+    "Start a QR login: return the unikey, the QR code SVG, and its session cookies."
     try:
-        key, svg = qr_key()
+        key, svg, cookies = qr_key()
     except BookImportException as e:
         return jsonify({"ok": False, "message": e.message})
-    return jsonify({"ok": True, "key": key, "qr_svg": svg})
+    return jsonify({"ok": True, "key": key, "qr_svg": svg, "cookies": cookies})
 
 
 @bp.route("/login/qr/check", methods=["GET"])
 def login_qr_check():
-    "Poll the QR login state once (waiting / scanned / expired / confirmed)."
+    "Poll the QR login state once (waiting / scanned / verify / expired / confirmed)."
     try:
-        result = qr_check(request.args.get("key", ""))
+        result = qr_check(
+            request.args.get("key", ""),
+            _cookies_from_param(request.args.get("cookies", "")),
+        )
     except BookImportException as e:
         return jsonify({"ok": False, "message": e.message})
     return jsonify({"ok": True, **result})
