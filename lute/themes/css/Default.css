@@ -925,6 +925,7 @@ canvas + svg text {
   --yt-color-3: #1c1c1e !important;   /* container bg (matches body bg) */
   --yt-color-4: #0a84ff !important;   /* primary accent button color */
   --yt-color-5: #2c2c2e !important;   /* secondary panel bg (timeline/rate) */
+  --yt-buffered-color: rgba(10, 132, 255, 0.38) !important;  /* buffered band: muted blue, distinct from track #1c1c1e and played #0a84ff */
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   background-color: var(--yt-color-3) !important;
   border-radius: 12px !important;
