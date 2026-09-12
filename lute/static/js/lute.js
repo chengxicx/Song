@@ -365,6 +365,32 @@ function _close_term_popups() {
 }
 
 /**
+ * Tap-away closing for term popups on touch screens.
+ *
+ * A popup opened programmatically (_quick_show_popup -- the single tap
+ * of Quick Set Status mode) never gets auto-close handlers, because
+ * jquery-ui only wires mouseleave / focusout for opens that came from
+ * real mouseover / focusin events.  So close it whenever a touch ends
+ * somewhere that is neither the popup card itself (its links still
+ * need their taps) nor another word (a word tap manages its own
+ * popups: it replaces this one or opens the edit form).  A tap that
+ * went elsewhere also drops a popup still waiting out its double-tap
+ * delay -- it should never appear at all.
+ *
+ * Bound on touchend, not click: the reading-page touch flow can keep
+ * the synthesized click from firing, and on desktop this handler is
+ * irrelevant anyway -- the popup closes on mouseleave long before any
+ * click could land.
+ */
+$(document).on('touchend', function (e) {
+  const $t = $(e.target);
+  if ($t.closest('.ui-tooltip').length) return;
+  if ($t.closest('.word').length) return;
+  _cancel_pending_popup();
+  _close_term_popups();
+});
+
+/**
  * Term-popup content for the jquery-ui tooltip.
  *
  * Content is fetched with HTMX and cached: the first hover on a word
