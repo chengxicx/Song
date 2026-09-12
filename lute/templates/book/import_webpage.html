@@ -82,6 +82,7 @@
     <option value="youtube">YouTube video</option>
     <option value="bilibili">Bilibili video</option>
     <option value="mp3">MP3 / M4A audio</option>
+    <option value="netease">NetEase Cloud Music</option>
     <option value="video">Online video</option>
     <option value="manga">Mokuro Manga</option>
     <option value="pdf">PDF</option>
@@ -240,6 +241,38 @@
   <div class="import-actions">
     <input type="hidden" name="import_type" value="mp3">
     <button type="submit" id="mp3-import" class="btn btn-primary">Import</button>
+  </div>
+</form>
+
+<form id="netease-form" class="import-form" action="/book/import_webpage" method="post" style="display: none;">
+  <p class="import-desc">Import a song from NetEase Cloud Music: the audio is downloaded to your library and its LRC lyrics become the book text, synced line by line with playback. VIP / copyright-restricted songs require logging in via Settings first.</p>
+  <div class="iform">
+    <div class="irow">
+      <label class="ilbl" for="netease-language">Language</label>
+      <div class="ictrl">
+        <select id="netease-language" name="language_id">
+          {% for id, name in language_choices %}
+          <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="netease_url">Song URL</label>
+      <div class="ictrl">
+        <input type="url" id="netease_url" name="netease_url" placeholder="https://music.163.com/#/song?id=..." autofocus>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="netease_tag">Tags</label>
+      <div class="ictrl">
+        <input type="text" id="netease_tag" name="netease_tag" class="form-control">
+      </div>
+    </div>
+  </div>
+  <div class="import-actions">
+    <input type="hidden" name="import_type" value="netease">
+    <button type="submit" id="netease-import" class="btn btn-primary">Import</button>
   </div>
 </form>
 
@@ -446,6 +479,7 @@
     const youtubeForm = $('#youtube-form');
     const bilibiliForm = $('#bilibili-form');
     const mp3Form = $('#mp3-form');
+    const neteaseForm = $('#netease-form');
     const videoForm = $('#video-form');
     const mangaForm = $('#manga-form');
     const pdfForm = $('#pdf-form');
@@ -456,6 +490,7 @@
     var ytTagify = setupTagsTagify(document.getElementById('youtube_tag'));
     var biliTagify = setupTagsTagify(document.getElementById('bilibili_tag'));
     var mp3Tagify = setupTagsTagify(document.getElementById('mp3_tag'));
+    var neteaseTagify = setupTagsTagify(document.getElementById('netease_tag'));
     var videoTagify = setupTagsTagify(document.getElementById('video_tag'));
     var mangaTagify = setupTagsTagify(document.getElementById('manga_tag'));
     var pdfTagify = setupTagsTagify(document.getElementById('pdf_tag'));
@@ -468,6 +503,7 @@
       youtubeForm.toggle(t === 'youtube');
       bilibiliForm.toggle(t === 'bilibili');
       mp3Form.toggle(t === 'mp3');
+      neteaseForm.toggle(t === 'netease');
       videoForm.toggle(t === 'video');
       mangaForm.toggle(t === 'manga');
       pdfForm.toggle(t === 'pdf');

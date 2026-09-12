@@ -103,6 +103,12 @@ const BOOK_TYPE_META = {
     color: '#2f9e44',
     paths: '<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>'
   },
+  netease: {
+    label: 'NetEase Cloud Music',
+    short: 'NetEase',
+    color: '#C20C0C',
+    paths: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'
+  },
   video: {
     label: 'Video',
     short: 'Video',
