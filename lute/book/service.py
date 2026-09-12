@@ -167,9 +167,11 @@ def parse_subtitle_content(content, ext=".srt"):
 
 
 def _parse_cues(content, ext):
-    "Parse srt/vtt content into a list of cue dicts."
+    "Parse srt/vtt/lrc content into a list of cue dicts."
     if ext == ".vtt":
         return _parse_vtt_cues(content)
+    if ext == ".lrc":
+        return _parse_lrc_cues(content)
     return _parse_srt_cues(content)
 
 
@@ -248,6 +250,72 @@ def _parse_vtt_cues(content):
     return cues
 
 
+# LRC (lyrics) timestamp, e.g. [01:23], [01:23.45], or [01:23.456]
+# (a colon instead of a dot before the fraction is also accepted).
+_LRC_TIME_RE = re.compile(r"\[(\d{1,3}):(\d{1,2})(?:[.:](\d{1,3}))?\]")
+_LRC_OFFSET_RE = re.compile(r"\[offset:\s*([+-]?\d+)\s*\]", re.IGNORECASE)
+_LRC_WORD_TIME_RE = re.compile(r"<\d{1,3}:\d{1,2}(?:[.:]\d{1,3})?>")
+
+
+def _parse_lrc_cues(content):
+    """
+    Parse LRC lyrics ("[mm:ss.xx]text" lines) into a list of cue dicts.
+
+    LRC has no end times, so each cue runs until the next line starts
+    (the last cue gets a fixed 5s tail).  Handled: multiple timestamps
+    on one line ("[00:01][00:30]chorus"), the [offset:ms] metadata tag
+    (positive shifts lyrics earlier, so it is subtracted), and
+    word-level karaoke timestamps ("<mm:ss.xx>" stripped).  Metadata
+    lines ([ti:], [ar:], ...) and lines without text are skipped.
+    """
+    offset = 0.0
+    om = _LRC_OFFSET_RE.search(content)
+    if om:
+        try:
+            offset = int(om.group(1)) / 1000.0
+        except ValueError:
+            offset = 0.0
+
+    timed = []  # (start, text or None) -- None for empty "instrumental gap" lines
+    for line in content.splitlines():
+        stamps = list(_LRC_TIME_RE.finditer(line))
+        if not stamps:
+            continue
+        # Remove the timestamp markers by position (a repeated marker
+        # value must not remove the wrong occurrence), then strip any
+        # word-level karaoke timestamps.
+        parts = []
+        pos = 0
+        for stamp in stamps:
+            parts.append(line[pos : stamp.start()])
+            pos = stamp.end()
+        parts.append(line[pos:])
+        text = _LRC_WORD_TIME_RE.sub("", "".join(parts)).strip()
+        for stamp in stamps:
+            frac = stamp.group(3)
+            start = (
+                int(stamp.group(1)) * 60
+                + int(stamp.group(2))
+                + (float(f"0.{frac}") if frac else 0.0)
+                - offset
+            )
+            timed.append((max(0.0, start), text or None))
+
+    # All timestamps bound the preceding cue's end (an empty-timestamp
+    # line means nothing is shown there), but only lines with text
+    # become cues.
+    timed.sort(key=lambda p: p[0])
+    cues = []
+    for i, (start, text) in enumerate(timed):
+        if text is None:
+            continue
+        next_start = timed[i + 1][0] if i + 1 < len(timed) else start + 5.0
+        cues.append(
+            {"start": start, "end": max(next_start, start + 0.5), "text": text}
+        )
+    return cues
+
+
 def parse_subtitle_content_any(name, content, ext=None):
     """
     Parse srt/vtt/txt subtitle content.
@@ -262,6 +330,8 @@ def parse_subtitle_content_any(name, content, ext=None):
         ext = (ext or "").lower()
     if ext == ".vtt":
         return parse_subtitle_content(content, ".vtt")
+    if ext == ".lrc":
+        return parse_subtitle_content(content, ".lrc")
     if ext == ".txt":
         return _parse_txt_subtitle(content)
     return parse_subtitle_content(content, ".srt")
@@ -286,7 +356,7 @@ def _url_extension(url, default):
     return default when the path has no recognised extension.
     """
     known = {
-        ".srt", ".vtt", ".txt", ".mp3", ".m4a", ".m4b", ".mp4", ".webm",
+        ".srt", ".vtt", ".txt", ".lrc", ".mp3", ".m4a", ".m4b", ".mp4", ".webm",
         ".mov", ".ogv", ".ogg", ".flac", ".wav", ".aac", ".opus",
     }
     try:

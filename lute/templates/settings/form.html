@@ -310,6 +310,41 @@
       <td>{{ form.tts_hover_delay }}</td>
     </tr>
 
+    <tr>
+      <td>
+        <h2>NetEase Cloud Music</h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Login for the <a href="/book/import_webpage">NetEase Cloud Music import</a>:
+        songs the logged-in account can play (incl. VIP) can be imported
+        with their lyrics.  Without a login, only freely playable songs work.
+      </td>
+      <td>
+        <div id="netease_status_line">Checking login status&hellip;</div>
+        <div style="margin-top: 8px;">
+          <button id="netease_qr_btn" class="btn btn-secondary" onclick="netease_start_qr(); return false;">
+            Scan QR to log in
+          </button>
+          <button id="netease_logout_btn" class="btn btn-danger" style="display: none;" onclick="netease_logout(); return false;">
+            Log out
+          </button>
+        </div>
+        <div id="netease_qr_area" style="display: none; margin-top: 10px;">
+          <div id="netease_qr_img" style="width: 200px;"></div>
+          <div id="netease_qr_status" style="margin-top: 5px;"></div>
+        </div>
+        <details style="margin-top: 10px;">
+          <summary>Or paste a cookie manually</summary>
+          <div style="margin-top: 6px;">
+            <input type="text" id="netease_cookie_input" class="form-control" placeholder="MUSIC_U=... (or the whole cookie header)" style="width: 60%;">
+            <button class="btn btn-secondary" style="margin-top: 6px;" onclick="netease_save_cookie(); return false;">Save cookie</button>
+          </div>
+        </details>
+      </td>
+    </tr>
+
   </table>
 
   <div class="form-action-row">
@@ -469,6 +504,123 @@
       }
     });
   }
+
+  /* NetEase Cloud Music QR login. */
+
+  var neteaseQrKey = null;
+  var neteasePollTimer = null;
+
+  function netease_set_status(loggedIn, nickname, vip) {
+    const el = document.getElementById('netease_status_line');
+    const logoutBtn = document.getElementById('netease_logout_btn');
+    if (loggedIn) {
+      el.textContent = '';
+      const nameEl = document.createElement('span');
+      nameEl.textContent = 'Logged in as ' + nickname;
+      el.appendChild(nameEl);
+      if (vip) {
+        const vipEl = document.createElement('span');
+        vipEl.style.color = '#C20C0C';
+        vipEl.textContent = ' (VIP)';
+        el.appendChild(vipEl);
+      }
+      logoutBtn.style.display = '';
+    } else {
+      el.textContent = 'Not logged in (only freely playable songs can be imported).';
+      logoutBtn.style.display = 'none';
+    }
+  }
+
+  function netease_refresh_status() {
+    fetch('/netease/login/status')
+      .then(r => r.json())
+      .then(d => netease_set_status(d.logged_in, d.nickname, d.vip))
+      .catch(() => {
+        document.getElementById('netease_status_line').textContent =
+          'Could not check login status.';
+      });
+  }
+
+  function netease_start_qr() {
+    const area = document.getElementById('netease_qr_area');
+    const imgHost = document.getElementById('netease_qr_img');
+    const statusEl = document.getElementById('netease_qr_status');
+    area.style.display = '';
+    imgHost.innerHTML = '';
+    statusEl.textContent = 'Loading QR code…';
+    fetch('/netease/login/qr')
+      .then(r => r.json())
+      .then(d => {
+        if (!d.ok) {
+          statusEl.textContent = d.message || 'Could not start QR login.';
+          return;
+        }
+        neteaseQrKey = d.key;
+        imgHost.innerHTML = d.qr_svg;
+        const svg = imgHost.querySelector('svg');
+        if (svg) {
+          svg.style.width = '200px';
+          svg.style.height = 'auto';
+        }
+        statusEl.textContent = 'Scan with the NetEase Cloud Music app…';
+        clearTimeout(neteasePollTimer);
+        neteasePollTimer = setTimeout(netease_poll_qr, 2000);
+      })
+      .catch(() => { statusEl.textContent = 'Could not start QR login.'; });
+  }
+
+  function netease_poll_qr() {
+    fetch('/netease/login/qr/check?key=' + encodeURIComponent(neteaseQrKey))
+      .then(r => r.json())
+      .then(d => {
+        const statusEl = document.getElementById('netease_qr_status');
+        if (!d.ok) {
+          statusEl.textContent = d.message || 'QR login failed.';
+          return;
+        }
+        if (d.state === 'waiting') {
+          neteasePollTimer = setTimeout(netease_poll_qr, 2000);
+        } else if (d.state === 'scanned') {
+          statusEl.textContent = 'Scanned — confirm in the NetEase app.';
+          neteasePollTimer = setTimeout(netease_poll_qr, 2000);
+        } else if (d.state === 'expired') {
+          netease_start_qr();  // Show a fresh QR when this one expires.
+        } else if (d.state === 'confirmed') {
+          statusEl.textContent = 'Login confirmed.';
+          netease_refresh_status();
+          setTimeout(() => {
+            document.getElementById('netease_qr_area').style.display = 'none';
+          }, 1500);
+        } else {
+          statusEl.textContent = 'Unexpected state: ' + d.state;
+        }
+      })
+      .catch(() => { neteasePollTimer = setTimeout(netease_poll_qr, 4000); });
+  }
+
+  function netease_logout() {
+    fetch('/netease/logout', { method: 'POST' })
+      .then(r => r.json())
+      .then(() => netease_refresh_status());
+  }
+
+  function netease_save_cookie() {
+    const input = document.getElementById('netease_cookie_input');
+    const fd = new FormData();
+    fd.append('cookie', input.value.trim());
+    fetch('/netease/login/cookie', { method: 'POST', body: fd })
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) {
+          input.value = '';
+          netease_refresh_status();
+        } else {
+          alert(d.message || 'Could not save the cookie.');
+        }
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', netease_refresh_status);
 
 </script>
 

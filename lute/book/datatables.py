@@ -24,7 +24,7 @@ def _configured_series_tags(session):
 # interpolated into the SQL below, so anything outside this list is
 # ignored.  "text" books store BkBookType = '', "series" is the alias
 # the series-aggregation branch reports for aggregate rows.
-_KNOWN_BOOK_TYPES = ("", "text", "youtube", "bilibili", "mp3", "video", "manga", "pdf", "series")
+_KNOWN_BOOK_TYPES = ("", "text", "youtube", "bilibili", "mp3", "netease", "video", "manga", "pdf", "series")
 
 
 def _book_type_filter_sql(column, type_filter):
