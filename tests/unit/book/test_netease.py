@@ -196,7 +196,9 @@ def test_api_requests_carry_stored_cookie(app_context):
     ) as get:
         netease_service.netease_audio_url("1")
         headers = get.call_args[1]["headers"]
-        assert headers["Cookie"] == "MUSIC_U=TESTCOOKIE"
+        assert "MUSIC_U=TESTCOOKIE" in headers["Cookie"]
+        # PC-client identity: without it VIP audio URLs are referer-locked.
+        assert "os=pc" in headers["Cookie"]
         assert "music.163.com" in get.call_args[0][0]
 
     netease_service.clear_cookie()
@@ -204,7 +206,9 @@ def test_api_requests_carry_stored_cookie(app_context):
         netease_service.requests, "get", return_value=_FakeResp(data)
     ) as get:
         netease_service.netease_audio_url("1")
-        assert "Cookie" not in get.call_args[1]["headers"]
+        headers = get.call_args[1]["headers"]
+        assert "MUSIC_U" not in headers["Cookie"]
+        assert "os=pc" in headers["Cookie"]
 
 
 def test_save_cookie_extracts_music_u_from_header(app_context):
@@ -223,7 +227,9 @@ def test_save_cookie_extracts_music_u_from_header(app_context):
 def test_qr_login_start_returns_key_and_svg(client):
     post_data = {"code": 200, "data": {"unikey": "UNIKEY1"}}
     with patch.object(
-        netease_service.requests, "post", return_value=_FakeResp(post_data)
+        netease_service.requests.Session, "get", return_value=_FakeResp({})
+    ), patch.object(
+        netease_service.requests.Session, "post", return_value=_FakeResp(post_data)
     ):
         resp = client.get("/netease/login/qr")
     assert resp.status_code == 200
@@ -234,6 +240,8 @@ def test_qr_login_start_returns_key_and_svg(client):
     assert data["qr_svg"].startswith("<svg")
     assert "xmlns" in data["qr_svg"]
     assert "<path" in data["qr_svg"]
+    # The session cookies are echoed for the check calls.
+    assert data["cookies"] == {}
 
 
 def test_qr_check_waits_then_confirms_and_stores_cookie(client, app_context):
@@ -244,13 +252,19 @@ def test_qr_check_waits_then_confirms_and_stores_cookie(client, app_context):
     )
 
     with patch.object(
-        netease_service.requests, "post", return_value=_FakeResp(waiting)
-    ):
-        data = client.get("/netease/login/qr/check?key=K").get_json()
+        netease_service.requests.Session, "post", return_value=_FakeResp(waiting)
+    ), patch.object(
+        netease_service, "_login_session", wraps=netease_service._login_session
+    ) as login_session:
+        data = client.get(
+            "/netease/login/qr/check?key=K&cookies=%7B%22NMTID%22%3A%22abc%22%7D"
+        ).get_json()
     assert data == {"ok": True, "state": "waiting"}
+    # The echoed cookies are loaded into the polling session.
+    login_session.assert_called_once_with({"NMTID": "abc"})
 
     with patch.object(
-        netease_service.requests, "post", return_value=confirmed_resp
+        netease_service.requests.Session, "post", return_value=confirmed_resp
     ) as post:
         data = client.get("/netease/login/qr/check?key=K").get_json()
     assert data["ok"] is True
@@ -263,9 +277,25 @@ def test_qr_check_waits_then_confirms_and_stores_cookie(client, app_context):
     netease_service.clear_cookie()
 
 
+def test_qr_check_verify_state_keeps_polling(client, app_context):
+    "Code 8821 (risk control) maps to a recoverable 'verify' state."
+    verify_resp = _FakeResp({"code": 8821, "message": "需要行为验证码验证"})
+    with patch.object(
+        netease_service.requests.Session, "post", return_value=verify_resp
+    ):
+        data = client.get("/netease/login/qr/check?key=K").get_json()
+    assert data == {
+        "ok": True,
+        "state": "verify",
+        "message": "需要行为验证码验证",
+    }
+
+
 def test_qr_check_expired(client):
     with patch.object(
-        netease_service.requests, "post", return_value=_FakeResp({"code": 800})
+        netease_service.requests.Session,
+        "post",
+        return_value=_FakeResp({"code": 800}),
     ):
         data = client.get("/netease/login/qr/check?key=K").get_json()
     assert data == {"ok": True, "state": "expired"}
