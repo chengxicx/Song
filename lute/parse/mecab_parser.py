@@ -14,6 +14,7 @@ from io import StringIO
 import sys
 import os
 import re
+import threading
 from typing import List
 from natto import MeCab
 import jaconv
@@ -53,18 +54,30 @@ class JapaneseParser(AbstractParser):
     _mecab_instance = None  # default MeCab()
     _mecab_yomi_instance = None  # MeCab(r"-O yomi") for IPADIC readings
 
+    # The natto MeCab wrapper is not thread-safe: concurrent parse()
+    # calls on one instance corrupt the underlying lattice state
+    # (truncated multi-byte output, bogus "too long sentence" errors,
+    # spins).  Flask serves requests on threads, and e.g. the reading
+    # page and its subtitle-words AJAX can tokenize concurrently, so
+    # every MeCab access is serialized with this lock.
+    _mecab_lock = threading.Lock()
+
     @classmethod
     def _get_mecab(cls):
         """Return the cached default MeCab instance, creating if needed."""
         if cls._mecab_instance is None:
-            cls._mecab_instance = MeCab()
+            with cls._mecab_lock:
+                if cls._mecab_instance is None:
+                    cls._mecab_instance = MeCab()
         return cls._mecab_instance
 
     @classmethod
     def _get_mecab_yomi(cls):
         """Return the cached MeCab instance with -O yomi flag."""
         if cls._mecab_yomi_instance is None:
-            cls._mecab_yomi_instance = MeCab(r"-O yomi")
+            with cls._mecab_lock:
+                if cls._mecab_yomi_instance is None:
+                    cls._mecab_yomi_instance = MeCab(r"-O yomi")
         return cls._mecab_yomi_instance
 
     @classmethod
@@ -240,7 +253,9 @@ class JapaneseParser(AbstractParser):
         # append a fake EOP token after each paragraph.
         nm = self._get_mecab()
         for para in text.split("\n"):
-            for n in nm.parse(para, as_nodes=True):
+            with JapaneseParser._mecab_lock:
+                nodes = list(nm.parse(para, as_nodes=True))
+            for n in nodes:
                 # Skip BOS/EOS nodes
                 if n.stat == 2 or n.surface is None or n.surface == "":
                     continue
@@ -346,7 +361,8 @@ class JapaneseParser(AbstractParser):
             # fall back to the surface form for tokens without a
             # readable reading.
             nm = self._get_mecab()
-            raw = nm.parse(text)
+            with JapaneseParser._mecab_lock:
+                raw = nm.parse(text)
             for line in raw.split("\n"):
                 line = line.strip()
                 if not line or line == "EOS":
@@ -368,7 +384,9 @@ class JapaneseParser(AbstractParser):
         else:
             # IPADIC: use the built-in "yomi" output format.
             nm = self._get_mecab_yomi()
-            for n in nm.parse(text, as_nodes=True):
+            with JapaneseParser._mecab_lock:
+                yomi_nodes = list(nm.parse(text, as_nodes=True))
+            for n in yomi_nodes:
                 readings.append(n.feature)
         readings = [r.strip() for r in readings if r is not None and r.strip() != ""]
 
@@ -546,7 +564,8 @@ class JapaneseParser(AbstractParser):
 
         lemmas = []
         nm = self._get_mecab()
-        raw = nm.parse(text)
+        with JapaneseParser._mecab_lock:
+            raw = nm.parse(text)
         for line in raw.split("\n"):
             line = line.strip()
             if not line or line == "EOS":
