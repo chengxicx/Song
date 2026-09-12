@@ -20,6 +20,7 @@ from lute.book.service import (
     BookImportException,
     BookDataFromUrl,
     parse_subtitle_file,
+    parse_subtitle_content,
     parse_subtitle_from_url,
     cues_to_srt_text,
     youtube_video_id,
@@ -27,6 +28,13 @@ from lute.book.service import (
     _url_content_length,
     download_url_to_file,
     MEDIA_LOCAL_MAX_BYTES,
+)
+from lute.netease.service import (
+    netease_song_id,
+    netease_song_title,
+    netease_audio_url,
+    netease_lyric_content,
+    NETEASE_MAX_AUDIO_BYTES,
 )
 from lute.book.datatables import get_data_tables_list
 from lute.book.series import get_series_overview
@@ -226,6 +234,7 @@ def edit(bookid):
         "youtube",
         "bilibili",
         "mp3",
+        "netease",
         "video",
     ):
         form.text.data = cues_to_srt_text(b.cues)
@@ -263,6 +272,8 @@ def import_webpage():
             return _import_bilibili_video()
         if import_type == "mp3":
             return _import_mp3_audio()
+        if import_type == "netease":
+            return _import_netease_music()
         if import_type == "video":
             return _import_online_video()
         if import_type == "manga":
@@ -532,6 +543,74 @@ def _import_mp3_audio():
             b.audio_filename = audio_filename
         elif media_url:
             b.media_url = media_url
+        book = svc.import_book(b, db.session)
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+    return redirect(f"/read/{book.id}/page/1", 302)
+
+
+def _import_netease_music():
+    """
+    Create a NetEase Cloud Music book from a song URL.
+
+    The song's audio (320 kbps mp3) is downloaded and stored locally,
+    and its LRC lyrics become the book text plus the player cue timing.
+    """
+    url = request.form.get("netease_url", "").strip()
+    tags = _parse_tagify_tags(request.form.get("netease_tag", ""))
+    language_id = request.form.get("language_id")
+
+    song_id = netease_song_id(url)
+    if song_id is None:
+        flash("Please enter a valid NetEase Cloud Music song URL.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if not language_id:
+        flash("Please choose a language.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    try:
+        title = netease_song_title(song_id)
+        audio_url = netease_audio_url(song_id)
+        lrc_content = netease_lyric_content(song_id)
+        text, cues_json = parse_subtitle_content(lrc_content, ext=".lrc")
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if not (text and text.strip()):
+        flash("The song's lyrics contain no text.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    try:
+        audio_filename = download_url_to_file(
+            audio_url,
+            current_app.env_config.useraudiopath,
+            max_bytes=NETEASE_MAX_AUDIO_BYTES,
+        )
+    except BookImportException as e:
+        flash(
+            f"{e.message}  The song's audio could not be stored -- try "
+            "downloading it manually and importing it as an MP3 book.",
+            "notice",
+        )
+        return redirect("/book/import_webpage", 302)
+
+    b = Book()
+    b.language_id = int(language_id) if language_id else None
+    b.title = title[:200]
+    b.source_uri = url
+    b.text = text
+    b.srt_data = cues_json
+    b.audio_filename = audio_filename
+    b.book_type = "netease"
+    b.book_tags = tags
+    b.threshold_page_tokens = 250
+    b.split_by = "paragraphs"
+
+    svc = BookService()
+    try:
         book = svc.import_book(b, db.session)
     except BookImportException as e:
         flash(e.message, "notice")

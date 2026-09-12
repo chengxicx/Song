@@ -131,7 +131,7 @@ def _subtitle_words_html(book):
     subtitle changes produce a fresh render (see
     _yt_subtitle_words_cache).
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "video"):
+    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "netease", "video"):
         return []
     cache_key = _subtitle_cache_key(book.id, book.srt_data)
     cached = _yt_subtitle_words_cache.get(cache_key)
@@ -312,7 +312,7 @@ def _sync_media_page_text_to_cues(book, pagenum, original_text, new_text):
     Returns "updated" (srt_data written), "unchanged" (nothing to do), or
     "mismatch" (page text and cues don't line up; cues left alone).
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "video"):
+    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "netease", "video"):
         return "unchanged"
     cues = list(book.cues)
     if not cues:
@@ -410,7 +410,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         bvid, _aid = bilibili_video_id(book.source_uri)
         bilibili_page_num = bilibili_page(book.source_uri)
     srt_cues = []
-    if book_type in ("youtube", "bilibili", "mp3", "video"):
+    if book_type in ("youtube", "bilibili", "mp3", "netease", "video"):
         srt_cues = list(book.cues)
         for c in srt_cues:
             c["start_str"] = _fmt_seconds(c.get("start", 0))
@@ -444,7 +444,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
             mp3_audio_url = _versioned_audio_url()
         elif book.media_url:
             mp3_audio_url = book.media_url
-    elif book.audio_filename and book_type in ("mp3", ""):
+    elif book.audio_filename and book_type in ("mp3", "netease", ""):
         mp3_audio_url = _versioned_audio_url()
 
     # The unified player backend: youtube = iframe, video = HTML5 video,

@@ -166,6 +166,7 @@ class EditBookForm(FlaskForm):
             ("youtube", "YouTube video"),
             ("bilibili", "Bilibili video"),
             ("mp3", "MP3 / M4A audio"),
+            ("netease", "NetEase Cloud Music"),
             ("video", "Online video"),
         ],
     )
@@ -202,7 +203,7 @@ class EditBookForm(FlaskForm):
 
         # If the type was changed away from youtube/bilibili/mp3/video,
         # clear the subtitle data.
-        if obj.book_type not in ("youtube", "bilibili", "mp3", "video"):
+        if obj.book_type not in ("youtube", "bilibili", "mp3", "netease", "video"):
             obj.srt_data = None
             obj.video_current_pos = None
 
@@ -218,7 +219,7 @@ class EditBookForm(FlaskForm):
             obj.audio_bookmarks = None
             obj.audio_current_pos = None
 
-        if obj.book_type in ("youtube", "bilibili", "mp3", "video"):
+        if obj.book_type in ("youtube", "bilibili", "mp3", "netease", "video"):
             self._parse_youtube_subtitles(obj)
 
     def _parse_youtube_subtitles(self, obj):
