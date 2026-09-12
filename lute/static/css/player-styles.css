@@ -452,6 +452,10 @@
   --yt-color-3: aliceblue;
   --yt-color-4: #79b7e7;
   --yt-color-5: #d6edff;
+  /* Buffered band on the seek bar.  Kept separate from --yt-color-5
+     (which doubles as the timeline-wrap panel background) so the band
+     stays visible in every theme; themes override this variable. */
+  --yt-buffered-color: #c8e2f8;
 }
 
 .yt-player-video-wrap {
@@ -640,12 +644,12 @@
   border-radius: 999px;
   box-sizing: border-box;
   /* Two layers, both anchored left: played (opaque, on top) and the
-     lighter buffered band behind it (painted by the player JS from the
+     buffered band behind it (painted by the player JS from the
      media element's buffered ranges / YT getVideoLoadedFraction). */
   background-size: 0% 100%, 0% 100%;
   background-image:
     linear-gradient(var(--yt-color-1), var(--yt-color-1)),
-    linear-gradient(var(--yt-color-5), var(--yt-color-5));
+    linear-gradient(var(--yt-buffered-color, #c8e2f8), var(--yt-buffered-color, #c8e2f8));
   background-repeat: no-repeat;
   cursor: pointer;
 }
