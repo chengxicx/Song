@@ -259,6 +259,93 @@
   });
 </script>
 
+<script>
+  /* Touch-friendly menu-bar dropdowns.
+     The menus are opened by CSS :hover, which on touch screens is a
+     sticky state: the first tap opens a menu and then nothing closes it
+     -- a second tap on the same item keeps the hover alive, and a tap
+     elsewhere does not clear it either.  On devices without hover,
+     drive the menus with taps instead: tap toggles the menu, tapping
+     another item switches, and tapping anywhere else closes whatever
+     is open.  (The open state is the .sub-open class; the CSS :hover
+     rule is limited to (hover: hover) devices in styles.css.) */
+  (function () {
+    var noHover = window.matchMedia("(hover: none)");
+    var down = null;          // pointerdown position, for the tap-vs-scroll check
+    var suppressClick = null; // the backup disk link whose navigation to swallow
+
+    function close_open_menus() {
+      document.querySelectorAll(".menu-item.sub-open, .backup-widget.sub-open")
+        .forEach(function (el) {
+          el.classList.remove("sub-open");
+        });
+    }
+
+    document.addEventListener("pointerdown", function (e) {
+      down = { x: e.clientX, y: e.clientY };
+      suppressClick = null;
+    }, true);
+
+    document.addEventListener("pointerup", function (e) {
+      if (!down) return;
+      var dx = e.clientX - down.x, dy = e.clientY - down.y;
+      down = null;
+      // A drag or scroll that happens to end on the menu bar is not a tap.
+      if (dx * dx + dy * dy > 100) return;
+
+      var toggle = e.target.closest(".menu-item > span, .backup-widget > a");
+      if (toggle) {
+        // Desktop keeps the CSS-hover behavior; don't hijack its taps.
+        if (!noHover.matches) return;
+        var item = toggle.parentElement;
+        // "Home" wraps a plain link and has no dropdown: let it through.
+        if (item.classList.contains("menu-item") &&
+            !item.querySelector(":scope > .sub-menu")) return;
+        e.preventDefault();
+        var wasOpen = item.classList.contains("sub-open");
+        close_open_menus();
+        if (!wasOpen) item.classList.add("sub-open");
+        if (toggle.tagName === "A") {
+          // The backup disk is a real link; on touch it opens the menu
+          // instead of navigating.  Swallow the click it would produce.
+          suppressClick = toggle;
+        }
+        return;
+      }
+      // Taps inside an open menu -- its own links! -- must not close it
+      // first: hiding the menu between touchend and the synthesized
+      // click cancels the click, so the link would never fire.  Only a
+      // tap truly outside the open menu closes it.  (Runs on every
+      // device: a click-away never hurts the hover behavior, and it
+      // cleans up a .sub-open left over after a device change.)
+      if (!e.target.closest(".menu-item.sub-open, .backup-widget.sub-open")) {
+        close_open_menus();
+      }
+    }, true);
+
+    document.addEventListener("click", function (e) {
+      if (suppressClick &&
+          (e.target === suppressClick || suppressClick.contains(e.target))) {
+        e.preventDefault();
+        e.stopPropagation();
+        suppressClick = null;
+      }
+    }, true);
+
+    // A stale .sub-open would keep a menu open after the device gets a
+    // real mouse back: moving the pointer away closes it again.  Only
+    // for real-pointer devices -- on touch, the compatibility mouse
+    // events synthesized after a tap include mouseout with a null
+    // relatedTarget, and closing the menu there would cancel the link
+    // click that follows it.
+    document.addEventListener("mouseout", function (e) {
+      if (noHover.matches) return;
+      var item = e.target.closest(".menu-item.sub-open, .backup-widget.sub-open");
+      if (item && !item.contains(e.relatedTarget)) item.classList.remove("sub-open");
+    });
+  })();
+</script>
+
 <script data-cfasync="false">
   // PWA service worker registration
   if ('serviceWorker' in navigator) {
