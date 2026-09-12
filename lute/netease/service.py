@@ -33,6 +33,9 @@ _BROWSER_HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
     ),
     "Referer": "https://music.163.com/",
+    "Origin": "https://music.163.com",
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
 }
 
 # Songs are downloaded and stored locally (the CDN URLs expire, so
@@ -130,15 +133,21 @@ def qr_key():
     """
     Start a QR login.
 
-    Returns (unikey, qr_svg), where the QR image encodes
+    Returns (unikey, qr_svg, cookies): the QR image encodes
     https://music.163.com/login?codekey={unikey} -- scanning it with
-    the NetEase Cloud Music app asks the user to authorize.
+    the NetEase Cloud Music app asks the user to authorize.  The
+    session cookies from this call must be passed back to each
+    qr_check() so the whole handshake shares one web session (NetEase
+    risk-controls logins whose polling context drifts).
     """
+    session = _login_session()
     try:
-        resp = requests.post(
+        # Warm the session up like a real visit first: the homepage
+        # hands out the cookies (NMTID etc.) a genuine web client has.
+        session.get(f"{BASE_URL}/", timeout=15)
+        resp = session.post(
             f"{BASE_URL}/api/login/qrcode/unikey",
             data={"type": "1"},
-            headers=_BROWSER_HEADERS,
             timeout=15,
         )
         resp.raise_for_status()
@@ -154,22 +163,26 @@ def qr_key():
         raise BookImportException(
             f"Could not start NetEase QR login (code {data.get('code')})."
         )
-    return key, _qr_svg(f"{BASE_URL}/login?codekey={key}")
+    cookies = {c.name: c.value for c in session.cookies}
+    return key, _qr_svg(f"{BASE_URL}/login?codekey={key}"), cookies
 
 
-def qr_check(key):
+def qr_check(key, cookies=None):
     """
     Poll the QR login state once.
 
-    Returns {"state": "waiting" | "scanned" | "expired" | "confirmed"}
-    plus "nickname" on confirmation.  On confirmation the MUSIC_U
-    cookie from the response is stored as a user setting.
+    Returns {"state": "waiting" | "scanned" | "verify" | "expired" |
+    "confirmed"} plus "nickname" on confirmation.  On confirmation the
+    MUSIC_U cookie from the response is stored as a user setting.
+    "verify" means NetEase risk control demands extra (slider)
+    verification: the user should complete any prompt on their phone
+    and the caller should keep polling.
     """
+    session = _login_session(cookies)
     try:
-        resp = requests.post(
+        resp = session.post(
             f"{BASE_URL}/api/login/qrcode/client/login",
             data={"key": key or "", "type": "1"},
-            headers=_BROWSER_HEADERS,
             timeout=15,
         )
         resp.raise_for_status()
@@ -185,6 +198,15 @@ def qr_check(key):
         return {"state": "waiting"}
     if code == 802:
         return {"state": "scanned"}
+    if code == 8821:
+        # Risk control: a behavior/slider verification is required.
+        # The app usually surfaces it to the scanning user; keep
+        # polling -- completing it lets the flow continue.
+        return {
+            "state": "verify",
+            "message": (data.get("message") or "").strip()
+            or "verification required",
+        }
     if code == 803:
         cookie = resp.cookies.get("MUSIC_U")
         if not cookie:
@@ -197,7 +219,10 @@ def qr_check(key):
         save_cookie_value(cookie)
         profile = account_profile() or {}
         return {"state": "confirmed", "nickname": profile.get("nickname", "")}
-    raise BookImportException(f"Unexpected NetEase QR login response (code {code}).")
+    raise BookImportException(
+        f"Unexpected NetEase QR login response "
+        f"(code {code} {(data.get('message') or '').strip()}).".strip()
+    )
 
 
 def account_profile():
@@ -262,10 +287,31 @@ def _stored_cookie():
 def _headers():
     "Request headers, with the MUSIC_U cookie when logged in."
     h = dict(_BROWSER_HEADERS)
+    parts = []
     cookie = _stored_cookie()
     if cookie:
-        h["Cookie"] = f"MUSIC_U={cookie}"
+        parts.append(f"MUSIC_U={cookie}")
+    # Identify as the PC client: the audio URLs handed out to web
+    # sessions are referer-locked (the CDN 403s them), while the ones
+    # issued for the PC app download fine.
+    parts.append("os=pc; appver=8.10.20")
+    h["Cookie"] = "; ".join(parts)
     return h
+
+
+def _login_session(cookies=None):
+    """
+    A requests.Session looking like a real web client, optionally
+    pre-loaded with the cookies of an in-progress QR login (see
+    qr_key / qr_check).
+    """
+    session = requests.Session()
+    session.headers.update(_BROWSER_HEADERS)
+    if cookies:
+        for name, value in cookies.items():
+            if isinstance(name, str) and isinstance(value, str) and name and value:
+                session.cookies.set(name, value, domain="music.163.com")
+    return session
 
 
 def _api_get(path, params=None):
