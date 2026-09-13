@@ -169,6 +169,7 @@ def _add_base_routes(app, app_config):
                 "user_settings": json.dumps({}),
                 "user_hotkeys": json.dumps({}),
                 "current_theme": "Default.css",
+                "custom_styles": "",
                 "lute_version": lute.__version__,
                 "asset_cache_bust": lute.ASSET_CACHE_BUST,
                 "multiuser_enabled": True,
@@ -190,6 +191,10 @@ def _add_base_routes(app, app_config):
             "user_settings": json.dumps(current_settings()),
             "user_hotkeys": json.dumps(current_hotkeys()),
             "current_theme": us_repo.get_value("current_theme"),
+            # The cached settings bucket already holds custom_styles, so
+            # this is a dict lookup, not another db query.  base.html
+            # skips the custom_styles <link> entirely when it is empty.
+            "custom_styles": current_settings().get("custom_styles", ""),
             "lute_version": lute.__version__,
             "asset_cache_bust": lute.ASSET_CACHE_BUST,
             "multiuser_enabled": mu_store.enabled(),
