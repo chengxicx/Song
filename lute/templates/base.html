@@ -59,7 +59,11 @@
   <link rel="stylesheet" type="text/css" href="{{ vstatic('css/player-styles.css') }}" />
 
   <link rel="stylesheet" type="text/css" href="/theme/current?v={{ current_theme }}">
+  {# Only request custom styles when the user has actually saved some;
+     an empty stylesheet still costs a render-blocking request. #}
+  {% if custom_styles %}
   <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ current_theme }}">
+  {% endif %}
 
   {% block preloadassets %}{% endblock %}
 
