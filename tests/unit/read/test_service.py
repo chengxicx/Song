@@ -11,6 +11,7 @@ from lute.models.term import Term
 from lute.book.model import Book, Repository
 from lute.book.service import Service as BookService
 from lute.read.service import Service
+from lute.read.render.service import Service as RenderService
 from lute.db import db
 
 from tests.dbasserts import assert_record_count_equals, assert_sql_result
@@ -362,3 +363,82 @@ def test_pdf_page_done_route_marks_page_known(app, client, app_context, english)
         assert_sql_result(sql, ["cat; 99", "dog; 99", "hello; 99"], "after")
     finally:
         shutil.rmtree(pdf_dir, ignore_errors=True)
+
+
+def _render_items(text, language):
+    "Tokenize text into TextItems, leaving its new terms unsaved."
+    rs = RenderService(db.session)
+    return rs.get_textitems(text, language)
+
+
+def test_save_new_textitem_terms_persists_new_words(english, app_context):
+    "Without contention, the render's unsaved terms are stored as status 0."
+    items = _render_items("Dog cat.", english)
+    assert all(ti.term.id is None for ti in items if ti.is_word), "unsaved"
+
+    Service(db.session).save_new_textitem_terms(items)
+
+    sql = "select WoTextLC, WoStatus from words order by WoTextLC"
+    assert_sql_result(sql, ["cat; 0", "dog; 0"], "saved")
+    assert all(ti.term.id is not None for ti in items if ti.is_word), "attached"
+
+
+def test_save_new_textitem_terms_race_with_concurrent_save(english, app_context):
+    """
+    Another request committing the same new words first (the first-open
+    race) must not raise a UNIQUE constraint error: the textitems are
+    re-pointed at the persisted terms instead.
+    """
+    items = _render_items("Dog cat.", english)
+
+    for text in ("Dog", "cat"):
+        rival = Term.create_term_no_parsing(english, text)
+        rival.status = 0
+        db.session.add(rival)
+    db.session.commit()
+
+    Service(db.session).save_new_textitem_terms(items)
+
+    sql = "select WoTextLC, WoStatus from words order by WoTextLC"
+    assert_sql_result(sql, ["cat; 0", "dog; 0"], "no duplicate terms")
+    for ti in items:
+        if ti.is_word:
+            assert ti.term.id is not None, f"'{ti.text}' re-pointed"
+
+
+def test_save_new_textitem_terms_race_partial_overlap(english, app_context):
+    "Words the other request saved are re-pointed; only the rest are inserted."
+    items = _render_items("Dog cat.", english)
+
+    rival = Term.create_term_no_parsing(english, "Dog")
+    rival.status = 0
+    db.session.add(rival)
+    db.session.commit()
+
+    Service(db.session).save_new_textitem_terms(items)
+
+    sql = "select WoTextLC, WoStatus from words order by WoTextLC"
+    assert_sql_result(sql, ["cat; 0", "dog; 0"], "one row per word")
+    dog_ti = next(ti for ti in items if ti.is_word and ti.text_lc == "dog")
+    cat_ti = next(ti for ti in items if ti.is_word and ti.text_lc == "cat")
+    assert dog_ti.term.id == rival.id, "re-pointed at the rival's term"
+    assert cat_ti.term.id is not None, "missing word still saved"
+
+
+def test_save_new_textitem_terms_dedupes_repeated_renders(english, app_context):
+    """
+    Rendering two texts sharing a word (e.g. a manga page's per-line
+    renders) yields distinct unsaved Terms for the same word; they
+    collapse into a single persisted term and the textitems agree on it.
+    """
+    items1 = _render_items("Dog barks.", english)
+    items2 = _render_items("Dog runs.", english)
+
+    Service(db.session).save_new_textitem_terms(items1 + items2)
+
+    sql = "select WoTextLC, WoStatus from words order by WoTextLC"
+    assert_sql_result(sql, ["barks; 0", "dog; 0", "runs; 0"], "one row per word")
+    dog1 = next(ti for ti in items1 if ti.is_word and ti.text_lc == "dog")
+    dog2 = next(ti for ti in items2 if ti.is_word and ti.text_lc == "dog")
+    assert dog1.term.id is not None, "saved"
+    assert dog1.term.id == dog2.term.id, "duplicates share the persisted term"
