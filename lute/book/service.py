@@ -475,6 +475,28 @@ def cues_to_srt_text(cues):
     return "\n".join(lines).rstrip()
 
 
+def media_audio_url(book):
+    """
+    Stream URL for a media book's audio, for embedding a player outside
+    the reading page (edit forms).  Same rules as the reading player:
+    locally-stored files stream from /useraudio/stream versioned by the
+    file's mtime; a "video" book whose media was not downloaded plays
+    from its remote media_url.  Returns None when nothing is playable.
+    """
+    btype = book.book_type or ""
+    if btype == "video":
+        if not book.audio_filename:
+            return book.media_url
+    elif not (book.audio_filename and btype in ("mp3", "netease", "")):
+        return None
+    fname = os.path.join(current_app.env_config.useraudiopath, book.audio_filename)
+    try:
+        version = int(os.stat(fname).st_mtime)
+    except OSError:
+        version = 0
+    return f"/useraudio/stream/{book.id}?v={version}"
+
+
 class FileTextExtraction:
     "Utility to extract text from various file formats."
 

@@ -582,6 +582,99 @@ def test_edit_page_propagates_text_to_cues(app, app_context, english, client):
     assert book.cues[2]["end"] == 13.0
 
 
+def test_edit_page_shows_timing_panel(app, app_context, english, client):
+    "The page edit form of a media book offers the lyrics timing panel."
+    dbbook = _make_youtube_book(app, app_context, english)
+    resp = client.get(f"/read/editpage/{dbbook.id}/1")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+    assert "Lyrics &amp; timing" in content
+    assert "cueDataInput" in content
+    assert 'mode: "page"' in content
+    assert '"i": 0' in content
+    assert '"start": 1.0' in content
+
+
+def test_edit_page_cue_data_updates_timings(app, app_context, english, client):
+    "The timing panel's cue_data writes text + start/end back into the cues."
+    dbbook = _make_youtube_book(app, app_context, english)
+
+    cue_data = json.dumps(
+        [
+            {"i": 0, "start": 1.5, "end": 4.0, "text": "Hello world."},
+            {"i": 1, "start": 5.25, "end": 8.0, "text": "Edited via panel."},
+            {"i": 2, "start": 10.0, "end": 13.0, "text": "Goodbye!"},
+        ]
+    )
+    resp = client.post(
+        f"/read/editpage/{dbbook.id}/1",
+        data={"text": "Hello world.\nEdited via panel.\nGoodbye!", "cue_data": cue_data},
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+
+    book = BookRepository(db.session).find(dbbook.id)
+    assert book.cues[1]["text"] == "Edited via panel."
+    assert book.cues[1]["start"] == 5.25
+    assert book.cues[1]["end"] == 8.0
+    assert book.cues[0]["start"] == 1.5
+    # Cues outside the submitted set are untouched.
+    assert book.cues[2]["start"] == 10.0
+    assert book.cues[2]["end"] == 13.0
+
+
+def test_edit_page_cue_data_mismatch_keeps_cues(app, app_context, english, client):
+    "cue_data for a page whose line count changed is ignored (same guard as text sync)."
+    dbbook = _make_youtube_book(app, app_context, english)
+
+    cue_data = json.dumps(
+        [
+            {"i": 0, "start": 99.0, "end": 99.5, "text": "Hello world."},
+            {"i": 1, "start": 99.0, "end": 99.5, "text": "This is a test subtitle."},
+            {"i": 2, "start": 99.0, "end": 99.5, "text": "Goodbye!"},
+        ]
+    )
+    resp = client.post(
+        f"/read/editpage/{dbbook.id}/1",
+        data={"text": "Hello world.\nAn extra line.\nThis is a test subtitle.\nGoodbye!", "cue_data": cue_data},
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+
+    book = BookRepository(db.session).find(dbbook.id)
+    # Nothing written: the page no longer maps one line per cue.
+    assert book.cues[0]["start"] == 1.0
+    assert book.cues[1]["start"] == 5.0
+    assert book.cues[1]["text"] == "This is a test subtitle."
+    assert book.cues[2]["end"] == 13.0
+
+
+def test_edit_page_cue_data_bad_values_ignored(app, app_context, english, client):
+    "Invalid cue_data entries are skipped; the rest still applies."
+    dbbook = _make_youtube_book(app, app_context, english)
+
+    cue_data = json.dumps(
+        [
+            {"i": 0, "start": "not-a-number", "end": 4.0, "text": "Hello world."},
+            {"i": 1, "start": -3.0, "end": 8.0, "text": "This is a test subtitle."},
+            {"i": 2, "start": 10.5, "end": 13.0, "text": "Goodbye!"},
+        ]
+    )
+    resp = client.post(
+        f"/read/editpage/{dbbook.id}/1",
+        data={"text": "Hello world.\nThis is a test subtitle.\nGoodbye!", "cue_data": cue_data},
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+
+    book = BookRepository(db.session).find(dbbook.id)
+    # Entries 0 and 1 are invalid (unparsable / negative time): untouched.
+    assert book.cues[0]["start"] == 1.0
+    assert book.cues[1]["start"] == 5.0
+    # Entry 2 is valid and applied.
+    assert book.cues[2]["start"] == 10.5
+
+
 def test_sync_media_page_text_crlf_line_endings(app, app_context, english):
     "Page text with CRLF line endings still syncs to the cues (mp3 books)."
     from lute.read.routes import _sync_media_page_text_to_cues

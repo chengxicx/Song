@@ -23,6 +23,7 @@ from lute.book.service import (
     parse_subtitle_content,
     parse_subtitle_from_url,
     cues_to_srt_text,
+    media_audio_url,
     youtube_video_id,
     bilibili_video_id,
     _url_content_length,
@@ -249,6 +250,10 @@ def edit(bookid):
         except BookImportException as e:
             flash(e.message, "notice")
 
+    # Audio for the lyrics timing side panel (same rules as the reading
+    # player; see media_audio_url).
+    cue_audio_url = media_audio_url(b)
+
     lang_repo = LanguageRepository(db.session)
     lang = lang_repo.find(b.language_id)
     return render_template(
@@ -258,6 +263,7 @@ def edit(bookid):
         form=form,
         tags=repo.get_book_tags(),
         allowed_extensions=ALLOWED_AUDIO_EXTENSIONS,
+        cue_audio_url=cue_audio_url,
     )
 
 

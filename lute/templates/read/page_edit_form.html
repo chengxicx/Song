@@ -17,8 +17,9 @@
 </p>
 {% endfor %}
 
-<form method="POST">
+<form method="POST" id="editPageForm">
   {{ form.hidden_tag() }}
+  <input type="hidden" name="cue_data" id="cueDataInput" value="">
 
   <table id="edit-page-table">
     <tr><td>
@@ -33,5 +34,46 @@
     </table>
 </form>
 
-{% endblock %}
+{# Lyrics timing side panel for media books: one editor row per subtitle
+   cue covered by this page (start / end / text).  Rows are built by
+   book-edit-cues.js from window.LUTE_CUE_EDIT.cues; on submit the panel
+   fills #cueDataInput so the cues' timings are saved alongside the text. #}
+<div id="cueEditorPanel" aria-label="Lyrics and timing editor">
+  <div class="cue-panel-head">
+    <span class="cue-panel-title">Lyrics &amp; timing<span id="cuePanelCount"></span></span>
+    <button type="button" id="cuePanelCollapse" title="Hide panel">&laquo;</button>
+  </div>
 
+  <div class="cue-panel-player" id="cuePanelPlayer" style="display: none;">
+    <audio id="cueAudio" preload="metadata" {% if cue_audio_url %}src="{{ cue_audio_url }}"{% endif %}></audio>
+    <div class="cue-player-line">
+      <button type="button" class="cue-play-btn" id="cuePlayBtn" title="Play / pause">&#9654;</button>
+      <span class="cue-time"><span id="cueCurrentTime">00:00.000</span> <span class="cue-time-muted" id="cueDuration"></span></span>
+    </div>
+    <div class="cue-progress" id="cueProgress" title="Click to seek">
+      <div class="cue-progress-fill" id="cueProgressFill"></div>
+      <div class="cue-progress-knob" id="cueProgressKnob"></div>
+    </div>
+    <div class="cue-panel-note">Play the song, then press the clock button on a line to set its start time to the current playback position.</div>
+  </div>
+
+  <div class="cue-panel-warn" id="cuePanelWarn"></div>
+
+  <div class="cue-panel-rows" id="cuePanelRows"></div>
+
+  <div class="cue-panel-footer">Timing edits are saved together with the text</div>
+</div>
+
+<button type="button" id="cuePanelTab" title="Show the lyrics timing panel">&#9201;&nbsp;Lyrics &amp; timing</button>
+
+<script type="text/javascript">
+  window.LUTE_CUE_EDIT = {
+    mode: "page",
+    hasCues: {{ 'true' if page_cues else 'false' }},
+    audioUrl: {{ (cue_audio_url or none) | tojson }},
+    cues: {{ page_cues | tojson }}
+  };
+</script>
+<script type="text/javascript" src="{{ vstatic('js/book-edit-cues.js') }}" charset="utf-8"></script>
+
+{% endblock %}
