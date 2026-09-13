@@ -44,6 +44,9 @@
 
   var audio = document.getElementById("cueAudio");
   var playBtn = document.getElementById("cuePlayBtn");
+  var prevBtn = document.getElementById("cuePrevBtn");
+  var nextBtn = document.getElementById("cueNextBtn");
+  var apBtn = document.getElementById("cueAutoPauseBtn");
   var curTimeEl = document.getElementById("cueCurrentTime");
   var durEl = document.getElementById("cueDuration");
   var bar = document.getElementById("cueProgress");
@@ -53,6 +56,8 @@
   var cues = [];          // working copies: {i, start, end, text}
   var lastActive = -1;
   var taTimer = null;
+  var apOn = false;       // auto-pause at the end of each line
+  var apIdx = -1;         // the cue being played/watched (for auto-pause)
 
   /* ---------- time formatting / parsing ---------- */
 
@@ -353,6 +358,18 @@
     row.appendChild(top);
     row.appendChild(times);
     row.appendChild(txt);
+
+    // Click anywhere on the line that isn't an editor control to play
+    // that line from its start -- the edit-page counterpart of tapping
+    // the reading player's subtitle to re-listen while checking edits.
+    idx.title = "Click to play this line";
+    row.addEventListener("click", function (e) {
+      var tag = e.target && e.target.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "BUTTON") return;
+      var sel = window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      seekToCue(k, true);
+    });
     return row;
   }
 
@@ -379,6 +396,34 @@
 
   /* ---------- mini player ---------- */
 
+  // Last cue whose start is at or before t (mirrors setActiveRow).
+  function cueIndexAt(t) {
+    var idx = -1;
+    for (var k = 0; k < cues.length; k++) {
+      if (t >= cues[k].start) idx = k;
+    }
+    return idx;
+  }
+
+  // Jump to a cue's start; with autoplay, start playing from there.
+  function seekToCue(k, autoplay) {
+    if (!audio || !cues.length) return;
+    if (k < 0) k = 0;
+    if (k > cues.length - 1) k = cues.length - 1;
+    audio.currentTime = cues[k].start;
+    apIdx = k;
+    setActiveRow();
+    if (autoplay && audio.paused) audio.play();
+  }
+
+  // Prev/next line.  Mirrors the reading player: with auto-pause on,
+  // stepping while paused plays the target line right away; with it
+  // off the play state is kept so the user can scrub through lines.
+  function stepCue(delta) {
+    var idx = apIdx >= 0 ? apIdx : cueIndexAt(audio.currentTime);
+    seekToCue(idx + delta, apOn);
+  }
+
   function initPlayer() {
     var playerBoxEl = document.getElementById("cuePanelPlayer");
     if (!CFG.audioUrl || !audio || !playBtn) {
@@ -394,6 +439,15 @@
         audio.pause();
       }
     });
+    if (prevBtn) prevBtn.addEventListener("click", function () { stepCue(-1); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { stepCue(1); });
+    if (apBtn) {
+      apBtn.addEventListener("click", function () {
+        apOn = !apOn;
+        apBtn.classList.toggle("on", apOn);
+        if (apOn) apIdx = cueIndexAt(audio.currentTime);
+      });
+    }
     var updBtn = function () {
       playBtn.innerHTML = audio.paused ? "&#9654;" : "&#10074;&#10074;";
       setActiveRow();
@@ -402,6 +456,19 @@
     audio.addEventListener("pause", updBtn);
     audio.addEventListener("ended", updBtn);
     audio.addEventListener("timeupdate", function () {
+      var t = audio.currentTime;
+      // Auto-pause fires against the cue being watched BEFORE the index
+      // is recomputed: once t crosses cue.end the index would already
+      // move to the next cue, whose end would never trigger.
+      if (apOn && !audio.paused && apIdx >= 0) {
+        var c = cues[apIdx];
+        if (c && t >= c.end) {
+          audio.pause();
+          audio.currentTime = c.start;
+          t = c.start;
+        }
+      }
+      apIdx = cueIndexAt(t);
       curTimeEl.textContent = fmtShort(audio.currentTime);
       if (audio.duration && isFinite(audio.duration)) {
         var pct = (audio.currentTime / audio.duration) * 100;
@@ -420,6 +487,7 @@
       var r = bar.getBoundingClientRect();
       audio.currentTime =
         Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)) * audio.duration;
+      apIdx = cueIndexAt(audio.currentTime);
       setActiveRow();
     });
     updBtn();

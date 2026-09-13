@@ -47,14 +47,19 @@
   <div class="cue-panel-player" id="cuePanelPlayer" style="display: none;">
     <audio id="cueAudio" preload="metadata" {% if cue_audio_url %}src="{{ cue_audio_url }}"{% endif %}></audio>
     <div class="cue-player-line">
+      <button type="button" class="cue-step-btn" id="cuePrevBtn" title="Previous line">&#9198;</button>
       <button type="button" class="cue-play-btn" id="cuePlayBtn" title="Play / pause">&#9654;</button>
+      <button type="button" class="cue-step-btn" id="cueNextBtn" title="Next line">&#9197;</button>
+      <button type="button" class="cue-ap-btn" id="cueAutoPauseBtn" title="Auto-pause at the end of each line" aria-label="Auto-pause">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M10 8.5v7M14 8.5v7" stroke-linecap="round"></path></svg>
+      </button>
       <span class="cue-time"><span id="cueCurrentTime">00:00.000</span> <span class="cue-time-muted" id="cueDuration"></span></span>
     </div>
     <div class="cue-progress" id="cueProgress" title="Click to seek">
       <div class="cue-progress-fill" id="cueProgressFill"></div>
       <div class="cue-progress-knob" id="cueProgressKnob"></div>
     </div>
-    <div class="cue-panel-note">Play the song, then press the clock button on a line to set its start time to the current playback position.</div>
+    <div class="cue-panel-note">Click a line number to play that line, or turn on auto-pause to step through lines. Press the clock button on a line to set its start time to the current playback position.</div>
   </div>
 
   <div class="cue-panel-warn" id="cuePanelWarn"></div>
