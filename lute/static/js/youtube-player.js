@@ -569,7 +569,11 @@
     var target = ytCueIndex < 0 ? 0 : ytCueIndex + delta;
     if (target < 0) target = 0;
     if (target >= n) target = n - 1;
-    ytSeekToCue(target, false);
+    // In line-by-line study (auto-pause on), stepping while paused
+    // plays the next sentence right away; with auto-pause off the
+    // play state is kept so the user can scrub through subtitles
+    // without forcing playback.
+    ytSeekToCue(target, ytAutoPause);
   }
 
   /* ------------------------------------------------------------------ */
@@ -930,6 +934,20 @@
         if (window.luteHoverSpeakCancel) window.luteHoverSpeakCancel();
       });
     }
+
+    // Tap anywhere on the line that isn't a word (padding, marquee
+    // gaps, punctuation spans) to replay the current line from its
+    // start -- a quick re-listen while checking word statuses on the
+    // mini player.  Taps on words keep their term-popup behavior, and
+    // a drag-selection across words (its click lands on this common
+    // ancestor with a live selection) must not replay.
+    t.on("click", function (e) {
+      if (e.target.closest && e.target.closest(".word")) return;
+      var sel = window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (ytCueIndex < 0) return;
+      ytSeekToCue(ytCueIndex, true);
+    });
 
     // Status colors are always applied (see ytApplySubtitleStatusColors),
     // so we do NOT bind the hover-based add/remove that the main text
