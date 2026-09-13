@@ -184,6 +184,15 @@
   }
 
   let setup_book_datatable = function(initial_search) {
+    // Dedup baseline for state saves, seeded from whatever state gets
+    // restored below so the post-init saves are skipped.
+    var _booklistLastStateKey = null;
+    var _booklist_state_key = function(data) {
+      if (!data) return 'null';
+      var d = $.extend({}, data);
+      delete d.time;
+      return JSON.stringify(d);
+    };
     book_listing_table = $('#booktable').DataTable({
       layout: {
         topStart: [
@@ -233,6 +242,13 @@
         // gets the old layout's visibility applied to the wrong columns.
         // (v6 = the Progress column added between Tags and Word count.)
         data.version = 6;
+        // DataTables saves state right after restoring it (and again on
+        // some redraws) with a payload identical to what was loaded;
+        // skip the backend POST unless something actually changed.
+        // (Only the volatile 'time' field differs between saves.)
+        var stateKey = _booklist_state_key(data);
+        if (stateKey === _booklistLastStateKey) return;
+        _booklistLastStateKey = stateKey;
         var stateJson = JSON.stringify(data);
         // Always save to localStorage as instant fallback.
         localStorage.setItem('booklisting_datatables_state', stateJson);
@@ -257,6 +273,7 @@
           try {
             var ld = JSON.parse(saved);
             if (ld && ld.version === 6) {
+              _booklistLastStateKey = _booklist_state_key(ld);
               callback(ld);
               return;
             }
@@ -273,14 +290,17 @@
                 var sd = JSON.parse(resp.value);
                 if (sd && sd.version === 6) {
                   localStorage.setItem('booklisting_datatables_state', resp.value);
+                  _booklistLastStateKey = _booklist_state_key(sd);
                   callback(sd);
                   return;
                 }
               } catch (err) { /* ignore malformed state */ }
             }
+            _booklistLastStateKey = null;
             callback(null);
           },
           error: function() {
+            _booklistLastStateKey = null;
             callback(null);
           }
         });
