@@ -222,9 +222,61 @@
       return;
     }
     input.classList.remove("invalid");
+    var old = cues[k][key];
     cues[k][key] = t;
+    chainBoundary(k, key, old);
     if (MODE === "book") syncToTextarea();
     setActiveRow();
+  }
+
+  var EPS = 0.001;
+
+  // Retiming keeps shared boundaries contiguous: when a cue's start
+  // moves, the previous cue's end follows when it was sharing (or
+  // overlapping) that boundary -- LRC-derived cues are contiguous by
+  // construction, so retiming one line shifts the neighbour's edge
+  // instead of leaving a gap or overlap.  A true gap (neighbour ends
+  // before the old start, e.g. an instrumental break) is left alone.
+  // Symmetrically, moving a cue's end pulls the next cue's start.
+  function chainBoundary(k, key, oldVal) {
+    if (key === "start" && k > 0) {
+      var prevEnd = cues[k - 1].end;
+      if (
+        prevEnd >= oldVal - EPS &&
+        Math.abs(prevEnd - cues[k].start) > EPS
+      ) {
+        cues[k - 1].end = cues[k].start;
+        updateTimeInput(k - 1, "end");
+        flashRow(k - 1);
+      }
+    } else if (key === "end" && k < cues.length - 1) {
+      var nextStart = cues[k + 1].start;
+      if (
+        nextStart <= oldVal + EPS &&
+        Math.abs(nextStart - cues[k].end) > EPS
+      ) {
+        cues[k + 1].start = cues[k].end;
+        updateTimeInput(k + 1, "start");
+        flashRow(k + 1);
+      }
+    }
+  }
+
+  function updateTimeInput(k, key) {
+    var row = rowsBox.children[k];
+    if (!row) return;
+    var inp = row.querySelector(".cue-time-" + key);
+    if (inp) {
+      inp.value = fmtShort(cues[k][key]);
+      inp.classList.remove("invalid");
+    }
+  }
+
+  function flashRow(k) {
+    var row = rowsBox.children[k];
+    if (!row) return;
+    row.classList.add("cue-flash");
+    window.setTimeout(function () { row.classList.remove("cue-flash"); }, 400);
   }
 
   function buildRow(c, k) {
@@ -247,10 +299,12 @@
       '<path d="M9 2h6"></path></svg>';
     set.addEventListener("click", function () {
       if (!audio) return;
+      var old = cues[k].start;
       cues[k].start = audio.currentTime;
       var inp = row.querySelector(".cue-time-start");
       inp.value = fmtShort(cues[k].start);
       inp.classList.remove("invalid");
+      chainBoundary(k, "start", old);
       if (MODE === "book") syncToTextarea();
       setActiveRow();
       row.classList.add("cue-flash");
