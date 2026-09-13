@@ -1,5 +1,18 @@
 "use strict";
 
+// Dictionary domains whose tab favicons are self-hosted under
+// /static/icn/dict/<domain>.png.  Anything else falls back to
+// Google's favicon service at runtime.
+const LOCAL_DICT_FAVICONS = [
+  "www.youdao.com",
+  "www.doubao.com",
+  "fanyi.baidu.com",
+  "jisho.org",
+  "www.japandict.com",
+  "en.wiktionary.org",
+  "www.weblio.jp",
+];
+
 
 /**
  * A general lookup button, for images, sentences, etc.
@@ -177,8 +190,17 @@ class DictButton extends LookupButton {
 
       fimg = document.createElement("img");
       fimg.classList.add("dict-btn-fav-img");
-      const favicon_src = `http://www.google.com/s2/favicons?domain=${domain}`;
-      fimg.src = favicon_src;
+      // Prefer the self-hosted icon (no third-party request on every
+      // reading-page load); unknown domains fall back to Google's
+      // favicon service, as does a missing local file.
+      const local = LOCAL_DICT_FAVICONS.indexOf(domain) !== -1
+        ? `/static/icn/dict/${domain}.png`
+        : null;
+      const google_favicon = `https://www.google.com/s2/favicons?domain=${domain}`;
+      fimg.src = local || google_favicon;
+      if (local) {
+        fimg.onerror = () => { fimg.onerror = null; fimg.src = google_favicon; };
+      }
     }
     catch(err) {}
 
