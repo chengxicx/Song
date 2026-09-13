@@ -169,6 +169,12 @@ lute.log
 lute_run.log
 lute_data/
 
+# Uploaded user theme, kept on the server only.  Committing a built-in
+# copy of the same name would make Service.get_current_css() concatenate
+# both and emit the identical CSS twice (see lute/themes/service.py).
+lute/themes/css/Boox_Leaf5C.css
+
 # Local tool / agent working dirs (not part of source)
 .workbuddy/
 .zcode/
+.trae/
