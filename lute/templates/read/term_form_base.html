@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/jquery/jquery-ui.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/tagify/tagify.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/tagify/tagify_overrides.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}?v={{ lute_version }}" />
+    <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
 
     {% if theme_css_hash %}
     <link rel="stylesheet" type="text/css" href="/theme/current?v={{ theme_css_hash }}">
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.min.js') }}" charset="utf-8"></script>
     <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.polyfills.min.js') }}" charset="utf-8"></script>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260911a" charset="utf-8" defer></script>
+    <script type="text/javascript" src="{{ vstatic('js/tts.js') }}" charset="utf-8" defer></script>
 
   </head>
 

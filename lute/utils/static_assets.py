@@ -50,3 +50,29 @@ def make_vstatic(static_folder, url_for_func):
         return f"{url_for_func(filename)}?v={file_hash(static_folder, filename)}"
 
     return vstatic
+
+
+def make_vstatic_js(static_folder, url_for_func):
+    """
+    Build the vstatic_js() template global for first-party JS.
+
+    Lute serves its own JS through /static/js/never_cache/<file> so that
+    it can be marked immutable for a year; the "never_cache" path segment
+    is a route marker, not a directory -- the route maps it back onto
+    static/js/ (see app_factory.custom_js).
+
+    vstatic_js('lute.js') ->
+        '/static/js/never_cache/lute.js?v=<hash of static/js/lute.js>'
+
+    The version is the file's own content hash, so editing the JS changes
+    the URL by itself.  That replaces the two hand-maintained schemes it
+    supersedes -- ?v={{ lute_version }} and the ASSET_CACHE_BUST constant
+    -- both of which pinned clients to a stale file whenever somebody
+    forgot to bump the string.
+    """
+
+    def vstatic_js(filename):
+        relpath = f"js/{filename}"
+        return f"{url_for_func(filename)}?v={file_hash(static_folder, relpath)}"
+
+    return vstatic_js
