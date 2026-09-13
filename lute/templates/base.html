@@ -15,8 +15,8 @@
   <link rel="icon" href="{{ url_for('static', filename='favicon_dev.ico') }}" type="image/x-icon"/>
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon_dev.ico') }}" type="image/x-icon"/>
   {% else %}
-  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}?v=2" type="image/x-icon"/>
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}?v=2" type="image/x-icon"/>
+  <link rel="icon" href="{{ vstatic('favicon.ico') }}" type="image/x-icon"/>
+  <link rel="shortcut icon" href="{{ vstatic('favicon.ico') }}" type="image/x-icon"/>
   {% endif %}
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -87,11 +87,13 @@
   <script type="text/javascript" src="{{ vstatic('vendor/htmx/htmx.min.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ vstatic('vendor/alpine/alpine.min.js') }}" defer charset="utf-8"></script>
 
-  <!-- Versioned JS files: cache busting via ?v={{ lute_version }} -->
-  <script type="text/javascript" src="/static/js/never_cache/lute-hotkey-utils.js?v={{ lute_version }}" charset="utf-8"></script>
-  <script type="text/javascript" src="/static/js/never_cache/lute-popups.js?v={{ lute_version }}" charset="utf-8"></script>
-  <script type="text/javascript" src="/static/js/never_cache/lute.js?v={{ lute_version }}" charset="utf-8"></script>
-  <script type="text/javascript" src="/static/js/never_cache/lute-anki.js?v={{ lute_version }}" charset="utf-8"></script>
+  <!-- Lute's own JS: vstatic_js() adds ?v=<content hash>, so editing a
+       file changes its URL and the year-long immutable cache is busted
+       without anyone having to remember a version bump. -->
+  <script type="text/javascript" src="{{ vstatic_js('lute-hotkey-utils.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-popups.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-anki.js') }}" charset="utf-8"></script>
 
   <script type="text/javascript">
     const LUTE_USER_SETTINGS = {{ user_settings | safe }}

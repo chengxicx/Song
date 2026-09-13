@@ -174,7 +174,6 @@ def _add_base_routes(app, app_config):
                 "custom_styles": "",
                 "custom_styles_hash": "",
                 "lute_version": lute.__version__,
-                "asset_cache_bust": lute.ASSET_CACHE_BUST,
                 "multiuser_enabled": True,
                 "current_username": None,
                 "is_admin": False,
@@ -208,7 +207,6 @@ def _add_base_routes(app, app_config):
             "custom_styles": _custom_styles,
             "custom_styles_hash": _css_hash(_custom_styles),
             "lute_version": lute.__version__,
-            "asset_cache_bust": lute.ASSET_CACHE_BUST,
             "multiuser_enabled": mu_store.enabled(),
             "current_username": req_username,
             "is_admin": mu_store.enabled() and mu_store.is_admin(req_username),
@@ -496,6 +494,17 @@ def _create_app(app_config, extra_config):
     app.jinja_env.globals["vstatic"] = static_assets.make_vstatic(
         app.static_folder,
         lambda filename: url_for("static", filename=filename),
+    )
+
+    # vstatic_js(): same idea for Lute's own JS, which is served by the
+    # immutable-cached /static/js/never_cache/<file> route.  Templates must
+    # use one of these two helpers rather than a hand-written ?v= string:
+    # these assets are cached for a year, so a version string somebody
+    # forgets to bump pins clients to the old file.  There is a test that
+    # enforces this (tests/unit/utils/test_static_assets.py).
+    app.jinja_env.globals["vstatic_js"] = static_assets.make_vstatic_js(
+        app.static_folder,
+        lambda filename: url_for("custom_js", filename=filename),
     )
 
     db.init_app(app)
