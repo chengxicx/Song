@@ -927,8 +927,9 @@ def get_term_summary(session, lang_id, period="7days"):
 
     where_clause = "where " + " and ".join(where_parts)
 
-    total_sql = f"select count(*) from words {where_clause}"
-    total = session.execute(text(total_sql), params).scalar() or 0
+    # The total is derived from the cumulative group-by below: its WHERE
+    # clause is identical, so a separate count(*) would scan the words
+    # table a second time for a number we already have.
 
     # Use Python date comparison instead of SQLite date('now', 'localtime')
     # to avoid timezone mismatches between SQLite and the application.
@@ -965,7 +966,7 @@ def get_term_summary(session, lang_id, period="7days"):
     cumulative_by_status = {int(r[0]): int(r[1]) for r in cum_rows}
 
     return {
-        "total_terms": int(total),
+        "total_terms": sum(cumulative_by_status.values()),
         "recent_by_status": recent_by_status,
         "recent_label": "Today"
         if period == "today"
