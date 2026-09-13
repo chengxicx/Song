@@ -175,3 +175,49 @@ def test_first_party_js_is_referenced_through_vstatic_js():
         "JS assets must be loaded via vstatic() / vstatic_js() so the URL"
         " carries a content hash:\n  " + "\n  ".join(offenders)
     )
+
+
+_STATIC_DIR = os.path.join(os.path.dirname(lute.__file__), "static")
+_SW_FILE = os.path.join(_STATIC_DIR, "sw.js")
+
+_ASSET_REF = re.compile(r"""vstatic(_js)?\(\s*['"]([^'"]+)['"]\s*\)""")
+
+
+def test_every_versioned_asset_reference_exists():
+    """
+    vstatic() degrades quietly on a typo: file_hash() returns "0" and the
+    page renders a 404 URL that nothing else checks.
+    """
+    offenders = []
+    for path in _template_files():
+        rel = os.path.relpath(path, _TEMPLATES_DIR)
+        with open(path, encoding="utf-8") as f:
+            for lineno, line in enumerate(f, 1):
+                for is_js, filename in _ASSET_REF.findall(line):
+                    relpath = os.path.join("js", filename) if is_js else filename
+                    if not os.path.exists(os.path.join(_STATIC_DIR, relpath)):
+                        offenders.append(f"{rel}:{lineno}: missing {relpath}")
+    assert (
+        not offenders
+    ), "Templates reference static assets that do not exist:\n  " + "\n  ".join(
+        offenders
+    )
+
+
+def test_service_worker_precache_entries_exist():
+    """
+    The install fails as a unit: if any cache.addAll() entry 404s the
+    browser rejects the install and no service worker ever activates, so a
+    single stale entry silently disables offline support entirely.
+    """
+    with open(_SW_FILE, encoding="utf-8") as f:
+        text = f.read()
+    entries = re.findall(r"'/static/([^']+)'", text)
+    # sw.js also matches on path *prefixes* (e.g. /static/js/never_cache/)
+    # to pick a caching strategy; those aren't precache entries.
+    entries = [e for e in entries if not e.endswith("/")]
+    assert entries, "No precache entries found -- has the list moved?"
+    missing = [e for e in entries if not os.path.exists(os.path.join(_STATIC_DIR, e))]
+    assert not missing, "sw.js precaches files that no longer exist:\n  " + "\n  ".join(
+        missing
+    )
