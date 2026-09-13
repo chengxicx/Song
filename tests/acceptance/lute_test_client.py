@@ -399,9 +399,8 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     ################################3
     # Reading/rendering
 
-    def wait_reading_ready(self):
-        """
-        Wait until the reading page has swapped its text in.
+    def wait_reading_ready(self, timeout=10000):
+        """Wait until the reading page has finished its async setup.
 
         The reading text arrives asynchronously (htmx.ajax into #thetext),
         and the post-swap bookkeeping in _finishPageSwap ends by calling
@@ -413,10 +412,16 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         luteStartReadingDone is set by _finishPageSwap, so it becomes true
         only once the swap (and its resets) have finished.  Tolerates pages
         that have no such global at all.
+
+        Uses an explicit timeout rather than the suite's 4s default: that
+        default is tuned for assertions, and this is a readiness wait, not a
+        check -- on a loaded machine (or right after a hotkey-triggered
+        reload) the swap can legitimately take longer than 4s.
         """
         self.page.wait_for_function(
             """() => typeof luteStartReadingDone === 'undefined'
-                     || luteStartReadingDone === true"""
+                     || luteStartReadingDone === true""",
+            timeout=timeout,
         )
 
     def displayed_text(self):
