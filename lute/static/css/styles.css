@@ -4330,6 +4330,42 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     justify-content: center;
 }
 
+.cue-step-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: rgba(128, 128, 128, 0.3);
+    color: inherit;
+    font-size: 10px;
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cue-ap-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(128, 128, 128, 0.55);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cue-ap-btn.on {
+    background: #4cbb17;
+    border-color: #4cbb17;
+    color: #fff;
+}
+
 .cue-time {
     font-variant-numeric: tabular-nums;
     font-size: 13px;
@@ -4422,6 +4458,7 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 .cue-idx {
     color: #8e8e93;
     font-size: 12px;
+    cursor: pointer;
 }
 
 .cue-set-btn {
