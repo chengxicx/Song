@@ -73,8 +73,13 @@ def session_chrome_browser(request, _environment_check):
 
     playwright = sync_playwright().start()
 
+    # A cold browser start easily blows past 4s on a loaded or sandboxed
+    # machine, and the fixture is session-scoped: when the launch fails
+    # every test in the suite fails with it.  A wider cap costs nothing
+    # on a warm machine.
+    launch_timeout = int(os.environ.get("LUTE_TEST_BROWSER_LAUNCH_TIMEOUT", 20000))
     launch_options = {
-        "timeout": 4000,
+        "timeout": launch_timeout,
         "headless": headless,
         # Chromium-specific launch args
         "args": ["--disable-blink-features=AutomationControlled"],
