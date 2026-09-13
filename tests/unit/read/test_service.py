@@ -169,9 +169,7 @@ def test_set_terms_to_known_ignores_invalid_ids(english, app_context):
     assert service.set_terms_to_known(["x", None, -3], dbbook) == 0
 
     sql = "select WoTextLC, WoStatus from words order by WoText"
-    assert_sql_result(
-        sql, ["dog; 1"], "no changes made for invalid input"
-    )
+    assert_sql_result(sql, ["dog; 1"], "no changes made for invalid input")
 
 
 def test_smoke_start_reading(english, app_context):
@@ -237,9 +235,7 @@ def _make_pdf_book(app, english, page_texts):
     b.pdf_stream = io.BytesIO(make_pdf_bytes(page_texts))
     b.pdf_stream_filename = "test.pdf"
     book = BookService().import_book(b, db.session)
-    pdf_dir = os.path.join(
-        app.static_folder, os.path.dirname(book.pdf_path.strip("/"))
-    )
+    pdf_dir = os.path.join(app.static_folder, os.path.dirname(book.pdf_path.strip("/")))
     return book, pdf_dir
 
 
