@@ -1240,8 +1240,25 @@
     gap: 0.55rem;
   }
 
-  .youtube-player-container .yt-controls-right {
-    display: none;
+  /* Collapsed mini bar: hide the right-side controls except the
+     auto-pause toggle, lifted into the controls row via
+     display:contents as an icon-only square, so line-by-line
+     listening (play -> auto-pause -> step) needs no expand.  The
+     sheet re-shows the whole group (see .player-sheet-open rules). */
+  .youtube-player-container:not(.player-sheet-open) .yt-controls-right {
+    display: contents;
+  }
+
+  .youtube-player-container:not(.player-sheet-open) .yt-controls-right > :not(#yt-autopause-btn) {
+    display: none !important;
+  }
+
+  .youtube-player-container:not(.player-sheet-open) #yt-autopause-btn {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    justify-content: center;
   }
 
   .youtube-player-container .yt-play-btn {
