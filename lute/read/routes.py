@@ -729,8 +729,17 @@ def new_page(bookid, position, pagenum):
         return redirect(f"/read/{book.id}", 302)
 
     text_dir = "rtl" if book.language.right_to_left else "ltr"
+    # page_edit_form.html renders the lyrics-timing panel state, and
+    # `{{ page_cues | tojson }}` raises on an undefined variable -- passing
+    # nothing here made every "add page" 500.  A page that is being created is
+    # empty, so it has no cues and no timing panel.
     return render_template(
-        "read/page_edit_form.html", hide_top_menu=True, form=form, text_dir=text_dir
+        "read/page_edit_form.html",
+        hide_top_menu=True,
+        form=form,
+        text_dir=text_dir,
+        page_cues=[],
+        cue_audio_url=None,
     )
 
 

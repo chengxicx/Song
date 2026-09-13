@@ -1,0 +1,128 @@
+# 高危区 Smoke 清单
+
+> 用途：这些区域改一行就可能静默坏掉，且**默认 `pytest` 完全覆盖不到**——
+> `.pytest.ini` 里 `--ignore=tests/acceptance/ --ignore=tests/playwright/`，
+> 浏览器级套件平时根本不跑。改动前后各过一遍，比事后回滚便宜。
+>
+> 覆盖情况一栏是**实测**的（在 `tests/` 里检索过），不是估计值。
+
+---
+
+## 三层护栏
+
+| 层 | 触发 | 命令 | 覆盖 |
+|---|---|---|---|
+| L1 本地快检 | 每次改完 | `./venv/bin/python -m pytest` | 857 项，~23 分钟，**不含**任何浏览器套件 |
+| L2 浏览器套件 | 改动高危区时手跑 / nightly 自动 | `inv accept` → `inv acceptmobile` → `inv playwright` | 55 项 acceptance + 4 项 @mobile + playwright |
+| L3 nightly | 每天 02:00（北京） | `.github/workflows/nightly-guardrail.yml` | 同 L2，自动跑，失败留截图 artifact |
+
+**L2 必须串行**：三套都起 5001 端口并清空 test db，并发会互相踩。
+
+---
+
+## 基线（2026-09-13：L2 首跑 → 清理后）
+
+这之前 L2 **从未在本分支跑过**，首跑结果就是基线。清理后已全绿。
+
+| 套件 | 首跑 | 现在 |
+|---|---|---|
+| `inv accept` | 50 passed / **5 failed**（241s） | **55 passed / 0 failed**（192s） |
+| `inv acceptmobile` | 全绿 | **4 passed / 0 failed**（10s） |
+| `inv playwright` | 1 passed / **2 failed**（48s） | **3 passed / 1 skipped**（24s） |
+
+首跑 7 条失败的归因（**没有一条是产品回归**）：
+
+| 失败用例 | 归因 | 处理 |
+|---|---|---|
+| `test_book.py::test_i_can_import_a_text_file` | **flaky** — 隔离重跑即通过 | 未改 |
+| `test_dict_popup.py::test_dictionary_popup_closed_on_unload` | **陈旧选择器** — 阅读页已改汉堡菜单，`[title="Home"]` 全仓不存在 | `.hamburger-btn` → `#reading_menu a[href='/']` |
+| `test_reading.py::test_user_can_add_and_remove_pages` | **陈旧选择器** — 模板里已无 `id="text"` | — |
+| `test_reading.py::test_page_start_date_is_set_correctly_during_reading` | **陈旧选择器** — footer 已删，无 `#footerNextPage` | 改点 header 的 `#navNext` |
+| `test_reading.py::test_peeking_at_page_does_not_set_current_page_or_start_date` | **外网依赖** — 词典 tab 图标回退到 `google.com/s2/favicons`，无外网时 5 个请求挂住 → `load` 不触发（路由本身 200/0.02s） | 产品侧删掉该回退：图标只走自托管（`dict-tabs.js`） |
+| `playwright::test_playwright` | fork 的 **fit-to-screen 分页**把非当前屏的词 `display:none` | 先翻屏（`_reveal`） |
+| `playwright::test_page_change_first_word` | 上一次点击**残留 hover**，`LUTE_CURR_TERM_DATA_ORDER` 从悬停词起算 | 先 `_park_mouse` |
+
+顺带查出的 **2 个真实产品 bug**（与本套件无关，顺手修）：
+
+1. `bookmarks/list.html` 没引 `book-listing-shared.js` ⇒ 书签行的「…」菜单永远打不开，Edit / Delete 点不到。
+2. `read/routes.py:new_page` 渲染 `page_edit_form.html` 时漏传 `page_cues` / `cue_audio_url` ⇒ `{{ page_cues | tojson }}` 抛 `TypeError`，**新增页永远 500**。
+
+### 三条「看着像产品回归、其实是测试没等」的竞态（已修）
+
+1. **阅读页文本是异步 swap 进来的**：`htmx.ajax` 写入 `#thetext`，而 `_finishPageSwap()` 末尾会调
+   `start_hover_mode()` → `_hide_term_edit_form()`，把词条表单/词典/光标一起清掉。在 swap 落地前碰文本的步骤会被就地"撤销"。
+   - 症状 A：`I hover over "otro"` 的 `count == 1` 断言拿到 **0**（词还没渲染）。
+   - 症状 B：词条表单刚打开就被清成 `/read/empty`（空白 iframe）。
+   - 修法：`LuteTestClient.wait_reading_ready()`（等 `luteStartReadingDone`）；`click_word()` 内调用，`when_hover` 显式调用。
+2. **无效保存的校验提示是随 POST 响应写回 iframe 的**：只读一次 `iframe.content()` 会读到**上一份文档**；
+   而 `page.frame(name=...)` 在表单导航的一瞬间还会返回 `None`。
+   - 修法：`then_reading_page_term_form_iframe_contains` 改用 `frame_locator("#wordframeid")` + `to_contain_text()`（自动重试）。
+3. **`h` 热键（ToggleHighlight）会 `location.reload()`**：下一步可能在 reload 落地前就开始动手，改完又被打回。
+   - 症状：`test_toggling_highlighting_only_shows_highlights_on_hovered_terms` 间歇性在 `displayed_text()` 的
+     `wait_for_selector('span[class*="textitem"]')` 上超时。
+   - 修法：`press_hotkey()` 结尾 `wait_for_load_state("load", timeout=2000)`（不导航的热键是 no-op）。
+
+> 服务端日志里反复出现的 `StaleDataError / PendingRollbackError`（`app_factory.py:183 inject_menu_bar_vars`）
+> 在整个 run 中持续存在，**通过和失败的用例都会出现**，与上述失败无因果 —— 是独立的既有噪声。
+
+---
+
+## 高危区清单
+
+| # | 区域 | 现有自动覆盖 | 缺口 | 手工验证要点 |
+|---|---|---|---|---|
+| 1 | **刷新同步**（改状态后阅读帧/列表同步） | ✅ `reading.feature`「Updating term status updates the reading frame」(@mobile)、「Learned terms are applied to new texts.」；`sync_status.feature`「Can link child and single parent term.」「Linking multiple parents breaks status updating.」 | 三者同步视图（阅读页 / 列表 / 词列表）**同时**打开的交叉一致性 | 开两个标签页，A 页改状态 → B 页刷新，确认无陈旧计数 |
+| 2 | **列显隐**（book list 列开关） | ❌ 无 | 全无 | 关掉 Status / New word 列 → 确认不发 `/table_stats` 请求；再打开 → 数据回填且不闪烁 |
+| 3 | **Quick Set Status Mode** | ❌ 无（`reading_menu.html` 的 `tap_sets_status`） | 全无 | 开关切换后，阅读页单击词是否直接置状态；与 hotkey 1-5 是否冲突 |
+| 4 | **网页导入** | ⚠️ 部分：`book.feature`「I can import a url.」 | 真实外网页面（含编码/重定向） | 导入一个非 UTF-8 页面，确认不乱码、不静默截断 |
+| 5 | **PDF 书** | ⚠️ 仅单元级（`unit/book/test_stats.py` 等）；acceptance 有 `Hola.pdf` 素材但无 PDF 专属场景 | 「New word 恒 0%」类回归只有单测兜底 | 导入 PDF → Stats 页 New word% 非 0；页数/进度条正确 |
+| 6 | **漫画分页**（`_splitToScreens`，`lute.js:1993-2000` 的 rAF 重排） | ❌ **零覆盖**（`tests/` 里检索 `manga` / `_splitToScreens` / `mokuro` 无命中） | 全无 | 改窗口宽度 / 缩放 → 屏幕切分重算，不丢字、不错位；跨屏导航边界 |
+| 7 | **词条弹窗定位**（jQuery UI tooltip） | ❌ 无（acceptance 有聚焦/热键场景，但无弹窗定位断言） | 全无 | 折行词（行尾换行）弹窗要贴着**光标那一行**，不能偏 400px；关闭要即时（无 ~400ms 淡出残留） |
+| 8 | **触摸点击反馈** | ❌ 无（`tap-pressed` / `tap-ack` / haptics 在 `tests/` 无引用） | 全无 | `localStorage.screen_interactions_type='mobile'` + reload，再测四态与震动开关 |
+| 9 | **主题系统** | ⚠️ 仅单元级（`unit/themes/test_service.py` 测 CSS 拼接） | 渲染层无覆盖 | 切主题看 `#status` 选中态对勾是否可见（亮色主题易隐形） |
+| 10 | **备份/恢复迁移** | ✅ `unit/backup/test_restore_migration.py` | 上游 `.db.gz` 恢复后 Song 专属迁移 | 恢复后重启，确认 `LgKiwi*` 四列存在 |
+
+---
+
+## 部署前 5 分钟 Gate
+
+改过上面任意一行时，部署前跑：
+
+```bash
+cd /Users/cxi/Documents/lutedev/lute-v3
+
+# 0. 清掉沙箱 mkdir 缺陷留下的基目录，否则 72 个用例会在 setup 阶段集体 PermissionError
+rm -rf "$TMPDIR"pytest-of-*
+
+# 1. 确认没有别的 pytest 在跑（测试库是固定共享路径，只能独占）
+pgrep -fl pytest || echo "clean"
+
+# 2. 清沙箱代理对 localhost 的干扰（不设这个，_site_is_running 会拿到 502 而直接抛错）
+export NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1
+
+# 3. 本机没有 playwright 自带 chromium，用系统 Edge；并绕过代理
+export LUTE_TEST_BROWSER_CHANNEL=msedge
+export LUTE_TEST_BROWSER_ARGS=--no-proxy-server
+
+# 4. tasks.py 用的是裸 python/pytest，需要 venv 在 PATH 前面
+export PATH="$PWD/venv/bin:$PATH"
+
+# 5. 串行跑（都占 5001，别并发）
+./venv/bin/python -m invoke accept
+./venv/bin/python -m invoke acceptmobile
+./venv/bin/python -m invoke playwright
+```
+
+**收尾**：`pgrep -fl pytest` 核实无残留进程。
+
+---
+
+## 已知环境坑（不是代码问题）
+
+| 现象 | 真因 | 处理 |
+|---|---|---|
+| `_site_is_running` 抛 `RuntimeError: Got code 502` | 沙箱设了 `HTTP_PROXY` 但没 `NO_PROXY`，`requests.get("localhost:5001")` 被代理拦截 | 设 `NO_PROXY=localhost,127.0.0.1` |
+| 浏览器起不来 / 超时 | `~/Library/Caches/ms-playwright/` 为空，未下载自带 chromium | 设 `LUTE_TEST_BROWSER_CHANNEL=msedge` |
+| 72 个用例 setup 阶段 `PermissionError`，报文含 `pytest-of-` | 沙箱 `mkdir` shim 在目录已存在时仍抛错 | 跑前 `rm -rf "$TMPDIR"pytest-of-*` |
+| 大面积 `readonly database` / `no such table` / `disk I/O error` | 两个 pytest 并发，互相删建同一个 test db | 只跑一个；`pgrep -fl pytest` 清残留 |
+| 所有浏览器测试都访问不到 5001 | `tasks.py` 里子进程用裸 `python` | 把 `venv/bin` 放到 PATH 最前 |
