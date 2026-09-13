@@ -29,7 +29,9 @@ def _revalidate(content):
         "Cache-Control": "no-cache, must-revalidate, max-age=0",
         "Pragma": "no-cache",
     }
-    if etag in request.if_none_match:
+    # Weak comparison: intermediaries (e.g. Cloudflare gzip) downgrade
+    # strong etags to W/"..." and the browser echoes that back.
+    if request.if_none_match.contains_weak(etag):
         response = Response(status=304)
     else:
         response = Response(content, 200)
