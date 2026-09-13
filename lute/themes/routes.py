@@ -17,18 +17,17 @@ def _etag_of(content):
     return hashlib.sha1(content.encode("utf-8")).hexdigest()
 
 
-def _revalidate(content):
+def _immutable_css(content):
     """
-    Return a 304 when the client's If-None-Match matches, else a 200
-    with the content.  Either way the response is marked no-cache so
-    the browser revalidates on every load: theme changes show up
-    immediately without re-downloading unchanged stylesheets.
+    Serve content-addressed theme CSS.
+
+    Templates build the URL as /theme/...?v=<sha1 of the css>, so any
+    change to the theme (or custom styles) produces a new URL and the
+    browser can cache this response effectively forever.  The etag
+    304 revalidation is kept as a safety net for stale URLs.
     """
     etag = _etag_of(content)
-    headers = {
-        "Cache-Control": "no-cache, must-revalidate, max-age=0",
-        "Pragma": "no-cache",
-    }
+    headers = {"Cache-Control": "public, max-age=31536000, immutable"}
     # Weak comparison: intermediaries (e.g. Cloudflare gzip) downgrade
     # strong etags to W/"..." and the browser echoes that back.
     if request.if_none_match.contains_weak(etag):
@@ -46,7 +45,7 @@ def _revalidate(content):
 def current_theme():
     "Return current css."
     service = Service(db.session)
-    return _revalidate(service.get_current_css())
+    return _immutable_css(service.get_current_css())
 
 
 @bp.route("/custom_styles", methods=["GET"])
@@ -55,7 +54,7 @@ def custom_styles():
     Return the custom settings for inclusion in the base.html.
     """
     repo = UserSettingRepository(db.session)
-    return _revalidate(repo.get_value("custom_styles"))
+    return _immutable_css(repo.get_value("custom_styles"))
 
 
 @bp.route("/next", methods=["POST"])

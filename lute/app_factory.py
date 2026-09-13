@@ -6,6 +6,7 @@ Methods: create_app.
 
 import os
 import json
+import hashlib
 import platform
 import secrets
 import sqlite3
@@ -169,7 +170,9 @@ def _add_base_routes(app, app_config):
                 "user_settings": json.dumps({}),
                 "user_hotkeys": json.dumps({}),
                 "current_theme": "Default.css",
+                "theme_css_hash": "",
                 "custom_styles": "",
+                "custom_styles_hash": "",
                 "lute_version": lute.__version__,
                 "asset_cache_bust": lute.ASSET_CACHE_BUST,
                 "multiuser_enabled": True,
@@ -179,6 +182,13 @@ def _add_base_routes(app, app_config):
         us_repo = UserSettingRepository(db.session)
         bs = us_repo.get_backup_settings()
         have_languages = len(db.session.query(Language).all()) > 0
+        # Content hashes for the theme css links: the URL carries the
+        # hash, so browsers (and CDNs) can cache the response forever
+        # and a theme change simply produces a new URL.
+        from lute.themes.service import Service as _ThemeService
+        _theme_css = _ThemeService(db.session).get_current_css()
+        _custom_styles = current_settings().get("custom_styles", "")
+        _css_hash = lambda s: hashlib.sha1(s.encode("utf-8")).hexdigest() if s else ""
         # Templates can be rendered outside a request (e.g. background
         # rendering in tests); session is only readable in requests.
         req_username = session.get("user") if has_request_context() else None
@@ -191,10 +201,12 @@ def _add_base_routes(app, app_config):
             "user_settings": json.dumps(current_settings()),
             "user_hotkeys": json.dumps(current_hotkeys()),
             "current_theme": us_repo.get_value("current_theme"),
+            "theme_css_hash": _css_hash(_theme_css),
             # The cached settings bucket already holds custom_styles, so
             # this is a dict lookup, not another db query.  base.html
             # skips the custom_styles <link> entirely when it is empty.
-            "custom_styles": current_settings().get("custom_styles", ""),
+            "custom_styles": _custom_styles,
+            "custom_styles_hash": _css_hash(_custom_styles),
             "lute_version": lute.__version__,
             "asset_cache_bust": lute.ASSET_CACHE_BUST,
             "multiuser_enabled": mu_store.enabled(),

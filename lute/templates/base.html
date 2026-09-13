@@ -58,11 +58,14 @@
   <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ vstatic('css/player-styles.css') }}" />
 
-  <link rel="stylesheet" type="text/css" href="/theme/current?v={{ current_theme }}">
-  {# Only request custom styles when the user has actually saved some;
-     an empty stylesheet still costs a render-blocking request. #}
+  {# Content-addressed theme css: the ?v= hash changes whenever the
+     theme changes, so the response can be cached effectively forever.
+     An empty custom_styles skips its request entirely. #}
+  {% if theme_css_hash %}
+  <link rel="stylesheet" type="text/css" href="/theme/current?v={{ theme_css_hash }}">
+  {% endif %}
   {% if custom_styles %}
-  <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ current_theme }}">
+  <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ custom_styles_hash }}">
   {% endif %}
 
   {% block preloadassets %}{% endblock %}
