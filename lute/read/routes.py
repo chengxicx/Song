@@ -231,12 +231,15 @@ def _rerender_subtitle_cues(book, indices):
         return {}
     lang = book.language
     render_service = RenderService(db.session)
+    # One indexer reused across every cue being re-rendered, instead of
+    # a fresh multiword-table query per cue.
+    mw = render_service.get_multiword_indexer(lang)
     cache_key = _subtitle_cache_key(book.id, book.srt_data)
     cached = _yt_subtitle_words_cache.get(cache_key)
     result = {}
     for i in valid:
         cue_text = (cues[i].get("text") or "").replace("\n", " ")
-        textitems = render_service.get_textitems(cue_text, lang)
+        textitems = render_service.get_textitems(cue_text, lang, mw)
         _save_new_subtitle_terms(textitems)
         parts = []
         for ti in textitems:
@@ -460,7 +463,9 @@ def _apply_media_page_cue_data(book, pagenum, new_text, cue_data):
             txt = str(item.get("text") or "")
         except (KeyError, TypeError, ValueError):
             continue
-        if not (math.isfinite(start) and math.isfinite(end) and start >= 0 and end >= 0):
+        if not (
+            math.isfinite(start) and math.isfinite(end) and start >= 0 and end >= 0
+        ):
             continue
         cue = cues[i]
         if cue.get("start") != start:
