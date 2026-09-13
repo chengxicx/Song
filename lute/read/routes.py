@@ -4,6 +4,7 @@
 
 import gzip
 import json
+import math
 import os
 from flask import (
     Blueprint,
@@ -32,6 +33,7 @@ from lute.book.service import (
     bilibili_embed_url,
     bilibili_video_id,
     bilibili_page,
+    media_audio_url,
 )
 from lute.tts.routes import get_lang_code_for
 from lute.db import db
@@ -377,6 +379,112 @@ def _sync_media_page_text_to_cues(book, pagenum, original_text, new_text):
     if not changed:
         return "unchanged"
 
+    book.srt_data = json.dumps(cues, ensure_ascii=False)
+    invalidate_yt_subtitle_cache(book.id)
+    return "updated"
+
+
+def _page_cue_span(book, pagenum, line_count):
+    """
+    Absolute cue indices covered by a media book page's lines, or None
+    when the page and the cues don't line up.
+
+    Same positional anchoring as _sync_media_page_text_to_cues: the
+    page's first line sits at the cumulative line count of the pages
+    before it, and only the clean one-line-per-cue case is handled (a
+    page whose lines straddle a multi-line cue has no contiguous cue
+    span, so the timing panel is not offered for it).
+    """
+    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "netease", "video"):
+        return None
+    cues = list(book.cues)
+    if not cues or not line_count:
+        return None
+
+    def _norm(s):
+        return (s or "").replace("\r", "")
+
+    line_to_cue = []
+    for idx, cue in enumerate(cues):
+        segs = _norm(cue.get("text") or "").split("\n")
+        line_to_cue.extend([idx] * len(segs))
+
+    anchor = 0
+    for t in book.texts:
+        if t.order < pagenum:
+            anchor += len(_norm(t.text).split("\n"))
+    if anchor + line_count > len(line_to_cue):
+        return None
+    covered = line_to_cue[anchor : anchor + line_count]
+    if covered != list(range(covered[0], covered[0] + line_count)):
+        return None
+    return covered
+
+
+def _parse_cue_data(raw):
+    """
+    Parse the timing panel's submitted cue JSON (a list of
+    {i, start, end, text} objects); None when absent or invalid, which
+    falls back to the legacy plain-text sync.
+    """
+    if not raw:
+        return None
+    try:
+        data = json.loads(raw)
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(data, list):
+        return None
+    items = [d for d in data if isinstance(d, dict)]
+    return items or None
+
+
+def _apply_media_page_cue_data(book, pagenum, new_text, cue_data):
+    """
+    Write the timing panel's structured cue edits (text + start/end) back
+    into book.cues, keyed by absolute cue index.
+
+    Same anchoring rules as _sync_media_page_text_to_cues: the page must
+    still be a contiguous one-line-per-cue run, or nothing is written and
+    the caller flashes the mismatch warning.  The text-drift tolerance
+    check is deliberately not applied: the panel is populated from the
+    cues themselves, so its values stay authoritative even when the page
+    text has drifted from them.
+
+    Returns "updated", "unchanged", or "mismatch" (same meanings as
+    _sync_media_page_text_to_cues).
+    """
+    new_lines = (new_text or "").replace("\r", "").split("\n")
+    span = _page_cue_span(book, pagenum, len(new_lines))
+    if span is None:
+        return "mismatch"
+    allowed = set(span)
+    cues = list(book.cues)
+    changed = False
+    for item in cue_data:
+        try:
+            i = int(item["i"])
+            if i not in allowed:
+                continue
+            start = float(item["start"])
+            end = float(item["end"])
+            txt = str(item.get("text") or "")
+        except (KeyError, TypeError, ValueError):
+            continue
+        if not (math.isfinite(start) and math.isfinite(end) and start >= 0 and end >= 0):
+            continue
+        cue = cues[i]
+        if cue.get("start") != start:
+            cue["start"] = start
+            changed = True
+        if cue.get("end") != end:
+            cue["end"] = end
+            changed = True
+        if cue.get("text") != txt:
+            cue["text"] = txt
+            changed = True
+    if not changed:
+        return "unchanged"
     book.srt_data = json.dumps(cues, ensure_ascii=False)
     invalidate_yt_subtitle_cache(book.id)
     return "updated"
@@ -953,10 +1061,18 @@ def edit_page(bookid, pagenum):
     if form.validate_on_submit():
         form.populate_obj(text)
         db.session.add(text)
-        # For media books the reading text is driven by the subtitle cues;
-        # propagate the edit back into the cues so the player subtitles
-        # reflect the change.
-        status = _sync_media_page_text_to_cues(book, pagenum, original_text, text.text)
+        # For media books the reading text is driven by the subtitle cues.
+        # The page's timing panel (when shown) submits structured cue
+        # edits (text + start/end times) by absolute cue index; without
+        # it, fall back to propagating the plain text edits into the cue
+        # texts so the player subtitles reflect the change.
+        cue_data = _parse_cue_data(request.form.get("cue_data"))
+        if cue_data is not None:
+            status = _apply_media_page_cue_data(book, pagenum, text.text, cue_data)
+        else:
+            status = _sync_media_page_text_to_cues(
+                book, pagenum, original_text, text.text
+            )
         db.session.commit()
         if status == "mismatch":
             flash(
@@ -970,6 +1086,28 @@ def edit_page(bookid, pagenum):
         return redirect(f"/read/{book.id}", 302)
 
     text_dir = "rtl" if book.language.right_to_left else "ltr"
+    # Lyrics timing panel: the page's cues (with absolute indices) and the
+    # book's audio stream, so the panel can offer per-line timing edits.
+    page_cues = []
+    cue_audio_url = None
+    page_lines = (original_text or "").replace("\r", "").split("\n")
+    span = _page_cue_span(book, pagenum, len(page_lines))
+    if span is not None:
+        page_cues = [
+            {
+                "i": i,
+                "start": book.cues[i].get("start", 0),
+                "end": book.cues[i].get("end", 0),
+                "text": book.cues[i].get("text") or "",
+            }
+            for i in span
+        ]
+        cue_audio_url = media_audio_url(book)
     return render_template(
-        "read/page_edit_form.html", hide_top_menu=True, form=form, text_dir=text_dir
+        "read/page_edit_form.html",
+        hide_top_menu=True,
+        form=form,
+        text_dir=text_dir,
+        page_cues=page_cues,
+        cue_audio_url=cue_audio_url,
     )

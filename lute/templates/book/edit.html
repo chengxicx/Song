@@ -102,6 +102,39 @@
   </div>
 </form>
 
+{# Fixed left panel for editing lyric timing + text line by line.
+   Rows are built by book-edit-cues.js from the SRT text in #text;
+   every panel edit rewrites that textarea, so the save flow is unchanged. #}
+<div id="cueEditorPanel" aria-label="Lyrics and timing editor">
+  <div class="cue-panel-head">
+    <span class="cue-panel-title">Lyrics &amp; timing<span id="cuePanelCount"></span></span>
+    <button type="button" id="cuePanelCollapse" title="Hide panel">&laquo;</button>
+  </div>
+
+  <div class="cue-panel-player" id="cuePanelPlayer" style="display: none;">
+    <audio id="cueAudio" preload="metadata" {% if cue_audio_url %}src="{{ cue_audio_url }}"{% endif %}></audio>
+    <div class="cue-player-line">
+      <button type="button" class="cue-play-btn" id="cuePlayBtn" title="Play / pause">&#9654;</button>
+      <span class="cue-time"><span id="cueCurrentTime">00:00.000</span> <span class="cue-time-muted" id="cueDuration"></span></span>
+    </div>
+    <div class="cue-progress" id="cueProgress" title="Click to seek">
+      <div class="cue-progress-fill" id="cueProgressFill"></div>
+      <div class="cue-progress-knob" id="cueProgressKnob"></div>
+    </div>
+    <div class="cue-panel-note">Play the song, then press the clock button on a line to set its start time to the current playback position.</div>
+  </div>
+
+  <div class="cue-panel-warn" id="cuePanelWarn">
+    Cannot parse the SRT text. Fix the format in the text box first &mdash; the panel is paused to protect your edits.
+  </div>
+
+  <div class="cue-panel-rows" id="cuePanelRows"></div>
+
+  <div class="cue-panel-footer">Edits sync instantly to the SRT text &rarr;</div>
+</div>
+
+<button type="button" id="cuePanelTab" title="Show the lyrics timing panel">&#9201;&nbsp;Lyrics &amp; timing</button>
+
 <script type="text/javascript">
   var TAGS = {{ tags | safe }};
 
@@ -138,6 +171,11 @@
       $('#source_uri').closest('tr').find('td').first().text(srcLabel);
       // The text field holds the SRT subtitles for youtube / bilibili / mp3 / video books.
       $('#textRow').find('td').first().text(hasSubtitles ? 'Subtitle text (SRT, editable)' : 'Text');
+      // The lyrics timing side panel is only for subtitle books that
+      // already have cues parsed (window.LUTE_CUE_EDIT.hasCues).
+      if (window.LuteCueEdit) {
+        window.LuteCueEdit.setType(hasSubtitles && window.LUTE_CUE_EDIT && window.LUTE_CUE_EDIT.hasCues);
+      }
     };
     $('#book_type').on('change', setupTypeFields);
     setupTypeFields();
@@ -152,5 +190,13 @@
   }
 
 </script>
+
+<script type="text/javascript">
+  window.LUTE_CUE_EDIT = {
+    hasCues: {{ 'true' if book.srt_data else 'false' }},
+    audioUrl: {{ (cue_audio_url or none) | tojson }}
+  };
+</script>
+<script type="text/javascript" src="{{ vstatic('js/book-edit-cues.js') }}" charset="utf-8"></script>
 
 {% endblock %}
