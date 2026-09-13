@@ -50,7 +50,14 @@ def test_dictionary_popup_closed_on_unload(luteclient):
 
     assert len(context.pages) == initial_page_count + 1, "New page opened"
 
-    luteclient.page.locator('[title="Home"]').first.click()
+    # The fork moved the reading page's navigation behind the hamburger menu
+    # (`#reading_home_link` is commented out in read/index.html), so the old
+    # `[title="Home"]` locator matches nothing.  The menu's logo link is what
+    # leaves the book now -- any full navigation fires the unload handler
+    # under test.
+    luteclient.page.click(".hamburger-btn")
+    luteclient.sleep(0.5)  # let the menu finish sliding in
+    luteclient.page.click("#reading_menu a[href='/']")
     luteclient.sleep(1)  # wait for page transition and unload event
 
     assert len(context.pages) == initial_page_count, "popup closed automatically"
