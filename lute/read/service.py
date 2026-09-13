@@ -8,6 +8,7 @@ from collections import defaultdict
 from datetime import datetime
 import functools
 from flask import current_app
+from sqlalchemy.exc import IntegrityError
 from lute.models.term import Term, Status
 from lute.models.book import Text, WordsRead
 from lute.models.repositories import BookRepository, UserSettingRepository
@@ -550,19 +551,75 @@ class Service:
             repo.add(t)
         repo.commit()
 
+    def save_new_textitem_terms(self, textitems):
+        """
+        Save the unsaved status-0 Terms attached to the given TextItems,
+        recovering from concurrent saves.
+
+        The first open of a new book fires several tokenizing requests
+        at once (the start_reading fragment, the whole-book subtitle
+        words fetch, ...), and each creates its own unsaved Terms for
+        the same words.  The loser of that race fails its commit with a
+        UNIQUE constraint violation on words(WoLgID, WoTextLC).  On
+        rollback, the TextItems are re-pointed at whichever terms
+        actually got persisted, and only the still-missing texts are
+        rebuilt and retried.
+        """
+        # (language id, text_lc) -> TextItems sharing one unsaved term.
+        # A word repeated across a manga page's per-line renders can
+        # carry several distinct Term objects for the same text.
+        pending = {}
+        for ti in textitems:
+            t = ti.term
+            if ti.is_word and t is not None and t.id is None and t.status == 0:
+                pending.setdefault((t.language.id, t.text_lc), []).append(ti)
+        if not pending:
+            return
+
+        # Plain data captured up front: after a rollback the unsaved
+        # Term objects are detached, so the recovery path must not read
+        # anything off them.
+        sources = {
+            key: (tis[0].term.language, tis[0].term.text)
+            for key, tis in pending.items()
+        }
+
+        for _attempt in range(5):
+            for tis in pending.values():
+                self.session.add(tis[0].term)
+            try:
+                self.session.commit()
+            except IntegrityError:
+                self.session.rollback()
+                for key, tis in pending.items():
+                    language, text = sources[key]
+                    existing = (
+                        self.session.query(Term)
+                        .filter(
+                            Term.language_id == key[0],
+                            Term.text_lc == key[1],
+                        )
+                        .first()
+                    )
+                    if existing is not None:
+                        for ti in tis:
+                            ti.term = existing
+                    else:
+                        for ti in tis:
+                            rebuilt = Term.create_term_no_parsing(language, text)
+                            rebuilt.status = 0
+                            ti.term = rebuilt
+                continue
+            for tis in pending.values():
+                for ti in tis:
+                    ti.term = tis[0].term
+            return
+
     def _save_new_status_0_terms(self, paragraphs):
         "Add status 0 terms for new textitems in paragraph."
-        tis_with_new_terms = [
-            ti
-            for para in paragraphs
-            for sentence in para
-            for ti in sentence
-            if ti.is_word and ti.term.id is None and ti.term.status == 0
-        ]
-
-        for ti in tis_with_new_terms:
-            self.session.add(ti.term)
-        self.session.commit()
+        self.save_new_textitem_terms(
+            ti for para in paragraphs for sentence in para for ti in sentence
+        )
 
     def _get_reading_data(self, dbbook, pagenum, track_page_open=False):
         "Get paragraphs, set text.start_date if needed."
@@ -895,30 +952,10 @@ class Service:
     def _save_new_rendered_terms(self, items):
         """
         Add status-0 terms found in the TextItems of an externally
-        rendered page (manga / pdf).
-
-        Each line / word is tokenized with its own get_textitems() call,
-        so a word repeated within a page can produce several distinct,
-        unsaved Term objects for the same text; de-duplicate them by
-        (language, text_lc) before committing to avoid UNIQUE
-        constraint violations on words.WoLgID + words.WoTextLC.
+        rendered page (manga / pdf), de-duplicated by (language,
+        text_lc) and guarded against concurrent saves.
         """
-        seen = set()
-        new_terms = []
-        for ti in items:
-            if (
-                ti.is_word
-                and ti.term is not None
-                and ti.term.id is None
-                and ti.term.status == 0
-            ):
-                key = (ti.term.language.id, ti.term.text_lc)
-                if key not in seen:
-                    seen.add(key)
-                    new_terms.append(ti.term)
-        for t in new_terms:
-            self.session.add(t)
-        self.session.commit()
+        self.save_new_textitem_terms(items)
 
     def _sort_components(self, term, components):
         "Sort components by min position in string and length."

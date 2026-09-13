@@ -195,18 +195,7 @@ def _subtitle_words_html(book):
 
 def _save_new_subtitle_terms(textitems):
     "Save status-0 terms created while tokenizing subtitle text."
-    new_terms = [
-        ti.term
-        for ti in textitems
-        if ti.is_word
-        and ti.term is not None
-        and ti.term.id is None
-        and ti.term.status == 0
-    ]
-    if new_terms:
-        for t in new_terms:
-            db.session.add(t)
-        db.session.commit()
+    Service(db.session).save_new_textitem_terms(textitems)
 
 
 def _cue_indices_matching_term(cues, term_text):
