@@ -1,5 +1,7 @@
 "Theming routes."
 
+import hashlib
+
 from flask import Blueprint, Response, jsonify, request, send_from_directory
 
 from lute.themes.service import Service
@@ -10,11 +12,31 @@ from lute.db import db
 bp = Blueprint("themes", __name__, url_prefix="/theme")
 
 
-def _never_cache(response):
-    "Prevent browsers/CDN heuristically caching this dynamic per-user response."
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
+def _etag_of(content):
+    "Strong etag (raw hex) for the given css content."
+    return hashlib.sha1(content.encode("utf-8")).hexdigest()
+
+
+def _revalidate(content):
+    """
+    Return a 304 when the client's If-None-Match matches, else a 200
+    with the content.  Either way the response is marked no-cache so
+    the browser revalidates on every load: theme changes show up
+    immediately without re-downloading unchanged stylesheets.
+    """
+    etag = _etag_of(content)
+    headers = {
+        "Cache-Control": "no-cache, must-revalidate, max-age=0",
+        "Pragma": "no-cache",
+    }
+    if etag in request.if_none_match:
+        response = Response(status=304)
+    else:
+        response = Response(content, 200)
+        response.content_type = "text/css; charset=utf-8"
+    response.headers["ETag"] = f'"{etag}"'
+    for k, v in headers.items():
+        response.headers[k] = v
     return response
 
 
@@ -22,9 +44,7 @@ def _never_cache(response):
 def current_theme():
     "Return current css."
     service = Service(db.session)
-    response = Response(service.get_current_css(), 200)
-    response.content_type = "text/css; charset=utf-8"
-    return _never_cache(response)
+    return _revalidate(service.get_current_css())
 
 
 @bp.route("/custom_styles", methods=["GET"])
@@ -33,10 +53,7 @@ def custom_styles():
     Return the custom settings for inclusion in the base.html.
     """
     repo = UserSettingRepository(db.session)
-    css = repo.get_value("custom_styles")
-    response = Response(css, 200)
-    response.content_type = "text/css; charset=utf-8"
-    return _never_cache(response)
+    return _revalidate(repo.get_value("custom_styles"))
 
 
 @bp.route("/next", methods=["POST"])
