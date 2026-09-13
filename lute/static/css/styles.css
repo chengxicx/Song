@@ -2793,6 +2793,13 @@ input[type="checkbox"][disabled] + label {
     height: 60%;
 }
 
+/* A percentage height is ignored while the tab row's intrinsic height is
+   being computed, so a large favicon would set the row height instead of
+   shrinking to it.  Cap it in absolute units. */
+.dict-btn-fav-img {
+    max-height: 1.1rem;
+}
+
 .dict-btn-list-img,
 .dict-btn-external-img {
     position: absolute;
