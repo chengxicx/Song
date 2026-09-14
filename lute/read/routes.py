@@ -118,31 +118,19 @@ def _fmt_seconds(secs):
     return f"{m}:{s:02d}"
 
 
-def _subtitle_words_html(book):
-    """
-    Render word-by-word HTML for each subtitle cue, so the scrolling
-    subtitle line can reuse the exact reading-page tokenization and
-    click behavior.
+_SUBTITLE_BOOK_TYPES = ("youtube", "bilibili", "mp3", "netease", "video")
 
-    The book text is the cues joined by newlines, so tokenizing the
-    joined text and splitting on the end-of-paragraph sentinel (¶)
-    yields one chunk per cue.  Returns a list of HTML strings aligned
-    with book.cues.
 
-    Results are cached per book, keyed by (book id, srt_data) so that
-    subtitle changes produce a fresh render (see
-    _yt_subtitle_words_cache).
+def _render_cue_chunks(cues, lang):
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "netease", "video"):
-        return []
-    cache_key = _subtitle_cache_key(book.id, book.srt_data)
-    cached = _yt_subtitle_words_cache.get(cache_key)
-    if cached is not None and _subtitle_cache_is_fresh(cached):
-        return cached["html"]
-    cues = list(book.cues)
-    if not cues:
-        return []
-    lang = book.language
+    Tokenize the given cues and render each cue's word spans.
+
+    The cue texts are joined by newlines, so tokenizing the joined text
+    and splitting on the end-of-paragraph sentinel (¶) yields one chunk
+    per cue.  Returns (rendered, statuses): a list of HTML strings
+    aligned with `cues`, plus the term statuses baked into them (used to
+    detect a stale cache entry, see _subtitle_cache_is_fresh).
+    """
     render_service = RenderService(db.session)
     # Internal newlines in a single cue are replaced with a space so
     # each cue maps to exactly one paragraph (and therefore one chunk).
@@ -178,19 +166,67 @@ def _subtitle_words_html(book):
     # Pad/truncate so the list aligns with the cues.
     while len(rendered) < len(cues):
         rendered.append("")
-    result = rendered[: len(cues)]
-
-    # Record the term statuses that were baked into the rendered HTML so
-    # later requests served by *other* gunicorn workers can detect when
-    # the cache has gone stale (see _subtitle_cache_is_fresh).
     statuses = {
         ti.wo_id: ti.wo_status
         for chunk in chunks
         for ti in chunk
         if ti.wo_id is not None
     }
-    _yt_subtitle_words_cache[cache_key] = {"html": result, "statuses": statuses}
-    return result
+    return rendered[: len(cues)], statuses
+
+
+def _subtitle_words_html(book):
+    """
+    Render word-by-word HTML for each subtitle cue, so the scrolling
+    subtitle line can reuse the exact reading-page tokenization and
+    click behavior.  Returns a list of HTML strings aligned with
+    book.cues.
+
+    Results are cached per book, keyed by (book id, srt_data) so that
+    subtitle changes produce a fresh render (see
+    _yt_subtitle_words_cache).
+    """
+    if (book.book_type or "") not in _SUBTITLE_BOOK_TYPES:
+        return []
+    cache_key = _subtitle_cache_key(book.id, book.srt_data)
+    cached = _yt_subtitle_words_cache.get(cache_key)
+    if cached is not None and _subtitle_cache_is_fresh(cached):
+        return cached["html"]
+    cues = list(book.cues)
+    if not cues:
+        return []
+    rendered, statuses = _render_cue_chunks(cues, book.language)
+    _yt_subtitle_words_cache[cache_key] = {"html": rendered, "statuses": statuses}
+    return rendered
+
+
+def _subtitle_words_window(book, start, end):
+    """
+    Word HTML for cues [start, end] only, as (total, {index: html}).
+
+    Served from the full-book cache when one exists; otherwise just this
+    range is tokenized.  Tokenizing a whole book's subtitles (a long
+    video is tens of thousands of words) takes tens of seconds and holds
+    a request thread the whole time -- far too long to make the first
+    subtitle line wait for, and enough to stall the app on its own.
+    """
+    if (book.book_type or "") not in _SUBTITLE_BOOK_TYPES:
+        return 0, {}
+    cues = list(book.cues)
+    total = len(cues)
+    if total == 0:
+        return 0, {}
+    start = max(0, min(start, total - 1))
+    end = max(start, min(end, total - 1))
+
+    cache_key = _subtitle_cache_key(book.id, book.srt_data)
+    cached = _yt_subtitle_words_cache.get(cache_key)
+    if cached is not None and _subtitle_cache_is_fresh(cached):
+        html = cached["html"]
+        return total, {str(i): html[i] for i in range(start, end + 1)}
+
+    rendered, _statuses = _render_cue_chunks(cues[start : end + 1], book.language)
+    return total, {str(start + i): h for i, h in enumerate(rendered)}
 
 
 def _save_new_subtitle_terms(textitems):
@@ -865,22 +901,14 @@ def youtube_subtitle_words(bookid):
     from_arg = request.args.get("from")
     to_arg = request.args.get("to")
     if book is not None and (from_arg is not None or to_arg is not None):
-        # Windowed fetch: the full-book payload is several MB of HTML, so
-        # the player asks only for the cues around the play position and
-        # fills the rest in as playback moves.  The rendered HTML is
-        # already cached server-side, so this is just a slice.
-        words = _subtitle_words_html(book)
-        total = len(words)
+        # Windowed fetch: the player asks only for the cues around the
+        # play position and fills the rest in as playback moves.  When no
+        # full-book render is cached, only this range is tokenized --
+        # doing the whole book up front can take tens of seconds.
         start = int(from_arg) if (from_arg or "").isdigit() else 0
-        end = int(to_arg) if (to_arg or "").isdigit() else total - 1
-        start = max(0, min(start, max(0, total - 1)))
-        end = max(start - 1, min(end, total - 1))
-        resp = jsonify(
-            {
-                "total": total,
-                "cues": {str(i): words[i] for i in range(start, end + 1)},
-            }
-        )
+        end = int(to_arg) if (to_arg or "").isdigit() else 0
+        total, cues_html = _subtitle_words_window(book, start, end)
+        resp = jsonify({"total": total, "cues": cues_html})
     elif book is not None and (term_text is not None or cue_arg is not None):
         cues = list(book.cues)
         if term_text is not None:
