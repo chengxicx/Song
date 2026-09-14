@@ -55,6 +55,12 @@
   var ytStatusRefreshTimer = null;
   var ytPauseRefreshTimer = null;
   var ytNeedsFullSubtitleRefresh = false;
+  // Subtitle word HTML is fetched in windows around the play position
+  // (see ytEnsureWordsAround): a long book renders to several MB of
+  // word spans, which is far too much to fetch and parse up front.
+  var WORDS_WINDOW = 40;
+  var WORDS_TOTAL = 0;
+  var WORDS_REQUESTED = [];
 
   var ytContainer = document.getElementById("yt-player-container");
   var ytVideoWrap = document.querySelector(".yt-player-video-wrap");
@@ -296,18 +302,22 @@
     if (event.data === PS.PAUSED) {
       ytSavePosition();
       // If subtitle colors may be out of sync across cues (bulk status
-      // update or cache invalidation — see ytApplySubtitlePatch), pull
-      // a full refresh once the media is paused: the refetch is large
-      // and the server rebuild can be slow, so keep it off the path
-      // that competes with the audio stream.  Skipped when playback
-      // resumed within the delay.
+      // update or cache invalidation — see ytApplySubtitlePatch),
+      // re-fetch the current window once the media is paused: the
+      // server rebuild can be slow, so keep it off the path that
+      // competes with the audio stream.  Skipped when playback resumed
+      // within the delay.
       if (ytNeedsFullSubtitleRefresh) {
         if (ytPauseRefreshTimer) clearTimeout(ytPauseRefreshTimer);
         ytPauseRefreshTimer = setTimeout(function () {
           ytPauseRefreshTimer = null;
           if (!ytPlaying && ytNeedsFullSubtitleRefresh) {
             ytNeedsFullSubtitleRefresh = false;
-            ytLoadSubtitleWords(true);
+            // Drop the remembered ranges so the window is really
+            // re-fetched rather than served from what we already have.
+            WORDS_REQUESTED.length = 0;
+            for (var i = 0; i < WORDS.length; i++) WORDS[i] = null;
+            ytEnsureWordsAround(ytCueIndex >= 0 ? ytCueIndex : 0);
           }
         }, 2000);
       }
@@ -424,6 +434,9 @@
   }
 
   function ytActivateCue(idx) {
+    // Make sure the words for this cue (and its neighbours) are on
+    // their way; until they land the plain-text fallback below shows.
+    ytEnsureWordsAround(idx);
     // Single-line scrolling subtitle, reusing the reading-page word spans.
     // If the word HTML hasn't been loaded yet (WORDS is empty), fall
     // back to the plain cue text so the user sees something immediately.
@@ -979,9 +992,76 @@
     return d.innerHTML;
   }
 
-  // Fetch the tokenized word HTML for all cues.  This is deferred so
-  // the expensive tokenization doesn't block the initial page
-  // render.  While loading, the subtitle shows plain cue text.
+  // Fetch the tokenized word HTML for a window of cues around `idx`.
+  // The full-book payload is several MB, so loading all of it up front
+  // costs a multi-megabyte JSON parse plus the memory to hold it --
+  // very noticeable on a slow device.  Instead each cue's words arrive
+  // shortly before they're needed; until then the subtitle falls back to
+  // plain cue text (see ytActivateCue).
+  function ytEnsureWordsAround(idx) {
+    if (!BOOK_ID || idx < 0) return;
+    var half = Math.floor(WORDS_WINDOW / 2);
+    var from = Math.max(0, idx - half);
+    var to = idx + half;
+    if (WORDS_TOTAL > 0) to = Math.min(to, WORDS_TOTAL - 1);
+    if (ytWordsRangeRequested(from, to)) return;
+
+    // Record the range before the request so a burst of cue changes
+    // (e.g. seeking) doesn't fire one request per cue.
+    WORDS_REQUESTED.push([from, to]);
+    $.ajax({
+      url: "/read/youtube_subtitle_words/" + BOOK_ID,
+      method: "GET",
+      data: { from: from, to: to },
+      dataType: "json",
+    })
+      .done(function (data) {
+        if (!data || !data.cues) return;
+        ytApplyWordsWindow(data);
+      })
+      .fail(function () {
+        // Let a later cue change retry this window.
+        for (var i = WORDS_REQUESTED.length - 1; i >= 0; i--) {
+          if (WORDS_REQUESTED[i][0] === from && WORDS_REQUESTED[i][1] === to) {
+            WORDS_REQUESTED.splice(i, 1);
+            break;
+          }
+        }
+      });
+  }
+
+  function ytWordsRangeRequested(from, to) {
+    for (var i = 0; i < WORDS_REQUESTED.length; i++) {
+      var r = WORDS_REQUESTED[i];
+      if (r[0] <= from && r[1] >= to) return true;
+    }
+    return false;
+  }
+
+  // Store a {total, cues} window response, then refresh the visible
+  // subtitle if the cue it is showing just got its word spans.
+  function ytApplyWordsWindow(data) {
+    var total = data.total || 0;
+    if (total > 0) {
+      WORDS_TOTAL = total;
+      while (WORDS.length < total) WORDS.push(null);
+    }
+    var hadCurrent = ytCueIndex >= 0 && !!WORDS[ytCueIndex];
+    for (var k in data.cues) {
+      if (!Object.prototype.hasOwnProperty.call(data.cues, k)) continue;
+      var i = Number(k);
+      if (!isFinite(i) || i < 0 || i >= WORDS.length) continue;
+      WORDS[i] = data.cues[k];
+    }
+    if (ytCueIndex >= 0 && !hadCurrent && WORDS[ytCueIndex])
+      ytActivateCue(ytCueIndex);
+  }
+
+  // Fetch the tokenized word HTML for all cues.  Only used as a
+  // fallback (e.g. a failed incremental refresh); the normal path is the
+  // per-window fetch in ytEnsureWordsAround.  This is deferred so the
+  // expensive tokenization doesn't block the initial page render.  While
+  // loading, the subtitle shows plain cue text.
   //
   // The `reactivate` argument: when true (the default), re-inject the
   // current cue's word spans after the data arrives (needed on the
@@ -1018,7 +1098,9 @@
     for (var k in cues) {
       if (!Object.prototype.hasOwnProperty.call(cues, k)) continue;
       var i = Number(k);
-      if (!isFinite(i) || i < 0 || i >= WORDS.length) continue;
+      // With windowed loading WORDS may not have been sized yet, so a
+      // patch for a far-away cue simply grows the sparse array.
+      if (!isFinite(i) || i < 0) continue;
       WORDS[i] = cues[k];
       if (i === ytCueIndex) touchedCurrent = true;
     }
@@ -1105,7 +1187,18 @@
     bindControls();
     bindSubtitleInteractions();
     bindKeys();
-    ytLoadSubtitleWords();
+    // Only the words around the saved playback position: a full fetch
+    // would pull several MB of HTML before the first line is readable.
+    var startIdx = 0;
+    if (START_POS > 0) {
+      for (var w = CUES.length - 1; w >= 0; w--) {
+        if ((CUES[w].start || 0) <= START_POS) {
+          startIdx = w;
+          break;
+        }
+      }
+    }
+    ytEnsureWordsAround(startIdx);
 
     // Create the player immediately for the media backends (the
     // <audio>/<video> element is already in the DOM); for YouTube, wait

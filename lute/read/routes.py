@@ -846,7 +846,13 @@ def youtube_subtitle_words(bookid):
     With ``?term=<text>`` (or ``?cue=<index>``) only the affected cues
     are re-rendered and the cached entry is patched in place; the
     response is then {"cues": {cue_index: html}, "patched": bool}
-    instead of a full list.  This keeps term saves cheap: no full-book
+    instead of a full list.
+
+    With ``?from=<i>&to=<j>`` only that inclusive cue range is returned,
+    as {"total": n, "cues": {index: html}}: the full-book payload is
+    several MB of HTML, which is far too much to parse up front on a
+    slow device, so the player fetches a window around the play position
+    and fills the rest in as playback moves.  This keeps term saves cheap: no full-book
     re-tokenization and no multi-megabyte payload while the audio is
     playing.  ``patched`` is false when no cached entry existed, telling
     the player its WORDS copy may be wholly out of sync (e.g. after the
@@ -856,7 +862,26 @@ def youtube_subtitle_words(bookid):
     book = _find_book(bookid)
     term_text = request.args.get("term")
     cue_arg = request.args.get("cue")
-    if book is not None and (term_text is not None or cue_arg is not None):
+    from_arg = request.args.get("from")
+    to_arg = request.args.get("to")
+    if book is not None and (from_arg is not None or to_arg is not None):
+        # Windowed fetch: the full-book payload is several MB of HTML, so
+        # the player asks only for the cues around the play position and
+        # fills the rest in as playback moves.  The rendered HTML is
+        # already cached server-side, so this is just a slice.
+        words = _subtitle_words_html(book)
+        total = len(words)
+        start = int(from_arg) if (from_arg or "").isdigit() else 0
+        end = int(to_arg) if (to_arg or "").isdigit() else total - 1
+        start = max(0, min(start, max(0, total - 1)))
+        end = max(start - 1, min(end, total - 1))
+        resp = jsonify(
+            {
+                "total": total,
+                "cues": {str(i): words[i] for i in range(start, end + 1)},
+            }
+        )
+    elif book is not None and (term_text is not None or cue_arg is not None):
         cues = list(book.cues)
         if term_text is not None:
             indices = _cue_indices_matching_term(cues, term_text)
