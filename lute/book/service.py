@@ -721,7 +721,13 @@ class Service:
 
         # Build a lookup: basename -> list of (rel_path_from_target_dir)
         # for every regular file extracted under target_dir.
+        #
+        # A parallel index keyed by the extension-less stem lets us still
+        # find an image whose format changed after the .mokuro file was
+        # written -- e.g. a jpg -> webp conversion renames the files but
+        # leaves img_path as "001.jpg" (issue: manga book with blank page).
         basename_index = {}
+        stem_index = {}
         for root, _dirs, files in os.walk(target_dir):
             for f in files:
                 abs_f = os.path.join(root, f)
@@ -729,7 +735,9 @@ class Service:
                     rel_f = os.path.relpath(abs_f, target_dir).replace("\\", "/")
                 except ValueError:
                     continue
-                basename_index.setdefault(os.path.basename(f).lower(), []).append(rel_f)
+                base = os.path.basename(f).lower()
+                basename_index.setdefault(base, []).append(rel_f)
+                stem_index.setdefault(os.path.splitext(base)[0], []).append(rel_f)
 
         volume = (mokuro.get("volume") or "").strip().replace("\\", "/")
 
@@ -758,8 +766,13 @@ class Service:
                 except ValueError:
                     pass
             # 4) Just the basename in any subdirectory (fallback scan).
+            #    When nothing carries that exact name, retry ignoring the
+            #    extension so images converted to another format still
+            #    resolve (img_path "001.jpg" -> extracted "001.webp").
             base = os.path.basename(raw)
             matches = basename_index.get(base.lower()) or []
+            if not matches:
+                matches = stem_index.get(os.path.splitext(base)[0].lower()) or []
             # Prefer matches whose path contains the volume name if any.
             if volume:
                 sorted_matches = sorted(
