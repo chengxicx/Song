@@ -9,6 +9,7 @@ import base64
 import io
 import json
 import os
+import shutil
 import zipfile
 
 from lute.db import db
@@ -187,6 +188,100 @@ def test_extract_manga_volume_subdir_layout(app_context):
     # img_path rewritten to include the volume subdirectory.
     assert parsed["pages"][0]["img_path"] == f"{volume}/001.jpg"
     assert parsed["pages"][1]["img_path"] == f"{volume}/002.jpg"
+
+
+def test_extract_manga_image_extension_changed(app_context):
+    """
+    A jpg -> webp conversion renames the image files but leaves the
+    .mokuro img_path values as "001.jpg".  The extractor must still
+    resolve them and rewrite img_path to the file that actually
+    exists, otherwise the reading screen requests a .jpg that 404s and
+    the page renders blank.
+    """
+    from flask import current_app
+
+    volume = "textbook_vol"
+    page = {
+        "version": "0.2.1",
+        "img_width": 1365,
+        "img_height": 2048,
+        "blocks": [],
+    }
+    mokuro = {
+        "version": "0.2.1",
+        "title": "Converted",
+        "volume": volume,
+        "pages": [
+            dict(page, img_path="001.jpg"),
+            dict(page, img_path="002.jpg"),
+        ],
+    }
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(f"{volume}.mokuro", json.dumps(mokuro, ensure_ascii=False))
+        for n in ("001", "002"):
+            zf.writestr(f"{volume}/{n}.webp", PNG_1PX)
+    buf.seek(0)
+
+    manga_path, parsed = BookService().extract_manga("book.cbz", buf)
+    target = os.path.join(current_app.static_folder, manga_path)
+
+    assert os.path.exists(os.path.join(target, volume, "001.webp"))
+    assert parsed["pages"][0]["img_path"] == f"{volume}/001.webp"
+    assert parsed["pages"][1]["img_path"] == f"{volume}/002.webp"
+
+
+def test_read_page_resolves_image_after_extension_change(app_context, japanese):
+    """
+    Books imported before the fix keep the stale "001.jpg" img_path in
+    the DB, so the reading screen must resolve it against the real
+    files on disk (001.webp) at render time -- no re-import required.
+    """
+    from flask import current_app
+
+    from lute.book.model import Book
+    from lute.read.service import Service as ReadService
+
+    manga_path = "manga/test-ext-change"
+    target = os.path.join(current_app.static_folder, manga_path)
+    os.makedirs(target, exist_ok=True)
+    with open(os.path.join(target, "001.webp"), "wb") as f:
+        f.write(PNG_1PX)
+
+    pages = [
+        {
+            "version": "0.2.1",
+            "img_path": "001.jpg",  # stale: the extracted file is 001.webp
+            "img_width": 10,
+            "img_height": 10,
+            "blocks": [
+                {
+                    "box": [1, 1, 5, 5],
+                    "vertical": False,
+                    "font_size": 5,
+                    "lines": ["テスト"],
+                }
+            ],
+        }
+    ]
+
+    book = Book()
+    book.language_id = japanese.id
+    book.title = "Extension changed"
+    book.book_type = "manga"
+    book.manga_path = manga_path
+    book.manga_data = json.dumps(
+        {"version": "0.2.1", "pages": pages}, ensure_ascii=False
+    )
+    dbbook = BookService().import_book(book, db.session)
+
+    try:
+        ctx = ReadService(db.session).manga_page_context(
+            dbbook, 1, track_page_open=False
+        )
+        assert ctx["img_url"] == f"/static/{manga_path}/001.webp"
+    finally:
+        shutil.rmtree(target, ignore_errors=True)
 
 
 def test_extract_manga_rejects_bad_extension(app_context):
