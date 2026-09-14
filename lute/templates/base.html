@@ -51,10 +51,22 @@
     
   {# vstatic() = url_for('static', ...) + ?v=<content hash>, so these
      immutable-cached assets are re-fetched exactly when they change. #}
+
+  {# The reading page loads a trimmed asset set: it needs none of
+     DataTables / Tagify / jeditable.  DataTables is listing-page only;
+     the term form runs inside its own iframe document
+     (read/term_form_base.html) which loads its own Tagify + jeditable.
+     Skipping them removes ~80 KB and 5 requests from the reading page,
+     which matters because every request costs a full round trip.
+     jQuery UI is NOT skipped: lute.js calls $.fn.tooltip() for the term
+     popup on the reading page. #}
+  {% set _reading_page = (request.endpoint or '').startswith('read.') %}
   <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/jquery/jquery-ui.css') }}" />
+  {% if not _reading_page %}
   <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/tagify/tagify.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/tagify/tagify_overrides.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/datatables/datatables.min.css') }}" />
+  {% endif %}
   <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ vstatic('css/player-styles.css') }}" />
 
@@ -73,11 +85,13 @@
   <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery-ui.min.js') }}"  charset="utf-8"></script>
+  {% if not _reading_page %}
   <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.jeditable.mini.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.min.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.polyfills.min.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ vstatic('vendor/datatables/datatables.min.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ vstatic('vendor/datatables/datatables.button.download.js') }}" charset="utf-8"></script>
+  {% endif %}
   <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.hoverIntent.js') }}" charset="utf-8"></script>
 
   <!-- HTMX + Alpine.js: progressive enhancement for partial-page interactions
