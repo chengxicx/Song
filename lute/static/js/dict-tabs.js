@@ -21,6 +21,24 @@ const LOCAL_DICT_FAVICONS = [
 ];
 
 
+// Dictionary tab icons are tiny (1-10 KB) but each is its own request,
+// and on a high-latency link the ~7 of them add a noticeable slice to
+// the initial render.  Setting src only after the page has loaded keeps
+// them out of the document's load event, so the reading page shows up
+// sooner; they still appear (just a moment later).
+function _deferDictIcon(img) {
+  const src = img.getAttribute("data-src");
+  if (!src) return;
+  const set = () => {
+    img.removeAttribute("data-src");
+    img.src = src;
+  };
+  if (typeof window.requestIdleCallback === "function")
+    window.requestIdleCallback(set, { timeout: 2000 });
+  else window.setTimeout(set, 0);
+}
+
+
 /**
  * A general lookup button, for images, sentences, etc.
  */
@@ -213,8 +231,10 @@ class DictButton extends LookupButton {
     this.btn.textContent = this.label;
 
     // Must prepend after the textContent is set, or it is overwritten/lost.
-    if (fimg != null)
+    if (fimg != null) {
       this.btn.prepend(fimg);
+      _deferDictIcon(fimg);
+    }
 
     this.btn.setAttribute("title", this.label);
 
