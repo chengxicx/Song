@@ -494,6 +494,43 @@ def test_subtitle_words_gzip_response(app, app_context, english):
     assert plain.get_json()[0] != ""
 
 
+def test_window_params_return_only_the_requested_cues(app, app_context, english):
+    "GET ?from=&to= returns that range plus the total cue count."
+    from lute.read.routes import _subtitle_words_html
+
+    dbbook = _make_three_cue_book(english, "YT_WINDOW")
+    _subtitle_words_html(dbbook)
+
+    client = app.test_client()
+    resp = client.get(
+        f"/read/youtube_subtitle_words/{dbbook.id}",
+        query_string={"from": 1, "to": 2},
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] == 3
+    assert sorted(data["cues"].keys()) == ["1", "2"]
+    assert "Goodbye" in data["cues"]["2"]
+
+
+def test_window_params_are_clamped_to_the_book(app, app_context, english):
+    "A window past the last cue is clamped, not an error."
+    from lute.read.routes import _subtitle_words_html
+
+    dbbook = _make_three_cue_book(english, "YT_WINDOW_CLAMP")
+    _subtitle_words_html(dbbook)
+
+    client = app.test_client()
+    resp = client.get(
+        f"/read/youtube_subtitle_words/{dbbook.id}",
+        query_string={"from": 0, "to": 99},
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] == 3
+    assert sorted(data["cues"].keys()) == ["0", "1", "2"]
+
+
 def test_read_page_passes_youtube_data(app, app_context, english, client):
     "Reading a youtube book renders the player with cues and words."
     dbbook = _make_youtube_book(app, app_context, english)
