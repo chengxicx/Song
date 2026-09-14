@@ -531,6 +531,39 @@ def test_window_params_are_clamped_to_the_book(app, app_context, english):
     assert sorted(data["cues"].keys()) == ["0", "1", "2"]
 
 
+def test_window_does_not_tokenize_the_whole_book_when_uncached(
+    app, app_context, english
+):
+    "With no cached render, only the requested cues are tokenized."
+    from lute.read.routes import (
+        _subtitle_words_html,
+        _yt_subtitle_words_cache,
+        invalidate_yt_subtitle_cache,
+    )
+
+    dbbook = _make_three_cue_book(english, "YT_WINDOW_COLD")
+    invalidate_yt_subtitle_cache()
+    _yt_subtitle_words_cache.clear()
+
+    client = app.test_client()
+    resp = client.get(
+        f"/read/youtube_subtitle_words/{dbbook.id}",
+        query_string={"from": 1, "to": 2},
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] == 3
+    assert sorted(data["cues"].keys()) == ["1", "2"]
+
+    # A long book is expensive to tokenize, so a windowed request must
+    # not trigger the full-book render as a side effect.
+    keys = [k for k in _yt_subtitle_words_cache if k[1] == dbbook.id]
+    assert keys == [], "window request must not build the full-book cache"
+
+    _subtitle_words_html(dbbook)  # still available, renders on demand
+    assert len(_subtitle_words_html(dbbook)) == 3
+
+
 def test_read_page_passes_youtube_data(app, app_context, english, client):
     "Reading a youtube book renders the player with cues and words."
     dbbook = _make_youtube_book(app, app_context, english)
