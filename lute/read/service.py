@@ -755,12 +755,22 @@ class Service:
                         )
                     # Fallback: walk the manga directory and match by
                     # basename, preferring paths that mention volume.
+                    # If no file carries that exact name, retry ignoring
+                    # the extension -- a jpg -> webp conversion renames
+                    # the files without updating the stored img_path, so
+                    # already-imported books need this too.
                     base = os.path.basename(raw_img_path).lower()
-                    matches = []
+                    stem = os.path.splitext(base)[0]
+                    exact_matches = []
+                    stem_matches = []
                     for root, _dirs, files in os.walk(manga_abs):
                         for f in files:
-                            if os.path.basename(f).lower() == base:
-                                matches.append(os.path.join(root, f))
+                            fname = os.path.basename(f).lower()
+                            if fname == base:
+                                exact_matches.append(os.path.join(root, f))
+                            elif os.path.splitext(fname)[0] == stem:
+                                stem_matches.append(os.path.join(root, f))
+                    matches = exact_matches or stem_matches
                     if matches:
 
                         def _match_key(p):
