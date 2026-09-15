@@ -60,6 +60,16 @@
             <input type="checkbox" id="yt-audio-mode-cb">
             <span>Audio only</span>
           </label>
+          {# Video quality.  The stream is relayed through a narrow egress, so
+             the cheapest Bilibili rendition is what plays unless a higher one
+             is chosen here.  The options are filled in from the manifest once
+             dash.js has parsed it, and the row stays hidden when there is only
+             one rendition to play (or in embed mode, where Bilibili's own
+             player owns quality). #}
+          <div class="yt-settings-option yt-quality-option" id="yt-quality-row" hidden>
+            <select id="yt-quality-select" title="Video quality. Lower uses less of the relay."></select>
+            <span>Quality</span>
+          </div>
         </div>
       </div>
       <div id="yt-playback-rate-container" title="Playback rate. Click the number to reset">
