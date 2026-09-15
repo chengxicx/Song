@@ -81,6 +81,7 @@
 | 8 | **触摸点击反馈** | ❌ 无（`tap-pressed` / `tap-ack` / haptics 在 `tests/` 无引用） | 全无 | `localStorage.screen_interactions_type='mobile'` + reload，再测四态与震动开关 |
 | 9 | **主题系统** | ⚠️ 仅单元级（`unit/themes/test_service.py` 测 CSS 拼接） | 渲染层无覆盖 | 切主题看 `#status` 选中态对勾是否可见（亮色主题易隐形） |
 | 10 | **备份/恢复迁移** | ✅ `unit/backup/test_restore_migration.py` | 上游 `.db.gz` 恢复后 Song 专属迁移 | 恢复后重启，确认 `LgKiwi*` 四列存在 |
+| 11 | **Bilibili 播放**（DASH 中继 + 官方播放器降级） | ⚠️ `unit/book/test_bilibili.py`（30 项：URL 解析、上游失败→502 JSON、代理透传） | 真实网络的取流与播放；降级路径无自动化 | 服务器出口 IP 被 B 站风控（`-412 request was banned`）时中继**永久不可用**，与代码无关。确认 `LUTE_BILIBILI_PROXY` 已配且隧道在线 → 出画面且**字幕跟随正常**；把隧道断开再刷新 → 应自动降级到官方播放器（能看视频，字幕不跟随、传输控件置灰） |
 
 ---
 
@@ -126,3 +127,5 @@ export PATH="$PWD/venv/bin:$PATH"
 | 72 个用例 setup 阶段 `PermissionError`，报文含 `pytest-of-` | 沙箱 `mkdir` shim 在目录已存在时仍抛错 | 跑前 `rm -rf "$TMPDIR"pytest-of-*` |
 | 大面积 `readonly database` / `no such table` / `disk I/O error` | 两个 pytest 并发，互相删建同一个 test db | 只跑一个；`pgrep -fl pytest` 清残留 |
 | 所有浏览器测试都访问不到 5001 | `tasks.py` 里子进程用裸 `python` | 把 `venv/bin` 放到 PATH 最前 |
+| Bilibili 书黑屏、接口返回 **HTTP 500** 而非 JSON | 服务器在海外（洛杉矶），B 站 API 按 IP 风控返 `-412`，而路由曾只捕 `ValueError` 兜不住 `HTTPError` | 已修（返回 502 JSON）。长期靠配置出口：`LUTE_BILIBILI_PROXY`，见 `lute/utils/outbound_proxy.py` 与 `utils/bili_egress_proxy.py` |
+| 配了代理仍黑屏 | 隧道断了（本机休眠 / SSH 断开 / 代理进程被回收） | 重启 `utils/bili_egress_proxy.py` 与 `ssh -N -R …`；页面会降级到官方播放器，可据此判断 |
