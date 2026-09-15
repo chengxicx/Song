@@ -23,6 +23,8 @@ expiry (deadline) and we don't want to hit the API on every segment.
 import time
 import requests
 
+from lute.utils.outbound_proxy import bilibili_proxies
+
 # Sentinel for the availability of the bilibili page / stream.
 _UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -35,18 +37,73 @@ _stream_cache = {}
 _STREAM_TTL = 30 * 60  # playurl URLs last ~2h; refresh well before that.
 
 
+class BilibiliStreamError(Exception):
+    """A Bilibili stream could not be obtained or relayed.
+
+    This covers two very different situations, both of which used to
+    escape as an unhandled ``requests`` exception (and therefore as a
+    500 error page, which the DASH player cannot parse):
+
+      * the video genuinely has no usable stream (deleted, region-locked,
+        page number out of range), and
+      * Bilibili's risk control refused the request outright.  It answers
+        HTTP 412 / ``{"code": -412, "message": "request was banned"}``
+        for IP ranges it distrusts, notably datacenter and overseas
+        addresses, no matter which headers or cookies are sent.  A server
+        on such an address can never proxy the stream -- see the
+        ``_risk_control_hint`` below.
+    """
+
+
+def _risk_control_hint(err):
+    "Extra guidance for the status codes Bilibili uses to ban a client."
+    code = getattr(getattr(err, "response", None), "status_code", None)
+    if code in (403, 412, 429):
+        return (
+            " -- Bilibili is refusing this server's IP (risk control). "
+            "It cannot be worked around with headers or cookies; the host "
+            "needs an egress IP that Bilibili accepts, or the video has to "
+            "be played with the official embed instead."
+        )
+    return ""
+
+
+def _api_get_json(url, what):
+    """GET a Bilibili JSON API and return its ``data``, or raise.
+
+    Every failure is funnelled into BilibiliStreamError so callers never
+    have to guess at the exception type.
+    """
+    try:
+        r = requests.get(
+            url, timeout=10, headers=_api_headers(), proxies=bilibili_proxies()
+        )
+        r.raise_for_status()
+        data = r.json()
+    except requests.exceptions.HTTPError as e:
+        raise BilibiliStreamError(
+            f"{what} request failed: {e}{_risk_control_hint(e)}"
+        ) from e
+    except requests.exceptions.RequestException as e:
+        raise BilibiliStreamError(f"{what} request failed: {e}") from e
+    except ValueError as e:
+        # A non-JSON body (Bilibili serves an HTML risk-control page for
+        # some blocked requests) reaches here via r.json().
+        raise BilibiliStreamError(f"{what} returned a non-JSON response") from e
+    if data.get("code") != 0:
+        raise BilibiliStreamError(
+            data.get("message") or f"{what} error (code {data.get('code')})"
+        )
+    return data["data"]
+
+
 def _api_headers():
     return {"User-Agent": _UA, "Referer": _REFERER}
 
 
 def _fetch_view(bvid):
     url = f"https://api.bilibili.com/x/web-interface/view?bvid={bvid}"
-    r = requests.get(url, timeout=10, headers=_api_headers())
-    r.raise_for_status()
-    data = r.json()
-    if data.get("code") != 0:
-        raise ValueError(data.get("message") or "Bilibili view API error")
-    return data["data"]
+    return _api_get_json(url, "Bilibili view API")
 
 
 def _fetch_playurl(bvid, cid):
@@ -54,12 +111,7 @@ def _fetch_playurl(bvid, cid):
         "https://api.bilibili.com/x/player/playurl"
         f"?bvid={bvid}&cid={cid}&fnval=16&fourk=1&qn=64&platform=pc&high_quality=1"
     )
-    r = requests.get(url, timeout=10, headers=_api_headers())
-    r.raise_for_status()
-    data = r.json()
-    if data.get("code") != 0:
-        raise ValueError(data.get("message") or "Bilibili playurl API error")
-    return data["data"]
+    return _api_get_json(url, "Bilibili playurl API")
 
 
 def _pick(streams):
@@ -90,7 +142,7 @@ def stream_info(bvid, page=1):
     view = _fetch_view(bvid)
     pages = view.get("pages") or []
     if not pages or page < 1 or page > len(pages):
-        raise ValueError("Video page not found")
+        raise BilibiliStreamError("Video page not found")
     cid = pages[page - 1]["cid"]
     # The view API's top-level "duration" sums all pages of a multi-part
     # video (the whole collection).  Use the selected page's own
@@ -102,7 +154,7 @@ def stream_info(bvid, page=1):
     video = _pick(dash.get("video"))
     audio = _pick(dash.get("audio"))
     if not video or not audio:
-        raise ValueError("No playable stream for this video")
+        raise BilibiliStreamError("No playable stream for this video")
 
     def _seg(s):
         sb = s.get("SegmentBase") or s.get("segment_base") or {}
@@ -196,12 +248,18 @@ def proxy_stream(base_url, range_header):
     headers = _api_headers()
     if range_header:
         headers["Range"] = range_header
-    r = requests.get(
-        base_url,
-        headers=headers,
-        stream=True,
-        timeout=30,
-    )
+    try:
+        r = requests.get(
+            base_url,
+            headers=headers,
+            stream=True,
+            timeout=30,
+            proxies=bilibili_proxies(),
+        )
+    except requests.exceptions.RequestException as e:
+        # A CDN segment host -- often an obfuscated PCDN node that only
+        # serves mainland clients -- can be unreachable from the server.
+        raise BilibiliStreamError(f"CDN segment request failed: {e}") from e
     resp_headers = {
         "Content-Type": r.headers.get("Content-Type", "application/octet-stream"),
         "Accept-Ranges": r.headers.get("Accept-Ranges", "bytes"),

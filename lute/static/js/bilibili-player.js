@@ -18,12 +18,22 @@
 
    Data (bilibiliUrl, cues, words, ...) is injected by
    templates/read/bilibili_player.html via window.LUTE_YT_DATA.
+
+   Backend note: the video is NOT an embedded iframe.  It is an HTML5
+   <video> driven by dash.js from a DASH manifest our own server builds
+   (lute/read/bilibili_stream.py), so playback stays under our control
+   and subtitle sync works.  An earlier version of this comment claimed
+   the iframe player was driven over postMessage; that is not possible --
+   the modern player exposes no postMessage API, which is exactly why the
+   DASH relay exists.  The iframe is only used as a last-resort fallback
+   (see ytUseEmbedPlayer) and loses subtitle sync when it is.
 */
 
 (function () {
   "use strict";
 
-  // Bilibili iframe player states (mirrors the message types we handle).
+  // Player states, named as in the YouTube IFrame API because the shared
+  // player logic below is written against that set.
   var PS = {
     UNSTARTED: -1,
     ENDED: 0,
@@ -223,7 +233,10 @@
     var videoEl = document.getElementById("bili-player");
     if (!videoEl) return;
     if (!MPD_URL) {
-      if (ytLoading) {
+      // No stream endpoint (unparseable URL, or the server could not
+      // build the manifest): go straight to the embed player.
+      ytUseEmbedPlayer();
+      if (!ytEmbedMode && ytLoading) {
         ytLoading.textContent =
           "Unable to load the Bilibili player: no video stream available.";
       }
@@ -239,7 +252,7 @@
 
   function ytOnReady() {
     ytPlayerReady = true;
-    if (ytLoading) ytLoading.style.display = "none";
+    if (ytLoading && !ytEmbedMode) ytLoading.style.display = "none";
     if (START_POS > 0) {
       try { ytPlayer.seekTo(START_POS, true); } catch (e) { /* ignore */ }
     }
@@ -255,7 +268,7 @@
   // timeline isn't mistaken for a crash.
   var ytBufferingVisible = false;
   function ytShowBuffering(show) {
-    if (!ytLoading || !ytPlayerReady) return;
+    if (!ytLoading || !ytPlayerReady || ytEmbedMode) return;
     if (show) {
       if (!ytBufferingVisible) {
         ytBufferingVisible = true;
@@ -284,8 +297,74 @@
     }
   }
 
-  function ytOnError() {
+  /* ------------------------------------------------------------------ */
+  /* Embed fallback                                                      */
+  /* ------------------------------------------------------------------ */
+
+  // When our own stream relay cannot be used, fall back to Bilibili's
+  // official embed player.  The manifest endpoint fails whenever the
+  // server cannot reach Bilibili at all -- Bilibili's API answers HTTP
+  // 412 ("request was banned") to datacenter and overseas addresses and
+  // no header or cookie changes that, so on such a host the relay is
+  // permanently unavailable unless an accepted egress is configured
+  // (LUTE_BILIBILI_PROXY, see lute/utils/outbound_proxy.py).
+  //
+  // The embed player still works there because the *browser* loads it,
+  // from an IP Bilibili accepts.  The trade-off is subtitle sync: the
+  // modern player exposes no postMessage API, so the parent page can
+  // neither read currentTime nor seek it (verified against
+  // player.bilibili.com and its core bundle -- the only "message"
+  // listeners there belong to jQuery's setImmediate polyfill and to
+  // EME/DRM).  The transcript therefore stays readable but no longer
+  // follows playback, and the transport controls become inert.
+  var ytEmbedMode = false;
+
+  function ytDisableTransport(off) {
+    var ids = [
+      "yt-play-btn", "yt-prev-cue-btn", "yt-next-cue-btn",
+      "yt-rate-dec", "yt-rate-inc", "yt-loop-btn", "yt-autopause-btn",
+    ];
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (el) el.disabled = !!off;
+    }
+    if (ytTimeline) ytTimeline.disabled = !!off;
+  }
+
+  function ytUseEmbedPlayer() {
+    if (ytEmbedMode || !BILI_URL || !ytVideoWrap) return;
+    ytEmbedMode = true;
+
+    var frame = document.createElement("iframe");
+    frame.className = "bili-player-frame bili-embed-frame";
+    frame.src = BILI_URL;
+    frame.setAttribute("allowfullscreen", "true");
+    frame.setAttribute("scrolling", "no");
+    frame.setAttribute("frameborder", "0");
+
+    var videoEl = document.getElementById("bili-player");
+    if (videoEl) {
+      videoEl.style.display = "none";
+      ytVideoWrap.insertBefore(frame, videoEl);
+    } else {
+      ytVideoWrap.appendChild(frame);
+    }
+
+    if (ytContainer) ytContainer.classList.add("bili-embed-active");
+    ytDisableTransport(true);
+
     if (ytLoading) {
+      ytLoading.textContent =
+        "Song cannot relay this video, so it is playing in Bilibili's embed " +
+        "player. Subtitle sync (auto-scroll, loop, auto-pause) is not " +
+        "available in this mode; the transcript below still works.";
+      ytLoading.style.display = "block";
+    }
+  }
+
+  function ytOnError() {
+    ytUseEmbedPlayer();
+    if (ytLoading && !ytEmbedMode) {
       ytLoading.textContent =
         "Unable to play this video. The transcript below is still available.";
       ytLoading.style.display = "block";
@@ -297,6 +376,7 @@
   /* ------------------------------------------------------------------ */
 
   function ytPoll() {
+    if (ytEmbedMode) return;
     if (!ytPlayerReady || !ytPlayer) return;
     var t = ytPlayer.getCurrentTime() || 0;
     var dur = ytPlayer.getDuration() || 0;
