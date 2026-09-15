@@ -815,8 +815,11 @@ def bilibili_mpd(bvid):
     page = request.args.get("page", 1, type=int)
     try:
         info = bilibili_stream.stream_info(bvid, page)
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+    except bilibili_stream.BilibiliStreamError as e:
+        # 502: the upstream (Bilibili) is the one failing here, not this
+        # app.  Returning JSON matters -- the DASH player parses the body,
+        # and an unhandled exception used to surface as an HTML 500 page.
+        return jsonify({"error": str(e)}), 502
     video_proxy = url_for(
         "read.bilibili_proxy", bvid=bvid, stream_type="video", page=page
     )
@@ -841,11 +844,14 @@ def bilibili_proxy(bvid, stream_type):
     try:
         info = bilibili_stream.stream_info(bvid, page)
         stream = info[stream_type]
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
-    status, headers, content = bilibili_stream.proxy_stream(
-        stream["baseUrl"], range_header
-    )
+    except bilibili_stream.BilibiliStreamError as e:
+        return jsonify({"error": str(e)}), 502
+    try:
+        status, headers, content = bilibili_stream.proxy_stream(
+            stream["baseUrl"], range_header
+        )
+    except bilibili_stream.BilibiliStreamError as e:
+        return jsonify({"error": str(e)}), 502
     return Response(content, status=status, headers=headers)
 
 

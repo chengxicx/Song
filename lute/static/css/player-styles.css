@@ -505,6 +505,16 @@
   border: 0;
 }
 
+/* Embed fallback (see ytUseEmbedPlayer in bilibili-player.js): the
+   official player exposes no postMessage API, so our transport controls
+   cannot drive it and are shown as unavailable. */
+.bili-embed-active .audio-button[disabled],
+.bili-embed-active .yt-toggle-btn[disabled],
+.bili-embed-active .yt-timeline[disabled] {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .yt-player-loading {
   position: absolute;
   inset: 0;
