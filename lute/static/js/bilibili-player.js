@@ -9,6 +9,11 @@
 
    Provides:
    - play/pause, seek timeline, playback rate controls
+   - a video-quality menu (settings gear), defaulting to the cheapest
+     rendition Bilibili offers for the video: the stream is relayed
+     through a narrow egress, so the low end plays unless the reader
+     deliberately chooses otherwise.  Adaptive switching is off for the
+     same reason -- it would climb back up on its own.
    - single-sentence loop and auto-pause-at-end-of-sentence
    - a single-line scrolling subtitle synced to the media, whose words
      reuse the reading-page tokenization and click-to-lookup behavior
@@ -89,6 +94,17 @@
   var ytSettingsDropdown = document.getElementById("yt-settings-dropdown");
   var ytAudioModeCb = document.getElementById("yt-audio-mode-cb");
   var AUDIO_MODE_STORAGE_KEY = "ytAudioMode";
+  var ytQualityRow = document.getElementById("yt-quality-row");
+  var ytQualitySelect = document.getElementById("yt-quality-select");
+  // Remembered video quality, stored as the rendition height (e.g. 480)
+  // rather than as a rendition index: an index only means something
+  // within one manifest's rendition list, while a height stays
+  // meaningful across videos.  Absent means "the lowest one", which is
+  // the intended default here -- the stream is relayed through a narrow
+  // egress (see lute/utils/outbound_proxy.py), so the cheap end plays
+  // unless the reader deliberately asks for more.
+  var QUALITY_STORAGE_KEY = "biliVideoQuality";
+
 
   function ytFmtTime(secs) {
     if (!isFinite(secs) || secs < 0) secs = 0;
@@ -170,6 +186,31 @@
       }
       try {
         player = dashjs.MediaPlayer().create();
+        // Steer playback at the cheap end.  ABR measures throughput and
+        // climbs as far as it can, which is exactly wrong here: the
+        // stream is relayed through an SSH tunnel, so a higher rendition
+        // costs the far end's uplink and buys nothing (these are
+        // subtitle-reading videos).  "initialBitrate: video 1" (kbps)
+        // makes the very first pick the cheapest rendition, before we
+        // know the list of them; switching it back off avoids any later
+        // climb.  Audio keeps ABR -- it is one small track either way.
+        // In dash.js 4.7 this is settings-only: setAutoSwitchQualityFor
+        // no longer exists.
+        try {
+          player.updateSettings({
+            streaming: {
+              abr: {
+                autoSwitchBitrate: { video: false },
+                initialBitrate: { video: 1 },
+              },
+            },
+          });
+        } catch (e) { /* an older/newer dash.js: the pick below still holds */ }
+        // The rendition list only exists once the stream is set up, and
+        // it is not always there on the first event, so try again on each
+        // of them and give up after a few attempts.
+        player.on("manifestLoaded", ytScheduleQualityControls);
+        player.on("streamInitialized", ytScheduleQualityControls);
         player.on("error", function () {
           if (typeof handlers.onError === "function") handlers.onError();
         });
@@ -222,6 +263,28 @@
         return Math.min(1, end / d);
       },
       _init: init,
+      // Video renditions as dash.js sees them.  Each entry carries
+      // qualityIndex (what setQualityFor expects), bitrate and height.
+      // Empty until the manifest has been parsed.
+      getVideoBitrates: function () {
+        try {
+          return (player && player.getBitrateInfoListFor("video")) || [];
+        } catch (e) {
+          return [];
+        }
+      },
+      setVideoQuality: function (qualityIndex) {
+        try {
+          player.setQualityFor("video", qualityIndex, true);
+        } catch (e) { /* ignore */ }
+      },
+      getVideoQuality: function () {
+        try {
+          return player ? player.getQualityFor("video") : null;
+        } catch (e) {
+          return null;
+        }
+      },
     };
   }
 
@@ -353,6 +416,9 @@
 
     if (ytContainer) ytContainer.classList.add("bili-embed-active");
     ytDisableTransport(true);
+    // Quality is Bilibili's own business in this mode; our rendition menu
+    // would be a lie.
+    if (ytQualityRow) ytQualityRow.hidden = true;
 
     // Bilibili's player owns its own transport, so this state must be
     // reported OUTSIDE the video: the loading overlay is inset:0 and
@@ -685,6 +751,9 @@
       // opens as an audio-only screen immediately.
       ytApplyAudioMode();
     }
+    if (ytQualitySelect) {
+      ytQualitySelect.addEventListener("change", ytOnQualityChange);
+    }
     if (ytSettingsBtn && ytSettingsDropdown) {
       ytSettingsBtn.addEventListener("click", function (e) {
         e.stopPropagation();
@@ -777,6 +846,105 @@
       if (typeof _splitToScreens === "function") _splitToScreens();
       if (typeof _layout_side_nav === "function") _layout_side_nav();
     }, 50);
+  }
+
+  function ytQualityLabel(item) {
+    if (item.height) return item.height + "p";
+    if (item.bitrate) return Math.round(item.bitrate / 1000) + "k";
+    return String(item.qualityIndex);
+  }
+
+  // Video renditions, cheapest first.  Read from dash.js rather than from
+  // a hardcoded list, so the menu shows exactly what this video offers.
+  function ytQualityOptions() {
+    var list = (ytPlayer && ytPlayer.getVideoBitrates()) || [];
+    var items = [];
+    for (var i = 0; i < list.length; i++) {
+      var it = list[i];
+      if (it && typeof it.qualityIndex === "number") items.push(it);
+    }
+    items.sort(function (a, b) { return (a.bitrate || 0) - (b.bitrate || 0); });
+    return items;
+  }
+
+  // (Re)build the quality menu and apply the rendition to start on: the
+  // reader's remembered choice when this video offers it, otherwise the
+  // cheapest one.  Returns true once it has something to show, so the
+  // caller can retry -- the rendition list is not guaranteed to be ready
+  // on the first event dash.js fires.
+  function ytPopulateQualityControls() {
+    if (!ytQualitySelect || !ytQualityRow) return false;
+    var items = ytQualityOptions();
+    if (!items.length) return false;
+
+    ytQualitySelect.innerHTML = "";
+    for (var i = 0; i < items.length; i++) {
+      var opt = document.createElement("option");
+      opt.value = String(items[i].qualityIndex);
+      opt.textContent = ytQualityLabel(items[i]);
+      if (items[i].bitrate) {
+        opt.title = Math.round(items[i].bitrate / 1000) + " kbps";
+      }
+      ytQualitySelect.appendChild(opt);
+    }
+
+    // A menu with a single entry is not a choice, and in embed mode
+    // Bilibili's own player owns quality, so show nothing in either case.
+    ytQualityRow.hidden = ytEmbedMode || items.length < 2;
+    if (ytQualityRow.hidden) return true;
+
+    var saved = parseInt(localStorage.getItem(QUALITY_STORAGE_KEY), 10);
+    var pick = null;
+    if (!isNaN(saved)) {
+      for (var j = 0; j < items.length; j++) {
+        if (items[j].height === saved) { pick = items[j]; break; }
+      }
+    }
+    if (!pick) pick = items[0]; // the cheap default
+    ytQualitySelect.value = String(pick.qualityIndex);
+    ytApplyVideoQuality(pick.qualityIndex);
+    return true;
+  }
+
+  // Retry a few times: dash.js surfaces the manifest before it surfaces
+  // the renditions, and neither event is guaranteed to be the last word.
+  function ytScheduleQualityControls() {
+    var tries = 0;
+    function attempt() {
+      tries += 1;
+      if (ytPopulateQualityControls()) return;
+      if (tries < 8) window.setTimeout(attempt, 400);
+    }
+    attempt();
+  }
+
+  function ytApplyVideoQuality(qualityIndex) {
+    if (!ytPlayer || typeof ytPlayer.setVideoQuality !== "function") return;
+    // Video ABR is off (see LuteBilibiliPlayer.init), so this pick holds
+    // instead of being overridden as soon as the throughput estimate
+    // improves -- which, over the relay, it never should.
+    ytPlayer.setVideoQuality(qualityIndex);
+  }
+
+  function ytOnQualityChange() {
+    if (!ytQualitySelect) return;
+    var qi = parseInt(ytQualitySelect.value, 10);
+    if (isNaN(qi)) return;
+    var items = ytQualityOptions();
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].qualityIndex === qi) {
+        // Remembered as a height, not an index: an index only means
+        // something inside one manifest, a height carries across videos.
+        if (items[i].height) {
+          localStorage.setItem(QUALITY_STORAGE_KEY, String(items[i].height));
+        }
+        break;
+      }
+    }
+    ytApplyVideoQuality(qi);
+    // The change came from a click inside the menu, so the outside-click
+    // closer never fires; close it here (same as the audio-only toggle).
+    if (ytSettingsDropdown) ytSettingsDropdown.hidden = true;
   }
 
   /* ------------------------------------------------------------------ */
