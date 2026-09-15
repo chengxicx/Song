@@ -187,9 +187,10 @@ def stream_info(bvid, page=1):
     stream is relayed through a narrow egress (see
     lute/utils/outbound_proxy.py) and the reader can pick a higher one
     from the player's settings menu when they want it.  ``audio`` is the
-    best available track -- audio is roughly a tenth of the bytes of the
-    480p video and intelligibility is the whole point of a listening
-    book, so it is not traded away for egress.
+    highest-bandwidth track, which is often the *larger* half of the
+    bytes (measured on one 45-part video: 102 kbps audio against 42 and
+    61 kbps video) -- but intelligibility is the whole point of a
+    listening book, so it is not traded away for egress.
 
     Raises BilibiliStreamError if the video is unavailable or has no DASH
     streams, or if Bilibili cannot be reached (its API bans the server's
