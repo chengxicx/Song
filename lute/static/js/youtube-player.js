@@ -553,7 +553,11 @@
 
       row.appendChild(ts);
       row.appendChild(txt);
-      row.addEventListener("click", function () {
+      row.addEventListener("click", function (e) {
+        // Selecting text in the transcript (to copy a phrase, or to
+        // check words) ends with a click on the row; jumping and
+        // playing then would be a surprise.
+        if (typeof click_ends_selection === "function" && click_ends_selection(e)) return;
         ytSeekToCue(i, true);
       });
       ytTranscriptList.appendChild(row);
@@ -951,13 +955,14 @@
     // Tap anywhere on the line that isn't a word (padding, marquee
     // gaps, punctuation spans) to replay the current line from its
     // start -- a quick re-listen while checking word statuses on the
-    // mini player.  Taps on words keep their term-popup behavior, and
-    // a drag-selection across words (its click lands on this common
-    // ancestor with a live selection) must not replay.
+    // mini player.  Taps on words keep their term-popup behavior, and a
+    // drag-selection across words must not replay: its click lands on
+    // this common ancestor, and the selection check in
+    // click_ends_selection() is what catches it (the native selection is
+    // often already empty by then -- see lute-cursor.js).
     t.on("click", function (e) {
       if (e.target.closest && e.target.closest(".word")) return;
-      var sel = window.getSelection();
-      if (sel && !sel.isCollapsed) return;
+      if (typeof click_ends_selection === "function" && click_ends_selection(e)) return;
       if (ytCueIndex < 0) return;
       ytSeekToCue(ytCueIndex, true);
     });
