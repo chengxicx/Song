@@ -84,6 +84,7 @@
   var ytTranscriptList = document.getElementById("yt-transcript-list");
   var ytSubtitle = document.getElementById("yt-scrolling-subtitle-inner");
   var ytLoading = document.getElementById("yt-player-loading");
+  var ytEmbedNotice = document.getElementById("bili-embed-notice");
   var ytSettingsBtn = document.getElementById("yt-settings-btn");
   var ytSettingsDropdown = document.getElementById("yt-settings-dropdown");
   var ytAudioModeCb = document.getElementById("yt-audio-mode-cb");
@@ -353,12 +354,19 @@
     if (ytContainer) ytContainer.classList.add("bili-embed-active");
     ytDisableTransport(true);
 
-    if (ytLoading) {
-      ytLoading.textContent =
+    // Bilibili's player owns its own transport, so this state must be
+    // reported OUTSIDE the video: the loading overlay is inset:0 and
+    // stacks above the iframe, which would swallow every click and make
+    // the embed look frozen.  Hide the overlay and use the sibling
+    // notice instead.
+    if (ytLoading) ytLoading.style.display = "none";
+    if (ytEmbedNotice) {
+      ytEmbedNotice.textContent =
         "Song cannot relay this video, so it is playing in Bilibili's embed " +
-        "player. Subtitle sync (auto-scroll, loop, auto-pause) is not " +
-        "available in this mode; the transcript below still works.";
-      ytLoading.style.display = "block";
+        "player -- use that player's own controls. Subtitle sync " +
+        "(auto-scroll, loop, auto-pause) is not available in this mode; " +
+        "the transcript below still works.";
+      ytEmbedNotice.hidden = false;
     }
   }
 
@@ -888,9 +896,11 @@
 
     createYoutubePlayer();
 
-    // Fallback message if the player never becomes ready.
+    // Fallback message if the player never becomes ready.  Skipped in
+    // embed mode, where the player is ready by definition and bringing
+    // this overlay back would cover the iframe after 15 seconds.
     window.setTimeout(function () {
-      if (ytLoading && !ytPlayerReady) {
+      if (ytLoading && !ytPlayerReady && !ytEmbedMode) {
         ytLoading.textContent =
           "Unable to load the Bilibili player. The transcript below is still available.";
         ytLoading.style.display = "block";

@@ -505,6 +505,34 @@
   border: 0;
 }
 
+/* In embed mode the iframe is the only interactive thing in the wrap:
+   Bilibili's player owns play/pause/volume, so nothing of ours may stack
+   above it.  .yt-player-loading is inset:0 with z-index:1, which beats
+   the iframe's z-index:auto, so it has to be taken out of the way -- the
+   JS also sets display:none inline, and this is the CSS-level guarantee
+   (hence !important, to beat that inline style). */
+.yt-player-video-wrap .bili-embed-frame {
+  z-index: 2;
+}
+
+.bili-embed-active .yt-player-loading {
+  display: none !important;
+}
+
+/* Embed-fallback notice: a sibling of the video wrap, never an overlay.
+   Uses the same self-contained palette as .yt-player-loading (dark box,
+   white text) so it stays legible in every theme without needing a
+   per-theme override. */
+.bili-embed-notice {
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
 /* Embed fallback (see ytUseEmbedPlayer in bilibili-player.js): the
    official player exposes no postMessage API, so our transport controls
    cannot drive it and are shown as unavailable. */

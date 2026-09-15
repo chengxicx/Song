@@ -81,7 +81,7 @@
 | 8 | **触摸点击反馈** | ❌ 无（`tap-pressed` / `tap-ack` / haptics 在 `tests/` 无引用） | 全无 | `localStorage.screen_interactions_type='mobile'` + reload，再测四态与震动开关 |
 | 9 | **主题系统** | ⚠️ 仅单元级（`unit/themes/test_service.py` 测 CSS 拼接） | 渲染层无覆盖 | 切主题看 `#status` 选中态对勾是否可见（亮色主题易隐形） |
 | 10 | **备份/恢复迁移** | ✅ `unit/backup/test_restore_migration.py` | 上游 `.db.gz` 恢复后 Song 专属迁移 | 恢复后重启，确认 `LgKiwi*` 四列存在 |
-| 11 | **Bilibili 播放**（DASH 中继 + 官方播放器降级） | ⚠️ `unit/book/test_bilibili.py`（30 项：URL 解析、上游失败→502 JSON、代理透传） | 真实网络的取流与播放；降级路径无自动化 | 服务器出口 IP 被 B 站风控（`-412 request was banned`）时中继**永久不可用**，与代码无关。确认 `LUTE_BILIBILI_PROXY` 已配且隧道在线 → 出画面且**字幕跟随正常**；把隧道断开再刷新 → 应自动降级到官方播放器（能看视频，字幕不跟随、传输控件置灰） |
+| 11 | **Bilibili 播放**（DASH 中继 + 官方播放器降级） | ✅ `unit/book/test_bilibili.py`（31 项：URL 解析、上游失败→502 JSON、代理透传）+ `unit/book/test_bilibili_embed_fallback.py`（5 项：降级态不被覆盖层遮挡） | 真实网络的取流与播放 | 服务器出口 IP 被 B 站风控（`-412 request was banned`）时中继**永久不可用**，与代码无关。确认 `LUTE_BILIBILI_PROXY` 已配且隧道在线 → 出画面且**字幕跟随正常**；把隧道断开再刷新 → 应自动降级到官方播放器（能看视频、字幕不跟随），且在官方播放器上**点得动播放/暂停/音量** |
 
 ---
 
@@ -129,3 +129,21 @@ export PATH="$PWD/venv/bin:$PATH"
 | 所有浏览器测试都访问不到 5001 | `tasks.py` 里子进程用裸 `python` | 把 `venv/bin` 放到 PATH 最前 |
 | Bilibili 书黑屏、接口返回 **HTTP 500** 而非 JSON | 服务器在海外（洛杉矶），B 站 API 按 IP 风控返 `-412`，而路由曾只捕 `ValueError` 兜不住 `HTTPError` | 已修（返回 502 JSON）。长期靠配置出口：`LUTE_BILIBILI_PROXY`，见 `lute/utils/outbound_proxy.py` 与 `utils/bili_egress_proxy.py` |
 | 配了代理仍黑屏 | 隧道断了（本机休眠 / SSH 断开 / 代理进程被回收） | 重启 `utils/bili_egress_proxy.py` 与 `ssh -N -R …`；页面会降级到官方播放器，可据此判断 |
+
+---
+
+## Bilibili 出口代理：谁在用它
+
+**隧道不是给浏览器的，是给服务器的。** 打开 `/read/<bilibili 书>` 不触发它——渲染只做纯正则解析（`read/routes.py`），零网络出口。只有服务器自己去取流时才走出口：
+
+| 触发点 | 频率 |
+|---|---|
+| dash.js 要 MPD 清单 → `stream_info()` → `api.bilibili.com` | 每个 `(bvid, page)` 最多 30 分钟一次（进程内存缓存，重启即清） |
+| 播放中取视频/音频分段 → `proxy_stream()` → B 站 CDN | **播放全程持续**（每个 Range 请求都转发） |
+| 导入新 B 站书抓标题 → `bilibili_title` | 一次性 |
+
+所以：**任何账号**在该部署上播放 B 站书都会经这条隧道，媒体字节走的是出口机器的**上行带宽**，不是某个浏览器的。隧道断开时页面自动降级，不报错。
+
+**他人从 GitHub 部署不会自动形成隧道**：仓库里没有任何地址、端口或凭据（`git grep 172.236.226.132` 零命中，文档与脚本只用 `root@<server>` 占位）。未设 `LUTE_BILIBILI_PROXY` 时行为与改造前完全一致（`bilibili_proxies()` 返回 `None` → 直连），所以国内服务器、或没被风控的部署**什么都不用配**。
+
+**降级态的不变式**：embed 模式下视频区里除 iframe 外不得叠任何覆盖层。`.yt-player-loading` 是 `inset:0; z-index:1`，而 iframe 默认 `z-index:auto`，覆盖层会吞掉所有点击——表现是"画面在播却点不动、像卡死"。护栏：`tests/unit/book/test_bilibili_embed_fallback.py`（CSS 层级 + JS 侧隐藏的双重断言）。

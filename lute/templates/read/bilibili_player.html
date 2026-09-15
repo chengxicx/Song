@@ -20,6 +20,12 @@
     <div class="yt-player-loading" id="yt-player-loading">Loading player...</div>
   </div>
 
+  {# Embed-fallback notice.  Deliberately a SIBLING of the video wrap, not
+     an overlay: in that mode an iframe fills the wrap and Bilibili's own
+     player owns play/pause/volume, so any message drawn inside the wrap
+     would sit above the iframe and swallow the clicks meant for it. #}
+  <div class="bili-embed-notice" id="bili-embed-notice" hidden></div>
+
   <div class="yt-player-controls">
     <div class="yt-controls-left">
       <button id="yt-prev-cue-btn" class="audio-button yt-cue-btn" title="Previous subtitle">
