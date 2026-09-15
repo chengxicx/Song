@@ -218,3 +218,47 @@ function select_ended(el, e) {
 }
 
 
+/* ========================================= */
+/** Tap vs. drag-selection.
+ *
+ * The players treat a click on the subtitle line / a transcript row as
+ * "jump here and play".  A click also fires when a text selection ends,
+ * so those handlers must ignore that click -- otherwise selecting a few
+ * words on a paused player starts playback.
+ *
+ * window.getSelection() alone is not enough for that test: a drag that
+ * ends inside word spans can leave the native selection collapsed (the
+ * page's own word-selection UI takes over and the browser drops its
+ * selection), in which case the click looks exactly like a tap.  So
+ * also compare where the pointer went down with where it came up.
+ */
+
+/** Pointer travel, in CSS pixels, that still counts as a tap. */
+const TAP_DRAG_SLOP = 6;
+
+let _last_press_x = null;
+let _last_press_y = null;
+
+$(document).on('mousedown', function(e) {
+  _last_press_x = e.clientX;
+  _last_press_y = e.clientY;
+});
+
+/** True if the click ended a drag rather than being a tap. */
+function click_was_drag(e) {
+  if (_last_press_x === null)
+    return false;
+  return Math.abs(e.clientX - _last_press_x) > TAP_DRAG_SLOP
+      || Math.abs(e.clientY - _last_press_y) > TAP_DRAG_SLOP;
+}
+
+/** True if this click should be ignored because it ended a text/word
+ *  selection instead of being a tap. */
+function click_ends_selection(e) {
+  if (click_was_drag(e))
+    return true;
+  const sel = window.getSelection();
+  return !!(sel && !sel.isCollapsed);
+}
+
+

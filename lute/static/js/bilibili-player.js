@@ -460,7 +460,11 @@
 
       row.appendChild(ts);
       row.appendChild(txt);
-      row.addEventListener("click", function () {
+      row.addEventListener("click", function (e) {
+        // Selecting text in the transcript (to copy a phrase, or to
+        // check words) ends with a click on the row; jumping and
+        // playing then would be a surprise.
+        if (typeof click_ends_selection === "function" && click_ends_selection(e)) return;
         ytSeekToCue(i, true);
       });
       ytTranscriptList.appendChild(row);
