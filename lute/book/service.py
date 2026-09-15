@@ -22,6 +22,7 @@ from pypdf import PdfReader
 from subtitle_parser import SrtParser
 from lute.book.model import Repository
 from lute.utils.mp4faststart import faststart_quietly
+from lute.utils.outbound_proxy import bilibili_proxies
 
 
 class BookImportException(Exception):
@@ -938,7 +939,9 @@ class Service:
                 api = f"https://api.bilibili.com/x/web-interface/view?bvid={bvid}"
             else:
                 api = f"https://api.bilibili.com/x/web-interface/view?aid={aid}"
-            response = requests.get(api, timeout=10, headers=headers)
+            response = requests.get(
+                api, timeout=10, headers=headers, proxies=bilibili_proxies()
+            )
             response.raise_for_status()
             data = response.json()
             title = (data.get("data") or {}).get("title", "").strip()
