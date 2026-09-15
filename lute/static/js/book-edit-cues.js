@@ -366,6 +366,11 @@
     row.addEventListener("click", function (e) {
       var tag = e.target && e.target.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "BUTTON") return;
+      // Selecting text here (to edit a line, or copy it) also ends with a
+      // click on the row; it must not start playback.  See
+      // click_ends_selection() in lute-cursor.js for why the pointer
+      // travel is checked as well.
+      if (typeof click_ends_selection === "function" && click_ends_selection(e)) return;
       var sel = window.getSelection();
       if (sel && !sel.isCollapsed) return;
       seekToCue(k, true);
