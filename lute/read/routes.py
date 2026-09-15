@@ -811,6 +811,12 @@ def bilibili_mpd(bvid):
     The manifest's BaseURLs point at our own proxy endpoints so the
     browser never talks to Bilibili directly (which would be blocked by
     CORS / anti-leeching).  ``page`` selects a multi-part video page.
+
+    Every video rendition Bilibili offers gets a Representation, each
+    with its own proxy URL carrying a ``q`` index.  The player therefore
+    holds all the qualities at once and can switch between them from its
+    settings menu; the cheapest one is listed first and is what the
+    player starts on, since the stream is relayed over a narrow egress.
     """
     page = request.args.get("page", 1, type=int)
     try:
@@ -820,13 +826,16 @@ def bilibili_mpd(bvid):
         # app.  Returning JSON matters -- the DASH player parses the body,
         # and an unhandled exception used to surface as an HTML 500 page.
         return jsonify({"error": str(e)}), 502
-    video_proxy = url_for(
-        "read.bilibili_proxy", bvid=bvid, stream_type="video", page=page
-    )
+    video_proxies = [
+        url_for(
+            "read.bilibili_proxy", bvid=bvid, stream_type="video", page=page, q=i
+        )
+        for i in range(len(info.get("videos") or [info["video"]]))
+    ]
     audio_proxy = url_for(
         "read.bilibili_proxy", bvid=bvid, stream_type="audio", page=page
     )
-    mpd = bilibili_stream.build_mpd(info, video_proxy, audio_proxy)
+    mpd = bilibili_stream.build_mpd(info, video_proxies, audio_proxy)
     return Response(mpd, mimetype="application/dash+xml")
 
 
@@ -834,18 +843,33 @@ def bilibili_mpd(bvid):
 def bilibili_proxy(bvid, stream_type):
     """Proxy a range request for a Bilibili DASH segment to the CDN.
 
-    ``stream_type`` is "video" or "audio".  Adds the Referer / UA headers
-    the CDN requires and relays the byte range the player asked for.
+    ``stream_type`` is "video" or "audio"; for video, ``q`` picks which
+    rendition to relay (0 is the cheapest, matching the manifest order).
+    Adds the Referer / UA headers the CDN requires and relays the byte
+    range the player asked for.
     """
     if stream_type not in ("video", "audio"):
         return jsonify({"error": "invalid stream type"}), 400
     page = request.args.get("page", 1, type=int)
+    quality = request.args.get("q", 0, type=int)
     range_header = request.headers.get("Range")
     try:
         info = bilibili_stream.stream_info(bvid, page)
-        stream = info[stream_type]
     except bilibili_stream.BilibiliStreamError as e:
         return jsonify({"error": str(e)}), 502
+    if stream_type == "video":
+        # ``videos`` is the full rendition list; info built before that
+        # existed (or by a caller that only ever picks one) carries just
+        # ``video``, and then there is nothing to index into.
+        renditions = info.get("videos")
+        if renditions:
+            if quality < 0 or quality >= len(renditions):
+                return jsonify({"error": "invalid video quality"}), 400
+            stream = renditions[quality]
+        else:
+            stream = info["video"]
+    else:
+        stream = info["audio"]
     try:
         status, headers, content = bilibili_stream.proxy_stream(
             stream["baseUrl"], range_header

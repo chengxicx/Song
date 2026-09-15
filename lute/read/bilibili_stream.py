@@ -10,7 +10,11 @@ audio) ourselves:
     APIs (no login required) to obtain the fragmented-MP4 segment URLs
     and the codec / init-range metadata.
   * ``build_mpd`` turns that into an on-demand DASH manifest whose
-    BaseURLs point at our own proxy endpoints.
+    BaseURLs point at our own proxy endpoints.  Every video rendition
+    Bilibili offers becomes its own Representation, so the player can
+    switch quality without refetching the manifest; they are ordered
+    lowest-bitrate first because the stream is relayed through a narrow
+    egress and the low end is what should be used by default.
   * ``proxy_stream`` relays the byte ranges dash.js requests on to
     Bilibili's CDN, adding the headers the CDN requires (Referer, UA),
     so the browser never talks to Bilibili directly and the stream is
@@ -21,6 +25,8 @@ expiry (deadline) and we don't want to hit the API on every segment.
 """
 
 import time
+from xml.sax.saxutils import escape as _xml_escape
+
 import requests
 
 from lute.utils.outbound_proxy import bilibili_proxies
@@ -32,9 +38,19 @@ _UA = (
 )
 _REFERER = "https://www.bilibili.com"
 
+# Bilibili offers the same quality in more than one codec (AVC/H.264 is
+# codecid 7, HEVC is 12) and lists them all under the same quality id.
+# Only AVC is safe to hand to a browser as DASH-in-MP4: an HEVC rendition
+# that wins a bandwidth-based pick fails to decode, which shows up as a
+# black player and no error message at all.  Preference, not a filter --
+# if a video is HEVC-only we still play it rather than refusing.
+_VIDEO_CODEC_PREFERENCE = ("avc1", "avc3")
+_AUDIO_CODEC_PREFERENCE = ("mp4a",)
+
 # name -> (expiry_ts, info)
 _stream_cache = {}
 _STREAM_TTL = 30 * 60  # playurl URLs last ~2h; refresh well before that.
+
 
 
 class BilibiliStreamError(Exception):
@@ -114,26 +130,71 @@ def _fetch_playurl(bvid, cid):
     return _api_get_json(url, "Bilibili playurl API")
 
 
-def _pick(streams):
-    """Return the highest-bandwidth stream from a DASH list."""
-    best = None
-    for s in streams or []:
-        bw = s.get("bandwidth") or 0
-        if best is None or bw > best.get("bandwidth", 0):
-            best = s
-    return best
+def _codec_preferred(stream, prefixes):
+    "True when the stream's codec string starts with one of the prefixes."
+    codecs = (stream.get("codecs") or "").lower()
+    return any(codecs.startswith(p) for p in prefixes)
+
+
+def _usable_renditions(streams, codec_prefixes):
+    """Return playable renditions, lowest bandwidth first.
+
+    Preference order is: decodable codec, then bitrate ascending.  A
+    lowest-first list matters twice over -- the caller takes the first
+    entry as the default (the egress is narrow, so the cheap end should
+    be what plays unless the reader asks otherwise) and the DASH manifest
+    keeps that order so a rendition index means the same thing to the
+    player as it does here.
+
+    Renditions that would look identical to the player (same codec, same
+    bitrate and size) are collapsed: Bilibili does list the same audio
+    track twice.  Streams with no URL are dropped, since there is nothing
+    to relay.
+    """
+    usable = [
+        s
+        for s in (streams or [])
+        if (s.get("baseUrl") or s.get("base_url"))
+    ]
+    preferred = [s for s in usable if _codec_preferred(s, codec_prefixes)]
+    chosen = preferred or usable  # never end up with nothing to play
+    seen = set()
+    out = []
+    for s in sorted(chosen, key=lambda s: int(s.get("bandwidth") or 0)):
+        key = (
+            s.get("codecs"),
+            int(s.get("bandwidth") or 0),
+            s.get("width"),
+            s.get("height"),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(s)
+    return out
 
 
 def stream_info(bvid, page=1):
     """
     Return the DASH stream metadata for a Bilibili video.
 
-    Returns a dict with keys: duration, video (baseUrl, mimeType, codecs,
-    bandwidth, width, height, init, index), audio (baseUrl, mimeType,
-    codecs, bandwidth, init, index).  Raises BilibiliStreamError if the
-    video is unavailable or has no DASH streams, or if Bilibili cannot be
-    reached (its API bans the server's IP outright, so this is the normal
-    failure and callers should degrade rather than error out).
+    Returns a dict with keys: duration, cid, videos, video, audio.
+
+    ``videos`` is every video rendition Bilibili offers for this page,
+    lowest bandwidth first, each shaped as (baseUrl, mimeType, codecs,
+    bandwidth, width, height, init, index).  ``video`` is simply the
+    first of them: the default is the *cheapest* rendition, because the
+    stream is relayed through a narrow egress (see
+    lute/utils/outbound_proxy.py) and the reader can pick a higher one
+    from the player's settings menu when they want it.  ``audio`` is the
+    best available track -- audio is roughly a tenth of the bytes of the
+    480p video and intelligibility is the whole point of a listening
+    book, so it is not traded away for egress.
+
+    Raises BilibiliStreamError if the video is unavailable or has no DASH
+    streams, or if Bilibili cannot be reached (its API bans the server's
+    IP outright, so this is the normal failure and callers should degrade
+    rather than error out).
     Results are cached for _STREAM_TTL per (bvid, page), so the API leg
     runs at most once per half hour even while segments stream through.
     """
@@ -155,9 +216,9 @@ def stream_info(bvid, page=1):
 
     play = _fetch_playurl(bvid, cid)
     dash = play.get("dash") or {}
-    video = _pick(dash.get("video"))
-    audio = _pick(dash.get("audio"))
-    if not video or not audio:
+    videos = _usable_renditions(dash.get("video"), _VIDEO_CODEC_PREFERENCE)
+    audios = _usable_renditions(dash.get("audio"), _AUDIO_CODEC_PREFERENCE)
+    if not videos or not audios:
         raise BilibiliStreamError("No playable stream for this video")
 
     def _seg(s):
@@ -166,7 +227,7 @@ def stream_info(bvid, page=1):
             "baseUrl": s.get("baseUrl") or s.get("base_url"),
             "mimeType": s.get("mimeType") or s.get("mime_type") or "video/mp4",
             "codecs": s.get("codecs") or "",
-            "bandwidth": int(s.get("bandwidth") or s.get("bandwidth") or 0),
+            "bandwidth": int(s.get("bandwidth") or 0),
             "width": int(s.get("width") or 0),
             "height": int(s.get("height") or 0),
             "init": sb.get("initialization") or sb.get("Initialization"),
@@ -177,10 +238,10 @@ def stream_info(bvid, page=1):
         "bvid": bvid,
         "cid": cid,
         "duration": duration,
-        "video": _seg(video),
-        "audio": _seg(audio),
+        "videos": [_seg(v) for v in videos],
+        "video": _seg(videos[0]),
+        "audio": _seg(audios[-1]),
     }
-    info.setdefault("video", {})["init"] = info["video"].get("init")
     _stream_cache[key] = (now + _STREAM_TTL, info)
     return info
 
@@ -198,14 +259,7 @@ _MPD_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
      minBufferTime="PT1.5S">
   <Period duration="PT{duration:.3f}S">
     <AdaptationSet mimeType="{video_mime}" segmentAlignment="true" startWithSAP="1">
-      <Representation id="video" mimeType="{video_mime}" codecs="{video_codecs}"
-                      bandwidth="{video_bw}" width="{video_w}" height="{video_h}">
-        <BaseURL>{video_proxy}</BaseURL>
-        <SegmentBase indexRange="{video_index}">
-          <Initialization range="{video_init}"/>
-        </SegmentBase>
-      </Representation>
-    </AdaptationSet>
+{video_reps}    </AdaptationSet>
     <AdaptationSet mimeType="{audio_mime}" segmentAlignment="true" startWithSAP="1">
       <Representation id="audio" mimeType="{audio_mime}" codecs="{audio_codecs}"
                       bandwidth="{audio_bw}">
@@ -219,27 +273,68 @@ _MPD_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 </MPD>
 """
 
+# One video rendition.  Its BaseURL carries the rendition index (``q``), so
+# the proxy knows which CDN stream to relay.  That makes the URL contain an
+# ampersand, which XML does not allow bare -- hence escaping at the call
+# site: an unescaped one makes the whole manifest unparseable and the
+# player simply never starts.
+_VIDEO_REP_TEMPLATE = """      <Representation id="video-{i}" mimeType="{mime}" codecs="{codecs}"
+                      bandwidth="{bw}" width="{w}" height="{h}">
+        <BaseURL>{proxy}</BaseURL>
+        <SegmentBase indexRange="{index}">
+          <Initialization range="{init}"/>
+        </SegmentBase>
+      </Representation>
+"""
 
-def build_mpd(info, video_proxy, audio_proxy):
-    """Build an on-demand DASH manifest from stream_info."""
+
+def build_mpd(info, video_proxies, audio_proxy):
+    """Build an on-demand DASH manifest from stream_info.
+
+    Every available video rendition becomes a Representation, all served
+    through our own proxy, so the player can switch quality inside the
+    settings menu without refetching the manifest or losing its place.
+    They are emitted lowest-bandwidth first, which is both the default
+    and the order the player's rendition indices rely on.
+
+    ``video_proxies`` may be a single URL (used for every rendition) or a
+    list parallel to ``info["videos"]``.
+    """
     v = info["video"]
     a = info["audio"]
+    renditions = info.get("videos") or [v]
+    if isinstance(video_proxies, (list, tuple)):
+        proxies = list(video_proxies)
+    else:
+        proxies = [video_proxies]
+
+    reps = []
+    for i, r in enumerate(renditions):
+        proxy = proxies[i] if i < len(proxies) else proxies[-1]
+        reps.append(
+            _VIDEO_REP_TEMPLATE.format(
+                i=i,
+                mime=r.get("mimeType") or "video/mp4",
+                codecs=r.get("codecs") or "avc1.64001F",
+                bw=r.get("bandwidth") or 0,
+                w=r.get("width") or 0,
+                h=r.get("height") or 0,
+                proxy=_xml_escape(proxy),
+                index=_xml_escape(r.get("index") or ""),
+                init=_xml_escape(r.get("init") or ""),
+            )
+        )
+
     return _MPD_TEMPLATE.format(
         duration=info["duration"],
         video_mime=v.get("mimeType") or "video/mp4",
-        video_codecs=v.get("codecs") or "avc1.64001F",
-        video_bw=v.get("bandwidth") or 0,
-        video_w=v.get("width") or 0,
-        video_h=v.get("height") or 0,
-        video_proxy=video_proxy,
-        video_index=v.get("index") or "",
-        video_init=v.get("init") or "",
+        video_reps="".join(reps),
         audio_mime=a.get("mimeType") or "audio/mp4",
         audio_codecs=a.get("codecs") or "mp4a.40.2",
         audio_bw=a.get("bandwidth") or 0,
-        audio_proxy=audio_proxy,
-        audio_index=a.get("index") or "",
-        audio_init=a.get("init") or "",
+        audio_proxy=_xml_escape(audio_proxy),
+        audio_index=_xml_escape(a.get("index") or ""),
+        audio_init=_xml_escape(a.get("init") or ""),
     )
 
 
