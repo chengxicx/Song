@@ -862,6 +862,37 @@
   margin: 0;
 }
 
+/* Video-quality picker (Bilibili books).  Shown only when the manifest
+   actually offers a choice -- see ytPopulateQualityControls.  The control
+   and its colours deliberately inherit from the dropdown, because themes
+   restyle that panel (the default theme makes it dark) and a hardcoded
+   light background here would be unreadable on it. */
+.yt-quality-option[hidden] {
+  display: none;
+}
+
+.yt-quality-option {
+  cursor: default;
+}
+
+.yt-quality-option select {
+  min-width: 5.5rem;
+  margin: 0;
+  padding: 0.1rem 0.25rem;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background-color: transparent;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.yt-quality-option select:hover {
+  opacity: 1;
+}
+
 /* Audio-only mode for online video books: hides the video area so the
    reading screen matches an MP3 book (controls + scrolling subtitle).
    The hidden <video> keeps playing its audio track. */
