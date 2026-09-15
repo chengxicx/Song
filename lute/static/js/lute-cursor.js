@@ -279,13 +279,18 @@ const DOUBLE_CLICK_MS = 260;
 function bind_line_click(el, action) {
   let last_click_at = 0;
   el.addEventListener('click', function(e) {
-    if (click_ends_selection(e))
-      return;
     const now = Date.now();
+    // A click that ends a selection must not fire the action -- but it
+    // still has to take part in the double-click bookkeeping below,
+    // because the second click of a double-click *does* end a selection
+    // (the browser selected the word) and is what cancels the first.
+    const ends_selection = click_ends_selection(e);
     if (now - last_click_at < DOUBLE_CLICK_MS) {
       last_click_at = 0;
       return;
     }
+    if (ends_selection)
+      return;
     last_click_at = now;
     setTimeout(function() {
       // Still the latest click?  (A second click resets last_click_at.)
