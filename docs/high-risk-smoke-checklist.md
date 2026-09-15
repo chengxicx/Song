@@ -81,7 +81,7 @@
 | 8 | **触摸点击反馈** | ❌ 无（`tap-pressed` / `tap-ack` / haptics 在 `tests/` 无引用） | 全无 | `localStorage.screen_interactions_type='mobile'` + reload，再测四态与震动开关 |
 | 9 | **主题系统** | ⚠️ 仅单元级（`unit/themes/test_service.py` 测 CSS 拼接） | 渲染层无覆盖 | 切主题看 `#status` 选中态对勾是否可见（亮色主题易隐形） |
 | 10 | **备份/恢复迁移** | ✅ `unit/backup/test_restore_migration.py` | 上游 `.db.gz` 恢复后 Song 专属迁移 | 恢复后重启，确认 `LgKiwi*` 四列存在 |
-| 11 | **Bilibili 播放**（DASH 中继 + 官方播放器降级） | ✅ `unit/book/test_bilibili.py`（31 项：URL 解析、上游失败→502 JSON、代理透传）+ `unit/book/test_bilibili_embed_fallback.py`（5 项：降级态不被覆盖层遮挡） | 真实网络的取流与播放 | 服务器出口 IP 被 B 站风控（`-412 request was banned`）时中继**永久不可用**，与代码无关。确认 `LUTE_BILIBILI_PROXY` 已配且隧道在线 → 出画面且**字幕跟随正常**；把隧道断开再刷新 → 应自动降级到官方播放器（能看视频、字幕不跟随），且在官方播放器上**点得动播放/暂停/音量** |
+| 11 | **Bilibili 播放**（DASH 中继 + 官方播放器降级 + 画质档位） | ✅ `unit/book/test_bilibili.py`（31 项：URL 解析、上游失败→502 JSON、代理透传）+ `unit/book/test_bilibili_quality.py`（25 项：默认最低码率、AVC 优先、多档 MPD 为合法 XML、`q=` 路由、档位菜单护栏）+ `unit/book/test_bilibili_embed_fallback.py`（5 项：降级态不被覆盖层遮挡） | 真实网络的取流与播放 | 服务器出口 IP 被 B 站风控（`-412 request was banned`）时中继**永久不可用**，与代码无关。确认 `LUTE_BILIBILI_PROXY` 已配且隧道在线 → 出画面且**字幕跟随正常**；把隧道断开再刷新 → 应自动降级到官方播放器（能看视频、字幕不跟随），且在官方播放器上**点得动播放/暂停/音量**；齿轮里的 Quality 应显示**最低档**且切档后画面继续 |
 
 ---
 
@@ -147,3 +147,14 @@ export PATH="$PWD/venv/bin:$PATH"
 **他人从 GitHub 部署不会自动形成隧道**：仓库里没有任何地址、端口或凭据（`git grep 172.236.226.132` 零命中，文档与脚本只用 `root@<server>` 占位）。未设 `LUTE_BILIBILI_PROXY` 时行为与改造前完全一致（`bilibili_proxies()` 返回 `None` → 直连），所以国内服务器、或没被风控的部署**什么都不用配**。
 
 **降级态的不变式**：embed 模式下视频区里除 iframe 外不得叠任何覆盖层。`.yt-player-loading` 是 `inset:0; z-index:1`，而 iframe 默认 `z-index:auto`，覆盖层会吞掉所有点击——表现是"画面在播却点不动、像卡死"。护栏：`tests/unit/book/test_bilibili_embed_fallback.py`（CSS 层级 + JS 侧隐藏的双重断言）。
+
+## 画质：默认最低档，手动升档
+
+**默认播最低码率**，因为字节要过隧道（出口机的上行带宽是瓶颈）：
+
+- `stream_info()` 返回 `videos`（**按码率升序**，第一个即默认）与 `video`（= `videos[0]`）。音频仍是**最高档**——实测 480p 视频 61 kbps 而音频 90 kbps，音频占流量更大，但听力材料牺牲音质不划算。
+- `build_mpd()` 为**每一档**生成一个 `Representation`，各自带 `?q=<index>` 的代理 URL ⇒ 切档不需要重取清单、不丢进度。Representation 顺序 = 档位索引顺序，**别改**。
+- 前端：`autoSwitchBitrate.video=false`（dash.js 4.7 已移除 `setAutoSwitchQualityFor`，只能走 `updateSettings`）+ `initialBitrate.video=1` 让首帧就落在最低档；**ABR 开着会自己爬到高档**（本地实测 8 秒内就爬到 480p）。
+- 档位菜单在齿轮里，选项由 `getBitrateInfoListFor("video")` 动态生成。**它在 `manifestLoaded` 时还是空的**（实测），代码在 `manifestLoaded` 与 `streamInitialized` 上都挂载并最多重试 8 次。选择按**高度**（如 480）记住，不是按索引。
+- **MPD 的 BaseURL 必须 XML 转义**：带 `?page=N&q=M` 后裸 `&` 会让整份清单不可解析，播放器静默不启动。护栏测试用 `ElementTree.fromstring` 真解析一遍。
+- 取流优先 **AVC**（`avc1`/`avc3`），HEVC 即使码率更高也排在后面——浏览器解不了 HEVC 时表现是**黑屏且无任何错误**，看起来就像"B 站坏了"。全是 HEVC 时才回退使用。
