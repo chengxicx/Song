@@ -21,6 +21,7 @@ from openepub import Epub, EpubError
 from pypdf import PdfReader
 from subtitle_parser import SrtParser
 from lute.book.model import Repository
+from lute.utils.mp4faststart import faststart_quietly
 
 
 class BookImportException(Exception):
@@ -445,6 +446,10 @@ def download_url_to_file(url, dest_dir, max_bytes=None):
         raise BookImportException(
             f"Could not download {url} (error: {str(e)})"
         ) from e
+    # A downloaded mp4-family file can have its moov atom at the end
+    # (the player then had to fetch the whole file before it could show
+    # a duration); make it streaming-friendly.  Best-effort.
+    faststart_quietly(fp, current_app.logger)
     return filename
 
 
@@ -950,6 +955,11 @@ class Service:
         filename = self._unique_fname(audio_file_field_data.filename)
         fp = os.path.join(current_app.env_config.useraudiopath, filename)
         audio_file_field_data.save(fp)
+        # Uploaded/recorded mp4-family audio often has moov at the end
+        # (browser MediaRecorder always does), which forces the player to
+        # read the whole file before it knows the duration.  Best-effort
+        # re-mux; the import never fails because of it.
+        faststart_quietly(fp, current_app.logger)
         return filename
 
     def book_data_from_url(self, url):
