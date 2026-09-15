@@ -261,4 +261,38 @@ function click_ends_selection(e) {
   return !!(sel && !sel.isCollapsed);
 }
 
+/** How long to wait for a possible second click, in ms. */
+const DOUBLE_CLICK_MS = 260;
+
+/** Single-click dispatch for "click this line to play" areas.
+ *
+ * The action is skipped when the click ends a selection, and it is
+ * deferred by one double-click window because the *first* click of a
+ * double-click looks exactly like a tap: double-clicking a line selects
+ * a word to copy it, which should not also start playback.  The
+ * deferred action is dropped when the second click arrives.
+ *
+ * Used by the transcript lists (the players' and the cue editor's); a
+ * tap on the scrolling subtitle line stays immediate -- it is not text
+ * the user selects from, and latency there would be felt.
+ */
+function bind_line_click(el, action) {
+  let last_click_at = 0;
+  el.addEventListener('click', function(e) {
+    if (click_ends_selection(e))
+      return;
+    const now = Date.now();
+    if (now - last_click_at < DOUBLE_CLICK_MS) {
+      last_click_at = 0;
+      return;
+    }
+    last_click_at = now;
+    setTimeout(function() {
+      // Still the latest click?  (A second click resets last_click_at.)
+      if (last_click_at === now)
+        action(e);
+    }, DOUBLE_CLICK_MS);
+  });
+}
+
 
