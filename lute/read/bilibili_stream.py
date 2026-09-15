@@ -130,8 +130,12 @@ def stream_info(bvid, page=1):
 
     Returns a dict with keys: duration, video (baseUrl, mimeType, codecs,
     bandwidth, width, height, init, index), audio (baseUrl, mimeType,
-    codecs, bandwidth, init, index).  Raises ValueError if the video is
-    unavailable or has no DASH streams.
+    codecs, bandwidth, init, index).  Raises BilibiliStreamError if the
+    video is unavailable or has no DASH streams, or if Bilibili cannot be
+    reached (its API bans the server's IP outright, so this is the normal
+    failure and callers should degrade rather than error out).
+    Results are cached for _STREAM_TTL per (bvid, page), so the API leg
+    runs at most once per half hour even while segments stream through.
     """
     key = (bvid, page)
     now = time.time()
