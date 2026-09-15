@@ -175,12 +175,13 @@ ssh root@<服务器IP> 'cd /opt/lute && LUTE_BILIBILI_PROXY=http://127.0.0.1:188
 from lute.read import bilibili_stream as b
 info = b.stream_info(\"BV1aa411J7dB\", 1)
 rows = info.get(\"videos\") or [info[\"video\"]]
-print(\"ok:\", [(v[\"height\"], v[\"bandwidth\"]) for v in rows])
-print(\"audio:\", [a[\"bandwidth\"] for a in info[\"audios\"]])
+print(\"video:\", [(v[\"height\"], v[\"bandwidth\"]) for v in rows])
+print(\"audio:\", info[\"audio\"][\"bandwidth\"])
 "'
 ```
 
-期望形如 `ok: [(360, 4xxxx), (480, 6xxxx)]` —— **按码率升序，第一个就是默认档**。
+期望形如 `video: [(360, 4xxxx), (480, 6xxxx)]` —— **按码率升序，第一个就是默认档**（`audio` 是单个
+dict，取的是最高档：音频占的字节比视频多，但听力材料不牺牲音质）。
 `412` / `BilibiliStreamError` → 出口机自检（3.0）没绿，或隧道不在。
 
 > 不要用 `curl` 去打阅读页/取流路由来验收：应用自己还有一层登录，裸 curl 一律 `302 → /login`。
@@ -193,6 +194,8 @@ print(\"audio:\", [a[\"bandwidth\"] for a in info[\"audios\"]])
 - [ ] 画面正常播放，**不是** B 站官方 iframe 外壳
 - [ ] **字幕 / 逐词跟随正常**（这是 DASH 中继独有的能力，降级态做不到）
 - [ ] 齿轮里的 **Quality 显示最低档**（如 360p）；手动切到 480p 后画面继续、**不中断重来**
+      —— 判定证据：控制台里 `document.querySelector('video').videoHeight` 由 `360` 变 `480`，
+      且 `currentTime` 继续前进而不是归零（播放器没在播时看不到变化，先点播放）
 - [ ] 刷新页面后画质记忆生效（按高度记忆，只记手动选择）
 
 ### 4.4 降级路径也没坏（可选，1 分钟）

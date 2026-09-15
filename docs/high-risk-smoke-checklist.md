@@ -152,7 +152,7 @@ export PATH="$PWD/venv/bin:$PATH"
 
 **默认播最低码率**，因为字节要过隧道（出口机的上行带宽是瓶颈）：
 
-- `stream_info()` 返回 `videos`（**按码率升序**，第一个即默认）与 `video`（= `videos[0]`）。音频仍是**最高档**——实测 480p 视频 61 kbps 而音频 90 kbps，音频占流量更大，但听力材料牺牲音质不划算。
+- `stream_info()` 返回 `videos`（**按码率升序**，第一个即默认）与 `video`（= `videos[0]`）。音频仍是**最高档**——实测某 45P 视频：480p 视频 61 kbps、360p 42 kbps，而音频 102 kbps，**音频才是流量大头**，但听力材料牺牲音质不划算。
 - `build_mpd()` 为**每一档**生成一个 `Representation`，各自带 `?q=<index>` 的代理 URL ⇒ 切档不需要重取清单、不丢进度。Representation 顺序 = 档位索引顺序，**别改**。
 - 前端：`autoSwitchBitrate.video=false`（dash.js 4.7 已移除 `setAutoSwitchQualityFor`，只能走 `updateSettings`）+ `initialBitrate.video=1` 让首帧就落在最低档；**ABR 开着会自己爬到高档**（本地实测 8 秒内就爬到 480p）。
 - 档位菜单在齿轮里，选项由 `getBitrateInfoListFor("video")` 动态生成。**它在 `manifestLoaded` 时还是空的**（实测），代码在 `manifestLoaded` 与 `streamInitialized` 上都挂载并最多重试 8 次。选择按**高度**（如 480）记住，不是按索引。
