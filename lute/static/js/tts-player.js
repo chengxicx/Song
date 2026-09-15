@@ -777,11 +777,11 @@
 
       row.appendChild(ts);
       row.appendChild(txt);
-      row.addEventListener("click", function (e) {
-        // Selecting text in the transcript (to copy a phrase, or to
-        // check words) ends with a click on the row; jumping and
-        // reading then would be a surprise.
-        if (typeof click_ends_selection === "function" && click_ends_selection(e)) return;
+      // Clicking a line jumps to it and reads -- but not when the click
+      // was the end of a selection, nor the first click of a
+      // double-click, which selects a word to copy.  bind_line_click()
+      // handles both (see lute-cursor.js).
+      bind_line_click(row, function () {
         ttsSeekToCue(i, true);
       });
       ttsTranscriptList.appendChild(row);
