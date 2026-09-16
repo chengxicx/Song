@@ -6,9 +6,11 @@ lookup of overlaid words.
 """
 
 import base64
+import html
 import io
 import json
 import os
+import re
 import shutil
 import zipfile
 
@@ -842,6 +844,29 @@ def test_manga_edit_saves_title_and_tags(app, app_context, japanese, client):
     assert reloaded.book_type == "manga"
     assert reloaded.manga_path == old_path, "no archive uploaded, images unchanged"
     assert reloaded.page_count == 2
+
+
+def test_manga_edit_page_prefills_the_tags_it_will_save(
+    app, app_context, japanese, client
+):
+    """
+    A tagged manga book renders its tags into the form, so re-saving the
+    page without touching the tag field keeps them (the field replaces
+    the book's tags, so an empty echo would silently drop them).
+    """
+    book = _import_and_get_book(app, app_context, japanese, client)
+    _post_manga_edit(client, book.id, book_tags='[{"value":"Manga"},{"value":"jp"}]')
+
+    resp = client.get(f"/book/edit/{book.id}")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+    assert "Manga" in content and "jp" in content, "tags are shown in the form"
+    rendered = re.search(r'id="book_tags"[^>]*value="([^"]*)"', content).group(1)
+
+    # Post the untouched field straight back: tags must survive.
+    _post_manga_edit(client, book.id, book_tags=html.unescape(rendered))
+    reloaded = BookRepository(db.session).find(book.id)
+    assert sorted(t.text for t in reloaded.book_tags) == ["Manga", "jp"]
 
 
 def test_manga_edit_reimports_archive_over_the_book(
