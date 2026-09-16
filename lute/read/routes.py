@@ -19,6 +19,11 @@ from flask import (
 )
 from lute.read.service import Service
 from lute.read.render.service import Service as RenderService
+from lute.read.render.grammar_analysis import (
+    analyze as analyze_grammar,
+    is_japanese_language,
+)
+from lute.read.render.grammar_analysis_ja import analyze_japanese
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
 from lute.term.model import Repository
@@ -1044,6 +1049,34 @@ def render_page_fragment(book, pagenum, track_page_open=False):
 def empty():
     "Show an empty/blank page."
     return ""
+
+
+@bp.route("/grammar_analysis/<int:bookid>/<int:pagenum>", methods=["GET"])
+def grammar_analysis(bookid, pagenum):
+    """
+    Analyze the grammar points on the current reading page.
+
+    Reads the page's original text and returns JSON:
+      [{ "name", "level", "desc", "examples": [{ "sentence": ... }] }]
+
+    Japanese books use the Sudachi-based POS-aware engine; other
+    languages fall back to the regex-based rule library.
+    """
+    book = _find_book(bookid)
+    if book is None:
+        return jsonify({"error": "book not found"}), 404
+    text = book.text_at_page(pagenum)
+    lang = book.language
+    if is_japanese_language(lang):
+        return jsonify(analyze_japanese(text.text))
+    render_service = RenderService(db.session)
+    paragraphs = render_service.get_paragraphs(text.text, lang)
+    sentences = [
+        "".join(ti.text for ti in sentence)
+        for para in paragraphs
+        for sentence in para
+    ]
+    return jsonify(analyze_grammar(sentences))
 
 
 def _term_form_action(term):
