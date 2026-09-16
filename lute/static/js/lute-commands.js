@@ -147,6 +147,120 @@ function handle_translate(span_attribute) {
 }
 
 
+/**
+ * 调用后端 /read/grammar_analysis 分析当前页语法。结果不是悬浮浮层，而是
+ * 直接渲染在阅读页右侧栏 #read_pane_right 内，占满整列（顶部词形编辑区 +
+ * 底部词典区）。点击单词会恢复右侧栏默认的词形表单 + 词典视图。
+ */
+function open_grammar_analysis() {
+  const bookid = $("#book_id").val();
+  const pagenum = $("#page_num").val();
+  const url = `/read/grammar_analysis/${bookid}/${pagenum}`;
+  const pane = document.getElementById("read_pane_right");
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      }[c];
+    });
+  }
+
+  // Remove the analysis view and restore the right pane to its default
+  // (term-form + dictionary) state.  Exposed globally so clicking a word
+  // (LuteTermFormOpened) can restore the default view.
+  function closeGrammarAnalysis() {
+    $("#grammar-analysis-panel").remove();
+    if (!pane) return;
+    pane.classList.remove("grammar-mode");
+    if (window.matchMedia && window.matchMedia("(max-width: 980px)").matches) {
+      pane.classList.remove("open-dict");
+      pane.style.removeProperty("transform");
+      pane.style.removeProperty("opacity");
+      const btm = document.querySelector(".btm-margin-container");
+      if (btm) {
+        btm.classList.remove("open-dict");
+        btm.style.removeProperty("margin-top");
+      }
+    }
+  }
+  window.closeGrammarAnalysis = closeGrammarAnalysis;
+
+  // Drop any previous analysis before rendering a new one.
+  closeGrammarAnalysis();
+
+  // On small screens the pane is translated off-screen until a term opens;
+  // bring it up so the analysis is visible.
+  if (pane && window.matchMedia && window.matchMedia("(max-width: 980px)").matches) {
+    pane.classList.add("open-dict");
+    pane.style.transform = "translateY(0)";
+    pane.style.opacity = "1";
+    const btm = document.querySelector(".btm-margin-container");
+    if (btm) btm.classList.add("open-dict");
+  }
+
+  function header() {
+    return (
+      '<div class="grammar-analysis-panel__header">' +
+      '<span class="grammar-analysis-panel__title">Grammar Analysis</span>' +
+      '<button type="button" class="grammar-analysis-panel__close" aria-label="Close">&times;</button>' +
+      "</div>"
+    );
+  }
+
+  const panel = $("<div/>", {
+    id: "grammar-analysis-panel",
+    class: "grammar-analysis-panel",
+  }).html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">Analyzing…</div></div>');
+
+  if (pane) {
+    pane.classList.add("grammar-mode");
+    pane.appendChild(panel[0]);
+  } else {
+    $("body").append(panel);
+  }
+  panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+
+  $.getJSON(url)
+    .done(function (data) {
+      let bodyHtml;
+      if (!data || data.length === 0) {
+        bodyHtml = '<div class="grammar-analysis-panel__state">No known grammar points detected on this page.</div>';
+      } else {
+        const items = data
+          .map(function (g) {
+            const level = g.level ? '<span class="grammar-item__level">' + escapeHtml(g.level) + "</span>" : "";
+            const desc = g.desc ? '<div class="grammar-item__desc">' + escapeHtml(g.desc) + "</div>" : "";
+            const examples = (g.examples || []).map(function (ex) {
+              return '<div class="grammar-item__example">' + escapeHtml(ex.sentence) + "</div>";
+            }).join("");
+            return (
+              '<div class="grammar-item">' +
+              '<div class="grammar-item__head">' +
+              level +
+              '<span class="grammar-item__name">' + escapeHtml(g.name) + "</span>" +
+              "</div>" +
+              desc +
+              '<div class="grammar-item__examples">' + examples + "</div>" +
+              "</div>"
+            );
+          }).join("");
+        bodyHtml = '<div class="grammar-analysis-panel__body">' + items + "</div>";
+      }
+      panel.html(header() + bodyHtml);
+      panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+    })
+    .fail(function () {
+      panel.html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">Analysis failed. Please try again.</div></div>');
+      panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+    });
+}
+
+
 /** THEMES AND HIGHLIGHTS *************************/
 /* Change to the next theme, and reload the page. */
 function next_theme() {
