@@ -21,6 +21,7 @@ from openepub import Epub, EpubError
 from pypdf import PdfReader
 from subtitle_parser import SrtParser
 from lute.book.model import Repository
+from lute.utils.manga_images import image_path_for_page
 from lute.utils.mp4faststart import faststart_quietly
 from lute.utils.outbound_proxy import bilibili_proxies
 
@@ -747,9 +748,19 @@ class Service:
 
         volume = (mokuro.get("volume") or "").strip().replace("\\", "/")
 
-        for page in mokuro.get("pages") or []:
+        for page_index, page in enumerate(mokuro.get("pages") or []):
             raw = (page.get("img_path") or "").replace("\\", "/")
             if not raw:
+                # No img_path: this .mokuro carries only the OCR data
+                # (the official CLI adds img_path when it assembles the
+                # volume file), so pair the page with its image by
+                # position -- mokuro's own rule -- and write it down, so
+                # the reading screen has a concrete path to request.
+                ordinal = image_path_for_page(
+                    target_dir, page_index, volume
+                )
+                if ordinal is not None:
+                    page["img_path"] = ordinal
                 continue
 
             candidates = []
