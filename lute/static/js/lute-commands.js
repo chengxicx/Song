@@ -309,30 +309,78 @@ function open_grammar_analysis() {
         var sentences = Array.prototype.slice.call(phraseNodes).map(function (el) {
           return { el: el, t: stripText(el.textContent) };
         });
+        function commonAncestor(a, b) {
+          if (!a || !b) return a || b;
+          var chain = [];
+          var n = a;
+          while (n) { chain.push(n); n = n.parentElement; }
+          var m = b;
+          while (m) {
+            if (chain.indexOf(m) !== -1) return m;
+            m = m.parentElement;
+          }
+          return null;
+        }
         Array.prototype.forEach.call(
           panel[0].querySelectorAll(".grammar-item"),
           function (item) {
             var targets = [];
+            function pushTarget(n) {
+              if (n && targets.indexOf(n) === -1) targets.push(n);
+            }
             Array.prototype.forEach.call(
               item.querySelectorAll(".grammar-item__example"),
               function (ex) {
                 var want = stripText(ex.textContent);
                 if (!want) return;
+                // Contiguous run of sentences/phrases covering the example.
+                var nodes = [];
                 for (var i = 0; i < sentences.length; i++) {
                   var acc = "";
                   for (var j = i; j < sentences.length; j++) {
                     acc += sentences[j].t;
                     if (acc.indexOf(want) !== -1) {
                       for (var k = i; k <= j; k++) {
-                        if (targets.indexOf(sentences[k].el) === -1) {
-                          targets.push(sentences[k].el);
-                        }
+                        if (nodes.indexOf(sentences[k].el) === -1) nodes.push(sentences[k].el);
                       }
                       i = j; // the example has been matched; skip this run
                       break;
                     }
                     if (acc.length > want.length + 60) break;
                   }
+                }
+                if (!nodes.length) return;
+                // .textsentence is a font-size:0 wrapper (the visible words
+                // live in .textitem), so an outline on it collapses to a
+                // near-zero box.  Find the nearest ancestor that actually
+                // renders a box (usually the <p> line) and outline that, so
+                // the whole sentence gets one clean ring.
+                function nearestBox(el) {
+                  var guard = 0;
+                  while (el && el !== textRoot && guard < 8) {
+                    var r = el.getBoundingClientRect();
+                    var cs = window.getComputedStyle(el);
+                    if (r.height > 4 && cs.display !== "inline" &&
+                        cs.display !== "contents") {
+                      return el;
+                    }
+                    el = el.parentElement;
+                    guard++;
+                  }
+                  return null;
+                }
+                var anc = nodes[0];
+                for (var a = 1; a < nodes.length && anc && anc !== textRoot; a++) {
+                  anc = commonAncestor(anc, nodes[a]);
+                }
+                var box = nearestBox(anc && anc !== textRoot ? anc : nodes[0]);
+                if (box) {
+                  pushTarget(box);
+                } else {
+                  // No single block covers the run; ring each phrase's line.
+                  nodes.forEach(function (n) {
+                    pushTarget(nearestBox(n) || n);
+                  });
                 }
               }
             );
