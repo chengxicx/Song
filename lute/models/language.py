@@ -67,6 +67,8 @@ class Language(
     # the translation target falls back to the browser UI language.
     tts_lang = db.Column("LgTTSLang", db.String(20))
     translate_target_lang = db.Column("LgTranslateTargetLang", db.String(20))
+    # Display language for grammar analysis results ("en" default, "zh" Chinese).
+    grammar_translate_lang = db.Column("LgGrammarTranslateLang", db.String(20))
 
     def __init__(self):
         self.character_substitutions = "´='|`='|’='|‘='|...=…|..=‥"
@@ -193,6 +195,7 @@ class Language(
             "word_chars": "word_characters",
             "tts_lang": "tts_lang",
             "translate_target_lang": "translate_target_lang",
+            "grammar_translate_lang": "grammar_translate_lang",
         }
 
         for key in d.keys():

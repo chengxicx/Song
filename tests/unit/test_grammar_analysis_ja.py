@@ -1,11 +1,15 @@
 """Tests for the N5 Japanese grammar-analysis engine."""
 
+import re
+
 import pytest
 
 from lute.read.render.grammar_analysis_ja import (
     _ALL_LEVELS,
+    _ALL_RULES,
     _DATA_RULES,
     _N5_RULES,
+    _ZH_DESC,
     analyze_japanese,
 )
 from lute.read.render.grammar_analysis import is_japanese_language
@@ -141,3 +145,26 @@ def test_no_particles_in_levels():
         assert rule.get("kind") != "particle", (
             f"data rule {rule['key']} should not be a particle"
         )
+
+
+def test_chinese_display_language():
+    "display_lang='zh' yields Chinese desc for hits; default stays English."
+    zh = analyze_japanese("毎日運動することにした。", display_lang="zh")
+    hit = next(e for e in zh if e["key"] == "cl_kotonisuru_n4_0")
+    assert re.search(r"[\u4e00-\u9fff]", hit["desc"]), (
+        f"expected Chinese desc, got: {hit['desc']!r}"
+    )
+
+    en = analyze_japanese("毎日運動することにした。")
+    en_hit = next(e for e in en if e["key"] == "cl_kotonisuru_n4_0")
+    rule = next(r for r in _ALL_RULES if r["key"] == "cl_kotonisuru_n4_0")
+    assert en_hit["desc"] == rule["meaning"] == "decide to do"
+
+
+def test_zh_table_covers_all_patterns():
+    "Every rule pattern in _ALL_RULES has a Chinese translation entry."
+    assert _ZH_DESC, "translation table must not be empty"
+    missing = [r["pattern"] for r in _ALL_RULES if r["pattern"] not in _ZH_DESC]
+    assert missing == []
+    for value in _ZH_DESC.values():
+        assert re.search(r"[\u4e00-\u9fff]", value), f"non-Chinese desc: {value!r}"
