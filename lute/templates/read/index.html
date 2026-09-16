@@ -727,17 +727,9 @@
 
     // Re-flow the page into screen-height groups now that the content
     // is swapped in and laid out (fonts/status classes are applied above).
+    // Fixed pages (manga / PDF) are re-fitted to the pane by the same
+    // call -- see the manga branch of _splitToScreens.
     requestAnimationFrame(_splitToScreens);
-
-    // Manga / PDF pages are fixed pages with %-positioned overlays:
-    // scale the whole page so it fits the reading area, then re-fit once
-    // the image finishes decoding (manga: its intrinsic height is 0
-    // until then) or once the canvas renders (PDF).
-    if (_isMangaReader()) {
-      const img = theText?.querySelector(".manga-page-img");
-      if (img) img.addEventListener("load", () => _fitMangaPage(), { once: true });
-      requestAnimationFrame(_fitMangaPage);
-    }
 
     if (initial) {
       prepareTextInteractions();
@@ -1033,7 +1025,27 @@
       natW = media.naturalWidth;
       natH = media.naturalHeight;
     }
-    if (!natW || !natH) return; // dimensions not known yet; retried later
+    if (!natW || !natH) {
+      // Dimensions not known yet.  For manga that means the page image
+      // has not been decoded -- and every content swap (term save,
+      // status update) puts a *fresh* <img> in the pane, so we must
+      // re-fit once it is ready: until then the page keeps its CSS size
+      // (100% of the pane) and the reader sees it blown up.  One pending
+      // retry at a time; a broken image is complete with no intrinsic
+      // size and is skipped instead of being retried forever.
+      if (media && !media.complete && !media.dataset.pageFitRetry) {
+        media.dataset.pageFitRetry = "1";
+        media.addEventListener(
+          "load",
+          () => {
+            delete media.dataset.pageFitRetry;
+            _fitMangaPage();
+          },
+          { once: true }
+        );
+      }
+      return; // dimensions not known yet; retried later
+    }
     page.style.transform = "none";
     // clientHeight includes the container's padding; the last screen
     // reserves a bottom strip for the end-of-book button.
@@ -1111,12 +1123,21 @@
       // Manga / pdf pages are single fixed pages, so there is nothing to
       // split -- but the end-of-book button still belongs on the last
       // page, where the next arrow stops navigating.  The last-screen
-      // class reserves the bottom strip it sits in.
+      // class reserves the bottom strip it sits in, so it is toggled
+      // before the fit, which measures the pane's padding.
       const _pn = parseInt($("#page_num").val());
       const _mp = parseInt($("#page_count").val());
       const _lastPage = _pn >= _mp;
       wrap.classList.toggle("last-screen", _lastPage);
       if (endBtn) endBtn.classList.toggle("hide", !_lastPage);
+      // This is the single choke point every content change goes through
+      // (page turn, term save, bulk status update, ResizeObserver
+      // re-flow, ...).  The fixed page's pixel size is set inline by the
+      // fit, and a swapped-in page fragment carries no inline size at
+      // all: without re-fitting here the image falls back to its CSS
+      // width (100% of the pane) and the reader sees it magnified after
+      // a save.  Idempotent, so calling it per re-flow is cheap.
+      _fitMangaPage();
       return;
     }
     if (_videoScrollMode()) {
