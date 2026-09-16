@@ -800,6 +800,11 @@ def test_manga_edit_page_is_manga_specific(app, app_context, japanese, client):
     assert 'name="audiofile"' not in content
     assert "cueEditorPanel" not in content
 
+    # Save / Cancel only: there is no "Read" shortcut here, because it
+    # would navigate away and silently drop unsaved title / tag edits.
+    assert 'class="btn btn-primary">Save</button>' in content
+    assert "window.location = '/read/" not in content
+
 
 def test_text_book_uses_the_generic_edit_page(app, app_context, japanese, client):
     "A plain text book is unaffected: /book/edit still shows the text form."
