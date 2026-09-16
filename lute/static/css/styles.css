@@ -4719,18 +4719,11 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 }
 
 /* Reading-text highlight driven by hovering a grammar entry on the right.
-   Use an outline ring (sits outside the element box, so it never covers
-   the per-word status colours) plus only a whisper of background warmth;
-   the word glyphs keep their own colours and stay readable. */
+   A clean outline ring only -- the outline sits outside the element box so
+   it never covers the per-word status colours.  No inner background fill. */
 #thetext .grammar-source-active {
     outline: 2px solid var(--btn-accent, #007aff);
     outline-offset: 3px;
     border-radius: 4px;
-    background-color: color-mix(in srgb, var(--btn-accent, #007aff) 7%, transparent);
-    transition: outline-color 0.12s ease, background-color 0.12s ease;
-}
-#thetext .grammar-source-active.rubytag,
-#thetext .grammar-source-active.rubytag rt {
-    outline: none;
-    background-color: transparent;
+    transition: outline-color 0.12s ease;
 }
