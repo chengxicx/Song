@@ -82,6 +82,19 @@
 | 9 | **主题系统** | ⚠️ 仅单元级（`unit/themes/test_service.py` 测 CSS 拼接） | 渲染层无覆盖 | 切主题看 `#status` 选中态对勾是否可见（亮色主题易隐形） |
 | 10 | **备份/恢复迁移** | ✅ `unit/backup/test_restore_migration.py` | 上游 `.db.gz` 恢复后 Song 专属迁移 | 恢复后重启，确认 `LgKiwi*` 四列存在 |
 | 11 | **Bilibili 播放**（DASH 中继 + 官方播放器降级 + 画质档位） | ✅ `unit/book/test_bilibili.py`（31 项：URL 解析、上游失败→502 JSON、代理透传）+ `unit/book/test_bilibili_quality.py`（25 项：默认最低码率、AVC 优先、多档 MPD 为合法 XML、`q=` 路由、档位菜单护栏）+ `unit/book/test_bilibili_embed_fallback.py`（5 项：降级态不被覆盖层遮挡） | 真实网络的取流与播放 | 服务器出口 IP 被 B 站风控（`-412 request was banned`）时中继**永久不可用**，与代码无关。确认 `LUTE_BILIBILI_PROXY` 已配且隧道在线 → 出画面且**字幕跟随正常**；把隧道断开再刷新 → 应自动降级到官方播放器（能看视频、字幕不跟随），且在官方播放器上**点得动播放/暂停/音量**；齿轮里的 Quality 应显示**最低档**且切档后画面继续 |
+| 12 | **漫画书编辑 / 重导**（`/book/edit/<漫画书>` 覆盖原书） | ✅ `unit/book/test_manga.py`（8 项：编辑页只有漫画控件、改标题标签不动图片、上传新包换页/图/mokuro、页数增减、坏扩展名与空白标题被拒、纯文本书仍走通用编辑页） | 浏览器里真实选包上传、数百页大包耗时 | 列表点 Edit → 只出现漫画页（**无文本框、无 Type 下拉**）；只改标题标签 → 图片目录与页数不变；传一个新包 → 页数变成新数、`/read/<id>/page/1` 显示新图，**书 id 不变**（阅读记录仍在）；传 `.rar` / 空标题 → 报错且书不变 |
+
+---
+
+## 漫画书：编辑页 = 换包重导（覆盖原书）
+
+`/book/edit/<id>` 现在对 `book_type == "manga"` **分流**到 `_edit_manga()`（`lute/book/routes.py`），渲染 `book/edit_manga.html`：只有标题 / 标签 / 「替换压缩包」。
+
+- **旧行为为什么必须改**：漫画书渲染的是通用文本编辑页 —— 文本框恒空（漫画页文本本来就是空占位），而 Type 下拉里**没有 manga 这个选项**，一旦保存就把书悄悄改成文本书（页还是那些空页）⇒ 一本书直接坏掉，且不报错。
+- **重导语义**：书 id、语言、标签、词的状态都不变；`manga_path`、`manga_data`、页行（每页一个空 `TxText`）按新包重建（`BookService.replace_manga()`）。页数可变多可少。
+- **页行必须显式 `session.add_all()`**：重导时书已经是 persistent，SQLAlchemy 2.0 不再对「往持久父集合里 append 瞬时子对象」做 backref cascade，只发一条 `SAWarning`。症状是**页数静默变 0**（`page_count == 0`），页面全黑但无异常。旧数据的 `wordsread.WrTxID` 走 `ondelete=SET NULL`，所以已读词不丢。
+- **旧的 `static/manga/<uuid>/` 故意不删**：书的 `BkMangaPath` 是它的唯一引用，留着重放旧 `.db.gz` 备份时仍能找到图（与「别批量删孤儿目录」的约定一致）。
+- 副作用（可接受）：书内「已读页」进度归零（内容已经换了），页面书签随页行一起被清掉。
 
 ---
 
@@ -93,7 +106,8 @@
 cd /Users/cxi/Documents/lutedev/lute-v3
 
 # 0. 清掉沙箱 mkdir 缺陷留下的基目录，否则 72 个用例会在 setup 阶段集体 PermissionError
-rm -rf "$TMPDIR"pytest-of-*
+#    （**别用 `rm -rf "$TMPDIR"pytest-of-*`**：zsh 下 glob 无匹配会报 `no matches found` 并中止整条命令链）
+find "${TMPDIR}" -maxdepth 1 -name 'pytest-of-*' -exec rm -rf {} + 2>/dev/null
 
 # 1. 确认没有别的 pytest 在跑（测试库是固定共享路径，只能独占）
 pgrep -fl pytest || echo "clean"
