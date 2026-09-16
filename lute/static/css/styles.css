@@ -4711,3 +4711,18 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     color: var(--g-text-2);
     margin-right: 4px;
 }
+
+/* Grammar examples must never carry a TTS speaker (nothing to read
+   aloud, and they re-use the page's sentence text). */
+.grammar-analysis-panel .lute-sentence-play-btn {
+    display: none !important;
+}
+
+/* Reading-text highlight driven by hovering a grammar entry on the right. */
+#thetext .grammar-source-active,
+#thetext .grammar-source-active .textitem {
+    background-color: color-mix(in srgb, var(--btn-accent, #007aff) 20%, transparent);
+    border-radius: 3px;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--btn-accent, #007aff) 12%, transparent);
+    transition: background-color 0.12s ease, box-shadow 0.12s ease;
+}
