@@ -219,6 +219,7 @@ function open_grammar_analysis() {
     return (
       '<div class="grammar-analysis-panel__header">' +
       '<span class="grammar-analysis-panel__title">Grammar Analysis</span>' +
+      '<span id="grammar-count" class="grammar-analysis-panel__badge">…</span>' +
       '<button type="button" class="grammar-analysis-panel__close" aria-label="Close">&times;</button>' +
       "</div>"
     );
@@ -235,6 +236,19 @@ function open_grammar_analysis() {
   } else {
     $("body").append(panel);
   }
+
+  // Start the panel at the reader's stored font size so the side-bar font
+  // buttons (A+/A-) control it consistently from the moment it opens.
+  if (typeof localStorage !== "undefined") {
+    const base = document.querySelector("#thetext span.textitem");
+    const defaultPx = base ? parseFloat(window.getComputedStyle(base).fontSize) : 18;
+    const stored = localStorage.getItem("fontSize");
+    const px = stored ? parseFloat(stored) : defaultPx;
+    if (window.convertPixelsToRem && isFinite(px)) {
+      panel[0].style.fontSize = window.convertPixelsToRem(px) + "rem";
+    }
+  }
+
   panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
 
   $.getJSON(url)
@@ -251,7 +265,8 @@ function open_grammar_analysis() {
               return '<div class="grammar-item__example">' + escapeHtml(ex.sentence) + "</div>";
             }).join("");
             return (
-              '<div class="grammar-item">' +
+              '<div class="grammar-item grammar-item--' +
+              escapeHtml(g.level || "N") + '">' +
               '<div class="grammar-item__head">' +
               level +
               '<span class="grammar-item__name">' + escapeHtml(g.name) + "</span>" +
@@ -264,6 +279,9 @@ function open_grammar_analysis() {
         bodyHtml = '<div class="grammar-analysis-panel__body">' + items + "</div>";
       }
       panel.html(header() + bodyHtml);
+      panel.find("#grammar-count").text(
+        data.length + (data.length === 1 ? " point" : " points")
+      );
       panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
     })
     .fail(function () {
