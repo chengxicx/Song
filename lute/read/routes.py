@@ -1065,12 +1065,16 @@ def grammar_analysis(bookid, pagenum):
     book = _find_book(bookid)
     if book is None:
         return jsonify({"error": "book not found"}), 404
-    text = book.text_at_page(pagenum)
     lang = book.language
+    # The reader splits one Lute page into sub-screens; analyse only the
+    # current sub-screen when the client supplies its text, falling back to
+    # the whole page otherwise.
+    snippet = request.args.get("text", "")
+    page_text = snippet if snippet.strip() else book.text_at_page(pagenum).text
     if is_japanese_language(lang):
-        return jsonify(analyze_japanese(text.text))
+        return jsonify(analyze_japanese(page_text))
     render_service = RenderService(db.session)
-    paragraphs = render_service.get_paragraphs(text.text, lang)
+    paragraphs = render_service.get_paragraphs(page_text, lang)
     sentences = [
         "".join(ti.text for ti in sentence)
         for para in paragraphs

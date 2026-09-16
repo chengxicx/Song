@@ -155,7 +155,19 @@ function handle_translate(span_attribute) {
 function open_grammar_analysis() {
   const bookid = $("#book_id").val();
   const pagenum = $("#page_num").val();
-  const url = `/read/grammar_analysis/${bookid}/${pagenum}`;
+  // Analyse only the current sub-screen: the reader splits one Lute page
+  // into screen-height groups and only the active group's <p> elements are
+  // visible.  Collect their text (skip manga/pdf, which have no text nodes).
+  let snippet = "";
+  const theText = document.getElementById("thetext");
+  if (theText && !theText.classList.contains("manga-text-container")) {
+    snippet = Array.from(theText.querySelectorAll(":scope > p"))
+      .filter(function (p) { return p.style.display !== "none" && p.textContent; })
+      .map(function (p) { return p.textContent; })
+      .join("");
+  }
+  const url = `/read/grammar_analysis/${bookid}/${pagenum}` +
+    (snippet ? "?text=" + encodeURIComponent(snippet) : "");
   const pane = document.getElementById("read_pane_right");
 
   function escapeHtml(s) {
