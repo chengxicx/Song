@@ -301,7 +301,7 @@ function open_grammar_analysis() {
         var activeRings = [];
 
         function updateActiveRings() {
-          activeRings.forEach(function (r) { placeRing(r.ring, r.nodes); });
+          activeRings.forEach(function (r) { placeRing(r.ring, r.run); });
         }
         window.addEventListener("scroll", updateActiveRings, { passive: true });
         window.addEventListener("resize", updateActiveRings);
@@ -309,17 +309,6 @@ function open_grammar_analysis() {
         function hideAllRings() {
           activeRings.forEach(function (r) { r.ring.style.display = "none"; });
           activeRings = [];
-        }
-
-        function nodeRects(node) {
-          var items = node.querySelectorAll(".textitem");
-          var rects = [];
-          if (items.length) {
-            items.forEach(function (it) { rects.push(it.getBoundingClientRect()); });
-          } else {
-            rects.push(node.getBoundingClientRect());
-          }
-          return rects;
         }
 
         function unionRect(rects) {
@@ -335,9 +324,43 @@ function open_grammar_analysis() {
           return { top: top, left: left, width: right - left, height: bottom - top };
         }
 
-        function placeRing(ring, nodes) {
+        // Ring exactly around the example substring within the matched
+        // nodes: a node may hold more than the example (e.g. an mp3 phrase
+        // node that begins with "あの、すみません。" before the example),
+        // so collect the .textitem cells of the whole run, locate where the
+        // stripped example text falls in the concatenated text, and only
+        // union the cells that overlap that range.
+        function placeRing(ring, run) {
+          var want = run.want || "";
+          var cells = [];
+          run.nodes.forEach(function (n) {
+            var items = n.querySelectorAll(".textitem");
+            if (items.length) {
+              items.forEach(function (it) {
+                cells.push({ el: it, t: stripText(it.textContent) });
+              });
+            } else {
+              cells.push({ el: n, t: stripText(n.textContent) });
+            }
+          });
           var rects = [];
-          nodes.forEach(function (n) { rects = rects.concat(nodeRects(n)); });
+          if (want && cells.length) {
+            var full = "", starts = [];
+            cells.forEach(function (c) { starts.push(full.length); full += c.t; });
+            var pos = full.indexOf(want);
+            if (pos !== -1) {
+              var end = pos + want.length;
+              cells.forEach(function (c, idx) {
+                var cStart = starts[idx], cEnd = cStart + c.t.length;
+                if (cEnd > pos && cStart < end) {
+                  rects.push(c.el.getBoundingClientRect());
+                }
+              });
+            }
+          }
+          if (!rects.length) {
+            cells.forEach(function (c) { rects.push(c.el.getBoundingClientRect()); });
+          }
           var u = unionRect(rects);
           if (!u) { ring.style.display = "none"; return; }
           var pad = 4;
@@ -402,7 +425,7 @@ function open_grammar_analysis() {
                     if (acc.length > want.length + 60) break;
                   }
                 }
-                if (nodes.length) exampleRuns.push(nodes);
+                if (nodes.length) exampleRuns.push({ want: want, nodes: nodes });
               }
             );
             if (exampleRuns.length === 0) return;
@@ -410,12 +433,12 @@ function open_grammar_analysis() {
             item.addEventListener("mouseenter", function () {
               hideAllRings();
               rings = [];
-              exampleRuns.forEach(function (nodes) {
+              exampleRuns.forEach(function (run) {
                 var ring = document.createElement("div");
                 ring.className = "grammar-ring";
                 ringLayer.appendChild(ring);
-                placeRing(ring, nodes);
-                rings.push({ ring: ring, nodes: nodes });
+                placeRing(ring, run);
+                rings.push({ ring: ring, run: run });
               });
               activeRings = rings;
             });
