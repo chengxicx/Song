@@ -1072,7 +1072,8 @@ def grammar_analysis(bookid, pagenum):
     snippet = request.args.get("text", "")
     page_text = snippet if snippet.strip() else book.text_at_page(pagenum).text
     if is_japanese_language(lang):
-        return jsonify(analyze_japanese(page_text))
+        display = getattr(lang, "grammar_translate_lang", "") or "en"
+        return jsonify(analyze_japanese(page_text, display_lang=display))
     render_service = RenderService(db.session)
     paragraphs = render_service.get_paragraphs(page_text, lang)
     sentences = [
