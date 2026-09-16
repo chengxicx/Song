@@ -352,6 +352,9 @@
 
   let _lute_form_event_handler = function(event) {
     if (event.data.event === "LuteTermFormOpened") {
+      // A grammar-analysis view may be filling the right pane; clicking a
+      // word restores the pane to its default term-form + dictionary state.
+      if (window.closeGrammarAnalysis) window.closeGrammarAnalysis();
       LookupButton.TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
       loadDictionaries();
     }

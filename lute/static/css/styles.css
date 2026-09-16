@@ -4539,3 +4539,138 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     color: #8e8e93;
     font-size: 11.5px;
 }
+
+/* Grammar analysis lives inside the reading page's right pane (#read_pane_right),
+   filling the whole column (top term-form area + bottom dictionary area).  It is
+   not a floating overlay: while it is shown the pane's normal wordframe and
+   dictionary regions are hidden, and clicking a word restores the default view. */
+#read_pane_right.grammar-mode > .wordframecontainer,
+#read_pane_right.grammar-mode > .dictcontainer {
+    display: none !important;
+}
+
+.grammar-analysis-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background-color, #fff);
+    color: var(--font-color, #000);
+    overflow: hidden;
+    font: 100%/1.4 "Lucida Grande", Arial, sans-serif, STHeiti,
+        "Arial Unicode MS", MingLiu;
+}
+
+.grammar-analysis-panel__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--form-border-color, #ddd);
+    background-color: color-mix(
+        in srgb,
+        var(--btn-accent, #007aff) 10%,
+        var(--background-color, #fff)
+    );
+}
+
+.grammar-analysis-panel__title {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.grammar-analysis-panel__badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--btn-accent, #007aff);
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    padding: 1px 8px;
+    opacity: 0.9;
+}
+
+.grammar-analysis-panel__close {
+    border: none;
+    background: transparent;
+    color: var(--font-color, #000);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+    opacity: 0.6;
+}
+.grammar-analysis-panel__close:hover {
+    opacity: 1;
+}
+
+.grammar-analysis-panel__body {
+    overflow-y: auto;
+    padding: 10px 12px;
+}
+
+.grammar-analysis-panel__state {
+    padding: 20px 12px;
+    text-align: center;
+    color: color-mix(in srgb, var(--font-color, #000) 55%, transparent);
+    font-size: 13px;
+}
+
+.grammar-item {
+    border-left: 3px solid var(--btn-accent, #007aff);
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border-radius: 0 6px 6px 0;
+    background-color: color-mix(
+        in srgb,
+        var(--font-color, #000) 4%,
+        transparent
+    );
+}
+
+.grammar-item__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.grammar-item__level {
+    flex: none;
+    margin-top: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--btn-accent, #007aff);
+    background: color-mix(
+        in srgb,
+        var(--btn-accent, #007aff) 14%,
+        transparent
+    );
+    border-radius: 4px;
+    padding: 1px 5px;
+}
+
+.grammar-item__name {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.grammar-item__desc {
+    margin-top: 2px;
+    font-size: 12px;
+    color: color-mix(in srgb, var(--font-color, #000) 60%, transparent);
+}
+
+.grammar-item__examples {
+    margin-top: 6px;
+    display: grid;
+    gap: 4px;
+}
+
+.grammar-item__example {
+    font-size: 12.5px;
+    line-height: 1.45;
+    padding-left: 10px;
+    border-left: 1px solid var(--form-border-color, #ddd);
+    color: var(--font-color, #000);
+}
