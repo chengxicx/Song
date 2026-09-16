@@ -48,6 +48,7 @@ from lute.book.epub_import import (
 from lute.book.forms import (
     NewBookForm,
     EditBookForm,
+    MangaEditForm,
     BookSettingsForm,
     ALLOWED_AUDIO_EXTENSIONS,
 )
@@ -59,6 +60,7 @@ from lute.db import db
 from lute.models.language import Language
 from lute.models.repositories import (
     BookRepository,
+    BookTagRepository,
     UserSettingRepository,
     LanguageRepository,
 )
@@ -227,6 +229,12 @@ def edit(bookid):
     "Edit a book - title, text, source, tags, and audio can be changed."
     repo = Repository(db.session)
     b = repo.load(bookid)
+
+    # Manga books have no text, and their images can only be replaced by
+    # re-importing an archive, so they have their own edit page.
+    if (b.book_type or "") == "manga":
+        return _edit_manga(b)
+
     form = EditBookForm(obj=b)
 
     # For youtube/bilibili/mp3/video books the text field holds the SRT
@@ -264,6 +272,62 @@ def edit(bookid):
         tags=repo.get_book_tags(),
         allowed_extensions=ALLOWED_AUDIO_EXTENSIONS,
         cue_audio_url=cue_audio_url,
+    )
+
+
+def _set_book_tags(dbbook, tag_texts):
+    "Replace a book's tags, creating any tag that doesn't exist yet."
+    btr = BookTagRepository(db.session)
+    tags = [btr.find_or_create_by_text(t) for t in tag_texts]
+    dbbook.remove_all_book_tags()
+    for tag in tags:
+        dbbook.add_book_tag(tag)
+
+
+def _edit_manga(book):
+    """
+    Edit page for a Mokuro manga book.
+
+    A manga book has no text (its pages are empty placeholders, one per
+    mokuro page) and its images can only change by re-importing an
+    archive, so the generic text edit form is meaningless here: this page
+    edits the title and tags in place, and re-imports an uploaded .zip /
+    .cbz over the same book.
+    """
+    dbbook = _find_book(book.id)
+    form = MangaEditForm(obj=book)
+
+    if form.validate_on_submit():
+        archive = form.manga_file.data
+        dbbook.title = form.title.data.strip()
+        _set_book_tags(dbbook, _parse_tagify_tags(form.book_tags.data))
+        db.session.commit()
+
+        if archive:
+            try:
+                BookService().replace_manga(
+                    dbbook, archive.filename, archive.stream, db.session
+                )
+            except BookImportException as e:
+                flash(e.message, "notice")
+                return redirect(f"/book/edit/{book.id}", 302)
+            # Page count and word count changed with the new archive.
+            StatsService(db.session).mark_stale(dbbook)
+            flash(f'"{dbbook.title}" re-imported: the manga pages were replaced.')
+            return redirect(f"/read/{dbbook.id}/page/1", 302)
+
+        flash(f'"{dbbook.title}" updated.')
+        return redirect("/", 302)
+
+    lang_repo = LanguageRepository(db.session)
+    lang = lang_repo.find(book.language_id)
+    return render_template(
+        "book/edit_manga.html",
+        book=dbbook,
+        form=form,
+        title_direction="rtl" if lang.right_to_left else "ltr",
+        tags=Repository(db.session).get_book_tags(),
+        page_count=dbbook.page_count,
     )
 
 

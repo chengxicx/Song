@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Manga{% endblock %}
+{% block header %}Edit manga book{% endblock %}
+
+{% block body %}
+
+{% for field_name, field_errors in form.errors.items() %}
+{% for error in field_errors %}
+<div class="flash-notice-narrow">{{ error }}</div>
+{% endfor %}
+{% endfor %}
+
+<p style="width: 60%; margin-bottom: 20px;">This is a Mokuro manga book, so it has no text to edit.
+  You can change the title and tags, and you can upload a new archive to replace the book's pages and
+  images. The language can't be changed after a book has been created.</p>
+
+<form method="POST" enctype="multipart/form-data">
+  {{ form.hidden_tag() }}
+
+  <table id="book">
+  <tbody>
+
+    <tr>
+      <td>Type</td>
+      <td>
+        <span class="smallfilename">Mokuro manga &mdash; {{ page_count }} page{{ '' if page_count == 1 else 's' }}</span>
+      </td>
+    </tr>
+
+    <tr>
+      <td>{{ form.title.label }}</td>
+      <td>{{ form.title(class="form-control", dir=title_direction) }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.book_tags.label }}</td>
+      <td>{{ form.book_tags(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>Current archive</td>
+      <td>
+        <span class="smallfilename">{{ book.source_uri or 'unknown' }}</span>
+      </td>
+    </tr>
+
+    <tr>
+      <td>{{ form.manga_file.label }}<br />
+        <span class="formfieldcomment">zip, cbz</span>
+      </td>
+      <td>
+        {{ form.manga_file(accept=".zip,.cbz") }}
+        <div style="margin-top: 5px;">
+          <span class="smallfilename">Optional. Re-imports the uploaded archive over this book:
+            the pages, images and text boxes are replaced, and reading starts again at page 1.
+            Words already marked as read stay known.</span>
+        </div>
+      </td>
+    </tr>
+
+  </tbody>
+  </table>
+
+  <div class="form-action-row">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button class="btn btn-secondary" onclick="window.location = '/read/{{ book.id }}/page/1'; return false;">Read</button>
+    <button class="btn btn-secondary" onclick="window.location = '/'; return false;">Cancel</button>
+  </div>
+</form>
+
+<script type="text/javascript">
+  var TAGS = {{ tags | safe }};
+
+  $(document).ready(function () {
+    new Tagify(document.getElementById('book_tags'), {
+      placeholder: 'Tags',
+      editTags: false,
+      autoComplete: { rightKey: true, tabKey: true },
+      dropdown: { enabled: 1 },
+      enforceWhitelist: false,
+      whitelist: TAGS
+    });
+  });
+</script>
+
+{% endblock %}

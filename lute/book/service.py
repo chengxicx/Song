@@ -21,6 +21,7 @@ from openepub import Epub, EpubError
 from pypdf import PdfReader
 from subtitle_parser import SrtParser
 from lute.book.model import Repository
+from lute.models.book import Text as DBText
 from lute.utils.manga_images import image_path_for_page
 from lute.utils.mp4faststart import faststart_quietly
 from lute.utils.outbound_proxy import bilibili_proxies
@@ -815,6 +816,42 @@ class Service:
                 page["img_path"] = resolved
 
         return f"manga/{manga_uuid}", mokuro
+
+    def replace_manga(self, dbbook, filename, filestream, session):
+        """
+        Re-import a manga archive over an existing manga book.
+
+        The book keeps its id, language and reading history; its images,
+        mokuro data and page rows are replaced with the new archive's.
+
+        Manga pages carry no text (they are empty placeholders, one per
+        mokuro page), so the pages are rebuilt to the new archive's page
+        count.  Dropping them cascades to the page bookmarks and
+        sentences, and detaches the wordsread rows (WrTxID is
+        "SET NULL"), so terms already marked as read stay known.
+
+        The previous static/manga/<uuid> directory is deliberately left
+        in place: a book row is the only reference to it, so restoring
+        an older .db.gz backup still finds its images.
+
+        Raises BookImportException on invalid archives.
+        """
+        manga_path, mokuro = self.extract_manga(filename, filestream)
+        pages = mokuro.get("pages") or []
+
+        dbbook.manga_path = manga_path
+        dbbook.manga_data = json.dumps(mokuro, ensure_ascii=False)
+        dbbook.source_uri = filename
+
+        dbbook.texts = []
+        session.flush()
+        # The pages are added explicitly: the book is already persistent
+        # here, so simply appending to its collection would not cascade a
+        # save to the transient page objects (SQLAlchemy 2.0).
+        new_pages = [DBText(dbbook, "", index + 1) for index in range(len(pages))]
+        session.add_all(new_pages)
+        session.commit()
+        return dbbook
 
     def extract_pdf(self, filename, filestream):
         """

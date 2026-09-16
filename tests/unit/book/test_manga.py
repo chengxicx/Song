@@ -60,6 +60,21 @@ SAMPLE_PAGES = [
             },
         ],
     },
+    # A third page, so re-importing a bigger archive can be tested.
+    {
+        "version": "0.2.1",
+        "img_path": "hanabira_manga_03.jpg",
+        "img_width": 848,
+        "img_height": 1264,
+        "blocks": [
+            {
+                "box": [120, 260, 300, 330],
+                "vertical": False,
+                "font_size": 22,
+                "lines": ["おはよう"],
+            },
+        ],
+    },
 ]
 
 
@@ -715,12 +730,12 @@ def test_termpopup_returns_term_data(app, app_context, japanese, client):
 
 
 def test_manga_edit_preserves_manga_data(app, app_context, japanese, client):
-    "Re-saving a manga book keeps its manga path and JSON."
+    "A business-object re-save keeps the manga path and JSON."
     book = _import_and_get_book(app, app_context, japanese, client)
 
-    # Reload into a BO and re-save it (the same path the edit route uses);
-    # the manga fields are not exposed via the edit form, so they must
-    # survive intact.
+    # Reload into a BO and re-save it (e.g. scripts and data cleanup
+    # round-trip books this way); the manga fields are not carried by
+    # the BO's text, so they must survive intact.
     repo = BookRepository(db.session)
     updated = BookModelRepository(db.session)._build_business_book(book)
     updated.title = "Test Manga [edited]"
@@ -732,6 +747,180 @@ def test_manga_edit_preserves_manga_data(app, app_context, japanese, client):
     assert reloaded.manga_path == book.manga_path
     assert reloaded.manga is not None
     assert reloaded.title == "Test Manga [edited]"
+
+
+# ---------------------------------------------------------------------
+# Edit page: manga books get their own page, and can be re-imported
+# ---------------------------------------------------------------------
+
+
+def _post_manga_edit(client, book_id, **extra):
+    """
+    POST the manga edit form.
+
+    `archive` is a (stream, mokuro) pair from make_archive; when omitted
+    no file is uploaded, i.e. only the title/tags are saved.
+    """
+    data = {
+        "title": extra.get("title", "Test Manga"),
+        "book_tags": extra.get("book_tags", ""),
+    }
+    archive = extra.get("archive")
+    if archive is not None:
+        filename = extra.get("archive_name", "hanabira_manga_01.cbz")
+        data["manga_file"] = (archive[0], filename)
+    return client.post(
+        f"/book/edit/{book_id}",
+        data=data,
+        content_type="multipart/form-data",
+        follow_redirects=False,
+    )
+
+
+def test_manga_edit_page_is_manga_specific(app, app_context, japanese, client):
+    """
+    /book/edit/<manga id> shows the manga page: no text editor and no
+    way to retype the book, but the archive can be replaced.
+    """
+    book = _import_and_get_book(app, app_context, japanese, client)
+
+    resp = client.get(f"/book/edit/{book.id}")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+
+    assert "Edit manga book" in content
+    assert 'name="manga_file"' in content
+    assert 'accept=".zip,.cbz"' in content
+    assert "hanabira_manga_01.cbz" in content, "the current archive is shown"
+    assert "2 pages" in content
+
+    # None of the generic (meaningless) text-editing controls.
+    assert 'name="text"' not in content
+    assert 'id="book_type"' not in content
+    assert 'name="audiofile"' not in content
+    assert "cueEditorPanel" not in content
+
+
+def test_text_book_uses_the_generic_edit_page(app, app_context, japanese, client):
+    "A plain text book is unaffected: /book/edit still shows the text form."
+    b = Book()
+    b.language_id = japanese.id
+    b.title = "Plain text book"
+    b.text = "これは テスト です。"
+    dbbook = BookService().import_book(b, db.session)
+
+    resp = client.get(f"/book/edit/{dbbook.id}")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+    assert 'id="book_type"' in content
+    assert 'name="text"' in content
+    assert 'name="manga_file"' not in content
+
+
+def test_manga_edit_saves_title_and_tags(app, app_context, japanese, client):
+    "Without an archive, only the title and tags change."
+    book = _import_and_get_book(app, app_context, japanese, client)
+    old_path = book.manga_path
+
+    resp = _post_manga_edit(
+        client,
+        book.id,
+        title="Renamed Manga",
+        book_tags='[{"value":"Manga"},{"value":"jp"}]',
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/"
+
+    reloaded = BookRepository(db.session).find(book.id)
+    assert reloaded.title == "Renamed Manga"
+    assert sorted(t.text for t in reloaded.book_tags) == ["Manga", "jp"]
+    assert reloaded.book_type == "manga"
+    assert reloaded.manga_path == old_path, "no archive uploaded, images unchanged"
+    assert reloaded.page_count == 2
+
+
+def test_manga_edit_reimports_archive_over_the_book(
+    app, app_context, japanese, client
+):
+    "An uploaded archive replaces the book's pages, images and mokuro data."
+    from flask import current_app
+
+    book = _import_and_get_book(app, app_context, japanese, client)  # 2 pages
+    old_path = book.manga_path
+
+    resp = _post_manga_edit(
+        client,
+        book.id,
+        archive=make_archive(".cbz", 3),
+        archive_name="new_manga.cbz",
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == f"/read/{book.id}/page/1"
+
+    reloaded = BookRepository(db.session).find(book.id)
+    assert reloaded.id == book.id, "the same book row is reused"
+    assert reloaded.book_type == "manga"
+    assert reloaded.source_uri == "new_manga.cbz"
+    assert reloaded.manga_path != old_path
+    assert reloaded.page_count == 3
+    assert len(reloaded.manga["pages"]) == 3
+
+    new_dir = os.path.join(current_app.static_folder, reloaded.manga_path)
+    assert os.path.isdir(new_dir)
+    assert os.path.exists(os.path.join(new_dir, "hanabira_manga_03.jpg"))
+    # The previous folder is deliberately kept on disk, so restoring an
+    # older DB backup still finds the images it refers to.
+    assert os.path.isdir(os.path.join(current_app.static_folder, old_path))
+
+    # The reading screen serves the new images.
+    resp = client.get(f"/read/start_reading/{book.id}/1")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+    assert f'src="/static/{reloaded.manga_path}/hanabira_manga_01.jpg"' in content
+
+
+def test_manga_edit_reimport_shrinks_to_the_new_page_count(
+    app, app_context, japanese, client
+):
+    "Re-importing a smaller archive drops the extra pages."
+    book = _import_and_get_book(app, app_context, japanese, client)  # 2 pages
+
+    resp = _post_manga_edit(client, book.id, archive=make_archive(".cbz", 1))
+    assert resp.status_code == 302
+
+    reloaded = BookRepository(db.session).find(book.id)
+    assert reloaded.page_count == 1
+    assert len(reloaded.manga["pages"]) == 1
+
+
+def test_manga_edit_rejects_bad_archive(app, app_context, japanese, client):
+    "A non-zip/cbz upload is rejected and nothing is saved."
+    book = _import_and_get_book(app, app_context, japanese, client)
+
+    resp = _post_manga_edit(
+        client,
+        book.id,
+        title="Should not be saved",
+        archive=(io.BytesIO(b"nope"), None),
+        archive_name="book.rar",
+    )
+    assert resp.status_code == 200
+    assert ".zip or .cbz" in resp.get_data(as_text=True)
+
+    reloaded = BookRepository(db.session).find(book.id)
+    assert reloaded.title == "Test Manga"
+    assert reloaded.manga_path == book.manga_path
+    assert reloaded.page_count == 2
+
+
+def test_manga_edit_requires_a_title(app, app_context, japanese, client):
+    "The title can't be blanked out."
+    book = _import_and_get_book(app, app_context, japanese, client)
+
+    resp = _post_manga_edit(client, book.id, title="")
+    assert resp.status_code == 200
+    assert "This field is required" in resp.get_data(as_text=True)
+    assert BookRepository(db.session).find(book.id).title == "Test Manga"
 
 
 import pytest  # noqa: E402  (used by the extract_manga rejection tests)
