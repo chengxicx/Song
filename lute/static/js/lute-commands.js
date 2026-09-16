@@ -293,12 +293,22 @@ function open_grammar_analysis() {
         textRoot.querySelectorAll(".grammar-source-active").forEach(function (n) {
           n.classList.remove("grammar-source-active");
         });
-        var sentences = Array.prototype.slice.call(
-          textRoot.querySelectorAll(".textsentence, .textrow, p")
-        );
-        function normText(t) {
-          return (t || "").replace(/🔊/g, "").replace(/\s+/g, " ").trim();
+        // Media-driven books (mp3/subtitles) often split one grammar
+        // example across several adjacent phrase nodes.  Match by a
+        // contiguous run of sentences whose combined text contains the
+        // example, ignoring whitespace and punctuation.  Use one sentence
+        // source (.textsentence, else .textrow/p) to avoid matching a node
+        // and its parent and drawing a double ring.
+        function stripText(t) {
+          return (t || "").replace(/🔊/g, "").replace(/[^\p{L}\p{N}]/gu, "");
         }
+        var phraseNodes = textRoot.querySelectorAll(".textsentence");
+        if (!phraseNodes.length) {
+          phraseNodes = textRoot.querySelectorAll(".textrow, p");
+        }
+        var sentences = Array.prototype.slice.call(phraseNodes).map(function (el) {
+          return { el: el, t: stripText(el.textContent) };
+        });
         Array.prototype.forEach.call(
           panel[0].querySelectorAll(".grammar-item"),
           function (item) {
@@ -306,18 +316,24 @@ function open_grammar_analysis() {
             Array.prototype.forEach.call(
               item.querySelectorAll(".grammar-item__example"),
               function (ex) {
-                var want = normText(ex.textContent);
+                var want = stripText(ex.textContent);
                 if (!want) return;
-                sentences.forEach(function (s) {
-                  var t = normText(s.textContent);
-                  // Exact match first, then fall back to containment so a
-                  // sentence that got grouped/parsed slightly differently
-                  // on the reading side still lights up.  Collect every
-                  // matching sentence, not just the first.
-                  var hit = t === want ||
-                    (t.length > 0 && want.length > 0 && t.indexOf(want) !== -1);
-                  if (hit && targets.indexOf(s) === -1) targets.push(s);
-                });
+                for (var i = 0; i < sentences.length; i++) {
+                  var acc = "";
+                  for (var j = i; j < sentences.length; j++) {
+                    acc += sentences[j].t;
+                    if (acc.indexOf(want) !== -1) {
+                      for (var k = i; k <= j; k++) {
+                        if (targets.indexOf(sentences[k].el) === -1) {
+                          targets.push(sentences[k].el);
+                        }
+                      }
+                      i = j; // the example has been matched; skip this run
+                      break;
+                    }
+                    if (acc.length > want.length + 60) break;
+                  }
+                }
               }
             );
             if (targets.length === 0) return;
