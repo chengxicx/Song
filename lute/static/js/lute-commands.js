@@ -237,16 +237,16 @@ function open_grammar_analysis() {
     $("body").append(panel);
   }
 
-  // Start the panel at the reader's stored font size so the side-bar font
-  // buttons (A+/A-) control it consistently from the moment it opens.
-  if (typeof localStorage !== "undefined") {
-    const base = document.querySelector("#thetext span.textitem");
-    const defaultPx = base ? parseFloat(window.getComputedStyle(base).fontSize) : 18;
-    const stored = localStorage.getItem("fontSize");
-    const px = stored ? parseFloat(stored) : defaultPx;
-    if (window.convertPixelsToRem && isFinite(px)) {
-      panel[0].style.fontSize = window.convertPixelsToRem(px) + "rem";
+  // Start the panel at its own stored size (independent of the reading text
+  // size).  On first open, seed it from the reader's font size.
+  if (window.convertPixelsToRem) {
+    let gfs = parseFloat(localStorage.getItem("grammarFontSize"));
+    if (!isFinite(gfs)) {
+      const base = document.querySelector("#thetext span.textitem");
+      const defaultPx = base ? parseFloat(window.getComputedStyle(base).fontSize) : 14;
+      gfs = parseFloat(localStorage.getItem("fontSize")) || defaultPx;
     }
+    panel[0].style.fontSize = window.convertPixelsToRem(clamp(gfs, 8, 60)) + "rem";
   }
 
   panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
