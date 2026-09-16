@@ -284,6 +284,113 @@ def test_read_page_resolves_image_after_extension_change(app_context, japanese):
         shutil.rmtree(target, ignore_errors=True)
 
 
+def test_extract_manga_pages_without_img_path(app_context):
+    """
+    A .mokuro assembled from the raw _ocr output has no img_path on its
+    pages -- the official mokuro CLI is what adds that field when it
+    builds the volume file.  Such an archive is still perfectly
+    readable, because mokuro pairs pages with images by natural-sorted
+    position.  The extractor must write those paths down, otherwise the
+    imported book has pages with no image to request.
+    """
+    from flask import current_app
+
+    volume = "textbook_vol"
+    page = {
+        "version": "0.2.5",
+        "img_width": 1365,
+        "img_height": 2048,
+        "blocks": [],
+    }
+    mokuro = {
+        "version": "0.2.5",
+        "title": "mokuro_project",
+        "volume": volume,
+        "pages": [dict(page), dict(page), dict(page)],
+    }
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(f"{volume}.mokuro", json.dumps(mokuro, ensure_ascii=False))
+        for n in ("001", "002", "003"):
+            zf.writestr(f"{volume}/{n}.webp", PNG_1PX)
+    buf.seek(0)
+
+    manga_path, parsed = BookService().extract_manga("book.cbz", buf)
+    target = os.path.join(current_app.static_folder, manga_path)
+
+    assert [p["img_path"] for p in parsed["pages"]] == [
+        f"{volume}/001.webp",
+        f"{volume}/002.webp",
+        f"{volume}/003.webp",
+    ]
+    for page in parsed["pages"]:
+        assert os.path.isfile(os.path.join(target, page["img_path"]))
+
+
+def test_read_page_resolves_image_without_img_path(app_context, japanese):
+    """
+    Books imported before the fix keep pages with no img_path in the
+    DB, so the reading screen must fall back to positional matching at
+    render time -- no re-import required.  Before the fix the URL was
+    the bare manga directory, which 403s and renders a blank page.
+    """
+    from flask import current_app
+
+    from lute.book.model import Book
+    from lute.read.service import Service as ReadService
+
+    manga_path = "manga/test-no-img-path"
+    target = os.path.join(current_app.static_folder, manga_path)
+    volume_dir = os.path.join(target, "textbook_vol")
+    os.makedirs(volume_dir, exist_ok=True)
+    for n in ("001", "002"):
+        with open(os.path.join(volume_dir, f"{n}.webp"), "wb") as f:
+            f.write(PNG_1PX)
+
+    pages = [
+        {
+            "version": "0.2.5",
+            "img_width": 10,
+            "img_height": 10,
+            "blocks": [
+                {
+                    "box": [1, 1, 5, 5],
+                    "vertical": False,
+                    "font_size": 5,
+                    "lines": ["テ"],
+                }
+            ],
+        },
+        {
+            "version": "0.2.5",
+            "img_width": 10,
+            "img_height": 10,
+            "blocks": [],
+        },
+    ]
+
+    book = Book()
+    book.language_id = japanese.id
+    book.title = "No img_path"
+    book.book_type = "manga"
+    book.manga_path = manga_path
+    book.manga_data = json.dumps(
+        {"version": "0.2.5", "volume": "textbook_vol", "pages": pages},
+        ensure_ascii=False,
+    )
+    dbbook = BookService().import_book(book, db.session)
+
+    try:
+        service = ReadService(db.session)
+        ctx = service.manga_page_context(dbbook, 1, track_page_open=False)
+        assert ctx["img_url"] == f"/static/{manga_path}/textbook_vol/001.webp"
+
+        ctx = service.manga_page_context(dbbook, 2, track_page_open=False)
+        assert ctx["img_url"] == f"/static/{manga_path}/textbook_vol/002.webp"
+    finally:
+        shutil.rmtree(target, ignore_errors=True)
+
+
 def test_extract_manga_rejects_bad_extension(app_context):
     "An invalid extension is rejected before any extraction."
     stream, _ = make_archive(".cbz")
