@@ -262,7 +262,8 @@ function open_grammar_analysis() {
             const level = g.level ? '<span class="grammar-item__level">' + escapeHtml(g.level) + "</span>" : "";
             const desc = g.desc ? '<div class="grammar-item__desc">' + escapeHtml(g.desc) + "</div>" : "";
             const examples = (g.examples || []).map(function (ex) {
-              return '<div class="grammar-item__example">' + escapeHtml(ex.sentence) + "</div>";
+              return '<div class="grammar-item__example">' +
+                escapeHtml(String(ex.sentence).replace(/🔊/g, "")) + "</div>";
             }).join("");
             return (
               '<div class="grammar-item grammar-item--' +
@@ -283,6 +284,46 @@ function open_grammar_analysis() {
         data.length + (data.length === 1 ? " point" : " points")
       );
       panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+
+      // Cross-highlight: hovering a grammar entry on the right highlights
+      // the matching sentence in the reading text on the left.
+      var textRoot = document.getElementById("thetext");
+      if (textRoot) {
+        // Drop any highlight left over from a previous render.
+        textRoot.querySelectorAll(".grammar-source-active").forEach(function (n) {
+          n.classList.remove("grammar-source-active");
+        });
+        var sentences = Array.prototype.slice.call(
+          textRoot.querySelectorAll(".textsentence, .textrow, p")
+        );
+        function normText(t) {
+          return (t || "").replace(/🔊/g, "").replace(/\s+/g, " ").trim();
+        }
+        Array.prototype.forEach.call(
+          panel[0].querySelectorAll(".grammar-item"),
+          function (item) {
+            var targets = Array.prototype.map.call(
+              item.querySelectorAll(".grammar-item__example"),
+              function (ex) {
+                var want = normText(ex.textContent);
+                for (var i = 0; i < sentences.length; i++) {
+                  if (normText(sentences[i].textContent) === want) {
+                    return sentences[i];
+                  }
+                }
+                return null;
+              }
+            ).filter(Boolean);
+            if (targets.length === 0) return;
+            item.addEventListener("mouseenter", function () {
+              targets.forEach(function (t) { t.classList.add("grammar-source-active"); });
+            });
+            item.addEventListener("mouseleave", function () {
+              targets.forEach(function (t) { t.classList.remove("grammar-source-active"); });
+            });
+          }
+        );
+      }
     })
     .fail(function () {
       panel.html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">Analysis failed. Please try again.</div></div>');
