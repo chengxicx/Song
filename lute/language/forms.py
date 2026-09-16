@@ -80,6 +80,11 @@ class LanguageForm(FlaskForm):
         choices=tag_choices("browser language"),
         default="",
     )
+    grammar_translate_lang = SelectField(
+        "Grammar Analysis Language",
+        choices=[("en", "English"), ("zh", "中文")],
+        default="en",
+    )
 
     # --- Korean / Kiwi-specific settings.
     # These fields are only rendered when the parser_type is 'lute_korean'.
