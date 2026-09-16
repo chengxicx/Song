@@ -1303,6 +1303,19 @@
     _updateSideArrows();
     set_page_fraction();
     _updateSliderProgress();
+
+    // If the grammar-analysis pane is open, refresh it whenever the
+    // visible sub-screen (or the Lute page) changes, so the panel always
+    // analyses the text that is currently on screen.
+    if (document.getElementById("grammar-analysis-panel")) {
+      const _pnum = parseInt($("#page_num").val(), 10);
+      const _key = _pnum + ":" + curScreen;
+      if (window.__grammarPaneKey !== _key &&
+          typeof open_grammar_analysis === "function") {
+        window.__grammarPaneKey = _key;
+        open_grammar_analysis();
+      }
+    }
   }
 
   // Move backward/forward; within a page prefer sub-screens before
