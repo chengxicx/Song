@@ -302,18 +302,24 @@ function open_grammar_analysis() {
         Array.prototype.forEach.call(
           panel[0].querySelectorAll(".grammar-item"),
           function (item) {
-            var targets = Array.prototype.map.call(
+            var targets = [];
+            Array.prototype.forEach.call(
               item.querySelectorAll(".grammar-item__example"),
               function (ex) {
                 var want = normText(ex.textContent);
-                for (var i = 0; i < sentences.length; i++) {
-                  if (normText(sentences[i].textContent) === want) {
-                    return sentences[i];
-                  }
-                }
-                return null;
+                if (!want) return;
+                sentences.forEach(function (s) {
+                  var t = normText(s.textContent);
+                  // Exact match first, then fall back to containment so a
+                  // sentence that got grouped/parsed slightly differently
+                  // on the reading side still lights up.  Collect every
+                  // matching sentence, not just the first.
+                  var hit = t === want ||
+                    (t.length > 0 && want.length > 0 && t.indexOf(want) !== -1);
+                  if (hit && targets.indexOf(s) === -1) targets.push(s);
+                });
               }
-            ).filter(Boolean);
+            );
             if (targets.length === 0) return;
             item.addEventListener("mouseenter", function () {
               targets.forEach(function (t) { t.classList.add("grammar-source-active"); });
