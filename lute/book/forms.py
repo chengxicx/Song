@@ -271,6 +271,41 @@ class EditBookForm(FlaskForm):
             ) from e
 
 
+class MangaEditForm(FlaskForm):
+    """
+    Edit a Mokuro manga book.
+
+    Manga books have no text to edit: title and tags are edited in
+    place, and an uploaded archive is re-imported over the book
+    (replacing its images, pages and mokuro data).
+    """
+
+    title = StringField("Title", validators=[DataRequired(), Length(max=255)])
+    book_tags = StringField("Tags")
+    manga_file = FileField(
+        "Replace archive",
+        validators=[
+            FileAllowed(
+                ["zip", "cbz"],
+                "Please upload a valid Mokuro manga archive (.zip or .cbz).",
+            )
+        ],
+    )
+
+    def __init__(self, *args, **kwargs):
+        "Call the constructor of the superclass (FlaskForm)"
+        super().__init__(*args, **kwargs)
+        book = kwargs.get("obj")
+
+        def _data(arr):
+            "Get data in proper format for tagify."
+            return json.dumps([{"value": p} for p in arr])
+
+        self.book_tags.data = _data(book.book_tags)
+        if request.method == "POST":
+            self.book_tags.data = request.form.get("book_tags", "")
+
+
 class BookSettingsForm(FlaskForm):
     """
     Book listing behaviour (home page series aggregation).
