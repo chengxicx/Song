@@ -16,6 +16,7 @@ from lute.book.stats import Service as StatsService
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.term.model import Repository
+from lute.utils.manga_images import image_path_for_page
 
 # from lute.utils.debug_helpers import DebugTimer
 
@@ -739,9 +740,22 @@ class Service:
         # this up during extract_manga(), but already-imported books
         # need a runtime lookup.
         resolved_img_path = raw_img_path
-        if manga_path and raw_img_path:
+        if manga_path:
             manga_abs = os.path.join(current_app.static_folder, manga_path)
-            if os.path.isdir(manga_abs):
+            is_dir = os.path.isdir(manga_abs)
+            if is_dir and not raw_img_path:
+                # No img_path at all.  A .mokuro assembled from the raw
+                # _ocr output carries only the OCR data, so the page is
+                # matched to its image by position -- the same rule
+                # mokuro uses.  Returning early here would leave the URL
+                # pointing at the directory itself, which 403s and
+                # renders a blank page.
+                ordinal = image_path_for_page(
+                    manga_abs, pagenum - 1, manga.get("volume")
+                )
+                if ordinal:
+                    resolved_img_path = ordinal
+            elif is_dir:
                 raw_abs = os.path.normpath(os.path.join(manga_abs, raw_img_path))
                 if not os.path.isfile(raw_abs):
                     # Try volume subdir, then basename scan.
