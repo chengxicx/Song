@@ -289,10 +289,64 @@ function open_grammar_analysis() {
       // the matching sentence in the reading text on the left.
       var textRoot = document.getElementById("thetext");
       if (textRoot) {
-        // Drop any highlight left over from a previous render.
-        textRoot.querySelectorAll(".grammar-source-active").forEach(function (n) {
-          n.classList.remove("grammar-source-active");
-        });
+        // Precise highlight overlay: hovering a grammar entry draws a ring
+        // exactly around the example sentences' visible text (.textitem)
+        // in the reading pane.  Ring rects come from the union of the
+        // matched phrase nodes, so a media book that splits one sentence
+        // across several phrases still gets a single clean ring -- and a
+        // block that also holds other sentences is never over-highlighted.
+        var ringLayer = document.createElement("div");
+        ringLayer.className = "grammar-ring-layer";
+        document.body.appendChild(ringLayer);
+        var activeRings = [];
+
+        function updateActiveRings() {
+          activeRings.forEach(function (r) { placeRing(r.ring, r.nodes); });
+        }
+        window.addEventListener("scroll", updateActiveRings, { passive: true });
+        window.addEventListener("resize", updateActiveRings);
+
+        function hideAllRings() {
+          activeRings.forEach(function (r) { r.ring.style.display = "none"; });
+          activeRings = [];
+        }
+
+        function nodeRects(node) {
+          var items = node.querySelectorAll(".textitem");
+          var rects = [];
+          if (items.length) {
+            items.forEach(function (it) { rects.push(it.getBoundingClientRect()); });
+          } else {
+            rects.push(node.getBoundingClientRect());
+          }
+          return rects;
+        }
+
+        function unionRect(rects) {
+          var top = Infinity, left = Infinity, bottom = -Infinity, right = -Infinity;
+          rects.forEach(function (r) {
+            if (!r.width && !r.height) return;
+            top = Math.min(top, r.top);
+            left = Math.min(left, r.left);
+            bottom = Math.max(bottom, r.bottom);
+            right = Math.max(right, r.right);
+          });
+          if (top === Infinity) return null;
+          return { top: top, left: left, width: right - left, height: bottom - top };
+        }
+
+        function placeRing(ring, nodes) {
+          var rects = [];
+          nodes.forEach(function (n) { rects = rects.concat(nodeRects(n)); });
+          var u = unionRect(rects);
+          if (!u) { ring.style.display = "none"; return; }
+          var pad = 4;
+          ring.style.display = "block";
+          ring.style.left = (u.left - pad) + "px";
+          ring.style.top = (u.top - pad) + "px";
+          ring.style.width = (u.width + pad * 2) + "px";
+          ring.style.height = (u.height + pad * 2) + "px";
+        }
         // Media-driven books (mp3/subtitles) often split one grammar
         // example across several adjacent phrase nodes.  Match by a
         // contiguous run of sentences whose combined text contains the
@@ -324,10 +378,9 @@ function open_grammar_analysis() {
         Array.prototype.forEach.call(
           panel[0].querySelectorAll(".grammar-item"),
           function (item) {
-            var targets = [];
-            function pushTarget(n) {
-              if (n && targets.indexOf(n) === -1) targets.push(n);
-            }
+            // For each example sentence of this entry, the phrase nodes
+            // (contiguous run) that contain it in the reading text.
+            var exampleRuns = [];
             Array.prototype.forEach.call(
               item.querySelectorAll(".grammar-item__example"),
               function (ex) {
@@ -349,48 +402,24 @@ function open_grammar_analysis() {
                     if (acc.length > want.length + 60) break;
                   }
                 }
-                if (!nodes.length) return;
-                // .textsentence is a font-size:0 wrapper (the visible words
-                // live in .textitem), so an outline on it collapses to a
-                // near-zero box.  Find the nearest ancestor that actually
-                // renders a box (usually the <p> line) and outline that, so
-                // the whole sentence gets one clean ring.
-                function nearestBox(el) {
-                  var guard = 0;
-                  while (el && el !== textRoot && guard < 8) {
-                    var r = el.getBoundingClientRect();
-                    var cs = window.getComputedStyle(el);
-                    if (r.height > 4 && cs.display !== "inline" &&
-                        cs.display !== "contents") {
-                      return el;
-                    }
-                    el = el.parentElement;
-                    guard++;
-                  }
-                  return null;
-                }
-                var anc = nodes[0];
-                for (var a = 1; a < nodes.length && anc && anc !== textRoot; a++) {
-                  anc = commonAncestor(anc, nodes[a]);
-                }
-                var box = nearestBox(anc && anc !== textRoot ? anc : nodes[0]);
-                if (box) {
-                  pushTarget(box);
-                } else {
-                  // No single block covers the run; ring each phrase's line.
-                  nodes.forEach(function (n) {
-                    pushTarget(nearestBox(n) || n);
-                  });
-                }
+                if (nodes.length) exampleRuns.push(nodes);
               }
             );
-            if (targets.length === 0) return;
+            if (exampleRuns.length === 0) return;
+            var rings = [];
             item.addEventListener("mouseenter", function () {
-              targets.forEach(function (t) { t.classList.add("grammar-source-active"); });
+              hideAllRings();
+              rings = [];
+              exampleRuns.forEach(function (nodes) {
+                var ring = document.createElement("div");
+                ring.className = "grammar-ring";
+                ringLayer.appendChild(ring);
+                placeRing(ring, nodes);
+                rings.push({ ring: ring, nodes: nodes });
+              });
+              activeRings = rings;
             });
-            item.addEventListener("mouseleave", function () {
-              targets.forEach(function (t) { t.classList.remove("grammar-source-active"); });
-            });
+            item.addEventListener("mouseleave", hideAllRings);
           }
         );
       }

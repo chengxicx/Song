@@ -4719,11 +4719,22 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 }
 
 /* Reading-text highlight driven by hovering a grammar entry on the right.
-   A clean outline ring only -- the outline sits outside the element box so
-   it never covers the per-word status colours.  No inner background fill. */
-#thetext .grammar-source-active {
+   Rings are absolutely positioned overlay divs drawn exactly around the
+   matched example text (union of the .textitem boxes), so they never cover
+   the per-word status colours and never over-enclose neighbouring
+   sentences on the same line. */
+.grammar-ring-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10000;
+}
+.grammar-ring {
+    position: absolute;
+    display: none;
     outline: 2px solid var(--btn-accent, #007aff);
-    outline-offset: 3px;
+    outline-offset: 2px;
     border-radius: 4px;
     transition: outline-color 0.12s ease;
+    box-sizing: border-box;
 }
