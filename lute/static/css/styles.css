@@ -4560,46 +4560,69 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     overflow: hidden;
     font: 100%/1.4 "Lucida Grande", Arial, sans-serif, STHeiti,
         "Arial Unicode MS", MingLiu;
+    /* Base size; the sidebar A+/A- buttons stamp this in rem so the whole
+       panel scales (all child sizes are em). */
+    font-size: 14px;
+
+    /* Panel-local semantic tokens (light defaults, readable on dark too). */
+    --g-card: color-mix(in srgb, var(--font-color, #000) 4%, transparent);
+    --g-card-border: color-mix(in srgb, var(--font-color, #000) 10%, transparent);
+    --g-text-2: color-mix(in srgb, var(--font-color, #000) 64%, transparent);
+    --g-rule: color-mix(in srgb, var(--font-color, #000) 16%, transparent);
+    --g-accent: var(--btn-accent, #007aff);
+    --g-accent-soft: color-mix(in srgb, var(--g-accent) 15%, transparent);
+    --g-accent-line: color-mix(in srgb, var(--g-accent) 45%, transparent);
 }
+
+/* JLPT level -> accent hue, so each grammar point is easy to scan.
+   Mid-tone hues keep the badges readable on both light and dark themes. */
+.grammar-item--N5 { --g-accent: #37b24d; }
+.grammar-item--N4 { --g-accent: #339af0; }
+.grammar-item--N3 { --g-accent: #f08c00; }
+.grammar-item--N2 { --g-accent: #845ef7; }
+.grammar-item--N1 { --g-accent: #e64980; }
+.grammar-item--N  { --g-accent: var(--btn-accent, #007aff); }
 
 .grammar-analysis-panel__header {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--form-border-color, #ddd);
-    background-color: color-mix(
-        in srgb,
-        var(--btn-accent, #007aff) 10%,
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--g-rule);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--g-accent-soft) 45%, var(--background-color, #fff)),
         var(--background-color, #fff)
     );
 }
 
 .grammar-analysis-panel__title {
     flex: 1;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 1.12em;
+    font-weight: 700;
+    letter-spacing: 0.01em;
 }
 
 .grammar-analysis-panel__badge {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--btn-accent, #007aff);
+    font-size: 0.85em;
+    font-weight: 700;
+    color: var(--g-accent);
     border: 1px solid currentColor;
     border-radius: 999px;
-    padding: 1px 8px;
-    opacity: 0.9;
+    padding: 1px 9px;
+    opacity: 0.95;
 }
 
 .grammar-analysis-panel__close {
     border: none;
     background: transparent;
     color: var(--font-color, #000);
-    font-size: 20px;
+    font-size: 1.5em;
     line-height: 1;
     cursor: pointer;
-    padding: 0 2px;
-    opacity: 0.6;
+    padding: 0 3px;
+    opacity: 0.55;
+    border-radius: 4px;
 }
 .grammar-analysis-panel__close:hover {
     opacity: 1;
@@ -4607,70 +4630,84 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 
 .grammar-analysis-panel__body {
     overflow-y: auto;
-    padding: 10px 12px;
+    padding: 12px 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .grammar-analysis-panel__state {
-    padding: 20px 12px;
+    padding: 26px 12px;
     text-align: center;
     color: color-mix(in srgb, var(--font-color, #000) 55%, transparent);
-    font-size: 13px;
+    font-size: 0.98em;
 }
 
 .grammar-item {
-    border-left: 3px solid var(--btn-accent, #007aff);
-    padding: 8px 10px;
-    margin-bottom: 10px;
-    border-radius: 0 6px 6px 0;
-    background-color: color-mix(
-        in srgb,
-        var(--font-color, #000) 4%,
-        transparent
-    );
+    --acute: var(--g-accent);
+    border: 1px solid var(--g-card-border);
+    border-left: 3px solid var(--acute);
+    padding: 10px 12px;
+    border-radius: 8px;
+    background-color: var(--g-card);
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+.grammar-item:hover {
+    border-color: var(--g-accent-line);
+    background-color: color-mix(in srgb, var(--g-accent-soft) 40%, var(--g-card));
 }
 
 .grammar-item__head {
     display: flex;
-    align-items: flex-start;
-    gap: 6px;
+    align-items: center;
+    gap: 8px;
 }
 
 .grammar-item__level {
     flex: none;
-    margin-top: 2px;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--btn-accent, #007aff);
-    background: color-mix(
-        in srgb,
-        var(--btn-accent, #007aff) 14%,
-        transparent
-    );
-    border-radius: 4px;
-    padding: 1px 5px;
+    font-size: 0.72em;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--acute);
+    background: var(--g-accent-soft);
+    border-radius: 6px;
+    padding: 2px 7px;
+    text-transform: uppercase;
 }
 
 .grammar-item__name {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 1.08em;
+    font-weight: 700;
+    line-height: 1.3;
 }
 
 .grammar-item__desc {
-    margin-top: 2px;
-    font-size: 12px;
-    color: color-mix(in srgb, var(--font-color, #000) 60%, transparent);
+    margin-top: 4px;
+    font-size: 0.98em;
+    color: var(--g-text-2);
 }
 
 .grammar-item__examples {
-    margin-top: 6px;
+    margin-top: 8px;
     display: grid;
-    gap: 4px;
+    gap: 5px;
 }
 
 .grammar-item__example {
-    font-size: 12.5px;
-    line-height: 1.45;
-    padding-left: 10px;
-    border-left: 1px solid var(--form-border-color, #ddd);
+    font-size: 0.96em;
+    line-height: 1.5;
+    padding: 6px 10px 6px 12px;
+    border-left: 2px solid var(--g-accent-line);
+    background: color-mix(in srgb, var(--font-color, #000) 3%, transparent);
+    border-radius: 0 6px 6px 0;
     color: var(--font-color, #000);
+}
+.grammar-item__example:first-child {
+    border-left-style: solid;
+}
+.grammar-item__example::before {
+    content: "例 ";
+    font-size: 0.82em;
+    color: var(--g-text-2);
+    margin-right: 4px;
 }

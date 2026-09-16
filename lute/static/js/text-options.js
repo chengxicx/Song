@@ -61,6 +61,14 @@ function incrementFontSize(delta) {
     item.style.fontSize = sizeRem;
   });
 
+  // Keep the grammar-analysis panel in step with the reading font-size
+  // buttons: its text is sized in em against the panel root, so stamping
+  // the panel root with the same stored size scales the whole panel.
+  const grammarPanel = document.querySelector(".grammar-analysis-panel");
+  if (grammarPanel) {
+    grammarPanel.style.fontSize = sizeRem;
+  }
+
   localStorage.setItem(STORAGE_KEY, newSize);
   // The screen groups were measured for the old font size; re-flow so
   // paragraphs don't spill into an overflowing multicol column.
