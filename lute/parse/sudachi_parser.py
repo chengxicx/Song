@@ -18,6 +18,7 @@ Users select it as the "Parse as" type for their Japanese language.
 """
 
 import re
+import threading
 from typing import List
 
 import jaconv
@@ -42,8 +43,23 @@ class JapaneseSudachiParser(AbstractParser):
     """
 
     _is_supported = None
-    _instance = None
-    _instance_key = None
+    # Cache key for the _is_supported result.  Kept separate from the
+    # dictionary cache key below: they hold different key formats
+    # ("core|C" vs "core"), and sharing one attribute made
+    # is_supported() miss its cache on every call.
+    _support_key = None
+
+    # Tokenizer instances are NOT shareable: sudachipy's Tokenizer wraps
+    # a mutable Rust object, and two threads tokenizing at once raise
+    # "RuntimeError: Already borrowed" (measured: ~50% of calls fail
+    # with 2 threads, ~92% with 12).  The Dictionary *is* shareable and
+    # is the expensive part to build (~70MB of dictionary data for
+    # "core"), so load exactly one and give each thread its own cheap
+    # Tokenizer through thread-local storage.
+    _dictionary = None
+    _dictionary_key = None
+    _dictionary_lock = threading.Lock()
+    _thread_local = threading.local()
 
     # ---- support detection ----
 
@@ -58,7 +74,7 @@ class JapaneseSudachiParser(AbstractParser):
 
         if (
             JapaneseSudachiParser._is_supported is not None
-            and JapaneseSudachiParser._instance_key == cache_key
+            and JapaneseSudachiParser._support_key == cache_key
         ):
             return JapaneseSudachiParser._is_supported
 
@@ -68,8 +84,21 @@ class JapaneseSudachiParser(AbstractParser):
         except Exception:  # pylint: disable=broad-except
             JapaneseSudachiParser._is_supported = False
 
-        JapaneseSudachiParser._instance_key = cache_key
+        JapaneseSudachiParser._support_key = cache_key
         return JapaneseSudachiParser._is_supported
+
+    @classmethod
+    def _invalidate_cache(cls):
+        """
+        Drop the cached support flag and shared dictionary, so the next
+        call reloads them (e.g. after a database restore or a change of
+        the sudachi dictionary setting).  Per-thread tokenizers are
+        keyed by dictionary name, so they rebuild themselves lazily.
+        """
+        JapaneseSudachiParser._is_supported = None
+        JapaneseSudachiParser._support_key = None
+        JapaneseSudachiParser._dictionary = None
+        JapaneseSudachiParser._dictionary_key = None
 
     # ---- settings helpers ----
 
@@ -94,43 +123,64 @@ class JapaneseSudachiParser(AbstractParser):
     @classmethod
     def _build_tokenizer(cls, dict_type: str):
         """
-        Build (or return cached) SudachiPy tokenizer for the given
-        dictionary type.
+        Return this thread's SudachiPy tokenizer for the given
+        dictionary type, creating it on first use.
+
+        One shared Dictionary, one cheap Tokenizer per thread: the
+        Tokenizer cannot be used from two threads at once, the
+        Dictionary can be shared.
+        """
+        tls = JapaneseSudachiParser._thread_local
+        tok = getattr(tls, "tokenizer", None)
+        if tok is not None and getattr(tls, "tokenizer_key", None) == dict_type:
+            return tok
+
+        sd = cls._get_dictionary(dict_type)
+        tok = sd.create()
+        tls.tokenizer = tok
+        tls.tokenizer_key = dict_type
+        return tok
+
+    @classmethod
+    def _get_dictionary(cls, dict_type: str):
+        """
+        Build (or return cached) SudachiPy Dictionary for the given
+        dictionary type.  Guarded by a lock: loading a dictionary is
+        expensive and must not happen once per thread.
+        """
+        with JapaneseSudachiParser._dictionary_lock:
+            if (
+                JapaneseSudachiParser._dictionary is not None
+                and JapaneseSudachiParser._dictionary_key == dict_type
+            ):
+                return JapaneseSudachiParser._dictionary
+
+            sd = cls._load_dictionary(dict_type)
+            JapaneseSudachiParser._dictionary = sd
+            JapaneseSudachiParser._dictionary_key = dict_type
+            return sd
+
+    @classmethod
+    def _load_dictionary(cls, dict_type: str):
+        """
+        Load a SudachiPy Dictionary, tolerating the API change from
+        Dictionary(dict_type=...) (<=0.6.x) to Dictionary(dict=...)
+        (>=0.7.x), and finally falling back to the default dictionary.
         """
         import warnings  # pylint: disable=import-outside-toplevel
         from sudachipy import Dictionary  # pylint: disable=import-outside-toplevel
 
-        cache_key = dict_type
-        if (
-            JapaneseSudachiParser._instance is not None
-            and JapaneseSudachiParser._instance_key == cache_key
-        ):
-            return JapaneseSudachiParser._instance
-
-        # Dictionary() auto-discovers installed sudachidict packages.
-        # The parameter name changed from "dict_type" (<=0.6.x) to
-        # "dict" (>=0.7.x).  Try the new name first, fall back to the
-        # old one, then to no parameter (uses default "core").
-        tok = None
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
             try:
-                sd = Dictionary(dict=dict_type)
-                tok = sd.create()
+                return Dictionary(dict=dict_type)
             except TypeError:
                 try:
-                    sd = Dictionary(dict_type=dict_type)
-                    tok = sd.create()
-                except Exception:
-                    sd = Dictionary()
-                    tok = sd.create()
-            except Exception:
-                sd = Dictionary()
-                tok = sd.create()
-
-        JapaneseSudachiParser._instance = tok
-        JapaneseSudachiParser._instance_key = cache_key
-        return tok
+                    return Dictionary(dict_type=dict_type)
+                except Exception:  # pylint: disable=broad-except
+                    return Dictionary()
+            except Exception:  # pylint: disable=broad-except
+                return Dictionary()
 
     @classmethod
     def _get_split_mode(cls, mode: str):
