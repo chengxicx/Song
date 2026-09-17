@@ -1070,7 +1070,13 @@ def grammar_analysis(bookid, pagenum):
     # current sub-screen when the client supplies its text, falling back to
     # the whole page otherwise.
     snippet = request.args.get("text", "")
-    page_text = snippet if snippet.strip() else book.text_at_page(pagenum).text
+    if snippet.strip():
+        page_text = snippet
+    else:
+        # Manga pages store no page text -- the words live in the .mokuro
+        # OCR data, so rebuild the page text from the OCR blocks.
+        manga_text = _manga_page_text(book, pagenum)
+        page_text = manga_text if manga_text is not None else book.text_at_page(pagenum).text
     if is_japanese_language(lang):
         display = getattr(lang, "grammar_translate_lang", "") or "en"
         return jsonify(analyze_japanese(page_text, display_lang=display))
@@ -1082,6 +1088,33 @@ def grammar_analysis(bookid, pagenum):
         for sentence in para
     ]
     return jsonify(analyze_grammar(sentences))
+
+
+def _manga_page_text(book, pagenum):
+    """
+    Rebuild the natural text of one manga page from its .mokuro OCR data.
+
+    Manga books store no text in their page Text objects (the words only
+    exist in the OCR blocks), so grammar analysis must reconstruct the
+    text from the block lines.  Returns None when the book has no manga
+    data or the page is out of range.
+    """
+    manga = getattr(book, "manga", None) or {}
+    pages = manga.get("pages") or []
+    if not 1 <= pagenum <= len(pages):
+        return None
+    chunks = []
+    for block in pages[pagenum - 1].get("blocks") or []:
+        for line in block.get("lines") or []:
+            # A mokuro "line" can hold several physical rows joined by
+            # newlines or the "¶" paragraph marker; treat each as its own
+            # sentence chunk.
+            for phys in line.replace("¶", "\n").split("\n"):
+                if phys.strip():
+                    chunks.append(phys.strip())
+    if not chunks:
+        return None
+    return "。".join(chunks) + "。"
 
 
 def _term_form_action(term):
