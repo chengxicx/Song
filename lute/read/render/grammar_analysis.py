@@ -14,6 +14,9 @@ import re
 # or by its language name.
 _JAPANESE_PARSER_TYPES = {"japanese", "japanese_sudachi"}
 
+# Korean parser types registered by the lute-korean plugin.
+_KOREAN_PARSER_TYPES = {"korean", "lute_korean"}
+
 
 def is_japanese_language(language):
     """
@@ -27,6 +30,20 @@ def is_japanese_language(language):
         return True
     name = (getattr(language, "name", None) or "").lower()
     return "japanese" in name or "日本語" in name
+
+
+def is_korean_language(language):
+    """
+    True if the given Language is a Korean language whose reading page
+    should use the Kiwi-based grammar engine.
+    """
+    if language is None:
+        return False
+    parser_type = (getattr(language, "parser_type", None) or "").strip().lower()
+    if parser_type in _KOREAN_PARSER_TYPES:
+        return True
+    name = (getattr(language, "name", None) or "").lower()
+    return "korean" in name or "한국어" in name or "韩语" in name or "韓語" in name
 
 
 # 每条规则：{"key", "name", "desc", "pattern"}
