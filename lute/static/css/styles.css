@@ -4739,12 +4739,18 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     transition: outline-color 0.12s ease;
     box-sizing: border-box;
 }
-/* Matched words inside the ringed sentence: an amber glow (via box-shadow,
-   never background-color, so per-word status colours stay intact) shown
-   while the grammar entry is hovered. */
-.grammar-word-active {
-    box-shadow: 0 0 0 2px rgba(255, 214, 90, 0.85), inset 0 0 0 1px rgba(255, 214, 90, 0.55);
+/* Matched words inside the ringed sentence: one amber outline box per
+   contiguous run of matched words (drawn as a positioned div, never
+   background-color, so per-word status colours stay intact) shown while
+   the grammar entry is hovered. */
+.grammar-word-ring {
+    position: absolute;
+    display: none;
+    outline: 2px solid rgba(255, 214, 90, 0.9);
+    outline-offset: 1px;
     border-radius: 3px;
+    transition: outline-color 0.12s ease;
+    box-sizing: border-box;
 }
 /* Matched words marked inside the grammar panel's example sentences. */
 .grammar-item__match {

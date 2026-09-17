@@ -332,11 +332,6 @@ function open_grammar_analysis() {
         function hideAllRings() {
           activeRings.forEach(function (r) { r.ring.style.display = "none"; });
           activeRings = [];
-          if (textRoot) {
-            textRoot.querySelectorAll(".grammar-word-active").forEach(function (el) {
-              el.classList.remove("grammar-word-active");
-            });
-          }
         }
 
         function unionRect(rects) {
@@ -352,8 +347,8 @@ function open_grammar_analysis() {
           return { top: top, left: left, width: right - left, height: bottom - top };
         }
 
-        function positionRing(ring, rect) {
-          var pad = 3;
+        function positionRing(ring, rect, pad) {
+          if (pad === undefined) pad = 3;
           ring.style.display = "block";
           ring.style.left = (rect.left - pad) + "px";
           ring.style.top = (rect.top - pad) + "px";
@@ -402,9 +397,11 @@ function open_grammar_analysis() {
         }
 
         // Ring the whole sentence that contains a match (blue outline), and
-        // tint only the matched words inside it (amber glow), using the
-        // backend's exact character offsets.  Falls back to ringing the whole
-        // run when the example text can't be located.
+        // draw one amber box around each contiguous run of matched words,
+        // using the backend's exact character offsets.  Adjacent cells (a
+        // word plus its trailing space) merge into a single box so a phrase
+        // like "는 것" never looks like several separate boxes.  Falls back
+        // to ringing the whole run when the example text can't be located.
         function planRun(run) {
           var example = run.example || "";
           var spans = run.spans || [[0, example.length]];
@@ -415,25 +412,41 @@ function open_grammar_analysis() {
             cells.forEach(function (c) { starts.push(full.length); full += c.t; });
             var pos = full.indexOf(example);
             if (pos !== -1) {
-              var tintEls = [];
+              var wordBoxes = [];
               spans.forEach(function (sp) {
                 var s = pos + sp[0], e = pos + sp[1];
+                // Cell indices overlapping the span, then grouped into
+                // contiguous runs (consecutive cells) for one box per run.
+                var idxs = [];
                 cells.forEach(function (c, idx) {
                   var cStart = starts[idx], cEnd = cStart + c.t.length;
-                  if (cEnd > s && cStart < e && tintEls.indexOf(c.el) === -1) {
-                    tintEls.push(c.el);
-                  }
+                  if (cEnd > s && cStart < e) idxs.push(idx);
                 });
+                for (var i = 0; i < idxs.length; i++) {
+                  var j = i;
+                  while (j + 1 < idxs.length && idxs[j + 1] === idxs[j] + 1) j++;
+                  var runEls = [];
+                  for (var k = i; k <= j; k++) runEls.push(cells[idxs[k]].el);
+                  var u = unionRect(runEls.map(function (el) { return el.getBoundingClientRect(); }));
+                  if (u) wordBoxes.push({ rect: u, els: runEls });
+                  i = j;
+                }
               });
               var all = cells.map(function (c) { return c.el.getBoundingClientRect(); });
-              var u = unionRect(all);
-              if (u) plan.push({ rect: u, els: cells.map(function (c) { return c.el; }), tintEls: tintEls });
+              var uAll = unionRect(all);
+              if (uAll) {
+                plan.push({
+                  rect: uAll,
+                  els: cells.map(function (c) { return c.el; }),
+                  wordBoxes: wordBoxes
+                });
+              }
             }
           }
           if (!plan.length) {
             var all2 = cells.map(function (c) { return c.el.getBoundingClientRect(); });
             var u2 = unionRect(all2);
-            if (u2) plan.push({ rect: u2, els: cells.map(function (c) { return c.el; }), tintEls: [] });
+            if (u2) plan.push({ rect: u2, els: cells.map(function (c) { return c.el; }), wordBoxes: [] });
           }
           return plan;
         }
@@ -473,7 +486,34 @@ function open_grammar_analysis() {
             var g = dataItems[itemIdx];
             if (!g) return;
             var exampleEls = item.querySelectorAll(".grammar-item__example");
-            var exampleRuns = [];
+            function showRings(runs) {
+              hideAllRings();
+              var rings = [];
+              runs.forEach(function (run) {
+                planRun(run).forEach(function (p) {
+                  var ring = document.createElement("div");
+                  ring.className = "grammar-ring";
+                  ringLayer.appendChild(ring);
+                  positionRing(ring, p.rect);
+                  rings.push({ ring: ring, cells: p.els });
+                  // One amber box per contiguous run of matched words.
+                  p.wordBoxes.forEach(function (wb) {
+                    var w = document.createElement("div");
+                    w.className = "grammar-word-ring";
+                    ringLayer.appendChild(w);
+                    positionRing(w, wb.rect, 1);
+                    rings.push({ ring: w, cells: wb.els });
+                  });
+                });
+              });
+              activeRings = rings;
+            }
+
+            // Hovering one example highlights only that example's sentence
+            // (blue ring + amber boxes on its matched words) -- never every
+            // example of the item at once.  Hovering the item head shows the
+            // first example.
+            var firstRuns = null;
             Array.prototype.forEach.call(exampleEls, function (exEl, exIdx) {
               var ex = (g.examples || [])[exIdx] || {};
               // The backend reports exact matched-word offsets inside the
@@ -486,27 +526,18 @@ function open_grammar_analysis() {
                 .filter(function (r) { return r[0] >= 0 && r[1] > r[0] && r[1] <= example.length; });
               if (!spans.length) spans = [[0, example.length]];
               var nodes = findRuns(stripText(example));
-              if (nodes.length) exampleRuns.push({ example: example, spans: spans, nodes: nodes });
+              if (!nodes.length) return;
+              var runs = [{ example: example, spans: spans, nodes: nodes }];
+              if (!firstRuns) firstRuns = runs;
+              exEl.addEventListener("mouseenter", function () { showRings(runs); });
+              exEl.addEventListener("mouseleave", hideAllRings);
             });
-            if (exampleRuns.length === 0) return;
-
-            function showHighlights() {
-              hideAllRings();
-              var rings = [];
-              exampleRuns.forEach(function (run) {
-                planRun(run).forEach(function (p) {
-                  var ring = document.createElement("div");
-                  ring.className = "grammar-ring";
-                  ringLayer.appendChild(ring);
-                  positionRing(ring, p.rect);
-                  p.tintEls.forEach(function (el) { el.classList.add("grammar-word-active"); });
-                  rings.push({ ring: ring, cells: p.els });
-                });
-              });
-              activeRings = rings;
+            if (!firstRuns) return;
+            var headEl = item.querySelector(".grammar-item__head");
+            if (headEl) {
+              headEl.addEventListener("mouseenter", function () { showRings(firstRuns); });
+              headEl.addEventListener("mouseleave", hideAllRings);
             }
-            item.addEventListener("mouseenter", showHighlights);
-            item.addEventListener("mouseleave", hideAllRings);
           }
         );
       }
