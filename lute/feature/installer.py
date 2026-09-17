@@ -248,7 +248,9 @@ def upgrade_plugin(name, kind="feature"):
 
     ``kind`` is 'feature' or 'parser'; it selects how the entry point
     maps to a pip distribution (same mapping as :func:`uninstall_plugin`).
-    Returns (ok, message).  A restart is required for the UI to update.
+    Returns (ok, message, restart_needed).  ``restart_needed`` is False
+    when the package was already at the latest version, so callers don't
+    claim a fake upgrade.
     """
     packages = installed_plugin_packages()
     info = packages.get(name)
@@ -258,7 +260,9 @@ def upgrade_plugin(name, kind="feature"):
         # Fall back to the parser mapping by name.
         package = _pypi_name_for_parser(name)
     if not package:
-        return False, f"未找到插件 '{name}' 对应的包"
+        return False, f"未找到插件 '{name}' 对应的包", False
+
+    old_version = info.get("version") if info else None
 
     try:
         proc = subprocess.run(
@@ -268,15 +272,28 @@ def upgrade_plugin(name, kind="feature"):
             timeout=PIP_TIMEOUT_SECONDS,
         )
     except subprocess.TimeoutExpired:
-        return False, f"pip install 超时（{PIP_TIMEOUT_SECONDS}s）"
+        return False, f"pip install 超时（{PIP_TIMEOUT_SECONDS}s）", False
     except OSError as exc:
-        return False, f"无法运行 pip：{exc}"
+        return False, f"无法运行 pip：{exc}", False
 
     if proc.returncode != 0:
         output = (proc.stdout or "") + (proc.stderr or "")
-        return False, f"pip install 失败：\n{output.strip()[-1500:]}"
+        return False, f"pip install 失败：\n{output.strip()[-1500:]}", False
 
-    return True, f"已升级 {package}，请重启 Lute 生效"
+    # Re-read the installed version: pip exits 0 even when it had nothing
+    # newer to install, so compare versions to report an accurate outcome.
+    new_version = None
+    try:
+        new_version = installed_plugin_packages().get(name, {}).get("version")
+    except Exception:  # pylint: disable=broad-except
+        pass
+
+    if new_version is not None and new_version == old_version:
+        return True, f"{package} 已是最新版本 {new_version}", False
+
+    if new_version:
+        return True, f"已升级 {package} 到 {new_version}，请重启 Lute 生效", True
+    return True, f"已升级 {package}，请重启 Lute 生效", True
 
 
 def uninstall_plugin(name, kind="feature"):
