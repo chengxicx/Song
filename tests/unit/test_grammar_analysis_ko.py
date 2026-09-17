@@ -38,9 +38,11 @@ def test_handwritten_rule_offsets_are_precise():
         if e["key"] == "ko_su_issda":
             example = e["examples"][0]
             (start, end) = example["matches"][0]["start"], example["matches"][0]["end"]
-            # The rule starts at the ㄹ-ending (ETM) on the verb, so the
-            # matched slice spans the construction "할 수" (not the verb alone).
-            assert example["sentence"][start:end] == "할 수"
+            # The rule starts at the ㄹ-ending (ETM) on the verb and runs to
+            # the 있다 stem, so the matched slice spans the construction
+            # "할 수 있" (Kiwi decomposes 할 into 하 + ᆯ, so the anchor is
+            # Kiwi's character offset, not the surface lengths).
+            assert example["sentence"][start:end] == "할 수 있"
 
 
 def test_display_language_switches_desc():
