@@ -1082,6 +1082,12 @@ def grammar_analysis(bookid, pagenum):
         # OCR data, so rebuild the page text from the OCR blocks.
         manga_text = _manga_page_text(book, pagenum)
         page_text = manga_text if manga_text is not None else book.text_at_page(pagenum).text
+    # The reader renders empty paragraphs as a zero-width-space placeholder
+    # and can inject the 🔊 audio marker into the text the client sends
+    # back; both are display artifacts, not grammar.  Strip them before
+    # analysis so no tokenizer/analyzer ever sees them (the Japanese and
+    # Korean engines do the same internally).
+    page_text = page_text.replace("\u200b", "").replace("🔊", "")
     if is_japanese_language(lang):
         display = getattr(lang, "grammar_translate_lang", "") or "en"
         return jsonify(analyze_japanese(page_text, display_lang=display))
