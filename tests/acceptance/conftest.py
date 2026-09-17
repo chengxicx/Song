@@ -152,10 +152,13 @@ def fixture_lute_client(request, chromebrowser):
     yield c
 
 
-@pytest.fixture(name="_restore_jp_parser")
-def fixture_restore_jp_parser(luteclient):
-    "Hack for test: restore a parser using the dev api."
+@pytest.fixture(name="_restore_jp_parsers")
+def fixture_restore_jp_parsers(luteclient):
+    "Hack for test: restore the parsers using the dev api."
     yield
+    luteclient.change_parser_registry_key(
+        "disabled_japanese_sudachi", "japanese_sudachi"
+    )
     luteclient.change_parser_registry_key("disabled_japanese", "japanese")
 
 
@@ -187,13 +190,20 @@ def given_running_site(luteclient):
     assert "Lute" in luteclient.page.content()
 
 
-@given('I disable the "japanese" parser')
-def disable_japanese_parser(luteclient, _restore_jp_parser):
+@given("I disable the Japanese parsers")
+def disable_japanese_parsers(luteclient, _restore_jp_parsers):
+    "Disable both: the language may be on either one."
+    luteclient.change_parser_registry_key(
+        "japanese_sudachi", "disabled_japanese_sudachi"
+    )
     luteclient.change_parser_registry_key("japanese", "disabled_japanese")
 
 
-@given('I enable the "japanese" parser')
-def enable_jp_parser(luteclient):
+@given("I enable the Japanese parsers")
+def enable_jp_parsers(luteclient):
+    luteclient.change_parser_registry_key(
+        "disabled_japanese_sudachi", "japanese_sudachi"
+    )
     luteclient.change_parser_registry_key("disabled_japanese", "japanese")
 
 
