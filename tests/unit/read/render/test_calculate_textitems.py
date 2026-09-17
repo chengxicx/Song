@@ -166,3 +166,18 @@ def test_crazy_case(english):
     expected = "[A-1][ -1][B C-3][C D E-5][E F G H I-9]"
     expected_displayed = "[A-1][ -1][B C-3][ D E-5][ F G H I-9]"
     assert_renderable_equals(english, data, words, expected, expected_displayed)
+
+
+def test_zero_width_space_tokens_do_not_crash(english):
+    """
+    A token that is itself a zero-width space (the Korean Kiwi tokenizer
+    emits these for the reader's empty-paragraph placeholder) used to
+    produce out-of-range indexes in the multi-word-term search -- the zws
+    is both the term separator and a token -- and crash with IndexError.
+    The bogus items are skipped instead.
+    """
+    zws = chr(0x200B)
+    tokens = [zws, zws, zws]
+    tis = get_textitems(make_tokens(tokens), [], english)
+    assert len(tis) > 0
+    assert all(0 <= ti.index and ti.index + ti.token_count <= len(tokens) for ti in tis)
