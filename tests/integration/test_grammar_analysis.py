@@ -38,6 +38,35 @@ def test_grammar_analysis_unknown_book_404(client, empty_db):
     assert resp.status_code == 404
 
 
+def test_grammar_analysis_strips_zws_from_client_snippet(client, empty_db, korean):
+    """
+    阅读器把空段落渲染成零宽空格占位符，客户端拼接 snippet 时会把它们一起
+    发回。韩语 Kiwi 分词器会把零宽空格单独切成 token，旧代码在词内嵌 zws
+    时会把多词索引算到越界并抛 IndexError（书 44 的 500 就是这个），分析前
+    必须清理掉。
+    """
+    zws = "\u200b"
+    book = make_book(
+        "ZWS Snippet Demo",
+        ["저는 영화를 보고 있어요."],
+        korean,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    # 模拟客户端发回的 snippet：空段落占位符 + 正文。
+    snippet = f"\n  {zws}\n저는 영화를 보고 있어요.\n  {zws}\n"
+    resp = client.get(
+        f"/read/grammar_analysis/{book.id}/1", query_string={"text": snippet}
+    )
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    names = {g["name"] for g in data}
+    assert "-고 있다" in names
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
 def test_japanese_grammar_analysis_uses_ja_engine(client, empty_db, japanese):
     "日语书籍应走 Sudachi 语法引擎，返回 N5 规则与例句。"
     book = make_book(
