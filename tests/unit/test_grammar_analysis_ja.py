@@ -93,6 +93,23 @@ def test_negative_examples_do_not_false_positive(key, sentence):
     assert key not in hits, f"rule {key} should NOT match: {sentence}"
 
 
+def test_subtitle_line_ending_in_match_does_not_overflow():
+    """
+    A subtitle/transcript line with no trailing 。 may end exactly on a
+    matched construction (e.g. "〜から").  The token run then reaches the
+    end of the token list; the character span must clamp to the sentence
+    end instead of indexing a non-existent offset.
+    """
+    results = analyze_japanese("これが一番おいしいですから\nええ 友達が来ますから")
+    assert any(e["key"] == "kara_reason" for e in results)
+    entry = next(e for e in results if e["key"] == "kara_reason")
+    for ex in entry["examples"]:
+        s = ex["sentence"]
+        for m in ex["matches"]:
+            assert m["start"] >= 0 and m["end"] <= len(s), f"match out of range: {m}"
+            assert s[m["start"] : m["end"]] == "から"
+
+
 def test_analysis_return_shape():
     "Return entries have the fields the front-end panel renders."
     results = analyze_japanese("日本に行ったことがあります。")
