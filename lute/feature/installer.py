@@ -46,15 +46,74 @@ def _package_name_for(ep):
         return ep.name
 
 
+def _entry_point_infos(group):
+    """
+    ``{(ep.name, ep.value): {"dist_name": str, "version": str}}`` for every
+    entry point in ``group``, resolved by scanning installed distributions.
+
+    Python < 3.10 EntryPoints expose no ``.dist`` attribute, so map entry
+    points back to their pip distribution by scanning ``distributions()``
+    instead (works on 3.8+).  Returns an empty dict when the metadata API
+    is unavailable.
+    """
+    out = {}
+    try:
+        from importlib import metadata
+    except Exception:  # pylint: disable=broad-except
+        return out
+    try:
+        for dist in metadata.distributions():
+            try:
+                eps = dist.entry_points
+            except Exception:  # pylint: disable=broad-except
+                continue
+            if isinstance(eps, dict):
+                group_eps = [e for g, lst in eps.items() if g == group for e in lst]
+            else:
+                group_eps = [e for e in eps if getattr(e, "group", None) == group]
+            if not group_eps:
+                continue
+            dist_name = ""
+            try:
+                dist_name = dist.metadata.get("Name") or ""
+            except Exception:  # pylint: disable=broad-except
+                pass
+            for e in group_eps:
+                out[(e.name, e.value)] = {
+                    "dist_name": dist_name,
+                    "version": dist.version,
+                }
+    except Exception:  # pylint: disable=broad-except
+        pass
+    return out
+
+
 def installed_plugin_packages():
     """
-    Return ``{name: {"type": "feature"|"parser", "package": dist}}`` for
-    every discovered plugin entry point.
+    Return ``{name: {"type": "feature"|"parser", "package": dist,
+    "version": str|None}}`` for every discovered plugin entry point.
+
+    ``package``/``version`` are the pip distribution name and version when
+    the plugin was installed from a package; both are None/fallbacks when
+    no backing distribution can be determined (e.g. entry points picked up
+    from a source checkout).
     """
     out = {}
     for kind, group in (("feature", "lute.plugin.feature"), ("parser", "lute.plugin.parse")):
+        infos = _entry_point_infos(group)
         for ep in _iter_entry_points(group):
-            out[ep.name] = {"type": kind, "package": _package_name_for(ep)}
+            info = infos.get((ep.name, ep.value))
+            if info is None and getattr(ep, "dist", None) is not None:
+                try:
+                    info = {
+                        "dist_name": ep.dist.metadata.get("Name") or "",
+                        "version": ep.dist.version,
+                    }
+                except Exception:  # pylint: disable=broad-except
+                    info = None
+            package = (info or {}).get("dist_name") or _package_name_for(ep)
+            version = (info or {}).get("version")
+            out[ep.name] = {"type": kind, "package": package, "version": version}
     return out
 
 
@@ -180,6 +239,44 @@ def _parser_type_for_spec(spec):
 def install_feature_plugin(spec):
     """Backwards-compatible alias for :func:`install_plugin`."""
     return install_plugin(spec)
+
+
+def upgrade_plugin(name, kind="feature"):
+    """
+    Upgrade an installed plugin to its latest version with ``pip install
+    --upgrade``.
+
+    ``kind`` is 'feature' or 'parser'; it selects how the entry point
+    maps to a pip distribution (same mapping as :func:`uninstall_plugin`).
+    Returns (ok, message).  A restart is required for the UI to update.
+    """
+    packages = installed_plugin_packages()
+    info = packages.get(name)
+    if info:
+        package = info.get("package")
+    else:
+        # Fall back to the parser mapping by name.
+        package = _pypi_name_for_parser(name)
+    if not package:
+        return False, f"未找到插件 '{name}' 对应的包"
+
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-m", "pip", "install", "--upgrade", package, "--quiet"],
+            capture_output=True,
+            text=True,
+            timeout=PIP_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        return False, f"pip install 超时（{PIP_TIMEOUT_SECONDS}s）"
+    except OSError as exc:
+        return False, f"无法运行 pip：{exc}"
+
+    if proc.returncode != 0:
+        output = (proc.stdout or "") + (proc.stderr or "")
+        return False, f"pip install 失败：\n{output.strip()[-1500:]}"
+
+    return True, f"已升级 {package}，请重启 Lute 生效"
 
 
 def uninstall_plugin(name, kind="feature"):
