@@ -161,10 +161,13 @@ function open_grammar_analysis() {
   let snippet = "";
   const theText = document.getElementById("thetext");
   if (theText && !theText.classList.contains("manga-text-container")) {
+    // Join paragraphs with a newline so subtitle/transcript lines (which
+    // usually carry no 。/！) stay separable on the analysis side instead of
+    // collapsing the whole page into one pseudo-sentence.
     snippet = Array.from(theText.querySelectorAll(":scope > p"))
       .filter(function (p) { return p.style.display !== "none" && p.textContent; })
       .map(function (p) { return p.textContent; })
-      .join("");
+      .join("\n");
   }
   const url = `/read/grammar_analysis/${bookid}/${pagenum}` +
     (snippet ? "?text=" + encodeURIComponent(snippet) : "");
@@ -257,13 +260,35 @@ function open_grammar_analysis() {
       if (!data || data.length === 0) {
         bodyHtml = '<div class="grammar-analysis-panel__state">No known grammar points detected on this page.</div>';
       } else {
+        // Render one example sentence, wrapping the backend-reported matched
+        // words (exact character offsets) in <mark>.
+        function renderExample(ex) {
+          var s = String(ex.sentence || "").replace(/🔊/g, "");
+          var ranges = (ex.matches || [])
+            .map(function (m) { return [m.start, m.end]; })
+            .filter(function (r) { return r[0] >= 0 && r[1] > r[0] && r[1] <= s.length; });
+          if (!ranges.length) return escapeHtml(s);
+          ranges.sort(function (a, b) { return a[0] - b[0]; });
+          var merged = [ranges[0]];
+          for (var i = 1; i < ranges.length; i++) {
+            var last = merged[merged.length - 1];
+            if (ranges[i][0] <= last[1]) last[1] = Math.max(last[1], ranges[i][1]);
+            else merged.push(ranges[i]);
+          }
+          var html = "", pos = 0;
+          merged.forEach(function (r) {
+            html += escapeHtml(s.slice(pos, r[0])) +
+              '<mark class="grammar-item__match">' + escapeHtml(s.slice(r[0], r[1])) + "</mark>";
+            pos = r[1];
+          });
+          return html + escapeHtml(s.slice(pos));
+        }
         const items = data
           .map(function (g) {
             const level = g.level ? '<span class="grammar-item__level">' + escapeHtml(g.level) + "</span>" : "";
             const desc = g.desc ? '<div class="grammar-item__desc">' + escapeHtml(g.desc) + "</div>" : "";
             const examples = (g.examples || []).map(function (ex) {
-              return '<div class="grammar-item__example">' +
-                escapeHtml(String(ex.sentence).replace(/🔊/g, "")) + "</div>";
+              return '<div class="grammar-item__example">' + renderExample(ex) + "</div>";
             }).join("");
             return (
               '<div class="grammar-item grammar-item--' +
@@ -285,23 +310,21 @@ function open_grammar_analysis() {
       );
       panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
 
-      // Cross-highlight: hovering a grammar entry on the right highlights
-      // the matching sentence in the reading text on the left.
+      // Cross-highlight: hovering a grammar entry on the right draws a blue
+      // ring around the whole example sentence and an amber glow around the
+      // matched words inside it -- never the whole paragraph.
       var textRoot = document.getElementById("thetext");
       if (textRoot) {
-        // Precise highlight overlay: hovering a grammar entry draws a ring
-        // exactly around the example sentences' visible text (.textitem)
-        // in the reading pane.  Ring rects come from the union of the
-        // matched phrase nodes, so a media book that splits one sentence
-        // across several phrases still gets a single clean ring -- and a
-        // block that also holds other sentences is never over-highlighted.
         var ringLayer = document.createElement("div");
         ringLayer.className = "grammar-ring-layer";
         document.body.appendChild(ringLayer);
         var activeRings = [];
 
         function updateActiveRings() {
-          activeRings.forEach(function (r) { placeRing(r.ring, r.run); });
+          activeRings.forEach(function (r) {
+            var u = unionRect(r.cells.map(function (el) { return el.getBoundingClientRect(); }));
+            if (u) positionRing(r.ring, u);
+          });
         }
         window.addEventListener("scroll", updateActiveRings, { passive: true });
         window.addEventListener("resize", updateActiveRings);
@@ -309,6 +332,11 @@ function open_grammar_analysis() {
         function hideAllRings() {
           activeRings.forEach(function (r) { r.ring.style.display = "none"; });
           activeRings = [];
+          if (textRoot) {
+            textRoot.querySelectorAll(".grammar-word-active").forEach(function (el) {
+              el.classList.remove("grammar-word-active");
+            });
+          }
         }
 
         function unionRect(rects) {
@@ -324,61 +352,30 @@ function open_grammar_analysis() {
           return { top: top, left: left, width: right - left, height: bottom - top };
         }
 
-        // Ring exactly around the example substring within the matched
-        // nodes: a node may hold more than the example (e.g. an mp3 phrase
-        // node that begins with "あの、すみません。" before the example),
-        // so collect the .textitem cells of the whole run, locate where the
-        // stripped example text falls in the concatenated text, and only
-        // union the cells that overlap that range.
-        function placeRing(ring, run) {
-          var want = run.want || "";
-          var cells = [];
-          run.nodes.forEach(function (n) {
-            var items = n.querySelectorAll(".textitem");
-            if (items.length) {
-              items.forEach(function (it) {
-                cells.push({ el: it, t: stripText(it.textContent) });
-              });
-            } else {
-              cells.push({ el: n, t: stripText(n.textContent) });
-            }
-          });
-          var rects = [];
-          if (want && cells.length) {
-            var full = "", starts = [];
-            cells.forEach(function (c) { starts.push(full.length); full += c.t; });
-            var pos = full.indexOf(want);
-            if (pos !== -1) {
-              var end = pos + want.length;
-              cells.forEach(function (c, idx) {
-                var cStart = starts[idx], cEnd = cStart + c.t.length;
-                if (cEnd > pos && cStart < end) {
-                  rects.push(c.el.getBoundingClientRect());
-                }
-              });
-            }
-          }
-          if (!rects.length) {
-            cells.forEach(function (c) { rects.push(c.el.getBoundingClientRect()); });
-          }
-          var u = unionRect(rects);
-          if (!u) { ring.style.display = "none"; return; }
-          var pad = 4;
+        function positionRing(ring, rect) {
+          var pad = 3;
           ring.style.display = "block";
-          ring.style.left = (u.left - pad) + "px";
-          ring.style.top = (u.top - pad) + "px";
-          ring.style.width = (u.width + pad * 2) + "px";
-          ring.style.height = (u.height + pad * 2) + "px";
+          ring.style.left = (rect.left - pad) + "px";
+          ring.style.top = (rect.top - pad) + "px";
+          ring.style.width = (rect.width + pad * 2) + "px";
+          ring.style.height = (rect.height + pad * 2) + "px";
         }
-        // Media-driven books (mp3/subtitles) often split one grammar
-        // example across several adjacent phrase nodes.  Match by a
-        // contiguous run of sentences whose combined text contains the
-        // example, ignoring whitespace and punctuation.  Use one sentence
-        // source (.textsentence, else .textrow/p) to avoid matching a node
-        // and its parent and drawing a double ring.
+
+        // Match text with only letters/numbers so punctuation or the 🔊
+        // marker never interferes with locating a phrase.
         function stripText(t) {
           return (t || "").replace(/🔊/g, "").replace(/[^\p{L}\p{N}]/gu, "");
         }
+
+        // Full text for offset matching: keep punctuation so the backend's
+        // character offsets line up with the rendered cells; drop only the
+        // reader's display artifacts (🔊 / zero-width space).
+        function cleanText(t) {
+          return (t || "").replace(/🔊/g, "").replace(/\u200b/gi, "");
+        }
+
+        // Media-driven books (mp3/subtitles) split one example across several
+        // adjacent phrase nodes, so work on .textsentence (else .textrow/p).
         var phraseNodes = textRoot.querySelectorAll(".textsentence");
         if (!phraseNodes.length) {
           phraseNodes = textRoot.querySelectorAll(".textrow, p");
@@ -386,62 +383,129 @@ function open_grammar_analysis() {
         var sentences = Array.prototype.slice.call(phraseNodes).map(function (el) {
           return { el: el, t: stripText(el.textContent) };
         });
-        function commonAncestor(a, b) {
-          if (!a || !b) return a || b;
-          var chain = [];
-          var n = a;
-          while (n) { chain.push(n); n = n.parentElement; }
-          var m = b;
-          while (m) {
-            if (chain.indexOf(m) !== -1) return m;
-            m = m.parentElement;
-          }
-          return null;
+
+        // All .textitem cells of a node run, with their cleaned text and
+        // offsets inside the run's concatenated text.
+        function runCells(nodes) {
+          var cells = [];
+          nodes.forEach(function (n) {
+            var items = n.querySelectorAll(".textitem");
+            if (items.length) {
+              items.forEach(function (it) {
+                cells.push({ el: it, t: cleanText(it.textContent) });
+              });
+            } else {
+              cells.push({ el: n, t: cleanText(n.textContent) });
+            }
+          });
+          return cells;
         }
+
+        // Ring the whole sentence that contains a match (blue outline), and
+        // tint only the matched words inside it (amber glow), using the
+        // backend's exact character offsets.  Falls back to ringing the whole
+        // run when the example text can't be located.
+        function planRun(run) {
+          var example = run.example || "";
+          var spans = run.spans || [[0, example.length]];
+          var cells = runCells(run.nodes);
+          var plan = [];
+          if (example && cells.length) {
+            var full = "", starts = [];
+            cells.forEach(function (c) { starts.push(full.length); full += c.t; });
+            var pos = full.indexOf(example);
+            if (pos !== -1) {
+              var tintEls = [];
+              spans.forEach(function (sp) {
+                var s = pos + sp[0], e = pos + sp[1];
+                cells.forEach(function (c, idx) {
+                  var cStart = starts[idx], cEnd = cStart + c.t.length;
+                  if (cEnd > s && cStart < e && tintEls.indexOf(c.el) === -1) {
+                    tintEls.push(c.el);
+                  }
+                });
+              });
+              var all = cells.map(function (c) { return c.el.getBoundingClientRect(); });
+              var u = unionRect(all);
+              if (u) plan.push({ rect: u, els: cells.map(function (c) { return c.el; }), tintEls: tintEls });
+            }
+          }
+          if (!plan.length) {
+            var all2 = cells.map(function (c) { return c.el.getBoundingClientRect(); });
+            var u2 = unionRect(all2);
+            if (u2) plan.push({ rect: u2, els: cells.map(function (c) { return c.el; }), tintEls: [] });
+          }
+          return plan;
+        }
+
+        // Contiguous runs of sentence nodes whose combined text contains the
+        // target phrase (ignoring whitespace and punctuation).  Prefer a
+        // single sentence node that contains the phrase outright; only when
+        // none does (a phrase split across adjacent nodes, e.g. in media
+        // books) do we span the minimal set of sentences.
+        function findRuns(want) {
+          var nodes = [];
+          var i;
+          for (i = 0; i < sentences.length; i++) {
+            if (sentences[i].t.indexOf(want) !== -1) {
+              nodes.push(sentences[i].el);
+            }
+          }
+          if (nodes.length) return nodes;
+          for (i = 0; i < sentences.length; i++) {
+            var acc = sentences[i].t;
+            for (var j = i + 1; j < sentences.length; j++) {
+              acc += sentences[j].t;
+              if (acc.indexOf(want) !== -1) {
+                for (var k = i; k <= j; k++) nodes.push(sentences[k].el);
+                return nodes;
+              }
+              if (acc.length > want.length + 60) break;
+            }
+          }
+          return nodes;
+        }
+
+        var dataItems = data || [];
         Array.prototype.forEach.call(
           panel[0].querySelectorAll(".grammar-item"),
-          function (item) {
-            // For each example sentence of this entry, the phrase nodes
-            // (contiguous run) that contain it in the reading text.
+          function (item, itemIdx) {
+            var g = dataItems[itemIdx];
+            if (!g) return;
+            var exampleEls = item.querySelectorAll(".grammar-item__example");
             var exampleRuns = [];
-            Array.prototype.forEach.call(
-              item.querySelectorAll(".grammar-item__example"),
-              function (ex) {
-                var want = stripText(ex.textContent);
-                if (!want) return;
-                // Contiguous run of sentences/phrases covering the example.
-                var nodes = [];
-                for (var i = 0; i < sentences.length; i++) {
-                  var acc = "";
-                  for (var j = i; j < sentences.length; j++) {
-                    acc += sentences[j].t;
-                    if (acc.indexOf(want) !== -1) {
-                      for (var k = i; k <= j; k++) {
-                        if (nodes.indexOf(sentences[k].el) === -1) nodes.push(sentences[k].el);
-                      }
-                      i = j; // the example has been matched; skip this run
-                      break;
-                    }
-                    if (acc.length > want.length + 60) break;
-                  }
-                }
-                if (nodes.length) exampleRuns.push({ want: want, nodes: nodes });
-              }
-            );
+            Array.prototype.forEach.call(exampleEls, function (exEl, exIdx) {
+              var ex = (g.examples || [])[exIdx] || {};
+              // The backend reports exact matched-word offsets inside the
+              // example sentence; fall back to the whole sentence when no
+              // match info is available.
+              var example = cleanText(ex.sentence || exEl.textContent);
+              if (!example) return;
+              var spans = (ex.matches || [])
+                .map(function (m) { return [m.start, m.end]; })
+                .filter(function (r) { return r[0] >= 0 && r[1] > r[0] && r[1] <= example.length; });
+              if (!spans.length) spans = [[0, example.length]];
+              var nodes = findRuns(stripText(example));
+              if (nodes.length) exampleRuns.push({ example: example, spans: spans, nodes: nodes });
+            });
             if (exampleRuns.length === 0) return;
-            var rings = [];
-            item.addEventListener("mouseenter", function () {
+
+            function showHighlights() {
               hideAllRings();
-              rings = [];
+              var rings = [];
               exampleRuns.forEach(function (run) {
-                var ring = document.createElement("div");
-                ring.className = "grammar-ring";
-                ringLayer.appendChild(ring);
-                placeRing(ring, run);
-                rings.push({ ring: ring, run: run });
+                planRun(run).forEach(function (p) {
+                  var ring = document.createElement("div");
+                  ring.className = "grammar-ring";
+                  ringLayer.appendChild(ring);
+                  positionRing(ring, p.rect);
+                  p.tintEls.forEach(function (el) { el.classList.add("grammar-word-active"); });
+                  rings.push({ ring: ring, cells: p.els });
+                });
               });
               activeRings = rings;
-            });
+            }
+            item.addEventListener("mouseenter", showHighlights);
             item.addEventListener("mouseleave", hideAllRings);
           }
         );

@@ -1057,7 +1057,10 @@ def grammar_analysis(bookid, pagenum):
     Analyze the grammar points on the current reading page.
 
     Reads the page's original text and returns JSON:
-      [{ "name", "level", "desc", "examples": [{ "sentence": ... }] }]
+      [{ "name", "level", "desc", "examples": [{"sentence", "matches"}] }]
+
+    "matches" lists the exact substrings matched inside each example
+    sentence, so the reader can highlight the grammar words.
 
     Japanese books use the Sudachi-based POS-aware engine; other
     languages fall back to the regex-based rule library.

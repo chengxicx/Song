@@ -91,24 +91,29 @@ def analyze(sentences):
     """
     输入：句子文本列表（list[str]）。
     输出：list[dict]，每个命中的语法点一项：
-      {"name", "desc", "examples": [{"sentence": ...}]}
+      {"name", "desc", "examples": [{"sentence", "matches"}]}
     同一语法点在一页出现多次时合并，例句去重保留原文。
+    "matches" 是例句中命中的原文片段，用于前端在阅读文本中高亮。
     """
     matched = []
     for sentence in sentences:
         if not sentence or not sentence.strip():
             continue
         for rule in _GRAMMAR_RULES:
-            if rule["pattern"].search(sentence):
-                # 找到已记录的同名语法点，追加例句；否则新建。
-                entry = next((e for e in matched if e["name"] == rule["name"]), None)
-                if entry is None:
-                    entry = {
-                        "name": rule["name"],
-                        "desc": rule["desc"],
-                        "examples": [],
-                    }
-                    matched.append(entry)
-                if sentence not in [ex["sentence"] for ex in entry["examples"]]:
-                    entry["examples"].append({"sentence": sentence})
+            m = rule["pattern"].search(sentence)
+            if not m:
+                continue
+            # 找到已记录的同名语法点，追加例句；否则新建。
+            entry = next((e for e in matched if e["name"] == rule["name"]), None)
+            if entry is None:
+                entry = {
+                    "name": rule["name"],
+                    "desc": rule["desc"],
+                    "examples": [],
+                }
+                matched.append(entry)
+            if sentence not in [ex["sentence"] for ex in entry["examples"]]:
+                entry["examples"].append(
+                    {"sentence": sentence, "matches": [{"start": m.start(), "end": m.end()}]}
+                )
     return matched
