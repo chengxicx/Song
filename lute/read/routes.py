@@ -22,8 +22,10 @@ from lute.read.render.service import Service as RenderService
 from lute.read.render.grammar_analysis import (
     analyze as analyze_grammar,
     is_japanese_language,
+    is_korean_language,
 )
 from lute.read.render.grammar_analysis_ja import analyze_japanese
+from lute.read.render.grammar_analysis_ko import analyze_korean
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
 from lute.term.model import Repository
@@ -1083,6 +1085,9 @@ def grammar_analysis(bookid, pagenum):
     if is_japanese_language(lang):
         display = getattr(lang, "grammar_translate_lang", "") or "en"
         return jsonify(analyze_japanese(page_text, display_lang=display))
+    if is_korean_language(lang):
+        display = getattr(lang, "grammar_translate_lang", "") or "en"
+        return jsonify(analyze_korean(page_text, display_lang=display))
     render_service = RenderService(db.session)
     paragraphs = render_service.get_paragraphs(page_text, lang)
     sentences = [
