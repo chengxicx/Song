@@ -157,7 +157,9 @@ class Repository:
         # without a fuller context, which in some language parsers can result
         # in different results.  For example, the Japanese "集めれ" string can
         # can be parsed with mecab to return one unit ("集めれ") or two ("集め/れ"),
-        # depending on context.
+        # depending on context.  (The default Japanese parser is Sudachi, which
+        # splits differently -- e.g. "もしも" becomes "もし/も" out of context --
+        # but the caveat is the same for both.)
 
         # So what does this mean?  It means that any context-less searches
         # for terms that have ambiguous parsing results will, themselves,

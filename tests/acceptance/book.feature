@@ -149,6 +149,6 @@ Feature: Books and stats are available
             だけども、間違えますよね。
         Then the page title is Reading "Jp test"
         And the reading pane shows:
-            最初/はね/難しい/。/
+            最初/は/ね/難しい/。/
 
             だけど (1)/も/、/間違え/ます/よ/ね/。

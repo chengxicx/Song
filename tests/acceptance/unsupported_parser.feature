@@ -18,7 +18,7 @@ Feature: Unsupported language data is hidden
 
 
     Scenario: Disabled data is hidden
-        Given I disable the "japanese" parser
+        Given I disable the Japanese parsers
         Given I visit "/"
 
         When I set the book table filter to "Hola"
@@ -29,9 +29,9 @@ Feature: Unsupported language data is hidden
 
 
     Scenario: Re-enabled data is still available
-        Given I disable the "japanese" parser
+        Given I disable the Japanese parsers
         Given I visit "/"
-        Given I enable the "japanese" parser
+        Given I enable the Japanese parsers
         Given I visit "/"
 
         When I set the book table filter to "Hola"
