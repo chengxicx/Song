@@ -28,7 +28,7 @@
 |---|---|---|
 | `inv accept` | 50 passed / **5 failed**（241s） | **55 passed / 0 failed**（192s） |
 | `inv acceptmobile` | 全绿 | **4 passed / 0 failed**（10s） |
-| `inv playwright` | 1 passed / **2 failed**（48s） | **3 passed / 1 skipped**（24s） |
+| `inv playwright` | 1 passed / **2 failed**（48s） | **4 passed / 1 skipped**（28s） |
 
 首跑 7 条失败的归因（**没有一条是产品回归**）：
 

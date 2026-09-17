@@ -101,6 +101,16 @@
           {% if term.id %}
           <button id="delete" type="button" class="btn btn-danger" onclick="deleteTerm()">Delete</button>
           {% endif %}
+          {% if embedded_in_reading_frame %}
+          {#
+            Shortcut to the reading page's grammar analysis, which replaces
+            the right pane's contents.  Only meaningful inside the reading
+            frame -- the standalone /term/edit pages have no grammar view.
+          #}
+          <button id="btn-grammar" type="button" class="btn btn-secondary"
+                  title="Show the grammar analysis for this page"
+                  onclick="openGrammarFromTermForm()">Grammar</button>
+          {% endif %}
       </div>
     </div>
   </form>
@@ -553,6 +563,21 @@
     }, DELAY);
 
     parents_tagify.off('add', onFinalTagAdded);  // clean up listener.
+  }
+
+
+  // =============================
+  // Grammar.
+
+  // The Grammar button (reading frame only).  The grammar analysis is
+  // rendered by the reading page in its right pane -- the frame has no
+  // grammar view of its own -- so ask the parent page to show it for the
+  // current page.  The pane's close button, or clicking another word,
+  // brings this form back.
+  function openGrammarFromTermForm() {
+    if (!EMBEDDED_IN_READING_FRAME)
+      return;
+    window.parent.postMessage({ event: "LuteTermFormGrammarRequested" }, "*");
   }
 
 
