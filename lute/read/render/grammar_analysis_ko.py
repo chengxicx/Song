@@ -62,6 +62,11 @@ def _tokens_for(sentence):
     for m in tok.tokenize(sentence):
         out.append(
             {
+                # Kiwi's character offset of the morpheme in the input.
+                # This is the one reliable anchor: a surface form's length
+                # can diverge from its display width (할 is one syllable but
+                # comes back as 하 + ᆯ), so accumulating lengths drifts.
+                "start": m.start,
                 "surface": m.form,
                 "lemma": getattr(m, "lemma", None) or m.form,
                 "pos": m.tag,
@@ -125,13 +130,14 @@ def _token_span_runs(conds, tokens):
 
 
 def _token_offsets(tokens):
-    "Character offset in the sentence of each token's start."
-    offsets = []
-    n = 0
-    for t in tokens:
-        offsets.append(n)
-        n += len(t["surface"])
-    return offsets
+    """
+    Character offset in the sentence of each token's start.
+
+    Taken straight from Kiwi (`start`), never accumulated from surface
+    lengths: Kiwi strips whitespace from surfaces and decomposes some
+    syllables (할 -> 하 + ᆯ), so length arithmetic drifts.
+    """
+    return [t["start"] for t in tokens]
 
 
 def _spec_spans(spec, tokens, sentence_text):
