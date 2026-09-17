@@ -204,6 +204,13 @@ def get_textitems(tokens, terms, language, multiword_term_indexer=None):
 
     def _add_textitem(index, text_lc, count):
         "Add a TextItem for position index in tokens."
+        if index < 0 or index + count > len(tokens_orig):
+            # Some parsers (e.g. the Korean Kiwi tokenizer) can emit
+            # zero-width-space tokens; when such a token appears inside the
+            # multi-word-term search the computed string index can exceed
+            # the token list (the zws is both a term separator and a token),
+            # so skip the bogus item instead of crashing.
+            return
         text_orig = tokens_orig[index]
         if count > 1:
             text_orig = zws.join(tokens_orig[index : index + count])
