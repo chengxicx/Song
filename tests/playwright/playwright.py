@@ -465,6 +465,57 @@ def test_playwright_after_db_reset():  # pylint: disable=too-many-statements
     sp.stop()
 
 
+def test_term_form_grammar_button():
+    """
+    The term form's Grammar button switches the right pane to the page's
+    grammar analysis, and closing it brings the form back.
+
+    The form lives in the wordframe iframe and the analysis is rendered by
+    the reading page itself, so this can only be checked in a browser: the
+    frame has to reach its parent, which then has to fill the pane.
+    """
+
+    showbrowser = os.environ.get("SHOW", "") == "true"
+    with sync_playwright() as sp:
+        browser = _launch(sp.chromium, headless=not showbrowser)
+        context = browser.new_context()
+        context.set_default_timeout(30000)
+        page = context.new_page()
+
+        page.goto("http://localhost:5001/dev_api/load_demo")
+
+        # Open Tutorial and click a word, which fills the term form.
+        page.goto("http://localhost:5001")
+        page.get_by_role("link", name="Tutorial", exact=True).click()
+        _park_mouse(page)
+        _reveal(page, "#thetext span.word").click()
+
+        frame = page.frame_locator('iframe[name="wordframe"]')
+        grammar_btn = frame.get_by_role("button", name="Grammar")
+        expect(grammar_btn).to_be_visible()
+
+        # The button asks the reading page to show the analysis, which
+        # replaces the pane's normal contents.
+        grammar_btn.click()
+        expect(page.locator("#grammar-analysis-panel")).to_be_visible()
+        expect(page.locator("#read_pane_right")).to_have_class(
+            re.compile(r"grammar-mode")
+        )
+        expect(page.locator(".wordframecontainer")).to_be_hidden()
+
+        # Closing the analysis gives the pane -- and the still-loaded
+        # term form -- back.
+        page.locator(".grammar-analysis-panel__close").click()
+        expect(page.locator("#grammar-analysis-panel")).to_have_count(0)
+        expect(page.locator("#read_pane_right")).not_to_have_class(
+            re.compile(r"grammar-mode")
+        )
+        expect(grammar_btn).to_be_visible()
+
+        context.close()
+        browser.close()
+
+
 def test_playwright():
     "Run playwright with tests."
     with sync_playwright() as sp:
