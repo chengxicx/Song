@@ -264,3 +264,66 @@ env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy \
 
 这三条**早就写在**现成文档里了：`docs/high-risk-smoke-checklist.md:108-129`（三行 `export` + 串行铁律）与项目 skill `run-lute-browser-tests` 的「必需环境变量」一节。这次绕了远路，唯一原因是**没先加载那个 skill** —— 下次改高危区、要跑 L2 时第一步就把它读出来。
 
+---
+
+## 九、提交与部署（2026-09-17）
+
+### 提交
+
+工作区里其实是**两组独立改动**，分成两个 commit：
+
+| commit | 内容 | 文件 |
+| --- | --- | --- |
+| `b6e998b0` | `fix(parse): make the Sudachi parser thread-safe` | `lute/parse/sudachi_parser.py`、`lute/app_factory.py`、`tests/unit/parse/test_JapaneseSudachiParser.py`（新增） |
+| `900b3088` | `feat(language): demote MeCab to a fallback Japanese parser` | registry / routes / models.language / term.model + 7 个测试文件 + 本报告 + 子模块指针 |
+
+**子模块按前置顺序处理**：先在 `lute/db/language_defs` 里 commit（`7c6af0d`）并 `git push origin master`（`f68c5bd..7c6af0d`），再回父仓库 `git add lute/db/language_defs` 更新指针（`f68c5bd7` → `7c6af0d4`），最后 push 父仓库。部署日志确认了 `Submodule path 'lute/db/language_defs': checked out '7c6af0d4…'`。
+
+### 一个 flake（不是回归）
+
+第一次 L2 重跑出现 `inv accept` **1 failed / 54 passed**，失败项是 `test_book.py::test_bad_text_files_are_rejected[non_utf_8.txt-non_utf_8.txt is not utf-8 encoding]`。
+
+- 单独重跑该用例（6 个参数化全跑）：**6 passed**。
+- 紧接着再跑一次全量：**55 passed / 0 failed**。
+- **根因**：该 scenario 的 step 是 `make_book_from_file()` —— 点完 `#save` 只 `_sleep(0.2)` 就断言 `page.content()`，**没有等导航提交**。机器忙时 0.2 秒不够，`content()` 拿到的还是**上一页**（失败报文里的 `<title>New Book…` 正是新书表单页）。属既有的 test-side 时序 hack。
+- 本地没有装 `pytest-randomly`（`pip list` 只有 `pytest 8.4.2` + `pytest-bdd 7.3.0`）⇒ 顺序是确定的，所以这不是随机排序问题，纯粹是时序竞争。
+- 项目里早有同类记录：`.workbuddy/memory/2026-09-13.md`「连续两轮全量 accept 各挂 1 条且**每次都不同**，隔离重跑均通过，第三轮 55/0」；`docs/high-risk-smoke-checklist.md:37` 也标了 `test_i_can_import_a_text_file` 为 flaky。
+
+> **可选的后续改进**（本次未做，因为它出现在部署验证之后、再改就要重跑 L2）：把 `make_book_from_file` / `make_book_from_url` 里的 `_sleep(0.2)` 换成等待导航 —— 例如 `with page.expect_navigation(): page.locator("#save").click(force=True)`。这能从根上消掉这一整类 flake。
+
+### 部署
+
+`ssh root@172.236.226.132 'bash /opt/lute/deploy.sh'` 一次通过：
+`b9e14866..900b3088` → `HEAD is now at 900b3088` → 子模块 `7c6af0d4` → `pip install -e .` 无错 → `Active: active (running)`。
+重启后的启动日志里 **`Japanese (MeCab)` 与 `Japanese (Sudachi)` 两个解析器都仍在 Enabled parsers 列表**（正是方案 A 的意图），且 `journalctl` 中无任何 error/traceback/exception。
+
+### 生产验证（两层）
+
+**(1) 生产解释器内的行为脚本**（`scp` 到 `/tmp`，用 `./venv/bin/python` 跑，跑完删除）—— 全部 PASS：
+
+- `is_legacy_parser("japanese")` = True；`supported_parser_types()` = `['classicalchinese','japanese','japanese_sudachi','spacedel','turkish']`（**仍含 legacy**）；`selectable_parsers()` = 同上去掉 `japanese`；且严格等于「supported 减 legacy」。
+- 生产磁盘上的 `japanese/definition.yaml`：`parser_type: japanese_sudachi` + `parser_type_fallback: japanese`；`Language.from_dict()` 解析为 `japanese_sudachi`；把 `is_supported` monkeypatch 成「sudachi 不存在」后，解析结果回退为 `japanese` ⇒ **fallback 真的生效**。
+- **线程压测：8 线程 × 30 轮 × 4 句 = 960 次并发解析，0 异常；每线程 token 数完全相同（`1470` × 8）** —— 这就是线程安全修复在生产解释器上的直接证明（修复前第 67 次调用即 `Already borrowed`）。
+- `japanese_sudachi` 与 `japanese` 两个解析器都仍 `is_supported`。
+
+**(2) 生产端到端 UI（Playwright 打 https://www.metaman.dpdns.org）** —— 全部 PASS：
+
+| 检查 | 结果 |
+| --- | --- |
+| 应用登录 | 通过 |
+| `/language/new/Japanese` 的 `select#parser_type` 选项 | `['japanese_sudachi']` — 有 Sudachi、**没有 MeCab** |
+| `/language/edit/13`（日语，`LgParserType=japanese_sudachi`） | 选中 `japanese_sudachi`，**不含** MeCab 选项 |
+| `/read/285`（日语书） | `luteStartReadingDone === true`，渲染出 **224 个 `span.textitem`** |
+| 点术语弹窗 | `作` → 弹窗 `'作\n\nさく'`（解析 + 查词端到端可用） |
+
+UI 脚本本身踩的两个坑（与改动无关，但会伪装成「功能坏了」）：
+
+- **术语弹窗是 jquery-ui tooltip 且挂到 `<body>` 下** ⇒ `#thetext .ui-tooltip` 永远匹配不到，要用全局 `.ui-tooltip`。
+- 沙箱有 `HTTP_PROXY` 才能出网，但 Chromium 不会自动继承 ⇒ 访问**外部站点**要 `new_context(proxy={"server": os.environ["HTTP_PROXY"]})`；同时 `launch(args=["--no-proxy-server"])` 免得打 localhost 被代理截。两者不矛盾：launch 关全局代理，context 只给这一个上下文指代理。
+
+这两条已补进 skill `song-lute-deploy` 的 §5b（v1.4.0）；子模块部署前置也补成了新的 §1a。
+
+### 终态
+
+生产 HEAD `900b3088`（`git describe` → `3.10.3.5-411-g900b3088`），子模块 `7c6af0d4`，`lute.service` active。服务器上的临时验证脚本已删除。
+
