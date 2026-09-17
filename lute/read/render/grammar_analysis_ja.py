@@ -146,7 +146,12 @@ def _match_spans(rule, tokens, sentence_text):
             offsets = _token_offsets(tokens)
             for start, end in _token_span_runs(spec["conds"], tokens):
                 if end > start:
-                    spans.append((offsets[start], offsets[end]))
+                    # A pattern may match up to (and including) the final
+                    # token of the sentence (e.g. a short subtitle line
+                    # with no trailing 。).  Its character end is then the
+                    # end of the sentence, not a token start offset.
+                    span_end = offsets[end] if end < len(offsets) else len(sentence_text)
+                    spans.append((offsets[start], span_end))
     return spans
 
 
