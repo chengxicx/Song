@@ -203,6 +203,16 @@ class Language(
             if funcname:
                 load(key, funcname)
 
+        # A definition may name a preferred parser and a fallback for
+        # machines where the preferred one isn't installed.  This
+        # matters when the preferred parser comes from an optional
+        # dependency (e.g. sudachipy) while the fallback is a core one,
+        # so the predefined language stays loadable instead of
+        # vanishing from the language list.
+        fallback = d.get("parser_type_fallback")
+        if fallback and not lang.is_supported and is_supported(fallback):
+            lang.parser_type = fallback
+
         ld_sort = 1
         for ld_data in d["dictionaries"]:
             dtype = ld_data["type"]
