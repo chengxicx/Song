@@ -359,6 +359,14 @@
       loadDictionaries();
     }
 
+    // The term form's "Grammar" button: switch the right pane over to the
+    // page's grammar analysis.  The form stays loaded in the frame (just
+    // hidden), so closing the analysis -- or clicking a word -- brings it
+    // straight back.
+    if (event.data.event === "LuteTermFormGrammarRequested") {
+      if (typeof open_grammar_analysis === "function") open_grammar_analysis();
+    }
+
     if (event.data.event === "LuteTermFormOpened" && mediaTablet.matches) {
       readPaneRight.classList.add("open-dict");
       btmMarginCont.classList.add("open-dict");
