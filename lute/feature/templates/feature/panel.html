@@ -18,6 +18,7 @@
   .pl-state { font-size: .75em; padding: 1px 8px; border-radius: 3px; }
   .pl-state.loaded { background: var(--btn-accent, #007aff); color: #fff; }
   .pl-state.pending { border: 1px solid var(--form-border-color, #ddd); color: var(--amber-color, #b45309); }
+  .pl-ver { font-size: .8em; font-family: var(--font-mono, monospace); opacity: .85; }
   .pl-msg { margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: .85em; }
   .pl-msg.ok { background: rgba(0,180,0,.12); border: 1px solid #2a9d4f; }
   .pl-msg.err { background: rgba(220,50,50,.12); border: 1px solid #c94545; }
@@ -112,6 +113,7 @@
     function render(payload) {
       var pkgs = payload.packages || {};
       var types = payload.types || {};
+      var versions = payload.versions || {};
       var loaded = payload.loaded || [];
       var names = payload.installed || [];
       if (!names.length) {
@@ -127,17 +129,25 @@
         // discovered; feature plugins need register() to have run.
         var state = isParser || loaded.indexOf(name) >= 0;
         var kindLabel = isParser ? 'parser' : 'feature';
+        var ver = versions[name];
         html +=
           '<div class="pl-row">' +
             '<strong>' + name + '</strong>' + stateTag(name, state) +
             '<span class="pl-state" style="opacity:.65">' + kindLabel + '</span>' +
+            (ver ? '<span class="pl-ver">v' + ver + '</span>' : '') +
             (pkgs[name] && pkgs[name] !== name ? '<span class="pl-muted">(' + pkgs[name] + ')</span>' : '') +
             '<span style="flex:1"></span>' +
             (isDemo ? '<span class="pl-state" style="opacity:.6">built-in</span>'
-                    : '<button class="btn" data-uninstall="' + name + '" data-kind="' + kind + '">Remove</button>') +
+                    : '<button class="btn" data-upgrade="' + name + '" data-kind="' + kind + '">Upgrade</button>' +
+                      '<button class="btn" data-uninstall="' + name + '" data-kind="' + kind + '">Remove</button>') +
           '</div>';
       });
       listEl.innerHTML = html;
+      listEl.querySelectorAll('[data-upgrade]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          doUpgrade(b.getAttribute('data-upgrade'), b.getAttribute('data-kind'));
+        });
+      });
       listEl.querySelectorAll('[data-uninstall]').forEach(function (b) {
         b.addEventListener('click', function () {
           doUninstall(b.getAttribute('data-uninstall'), b.getAttribute('data-kind'));
@@ -178,6 +188,18 @@
         return refresh();
       }).catch(function (e) { btn.disabled = false; showMsg(false, 'Request failed: ' + e); });
     });
+
+    function doUpgrade(name, kind) {
+      showMsg(true, 'Upgrading ' + name + '…');
+      fetch('/_feature/upgrade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ name: name, kind: kind || 'feature' })
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        showMsg(d.ok, d.message + (d.ok ? ' Restart Lute to activate it.' : ''));
+        refresh();
+      }).catch(function (e) { showMsg(false, 'Request failed: ' + e); });
+    }
 
     function doUninstall(name, kind) {
       if (!confirm('Remove plugin "' + name + '"? This requires a restart to take effect.')) return;

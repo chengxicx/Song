@@ -86,6 +86,7 @@ def installed_json():
                 name: info.get("package") for name, info in pkgs.items()
             },
             "types": {name: info.get("type") for name, info in pkgs.items()},
+            "versions": {name: info.get("version") for name, info in pkgs.items()},
             "loaded": registry.loaded_plugins,
         }
     )
@@ -108,6 +109,27 @@ def install():
             400,
         )
     ok, message = installer.install_plugin(spec)
+    return jsonify({"ok": ok, "message": message})
+
+
+@bp.post("/upgrade")
+def upgrade():
+    """Upgrade an installed plugin to its latest PyPI release."""
+    name = (request.form.get("name") or "").strip()
+    if not name:
+        return jsonify({"ok": False, "message": "Missing plugin name."}), 400
+    if name == "_demo":
+        return (
+            jsonify(
+                {
+                    "ok": False,
+                    "message": "'_demo' is Lute's built-in marker and cannot be upgraded.",
+                }
+            ),
+            400,
+        )
+    kind = (request.form.get("kind") or "feature").strip()
+    ok, message = installer.upgrade_plugin(name, kind=kind)
     return jsonify({"ok": ok, "message": message})
 
 
