@@ -30,8 +30,15 @@ def _get_tokenizer():
 
 
 def _split_sentences(text):
-    "Split a page of text into sentences on Japanese punctuation."
-    parts = re.split(r"(?<=[。．！？!?])", text.replace("\n", " "))
+    """
+    Split a page of text into sentences on Japanese punctuation or line breaks.
+
+    Line breaks matter for subtitle/transcript books, whose lines usually
+    carry no 。/！ so an entire page would otherwise collapse into one
+    pseudo-sentence (making every grammar example the whole page).
+    """
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    parts = re.split(r"(?<=[。．！？!?])|\n", text)
     return [p.strip() for p in parts if p and p.strip()]
 
 
@@ -68,39 +75,84 @@ def _match_condition(cond, token):
 
 
 def _try_match(conds, tokens, i, j):
-    "Backtracking match of the condition sequence against the token list."
+    """
+    Backtracking match of the condition sequence against the token list.
+
+    Returns the number of tokens consumed, or -1 when the sequence does
+    not match starting at token j.
+    """
     if i == len(conds):
-        return True
+        return 0
     cond = conds[i]
     if cond.get("optional"):
-        if j < len(tokens) and _match_condition(cond, tokens[j]) and _try_match(conds, tokens, i + 1, j + 1):
-            return True
+        if j < len(tokens) and _match_condition(cond, tokens[j]):
+            n = _try_match(conds, tokens, i + 1, j + 1)
+            if n >= 0:
+                return n + 1
         return _try_match(conds, tokens, i + 1, j)
     if j >= len(tokens):
-        return False
+        return -1
     if not _match_condition(cond, tokens[j]):
-        return False
-    return _try_match(conds, tokens, i + 1, j + 1)
+        return -1
+    n = _try_match(conds, tokens, i + 1, j + 1)
+    if n < 0:
+        return -1
+    return n + 1
 
 
 def _match_tokens(conds, tokens):
     "True if the condition sequence appears anywhere in the token list."
     for start in range(len(tokens)):
-        if _try_match(conds, tokens, 0, start):
+        if _try_match(conds, tokens, 0, start) >= 0:
             return True
     return False
 
 
-def _matches(rule, tokens, sentence_text):
-    "True if any pattern-spec of the rule matches this sentence."
+def _token_span_runs(conds, tokens):
+    "Token-index runs (start, end) where the condition sequence matches."
+    runs = []
+    for start in range(len(tokens)):
+        n = _try_match(conds, tokens, 0, start)
+        if n > 0:
+            runs.append((start, start + n))
+    return runs
+
+
+def _token_offsets(tokens):
+    "Character offset in the sentence text of each token's start."
+    offsets = []
+    n = 0
+    for t in tokens:
+        offsets.append(n)
+        n += len(t["surface"])
+    return offsets
+
+
+def _match_spans(rule, tokens, sentence_text):
+    """
+    (start, end) character ranges of sentence_text matched by this rule.
+
+    Regex specs return their match span; token specs return the span of
+    the matched token run.  Exact offsets let the front-end highlight
+    precisely the matched words (and never, say, the で inside です).
+    """
+    spans = []
     for spec in rule["patterns"]:
         if spec["type"] == "regex":
-            if spec["re"].search(sentence_text):
-                return True
+            for m in spec["re"].finditer(sentence_text):
+                if m.group(0):
+                    spans.append(m.span())
         else:  # tokens
-            if _match_tokens(spec["conds"], tokens):
-                return True
-    return False
+            offsets = _token_offsets(tokens)
+            for start, end in _token_span_runs(spec["conds"], tokens):
+                if end > start:
+                    spans.append((offsets[start], offsets[end]))
+    return spans
+
+
+def _matches(rule, tokens, sentence_text):
+    "True if any pattern-spec of the rule matches this sentence."
+    return bool(_match_spans(rule, tokens, sentence_text))
 
 
 # ---- rules -----------------------------------------------------------
@@ -595,23 +647,31 @@ def analyze_japanese(page_text, display_lang="en"):
     isn't dominated by を/に/で/と hits.
 
     Returns a list of dicts:
-      {"key", "name", "level", "desc", "examples": [{"sentence": ...}]}
+      {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     Rules appearing multiple times are merged; examples are deduped.
+    Each example's "matches" is a list of {"start", "end"} character
+    offsets (within "sentence") of the matched words / constructions, so
+    the front-end can highlight exactly those words in the reading text.
     """
+    # 🔊 and zero-width spaces are display artifacts of the reader, not
+    # grammar; strip them so offsets align with the rendered text.
+    page_text = page_text.replace("🔊", "").replace("\u200b", "")
     sentences = _split_sentences(page_text)
     matched = []
-    particle_examples = {}  # particle key -> [sentences]
+    particle_examples = {}  # particle key -> [(sentence, [matches])]
     for sentence in sentences:
         if not sentence:
             continue
         tokens = _tokens_for(sentence)
         for rule in _ALL_RULES:
-            if not _matches(rule, tokens, sentence):
+            spans = _match_spans(rule, tokens, sentence)
+            if not spans:
                 continue
+            matches = [{"start": s, "end": e} for s, e in spans]
             if rule.get("kind") == "particle":
                 ex = particle_examples.setdefault(rule["key"], [])
-                if sentence not in ex:
-                    ex.append(sentence)
+                if not any(s == sentence for s, _ in ex):
+                    ex.append((sentence, matches))
                 continue
             entry = next((e for e in matched if e["key"] == rule["key"]), None)
             if entry is None:
@@ -623,8 +683,8 @@ def analyze_japanese(page_text, display_lang="en"):
                     "examples": [],
                 }
                 matched.append(entry)
-            if sentence not in [ex["sentence"] for ex in entry["examples"]]:
-                entry["examples"].append({"sentence": sentence})
+            if not any(e["sentence"] == sentence for e in entry["examples"]):
+                entry["examples"].append({"sentence": sentence, "matches": matches})
 
     if particle_examples:
         symbols = [
@@ -634,11 +694,16 @@ def analyze_japanese(page_text, display_lang="en"):
         ]
         shown = []
         for ex_list in particle_examples.values():
-            for s in ex_list:
+            for sentence, spans in ex_list:
                 if len(shown) >= 6:
                     break
-                if s not in shown:
-                    shown.append(s)
+                existing = next((e for e in shown if e["sentence"] == sentence), None)
+                if existing is None:
+                    shown.append({"sentence": sentence, "matches": list(spans)})
+                else:
+                    for sp in spans:
+                        if sp not in existing["matches"]:
+                            existing["matches"].append(sp)
             if len(shown) >= 6:
                 break
         matched.append(
@@ -647,7 +712,7 @@ def analyze_japanese(page_text, display_lang="en"):
                 "name": "Particles: " + "・".join(symbols),
                 "level": "N5",
                 "desc": _ZH_PARTICLE if display_lang == "zh" else "Basic N5 particles detected",
-                "examples": [{"sentence": s} for s in shown],
+                "examples": shown,
             }
         )
     return matched
