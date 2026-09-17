@@ -129,8 +129,8 @@ def upgrade():
             400,
         )
     kind = (request.form.get("kind") or "feature").strip()
-    ok, message = installer.upgrade_plugin(name, kind=kind)
-    return jsonify({"ok": ok, "message": message})
+    ok, message, restart_needed = installer.upgrade_plugin(name, kind=kind)
+    return jsonify({"ok": ok, "message": message, "restart_needed": restart_needed})
 
 
 @bp.post("/uninstall")

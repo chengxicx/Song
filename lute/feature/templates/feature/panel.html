@@ -196,7 +196,8 @@
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ name: name, kind: kind || 'feature' })
       }).then(function (r) { return r.json(); }).then(function (d) {
-        showMsg(d.ok, d.message + (d.ok ? ' Restart Lute to activate it.' : ''));
+        var restartHint = (d.ok && d.restart_needed) ? ' Restart Lute to activate it.' : '';
+        showMsg(d.ok, d.message + restartHint);
         refresh();
       }).catch(function (e) { showMsg(false, 'Request failed: ' + e); });
     }
