@@ -1,0 +1,7295 @@
+[
+ {
+  "key": "irregular_verb__def0",
+  "name": "Irregular Verbs",
+  "slug": "",
+  "meaning": "",
+  "type": "other",
+  "examples": [],
+  "focus": [],
+  "zh": "不规则动词",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "noun_간__duration",
+  "name": "간",
+  "slug": "duration",
+  "meaning": "Follows expressions of time (초, 분, 시간, 며칠, 년 etc), indicating that an action continued throughout a period.",
+  "type": "noun",
+  "examples": [
+   "묻지마 방화가 일어나는 바람에 지하철 운행이 30분간 중단되었다.",
+   "그 정치가는 2009년부터 9년간 중학교 교사로 일했거든요.",
+   "여자친구랑 헤어지고 나서 며칠간 술에 취해 펑펑 울었어요."
+  ],
+  "focus": [
+   "간"
+  ],
+  "zh": "……之间；反正……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_같이__similarity",
+  "name": "같이",
+  "slug": "similarity",
+  "meaning": "Indicates resemblance or a metaphorical comparison in actions or objects",
+  "type": "universal",
+  "examples": [
+   "그녀는 너같이 예쁜다.",
+   "로봇같이 걷다.",
+   "영화배우같이 잘생겼어요."
+  ],
+  "focus": [
+   "같이"
+  ],
+  "zh": "和……一起；像……一样",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_경__around-time",
+  "name": "경",
+  "slug": "around-time",
+  "meaning": "Follows time words like '시,' '분,' '월,' '반,' to express that an event or action occurred around that time.",
+  "type": "noun",
+  "examples": [
+   "아마 작년 4월경이었을 거예요.",
+   "민수는 1시 반경에 지하철역으로 향했다.",
+   "시현에 따르면 어젯밤 8시경부터 친구와 해변에서 불꽃놀이를 했다고 한다."
+  ],
+  "focus": [
+   "반경",
+   "시경",
+   "월경"
+  ],
+  "zh": "……之际；……关头",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_까지__range",
+  "name": "까지",
+  "slug": "range",
+  "meaning": "Indicate the end of the range of time, place or action.",
+  "type": "universal",
+  "examples": [
+   "오늘은 6시까지 일할 거에요.",
+   "조금 식을 때까지 기다려야겠어요.",
+   "전화비 많이 나오게 언제까지 떠들고 있을 거야!"
+  ],
+  "focus": [
+   "까지"
+  ],
+  "zh": "到……为止",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_껏__to-the-fullest",
+  "name": "껏",
+  "slug": "to-the-fullest",
+  "meaning": "to that capacity’s fullest extent.",
+  "type": "noun",
+  "examples": [
+   "주말에는 마음껏 쉬고 싶어요.",
+   "시험이 끝났으니 이제 마음껏 놀 수 있어요.",
+   "오늘은 힘껏 달려 봐요."
+  ],
+  "focus": [
+   "껏"
+  ],
+  "zh": "尽量……；……到头",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_께__target",
+  "name": "께",
+  "slug": "target",
+  "meaning": "Define a person or a living creature as the recipient or target of an action. This is the honorific version of 한테 or 에게.",
+  "type": "universal",
+  "examples": [
+   "선생님께 인사를 드렸습니다.",
+   "사장님께 보고서를 보냈어요."
+  ],
+  "focus": [
+   "께"
+  ],
+  "zh": "（敬语）给……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_께서__subject",
+  "name": "께서",
+  "slug": "subject",
+  "meaning": "Mark the subject of the sentence. The honorific version of 이/가.",
+  "type": "universal",
+  "examples": [
+   "아버지께서 뭘 읽고 계세요?",
+   "사장님께서 직원들에게 선물을 주셨어요."
+  ],
+  "focus": [
+   "께서"
+  ],
+  "zh": "（敬语主格）……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_끼리__group-together",
+  "name": "끼리",
+  "slug": "group-together",
+  "meaning": "Used to indicate that actions or interactions are done among members of the same group or category.",
+  "type": "noun",
+  "examples": [
+   "친구들끼리 영화를 봤어요.",
+   "아이들끼리 놀이터에서 놀아요.",
+   "학생들끼리 의견을 나눠요."
+  ],
+  "focus": [
+   "아이들끼리",
+   "학생들끼리",
+   "친구들끼리"
+  ],
+  "zh": "……之间；……彼此",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_네__collective",
+  "name": "네",
+  "slug": "collective",
+  "meaning": "Shows which group a person is part of",
+  "type": "noun",
+  "examples": [
+   "민수네 가게는 항상 손님이 많아요.",
+   "수지네 가족은 여행을 갔어요.",
+   "친구네 집에서 파티를 열었어요."
+  ],
+  "focus": [
+   "친구네",
+   "민수네",
+   "수지네"
+  ],
+  "zh": "……啊（表发现/感叹）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_님__honorific",
+  "name": "님",
+  "slug": "honorific",
+  "meaning": "An honorific particle designating people, showing them respect and honor.",
+  "type": "noun",
+  "examples": [
+   "옆집에 사는 아저씨가 선생님이래요.",
+   "사장님께서 출장을 가십니다.",
+   "손님, 이게 신상품입니다."
+  ],
+  "focus": [
+   "님"
+  ],
+  "zh": "……先生/女士（敬称）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_답다__has-quality-of",
+  "name": "답다",
+  "slug": "has-quality-of",
+  "meaning": "Indicate that it has some of the qualities or characteristics of the noun and turn it into an descriptive verb.",
+  "type": "noun",
+  "examples": [
+   "정말 신사답게 행동하네요.",
+   "전쟁에서 승리한 장군답다."
+  ],
+  "focus": [
+   "신사답게",
+   "장군답다"
+  ],
+  "zh": "像……一样的；具有……气质的",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_당__for-each",
+  "name": "당",
+  "slug": "for-each",
+  "meaning": "Typically follows measure words, creating a ratio between a measure word and a value. Similar to 마다.",
+  "type": "noun",
+  "examples": [
+   "핫도그 하나당 5천원이래.",
+   "그 드라마는 회당 시청률이 80%를 넘을 정도로 아주 핫했어요.",
+   "할인주차권의 유효시간 종료 이후에는 10분당 1,000원의 할증요금이 부과됩니다"
+  ],
+  "focus": [
+   "당"
+  ],
+  "zh": "每……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_당하다__experience-consequence",
+  "name": "당하다",
+  "slug": "experience-consequence",
+  "meaning": "To be the -- often helpless -- subject of an action, performed by someone else, that has a negative consequence for the subject.",
+  "type": "noun",
+  "examples": [
+   "좋아하는 여자한테 고백했다가 거절당했다.",
+   "조금 바보 취급당하는 것 같아서 기분이 좋지는 않았다.",
+   "악플 많이 달면, 차단당할 수도 있어요.",
+   "자연사는 절대 아니었을 거예요. 저는 언니가 살해당했다고 믿습니다.",
+   "학교에서 담배를 파는 게 들켜서 퇴학당했어요."
+  ],
+  "focus": [
+   "살해당했다고",
+   "퇴학당했어요",
+   "거절당했다",
+   "취급당하는",
+   "차단당할"
+  ],
+  "zh": "被……；遭受……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_대로__according-to",
+  "name": "대로",
+  "slug": "according-to",
+  "meaning": "When added to the end of a noun, it indicates that something is \"as\" or \"in accordance with\" the noun.",
+  "type": "universal",
+  "examples": [
+   "모든 것이 예정대로 진행되고 있습니다.",
+   "화면의 모습대로, 그 배우는 멋있어요."
+  ],
+  "focus": [
+   "대로"
+  ],
+  "zh": "按照……；照……样",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_더러__target-person",
+  "name": "더러",
+  "slug": "target-person",
+  "meaning": "Follows a pronoun or title to define a person as the recipient or target of an action. Commonly used with expressions related to speech or conversation.",
+  "type": "noun",
+  "examples": [
+   "그것은 형더러 물어봐.",
+   "누가 너더러 냄새 난대?",
+   "너더러 무조건 견디라는 말은 아니야."
+  ],
+  "focus": [
+   "형더러",
+   "너더러"
+  ],
+  "zh": "（口语对象助词）向……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_도__addition",
+  "name": "도",
+  "slug": "addition",
+  "meaning": "It indicates that the noun is being added to a list of items, actions, or descriptions previously mentioned or understood from the context.",
+  "type": "universal",
+  "examples": [
+   "저도 아직 확신이 사실은 없어요.",
+   "친구도 왔어요."
+  ],
+  "focus": [
+   "도"
+  ],
+  "zh": "也；连……都",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_되다__to-become",
+  "name": "되다",
+  "slug": "to-become",
+  "meaning": "Indicates nouns into passive verbs, things working out, becoming something.",
+  "type": "noun",
+  "examples": [
+   "제가 야구 팀에 선택됐어요!",
+   "문법 실수가 수정됐어요.",
+   "새 정책이 국회에서 발의됐어요.",
+   "걱정하지 마, 잘 될 거야.",
+   "애벌레는 나비가 됩니다.",
+   "여기서 사진을 찍어도 돼요?"
+  ],
+  "focus": [
+   "수정됐어요",
+   "발의됐어요",
+   "선택됐어요",
+   "됩니다",
+   "돼요",
+   "될"
+  ],
+  "zh": "成为……；被……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_드리다__do-respectfully",
+  "name": "드리다",
+  "slug": "do-respectfully",
+  "meaning": "Attaches to nouns denoting action and expresses that the action is done respectfully.",
+  "type": "noun",
+  "examples": [
+   "일단 부모님께 문안드려야 합니다.",
+   "선생님, 감사드립니다!"
+  ],
+  "focus": [
+   "감사드립니다",
+   "문안드려야"
+  ],
+  "zh": "给……（敬语）；请求",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_들__plural",
+  "name": "들",
+  "slug": "plural",
+  "meaning": "Attached to nouns, pronouns, adverbs, etc. to indicate plurality.",
+  "type": "noun",
+  "examples": [
+   "옆방 애들이랑 싸웠어?",
+   "과일들도 예쁘게 깎아서 접시에 담아요.",
+   "미나의 친한 친구들을 집으로 초대했어요."
+  ],
+  "focus": [
+   "들"
+  ],
+  "zh": "（复数助词）……们",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_따라__unusually",
+  "name": "따라",
+  "slug": "unusually",
+  "meaning": "Follows a time expression and expresses that some action happened exclusively or unusually so in that period of time and does not represent the usual behavior or state of affairs.",
+  "type": "noun",
+  "examples": [
+   "오늘따라 날씨가 왜 이래?",
+   "그날따라 남편이 일찍 들어왔거든..."
+  ],
+  "focus": [
+   "그날따라",
+   "오늘따라"
+  ],
+  "zh": "随着……；按照……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_랑_이랑__enumeration",
+  "name": "랑/이랑",
+  "slug": "enumeration",
+  "meaning": "Connects multiple nouns, indicating a list or group without specifying order.",
+  "type": "universal",
+  "examples": [
+   "아저씨, 식빵이랑 꽈배기 주세요."
+  ],
+  "focus": [
+   "이랑"
+  ],
+  "zh": "和……（口语）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_랑_이랑__companionship",
+  "name": "랑/이랑",
+  "slug": "companionship",
+  "meaning": "Indicates that an action involves more than one party or that something is done together with someone or something else.",
+  "type": "universal",
+  "examples": [
+   "옆방 애들이랑 싸웠어?",
+   "선생님이랑 같이 풀어봐요."
+  ],
+  "focus": [
+   "이랑"
+  ],
+  "zh": "和……（口语）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_로_으로__method",
+  "name": "(으)로",
+  "slug": "method",
+  "meaning": "Expresses the means or tools that enable us to perform an action.",
+  "type": "universal",
+  "examples": [
+   "자전거로 다녀요.",
+   "글은 연필로 씁니다."
+  ],
+  "focus": [
+   "로"
+  ],
+  "zh": "用……；以……（方式/工具/方向）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_로_으로__direction",
+  "name": "(으)로",
+  "slug": "direction",
+  "meaning": "Used to express a direction.",
+  "type": "universal",
+  "examples": [
+   "우리 집 창밖으로 서울 타워가 보여요."
+  ],
+  "focus": [
+   "으로"
+  ],
+  "zh": "用……；以……（方式/工具/方向）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_로써_으로써__means-or-method",
+  "name": "(으)로써",
+  "slug": "means-or-method",
+  "meaning": "This form shows how something happens or is done using a certain method or way.",
+  "type": "noun",
+  "examples": [
+   "고기를 식칼로써 토막을 내요.",
+   "학생들이 토론으로써 문제를 해결했어요."
+  ],
+  "focus": [
+   "토론으로써",
+   "식칼로써"
+  ],
+  "zh": "用……来；凭借……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_마다__repetition",
+  "name": "마다",
+  "slug": "repetition",
+  "meaning": "When preceded by a temporal indication, it indicates the recurrence of an event.",
+  "type": "noun",
+  "examples": [
+   "3시간마다 확인하십시오.",
+   "음식을 먹을 때마다 배가 아파요."
+  ],
+  "focus": [
+   "마다"
+  ],
+  "zh": "每……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_마다__all",
+  "name": "마다",
+  "slug": "all",
+  "meaning": "Indicates the inclusion of all the elements of a group with no exception.",
+  "type": "noun",
+  "examples": [
+   "나라마다 국기가 달라요.",
+   "불의 제국은 날마다 전쟁을 일으켜."
+  ],
+  "focus": [
+   "마다"
+  ],
+  "zh": "每……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_마따나__according-to",
+  "name": "마따나",
+  "slug": "according-to",
+  "meaning": "Used with the word 말 to express sentiments like \"as you said\", \"as mentioned\", \"as I say\", \"as you say\".",
+  "type": "noun",
+  "examples": [
+   "자네 말마따나 쉬는 게 좋겠네.",
+   "자네 말마따나 극과 극은 통하는 법이지."
+  ],
+  "focus": [
+   "말마따나"
+  ],
+  "zh": "正如……；正如……一样",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_마저__even-this-too",
+  "name": "마저(도)",
+  "slug": "even-this-too",
+  "meaning": "Emphasizes that the additionally included listed item is least expected.",
+  "type": "noun",
+  "examples": [
+   "가족마저 나를 믿지 않았다.",
+   "희망마저도 사라졌어요.",
+   "집에 너무 늦게 오니까, 강아지마저 잠들어 있었어요."
+  ],
+  "focus": [
+   "강아지마저",
+   "희망마저도",
+   "가족마저"
+  ],
+  "zh": "连……都；甚至",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_만__limitation",
+  "name": "만",
+  "slug": "limitation",
+  "meaning": "A particle that expresses the sense of limitation, emphasis and degree of comparison.",
+  "type": "universal",
+  "examples": [
+   "제 남동생은 액션 영화만 보고 다른 영화는 안 봐요.",
+   "주말에는 하루 종일 집에서 잠만 자요."
+  ],
+  "focus": [
+   "만"
+  ],
+  "zh": "只；仅",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_만큼__as-much-as",
+  "name": "만큼",
+  "slug": "as-much-as",
+  "meaning": "When added to the end of a noun, it describes something done as much as the noun.",
+  "type": "universal",
+  "examples": [
+   "우리 집은 공원만큼 조용해요.",
+   "유령을 본 것만큼 무서워요."
+  ],
+  "focus": [
+   "만큼"
+  ],
+  "zh": "和……一样；……的程度",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_밖에__exclusion",
+  "name": "밖에",
+  "slug": "exclusion",
+  "meaning": "Express the only thing or option available, no other possibilities available.",
+  "type": "universal",
+  "examples": [
+   "푸른 구슬은 세상에 하나밖에 없습니다.",
+   "왜 빵을 두 개밖에 안 줘?",
+   "그는 공부밖에 모른다."
+  ],
+  "focus": [
+   "밖에"
+  ],
+  "zh": "只有……；除……外",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_받다__receive-action",
+  "name": "받다",
+  "slug": "receive-action",
+  "meaning": "Attaches to nouns denoting action and expresses that the subject is the recipient of that action.",
+  "type": "noun",
+  "examples": [
+   "현우는 모든 사람에게 사랑받아요.",
+   "선생님께 칭찬받았어."
+  ],
+  "focus": [
+   "칭찬받았어",
+   "사랑받아요"
+  ],
+  "zh": "被……；收到……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_보고__target-person",
+  "name": "보고",
+  "slug": "target-person",
+  "meaning": "Used to indicate the person to whom a question, request, order, etc is directed at. Commonly used in colloquial speech when quoting others.",
+  "type": "noun",
+  "examples": [
+   "회선 씨가 세훈 씨보고 보고서 쓰는 설 도와 달라고 하던데요.",
+   "남편이 저보고 보라색이 잘 어울린다고 했어요."
+  ],
+  "focus": [
+   "보고"
+  ],
+  "zh": "向……；对……（口语对象）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_보다__compare",
+  "name": "보다",
+  "slug": "compare",
+  "meaning": "Express that something is more or less than the noun in a certain quality or quantity. Used to directly compare two items.",
+  "type": "universal",
+  "examples": [
+   "택시가 버스보다 빠릅니다.",
+   "사람에게는 무엇보다 사랑이 필요합니다."
+  ],
+  "focus": [
+   "보다"
+  ],
+  "zh": "比……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_부__starting-from",
+  "name": "부",
+  "slug": "starting-from",
+  "meaning": "Indicate the starting point of an action, time or place.",
+  "type": "noun",
+  "examples": [
+   "7월 1일부로 새로운 규정이 시행됩니다.",
+   "그녀는 지난주 금요일부로 회사를 떠났어요.",
+   "이 약속은 내일부로 효력이 발생합니다."
+  ],
+  "focus": [
+   "부"
+  ],
+  "zh": "……（单位）……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_부터__starting-point",
+  "name": "부터",
+  "slug": "starting-point",
+  "meaning": "Indicate the starting point of an action, time or place.",
+  "type": "universal",
+  "examples": [
+   "지금부터 시작합니다.",
+   "23일부터 축제가 열려요.",
+   "오전 5시부터 지하철이 다녀요."
+  ],
+  "focus": [
+   "부터"
+  ],
+  "zh": "从……起",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_뿐__nothing-more",
+  "name": "뿐",
+  "slug": "nothing-more",
+  "meaning": "Used when there is nothing more than the content of the preceding statement or when it is the only one.",
+  "type": "universal",
+  "examples": [
+   "하루 종일 먹은 게 김밥 한 줄뿐이라서 너무 배가 고파요.",
+   "내가 가진 것은 천 원뿐이에요."
+  ],
+  "focus": [
+   "뿐"
+  ],
+  "zh": "只有……；只是……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_스럽다__has-quality-of",
+  "name": "스럽다",
+  "slug": "has-quality-of",
+  "meaning": "Indicate that it has all of the qualities or characteristics of the noun and turn it into an descriptive verb.",
+  "type": "noun",
+  "examples": [
+   "강아지가 너무 사랑스럽게 웃어요.",
+   "선생님이 너무 촌스러워요."
+  ],
+  "focus": [
+   "촌스러워요",
+   "사랑스럽게"
+  ],
+  "zh": "令人感到……；有……的样子",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_시키다__order",
+  "name": "시키다",
+  "slug": "order",
+  "meaning": "Indicates causation or making someone do something.",
+  "type": "noun",
+  "examples": [
+   "사장님이 직원들에게 일을 시켰어요.",
+   "오늘 동생한테 거실을 청소시켰다.",
+   "아빠가 컴퓨터 끄고 억지로 공부시켰다.",
+   "너무 배고파서 피자를 시켰어요."
+  ],
+  "focus": [
+   "청소시켰다",
+   "공부시켰다",
+   "시켰어요"
+  ],
+  "zh": "让……做……；使……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_씩__equally-distributed",
+  "name": "씩",
+  "slug": "equally-distributed",
+  "meaning": "Emphasis that something is being done or distributed equally among people or things.",
+  "type": "noun",
+  "examples": [
+   "학생들에게 책을 한 권씩 나눠주세요.",
+   "저희 가족은 매주 일요일마다 한 번씩 영화를 보러 가요.",
+   "조금씩 배우고 있어요."
+  ],
+  "focus": [
+   "조금씩",
+   "번씩",
+   "권씩"
+  ],
+  "zh": "每……（分配）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_아_야__informal-address",
+  "name": "아/야",
+  "slug": "informal-address",
+  "meaning": "A casual form of address used for things like juniors, friends, and animals.",
+  "type": "noun",
+  "examples": [
+   "야, 이 멍청아! 제대로 공부 안 해?",
+   "새야 새야 파랑새야.",
+   "철수야, 어디 가니?",
+   "얘들아, 이리 와라!"
+  ],
+  "focus": [
+   "파랑새야",
+   "멍청아",
+   "철수야",
+   "얘들아",
+   "새야"
+  ],
+  "zh": "（呼格）……啊",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_어치__amount-that-corresponds-to-price",
+  "name": "어치",
+  "slug": "amount-that-corresponds-to-price",
+  "meaning": "Used to mean the amount that corresponds to that price",
+  "type": "noun",
+  "examples": [
+   "그 가게에서 책 20,000원어치를 샀어요.",
+   "그의 경험은 매우 값어치 있는 것이었다."
+  ],
+  "focus": [
+   "원어치를",
+   "값어치"
+  ],
+  "zh": "……（一点）也不……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_에__time",
+  "name": "에",
+  "slug": "time",
+  "meaning": "Indicates the time of the action. Can be used with days, hours, seasons, etc.",
+  "type": "universal",
+  "examples": [
+   "비행기는 아홉 시에 출발합니다.",
+   "저는 지난주에 감기에 걸렸어요."
+  ],
+  "focus": [
+   "에"
+  ],
+  "zh": "在……；于……（场所/时间）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_에__location",
+  "name": "에",
+  "slug": "location",
+  "meaning": "When used with 있다 or 없다, it express the location of a person or thing.",
+  "type": "universal",
+  "examples": [
+   "소파 위에 고양이가 있어요.",
+   "집에 안 쓰는 나무판자나 널빤지 같은 거 없나?"
+  ],
+  "focus": [
+   "있어요",
+   "없나",
+   "에"
+  ],
+  "zh": "在……；于……（场所/时间）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_에__direction",
+  "name": "에",
+  "slug": "direction",
+  "meaning": "When used with verbs of movement, it express the direction of the action.",
+  "type": "universal",
+  "examples": [
+   "저기 빈자리에 가서 앉고.",
+   "여동생은 학교에 남동생은 유치원에 갑니다."
+  ],
+  "focus": [
+   "갑니다",
+   "가서",
+   "에"
+  ],
+  "zh": "在……；于……（场所/时间）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_에게__target",
+  "name": "에게",
+  "slug": "target",
+  "meaning": "Define a person or a living creature as the recipient or target of an action. This is the formal version of 한테 or 께.",
+  "type": "universal",
+  "examples": [
+   "저는 친구에게 빌려준 책을 달라고 했어요.",
+   "경찰이 운전자에게 운전면허증을 보여 달라고 해요."
+  ],
+  "focus": [
+   "에게"
+  ],
+  "zh": "给……；向……（对象）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_에다가__onto-into",
+  "name": "에다가",
+  "slug": "onto-into",
+  "meaning": "Shows where something is put or added.",
+  "type": "noun",
+  "examples": [
+   "테이블에다가 노트북을 놨어요.",
+   "그릇에다가 밥을 담았어요.",
+   "박스에다가 책을 넣으세요.",
+   "종이에다가 이름을 쓰세요.",
+   "냉장고에다가 두유를 넣었어요.",
+   "펜을 어디다가 두었어요?"
+  ],
+  "focus": [
+   "에다가",
+   "다가"
+  ],
+  "zh": "在……上；往……（处所）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_에서__action-place",
+  "name": "에서",
+  "slug": "action-place",
+  "meaning": "Used to indicate where an action occurs or to indicate a reference frame that is considered a point of origin.",
+  "type": "universal",
+  "examples": [
+   "서울에서 멀어요?",
+   "자습실에서 5시간 공부했어요.",
+   "그중에서 누가 제일 좋은데?"
+  ],
+  "focus": [
+   "에서"
+  ],
+  "zh": "在……（动作场所）；从……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_와_과__enumeration",
+  "name": "와/과",
+  "slug": "enumeration",
+  "meaning": "Connects multiple nouns, indicating a list or group without specifying order.",
+  "type": "universal",
+  "examples": [
+   "초가집에는 어머니와 어린 삼 남매가 살았다.",
+   "대만과 일본은 사이가  좋다."
+  ],
+  "focus": [
+   "와",
+   "과"
+  ],
+  "zh": "和……；与……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_와_과__companionship",
+  "name": "와/과",
+  "slug": "companionship",
+  "meaning": "Indicates that an action involves more than one party or that something is done together with someone or something else.",
+  "type": "universal",
+  "examples": [
+   "너와 난 평생을 함께할 친구야.",
+   "친구와 같이 갔어요."
+  ],
+  "focus": [
+   "와"
+  ],
+  "zh": "和……；与……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_요__politeness-ending",
+  "name": "요",
+  "slug": "politeness-ending",
+  "meaning": "Used to indicate respect for the other person, the subject who is shown respect.",
+  "type": "universal",
+  "examples": [
+   "꽃향기를 맡고 있었어요."
+  ],
+  "focus": [
+   "있었어요"
+  ],
+  "zh": "……（句尾语气）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_요__short-reply",
+  "name": "요",
+  "slug": "short-reply",
+  "meaning": "Used when you have a response related to the question by using '요' as the short answer. A way to reply with just a noun, without having to repeat any of what has just been said. Also written as 이요.",
+  "type": "universal",
+  "examples": [
+   "어디까지 가세요? 서울역이요.",
+   "아들아, 점심은 뭐 먹었니? 라면요.",
+   "몇 분 예약 도와 드릴까요? 10명요."
+  ],
+  "focus": [
+   "이요",
+   "요"
+  ],
+  "zh": "……（句尾语气）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_으로서__role-capacity",
+  "name": "(으)로서",
+  "slug": "role-capacity",
+  "meaning": "Indicates the role, capacity, or status of someone or something in relation to an action or state.",
+  "type": "noun",
+  "examples": [
+   "학생으로서 책임을 다해야 합니다.",
+   "부모로서 최선을 다하고 있습니다.",
+   "대표로서 회의에 참석했습니다.",
+   "비서로서 저는 정확한 정보를 제공합니다.",
+   "친구로서 너를 도와주고 싶어.",
+   "동료로서 조언을 해줄게."
+  ],
+  "focus": [
+   "으로서",
+   "로서"
+  ],
+  "zh": "作为……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_은_는__topic",
+  "name": "은/는",
+  "slug": "topic",
+  "meaning": "Mark the topic of the sentence",
+  "type": "universal",
+  "examples": [
+   "저는 학생입니다.",
+   "카멜레온 혀는 번개처럼 빨라요.",
+   "설탕은 사탕처럼 단맛이에요."
+  ],
+  "focus": [
+   "은",
+   "는"
+  ],
+  "zh": "……（主题助词）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_을_를__object",
+  "name": "을/를",
+  "slug": "object",
+  "meaning": "The object marker is used to indicate that a noun is the object in a sentence.",
+  "type": "universal",
+  "examples": [
+   "그때부터 10년을 기다렸어요.",
+   "저도 몇 번을 가봤어요."
+  ],
+  "focus": [
+   "을"
+  ],
+  "zh": "……（宾格助词）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_의__relation",
+  "name": "의",
+  "slug": "relation",
+  "meaning": "Used to express a relationship between two words, which can be expressed as \"of\" in English. The first noun being the possessor of the second noun.",
+  "type": "universal",
+  "examples": [
+   "친구의 집.",
+   "여동생의 생일이 언제예요?",
+   "지진의 흔들림이 느껴졌다."
+  ],
+  "focus": [
+   "의"
+  ],
+  "zh": "……的（所有格）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이_가__subject",
+  "name": "이/가",
+  "slug": "subject",
+  "meaning": "Mark the subject of the sentence.",
+  "type": "universal",
+  "examples": [
+   "눈이 펑펑 내려요.",
+   "머리가 길다면 머리를 묶어야 해요."
+  ],
+  "focus": [
+   "가",
+   "이"
+  ],
+  "zh": "……（主格助词）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이나_나__choice",
+  "name": "(이)나",
+  "slug": "choice",
+  "meaning": "Can be used to list two or more choices and one of them will be chosen. V+거나 is the same but with verbs.",
+  "type": "universal",
+  "examples": [
+   "한가할 때는 책이나 영화를 봅니다.",
+   "학교 갈 때는 버스나 전철을 타고 갑니다."
+  ],
+  "focus": [
+   "이나",
+   "나"
+  ],
+  "zh": "或者；多达……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이나_나__no-less-than",
+  "name": "(이)나",
+  "slug": "no-less-than",
+  "meaning": "It expresses that the amount of something is much more than expected or higher than the standard.",
+  "type": "universal",
+  "examples": [
+   "저는 남동생 다섯 명이나 있어요."
+  ],
+  "focus": [
+   "이나"
+  ],
+  "zh": "或者；多达……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이나_나__at-least",
+  "name": "(이)나",
+  "slug": "at-least",
+  "meaning": "It expresses that the choice is not really one's first choice but it is fine as the second best option.",
+  "type": "universal",
+  "examples": [
+   "오늘 오후에 시간 있으면 카페에나 갑시다."
+  ],
+  "focus": [
+   "나"
+  ],
+  "zh": "或者；多达……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이다__copula",
+  "name": "이다",
+  "slug": "copula",
+  "meaning": "Express that the subject and predicate are the same thing.",
+  "type": "noun",
+  "examples": [
+   "저는 학생이에요.",
+   "오늘은 내 친구 생일이에요."
+  ],
+  "focus": [
+   "이에요"
+  ],
+  "zh": "是……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이라도_라도__sufficient-choice",
+  "name": "(이)라도",
+  "slug": "sufficient-choice",
+  "meaning": "It expresses the speaker's choice of something will suffice even though it may not be the best choice.",
+  "type": "universal",
+  "examples": [
+   "과자라도 먹을래요?",
+   "배가 고파서 라면이라도 먹어야 될 거예요."
+  ],
+  "focus": [
+   "이라도",
+   "라도"
+  ],
+  "zh": "即使……也；哪怕是……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이랍시고__pretending-to-be",
+  "name": "(이)랍시고",
+  "slug": "pretending-to-be",
+  "meaning": "Expresses that someone is pretending or acting as if something is something, often with a mocking or critical tone.",
+  "type": "noun",
+  "examples": [
+   "그는 의사랍시고 조언을 했지만 도움이 되지 않았다.",
+   "친구랍시고 나를 속였다.",
+   "전문가랍시고 설명했지만 틀렸다.",
+   "아이가 선물이랍시고 막대사탕을 줬어요."
+  ],
+  "focus": [
+   "이랍시고",
+   "랍시고"
+  ],
+  "zh": "说是什么……（讥讽）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이시여__polite-address",
+  "name": "(이)시여",
+  "slug": "polite-address",
+  "meaning": "A polite form of address, often implying an exclamation or an appeal. This is a more polite version of (이)여.",
+  "type": "noun",
+  "examples": [
+   "전능자시여 우리에게 자비를 베풀어 주옵소서.",
+   "하늘이시여, 우리를 지켜 주소서."
+  ],
+  "focus": [
+   "전능자시여",
+   "하늘이시여"
+  ],
+  "zh": "……啊（呼告/敬）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이야__copula",
+  "name": "(이)야",
+  "slug": "copula",
+  "meaning": "Express that the subject and predicate are the same thing.",
+  "type": "universal",
+  "examples": [
+   "지금은 쉬는 시간이야."
+  ],
+  "focus": [
+   "이야"
+  ],
+  "zh": "（强调/口语主题）……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이야__emphasis",
+  "name": "(이)야",
+  "slug": "emphasis",
+  "meaning": "Particle referring to an emphasis.",
+  "type": "universal",
+  "examples": [
+   "커피야 늘 한 잔씩 마시고 있어.",
+   "왜 이제야 도착하는 거야?"
+  ],
+  "focus": [
+   "커피야",
+   "이제야"
+  ],
+  "zh": "（强调/口语主题）……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이야말로_야말로__prime-example",
+  "name": "(이)야말로",
+  "slug": "prime-example",
+  "meaning": "Emphasizes the preceding noun as the prime example among a number of other possibilities.",
+  "type": "universal",
+  "examples": [
+   "한글이야말로 세계에서 가장 우수한 문자예요.",
+   "운동이야말로 가장 중요한 것이라고 생각해요."
+  ],
+  "focus": [
+   "이야말로"
+  ],
+  "zh": "……才是；正是……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이여__polite-address",
+  "name": "(이)여",
+  "slug": "polite-address",
+  "meaning": "A polite form of address, often implying an exclamation or an appeal.",
+  "type": "noun",
+  "examples": [
+   "주여, 잘못을 용서하여 주소서.",
+   "젊은 그대들이여, 시간을 아껴 쓰시오.",
+   "겨레여, 잠에서 깨어나라!"
+  ],
+  "focus": [
+   "그대들이여",
+   "겨레여",
+   "주여"
+  ],
+  "zh": "……啊（呼告）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_이자__dual-roles",
+  "name": "이자",
+  "slug": "dual-roles",
+  "meaning": "Indicate that someone or something is both A and B simultaneously.",
+  "type": "noun",
+  "examples": [
+   "그는 나의 선생님이자 친구이다.",
+   "그녀는 배우이자 가수이다.",
+   "이 책은 교과서이자 참고서입니다.",
+   "슬기님은 프로그래머이자 여성입니다.",
+   "이곳은 관광지이자 역사적인 장소입니다."
+  ],
+  "focus": [
+   "이자"
+  ],
+  "zh": "又是……；既是……",
+  "level": "TOPIK 5-6"
+ },
+ {
+  "key": "noun_이자__first-and-last",
+  "name": "이자",
+  "slug": "first-and-last",
+  "meaning": "Emphasize that someone or something is both the first and the last",
+  "type": "noun",
+  "examples": [
+   "그 사람은 우리 나라의 처음이자 마지막 공주였어요.",
+   "이 경기는 그의 처음이자 마지막 출전이었다.",
+   "이것은 제 처음이자 마지막 기회예요."
+  ],
+  "focus": [
+   "이자"
+  ],
+  "zh": "又是……；既是……",
+  "level": "TOPIK 5-6"
+ },
+ {
+  "key": "noun_조차__extreme-cases",
+  "name": "조차",
+  "slug": "extreme-cases",
+  "meaning": "Used to emphasize that something is not even as much as something else. An inclusion of extreme cases that are generally hard to predict. The one attached to 조차 is the most important.",
+  "type": "universal",
+  "examples": [
+   "엄마조차 저를 못 믿으시는 거예요?",
+   "그 학생은 시험마다 공부조차 하지 않은데 성적표가 진짜 대단하네."
+  ],
+  "focus": [
+   "조차"
+  ],
+  "zh": "连……都；甚至",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_짜리__such-a-number-or-amount",
+  "name": "짜리",
+  "slug": "such-a-number-or-amount",
+  "meaning": "Something of such a number or amount",
+  "type": "noun",
+  "examples": [
+   "이 신발로 6사이즈짜리 있나요?",
+   "우리 집은 세 층짜리 건물이에요."
+  ],
+  "focus": [
+   "사이즈짜리",
+   "층짜리"
+  ],
+  "zh": "……价值的；……岁的",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_째__the-nth",
+  "name": "째",
+  "slug": "the-nth",
+  "meaning": "Follows nouns, including time nouns and counters, to express that a noun is the nth occurrence of something.",
+  "type": "noun",
+  "examples": [
+   "세 번째 노크 후에 문이 열렸다.",
+   "지금 30분째 손님 하나 없어요.",
+   "병원에 근무한 지 6년째 되던 해에 연인이 생겼다.",
+   "고등학교 때부터 이 공포증을 이겨낼 여러 가지 시도를 해봤어. 상담 선생님도 두 명째야."
+  ],
+  "focus": [
+   "째"
+  ],
+  "zh": "第……；连……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_쯤__approximation",
+  "name": "쯤",
+  "slug": "approximation",
+  "meaning": "Used after nouns indicating numbers, quantities, and time to express approximation.",
+  "type": "noun",
+  "examples": [
+   "공항에 한 시쯤 도착했어요.",
+   "저는 일 년에 두 번쯤 여행을 가요."
+  ],
+  "focus": [
+   "쯤"
+  ],
+  "zh": "大约……；……左右",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_처럼__similarity",
+  "name": "처럼",
+  "slug": "similarity",
+  "meaning": "Expresses similarity or metaphor, can be translated as \"like\" in English",
+  "type": "universal",
+  "examples": [
+   "설탕은 사탕처럼 단맛이에요.",
+   "소금은 바닷물처럼 짠맛이에요.",
+   "카멜레온 혀는 번개처럼 빨라요."
+  ],
+  "focus": [
+   "처럼"
+  ],
+  "zh": "像……一样",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_치고__exception",
+  "name": "치고",
+  "slug": "exception",
+  "meaning": "Used to show that something is unusual or noteworthy",
+  "type": "noun",
+  "examples": [
+   "그는 학생치고는 김치를 정말 잘 담가요.",
+   "이 가게는 동네 식당치고는 인테리어가 굉장히 세련됐네요.",
+   "이 옷은 디자이너치고는 꽤 평범한 편이에요.",
+   "그 박사님은 물리학자치고는 감성이 풍부하시네요.",
+   "이 샐러드는 건강식치고는 꽤 달콤하네요."
+  ],
+  "focus": [
+   "치고는"
+  ],
+  "zh": "凡是……；作为……还算",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_커녕__not-even",
+  "name": "(은/는)커녕",
+  "slug": "not-even",
+  "meaning": "Used typically in negative sentences in the form 'A는커녕 B', meaning that not only did a negative event A happen (or a positive event A did not happen), but that an even more negative event B happened (or a less positive event B did not happen either).",
+  "type": "noun",
+  "examples": [
+   "유경은 대학교커녕 초등학교도 다니지 못했다.",
+   "그 시절 운동은 커녕 하루의 절반은 누워 있었다.",
+   "1999년에 지구 멸망은커녕 멀쩡하게 잘 돌아가고 있었다.",
+   "시험을 망친 진우에게는 위로의 말을 해주기는커녕 오히려 차갑게 대했다.",
+   "가해자가 피해자를 불러내 돈을 돌려주지 않으면 죽여 버리겠다며 식칼로 협박을 했는데, 피해자가 겁을 내기는커녕 바보 취급하듯 비웃었어요."
+  ],
+  "focus": [
+   "은 커녕",
+   "는커녕",
+   "은커녕",
+   "커녕"
+  ],
+  "zh": "别说……；……都不说",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_하고__enumeration",
+  "name": "하고",
+  "slug": "enumeration",
+  "meaning": "Connects multiple nouns, indicating a list or group without specifying order.",
+  "type": "universal",
+  "examples": [
+   "책하고 잡지를 샀어요.",
+   "담배하고 술을 끊었어요."
+  ],
+  "focus": [
+   "하고"
+  ],
+  "zh": "和……；与……一起",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_하고__companionship",
+  "name": "하고",
+  "slug": "companionship",
+  "meaning": "Indicates that an action involves more than one party or that something is done together with someone or something else.",
+  "type": "universal",
+  "examples": [
+   "어제 회사 동료하고 저녁을 먹었어요.",
+   "그 사람이 싫은 건 아니고 그냥 저하고 성격이 잘 안 맞는 거 같아요."
+  ],
+  "focus": [
+   "하고"
+  ],
+  "zh": "和……；与……一起",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_하다__to-do",
+  "name": "하다",
+  "slug": "to-do",
+  "meaning": "Turns nouns into action verbs, turns nouns into descriptive verbs, to perform actions, to do something.",
+  "type": "noun",
+  "examples": [
+   "저는 매일 아침 요가를 해요.",
+   "그 회사가 이벤트를 스폰서했어요.",
+   "이 문제를 어떻게 해결할 거예요?",
+   "이 여행이 특별할 거예요.",
+   "그 가수는 유명해요.",
+   "회의를 오후 3시에 하기로 했어요.",
+   "그 일은 제가 할 게요."
+  ],
+  "focus": [
+   "스폰서했어요",
+   "유명해요",
+   "해결할",
+   "하기로",
+   "특별할",
+   "해요",
+   "할"
+  ],
+  "zh": "做……；称为……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "noun_한테__target",
+  "name": "한테",
+  "slug": "target",
+  "meaning": "Define a person or a living creature as the recipient or target of an action.",
+  "type": "universal",
+  "examples": [
+   "친구한테 선물을 보냈어요.",
+   "그 돈을 누구한테 주었어요?",
+   "뭐라고? 야 꼬맹이 너! 지금 나한테 한 소리야?"
+  ],
+  "focus": [
+   "한테"
+  ],
+  "zh": "给……；向……（口语对象）",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "verb_ㄴ_은_는_ㄹ_을__noun-modifiers",
+  "name": "는/(으)ㄴ/(으)ㄹ",
+  "slug": "noun-modifiers",
+  "meaning": "Enables it to function as a modifying clause for the substantive following it.",
+  "type": "verb",
+  "examples": [
+   "호수 주변에는 예쁜 꽃밭이 있어요.",
+   "저녁에 먹을 음식을 준비합시다.",
+   "우리는 일요일 아침에 늦잠 자는 것을 좋아합니다."
+  ],
+  "focus": [
+   "예쁜",
+   "먹을",
+   "자는"
+  ],
+  "zh": "……的（定语形）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_ㄴ데_은데_는데__background-information",
+  "name": "(은/ㄴ/는)데",
+  "slug": "background-information",
+  "meaning": "Used by the speaker to provide some background information to the listener so they can understand the context.",
+  "type": "verb",
+  "examples": [
+   "신발이 조금 작은데 더 큰 사이즈 있어요?",
+   "음식이 너무 매운데 물을 좀 더 넣어 주시면 좋겠어요."
+  ],
+  "focus": [
+   "매운데",
+   "작은데"
+  ],
+  "zh": "……但/……呢（背景/转折）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_ㄴ데_은데_는데__await-response",
+  "name": "(은/ㄴ/는)데",
+  "slug": "await-response",
+  "meaning": "It can be used to express the expectation for a response from the listener.",
+  "type": "verb",
+  "examples": [
+   "오늘은 좀 바쁜데...",
+   "제가 머리가 많이 아픈데."
+  ],
+  "focus": [
+   "바쁜데",
+   "아픈데"
+  ],
+  "zh": "……但/……呢（背景/转折）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_ㄴ지_은지_는지__vague-reasoning",
+  "name": "(으)ㄴ/는지",
+  "slug": "vague-reasoning",
+  "meaning": "Indicate an ambiguous, uncertain reason or judgment about the following statement. Can also indicate a vague doubt.",
+  "type": "verb",
+  "examples": [
+   "시험 문제가 어려웠는지 점수가 좋은 학생이 적어요.",
+   "제 친구는 여행을 좋아하는지 방학 때마다 여행을 가요."
+  ],
+  "focus": [
+   "어려웠는지",
+   "좋아하는지"
+  ],
+  "zh": "……与否；是否……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_거나__choice",
+  "name": "거나",
+  "slug": "choice",
+  "meaning": "Used when one of either the preceding statement or the following statement can be chosen.",
+  "type": "verb",
+  "examples": [
+   "저는 주말에 책을 읽거나 영화를 봐요.",
+   "주말에는 공부를 하거나 밖에서 놀거나 합니다."
+  ],
+  "focus": [
+   "거나"
+  ],
+  "zh": "……或……；要……还是……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_거늘__reason-or-cause",
+  "name": "거늘",
+  "slug": "reason-or-cause",
+  "meaning": "Used to express a reason or cause, often implying a contrast or rhetorical question.",
+  "type": "verb",
+  "examples": [
+   "그는 열심히 노력했거늘 왜 실패했을까?",
+   "봄이 되었거늘 날씨가 아직도 춥다.",
+   "경고를 받았거늘 또 같은 실수를 하다니."
+  ],
+  "focus": [
+   "거늘"
+  ],
+  "zh": "竟然……；（古语）而……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_거니__not-only-but-also",
+  "name": "(이)거니",
+  "slug": "not-only-but-also",
+  "meaning": "Not only the first clause is true, but the second clause is also true.",
+  "type": "verb",
+  "examples": [
+   "그는 친절하거니와 지혜로워요.",
+   "날씨가 춥거니와 바람도 많이 불어요.",
+   "이 음식은 맛있거니와 가격도 저렴해요.",
+   "그녀는 학생이거니와 작가입니다."
+  ],
+  "focus": [
+   "이거니와",
+   "거니와"
+  ],
+  "zh": "……是当然的；……（推理）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_거니__past-acknowledgment",
+  "name": "(이)거니",
+  "slug": "past-acknowledgment",
+  "meaning": "Used to affirm or emphasize a past event or truth before stressing the following statement.",
+  "type": "verb",
+  "examples": [
+   "내가 잘못했거니 후회가 남았어요.",
+   "그녀가 바빴거니 더 이상 기다리지 않았어요."
+  ],
+  "focus": [
+   "거니"
+  ],
+  "zh": "……是当然的；……（推理）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_거니__repetition-alternation",
+  "name": "(이)거니",
+  "slug": "repetition-alternation",
+  "meaning": "Indicate repetitive or alternating actions.",
+  "type": "verb",
+  "examples": [
+   "사람들이 모임에 오거니 가거니 합니다."
+  ],
+  "focus": [
+   "거니"
+  ],
+  "zh": "……是当然的；……（推理）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_거든__reasoning",
+  "name": "거든(요)",
+  "slug": "reasoning",
+  "meaning": "Referring to the reason, cause, or basis for the preceding statement that the speaker thought of. Usually expected that the listener has no prior knowledge of the reason. Used only in conversation.",
+  "type": "verb",
+  "examples": [
+   "오늘은 공부해야 해요. 내일 중간시험을 보거든요.",
+   "시원한 바람이 솔솔 불고, 배가 고프면 간식도 먹을 수 있거든요.",
+   "한국에서는 집의 크기를 이야기할 때 '평', 평이라는 단위를 쓰거든요."
+  ],
+  "focus": [
+   "거든요"
+  ],
+  "zh": "因为……；……（说明原因/预测）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_거든__conditional",
+  "name": "거든(요)",
+  "slug": "conditional",
+  "meaning": "Express that if the preceding statement turns out to be true, then the following statement can happen.",
+  "type": "verb",
+  "examples": [
+   "바쁘거든 먼저 가십시오.",
+   "비가 그치거든 축구를 할까요?"
+  ],
+  "focus": [
+   "거든"
+  ],
+  "zh": "因为……；……（说明原因/预测）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_거들랑__informing",
+  "name": "거들랑/걸랑",
+  "slug": "informing",
+  "meaning": "Indicates the speaker is revealing information the listener is likely unaware of.",
+  "type": "verb",
+  "examples": [
+   "그 무렵 우리는 서울에서 살았거들랑.",
+   "사실은 그 아이가 내 친구 동생이걸랑."
+  ],
+  "focus": [
+   "살았거들랑",
+   "동생이걸랑"
+  ],
+  "zh": "如果……；……的话",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_거들랑__conditional",
+  "name": "거들랑/걸랑",
+  "slug": "conditional",
+  "meaning": "Expresses that if the preceding statement turns out to be true, then the following statement can happen.",
+  "type": "verb",
+  "examples": [
+   "철수를 만나거들랑 내 말을 전해라.",
+   "서울에 가거들랑 편지해라.",
+   "커피가 마시고 싶걸랑 설탕을 사 와라."
+  ],
+  "focus": [
+   "만나거들랑",
+   "가거들랑",
+   "싶걸랑"
+  ],
+  "zh": "如果……；……的话",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_거라__commanding-old-fashioned",
+  "name": "거라, 너라",
+  "slug": "commanding-old-fashioned",
+  "meaning": "Used to give commands. Old-fashioned compared to -아라/어라/해라. NOTE: -너라 has the same meaning, but is used exclusively with -오다 verbs.",
+  "type": "verb",
+  "examples": [
+   "빨리 먹거라.",
+   "천천히 놀다 가거라.",
+   "지금 당장 교실로 가거라. 선생님이 기다리신다.",
+   "어서 나오너라."
+  ],
+  "focus": [
+   "먹거라",
+   "가거라",
+   "너라"
+  ],
+  "zh": "（命令）……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_건__casual-choice",
+  "name": "건",
+  "slug": "casual-choice",
+  "meaning": "Used in everyday conversations to offer choices in a casual way.",
+  "type": "verb",
+  "examples": [
+   "커피 마실래? 커피건 차건 다른 음료 마시고 싶은 거 있어?",
+   "주말에 영화 보러 가건 집에서 쉴 거야.",
+   "매운 음식 좋아해? 짜건 단 건 어때?",
+   "직접 만나건 전화로 얘기하건 편한 방법으로 하자.",
+   "친구들을 만나건 혼자 있건 오늘은 기분 좋게 지낼 거야."
+  ],
+  "focus": [
+   "건"
+  ],
+  "zh": "……的事/话；……的话",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_건대__heres-what-I-think",
+  "name": "건대",
+  "slug": "heres-what-I-think",
+  "meaning": "Expresses that the clause that comes after is something that the speaker has heard, seen, or wishes or believes. Commonly added to verbs like \"장담하다,\" \"짐작하다,\" \"보다,\" \"바라다.\"",
+  "type": "verb",
+  "examples": [
+   "맹세코 말하건대 나는 하지 않았어.",
+   "장담하건대 그 친구가 분명히 시험을 잘 볼 것이다.",
+   "지금까지 받은 보고를 종합적으로 판단해 보건대 부검 할 필요는 없을 것 같습니다.",
+   "억양으로 미루어보건대 외국인이다.",
+   "생각건대 인생은 꿈에 지나지 않다.",
+   "추측건대 이 실험실에서 탈출하려면 초록문을 열어야 해.",
+   "말투로 짐작건대 지금 아내와 사이가 별로 안 좋은 것 같다."
+  ],
+  "focus": [
+   "건대"
+  ],
+  "zh": "……（表明）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_게__making-adverb",
+  "name": "게",
+  "slug": "making-adverb",
+  "meaning": "Expresses the purpose, method or though about the action that follows. It turns descriptive verb into adverb.",
+  "type": "verb",
+  "examples": [
+   "오늘 학교 늦게 갔어요.",
+   "머리를 짧게 잘랐어요.",
+   "입 크게 벌리고, 아 하세요."
+  ],
+  "focus": [
+   "늦게",
+   "크게",
+   "짧게"
+  ],
+  "zh": "……地（副词化/使役）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_게__expectation",
+  "name": "게",
+  "slug": "expectation",
+  "meaning": "Expect a result, criterion or standard in the following action and is necessary for the first clause to be realized.",
+  "type": "verb",
+  "examples": [
+   "저녁 같이 먹게 빨리 오세요.",
+   "사람들이 모두 보게 안내문 벽에 붙였다."
+  ],
+  "focus": [
+   "보게",
+   "먹게"
+  ],
+  "zh": "……地（副词化/使役）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_게__하게체-command",
+  "name": "게",
+  "slug": "하게체-command",
+  "meaning": "Used to give commands or requests to a junior or someone with whom one is on familiar terms, in the 하게체 speech level.",
+  "type": "verb",
+  "examples": [
+   "자네 이것 좀 보게.",
+   "김 서방인가? 어서 들어오게."
+  ],
+  "focus": [
+   "들어오게",
+   "보게"
+  ],
+  "zh": "……地（副词化/使役）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_게끔__expectation-emphasized",
+  "name": "게끔",
+  "slug": "expectation-emphasized",
+  "meaning": "A result, criterion or standard in the following action is expected and necessary for the first clause to be realized. Like -게, but with more emphasis.",
+  "type": "verb",
+  "examples": [
+   "아무도 눈치를 채지 못하게끔 조심스럽게 과자를 훔쳐먹었다.",
+   "'떡밥'이란 알려지지 않았던 사실이나 반전 등을 작품에서 직접적으로 드러내기 전 그 사실을 조금이나마 유추할 수 있게끔 미리 작품속에 숨겨놓은 내용을 비유적으로 이르는 말이다."
+  ],
+  "focus": [
+   "게끔"
+  ],
+  "zh": "使得……；以便……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_게나__하게체-command",
+  "name": "게나",
+  "slug": "하게체-command",
+  "meaning": "Used to give commands or requests to a junior or someone with whom one is on familiar terms, in the 하게체 speech level. Identical to :grammar[verb_게]{하게체-command} in meaning, but expresses a more familiar and friendly tone.",
+  "type": "verb",
+  "examples": [
+   "어서 오게나.",
+   "혼자만 알고 있게나.",
+   "수건 좀 가져다주게나."
+  ],
+  "focus": [
+   "가져다주게나",
+   "있게나",
+   "오게나"
+  ],
+  "zh": "（口语提议）……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_겠__intention",
+  "name": "겠",
+  "slug": "intention",
+  "meaning": "Expresses the speaker's intention or plan to do something in the future.",
+  "type": "verb",
+  "examples": [
+   "시술 시작하겠습니다.",
+   "조금 식을 때까지 기다려야겠어요."
+  ],
+  "focus": [
+   "겠"
+  ],
+  "zh": "（将来/推测）会……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_겠__supposition",
+  "name": "겠",
+  "slug": "supposition",
+  "meaning": "Expresses the speaker's supposition about a certain situation.",
+  "type": "verb",
+  "examples": [
+   "이 음식 정말 맛있겠다!",
+   "이 영화 정말 재밌겠다!"
+  ],
+  "focus": [
+   "겠"
+  ],
+  "zh": "（将来/推测）会……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_겠거니__i-figured",
+  "name": "겠거니",
+  "slug": "i-figured",
+  "meaning": "Expresses an assumption or supposition of the speaker about a particular situation.",
+  "type": "verb",
+  "examples": [
+   "다른 조원들이 지정된 일을 하겠거니 하고 컴퓨터 껐는데 다음 날에 등교했더니 아무것도 안 했더라고요.",
+   "첫번째 책이 좋아서 두번째 책도 좋겠거니 하고 샀는데, 읽어보니까 별로더라고요.",
+   "과민한 탓이겠거니 했는데 다시 생각해보니까 진짜 미행이 맞았던 것 같아요."
+  ],
+  "focus": [
+   "겠거니"
+  ],
+  "zh": "大概会……吧（推测）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_고__listing",
+  "name": "고",
+  "slug": "listing",
+  "meaning": "Used when listing two or more equals elements or facts.",
+  "type": "verb",
+  "examples": [
+   "그 모임은 아주 즐겁고 좋았어요.",
+   "제 남자 친구는 키가 크고 조금 통통한 편이에요."
+  ],
+  "focus": [
+   "고"
+  ],
+  "zh": "……然后；而且",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_고__sequential",
+  "name": "고",
+  "slug": "sequential",
+  "meaning": "Used when the preceding and following statement happens in a sequential manner.",
+  "type": "verb",
+  "examples": [
+   "친구를 만나고 영화를 봤어요.",
+   "우리 아침도 안 먹고 나왔는데 국수나 먹고 갈까?"
+  ],
+  "focus": [
+   "고"
+  ],
+  "zh": "……然后；而且",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_고말고__positive-response",
+  "name": "고말고",
+  "slug": "positive-response",
+  "meaning": "Emphasizes a positive response to a question from the other party.",
+  "type": "verb",
+  "examples": [
+   "기쁜 일이고말고.",
+   "나야 물론 좋고말고."
+  ],
+  "focus": [
+   "일이고말고",
+   "좋고말고"
+  ],
+  "zh": "当然……；那还用说",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_고서__sequence",
+  "name": "고서",
+  "slug": "sequence",
+  "meaning": "When the first action get completed before the subsequent action started and there is a relationship between the two actions.",
+  "type": "verb",
+  "examples": [
+   "저 문을 뚫고서 궁전으로 돌진합시다!",
+   "그 남자는 결혼을 하고서 사람이 달라졌어."
+  ],
+  "focus": [
+   "고서"
+  ],
+  "zh": "……之后（接着）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_고자__purpose",
+  "name": "고자",
+  "slug": "purpose",
+  "meaning": "State the intention or purpose for doing the action stated in the next clause. Used in formal situation.",
+  "type": "verb",
+  "examples": [
+   "저는 오늘 시민 여러분들의 의견을 듣고자 이 자리에 섰습니다.",
+   "한국어 실력을 늘리고자 한국 드라마를 자주 보고 있어요."
+  ],
+  "focus": [
+   "고자"
+  ],
+  "zh": "为了……；打算……（正式）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_고프다__desire",
+  "name": "고프다",
+  "slug": "desire",
+  "meaning": "Used to express a desire or wish to do something. A shortened form of :grammar[고_싶다].",
+  "type": "verb",
+  "examples": [
+   "나도 춤추고파!",
+   "예전부터 보고픈 사람을 드디어 봤다."
+  ],
+  "focus": [
+   "춤추고파",
+   "보고픈"
+  ],
+  "zh": "（词根）饿……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_군_구나__new-information",
+  "name": "군(요)/구나/구먼",
+  "slug": "new-information",
+  "meaning": "Express surprise after learning something new.",
+  "type": "verb",
+  "examples": [
+   "한 달 배운 것치고는 운전을 꽤 잘하는구나.",
+   "이 식당 반찬이 모두 맛있군요.",
+   "저 배우가 연기를 정말 잘하는군요.",
+   "내 자네의 됨됨이를 잘못 봤구먼!"
+  ],
+  "focus": [
+   "잘하는구나",
+   "잘하는군요",
+   "맛있군요",
+   "봤구먼"
+  ],
+  "zh": "……啊（感叹）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_그려__emphasis",
+  "name": "그려",
+  "slug": "emphasis",
+  "meaning": "Emphasizes the contents of the sentence.",
+  "type": "verb",
+  "examples": [
+   "앞으로는 자주 만납시다그려.",
+   "그 집 사정이 참 딱하데그려.",
+   "일주일 전에 나갔던 놈이 이제야 돌아왔네그려."
+  ],
+  "focus": [
+   "돌아왔네그려",
+   "만납시다그려",
+   "딱하데그려"
+  ],
+  "zh": "……就行/……吧（口语劝）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_기__verb-to-noun",
+  "name": "기",
+  "slug": "verb-to-noun",
+  "meaning": "Convert the preceding word as a noun.",
+  "type": "verb",
+  "examples": [
+   "그 약은 작아서 먹기가 편해요.",
+   "회사에 다니면서 공부하기가 힘들어요."
+  ],
+  "focus": [
+   "기"
+  ],
+  "zh": "（名词化）做……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_기는_긴__gentle-refutation",
+  "name": "기는(요)",
+  "slug": "gentle-refutation",
+  "meaning": "Expression is used to politely refute or disagree with the other person's statement. Used in response to a compliment to show modesty. Can also be used lightly criticize or scold someone.",
+  "type": "verb",
+  "examples": [
+   "잘하기는요. 저보다 잘하는 사람이 많아요."
+  ],
+  "focus": [
+   "기는요"
+  ],
+  "zh": "哪里……；谈不上……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_기는_긴__partial-acknowledgment",
+  "name": "기는(요)",
+  "slug": "partial-acknowledgment",
+  "meaning": "In the form 기는/긴 하다, the speaker acknowledges that something is true or is indeed the case. It is often followed by -지만 or -는데/ㄴ데 grammar to form a partial acknowledgment with an objection.",
+  "type": "verb",
+  "examples": [
+   "니 말대로 이 라면이 맛이 좀 없긴 하네.",
+   "우리 아이가 시끄럽게 하기는 해도 말썽을 부리지는 않아. 그러니까 걱정하지 마.",
+   "한국어를 5년 전부터 공부해왔어요. 아직까진 잘 못하긴 하지만요."
+  ],
+  "focus": [
+   "기는",
+   "긴"
+  ],
+  "zh": "哪里……；谈不上……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_기에__reason-or-cause-written",
+  "name": "기에",
+  "slug": "reason-or-cause-written",
+  "meaning": "Used to express the reason or cause for the speaker's action. Note that '-길래' is the conversational, spoken version of -기에.",
+  "type": "verb",
+  "examples": [
+   "날씨가 따뜻하기에 산책을 했다.",
+   "사람들이 너무 많기에 다른 곳에 갔다."
+  ],
+  "focus": [
+   "따뜻하기에",
+   "많기에"
+  ],
+  "zh": "因为……；……所以",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_기에__conditions-for",
+  "name": "기에",
+  "slug": "conditions-for",
+  "meaning": "The preceding clause expresses an often hypothetical situation, and the subsequent clause expresses a judgment related to the situation. Depending on whether the judgment is positive or negative, conditions for the situation can be either great or lacking. Often used with 는.",
+  "type": "verb",
+  "examples": [
+   "바다 가기에는 날씨가 딱 좋아요.",
+   "케이크 먹기엔 너무 배불러.",
+   "그 게임 하기엔 인원이 부족해. 8인부터잖아."
+  ],
+  "focus": [
+   "가기에는",
+   "하기엔",
+   "먹기엔"
+  ],
+  "zh": "因为……；……所以",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_기에__point-of-view",
+  "name": "기에",
+  "slug": "point-of-view",
+  "meaning": "Used with verbs like 보다, 느끼다, and 생각하다 at the start of a sentence to express one's point of view, or to ask another's point of view. Often used with 는.",
+  "type": "verb",
+  "examples": [
+   "너가 보기엔 어때?",
+   "제가 보기에는 아주 능력 있는 분이에요.",
+   "제가 느끼기에는 그 책은 초등학생이 읽기에는 적절하지 않아요."
+  ],
+  "focus": [
+   "느끼기에는",
+   "보기에는",
+   "보기엔"
+  ],
+  "zh": "因为……；……所以",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_길래__reason-or-cause",
+  "name": "길래",
+  "slug": "reason-or-cause",
+  "meaning": "Used to express the reason or cause for the speaker's action.",
+  "type": "verb",
+  "examples": [
+   "날씨가 따뜻하길래 산책을 했어요.",
+   "사람들이 너무 많길래 다른 곳에 갔어요."
+  ],
+  "focus": [
+   "따뜻하길래",
+   "많길래"
+  ],
+  "zh": "因为……；由于……（口语）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_나니__background-information",
+  "name": "나니",
+  "slug": "background-information",
+  "meaning": "Used by the speaker to provide some background information to the listener before connecting other related facts. It has a serious or solemn tone.",
+  "type": "verb",
+  "examples": [
+   "자네를 믿나니 나를 실망시키지 말게.",
+   "다시 묻나니 너는 어디에서 와서 어디로 가느냐."
+  ],
+  "focus": [
+   "묻나니",
+   "믿나니"
+  ],
+  "zh": "……（所以）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_나니__reason",
+  "name": "나니",
+  "slug": "reason",
+  "meaning": "Expresses the first clause is the reason, condition, or basis for the second clause and should only be used with action verbs. It has a serious or solemn tone.",
+  "type": "verb",
+  "examples": [
+   "네가 진심으로 사과하나니 내가 용서하겠다.",
+   "모든 준비가 끝났나니 이제 시작하도록 하자."
+  ],
+  "focus": [
+   "사과하나니",
+   "끝났나니"
+  ],
+  "zh": "……（所以）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_나이까__question",
+  "name": "나이까",
+  "slug": "question",
+  "meaning": "Used to ask a question in the 하소서체 speech level.",
+  "type": "verb",
+  "examples": [
+   "어찌 감히 어명을 거역하겠나이까?",
+   "주인님, 부르셨나이까?",
+   "제가 어찌 그런 말을 하겠사옵나이까?"
+  ],
+  "focus": [
+   "하겠사옵나이까",
+   "거역하겠나이까",
+   "부르셨나이까"
+  ],
+  "zh": "……吗？（极敬语）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_나이다__simple-statement",
+  "name": "나이다",
+  "slug": "simple-statement",
+  "meaning": "Expresses a simple statement in 하소서체.",
+  "type": "verb",
+  "examples": [
+   "나라를 위하여 죽는 것이 제 영광이옵나이다.",
+   "신령님께 비나이다.",
+   "명대로 거행하겠나이다."
+  ],
+  "focus": [
+   "나이다"
+  ],
+  "zh": "（极敬语）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_냐__informal-question",
+  "name": "냐",
+  "slug": "informal-question",
+  "meaning": "A casual interrogative ending in Korean, often used in informal speech to ask questions.",
+  "type": "verb",
+  "examples": [
+   "상담 한 번 받아보면 어떻겠냐?",
+   "둘째 날인데 벌써부터 싸움질이냐?"
+  ],
+  "focus": [
+   "냐"
+  ],
+  "zh": "（疑问）……吗",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_냐고__quoting-questions",
+  "name": "(으/느/이)냐고",
+  "slug": "quoting-questions",
+  "meaning": "It is used when the speaker quotes another person's question indirectly.",
+  "type": "verb",
+  "examples": [
+   "저한테 어디 가냐고 물었어요.",
+   "저는 몇 살이냐고 물어보는 게 제일 싫어요.",
+   "전화번호가 몇 번이냐고 그랬어요."
+  ],
+  "focus": [
+   "살이냐고",
+   "번이냐고",
+   "가냐고"
+  ],
+  "zh": "问是否……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_네__discovery",
+  "name": "네(요)",
+  "slug": "discovery",
+  "meaning": "Indicate that the speaker is impressed by a fact or situation they just learned about.",
+  "type": "verb",
+  "examples": [
+   "꼭 드라마 한 장면 같네요.",
+   "오늘은 TV 안 틀어 놨네요?",
+   "지갑을 찾았다니 다행이네요."
+  ],
+  "focus": [
+   "네요"
+  ],
+  "zh": "……啊（感叹/新发现）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_노라__informal statement",
+  "name": "노라",
+  "slug": "informal statement",
+  "meaning": "An archaic conjugation to informally express a simple statement or indirect quotation.",
+  "type": "verb",
+  "examples": [
+   "이기고 돌아왔노라.",
+   "그는 이기고 돌아왔노라고 말했다.",
+   "우리는 어떠한 어려움에 부닥쳐도 명예를 지키겠노라 맹세하였다.",
+   "우리의 회포를 적어 형을 영결하노라."
+  ],
+  "focus": [
+   "돌아왔노라고",
+   "영결하노라",
+   "돌아왔노라",
+   "지키겠노라"
+  ],
+  "zh": "（古语）……而",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_노라면_느라면__result-of-consistency",
+  "name": "노라면/느라면",
+  "slug": "result-of-consistency",
+  "meaning": "Expresses a result that can happen when an action is done consistently.",
+  "type": "composite",
+  "examples": [
+   "열심히 사노라면 좋은 날도 있겠지.",
+   "홈쇼핑을 보고 있노라면 언제 시간이 갔는지 알 수 없을 지경이었다.",
+   "어머니 사진을 보느라면, 어머니가 보고 싶어져요."
+  ],
+  "focus": [
+   "느라면",
+   "노라면"
+  ],
+  "zh": "如果（忙于）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_느니__better-choice",
+  "name": "느니",
+  "slug": "better-choice",
+  "meaning": "Indicates that although neither of the two choices mentioned in the preceding and following clauses is ideal, the one in the following clause is the better option.",
+  "type": "verb",
+  "examples": [
+   "비가 오는 날에 걷느니 차라리 집에 있을래요.",
+   "혼자서 공부하느니 도서관에서 친구들과 같이 공부할게요."
+  ],
+  "focus": [
+   "공부하느니",
+   "걷느니"
+  ],
+  "zh": "与其……不如……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_느니__listing",
+  "name": "느니",
+  "slug": "listing",
+  "meaning": "A connective ending used when listing words, thoughts, opinions, etc, that are usually opposite of one another.",
+  "type": "verb",
+  "examples": [
+   "그 두 사람 정말 결혼 할 수 있을까요? 결혼을 하느니 마느니 정말 말이 많던데요?",
+   "화초 색상이 안 어울린다느니, 키가 안 맞는다느니, 나불나불 말만 하던 김 대리는 갑자기 집에 일이 생겼다며 먼저 돌아갔다."
+  ],
+  "focus": [
+   "느니"
+  ],
+  "zh": "与其……不如……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_느라고_느라__indicating-the-cause",
+  "name": "느라(고)",
+  "slug": "indicating-the-cause",
+  "meaning": "Used when the action of the preceding statement is the purpose or cause of the following statement. Mostly used in negative scenario.",
+  "type": "verb",
+  "examples": [
+   "샤워를 하느라고 전화를 못 받았어요.",
+   "옷을 사느라고 돈을 다 썼어요.",
+   "아침에 등교하느라 일어나기가 힘들어."
+  ],
+  "focus": [
+   "느라고",
+   "느라"
+  ],
+  "zh": "（忙着）……（所以）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_는고__soft-question",
+  "name": "는고/(으)ㄴ고",
+  "slug": "soft-question",
+  "meaning": "It can be used to ask a question in a polite and gentle way.",
+  "type": "verb",
+  "examples": [
+   "선물로 무엇이 좋은고?",
+   "이게 누구 것인고?",
+   "무엇을 바라는고?"
+  ],
+  "focus": [
+   "바라는고",
+   "것인고",
+   "좋은고"
+  ],
+  "zh": "（老问句）……吗",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_는고__pondering",
+  "name": "는고/(으)ㄴ고",
+  "slug": "pondering",
+  "meaning": "Expresses the speaker's speculation, curiosity or assumption about something.",
+  "type": "verb",
+  "examples": [
+   "얼마나 훌륭한 일인고!",
+   "일이 해결이 되다니 이 얼마나 좋은고?",
+   "내가 왜 그런 말을 했는고.",
+   "내가 무슨 잘못이 있는고."
+  ],
+  "focus": [
+   "했는고",
+   "일인고",
+   "있는고",
+   "좋은고"
+  ],
+  "zh": "（老问句）……吗",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_는구려__하오체-new-information",
+  "name": "(는)구려/(는)구료",
+  "slug": "하오체-new-information",
+  "meaning": "Express surprise after learning something new.",
+  "type": "verb",
+  "examples": [
+   "정말 깨끗한 동네이구려.",
+   "그 소식에 참 서운하셨겠구료.",
+   "오늘은 참 잘 잡수시는구려."
+  ],
+  "focus": [
+   "서운하셨겠구료",
+   "잡수시는구려",
+   "동네이구려"
+  ],
+  "zh": "……呢（口语，表发现）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_는구려__하오체-polite-command",
+  "name": "(는)구려/(는)구료",
+  "slug": "하오체-polite-command",
+  "meaning": "Expresses a command in a polite, suggestive tone.",
+  "type": "verb",
+  "examples": [
+   "더 늦으면 어두워질 테니 어서 가구려.",
+   "이 사람에게도 한 잔 권하시구려."
+  ],
+  "focus": [
+   "권하시구려",
+   "가구려"
+  ],
+  "zh": "……呢（口语，表发现）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_는다기보다는__more-appropriate-description",
+  "name": "(ㄴ/는)다기보다는/(이)라기보다는",
+  "slug": "more-appropriate-description",
+  "meaning": "This phrase is used to show that the information in the next part of the sentence describes the topic better than the information in the previous part.",
+  "type": "verb",
+  "examples": [
+   "이 장소가 시끄럽다기보다는 사람들이 많이 모여서 복잡해요.",
+   "그 가수가 유명하다기보다는 독특한 목소리로 알려져 있어요."
+  ],
+  "focus": [
+   "시끄럽다기보다는",
+   "유명하다기보다는"
+  ],
+  "zh": "与其说……不如说……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_는다는_ㄴ다는_다는_라는__quote",
+  "name": "(ㄴ/는)다는, (이)라는",
+  "slug": "quote",
+  "meaning": "Used to quote other people or yourself.",
+  "type": "verb",
+  "examples": [
+   "이 분수에 동전을 던지면 행복해진다는 이야기가 있어요.",
+   "주연 씨 결혼한다는 소식 들었어요?"
+  ],
+  "focus": [
+   "행복해진다는",
+   "결혼한다는"
+  ],
+  "zh": "所谓的……；说是……的",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_는다면_ㄴ다면_다면__hypothetical-situation",
+  "name": "(ㄴ/는)다면",
+  "slug": "hypothetical-situation",
+  "meaning": "Used to express a hypothetical situation contrary to what actually happened in the past or now or situation that have yet to occurs.",
+  "type": "verb",
+  "examples": [
+   "10년 전 돌아간다면 더 열심히 공부하고 싶어.",
+   "날씨가 좋았다면 한라산에 갈 수 있었을 텐데.",
+   "지난 학기에 열심히 공부하지 않았다면 장학금을 받을 수 없었겠지?"
+  ],
+  "focus": [
+   "돌아간다면",
+   "않았다면",
+   "좋았다면"
+  ],
+  "zh": "如果说……；假如……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_는답시고__attempting-but-failing",
+  "name": "(ㄴ/는)답시고",
+  "slug": "attempting-but-failing",
+  "meaning": "Expresses that someone attempts to do something, but ends up causing a bad result.",
+  "type": "verb",
+  "examples": [
+   "동생이 휴대폰을 고친답시고 만지다가 망가뜨렸어.",
+   "아기가 엄마를 도와준답시고 설거지를 하다가 주방을 엉망으로 만들었다.",
+   "친구가 공부한답시고 도서관에 갔지만 잠만 잤다.",
+   "그녀가 웃긴 이야기 한답시고 했는데 아무도 안 웃었다."
+  ],
+  "focus": [
+   "답시고"
+  ],
+  "zh": "说什么……（讥讽）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_는지라__reason-or-cause",
+  "name": "는지라/(으)ㄴ지라",
+  "slug": "reason-or-cause",
+  "meaning": "Indicates that the first clause is the reason or cause for the second clause.",
+  "type": "verb",
+  "examples": [
+   "선생님께서 고집을 굽히지 않으시는지라 우리도 어쩔 수 없었다.",
+   "이미 밥을 먹은지라 더 이상 먹을 수가 없다.",
+   "나는 어릴 적부터의 친구인지라 그의 마음을 잘 안다.",
+   "기분이 좋은지라 다른 사람에게도 다정하게 말을 건다."
+  ],
+  "focus": [
+   "않으시는지라",
+   "친구인지라",
+   "좋은지라",
+   "먹은지라"
+  ],
+  "zh": "因为……；由于……（书面）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다_ㄴ다_는다__plain-form",
+  "name": "(ㄴ/는)다",
+  "slug": "plain-form",
+  "meaning": "A sentence final ending used to describe an event or fact of the present.",
+  "type": "verb",
+  "examples": [
+   "바람이 시원하다.",
+   "우리 가족은 아파트에서 산다."
+  ],
+  "focus": [
+   "시원하다",
+   "산다"
+  ],
+  "zh": "……（陈述体/引用）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다가__change-of-action",
+  "name": "다가",
+  "slug": "change-of-action",
+  "meaning": "Expresses the speaker's interruption of one action to immediately start another action.",
+  "type": "verb",
+  "examples": [
+   "밥을 먹다가 전화를 받았습니다.",
+   "누워서 영상을 보다가 핸드폰을 손에서 놓쳤어요."
+  ],
+  "focus": [
+   "다가"
+  ],
+  "zh": "……着（中途）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다가__transition-of-action",
+  "name": "다가",
+  "slug": "transition-of-action",
+  "meaning": "It can also be used to express that the action in the first clause continues while the action in the second clause occurs.",
+  "type": "verb",
+  "examples": [
+   "잠을 자다가 무서운 꿈을 꿨어요.",
+   "집에 오다가 친구를 만났어요."
+  ],
+  "focus": [
+   "다가"
+  ],
+  "zh": "……着（中途）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다가는__precaution",
+  "name": "다가는",
+  "slug": "precaution",
+  "meaning": "Used to express the speaker's view that if the action in the first clause happens then a negative result might occur in the future",
+  "type": "verb",
+  "examples": [
+   "실수했다가는 큰일난다.",
+   "돈을 계획 없이 쓰다가는 필요할 때 돈이 부족할지도 몰라요."
+  ],
+  "focus": [
+   "다가는"
+  ],
+  "zh": "再……的话就会……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다거나__or-something",
+  "name": "(ㄴ/는)다거나, (이)라거나",
+  "slug": "or-something",
+  "meaning": "Used to indirectly reference something when listing options.",
+  "type": "verb",
+  "examples": [
+   "다솜은 친구랑 통화한다거나 좋아하는 웹툰을 정주행한다거나 하는 것으로 스트레스를 푼다.",
+   "수민이가 자꾸 나한테 장난을 치거나 바보라거나 해서 진짜 못 참겠다.",
+   "그 돌을 신으로 모신다거나 뭐 그런 거였습니까?",
+   "감각이 둔하다거나 마수 사냥 경험이 부족하다면 충분히 혼란스러울 수 있는 상황이었지만 유노는 어느 쪽에도 해당하지 않았다."
+  ],
+  "focus": [
+   "한다거나",
+   "신다거나",
+   "라거나",
+   "다거나"
+  ],
+  "zh": "……也好……也好（列举）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다고__quote-declarative-sentence",
+  "name": "(는/ㄴ)다고",
+  "slug": "quote-declarative-sentence",
+  "meaning": "Used to pass along what the speaker heard from another person, or to present the subject's thoughts, opinions, etc.",
+  "type": "verb",
+  "examples": [
+   "내일 한국에 간다고 들었는데요.",
+   "비가 온다고요? 스키 타러 가려고 했는데 못 가겠네요.",
+   "회의가 조금 있으면 끝난다고 하니까 끝나자마자 빨리 갈게요."
+  ],
+  "focus": [
+   "끝난다고",
+   "온다고요",
+   "간다고"
+  ],
+  "zh": "听说……；说是……（引用）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다니_라니_냐니_자니__reaction",
+  "name": "다니/라니/냐니/자니",
+  "slug": "reaction",
+  "meaning": "Expression to show the speaker's reaction, shock or disbelief to something they just learned, heard, saw or experienced.",
+  "type": "verb",
+  "examples": [
+   "두 달 동안 살을 10kg이나 빼다니 정말이에요?",
+   "그 사람이 너에게 뭐라니?",
+   "친구에게 내일 등산을 가겠냐니 싫다고 하더라.",
+   "그래 너희 남편은 이번 여름에 어디로 휴가를 가자니?"
+  ],
+  "focus": [
+   "라니",
+   "자니",
+   "냐니",
+   "다니"
+  ],
+  "zh": "竟然……；真是……（惊叹/引用）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다니까__confirming-prior-information",
+  "name": "(ㄴ/는)다니까/(이)라니까",
+  "slug": "confirming-prior-information",
+  "meaning": "Reminds the listener about something already said, or about a prediction that came true.",
+  "type": "verb",
+  "examples": [
+   "약속 취소했다고 말했다니까, 왜 기다렸어?",
+   "집에 간다니까, 걱정하지 마.",
+   "이게 정답이라니까, 더 이상 의심하지 마."
+  ],
+  "focus": [
+   "이라니까",
+   "다니까"
+  ],
+  "zh": "都说了……（强调）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다든가__or-theoretical",
+  "name": "(ㄴ)다든가, (이)라든가",
+  "slug": "or-theoretical",
+  "meaning": "-라든가 is used to list various descriptions that can be selected. (ㄴ)다든가 follows verbs or adjectives to list various propositions that can be selected. These descriptions or propositions are mainly theoretical, which is the distinction between this grammar and -든가.",
+  "type": "verb",
+  "examples": [
+   "집에 누군가 찾아오지는 않았습니까? 아니면 전화가 걸려왔다든가...",
+   "요즘 미나에게 고민거리 같은 건 없었니? 성적이라든가, 가족 문제라든가. 남자친구와 싸웠다든가 하는 거 말이야.",
+   "이 답장을 보내기 위해 저는 말도 안 되는 계획을 실행할 예정이고, 그 결과로 유치장에 갇힌다든가 연구원직을 박탈당한다든가 하는 상당한 징계를 받게 되겠죠.",
+   "그 여자 좀 별로였거든. 얼굴이 이상했다든가 성격이 괴팍했다든가 그런 건 아닌데, 느낌이 영 별로야."
+  ],
+  "focus": [
+   "이라든가",
+   "라든가",
+   "다든가"
+  ],
+  "zh": "……也好……也好（书面列举）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다든지__whether-theoretical",
+  "name": "(ㄴ)다든지, (이)라든지",
+  "slug": "whether-theoretical",
+  "meaning": "An abbreviation of '-다고/라고 하든지' used to suggest that any of the stated descriptions are possible.",
+  "type": "verb",
+  "examples": [
+   "유학 생활이 힘들다든지 한국어 공부가 어렵다든지 하며 불평만 하지 마세요.",
+   "실종이 물론 우연은 아니겠죠. 어떤 사고에 휘말렸다든지...",
+   "뭐라도 지금 좀 갖다 줘. 간단한 빵이라든지, 수프라든지."
+  ],
+  "focus": [
+   "이라든지",
+   "라든지",
+   "다든지"
+  ],
+  "zh": "……也好……也好；无论……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다마다__positive-response",
+  "name": "다마다",
+  "slug": "positive-response",
+  "meaning": "Emphasizes a positive response to a question from the other party.",
+  "type": "verb",
+  "examples": [
+   "암, 네 말이 맞다마다.",
+   "도와달라 말했는가. 물론일세! 좋다마다! 얼마든지 도와줌세!"
+  ],
+  "focus": [
+   "좋다마다",
+   "맞다마다"
+  ],
+  "zh": "当然……；那是自然",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다면서_라면서_다며__fact-checking",
+  "name": "다면서(요)",
+  "slug": "fact-checking",
+  "meaning": "Used to confirm with another person something that the speaker heard previously from some other source.",
+  "type": "verb",
+  "examples": [
+   "한국 사람들이 거의 날마다 김치를 먹는다면서요?",
+   "방학 동안 스웨덴에 갔었다면서? 춥지 않았어?",
+   "벌써 다 끝났다면서요?"
+  ],
+  "focus": [
+   "다면서요",
+   "다면서"
+  ],
+  "zh": "听说……；说是……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_다시피__confirmation",
+  "name": "다시피",
+  "slug": "confirmation",
+  "meaning": "Used to express the confirmation of a fact that the listener is already aware of.",
+  "type": "verb",
+  "examples": [
+   "보다시피 날씨가 좋아요.",
+   "들으시다시피 음악이 아주 좋아요."
+  ],
+  "focus": [
+   "들으시다시피",
+   "보다시피"
+  ],
+  "zh": "几乎……；如同……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_더__recalling-experience",
+  "name": "더",
+  "slug": "recalling-experience",
+  "meaning": "Express and convey in the present a fact directly experienced or witnessed in the past.",
+  "type": "verb",
+  "examples": [
+   "그날은 다들 신이 나더라.",
+   "어제 그 식당 음식이 참 맛있더군요.",
+   "아이들이 놀이터에서 재미있게 놀더라.",
+   "민지가 피아노를 정말 잘 치더라.",
+   "그 영화는 생각보다 지루하더라고요.",
+   "지난주에 간 전시회가 무척 흥미롭더군요."
+  ],
+  "focus": [
+   "더라고요",
+   "더군요",
+   "더라"
+  ],
+  "zh": "（回忆过去）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_더냐__asking-about-a-personal-experience",
+  "name": "더냐",
+  "slug": "asking-about-a-personal-experience",
+  "meaning": "Used to ask about what the listener personally saw or heard in the past.",
+  "type": "verb",
+  "examples": [
+   "일본에 도착하니까 눈이 오더냐?",
+   "누가 그런 말을 하라고 하더냐?"
+  ],
+  "focus": [
+   "더냐"
+  ],
+  "zh": "（回忆疑问）……吗",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_더니__change-compared-to-the-past",
+  "name": "더니",
+  "slug": "change-compared-to-the-past",
+  "meaning": "Used when the speaker wants to refer to a change compared to the past that they have directly seen or experienced. The speaker themself cannot be the subject.",
+  "type": "verb",
+  "examples": [
+   "아침에는 하늘에 구름 한 점 없는 게 하루 종일 맑을 것 같더니, 금방 비가 쏟아지네.",
+   "어릴 때 편식을 하더니 이제 나도 못 먹는 것까지 잘 먹는구나."
+  ],
+  "focus": [
+   "하더니",
+   "같더니"
+  ],
+  "zh": "……（以前）结果现在……；一边……一边",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_더니__and-then",
+  "name": "더니",
+  "slug": "and-then",
+  "meaning": "Used to narrate a sequence of events directly observed by the speaker. The subjects of both clauses are usually but not always the same, and the speaker cannot be the subject. There is often a nuance that the first clause becomes the cause of the second clause.",
+  "type": "verb",
+  "examples": [
+   "미나는 부엌에 가더니 5분 만에 라면을 만들어 냈다.",
+   "구름이 끼더니 눈이 왔다.",
+   "이야기 중이던 맥스가 우리의 대화를 가만히 듣고 서 있는 앨리스를 흘긋 쳐다보더니 입을 닫았다.",
+   "눈시울이 점점 붉어지더니 제이콥이 결국 참지 못하고 펑펑 울기 시작했다."
+  ],
+  "focus": [
+   "붉어지더니",
+   "쳐다보더니",
+   "끼더니",
+   "가더니"
+  ],
+  "zh": "……（以前）结果现在……；一边……一边",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_더니__related-to-past-event",
+  "name": "더니",
+  "slug": "related-to-past-event",
+  "meaning": "Used to express the existence of an additional event or truth related to something in the past.",
+  "type": "verb",
+  "examples": [
+   "요즘 부동산에 집 보러 다니더니 좋은 집을 찾았어요?"
+  ],
+  "focus": [
+   "다니더니"
+  ],
+  "zh": "……（以前）结果现在……；一边……一边",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_더라고__recollecting-a-personal-experience",
+  "name": "더라고(요)",
+  "slug": "recollecting-a-personal-experience",
+  "meaning": "Used to relate something that the speaker came to know through direct past experience. Usually conjugated in present tense. Often used as '-더라' in casual speech.",
+  "type": "verb",
+  "examples": [
+   "일본에 도착하니까 눈이 왔더라고요.",
+   "이 제품이 요즘 청소년들에게 정말 인기가 많더라고요.",
+   "민주가 축구 되게 잘하더라.",
+   "한국에 처음 왔을 때 외국인이 별로 없더라고요."
+  ],
+  "focus": [
+   "없더라고요",
+   "잘하더라",
+   "더라고요"
+  ],
+  "zh": "……呢（回忆/见证）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_더라고__confirming-a-forgotten-experience",
+  "name": "더라고(요)",
+  "slug": "confirming-a-forgotten-experience",
+  "meaning": "Used in casual speech to wonder to oneself while recalling a past event, or to ask the listener about a shared past experience. 뭐더라 / 뭐였더라 can be filler words.",
+  "type": "verb",
+  "examples": [
+   "우리가 처음으로 언제 만났더라?",
+   "그 가수 이름 뭐더라?",
+   "내가 어제 어디 갔더라?"
+  ],
+  "focus": [
+   "만났더라",
+   "갔더라",
+   "뭐더라"
+  ],
+  "zh": "……呢（回忆/见证）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_더라도__strong-inevitable-outcome",
+  "name": "더라도",
+  "slug": "strong-inevitable-outcome",
+  "meaning": "Indicates that the second clause will happens regardless of the described state or action of the first clause. Stronger in meaning than 아/어도. Often used to speculate or theorize.",
+  "type": "verb",
+  "examples": [
+   "식당에 일찍 가서 줄 서 있더라도 웨이팅이 오래 걸릴 수도 있어요.",
+   "라면은 매일 먹더라도 질리지 않을 것 같아요.",
+   "헤어진 상대를 훨씬 더 멋있는 모습으로 마주치게 되면 상대방을 후회하게 만들 수 있고, 후회까지는 아니더라도 조금의 씁쓸함을 안겨줄 수 있습니다."
+  ],
+  "focus": [
+   "아니더라도",
+   "있더라도",
+   "먹더라도"
+  ],
+  "zh": "即使……也……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_더라면__hypothetical-past-situation",
+  "name": "더라면",
+  "slug": "hypothetical-past-situation",
+  "meaning": "Used to hypothesize a past situation that is the opposite of what actually happened, usually to express the speaker's regret or disappointment or the relief of not doing it.",
+  "type": "verb",
+  "examples": [
+   "제가 키가 컸더라면 모델이 되었을 거예요.",
+   "제가 2분 빨리 집을 나갔더라면 버스를 안 놓쳤을 거에요.",
+   "돈을 아껴서 썼더라면 다른 사람에게 돈을 빌리지 않아도 됐을 텐데."
+  ],
+  "focus": [
+   "더라면"
+  ],
+  "zh": "如果（当时）……的话",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_던__past-habitual-experience",
+  "name": "던",
+  "slug": "past-habitual-experience",
+  "meaning": "Used to share or ask about a past experience. The past experience must have been habitual and not a one-time occurrence.",
+  "type": "verb",
+  "examples": [
+   "어릴 때 엄마가 해주시던 밥이 정말 맛있었어.",
+   "신입 사원일 때 자주 입던 옷인데 지금도 가끔 입어."
+  ],
+  "focus": [],
+  "zh": "过去……的（定语）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_던__past-interrupted-action",
+  "name": "던",
+  "slug": "past-interrupted-action",
+  "meaning": "",
+  "type": "verb",
+  "examples": [
+   "내가 먹던 라면을 동생이 훔쳐먹었다.",
+   "하던 일 해.",
+   "전화가 울렸을 때 읽던 책을 접고 받았다."
+  ],
+  "focus": [],
+  "zh": "过去……的（定语）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_던__past-action",
+  "name": "던",
+  "slug": "past-action",
+  "meaning": "Implies that an event or action might have not been completed in the past and has been stopped since.",
+  "type": "verb",
+  "examples": [
+   "'김'이라는 성은 신라에 살고 있던 귀족들의 성씨였어요."
+  ],
+  "focus": [
+   "던"
+  ],
+  "zh": "过去……的（定语）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_던가__asking-about-the-past",
+  "name": "던가",
+  "slug": "asking-about-the-past",
+  "meaning": "Used exclusively in 하게체 to ask the listener about a past event. 하게체 is a register of speech that slightly lowers the listener and is falling out of fashion as of recently. It sounds extremely awkward when used by younger people.",
+  "type": "verb",
+  "examples": [
+   "그 식당이 맛있던가?",
+   "뭐라고 하던가?"
+  ],
+  "focus": [
+   "맛있던가",
+   "하던가"
+  ],
+  "zh": "（回忆）……吗",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_던가__asking-oneself-about-the-past",
+  "name": "던가",
+  "slug": "asking-oneself-about-the-past",
+  "meaning": "Used to wonder to oneself about something in the past or to make a guess about a past event.",
+  "type": "verb",
+  "examples": [
+   "내가 그랬던가?",
+   "둘이 그렇게 친했던가?",
+   "혹시 내가 기분을 안 좋게 했던가 해서 걱정했지."
+  ],
+  "focus": [
+   "그랬던가",
+   "친했던가",
+   "했던가"
+  ],
+  "zh": "（回忆）……吗",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_던데__surprise",
+  "name": "던데(요)",
+  "slug": "surprise",
+  "meaning": "Used to express surprise or disbelief toward a past event or particular situation based on something that the speaker saw or experienced. Expecting an answer from the listener. Can also be used to make a contradiction.",
+  "type": "verb",
+  "examples": [
+   "그 사람은 축구도 제법 잘하던데요.",
+   "제가 오늘 학교에 왔을 때 교실에 아무도 없던데요.",
+   "그곳에는 맛있는 음식들이 많던데요."
+  ],
+  "focus": [
+   "던데요"
+  ],
+  "zh": "……呢；……啊（回忆/提示）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_던데__relating-experience",
+  "name": "던데(요)",
+  "slug": "relating-experience",
+  "meaning": "Similar to ㄴ/는데, but with the added nuance that the speaker has seen or experienced the fact or situation described in that clause. When a '다' is added in front (-다던데), it is used to convey that the speaker has heard from someone that something is the case.",
+  "type": "verb",
+  "examples": [
+   "너 요즘 이상한 사람들이랑 어울리던데 괜찮아?",
+   "한국 음식이 맵다던데 사실인가요?"
+  ],
+  "focus": [],
+  "zh": "……呢；……啊（回忆/提示）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_데__recollecting-a-personal-experience",
+  "name": "데(요)",
+  "slug": "recollecting-a-personal-experience",
+  "meaning": "Used to relate something that the speaker came to know through direct past experience.",
+  "type": "verb",
+  "examples": [
+   "일본 사람들은 타코야끼를 자주 먹데.",
+   "오늘 시험 공부를 열심히 했는데 끝나고 보니까 새벽 2시데요.",
+   "우리 할머니 고향은 하나도 안 변했데."
+  ],
+  "focus": [
+   "데요",
+   "데"
+  ],
+  "zh": "……的原因；……的情况",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_도다__admiration",
+  "name": "도다/로다",
+  "slug": "admiration",
+  "meaning": "An archaic ending used to express admiration in a solemn tone.",
+  "type": "verb",
+  "examples": [
+   "평생을 조국을 위해 헌신하였으니 참으로 애국자도다.",
+   "훌륭하도다, 우리 학생들.",
+   "독하도다. 독하도다. 서울 양반 독하도다. 원수로다. 원수로다. 존비귀천 원수로다."
+  ],
+  "focus": [
+   "애국자도다",
+   "훌륭하도다",
+   "원수로다",
+   "독하도다"
+  ],
+  "zh": "（古语）……啊",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_도록__objective",
+  "name": "도록",
+  "slug": "objective",
+  "meaning": "It expresses that the preceding clause is the goal or reason for doing the action stated in the following clause.",
+  "type": "verb",
+  "examples": [
+   "아침에 일찍 일어나도록 어젯밤에 일찍 잤어요.",
+   "필요할 때 잘 찾아볼 수 있도록 정리를 잘 해 두세요.",
+   "음식은 상하지 않도록 냉장고에 넣어 두는 게 좋겠어요."
+  ],
+  "focus": [
+   "도록"
+  ],
+  "zh": "……到（程度/时间）；以便……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_든가__or-suggestion",
+  "name": "든가",
+  "slug": "or-suggestion",
+  "meaning": "Similar to 든지. Expresses that either one of the two stated actions or situations is acceptable. If there is only one stated action, it can be a suggestion that the listener do the stated action \"or something\" and is often motivated by anger or passive-aggression. Is sometimes written as \"-던가\" although this is not standard spelling.",
+  "type": "verb",
+  "examples": [
+   "아, 들으라고 한 소리는 아니구나? 그럼 말소리를 좀 작게 소곤대면서 하든가. 아니면 어디 구석에 찌그러져서 지껄이든가.",
+   "밥이 없으니 점심으로 라면을 끓이든가 빵을 먹든가 해.",
+   "가: 빨리 원하는 거나 사. 좀 이따 친구랑 약속 있는데... 빨리 끝내자. 나: 그럼 그냥 가든가!"
+  ],
+  "focus": [
+   "든가"
+  ],
+  "zh": "……也好；或者……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_든지__regardless",
+  "name": "든지",
+  "slug": "regardless",
+  "meaning": "Used when any of the stated choices are fine, express a contrast between the options. Require at least 2 options.",
+  "type": "verb",
+  "examples": [
+   "누구든지 언제든지 참여하실 수 있는 챌린지니까.",
+   "대학교에 진학하든지 진학하지 않든지 열심히 공부해야 돼요."
+  ],
+  "focus": [
+   "든지"
+  ],
+  "zh": "……也好；无论……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_듯이__similarity",
+  "name": "듯이",
+  "slug": "similarity",
+  "meaning": "A connective ending used when the following statement is almost the same to the preceding statement.",
+  "type": "verb",
+  "examples": [
+   "왜 이렇게 싸우듯이 마시나요?",
+   "가수는 노래를 부르듯이 말했다."
+  ],
+  "focus": [
+   "듯이"
+  ],
+  "zh": "像……一样；仿佛……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_라고__quote-declarative-sentence",
+  "name": "(이/으)라고",
+  "slug": "quote-declarative-sentence",
+  "meaning": "It can be used to quote what the speaker heard from another person. Indirectly quoting a declarative sentence. Used to ask for clarification or reconfirmation of something they just heard.",
+  "type": "verb",
+  "examples": [
+   "가족이 모두 4명이라고 하요.",
+   "선생님이 뭐라고 했어요?"
+  ],
+  "focus": [
+   "이라고",
+   "라고"
+  ],
+  "zh": "说……；让……（引用）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_라고__quote-imperative-sentence",
+  "name": "(이/으)라고",
+  "slug": "quote-imperative-sentence",
+  "meaning": "It can also be used to quote an imperative statement. Can be an instruction or command.",
+  "type": "verb",
+  "examples": [
+   "일곱 시까지 돌아오라고 일렀거늘 왜 늦었느냐?",
+   "의사가 매운 음식을 먹지 말라고 했다."
+  ],
+  "focus": [
+   "라고"
+  ],
+  "zh": "说……；让……（引用）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_려거든__conditional-intention",
+  "name": "(으)려거든",
+  "slug": "conditional-intention",
+  "meaning": "Very similar to -(으)려면, but less common. Expresses that if the listener intends to take an action, then they should act according to the second clause (the part that comes after the (으)려거든)",
+  "type": "verb",
+  "examples": [
+   "건강한 치아를 유지하려거든 하루에 두번 이 닦아야 해요.",
+   "여러 나라의 요리를 배우려거든 요리학원에 등록해보세요."
+  ],
+  "focus": [
+   "려거든"
+  ],
+  "zh": "如果要……就……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_로구나__new-information-strong-reaction",
+  "name": "로군(요)/로구나/로구먼/로고",
+  "slug": "new-information-strong-reaction",
+  "meaning": "Express surprise after learning something new. Only used with '이다' and '아니다' (sometimes in combination with '-으시'), and is stronger than 군(요)/구나/구먼 in these special cases. 로고 is an archaic form of the other three.",
+  "type": "verb",
+  "examples": [
+   "그 남자 말이로군요.",
+   "그래서 기분이 안 좋은 거로구나.",
+   "그건 그냥 마음이 변했기 때문... 아니, 그게 아니로군요.",
+   "길을 잘 모르는 걸 보니 이번이 초행길이시로구먼.",
+   "역겨운 아해들이로고! 옛날과 달라진 바가 하나도 없다!"
+  ],
+  "focus": [
+   "로구나",
+   "로구먼",
+   "로군요",
+   "로고"
+  ],
+  "zh": "……啊（感叹）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_마는__contrasting",
+  "name": "마는/만",
+  "slug": "contrasting",
+  "meaning": "Acknowledges a preceding fact while expressing doubts about it or situations that contradict it.",
+  "type": "noun",
+  "examples": [
+   "얼마 되겠느냐마는 보태어 쓰도록 해라.",
+   "너도 가지마는 그다지 재미는 없을 것이다.",
+   "영화를 보고는 싶지마는 시간이 안 난다.",
+   "사고 싶다마는 돈이 없군.",
+   "집에서 쉬겠다더니만 웬일로 나왔니?"
+  ],
+  "focus": [
+   "되겠느냐마는",
+   "쉬겠다더니만",
+   "싶다마는",
+   "싶지마는",
+   "가지마는"
+  ],
+  "zh": "……（连词）不过……",
+  "level": "TOPIK 1-2"
+ },
+ {
+  "key": "verb_며_으며__occurring-simultaneously",
+  "name": "(으)며",
+  "slug": "occurring-simultaneously",
+  "meaning": "Indicates that two or more actions are happening at the same time.",
+  "type": "verb",
+  "examples": [
+   "노래를 하며 공부를 한다.",
+   "빨갛고 매운 음식을 먹으며 스트레스를 푸는 장면을 본 적이 있나요?"
+  ],
+  "focus": [
+   "으며",
+   "며"
+  ],
+  "zh": "……并且……；一边……一边",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_며_으며__listing-actions-states-or-facts",
+  "name": "(으)며",
+  "slug": "listing-actions-states-or-facts",
+  "meaning": "Used to list two or more actions, states, or facts. Mainly used in written language or formal situations.",
+  "type": "verb",
+  "examples": [
+   "그곳은 마치 고향처럼 아늑하고 포근하며 정겨운 느낌을 주는 곳이다.",
+   "한국 사람들은 매운 음식을 좋아하며 일을 빨리 처리한다고 들었다."
+  ],
+  "focus": [
+   "며"
+  ],
+  "zh": "……并且……；一边……一边",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_며_으며__listing-things",
+  "name": "(으)며",
+  "slug": "listing-things",
+  "meaning": "When used with 이다, it used to list two or more things or statement. Also implies that they are large in number and there are more than just the listed items.",
+  "type": "verb",
+  "examples": [
+   "돈이며 명예며 관심없다.",
+   "무며 오이며 부추며 갖가지 채소로 김치를 담근다."
+  ],
+  "focus": [
+   "며"
+  ],
+  "zh": "……并且……；一边……一边",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_면_으면__condition",
+  "name": "(으)면",
+  "slug": "condition",
+  "meaning": "Used when the preceding statement becomes the condition of the following statement.",
+  "type": "verb",
+  "examples": [
+   "공부를 열심히 하면 좋은 성적이 좋아집니다.",
+   "내일 시간이 있으면 같이 영화를 볼래요?"
+  ],
+  "focus": [
+   "있으면",
+   "하면"
+  ],
+  "zh": "如果……；当……时",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_면_으면__supposition",
+  "name": "(으)면",
+  "slug": "supposition",
+  "meaning": "Used to suppose or assume something that has not yet happened.",
+  "type": "verb",
+  "examples": [
+   "내가 죽으면 우리 아이들은 누가 돌보니?",
+   "시험이 끝나면 푹 쉴 거예요."
+  ],
+  "focus": [
+   "끝나면",
+   "죽으면"
+  ],
+  "zh": "如果……；当……时",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_면_으면__repetitive",
+  "name": "(으)면",
+  "slug": "repetitive",
+  "meaning": "Used to indicate a habitual and repetitive condition.",
+  "type": "verb",
+  "examples": [
+   "남편은 내가 잠들어 있으면 깨우지 않으려고 살금살금 걸어 다닌다."
+  ],
+  "focus": [
+   "있으면"
+  ],
+  "zh": "如果……；当……时",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_면서_으면서__simultaneous",
+  "name": "(으)면서",
+  "slug": "simultaneous",
+  "meaning": "Indicates that two or more actions are happening at the same time.",
+  "type": "verb",
+  "examples": [
+   "밥을 먹으면서 이야기를 했어요.",
+   "춤을 추면서 노래를 불렀어요.",
+   "친구를 기다리면서 뉴스를 읽고 있어요."
+  ],
+  "focus": [
+   "으면서",
+   "면서"
+  ],
+  "zh": "一边……一边……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_세요_으세요__polite-command",
+  "name": "(으)세요",
+  "slug": "polite-command",
+  "meaning": "A polite imperative form used to give instructions or make requests.",
+  "type": "verb",
+  "examples": [
+   "여기 앉으세요.",
+   "이 길로 쭉 가세요.",
+   "조심하세요."
+  ],
+  "focus": [
+   "조심하세요",
+   "앉으세요",
+   "가세요"
+  ],
+  "zh": "请……（礼貌祈使）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_세요_으세요__polite-question",
+  "name": "(으)세요",
+  "slug": "polite-question",
+  "meaning": "Politely ask about someone's action or state.",
+  "type": "verb",
+  "examples": [
+   "지금 어디에 계세요?",
+   "무슨 일을 하세요?",
+   "시간이 있으세요?",
+   "어떤 음악을 좋아하세요?"
+  ],
+  "focus": [
+   "좋아하세요",
+   "있으세요",
+   "하세요",
+   "계세요"
+  ],
+  "zh": "请……（礼貌祈使）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_세요_으세요__polite-statement",
+  "name": "(으)세요",
+  "slug": "polite-statement",
+  "meaning": "Used to politely state someone's action or state.",
+  "type": "verb",
+  "examples": [
+   "선생님은 한국어를 가르치세요.",
+   "부모님은 서울에 계세요.",
+   "생일이세요.",
+   "할머니께서 편찮으세요."
+  ],
+  "focus": [
+   "가르치세요",
+   "계세요",
+   "세요"
+  ],
+  "zh": "请……（礼貌祈使）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_소서__solemn-request",
+  "name": "(으)소서",
+  "slug": "solemn-request",
+  "meaning": "Used to express a request or wish in an extremely polite fashion. Most often used when speaking to kings, queens, and God.",
+  "type": "verb",
+  "examples": [
+   "신이시여, 우리를 버리지 마소서!",
+   "주님을 믿사오며 나의 마음에 용기를 채워주소서.",
+   "식단의 고통을 이겨내게 하소서.",
+   "저의 말씀을 들으소서."
+  ],
+  "focus": [
+   "채워주소서",
+   "들으소서",
+   "마소서",
+   "하소서"
+  ],
+  "zh": "愿……（恳求/古语）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_습니까_ㅂ니까__polite-question",
+  "name": "(스)ㅂ니까",
+  "slug": "polite-question",
+  "meaning": "Used when the speaker asks the listener politely.",
+  "type": "verb",
+  "examples": [
+   "보통 몇 시에 잡니까?",
+   "신랑 좀 빌려주시겠습니까?",
+   "질문 있습니까?"
+  ],
+  "focus": [
+   "빌려주시겠습니까",
+   "있습니까",
+   "잡니까"
+  ],
+  "zh": "……吗？（正式礼貌疑问）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_습니다_ㅂ니다__present-tense",
+  "name": "(스)ㅂ니다",
+  "slug": "present-tense",
+  "meaning": "Used to explain the present action, state, or fact politely.",
+  "type": "verb",
+  "examples": [
+   "할아버지가 칭찬하셨습니다.",
+   "전 사람을 해친 적이 없습니다.",
+   "저를 살려 주신 은혜를 꼭 갚고 싶습니다."
+  ],
+  "focus": [
+   "칭찬하셨습니다",
+   "없습니다",
+   "싶습니다"
+  ],
+  "zh": "……（正式礼貌体）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_습니다만__polite-contrast",
+  "name": "(스)ㅂ니다만",
+  "slug": "polite-contrast",
+  "meaning": "Politely present contrasting information after stating a fact.",
+  "type": "verb",
+  "examples": [
+   "이 연구는 중요한 의미가 있습니다만 아직 한계점이 많이 존재합니다.",
+   "정부 발표 내용은 분명합니다만 일부 시민단체에서 반발하고 있습니다.",
+   "지금까지 훌륭한 결과를 내었습니다만 앞으로 더 많은 데이터가 필요할 것 같습니다.",
+   "작년 실적은 향상되었습니다만 여전히 예산 문제가 해결되지 않았습니다.",
+   "교수님의 이론은 타당합니다만 실제 적용 사례를 더 살펴볼 필요가 있을 것 같습니다."
+  ],
+  "focus": [
+   "습니다만",
+   "합니다만"
+  ],
+  "zh": "不过……；但是……（正式）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_시_으시__honorific",
+  "name": "(으)시",
+  "slug": "honorific",
+  "meaning": "Honor the subject of the sentence. Show respect to a person, their possessions or body part.",
+  "type": "verb",
+  "examples": [
+   "국에 소금을 더 넣으시겠어요?",
+   "여기 앉으시겠어요?",
+   "저도 곧 따라갈 테니까 먼저 출발하시지요."
+  ],
+  "focus": [
+   "으시",
+   "시"
+  ],
+  "zh": "（敬语）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_아_어_여__present-tense",
+  "name": "아/어/여",
+  "slug": "present-tense",
+  "meaning": "Describe a certain fact, ask a question, give an order, or advise.",
+  "type": "verb",
+  "examples": [
+   "학교에 가요.",
+   "그 여자는 진짜 예뻐요.",
+   "날씨가 정말 좋아요.",
+   "그 사람은 어디에 살아요?"
+  ],
+  "focus": [
+   "좋아요",
+   "살아요",
+   "예뻐요",
+   "가요"
+  ],
+  "zh": "……（口语连接/结尾）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_아다가_어다가_해다가__sequential-actions",
+  "name": "아/어다가",
+  "slug": "sequential-actions",
+  "meaning": "It expresses that the second clause is performed based on the result of first completing the action in the first clause. The first and seconds clause must happens in different locations.",
+  "type": "verb",
+  "examples": [
+   "케이크를 만들어다가 친구에게 줬어요.",
+   "저녁에 피자과 지킨을 시켜다가 집에서 먹을까요?",
+   "제가 은행에서 돈을 찾아다가 드릴게요."
+  ],
+  "focus": [
+   "만들어다가",
+   "찾아다가",
+   "시켜다가"
+  ],
+  "zh": "……之后（接着）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_아도_어도_여도__inevitable-outcome",
+  "name": "아/어도",
+  "slug": "inevitable-outcome",
+  "meaning": "Indicates that the second clause will happens regardless of the described state or action of the first clause.",
+  "type": "verb",
+  "examples": [
+   "책을 사도 공부는 안해요.",
+   "라면은 매일 먹어도 질리지 않아요.",
+   "비가 와도 여행을 갈 거야?"
+  ],
+  "focus": [
+   "먹어도",
+   "와도",
+   "사도"
+  ],
+  "zh": "即使……也……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_아라_어라_해라__commanding",
+  "name": "아/어/여라",
+  "slug": "commanding",
+  "meaning": "Used to give commands or requests in an informal manner.",
+  "type": "verb",
+  "examples": [
+   "밥을 먹어라.",
+   "집에 가서 숙제를 해라.",
+   "창문을 닫아라. 바람이 너무 많이 들어와."
+  ],
+  "focus": [
+   "먹어라",
+   "닫아라",
+   "해라"
+  ],
+  "zh": "……吧（命令）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_아서_어서_해서__reason-or-cause",
+  "name": "아/어서",
+  "slug": "reason-or-cause",
+  "meaning": "The first clause is the reason for or the cause of the second clause.",
+  "type": "verb",
+  "examples": [
+   "그 옷은 작아서 못 입어요.",
+   "요즘에 바빠서 친구들을 못 만나요."
+  ],
+  "focus": [
+   "바빠서",
+   "작아서"
+  ],
+  "zh": "因为……；……然后",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_아서_어서_해서__sequence-of-events",
+  "name": "아/어서",
+  "slug": "sequence-of-events",
+  "meaning": "A connective ending to indicate a temporal relationship between events. The second clause can only happen after the first action has happened.",
+  "type": "verb",
+  "examples": [
+   "내일 친구를 만나서 영화를 볼 거예요.",
+   "조금 더 돈을 모아서 장난감을 살까요?"
+  ],
+  "focus": [
+   "모아서",
+   "만나서"
+  ],
+  "zh": "因为……；……然后",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_았_었_했__past-tense",
+  "name": "았/었/였",
+  "slug": "past-tense",
+  "meaning": "Indicate that an event happened in the past.",
+  "type": "verb",
+  "examples": [
+   "어제 배가 아팠어요. 그래서 잠을 못 잤어요.",
+   "어제 회사 동료하고 저녁을 먹었어요.",
+   "남자 친구를 처음 만났을 때 첫인상이 어땠어요?"
+  ],
+  "focus": [
+   "아팠어요",
+   "먹었어요",
+   "어땠어요",
+   "만났을",
+   "잤어요"
+  ],
+  "zh": "（过去时）……了",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_았던_었던_했던__past-completed",
+  "name": "(았/었/였)던",
+  "slug": "past-completed",
+  "meaning": "Indicates an verb in the past has completed in the past, with the nuance of recollecting a memory.",
+  "type": "verb",
+  "examples": [
+   "시끄러웠던 교실이 요즘에 아주 조용해요.",
+   "우리가 살았던 집은 매우 넓었어요.",
+   "저는 어릴 때 했던 게임을 아직 좋아해요."
+  ],
+  "focus": [
+   "시끄러웠던",
+   "살았던",
+   "했던"
+  ],
+  "zh": "（过去）……过的（定语）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_았었_었었_했었__past-tense",
+  "name": "(았/었/였)었",
+  "slug": "past-tense",
+  "meaning": "Referring to a past event that is different from the present or does not continue to the present.",
+  "type": "verb",
+  "examples": [
+   "10년 전까지는 외국에 살았었어요.",
+   "어렸을 때는 파를 안 먹었었어요.",
+   "이 아빠가 군대 있을 때 취사병이었다고 얘기했었나?"
+  ],
+  "focus": [
+   "먹었었어요",
+   "살았었어요",
+   "얘기했었나"
+  ],
+  "zh": "……过（过去完成）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_어서인지__perhaps-because",
+  "name": "아/어서인지",
+  "slug": "perhaps-because",
+  "meaning": "Suggest a possible reason or cause for a situation, with a hint of uncertainty.",
+  "type": "verb",
+  "examples": [
+   "열심히 공부해서인지 학교에서 좋은 성적을 받고 있어요.",
+   "산책하러 공원에 자주 가서인지 기분이 좋아요.",
+   "음식을 급하게 먹어서인지 소화가 잘 안 돼요.",
+   "그 영화가 재미있어서인지 사람들이 많이 봤어요.",
+   "잠을 충분히 못 잤어서인지 피곤해요."
+  ],
+  "focus": [
+   "어서인지",
+   "해서인지",
+   "서인지"
+  ],
+  "zh": "也许是因为……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_어야_아야__condition",
+  "name": "아/어야",
+  "slug": "condition",
+  "meaning": "Express a necessity, obligation or a condition that has be completed for something else to realize.",
+  "type": "verb",
+  "examples": [
+   "날씨가 추워졌으니까 옷을 따뜻하게 입어야겠어요.",
+   "품질이 좋아야 사람들이 그 물건을 살 거예요.",
+   "내 실수였으니까 내가 바로잡아야 한다고."
+  ],
+  "focus": [
+   "아야",
+   "어야"
+  ],
+  "zh": "必须……；只有……才",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_어야지__strong-intention",
+  "name": "아/어야지",
+  "slug": "strong-intention",
+  "meaning": "Express speaker’s strong intention for oneself or a strong suggestion to someone else.",
+  "type": "verb",
+  "examples": [
+   "영화가 너무 재미있다고 했어. 나도 봐야지.",
+   "패스트푸드만 먹지 말고 채소도 먹어야지.",
+   "대통령이 연설를 하시니까 꼭 가야지요."
+  ],
+  "focus": [
+   "먹어야지",
+   "가야지요",
+   "봐야지"
+  ],
+  "zh": "应该……；……好了",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_었더니__and-then",
+  "name": "(았/었/했)더니",
+  "slug": "and-then",
+  "meaning": "Used to narrate a sequence of events observed by the speaker. There is often a nuance that the first clause becomes the cause of the second clause. The subjects of both clauses must be different. Note that the speaker's past self and present self can be considered different subjects, and so first-person narration is possible.",
+  "type": "verb",
+  "examples": [
+   "어제 오랜만에 하체를 했더니 다리가 너무 아파.",
+   "언니가 동생에게 너 괜찮냐고 물어봤더니 눈물이 펑펑 나왔어.",
+   "부모님한테 다음에 차로 태워달라고 했어. 그랬더니 알겠다고 하셨어!"
+  ],
+  "focus": [
+   "물어봤더니",
+   "그랬더니",
+   "했더니"
+  ],
+  "zh": "（当时）……结果……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으나__although-but",
+  "name": "으나",
+  "slug": "although-but",
+  "meaning": "Expressing contrast or an unexpected outcome.",
+  "type": "verb",
+  "examples": [
+   "이 음식은 건강에 좋으나 맛이 조금 밍밍해요.",
+   "새로운 게임은 흥미롭으나 버그가 많아서 플레이하기 어렵네요.",
+   "이 옷은 세련되나 가격이 너무 비싸요.",
+   "그 박사님은 매우 뛰어나시나 가끔 기본적인 예의를 잊어요.",
+   "코드를 간결하게 짰으나 여전히 에러가 발생해요.",
+   "숙제를 열심히 했으나 선생님께 칭찬받지 못했어요.",
+   "전시된 작품은 다양하나 생각보다 관람객이 적었어요.",
+   "매일 운동하나 체중이 줄지 않네요.",
+   "이 김치는 전통적이나 너무 매워서 먹기 힘들어요.",
+   "그 정치인은 유명하나 실질적인 변화를 이끌지 못해요."
+  ],
+  "focus": [
+   "으나",
+   "나"
+  ],
+  "zh": "但是……；虽然……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으나마__reluctant-acceptance",
+  "name": "(으)나마",
+  "slug": "reluctant-acceptance",
+  "meaning": "Expresses the speaker's reluctant acceptance of a situation as-is, even though it is not entirely satisfactory.",
+  "type": "verb",
+  "examples": [
+   "너나마 와 주어서 다행이다.",
+   "반찬 없는 밥이나마 많이 자시게.",
+   "먼발치로나마 보게 되어 기뻤다.",
+   "변변치는 못하나마 많이 잡수십시오.",
+   "늦었으나마 인사드립니다."
+  ],
+  "focus": [
+   "먼발치로나마",
+   "늦었으나마",
+   "못하나마",
+   "밥이나마",
+   "너나마"
+  ],
+  "zh": "虽然……但（起码）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으니_니__informal-question",
+  "name": "(으/이)니",
+  "slug": "informal-question",
+  "meaning": "A casual interrogative ending in Korean, often used in informal speech to ask questions. Appear at the end of the sentence and only as 니.",
+  "type": "verb",
+  "examples": [
+   "넌 어느 게 더 비싸 보이니?",
+   "빵을 몇 개나 샀니?",
+   "요즘 바쁘니?"
+  ],
+  "focus": [
+   "니"
+  ],
+  "zh": "因为……；既然……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으니_니__reason-or-cause",
+  "name": "(으/이)니",
+  "slug": "reason-or-cause",
+  "meaning": "When the preceding statement is the cause or reason for the next statement or convey a fact.",
+  "type": "verb",
+  "examples": [
+   "시간이 없으니 빨리 이동합시다.",
+   "오늘 수업은 끝났으니 돌아가셔도 좋습니다."
+  ],
+  "focus": [
+   "으니"
+  ],
+  "zh": "因为……；既然……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으니까_니까__reason-or-cause",
+  "name": "(으)니까",
+  "slug": "reason-or-cause",
+  "meaning": "It expresses the reason or cause for something. Commonly used to explain the reason for one’s actions or to express to provide justification for something.",
+  "type": "verb",
+  "examples": [
+   "이번 주는 바쁘니까 다음 주에 합시다."
+  ],
+  "focus": [
+   "바쁘니까"
+  ],
+  "zh": "因为……；由于……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으니까_니까__discovery",
+  "name": "(으)니까",
+  "slug": "discovery",
+  "meaning": "It expresses the discovery of a fact or situation. The first clause is the action and the second clause is about the discovery. This form can only be used with action verbs.",
+  "type": "verb",
+  "examples": [
+   "아침에 회사에 가니까 아무도 없었어요.",
+   "어제 백화점에 가니까 세일을 하고 있었어요."
+  ],
+  "focus": [
+   "가니까"
+  ],
+  "zh": "因为……；由于……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으되__but-however",
+  "name": "(으)되",
+  "slug": "but-however",
+  "meaning": "Introduces some truth but adds a contrasting fact, details, conditions, or restrictions.",
+  "type": "verb",
+  "examples": [
+   "한국 드라마를 당연히 보시되 영어 자막만 쓰지 마셔요.",
+   "돈은 있으되 쓸 시간은 없다..."
+  ],
+  "focus": [
+   "으되",
+   "되"
+  ],
+  "zh": "只是……；但……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으되__archaic-quoting",
+  "name": "(으)되",
+  "slug": "archaic-quoting",
+  "meaning": "Introduces a direct quote.",
+  "type": "verb",
+  "examples": [
+   "임금님이 말씀하시되, \"들라 하라!\""
+  ],
+  "focus": [
+   "되"
+  ],
+  "zh": "只是……；但……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으랴__busy-with",
+  "name": "(으)랴",
+  "slug": "busy-with",
+  "meaning": "Used to enumerate several actions that the speaker is trying hard to complete and the negative effect on the speaker, such as being tired or busy.",
+  "type": "verb",
+  "examples": [
+   "음식 만들랴 집안 청소하랴 쉴 틈이 없다.",
+   "어학당에서 공부하랴 회사에 다니랴 눈 코 뜰 새 없어요."
+  ],
+  "focus": [
+   "랴"
+  ],
+  "zh": "哪会……；怎么会……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으랴__rhetorical-question",
+  "name": "(으)랴",
+  "slug": "rhetorical-question",
+  "meaning": "Used in informal language to forcefully and ironically support or refute an idea. Very similar to the rhetorical use of -겠어(요).",
+  "type": "verb",
+  "examples": [
+   "웃는 낯에 침 뱉으랴.",
+   "돈을 누가 마다하랴.",
+   "공든 탑이 무너지랴."
+  ],
+  "focus": [
+   "으랴",
+   "랴"
+  ],
+  "zh": "哪会……；怎么会……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으러_러__movement-with-intention",
+  "name": "(으)러",
+  "slug": "movement-with-intention",
+  "meaning": "Express a movement toward a location in order to perform the action. Used with verbs of movement.",
+  "type": "verb",
+  "examples": [
+   "나 지금 도서관에 책 빌리러 가는데 같이 갈래?",
+   "동생은 학원에 피아노를 배우러 가요.",
+   "저는 극장에 공연을 보러 가요."
+  ],
+  "focus": [
+   "우러",
+   "러"
+  ],
+  "zh": "为了去……而",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으려고_려고__intention",
+  "name": "(으)려고",
+  "slug": "intention",
+  "meaning": "Express an intention, desire or purpose to do something. The speaker will do what is stated in the second clause for the purpose of the first clause.",
+  "type": "verb",
+  "examples": [
+   "드라마를 보려고 한국어를 배우고 있어요.",
+   "할아버지는 낚싯대를 거두려고 일어났다.",
+   "누나가 유학을 가려고 학교를 알아보는 중이에요."
+  ],
+  "focus": [
+   "려고"
+  ],
+  "zh": "为了……；打算……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으려나__wondering",
+  "name": "(으/ㄹ/을)려나",
+  "slug": "wondering",
+  "meaning": "Expresses curiosity, speculation or doubt to oneself about a future situation or outcome.",
+  "type": "verb",
+  "examples": [
+   "비가 올려나?",
+   "오늘도 지각을 하려나?",
+   "언제 내 집에서 나갈 수 있을려나?",
+   "내일은 날씨가 좋으려나?"
+  ],
+  "focus": [
+   "있을려나",
+   "좋으려나",
+   "하려나",
+   "올려나"
+  ],
+  "zh": "是否会……呢；大概……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으려다가__interrupted-intention",
+  "name": "(으)려다가",
+  "slug": "interrupted-intention",
+  "meaning": "Contraction of -(으)려고 하다가. Express that the speaker intended or tried to do something, but \"interrupted\" the intention or attempt by doing something else, leaving the original intention unfulfilled.",
+  "type": "verb",
+  "examples": [
+   "그 영화를 DVD 대여점에서 빌려 보려다가 텔레비전에서 오늘 방영한다는 것을 알고는 그만두었다.",
+   "문을 노크하려다가 손을 멈췄다.",
+   "몇 년 전 우리 어머니는 병원에서 다른 입원환자를 죽이려다가 붙잡혔어."
+  ],
+  "focus": [
+   "려다가"
+  ],
+  "zh": "正打算……却……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으려던_려던__interruption",
+  "name": "(으)려던",
+  "slug": "interruption",
+  "meaning": "Express that the action or intention was about to happens but got interrupted to change to something else.",
+  "type": "verb",
+  "examples": [
+   "라면을 끓이는군요. 저도 마침 라면을 먹으려던 참이었어요.",
+   "저도 백화점에 가려던 참이었는데 같이 가요."
+  ],
+  "focus": [
+   "으려던",
+   "려던"
+  ],
+  "zh": "正要……的（定语）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으려면_려면__assume-intention",
+  "name": "(으)려면",
+  "slug": "assume-intention",
+  "meaning": "Shortened form of (으)려고 하면. Used when the speaker assumes that one wishes to achieve something and gives the conditions and requirements to achieve it.",
+  "type": "verb",
+  "examples": [
+   "덜렁대는 버릇을 고치려면 어떻게 해야 할까요?",
+   "다음 마술을 하려면 여러분 중 한 명이 필요합니다."
+  ],
+  "focus": [
+   "려면"
+  ],
+  "zh": "要想……的话",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으려무나__friendly-command",
+  "name": "(으)렴 / (으)려무나 / (으)려마",
+  "slug": "friendly-command",
+  "meaning": "Used to give a soft command or suggestion among those who are younger. The extended form also appears as 려므나, however this is not standard korean.",
+  "type": "verb",
+  "examples": [
+   "밥 먹으렴.",
+   "일찍 자렴.",
+   "조금만 더 기다리렴.",
+   "천천히 걸으려마 급할 필요 없어.",
+   "운동하려무나 몸이 건강해질 거야.",
+   "빨리 준비하려무나 시간이 없어.",
+   "조용히 앉으려무나 수업이 곧 시작될 거야.",
+   "잘 놀았으니 이제 공부를 열심히 하려므나."
+  ],
+  "focus": [
+   "하려므나",
+   "으려무나",
+   "으려마",
+   "려무나",
+   "으렴",
+   "렴"
+  ],
+  "zh": "（温和命令）……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으렷다__educated-guess",
+  "name": "(으)렷다",
+  "slug": "educated-guess",
+  "meaning": "Expresses a conjecture or assertion that something is undoubtedly true based on experience or logic.",
+  "type": "verb",
+  "examples": [
+   "그는 다시는 두말 못 하렷다.",
+   "지금쯤은 책을 다 읽었으렷다.",
+   "눈어림으로 짐작하건대 아직 25살이 넘지 않으렷다."
+  ],
+  "focus": [
+   "읽었으렷다",
+   "않으렷다",
+   "하렷다"
+  ],
+  "zh": "（古语）……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으렷다__command",
+  "name": "(으)렷다",
+  "slug": "command",
+  "meaning": "Expresses a command or order.",
+  "type": "verb",
+  "examples": [
+   "다시는 내 앞에 나타나지 말렷다.",
+   "당장 그 죄인을 묶으렷다."
+  ],
+  "focus": [
+   "묶으렷다",
+   "말렷다"
+  ],
+  "zh": "（古语）……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으리__prediction",
+  "name": "(으)리",
+  "slug": "prediction",
+  "meaning": "Expresses the speaker's prediction or guess about some situation. Can be used in pairing with other conjugations or used alone as a verb final ending.",
+  "type": "verb",
+  "examples": [
+   "그는 뭐든 열심히 일하니 꼭 성공하리라.",
+   "내일이면 늦으리니 빨리 대책을 세워야 할 것이다.",
+   "사노라면 슬픈 날도 있겠지만 즐거운 날도 있으리다.",
+   "지금쯤이면 고향에 진달래가 활짝 피었으리.",
+   "그 사람이 그런 짓을 하리라고는 상상도 못했어요.",
+   "자신은 그녀에게 아주 소중한 친구이리라는 자신감이 있었다."
+  ],
+  "focus": [
+   "성공하리라",
+   "피었으리",
+   "늦으리니",
+   "있으리다",
+   "리라"
+  ],
+  "zh": "（不会/不能）……；怎么可能",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으리__intention",
+  "name": "(으)리",
+  "slug": "intention",
+  "meaning": "Expresses the speaker's intention or will to do something. Can be used in pairing with other conjugations or used alone as a verb final ending. When used as a final ending, can be used to ask about the listener's intention.",
+  "type": "verb",
+  "examples": [
+   "잠시 기다리면 내가 곧 처리해 주리다.",
+   "내 반드시 돌아오리니 꼭 기다려 다오.",
+   "뒷일은 내가 맡으리다.",
+   "내가 먼저 밥을 먹으리?"
+  ],
+  "focus": [
+   "돌아오리니",
+   "맡으리다",
+   "주리다",
+   "먹으리"
+  ],
+  "zh": "（不会/不能）……；怎么可能",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으리__informal-logical-rebuttal",
+  "name": "(으)리",
+  "slug": "informal-logical-rebuttal",
+  "meaning": "Used to respond back with a question, asking how something could be so based on reason. This meaning is only used alone as a verb final ending.",
+  "type": "verb",
+  "examples": [
+   "그런 사람이 무슨 애국자이리?",
+   "어찌 내가 이런 일을 하리?"
+  ],
+  "focus": [
+   "애국자이리",
+   "하리"
+  ],
+  "zh": "（不会/不能）……；怎么可能",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으리라__expressing-will",
+  "name": "(으)리라",
+  "slug": "expressing-will",
+  "meaning": "Expresses the speaker's resolve or intention to do something.",
+  "type": "verb",
+  "examples": [
+   "반드시 성공하리라.",
+   "끝까지 노력하리라.",
+   "이번에는 반드시 성공하리라."
+  ],
+  "focus": [
+   "리라"
+  ],
+  "zh": "将……；（估计）会……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으리라__strong-prediction",
+  "name": "(으)리라",
+  "slug": "strong-prediction",
+  "meaning": "Make a strong guess or prediction about future events.",
+  "type": "verb",
+  "examples": [
+   "곧 여름이 오리라.",
+   "곧 해가 떠오르리라.",
+   "그녀가 성공하겠으리라.",
+   "진실이 밝혀지리라."
+  ],
+  "focus": [
+   "으리라",
+   "리라"
+  ],
+  "zh": "将……；（估计）会……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으리만치__so-much-so-that",
+  "name": "(으)리만치",
+  "slug": "so-much-so-that",
+  "meaning": "Very similar to -ㄹ 정도로 or -ㄹ 만큼 (but less common), it expresses the extent of a verb or adjective.",
+  "type": "verb",
+  "examples": [
+   "우연치고는 너무 이상하리만치 자꾸 엮이는 것 같아요.",
+   "선뜩하리만치 깔끔한 공중제비로, 아이돌이 무대 왼 구석에서 튀어나왔다."
+  ],
+  "focus": [
+   "리만치"
+  ],
+  "zh": "……到……的地步",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으리오__expressing-impossibility",
+  "name": "(으)리오",
+  "slug": "expressing-impossibility",
+  "meaning": "Emphasize that something is impossible or unlikely by asking a rhetorical question.",
+  "type": "verb",
+  "examples": [
+   "내 어찌 고향을 잊으리오.",
+   "그 누가 당신을 싫어하리오.",
+   "우리가 어찌 포기하였으리오.",
+   "그가 성공하겠으리오?"
+  ],
+  "focus": [
+   "으리오",
+   "리오"
+  ],
+  "zh": "（反问）怎么会……？",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으마__intention-old-fashioned",
+  "name": "(으)마",
+  "slug": "intention-old-fashioned",
+  "meaning": "Used when the speaker promises to the listener that they will do something. Very similar to (으)ㄹ게(요).",
+  "type": "verb",
+  "examples": [
+   "오전에 가마.",
+   "내가 도와주마."
+  ],
+  "focus": [
+   "마"
+  ],
+  "zh": "（承诺）……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으므로__cause-or-reason",
+  "name": "(으)므로",
+  "slug": "cause-or-reason",
+  "meaning": "Shows the reason for something",
+  "type": "verb",
+  "examples": [
+   "이 프로젝트는 중요하므로 모두가 참여해야 합니다.",
+   "시간이 부족하므로 회의를 빨리 시작하겠습니다.",
+   "회의 시간이 정해졌으므로 모두 제시간에 도착해야 합니다."
+  ],
+  "focus": [
+   "정해졌으므로",
+   "부족하므로",
+   "중요하므로"
+  ],
+  "zh": "因为……；由于……（书面）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으세__하게체-suggestion",
+  "name": "(으)세",
+  "slug": "하게체-suggestion",
+  "meaning": "A way to express a suggestion to do a certain act together in the 하게체 speech level. It can also show up as (스)ㅂ세 in dialect.",
+  "type": "verb",
+  "examples": [
+   "우리 힘껏 일해 보세.",
+   "이 책을 우리 함께 읽으세.",
+   "그 일 우리가 맡으세.",
+   "말로만 사죄해서는 쓸모가 없지. 그대가 바라는 것이라면 무엇이든 들어주도록 합세.",
+   "문을 닫습세."
+  ],
+  "focus": [
+   "맡으세",
+   "닫습세",
+   "읽으세",
+   "보세",
+   "합세"
+  ],
+  "zh": "……吧（平辈提议）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으십시오_십시오__politely-asking",
+  "name": "(으)십시오",
+  "slug": "politely-asking",
+  "meaning": "An even more polite imperative form used to give instructions or make requests.",
+  "type": "verb",
+  "examples": [
+   "여기서 내리십시오."
+  ],
+  "focus": [
+   "내리십시오"
+  ],
+  "zh": "请……（正式祈使）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으오_오_소__하오체-present-tense",
+  "name": "(으)오/소",
+  "slug": "하오체-present-tense",
+  "meaning": "Used to explain the present action, state, or fact politely in the 하오체 speech level.",
+  "type": "verb",
+  "examples": [
+   "날씨가 참 좋소.",
+   "그것을 믿지 않소.",
+   "우리는 산에 가오.",
+   "시간이 많지 않소."
+  ],
+  "focus": [
+   "소",
+   "오"
+  ],
+  "zh": "（文艺语结尾）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으오_오_소__하오체-polite-question",
+  "name": "(으)오/소",
+  "slug": "하오체-polite-question",
+  "meaning": "Used when the speaker asks the listener politely in the 하오체 speech level.",
+  "type": "verb",
+  "examples": [
+   "어디로 가오?",
+   "무슨 일이 있소?",
+   "무엇을 찾소?",
+   "오늘 기분이 어떻소?"
+  ],
+  "focus": [
+   "소",
+   "오"
+  ],
+  "zh": "（文艺语结尾）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으오_오_소__하오체-command",
+  "name": "(으)오/소",
+  "slug": "하오체-command",
+  "meaning": "Semi-formal polite command sentence ending in the 하오체 speech level.",
+  "type": "verb",
+  "examples": [
+   "이쪽으로 오시오.",
+   "문을 닫으오.",
+   "조용히 하시오.",
+   "책을 읽으오."
+  ],
+  "focus": [
+   "오"
+  ],
+  "zh": "（文艺语结尾）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으오_오_소__하오체-suggestion",
+  "name": "(으)오/소",
+  "slug": "하오체-suggestion",
+  "meaning": "Used to suggest or propose something with the listener, an intention of doing a certain action together in the 하오체 speech level.",
+  "type": "verb",
+  "examples": [
+   "함께 식사하오.",
+   "같이 먹으오.",
+   "이 일을 같이 하오.",
+   "산책을 하오."
+  ],
+  "focus": [
+   "오"
+  ],
+  "zh": "（文艺语结尾）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으오_오_소__하오체-honorific",
+  "name": "(으)오/소",
+  "slug": "하오체-honorific",
+  "meaning": "Semi-formal polite sentence ending in the 하오체 speech level with honorific.",
+  "type": "verb",
+  "examples": [
+   "건강하시오.",
+   "행복하시오.",
+   "오래 사시오.",
+   "조심하시오."
+  ],
+  "focus": [
+   "오"
+  ],
+  "zh": "（文艺语结尾）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으오_으옵_사오_사옵_자오_자옵__humility",
+  "name": "(으)오/(으)옵/사오/사옵/자오/자옵",
+  "slug": "humility",
+  "meaning": "Used to express humility and additional politeness in the 하소서체 speech level. 사옵 and 자옵 are occasionally shortened to 삽 and 잡 respectively.",
+  "type": "verb",
+  "examples": [
+   "여기 그런 게 없으와.",
+   "필요한 거 있으시다면 저를 불러 주시옵소서.",
+   "저희가 그 사람을 믿었삽더니 배신당했나이다.",
+   "당신을 믿사오니 힘내세요.",
+   "스승의 뜻을 좇잡나이다.",
+   "당신을 믿사옵고 따르옵니다.",
+   "분부 받자옵나이다."
+  ],
+  "focus": [
+   "받자옵나이다",
+   "믿었삽더니",
+   "따르옵니다",
+   "주시옵소서",
+   "좇잡나이다",
+   "믿사오니",
+   "믿사옵고",
+   "없으와"
+  ],
+  "zh": "（古/敬语结尾）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으오이까_사오이까__humble-question",
+  "name": "(으)오이까/사오이까",
+  "slug": "humble-question",
+  "meaning": "Used to ask a question politely and respectfully in the 하소서체 speech level.",
+  "type": "verb",
+  "examples": [
+   "이 마을에 그런 사람이 있겠사오이까?",
+   "선생께서는 진정 정당하게 이겼소이까?",
+   "그것이 그리 중요하오이까?",
+   "선생은 누구를 찾으오이까?"
+  ],
+  "focus": [
+   "있겠사오이까",
+   "중요하오이까",
+   "이겼소이까",
+   "찾으오이까"
+  ],
+  "zh": "……吗？（古敬疑问）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으오이다_사오이다__humble-statement",
+  "name": "(으)오이다/사오이다",
+  "slug": "humble-statement",
+  "meaning": "Used to express an action or simple statement humbly in the 하소서체 speech level.",
+  "type": "verb",
+  "examples": [
+   "그만 가겠쇠다.",
+   "아비가 산삼 효험으로 병은 좀 나았사오나 소인 옥에 있는 동안에 죽었소이다.",
+   "우리에겐 우리의 임무가 있사오이다.",
+   "웬 낯선 사람이 찾으오이다.",
+   "참으로 오랜만이오이다.",
+   "나는 오늘 떠나외다."
+  ],
+  "focus": [
+   "오랜만이오이다",
+   "찾으오이다",
+   "있사오이다",
+   "죽었소이다",
+   "떠나외다",
+   "가겠쇠다"
+  ],
+  "zh": "……（古敬陈述）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으옵시_사옵시_자옵시__humility",
+  "name": "(으)옵시/사옵시/자옵시",
+  "slug": "humility",
+  "meaning": "Used to express humility and additional politeness in the 하소서체 speech level.",
+  "type": "verb",
+  "examples": [
+   "부모님의 은혜는 깊으옵시어 갚을 길이 없어라.",
+   "제 말씀을 듣자옵시니 놀라셨나이다",
+   "성주님께서 행차하옵신다."
+  ],
+  "focus": [
+   "행차하옵신다",
+   "깊으옵시어",
+   "듣자옵시니"
+  ],
+  "zh": "（极敬语）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_으이__하게체-description",
+  "name": "(으)이/의",
+  "slug": "하게체-description",
+  "meaning": "Used to express an impression or a simple description in the 하게체 speech level. Can be shortened from (으)이 to just 의.",
+  "type": "verb",
+  "examples": [
+   "그것 참 좋의.",
+   "요사이 날씨가 꽤 차이.",
+   "자네 솜씨가 정말 대단하이.",
+   "그런 짓은 이제 싫으이.",
+   "용하이, 정말 좋은 생각을 했네."
+  ],
+  "focus": [
+   "대단하이",
+   "용하이",
+   "싫으이",
+   "좋의",
+   "차이"
+  ],
+  "zh": "……的（古语所有格）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_은가_ㄴ가_나__soft-question",
+  "name": "(으)ㄴ가(요), 나(요)",
+  "slug": "soft-question",
+  "meaning": "It can be use to ask a question in a polite and gentle way.",
+  "type": "verb",
+  "examples": [
+   "여러분도 혹시 명상을 하시나요?",
+   "이거 환불 되나요?",
+   "지금 기다리는 사람이 많은가요?",
+   "이 소포를 어디로 보내실 건가요?"
+  ],
+  "focus": [
+   "많은가요",
+   "하시나요",
+   "건가요",
+   "되나요"
+  ],
+  "zh": "……吗（疑问/委婉）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_은가_ㄴ가_나__pondering",
+  "name": "(으)ㄴ가(요), 나(요)",
+  "slug": "pondering",
+  "meaning": "Expresses the speaker's speculation, curiosity or assumption about something.",
+  "type": "verb",
+  "examples": [
+   "그 아이는 자라면 언젠가 범인이 되나?",
+   "내가 좋은 사람인가? 정말 이게 옳은 길이나?"
+  ],
+  "focus": [
+   "나"
+  ],
+  "zh": "……吗（疑问/委婉）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_은들__no-matter",
+  "name": "(은/ㄴ)들",
+  "slug": "no-matter",
+  "meaning": "Expresses that even if the conditions of the preceding clause are true, the result will not be as expected. Can be used along with -겠어(요) as a rhetorical question.",
+  "type": "verb",
+  "examples": [
+   "돈을 많이 번들 저금하기만 하고 안 쓰면 아무 소용이 없지 않나요?",
+   "그 목격자가 경찰에 사실대로 말한다면, 용의자가 아무리 부인한들 형사는 믿어주지 않을 것이다.",
+   "사전이 아무리 가까이 있다 한들 그것을 찾아보지 않으면 사전 속의 지식은 남의 머릿속에 든 지식일 뿐이다.",
+   "집이 좁은들 우리가 살 수 없겠어?"
+  ],
+  "focus": [
+   "부인한들",
+   "좁은들",
+   "한들",
+   "번들"
+  ],
+  "zh": "即使……也；哪会……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을걸_ㄹ걸__guessing",
+  "name": "(으)ㄹ걸(요)",
+  "slug": "guessing",
+  "meaning": "Used when stating an unconfirmed assumptions or supposition about a something unsure or a future event.",
+  "type": "verb",
+  "examples": [
+   "출퇴근 시간이니까 지하철을 타는 게 더 빠를걸요.",
+   "아이들이 매운 요리는 잘 먹지 않을걸요."
+  ],
+  "focus": [
+   "않을걸요",
+   "빠를걸요"
+  ],
+  "zh": "可能会……吧（后悔/推测）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을게_ㄹ게__intention",
+  "name": "(으)ㄹ게(요)",
+  "slug": "intention",
+  "meaning": "Used when the speaker promises or notifies the listener of their decision or intention that they will do something.",
+  "type": "verb",
+  "examples": [
+   "제가 전화를 받을게요.",
+   "지금은 비가 많이 오니까 조금 이따가 출발할게요."
+  ],
+  "focus": [
+   "출발할게요",
+   "받을게요"
+  ],
+  "zh": "我会……（承诺）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을까_ㄹ까__suggestion",
+  "name": "(으)ㄹ까",
+  "slug": "suggestion",
+  "meaning": "Used to make a suggestion to the listener, sometime with the intent of doing something together.",
+  "type": "verb",
+  "examples": [
+   "비가 많이 와요. 택시를 탈까요?",
+   "어디에서 사진을 찍을까요?"
+  ],
+  "focus": [
+   "찍을까요",
+   "탈까요"
+  ],
+  "zh": "会不会……；……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을까_ㄹ까__asking-opinion",
+  "name": "(으)ㄹ까",
+  "slug": "asking-opinion",
+  "meaning": "Ask the for listener's preference, thought or opinion.",
+  "type": "verb",
+  "examples": [
+   "제가 몇 시에 전화할까요?",
+   "오늘 백화점에 사람이 많을까요?",
+   "공기가 나쁜데 창문을 닫을까요?"
+  ],
+  "focus": [
+   "전화할까요",
+   "닫을까요",
+   "많을까요"
+  ],
+  "zh": "会不会……；……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을까_ㄹ까__wondering",
+  "name": "(으)ㄹ까",
+  "slug": "wondering",
+  "meaning": "Wondering to oneself, considering a possbility or action.",
+  "type": "verb",
+  "examples": [
+   "이게 맛있을까?",
+   "오늘 시장에 갈까?",
+   "그래서... 음... 뭐랄까? 아니야, 상관없어."
+  ],
+  "focus": [
+   "맛있을까",
+   "뭐랄까",
+   "갈까"
+  ],
+  "zh": "会不会……；……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을꼬__asking-opinion",
+  "name": "(으)ㄹ꼬",
+  "slug": "asking-opinion",
+  "meaning": "Ask for the listener's or one's own preference, thought or opinion.",
+  "type": "verb",
+  "examples": [
+   "영희야, 너는 무슨 노래를 부를꼬?",
+   "우리 언제 떠날꼬?",
+   "방이 왜 이리 좁을꼬?"
+  ],
+  "focus": [
+   "떠날꼬",
+   "부를꼬",
+   "좁을꼬"
+  ],
+  "zh": "（推测）会……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을꼬__wondering",
+  "name": "(으)ㄹ꼬",
+  "slug": "wondering",
+  "meaning": "Wondering to oneself, expressing conjecture or speculation.",
+  "type": "verb",
+  "examples": [
+   "이제 나는 무엇을 하여 먹고살꼬?",
+   "집도 없이 나는 어디로 갈꼬?",
+   "그이는 어디로 갔을꼬?"
+  ],
+  "focus": [
+   "먹고살꼬",
+   "갔을꼬",
+   "갈꼬"
+  ],
+  "zh": "（推测）会……吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을라__expresses-concern",
+  "name": "(으)ㄹ라",
+  "slug": "expresses-concern",
+  "meaning": "Expresses concern that what was just mentioned might happen.",
+  "type": "verb",
+  "examples": [
+   "쉿! 이쭉 쳐다볼라.",
+   "그렇게 빨리 뛰지 마라 다칠라.",
+   "우리는 가지 말자, 그 귀찮은 놈도 왔을라."
+  ],
+  "focus": [
+   "볼라",
+   "칠라",
+   "을라"
+  ],
+  "zh": "（口语）打算……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을라치면__whenever",
+  "name": "(으)ㄹ라치면",
+  "slug": "whenever",
+  "meaning": "Expresses that every time some action tries to happen, it results in another action to happen. Equivalent to -으려고 할 때마다 or -으려고 하면.",
+  "type": "verb",
+  "examples": [
+   "무슨 BL 드라마를 볼라치면 어머니가 내 방에 들어오셔.",
+   "분위기가 어색할라치면 얘가 재밌는 농담을 하거든.",
+   "공부를 할라치면 친구가 카톡을 보내요..."
+  ],
+  "focus": [
+   "어색할라치면",
+   "할라치면",
+   "볼라치면"
+  ],
+  "zh": "正要……的时候",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을래_ㄹ래__intention",
+  "name": "(으)ㄹ래(요)",
+  "slug": "intention",
+  "meaning": "Used to indicate the speaker's intention to do something in the future.",
+  "type": "verb",
+  "examples": [
+   "어른이 되면 우선 운전 면허를 딸래요.",
+   "전 홍차를 마실래요."
+  ],
+  "focus": [
+   "마실래요",
+   "딸래요"
+  ],
+  "zh": "我要……；要不要……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을래_ㄹ래__asking-opinion",
+  "name": "(으)ㄹ래(요)",
+  "slug": "asking-opinion",
+  "meaning": "To ask for the listener's thoughts about the thing to do in the future.",
+  "type": "verb",
+  "examples": [
+   "내일 시간이 있으면 같이 영화를 볼래요?",
+   "오늘 점심을 같이 먹을래요?"
+  ],
+  "focus": [
+   "먹을래요",
+   "볼래요"
+  ],
+  "zh": "我要……；要不要……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을망정_을지언정__even-though",
+  "name": "(으)ㄹ망정 / (으)ㄹ지언정",
+  "slug": "even-though",
+  "meaning": "Acknowledge or assume the truth of the first part and emphasize a contrasting fact in the second.",
+  "type": "verb",
+  "examples": [
+   "그는 나를 돕지는 못할망정 방해는 하지 말아야지요.",
+   "친구가 이해는 못해줄망정 비난은 하지 않았으면 좋겠어요.",
+   "오늘이 삶의 끝일지언정 후회 없는 하루를 보내도록 하겠다",
+   "그는 지키지는 못할지언정 약속은 함부로 하지 않아요."
+  ],
+  "focus": [
+   "일지언정",
+   "지언정",
+   "망정"
+  ],
+  "zh": "宁愿……也；即使……也",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을밖에__no-choice-but-to",
+  "name": "(으)ㄹ밖에",
+  "slug": "no-choice-but-to",
+  "meaning": "Used when there is no other choice but the preceding state/action. This is an informal version of :grammar[을_수밖에_없다].",
+  "type": "verb",
+  "examples": [
+   "어른들이 다 가시니 나도 갈밖에.",
+   "선생님이 시키는데 할밖에.",
+   "주인이 내놓으라면 내놓을밖에."
+  ],
+  "focus": [
+   "내놓을밖에",
+   "할밖에",
+   "갈밖에"
+  ],
+  "zh": "只能……；除了……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을세__하게체-simple-statement",
+  "name": "(으)ㄹ세",
+  "slug": "하게체-simple-statement",
+  "meaning": "Used to express the speaker's thoughts or conjecture in the 하게체 speech level.",
+  "type": "verb",
+  "examples": [
+   "내 가게 문 닫으면 그 자가 춤출세.",
+   "이번 그림 참 좋을세그려.",
+   "“누구요?” “날세.”"
+  ],
+  "focus": [
+   "좋을세그려",
+   "춤출세",
+   "날세"
+  ],
+  "zh": "……（推测/约定）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을세__하게체-realization",
+  "name": "(으)ㄹ세",
+  "slug": "하게체-realization",
+  "meaning": "Express admiration after realizing something new, in the 하게체 speech level.",
+  "type": "verb",
+  "examples": [
+   "어머, 그게 바로 오늘일세.",
+   "그 생각 참 좋을세."
+  ],
+  "focus": [
+   "오늘일세",
+   "좋을세"
+  ],
+  "zh": "……（推测/约定）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을세__하게체-intention",
+  "name": "(으)ㄹ세",
+  "slug": "하게체-intention",
+  "meaning": "Express intention in the 하게체 speech level.",
+  "type": "verb",
+  "examples": [
+   "그럼 이따가 기별할세. 잘 가게.",
+   "아버님이 오시면 함께 먹을세."
+  ],
+  "focus": [
+   "기별할세",
+   "먹을세"
+  ],
+  "zh": "……（推测/约定）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을수록__the-more",
+  "name": "(으)ㄹ수록",
+  "slug": "the-more",
+  "meaning": "The more you do something, the more another thing happens.",
+  "type": "verb",
+  "examples": [
+   "빨리 걸을수록 더 피곤해요.",
+   "자주 만날수록 친해져요.",
+   "일찍 잘수록 건강해요."
+  ],
+  "focus": [
+   "만날수록",
+   "걸을수록",
+   "잘수록"
+  ],
+  "zh": "越……越……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_을지_ㄹ지__vague-doubt",
+  "name": "(으)ㄹ지(도)",
+  "slug": "vague-doubt",
+  "meaning": "Used to indicate the speaker's vague doubt.",
+  "type": "verb",
+  "examples": [
+   "내일 있을 중요한 시험을 잘 볼 수 있을지 걱정이 되어 잠을 설쳤다."
+  ],
+  "focus": [
+   "있을지"
+  ],
+  "zh": "是否会……；……与否",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_음__concept-noun",
+  "name": "(으)ㅁ",
+  "slug": "concept-noun",
+  "meaning": "Turns verbs or adjectives into abstract nouns representing a concept or idea.",
+  "type": "verb",
+  "examples": [
+   "죽음이 두렵다.",
+   "믿음은 중요한 가치이다.",
+   "잠이 부족하면 건강에 해로움이 생긴다."
+  ],
+  "focus": [
+   "음",
+   "움"
+  ],
+  "zh": "（名词化的）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_음__nominalization",
+  "name": "(으)ㅁ",
+  "slug": "nominalization",
+  "meaning": "Turns verbs or adjectives into nouns, often used in formal writing to state facts or make lists.",
+  "type": "verb",
+  "examples": [
+   "공부함이 즐겁다.",
+   "참석하지 못했음을 알려드립니다.",
+   "문제를 해결했음을 보고합니다."
+  ],
+  "focus": [
+   "음",
+   "함"
+  ],
+  "zh": "（名词化的）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_음__formal-ending",
+  "name": "(으)ㅁ",
+  "slug": "formal-ending",
+  "meaning": "Used at the end of sentences in formal writing to state facts or conclusions.",
+  "type": "verb",
+  "examples": [
+   "이상으로 보고를 마치겠음.",
+   "모든 준비가 완료되었음."
+  ],
+  "focus": [
+   "음"
+  ],
+  "zh": "（名词化的）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_음세__future-intention",
+  "name": "(으)ㅁ세",
+  "slug": "future-intention",
+  "meaning": "Expresses the speaker's enthusiastic intention to do something in the 하게체 speech level.",
+  "type": "verb",
+  "examples": [
+   "곧 밥을 먹음세.",
+   "그 일은 내가 함세.",
+   "커피를 사다 줌세."
+  ],
+  "focus": [
+   "먹음세",
+   "줌세",
+   "함세"
+  ],
+  "zh": "……吧（正式推测）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_읍시다_ㅂ시다__suggestion",
+  "name": "(으)ㅂ시다",
+  "slug": "suggestion",
+  "meaning": "Used to suggest or propose something with the listener, an intention of doing a certain action together.",
+  "type": "verb",
+  "examples": [
+   "경치가 좋아요. 여기에서 사진을 찍읍시다.",
+   "제가 매운 음식을 못 먹으니까 다른 음식을 먹읍시다.",
+   "길이 막혀요. 택시를 타지 맙시다."
+  ],
+  "focus": [
+   "먹읍시다",
+   "찍읍시다",
+   "맙시다"
+  ],
+  "zh": "……吧（提议）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_이라서_라서__reason-or-cause",
+  "name": "(이)라서",
+  "slug": "reason-or-cause",
+  "meaning": "Used for a reason or cause.",
+  "type": "verb",
+  "examples": [
+   "어머니 생신이라서 고향에 가야 돼요.",
+   "달리기 시합이 아니라서 제가 달리고 싶은 속도로 달릴 수 있어요.",
+   "제가 임산부라서 그러는데 이 자리에 앉아도 될까요?"
+  ],
+  "focus": [
+   "라서"
+  ],
+  "zh": "因为是……；所以……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_자__suggestion",
+  "name": "자",
+  "slug": "suggestion",
+  "meaning": "A way to express a suggestion to do a certain act together.",
+  "type": "verb",
+  "examples": [
+   "오늘 저녁엔 생선구이 실컷 먹자!",
+   "회사 끝나면 술 한 잔 하자."
+  ],
+  "focus": [
+   "자"
+  ],
+  "zh": "（提议）……吧；一……就……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_자__simultaneous-action",
+  "name": "자",
+  "slug": "simultaneous-action",
+  "meaning": "Indicates that the second action occurs **as** or **when** the first action is happening.",
+  "type": "verb",
+  "examples": [
+   "창문을 열자 바람이 들어왔다.",
+   "의자에 앉자 잠들었다.",
+   "차에서 연기가 나자 운전사는 차에서 뛰쳐나왔다."
+  ],
+  "focus": [
+   "자"
+  ],
+  "zh": "（提议）……吧；一……就……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_자고__quote-suggestion",
+  "name": "자고",
+  "slug": "quote-suggestion",
+  "meaning": "Used to indirectly convey someone's recommendation or suggestion.",
+  "type": "verb",
+  "examples": [
+   "아빠가 밥을 먹자고 했어.",
+   "이번 주말에 만나자고 말했다.",
+   "남자 친구가 주말에 극장에서 영화를 보자고 해요."
+  ],
+  "focus": [
+   "만나자고",
+   "보자고",
+   "먹자고"
+  ],
+  "zh": "提议……；叫……一起",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_자꾸나__suggestion",
+  "name": "자꾸나",
+  "slug": "suggestion",
+  "meaning": "A way to express a suggestion to do a certain act together. This is identical in meaning to :grammar[verb_자]{suggestion}, but carries a more intimate tone.",
+  "type": "verb",
+  "examples": [
+   "너만 먹지 말고 나도 좀 먹자꾸나.",
+   "더욱 부지런해지자꾸나.",
+   "같이 놀자꾸나."
+  ],
+  "focus": [
+   "부지런해지자꾸나",
+   "먹자꾸나",
+   "놀자꾸나"
+  ],
+  "zh": "（反复）一再……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_자마자__as-soon-as",
+  "name": "자마자",
+  "slug": "as-soon-as",
+  "meaning": "Indicates that something happens immediately at the end of an action.",
+  "type": "verb",
+  "examples": [
+   "비가 그치자마자 날씨가 추워졌다.",
+   "벨이 울리자마자 아이들은 방을 뛰쳐나갔다."
+  ],
+  "focus": [
+   "자마자"
+  ],
+  "zh": "一……就……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_잖아__reminding",
+  "name": "잖아",
+  "slug": "reminding",
+  "meaning": "Indicates that the speaker is reminding the listener of a reason they should be aware or might have forgotten.",
+  "type": "verb",
+  "examples": [
+   "지하철을 탑시다. 출퇴근 시간에는 차가 많이 밀리잖아요.",
+   "그렇게 싸우지 말고 사이좋게 지내. 둘이 친구잖아."
+  ],
+  "focus": [
+   "밀리잖아요",
+   "친구잖아"
+  ],
+  "zh": "不是……嘛（提醒）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_지__confirmation",
+  "name": "지",
+  "slug": "confirmation",
+  "meaning": "Used when the speaker want to confirm an already known fact with the listener or obtains the listener's agreement.",
+  "type": "verb",
+  "examples": [
+   "설마 그 사람이랑 다시 사귀고 싶은 건 아니지?"
+  ],
+  "focus": [
+   "아니지"
+  ],
+  "zh": "……之后（已多久）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "verb_지만__contrast",
+  "name": "지만",
+  "slug": "contrast",
+  "meaning": "Express a contrast between two clauses and the second clause is usually a contrast to the first clause.",
+  "type": "verb",
+  "examples": [
+   "조금 비싸지만 그래도 너무 맛있어요.",
+   "경고하지만 그것은 위험하다."
+  ],
+  "focus": [
+   "지만"
+  ],
+  "zh": "但是……；虽然……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "ㄹ_것이다__future-plan",
+  "name": "(으)ㄹ 것이다",
+  "slug": "future-plan",
+  "meaning": "Used to express a future plan.",
+  "type": "composite",
+  "examples": [
+   "저는 내일 학교에 갈 것입니다.",
+   "어디에서 팔 거예요?",
+   "토요일에는 소풍을 갈 거에요.",
+   "나는 주말에 집에서 푹 쉴 거야."
+  ],
+  "focus": [
+   "갈 것입니다",
+   "갈 거에요",
+   "팔 거예요",
+   "쉴 거야"
+  ],
+  "zh": "将……；（推测）会……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "ㄹ_것이다__supposition",
+  "name": "(으)ㄹ 것이다",
+  "slug": "supposition",
+  "meaning": "Expresses the speaker's supposition about a certain situation based on something heard, seen or personal experience.",
+  "type": "composite",
+  "examples": [
+   "생일 선물로는 스마트폰을 좋아할 거예요.",
+   "공사를 하는 동안 좀 시끄러울 거예요."
+  ],
+  "focus": [
+   "시끄러울 거예요",
+   "좋아할 거예요"
+  ],
+  "zh": "将……；（推测）会……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "ㄹ_바라다__hope",
+  "name": "을/를 바라다",
+  "slug": "hope",
+  "meaning": "Used to express the speaker's hope or wish for something to happen.",
+  "type": "composite",
+  "examples": [
+   "여러분의 성공을 기원하며 행복한 미래를 가지시길 바랍니다.",
+   "모두가 안전하게 돌아오시길 바랍니다.",
+   "모두의 행복을 바랍니다."
+  ],
+  "focus": [
+   "돌아오시길 바랍니다",
+   "가지시길 바랍니다",
+   "행복을 바랍니다"
+  ],
+  "zh": "希望……；盼望……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "ㄹ_뻔하다__something-almost-happened",
+  "name": "(으)ㄹ 뻔하다",
+  "slug": "something-almost-happened",
+  "meaning": "Indicate one's relief that a past event almost happened but did not.",
+  "type": "composite",
+  "examples": [
+   "친구와 통화하다가 음식을 다 태울 뻔했어요.",
+   "네가 전화하지 않았더라면 약속을 잊어버릴 뻔했어요.",
+   "너무 추워서 죽을 뻔했어요."
+  ],
+  "focus": [
+   "잊어버릴 뻔했어요",
+   "죽을 뻔했어요",
+   "태울 뻔했어요"
+  ],
+  "zh": "差点……；险些……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "ㄹ_수_있다__ability-or-possibility",
+  "name": "(으)ㄹ 수 있다/없다",
+  "slug": "ability-or-possibility",
+  "meaning": "A pattern to expresses when someone is able to do something or when something is possible.",
+  "type": "composite",
+  "examples": [
+   "운전할 수 있어요.",
+   "저는 그 사실을 믿을 수 없어요."
+  ],
+  "focus": [
+   "운전할 수 있어요",
+   "믿을 수 없어요"
+  ],
+  "zh": "能够/不能做……；有可能",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "ㄹ_수도_있다__possibility",
+  "name": "(으)ㄹ 수도 있다/없다",
+  "slug": "possibility",
+  "meaning": "Expresses that such a possibility also exists.",
+  "type": "composite",
+  "examples": [
+   "저 내일 시간이 없을 수도 있어요.",
+   "친구가 올 수도 있어요.",
+   "그렇게 많은 돈을 가지고 있는 것을 상상할 수도 없어요."
+  ],
+  "focus": [
+   "상상할 수도 없어요",
+   "없을 수도 있어요",
+   "올 수도 있어요"
+  ],
+  "zh": "也可能/不可能……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "거나_말거나__whether-or-not",
+  "name": "거나 말거나",
+  "slug": "whether-or-not",
+  "meaning": "Conveys a strong decision that something will happen regardless of the situation.",
+  "type": "composite",
+  "examples": [
+   "그녀가 이번 연구를 끝내거나 말거나 이미 많은 여성들한테 롤 모델이 되고 있어요.",
+   "새로운 영화를 보러 가거나 말거나 책 읽는 게 아이디어 얻는 데 더 좋대요",
+   "새로운 취미를 찾거나 말거나 일단 지금까지 하던 걸 계속할 거예요.",
+   "다이어트를 하거나 말거나 어쨌든 살은 이미 빠졌어요."
+  ],
+  "focus": [
+   "거나 말거나"
+  ],
+  "zh": "不管……；……与否",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "건_말건__whether-or-not",
+  "name": "건 말건",
+  "slug": "whether-or-not",
+  "meaning": "Conveys a strong decision that something will happen regardless of the situation in a casual way.",
+  "type": "composite",
+  "examples": [
+   "비가 오건 말건 산책은 할 거예요.",
+   "사람들이 이해하건 말건 제 생각은 바꾸지 않을 거예요.",
+   "시험 결과가 좋건 말건 최선을 다한 걸로 만족해요.",
+   "친구가 오건 말건 파티 음식은 준비해 놓을게요.",
+   "어머니가 허락하건 말건 여행 계획은 진행할 거예요."
+  ],
+  "focus": [
+   "건 말건"
+  ],
+  "zh": "不管……；无论……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "게_되다__made-to-become-a-certain-way",
+  "name": "게 되다",
+  "slug": "made-to-become-a-certain-way",
+  "meaning": "Expresses a change from one state to another or a change in situation as a result of someone else's action or the environment, regardless of the will of the subject.",
+  "type": "composite",
+  "examples": [
+   "요리를 잘하게 되었어요.",
+   "축구를 좋아하게 되었어요.",
+   "저는 버섯을 안 먹었었는데 먹게 됐어요."
+  ],
+  "focus": [
+   "좋아하게 되었어요",
+   "잘하게 되었어요",
+   "먹게 됐어요"
+  ],
+  "zh": "变得……；就……（结果）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "게_하다__To-influence-someone",
+  "name": "게 하다",
+  "slug": "To-influence-someone",
+  "meaning": "Used to express that the speaker caused, influenced or let someone do something",
+  "type": "composite",
+  "examples": [
+   "선생님은 학생들이 열심히 공부하게 했어요.",
+   "부모님이 제가 더 건강하게 살게 하셨어요.",
+   "저는 아이가 방을 청소하게 했어요."
+  ],
+  "focus": [
+   "게 하셨어요",
+   "게 했어요"
+  ],
+  "zh": "让……做……（使动）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "고_나니까__sequence-of-actions",
+  "name": "고 나니(까)",
+  "slug": "sequence-of-actions",
+  "meaning": "Indicates that an action or event happens after another action or event but with a reason or cause.",
+  "type": "composite",
+  "examples": [
+   "요리를 하고 나니까 주방이 매우 더러워졌어요.",
+   "오랫동안 무언가를 하고 나니 팔이 조금 아프네요."
+  ],
+  "focus": [
+   "하고 나니까",
+   "하고 나니"
+  ],
+  "zh": "……之后才……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "고_나면__sequence-of-actions",
+  "name": "고 나면",
+  "slug": "sequence-of-actions",
+  "meaning": "Indicates that an action or event happens after another action or event, but with a conditional relationship.",
+  "type": "composite",
+  "examples": [
+   "일을 다 마치고 나면 집에 갈 거예요.",
+   "운동을 하고 나면 샤워를 합니다."
+  ],
+  "focus": [
+   "마치고 나면",
+   "하고 나면"
+  ],
+  "zh": "一旦……就……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "고_나서__sequence-of-actions",
+  "name": "고 나서",
+  "slug": "sequence-of-actions",
+  "meaning": "Indicates that an action or event happens after another action or event.",
+  "type": "composite",
+  "examples": [
+   "저는 밥을 먹고 나서 숙제를 할 거예요.",
+   "저는 저녁을 먹고 나서 텔레비전을 봐요."
+  ],
+  "focus": [
+   "먹고 나서"
+  ],
+  "zh": "……之后",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "고_말겠다__strong-determination",
+  "name": "고 말겠다",
+  "slug": "strong-determination",
+  "meaning": "Expresses the speaker''s strong will or determination to do something or complete an action.",
+  "type": "composite",
+  "examples": [
+   "이번 프로젝트를 성공시키고 말겠습니다.",
+   "반드시 진실을 밝히고 말겠어요.",
+   "목표를 이루고 말겠다."
+  ],
+  "focus": [
+   "고 말겠습니다",
+   "고 말겠어요",
+   "고 말겠다"
+  ],
+  "zh": "非要……；一定要……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "고_말다__unintentional-result",
+  "name": "고 말다",
+  "slug": "unintentional-result",
+  "meaning": "Expresses that an action happened unintentionally, unexpectedly, or inevitably.",
+  "type": "composite",
+  "examples": [
+   "그만 화를 내고 말았어요.",
+   "친구의 비밀을 말하고 말았습니다.",
+   "다이어트 중인데 케이크를 먹고 말았어."
+  ],
+  "focus": [
+   "고 말았습니다",
+   "고 말았어요",
+   "고 말았어"
+  ],
+  "zh": "最终还是……了",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "고_보니까__realizing-something-after-acting",
+  "name": "고 보니(까)",
+  "slug": "realizing-something-after-acting",
+  "meaning": "Indicates a realization or conclusion after some action or event.",
+  "type": "composite",
+  "examples": [
+   "지하철에서 내리고 보니 가방이 없더라고요.",
+   "버스를 타고 보니까 반대 방향으로 가는 것이었어요."
+  ],
+  "focus": [
+   "고 보니까",
+   "고 보니"
+  ],
+  "zh": "……之后才发现……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "고_싶다__desire",
+  "name": "고 싶다",
+  "slug": "desire",
+  "meaning": "Used to express a desire or wish to do something.",
+  "type": "composite",
+  "examples": [
+   "한 친구를 만나고 싶습니다.",
+   "작년에 한국에 여행하고 싶었어요."
+  ],
+  "focus": [
+   "고 싶었어요",
+   "고 싶습니다"
+  ],
+  "zh": "想做……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "고_있다__ongoing-state",
+  "name": "고 있다",
+  "slug": "ongoing-state",
+  "meaning": "Expresses that an action is ongoing. This pattern is sometime mentioned as progressive tense.",
+  "type": "composite",
+  "examples": [
+   "지금 이메일를 쓰고 있어요.",
+   "저는 주말마다 운동하고 있어요."
+  ],
+  "focus": [
+   "고 있어요"
+  ],
+  "zh": "正在……；……进行中",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "곤_하다__habit",
+  "name": "곤 하다",
+  "slug": "habit",
+  "meaning": "Indicate a habitual action of the present or past.",
+  "type": "composite",
+  "examples": [
+   "사무실에서 퇴근하고 운동하곤 해요.",
+   "밤에 잠이 안 오면 음악을 듣곤 해요."
+  ],
+  "focus": [
+   "운동하곤 해요",
+   "듣곤 해요"
+  ],
+  "zh": "常常……；总是……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "기_마련이다__is-natural-or-inevitable",
+  "name": "기 마련이다",
+  "slug": "is-natural-or-inevitable",
+  "meaning": "Used to indicate the occurrence of something being natural or inevitable based on common facts or beliefs.",
+  "type": "composite",
+  "examples": [
+   "겨울이 아무리 추워도 봄은 오기 마련이다.",
+   "진실은 언젠가 드러나기 마련이니까 어디 두고 봅시다."
+  ],
+  "focus": [
+   "기 마련이니까",
+   "기 마련이다"
+  ],
+  "zh": "……是必然的；难免……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "기_일쑤이다__often-happens-in-a-negative-way",
+  "name": "기 일쑤이다",
+  "slug": "often-happens-in-a-negative-way",
+  "meaning": "Used to show that something happens often, usually in a bad way.",
+  "type": "composite",
+  "examples": [
+   "친구가 약속을 잊기 일쑤예요.",
+   "동생은 물건을 잃어버리기 일쑤예요."
+  ],
+  "focus": [
+   "잃어버리기 일쑤예요",
+   "잊기 일쑤예요"
+  ],
+  "zh": "动辄……；经常……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "기도_하다__Sometimes-it-happens",
+  "name": "기도 하다",
+  "slug": "Sometimes-it-happens",
+  "meaning": "Used to say sometimes the action happens.",
+  "type": "composite",
+  "examples": [
+   "저는 주말에는 맛있는 음식을 만들어 먹기도 해요.",
+   "저는 주말에 영화를 보기도 해요."
+  ],
+  "focus": [
+   "먹기도 해요",
+   "보기도 해요"
+  ],
+  "zh": "有时也……；也做过……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "기로_하다__make-a-promise-with-another-person-or-oneself",
+  "name": "기로 하다",
+  "slug": "make-a-promise-with-another-person-or-oneself",
+  "meaning": "Used to make a promise with another person or oneself.",
+  "type": "composite",
+  "examples": [
+   "건강 때문에 올해부터 담배를 끊기로 했어요.",
+   "우리는 3년 후에 결혼하기로 했습니다."
+  ],
+  "focus": [
+   "결혼하기로 했습니다",
+   "끊기로 했어요"
+  ],
+  "zh": "决定……；约好……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_것__change-sentence-to-noun",
+  "name": "는/(으)ㄴ/(으)ㄹ 것",
+  "slug": "change-sentence-to-noun",
+  "meaning": "Changes the sentence, or the verb phrase of a sentence, into a noun.",
+  "type": "composite",
+  "examples": [
+   "책을 읽는 것을 좋아해요.",
+   "우리는 다음 주에 갈 것이에요."
+  ],
+  "focus": [
+   "갈 것",
+   "는 것"
+  ],
+  "zh": "……的（名词化）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_것_같다__it-seems-like",
+  "name": "는/(으)ㄴ/(으)ㄹ 것 같다",
+  "slug": "it-seems-like",
+  "meaning": "Used to express a thought, guess, or assumption that one isn't fully certain of.",
+  "type": "composite",
+  "examples": [
+   "날씨가 추을 것 같아요.",
+   "파티가 재미있을 것 같아요.",
+   "여기에 아무도 없는 것 같아요.",
+   "점심 시간이 끝나서 제 친구가 이미 먹은 것 같아요.",
+   "좋은 사람인 것 같다."
+  ],
+  "focus": [
+   "은 것 같아요",
+   "을 것 같아요",
+   "는 것 같아요",
+   "인 것 같다"
+  ],
+  "zh": "好像……；似乎……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_길에__while-on-my-way",
+  "name": "는 길에",
+  "slug": "while-on-my-way",
+  "meaning": "Expresses that while en route to or from a place, another action takes place.",
+  "type": "composite",
+  "examples": [
+   "집에 가는 길에 빵을 샀어요.",
+   "시장에 들르는 길에 커피를 샀어요.",
+   "친구를 만나러 나가는 길에 책을 반납할 거예요.",
+   "회사에서 나오는 길에 꽃집에 들렀어요.",
+   "도서관에 가는 길에 편의점에 들를까요?"
+  ],
+  "focus": [
+   "는 길에"
+  ],
+  "zh": "……的路上；顺路……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_길이다__on-my-way",
+  "name": "는 길이다",
+  "slug": "on-my-way",
+  "meaning": "Used with motion verbs to indicate that the speaker is currently en route going to or coming from a place.",
+  "type": "composite",
+  "examples": [
+   "제가 집에 가는 길이에요.",
+   "지금 회사에서 나오는 길이에요.",
+   "산을 올라가는 길이에요.",
+   "지금 병원에 들어가는 길이에요.",
+   "어제는 산을 내려가는 길이었어요.",
+   "목사님이 지금 교회에 오시는 길이라고 했어요.",
+   "색연필을 사러 가는 길인데 혹시 필요한 것이 있어요?",
+   "제가 지금 집에 가는 길이라서 20분 후에 또 전화하면 안 돼요?"
+  ],
+  "focus": [
+   "는 길"
+  ],
+  "zh": "正在……（途中）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_김에__while-at-it",
+  "name": "는 김에",
+  "slug": "while-at-it",
+  "meaning": "Expresses doing another action while doing something else, taking advantage of the situation.",
+  "type": "composite",
+  "examples": [
+   "시장에 가는 김에 새로운 옷을 구경했어요.",
+   "모델 촬영을 준비하는 김에 메이크업도 연습했어요.",
+   "서울에 오는 김에 전시회에 들렀어요.",
+   "청소하는 김에 오래된 책도 정리했어요.",
+   "학교에 가는 김에 도서관에서 책을 빌렸어요.",
+   "해변에 가는 김에 사진을 많이 찍었어요.",
+   "자동차를 닦는 김에 내부 청소도 했어요.",
+   "시험 공부하는 김에 노트도 정리했어요.",
+   "게임하는 김에 새로운 캐릭터를 만들어 봤어요.",
+   "여행 준비하는 김에 비행기 표도 확인했어요."
+  ],
+  "focus": [
+   "는 김에"
+  ],
+  "zh": "趁……的机会；顺便……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_모양이다__guess-a-situation-after-observation",
+  "name": "(으)ㄴ/는 모양이다",
+  "slug": "guess-a-situation-after-observation",
+  "meaning": "Used to infer or guess a situation after observation.",
+  "type": "composite",
+  "examples": [
+   "하늘을 보니 곧 비가 올 모양이에요.",
+   "전화를 안 받는 걸 보니 집에 아무도 없는 모양이에요."
+  ],
+  "focus": [
+   "없는 모양이에요",
+   "올 모양이에요"
+  ],
+  "zh": "看起来……；……的样子",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_바람에__unintended-consequence",
+  "name": "는 바람에",
+  "slug": "unintended-consequence",
+  "meaning": "Used to indicate that something happened as an unintended consequence or result of a particular action or situation, often with a negative or unexpected outcome.",
+  "type": "composite",
+  "examples": [
+   "비가 오는 바람에 소풍을 취소했어요.",
+   "전기가 나가는 바람에 TV를 못 봤어요."
+  ],
+  "focus": [
+   "나가는 바람에",
+   "오는 바람에"
+  ],
+  "zh": "因为……（导致）；……的作用",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_반면에__expressing-contrast",
+  "name": "는 반면에",
+  "slug": "expressing-contrast",
+  "meaning": "Used to show that two clauses are contrasting or opposite to each other.",
+  "type": "composite",
+  "examples": [
+   "이 보고서는 이해하기 쉬운 반면에 다른 보고서들은 복잡합니다.",
+   "서울의 날씨는 추운 반면에 남쪽 지방은 따뜻합니다.",
+   "이 도시는 밤에는 조용한 반면에 낮에는 매우 붐벼요."
+  ],
+  "focus": [
+   "한 반면에",
+   "운 반면에"
+  ],
+  "zh": "相反……；……而……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_법이다__expressing-inevitability",
+  "name": "(으)ㄴ/는 법이다",
+  "slug": "expressing-inevitability",
+  "meaning": "Indicates that a certain situation or outcome is expected, natural, or bound to happen.",
+  "type": "composite",
+  "examples": [
+   "기대가 크면 실망도 큰 법이지.",
+   "싸고 품질이 좋은 물건은 잘 팔리는 법이다.",
+   "기대가 클수록 실망도 큰 법이죠.",
+   "노력하지 않으면 실패하는 법이다.",
+   "시간이 지나면 모든 것이 변하는 법이다."
+  ],
+  "focus": [
+   "는 법이다",
+   "큰 법이지",
+   "큰 법이죠"
+  ],
+  "zh": "……是常理；必然……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_셈이다__equivalent-to",
+  "name": "(으)ㄴ/는 셈이다",
+  "slug": "equivalent-to",
+  "meaning": "Expresses that something is practically the same as something else.",
+  "type": "composite",
+  "examples": [
+   "이번 촬영은 꽤 잘된 셈이에요.",
+   "그동안 열심히 준비했으니 거의 합격한 셈이죠.",
+   "이 정도면 절반은 성공한 셈이에요.",
+   "모델들이 많아 보여도 사실상 없는 셈이에요.",
+   "오늘 학교에서 발표를 성공적으로 마친 셈이었어요.",
+   "친구들과 파리 여행을 즐긴 셈이었어요.",
+   "우리가 박물관에서 본 것은 역사를 체험한 셈이에요.",
+   "이 과제는 거의 다 한 셈일 거예요.",
+   "이번 시험 결과를 보면 다음 학기에 합격한 셈일지도 몰라요."
+  ],
+  "focus": [
+   "긴 셈이었어요",
+   "친 셈이었어요",
+   "한 셈이에요",
+   "한 셈일지도",
+   "된 셈이에요",
+   "는 셈이에요",
+   "한 셈이죠",
+   "한 셈일"
+  ],
+  "zh": "……算起来；可以说是……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_셈이다__calculated-as",
+  "name": "(으)ㄴ/는 셈이다",
+  "slug": "calculated-as",
+  "meaning": "Indicates that something can be counted, interpreted, or calculated as another thing.",
+  "type": "composite",
+  "examples": [
+   "이 식당의 가격을 생각하면 정말 싼 셈이에요.",
+   "이 일을 10년 동안 했으니 이제 전문가인 셈이에요.",
+   "하루에 5시간씩 공부하면 한 달에 150시간을 공부한 셈이에요.",
+   "일주일에 다섯 번 밖에서 식사하면 거의 매일 외식하는 셈이에요."
+  ],
+  "focus": [
+   "인 셈이에요",
+   "는 셈이에요",
+   "한 셈이에요",
+   "싼 셈이에요"
+  ],
+  "zh": "……算起来；可以说是……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "는_편이다__tendency-to-do-something",
+  "name": "(으)ㄴ/는 편이다",
+  "slug": "tendency-to-do-something",
+  "meaning": "Expresses a tendency or habit to do or be something.",
+  "type": "composite",
+  "examples": [
+   "저는 다른 사람들보다 커피를 많이 마시는 편이에요.",
+   "회사 앞 식당이 음식도 맛있고 가격도 싼 편이에요.",
+   "오늘은 날씨가 좋은 편이에요."
+  ],
+  "focus": [
+   "마시는 편이에요",
+   "좋은 편이에요",
+   "싼 편이에요"
+  ],
+  "zh": "算是……；属于……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "다가_보니까__realization",
+  "name": "다(가) 보니(까)",
+  "slug": "realization",
+  "meaning": "Indicates a sudden realization or conclusion after doing an action continuously for quite some time.",
+  "type": "composite",
+  "examples": [
+   "책을 읽다가 보니 시간이 훌쩍 지나갔어요.",
+   "일을 하다가 보니까 실력이 늘었어요.",
+   "한국어를 매일매일 계속 하다 보니까 발음이 알아서 늘더라고요."
+  ],
+  "focus": [
+   "다가 보니까",
+   "다 보니까",
+   "다가 보니"
+  ],
+  "zh": "……着（做着）就发现……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "다가_보니까__causation",
+  "name": "다(가) 보니(까)",
+  "slug": "causation",
+  "meaning": "Used with 이다. It provides a reason or background for the following clause.",
+  "type": "composite",
+  "examples": [
+   "열아홉 살이다 보니까 솔직히 유치할 줄 알았는데 생각이 깊더라.",
+   "선생님이다 보니까 애들이 쓰는 신조어를 쉽게 배우게 돼요.",
+   "판매자가 말하는 가격이 말도 안 되게 비쌌는데, 절실히 필요로 하는 입장이다 보니 잔말 없이 살 수밖에 없었다."
+  ],
+  "focus": [
+   "다 보니까",
+   "다 보니"
+  ],
+  "zh": "……着（做着）就发现……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "다가_보면__result-of-consistency",
+  "name": "다(가) 보면",
+  "slug": "result-of-consistency",
+  "meaning": "Expresses a result that can happen when an action is done consistently for quite some time. Often used in suggestions.",
+  "type": "composite",
+  "examples": [
+   "강력계 형사로 활동하다 보면 위험에 처할 때도 있어서 호신술로 합기도 배웠죠.",
+   "그 선배와 함께 일하다 보면 좋은 호텔리어란 뭔지 곧 알게 될 겁니다.",
+   "헬스 꾸준히 가다 보면 살 빠질 거예요."
+  ],
+  "focus": [
+   "하다 보면",
+   "다 보면"
+  ],
+  "zh": "……做着做着就……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "다고_치다__assumption-hypothesis",
+  "name": "다고/라고 치다",
+  "slug": "assumption-hypothesis",
+  "meaning": "To assume or consider a hypothetical scenario as if it were true.",
+  "type": "composite",
+  "examples": [
+   "모든 학생이 숙제를 마쳤다고 치고 발표를 시작합시다.",
+   "그가 이 작품을 이해했다고 치고 설명을 생략할게요.",
+   "내일 아침에 운동한다고 치고 일찍 잠자리에 드세요.",
+   "코드가 이미 최적화되었다고 치고 테스트를 진행해 봅시다.",
+   "그 식단이 효과적이라고 치고 한 달 더 유지해볼까요?",
+   "그가 전문가라고 치고 그의 조언을 들어보겠습니다."
+  ],
+  "focus": [
+   "다고 치고",
+   "라고 치고"
+  ],
+  "zh": "就当……算；假定……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "다시피_하다__almost",
+  "name": "다시피 하다",
+  "slug": "almost",
+  "meaning": "Used to describe a situation where something is almost or practically the same or close to another action, but isn't exactly the same.",
+  "type": "composite",
+  "examples": [
+   "그 남자는 매일 집에서 살다시피 해요.",
+   "비가 너무 많이 와서 물에 잠기다시피 했어요.",
+   "그 여자는 삼겹살을 주식으로 하다시피 해요."
+  ],
+  "focus": [
+   "잠기다시피 했어요",
+   "하다시피 해요",
+   "살다시피 해요"
+  ],
+  "zh": "几乎等于……；可以说……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "단_말__Asking-for-confirmation",
+  "name": "(ㄴ/는)단/(이)란 말",
+  "slug": "Asking-for-confirmation",
+  "meaning": "Used to confirm what the other person said.",
+  "type": "composite",
+  "examples": [
+   "날씨가 춥고 스키를 가겠단 말이에요?",
+   "네가 어제 늦게 잤단 말이에요?",
+   "너는 지금 나한테 화났단 말이에요?"
+  ],
+  "focus": [
+   "단 말이에요"
+  ],
+  "zh": "意思是……；就是说……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "단_말__Emphasizing",
+  "name": "(ㄴ/는)단/(이)란 말",
+  "slug": "Emphasizing",
+  "meaning": "Used to emphasize what the speaker said.",
+  "type": "composite",
+  "examples": [
+   "다시 해보란 말이야",
+   "숙제하란 말이야",
+   "조용히 하란 말이야"
+  ],
+  "focus": [
+   "란 말이야"
+  ],
+  "zh": "意思是……；就是说……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "대신에__replace-an-action",
+  "name": "대신(에)",
+  "slug": "replace-an-action",
+  "meaning": "Indicates an action can be replaced or compensated by another.",
+  "type": "composite",
+  "examples": [
+   "저 대신에 주문좀 해주시겠어요?",
+   "밥 대신에 피자를 먹을래요?"
+  ],
+  "focus": [
+   "저 대신에",
+   "밥 대신에"
+  ],
+  "zh": "代替……；作为交换",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "동안__for-a-period-of-time",
+  "name": "동안",
+  "slug": "for-a-period-of-time",
+  "meaning": "Indicates the time period when a certain action begins and lasts until it ends.",
+  "type": "composite",
+  "examples": [
+   "어제 12 시간 동안 잤어요.",
+   "곰은 겨울 동안에 겨울잠을 자요."
+  ],
+  "focus": [
+   "겨울 동안에",
+   "시간 동안"
+  ],
+  "zh": "在……期间",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "때__when-an-action-occurs",
+  "name": "때",
+  "slug": "when-an-action-occurs",
+  "meaning": "Expresses the time when an action occurs or its duration.",
+  "type": "composite",
+  "examples": [
+   "방학 때 아르바이트를 해요.",
+   "7살 때 사진이에요."
+  ],
+  "focus": [
+   "방학 때",
+   "살 때"
+  ],
+  "zh": "……的时候",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "때문에__reason-or-cause",
+  "name": "때문에",
+  "slug": "reason-or-cause",
+  "meaning": "Expresses a reason or cause of a situation.",
+  "type": "composite",
+  "examples": [
+   "눈 때문에 길이 미끄러워요.",
+   "감기 때문에 병원에 갔어요."
+  ],
+  "focus": [
+   "감기 때문에",
+   "눈 때문에"
+  ],
+  "zh": "因为……；由于……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "만_해도__as-recently-as",
+  "name": "만 해도",
+  "slug": "as-recently-as",
+  "meaning": "When following an expression of time (-전, -까지, 때...), expresses that as recently as some point in the past, something was different or not the case.",
+  "type": "composite",
+  "examples": [
+   "10년 전만 해도, 우리 나라가 이렇게 양극화되지는 않았다.",
+   "어제까지만 해도 나는 그 사람이 사건에 관여했을 거라고는 생각도 못했어.",
+   "도서관에 들어올 때까지만 해도 공부할 의욕이 차고 넘쳐났는데 교과서 펴고 보니까 집중이 안 되더라고요.",
+   "그때만 해도 한국어를 잘 못했었어.",
+   "누구도 그를 한 달 전까지만 해도 노숙자라고 상상하지 못했을 것이다."
+  ],
+  "focus": [
+   "어제까지만 해도",
+   "전까지만 해도",
+   "때까지만 해도",
+   "그때만 해도",
+   "전만 해도"
+  ],
+  "zh": "就拿……来说；光是……就",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_가다__continuely",
+  "name": "아/어 가다",
+  "slug": "continuely",
+  "meaning": "Indicates an action in the present continues into the future.",
+  "type": "composite",
+  "examples": [
+   "한국어를 공부해 가겠습니다!",
+   "일이 잘 돼 가요?",
+   "시간이 지나면서, 저는 아버지를 더 닮아 가고 있어요!",
+   "살아가면서 힘든 일이 많지만 포기하지 않을 거예요!"
+  ],
+  "focus": [
+   "공부해 가겠습니다",
+   "닮아 가고 있어요",
+   "살아가면서",
+   "돼 가요"
+  ],
+  "zh": "（逐渐）……下去",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_가다__going-somewhere",
+  "name": "아/어 가다",
+  "slug": "going-somewhere",
+  "meaning": "Indicates an action moves away from the speaker and towards a destination or person.",
+  "type": "composite",
+  "examples": [
+   "식당까지 걸어 갔어요.",
+   "집에서 기다려 주세요. 치킨을 사 갈게요.",
+   "여기에서 먹어도 안 돼요. 음식을 가져가세요."
+  ],
+  "focus": [
+   "걸어 갔어요",
+   "가져가세요",
+   "사 갈게요"
+  ],
+  "zh": "（逐渐）……下去",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_가다__almost-done",
+  "name": "아/어 가다",
+  "slug": "almost-done",
+  "meaning": "Indicates an action that has started is still in progress but will soon end.",
+  "type": "composite",
+  "examples": [
+   "드라마가 다 끝나 가요.",
+   "물이 조금밖에 안 남아서 거의 다 마셔 가요.",
+   "이 책을 다 읽어 가요.",
+   "거의 다 도착해 가요. 조금만 더 기다려 주세요."
+  ],
+  "focus": [
+   "도착해 가요",
+   "마셔 가요",
+   "끝나 가요",
+   "읽어 가요"
+  ],
+  "zh": "（逐渐）……下去",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_가지다__time-order-of-two-actions",
+  "name": "아/어 가지다",
+  "slug": "time-order-of-two-actions",
+  "meaning": "Used to indicate time order of 2 actions, that the 1st action must be completed in order to do the 2nd action.",
+  "type": "composite",
+  "examples": [
+   "빨래해 가지고 걸고 있어요.",
+   "친구에게 책을 빌려 가지고 읽었어요."
+  ],
+  "focus": [
+   "빨래해 가지고",
+   "빌려 가지고"
+  ],
+  "zh": "……之后（拿着）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_가지다__reasoning",
+  "name": "아/어 가지다",
+  "slug": "reasoning",
+  "meaning": "Used to indicate reason or cause to do an action.",
+  "type": "composite",
+  "examples": [
+   "많이 먹어 가지고 너무 배불러요.",
+   "낮에 커피를 많이 마셔 가지고 밤에 잠을 못잤어요."
+  ],
+  "focus": [
+   "먹어 가지고",
+   "마셔 가지고"
+  ],
+  "zh": "……之后（拿着）……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_나가다__in-progress-action",
+  "name": "아/어 나가다",
+  "slug": "in-progress-action",
+  "meaning": "Marks an action as ongoing or in progress.",
+  "type": "composite",
+  "examples": [
+   "아무것도 없어도 너만 있으면 살아 나가겠지.",
+   "우리 아들이 일을 열심히 해나가고 있어."
+  ],
+  "focus": [
+   "살아 나가겠지",
+   "해나가고"
+  ],
+  "zh": "继续……下去",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_내다__overcoming-difficulty",
+  "name": "아/어 내다",
+  "slug": "overcoming-difficulty",
+  "meaning": "Marks an action as completed through much difficulty, effort, or time.",
+  "type": "composite",
+  "examples": [
+   "김치리더 덕분에 드디어 그 어려운 책을 읽어 냈습니다!",
+   "경찰 아저씨가 범인을 찾아냈다."
+  ],
+  "focus": [
+   "읽어 냈습니다",
+   "찾아냈다"
+  ],
+  "zh": "坚持……到底；终于……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_놓다__maintain",
+  "name": "아/어 놓다",
+  "slug": "maintain",
+  "meaning": "Indicates the continuation of a state after an action is being done or just maintaining a certain state.",
+  "type": "composite",
+  "examples": [
+   "음식 냄새가 많이 나서 창문을 열어 놨어요.",
+   "밖이 갑자기 어두워지고 저는 겁이 나서 커튼을 닫아 놓았어요.",
+   "열쇠를 서랍에 넣어놓았어."
+  ],
+  "focus": [
+   "닫아 놓았어요",
+   "열어 놨어요",
+   "넣어놓았어"
+  ],
+  "zh": "事先……好；……着",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_달다__request",
+  "name": "아/어 달다",
+  "slug": "request",
+  "meaning": "Asking for the act previously mentioned to be carried out.",
+  "type": "composite",
+  "examples": [
+   "친구가 갑자기 큰돈을 빌려 달라는데 어떻게 해야 할지 모르겠어.",
+   "아이는 잘못했다며 한 번만 용서해 달라고 아버지께 빌고 있었다."
+  ],
+  "focus": [
+   "달라는데",
+   "달라고"
+  ],
+  "zh": "请……给（请求）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_달라고__quote-favor-request",
+  "name": "아/어 달라고",
+  "slug": "quote-favor-request",
+  "meaning": "Used to pass along what the speaker has requested for another person to do something for them.",
+  "type": "composite",
+  "examples": [
+   "아빠가 쓰레기 버려달라고 하셨어요.",
+   "남동생이 나한테 도와 달라고 했어."
+  ],
+  "focus": [
+   "버려달라고",
+   "달라고"
+  ],
+  "zh": "（请）……给我（引用请求）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_대다__excessive-action",
+  "name": "아/어 대다",
+  "slug": "excessive-action",
+  "meaning": "This expression is used to show that something is done too much and keeps happening.",
+  "type": "composite",
+  "examples": [
+   "동생이 계속 울어 대서 머리가 아파요.",
+   "고양이가 밤에 울어 대서 잠을 못 잤어요."
+  ],
+  "focus": [
+   "울어 대서"
+  ],
+  "zh": "一个劲儿地……；不停地……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_두다__maintain",
+  "name": "아/어 두다",
+  "slug": "maintain",
+  "meaning": "Indicates the continuation of a state after an action is being done or just maintaining a certain state.",
+  "type": "composite",
+  "examples": [
+   "서랍 안에 중요한 것이 많아서 항상 잠가 둡니다.",
+   "코트는 이 옷걸이에 걸어 두세요.",
+   "라면을 많이 사 뒀어요."
+  ],
+  "focus": [
+   "잠가 둡니다",
+   "걸어 두세요",
+   "사 뒀어요"
+  ],
+  "zh": "事先……好；放着……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_두다__prepare",
+  "name": "아/어 두다",
+  "slug": "prepare",
+  "meaning": "Doing an action in advance to prepare for a future event.",
+  "type": "composite",
+  "examples": [
+   "발표할 때 실수하지 않으려면 연습을 많이 해 두세요."
+  ],
+  "focus": [
+   "해 두세요"
+  ],
+  "zh": "事先……好；放着……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_드리다__favor-request",
+  "name": "아/어 드리다",
+  "slug": "favor-request",
+  "meaning": "Indicate that you are doing something for the sake of others or to ask someone to do something for you.",
+  "type": "composite",
+  "examples": [
+   "에어컨을 켜 드릴까요?",
+   "고객님, 이 상품이 마음에 드시면 새 상품으로 포장해 드릴게요."
+  ],
+  "focus": [
+   "포장해 드릴게요",
+   "켜 드릴까요"
+  ],
+  "zh": "为……（敬语）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_마지않다__sincerely",
+  "name": "아/어 마지않다",
+  "slug": "sincerely",
+  "meaning": "Emphasizes that an action is being done sincerely.",
+  "type": "composite",
+  "examples": [
+   "올해는 좋은 일만 있으시길 바라 마지않습니다.",
+   "그대를 기대해마지않아 자꾸 먼 바다를 쳐다보오!",
+   "현우가 수빈이를 사랑해 마지아니한다."
+  ],
+  "focus": [
+   "사랑해 마지아니한다",
+   "바라 마지않습니다",
+   "기대해마지않아"
+  ],
+  "zh": "不住地……；……不已",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_버리다__completed",
+  "name": "아/어 버리다",
+  "slug": "completed",
+  "meaning": "Used after an action or event is finished and completed. It can refers to facts nothing remains after that or the speaker's feeling about it.",
+  "type": "composite",
+  "examples": [
+   "그 사람이 드디어 떠나 버렸어요.",
+   "건강을 위하여 담배를 끊어 버렸어요."
+  ],
+  "focus": [
+   "끊어 버렸어요",
+   "떠나 버렸어요"
+  ],
+  "zh": "……掉；……完了",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_보다__try",
+  "name": "아/어 보다",
+  "slug": "try",
+  "meaning": "Expresses the meaning of trying something out or experiencing an action.",
+  "type": "composite",
+  "examples": [
+   "김치를 먹어보세요.",
+   "제가 한번 읽어볼까요?"
+  ],
+  "focus": [
+   "읽어볼까요",
+   "먹어보세요"
+  ],
+  "zh": "试着……；……过",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_보이다__feelings-based-on-outward-appearance",
+  "name": "아/어 보이다",
+  "slug": "feelings-based-on-outward-appearance",
+  "meaning": "Conveys feelings based on some outward appearance.",
+  "type": "composite",
+  "examples": [
+   "마크 씨, 얼굴이 피곤해 보여요. 무슨 일 있어요?",
+   "도서관 앞에서 봤는데 많이 우울해 보였어요.",
+   "이 음식은 많이 매워 보이는데 괜찮아요?"
+  ],
+  "focus": [
+   "우울해 보였어요",
+   "피곤해 보여요",
+   "매워 보이는데"
+  ],
+  "zh": "看起来……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_봤자__no-use",
+  "name": "아/어 봤자",
+  "slug": "no-use",
+  "meaning": "Indicates that even if the first clause is true, it is no use or ineffective. The second clause is negative and often expresses a reason that the first clause is in vain.",
+  "type": "composite",
+  "examples": [
+   "권력이나 돈이 많아봤자 다 부질없더라고요.",
+   "울지 마. 울어봤자 해결되는 거 하나도 없어.",
+   "지금 바로 헬스 끊어봤자 당분간 꾸준히 다닐 시간 없을 것 같아.",
+   "이런 불편한 회식자리에 오래 남아봤자 신경질만 낼 거야."
+  ],
+  "focus": [
+   "아봤자",
+   "어봤자"
+  ],
+  "zh": "就算……也无济于事；再……也",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_빠지다__fall-into",
+  "name": "아/어 빠지다",
+  "slug": "fall-into",
+  "meaning": "Indicate becoming completely absorbed or immersed in the action or state.",
+  "type": "composite",
+  "examples": [
+   "그 그림이 너무 아름다워서 바라봐 빠져버렸어요.",
+   "소설이 너무 흥미로워서 밤새 읽어 빠졌어요.",
+   "그는 최근 도예를 빚어 빠져서 하루 종일 흙을 다루고 있어요.",
+   "게임을 해 빠져 시간 가는 줄 몰랐어요.",
+   "그녀는 요가를 연습해 빠져서 매일 열심히 운동하고 있어요.",
+   "그녀는 메이크업 튜토리얼을 봐 빠져서 매일 새로운 화장법을 시도해요.",
+   "로맨스 소설을 읽어 빠져서 휴대폰을 볼 시간도 없어요.",
+   "유럽 디저트 레시피를 만들어 빠져보니 이제 매주 새로운 케이크를 구워요.",
+   "그녀는 방탄소년단 영상을 봐 빠져 하루 종일 유튜브를 시청하고 있어요.",
+   "새로운 스킨케어 제품 정보를 찾아 빠져 밤늦게까지 인터넷을 뒤지고 있어요.",
+   "최신 패션 트렌드를 연구해 빠져 옷장 정리에 많은 시간을 쓰고 있어요.",
+   "인테리어 블로그를 보고 꾸며 빠져 집 안 분위기를 완전히 바꾸고 싶어 해요.",
+   "한복 디자인에 관심을 갖고 자료를 찾아 빠져 전통문화를 더 깊이 이해하게 되었어요."
+  ],
+  "focus": [
+   "봐 빠져버렸어요",
+   "어 빠졌어요",
+   "어 빠져보니",
+   "어 빠져서",
+   "해 빠져서",
+   "봐 빠져서",
+   "아 빠져",
+   "봐 빠져",
+   "해 빠져",
+   "며 빠져"
+  ],
+  "zh": "……得很；……极了",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_오다__up-till-now",
+  "name": "아/어 오다",
+  "slug": "up-till-now",
+  "meaning": "Indicates an action that started in the past continues into the present.",
+  "type": "composite",
+  "examples": [
+   "10년부터 한국에서 살아 왔어요.",
+   "제 선생님을 항상 믿어 와요?",
+   "나는 열심히 일해 왔어요.",
+   "이 순간을 기다려 왔어요."
+  ],
+  "focus": [
+   "기다려 왔어요",
+   "살아 왔어요",
+   "일해 왔어요",
+   "믿어 와요"
+  ],
+  "zh": "一直……（过来）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_오다__coming-from-somewhere",
+  "name": "아/어 오다",
+  "slug": "coming-from-somewhere",
+  "meaning": "Indicates an action comes from a destination/person or moves towards the speaker's current location.",
+  "type": "composite",
+  "examples": [
+   "치킨을 먹고 싶어? 그럼 지금 사 올게.",
+   "학생들이 교실에 들어왔어요.",
+   "책을 몇 권 가져와 주세요."
+  ],
+  "focus": [
+   "들어왔어요",
+   "사 올게",
+   "가져와"
+  ],
+  "zh": "一直……（过来）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_있다__continuing-state",
+  "name": "아/어 있다",
+  "slug": "continuing-state",
+  "meaning": "Expresses a continuing state of a completed action. The action has been completed, but the state still maintains itself.",
+  "type": "composite",
+  "examples": [
+   "얼굴에 상처가 아직 남아 있습니다.",
+   "버스 정류장에는 사람들이 줄을 서 있어요."
+  ],
+  "focus": [
+   "남아 있습니다",
+   "서 있어요"
+  ],
+  "zh": "……着；已处于……状态",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_주다__favor-request",
+  "name": "아/어 주다",
+  "slug": "favor-request",
+  "meaning": "Indicate that you are doing something for the sake of others or to ask someone to do something for you.",
+  "type": "composite",
+  "examples": [
+   "할아버지는 잉어를 강물에 놓아주었다.",
+   "여러분 벌써 포기하지 말아주세요! 제가 천천히 설명해 보겠습니다!"
+  ],
+  "focus": [
+   "놓아주었다",
+   "말아주세요"
+  ],
+  "zh": "为某人做……；帮……做",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_지다__change-in-state",
+  "name": "아/어 지다",
+  "slug": "change-in-state",
+  "meaning": "Express a change in state over time. Can only be used with descriptive verbs.",
+  "type": "composite",
+  "examples": [
+   "요즘 운동을 해서 살이 많이 빠졌어요.",
+   "공부를 하고 있는데 갑자기 방에 불이 꺼졌어요."
+  ],
+  "focus": [
+   "빠졌어요",
+   "꺼졌어요"
+  ],
+  "zh": "变得……；被……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어_하다__perceived-action",
+  "name": "아/어 하다",
+  "slug": "perceived-action",
+  "meaning": "Added to descriptive verbs to change turn them into action verbs and convey an emotion or sensation.",
+  "type": "composite",
+  "examples": [
+   "동생은 한국어 공부를 재미있어해요.",
+   "눈치가 없는 사람을 싫어해요."
+  ],
+  "focus": [
+   "재미있어해요",
+   "싫어해요"
+  ],
+  "zh": "感到……；显得……（第三人称）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "아어도_되다__permission-or-approval-for-a-behaviour",
+  "name": "아/어도 되다",
+  "slug": "permission-or-approval-for-a-behaviour",
+  "meaning": "Used to ask for permission or approval before doing a certain action",
+  "type": "composite",
+  "examples": [
+   "사진을 찍어도 돼요?",
+   "여기 앉아도 돼요?",
+   "창문을 열어도 돼요?"
+  ],
+  "focus": [
+   "앉아도 돼요",
+   "찍어도 돼요",
+   "열어도 돼요"
+  ],
+  "zh": "可以……；……也行",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "안_아요__negative-expression",
+  "name": "안 아요",
+  "slug": "negative-expression",
+  "meaning": "A pattern used to express the negative form of a verb.",
+  "type": "composite",
+  "examples": [
+   "저는 생선을 안 좋아해요.",
+   "아까 전화했었는데 왜 안 받았어?"
+  ],
+  "focus": [
+   "안 좋아해요",
+   "안 받았어"
+  ],
+  "zh": "不……（口语否定）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "어야_되다__necessity-to-do-something",
+  "name": "아/어야 되다/하다",
+  "slug": "necessity-to-do-something",
+  "meaning": "Express an obligation or necessity to do something.",
+  "type": "composite",
+  "examples": [
+   "내일 시험이 있어요. 그래서 공부해야 돼요.",
+   "감기에 걸리지 않기 위해서 따뜻한 옷을 입어야 해요.",
+   "늘 너무 피곤해요. 집에서 쉬어야 돼요."
+  ],
+  "focus": [
+   "공부해야 돼요",
+   "쉬어야 돼요",
+   "입어야 해요"
+  ],
+  "zh": "必须……；应该……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "었으면_좋겠다__person-wish-or-hope",
+  "name": "았/었으면 좋겠다",
+  "slug": "person-wish-or-hope",
+  "meaning": "Expresses a person's wish or hope about something that has yet to be realized.",
+  "type": "composite",
+  "examples": [
+   "따뜻한 봄에 결혼했으면 좋겠어요.",
+   "친구들하고 스키장에 갈거예요. 방학이 빨리 왔으면 좋겠어요.",
+   "차가 있었으면 좋겠어요.",
+   "크리스마스에 눈이 왔으면 좋겠어요."
+  ],
+  "focus": [
+   "결혼했으면 좋겠어요",
+   "있었으면 좋겠어요",
+   "왔으면 좋겠어요"
+  ],
+  "zh": "要是……就好了",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "었을_것__past-assumption",
+  "name": "(았/었/했)을 것",
+  "slug": "past-assumption",
+  "meaning": "Indicates an assumption about past events or potential outcomes of past events.",
+  "type": "composite",
+  "examples": [
+   "날씨가 좀 더 따뜻했다면 나갔을 거예요.",
+   "그 카메라를 싼다면 샀을 거예요.",
+   "아이가 배가 아팠을 것이다."
+  ],
+  "focus": [
+   "아팠을 것이다",
+   "나갔을 거예요",
+   "샀을 거예요"
+  ],
+  "zh": "（当时）会……的",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "에_대해서__about",
+  "name": "에 대해(서)",
+  "slug": "about",
+  "meaning": "When you want to talk about something",
+  "type": "composite",
+  "examples": [
+   "한국 패션 스타일에 대해 어떻게 생각해요?",
+   "사람들은 여행에 대해서 말이 많아요."
+  ],
+  "focus": [
+   "에 대해서",
+   "에 대해"
+  ],
+  "zh": "关于……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "에_따라서__depending-on",
+  "name": "에 따라(서)",
+  "slug": "depending-on",
+  "meaning": "Used to say depending on something.",
+  "type": "composite",
+  "examples": [
+   "날씨에 따라서 우산을 가져가요.",
+   "가격에 따라서 사람들의 선택이 달라져요.",
+   "날씨에 따라 옷을 고르는 것이 달라요."
+  ],
+  "focus": [
+   "날씨에 따라서",
+   "가격에 따라서",
+   "날씨에 따라"
+  ],
+  "zh": "根据……；按照……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "에_비해서__compared-to",
+  "name": "에 비해(서)/비하면",
+  "slug": "compared-to",
+  "meaning": "Used to compare two items.",
+  "type": "composite",
+  "examples": [
+   "택시를 타는 거에 비해 기차를 타는 건 더 싸요.",
+   "우리 아버지가 사진에 비하면 실물이 훨씬 낫거든요."
+  ],
+  "focus": [
+   "에 비하면",
+   "에 비해"
+  ],
+  "zh": "与……相比",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "에도_불구하고__despite-in-spite-of",
+  "name": "에도 불구하고",
+  "slug": "despite-in-spite-of",
+  "meaning": "Expresses that something occurs despite a certain situation or condition.",
+  "type": "composite",
+  "examples": [
+   "비에도 불구하고 그는 출근했다.",
+   "피곤함에도 불구하고 공부를 계속했다.",
+   "어려움에도 불구하고 포기하지 않았다.",
+   "실패에도 불구하고 다시 시도했다."
+  ],
+  "focus": [
+   "에도 불구하고"
+  ],
+  "zh": "尽管……仍然……；虽然……但",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "으나_마나__no-use",
+  "name": "(으)나 마나",
+  "slug": "no-use",
+  "meaning": "Express that doing something will not change the result; it's pointless to do it.",
+  "type": "composite",
+  "examples": [
+   "지금 가나 마나 그녀는 없을 거예요.",
+   "그 영화는 보나 마나 재미없을 거야.",
+   "그 책은 읽으나 마나 시간 낭비예요.",
+   "시험 공부를 하나 마나 결과는 똑같을 거야.",
+   "그 사람을 만나나 마나 시간 낭비예요.",
+   "하나 더 죽이나마나 손해 볼 거 없어! 어차피 무기징역이잖아. 어차피 못 나가는데.",
+   "벼락치기로 시험공부 하나마나 마찬가지이다."
+  ],
+  "focus": [
+   "으나 마나",
+   "나 마나",
+   "나마나"
+  ],
+  "zh": "做不做都一样；……也一样",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "으려고_하다__intending-to",
+  "name": "(으)려고 하다",
+  "slug": "intending-to",
+  "meaning": "Express an intention, desire or purpose to do something. The speaker expresses one's intention to do the act mentioned in the preceding statement.",
+  "type": "composite",
+  "examples": [
+   "염색을 하려고 하는데 요즘 무슨 색이 유행이에요?",
+   "날씨가 좋아서 공원에 가려고 해요.",
+   "일월에 운동을 시작하려고 하는 사람들이 많아요."
+  ],
+  "focus": [
+   "려고 하는데",
+   "려고 해요",
+   "려고 하는"
+  ],
+  "zh": "打算……；想……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "으려던_참이다__be-just-about-to",
+  "name": "(으)려던 참이다",
+  "slug": "be-just-about-to",
+  "meaning": "The speaker is just about to do something very soon.",
+  "type": "composite",
+  "examples": [
+   "기차를 타려던 참에 그를 만났다.",
+   "저녁을 먹으려던 참인데 같이 갈래요?"
+  ],
+  "focus": [
+   "먹으려던 참인데",
+   "타려던 참에"
+  ],
+  "zh": "正打算……的时候",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "으로_인하다__due-to",
+  "name": "(으)로 인하다",
+  "slug": "due-to",
+  "meaning": "Indicates the cause or reason for a certain situation or event.",
+  "type": "composite",
+  "examples": [
+   "비로 인해 경기가 취소되었습니다.",
+   "사고로 인해 길이 막혔어요.",
+   "지진으로 인해 많은 사람들이 피해를 입었습니다.",
+   "컴퓨터 문제로 인해 작업이 지연되었습니다."
+  ],
+  "focus": [
+   "으로 인해",
+   "로 인해"
+  ],
+  "zh": "因……导致；由……造成",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "으면_안_되다__not-allowed-to-do-an-action",
+  "name": "(으)면 안 되다",
+  "slug": "not-allowed-to-do-an-action",
+  "meaning": "Used to say a particular action is not allowed.",
+  "type": "composite",
+  "examples": [
+   "실내에서 담배를 피우면 안 돼요.",
+   "운전 중에 전화하면 안 돼요.",
+   "지금 길을 건너면 안 돼요."
+  ],
+  "focus": [
+   "면 안 돼요"
+  ],
+  "zh": "不可以……；不能……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "은_적이_있다__have-done",
+  "name": "(으)ㄴ 적이 있다/없다",
+  "slug": "have-done",
+  "meaning": "Indicates you have a certain experience in the past.",
+  "type": "composite",
+  "examples": [
+   "어릴 때 병원에 입원한 적이 있어요.",
+   "한국말을 몰라서 실수한 적이 있어요."
+  ],
+  "focus": [
+   "입원한 적이 있어요",
+   "실수한 적이 있어요"
+  ],
+  "zh": "曾经……过 / 从未……过",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "은_적이_있다__have-not-done",
+  "name": "(으)ㄴ 적이 있다/없다",
+  "slug": "have-not-done",
+  "meaning": "Indicates you not having a certain experience in the past",
+  "type": "composite",
+  "examples": [
+   "회사에 지각한 적이 없어요.",
+   "어릴 때 병원에 입원한 적이 없어요."
+  ],
+  "focus": [
+   "입원한 적이 없어요",
+   "지각한 적이 없어요"
+  ],
+  "zh": "曾经……过 / 从未……过",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "은_지__time-passed",
+  "name": "(으)ㄴ 지",
+  "slug": "time-passed",
+  "meaning": "Indicates how much time has passed since some situation or action occurred",
+  "type": "composite",
+  "examples": [
+   "저는 한국에 온 지 2년이 됐습니다.",
+   "담배 끊은 지 한 달 됐어요.",
+   "컴퓨터게임을 한 지 5시간이 넘었어요."
+  ],
+  "focus": [
+   "끊은 지",
+   "한 지",
+   "온 지"
+  ],
+  "zh": "……已经（多久）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "은_채로__in-the-state-of",
+  "name": "(으)ㄴ 채로",
+  "slug": "in-the-state-of",
+  "meaning": "Used to indicate that the following clause is performed whilst in the state or condition described before.",
+  "type": "composite",
+  "examples": [
+   "옷을 입은 채로 물에 들어가세요.",
+   "소포가 개봉된 채로 배달되었다."
+  ],
+  "focus": [
+   "은 채로",
+   "된 채로"
+  ],
+  "zh": "……着（保持状态）",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_길이_없다__no-way-of",
+  "name": "ㄹ/을 길이 없다",
+  "slug": "no-way-of",
+  "meaning": "There is no possible way or method to do something",
+  "type": "composite",
+  "examples": [
+   "그 사실을 확인할 길이 없다.",
+   "죽은 그 사람이 누구인지 알 길이 없어요.",
+   "이 문제를 해결할 길이 없어요.",
+   "진실을 밝힐 길이 없다.",
+   "우리가 언제 그 일을 끝낼지 알 길이 없어요."
+  ],
+  "focus": [
+   "알 길이 없어요",
+   "할 길이 없어요",
+   "힐 길이 없다",
+   "할 길이 없다"
+  ],
+  "zh": "没有办法……；无从……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_리가_없다__impossible-reasoning",
+  "name": "ㄹ/을 리가 없다",
+  "slug": "impossible-reasoning",
+  "meaning": "Indicates the speaker's disbelief or doubt",
+  "type": "composite",
+  "examples": [
+   "친구가 늦을 리가 없어요.",
+   "이 음식을 안 좋아할 리가 없어요."
+  ],
+  "focus": [
+   "안 좋아할 리가 없어요",
+   "늦을 리가 없어요"
+  ],
+  "zh": "不可能……；……才怪",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_막론하고__regardless-of",
+  "name": "을/를 막론하고",
+  "slug": "regardless-of",
+  "meaning": "Indicates that the noun is not considered in making a judgment or decision; regardless of noun",
+  "type": "composite",
+  "examples": [
+   "성별을 막론하고 지원할 수 있습니다.",
+   "날씨를 막론하고 행사는 예정대로 진행됩니다.",
+   "국적을 막론하고 모두 환영합니다.",
+   "계절을 막론하고 이곳은 아름답습니다.",
+   "경험을 막론하고 누구나 참여할 수 있어요."
+  ],
+  "focus": [
+   "를 막론하고",
+   "을 막론하고"
+  ],
+  "zh": "不论……；无论……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_만하다__be-worth-doing",
+  "name": "(으)ㄹ 만하다",
+  "slug": "be-worth-doing",
+  "meaning": "Indicates something is worth doing",
+  "type": "composite",
+  "examples": [
+   "이 영화가 정말 볼 만해요.",
+   "한국어는 공부할 만해요."
+  ],
+  "focus": [
+   "공부할 만해요",
+   "볼 만해요"
+  ],
+  "zh": "值得……；够得上……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_바에야__better-choice",
+  "name": "(으)ㄹ 바에야",
+  "slug": "better-choice",
+  "meaning": "Used when expressing a preference between two choices, where neither is ideal. The first choice is either not feasible or inappropriate, so the second choice is selected instead.",
+  "type": "composite",
+  "examples": [
+   "그 영화를 볼 바에야 차라리 책을 읽겠어요.",
+   "혼자 갈 바에야 친구랑 같이 가는 게 낫겠어요."
+  ],
+  "focus": [
+   "갈 바에야",
+   "볼 바에야"
+  ],
+  "zh": "与其……还不如……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_뿐만_아니라__not-only-but-also",
+  "name": "(으)ㄹ 뿐만 아니라",
+  "slug": "not-only-but-also",
+  "meaning": "Shows that one does A and also does B",
+  "type": "composite",
+  "examples": [
+   "정원에 점핑스파이더가 많을 뿐만 아니라 애완동물로도 키워요.",
+   "내 여자친구는 예쁠 뿐만 아니라 똑똑해요.",
+   "그는 음악을 잘 연주할 뿐만 아니라 노래도 잘 불러요."
+  ],
+  "focus": [
+   "쁠 뿐만 아니라",
+   "을 뿐만 아니라",
+   "할 뿐만 아니라"
+  ],
+  "zh": "不仅……而且……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_수밖에_없다__no-choice-but-to",
+  "name": "(으)ㄹ 수밖에 없다",
+  "slug": "no-choice-but-to",
+  "meaning": "Used when there is no other choice but the preceding state/action.",
+  "type": "composite",
+  "examples": [
+   "너무 빨리 운전해서, 차 손잡이를 꽉 잡을 수밖에 없었다.",
+   "금연법이 시행되면 PC방을 닫을 수밖에 없다."
+  ],
+  "focus": [
+   "을 수밖에 없었다",
+   "을 수밖에 없다"
+  ],
+  "zh": "只能……；不得不……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_위해서__purpose",
+  "name": "을/를 위해(서)",
+  "slug": "purpose",
+  "meaning": "Used when doing something to achieve a goal or for a specific purpose.",
+  "type": "composite",
+  "examples": [
+   "군인은 나라를 위해서 일하는 사람이에요.",
+   "건강을 위해서 매일 비타민을 먹고 있어요."
+  ],
+  "focus": [
+   "나라를 위해서",
+   "건강을 위해서"
+  ],
+  "zh": "为了……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_정도로__extent-of-an-action",
+  "name": "(으)ㄹ 정도로",
+  "slug": "extent-of-an-action",
+  "meaning": "Expresses degree of an action",
+  "type": "composite",
+  "examples": [
+   "너무 피곤할 정도로 많이 일했어요.",
+   "웃다가 울 정도로 재미있었어요."
+  ],
+  "focus": [
+   "피곤할 정도로",
+   "울 정도로"
+  ],
+  "zh": "……到……的程度",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_정도이다__to-the-extent-that",
+  "name": "(으)ㄹ 정도이다",
+  "slug": "to-the-extent-that",
+  "meaning": "Expresses the degree or extent of a state or action, showing that something is so [adjective/verb] that a certain result follows.",
+  "type": "composite",
+  "examples": [
+   "그는 너무 피곤해서 쓰러질 정도예요.",
+   "그 영화는 너무 감동적이어서 눈물이 계속 흘렀을 정도였어요.",
+   "이 음식은 너무 맛있어서 매일 먹고 싶을 정도예요.",
+   "밖이 너무 추워서 아무것도 할 수 없을 정도였어요."
+  ],
+  "focus": [
+   "을 정도였어요",
+   "을 정도예요",
+   "질 정도예요"
+  ],
+  "zh": "……到……的程度",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_줄_알다__knows-how-to-do-something",
+  "name": "(으)ㄹ 줄 알다/모르다",
+  "slug": "knows-how-to-do-something",
+  "meaning": "Used to say you know or have the ability to do something.",
+  "type": "composite",
+  "examples": [
+   "된장찌개를 맛있게 끓일 줄 알아요.",
+   "저는 잡채하고 스파게티를 만들 줄 알아요."
+  ],
+  "focus": [
+   "끓일 줄 알아요",
+   "만들 줄 알아요"
+  ],
+  "zh": "会做……；知道怎么……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_줄_알다__doesn't-know-how-to-do-something",
+  "name": "(으)ㄹ 줄 알다/모르다",
+  "slug": "doesn't-know-how-to-do-something",
+  "meaning": "Used to say you don't know or don't have the ability to do something.",
+  "type": "composite",
+  "examples": [
+   "휴대 전화로 사진을 보낼 줄 몰라요.",
+   "저는 영어를 할 줄 몰라요."
+  ],
+  "focus": [
+   "보낼 줄 몰라요",
+   "할 줄 몰라요"
+  ],
+  "zh": "会做……；知道怎么……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_테니까__reason-for-suggestion",
+  "name": "(으)ㄹ 테니(까)",
+  "slug": "reason-for-suggestion",
+  "meaning": "The second part of the sentence gives the speaker's advice or suggestion to the listener. The first part explains why the speaker is giving that advice or suggestion. '까' is sometimes omitted.",
+  "type": "composite",
+  "examples": [
+   "비가 올 테니까 우산을 가져 가세요.",
+   "일찍 일어날 테니까 늦지 말고 잘 준비하세요.",
+   "바쁠 테니까 오늘은 점심을 밖에서 먹자.",
+   "요리는 내가 할 테니 청소기 좀 돌려."
+  ],
+  "focus": [
+   "일어날 테니까",
+   "바쁠 테니까",
+   "올 테니까",
+   "할 테니"
+  ],
+  "zh": "（因为）会……；既然……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을_텐데__expected-future-situation",
+  "name": "(으)ㄹ 텐데",
+  "slug": "expected-future-situation",
+  "meaning": "Used to express an expected or intended future event.",
+  "type": "composite",
+  "examples": [
+   "내일 비가 올 텐데 우산을 챙겨 가세요.",
+   "지금쯤 도착했을 텐데 아직 오지 않았어.",
+   "일찍 일어날 텐데 왜 아직도 자고 있어요?"
+  ],
+  "focus": [
+   "도착했을 텐데",
+   "일어날 텐데",
+   "올 텐데"
+  ],
+  "zh": "应该会……；……才对吧",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을까_말까__whether-to-do-or-not",
+  "name": "(으)ㄹ까 말까",
+  "slug": "whether-to-do-or-not",
+  "meaning": "Express hesitation or indecision about doing something.",
+  "type": "composite",
+  "examples": [
+   "오늘 학교에 갈까 말까 생각 중이에요.",
+   "배가 안 고파서 점심을 먹을까 말까 해요.",
+   "나는 차를 살까 말까 장난스럽게 생각하고 있어요.",
+   "새로운 취미를 시작할까 말까 고민하고 있어요.",
+   "친구에게 전화할까 말까 망설이고 있어요."
+  ],
+  "focus": [
+   "을까 말까",
+   "할까 말까",
+   "갈까 말까",
+   "까 말까"
+  ],
+  "zh": "要不要……；纠结要不要……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을까_봐__concern-about-something",
+  "name": "(으)ㄹ까 봐",
+  "slug": "concern-about-something",
+  "meaning": "Indicates the speaker did, or is doing, something in the second clause because they are worried or afraid that what is mentioned in the first clause has happened or will happen.",
+  "type": "composite",
+  "examples": [
+   "주말에 날씨가 나쁠까 봐 걱정이에요.",
+   "중요한 일을 잊어버릴까 봐 수첩에 항상 메모해요.",
+   "살이 찔까 봐 기름진 음식 안 먹어요."
+  ],
+  "focus": [
+   "잊어버릴까 봐",
+   "나쁠까 봐",
+   "찔까 봐"
+  ],
+  "zh": "怕……；担心……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을까_하다__be-thinking-of",
+  "name": "(으)ㄹ까 하다",
+  "slug": "be-thinking-of",
+  "meaning": "The speaker is not sure about their plan or intention, and it might change.",
+  "type": "composite",
+  "examples": [
+   "오늘 저녁에 피자를 먹을까 해요.",
+   "이번 방학에는 한국 여행을 할까 해요."
+  ],
+  "focus": [
+   "먹을까 해요",
+   "할까 해요"
+  ],
+  "zh": "打算……；正想要……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을락_말락__close-to-happening",
+  "name": "(으)ㄹ락 말락",
+  "slug": "close-to-happening",
+  "meaning": "Expresses that an action is about to happen or really close to occurring with no indication of it actually happening or not.",
+  "type": "composite",
+  "examples": [
+   "비가 올락 말락 하는 날씨가 제일 싫거든요.",
+   "남편이 설득될락 말락 해서 조금 더 기다려줘.",
+   "요즘은 눈이 너무 올랑 말랑 하네요."
+  ],
+  "focus": [
+   "설득될락 말락",
+   "올락 말락",
+   "올랑 말랑"
+  ],
+  "zh": "差一点就……；将……不……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "을지도_모르다__possible-outcome",
+  "name": "(으)ㄹ지(도) 모르다",
+  "slug": "possible-outcome",
+  "meaning": "Used to indicate that something might happen or could possibly occur.",
+  "type": "composite",
+  "examples": [
+   "오늘 오후에 비가 올지도 몰라요.",
+   "바람이 많이 불어서 비행기가 출발할 수 있을지 모르겠습니다."
+  ],
+  "focus": [
+   "있을지 모르겠습니다",
+   "올지도 몰라요"
+  ],
+  "zh": "也许……；说不定……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "전에__before-a-certain-time",
+  "name": "전에",
+  "slug": "before-a-certain-time",
+  "meaning": "Used to say before a certain time or before an action",
+  "type": "composite",
+  "examples": [
+   "5년 전에 한국에 왔어요.",
+   "식사 전에 이 약을 드세요."
+  ],
+  "focus": [
+   "식사 전에",
+   "년 전에"
+  ],
+  "zh": "在……之前",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "중__when-an-action-occurs",
+  "name": "중",
+  "slug": "when-an-action-occurs",
+  "meaning": "Indicate that the subject is in the process of performing an action",
+  "type": "composite",
+  "examples": [
+   "나는 수업 중이에요. 나중에 전화할게요.",
+   "그 건물은 공사 중입니다."
+  ],
+  "focus": [
+   "공사 중입니다",
+   "수업 중이에요"
+  ],
+  "zh": "……当中",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "지_그렇다__gentle-suggestion",
+  "name": "지 그렇다",
+  "slug": "gentle-suggestion",
+  "meaning": "Used as -지 그래, -지 그래요, -지 그러세요 depending on the level of speech to suggest that the listener do something. -지 그래 and -지 그래요 are less direct / more gentle compared to other kinds of suggestions in 반말 and 존댓말 respectively, but -지 그러세요 is probably on the more direct side and should not be used to those above you.",
+  "type": "composite",
+  "examples": [
+   "그 단어를 모르면 사전에 찾아보지 그래요?",
+   "식당 구석에 저 의자 좀 치우지 그래요? 너무 낡아서 눈에 거슬려요.",
+   "이제 출발 좀 하지 그래?"
+  ],
+  "focus": [
+   "지 그래요",
+   "지 그래"
+  ],
+  "zh": "不如……；……怎么样",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "지_말다__prohibition",
+  "name": "지 말다",
+  "slug": "prohibition",
+  "meaning": "Used to requesting, persuading or ordering the listener not to do something.",
+  "type": "composite",
+  "examples": [
+   "기대도 하지 마.",
+   "복도에서 뛰지 마세요.",
+   "선생님이 내일 시험을 보니까 시험 시간에 늦지 말라고 했어요."
+  ],
+  "focus": [
+   "뛰지 마세요",
+   "늦지 말라고",
+   "하지 마"
+  ],
+  "zh": "别……；不要……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "지_못하다__lack-of-ability",
+  "name": "지 못하다",
+  "slug": "lack-of-ability",
+  "meaning": "A pattern to expresses the subject's inability to do something or the fact that something does not go according to the subject's will.",
+  "type": "composite",
+  "examples": [
+   "제 동생은 스케이트를 타지 못해요.",
+   "우리는 삼 일 동안 협상하였지만, 거래를 하지 못했습니다."
+  ],
+  "focus": [
+   "지 못했습니다",
+   "지 못해요"
+  ],
+  "zh": "没能……；无法……",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "지_않다__negative-expression",
+  "name": "지 않다",
+  "slug": "negative-expression",
+  "meaning": "A pattern used to express the negative form of a verb.",
+  "type": "composite",
+  "examples": [
+   "보고서를 오늘까지 내지 않아도 돼요.",
+   "돈이 부족해서 살 만한 집을 구하기가 쉽지 않아요."
+  ],
+  "focus": [
+   "지 않아요",
+   "지 않아도"
+  ],
+  "zh": "不……；否定",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "지_않아도_되다__behaviour-is-not-necessary",
+  "name": "지 않아도 되다",
+  "slug": "behaviour-is-not-necessary",
+  "meaning": "Used to say a particular behaviour is not necessary. It is the negative form of <f>아/어야 되다</f>.",
+  "type": "composite",
+  "examples": [
+   "유치원생은 버스 요금을 내지 않아도 돼요.",
+   "평일이니까 영화 표를 미리 사지 않아도 돼요."
+  ],
+  "focus": [
+   "내지 않아도 돼요",
+   "사지 않아도 돼요"
+  ],
+  "zh": "不用……也可以",
+  "level": "TOPIK 3-4"
+ },
+ {
+  "key": "후에__after-a-certain-period-of-time",
+  "name": "후에/뒤에",
+  "slug": "after-a-certain-period-of-time",
+  "meaning": "Used to say something happens after a certain period of time",
+  "type": "composite",
+  "examples": [
+   "한 달 후에 아기가 태어나요.",
+   "대학교를 졸업 뒤에 취직을 했어요."
+  ],
+  "focus": [
+   "한 달 후에",
+   "졸업 뒤에"
+  ],
+  "zh": "在……之后",
+  "level": "TOPIK 3-4"
+ }
+]

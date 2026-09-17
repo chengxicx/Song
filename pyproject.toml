@@ -73,6 +73,9 @@ japanese-sudachi = [
   "sudachipy>=0.6.0",
   "sudachidict-core>=0.2.0",
 ]
+korean = [
+  "kiwipiepy>=0.22.0",
+]
 
 [project.urls]
 Home = "https://github.com/luteorg/lute-v3"
