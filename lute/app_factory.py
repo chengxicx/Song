@@ -679,6 +679,12 @@ def _create_app(app_config, extra_config):
             JapaneseParser._invalidate_mecab_cache()
         except Exception:  # pylint: disable=broad-exception-caught
             pass
+        try:
+            from lute.parse.sudachi_parser import JapaneseSudachiParser
+
+            JapaneseSudachiParser._invalidate_cache()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
 
     @app.after_request
     def _no_cache_dynamic_pages(response):
