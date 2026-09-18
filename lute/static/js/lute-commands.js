@@ -190,6 +190,20 @@ function open_grammar_analysis() {
   // (LuteTermFormOpened) can restore the default view.
   function closeGrammarAnalysis() {
     $("#grammar-analysis-panel").remove();
+    // The hover rings live in their own layer on document.body, so removing the
+    // panel did not remove them: a ring shown when the panel closes stayed
+    // painted on the page for good.  Closing mid-hover is the common case, not
+    // an edge case -- clicking a word closes the panel, and the example is
+    // removed from the DOM before mouseleave can fire.  The leaves sat at
+    // absolute coordinates, so as soon as the text moved they ringed whatever
+    // had moved under them.
+    Array.prototype.forEach.call(
+      document.querySelectorAll(".grammar-ring-layer"),
+      function (layer) {
+        if (layer.luteRingCleanup) layer.luteRingCleanup();
+        layer.remove();
+      }
+    );
     if (!pane) return;
     pane.classList.remove("grammar-mode");
     if (window.matchMedia && window.matchMedia("(max-width: 980px)").matches) {
@@ -393,9 +407,15 @@ function open_grammar_analysis() {
         }
         window.addEventListener("scroll", updateActiveRings, { passive: true });
         window.addEventListener("resize", updateActiveRings);
+        // One layer per open, and these listeners are per layer too: without
+        // this they outlive the panel and every open adds another pair.
+        ringLayer.luteRingCleanup = function () {
+          window.removeEventListener("scroll", updateActiveRings);
+          window.removeEventListener("resize", updateActiveRings);
+        };
 
         function hideAllRings() {
-          activeRings.forEach(function (r) { r.ring.style.display = "none"; });
+          activeRings.forEach(function (r) { r.ring.remove(); });
           activeRings = [];
         }
 
