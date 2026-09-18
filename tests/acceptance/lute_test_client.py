@@ -138,7 +138,10 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         "Create a book with title, content from url, and languagename."
         self.visit("book/import_webpage")
         # "Text" is the default import type; switch to the web page form.
-        self.page.select_option("#import_type", "webpage")
+        # The type picker is a custom dropdown (icons per option), not a
+        # native select.
+        self.page.locator("#import-type-button").click()
+        self.page.locator('#import-type-menu [data-value="webpage"]').click()
         self.page.fill("#importurl", url)
         self.page.locator("#import").click()
         time.sleep(0.1)  # hack
