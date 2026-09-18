@@ -149,10 +149,13 @@ def report(state, top, keys):
         print()
         print("=== 指定条目 ===")
         for key in [k.strip() for k in keys.split(",") if k.strip()]:
-            rule = index.get(key)
+            rule = index.get(key) or {}
+            # A reviewed entry that carries no row still has a derived name
+            # (its fragment, or an example word), so say which it is.
+            note = "  (静默/不出行)" if rule.get("skipped") else ""
             print(
-                "  %6.1f%%  %-26s %s"
-                % (share.get(key, 0.0), (rule or {}).get("pattern", "?")[:26], key)
+                "  %6.1f%%  %-26s %s%s"
+                % (share.get(key, 0.0), rule.get("pattern", "?")[:26], key, note)
             )
 
     print()
