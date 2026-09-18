@@ -268,6 +268,47 @@ def test_short_kana_grammar_points_report_on_their_own(sentence, key):
 
 
 @pytest.mark.parametrize(
+    "sentence, key",
+    [
+        # The *short* alternative of a pattern's fragment list.  The derivation
+        # used to iterate only the "distinctive" fragments, so whenever a longer
+        # one qualified the shorter one never became a matcher at all -- these
+        # forms were silently unreported, not merely mis-titled.
+        ("この本は高くないです。", "ds_i-adjective-negative"),
+        ("明日は雨だろう。", "ds_darou-deshou-conjecture"),
+        ("安いけど、買わない。", "ds_ga-kedo-although"),
+    ],
+)
+def test_every_alternative_in_a_pattern_is_matched(sentence, key):
+    """"くない / くありません" is two forms; both have to match."""
+    assert key in _keys(sentence)
+
+
+def test_short_fragments_affect_the_title_not_the_matchers():
+    """
+    The kana-length rule picks the row's *title*, never which forms the entry
+    teaches.  i-adjective-negative matches both forms but is still titled with
+    its distinctive fragment, which is what keeps row names readable.
+    """
+    rule = next(r for r in _DATA_RULES if r["key"] == "ds_i-adjective-negative")
+    assert len(rule["derived"]) == 2, rule["derived"]
+    assert rule["pattern"] == "〜くありません"
+
+
+def test_question_words_are_aggregated_not_listed():
+    """
+    question-words-basic (何 / 誰 / どこ / いつ / どう / どうして) is the other
+    half of the こそあど series that koko-soko-asoko-doko already represents --
+    どこ appears in both -- and a question word is what the word popup answers.
+    Once the derivation stopped dropping its shorter fragments it reached a
+    third of all pages, so it joins the aggregated row rather than getting one.
+    """
+    for sentence in ("これは何ですか。", "いつ行きますか。", "どこにありますか。"):
+        assert "ds_question-words-basic" not in _keys(sentence), sentence
+    assert "basic_forms" in _keys("これは何ですか。")
+
+
+@pytest.mark.parametrize(
     "sentence, expected",
     [
         # A real quotative って after a plain form.
