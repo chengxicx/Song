@@ -504,13 +504,18 @@ _LATIN = re.compile(r"[A-Za-z\[\]]")
 # A fragment with no kanji and at most this many kana is too generic to be a
 # rule's own display name (です / ます / これ / ほど ...), so such an entry is
 # titled with its whole fragment list rather than its longest piece.  This
-# affects *naming only*: which entries get folded into the aggregated row is
-# decided by _FUNCTION_WORD_IDS below, never by the shape of the text.
+# affects *naming only*, and that is an invariant worth keeping: every fragment
+# still becomes a matcher, because a pattern that spells out alternatives means
+# all of them -- "い-adjective stem + くない / くありません" is two forms, and
+# letting the longer one hide the shorter one silently lost くない, だろう,
+# けど, どこ and a dozen more.  Which entries get folded into the aggregated row
+# is likewise decided by _FUNCTION_WORD_IDS below, never by the shape of the
+# text.
 _SHORT_KANA_LIMIT = 3
 
 # Entries that carry no grammar point of their own and are far too frequent to
 # give a row each: the copula / polite paradigm (です・ます・ました・だった), the
-# demonstratives and the counting question words.  Their sentences are folded
+# こそあど series and the counting question words.  Their sentences are folded
 # into one capped "basic forms" entry, the same treatment the hand-written
 # particle rules get.
 #
@@ -520,6 +525,11 @@ _SHORT_KANA_LIMIT = 3
 # regexes mis-fire in both directions -- "Noun + です" also matches ですら (N1,
 # "even"), "それ" also matches それで (N4, "therefore"), "あの" also matches
 # ほどの (N1).  Keep this list explicit and reviewed.
+#
+# question-words-basic (何 / 誰 / どこ / いつ / どう / どうして) joins them: it is
+# the same series as koko-soko-asoko-doko above, which どこ already appears in,
+# and once the derivation stopped dropping a pattern's shorter fragments it
+# reached 33% of pages -- and a question word is what the word popup answers.
 _FUNCTION_WORD_IDS = frozenset({
     "desu-polite-copula",
     "i-adj-desu-politeness",
@@ -530,6 +540,7 @@ _FUNCTION_WORD_IDS = frozenset({
     "kore-sore-are-demonstratives",
     "kono-sono-ano-dono-attributive",
     "koko-soko-asoko-doko",
+    "question-words-basic",
     "ikutsu-how-many",
     "ikura-how-much",
 })
@@ -1009,11 +1020,16 @@ def _load_level(level):
                 specs = [gap]
                 shown = [fragments[0], fragments[-1]]
             else:
-                # Prefer distinctive fragments for the title; an entry whose
-                # fragments are all short kana is titled with all of them (のに).
+                # Every fragment becomes a matcher.  The kana-length rule picks
+                # the *title*, never which forms the entry teaches: a pattern
+                # that spells out alternatives means all of them, and iterating
+                # `specific or fragments` instead dropped the shorter one
+                # whenever the longer one qualified -- くない next to
+                # くありません, だろう next to でしょう, けど, どこ / いつ --
+                # which is why those forms were never reported at all.
                 specific = [f for f in fragments if _is_specific(f)]
-                specs, shown = [], []
-                for fragment in specific or fragments:
+                specs, matched = [], []
+                for fragment in fragments:
                     if _covered_by_hand_written(fragment):
                         continue
                     # What the description says comes before this fragment
@@ -1022,10 +1038,13 @@ def _load_level(level):
                     spec = _fragment_spec(fragment, joined, example_tokens, prefix)
                     if spec is not None:
                         specs.append(spec)
-                        shown.append(fragment)
+                        matched.append(fragment)
                 if not specs:
                     rules.append(_make_data_rule(level, item, idx, skipped=True))
                     continue
+                # Title from the distinctive fragments; an entry whose
+                # fragments are all short kana is titled with all of them (のに).
+                shown = [f for f in matched if f in specific] or matched
 
         # Which row an entry lands in is a property of the entry, not of how
         # its pattern happens to be spelled: only the reviewed function-word
