@@ -364,9 +364,14 @@ function open_grammar_analysis() {
 
         // Full text for offset matching: keep punctuation so the backend's
         // character offsets line up with the rendered cells; drop only the
-        // reader's display artifacts (🔊 / zero-width space).
+        // reader's display artifacts (🔊 / zero-width space) and line
+        // breaks, which never appear inside the DOM cells (a newline in a
+        // book becomes a paragraph break, not a rendered character).
         function cleanText(t) {
-          return (t || "").replace(/🔊/g, "").replace(/\u200b/gi, "");
+          return (t || "")
+            .replace(/🔊/g, "")
+            .replace(/\u200b/gi, "")
+            .replace(/\r?\n/g, "");
         }
 
         // Media-driven books (mp3/subtitles) split one example across several
@@ -455,7 +460,9 @@ function open_grammar_analysis() {
         // target phrase (ignoring whitespace and punctuation).  Prefer a
         // single sentence node that contains the phrase outright; only when
         // none does (a phrase split across adjacent nodes, e.g. in media
-        // books) do we span the minimal set of sentences.
+        // books or a multi-line example) do we pick the *smallest* window of
+        // consecutive sentences that contains it, so unrelated sentences
+        // before the phrase are never swept into the ring.
         function findRuns(want) {
           var nodes = [];
           var i;
@@ -465,16 +472,20 @@ function open_grammar_analysis() {
             }
           }
           if (nodes.length) return nodes;
+          var best = null;
           for (i = 0; i < sentences.length; i++) {
             var acc = sentences[i].t;
             for (var j = i + 1; j < sentences.length; j++) {
               acc += sentences[j].t;
               if (acc.indexOf(want) !== -1) {
-                for (var k = i; k <= j; k++) nodes.push(sentences[k].el);
-                return nodes;
+                if (!best || j - i < best.j - best.i) best = { i: i, j: j };
+                break;
               }
               if (acc.length > want.length + 60) break;
             }
+          }
+          if (best) {
+            for (var k = best.i; k <= best.j; k++) nodes.push(sentences[k].el);
           }
           return nodes;
         }
@@ -519,10 +530,26 @@ function open_grammar_analysis() {
               // The backend reports exact matched-word offsets inside the
               // example sentence; fall back to the whole sentence when no
               // match info is available.
-              var example = cleanText(ex.sentence || exEl.textContent);
+              var rawExample = ex.sentence || exEl.textContent;
+              var example = cleanText(rawExample);
               if (!example) return;
+              // A multi-line example (line break inside the sentence, e.g.
+              // from subtitle books or an older analysis) has its backend
+              // offsets in the raw text, while cleanText drops the newlines;
+              // shift each offset by the newlines removed before it.
               var spans = (ex.matches || [])
-                .map(function (m) { return [m.start, m.end]; })
+                .map(function (m) {
+                  var s = m.start, e = m.end;
+                  // newlines before s and before e, in the raw text
+                  var nlBeforeS = 0, nlBeforeE = 0;
+                  for (var ri = 0; ri < e && ri < rawExample.length; ri++) {
+                    if (rawExample[ri] === "\n" || rawExample[ri] === "\r") {
+                      if (ri < s) nlBeforeS++;
+                      nlBeforeE++;
+                    }
+                  }
+                  return [s - nlBeforeS, e - nlBeforeE];
+                })
                 .filter(function (r) { return r[0] >= 0 && r[1] > r[0] && r[1] <= example.length; });
               if (!spans.length) spans = [[0, example.length]];
               var nodes = findRuns(stripText(example));
