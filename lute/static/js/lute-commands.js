@@ -575,7 +575,21 @@ function open_grammar_analysis() {
           return nodes;
         }
 
-        var dataItems = data || [];
+        // The hover binding below pairs each .grammar-item element with its
+        // data by array index.  The DOM is ordered by level group (N5 first),
+        // not by match order, so index into the same flattened order the
+        // renderer produced -- indexing the raw response bound every
+        // multi-level page's rows to the wrong data, and a row's hover rang
+        // another row's sentence (single-level pages were unaffected, which
+        // is why the screens that happened to be single-level looked fine).
+        var dataItems = [];
+        if (groups) {
+          groups.forEach(function (group) {
+            group.items.forEach(function (g) {
+              dataItems.push(g);
+            });
+          });
+        }
         Array.prototype.forEach.call(
           panel[0].querySelectorAll(".grammar-item"),
           function (item, itemIdx) {
