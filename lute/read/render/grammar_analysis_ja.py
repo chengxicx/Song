@@ -360,7 +360,13 @@ _N5_RULES = [
         "please do (for me)",
         ["窓を開けてください。", "ここに名前を書いてください。"],
         [
-            {"type": "regex", "re": re.compile(r"てください")},
+            # 動詞 + て/で + ください.  The で form is the same request -- 読んで,
+            # 遊んで, 死んで -- and a bare て-regex missed all of them, which is
+            # how 読んでください ended up reported as 〜ないでください.
+            {
+                "type": "tokens",
+                "conds": [_P("動詞"), _SURF_IN("て", "で"), _SURF("ください")],
+            },
         ],
     ),
     _rule(
@@ -661,16 +667,34 @@ _VOCAB_IDS = frozenset({
 _CONCEPT_IDS = frozenset({"jidoushi-tadoushi", "i-adjective-nonpast"})
 
 # Data entries whose pattern names a *form* rather than a literal string
-# ("Verb ない-form + で").  Their formation text is a list of examples of that
-# form, so the fallback that reads it titles the entry after whichever example
-# word comes first -- nai-de-without-doing came out as "〜言わないで", a row
-# that never appeared at all, because its examples are 食べないで / 言わないで /
-# しないで.  A pattern that names a form has to be matched on that form.
+# ("Verb ない-form + で"), or names one alongside a literal too short to stand
+# alone ("Verb-ない + でください").  Their formation text is a list of examples
+# of that form, so the fallback that reads it titles the entry after whichever
+# example word comes first.
+#
+#   nai-de-without-doing  came out as "〜言わないで", a row that never appeared
+#                         at all, because its examples are 食べないで /
+#                         言わないで / しないで.
+#   nai-de-kudasai        came out as a bare literal でください -- the ない of
+#                         its pattern was dropped, and で was too short to
+#                         survive -- which then matched *any* でください.  So
+#                         読んでください ("please read") was reported as
+#                         〜ないでください ("please don't"), the opposite
+#                         request, and 〜てください could not be reported
+#                         instead because the hand-written rule matched a bare
+#                         て.  Fixed at both ends: 〜てください now accepts
+#                         動詞 + て/で + ください, and this entry says what it
+#                         means.
+#
+# A general "the pattern names Verb-ない, so require ない in front" marker was
+# tried and withdrawn: it broke naku-mo-nai, whose fragment (くもない) already
+# carries ない's 連用 tail, so the required ない landed in the wrong place and
+# the entry stopped firing (2.8% of pages -> 0).
 #
 # Kept as a reviewed map rather than a general slot -> part-of-speech
-# translator, because the condition below is not inferable from the pattern:
-# "Verb ない-form + で" is 動詞 + ない + で, and Sudachi reports that ない as
-# 助動詞 -- no part-of-speech lookup would find it.
+# translator, because the conditions below are not inferable from the pattern:
+# "Verb ない-form + で" is 動詞 + ない + で and Sudachi reports that ない as
+# 助動詞, so no part-of-speech lookup would find it.
 #
 # Each spec is validated against the entry's own examples at load time (see
 # _load_level), so a library update that invalidates one falls back to the old
@@ -686,6 +710,20 @@ _SLOT_SPECS = {
                     {"pos1": "動詞"},
                     {"lemma": {"ない"}},
                     {"surface": "で"},
+                ],
+            }
+        ],
+    ),
+    "nai-de-kudasai": (
+        "ないでください",
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    {"lemma": {"ない"}},
+                    {"surface": "で"},
+                    {"surface": "ください"},
                 ],
             }
         ],
@@ -866,14 +904,28 @@ def _gap_spec(fragments, pattern, joined_examples, example_tokens):
     return spec
 
 
-# Literals already covered by the hand-written N5 rules above (their regex
-# specs).  A data rule whose fragment is covered by one of these is redundant
-# -- e.g. the data 〜てください entry vs. the hand-written "てください" rule.
+# Literals already covered by the hand-written N5 rules above.  A data rule
+# whose fragment is covered by one of these is redundant -- e.g. the data
+# 〜てください entry vs. the hand-written one.
 _HAND_WRITTEN_LITERALS = [
     spec["re"].pattern
     for rule in _N5_RULES
     for spec in rule["patterns"]
     if spec["type"] == "regex"
+] + [
+    # Fixed surfaces a hand-written *token* spec requires, for the same reason:
+    # whether 〜てください is spelled as a regex or as 動詞 + て + ください, it
+    # is still one rule, and the data entry it covers has to stay covered --
+    # deriving the list from the regex specs alone silently un-suppressed it and
+    # the panel showed 〜てください and 〜ください side by side.
+    #
+    # Listed by hand rather than derived from every hand-written token spec,
+    # because covering is per-*reading*: the hand-written 〜から is the reason
+    # reading, and letting its から count as covered also swallowed 〜てから
+    # ("after doing"), a different reading of the same particle.  Surfaces of
+    # one or two kana cannot over-reach here anyway -- they are too short to be
+    # a fragment of their own.
+    "ください",
 ]
 # Lemma specs of the hand-written rules (e.g. 〜たい), so a data entry for the
 # same inflected form is not reported a second time.
