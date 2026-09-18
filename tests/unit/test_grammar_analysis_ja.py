@@ -11,6 +11,7 @@ from lute.read.render.grammar_analysis_ja import (
     _FUNCTION_WORD_IDS,
     _N5_RULES,
     _PARTICLE_IDS,
+    _VOCAB_IDS,
     _ZH_DESC,
     analyze_japanese,
 )
@@ -430,13 +431,22 @@ def test_te_iru_does_not_overreach(sentence):
 def test_existence_and_progressive_are_reported_once():
     """
     〜がいます / 〜があります and 〜ています are the hand-written rules' job.
-    Their data entries derive a bare います literal -- which also matches the
-    います of 知っています -- so they are superseded rather than folded into
-    the basics row, where a stray います reads as an existence marker.
+    Their data entries derive a bare います / あります literal -- which also
+    matches the います of 知っています -- so they are superseded rather than
+    folded into the basics row, where a stray います reads as an existence
+    marker.
     """
     existence = _keys("庭に犬がいます。")
     assert "ga_imasu_arimasu" in existence
     assert "ds_imasu-existence-animate" not in existence
+
+    inanimate = _keys("机の上に本があります。")
+    assert "ga_imasu_arimasu" in inanimate
+    assert "ds_arimasu-existence-inanimate" not in inanimate
+
+    # ... including where both occur, so the panel shows the point once.
+    both = [e for e in analyze_japanese("犬がいます。本があります。") if "います" in e["name"]]
+    assert len(both) == 1, [e["name"] for e in both]
 
     progressive = _keys("今、本を読んでいます。")
     assert "te_iru" in progressive
@@ -509,3 +519,73 @@ def test_aggregated_entries_come_last():
     keys = [e["key"] for e in analyze_japanese("私は学生です。本を読みます。", display_lang="zh")]
     assert keys[-1] == "basic_particles"
     assert keys[-2] == "basic_forms"
+
+
+# --- reviewed vocabulary entries (see _VOCAB_IDS) --------------------------
+#
+# A row reading "〜時間 = ……小时" costs a row and teaches no grammar: the word
+# popup already answers that.  Which entries those are is reviewed by hand;
+# scripts/screen_grammar_library.py produces the candidates.
+
+_VOCAB_SENTENCES = [
+    ("三時間歩いた。", "ds_jikan-time-duration"),
+    ("友だちと一緒に行きます。", "ds_issho-ni-together"),
+    ("一番高い山に登った。", "ds_ichiban-superlative"),
+    ("毎週映画を見ます。", "ds_mai-every-prefix"),
+    ("何時に起きますか。", "ds_nanji-what-time"),
+    ("今日は何曜日ですか。", "ds_nanyoubi-day-of-week"),
+]
+
+
+@pytest.mark.parametrize("sentence,key", _VOCAB_SENTENCES)
+def test_vocabulary_entries_never_get_a_row(sentence, key):
+    "A reviewed vocabulary entry is silent even where its word occurs."
+    assert key not in _keys(sentence)
+
+
+def test_vocabulary_entries_keep_their_derived_spec():
+    """
+    These are skipped on review, not because their pattern yielded nothing:
+    "derived" keeps what the screen matched on, so the verdict can be
+    re-derived later instead of being a one-off judgement.
+
+    (The counter entries -- counter-tsu, Number + つ -- are listed for the same
+    reason but derive no spec at all; they were already skipped.)
+    """
+    for rid in ("jikan-time-duration", "issho-ni-together", "ichiban-superlative"):
+        rule = next(r for r in _DATA_RULES if r["key"] == "ds_" + rid)
+        assert rule["skipped"] is True
+        assert rule["patterns"] == [], "a skipped rule must carry no matcher"
+        assert rule["derived"], rid
+
+
+def test_vocab_ids_are_library_entries():
+    """
+    The reviewed list is frozen on purpose: a typo here would quietly screen
+    nothing, and adding an entry means someone read its panel row and decided
+    it is vocabulary.  Both are worth a test failure.
+    """
+    from scripts.screen_grammar_library import load_library
+
+    library = load_library()
+    assert _VOCAB_IDS <= set(library), sorted(_VOCAB_IDS - set(library))
+    assert len(_VOCAB_IDS) == 14, "changing the list is a review, not a patch"
+
+
+def test_vocabulary_screen_still_flags_the_vocab_ids():
+    """
+    The screen and the list must not drift apart.  If the library is
+    re-vendored or the derivation changes, the entries the list removes have
+    to still look like vocabulary to the screen -- otherwise the list is stale
+    and should be re-derived, not trusted.
+    """
+    from scripts.screen_grammar_library import screen
+
+    flagged = {rid for rid, _rule, _entry, _lits, _heads in screen()}
+    live = {
+        r["key"][3:]
+        for r in _DATA_RULES
+        if r["skipped"] and r["key"][3:] in _VOCAB_IDS and r["derived"]
+    }
+    assert live, "expected the reviewed vocabulary entries to derive a spec"
+    assert live <= flagged, sorted(live - flagged)
