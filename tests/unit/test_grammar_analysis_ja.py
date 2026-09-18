@@ -495,7 +495,17 @@ def test_existence_and_progressive_are_reported_once():
     assert "te_iru" in progressive
     assert "ds_te-imasu-progressive" not in progressive
 
-    basics = [e for e in analyze_japanese("今、本を読んでいます。") if e["key"] == "basic_forms"]
+    # 〜ています is not the polite ます -- see _NOT_AFTER -- so it feeds no
+    # basic form at all.  It used to, which is what put います in the row's
+    # title and in its highlighted examples.
+    progressive_entries = analyze_japanese("今、本を読んでいます。")
+    assert "basic_forms" not in [e["key"] for e in progressive_entries]
+
+    # The basics row itself names no existence marker.
+    basics = [
+        e for e in analyze_japanese("私は学生です。毎朝、コーヒーを飲みます。")
+        if e["key"] == "basic_forms"
+    ]
     assert basics, "expected at least one basic form on this sentence"
     assert "います" not in basics[0]["name"], basics[0]["name"]
 
@@ -793,3 +803,70 @@ def test_rules_are_named_after_their_own_pattern():
     assert named_from_examples == _FORMATION_NAMED, sorted(
         named_from_examples - _FORMATION_NAMED
     )
+
+
+# --- left-context exclusions (see _NOT_AFTER) -------------------------------
+#
+# "Verb + ます" cannot tell 知っ**て**い**ます** from 行き**ます**: the auxiliary
+# い is 動詞,非自立可能, and so are 行き / 来 / あり, so no part of speech
+# separates them.  What precedes the run does.
+
+
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        "店長は知っています。",
+        "彼は本を読んでいます。",       # で form of the te-form
+        "子供が遊んでいます。",
+        "もう食べてしまいました。",
+        "雨が降っていました。",
+        "書いておきました。",
+    ],
+)
+def test_te_chain_is_not_read_as_the_polite_suffix(sentence):
+    """
+    A 〜て + auxiliary chain is a grammar point of its own (〜ている, 〜てしまう,
+    〜ておく ...) and has its own row.  The polite-suffix row must not claim it:
+    it used to offer 知っています as an example of 〜ます, with います highlighted.
+    """
+    entries = analyze_japanese(sentence, display_lang="zh")
+    forms = [e for e in entries if e["key"] == "basic_forms"]
+    assert forms == [], [e["name"] for e in entries]
+
+
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        "毎朝、コーヒーを飲みます。",
+        "昨日、映画を見ました。",
+    ],
+)
+def test_polite_suffix_still_reports(sentence):
+    "The ordinary polite form is still a basic form."
+    assert "basic_forms" in _keys(sentence), sentence
+
+
+def test_polite_suffix_is_not_blocked_by_the_homograph_de():
+    """
+    The で of 電車**で**行きます ("go by train") is 助詞,格助詞 -- a bare て/で
+    exclusion would drop this sentence, which is an ordinary 〜ます.  Only the
+    te-form connective (助詞,接続助詞) may block.
+    """
+    for sentence in ("電車で行きます。", "東京で会いました。", "鉛筆で書きました。"):
+        assert "basic_forms" in _keys(sentence), sentence
+
+
+def test_not_after_is_wired_into_the_specs():
+    "Guards the reviewed list against a typo quietly excluding nothing."
+    from lute.read.render.grammar_analysis_ja import _NOT_AFTER, _TE_CONNECTIVE
+
+    from scripts.screen_grammar_library import load_library
+
+    library = load_library()
+    assert set(_NOT_AFTER) <= set(library), sorted(set(_NOT_AFTER) - set(library))
+    for rid, cond in _NOT_AFTER.items():
+        rule = next(r for r in _DATA_RULES if r["key"] == "ds_" + rid)
+        token_specs = [s for s in rule["patterns"] if s["type"] == "tokens"]
+        assert token_specs, rid
+        assert all(s.get("not_after") == cond for s in token_specs), rid
+    assert _TE_CONNECTIVE["pos2"] == "接続助詞"

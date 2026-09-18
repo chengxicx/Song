@@ -223,6 +223,15 @@ def _match_spans(rule, tokens, sentence_text):
             )
         else:  # tokens
             runs = _token_span_runs(spec["conds"], tokens)
+            # A token spec may name a token that must not sit immediately in
+            # front of the run (see _NOT_AFTER).  A run at the start of the
+            # sentence has nothing in front of it, so nothing excludes it.
+            if spec.get("not_after") is not None:
+                runs = [
+                    (s, e)
+                    for (s, e) in runs
+                    if s == 0 or not _match_condition(spec["not_after"], tokens[s - 1])
+                ]
         for start, end in runs:
             if end > start:
                 # A pattern may match up to (and including) the final
@@ -730,6 +739,28 @@ _SLOT_SPECS = {
     ),
 }
 
+# The て-form connective: Sudachi reports both the て of 知っ+て and the で of
+# 読ん+で as 助詞,接続助詞, while the homograph で of 電車で行きます ("go by
+# train") is 助詞,格助詞 -- a bare て/で test would drop that sentence too.
+_TE_CONNECTIVE = {"pos1": "助詞", "pos2": "接続助詞", "surface_in": ("て", "で")}
+
+# Data entries whose match must not sit directly after a given token.
+#
+# The polite suffixes are also how a 〜て + auxiliary chain closes, and "Verb +
+# ます" cannot tell the two apart: 知っ+て+い+ます tokenises as 動詞 + 助詞 +
+# 動詞(非自立可能) + 助動詞, so the ます entry matched the います of every
+# 〜ている, and the panel offered 知っています as an example of 〜ます with います
+# highlighted.  Those chains are grammar points in their own right and have
+# their own rows (〜ている, 〜てしまう, 〜てある, 〜ておく ...), so 〜ます must not
+# claim them.  The auxiliary's own part of speech cannot be used instead: 行き /
+# 来 / あり are 動詞,非自立可能 too, so nothing about the auxiliary separates it
+# from 行き -- what precedes it does.
+_NOT_AFTER = {
+    "masu-polite-verb": _TE_CONNECTIVE,
+    "mashita-polite-past-verb": _TE_CONNECTIVE,
+    "masendeshita-polite-past-negative-verb": _TE_CONNECTIVE,
+}
+
 # Widest 〜 gap tolerated between the two anchors of a gapped construction
 # (から ... にかけて).  Short windows keep the highlight tight.
 _ANCHOR_MAXGAP = 8
@@ -1005,6 +1036,8 @@ def _load_level(level):
       * an entry listed in ``_SLOT_SPECS`` whose pattern names a form rather
         than a literal string is matched on that form;
       * a gapped construction (から ... にかけて) becomes a two-anchor spec;
+      * a reviewed entry listed in ``_NOT_AFTER`` additionally names a token
+        that must not sit immediately in front of its match;
       * otherwise every contentful fragment becomes its own spec -- a literal
         substring regex when it occurs in the examples, else a lemma-based
         token spec so inflected forms still match (ようにする / ようにします);
@@ -1097,6 +1130,17 @@ def _load_level(level):
                 # Title from the distinctive fragments; an entry whose
                 # fragments are all short kana is titled with all of them (のに).
                 shown = [f for f in matched if f in specific] or matched
+
+        # See _NOT_AFTER: a reviewed entry whose match must not follow a
+        # particular token (ます after a て-form).  Added to the derived spec
+        # rather than written out, so the derivation stays the source of what
+        # the entry matches and only the left context is reviewed.
+        excluded = _NOT_AFTER.get(item.get("id") or "")
+        if excluded is not None:
+            specs = [
+                dict(spec, not_after=excluded) if spec.get("type") == "tokens" else spec
+                for spec in specs
+            ]
 
         # Which row an entry lands in is a property of the entry, not of how
         # its pattern happens to be spelled: only the reviewed function-word
