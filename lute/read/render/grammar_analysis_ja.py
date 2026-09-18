@@ -552,9 +552,15 @@ _FUNCTION_WORD_IDS = frozenset({
 #                        〜ている, but its fragments reduce to います, so it
 #                        showed up as a second row named "〜います" next to the
 #                        real 〜います.  て/で is handled by that rule.
+#   arimasu-existence-inanimate
+#                        the mirror of imasu-existence-animate: its pattern
+#                        yields the bare literal あります, which fires on the
+#                        existence verb wherever it appears, and the same
+#                        hand-written rule reports it.
 _SUPERSEDED_IDS = frozenset({
     "kara-cause",
     "imasu-existence-animate",
+    "arimasu-existence-inanimate",
     "te-imasu-progressive",
 })
 
@@ -562,6 +568,50 @@ _SUPERSEDED_IDS = frozenset({
 # particle row instead of getting a row each, the same treatment the
 # hand-written particle rules get.  (The "from" reading of から is a particle.)
 _PARTICLE_IDS = frozenset({"particle-kara-from"})
+
+# Data entries that are vocabulary, not grammar.  The panel answers "which
+# constructions are in this sentence"; Lute answers "what does 時間 mean" from
+# the word popup, so a row reading "〜時間 = ……小时" costs a row and teaches no
+# grammar.  These entries are dropped rather than folded into a third
+# aggregated row, which would repeat the "Basics:" mistake -- a bucket is only
+# useful when the things in it are worth studying together.
+#
+# The list is *derived*, not guessed: scripts/screen_grammar_library.py looks
+# for entries whose descriptive pattern carries no conjugation slot
+# ("Plain form", "Verb-て form", "ます-stem") and whose spec then degenerated to
+# a bare literal starting with a content word.  That screen is high-recall and
+# over-flags -- こと / つもり / はず / ところ / まま are also 名詞 and are real
+# points, まみれ / ぐるみ / 向け / 抜きで are 接尾辞 -- so its output was
+# reviewed entry by entry before landing here.  Only the groups below survived:
+# a row that restates the dictionary entry, and nothing more.
+#
+# Deliberately *not* here, though the screen flags them:
+#   ga-wakaru / ga-dekiru / ga-hoshii / ga-kikoeru-mieru
+#       "Noun + が + predicate" entries.  Their rows carry the が-marking,
+#       which the word popup does not.
+#   iwaba / nani-se / sorede / ...  (all under 4% of pages)
+#       N1/N2 discourse adverbs and conjunctions.  Lexical, but they are
+#       listed as grammar and cheap enough on the panel not to matter.
+_VOCAB_IDS = frozenset({
+    # number + counter: the counter's own reading is the point, and the word
+    # popup already shows it
+    "counter-tsu",
+    "counter-people-nin",
+    "counter-ji-oclock",
+    "counter-fun-minute",
+    "counter-sai-age",
+    "counter-en-money",
+    "counter-hon-long",
+    "counter-mai-flat",
+    "jikan-time-duration",
+    # calendar / time words
+    "mai-every-prefix",
+    "nanji-what-time",
+    "nanyoubi-day-of-week",
+    # lexical adverbs: the row repeats the word's gloss
+    "issho-ni-together",
+    "ichiban-superlative",
+})
 
 # Widest 〜 gap tolerated between the two anchors of a gapped construction
 # (から ... にかけて).  Short windows keep the highlight tight.
@@ -790,7 +840,14 @@ def _make_data_rule(level, item, idx, skipped, specs=None, shown=None, kind="con
         "meaning_zh": _ZH_BY_ID.get(item.get("id") or "", ""),
         "formation": item.get("formation") or "",
         "examples": [e["japanese"] for e in item.get("examples") or []],
+        # "patterns" is what the matcher reads, so an empty list is how a
+        # skipped rule stays silent.  "derived" keeps whatever the derivation
+        # did produce, for introspection: scripts/screen_grammar_library.py
+        # reads it to re-derive which entries look like vocabulary, and the
+        # tests check it to prove a skipped entry was skipped on purpose
+        # rather than because its pattern yielded nothing.
         "patterns": [] if skipped else (specs or []),
+        "derived": list(specs or []),
         "kind": kind,
         "skipped": skipped,
     }
@@ -811,7 +868,9 @@ def _load_level(level):
         as "Verb → potential form", fragments already covered by the
         hand-written N5 rules, or fragments too vague to match reliably --
         are marked ``skipped`` and never fire, so they cannot cause false
-        positives and never appear in the panel.
+        positives and never appear in the panel.  The reviewed vocabulary
+        ids (see _VOCAB_IDS) are skipped the same way, for a different
+        reason: their rows would only restate the word popup.
 
     The ``kind`` is then taken from the entry itself: only the reviewed
     function-word ids (see _FUNCTION_WORD_IDS) are folded into the aggregated
@@ -875,9 +934,12 @@ def _load_level(level):
         else:
             kind = "construction"
 
+        # A reviewed vocabulary entry is skipped *after* its spec is derived,
+        # so "derived" still records what the screen matched on.
+        skipped = item.get("id") in _VOCAB_IDS
         rules.append(
             _make_data_rule(
-                level, item, idx, skipped=False, specs=specs, shown=shown, kind=kind
+                level, item, idx, skipped=skipped, specs=specs, shown=shown, kind=kind
             )
         )
     return rules
