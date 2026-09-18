@@ -711,6 +711,17 @@ def _jp_fragments(text):
     Fragments keep only kana / kanji runs: Latin placeholders ("Noun",
     "V dict", "[adj]") and parenthetical qualifiers ("(non-past)") are
     dropped, which is what turns a description into something matchable.
+
+    Note the order in the body: the split comes first, and parentheses are
+    stripped out of each *segment*.  Doing it the other way round -- strip,
+    then split -- reads better and is wrong.  "お + V ます-stem + する (or ご +
+    Sino-Japanese noun + する)" would then yield the bare literal する, which
+    matches every する verb in the language: a 「〜する」 row appeared on 91.5%
+    of a 400-page corpus.  Those parentheticals hold the *rest of the
+    construction*, not a qualifier, so peeling them off frees a literal that
+    is not distinctive.  If the order is ever changed, every entry that gains
+    a fragment has to be reviewed -- scripts/measure_grammar_panel.py prints
+    the share of pages each row reaches, before and after.
     """
     if not text:
         return []
