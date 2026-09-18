@@ -4717,6 +4717,30 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     line-height: 1.3;
 }
 
+/* The aggregated "Basic forms" / "Particles" rows fire on nearly every page
+   and each carries a handful of examples, so they render pre-collapsed;
+   clicking the head (see lute-commands.js) folds them open. */
+.grammar-item--fold > .grammar-item__head {
+    cursor: pointer;
+    user-select: none;
+}
+
+.grammar-item__fold {
+    flex: none;
+    margin-left: auto;
+    font-size: 0.78em;
+    color: var(--g-text-2);
+    transition: transform 0.15s ease;
+}
+/* Expanded: the right-pointing chevron turns down. */
+.grammar-item--fold:not(.grammar-item--collapsed) .grammar-item__fold {
+    transform: rotate(90deg);
+}
+.grammar-item--collapsed .grammar-item__desc,
+.grammar-item--collapsed .grammar-item__examples {
+    display: none;
+}
+
 .grammar-item__desc {
     margin-top: 4px;
     font-size: 0.98em;
