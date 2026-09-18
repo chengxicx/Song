@@ -110,6 +110,28 @@ def test_subtitle_line_ending_in_match_does_not_overflow():
             assert s[m["start"] : m["end"]] == "から"
 
 
+def test_multiline_example_never_spans_the_line_break():
+    """
+    A logical sentence split by a hard line break (a newline in the raw
+    text becomes a paragraph break on the reading page) must not be
+    returned as one multi-line example: the front-end locates examples
+    against individual sentence nodes, and a newline-bearing example would
+    make it ring several unrelated sentences (e.g. 〜によって circling the
+    previous sentence too).
+    """
+    results = analyze_japanese(
+        "冬は十二月から二月ごろまでで、北の地方では雪がたくさん降ります。\n"
+        "季節によって食べ物や行事も変わる\n"
+        "ので、日本の生活はとても楽しいです。"
+    )
+    entry = next(e for e in results if "よっ" in e["name"])
+    for ex in entry["examples"]:
+        assert "\n" not in ex["sentence"], f"example spans a line break: {ex['sentence']!r}"
+    assert any(
+        ex["sentence"] == "季節によって食べ物や行事も変わる" for ex in entry["examples"]
+    )
+
+
 def test_analysis_return_shape():
     "Return entries have the fields the front-end panel renders."
     results = analyze_japanese("日本に行ったことがあります。")
