@@ -14,6 +14,10 @@
     background: var(--panel-bg, #fff); color: var(--font-color, #333);
   }
   .import-type-bar label { font-weight: 600; color: var(--font-color, #444); }
+  /* The type icon chip mirrors the selected import type.  It reuses the
+     home table's .type-chip look but is not clickable. */
+  #import-type-icon { cursor: default; }
+  #import-type-icon:hover { opacity: 1; }
 
   .import-form {
     max-width: 720px; background: var(--panel-bg, #fff);
@@ -76,6 +80,7 @@
 
 <div class="import-type-bar">
   <label for="import_type">Import type:</label>
+  <span id="import-type-icon" class="type-chip" aria-hidden="true"></span>
   <select id="import_type" name="import_type" class="import-type-select">
     <option value="text" selected>Text</option>
     <option value="webpage">Web page</option>
@@ -457,6 +462,7 @@
   </div>
 </div>
 
+<script type="text/javascript" src="{{ vstatic('js/book-type-icons.js') }}" charset="utf-8"></script>
 <script type="text/javascript">
   var EXISTING_TAGS = {{ existing_tags | tojson }};
 
@@ -511,6 +517,12 @@
       if (t !== 'epub') {
         epubPreviewPanel.hide();
       }
+      // The icon chip next to the select mirrors the chosen type.
+      const meta = BOOK_TYPE_META[t] || BOOK_TYPE_META.text;
+      $('#import-type-icon')
+        .html(book_type_icon_svg(t))
+        .css('background', book_type_tint(t, 0.12))
+        .attr('title', meta.label);
     };
 
     typeSel.on('change', updateForms);
