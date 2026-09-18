@@ -9,10 +9,6 @@
      compact theme menu-bar, which stacks above the content. */
   .import-type-bar { display: flex; align-items: center; gap: 10px; margin: 1rem 0 1.25rem; }
   .import-type-bar label { font-weight: 600; color: var(--font-color, #444); }
-  /* The type icon chip mirrors the selected import type.  It reuses the
-     home table's .type-chip look but is not clickable. */
-  #import-type-icon { cursor: default; }
-  #import-type-icon:hover { opacity: 1; }
 
   /* Custom dropdown for the import type: native <option> elements can't
      render the per-type icons.  The visible button + listbox replace the
@@ -41,11 +37,13 @@
   .import-type-menu li:hover,
   .import-type-menu li.itd-active { background: rgba(109, 169, 233, 0.16); }
   .import-type-menu li.itd-current { background: #3d7ecc; color: #fff; }
-  .import-type-menu .itd-ico {
+  /* The tinted icon square, shared by the closed button and every
+     listbox row so they render identically. */
+  .itd-ico {
     flex: 0 0 auto; width: 24px; height: 24px; border-radius: 6px;
     display: inline-flex; align-items: center; justify-content: center;
   }
-  /* The tinted icon square would sit muddily on the blue selected row. */
+  /* On the blue selected row the tinted square looks muddy. */
   .import-type-menu li.itd-current .itd-ico { background: rgba(255,255,255,.3) !important; }
 
   .import-form {
@@ -109,10 +107,10 @@
 
 <div class="import-type-bar">
   <label for="import-type-button">Import type:</label>
-  <span id="import-type-icon" class="type-chip" aria-hidden="true"></span>
   <div class="import-type-dd">
     <button type="button" id="import-type-button" class="import-type-btn"
             aria-haspopup="listbox" aria-expanded="false">
+      <span class="itd-ico" id="import-type-button-ico" aria-hidden="true"></span>
       <span id="import-type-label">Text</span>
       <svg class="itd-caret" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
@@ -580,11 +578,10 @@
       importType = v;
       const t = IMPORT_TYPES.find(function (x) { return x.value === v; }) || IMPORT_TYPES[0];
       $('#import-type-label').text(t.label);
-      const meta = BOOK_TYPE_META[v] || BOOK_TYPE_META.text;
-      $('#import-type-icon')
+      // Same tinted chip in the closed button and on every row.
+      $('#import-type-button-ico')
         .html(book_type_icon_svg(v))
-        .css('background', book_type_tint(v, 0.12))
-        .attr('title', meta.label);
+        .css('background', book_type_tint(v, 0.12));
       typeMenu.find('li').each(function () {
         const on = $(this).data('value') === v;
         $(this).attr('aria-selected', on ? 'true' : 'false').toggleClass('itd-current', on);
