@@ -4576,13 +4576,14 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 }
 
 /* JLPT level -> accent hue, so each grammar point is easy to scan.
-   Mid-tone hues keep the badges readable on both light and dark themes. */
-.grammar-item--N5 { --g-accent: #37b24d; }
-.grammar-item--N4 { --g-accent: #339af0; }
-.grammar-item--N3 { --g-accent: #f08c00; }
-.grammar-item--N2 { --g-accent: #845ef7; }
-.grammar-item--N1 { --g-accent: #e64980; }
-.grammar-item--N  { --g-accent: var(--btn-accent, #007aff); }
+   Mid-tone hues keep the badges readable on both light and dark themes.
+   The level group headers carry the same hue, so a level reads as one block. */
+.grammar-item--N5, .grammar-group--N5 { --g-accent: #37b24d; }
+.grammar-item--N4, .grammar-group--N4 { --g-accent: #339af0; }
+.grammar-item--N3, .grammar-group--N3 { --g-accent: #f08c00; }
+.grammar-item--N2, .grammar-group--N2 { --g-accent: #845ef7; }
+.grammar-item--N1, .grammar-group--N1 { --g-accent: #e64980; }
+.grammar-item--N,  .grammar-group--N  { --g-accent: var(--btn-accent, #007aff); }
 
 .grammar-analysis-panel__header {
     display: flex;
@@ -4642,6 +4643,40 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     text-align: center;
     color: color-mix(in srgb, var(--font-color, #000) 55%, transparent);
     font-size: 0.98em;
+}
+
+/* Level sections.  The panel body's direct children are groups, so its 10px
+   gap separates sections and the same gap separates the cards inside one. */
+.grammar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Sticky so the level stays visible while its cards scroll past -- the point
+   of the grouping is lost as soon as the header scrolls out of view. */
+.grammar-group__head {
+    position: sticky;
+    top: -12px;
+    z-index: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 0 4px;
+    background-color: var(--background-color, #fff);
+    border-bottom: 1px solid var(--g-rule);
+}
+
+.grammar-group__level {
+    font-size: 0.86em;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--g-accent);
+}
+
+.grammar-group__count {
+    font-size: 0.78em;
+    color: var(--g-text-2);
 }
 
 .grammar-item {
