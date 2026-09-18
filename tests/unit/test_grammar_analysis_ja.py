@@ -158,7 +158,7 @@ def test_is_japanese_language_detection():
 
 
 def test_data_rules_loaded_for_all_levels():
-    "Data-driven rules are loaded for N4/N3/N2/N1 with the needed fields."
+    "Data-driven rules are loaded for N5-N1 with the needed fields."
     for level in _ALL_LEVELS:
         rules = [r for r in _DATA_RULES if r["level"] == level]
         assert rules, f"no data rules loaded for {level}"
@@ -168,42 +168,191 @@ def test_data_rules_loaded_for_all_levels():
             assert r["examples"]
 
 
+def test_full_jlpt_library_is_loaded():
+    "The whole curated JLPT grammar library is present, not just a sample."
+    assert len(_DATA_RULES) >= 590
+    by_level = {lvl: len([r for r in _DATA_RULES if r["level"] == lvl]) for lvl in _ALL_LEVELS}
+    assert by_level == {"N5": 77, "N4": 89, "N3": 130, "N2": 149, "N1": 150}, by_level
+    # The great majority of entries must be usable matchers rather than
+    # skipped: entries only get skipped for good reason (see _load_level).
+    active = [r for r in _DATA_RULES if not r["skipped"]]
+    assert len(active) >= 480, f"only {len(active)} of {len(_DATA_RULES)} rules are active"
+
+
 def test_each_data_rule_matches_its_own_examples():
-    "Every non-skipped data rule fires on a text built from its own examples."
+    """
+    Every non-skipped data rule fires on a text built from its own examples.
+    Basic-form rules are folded into one aggregated entry, the same way
+    particles are.
+    """
     active = [r for r in _DATA_RULES if not r["skipped"]]
     assert active, "expected some active data rules"
     for rule in active:
         text = "".join(rule["examples"])
         hits = _keys(text)
-        assert rule["key"] in hits, f"data rule {rule['key']} did not match its own examples"
+        expected = "basic_forms" if rule["kind"] == "basic" else rule["key"]
+        assert expected in hits, f"data rule {rule['key']} did not match its own examples"
 
 
 def test_no_particles_in_levels():
-    "N4-N1 data rules are all constructions; none is folded into a particle entry."
+    "N4-N1 data rules are constructions/basics; none is a hand-written particle."
     for rule in _DATA_RULES:
-        assert rule.get("kind") != "particle", (
-            f"data rule {rule['key']} should not be a particle"
-        )
+        assert rule.get("kind") in ("construction", "basic"), rule["key"]
+
+
+def test_basic_form_rules_are_aggregated_not_listed():
+    """
+    です / ます and friends appear in most sentences; they are reported as one
+    capped "Basics" entry instead of one entry per form.
+    """
+    results = analyze_japanese("私は学生です。毎日本を読みます。", display_lang="zh")
+    keys = [e["key"] for e in results]
+    assert "basic_forms" in keys
+    assert not [k for k in keys if k.startswith("ds_") and "desu" in k]
+    basics = next(e for e in results if e["key"] == "basic_forms")
+    assert basics["name"].startswith("Basics: ")
+    assert "です" in basics["name"]
 
 
 def test_chinese_display_language():
-    "display_lang='zh' yields Chinese desc for hits; default stays English."
+    "display_lang='zh' yields the curated Chinese gloss; default stays English."
     zh = analyze_japanese("毎日運動することにした。", display_lang="zh")
-    hit = next(e for e in zh if e["key"] == "cl_kotonisuru_n4_0")
+    hit = next(e for e in zh if e["key"] == "ds_koto-ni-suru-decide")
     assert re.search(r"[\u4e00-\u9fff]", hit["desc"]), (
         f"expected Chinese desc, got: {hit['desc']!r}"
     )
+    assert not hit["desc"].isascii()
 
     en = analyze_japanese("毎日運動することにした。")
-    en_hit = next(e for e in en if e["key"] == "cl_kotonisuru_n4_0")
-    rule = next(r for r in _ALL_RULES if r["key"] == "cl_kotonisuru_n4_0")
-    assert en_hit["desc"] == rule["meaning"] == "decide to do"
+    en_hit = next(e for e in en if e["key"] == "ds_koto-ni-suru-decide")
+    rule = next(r for r in _ALL_RULES if r["key"] == "ds_koto-ni-suru-decide")
+    assert en_hit["desc"] == rule["meaning"]
+    assert "decide" in rule["meaning"]
 
 
-def test_zh_table_covers_all_patterns():
-    "Every rule pattern in _ALL_RULES has a Chinese translation entry."
+def test_zh_glosses_cover_the_whole_library():
+    "Every data rule carries a Chinese gloss (zh.json covers every entry id)."
+    missing = [r["key"] for r in _DATA_RULES if not r.get("meaning_zh")]
+    assert missing == [], f"{len(missing)} rules without a Chinese gloss: {missing[:5]}"
+    for rule in _DATA_RULES:
+        assert re.search(r"[\u4e00-\u9fff]", rule["meaning_zh"]), rule["key"]
+
+
+def test_zh_table_still_covers_hand_written_rules():
+    "The legacy hand-written N5 table is still complete for its own rules."
     assert _ZH_DESC, "translation table must not be empty"
-    missing = [r["pattern"] for r in _ALL_RULES if r["pattern"] not in _ZH_DESC]
+    hand_written = [r for r in _ALL_RULES if r["key"] in {n["key"] for n in _N5_RULES}]
+    missing = [r["pattern"] for r in hand_written if r["pattern"] not in _ZH_DESC]
     assert missing == []
     for value in _ZH_DESC.values():
         assert re.search(r"[\u4e00-\u9fff]", value), f"non-Chinese desc: {value!r}"
+
+
+# ---- regression tests for the full-library matching rules ----------------
+
+
+def test_reported_sentence_now_matches_grammar():
+    """
+    私はどれほど驚いたでしょう (book 271) matched nothing when only the
+    hand-written N5 rules existed: は was not a rule, and neither ほど nor
+    でしょう was in the library.  でしょう is an N4 point (だろう / でしょう),
+    so it must be reported now.
+    """
+    results = analyze_japanese("私はどれほど驚いたでしょう。", display_lang="zh")
+    assert "ds_darou-deshou-conjecture" in {e["key"] for e in results}
+    hit = next(e for e in results if e["key"] == "ds_darou-deshou-conjecture")
+    assert hit["level"] == "N4"
+    ex = hit["examples"][0]
+    assert ex["sentence"] == "私はどれほど驚いたでしょう。"
+    for m in ex["matches"]:
+        assert ex["sentence"][m["start"] : m["end"]] == "でしょう"
+
+
+def test_hodo_and_hai_are_at_least_recognised():
+    "ほど is folded into the basics entry; the topic は is a particle point."
+    keys = _keys("私はどれほど驚いたでしょう。")
+    assert "basic_forms" in keys
+
+
+@pytest.mark.parametrize(
+    "sentence, expected",
+    [
+        ("ここで食べてもいいですか。", "ds_te-mo-ii-permission"),
+        ("ここで写真を撮ってはいけません。", None),
+        ("期限などどうでもいいです。", None),  # どうでもいい is not 〜てもいい
+    ],
+)
+def test_te_form_prefix_constraint(sentence, expected):
+    """
+    A "Verb-て + X" entry must really see a verb + て in front of X: the で of
+    どうでもいい must not be mistaken for a て form.
+    """
+    keys = _keys(sentence)
+    if expected:
+        assert expected in keys, f"expected {expected} for {sentence}"
+    else:
+        assert "ds_te-mo-ii-permission" not in keys, f"false positive on {sentence}"
+
+
+def test_gapped_construction_needs_both_anchors():
+    "〜から...にかけて (a gapped point) fires only when both anchors appear."
+    with_anchors = _keys("三月から五月にかけて花が咲きます。")
+    assert "ds_ni-kakete-through" in with_anchors
+    only_tail = _keys("五月にかけて花が咲きます。")
+    assert "ds_ni-kakete-through" not in only_tail
+
+
+def test_regex_specs_only_match_whole_tokens():
+    """
+    The literal 上に must not be found inside the single word 地上, which is
+    a different word entirely (N2 〜上に means "besides / on top of that").
+    """
+    assert "ds_ue-ni-in-addition" not in _keys("完璧なウインクで地上に星を飛ばす。")
+
+
+def test_plain_form_marker_keeps_compound_nouns_out():
+    "いすの上に is the ordinary noun + の, not the N2 〜上に."
+    assert "ds_ue-ni-in-addition" not in _keys("いすの上に置いてください。")
+    assert "ds_ue-ni-in-addition" in _keys("安い上に、便利です。")
+
+
+def test_la_lemma_chain_does_not_leak_from_mashou():
+    """
+    Sudachi lemmatises ましょう to ます, so a lemma-based spec for 〜ましょうか
+    also matches a plain ますか question.  The spec must use surfaces.
+    """
+    assert "ds_mashou-ka-invitation" not in _keys("毎晩何を飲みますか。")
+    assert "ds_mashou-ka-invitation" in _keys("一緒に飲みましょうか。")
+
+
+def test_skipped_rules_never_fire():
+    "Rules marked skipped carry no matcher and can never appear."
+    skipped = [r for r in _DATA_RULES if r["skipped"]]
+    assert skipped, "the loader should skip the unusable entries"
+    for rule in skipped:
+        assert rule["patterns"] == []
+        text = "".join(rule["examples"])
+        assert rule["key"] not in _keys(text)
+
+
+def test_examples_are_capped_per_rule():
+    """
+    A common construction appears many times on a page; the panel keeps a few
+    anchor examples per point instead of every instance.
+    """
+    from lute.read.render.grammar_analysis_ja import _CONSTRUCTION_EXAMPLE_CAP
+
+    results = analyze_japanese(
+        "寿司を食べています。ご飯を食べています。パンを食べています。"
+        "そばを食べています。うどんを食べています。",
+        display_lang="zh",
+    )
+    entry = next(e for e in results if e["key"] == "te_iru")
+    assert len(entry["examples"]) == _CONSTRUCTION_EXAMPLE_CAP
+
+
+def test_aggregated_entries_come_last():
+    "Basics and Particles aggregates are trailing so real points lead."
+    keys = [e["key"] for e in analyze_japanese("私は学生です。本を読みます。", display_lang="zh")]
+    assert keys[-1] == "basic_particles"
+    assert keys[-2] == "basic_forms"

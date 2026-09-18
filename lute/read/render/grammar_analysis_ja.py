@@ -1,13 +1,25 @@
 """
-N5 Japanese grammar point detection.
+Japanese grammar point detection (JLPT N5-N1).
 
 Uses SudachiPy to tokenize each sentence with full POS and a
 lemma (dictionary form), then a token-aware matcher recognises the
 grammar constructions.  Using lemmas means conjugated forms (e.g.
 食べている / 食べていました) match the same rule.
 
-Data source (meanings / examples): OpenJLPT  (CC BY-SA 4.0)
-https://github.com/evanclan/OpenJLPT  -- data/json/grammar/n5.json
+Rules come from two places:
+
+* ``_N5_RULES`` below -- a small hand-written, debugged set covering the
+  N5 basics (particles, て forms, politeness), with examples from OpenJLPT
+  (CC BY-SA 4.0, https://github.com/evanclan/OpenJLPT).
+* ``lute/jlpt_data/grammar/n{5..1}.json`` -- the full curated JLPT grammar
+  library (595 points), from "japanese-language-data" by Justin Kindrix and
+  contributors (CC BY-SA 4.0,
+  https://github.com/jkindrix/japanese-language-data), vendored verbatim.
+  ``zh.json`` beside them holds this project's Chinese glosses, keyed by the
+  upstream entry id.
+
+Matcher specs are *derived* from each entry's descriptive pattern and
+validated against that entry's own examples -- see ``_load_level``.
 """
 
 import json
@@ -65,6 +77,10 @@ def _match_condition(cond, token):
         return True
     if "surface" in cond and token["surface"] != cond["surface"]:
         return False
+    if "surface_in" in cond and token["surface"] not in cond["surface_in"]:
+        return False
+    if "surface_not" in cond and token["surface"] in cond["surface_not"]:
+        return False
     if "lemma" in cond and token["lemma"] not in cond["lemma"]:
         return False
     if "pos1" in cond and token["pos"][0] != cond["pos1"]:
@@ -100,14 +116,6 @@ def _try_match(conds, tokens, i, j):
     return n + 1
 
 
-def _match_tokens(conds, tokens):
-    "True if the condition sequence appears anywhere in the token list."
-    for start in range(len(tokens)):
-        if _try_match(conds, tokens, 0, start) >= 0:
-            return True
-    return False
-
-
 def _token_span_runs(conds, tokens):
     "Token-index runs (start, end) where the condition sequence matches."
     runs = []
@@ -128,6 +136,42 @@ def _token_offsets(tokens):
     return offsets
 
 
+def _on_token_edges(start, end, offsets, token_ends):
+    """
+    True if a character range starts and ends exactly on token boundaries.
+
+    Sudachi covers the sentence exactly, so token starts/ends are the only
+    positions where a literal may begin or finish without cutting a word in
+    half.
+    """
+    boundaries = set(offsets)
+    boundaries.update(token_ends)
+    return start in boundaries and end in boundaries
+
+
+def _anchor_spans(before, after, tokens, maxgap):
+    """
+    Token runs matched by a two-anchor (gapped) spec.
+
+    `before` and `after` are token-condition sequences; the spec matches
+    when both appear in order with at most `maxgap` tokens between them,
+    e.g. から...にかけて, まんざら...でもない, もう...ました.
+    """
+    runs = []
+    n = len(tokens)
+    for start in range(n):
+        nbefore = _try_match(before, tokens, 0, start)
+        if nbefore <= 0:
+            continue
+        gap_from = start + nbefore
+        for j in range(gap_from, min(gap_from + maxgap + 1, n)):
+            nafter = _try_match(after, tokens, 0, j)
+            if nafter > 0:
+                runs.append((start, j + nafter))
+                break
+    return runs
+
+
 def _match_spans(rule, tokens, sentence_text):
     """
     (start, end) character ranges of sentence_text matched by this rule.
@@ -137,21 +181,37 @@ def _match_spans(rule, tokens, sentence_text):
     precisely the matched words (and never, say, the で inside です).
     """
     spans = []
+    offsets = _token_offsets(tokens)
+    token_ends = [o + len(t["surface"]) for o, t in zip(offsets, tokens)]
     for spec in rule["patterns"]:
         if spec["type"] == "regex":
             for m in spec["re"].finditer(sentence_text):
-                if m.group(0):
-                    spans.append(m.span())
+                if not m.group(0):
+                    continue
+                # A kanji-leading literal is anchored to whole tokens: the
+                # 上に of 〜上に must not be found inside the word 地上.
+                # Kana-leading literals are left alone -- くありません
+                # legitimately starts inside the inflected 面白く.
+                if spec.get("anchor") and not _on_token_edges(
+                    m.start(), m.end(), offsets, token_ends
+                ):
+                    continue
+                spans.append(m.span())
+            continue
+        if spec["type"] == "anchors":
+            runs = _anchor_spans(
+                spec["before"], spec["after"], tokens, spec.get("maxgap", 8)
+            )
         else:  # tokens
-            offsets = _token_offsets(tokens)
-            for start, end in _token_span_runs(spec["conds"], tokens):
-                if end > start:
-                    # A pattern may match up to (and including) the final
-                    # token of the sentence (e.g. a short subtitle line
-                    # with no trailing 。).  Its character end is then the
-                    # end of the sentence, not a token start offset.
-                    span_end = offsets[end] if end < len(offsets) else len(sentence_text)
-                    spans.append((offsets[start], span_end))
+            runs = _token_span_runs(spec["conds"], tokens)
+        for start, end in runs:
+            if end > start:
+                # A pattern may match up to (and including) the final
+                # token of the sentence (e.g. a short subtitle line
+                # with no trailing 。).  Its character end is then the
+                # end of the sentence, not a token start offset.
+                span_end = offsets[end] if end < len(offsets) else len(sentence_text)
+                spans.append((offsets[start], span_end))
     return spans
 
 
@@ -381,11 +441,13 @@ _PARTICLE_SYMBOLS = {
 }
 
 
-# ---- data-driven rules (N4-N1) ----------------------------------------
+# ---- data-driven rules (N5-N1) ----------------------------------------
 
-# Levels loaded from JSON data files under lute/jlpt_data/grammar/.  N5 keeps
-# its hand-written, debugged rules in _N5_RULES above.
-_ALL_LEVELS = ["N4", "N3", "N2", "N1"]
+# Levels loaded from the curated JSON data files under lute/jlpt_data/grammar/.
+# N5 keeps its hand-written, debugged rules in _N5_RULES above; a data rule
+# whose matcher duplicates a hand-written one is dropped at load time so the
+# same point is never reported twice.
+_ALL_LEVELS = ["N5", "N4", "N3", "N2", "N1"]
 
 # Where the grammar JSON lives, relative to this module:
 #   lute/read/render/grammar_analysis_ja.py  ->  lute/jlpt_data/grammar/
@@ -393,73 +455,251 @@ _DATA_DIR = os.path.normpath(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "jlpt_data", "grammar")
 )
 
-# Simple kana -> romaji map used only to build readable, stable rule keys.
-_ROMAJI = {}
-for _src, _dst in [
-    ("あいうえお", "a i u e o"),
-    ("かきくけこ", "ka ki ku ke ko"),
-    ("さしすせそ", "sa shi su se so"),
-    ("たちつてと", "ta chi tsu te to"),
-    ("なにぬねの", "na ni nu ne no"),
-    ("はひふへほ", "ha hi fu he ho"),
-    ("まみむめも", "ma mi mu me mo"),
-    ("やゆよ", "ya yu yo"),
-    ("らりるれろ", "ra ri ru re ro"),
-    ("わをん", "wa wo n"),
-    ("がぎぐげご", "ga gi gu ge go"),
-    ("ざじずぜぞ", "za ji zu ze zo"),
-    ("だぢづでど", "da ji du de do"),
-    ("ばびぶべぼ", "ba bi bu be bo"),
-    ("ぱぴぷぺぽ", "pa pi pu pe po"),
-    ("ゃゅょっ", "xya xyu xyo xtsu"),
-    ("アイウエオ", "a i u e o"),
-    ("カキクケコ", "ka ki ku ke ko"),
-    ("サシスセソ", "sa shi su se so"),
-    ("タチツテト", "ta chi tsu te to"),
-    ("ナニヌネノ", "na ni nu ne no"),
-    ("ハヒフヘホ", "ha hi fu he ho"),
-    ("マミムメモ", "ma mi mu me mo"),
-    ("ヤユヨ", "ya yu yo"),
-    ("ラリルレロ", "ra ri ru re ro"),
-    ("ワヲン", "wa wo n"),
-    ("ガギグゲゴ", "ga gi gu ge go"),
-    ("ザジズゼゾ", "za ji zu ze zo"),
-    ("ダヂヅデド", "da ji du de do"),
-    ("バビブベボ", "ba bi bu be bo"),
-    ("パピプペポ", "pa pi pu pe po"),
-    ("ャュョッ", "xya xyu xyo xtsu"),
-]:
-    for _k, _v in zip(_src, _dst.split()):
-        _ROMAJI[_k] = _v
+# Upstream patterns are *descriptive*, not literal: "Noun / V dict + に難くない",
+# "Plain form + だろう / でしょう", "Verb → potential form".  The matcher spec is
+# therefore derived by pulling the Japanese literal fragments out of that
+# description and validating every fragment against the entry's own examples.
+_ONLY_JP = re.compile(r"^[\u3040-\u309f\u30a0-\u30ff\u30fc\u3005\u4e00-\u9fff]+$")
+_FRAG_SPLIT = re.compile(r"[+/／、，,;；]")
+_PARENS = re.compile(r"[（(][^）)]*[）)]")
+_KANJI = re.compile(r"[\u4e00-\u9fff\u3005]")
+_LATIN = re.compile(r"[A-Za-z\[\]]")
+
+# A fragment with no kanji and at most this many kana is a bare function word
+# (です / ます / これ / ほど / など ...).  They are genuine grammar points but far
+# too frequent to list one entry per hit, so their sentences are folded into a
+# single capped "basics" entry -- the same treatment the particle rules get.
+_BASIC_KANA_LIMIT = 3
+
+# Widest 〜 gap tolerated between the two anchors of a gapped construction
+# (から ... にかけて).  Short windows keep the highlight tight.
+_ANCHOR_MAXGAP = 8
+
+# ---- pattern text -> matcher spec -------------------------------------
 
 
-def _extract_core(pattern):
-    "Strip leading 〜/～ and truncate at parenthetical qualifiers; keep the core literal."
-    s = pattern.strip().lstrip("〜～")
-    s = re.split(r"[（）()]", s)[0].strip()
-    return s
+def _slug(text):
+    "ASCII slug for rule keys."
+    slug = re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")
+    return slug or "base"
 
 
-def _data_key(pattern, level, idx):
-    "Stable, unique ASCII key derived from the pattern text."
-    core = _extract_core(pattern) or ""
-    slug = "".join(_ROMAJI.get(ch, "u%x" % ord(ch)) for ch in core)
-    slug = re.sub(r"[^a-z0-9]+", "_", slug).strip("_")
-    if not slug:
-        slug = "base"
-    return f"cl_{slug}_{level.lower()}_{idx}"
+def _jp_fragments(text):
+    """
+    Japanese literal fragments of a descriptive pattern/formation string.
+
+    "Noun / V dict + に難くない"      -> ["に難くない"]
+    "Plain form + だろう / でしょう"   -> ["だろう", "でしょう"]
+    "Noun + の + 上/下/中"            -> ["上", "下", "中"] is dropped by the
+                                         length filter, so such entries are
+                                         skipped rather than matched loosely.
+    "Verb → potential form"           -> [] (pure conjugation table)
+
+    Fragments keep only kana / kanji runs: Latin placeholders ("Noun",
+    "V dict", "[adj]") and parenthetical qualifiers ("(non-past)") are
+    dropped, which is what turns a description into something matchable.
+    """
+    if not text:
+        return []
+    text = text.replace("〜", "").replace("～", "").replace("＋", "+").replace("／", "/")
+    out = []
+    for clause in _FRAG_SPLIT.split(text):
+        frag = _PARENS.sub("", clause).strip().strip("。．.　 ")
+        if len(frag) < 2 or not _ONLY_JP.match(frag):
+            continue
+        if frag not in out:
+            out.append(frag)
+    return out
 
 
-def _make_data_rule(level, item, idx, skipped):
-    example_sentences = [e["ja"] for e in item["examples"]]
+def _is_contentful(fragment):
+    "True if a fragment is specific enough to deserve its own panel entry."
+    return bool(_KANJI.search(fragment)) or len(fragment) > _BASIC_KANA_LIMIT
+
+
+# Descriptive patterns name what comes *before* the literal fragment
+# ("Verb-て + もいい", "Verb stem + 終わる").  Matching the bare fragment
+# over-fires -- どうでもいいです is not 〜てもいいです, and the 終わる of
+# 昼が終わって is not the compound 〜終わる -- so the description is used to
+# require the tokens in front of the fragment.
+#
+# Each marker is (pattern in the description, required tokens, kanji_only).
+# "kanji_only" applies the marker only when the fragment itself starts with a
+# kanji: 上に / 内に style fragments collide with the ordinary noun + の
+# compound (いすの上に is not the N2 〜上に), while kana-only fragments
+# (ので / のに / と思う) have no such homograph and need no guard.
+_CONTEXT_MARKERS = [
+    (
+        re.compile(r"[Vv]erb-?て|V-て|て ?form|て-form"),
+        [{"pos1": "動詞"}, {"surface_in": ("て", "で")}],
+        False,
+    ),
+    (
+        re.compile(r"[Vv]erb-?た|V-た|た ?form|た-form"),
+        [{"pos1": "動詞"}, {"surface_in": ("た", "だ")}],
+        False,
+    ),
+    (re.compile(r"[Vv]erb[- ]?stem|V stem|[Vv]erb-?ない stem"), [{"pos1": "動詞"}], False),
+    (re.compile(r"[Vv]erb-?ば form|ば ?form"), [{"surface": "ば"}], False),
+    (re.compile(r"[Pp]lain form|V plain|[Vv]erb-?plain"), [{"surface_not": ("の",)}], True),
+]
+
+# Descriptions of pure conjugation tables ("Verb → potential form").  Their
+# Japanese fragments are endings like れる / られる, which fire on unrelated
+# words, so such entries are never derived from the formation field.
+_CONJUGATION_TABLE = re.compile(r"→|->")
+
+
+def _context_cond(description, fragment):
+    "Tokens required in front of the fragment, as named by the description."
+    kanji_lead = bool(_KANJI.match(fragment or ""))
+    for marker, conds, kanji_only in _CONTEXT_MARKERS:
+        if kanji_only and not kanji_lead:
+            continue
+        if marker.search(description):
+            return conds
+    return None
+
+
+def _spec_matches(spec, tokens, sentence):
+    "Run one candidate spec through the real matcher."
+    return bool(_match_spans({"patterns": [spec]}, tokens, sentence))
+
+
+def _fragment_spec(fragment, joined_examples, example_tokens, prefix=None):
+    """
+    Match spec for one literal fragment, validated with the real matcher
+    against the entry's own examples -- a fragment that never matches them
+    cannot be a matcher, and a spec that only matches under looser semantics
+    than the matcher applies is useless.
+
+    Candidates are tried most-precise-first:
+
+      * with a `prefix` (see _CONTEXT_MARKERS) the fragment is matched as a
+        token sequence so the tokens in front of it can be required too --
+        surface-first, because Sudachi lemmatises ましょう to ます and a lemma
+        chain would also match a plain ますか question;
+      * a kanji-leading literal is anchored to whole tokens, so the 上に of
+        〜上に is not found inside the word 地上;
+      * the same literal unanchored, for entries whose own examples only ever
+        show it inside a bigger token (直す inside 書き直す);
+      * finally a lemma chain, which lets inflected forms match
+        (ことがある matching ことがあります).
+    """
+    tokens = _tokens_for(fragment)
+    if prefix:
+        candidates = [
+            {"type": "tokens", "conds": prefix + [{"surface": t["surface"]} for t in tokens]},
+            {"type": "tokens", "conds": prefix + [{"lemma": {t["lemma"]}} for t in tokens]},
+        ]
+    else:
+        candidates = [
+            {
+                "type": "regex",
+                "re": re.compile(re.escape(fragment)),
+                "anchor": bool(_KANJI.match(fragment)),
+            },
+            {"type": "regex", "re": re.compile(re.escape(fragment))},
+            {"type": "tokens", "conds": [{"lemma": {t["lemma"]}} for t in tokens]},
+        ]
+    for spec in candidates:
+        if _spec_matches(spec, example_tokens, joined_examples):
+            return spec
+    return None
+
+
+def _gap_spec(fragments, pattern, joined_examples, example_tokens):
+    """
+    Spec for a gapped construction such as から ... にかけて.
+
+    Only built when the description really places a placeholder between the
+    first and the last fragment ("Noun + から + Noun + にかけて"); the two
+    anchors then have to occur in order within a short window.  Returns None
+    when the entry is not gapped or the spec does not match its own examples.
+    """
+    if len(fragments) < 2:
+        return None
+    first, last = fragments[0], fragments[-1]
+    i, j = pattern.find(first), pattern.rfind(last)
+    if i < 0 or j <= i or not _LATIN.search(pattern[i + len(first) : j]):
+        return None
+    spec = {
+        "type": "anchors",
+        "before": [{"lemma": {t["lemma"]}} for t in _tokens_for(first)],
+        "after": [{"lemma": {t["lemma"]}} for t in _tokens_for(last)],
+        "maxgap": _ANCHOR_MAXGAP,
+    }
+    if not _spec_matches(spec, example_tokens, joined_examples):
+        return None
+    return spec
+
+
+# Literals already covered by the hand-written N5 rules above (their regex
+# specs).  A data rule whose fragment is covered by one of these is redundant
+# -- e.g. the data 〜てください entry vs. the hand-written "てください" rule.
+_HAND_WRITTEN_LITERALS = [
+    spec["re"].pattern
+    for rule in _N5_RULES
+    for spec in rule["patterns"]
+    if spec["type"] == "regex"
+]
+# Lemma specs of the hand-written rules (e.g. 〜たい), so a data entry for the
+# same inflected form is not reported a second time.
+_HAND_WRITTEN_LEMMAS = {
+    lemma
+    for rule in _N5_RULES
+    for spec in rule["patterns"]
+    if spec["type"] == "tokens" and len(spec["conds"]) == 1
+    for lemma in (spec["conds"][0].get("lemma") or set())
+}
+
+
+def _covered_by_hand_written(fragment):
+    "True if a hand-written N5 rule already reports this fragment."
+    if fragment in _HAND_WRITTEN_LEMMAS:
+        return True
+    return any(fragment in literal for literal in _HAND_WRITTEN_LITERALS)
+
+
+def _load_zh():
+    """
+    Curated Chinese glosses, keyed by data entry id (zh.json next to the
+    level files).  Kept beside the vendored data rather than inside it so the
+    upstream files stay verbatim.
+    """
+    path = os.path.join(_DATA_DIR, "zh.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+_ZH_BY_ID = _load_zh()
+
+
+def _make_data_rule(level, item, idx, skipped, specs=None, shown=None, kind="construction"):
+    "Turn one curated JSON entry into a rule dict."
+    shown = shown or []
+    if len(shown) > 1:
+        # Alternatives (だろう / でしょう) are one grammar point: show both.
+        name = "〜" + "・".join(shown)
+    elif shown:
+        name = "〜" + shown[0]
+    else:
+        # Nothing matchable was derived; the descriptive pattern is kept for
+        # the record but the rule never fires.
+        name = item.get("pattern") or item.get("id") or f"{level}-{idx}"
     return {
-        "key": _data_key(item["pattern"], level, idx),
-        "pattern": item["pattern"],
+        "key": "ds_" + _slug(item.get("id") or f"{level}-{idx}"),
+        "pattern": name,
+        "descriptive": item.get("pattern") or "",
         "level": level,
-        "meaning": item["meaning"],
-        "examples": example_sentences,
-        "patterns": [],
-        "kind": "construction",
+        "meaning": item.get("meaning_en") or "",
+        "meaning_zh": _ZH_BY_ID.get(item.get("id") or "", ""),
+        "formation": item.get("formation") or "",
+        "examples": [e["japanese"] for e in item.get("examples") or []],
+        "patterns": [] if skipped else (specs or []),
+        "kind": kind,
         "skipped": skipped,
     }
 
@@ -468,14 +708,18 @@ def _load_level(level):
     """
     Load one level's JSON file and turn each entry into a rule dict.
 
-    Match specs are auto-derived from the pattern text:
-      * a literal-substring regex when the core string matches the rule's own
-        examples (the common, low-noise case);
-      * otherwise a lemma-based token spec, which lets conjugated forms match
-        (e.g. ようにする matching ようにします);
-      * rules whose pattern is too vague to match reliably (single bare kanji,
-        or constructions that do not appear in their own examples) are marked
-        ``skipped`` so they never fire and never cause false positives.
+    Match specs are derived from the descriptive pattern text and validated
+    against the entry's own examples:
+
+      * a gapped construction (から ... にかけて) becomes a two-anchor spec;
+      * otherwise every contentful fragment becomes its own spec -- a literal
+        substring regex when it occurs in the examples, else a lemma-based
+        token spec so inflected forms still match (ようにする / ようにします);
+      * entries that yield nothing matchable -- pure conjugation tables such
+        as "Verb → potential form", fragments already covered by the
+        hand-written N5 rules, or fragments too vague to match reliably --
+        are marked ``skipped`` and never fire, so they cannot cause false
+        positives and never appear in the panel.
     """
     path = os.path.join(_DATA_DIR, f"{level.lower()}.json")
     if not os.path.exists(path):
@@ -484,28 +728,46 @@ def _load_level(level):
         entries = json.load(fh)
     rules = []
     for idx, item in enumerate(entries):
-        core = _extract_core(item["pattern"])
-        joined = "".join(e["ja"] for e in item["examples"])
-        # A single bare character (中 / 方 / 時 / 間 / 日 ...) is far too
-        # generic to match on directly - skip it to avoid false positives.
-        if len(core) < 2:
-            rules.append(_make_data_rule(level, item, idx, skipped=True))
-            continue
-        if re.search(re.escape(core), joined):
-            # Literal substring match: precise, matches the rule's own examples.
-            rule = _make_data_rule(level, item, idx, skipped=False)
-            rule["patterns"] = [{"type": "regex", "re": re.compile(re.escape(core))}]
-            rules.append(rule)
-            continue
-        # Try a lemma-based token spec so inflected forms still match.
-        conds = [{"lemma": {t["lemma"]}} for t in _tokens_for(core)] if core else []
-        if conds and _match_tokens(conds, _tokens_for(joined)):
-            rule = _make_data_rule(level, item, idx, skipped=False)
-            rule["patterns"] = [{"type": "tokens", "conds": conds}]
-            rules.append(rule)
-            continue
-        # Too generic / unreliable: skip (kept out of the panel entirely).
-        rules.append(_make_data_rule(level, item, idx, skipped=True))
+        pattern = item.get("pattern") or ""
+        fragments = _jp_fragments(pattern)
+        if not fragments and not _CONJUGATION_TABLE.search(pattern):
+            # Conjugation tables ("Verb → potential form") describe no
+            # literal construction; their formation text only yields bare
+            # endings, so they are never matched loosely either.
+            fragments = _jp_fragments(item.get("formation") or "")
+        joined = "".join(e["japanese"] for e in item.get("examples") or [])
+        example_tokens = _tokens_for(joined)
+
+        gap = _gap_spec(fragments, pattern, joined, example_tokens)
+        if gap is not None:
+            specs = [gap]
+            shown = [fragments[0], fragments[-1]]
+            kind = "construction"
+        else:
+            # Prefer contentful fragments; if the entry has none, the whole
+            # rule is a bare function word and belongs in the basics bucket.
+            contentful = [f for f in fragments if _is_contentful(f)]
+            specs, shown = [], []
+            for fragment in contentful or fragments:
+                if _covered_by_hand_written(fragment):
+                    continue
+                # What the description says comes before this fragment
+                # ("Verb-て + もいい" -> the fragment needs a て in front).
+                prefix = _context_cond(pattern[: pattern.find(fragment)], fragment)
+                spec = _fragment_spec(fragment, joined, example_tokens, prefix)
+                if spec is not None:
+                    specs.append(spec)
+                    shown.append(fragment)
+            if not specs:
+                rules.append(_make_data_rule(level, item, idx, skipped=True))
+                continue
+            kind = "construction" if contentful else "basic"
+
+        rules.append(
+            _make_data_rule(
+                level, item, idx, skipped=False, specs=specs, shown=shown, kind=kind
+            )
+        )
     return rules
 
 
@@ -634,11 +896,57 @@ _ZH_DESC = {
 }
 
 _ZH_PARTICLE = "基础 N5 助词检测"
+_ZH_BASICS = "基础敬体与功能词（です・ます・これ 等），出现极频繁，仅示意"
+
+# Number of example sentences shown for the two aggregated entries, and how
+# many distinct symbols (particles / basic forms) are listed in their titles.
+_AGGREGATE_EXAMPLE_CAP = 6
+_AGGREGATE_SYMBOL_CAP = 8
+
+# Examples kept per constructive grammar point.  A full JLPT library matches
+# many points on a normal page, so the panel shows a few anchors per point
+# instead of every single instance (which made the pane hundreds of rows).
+_CONSTRUCTION_EXAMPLE_CAP = 3
+
+
+def _aggregate_symbols(buckets):
+    "Symbols of the rules that fired, in rule order and without duplicates."
+    symbols = []
+    for rule in _ALL_RULES:
+        if rule["key"] not in buckets:
+            continue
+        symbol = _PARTICLE_SYMBOLS.get(rule["key"]) or rule["pattern"].lstrip("〜")
+        if symbol and symbol not in symbols:
+            symbols.append(symbol)
+        if len(symbols) >= _AGGREGATE_SYMBOL_CAP:
+            break
+    return symbols
+
+
+def _aggregate_examples(buckets):
+    "First few distinct sentences across the buckets, merging overlapping matches."
+    shown = []
+    for examples in buckets.values():
+        for sentence, spans in examples:
+            if len(shown) >= _AGGREGATE_EXAMPLE_CAP:
+                return shown
+            existing = next((e for e in shown if e["sentence"] == sentence), None)
+            if existing is None:
+                shown.append({"sentence": sentence, "matches": list(spans)})
+            else:
+                for span in spans:
+                    if span not in existing["matches"]:
+                        existing["matches"].append(span)
+    return shown
 
 
 def _desc(rule, display_lang):
     "Description for a rule in the requested display language."
     if display_lang == "zh":
+        # Curated Chinese gloss shipped with the data beats both the legacy
+        # hand-written table and the English meaning.
+        if rule.get("meaning_zh"):
+            return rule["meaning_zh"]
         return _ZH_DESC.get(rule["pattern"], rule["meaning"])
     return rule["meaning"]
 
@@ -664,6 +972,7 @@ def analyze_japanese(page_text, display_lang="en"):
     sentences = _split_sentences(page_text)
     matched = []
     particle_examples = {}  # particle key -> [(sentence, [matches])]
+    basic_examples = {}  # data rule key -> [(sentence, [matches])] for basics
     for sentence in sentences:
         if not sentence:
             continue
@@ -673,8 +982,13 @@ def analyze_japanese(page_text, display_lang="en"):
             if not spans:
                 continue
             matches = [{"start": s, "end": e} for s, e in spans]
-            if rule.get("kind") == "particle":
-                ex = particle_examples.setdefault(rule["key"], [])
+            kind = rule.get("kind")
+            if kind in ("particle", "basic"):
+                # Both are far too frequent to list one entry per hit; the
+                # examples are collected per rule and folded into a single
+                # capped aggregate entry below.
+                bucket = particle_examples if kind == "particle" else basic_examples
+                ex = bucket.setdefault(rule["key"], [])
                 if not any(s == sentence for s, _ in ex):
                     ex.append((sentence, matches))
                 continue
@@ -689,35 +1003,28 @@ def analyze_japanese(page_text, display_lang="en"):
                 }
                 matched.append(entry)
             if not any(e["sentence"] == sentence for e in entry["examples"]):
-                entry["examples"].append({"sentence": sentence, "matches": matches})
+                if len(entry["examples"]) < _CONSTRUCTION_EXAMPLE_CAP:
+                    entry["examples"].append({"sentence": sentence, "matches": matches})
+
+    if basic_examples:
+        matched.append(
+            {
+                "key": "basic_forms",
+                "name": "Basics: " + "・".join(_aggregate_symbols(basic_examples)),
+                "level": "N5",
+                "desc": _ZH_BASICS if display_lang == "zh" else "Basic polite / function words detected",
+                "examples": _aggregate_examples(basic_examples),
+            }
+        )
 
     if particle_examples:
-        symbols = [
-            _PARTICLE_SYMBOLS.get(rule["key"], rule["key"])
-            for rule in _ALL_RULES
-            if rule["key"] in particle_examples
-        ]
-        shown = []
-        for ex_list in particle_examples.values():
-            for sentence, spans in ex_list:
-                if len(shown) >= 6:
-                    break
-                existing = next((e for e in shown if e["sentence"] == sentence), None)
-                if existing is None:
-                    shown.append({"sentence": sentence, "matches": list(spans)})
-                else:
-                    for sp in spans:
-                        if sp not in existing["matches"]:
-                            existing["matches"].append(sp)
-            if len(shown) >= 6:
-                break
         matched.append(
             {
                 "key": "basic_particles",
-                "name": "Particles: " + "・".join(symbols),
+                "name": "Particles: " + "・".join(_aggregate_symbols(particle_examples)),
                 "level": "N5",
                 "desc": _ZH_PARTICLE if display_lang == "zh" else "Basic N5 particles detected",
-                "examples": shown,
+                "examples": _aggregate_examples(particle_examples),
             }
         )
     return matched
