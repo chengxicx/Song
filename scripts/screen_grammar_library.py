@@ -41,7 +41,6 @@ rule actually reaches, which is what makes the noisy ones obvious.
 """
 
 import argparse
-import binascii
 import collections
 import glob
 import json
@@ -52,6 +51,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from lute.read.render import grammar_analysis_ja as G  # noqa: E402
+from scripts.measure_grammar_panel import load_corpus  # noqa: E402
 
 _GRAMMAR_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -169,15 +169,10 @@ def screen():
 
 def corpus_page_share(path):
     """rule key -> share of pages it fires on (needs the corpus file)."""
-    pages = [
-        binascii.unhexlify(line.strip()).decode("utf-8")
-        for line in open(path, encoding="utf-8")
-        if line.strip()
-    ]
+    pages = load_corpus(path)
     hits = collections.Counter()
     for page in pages:
-        text = page.replace("\u200b", "")
-        for entry in G.analyze_japanese(text, display_lang="zh"):
+        for entry in G.analyze_japanese(page, display_lang="zh"):
             hits[entry["key"]] += 1
     return {k: 100.0 * v / len(pages) for k, v in hits.items()}, len(pages)
 
