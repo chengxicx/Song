@@ -303,7 +303,15 @@ function open_grammar_analysis() {
           return LEVELS.indexOf(lvl) === -1 ? "N" : lvl;
         }
 
+        // The two aggregated buckets ("Basic forms: …", "Particles: …") fire
+        // on nearly every page and each carries up to six example sentences,
+        // so they render pre-collapsed; clicking the head folds them open.
+        function isAggregate(g) {
+          return g.key === "basic_forms" || g.key === "basic_particles";
+        }
+
         function itemHtml(g, withLevelChip) {
+          const fold = isAggregate(g);
           const level =
             withLevelChip && g.level
               ? '<span class="grammar-item__level">' + escapeHtml(g.level) + "</span>"
@@ -314,10 +322,13 @@ function open_grammar_analysis() {
           }).join("");
           return (
             '<div class="grammar-item grammar-item--' +
-            escapeHtml(levelClass(g.level)) + '">' +
-            '<div class="grammar-item__head">' +
+            escapeHtml(levelClass(g.level)) +
+            (fold ? " grammar-item--fold grammar-item--collapsed" : "") +
+            '">' +
+            '<div class="grammar-item__head"' + (fold ? ' role="button"' : "") + ">" +
             level +
             '<span class="grammar-item__name">' + escapeHtml(g.name) + "</span>" +
+            (fold ? '<span class="grammar-item__fold" aria-hidden="true">&#9656;</span>' : "") +
             "</div>" +
             desc +
             '<div class="grammar-item__examples">' + examples + "</div>" +
@@ -594,6 +605,17 @@ function open_grammar_analysis() {
           panel[0].querySelectorAll(".grammar-item"),
           function (item, itemIdx) {
             var g = dataItems[itemIdx];
+            // Fold toggle for the aggregated rows (see itemHtml): the click
+            // does not need the row's data, so it is bound even if the data
+            // pairing below ever fails.
+            if (item.classList.contains("grammar-item--fold")) {
+              var foldHead = item.querySelector(".grammar-item__head");
+              if (foldHead) {
+                foldHead.addEventListener("click", function () {
+                  item.classList.toggle("grammar-item--collapsed");
+                });
+              }
+            }
             if (!g) return;
             var exampleEls = item.querySelectorAll(".grammar-item__example");
             function showRings(runs) {
