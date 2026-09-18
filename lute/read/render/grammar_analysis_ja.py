@@ -244,6 +244,10 @@ def _matches(rule, tokens, sentence_text):
 _P = lambda *ks: {k: v for k, v in zip(("pos1", "pos2", "pos3"), ks)}
 # short helpers: fixed surface, fixed lemma(set), a plain particle token
 _SURF = lambda s: {"surface": s}
+# Alternate surfaces of one token: the て-form is て after す/く/る/つ and で
+# after む/ぶ/ぬ/ぐ (読んで, 遊んで, 死んで), which Sudachi reports as a
+# separate で token -- a rule written against て alone misses half the verbs.
+_SURF_IN = lambda *surfaces: {"surface_in": tuple(surfaces)}
 _LEMMA = lambda *lemmas: {"lemma": set(lemmas)}
 _OPT = lambda cond: {**cond, "optional": True}
 
@@ -339,7 +343,15 @@ _N5_RULES = [
         "is/am/are doing (progressive) or resultant state",
         ["今、ご飯を食べています。", "電気がついています。"],
         [
-            {"type": "tokens", "conds": [_SURF("て"), _LEMMA("いる")]},
+            # て *or* で -- and no 動詞 constraint in front, deliberately.
+            # Widening て -> て/で is worth +8 pages of 400 (む/ぶ/ぬ/ぐ verbs
+            # like 読んでいます, which were silently missed), and requiring a
+            # 動詞 right before the て would take back 5 of them: in the passive
+            # 言われています / 展示されていました the token before て is the
+            # 受身 auxiliary, not the verb.  Costing those back to exclude
+            # 元気でいる is a bad trade -- でいる after a な-adjective states a
+            # continuing condition and reads correctly as 〜ている.
+            {"type": "tokens", "conds": [_SURF_IN("て", "で"), _LEMMA("いる")]},
         ],
     ),
     _rule(
@@ -498,9 +510,9 @@ _SHORT_KANA_LIMIT = 3
 
 # Entries that carry no grammar point of their own and are far too frequent to
 # give a row each: the copula / polite paradigm (です・ます・ました・だった), the
-# demonstratives, the counting question words and います (existence).  Their
-# sentences are folded into one capped "basic forms" entry, the same treatment
-# the hand-written particle rules get.
+# demonstratives and the counting question words.  Their sentences are folded
+# into one capped "basic forms" entry, the same treatment the hand-written
+# particle rules get.
 #
 # Listed by id on purpose, because the pattern text cannot separate these from
 # real grammar points: most JLPT points are *also* short kana tails (のに,
@@ -520,16 +532,31 @@ _FUNCTION_WORD_IDS = frozenset({
     "koko-soko-asoko-doko",
     "ikutsu-how-many",
     "ikura-how-much",
-    "imasu-existence-animate",
 })
 
 # Data entries whose form a hand-written rule already reports precisely, and
-# whose own derived spec would fire on the *other* reading of that form as
-# well: から is 格助詞 after a noun (駅から, "from") and 接続助詞 after a
-# predicate (寒いから, "because"), and a bare から cannot tell them apart --
-# deriving both puts a "because" gloss on every "from" and vice versa.  The
-# hand-written 〜から covers the reason reading by part of speech.
-_SUPERSEDED_IDS = frozenset({"kara-cause"})
+# whose own derived spec would either fire on a different reading of the form
+# or duplicate that rule under a misleading name:
+#
+#   kara-cause           から is 格助詞 after a noun (駅から, "from") and
+#                        接続助詞 after a predicate (寒いから, "because"); a
+#                        bare から cannot tell them apart, so deriving it puts
+#                        a "because" gloss on every "from".  The hand-written
+#                        〜から reports the reason reading by part of speech.
+#   imasu-existence-animate
+#                        its pattern ("Place に Animate が います") yields the
+#                        bare literal います, which also matches the います of
+#                        知っています -- and the hand-written
+#                        〜がいます / 〜があります reports existence anyway.
+#   te-imasu-progressive  〜ています is the same point as the hand-written
+#                        〜ている, but its fragments reduce to います, so it
+#                        showed up as a second row named "〜います" next to the
+#                        real 〜います.  て/で is handled by that rule.
+_SUPERSEDED_IDS = frozenset({
+    "kara-cause",
+    "imasu-existence-animate",
+    "te-imasu-progressive",
+})
 
 # Data entries that are particle usages: their sentences join the single
 # particle row instead of getting a row each, the same treatment the
