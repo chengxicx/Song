@@ -245,7 +245,10 @@ def test_only_reviewed_function_words_are_aggregated():
     """
     aggregated = {r["key"] for r in _DATA_RULES if r.get("kind") == "basic"}
     assert aggregated == {"ds_" + i for i in _FUNCTION_WORD_IDS}
-    assert len(aggregated) == 12
+    # A hand-reviewed list, not a growing bucket: if it needs more than a
+    # dozen members the classification has drifted back into guessing.
+    assert len(aggregated) <= 12
+    assert len(aggregated) == len(_FUNCTION_WORD_IDS)
 
 
 @pytest.mark.parametrize(
@@ -386,6 +389,62 @@ def test_te_form_prefix_constraint(sentence, expected):
         assert expected in keys, f"expected {expected} for {sentence}"
     else:
         assert "ds_te-mo-ii-permission" not in keys, f"false positive on {sentence}"
+
+
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        "今、ご飯を食べています。",   # て form
+        "今、本を読んでいます。",     # で form (む/ぶ/ぬ/ぐ verbs)
+        "東京に住んでいます。",
+        "猫が死んでいる。",
+        "このお寺は江戸時代に建てられています。",  # passive: て follows an auxiliary
+        "くじらは昔、人間に捕まえられていました。",
+    ],
+)
+def test_te_iru_covers_both_te_and_de(sentence):
+    """
+    〜ている must fire on the で form too: Sudachi reports the て-form of
+    む/ぶ/ぬ/ぐ verbs as a separate で token (読ん + で + います), so a rule
+    written against て alone silently missed half the verbs.
+
+    Passives are in here for the other half of the same decision: the て of
+    言われています is preceded by the 受身 auxiliary, not the verb, so the
+    spec must not require a 動詞 immediately in front of it.
+    """
+    assert "te_iru" in _keys(sentence), sentence
+
+
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        "本を読んで、います。",   # comma breaks the sequence
+        "ここにいます。",         # いる as the main verb, no て form in front
+    ],
+)
+def test_te_iru_does_not_overreach(sentence):
+    "Widening 〜ている to で must not make it fire without a preceding て form."
+    assert "te_iru" not in _keys(sentence), sentence
+
+
+def test_existence_and_progressive_are_reported_once():
+    """
+    〜がいます / 〜があります and 〜ています are the hand-written rules' job.
+    Their data entries derive a bare います literal -- which also matches the
+    います of 知っています -- so they are superseded rather than folded into
+    the basics row, where a stray います reads as an existence marker.
+    """
+    existence = _keys("庭に犬がいます。")
+    assert "ga_imasu_arimasu" in existence
+    assert "ds_imasu-existence-animate" not in existence
+
+    progressive = _keys("今、本を読んでいます。")
+    assert "te_iru" in progressive
+    assert "ds_te-imasu-progressive" not in progressive
+
+    basics = [e for e in analyze_japanese("今、本を読んでいます。") if e["key"] == "basic_forms"]
+    assert basics, "expected at least one basic form on this sentence"
+    assert "います" not in basics[0]["name"], basics[0]["name"]
 
 
 def test_gapped_construction_needs_both_anchors():
