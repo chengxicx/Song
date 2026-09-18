@@ -283,25 +283,90 @@ function open_grammar_analysis() {
           });
           return html + escapeHtml(s.slice(pos));
         }
-        const items = data
-          .map(function (g) {
-            const level = g.level ? '<span class="grammar-item__level">' + escapeHtml(g.level) + "</span>" : "";
-            const desc = g.desc ? '<div class="grammar-item__desc">' + escapeHtml(g.desc) + "</div>" : "";
-            const examples = (g.examples || []).map(function (ex) {
-              return '<div class="grammar-item__example">' + renderExample(ex) + "</div>";
-            }).join("");
+        const LEVELS = ["N5", "N4", "N3", "N2", "N1"];
+
+        function levelClass(lvl) {
+          return LEVELS.indexOf(lvl) === -1 ? "N" : lvl;
+        }
+
+        function itemHtml(g, withLevelChip) {
+          const level =
+            withLevelChip && g.level
+              ? '<span class="grammar-item__level">' + escapeHtml(g.level) + "</span>"
+              : "";
+          const desc = g.desc ? '<div class="grammar-item__desc">' + escapeHtml(g.desc) + "</div>" : "";
+          const examples = (g.examples || []).map(function (ex) {
+            return '<div class="grammar-item__example">' + renderExample(ex) + "</div>";
+          }).join("");
+          return (
+            '<div class="grammar-item grammar-item--' +
+            escapeHtml(levelClass(g.level)) + '">' +
+            '<div class="grammar-item__head">' +
+            level +
+            '<span class="grammar-item__name">' + escapeHtml(g.name) + "</span>" +
+            "</div>" +
+            desc +
+            '<div class="grammar-item__examples">' + examples + "</div>" +
+            "</div>"
+          );
+        }
+
+        // Group by JLPT level, easiest first, keeping the match order inside a
+        // level.  A page normally spans two or three levels and a full library
+        // can put 25 points on one page; flat in match order that is a wall
+        // with N4/N3 rows interleaved between N5 ones, so the level headers
+        // carry most of the readability.  A single-level page gets no header
+        // (it would only repeat the chip on every row).
+        var groups = [];
+        data.forEach(function (g) {
+          var lvl = g.level || "";
+          var group = null;
+          for (var i = 0; i < groups.length; i++) {
+            if (groups[i].level === lvl) {
+              group = groups[i];
+              break;
+            }
+          }
+          if (!group) {
+            group = { level: lvl, items: [] };
+            groups.push(group);
+          }
+          group.items.push(g);
+        });
+        groups.sort(function (a, b) {
+          var ia = LEVELS.indexOf(a.level);
+          var ib = LEVELS.indexOf(b.level);
+          return (ia === -1 ? LEVELS.length : ia) - (ib === -1 ? LEVELS.length : ib);
+        });
+        var showHeaders = groups.length > 1;
+        const items = groups
+          .map(function (group) {
+            var head = "";
+            if (showHeaders) {
+              head =
+                '<div class="grammar-group__head">' +
+                '<span class="grammar-group__level">' +
+                escapeHtml(group.level || "—") +
+                "</span>" +
+                '<span class="grammar-group__count">' +
+                group.items.length +
+                "</span>" +
+                "</div>";
+            }
             return (
-              '<div class="grammar-item grammar-item--' +
-              escapeHtml(g.level || "N") + '">' +
-              '<div class="grammar-item__head">' +
-              level +
-              '<span class="grammar-item__name">' + escapeHtml(g.name) + "</span>" +
-              "</div>" +
-              desc +
-              '<div class="grammar-item__examples">' + examples + "</div>" +
+              '<div class="grammar-group grammar-group--' +
+              escapeHtml(levelClass(group.level)) +
+              '">' +
+              head +
+              group.items
+                .map(function (g) {
+                  return itemHtml(g, !showHeaders);
+                })
+                .join("") +
               "</div>"
             );
-          }).join("");
+          })
+          .join("");
         bodyHtml = '<div class="grammar-analysis-panel__body">' + items + "</div>";
       }
       panel.html(header() + bodyHtml);
