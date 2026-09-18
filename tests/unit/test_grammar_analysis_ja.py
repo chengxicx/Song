@@ -595,11 +595,12 @@ def test_vocabulary_screen_still_flags_the_vocab_ids():
 
 # --- patterns that name a form instead of a literal (see _SLOT_SPECS) ------
 #
-# "い-adjective + (です)" names a part of speech, not a string.  The pattern
-# yields no literal, so the derivation fell back to the entry's formation
-# field -- a list of *examples* of that form -- and titled the row after
-# whichever example came first: "〜高い" (a row that only appeared where 高い
-# itself did) and "〜言わないで" (a row that never appeared at all).
+# "Verb ない-form + で" names a form, not a string.  The pattern yields no
+# literal, so the derivation fell back to the entry's formation field -- a list
+# of *examples* of that form -- and titled the row after whichever example came
+# first: "〜言わないで", a row that then never appeared at all.  The other such
+# entry, "い-adjective + (です)", is not a construction the sentence is made of
+# and gets no row at all -- see _CONCEPT_IDS.
 
 
 def test_slot_specs_match_their_own_examples():
@@ -623,18 +624,20 @@ def test_slot_specs_match_their_own_examples():
             assert _spec_matches(spec, tokens, joined), rid
 
 
-def test_i_adjective_nonpast_is_matched_on_the_adjective():
+def test_i_adjective_nonpast_gets_no_row():
     """
-    The row reports the い-adjective itself, in its non-past (dictionary)
-    form -- the same surface convention as its siblings 〜かった and
-    〜くありません, which is why it is wide: an い-adjective in dictionary
-    form is the default form, and 83% of pages contain one.  Inflected forms
-    belong to those sibling rows, and な-adjectives to theirs.
+    Whether an い-adjective is in its dictionary form is a property of the
+    word, not a construction the sentence is made of: the panel reports the
+    latter.  Matched on 形容詞 in dictionary form the entry hit 83% of a
+    400-page corpus -- the dictionary form is the default form, so nearly
+    every page carried the row -- and it said nothing the reader could not see
+    in the word itself.  The forms that do have to be recognised keep their
+    own rows, which is what this checks on both sides.
     """
     for sentence in ("この本は高いです。", "その映画は面白い。", "新しい本を読んだ。"):
-        assert "ds_i-adjective-nonpast" in _keys(sentence), sentence
-    for sentence in ("昨日は寒かったです。", "高くありません。", "静かです。", "有名だ。"):
         assert "ds_i-adjective-nonpast" not in _keys(sentence), sentence
+    assert "ds_i-adjective-past" in _keys("昨日は寒かったです。")
+    assert "ds_i-adjective-negative" in _keys("高くありません。")
 
 
 def test_nai_de_reports_without_doing():
@@ -673,6 +676,7 @@ def test_reviewed_silent_ids_are_library_entries():
 
     library = load_library()
     assert _CONCEPT_IDS <= set(library), sorted(_CONCEPT_IDS - set(library))
+    assert len(_CONCEPT_IDS) == 2, "changing the list is a review, not a patch"
     for rid in _CONCEPT_IDS:
         rule = next(r for r in _DATA_RULES if r["key"] == "ds_" + rid)
         assert rule["skipped"] is True

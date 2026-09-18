@@ -81,12 +81,6 @@ def _match_condition(cond, token):
         return False
     if "surface_not" in cond and token["surface"] in cond["surface_not"]:
         return False
-    # Dictionary form.  Sudachi reports no conjugation field through this
-    # interface, and an inflected 形容詞 keeps its lemma (高かっ / 高く both
-    # lemmatise to 高い), so surface == lemma is how "non-past dictionary form"
-    # is stated.  See _SLOT_SPECS.
-    if cond.get("surface_is_lemma") and token["surface"] != token["lemma"]:
-        return False
     if "lemma" in cond and token["lemma"] not in cond["lemma"]:
         return False
     if "pos1" in cond and token["pos"][0] != cond["pos1"]:
@@ -632,43 +626,46 @@ _VOCAB_IDS = frozenset({
 #                      verbs.  A sentence does not contain "the transitive /
 #                      intransitive distinction"; the verb in it does, and the
 #                      word popup already says which one it is.
-_CONCEPT_IDS = frozenset({"jidoushi-tadoushi"})
+#   i-adjective-nonpast
+#                      "い-adjective non-past" -- whether an い-adjective is
+#                      in its dictionary form is a property of the *word*, and
+#                      the panel reports the constructions a sentence is made
+#                      of.  Matched on 形容詞 in dictionary form it fired on
+#                      83% of a 400-page corpus, because the dictionary form
+#                      is the default form: nearly every page carries one, so
+#                      the row was furniture, and it said nothing the reader
+#                      could not see in the word itself.  The two forms that
+#                      have to be *recognised* in a sentence -- 〜かった and
+#                      〜くありません -- keep their own rows.
+#
+#                      Nothing else carries this: the term layer stores no
+#                      part of speech (nothing in the templates or JS mentions
+#                      one), and the 変形 -> 辞書形 link in `wordparents` is
+#                      written only by TermRepository.find_or_new(), which
+#                      returns early when the term already exists -- terms are
+#                      created when a page opens -- and by construction never
+#                      fires when lemma == surface, i.e. never for a
+#                      dictionary form.  248 of the 8117 Japanese terms on
+#                      production carried a parent, almost all of them verbs.
+_CONCEPT_IDS = frozenset({"jidoushi-tadoushi", "i-adjective-nonpast"})
 
 # Data entries whose pattern names a *form* rather than a literal string
-# ("い-adjective + (です)", "Verb ない-form + で").  Their formation text is a
-# list of examples of that form, so the fallback that reads it titles the entry
-# after whichever example word comes first: i-adjective-nonpast came out as
-# "〜高い" (3.5% of pages, a row that only appeared where 高い itself did) and
-# nai-de-without-doing as "〜言わないで" (a row that never appeared at all,
-# because the examples are 食べないで / 言わないで / しないで).  A pattern that
-# names a form has to be matched on that form.
+# ("Verb ない-form + で").  Their formation text is a list of examples of that
+# form, so the fallback that reads it titles the entry after whichever example
+# word comes first -- nai-de-without-doing came out as "〜言わないで", a row
+# that never appeared at all, because its examples are 食べないで / 言わないで /
+# しないで.  A pattern that names a form has to be matched on that form.
 #
 # Kept as a reviewed map rather than a general slot -> part-of-speech
-# translator, because neither condition below is inferable from the pattern:
-#
-#   * "い-adjective non-past" is not simply 形容詞 -- it is the dictionary
-#     form, and 高かっ / 高く share the lemma 高い.  Hence surface_is_lemma,
-#     with pos2 一般 so that the 形容詞,非自立可能 ない of 高くない is not
-#     counted as one.
-#   * "Verb ない-form + で" is 動詞 + ない + で, and Sudachi reports that ない
-#     as 助動詞 -- no part-of-speech lookup would find it.
+# translator, because the condition below is not inferable from the pattern:
+# "Verb ない-form + で" is 動詞 + ない + で, and Sudachi reports that ない as
+# 助動詞 -- no part-of-speech lookup would find it.
 #
 # Each spec is validated against the entry's own examples at load time (see
 # _load_level), so a library update that invalidates one falls back to the old
 # derivation instead of reporting something wrong; a test asserts they stay
 # valid, so that fallback never actually happens.
 _SLOT_SPECS = {
-    "i-adjective-nonpast": (
-        "い形容词",
-        [
-            {
-                "type": "tokens",
-                "conds": [
-                    {"pos1": "形容詞", "pos2": "一般", "surface_is_lemma": True}
-                ],
-            }
-        ],
-    ),
     "nai-de-without-doing": (
         "ないで",
         [
