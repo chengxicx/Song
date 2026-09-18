@@ -697,6 +697,38 @@ def test_nai_de_reports_without_doing():
         assert "ds_nai-de-without-doing" not in _keys(sentence), sentence
 
 
+def test_te_kudasai_covers_the_de_form():
+    """
+    〜てください is one request however the verb's て-form is spelled -- 読んで /
+    遊んで / 死んで are the same form.  The hand-written rule matched a bare て,
+    so 読んでください was not reported as 〜てください at all; the data entry for
+    〜ないでください, whose ない had been dropped from its spec, claimed it
+    instead and called it "please don't".
+    """
+    for sentence in ("ここに名前を書いてください。", "読んでください。", "遊んでください。"):
+        assert "te_kudasai" in _keys(sentence), sentence
+    # The hand-written rule is the only 〜てください row; the data entry it
+    # covers stays suppressed even though the hand-written spec is a token
+    # spec now, not the regex the suppression used to be derived from.
+    assert "ds_te-kudasai-request" not in _keys("読んでください。")
+
+
+def test_nai_de_kudasai_needs_its_nai():
+    """
+    〜ないでください is "please don't", and the ない is the whole difference:
+    the spec was the bare literal でください, which matched every でください in
+    the language -- including the で-form of a plain request.
+    """
+    for sentence in ("何も言わないでください。", "心配しないでください。"):
+        assert "ds_nai-de-kudasai" in _keys(sentence), sentence
+    assert any(
+        e["name"] == "〜ないでください"
+        for e in analyze_japanese("心配しないでください。", display_lang="zh")
+    )
+    for sentence in ("ここに名前を書いてください。", "読んでください。", "これは本ではない。"):
+        assert "ds_nai-de-kudasai" not in _keys(sentence), sentence
+
+
 def test_concept_entries_get_no_row():
     """
     jidoushi-tadoushi is a category article.  A sentence does not contain "the
