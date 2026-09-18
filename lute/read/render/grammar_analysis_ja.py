@@ -172,6 +172,22 @@ def _anchor_spans(before, after, tokens, maxgap):
     return runs
 
 
+def _starts_inside_verb(start, tokens, offsets):
+    """
+    True if a character offset falls *strictly inside* a verb token.
+
+    Kana-only literals are otherwise free to start mid-token -- くありません
+    begins inside the inflected adjective 面白く, which is legitimate -- but a
+    verb's tail is never the construction: the って of 困っている is that
+    verb's own て-form, not the colloquial quotative 〜って.  Without this the
+    〜って entry fires on almost every sentence that uses a て-form.
+    """
+    for token, offset in zip(tokens, offsets):
+        if offset < start < offset + len(token["surface"]):
+            return token["pos"][0] == "動詞"
+    return False
+
+
 def _match_spans(rule, tokens, sentence_text):
     """
     (start, end) character ranges of sentence_text matched by this rule.
@@ -195,6 +211,9 @@ def _match_spans(rule, tokens, sentence_text):
                 if spec.get("anchor") and not _on_token_edges(
                     m.start(), m.end(), offsets, token_ends
                 ):
+                    continue
+                # Neither may any literal start inside a 動詞 (see above).
+                if _starts_inside_verb(m.start(), tokens, offsets):
                     continue
                 spans.append(m.span())
             continue
@@ -265,10 +284,15 @@ _N5_RULES = [
     ),
     _rule(
         "kara_reason",
-        "〜から（reason）",
+        "〜から",
         "because; since",
         ["雨が降っているから、出かけません。", "眠いから、早く寝ます。"],
         [
+            # から is 格助詞 after a noun (駅から) and 接続助詞 after a predicate
+            # (寒いから); only the latter is the reason reading.  The name is
+            # deliberately the bare 〜から so it folds together with the data
+            # rules for the same form (_merge_same_name) instead of showing the
+            # same から twice.
             {"type": "tokens", "conds": [{"surface": "から", "pos1": "助詞", "pos2": "接続助詞"}]},
         ],
     ),
@@ -465,11 +489,52 @@ _PARENS = re.compile(r"[（(][^）)]*[）)]")
 _KANJI = re.compile(r"[\u4e00-\u9fff\u3005]")
 _LATIN = re.compile(r"[A-Za-z\[\]]")
 
-# A fragment with no kanji and at most this many kana is a bare function word
-# (です / ます / これ / ほど / など ...).  They are genuine grammar points but far
-# too frequent to list one entry per hit, so their sentences are folded into a
-# single capped "basics" entry -- the same treatment the particle rules get.
-_BASIC_KANA_LIMIT = 3
+# A fragment with no kanji and at most this many kana is too generic to be a
+# rule's own display name (です / ます / これ / ほど ...), so such an entry is
+# titled with its whole fragment list rather than its longest piece.  This
+# affects *naming only*: which entries get folded into the aggregated row is
+# decided by _FUNCTION_WORD_IDS below, never by the shape of the text.
+_SHORT_KANA_LIMIT = 3
+
+# Entries that carry no grammar point of their own and are far too frequent to
+# give a row each: the copula / polite paradigm (です・ます・ました・だった), the
+# demonstratives, the counting question words and います (existence).  Their
+# sentences are folded into one capped "basic forms" entry, the same treatment
+# the hand-written particle rules get.
+#
+# Listed by id on purpose, because the pattern text cannot separate these from
+# real grammar points: most JLPT points are *also* short kana tails (のに,
+# ながら, ばかり, つつ, ものの, まみれ, だらけ, くらい, さえ ...) and the obvious
+# regexes mis-fire in both directions -- "Noun + です" also matches ですら (N1,
+# "even"), "それ" also matches それで (N4, "therefore"), "あの" also matches
+# ほどの (N1).  Keep this list explicit and reviewed.
+_FUNCTION_WORD_IDS = frozenset({
+    "desu-polite-copula",
+    "i-adj-desu-politeness",
+    "na-adjective-nonpast",
+    "na-adjective-past",
+    "masu-polite-verb",
+    "mashita-polite-past-verb",
+    "kore-sore-are-demonstratives",
+    "kono-sono-ano-dono-attributive",
+    "koko-soko-asoko-doko",
+    "ikutsu-how-many",
+    "ikura-how-much",
+    "imasu-existence-animate",
+})
+
+# Data entries whose form a hand-written rule already reports precisely, and
+# whose own derived spec would fire on the *other* reading of that form as
+# well: から is 格助詞 after a noun (駅から, "from") and 接続助詞 after a
+# predicate (寒いから, "because"), and a bare から cannot tell them apart --
+# deriving both puts a "because" gloss on every "from" and vice versa.  The
+# hand-written 〜から covers the reason reading by part of speech.
+_SUPERSEDED_IDS = frozenset({"kara-cause"})
+
+# Data entries that are particle usages: their sentences join the single
+# particle row instead of getting a row each, the same treatment the
+# hand-written particle rules get.  (The "from" reading of から is a particle.)
+_PARTICLE_IDS = frozenset({"particle-kara-from"})
 
 # Widest 〜 gap tolerated between the two anchors of a gapped construction
 # (から ... にかけて).  Short windows keep the highlight tight.
@@ -512,9 +577,9 @@ def _jp_fragments(text):
     return out
 
 
-def _is_contentful(fragment):
-    "True if a fragment is specific enough to deserve its own panel entry."
-    return bool(_KANJI.search(fragment)) or len(fragment) > _BASIC_KANA_LIMIT
+def _is_specific(fragment):
+    "True if a fragment is distinctive enough to name a rule on its own."
+    return bool(_KANJI.search(fragment)) or len(fragment) > _SHORT_KANA_LIMIT
 
 
 # Descriptive patterns name what comes *before* the literal fragment
@@ -720,6 +785,12 @@ def _load_level(level):
         hand-written N5 rules, or fragments too vague to match reliably --
         are marked ``skipped`` and never fire, so they cannot cause false
         positives and never appear in the panel.
+
+    The ``kind`` is then taken from the entry itself: only the reviewed
+    function-word ids (see _FUNCTION_WORD_IDS) are folded into the aggregated
+    row, everything else -- however short and kana-only its pattern is --
+    reports on its own, because it is a grammar point the learner is here to
+    study (のに, ばかり, ほど, つつ, ものの, まみれ ...).
     """
     path = os.path.join(_DATA_DIR, f"{level.lower()}.json")
     if not os.path.exists(path):
@@ -728,6 +799,12 @@ def _load_level(level):
         entries = json.load(fh)
     rules = []
     for idx, item in enumerate(entries):
+        if item.get("id") in _SUPERSEDED_IDS:
+            # See _SUPERSEDED_IDS: a hand-written rule reports this form
+            # already, and this entry's own spec would also fire on the
+            # other reading of it.
+            rules.append(_make_data_rule(level, item, idx, skipped=True))
+            continue
         pattern = item.get("pattern") or ""
         fragments = _jp_fragments(pattern)
         if not fragments and not _CONJUGATION_TABLE.search(pattern):
@@ -742,13 +819,12 @@ def _load_level(level):
         if gap is not None:
             specs = [gap]
             shown = [fragments[0], fragments[-1]]
-            kind = "construction"
         else:
-            # Prefer contentful fragments; if the entry has none, the whole
-            # rule is a bare function word and belongs in the basics bucket.
-            contentful = [f for f in fragments if _is_contentful(f)]
+            # Prefer distinctive fragments for the title; an entry whose
+            # fragments are all short kana is titled with all of them (のに).
+            specific = [f for f in fragments if _is_specific(f)]
             specs, shown = [], []
-            for fragment in contentful or fragments:
+            for fragment in specific or fragments:
                 if _covered_by_hand_written(fragment):
                     continue
                 # What the description says comes before this fragment
@@ -761,7 +837,16 @@ def _load_level(level):
             if not specs:
                 rules.append(_make_data_rule(level, item, idx, skipped=True))
                 continue
-            kind = "construction" if contentful else "basic"
+
+        # Which row an entry lands in is a property of the entry, not of how
+        # its pattern happens to be spelled: only the reviewed function-word
+        # ids are folded together, every other entry reports on its own.
+        if item.get("id") in _FUNCTION_WORD_IDS:
+            kind = "basic"
+        elif item.get("id") in _PARTICLE_IDS:
+            kind = "particle"
+        else:
+            kind = "construction"
 
         rules.append(
             _make_data_rule(
@@ -791,7 +876,7 @@ _ZH_DESC = {
     # ---- N5 (hand-written rules) ----
     "〜が（but）": "但是；不过；可是",
     "〜がいます / 〜があります": "有……；存在……（生物或非生物）",
-    "〜から（reason）": "因为；由于",
+    "〜から": "因为；由于",
     "〜が好きです / 〜が嫌いです": "喜欢……／讨厌……",
     "〜たい": "想要做……",
     "〜たことがあります": "曾经做过……；有……的经历",
@@ -896,29 +981,43 @@ _ZH_DESC = {
 }
 
 _ZH_PARTICLE = "基础 N5 助词检测"
-_ZH_BASICS = "基础敬体与功能词（です・ます・これ 等），出现极频繁，仅示意"
+_ZH_BASICS = "基础敬体・指示词・疑问词（です・ます・これ 等），出现极频繁，仅示意"
 
 # Number of example sentences shown for the two aggregated entries, and how
 # many distinct symbols (particles / basic forms) are listed in their titles.
+# Past the cap the title ends in … rather than pretending to be complete.
 _AGGREGATE_EXAMPLE_CAP = 6
-_AGGREGATE_SYMBOL_CAP = 8
+_AGGREGATE_SYMBOL_CAP = 6
 
 # Examples kept per constructive grammar point.  A full JLPT library matches
 # many points on a normal page, so the panel shows a few anchors per point
 # instead of every single instance (which made the pane hundreds of rows).
 _CONSTRUCTION_EXAMPLE_CAP = 3
 
+# Ordering of the levels, easiest first.  Used both to label a merged row with
+# the level where its form is introduced and by the front-end, which groups the
+# panel by level.
+_LEVEL_RANK = {"N5": 0, "N4": 1, "N3": 2, "N2": 3, "N1": 4}
+
 
 def _aggregate_symbols(buckets):
-    "Symbols of the rules that fired, in rule order and without duplicates."
+    """
+    Symbols of the rules that fired, in rule order and without duplicates.
+
+    An entry that lists alternatives (〜この・あの・どの) contributes only its
+    first form: as one "symbol" the whole string reads as three separate
+    particles next to the real ones.  A trailing … marks a truncated list.
+    """
     symbols = []
     for rule in _ALL_RULES:
         if rule["key"] not in buckets:
             continue
         symbol = _PARTICLE_SYMBOLS.get(rule["key"]) or rule["pattern"].lstrip("〜")
+        symbol = symbol.split("・")[0].strip()
         if symbol and symbol not in symbols:
             symbols.append(symbol)
         if len(symbols) >= _AGGREGATE_SYMBOL_CAP:
+            symbols.append("…")
             break
     return symbols
 
@@ -938,6 +1037,39 @@ def _aggregate_examples(buckets):
                     if span not in existing["matches"]:
                         existing["matches"].append(span)
     return shown
+
+
+def _merge_same_name(entries):
+    """
+    Fold entries that would show the same headline into a single row.
+
+    One form can carry several readings -- 〜から is both the starting point
+    (駅から) and the reason (寒いから), 〜こそ is plain emphasis and the てこそ
+    construction -- and a bare literal cannot tell which one it is.  Two rows
+    under the same name show the same sentence with the same highlight twice,
+    which reads as a bug; one row listing both glosses reads the way a
+    textbook lists them.  The row keeps the easiest level of the group, i.e.
+    the level at which the form is first introduced.
+    """
+    merged = []
+    for entry in entries:
+        existing = next((e for e in merged if e["name"] == entry["name"]), None)
+        if existing is None:
+            # Copy the example list too: this row may absorb another entry's
+            # examples below, and mutating the caller's list would be a
+            # surprise for anyone holding on to the unmerged results.
+            merged.append({**entry, "examples": list(entry["examples"])})
+            continue
+        if entry["desc"] and entry["desc"] not in existing["desc"]:
+            existing["desc"] = (existing["desc"] + "；" + entry["desc"]).strip("；")
+        if _LEVEL_RANK.get(entry["level"], 9) < _LEVEL_RANK.get(existing["level"], 9):
+            existing["level"] = entry["level"]
+        for ex in entry["examples"]:
+            if len(existing["examples"]) >= _CONSTRUCTION_EXAMPLE_CAP:
+                break
+            if not any(e["sentence"] == ex["sentence"] for e in existing["examples"]):
+                existing["examples"].append(ex)
+    return merged
 
 
 def _desc(rule, display_lang):
@@ -1010,9 +1142,9 @@ def analyze_japanese(page_text, display_lang="en"):
         matched.append(
             {
                 "key": "basic_forms",
-                "name": "Basics: " + "・".join(_aggregate_symbols(basic_examples)),
+                "name": "Basic forms: " + "・".join(_aggregate_symbols(basic_examples)),
                 "level": "N5",
-                "desc": _ZH_BASICS if display_lang == "zh" else "Basic polite / function words detected",
+                "desc": _ZH_BASICS if display_lang == "zh" else "Copula, demonstratives and question words detected",
                 "examples": _aggregate_examples(basic_examples),
             }
         )
@@ -1027,4 +1159,4 @@ def analyze_japanese(page_text, display_lang="en"):
                 "examples": _aggregate_examples(particle_examples),
             }
         )
-    return matched
+    return _merge_same_name(matched)
