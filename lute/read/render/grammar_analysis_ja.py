@@ -81,6 +81,12 @@ def _match_condition(cond, token):
         return False
     if "surface_not" in cond and token["surface"] in cond["surface_not"]:
         return False
+    # Dictionary form.  Sudachi reports no conjugation field through this
+    # interface, and an inflected 形容詞 keeps its lemma (高かっ / 高く both
+    # lemmatise to 高い), so surface == lemma is how "non-past dictionary form"
+    # is stated.  See _SLOT_SPECS.
+    if cond.get("surface_is_lemma") and token["surface"] != token["lemma"]:
+        return False
     if "lemma" in cond and token["lemma"] not in cond["lemma"]:
         return False
     if "pos1" in cond and token["pos"][0] != cond["pos1"]:
@@ -613,6 +619,71 @@ _VOCAB_IDS = frozenset({
     "ichiban-superlative",
 })
 
+# Data entries that describe a *class* of forms rather than a construction.
+# Their formation text is a list of members, not a template, and nothing in a
+# sentence marks the entry -- so there is no row to show, and the derivation
+# can only pick out whichever members its own examples happen to contain.
+#
+#   jidoushi-tadoushi  "Transitive verb (他動詞) vs intransitive verb (自動詞)
+#                      pairs" -- a category article.  Its formation lists 14
+#                      pairs; the derivation could validate only the two its
+#                      examples contain (開く, 消す), so 11.2% of pages showed
+#                      a row titled "〜開く・消す" pointing at two arbitrary
+#                      verbs.  A sentence does not contain "the transitive /
+#                      intransitive distinction"; the verb in it does, and the
+#                      word popup already says which one it is.
+_CONCEPT_IDS = frozenset({"jidoushi-tadoushi"})
+
+# Data entries whose pattern names a *form* rather than a literal string
+# ("い-adjective + (です)", "Verb ない-form + で").  Their formation text is a
+# list of examples of that form, so the fallback that reads it titles the entry
+# after whichever example word comes first: i-adjective-nonpast came out as
+# "〜高い" (3.5% of pages, a row that only appeared where 高い itself did) and
+# nai-de-without-doing as "〜言わないで" (a row that never appeared at all,
+# because the examples are 食べないで / 言わないで / しないで).  A pattern that
+# names a form has to be matched on that form.
+#
+# Kept as a reviewed map rather than a general slot -> part-of-speech
+# translator, because neither condition below is inferable from the pattern:
+#
+#   * "い-adjective non-past" is not simply 形容詞 -- it is the dictionary
+#     form, and 高かっ / 高く share the lemma 高い.  Hence surface_is_lemma,
+#     with pos2 一般 so that the 形容詞,非自立可能 ない of 高くない is not
+#     counted as one.
+#   * "Verb ない-form + で" is 動詞 + ない + で, and Sudachi reports that ない
+#     as 助動詞 -- no part-of-speech lookup would find it.
+#
+# Each spec is validated against the entry's own examples at load time (see
+# _load_level), so a library update that invalidates one falls back to the old
+# derivation instead of reporting something wrong; a test asserts they stay
+# valid, so that fallback never actually happens.
+_SLOT_SPECS = {
+    "i-adjective-nonpast": (
+        "い形容词",
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "形容詞", "pos2": "一般", "surface_is_lemma": True}
+                ],
+            }
+        ],
+    ),
+    "nai-de-without-doing": (
+        "ないで",
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    {"lemma": {"ない"}},
+                    {"surface": "で"},
+                ],
+            }
+        ],
+    ),
+}
+
 # Widest 〜 gap tolerated between the two anchors of a gapped construction
 # (から ... にかけて).  Short windows keep the highlight tight.
 _ANCHOR_MAXGAP = 8
@@ -860,6 +931,8 @@ def _load_level(level):
     Match specs are derived from the descriptive pattern text and validated
     against the entry's own examples:
 
+      * an entry listed in ``_SLOT_SPECS`` whose pattern names a form rather
+        than a literal string is matched on that form;
       * a gapped construction (から ... にかけて) becomes a two-anchor spec;
       * otherwise every contentful fragment becomes its own spec -- a literal
         substring regex when it occurs in the examples, else a lemma-based
@@ -868,9 +941,11 @@ def _load_level(level):
         as "Verb → potential form", fragments already covered by the
         hand-written N5 rules, or fragments too vague to match reliably --
         are marked ``skipped`` and never fire, so they cannot cause false
-        positives and never appear in the panel.  The reviewed vocabulary
-        ids (see _VOCAB_IDS) are skipped the same way, for a different
-        reason: their rows would only restate the word popup.
+        positives and never appear in the panel.  The reviewed ids in
+        ``_VOCAB_IDS`` (their row would only restate the word popup) and
+        ``_CONCEPT_IDS`` (a class of forms, with nothing in the sentence to
+        point at) are skipped the same way, but only *after* the derivation
+        runs, so ``derived`` still records what it produced.
 
     The ``kind`` is then taken from the entry itself: only the reviewed
     function-word ids (see _FUNCTION_WORD_IDS) are folded into the aggregated
@@ -892,37 +967,57 @@ def _load_level(level):
             rules.append(_make_data_rule(level, item, idx, skipped=True))
             continue
         pattern = item.get("pattern") or ""
-        fragments = _jp_fragments(pattern)
-        if not fragments and not _CONJUGATION_TABLE.search(pattern):
-            # Conjugation tables ("Verb → potential form") describe no
-            # literal construction; their formation text only yields bare
-            # endings, so they are never matched loosely either.
-            fragments = _jp_fragments(item.get("formation") or "")
         joined = "".join(e["japanese"] for e in item.get("examples") or [])
         example_tokens = _tokens_for(joined)
 
-        gap = _gap_spec(fragments, pattern, joined, example_tokens)
-        if gap is not None:
-            specs = [gap]
-            shown = [fragments[0], fragments[-1]]
+        # See _SLOT_SPECS: a pattern that names a form instead of a literal is
+        # matched on the form.  Validated against the entry's own examples, so
+        # a spec the library has outgrown degrades to the old derivation
+        # rather than misreporting.
+        slot = _SLOT_SPECS.get(item.get("id") or "")
+        if slot is not None and not all(
+            _spec_matches(spec, example_tokens, joined) for spec in slot[1]
+        ):
+            slot = None
+
+        fragments = _jp_fragments(pattern)
+        if not fragments and slot is None and not _CONJUGATION_TABLE.search(pattern):
+            # Nothing in the pattern is matchable and there is no reviewed
+            # spec for it, so the only text left is the formation field.  For
+            # an entry that describes a form that field is a list of examples
+            # of it, and reading it titles the entry after one of them -- a
+            # last resort, correct only when the field names the construction
+            # itself.  (Conjugation tables such as "Verb → potential form"
+            # describe no literal construction at all; their formation text
+            # yields bare endings, so they are never matched loosely either.)
+            fragments = _jp_fragments(item.get("formation") or "")
+
+        if slot is not None:
+            shown = [slot[0]]
+            specs = list(slot[1])
         else:
-            # Prefer distinctive fragments for the title; an entry whose
-            # fragments are all short kana is titled with all of them (のに).
-            specific = [f for f in fragments if _is_specific(f)]
-            specs, shown = [], []
-            for fragment in specific or fragments:
-                if _covered_by_hand_written(fragment):
+            gap = _gap_spec(fragments, pattern, joined, example_tokens)
+            if gap is not None:
+                specs = [gap]
+                shown = [fragments[0], fragments[-1]]
+            else:
+                # Prefer distinctive fragments for the title; an entry whose
+                # fragments are all short kana is titled with all of them (のに).
+                specific = [f for f in fragments if _is_specific(f)]
+                specs, shown = [], []
+                for fragment in specific or fragments:
+                    if _covered_by_hand_written(fragment):
+                        continue
+                    # What the description says comes before this fragment
+                    # ("Verb-て + もいい" -> the fragment needs a て in front).
+                    prefix = _context_cond(pattern[: pattern.find(fragment)], fragment)
+                    spec = _fragment_spec(fragment, joined, example_tokens, prefix)
+                    if spec is not None:
+                        specs.append(spec)
+                        shown.append(fragment)
+                if not specs:
+                    rules.append(_make_data_rule(level, item, idx, skipped=True))
                     continue
-                # What the description says comes before this fragment
-                # ("Verb-て + もいい" -> the fragment needs a て in front).
-                prefix = _context_cond(pattern[: pattern.find(fragment)], fragment)
-                spec = _fragment_spec(fragment, joined, example_tokens, prefix)
-                if spec is not None:
-                    specs.append(spec)
-                    shown.append(fragment)
-            if not specs:
-                rules.append(_make_data_rule(level, item, idx, skipped=True))
-                continue
 
         # Which row an entry lands in is a property of the entry, not of how
         # its pattern happens to be spelled: only the reviewed function-word
@@ -934,9 +1029,11 @@ def _load_level(level):
         else:
             kind = "construction"
 
-        # A reviewed vocabulary entry is skipped *after* its spec is derived,
-        # so "derived" still records what the screen matched on.
-        skipped = item.get("id") in _VOCAB_IDS
+        # A reviewed entry that carries no row of its own is skipped *after*
+        # its spec is derived, so "derived" still records what the derivation
+        # produced: _VOCAB_IDS (the word popup already answers it) and
+        # _CONCEPT_IDS (a class of forms, not a construction).
+        skipped = item.get("id") in _VOCAB_IDS or item.get("id") in _CONCEPT_IDS
         rules.append(
             _make_data_rule(
                 level, item, idx, skipped=skipped, specs=specs, shown=shown, kind=kind

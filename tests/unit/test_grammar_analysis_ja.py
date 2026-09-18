@@ -7,10 +7,12 @@ import pytest
 from lute.read.render.grammar_analysis_ja import (
     _ALL_LEVELS,
     _ALL_RULES,
+    _CONCEPT_IDS,
     _DATA_RULES,
     _FUNCTION_WORD_IDS,
     _N5_RULES,
     _PARTICLE_IDS,
+    _SLOT_SPECS,
     _VOCAB_IDS,
     _ZH_DESC,
     analyze_japanese,
@@ -589,3 +591,128 @@ def test_vocabulary_screen_still_flags_the_vocab_ids():
     }
     assert live, "expected the reviewed vocabulary entries to derive a spec"
     assert live <= flagged, sorted(live - flagged)
+
+
+# --- patterns that name a form instead of a literal (see _SLOT_SPECS) ------
+#
+# "い-adjective + (です)" names a part of speech, not a string.  The pattern
+# yields no literal, so the derivation fell back to the entry's formation
+# field -- a list of *examples* of that form -- and titled the row after
+# whichever example came first: "〜高い" (a row that only appeared where 高い
+# itself did) and "〜言わないで" (a row that never appeared at all).
+
+
+def test_slot_specs_match_their_own_examples():
+    """
+    The load-time guard, asserted so that it never actually fires: a reviewed
+    spec that no longer fits its entry's examples is dropped and the entry
+    falls back to the old derivation.  This is what would catch that.
+    """
+    from lute.read.render.grammar_analysis_ja import _spec_matches, _tokens_for
+    from scripts.screen_grammar_library import load_library
+
+    library = load_library()
+    assert _SLOT_SPECS, "expected the reviewed slot specs to be non-empty"
+    for rid, (label, specs) in _SLOT_SPECS.items():
+        assert rid in library, rid
+        assert label, rid
+        entry = library[rid]
+        joined = "".join(e["japanese"] for e in entry["examples"])
+        tokens = _tokens_for(joined)
+        for spec in specs:
+            assert _spec_matches(spec, tokens, joined), rid
+
+
+def test_i_adjective_nonpast_is_matched_on_the_adjective():
+    """
+    The row reports the い-adjective itself, in its non-past (dictionary)
+    form -- the same surface convention as its siblings 〜かった and
+    〜くありません, which is why it is wide: an い-adjective in dictionary
+    form is the default form, and 83% of pages contain one.  Inflected forms
+    belong to those sibling rows, and な-adjectives to theirs.
+    """
+    for sentence in ("この本は高いです。", "その映画は面白い。", "新しい本を読んだ。"):
+        assert "ds_i-adjective-nonpast" in _keys(sentence), sentence
+    for sentence in ("昨日は寒かったです。", "高くありません。", "静かです。", "有名だ。"):
+        assert "ds_i-adjective-nonpast" not in _keys(sentence), sentence
+
+
+def test_nai_de_reports_without_doing():
+    """
+    "Verb ない-form + で" is 動詞 + ない + で -- Sudachi reports that ない as
+    助動詞, so no part-of-speech lookup finds it and the entry has to say so
+    itself.  Its old row was titled 〜言わないで, one of its own examples.
+    """
+    for sentence in (
+        "朝ごはんを食べないで学校へ行った。",
+        "何も言わないでください。",
+        "勉強しないで遊んでいた。",
+    ):
+        assert "ds_nai-de-without-doing" in _keys(sentence), sentence
+    for sentence in ("これは本ではない。", "知らないです。", "少なくないです。"):
+        assert "ds_nai-de-without-doing" not in _keys(sentence), sentence
+
+
+def test_concept_entries_get_no_row():
+    """
+    jidoushi-tadoushi is a category article.  A sentence does not contain "the
+    transitive / intransitive distinction"; the verb in it does, and the word
+    popup already says which one that is.  Its row was titled after two
+    arbitrary members of its example list (〜開く・消す) and appeared on 11.2%
+    of pages.  The constructions those verbs are in still report.
+    """
+    for sentence in ("ドアが開いている。", "電気を消してください。"):
+        assert "ds_jidoushi-tadoushi" not in _keys(sentence), sentence
+    assert "te_iru" in _keys("ドアが開いている。")
+    assert "te_kudasai" in _keys("電気を消してください。")
+
+
+def test_reviewed_silent_ids_are_library_entries():
+    "Same guard as _VOCAB_IDS: a typo would silently stop screening anything."
+    from scripts.screen_grammar_library import load_library
+
+    library = load_library()
+    assert _CONCEPT_IDS <= set(library), sorted(_CONCEPT_IDS - set(library))
+    for rid in _CONCEPT_IDS:
+        rule = next(r for r in _DATA_RULES if r["key"] == "ds_" + rid)
+        assert rule["skipped"] is True
+        assert rule["patterns"] == [], "a skipped rule must carry no matcher"
+        assert rule["derived"], rid
+
+
+# Rules whose headline comes from the formation field yet is still the
+# construction itself -- the pattern's literals sit inside parenthetical
+# alternatives ("Noun + 向け(に / の)"), which the derivation cannot read.
+_FORMATION_NAMED = {
+    "muke-targeted-for",
+    "muki-suitable-for",
+    "hoka-nai-no-choice",
+    "wo-hajime-including",
+}
+
+
+def test_rules_are_named_after_their_own_pattern():
+    """
+    A row's headline has to come from the entry it reports.  When the pattern
+    names no literal, the derivation falls back to the formation field, which
+    for an entry describing a form is a list of examples -- and the row is then
+    named after an example word.  _SLOT_SPECS and _CONCEPT_IDS fix the three
+    that did; this keeps the class from growing back unnoticed.
+    """
+    from scripts.screen_grammar_library import load_library
+
+    library = load_library()
+    named_from_examples = set()
+    for rule in _DATA_RULES:
+        rid = rule["key"][3:]
+        if rule["skipped"] or rid in _SLOT_SPECS:
+            continue
+        pattern = library[rid]["pattern"]
+        if any(
+            frag and frag not in pattern
+            for frag in rule["pattern"].lstrip("〜").split("・")
+        ):
+            named_from_examples.add(rid)
+    assert named_from_examples == _FORMATION_NAMED, sorted(
+        named_from_examples - _FORMATION_NAMED
+    )
