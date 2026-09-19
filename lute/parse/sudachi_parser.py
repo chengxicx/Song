@@ -404,3 +404,33 @@ class JapaneseSudachiParser(AbstractParser):
         if ret in ("", text):
             return None
         return ret
+
+    def content_token_count(self, text: str) -> int:
+        """
+        Number of content-word tokens (自立語) in the given text.
+
+        Used by the lemma/parent backfill (roadmap 2.3, see
+        lute/term/lemma_parents.py): a term that is a concatenation of
+        several content words (似ている) resolves to a concatenated
+        "lemma" (似るいる) which must not become a parent term, whereas
+        a single content word plus auxiliaries (食べた -> 食べる + た)
+        resolves to a real dictionary form.
+
+        Deliberately a separate walk rather than a refactor of
+        get_lemma(): get_lemma() runs on the reading page and in
+        find_or_new(), and is pinned by the parser and grammar tests.
+        """
+        zws = "\u200B"
+        text = text.replace(zws, "")
+
+        if self._string_is_hiragana(text):
+            return 0
+
+        tok = self._build_tokenizer(self._get_dict_setting())
+        split_mode = self._get_split_mode(self._get_mode_setting())
+
+        count = 0
+        for m in tok.tokenize(text, mode=split_mode):
+            if self._is_content_token(m.part_of_speech(), m.surface()):
+                count += 1
+        return count
