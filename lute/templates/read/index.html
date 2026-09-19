@@ -136,13 +136,26 @@
      here so it can be cached and reused without further requests. #}
   <div id="termpopup-cache" style="display:none"></div>
 
+  {# End-of-book controls: two ghost icon buttons over the reserved
+     bottom strip of the very last screen.  Hidden until the reader
+     hovers the reading text (styles.css), and always shown on touch
+     devices, which have no hover. #}
   <div id="reading-end-controls" class="hide">
-    <button type="button" class="mark-known-btn"
+    <button type="button" class="end-icon-btn known"
             id="endMarkRestAsKnown"
             onclick="handle_page_done(true, 0, END_OF_BOOK_MARKS_ALL_PAGES)"
             title="Mark the remaining words on all pages of the book as known and finish the book">
-      Mark rest as known
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>
     </button>
+    {% if series_tag %}
+    <a class="end-icon-btn toc" href="/book/series/{{ series_tag | urlencode }}" title="Back to book set: {{ series_tag }}">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/></svg>
+    </a>
+    {% else %}
+    <a class="end-icon-btn toc" href="/" title="Back to Home">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/></svg>
+    </a>
+    {% endif %}
   </div>
   <div class="btm-margin-container"></div>
 </div>

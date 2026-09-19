@@ -9,6 +9,33 @@ import json
 
 from lute.book.stats import get_difficulty_label
 from lute.db import db
+from lute.models.repositories import MissingUserSettingKeyException
+from lute.models.repositories import UserSettingRepository
+
+
+def configured_series_tags(session):
+    """
+    Book tags configured as series / book sets (UserSetting
+    'book_series_tags', comma-separated tag texts).  Returns the raw
+    tag texts, unescaped.
+    """
+    try:
+        raw = UserSettingRepository(session).get_value("book_series_tags") or ""
+    except MissingUserSettingKeyException:
+        raw = ""
+    return [t.strip() for t in raw.split(",") if t.strip()]
+
+
+def series_tag_for_book(session, book):
+    """
+    The first of the book's tags that is configured as a series, or
+    None when the book doesn't belong to a book set.
+    """
+    tag_texts = [t.text for t in book.book_tags]
+    return next(
+        (st for st in configured_series_tags(session) if st in tag_texts), None
+    )
+
 
 _SERIES_BOOKS_SQL = """
 SELECT
