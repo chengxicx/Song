@@ -239,6 +239,22 @@ def test_language_edit_without_engine_shows_note(client, empty_db):
     assert "No dedicated grammar engine" in resp.data.decode("utf-8")
 
 
+def test_language_edit_ja_ko_note_parser_shipped_engine(client, empty_db, korean, japanese):
+    "日语/韩语语言页不谎称没有引擎：说明引擎（Sudachi/Kiwi）随 parser 提供。"
+    resp = client.get(f"/language/edit/{korean.id}")
+    assert resp.status_code == 200, resp.data
+    body = resp.data.decode("utf-8")
+    assert "Kiwi" in body
+    assert "No dedicated grammar engine" not in body
+    assert "한국어" in body, "语法解释语言下拉应有 한국어 选项"
+
+    resp = client.get(f"/language/edit/{japanese.id}")
+    assert resp.status_code == 200, resp.data
+    body = resp.data.decode("utf-8")
+    assert "Sudachi" in body
+    assert "No dedicated grammar engine" not in body
+
+
 def test_install_route_rejects_unknown_extra(client, empty_db):
     "未知 extra 的安装请求应报错并不执行 pip。"
     resp = client.post(
