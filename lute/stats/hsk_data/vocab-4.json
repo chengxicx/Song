@@ -1,0 +1,4188 @@
+[
+  {
+    "word": "一切",
+    "reading": "yī qiè",
+    "meanings": [
+      "everything"
+    ]
+  },
+  {
+    "word": "不仅",
+    "reading": "bù jǐn",
+    "meanings": [
+      "not only [this one]"
+    ]
+  },
+  {
+    "word": "不但",
+    "reading": "bú dàn",
+    "meanings": [
+      "not only"
+    ]
+  },
+  {
+    "word": "不得不",
+    "reading": "bù dé bù",
+    "meanings": [
+      "to have to"
+    ]
+  },
+  {
+    "word": "不管",
+    "reading": "bù guǎn",
+    "meanings": [
+      "regardless of",
+      "no matter (what/how)"
+    ]
+  },
+  {
+    "word": "不过",
+    "reading": "bú guò",
+    "meanings": [
+      "however"
+    ]
+  },
+  {
+    "word": "专业",
+    "reading": "zhuān yè",
+    "meanings": [
+      "professional"
+    ]
+  },
+  {
+    "word": "专门",
+    "reading": "zhuān mén",
+    "meanings": [
+      "specialised"
+    ]
+  },
+  {
+    "word": "世纪",
+    "reading": "shì jì",
+    "meanings": [
+      "century"
+    ]
+  },
+  {
+    "word": "丢",
+    "reading": "diū",
+    "meanings": [
+      "lose"
+    ]
+  },
+  {
+    "word": "严格",
+    "reading": "yán gé",
+    "meanings": [
+      "strict"
+    ]
+  },
+  {
+    "word": "严重",
+    "reading": "yán zhòng",
+    "meanings": [
+      "serious"
+    ]
+  },
+  {
+    "word": "个子",
+    "reading": "gè zi",
+    "meanings": [
+      "height",
+      "stature"
+    ]
+  },
+  {
+    "word": "中文",
+    "reading": "zhōng wén",
+    "meanings": [
+      "Chinese [written language]"
+    ]
+  },
+  {
+    "word": "丰富",
+    "reading": "fēng fù",
+    "meanings": [
+      "enrich",
+      "abundant rich",
+      "plentiful"
+    ]
+  },
+  {
+    "word": "主动",
+    "reading": "zhǔ dòng",
+    "meanings": [
+      "take the initiative"
+    ]
+  },
+  {
+    "word": "主意",
+    "reading": "zhǔ yi",
+    "meanings": [
+      "idea"
+    ]
+  },
+  {
+    "word": "举办",
+    "reading": "jǔ bàn",
+    "meanings": [
+      "hold",
+      "conduct",
+      "run [an event]"
+    ]
+  },
+  {
+    "word": "之",
+    "reading": "zhī",
+    "meanings": [
+      "[a more literary form of 的",
+      "showing possession]"
+    ]
+  },
+  {
+    "word": "乒乓球",
+    "reading": "pīng pāng qiú",
+    "meanings": [
+      "table tennis",
+      "ping-pong"
+    ]
+  },
+  {
+    "word": "乘坐",
+    "reading": "chéng zuò",
+    "meanings": [
+      "to ride (in a vehicle)"
+    ]
+  },
+  {
+    "word": "也许",
+    "reading": "yě xǔ",
+    "meanings": [
+      "perhaps"
+    ]
+  },
+  {
+    "word": "乱",
+    "reading": "luàn",
+    "meanings": [
+      "chaotic"
+    ]
+  },
+  {
+    "word": "于是",
+    "reading": "yú shì",
+    "meanings": [
+      "as a result"
+    ]
+  },
+  {
+    "word": "互相",
+    "reading": "hù xiāng",
+    "meanings": [
+      "each other"
+    ]
+  },
+  {
+    "word": "亚洲",
+    "reading": "Yà zhōu",
+    "meanings": [
+      "Asia"
+    ]
+  },
+  {
+    "word": "交",
+    "reading": "jiāo",
+    "meanings": [
+      "exchange to hand over",
+      "to accociate with"
+    ]
+  },
+  {
+    "word": "交流",
+    "reading": "jiāo liú",
+    "meanings": [
+      "exchange",
+      "communication"
+    ]
+  },
+  {
+    "word": "交通",
+    "reading": "jiāo tōng",
+    "meanings": [
+      "transport",
+      "traffic"
+    ]
+  },
+  {
+    "word": "京剧",
+    "reading": "jīng jù",
+    "meanings": [
+      "Beijing opera"
+    ]
+  },
+  {
+    "word": "亮",
+    "reading": "liàng",
+    "meanings": [
+      "bright",
+      "to shine"
+    ]
+  },
+  {
+    "word": "亲戚",
+    "reading": "qīn qi",
+    "meanings": [
+      "relatives"
+    ]
+  },
+  {
+    "word": "人民币",
+    "reading": "rén mín bì",
+    "meanings": [
+      "Renminbi [Chinese currency]"
+    ]
+  },
+  {
+    "word": "亿",
+    "reading": "yì",
+    "meanings": [
+      "100 million"
+    ]
+  },
+  {
+    "word": "仍然",
+    "reading": "réng rán",
+    "meanings": [
+      "still"
+    ]
+  },
+  {
+    "word": "从来",
+    "reading": "cóng lái",
+    "meanings": [
+      "always"
+    ]
+  },
+  {
+    "word": "仔细",
+    "reading": "zǐ xì",
+    "meanings": [
+      "careful"
+    ]
+  },
+  {
+    "word": "代替",
+    "reading": "dài tì",
+    "meanings": [
+      "instead"
+    ]
+  },
+  {
+    "word": "代表",
+    "reading": "dài biǎo",
+    "meanings": [
+      "to stand for",
+      "on behalf of representative"
+    ]
+  },
+  {
+    "word": "以",
+    "reading": "yǐ",
+    "meanings": [
+      "using because of",
+      "so as to"
+    ]
+  },
+  {
+    "word": "价格",
+    "reading": "jià gé",
+    "meanings": [
+      "price"
+    ]
+  },
+  {
+    "word": "任何",
+    "reading": "rèn hé",
+    "meanings": [
+      "any"
+    ]
+  },
+  {
+    "word": "任务",
+    "reading": "rèn wu",
+    "meanings": [
+      "task"
+    ]
+  },
+  {
+    "word": "份",
+    "reading": "fèn",
+    "meanings": [
+      "portion"
+    ]
+  },
+  {
+    "word": "优点",
+    "reading": "yōu diǎn",
+    "meanings": [
+      "advantage"
+    ]
+  },
+  {
+    "word": "优秀",
+    "reading": "yōu xiù",
+    "meanings": [
+      "outstanding"
+    ]
+  },
+  {
+    "word": "传真",
+    "reading": "chuán zhēn",
+    "meanings": [
+      "fax"
+    ]
+  },
+  {
+    "word": "伤心",
+    "reading": "shāng xīn",
+    "meanings": [
+      "sad"
+    ]
+  },
+  {
+    "word": "估计",
+    "reading": "gū jì",
+    "meanings": [
+      "to estimate"
+    ]
+  },
+  {
+    "word": "作者",
+    "reading": "zuò zhě",
+    "meanings": [
+      "author"
+    ]
+  },
+  {
+    "word": "使用",
+    "reading": "shǐ yòng",
+    "meanings": [
+      "use"
+    ]
+  },
+  {
+    "word": "例如",
+    "reading": "lì rú",
+    "meanings": [
+      "for example"
+    ]
+  },
+  {
+    "word": "保护",
+    "reading": "bǎo hù",
+    "meanings": [
+      "protection",
+      "to protect"
+    ]
+  },
+  {
+    "word": "保证",
+    "reading": "bǎo zhèng",
+    "meanings": [
+      "guarantee"
+    ]
+  },
+  {
+    "word": "信任",
+    "reading": "xìn rèn",
+    "meanings": [
+      "to trust"
+    ]
+  },
+  {
+    "word": "信心",
+    "reading": "xìn xīn",
+    "meanings": [
+      "confidence"
+    ]
+  },
+  {
+    "word": "信用卡",
+    "reading": "xìn yòng kǎ",
+    "meanings": [
+      "credit card"
+    ]
+  },
+  {
+    "word": "俩",
+    "reading": "liǎ",
+    "meanings": [
+      "two",
+      "both (people)"
+    ]
+  },
+  {
+    "word": "修",
+    "reading": "xiū",
+    "meanings": [
+      "repair"
+    ]
+  },
+  {
+    "word": "值得",
+    "reading": "zhí de",
+    "meanings": [
+      "worthy"
+    ]
+  },
+  {
+    "word": "假",
+    "reading": "jiǎ",
+    "meanings": [
+      "false"
+    ]
+  },
+  {
+    "word": "做生意",
+    "reading": "zuò shēng yi",
+    "meanings": [
+      "to do business"
+    ]
+  },
+  {
+    "word": "停止",
+    "reading": "tíng zhǐ",
+    "meanings": [
+      "to stop"
+    ]
+  },
+  {
+    "word": "偶尔",
+    "reading": "ǒu ěr",
+    "meanings": [
+      "occasionally"
+    ]
+  },
+  {
+    "word": "儿童",
+    "reading": "ér tóng",
+    "meanings": [
+      "child",
+      "children"
+    ]
+  },
+  {
+    "word": "允许",
+    "reading": "yǔn xǔ",
+    "meanings": [
+      "allow",
+      "permit"
+    ]
+  },
+  {
+    "word": "元",
+    "reading": "yuán",
+    "meanings": [
+      "yuan [unit of Chinese currency]",
+      "dollar"
+    ]
+  },
+  {
+    "word": "光",
+    "reading": "guāng",
+    "meanings": [
+      "light"
+    ]
+  },
+  {
+    "word": "免费",
+    "reading": "miǎn fèi",
+    "meanings": [
+      "free"
+    ]
+  },
+  {
+    "word": "入口",
+    "reading": "rù kǒu",
+    "meanings": [
+      "entrance [to a building]"
+    ]
+  },
+  {
+    "word": "全部",
+    "reading": "quán bù",
+    "meanings": [
+      "all"
+    ]
+  },
+  {
+    "word": "公里",
+    "reading": "gōng lǐ",
+    "meanings": [
+      "kilometre"
+    ]
+  },
+  {
+    "word": "共同",
+    "reading": "gòng tóng",
+    "meanings": [
+      "jointly"
+    ]
+  },
+  {
+    "word": "关键",
+    "reading": "guān jiàn",
+    "meanings": [
+      "crucial (point)"
+    ]
+  },
+  {
+    "word": "兴奋",
+    "reading": "xīng fèn",
+    "meanings": [
+      "excited"
+    ]
+  },
+  {
+    "word": "其中",
+    "reading": "qí zhōng",
+    "meanings": [
+      "among which"
+    ]
+  },
+  {
+    "word": "其次",
+    "reading": "qí cì",
+    "meanings": [
+      "next"
+    ]
+  },
+  {
+    "word": "养成",
+    "reading": "yǎng chéng",
+    "meanings": [
+      "to cultivate"
+    ]
+  },
+  {
+    "word": "内",
+    "reading": "nèi",
+    "meanings": [
+      "within"
+    ]
+  },
+  {
+    "word": "内容",
+    "reading": "nèi róng",
+    "meanings": [
+      "content"
+    ]
+  },
+  {
+    "word": "最后",
+    "reading": "zuì hòu",
+    "meanings": [
+      "lastly"
+    ]
+  },
+  {
+    "word": "最好",
+    "reading": "zuì hǎo",
+    "meanings": [
+      "best"
+    ]
+  },
+  {
+    "word": "农村",
+    "reading": "nóng cūn",
+    "meanings": [
+      "countryside rural area"
+    ]
+  },
+  {
+    "word": "冷静",
+    "reading": "lěng jìng",
+    "meanings": [
+      "calm"
+    ]
+  },
+  {
+    "word": "准时",
+    "reading": "zhǔn shí",
+    "meanings": [
+      "punctual"
+    ]
+  },
+  {
+    "word": "准确",
+    "reading": "zhǔn què",
+    "meanings": [
+      "accurate"
+    ]
+  },
+  {
+    "word": "凉快",
+    "reading": "liáng kuai",
+    "meanings": [
+      "cool"
+    ]
+  },
+  {
+    "word": "减少",
+    "reading": "jiǎn shǎo",
+    "meanings": [
+      "to reduce",
+      "to cut back",
+      "decrease"
+    ]
+  },
+  {
+    "word": "减肥",
+    "reading": "jiǎn féi",
+    "meanings": [
+      "to lose weight"
+    ]
+  },
+  {
+    "word": "出发",
+    "reading": "chū fā",
+    "meanings": [
+      "set off",
+      "depart"
+    ]
+  },
+  {
+    "word": "出差",
+    "reading": "chū chāi",
+    "meanings": [
+      "go on business trip"
+    ]
+  },
+  {
+    "word": "出生",
+    "reading": "chū shēng",
+    "meanings": [
+      "birth",
+      "to be born"
+    ]
+  },
+  {
+    "word": "刀",
+    "reading": "dāo",
+    "meanings": [
+      "knife"
+    ]
+  },
+  {
+    "word": "分之",
+    "reading": "fēn zhī",
+    "meanings": [
+      "X out of Y"
+    ]
+  },
+  {
+    "word": "判断",
+    "reading": "pàn duàn",
+    "meanings": [
+      "to decide"
+    ]
+  },
+  {
+    "word": "到处",
+    "reading": "dào chù",
+    "meanings": [
+      "everywhere"
+    ]
+  },
+  {
+    "word": "到底",
+    "reading": "dào dǐ",
+    "meanings": [
+      "in the end"
+    ]
+  },
+  {
+    "word": "制造",
+    "reading": "zhì zào",
+    "meanings": [
+      "to manufacture"
+    ]
+  },
+  {
+    "word": "剩",
+    "reading": "shèng",
+    "meanings": [
+      "spare"
+    ]
+  },
+  {
+    "word": "力气",
+    "reading": "lì qi",
+    "meanings": [
+      "strength"
+    ]
+  },
+  {
+    "word": "加油站",
+    "reading": "jiā yóu zhàn",
+    "meanings": [
+      "petrol station"
+    ]
+  },
+  {
+    "word": "加班",
+    "reading": "jiā bān",
+    "meanings": [
+      "over work"
+    ]
+  },
+  {
+    "word": "动作",
+    "reading": "dòng zuò",
+    "meanings": [
+      "movement"
+    ]
+  },
+  {
+    "word": "勇敢",
+    "reading": "yǒng gǎn",
+    "meanings": [
+      "brave"
+    ]
+  },
+  {
+    "word": "包括",
+    "reading": "bāo kuò",
+    "meanings": [
+      "include"
+    ]
+  },
+  {
+    "word": "区别",
+    "reading": "qū bié",
+    "meanings": [
+      "difference"
+    ]
+  },
+  {
+    "word": "十分",
+    "reading": "shí fēn",
+    "meanings": [
+      "completely",
+      "utterly [literally \"ten points\"]"
+    ]
+  },
+  {
+    "word": "千万",
+    "reading": "qiān wàn",
+    "meanings": [
+      "ten million"
+    ]
+  },
+  {
+    "word": "博士",
+    "reading": "bó shì",
+    "meanings": [
+      "doctor"
+    ]
+  },
+  {
+    "word": "印象",
+    "reading": "yìn xiàng",
+    "meanings": [
+      "impression"
+    ]
+  },
+  {
+    "word": "危险",
+    "reading": "wēi xiǎn",
+    "meanings": [
+      "dangerous",
+      "danger"
+    ]
+  },
+  {
+    "word": "即使",
+    "reading": "jí shǐ",
+    "meanings": [
+      "even if"
+    ]
+  },
+  {
+    "word": "却",
+    "reading": "què",
+    "meanings": [
+      "but"
+    ]
+  },
+  {
+    "word": "厉害",
+    "reading": "lì hai",
+    "meanings": [
+      "difficult to deal with"
+    ]
+  },
+  {
+    "word": "压力",
+    "reading": "yā lì",
+    "meanings": [
+      "pressure"
+    ]
+  },
+  {
+    "word": "厚",
+    "reading": "hòu",
+    "meanings": [
+      "thick"
+    ]
+  },
+  {
+    "word": "原因",
+    "reading": "yuán yīn",
+    "meanings": [
+      "reason"
+    ]
+  },
+  {
+    "word": "原来",
+    "reading": "yuán lái",
+    "meanings": [
+      "originally"
+    ]
+  },
+  {
+    "word": "原谅",
+    "reading": "yuán liàng",
+    "meanings": [
+      "to excuse"
+    ]
+  },
+  {
+    "word": "参观",
+    "reading": "cān guān",
+    "meanings": [
+      "to visit (a place",
+      "a museum",
+      "etc.)"
+    ]
+  },
+  {
+    "word": "及时",
+    "reading": "jí shí",
+    "meanings": [
+      "in time"
+    ]
+  },
+  {
+    "word": "友好",
+    "reading": "yǒu hǎo",
+    "meanings": [
+      "friendly"
+    ]
+  },
+  {
+    "word": "友谊",
+    "reading": "yǒu yì",
+    "meanings": [
+      "companionship"
+    ]
+  },
+  {
+    "word": "反对",
+    "reading": "fǎn duì",
+    "meanings": [
+      "to fight against",
+      "to opposed to something"
+    ]
+  },
+  {
+    "word": "反映",
+    "reading": "fǎn yìng",
+    "meanings": [
+      "to mirror"
+    ]
+  },
+  {
+    "word": "发",
+    "reading": "fā",
+    "meanings": [
+      "to send (an email)"
+    ]
+  },
+  {
+    "word": "发展",
+    "reading": "fā zhǎn",
+    "meanings": [
+      "develop"
+    ]
+  },
+  {
+    "word": "发生",
+    "reading": "fā shēng",
+    "meanings": [
+      "happen"
+    ]
+  },
+  {
+    "word": "取",
+    "reading": "qǔ",
+    "meanings": [
+      "take",
+      "get"
+    ]
+  },
+  {
+    "word": "受不了",
+    "reading": "shòu bù liǎo",
+    "meanings": [
+      "cannot bear it"
+    ]
+  },
+  {
+    "word": "另外",
+    "reading": "lìng wài",
+    "meanings": [
+      "another"
+    ]
+  },
+  {
+    "word": "只好",
+    "reading": "zhǐ hǎo",
+    "meanings": [
+      "have to",
+      "forced to"
+    ]
+  },
+  {
+    "word": "只要",
+    "reading": "zhǐ yào",
+    "meanings": [
+      "so long as ..."
+    ]
+  },
+  {
+    "word": "可怜",
+    "reading": "kě lián",
+    "meanings": [
+      "pitiful",
+      "to have pity on"
+    ]
+  },
+  {
+    "word": "可惜",
+    "reading": "kě xī",
+    "meanings": [
+      "it's a pity"
+    ]
+  },
+  {
+    "word": "可是",
+    "reading": "kě shì",
+    "meanings": [
+      "but"
+    ]
+  },
+  {
+    "word": "台",
+    "reading": "tái",
+    "meanings": [
+      "platform"
+    ]
+  },
+  {
+    "word": "叶子",
+    "reading": "yè zi",
+    "meanings": [
+      "foliage"
+    ]
+  },
+  {
+    "word": "号码",
+    "reading": "hào mǎ",
+    "meanings": [
+      "number"
+    ]
+  },
+  {
+    "word": "吃惊",
+    "reading": "chī jīng",
+    "meanings": [
+      "to be startled"
+    ]
+  },
+  {
+    "word": "各",
+    "reading": "gè",
+    "meanings": [
+      "each"
+    ]
+  },
+  {
+    "word": "合格",
+    "reading": "hé gé",
+    "meanings": [
+      "qualified"
+    ]
+  },
+  {
+    "word": "合适",
+    "reading": "hé shì",
+    "meanings": [
+      "suitable"
+    ]
+  },
+  {
+    "word": "同情",
+    "reading": "tóng qíng",
+    "meanings": [
+      "to sympathize with"
+    ]
+  },
+  {
+    "word": "后悔",
+    "reading": "hòu huǐ",
+    "meanings": [
+      "to regret"
+    ]
+  },
+  {
+    "word": "后来",
+    "reading": "hòu lái",
+    "meanings": [
+      "afterward"
+    ]
+  },
+  {
+    "word": "否则",
+    "reading": "fǒu zé",
+    "meanings": [
+      "if not"
+    ]
+  },
+  {
+    "word": "吵",
+    "reading": "chǎo",
+    "meanings": [
+      "noisy"
+    ]
+  },
+  {
+    "word": "吸引",
+    "reading": "xī yǐn",
+    "meanings": [
+      "to attract (interest, investment etc)"
+    ]
+  },
+  {
+    "word": "呀",
+    "reading": "ya",
+    "meanings": [
+      "ah"
+    ]
+  },
+  {
+    "word": "周围",
+    "reading": "zhōu wéi",
+    "meanings": [
+      "around"
+    ]
+  },
+  {
+    "word": "味道",
+    "reading": "wèi dào",
+    "meanings": [
+      "flavour"
+    ]
+  },
+  {
+    "word": "咱们",
+    "reading": "zán men",
+    "meanings": [
+      "we [you and me etc.]"
+    ]
+  },
+  {
+    "word": "咳嗽",
+    "reading": "ké sou",
+    "meanings": [
+      "cough"
+    ]
+  },
+  {
+    "word": "咸",
+    "reading": "xián",
+    "meanings": [
+      "salty"
+    ]
+  },
+  {
+    "word": "响",
+    "reading": "xiǎng",
+    "meanings": [
+      "echo"
+    ]
+  },
+  {
+    "word": "售货员",
+    "reading": "shòu huò yuán",
+    "meanings": [
+      "sales assistant"
+    ]
+  },
+  {
+    "word": "商量",
+    "reading": "shāng liang",
+    "meanings": [
+      "to consult"
+    ]
+  },
+  {
+    "word": "嘴",
+    "reading": "zuǐ",
+    "meanings": [
+      "mouth"
+    ]
+  },
+  {
+    "word": "回忆",
+    "reading": "huí yì",
+    "meanings": [
+      "to recall"
+    ]
+  },
+  {
+    "word": "因此",
+    "reading": "yīn cǐ",
+    "meanings": [
+      "because of this"
+    ]
+  },
+  {
+    "word": "困",
+    "reading": "kùn",
+    "meanings": [
+      "difficulty",
+      "sleepy"
+    ]
+  },
+  {
+    "word": "困难",
+    "reading": "kùn nan",
+    "meanings": [
+      "difficulty"
+    ]
+  },
+  {
+    "word": "国际",
+    "reading": "guó jì",
+    "meanings": [
+      "international"
+    ]
+  },
+  {
+    "word": "地址",
+    "reading": "dì zhǐ",
+    "meanings": [
+      "address"
+    ]
+  },
+  {
+    "word": "地球",
+    "reading": "dì qiú",
+    "meanings": [
+      "earth"
+    ]
+  },
+  {
+    "word": "坚持",
+    "reading": "jiān chí",
+    "meanings": [
+      "to persevere with"
+    ]
+  },
+  {
+    "word": "垃圾桶",
+    "reading": "lā jī tǒng",
+    "meanings": [
+      "rubbish bin"
+    ]
+  },
+  {
+    "word": "基础",
+    "reading": "jī chǔ",
+    "meanings": [
+      "base"
+    ]
+  },
+  {
+    "word": "堵车",
+    "reading": "dǔ chē",
+    "meanings": [
+      "traffic jam"
+    ]
+  },
+  {
+    "word": "塑料袋",
+    "reading": "sù liào dài",
+    "meanings": [
+      "plastic bag"
+    ]
+  },
+  {
+    "word": "填空",
+    "reading": "tián kòng",
+    "meanings": [
+      "fill in blanks"
+    ]
+  },
+  {
+    "word": "墙",
+    "reading": "qiáng",
+    "meanings": [
+      "wall"
+    ]
+  },
+  {
+    "word": "增加",
+    "reading": "zēng jiā",
+    "meanings": [
+      "to increase",
+      "add",
+      "raise"
+    ]
+  },
+  {
+    "word": "增长",
+    "reading": "zēng zhǎng",
+    "meanings": [
+      "to grow"
+    ]
+  },
+  {
+    "word": "复印",
+    "reading": "fù yìn",
+    "meanings": [
+      "to photocopy"
+    ]
+  },
+  {
+    "word": "复杂",
+    "reading": "fù zá",
+    "meanings": [
+      "complicated"
+    ]
+  },
+  {
+    "word": "够",
+    "reading": "gòu",
+    "meanings": [
+      "enough"
+    ]
+  },
+  {
+    "word": "大使馆",
+    "reading": "dà shǐ guǎn",
+    "meanings": [
+      "embassy"
+    ]
+  },
+  {
+    "word": "大夫",
+    "reading": "dài fu",
+    "meanings": [
+      "doctor"
+    ]
+  },
+  {
+    "word": "大概",
+    "reading": "dà gài",
+    "meanings": [
+      "probably",
+      "maybe"
+    ]
+  },
+  {
+    "word": "大约",
+    "reading": "dà yuē",
+    "meanings": [
+      "approximately",
+      "around",
+      "about"
+    ]
+  },
+  {
+    "word": "失望",
+    "reading": "shī wàng",
+    "meanings": [
+      "disappointed"
+    ]
+  },
+  {
+    "word": "失败",
+    "reading": "shī bài",
+    "meanings": [
+      "fail"
+    ]
+  },
+  {
+    "word": "奖金",
+    "reading": "jiǎng jīn",
+    "meanings": [
+      "premium"
+    ]
+  },
+  {
+    "word": "好像",
+    "reading": "hǎo xiàng",
+    "meanings": [
+      "to seem"
+    ]
+  },
+  {
+    "word": "好处",
+    "reading": "hǎo chu",
+    "meanings": [
+      "advantage",
+      "benefit"
+    ]
+  },
+  {
+    "word": "孤单",
+    "reading": "gū dān",
+    "meanings": [
+      "alone"
+    ]
+  },
+  {
+    "word": "安全",
+    "reading": "ān quán",
+    "meanings": [
+      "safe",
+      "security"
+    ]
+  },
+  {
+    "word": "安排",
+    "reading": "ān pái",
+    "meanings": [
+      "to arrange",
+      "plan"
+    ]
+  },
+  {
+    "word": "完全",
+    "reading": "wán quán",
+    "meanings": [
+      "complete"
+    ]
+  },
+  {
+    "word": "实在",
+    "reading": "shí zài",
+    "meanings": [
+      "truly"
+    ]
+  },
+  {
+    "word": "实际",
+    "reading": "shí jì",
+    "meanings": [
+      "reality",
+      "specific",
+      "actual"
+    ]
+  },
+  {
+    "word": "害羞",
+    "reading": "hài xiū",
+    "meanings": [
+      "shy"
+    ]
+  },
+  {
+    "word": "家具",
+    "reading": "jiā jù",
+    "meanings": [
+      "furniture"
+    ]
+  },
+  {
+    "word": "宽",
+    "reading": "kuān",
+    "meanings": [
+      "wide"
+    ]
+  },
+  {
+    "word": "寄",
+    "reading": "jì",
+    "meanings": [
+      "to send (mail",
+      "post)"
+    ]
+  },
+  {
+    "word": "密码",
+    "reading": "mì mǎ",
+    "meanings": [
+      "code"
+    ]
+  },
+  {
+    "word": "富",
+    "reading": "fù",
+    "meanings": [
+      "rich"
+    ]
+  },
+  {
+    "word": "寒假",
+    "reading": "hán jià",
+    "meanings": [
+      "winter holiday"
+    ]
+  },
+  {
+    "word": "对话",
+    "reading": "duì huà",
+    "meanings": [
+      "dialogue"
+    ]
+  },
+  {
+    "word": "对面",
+    "reading": "duì miàn",
+    "meanings": [
+      "opposite"
+    ]
+  },
+  {
+    "word": "导游",
+    "reading": "dǎo yóu",
+    "meanings": [
+      "lead a site-seeing tour"
+    ]
+  },
+  {
+    "word": "将来",
+    "reading": "jiāng lái",
+    "meanings": [
+      "in the future",
+      "future"
+    ]
+  },
+  {
+    "word": "尊重",
+    "reading": "zūn zhòng",
+    "meanings": [
+      "to honour"
+    ]
+  },
+  {
+    "word": "小说",
+    "reading": "xiǎo shuō",
+    "meanings": [
+      "novel"
+    ]
+  },
+  {
+    "word": "尝",
+    "reading": "cháng",
+    "meanings": [
+      "taste"
+    ]
+  },
+  {
+    "word": "尤其",
+    "reading": "yóu qí",
+    "meanings": [
+      "especially"
+    ]
+  },
+  {
+    "word": "尽管",
+    "reading": "jǐn guǎn",
+    "meanings": [
+      "without hesitating",
+      "despite"
+    ]
+  },
+  {
+    "word": "工具",
+    "reading": "gōng jù",
+    "meanings": [
+      "tool"
+    ]
+  },
+  {
+    "word": "工资",
+    "reading": "gōng zī",
+    "meanings": [
+      "wage",
+      "salary"
+    ]
+  },
+  {
+    "word": "巧克力",
+    "reading": "qiǎo kè lì",
+    "meanings": [
+      "chocolate"
+    ]
+  },
+  {
+    "word": "差不多",
+    "reading": "chà bu duō",
+    "meanings": [
+      "almost"
+    ]
+  },
+  {
+    "word": "市场",
+    "reading": "shì chǎng",
+    "meanings": [
+      "market"
+    ]
+  },
+  {
+    "word": "帅",
+    "reading": "shuài",
+    "meanings": [
+      "handsome"
+    ]
+  },
+  {
+    "word": "师傅",
+    "reading": "shī fu",
+    "meanings": [
+      "master"
+    ]
+  },
+  {
+    "word": "干杯",
+    "reading": "gān bēi",
+    "meanings": [
+      "cheers"
+    ]
+  },
+  {
+    "word": "干燥",
+    "reading": "gān zào",
+    "meanings": [
+      "dull",
+      "dry"
+    ]
+  },
+  {
+    "word": "平时",
+    "reading": "píng shí",
+    "meanings": [
+      "ordinarily"
+    ]
+  },
+  {
+    "word": "年龄",
+    "reading": "nián líng",
+    "meanings": [
+      "age"
+    ]
+  },
+  {
+    "word": "并且",
+    "reading": "bìng qiě",
+    "meanings": [
+      "and"
+    ]
+  },
+  {
+    "word": "幸福",
+    "reading": "xìng fú",
+    "meanings": [
+      "happiness"
+    ]
+  },
+  {
+    "word": "幽默",
+    "reading": "yōu mò",
+    "meanings": [
+      "humorous"
+    ]
+  },
+  {
+    "word": "广告",
+    "reading": "guǎng gào",
+    "meanings": [
+      "advertisement"
+    ]
+  },
+  {
+    "word": "广播",
+    "reading": "guǎng bō",
+    "meanings": [
+      "broadcast"
+    ]
+  },
+  {
+    "word": "底",
+    "reading": "dǐ",
+    "meanings": [
+      "bottom"
+    ]
+  },
+  {
+    "word": "座",
+    "reading": "zuò",
+    "meanings": [
+      "seat"
+    ]
+  },
+  {
+    "word": "座位",
+    "reading": "zuò wèi",
+    "meanings": [
+      "place",
+      "seat"
+    ]
+  },
+  {
+    "word": "开玩笑",
+    "reading": "kāi wán xiào",
+    "meanings": [
+      "joke"
+    ]
+  },
+  {
+    "word": "弄",
+    "reading": "nòng",
+    "meanings": [
+      "play with",
+      "fix",
+      "manage"
+    ]
+  },
+  {
+    "word": "引起",
+    "reading": "yǐn qǐ",
+    "meanings": [
+      "to give rise to"
+    ]
+  },
+  {
+    "word": "弹钢琴",
+    "reading": "tán gāng qín",
+    "meanings": [
+      "to play the piano"
+    ]
+  },
+  {
+    "word": "当",
+    "reading": "dāng",
+    "meanings": [
+      "work as"
+    ]
+  },
+  {
+    "word": "当地",
+    "reading": "dāng dì",
+    "meanings": [
+      "local area"
+    ]
+  },
+  {
+    "word": "当时",
+    "reading": "dāng shí",
+    "meanings": [
+      "at that time"
+    ]
+  },
+  {
+    "word": "往",
+    "reading": "wǎng",
+    "meanings": [
+      "towards"
+    ]
+  },
+  {
+    "word": "往往",
+    "reading": "wǎng wǎng",
+    "meanings": [
+      "often"
+    ]
+  },
+  {
+    "word": "律师",
+    "reading": "lǜ shī",
+    "meanings": [
+      "lawyer"
+    ]
+  },
+  {
+    "word": "得意",
+    "reading": "dé yì",
+    "meanings": [
+      "proud of oneself"
+    ]
+  },
+  {
+    "word": "心情",
+    "reading": "xīn qíng",
+    "meanings": [
+      "mood"
+    ]
+  },
+  {
+    "word": "忽然",
+    "reading": "hū rán",
+    "meanings": [
+      "suddenly"
+    ]
+  },
+  {
+    "word": "怀疑",
+    "reading": "huái yí",
+    "meanings": [
+      "doubt"
+    ]
+  },
+  {
+    "word": "态度",
+    "reading": "tài du",
+    "meanings": [
+      "manner"
+    ]
+  },
+  {
+    "word": "性别",
+    "reading": "xìng bié",
+    "meanings": [
+      "sex",
+      "gender"
+    ]
+  },
+  {
+    "word": "性格",
+    "reading": "xìng gé",
+    "meanings": [
+      "temperament"
+    ]
+  },
+  {
+    "word": "总结",
+    "reading": "zǒng jié",
+    "meanings": [
+      "to sum up"
+    ]
+  },
+  {
+    "word": "恐怕",
+    "reading": "kǒng pà",
+    "meanings": [
+      "afraid"
+    ]
+  },
+  {
+    "word": "情况",
+    "reading": "qíng kuàng",
+    "meanings": [
+      "happening"
+    ]
+  },
+  {
+    "word": "愉快",
+    "reading": "yú kuài",
+    "meanings": [
+      "joyful"
+    ]
+  },
+  {
+    "word": "意见",
+    "reading": "yì jiàn",
+    "meanings": [
+      "idea"
+    ]
+  },
+  {
+    "word": "感动",
+    "reading": "gǎn dòng",
+    "meanings": [
+      "move (emotionally)"
+    ]
+  },
+  {
+    "word": "感情",
+    "reading": "gǎn qíng",
+    "meanings": [
+      "feeling"
+    ]
+  },
+  {
+    "word": "感觉",
+    "reading": "gǎn jué",
+    "meanings": [
+      "feel"
+    ]
+  },
+  {
+    "word": "感谢",
+    "reading": "gǎn xiè",
+    "meanings": [
+      "to thank"
+    ]
+  },
+  {
+    "word": "懒",
+    "reading": "lǎn",
+    "meanings": [
+      "lazy"
+    ]
+  },
+  {
+    "word": "成为",
+    "reading": "chéng wéi",
+    "meanings": [
+      "become"
+    ]
+  },
+  {
+    "word": "成功",
+    "reading": "chéng gōng",
+    "meanings": [
+      "success",
+      "successful"
+    ]
+  },
+  {
+    "word": "成熟",
+    "reading": "chéng shú",
+    "meanings": [
+      "mature"
+    ]
+  },
+  {
+    "word": "戴",
+    "reading": "dài",
+    "meanings": [
+      "to wear (accessories)"
+    ]
+  },
+  {
+    "word": "所有",
+    "reading": "suǒ yǒu",
+    "meanings": [
+      "all"
+    ]
+  },
+  {
+    "word": "打印",
+    "reading": "dǎ yìn",
+    "meanings": [
+      "print"
+    ]
+  },
+  {
+    "word": "打扮",
+    "reading": "dǎ ban",
+    "meanings": [
+      "to decorate"
+    ]
+  },
+  {
+    "word": "打扰",
+    "reading": "dǎ rǎo",
+    "meanings": [
+      "disturb"
+    ]
+  },
+  {
+    "word": "打折",
+    "reading": "dǎ zhé",
+    "meanings": [
+      "to give a discount"
+    ]
+  },
+  {
+    "word": "打针",
+    "reading": "dǎ zhēn",
+    "meanings": [
+      "give/have an injection"
+    ]
+  },
+  {
+    "word": "扔",
+    "reading": "rēng",
+    "meanings": [
+      "to throw"
+    ]
+  },
+  {
+    "word": "扩大",
+    "reading": "kuò dà",
+    "meanings": [
+      "to expand"
+    ]
+  },
+  {
+    "word": "批评",
+    "reading": "pī píng",
+    "meanings": [
+      "criticise"
+    ]
+  },
+  {
+    "word": "技术",
+    "reading": "jì shù",
+    "meanings": [
+      "technology"
+    ]
+  },
+  {
+    "word": "护士",
+    "reading": "hù shi",
+    "meanings": [
+      "nurse"
+    ]
+  },
+  {
+    "word": "报名",
+    "reading": "bào míng",
+    "meanings": [
+      "sign up"
+    ]
+  },
+  {
+    "word": "报道",
+    "reading": "bào dào",
+    "meanings": [
+      "report"
+    ]
+  },
+  {
+    "word": "抬",
+    "reading": "tái",
+    "meanings": [
+      "to lift"
+    ]
+  },
+  {
+    "word": "抱",
+    "reading": "bào",
+    "meanings": [
+      "to hold"
+    ]
+  },
+  {
+    "word": "抱歉",
+    "reading": "bào qiàn",
+    "meanings": [
+      "apologise"
+    ]
+  },
+  {
+    "word": "抽烟",
+    "reading": "chōu yān",
+    "meanings": [
+      "to smoke"
+    ]
+  },
+  {
+    "word": "拉",
+    "reading": "lā",
+    "meanings": [
+      "to play (a bowed instrument) to pull"
+    ]
+  },
+  {
+    "word": "拒绝",
+    "reading": "jù jué",
+    "meanings": [
+      "to refuse"
+    ]
+  },
+  {
+    "word": "招聘",
+    "reading": "zhāo pìn",
+    "meanings": [
+      "recruitment"
+    ]
+  },
+  {
+    "word": "挂",
+    "reading": "guà",
+    "meanings": [
+      "hang up"
+    ]
+  },
+  {
+    "word": "指",
+    "reading": "zhǐ",
+    "meanings": [
+      "finger",
+      "point at"
+    ]
+  },
+  {
+    "word": "按时",
+    "reading": "àn shí",
+    "meanings": [
+      "on time"
+    ]
+  },
+  {
+    "word": "按照",
+    "reading": "àn zhào",
+    "meanings": [
+      "according to"
+    ]
+  },
+  {
+    "word": "挺",
+    "reading": "tǐng",
+    "meanings": [
+      "quite"
+    ]
+  },
+  {
+    "word": "掉",
+    "reading": "diào",
+    "meanings": [
+      "lose",
+      "[as a complement after some verbs to indicate result of action]"
+    ]
+  },
+  {
+    "word": "排列",
+    "reading": "pái liè",
+    "meanings": [
+      "array"
+    ]
+  },
+  {
+    "word": "接受",
+    "reading": "jiē shòu",
+    "meanings": [
+      "accept"
+    ]
+  },
+  {
+    "word": "推",
+    "reading": "tuī",
+    "meanings": [
+      "to push",
+      "refuse"
+    ]
+  },
+  {
+    "word": "推迟",
+    "reading": "tuī chí",
+    "meanings": [
+      "to postpone"
+    ]
+  },
+  {
+    "word": "提供",
+    "reading": "tí gōng",
+    "meanings": [
+      "to offer"
+    ]
+  },
+  {
+    "word": "提前",
+    "reading": "tí qián",
+    "meanings": [
+      "in advance"
+    ]
+  },
+  {
+    "word": "提醒",
+    "reading": "tí xǐng",
+    "meanings": [
+      "remind"
+    ]
+  },
+  {
+    "word": "握手",
+    "reading": "wò shǒu",
+    "meanings": [
+      "to shake hands"
+    ]
+  },
+  {
+    "word": "撞",
+    "reading": "zhuàng",
+    "meanings": [
+      "to hit"
+    ]
+  },
+  {
+    "word": "擦",
+    "reading": "cā",
+    "meanings": [
+      "rub"
+    ]
+  },
+  {
+    "word": "支持",
+    "reading": "zhī chí",
+    "meanings": [
+      "to be in favour of"
+    ]
+  },
+  {
+    "word": "收",
+    "reading": "shōu",
+    "meanings": [
+      "to receive"
+    ]
+  },
+  {
+    "word": "收入",
+    "reading": "shōu rù",
+    "meanings": [
+      "income"
+    ]
+  },
+  {
+    "word": "收拾",
+    "reading": "shōu shi",
+    "meanings": [
+      "to put in order"
+    ]
+  },
+  {
+    "word": "改变",
+    "reading": "gǎi biàn",
+    "meanings": [
+      "to change"
+    ]
+  },
+  {
+    "word": "放弃",
+    "reading": "fàng qì",
+    "meanings": [
+      "to renounce"
+    ]
+  },
+  {
+    "word": "放暑假",
+    "reading": "fàng shǔ jià",
+    "meanings": [
+      "to be on summer vacation"
+    ]
+  },
+  {
+    "word": "故意",
+    "reading": "gù yì",
+    "meanings": [
+      "intentional"
+    ]
+  },
+  {
+    "word": "效果",
+    "reading": "xiào guǒ",
+    "meanings": [
+      "result"
+    ]
+  },
+  {
+    "word": "教授",
+    "reading": "jiào shòu",
+    "meanings": [
+      "professor"
+    ]
+  },
+  {
+    "word": "教育",
+    "reading": "jiào yù",
+    "meanings": [
+      "education"
+    ]
+  },
+  {
+    "word": "散步",
+    "reading": "sàn bù",
+    "meanings": [
+      "to go for a walk",
+      "stroll"
+    ]
+  },
+  {
+    "word": "数字",
+    "reading": "shù zì",
+    "meanings": [
+      "digital"
+    ]
+  },
+  {
+    "word": "数量",
+    "reading": "shù liàng",
+    "meanings": [
+      "amount"
+    ]
+  },
+  {
+    "word": "敲",
+    "reading": "qiāo",
+    "meanings": [
+      "to hit"
+    ]
+  },
+  {
+    "word": "整理",
+    "reading": "zhěng lǐ",
+    "meanings": [
+      "to arrange"
+    ]
+  },
+  {
+    "word": "整齐",
+    "reading": "zhěng qí",
+    "meanings": [
+      "tidy"
+    ]
+  },
+  {
+    "word": "文章",
+    "reading": "wén zhāng",
+    "meanings": [
+      "essay"
+    ]
+  },
+  {
+    "word": "断",
+    "reading": "duàn",
+    "meanings": [
+      "to break"
+    ]
+  },
+  {
+    "word": "方向",
+    "reading": "fāng xiàng",
+    "meanings": [
+      "direction"
+    ]
+  },
+  {
+    "word": "方法",
+    "reading": "fāng fǎ",
+    "meanings": [
+      "method"
+    ]
+  },
+  {
+    "word": "方面",
+    "reading": "fāng miàn",
+    "meanings": [
+      "aspect"
+    ]
+  },
+  {
+    "word": "无",
+    "reading": "wú",
+    "meanings": [
+      "without"
+    ]
+  },
+  {
+    "word": "无聊",
+    "reading": "wú liáo",
+    "meanings": [
+      "bored",
+      "boring"
+    ]
+  },
+  {
+    "word": "无论",
+    "reading": "wú lùn",
+    "meanings": [
+      "no matter what or how"
+    ]
+  },
+  {
+    "word": "既然",
+    "reading": "jì rán",
+    "meanings": [
+      "since"
+    ]
+  },
+  {
+    "word": "日记",
+    "reading": "rì jì",
+    "meanings": [
+      "diary"
+    ]
+  },
+  {
+    "word": "普遍",
+    "reading": "pǔ biàn",
+    "meanings": [
+      "universal"
+    ]
+  },
+  {
+    "word": "暂时",
+    "reading": "zàn shí",
+    "meanings": [
+      "for the time being",
+      "temporary"
+    ]
+  },
+  {
+    "word": "暖和",
+    "reading": "nuǎn huo",
+    "meanings": [
+      "warm"
+    ]
+  },
+  {
+    "word": "暗",
+    "reading": "àn",
+    "meanings": [
+      "dark"
+    ]
+  },
+  {
+    "word": "有趣",
+    "reading": "yǒu qù",
+    "meanings": [
+      "interesting",
+      "fascinating"
+    ]
+  },
+  {
+    "word": "本来",
+    "reading": "běn lái",
+    "meanings": [
+      "originally"
+    ]
+  },
+  {
+    "word": "朵",
+    "reading": "duǒ",
+    "meanings": [
+      "stem",
+      "[measure word for flowers]"
+    ]
+  },
+  {
+    "word": "杂志",
+    "reading": "zá zhì",
+    "meanings": [
+      "magazine"
+    ]
+  },
+  {
+    "word": "材料",
+    "reading": "cái liào",
+    "meanings": [
+      "material"
+    ]
+  },
+  {
+    "word": "条件",
+    "reading": "tiáo jiàn",
+    "meanings": [
+      "condition"
+    ]
+  },
+  {
+    "word": "来不及",
+    "reading": "lái bu jí",
+    "meanings": [
+      "there's not enough time (to do something)"
+    ]
+  },
+  {
+    "word": "来得及",
+    "reading": "lái de jí",
+    "meanings": [
+      "there's still time"
+    ]
+  },
+  {
+    "word": "极其",
+    "reading": "jí qí",
+    "meanings": [
+      "extremely"
+    ]
+  },
+  {
+    "word": "果然",
+    "reading": "guǒ rán",
+    "meanings": [
+      "really"
+    ]
+  },
+  {
+    "word": "标准",
+    "reading": "biāo zhǔn",
+    "meanings": [
+      "standard",
+      "standardised"
+    ]
+  },
+  {
+    "word": "样子",
+    "reading": "yàng zi",
+    "meanings": [
+      "appearance"
+    ]
+  },
+  {
+    "word": "桥",
+    "reading": "qiáo",
+    "meanings": [
+      "bridge"
+    ]
+  },
+  {
+    "word": "梦",
+    "reading": "mèng",
+    "meanings": [
+      "dream"
+    ]
+  },
+  {
+    "word": "森林",
+    "reading": "sēn lín",
+    "meanings": [
+      "forest"
+    ]
+  },
+  {
+    "word": "棵",
+    "reading": "kē",
+    "meanings": [
+      "individual [measure word for trees, cabbages, plants etc]"
+    ]
+  },
+  {
+    "word": "植物",
+    "reading": "zhí wù",
+    "meanings": [
+      "plants"
+    ]
+  },
+  {
+    "word": "正好",
+    "reading": "zhèng hǎo",
+    "meanings": [
+      "just right"
+    ]
+  },
+  {
+    "word": "正常",
+    "reading": "zhèng cháng",
+    "meanings": [
+      "normal",
+      "fine",
+      "generally speaking"
+    ]
+  },
+  {
+    "word": "正式",
+    "reading": "zhèng shì",
+    "meanings": [
+      "formal"
+    ]
+  },
+  {
+    "word": "正确",
+    "reading": "zhèng què",
+    "meanings": [
+      "correct"
+    ]
+  },
+  {
+    "word": "死",
+    "reading": "sǐ",
+    "meanings": [
+      "die",
+      "extremely",
+      "rigid"
+    ]
+  },
+  {
+    "word": "母亲",
+    "reading": "mǔ qīn",
+    "meanings": [
+      "mother"
+    ]
+  },
+  {
+    "word": "毕业",
+    "reading": "bì yè",
+    "meanings": [
+      "graduate"
+    ]
+  },
+  {
+    "word": "毛巾",
+    "reading": "máo jīn",
+    "meanings": [
+      "towel"
+    ]
+  },
+  {
+    "word": "民族",
+    "reading": "mín zú",
+    "meanings": [
+      "nationality"
+    ]
+  },
+  {
+    "word": "气候",
+    "reading": "qì hòu",
+    "meanings": [
+      "climate"
+    ]
+  },
+  {
+    "word": "永远",
+    "reading": "yǒng yuǎn",
+    "meanings": [
+      "forever"
+    ]
+  },
+  {
+    "word": "汗",
+    "reading": "hàn",
+    "meanings": [
+      "sweat"
+    ]
+  },
+  {
+    "word": "污染",
+    "reading": "wū rǎn",
+    "meanings": [
+      "pollution",
+      "to contaminate"
+    ]
+  },
+  {
+    "word": "汤",
+    "reading": "tāng",
+    "meanings": [
+      "soup"
+    ]
+  },
+  {
+    "word": "沙发",
+    "reading": "shā fā",
+    "meanings": [
+      "sofa"
+    ]
+  },
+  {
+    "word": "法律",
+    "reading": "fǎ lǜ",
+    "meanings": [
+      "law"
+    ]
+  },
+  {
+    "word": "洗衣机",
+    "reading": "xǐ yī jī",
+    "meanings": [
+      "washing machine"
+    ]
+  },
+  {
+    "word": "活动",
+    "reading": "huó dòng",
+    "meanings": [
+      "activity"
+    ]
+  },
+  {
+    "word": "活泼",
+    "reading": "huó po",
+    "meanings": [
+      "brisk",
+      "lively"
+    ]
+  },
+  {
+    "word": "流利",
+    "reading": "liú lì",
+    "meanings": [
+      "fluent"
+    ]
+  },
+  {
+    "word": "流泪",
+    "reading": "liú lèi",
+    "meanings": [
+      "to shed tears"
+    ]
+  },
+  {
+    "word": "流行",
+    "reading": "liú xíng",
+    "meanings": [
+      "popular"
+    ]
+  },
+  {
+    "word": "浪漫",
+    "reading": "làng màn",
+    "meanings": [
+      "romantic"
+    ]
+  },
+  {
+    "word": "浪费",
+    "reading": "làng fèi",
+    "meanings": [
+      "waste"
+    ]
+  },
+  {
+    "word": "海洋",
+    "reading": "hǎi yáng",
+    "meanings": [
+      "ocean"
+    ]
+  },
+  {
+    "word": "消息",
+    "reading": "xiāo xi",
+    "meanings": [
+      "news"
+    ]
+  },
+  {
+    "word": "深",
+    "reading": "shēn",
+    "meanings": [
+      "dark [colour]",
+      "deep"
+    ]
+  },
+  {
+    "word": "温度",
+    "reading": "wēn dù",
+    "meanings": [
+      "temperature"
+    ]
+  },
+  {
+    "word": "湿润",
+    "reading": "shī rùn",
+    "meanings": [
+      "moist"
+    ]
+  },
+  {
+    "word": "满",
+    "reading": "mǎn",
+    "meanings": [
+      "reach a quota or limit",
+      "full"
+    ]
+  },
+  {
+    "word": "演出",
+    "reading": "yǎn chū",
+    "meanings": [
+      "performance"
+    ]
+  },
+  {
+    "word": "演员",
+    "reading": "yǎn yuán",
+    "meanings": [
+      "actor/actress"
+    ]
+  },
+  {
+    "word": "激动",
+    "reading": "jī dòng",
+    "meanings": [
+      "to excite"
+    ]
+  },
+  {
+    "word": "火",
+    "reading": "huǒ",
+    "meanings": [
+      "fire"
+    ]
+  },
+  {
+    "word": "烦恼",
+    "reading": "fán nǎo",
+    "meanings": [
+      "to be worried"
+    ]
+  },
+  {
+    "word": "热闹",
+    "reading": "rè nao",
+    "meanings": [
+      "bustling",
+      "lively"
+    ]
+  },
+  {
+    "word": "然而",
+    "reading": "rán ér",
+    "meanings": [
+      "however"
+    ]
+  },
+  {
+    "word": "熟悉",
+    "reading": "shú xī",
+    "meanings": [
+      "to be familiar with"
+    ]
+  },
+  {
+    "word": "爱情",
+    "reading": "ài qíng",
+    "meanings": [
+      "romantic love"
+    ]
+  },
+  {
+    "word": "父亲",
+    "reading": "fù qīn",
+    "meanings": [
+      "father"
+    ]
+  },
+  {
+    "word": "牙膏",
+    "reading": "yá gāo",
+    "meanings": [
+      "toothpaste"
+    ]
+  },
+  {
+    "word": "特点",
+    "reading": "tè diǎn",
+    "meanings": [
+      "characteristic feature"
+    ]
+  },
+  {
+    "word": "猜",
+    "reading": "cāi",
+    "meanings": [
+      "guess"
+    ]
+  },
+  {
+    "word": "猪",
+    "reading": "zhū",
+    "meanings": [
+      "pig"
+    ]
+  },
+  {
+    "word": "猴子",
+    "reading": "hóu zi",
+    "meanings": [
+      "monkey"
+    ]
+  },
+  {
+    "word": "现代",
+    "reading": "xiàn dài",
+    "meanings": [
+      "modern"
+    ]
+  },
+  {
+    "word": "理发",
+    "reading": "lǐ fà",
+    "meanings": [
+      "hair-dressing"
+    ]
+  },
+  {
+    "word": "理想",
+    "reading": "lǐ xiǎng",
+    "meanings": [
+      "ideal",
+      "ambition"
+    ]
+  },
+  {
+    "word": "理解",
+    "reading": "lǐ jiě",
+    "meanings": [
+      "comprehend",
+      "understanding"
+    ]
+  },
+  {
+    "word": "瓶子",
+    "reading": "píng zi",
+    "meanings": [
+      "bottle"
+    ]
+  },
+  {
+    "word": "甚至",
+    "reading": "shèn zhì",
+    "meanings": [
+      "even"
+    ]
+  },
+  {
+    "word": "生命",
+    "reading": "shēng mìng",
+    "meanings": [
+      "life"
+    ]
+  },
+  {
+    "word": "生活",
+    "reading": "shēng huó",
+    "meanings": [
+      "life"
+    ]
+  },
+  {
+    "word": "由",
+    "reading": "yóu",
+    "meanings": [
+      "from"
+    ]
+  },
+  {
+    "word": "由于",
+    "reading": "yóu yú",
+    "meanings": [
+      "due to"
+    ]
+  },
+  {
+    "word": "申请",
+    "reading": "shēn qǐng",
+    "meanings": [
+      "to apply",
+      "application"
+    ]
+  },
+  {
+    "word": "留",
+    "reading": "liú",
+    "meanings": [
+      "remain"
+    ]
+  },
+  {
+    "word": "留学",
+    "reading": "liú xué",
+    "meanings": [
+      "study abroad"
+    ]
+  },
+  {
+    "word": "皮肤",
+    "reading": "pí fū",
+    "meanings": [
+      "skin"
+    ]
+  },
+  {
+    "word": "盐",
+    "reading": "yán",
+    "meanings": [
+      "salt"
+    ]
+  },
+  {
+    "word": "盒子",
+    "reading": "hé zi",
+    "meanings": [
+      "small box"
+    ]
+  },
+  {
+    "word": "目的",
+    "reading": "mù dì",
+    "meanings": [
+      "objective",
+      "purpose"
+    ]
+  },
+  {
+    "word": "直接",
+    "reading": "zhí jiē",
+    "meanings": [
+      "direct"
+    ]
+  },
+  {
+    "word": "相反",
+    "reading": "xiāng fǎn",
+    "meanings": [
+      "opposite",
+      "on the contrary"
+    ]
+  },
+  {
+    "word": "省",
+    "reading": "shěng",
+    "meanings": [
+      "to save"
+    ]
+  },
+  {
+    "word": "看法",
+    "reading": "kàn fǎ",
+    "meanings": [
+      "opinion"
+    ]
+  },
+  {
+    "word": "真正",
+    "reading": "zhēn zhèng",
+    "meanings": [
+      "real"
+    ]
+  },
+  {
+    "word": "知识",
+    "reading": "zhī shi",
+    "meanings": [
+      "knowledge"
+    ]
+  },
+  {
+    "word": "研究生",
+    "reading": "yán jiū shēng",
+    "meanings": [
+      "graduate student"
+    ]
+  },
+  {
+    "word": "破",
+    "reading": "pò",
+    "meanings": [
+      "break"
+    ]
+  },
+  {
+    "word": "硕士",
+    "reading": "shuò shì",
+    "meanings": [
+      "master's degree"
+    ]
+  },
+  {
+    "word": "硬",
+    "reading": "yìng",
+    "meanings": [
+      "hard"
+    ]
+  },
+  {
+    "word": "确实",
+    "reading": "què shí",
+    "meanings": [
+      "indeed"
+    ]
+  },
+  {
+    "word": "礼貌",
+    "reading": "lǐ mào",
+    "meanings": [
+      "courtesy",
+      "politeness"
+    ]
+  },
+  {
+    "word": "社会",
+    "reading": "shè huì",
+    "meanings": [
+      "society"
+    ]
+  },
+  {
+    "word": "祝贺",
+    "reading": "zhù hè",
+    "meanings": [
+      "to congratulate"
+    ]
+  },
+  {
+    "word": "禁止",
+    "reading": "jìn zhǐ",
+    "meanings": [
+      "to ban",
+      "prohibit",
+      "forbid"
+    ]
+  },
+  {
+    "word": "科学",
+    "reading": "kē xué",
+    "meanings": [
+      "science"
+    ]
+  },
+  {
+    "word": "租",
+    "reading": "zū",
+    "meanings": [
+      "to rent"
+    ]
+  },
+  {
+    "word": "积极",
+    "reading": "jī jí",
+    "meanings": [
+      "active"
+    ]
+  },
+  {
+    "word": "积累",
+    "reading": "jī lěi",
+    "meanings": [
+      "to accumulate"
+    ]
+  },
+  {
+    "word": "稍微",
+    "reading": "shāo wēi",
+    "meanings": [
+      "a little bit"
+    ]
+  },
+  {
+    "word": "究竟",
+    "reading": "jiū jìng",
+    "meanings": [
+      "after all",
+      "when all is said and done"
+    ]
+  },
+  {
+    "word": "穷",
+    "reading": "qióng",
+    "meanings": [
+      "poor"
+    ]
+  },
+  {
+    "word": "空气",
+    "reading": "kōng qì",
+    "meanings": [
+      "air"
+    ]
+  },
+  {
+    "word": "窄",
+    "reading": "zhǎi",
+    "meanings": [
+      "narrow"
+    ]
+  },
+  {
+    "word": "窗户",
+    "reading": "chuāng hu",
+    "meanings": [
+      "window"
+    ]
+  },
+  {
+    "word": "竞争",
+    "reading": "jìng zhēng",
+    "meanings": [
+      "to compete"
+    ]
+  },
+  {
+    "word": "笑话",
+    "reading": "xiào huà",
+    "meanings": [
+      "joke"
+    ]
+  },
+  {
+    "word": "笔记本",
+    "reading": "bǐ jì běn",
+    "meanings": [
+      "notebook"
+    ]
+  },
+  {
+    "word": "符合",
+    "reading": "fú hé",
+    "meanings": [
+      "tally with",
+      "accord with"
+    ]
+  },
+  {
+    "word": "笨",
+    "reading": "bèn",
+    "meanings": [
+      "stupid"
+    ]
+  },
+  {
+    "word": "答案",
+    "reading": "dá àn",
+    "meanings": [
+      "answer"
+    ]
+  },
+  {
+    "word": "签证",
+    "reading": "qiān zhèng",
+    "meanings": [
+      "visa"
+    ]
+  },
+  {
+    "word": "算",
+    "reading": "suàn",
+    "meanings": [
+      "reckon"
+    ]
+  },
+  {
+    "word": "管理",
+    "reading": "guǎn lǐ",
+    "meanings": [
+      "to supervise"
+    ]
+  },
+  {
+    "word": "篇",
+    "reading": "piān",
+    "meanings": [
+      "sheet"
+    ]
+  },
+  {
+    "word": "粗心",
+    "reading": "cū xīn",
+    "meanings": [
+      "careless"
+    ]
+  },
+  {
+    "word": "精彩",
+    "reading": "jīng cǎi",
+    "meanings": [
+      "brilliant"
+    ]
+  },
+  {
+    "word": "精神",
+    "reading": "jīng shén",
+    "meanings": [
+      "essence",
+      "spirit"
+    ]
+  },
+  {
+    "word": "紧张",
+    "reading": "jǐn zhāng",
+    "meanings": [
+      "nervous",
+      "anxious"
+    ]
+  },
+  {
+    "word": "约会",
+    "reading": "yuē huì",
+    "meanings": [
+      "appointment"
+    ]
+  },
+  {
+    "word": "组成",
+    "reading": "zǔ chéng",
+    "meanings": [
+      "to form"
+    ]
+  },
+  {
+    "word": "组织",
+    "reading": "zǔ zhī",
+    "meanings": [
+      "organisation"
+    ]
+  },
+  {
+    "word": "经历",
+    "reading": "jīng lì",
+    "meanings": [
+      "experience"
+    ]
+  },
+  {
+    "word": "经济",
+    "reading": "jīng jì",
+    "meanings": [
+      "economics"
+    ]
+  },
+  {
+    "word": "经验",
+    "reading": "jīng yàn",
+    "meanings": [
+      "experience"
+    ]
+  },
+  {
+    "word": "继续",
+    "reading": "jì xù",
+    "meanings": [
+      "to carry on",
+      "continue"
+    ]
+  },
+  {
+    "word": "缺少",
+    "reading": "quē shǎo",
+    "meanings": [
+      "lack"
+    ]
+  },
+  {
+    "word": "缺点",
+    "reading": "quē diǎn",
+    "meanings": [
+      "disadvantage"
+    ]
+  },
+  {
+    "word": "网球",
+    "reading": "wǎng qiú",
+    "meanings": [
+      "tennis"
+    ]
+  },
+  {
+    "word": "网站",
+    "reading": "wǎng zhàn",
+    "meanings": [
+      "website"
+    ]
+  },
+  {
+    "word": "美丽",
+    "reading": "měi lì",
+    "meanings": [
+      "pretty"
+    ]
+  },
+  {
+    "word": "羡慕",
+    "reading": "xiàn mù",
+    "meanings": [
+      "to envy"
+    ]
+  },
+  {
+    "word": "群",
+    "reading": "qún",
+    "meanings": [
+      "group"
+    ]
+  },
+  {
+    "word": "羽毛球",
+    "reading": "yǔ máo qiú",
+    "meanings": [
+      "badminton"
+    ]
+  },
+  {
+    "word": "翻译",
+    "reading": "fān yì",
+    "meanings": [
+      "to translate"
+    ]
+  },
+  {
+    "word": "老虎",
+    "reading": "lǎo hǔ",
+    "meanings": [
+      "tiger"
+    ]
+  },
+  {
+    "word": "考虑",
+    "reading": "kǎo lǜ",
+    "meanings": [
+      "consider"
+    ]
+  },
+  {
+    "word": "而",
+    "reading": "ér",
+    "meanings": [
+      "and",
+      "while"
+    ]
+  },
+  {
+    "word": "耐心",
+    "reading": "nài xīn",
+    "meanings": [
+      "patient"
+    ]
+  },
+  {
+    "word": "聊天",
+    "reading": "liáo tiān",
+    "meanings": [
+      "to chat"
+    ]
+  },
+  {
+    "word": "职业",
+    "reading": "zhí yè",
+    "meanings": [
+      "profession",
+      "career"
+    ]
+  },
+  {
+    "word": "联系",
+    "reading": "lián xì",
+    "meanings": [
+      "to make contact"
+    ]
+  },
+  {
+    "word": "肚子",
+    "reading": "dù zi",
+    "meanings": [
+      "belly"
+    ]
+  },
+  {
+    "word": "肯定",
+    "reading": "kěn dìng",
+    "meanings": [
+      "certain",
+      "definite"
+    ]
+  },
+  {
+    "word": "能力",
+    "reading": "néng lì",
+    "meanings": [
+      "skills",
+      "ability"
+    ]
+  },
+  {
+    "word": "脱",
+    "reading": "tuō",
+    "meanings": [
+      "to escape",
+      "shed"
+    ]
+  },
+  {
+    "word": "自然",
+    "reading": "zì rán",
+    "meanings": [
+      "natural"
+    ]
+  },
+  {
+    "word": "至少",
+    "reading": "zhì shǎo",
+    "meanings": [
+      "at least"
+    ]
+  },
+  {
+    "word": "航班",
+    "reading": "háng bān",
+    "meanings": [
+      "flight"
+    ]
+  },
+  {
+    "word": "艺术",
+    "reading": "yì shù",
+    "meanings": [
+      "art"
+    ]
+  },
+  {
+    "word": "节约",
+    "reading": "jié yuē",
+    "meanings": [
+      "to save",
+      "economise"
+    ]
+  },
+  {
+    "word": "苦",
+    "reading": "kǔ",
+    "meanings": [
+      "bitter"
+    ]
+  },
+  {
+    "word": "范围",
+    "reading": "fàn wéi",
+    "meanings": [
+      "range"
+    ]
+  },
+  {
+    "word": "获得",
+    "reading": "huò dé",
+    "meanings": [
+      "obtain",
+      "win"
+    ]
+  },
+  {
+    "word": "著名",
+    "reading": "zhù míng",
+    "meanings": [
+      "famous"
+    ]
+  },
+  {
+    "word": "血",
+    "reading": "xuè",
+    "meanings": [
+      "blood"
+    ]
+  },
+  {
+    "word": "行",
+    "reading": "xíng",
+    "meanings": [
+      "OK"
+    ]
+  },
+  {
+    "word": "表扬",
+    "reading": "biǎo yáng",
+    "meanings": [
+      "to praise"
+    ]
+  },
+  {
+    "word": "表格",
+    "reading": "biǎo gé",
+    "meanings": [
+      "form",
+      "table"
+    ]
+  },
+  {
+    "word": "表达",
+    "reading": "biǎo dá",
+    "meanings": [
+      "to voice (an opinion)"
+    ]
+  },
+  {
+    "word": "袜子",
+    "reading": "wà zi",
+    "meanings": [
+      "socks"
+    ]
+  },
+  {
+    "word": "被",
+    "reading": "bèi",
+    "meanings": [
+      "quilt",
+      "by (somebody/something)"
+    ]
+  },
+  {
+    "word": "西红柿",
+    "reading": "xī hóng shì",
+    "meanings": [
+      "tomato"
+    ]
+  },
+  {
+    "word": "观众",
+    "reading": "guān zhòng",
+    "meanings": [
+      "audience"
+    ]
+  },
+  {
+    "word": "规定",
+    "reading": "guī dìng",
+    "meanings": [
+      "rule"
+    ]
+  },
+  {
+    "word": "解释",
+    "reading": "jiě shì",
+    "meanings": [
+      "to justify",
+      "explanation"
+    ]
+  },
+  {
+    "word": "警察",
+    "reading": "jǐng chá",
+    "meanings": [
+      "police"
+    ]
+  },
+  {
+    "word": "计划",
+    "reading": "jì huà",
+    "meanings": [
+      "plan"
+    ]
+  },
+  {
+    "word": "讨厌",
+    "reading": "tǎo yàn",
+    "meanings": [
+      "dislike",
+      "loathe"
+    ]
+  },
+  {
+    "word": "讨论",
+    "reading": "tǎo lùn",
+    "meanings": [
+      "to discuss"
+    ]
+  },
+  {
+    "word": "记者",
+    "reading": "jì zhě",
+    "meanings": [
+      "journalist"
+    ]
+  },
+  {
+    "word": "许多",
+    "reading": "xǔ duō",
+    "meanings": [
+      "many"
+    ]
+  },
+  {
+    "word": "访问",
+    "reading": "fǎng wèn",
+    "meanings": [
+      "to interview",
+      "visit"
+    ]
+  },
+  {
+    "word": "证明",
+    "reading": "zhèng míng",
+    "meanings": [
+      "proof"
+    ]
+  },
+  {
+    "word": "词典",
+    "reading": "cí diǎn",
+    "meanings": [
+      "dictionary"
+    ]
+  },
+  {
+    "word": "试",
+    "reading": "shì",
+    "meanings": [
+      "to try"
+    ]
+  },
+  {
+    "word": "诚实",
+    "reading": "chéng shí",
+    "meanings": [
+      "honest"
+    ]
+  },
+  {
+    "word": "详细",
+    "reading": "xiáng xì",
+    "meanings": [
+      "detailed"
+    ]
+  },
+  {
+    "word": "语法",
+    "reading": "yǔ fǎ",
+    "meanings": [
+      "grammar"
+    ]
+  },
+  {
+    "word": "语言",
+    "reading": "yǔ yán",
+    "meanings": [
+      "language"
+    ]
+  },
+  {
+    "word": "误会",
+    "reading": "wù huì",
+    "meanings": [
+      "to misunderstand"
+    ]
+  },
+  {
+    "word": "说明",
+    "reading": "shuō míng",
+    "meanings": [
+      "to explain",
+      "instruction"
+    ]
+  },
+  {
+    "word": "请假",
+    "reading": "qǐng jià",
+    "meanings": [
+      "ask for leave"
+    ]
+  },
+  {
+    "word": "请客",
+    "reading": "qǐng kè",
+    "meanings": [
+      "invite to dinner"
+    ]
+  },
+  {
+    "word": "调查",
+    "reading": "diào chá",
+    "meanings": [
+      "investigation"
+    ]
+  },
+  {
+    "word": "谈",
+    "reading": "tán",
+    "meanings": [
+      "talk"
+    ]
+  },
+  {
+    "word": "负责",
+    "reading": "fù zé",
+    "meanings": [
+      "responsible for"
+    ]
+  },
+  {
+    "word": "责任",
+    "reading": "zé rèn",
+    "meanings": [
+      "responsibility"
+    ]
+  },
+  {
+    "word": "质量",
+    "reading": "zhì liàng",
+    "meanings": [
+      "quality"
+    ]
+  },
+  {
+    "word": "购物",
+    "reading": "gòu wù",
+    "meanings": [
+      "shopping"
+    ]
+  },
+  {
+    "word": "赚",
+    "reading": "zhuàn",
+    "meanings": [
+      "to earn"
+    ]
+  },
+  {
+    "word": "赢",
+    "reading": "yíng",
+    "meanings": [
+      "win"
+    ]
+  },
+  {
+    "word": "起飞",
+    "reading": "qǐ fēi",
+    "meanings": [
+      "take off [plane]"
+    ]
+  },
+  {
+    "word": "超过",
+    "reading": "chāo guò",
+    "meanings": [
+      "exceed"
+    ]
+  },
+  {
+    "word": "距离",
+    "reading": "jù lí",
+    "meanings": [
+      "distance",
+      "be away from"
+    ]
+  },
+  {
+    "word": "躺",
+    "reading": "tǎng",
+    "meanings": [
+      "lie down"
+    ]
+  },
+  {
+    "word": "软",
+    "reading": "ruǎn",
+    "meanings": [
+      "soft"
+    ]
+  },
+  {
+    "word": "轻",
+    "reading": "qīng",
+    "meanings": [
+      "light-weight"
+    ]
+  },
+  {
+    "word": "轻松",
+    "reading": "qīng sōng",
+    "meanings": [
+      "gentle"
+    ]
+  },
+  {
+    "word": "输",
+    "reading": "shū",
+    "meanings": [
+      "to lose"
+    ]
+  },
+  {
+    "word": "辛苦",
+    "reading": "xīn kǔ",
+    "meanings": [
+      "hard",
+      "tough [work",
+      "life]"
+    ]
+  },
+  {
+    "word": "辣",
+    "reading": "là",
+    "meanings": [
+      "spicy"
+    ]
+  },
+  {
+    "word": "过程",
+    "reading": "guò chéng",
+    "meanings": [
+      "course of events"
+    ]
+  },
+  {
+    "word": "进行",
+    "reading": "jìn xíng",
+    "meanings": [
+      "advance",
+      "progress"
+    ]
+  },
+  {
+    "word": "连",
+    "reading": "lián",
+    "meanings": [
+      "connect"
+    ]
+  },
+  {
+    "word": "适合",
+    "reading": "shì hé",
+    "meanings": [
+      "suitable for"
+    ]
+  },
+  {
+    "word": "适应",
+    "reading": "shì yìng",
+    "meanings": [
+      "to adapt"
+    ]
+  },
+  {
+    "word": "逐渐",
+    "reading": "zhú jiàn",
+    "meanings": [
+      "gradually"
+    ]
+  },
+  {
+    "word": "通知",
+    "reading": "tōng zhī",
+    "meanings": [
+      "notify"
+    ]
+  },
+  {
+    "word": "通过",
+    "reading": "tōng guò",
+    "meanings": [
+      "by means of",
+      "through",
+      "via"
+    ]
+  },
+  {
+    "word": "逛",
+    "reading": "guàng",
+    "meanings": [
+      "stroll"
+    ]
+  },
+  {
+    "word": "速度",
+    "reading": "sù dù",
+    "meanings": [
+      "speed"
+    ]
+  },
+  {
+    "word": "遍",
+    "reading": "biàn",
+    "meanings": [
+      "time [when doing something repeatedly]"
+    ]
+  },
+  {
+    "word": "道歉",
+    "reading": "dào qiàn",
+    "meanings": [
+      "apology"
+    ]
+  },
+  {
+    "word": "邀请",
+    "reading": "yāo qǐng",
+    "meanings": [
+      "invitation"
+    ]
+  },
+  {
+    "word": "酸",
+    "reading": "suān",
+    "meanings": [
+      "sour"
+    ]
+  },
+  {
+    "word": "醒",
+    "reading": "xǐng",
+    "meanings": [
+      "wake",
+      "awake"
+    ]
+  },
+  {
+    "word": "重新",
+    "reading": "chóng xīn",
+    "meanings": [
+      "again"
+    ]
+  },
+  {
+    "word": "重点",
+    "reading": "zhòng diǎn",
+    "meanings": [
+      "main point"
+    ]
+  },
+  {
+    "word": "重视",
+    "reading": "zhòng shì",
+    "meanings": [
+      "value"
+    ]
+  },
+  {
+    "word": "钥匙",
+    "reading": "yào shi",
+    "meanings": [
+      "key"
+    ]
+  },
+  {
+    "word": "镜子",
+    "reading": "jìng zi",
+    "meanings": [
+      "mirror"
+    ]
+  },
+  {
+    "word": "长城",
+    "reading": "Cháng chéng",
+    "meanings": [
+      "The Great Wall"
+    ]
+  },
+  {
+    "word": "长江",
+    "reading": "Cháng jiāng",
+    "meanings": [
+      "Yangtze River"
+    ]
+  },
+  {
+    "word": "阅读",
+    "reading": "yuè dú",
+    "meanings": [
+      "reading"
+    ]
+  },
+  {
+    "word": "阳光",
+    "reading": "yáng guāng",
+    "meanings": [
+      "optimistic",
+      "cheerful",
+      "sunlight"
+    ]
+  },
+  {
+    "word": "降低",
+    "reading": "jiàng dī",
+    "meanings": [
+      "to reduce"
+    ]
+  },
+  {
+    "word": "限制",
+    "reading": "xiàn zhì",
+    "meanings": [
+      "to restrict"
+    ]
+  },
+  {
+    "word": "陪",
+    "reading": "péi",
+    "meanings": [
+      "accompany"
+    ]
+  },
+  {
+    "word": "随便",
+    "reading": "suí biàn",
+    "meanings": [
+      "as one wishes"
+    ]
+  },
+  {
+    "word": "随着",
+    "reading": "suí zhe",
+    "meanings": [
+      "along with"
+    ]
+  },
+  {
+    "word": "难受",
+    "reading": "nán shòu",
+    "meanings": [
+      "feel unwell",
+      "difficult to bear"
+    ]
+  },
+  {
+    "word": "难道",
+    "reading": "nán dào",
+    "meanings": [
+      "could it be...?"
+    ]
+  },
+  {
+    "word": "集合",
+    "reading": "jí hé",
+    "meanings": [
+      "to gather"
+    ]
+  },
+  {
+    "word": "竟然",
+    "reading": "jìng rán",
+    "meanings": [
+      "[indicates unexpectedness]"
+    ]
+  },
+  {
+    "word": "页",
+    "reading": "yè",
+    "meanings": [
+      "page"
+    ]
+  },
+  {
+    "word": "顺便",
+    "reading": "shùn biàn",
+    "meanings": [
+      "in passing",
+      "incidentally"
+    ]
+  },
+  {
+    "word": "顺利",
+    "reading": "shùn lì",
+    "meanings": [
+      "smooth"
+    ]
+  },
+  {
+    "word": "顺序",
+    "reading": "shùn xù",
+    "meanings": [
+      "sequence"
+    ]
+  },
+  {
+    "word": "顾客",
+    "reading": "gù kè",
+    "meanings": [
+      "customer"
+    ]
+  },
+  {
+    "word": "顿",
+    "reading": "dùn",
+    "meanings": [
+      "[measure word for occurences, and therefore of meals]"
+    ]
+  },
+  {
+    "word": "预习",
+    "reading": "yù xí",
+    "meanings": [
+      "to prepare a lesson"
+    ]
+  },
+  {
+    "word": "风景",
+    "reading": "fēng jǐng",
+    "meanings": [
+      "scenery"
+    ]
+  },
+  {
+    "word": "食品",
+    "reading": "shí pǐn",
+    "meanings": [
+      "food (items)"
+    ]
+  },
+  {
+    "word": "饮料",
+    "reading": "yǐn liào",
+    "meanings": [
+      "drink"
+    ]
+  },
+  {
+    "word": "饺子",
+    "reading": "jiǎo zi",
+    "meanings": [
+      "dumpling"
+    ]
+  },
+  {
+    "word": "饼干",
+    "reading": "bǐng gān",
+    "meanings": [
+      "cookie",
+      "biscuit"
+    ]
+  },
+  {
+    "word": "首先",
+    "reading": "shǒu xiān",
+    "meanings": [
+      "first"
+    ]
+  },
+  {
+    "word": "首都",
+    "reading": "shǒu dū",
+    "meanings": [
+      "capital (city)"
+    ]
+  },
+  {
+    "word": "香",
+    "reading": "xiāng",
+    "meanings": [
+      "fragrant"
+    ]
+  },
+  {
+    "word": "马虎",
+    "reading": "mǎ hu",
+    "meanings": [
+      "careless"
+    ]
+  },
+  {
+    "word": "骄傲",
+    "reading": "jiāo ào",
+    "meanings": [
+      "proud",
+      "arrogant"
+    ]
+  },
+  {
+    "word": "骗",
+    "reading": "piàn",
+    "meanings": [
+      "deceive",
+      "cheat"
+    ]
+  },
+  {
+    "word": "高级",
+    "reading": "gāo jí",
+    "meanings": [
+      "advanced",
+      "high level"
+    ]
+  },
+  {
+    "word": "麻烦",
+    "reading": "má fan",
+    "meanings": [
+      "hassle",
+      "to trouble somebody"
+    ]
+  },
+  {
+    "word": "鼓励",
+    "reading": "gǔ lì",
+    "meanings": [
+      "encourage"
+    ]
+  },
+  {
+    "word": "鼓掌",
+    "reading": "gǔ zhǎng",
+    "meanings": [
+      "applaud"
+    ]
+  }
+]

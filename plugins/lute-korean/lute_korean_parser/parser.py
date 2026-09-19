@@ -236,7 +236,7 @@ class KoreanParser(AbstractParser):
 
     # ---- morpheme grouping strategies ----
 
-    def _group_eojeol(self, morphs):
+    def _group_eojeol(self, morphs, para, eojeol_end):
         """
         Given a list of morphemes belonging to the SAME 어절
         (consecutive non-space tokens with no position gap), return
@@ -251,6 +251,14 @@ class KoreanParser(AbstractParser):
         Mode 'lemma'    : predicate stems merged into single lemma form,
                           particles/endings kept as separate tokens.
         Mode 'morpheme' : one token per morphological morpheme.
+
+        `para` is the original (already-cleaned) paragraph line and
+        `eojeol_end` the character offset of the first morpheme of the
+        NEXT 어절 (or len(para)).  Display surfaces are always sliced
+        from `para` by Kiwi's character positions, never joined from
+        Kiwi's `form` strings: those are un-contracted bases (피해 comes
+        back as 피하 + 여, 이어 as 잇 + 어, 했 as 하 + 었), so joining
+        them corrupts the stored text (피하여, 잇어, 하었다).
         """
         # Nothing to do for empty lists.
         if not morphs:
@@ -259,10 +267,9 @@ class KoreanParser(AbstractParser):
         mode = self._mode  # set on the instance by get_parsed_tokens
         join_compound = self._join_compound
 
-        # --- 'eojeol' mode: return the entire surface as one token. ---
+        # --- 'eojeol' mode: the whole 어절 as stored in the original text. ---
         if mode == "eojeol":
-            # Build up the raw surface string in-order.
-            surface = "".join(m.form for m in morphs)
+            surface = para[morphs[0].start:eojeol_end].rstrip()
             # The 'representative' morph is whatever the first non-symbol
             # morph is (so that sentence-end detection still fires via
             # the representative if the user uses SF as part of the
@@ -366,20 +373,56 @@ class KoreanParser(AbstractParser):
         # --- 'morpheme' mode (default) --------------------------------------
         # One token per morpheme, but optionally merge consecutive pure
         # noun morphemes into a single compound-noun token.
-        out = []
+        # Pass 1: slice each morpheme's display text from the original
+        # paragraph (by Kiwi's character positions) instead of using the
+        # un-contracted `form`, so the tokens tile the stored text.
+        sliced = []
         i = 0
         n = len(morphs)
         while i < n:
             m = morphs[i]
-            if join_compound and self._is_noun_morph(m):
-                start = i
-                while i + 1 < n and self._is_noun_morph(morphs[i + 1]):
-                    i += 1
-                surface = "".join(x.form for x in morphs[start:i + 1])
-                out.append((surface, morphs[start], morphs[start]))
+            nxt = morphs[i + 1] if i + 1 < n else None
+            end = nxt.start if nxt else eojeol_end
+            if end == m.start:
+                # Same syllable decomposed into several morphemes (했 =
+                # 하 + 었): the earlier ones own no characters, so fold
+                # them into the last morpheme of the run.
                 i += 1
                 continue
-            out.append((m.form, m, m))
+            text = para[m.start:end]
+            # Contracted ending: the stem's surface is longer than its
+            # slice (위해 = 위하 + 여, 나섰고 = 나서 + 었), so absorb the
+            # ending's characters into the stem to keep the word intact.
+            if (
+                nxt is not None
+                and (nxt.tag or "").startswith("E")
+                and text != m.form
+                and m.form.startswith(text)
+            ):
+                after = morphs[i + 2] if i + 2 < n else None
+                text = para[m.start:(after.start if after else eojeol_end)]
+                i += 1  # skip the absorbed ending below
+            i += 1
+            # The last slice of the 어절 reaches eojeol_end and may have
+            # swallowed the space before the next 어절.
+            if i >= n:
+                text = text.rstrip()
+            sliced.append((text, m))
+        # Pass 2: optional compound-noun merging, then emit.
+        out = []
+        i = 0
+        sn = len(sliced)
+        while i < sn:
+            text, m = sliced[i]
+            if join_compound and self._is_noun_morph(m):
+                start = i
+                while i + 1 < sn and self._is_noun_morph(sliced[i + 1][1]):
+                    i += 1
+                surface = "".join(x[0] for x in sliced[start:i + 1])
+                out.append((surface, sliced[start][1], sliced[start][1]))
+                i += 1
+                continue
+            out.append((text, m, m))
             i += 1
         return out
 
@@ -431,11 +474,19 @@ class KoreanParser(AbstractParser):
 
                 # 2) For each 어절, convert into grouped tokens, and
                 #    insert a space token between consecutive 어절.
-                para_prev_end = 0
+                #    `eojeol_end` is the character offset of the first
+                #    morpheme of the NEXT 어절 (or the paragraph length),
+                #    so `_group_eojeol` can slice display surfaces from
+                #    the original `para` instead of joining Kiwi `form`s.
                 for idx, morphs in enumerate(eojeols):
                     if idx > 0:
                         tokens.append(ParsedToken(" ", False, False))
-                    grouped = self._group_eojeol(morphs)
+                    eojeol_end = (
+                        eojeols[idx + 1][0].start
+                        if idx + 1 < len(eojeols)
+                        else len(para)
+                    )
+                    grouped = self._group_eojeol(morphs, para, eojeol_end)
                     for surface, rep_tag_morph, _rep_lemma_morph in grouped:
                         is_word = self._is_word_morph(rep_tag_morph, self._filter_particles)
                         is_eos = (rep_tag_morph.tag in self._SENTENCE_END_TAGS) or any(

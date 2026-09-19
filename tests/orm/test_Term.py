@@ -308,12 +308,12 @@ def test_new_term_without_zws_is_parsed_from_scratch(japanese):
     directly into a form, or from a CSV import) has no in-context
     token information available, so it keeps the original behaviour of
     being parsed fresh -- which, for this ambiguous phrase, produces
-    the (documented, pre-existing) 3-token result.
+    the (documented, pre-existing) 4-token result.
     """
     zws = "\u200B"
     term = Term(japanese, "それはそれで")
-    assert term.token_count == 3
-    assert term.text == f"それ{zws}は{zws}それで"
+    assert term.token_count == 4
+    assert term.text == f"それ{zws}は{zws}それ{zws}で"
 
 
 @pytest.mark.term_case

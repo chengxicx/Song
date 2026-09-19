@@ -79,6 +79,8 @@ def _start(args):
 
     config_file_path = _get_config_file_path(args.config)
     app = create_app(config_file_path, output_func=_print)
+    # data_initialization handles multi-user mode internally
+    # (per-user housekeeping, no demo data).
     with app.app_context():
         data_initialization(db.session, _print)
 
@@ -102,8 +104,16 @@ def _start(args):
     """
     _print(textwrap.dedent(msg))
 
+    # waitress defaults to 4 worker threads, which is too few for Lute:
+    # a playing audio stream holds its thread for the whole request, so
+    # two or three streams (or a couple of slow clients) starve every
+    # other request and the whole app appears hung.  SQLite is read-mostly
+    # here, so a larger pool is cheap.  Override with
+    # LUTE_WAITRESS_THREADS if a deployment needs something else.
+    threads = int(os.environ.get("LUTE_WAITRESS_THREADS", "12") or 12)
+
     try:
-        serve(app, host=host_ip, port=args.port)
+        serve(app, host=host_ip, port=args.port, threads=threads)
     except OSError as err:
         if err.errno == errno.EADDRINUSE:
             msg = [

@@ -1,0 +1,13 @@
+{# Fragment rendered into a top-level sub-menu by HTMX.
+   Each plugin-contributed menu item becomes a regular <li><a> child,
+   styled to match the existing .sub-menu items in base.html.
+   When `items` is empty this fragment renders nothing, which is the
+   expected case before any feature plugin is installed. #}
+{% for item in items %}
+<li>
+  <a href="{{ item.url }}"
+     {% if item.icon %}class="feature-menu-item" data-icon="{{ item.icon }}"{% endif %}>
+    {{ item.label }}
+  </a>
+</li>
+{% endfor %}

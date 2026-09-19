@@ -1,5 +1,43 @@
 "use strict";
 
+// Dictionary domains whose tab favicons are self-hosted under
+// /static/icn/dict/<domain>.png.
+//
+// Icons are *only* ever loaded from this list: the reading page must not
+// reach out to a third-party favicon service, because a blocked or slow
+// external host keeps the document's `load` event pending and stalls the
+// whole page (and it leaks the user's dictionary choice to a third
+// party).  Domains not listed simply show their text label.  To add an
+// icon: drop `<domain>.png` into lute/static/icn/dict/ and add the
+// domain here.
+const LOCAL_DICT_FAVICONS = [
+  "www.youdao.com",
+  "www.doubao.com",
+  "fanyi.baidu.com",
+  "jisho.org",
+  "www.japandict.com",
+  "en.wiktionary.org",
+  "www.weblio.jp",
+];
+
+
+// Dictionary tab icons are tiny (1-10 KB) but each is its own request,
+// and on a high-latency link the ~7 of them add a noticeable slice to
+// the initial render.  Setting src only after the page has loaded keeps
+// them out of the document's load event, so the reading page shows up
+// sooner; they still appear (just a moment later).
+function _deferDictIcon(img) {
+  const src = img.getAttribute("data-src");
+  if (!src) return;
+  const set = () => {
+    img.removeAttribute("data-src");
+    img.src = src;
+  };
+  if (typeof window.requestIdleCallback === "function")
+    window.requestIdleCallback(set, { timeout: 2000 });
+  else window.setTimeout(set, 0);
+}
+
 
 /**
  * A general lookup button, for images, sentences, etc.
@@ -175,18 +213,28 @@ class DictButton extends LookupButton {
       const domain = urlObj.hostname;
       this.label = domain.split("www.").splice(-1)[0];
 
-      fimg = document.createElement("img");
-      fimg.classList.add("dict-btn-fav-img");
-      const favicon_src = `http://www.google.com/s2/favicons?domain=${domain}`;
-      fimg.src = favicon_src;
+      // Self-hosted icon only (see LOCAL_DICT_FAVICONS).  A domain we
+      // don't ship an icon for, or a 404, just falls back to the text
+      // label -- never to a remote service.
+      if (LOCAL_DICT_FAVICONS.indexOf(domain) !== -1) {
+        fimg = document.createElement("img");
+        fimg.classList.add("dict-btn-fav-img");
+        fimg.onerror = () => {
+          fimg.onerror = null;
+          fimg.remove();
+        };
+        fimg.src = `/static/icn/dict/${domain}.png`;
+      }
     }
     catch(err) {}
 
     this.btn.textContent = this.label;
 
     // Must prepend after the textContent is set, or it is overwritten/lost.
-    if (fimg != null)
+    if (fimg != null) {
       this.btn.prepend(fimg);
+      _deferDictIcon(fimg);
+    }
 
     this.btn.setAttribute("title", this.label);
 

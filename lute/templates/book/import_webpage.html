@@ -8,12 +8,43 @@
   /* Top margin keeps the select (and its focus ring) clear of the
      compact theme menu-bar, which stacks above the content. */
   .import-type-bar { display: flex; align-items: center; gap: 10px; margin: 1rem 0 1.25rem; }
-  .import-type-bar .import-type-select {
+  .import-type-bar label { font-weight: 600; color: var(--font-color, #444); }
+
+  /* Custom dropdown for the import type: native <option> elements can't
+     render the per-type icons.  The visible button + listbox replace the
+     old select; markup and behavior are wired up in the script below. */
+  .import-type-dd { position: relative; }
+  .import-type-btn {
+    display: inline-flex; align-items: center; gap: .5rem; min-width: 11rem;
     font-size: .95rem; padding: .4rem .7rem; border-radius: 6px;
     border: 1px solid var(--form-border-color, #ccc);
     background: var(--panel-bg, #fff); color: var(--font-color, #333);
+    cursor: pointer; text-align: left;
   }
-  .import-type-bar label { font-weight: 600; color: var(--font-color, #444); }
+  .import-type-btn .itd-caret { margin-left: auto; opacity: .7; flex: 0 0 auto; }
+  .import-type-menu {
+    position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%;
+    z-index: 60; margin: 0; padding: .3rem; list-style: none;
+    background: var(--panel-bg, #fff); color: var(--font-color, #333);
+    border: 1px solid var(--form-border-color, #ccc); border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  }
+  .import-type-menu li {
+    display: flex; align-items: center; gap: .55rem;
+    padding: .42rem .55rem; border-radius: 6px; cursor: pointer;
+    font-size: .95rem; white-space: nowrap;
+  }
+  .import-type-menu li:hover,
+  .import-type-menu li.itd-active { background: rgba(109, 169, 233, 0.16); }
+  .import-type-menu li.itd-current { background: #3d7ecc; color: #fff; }
+  /* The tinted icon square, shared by the closed button and every
+     listbox row so they render identically. */
+  .itd-ico {
+    flex: 0 0 auto; width: 24px; height: 24px; border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  /* On the blue selected row the tinted square looks muddy. */
+  .import-type-menu li.itd-current .itd-ico { background: rgba(255,255,255,.3) !important; }
 
   .import-form {
     max-width: 720px; background: var(--panel-bg, #fff);
@@ -75,18 +106,16 @@
 </style>
 
 <div class="import-type-bar">
-  <label for="import_type">Import type:</label>
-  <select id="import_type" name="import_type" class="import-type-select">
-    <option value="text" selected>Text</option>
-    <option value="webpage">Web page</option>
-    <option value="youtube">YouTube video</option>
-    <option value="bilibili">Bilibili video</option>
-    <option value="mp3">MP3 / M4A audio</option>
-    <option value="video">Online video</option>
-    <option value="manga">Mokuro Manga</option>
-    <option value="pdf">PDF</option>
-    <option value="epub">EPUB</option>
-  </select>
+  <label for="import-type-button">Import type:</label>
+  <div class="import-type-dd">
+    <button type="button" id="import-type-button" class="import-type-btn"
+            aria-haspopup="listbox" aria-expanded="false">
+      <span class="itd-ico" id="import-type-button-ico" aria-hidden="true"></span>
+      <span id="import-type-label">Text</span>
+      <svg class="itd-caret" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <ul id="import-type-menu" class="import-type-menu" role="listbox" aria-label="Import type" hidden></ul>
+  </div>
 </div>
 
 <div id="text-form">
@@ -240,6 +269,38 @@
   <div class="import-actions">
     <input type="hidden" name="import_type" value="mp3">
     <button type="submit" id="mp3-import" class="btn btn-primary">Import</button>
+  </div>
+</form>
+
+<form id="netease-form" class="import-form" action="/book/import_webpage" method="post" style="display: none;">
+  <p class="import-desc">Import a song from NetEase Cloud Music: the audio is downloaded to your library and its LRC lyrics become the book text, synced line by line with playback. VIP / copyright-restricted songs require logging in via Settings first.</p>
+  <div class="iform">
+    <div class="irow">
+      <label class="ilbl" for="netease-language">Language</label>
+      <div class="ictrl">
+        <select id="netease-language" name="language_id">
+          {% for id, name in language_choices %}
+          <option value="{{ id }}" {% if id == current_language_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="netease_url">Song URL</label>
+      <div class="ictrl">
+        <input type="url" id="netease_url" name="netease_url" placeholder="https://music.163.com/#/song?id=..." autofocus>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="netease_tag">Tags</label>
+      <div class="ictrl">
+        <input type="text" id="netease_tag" name="netease_tag" class="form-control">
+      </div>
+    </div>
+  </div>
+  <div class="import-actions">
+    <input type="hidden" name="import_type" value="netease">
+    <button type="submit" id="netease-import" class="btn btn-primary">Import</button>
   </div>
 </form>
 
@@ -424,6 +485,7 @@
   </div>
 </div>
 
+<script type="text/javascript" src="{{ vstatic('js/book-type-icons.js') }}" charset="utf-8"></script>
 <script type="text/javascript">
   var EXISTING_TAGS = {{ existing_tags | tojson }};
 
@@ -440,34 +502,55 @@
   }
 
   $(document).ready(function () {
-    const typeSel = $('#import_type');
     const textForm = $('#text-form');
     const webpageForm = $('#webpage-form');
     const youtubeForm = $('#youtube-form');
     const bilibiliForm = $('#bilibili-form');
     const mp3Form = $('#mp3-form');
+    const neteaseForm = $('#netease-form');
     const videoForm = $('#video-form');
     const mangaForm = $('#manga-form');
     const pdfForm = $('#pdf-form');
     const epubForm = $('#epub-form');
     const epubPreviewPanel = $('#epub-preview-panel');
 
+    // The import-type picker is a custom dropdown (button + listbox) so
+    // every option can show its book-type icon.  importType below is the
+    // single source of truth; everything renders from it.
+    const IMPORT_TYPES = [
+      { value: 'text', label: 'Text' },
+      { value: 'webpage', label: 'Web page' },
+      { value: 'youtube', label: 'YouTube video' },
+      { value: 'bilibili', label: 'Bilibili video' },
+      { value: 'mp3', label: 'MP3 / M4A audio' },
+      { value: 'netease', label: 'NetEase Cloud Music' },
+      { value: 'video', label: 'Online video' },
+      { value: 'manga', label: 'Mokuro Manga' },
+      { value: 'pdf', label: 'PDF' },
+      { value: 'epub', label: 'EPUB' }
+    ];
+    let importType = 'text';
+    const typeBtn = $('#import-type-button');
+    const typeMenu = $('#import-type-menu');
+
     // Init Tagify on all tag inputs.
     var ytTagify = setupTagsTagify(document.getElementById('youtube_tag'));
     var biliTagify = setupTagsTagify(document.getElementById('bilibili_tag'));
     var mp3Tagify = setupTagsTagify(document.getElementById('mp3_tag'));
+    var neteaseTagify = setupTagsTagify(document.getElementById('netease_tag'));
     var videoTagify = setupTagsTagify(document.getElementById('video_tag'));
     var mangaTagify = setupTagsTagify(document.getElementById('manga_tag'));
     var pdfTagify = setupTagsTagify(document.getElementById('pdf_tag'));
     var epubTagify = setupTagsTagify(document.getElementById('epub_tag'));
 
     const updateForms = function () {
-      const t = typeSel.val();
+      const t = importType;
       textForm.toggle(t === 'text');
       webpageForm.toggle(t === 'webpage');
       youtubeForm.toggle(t === 'youtube');
       bilibiliForm.toggle(t === 'bilibili');
       mp3Form.toggle(t === 'mp3');
+      neteaseForm.toggle(t === 'netease');
       videoForm.toggle(t === 'video');
       mangaForm.toggle(t === 'manga');
       pdfForm.toggle(t === 'pdf');
@@ -477,8 +560,105 @@
       }
     };
 
-    typeSel.on('change', updateForms);
-    updateForms();
+    // Build one icon-led row per type, then reflect the current type on
+    // the button label, the icon chip and the listbox selection.
+    const buildTypeMenu = function () {
+      IMPORT_TYPES.forEach(function (t) {
+        const li = $('<li role="option"></li>')
+          .attr('data-value', t.value)
+          .append($('<span class="itd-ico" aria-hidden="true"></span>')
+            .css('background', book_type_tint(t.value, 0.12))
+            .html(book_type_icon_svg(t.value)))
+          .append($('<span class="itd-lbl"></span>').text(t.label));
+        typeMenu.append(li);
+      });
+    };
+
+    const setImportType = function (v) {
+      importType = v;
+      const t = IMPORT_TYPES.find(function (x) { return x.value === v; }) || IMPORT_TYPES[0];
+      $('#import-type-label').text(t.label);
+      // Same tinted chip in the closed button and on every row.
+      $('#import-type-button-ico')
+        .html(book_type_icon_svg(v))
+        .css('background', book_type_tint(v, 0.12));
+      typeMenu.find('li').each(function () {
+        const on = $(this).data('value') === v;
+        $(this).attr('aria-selected', on ? 'true' : 'false').toggleClass('itd-current', on);
+      });
+      updateForms();
+    };
+
+    const menuOpen = function () { return typeMenu.is(':visible'); };
+    const closeMenu = function () {
+      typeMenu.hide();
+      typeMenu.find('li').removeClass('itd-active');
+      typeBtn.attr('aria-expanded', 'false');
+    };
+    const openMenu = function () {
+      typeMenu.show();
+      typeBtn.attr('aria-expanded', 'true');
+      // Start keyboard navigation on the selected row.
+      typeMenu.find('li').removeClass('itd-active');
+      const cur = typeMenu.find('li[data-value="' + importType + '"]');
+      if (cur.length) cur.addClass('itd-active');
+    };
+    const moveActive = function (dir) {
+      const rows = typeMenu.find('li');
+      let idx = rows.index(rows.filter('.itd-active').first());
+      if (idx === -1) idx = rows.index(rows.filter('[data-value="' + importType + '"]').first());
+      idx = (idx + dir + rows.length) % rows.length;
+      rows.removeClass('itd-active').eq(idx).addClass('itd-active');
+    };
+
+    buildTypeMenu();
+    setImportType('text');
+
+    typeBtn.on('click', function (e) {
+      e.stopPropagation();
+      if (menuOpen()) closeMenu(); else openMenu();
+    });
+    typeMenu.on('click', 'li', function () {
+      setImportType($(this).data('value'));
+      closeMenu();
+      typeBtn.trigger('focus');
+    });
+    // Click/tap anywhere outside the widget closes it.  (stopPropagation
+    // on the button keeps its own opening click from landing here.)
+    $(document).on('click', function (e) {
+      if (menuOpen() && !$(e.target).closest('.import-type-dd').length) {
+        closeMenu();
+      }
+    });
+    typeBtn.on('keydown', function (e) {
+      if (e.key === 'Escape' && menuOpen()) {
+        closeMenu();
+        return;
+      }
+      if (!menuOpen()) {
+        if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openMenu();
+        }
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        moveActive(1);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        moveActive(-1);
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const row = typeMenu.find('li.itd-active').first();
+        if (row.length) {
+          setImportType(row.data('value'));
+        }
+        closeMenu();
+      } else if (e.key === 'Tab') {
+        closeMenu();
+      }
+    });
 
     // Auto-fill the title from the file name if the title field is empty.
     const getFilenameWithoutExtension = function (filename) {

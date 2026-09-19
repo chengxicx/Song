@@ -104,7 +104,7 @@ def test_reading_setting(app_context):
     }
     p = JapaneseParser()
     for k, v in cases.items():
-        current_settings["japanese_reading"] = k
+        current_settings()["japanese_reading"] = k
         assert p.get_reading("強い") == v, k
 
 
@@ -113,7 +113,7 @@ def test_dict_type_auto_detects_ipadic_by_default(app_context):
     # Clear the cache to force a fresh detection.
     JapaneseParser._dict_type = None
     JapaneseParser._old_dict_setting = None
-    current_settings["japanese_dict"] = "auto"
+    current_settings()["japanese_dict"] = "auto"
     detected = JapaneseParser._detect_dict_type()
     # We don't know which dict the dev machine has, but the
     # detection should always return one of the two valid values
@@ -125,7 +125,7 @@ def test_dict_type_respects_explicit_ipadic_setting(app_context):
     "Explicit ipadic setting skips detection and returns ipadic."
     JapaneseParser._dict_type = None
     JapaneseParser._old_dict_setting = None
-    current_settings["japanese_dict"] = "ipadic"
+    current_settings()["japanese_dict"] = "ipadic"
     assert JapaneseParser._detect_dict_type() == "ipadic"
 
 
@@ -133,7 +133,7 @@ def test_dict_type_respects_explicit_unidic_setting(app_context):
     "Explicit unidic setting skips detection and returns unidic."
     JapaneseParser._dict_type = None
     JapaneseParser._old_dict_setting = None
-    current_settings["japanese_dict"] = "unidic"
+    current_settings()["japanese_dict"] = "unidic"
     assert JapaneseParser._detect_dict_type() == "unidic"
 
 
@@ -141,7 +141,7 @@ def test_dict_type_is_cached(app_context):
     "Second call with same settings returns cached value."
     JapaneseParser._dict_type = None
     JapaneseParser._old_dict_setting = None
-    current_settings["japanese_dict"] = "auto"
+    current_settings()["japanese_dict"] = "auto"
     first = JapaneseParser._detect_dict_type()
     second = JapaneseParser._detect_dict_type()
     assert first == second
@@ -151,10 +151,10 @@ def test_dict_type_cache_invalidates_on_setting_change(app_context):
     "Changing the dict setting invalidates the cache."
     JapaneseParser._dict_type = None
     JapaneseParser._old_dict_setting = None
-    current_settings["japanese_dict"] = "ipadic"
+    current_settings()["japanese_dict"] = "ipadic"
     assert JapaneseParser._detect_dict_type() == "ipadic"
     # Change to unidic -- cache should be invalidated.
-    current_settings["japanese_dict"] = "unidic"
+    current_settings()["japanese_dict"] = "unidic"
     assert JapaneseParser._detect_dict_type() == "unidic"
 
 
@@ -166,8 +166,8 @@ def test_get_reading_with_unidic_returns_reading(app_context):
     with IPADIC field 9 is not the right field, so we just verify
     the code path doesn't crash and returns None or a string.
     """
-    current_settings["japanese_dict"] = "unidic"
-    current_settings["japanese_reading"] = "hiragana"
+    current_settings()["japanese_dict"] = "unidic"
+    current_settings()["japanese_reading"] = "hiragana"
     # Reset cache so detection picks up the explicit setting.
     JapaneseParser._dict_type = None
     JapaneseParser._old_dict_setting = None
@@ -203,7 +203,7 @@ def test_get_lemma_hiragana_returns_none(app_context):
 
 def test_get_lemma_unidic_mode_does_not_crash(app_context):
     "When set to unidic mode, get_lemma doesn't crash."
-    current_settings["japanese_dict"] = "unidic"
+    current_settings()["japanese_dict"] = "unidic"
     JapaneseParser._dict_type = None
     JapaneseParser._old_dict_setting = None
     p = JapaneseParser()

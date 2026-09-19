@@ -1,7 +1,7 @@
 /* Lute Service Worker - PWA offline support */
 // NOTE: bump this name whenever shipped static assets change, so all
 // clients drop the old offline cache and re-precache fresh copies.
-const CACHE_NAME = 'lute-v3.10.5.4.20260903a';
+const CACHE_NAME = 'lute-v3.10.5.4.20260913b';
 
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
@@ -29,6 +29,9 @@ const STATIC_ASSETS = [
   '/static/js/resize.js',
   '/static/js/text-options.js',
   '/static/js/tts.js',
+  '/static/js/tts-translate.js',
+  '/static/js/tts-player.js',
+  '/static/js/tts-ui.js',
   '/static/js/player-dock.js',
   '/static/js/pdf-reader.js',
   '/static/js/vendor/pdfjs/pdf.module.js',
@@ -37,6 +40,10 @@ const STATIC_ASSETS = [
   '/static/js/lute-hotkey-utils.js',
   '/static/js/lute-popups.js',
   '/static/js/lute.js',
+  '/static/js/lute-tooltip.js',
+  '/static/js/lute-cursor.js',
+  '/static/js/lute-touch.js',
+  '/static/js/lute-commands.js',
   '/static/js/lute-anki.js',
   '/static/img/lute.webp',
   '/static/img/icon-192.png',
