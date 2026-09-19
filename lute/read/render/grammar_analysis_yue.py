@@ -17,7 +17,7 @@ from lute.read.render.grammar_analysis_matcher import (
     spec_surface,
 )
 
-_PUNCT = set("，。！？；：、（）「」『』《》〈〉""''…—·,.!?;:\"'()`")
+_PUNCT = set("，。！？；：、（）「」『』《》〈〉" "''…—·,.!?;:\"'()`")
 
 _HAN = r"\u4e00-\u9fff"
 
@@ -25,7 +25,11 @@ _HAN = r"\u4e00-\u9fff"
 def _tokens_for(sentence):
     "Character-level tokens; punctuation flagged for sequence skipping."
     return [
-        {"surface": ch, "pos": "PUNCT" if ch in _PUNCT or ch.isspace() else "X", "idx": i}
+        {
+            "surface": ch,
+            "pos": "PUNCT" if ch in _PUNCT or ch.isspace() else "X",
+            "idx": i,
+        }
         for i, ch in enumerate(sentence)
     ]
 

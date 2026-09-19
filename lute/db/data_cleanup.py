@@ -52,7 +52,9 @@ def _set_pdf_texts_word_count(session, output_function):
     no working parser are skipped, and the flag stays unset so they
     are retried on the next startup after the parser is fixed.
     """
-    from lute.book.service import Service as BookService  # pylint: disable=import-outside-toplevel
+    from lute.book.service import (
+        Service as BookService,
+    )  # pylint: disable=import-outside-toplevel
 
     repo = UserSettingRepository(session)
     if (repo.get_dynamic_value(_PDF_WC_BACKFILL_FLAG) or "") == "1":

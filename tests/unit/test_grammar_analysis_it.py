@@ -68,7 +68,10 @@ def test_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The Italian engine grades points with CEFR levels."
-    levels = {e["key"]: e["level"] for e in analyze_italian(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"]
+        for e in analyze_italian(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["it_ce"] == "A1"
     assert levels["it_passato_prossimo"] == "A2"
 

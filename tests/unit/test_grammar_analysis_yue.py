@@ -65,7 +65,10 @@ def test_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The Cantonese engine grades points with CEFR bands."
-    levels = {e["key"]: e["level"] for e in analyze_cantonese(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"]
+        for e in analyze_cantonese(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["yue_ge"] == "A1"
     assert levels["yue_maai"] == "B1"
 
