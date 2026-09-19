@@ -4,9 +4,9 @@ Spanish grammar point detection (spaCy es_core_news_sm).
 Mirrors the English engine: sentences are split, tokenised with lemma +
 POS + morphological features, and token-aware rules recognise grammar
 constructions.  The sm model tags mood/tense reliably inside a sentence
-context but fumbles isolated words and the simple future, so rules anchor
-on context (e.g. a trigger + que + subjunctive) and the future is covered
-by the "ir a + infinitive" periphrasis.
+context but fumbles isolated words, the simple future and imperatives, so
+rules anchor on context (e.g. a trigger + que + subjunctive) and the
+future is covered by the "ir a + infinitive" periphrasis.
 
 spaCy and the model are imported lazily so the base install works without
 them; the route falls back to the generic rule library on ImportError.
@@ -201,6 +201,122 @@ _ES_RULES = [
         "(se lo doy).",
         {"seq": [{"surface_in": ["le", "les"], "morph": {"Case": "Dat"}}]},
         zh="间接宾语代词 le/les（给他/她/他们），常与 gustar 类动词、se 连用。",
+    ),
+    # ---- B1 ----
+    make_rule(
+        "es_subj_present",
+        "Present subjunctive",
+        "B1",
+        "used after triggers of will, emotion, doubt or necessity: "
+        "quiero que, espero que, es posible que + subjunctive verb.",
+        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Pres"}}]},
+        zh="虚拟式现在时：意愿/情感/怀疑类触发词后用（quiero que vengas）。",
+    ),
+    make_rule(
+        "es_conditional",
+        "Conditional (habría / compraría)",
+        "B1",
+        "hypothetical or polite: compraría = I would buy.",
+        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Cnd"}}]},
+        zh="条件式（compraría 等）：假设或礼貌表达。",
+    ),
+    make_rule(
+        "es_present_perfect",
+        "Present perfect: he + participle",
+        "B1",
+        "he/has/ha + participle: a past action linked to now (he comido).",
+        {
+            "seq": [
+                spec_surface("he", "has", "ha", "hemos", "habéis", "han"),
+                spec_morph(VerbForm="Part"),
+            ]
+        },
+        zh="现在完成时：he/has/ha + 过去分词（he comido 我吃过了）。",
+    ),
+    make_rule(
+        "es_pluperfect",
+        "Pluperfect: había + participle",
+        "B1",
+        "había + participle: the earlier of two past events (ya había comido).",
+        {
+            "seq": [
+                spec_surface("había", "habías", "habíamos", "habían", "hube"),
+                spec_morph(VerbForm="Part"),
+            ]
+        },
+        zh="过去完成时：había + 过去分词，表示过去的过去。",
+    ),
+    make_rule(
+        "es_si_conditional",
+        "si + past subjunctive, conditional",
+        "B1",
+        "hypothetical: Si tuviera dinero, compraría una casa.",
+        {"left": [spec_surface("si")], "right": [spec_morph(Mood="Cnd")], "min_gap": 1, "max_gap": 10},
+        zh="si + 虚拟式过去时，主句条件式：假设（Si tuviera…, compraría…）。",
+    ),
+    # ---- B2 ----
+    make_rule(
+        "es_subj_past",
+        "Imperfect subjunctive (-ra / -se)",
+        "B2",
+        "the past subjunctive: si tuviera, como si fuera; needed after past "
+        "triggers (quería que vinieras).",
+        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Imp"}}]},
+        zh="虚拟式过去时（-ra/-se 形式）：过去触发词或 si 条件句中用（si tuviera）。",
+    ),
+    make_rule(
+        "es_subj_pluperfect",
+        "Pluperfect subjunctive: hubiera + participle",
+        "B2",
+        "an unreal past: si hubiera sabido, habría venido.",
+        {
+            "seq": [
+                spec_surface(
+                    "hubiera", "hubieras", "hubiéramos", "hubieran",
+                    "hubiese", "hubieses", "hubiésemos", "hubiesen",
+                ),
+                spec_morph(VerbForm="Part"),
+            ]
+        },
+        zh="过去虚拟完成时：hubiera/hubiese + 过去分词，对过去的假设。",
+    ),
+    make_rule(
+        "es_conditional_perfect",
+        "Conditional perfect: habría + participle",
+        "B2",
+        "what would have happened: habría venido.",
+        {
+            "seq": [
+                spec_surface("habría", "habrías", "habríamos", "habrían"),
+                spec_morph(VerbForm="Part"),
+            ]
+        },
+        zh="条件复合时：habría + 过去分词（本会……）。",
+    ),
+    make_rule(
+        "es_se",
+        "se constructions (reflexive / passive / impersonal)",
+        "B2",
+        "se lavar = wash oneself; se vende = is sold (passive); "
+        "se dice = people say (impersonal).",
+        {"seq": [spec_surface("se"), spec_pos("VERB")]},
+        zh="se 结构：自复（se lava）、自复被动（se vende 被出售）、无人称（se dice 人们说）。",
+    ),
+    make_rule(
+        "es_como_si",
+        "como si + subjunctive",
+        "B2",
+        "as if: actúa como si nada hubiera pasado.",
+        {"seq": [spec_surface("como"), spec_surface("si")]},
+        zh="como si + 虚拟式：好像……一样。",
+    ),
+    make_rule(
+        "es_llevar_gerund",
+        "llevar + time + gerund",
+        "B2",
+        "duration up to now: llevo dos años viviendo aquí.",
+        {"left": [spec_lemma("llevar")], "right": [spec_morph(VerbForm="Ger")], "min_gap": 0, "max_gap": 6},
+        zh="llevar + 时间 + 副动词：持续做某事已多久（llevo dos años viviendo）。",
     ),
 ]
 

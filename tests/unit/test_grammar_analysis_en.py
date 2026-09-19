@@ -31,6 +31,21 @@ _RULE_SENTENCES = {
     "en_too_to": "He is too tired to walk.",
     "en_as_as": "She is as tall as her sister.",
     "en_either_or": "You can have either tea or coffee.",
+    "en_present_perfect": "I have finished my work.",
+    "en_past_perfect": "She had left before I arrived.",
+    "en_passive": "The book was written by a famous author.",
+    "en_first_conditional": "If it rains, I will stay home.",
+    "en_second_conditional": "If I had time, I would go.",
+    "en_so_that": "It was so dark that I couldn't see.",
+    "en_used_to": "I used to play tennis.",
+    "en_relative_pronouns": "The man who lives next door is friendly.",
+    "en_reported_speech": "She said that she was tired.",
+    "en_third_conditional": "If I had known, I would have come.",
+    "en_wish_past": "I wish I knew the answer.",
+    "en_must_have": "She must have finished already.",
+    "en_have_sth_done": "I had it repaired yesterday.",
+    "en_despite": "Despite the rain, we went out.",
+    "en_unless": "Unless it rains, we will go out.",
 }
 
 

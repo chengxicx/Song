@@ -30,6 +30,17 @@ _RULE_SENTENCES = {
     "es_mas_que": "Este libro es más interesante que aquel.",
     "es_tan_como": "Es tan alto como su hermano.",
     "es_le": "Le gusta el café por la mañana.",
+    "es_subj_present": "Quiero que vengas.",
+    "es_conditional": "Yo compraría esa casa.",
+    "es_present_perfect": "He comido ya.",
+    "es_pluperfect": "Ya había comido cuando llegó.",
+    "es_si_conditional": "Si tuviera dinero, compraría una casa.",
+    "es_subj_past": "Actuaba como si fuera el dueño.",
+    "es_subj_pluperfect": "Si hubiera sabido, habría venido.",
+    "es_conditional_perfect": "Habría sido mejor así.",
+    "es_se": "Aquí se habla español.",
+    "es_como_si": "Actúa como si nada pasara.",
+    "es_llevar_gerund": "Llevo dos años viviendo aquí.",
 }
 
 
