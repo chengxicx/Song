@@ -464,9 +464,7 @@ def test_update_start_date_tolerates_deleted_book(app_context, english, monkeypa
         raise StaleDataError("UPDATE texts matched 0 rows", {}, None)
 
     monkeypatch.setattr(db.session, "commit", failing_commit)
-    monkeypatch.setattr(
-        db.session, "rollback", lambda: rolled_back.append(True)
-    )
+    monkeypatch.setattr(db.session, "rollback", lambda: rolled_back.append(True))
 
     service.update_start_date(dbbook, 1)  # must not raise
     assert rolled_back, "session rolled back after the stale write"
