@@ -155,6 +155,33 @@ def setup_db(app_config, output_func=None):
     """
     Main setup routine.
     """
+    if getattr(app_config, "db_uri", None):
+        # A test harness pointed connections at a named in-memory db
+        # (LUTE_DB_URI, see AppConfig).  There is no file to inspect:
+        # the baseline is created once per process (on first use), and
+        # migrations can still be applied but never backed up.
+        with closing(_open_connection(app_config)) as conn:
+            has_tables = (
+                conn.execute(
+                    "SELECT count(*) FROM sqlite_master WHERE type = 'table'"
+                ).fetchone()[0]
+                > 0
+            )
+        if not has_tables:
+            with closing(_open_connection(app_config)) as conn:
+                with open(
+                    os.path.join(_schema_dir(), "baseline.sql"), "r", encoding="utf8"
+                ) as f:
+                    conn.executescript(f.read())
+        migrator = _create_migrator()
+        with closing(_open_connection(app_config)) as conn:
+            if migrator.has_migrations(conn):
+                # Apply like the file path does.  There is no file to
+                # back up first, but this branch only ever runs for test
+                # dbs, where losing data is the point.
+                migrator.do_migration(conn)
+        return
+
     dbfile = app_config.dbfilename
     backup_dir = app_config.system_backup_path
     backup_count = 20  # Arbitrary
@@ -167,3 +194,8 @@ def setup_db(app_config, output_func=None):
 
     setup = Setup(dbfile, baseline, bm, migrator, output_func)
     setup.setup()
+
+
+def _open_connection(app_config):
+    "Connection to the app config's db (LUTE_DB_URI override aware)."
+    return app_config.sqlite3_connect(detect_types=sqlite3.PARSE_DECLTYPES)
