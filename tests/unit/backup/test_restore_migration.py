@@ -85,7 +85,9 @@ def fixture_upstream_backup_file(testconfig):
                 if col in existing:
                     cur.execute(f'ALTER TABLE {table} DROP COLUMN "{col}"')
         qmarks = ",".join("?" * len(SONG_MIGRATIONS))
-        cur.execute(f"DELETE FROM _migrations WHERE filename IN ({qmarks})", SONG_MIGRATIONS)
+        cur.execute(
+            f"DELETE FROM _migrations WHERE filename IN ({qmarks})", SONG_MIGRATIONS
+        )
         conn.commit()
         # Sanity: the trimmed db really is missing Song's columns.
         langs = [r[1] for r in cur.execute("PRAGMA table_info(languages)")]
@@ -137,7 +139,9 @@ def test_restore_old_schema_backup_runs_migrations_without_restart(
     try:
         names = [
             r[0]
-            for r in conn.execute("SELECT filename FROM _migrations WHERE filename LIKE '2026%'")
+            for r in conn.execute(
+                "SELECT filename FROM _migrations WHERE filename LIKE '2026%'"
+            )
         ]
     finally:
         conn.close()
