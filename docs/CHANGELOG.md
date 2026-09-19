@@ -16,10 +16,10 @@ Feature changes:
   dedicated engine.
 * "Grammar Analysis Language" gains a 한국어 choice: the Korean grammar
   panel explains its points in Korean (Korean descriptions for every
-  kimchi-grammar entry), and the matcher engines (English, Spanish,
-  Russian, French, German, Italian, Portuguese, Thai, Arabic, Mandarin,
-  Cantonese) show authored Korean descriptions as well.  The Japanese
-  engine keeps its English meanings for now.
+  kimchi-grammar entry), the matcher engines (English, Spanish, Russian,
+  French, German, Italian, Portuguese, Thai, Arabic, Mandarin, Cantonese)
+  show authored Korean descriptions, and the Japanese engine explains
+  every curated JLPT entry in Korean (ko.json, mirroring zh.json).
 
 
 # 3.10.3 (2026-07-06)
