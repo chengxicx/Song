@@ -177,6 +177,7 @@ def edit(langid):
         form=form,
         language=language,
         engine_status=grammar_analysis.grammar_engine_status(language),
+        engine_note=grammar_analysis.grammar_engine_note(language),
     )
 
 
