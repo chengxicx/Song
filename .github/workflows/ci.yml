@@ -4,9 +4,19 @@ on:
   push:
     # A branch github-ci can be created and used for ci
     # experiments and tweaks.
-    branches: [ "develop", "master", "github-ci", "windows", "all-features-combine" ]
+    #
+    # all-features-combine is the working branch (gate every push);
+    # song is the release branch production deploys from (gates the
+    # merge / any direct hotfix).
+    branches: [ "develop", "master", "github-ci", "windows", "all-features-combine", "song" ]
   pull_request:
     branches: [ "develop", "master" ]
+
+# Rapid successive pushes to the same branch supersede the earlier
+# run; cancel it instead of stacking queued runs.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
