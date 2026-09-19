@@ -20,13 +20,22 @@ from lute.book.service import (
     BookImportException,
     BookDataFromUrl,
     parse_subtitle_file,
+    parse_subtitle_content,
     parse_subtitle_from_url,
     cues_to_srt_text,
+    media_audio_url,
     youtube_video_id,
     bilibili_video_id,
     _url_content_length,
     download_url_to_file,
     MEDIA_LOCAL_MAX_BYTES,
+)
+from lute.netease.service import (
+    netease_song_id,
+    netease_song_title,
+    netease_audio_url,
+    netease_lyric_content,
+    NETEASE_MAX_AUDIO_BYTES,
 )
 from lute.book.datatables import get_data_tables_list
 from lute.book.series import get_series_overview
@@ -39,6 +48,7 @@ from lute.book.epub_import import (
 from lute.book.forms import (
     NewBookForm,
     EditBookForm,
+    MangaEditForm,
     BookSettingsForm,
     ALLOWED_AUDIO_EXTENSIONS,
 )
@@ -50,6 +60,7 @@ from lute.db import db
 from lute.models.language import Language
 from lute.models.repositories import (
     BookRepository,
+    BookTagRepository,
     UserSettingRepository,
     LanguageRepository,
 )
@@ -218,6 +229,12 @@ def edit(bookid):
     "Edit a book - title, text, source, tags, and audio can be changed."
     repo = Repository(db.session)
     b = repo.load(bookid)
+
+    # Manga books have no text, and their images can only be replaced by
+    # re-importing an archive, so they have their own edit page.
+    if (b.book_type or "") == "manga":
+        return _edit_manga(b)
+
     form = EditBookForm(obj=b)
 
     # For youtube/bilibili/mp3/video books the text field holds the SRT
@@ -226,6 +243,7 @@ def edit(bookid):
         "youtube",
         "bilibili",
         "mp3",
+        "netease",
         "video",
     ):
         form.text.data = cues_to_srt_text(b.cues)
@@ -240,6 +258,10 @@ def edit(bookid):
         except BookImportException as e:
             flash(e.message, "notice")
 
+    # Audio for the lyrics timing side panel (same rules as the reading
+    # player; see media_audio_url).
+    cue_audio_url = media_audio_url(b)
+
     lang_repo = LanguageRepository(db.session)
     lang = lang_repo.find(b.language_id)
     return render_template(
@@ -249,6 +271,63 @@ def edit(bookid):
         form=form,
         tags=repo.get_book_tags(),
         allowed_extensions=ALLOWED_AUDIO_EXTENSIONS,
+        cue_audio_url=cue_audio_url,
+    )
+
+
+def _set_book_tags(dbbook, tag_texts):
+    "Replace a book's tags, creating any tag that doesn't exist yet."
+    btr = BookTagRepository(db.session)
+    tags = [btr.find_or_create_by_text(t) for t in tag_texts]
+    dbbook.remove_all_book_tags()
+    for tag in tags:
+        dbbook.add_book_tag(tag)
+
+
+def _edit_manga(book):
+    """
+    Edit page for a Mokuro manga book.
+
+    A manga book has no text (its pages are empty placeholders, one per
+    mokuro page) and its images can only change by re-importing an
+    archive, so the generic text edit form is meaningless here: this page
+    edits the title and tags in place, and re-imports an uploaded .zip /
+    .cbz over the same book.
+    """
+    dbbook = _find_book(book.id)
+    form = MangaEditForm(obj=book)
+
+    if form.validate_on_submit():
+        archive = form.manga_file.data
+        dbbook.title = form.title.data.strip()
+        _set_book_tags(dbbook, _parse_tagify_tags(form.book_tags.data))
+        db.session.commit()
+
+        if archive:
+            try:
+                BookService().replace_manga(
+                    dbbook, archive.filename, archive.stream, db.session
+                )
+            except BookImportException as e:
+                flash(e.message, "notice")
+                return redirect(f"/book/edit/{book.id}", 302)
+            # Page count and word count changed with the new archive.
+            StatsService(db.session).mark_stale(dbbook)
+            flash(f'"{dbbook.title}" re-imported: the manga pages were replaced.')
+            return redirect(f"/read/{dbbook.id}/page/1", 302)
+
+        flash(f'"{dbbook.title}" updated.')
+        return redirect("/", 302)
+
+    lang_repo = LanguageRepository(db.session)
+    lang = lang_repo.find(book.language_id)
+    return render_template(
+        "book/edit_manga.html",
+        book=dbbook,
+        form=form,
+        title_direction="rtl" if lang.right_to_left else "ltr",
+        tags=Repository(db.session).get_book_tags(),
+        page_count=dbbook.page_count,
     )
 
 
@@ -263,6 +342,8 @@ def import_webpage():
             return _import_bilibili_video()
         if import_type == "mp3":
             return _import_mp3_audio()
+        if import_type == "netease":
+            return _import_netease_music()
         if import_type == "video":
             return _import_online_video()
         if import_type == "manga":
@@ -532,6 +613,74 @@ def _import_mp3_audio():
             b.audio_filename = audio_filename
         elif media_url:
             b.media_url = media_url
+        book = svc.import_book(b, db.session)
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+    return redirect(f"/read/{book.id}/page/1", 302)
+
+
+def _import_netease_music():
+    """
+    Create a NetEase Cloud Music book from a song URL.
+
+    The song's audio (320 kbps mp3) is downloaded and stored locally,
+    and its LRC lyrics become the book text plus the player cue timing.
+    """
+    url = request.form.get("netease_url", "").strip()
+    tags = _parse_tagify_tags(request.form.get("netease_tag", ""))
+    language_id = request.form.get("language_id")
+
+    song_id = netease_song_id(url)
+    if song_id is None:
+        flash("Please enter a valid NetEase Cloud Music song URL.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if not language_id:
+        flash("Please choose a language.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    try:
+        title = netease_song_title(song_id)
+        audio_url = netease_audio_url(song_id)
+        lrc_content = netease_lyric_content(song_id)
+        text, cues_json = parse_subtitle_content(lrc_content, ext=".lrc")
+    except BookImportException as e:
+        flash(e.message, "notice")
+        return redirect("/book/import_webpage", 302)
+
+    if not (text and text.strip()):
+        flash("The song's lyrics contain no text.", "notice")
+        return redirect("/book/import_webpage", 302)
+
+    try:
+        audio_filename = download_url_to_file(
+            audio_url,
+            current_app.env_config.useraudiopath,
+            max_bytes=NETEASE_MAX_AUDIO_BYTES,
+        )
+    except BookImportException as e:
+        flash(
+            f"{e.message}  The song's audio could not be stored -- try "
+            "downloading it manually and importing it as an MP3 book.",
+            "notice",
+        )
+        return redirect("/book/import_webpage", 302)
+
+    b = Book()
+    b.language_id = int(language_id) if language_id else None
+    b.title = title[:200]
+    b.source_uri = url
+    b.text = text
+    b.srt_data = cues_json
+    b.audio_filename = audio_filename
+    b.book_type = "netease"
+    b.book_tags = tags
+    b.threshold_page_tokens = 250
+    b.split_by = "paragraphs"
+
+    svc = BookService()
+    try:
         book = svc.import_book(b, db.session)
     except BookImportException as e:
         flash(e.message, "notice")
@@ -850,7 +999,15 @@ def delete(bookid):
     b = _find_book(bookid)
     db.session.delete(b)
     db.session.commit()
-    return redirect("/", 302)
+    return redirect(_action_return_target(), 302)
+
+
+def _action_return_target():
+    "Return the page to go back to after an action; default to home."
+    nxt = request.form.get("next", "")
+    if nxt.startswith("/") and not nxt.startswith("//"):
+        return nxt
+    return "/"
 
 
 @bp.route("/delete_series/<tagtext>", methods=["POST"])

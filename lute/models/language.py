@@ -56,7 +56,7 @@ class Language(
     is_active = db.Column("LgIsActive", db.Boolean, default=True)
 
     # Kiwi (Korean) parser settings.
-    # These columns only have meaning when LgParserType = 'korean'.
+    # These columns only have meaning when LgParserType = 'lute_korean'.
     kiwi_tokenizer_mode = db.Column("LgKiwiTokenizerMode", db.String(20), default="morpheme")
     kiwi_stemming = db.Column("LgKiwiStemming", db.Boolean, default=True)
     kiwi_filter_particles = db.Column("LgKiwiFilterParticles", db.Boolean, default=False)
@@ -67,6 +67,8 @@ class Language(
     # the translation target falls back to the browser UI language.
     tts_lang = db.Column("LgTTSLang", db.String(20))
     translate_target_lang = db.Column("LgTranslateTargetLang", db.String(20))
+    # Display language for grammar analysis results ("en" default, "zh" Chinese).
+    grammar_translate_lang = db.Column("LgGrammarTranslateLang", db.String(20))
 
     def __init__(self):
         self.character_substitutions = "´='|`='|’='|‘='|...=…|..=‥"
@@ -193,12 +195,23 @@ class Language(
             "word_chars": "word_characters",
             "tts_lang": "tts_lang",
             "translate_target_lang": "translate_target_lang",
+            "grammar_translate_lang": "grammar_translate_lang",
         }
 
         for key in d.keys():
             funcname = mappings.get(key, "")
             if funcname:
                 load(key, funcname)
+
+        # A definition may name a preferred parser and a fallback for
+        # machines where the preferred one isn't installed.  This
+        # matters when the preferred parser comes from an optional
+        # dependency (e.g. sudachipy) while the fallback is a core one,
+        # so the predefined language stays loadable instead of
+        # vanishing from the language list.
+        fallback = d.get("parser_type_fallback")
+        if fallback and not lang.is_supported and is_supported(fallback):
+            lang.parser_type = fallback
 
         ld_sort = 1
         for ld_data in d["dictionaries"]:

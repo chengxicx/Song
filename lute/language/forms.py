@@ -80,9 +80,14 @@ class LanguageForm(FlaskForm):
         choices=tag_choices("browser language"),
         default="",
     )
+    grammar_translate_lang = SelectField(
+        "Grammar Analysis Language",
+        choices=[("en", "English"), ("zh", "中文")],
+        default="en",
+    )
 
     # --- Korean / Kiwi-specific settings.
-    # These fields are only rendered when the parser_type is 'korean'.
+    # These fields are only rendered when the parser_type is 'lute_korean'.
 
     kiwi_tokenizer_mode_choices = [
         ("morpheme", "Fine-grained / Morpheme (예상 + 하 + 었 + 는데"),

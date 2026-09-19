@@ -49,14 +49,15 @@ This is a test subtitle.
 
 def test_youtube_video_id_watch_url():
     assert (
-        youtube_video_id("https://www.youtube.com/watch?v=J7BXhKSqH6o")
-        == "J7BXhKSqH6o"
+        youtube_video_id("https://www.youtube.com/watch?v=J7BXhKSqH6o") == "J7BXhKSqH6o"
     )
 
 
 def test_youtube_video_id_watch_with_extra_params():
     assert (
-        youtube_video_id("https://www.youtube.com/watch?v=J7BXhKSqH6o&t=30s&ab_channel=x")
+        youtube_video_id(
+            "https://www.youtube.com/watch?v=J7BXhKSqH6o&t=30s&ab_channel=x"
+        )
         == "J7BXhKSqH6o"
     )
 
@@ -67,15 +68,13 @@ def test_youtube_video_id_youtu_be():
 
 def test_youtube_video_id_embed():
     assert (
-        youtube_video_id("https://www.youtube.com/embed/J7BXhKSqH6o")
-        == "J7BXhKSqH6o"
+        youtube_video_id("https://www.youtube.com/embed/J7BXhKSqH6o") == "J7BXhKSqH6o"
     )
 
 
 def test_youtube_video_id_shorts():
     assert (
-        youtube_video_id("https://www.youtube.com/shorts/J7BXhKSqH6o")
-        == "J7BXhKSqH6o"
+        youtube_video_id("https://www.youtube.com/shorts/J7BXhKSqH6o") == "J7BXhKSqH6o"
     )
 
 
@@ -126,9 +125,7 @@ Hello world.
 00:00:05.000 --> 00:00:08.500 align:start position:0%
 This is a test subtitle.
 """
-    text, cues_json = parse_subtitle_file(
-        "sub.vtt", io.BytesIO(yt_vtt.encode())
-    )
+    text, cues_json = parse_subtitle_file("sub.vtt", io.BytesIO(yt_vtt.encode()))
     assert text == "Hello world.\nThis is a test subtitle."
     cues = json.loads(cues_json)
     assert len(cues) == 2
@@ -393,7 +390,7 @@ def test_incremental_term_patch_updates_cache_in_place(app, app_context, english
 
     # The cache entry was patched in place, not dropped: a later full
     # fetch reuses it (with the fresh status) instead of re-tokenizing.
-    keys = [k for k in _yt_subtitle_words_cache if k[0] == dbbook.id]
+    keys = [k for k in _yt_subtitle_words_cache if k[1] == dbbook.id]
     assert keys, "cache entry must survive the patch"
     full = _subtitle_words_html(dbbook)
     assert 'data-status-class="status2"' in re.search(
@@ -416,9 +413,7 @@ def test_incremental_cue_param_rerenders_single_cue(app, app_context, english):
     assert "Goodbye" in data["cues"]["2"]
 
 
-def test_incremental_reports_patched_false_after_invalidate(
-    app, app_context, english
-):
+def test_incremental_reports_patched_false_after_invalidate(app, app_context, english):
     "After an invalidation the player learns it needs a full refresh."
     from lute.read.routes import _subtitle_words_html, invalidate_yt_subtitle_cache
 
@@ -433,9 +428,7 @@ def test_incremental_reports_patched_false_after_invalidate(
     assert "Hello" in data["cues"]["0"]
 
 
-def test_incremental_term_patch_strips_zero_width_spaces(
-    app, app_context, english
-):
+def test_incremental_term_patch_strips_zero_width_spaces(app, app_context, english):
     "Multiword term text carries ZWS; matching must still hit cue text."
     from lute.read.routes import _subtitle_words_html
 
@@ -474,7 +467,7 @@ def test_bulk_update_status_patches_subtitle_cache(app, app_context, english):
     )
     assert resp.status_code == 200
 
-    keys = [k for k in _yt_subtitle_words_cache if k[0] == dbbook.id]
+    keys = [k for k in _yt_subtitle_words_cache if k[1] == dbbook.id]
     assert keys, "bulk update must patch, not clear, the cache"
     full = _subtitle_words_html(dbbook)
     hello_span = re.search(r"<span[^>]*>Hello</span>", full[0]).group(0)
@@ -499,6 +492,76 @@ def test_subtitle_words_gzip_response(app, app_context, english):
     plain = client.get(f"/read/youtube_subtitle_words/{dbbook.id}")
     assert plain.headers.get("Content-Encoding") is None
     assert plain.get_json()[0] != ""
+
+
+def test_window_params_return_only_the_requested_cues(app, app_context, english):
+    "GET ?from=&to= returns that range plus the total cue count."
+    from lute.read.routes import _subtitle_words_html
+
+    dbbook = _make_three_cue_book(english, "YT_WINDOW")
+    _subtitle_words_html(dbbook)
+
+    client = app.test_client()
+    resp = client.get(
+        f"/read/youtube_subtitle_words/{dbbook.id}",
+        query_string={"from": 1, "to": 2},
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] == 3
+    assert sorted(data["cues"].keys()) == ["1", "2"]
+    assert "Goodbye" in data["cues"]["2"]
+
+
+def test_window_params_are_clamped_to_the_book(app, app_context, english):
+    "A window past the last cue is clamped, not an error."
+    from lute.read.routes import _subtitle_words_html
+
+    dbbook = _make_three_cue_book(english, "YT_WINDOW_CLAMP")
+    _subtitle_words_html(dbbook)
+
+    client = app.test_client()
+    resp = client.get(
+        f"/read/youtube_subtitle_words/{dbbook.id}",
+        query_string={"from": 0, "to": 99},
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] == 3
+    assert sorted(data["cues"].keys()) == ["0", "1", "2"]
+
+
+def test_window_does_not_tokenize_the_whole_book_when_uncached(
+    app, app_context, english
+):
+    "With no cached render, only the requested cues are tokenized."
+    from lute.read.routes import (
+        _subtitle_words_html,
+        _yt_subtitle_words_cache,
+        invalidate_yt_subtitle_cache,
+    )
+
+    dbbook = _make_three_cue_book(english, "YT_WINDOW_COLD")
+    invalidate_yt_subtitle_cache()
+    _yt_subtitle_words_cache.clear()
+
+    client = app.test_client()
+    resp = client.get(
+        f"/read/youtube_subtitle_words/{dbbook.id}",
+        query_string={"from": 1, "to": 2},
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["total"] == 3
+    assert sorted(data["cues"].keys()) == ["1", "2"]
+
+    # A long book is expensive to tokenize, so a windowed request must
+    # not trigger the full-book render as a side effect.
+    keys = [k for k in _yt_subtitle_words_cache if k[1] == dbbook.id]
+    assert keys == [], "window request must not build the full-book cache"
+
+    _subtitle_words_html(dbbook)  # still available, renders on demand
+    assert len(_subtitle_words_html(dbbook)) == 3
 
 
 def test_read_page_passes_youtube_data(app, app_context, english, client):
@@ -589,6 +652,99 @@ def test_edit_page_propagates_text_to_cues(app, app_context, english, client):
     assert book.cues[2]["end"] == 13.0
 
 
+def test_edit_page_shows_timing_panel(app, app_context, english, client):
+    "The page edit form of a media book offers the lyrics timing panel."
+    dbbook = _make_youtube_book(app, app_context, english)
+    resp = client.get(f"/read/editpage/{dbbook.id}/1")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+    assert "Lyrics &amp; timing" in content
+    assert "cueDataInput" in content
+    assert 'mode: "page"' in content
+    assert '"i": 0' in content
+    assert '"start": 1.0' in content
+
+
+def test_edit_page_cue_data_updates_timings(app, app_context, english, client):
+    "The timing panel's cue_data writes text + start/end back into the cues."
+    dbbook = _make_youtube_book(app, app_context, english)
+
+    cue_data = json.dumps(
+        [
+            {"i": 0, "start": 1.5, "end": 4.0, "text": "Hello world."},
+            {"i": 1, "start": 5.25, "end": 8.0, "text": "Edited via panel."},
+            {"i": 2, "start": 10.0, "end": 13.0, "text": "Goodbye!"},
+        ]
+    )
+    resp = client.post(
+        f"/read/editpage/{dbbook.id}/1",
+        data={"text": "Hello world.\nEdited via panel.\nGoodbye!", "cue_data": cue_data},
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+
+    book = BookRepository(db.session).find(dbbook.id)
+    assert book.cues[1]["text"] == "Edited via panel."
+    assert book.cues[1]["start"] == 5.25
+    assert book.cues[1]["end"] == 8.0
+    assert book.cues[0]["start"] == 1.5
+    # Cues outside the submitted set are untouched.
+    assert book.cues[2]["start"] == 10.0
+    assert book.cues[2]["end"] == 13.0
+
+
+def test_edit_page_cue_data_mismatch_keeps_cues(app, app_context, english, client):
+    "cue_data for a page whose line count changed is ignored (same guard as text sync)."
+    dbbook = _make_youtube_book(app, app_context, english)
+
+    cue_data = json.dumps(
+        [
+            {"i": 0, "start": 99.0, "end": 99.5, "text": "Hello world."},
+            {"i": 1, "start": 99.0, "end": 99.5, "text": "This is a test subtitle."},
+            {"i": 2, "start": 99.0, "end": 99.5, "text": "Goodbye!"},
+        ]
+    )
+    resp = client.post(
+        f"/read/editpage/{dbbook.id}/1",
+        data={"text": "Hello world.\nAn extra line.\nThis is a test subtitle.\nGoodbye!", "cue_data": cue_data},
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+
+    book = BookRepository(db.session).find(dbbook.id)
+    # Nothing written: the page no longer maps one line per cue.
+    assert book.cues[0]["start"] == 1.0
+    assert book.cues[1]["start"] == 5.0
+    assert book.cues[1]["text"] == "This is a test subtitle."
+    assert book.cues[2]["end"] == 13.0
+
+
+def test_edit_page_cue_data_bad_values_ignored(app, app_context, english, client):
+    "Invalid cue_data entries are skipped; the rest still applies."
+    dbbook = _make_youtube_book(app, app_context, english)
+
+    cue_data = json.dumps(
+        [
+            {"i": 0, "start": "not-a-number", "end": 4.0, "text": "Hello world."},
+            {"i": 1, "start": -3.0, "end": 8.0, "text": "This is a test subtitle."},
+            {"i": 2, "start": 10.5, "end": 13.0, "text": "Goodbye!"},
+        ]
+    )
+    resp = client.post(
+        f"/read/editpage/{dbbook.id}/1",
+        data={"text": "Hello world.\nThis is a test subtitle.\nGoodbye!", "cue_data": cue_data},
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+
+    book = BookRepository(db.session).find(dbbook.id)
+    # Entries 0 and 1 are invalid (unparsable / negative time): untouched.
+    assert book.cues[0]["start"] == 1.0
+    assert book.cues[1]["start"] == 5.0
+    # Entry 2 is valid and applied.
+    assert book.cues[2]["start"] == 10.5
+
+
 def test_sync_media_page_text_crlf_line_endings(app, app_context, english):
     "Page text with CRLF line endings still syncs to the cues (mp3 books)."
     from lute.read.routes import _sync_media_page_text_to_cues
@@ -597,7 +753,9 @@ def test_sync_media_page_text_crlf_line_endings(app, app_context, english):
     # Stored page text uses CRLF line endings; cue lines split on \n only.
     original_text = "Hello world.\r\nThis is a test subtitle.\r\nGoodbye!"
     new_text = "Hello world.\r\nThis line was edited.\r\nGoodbye!"
-    assert _sync_media_page_text_to_cues(dbbook, original_text, new_text) is True
+    assert (
+        _sync_media_page_text_to_cues(dbbook, 1, original_text, new_text) == "updated"
+    )
 
     book = BookRepository(db.session).find(dbbook.id)
     assert book.cues[0]["text"] == "Hello world."
@@ -615,7 +773,9 @@ def test_sync_media_page_text_drifted_line(app, app_context, english):
     # still find the page block and apply an edit made on another line.
     original_text = "Hello world.\nThis is a drifted line.\nGoodbye!"
     new_text = "Hello world.\nThis is a drifted line.\nGoodbye again!"
-    assert _sync_media_page_text_to_cues(dbbook, original_text, new_text) is True
+    assert (
+        _sync_media_page_text_to_cues(dbbook, 1, original_text, new_text) == "updated"
+    )
 
     book = BookRepository(db.session).find(dbbook.id)
     assert book.cues[0]["text"] == "Hello world."
@@ -632,8 +792,96 @@ def test_sync_media_page_text_no_match_does_nothing(app, app_context, english):
     before = json.loads(dbbook.srt_data)
     original_text = "Completely\nUnrelated\nLines"
     new_text = "Completely\nUnrelated\nChange"
-    assert _sync_media_page_text_to_cues(dbbook, original_text, new_text) is False
+    assert (
+        _sync_media_page_text_to_cues(dbbook, 1, original_text, new_text) == "mismatch"
+    )
     assert json.loads(dbbook.srt_data) == before
+
+
+_FIVE_LINES = ["Line one.", "Line two.", "Line three.", "Line four.", "Line five."]
+
+
+def _make_five_cue_book(app, app_context, english):
+    "A 5-cue youtube book, one cue per page line."
+    from lute.book.model import Book
+
+    b = Book()
+    b.title = "Five cue book"
+    b.language_id = english.id
+    b.text = "\n".join(_FIVE_LINES)
+    b.book_type = "youtube"
+    b.srt_data = json.dumps(
+        [
+            {"start": float(i), "end": float(i) + 0.8, "text": t}
+            for i, t in enumerate(_FIVE_LINES)
+        ]
+    )
+    b.source_uri = "https://www.youtube.com/watch?v=J7BXhKSqH6o"
+    b.book_tags = ["youtube"]
+    return BookService().import_book(b, db.session)
+
+
+def test_sync_media_page_text_refuses_to_shift_a_drifted_page(
+    app, app_context, english
+):
+    """
+    A page whose text has drifted by a line is never re-anchored to a
+    neighbouring run of cues.
+
+    Regression: matching the page anywhere in the book let a page that had
+    lost a line (two lines merged) bind to the cues one slot later, and the
+    page's lines were then written there -- overwriting the correct cue
+    texts, so every subtitle in that run showed the previous line.
+    """
+    from lute.read.routes import _sync_media_page_text_to_cues
+
+    dbbook = _make_five_cue_book(app, app_context, english)
+    before = json.loads(dbbook.srt_data)
+    assert [c["text"] for c in before] == _FIVE_LINES
+
+    # The page carries a merged line: 4 page lines for 5 cues.  (Such an
+    # edit changed the line count, so the sync refused to apply it and the
+    # page kept the merged text.)
+    page_text = "Line one.\nLine two. Line three.\nLine four.\nLine five."
+    assert _sync_media_page_text_to_cues(dbbook, 1, page_text, page_text) == "mismatch"
+    assert json.loads(dbbook.srt_data) == before
+
+    # An edit made on that drifted page is refused as well -- never guess.
+    edited = "Line one.\nLine two. Line three.\nLine four.\nLine five edited."
+    assert _sync_media_page_text_to_cues(dbbook, 1, page_text, edited) == "mismatch"
+    assert json.loads(dbbook.srt_data) == before
+
+
+def test_sync_media_page_text_anchors_to_the_page_position(app, app_context, english):
+    """
+    Page N's lines go to the cues at page N's own position, not to the cues
+    that happen to look most similar earlier in the book.
+    """
+    from lute.models.book import Text
+    from lute.read.routes import _sync_media_page_text_to_cues
+
+    dbbook = _make_five_cue_book(app, app_context, english)
+    # Split the single page into two: page 2 starts at cue line 2.
+    dbbook.texts[0].text = "Line one.\nLine two."
+    db.session.add(Text(dbbook, "Line three.\nLine four.\nLine five.", 2))
+    db.session.commit()
+
+    edited = "Line three.\nLine four changed.\nLine five."
+    assert (
+        _sync_media_page_text_to_cues(
+            dbbook, 2, "Line three.\nLine four.\nLine five.", edited
+        )
+        == "updated"
+    )
+
+    book = BookRepository(db.session).find(dbbook.id)
+    assert [c["text"] for c in book.cues] == [
+        "Line one.",
+        "Line two.",
+        "Line three.",
+        "Line four changed.",
+        "Line five.",
+    ]
 
 
 def test_save_youtube_player_data(app, app_context, english, client):
@@ -663,7 +911,12 @@ def test_books_datatables_show_youtube_book(app, app_context, english, client):
         "columns": [
             {"data": "0", "name": "BkID", "searchable": False, "orderable": False},
             {"data": "1", "name": "BkTitle", "searchable": True, "orderable": True},
-            {"data": "2", "name": "IsCompleted", "searchable": False, "orderable": False},
+            {
+                "data": "2",
+                "name": "IsCompleted",
+                "searchable": False,
+                "orderable": False,
+            },
         ],
         "order": [{"column": "1", "dir": "asc"}],
         "start": "0",
@@ -708,7 +961,9 @@ def test_edit_book_preserves_type(app, app_context, english, client):
         "book_tags": '[{"value": "youtube"}]',
         "book_type": "youtube",
     }
-    resp = client.post(f"/book/edit/{dbbook.id}", data=form_data, follow_redirects=False)
+    resp = client.post(
+        f"/book/edit/{dbbook.id}", data=form_data, follow_redirects=False
+    )
     assert resp.status_code == 302
 
     repo = BookRepository(db.session)
@@ -740,7 +995,9 @@ def test_edit_book_updates_cues_from_srt_text(app, app_context, english, client)
         "book_tags": '[{"value": "youtube"}]',
         "book_type": "youtube",
     }
-    resp = client.post(f"/book/edit/{dbbook.id}", data=form_data, follow_redirects=False)
+    resp = client.post(
+        f"/book/edit/{dbbook.id}", data=form_data, follow_redirects=False
+    )
     assert resp.status_code == 302
 
     repo = BookRepository(db.session)

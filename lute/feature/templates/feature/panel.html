@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+
+{% block title %}Plugins{% endblock %}
+{% block header %}Plugins{% endblock %}
+
+{% block body %}
+
+<style>
+  .pl { margin: 0 auto; max-width: 760px; }
+  .pl-card { border: 1px solid var(--form-border-color, #ddd); border-radius: 6px; padding: 16px; margin: 12px 0; }
+  .pl-card h2 { margin: 0 0 6px; font-size: 1.15em; }
+  .pl-muted { opacity: .7; font-size: .85em; }
+  .pl-install-row { display: flex; gap: 8px; margin-top: 8px; }
+  .pl-install-row .form-control { flex: 1; }
+  .pl-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid
+            var(--form-border-color, #ddd); flex-wrap: wrap; }
+  .pl-row:last-child { border-bottom: none; }
+  .pl-state { font-size: .75em; padding: 1px 8px; border-radius: 3px; }
+  .pl-state.loaded { background: var(--btn-accent, #007aff); color: #fff; }
+  .pl-state.pending { border: 1px solid var(--form-border-color, #ddd); color: var(--amber-color, #b45309); }
+  .pl-ver { font-size: .8em; font-family: var(--font-mono, monospace); opacity: .85; }
+  .pl-msg { margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: .85em; }
+  .pl-msg.ok { background: rgba(0,180,0,.12); border: 1px solid #2a9d4f; }
+  .pl-msg.err { background: rgba(220,50,50,.12); border: 1px solid #c94545; }
+  .pl-import { position: relative; }
+  .pl-import-btn::after { content: '\25be'; margin-left: 5px; font-size: .8em; opacity: .6; }
+  .pl-import-menu {
+    position: absolute; top: calc(100% + 6px); right: 0; z-index: 10;
+    min-width: 172px;
+    background: var(--background-color, #fff);
+    border: 1px solid var(--form-border-color, #ddd);
+    border-radius: 6px; padding: 4px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.14);
+  }
+  .pl-import-menu .pl-pick {
+    display: block; width: 100%; padding: 8px 12px;
+    border: 0; background: none; border-radius: 4px;
+    font-size: .9em; text-align: left; white-space: nowrap;
+    color: var(--font-color, #000); cursor: pointer;
+  }
+  .pl-import-menu .pl-pick:hover { background: var(--btn-accent, #007aff); color: #fff; }
+</style>
+
+<div class="pl">
+
+  <div class="pl-card">
+    <h2>Install a plugin</h2>
+    <div class="pl-muted">
+      <p><strong>Supported formats</strong> — enter one of these in the box and press Install:</p>
+      <ul style="margin:6px 0 8px 18px; padding:0; line-height:1.7;">
+        <li><strong>PyPI package name</strong> — e.g. <code>lute3-storygen</code>,
+          <code>lute3-cantonese</code>, <code>lute3-thai</code>. Parser plugins
+          (cantonese / thai / mandarin / khmer) are detected by name and installed
+          as language parsers; everything else is installed as a feature plugin.</li>
+        <li><strong>pip URL</strong> — a Git / HTTP archive URL, e.g.
+          <code>git+https://github.com/user/repo.git</code> or
+          <code>https://host/pkg.tar.gz</code>.</li>
+        <li><strong>Path on this server</strong> — a source directory containing
+          <code>pyproject.toml</code>, e.g. <code>/opt/plugins/lute-storygen</code>.</li>
+      </ul>
+      <p><strong>Import</strong> — for remote hosts, use the <b>Import</b> button
+      instead of typing a path: hover it to pick a whole source folder or a
+      <code>.zip</code> archive of the plugin package. The selection is staged,
+      then installed when you press <b>Install</b>. No server-side path is needed.</p>
+      <p>Reinstalling a plugin with the same name overwrites/updates it. The
+      plugin takes effect after you restart Lute.</p>
+    </div>
+    <div class="pl-install-row">
+      <input id="pl_spec" type="text" class="form-control"
+             placeholder="lute3-storygen  or  /path/to/lute-storygen" />
+      <div class="pl-import">
+        <button id="pl_import_btn" class="btn pl-import-btn" type="button">Import</button>
+        <div id="pl_import_menu" class="pl-import-menu" hidden>
+          <button class="pl-pick" type="button" data-pick="folder">Choose folder…</button>
+          <button class="pl-pick" type="button" data-pick="zip">Choose zip…</button>
+        </div>
+      </div>
+      <button id="pl_install_btn" class="btn btn-primary">Install</button>
+    </div>
+    <input type="file" id="pl_folder" webkitdirectory directory multiple
+           style="display:none;" />
+    <input type="file" id="pl_zip" accept=".zip,application/zip"
+           style="display:none;" />
+    <div id="pl_install_msg" class="pl-msg" style="display:none;"></div>
+  </div>
+
+  <div class="pl-card">
+    <h2>Installed plugins</h2>
+    <div id="pl_list"></div>
+  </div>
+
+</div>
+
+<script>
+  (function () {
+    var listEl = document.getElementById('pl_list');
+    var specEl = document.getElementById('pl_spec');
+    var btn = document.getElementById('pl_install_btn');
+    var importBtn = document.getElementById('pl_import_btn');
+    var importMenu = document.getElementById('pl_import_menu');
+    var folderEl = document.getElementById('pl_folder');
+    var zipEl = document.getElementById('pl_zip');
+    var msgEl = document.getElementById('pl_install_msg');
+    // A folder/zip selection is staged here, then installed on Install.
+    var staged = null;
+
+    function stateTag(name, loaded) {
+      return loaded
+        ? '<span class="pl-state loaded">loaded</span>'
+        : '<span class="pl-state pending">needs restart</span>';
+    }
+
+    function render(payload) {
+      var pkgs = payload.packages || {};
+      var types = payload.types || {};
+      var versions = payload.versions || {};
+      var loaded = payload.loaded || [];
+      var names = payload.installed || [];
+      if (!names.length) {
+        listEl.innerHTML = '<div class="pl-muted">No plugins found.</div>';
+        return;
+      }
+      var html = '';
+      names.forEach(function (name) {
+        var isDemo = (name === '_demo');
+        var kind = types[name] || 'feature';
+        var isParser = (kind === 'parser');
+        // Parser plugins are "available" as soon as their entry point is
+        // discovered; feature plugins need register() to have run.
+        var state = isParser || loaded.indexOf(name) >= 0;
+        var kindLabel = isParser ? 'parser' : 'feature';
+        var ver = versions[name];
+        html +=
+          '<div class="pl-row">' +
+            '<strong>' + name + '</strong>' + stateTag(name, state) +
+            '<span class="pl-state" style="opacity:.65">' + kindLabel + '</span>' +
+            (ver ? '<span class="pl-ver">v' + ver + '</span>' : '') +
+            (pkgs[name] && pkgs[name] !== name ? '<span class="pl-muted">(' + pkgs[name] + ')</span>' : '') +
+            '<span style="flex:1"></span>' +
+            (isDemo ? '<span class="pl-state" style="opacity:.6">built-in</span>'
+                    : '<button class="btn" data-upgrade="' + name + '" data-kind="' + kind + '">Upgrade</button>' +
+                      '<button class="btn" data-uninstall="' + name + '" data-kind="' + kind + '">Remove</button>') +
+          '</div>';
+      });
+      listEl.innerHTML = html;
+      listEl.querySelectorAll('[data-upgrade]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          doUpgrade(b.getAttribute('data-upgrade'), b.getAttribute('data-kind'));
+        });
+      });
+      listEl.querySelectorAll('[data-uninstall]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          doUninstall(b.getAttribute('data-uninstall'), b.getAttribute('data-kind'));
+        });
+      });
+    }
+
+    function showMsg(ok, text) {
+      msgEl.className = 'pl-msg ' + (ok ? 'ok' : 'err');
+      msgEl.textContent = text;
+      msgEl.style.display = 'block';
+    }
+
+    function refresh() {
+      return fetch('/_feature/installed').then(function (r) { return r.json(); }).then(render);
+    }
+
+    btn.addEventListener('click', function () {
+      // A picked folder/zip takes priority over a typed spec.
+      if (staged) {
+        var s = staged;
+        staged = null;
+        uploadFormData(s.fd, 'Installing ' + s.label + '…');
+        return;
+      }
+      var spec = specEl.value.trim();
+      if (!spec) { showMsg(false, 'Please enter a pip spec or pick a plugin to import.'); return; }
+      btn.disabled = true;
+      showMsg(true, 'Installing <code>' + spec + '</code>…');
+      fetch('/_feature/install', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ spec: spec })
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        btn.disabled = false;
+        showMsg(d.ok, d.message + (d.ok ? ' Restart Lute to activate it.' : ''));
+        if (d.ok) { specEl.value = ''; }
+        return refresh();
+      }).catch(function (e) { btn.disabled = false; showMsg(false, 'Request failed: ' + e); });
+    });
+
+    function doUpgrade(name, kind) {
+      showMsg(true, 'Upgrading ' + name + '…');
+      fetch('/_feature/upgrade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ name: name, kind: kind || 'feature' })
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        var restartHint = (d.ok && d.restart_needed) ? ' Restart Lute to activate it.' : '';
+        showMsg(d.ok, d.message + restartHint);
+        refresh();
+      }).catch(function (e) { showMsg(false, 'Request failed: ' + e); });
+    }
+
+    function doUninstall(name, kind) {
+      if (!confirm('Remove plugin "' + name + '"? This requires a restart to take effect.')) return;
+      showMsg(true, 'Removing ' + name + '…');
+      fetch('/_feature/uninstall', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ name: name, kind: kind || 'feature' })
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        showMsg(d.ok, d.message);
+        refresh();
+      }).catch(function (e) { showMsg(false, 'Request failed: ' + e); });
+    }
+
+    function uploadFormData(fd, label) {
+      btn.disabled = true;
+      showMsg(true, label);
+      fetch('/_feature/upload_install', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); }).then(function (d) {
+          btn.disabled = false;
+          showMsg(d.ok, d.message + (d.ok ? ' Restart Lute to activate it.' : ''));
+          return refresh();
+        }).catch(function (e) {
+          btn.disabled = false;
+          showMsg(false, 'Upload/install failed: ' + e);
+        });
+    }
+
+    // One Import button: hover reveals a small menu for picking a folder or
+    // a zip. Clicking the button also toggles it (touch / keyboard fallback).
+    // Either choice only stages the selection; Install does the install.
+    var wrapEl = importBtn.parentElement;
+    var showTimer = null, hideTimer = null;
+    function delayShow() {
+      clearTimeout(hideTimer); hideTimer = null;
+      if (showTimer) return;
+      showTimer = setTimeout(function () { showTimer = null; importMenu.hidden = false; }, 80);
+    }
+    function delayHide() {
+      clearTimeout(showTimer); showTimer = null;
+      if (hideTimer) return;
+      hideTimer = setTimeout(function () { hideTimer = null; importMenu.hidden = true; }, 150);
+    }
+    function clearTimers() {
+      clearTimeout(showTimer); showTimer = null;
+      clearTimeout(hideTimer); hideTimer = null;
+    }
+    wrapEl.addEventListener('mouseenter', delayShow);
+    wrapEl.addEventListener('mouseleave', delayHide);
+    importBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      clearTimers();
+      importMenu.hidden = !importMenu.hidden;
+    });
+    document.addEventListener('click', function () { importMenu.hidden = true; });
+    importMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+    importMenu.querySelectorAll('[data-pick]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        clearTimers();
+        importMenu.hidden = true;
+        (b.getAttribute('data-pick') === 'folder' ? folderEl : zipEl).click();
+      });
+    });
+
+    // Folder picker: upload the chosen folder to the server, which then
+    // pip-installs it. This works even when Lute runs on a remote host —
+    // the browser never needs a server-visible path.
+    folderEl.addEventListener('change', function () {
+      if (!folderEl.files || !folderEl.files.length) return;
+      var files = Array.prototype.slice.call(folderEl.files);
+      var fd = new FormData();
+      files.forEach(function (f) {
+        var rel = (f.webkitRelativePath || f.name || '').replace(/\\/g, '/');
+        if (!rel || rel.indexOf('..') === 0) return;
+        // Skip build artifacts and VCS junk.
+        if (/__pycache__|\.pyc$|\.git|node_modules|\.venv|dist\/|build\//.test(rel)) return;
+        fd.append('files', f, rel);
+      });
+      if (!fd.has('files')) { showMsg(false, 'No files selected.'); return; }
+      var name = (files[0].webkitRelativePath || files[0].name || 'folder').split('/')[0] || 'folder';
+      staged = { fd: fd, label: 'folder "' + name + '" (' + files.length + ' files)' };
+      showMsg(true, 'Ready to install: ' + staged.label + '. Click Install.');
+      folderEl.value = '';
+    });
+
+    // Zip picker: upload a single .zip archive of the plugin package.
+    zipEl.addEventListener('change', function () {
+      if (!zipEl.files || !zipEl.files.length) return;
+      var f = zipEl.files[0];
+      var fd = new FormData();
+      fd.append('files', f, f.name);
+      staged = { fd: fd, label: 'archive ' + f.name };
+      showMsg(true, 'Ready to install: ' + staged.label + '. Click Install.');
+      zipEl.value = '';
+    });
+
+    refresh();
+  })();
+</script>
+{% endblock %}

@@ -4,31 +4,34 @@
 
 {% block body %}
 
-{% if book_type in ("youtube", "mp3", "video") %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/youtube-player.js') }}?v=20260830a" charset="utf-8" defer></script>
+{% if book_type in ("youtube", "mp3", "netease", "video") %}
+<script type="text/javascript" src="{{ vstatic('js/youtube-player.js') }}" charset="utf-8" defer></script>
 {% elif book_type == "bilibili" %}
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/dash.all.min.js') }}?v=20260816" charset="utf-8" defer></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/bilibili-player.js') }}?v=20260902a" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('vendor/dash.all.min.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/bilibili-player.js') }}" charset="utf-8" defer></script>
 {% elif book_type == "pdf" %}
 {# Vendored pdf.js (Mozilla, Apache 2.0).  The inline module exposes
    window.pdfjsLib with a shared module worker and fires "pdfjs-ready";
    the deferred pdf-reader.js below runs after it, in document order. #}
 <script type="module">
-  import * as pdfjsLib from "{{ url_for('static', filename='js/vendor/pdfjs/pdf.module.js') }}?v=20260829";
+  import * as pdfjsLib from "{{ vstatic('js/vendor/pdfjs/pdf.module.js') }}";
   pdfjsLib.GlobalWorkerOptions.workerPort = new Worker(
-    "{{ url_for('static', filename='js/vendor/pdfjs/pdf.worker.module.js') }}?v=20260829",
+    "{{ vstatic('js/vendor/pdfjs/pdf.worker.module.js') }}",
     { type: "module" }
   );
   window.pdfjsLib = pdfjsLib;
   window.dispatchEvent(new Event("pdfjs-ready"));
 </script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/pdf-reader.js') }}?v=20260829b" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/pdf-reader.js') }}" charset="utf-8" defer></script>
 {% endif %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/resize.js') }}?v=20260805f" charset="utf-8" defer></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/text-options.js') }}?v=20260830b" charset="utf-8" defer></script>
-<script type="text/javascript" src="/static/js/never_cache/dict-tabs.js?v={{ lute_version }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/tts.js') }}?v=20260902a" charset="utf-8" defer></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/player-dock.js') }}?v=20260830a" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/resize.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/text-options.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic_js('dict-tabs.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ vstatic('js/tts.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/tts-translate.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/tts-player.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/tts-ui.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/player-dock.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
@@ -54,7 +57,7 @@
 
 <div id="read_pane_container"
      x-data="readState()"
-     :class="{ 'focus-mode-active': focusMode, 'tap_sets_status-active': tapSetsStatus, 'arrow_marks_known-active': arrowMarksKnown }">
+     :class="{ 'focus-mode-active': focusMode, 'tap_sets_status-active': tapSetsStatus, 'arrow_marks_known-active': arrowMarksKnown, 'tap_haptics-active': tapHaptics }">
 
 <div id="read_pane_left">
 
@@ -105,7 +108,7 @@
 
   </div>
 
-  {% if book_type in ("youtube", "mp3", "video") %}
+  {% if book_type in ("youtube", "mp3", "netease", "video") %}
   {% include "read/youtube_player.html" %}
   {% elif book_type == "bilibili" %}
   {% include "read/bilibili_player.html" %}
@@ -248,6 +251,46 @@
     }
   })
 
+  // Swipe left/right on the reading text to turn pages (mobile only),
+  // mirroring the (hidden on mobile) prev/next arrow buttons.
+  let _swipe_start_x = null;
+  let _swipe_start_y = null;
+  const _swipe_turn_threshold_px = 40;
+
+  let _handle_swipe_start = function(event) {
+    const t = event.touches[0];
+    if (!t) return;
+    _swipe_start_x = t.clientX;
+    _swipe_start_y = t.clientY;
+  };
+
+  let _handle_swipe_end = function(event) {
+    if (_swipe_start_x == null) return;
+    const t = event.changedTouches[0];
+    const dX = t.clientX - _swipe_start_x;
+    const dY = t.clientY - _swipe_start_y;
+    _swipe_start_x = null;
+    _swipe_start_y = null;
+
+    // Only turn pages on a decisive horizontal swipe; ignore
+    // vertical scrolls and small movements (e.g. taps).
+    if (Math.abs(dX) < _swipe_turn_threshold_px) return;
+    if (Math.abs(dX) <= Math.abs(dY) * 1.5) return;
+
+    if (dX < 0) {
+      navigateNext();   // swipe left -> next page/sub-screen
+    } else {
+      navigatePrev();   // swipe right -> previous page/sub-screen
+    }
+  };
+
+  // Mirror the CSS @media (hover: none) and (pointer: coarse) check:
+  // only enable swipe page-turning on touch-primary devices.
+  if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+    theText.addEventListener("touchstart", _handle_swipe_start, { passive: true });
+    theText.addEventListener("touchend", _handle_swipe_end, { passive: true });
+  }
+
   // Display the term form when a multi-word term is created on
   // mobile. This must be "pointerup", and not "click", because the
   // "touchend" event cancels the click event.
@@ -275,6 +318,10 @@
       focusMode: !isTablet && localStorage.getItem(`focusMode-book${bookId}`) === "true",
       tapSetsStatus: isTablet && localStorage.getItem("tap_sets_status") === "true",
       arrowMarksKnown: localStorage.getItem("arrow_marks_known") === "true",
+      isTouch: window.matchMedia("(hover: none) and (pointer: coarse)").matches,
+      // Haptics default on; iOS has no Vibration API so this is
+      // silently ignored there (see _tap_buzz in lute.js).
+      tapHaptics: localStorage.getItem("tap_haptics") !== "false",
       init() {
         if (typeof update_arrow_titles === "function") update_arrow_titles();
         this.$watch("focusMode", (v) => {
@@ -286,6 +333,9 @@
         this.$watch("arrowMarksKnown", (v) => {
           localStorage.setItem("arrow_marks_known", v ? "true" : "false");
           if (typeof update_arrow_titles === "function") update_arrow_titles();
+        });
+        this.$watch("tapHaptics", (v) => {
+          localStorage.setItem("tap_haptics", v ? "true" : "false");
         });
       },
     };
@@ -302,8 +352,19 @@
 
   let _lute_form_event_handler = function(event) {
     if (event.data.event === "LuteTermFormOpened") {
+      // A grammar-analysis view may be filling the right pane; clicking a
+      // word restores the pane to its default term-form + dictionary state.
+      if (window.closeGrammarAnalysis) window.closeGrammarAnalysis();
       LookupButton.TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
       loadDictionaries();
+    }
+
+    // The term form's "Grammar" button: switch the right pane over to the
+    // page's grammar analysis.  The form stays loaded in the frame (just
+    // hidden), so closing the analysis -- or clicking a word -- brings it
+    // straight back.
+    if (event.data.event === "LuteTermFormGrammarRequested") {
+      if (typeof open_grammar_analysis === "function") open_grammar_analysis();
     }
 
     if (event.data.event === "LuteTermFormOpened" && mediaTablet.matches) {
@@ -447,12 +508,59 @@
     goto_relative_page(0, true);
   });
 
-  // Set "page X/Y" in page nav.
+  // Set the page nav indicator.  Books using fit-to-screen sub-pagination
+  // (see subScreens below) replace the bare parent-page "x/y" with the
+  // reader's preferred display: the whole-book percentage refined by the
+  // sub-screen position (default), or the sub-screen count "n/m" after a
+  // click on the label.  Hovering always reveals the underlying parent
+  // "x/y"; books without sub-screens keep the plain "x/y".
+  let _bookHasSubscreens = false;
+  let _indicatorHovered = false;
+
   let set_page_fraction = function() {
     const pagenum = parseInt($('#page_num').val());
     const maxpage = parseInt($('#page_count').val());
-    $('#page_indicator').text(`${pagenum}/${maxpage}`);
+    const el = $('#page_indicator');
+    const inSubMode = _bookHasSubscreens && subScreens.length > 0;
+    el.toggleClass('subpage-mode', inSubMode);
+    if (!inSubMode || _indicatorHovered) {
+      el.text(`${pagenum}/${maxpage}`);
+      return;
+    }
+    if (localStorage.getItem('readPageIndicatorMode') === 'subpage') {
+      el.text(`${curScreen + 1}/${subScreens.length}`);
+      return;
+    }
+    // Whole-book progress with sub-screen granularity; a page that fits
+    // in a single screen counts as one whole page step.
+    const pageFrac = subScreens.length > 1 ? (curScreen + 1) / subScreens.length : 1;
+    el.text(`${Math.min(Math.round(((pagenum - 1) + pageFrac) / maxpage * 100), 100)}%`);
   };
+
+  // Hover previews the parent-page position, click toggles the preferred
+  // display between percentage and sub-screen count.  Both only act in
+  // sub-page mode (the subpage-mode class also gates the pointer cursor).
+  $('#page_indicator')
+    .on('mouseenter', function() {
+      _indicatorHovered = true;
+      set_page_fraction();
+    })
+    .on('mouseleave', function() {
+      _indicatorHovered = false;
+      set_page_fraction();
+    })
+    .on('click', function() {
+      if (!_bookHasSubscreens || subScreens.length === 0) return;
+      const next =
+        localStorage.getItem('readPageIndicatorMode') === 'subpage'
+          ? 'percent'
+          : 'subpage';
+      localStorage.setItem('readPageIndicatorMode', next);
+      // The click always happens while hovered; clear the hover preview so
+      // the newly selected display shows up immediately.
+      _indicatorHovered = false;
+      set_page_fraction();
+    });
 
   // Enable page nav links, depending on page num.
   let enable_page_nav_links = function() {
@@ -475,6 +583,7 @@
     $('#navSidePrev').removeClass('hide');
     $('#navSideNext').removeClass('hide');
     _layout_side_nav();
+    _updateSideArrows();
     // Media books in scrolling mode override the unhide above: their
     // arrows appear only once the page is scrolled to the bottom.
     if (typeof _updateScrollModeArrows === "function")
@@ -507,24 +616,51 @@
   const maxpage = parseInt($('#page_count').val());
   // disable read slider if there's only 1 page
   if (maxpage > 1) document.getElementById("read-slider").classList.remove("read_page_disabled");
+  // Sub-page books park the thumb at fractional (sub-page-refined)
+  // positions; the default step=1 would snap those back to whole pages.
+  readSlider.step = "any";
 
   readSlider.addEventListener("input", function() {
     const pagenum = parseInt($('#page_num').val());
-    const p = Number(readSlider.value) + 1 - pagenum;
+    // The thumb tracks the pointer continuously; keep the fill glued to
+    // it and preview the target parent page (rounded).
+    const frac = maxpage > 1 ? Number(readSlider.value) / (maxpage - 1) : 0;
+    readSlider.style.backgroundSize = `${frac * 100}% 100%`;
+    const p = Math.round(Number(readSlider.value)) + 1 - pagenum;
     const actualPage = getActualPage(p);
-    updateReadSlider(actualPage);
     document.getElementById("page_indicator").textContent = `${actualPage}/${maxpage}`;
   })
-  
-  readSlider.addEventListener("change", function() { 
+
+  readSlider.addEventListener("change", function() {
     const pagenum = parseInt($('#page_num').val());
-    const p = Number(readSlider.value) + 1 - pagenum;
+    const p = Math.round(Number(readSlider.value)) + 1 - pagenum;
+    if (p === 0) {
+      // Released on the current page (e.g. a keyboard nudge of the
+      // step=any scrubber): just re-seat the thumb, no page reload.
+      _updateSliderProgress();
+      return;
+    }
     goto_relative_page(p);
   })
 
   function updateReadSlider(p) {
     readSlider.value = p - 1;
     readSlider.style.backgroundSize = `${100 / (maxpage - 1) * readSlider.value}% 100%`;
+  }
+
+  // For sub-page books, park the thumb and fill at the same whole-book
+  // percentage the page indicator shows (parent pages refined by the
+  // current sub-screen), so the bar reads as a true progress bar.  The
+  // value stays fractional only as a visual resting position: the input/
+  // change handlers round it back to whole pages.  Plain books keep the
+  // page-start mapping from updateReadSlider().
+  function _updateSliderProgress() {
+    if (!_bookHasSubscreens || subScreens.length === 0) return;
+    const pagenum = parseInt($('#page_num').val());
+    const pageFrac = subScreens.length > 1 ? (curScreen + 1) / subScreens.length : 1;
+    const overall = ((pagenum - 1) + pageFrac) / maxpage;
+    readSlider.value = overall * (maxpage - 1);
+    readSlider.style.backgroundSize = `${overall * 100}% 100%`;
   }
   
   function getActualPage(p) {
@@ -602,17 +738,9 @@
 
     // Re-flow the page into screen-height groups now that the content
     // is swapped in and laid out (fonts/status classes are applied above).
+    // Fixed pages (manga / PDF) are re-fitted to the pane by the same
+    // call -- see the manga branch of _splitToScreens.
     requestAnimationFrame(_splitToScreens);
-
-    // Manga / PDF pages are fixed pages with %-positioned overlays:
-    // scale the whole page so it fits the reading area, then re-fit once
-    // the image finishes decoding (manga: its intrinsic height is 0
-    // until then) or once the canvas renders (PDF).
-    if (_isMangaReader()) {
-      const img = theText?.querySelector(".manga-page-img");
-      if (img) img.addEventListener("load", () => _fitMangaPage(), { once: true });
-      requestAnimationFrame(_fitMangaPage);
-    }
 
     if (initial) {
       prepareTextInteractions();
@@ -624,6 +752,16 @@
 
   document.body.addEventListener('htmx:afterSwap', function (e) {
     if (!e.target || e.target.id !== 'thetext') return;
+
+    // The TTS sentence 🔊 buttons are not part of the swapped-in HTML; the
+    // debounced tts.js observer re-adds them ~100ms later.  Re-inject them
+    // synchronously NOW so _splitToScreens (rAF, below) measures paragraph
+    // heights with the buttons already in place.  Injecting late makes the
+    // sentences reflow after the screen is rendered, making the reading pane
+    // visibly jump on every term-save.  No-op when sentence buttons are off.
+    if (typeof window.luteInjectSentenceButtons === "function") {
+      window.luteInjectSentenceButtons();
+    }
 
     // Page navigation (goto_relative_page).
     if (_pendingNav) {
@@ -829,9 +967,27 @@
     const doc = document.documentElement;
     const maxScroll = Math.max(0, doc.scrollHeight - window.innerHeight);
     const atBottom = window.scrollY >= maxScroll - 60;
-    navSidePrev.classList.toggle("hide", !atBottom);
+    const pagenum = parseInt($("#page_num").val());
     navSideNext.classList.toggle("hide", !atBottom);
+    // The book's first page has no earlier page, so the left arrow is
+    // dead even at the bottom (same rule as the fit-to-screen arrows).
+    navSidePrev.classList.toggle("hide", !atBottom || pagenum <= 1);
     if (atBottom) _layout_side_nav();
+  }
+
+  // The book's very first screen (page 1, first sub-screen) has nothing
+  // before it, so the left arrow is a dead control there: hide it.  On
+  // later screens / pages it still works (sub-screen or page crossing),
+  // so it is shown again.  Scrolling mode owns both arrows itself and
+  // skips this helper.
+  function _updateSideArrows() {
+    if (!navSidePrev || !navSideNext) return;
+    if (typeof _videoScrollMode === "function" && _videoScrollMode()) return;
+    const pagenum = parseInt($("#page_num").val());
+    const atFirstScreen =
+      pagenum <= 1 && (subScreens.length === 0 || curScreen === 0);
+    navSidePrev.classList.toggle("hide", atFirstScreen);
+    if (!atFirstScreen) _layout_side_nav();
   }
 
   // Keep the bottom-of-page arrow state in sync while the reader
@@ -880,7 +1036,27 @@
       natW = media.naturalWidth;
       natH = media.naturalHeight;
     }
-    if (!natW || !natH) return; // dimensions not known yet; retried later
+    if (!natW || !natH) {
+      // Dimensions not known yet.  For manga that means the page image
+      // has not been decoded -- and every content swap (term save,
+      // status update) puts a *fresh* <img> in the pane, so we must
+      // re-fit once it is ready: until then the page keeps its CSS size
+      // (100% of the pane) and the reader sees it blown up.  One pending
+      // retry at a time; a broken image is complete with no intrinsic
+      // size and is skipped instead of being retried forever.
+      if (media && !media.complete && !media.dataset.pageFitRetry) {
+        media.dataset.pageFitRetry = "1";
+        media.addEventListener(
+          "load",
+          () => {
+            delete media.dataset.pageFitRetry;
+            _fitMangaPage();
+          },
+          { once: true }
+        );
+      }
+      return; // dimensions not known yet; retried later
+    }
     page.style.transform = "none";
     // clientHeight includes the container's padding; the last screen
     // reserves a bottom strip for the end-of-book button.
@@ -958,12 +1134,21 @@
       // Manga / pdf pages are single fixed pages, so there is nothing to
       // split -- but the end-of-book button still belongs on the last
       // page, where the next arrow stops navigating.  The last-screen
-      // class reserves the bottom strip it sits in.
+      // class reserves the bottom strip it sits in, so it is toggled
+      // before the fit, which measures the pane's padding.
       const _pn = parseInt($("#page_num").val());
       const _mp = parseInt($("#page_count").val());
       const _lastPage = _pn >= _mp;
       wrap.classList.toggle("last-screen", _lastPage);
       if (endBtn) endBtn.classList.toggle("hide", !_lastPage);
+      // This is the single choke point every content change goes through
+      // (page turn, term save, bulk status update, ResizeObserver
+      // re-flow, ...).  The fixed page's pixel size is set inline by the
+      // fit, and a swapped-in page fragment carries no inline size at
+      // all: without re-fitting here the image falls back to its CSS
+      // width (100% of the pane) and the reader sees it magnified after
+      // a save.  Idempotent, so calling it per re-flow is cheap.
+      _fitMangaPage();
       return;
     }
     if (_videoScrollMode()) {
@@ -996,9 +1181,12 @@
       if (el) el.classList.remove("video-scroll-mode");
     });
     // Leaving scrolling mode (e.g. audio-only toggled off): restore the
-    // always-visible arrows used by the fit-to-screen paging.
+    // always-visible arrows used by the fit-to-screen paging.  The left
+    // arrow's first-screen rule is re-applied here and by _renderScreen
+    // below.
     navSidePrev?.classList.remove("hide");
     navSideNext?.classList.remove("hide");
+    _updateSideArrows();
     // The reader must not jump back to sub-screen 0 on every re-flow.
     // `anchor`, when given, is a <p> already inside #thetext that should
     // stay on screen (e.g. the paragraph holding a just-saved word).
@@ -1091,6 +1279,7 @@
     }
 
     subScreens = groups;
+    if (groups.length > 1) _bookHasSubscreens = true;
     if (anchor && anchor.nodeType === Node.ELEMENT_NODE) {
       const gi = subScreens.findIndex((g) => g.includes(anchor));
       if (gi >= 0) {
@@ -1119,6 +1308,22 @@
       curScreen === subScreens.length - 1 && pagenum >= maxpage;
     wrap.classList.toggle("last-screen", isLast);
     if (endBtn) endBtn.classList.toggle("hide", !isLast);
+    _updateSideArrows();
+    set_page_fraction();
+    _updateSliderProgress();
+
+    // If the grammar-analysis pane is open, refresh it whenever the
+    // visible sub-screen (or the Lute page) changes, so the panel always
+    // analyses the text that is currently on screen.
+    if (document.getElementById("grammar-analysis-panel")) {
+      const _pnum = parseInt($("#page_num").val(), 10);
+      const _key = _pnum + ":" + curScreen;
+      if (window.__grammarPaneKey !== _key &&
+          typeof open_grammar_analysis === "function") {
+        window.__grammarPaneKey = _key;
+        open_grammar_analysis();
+      }
+    }
   }
 
   // Move backward/forward; within a page prefer sub-screens before

@@ -18,6 +18,7 @@ import time
 import json
 import requests
 from playwright.sync_api import Keyboard, Mouse, expect
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 
 class LuteTestClient:  # pylint: disable=too-many-public-methods
@@ -137,7 +138,10 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         "Create a book with title, content from url, and languagename."
         self.visit("book/import_webpage")
         # "Text" is the default import type; switch to the web page form.
-        self.page.select_option("#import_type", "webpage")
+        # The type picker is a custom dropdown (icons per option), not a
+        # native select.
+        self.page.locator("#import-type-button").click()
+        self.page.locator('#import-type-menu [data-value="webpage"]').click()
         self.page.fill("#importurl", url)
         self.page.locator("#import").click()
         time.sleep(0.1)  # hack
@@ -398,6 +402,31 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     ################################3
     # Reading/rendering
 
+    def wait_reading_ready(self, timeout=10000):
+        """Wait until the reading page has finished its async setup.
+
+        The reading text arrives asynchronously (htmx.ajax into #thetext),
+        and the post-swap bookkeeping in _finishPageSwap ends by calling
+        start_hover_mode(), which resets the cursor and hides the term form
+        and dictionaries.  A step that interacts with the text before that
+        has run gets its work undone underneath it: the hover step finds no
+        words to hover, and a term form opened too early is wiped.
+
+        luteStartReadingDone is set by _finishPageSwap, so it becomes true
+        only once the swap (and its resets) have finished.  Tolerates pages
+        that have no such global at all.
+
+        Uses an explicit timeout rather than the suite's 4s default: that
+        default is tuned for assertions, and this is a readiness wait, not a
+        check -- on a loaded machine (or right after a hotkey-triggered
+        reload) the swap can legitimately take longer than 4s.
+        """
+        self.page.wait_for_function(
+            """() => typeof luteStartReadingDone === 'undefined'
+                     || luteStartReadingDone === true""",
+            timeout=timeout,
+        )
+
     def displayed_text(self):
         "Return the TextItems, with '/' at token boundaries."
         self.page.wait_for_selector('span[class*="textitem"]')
@@ -442,6 +471,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
     def click_word(self, word):
         "Click a word in the reading frame."
+        self.wait_reading_ready()
         el = self._get_element_for_word(word)
         # print(f"got element {el}", flush=True)
         if self.has_touch:
@@ -601,6 +631,19 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         self.page.evaluate(script, el)
         time.sleep(0.2)  # Or it's too fast.
         # print(script)
+
+        # Some hotkeys reload the page: ToggleHighlight posts to
+        # /theme/toggle_highlight and then calls location.reload(), and that
+        # reload can still be in flight when this returns.  Without waiting,
+        # the next step interacts with a document that is about to be
+        # replaced -- the step appears to pass, then the reload destroys what
+        # it did.  Waiting for "load" is a no-op for hotkeys that don't
+        # navigate (the document is already loaded).
+        try:
+            self.page.wait_for_load_state("load", timeout=2000)
+        except PlaywrightTimeoutError:
+            pass
+
         # Have to refresh the content to query the dom.
         self._refresh_browser()
 
@@ -622,7 +665,19 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         # Only refresh the reading frame if everything was ok.
         # Some submits will fail due to validation errors,
         # and we want to look at them.
-        if "updated" in iframe.content():
+        #
+        # The success path leaves a #term-saved-flash element behind (see
+        # _on_term_form_saved in term/_form.html).  Do NOT look for the
+        # word "updated" in the frame's raw HTML: the template's own JS
+        # comments and strings contain it, so that check is always true --
+        # and _refresh_browser rebuilds <body>, which recreates
+        # #wordframeid from its *attribute*.  That attribute is stale
+        # ("/read/empty", left behind by _hide_term_edit_form, because the
+        # form navigates with frame.location.href instead), so refreshing
+        # discarded the re-rendered validation error before it could be
+        # checked.
+        saved = iframe.evaluate("() => !!document.getElementById('term-saved-flash')")
+        if saved:
             should_refresh = True
 
         # Have to refresh the content to query the dom.

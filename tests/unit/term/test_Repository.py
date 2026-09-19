@@ -694,11 +694,17 @@ def test_find_or_new_existing_term_not_affected_by_lemma(japanese, repo):
 def test_find_or_new_ambiguous_japanese_terms(japanese, repo):
     """
     Characterization test only: behaviour of find_or_new for
-    ambiguously parsable 集めれ terms
+    ambiguously parsable Japanese terms.
+
+    The specific phrase is parser-dependent -- with the default
+    (Sudachi) parser もしも parses into two tokens, while the MeCab
+    backup parser parses 集めれ into two. Either way the point is the
+    same: a context-free search for a term whose parsed form differs
+    from its stored text does not find it.
 
     See comments in find_or_new for notes.
     """
-    s = "集めれ"
+    s = "もしも"
     term = DBTerm.create_term_no_parsing(japanese, s)
     db.session.add(term)
     db.session.commit()
@@ -706,7 +712,7 @@ def test_find_or_new_ambiguous_japanese_terms(japanese, repo):
     t = repo.find_or_new(japanese.id, s)
     assert t.id is None, "do _not_ have term, searching for string without context"
     zws = "\u200B"
-    assert t.text == f"集め{zws}れ", "returns a new term"
+    assert t.text == f"もし{zws}も", "returns a new term"
 
 
 def test_find_or_new_with_pretokenized_text_finds_in_context_term(japanese, repo):

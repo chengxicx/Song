@@ -6,9 +6,12 @@ lookup of overlaid words.
 """
 
 import base64
+import html
 import io
 import json
 import os
+import re
+import shutil
 import zipfile
 
 from lute.db import db
@@ -56,6 +59,21 @@ SAMPLE_PAGES = [
                 "vertical": True,
                 "font_size": 30,
                 "lines": ["夜——"],
+            },
+        ],
+    },
+    # A third page, so re-importing a bigger archive can be tested.
+    {
+        "version": "0.2.1",
+        "img_path": "hanabira_manga_03.jpg",
+        "img_width": 848,
+        "img_height": 1264,
+        "blocks": [
+            {
+                "box": [120, 260, 300, 330],
+                "vertical": False,
+                "font_size": 22,
+                "lines": ["おはよう"],
             },
         ],
     },
@@ -187,6 +205,207 @@ def test_extract_manga_volume_subdir_layout(app_context):
     # img_path rewritten to include the volume subdirectory.
     assert parsed["pages"][0]["img_path"] == f"{volume}/001.jpg"
     assert parsed["pages"][1]["img_path"] == f"{volume}/002.jpg"
+
+
+def test_extract_manga_image_extension_changed(app_context):
+    """
+    A jpg -> webp conversion renames the image files but leaves the
+    .mokuro img_path values as "001.jpg".  The extractor must still
+    resolve them and rewrite img_path to the file that actually
+    exists, otherwise the reading screen requests a .jpg that 404s and
+    the page renders blank.
+    """
+    from flask import current_app
+
+    volume = "textbook_vol"
+    page = {
+        "version": "0.2.1",
+        "img_width": 1365,
+        "img_height": 2048,
+        "blocks": [],
+    }
+    mokuro = {
+        "version": "0.2.1",
+        "title": "Converted",
+        "volume": volume,
+        "pages": [
+            dict(page, img_path="001.jpg"),
+            dict(page, img_path="002.jpg"),
+        ],
+    }
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(f"{volume}.mokuro", json.dumps(mokuro, ensure_ascii=False))
+        for n in ("001", "002"):
+            zf.writestr(f"{volume}/{n}.webp", PNG_1PX)
+    buf.seek(0)
+
+    manga_path, parsed = BookService().extract_manga("book.cbz", buf)
+    target = os.path.join(current_app.static_folder, manga_path)
+
+    assert os.path.exists(os.path.join(target, volume, "001.webp"))
+    assert parsed["pages"][0]["img_path"] == f"{volume}/001.webp"
+    assert parsed["pages"][1]["img_path"] == f"{volume}/002.webp"
+
+
+def test_read_page_resolves_image_after_extension_change(app_context, japanese):
+    """
+    Books imported before the fix keep the stale "001.jpg" img_path in
+    the DB, so the reading screen must resolve it against the real
+    files on disk (001.webp) at render time -- no re-import required.
+    """
+    from flask import current_app
+
+    from lute.book.model import Book
+    from lute.read.service import Service as ReadService
+
+    manga_path = "manga/test-ext-change"
+    target = os.path.join(current_app.static_folder, manga_path)
+    os.makedirs(target, exist_ok=True)
+    with open(os.path.join(target, "001.webp"), "wb") as f:
+        f.write(PNG_1PX)
+
+    pages = [
+        {
+            "version": "0.2.1",
+            "img_path": "001.jpg",  # stale: the extracted file is 001.webp
+            "img_width": 10,
+            "img_height": 10,
+            "blocks": [
+                {
+                    "box": [1, 1, 5, 5],
+                    "vertical": False,
+                    "font_size": 5,
+                    "lines": ["テスト"],
+                }
+            ],
+        }
+    ]
+
+    book = Book()
+    book.language_id = japanese.id
+    book.title = "Extension changed"
+    book.book_type = "manga"
+    book.manga_path = manga_path
+    book.manga_data = json.dumps(
+        {"version": "0.2.1", "pages": pages}, ensure_ascii=False
+    )
+    dbbook = BookService().import_book(book, db.session)
+
+    try:
+        ctx = ReadService(db.session).manga_page_context(
+            dbbook, 1, track_page_open=False
+        )
+        assert ctx["img_url"] == f"/static/{manga_path}/001.webp"
+    finally:
+        shutil.rmtree(target, ignore_errors=True)
+
+
+def test_extract_manga_pages_without_img_path(app_context):
+    """
+    A .mokuro assembled from the raw _ocr output has no img_path on its
+    pages -- the official mokuro CLI is what adds that field when it
+    builds the volume file.  Such an archive is still perfectly
+    readable, because mokuro pairs pages with images by natural-sorted
+    position.  The extractor must write those paths down, otherwise the
+    imported book has pages with no image to request.
+    """
+    from flask import current_app
+
+    volume = "textbook_vol"
+    page = {
+        "version": "0.2.5",
+        "img_width": 1365,
+        "img_height": 2048,
+        "blocks": [],
+    }
+    mokuro = {
+        "version": "0.2.5",
+        "title": "mokuro_project",
+        "volume": volume,
+        "pages": [dict(page), dict(page), dict(page)],
+    }
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(f"{volume}.mokuro", json.dumps(mokuro, ensure_ascii=False))
+        for n in ("001", "002", "003"):
+            zf.writestr(f"{volume}/{n}.webp", PNG_1PX)
+    buf.seek(0)
+
+    manga_path, parsed = BookService().extract_manga("book.cbz", buf)
+    target = os.path.join(current_app.static_folder, manga_path)
+
+    assert [p["img_path"] for p in parsed["pages"]] == [
+        f"{volume}/001.webp",
+        f"{volume}/002.webp",
+        f"{volume}/003.webp",
+    ]
+    for page in parsed["pages"]:
+        assert os.path.isfile(os.path.join(target, page["img_path"]))
+
+
+def test_read_page_resolves_image_without_img_path(app_context, japanese):
+    """
+    Books imported before the fix keep pages with no img_path in the
+    DB, so the reading screen must fall back to positional matching at
+    render time -- no re-import required.  Before the fix the URL was
+    the bare manga directory, which 403s and renders a blank page.
+    """
+    from flask import current_app
+
+    from lute.book.model import Book
+    from lute.read.service import Service as ReadService
+
+    manga_path = "manga/test-no-img-path"
+    target = os.path.join(current_app.static_folder, manga_path)
+    volume_dir = os.path.join(target, "textbook_vol")
+    os.makedirs(volume_dir, exist_ok=True)
+    for n in ("001", "002"):
+        with open(os.path.join(volume_dir, f"{n}.webp"), "wb") as f:
+            f.write(PNG_1PX)
+
+    pages = [
+        {
+            "version": "0.2.5",
+            "img_width": 10,
+            "img_height": 10,
+            "blocks": [
+                {
+                    "box": [1, 1, 5, 5],
+                    "vertical": False,
+                    "font_size": 5,
+                    "lines": ["テ"],
+                }
+            ],
+        },
+        {
+            "version": "0.2.5",
+            "img_width": 10,
+            "img_height": 10,
+            "blocks": [],
+        },
+    ]
+
+    book = Book()
+    book.language_id = japanese.id
+    book.title = "No img_path"
+    book.book_type = "manga"
+    book.manga_path = manga_path
+    book.manga_data = json.dumps(
+        {"version": "0.2.5", "volume": "textbook_vol", "pages": pages},
+        ensure_ascii=False,
+    )
+    dbbook = BookService().import_book(book, db.session)
+
+    try:
+        service = ReadService(db.session)
+        ctx = service.manga_page_context(dbbook, 1, track_page_open=False)
+        assert ctx["img_url"] == f"/static/{manga_path}/textbook_vol/001.webp"
+
+        ctx = service.manga_page_context(dbbook, 2, track_page_open=False)
+        assert ctx["img_url"] == f"/static/{manga_path}/textbook_vol/002.webp"
+    finally:
+        shutil.rmtree(target, ignore_errors=True)
 
 
 def test_extract_manga_rejects_bad_extension(app_context):
@@ -513,12 +732,12 @@ def test_termpopup_returns_term_data(app, app_context, japanese, client):
 
 
 def test_manga_edit_preserves_manga_data(app, app_context, japanese, client):
-    "Re-saving a manga book keeps its manga path and JSON."
+    "A business-object re-save keeps the manga path and JSON."
     book = _import_and_get_book(app, app_context, japanese, client)
 
-    # Reload into a BO and re-save it (the same path the edit route uses);
-    # the manga fields are not exposed via the edit form, so they must
-    # survive intact.
+    # Reload into a BO and re-save it (e.g. scripts and data cleanup
+    # round-trip books this way); the manga fields are not carried by
+    # the BO's text, so they must survive intact.
     repo = BookRepository(db.session)
     updated = BookModelRepository(db.session)._build_business_book(book)
     updated.title = "Test Manga [edited]"
@@ -530,6 +749,208 @@ def test_manga_edit_preserves_manga_data(app, app_context, japanese, client):
     assert reloaded.manga_path == book.manga_path
     assert reloaded.manga is not None
     assert reloaded.title == "Test Manga [edited]"
+
+
+# ---------------------------------------------------------------------
+# Edit page: manga books get their own page, and can be re-imported
+# ---------------------------------------------------------------------
+
+
+def _post_manga_edit(client, book_id, **extra):
+    """
+    POST the manga edit form.
+
+    `archive` is a (stream, mokuro) pair from make_archive; when omitted
+    no file is uploaded, i.e. only the title/tags are saved.
+    """
+    data = {
+        "title": extra.get("title", "Test Manga"),
+        "book_tags": extra.get("book_tags", ""),
+    }
+    archive = extra.get("archive")
+    if archive is not None:
+        filename = extra.get("archive_name", "hanabira_manga_01.cbz")
+        data["manga_file"] = (archive[0], filename)
+    return client.post(
+        f"/book/edit/{book_id}",
+        data=data,
+        content_type="multipart/form-data",
+        follow_redirects=False,
+    )
+
+
+def test_manga_edit_page_is_manga_specific(app, app_context, japanese, client):
+    """
+    /book/edit/<manga id> shows the manga page: no text editor and no
+    way to retype the book, but the archive can be replaced.
+    """
+    book = _import_and_get_book(app, app_context, japanese, client)
+
+    resp = client.get(f"/book/edit/{book.id}")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+
+    assert "Edit manga book" in content
+    assert 'name="manga_file"' in content
+    assert 'accept=".zip,.cbz"' in content
+    assert "hanabira_manga_01.cbz" in content, "the current archive is shown"
+    assert "2 pages" in content
+
+    # None of the generic (meaningless) text-editing controls.
+    assert 'name="text"' not in content
+    assert 'id="book_type"' not in content
+    assert 'name="audiofile"' not in content
+    assert "cueEditorPanel" not in content
+
+    # Save / Cancel only: there is no "Read" shortcut here, because it
+    # would navigate away and silently drop unsaved title / tag edits.
+    assert 'class="btn btn-primary">Save</button>' in content
+    assert "window.location = '/read/" not in content
+
+
+def test_text_book_uses_the_generic_edit_page(app, app_context, japanese, client):
+    "A plain text book is unaffected: /book/edit still shows the text form."
+    b = Book()
+    b.language_id = japanese.id
+    b.title = "Plain text book"
+    b.text = "これは テスト です。"
+    dbbook = BookService().import_book(b, db.session)
+
+    resp = client.get(f"/book/edit/{dbbook.id}")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+    assert 'id="book_type"' in content
+    assert 'name="text"' in content
+    assert 'name="manga_file"' not in content
+
+
+def test_manga_edit_saves_title_and_tags(app, app_context, japanese, client):
+    "Without an archive, only the title and tags change."
+    book = _import_and_get_book(app, app_context, japanese, client)
+    old_path = book.manga_path
+
+    resp = _post_manga_edit(
+        client,
+        book.id,
+        title="Renamed Manga",
+        book_tags='[{"value":"Manga"},{"value":"jp"}]',
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/"
+
+    reloaded = BookRepository(db.session).find(book.id)
+    assert reloaded.title == "Renamed Manga"
+    assert sorted(t.text for t in reloaded.book_tags) == ["Manga", "jp"]
+    assert reloaded.book_type == "manga"
+    assert reloaded.manga_path == old_path, "no archive uploaded, images unchanged"
+    assert reloaded.page_count == 2
+
+
+def test_manga_edit_page_prefills_the_tags_it_will_save(
+    app, app_context, japanese, client
+):
+    """
+    A tagged manga book renders its tags into the form, so re-saving the
+    page without touching the tag field keeps them (the field replaces
+    the book's tags, so an empty echo would silently drop them).
+    """
+    book = _import_and_get_book(app, app_context, japanese, client)
+    _post_manga_edit(client, book.id, book_tags='[{"value":"Manga"},{"value":"jp"}]')
+
+    resp = client.get(f"/book/edit/{book.id}")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+    assert "Manga" in content and "jp" in content, "tags are shown in the form"
+    rendered = re.search(r'id="book_tags"[^>]*value="([^"]*)"', content).group(1)
+
+    # Post the untouched field straight back: tags must survive.
+    _post_manga_edit(client, book.id, book_tags=html.unescape(rendered))
+    reloaded = BookRepository(db.session).find(book.id)
+    assert sorted(t.text for t in reloaded.book_tags) == ["Manga", "jp"]
+
+
+def test_manga_edit_reimports_archive_over_the_book(
+    app, app_context, japanese, client
+):
+    "An uploaded archive replaces the book's pages, images and mokuro data."
+    from flask import current_app
+
+    book = _import_and_get_book(app, app_context, japanese, client)  # 2 pages
+    old_path = book.manga_path
+
+    resp = _post_manga_edit(
+        client,
+        book.id,
+        archive=make_archive(".cbz", 3),
+        archive_name="new_manga.cbz",
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == f"/read/{book.id}/page/1"
+
+    reloaded = BookRepository(db.session).find(book.id)
+    assert reloaded.id == book.id, "the same book row is reused"
+    assert reloaded.book_type == "manga"
+    assert reloaded.source_uri == "new_manga.cbz"
+    assert reloaded.manga_path != old_path
+    assert reloaded.page_count == 3
+    assert len(reloaded.manga["pages"]) == 3
+
+    new_dir = os.path.join(current_app.static_folder, reloaded.manga_path)
+    assert os.path.isdir(new_dir)
+    assert os.path.exists(os.path.join(new_dir, "hanabira_manga_03.jpg"))
+    # The previous folder is deliberately kept on disk, so restoring an
+    # older DB backup still finds the images it refers to.
+    assert os.path.isdir(os.path.join(current_app.static_folder, old_path))
+
+    # The reading screen serves the new images.
+    resp = client.get(f"/read/start_reading/{book.id}/1")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+    assert f'src="/static/{reloaded.manga_path}/hanabira_manga_01.jpg"' in content
+
+
+def test_manga_edit_reimport_shrinks_to_the_new_page_count(
+    app, app_context, japanese, client
+):
+    "Re-importing a smaller archive drops the extra pages."
+    book = _import_and_get_book(app, app_context, japanese, client)  # 2 pages
+
+    resp = _post_manga_edit(client, book.id, archive=make_archive(".cbz", 1))
+    assert resp.status_code == 302
+
+    reloaded = BookRepository(db.session).find(book.id)
+    assert reloaded.page_count == 1
+    assert len(reloaded.manga["pages"]) == 1
+
+
+def test_manga_edit_rejects_bad_archive(app, app_context, japanese, client):
+    "A non-zip/cbz upload is rejected and nothing is saved."
+    book = _import_and_get_book(app, app_context, japanese, client)
+
+    resp = _post_manga_edit(
+        client,
+        book.id,
+        title="Should not be saved",
+        archive=(io.BytesIO(b"nope"), None),
+        archive_name="book.rar",
+    )
+    assert resp.status_code == 200
+    assert ".zip or .cbz" in resp.get_data(as_text=True)
+
+    reloaded = BookRepository(db.session).find(book.id)
+    assert reloaded.title == "Test Manga"
+    assert reloaded.manga_path == book.manga_path
+    assert reloaded.page_count == 2
+
+
+def test_manga_edit_requires_a_title(app, app_context, japanese, client):
+    "The title can't be blanked out."
+    book = _import_and_get_book(app, app_context, japanese, client)
+
+    resp = _post_manga_edit(client, book.id, title="")
+    assert resp.status_code == 200
+    assert "This field is required" in resp.get_data(as_text=True)
+    assert BookRepository(db.session).find(book.id).title == "Test Manga"
 
 
 import pytest  # noqa: E402  (used by the extract_manga rejection tests)

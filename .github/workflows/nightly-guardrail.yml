@@ -1,0 +1,95 @@
+name: nightly-guardrail
+
+# Why this workflow exists
+# ------------------------
+# The main ci.yml only triggers on the upstream branch names
+# (develop / master / github-ci / windows), so it never runs on this
+# fork's working branch.  The browser-level suites are also excluded
+# from `pytest` by .pytest.ini (they are slow), which means nothing
+# exercises the reading page, term form, import or book-list flows
+# unless someone remembers to run `inv accept` by hand.
+#
+# This workflow runs exactly those suites, once a day, so regressions
+# in the high-risk areas surface on their own instead of at deploy time.
+#
+# Run it manually from the Actions tab (workflow_dispatch) before a
+# risky merge if you don't want to wait for the schedule.
+
+on:
+  schedule:
+    # 18:00 UTC == 02:00 Asia/Shanghai (next day) -- quiet hours locally.
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+    inputs:
+      python_version:
+        description: "Python version to test with"
+        required: false
+        default: "3.11"
+
+permissions:
+  contents: read
+
+jobs:
+  guardrail:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    strategy:
+      # Don't stop the other suites when one fails: a single bad suite
+      # shouldn't hide the state of the rest.
+      fail-fast: false
+
+    steps:
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y mecab mecab-ipadic-utf8
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ github.event.inputs.python_version || '3.11' }}
+        cache: 'pip'
+
+    - name: Install packages using flit
+      run: |
+        pip install flit
+        flit install --only-deps --deps develop
+
+    - name: Setup config
+      run: |
+        mkdir ${{ github.workspace }}/data
+        echo "ENV: dev" > ${{ github.workspace }}/lute/config/config.yml
+        echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/lute/config/config.yml
+        echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/lute/config/config.yml
+        cat ${{ github.workspace }}/lute/config/config.yml
+
+    - name: Playwright install
+      run: playwright install
+
+    # The suites below all start a server on port 5001 and wipe the test
+    # db, so they must never run concurrently.  Steps run in order.
+    - name: Acceptance testing
+      run: |
+        export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
+        inv accept
+
+    - name: Mobile acceptance testing
+      run: |
+        export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
+        inv acceptmobile
+
+    - name: Playwright smoke testing
+      run: inv playwright
+
+    - name: Upload failure screenshots
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: acceptance-failure-screenshots
+        path: tests/acceptance/failure_screenshots/
+        if-no-files-found: ignore

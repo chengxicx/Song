@@ -20,6 +20,12 @@
     <div class="yt-player-loading" id="yt-player-loading">Loading player...</div>
   </div>
 
+  {# Embed-fallback notice.  Deliberately a SIBLING of the video wrap, not
+     an overlay: in that mode an iframe fills the wrap and Bilibili's own
+     player owns play/pause/volume, so any message drawn inside the wrap
+     would sit above the iframe and swallow the clicks meant for it. #}
+  <div class="bili-embed-notice" id="bili-embed-notice" hidden></div>
+
   <div class="yt-player-controls">
     <div class="yt-controls-left">
       <button id="yt-prev-cue-btn" class="audio-button yt-cue-btn" title="Previous subtitle">
@@ -54,6 +60,16 @@
             <input type="checkbox" id="yt-audio-mode-cb">
             <span>Audio only</span>
           </label>
+          {# Video quality.  The stream is relayed through a narrow egress, so
+             the cheapest Bilibili rendition is what plays unless a higher one
+             is chosen here.  The options are filled in from the manifest once
+             dash.js has parsed it, and the row stays hidden when there is only
+             one rendition to play (or in embed mode, where Bilibili's own
+             player owns quality). #}
+          <div class="yt-settings-option yt-quality-option" id="yt-quality-row" hidden>
+            <select id="yt-quality-select" title="Video quality. Lower uses less of the relay."></select>
+            <span>Quality</span>
+          </div>
         </div>
       </div>
       <div id="yt-playback-rate-container" title="Playback rate. Click the number to reset">
@@ -65,7 +81,7 @@
         <svg viewBox="0 0 24 24" class="yt-icn"><path d="M17 2l4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
         <span class="yt-toggle-label">Loop</span>
       </button>
-      <button id="yt-autopause-btn" class="yt-toggle-btn" title="Auto-pause at the end of each sentence">
+      <button id="yt-autopause-btn" class="yt-toggle-btn" title="Auto-pause at the end of each sentence" aria-label="Auto-pause">
         <svg viewBox="0 0 24 24" class="yt-icn"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path><path d="M9 9h2v6H9zM13 9h2v6h-2z"></path></svg>
         <span class="yt-toggle-label">Auto-pause</span>
       </button>
