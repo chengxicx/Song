@@ -80,7 +80,9 @@ def test_missing_dbname_throws(tmp_path):
         AppConfig(config_file)
 
 
-def test_system_specific_datapath_returned_if_DATAPATH_not_specified(tmp_path, monkeypatch):
+def test_system_specific_datapath_returned_if_DATAPATH_not_specified(
+    tmp_path, monkeypatch
+):
     """
     Using library to get platform-specific paths.  Tests will
     hardcode the appropriate system path.
