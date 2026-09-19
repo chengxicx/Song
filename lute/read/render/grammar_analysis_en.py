@@ -355,6 +355,75 @@ _EN_RULES = [
         {"seq": [spec_surface("unless")]},
         zh="unless = if not：除非。",
     ),
+    # ---- C1 ----
+    make_rule(
+        "en_inversion",
+        "Inversion (Never have I / Hardly had ... when)",
+        "C1",
+        "negative or limiting adverbials put before the auxiliary invert the "
+        "word order: Never have I seen, No sooner had we left than ...",
+        {
+            "any_of": [
+                {"seq": [spec_surface("never", "rarely", "seldom", "little"), spec_pos("AUX")]},
+                {"seq": [spec_surface("not"), spec_surface("only"), spec_pos("AUX")]},
+                {"left": [spec_surface("hardly", "scarcely")], "right": [spec_surface("when", "before", "than")], "min_gap": 1, "max_gap": 10},
+                {"left": [spec_surface("no"), spec_surface("sooner")], "right": [spec_surface("than")], "min_gap": 1, "max_gap": 10},
+            ]
+        },
+        zh="倒装：否定/限制副词置于句首引起倒装（Never have I seen / No sooner had ... than）。",
+    ),
+    make_rule(
+        "en_future_perfect",
+        "Future perfect: will have + participle",
+        "C1",
+        "completion by a future point: will have finished.",
+        {"seq": [spec_surface("will"), spec_surface("have"), spec_morph(VerbForm="Part")]},
+        zh="将来完成时：will have + 过去分词（到将来某时将已完成）。",
+    ),
+    make_rule(
+        "en_future_continuous",
+        "Future continuous: will be + -ing",
+        "C1",
+        "an action in progress at a future time: will be waiting.",
+        {
+            "any_of": [
+                {"seq": [spec_surface("will"), spec_lemma("be"), spec_morph(Aspect="Prog")]},
+                {"seq": [spec_surface("will"), spec_lemma("be"), spec_morph(VerbForm="Ger")]},
+            ]
+        },
+        zh="将来进行时：will be + 动词-ing（将来某时正在进行）。",
+    ),
+    make_rule(
+        "en_whereas",
+        "whereas / whilst",
+        "C1",
+        "formal contrast or time: whereas, whilst.",
+        {"seq": [spec_surface("whereas", "whilst")]},
+        zh="whereas / whilst：然而/当……时（正式语体）。",
+    ),
+    # ---- C2 ----
+    make_rule(
+        "en_cleft",
+        "Cleft sentence (it was ... that)",
+        "C2",
+        "emphasis by splitting the sentence: It was John that broke it.",
+        {"re": re.compile(r"(?i)\bit\s+(?:was|is)\s+\S+\s+(?:that|who)\b")},
+        zh="强调句（分裂句）：It was ... that/who，强调句子成分。",
+    ),
+    make_rule(
+        "en_mandative_subjunctive",
+        "Mandative subjunctive (suggest that ...)",
+        "C2",
+        "demand-type verbs take a that-clause with a base-form verb: "
+        "suggest/recommend/insist that he go.",
+        {
+            "left": [spec_lemma("suggest", "recommend", "insist", "demand", "propose")],
+            "right": [spec_surface("that")],
+            "min_gap": 0,
+            "max_gap": 2,
+        },
+        zh="命令性虚拟式：suggest/recommend/insist that + 从句用动词原形（that he go）。",
+    ),
 ]
 
 
