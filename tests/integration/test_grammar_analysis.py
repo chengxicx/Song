@@ -210,6 +210,40 @@ def test_grammar_analysis_unknown_book_404(client, empty_db):
     assert resp.status_code == 404
 
 
+def test_language_edit_shows_engine_status(client, empty_db, english):
+    "语言编辑页应显示语法引擎状态行。"
+    resp = client.get(f"/language/edit/{english.id}")
+    assert resp.status_code == 200, resp.data
+    body = resp.data.decode("utf-8")
+    assert "grammar engine" in body
+    assert "english" in body
+
+
+def test_language_edit_without_engine_shows_note(client, empty_db):
+    "无专属引擎的语言显示 basic rules 说明。"
+    from lute.db import db as _db
+    from lute.language.service import Service as LangService
+    from lute.models.language import Language
+
+    lang = _db.session.query(Language).filter(Language.name == "Turkish").first()
+    if lang is None:
+        lang = LangService(_db.session).get_language_def("Turkish").language
+        _db.session.add(lang)
+        _db.session.commit()
+    resp = client.get(f"/language/edit/{lang.id}")
+    assert resp.status_code == 200, resp.data
+    assert "No dedicated grammar engine" in resp.data.decode("utf-8")
+
+
+def test_install_route_rejects_unknown_extra(client, empty_db):
+    "未知 extra 的安装请求应报错并不执行 pip。"
+    resp = client.post(
+        "/language/grammar_engine/install/klingon", follow_redirects=True
+    )
+    assert resp.status_code == 200
+    assert "Unknown grammar engine" in resp.data.decode("utf-8")
+
+
 def test_grammar_analysis_strips_zws_from_client_snippet(client, empty_db, korean):
     """
     阅读器把空段落渲染成零宽空格占位符，客户端拼接 snippet 时会把它们一起
