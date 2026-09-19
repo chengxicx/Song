@@ -210,7 +210,10 @@ def match_rule(rule, tokens, sentence_text):
                 neighbour = _left_neighbour(tokens, start)
                 veto = neighbour is not None and _match_condition(rule["not_after"], neighbour)
             if not veto and end > start:
-                char_end = offsets[end - 1] + len(tokens[end - 1]["surface"])
+                last = tokens[end - 1]
+                # An engine may report the token's true end offset (used when
+                # the matching "surface" is normalised shorter than the text).
+                char_end = last.get("end") or offsets[end - 1] + len(last["surface"])
                 spans.append((offsets[start], char_end))
     # Drop duplicate / contained spans, keep reading order.
     spans = sorted(set(spans))
