@@ -3,10 +3,11 @@
 
 Feature changes:
 
-* Grammar analysis panel for English, Spanish and Russian, graded with CEFR levels
-  (A1-C2), following the Japanese/Korean engines.  The engines need optional
-  dependencies; a bare install keeps working with the basic regex rules.  Install
-  all engines with: `pip install -e ".[english,spanish,russian]"`
+* Grammar analysis panel for English, Spanish, Russian, French, German, Thai and
+  Arabic, graded with CEFR levels (A1-C2), following the Japanese/Korean engines.
+  The engines need optional dependencies; a bare install keeps working with the
+  basic regex rules.  Install all engines with:
+  `pip install -e ".[japanese-sudachi,korean,english,spanish,russian,french,german,thai,arabic]"`
 
 
 # 3.10.3 (2026-07-06)
