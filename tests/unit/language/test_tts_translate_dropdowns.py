@@ -87,6 +87,7 @@ def test_form_post_persists_selected_tags(client):
             "dictionaries-1-sort_order": "2",
             "tts_lang": "zh-HK",
             "translate_target_lang": "zh-CN",
+            "grammar_translate_lang": "en",
         },
         follow_redirects=False,
     )
