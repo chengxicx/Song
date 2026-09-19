@@ -10,8 +10,7 @@ Feature changes:
   keeps working with the basic regex rules.  Install all engines with:
   `pip install -e ".[japanese-sudachi,korean,english,spanish,russian,french,german,italian,portuguese,thai,arabic]"`
 * Language edit page shows each language's grammar engine status, with an
-  Install button that pip-installs the engine's packages when missing
-  (covers the Korean/Kiwi engine too).
+  Install button that pip-installs the engine's packages when missing.
 * "Grammar Analysis Language" gains a 한국어 choice: the Korean grammar
   panel can now explain its grammar points in Korean (Korean descriptions
   for every kimchi-grammar entry; other engines keep their English text).
