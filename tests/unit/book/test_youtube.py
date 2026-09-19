@@ -678,7 +678,10 @@ def test_edit_page_cue_data_updates_timings(app, app_context, english, client):
     )
     resp = client.post(
         f"/read/editpage/{dbbook.id}/1",
-        data={"text": "Hello world.\nEdited via panel.\nGoodbye!", "cue_data": cue_data},
+        data={
+            "text": "Hello world.\nEdited via panel.\nGoodbye!",
+            "cue_data": cue_data,
+        },
         follow_redirects=False,
     )
     assert resp.status_code == 302
@@ -706,7 +709,10 @@ def test_edit_page_cue_data_mismatch_keeps_cues(app, app_context, english, clien
     )
     resp = client.post(
         f"/read/editpage/{dbbook.id}/1",
-        data={"text": "Hello world.\nAn extra line.\nThis is a test subtitle.\nGoodbye!", "cue_data": cue_data},
+        data={
+            "text": "Hello world.\nAn extra line.\nThis is a test subtitle.\nGoodbye!",
+            "cue_data": cue_data,
+        },
         follow_redirects=False,
     )
     assert resp.status_code == 302
@@ -732,7 +738,10 @@ def test_edit_page_cue_data_bad_values_ignored(app, app_context, english, client
     )
     resp = client.post(
         f"/read/editpage/{dbbook.id}/1",
-        data={"text": "Hello world.\nThis is a test subtitle.\nGoodbye!", "cue_data": cue_data},
+        data={
+            "text": "Hello world.\nThis is a test subtitle.\nGoodbye!",
+            "cue_data": cue_data,
+        },
         follow_redirects=False,
     )
     assert resp.status_code == 302

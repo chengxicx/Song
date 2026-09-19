@@ -19,7 +19,7 @@ from lute.read.render.grammar_analysis_matcher import (
     spec_surface,
 )
 
-_PUNCT = set("，。！？；：、（）「」『』《》〈〉""''…—·,.!?;:\"'()`")
+_PUNCT = set("，。！？；：、（）「」『』《》〈〉" "''…—·,.!?;:\"'()`")
 
 _HAN = r"\u4e00-\u9fff"
 
@@ -27,7 +27,11 @@ _HAN = r"\u4e00-\u9fff"
 def _tokens_for(sentence):
     "Character-level tokens; punctuation flagged for sequence skipping."
     return [
-        {"surface": ch, "pos": "PUNCT" if ch in _PUNCT or ch.isspace() else "X", "idx": i}
+        {
+            "surface": ch,
+            "pos": "PUNCT" if ch in _PUNCT or ch.isspace() else "X",
+            "idx": i,
+        }
         for i, ch in enumerate(sentence)
     ]
 
@@ -36,6 +40,7 @@ def _tokens_for(sentence):
 #
 # Levels use CEFR bands (A1..C2) as a display approximation.  Regex rules
 # match the raw sentence; token rules work on the character stream.
+
 
 def _re(pattern):
     return {"re": re.compile(pattern)}
@@ -144,17 +149,20 @@ _ZH_RULES = [
         "zh_shi_de",
         "是 ... 的 (emphasis frame)",
         "A1",
-        "是 ... 的 highlights when/how/where a known event happened: "
-        "他是昨天来的.",
-        {"left": [spec_surface("是")], "right": [spec_surface("的")], "min_gap": 1, "max_gap": 8},
+        "是 ... 的 highlights when/how/where a known event happened: " "他是昨天来的.",
+        {
+            "left": [spec_surface("是")],
+            "right": [spec_surface("的")],
+            "min_gap": 1,
+            "max_gap": 8,
+        },
         zh="是 … 的：强调已发生事件的时间/方式/地点（他是昨天来的）。",
     ),
     make_rule(
         "zh_ba_sentence",
         "把 sentence (disposal)",
         "A2",
-        "把 moves the object before the verb, which takes a complement: "
-        "把作业写完了.",
+        "把 moves the object before the verb, which takes a complement: " "把作业写完了.",
         _re(r"把[" + _HAN + r"]{1,6}(?:了|到|在|成|得|给|好|完)"),
         zh="把字句：宾语前移，动词带补语（把作业写完了）。",
     ),

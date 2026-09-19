@@ -98,7 +98,10 @@ def test_korean_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The English engine grades points with CEFR levels."
-    levels = {e["key"]: e["level"] for e in analyze_english(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"]
+        for e in analyze_english(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["en_there_be"] == "A1"
     assert levels["en_past_simple"] == "A2"
 

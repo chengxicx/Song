@@ -32,9 +32,7 @@ def series_tag_for_book(session, book):
     None when the book doesn't belong to a book set.
     """
     tag_texts = [t.text for t in book.book_tags]
-    return next(
-        (st for st in configured_series_tags(session) if st in tag_texts), None
-    )
+    return next((st for st in configured_series_tags(session) if st in tag_texts), None)
 
 
 _SERIES_BOOKS_SQL = """
@@ -126,9 +124,7 @@ def get_series_overview(session, tagtext):
     DataTable on the overview page (BkID/BkTitle/... keys, mirroring
     the home book table's row shape), plus a few display-only fields.
     """
-    rows = session.execute(
-        db.text(_SERIES_BOOKS_SQL), {"tagtext": tagtext}
-    ).fetchall()
+    rows = session.execute(db.text(_SERIES_BOOKS_SQL), {"tagtext": tagtext}).fetchall()
     if len(rows) == 0:
         return None
 
@@ -153,7 +149,9 @@ def get_series_overview(session, tagtext):
             read_count += 1
         else:
             # Prefer non-archived books when picking the continue target.
-            if continue_book is None or (continue_book["archived"] and not r.BkArchived):
+            if continue_book is None or (
+                continue_book["archived"] and not r.BkArchived
+            ):
                 continue_book = {
                     "id": r.BkID,
                     "title": r.BkTitle,

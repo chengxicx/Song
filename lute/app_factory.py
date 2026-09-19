@@ -186,6 +186,7 @@ def _add_base_routes(app, app_config):
         # hash, so browsers (and CDNs) can cache the response forever
         # and a theme change simply produces a new URL.
         from lute.themes.service import Service as _ThemeService
+
         _theme_css = _ThemeService(db.session).get_current_css()
         _custom_styles = current_settings().get("custom_styles", "")
         _css_hash = lambda s: hashlib.sha1(s.encode("utf-8")).hexdigest() if s else ""

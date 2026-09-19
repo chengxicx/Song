@@ -4,7 +4,14 @@ Book create/edit forms.
 
 import json
 from flask import request
-from wtforms import StringField, SelectField, TextAreaField, IntegerField, HiddenField, SelectMultipleField
+from wtforms import (
+    StringField,
+    SelectField,
+    TextAreaField,
+    IntegerField,
+    HiddenField,
+    SelectMultipleField,
+)
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm

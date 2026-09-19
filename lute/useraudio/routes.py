@@ -38,9 +38,12 @@ def _audio_etag(fname, size, mtime):
     identity rather than its bytes, so re-uploading a book's audio
     (new size/mtime) changes the ETag without hashing megabytes.
     """
-    return '"%s"' % hashlib.md5(
-        f"{os.path.basename(fname)}:{size}:{int(mtime)}".encode()
-    ).hexdigest()
+    return (
+        '"%s"'
+        % hashlib.md5(
+            f"{os.path.basename(fname)}:{size}:{int(mtime)}".encode()
+        ).hexdigest()
+    )
 
 
 def _send_audio_range_aware(fname):
