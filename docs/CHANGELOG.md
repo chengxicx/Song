@@ -15,8 +15,11 @@ Feature changes:
   Kiwi) ships with the language's parser instead of claiming there is no
   dedicated engine.
 * "Grammar Analysis Language" gains a 한국어 choice: the Korean grammar
-  panel can now explain its grammar points in Korean (Korean descriptions
-  for every kimchi-grammar entry; other engines keep their English text).
+  panel explains its points in Korean (Korean descriptions for every
+  kimchi-grammar entry), and the matcher engines (English, Spanish,
+  Russian, French, German, Italian, Portuguese, Thai, Arabic, Mandarin,
+  Cantonese) show authored Korean descriptions as well.  The Japanese
+  engine keeps its English meanings for now.
 
 
 # 3.10.3 (2026-07-06)
