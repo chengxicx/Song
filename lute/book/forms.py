@@ -27,6 +27,10 @@ AUDIO_VALIDATION_MSG = (
     f"Please upload a valid audio file ({', '.join(ALLOWED_AUDIO_EXTENSIONS)})"
 )
 
+# Book types whose reading text is generated from subtitles: the text
+# field holds the SRT original and the player follows srt_data cues.
+SUBTITLE_BOOK_TYPES = ("youtube", "bilibili", "mp3", "netease", "video")
+
 
 def _tag_values(field_data):
     "Convert field data to array."
@@ -203,12 +207,19 @@ class EditBookForm(FlaskForm):
 
         # If the type was changed away from youtube/bilibili/mp3/video,
         # clear the subtitle data.
-        if obj.book_type not in ("youtube", "bilibili", "mp3", "netease", "video"):
+        if obj.book_type not in SUBTITLE_BOOK_TYPES:
             obj.srt_data = None
             obj.video_current_pos = None
 
+        # A subtitle book's text is owned by its SRT data, so a stray
+        # "Text file" upload must be ignored: the field is hidden for
+        # these types, but a file picked while the book was a Text type
+        # stays attached to the (now hidden) input when the type is
+        # switched.  Letting it through would overwrite book.text with
+        # the file's content after _parse_youtube_subtitles has already
+        # reparsed the cues, desyncing text and player timings.
         tfd = self.textfile.data
-        if tfd:
+        if tfd and obj.book_type not in SUBTITLE_BOOK_TYPES:
             obj.text_stream = tfd.stream
             obj.text_stream_filename = tfd.filename
 
@@ -219,7 +230,7 @@ class EditBookForm(FlaskForm):
             obj.audio_bookmarks = None
             obj.audio_current_pos = None
 
-        if obj.book_type in ("youtube", "bilibili", "mp3", "netease", "video"):
+        if obj.book_type in SUBTITLE_BOOK_TYPES:
             self._parse_youtube_subtitles(obj)
 
     def _parse_youtube_subtitles(self, obj):
