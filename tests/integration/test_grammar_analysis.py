@@ -1,19 +1,26 @@
 """
 可行性原型：/read/grammar_analysis 接口的冒烟测试。
+
+English/Spanish/Russian books route to their dedicated spaCy / pymorphy3
+engines (skipped when the optional dependency isn't installed); every
+other language falls back to the generic regex rule library.
 """
 
 import json
+import pytest
 from lute.db import db
 from tests.utils import make_book
 
 
-def test_grammar_analysis_returns_points(client, empty_db, english):
-    "创建一本含语法例句的书，调用接口应返回语法点与例句。"
+def test_english_grammar_analysis_uses_en_engine(client, empty_db, english):
+    "英语书籍应走 spaCy 语法引擎，返回 CEFR 分级规则与例句。"
+    pytest.importorskip("spacy")
+    pytest.importorskip("en_core_web_sm")
     book = make_book(
-        "Grammar Demo",
+        "English Grammar Demo",
         [
-            "If it rains, then we stay home. The box is too heavy to lift. "
-            "Neither he nor she likes it."
+            "The box is too heavy to lift. She is as tall as her brother. "
+            "They went home early."
         ],
         english,
     )
@@ -23,11 +30,75 @@ def test_grammar_analysis_returns_points(client, empty_db, english):
     resp = client.get(f"/read/grammar_analysis/{book.id}/1")
     assert resp.status_code == 200, resp.data
     data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "en_too_to" in keys
+    assert "en_as_as" in keys
+    assert "en_past_simple" in keys
+    for g in data:
+        assert g["level"] in ("A1", "A2", "B1", "B2", "C1", "C2"), "英语语法点应标注 CEFR"
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_spanish_grammar_analysis_uses_es_engine(client, empty_db, spanish):
+    "西班牙语书籍应走 spaCy 语法引擎。"
+    pytest.importorskip("spacy")
+    pytest.importorskip("es_core_news_sm")
+    book = make_book(
+        "Spanish Grammar Demo",
+        ["Hay un problema grave. Ayer comió paella. Voy a comer ahora."],
+        spanish,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "es_hay" in keys
+    assert "es_preterite" in keys
+    assert "es_ir_a" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_russian_grammar_analysis_uses_ru_engine(client, empty_db, russian):
+    "俄语书籍应走 pymorphy3 语法引擎。"
+    pytest.importorskip("pymorphy3")
+    book = make_book(
+        "Russian Grammar Demo",
+        ["У меня есть время. Мы живём в Москве. Вчера я читал книгу."],
+        russian,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "ru_u_menya" in keys
+    assert "ru_prep_loct" in keys
+    assert "ru_past" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_grammar_analysis_fallback_for_other_languages(client, empty_db, french):
+    "无专用引擎的语言（如法语）应退回通用正则规则库。"
+    book = make_book(
+        "Fallback Grammar Demo",
+        ["If it rains, then we stay home."],
+        french,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
     names = {g["name"] for g in data}
     assert "条件句 (Conditional)" in names
-    assert "太...而不能 (too ... to)" in names
-    assert "否定并列 (neither ... nor)" in names
-    # 每个语法点都应带原文例句。
     for g in data:
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
 

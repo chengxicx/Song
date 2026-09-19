@@ -1,4 +1,14 @@
 
+# Unreleased
+
+Feature changes:
+
+* Grammar analysis panel for English, Spanish and Russian, graded with CEFR levels
+  (A1-C2), following the Japanese/Korean engines.  The engines need optional
+  dependencies; a bare install keeps working with the basic regex rules.  Install
+  all engines with: `pip install -e ".[english,spanish,russian]"`
+
+
 # 3.10.3 (2026-07-06)
 
 Bugfix:
