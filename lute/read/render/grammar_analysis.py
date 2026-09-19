@@ -62,6 +62,54 @@ def is_korean_language(language):
 # no parser_type to key on.
 
 
+def is_mandarin_chinese_language(language):
+    "True if the given Language should use the Mandarin grammar engine."
+    if language is None:
+        return False
+    parser_type = (getattr(language, "parser_type", None) or "").strip().lower()
+    if parser_type == "lute_mandarin":
+        return True
+    if parser_type == "lute_cantonese":
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    if "classical" in name or "文言" in name:
+        return False
+    if (
+        "cantonese" in name
+        or "粤语" in name
+        or "粵語" in name
+        or "广东话" in name
+        or "廣東話" in name
+    ):
+        # "Cantonese Chinese" contains "chinese"; keep the two apart.
+        return False
+    return (
+        "mandarin" in name
+        or "chinese" in name
+        or "中文" in name
+        or "汉语" in name
+        or "漢語" in name
+        or "普通话" in name
+    )
+
+
+def is_cantonese_language(language):
+    "True if the given Language should use the Cantonese grammar engine."
+    if language is None:
+        return False
+    parser_type = (getattr(language, "parser_type", None) or "").strip().lower()
+    if parser_type == "lute_cantonese":
+        return True
+    name = (getattr(language, "name", None) or "").lower()
+    return (
+        "cantonese" in name
+        or "粤语" in name
+        or "粵語" in name
+        or "广东话" in name
+        or "廣東話" in name
+    )
+
+
 def is_english_language(language):
     "True if the given Language should use the spaCy English grammar engine."
     if language is None:
@@ -97,7 +145,14 @@ def is_french_language(language):
     if language is None:
         return False
     name = (getattr(language, "name", None) or "").lower()
-    return "french" in name or "français" in name or "francais" in name or "法语" in name or "法文" in name or "法語" in name
+    return (
+        "french" in name
+        or "français" in name
+        or "francais" in name
+        or "法语" in name
+        or "法文" in name
+        or "法語" in name
+    )
 
 
 def is_german_language(language):
@@ -105,7 +160,13 @@ def is_german_language(language):
     if language is None:
         return False
     name = (getattr(language, "name", None) or "").lower()
-    return "german" in name or "deutsch" in name or "德语" in name or "德文" in name or "德語" in name
+    return (
+        "german" in name
+        or "deutsch" in name
+        or "德语" in name
+        or "德文" in name
+        or "德語" in name
+    )
 
 
 def is_thai_language(language):
@@ -116,7 +177,9 @@ def is_thai_language(language):
     if parser_type in _THAI_PARSER_TYPES:
         return True
     name = (getattr(language, "name", None) or "").lower()
-    return "thai" in name or "ไทย" in name or "泰语" in name or "泰文" in name or "泰語" in name
+    return (
+        "thai" in name or "ไทย" in name or "泰语" in name or "泰文" in name or "泰語" in name
+    )
 
 
 def is_arabic_language(language):
@@ -124,18 +187,57 @@ def is_arabic_language(language):
     if language is None:
         return False
     name = (getattr(language, "name", None) or "").lower()
-    return "arabic" in name or "العربية" in name or "阿拉伯语" in name or "阿拉伯文" in name or "阿拉伯語" in name
+    return (
+        "arabic" in name
+        or "العربية" in name
+        or "阿拉伯语" in name
+        or "阿拉伯文" in name
+        or "阿拉伯語" in name
+    )
+
+
+def is_italian_language(language):
+    "True if the given Language should use the spaCy Italian grammar engine."
+    if language is None:
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    return (
+        "italian" in name
+        or "italiano" in name
+        or "意大利语" in name
+        or "意大利文" in name
+        or "意大利語" in name
+    )
+
+
+def is_portuguese_language(language):
+    "True if the given Language should use the spaCy Portuguese grammar engine."
+    if language is None:
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    return (
+        "portuguese" in name
+        or "português" in name
+        or "portugues" in name
+        or "葡萄牙语" in name
+        or "葡萄牙文" in name
+        or "葡萄牙語" in name
+    )
 
 
 # ---- startup dependency check -----------------------------------------
 #
 # language label, detector, importable deps, pip extra that provides them
 _ENGINE_REQUIREMENTS = [
+    ("Mandarin Chinese", is_mandarin_chinese_language, (), "chinese"),
+    ("Cantonese", is_cantonese_language, (), "cantonese"),
     ("English", is_english_language, ("spacy", "en_core_web_sm"), "english"),
     ("Spanish", is_spanish_language, ("spacy", "es_core_news_sm"), "spanish"),
     ("Russian", is_russian_language, ("pymorphy3",), "russian"),
     ("French", is_french_language, ("spacy", "fr_core_news_sm"), "french"),
     ("German", is_german_language, ("spacy", "de_core_news_sm"), "german"),
+    ("Italian", is_italian_language, ("spacy", "it_core_news_sm"), "italian"),
+    ("Portuguese", is_portuguese_language, ("spacy", "pt_core_news_sm"), "portuguese"),
     ("Thai", is_thai_language, ("pythainlp",), "thai"),
     ("Arabic", is_arabic_language, ("pyarabic",), "arabic"),
 ]
@@ -162,6 +264,14 @@ _ENGINE_INSTALL_SPECS = {
         "de-core-news-sm@https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.8.0/de_core_news_sm-3.8.0-py3-none-any.whl",
     ],
     "russian": ["pymorphy3>=2.0,<3", "pymorphy3-dicts-ru>=2.4,<3"],
+    "italian": [
+        "spacy>=3.8.0,<3.8.4",
+        "it-core-news-sm@https://github.com/explosion/spacy-models/releases/download/it_core_news_sm-3.8.0/it_core_news_sm-3.8.0-py3-none-any.whl",
+    ],
+    "portuguese": [
+        "spacy>=3.8.0,<3.8.4",
+        "pt-core-news-sm@https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.8.0/pt_core_news_sm-3.8.0-py3-none-any.whl",
+    ],
     "thai": ["pythainlp>=5.0,<6"],
     "arabic": ["pyarabic>=0.6,<2"],
 }
@@ -188,7 +298,13 @@ def grammar_engine_status(language):
     """
     label, extra = grammar_engine_for(language)
     if label is None:
-        return {"label": None, "extra": None, "installed": False, "missing": [], "installable": False}
+        return {
+            "label": None,
+            "extra": None,
+            "installed": False,
+            "missing": [],
+            "installable": False,
+        }
     deps = next(_deps for _l, _d, _deps, _e in _ENGINE_REQUIREMENTS if _e == extra)
     missing = [dep for dep in deps if importlib.util.find_spec(dep) is None]
     return {
@@ -198,6 +314,32 @@ def grammar_engine_status(language):
         "missing": missing,
         "installable": extra in _ENGINE_INSTALL_SPECS,
     }
+
+
+# Japanese and Korean grammar analysis runs on the reading page's own
+# parser tokenizer (Sudachi / Kiwi).  There is no separate grammar
+# dependency or pip extra -- the parser plugin ships it -- so the language
+# page's status line notes that instead of falling through to the
+# "no dedicated engine / basic rules" wording.
+_PARSER_SHIPPED_ENGINES = [
+    ("Japanese", "Sudachi", is_japanese_language),
+    ("Korean", "Kiwi", is_korean_language),
+]
+
+
+def grammar_engine_note(language):
+    """
+    For languages whose grammar engine rides on the parser's own tokenizer,
+    return {"label", "tokenizer"} (Japanese/Sudachi, Korean/Kiwi); None for
+    languages served by the standalone engines (grammar_engine_status) or
+    with no dedicated engine at all.
+    """
+    if language is None:
+        return None
+    for label, tokenizer, detect in _PARSER_SHIPPED_ENGINES:
+        if detect(language):
+            return {"label": label, "tokenizer": tokenizer}
+    return None
 
 
 def install_grammar_engine(extra):
@@ -224,7 +366,10 @@ def install_grammar_engine(extra):
         return False, f"Could not run pip: {e}"
     if proc.returncode != 0:
         output = (proc.stdout or "") + (proc.stderr or "")
-        return False, f"pip install of the {extra} engine failed:\n{output.strip()[-2000:]}"
+        return (
+            False,
+            f"pip install of the {extra} engine failed:\n{output.strip()[-2000:]}",
+        )
     return True, (
         f"Installed the {extra} grammar engine. "
         "If the grammar panel still shows the basic rules, restart the app."
@@ -278,9 +423,7 @@ _GRAMMAR_RULES = [
     {
         "name": "并列强调 (not only ... but also)",
         "desc": "强调两者，语气更强",
-        "pattern": re.compile(
-            r"\bnot\s+only\b.{0,60}?\bbut\s+also\b", re.IGNORECASE
-        ),
+        "pattern": re.compile(r"\bnot\s+only\b.{0,60}?\bbut\s+also\b", re.IGNORECASE),
     },
     {
         "name": "太...而不能 (too ... to)",
@@ -352,6 +495,9 @@ def analyze(sentences):
                 matched.append(entry)
             if sentence not in [ex["sentence"] for ex in entry["examples"]]:
                 entry["examples"].append(
-                    {"sentence": sentence, "matches": [{"start": m.start(), "end": m.end()}]}
+                    {
+                        "sentence": sentence,
+                        "matches": [{"start": m.start(), "end": m.end()}],
+                    }
                 )
     return matched

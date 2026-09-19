@@ -13,6 +13,9 @@ import threading
 
 import pytest
 
+pytest.importorskip("sudachipy")
+pytest.importorskip("sudachidict_core")
+
 from lute.models.language import Language
 from lute.parse.sudachi_parser import JapaneseSudachiParser
 from lute.settings.current import current_settings

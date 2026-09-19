@@ -107,6 +107,10 @@ def test_legacy_parser_stays_a_supported_type():
     assert "japanese" in [k for k, _ in supported_parsers()]
 
 
+@pytest.mark.skipif(
+    not is_supported("japanese_sudachi"),
+    reason="sudachi extra not installed; the parser is not selectable",
+)
 def test_legacy_parser_is_not_selectable():
     "It isn't offered for a new language."
     keys = [k for k, _ in selectable_parsers()]

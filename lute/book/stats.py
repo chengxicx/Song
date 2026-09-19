@@ -334,11 +334,7 @@ class Service:
         "Gets stats from the cache if available, or calculates."
         bk_id = book.id
         stats = self.session.query(BookStats).filter_by(BkID=bk_id).first()
-        if (
-            stats is None
-            or stats.status_distribution is None
-            or stats.stale
-        ):
+        if stats is None or stats.status_distribution is None or stats.stale:
             newstats = self._calculate_stats(book)
             self._update_stats(book, newstats)
             stats = self.session.query(BookStats).filter_by(BkID=bk_id).first()

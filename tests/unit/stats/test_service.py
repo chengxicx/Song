@@ -1,6 +1,10 @@
+import pytest
+
 "Stats service test."
 
 from datetime import datetime, timedelta
+
+from lute.parse.registry import is_supported
 from lute.models.book import WordsRead
 from lute.models.term import Term
 from lute.db import db
@@ -373,6 +377,10 @@ def test_cefr_words_and_export_endpoints(english, app_context, client):
     assert "C2," in body
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_korean"),
+    reason="lute_korean parser plugin not installed",
+)
 def test_get_topik_data_counts_by_level(korean, app_context):
     "Seen/mastered counts attributed to TOPIK A/B/C bands."
     _save_jp_term(korean, "가게", 99)  # mastered (A)
@@ -391,6 +399,10 @@ def test_get_topik_data_counts_by_level(korean, app_context):
     assert data["total_seen"] == 2
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_korean"),
+    reason="lute_korean parser plugin not installed",
+)
 def test_topik_data_endpoint(korean, app_context, client):
     "The /stats/topik_data endpoint returns band data for a Korean language."
     _save_jp_term(korean, "가게", 99)
@@ -409,6 +421,10 @@ def test_topik_data_endpoint(korean, app_context, client):
     assert resp.status_code == 400
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_korean"),
+    reason="lute_korean parser plugin not installed",
+)
 def test_get_topik_words_filters(korean, app_context):
     "Drilldown respects the unmastered/mastered/notseen filters."
     _save_jp_term(korean, "가게", 99)
@@ -428,6 +444,10 @@ def test_get_topik_words_filters(korean, app_context):
     assert "한국" not in notseen_words
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_korean"),
+    reason="lute_korean parser plugin not installed",
+)
 def test_topik_words_and_export_endpoints(korean, app_context, client):
     "The topik_words and topik_export endpoints behave like the JLPT ones."
     _save_jp_term(korean, "가게", 99)
@@ -756,6 +776,10 @@ def test_german_words_and_export_endpoints(german, app_context, client):
     assert "C2," in body
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_thai"),
+    reason="lute_thai parser plugin not installed",
+)
 def test_get_thai_data_counts_by_level(thai, app_context):
     "Seen/mastered counts attributed to Thai frequency buckets."
     _save_jp_term(thai, "และ", 99)  # mastered (1-500)
@@ -775,6 +799,10 @@ def test_get_thai_data_counts_by_level(thai, app_context):
     assert data["total_seen"] == 2
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_thai"),
+    reason="lute_thai parser plugin not installed",
+)
 def test_thai_data_endpoint(thai, app_context, client):
     "The /stats/thai_data endpoint returns bucket data for a Thai language."
     _save_jp_term(thai, "และ", 99)
@@ -793,6 +821,10 @@ def test_thai_data_endpoint(thai, app_context, client):
     assert resp.status_code == 400
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_thai"),
+    reason="lute_thai parser plugin not installed",
+)
 def test_get_thai_words_filters(thai, app_context):
     "Drilldown respects the unmastered/mastered/notseen filters."
     _save_jp_term(thai, "และ", 99)
@@ -814,6 +846,10 @@ def test_get_thai_words_filters(thai, app_context):
     assert all(w["id"] is None for w in notseen)
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_thai"),
+    reason="lute_thai parser plugin not installed",
+)
 def test_thai_words_and_export_endpoints(thai, app_context, client):
     "The thai_words and thai_export endpoints behave like the JLPT ones."
     _save_jp_term(thai, "และ", 99)
@@ -1051,6 +1087,10 @@ def test_arabic_words_and_export_endpoints(arabic, app_context, client):
     assert "C2," in body
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_mandarin"),
+    reason="lute_mandarin parser plugin not installed",
+)
 def test_get_hsk2_data_counts_by_level(mandarin, app_context):
     "Seen/mastered counts attributed to HSK 2.0 levels."
     # HSK 2.0 levels: 猫=1, 运动=2, 环境=3, 成熟=4.
@@ -1082,6 +1122,10 @@ def test_get_hsk3_data_counts_and_7():
     assert word_levels["7"] > 0  # the 7-9 band has entries
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_mandarin"),
+    reason="lute_mandarin parser plugin not installed",
+)
 def test_get_hsk3_data_counts_by_level(mandarin, app_context):
     "HSK 3.0 level attribution on stored terms."
     # HSK 3.0 levels: 爱=1, 运动=2, 安全=3, 性格=4.
@@ -1100,6 +1144,10 @@ def test_get_hsk3_data_counts_by_level(mandarin, app_context):
     assert data["total_seen"] == 2
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_mandarin"),
+    reason="lute_mandarin parser plugin not installed",
+)
 def test_hsk_data_endpoint(mandarin, app_context, client):
     "The hsk2_data/hsk3_data endpoints return level data for a Mandarin language."
     _save_jp_term(mandarin, "猫", 99)
@@ -1126,6 +1174,10 @@ def test_hsk_data_endpoint(mandarin, app_context, client):
     assert resp.status_code == 400
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_mandarin"),
+    reason="lute_mandarin parser plugin not installed",
+)
 def test_get_hsk3_words_filters(mandarin, app_context):
     "HSK 3.0 drilldown respects the unmastered/mastered/notseen filters."
     _save_jp_term(mandarin, "爱", 99)
@@ -1145,6 +1197,10 @@ def test_get_hsk3_words_filters(mandarin, app_context):
     assert all(w["id"] is None for w in notseen)
 
 
+@pytest.mark.skipif(
+    not is_supported("lute_mandarin"),
+    reason="lute_mandarin parser plugin not installed",
+)
 def test_hsk_words_and_export_endpoints(mandarin, app_context, client):
     "The hsk2_* and hsk3_* endpoint groups behave like the JLPT ones."
     _save_jp_term(mandarin, "猫", 99)

@@ -65,6 +65,7 @@ dev = [
   "pipdeptree>=2.13.0,<3",
   "pylint>=2.17.5,<4",
   "pytest-bdd>=7.0.0,<8",
+  "pytest-xdist>=3.6.1,<4",
   "playwright>=1.39.0,<2",
   "pre-commit>=3.5.0,<4",
   "black>=23.10.1,<24",
@@ -90,6 +91,14 @@ spanish = [
 russian = [
   "pymorphy3>=2.0,<3",
   "pymorphy3-dicts-ru>=2.4,<3",
+]
+italian = [
+  "spacy>=3.8.0,<3.8.4",
+  "it-core-news-sm@https://github.com/explosion/spacy-models/releases/download/it_core_news_sm-3.8.0/it_core_news_sm-3.8.0-py3-none-any.whl",
+]
+portuguese = [
+  "spacy>=3.8.0,<3.8.4",
+  "pt-core-news-sm@https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.8.0/pt_core_news_sm-3.8.0-py3-none-any.whl",
 ]
 french = [
   "spacy>=3.8.0,<3.8.4",

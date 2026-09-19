@@ -183,7 +183,9 @@ def test_import_page_renders_with_epub_type(app, app_context, english):
     client = app.test_client()
     resp = client.get("/book/import_webpage")
     assert resp.status_code == 200
-    assert b'<option value="epub">' in resp.data
+    # The import-type picker is a custom button + listbox; the epub form
+    # carries the chosen type in a hidden input.
+    assert b'name="import_type" value="epub"' in resp.data
     assert b'id="epub_preview_toggle" checked' in resp.data
     assert b'id="epub-preview-panel"' in resp.data
 

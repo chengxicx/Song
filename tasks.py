@@ -403,7 +403,9 @@ def db_reset(c):
 
     Can only be run on a testing db.
     """
-    c.run("pytest -m dbreset")
+    # The empty LUTE_DB_URI opts this run out of the in-memory test db
+    # (see tests/conftest.py): this task exists to reset the on-disk db.
+    c.run("pytest -m dbreset", env={"LUTE_DB_URI": ""})
     print("\nok, export baseline.sql if needed.\n")
 
 
