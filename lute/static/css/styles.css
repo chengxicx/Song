@@ -4585,6 +4585,14 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 .grammar-item--N1, .grammar-group--N1 { --g-accent: #e64980; }
 .grammar-item--N,  .grammar-group--N  { --g-accent: var(--btn-accent, #007aff); }
 
+/* CEFR levels (English/Spanish/Russian engines), easy -> hard. */
+.grammar-item--A1, .grammar-group--A1 { --g-accent: #37b24d; }
+.grammar-item--A2, .grammar-group--A2 { --g-accent: #20c997; }
+.grammar-item--B1, .grammar-group--B1 { --g-accent: #339af0; }
+.grammar-item--B2, .grammar-group--B2 { --g-accent: #f08c00; }
+.grammar-item--C1, .grammar-group--C1 { --g-accent: #845ef7; }
+.grammar-item--C2, .grammar-group--C2 { --g-accent: #e64980; }
+
 .grammar-analysis-panel__header {
     display: flex;
     align-items: center;
