@@ -9,6 +9,31 @@ import json
 
 from lute.book.stats import get_difficulty_label
 from lute.db import db
+from lute.models.repositories import MissingUserSettingKeyException
+from lute.models.repositories import UserSettingRepository
+
+
+def configured_series_tags(session):
+    """
+    Book tags configured as series / book sets (UserSetting
+    'book_series_tags', comma-separated tag texts).  Returns the raw
+    tag texts, unescaped.
+    """
+    try:
+        raw = UserSettingRepository(session).get_value("book_series_tags") or ""
+    except MissingUserSettingKeyException:
+        raw = ""
+    return [t.strip() for t in raw.split(",") if t.strip()]
+
+
+def series_tag_for_book(session, book):
+    """
+    The first of the book's tags that is configured as a series, or
+    None when the book doesn't belong to a book set.
+    """
+    tag_texts = [t.text for t in book.book_tags]
+    return next((st for st in configured_series_tags(session) if st in tag_texts), None)
+
 
 _SERIES_BOOKS_SQL = """
 SELECT
@@ -99,9 +124,7 @@ def get_series_overview(session, tagtext):
     DataTable on the overview page (BkID/BkTitle/... keys, mirroring
     the home book table's row shape), plus a few display-only fields.
     """
-    rows = session.execute(
-        db.text(_SERIES_BOOKS_SQL), {"tagtext": tagtext}
-    ).fetchall()
+    rows = session.execute(db.text(_SERIES_BOOKS_SQL), {"tagtext": tagtext}).fetchall()
     if len(rows) == 0:
         return None
 
@@ -126,7 +149,13 @@ def get_series_overview(session, tagtext):
             read_count += 1
         else:
             # Prefer non-archived books when picking the continue target.
-            if continue_book is None or (continue_book["archived"] and not r.BkArchived):
+            if continue_book is None or (
+                # Short-circuit guards the subscript: continue_book is a
+                # dict by the time "archived" is read.  (pylint cannot
+                # narrow None -> dict across the or.)
+                continue_book["archived"]  # pylint: disable=unsubscriptable-object
+                and not r.BkArchived
+            ):
                 continue_book = {
                     "id": r.BkID,
                     "title": r.BkTitle,

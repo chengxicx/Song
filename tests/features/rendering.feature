@@ -454,6 +454,7 @@ Feature: Rendering
             私(1)/は/元気(1)/です(1)/.
 
 
+    @skip_without_sudachi
     Scenario: Japanese multiword at end of sentence.
         Given language Japanese
         And text:

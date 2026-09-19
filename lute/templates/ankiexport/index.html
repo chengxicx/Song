@@ -79,7 +79,7 @@
 
   function _make_validation_failed_icon(msg) {
     const fail_icon = $('<img class="export_validation_failed">')
-          .attr("src", "{{ url_for('static', filename='icn/cross.png') }}")
+          .attr("src", "{{ vstatic('icn/cross.png') }}")
           .attr("title", msg)
           .css({ width: "20px", height: "20px", cursor: "pointer", marginLeft: "5px"});
     return fail_icon;

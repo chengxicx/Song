@@ -26,7 +26,9 @@ def _tokenizer():
     "Lazy, process-lifetime pythainlp word_tokenize."
     global _TOKENIZER
     if _TOKENIZER is None:
-        from pythainlp.tokenize import word_tokenize  # pylint: disable=import-outside-toplevel
+        from pythainlp.tokenize import (
+            word_tokenize,
+        )  # pylint: disable=import-outside-toplevel
 
         _TOKENIZER = word_tokenize
     return _TOKENIZER
@@ -62,7 +64,13 @@ _TH_RULES = [
         "Pronouns (ผม / ฉัน / คุณ / เขา)",
         "A1",
         "ผม (male I), ฉัน (female I), คุณ (you), เขา (he/she), เรา (we).",
-        {"seq": [spec_surface("ผม", "ฉัน", "คุณ", "เขา", "เรา", "เธอ", "พวกเรา", "พวกเขา")]},
+        {
+            "seq": [
+                spec_surface(
+                    "ผม", "ฉัน", "คุณ", "เขา", "เรา", "เธอ", "พวกเรา", "พวกเขา"
+                )
+            ]
+        },
         zh="人称代词：ผม（男我）/ ฉัน（女我）/ คุณ（你）/ เขา（他/她）。",
     ),
     make_rule(
@@ -86,7 +94,21 @@ _TH_RULES = [
         "Question words (อะไร / ที่ไหน / ใคร / ทำไม)",
         "A1",
         "อะไร = what, ที่ไหน = where, ใคร = who, ทำไม = why, เมื่อไหร่ = when.",
-        {"seq": [spec_surface("อะไร", "ที่ไหน", "ไหน", "ใคร", "ทำไม", "เมื่อไหร่", "เมื่อไร", "เท่าไหร่", "กี่")]},
+        {
+            "seq": [
+                spec_surface(
+                    "อะไร",
+                    "ที่ไหน",
+                    "ไหน",
+                    "ใคร",
+                    "ทำไม",
+                    "เมื่อไหร่",
+                    "เมื่อไร",
+                    "เท่าไหร่",
+                    "กี่",
+                )
+            ]
+        },
         zh="特殊疑问词：อะไร 什么 / ที่ไหน 哪里 / ใคร 谁 / ทำไม 为什么。",
     ),
     make_rule(
@@ -197,7 +219,12 @@ _TH_RULES = [
         "สามารถ ... ได้ (can)",
         "B1",
         "สามารถ before and ได้ after the verb frame ability: สามารถทำได้.",
-        {"left": [spec_surface("สามารถ")], "right": [spec_surface("ได้")], "min_gap": 1, "max_gap": 4},
+        {
+            "left": [spec_surface("สามารถ")],
+            "right": [spec_surface("ได้")],
+            "min_gap": 1,
+            "max_gap": 4,
+        },
         zh="สามารถ … ได้ 框型：能够做……。",
     ),
     make_rule(
@@ -272,7 +299,12 @@ _TH_RULES = [
         "ทั้ง ... และ (both ... and)",
         "B2",
         "ทั้ง before the first item and และ before the last one.",
-        {"left": [spec_surface("ทั้ง")], "right": [spec_surface("และ")], "min_gap": 1, "max_gap": 4},
+        {
+            "left": [spec_surface("ทั้ง")],
+            "right": [spec_surface("และ")],
+            "min_gap": 1,
+            "max_gap": 4,
+        },
         zh="ทั้ง … และ：既……又……。",
     ),
     make_rule(

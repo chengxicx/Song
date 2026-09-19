@@ -8,6 +8,7 @@ import shutil
 import gzip
 import sqlite3
 import tempfile
+from contextlib import closing
 from datetime import datetime
 import time
 from typing import List, Union
@@ -130,7 +131,7 @@ class Service:
         fname = f"{prefix}lute_backup_{suffix}.db"
         backupfile = os.path.join(settings.backup_dir, fname)
 
-        f = self._create_db_backup(app_config.dbfilename, backupfile)
+        f = self._create_db_backup(app_config, backupfile)
         self._remove_excess_backups(settings.backup_count, settings.backup_dir)
         return f
 
@@ -180,9 +181,16 @@ class Service:
 
         return ""
 
-    def _create_db_backup(self, dbfilename, backupfile):
+    def _create_db_backup(self, app_config, backupfile):
         "Make a backup."
-        shutil.copy(dbfilename, backupfile)
+        if getattr(app_config, "db_uri", None):
+            # In-memory db (test harness): no file to copy, so
+            # materialize it with the sqlite backup API first.
+            with closing(app_config.sqlite3_connect()) as src:
+                with closing(sqlite3.connect(backupfile)) as dst:
+                    src.backup(dst)
+        else:
+            shutil.copy(app_config.dbfilename, backupfile)
         f = f"{backupfile}.gz"
         with open(backupfile, "rb") as in_file, gzip.open(
             f, "wb", compresslevel=4
@@ -215,8 +223,7 @@ class Service:
         shutil.copytree(userimagespath, target_dir, dirs_exist_ok=True)
 
     def _add_missing_default_settings(
-        self, dbfilename, _app_config,
-        current_backup_dir=None, current_mecab_path=None
+        self, dbfilename, _app_config, current_backup_dir=None, current_mecab_path=None
     ):
         """
         Add any missing default user settings to the database at dbfilename.
@@ -317,7 +324,9 @@ class Service:
     # Set by restore_backup(), checked in before_request handler.
     _engine_needs_reset = False
 
-    def restore_backup(self, app_config, backup_file_path):  # pylint: disable=too-many-locals
+    def restore_backup(
+        self, app_config, backup_file_path
+    ):  # pylint: disable=too-many-locals
         """
         Restore from a backup file.
 
@@ -361,8 +370,9 @@ class Service:
         if is_gz:
             temp_dir = tempfile.mkdtemp()
             db_file_to_restore = os.path.join(temp_dir, "restored.db")
-            with gzip.open(backup_file_path, "rb") as f_in, \
-                 open(db_file_to_restore, "wb") as f_out:
+            with gzip.open(backup_file_path, "rb") as f_in, open(
+                db_file_to_restore, "wb"
+            ) as f_out:
                 shutil.copyfileobj(f_in, f_out)
 
         try:
@@ -382,8 +392,9 @@ class Service:
                 conn.close()
 
             # Backup current database first (safety copy)
-            safety_copy = current_db + ".pre_restore_" + \
-                datetime.now().strftime("%Y%m%d_%H%M%S")
+            safety_copy = (
+                current_db + ".pre_restore_" + datetime.now().strftime("%Y%m%d_%H%M%S")
+            )
             shutil.copy2(current_db, safety_copy)
 
             # Replace current database with restored one
@@ -392,7 +403,8 @@ class Service:
             # Add any missing default user settings to the restored db,
             # and preserve system-specific settings (backup_dir, mecab_path).
             self._add_missing_default_settings(
-                current_db, app_config,
+                current_db,
+                app_config,
                 current_backup_dir=current_backup_dir,
                 current_mecab_path=current_mecab_path,
             )

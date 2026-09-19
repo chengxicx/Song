@@ -9,6 +9,7 @@ other language falls back to the generic regex rule library.
 import json
 import pytest
 from lute.db import db
+from lute.parse.registry import is_supported
 from tests.utils import make_book
 
 
@@ -174,19 +175,23 @@ def test_arabic_grammar_analysis_uses_ar_engine(client, empty_db, arabic):
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
 
 
-def test_grammar_analysis_fallback_for_other_languages(client, empty_db):
-    "无专用引擎的语言（如土耳其语）应退回通用正则规则库。"
+def _get_or_create_language(name):
+    "Fetch a predefined language from the db, creating it if needed."
     from lute.db import db as _db
     from lute.language.service import Service as LangService
     from lute.models.language import Language
 
-    lang = (
-        _db.session.query(Language).filter(Language.name == "Turkish").first()
-    )
+    lang = _db.session.query(Language).filter(Language.name == name).first()
     if lang is None:
-        lang = LangService(_db.session).get_language_def("Turkish").language
+        lang = LangService(_db.session).get_language_def(name).language
         _db.session.add(lang)
         _db.session.commit()
+    return lang
+
+
+def test_grammar_analysis_fallback_for_other_languages(client, empty_db):
+    "无专用引擎的语言（如土耳其语）应退回通用正则规则库。"
+    lang = _get_or_create_language("Turkish")
     book = make_book(
         "Fallback Grammar Demo",
         ["If it rains, then we stay home."],
@@ -235,6 +240,24 @@ def test_language_edit_without_engine_shows_note(client, empty_db):
     assert "No dedicated grammar engine" in resp.data.decode("utf-8")
 
 
+def test_language_edit_ja_ko_note_parser_shipped_engine(
+    client, empty_db, korean, japanese
+):
+    "日语/韩语语言页不谎称没有引擎：说明引擎（Sudachi/Kiwi）随 parser 提供。"
+    resp = client.get(f"/language/edit/{korean.id}")
+    assert resp.status_code == 200, resp.data
+    body = resp.data.decode("utf-8")
+    assert "Kiwi" in body
+    assert "No dedicated grammar engine" not in body
+    assert "한국어" in body, "语法解释语言下拉应有 한국어 选项"
+
+    resp = client.get(f"/language/edit/{japanese.id}")
+    assert resp.status_code == 200, resp.data
+    body = resp.data.decode("utf-8")
+    assert "Sudachi" in body
+    assert "No dedicated grammar engine" not in body
+
+
 def test_install_route_rejects_unknown_extra(client, empty_db):
     "未知 extra 的安装请求应报错并不执行 pip。"
     resp = client.post(
@@ -245,6 +268,8 @@ def test_install_route_rejects_unknown_extra(client, empty_db):
 
 
 def test_grammar_analysis_strips_zws_from_client_snippet(client, empty_db, korean):
+    if not is_supported("lute_korean"):
+        pytest.skip("lute_korean parser not installed")
     """
     阅读器把空段落渲染成零宽空格占位符，客户端拼接 snippet 时会把它们一起
     发回。韩语 Kiwi 分词器会把零宽空格单独切成 token，旧代码在词内嵌 zws
@@ -273,7 +298,32 @@ def test_grammar_analysis_strips_zws_from_client_snippet(client, empty_db, korea
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
 
 
+def test_korean_grammar_analysis_ko_display_language(client, empty_db, korean):
+    if not is_supported("lute_korean"):
+        pytest.skip("lute_korean parser not installed")
+    "grammar_translate_lang=ko 时，韩语语法点应返回韩语释义。"
+    korean.grammar_translate_lang = "ko"
+    db.session.add(korean)
+    db.session.commit()
+    book = make_book(
+        "Korean Display Lang Demo",
+        ["저는 지금 밥을 먹고 있어요."],
+        korean,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    go_issda = next(g for g in data if g["key"] == "ko_go_issda")
+    assert "진행" in go_issda["desc"]
+    assert "is/am/are" not in go_issda["desc"]
+
+
 def test_japanese_grammar_analysis_uses_ja_engine(client, empty_db, japanese):
+    if not is_supported("japanese_sudachi"):
+        pytest.skip("japanese_sudachi parser not installed")
     "日语书籍应走 Sudachi 语法引擎，返回 N5 规则与例句。"
     book = make_book(
         "Japanese Grammar Demo",
@@ -294,9 +344,9 @@ def test_japanese_grammar_analysis_uses_ja_engine(client, empty_db, japanese):
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
 
 
-def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(
-    client, empty_db, japanese
-):
+def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(client, empty_db, japanese):
+    if not is_supported("japanese_sudachi"):
+        pytest.skip("japanese_sudachi parser not installed")
     """
     Manga 书籍的页面 Text 为空，语法分析应从 mokuro OCR 数据中重建文本并
     返回日语语法点，而不是返回空列表。
@@ -304,20 +354,22 @@ def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(
     from lute.book.model import Book
     from lute.book.service import Service as BookService
 
-    pages = [{
-        "version": "0.2.1",
-        "img_path": "page.jpg",
-        "img_width": 848,
-        "img_height": 1264,
-        "blocks": [
-            {
-                "box": [10, 10, 100, 100],
-                "vertical": False,
-                "font_size": 25,
-                "lines": ["今日は学校に行きたいです。", "ご飯を食べています。"],
-            },
-        ],
-    }]
+    pages = [
+        {
+            "version": "0.2.1",
+            "img_path": "page.jpg",
+            "img_width": 848,
+            "img_height": 1264,
+            "blocks": [
+                {
+                    "box": [10, 10, 100, 100],
+                    "vertical": False,
+                    "font_size": 25,
+                    "lines": ["今日は学校に行きたいです。", "ご飯を食べています。"],
+                },
+            ],
+        }
+    ]
 
     book = Book()
     book.language_id = japanese.id
@@ -338,4 +390,110 @@ def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(
     assert "〜ている" in names
     for g in data:
         assert g["level"] == "N5", "日语语法点都应标注 N5"
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_mandarin_grammar_analysis_uses_zh_engine(client, empty_db, mandarin):
+    if not is_supported("lute_mandarin"):
+        pytest.skip("lute_mandarin parser not installed")
+    "中文书籍应走零依赖中文语法引擎。"
+    book = make_book(
+        "Mandarin Grammar Demo",
+        ["我吃了饭。他是昨天来的。他把作业写完了。"],
+        mandarin,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "zh_le" in keys
+    assert "zh_shi_de" in keys
+    assert "zh_ba_sentence" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_cantonese_grammar_analysis_uses_yue_engine(client, empty_db):
+    if not is_supported("lute_cantonese"):
+        pytest.skip("lute_cantonese parser not installed")
+    "粤语书籍应走零依赖粤语语法引擎。"
+    from lute.models.language import Language
+
+    lang = Language()
+    lang.name = "Cantonese Chinese"
+    lang.parser_type = "lute_cantonese"
+    lang.character_substitutions = ""
+    lang.regexp_split_sentences = ".!?。！？"
+    lang.exceptions_split_sentences = ""
+    lang.word_characters = "一-鿿"
+    db.session.add(lang)
+    db.session.commit()
+
+    book = make_book(
+        "Cantonese Grammar Demo",
+        ["我食咗飯。佢唔去。佢睇緊電視。"],
+        lang,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "yue_zo" in keys
+    assert "yue_m" in keys
+    assert "yue_gan" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_italian_grammar_analysis_uses_it_engine(client, empty_db):
+    "意大利语书籍应走 spaCy 语法引擎。"
+    pytest.importorskip("spacy")
+    pytest.importorskip("it_core_news_sm")
+    lang = _get_or_create_language("Italian")
+    book = make_book(
+        "Italian Grammar Demo",
+        ["Ho mangiato ieri. Sto mangiando una pizza. Penso che sia giusto."],
+        lang,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "it_passato_prossimo" in keys
+    assert "it_stare_gerundio" in keys
+    assert "it_congiuntivo" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_portuguese_grammar_analysis_uses_pt_engine(client, empty_db):
+    "葡萄牙语书籍应走 spaCy 语法引擎。"
+    pytest.importorskip("spacy")
+    pytest.importorskip("pt_core_news_sm")
+    lang = _get_or_create_language("Portuguese")
+    book = make_book(
+        "Portuguese Grammar Demo",
+        ["Há um problema. Vou comer agora. Quando era criança, vivia aqui."],
+        lang,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "pt_haver" in keys
+    assert "pt_ir_inf" in keys
+    assert "pt_imperfeito" in keys
+    for g in data:
         assert g["examples"], f"语法点 {g['name']} 缺少例句"

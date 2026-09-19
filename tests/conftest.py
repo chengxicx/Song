@@ -3,8 +3,11 @@ Common fixtures used by many tests.
 """
 
 import os
+import sqlite3
 import yaml
 import pytest
+
+import lute
 
 # Opt this process out of the WorkBuddy CLI "safe-delete" bulk guard.
 # The sandbox shim patches os.remove/unlink and, when a deletion
@@ -26,6 +29,12 @@ from lute.app_factory import create_app
 from lute.models.language import Language
 
 
+# The shared in-memory test db (see pytest_sessionstart below).  Named
+# in-memory dbs exist per process, so each pytest-xdist worker gets its
+# own automatically; within a process the name just has to be stable.
+_MEMORY_DB_URI = "file:lute_test_pytest?mode=memory&cache=shared"
+
+
 def pytest_sessionstart(session):  # pylint: disable=unused-argument
     """
     Ensure test config defines a test environment.
@@ -37,6 +46,13 @@ def pytest_sessionstart(session):  # pylint: disable=unused-argument
     DATAPATH must be specified: this ensures that the tests don't
     accidentally write into the user_data (which could mess with prod
     data/media etc)
+
+    Also points every connection at a named in-memory sqlite db
+    (LUTE_DB_URI, see AppConfig): the schema is built once per process
+    and reset between tests, instead of deleting and rebuilding the db
+    file for every test.  Tests that specifically exercise the on-disk
+    db file lifecycle opt out by clearing the env var (see
+    tests/integration/test_main.py, tests/unit/multiuser).
     """
     thisdir = os.path.dirname(os.path.realpath(__file__))
     configfile = os.path.join(thisdir, "..", "lute", "config", "config.yml")
@@ -57,6 +73,14 @@ def pytest_sessionstart(session):  # pylint: disable=unused-argument
         msg = f"Bad config.yml: {', '.join(failures)}"
         pytest.exit(msg)
 
+    os.environ["LUTE_DB_URI"] = _MEMORY_DB_URI
+    # xdist workers run in separate processes, so they already get
+    # separate in-memory dbs; the shared on-disk datapath is what they'd
+    # race on (user images/audio), so give each its own.
+    worker = os.environ.get("PYTEST_XDIST_WORKER")
+    if worker:
+        os.environ["LUTE_DATAPATH"] = f"/tmp/lute_test_data_{worker}"
+
 
 @pytest.fixture(name="testconfig")
 def fixture_config():
@@ -65,20 +89,99 @@ def fixture_config():
     yield ac
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _memory_db_keeper():
+    """
+    Create the shared in-memory db schema once, and hold one connection
+    to it open for the session.
+
+    sqlite destroys a named in-memory db when its last connection
+    closes, so this keeper is what makes the db survive between tests
+    (every other connection is opened and closed per checkout).  Building
+    the baseline here also means the per-test reset always has tables to
+    clear, even before the first create_app ran setup_db.
+    """
+    ac = AppConfig(AppConfig.default_config_filename())
+    if ac.db_uri is None:
+        yield None
+        return
+    conn = sqlite3.connect(ac.db_uri, uri=True, check_same_thread=False)
+    conn.executescript(_baseline_sql())
+    conn.commit()
+    yield conn
+    conn.close()
+
+
+def _baseline_sql():
+    "The baseline schema sql (same file setup_db uses)."
+    schema_dir = os.path.join(os.path.dirname(lute.__file__), "db", "schema")
+    with open(os.path.join(schema_dir, "baseline.sql"), "r", encoding="utf8") as f:
+        return f.read()
+
+
+def _reset_memory_db(config):
+    """
+    Wipe the shared in-memory db's data back to freshly-baselined state.
+
+    The schema (tables, indexes, triggers, static rows, migration
+    records) is built once per session and left in place; only data is
+    removed.  This is what makes the suite cheap -- rebuilding the
+    schema per test (the old unlink-the-file approach) costs about the
+    same as the data wipe does, and a naive "delete from languages"
+    cascade is actively expensive: the AFTER DELETE trigger on words
+    updates the surviving rows on every deleted row, which is quadratic
+    on a demo-data-sized db.  So: drop the triggers, delete every
+    table's rows with FKs off, restore the baseline system rows,
+    re-create the triggers.
+    """
+    conn = sqlite3.connect(config.db_uri, uri=True)
+    try:
+        trigger_sql = [
+            r[0]
+            for r in conn.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'trigger' "
+                "AND sql IS NOT NULL"
+            )
+        ]
+        for (name,) in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'trigger'"
+        ):
+            conn.execute(f'drop trigger if exists "{name}"')
+        conn.execute("pragma foreign_keys = OFF")
+        tables = [
+            r[0]
+            for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table' "
+                "AND name NOT LIKE 'sqlite_%'"
+                # Static rows every fresh db has: don't wipe them.
+                " AND name NOT IN ('statuses', '_migrations')"
+            )
+        ]
+        for name in tables:
+            conn.execute(f'delete from "{name}"')
+        conn.execute("insert into settings values('LoadDemoData','system','1')")
+        for sql in trigger_sql:
+            conn.execute(sql)
+        conn.commit()
+    finally:
+        conn.close()
+
+
 @pytest.fixture(name="app")
 def fixture_app():
     """
     A clean instance of the demo database.
 
-    I'm not a _huge_ fan of this because if the app
-    is open while tests are running, the app seems to hold
-    on to references to the old deleted db ...
-    that said, it's much faster to do this than to do a
-    "wipe and reload database" on every test run.
+    With the shared in-memory db (default): the schema is built once
+    per process and wiped back to baseline state before every test.
+    Tests that opt out (LUTE_DB_URI cleared) still get the historical
+    delete-the-file-and-recreate behaviour.
     """
     config_file = AppConfig.default_config_filename()
     c = AppConfig(config_file)
-    if os.path.exists(c.dbfilename):
+    if c.db_uri is not None:
+        _reset_memory_db(c)
+    elif os.path.exists(c.dbfilename):
         os.unlink(c.dbfilename)
     extra_config = {"WTF_CSRF_ENABLED": False, "TESTING": True}
     app = create_app(config_file, extra_config=extra_config)

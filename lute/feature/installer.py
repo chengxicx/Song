@@ -99,7 +99,10 @@ def installed_plugin_packages():
     from a source checkout).
     """
     out = {}
-    for kind, group in (("feature", "lute.plugin.feature"), ("parser", "lute.plugin.parse")):
+    for kind, group in (
+        ("feature", "lute.plugin.feature"),
+        ("parser", "lute.plugin.parse"),
+    ):
         infos = _entry_point_infos(group)
         for ep in _iter_entry_points(group):
             info = infos.get((ep.name, ep.value))
@@ -161,7 +164,7 @@ def _normalize_spec(spec):
     if not spec:
         return spec
     if spec.startswith("file://"):
-        spec = spec[len("file://"):]
+        spec = spec[len("file://") :]
     # strip trailing slashes
     spec = spec.rstrip("/")
     base = os.path.basename(spec)

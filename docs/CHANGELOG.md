@@ -3,13 +3,23 @@
 
 Feature changes:
 
-* Grammar analysis panel for English, Spanish, Russian, French, German, Thai and
-  Arabic, graded with CEFR levels (A1-C2), following the Japanese/Korean engines.
-  The engines need optional dependencies; a bare install keeps working with the
-  basic regex rules.  Install all engines with:
-  `pip install -e ".[japanese-sudachi,korean,english,spanish,russian,french,german,thai,arabic]"`
+* Grammar analysis panel for English, Spanish, Russian, French, German, Italian,
+  Portuguese, Thai, Arabic, Mandarin Chinese and Cantonese, graded with CEFR
+  levels (A1-C2), following the Japanese/Korean engines.  The engines need
+  optional dependencies (the Chinese/Cantonese ones need none); a bare install
+  keeps working with the basic regex rules.  Install all engines with:
+  `pip install -e ".[japanese-sudachi,korean,english,spanish,russian,french,german,italian,portuguese,thai,arabic]"`
 * Language edit page shows each language's grammar engine status, with an
   Install button that pip-installs the engine's packages when missing.
+  The Japanese and Korean pages note that their grammar engine (Sudachi /
+  Kiwi) ships with the language's parser instead of claiming there is no
+  dedicated engine.
+* "Grammar Analysis Language" gains a 한국어 choice: the Korean grammar
+  panel explains its points in Korean (Korean descriptions for every
+  kimchi-grammar entry), the matcher engines (English, Spanish, Russian,
+  French, German, Italian, Portuguese, Thai, Arabic, Mandarin, Cantonese)
+  show authored Korean descriptions, and the Japanese engine explains
+  every curated JLPT entry in Korean (ko.json, mirroring zh.json).
 
 
 # 3.10.3 (2026-07-06)

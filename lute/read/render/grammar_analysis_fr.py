@@ -101,7 +101,9 @@ _FR_RULES = [
         "ne before the verb, the second word after it: je ne sais pas.",
         {
             "left": [spec_surface("ne", "n'")],
-            "right": [spec_surface("pas", "plus", "jamais", "rien", "personne", "aucun")],
+            "right": [
+                spec_surface("pas", "plus", "jamais", "rien", "personne", "aucun")
+            ],
             "min_gap": 1,
             "max_gap": 5,
         },
@@ -115,8 +117,21 @@ _FR_RULES = [
         {
             "seq": [
                 spec_surface(
-                    "mon", "ma", "mes", "ton", "ta", "tes", "son", "sa", "ses",
-                    "notre", "nos", "votre", "vos", "leur", "leurs",
+                    "mon",
+                    "ma",
+                    "mes",
+                    "ton",
+                    "ta",
+                    "tes",
+                    "son",
+                    "sa",
+                    "ses",
+                    "notre",
+                    "nos",
+                    "votre",
+                    "vos",
+                    "leur",
+                    "leurs",
                 )
             ]
         },
@@ -266,7 +281,12 @@ _FR_RULES = [
         "si + imparfait, conditionnel",
         "B2",
         "unreal present: Si j'avais de l'argent, je voyagerais.",
-        {"left": [spec_surface("si")], "right": [spec_morph(Mood="Cnd")], "min_gap": 1, "max_gap": 10},
+        {
+            "left": [spec_surface("si")],
+            "right": [spec_morph(Mood="Cnd")],
+            "min_gap": 1,
+            "max_gap": 10,
+        },
         zh="si + 未完成过去时，主句条件式：假设。",
     ),
     make_rule(
@@ -274,7 +294,12 @@ _FR_RULES = [
         "en + participe présent (gérondif)",
         "B2",
         "while doing / by doing: en travaillant.",
-        {"seq": [spec_surface("en"), {"pos_in": ["VERB"], "morph": {"VerbForm": "Part", "Tense": "Pres"}}]},
+        {
+            "seq": [
+                spec_surface("en"),
+                {"pos_in": ["VERB"], "morph": {"VerbForm": "Part", "Tense": "Pres"}},
+            ]
+        },
         zh="副动词：en + 现在分词，表示『一边……/通过……』。",
     ),
     make_rule(
@@ -282,7 +307,11 @@ _FR_RULES = [
         "Past subjunctive (ait / été + subj)",
         "B2",
         "an unreal or prior action in the subjunctive: je doute qu'il ait fini.",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Past"}}]},
+        {
+            "seq": [
+                {"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Past"}}
+            ]
+        },
         zh="虚拟式过去时（ait / soit été）：表示先于主句或假设的过去。",
     ),
     # ---- C1 ----

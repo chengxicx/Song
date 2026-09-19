@@ -32,7 +32,11 @@ _WORD_RE = re.compile(r"[\w\u064B-\u0652\u0670]+", re.UNICODE)
 
 def _normalise(text):
     "Strip vowel diacritics (tashkeel) and the tatweel stretch mark."
-    from pyarabic.araby import strip_shadda, strip_tashkeel, strip_tatweel  # pylint: disable=import-outside-toplevel
+    from pyarabic.araby import (
+        strip_shadda,
+        strip_tashkeel,
+        strip_tatweel,
+    )  # pylint: disable=import-outside-toplevel
 
     return strip_shadda(strip_tatweel(strip_tashkeel(text)))
 
@@ -83,11 +87,12 @@ _AR_RULES = [
         "ar_questions",
         "Question words (هل / ماذا / كيف...)",
         "A1",
-        "هل makes a yes/no question; ماذا/متى/أين/كيف/كم/لماذا ask for "
-        "information.",
+        "هل makes a yes/no question; ماذا/متى/أين/كيف/كم/لماذا ask for " "information.",
         {
             "seq": [
-                spec_surface("هل", "ماذا", "ما", "متى", "أين", "كيف", "كم", "لماذا", "من")
+                spec_surface(
+                    "هل", "ماذا", "ما", "متى", "أين", "كيف", "كم", "لماذا", "من"
+                )
             ]
         },
         zh="疑问词：هل 一般疑问；ماذا/متى/أين/كيف/كم/لماذا 特殊疑问。",
@@ -100,7 +105,20 @@ _AR_RULES = [
         "attached pronoun.",
         {
             "seq": [
-                spec_surface("في", "من", "إلى", "على", "عن", "مع", "بين", "بعد", "قبل", "عند", "تحت", "فوق")
+                spec_surface(
+                    "في",
+                    "من",
+                    "إلى",
+                    "على",
+                    "عن",
+                    "مع",
+                    "بين",
+                    "بعد",
+                    "قبل",
+                    "عند",
+                    "تحت",
+                    "فوق",
+                )
             ]
         },
         zh="常用介词：في/من/إلى/على/عن/مع 等，后接属格名词或 Attached pronoun。",
@@ -133,8 +151,7 @@ _AR_RULES = [
         "ar_kana",
         "كان / أصبح (kana verbs)",
         "A1",
-        "كان = was/were, أصبح = became; the predicate stays in the "
-        "nominative.",
+        "كان = was/were, أصبح = became; the predicate stays in the " "nominative.",
         {"seq": [spec_surface("كان", "كانت", "كانوا", "يكون", "أصبح", "أصارت")]},
         zh="كان 类动词：كان = 曾经是，أصبح = 变得；表语仍为主格。",
     ),
@@ -175,8 +192,7 @@ _AR_RULES = [
         "ar_sawfa",
         "سوف / سـ (future)",
         "A2",
-        "سوف (or the prefix سـ) before a present verb makes it future: "
-        "سوف أذهب.",
+        "سوف (or the prefix سـ) before a present verb makes it future: " "سوف أذهب.",
         {"seq": [spec_surface("سوف")]},
         zh="将来标记：سوف（或动词前加 سـ）+ 现在时动词（سوف أذهب 我将去）。",
     ),
@@ -284,8 +300,7 @@ _AR_RULES = [
         "ar_kullama",
         "كلما (the more / whenever)",
         "B2",
-        "كلما pairs with وقد/كان for 'the more ... the more': كلما كبر، "
-        "ازاد علمه.",
+        "كلما pairs with وقد/كان for 'the more ... the more': كلما كبر، " "ازاد علمه.",
         {"seq": [spec_surface("كلما")]},
         zh="كلما：越……越……；每当……。",
     ),
