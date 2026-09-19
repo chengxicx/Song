@@ -52,7 +52,6 @@ _stream_cache = {}
 _STREAM_TTL = 30 * 60  # playurl URLs last ~2h; refresh well before that.
 
 
-
 class BilibiliStreamError(Exception):
     """A Bilibili stream could not be obtained or relayed.
 
@@ -151,11 +150,7 @@ def _usable_renditions(streams, codec_prefixes):
     track twice.  Streams with no URL are dropped, since there is nothing
     to relay.
     """
-    usable = [
-        s
-        for s in (streams or [])
-        if (s.get("baseUrl") or s.get("base_url"))
-    ]
+    usable = [s for s in (streams or []) if (s.get("baseUrl") or s.get("base_url"))]
     preferred = [s for s in usable if _codec_preferred(s, codec_prefixes)]
     chosen = preferred or usable  # never end up with nothing to play
     seen = set()

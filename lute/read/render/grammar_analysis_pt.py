@@ -65,7 +65,13 @@ _PT_RULES = [
         "estar + em (location)",
         "A1",
         "estar (state) + em states a location: está em casa.",
-        {"seq": [spec_lemma("estar"), spec_surface("em"), spec_pos("DET", "NOUN", "PROPN", "PRON", "NUM")]},
+        {
+            "seq": [
+                spec_lemma("estar"),
+                spec_surface("em"),
+                spec_pos("DET", "NOUN", "PROPN", "PRON", "NUM"),
+            ]
+        },
         zh="estar + em 表示位置：está em casa（在家）。",
     ),
     make_rule(
@@ -73,7 +79,12 @@ _PT_RULES = [
         "há / tem (there is)",
         "A1",
         "impersonal há (or colloquial tem) = there is/are: há um problema.",
-        {"seq": [spec_surface("há", "havia", "houve", "tem", "tinha"), spec_pos("NOUN", "DET", "NUM", "PRON", "ADJ")]},
+        {
+            "seq": [
+                spec_surface("há", "havia", "houve", "tem", "tinha"),
+                spec_pos("NOUN", "DET", "NUM", "PRON", "ADJ"),
+            ]
+        },
         zh="há / tem：有、存在（há um problema 有个问题）。",
     ),
     make_rule(
@@ -89,7 +100,21 @@ _PT_RULES = [
         "Question words (onde / como / por que...)",
         "A1",
         "onde where, como how, quando when, por que why, quem who, qual which.",
-        {"seq": [spec_surface("onde", "como", "quando", "por que", "porque", "porquê", "quem", "qual", "quanto")]},
+        {
+            "seq": [
+                spec_surface(
+                    "onde",
+                    "como",
+                    "quando",
+                    "por que",
+                    "porque",
+                    "porquê",
+                    "quem",
+                    "qual",
+                    "quanto",
+                )
+            ]
+        },
         zh="特殊疑问词：onde 哪里 / por que 为什么 / quanto 多少。",
     ),
     # ---- A2 ----
@@ -136,7 +161,18 @@ _PT_RULES = [
                     "max_gap": 5,
                 },
                 {
-                    "left": [spec_surface("posso", "podemos", "devo", "devemos", "quero", "queremos", "preciso", "precisamos")],
+                    "left": [
+                        spec_surface(
+                            "posso",
+                            "podemos",
+                            "devo",
+                            "devemos",
+                            "quero",
+                            "queremos",
+                            "preciso",
+                            "precisamos",
+                        )
+                    ],
                     "right": [_INF],
                     "min_gap": 0,
                     "max_gap": 5,
@@ -150,7 +186,13 @@ _PT_RULES = [
         "ter que / ter de + infinitive",
         "A2",
         "obligation: tenho que estudar.",
-        {"seq": [spec_surface("tenho", "tens", "temos", "têm"), spec_surface("que", "de"), _INF]},
+        {
+            "seq": [
+                spec_surface("tenho", "tens", "temos", "têm"),
+                spec_surface("que", "de"),
+                _INF,
+            ]
+        },
         zh="ter que/de + 原形动词：必须、不得不。",
     ),
     make_rule(
@@ -158,7 +200,12 @@ _PT_RULES = [
         "mais / menos / tão ... que / como",
         "A2",
         "comparative and equality: mais alto que, tão rápido como.",
-        {"left": [spec_surface("mais", "menos", "tão")], "right": [spec_surface("que", "como")], "min_gap": 1, "max_gap": 4},
+        {
+            "left": [spec_surface("mais", "menos", "tão")],
+            "right": [spec_surface("que", "como")],
+            "min_gap": 1,
+            "max_gap": 4,
+        },
         zh="比较：mais/menos … que、tão … como（比……更/一样）。",
     ),
     # ---- B1 ----
@@ -178,7 +225,11 @@ _PT_RULES = [
         {
             "any_of": [
                 {"re": re.compile(r"(?i)\b(?:[dnpm][oa]s?|os|as|o|a)\s+quals?\b")},
-                {"seq": [spec_surface("cujo", "cujos", "cuja", "cujas", "quem", "ondev")]},
+                {
+                    "seq": [
+                        spec_surface("cujo", "cujos", "cuja", "cujas", "quem", "ondev")
+                    ]
+                },
             ]
         },
         zh="关系代词：o qual（随先行词变位）/ cujo（……的）/ quem。",
@@ -188,7 +239,11 @@ _PT_RULES = [
         "há + time (ago / duration)",
         "B1",
         "há dois anos = two years ago (past) or for two years (up to now).",
-        {"re": re.compile(r"(?i)\bhá\s+(?:\d+|dois|duas|três|tres|quatro|cinco|muitos)\s+(?:anos|meses|semanas|dias|horas|minutos)\b")},
+        {
+            "re": re.compile(
+                r"(?i)\bhá\s+(?:\d+|dois|duas|três|tres|quatro|cinco|muitos)\s+(?:anos|meses|semanas|dias|horas|minutos)\b"
+            )
+        },
         zh="há + 时间：……前（过去）或……至今（持续）。",
     ),
     make_rule(
@@ -213,7 +268,12 @@ _PT_RULES = [
         "Mais-que-perfeito: tinha + participle",
         "B2",
         "the earlier of two past events: já tinha comido.",
-        {"left": [spec_surface("tinha", "tínhamos", "tinham")], "right": [spec_morph(VerbForm="Part")], "min_gap": 0, "max_gap": 3},
+        {
+            "left": [spec_surface("tinha", "tínhamos", "tinham")],
+            "right": [spec_morph(VerbForm="Part")],
+            "min_gap": 0,
+            "max_gap": 3,
+        },
         zh="过去完成时：tinha + 过去分词（过去的过去）。",
     ),
     make_rule(
@@ -221,7 +281,12 @@ _PT_RULES = [
         "se + conjuntivo, condicional",
         "B2",
         "unreal present: Se eu fosse rico, viajaria.",
-        {"left": [spec_surface("se")], "right": [spec_morph(Mood="Cnd")], "min_gap": 1, "max_gap": 10},
+        {
+            "left": [spec_surface("se")],
+            "right": [spec_morph(Mood="Cnd")],
+            "min_gap": 1,
+            "max_gap": 10,
+        },
         zh="se + 虚拟式，主句条件式：假设。",
     ),
     # ---- C1 ----
@@ -230,7 +295,11 @@ _PT_RULES = [
         "Imperfect subjunctive (fosse / tivesse)",
         "C1",
         "unreal conditions and past-tense subjunctive: se eu fosse.",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Imp"}}]},
+        {
+            "seq": [
+                {"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Imp"}}
+            ]
+        },
         zh="虚拟式未完成时（fosse / tivesse）：假设与过去转述。",
     ),
 ]

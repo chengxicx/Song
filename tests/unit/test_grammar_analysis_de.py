@@ -63,7 +63,9 @@ def test_modal_gap_spans_the_clause():
         if e["key"] == "de_modals":
             example = e["examples"][0]
             m = example["matches"][0]
-            assert example["sentence"][m["start"] : m["end"]] == "kann heute nicht kommen"
+            assert (
+                example["sentence"][m["start"] : m["end"]] == "kann heute nicht kommen"
+            )
 
 
 def test_display_language_switches_desc():
@@ -76,7 +78,9 @@ def test_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The German engine grades points with CEFR levels."
-    levels = {e["key"]: e["level"] for e in analyze_german(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"] for e in analyze_german(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["de_es_gibt"] == "A1"
     assert levels["de_perfekt"] == "A2"
 
