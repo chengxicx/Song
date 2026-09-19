@@ -91,6 +91,7 @@ _BOOK_PROGRESS_SQL = """
     end
 """
 
+
 # NOTE: this must be built at request time, not at module import.
 # The app factory imports this module before init_parser_plugins() runs,
 # so a module-level f-string would freeze the parser list *without* any
