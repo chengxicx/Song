@@ -138,6 +138,7 @@ Feature: Books and stats are available
 
 
     # Production bug https://github.com/jzohrab/lute-v3/issues/375
+    @skip_without_sudachi
     Scenario: Japanese production bug 375.
         Given I visit "/"
         Given a new Japanese term:
