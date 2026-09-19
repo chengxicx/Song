@@ -45,6 +45,12 @@ def review_index():
     )
 
 
+@bp.route("/session")
+def session_page():
+    "Review session page; the cards load via POST /review/start."
+    return render_template("/review/session.html")
+
+
 @bp.route("/sync", methods=["POST"])
 def sync():
     "Sync the queue from all active specs, and report."
