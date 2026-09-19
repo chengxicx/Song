@@ -8,6 +8,8 @@ Feature changes:
   The engines need optional dependencies; a bare install keeps working with the
   basic regex rules.  Install all engines with:
   `pip install -e ".[japanese-sudachi,korean,english,spanish,russian,french,german,thai,arabic]"`
+* Language edit page shows each language's grammar engine status, with an
+  Install button that pip-installs the engine's packages when missing.
 
 
 # 3.10.3 (2026-07-06)
