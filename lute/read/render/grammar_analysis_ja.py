@@ -267,6 +267,7 @@ def _rule(key, pattern, meaning, examples, patterns, kind="construction"):
         "pattern": pattern,
         "level": "N5",
         "meaning": meaning,
+        "meaning_ko": "",
         "examples": examples,
         "patterns": patterns,
         "kind": kind,
@@ -992,6 +993,21 @@ def _load_zh():
 _ZH_BY_ID = _load_zh()
 
 
+def _load_ko():
+    """
+    Curated Korean glosses, keyed by data entry id (ko.json next to the
+    level files) -- the panel's 한국어 display language, mirroring zh.json.
+    """
+    path = os.path.join(_DATA_DIR, "ko.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+_KO_BY_ID = _load_ko()
+
+
 def _make_data_rule(level, item, idx, skipped, specs=None, shown=None, kind="construction"):
     "Turn one curated JSON entry into a rule dict."
     shown = shown or []
@@ -1011,6 +1027,7 @@ def _make_data_rule(level, item, idx, skipped, specs=None, shown=None, kind="con
         "level": level,
         "meaning": item.get("meaning_en") or "",
         "meaning_zh": _ZH_BY_ID.get(item.get("id") or "", ""),
+        "meaning_ko": _KO_BY_ID.get(item.get("id") or "", ""),
         "formation": item.get("formation") or "",
         "examples": [e["japanese"] for e in item.get("examples") or []],
         # "patterns" is what the matcher reads, so an empty list is how a
@@ -1178,6 +1195,34 @@ _DATA_RULES = _load_all()
 _ALL_RULES = _N5_RULES + _DATA_RULES
 
 
+# Korean descriptions for the hand-written rules (data rules get theirs
+# from ko.json by entry id) -- the panel's 한국어 display language.
+_KO_HAND = {
+    "ga_but": "역접을 나타내는 が(\"하지만\").",
+    "ga_imasu_arimasu": "존재를 나타내는 がいます(사람·동물)/があります(사물).",
+    "kara_reason": "이유를 나타내는 から(\"~때문에\").",
+    "suki_kirai": "좋아함·싫어함을 나타내는 好きです/嫌いです(대상은 が).",
+    "tai": "\"~하고 싶다\"의 소망을 나타내는 たい.",
+    "ta_koto_ga_arimasu": "경험을 나타내는 たことがあります(\"~해 본 적이 있다\").",
+    "de_place_means": "동작의 장소나 수단을 나타내는 で.",
+    "te_iru": "진행이나 결과 상태를 나타내는 ている.",
+    "te_kudasai": "\"~해 주세요\"의 부탁 てください.",
+    "deshita": "です의 과거형 でした(\"~이었습니다\").",
+    "de_wa_arimasen": "\"~이 아닙니다\"의 정중 부정 ではありません.",
+    "te_wa_ikemasen": "금지를 나타내는 てはいけません(\"~해선 안 됩니다\").",
+    "te_mo_ii_desu": "허가를 나타내는 てもいいです(\"~해도 됩니다\").",
+    "to_and_with": "\"~와/~하고\"의 と.",
+    "nakute_mo_ii_desu": "\"~하지 않아도 됩니다\"의 なくてもいいです.",
+    "nakereba_narimasen": "의무를 나타내는 なければなりません/なくてはいけません(\"~해야 합니다\").",
+    "ni_time_destination": "시간·목적지·간접 대상을 나타내는 조사 に.",
+    "mashou": "\"~합시다\"의 권유 ましょう.",
+    "masen_ka": "\"~하지 않으시겠습니까?\"의 권유 ませんか.",
+    "wo_object": "직접목적어를 나타내는 조사 を.",
+}
+for _hand_rule in _N5_RULES:
+    _hand_rule["meaning_ko"] = _KO_HAND.get(_hand_rule["key"], "")
+
+
 # Chinese descriptions for grammar analysis, keyed by rule "pattern".
 # Authoritative table; rules lacking an entry fall back to the English
 # meaning when the display language is Chinese.
@@ -1291,6 +1336,8 @@ _ZH_DESC = {
 
 _ZH_PARTICLE = "基础 N5 助词检测"
 _ZH_BASICS = "基础敬体・指示词・疑问词（です・ます・これ 等），出现极频繁，仅示意"
+_KO_PARTICLE = "기초 N5 조사 감지"
+_KO_BASICS = "기초 정중체·지시어·의문사（です・ます・これ 등）가 극히 자주 나타나 요약만 표시"
 
 # Number of example sentences shown for the two aggregated entries, and how
 # many distinct symbols (particles / basic forms) are listed in their titles.
@@ -1383,6 +1430,8 @@ def _merge_same_name(entries):
 
 def _desc(rule, display_lang):
     "Description for a rule in the requested display language."
+    if display_lang == "ko":
+        return rule.get("meaning_ko") or rule["meaning"]
     if display_lang == "zh":
         # Curated Chinese gloss shipped with the data beats both the legacy
         # hand-written table and the English meaning.
@@ -1453,7 +1502,11 @@ def analyze_japanese(page_text, display_lang="en"):
                 "key": "basic_forms",
                 "name": "Basic forms: " + "・".join(_aggregate_symbols(basic_examples)),
                 "level": "N5",
-                "desc": _ZH_BASICS if display_lang == "zh" else "Copula, demonstratives and question words detected",
+                "desc": (
+                    _KO_BASICS if display_lang == "ko"
+                    else _ZH_BASICS if display_lang == "zh"
+                    else "Copula, demonstratives and question words detected"
+                ),
                 "examples": _aggregate_examples(basic_examples),
             }
         )
@@ -1464,7 +1517,11 @@ def analyze_japanese(page_text, display_lang="en"):
                 "key": "basic_particles",
                 "name": "Particles: " + "・".join(_aggregate_symbols(particle_examples)),
                 "level": "N5",
-                "desc": _ZH_PARTICLE if display_lang == "zh" else "Basic N5 particles detected",
+                "desc": (
+                    _KO_PARTICLE if display_lang == "ko"
+                    else _ZH_PARTICLE if display_lang == "zh"
+                    else "Basic N5 particles detected"
+                ),
                 "examples": _aggregate_examples(particle_examples),
             }
         )
