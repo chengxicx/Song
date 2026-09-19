@@ -3,6 +3,8 @@
 import json
 import os
 
+import pytest
+
 from lute.read.render import grammar_analysis_matcher as matcher
 from lute.read.render.grammar_analysis_ja import _ALL_RULES, _DATA_RULES
 
@@ -16,7 +18,9 @@ def _rule_keys(tag):
         f"lute.read.render.grammar_analysis_{tag}",
         fromlist=["_RULES"],
     )
-    rules = [v for k, v in vars(mod).items() if k.startswith("_") and k.endswith("_RULES")]
+    rules = [
+        v for k, v in vars(mod).items() if k.startswith("_") and k.endswith("_RULES")
+    ]
     assert rules, f"no _*_RULES list found in grammar_analysis_{tag}"
     return {r["key"] for r in rules[0]}
 
@@ -26,7 +30,9 @@ def test_every_matcher_rule_has_a_korean_description():
     for tag in _MATCHER_ENGINES:
         keys = _rule_keys(tag)
         missing = sorted(keys - set(matcher._KO_BY_KEY))
-        assert not missing, f"grammar_analysis_{tag} rules lack ko descriptions: {missing}"
+        assert (
+            not missing
+        ), f"grammar_analysis_{tag} rules lack ko descriptions: {missing}"
 
 
 def test_ko_table_has_no_stale_keys():
@@ -42,7 +48,10 @@ def test_ko_table_has_no_stale_keys():
 
 _JA_DATA_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "..", "lute", "jlpt_data", "grammar",
+    "..",
+    "lute",
+    "jlpt_data",
+    "grammar",
 )
 
 
@@ -70,8 +79,23 @@ def test_japanese_ko_json_has_no_stale_ids():
     assert not stale, f"ko.json keys name no curated entry: {stale}"
 
 
+def _sudachi_available():
+    "Data rules are only derived when the sudachi extra is installed."
+    try:
+        import sudachipy  # noqa: F401  pylint: disable=unused-import,import-outside-toplevel
+    except ImportError:
+        return False
+    return True
+
+
+@pytest.mark.skipif(
+    not _sudachi_available(),
+    reason="sudachi extra not installed; data rules derive nothing",
+)
 def test_japanese_every_rule_has_a_korean_description():
     "Data rules get meaning_ko from ko.json; hand-written rules from _KO_HAND."
-    missing = sorted(r["key"] for r in _ALL_RULES if not (r.get("meaning_ko") or "").strip())
+    missing = sorted(
+        r["key"] for r in _ALL_RULES if not (r.get("meaning_ko") or "").strip()
+    )
     assert not missing, f"Japanese rules lack ko descriptions: {missing}"
     assert len(_DATA_RULES) >= 500
