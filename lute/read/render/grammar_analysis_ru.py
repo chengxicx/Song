@@ -392,6 +392,36 @@ _RU_RULES = [
         },
         zh="否定代词/副词 + не 构成双重否定：никогда не（从未……）。",
     ),
+    # ---- C1 / C2 ----
+    make_rule(
+        "ru_kak_ni",
+        "как ни + (however much)",
+        "C1",
+        "concessive: как ни старайся, как ни странно.",
+        {"seq": [spec_surface("как"), spec_surface("ни")]},
+        zh="как ни：无论怎样……（让步：как ни старайся 无论怎么努力）。",
+    ),
+    make_rule(
+        "ru_edva_li",
+        "едва ли / вряд ли (doubt)",
+        "C1",
+        "doubtful: вряд ли он придёт.",
+        {
+            "any_of": [
+                {"seq": [spec_surface("едва"), spec_surface("ли")]},
+                {"seq": [spec_surface("вряд"), spec_surface("ли")]},
+            ]
+        },
+        zh="едва ли / вряд ли：未必，恐怕不会。",
+    ),
+    make_rule(
+        "ru_chem_tem",
+        "чем ... , тем ... (the ... the ...)",
+        "C2",
+        "correlative comparison: чем больше, тем лучше.",
+        {"left": [spec_surface("чем")], "right": [spec_surface("тем")], "min_gap": 1, "max_gap": 8},
+        zh="чем …, тем …：越……越……（чем больше, тем лучше）。",
+    ),
 ]
 
 
