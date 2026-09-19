@@ -93,8 +93,10 @@ def main(argv):
         print(__doc__)
         return 1
     point_dir = argv[1]
-    out = argv[2] if len(argv) > 2 else os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "grammar_ko.json"
+    out = (
+        argv[2]
+        if len(argv) > 2
+        else os.path.join(os.path.dirname(os.path.abspath(__file__)), "grammar_ko.json")
     )
     entries = generate(point_dir)
     with open(out, "w", encoding="utf-8") as fh:

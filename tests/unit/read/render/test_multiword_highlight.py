@@ -66,15 +66,9 @@ def test_japanese_multiword_term_gets_highlighted_after_save(japanese, app_conte
 
     # Sanity: the term was saved with ZWS preserved in both text
     # and text_lc, and token_count == 3.
-    all_saved = (
-        db.session.query(DBTerm)
-        .filter(DBTerm.language_id == japanese.id)
-        .all()
-    )
+    all_saved = db.session.query(DBTerm).filter(DBTerm.language_id == japanese.id).all()
     # Filter in Python so a SQL comparison quirk can't hide the match.
-    saved = next(
-        (t for t in all_saved if t.text == multiword_text), None
-    )
+    saved = next((t for t in all_saved if t.text == multiword_text), None)
     assert saved is not None, (
         f"term not saved with text={multiword_text!r}; "
         f"saved terms: {[(t.id, t.text) for t in all_saved]}"
@@ -90,12 +84,10 @@ def test_japanese_multiword_term_gets_highlighted_after_save(japanese, app_conte
 
     # The three tokens should have been collapsed into a single
     # multiword TextItem with status 1.
-    multi_with_status = [
-        (txt, st) for (txt, st) in statuses if zws in txt and st == 1
-    ]
-    assert multi_with_status, (
-        f"no highlighted multiword TextItem found; got statuses={statuses}"
-    )
+    multi_with_status = [(txt, st) for (txt, st) in statuses if zws in txt and st == 1]
+    assert (
+        multi_with_status
+    ), f"no highlighted multiword TextItem found; got statuses={statuses}"
     # And the displayed text (with ZWS stripped) should be 行きました.
     displayed = multi_with_status[0][0].replace(zws, "")
     assert displayed == "行きました", displayed
@@ -128,8 +120,7 @@ def test_japanese_multiword_term_full_http_flow(japanese, app_context, client):
     assert "original_text" in body, "missing original_text field"
     # The ZWS must appear in the rendered HTML value attribute.
     assert multiword_text in body, (
-        f"ZWS-joined text missing from form HTML; "
-        f"got body snippet: {body[:500]!r}"
+        f"ZWS-joined text missing from form HTML; " f"got body snippet: {body[:500]!r}"
     )
 
     # Now POST the form to actually save the term.
@@ -158,19 +149,16 @@ def test_japanese_multiword_term_full_http_flow(japanese, app_context, client):
         .first()
     )
     assert saved is not None, "multiword term not saved"
-    assert saved.text == multiword_text, (
-        f"text lost ZWS: saved={saved.text!r}, expected={multiword_text!r}"
-    )
+    assert (
+        saved.text == multiword_text
+    ), f"text lost ZWS: saved={saved.text!r}, expected={multiword_text!r}"
     assert saved.token_count == 3, f"token_count={saved.token_count}"
 
     # Finally, re-render and confirm highlighting.
     service = Service(db.session)
     paragraphs = service.get_paragraphs(text.text, japanese)
     statuses = _get_textitem_statuses(paragraphs)
-    multi_with_status = [
-        (txt, st) for (txt, st) in statuses if zws in txt and st == 1
-    ]
+    multi_with_status = [(txt, st) for (txt, st) in statuses if zws in txt and st == 1]
     assert multi_with_status, (
-        f"no highlighted multiword TextItem after HTTP save; "
-        f"statuses={statuses}"
+        f"no highlighted multiword TextItem after HTTP save; " f"statuses={statuses}"
     )

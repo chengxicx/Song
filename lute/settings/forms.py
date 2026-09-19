@@ -93,7 +93,9 @@ class UserSettingsForm(FlaskForm):
         choices=tts_hover_delay_choices,
         default="200",
     )
-    tts_click_pronunciation = BooleanField("Pronounce word when clicked (term form opens)")
+    tts_click_pronunciation = BooleanField(
+        "Pronounce word when clicked (term form opens)"
+    )
     tts_show_control_panel = BooleanField("Show TTS Player")
     tts_show_sentence_buttons = BooleanField("Show 🔊 button on each sentence")
 

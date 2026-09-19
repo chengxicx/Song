@@ -230,4 +230,3 @@ def test_translate_route_caches_successful_result(
     assert first == {"translation": "hello"}
     assert second == {"translation": "hello"}
     assert calls["n"] == 1, "second call served from cache"
-

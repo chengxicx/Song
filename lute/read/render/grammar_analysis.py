@@ -145,7 +145,14 @@ def is_french_language(language):
     if language is None:
         return False
     name = (getattr(language, "name", None) or "").lower()
-    return "french" in name or "français" in name or "francais" in name or "法语" in name or "法文" in name or "法語" in name
+    return (
+        "french" in name
+        or "français" in name
+        or "francais" in name
+        or "法语" in name
+        or "法文" in name
+        or "法語" in name
+    )
 
 
 def is_german_language(language):
@@ -153,7 +160,13 @@ def is_german_language(language):
     if language is None:
         return False
     name = (getattr(language, "name", None) or "").lower()
-    return "german" in name or "deutsch" in name or "德语" in name or "德文" in name or "德語" in name
+    return (
+        "german" in name
+        or "deutsch" in name
+        or "德语" in name
+        or "德文" in name
+        or "德語" in name
+    )
 
 
 def is_thai_language(language):
@@ -164,7 +177,9 @@ def is_thai_language(language):
     if parser_type in _THAI_PARSER_TYPES:
         return True
     name = (getattr(language, "name", None) or "").lower()
-    return "thai" in name or "ไทย" in name or "泰语" in name or "泰文" in name or "泰語" in name
+    return (
+        "thai" in name or "ไทย" in name or "泰语" in name or "泰文" in name or "泰語" in name
+    )
 
 
 def is_arabic_language(language):
@@ -172,7 +187,13 @@ def is_arabic_language(language):
     if language is None:
         return False
     name = (getattr(language, "name", None) or "").lower()
-    return "arabic" in name or "العربية" in name or "阿拉伯语" in name or "阿拉伯文" in name or "阿拉伯語" in name
+    return (
+        "arabic" in name
+        or "العربية" in name
+        or "阿拉伯语" in name
+        or "阿拉伯文" in name
+        or "阿拉伯語" in name
+    )
 
 
 def is_italian_language(language):
@@ -180,7 +201,13 @@ def is_italian_language(language):
     if language is None:
         return False
     name = (getattr(language, "name", None) or "").lower()
-    return "italian" in name or "italiano" in name or "意大利语" in name or "意大利文" in name or "意大利語" in name
+    return (
+        "italian" in name
+        or "italiano" in name
+        or "意大利语" in name
+        or "意大利文" in name
+        or "意大利語" in name
+    )
 
 
 def is_portuguese_language(language):
@@ -188,7 +215,14 @@ def is_portuguese_language(language):
     if language is None:
         return False
     name = (getattr(language, "name", None) or "").lower()
-    return "portuguese" in name or "português" in name or "portugues" in name or "葡萄牙语" in name or "葡萄牙文" in name or "葡萄牙語" in name
+    return (
+        "portuguese" in name
+        or "português" in name
+        or "portugues" in name
+        or "葡萄牙语" in name
+        or "葡萄牙文" in name
+        or "葡萄牙語" in name
+    )
 
 
 # ---- startup dependency check -----------------------------------------
@@ -264,7 +298,13 @@ def grammar_engine_status(language):
     """
     label, extra = grammar_engine_for(language)
     if label is None:
-        return {"label": None, "extra": None, "installed": False, "missing": [], "installable": False}
+        return {
+            "label": None,
+            "extra": None,
+            "installed": False,
+            "missing": [],
+            "installable": False,
+        }
     deps = next(_deps for _l, _d, _deps, _e in _ENGINE_REQUIREMENTS if _e == extra)
     missing = [dep for dep in deps if importlib.util.find_spec(dep) is None]
     return {
@@ -326,7 +366,10 @@ def install_grammar_engine(extra):
         return False, f"Could not run pip: {e}"
     if proc.returncode != 0:
         output = (proc.stdout or "") + (proc.stderr or "")
-        return False, f"pip install of the {extra} engine failed:\n{output.strip()[-2000:]}"
+        return (
+            False,
+            f"pip install of the {extra} engine failed:\n{output.strip()[-2000:]}",
+        )
     return True, (
         f"Installed the {extra} grammar engine. "
         "If the grammar panel still shows the basic rules, restart the app."
@@ -380,9 +423,7 @@ _GRAMMAR_RULES = [
     {
         "name": "并列强调 (not only ... but also)",
         "desc": "强调两者，语气更强",
-        "pattern": re.compile(
-            r"\bnot\s+only\b.{0,60}?\bbut\s+also\b", re.IGNORECASE
-        ),
+        "pattern": re.compile(r"\bnot\s+only\b.{0,60}?\bbut\s+also\b", re.IGNORECASE),
     },
     {
         "name": "太...而不能 (too ... to)",
@@ -454,6 +495,9 @@ def analyze(sentences):
                 matched.append(entry)
             if sentence not in [ex["sentence"] for ex in entry["examples"]]:
                 entry["examples"].append(
-                    {"sentence": sentence, "matches": [{"start": m.start(), "end": m.end()}]}
+                    {
+                        "sentence": sentence,
+                        "matches": [{"start": m.start(), "end": m.end()}],
+                    }
                 )
     return matched

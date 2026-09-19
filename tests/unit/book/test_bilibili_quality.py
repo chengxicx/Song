@@ -54,33 +54,57 @@ def _seg(init="0-799", index="800-1399"):
 
 
 AVC_480 = {
-    "id": 32, "codecid": 7, "bandwidth": 61143, "codecs": "avc1.64001F",
-    "width": 852, "height": 480, "baseUrl": "https://cdn.example/480.m4s",
+    "id": 32,
+    "codecid": 7,
+    "bandwidth": 61143,
+    "codecs": "avc1.64001F",
+    "width": 852,
+    "height": 480,
+    "baseUrl": "https://cdn.example/480.m4s",
     "SegmentBase": _seg(),
 }
 AVC_360 = {
-    "id": 16, "codecid": 7, "bandwidth": 42049, "codecs": "avc1.64001E",
-    "width": 640, "height": 360, "baseUrl": "https://cdn.example/360.m4s",
+    "id": 16,
+    "codecid": 7,
+    "bandwidth": 42049,
+    "codecs": "avc1.64001E",
+    "width": 640,
+    "height": 360,
+    "baseUrl": "https://cdn.example/360.m4s",
     "SegmentBase": _seg(),
 }
 # Deliberately faster than the AVC rendition: a real payload does offer
 # HEVC at a higher bandwidth, and a bandwidth-only pick would choose it.
 HEVC_480 = {
-    "id": 32, "codecid": 12, "bandwidth": 99000, "codecs": "hev1.1.6.L120.90",
-    "width": 852, "height": 480, "baseUrl": "https://cdn.example/480hevc.m4s",
+    "id": 32,
+    "codecid": 12,
+    "bandwidth": 99000,
+    "codecs": "hev1.1.6.L120.90",
+    "width": 852,
+    "height": 480,
+    "baseUrl": "https://cdn.example/480hevc.m4s",
     "SegmentBase": _seg(),
 }
 AUDIO_192 = {
-    "id": 30280, "bandwidth": 90957, "codecs": "mp4a.40.2",
-    "baseUrl": "https://cdn.example/a192.m4s", "SegmentBase": _seg(),
+    "id": 30280,
+    "bandwidth": 90957,
+    "codecs": "mp4a.40.2",
+    "baseUrl": "https://cdn.example/a192.m4s",
+    "SegmentBase": _seg(),
 }
 AUDIO_132 = {
-    "id": 30232, "bandwidth": 90957, "codecs": "mp4a.40.2",
-    "baseUrl": "https://cdn.example/a132.m4s", "SegmentBase": _seg(),
+    "id": 30232,
+    "bandwidth": 90957,
+    "codecs": "mp4a.40.2",
+    "baseUrl": "https://cdn.example/a132.m4s",
+    "SegmentBase": _seg(),
 }
 AUDIO_64 = {
-    "id": 30216, "bandwidth": 67348, "codecs": "mp4a.40.2",
-    "baseUrl": "https://cdn.example/a64.m4s", "SegmentBase": _seg(),
+    "id": 30216,
+    "bandwidth": 67348,
+    "codecs": "mp4a.40.2",
+    "baseUrl": "https://cdn.example/a64.m4s",
+    "SegmentBase": _seg(),
 }
 
 _VIEW = {"duration": 7200, "pages": [{"cid": 101, "duration": 193}]}
@@ -89,8 +113,9 @@ _VIEW = {"duration": 7200, "pages": [{"cid": 101, "duration": 193}]}
 def _stream_info(bvid, video, audio, page=1):
     """stream_info with the API layer stubbed out."""
     play = {"dash": {"video": video, "audio": audio, "duration": 193}}
-    with patch.object(bilibili_stream, "_fetch_view", return_value=_VIEW), \
-         patch.object(bilibili_stream, "_fetch_playurl", return_value=play):
+    with patch.object(bilibili_stream, "_fetch_view", return_value=_VIEW), patch.object(
+        bilibili_stream, "_fetch_playurl", return_value=play
+    ):
         return bilibili_stream.stream_info(bvid, page)
 
 
@@ -121,13 +146,11 @@ def test_avc_is_preferred_over_a_faster_hevc_rendition():
     HEVC wins a bandwidth-only comparison, and a browser that cannot
     decode it shows a black player with no error to explain itself.
     """
-    info = _stream_info(
-        "BV1quality03", [HEVC_480, AVC_480, AVC_360], [AUDIO_192]
-    )
+    info = _stream_info("BV1quality03", [HEVC_480, AVC_480, AVC_360], [AUDIO_192])
     assert [v["height"] for v in info["videos"]] == [360, 480]
-    assert not any("hev" in v["codecs"] for v in info["videos"]), (
-        "an undecodable rendition must not be offered in the menu"
-    )
+    assert not any(
+        "hev" in v["codecs"] for v in info["videos"]
+    ), "an undecodable rendition must not be offered in the menu"
 
 
 def test_hevc_only_video_still_plays():
@@ -273,11 +296,10 @@ def test_proxy_serves_the_requested_rendition(client):
 def test_proxy_rejects_an_out_of_range_rendition(client):
     "A stale manifest must not be able to name a rendition that does not exist."
     info = _stream_info("BV1quality16", [AVC_480, AVC_360], [AUDIO_192])
-    with patch.object(bilibili_stream, "stream_info", return_value=info), \
-         patch.object(bilibili_stream, "proxy_stream") as proxy:
-        resp = client.get(
-            "/read/bilibili/stream/proxy/BV1quality16/video?page=1&q=99"
-        )
+    with patch.object(bilibili_stream, "stream_info", return_value=info), patch.object(
+        bilibili_stream, "proxy_stream"
+    ) as proxy:
+        resp = client.get("/read/bilibili/stream/proxy/BV1quality16/video?page=1&q=99")
     assert resp.status_code == 400
     assert resp.is_json
     assert not proxy.called, "nothing should be relayed for a bad index"
@@ -298,8 +320,10 @@ def test_proxy_still_works_with_single_rendition_info(client):
     Info that carries only the chosen rendition has nothing to index
     into, so the proxy must serve it rather than reject the request.
     """
-    info = {"video": {"baseUrl": "https://cdn.example/only.m4s"},
-            "audio": {"baseUrl": "https://cdn.example/a.m4s"}}
+    info = {
+        "video": {"baseUrl": "https://cdn.example/only.m4s"},
+        "audio": {"baseUrl": "https://cdn.example/a.m4s"},
+    }
     with patch.object(bilibili_stream, "stream_info", return_value=info):
         resp, captured = _proxy_capture(
             client, "/read/bilibili/stream/proxy/BV1quality18/video?page=1&q=1"
@@ -317,13 +341,13 @@ def test_quality_menu_lives_in_the_settings_dropdown():
     soup = BeautifulSoup(_read(_TEMPLATE), "html.parser")
     select = soup.find(id="yt-quality-select")
     assert select is not None, "the template must ship the quality picker"
-    assert select.find_parent(id="yt-settings-dropdown") is not None, (
-        "the picker belongs in the settings menu, next to Audio only"
-    )
+    assert (
+        select.find_parent(id="yt-settings-dropdown") is not None
+    ), "the picker belongs in the settings menu, next to Audio only"
     row = soup.find(id="yt-quality-row")
-    assert row is not None and row.has_attr("hidden"), (
-        "the row starts hidden: it is only shown when there is a choice"
-    )
+    assert row is not None and row.has_attr(
+        "hidden"
+    ), "the row starts hidden: it is only shown when there is a choice"
 
 
 def test_hidden_quality_row_actually_hides():
@@ -357,38 +381,38 @@ def test_adaptive_switching_is_disabled_for_video():
     over the relay means re-fetching at a bitrate the uplink cannot hold.
     """
     js = _read(_JS)
-    assert "autoSwitchBitrate: { video: false }" in js, (
-        "video ABR must be off or the reader's low-bitrate default is undone"
-    )
-    assert "updateSettings" in js, (
-        "dash.js 4.7 dropped setAutoSwitchQualityFor; settings is the way"
-    )
+    assert (
+        "autoSwitchBitrate: { video: false }" in js
+    ), "video ABR must be off or the reader's low-bitrate default is undone"
+    assert (
+        "updateSettings" in js
+    ), "dash.js 4.7 dropped setAutoSwitchQualityFor; settings is the way"
 
 
 def test_menu_populates_from_the_manifest_and_defaults_to_the_cheapest():
     js = _read(_JS)
-    assert 'player.on("manifestLoaded"' in js, (
-        "the rendition list only exists once the manifest has been parsed"
-    )
+    assert (
+        'player.on("manifestLoaded"' in js
+    ), "the rendition list only exists once the manifest has been parsed"
     options = js[js.index("function ytQualityOptions") :]
     options = options[: options.index("function ytPopulateQualityControls")]
-    assert "getVideoBitrates" in options, (
-        "the menu must reflect what this video actually offers"
-    )
+    assert (
+        "getVideoBitrates" in options
+    ), "the menu must reflect what this video actually offers"
     body = js[js.index("function ytPopulateQualityControls") :]
     body = body[: body.index("function ytApplyVideoQuality")]
-    assert "if (!pick) pick = items[0];" in body, (
-        "the fallback when nothing is remembered must be the cheapest"
-    )
+    assert (
+        "if (!pick) pick = items[0];" in body
+    ), "the fallback when nothing is remembered must be the cheapest"
 
 
 def test_a_single_rendition_shows_no_menu():
     js = _read(_JS)
     body = js[js.index("function ytPopulateQualityControls") :]
     body = body[: body.index("function ytApplyVideoQuality")]
-    assert "items.length < 2" in body, (
-        "a one-entry menu is not a choice and should not be shown"
-    )
+    assert (
+        "items.length < 2" in body
+    ), "a one-entry menu is not a choice and should not be shown"
 
 
 def test_quality_choice_survives_a_reload_as_a_height():

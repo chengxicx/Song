@@ -249,7 +249,9 @@ class Repository:
                 f"Failed to split book '{book.title}' into pages using parser "
                 f"'{pname}' for language '{language.name}': {e}"
             )
-            from lute.book.service import BookImportException  # pylint: disable=import-outside-toplevel, cyclic-import
+            from lute.book.service import (
+                BookImportException,
+            )  # pylint: disable=import-outside-toplevel, cyclic-import
 
             raise BookImportException(message=msg, cause=e) from e
 
@@ -257,7 +259,9 @@ class Repository:
 
         if not pages:
             pname = getattr(language.parser, "name", lambda: "unknown")()
-            from lute.book.service import BookImportException  # pylint: disable=import-outside-toplevel, cyclic-import
+            from lute.book.service import (
+                BookImportException,
+            )  # pylint: disable=import-outside-toplevel, cyclic-import
 
             raise BookImportException(
                 f"Parser '{pname}' for language '{language.name}' produced no pages "
@@ -315,7 +319,9 @@ class Repository:
                 # Normalize line endings and strip for comparison so
                 # that minor whitespace differences don't trigger a
                 # re-parse.
-                norm_current = current_text.replace("\r\n", "\n").replace("\r", "\n").strip()
+                norm_current = (
+                    current_text.replace("\r\n", "\n").replace("\r", "\n").strip()
+                )
                 norm_new = new_text.replace("\r\n", "\n").replace("\r", "\n").strip()
                 if norm_new != norm_current:
                     # Remove existing pages; cascade deletes sentences

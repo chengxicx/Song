@@ -78,7 +78,10 @@ def test_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The Mandarin engine grades points with CEFR bands."
-    levels = {e["key"]: e["level"] for e in analyze_chinese(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"]
+        for e in analyze_chinese(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["zh_le"] == "A1"
     assert levels["zh_ba_sentence"] == "A2"
 

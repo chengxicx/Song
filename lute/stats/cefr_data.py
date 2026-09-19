@@ -81,6 +81,7 @@ def level_totals():
 # a candidate too, so stored surface forms still match their headword.
 # ---------------------------------------------------------------------------
 
+
 def base_candidates(word):
     "Return a set of candidate base forms for a stored (lowercased) word."
     w = (word or "").strip().lower()
@@ -90,26 +91,26 @@ def base_candidates(word):
     n = len(w)
 
     if w.endswith("ies") and n > 4:
-        cands.add(w[:-3] + "y")          # cities -> city
+        cands.add(w[:-3] + "y")  # cities -> city
     if w.endswith("es") and n > 4 and not w.endswith("sses"):
-        cands.add(w[:-2])                # boxes -> box, watches -> watch
+        cands.add(w[:-2])  # boxes -> box, watches -> watch
     if w.endswith("s") and n > 3 and not w.endswith(("ss", "us")):
-        cands.add(w[:-1])                # dogs -> dog
+        cands.add(w[:-1])  # dogs -> dog
 
     if w.endswith("ied") and n > 5:
-        cands.add(w[:-3] + "y")          # studied -> study
+        cands.add(w[:-3] + "y")  # studied -> study
     if w.endswith("ed"):
         base = w[:-2]
-        cands.add(base)                  # walked -> walk
-        cands.add(base + "e")            # loved -> love
+        cands.add(base)  # walked -> walk
+        cands.add(base + "e")  # loved -> love
         if len(base) > 1 and base[-1] == base[-2]:
-            cands.add(base[:-1])         # stopped -> stop
+            cands.add(base[:-1])  # stopped -> stop
     if w.endswith("ing"):
         base = w[:-3]
         cands.add(base)
-        cands.add(base + "e")            # making -> make
+        cands.add(base + "e")  # making -> make
         if len(base) > 1 and base[-1] == base[-2]:
-            cands.add(base[:-1])         # running -> run
+            cands.add(base[:-1])  # running -> run
 
     return cands
 

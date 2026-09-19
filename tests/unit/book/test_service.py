@@ -95,9 +95,7 @@ def _import_pdf_book(app, spanish, page_texts):
     b.pdf_stream = io.BytesIO(make_pdf_bytes(page_texts))
     b.pdf_stream_filename = "test.pdf"
     book = Service().import_book(b, db.session)
-    pdf_dir = os.path.join(
-        app.static_folder, os.path.dirname(book.pdf_path.strip("/"))
-    )
+    pdf_dir = os.path.join(app.static_folder, os.path.dirname(book.pdf_path.strip("/")))
     return book, pdf_dir
 
 

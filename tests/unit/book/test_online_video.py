@@ -77,6 +77,7 @@ def test_parse_txt_plain_transcript_has_no_cues():
 
 def test_parse_srt_url_downloads_and_parses():
     "parse_subtitle_from_url downloads the subtitle and parses it."
+
     class _Resp:
         content = None
 
@@ -87,9 +88,7 @@ def test_parse_srt_url_downloads_and_parses():
     resp.content = SAMPLE_SRT.encode("utf-8-sig")
 
     with patch.object(book_service.requests, "get", return_value=resp):
-        text, cues_json = parse_subtitle_from_url(
-            "https://example.com/sub.srt"
-        )
+        text, cues_json = parse_subtitle_from_url("https://example.com/sub.srt")
 
     assert "Hello world." in text
     assert len(__import__("json").loads(cues_json)) == 3
@@ -217,7 +216,9 @@ def test_mp3_online_url_creates_mp3_book(app, app_context, client, english):
     assert book.media_url == "https://a.example.com/song.mp3"
 
 
-def _make_video_book(app, app_context, english, media_url="https://v.example.com/clip.mp4"):
+def _make_video_book(
+    app, app_context, english, media_url="https://v.example.com/clip.mp4"
+):
     from lute.book.model import Book
     from lute.book.service import Service as BookService
 

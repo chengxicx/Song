@@ -174,7 +174,9 @@ _LEMMA = lambda *lemmas: {"lemma": set(lemmas)}
 _POS = lambda p: {"pos": p}
 
 
-def _rule(key, name, meaning, patterns, level="TOPIK 1-2", zh="", ko="", kind="construction"):
+def _rule(
+    key, name, meaning, patterns, level="TOPIK 1-2", zh="", ko="", kind="construction"
+):
     return {
         "key": key,
         "pattern": name,
@@ -262,7 +264,15 @@ _KO_RULES = [
         "ko_gi_jeone",
         "-기 전에",
         "before doing",
-        [{"type": "tokens", "conds": [{"surface": "기", "pos": "ETN"}, {"surface": "전", "pos": "NNG"}]}],
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface": "기", "pos": "ETN"},
+                    {"surface": "전", "pos": "NNG"},
+                ],
+            }
+        ],
         zh="在……之前",
         ko="어떤 일보다 앞서 함을 나타내는 표현.",
     ),
@@ -292,6 +302,7 @@ _KO_RULES = [
     ),
 ]
 
+
 def _norm_name(name):
     "Normalise a grammar name so '-아/어서' and '아/어서' compare equal."
     n = name.strip().lstrip("-－~〜")
@@ -308,7 +319,11 @@ _HANDWRITTEN_NORMS = {_norm_name(r["pattern"]) for r in _KO_RULES}
 # kimchi-grammar (CC-BY 4.0).  Matches the layout of jlpt_data/grammar.
 _DATA_PATH = os.path.normpath(
     os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "..", "..", "jlpt_data", "grammar_ko.json"
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_ko.json",
     )
 )
 
@@ -443,6 +458,7 @@ def _count_loaded_rules():
 
 # ---------------------------------------------------------------------
 
+
 def analyze_korean(page_text, display_lang="en"):
     """
     Analyze a page of Korean text for grammar points.
@@ -489,7 +505,9 @@ def analyze_korean(page_text, display_lang="en"):
                 if desc_now not in entry["meanings"]:
                     entry["meanings"].append(desc_now)
             if not any(e["sentence"] == sentence for e in entry["examples"]):
-                entry["examples"].append({"sentence": sentence, "matches": list(matches)})
+                entry["examples"].append(
+                    {"sentence": sentence, "matches": list(matches)}
+                )
     matched = []
     for n in order:
         entry = by_name[n]

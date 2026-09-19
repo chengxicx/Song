@@ -99,15 +99,9 @@ class LanguageForm(FlaskForm):
         choices=kiwi_tokenizer_mode_choices,
         default="morpheme",
     )
-    kiwi_stemming = BooleanField(
-        "自动提取词典原形 (Stemming / Lemmatization)"
-    )
-    kiwi_filter_particles = BooleanField(
-        "过滤语法助词 (Filter Particles: 은/는, 이/가…)"
-    )
-    kiwi_join_compound_nouns = BooleanField(
-        "合并复合名词 (Join Compound Nouns)"
-    )
+    kiwi_stemming = BooleanField("自动提取词典原形 (Stemming / Lemmatization)")
+    kiwi_filter_particles = BooleanField("过滤语法助词 (Filter Particles: 은/는, 이/가…)")
+    kiwi_join_compound_nouns = BooleanField("合并复合名词 (Join Compound Nouns)")
 
     def validate_dictionaries(self, field):  # pylint: disable=unused-argument
         "Dictionaries must be valid."

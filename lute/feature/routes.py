@@ -55,9 +55,7 @@ def menu_fragment(parent):
     """
     registry = get_registry()
     items = registry.menu_items_for(parent)
-    return render_template(
-        "feature/_menu_items.html", items=items, parent=parent
-    )
+    return render_template("feature/_menu_items.html", items=items, parent=parent)
 
 
 @bp.get("/panel")
@@ -82,9 +80,7 @@ def installed_json():
     return jsonify(
         {
             "installed": installer.installed_plugin_names(),
-            "packages": {
-                name: info.get("package") for name, info in pkgs.items()
-            },
+            "packages": {name: info.get("package") for name, info in pkgs.items()},
             "types": {name: info.get("type") for name, info in pkgs.items()},
             "versions": {name: info.get("version") for name, info in pkgs.items()},
             "loaded": registry.loaded_plugins,
@@ -104,7 +100,10 @@ def install():
     if not spec:
         return (
             jsonify(
-                {"ok": False, "message": "Please enter a pip spec (name, path, or URL)."}
+                {
+                    "ok": False,
+                    "message": "Please enter a pip spec (name, path, or URL).",
+                }
             ),
             400,
         )
@@ -211,7 +210,9 @@ def upload_install():
                             shutil.copyfileobj(src, out)
             except zipfile.BadZipFile:
                 return (
-                    jsonify({"ok": False, "message": "Uploaded file is not a valid .zip."}),
+                    jsonify(
+                        {"ok": False, "message": "Uploaded file is not a valid .zip."}
+                    ),
                     400,
                 )
 

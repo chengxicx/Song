@@ -47,6 +47,7 @@ _EXAMPLE_CAP = 3
 
 # ---- sentence splitting ----------------------------------------------
 
+
 def split_sentences(text):
     """
     Split a page of text into sentences on .!?… or line breaks.
@@ -65,6 +66,7 @@ def split_sentences(text):
 
 
 # ---- condition matching ----------------------------------------------
+
 
 def _is_punct(token):
     return (token.get("pos") or "") in _PUNCT_POS
@@ -90,7 +92,9 @@ def _pos_match_any(token, wanted):
     readings.extend(
         (p.get("pos") or "", p.get("score", 0.0)) for p in token.get("parses", [])
     )
-    return any(pos in wanted and score > _POS_SCORE_RATIO * best for pos, score in readings)
+    return any(
+        pos in wanted and score > _POS_SCORE_RATIO * best for pos, score in readings
+    )
 
 
 def _match_condition(cond, token):
@@ -211,7 +215,9 @@ def match_rule(rule, tokens, sentence_text):
         veto = False
         if rule.get("not_after"):
             neighbour = _left_neighbour(tokens, start)
-            veto = neighbour is not None and _match_condition(rule["not_after"], neighbour)
+            veto = neighbour is not None and _match_condition(
+                rule["not_after"], neighbour
+            )
         if not veto and end > start:
             last = tokens[end - 1]
             # An engine may report the token's true end offset (used when
@@ -231,6 +237,7 @@ def match_rule(rule, tokens, sentence_text):
 
 
 # ---- rule helpers ------------------------------------------------------
+
 
 def spec_surface(*surfaces):
     "Spec matching any of the given surface forms (case-insensitive)."
@@ -597,6 +604,7 @@ def _desc(rule, display_lang):
 
 # ---- analysis driver ---------------------------------------------------
 
+
 def analyze_tokens(page_text, rules, tokens_for_sentence, display_lang):
     """
     Run the rules over a page of text.
@@ -637,6 +645,9 @@ def analyze_tokens(page_text, rules, tokens_for_sentence, display_lang):
             if any(ex["sentence"] == sentence for ex in entry["examples"]):
                 continue
             entry["examples"].append(
-                {"sentence": sentence, "matches": [{"start": s, "end": e} for s, e in spans]}
+                {
+                    "sentence": sentence,
+                    "matches": [{"start": s, "end": e} for s, e in spans],
+                }
             )
     return [by_key[k] for k in order]

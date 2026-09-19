@@ -239,7 +239,9 @@ def test_language_edit_without_engine_shows_note(client, empty_db):
     assert "No dedicated grammar engine" in resp.data.decode("utf-8")
 
 
-def test_language_edit_ja_ko_note_parser_shipped_engine(client, empty_db, korean, japanese):
+def test_language_edit_ja_ko_note_parser_shipped_engine(
+    client, empty_db, korean, japanese
+):
     "日语/韩语语言页不谎称没有引擎：说明引擎（Sudachi/Kiwi）随 parser 提供。"
     resp = client.get(f"/language/edit/{korean.id}")
     assert resp.status_code == 200, resp.data
@@ -335,9 +337,7 @@ def test_japanese_grammar_analysis_uses_ja_engine(client, empty_db, japanese):
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
 
 
-def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(
-    client, empty_db, japanese
-):
+def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(client, empty_db, japanese):
     """
     Manga 书籍的页面 Text 为空，语法分析应从 mokuro OCR 数据中重建文本并
     返回日语语法点，而不是返回空列表。
@@ -345,20 +345,22 @@ def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(
     from lute.book.model import Book
     from lute.book.service import Service as BookService
 
-    pages = [{
-        "version": "0.2.1",
-        "img_path": "page.jpg",
-        "img_width": 848,
-        "img_height": 1264,
-        "blocks": [
-            {
-                "box": [10, 10, 100, 100],
-                "vertical": False,
-                "font_size": 25,
-                "lines": ["今日は学校に行きたいです。", "ご飯を食べています。"],
-            },
-        ],
-    }]
+    pages = [
+        {
+            "version": "0.2.1",
+            "img_path": "page.jpg",
+            "img_width": 848,
+            "img_height": 1264,
+            "blocks": [
+                {
+                    "box": [10, 10, 100, 100],
+                    "vertical": False,
+                    "font_size": 25,
+                    "lines": ["今日は学校に行きたいです。", "ご飯を食べています。"],
+                },
+            ],
+        }
+    ]
 
     book = Book()
     book.language_id = japanese.id
@@ -380,6 +382,7 @@ def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(
     for g in data:
         assert g["level"] == "N5", "日语语法点都应标注 N5"
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
 
 def test_mandarin_grammar_analysis_uses_zh_engine(client, empty_db, mandarin):
     "中文书籍应走零依赖中文语法引擎。"
