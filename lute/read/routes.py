@@ -858,9 +858,7 @@ def bilibili_mpd(bvid):
         # and an unhandled exception used to surface as an HTML 500 page.
         return jsonify({"error": str(e)}), 502
     video_proxies = [
-        url_for(
-            "read.bilibili_proxy", bvid=bvid, stream_type="video", page=page, q=i
-        )
+        url_for("read.bilibili_proxy", bvid=bvid, stream_type="video", page=page, q=i)
         for i in range(len(info.get("videos") or [info["video"]]))
     ]
     audio_proxy = url_for(
@@ -1105,7 +1103,9 @@ def grammar_analysis(bookid, pagenum):
         # Manga pages store no page text -- the words live in the .mokuro
         # OCR data, so rebuild the page text from the OCR blocks.
         manga_text = _manga_page_text(book, pagenum)
-        page_text = manga_text if manga_text is not None else book.text_at_page(pagenum).text
+        page_text = (
+            manga_text if manga_text is not None else book.text_at_page(pagenum).text
+        )
     # The reader renders empty paragraphs as a zero-width-space placeholder
     # and can inject the 🔊 audio marker into the text the client sends
     # back; both are display artifacts, not grammar.  Strip them before
@@ -1113,14 +1113,13 @@ def grammar_analysis(bookid, pagenum):
     # Korean engines do the same internally).
     page_text = page_text.replace("\u200b", "").replace("🔊", "")
     display = getattr(lang, "grammar_translate_lang", "") or "en"
-    if is_japanese_language(lang):
-        return jsonify(analyze_japanese(page_text, display_lang=display))
-    if is_korean_language(lang):
-        return jsonify(analyze_korean(page_text, display_lang=display))
-    # The European engines need optional heavy dependencies (spaCy models /
-    # pymorphy3); when they are missing, fall back to the generic regex
-    # rule library instead of failing the panel.
+    # Every engine runs on optional heavy dependencies (Sudachi, Kiwi,
+    # spaCy models, pymorphy3, pythainlp, pyarabic); when one is missing,
+    # fall back to the generic regex rule library instead of failing
+    # the panel.
     for detector, engine, extra in (
+        (is_japanese_language, analyze_japanese, "japanese-sudachi"),
+        (is_korean_language, analyze_korean, "korean"),
         (is_mandarin_chinese_language, analyze_chinese, "chinese"),
         (is_cantonese_language, analyze_cantonese, "cantonese"),
         (is_english_language, analyze_english, "english"),
@@ -1147,9 +1146,7 @@ def grammar_analysis(bookid, pagenum):
     render_service = RenderService(db.session)
     paragraphs = render_service.get_paragraphs(page_text, lang)
     sentences = [
-        "".join(ti.text for ti in sentence)
-        for para in paragraphs
-        for sentence in para
+        "".join(ti.text for ti in sentence) for para in paragraphs for sentence in para
     ]
     return jsonify(analyze_grammar(sentences))
 
