@@ -1,0 +1,99 @@
+/* Review queue pages. */
+
+.review-status {
+  margin-bottom: 10px;
+}
+
+.review-hint {
+  color: #888;
+  font-size: 0.9em;
+}
+
+.review-specs {
+  margin: 10px 0;
+  border-collapse: collapse;
+}
+
+.review-specs th,
+.review-specs td {
+  text-align: left;
+  padding: 4px 12px 4px 0;
+}
+
+#review_card {
+  max-width: 700px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.review-front-term,
+.review-back-term {
+  font-size: 2.2em;
+  margin: 20px 0;
+}
+
+.review-front-translation {
+  font-size: 1.4em;
+  margin: 20px 0;
+}
+
+.review-front-sentence,
+.review-sentence {
+  font-size: 1.3em;
+  line-height: 1.8;
+  margin: 20px 0;
+}
+
+.cloze-blank {
+  background: var(--highlight, #ffee99);
+  padding: 0 6px;
+  border-radius: 3px;
+}
+
+.review-typing {
+  font-size: 1.3em;
+  padding: 6px 10px;
+  width: 60%;
+  margin: 10px 0;
+}
+
+.review-actions {
+  margin: 15px 0;
+}
+
+.review-actions button {
+  margin: 0 5px;
+}
+
+.review-banner {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.review-ok {
+  color: #2e7d32;
+}
+
+.review-bad {
+  color: #c62828;
+}
+
+.review-reading {
+  font-style: italic;
+  color: #666;
+}
+
+.review-translation {
+  color: #444;
+}
+
+.review-image {
+  max-width: 300px;
+  max-height: 200px;
+  display: block;
+  margin: 10px auto;
+}
+
+.review-grade {
+  margin: 0 4px;
+}

@@ -15,6 +15,7 @@ from lute.cli.term_parent_backfill import (
     run_backfill,
     undo_backfill,
 )
+from lute.review import enqueue as review_enqueue
 
 bp = Blueprint("cli", __name__)
 
@@ -229,3 +230,30 @@ def parent_backfill_undo_cmd(audit, commit, delete_created_terms):
             "Parent terms: %d deleted, %d kept (still referenced)."
             % (terms_removed, terms_kept)
         )
+
+
+@bp.cli.command("review_sync")
+@click.option(
+    "--commit",
+    is_flag=True,
+    help="""
+    Enqueue the cards.  If not set, report only: nothing is written.
+""",
+)
+@click.option(
+    "--limit",
+    type=int,
+    default=None,
+    help="""
+    Only enqueue the first N cards, for a canary run.
+""",
+)
+def review_sync_cmd(commit, limit):
+    """
+    Enqueue review cards from all active review specs.
+
+    Dry-run by default.  Syncing only ever adds: cards already in the
+    queue keep their scheduling, and no card is ever removed.
+    """
+    result = review_enqueue.run_sync(commit=commit, limit=limit)
+    print(review_enqueue.format_report(result))
