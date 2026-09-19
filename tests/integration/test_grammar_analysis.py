@@ -9,6 +9,7 @@ other language falls back to the generic regex rule library.
 import json
 import pytest
 from lute.db import db
+from lute.parse.registry import is_supported
 from tests.utils import make_book
 
 
@@ -267,6 +268,8 @@ def test_install_route_rejects_unknown_extra(client, empty_db):
 
 
 def test_grammar_analysis_strips_zws_from_client_snippet(client, empty_db, korean):
+    if not is_supported("lute_korean"):
+        pytest.skip("lute_korean parser not installed")
     """
     阅读器把空段落渲染成零宽空格占位符，客户端拼接 snippet 时会把它们一起
     发回。韩语 Kiwi 分词器会把零宽空格单独切成 token，旧代码在词内嵌 zws
@@ -296,6 +299,8 @@ def test_grammar_analysis_strips_zws_from_client_snippet(client, empty_db, korea
 
 
 def test_korean_grammar_analysis_ko_display_language(client, empty_db, korean):
+    if not is_supported("lute_korean"):
+        pytest.skip("lute_korean parser not installed")
     "grammar_translate_lang=ko 时，韩语语法点应返回韩语释义。"
     korean.grammar_translate_lang = "ko"
     db.session.add(korean)
@@ -317,6 +322,8 @@ def test_korean_grammar_analysis_ko_display_language(client, empty_db, korean):
 
 
 def test_japanese_grammar_analysis_uses_ja_engine(client, empty_db, japanese):
+    if not is_supported("japanese_sudachi"):
+        pytest.skip("japanese_sudachi parser not installed")
     "日语书籍应走 Sudachi 语法引擎，返回 N5 规则与例句。"
     book = make_book(
         "Japanese Grammar Demo",
@@ -338,6 +345,8 @@ def test_japanese_grammar_analysis_uses_ja_engine(client, empty_db, japanese):
 
 
 def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(client, empty_db, japanese):
+    if not is_supported("japanese_sudachi"):
+        pytest.skip("japanese_sudachi parser not installed")
     """
     Manga 书籍的页面 Text 为空，语法分析应从 mokuro OCR 数据中重建文本并
     返回日语语法点，而不是返回空列表。
@@ -385,6 +394,8 @@ def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(client, empty_db, japa
 
 
 def test_mandarin_grammar_analysis_uses_zh_engine(client, empty_db, mandarin):
+    if not is_supported("lute_mandarin"):
+        pytest.skip("lute_mandarin parser not installed")
     "中文书籍应走零依赖中文语法引擎。"
     book = make_book(
         "Mandarin Grammar Demo",
@@ -406,6 +417,8 @@ def test_mandarin_grammar_analysis_uses_zh_engine(client, empty_db, mandarin):
 
 
 def test_cantonese_grammar_analysis_uses_yue_engine(client, empty_db):
+    if not is_supported("lute_cantonese"):
+        pytest.skip("lute_cantonese parser not installed")
     "粤语书籍应走零依赖粤语语法引擎。"
     from lute.models.language import Language
 
