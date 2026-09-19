@@ -69,6 +69,11 @@ def _tokens_for(sentence):
         if not parses:
             continue
         best = parses[0]
+        # pymorphy3 returns every dictionary reading, including ghosts with
+        # a tiny score ("моря" carries a 1.6% "морить" gerund reading).
+        # Keep only readings close to the best one: POS-only rules match on
+        # ANY reading, and ghost readings would fire them spuriously.
+        parses = [p for p in parses if p.score >= 0.1 * best.score]
         tokens.append(
             {
                 "surface": m.group(),
@@ -76,13 +81,15 @@ def _tokens_for(sentence):
                 "pos": best.tag.POS or "",
                 "morph": _gramemes(best.tag),
                 "idx": m.start(),
+                "score": best.score,
                 "parses": [
                     {
                         "lemma": p.normal_form,
                         "pos": p.tag.POS or "",
                         "morph": _gramemes(p.tag),
+                        "score": p.score,
                     }
-                    for p in parses[:4]
+                    for p in parses
                 ],
             }
         )
