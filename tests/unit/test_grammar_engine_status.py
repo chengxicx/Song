@@ -23,7 +23,9 @@ def test_grammar_engine_for_maps_by_language_name():
         "Russian",
         "russian",
     )
-    assert grammar_analysis.grammar_engine_for(StubLanguage(parser_type="lute_thai")) == (
+    assert grammar_analysis.grammar_engine_for(
+        StubLanguage(parser_type="lute_thai")
+    ) == (
         "Thai",
         "thai",
     )
@@ -58,6 +60,20 @@ def test_status_uninstallable_engine_has_no_label_when_missing():
     assert status["missing"] == []
 
 
+def test_parser_shipped_engine_note_for_ja_ko():
+    "JA/KO grammar engines ride on the parser's own tokenizer, not an extra."
+    assert grammar_analysis.grammar_engine_note(StubLanguage(name="Japanese")) == {
+        "label": "Japanese",
+        "tokenizer": "Sudachi",
+    }
+    assert grammar_analysis.grammar_engine_note(
+        StubLanguage(parser_type="lute_korean")
+    ) == {"label": "Korean", "tokenizer": "Kiwi"}
+    assert grammar_analysis.grammar_engine_note(StubLanguage(name="Turkish")) is None
+    assert grammar_analysis.grammar_engine_note(StubLanguage(name="English")) is None
+    assert grammar_analysis.grammar_engine_note(None) is None
+
+
 def test_install_unknown_extra_fails_without_pip():
     "An unknown extra is rejected before any pip call."
     ok, message = grammar_analysis.install_grammar_engine("klingon")
@@ -70,7 +86,9 @@ def _fake_run(resultcode, monkeypatch):
 
     def fake_run(cmd, capture_output, text, timeout):  # pylint: disable=unused-argument
         calls.append(cmd)
-        proc = type("Proc", (), {"returncode": resultcode, "stdout": "", "stderr": ""})()
+        proc = type(
+            "Proc", (), {"returncode": resultcode, "stdout": "", "stderr": ""}
+        )()
         return proc
 
     monkeypatch.setattr(grammar_analysis.subprocess, "run", fake_run)
@@ -94,7 +112,9 @@ def test_install_failure_reports_output(monkeypatch):
 
     def fake_run(cmd, capture_output, text, timeout):  # pylint: disable=unused-argument
         calls.append(cmd)
-        return type("Proc", (), {"returncode": 1, "stdout": "boom", "stderr": "bad spec"})()
+        return type(
+            "Proc", (), {"returncode": 1, "stdout": "boom", "stderr": "bad spec"}
+        )()
 
     monkeypatch.setattr(grammar_analysis.subprocess, "run", fake_run)
     ok, message = grammar_analysis.install_grammar_engine("russian")
@@ -104,9 +124,17 @@ def test_install_failure_reports_output(monkeypatch):
     assert len(calls) == 1
 
 
-def test_install_specs_cover_every_engine():
+def test_install_specs_cover_every_engine_with_deps():
     "Every engine with importable deps has a pip spec list, and vice versa."
-    for _label, _detect, _deps, extra in grammar_analysis._ENGINE_REQUIREMENTS:
-        assert extra in grammar_analysis._ENGINE_INSTALL_SPECS, extra
+    for _label, _detect, deps, extra in grammar_analysis._ENGINE_REQUIREMENTS:
+        if deps:
+            assert extra in grammar_analysis._ENGINE_INSTALL_SPECS, extra
     for extra in grammar_analysis._ENGINE_INSTALL_SPECS:
-        assert any(e == extra for _l, _d, _deps, e in grammar_analysis._ENGINE_REQUIREMENTS), extra
+        assert any(
+            e == extra for _l, _d, _deps, e in grammar_analysis._ENGINE_REQUIREMENTS
+        ), extra
+    # Zero-dependency engines (Mandarin/Cantonese) need no install step.
+    assert (
+        grammar_analysis.grammar_engine_status(StubLanguage(name="中文"))["installed"]
+        is True
+    )

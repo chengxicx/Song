@@ -23,21 +23,29 @@ from lute.read.render.grammar_analysis import (
     analyze as analyze_grammar,
     is_japanese_language,
     is_korean_language,
+    is_mandarin_chinese_language,
+    is_cantonese_language,
     is_english_language,
     is_spanish_language,
     is_russian_language,
     is_french_language,
     is_german_language,
+    is_italian_language,
+    is_portuguese_language,
     is_thai_language,
     is_arabic_language,
 )
 from lute.read.render.grammar_analysis_ja import analyze_japanese
 from lute.read.render.grammar_analysis_ko import analyze_korean
+from lute.read.render.grammar_analysis_zh import analyze_chinese
+from lute.read.render.grammar_analysis_yue import analyze_cantonese
 from lute.read.render.grammar_analysis_en import analyze_english
 from lute.read.render.grammar_analysis_es import analyze_spanish
 from lute.read.render.grammar_analysis_ru import analyze_russian
 from lute.read.render.grammar_analysis_fr import analyze_french
 from lute.read.render.grammar_analysis_de import analyze_german
+from lute.read.render.grammar_analysis_it import analyze_italian
+from lute.read.render.grammar_analysis_pt import analyze_portuguese
 from lute.read.render.grammar_analysis_th import analyze_thai
 from lute.read.render.grammar_analysis_ar import analyze_arabic
 from lute.read.forms import TextForm
@@ -57,6 +65,8 @@ from lute.book.service import (
     media_audio_url,
 )
 from lute.tts.routes import get_lang_code_for
+from lute.book.series import series_tag_for_book
+from lute.book.types import subtitle_book_types
 from lute.db import db
 
 
@@ -139,7 +149,9 @@ def _fmt_seconds(secs):
     return f"{m}:{s:02d}"
 
 
-_SUBTITLE_BOOK_TYPES = ("youtube", "bilibili", "mp3", "netease", "video")
+# Subtitle books: their reading text comes from SRT cues.  From the
+# single book-type registry (lute.book.types).
+_SUBTITLE_BOOK_TYPES = subtitle_book_types()
 
 
 def _render_cue_chunks(cues, lang):
@@ -363,7 +375,7 @@ def _sync_media_page_text_to_cues(book, pagenum, original_text, new_text):
     Returns "updated" (srt_data written), "unchanged" (nothing to do), or
     "mismatch" (page text and cues don't line up; cues left alone).
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "netease", "video"):
+    if (book.book_type or "") not in _SUBTITLE_BOOK_TYPES:
         return "unchanged"
     cues = list(book.cues)
     if not cues:
@@ -444,7 +456,7 @@ def _page_cue_span(book, pagenum, line_count):
     page whose lines straddle a multi-line cue has no contiguous cue
     span, so the timing panel is not offered for it).
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "netease", "video"):
+    if (book.book_type or "") not in _SUBTITLE_BOOK_TYPES:
         return None
     cues = list(book.cues)
     if not cues or not line_count:
@@ -569,7 +581,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         bvid, _aid = bilibili_video_id(book.source_uri)
         bilibili_page_num = bilibili_page(book.source_uri)
     srt_cues = []
-    if book_type in ("youtube", "bilibili", "mp3", "netease", "video"):
+    if book_type in _SUBTITLE_BOOK_TYPES:
         srt_cues = list(book.cues)
         for c in srt_cues:
             c["start_str"] = _fmt_seconds(c.get("start", 0))
@@ -620,6 +632,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         is_rtl=lang.right_to_left,
         html_title=book.title,
         book=book,
+        series_tag=series_tag_for_book(db.session, book),
         sentence_dict_uris=lang.sentence_dict_uris,
         page_num=pagenum,
         page_count=book.page_count,
@@ -848,9 +861,7 @@ def bilibili_mpd(bvid):
         # and an unhandled exception used to surface as an HTML 500 page.
         return jsonify({"error": str(e)}), 502
     video_proxies = [
-        url_for(
-            "read.bilibili_proxy", bvid=bvid, stream_type="video", page=page, q=i
-        )
+        url_for("read.bilibili_proxy", bvid=bvid, stream_type="video", page=page, q=i)
         for i in range(len(info.get("videos") or [info["video"]]))
     ]
     audio_proxy = url_for(
@@ -1095,7 +1106,9 @@ def grammar_analysis(bookid, pagenum):
         # Manga pages store no page text -- the words live in the .mokuro
         # OCR data, so rebuild the page text from the OCR blocks.
         manga_text = _manga_page_text(book, pagenum)
-        page_text = manga_text if manga_text is not None else book.text_at_page(pagenum).text
+        page_text = (
+            manga_text if manga_text is not None else book.text_at_page(pagenum).text
+        )
     # The reader renders empty paragraphs as a zero-width-space placeholder
     # and can inject the 🔊 audio marker into the text the client sends
     # back; both are display artifacts, not grammar.  Strip them before
@@ -1103,19 +1116,22 @@ def grammar_analysis(bookid, pagenum):
     # Korean engines do the same internally).
     page_text = page_text.replace("\u200b", "").replace("🔊", "")
     display = getattr(lang, "grammar_translate_lang", "") or "en"
-    if is_japanese_language(lang):
-        return jsonify(analyze_japanese(page_text, display_lang=display))
-    if is_korean_language(lang):
-        return jsonify(analyze_korean(page_text, display_lang=display))
-    # The European engines need optional heavy dependencies (spaCy models /
-    # pymorphy3); when they are missing, fall back to the generic regex
-    # rule library instead of failing the panel.
+    # Every engine runs on optional heavy dependencies (Sudachi, Kiwi,
+    # spaCy models, pymorphy3, pythainlp, pyarabic); when one is missing,
+    # fall back to the generic regex rule library instead of failing
+    # the panel.
     for detector, engine, extra in (
+        (is_japanese_language, analyze_japanese, "japanese-sudachi"),
+        (is_korean_language, analyze_korean, "korean"),
+        (is_mandarin_chinese_language, analyze_chinese, "chinese"),
+        (is_cantonese_language, analyze_cantonese, "cantonese"),
         (is_english_language, analyze_english, "english"),
         (is_spanish_language, analyze_spanish, "spanish"),
         (is_russian_language, analyze_russian, "russian"),
         (is_french_language, analyze_french, "french"),
         (is_german_language, analyze_german, "german"),
+        (is_italian_language, analyze_italian, "italian"),
+        (is_portuguese_language, analyze_portuguese, "portuguese"),
         (is_thai_language, analyze_thai, "thai"),
         (is_arabic_language, analyze_arabic, "arabic"),
     ):
@@ -1133,9 +1149,7 @@ def grammar_analysis(bookid, pagenum):
     render_service = RenderService(db.session)
     paragraphs = render_service.get_paragraphs(page_text, lang)
     sentences = [
-        "".join(ti.text for ti in sentence)
-        for para in paragraphs
-        for sentence in para
+        "".join(ti.text for ti in sentence) for para in paragraphs for sentence in para
     ]
     return jsonify(analyze_grammar(sentences))
 

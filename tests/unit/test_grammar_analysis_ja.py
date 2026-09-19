@@ -4,6 +4,9 @@ import re
 
 import pytest
 
+pytest.importorskip("sudachipy")
+pytest.importorskip("sudachidict_core")
+
 from lute.read.render.grammar_analysis_ja import (
     _ALL_LEVELS,
     _ALL_RULES,
@@ -125,16 +128,14 @@ def test_multiline_example_never_spans_the_line_break():
     previous sentence too).
     """
     results = analyze_japanese(
-        "冬は十二月から二月ごろまでで、北の地方では雪がたくさん降ります。\n"
-        "季節によって食べ物や行事も変わる\n"
-        "ので、日本の生活はとても楽しいです。"
+        "冬は十二月から二月ごろまでで、北の地方では雪がたくさん降ります。\n" "季節によって食べ物や行事も変わる\n" "ので、日本の生活はとても楽しいです。"
     )
     entry = next(e for e in results if "よっ" in e["name"])
     for ex in entry["examples"]:
-        assert "\n" not in ex["sentence"], f"example spans a line break: {ex['sentence']!r}"
-    assert any(
-        ex["sentence"] == "季節によって食べ物や行事も変わる" for ex in entry["examples"]
-    )
+        assert (
+            "\n" not in ex["sentence"]
+        ), f"example spans a line break: {ex['sentence']!r}"
+    assert any(ex["sentence"] == "季節によって食べ物や行事も変わる" for ex in entry["examples"])
 
 
 def test_analysis_return_shape():
@@ -176,12 +177,16 @@ def test_data_rules_loaded_for_all_levels():
 def test_full_jlpt_library_is_loaded():
     "The whole curated JLPT grammar library is present, not just a sample."
     assert len(_DATA_RULES) >= 590
-    by_level = {lvl: len([r for r in _DATA_RULES if r["level"] == lvl]) for lvl in _ALL_LEVELS}
+    by_level = {
+        lvl: len([r for r in _DATA_RULES if r["level"] == lvl]) for lvl in _ALL_LEVELS
+    }
     assert by_level == {"N5": 77, "N4": 89, "N3": 130, "N2": 149, "N1": 150}, by_level
     # The great majority of entries must be usable matchers rather than
     # skipped: entries only get skipped for good reason (see _load_level).
     active = [r for r in _DATA_RULES if not r["skipped"]]
-    assert len(active) >= 480, f"only {len(active)} of {len(_DATA_RULES)} rules are active"
+    assert (
+        len(active) >= 480
+    ), f"only {len(active)} of {len(_DATA_RULES)} rules are active"
 
 
 def test_each_data_rule_matches_its_own_examples():
@@ -202,13 +207,17 @@ def test_each_data_rule_matches_its_own_examples():
         hits = {e["key"] for e in entries}
         names = {e["name"] for e in entries}
         if rule["kind"] == "basic":
-            assert "basic_forms" in hits, f"data rule {rule['key']} not folded into basic_forms"
+            assert (
+                "basic_forms" in hits
+            ), f"data rule {rule['key']} not folded into basic_forms"
         elif rule["kind"] == "particle":
-            assert "basic_particles" in hits, f"data rule {rule['key']} not folded into basic_particles"
+            assert (
+                "basic_particles" in hits
+            ), f"data rule {rule['key']} not folded into basic_particles"
         else:
-            assert rule["key"] in hits or rule["pattern"] in names, (
-                f"data rule {rule['key']} ({rule['pattern']}) did not match its own examples"
-            )
+            assert (
+                rule["key"] in hits or rule["pattern"] in names
+            ), f"data rule {rule['key']} ({rule['pattern']}) did not match its own examples"
 
 
 def test_data_rule_kinds_are_known():
@@ -280,7 +289,7 @@ def test_short_kana_grammar_points_report_on_their_own(sentence, key):
     ],
 )
 def test_every_alternative_in_a_pattern_is_matched(sentence, key):
-    """"くない / くありません" is two forms; both have to match."""
+    """ "くない / くありません" is two forms; both have to match."""
     assert key in _keys(sentence)
 
 
@@ -337,9 +346,9 @@ def test_chinese_display_language():
     "display_lang='zh' yields the curated Chinese gloss; default stays English."
     zh = analyze_japanese("毎日運動することにした。", display_lang="zh")
     hit = next(e for e in zh if e["key"] == "ds_koto-ni-suru-decide")
-    assert re.search(r"[\u4e00-\u9fff]", hit["desc"]), (
-        f"expected Chinese desc, got: {hit['desc']!r}"
-    )
+    assert re.search(
+        r"[\u4e00-\u9fff]", hit["desc"]
+    ), f"expected Chinese desc, got: {hit['desc']!r}"
     assert not hit["desc"].isascii()
 
     en = analyze_japanese("毎日運動することにした。")
@@ -438,8 +447,8 @@ def test_te_form_prefix_constraint(sentence, expected):
 @pytest.mark.parametrize(
     "sentence",
     [
-        "今、ご飯を食べています。",   # て form
-        "今、本を読んでいます。",     # で form (む/ぶ/ぬ/ぐ verbs)
+        "今、ご飯を食べています。",  # て form
+        "今、本を読んでいます。",  # で form (む/ぶ/ぬ/ぐ verbs)
         "東京に住んでいます。",
         "猫が死んでいる。",
         "このお寺は江戸時代に建てられています。",  # passive: て follows an auxiliary
@@ -462,8 +471,8 @@ def test_te_iru_covers_both_te_and_de(sentence):
 @pytest.mark.parametrize(
     "sentence",
     [
-        "本を読んで、います。",   # comma breaks the sequence
-        "ここにいます。",         # いる as the main verb, no て form in front
+        "本を読んで、います。",  # comma breaks the sequence
+        "ここにいます。",  # いる as the main verb, no て form in front
     ],
 )
 def test_te_iru_does_not_overreach(sentence):
@@ -503,8 +512,7 @@ def test_existence_and_progressive_are_reported_once():
 
     # The basics row itself names no existence marker.
     basics = [
-        e for e in analyze_japanese("私は学生です。毎朝、コーヒーを飲みます。")
-        if e["key"] == "basic_forms"
+        e for e in analyze_japanese("私は学生です。毎朝、コーヒーを飲みます。") if e["key"] == "basic_forms"
     ]
     assert basics, "expected at least one basic form on this sentence"
     assert "います" not in basics[0]["name"], basics[0]["name"]
@@ -559,8 +567,7 @@ def test_examples_are_capped_per_rule():
     from lute.read.render.grammar_analysis_ja import _CONSTRUCTION_EXAMPLE_CAP
 
     results = analyze_japanese(
-        "寿司を食べています。ご飯を食べています。パンを食べています。"
-        "そばを食べています。うどんを食べています。",
+        "寿司を食べています。ご飯を食べています。パンを食べています。" "そばを食べています。うどんを食べています。",
         display_lang="zh",
     )
     entry = next(e for e in results if e["key"] == "te_iru")
@@ -816,7 +823,7 @@ def test_rules_are_named_after_their_own_pattern():
     "sentence",
     [
         "店長は知っています。",
-        "彼は本を読んでいます。",       # で form of the te-form
+        "彼は本を読んでいます。",  # で form of the te-form
         "子供が遊んでいます。",
         "もう食べてしまいました。",
         "雨が降っていました。",
@@ -870,3 +877,25 @@ def test_not_after_is_wired_into_the_specs():
         assert token_specs, rid
         assert all(s.get("not_after") == cond for s in token_specs), rid
     assert _TE_CONNECTIVE["pos2"] == "接続助詞"
+
+
+def test_korean_display_language_switches_desc():
+    "한국어 display uses ko.json for data rules and _KO_HAND for hand-written."
+    ko = {e["name"]: e for e in analyze_japanese("日本に行きたいです。", "ko")}
+    en = {e["name"]: e for e in analyze_japanese("日本に行きたいです。", "en")}
+    assert "소망" in ko["〜たい"]["desc"]
+    assert "want to do" not in ko["〜たい"]["desc"]
+    assert "want to do" in en["〜たい"]["desc"]
+
+
+def test_korean_display_covers_data_rules():
+    "A data-driven rule shows its ko.json gloss."
+    ko = {e["name"]: e for e in analyze_japanese("明日は雨でしょう。", "ko")}
+    assert "추측" in ko["〜でしょう"]["desc"]
+
+
+def test_korean_display_translates_aggregates():
+    "The two aggregate buckets show Korean descriptions too."
+    res = analyze_japanese("私は学生です。あれは本です。", "ko")
+    basics = next(g for g in res if g["key"] == "basic_forms")
+    assert "기초" in basics["desc"]

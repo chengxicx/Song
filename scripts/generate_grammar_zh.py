@@ -108,7 +108,6 @@ ZH = {
     "i-adj-desu-politeness": "……的（い形礼貌体）",
     "kara-cause": "因为……；由于（から）",
     "potential-form": "能……；会……（可能态）",
-
     # ===== N4 =====
     "passive-form": "被……；受到（被动，含受害）",
     "causative-form": "让……做；使（使役态）",
@@ -200,7 +199,6 @@ ZH = {
     "you-ka-to-omou": "想要……（正考虑，かと思う）",
     "you-da-appearance": "似乎……；好像（ようだ，有根据）",
     "mitai-looks-like": "好像……；像（みたい，口语）",
-
     # ===== N3 =====
     "rashii-seems": "好像……；有……特征（らしい）",
     "te-oku": "预先做……；保持状态（ておく）",
@@ -333,7 +331,6 @@ ZH = {
     "ni-atatte-occasion": "在……之际；当（にあたって，郑重）",
     "ni-sakidatte-prior": "在……之前；先于（に先立って）",
     "wo-kikkake-ni": "以……为契机；趁（をきっかけに）",
-
     # ===== N2 =====
     "wo-keiki-ni": "以……为转机；借（を契機に）",
     "ni-tsuki-due-to": "由于……；每（につき）",
@@ -484,7 +481,6 @@ ZH = {
     "ni-kataku-nai": "不难……；容易（に難くない）",
     "wo-yogi-naku-sareru": "被迫……；不得不（を余儀なくされる）",
     "wo-kinjienai": "不禁……；难以抑制（を禁じ得ない）",
-
     # ===== N1 =====
     "zu-ni-wa-okanai": "必定会……；难免（ずにはおかない）",
     "nai-dewa-okanai": "必定……；势必要（ではおかない）",

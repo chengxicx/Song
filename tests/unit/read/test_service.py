@@ -438,3 +438,40 @@ def test_save_new_textitem_terms_dedupes_repeated_renders(english, app_context):
     dog2 = next(ti for ti in items2 if ti.is_word and ti.text_lc == "dog")
     assert dog1.term.id is not None, "saved"
     assert dog1.term.id == dog2.term.id, "duplicates share the persisted term"
+
+
+def test_update_start_date_tolerates_deleted_book(app_context, english, monkeypatch):
+    """
+    The unload beacon is fire-and-forget: the book can be deleted while
+    the beacon is in flight, so its commit fails with StaleDataError
+    (the texts UPDATE matches no rows).  That error must be swallowed
+    AND rolled back -- an unhandled one (or an unrolled-back session)
+    poisons the worker thread's session, which then serves stale data
+    to later requests.
+    """
+    from sqlalchemy.orm.exc import StaleDataError
+
+    b = Book()
+    b.language_id = english.id
+    b.title = "beacon book"
+    b.text = "Hello world."
+    dbbook = BookService().import_book(b, db.session)
+
+    service = Service(db.session)
+    rolled_back = []
+
+    def failing_commit():
+        raise StaleDataError("UPDATE texts matched 0 rows", {}, None)
+
+    monkeypatch.setattr(db.session, "commit", failing_commit)
+    monkeypatch.setattr(db.session, "rollback", lambda: rolled_back.append(True))
+
+    service.update_start_date(dbbook, 1)  # must not raise
+    assert rolled_back, "session rolled back after the stale write"
+
+    monkeypatch.undo()
+    assert_sql_result(
+        "select count(*) from texts",
+        ["1"],
+        "session usable again after the rollback",
+    )

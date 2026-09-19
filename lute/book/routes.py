@@ -51,7 +51,9 @@ from lute.book.forms import (
     MangaEditForm,
     BookSettingsForm,
     ALLOWED_AUDIO_EXTENSIONS,
+    SUBTITLE_BOOK_TYPES,
 )
+from lute.book.types import import_type_choices
 from lute.book.stats import Service as StatsService
 from lute.book.stats import get_difficulty_label
 import lute.utils.formutils
@@ -237,15 +239,9 @@ def edit(bookid):
 
     form = EditBookForm(obj=b)
 
-    # For youtube/bilibili/mp3/video books the text field holds the SRT
-    # original (with timestamps) so it can be edited directly.
-    if request.method == "GET" and (b.book_type or "") in (
-        "youtube",
-        "bilibili",
-        "mp3",
-        "netease",
-        "video",
-    ):
+    # For subtitle books the text field holds the SRT original (with
+    # timestamps) so it can be edited directly.
+    if request.method == "GET" and (b.book_type or "") in SUBTITLE_BOOK_TYPES:
         form.text.data = cues_to_srt_text(b.cues)
 
     if form.validate_on_submit():
@@ -374,6 +370,7 @@ def import_webpage():
         tags=repo.get_book_tags(),
         rtl_map=json.dumps(_language_is_rtl_map()),
         show_language_selector=True,
+        import_types_json=json.dumps(import_type_choices()),
     )
 
 

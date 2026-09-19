@@ -27,6 +27,8 @@ _TEMPLATES_DIR = os.path.join(os.path.dirname(lute.__file__), "templates")
 _TEMPLATE = os.path.join(_TEMPLATES_DIR, "read", "bilibili_player.html")
 _CSS = os.path.join(_STATIC_DIR, "css", "player-styles.css")
 _JS = os.path.join(_STATIC_DIR, "js", "bilibili-player.js")
+# Shared player engine (element lookups, ready-timeout) lives here.
+_BASE_JS = os.path.join(_STATIC_DIR, "js", "media-player-base.js")
 
 
 def _read(path):
@@ -63,9 +65,9 @@ def test_embed_notice_is_outside_the_video_wrap():
 
 def test_loading_overlay_is_switched_off_in_embed_mode():
     body = _css_rule(_read(_CSS), ".bili-embed-active .yt-player-loading")
-    assert "display: none" in re.sub(r"\s+", " ", body), (
-        "the loading overlay must be hidden while the embed player is active"
-    )
+    assert "display: none" in re.sub(
+        r"\s+", " ", body
+    ), "the loading overlay must be hidden while the embed player is active"
     assert "!important" in body, (
         "the JS sets display inline on this element, so the rule needs"
         " !important to win"
@@ -84,17 +86,17 @@ def test_embed_iframe_stacks_above_the_loading_overlay():
 
 def test_js_hides_the_overlay_when_the_fallback_engages():
     js = _read(_JS)
-    start = js.index("function ytUseEmbedPlayer()")
-    body = js[start : js.index("function ytOnError()")]
-    assert 'ytLoading.style.display = "none"' in body, (
-        "ytUseEmbedPlayer must take the loading overlay out of the way"
-    )
-    assert "ytEmbedNotice.hidden = false" in body, (
-        "ytUseEmbedPlayer must report the fallback in the sibling notice"
-    )
-    assert 'getElementById("bili-embed-notice")' in js, (
-        "the notice the JS shows must be the element the template ships"
-    )
+    start = js.index("function ytUseEmbedPlayer(")
+    body = js[start : js.index("function ytOnError(")]
+    assert (
+        'api.els.loading.style.display = "none"' in body
+    ), "ytUseEmbedPlayer must take the loading overlay out of the way"
+    assert (
+        "api.els.embedNotice.hidden = false" in body
+    ), "ytUseEmbedPlayer must report the fallback in the sibling notice"
+    assert 'getElementById("bili-embed-notice")' in _read(
+        _BASE_JS
+    ), "the notice the JS shows must be the element the template ships"
 
 
 def test_ready_timeout_does_not_fire_in_embed_mode():
@@ -102,7 +104,7 @@ def test_ready_timeout_does_not_fire_in_embed_mode():
     The "player never became ready" timer would re-show the overlay on top
     of a perfectly good embed, because the embed never sets ytPlayerReady.
     """
-    js = _read(_JS)
-    assert "!ytPlayerReady && !ytEmbedMode" in js, (
-        "the 15s ready-timeout must be skipped in embed mode"
-    )
+    js = _read(_BASE_JS)
+    assert (
+        "!ytPlayerReady && !ytEmbedMode" in js
+    ), "the 15s ready-timeout must be skipped in embed mode"

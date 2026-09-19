@@ -31,8 +31,21 @@ _ALEF_MAP = str.maketrans({"آ": "ا", "أ": "ا", "إ": "ا", "ٱ": "ا", "ى":
 
 # preposition/conjunction prefixes (incl. article + conjunction combos)
 _PREFIXES = (
-    "وال", "فال", "بال", "كال", "لل", "والال", "بالال", "فالال",
-    "و", "ف", "ب", "ل", "ك", "ال", "س",
+    "وال",
+    "فال",
+    "بال",
+    "كال",
+    "لل",
+    "والال",
+    "بالال",
+    "فالال",
+    "و",
+    "ف",
+    "ب",
+    "ل",
+    "ك",
+    "ال",
+    "س",
 )
 # possessive / object pronoun suffixes
 _SUFFIXES = ("كما", "كم", "كن", "ها", "هم", "هن", "نا", "ني", "ن", "ك", "ه")
@@ -87,7 +100,7 @@ def _candidate_stems(w):
         for cand in work:
             for pre in _PREFIXES:
                 if cand.startswith(pre) and len(cand) > len(pre):
-                    nxt.add(cand[len(pre):])
+                    nxt.add(cand[len(pre) :])
         out.update(nxt)
         work = nxt
         if not work:

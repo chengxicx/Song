@@ -98,9 +98,7 @@ def make_archive(ext=".cbz", num_pages=2):
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
         mokuro = make_mokuro(num_pages)
-        zf.writestr(
-            "hanabira_manga_01.mokuro", json.dumps(mokuro, ensure_ascii=False)
-        )
+        zf.writestr("hanabira_manga_01.mokuro", json.dumps(mokuro, ensure_ascii=False))
         for page in mokuro["pages"]:
             zf.writestr(page["img_path"], PNG_1PX)
     buf.seek(0)
@@ -118,7 +116,9 @@ def _import_manga(client, language_id, ext=".cbz", num_pages=2, **extra):
         "manga_file": (stream, f"hanabira_manga_01{ext}"),
     }
     resp = client.post(
-        "/book/import_webpage", data=data, content_type="multipart/form-data",
+        "/book/import_webpage",
+        data=data,
+        content_type="multipart/form-data",
         follow_redirects=False,
     )
     return resp, mokuro
@@ -173,8 +173,14 @@ def test_extract_manga_volume_subdir_layout(app_context):
                 "img_path": "001.jpg",
                 "img_width": 1080,
                 "img_height": 1530,
-                "blocks": [{"box": [53, 461, 552, 568], "vertical": False,
-                            "font_size": 32, "lines": ["テスト"]}],
+                "blocks": [
+                    {
+                        "box": [53, 461, 552, 568],
+                        "vertical": False,
+                        "font_size": 32,
+                        "lines": ["テスト"],
+                    }
+                ],
             },
             {
                 "version": "0.1.6",
@@ -498,8 +504,8 @@ def test_import_page_has_manga_option(app, app_context, client):
     assert 'value="manga"' in content
     assert 'id="manga-form"' in content
     assert 'id="manga_file"' in content
-    assert '.zip,.cbz' in content
-    assert 'Manga' in content
+    assert ".zip,.cbz" in content
+    assert "Manga" in content
 
 
 def test_import_manga_zip_route(app, app_context, japanese, client):
@@ -551,7 +557,9 @@ def test_import_manga_db_path_matches_filesystem(app, app_context, japanese, cli
 def test_import_manga_custom_tags(app, app_context, japanese, client):
     "Tags entered in the form are applied as given."
     resp, _ = _import_manga(
-        client, japanese.id, ".zip",
+        client,
+        japanese.id,
+        ".zip",
         manga_tag='[{"value":"Manga"},{"value":"reading"}]',
     )
     assert resp.status_code == 302
@@ -568,7 +576,9 @@ def test_import_manga_rejects_bad_extension(app, app_context, client):
         "manga_file": (io.BytesIO(b"nope"), "book.rar"),
     }
     resp = client.post(
-        "/book/import_webpage", data=data, content_type="multipart/form-data",
+        "/book/import_webpage",
+        data=data,
+        content_type="multipart/form-data",
         follow_redirects=True,
     )
     content = resp.get_data(as_text=True)
@@ -642,27 +652,31 @@ def test_manga_context_filters_paragraph_marker(app, app_context, japanese):
     from lute.book.model import Book
     from lute.read.service import Service as ReadService
 
-    pages = [{
-        "version": "0.2.1",
-        "img_path": "page.jpg",
-        "img_width": 848,
-        "img_height": 1264,
-        "blocks": [
-            {
-                "box": [10, 10, 100, 100],
-                "vertical": False,
-                "font_size": 25,
-                "lines": ["一行目\n二行目", "まとめ¶あとがき"],
-            },
-        ],
-    }]
+    pages = [
+        {
+            "version": "0.2.1",
+            "img_path": "page.jpg",
+            "img_width": 848,
+            "img_height": 1264,
+            "blocks": [
+                {
+                    "box": [10, 10, 100, 100],
+                    "vertical": False,
+                    "font_size": 25,
+                    "lines": ["一行目\n二行目", "まとめ¶あとがき"],
+                },
+            ],
+        }
+    ]
 
     book = Book()
     book.language_id = japanese.id
     book.title = "Pilcrow filter"
     book.book_type = "manga"
     book.manga_path = "manga/test-nonexistent"
-    book.manga_data = json.dumps({"version": "0.2.1", "pages": pages}, ensure_ascii=False)
+    book.manga_data = json.dumps(
+        {"version": "0.2.1", "pages": pages}, ensure_ascii=False
+    )
     dbbook = BookService().import_book(book, db.session)
 
     ctx = ReadService(db.session).manga_page_context(dbbook, 1, track_page_open=False)
@@ -672,9 +686,12 @@ def test_manga_context_filters_paragraph_marker(app, app_context, japanese):
     assert all_items, "lines produced items"
     assert not any(it.text == "¶" for it in all_items), "¶ marker is filtered out"
     lines = ["".join(it.text for it in line) for line in line_items]
-    assert lines == ["一行目", "二行目", "まとめ", "あとがき"], (
-        "each physical row renders on its own line"
-    )
+    assert lines == [
+        "一行目",
+        "二行目",
+        "まとめ",
+        "あとがき",
+    ], "each physical row renders on its own line"
 
 
 def test_manga_words_get_data_wid_after_page_load(app, app_context, japanese, client):
@@ -869,9 +886,7 @@ def test_manga_edit_page_prefills_the_tags_it_will_save(
     assert sorted(t.text for t in reloaded.book_tags) == ["Manga", "jp"]
 
 
-def test_manga_edit_reimports_archive_over_the_book(
-    app, app_context, japanese, client
-):
+def test_manga_edit_reimports_archive_over_the_book(app, app_context, japanese, client):
     "An uploaded archive replaces the book's pages, images and mokuro data."
     from flask import current_app
 
