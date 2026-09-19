@@ -110,7 +110,7 @@
   let render_delete = function ( data, type, row, meta ) {
     // TODO zzfuture fix: security - add CSRF token
     const tgid = row['TgID'];
-    return `<span id="deltermtag${tgid}" onclick="confirm_delete(${tgid})"><img src="{{ url_for('static', filename='/icn/minus-button.png') }}" title="Delete" /></span>`;
+    return `<span id="deltermtag${tgid}" onclick="confirm_delete(${tgid})"><img src="{{ vstatic('icn/minus-button.png') }}" title="Delete" /></span>`;
   }
 
   $(document).ready(function () {

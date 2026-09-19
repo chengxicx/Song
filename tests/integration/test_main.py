@@ -6,8 +6,19 @@ import os
 import sqlite3
 from contextlib import closing
 
+import pytest
+
 from lute.config.app_config import AppConfig
 from lute.app_factory import create_app
+
+
+@pytest.fixture(autouse=True)
+def _use_file_db(monkeypatch):
+    """
+    These tests exercise the on-disk db lifecycle (setup_db creating the
+    file), so opt out of the shared in-memory test db (tests/conftest.py).
+    """
+    monkeypatch.delenv("LUTE_DB_URI", raising=False)
 
 
 def test_init_no_existing_database(testconfig):
