@@ -65,6 +65,7 @@ from lute.book.service import (
     media_audio_url,
 )
 from lute.tts.routes import get_lang_code_for
+from lute.book.series import series_tag_for_book
 from lute.db import db
 
 
@@ -628,6 +629,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         is_rtl=lang.right_to_left,
         html_title=book.title,
         book=book,
+        series_tag=series_tag_for_book(db.session, book),
         sentence_dict_uris=lang.sentence_dict_uris,
         page_num=pagenum,
         page_count=book.page_count,
