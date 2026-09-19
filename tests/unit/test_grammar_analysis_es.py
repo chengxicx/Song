@@ -41,6 +41,10 @@ _RULE_SENTENCES = {
     "es_se": "Aquí se habla español.",
     "es_como_si": "Actúa como si nada pasara.",
     "es_llevar_gerund": "Llevo dos años viviendo aquí.",
+    "es_de_haber": "De haber sabido, habría venido.",
+    "es_por_mas_que": "Por más que trabaje, no terminará.",
+    "es_y_eso_que": "Vinimos ayer, y eso que llovía.",
+    "es_no_es_que": "No es que sea tonto, es que no quiero.",
 }
 
 
