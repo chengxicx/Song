@@ -5,8 +5,14 @@
 - 这是最小 demo，规则覆盖有限，不追求完备。
 - 数据来源：阅读页已经解析好的句子文本。
 - 每条规则给出：语法名、简短说明，以及命中的原文例句。
+
+This module also hosts the per-language dispatch helpers that steer a
+grammar-analysis request to the right engine, and the startup check that
+reports missing optional engine dependencies.
 """
 
+import importlib.util
+import logging
 import re
 
 
@@ -44,6 +50,87 @@ def is_korean_language(language):
         return True
     name = (getattr(language, "name", None) or "").lower()
     return "korean" in name or "한국어" in name or "韩语" in name or "韓語" in name
+
+
+# English / Spanish / Russian are identified by language name only: they all
+# share the generic "spacedel" parser with many other languages, so there is
+# no parser_type to key on.
+
+
+def is_english_language(language):
+    "True if the given Language should use the spaCy English grammar engine."
+    if language is None:
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    return "english" in name or "英语" in name or "英文" in name
+
+
+def is_spanish_language(language):
+    "True if the given Language should use the spaCy Spanish grammar engine."
+    if language is None:
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    return (
+        "spanish" in name
+        or "español" in name
+        or "espanol" in name
+        or "西班牙语" in name
+        or "西语" in name
+    )
+
+
+def is_russian_language(language):
+    "True if the given Language should use the pymorphy3 Russian grammar engine."
+    if language is None:
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    return "russian" in name or "русский" in name or "俄语" in name or "俄文" in name
+
+
+# ---- startup dependency check -----------------------------------------
+#
+# language label, detector, importable deps, pip extra that provides them
+_ENGINE_REQUIREMENTS = [
+    ("English", is_english_language, ("spacy", "en_core_web_sm"), "english"),
+    ("Spanish", is_spanish_language, ("spacy", "es_core_news_sm"), "spanish"),
+    ("Russian", is_russian_language, ("pymorphy3",), "russian"),
+]
+
+
+def report_grammar_engine_status(session):
+    """
+    Startup check: when the DB has an English/Spanish/Russian language but
+    its grammar-analysis dependency isn't installed, log the pip command
+    that installs it.
+
+    Books keep working either way: the grammar route falls back to the
+    generic regex rule library below.  Uses importlib.util.find_spec so no
+    heavy package is actually imported at startup.
+    """
+    # Imported here (not at module top) to avoid a circular import.
+    from lute.models.language import Language
+
+    names_by_extra = {}
+    for lang in session.query(Language).all():
+        for _label, detect, _deps, extra in _ENGINE_REQUIREMENTS:
+            if detect(lang):
+                names_by_extra.setdefault(extra, set()).add(lang.name)
+    logger = logging.getLogger(__name__)
+    for label, _detect, deps, extra in _ENGINE_REQUIREMENTS:
+        names = names_by_extra.get(extra)
+        if not names:
+            continue
+        missing = [dep for dep in deps if importlib.util.find_spec(dep) is None]
+        if missing:
+            logger.warning(
+                "Grammar analysis for %s (%s) needs missing package(s): %s.  "
+                'Run: pip install -e ".[%s]"; until then the grammar panel '
+                "uses the basic regex rules.",
+                ", ".join(sorted(names)),
+                label,
+                ", ".join(missing),
+                extra,
+            )
 
 
 # 每条规则：{"key", "name", "desc", "pattern"}

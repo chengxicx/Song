@@ -23,9 +23,15 @@ from lute.read.render.grammar_analysis import (
     analyze as analyze_grammar,
     is_japanese_language,
     is_korean_language,
+    is_english_language,
+    is_spanish_language,
+    is_russian_language,
 )
 from lute.read.render.grammar_analysis_ja import analyze_japanese
 from lute.read.render.grammar_analysis_ko import analyze_korean
+from lute.read.render.grammar_analysis_en import analyze_english
+from lute.read.render.grammar_analysis_es import analyze_spanish
+from lute.read.render.grammar_analysis_ru import analyze_russian
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
 from lute.term.model import Repository
@@ -1088,12 +1094,30 @@ def grammar_analysis(bookid, pagenum):
     # analysis so no tokenizer/analyzer ever sees them (the Japanese and
     # Korean engines do the same internally).
     page_text = page_text.replace("\u200b", "").replace("🔊", "")
+    display = getattr(lang, "grammar_translate_lang", "") or "en"
     if is_japanese_language(lang):
-        display = getattr(lang, "grammar_translate_lang", "") or "en"
         return jsonify(analyze_japanese(page_text, display_lang=display))
     if is_korean_language(lang):
-        display = getattr(lang, "grammar_translate_lang", "") or "en"
         return jsonify(analyze_korean(page_text, display_lang=display))
+    # The European engines need optional heavy dependencies (spaCy models /
+    # pymorphy3); when they are missing, fall back to the generic regex
+    # rule library instead of failing the panel.
+    for detector, engine, extra in (
+        (is_english_language, analyze_english, "english"),
+        (is_spanish_language, analyze_spanish, "spanish"),
+        (is_russian_language, analyze_russian, "russian"),
+    ):
+        if detector(lang):
+            try:
+                return jsonify(engine(page_text, display_lang=display))
+            except (ImportError, OSError):
+                current_app.logger.warning(
+                    "%s grammar engine not installed; using the basic regex rules. "
+                    'Run: pip install -e ".[%s]"',
+                    extra.capitalize(),
+                    extra,
+                )
+                break
     render_service = RenderService(db.session)
     paragraphs = render_service.get_paragraphs(page_text, lang)
     sentences = [
