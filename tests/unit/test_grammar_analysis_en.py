@@ -46,6 +46,12 @@ _RULE_SENTENCES = {
     "en_have_sth_done": "I had it repaired yesterday.",
     "en_despite": "Despite the rain, we went out.",
     "en_unless": "Unless it rains, we will go out.",
+    "en_inversion": "Never have I seen such a mess.",
+    "en_future_perfect": "By June I will have finished the course.",
+    "en_future_continuous": "Tomorrow at noon I will be flying to Rome.",
+    "en_whereas": "He is tall, whereas she is short.",
+    "en_cleft": "It was John that broke the window.",
+    "en_mandative_subjunctive": "I insist that he be on time.",
 }
 
 
