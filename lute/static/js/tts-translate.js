@@ -15,6 +15,18 @@
 
   let _isFilling = false;
 
+  // The word currently shown in the form within doc, or null.  In-place
+  // form updates keep the same document alive word after word, so a
+  // slow translate request can outlive the word it was started for --
+  // async fills are discarded when the form has moved on.
+  function currentFormWord(doc) {
+    var t = null;
+    try {
+      t = doc.getElementById("text") || doc.querySelector('input[name="text"]');
+    } catch (_) {}
+    return t ? t.value.trim() : null;
+  }
+
   function forceFill(el, text) {
     if (!el) return;
     _isFilling = true;
@@ -194,6 +206,11 @@
                     document.getElementById("translation") ||
                     document.querySelector('textarea[name="translation"]');
                 }
+                // Skip when the form now shows another word, or the
+                // user typed a translation while the request ran.
+                if (currentFormWord(doc) !== word) return;
+                if (freshTarget && freshTarget.value &&
+                    freshTarget.value !== "Translating...") return;
                 forceFill(freshTarget, translated);
               } else {
                 let freshTarget =
@@ -204,7 +221,8 @@
                     document.getElementById("translation") ||
                     document.querySelector('textarea[name="translation"]');
                 }
-                if (freshTarget && freshTarget.value === "Translating...") {
+                if (currentFormWord(doc) === word &&
+                    freshTarget && freshTarget.value === "Translating...") {
                   forceFill(freshTarget, "");
                 }
               }
@@ -213,7 +231,8 @@
               let freshTarget =
                 doc.getElementById("translation") ||
                 doc.querySelector('textarea[name="translation"]');
-              if (freshTarget && freshTarget.value === "Translating...") {
+              if (currentFormWord(doc) === word &&
+                  freshTarget && freshTarget.value === "Translating...") {
                 forceFill(freshTarget, "");
               }
             });
