@@ -6,8 +6,6 @@ from datetime import datetime
 
 import pytest
 
-pytest.importorskip("fsrs")
-
 from lute.db import db  # noqa: E402
 from lute.models.review import ReviewCard  # noqa: E402
 from lute.review import enqueue, service  # noqa: E402
@@ -17,6 +15,7 @@ from tests.utils import add_terms, make_book  # noqa: E402
 
 def test_full_review_flow(empty_db, spanish):
     "Sync a spec, run a session, grade a cloze card by typing."
+    pytest.importorskip("fsrs")
     terms = add_terms(spanish, ["gato"])
     terms[0].translation = "cat"
     db.session.add(terms[0])
@@ -56,7 +55,7 @@ def test_full_review_flow(empty_db, spanish):
 
 
 def test_review_routes(empty_db, spanish, client):
-    "The HTTP endpoints wire up: index page, sync, start, grade."
+    "The no-fsrs HTTP endpoints wire up: index, session page, sync."
     terms = add_terms(spanish, ["perro"])
     db.session.add(terms[0])
     db.session.commit()
@@ -76,12 +75,37 @@ def test_review_routes(empty_db, spanish, client):
     assert resp.status_code == 200
     assert b"Review" in resp.data
 
+    # Session page renders; cards load client-side via /review/start.
+    resp = client.get("/review/session")
+    assert resp.status_code == 200
+    assert b"review_session_container" in resp.data
+
     # Sync via the endpoint.
     resp = client.post("/review/sync")
     assert resp.status_code == 200
     assert resp.json["cards_added"] == 1
 
-    # Start + grade via the endpoints.
+
+def test_review_grade_routes(empty_db, spanish, client):
+    "Start + grade via the endpoints."
+    pytest.importorskip("fsrs")
+
+    terms = add_terms(spanish, ["perro"])
+    db.session.add(terms[0])
+    db.session.commit()
+
+    from lute.models.review import ReviewSpec
+
+    spec = ReviewSpec()
+    spec.name = "dogs"
+    spec.criteria = 'language == "Spanish"'
+    spec.set_card_types(["recognition"])
+    spec.active = True
+    db.session.add(spec)
+    db.session.commit()
+
+    client.post("/review/sync")
+
     resp = client.post("/review/start")
     assert resp.status_code == 200
     cards = resp.json["cards"]
