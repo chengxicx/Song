@@ -4,7 +4,8 @@ Tests for the Bilibili video book feature.
 
 import io
 import json
-from unittest.mock import patch
+from unittest.mock import Mock, patch
+import pytest
 import requests
 from lute.db import db
 from lute.book.service import (
@@ -342,3 +343,176 @@ def test_stream_info_uses_selected_page_duration():
         info = bilibili_stream.stream_info("BV1xx411c7mD", page=2)
     assert info["duration"] == 300
     assert info["cid"] == 202
+
+
+# ---------------------------------------------------------------------
+# Upstream failures must surface as BilibiliStreamError.
+#
+# They used to escape as raw requests exceptions, and since the routes
+# only caught ValueError the request died as an HTML 500 page -- which
+# the DASH player cannot parse, so the player just sat there.  Bilibili
+# bans datacenter / overseas IPs with HTTP 412 (or
+# {"code": -412, "message": "request was banned"}), so this is the
+# normal failure mode of a server that cannot reach Bilibili, not an
+# exotic one.
+# ---------------------------------------------------------------------
+
+
+def _http_error(status):
+    "A requests HTTPError carrying a response with the given status."
+    resp = requests.Response()
+    resp.status_code = status
+    resp.url = "https://api.bilibili.com/x/web-interface/view"
+    return requests.exceptions.HTTPError(f"{status} Client Error", response=resp)
+
+
+def _json_response(payload):
+    "A stand-in for a requests response whose body is JSON."
+    m = Mock()
+    m.raise_for_status.return_value = None
+    m.status_code = 200
+    m.json.return_value = payload
+    return m
+
+
+def test_http_error_412_becomes_stream_error_with_guidance():
+    "A risk-control ban is reported as such, not as a bare 412."
+    from lute.read import bilibili_stream
+
+    with patch.object(bilibili_stream.requests, "get", side_effect=_http_error(412)):
+        with pytest.raises(bilibili_stream.BilibiliStreamError) as exc:
+            bilibili_stream.stream_info("BV1risk412", 1)
+    msg = str(exc.value)
+    assert "412" in msg
+    assert "risk control" in msg
+    assert "official embed" in msg
+
+
+def test_blocked_body_with_banned_code_becomes_stream_error():
+    "The real blocked response shape (code -412) is not mistaken for success."
+    from lute.read import bilibili_stream
+
+    banned = _json_response({"code": -412, "message": "request was banned"})
+    with patch.object(bilibili_stream.requests, "get", return_value=banned):
+        with pytest.raises(bilibili_stream.BilibiliStreamError) as exc:
+            bilibili_stream.stream_info("BV1banned1", 1)
+    assert "request was banned" in str(exc.value)
+
+
+def test_non_json_body_becomes_stream_error():
+    "A risk-control HTML page must not surface as a JSON decode error."
+    from lute.read import bilibili_stream
+
+    m = Mock()
+    m.raise_for_status.return_value = None
+    m.status_code = 200
+    m.json.side_effect = ValueError("Expecting value: line 1 column 1")
+    with patch.object(bilibili_stream.requests, "get", return_value=m):
+        with pytest.raises(bilibili_stream.BilibiliStreamError) as exc:
+            bilibili_stream.stream_info("BV1htmlpage", 1)
+    assert "non-JSON" in str(exc.value)
+
+
+def test_connection_error_becomes_stream_error():
+    "A transport failure is wrapped too."
+    from lute.read import bilibili_stream
+
+    boom = requests.exceptions.ConnectionError("dns failure")
+    with patch.object(bilibili_stream.requests, "get", side_effect=boom):
+        with pytest.raises(bilibili_stream.BilibiliStreamError):
+            bilibili_stream.stream_info("BV1dnsfail1", 1)
+
+
+def test_unreachable_proxy_becomes_stream_error():
+    """A dead egress proxy is the expected steady-state failure, not a 500.
+
+    LUTE_BILIBILI_PROXY points at an SSH reverse tunnel, so it is
+    unreachable whenever that tunnel is down (the far end slept, the SSH
+    session dropped, the proxy was stopped).  requests raises ProxyError,
+    which must degrade the page to the embed player rather than crash it.
+    """
+    from lute.read import bilibili_stream
+
+    boom = requests.exceptions.ProxyError(
+        "Cannot connect to proxy", OSError("Connection refused")
+    )
+    with patch.object(bilibili_stream.requests, "get", side_effect=boom):
+        with pytest.raises(bilibili_stream.BilibiliStreamError):
+            bilibili_stream.stream_info("BV1noproxy1", 1)
+
+
+def test_page_out_of_range_raises_stream_error():
+    "An out-of-range page is an expected error, not a ValueError."
+    from lute.read import bilibili_stream
+
+    view = {"duration": 10, "pages": [{"cid": 101, "duration": 10}]}
+    with patch.object(bilibili_stream, "_fetch_view", return_value=view):
+        with pytest.raises(bilibili_stream.BilibiliStreamError):
+            bilibili_stream.stream_info("BV1pageoor1", page=9)
+
+
+def test_missing_dash_raises_stream_error():
+    "A video with no playable DASH streams is reported, not crashed on."
+    from lute.read import bilibili_stream
+
+    view = {"duration": 10, "pages": [{"cid": 101, "duration": 10}]}
+    with patch.object(bilibili_stream, "_fetch_view", return_value=view), \
+         patch.object(bilibili_stream, "_fetch_playurl", return_value={}):
+        with pytest.raises(bilibili_stream.BilibiliStreamError) as exc:
+            bilibili_stream.stream_info("BV1nodashx1", page=1)
+    assert "No playable stream" in str(exc.value)
+
+
+def test_proxy_stream_connection_error_becomes_stream_error():
+    "An unreachable CDN segment host raises the module's own error."
+    from lute.read import bilibili_stream
+
+    boom = requests.exceptions.ConnectTimeout("pcdn node timed out")
+    with patch.object(bilibili_stream.requests, "get", side_effect=boom):
+        with pytest.raises(bilibili_stream.BilibiliStreamError) as exc:
+            bilibili_stream.proxy_stream("https://cdn.example/x.m4s", "bytes=0-1")
+    assert "CDN segment" in str(exc.value)
+
+
+# ---------------------------------------------------------------------
+# The stream routes answer with JSON and a 502, never an HTML 500 page.
+# ---------------------------------------------------------------------
+
+
+def test_mpd_route_returns_502_json_when_stream_unavailable(client):
+    "The manifest endpoint reports upstream failure as JSON."
+    from lute.read import bilibili_stream
+
+    err = bilibili_stream.BilibiliStreamError("request was banned")
+    with patch.object(bilibili_stream, "stream_info", side_effect=err):
+        resp = client.get("/read/bilibili/stream/mpd/BV1xx411c7mD?page=1")
+    assert resp.status_code == 502
+    assert resp.is_json
+    assert "request was banned" in resp.get_json()["error"]
+
+
+def test_mpd_route_returns_502_when_stream_info_raises_unexpectedly(client):
+    "Even an unexpected upstream exception must not become an HTML 500."
+    from lute.read import bilibili_stream
+
+    with patch.object(
+        bilibili_stream, "stream_info", side_effect=bilibili_stream.BilibiliStreamError("x")
+    ):
+        resp = client.get("/read/bilibili/stream/mpd/BV1xx411c7mD?page=1")
+    assert resp.status_code != 500
+    assert resp.is_json
+
+
+def test_proxy_route_returns_502_json_when_segment_unavailable(client):
+    "A failing CDN relay is reported as JSON, not as a 500 page."
+    from lute.read import bilibili_stream
+
+    info = {"video": {"baseUrl": "https://cdn.example/v.m4s"},
+            "audio": {"baseUrl": "https://cdn.example/a.m4s"}}
+    err = bilibili_stream.BilibiliStreamError("CDN segment request failed")
+    with patch.object(bilibili_stream, "stream_info", return_value=info), \
+         patch.object(bilibili_stream, "proxy_stream", side_effect=err):
+        resp = client.get("/read/bilibili/stream/proxy/BV1xx411c7mD/video?page=1")
+    assert resp.status_code == 502
+    assert resp.is_json
+    assert "CDN segment" in resp.get_json()["error"]

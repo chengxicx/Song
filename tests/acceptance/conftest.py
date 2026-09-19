@@ -16,7 +16,7 @@ import requests
 
 import pytest
 from pytest_bdd import given, when, then, parsers
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 from tests.acceptance.lute_test_client import LuteTestClient
 
 
@@ -73,12 +73,33 @@ def session_chrome_browser(request, _environment_check):
 
     playwright = sync_playwright().start()
 
+    # A cold browser start easily blows past 4s on a loaded or sandboxed
+    # machine, and the fixture is session-scoped: when the launch fails
+    # every test in the suite fails with it.  A wider cap costs nothing
+    # on a warm machine.
+    launch_timeout = int(os.environ.get("LUTE_TEST_BROWSER_LAUNCH_TIMEOUT", 20000))
     launch_options = {
-        "timeout": 4000,
+        "timeout": launch_timeout,
         "headless": headless,
         # Chromium-specific launch args
         "args": ["--disable-blink-features=AutomationControlled"],
     }
+
+    # Environment overrides, for running the acceptance suite on machines
+    # that don't have playwright's bundled chromium (e.g. sandboxed /
+    # proxied environments where the download is blocked).
+    #
+    #   LUTE_TEST_BROWSER_CHANNEL=msedge          use an installed browser
+    #   LUTE_TEST_BROWSER_ARGS="--no-proxy-server"
+    #
+    # Both default to unset, so normal runs and CI are unaffected.
+    channel = os.environ.get("LUTE_TEST_BROWSER_CHANNEL")
+    if channel:
+        launch_options["channel"] = channel
+
+    extra_args = os.environ.get("LUTE_TEST_BROWSER_ARGS", "").split()
+    if extra_args:
+        launch_options["args"] = launch_options["args"] + extra_args
 
     browser = playwright.chromium.launch(**launch_options)
 
@@ -131,10 +152,13 @@ def fixture_lute_client(request, chromebrowser):
     yield c
 
 
-@pytest.fixture(name="_restore_jp_parser")
-def fixture_restore_jp_parser(luteclient):
-    "Hack for test: restore a parser using the dev api."
+@pytest.fixture(name="_restore_jp_parsers")
+def fixture_restore_jp_parsers(luteclient):
+    "Hack for test: restore the parsers using the dev api."
     yield
+    luteclient.change_parser_registry_key(
+        "disabled_japanese_sudachi", "japanese_sudachi"
+    )
     luteclient.change_parser_registry_key("disabled_japanese", "japanese")
 
 
@@ -166,13 +190,20 @@ def given_running_site(luteclient):
     assert "Lute" in luteclient.page.content()
 
 
-@given('I disable the "japanese" parser')
-def disable_japanese_parser(luteclient, _restore_jp_parser):
+@given("I disable the Japanese parsers")
+def disable_japanese_parsers(luteclient, _restore_jp_parsers):
+    "Disable both: the language may be on either one."
+    luteclient.change_parser_registry_key(
+        "japanese_sudachi", "disabled_japanese_sudachi"
+    )
     luteclient.change_parser_registry_key("japanese", "disabled_japanese")
 
 
-@given('I enable the "japanese" parser')
-def enable_jp_parser(luteclient):
+@given("I enable the Japanese parsers")
+def enable_jp_parsers(luteclient):
+    luteclient.change_parser_registry_key(
+        "disabled_japanese_sudachi", "japanese_sudachi"
+    )
     luteclient.change_parser_registry_key("disabled_japanese", "japanese")
 
 
@@ -460,8 +491,15 @@ def when_post_bulk_edits_while_reading(luteclient, content):
 @then(parsers.parse('the reading page term form frame contains "{text}"'))
 def then_reading_page_term_form_iframe_contains(luteclient, text):
     "Have to get and read the iframe content, it's not in the main browser page."
-    iframe = luteclient.page.frame(name="wordframe")
-    assert text in iframe.content()
+    # Retry rather than reading the frame's document once: on a failed save
+    # the frame is only replaced with the re-rendered form (carrying the
+    # validation message) when the POST response arrives, so a single read
+    # can still return the *previous* document.  frame_locator() resolves
+    # the frame lazily too, which avoids page.frame(name=...) returning
+    # None for the instant the frame is navigating.
+    expect(
+        luteclient.page.frame_locator("#wordframeid").locator("body")
+    ).to_contain_text(text)
 
 
 # Reading, word actions
@@ -528,6 +566,10 @@ def when_click_word_press_hotkey(luteclient, word, hotkey):
 @when(parsers.parse('I hover over "{word}"'))
 def when_hover(luteclient, word):
     "Hover over a term."
+    # This is the only reading-text step that does not go through
+    # LuteTestClient.click_word, so it has to do the same readiness wait:
+    # hovering before the text has been swapped in finds no words at all.
+    luteclient.wait_reading_ready()
     # Filter to visible elements: the hidden TTS transcript duplicates
     # reading text, which would otherwise cause false matches.
     els = luteclient.page.locator(f"text={word} >> visible=true")
@@ -548,17 +590,33 @@ def given_set_hotkey(luteclient, hotkey, value):
 
 
 # Reading, paging
+#
+# The fork deleted the reading footer (and with it `#footerNextPage` and
+# `#footerMarkRestAsKnownNextPage`).  Paging now lives in the reading header:
+# `#navNext` runs handle_page_done(arrowMarksKnown, 1), i.e. mark the page as
+# read and go on -- and it also marks the unknown words of the current screen
+# as known when the reading menu's "Mark rest known" toggle is on.  The step
+# names are kept so the .feature files stay untouched.
 
 
 @when(parsers.parse("I click the footer green check"))
 def when_click_footer_check(luteclient):
-    "Click footer."
-    luteclient.page.click("#footerMarkRestAsKnownNextPage")
+    "Mark this page's unknown words known, then go to the next page."
+    luteclient.page.evaluate(
+        """() => {
+        const cb = document.querySelector('#arrow_marks_known');
+        if (cb) {
+          cb.checked = true;
+          cb.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }"""
+    )
+    luteclient.page.click("#navNext")
     time.sleep(0.1)  # Leave this, remove and test fails.
 
 
 @when(parsers.parse("I click the footer next page"))
 def when_click_footer_next_page(luteclient):
-    "Click footer."
-    luteclient.page.click("#footerNextPage")
+    "Go to the next page."
+    luteclient.page.click("#navNext")
     time.sleep(0.1)  # Leave this, remove and test fails.

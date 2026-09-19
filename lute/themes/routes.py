@@ -1,5 +1,7 @@
 "Theming routes."
 
+import hashlib
+
 from flask import Blueprint, Response, jsonify, request, send_from_directory
 
 from lute.themes.service import Service
@@ -10,11 +12,32 @@ from lute.db import db
 bp = Blueprint("themes", __name__, url_prefix="/theme")
 
 
-def _never_cache(response):
-    "Prevent browsers/CDN heuristically caching this dynamic per-user response."
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
+def _etag_of(content):
+    "Strong etag (raw hex) for the given css content."
+    return hashlib.sha1(content.encode("utf-8")).hexdigest()
+
+
+def _immutable_css(content):
+    """
+    Serve content-addressed theme CSS.
+
+    Templates build the URL as /theme/...?v=<sha1 of the css>, so any
+    change to the theme (or custom styles) produces a new URL and the
+    browser can cache this response effectively forever.  The etag
+    304 revalidation is kept as a safety net for stale URLs.
+    """
+    etag = _etag_of(content)
+    headers = {"Cache-Control": "public, max-age=31536000, immutable"}
+    # Weak comparison: intermediaries (e.g. Cloudflare gzip) downgrade
+    # strong etags to W/"..." and the browser echoes that back.
+    if request.if_none_match.contains_weak(etag):
+        response = Response(status=304)
+    else:
+        response = Response(content, 200)
+        response.content_type = "text/css; charset=utf-8"
+    response.headers["ETag"] = f'"{etag}"'
+    for k, v in headers.items():
+        response.headers[k] = v
     return response
 
 
@@ -22,9 +45,7 @@ def _never_cache(response):
 def current_theme():
     "Return current css."
     service = Service(db.session)
-    response = Response(service.get_current_css(), 200)
-    response.content_type = "text/css; charset=utf-8"
-    return _never_cache(response)
+    return _immutable_css(service.get_current_css())
 
 
 @bp.route("/custom_styles", methods=["GET"])
@@ -33,10 +54,7 @@ def custom_styles():
     Return the custom settings for inclusion in the base.html.
     """
     repo = UserSettingRepository(db.session)
-    css = repo.get_value("custom_styles")
-    response = Response(css, 200)
-    response.content_type = "text/css; charset=utf-8"
-    return _never_cache(response)
+    return _immutable_css(repo.get_value("custom_styles"))
 
 
 @bp.route("/next", methods=["POST"])
@@ -76,11 +94,11 @@ def toggle_dark_theme():
 @bp.route("/toggle_highlight", methods=["POST"])
 def toggle_highlight():
     "Fix the highlight."
-    new_setting = not current_settings["show_highlights"]
+    new_setting = not current_settings()["show_highlights"]
     repo = UserSettingRepository(db.session)
     repo.set_value("show_highlights", new_setting)
     db.session.commit()
-    current_settings["show_highlights"] = new_setting
+    current_settings()["show_highlights"] = new_setting
     return jsonify("ok")
 
 

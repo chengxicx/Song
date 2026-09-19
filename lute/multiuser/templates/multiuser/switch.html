@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Multi-user mode{% endblock %}
+
+{% block header %}Multi-user mode{% endblock %}
+
+{% block body %}
+
+<p>Current status: <strong>{{ "ON" if enabled else "OFF" }}</strong></p>
+
+{% if not enabled %}
+
+  <p>
+    When multi-user mode is on, every user gets their own private library
+    (books, terms, settings, audio, images) and logs in with a password.
+  </p>
+
+  {% if has_users_db %}
+  <form method="POST" action="/multiuser/enable" style="max-width: 400px; border: 1px solid #444; padding: 16px; border-radius: 8px;">
+    <p style="margin-top: 0;">A previous multi-user configuration exists.
+      Log in as an admin to re-enable it: your current single-user data
+      will be moved into that account.</p>
+    <label for="username">Admin username</label><br/>
+    <input type="text" id="username" name="username" required autofocus
+           style="width:100%;padding:7px 9px;" /><br/><br/>
+    <label for="password">Password</label><br/>
+    <input type="password" id="password" name="password" required
+           style="width:100%;padding:7px 9px;" /><br/><br/>
+    <button type="submit" style="padding:8px 20px;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer;">Enable multi-user mode</button>
+  </form>
+  {% else %}
+  <form method="POST" action="/multiuser/enable" style="max-width: 400px; border: 1px solid #444; padding: 16px; border-radius: 8px;">
+    <p style="margin-top: 0;">Create the admin account.  Your current books,
+      terms, and settings will be moved into this account and become its
+      private library.</p>
+    <label for="username">Admin username</label><br/>
+    <input type="text" id="username" name="username" required maxlength="32" autofocus
+           style="width:100%;padding:7px 9px;" /> <br/>
+    <small style="color:#868e96;">1-32 characters: letters, digits, . _ -</small><br/><br/>
+    <label for="password">Password</label><br/>
+    <input type="password" id="password" name="password" required
+           style="width:100%;padding:7px 9px;" /><br/><br/>
+    <label for="confirm">Confirm password</label><br/>
+    <input type="password" id="confirm" name="confirm" required
+           style="width:100%;padding:7px 9px;" /><br/><br/>
+    <button type="submit" style="padding:8px 20px;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer;">Enable multi-user mode</button>
+  </form>
+  {% endif %}
+
+{% else %}
+
+  {% if is_admin %}
+  <form method="POST" action="/multiuser/disable" style="max-width: 480px; border: 1px solid #a00; padding: 16px; border-radius: 8px;"
+        onsubmit="return confirm('Disable multi-user mode? Only YOUR data ({{ me }}) will be visible in single-user mode. Other users\\' data is kept but frozen until multi-user mode is enabled again.');">
+    <p style="margin-top: 0;">
+      Disabling returns <strong>your</strong> data ({{ me }}) to single-user mode.
+      Other users' data is <strong>kept but frozen</strong> under the
+      <code>users/</code> folder and cannot be accessed until multi-user mode
+      is enabled again (by an admin).
+    </p>
+    <button type="submit" style="padding:8px 20px;background:#e03131;color:#fff;border:none;border-radius:4px;cursor:pointer;">Disable multi-user mode</button>
+  </form>
+  {% else %}
+  <p>Only an admin can disable multi-user mode.</p>
+  {% endif %}
+
+{% endif %}
+
+{% endblock %}

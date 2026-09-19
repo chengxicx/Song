@@ -410,6 +410,17 @@ span.status98, span.status99 {
   color: inherit; 
 }
 
+/* 单词状态按钮（1-5 / Wkn / Ign）亮色模式适配：
+   Wkn、Ign 的图标本身是黑色（invert(0)），亮色主题不能套用
+   深色主题的 invert(1)，否则选中后图标变白，在浅色背景上看不见。
+   与 LWT / LingQ / Black_and_White 保持一致。 */
+#status label[for="status-5"]::after,
+#status label[for="status-6"]::after,
+#status #status-5:checked + label::after,
+#status #status-6:checked + label::after {
+    filter: invert(0);
+}
+
 /* ---------------------------------------------------------
    7. 底部控件布局对齐
    --------------------------------------------------------- */
@@ -906,6 +917,7 @@ canvas + svg text {
   --yt-color-3: #f7f3ea !important;   /* container bg (matches body bg) */
   --yt-color-4: #007aff !important;   /* primary accent button color */
   --yt-color-5: #ffffff !important;   /* secondary panel bg (timeline/rate) */
+  --yt-buffered-color: rgba(0, 122, 255, 0.18) !important;  /* buffered band: cool light blue on the warm track */
   border: 1px solid rgba(0, 0, 0, 0.12) !important;
   background-color: var(--yt-color-3) !important;
   border-radius: 12px !important;

@@ -4,6 +4,7 @@
 
 import gzip
 import json
+import math
 import os
 from flask import (
     Blueprint,
@@ -18,11 +19,33 @@ from flask import (
 )
 from lute.read.service import Service
 from lute.read.render.service import Service as RenderService
+from lute.read.render.grammar_analysis import (
+    analyze as analyze_grammar,
+    is_japanese_language,
+    is_korean_language,
+    is_english_language,
+    is_spanish_language,
+    is_russian_language,
+    is_french_language,
+    is_german_language,
+    is_thai_language,
+    is_arabic_language,
+)
+from lute.read.render.grammar_analysis_ja import analyze_japanese
+from lute.read.render.grammar_analysis_ko import analyze_korean
+from lute.read.render.grammar_analysis_en import analyze_english
+from lute.read.render.grammar_analysis_es import analyze_spanish
+from lute.read.render.grammar_analysis_ru import analyze_russian
+from lute.read.render.grammar_analysis_fr import analyze_french
+from lute.read.render.grammar_analysis_de import analyze_german
+from lute.read.render.grammar_analysis_th import analyze_thai
+from lute.read.render.grammar_analysis_ar import analyze_arabic
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form, serialize_term_form_data
 from lute.settings.current import current_settings
+from lute.multiuser.context import current_scope_key
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
 from lute.models.term import Term
@@ -31,6 +54,7 @@ from lute.book.service import (
     bilibili_embed_url,
     bilibili_video_id,
     bilibili_page,
+    media_audio_url,
 )
 from lute.tts.routes import get_lang_code_for
 from lute.db import db
@@ -48,15 +72,24 @@ bp = Blueprint("read", __name__, url_prefix="/read")
 _yt_subtitle_words_cache = {}
 
 
+def _subtitle_cache_key(book_id, srt_data):
+    "Cache key scoped per user: book ids differ between user dbs."
+    return (current_scope_key(), book_id, srt_data)
+
+
 def invalidate_yt_subtitle_cache(book_id=None):
     """Clear the subtitle word-HTML cache.
 
     Called after term status updates so the subtitle re-renders with
-    fresh data-status-class values.  If book_id is given, only that
-    book's entries are cleared; otherwise the entire cache is wiped.
+    fresh data-status-class values.  If book_id is given, only the
+    current user's entry for that book is cleared; otherwise the
+    entire cache is wiped.
     """
     if book_id is not None:
-        for k in [k for k in _yt_subtitle_words_cache if k[0] == book_id]:
+        scope = current_scope_key()
+        for k in [
+            k for k in _yt_subtitle_words_cache if k[0] == scope and k[1] == book_id
+        ]:
             _yt_subtitle_words_cache.pop(k, None)
     else:
         _yt_subtitle_words_cache.clear()
@@ -72,15 +105,16 @@ def patch_yt_subtitle_caches_for_term(texts):
     (10-20s for long books) that invalidation would force on the next
     fetch.  Multiword terms still need invalidate_yt_subtitle_cache().
     """
-    needles = [
-        (t or "").replace("\u200b", "").strip().lower()
-        for t in (texts or [])
-    ]
+    needles = [(t or "").replace("\u200b", "").strip().lower() for t in (texts or [])]
     needles = [n for n in needles if n]
     if not needles:
         return
     br = BookRepository(db.session)
-    for book_id, srt_data in list(_yt_subtitle_words_cache.keys()):
+    scope = current_scope_key()
+    for entry_scope, book_id, srt_data in list(_yt_subtitle_words_cache.keys()):
+        if entry_scope != scope:
+            # Another user's cached book: not visible from this db.
+            continue
         haystack = (srt_data or "").lower()
         if not any(n in haystack for n in needles):
             continue
@@ -105,31 +139,19 @@ def _fmt_seconds(secs):
     return f"{m}:{s:02d}"
 
 
-def _subtitle_words_html(book):
-    """
-    Render word-by-word HTML for each subtitle cue, so the scrolling
-    subtitle line can reuse the exact reading-page tokenization and
-    click behavior.
+_SUBTITLE_BOOK_TYPES = ("youtube", "bilibili", "mp3", "netease", "video")
 
-    The book text is the cues joined by newlines, so tokenizing the
-    joined text and splitting on the end-of-paragraph sentinel (¶)
-    yields one chunk per cue.  Returns a list of HTML strings aligned
-    with book.cues.
 
-    Results are cached per book, keyed by (book id, srt_data) so that
-    subtitle changes produce a fresh render (see
-    _yt_subtitle_words_cache).
+def _render_cue_chunks(cues, lang):
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "video"):
-        return []
-    cache_key = (book.id, book.srt_data)
-    cached = _yt_subtitle_words_cache.get(cache_key)
-    if cached is not None and _subtitle_cache_is_fresh(cached):
-        return cached["html"]
-    cues = list(book.cues)
-    if not cues:
-        return []
-    lang = book.language
+    Tokenize the given cues and render each cue's word spans.
+
+    The cue texts are joined by newlines, so tokenizing the joined text
+    and splitting on the end-of-paragraph sentinel (¶) yields one chunk
+    per cue.  Returns (rendered, statuses): a list of HTML strings
+    aligned with `cues`, plus the term statuses baked into them (used to
+    detect a stale cache entry, see _subtitle_cache_is_fresh).
+    """
     render_service = RenderService(db.session)
     # Internal newlines in a single cue are replaced with a space so
     # each cue maps to exactly one paragraph (and therefore one chunk).
@@ -165,32 +187,72 @@ def _subtitle_words_html(book):
     # Pad/truncate so the list aligns with the cues.
     while len(rendered) < len(cues):
         rendered.append("")
-    result = rendered[: len(cues)]
-
-    # Record the term statuses that were baked into the rendered HTML so
-    # later requests served by *other* gunicorn workers can detect when
-    # the cache has gone stale (see _subtitle_cache_is_fresh).
     statuses = {
         ti.wo_id: ti.wo_status
         for chunk in chunks
         for ti in chunk
         if ti.wo_id is not None
     }
-    _yt_subtitle_words_cache[cache_key] = {"html": result, "statuses": statuses}
-    return result
+    return rendered[: len(cues)], statuses
+
+
+def _subtitle_words_html(book):
+    """
+    Render word-by-word HTML for each subtitle cue, so the scrolling
+    subtitle line can reuse the exact reading-page tokenization and
+    click behavior.  Returns a list of HTML strings aligned with
+    book.cues.
+
+    Results are cached per book, keyed by (book id, srt_data) so that
+    subtitle changes produce a fresh render (see
+    _yt_subtitle_words_cache).
+    """
+    if (book.book_type or "") not in _SUBTITLE_BOOK_TYPES:
+        return []
+    cache_key = _subtitle_cache_key(book.id, book.srt_data)
+    cached = _yt_subtitle_words_cache.get(cache_key)
+    if cached is not None and _subtitle_cache_is_fresh(cached):
+        return cached["html"]
+    cues = list(book.cues)
+    if not cues:
+        return []
+    rendered, statuses = _render_cue_chunks(cues, book.language)
+    _yt_subtitle_words_cache[cache_key] = {"html": rendered, "statuses": statuses}
+    return rendered
+
+
+def _subtitle_words_window(book, start, end):
+    """
+    Word HTML for cues [start, end] only, as (total, {index: html}).
+
+    Served from the full-book cache when one exists; otherwise just this
+    range is tokenized.  Tokenizing a whole book's subtitles (a long
+    video is tens of thousands of words) takes tens of seconds and holds
+    a request thread the whole time -- far too long to make the first
+    subtitle line wait for, and enough to stall the app on its own.
+    """
+    if (book.book_type or "") not in _SUBTITLE_BOOK_TYPES:
+        return 0, {}
+    cues = list(book.cues)
+    total = len(cues)
+    if total == 0:
+        return 0, {}
+    start = max(0, min(start, total - 1))
+    end = max(start, min(end, total - 1))
+
+    cache_key = _subtitle_cache_key(book.id, book.srt_data)
+    cached = _yt_subtitle_words_cache.get(cache_key)
+    if cached is not None and _subtitle_cache_is_fresh(cached):
+        html = cached["html"]
+        return total, {str(i): html[i] for i in range(start, end + 1)}
+
+    rendered, _statuses = _render_cue_chunks(cues[start : end + 1], book.language)
+    return total, {str(start + i): h for i, h in enumerate(rendered)}
 
 
 def _save_new_subtitle_terms(textitems):
     "Save status-0 terms created while tokenizing subtitle text."
-    new_terms = [
-        ti.term for ti in textitems
-        if ti.is_word and ti.term is not None
-        and ti.term.id is None and ti.term.status == 0
-    ]
-    if new_terms:
-        for t in new_terms:
-            db.session.add(t)
-        db.session.commit()
+    Service(db.session).save_new_textitem_terms(textitems)
 
 
 def _cue_indices_matching_term(cues, term_text):
@@ -206,10 +268,7 @@ def _cue_indices_matching_term(cues, term_text):
     needle = (term_text or "").replace(ZWS, "").strip().lower()
     if not needle:
         return []
-    return [
-        i for i, c in enumerate(cues)
-        if needle in (c.get("text") or "").lower()
-    ]
+    return [i for i, c in enumerate(cues) if needle in (c.get("text") or "").lower()]
 
 
 def _rerender_subtitle_cues(book, indices):
@@ -229,12 +288,15 @@ def _rerender_subtitle_cues(book, indices):
         return {}
     lang = book.language
     render_service = RenderService(db.session)
-    cache_key = (book.id, book.srt_data)
+    # One indexer reused across every cue being re-rendered, instead of
+    # a fresh multiword-table query per cue.
+    mw = render_service.get_multiword_indexer(lang)
+    cache_key = _subtitle_cache_key(book.id, book.srt_data)
     cached = _yt_subtitle_words_cache.get(cache_key)
     result = {}
     for i in valid:
         cue_text = (cues[i].get("text") or "").replace("\n", " ")
-        textitems = render_service.get_textitems(cue_text, lang)
+        textitems = render_service.get_textitems(cue_text, lang, mw)
         _save_new_subtitle_terms(textitems)
         parts = []
         for ti in textitems:
@@ -268,16 +330,12 @@ def _subtitle_cache_is_fresh(entry):
     if not statuses:
         return True
     wids = list(statuses.keys())
-    rows = (
-        db.session.query(Term.id, Term.status)
-        .filter(Term.id.in_(wids))
-        .all()
-    )
+    rows = db.session.query(Term.id, Term.status).filter(Term.id.in_(wids)).all()
     current = dict(rows)
     return all(current.get(wid) == status for wid, status in statuses.items())
 
 
-def _sync_media_page_text_to_cues(book, original_text, new_text):
+def _sync_media_page_text_to_cues(book, pagenum, original_text, new_text):
     """
     Propagate an edited page's text back into the subtitle cue texts.
 
@@ -287,19 +345,29 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
     ``book.srt_data``).  ``edit_page`` only updates the page's Text record,
     so without this the player would keep showing the old subtitle text.
 
-    We locate the edited page's lines within the full cue line stream,
-    then write the new lines back into the corresponding cues.  Only the
-    common single-line-per-cue case is handled; if the alignment isn't
-    clean (e.g. multi-line cues, or a different number of lines after the
-    edit) we leave the cues untouched rather than risk corrupting them.
+    The page is *anchored to its own position* in the cue line stream -- the
+    cumulative line count of the pages before it -- and its lines are
+    written to exactly those cues.  Anchoring matters.  Locating the page by
+    best content match *anywhere* in the book is ambiguous: a page whose
+    text has drifted by one line (e.g. two lines were merged, so the page
+    has one line fewer than the cues it covers) matches a neighbouring run
+    of cues much better than its own, and writing the page there silently
+    shifts/duplicates whole subtitles.  Subtitle sync for book 270 was
+    destroyed exactly that way.
 
-    Returns True if ``book.srt_data`` was updated, False otherwise.
+    Only the clean single-line-per-cue case is handled.  When anything
+    doesn't line up (a line was added/removed/merged, multi-line cues, or
+    the page text has drifted from the cues) the cues are left untouched
+    and the caller is told, rather than guessing and corrupting them.
+
+    Returns "updated" (srt_data written), "unchanged" (nothing to do), or
+    "mismatch" (page text and cues don't line up; cues left alone).
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "video"):
-        return False
+    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "netease", "video"):
+        return "unchanged"
     cues = list(book.cues)
     if not cues:
-        return False
+        return "unchanged"
 
     def _norm(s):
         # The page text may carry CRLF/CR line endings (or stray \r) while
@@ -309,7 +377,7 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
     orig_lines = [_norm(x) for x in (original_text or "").split("\n")]
     new_lines = [_norm(x) for x in (new_text or "").split("\n")]
     if not orig_lines or not new_lines:
-        return False
+        return "unchanged"
 
     # The full cue line stream is exactly how book.text is built
     # ("\n".join(cue text)).  Each line maps back to its owning cue, so
@@ -321,29 +389,35 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
         full_lines.extend(segs)
         line_to_cue.extend([idx] * len(segs))
 
-    # Locate the edited page's lines by best alignment: pick the stream
-    # offset whose block shares the most lines with the page, tolerating a
-    # few lines that were already edited/drifted without giving up entirely.
     n = len(orig_lines)
-    best_index = None
-    best_score = -1
-    for i in range(len(full_lines) - n + 1):
-        score = sum(1 for k in range(n) if full_lines[i + k] == orig_lines[k])
-        if score > best_score:
-            best_score = score
-            best_index = i
-    if best_index is None or best_score <= 0:
-        return False
-    start = best_index
+    # A changed line count means the page no longer maps one line per cue
+    # (a line was added, removed, merged or split); don't guess.
+    if len(new_lines) != n:
+        return "mismatch"
 
-    covered = line_to_cue[start : start + n]
+    # The page's first line sits at the cumulative line count of the pages
+    # before it: pages are contiguous runs of "\n".join(cue text).
+    anchor = 0
+    for t in book.texts:
+        if t.order < pagenum:
+            anchor += len(_norm(t.text).split("\n"))
+    if anchor + n > len(full_lines):
+        return "mismatch"
+
+    covered = line_to_cue[anchor : anchor + n]
     cue_start = covered[0]
     # Only handle the clean single-line-cue case (the norm for subtitles),
     # where the covered cues are exactly one cue per line.
     if covered != list(range(cue_start, cue_start + n)):
-        return False
-    if len(new_lines) != n:
-        return False
+        return "mismatch"
+
+    # The page text must still agree with the cues it claims to cover: a
+    # couple of drifted lines are tolerated (users fix lines out of band),
+    # but a wholesale mismatch means the text and the subtitles have already
+    # drifted apart, and writing here would corrupt the cues.
+    score = sum(1 for k in range(n) if full_lines[anchor + k] == orig_lines[k])
+    if score < n - 2:
+        return "mismatch"
 
     changed = False
     for offset, line in enumerate(new_lines):
@@ -352,11 +426,119 @@ def _sync_media_page_text_to_cues(book, original_text, new_text):
             cues[k]["text"] = line
             changed = True
     if not changed:
-        return False
+        return "unchanged"
 
     book.srt_data = json.dumps(cues, ensure_ascii=False)
     invalidate_yt_subtitle_cache(book.id)
-    return True
+    return "updated"
+
+
+def _page_cue_span(book, pagenum, line_count):
+    """
+    Absolute cue indices covered by a media book page's lines, or None
+    when the page and the cues don't line up.
+
+    Same positional anchoring as _sync_media_page_text_to_cues: the
+    page's first line sits at the cumulative line count of the pages
+    before it, and only the clean one-line-per-cue case is handled (a
+    page whose lines straddle a multi-line cue has no contiguous cue
+    span, so the timing panel is not offered for it).
+    """
+    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "netease", "video"):
+        return None
+    cues = list(book.cues)
+    if not cues or not line_count:
+        return None
+
+    def _norm(s):
+        return (s or "").replace("\r", "")
+
+    line_to_cue = []
+    for idx, cue in enumerate(cues):
+        segs = _norm(cue.get("text") or "").split("\n")
+        line_to_cue.extend([idx] * len(segs))
+
+    anchor = 0
+    for t in book.texts:
+        if t.order < pagenum:
+            anchor += len(_norm(t.text).split("\n"))
+    if anchor + line_count > len(line_to_cue):
+        return None
+    covered = line_to_cue[anchor : anchor + line_count]
+    if covered != list(range(covered[0], covered[0] + line_count)):
+        return None
+    return covered
+
+
+def _parse_cue_data(raw):
+    """
+    Parse the timing panel's submitted cue JSON (a list of
+    {i, start, end, text} objects); None when absent or invalid, which
+    falls back to the legacy plain-text sync.
+    """
+    if not raw:
+        return None
+    try:
+        data = json.loads(raw)
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(data, list):
+        return None
+    items = [d for d in data if isinstance(d, dict)]
+    return items or None
+
+
+def _apply_media_page_cue_data(book, pagenum, new_text, cue_data):
+    """
+    Write the timing panel's structured cue edits (text + start/end) back
+    into book.cues, keyed by absolute cue index.
+
+    Same anchoring rules as _sync_media_page_text_to_cues: the page must
+    still be a contiguous one-line-per-cue run, or nothing is written and
+    the caller flashes the mismatch warning.  The text-drift tolerance
+    check is deliberately not applied: the panel is populated from the
+    cues themselves, so its values stay authoritative even when the page
+    text has drifted from them.
+
+    Returns "updated", "unchanged", or "mismatch" (same meanings as
+    _sync_media_page_text_to_cues).
+    """
+    new_lines = (new_text or "").replace("\r", "").split("\n")
+    span = _page_cue_span(book, pagenum, len(new_lines))
+    if span is None:
+        return "mismatch"
+    allowed = set(span)
+    cues = list(book.cues)
+    changed = False
+    for item in cue_data:
+        try:
+            i = int(item["i"])
+            if i not in allowed:
+                continue
+            start = float(item["start"])
+            end = float(item["end"])
+            txt = str(item.get("text") or "")
+        except (KeyError, TypeError, ValueError):
+            continue
+        if not (
+            math.isfinite(start) and math.isfinite(end) and start >= 0 and end >= 0
+        ):
+            continue
+        cue = cues[i]
+        if cue.get("start") != start:
+            cue["start"] = start
+            changed = True
+        if cue.get("end") != end:
+            cue["end"] = end
+            changed = True
+        if cue.get("text") != txt:
+            cue["text"] = txt
+            changed = True
+    if not changed:
+        return "unchanged"
+    book.srt_data = json.dumps(cues, ensure_ascii=False)
+    invalidate_yt_subtitle_cache(book.id)
+    return "updated"
 
 
 def _render_book_page(book, pagenum, track_page_open=True):
@@ -371,7 +553,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         return redirect("/", 302)
 
     lang = book.language
-    show_highlights = current_settings["show_highlights"]
+    show_highlights = current_settings()["show_highlights"]
     lang_repo = LanguageRepository(db.session)
     term_dicts = lang_repo.all_dictionaries()[lang.id]["term"]
 
@@ -387,7 +569,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         bvid, _aid = bilibili_video_id(book.source_uri)
         bilibili_page_num = bilibili_page(book.source_uri)
     srt_cues = []
-    if book_type in ("youtube", "bilibili", "mp3", "video"):
+    if book_type in ("youtube", "bilibili", "mp3", "netease", "video"):
         srt_cues = list(book.cues)
         for c in srt_cues:
             c["start_str"] = _fmt_seconds(c.get("start", 0))
@@ -408,9 +590,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
     # stale file: replacing the audio changes its mtime, which changes
     # the URL, which bypasses the old cache entry.
     def _versioned_audio_url():
-        fname = os.path.join(
-            current_app.env_config.useraudiopath, book.audio_filename
-        )
+        fname = os.path.join(current_app.env_config.useraudiopath, book.audio_filename)
         try:
             version = int(os.stat(fname).st_mtime)
         except OSError:
@@ -423,13 +603,14 @@ def _render_book_page(book, pagenum, track_page_open=True):
             mp3_audio_url = _versioned_audio_url()
         elif book.media_url:
             mp3_audio_url = book.media_url
-    elif book.audio_filename and book_type in ("mp3", ""):
+    elif book.audio_filename and book_type in ("mp3", "netease", ""):
         mp3_audio_url = _versioned_audio_url()
 
     # The unified player backend: youtube = iframe, video = HTML5 video,
     # audio = HTML5 audio.  Bilibili books use their own template.
     media_backend = (
-        "youtube" if book_type == "youtube"
+        "youtube"
+        if book_type == "youtube"
         else ("video" if book_type == "video" else "audio")
     )
 
@@ -485,7 +666,9 @@ def read(bookid):
 
     page_num = 1
     if not book.texts:
-        flash(f"Book {book.title} has no pages (possibly the parser failed to split text).")
+        flash(
+            f"Book {book.title} has no pages (possibly the parser failed to split text)."
+        )
         return redirect("/", 302)
 
     text = book.texts[0]
@@ -555,7 +738,7 @@ def screen_done():
 
     service = Service(db.session)
     count = service.set_terms_to_known(wordids, book)
-    return jsonify({ "updated": count })
+    return jsonify({"updated": count})
 
 
 @bp.route("/delete_page/<int:bookid>/<int:pagenum>", methods=["GET"])
@@ -603,8 +786,17 @@ def new_page(bookid, position, pagenum):
         return redirect(f"/read/{book.id}", 302)
 
     text_dir = "rtl" if book.language.right_to_left else "ltr"
+    # page_edit_form.html renders the lyrics-timing panel state, and
+    # `{{ page_cues | tojson }}` raises on an undefined variable -- passing
+    # nothing here made every "add page" 500.  A page that is being created is
+    # empty, so it has no cues and no timing panel.
     return render_template(
-        "read/page_edit_form.html", hide_top_menu=True, form=form, text_dir=text_dir
+        "read/page_edit_form.html",
+        hide_top_menu=True,
+        form=form,
+        text_dir=text_dir,
+        page_cues=[],
+        cue_audio_url=None,
     )
 
 
@@ -640,19 +832,31 @@ def bilibili_mpd(bvid):
     The manifest's BaseURLs point at our own proxy endpoints so the
     browser never talks to Bilibili directly (which would be blocked by
     CORS / anti-leeching).  ``page`` selects a multi-part video page.
+
+    Every video rendition Bilibili offers gets a Representation, each
+    with its own proxy URL carrying a ``q`` index.  The player therefore
+    holds all the qualities at once and can switch between them from its
+    settings menu; the cheapest one is listed first and is what the
+    player starts on, since the stream is relayed over a narrow egress.
     """
     page = request.args.get("page", 1, type=int)
     try:
         info = bilibili_stream.stream_info(bvid, page)
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
-    video_proxy = url_for(
-        "read.bilibili_proxy", bvid=bvid, stream_type="video", page=page
-    )
+    except bilibili_stream.BilibiliStreamError as e:
+        # 502: the upstream (Bilibili) is the one failing here, not this
+        # app.  Returning JSON matters -- the DASH player parses the body,
+        # and an unhandled exception used to surface as an HTML 500 page.
+        return jsonify({"error": str(e)}), 502
+    video_proxies = [
+        url_for(
+            "read.bilibili_proxy", bvid=bvid, stream_type="video", page=page, q=i
+        )
+        for i in range(len(info.get("videos") or [info["video"]]))
+    ]
     audio_proxy = url_for(
         "read.bilibili_proxy", bvid=bvid, stream_type="audio", page=page
     )
-    mpd = bilibili_stream.build_mpd(info, video_proxy, audio_proxy)
+    mpd = bilibili_stream.build_mpd(info, video_proxies, audio_proxy)
     return Response(mpd, mimetype="application/dash+xml")
 
 
@@ -660,21 +864,39 @@ def bilibili_mpd(bvid):
 def bilibili_proxy(bvid, stream_type):
     """Proxy a range request for a Bilibili DASH segment to the CDN.
 
-    ``stream_type`` is "video" or "audio".  Adds the Referer / UA headers
-    the CDN requires and relays the byte range the player asked for.
+    ``stream_type`` is "video" or "audio"; for video, ``q`` picks which
+    rendition to relay (0 is the cheapest, matching the manifest order).
+    Adds the Referer / UA headers the CDN requires and relays the byte
+    range the player asked for.
     """
     if stream_type not in ("video", "audio"):
         return jsonify({"error": "invalid stream type"}), 400
     page = request.args.get("page", 1, type=int)
+    quality = request.args.get("q", 0, type=int)
     range_header = request.headers.get("Range")
     try:
         info = bilibili_stream.stream_info(bvid, page)
-        stream = info[stream_type]
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
-    status, headers, content = bilibili_stream.proxy_stream(
-        stream["baseUrl"], range_header
-    )
+    except bilibili_stream.BilibiliStreamError as e:
+        return jsonify({"error": str(e)}), 502
+    if stream_type == "video":
+        # ``videos`` is the full rendition list; info built before that
+        # existed (or by a caller that only ever picks one) carries just
+        # ``video``, and then there is nothing to index into.
+        renditions = info.get("videos")
+        if renditions:
+            if quality < 0 or quality >= len(renditions):
+                return jsonify({"error": "invalid video quality"}), 400
+            stream = renditions[quality]
+        else:
+            stream = info["video"]
+    else:
+        stream = info["audio"]
+    try:
+        status, headers, content = bilibili_stream.proxy_stream(
+            stream["baseUrl"], range_header
+        )
+    except bilibili_stream.BilibiliStreamError as e:
+        return jsonify({"error": str(e)}), 502
     return Response(content, status=status, headers=headers)
 
 
@@ -711,7 +933,13 @@ def youtube_subtitle_words(bookid):
     With ``?term=<text>`` (or ``?cue=<index>``) only the affected cues
     are re-rendered and the cached entry is patched in place; the
     response is then {"cues": {cue_index: html}, "patched": bool}
-    instead of a full list.  This keeps term saves cheap: no full-book
+    instead of a full list.
+
+    With ``?from=<i>&to=<j>`` only that inclusive cue range is returned,
+    as {"total": n, "cues": {index: html}}: the full-book payload is
+    several MB of HTML, which is far too much to parse up front on a
+    slow device, so the player fetches a window around the play position
+    and fills the rest in as playback moves.  This keeps term saves cheap: no full-book
     re-tokenization and no multi-megabyte payload while the audio is
     playing.  ``patched`` is false when no cached entry existed, telling
     the player its WORDS copy may be wholly out of sync (e.g. after the
@@ -721,7 +949,18 @@ def youtube_subtitle_words(bookid):
     book = _find_book(bookid)
     term_text = request.args.get("term")
     cue_arg = request.args.get("cue")
-    if book is not None and (term_text is not None or cue_arg is not None):
+    from_arg = request.args.get("from")
+    to_arg = request.args.get("to")
+    if book is not None and (from_arg is not None or to_arg is not None):
+        # Windowed fetch: the player asks only for the cues around the
+        # play position and fills the rest in as playback moves.  When no
+        # full-book render is cached, only this range is tokenized --
+        # doing the whole book up front can take tens of seconds.
+        start = int(from_arg) if (from_arg or "").isdigit() else 0
+        end = int(to_arg) if (to_arg or "").isdigit() else 0
+        total, cues_html = _subtitle_words_window(book, start, end)
+        resp = jsonify({"total": total, "cues": cues_html})
+    elif book is not None and (term_text is not None or cue_arg is not None):
         cues = list(book.cues)
         if term_text is not None:
             indices = _cue_indices_matching_term(cues, term_text)
@@ -729,12 +968,16 @@ def youtube_subtitle_words(bookid):
             indices = [int(cue_arg)]
         else:
             indices = []
-        patched = (book.id, book.srt_data) in _yt_subtitle_words_cache
+        patched = (
+            _subtitle_cache_key(book.id, book.srt_data) in _yt_subtitle_words_cache
+        )
         result = _rerender_subtitle_cues(book, indices)
-        resp = jsonify({
-            "cues": {str(i): h for i, h in result.items()},
-            "patched": patched,
-        })
+        resp = jsonify(
+            {
+                "cues": {str(i): h for i, h in result.items()},
+                "patched": patched,
+            }
+        )
     elif book is None:
         resp = jsonify([])
     else:
@@ -822,6 +1065,106 @@ def render_page_fragment(book, pagenum, track_page_open=False):
 def empty():
     "Show an empty/blank page."
     return ""
+
+
+@bp.route("/grammar_analysis/<int:bookid>/<int:pagenum>", methods=["GET"])
+def grammar_analysis(bookid, pagenum):
+    """
+    Analyze the grammar points on the current reading page.
+
+    Reads the page's original text and returns JSON:
+      [{ "name", "level", "desc", "examples": [{"sentence", "matches"}] }]
+
+    "matches" lists the exact substrings matched inside each example
+    sentence, so the reader can highlight the grammar words.
+
+    Japanese books use the Sudachi-based POS-aware engine; other
+    languages fall back to the regex-based rule library.
+    """
+    book = _find_book(bookid)
+    if book is None:
+        return jsonify({"error": "book not found"}), 404
+    lang = book.language
+    # The reader splits one Lute page into sub-screens; analyse only the
+    # current sub-screen when the client supplies its text, falling back to
+    # the whole page otherwise.
+    snippet = request.args.get("text", "")
+    if snippet.strip():
+        page_text = snippet
+    else:
+        # Manga pages store no page text -- the words live in the .mokuro
+        # OCR data, so rebuild the page text from the OCR blocks.
+        manga_text = _manga_page_text(book, pagenum)
+        page_text = manga_text if manga_text is not None else book.text_at_page(pagenum).text
+    # The reader renders empty paragraphs as a zero-width-space placeholder
+    # and can inject the 🔊 audio marker into the text the client sends
+    # back; both are display artifacts, not grammar.  Strip them before
+    # analysis so no tokenizer/analyzer ever sees them (the Japanese and
+    # Korean engines do the same internally).
+    page_text = page_text.replace("\u200b", "").replace("🔊", "")
+    display = getattr(lang, "grammar_translate_lang", "") or "en"
+    if is_japanese_language(lang):
+        return jsonify(analyze_japanese(page_text, display_lang=display))
+    if is_korean_language(lang):
+        return jsonify(analyze_korean(page_text, display_lang=display))
+    # The European engines need optional heavy dependencies (spaCy models /
+    # pymorphy3); when they are missing, fall back to the generic regex
+    # rule library instead of failing the panel.
+    for detector, engine, extra in (
+        (is_english_language, analyze_english, "english"),
+        (is_spanish_language, analyze_spanish, "spanish"),
+        (is_russian_language, analyze_russian, "russian"),
+        (is_french_language, analyze_french, "french"),
+        (is_german_language, analyze_german, "german"),
+        (is_thai_language, analyze_thai, "thai"),
+        (is_arabic_language, analyze_arabic, "arabic"),
+    ):
+        if detector(lang):
+            try:
+                return jsonify(engine(page_text, display_lang=display))
+            except (ImportError, OSError):
+                current_app.logger.warning(
+                    "%s grammar engine not installed; using the basic regex rules. "
+                    'Run: pip install -e ".[%s]"',
+                    extra.capitalize(),
+                    extra,
+                )
+                break
+    render_service = RenderService(db.session)
+    paragraphs = render_service.get_paragraphs(page_text, lang)
+    sentences = [
+        "".join(ti.text for ti in sentence)
+        for para in paragraphs
+        for sentence in para
+    ]
+    return jsonify(analyze_grammar(sentences))
+
+
+def _manga_page_text(book, pagenum):
+    """
+    Rebuild the natural text of one manga page from its .mokuro OCR data.
+
+    Manga books store no text in their page Text objects (the words only
+    exist in the OCR blocks), so grammar analysis must reconstruct the
+    text from the block lines.  Returns None when the book has no manga
+    data or the page is out of range.
+    """
+    manga = getattr(book, "manga", None) or {}
+    pages = manga.get("pages") or []
+    if not 1 <= pagenum <= len(pages):
+        return None
+    chunks = []
+    for block in pages[pagenum - 1].get("blocks") or []:
+        for line in block.get("lines") or []:
+            # A mokuro "line" can hold several physical rows joined by
+            # newlines or the "¶" paragraph marker; treat each as its own
+            # sentence chunk.
+            for phys in line.replace("¶", "\n").split("\n"):
+                if phys.strip():
+                    chunks.append(phys.strip())
+    if not chunks:
+        return None
+    return "。".join(chunks) + "。"
 
 
 def _term_form_action(term):
@@ -925,14 +1268,53 @@ def edit_page(bookid, pagenum):
     if form.validate_on_submit():
         form.populate_obj(text)
         db.session.add(text)
-        # For media books the reading text is driven by the subtitle cues;
-        # propagate the edit back into the cues so the player subtitles
-        # reflect the change.
-        _sync_media_page_text_to_cues(book, original_text, text.text)
+        # For media books the reading text is driven by the subtitle cues.
+        # The page's timing panel (when shown) submits structured cue
+        # edits (text + start/end times) by absolute cue index; without
+        # it, fall back to propagating the plain text edits into the cue
+        # texts so the player subtitles reflect the change.
+        cue_data = _parse_cue_data(request.form.get("cue_data"))
+        if cue_data is not None:
+            status = _apply_media_page_cue_data(book, pagenum, text.text, cue_data)
+        else:
+            status = _sync_media_page_text_to_cues(
+                book, pagenum, original_text, text.text
+            )
         db.session.commit()
+        if status == "mismatch":
+            flash(
+                "Saved, but the subtitles were not updated: this page no "
+                "longer has the same number of lines as the subtitle cues "
+                "it covers (a line was added, removed, merged or split), or "
+                "its text has drifted from the subtitles.  Keep one line "
+                "per subtitle line, or re-import the subtitle file.",
+                "notice",
+            )
         return redirect(f"/read/{book.id}", 302)
 
     text_dir = "rtl" if book.language.right_to_left else "ltr"
+    # Lyrics timing panel: the page's cues (with absolute indices) and the
+    # book's audio stream, so the panel can offer per-line timing edits.
+    page_cues = []
+    cue_audio_url = None
+    page_lines = (original_text or "").replace("\r", "").split("\n")
+    span = _page_cue_span(book, pagenum, len(page_lines))
+    if span is not None:
+        page_cues = [
+            {
+                "i": i,
+                "start": book.cues[i].get("start", 0),
+                "end": book.cues[i].get("end", 0),
+                "text": book.cues[i].get("text") or "",
+            }
+            for i in span
+        ]
+        cue_audio_url = media_audio_url(book)
     return render_template(
-        "read/page_edit_form.html", hide_top_menu=True, form=form, text_dir=text_dir
+        "read/page_edit_form.html",
+        hide_top_menu=True,
+        form=form,
+        text_dir=text_dir,
+        page_cues=page_cues,
+        cue_audio_url=cue_audio_url,
     )

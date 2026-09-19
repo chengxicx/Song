@@ -10,8 +10,9 @@ from lute.models.repositories import UserSettingRepository
 from lute.language.service import Service
 from lute.language.forms import LanguageForm
 from lute.db import db
-from lute.parse.registry import supported_parsers
+from lute.parse.registry import selectable_parsers, supported_parsers
 from lute.parse.plugin_installer import ensure_parser_available
+from lute.read.render import grammar_analysis
 
 bp = Blueprint("language", __name__, url_prefix="/language")
 
@@ -111,9 +112,15 @@ def _dropdown_parser_choices(language=None):
     Sudachi for Japanese, Turkish for Turkish) plus the generic
     space-delimited parser as fallback.  Parsers for *other* languages
     (e.g. Turkish while editing Japanese) are hidden.
+
+    Legacy parsers (ref registry.__LUTE_LEGACY_PARSERS__) are offered
+    for new languages only indirectly: they're never in the general
+    list, but the language's *current* parser type is always kept
+    visible, so an existing language still using one doesn't silently
+    get its parser changed.
     """
     if language is None:
-        return [(a[0], a[1].name()) for a in supported_parsers()]
+        return [(a[0], a[1].name()) for a in selectable_parsers()]
 
     lang_name = (language.name or "").strip().lower()
     lang_type = (getattr(language, "parser_type", "") or "").strip().lower()
@@ -126,7 +133,7 @@ def _dropdown_parser_choices(language=None):
             return True
         return any(l in lang_name for l in langs)
 
-    matched = [(k, v.name()) for k, v in supported_parsers() if _matches(k, v)]
+    matched = [(k, v.name()) for k, v in selectable_parsers() if _matches(k, v)]
     if matched:
         # Keep the currently-selected parser visible even if the
         # language name doesn't match it (e.g. a custom-named
@@ -140,7 +147,7 @@ def _dropdown_parser_choices(language=None):
     # language).
     return [
         (k, v.name())
-        for k, v in supported_parsers()
+        for k, v in selectable_parsers()
         if v.languages() is None
     ]
 
@@ -165,7 +172,22 @@ def edit(langid):
 
     _add_hidden_dictionary_template_entry(form)
 
-    return render_template("language/edit.html", form=form, language=language)
+    return render_template(
+        "language/edit.html",
+        form=form,
+        language=language,
+        engine_status=grammar_analysis.grammar_engine_status(language),
+    )
+
+
+@bp.route("/grammar_engine/install/<string:extra>", methods=["POST"])
+def grammar_engine_install(extra):
+    """
+    Pip-install the packages providing one language's grammar engine.
+    """
+    ok, message = grammar_analysis.install_grammar_engine(extra)
+    flash(message, "success" if ok else "danger")
+    return redirect(url_for("language.index"))
 
 
 @bp.route("/new", defaults={"langname": None}, methods=["GET", "POST"])

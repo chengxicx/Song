@@ -210,6 +210,7 @@ span.hamburger {
   --yt-color-3: #48484a;   /* container background (matches --background-color) */
   --yt-color-4: #5a5a5c;   /* primary accent (play / transcript btn) */
   --yt-color-5: #3e3e40;   /* secondary panel (timeline wrap, rate) */
+  --yt-buffered-color: rgba(128, 149, 255, 0.28);   /* buffered band: muted fill blue on the #3e3e40 track */
   border-color: #293137 !important;
   background-color: var(--yt-color-3) !important;
 }

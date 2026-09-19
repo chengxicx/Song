@@ -11,8 +11,9 @@ bp = Blueprint("userimages", __name__, url_prefix="/userimages")
 @bp.route("/<int:lgid>/<path:f>", methods=["GET"])
 def get_image(lgid, f):
     "Serve the image from the data/userimages directory."
-    datapath = current_app.config["DATAPATH"]
-    directory = os.path.join(datapath, "userimages", str(lgid))
+    # env_config is the user-scoped proxy: in multi-user mode images
+    # live under the current user's own userimages directory.
+    directory = os.path.join(current_app.env_config.userimagespath, str(lgid))
     if not os.path.exists(os.path.join(directory, f)):
         return ""
     return send_from_directory(directory, f)

@@ -15,8 +15,8 @@
   <link rel="icon" href="{{ url_for('static', filename='favicon_dev.ico') }}" type="image/x-icon"/>
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon_dev.ico') }}" type="image/x-icon"/>
   {% else %}
-  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}?v=2" type="image/x-icon"/>
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}?v=2" type="image/x-icon"/>
+  <link rel="icon" href="{{ vstatic('favicon.ico') }}" type="image/x-icon"/>
+  <link rel="shortcut icon" href="{{ vstatic('favicon.ico') }}" type="image/x-icon"/>
   {% endif %}
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -24,8 +24,12 @@
   <meta name="theme-color" content="#2563eb" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="application-name" content="Lute" />
-  <meta name="apple-mobile-web-app-title" content="Lute" />
+  <meta name="application-name" content="Song" />
+  <meta name="apple-mobile-web-app-title" content="Song" />
+  {# iOS "Add to Home Screen" prefers apple-touch-icon over manifest icons;
+     without it Safari falls back to a page screenshot (showing the old
+     Lute header logo). #}
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/img/icon-192.png" />
 
   {# Clean the address bar: if the URL contains BasicAuth credentials, replace
      the URL in the history (no reload). The <base> tag above already ensures
@@ -45,40 +49,69 @@
   </script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
     
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/jquery/jquery-ui.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tagify/tagify.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/tagify/tagify_overrides.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/datatables/datatables.min.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}?v={{ asset_cache_bust }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/player-styles.css') }}?v={{ asset_cache_bust }}" />
+  {# vstatic() = url_for('static', ...) + ?v=<content hash>, so these
+     immutable-cached assets are re-fetched exactly when they change. #}
 
-  <link rel="stylesheet" type="text/css" href="/theme/current?v={{ current_theme }}">
-  <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ current_theme }}">
+  {# The reading page loads a trimmed asset set: it needs none of
+     DataTables / Tagify / jeditable.  DataTables is listing-page only;
+     the term form runs inside its own iframe document
+     (read/term_form_base.html) which loads its own Tagify + jeditable.
+     Skipping them removes ~80 KB and 5 requests from the reading page,
+     which matters because every request costs a full round trip.
+     jQuery UI is NOT skipped: lute.js calls $.fn.tooltip() for the term
+     popup on the reading page. #}
+  {% set _reading_page = (request.endpoint or '').startswith('read.') %}
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/jquery/jquery-ui.css') }}" />
+  {% if not _reading_page %}
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/tagify/tagify.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/tagify/tagify_overrides.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/datatables/datatables.min.css') }}" />
+  {% endif %}
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('css/player-styles.css') }}" />
+
+  {# Content-addressed theme css: the ?v= hash changes whenever the
+     theme changes, so the response can be cached effectively forever.
+     An empty custom_styles skips its request entirely. #}
+  {% if theme_css_hash %}
+  <link rel="stylesheet" type="text/css" href="/theme/current?v={{ theme_css_hash }}">
+  {% endif %}
+  {% if custom_styles %}
+  <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ custom_styles_hash }}">
+  {% endif %}
 
   {% block preloadassets %}{% endblock %}
 
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery-ui.min.js') }}"  charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.jeditable.mini.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/tagify/tagify.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/tagify/tagify.polyfills.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/datatables/datatables.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/datatables/datatables.button.download.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery/jquery.hoverIntent.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery-ui.min.js') }}"  charset="utf-8"></script>
+  {% if not _reading_page %}
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.jeditable.mini.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.polyfills.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/datatables/datatables.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/datatables/datatables.button.download.js') }}" charset="utf-8"></script>
+  {% endif %}
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.hoverIntent.js') }}" charset="utf-8"></script>
 
   <!-- HTMX + Alpine.js: progressive enhancement for partial-page interactions
        and reactive UI state. Loaded before the custom scripts so they can use
        htmx.* / Alpine. They coexist with jQuery (used by DataTables, tooltips,
        jPlayer, etc.). -->
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/htmx/htmx.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='vendor/alpine/alpine.min.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/htmx/htmx.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/alpine/alpine.min.js') }}" defer charset="utf-8"></script>
 
-  <!-- Versioned JS files: cache busting via ?v={{ lute_version }} -->
-  <script type="text/javascript" src="/static/js/never_cache/lute-hotkey-utils.js?v={{ lute_version }}" charset="utf-8"></script>
-  <script type="text/javascript" src="/static/js/never_cache/lute-popups.js?v={{ lute_version }}" charset="utf-8"></script>
-  <script type="text/javascript" src="/static/js/never_cache/lute.js?v={{ lute_version }}" charset="utf-8"></script>
-  <script type="text/javascript" src="/static/js/never_cache/lute-anki.js?v={{ lute_version }}" charset="utf-8"></script>
+  <!-- Lute's own JS: vstatic_js() adds ?v=<content hash>, so editing a
+       file changes its URL and the year-long immutable cache is busted
+       without anyone having to remember a version bump. -->
+  <script type="text/javascript" src="{{ vstatic_js('lute-hotkey-utils.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-popups.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-tooltip.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-cursor.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-touch.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-commands.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-anki.js') }}" charset="utf-8"></script>
 
   <script type="text/javascript">
     const LUTE_USER_SETTINGS = {{ user_settings | safe }}
@@ -177,7 +210,10 @@
       {% if have_languages %}
       <div class="menu-item">
         <span id="menu_books">Book</span>
-        <ul class="sub-menu">
+        <ul class="sub-menu" id="lute-feature-menu-book"
+            hx-get="{{ url_for('lute_feature.menu_fragment', parent='book') }}"
+            hx-trigger="load once"
+            hx-swap="beforeend">
           <li><a id="book_new" href="/book/import_webpage">Create new</a></li>
           <li><a href="/book/settings">Group into Set</a></li>
           <li><a href="/book/archived">Archive</a></li>
@@ -198,7 +234,11 @@
           <li><a id="lang_index" href="/language/index">Languages</a></li>
           <li><a href="/settings/index">Settings</a></li>
           <li><a href="/settings/shortcuts">Keyboard shortcuts</a></li>
+          {% if multiuser_enabled %}
+          <li><a href="/users/index">Users</a></li>
+          {% endif %}
           <li><a id="anki_export_index" href="/ankiexport/index">Anki exports</a></li>
+          <li><a id="feature_panel" href="/_feature/panel">Plugin</a></li>
         </ul>
       </div>
       <div class="menu-item">
@@ -214,6 +254,13 @@
           <li><a href="https://song.canny.io/" target="_blank">Feedback</a></li>
           <li><a href="https://luteorg.github.io/lute-manual/" target="_blank">Docs</a></li>
           <li><a href="https://discord.gg/CzFUQP5m8u" target="_blank">Discord</a></li>
+          {% if multiuser_enabled %}
+          <li>
+            <form method="POST" action="/logout" id="logout-form" style="margin: 0;">
+              <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">Log out ({{ current_username }})</a>
+            </form>
+          </li>
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -237,6 +284,93 @@
       $("#anki_export_index").css('display', 'none');
     }
   });
+</script>
+
+<script>
+  /* Touch-friendly menu-bar dropdowns.
+     The menus are opened by CSS :hover, which on touch screens is a
+     sticky state: the first tap opens a menu and then nothing closes it
+     -- a second tap on the same item keeps the hover alive, and a tap
+     elsewhere does not clear it either.  On devices without hover,
+     drive the menus with taps instead: tap toggles the menu, tapping
+     another item switches, and tapping anywhere else closes whatever
+     is open.  (The open state is the .sub-open class; the CSS :hover
+     rule is limited to (hover: hover) devices in styles.css.) */
+  (function () {
+    var noHover = window.matchMedia("(hover: none)");
+    var down = null;          // pointerdown position, for the tap-vs-scroll check
+    var suppressClick = null; // the backup disk link whose navigation to swallow
+
+    function close_open_menus() {
+      document.querySelectorAll(".menu-item.sub-open, .backup-widget.sub-open")
+        .forEach(function (el) {
+          el.classList.remove("sub-open");
+        });
+    }
+
+    document.addEventListener("pointerdown", function (e) {
+      down = { x: e.clientX, y: e.clientY };
+      suppressClick = null;
+    }, true);
+
+    document.addEventListener("pointerup", function (e) {
+      if (!down) return;
+      var dx = e.clientX - down.x, dy = e.clientY - down.y;
+      down = null;
+      // A drag or scroll that happens to end on the menu bar is not a tap.
+      if (dx * dx + dy * dy > 100) return;
+
+      var toggle = e.target.closest(".menu-item > span, .backup-widget > a");
+      if (toggle) {
+        // Desktop keeps the CSS-hover behavior; don't hijack its taps.
+        if (!noHover.matches) return;
+        var item = toggle.parentElement;
+        // "Home" wraps a plain link and has no dropdown: let it through.
+        if (item.classList.contains("menu-item") &&
+            !item.querySelector(":scope > .sub-menu")) return;
+        e.preventDefault();
+        var wasOpen = item.classList.contains("sub-open");
+        close_open_menus();
+        if (!wasOpen) item.classList.add("sub-open");
+        if (toggle.tagName === "A") {
+          // The backup disk is a real link; on touch it opens the menu
+          // instead of navigating.  Swallow the click it would produce.
+          suppressClick = toggle;
+        }
+        return;
+      }
+      // Taps inside an open menu -- its own links! -- must not close it
+      // first: hiding the menu between touchend and the synthesized
+      // click cancels the click, so the link would never fire.  Only a
+      // tap truly outside the open menu closes it.  (Runs on every
+      // device: a click-away never hurts the hover behavior, and it
+      // cleans up a .sub-open left over after a device change.)
+      if (!e.target.closest(".menu-item.sub-open, .backup-widget.sub-open")) {
+        close_open_menus();
+      }
+    }, true);
+
+    document.addEventListener("click", function (e) {
+      if (suppressClick &&
+          (e.target === suppressClick || suppressClick.contains(e.target))) {
+        e.preventDefault();
+        e.stopPropagation();
+        suppressClick = null;
+      }
+    }, true);
+
+    // A stale .sub-open would keep a menu open after the device gets a
+    // real mouse back: moving the pointer away closes it again.  Only
+    // for real-pointer devices -- on touch, the compatibility mouse
+    // events synthesized after a tap include mouseout with a null
+    // relatedTarget, and closing the menu there would cancel the link
+    // click that follows it.
+    document.addEventListener("mouseout", function (e) {
+      if (noHover.matches) return;
+      var item = e.target.closest(".menu-item.sub-open, .backup-widget.sub-open");
+      if (item && !item.contains(e.relatedTarget)) item.classList.remove("sub-open");
+    });
+  })();
 </script>
 
 <script data-cfasync="false">

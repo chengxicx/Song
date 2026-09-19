@@ -11,7 +11,6 @@ from lute.parse.base import AbstractParser
 from lute.parse.space_delimited_parser import SpaceDelimitedParser, TurkishParser
 from lute.parse.mecab_parser import JapaneseParser
 from lute.parse.sudachi_parser import JapaneseSudachiParser
-from lute.parse.kiwi_parser import KoreanParser
 from lute.parse.character_parser import ClassicalChineseParser
 
 
@@ -20,9 +19,25 @@ __LUTE_PARSERS__ = {
     "turkish": TurkishParser,
     "japanese": JapaneseParser,
     "japanese_sudachi": JapaneseSudachiParser,
-    "korean": KoreanParser,
     "classicalchinese": ClassicalChineseParser,
 }
+
+
+# Parser types kept only for backwards compatibility.
+#
+# These stay registered, and they stay in supported_parser_types() --
+# the book and term lists filter on that, so removing a parser type
+# would silently hide the books and terms of any language still using
+# it.  What they lose is being *offered*: they no longer appear in the
+# "Parse as" dropdown for a new language.  They remain selectable for a
+# language that already uses them, and language definition files can
+# still fall back to them via `parser_type_fallback` (ref
+# Language.from_dict).
+#
+# "japanese" (MeCab) is the backup for "japanese_sudachi": sudachipy is
+# an optional extra, natto-py is a core dependency, so a machine without
+# sudachipy can still load the predefined Japanese language.
+__LUTE_LEGACY_PARSERS__ = {"japanese"}
 
 
 def init_parser_plugins():
@@ -86,6 +101,23 @@ def supported_parsers():
 
 def supported_parser_types():
     """
-    List of supported Language.parser_types
+    List of supported Language.parser_types.
+
+    Includes the legacy parser types: this is what the book and term
+    lists filter on, so a legacy type must keep the data that uses it
+    visible.
     """
     return list(a[0] for a in supported_parsers())
+
+
+def is_legacy_parser(parser_name) -> bool:
+    "True if the parser is only kept for backwards compatibility."
+    return parser_name in __LUTE_LEGACY_PARSERS__
+
+
+def selectable_parsers():
+    """
+    Parsers to offer when creating a new language: everything supported
+    except the legacy types.
+    """
+    return [(k, v) for k, v in supported_parsers() if k not in __LUTE_LEGACY_PARSERS__]

@@ -124,6 +124,7 @@ span.hamburger {
   --yt-color-3: #48484a;   /* container bg (matches --background-color) */
   --yt-color-4: #5692AE;   /* primary accent (matches status-4 tone) */
   --yt-color-5: #3e3e40;   /* secondary panel (timeline wrap, rate) */
+  --yt-buffered-color: rgba(213, 255, 255, 0.22);   /* buffered band: dimmed fill tone on the #3e3e40 track */
   border-color: var(--dark-grey) !important;
   background-color: var(--yt-color-3) !important;
 }

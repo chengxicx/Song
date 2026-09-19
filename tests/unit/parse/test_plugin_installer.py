@@ -15,6 +15,7 @@ def test_plugin_package_mapping():
     "Known parser types map to their pip packages."
     assert pi.plugin_package_for("lute_cantonese") == "lute3-cantonese"
     assert pi.plugin_package_for("lute_mandarin") == "lute3-mandarin"
+    assert pi.plugin_package_for("lute_korean") == "lute3-korean"
     assert pi.plugin_package_for("spacedel") is None
     assert pi.plugin_package_for(None) is None
 
@@ -113,3 +114,100 @@ def test_ensure_parser_available_pip_failure(tmp_path, monkeypatch):
     assert ok is False
     assert "boom" in message
     assert "lute3-thai" in message, "falls back to PyPI package name"
+
+
+def test_ensure_existing_language_parsers(app_context, monkeypatch):
+    "Missing whitelisted parsers for existing languages are auto-installed."
+    from lute.db import db
+    from lute.models.language import Language
+
+    lang = Language()
+    lang.name = "Korean Existing (test)"
+    lang.parser_type = "lute_korean"
+    db.session.add(lang)
+    db.session.commit()
+
+    calls = []
+    monkeypatch.setattr(pi, "is_auto_installable", lambda pt: pt == "lute_korean")
+    monkeypatch.setattr(
+        pi,
+        "ensure_parser_available",
+        lambda pt: calls.append(pt) or (True, "mocked install"),
+    )
+
+    results = pi.ensure_existing_language_parsers(db.session)
+    assert calls == ["lute_korean"]
+    assert results == [("Korean Existing (test)", True, "mocked install")]
+
+
+def test_ensure_existing_language_parsers_skips_ok(app_context, monkeypatch):
+    "Languages with a supported/non-whitelisted parser are left untouched."
+    from lute.db import db
+    from lute.models.language import Language
+
+    lang = Language()
+    lang.name = "Plain (test)"
+    lang.parser_type = "spacedel"
+    db.session.add(lang)
+    db.session.commit()
+
+    calls = []
+    monkeypatch.setattr(pi, "is_auto_installable", lambda pt: False)
+    monkeypatch.setattr(
+        pi, "ensure_parser_available", lambda pt: calls.append(pt) or (True, "")
+    )
+
+    results = pi.ensure_existing_language_parsers(db.session)
+    assert results == []
+    assert calls == []
+
+
+def test_ensure_existing_language_parsers_heals_spacedel_by_name(
+    app_context, monkeypatch
+):
+    "A language on spacedel whose name matches a plugin is installed + healed."
+    from lute.db import db
+    from lute.models.language import Language
+
+    lang = Language()
+    lang.name = "Korean"
+    lang.parser_type = "spacedel"
+    db.session.add(lang)
+    db.session.commit()
+
+    calls = []
+    monkeypatch.setattr(pi, "is_auto_installable", lambda pt: False)
+    monkeypatch.setattr(
+        pi,
+        "ensure_parser_available",
+        lambda pt: calls.append(pt) or (True, "mocked install"),
+    )
+
+    results = pi.ensure_existing_language_parsers(db.session)
+    assert calls == ["lute_korean"]
+    assert results == [("Korean", True, "mocked install")]
+    # parser_type was restored to point at the plugin and persisted.
+    lang2 = db.session.query(Language).filter(Language.name == "Korean").first()
+    assert lang2.parser_type == "lute_korean"
+
+
+def test_ensure_existing_language_parsers_name_match_fails(app_context, monkeypatch):
+    "A failed install still reports the failure and does not change parser."
+    from lute.db import db
+    from lute.models.language import Language
+
+    lang = Language()
+    lang.name = "Korean"
+    lang.parser_type = "spacedel"
+    db.session.add(lang)
+    db.session.commit()
+
+    monkeypatch.setattr(pi, "is_auto_installable", lambda pt: False)
+    monkeypatch.setattr(
+        pi, "ensure_parser_available", lambda pt: (False, "install exploded")
+    )
+
+    results = pi.ensure_existing_language_parsers(db.session)
+    assert results == [("Korean", False, "install exploded")]
+    plain = db.session.query(Language).filter(Language.name == "Korean").first()
+    assert plain.parser_type == "spacedel"

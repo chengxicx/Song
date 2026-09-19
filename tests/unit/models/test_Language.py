@@ -6,8 +6,10 @@ Low value but ensure that the db mapping is correct.
 
 from lute.db import db
 from lute.db.demo import Service as DemoService
+from lute.language.service import Service
 from lute.models.language import Language
 from lute.models.repositories import LanguageRepository
+from lute.parse.registry import is_supported
 from tests.dbasserts import assert_sql_result
 
 
@@ -123,3 +125,57 @@ def test_tts_and_translate_fields_roundtrip(app_context):
     e3 = Language.from_dict(d)
     assert e3.tts_lang == "en-GB"
     assert e3.translate_target_lang == "zh-CN"
+
+
+def _def_with_parser(parser_type, fallback=None):
+    d = {"name": "Testlang", "dictionaries": [], "parser_type": parser_type}
+    if fallback is not None:
+        d["parser_type_fallback"] = fallback
+    return d
+
+
+def test_from_dict_uses_the_preferred_parser_when_available(monkeypatch):
+    "The fallback is ignored while the preferred parser is installed."
+    monkeypatch.setattr("lute.models.language.is_supported", lambda pt: True)
+    lang = Language.from_dict(_def_with_parser("japanese_sudachi", "japanese"))
+    assert lang.parser_type == "japanese_sudachi"
+
+
+def test_from_dict_falls_back_when_preferred_parser_is_missing(monkeypatch):
+    """
+    sudachipy is an optional extra, so a machine without it must still
+    be able to load the predefined Japanese language -- via the MeCab
+    parser, which is a core dependency.
+    """
+    monkeypatch.setattr(
+        "lute.models.language.is_supported", lambda pt: pt == "japanese"
+    )
+    lang = Language.from_dict(_def_with_parser("japanese_sudachi", "japanese"))
+    assert lang.parser_type == "japanese", "fell back to the backup parser"
+
+
+def test_from_dict_keeps_an_unsupported_parser_without_a_fallback(monkeypatch):
+    "No fallback declared means no substitution."
+    monkeypatch.setattr("lute.models.language.is_supported", lambda pt: False)
+    lang = Language.from_dict(_def_with_parser("japanese_sudachi"))
+    assert lang.parser_type == "japanese_sudachi"
+
+
+def test_from_dict_ignores_an_unavailable_fallback(monkeypatch):
+    "Don't switch to a parser that isn't there either."
+    monkeypatch.setattr("lute.models.language.is_supported", lambda pt: False)
+    lang = Language.from_dict(_def_with_parser("japanese_sudachi", "japanese"))
+    assert lang.parser_type == "japanese_sudachi"
+
+
+def test_japanese_definition_prefers_sudachi_and_falls_back_to_mecab(app_context):
+    "The real definition file: Sudachi preferred, MeCab declared backup."
+    service = Service(db.session)
+    lang = service.get_language_def("Japanese").language
+    assert lang.parser_type in ("japanese_sudachi", "japanese"), lang.parser_type
+    # Which one we end up with depends on what's installed here; the
+    # preferred one wins whenever sudachipy is present.
+    if is_supported("japanese_sudachi"):
+        assert lang.parser_type == "japanese_sudachi"
+    elif is_supported("japanese"):
+        assert lang.parser_type == "japanese", "the fallback"

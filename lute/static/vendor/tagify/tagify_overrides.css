@@ -87,3 +87,21 @@
     padding: 0.1rem !important;
     font-size: 0.8rem;
 }
+
+/* Lute: keep tagify chip text on a single line in the term table.
+   Base tagify uses `white-space: pre-wrap` on the chip text, so ZWS
+   (zero-width space, used as token separators in Japanese terms like
+   "ない\u200bよう\u200bに\u200bする") and "/" in CJK tags become ugly
+   wrap points when the Parents/Tags columns are narrow. Force
+   `nowrap` and let the chip extend past the cell (the <tags> scope
+   already has flex-wrap: wrap, so multiple long chips fall to a new
+   row of chips cleanly). */
+table#termtable .tagify__tag,
+table#termtable .tagify__tag > div,
+table#termtable .tagify__tag > div > * {
+    max-width: none;
+}
+table#termtable .tagify__tag > div > * {
+    white-space: nowrap !important;
+    overflow: visible;
+}
