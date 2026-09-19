@@ -66,6 +66,7 @@ from lute.book.service import (
 )
 from lute.tts.routes import get_lang_code_for
 from lute.book.series import series_tag_for_book
+from lute.book.types import subtitle_book_types
 from lute.db import db
 
 
@@ -148,7 +149,9 @@ def _fmt_seconds(secs):
     return f"{m}:{s:02d}"
 
 
-_SUBTITLE_BOOK_TYPES = ("youtube", "bilibili", "mp3", "netease", "video")
+# Subtitle books: their reading text comes from SRT cues.  From the
+# single book-type registry (lute.book.types).
+_SUBTITLE_BOOK_TYPES = subtitle_book_types()
 
 
 def _render_cue_chunks(cues, lang):
@@ -372,7 +375,7 @@ def _sync_media_page_text_to_cues(book, pagenum, original_text, new_text):
     Returns "updated" (srt_data written), "unchanged" (nothing to do), or
     "mismatch" (page text and cues don't line up; cues left alone).
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "netease", "video"):
+    if (book.book_type or "") not in _SUBTITLE_BOOK_TYPES:
         return "unchanged"
     cues = list(book.cues)
     if not cues:
@@ -453,7 +456,7 @@ def _page_cue_span(book, pagenum, line_count):
     page whose lines straddle a multi-line cue has no contiguous cue
     span, so the timing panel is not offered for it).
     """
-    if (book.book_type or "") not in ("youtube", "bilibili", "mp3", "netease", "video"):
+    if (book.book_type or "") not in _SUBTITLE_BOOK_TYPES:
         return None
     cues = list(book.cues)
     if not cues or not line_count:
@@ -578,7 +581,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         bvid, _aid = bilibili_video_id(book.source_uri)
         bilibili_page_num = bilibili_page(book.source_uri)
     srt_cues = []
-    if book_type in ("youtube", "bilibili", "mp3", "netease", "video"):
+    if book_type in _SUBTITLE_BOOK_TYPES:
         srt_cues = list(book.cues)
         for c in srt_cues:
             c["start_str"] = _fmt_seconds(c.get("start", 0))

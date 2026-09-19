@@ -9,6 +9,17 @@ from lute.app_factory import create_app
 from lute.multiuser import context, paths, store, switching
 
 
+@pytest.fixture(autouse=True)
+def _multiuser_tests_use_real_file_dbs(monkeypatch):
+    """
+    Multi-user mode is built on per-user on-disk sqlite files (switching
+    moves them around), so these tests opt out of the process-wide
+    in-memory test db (see tests/conftest.py).
+    """
+    monkeypatch.delenv("LUTE_DB_URI", raising=False)
+    monkeypatch.delenv("LUTE_DATAPATH", raising=False)
+
+
 @pytest.fixture(name="mu_datapath")
 def fixture_mu_datapath(tmp_path):
     "A clean datapath + config file for a multi-user test app."

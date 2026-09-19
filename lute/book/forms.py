@@ -4,19 +4,14 @@ Book create/edit forms.
 
 import json
 from flask import request
-from wtforms import (
-    StringField,
-    SelectField,
-    TextAreaField,
-    IntegerField,
-    HiddenField,
-    SelectMultipleField,
-)
+from wtforms import StringField, SelectField, TextAreaField, IntegerField, HiddenField, SelectMultipleField
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.widgets import ListWidget, CheckboxInput
+
+from lute.book.types import selectable_type_choices, subtitle_book_types
 
 # Global configuration for allowed audio files
 ALLOWED_AUDIO_EXTENSIONS = [
@@ -36,7 +31,9 @@ AUDIO_VALIDATION_MSG = (
 
 # Book types whose reading text is generated from subtitles: the text
 # field holds the SRT original and the player follows srt_data cues.
-SUBTITLE_BOOK_TYPES = ("youtube", "bilibili", "mp3", "netease", "video")
+# Kept as a module-level name (used by routes too); derived from the
+# single book-type registry (lute.book.types).
+SUBTITLE_BOOK_TYPES = subtitle_book_types()
 
 
 def _tag_values(field_data):
@@ -170,17 +167,8 @@ class EditBookForm(FlaskForm):
     )
 
     # YouTube video / Bilibili video / MP3 audio / Online video book fields.
-    book_type = SelectField(
-        "Type",
-        choices=[
-            ("", "Text"),
-            ("youtube", "YouTube video"),
-            ("bilibili", "Bilibili video"),
-            ("mp3", "MP3 / M4A audio"),
-            ("netease", "NetEase Cloud Music"),
-            ("video", "Online video"),
-        ],
-    )
+    # Choices come from the single book-type registry (lute.book.types).
+    book_type = SelectField("Type", choices=list(selectable_type_choices()))
     youtube_srt = FileField(
         "Subtitle file (SRT / VTT)",
         validators=[
