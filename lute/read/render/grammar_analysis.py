@@ -62,6 +62,54 @@ def is_korean_language(language):
 # no parser_type to key on.
 
 
+def is_mandarin_chinese_language(language):
+    "True if the given Language should use the Mandarin grammar engine."
+    if language is None:
+        return False
+    parser_type = (getattr(language, "parser_type", None) or "").strip().lower()
+    if parser_type == "lute_mandarin":
+        return True
+    if parser_type == "lute_cantonese":
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    if "classical" in name or "文言" in name:
+        return False
+    if (
+        "cantonese" in name
+        or "粤语" in name
+        or "粵語" in name
+        or "广东话" in name
+        or "廣東話" in name
+    ):
+        # "Cantonese Chinese" contains "chinese"; keep the two apart.
+        return False
+    return (
+        "mandarin" in name
+        or "chinese" in name
+        or "中文" in name
+        or "汉语" in name
+        or "漢語" in name
+        or "普通话" in name
+    )
+
+
+def is_cantonese_language(language):
+    "True if the given Language should use the Cantonese grammar engine."
+    if language is None:
+        return False
+    parser_type = (getattr(language, "parser_type", None) or "").strip().lower()
+    if parser_type == "lute_cantonese":
+        return True
+    name = (getattr(language, "name", None) or "").lower()
+    return (
+        "cantonese" in name
+        or "粤语" in name
+        or "粵語" in name
+        or "广东话" in name
+        or "廣東話" in name
+    )
+
+
 def is_english_language(language):
     "True if the given Language should use the spaCy English grammar engine."
     if language is None:
@@ -127,15 +175,35 @@ def is_arabic_language(language):
     return "arabic" in name or "العربية" in name or "阿拉伯语" in name or "阿拉伯文" in name or "阿拉伯語" in name
 
 
+def is_italian_language(language):
+    "True if the given Language should use the spaCy Italian grammar engine."
+    if language is None:
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    return "italian" in name or "italiano" in name or "意大利语" in name or "意大利文" in name or "意大利語" in name
+
+
+def is_portuguese_language(language):
+    "True if the given Language should use the spaCy Portuguese grammar engine."
+    if language is None:
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    return "portuguese" in name or "português" in name or "portugues" in name or "葡萄牙语" in name or "葡萄牙文" in name or "葡萄牙語" in name
+
+
 # ---- startup dependency check -----------------------------------------
 #
 # language label, detector, importable deps, pip extra that provides them
 _ENGINE_REQUIREMENTS = [
+    ("Mandarin Chinese", is_mandarin_chinese_language, (), "chinese"),
+    ("Cantonese", is_cantonese_language, (), "cantonese"),
     ("English", is_english_language, ("spacy", "en_core_web_sm"), "english"),
     ("Spanish", is_spanish_language, ("spacy", "es_core_news_sm"), "spanish"),
     ("Russian", is_russian_language, ("pymorphy3",), "russian"),
     ("French", is_french_language, ("spacy", "fr_core_news_sm"), "french"),
     ("German", is_german_language, ("spacy", "de_core_news_sm"), "german"),
+    ("Italian", is_italian_language, ("spacy", "it_core_news_sm"), "italian"),
+    ("Portuguese", is_portuguese_language, ("spacy", "pt_core_news_sm"), "portuguese"),
     ("Thai", is_thai_language, ("pythainlp",), "thai"),
     ("Arabic", is_arabic_language, ("pyarabic",), "arabic"),
 ]
@@ -162,6 +230,14 @@ _ENGINE_INSTALL_SPECS = {
         "de-core-news-sm@https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.8.0/de_core_news_sm-3.8.0-py3-none-any.whl",
     ],
     "russian": ["pymorphy3>=2.0,<3", "pymorphy3-dicts-ru>=2.4,<3"],
+    "italian": [
+        "spacy>=3.8.0,<3.8.4",
+        "it-core-news-sm@https://github.com/explosion/spacy-models/releases/download/it_core_news_sm-3.8.0/it_core_news_sm-3.8.0-py3-none-any.whl",
+    ],
+    "portuguese": [
+        "spacy>=3.8.0,<3.8.4",
+        "pt-core-news-sm@https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.8.0/pt_core_news_sm-3.8.0-py3-none-any.whl",
+    ],
     "thai": ["pythainlp>=5.0,<6"],
     "arabic": ["pyarabic>=0.6,<2"],
 }
