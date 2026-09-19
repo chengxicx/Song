@@ -430,7 +430,12 @@
       del.className = "btn btn-danger";
       del.setAttribute("onclick", "deleteTerm()");
       del.textContent = "Delete";
-      btn_container.appendChild(del);
+      // Keep the server-rendered order Save / Delete / Grammar: the
+      // container may hold a Grammar button (reading-frame forms), and
+      // appending here would slot Delete after it.
+      const grammar_btn = document.getElementById("btn-grammar");
+      if (grammar_btn) btn_container.insertBefore(del, grammar_btn);
+      else btn_container.appendChild(del);
     } else if (!_current_term_id && del) {
       del.remove();
     }
