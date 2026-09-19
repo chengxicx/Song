@@ -55,10 +55,12 @@ def split_sentences(text):
     carry no sentence-final punctuation and would otherwise collapse into
     one pseudo-sentence (making every grammar example the whole page).
     Abbreviations like "Mr." or "e.g." split too; the engines accept that
-    (the Japanese/Korean matchers have the same limitation).
+    (the Japanese/Korean matchers have the same limitation).  Full-width
+    CJK sentence marks are included so the Chinese/Cantonese engines split
+    with the same helper.
     """
     text = text.replace("\r\n", "\n").replace("\r", "\n")
-    parts = re.split(r"(?<=[.!?…])|\n", text)
+    parts = re.split(r"(?<=[.!?…。！？])|\n", text)
     return [p.strip() for p in parts if p and p.strip()]
 
 
@@ -170,14 +172,18 @@ def _token_runs(match, tokens):
 
 
 def _regex_spans(match, sentence_text):
-    "Character spans for a literal {'re': ...} match shape."
-    if "re" not in match:
-        return []
-    spans = []
-    for m in match["re"].finditer(sentence_text):
-        if m.group(0):
-            spans.append(m.span())
-    return spans
+    """
+    Character spans for {'re': ...} match shapes, collected recursively so
+    a regex alternative inside {"any_of": [...]} counts too.
+    """
+    if "re" in match:
+        return [m.span() for m in match["re"].finditer(sentence_text) if m.group(0)]
+    if "any_of" in match:
+        out = []
+        for alt in match["any_of"]:
+            out.extend(_regex_spans(alt, sentence_text))
+        return out
+    return []
 
 
 def _left_neighbour(tokens, start):
@@ -199,22 +205,21 @@ def match_rule(rule, tokens, sentence_text):
     """
     match = rule["match"]
     runs = _token_runs(match, tokens)
-    if "re" in match:
-        spans = _regex_spans(match, sentence_text)
-    else:
-        spans = []
-        offsets = [t["idx"] for t in tokens]
-        for start, end in runs:
-            veto = False
-            if rule.get("not_after"):
-                neighbour = _left_neighbour(tokens, start)
-                veto = neighbour is not None and _match_condition(rule["not_after"], neighbour)
-            if not veto and end > start:
-                last = tokens[end - 1]
-                # An engine may report the token's true end offset (used when
-                # the matching "surface" is normalised shorter than the text).
-                char_end = last.get("end") or offsets[end - 1] + len(last["surface"])
-                spans.append((offsets[start], char_end))
+    spans = []
+    offsets = [t["idx"] for t in tokens]
+    for start, end in runs:
+        veto = False
+        if rule.get("not_after"):
+            neighbour = _left_neighbour(tokens, start)
+            veto = neighbour is not None and _match_condition(rule["not_after"], neighbour)
+        if not veto and end > start:
+            last = tokens[end - 1]
+            # An engine may report the token's true end offset (used when
+            # the matching "surface" is normalised shorter than the text).
+            char_end = last.get("end") or offsets[end - 1] + len(last["surface"])
+            spans.append((offsets[start], char_end))
+    # Literal regex recognisers (top-level or nested in any_of).
+    spans.extend(_regex_spans(match, sentence_text))
     # Drop duplicate / contained spans, keep reading order.
     spans = sorted(set(spans))
     merged = []
