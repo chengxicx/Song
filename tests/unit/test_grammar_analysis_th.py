@@ -69,7 +69,9 @@ def test_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The Thai engine grades points with CEFR bands."
-    levels = {e["key"]: e["level"] for e in analyze_thai(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"] for e in analyze_thai(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["th_pronouns"] == "A1"
     assert levels["th_passive"] == "B2"
 

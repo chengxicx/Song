@@ -4,27 +4,14 @@ Show books in datatables.
 
 from lute.utils.data_tables import DataTablesSqliteQuery, supported_parser_type_criteria
 from lute.book.stats import difficulty_filter_sql, difficulty_sql_case
-from lute.models.repositories import UserSettingRepository
-from lute.models.repositories import MissingUserSettingKeyException
+from lute.book.series import configured_series_tags
+from lute.book.types import stored_book_type_filter_values
 
 
-def _configured_series_tags(session):
-    """
-    Book tags configured as series (UserSetting 'book_series_tags',
-    comma-separated tag texts).  Returns the raw tag texts, unescaped.
-    """
-    try:
-        raw = UserSettingRepository(session).get_value("book_series_tags") or ""
-    except MissingUserSettingKeyException:
-        raw = ""
-    return [t.strip() for t in raw.split(",") if t.strip()]
-
-
-# Book types the frontend Type chips can filter by.  The value is
-# interpolated into the SQL below, so anything outside this list is
-# ignored.  "text" books store BkBookType = '', "series" is the alias
-# the series-aggregation branch reports for aggregate rows.
-_KNOWN_BOOK_TYPES = ("", "text", "youtube", "bilibili", "mp3", "netease", "video", "manga", "pdf", "series")
+# Book types the frontend Type chips can filter by, from the single
+# book-type registry (lute.book.types).  The value is interpolated into
+# the SQL below, so anything outside this list is ignored.
+_KNOWN_BOOK_TYPES = stored_book_type_filter_values()
 
 
 def _book_type_filter_sql(column, type_filter):
@@ -103,6 +90,7 @@ _BOOK_PROGRESS_SQL = """
       )
     end
 """
+
 
 # NOTE: this must be built at request time, not at module import.
 # The app factory imports this module before init_parser_plugins() runs,
@@ -335,7 +323,7 @@ def get_data_tables_list(parameters, is_archived, session):
     # Series aggregation: books carrying a configured series tag are
     # collapsed into one row per tag.  Any active search or tag filter
     # switches back to the flat listing, so every book stays findable.
-    series_tags = _configured_series_tags(session)
+    series_tags = configured_series_tags(session)
     search_value = (parameters.get("search") or {}).get("value") or ""
     tag_filter = (parameters.get("filtTag") or "").strip()
     use_series_aggregation = (

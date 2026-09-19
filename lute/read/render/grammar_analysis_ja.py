@@ -71,6 +71,7 @@ def _tokens_for(sentence):
 
 # ---- matcher ---------------------------------------------------------
 
+
 def _match_condition(cond, token):
     "True if a single matcher (cond) matches a single token."
     if cond.get("any"):
@@ -267,6 +268,7 @@ def _rule(key, pattern, meaning, examples, patterns, kind="construction"):
         "pattern": pattern,
         "level": "N5",
         "meaning": meaning,
+        "meaning_ko": "",
         "examples": examples,
         "patterns": patterns,
         "kind": kind,
@@ -283,7 +285,10 @@ _N5_RULES = [
         "but; however",
         ["この本は高いですが、面白いです。", "日本語が好きですが、難しいです。"],
         [
-            {"type": "tokens", "conds": [{"surface": "が", "pos1": "助詞", "pos2": "接続助詞"}]},
+            {
+                "type": "tokens",
+                "conds": [{"surface": "が", "pos1": "助詞", "pos2": "接続助詞"}],
+            },
         ],
     ),
     _rule(
@@ -306,7 +311,10 @@ _N5_RULES = [
             # deliberately the bare 〜から so it folds together with the data
             # rules for the same form (_merge_same_name) instead of showing the
             # same から twice.
-            {"type": "tokens", "conds": [{"surface": "から", "pos1": "助詞", "pos2": "接続助詞"}]},
+            {
+                "type": "tokens",
+                "conds": [{"surface": "から", "pos1": "助詞", "pos2": "接続助詞"}],
+            },
         ],
     ),
     _rule(
@@ -342,7 +350,10 @@ _N5_RULES = [
         "marks the place of action or the means of doing something",
         ["学校で勉強します。", "バスで帰ります。"],
         [
-            {"type": "tokens", "conds": [{"surface": "で", "pos1": "助詞", "pos2": "格助詞"}]},
+            {
+                "type": "tokens",
+                "conds": [{"surface": "で", "pos1": "助詞", "pos2": "格助詞"}],
+            },
         ],
         kind="particle",
     ),
@@ -448,7 +459,10 @@ _N5_RULES = [
         "marks time, destination, or indirect target",
         ["7時に起きます。", "日本に行きます。"],
         [
-            {"type": "tokens", "conds": [{"surface": "に", "pos1": "助詞", "pos2": "格助詞"}]},
+            {
+                "type": "tokens",
+                "conds": [{"surface": "に", "pos1": "助詞", "pos2": "格助詞"}],
+            },
         ],
         kind="particle",
     ),
@@ -476,7 +490,10 @@ _N5_RULES = [
         "marks the direct object of a verb",
         ["本を読みます。", "コーヒーを飲みます。"],
         [
-            {"type": "tokens", "conds": [{"surface": "を", "pos1": "助詞", "pos2": "格助詞"}]},
+            {
+                "type": "tokens",
+                "conds": [{"surface": "を", "pos1": "助詞", "pos2": "格助詞"}],
+            },
         ],
         kind="particle",
     ),
@@ -503,7 +520,9 @@ _ALL_LEVELS = ["N5", "N4", "N3", "N2", "N1"]
 # Where the grammar JSON lives, relative to this module:
 #   lute/read/render/grammar_analysis_ja.py  ->  lute/jlpt_data/grammar/
 _DATA_DIR = os.path.normpath(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "jlpt_data", "grammar")
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "..", "jlpt_data", "grammar"
+    )
 )
 
 # Upstream patterns are *descriptive*, not literal: "Noun / V dict + に難くない",
@@ -545,20 +564,22 @@ _SHORT_KANA_LIMIT = 3
 # the same series as koko-soko-asoko-doko above, which どこ already appears in,
 # and once the derivation stopped dropping a pattern's shorter fragments it
 # reached 33% of pages -- and a question word is what the word popup answers.
-_FUNCTION_WORD_IDS = frozenset({
-    "desu-polite-copula",
-    "i-adj-desu-politeness",
-    "na-adjective-nonpast",
-    "na-adjective-past",
-    "masu-polite-verb",
-    "mashita-polite-past-verb",
-    "kore-sore-are-demonstratives",
-    "kono-sono-ano-dono-attributive",
-    "koko-soko-asoko-doko",
-    "question-words-basic",
-    "ikutsu-how-many",
-    "ikura-how-much",
-})
+_FUNCTION_WORD_IDS = frozenset(
+    {
+        "desu-polite-copula",
+        "i-adj-desu-politeness",
+        "na-adjective-nonpast",
+        "na-adjective-past",
+        "masu-polite-verb",
+        "mashita-polite-past-verb",
+        "kore-sore-are-demonstratives",
+        "kono-sono-ano-dono-attributive",
+        "koko-soko-asoko-doko",
+        "question-words-basic",
+        "ikutsu-how-many",
+        "ikura-how-much",
+    }
+)
 
 # Data entries whose form a hand-written rule already reports precisely, and
 # whose own derived spec would either fire on a different reading of the form
@@ -583,12 +604,14 @@ _FUNCTION_WORD_IDS = frozenset({
 #                        yields the bare literal あります, which fires on the
 #                        existence verb wherever it appears, and the same
 #                        hand-written rule reports it.
-_SUPERSEDED_IDS = frozenset({
-    "kara-cause",
-    "imasu-existence-animate",
-    "arimasu-existence-inanimate",
-    "te-imasu-progressive",
-})
+_SUPERSEDED_IDS = frozenset(
+    {
+        "kara-cause",
+        "imasu-existence-animate",
+        "arimasu-existence-inanimate",
+        "te-imasu-progressive",
+    }
+)
 
 # Data entries that are particle usages: their sentences join the single
 # particle row instead of getting a row each, the same treatment the
@@ -618,26 +641,28 @@ _PARTICLE_IDS = frozenset({"particle-kara-from"})
 #   iwaba / nani-se / sorede / ...  (all under 4% of pages)
 #       N1/N2 discourse adverbs and conjunctions.  Lexical, but they are
 #       listed as grammar and cheap enough on the panel not to matter.
-_VOCAB_IDS = frozenset({
-    # number + counter: the counter's own reading is the point, and the word
-    # popup already shows it
-    "counter-tsu",
-    "counter-people-nin",
-    "counter-ji-oclock",
-    "counter-fun-minute",
-    "counter-sai-age",
-    "counter-en-money",
-    "counter-hon-long",
-    "counter-mai-flat",
-    "jikan-time-duration",
-    # calendar / time words
-    "mai-every-prefix",
-    "nanji-what-time",
-    "nanyoubi-day-of-week",
-    # lexical adverbs: the row repeats the word's gloss
-    "issho-ni-together",
-    "ichiban-superlative",
-})
+_VOCAB_IDS = frozenset(
+    {
+        # number + counter: the counter's own reading is the point, and the word
+        # popup already shows it
+        "counter-tsu",
+        "counter-people-nin",
+        "counter-ji-oclock",
+        "counter-fun-minute",
+        "counter-sai-age",
+        "counter-en-money",
+        "counter-hon-long",
+        "counter-mai-flat",
+        "jikan-time-duration",
+        # calendar / time words
+        "mai-every-prefix",
+        "nanji-what-time",
+        "nanyoubi-day-of-week",
+        # lexical adverbs: the row repeats the word's gloss
+        "issho-ni-together",
+        "ichiban-superlative",
+    }
+)
 
 # Data entries that describe a *class* of forms rather than a construction.
 # Their formation text is a list of members, not a template, and nothing in a
@@ -842,7 +867,11 @@ _CONTEXT_MARKERS = [
     ),
     (re.compile(r"[Vv]erb[- ]?stem|V stem|[Vv]erb-?ない stem"), [{"pos1": "動詞"}], False),
     (re.compile(r"[Vv]erb-?ば form|ば ?form"), [{"surface": "ば"}], False),
-    (re.compile(r"[Pp]lain form|V plain|[Vv]erb-?plain"), [{"surface_not": ("の",)}], True),
+    (
+        re.compile(r"[Pp]lain form|V plain|[Vv]erb-?plain"),
+        [{"surface_not": ("の",)}],
+        True,
+    ),
 ]
 
 # Descriptions of pure conjugation tables ("Verb → potential form").  Their
@@ -890,8 +919,14 @@ def _fragment_spec(fragment, joined_examples, example_tokens, prefix=None):
     tokens = _tokens_for(fragment)
     if prefix:
         candidates = [
-            {"type": "tokens", "conds": prefix + [{"surface": t["surface"]} for t in tokens]},
-            {"type": "tokens", "conds": prefix + [{"lemma": {t["lemma"]}} for t in tokens]},
+            {
+                "type": "tokens",
+                "conds": prefix + [{"surface": t["surface"]} for t in tokens],
+            },
+            {
+                "type": "tokens",
+                "conds": prefix + [{"lemma": {t["lemma"]}} for t in tokens],
+            },
         ]
     else:
         candidates = [
@@ -992,7 +1027,24 @@ def _load_zh():
 _ZH_BY_ID = _load_zh()
 
 
-def _make_data_rule(level, item, idx, skipped, specs=None, shown=None, kind="construction"):
+def _load_ko():
+    """
+    Curated Korean glosses, keyed by data entry id (ko.json next to the
+    level files) -- the panel's 한국어 display language, mirroring zh.json.
+    """
+    path = os.path.join(_DATA_DIR, "ko.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+_KO_BY_ID = _load_ko()
+
+
+def _make_data_rule(
+    level, item, idx, skipped, specs=None, shown=None, kind="construction"
+):
     "Turn one curated JSON entry into a rule dict."
     shown = shown or []
     if len(shown) > 1:
@@ -1011,6 +1063,7 @@ def _make_data_rule(level, item, idx, skipped, specs=None, shown=None, kind="con
         "level": level,
         "meaning": item.get("meaning_en") or "",
         "meaning_zh": _ZH_BY_ID.get(item.get("id") or "", ""),
+        "meaning_ko": _KO_BY_ID.get(item.get("id") or "", ""),
         "formation": item.get("formation") or "",
         "examples": [e["japanese"] for e in item.get("examples") or []],
         # "patterns" is what the matcher reads, so an empty list is how a
@@ -1167,6 +1220,15 @@ def _load_level(level):
 
 def _load_all():
     "Load all data-driven levels, tallying how many rules were auto-skipped."
+    # The data rules are derived from Sudachi tokenization of the library
+    # examples.  Base installs ship without the sudachi extra, and this
+    # module is imported at app startup (read routes), so derive nothing
+    # there -- the reading screen falls back to the hand-written rules /
+    # regex library when the engine cannot run.
+    try:
+        _get_tokenizer()
+    except ImportError:
+        return []
     rules = []
     for lvl in _ALL_LEVELS:
         rules.extend(_load_level(lvl))
@@ -1176,6 +1238,34 @@ def _load_all():
 _DATA_RULES = _load_all()
 
 _ALL_RULES = _N5_RULES + _DATA_RULES
+
+
+# Korean descriptions for the hand-written rules (data rules get theirs
+# from ko.json by entry id) -- the panel's 한국어 display language.
+_KO_HAND = {
+    "ga_but": '역접을 나타내는 が("하지만").',
+    "ga_imasu_arimasu": "존재를 나타내는 がいます(사람·동물)/があります(사물).",
+    "kara_reason": '이유를 나타내는 から("~때문에").',
+    "suki_kirai": "좋아함·싫어함을 나타내는 好きです/嫌いです(대상은 が).",
+    "tai": '"~하고 싶다"의 소망을 나타내는 たい.',
+    "ta_koto_ga_arimasu": '경험을 나타내는 たことがあります("~해 본 적이 있다").',
+    "de_place_means": "동작의 장소나 수단을 나타내는 で.",
+    "te_iru": "진행이나 결과 상태를 나타내는 ている.",
+    "te_kudasai": '"~해 주세요"의 부탁 てください.',
+    "deshita": 'です의 과거형 でした("~이었습니다").',
+    "de_wa_arimasen": '"~이 아닙니다"의 정중 부정 ではありません.',
+    "te_wa_ikemasen": '금지를 나타내는 てはいけません("~해선 안 됩니다").',
+    "te_mo_ii_desu": '허가를 나타내는 てもいいです("~해도 됩니다").',
+    "to_and_with": '"~와/~하고"의 と.',
+    "nakute_mo_ii_desu": '"~하지 않아도 됩니다"의 なくてもいいです.',
+    "nakereba_narimasen": '의무를 나타내는 なければなりません/なくてはいけません("~해야 합니다").',
+    "ni_time_destination": "시간·목적지·간접 대상을 나타내는 조사 に.",
+    "mashou": '"~합시다"의 권유 ましょう.',
+    "masen_ka": '"~하지 않으시겠습니까?"의 권유 ませんか.',
+    "wo_object": "직접목적어를 나타내는 조사 を.",
+}
+for _hand_rule in _N5_RULES:
+    _hand_rule["meaning_ko"] = _KO_HAND.get(_hand_rule["key"], "")
 
 
 # Chinese descriptions for grammar analysis, keyed by rule "pattern".
@@ -1291,6 +1381,8 @@ _ZH_DESC = {
 
 _ZH_PARTICLE = "基础 N5 助词检测"
 _ZH_BASICS = "基础敬体・指示词・疑问词（です・ます・これ 等），出现极频繁，仅示意"
+_KO_PARTICLE = "기초 N5 조사 감지"
+_KO_BASICS = "기초 정중체·지시어·의문사（です・ます・これ 등）가 극히 자주 나타나 요약만 표시"
 
 # Number of example sentences shown for the two aggregated entries, and how
 # many distinct symbols (particles / basic forms) are listed in their titles.
@@ -1383,6 +1475,8 @@ def _merge_same_name(entries):
 
 def _desc(rule, display_lang):
     "Description for a rule in the requested display language."
+    if display_lang == "ko":
+        return rule.get("meaning_ko") or rule["meaning"]
     if display_lang == "zh":
         # Curated Chinese gloss shipped with the data beats both the legacy
         # hand-written table and the English meaning.
@@ -1453,7 +1547,13 @@ def analyze_japanese(page_text, display_lang="en"):
                 "key": "basic_forms",
                 "name": "Basic forms: " + "・".join(_aggregate_symbols(basic_examples)),
                 "level": "N5",
-                "desc": _ZH_BASICS if display_lang == "zh" else "Copula, demonstratives and question words detected",
+                "desc": (
+                    _KO_BASICS
+                    if display_lang == "ko"
+                    else _ZH_BASICS
+                    if display_lang == "zh"
+                    else "Copula, demonstratives and question words detected"
+                ),
                 "examples": _aggregate_examples(basic_examples),
             }
         )
@@ -1464,7 +1564,13 @@ def analyze_japanese(page_text, display_lang="en"):
                 "key": "basic_particles",
                 "name": "Particles: " + "・".join(_aggregate_symbols(particle_examples)),
                 "level": "N5",
-                "desc": _ZH_PARTICLE if display_lang == "zh" else "Basic N5 particles detected",
+                "desc": (
+                    _KO_PARTICLE
+                    if display_lang == "ko"
+                    else _ZH_PARTICLE
+                    if display_lang == "zh"
+                    else "Basic N5 particles detected"
+                ),
                 "examples": _aggregate_examples(particle_examples),
             }
         )

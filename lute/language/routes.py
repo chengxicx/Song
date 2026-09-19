@@ -139,17 +139,15 @@ def _dropdown_parser_choices(language=None):
         # language name doesn't match it (e.g. a custom-named
         # language), so the current value never disappears.
         if lang_type and not any(k == lang_type for k, _ in matched):
-            matched.extend((k, v.name()) for k, v in supported_parsers() if k == lang_type)
+            matched.extend(
+                (k, v.name()) for k, v in supported_parsers() if k == lang_type
+            )
         return matched
 
     # No language-specific parser applies; only offer generic parsers
     # (Space Delimited and any plugin parsers that don't declare a
     # language).
-    return [
-        (k, v.name())
-        for k, v in selectable_parsers()
-        if v.languages() is None
-    ]
+    return [(k, v.name()) for k, v in selectable_parsers() if v.languages() is None]
 
 
 @bp.route("/edit/<int:langid>", methods=["GET", "POST"])
@@ -177,6 +175,7 @@ def edit(langid):
         form=form,
         language=language,
         engine_status=grammar_analysis.grammar_engine_status(language),
+        engine_note=grammar_analysis.grammar_engine_note(language),
     )
 
 

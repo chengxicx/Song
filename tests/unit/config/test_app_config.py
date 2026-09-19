@@ -2,6 +2,8 @@
 App config tests
 """
 
+import os
+
 import pytest
 import yaml
 
@@ -16,8 +18,14 @@ def write_file(config_file, config_data):
         yaml.dump(config_data, file)
 
 
-def test_valid_config(tmp_path):
+def test_valid_config(tmp_path, monkeypatch):
     "Valid path and config is ok."
+    # These tests pin the yaml-driven config values, so the test
+    # harness's in-memory-db / per-worker-datapath overrides (see
+    # tests/conftest.py) must not interfere.
+    monkeypatch.delenv("LUTE_DB_URI", raising=False)
+    monkeypatch.delenv("LUTE_DATAPATH", raising=False)
+
     config_file = tmp_path / "valid_config.yaml"
     config_data = {"DBNAME": "my_db", "DATAPATH": "data_path"}
     write_file(config_file, config_data)
@@ -26,6 +34,27 @@ def test_valid_config(tmp_path):
     assert app_config.datapath == "data_path"
     assert app_config.sqliteconnstring == "sqlite:///data_path/my_db"
     assert app_config.env == "dev"
+
+
+def test_db_uri_override(tmp_path, monkeypatch):
+    "LUTE_DB_URI redirects connections but keeps dbfilename on disk."
+    monkeypatch.delenv("LUTE_DATAPATH", raising=False)
+    monkeypatch.setenv("LUTE_DB_URI", "file:lute_x?mode=memory&cache=shared")
+    config_file = tmp_path / "cfg.yaml"
+    write_file(config_file, {"DBNAME": "my_db", "DATAPATH": "data_path"})
+
+    ac = AppConfig(config_file)
+    assert ac.db_uri == "file:lute_x?mode=memory&cache=shared"
+    assert ac.dbfilename == os.path.join("data_path", "my_db")
+    assert ac.sqliteconnstring == (
+        "sqlite:///file:lute_x?mode=memory&cache=shared&uri=true"
+    )
+
+    # The empty string counts as unset (lets a caller force file mode).
+    monkeypatch.setenv("LUTE_DB_URI", "")
+    ac2 = AppConfig(config_file)
+    assert ac2.db_uri is None
+    assert ac2.sqliteconnstring == "sqlite:///data_path/my_db"
 
 
 def test_ENV_required(tmp_path):
@@ -51,11 +80,14 @@ def test_missing_dbname_throws(tmp_path):
         AppConfig(config_file)
 
 
-def test_system_specific_datapath_returned_if_DATAPATH_not_specified(tmp_path):
+def test_system_specific_datapath_returned_if_DATAPATH_not_specified(
+    tmp_path, monkeypatch
+):
     """
     Using library to get platform-specific paths.  Tests will
     hardcode the appropriate system path.
     """
+    monkeypatch.delenv("LUTE_DATAPATH", raising=False)
     config_file = tmp_path / "default_datapath.yaml"
     config_data = {"DBNAME": "my_db"}
     write_file(config_file, config_data)

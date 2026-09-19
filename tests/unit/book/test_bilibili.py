@@ -133,7 +133,9 @@ def test_bilibili_title_uses_view_api_av(app, app_context):
         "code": 0,
         "data": {"title": "Legacy Title"},
     }
-    with patch("lute.book.service.requests.get", return_value=_fake_response(payload)) as m:
+    with patch(
+        "lute.book.service.requests.get", return_value=_fake_response(payload)
+    ) as m:
         svc = BookService()
         title = svc.bilibili_title("https://www.bilibili.com/video/av123456")
     assert title == "Legacy Title"
@@ -206,7 +208,9 @@ def test_import_webpage_form_renders_bilibili_fields(app, app_context, english, 
 
 def test_import_bilibili_video_route(app, app_context, english, client):
     "POSTing to import_webpage with type=bilibili creates a book."
-    with patch.object(BookService, "bilibili_title", return_value="Route Bilibili Book"):
+    with patch.object(
+        BookService, "bilibili_title", return_value="Route Bilibili Book"
+    ):
         data = {
             "import_type": "bilibili",
             "bilibili_url": "https://www.bilibili.com/video/BV1xx411c7mD",
@@ -295,7 +299,9 @@ def test_edit_book_preserves_bilibili_type(app, app_context, english, client):
         "book_tags": '[{"value": "bilibili"}]',
         "book_type": "bilibili",
     }
-    resp = client.post(f"/book/edit/{dbbook.id}", data=form_data, follow_redirects=False)
+    resp = client.post(
+        f"/book/edit/{dbbook.id}", data=form_data, follow_redirects=False
+    )
     assert resp.status_code == 302
 
     repo = BookRepository(db.session)
@@ -329,17 +335,26 @@ def test_stream_info_uses_selected_page_duration():
         "code": 0,
         "data": {
             "dash": {
-                "video": [{"bandwidth": 1000, "baseUrl": "v.mp4",
-                           "SegmentBase": {"Initialization": "init",
-                                           "indexRange": "0-99"}}],
-                "audio": [{"bandwidth": 500, "baseUrl": "a.m4a",
-                           "SegmentBase": {"Initialization": "init",
-                                           "indexRange": "0-99"}}],
+                "video": [
+                    {
+                        "bandwidth": 1000,
+                        "baseUrl": "v.mp4",
+                        "SegmentBase": {"Initialization": "init", "indexRange": "0-99"},
+                    }
+                ],
+                "audio": [
+                    {
+                        "bandwidth": 500,
+                        "baseUrl": "a.m4a",
+                        "SegmentBase": {"Initialization": "init", "indexRange": "0-99"},
+                    }
+                ],
             }
         },
     }
-    with patch.object(bilibili_stream, "_fetch_view", return_value=view["data"]), \
-         patch.object(bilibili_stream, "_fetch_playurl", return_value=play["data"]):
+    with patch.object(
+        bilibili_stream, "_fetch_view", return_value=view["data"]
+    ), patch.object(bilibili_stream, "_fetch_playurl", return_value=play["data"]):
         info = bilibili_stream.stream_info("BV1xx411c7mD", page=2)
     assert info["duration"] == 300
     assert info["cid"] == 202
@@ -456,8 +471,9 @@ def test_missing_dash_raises_stream_error():
     from lute.read import bilibili_stream
 
     view = {"duration": 10, "pages": [{"cid": 101, "duration": 10}]}
-    with patch.object(bilibili_stream, "_fetch_view", return_value=view), \
-         patch.object(bilibili_stream, "_fetch_playurl", return_value={}):
+    with patch.object(bilibili_stream, "_fetch_view", return_value=view), patch.object(
+        bilibili_stream, "_fetch_playurl", return_value={}
+    ):
         with pytest.raises(bilibili_stream.BilibiliStreamError) as exc:
             bilibili_stream.stream_info("BV1nodashx1", page=1)
     assert "No playable stream" in str(exc.value)
@@ -496,7 +512,9 @@ def test_mpd_route_returns_502_when_stream_info_raises_unexpectedly(client):
     from lute.read import bilibili_stream
 
     with patch.object(
-        bilibili_stream, "stream_info", side_effect=bilibili_stream.BilibiliStreamError("x")
+        bilibili_stream,
+        "stream_info",
+        side_effect=bilibili_stream.BilibiliStreamError("x"),
     ):
         resp = client.get("/read/bilibili/stream/mpd/BV1xx411c7mD?page=1")
     assert resp.status_code != 500
@@ -507,11 +525,14 @@ def test_proxy_route_returns_502_json_when_segment_unavailable(client):
     "A failing CDN relay is reported as JSON, not as a 500 page."
     from lute.read import bilibili_stream
 
-    info = {"video": {"baseUrl": "https://cdn.example/v.m4s"},
-            "audio": {"baseUrl": "https://cdn.example/a.m4s"}}
+    info = {
+        "video": {"baseUrl": "https://cdn.example/v.m4s"},
+        "audio": {"baseUrl": "https://cdn.example/a.m4s"},
+    }
     err = bilibili_stream.BilibiliStreamError("CDN segment request failed")
-    with patch.object(bilibili_stream, "stream_info", return_value=info), \
-         patch.object(bilibili_stream, "proxy_stream", side_effect=err):
+    with patch.object(bilibili_stream, "stream_info", return_value=info), patch.object(
+        bilibili_stream, "proxy_stream", side_effect=err
+    ):
         resp = client.get("/read/bilibili/stream/proxy/BV1xx411c7mD/video?page=1")
     assert resp.status_code == 502
     assert resp.is_json

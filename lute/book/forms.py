@@ -4,12 +4,21 @@ Book create/edit forms.
 
 import json
 from flask import request
-from wtforms import StringField, SelectField, TextAreaField, IntegerField, HiddenField, SelectMultipleField
+from wtforms import (
+    StringField,
+    SelectField,
+    TextAreaField,
+    IntegerField,
+    HiddenField,
+    SelectMultipleField,
+)
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Length, NumberRange
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.widgets import ListWidget, CheckboxInput
+
+from lute.book.types import selectable_type_choices, subtitle_book_types
 
 # Global configuration for allowed audio files
 ALLOWED_AUDIO_EXTENSIONS = [
@@ -26,6 +35,12 @@ ALLOWED_AUDIO_EXTENSIONS = [
 AUDIO_VALIDATION_MSG = (
     f"Please upload a valid audio file ({', '.join(ALLOWED_AUDIO_EXTENSIONS)})"
 )
+
+# Book types whose reading text is generated from subtitles: the text
+# field holds the SRT original and the player follows srt_data cues.
+# Kept as a module-level name (used by routes too); derived from the
+# single book-type registry (lute.book.types).
+SUBTITLE_BOOK_TYPES = subtitle_book_types()
 
 
 def _tag_values(field_data):
@@ -159,17 +174,8 @@ class EditBookForm(FlaskForm):
     )
 
     # YouTube video / Bilibili video / MP3 audio / Online video book fields.
-    book_type = SelectField(
-        "Type",
-        choices=[
-            ("", "Text"),
-            ("youtube", "YouTube video"),
-            ("bilibili", "Bilibili video"),
-            ("mp3", "MP3 / M4A audio"),
-            ("netease", "NetEase Cloud Music"),
-            ("video", "Online video"),
-        ],
-    )
+    # Choices come from the single book-type registry (lute.book.types).
+    book_type = SelectField("Type", choices=list(selectable_type_choices()))
     youtube_srt = FileField(
         "Subtitle file (SRT / VTT)",
         validators=[
@@ -203,12 +209,19 @@ class EditBookForm(FlaskForm):
 
         # If the type was changed away from youtube/bilibili/mp3/video,
         # clear the subtitle data.
-        if obj.book_type not in ("youtube", "bilibili", "mp3", "netease", "video"):
+        if obj.book_type not in SUBTITLE_BOOK_TYPES:
             obj.srt_data = None
             obj.video_current_pos = None
 
+        # A subtitle book's text is owned by its SRT data, so a stray
+        # "Text file" upload must be ignored: the field is hidden for
+        # these types, but a file picked while the book was a Text type
+        # stays attached to the (now hidden) input when the type is
+        # switched.  Letting it through would overwrite book.text with
+        # the file's content after _parse_youtube_subtitles has already
+        # reparsed the cues, desyncing text and player timings.
         tfd = self.textfile.data
-        if tfd:
+        if tfd and obj.book_type not in SUBTITLE_BOOK_TYPES:
             obj.text_stream = tfd.stream
             obj.text_stream_filename = tfd.filename
 
@@ -219,7 +232,7 @@ class EditBookForm(FlaskForm):
             obj.audio_bookmarks = None
             obj.audio_current_pos = None
 
-        if obj.book_type in ("youtube", "bilibili", "mp3", "netease", "video"):
+        if obj.book_type in SUBTITLE_BOOK_TYPES:
             self._parse_youtube_subtitles(obj)
 
     def _parse_youtube_subtitles(self, obj):

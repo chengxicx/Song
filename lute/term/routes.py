@@ -139,10 +139,7 @@ def _term_ids_for_books(session, books):
         render_service = RenderService(session)
         mw = render_service.get_multiword_indexer(language)
         texts = [
-            t.text
-            for book in lang_books
-            for t in book.texts
-            if (t.text or "").strip()
+            t.text for book in lang_books for t in book.texts if (t.text or "").strip()
         ]
         for i in range(0, len(texts), chunk_size):
             chunk = "\n".join(texts[i : i + chunk_size])
@@ -331,7 +328,9 @@ def serialize_term_form_data(term, repo, session, form_action):
 
     language_repo = LanguageRepository(session)
     term_language = language_repo.find(term.language_id or -1)
-    hide_pronunciation = term_language is not None and not term_language.show_romanization
+    hide_pronunciation = (
+        term_language is not None and not term_language.show_romanization
+    )
 
     return {
         "term_id": term.id,
@@ -388,6 +387,7 @@ def handle_term_form(
             invalidate_yt_subtitle_cache,
             patch_yt_subtitle_caches_for_term,
         )
+
         if (dbterm.token_count or 1) > 1:
             # Multiword terms change how texts tokenize, so cached
             # subtitle renders must be rebuilt from scratch.
@@ -398,9 +398,7 @@ def handle_term_form(
             # read.routes.patch_yt_subtitle_caches_for_term).  The
             # player picks the fresh HTML up via its incremental
             # subtitle refresh.
-            patch_yt_subtitle_caches_for_term(
-                [term.text] + list(term.parents or [])
-            )
+            patch_yt_subtitle_caches_for_term([term.text] + list(term.parents or []))
         return return_on_success() if callable(return_on_success) else return_on_success
 
     # Note: on validation, form.duplicated_term may be set.
@@ -588,7 +586,10 @@ def bulk_update_status():
     # home screen keeps showing the last-known values until recomputed.
     book_id = data.get("book_id")
     if status_changed and book_id:
-        from lute.book.stats import Service as StatsService  # pylint: disable=import-outside-toplevel
+        from lute.book.stats import (
+            Service as StatsService,
+        )  # pylint: disable=import-outside-toplevel
+
         book = BookRepository(db.session).find(int(book_id))
         if book is not None:
             StatsService(db.session).mark_stale(book)
@@ -597,7 +598,10 @@ def bulk_update_status():
     # invalidating the whole subtitle cache (which would force a full
     # 10-20s rebuild on the next fetch), re-render just the cues that
     # contain the updated terms, in place.
-    from lute.read.routes import patch_yt_subtitle_caches_for_term  # pylint: disable=import-outside-toplevel
+    from lute.read.routes import (
+        patch_yt_subtitle_caches_for_term,
+    )  # pylint: disable=import-outside-toplevel
+
     updated_texts = []
     for u in updates:
         for tidstring in u.get("termids"):
@@ -623,7 +627,10 @@ def _page_fragment_after_update(book_id, pagenum):
     book = BookRepository(db.session).find(int(book_id))
     if book is None:
         return ""
-    from lute.read.routes import render_page_fragment  # pylint: disable=import-outside-toplevel
+    from lute.read.routes import (
+        render_page_fragment,
+    )  # pylint: disable=import-outside-toplevel
+
     return render_page_fragment(book, int(pagenum), track_page_open=False)
 
 
@@ -638,7 +645,10 @@ def bulk_delete():
         repo.delete(term)
     repo.commit()
 
-    from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
+    from lute.read.routes import (
+        invalidate_yt_subtitle_cache,
+    )  # pylint: disable=import-outside-toplevel
+
     invalidate_yt_subtitle_cache()
 
     return jsonify("ok")
@@ -653,6 +663,9 @@ def delete(termid):
     term = repo.load(termid)
     repo.delete(term)
     repo.commit()
-    from lute.read.routes import invalidate_yt_subtitle_cache  # pylint: disable=import-outside-toplevel
+    from lute.read.routes import (
+        invalidate_yt_subtitle_cache,
+    )  # pylint: disable=import-outside-toplevel
+
     invalidate_yt_subtitle_cache()
     return redirect("/term/index", 302)

@@ -10,7 +10,7 @@ are exposed for read-only access from template fragments.
 """
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 
 @dataclass
@@ -51,17 +51,13 @@ class FeatureRegistry:
     def add_menu_item(self, parent, label, url, icon="", order=100):
         """Register a menu item under an existing top-level menu."""
         self.menu_items.append(
-            MenuItem(
-                parent=parent, label=label, url=url, icon=icon, order=order
-            )
+            MenuItem(parent=parent, label=label, url=url, icon=icon, order=order)
         )
 
     def add_settings_tile(self, label, url, description="", order=100):
         """Register a card on the Settings page."""
         self.settings_tiles.append(
-            SettingsTile(
-                label=label, url=url, description=description, order=order
-            )
+            SettingsTile(label=label, url=url, description=description, order=order)
         )
 
     def menu_items_for(self, parent):

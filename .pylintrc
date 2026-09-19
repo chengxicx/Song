@@ -14,6 +14,13 @@ docstring-min-length=3
 # List of note tags to take in consideration, separated by a comma.
 notes=FIXME,XXX
 
+[TYPECHECK]
+
+# Optional heavy dependencies (Sudachi, spaCy, Kiwi, pymorphy3, pythainlp,
+# pyarabic, jieba) are not installed in every environment -- CI lints the
+# base install -- so their imports must not fail the lint.
+ignored-modules=sudachipy,sudachidict_core,spacy,kiwipiepy,pymorphy3,pythainlp,pyarabic,jieba
+
 [MESSAGES CONTROL]
 
 # Disable the message, report, category or checker with the given id(s).

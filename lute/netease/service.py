@@ -204,8 +204,7 @@ def qr_check(key, cookies=None):
         # polling -- completing it lets the flow continue.
         return {
             "state": "verify",
-            "message": (data.get("message") or "").strip()
-            or "verification required",
+            "message": (data.get("message") or "").strip() or "verification required",
         }
     if code == 803:
         cookie = resp.cookies.get("MUSIC_U")

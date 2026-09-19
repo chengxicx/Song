@@ -174,13 +174,16 @@ _LEMMA = lambda *lemmas: {"lemma": set(lemmas)}
 _POS = lambda p: {"pos": p}
 
 
-def _rule(key, name, meaning, patterns, level="TOPIK 1-2", zh="", kind="construction"):
+def _rule(
+    key, name, meaning, patterns, level="TOPIK 1-2", zh="", ko="", kind="construction"
+):
     return {
         "key": key,
         "pattern": name,
         "level": level,
         "meaning": meaning,
         "zh": zh,
+        "ko": ko,
         "patterns": patterns,
         "kind": kind,
     }
@@ -199,6 +202,7 @@ _KO_RULES = [
         "is/am/are doing; in the middle of doing",
         [{"type": "tokens", "conds": [{"surface": "고", "pos": "EC"}, _LEMMA("있다")]}],
         zh="正在做……；……进行中",
+        ko="동작이 진행 중임을 나타내는 표현.",
     ),
     _rule(
         "ko_su_issda",
@@ -206,6 +210,7 @@ _KO_RULES = [
         "can / cannot do; be possible / impossible",
         [{"type": "tokens", "conds": [_POS("ETM"), _SURF("수"), _LEMMA("있다", "없다")]}],
         zh="能够/不能做……；有可能",
+        ko="능력이나 가능성을 나타내는 표현.",
     ),
     _rule(
         "ko_go_sipda",
@@ -213,6 +218,7 @@ _KO_RULES = [
         "want to do",
         [{"type": "tokens", "conds": [{"surface": "고", "pos": "EC"}, _LEMMA("싶다")]}],
         zh="想做……；想要……",
+        ko="~하고 싶은 소망을 나타내는 표현.",
     ),
     _rule(
         "ko_ji_anhda",
@@ -220,6 +226,7 @@ _KO_RULES = [
         "negative: do not",
         [{"type": "tokens", "conds": [{"surface": "지", "pos": "EC"}, _LEMMA("않다")]}],
         zh="不……；否定",
+        ko="동사의 부정을 나타내는 표현.",
     ),
     _rule(
         "ko_aeo_seo",
@@ -227,6 +234,7 @@ _KO_RULES = [
         "because of; and so (reason / sequential)",
         [{"type": "tokens", "conds": [{"lemma": {"아서", "어서"}, "pos": "EC"}]}],
         zh="因为……；……所以……",
+        ko="앞 내용이 뒤 내용의 이유나 근거가 됨을 나타내는 연결 어미.",
     ),
     _rule(
         "ko_eunikka",
@@ -234,6 +242,7 @@ _KO_RULES = [
         "because; since (reason)",
         [{"type": "tokens", "conds": [{"surface": "니까", "pos": "EC"}]}],
         zh="因为……；由于……",
+        ko="이유나 근거를 나타내는 연결 어미.",
     ),
     _rule(
         "ko_geo_future",
@@ -241,6 +250,7 @@ _KO_RULES = [
         "will / going to do (future)",
         [{"type": "tokens", "conds": [_POS("ETM"), _SURF("거")]}],
         zh="将要……；打算……（将来）",
+        ko="앞으로의 계획이나 추측을 나타내는 표현.",
     ),
     _rule(
         "ko_aeo_juda",
@@ -248,13 +258,23 @@ _KO_RULES = [
         "do (something) for someone",
         [{"type": "tokens", "conds": [{"surface": "어", "pos": "EC"}, _LEMMA("주다")]}],
         zh="为某人做……；帮……做",
+        ko="남을 위해 행동함을 나타내는 보조 용언.",
     ),
     _rule(
         "ko_gi_jeone",
         "-기 전에",
         "before doing",
-        [{"type": "tokens", "conds": [{"surface": "기", "pos": "ETN"}, {"surface": "전", "pos": "NNG"}]}],
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface": "기", "pos": "ETN"},
+                    {"surface": "전", "pos": "NNG"},
+                ],
+            }
+        ],
         zh="在……之前",
+        ko="어떤 일보다 앞서 함을 나타내는 표현.",
     ),
     _rule(
         "ko_jung_ida",
@@ -262,6 +282,7 @@ _KO_RULES = [
         "in the middle of doing",
         [{"type": "tokens", "conds": [_SURF("중"), _POS("VCP")]}],
         zh="正在……当中；……中",
+        ko="동작이 진행되고 있는 중임을 나타내는 표현.",
     ),
     _rule(
         "ko_copula_polite",
@@ -269,6 +290,7 @@ _KO_RULES = [
         "polite copula: is / am / are",
         [{"type": "regex", "re": re.compile(r"입니다|이에요|예요")}],
         zh="是……（礼貌体）",
+        ko="정중하게 '~이다'를 나타내는 표현.",
     ),
     _rule(
         "ko_eumyon",
@@ -276,8 +298,10 @@ _KO_RULES = [
         "if / when (conditional)",
         [{"type": "tokens", "conds": [{"lemma": {"면", "으면"}, "pos": "EC"}]}],
         zh="如果……；当……时",
+        ko="앞 내용이 뒤 내용의 조건이나 가정이 됨을 나타내는 연결 어미.",
     ),
 ]
+
 
 def _norm_name(name):
     "Normalise a grammar name so '-아/어서' and '아/어서' compare equal."
@@ -295,7 +319,11 @@ _HANDWRITTEN_NORMS = {_norm_name(r["pattern"]) for r in _KO_RULES}
 # kimchi-grammar (CC-BY 4.0).  Matches the layout of jlpt_data/grammar.
 _DATA_PATH = os.path.normpath(
     os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "..", "..", "jlpt_data", "grammar_ko.json"
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_ko.json",
     )
 )
 
@@ -340,6 +368,7 @@ def _load_data_rules():
                 level=item.get("level")
                 or _LEVEL_BY_TYPE.get(item.get("type", ""), "TOPIK 3-4"),
                 zh=item.get("zh") or "",
+                ko=item.get("ko") or "",
             )
         )
     return rules
@@ -413,6 +442,8 @@ _KO_ZH = {
 
 def _desc(rule, display_lang):
     "Description for a rule in the requested display language."
+    if display_lang == "ko":
+        return rule.get("ko") or rule["meaning"]
     if display_lang != "zh":
         return rule["meaning"]
     if rule["zh"]:
@@ -426,6 +457,7 @@ def _count_loaded_rules():
 
 
 # ---------------------------------------------------------------------
+
 
 def analyze_korean(page_text, display_lang="en"):
     """
@@ -473,7 +505,9 @@ def analyze_korean(page_text, display_lang="en"):
                 if desc_now not in entry["meanings"]:
                     entry["meanings"].append(desc_now)
             if not any(e["sentence"] == sentence for e in entry["examples"]):
-                entry["examples"].append({"sentence": sentence, "matches": list(matches)})
+                entry["examples"].append(
+                    {"sentence": sentence, "matches": list(matches)}
+                )
     matched = []
     for n in order:
         entry = by_name[n]

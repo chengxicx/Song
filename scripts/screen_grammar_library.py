@@ -55,7 +55,9 @@ from scripts.measure_grammar_panel import load_corpus  # noqa: E402
 
 _GRAMMAR_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "lute", "jlpt_data", "grammar",
+    "lute",
+    "jlpt_data",
+    "grammar",
 )
 
 # A pattern segment mentioning any of these describes how a *form* attaches.
@@ -187,8 +189,10 @@ def main():
         share, npages = corpus_page_share(args.corpus)
 
     cands = screen()
-    print("%d candidates%s"
-          % (len(cands), " (corpus: %d pages)" % npages if npages else ""))
+    print(
+        "%d candidates%s"
+        % (len(cands), " (corpus: %d pages)" % npages if npages else "")
+    )
     print()
     print("%-6s %-30s %-5s %-30s %s" % ("页%", "id", "lvl", "规格字面量", "原料 pattern"))
     rows = []
@@ -196,9 +200,16 @@ def main():
         pct = share.get(rule["key"], 0.0)
         rows.append((pct, rid, rule, entry, literals))
     for pct, rid, rule, entry, literals in sorted(rows, reverse=True):
-        print("%-6s %-30s %-5s %-30s %s"
-              % ("%.1f" % pct if npages else "-", rid, rule["level"],
-                 "/".join(literals)[:30], entry["pattern"][:44]))
+        print(
+            "%-6s %-30s %-5s %-30s %s"
+            % (
+                "%.1f" % pct if npages else "-",
+                rid,
+                rule["level"],
+                "/".join(literals)[:30],
+                entry["pattern"][:44],
+            )
+        )
     print()
     in_vocab = sorted(r for r in (x[1] for x in rows) if r in G._VOCAB_IDS)
     print("已在 _VOCAB_IDS：%d 条" % len(in_vocab))

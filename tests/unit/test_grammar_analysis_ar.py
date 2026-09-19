@@ -79,7 +79,9 @@ def test_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The Arabic engine grades points with CEFR bands."
-    levels = {e["key"]: e["level"] for e in analyze_arabic(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"] for e in analyze_arabic(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["ar_prepositions"] == "A1"
     assert levels["ar_relative"] == "B1"
 

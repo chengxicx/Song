@@ -46,7 +46,9 @@ def saved_path(filename):
     return os.path.join(current_app.env_config.useraudiopath, filename)
 
 
-def test_save_audio_file_moves_moov_in_front(app_context):  # pylint: disable=unused-argument
+def test_save_audio_file_moves_moov_in_front(
+    app_context,
+):  # pylint: disable=unused-argument
     "An uploaded m4a is re-muxed as it is saved."
     storage = FileStorage(
         stream=io.BytesIO(tail_moov_m4a()),
@@ -60,7 +62,9 @@ def test_save_audio_file_moves_moov_in_front(app_context):  # pylint: disable=un
     assert [t for t, _s, _z, _h in top_level_boxes(path)] == [b"ftyp", b"moov", b"mdat"]
 
 
-def test_save_audio_file_leaves_other_formats_alone(app_context):  # pylint: disable=unused-argument
+def test_save_audio_file_leaves_other_formats_alone(
+    app_context,
+):  # pylint: disable=unused-argument
     "A non-mp4 upload is stored byte for byte."
     payload = b"ID3\x03\x00\x00\x00" + b"\x11" * 128
     storage = FileStorage(
@@ -71,7 +75,9 @@ def test_save_audio_file_leaves_other_formats_alone(app_context):  # pylint: dis
         assert f.read() == payload
 
 
-def test_save_audio_file_survives_an_unreadable_mp4(app_context):  # pylint: disable=unused-argument
+def test_save_audio_file_survives_an_unreadable_mp4(
+    app_context,
+):  # pylint: disable=unused-argument
     "A corrupt mp4-family upload is still imported, unmodified."
     payload = b"not really an mp4, just using the name" * 4
     storage = FileStorage(

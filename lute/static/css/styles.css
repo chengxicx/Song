@@ -12,12 +12,29 @@ body {
     --background-color: #fff;
     --font-color: #000;
 
+    /* Semantic tokens.  Themes override these (on body) instead of
+       re-painting whole selectors with !important; components below
+       read them.  Defaults = the light, no-theme look. */
+    --link-color: #007aff;            /* plain links */
+    --home-link-color: #000;          /* top-bar "Home" label */
+    --menu-link-color: #000;          /* menu-bar items (BOOKS, TERMS ...) */
+    --panel-bg: #fff;                 /* cards / tables / popovers */
+
     --status-0-color: #D5FFFF;
     --status-1-color: #F5B8A9;
     --status-2-color: #F5CCA9;
     --status-3-color: #F5E1A9;
     --status-4-color: #F5F3A9;
     --status-5-color: #DDFFDD;
+
+    /* Text colour painted on top of each status background; themes with
+       dark status backgrounds need lighter text. */
+    --status-0-text: #000;
+    --status-1-text: #000;
+    --status-2-text: #000;
+    --status-3-text: #000;
+    --status-4-text: #000;
+    --status-5-text: #000;
 
     --status-98-color: #ee8577;
     --status-99-color: #72da88;
@@ -57,7 +74,11 @@ body {
 
 a.home-link {
     text-decoration: none;
-    color: black !important;
+    /* Guard-var pattern: the !important still beats legacy themes'
+       global `a { color: ... !important }` rules, while token-based
+       themes get their way through --home-link-color (custom
+       properties cascade past specificity). */
+    color: var(--home-link-color, black) !important;
 }
 
 a.home-link:hover {
@@ -109,14 +130,15 @@ p.version {
     position: relative; /* Required for sub-menu positioning */
 }
 
-/* main menu item text (not links) */
+/* main menu item text (not links).  Same guard-var pattern as
+   a.home-link above. */
 .menu-item > span {
     text-decoration: none;
     display: block;
     cursor: pointer;
     text-transform: uppercase;
     font-weight: bold;
-    color: black !important;
+    color: var(--menu-link-color, black) !important;
 }
 
 .menu-item > a:hover {
@@ -1168,9 +1190,9 @@ div#thetext {
 }
 
 /* On the very last screen of the book, reserve a strip at the bottom for
-   the "Mark rest as known" button so it does not cover the text. */
+   the end-of-book icon buttons so they do not cover the text. */
 div#thetext.last-screen {
-    padding: 0 3.4rem 56px;
+    padding: 0 3.4rem 64px;
 }
 
 div#thetext.manga-text-container {
@@ -1215,38 +1237,76 @@ div#thetext p {
     font-size: 0;
 }
 
-/* End-of-book "Mark rest as known" button: a centre strip over the
-   reserved bottom padding of the last screen.  Hidden unless the last
-   screen of the last page is showing. */
+/* End-of-book controls: two ghost icon buttons centred over the
+   reserved bottom strip of the last screen ("mark rest as known" and
+   "back to Home / book set").  The strip is hidden until the reader
+   hovers the reading text (#thetext is the preceding sibling), and
+   stays shown while the pointer or keyboard focus is on the buttons.
+   Touch devices have no hover, so they always get the buttons
+   (slightly translucent) via the media query below. */
 #reading-end-controls {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    text-align: center;
-    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    padding: 6px 0 8px;
     z-index: 6;
     pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
-#reading-end-controls .mark-known-btn {
+#thetext.last-screen:hover ~ #reading-end-controls,
+#reading-end-controls:hover,
+#reading-end-controls:focus-within {
+    opacity: 1;
+    transform: none;
+}
+
+@media (hover: none) {
+    #reading-end-controls {
+        opacity: 0.8;
+        transform: none;
+    }
+}
+
+#reading-end-controls .end-icon-btn {
     pointer-events: auto;
-    display: inline-block;
-    padding: 9px 22px;
-    border: 1px solid currentColor;
-    border-radius: 999px;
-    background: #fff;
-    color: #4CBB17;
-    font-size: 0.95rem;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid color-mix(in srgb, var(--font-color) 35%, transparent);
+    background: transparent;
+    color: var(--font-color);
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
 
-#reading-end-controls .mark-known-btn:hover {
+#reading-end-controls .end-icon-btn.known:hover {
     background: #4CBB17;
-    color: #fff;
     border-color: #4CBB17;
+    color: #fff;
+}
+
+#reading-end-controls .end-icon-btn.toc:hover {
+    border-color: var(--font-color);
+    background: color-mix(in srgb, var(--font-color) 12%, transparent);
+}
+
+/* The toc button is an <a>: every theme forces a global link colour
+   with !important, so re-assert the ghost colour the same way. */
+#reading-end-controls a.end-icon-btn,
+#reading-end-controls a.end-icon-btn:hover {
+    color: var(--font-color) !important;
+    text-decoration: none;
 }
 
 span.drag-handle {

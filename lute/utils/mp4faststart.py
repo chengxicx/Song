@@ -101,13 +101,13 @@ def _patch_chunk_offsets(buf, start, end, shift):
     count = 0
     lowest = None
     highest = None
-    for typ, box_start, box_size, header_size in _read_boxes_bytearray(
-        buf, start, end
-    ):
+    for typ, box_start, box_size, header_size in _read_boxes_bytearray(buf, start, end):
         if typ in (b"stco", b"co64"):
             wide = typ == b"co64"
             entry_size = 8 if wide else 4
-            n = struct.unpack(">I", buf[box_start + header_size + 4 : box_start + header_size + 8])[0]
+            n = struct.unpack(
+                ">I", buf[box_start + header_size + 4 : box_start + header_size + 8]
+            )[0]
             table = box_start + header_size + 8
             if table + n * entry_size > box_start + box_size:
                 raise ValueError("chunk offset table overruns its box")

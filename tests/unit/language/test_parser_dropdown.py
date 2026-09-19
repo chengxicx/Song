@@ -11,14 +11,21 @@ here:
   parser.
 """
 
+import pytest
+
 from lute.language.routes import _dropdown_parser_choices
 from lute.models.language import Language
+from lute.parse.registry import is_supported
 
 
 def _keys(choices):
     return [k for k, _ in choices]
 
 
+@pytest.mark.skipif(
+    not is_supported("japanese_sudachi"),
+    reason="sudachi extra not installed; the parser is not offered",
+)
 def test_new_language_does_not_offer_the_legacy_parser():
     "MeCab is the backup parser now, not a choice for a new language."
     keys = _keys(_dropdown_parser_choices(None))
@@ -27,6 +34,10 @@ def test_new_language_does_not_offer_the_legacy_parser():
     assert "spacedel" in keys, "generic parser still offered"
 
 
+@pytest.mark.skipif(
+    not is_supported("japanese_sudachi"),
+    reason="sudachi extra not installed; the parser is not offered",
+)
 def test_japanese_language_is_offered_sudachi_only():
     "A Japanese language on the preferred parser isn't offered MeCab."
     lang = Language()
@@ -38,10 +49,19 @@ def test_japanese_language_is_offered_sudachi_only():
     assert "japanese" not in keys
 
 
+@pytest.mark.skipif(
+    not is_supported("japanese_sudachi"),
+    reason="sudachi extra not installed; the parser is not offered",
+)
 def test_existing_mecab_language_keeps_its_parser_selectable():
     """
-    An existing language still on MeCab must be able to stay on MeCab --
-    the current value is force-included even though it's legacy.
+
+    import pytest
+
+    from lute.parse.registry import is_supported
+
+        An existing language still on MeCab must be able to stay on MeCab --
+        the current value is force-included even though it's legacy.
     """
     lang = Language()
     lang.name = "Japanese"
