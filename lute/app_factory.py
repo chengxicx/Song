@@ -43,6 +43,7 @@ from lute.utils import static_assets
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
 from lute.parse import plugin_installer
+from lute.read.render import grammar_analysis
 from lute.feature.routes import bp as feature_bp
 from lute.feature import load_feature_plugins
 
@@ -762,6 +763,9 @@ def _init_parser_plugins(app, plugin_data_path, outfunc):
             ):
                 status = "OK" if ok else "FAILED"
                 outfunc(f"  * {name}: {status} - {message}")
+            # Grammar-analysis engines are optional extras; report the pip
+            # command when the user's languages would benefit from one.
+            grammar_analysis.report_grammar_engine_status(db.session)
 
     parsers = supported_parsers()
     parsers_with_extra_data = [
