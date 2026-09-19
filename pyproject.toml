@@ -91,6 +91,20 @@ russian = [
   "pymorphy3>=2.0,<3",
   "pymorphy3-dicts-ru>=2.4,<3",
 ]
+french = [
+  "spacy>=3.8.0,<3.8.4",
+  "fr-core-news-sm@https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.8.0/fr_core_news_sm-3.8.0-py3-none-any.whl",
+]
+german = [
+  "spacy>=3.8.0,<3.8.4",
+  "de-core-news-sm@https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.8.0/de_core_news_sm-3.8.0-py3-none-any.whl",
+]
+thai = [
+  "pythainlp>=2.3,<3",
+]
+arabic = [
+  "pyarabic>=0.6,<2",
+]
 
 [project.urls]
 Home = "https://github.com/luteorg/lute-v3"
