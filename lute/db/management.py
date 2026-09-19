@@ -120,6 +120,9 @@ def add_default_user_settings(session, default_user_backup_path):
         "tts_click_pronunciation": True,
         "tts_show_control_panel": True,
         "tts_show_sentence_buttons": True,
+        # Review queue:
+        "review_desired_retention": "0.9",
+        "review_max_new_per_day": 20,
     }
     add_initial_vals_if_needed(keys_and_defaults)
 
