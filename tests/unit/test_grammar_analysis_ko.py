@@ -53,6 +53,15 @@ def test_display_language_switches_desc():
     assert "is/am" in en["ko_go_issda"]["desc"].lower()
 
 
+def test_korean_display_uses_korean_description():
+    "한국어 display shows Korean descriptions for hand-written and data rules."
+    ko = {e["key"]: e for e in analyze_korean("저는 영화를 보고 있어요.", "ko")}
+    assert "진행" in ko["ko_go_issda"]["desc"]
+    data = analyze_korean("우리 집은 공원만큼 조용해요.", "ko")
+    mankeum = next(e for e in data if "만큼" in e["name"])
+    assert "정도" in mankeum["desc"], "data rule should use the JSON ko description"
+
+
 def test_data_driven_rule_fires():
     "A kimchi-grammar snapshot rule (만큼) is loaded and detected."
     hits = _keys("우리 집은 공원만큼 조용해요.")

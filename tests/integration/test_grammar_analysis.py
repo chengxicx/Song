@@ -231,6 +231,7 @@ def test_language_edit_korean_shows_korean_engine(client, empty_db, korean):
     assert "Korean grammar engine" in body
     assert "korean" in body
     assert "No dedicated grammar engine" not in body
+    assert "한국어" in body, "语法解释语言下拉应有 한국어 选项"
 
 
 def test_language_edit_without_engine_shows_note(client, empty_db):
@@ -285,6 +286,27 @@ def test_grammar_analysis_strips_zws_from_client_snippet(client, empty_db, korea
     assert "-고 있다" in names
     for g in data:
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_korean_grammar_analysis_ko_display_language(client, empty_db, korean):
+    "grammar_translate_lang=ko 时，韩语语法点应返回韩语释义。"
+    korean.grammar_translate_lang = "ko"
+    db.session.add(korean)
+    db.session.commit()
+    book = make_book(
+        "Korean Display Lang Demo",
+        ["저는 지금 밥을 먹고 있어요."],
+        korean,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    go_issda = next(g for g in data if g["key"] == "ko_go_issda")
+    assert "진행" in go_issda["desc"]
+    assert "is/am/are" not in go_issda["desc"]
 
 
 def test_japanese_grammar_analysis_uses_ja_engine(client, empty_db, japanese):

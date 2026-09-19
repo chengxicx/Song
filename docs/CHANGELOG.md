@@ -12,6 +12,9 @@ Feature changes:
 * Language edit page shows each language's grammar engine status, with an
   Install button that pip-installs the engine's packages when missing
   (covers the Korean/Kiwi engine too).
+* "Grammar Analysis Language" gains a 한국어 choice: the Korean grammar
+  panel can now explain its grammar points in Korean (Korean descriptions
+  for every kimchi-grammar entry; other engines keep their English text).
 
 
 # 3.10.3 (2026-07-06)
