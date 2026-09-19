@@ -75,6 +75,22 @@ def _morph_subset_any(token, feats):
     return any(all(m.get(k) == v for k, v in feats.items()) for m in morphs)
 
 
+# A POS reading counts only when it is a significant reading of the word,
+# not a dictionary ghost: pymorphy3 lists every reading, and "чай" carries
+# a 14% imperative-verb reading that must not fire imperative rules.
+_POS_SCORE_RATIO = 0.3
+
+
+def _pos_match_any(token, wanted):
+    "True if a significant reading of the token has one of the wanted POS."
+    best = token.get("score", 1.0) or 1.0
+    readings = [(token.get("pos") or "", best)]
+    readings.extend(
+        (p.get("pos") or "", p.get("score", 0.0)) for p in token.get("parses", [])
+    )
+    return any(pos in wanted and score > _POS_SCORE_RATIO * best for pos, score in readings)
+
+
 def _match_condition(cond, token):
     "True if a single spec matches a single token."
     if cond.get("any"):
@@ -89,11 +105,8 @@ def _match_condition(cond, token):
         lemmas.update((p.get("lemma") or "").lower() for p in token.get("parses", []))
         if not set(cond["lemma_in"]) & lemmas:
             return False
-    if "pos_in" in cond:
-        poss = {token.get("pos") or ""}
-        poss.update(p.get("pos") or "" for p in token.get("parses", []))
-        if not set(cond["pos_in"]) & poss:
-            return False
+    if "pos_in" in cond and not _pos_match_any(token, set(cond["pos_in"])):
+        return False
     if "morph" in cond and not _morph_subset_any(token, cond["morph"]):
         return False
     if "morph_not" in cond and _morph_subset_any(token, cond["morph_not"]):
