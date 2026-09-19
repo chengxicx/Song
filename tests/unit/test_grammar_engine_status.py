@@ -104,9 +104,12 @@ def test_install_failure_reports_output(monkeypatch):
     assert len(calls) == 1
 
 
-def test_install_specs_cover_every_engine():
+def test_install_specs_cover_every_engine_with_deps():
     "Every engine with importable deps has a pip spec list, and vice versa."
-    for _label, _detect, _deps, extra in grammar_analysis._ENGINE_REQUIREMENTS:
-        assert extra in grammar_analysis._ENGINE_INSTALL_SPECS, extra
+    for _label, _detect, deps, extra in grammar_analysis._ENGINE_REQUIREMENTS:
+        if deps:
+            assert extra in grammar_analysis._ENGINE_INSTALL_SPECS, extra
     for extra in grammar_analysis._ENGINE_INSTALL_SPECS:
         assert any(e == extra for _l, _d, _deps, e in grammar_analysis._ENGINE_REQUIREMENTS), extra
+    # Zero-dependency engines (Mandarin/Cantonese) need no install step.
+    assert grammar_analysis.grammar_engine_status(StubLanguage(name="中文"))["installed"] is True

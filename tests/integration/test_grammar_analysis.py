@@ -174,19 +174,23 @@ def test_arabic_grammar_analysis_uses_ar_engine(client, empty_db, arabic):
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
 
 
-def test_grammar_analysis_fallback_for_other_languages(client, empty_db):
-    "无专用引擎的语言（如土耳其语）应退回通用正则规则库。"
+def _get_or_create_language(name):
+    "Fetch a predefined language from the db, creating it if needed."
     from lute.db import db as _db
     from lute.language.service import Service as LangService
     from lute.models.language import Language
 
-    lang = (
-        _db.session.query(Language).filter(Language.name == "Turkish").first()
-    )
+    lang = _db.session.query(Language).filter(Language.name == name).first()
     if lang is None:
-        lang = LangService(_db.session).get_language_def("Turkish").language
+        lang = LangService(_db.session).get_language_def(name).language
         _db.session.add(lang)
         _db.session.commit()
+    return lang
+
+
+def test_grammar_analysis_fallback_for_other_languages(client, empty_db):
+    "无专用引擎的语言（如土耳其语）应退回通用正则规则库。"
+    lang = _get_or_create_language("Turkish")
     book = make_book(
         "Fallback Grammar Demo",
         ["If it rains, then we stay home."],
@@ -338,4 +342,105 @@ def test_japanese_manga_grammar_analysis_reads_mokuro_ocr(
     assert "〜ている" in names
     for g in data:
         assert g["level"] == "N5", "日语语法点都应标注 N5"
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+def test_mandarin_grammar_analysis_uses_zh_engine(client, empty_db, mandarin):
+    "中文书籍应走零依赖中文语法引擎。"
+    book = make_book(
+        "Mandarin Grammar Demo",
+        ["我吃了饭。他是昨天来的。他把作业写完了。"],
+        mandarin,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "zh_le" in keys
+    assert "zh_shi_de" in keys
+    assert "zh_ba_sentence" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_cantonese_grammar_analysis_uses_yue_engine(client, empty_db):
+    "粤语书籍应走零依赖粤语语法引擎。"
+    from lute.models.language import Language
+
+    lang = Language()
+    lang.name = "Cantonese Chinese"
+    lang.parser_type = "lute_cantonese"
+    lang.character_substitutions = ""
+    lang.regexp_split_sentences = ".!?。！？"
+    lang.exceptions_split_sentences = ""
+    lang.word_characters = "一-鿿"
+    db.session.add(lang)
+    db.session.commit()
+
+    book = make_book(
+        "Cantonese Grammar Demo",
+        ["我食咗飯。佢唔去。佢睇緊電視。"],
+        lang,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "yue_zo" in keys
+    assert "yue_m" in keys
+    assert "yue_gan" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_italian_grammar_analysis_uses_it_engine(client, empty_db):
+    "意大利语书籍应走 spaCy 语法引擎。"
+    pytest.importorskip("spacy")
+    pytest.importorskip("it_core_news_sm")
+    lang = _get_or_create_language("Italian")
+    book = make_book(
+        "Italian Grammar Demo",
+        ["Ho mangiato ieri. Sto mangiando una pizza. Penso che sia giusto."],
+        lang,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "it_passato_prossimo" in keys
+    assert "it_stare_gerundio" in keys
+    assert "it_congiuntivo" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_portuguese_grammar_analysis_uses_pt_engine(client, empty_db):
+    "葡萄牙语书籍应走 spaCy 语法引擎。"
+    pytest.importorskip("spacy")
+    pytest.importorskip("pt_core_news_sm")
+    lang = _get_or_create_language("Portuguese")
+    book = make_book(
+        "Portuguese Grammar Demo",
+        ["Há um problema. Vou comer agora. Quando era criança, vivia aqui."],
+        lang,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "pt_haver" in keys
+    assert "pt_ir_inf" in keys
+    assert "pt_imperfeito" in keys
+    for g in data:
         assert g["examples"], f"语法点 {g['name']} 缺少例句"

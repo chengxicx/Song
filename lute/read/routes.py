@@ -23,21 +23,29 @@ from lute.read.render.grammar_analysis import (
     analyze as analyze_grammar,
     is_japanese_language,
     is_korean_language,
+    is_mandarin_chinese_language,
+    is_cantonese_language,
     is_english_language,
     is_spanish_language,
     is_russian_language,
     is_french_language,
     is_german_language,
+    is_italian_language,
+    is_portuguese_language,
     is_thai_language,
     is_arabic_language,
 )
 from lute.read.render.grammar_analysis_ja import analyze_japanese
 from lute.read.render.grammar_analysis_ko import analyze_korean
+from lute.read.render.grammar_analysis_zh import analyze_chinese
+from lute.read.render.grammar_analysis_yue import analyze_cantonese
 from lute.read.render.grammar_analysis_en import analyze_english
 from lute.read.render.grammar_analysis_es import analyze_spanish
 from lute.read.render.grammar_analysis_ru import analyze_russian
 from lute.read.render.grammar_analysis_fr import analyze_french
 from lute.read.render.grammar_analysis_de import analyze_german
+from lute.read.render.grammar_analysis_it import analyze_italian
+from lute.read.render.grammar_analysis_pt import analyze_portuguese
 from lute.read.render.grammar_analysis_th import analyze_thai
 from lute.read.render.grammar_analysis_ar import analyze_arabic
 from lute.read.forms import TextForm
@@ -1111,11 +1119,15 @@ def grammar_analysis(bookid, pagenum):
     # pymorphy3); when they are missing, fall back to the generic regex
     # rule library instead of failing the panel.
     for detector, engine, extra in (
+        (is_mandarin_chinese_language, analyze_chinese, "chinese"),
+        (is_cantonese_language, analyze_cantonese, "cantonese"),
         (is_english_language, analyze_english, "english"),
         (is_spanish_language, analyze_spanish, "spanish"),
         (is_russian_language, analyze_russian, "russian"),
         (is_french_language, analyze_french, "french"),
         (is_german_language, analyze_german, "german"),
+        (is_italian_language, analyze_italian, "italian"),
+        (is_portuguese_language, analyze_portuguese, "portuguese"),
         (is_thai_language, analyze_thai, "thai"),
         (is_arabic_language, analyze_arabic, "arabic"),
     ):
