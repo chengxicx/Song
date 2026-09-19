@@ -1,7 +1,7 @@
 {
-  "name": "Lute - Learning Using Texts",
-  "short_name": "Lute",
-  "description": "Learning Using Texts - read foreign language texts with smart word tracking.",
+  "name": "Song",
+  "short_name": "Song",
+  "description": "Song - read foreign language texts with smart word tracking.",
   "start_url": "/?utm_source=pwa",
   "scope": "/",
   "id": "/",
@@ -18,7 +18,7 @@
     {
       "name": "Home",
       "short_name": "Home",
-      "description": "Go to Lute home page",
+      "description": "Go to Song home page",
       "url": "/",
       "icons": [
         {
@@ -49,14 +49,14 @@
       "sizes": "1280x720",
       "type": "image/webp",
       "form_factor": "wide",
-      "label": "Lute - Learning Using Texts"
+      "label": "Song - Learning Using Texts"
     },
     {
       "src": "/static/img/lute-screenshot-mobile.webp",
       "sizes": "750x1334",
       "type": "image/webp",
       "form_factor": "narrow",
-      "label": "Lute - Learning Using Texts"
+      "label": "Song - Learning Using Texts"
     }
   ]
 }

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}New User{% endblock %}
+
+{% block header %}New User{% endblock %}
+
+{% block body %}
+
+<form method="POST" action="/users/new" style="max-width: 360px;">
+  <label for="username">Username</label><br/>
+  <input type="text" id="username" name="username" required maxlength="32"
+         style="width:100%;padding:7px 9px;" autofocus /> <br/>
+  <small style="color:#868e96;">1-32 characters: letters, digits, . _ -</small><br/><br/>
+
+  <label for="password">Password</label><br/>
+  <input type="password" id="password" name="password" required
+         style="width:100%;padding:7px 9px;" /><br/><br/>
+
+  <label for="confirm">Confirm password</label><br/>
+  <input type="password" id="confirm" name="confirm" required
+         style="width:100%;padding:7px 9px;" /><br/><br/>
+
+  <label for="role">Role</label><br/>
+  <select id="role" name="role" style="padding:7px 9px;">
+    <option value="user" selected>User</option>
+    <option value="admin">Admin</option>
+  </select><br/><br/>
+
+  <button type="submit" style="padding:8px 20px;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer;">Create</button>
+  <a href="/users/index" style="margin-left: 10px;">Cancel</a>
+</form>
+
+{% endblock %}

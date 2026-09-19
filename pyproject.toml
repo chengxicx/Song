@@ -38,12 +38,21 @@ dependencies = [
   "subtitle-parser>=1.3.0",
   "ahocorapy>=1.6.2",
   "edge-tts>=6.1.0",
-  # Core Korean parser (lute/parse/kiwi_parser.py).
-  "kiwipiepy>=0.15.0"
+  "qrcode>=7.4.2,<9"
 ]
 
 [project.scripts]
 lute = "lute.main:start"
+
+# Feature plugin entry point group.
+# External plugins (e.g. lute3-storygen) declare themselves under this
+# group so lute's feature loader (lute/feature/loader.py) discovers and
+# wires them up at startup.  Lute itself ships one empty marker (_demo)
+# so the wiring is always exercised even with no plugins installed.
+# Real feature plugins live in separate packages that are NOT part of
+# this repo.
+[project.entry-points."lute.plugin.feature"]
+_demo = "lute.feature._demo:register"
 
 [package_data]
 lute.config = ["config/config.yml"]
@@ -63,6 +72,38 @@ dev = [
 japanese-sudachi = [
   "sudachipy>=0.6.0",
   "sudachidict-core>=0.2.0",
+]
+korean = [
+  "kiwipiepy>=0.22.0",
+]
+# Grammar-analysis engines.  spaCy is capped below 3.8.4 because that is the
+# last line shipping binary wheels for every supported Python (3.9-3.13);
+# the 3.8.0 model wheels pin the compatible spaCy range themselves.
+english = [
+  "spacy>=3.8.0,<3.8.4",
+  "en-core-web-sm@https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
+]
+spanish = [
+  "spacy>=3.8.0,<3.8.4",
+  "es-core-news-sm@https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl",
+]
+russian = [
+  "pymorphy3>=2.0,<3",
+  "pymorphy3-dicts-ru>=2.4,<3",
+]
+french = [
+  "spacy>=3.8.0,<3.8.4",
+  "fr-core-news-sm@https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.8.0/fr_core_news_sm-3.8.0-py3-none-any.whl",
+]
+german = [
+  "spacy>=3.8.0,<3.8.4",
+  "de-core-news-sm@https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.8.0/de_core_news_sm-3.8.0-py3-none-any.whl",
+]
+thai = [
+  "pythainlp>=5.0,<6",
+]
+arabic = [
+  "pyarabic>=0.6,<2",
 ]
 
 [project.urls]

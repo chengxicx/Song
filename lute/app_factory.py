@@ -6,22 +6,29 @@ Methods: create_app.
 
 import os
 import json
+import hashlib
 import platform
+import secrets
+import sqlite3
 import traceback
 import mimetypes
+from urllib.parse import quote
 from flask import (
     Flask,
     render_template,
     request,
     redirect,
     flash,
+    session,
     current_app,
+    has_request_context,
     make_response,
     send_from_directory,
     jsonify,
+    url_for,
 )
 from sqlalchemy.event import listens_for
-from sqlalchemy.pool import Pool
+from sqlalchemy.pool import NullPool, Pool
 
 from lute.config.app_config import AppConfig
 from lute.db import db
@@ -32,11 +39,20 @@ from lute.backup.service import Service as BackupService
 from lute.db.demo import Service as DemoService
 import lute
 import lute.utils.formutils
+from lute.utils import static_assets
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
+from lute.parse import plugin_installer
+from lute.read.render import grammar_analysis
+from lute.feature.routes import bp as feature_bp
+from lute.feature import load_feature_plugins
 
 from lute.models.book import Book
 from lute.models.language import Language
+from lute.multiuser import context as mu_context
+from lute.multiuser import paths as mu_paths
+from lute.multiuser import store as mu_store
+from lute.multiuser.config_proxy import UserScopedAppConfig
 from lute.settings.current import (
     refresh_global_settings,
     current_settings,
@@ -50,6 +66,7 @@ from lute.ankiexport.routes import bp as anki_bp
 from lute.book.routes import bp as book_bp
 from lute.bookmarks.routes import bp as bookmarks_bp
 from lute.language.routes import bp as language_bp
+from lute.multiuser.routes import bp as multiuser_bp
 from lute.term.routes import bp as term_bp
 from lute.termtag.routes import bp as termtag_bp
 from lute.read.routes import bp as read_bp
@@ -64,6 +81,7 @@ from lute.themes.routes import bp as themes_bp
 from lute.stats.routes import bp as stats_bp
 from lute.cli.commands import bp as cli_bp
 from lute.tts.routes import bp as tts_bp
+from lute.netease.routes import bp as netease_bp
 
 
 def _setup_app_dir(dirname, readme_content):
@@ -112,6 +130,24 @@ def _setup_app_dirs(app_config):
         _setup_app_dir(rec[0], rec[1])
 
 
+def _setup_base_app_dirs(app_config):
+    """
+    Base-level dirs needed when multi-user mode is on (per-user dirs
+    are created from their user config instead).
+    """
+    dp = app_config.datapath
+    required_dirs = [
+        [dp, "Lute data folder."],
+        [app_config.plugin_datapath, "Data files for plugins."],
+        [
+            app_config.temppath,
+            "Temp directory for export file writes, to avoid permissions issues.",
+        ],
+    ]
+    for rec in required_dirs:
+        _setup_app_dir(rec[0], rec[1])
+
+
 def _add_base_routes(app, app_config):
     """
     Add some basic routes.
@@ -122,20 +158,59 @@ def _add_base_routes(app, app_config):
         """
         Inject backup settings into the all templates for the menu bar.
         """
+        # Pre-login requests (multi-user mode) have no user scope: no
+        # db access is possible, so serve neutral values.  The login
+        # page is standalone and doesn't use these.
+        if mu_store.enabled() and not mu_context.get_current_user():
+            return {
+                "have_languages": False,
+                "backup_enabled": False,
+                "backup_directory": "",
+                "backup_last_display_date": None,
+                "backup_time_since": None,
+                "user_settings": json.dumps({}),
+                "user_hotkeys": json.dumps({}),
+                "current_theme": "Default.css",
+                "theme_css_hash": "",
+                "custom_styles": "",
+                "custom_styles_hash": "",
+                "lute_version": lute.__version__,
+                "multiuser_enabled": True,
+                "current_username": None,
+                "is_admin": False,
+            }
         us_repo = UserSettingRepository(db.session)
         bs = us_repo.get_backup_settings()
         have_languages = len(db.session.query(Language).all()) > 0
+        # Content hashes for the theme css links: the URL carries the
+        # hash, so browsers (and CDNs) can cache the response forever
+        # and a theme change simply produces a new URL.
+        from lute.themes.service import Service as _ThemeService
+        _theme_css = _ThemeService(db.session).get_current_css()
+        _custom_styles = current_settings().get("custom_styles", "")
+        _css_hash = lambda s: hashlib.sha1(s.encode("utf-8")).hexdigest() if s else ""
+        # Templates can be rendered outside a request (e.g. background
+        # rendering in tests); session is only readable in requests.
+        req_username = session.get("user") if has_request_context() else None
         ret = {
             "have_languages": have_languages,
             "backup_enabled": bs.backup_enabled,
             "backup_directory": bs.backup_dir,
             "backup_last_display_date": bs.last_backup_display_date,
             "backup_time_since": bs.time_since_last_backup,
-            "user_settings": json.dumps(current_settings),
-            "user_hotkeys": json.dumps(current_hotkeys),
+            "user_settings": json.dumps(current_settings()),
+            "user_hotkeys": json.dumps(current_hotkeys()),
             "current_theme": us_repo.get_value("current_theme"),
+            "theme_css_hash": _css_hash(_theme_css),
+            # The cached settings bucket already holds custom_styles, so
+            # this is a dict lookup, not another db query.  base.html
+            # skips the custom_styles <link> entirely when it is empty.
+            "custom_styles": _custom_styles,
+            "custom_styles_hash": _css_hash(_custom_styles),
             "lute_version": lute.__version__,
-            "asset_cache_bust": lute.ASSET_CACHE_BUST,
+            "multiuser_enabled": mu_store.enabled(),
+            "current_username": req_username,
+            "is_admin": mu_store.enabled() and mu_store.is_admin(req_username),
         }
         return ret
 
@@ -183,7 +258,9 @@ def _add_base_routes(app, app_config):
                 backup_show_warning=backup_show_warning,
                 backup_warning_msg=warning_msg,
                 reading_streak=get_reading_streak(db.session),
-                show_streak_on_home=current_settings.get("show_streak_on_home", False),
+                show_streak_on_home=current_settings().get(
+                    "show_streak_on_home", False
+                ),
             )
         )
         return response
@@ -202,6 +279,9 @@ def _add_base_routes(app, app_config):
 
     @app.route("/wipe_database")
     def wipe_db():
+        if mu_store.enabled() and not mu_store.is_admin(session.get("user")):
+            flash("Only an admin can wipe the database.")
+            return redirect("/", 302)
         demosvc = DemoService(db.session)
         if demosvc.contains_demo_data():
             demosvc.delete_demo_data()
@@ -249,8 +329,8 @@ def _add_base_routes(app, app_config):
         """
         ret = {
             "version": lute.__version__,
-            "datapath": current_app.config["DATAPATH"],
-            "database": current_app.config["DATABASE"],
+            "datapath": current_app.env_config.datapath,
+            "database": current_app.env_config.dbfilename,
         }
         return jsonify(ret)
 
@@ -317,6 +397,26 @@ def _add_base_routes(app, app_config):
         )
 
 
+def _load_or_create_secret_key(app_config):
+    """
+    Load the app SECRET_KEY, creating a random one on first use.
+
+    A real secret is required for signed sessions in multi-user mode;
+    it's persisted in the datapath so sessions survive restarts.
+    """
+    keyfile = os.path.join(app_config.datapath, ".secret_key")
+    if os.path.exists(keyfile):
+        with open(keyfile, "r", encoding="utf-8") as f:
+            existing = f.read().strip()
+            if existing:
+                return existing
+    new_key = secrets.token_hex(32)
+    fd = os.open(keyfile, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        f.write(new_key)
+    return new_key
+
+
 def _create_app(app_config, extra_config):
     """
     Create the app using the given configuration,
@@ -325,11 +425,39 @@ def _create_app(app_config, extra_config):
 
     app = Flask(__name__, instance_path=app_config.datapath)
 
+    def _connect_current_db():
+        """
+        Open a raw connection to the CURRENT scope's database.
+
+        Multi-user mode: each user gets their own sqlite file, resolved
+        per connection checkout from the request's user scope.  A db
+        touch without a user scope is a bug -- failing loudly here
+        beats silently creating an empty base db file.
+        Single-user mode: this is the base db file, as before.
+        """
+        if mu_store.enabled():
+            username = mu_context.get_current_user()
+            if username:
+                return sqlite3.connect(mu_paths.user_dbfilename(app_config, username))
+            raise RuntimeError(
+                "Multi-user mode is on, but no user scope is set for this "
+                "database access.  Boot-time code must run inside "
+                "multiuser.context.user_scope(username)."
+            )
+        return sqlite3.connect(app_config.dbfilename)
+
     config = {
-        "SECRET_KEY": "some_secret",
+        "SECRET_KEY": _load_or_create_secret_key(app_config),
         "DATABASE": app_config.dbfilename,
         "ENV": app_config.env,
         "SQLALCHEMY_DATABASE_URI": f"sqlite:///{app_config.dbfilename}",
+        # The URI above only selects the sqlite dialect; connections
+        # are opened per checkout by _connect_current_db, so no pooled
+        # connection can ever point at another user's db file.
+        "SQLALCHEMY_ENGINE_OPTIONS": {
+            "creator": _connect_current_db,
+            "poolclass": NullPool,
+        },
         "DATAPATH": app_config.datapath,
         # ref https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
         # Don't track mods.
@@ -343,17 +471,42 @@ def _create_app(app_config, extra_config):
         # book imports).  200 MB matches the Nginx client_max_body_size
         # on the production server.
         "MAX_CONTENT_LENGTH": 200 * 1024 * 1024,
+        "SESSION_COOKIE_SAMESITE": "Lax",
+        "PERMANENT_SESSION_LIFETIME": 86400 * 30,
     }
+    if app_config.env == "prod":
+        config["SESSION_COOKIE_SECURE"] = True
 
     final_config = {**config, **extra_config}
     app.config.from_mapping(final_config)
 
     # Attach the app_config to app so it's available at runtime.
-    app.env_config = app_config
+    # Wrapped in a proxy: user-scoped path attributes resolve to the
+    # logged-in user's directories when multi-user mode is on.
+    app.env_config = UserScopedAppConfig(app_config)
 
     # Force template auto-reload so that template changes are picked up
     # without needing to restart the server (especially in prod env).
     app.jinja_env.auto_reload = True
+
+    # vstatic(): url_for('static', ...) plus a content-hash ?v= param, so
+    # vendored assets (served immutable for a year) are re-fetched exactly
+    # when their content changes.  ref lute/utils/static_assets.py
+    app.jinja_env.globals["vstatic"] = static_assets.make_vstatic(
+        app.static_folder,
+        lambda filename: url_for("static", filename=filename),
+    )
+
+    # vstatic_js(): same idea for Lute's own JS, which is served by the
+    # immutable-cached /static/js/never_cache/<file> route.  Templates must
+    # use one of these two helpers rather than a hand-written ?v= string:
+    # these assets are cached for a year, so a version string somebody
+    # forgets to bump pins clients to the old file.  There is a test that
+    # enforces this (tests/unit/utils/test_static_assets.py).
+    app.jinja_env.globals["vstatic_js"] = static_assets.make_vstatic_js(
+        app.static_folder,
+        lambda filename: url_for("custom_js", filename=filename),
+    )
 
     db.init_app(app)
 
@@ -363,9 +516,21 @@ def _create_app(app_config, extra_config):
         dbapi_con.execute("pragma foreign_keys = on;")
 
     with app.app_context():
-        db.create_all()
-        add_default_user_settings(db.session, app_config.default_user_backup_path)
-        refresh_global_settings(db.session)
+        if mu_store.enabled():
+            # Multi-user mode: create/verify schema and seed default
+            # settings in EACH user's own database.
+            for username in [u["username"] for u in mu_store.users()]:
+                with mu_context.user_scope(username):
+                    db.create_all()
+                    add_default_user_settings(
+                        db.session,
+                        current_app.env_config.default_user_backup_path,
+                    )
+                    refresh_global_settings(db.session)
+        else:
+            db.create_all()
+            add_default_user_settings(db.session, app_config.default_user_backup_path)
+            refresh_global_settings(db.session)
     app.db = db
 
     _add_base_routes(app, app_config)
@@ -440,6 +605,38 @@ def _create_app(app_config, extra_config):
         return response
 
     @app.before_request
+    def _multiuser_auth_gate():
+        """
+        Route each request to its user's scope.
+
+        Multi-user mode: unauthenticated requests are redirected to
+        /login (static assets excepted); authenticated requests run
+        against the logged-in user's own database and data paths.
+        Single-user mode: no-op -- the scope stays on the default
+        (base) database and paths, exactly as before.
+        """
+        if not mu_store.enabled():
+            mu_context.set_current_user(None)
+            return
+
+        path = request.path
+        if path == "/login" or path.startswith("/static/") or path == "/favicon.ico":
+            mu_context.set_current_user(None)
+            return
+
+        username = session.get("user")
+        if username and mu_store.get_user(username) is not None:
+            mu_context.set_current_user(username)
+            return
+
+        mu_context.set_current_user(None)
+        session.clear()
+        login_url = url_for("multiuser.login")
+        if request.method == "GET":
+            login_url += "?next=" + quote(request.path)
+        return redirect(login_url)
+
+    @app.before_request
     def _before_request():
         """
         Reset engine and refresh settings after a backup restore.
@@ -450,6 +647,20 @@ def _create_app(app_config, extra_config):
         _BackupServiceClass._engine_needs_reset = False
         try:
             db.session.remove()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        # Run any pending schema migrations on the restored database.
+        # A backup restored from an older schema (e.g. made by upstream
+        # Lute) may be missing Song-specific columns (LgKiwi*, manga/
+        # pdf/srt book fields, etc.).  setup_db no-ops quickly if the
+        # schema is already current.
+        try:
+            setup_db(current_app.env_config)
+        except Exception:  # pylint: disable=broad-exception-caught
+            current_app.logger.error(
+                "Running migrations after restore failed.", exc_info=True
+            )
+        try:
             db.engine.dispose()
         except Exception:  # pylint: disable=broad-exception-caught
             pass
@@ -463,9 +674,16 @@ def _create_app(app_config, extra_config):
             pass
         try:
             from lute.parse.mecab_parser import JapaneseParser
+
             JapaneseParser._is_supported = None
             JapaneseParser._old_mecab_path = None
             JapaneseParser._invalidate_mecab_cache()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        try:
+            from lute.parse.sudachi_parser import JapaneseSudachiParser
+
+            JapaneseSudachiParser._invalidate_cache()
         except Exception:  # pylint: disable=broad-exception-caught
             pass
 
@@ -483,7 +701,9 @@ def _create_app(app_config, extra_config):
         images), which are not text/html, keep their long cache headers.
         """
         if request.method == "GET" and response.mimetype == "text/html":
-            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            response.headers[
+                "Cache-Control"
+            ] = "no-store, no-cache, must-revalidate, max-age=0"
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"
         return response
@@ -505,16 +725,47 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(stats_bp)
     app.register_blueprint(cli_bp)
     app.register_blueprint(tts_bp)
+    app.register_blueprint(netease_bp)
+    app.register_blueprint(multiuser_bp)
     if app_config.is_test_db:
         app.register_blueprint(dev_api_bp)
+
+    # Feature plugin support.
+    # - feature_bp always serves empty fragments unless plugins add items.
+    # - load_feature_plugins discovers installed plugins and wires up any
+    #   blueprints / menu items / settings tiles they register.
+    app.register_blueprint(feature_bp)
+    load_feature_plugins(app)
 
     return app
 
 
-def _init_parser_plugins(plugin_data_path, outfunc):
+def _init_parser_plugins(app, plugin_data_path, outfunc):
     "Load and init plugins."
     outfunc("Initializing parsers from plugins ...")
     init_parser_plugins()
+
+    # Auto-install missing whitelisted parser plugins for languages that
+    # already exist in the DB (e.g. Korean created before its parser was
+    # pluginized).  These never hit the install-on-predefined-load path,
+    # so without this step users would be stuck with an unusable parser.
+    outfunc("Checking parser plugins for existing languages ...")
+    # Multi-user mode: every user's db has its own languages, so run
+    # the check per user.  Single-user mode: one pass on the base db.
+    if mu_store.enabled():
+        scopes = [u["username"] for u in mu_store.users()]
+    else:
+        scopes = [None]
+    for username in scopes:
+        with mu_context.user_scope(username), app.app_context():
+            for name, ok, message in plugin_installer.ensure_existing_language_parsers(
+                db.session
+            ):
+                status = "OK" if ok else "FAILED"
+                outfunc(f"  * {name}: {status} - {message}")
+            # Grammar-analysis engines are optional extras; report the pip
+            # command when the user's languages would benefit from one.
+            grammar_analysis.report_grammar_engine_status(db.session)
 
     parsers = supported_parsers()
     parsers_with_extra_data = [
@@ -579,8 +830,18 @@ def create_app(
             app_config_path = AppConfig.default_config_filename()
 
     app_config = AppConfig(app_config_path)
-    _setup_app_dirs(app_config)
-    setup_db(app_config, output_func)
+    mu_store.load(app_config)
+    if mu_store.enabled():
+        # Multi-user mode: every user gets their own db and data dirs,
+        # migrated/created and schema-migrated individually.
+        _setup_base_app_dirs(app_config)
+        for userinfo in mu_store.users():
+            ucfg = mu_paths.user_config(app_config, userinfo["username"])
+            mu_paths.ensure_user_dirs(ucfg)
+            setup_db(ucfg, output_func)
+    else:
+        _setup_app_dirs(app_config)
+        setup_db(app_config, output_func)
 
     if extra_config is None:
         extra_config = {}
@@ -588,7 +849,7 @@ def create_app(
     app = _create_app(app_config, extra_config)
 
     # Plugins are loaded after the app, as they may use settings etc.
-    _init_parser_plugins(app_config.plugin_datapath, outfunc)
+    _init_parser_plugins(app, app_config.plugin_datapath, outfunc)
 
     return app
 
@@ -607,6 +868,16 @@ def data_initialization(session, output_func=None):
         pass
 
     outfunc = output_func or _null_print
+
+    # Multi-user mode: no single-user demo db; run the per-user
+    # housekeeping under each user's scope instead.  (All callers --
+    # lute.main and devstart.py -- go through here, so the mode check
+    # lives in this one place.)
+    if mu_store.enabled():
+        for userinfo in mu_store.users():
+            with mu_context.user_scope(userinfo["username"]):
+                clean_data(session, outfunc)
+        return
 
     demosvc = DemoService(session)
     if demosvc.should_load_demo_data():

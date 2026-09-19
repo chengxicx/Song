@@ -73,11 +73,11 @@
     {% endfor %}
 
     {# --- Korean / Kiwi-specific section. ----------------------------------
-       Only shown when the language's parser_type is 'korean'.
+       Only shown when the language's parser_type is 'lute_korean'.
        Toggled live by the `parser_type` dropdown's change event.
        Uses data-kiwi attribute on rows for easy selector-based toggling.
     ---------------------------------------------------------------------- #}
-    {% set _kiwi_visible = (form.parser_type.data == 'korean') %}
+    {% set _kiwi_visible = (form.parser_type.data == 'lute_korean') %}
     <tr data-kiwi-row style="display:{% if _kiwi_visible %}table-row{% else %}none{% endif %};">
       <td colspan="2">
         <h3 style="margin-top:14px; margin-bottom:6px;">한국어 Kiwi 切词设置 / Korean Kiwi Tokenizer</h3>
@@ -180,7 +180,7 @@
     // --- Show/hide the Kiwi section when the parser dropdown changes.
     var parserSel = document.querySelector("select#parser_type");
     function toggleKiwiRows() {
-      var isKorean = parserSel && parserSel.value === "korean";
+      var isKorean = parserSel && parserSel.value === "lute_korean";
       var rows = document.querySelectorAll("tr[data-kiwi-row]");
       rows.forEach(function(r) { r.style.display = isKorean ? "table-row" : "none"; });
     }
@@ -292,7 +292,7 @@
       var popup = window.open('', '_blank', 'width=600,height=600,top=50,left=50');
       const content = `<html>
 <head>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}?v={{ lute_version }}" />
+<link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
 <title>Dictionary test</title>
 </head>
 

@@ -32,6 +32,19 @@ addClickHandler(".manga-zoom-fit", resetMangaZoom);
 
 
 function incrementFontSize(delta) {
+  // When the grammar-analysis panel is open, the A+/A- buttons resize only
+  // the panel (right side); the reading text keeps its own size.  Close the
+  // panel to tune the reading text again.  delta === 0 is the post-reload
+  // re-apply and must keep re-stamping the reading words regardless.
+  const grammarPanel = document.querySelector(".grammar-analysis-panel");
+  if (grammarPanel && delta !== 0) {
+    const GF_KEY = "grammarFontSize";
+    const gfs = parseFloat(getFromLocalStorage(GF_KEY, 14));
+    const newGfs = clamp(gfs + delta, 8, 60);
+    grammarPanel.style.fontSize = `${convertPixelsToRem(newGfs)}rem`;
+    localStorage.setItem(GF_KEY, newGfs);
+    return;
+  }
   // Manga text items size themselves with container-query units (cqw)
   // against the page image; the reading-pane font controls must not
   // override those, so exclude any item inside a manga block.  PDF page

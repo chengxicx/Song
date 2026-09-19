@@ -166,6 +166,7 @@ class EditBookForm(FlaskForm):
             ("youtube", "YouTube video"),
             ("bilibili", "Bilibili video"),
             ("mp3", "MP3 / M4A audio"),
+            ("netease", "NetEase Cloud Music"),
             ("video", "Online video"),
         ],
     )
@@ -202,7 +203,7 @@ class EditBookForm(FlaskForm):
 
         # If the type was changed away from youtube/bilibili/mp3/video,
         # clear the subtitle data.
-        if obj.book_type not in ("youtube", "bilibili", "mp3", "video"):
+        if obj.book_type not in ("youtube", "bilibili", "mp3", "netease", "video"):
             obj.srt_data = None
             obj.video_current_pos = None
 
@@ -218,7 +219,7 @@ class EditBookForm(FlaskForm):
             obj.audio_bookmarks = None
             obj.audio_current_pos = None
 
-        if obj.book_type in ("youtube", "bilibili", "mp3", "video"):
+        if obj.book_type in ("youtube", "bilibili", "mp3", "netease", "video"):
             self._parse_youtube_subtitles(obj)
 
     def _parse_youtube_subtitles(self, obj):
@@ -268,6 +269,41 @@ class EditBookForm(FlaskForm):
             raise BookImportException(
                 f"Could not parse subtitle data: {e}", cause=e
             ) from e
+
+
+class MangaEditForm(FlaskForm):
+    """
+    Edit a Mokuro manga book.
+
+    Manga books have no text to edit: title and tags are edited in
+    place, and an uploaded archive is re-imported over the book
+    (replacing its images, pages and mokuro data).
+    """
+
+    title = StringField("Title", validators=[DataRequired(), Length(max=255)])
+    book_tags = StringField("Tags")
+    manga_file = FileField(
+        "Replace archive",
+        validators=[
+            FileAllowed(
+                ["zip", "cbz"],
+                "Please upload a valid Mokuro manga archive (.zip or .cbz).",
+            )
+        ],
+    )
+
+    def __init__(self, *args, **kwargs):
+        "Call the constructor of the superclass (FlaskForm)"
+        super().__init__(*args, **kwargs)
+        book = kwargs.get("obj")
+
+        def _data(arr):
+            "Get data in proper format for tagify."
+            return json.dumps([{"value": p} for p in arr])
+
+        self.book_tags.data = _data(book.book_tags)
+        if request.method == "POST":
+            self.book_tags.data = request.form.get("book_tags", "")
 
 
 class BookSettingsForm(FlaskForm):

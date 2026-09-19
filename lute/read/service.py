@@ -8,6 +8,7 @@ from collections import defaultdict
 from datetime import datetime
 import functools
 from flask import current_app
+from sqlalchemy.exc import IntegrityError
 from lute.models.term import Term, Status
 from lute.models.book import Text, WordsRead
 from lute.models.repositories import BookRepository, UserSettingRepository
@@ -15,6 +16,7 @@ from lute.book.stats import Service as StatsService
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.term.model import Repository
+from lute.utils.manga_images import image_path_for_page
 
 # from lute.utils.debug_helpers import DebugTimer
 
@@ -212,12 +214,9 @@ def _extract_pdf_page_words_pypdf(pdf_abs_path, pagenum):
         for run in line["runs"]:
             for match in re.finditer(r"\S+", run["text"]):
                 est_width = sum(
-                    _char_width(c, fs)
-                    for c in run["text"][match.start() : match.end()]
+                    _char_width(c, fs) for c in run["text"][match.start() : match.end()]
                 )
-                x_before = sum(
-                    _char_width(c, fs) for c in run["text"][: match.start()]
-                )
+                x_before = sum(_char_width(c, fs) for c in run["text"][: match.start()])
                 words.append(
                     {
                         "text": match.group(0),
@@ -341,7 +340,7 @@ class Service:
         elif mark_rest_as_known:
             self.set_page_unknowns_to_known(book, text, pagenum)
 
-    def set_page_unknowns_to_known(self, book, text, pagenum):
+    def set_page_unknowns_to_known(self, book, text, pagenum, finalize=True):
         """
         Mark the unknown words of one page as Well-Known, for any book
         type.
@@ -349,15 +348,18 @@ class Service:
         Manga and pdf books keep an *empty* page text (their words come
         from the image / pdf file), so the plain text path finds nothing
         to mark; those pages are re-tokenized from their source instead.
+
+        finalize=False leaves the commit and the stale-mark to the
+        caller, for whole-book walks.
         """
         btype = (book.book_type or "").lower()
         if btype == "pdf":
-            return self.set_pdf_page_unknowns_to_known(book, pagenum)
+            return self.set_pdf_page_unknowns_to_known(book, pagenum, finalize)
         if btype == "manga":
-            return self.set_manga_page_unknowns_to_known(book, pagenum)
+            return self.set_manga_page_unknowns_to_known(book, pagenum, finalize)
         return self.set_unknowns_to_known(text)
 
-    def _mark_rendered_page_unknowns_known(self, dbbook, items):
+    def _mark_rendered_page_unknowns_known(self, dbbook, items, finalize=True):
         """
         Mark the unknown words of an externally rendered page (manga /
         pdf) as Well-Known.
@@ -402,10 +404,13 @@ class Service:
                 self.session.add(t)
             updated += len(terms)
 
-        self.session.commit()
-
-        if updated:
-            StatsService(self.session).mark_stale(dbbook)
+        # "Mark the whole book known" walks every page; committing and
+        # re-marking the stats stale per page costs one write per page
+        # for no benefit, so the caller can defer both to the end.
+        if finalize:
+            self.session.commit()
+            if updated:
+                StatsService(self.session).mark_stale(dbbook)
 
         return updated
 
@@ -459,8 +464,13 @@ class Service:
             updated = 0
             for pagenum in range(1, book.page_count + 1):
                 updated += self.set_page_unknowns_to_known(
-                    book, book.text_at_page(pagenum), pagenum
+                    book, book.text_at_page(pagenum), pagenum, finalize=False
                 )
+            # One commit and one stale-mark for the whole book, instead
+            # of one of each per page.
+            self.session.commit()
+            if updated:
+                StatsService(self.session).mark_stale(book)
             return updated
 
         rs = RenderService(self.session)
@@ -550,19 +560,83 @@ class Service:
             repo.add(t)
         repo.commit()
 
+    def save_new_textitem_terms(self, textitems):
+        """
+        Save the unsaved status-0 Terms attached to the given TextItems,
+        recovering from concurrent saves.
+
+        The first open of a new book fires several tokenizing requests
+        at once (the start_reading fragment, the whole-book subtitle
+        words fetch, ...), and each creates its own unsaved Terms for
+        the same words.  The loser of that race fails its commit with a
+        UNIQUE constraint violation on words(WoLgID, WoTextLC).  On
+        rollback, the TextItems are re-pointed at whichever terms
+        actually got persisted, and only the still-missing texts are
+        rebuilt and retried.
+        """
+        # (language id, text_lc) -> TextItems sharing one unsaved term.
+        # A word repeated across a manga page's per-line renders can
+        # carry several distinct Term objects for the same text.
+        pending = {}
+        for ti in textitems:
+            t = ti.term
+            if ti.is_word and t is not None and t.id is None and t.status == 0:
+                pending.setdefault((t.language.id, t.text_lc), []).append(ti)
+        if not pending:
+            return
+
+        # Plain data captured up front: after a rollback the unsaved
+        # Term objects are detached, so the recovery path must not read
+        # anything off them.
+        sources = {
+            key: (tis[0].term.language, tis[0].term.text)
+            for key, tis in pending.items()
+        }
+
+        for _ in range(5):
+            for tis in pending.values():
+                self.session.add(tis[0].term)
+            try:
+                self.session.commit()
+            except IntegrityError:
+                self.session.rollback()
+                for key, tis in pending.items():
+                    language, text = sources[key]
+                    existing = (
+                        self.session.query(Term)
+                        .filter(
+                            Term.language_id == key[0],
+                            Term.text_lc == key[1],
+                        )
+                        .first()
+                    )
+                    if existing is not None:
+                        for ti in tis:
+                            ti.term = existing
+                    else:
+                        rebuilt = Term.create_term_no_parsing(language, text)
+                        rebuilt.status = 0
+                        for ti in tis:
+                            ti.term = rebuilt
+                continue
+            for tis in pending.values():
+                for ti in tis:
+                    ti.term = tis[0].term
+            return
+
+        # Five conflicts in a row is not a normal race.  The terms stay
+        # unsaved and get rebuilt on the next render, but say so: a
+        # silent drop is far harder to diagnose than a log line.
+        current_app.logger.warning(
+            "Gave up saving %d new term(s) after repeated write conflicts.",
+            len(pending),
+        )
+
     def _save_new_status_0_terms(self, paragraphs):
         "Add status 0 terms for new textitems in paragraph."
-        tis_with_new_terms = [
-            ti
-            for para in paragraphs
-            for sentence in para
-            for ti in sentence
-            if ti.is_word and ti.term.id is None and ti.term.status == 0
-        ]
-
-        for ti in tis_with_new_terms:
-            self.session.add(ti.term)
-        self.session.commit()
+        self.save_new_textitem_terms(
+            ti for para in paragraphs for sentence in para for ti in sentence
+        )
 
     def _get_reading_data(self, dbbook, pagenum, track_page_open=False):
         "Get paragraphs, set text.start_date if needed."
@@ -666,14 +740,26 @@ class Service:
         # this up during extract_manga(), but already-imported books
         # need a runtime lookup.
         resolved_img_path = raw_img_path
-        if manga_path and raw_img_path:
+        if manga_path:
             manga_abs = os.path.join(current_app.static_folder, manga_path)
-            if os.path.isdir(manga_abs):
+            is_dir = os.path.isdir(manga_abs)
+            if is_dir and not raw_img_path:
+                # No img_path at all.  A .mokuro assembled from the raw
+                # _ocr output carries only the OCR data, so the page is
+                # matched to its image by position -- the same rule
+                # mokuro uses.  Returning early here would leave the URL
+                # pointing at the directory itself, which 403s and
+                # renders a blank page.
+                ordinal = image_path_for_page(
+                    manga_abs, pagenum - 1, manga.get("volume")
+                )
+                if ordinal:
+                    resolved_img_path = ordinal
+            elif is_dir:
                 raw_abs = os.path.normpath(os.path.join(manga_abs, raw_img_path))
                 if not os.path.isfile(raw_abs):
                     # Try volume subdir, then basename scan.
-                    volume = ((manga.get("volume") or "").strip()
-                              .replace("\\", "/"))
+                    volume = (manga.get("volume") or "").strip().replace("\\", "/")
                     candidates = []
                     if volume:
                         candidates.append(
@@ -683,19 +769,28 @@ class Service:
                         )
                     # Fallback: walk the manga directory and match by
                     # basename, preferring paths that mention volume.
+                    # If no file carries that exact name, retry ignoring
+                    # the extension -- a jpg -> webp conversion renames
+                    # the files without updating the stored img_path, so
+                    # already-imported books need this too.
                     base = os.path.basename(raw_img_path).lower()
-                    matches = []
+                    stem = os.path.splitext(base)[0]
+                    exact_matches = []
+                    stem_matches = []
                     for root, _dirs, files in os.walk(manga_abs):
                         for f in files:
-                            if os.path.basename(f).lower() == base:
-                                matches.append(os.path.join(root, f))
+                            fname = os.path.basename(f).lower()
+                            if fname == base:
+                                exact_matches.append(os.path.join(root, f))
+                            elif os.path.splitext(fname)[0] == stem:
+                                stem_matches.append(os.path.join(root, f))
+                    matches = exact_matches or stem_matches
                     if matches:
+
                         def _match_key(p):
-                            has_vol = (
-                                bool(volume)
-                                and volume.lower() in p.lower()
-                            )
+                            has_vol = bool(volume) and volume.lower() in p.lower()
                             return (0 if has_vol else 1, len(p))
+
                         matches.sort(key=_match_key)
                         candidates.insert(0, matches[0])
                     for c in candidates:
@@ -709,7 +804,10 @@ class Service:
                             except ValueError:
                                 continue
 
-        return f"/static/{manga_path}/{resolved_img_path.lstrip('/')}", resolved_img_path
+        return (
+            f"/static/{manga_path}/{resolved_img_path.lstrip('/')}",
+            resolved_img_path,
+        )
 
     def _manga_page_blocks(self, dbbook, pagenum):
         """
@@ -729,6 +827,12 @@ class Service:
 
         rs = RenderService(self.session)
         lang = dbbook.language
+        # Build the multiword indexer once for the whole page.  Without
+        # it every line re-runs a full multiword-table query plus an
+        # O(all multiword terms) substring scan -- see
+        # RenderService.get_textitems, which is why stats.py and
+        # term/routes.py also build one and reuse it.
+        mw = rs.get_multiword_indexer(lang)
         blocks = []
         order = 0
         for bi, block in enumerate(page.get("blocks") or []):
@@ -742,7 +846,7 @@ class Service:
                 for phys in re.split(r"[¶\r\n]+", line):
                     if not phys.strip():
                         continue
-                    items = rs.get_textitems(phys, lang)
+                    items = rs.get_textitems(phys, lang, mw)
                     kept = []
                     for it in items:
                         # Guard against paragraph markers leaking through
@@ -766,7 +870,7 @@ class Service:
 
         return blocks
 
-    def set_manga_page_unknowns_to_known(self, dbbook, pagenum):
+    def set_manga_page_unknowns_to_known(self, dbbook, pagenum, finalize=True):
         """
         Mark the words rendered on one manga page as Well-Known.
 
@@ -778,7 +882,7 @@ class Service:
             return 0
         items = _manga_page_items(blocks)
         self._save_new_rendered_terms(items)
-        return self._mark_rendered_page_unknowns_known(dbbook, items)
+        return self._mark_rendered_page_unknowns_known(dbbook, items, finalize)
 
     def pdf_page_context(self, dbbook, pagenum, track_page_open=False):
         """
@@ -840,10 +944,14 @@ class Service:
 
         rs = RenderService(self.session)
         lang = dbbook.language
+        # One indexer for the whole page.  This loop tokenizes every
+        # extracted word on its own, so rebuilding the indexer per word
+        # would add a full multiword-table query per word on the page.
+        mw = rs.get_multiword_indexer(lang)
         word_contexts = []
         order = 0
         for word in words:
-            items = rs.get_textitems(word["text"], lang)
+            items = rs.get_textitems(word["text"], lang, mw)
             kept = []
             for it in items:
                 # Guard against paragraph markers leaking through
@@ -876,7 +984,7 @@ class Service:
 
         return page_width, page_height, word_contexts
 
-    def set_pdf_page_unknowns_to_known(self, dbbook, pagenum):
+    def set_pdf_page_unknowns_to_known(self, dbbook, pagenum, finalize=True):
         """
         Mark the words rendered on one pdf page as Well-Known.
 
@@ -890,35 +998,15 @@ class Service:
         _page_width, _page_height, word_contexts = ctx
         items = _pdf_page_items(word_contexts)
         self._save_new_rendered_terms(items)
-        return self._mark_rendered_page_unknowns_known(dbbook, items)
+        return self._mark_rendered_page_unknowns_known(dbbook, items, finalize)
 
     def _save_new_rendered_terms(self, items):
         """
         Add status-0 terms found in the TextItems of an externally
-        rendered page (manga / pdf).
-
-        Each line / word is tokenized with its own get_textitems() call,
-        so a word repeated within a page can produce several distinct,
-        unsaved Term objects for the same text; de-duplicate them by
-        (language, text_lc) before committing to avoid UNIQUE
-        constraint violations on words.WoLgID + words.WoTextLC.
+        rendered page (manga / pdf), de-duplicated by (language,
+        text_lc) and guarded against concurrent saves.
         """
-        seen = set()
-        new_terms = []
-        for ti in items:
-            if (
-                ti.is_word
-                and ti.term is not None
-                and ti.term.id is None
-                and ti.term.status == 0
-            ):
-                key = (ti.term.language.id, ti.term.text_lc)
-                if key not in seen:
-                    seen.add(key)
-                    new_terms.append(ti.term)
-        for t in new_terms:
-            self.session.add(t)
-        self.session.commit()
+        self.save_new_textitem_terms(items)
 
     def _sort_components(self, term, components):
         "Sort components by min position in string and length."

@@ -21,6 +21,10 @@ from openepub import Epub, EpubError
 from pypdf import PdfReader
 from subtitle_parser import SrtParser
 from lute.book.model import Repository
+from lute.models.book import Text as DBText
+from lute.utils.manga_images import image_path_for_page
+from lute.utils.mp4faststart import faststart_quietly
+from lute.utils.outbound_proxy import bilibili_proxies
 
 
 class BookImportException(Exception):
@@ -167,9 +171,11 @@ def parse_subtitle_content(content, ext=".srt"):
 
 
 def _parse_cues(content, ext):
-    "Parse srt/vtt content into a list of cue dicts."
+    "Parse srt/vtt/lrc content into a list of cue dicts."
     if ext == ".vtt":
         return _parse_vtt_cues(content)
+    if ext == ".lrc":
+        return _parse_lrc_cues(content)
     return _parse_srt_cues(content)
 
 
@@ -248,6 +254,72 @@ def _parse_vtt_cues(content):
     return cues
 
 
+# LRC (lyrics) timestamp, e.g. [01:23], [01:23.45], or [01:23.456]
+# (a colon instead of a dot before the fraction is also accepted).
+_LRC_TIME_RE = re.compile(r"\[(\d{1,3}):(\d{1,2})(?:[.:](\d{1,3}))?\]")
+_LRC_OFFSET_RE = re.compile(r"\[offset:\s*([+-]?\d+)\s*\]", re.IGNORECASE)
+_LRC_WORD_TIME_RE = re.compile(r"<\d{1,3}:\d{1,2}(?:[.:]\d{1,3})?>")
+
+
+def _parse_lrc_cues(content):
+    """
+    Parse LRC lyrics ("[mm:ss.xx]text" lines) into a list of cue dicts.
+
+    LRC has no end times, so each cue runs until the next line starts
+    (the last cue gets a fixed 5s tail).  Handled: multiple timestamps
+    on one line ("[00:01][00:30]chorus"), the [offset:ms] metadata tag
+    (positive shifts lyrics earlier, so it is subtracted), and
+    word-level karaoke timestamps ("<mm:ss.xx>" stripped).  Metadata
+    lines ([ti:], [ar:], ...) and lines without text are skipped.
+    """
+    offset = 0.0
+    om = _LRC_OFFSET_RE.search(content)
+    if om:
+        try:
+            offset = int(om.group(1)) / 1000.0
+        except ValueError:
+            offset = 0.0
+
+    timed = []  # (start, text or None) -- None for empty "instrumental gap" lines
+    for line in content.splitlines():
+        stamps = list(_LRC_TIME_RE.finditer(line))
+        if not stamps:
+            continue
+        # Remove the timestamp markers by position (a repeated marker
+        # value must not remove the wrong occurrence), then strip any
+        # word-level karaoke timestamps.
+        parts = []
+        pos = 0
+        for stamp in stamps:
+            parts.append(line[pos : stamp.start()])
+            pos = stamp.end()
+        parts.append(line[pos:])
+        text = _LRC_WORD_TIME_RE.sub("", "".join(parts)).strip()
+        for stamp in stamps:
+            frac = stamp.group(3)
+            start = (
+                int(stamp.group(1)) * 60
+                + int(stamp.group(2))
+                + (float(f"0.{frac}") if frac else 0.0)
+                - offset
+            )
+            timed.append((max(0.0, start), text or None))
+
+    # All timestamps bound the preceding cue's end (an empty-timestamp
+    # line means nothing is shown there), but only lines with text
+    # become cues.
+    timed.sort(key=lambda p: p[0])
+    cues = []
+    for i, (start, text) in enumerate(timed):
+        if text is None:
+            continue
+        next_start = timed[i + 1][0] if i + 1 < len(timed) else start + 5.0
+        cues.append(
+            {"start": start, "end": max(next_start, start + 0.5), "text": text}
+        )
+    return cues
+
+
 def parse_subtitle_content_any(name, content, ext=None):
     """
     Parse srt/vtt/txt subtitle content.
@@ -262,6 +334,8 @@ def parse_subtitle_content_any(name, content, ext=None):
         ext = (ext or "").lower()
     if ext == ".vtt":
         return parse_subtitle_content(content, ".vtt")
+    if ext == ".lrc":
+        return parse_subtitle_content(content, ".lrc")
     if ext == ".txt":
         return _parse_txt_subtitle(content)
     return parse_subtitle_content(content, ".srt")
@@ -286,7 +360,7 @@ def _url_extension(url, default):
     return default when the path has no recognised extension.
     """
     known = {
-        ".srt", ".vtt", ".txt", ".mp3", ".m4a", ".m4b", ".mp4", ".webm",
+        ".srt", ".vtt", ".txt", ".lrc", ".mp3", ".m4a", ".m4b", ".mp4", ".webm",
         ".mov", ".ogv", ".ogg", ".flac", ".wav", ".aac", ".opus",
     }
     try:
@@ -375,6 +449,10 @@ def download_url_to_file(url, dest_dir, max_bytes=None):
         raise BookImportException(
             f"Could not download {url} (error: {str(e)})"
         ) from e
+    # A downloaded mp4-family file can have its moov atom at the end
+    # (the player then had to fetch the whole file before it could show
+    # a duration); make it streaming-friendly.  Best-effort.
+    faststart_quietly(fp, current_app.logger)
     return filename
 
 
@@ -403,6 +481,28 @@ def cues_to_srt_text(cues):
         lines.append(c.get("text") or "")
         lines.append("")
     return "\n".join(lines).rstrip()
+
+
+def media_audio_url(book):
+    """
+    Stream URL for a media book's audio, for embedding a player outside
+    the reading page (edit forms).  Same rules as the reading player:
+    locally-stored files stream from /useraudio/stream versioned by the
+    file's mtime; a "video" book whose media was not downloaded plays
+    from its remote media_url.  Returns None when nothing is playable.
+    """
+    btype = book.book_type or ""
+    if btype == "video":
+        if not book.audio_filename:
+            return book.media_url
+    elif not (book.audio_filename and btype in ("mp3", "netease", "")):
+        return None
+    fname = os.path.join(current_app.env_config.useraudiopath, book.audio_filename)
+    try:
+        version = int(os.stat(fname).st_mtime)
+    except OSError:
+        version = 0
+    return f"/useraudio/stream/{book.id}?v={version}"
 
 
 class FileTextExtraction:
@@ -629,7 +729,13 @@ class Service:
 
         # Build a lookup: basename -> list of (rel_path_from_target_dir)
         # for every regular file extracted under target_dir.
+        #
+        # A parallel index keyed by the extension-less stem lets us still
+        # find an image whose format changed after the .mokuro file was
+        # written -- e.g. a jpg -> webp conversion renames the files but
+        # leaves img_path as "001.jpg" (issue: manga book with blank page).
         basename_index = {}
+        stem_index = {}
         for root, _dirs, files in os.walk(target_dir):
             for f in files:
                 abs_f = os.path.join(root, f)
@@ -637,13 +743,25 @@ class Service:
                     rel_f = os.path.relpath(abs_f, target_dir).replace("\\", "/")
                 except ValueError:
                     continue
-                basename_index.setdefault(os.path.basename(f).lower(), []).append(rel_f)
+                base = os.path.basename(f).lower()
+                basename_index.setdefault(base, []).append(rel_f)
+                stem_index.setdefault(os.path.splitext(base)[0], []).append(rel_f)
 
         volume = (mokuro.get("volume") or "").strip().replace("\\", "/")
 
-        for page in mokuro.get("pages") or []:
+        for page_index, page in enumerate(mokuro.get("pages") or []):
             raw = (page.get("img_path") or "").replace("\\", "/")
             if not raw:
+                # No img_path: this .mokuro carries only the OCR data
+                # (the official CLI adds img_path when it assembles the
+                # volume file), so pair the page with its image by
+                # position -- mokuro's own rule -- and write it down, so
+                # the reading screen has a concrete path to request.
+                ordinal = image_path_for_page(
+                    target_dir, page_index, volume
+                )
+                if ordinal is not None:
+                    page["img_path"] = ordinal
                 continue
 
             candidates = []
@@ -666,8 +784,13 @@ class Service:
                 except ValueError:
                     pass
             # 4) Just the basename in any subdirectory (fallback scan).
+            #    When nothing carries that exact name, retry ignoring the
+            #    extension so images converted to another format still
+            #    resolve (img_path "001.jpg" -> extracted "001.webp").
             base = os.path.basename(raw)
             matches = basename_index.get(base.lower()) or []
+            if not matches:
+                matches = stem_index.get(os.path.splitext(base)[0].lower()) or []
             # Prefer matches whose path contains the volume name if any.
             if volume:
                 sorted_matches = sorted(
@@ -693,6 +816,42 @@ class Service:
                 page["img_path"] = resolved
 
         return f"manga/{manga_uuid}", mokuro
+
+    def replace_manga(self, dbbook, filename, filestream, session):
+        """
+        Re-import a manga archive over an existing manga book.
+
+        The book keeps its id, language and reading history; its images,
+        mokuro data and page rows are replaced with the new archive's.
+
+        Manga pages carry no text (they are empty placeholders, one per
+        mokuro page), so the pages are rebuilt to the new archive's page
+        count.  Dropping them cascades to the page bookmarks and
+        sentences, and detaches the wordsread rows (WrTxID is
+        "SET NULL"), so terms already marked as read stay known.
+
+        The previous static/manga/<uuid> directory is deliberately left
+        in place: a book row is the only reference to it, so restoring
+        an older .db.gz backup still finds its images.
+
+        Raises BookImportException on invalid archives.
+        """
+        manga_path, mokuro = self.extract_manga(filename, filestream)
+        pages = mokuro.get("pages") or []
+
+        dbbook.manga_path = manga_path
+        dbbook.manga_data = json.dumps(mokuro, ensure_ascii=False)
+        dbbook.source_uri = filename
+
+        dbbook.texts = []
+        session.flush()
+        # The pages are added explicitly: the book is already persistent
+        # here, so simply appending to its collection would not cascade a
+        # save to the transient page objects (SQLAlchemy 2.0).
+        new_pages = [DBText(dbbook, "", index + 1) for index in range(len(pages))]
+        session.add_all(new_pages)
+        session.commit()
+        return dbbook
 
     def extract_pdf(self, filename, filestream):
         """
@@ -828,7 +987,9 @@ class Service:
                 api = f"https://api.bilibili.com/x/web-interface/view?bvid={bvid}"
             else:
                 api = f"https://api.bilibili.com/x/web-interface/view?aid={aid}"
-            response = requests.get(api, timeout=10, headers=headers)
+            response = requests.get(
+                api, timeout=10, headers=headers, proxies=bilibili_proxies()
+            )
             response.raise_for_status()
             data = response.json()
             title = (data.get("data") or {}).get("title", "").strip()
@@ -845,6 +1006,11 @@ class Service:
         filename = self._unique_fname(audio_file_field_data.filename)
         fp = os.path.join(current_app.env_config.useraudiopath, filename)
         audio_file_field_data.save(fp)
+        # Uploaded/recorded mp4-family audio often has moov at the end
+        # (browser MediaRecorder always does), which forces the player to
+        # read the whole file before it knows the duration.  Best-effort
+        # re-mux; the import never fails because of it.
+        faststart_quietly(fp, current_app.logger)
         return filename
 
     def book_data_from_url(self, url):
@@ -855,7 +1021,15 @@ class Service:
         s = None
         try:
             timeout = 20  # seconds
-            response = requests.get(url, timeout=timeout)
+            headers = {
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/124.0.0.0 Safari/537.36"
+                ),
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            }
+            response = requests.get(url, timeout=timeout, headers=headers)
             response.raise_for_status()
             s = response.content
         except requests.exceptions.RequestException as e:
@@ -896,7 +1070,7 @@ class Service:
                 extracted_text.append(element.text)
 
         title_node = soup.find("title")
-        orig_title = title_node.string if title_node else url
+        orig_title = (title_node.string if title_node else url) or url
 
         short_title = orig_title[:150]
         if len(orig_title) > 150:

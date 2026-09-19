@@ -95,9 +95,10 @@
   </div>
 </div>
 
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/dayjs/dayjs.min.js') }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/dayjs/relativeTime.js') }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/book-listing-shared.js') }}?v={{ lute_version }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ vstatic('vendor/dayjs/dayjs.min.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ vstatic('vendor/dayjs/relativeTime.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ vstatic('js/book-type-icons.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ vstatic('js/book-listing-shared.js') }}" charset="utf-8"></script>
 <script>
   var thresholds = [
   { l: 's', r: 1 },
@@ -184,6 +185,12 @@
   }
 
   let setup_book_datatable = function(initial_search) {
+    // Backend state saves are debounced: DataTables fires stateSaveCallback
+    // several times around init (defaults, then restored state) and again
+    // per change; each burst collapses into one POST carrying the final
+    // state.  localStorage keeps the instant per-browser fallback.
+    var _saveTimer = null;
+    var _pendingStateJson = null;
     book_listing_table = $('#booktable').DataTable({
       layout: {
         topStart: [
@@ -236,16 +243,23 @@
         var stateJson = JSON.stringify(data);
         // Always save to localStorage as instant fallback.
         localStorage.setItem('booklisting_datatables_state', stateJson);
-        // Also save to backend so it persists across browsers / computers.
-        try {
-          $.ajax({
-            url: '/settings/datatables_state/save',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ key: 'booklisting', value: stateJson }),
-            xhrFields: { withCredentials: true }
-          }).fail(function() { /* swallow, localStorage already has it */ });
-        } catch(e) {}
+        // Debounce the backend save so a burst of stateSaveCallback calls
+        // (init + redraws) becomes a single POST with the final state.
+        _pendingStateJson = stateJson;
+        if (_saveTimer) clearTimeout(_saveTimer);
+        _saveTimer = setTimeout(function() {
+          _saveTimer = null;
+          var payload = _pendingStateJson;
+          try {
+            $.ajax({
+              url: '/settings/datatables_state/save',
+              method: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify({ key: 'booklisting', value: payload }),
+              xhrFields: { withCredentials: true }
+            }).fail(function() { /* swallow, localStorage already has it */ });
+          } catch(e) {}
+        }, 1000);
       },
       stateLoadCallback: function(settings, callback) {
         // Always prefer the local snapshot (synchronous, always reflects

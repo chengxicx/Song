@@ -144,7 +144,18 @@ p.version {
     white-space: nowrap;
 }
 
-.menu-item:hover .sub-menu {
+/* Hover-open only where hover really exists.  On touch screens :hover
+   is a sticky state: the first tap opens the menu and nothing closes it
+   -- a second tap on the same item keeps the hover alive, and a tap
+   elsewhere doesn't clear it either.  Touch devices open these menus
+   through the .sub-open class toggled in base.html instead. */
+@media (hover: hover) {
+    .menu-item:hover .sub-menu {
+        display: block;
+    }
+}
+
+.menu-item.sub-open .sub-menu {
     display: block;
 }
 
@@ -511,8 +522,12 @@ div.toolbar {
     margin: 2px 0 4px;
     line-height: 1.3;
 }
-.backup-widget:hover .backup-sub-menu {
-    display: block;
+/* Same touch rule as .menu-item above: hover-open only on real
+   pointers; a touch tap navigates straight to the backup action. */
+@media (hover: hover) {
+    .backup-widget:hover .backup-sub-menu {
+        display: block;
+    }
 }
 
 /* 自定义列显隐菜单（齿轮点击弹出）—— 用 position:fixed 避免被滚动容器裁剪 */
@@ -662,6 +677,22 @@ div#read_pane_right {
 #page_indicator {
     font-weight: 500;
     font-size: 0.9rem;
+    /* Percentage / "x/y" / "n/m" all fit without reflowing the row. */
+    min-width: 3.4rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Sub-page mode: the label is clickable (percentage <-> sub-screen
+   count) and hovering previews the parent-page position. */
+#page_indicator.subpage-mode {
+    cursor: pointer;
+    color: var(--read-slider-color, #79b7e7);
+    transition: opacity 0.15s ease;
+}
+
+#page_indicator.subpage-mode:hover {
+    opacity: 0.72;
 }
 
 .reading_header_mid_top {
@@ -837,7 +868,8 @@ span.hamburger {
 #tap_sets_status-container,
 #tts-toggle-container,
 #tts-sentence-buttons-toggle-container,
-#arrow_marks_known-container {
+#arrow_marks_known-container,
+#tap_haptics-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -852,7 +884,8 @@ span.hamburger {
 #tap_sets_status,
 #tts-player-toggle,
 #tts-sentence-buttons-toggle,
-#arrow_marks_known {
+#arrow_marks_known,
+#tap_haptics {
     appearance: none;
     display: block;
     background-color: #ffffff;
@@ -869,7 +902,8 @@ span.hamburger {
 #tap_sets_status-container label,
 #tts-toggle-container label,
 #tts-sentence-buttons-toggle-container label,
-#arrow_marks_known-container label {
+#arrow_marks_known-container label,
+#tap_haptics-container label {
     font-weight: bold;
     min-width: 110px;
     text-align: right;
@@ -887,7 +921,8 @@ span.hamburger {
 #tap_sets_status::after,
 #tts-player-toggle::after,
 #tts-sentence-buttons-toggle::after,
-#arrow_marks_known::after {
+#arrow_marks_known::after,
+#tap_haptics::after {
     content: "";
     display: block;
     background-color: #616161;
@@ -902,7 +937,8 @@ span.hamburger {
 .tap_sets_status-active #tap_sets_status::after,
 .tts-player-active #tts-player-toggle::after,
 .tts-sentence-buttons-active #tts-sentence-buttons-toggle::after,
-.arrow_marks_known-active #arrow_marks_known::after {
+.arrow_marks_known-active #arrow_marks_known::after,
+.tap_haptics-active #tap_haptics::after {
     transform: translate(100%, 0);
     background-color: #ffffff;
 }
@@ -911,7 +947,8 @@ span.hamburger {
 .tap_sets_status-active #tap_sets_status,
 .tts-player-active #tts-player-toggle,
 .tts-sentence-buttons-active #tts-sentence-buttons-toggle,
-.arrow_marks_known-active #arrow_marks_known {
+.arrow_marks_known-active #arrow_marks_known,
+.tap_haptics-active #tap_haptics {
     background-color: #40916c;
     border-color: #40916c;
 }
@@ -929,7 +966,9 @@ span.hamburger {
 }
 
 #tap_sets_status-container label,
-#tap_sets_status-container input {
+#tap_sets_status-container input,
+#tap_haptics-container label,
+#tap_haptics-container input {
   display: inline-block;
   vertical-align: middle;
 }
@@ -1639,6 +1678,188 @@ img
     background: yellow !important;
 }
 
+
+/* ========================================= */
+/* Tap feedback on interactive text.
+
+   On a touch screen there is no hover, so a tap used to produce no
+   visible change at all until the server answered -- and on a cold
+   term-popup fetch that is a full network round-trip.  Users re-tapped
+   "to make sure", which the double-tap handler then read as a double
+   tap.  Four markers give every tap an immediate answer:
+
+     .tap-pressed  finger is down right now (touchstart -> touchend)
+     .tap-ack      tap received: one short flash        (+ buzz)
+     .tap-double   double tap received: two-beat pulse  (+ double buzz)
+     .tap-pending  request/speech in flight: pulsing dashed outline
+
+   Two kinds of element carry them:
+
+     span.textitem          a word in the reading pane
+     .lute-sentence-play-btn  the per-sentence 🔊 injected by tts.js
+
+   For words everything is outline / box-shadow only: they are inline
+   spans, so changing padding, margin or border width would reflow the
+   line and make the text jump under the reader's finger, and changing
+   the background would fight the per-status colours.  The 🔊 button is
+   inline-block with its own box, so it may also take a filled tint.
+
+   The JS that adds/removes these lives in lute.js (search "_tap_press",
+   and window.luteTapFeedback for the tts.js bridge); the durations
+   there must stay in sync with the animations below.
+   -------------------------------------------------------------------- */
+
+@media (pointer: coarse) {
+  span.textitem,
+  .lute-sentence-play-btn {
+    /* Drop the browser's own grey tap flash: it is inconsistent across
+       browsers and easy to miss.  The classes below replace it. */
+    -webkit-tap-highlight-color: transparent;
+    /* Disable double-tap-to-zoom.  Without this the browser waits
+       ~300ms after the first tap to see if a zoom is coming, which is
+       most of the double-tap window and makes the gesture feel
+       unreliable.  Panning still works, so page swipes are unaffected. */
+    touch-action: manipulation;
+  }
+}
+
+/* The rings are drawn in the element's own text colour (currentColor ==
+   var(--font-color) for a word), so they stay readable in every theme --
+   the light, dark, e-ink and paper themes define very different fonts
+   and backgrounds, and there is no shared accent variable to lean on.
+   --tap-glow-color thins it out for the softer expanding ring; the
+   @supports block just upgrades the fixed fallback when color-mix()
+   is available (every current browser). */
+span.textitem,
+.lute-sentence-play-btn {
+    --tap-glow-color: rgba(127, 127, 127, 0.45);
+}
+@supports (color: color-mix(in srgb, currentColor, transparent)) {
+  span.textitem,
+  .lute-sentence-play-btn {
+    --tap-glow-color: color-mix(in srgb, currentColor 38%, transparent);
+  }
+}
+
+/* The 🔊 button is a real box, so it also gets a filled "pressed" tint
+   on top of the ring -- a bare outline around a 14px glyph is easy to
+   miss.  (Words deliberately don't: their background is the word's
+   status colour.) */
+.lute-sentence-play-btn.tap-pressed,
+.lute-sentence-play-btn.tap-ack,
+.lute-sentence-play-btn.tap-pending {
+    background-color: rgba(127, 127, 127, 0.25);
+}
+
+/* Finger (or mouse button) is down on the element right now. */
+span.textitem.tap-pressed,
+.lute-sentence-play-btn.tap-pressed {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+    border-radius: 3px;
+}
+
+/* Tap registered. */
+span.textitem.tap-ack,
+.lute-sentence-play-btn.tap-ack {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+    border-radius: 3px;
+    animation: tap-ack-flash 0.4s ease-out 1 forwards;
+}
+
+@keyframes tap-ack-flash {
+    from { outline-color: currentColor; }
+    to   { outline-color: transparent; }
+}
+
+/* Double tap registered: two distinct beats so it never reads as two
+   single taps.  The expanding ring is a box-shadow, which -- like
+   outline -- is painted outside the box and cannot reflow the text. */
+span.textitem.tap-double,
+.lute-sentence-play-btn.tap-double {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+    border-radius: 3px;
+    animation: tap-double-flash 0.55s ease-out 1 forwards;
+}
+
+@keyframes tap-double-flash {
+    0% {
+        outline-color: currentColor;
+        box-shadow: 0 0 0 0 var(--tap-glow-color);
+    }
+    45% {
+        outline-color: transparent;
+        box-shadow: 0 0 0 9px transparent;
+    }
+    55% {
+        outline-color: currentColor;
+        box-shadow: 0 0 0 0 var(--tap-glow-color);
+    }
+    100% {
+        outline-color: transparent;
+        box-shadow: 0 0 0 11px transparent;
+    }
+}
+
+/* Waiting on the server / on the speech engine: a dashed outline that
+   breathes until the answer lands (or the safety timeout in lute.js
+   fires).  Static fallback for the e-ink theme, which sets
+   animation: none globally. */
+span.textitem.tap-pending,
+.lute-sentence-play-btn.tap-pending {
+    outline: 2px dashed currentColor;
+    outline-offset: 1px;
+    border-radius: 3px;
+    animation: tap-pending-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes tap-pending-pulse {
+    0%, 100% { outline-color: currentColor; }
+    50%      { outline-color: transparent; }
+}
+
+/* The sentence 🔊 ring is drawn *inside* the button's own box rather
+   than around it.
+
+   Outlines are painted after all inline content of the stacking
+   context, so a ring that spills outwards is drawn on top of whatever
+   sits next to it.  For a word that is fine: consecutive words are
+   separated by a space (measured ~4.8px here), so the 3px the shared
+   rules spill (1px offset + 2px width) still clears the neighbours.
+   The 🔊 button has only the 4px margin tts.js gives it and an 18px
+   box, and the first character of the sentence follows immediately --
+   the ring landed right on that character's left stroke and read as if
+   it were clipping it.
+
+   Inset, the ring cannot reach the text whatever the font size, emoji
+   width or locale.  This block must stay after the shared rules above:
+   the specificity is identical, so source order decides. */
+.lute-sentence-play-btn.tap-pressed,
+.lute-sentence-play-btn.tap-ack,
+.lute-sentence-play-btn.tap-double,
+.lute-sentence-play-btn.tap-pending {
+    outline-offset: -2px;
+}
+
+/* Respect "reduce motion": keep the markers, drop the movement. */
+@media (prefers-reduced-motion: reduce) {
+    span.textitem.tap-ack,
+    .lute-sentence-play-btn.tap-ack,
+    span.textitem.tap-pending,
+    .lute-sentence-play-btn.tap-pending {
+        animation: none;
+    }
+    /* .tap-double's base rule has no outline of its own (the animation
+       supplies it), so give it a static one here. */
+    span.textitem.tap-double,
+    .lute-sentence-play-btn.tap-double {
+        animation: none;
+        outline: 3px solid currentColor;
+    }
+}
+
 #termtags
 {
     width: 340px;
@@ -1683,6 +1904,14 @@ div.ui-tooltip {
     max-width: 400px !important;
     z-index: 1000; /*higher than audio because of words on the bottom, but lower than header and side menu */
     word-wrap: break-word;
+    /* The term popup is purely informational (no links or buttons), but
+       it is a 400px-wide card that sits right over the line below the
+       hovered word.  Without this, it swallows clicks on the words it
+       covers -- intermittently, whenever the card is still on screen
+       (e.g. during the close animation).  Let every click through to the
+       text; hover-open/close is driven by the word's own events, so the
+       popup itself never needs to receive pointer events. */
+    pointer-events: none;
 }
 
 .tooltip-image {
@@ -1904,54 +2133,79 @@ div.code pre {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 0.5rem;
+    height: 6px;
     margin: 0;
-    background-color: #d7d7d7;
-    border-radius: 3px;
+    background-color: color-mix(in srgb, var(--font-color, #888) 18%, transparent);
+    border-radius: 999px;
     box-sizing: border-box;
     background-size: 0% 100%;
-    background-image: linear-gradient(var(--read-slider-color), var(--read-slider-color));
+    background-image: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--read-slider-color) 72%, #000),
+        var(--read-slider-color)
+    );
     background-repeat: no-repeat;
 }
 
 #read-slider::-moz-range-thumb {
-    width: 30px;
-    height: 0.5rem;
-    border: 2px solid var(--read-slider-color);
-    background-size: 80%;
-    border-radius: 5px;
+    width: 10px;
+    height: 10px;
+    border: none;
+    border-radius: 50%;
     background-color: #fff;
-    background-size: 60%;
-  
-    background-position: center;
-    background-repeat: no-repeat;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     padding: 0;
     box-sizing: border-box;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 #read-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 30px;
-    height: 0.5rem;
-    border: 2px solid var(--read-slider-color);
-    background-size: 80%;
-    border-radius: 5px;
+    width: 10px;
+    height: 10px;
+    border: none;
+    border-radius: 50%;
     background-color: #fff;
-    background-size: 60%;
-  
-    background-position: center;
-    background-repeat: no-repeat;
-
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     padding: 0;
     box-sizing: border-box;
+    /* Centre the 10px dot on the 6px track. */
+    margin-top: -2px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Replace the loud default focus ring (keyboard users only) with a thin
+   accent outline that follows the pill shape. */
+#read-slider:focus-visible {
+    outline: 2px solid var(--read-slider-color);
+    outline-offset: 3px;
+}
+
+/* Grow the dot and cast a soft accent halo while interacting. */
+#read-slider:hover::-moz-range-thumb,
+#read-slider:active::-moz-range-thumb {
+    transform: scale(1.25);
+    box-shadow:
+        0 0 0 6px color-mix(in srgb, var(--read-slider-color) 25%, transparent),
+        0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+#read-slider:hover::-webkit-slider-thumb,
+#read-slider:active::-webkit-slider-thumb {
+    transform: scale(1.25);
+    box-shadow:
+        0 0 0 6px color-mix(in srgb, var(--read-slider-color) 25%, transparent),
+        0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 #read-slider.read_page_disabled::-moz-range-thumb {
-    border: 2px solid #d7d7d7;
+    background-color: color-mix(in srgb, var(--font-color, #888) 35%, transparent);
+    box-shadow: none;
 }
 
 #read-slider.read_page_disabled::-webkit-slider-thumb {
-    border: 2px solid #d7d7d7;
+    background-color: color-mix(in srgb, var(--font-color, #888) 35%, transparent);
+    box-shadow: none;
 }
 
 #read-slider::-webkit-slider-runnable-track {
@@ -2405,6 +2659,7 @@ input[type="checkbox"][disabled] + label {
 
 #term-button-container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
     gap: 0.6rem;
@@ -2537,6 +2792,13 @@ input[type="checkbox"][disabled] + label {
 .dict-btn-list-img,
 .dict-btn-external-img {
     height: 60%;
+}
+
+/* A percentage height is ignored while the tab row's intrinsic height is
+   being computed, so a large favicon would set the row height instead of
+   shrinking to it.  Cap it in absolute units. */
+.dict-btn-fav-img {
+    max-height: 1.1rem;
 }
 
 .dict-btn-list-img,
@@ -3057,17 +3319,19 @@ input[name='status']:disabled + label {
     }
 
     #read-slider {
-        height: 0.5rem;
+        height: 6px;
     }
 
     #read-slider::-moz-range-thumb {
-        width: 2.2rem;
-        height: 0.5rem;
+        width: 12px;
+        height: 12px;
+        margin-top: -3px;
     }
 
     #read-slider::-webkit-slider-thumb {
-        width: 2.2rem;
-        height: 0.5rem;
+        width: 12px;
+        height: 12px;
+        margin-top: -3px;
     }
 
     .reading_header_mid_top {
@@ -3934,4 +4198,631 @@ a.series-continue-btn:hover {
            browser would collapse the column without a floor. */
         min-width: 90px;
     }
+}
+
+/* On touch-primary (mobile/tablet) devices, hide the prev/next arrows;
+   page turning is done via left/right swipe gestures instead. */
+@media (hover: none) and (pointer: coarse) {
+    #navPrev,
+    #navNext {
+        display: none;
+    }
+}
+
+/* =========================================================
+   LYRICS & TIMING SIDE PANEL (book edit page, subtitle books)
+
+   Fixed panel at the far left: one editor row per subtitle cue
+   (start / end / text).  Visibility is driven purely by body
+   classes set from book-edit-cues.js:
+     body.cue-panel-open    book is a subtitle book with cues
+     body.cue-panel-closed  user collapsed the panel to the tab
+   ========================================================= */
+
+#cueEditorPanel {
+    display: none;
+    position: fixed;
+    left: 12px;
+    top: 64px;
+    bottom: 16px;
+    width: 360px;
+    flex-direction: column;
+    background: var(--panel-bg, #2c2c2e);
+    color: var(--font-color, #e5e5ea);
+    border: 1px solid rgba(128, 128, 128, 0.35);
+    border-radius: 12px;
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    z-index: 900;
+}
+
+body.cue-panel-open:not(.cue-panel-closed) #cueEditorPanel {
+    display: flex;
+}
+
+#cuePanelTab {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    padding: 16px 7px;
+    background: var(--panel-bg, #2c2c2e);
+    color: var(--font-color, #e5e5ea);
+    border: 1px solid rgba(128, 128, 128, 0.35);
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+    font-size: 12px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    z-index: 900;
+}
+
+body.cue-panel-open.cue-panel-closed #cuePanelTab {
+    display: block;
+}
+
+/* Shift the page content right so the panel does not cover the form
+   (wide screens only; on narrow screens the panel just overlays). */
+@media screen and (min-width: 1250px) {
+    body.cue-panel-open:not(.cue-panel-closed) .container > :not(.menu-bar):not(#cueEditorPanel):not(#cuePanelTab) {
+        margin-left: 396px;
+        transition: margin-left 0.25s ease;
+    }
+}
+
+.cue-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+.cue-panel-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#cuePanelCount {
+    color: #8e8e93;
+    font-weight: 400;
+    font-size: 12px;
+    margin-left: 6px;
+}
+
+#cuePanelCollapse {
+    background: none;
+    border: none;
+    color: #8e8e93;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+#cuePanelCollapse:hover {
+    color: inherit;
+    background: rgba(128, 128, 128, 0.18);
+}
+
+.cue-panel-player {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+#cueAudio {
+    display: none;
+}
+
+.cue-player-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cue-play-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: #0a84ff;
+    color: #fff;
+    font-size: 13px;
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cue-step-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: rgba(128, 128, 128, 0.3);
+    color: inherit;
+    font-size: 10px;
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cue-ap-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(128, 128, 128, 0.55);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cue-ap-btn.on {
+    background: #4cbb17;
+    border-color: #4cbb17;
+    color: #fff;
+}
+
+.cue-time {
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+}
+
+.cue-time-muted {
+    color: #8e8e93;
+}
+
+.cue-progress {
+    margin-top: 9px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(128, 128, 128, 0.3);
+    cursor: pointer;
+    position: relative;
+}
+
+.cue-progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0%;
+    background: #0a84ff;
+    border-radius: 2px;
+}
+
+.cue-progress-knob {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    left: 0%;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.cue-panel-note {
+    margin-top: 7px;
+    font-size: 11.5px;
+    color: #8e8e93;
+    line-height: 1.45;
+}
+
+.cue-panel-warn {
+    display: none;
+    margin: 8px 12px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: rgba(255, 69, 58, 0.85);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.cue-panel-rows {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0 8px;
+}
+
+.cue-panel-rows.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.cue-row {
+    padding: 9px 12px 10px 9px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.18);
+    border-left: 3px solid transparent;
+}
+
+.cue-row.active {
+    background: rgba(10, 132, 255, 0.13);
+    border-left-color: #0a84ff;
+}
+
+.cue-row.cue-flash {
+    background: rgba(10, 132, 255, 0.35);
+}
+
+.cue-row-top {
+    display: flex;
+    align-items: center;
+}
+
+.cue-idx {
+    color: #8e8e93;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.cue-set-btn {
+    margin-left: auto;
+    width: 30px;
+    height: 26px;
+    border-radius: 7px;
+    background: transparent;
+    border: 1px solid rgba(128, 128, 128, 0.4);
+    color: inherit;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+    padding: 0;
+}
+
+.cue-set-btn:hover {
+    border-color: #0a84ff;
+    color: #0a84ff;
+}
+
+/* No playable audio: the set-to-playback-time buttons are meaningless. */
+#cueEditorPanel.no-audio .cue-set-btn {
+    display: none;
+}
+
+.cue-times {
+    display: flex;
+    gap: 8px;
+    margin: 7px 0 0 24px;
+    align-items: center;
+}
+
+.cue-times label {
+    color: #8e8e93;
+    font-size: 11.5px;
+}
+
+.cue-row input[type="text"],
+.cue-row .cue-txt {
+    background: var(--background-color, #1c1c1e);
+    color: var(--font-color, #e5e5ea);
+    border: 1px solid rgba(128, 128, 128, 0.4);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-family: inherit;
+}
+
+.cue-time-in {
+    width: 92px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+.cue-row input.invalid {
+    border-color: #ff453a !important;
+}
+
+.cue-txt {
+    margin: 7px 0 0 24px;
+    width: calc(100% - 24px);
+    resize: none;
+    overflow-y: auto;
+    line-height: 1.45;
+}
+
+.cue-panel-footer {
+    padding: 8px 12px;
+    border-top: 1px solid rgba(128, 128, 128, 0.25);
+    color: #8e8e93;
+    font-size: 11.5px;
+}
+
+/* Grammar analysis lives inside the reading page's right pane (#read_pane_right),
+   filling the whole column (top term-form area + bottom dictionary area).  It is
+   not a floating overlay: while it is shown the pane's normal wordframe and
+   dictionary regions are hidden, and clicking a word restores the default view. */
+#read_pane_right.grammar-mode > .wordframecontainer,
+#read_pane_right.grammar-mode > .dictcontainer {
+    display: none !important;
+}
+
+.grammar-analysis-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background-color, #fff);
+    color: var(--font-color, #000);
+    overflow: hidden;
+    font: 100%/1.4 "Lucida Grande", Arial, sans-serif, STHeiti,
+        "Arial Unicode MS", MingLiu;
+    /* Base size; the sidebar A+/A- buttons stamp this in rem so the whole
+       panel scales (all child sizes are em). */
+    font-size: 14px;
+
+    /* Panel-local semantic tokens (light defaults, readable on dark too). */
+    --g-card: color-mix(in srgb, var(--font-color, #000) 4%, transparent);
+    --g-card-border: color-mix(in srgb, var(--font-color, #000) 10%, transparent);
+    --g-text-2: color-mix(in srgb, var(--font-color, #000) 64%, transparent);
+    --g-rule: color-mix(in srgb, var(--font-color, #000) 16%, transparent);
+    --g-accent: var(--btn-accent, #007aff);
+    --g-accent-soft: color-mix(in srgb, var(--g-accent) 15%, transparent);
+    --g-accent-line: color-mix(in srgb, var(--g-accent) 45%, transparent);
+}
+
+/* JLPT level -> accent hue, so each grammar point is easy to scan.
+   Mid-tone hues keep the badges readable on both light and dark themes.
+   The level group headers carry the same hue, so a level reads as one block. */
+.grammar-item--N5, .grammar-group--N5 { --g-accent: #37b24d; }
+.grammar-item--N4, .grammar-group--N4 { --g-accent: #339af0; }
+.grammar-item--N3, .grammar-group--N3 { --g-accent: #f08c00; }
+.grammar-item--N2, .grammar-group--N2 { --g-accent: #845ef7; }
+.grammar-item--N1, .grammar-group--N1 { --g-accent: #e64980; }
+.grammar-item--N,  .grammar-group--N  { --g-accent: var(--btn-accent, #007aff); }
+
+/* CEFR levels (English/Spanish/Russian engines), easy -> hard. */
+.grammar-item--A1, .grammar-group--A1 { --g-accent: #37b24d; }
+.grammar-item--A2, .grammar-group--A2 { --g-accent: #20c997; }
+.grammar-item--B1, .grammar-group--B1 { --g-accent: #339af0; }
+.grammar-item--B2, .grammar-group--B2 { --g-accent: #f08c00; }
+.grammar-item--C1, .grammar-group--C1 { --g-accent: #845ef7; }
+.grammar-item--C2, .grammar-group--C2 { --g-accent: #e64980; }
+
+.grammar-analysis-panel__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--g-rule);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--g-accent-soft) 45%, var(--background-color, #fff)),
+        var(--background-color, #fff)
+    );
+}
+
+.grammar-analysis-panel__title {
+    flex: 1;
+    font-size: 1.12em;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.grammar-analysis-panel__badge {
+    font-size: 0.85em;
+    font-weight: 700;
+    color: var(--g-accent);
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    padding: 1px 9px;
+    opacity: 0.95;
+}
+
+.grammar-analysis-panel__close {
+    border: none;
+    background: transparent;
+    color: var(--font-color, #000);
+    font-size: 1.5em;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 3px;
+    opacity: 0.55;
+    border-radius: 4px;
+}
+.grammar-analysis-panel__close:hover {
+    opacity: 1;
+}
+
+.grammar-analysis-panel__body {
+    overflow-y: auto;
+    padding: 12px 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.grammar-analysis-panel__state {
+    padding: 26px 12px;
+    text-align: center;
+    color: color-mix(in srgb, var(--font-color, #000) 55%, transparent);
+    font-size: 0.98em;
+}
+
+/* Level sections.  The panel body's direct children are groups, so its 10px
+   gap separates sections and the same gap separates the cards inside one. */
+.grammar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Sticky so the level stays visible while its cards scroll past -- the point
+   of the grouping is lost as soon as the header scrolls out of view. */
+.grammar-group__head {
+    position: sticky;
+    top: -12px;
+    z-index: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 0 4px;
+    background-color: var(--background-color, #fff);
+    border-bottom: 1px solid var(--g-rule);
+}
+
+.grammar-group__level {
+    font-size: 0.86em;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--g-accent);
+}
+
+.grammar-group__count {
+    font-size: 0.78em;
+    color: var(--g-text-2);
+}
+
+.grammar-item {
+    --acute: var(--g-accent);
+    border: 1px solid var(--g-card-border);
+    border-left: 3px solid var(--acute);
+    padding: 10px 12px;
+    border-radius: 8px;
+    background-color: var(--g-card);
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+.grammar-item:hover {
+    border-color: var(--g-accent-line);
+    background-color: color-mix(in srgb, var(--g-accent-soft) 40%, var(--g-card));
+}
+
+.grammar-item__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.grammar-item__level {
+    flex: none;
+    font-size: 0.72em;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--acute);
+    background: var(--g-accent-soft);
+    border-radius: 6px;
+    padding: 2px 7px;
+    text-transform: uppercase;
+}
+
+.grammar-item__name {
+    font-size: 1.08em;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+/* The aggregated "Basic forms" / "Particles" rows fire on nearly every page
+   and each carries a handful of examples, so they render pre-collapsed;
+   clicking the head (see lute-commands.js) folds them open. */
+.grammar-item--fold > .grammar-item__head {
+    cursor: pointer;
+    user-select: none;
+}
+
+.grammar-item__fold {
+    flex: none;
+    margin-left: auto;
+    font-size: 0.78em;
+    color: var(--g-text-2);
+    transition: transform 0.15s ease;
+}
+/* Expanded: the right-pointing chevron turns down. */
+.grammar-item--fold:not(.grammar-item--collapsed) .grammar-item__fold {
+    transform: rotate(90deg);
+}
+.grammar-item--collapsed .grammar-item__desc,
+.grammar-item--collapsed .grammar-item__examples {
+    display: none;
+}
+
+.grammar-item__desc {
+    margin-top: 4px;
+    font-size: 0.98em;
+    color: var(--g-text-2);
+}
+
+.grammar-item__examples {
+    margin-top: 8px;
+    display: grid;
+    gap: 5px;
+}
+
+.grammar-item__example {
+    font-size: 0.96em;
+    line-height: 1.5;
+    padding: 6px 10px 6px 12px;
+    border-left: 2px solid var(--g-accent-line);
+    background: color-mix(in srgb, var(--font-color, #000) 3%, transparent);
+    border-radius: 0 6px 6px 0;
+    color: var(--font-color, #000);
+}
+.grammar-item__example:first-child {
+    border-left-style: solid;
+}
+.grammar-item__example::before {
+    content: "例 ";
+    font-size: 0.82em;
+    color: var(--g-text-2);
+    margin-right: 4px;
+}
+
+/* Grammar examples must never carry a TTS speaker (nothing to read
+   aloud, and they re-use the page's sentence text). */
+.grammar-analysis-panel .lute-sentence-play-btn {
+    display: none !important;
+}
+
+/* Reading-text highlight driven by hovering a grammar entry on the right.
+   Rings are absolutely positioned overlay divs drawn exactly around the
+   matched example text (union of the .textitem boxes), so they never cover
+   the per-word status colours and never over-enclose neighbouring
+   sentences on the same line. */
+.grammar-ring-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10000;
+}
+.grammar-ring {
+    position: absolute;
+    display: none;
+    outline: 2px solid var(--btn-accent, #007aff);
+    outline-offset: 2px;
+    border-radius: 4px;
+    transition: outline-color 0.12s ease;
+    box-sizing: border-box;
+}
+/* Matched words inside the ringed sentence: one amber outline box per
+   contiguous run of matched words (drawn as a positioned div, never
+   background-color, so per-word status colours stay intact) shown while
+   the grammar entry is hovered. */
+.grammar-word-ring {
+    position: absolute;
+    display: none;
+    outline: 2px solid rgba(255, 214, 90, 0.9);
+    outline-offset: 1px;
+    border-radius: 3px;
+    transition: outline-color 0.12s ease;
+    box-sizing: border-box;
+}
+/* Matched words marked inside the grammar panel's example sentences. */
+.grammar-item__match {
+    background: rgba(255, 214, 90, 0.3);
+    border-radius: 2px;
+    padding: 0 1px;
+    box-shadow: inset 0 0 0 1px rgba(255, 214, 90, 0.45);
 }
