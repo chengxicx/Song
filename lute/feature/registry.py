@@ -10,7 +10,7 @@ are exposed for read-only access from template fragments.
 """
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 
 @dataclass
