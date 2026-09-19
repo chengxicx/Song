@@ -20,6 +20,10 @@ _READ_INDEX = os.path.join(
     os.path.dirname(__import__("lute").__file__), "templates", "read", "index.html"
 )
 
+_FORM_PATH = os.path.join(
+    os.path.dirname(__import__("lute").__file__), "templates", "term", "_form.html"
+)
+
 
 @pytest.fixture(name="repo")
 def fixture_repo():
@@ -67,14 +71,14 @@ def test_standalone_edit_page_has_no_grammar_button(app_context, client, english
     body = client.get(f"/term/edit/{term.id}").get_data(as_text=True)
 
     assert 'id="btnsubmit"' in body  # the form did render
-    assert "btn-grammar" not in body
+    assert 'id="btn-grammar"' not in body
 
 
 def test_standalone_new_page_has_no_grammar_button(app_context, client):
     "Same for the standalone 'create new term' page."
     body = client.get("/term/new").get_data(as_text=True)
 
-    assert "btn-grammar" not in body
+    assert 'id="btn-grammar"' not in body
 
 
 def test_reading_page_opens_the_analysis_for_that_event():
@@ -85,3 +89,32 @@ def test_reading_page_opens_the_analysis_for_that_event():
     assert "LuteTermFormGrammarRequested" in src
     event_block = src.split('"LuteTermFormGrammarRequested"')[1][:200]
     assert "open_grammar_analysis" in event_block
+
+
+def test_edit_form_button_order_save_delete_grammar(app_context, client, english, repo):
+    "Server render keeps Save before Delete before Grammar."
+    term = _save_term(repo, english, "grammarbtn3")
+    body = client.get(f"/read/edit_term/{term.id}").get_data(as_text=True)
+
+    assert (
+        body.index('id="btnsubmit"')
+        < body.index('id="delete"')
+        < body.index('id="btn-grammar"')
+    )
+
+
+def test_dynamic_delete_button_lands_before_grammar():
+    """
+    Saving a brand-new term in the frame adds the Delete button at runtime
+    (ensure_delete_button), on a form whose container is Save / Grammar.
+    The new button must be inserted before Grammar -- a plain appendChild
+    yields Save / Grammar / Delete.
+    """
+    with open(_FORM_PATH, encoding="utf-8") as f:
+        src = f.read()
+
+    fn = src.split("function ensure_delete_button()", 1)[1].split(
+        "function update_flash_message_notice", 1
+    )[0]
+    assert 'getElementById("btn-grammar")' in fn
+    assert "insertBefore(del, grammar_btn)" in fn
