@@ -7,6 +7,8 @@ and retrieved from DB.
 
 import pytest
 
+from lute.parse.registry import is_supported
+
 from lute.models.term import Term as DBTerm, TermTag
 from lute.db import db
 from lute.term.model import Term, Repository
@@ -692,6 +694,10 @@ def test_find_or_new_existing_term_not_affected_by_lemma(japanese, repo):
     # Existing term has no parents; lemma logic doesn't touch it.
 
 
+@pytest.mark.skipif(
+    not is_supported("japanese_sudachi"),
+    reason="tokenization of もしも is Sudachi-specific; MeCab splits differently",
+)
 def test_find_or_new_ambiguous_japanese_terms(japanese, repo):
     """
     Characterization test only: behaviour of find_or_new for
