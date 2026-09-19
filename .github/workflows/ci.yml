@@ -4,7 +4,7 @@ on:
   push:
     # A branch github-ci can be created and used for ci
     # experiments and tweaks.
-    branches: [ "develop", "master", "github-ci", "windows" ]
+    branches: [ "develop", "master", "github-ci", "windows", "all-features-combine" ]
   pull_request:
     branches: [ "develop", "master" ]
 
