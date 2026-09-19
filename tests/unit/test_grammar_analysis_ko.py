@@ -1,5 +1,9 @@
 """Tests for the Korean grammar-analysis engine (Kiwi + kimchi-grammar data)."""
 
+import pytest
+
+pytest.importorskip("kiwipiepy")
+
 from lute.read.render.grammar_analysis_ko import _KO_RULES, analyze_korean
 from lute.read.render.grammar_analysis import is_korean_language
 
