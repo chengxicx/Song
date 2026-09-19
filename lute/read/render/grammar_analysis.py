@@ -276,6 +276,32 @@ def grammar_engine_status(language):
     }
 
 
+# Japanese and Korean grammar analysis runs on the reading page's own
+# parser tokenizer (Sudachi / Kiwi).  There is no separate grammar
+# dependency or pip extra -- the parser plugin ships it -- so the language
+# page's status line notes that instead of falling through to the
+# "no dedicated engine / basic rules" wording.
+_PARSER_SHIPPED_ENGINES = [
+    ("Japanese", "Sudachi", is_japanese_language),
+    ("Korean", "Kiwi", is_korean_language),
+]
+
+
+def grammar_engine_note(language):
+    """
+    For languages whose grammar engine rides on the parser's own tokenizer,
+    return {"label", "tokenizer"} (Japanese/Sudachi, Korean/Kiwi); None for
+    languages served by the standalone engines (grammar_engine_status) or
+    with no dedicated engine at all.
+    """
+    if language is None:
+        return None
+    for label, tokenizer, detect in _PARSER_SHIPPED_ENGINES:
+        if detect(language):
+            return {"label": label, "tokenizer": tokenizer}
+    return None
+
+
 def install_grammar_engine(extra):
     """
     pip-install the packages providing one engine's extra.
