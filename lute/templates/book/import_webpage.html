@@ -516,19 +516,9 @@
 
     // The import-type picker is a custom dropdown (button + listbox) so
     // every option can show its book-type icon.  importType below is the
-    // single source of truth; everything renders from it.
-    const IMPORT_TYPES = [
-      { value: 'text', label: 'Text' },
-      { value: 'webpage', label: 'Web page' },
-      { value: 'youtube', label: 'YouTube video' },
-      { value: 'bilibili', label: 'Bilibili video' },
-      { value: 'mp3', label: 'MP3 / M4A audio' },
-      { value: 'netease', label: 'NetEase Cloud Music' },
-      { value: 'video', label: 'Online video' },
-      { value: 'manga', label: 'Mokuro Manga' },
-      { value: 'pdf', label: 'PDF' },
-      { value: 'epub', label: 'EPUB' }
-    ];
+    // single source of truth; everything renders from it.  The type list
+    // comes from the Python registry (lute/book/types.py) via the route.
+    const IMPORT_TYPES = {{ import_types_json|safe }};
     let importType = 'text';
     const typeBtn = $('#import-type-button');
     const typeMenu = $('#import-type-menu');
