@@ -211,6 +211,150 @@ _EN_RULES = [
         {"left": [spec_surface("either")], "right": [spec_surface("or")], "min_gap": 1, "max_gap": 8},
         zh="either ... or：二选一。",
     ),
+    # ---- B1 ----
+    make_rule(
+        "en_present_perfect",
+        "Present perfect: have/has + past participle",
+        "B1",
+        "a past action with a present result or an open time frame.",
+        {"seq": [spec_surface("have", "has", "'ve"), spec_morph(VerbForm="Part")]},
+        zh="现在完成时：have/has + 过去分词，过去的动作影响现在。",
+    ),
+    make_rule(
+        "en_past_perfect",
+        "Past perfect: had + past participle",
+        "B1",
+        "the earlier of two past events.",
+        {"seq": [spec_surface("had"), spec_morph(VerbForm="Part")]},
+        zh="过去完成时：had + 过去分词，表示过去的过去。",
+    ),
+    make_rule(
+        "en_passive",
+        "Passive: be + past participle",
+        "B1",
+        "the subject receives the action; the doer follows by or is omitted.",
+        {"seq": [spec_lemma("be"), spec_morph(VerbForm="Part", Aspect="Perf")]},
+        zh="被动语态：be + 过去分词，动作承受者作主语。",
+    ),
+    make_rule(
+        "en_first_conditional",
+        "First conditional: if + present, will",
+        "B1",
+        "a real future possibility: If it rains, I will stay.",
+        {"left": [spec_surface("if")], "right": [spec_surface("will")], "min_gap": 1, "max_gap": 10},
+        zh="第一条件句：if + 现在时，主句 will，真实可能。",
+    ),
+    make_rule(
+        "en_second_conditional",
+        "Second conditional: if + past, would",
+        "B1",
+        "an unreal or unlikely present/future: If I had time, I would go.",
+        {"left": [spec_surface("if")], "right": [spec_surface("would")], "min_gap": 1, "max_gap": 10},
+        zh="第二条件句：if + 过去时，主句 would，假设。",
+    ),
+    make_rule(
+        "en_so_that",
+        "so + adjective + that",
+        "B1",
+        "a result clause: so hard that I couldn't see.",
+        {"seq": [spec_surface("so"), spec_pos("ADJ", "ADV"), spec_surface("that")]},
+        zh="so + 形容词/副词 + that：如此……以至于。",
+    ),
+    make_rule(
+        "en_used_to",
+        "used to + verb",
+        "B1",
+        "a past habit or state that is no longer true.",
+        {
+            "seq": [
+                {"lemma_in": ["use"], "morph": {"Tense": "Past", "VerbForm": "Fin"}},
+                spec_surface("to"),
+                spec_pos("VERB", "AUX"),
+            ]
+        },
+        zh="used to do：过去的习惯/状态（现在没有了）。",
+    ),
+    make_rule(
+        "en_relative_pronouns",
+        "Relative clauses (who / which / whose)",
+        "B1",
+        "who/which/whose join a describing clause to a noun.",
+        {"seq": [spec_surface("who", "whom", "whose", "which")]},
+        zh="关系从句：who/which/whose 引导定语从句修饰名词。",
+    ),
+    make_rule(
+        "en_reported_speech",
+        "Reported speech (said / told)",
+        "B1",
+        "reporting verbs in the past shift the tense back one step.",
+        {"seq": [{"lemma_in": ["say", "tell", "ask"], "morph": {"Tense": "Past"}}]},
+        zh="间接引语：said/told 引出转述，时态后移。",
+    ),
+    # ---- B2 ----
+    make_rule(
+        "en_third_conditional",
+        "Third conditional: if + had done, would have done",
+        "B2",
+        "an unreal past: If I had known, I would have come.",
+        {
+            "left": [spec_surface("if")],
+            "right": [spec_surface("would"), spec_surface("have")],
+            "min_gap": 1,
+            "max_gap": 10,
+        },
+        zh="第三条件句：if + had done，主句 would have done，对过去的假设。",
+    ),
+    make_rule(
+        "en_wish_past",
+        "wish + past",
+        "B2",
+        "a wish about an unreal present: I wish I knew.",
+        {"left": [spec_lemma("wish")], "right": [spec_morph(Tense="Past")], "min_gap": 1, "max_gap": 4},
+        zh="wish + 过去时：对现状的遗憾/愿望。",
+    ),
+    make_rule(
+        "en_must_have",
+        "must have / can't have + participle",
+        "B2",
+        "a deduction about the past.",
+        {
+            "seq": [
+                spec_surface("must", "might", "could", "can't", "cannot"),
+                spec_surface("have"),
+                spec_morph(VerbForm="Part"),
+            ]
+        },
+        zh="must/can't have + 过去分词：对过去的肯定/否定推测。",
+    ),
+    make_rule(
+        "en_have_sth_done",
+        "have something done (causative)",
+        "B2",
+        "someone else does it for you: I had it repaired.",
+        {"seq": [spec_lemma("have"), spec_pos("NOUN", "PRON"), spec_morph(VerbForm="Part")]},
+        zh="have sth done 使役结构：请/让别人做某事。",
+    ),
+    make_rule(
+        "en_despite",
+        "despite / in spite of",
+        "B2",
+        "concession followed by a noun or -ing form (not a clause).",
+        {
+            "any_of": [
+                {"seq": [spec_surface("despite")]},
+                {"seq": [spec_surface("in"), spec_surface("spite"), spec_surface("of")]},
+            ]
+        },
+        zh="despite / in spite of：尽管（后接名词或 -ing）。",
+    ),
+    make_rule(
+        "en_unless",
+        "unless",
+        "B2",
+        "if ... not: Unless it rains, we'll go.",
+        {"seq": [spec_surface("unless")]},
+        zh="unless = if not：除非。",
+    ),
 ]
 
 
