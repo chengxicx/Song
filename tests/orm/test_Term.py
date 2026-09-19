@@ -3,6 +3,8 @@ Term mapping tests.
 """
 
 import pytest
+
+from lute.parse.registry import is_supported
 from lute.models.term import Term, TermTag, TermTextChangedException
 from lute.db import db
 from tests.dbasserts import assert_sql_result
@@ -302,6 +304,10 @@ def test_new_term_with_pretokenized_zws_text_is_not_reparsed(japanese):
 
 
 @pytest.mark.term_case
+@pytest.mark.skipif(
+    not is_supported("japanese_sudachi"),
+    reason="token count is Sudachi-specific; MeCab splits differently",
+)
 def test_new_term_without_zws_is_parsed_from_scratch(japanese):
     """
     Sanity/regression check: text with NO pre-existing zws (e.g., typed
