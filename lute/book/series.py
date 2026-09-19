@@ -150,7 +150,11 @@ def get_series_overview(session, tagtext):
         else:
             # Prefer non-archived books when picking the continue target.
             if continue_book is None or (
-                continue_book["archived"] and not r.BkArchived
+                # Short-circuit guards the subscript: continue_book is a
+                # dict by the time "archived" is read.  (pylint cannot
+                # narrow None -> dict across the or.)
+                continue_book["archived"]  # pylint: disable=unsubscriptable-object
+                and not r.BkArchived
             ):
                 continue_book = {
                     "id": r.BkID,
