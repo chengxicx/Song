@@ -12,12 +12,29 @@ body {
     --background-color: #fff;
     --font-color: #000;
 
+    /* Semantic tokens.  Themes override these (on body) instead of
+       re-painting whole selectors with !important; components below
+       read them.  Defaults = the light, no-theme look. */
+    --link-color: #007aff;            /* plain links */
+    --home-link-color: #000;          /* top-bar "Home" label */
+    --menu-link-color: #000;          /* menu-bar items (BOOKS, TERMS ...) */
+    --panel-bg: #fff;                 /* cards / tables / popovers */
+
     --status-0-color: #D5FFFF;
     --status-1-color: #F5B8A9;
     --status-2-color: #F5CCA9;
     --status-3-color: #F5E1A9;
     --status-4-color: #F5F3A9;
     --status-5-color: #DDFFDD;
+
+    /* Text colour painted on top of each status background; themes with
+       dark status backgrounds need lighter text. */
+    --status-0-text: #000;
+    --status-1-text: #000;
+    --status-2-text: #000;
+    --status-3-text: #000;
+    --status-4-text: #000;
+    --status-5-text: #000;
 
     --status-98-color: #ee8577;
     --status-99-color: #72da88;
@@ -57,7 +74,11 @@ body {
 
 a.home-link {
     text-decoration: none;
-    color: black !important;
+    /* Guard-var pattern: the !important still beats legacy themes'
+       global `a { color: ... !important }` rules, while token-based
+       themes get their way through --home-link-color (custom
+       properties cascade past specificity). */
+    color: var(--home-link-color, black) !important;
 }
 
 a.home-link:hover {
@@ -109,14 +130,15 @@ p.version {
     position: relative; /* Required for sub-menu positioning */
 }
 
-/* main menu item text (not links) */
+/* main menu item text (not links).  Same guard-var pattern as
+   a.home-link above. */
 .menu-item > span {
     text-decoration: none;
     display: block;
     cursor: pointer;
     text-transform: uppercase;
     font-weight: bold;
-    color: black !important;
+    color: var(--menu-link-color, black) !important;
 }
 
 .menu-item > a:hover {

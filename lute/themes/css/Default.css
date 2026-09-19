@@ -5,22 +5,37 @@
 
 /* ---------------------------------------------------------
    1. 全局 Apple Books 深色调 (Dark Theme)
+
+   Token layer: everything the shared stylesheet (styles.css) reads
+   through var(--token) is defined here -- themes only supply values,
+   the component rules live in styles.css.  See themes/css/README.md.
    --------------------------------------------------------- */
 body {
   /* 生词状态色彩 (深色模式下降低饱和度，防止刺眼) */
-  --status-0-color: #0a84ff;        
-  --status-1-color: #722c2b;        
-  --status-2-color: #6e5218;        
-  --status-3-color: #245838;        
-  --status-4-color: #214368;        
-  --status-5-color: #482f63;        
-  --status-learned-bg: #3a3a3c;     
-  --status-learned-color: #8e8e93;  
+  --status-0-color: #0a84ff;
+  --status-1-color: #722c2b;
+  --status-2-color: #6e5218;
+  --status-3-color: #245838;
+  --status-4-color: #214368;
+  --status-5-color: #482f63;
+  /* Light text painted on top of the dark status backgrounds. */
+  --status-1-text: #ffd7d5;
+  --status-2-text: #ffe8b3;
+  --status-3-text: #d1ebd8;
+  --status-4-text: #d2e4f7;
+  --status-5-text: #e5d7f2;
+  --status-learned-bg: #3a3a3c;
+  --status-learned-color: #8e8e93;
   --status-99-color: #38924c;
 
   --background-color: #1c1c1e;      /* Apple 界面暗黑背景色 */
   --panel-bg: #2c2c2e;            /* 悬浮卡片/表格底色 */
   --font-color: #e5e5ea;           /* 文本亮灰/白 */
+
+  /* Links and menu text (consumed by styles.css guard-var rules). */
+  --link-color: #0a84ff;
+  --menu-link-color: #8e8e93;
+  --menu-link-hover-color: #0a84ff;
 
   /* Chart.js 图表适配颜色 */
   --chart-tick-color: #8e8e93;
@@ -93,16 +108,17 @@ body {
 }
 
 .menu-item > span {
+  /* Colour comes from --menu-link-color (see the body token block);
+     styles.css paints it through the guard-var rule. */
   font-size: 12px !important;
   font-weight: 600 !important;
-  color: #8e8e93 !important;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   transition: color 0.2s ease;
 }
 
 .menu-item:hover > span {
-  color: #0a84ff !important;
+  color: var(--menu-link-hover-color, #0a84ff) !important;
 }
 
 /* 下拉菜单 —— 暗黑悬浮卡片 */
@@ -373,7 +389,9 @@ tr:last-child td {
 }
 
 a, a:link, a:visited {
-  color: #0a84ff !important;
+  /* Colour tokenized; the !important stays until every theme's global
+     link rule (Boox_Leaf5C etc.) drops theirs. */
+  color: var(--link-color, #0a84ff) !important;
   text-decoration: none;
   font-weight: 500;
 }
@@ -400,11 +418,11 @@ span.textitem {
 }
 
 span.status0 { background-color: transparent; color: var(--status-0-color); font-weight: 600; }
-span.status1 { background-color: var(--status-1-color); color: #ffd7d5; border-radius: 3px; padding: 1px 3px; }
-span.status2 { background-color: var(--status-2-color); color: #ffe8b3; border-radius: 3px; padding: 1px 3px; }
-span.status3 { background-color: var(--status-3-color); color: #d1ebd8; border-radius: 3px; padding: 1px 3px; }
-span.status4 { background-color: var(--status-4-color); color: #d2e4f7; border-radius: 3px; padding: 1px 3px; }
-span.status5 { background-color: var(--status-5-color); color: #e5d7f2; border-radius: 3px; padding: 1px 3px; }
+span.status1 { background-color: var(--status-1-color); color: var(--status-1-text, #ffd7d5); border-radius: 3px; padding: 1px 3px; }
+span.status2 { background-color: var(--status-2-color); color: var(--status-2-text, #ffe8b3); border-radius: 3px; padding: 1px 3px; }
+span.status3 { background-color: var(--status-3-color); color: var(--status-3-text, #d1ebd8); border-radius: 3px; padding: 1px 3px; }
+span.status4 { background-color: var(--status-4-color); color: var(--status-4-text, #d2e4f7); border-radius: 3px; padding: 1px 3px; }
+span.status5 { background-color: var(--status-5-color); color: var(--status-5-text, #e5d7f2); border-radius: 3px; padding: 1px 3px; }
 
 span.status98, span.status99 { 
   background-color: transparent; 
