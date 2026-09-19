@@ -69,7 +69,9 @@ def test_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The French engine grades points with CEFR levels."
-    levels = {e["key"]: e["level"] for e in analyze_french(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"] for e in analyze_french(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["fr_il_y_a"] == "A1"
     assert levels["fr_passe_compose"] == "A2"
 

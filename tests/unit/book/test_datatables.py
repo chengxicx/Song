@@ -92,7 +92,9 @@ def test_new_book_with_no_last_read_sorts_first_when_desc(app_context, english):
     db.session.add(fresh)
     db.session.commit()
 
-    d = get_data_tables_list(_dt_params_sorted_by_last_opened("desc"), False, db.session)
+    d = get_data_tables_list(
+        _dt_params_sorted_by_last_opened("desc"), False, db.session
+    )
     titles = [r["BkTitle"] for r in d["data"]]
     assert titles[0] == "new book", "NULL last-read must sort as newest (top)"
     assert titles.index("old book") > titles.index("new book")
@@ -203,16 +205,9 @@ def test_manga_book_word_count_in_datatables(app_context, empty_db, _dt_params):
     book.language = j
     book.title = "Manga DataTables"
     book.book_type = "manga"
-    book.manga_data = json.dumps({
-        "version": "0.2.1",
-        "pages": [
-            {
-                "blocks": [
-                    {"lines": ["こんにちは世界"]}
-                ]
-            }
-        ]
-    })
+    book.manga_data = json.dumps(
+        {"version": "0.2.1", "pages": [{"blocks": [{"lines": ["こんにちは世界"]}]}]}
+    )
     db.session.add(book)
     db.session.commit()
 
@@ -267,9 +262,7 @@ def fixture_series_books(english):
     _mk_tagged_book("Standalone", [], english)
 
 
-def test_book_type_exposed_for_flat_and_series_rows(
-    app_context, _dt_params, english
-):
+def test_book_type_exposed_for_flat_and_series_rows(app_context, _dt_params, english):
     "Flat rows carry the book's type; aggregated series rows say 'series'."
     svcbook = ServiceBook()
     svcbook.language_id = english.id
@@ -301,6 +294,7 @@ def test_series_tags_setting_default_exists(app_context):
 
 def test_book_type_filter_flat_rows(app_context, _dt_params, english):
     "filtType keeps only matching books; 'text' matches the default '' type."
+
     def _mk_typed_book(title, btype):
         svcbook = ServiceBook()
         svcbook.language_id = english.id
@@ -383,9 +377,7 @@ def test_series_book_with_two_series_tags_grouped_once(
     assert groups == {"aaa": 1, "bbb": 1}, "dual book only under first tag (aaa)"
 
 
-def test_series_aggregation_flat_when_searching(
-    app_context, _dt_params, _series_books
-):
+def test_series_aggregation_flat_when_searching(app_context, _dt_params, _series_books):
     "An active search disables aggregation so all books are findable."
     _set_series_setting(db.session, ["Erin"])
     _dt_params["search"] = {"value": "Erin", "regex": False}
@@ -406,9 +398,7 @@ def test_series_aggregation_flat_when_tag_filtered(
     assert all(r["SeriesTag"] is None for r in d["data"])
 
 
-def test_series_aggregation_no_tags_configured(
-    app_context, _dt_params, _series_books
-):
+def test_series_aggregation_no_tags_configured(app_context, _dt_params, _series_books):
     "No aggregation when the setting is empty."
     _set_series_setting(db.session, [])
     d = get_data_tables_list(_dt_params, False, db.session)

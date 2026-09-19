@@ -103,7 +103,13 @@ _EN_RULES = [
         {
             "any_of": [
                 {"seq": [spec_surface("must", "should"), spec_pos("VERB", "AUX")]},
-                {"seq": [spec_surface("have", "has", "had"), spec_surface("to"), spec_pos("VERB")]},
+                {
+                    "seq": [
+                        spec_surface("have", "has", "had"),
+                        spec_surface("to"),
+                        spec_pos("VERB"),
+                    ]
+                },
             ]
         },
         zh="must 必须（强义务），have to 不得不，should 应该（建议）。",
@@ -155,7 +161,14 @@ _EN_RULES = [
         "be going to + verb",
         "A2",
         "a plan or intention, or something about to happen.",
-        {"seq": [spec_lemma("be"), spec_surface("going"), spec_surface("to"), spec_pos("VERB")]},
+        {
+            "seq": [
+                spec_lemma("be"),
+                spec_surface("going"),
+                spec_surface("to"),
+                spec_pos("VERB"),
+            ]
+        },
         zh="be going to do：打算/将要（计划或即将发生）。",
     ),
     make_rule(
@@ -192,7 +205,14 @@ _EN_RULES = [
         "too + adjective + to ...",
         "A2",
         "so much of a quality that something is impossible.",
-        {"seq": [spec_surface("too"), spec_pos("ADJ"), spec_surface("to"), spec_pos("VERB")]},
+        {
+            "seq": [
+                spec_surface("too"),
+                spec_pos("ADJ"),
+                spec_surface("to"),
+                spec_pos("VERB"),
+            ]
+        },
         zh="too + 形容词 + to do：太……而不能。",
     ),
     make_rule(
@@ -200,7 +220,12 @@ _EN_RULES = [
         "as ... as",
         "A2",
         "equal comparison (as tall as).",
-        {"left": [spec_surface("as")], "right": [spec_surface("as")], "min_gap": 1, "max_gap": 3},
+        {
+            "left": [spec_surface("as")],
+            "right": [spec_surface("as")],
+            "min_gap": 1,
+            "max_gap": 3,
+        },
         zh="as + 形容词/副词 + as：和……一样。",
     ),
     make_rule(
@@ -208,7 +233,12 @@ _EN_RULES = [
         "either ... or",
         "A2",
         "a choice between two alternatives.",
-        {"left": [spec_surface("either")], "right": [spec_surface("or")], "min_gap": 1, "max_gap": 8},
+        {
+            "left": [spec_surface("either")],
+            "right": [spec_surface("or")],
+            "min_gap": 1,
+            "max_gap": 8,
+        },
         zh="either ... or：二选一。",
     ),
     # ---- B1 ----
@@ -241,7 +271,12 @@ _EN_RULES = [
         "First conditional: if + present, will",
         "B1",
         "a real future possibility: If it rains, I will stay.",
-        {"left": [spec_surface("if")], "right": [spec_surface("will")], "min_gap": 1, "max_gap": 10},
+        {
+            "left": [spec_surface("if")],
+            "right": [spec_surface("will")],
+            "min_gap": 1,
+            "max_gap": 10,
+        },
         zh="第一条件句：if + 现在时，主句 will，真实可能。",
     ),
     make_rule(
@@ -249,7 +284,12 @@ _EN_RULES = [
         "Second conditional: if + past, would",
         "B1",
         "an unreal or unlikely present/future: If I had time, I would go.",
-        {"left": [spec_surface("if")], "right": [spec_surface("would")], "min_gap": 1, "max_gap": 10},
+        {
+            "left": [spec_surface("if")],
+            "right": [spec_surface("would")],
+            "min_gap": 1,
+            "max_gap": 10,
+        },
         zh="第二条件句：if + 过去时，主句 would，假设。",
     ),
     make_rule(
@@ -309,7 +349,12 @@ _EN_RULES = [
         "wish + past",
         "B2",
         "a wish about an unreal present: I wish I knew.",
-        {"left": [spec_lemma("wish")], "right": [spec_morph(Tense="Past")], "min_gap": 1, "max_gap": 4},
+        {
+            "left": [spec_lemma("wish")],
+            "right": [spec_morph(Tense="Past")],
+            "min_gap": 1,
+            "max_gap": 4,
+        },
         zh="wish + 过去时：对现状的遗憾/愿望。",
     ),
     make_rule(
@@ -331,7 +376,13 @@ _EN_RULES = [
         "have something done (causative)",
         "B2",
         "someone else does it for you: I had it repaired.",
-        {"seq": [spec_lemma("have"), spec_pos("NOUN", "PRON"), spec_morph(VerbForm="Part")]},
+        {
+            "seq": [
+                spec_lemma("have"),
+                spec_pos("NOUN", "PRON"),
+                spec_morph(VerbForm="Part"),
+            ]
+        },
         zh="have sth done 使役结构：请/让别人做某事。",
     ),
     make_rule(
@@ -342,7 +393,13 @@ _EN_RULES = [
         {
             "any_of": [
                 {"seq": [spec_surface("despite")]},
-                {"seq": [spec_surface("in"), spec_surface("spite"), spec_surface("of")]},
+                {
+                    "seq": [
+                        spec_surface("in"),
+                        spec_surface("spite"),
+                        spec_surface("of"),
+                    ]
+                },
             ]
         },
         zh="despite / in spite of：尽管（后接名词或 -ing）。",
@@ -364,10 +421,25 @@ _EN_RULES = [
         "word order: Never have I seen, No sooner had we left than ...",
         {
             "any_of": [
-                {"seq": [spec_surface("never", "rarely", "seldom", "little"), spec_pos("AUX")]},
+                {
+                    "seq": [
+                        spec_surface("never", "rarely", "seldom", "little"),
+                        spec_pos("AUX"),
+                    ]
+                },
                 {"seq": [spec_surface("not"), spec_surface("only"), spec_pos("AUX")]},
-                {"left": [spec_surface("hardly", "scarcely")], "right": [spec_surface("when", "before", "than")], "min_gap": 1, "max_gap": 10},
-                {"left": [spec_surface("no"), spec_surface("sooner")], "right": [spec_surface("than")], "min_gap": 1, "max_gap": 10},
+                {
+                    "left": [spec_surface("hardly", "scarcely")],
+                    "right": [spec_surface("when", "before", "than")],
+                    "min_gap": 1,
+                    "max_gap": 10,
+                },
+                {
+                    "left": [spec_surface("no"), spec_surface("sooner")],
+                    "right": [spec_surface("than")],
+                    "min_gap": 1,
+                    "max_gap": 10,
+                },
             ]
         },
         zh="倒装：否定/限制副词置于句首引起倒装（Never have I seen / No sooner had ... than）。",
@@ -377,7 +449,13 @@ _EN_RULES = [
         "Future perfect: will have + participle",
         "C1",
         "completion by a future point: will have finished.",
-        {"seq": [spec_surface("will"), spec_surface("have"), spec_morph(VerbForm="Part")]},
+        {
+            "seq": [
+                spec_surface("will"),
+                spec_surface("have"),
+                spec_morph(VerbForm="Part"),
+            ]
+        },
         zh="将来完成时：will have + 过去分词（到将来某时将已完成）。",
     ),
     make_rule(
@@ -387,8 +465,20 @@ _EN_RULES = [
         "an action in progress at a future time: will be waiting.",
         {
             "any_of": [
-                {"seq": [spec_surface("will"), spec_lemma("be"), spec_morph(Aspect="Prog")]},
-                {"seq": [spec_surface("will"), spec_lemma("be"), spec_morph(VerbForm="Ger")]},
+                {
+                    "seq": [
+                        spec_surface("will"),
+                        spec_lemma("be"),
+                        spec_morph(Aspect="Prog"),
+                    ]
+                },
+                {
+                    "seq": [
+                        spec_surface("will"),
+                        spec_lemma("be"),
+                        spec_morph(VerbForm="Ger"),
+                    ]
+                },
             ]
         },
         zh="将来进行时：will be + 动词-ing（将来某时正在进行）。",

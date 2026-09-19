@@ -57,10 +57,16 @@ class Language(
 
     # Kiwi (Korean) parser settings.
     # These columns only have meaning when LgParserType = 'lute_korean'.
-    kiwi_tokenizer_mode = db.Column("LgKiwiTokenizerMode", db.String(20), default="morpheme")
+    kiwi_tokenizer_mode = db.Column(
+        "LgKiwiTokenizerMode", db.String(20), default="morpheme"
+    )
     kiwi_stemming = db.Column("LgKiwiStemming", db.Boolean, default=True)
-    kiwi_filter_particles = db.Column("LgKiwiFilterParticles", db.Boolean, default=False)
-    kiwi_join_compound_nouns = db.Column("LgKiwiJoinCompoundNouns", db.Boolean, default=False)
+    kiwi_filter_particles = db.Column(
+        "LgKiwiFilterParticles", db.Boolean, default=False
+    )
+    kiwi_join_compound_nouns = db.Column(
+        "LgKiwiJoinCompoundNouns", db.Boolean, default=False
+    )
 
     # Optional per-language overrides for TTS and term translation.
     # When empty, the TTS tag is derived from the language name, and
