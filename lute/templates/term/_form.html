@@ -386,6 +386,16 @@
       // Tell the parent screen: re-points the dict lookup buttons at
       // this form and reloads the dictionaries for the new term.
       window.parent.postMessage({ event: "LuteTermFormOpened" }, "*");
+
+      // The form document is no longer reloaded per word, so the
+      // boot-time auto-translate check (tts-ui.js boot) only ever saw
+      // the first term shown here.  Re-run it for the word just
+      // populated -- it no-ops when the translation is already set.
+      // tts-translate.js is only loaded in the reading screen's
+      // wordframe, hence the typeof guard.
+      if (typeof processTranslationFlow === "function") {
+        setTimeout(processTranslationFlow, 100);
+      }
     };
 
     // Reading frame: intercept the submit so the form is posted via
