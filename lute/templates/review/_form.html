@@ -1,0 +1,82 @@
+{% if form.general_errors | length > 0 %}
+<div class="flash-notice-narrow">
+  <p>Errors:</p>
+  {% for msg in form.general_errors %}
+  <p>{{ msg | safe }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% for field_name, field_errors in form.errors.items() %}
+<div class="flash-notice-narrow">
+  <p>{{ field_name }}
+    <ul>
+      {% for error in field_errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </p>
+</div>
+{% endfor %}
+
+<p>
+  Criteria use the same syntax as Anki exports:
+  <code>status &gt; 1</code>, <code>language == "Japanese"</code>,
+  <code>tags:["vocab"]</code>, <code>parents.count &gt;= 1</code>,
+  combined with <code>and</code> / <code>or</code>.
+  Language names in this Lute: {{ language_names | join(', ') }}.
+</p>
+
+<form id="review_spec_form" method="POST">
+  {{ form.hidden_tag() }}
+
+  <table id="reviewspec">
+  <tbody>
+
+    <tr>
+      <td>{{ form.name.label(class="form-control-label") }}</td>
+      <td>{{ form.name(class="form-control") }}</td>
+    </tr>
+
+    <tr>
+      <td>{{ form.criteria.label(class="form-control-label") }}</td>
+      <td>{{ form.criteria(class="form-largetextarea") }}</td>
+    </tr>
+
+    <tr>
+      <td>Card types</td>
+      <td>
+        <p>{{ form.card_recognition() }} {{ form.card_recognition.label() }}</p>
+        <p>{{ form.card_recall() }} {{ form.card_recall.label() }}</p>
+        <p>{{ form.card_cloze() }} {{ form.card_cloze.label() }}</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td>{{ form.active.label(class="form-control-label") }}</td>
+      <td>{{ form.active(class="form-control") }}</td>
+    </tr>
+
+  </tbody>
+  </table>
+
+  <div class="form-action-row">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button id="btnCancel" class="btn btn-secondary" onclick="window.location = '{{ url_for('review.review_index') }}'; return false;">Cancel</button>
+
+    {% if spec.id %}
+    <button id="btnDelete" class="btn btn-danger" onclick="confirm_delete({{ spec.id }}); return false;">Delete</button>
+    {% endif %}
+  </div>
+
+</form>
+
+<script>
+  function confirm_delete(spec_id) {
+    if (spec_id == null)
+      return;
+    if (!window.confirm("Delete review spec?  Already-queued cards are kept."))
+      return;
+    window.location = `/review/spec/delete/${spec_id}`;
+  }
+</script>
