@@ -9,6 +9,7 @@ from datetime import datetime
 import functools
 from flask import current_app
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import StaleDataError
 from lute.models.term import Term, Status
 from lute.models.book import Text, WordsRead
 from lute.models.repositories import BookRepository, UserSettingRepository
@@ -317,7 +318,15 @@ class Service:
         book.current_tx_id = text.id
         self.session.add(text)
         self.session.add(book)
-        self.session.commit()
+        try:
+            self.session.commit()
+        except StaleDataError:
+            # The beacon is fire-and-forget: the book (or its pages) can
+            # be deleted between loading the text and this commit -- e.g.
+            # the reader navigated away just as the book was removed.
+            # Nothing is left to update; roll back so this worker's
+            # session is not left poisoned for later requests.
+            self.session.rollback()
 
     def mark_page_read(
         self, bookid, pagenum, mark_rest_as_known, mark_rest_of_book_known=False
