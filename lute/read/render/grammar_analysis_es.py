@@ -86,7 +86,12 @@ _ES_RULES = [
         "hay / había + noun",
         "A1",
         "impersonal haber = there is / there are (no article before the noun).",
-        {"seq": [spec_surface("hay", "había", "hubo"), spec_pos("NOUN", "DET", "NUM", "PRON", "ADJ")]},
+        {
+            "seq": [
+                spec_surface("hay", "había", "hubo"),
+                spec_pos("NOUN", "DET", "NUM", "PRON", "ADJ"),
+            ]
+        },
         zh="hay / había 表示『有；存在』，名词前不加冠词（Hay un problema）。",
     ),
     make_rule(
@@ -97,7 +102,9 @@ _ES_RULES = [
         "(me gusta el café / me gustan los libros).",
         {
             "seq": [
-                spec_lemma("gustar", "encantar", "fascinar", "molestar", "doler", "apetecer")
+                spec_lemma(
+                    "gustar", "encantar", "fascinar", "molestar", "doler", "apetecer"
+                )
             ]
         },
         zh="gustar 类动词用法特殊：喜欢的事物作主语，人用间接宾语代词（me gusta…）。",
@@ -111,8 +118,19 @@ _ES_RULES = [
         {
             "seq": [
                 spec_surface(
-                    "qué", "cómo", "dónde", "cuándo", "quién", "quiénes",
-                    "cuál", "cuáles", "cuánto", "cuánta", "cuántos", "cuántas", "adónde",
+                    "qué",
+                    "cómo",
+                    "dónde",
+                    "cuándo",
+                    "quién",
+                    "quiénes",
+                    "cuál",
+                    "cuáles",
+                    "cuánto",
+                    "cuánta",
+                    "cuántos",
+                    "cuántas",
+                    "adónde",
                 )
             ]
         },
@@ -182,7 +200,12 @@ _ES_RULES = [
         "más ... que (comparison)",
         "A2",
         "más + adjective/noun + que = more ... than; menos ... que = less ... than.",
-        {"left": [spec_surface("más", "menos")], "right": [spec_surface("que")], "min_gap": 1, "max_gap": 4},
+        {
+            "left": [spec_surface("más", "menos")],
+            "right": [spec_surface("que")],
+            "min_gap": 1,
+            "max_gap": 4,
+        },
         zh="más/menos … que：比……更/更不……。",
     ),
     make_rule(
@@ -209,7 +232,11 @@ _ES_RULES = [
         "B1",
         "used after triggers of will, emotion, doubt or necessity: "
         "quiero que, espero que, es posible que + subjunctive verb.",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Pres"}}]},
+        {
+            "seq": [
+                {"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Pres"}}
+            ]
+        },
         zh="虚拟式现在时：意愿/情感/怀疑类触发词后用（quiero que vengas）。",
     ),
     make_rule(
@@ -251,7 +278,12 @@ _ES_RULES = [
         "si + past subjunctive, conditional",
         "B1",
         "hypothetical: Si tuviera dinero, compraría una casa.",
-        {"left": [spec_surface("si")], "right": [spec_morph(Mood="Cnd")], "min_gap": 1, "max_gap": 10},
+        {
+            "left": [spec_surface("si")],
+            "right": [spec_morph(Mood="Cnd")],
+            "min_gap": 1,
+            "max_gap": 10,
+        },
         zh="si + 虚拟式过去时，主句条件式：假设（Si tuviera…, compraría…）。",
     ),
     # ---- B2 ----
@@ -261,7 +293,11 @@ _ES_RULES = [
         "B2",
         "the past subjunctive: si tuviera, como si fuera; needed after past "
         "triggers (quería que vinieras).",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Imp"}}]},
+        {
+            "seq": [
+                {"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Imp"}}
+            ]
+        },
         zh="虚拟式过去时（-ra/-se 形式）：过去触发词或 si 条件句中用（si tuviera）。",
     ),
     make_rule(
@@ -272,8 +308,14 @@ _ES_RULES = [
         {
             "seq": [
                 spec_surface(
-                    "hubiera", "hubieras", "hubiéramos", "hubieran",
-                    "hubiese", "hubieses", "hubiésemos", "hubiesen",
+                    "hubiera",
+                    "hubieras",
+                    "hubiéramos",
+                    "hubieran",
+                    "hubiese",
+                    "hubieses",
+                    "hubiésemos",
+                    "hubiesen",
                 ),
                 spec_morph(VerbForm="Part"),
             ]
@@ -315,7 +357,12 @@ _ES_RULES = [
         "llevar + time + gerund",
         "B2",
         "duration up to now: llevo dos años viviendo aquí.",
-        {"left": [spec_lemma("llevar")], "right": [spec_morph(VerbForm="Ger")], "min_gap": 0, "max_gap": 6},
+        {
+            "left": [spec_lemma("llevar")],
+            "right": [spec_morph(VerbForm="Ger")],
+            "min_gap": 0,
+            "max_gap": 6,
+        },
         zh="llevar + 时间 + 副动词：持续做某事已多久（llevo dos años viviendo）。",
     ),
     # ---- C1 / C2 ----

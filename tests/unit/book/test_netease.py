@@ -134,13 +134,9 @@ def test_parse_lrc_duplicate_timestamps():
 def test_netease_song_title_formats_artists():
     data = {
         "code": 200,
-        "songs": [
-            {"name": "坏掉了", "artists": [{"name": "SUN18"}, {"name": "Other"}]}
-        ],
+        "songs": [{"name": "坏掉了", "artists": [{"name": "SUN18"}, {"name": "Other"}]}],
     }
-    with patch.object(
-        netease_service, "_api_get", return_value=data
-    ) as api_get:
+    with patch.object(netease_service, "_api_get", return_value=data) as api_get:
         assert netease_service.netease_song_title("1") == "坏掉了 - SUN18/Other"
     assert api_get.call_args[0][0] == "/api/song/detail/"
 
@@ -152,13 +148,18 @@ def test_netease_song_title_without_artist():
 
 
 def test_netease_song_title_not_found_raises():
-    with patch.object(netease_service, "_api_get", return_value={"code": 200, "songs": []}):
+    with patch.object(
+        netease_service, "_api_get", return_value={"code": 200, "songs": []}
+    ):
         with pytest.raises(BookImportException):
             netease_service.netease_song_title("1")
 
 
 def test_netease_audio_url_returns_url():
-    data = {"code": 200, "data": [{"url": "http://cdn.example.com/a.mp3", "br": 320000}]}
+    data = {
+        "code": 200,
+        "data": [{"url": "http://cdn.example.com/a.mp3", "br": 320000}],
+    }
     with patch.object(netease_service, "_api_get", return_value=data) as api_get:
         assert netease_service.netease_audio_url("1") == "http://cdn.example.com/a.mp3"
     assert api_get.call_args[0][0] == "/api/song/enhance/player/url"
@@ -174,7 +175,12 @@ def test_netease_audio_url_unavailable_raises():
 def test_netease_audio_url_trial_only_raises():
     data = {
         "code": 200,
-        "data": [{"url": "http://cdn.example.com/trial.mp3", "freeTrialInfo": {"start": 0, "end": 30000}}],
+        "data": [
+            {
+                "url": "http://cdn.example.com/trial.mp3",
+                "freeTrialInfo": {"start": 0, "end": 30000},
+            }
+        ],
     }
     with patch.object(netease_service, "_api_get", return_value=data):
         with pytest.raises(BookImportException, match="preview snippet"):
@@ -182,7 +188,9 @@ def test_netease_audio_url_trial_only_raises():
 
 
 def test_netease_lyric_content_missing_raises():
-    with patch.object(netease_service, "_api_get", return_value={"code": 200, "lrc": {"lyric": ""}}):
+    with patch.object(
+        netease_service, "_api_get", return_value={"code": 200, "lrc": {"lyric": ""}}
+    ):
         with pytest.raises(BookImportException):
             netease_service.netease_lyric_content("1")
 
@@ -247,9 +255,7 @@ def test_qr_login_start_returns_key_and_svg(client):
 def test_qr_check_waits_then_confirms_and_stores_cookie(client, app_context):
     waiting = {"code": 801}
     confirmed = {"code": 803}
-    confirmed_resp = _FakeResp(
-        confirmed, cookies={"MUSIC_U": "NEWCOOKIE"}, headers={}
-    )
+    confirmed_resp = _FakeResp(confirmed, cookies={"MUSIC_U": "NEWCOOKIE"}, headers={})
 
     with patch.object(
         netease_service.requests.Session, "post", return_value=_FakeResp(waiting)
@@ -307,9 +313,7 @@ def test_login_status_logged_out_and_in(client, app_context):
 
     netease_service.save_cookie_value("SOMECOOKIE")
     profile = {"code": 200, "profile": {"nickname": "Tester", "vipType": 11}}
-    with patch.object(
-        netease_service.requests, "get", return_value=_FakeResp(profile)
-    ):
+    with patch.object(netease_service.requests, "get", return_value=_FakeResp(profile)):
         data = client.get("/netease/login/status").get_json()
     assert data == {"logged_in": True, "nickname": "Tester", "vip": True}
 
@@ -409,9 +413,7 @@ def test_netease_import_invalid_url_flashes(app, app_context, client, english):
 
 def test_netease_import_unavailable_audio_flashes(app, app_context, client, english):
     "A VIP / restricted song without login shows a clear error."
-    with patch(
-        "lute.book.routes.netease_song_title", return_value="VIP Song"
-    ), patch(
+    with patch("lute.book.routes.netease_song_title", return_value="VIP Song"), patch(
         "lute.book.routes.netease_audio_url",
         side_effect=BookImportException("No playable audio for this song"),
     ):

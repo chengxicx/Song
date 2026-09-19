@@ -89,7 +89,21 @@ _IT_RULES = [
         "A1",
         "che/che cosa what, come how, dove where, perché why, quando when, "
         "chi who, quanto how much.",
-        {"seq": [spec_surface("che cosa", "cosa", "come", "dove", "perché", "perche", "quando", "chi", "quanto")]},
+        {
+            "seq": [
+                spec_surface(
+                    "che cosa",
+                    "cosa",
+                    "come",
+                    "dove",
+                    "perché",
+                    "perche",
+                    "quando",
+                    "chi",
+                    "quanto",
+                )
+            ]
+        },
         zh="特殊疑问词：che/cosa 什么、come 怎样、dove 哪里、perché 为什么。",
     ),
     # ---- A2 ----
@@ -101,7 +115,12 @@ _IT_RULES = [
         {
             "any_of": [
                 {"seq": [spec_lemma("stare"), spec_morph(VerbForm="Ger")]},
-                {"seq": [spec_surface("sto", "stai", "sta", "stiamo", "state", "stanno"), spec_morph(VerbForm="Ger")]},
+                {
+                    "seq": [
+                        spec_surface("sto", "stai", "sta", "stiamo", "state", "stanno"),
+                        spec_morph(VerbForm="Ger"),
+                    ]
+                },
             ]
         },
         zh="stare + 副动词：正在（sto mangiando 正在吃）。",
@@ -148,7 +167,12 @@ _IT_RULES = [
         "più / meno ... che / di",
         "A2",
         "comparative: più grande di, più che.",
-        {"left": [spec_surface("più", "piu", "meno")], "right": [spec_surface("che", "di")], "min_gap": 1, "max_gap": 4},
+        {
+            "left": [spec_surface("più", "piu", "meno")],
+            "right": [spec_surface("che", "di")],
+            "min_gap": 1,
+            "max_gap": 4,
+        },
         zh="比较级：più/meno … che/di（比……更/更不）。",
     ),
     make_rule(
@@ -194,7 +218,11 @@ _IT_RULES = [
         "da + time (duration up to now)",
         "B1",
         "Italian uses the PRESENT with da for durations: abito qui da due anni.",
-        {"re": re.compile(r"(?i)\bda\s+(?:\d+|due|tre|quattro|cinque|dieci|molti)\s+(?:anni|mesi|settimane|giorni|ore|minuti)\b")},
+        {
+            "re": re.compile(
+                r"(?i)\bda\s+(?:\d+|due|tre|quattro|cinque|dieci|molti)\s+(?:anni|mesi|settimane|giorni|ore|minuti)\b"
+            )
+        },
         zh="da + 时间 + 现在时：从……到现在（英语用完成时而意语用现在时）。",
     ),
     make_rule(
@@ -227,7 +255,13 @@ _IT_RULES = [
         "stare per + infinitive (about to)",
         "B2",
         "an imminent action: sto per uscire.",
-        {"seq": [spec_surface("sto", "stai", "sta", "stiamo", "state", "stanno"), spec_surface("per"), _INF]},
+        {
+            "seq": [
+                spec_surface("sto", "stai", "sta", "stiamo", "state", "stanno"),
+                spec_surface("per"),
+                _INF,
+            ]
+        },
         zh="stare per + 原形：马上就要（sto per uscire）。",
     ),
     make_rule(
@@ -235,7 +269,12 @@ _IT_RULES = [
         "Past subjunctive (abbia / sia stato)",
         "B2",
         "a prior action inside the subjunctive: penso che abbia finito.",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub"}}, spec_morph(VerbForm="Part")]},
+        {
+            "seq": [
+                {"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub"}},
+                spec_morph(VerbForm="Part"),
+            ]
+        },
         zh="虚拟式过去时（abbia fatto）：从句动作先于主句。",
     ),
     make_rule(
@@ -243,7 +282,12 @@ _IT_RULES = [
         "se + congiuntivo, condizionale",
         "B2",
         "unreal present: Se fossi ricco, viaggerei.",
-        {"left": [spec_surface("se")], "right": [spec_morph(Mood="Cnd")], "min_gap": 1, "max_gap": 10},
+        {
+            "left": [spec_surface("se")],
+            "right": [spec_morph(Mood="Cnd")],
+            "min_gap": 1,
+            "max_gap": 10,
+        },
         zh="se + 虚拟式，主句条件式：假设（Se fossi…, viaggerei…）。",
     ),
     # ---- C1 ----
@@ -252,7 +296,11 @@ _IT_RULES = [
         "Imperfect subjunctive (fossi / avessi)",
         "C1",
         "unreal or past-tense subjunctive: se fossi, pensavo che fosse.",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Imp"}}]},
+        {
+            "seq": [
+                {"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub", "Tense": "Imp"}}
+            ]
+        },
         zh="虚拟式未完成时（fossi / avessi）：假设与过去转述。",
     ),
     make_rule(
@@ -268,7 +316,14 @@ _IT_RULES = [
         "Passato remoto (literary past)",
         "C1",
         "the historical narrative past: fu, vide, andò.",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Tense": "Past", "VerbForm": "Fin"}}]},
+        {
+            "seq": [
+                {
+                    "pos_in": ["VERB", "AUX"],
+                    "morph": {"Tense": "Past", "VerbForm": "Fin"},
+                }
+            ]
+        },
         zh="远过去时（fu / andò）：书面叙事体（文学/历史）。",
     ),
 ]

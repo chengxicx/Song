@@ -62,7 +62,10 @@ def test_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The Portuguese engine grades points with CEFR levels."
-    levels = {e["key"]: e["level"] for e in analyze_portuguese(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"]
+        for e in analyze_portuguese(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["pt_haver"] == "A1"
     assert levels["pt_imperfeito"] == "A2"
 

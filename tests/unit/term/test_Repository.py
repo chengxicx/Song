@@ -682,6 +682,7 @@ def test_find_or_new_existing_term_not_affected_by_lemma(japanese, repo):
     only runs for newly created terms.
     """
     from lute.models.term import Term as DBTerm
+
     dbt = DBTerm(japanese, "広がる")
     db.session.add(dbt)
     db.session.commit()

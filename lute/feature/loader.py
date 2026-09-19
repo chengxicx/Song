@@ -37,8 +37,7 @@ def _iter_entry_points(group):
         custom_eps = list(eps.select(group=group))
     else:
         _log.warning(
-            "Unable to load plugins for python %s.%s; "
-            "please upgrade to 3.8+",
+            "Unable to load plugins for python %s.%s; " "please upgrade to 3.8+",
             vmaj,
             vmin,
         )
@@ -77,16 +76,12 @@ def load_feature_plugins(app):
             registry.loaded_plugins.append(ep.name)
             _log.info("Loaded feature plugin '%s'", ep.name)
         except Exception as exc:  # pylint: disable=broad-except
-            _log.warning(
-                "Feature plugin '%s' failed to load: %s", ep.name, exc
-            )
+            _log.warning("Feature plugin '%s' failed to load: %s", ep.name, exc)
 
     for bp in registry.blueprints:
         try:
             app.register_blueprint(bp)
         except Exception as exc:  # pylint: disable=broad-except
-            _log.warning(
-                "Failed to register feature blueprint '%s': %s", bp.name, exc
-            )
+            _log.warning("Failed to register feature blueprint '%s': %s", bp.name, exc)
 
     return registry

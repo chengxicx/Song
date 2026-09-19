@@ -33,7 +33,17 @@ PLUGIN_PACKAGES = {
 # Korean saved as "spacedel") even though its parser_type no longer names the
 # plugin directly.
 PLUGIN_LANGUAGE_NAMES = {
-    "lute_mandarin": {"mandarin", "mandarin chinese", "官话", "官話", "普通话", "普通話", "中文", "汉语", "漢語"},
+    "lute_mandarin": {
+        "mandarin",
+        "mandarin chinese",
+        "官话",
+        "官話",
+        "普通话",
+        "普通話",
+        "中文",
+        "汉语",
+        "漢語",
+    },
     "lute_thai": {"thai", "ไทย", "泰语", "泰語"},
     "lute_khmer": {"khmer", "크메르어", "高棉语", "高棉語"},
     "lute_cantonese": {"cantonese", "cantonese chinese", "廣東話", "广东话", "粤语", "粵語"},

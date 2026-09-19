@@ -98,7 +98,7 @@ def base_candidates(word):
     # elided determiners/pronouns: l'homme -> homme
     for el in _ELISIONS:
         if w.startswith(el) and len(w) > len(el) + 1 and w[len(el)] == "'":
-            cands.add(w[len(el) + 1:])
+            cands.add(w[len(el) + 1 :])
     for end in _ENDS:
         if len(w) > len(end) + 2 and w.endswith(end):
             stem = w[: -len(end)]

@@ -209,7 +209,10 @@ def save_datatables_state():
         db.session.commit()
         return jsonify({"result": "success", "message": "OK"})
     except Exception as e:  # pylint: disable=broad-exception-caught
-        return jsonify({"result": "failure", "message": f"{type(e).__name__}: {str(e)}"}), 500
+        return (
+            jsonify({"result": "failure", "message": f"{type(e).__name__}: {str(e)}"}),
+            500,
+        )
 
 
 @bp.route("/datatables_state/load/<path:key>", methods=["GET"])

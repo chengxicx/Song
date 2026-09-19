@@ -98,16 +98,14 @@ class Service:
         """
         List user-uploaded themes only.
         """
+
         def _make_display_name(s):
             ret = os.path.basename(s)
             ret = ret.replace(".css", "").replace("_", " ")
             return ret
 
         g = glob(os.path.join(current_app.env_config.userthemespath, "*.css"))
-        user_themes = [
-            (os.path.basename(f), _make_display_name(f))
-            for f in g
-        ]
+        user_themes = [(os.path.basename(f), _make_display_name(f)) for f in g]
         return sorted(user_themes, key=lambda x: x[1])
 
     def download_theme(self, theme_name):
@@ -115,6 +113,7 @@ class Service:
         Get the content of a theme file for download.
         Returns (content, is_user_uploaded) or (None, False) if not found.
         """
+
         def _read_file(fpath):
             if os.path.exists(fpath):
                 with open(fpath, "r", encoding="utf-8") as f:

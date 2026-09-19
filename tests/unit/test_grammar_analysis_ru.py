@@ -72,7 +72,10 @@ def test_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The Russian engine grades points with CEFR levels."
-    levels = {e["key"]: e["level"] for e in analyze_russian(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"]
+        for e in analyze_russian(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["ru_u_menya"] == "A1"
     assert levels["ru_past"] == "A2"
 

@@ -82,7 +82,10 @@ def test_display_language_switches_desc():
 
 def test_levels_are_cefr():
     "The Spanish engine grades points with CEFR levels."
-    levels = {e["key"]: e["level"] for e in analyze_spanish(" ".join(_RULE_SENTENCES.values()))}
+    levels = {
+        e["key"]: e["level"]
+        for e in analyze_spanish(" ".join(_RULE_SENTENCES.values()))
+    }
     assert levels["es_hay"] == "A1"
     assert levels["es_preterite"] == "A2"
 

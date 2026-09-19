@@ -98,9 +98,7 @@ def test_cleanup_backfills_pdf_word_counts(app_context, spanish, monkeypatch):
     # Remove the flag so the backfill runs.
     session = db.session
     session.execute(
-        sqltext(
-            "delete from settings where StKey = 'pdf_page_word_counts_backfilled'"
-        )
+        sqltext("delete from settings where StKey = 'pdf_page_word_counts_backfilled'")
     )
     session.commit()
 

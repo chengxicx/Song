@@ -41,7 +41,9 @@ def _save_term(repo, language, text):
     return repo.find(language.id, text)
 
 
-def test_reading_frame_edit_form_offers_the_shortcut(app_context, client, english, repo):
+def test_reading_frame_edit_form_offers_the_shortcut(
+    app_context, client, english, repo
+):
     "The reading frame's edit form carries Save / Delete / Grammar."
     term = _save_term(repo, english, "grammarbtn")
     body = client.get(f"/read/edit_term/{term.id}").get_data(as_text=True)
