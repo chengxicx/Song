@@ -143,7 +143,7 @@ def _reset_memory_db(config):
                 "AND sql IS NOT NULL"
             )
         ]
-        for name, in conn.execute(
+        for (name,) in conn.execute(
             "SELECT name FROM sqlite_master WHERE type = 'trigger'"
         ):
             conn.execute(f'drop trigger if exists "{name}"')
