@@ -23,6 +23,9 @@ _JAPANESE_PARSER_TYPES = {"japanese", "japanese_sudachi"}
 # Korean parser types registered by the lute-korean plugin.
 _KOREAN_PARSER_TYPES = {"korean", "lute_korean"}
 
+# Thai parser types registered by the lute-thai plugin.
+_THAI_PARSER_TYPES = {"thai", "lute_thai"}
+
 
 def is_japanese_language(language):
     """
@@ -87,6 +90,41 @@ def is_russian_language(language):
     return "russian" in name or "русский" in name or "俄语" in name or "俄文" in name
 
 
+def is_french_language(language):
+    "True if the given Language should use the spaCy French grammar engine."
+    if language is None:
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    return "french" in name or "français" in name or "francais" in name or "法语" in name or "法文" in name or "法語" in name
+
+
+def is_german_language(language):
+    "True if the given Language should use the spaCy German grammar engine."
+    if language is None:
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    return "german" in name or "deutsch" in name or "德语" in name or "德文" in name or "德語" in name
+
+
+def is_thai_language(language):
+    "True if the given Language should use the pythainlp Thai grammar engine."
+    if language is None:
+        return False
+    parser_type = (getattr(language, "parser_type", None) or "").strip().lower()
+    if parser_type in _THAI_PARSER_TYPES:
+        return True
+    name = (getattr(language, "name", None) or "").lower()
+    return "thai" in name or "ไทย" in name or "泰语" in name or "泰文" in name or "泰語" in name
+
+
+def is_arabic_language(language):
+    "True if the given Language should use the pyarabic Arabic grammar engine."
+    if language is None:
+        return False
+    name = (getattr(language, "name", None) or "").lower()
+    return "arabic" in name or "العربية" in name or "阿拉伯语" in name or "阿拉伯文" in name or "阿拉伯語" in name
+
+
 # ---- startup dependency check -----------------------------------------
 #
 # language label, detector, importable deps, pip extra that provides them
@@ -94,6 +132,10 @@ _ENGINE_REQUIREMENTS = [
     ("English", is_english_language, ("spacy", "en_core_web_sm"), "english"),
     ("Spanish", is_spanish_language, ("spacy", "es_core_news_sm"), "spanish"),
     ("Russian", is_russian_language, ("pymorphy3",), "russian"),
+    ("French", is_french_language, ("spacy", "fr_core_news_sm"), "french"),
+    ("German", is_german_language, ("spacy", "de_core_news_sm"), "german"),
+    ("Thai", is_thai_language, ("pythainlp",), "thai"),
+    ("Arabic", is_arabic_language, ("pyarabic",), "arabic"),
 ]
 
 

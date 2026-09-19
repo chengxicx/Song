@@ -84,12 +84,113 @@ def test_russian_grammar_analysis_uses_ru_engine(client, empty_db, russian):
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
 
 
-def test_grammar_analysis_fallback_for_other_languages(client, empty_db, french):
-    "无专用引擎的语言（如法语）应退回通用正则规则库。"
+def test_french_grammar_analysis_uses_fr_engine(client, empty_db, french):
+    "法语书籍应走 spaCy 语法引擎。"
+    pytest.importorskip("spacy")
+    pytest.importorskip("fr_core_news_sm")
+    book = make_book(
+        "French Grammar Demo",
+        ["Il y a un café. Hier j'ai mangé une pomme. Je ne sais pas."],
+        french,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "fr_il_y_a" in keys
+    assert "fr_passe_compose" in keys
+    assert "fr_negation" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_german_grammar_analysis_uses_de_engine(client, empty_db, german):
+    "德语书籍应走 spaCy 语法引擎。"
+    pytest.importorskip("spacy")
+    pytest.importorskip("de_core_news_sm")
+    book = make_book(
+        "German Grammar Demo",
+        ["Es gibt einen Park. Ich kann heute nicht kommen. Sie war müde."],
+        german,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "de_es_gibt" in keys
+    assert "de_modals" in keys
+    assert "de_praeteritum" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_thai_grammar_analysis_uses_th_engine(client, empty_db, thai):
+    "泰语书籍应走 pythainlp 语法引擎。"
+    pytest.importorskip("pythainlp")
+    book = make_book(
+        "Thai Grammar Demo",
+        ["ผมกำลังอ่านหนังสือ คุณจะไปไหน เขาไม่ชอบกาแฟ"],
+        thai,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "th_progressive" in keys
+    assert "th_future" in keys
+    assert "th_negation" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_arabic_grammar_analysis_uses_ar_engine(client, empty_db, arabic):
+    "阿拉伯语书籍应走 pyarabic 语法引擎。"
+    pytest.importorskip("pyarabic")
+    book = make_book(
+        "Arabic Grammar Demo",
+        ["هل أنت هنا؟ كان الجو جميلاً. الكتاب على الطاولة."],
+        arabic,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "ar_questions" in keys
+    assert "ar_kana" in keys
+    assert "ar_al" in keys
+    for g in data:
+        assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_grammar_analysis_fallback_for_other_languages(client, empty_db):
+    "无专用引擎的语言（如土耳其语）应退回通用正则规则库。"
+    from lute.db import db as _db
+    from lute.language.service import Service as LangService
+    from lute.models.language import Language
+
+    lang = (
+        _db.session.query(Language).filter(Language.name == "Turkish").first()
+    )
+    if lang is None:
+        lang = LangService(_db.session).get_language_def("Turkish").language
+        _db.session.add(lang)
+        _db.session.commit()
     book = make_book(
         "Fallback Grammar Demo",
         ["If it rains, then we stay home."],
-        french,
+        lang,
     )
     db.session.add(book)
     db.session.commit()
