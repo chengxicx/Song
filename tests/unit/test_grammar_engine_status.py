@@ -27,6 +27,16 @@ def test_grammar_engine_for_maps_by_language_name():
         "Thai",
         "thai",
     )
+    assert grammar_analysis.grammar_engine_for(StubLanguage(name="Korean")) == (
+        "Korean",
+        "korean",
+    )
+    assert grammar_analysis.grammar_engine_for(
+        StubLanguage(parser_type="lute_korean")
+    ) == (
+        "Korean",
+        "korean",
+    )
 
 
 def test_grammar_engine_for_unknown_language():
@@ -48,6 +58,15 @@ def test_status_shape_and_installed_flag():
         importlib.util.find_spec("en_core_web_sm") is not None
     )
     assert status["installed"] == expected_installed
+
+
+def test_korean_status_tracks_kiwipiepy():
+    "The Korean engine's only dependency is kiwipiepy."
+    status = grammar_analysis.grammar_engine_status(StubLanguage(name="한국어"))
+    assert status["label"] == "Korean"
+    assert status["extra"] == "korean"
+    assert status["installable"] is True
+    assert status["installed"] == (importlib.util.find_spec("kiwipiepy") is not None)
 
 
 def test_status_uninstallable_engine_has_no_label_when_missing():
