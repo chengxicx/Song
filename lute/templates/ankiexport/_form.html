@@ -52,7 +52,7 @@
         <div id="mappingContainer">
           <!-- Fields will be dynamically inserted here -->
         </div>
-        <img id="add_mapping_row" class="row_control" src="{{ url_for('static', filename='icn/plus-button.png') }}" onclick="add_field_mapping_row(null, null); return false;">
+        <img id="add_mapping_row" class="row_control" src="{{ vstatic('icn/plus-button.png') }}" onclick="add_field_mapping_row(null, null); return false;">
 
       </td>
     </tr>
@@ -268,7 +268,7 @@
       textBox.val(v);
     });
 
-    const del_button = $(`<img class="row_control" src="{{ url_for('static', filename='icn/minus-button.png') }}">`).data("row-id", this_id);
+    const del_button = $(`<img class="row_control" src="{{ vstatic('icn/minus-button.png') }}">`).data("row-id", this_id);
     del_button.on("click", function () { remove_mapping_row($(this).data("row-id")); });
 
     fieldContainer.append(fieldBox, fieldOpts, textBox, valOpts, del_button);

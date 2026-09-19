@@ -6,7 +6,7 @@
 {% block body %}
 
 <p>
-  <img id="showHideFilters" src="{{ url_for('static', filename='icn/plus-button.png') }}" />
+  <img id="showHideFilters" src="{{ vstatic('icn/plus-button.png') }}" />
   Filters
 </p>
 <div id="filterControls" style="display: none; margin-left: 20px;">
@@ -740,8 +740,8 @@
   let update_filter_button_src = function(is_hidden) {
     // console.log(`is_hidden = ${is_hidden}`);
     const new_src = is_hidden ?
-          "{{ url_for('static', filename='icn/plus-button.png') }}" :
-          "{{ url_for('static', filename='icn/minus-button.png') }}";
+          "{{ vstatic('icn/plus-button.png') }}" :
+          "{{ vstatic('icn/minus-button.png') }}";
     $('#showHideFilters').prop('src', new_src);
   }
 

@@ -48,16 +48,16 @@
             {{ dictionary.is_active }}
             {{ dictionary.sort_order }}
             <span class="test-dict-entity" title="Test dictionary" style="margin-left: 20px">
-              <img src="{{ url_for('static', filename='icn/external.png') }}">
+              <img src="{{ vstatic('icn/external.png') }}">
             </span>
             <span class="remove-dict-entity" title="Remove dictionary">
-              <img src="{{ url_for('static', filename='icn/minus-button.png') }}">
+              <img src="{{ vstatic('icn/minus-button.png') }}">
             </span>
           </div>
           {% endfor %}
         </div>
         <span id="add-dict-entity" title="Add dictionary">
-          <img src="{{ url_for('static', filename='icn/plus-button.png') }}">
+          <img src="{{ vstatic('icn/plus-button.png') }}">
         </span>
       </td>
     </tr>
@@ -89,7 +89,7 @@
         {{ form.kiwi_tokenizer_mode.label(class="form-control-label") }}
         <img
           id="about_kiwi_tokenizer_mode" style="margin-right:10px;"
-          src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+          src="{{ vstatic('icn/question-balloon.png') }}"
           title="Click for details"
           onclick="document.getElementById('kiwi_tokenizer_mode_help').style.display = document.getElementById('kiwi_tokenizer_mode_help').style.display === 'none' ? 'block' : 'none';"
           />
@@ -117,7 +117,7 @@
                   {{ form.kiwi_stemming.label(class="form-control-label") }}
                   <img
                     id="about_kiwi_stemming" style="margin-right:10px;"
-                    src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+                    src="{{ vstatic('icn/question-balloon.png') }}"
                     title="Click for details"
                     onclick="document.getElementById('kiwi_stemming_help').style.display = document.getElementById('kiwi_stemming_help').style.display === 'none' ? 'block' : 'none';"
                     />
@@ -134,7 +134,7 @@
                   {{ form.kiwi_filter_particles.label(class="form-control-label") }}
                   <img
                     id="about_kiwi_filter_particles" style="margin-right:10px;"
-                    src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+                    src="{{ vstatic('icn/question-balloon.png') }}"
                     title="Click for details"
                     onclick="document.getElementById('kiwi_filter_particles_help').style.display = document.getElementById('kiwi_filter_particles_help').style.display === 'none' ? 'block' : 'none';"
                     />
@@ -151,7 +151,7 @@
                   {{ form.kiwi_join_compound_nouns.label(class="form-control-label") }}
                   <img
                     id="about_kiwi_join_compound_nouns" style="margin-right:10px;"
-                    src="{{ url_for('static', filename='icn/question-balloon.png') }}"
+                    src="{{ vstatic('icn/question-balloon.png') }}"
                     title="Click for details"
                     onclick="document.getElementById('kiwi_join_compound_nouns_help').style.display = document.getElementById('kiwi_join_compound_nouns_help').style.display === 'none' ? 'block' : 'none';"
                     />

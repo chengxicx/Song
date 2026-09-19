@@ -12,8 +12,8 @@
   <base href="{% set _xfp = request.headers.get('X-Forwarded-Proto', '') %}{% set _proto = 'https' if (config.ENV == 'prod' or _xfp == 'https') else request.scheme %}{{ _proto }}://{{ request.host }}{{ request.path }}{% if request.query_string %}?{{ request.query_string.decode() }}{% endif %}">
 
   {% if config.ENV == 'dev' %}
-  <link rel="icon" href="{{ url_for('static', filename='favicon_dev.ico') }}" type="image/x-icon"/>
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon_dev.ico') }}" type="image/x-icon"/>
+  <link rel="icon" href="{{ vstatic('favicon_dev.ico') }}" type="image/x-icon"/>
+  <link rel="shortcut icon" href="{{ vstatic('favicon_dev.ico') }}" type="image/x-icon"/>
   {% else %}
   <link rel="icon" href="{{ vstatic('favicon.ico') }}" type="image/x-icon"/>
   <link rel="shortcut icon" href="{{ vstatic('favicon.ico') }}" type="image/x-icon"/>
@@ -29,7 +29,7 @@
   {# iOS "Add to Home Screen" prefers apple-touch-icon over manifest icons;
      without it Safari falls back to a page screenshot (showing the old
      Lute header logo). #}
-  <link rel="apple-touch-icon" sizes="180x180" href="/static/img/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ vstatic('img/icon-192.png') }}" />
 
   {# Clean the address bar: if the URL contains BasicAuth credentials, replace
      the URL in the history (no reload). The <base> tag above already ensures
@@ -51,6 +51,11 @@
     
   {# vstatic() = url_for('static', ...) + ?v=<content hash>, so these
      immutable-cached assets are re-fetched exactly when they change. #}
+
+  {# The single book-type registry (lute/book/types.py): the frontend
+     icon chips (book-type-icons.js) and the import-type picker render
+     from this, so Python and JS can never disagree on the type list. #}
+  <script>window.LUTE_BOOK_TYPES = {{ book_types_json|safe }};</script>
 
   {# The reading page loads a trimmed asset set: it needs none of
      DataTables / Tagify / jeditable.  DataTables is listing-page only;
@@ -130,7 +135,7 @@
   <div class="menu-bar">
     <div class="header">
       <a href="/" class="home-link">
-        <img src="{{ url_for('static', filename='img/lute.webp') }}" class="lutelogo" alt="LUTE Logo">
+        <img src="{{ vstatic('img/lute.webp') }}" class="lutelogo" alt="LUTE Logo">
       </a>
       <div class="title-container">
         <h1 id="luteTitle" title="Song(颂) — based on Lute">
@@ -173,7 +178,7 @@
          tablelisting.html. Positioned with position:fixed so it is never
          clipped by the DataTables scroll container. #}
       <span id="datatables_config_widget_top" class="config-widget-top" title="Columns" style="display:none;">
-        <img src="{{ url_for('static', filename='icn/settings-gear-icon.svg') }}" id="datatables_config_toggle_top" class="config-gear-top" />
+        <img src="{{ vstatic('icn/settings-gear-icon.svg') }}" id="datatables_config_toggle_top" class="config-gear-top" />
         <div id="colvis-menu" class="colvis-menu" style="display:none;"></div>
       </span>
       {# Backup quick-access disk icon, positioned immediately to the right

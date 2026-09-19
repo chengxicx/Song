@@ -21,6 +21,7 @@ from flask import (
     flash,
     session,
     current_app,
+    has_app_context,
     has_request_context,
     make_response,
     send_from_directory,
@@ -40,6 +41,7 @@ from lute.db.demo import Service as DemoService
 import lute
 import lute.utils.formutils
 from lute.utils import static_assets
+from lute.book import types as book_types
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
 from lute.parse import plugin_installer
@@ -186,7 +188,6 @@ def _add_base_routes(app, app_config):
         # hash, so browsers (and CDNs) can cache the response forever
         # and a theme change simply produces a new URL.
         from lute.themes.service import Service as _ThemeService
-
         _theme_css = _ThemeService(db.session).get_current_css()
         _custom_styles = current_settings().get("custom_styles", "")
         _css_hash = lambda s: hashlib.sha1(s.encode("utf-8")).hexdigest() if s else ""
@@ -445,16 +446,20 @@ def _create_app(app_config, extra_config):
                 "database access.  Boot-time code must run inside "
                 "multiuser.context.user_scope(username)."
             )
-        return sqlite3.connect(app_config.dbfilename)
+        # Single-user mode: the base db -- the LUTE_DB_URI override when a
+        # test harness set one (e.g. the shared in-memory test db), else
+        # the on-disk db file.
+        return app_config.sqlite3_connect()
 
     config = {
         "SECRET_KEY": _load_or_create_secret_key(app_config),
         "DATABASE": app_config.dbfilename,
         "ENV": app_config.env,
-        "SQLALCHEMY_DATABASE_URI": f"sqlite:///{app_config.dbfilename}",
-        # The URI above only selects the sqlite dialect; connections
-        # are opened per checkout by _connect_current_db, so no pooled
-        # connection can ever point at another user's db file.
+        # The URI only selects the sqlite dialect (the file: URI form of
+        # a LUTE_DB_URI override included); connections are opened per
+        # checkout by _connect_current_db, so no pooled connection can
+        # ever point at another user's db file.
+        "SQLALCHEMY_DATABASE_URI": app_config.sqliteconnstring,
         "SQLALCHEMY_ENGINE_OPTIONS": {
             "creator": _connect_current_db,
             "poolclass": NullPool,
@@ -509,12 +514,28 @@ def _create_app(app_config, extra_config):
         lambda filename: url_for("custom_js", filename=filename),
     )
 
+    # The single book-type registry (lute.book.types): base.html injects
+    # it as window.LUTE_BOOK_TYPES for the frontend icon/picker code, and
+    # read/index.html picks the player from book_media_types.
+    app.jinja_env.globals["book_types_json"] = json.dumps(book_types.BOOK_TYPES)
+    app.jinja_env.globals["book_media_types"] = book_types.media_player_types()
+
     db.init_app(app)
 
     @listens_for(Pool, "connect")
     def _pragmas_on_connect(dbapi_con, con_record):  # pylint: disable=unused-argument
         dbapi_con.execute("pragma recursive_triggers = on;")
         dbapi_con.execute("pragma foreign_keys = on;")
+        # Test dbs don't need durability: skipping the fsync per commit
+        # makes the test suite noticeably cheaper.  (Guarded because a
+        # connection can be opened outside any app context; the pragmas
+        # above must stay unconditional.)
+        try:
+            if has_app_context() and current_app.config.get("TESTING"):
+                dbapi_con.execute("pragma synchronous = off;")
+                dbapi_con.execute("pragma journal_mode = memory;")
+        except Exception:  # pylint: disable=broad-except
+            pass
 
     with app.app_context():
         if mu_store.enabled():
