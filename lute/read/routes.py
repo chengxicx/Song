@@ -26,12 +26,20 @@ from lute.read.render.grammar_analysis import (
     is_english_language,
     is_spanish_language,
     is_russian_language,
+    is_french_language,
+    is_german_language,
+    is_thai_language,
+    is_arabic_language,
 )
 from lute.read.render.grammar_analysis_ja import analyze_japanese
 from lute.read.render.grammar_analysis_ko import analyze_korean
 from lute.read.render.grammar_analysis_en import analyze_english
 from lute.read.render.grammar_analysis_es import analyze_spanish
 from lute.read.render.grammar_analysis_ru import analyze_russian
+from lute.read.render.grammar_analysis_fr import analyze_french
+from lute.read.render.grammar_analysis_de import analyze_german
+from lute.read.render.grammar_analysis_th import analyze_thai
+from lute.read.render.grammar_analysis_ar import analyze_arabic
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
 from lute.term.model import Repository
@@ -1106,6 +1114,10 @@ def grammar_analysis(bookid, pagenum):
         (is_english_language, analyze_english, "english"),
         (is_spanish_language, analyze_spanish, "spanish"),
         (is_russian_language, analyze_russian, "russian"),
+        (is_french_language, analyze_french, "french"),
+        (is_german_language, analyze_german, "german"),
+        (is_thai_language, analyze_thai, "thai"),
+        (is_arabic_language, analyze_arabic, "arabic"),
     ):
         if detector(lang):
             try:
