@@ -82,7 +82,7 @@ class LanguageForm(FlaskForm):
     )
     grammar_translate_lang = SelectField(
         "Grammar Analysis Language",
-        choices=[("en", "English"), ("zh", "中文")],
+        choices=[("en", "English"), ("zh", "中文"), ("ko", "한국어")],
         default="en",
     )
 
