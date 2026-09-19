@@ -72,6 +72,7 @@ from lute.multiuser.routes import bp as multiuser_bp
 from lute.term.routes import bp as term_bp
 from lute.termtag.routes import bp as termtag_bp
 from lute.read.routes import bp as read_bp
+from lute.review.routes import bp as review_bp
 from lute.bing.routes import bp as bing_bp
 from lute.userimage.routes import bp as userimage_bp
 from lute.useraudio.routes import bp as useraudio_bp
@@ -738,6 +739,7 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(term_bp)
     app.register_blueprint(termtag_bp)
     app.register_blueprint(read_bp)
+    app.register_blueprint(review_bp)
     app.register_blueprint(bing_bp)
     app.register_blueprint(userimage_bp)
     app.register_blueprint(useraudio_bp)

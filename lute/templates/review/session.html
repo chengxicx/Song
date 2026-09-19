@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Review session{% endblock %}
+{% block header %}Review{% endblock %}
+
+{% block body %}
+
+<div id="review_session_container">
+  <p id="review_progress"></p>
+  <div id="review_card"></div>
+</div>
+
+<div id="review_session_error" style="display: none;"></div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    LuteReview.start_session();
+  });
+</script>
+
+{% endblock %}

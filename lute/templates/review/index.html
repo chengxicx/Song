@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Review{% endblock %}
+{% block header %}Review{% endblock %}
+
+{% block body %}
+
+<div id="review_fsrs_status" class="review-status">
+  {% if fsrs_status.installed %}
+  <span>Scheduler: FSRS (fsrs package {{ fsrs_status.version }}).</span>
+  {% else %}
+  <span>Scheduler: the <code>fsrs</code> package is not installed.
+    <button class="btn btn-secondary" id="btn_install_fsrs"
+            onclick="LuteReview.install_fsrs();">Install</button>
+    <span class="review-hint">(needs Python 3.10+, installs {{ fsrs_status.pip_spec }})</span>
+  </span>
+  {% endif %}
+</div>
+<div id="review_install_message"></div>
+
+<p>
+  Due now: <b id="review_due_count">{{ counts.due }}</b> &nbsp;|&nbsp;
+  New remaining: <b id="review_new_remaining">{{ counts.new_remaining }}</b>
+  (max {{ counts.max_new_per_day }}/day, {{ counts.new_allowed_today }} left today)
+</p>
+
+<button class="btn btn-primary" id="btn_start_review"
+        onclick="window.location = '/review/session'; return false;">Start review</button>
+<button class="btn btn-secondary" id="btn_sync_review"
+        onclick="LuteReview.sync();">Sync queue</button>
+<span id="review_sync_message"></span>
+
+<h3>Queue specs</h3>
+<p>
+  Specs select which terms become review cards, using the same criteria
+  syntax as Anki exports, e.g.
+  <code>status &gt; 1 and language == "Japanese"</code>
+  (language names: {{ language_names | join(', ') }}).
+</p>
+<table id="review_specs" class="review-specs">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Criteria</th>
+      <th>Card types</th>
+      <th>Active</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for spec in specs_json %}
+    <tr>
+      <td><a id="review_spec_{{ spec.id }}" href="/review/spec/edit/{{ spec.id }}">{{ spec.name }}</a></td>
+      <td><code>{{ spec.criteria if spec.criteria else '(no criteria)' }}</code></td>
+      <td>{{ spec.card_types }}</td>
+      <td>{{ spec.active }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4">No specs yet -- create one below.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p><a href="/review/spec/new">Create new review specification</a></p>
+
+{% endblock %}

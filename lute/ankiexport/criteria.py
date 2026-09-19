@@ -48,7 +48,8 @@ def evaluate_criteria(s, term):
         return any(e in alltags for e in tagvals)
 
     def matches_lang(lang):
-        return term.language.name == lang[0]
+        'Case-insensitive name match, so language == "spanish" works.'
+        return (term.language.name or "").lower() == lang[0].lower()
 
     def check_has_images():
         "True if term or any parent has image."
@@ -133,7 +134,9 @@ def evaluate_criteria(s, term):
     parents_tag_matcher = Suppress(Literal("parents.tags") + Literal(":")) + tagcrit
     all_tag_matcher = Suppress(Literal("all.tags") + Literal(":")) + tagcrit
 
-    lang_matcher = Suppress("language") + Suppress(":") + quoteval
+    # Both 'language:"X"' and 'language == "X"' (or single '=') select
+    # by language name; the eq form is sugar for review-queue specs.
+    lang_matcher = Suppress("language") + Suppress(one_of(": = ==")) + quoteval
 
     has_options = Literal("image")
     has_matcher = Suppress("has") + Suppress(":") + has_options
