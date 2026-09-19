@@ -197,6 +197,7 @@ def is_portuguese_language(language):
 _ENGINE_REQUIREMENTS = [
     ("Mandarin Chinese", is_mandarin_chinese_language, (), "chinese"),
     ("Cantonese", is_cantonese_language, (), "cantonese"),
+    ("Korean", is_korean_language, ("kiwipiepy",), "korean"),
     ("English", is_english_language, ("spacy", "en_core_web_sm"), "english"),
     ("Spanish", is_spanish_language, ("spacy", "es_core_news_sm"), "spanish"),
     ("Russian", is_russian_language, ("pymorphy3",), "russian"),
@@ -213,6 +214,7 @@ _ENGINE_REQUIREMENTS = [
 # The language page's Install button pip-installs these directly, which
 # works for editable checkouts and PyPI installs alike.
 _ENGINE_INSTALL_SPECS = {
+    "korean": ["kiwipiepy>=0.22.0"],
     "english": [
         "spacy>=3.8.0,<3.8.4",
         "en-core-web-sm@https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
