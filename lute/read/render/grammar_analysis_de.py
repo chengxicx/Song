@@ -75,7 +75,11 @@ _DE_RULES = [
         "the conjugated modal comes second, the infinitive goes to the end "
         "of the clause: ich kann heute nicht kommen.",
         {
-            "left": [spec_lemma("können", "müssen", "wollen", "sollen", "dürfen", "mögen", "möchten")],
+            "left": [
+                spec_lemma(
+                    "können", "müssen", "wollen", "sollen", "dürfen", "mögen", "möchten"
+                )
+            ],
             "right": [_INF],
             "min_gap": 0,
             "max_gap": 8,
@@ -87,7 +91,13 @@ _DE_RULES = [
         "nicht / kein (negation)",
         "A1",
         "nicht negates verbs/adjectives; kein(e) negates nouns.",
-        {"seq": [spec_surface("nicht", "kein", "keine", "keinen", "keinem", "keiner", "nie")]},
+        {
+            "seq": [
+                spec_surface(
+                    "nicht", "kein", "keine", "keinen", "keinem", "keiner", "nie"
+                )
+            ]
+        },
         zh="否定：nicht 否定动词/形容词，kein 否定名词。",
     ),
     make_rule(
@@ -95,7 +105,21 @@ _DE_RULES = [
         "Question words (wer, was, wann, wo...)",
         "A1",
         "wer/was/wann/wo/warum/wie ask for information.",
-        {"seq": [spec_surface("wer", "was", "wann", "wo", "warum", "wie", "wohin", "woher", "wieso")]},
+        {
+            "seq": [
+                spec_surface(
+                    "wer",
+                    "was",
+                    "wann",
+                    "wo",
+                    "warum",
+                    "wie",
+                    "wohin",
+                    "woher",
+                    "wieso",
+                )
+            ]
+        },
         zh="特殊疑问词 wer/was/wann/wo/warum/wie。",
     ),
     make_rule(
@@ -103,7 +127,25 @@ _DE_RULES = [
         "Possessive articles (mein, dein, unser...)",
         "A1",
         "mein/dein/unser/euer + case ending agree with the thing owned.",
-        {"seq": [spec_surface("mein", "meine", "meinen", "meinem", "meiner", "dein", "deine", "deinen", "unser", "unsere", "unseren", "euer", "eure")]},
+        {
+            "seq": [
+                spec_surface(
+                    "mein",
+                    "meine",
+                    "meinen",
+                    "meinem",
+                    "meiner",
+                    "dein",
+                    "deine",
+                    "deinen",
+                    "unser",
+                    "unsere",
+                    "unseren",
+                    "euer",
+                    "eure",
+                )
+            ]
+        },
         zh="主有冠词 mein/dein/unser 等，随性数格变化。",
     ),
     # ---- A2 ----
@@ -112,7 +154,12 @@ _DE_RULES = [
         "Perfekt: haben/sein + Partizip",
         "A2",
         "the spoken past: ich habe gemacht, sie ist gegangen.",
-        {"left": [spec_lemma("haben", "sein")], "right": [_PART], "min_gap": 0, "max_gap": 3},
+        {
+            "left": [spec_lemma("haben", "sein")],
+            "right": [_PART],
+            "min_gap": 0,
+            "max_gap": 3,
+        },
         zh="现在完成时：haben/sein + 第二分词（口语常用过去时）。",
     ),
     make_rule(
@@ -185,7 +232,13 @@ _DE_RULES = [
         "weil / obwohl / damit (verb-final)",
         "B1",
         "subordinating conjunctions send the verb to the end: ... weil ich krank bin.",
-        {"seq": [spec_surface("weil", "obwohl", "damit", "sodass", "während", "bevor", "nachdem")]},
+        {
+            "seq": [
+                spec_surface(
+                    "weil", "obwohl", "damit", "sodass", "während", "bevor", "nachdem"
+                )
+            ]
+        },
         zh="从属连词 weil/obwohl/damit 等：动词移到句尾（框型）。",
     ),
     make_rule(
@@ -203,7 +256,12 @@ _DE_RULES = [
         "polite requests and unreal statements: ich würde gehen, wenn ich könnte.",
         {
             "any_of": [
-                {"left": [spec_lemma("würde")], "right": [_INF], "min_gap": 0, "max_gap": 5},
+                {
+                    "left": [spec_lemma("würde")],
+                    "right": [_INF],
+                    "min_gap": 0,
+                    "max_gap": 5,
+                },
                 {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Sub"}}]},
             ]
         },
@@ -241,7 +299,12 @@ _DE_RULES = [
         "je ... desto (the ... the ...)",
         "C1",
         "correlative comparison: je mehr, desto besser.",
-        {"left": [spec_surface("je")], "right": [spec_surface("desto")], "min_gap": 1, "max_gap": 6},
+        {
+            "left": [spec_surface("je")],
+            "right": [spec_surface("desto")],
+            "min_gap": 1,
+            "max_gap": 6,
+        },
         zh="je … desto：越……越……（je mehr, desto besser）。",
     ),
     make_rule(

@@ -76,7 +76,9 @@ def test_moves_moov_in_front_of_mdat(tmp_path):
     f = tmp_path / "audio.m4a"
     moov_size = make_file(f, tail=True)
     original_size = f.stat().st_size
-    original_mdat = f.read_bytes()[len(box(b"ftyp", b"isom" + struct.pack(">I", 512) + b"isomiso2")) :][:8 + 64]
+    original_mdat = f.read_bytes()[
+        len(box(b"ftyp", b"isom" + struct.pack(">I", 512) + b"isomiso2")) :
+    ][: 8 + 64]
 
     assert faststart_in_place(str(f)) == "rewritten"
 
@@ -89,7 +91,11 @@ def test_moves_moov_in_front_of_mdat(tmp_path):
 
     # The chunk offsets moved with the data they point at.
     moved = chunk_offsets(f)
-    assert moved == [len(box(b"ftyp", b"isom" + struct.pack(">I", 512) + b"isomiso2")) + moov_size + 8]
+    assert moved == [
+        len(box(b"ftyp", b"isom" + struct.pack(">I", 512) + b"isomiso2"))
+        + moov_size
+        + 8
+    ]
 
 
 def test_second_run_is_a_no_op(tmp_path):

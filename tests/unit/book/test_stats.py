@@ -28,7 +28,11 @@ def test_difficulty_label_default_thresholds():
     assert get_difficulty_label(21)[0] == "HARD"
     # Colour class tracks the label.
     labels = {v[0]: v[1] for v in [get_difficulty_label(p) for p in (5, 15, 25)]}
-    assert labels == {"EASY": "new-word-easy", "CHAL": "new-word-chal", "HARD": "new-word-hard"}
+    assert labels == {
+        "EASY": "new-word-easy",
+        "CHAL": "new-word-chal",
+        "HARD": "new-word-hard",
+    }
 
 
 def test_difficulty_filter_sql_thresholds():
@@ -200,18 +204,12 @@ def fixture_manga_book(empty_db):
     book.language = j
     book.title = "Manga Test"
     book.book_type = "manga"
-    book.manga_data = json.dumps({
-        "version": "0.2.1",
-        "pages": [
-            {
-                "blocks": [
-                    {
-                        "lines": ["こんにちは世界", "私は猫が好きです"]
-                    }
-                ]
-            }
-        ]
-    })
+    book.manga_data = json.dumps(
+        {
+            "version": "0.2.1",
+            "pages": [{"blocks": [{"lines": ["こんにちは世界", "私は猫が好きです"]}]}],
+        }
+    )
     db.session.add(book)
     db.session.commit()
     return book
@@ -377,9 +375,7 @@ def fixture_pdf_book(app, english):
     b.pdf_stream = io.BytesIO(make_pdf_bytes(["Hello cat dog", "one two"]))
     b.pdf_stream_filename = "test.pdf"
     book = BookService().import_book(b, db.session)
-    pdf_dir = os.path.join(
-        app.static_folder, os.path.dirname(book.pdf_path.strip("/"))
-    )
+    pdf_dir = os.path.join(app.static_folder, os.path.dirname(book.pdf_path.strip("/")))
     yield book
     shutil.rmtree(pdf_dir, ignore_errors=True)
 
@@ -416,12 +412,8 @@ def test_pdf_calc_status_distribution_reflects_terms(app_context, english, _pdf_
     assert dist[0] == 5, "all words still unknown"
 
     # Mark two words known; the distribution must follow.
-    db.session.execute(
-        text("update words set WoStatus = 4 where WoTextLC = 'cat'")
-    )
-    db.session.execute(
-        text("update words set WoStatus = 3 where WoTextLC = 'one'")
-    )
+    db.session.execute(text("update words set WoStatus = 4 where WoTextLC = 'cat'"))
+    db.session.execute(text("update words set WoStatus = 3 where WoTextLC = 'one'"))
     db.session.commit()
 
     dist2 = svc.calc_status_distribution(book)

@@ -134,8 +134,7 @@ def report(state, top, keys):
         % (per_page["median"], per_page["mean"], per_page["p90"], per_page["max"])
     )
     print(
-        "  响应体   中位 %dB  p90 %dB  最大 %dB"
-        % (size["median"], size["p90"], size["max"])
+        "  响应体   中位 %dB  p90 %dB  最大 %dB" % (size["median"], size["p90"], size["max"])
     )
     print(
         "  重名行的页 %.1f%%  条目总数 %d"
@@ -167,7 +166,12 @@ def report(state, top, keys):
         rule = index.get(key)
         print(
             "  %6.1f%%  [%-2s] %-26s %s"
-            % (pct, (rule or {}).get("level", "?"), (rule or {}).get("pattern", key)[:26], key)
+            % (
+                pct,
+                (rule or {}).get("level", "?"),
+                (rule or {}).get("pattern", key)[:26],
+                key,
+            )
         )
         shown += 1
         if shown >= top:
@@ -182,7 +186,9 @@ def main():
     src = ap.add_mutually_exclusive_group(required=True)
     src.add_argument("--corpus", help="page dump, one page per line")
     src.add_argument("--db", help="Lute SQLite database to read pages from")
-    ap.add_argument("--plain", action="store_true", help="--corpus is plain text, not hex")
+    ap.add_argument(
+        "--plain", action="store_true", help="--corpus is plain text, not hex"
+    )
     ap.add_argument("--language", default="Japanese", help="--db language name")
     ap.add_argument("--limit", type=int, default=400, help="--db page limit")
     ap.add_argument("--top", type=int, default=15, help="rows to list by page share")

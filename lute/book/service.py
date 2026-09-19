@@ -314,9 +314,7 @@ def _parse_lrc_cues(content):
         if text is None:
             continue
         next_start = timed[i + 1][0] if i + 1 < len(timed) else start + 5.0
-        cues.append(
-            {"start": start, "end": max(next_start, start + 0.5), "text": text}
-        )
+        cues.append({"start": start, "end": max(next_start, start + 0.5), "text": text})
     return cues
 
 
@@ -360,8 +358,22 @@ def _url_extension(url, default):
     return default when the path has no recognised extension.
     """
     known = {
-        ".srt", ".vtt", ".txt", ".lrc", ".mp3", ".m4a", ".m4b", ".mp4", ".webm",
-        ".mov", ".ogv", ".ogg", ".flac", ".wav", ".aac", ".opus",
+        ".srt",
+        ".vtt",
+        ".txt",
+        ".lrc",
+        ".mp3",
+        ".m4a",
+        ".m4b",
+        ".mp4",
+        ".webm",
+        ".mov",
+        ".ogv",
+        ".ogg",
+        ".flac",
+        ".wav",
+        ".aac",
+        ".opus",
     }
     try:
         path = urllib.parse.urlparse(url).path or ""
@@ -420,9 +432,7 @@ def download_url_to_file(url, dest_dir, max_bytes=None):
     download exceeds max_bytes (when given) or fails.
     """
     ext = _url_extension(url, ".bin")
-    filename = (
-        f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex}{ext}"
-    )
+    filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex}{ext}"
     fp = os.path.join(dest_dir, filename)
     try:
         with requests.get(url, timeout=60, stream=True, allow_redirects=True) as resp:
@@ -446,9 +456,7 @@ def download_url_to_file(url, dest_dir, max_bytes=None):
     except requests.exceptions.RequestException as e:
         with contextlib.suppress(OSError):
             os.remove(fp)
-        raise BookImportException(
-            f"Could not download {url} (error: {str(e)})"
-        ) from e
+        raise BookImportException(f"Could not download {url} (error: {str(e)})") from e
     # A downloaded mp4-family file can have its moov atom at the end
     # (the player then had to fetch the whole file before it could show
     # a duration); make it streaming-friendly.  Best-effort.
@@ -672,9 +680,7 @@ class Service:
         try:
             with zipfile.ZipFile(BytesIO(filestream.read())) as zf:
                 names = zf.namelist()
-                mokuro_candidates = [
-                    n for n in names if n.lower().endswith(".mokuro")
-                ]
+                mokuro_candidates = [n for n in names if n.lower().endswith(".mokuro")]
                 if not mokuro_candidates:
                     raise BookImportException(
                         "Archive contains no .mokuro file; "
@@ -757,9 +763,7 @@ class Service:
                 # volume file), so pair the page with its image by
                 # position -- mokuro's own rule -- and write it down, so
                 # the reading screen has a concrete path to request.
-                ordinal = image_path_for_page(
-                    target_dir, page_index, volume
-                )
+                ordinal = image_path_for_page(target_dir, page_index, volume)
                 if ordinal is not None:
                     page["img_path"] = ordinal
                 continue
