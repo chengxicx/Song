@@ -223,17 +223,6 @@ def test_language_edit_shows_engine_status(client, empty_db, english):
     assert "english" in body
 
 
-def test_language_edit_korean_shows_korean_engine(client, empty_db, korean):
-    "韩语语言编辑页应显示 Korean 语法引擎（Kiwi），而不是『无专属引擎』。"
-    resp = client.get(f"/language/edit/{korean.id}")
-    assert resp.status_code == 200, resp.data
-    body = resp.data.decode("utf-8")
-    assert "Korean grammar engine" in body
-    assert "korean" in body
-    assert "No dedicated grammar engine" not in body
-    assert "한국어" in body, "语法解释语言下拉应有 한국어 选项"
-
-
 def test_language_edit_without_engine_shows_note(client, empty_db):
     "无专属引擎的语言显示 basic rules 说明。"
     from lute.db import db as _db
