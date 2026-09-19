@@ -14,6 +14,8 @@ reports missing optional engine dependencies.
 import importlib.util
 import logging
 import re
+import subprocess
+import sys
 
 
 # Japanese is identified by its configured parser type (MeCab or Sudachi)
@@ -137,6 +139,96 @@ _ENGINE_REQUIREMENTS = [
     ("Thai", is_thai_language, ("pythainlp",), "thai"),
     ("Arabic", is_arabic_language, ("pyarabic",), "arabic"),
 ]
+
+# Concrete pip requirements providing each engine, mirroring the
+# optional-dependencies extras in pyproject.toml (kept in sync by hand).
+# The language page's Install button pip-installs these directly, which
+# works for editable checkouts and PyPI installs alike.
+_ENGINE_INSTALL_SPECS = {
+    "english": [
+        "spacy>=3.8.0,<3.8.4",
+        "en-core-web-sm@https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
+    ],
+    "spanish": [
+        "spacy>=3.8.0,<3.8.4",
+        "es-core-news-sm@https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl",
+    ],
+    "french": [
+        "spacy>=3.8.0,<3.8.4",
+        "fr-core-news-sm@https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.8.0/fr_core_news_sm-3.8.0-py3-none-any.whl",
+    ],
+    "german": [
+        "spacy>=3.8.0,<3.8.4",
+        "de-core-news-sm@https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.8.0/de_core_news_sm-3.8.0-py3-none-any.whl",
+    ],
+    "russian": ["pymorphy3>=2.0,<3", "pymorphy3-dicts-ru>=2.4,<3"],
+    "thai": ["pythainlp>=5.0,<6"],
+    "arabic": ["pyarabic>=0.6,<2"],
+}
+
+_PIP_TIMEOUT_SECONDS = 900
+
+
+def grammar_engine_for(language):
+    """
+    Return (label, extra) of the dedicated grammar engine serving the
+    given language, or (None, None) when only the basic rules apply.
+    """
+    for label, detect, _deps, extra in _ENGINE_REQUIREMENTS:
+        if detect(language):
+            return label, extra
+    return None, None
+
+
+def grammar_engine_status(language):
+    """
+    UI summary of the grammar engine for one language:
+      {"label", "extra", "installed", "missing", "installable"}
+    label is None when the language has no dedicated engine.
+    """
+    label, extra = grammar_engine_for(language)
+    if label is None:
+        return {"label": None, "extra": None, "installed": False, "missing": [], "installable": False}
+    deps = next(_deps for _l, _d, _deps, _e in _ENGINE_REQUIREMENTS if _e == extra)
+    missing = [dep for dep in deps if importlib.util.find_spec(dep) is None]
+    return {
+        "label": label,
+        "extra": extra,
+        "installed": not missing,
+        "missing": missing,
+        "installable": extra in _ENGINE_INSTALL_SPECS,
+    }
+
+
+def install_grammar_engine(extra):
+    """
+    pip-install the packages providing one engine's extra.
+
+    Returns (ok, message).  Mirrors the parser-plugin installer: a running
+    app can usually import the new packages without a restart, but a
+    restart is mentioned if the panel still shows the basic rules.
+    """
+    specs = _ENGINE_INSTALL_SPECS.get(extra or "")
+    if not specs:
+        return False, f"Unknown grammar engine '{extra}'"
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-m", "pip", "install", *specs],
+            capture_output=True,
+            text=True,
+            timeout=_PIP_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        return False, f"pip install of the {extra} engine timed out"
+    except OSError as e:
+        return False, f"Could not run pip: {e}"
+    if proc.returncode != 0:
+        output = (proc.stdout or "") + (proc.stderr or "")
+        return False, f"pip install of the {extra} engine failed:\n{output.strip()[-2000:]}"
+    return True, (
+        f"Installed the {extra} grammar engine. "
+        "If the grammar panel still shows the basic rules, restart the app."
+    )
 
 
 def report_grammar_engine_status(session):

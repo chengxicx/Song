@@ -5,4 +5,33 @@
 
 {% include "language/_form.html" %}
 
+{# Grammar analysis engine status + one-click install.  Languages without
+   a dedicated engine just note that the panel uses the basic rules. #}
+{% if engine_status.label %}
+<div style="margin-top:14px; padding:10px 14px; border:1px solid #ccc; border-radius:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+  {% if engine_status.installed %}
+    <span title="All engine dependencies are installed.">&#9989;</span>
+    <span>{{ engine_status.label }} grammar engine installed
+      (<code>{{ engine_status.extra }}</code>) &mdash; the Analyze grammar
+      menu uses the full engine on this language.</span>
+  {% else %}
+    <span title="Missing: {{ engine_status.missing|join(', ') }}">&#9888;&#65039;</span>
+    <span style="flex:1;">
+      {{ engine_status.label }} grammar engine <strong>not installed</strong>
+      (missing: <code>{{ engine_status.missing|join(', ') }}</code>) &mdash;
+      the grammar panel will fall back to the basic rules.
+    </span>
+    <form method="post" style="margin:0;"
+          action="{{ url_for('language.grammar_engine_install', extra=engine_status.extra) }}">
+      <button type="submit" class="btn btn-primary btn-sm">Install</button>
+    </form>
+  {% endif %}
+</div>
+{% else %}
+<div style="margin-top:14px; padding:10px 14px; border:1px dashed #ccc; border-radius:8px; color:#666;">
+  No dedicated grammar engine for this language &mdash; the Analyze grammar
+  menu uses the basic rules.
+</div>
+{% endif %}
+
 {% endblock %}

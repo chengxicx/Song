@@ -12,6 +12,7 @@ from lute.language.forms import LanguageForm
 from lute.db import db
 from lute.parse.registry import selectable_parsers, supported_parsers
 from lute.parse.plugin_installer import ensure_parser_available
+from lute.read.render import grammar_analysis
 
 bp = Blueprint("language", __name__, url_prefix="/language")
 
@@ -171,7 +172,22 @@ def edit(langid):
 
     _add_hidden_dictionary_template_entry(form)
 
-    return render_template("language/edit.html", form=form, language=language)
+    return render_template(
+        "language/edit.html",
+        form=form,
+        language=language,
+        engine_status=grammar_analysis.grammar_engine_status(language),
+    )
+
+
+@bp.route("/grammar_engine/install/<string:extra>", methods=["POST"])
+def grammar_engine_install(extra):
+    """
+    Pip-install the packages providing one language's grammar engine.
+    """
+    ok, message = grammar_analysis.install_grammar_engine(extra)
+    flash(message, "success" if ok else "danger")
+    return redirect(url_for("language.index"))
 
 
 @bp.route("/new", defaults={"langname": None}, methods=["GET", "POST"])
