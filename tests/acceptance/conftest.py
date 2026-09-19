@@ -620,3 +620,17 @@ def when_click_footer_next_page(luteclient):
     "Go to the next page."
     luteclient.page.click("#navNext")
     time.sleep(0.1)  # Leave this, remove and test fails.
+
+
+def pytest_collection_modifyitems(config, items):
+    "Skip scenarios tagged skip_without_sudachi when Sudachi is not installed."
+    from lute.parse.registry import is_supported
+
+    if is_supported("japanese_sudachi"):
+        return
+    skip = pytest.mark.skip(
+        reason="scenario asserts Sudachi tokenization; sudachi extra not installed"
+    )
+    for item in items:
+        if item.get_closest_marker("skip_without_sudachi"):
+            item.add_marker(skip)
