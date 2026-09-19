@@ -27,6 +27,13 @@
     </form>
   {% endif %}
 </div>
+{% elif engine_note %}
+<div style="margin-top:14px; padding:10px 14px; border:1px solid #ccc; border-radius:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+  <span title="The engine ships with the language's parser.">&#9989;</span>
+  <span>The Analyze grammar menu uses the full {{ engine_note.tokenizer }}
+    grammar engine on this language &mdash; it ships with the
+    {{ engine_note.label }} parser, so there is nothing extra to install.</span>
+</div>
 {% else %}
 <div style="margin-top:14px; padding:10px 14px; border:1px dashed #ccc; border-radius:8px; color:#666;">
   No dedicated grammar engine for this language &mdash; the Analyze grammar

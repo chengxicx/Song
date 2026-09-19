@@ -58,6 +58,20 @@ def test_status_uninstallable_engine_has_no_label_when_missing():
     assert status["missing"] == []
 
 
+def test_parser_shipped_engine_note_for_ja_ko():
+    "JA/KO grammar engines ride on the parser's own tokenizer, not an extra."
+    assert grammar_analysis.grammar_engine_note(StubLanguage(name="Japanese")) == {
+        "label": "Japanese",
+        "tokenizer": "Sudachi",
+    }
+    assert grammar_analysis.grammar_engine_note(
+        StubLanguage(parser_type="lute_korean")
+    ) == {"label": "Korean", "tokenizer": "Kiwi"}
+    assert grammar_analysis.grammar_engine_note(StubLanguage(name="Turkish")) is None
+    assert grammar_analysis.grammar_engine_note(StubLanguage(name="English")) is None
+    assert grammar_analysis.grammar_engine_note(None) is None
+
+
 def test_install_unknown_extra_fails_without_pip():
     "An unknown extra is rejected before any pip call."
     ok, message = grammar_analysis.install_grammar_engine("klingon")
