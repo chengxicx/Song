@@ -87,6 +87,15 @@ def test_display_language_switches_desc():
     assert "suggestion" in en["en_lets"]["desc"]
 
 
+def test_korean_display_language_switches_desc():
+    "한국어 display uses the central Korean description table."
+    ko = {e["key"]: e for e in analyze_english("Let's eat something.", "ko")}
+    en = {e["key"]: e for e in analyze_english("Let's eat something.", "en")}
+    assert "제안" in ko["en_lets"]["desc"]
+    assert "suggestion" not in ko["en_lets"]["desc"].lower()
+    assert "suggestion" in en["en_lets"]["desc"]
+
+
 def test_levels_are_cefr():
     "The English engine grades points with CEFR levels."
     levels = {e["key"]: e["level"] for e in analyze_english(" ".join(_RULE_SENTENCES.values()))}
