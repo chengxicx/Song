@@ -870,3 +870,25 @@ def test_not_after_is_wired_into_the_specs():
         assert token_specs, rid
         assert all(s.get("not_after") == cond for s in token_specs), rid
     assert _TE_CONNECTIVE["pos2"] == "接続助詞"
+
+
+def test_korean_display_language_switches_desc():
+    "한국어 display uses ko.json for data rules and _KO_HAND for hand-written."
+    ko = {e["name"]: e for e in analyze_japanese("日本に行きたいです。", "ko")}
+    en = {e["name"]: e for e in analyze_japanese("日本に行きたいです。", "en")}
+    assert "소망" in ko["〜たい"]["desc"]
+    assert "want to do" not in ko["〜たい"]["desc"]
+    assert "want to do" in en["〜たい"]["desc"]
+
+
+def test_korean_display_covers_data_rules():
+    "A data-driven rule shows its ko.json gloss."
+    ko = {e["name"]: e for e in analyze_japanese("明日は雨でしょう。", "ko")}
+    assert "추측" in ko["〜でしょう"]["desc"]
+
+
+def test_korean_display_translates_aggregates():
+    "The two aggregate buckets show Korean descriptions too."
+    res = analyze_japanese("私は学生です。あれは本です。", "ko")
+    basics = next(g for g in res if g["key"] == "basic_forms")
+    assert "기초" in basics["desc"]
