@@ -318,6 +318,40 @@ _ES_RULES = [
         {"left": [spec_lemma("llevar")], "right": [spec_morph(VerbForm="Ger")], "min_gap": 0, "max_gap": 6},
         zh="llevar + 时间 + 副动词：持续做某事已多久（llevo dos años viviendo）。",
     ),
+    # ---- C1 / C2 ----
+    make_rule(
+        "es_de_haber",
+        "de haber + participle (inverted condition)",
+        "C1",
+        "a literary unreal past: de haber sabido, habría venido "
+        "(= si hubiera sabido).",
+        {"seq": [spec_surface("de"), spec_lemma("haber"), spec_morph(VerbForm="Part")]},
+        zh="de haber + 过去分词：倒装条件句（= si hubiera…，要是当初……）。",
+    ),
+    make_rule(
+        "es_por_mas_que",
+        "por más que + subjunctive",
+        "C1",
+        "concessive: however much: por más que trabaje, no acabará.",
+        {"seq": [spec_surface("por"), spec_surface("más", "mas"), spec_surface("que")]},
+        zh="por más que + 虚拟式：无论怎样……（让步）。",
+    ),
+    make_rule(
+        "es_y_eso_que",
+        "y eso que (and yet)",
+        "C1",
+        "colloquial concession: y eso que llovía, vinimos.",
+        {"seq": [spec_surface("y"), spec_surface("eso"), spec_surface("que")]},
+        zh="y eso que：可是话说回来……（口语让步）。",
+    ),
+    make_rule(
+        "es_no_es_que",
+        "no es que + subjunctive",
+        "C2",
+        "it's not that ...: no es que sea tonto, es que no quiero.",
+        {"seq": [spec_surface("no"), spec_surface("es"), spec_surface("que")]},
+        zh="no es que + 虚拟式：并不是说……（先否认再解释）。",
+    ),
 ]
 
 
