@@ -297,10 +297,21 @@ function open_grammar_analysis() {
           });
           return html + escapeHtml(s.slice(pos));
         }
-        const LEVELS = ["N5", "N4", "N3", "N2", "N1"];
+        // JLPT levels (Japanese/Korean engines) and CEFR levels (European
+        // engines); a response speaks one scale or the other, so the group
+        // order picks the scale the data uses.
+        const JLPT_LEVELS = ["N5", "N4", "N3", "N2", "N1"];
+        const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
+        const LEVELS = data.some(function (g) {
+          return JLPT_LEVELS.indexOf(g.level) !== -1;
+        })
+          ? JLPT_LEVELS
+          : CEFR_LEVELS;
 
         function levelClass(lvl) {
-          return LEVELS.indexOf(lvl) === -1 ? "N" : lvl;
+          return JLPT_LEVELS.indexOf(lvl) === -1 && CEFR_LEVELS.indexOf(lvl) === -1
+            ? "N"
+            : lvl;
         }
 
         // The two aggregated buckets ("Basic forms: …", "Particles: …") fire
@@ -336,12 +347,13 @@ function open_grammar_analysis() {
           );
         }
 
-        // Group by JLPT level, easiest first, keeping the match order inside a
-        // level.  A page normally spans two or three levels and a full library
-        // can put 25 points on one page; flat in match order that is a wall
-        // with N4/N3 rows interleaved between N5 ones, so the level headers
-        // carry most of the readability.  A single-level page gets no header
-        // (it would only repeat the chip on every row).
+        // Group by level (JLPT or CEFR), easiest first, keeping the match
+        // order inside a level.  A page normally spans two or three levels
+        // and a full library can put 25 points on one page; flat in match
+        // order that is a wall with N4/N3 rows interleaved between N5 ones,
+        // so the level headers carry most of the readability.  A
+        // single-level page gets no header (it would only repeat the chip
+        // on every row).
         var groups = [];
         data.forEach(function (g) {
           var lvl = g.level || "";

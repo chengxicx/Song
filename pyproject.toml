@@ -76,6 +76,21 @@ japanese-sudachi = [
 korean = [
   "kiwipiepy>=0.22.0",
 ]
+# Grammar-analysis engines.  spaCy is capped below 3.8.4 because that is the
+# last line shipping binary wheels for every supported Python (3.9-3.13);
+# the 3.8.0 model wheels pin the compatible spaCy range themselves.
+english = [
+  "spacy>=3.8.0,<3.8.4",
+  "en-core-web-sm@https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
+]
+spanish = [
+  "spacy>=3.8.0,<3.8.4",
+  "es-core-news-sm@https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl",
+]
+russian = [
+  "pymorphy3>=2.0,<3",
+  "pymorphy3-dicts-ru>=2.4,<3",
+]
 
 [project.urls]
 Home = "https://github.com/luteorg/lute-v3"
