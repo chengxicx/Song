@@ -250,6 +250,148 @@ _RU_RULES = [
         {"seq": [{"pos_in": ["VERB"], "morph": {"Tense": "futr"}}]},
         zh="将来时：буду + 原形（未完成体）或完成体变位形式（прочитаю）。",
     ),
+    # ---- B1 ----
+    make_rule(
+        "ru_by",
+        "Conditional with бы",
+        "B1",
+        "бы + past form makes the conditional: я хотел бы, если бы.",
+        {"seq": [spec_surface("бы", "б")]},
+        zh="语气词 бы 构成假定式：хотел бы（我想……），если бы（要是……）。",
+    ),
+    make_rule(
+        "ru_chtoby",
+        "чтобы (in order to / that)",
+        "B1",
+        "purpose or desired action: чтобы помочь, я хочу, чтобы ты пришёл.",
+        {"seq": [spec_surface("чтобы")]},
+        zh="чтобы：为了……/希望……（目的或意愿从句）。",
+    ),
+    make_rule(
+        "ru_poka_ne",
+        "пока не (until)",
+        "B1",
+        "until: подожди, пока не придёт врач.",
+        {"seq": [spec_surface("пока"), spec_surface("не")]},
+        zh="пока не：直到……为止。",
+    ),
+    make_rule(
+        "ru_posle_togo_kak",
+        "после того как (after)",
+        "B1",
+        "after (a past action): после того как он ушёл.",
+        {"seq": [spec_surface("после"), spec_surface("того"), spec_surface("как")]},
+        zh="после того как：在……之后（连接时间从句）。",
+    ),
+    make_rule(
+        "ru_pricastie",
+        "Participles (-щий / -вший / -мый)",
+        "B1",
+        "verbal adjectives: читающий, прочитавший, читаемый.",
+        {"seq": [spec_pos("PRTF", "PRTS")]},
+        zh="形动词（-щий/-вший/-мый）：动词性的形容词（читающий 正在读的）。",
+    ),
+    make_rule(
+        "ru_deepricastie",
+        "Adverbial participles (-я / -в)",
+        "B1",
+        "verbal adverbs of manner: читая, прочитав.",
+        {"seq": [spec_pos("GRND")]},
+        zh="副动词（читая / прочитав）：表示伴随或先行动作。",
+    ),
+    make_rule(
+        "ru_motion_prefixes",
+        "Prefixed motion verbs (при-/у-/по-...)",
+        "B1",
+        "идти/ехать + prefix changes meaning: прийти (arrive), уйти (leave), "
+        "пойти (set off).",
+        {
+            "seq": [
+                {
+                    "lemma_in": [
+                        "пойти", "прийти", "уйти", "выйти", "зайти", "войти",
+                        "перейти", "дойти", "подойти", "приехать", "уехать",
+                        "заехать", "подъехать", "доехать", "выехать",
+                    ]
+                }
+            ]
+        },
+        zh="带前缀位移动词：прийти 到达、уйти 离开、пойти 出发等。",
+    ),
+    make_rule(
+        "ru_sya",
+        "-ся / -сь verbs (reflexive)",
+        "B1",
+        "reflexive verbs: учится, моется, оделась.",
+        {
+            "seq": [
+                {"surface_re": re.compile(r".*(?:ся|сь)$"), "pos_in": ["VERB"]}
+            ]
+        },
+        zh="-ся/-сь 反身动词：учится 学习、моется 洗澡等。",
+    ),
+    # ---- B2 ----
+    make_rule(
+        "ru_dolzhen_byl",
+        "должен был + infinitive (unfulfilled)",
+        "B2",
+        "was supposed to (but didn't): я должен был позвонить, но забыл.",
+        {
+            "seq": [
+                spec_surface("должен", "должна", "должно", "должны"),
+                spec_surface("был", "была", "было", "были"),
+                spec_pos("INFN"),
+            ]
+        },
+        zh="должен был + 原形：本应做（但没做）。",
+    ),
+    make_rule(
+        "ru_chut_ne",
+        "чуть не + perfective past (almost)",
+        "B2",
+        "almost did something: она чуть не упала.",
+        {"seq": [spec_surface("чуть"), spec_surface("не"), spec_pos("VERB")]},
+        zh="чуть не + 完成体过去时：差点就……。",
+    ),
+    make_rule(
+        "ru_stoilo_kak",
+        "стоило ... как / не успел ... как",
+        "B2",
+        "no sooner ... than: стоило прийти, как пошёл дождь.",
+        {
+            "any_of": [
+                {"left": [spec_surface("стоило")], "right": [spec_surface("как")], "min_gap": 1, "max_gap": 8},
+                {
+                    "left": [spec_surface("не"), spec_surface("успел", "успела", "успели")],
+                    "right": [spec_surface("как")],
+                    "min_gap": 1,
+                    "max_gap": 8,
+                },
+            ]
+        },
+        zh="стоило… как / не успел… как：刚一……就……。",
+    ),
+    make_rule(
+        "ru_v_techenie",
+        "в течение + genitive (during)",
+        "B2",
+        "within / during a period: в течение часа.",
+        {"seq": [spec_surface("в"), spec_surface("течение", "продолжение")]},
+        zh="в течение + 属格：在……期间（в течение часа 一小时内）。",
+    ),
+    make_rule(
+        "ru_double_neg",
+        "никогда / никто + не (double negative)",
+        "B2",
+        "negative pronouns keep не: я никогда не видел моря.",
+        {
+            "seq": [
+                spec_surface("никогда", "никто", "ничто", "нигде", "никакой", "никуда"),
+                spec_surface("не"),
+            ]
+        },
+        zh="否定代词/副词 + не 构成双重否定：никогда не（从未……）。",
+    ),
 ]
 
 
