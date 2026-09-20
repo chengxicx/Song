@@ -26,6 +26,12 @@ def _iter_entry_points(group):
 
     Compatible with Python 3.8+ (entry_points API differences).
     """
+
+    # Handle API breakage of entry_points.  On 3.12+ pylint resolves
+    # entry_points() to EntryPoints, which has no .get(), so the 3.8-3.11
+    # branch below is reported as an error even though it is dead code there.
+    # Same guard as lute.parse.registry.init_parser_plugins.
+    # pylint: disable=no-member
     vmaj = version_info.major
     vmin = version_info.minor
 
