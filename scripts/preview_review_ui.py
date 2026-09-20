@@ -3,8 +3,16 @@ Generate a standalone preview of the review UI (criteria builder +
 session card) for design review.
 
 Not part of the app: it writes one HTML file that loads the *real*
-review.css and lute-review-criteria.js, so what you see is what the
-app renders.  Run:  venv/bin/python scripts/preview_review_ui.py
+review.css and lute-review-criteria.js, so the controls look right.
+
+**This is a mock, not a test.**  Because it is hand-written it cannot
+catch a mismatch with the real templates, nor with the order the page
+loads things in -- it once looked perfect while the builder was dead in
+the app, since the real page renders the module's JSON tags *after*
+loading the script.  To check the real page, render the server's own
+HTML and run the JS against it (see the lute-ui-verify skill).
+
+Run:  venv/bin/python scripts/preview_review_ui.py
 """
 
 import json
