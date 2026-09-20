@@ -14,12 +14,17 @@ from flask import (
 from lute.db import db
 from lute.models.language import Language
 from lute.models.review import ReviewSpec
-from lute.review import enqueue, scheduler, service
+from lute.review import criteria_builder, enqueue, scheduler, service
 from lute.review.forms import ReviewSpecForm
 from lute.review.scheduler import SchedulerUnavailableError
 
 
 bp = Blueprint("review", __name__, url_prefix="/review")
+
+
+def _language_names():
+    "Language names, for the criteria builder's dropdowns."
+    return [lang.name for lang in db.session.query(Language).all()]
 
 
 @bp.route("/index")
@@ -41,7 +46,7 @@ def review_index():
         fsrs_status=scheduler.fsrs_status(),
         counts=service.counts(db.session),
         specs_json=specs_json,
-        language_names=[lang.name for lang in db.session.query(Language).all()],
+        language_names=_language_names(),
     )
 
 
@@ -96,7 +101,7 @@ def scheduler_install():
 
 def _handle_form(spec, form_template_name):
     "Handle the spec new/edit form."
-    form = ReviewSpecForm(obj=spec)
+    form = ReviewSpecForm(obj=spec, spec_id=spec.id)
     if request.method == "GET" and spec.id is not None:
         enabled = spec.card_types_enabled
         form.card_recognition.data = "recognition" in enabled
@@ -112,9 +117,17 @@ def _handle_form(spec, form_template_name):
         db.session.commit()
         return redirect("/review/index", 302)
 
-    language_names = [lang.name for lang in db.session.query(Language).all()]
+    language_names = _language_names()
+    criteria_text = form.criteria.data or ""
     return render_template(
-        form_template_name, form=form, spec=spec, language_names=language_names
+        form_template_name,
+        form=form,
+        spec=spec,
+        language_names=language_names,
+        # The builder renders itself from this; None means "this
+        # criteria can't be shown as rows, use the raw textarea".
+        builder_meta=criteria_builder.builder_meta(db.session, language_names),
+        builder_rows=criteria_builder.parse_criteria(criteria_text),
     )
 
 
@@ -127,10 +140,12 @@ def edit_spec(spec_id):
 
 @bp.route("/spec/new", methods=["GET", "POST"])
 def new_spec():
-    "Make a new spec."
+    "Make a new spec, pre-filled with the default criteria."
     spec = ReviewSpec()
     if spec.active is None:
         spec.active = True
+    if not spec.criteria:
+        spec.criteria = criteria_builder.default_criteria()
     return _handle_form(spec, "/review/new.html")
 
 
