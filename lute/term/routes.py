@@ -36,6 +36,7 @@ from lute.term.service import (
 from lute.db import db
 from lute.term.forms import TermForm
 import lute.utils.formutils
+from werkzeug.wrappers import Response as WerkzeugResponse
 
 bp = Blueprint("term", __name__, url_prefix="/term")
 
@@ -367,6 +368,12 @@ def handle_term_form(
     lives in an iframe in the reading frames and returns a different
     template on success.  return_on_success may be a response, or a
     zero-arg callable returning one (called only on successful posts).
+
+    Note the isinstance check rather than a plain callable() test: a
+    werkzeug Response is itself callable (it is a WSGI app, with
+    __call__(environ, start_response)), so callable() reports True for
+    both a response and a factory and would then invoke the response
+    with no arguments.
     """
     form = TermForm(obj=term, session=session)
 
@@ -399,7 +406,11 @@ def handle_term_form(
             # player picks the fresh HTML up via its incremental
             # subtitle refresh.
             patch_yt_subtitle_caches_for_term([term.text] + list(term.parents or []))
-        return return_on_success() if callable(return_on_success) else return_on_success
+        # A response is returned as-is; anything else is treated as a
+        # zero-arg factory (see the docstring).
+        if isinstance(return_on_success, WerkzeugResponse):
+            return return_on_success
+        return return_on_success()
 
     # Note: on validation, form.duplicated_term may be set.
     # See DUPLICATE_TERM_CHECK comments in other files.
