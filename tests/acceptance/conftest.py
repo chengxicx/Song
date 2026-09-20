@@ -234,7 +234,20 @@ def then_title(luteclient, title):
 
 @then(parsers.parse('the page contains "{text}"'))
 def then_page_contains(luteclient, text):
-    assert text in luteclient.page.content()
+    """
+    Poll, rather than reading once.
+
+    This step usually follows a click whose response may still be in
+    flight, and page.content() is a single snapshot of the current
+    document -- so it failed whenever the response lost that race.
+    book.feature's "invalid.vtt" row was the usual victim: the upload is
+    rejected server-side and the page re-renders with the message, but
+    reading immediately can still see the pre-submit form.  The polling
+    itself lives in wait_for_page_text, which edit_language shares for
+    exactly the same reason.
+    """
+    content = luteclient.wait_for_page_text(text)
+    assert text in content, f"the page never contained {text!r}"
 
 
 # Language
