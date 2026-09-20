@@ -152,6 +152,14 @@ def test_spec_form_flow(empty_db, spanish, client):
     assert resp.status_code == 200
     assert b"review_spec_form" in resp.data
 
+    # The dropdown builder renders, with its metadata and the default
+    # criteria pre-loaded as rows.
+    assert b'id="criteria_builder"' in resp.data
+    assert b'id="criteria_preset"' in resp.data
+    assert b'id="criteria_meta"' in resp.data
+    assert b'"field": "status"' in resp.data
+    assert b'"default_preset": "learning"' in resp.data
+
     resp = client.post(
         "/review/spec/new",
         data={
@@ -188,3 +196,116 @@ def test_spec_form_flow(empty_db, spanish, client):
     resp = client.get(f"/review/spec/delete/{spec.id}", follow_redirects=True)
     assert resp.status_code == 200
     assert db.session.query(ReviewSpec).count() == 0
+
+
+def test_undo_with_nothing_to_undo_is_a_400(empty_db, spanish, client):
+    "The undo endpoint reports 'nothing to undo' instead of 500ing."
+    resp = client.post("/review/undo")
+    assert resp.status_code == 400
+    assert "nothing to undo" in resp.json["error"].lower()
+
+
+def test_review_settings_page_round_trips(empty_db, spanish, client):
+    "The scheduling settings page renders the stored values and saves them."
+    from lute.models.repositories import UserSettingRepository
+
+    resp = client.get("/review/settings")
+    assert resp.status_code == 200
+    assert b"review_settings_form" in resp.data
+    # The seeded defaults are shown, not blank fields.
+    assert b'value="0.9"' in resp.data
+    assert b'value="20"' in resp.data
+
+    resp = client.post(
+        "/review/settings",
+        data={"review_desired_retention": "0.85", "review_max_new_per_day": "5"},
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200
+
+    repo = UserSettingRepository(db.session)
+    assert float(repo.get_value("review_desired_retention")) == 0.85
+    assert int(repo.get_value("review_max_new_per_day")) == 5
+
+    # Out-of-range values are rejected by the form, not stored.
+    resp = client.post(
+        "/review/settings",
+        data={"review_desired_retention": "2.0", "review_max_new_per_day": "5"},
+    )
+    assert resp.status_code == 200
+    assert float(repo.get_value("review_desired_retention")) == 0.85
+
+
+def test_review_index_links_to_settings(empty_db, spanish, client):
+    "The settings page is reachable from the dashboard."
+    resp = client.get("/review/index")
+    assert resp.status_code == 200
+    assert b'href="/review/settings"' in resp.data
+
+
+def test_duplicate_spec_name_is_a_form_error(empty_db, spanish, client):
+    "A duplicate name is a form error, not an IntegrityError 500."
+    from lute.models.review import ReviewSpec
+
+    spec = ReviewSpec()
+    spec.name = "taken"
+    spec.criteria = ""
+    spec.set_card_types(["recognition"])
+    spec.active = True
+    db.session.add(spec)
+    db.session.commit()
+
+    resp = client.post(
+        "/review/spec/new",
+        data={"name": "taken", "criteria": "", "card_recognition": "y", "active": "y"},
+    )
+    assert resp.status_code == 200
+    assert b"already exists" in resp.data
+    assert db.session.query(ReviewSpec).count() == 1
+
+
+def test_editing_a_spec_keeps_its_own_name(empty_db, spanish, client):
+    "Re-saving a spec must not trip its own uniqueness check."
+    from lute.models.review import ReviewSpec
+
+    spec = ReviewSpec()
+    spec.name = "mine"
+    spec.criteria = ""
+    spec.set_card_types(["recognition"])
+    spec.active = True
+    db.session.add(spec)
+    db.session.commit()
+
+    resp = client.post(
+        f"/review/spec/edit/{spec.id}",
+        data={"name": "mine", "criteria": "", "card_recognition": "y", "active": "y"},
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200
+    assert db.session.query(ReviewSpec).one().name == "mine"
+
+
+def test_criteria_the_builder_cannot_show_are_saved_verbatim(empty_db, spanish, client):
+    "Mixed and/or falls back to the raw textarea and is stored unchanged."
+    from lute.models.review import ReviewSpec
+
+    mixed = 'status >= 2 and tags:["a"] or language == "Spanish"'
+    resp = client.post(
+        "/review/spec/new",
+        data={
+            "name": "mixed",
+            "criteria": mixed,
+            "card_recognition": "y",
+            "active": "y",
+        },
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200
+    assert db.session.query(ReviewSpec).one().criteria == mixed
+
+    # And the edit page renders it in raw mode (builder_rows is null,
+    # which is what the template keys the 'open the textarea' on).
+    spec = db.session.query(ReviewSpec).one()
+    resp = client.get(f"/review/spec/edit/{spec.id}")
+    assert resp.status_code == 200
+    assert b'id="criteria_initial">null</script>' in resp.data
