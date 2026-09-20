@@ -47,9 +47,11 @@ def evaluate_criteria(s, term):
             alltags.extend([t.text for t in p.term_tags])
         return any(e in alltags for e in tagvals)
 
-    def matches_lang(lang):
+    def matches_lang(args):
         'Case-insensitive name match, so language == "spanish" works.'
-        return (term.language.name or "").lower() == lang[0].lower()
+        op, lang = args[0], args[1]
+        same = (term.language.name or "").lower() == lang.lower()
+        return same if op in (":", "=", "==") else not same
 
     def check_has_images():
         "True if term or any parent has image."
@@ -73,6 +75,8 @@ def evaluate_criteria(s, term):
             "!=": lambda a, b: a != b,
             "=": lambda a, b: a == b,
             "==": lambda a, b: a == b,
+            # '<>' is a SQL-style alias the parser accepts.
+            "<>": lambda a, b: a != b,
         }
         return opMap[opstring]
 
@@ -135,8 +139,9 @@ def evaluate_criteria(s, term):
     all_tag_matcher = Suppress(Literal("all.tags") + Literal(":")) + tagcrit
 
     # Both 'language:"X"' and 'language == "X"' (or single '=') select
-    # by language name; the eq form is sugar for review-queue specs.
-    lang_matcher = Suppress("language") + Suppress(one_of(": = ==")) + quoteval
+    # by language name; '!=' excludes it.  The eq form is sugar for
+    # review-queue specs.
+    lang_matcher = Suppress("language") + one_of(": = == !=") + quoteval
 
     has_options = Literal("image")
     has_matcher = Suppress("has") + Suppress(":") + has_options
