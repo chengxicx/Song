@@ -451,6 +451,89 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         "Text of the spec table on the review dashboard."
         return self.page.locator("#review_specs").inner_text()
 
+    def sync_review_queue(self):
+        """
+        Click 'Sync queue' on the dashboard; return the HTTP status.
+
+        The response *body* is deliberately not read.  The handler
+        reloads the page as soon as it has added cards, and Playwright
+        refuses to fetch a body for a response that was navigated away
+        from ("Read response.body() before triggering any navigation").
+        The status is enough -- a sync that hit spec errors returns 400 --
+        and the caller asserts the effect on the dashboard counters.
+        """
+        with self.page.expect_response(
+            lambda r: r.url.endswith("/review/sync") and r.request.method == "POST"
+        ) as resp:
+            self.page.click("#btn_sync_review")
+        return resp.value.status
+
+    def expect_review_new_count(self, expected):
+        "Wait for the dashboard's new-card counter to reach expected."
+        expect(self.page.locator("#review_new_remaining")).to_have_text(str(expected))
+
+    def review_session_state(self):
+        """
+        The live session DOM: the question, whether the answer is
+        showing, the grade buttons, whether the run is over.
+
+        All of it is built by lute-review.js from a POST to
+        /review/start, so none of it is in the served HTML -- and
+        `error` is captured so a failed start explains itself instead of
+        looking like a missing card.
+        """
+        return self.page.evaluate(
+            """() => {
+                 const card = document.getElementById("review_card");
+                 const q = document.getElementById("review_question");
+                 const answer = document.getElementById("review_answer");
+                 const grades = document.getElementById("review_grades");
+                 const undo = document.getElementById("review_undo");
+                 const err = document.getElementById("review_session_error");
+                 const progress = document.getElementById("review_progress");
+                 return {
+                   question: q ? q.textContent.trim() : null,
+                   answer_showing: !!answer && !answer.hidden,
+                   answer: answer ? answer.textContent.trim() : null,
+                   grades_showing: !!grades && !grades.hidden,
+                   grade_ratings: grades
+                     ? Array.from(grades.querySelectorAll(".rv-grade")).map(
+                         (b) => b.dataset.rating
+                       )
+                     : [],
+                   done: !!card && card.textContent.indexOf("Session done") >= 0,
+                   progress: progress ? progress.textContent.trim() : "",
+                   undo_available: !!undo && !undo.hidden,
+                   error:
+                     err && err.style.display !== "none"
+                       ? err.textContent.trim()
+                       : null,
+                 };
+               }"""
+        )
+
+    def wait_for_review_card(self):
+        "Wait until the session has fetched and rendered a card."
+        try:
+            self.page.locator("#review_card .rv-card").wait_for(timeout=8000)
+        except PlaywrightTimeoutError as ex:
+            state = self.review_session_state()
+            raise AssertionError(
+                f"no card was rendered; session state: {state}"
+            ) from ex
+
+    def reveal_review_answer(self):
+        "Click 'Show answer'."
+        self.page.click("#review_reveal")
+
+    def grade_review_card(self, rating):
+        "Click the grade button for a rating (1-4)."
+        self.page.click(f'.rv-grade[data-rating="{rating}"]')
+
+    def undo_last_grade(self):
+        "Click Undo in the session top bar."
+        self.page.click("#review_undo")
+
     ################################3
     # Reading/rendering
 
