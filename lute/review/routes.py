@@ -92,6 +92,15 @@ def grade():
         return jsonify({"error": str(ex), "needs_fsrs": True}), 400
 
 
+@bp.route("/undo", methods=["POST"])
+def undo():
+    "Reverse the most recent grading."
+    try:
+        return jsonify(service.undo_last(db.session))
+    except ValueError as ex:
+        return jsonify({"error": str(ex)}), 400
+
+
 @bp.route("/scheduler/install", methods=["POST"])
 def scheduler_install():
     "One-click pip install of the fsrs package."

@@ -11,7 +11,7 @@ pytest.importorskip("fsrs")
 from lute.db import db  # noqa: E402
 from lute.models.repositories import UserSettingRepository  # noqa: E402
 from lute.models.review import ReviewCard, ReviewLog, ReviewSpec  # noqa: E402
-from lute.review import enqueue, service  # noqa: E402
+from lute.review import enqueue, scheduler, service  # noqa: E402
 from lute.review.scheduler import (  # noqa: E402
     SchedulerUnavailableError,
     load_scheduler,
@@ -198,3 +198,35 @@ def test_load_scheduler_uses_retention_setting(empty_db, spanish):
     val = UserSettingRepository(db.session).get_value("review_desired_retention")
     sched = load_scheduler(val)
     assert abs(sched.desired_retention - 0.95) < 1e-9
+
+
+def test_undo_reverses_a_real_grade(empty_db, spanish):
+    """
+    End to end: a real fsrs grade, then undo, must leave the card
+    byte-for-byte as it was.  (test_undo.py covers the undo mechanics
+    without needing fsrs.)
+    """
+    _queue(spanish)
+    payload = service.start_session(db.session)
+    assert payload["undo"] is None, "nothing graded yet"
+
+    card_view = next(c for c in payload["cards"] if c["card_type"] == "recognition")
+    card = db.session.get(ReviewCard, card_view["id"])
+    before = scheduler.card_state(card)
+
+    graded = service.grade(db.session, card_view["id"], 3)
+    assert graded["undo"]["card_id"] == card.id
+    assert graded["undo"]["rating"] == 3
+    assert db.session.query(ReviewLog).count() == 1
+
+    service.undo_last(db.session)
+
+    db.session.refresh(card)
+    assert scheduler.card_state(card) == before
+    assert db.session.query(ReviewLog).count() == 0
+    assert service.undo_info(db.session) is None
+
+    # And the card is offered again, as an ungraded new card.
+    again = service.start_session(db.session)
+    assert card_view["id"] in [c["id"] for c in again["cards"]]
+    assert next(c for c in again["cards"] if c["id"] == card_view["id"])["reps"] == 0
