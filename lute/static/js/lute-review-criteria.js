@@ -24,8 +24,18 @@ window.LuteReviewCriteria = (function () {
     }
   }
 
-  const META = read_json("criteria_meta") || {};
-  const INITIAL = read_json("criteria_initial");
+  // Page data is read on demand, never at load time: the
+  // <script type="application/json"> tags live in the form partial, which
+  // the page renders *after* this file has already been loaded.  A
+  // top-level read therefore always comes back empty, and the builder
+  // silently does nothing.  A miss is not cached, so a later call (once
+  // the document has parsed) still succeeds.
+  let _meta = null;
+
+  function meta() {
+    if (_meta === null) _meta = read_json("criteria_meta");
+    return _meta || {};
+  }
 
   const state = {
     rows: [],
@@ -36,7 +46,7 @@ window.LuteReviewCriteria = (function () {
   let els = {};
 
   function field_spec(name) {
-    return (META.fields || []).find((f) => f.name === name) || null;
+    return (meta().fields || []).find((f) => f.name === name) || null;
   }
 
   function el(tag, cls, text) {
@@ -123,19 +133,19 @@ window.LuteReviewCriteria = (function () {
 
     const select = el("select", "cb-value");
     if (spec.value_kind === "status") {
-      add_options(select, [{ value: "", label: "(status)" }].concat(META.statuses || []));
+      add_options(select, [{ value: "", label: "(status)" }].concat(meta().statuses || []));
     } else if (spec.value_kind === "language") {
       add_options(
         select,
         [{ value: "", label: "(language)" }].concat(
-          (META.languages || []).map((n) => ({ value: n, label: n }))
+          (meta().languages || []).map((n) => ({ value: n, label: n }))
         )
       );
     } else if (spec.value_kind === "has") {
       add_options(
         select,
         [{ value: "", label: "(choose)" }].concat(
-          (META.has_options || []).map((n) => ({ value: n, label: n }))
+          (meta().has_options || []).map((n) => ({ value: n, label: n }))
         )
       );
     } else {
@@ -160,13 +170,13 @@ window.LuteReviewCriteria = (function () {
     }
 
     state.rows.forEach((row, idx) => {
-      const spec = field_spec(row.field) || META.fields[0];
+      const spec = field_spec(row.field) || meta().fields[0];
       const line = el("div", "criteria-row");
 
       const fieldsel = el("select", "cb-field");
       add_options(
         fieldsel,
-        (META.fields || []).map((f) => ({ value: f.name, label: f.label }))
+        (meta().fields || []).map((f) => ({ value: f.name, label: f.label }))
       );
       fieldsel.value = spec.name;
       fieldsel.addEventListener("change", () => {
@@ -181,7 +191,7 @@ window.LuteReviewCriteria = (function () {
         opsel,
         spec.ops.map((o) => ({
           value: o,
-          label: (META.op_labels || {})[o] || o,
+          label: (meta().op_labels || {})[o] || o,
         }))
       );
       opsel.value = spec.ops.indexOf(row.op) >= 0 ? row.op : spec.ops[0];
@@ -221,7 +231,7 @@ window.LuteReviewCriteria = (function () {
     sel.appendChild(new Option("(choose a starting point)", ""));
 
     const groups = {};
-    (META.presets || []).forEach((p) => {
+    (meta().presets || []).forEach((p) => {
       if (!groups[p.group]) {
         groups[p.group] = document.createElement("optgroup");
         groups[p.group].label = p.group;
@@ -235,7 +245,7 @@ window.LuteReviewCriteria = (function () {
     });
 
     sel.addEventListener("change", () => {
-      const p = (META.presets || []).find((x) => x.id === sel.value);
+      const p = (meta().presets || []).find((x) => x.id === sel.value);
       if (!p) return;
       state.raw = false;
       state.rows = JSON.parse(JSON.stringify(p.rows));
@@ -376,7 +386,7 @@ window.LuteReviewCriteria = (function () {
     }
     m = part.match(/^has\s*:\s*(\w+)$/);
     if (m) {
-      if ((META.has_options || []).indexOf(m[1]) < 0) return null;
+      if ((meta().has_options || []).indexOf(m[1]) < 0) return null;
       return { field: "has", op: ":", values: [m[1]] };
     }
     return null;
@@ -398,12 +408,12 @@ window.LuteReviewCriteria = (function () {
       form: document.getElementById("review_spec_form"),
     };
     if (!els.builder || !els.text) return;
-    if (!(META.fields || []).length) return;
+    if (!(meta().fields || []).length) return;
 
     // Datalist for tag values.
     const dl = el("datalist", null);
     dl.id = "criteria_tag_options";
-    (META.tags || []).forEach((t) => {
+    (meta().tags || []).forEach((t) => {
       const o = document.createElement("option");
       o.value = t;
       dl.appendChild(o);
@@ -425,7 +435,7 @@ window.LuteReviewCriteria = (function () {
         state.rows = [];
         set_raw_mode(false, "");
       }
-      const first = META.fields[0];
+      const first = meta().fields[0];
       state.rows.push({ field: first.name, op: first.ops[0], values: [] });
       render_rows();
       sync();
@@ -443,11 +453,12 @@ window.LuteReviewCriteria = (function () {
       });
     }
 
-    if (INITIAL === null) {
+    const initial = read_json("criteria_initial");
+    if (initial === null) {
       on_raw_input();
     } else {
-      state.rows = INITIAL.rows;
-      state.joiner = INITIAL.joiner;
+      state.rows = initial.rows;
+      state.joiner = initial.joiner;
       els.joiner.value = state.joiner;
       render_rows();
       sync();

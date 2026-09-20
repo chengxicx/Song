@@ -3,6 +3,8 @@ Smoke test the full review flow: spec -> sync -> session -> grade.
 """
 
 from datetime import datetime
+import os
+import re
 
 import pytest
 
@@ -11,6 +13,13 @@ from lute.models.review import ReviewCard  # noqa: E402
 from lute.review import enqueue, service  # noqa: E402
 
 from tests.utils import add_terms, make_book  # noqa: E402
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_BUILDER_JS = os.path.normpath(
+    os.path.join(
+        _HERE, "..", "..", "..", "lute", "static", "js", "lute-review-criteria.js"
+    )
+)
 
 
 def test_full_review_flow(empty_db, spanish):
@@ -309,3 +318,28 @@ def test_criteria_the_builder_cannot_show_are_saved_verbatim(empty_db, spanish, 
     resp = client.get(f"/review/spec/edit/{spec.id}")
     assert resp.status_code == 200
     assert b'id="criteria_initial">null</script>' in resp.data
+
+
+def test_spec_form_provides_every_element_the_builder_needs(empty_db, spanish, client):
+    """
+    The spec form and the builder JS are a contract.
+
+    Every id the JS looks up must exist in the rendered page.  Without
+    this check, renaming or dropping one leaves the builder dead in the
+    real app while every JS unit test still passes -- those run against
+    their own stub DOM and cannot see a template change at all.
+    """
+    with open(_BUILDER_JS, encoding="utf-8") as f:
+        js = f.read()
+
+    wanted = set(re.findall(r'getElementById\("([^"]+)"\)', js))
+    assert wanted, "the builder no longer looks up any element by id"
+
+    html = client.get("/review/spec/new").data.decode("utf-8")
+    missing = sorted(i for i in wanted if f'id="{i}"' not in html)
+    assert not missing, f"the spec form is missing builder elements: {missing}"
+
+    # The page must load the builder and its stylesheet too; base.html
+    # includes both, and moving either would kill the builder silently.
+    assert "lute-review-criteria.js" in html
+    assert "review.css" in html

@@ -123,6 +123,11 @@ const metaText = JSON.stringify(input.meta);
 const initialText =
   input.init === undefined ? null : JSON.stringify(input.init);
 
+// When set, the JSON tags are hidden until DOMContentLoaded -- which is
+// what really happens: base.html loads this file in <head>, but the tags
+// are rendered by the form partial later in <body>.
+let data_visible = !input.data_deferred;
+
 global.window = {};
 global.Option = function (text, value) {
   const o = new FakeEl("option");
@@ -135,8 +140,12 @@ global.document = {
     if (ev === "DOMContentLoaded") dom_ready = fn;
   },
   getElementById: (id) => {
-    if (id === "criteria_meta") return { textContent: metaText };
-    if (id === "criteria_initial") return { textContent: initialText };
+    if (id === "criteria_meta") {
+      return data_visible ? { textContent: metaText } : null;
+    }
+    if (id === "criteria_initial") {
+      return data_visible ? { textContent: initialText } : null;
+    }
     return byId[id] || null;
   },
   createElement: (tag) => new FakeEl(tag),
@@ -170,6 +179,8 @@ if (dom_ready === null) {
   process.stderr.write("the module never registered a DOMContentLoaded hook\n");
   process.exit(1);
 }
+// The document has finished parsing, so the JSON tags now exist.
+data_visible = true;
 dom_ready();
 
 const groups = byId.criteria_preset.children.map((g) => ({
