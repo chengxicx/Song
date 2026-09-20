@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Review settings{% endblock %}
+{% block header %}Review{% endblock %}
+
+{% block body %}
+
+<div id="review_fsrs_status" class="review-status" data-page-node-id="VSR8hEtkhs1CGbiLP53rgU">
+  {% if fsrs_status.installed %}
+  <span data-page-node-id="fwPFce2ROGhZDZyIPuHASr">Scheduler: FSRS (fsrs package {{ fsrs_status.version }}).</span>
+  {% else %}
+  <span data-page-node-id="TkFSE4dxKKu5gRcaMB0qw0">Scheduler: the <code data-page-node-id="XwcEIvRopQH6iUYvcwj2Xx">fsrs</code> package is not installed.
+    <button class="btn btn-secondary" id="btn_install_fsrs"
+            onclick="LuteReview.install_fsrs();" data-page-node-id="goFoCj3Ea4RTuccvalsxtC">Install</button>
+    <span class="review-hint" data-page-node-id="Qq2u4mQh4OUhiZyZH2dgOm">(needs Python 3.10+, installs {{ fsrs_status.pip_spec }})</span>
+  </span>
+  {% endif %}
+</div>
+<div id="review_install_message" data-page-node-id="qeSBhvIaixGwRBLT8wnzbn"></div>
+
+<h3 data-page-node-id="d37U1eFm0iTMJol3hLv4Bv">Review settings</h3>
+<p class="review-hint" data-page-node-id="XSixWmd7uBwto67izCD30g">
+  These affect the whole review queue. Today's queue currently holds
+  <b data-page-node-id="3xqKNkVcMoP5p1lYekVGzy">{{ counts.due }}</b> due and <b data-page-node-id="D8mU8BGDCvJCrllq7bFLu2">{{ counts.new_remaining }}</b> new card(s).
+</p>
+
+{% for field_name, field_errors in form.errors.items() %}
+{% for error in field_errors %}
+<div class="flash-notice" data-page-node-id="JsR2DD208wi3FTVxkxNgHS">{{ error }}</div>
+{% endfor %}
+{% endfor %}
+
+<form method="POST" id="review_settings_form" data-page-node-id="OxEuiJHUoPiBnPMDOvArft">
+  {{ form.hidden_tag() }}
+
+  <table class="settingstable" id="reviewsettings" data-page-node-id="lhai0atDijjBO6ALhqzUs2">
+    <tr data-page-node-id="D9p5x0CYTlxKzmCrweV0TX">
+      <td data-page-node-id="OLbJgbFUapn9pgCpEDPtdX">{{ form.review_desired_retention.label }}</td>
+      <td data-page-node-id="bzy4SBAtgB0flCZLBSNZlr">
+        {{ form.review_desired_retention(class="form-control") }}
+        <div class="review-hint" data-page-node-id="yXb7zO2gtTF42TmHydyfSc">
+          The share of cards FSRS expects you to still remember when they
+          come up, between 0.5 and 0.99. Higher means shorter intervals and
+          more reviews per day; 0.9 is the usual starting point.
+        </div>
+      </td>
+    </tr>
+
+    <tr data-page-node-id="S9QkSvIGRLxHGXKr79IlHO">
+      <td data-page-node-id="fjvDfpiCcBX2H2LIQcQRoZ">{{ form.review_max_new_per_day.label }}</td>
+      <td data-page-node-id="s4OA509HAC07EEpUsXBarK">
+        {{ form.review_max_new_per_day(class="form-control") }}
+        <div class="review-hint" data-page-node-id="3a6yMFmPO6If46fg9fmIDk">
+          How many never-seen cards one day's sessions may introduce.
+          0 turns new cards off, so you only revise what is already queued.
+          {% if counts.new_allowed_today == 0 and counts.max_new_per_day > 0 %}
+          <b data-page-node-id="iAuKVyjnqtc9VZLo4AZAUO">You have already used today's allowance.</b>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="form-action-row" data-page-node-id="SrrL7nTE0WGX0ZXGcCULqI">
+    <button type="submit" class="btn btn-primary" data-page-node-id="fWCyLEN91tHwTAO3GpegGs">Save</button>
+    <button class="btn btn-secondary"
+            onclick="window.location = '{{ url_for('review.review_index') }}'; return false;" data-page-node-id="J6AOiwM6CP6EkVHzbdl0do">Cancel</button>
+  </div>
+</form>
+
+<p class="review-hint" data-page-node-id="m2Op0ReqVHGEAbz50WK7is">
+  Cards already in the queue keep their scheduling history whatever you
+  change here; the new values apply from the next card you grade.
+</p>
+
+{% endblock %}
