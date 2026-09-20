@@ -176,5 +176,6 @@ lute/themes/css/Boox_Leaf5C.css
 
 # Local tool / agent working dirs (not part of source)
 .workbuddy/
+.workbuddy-ai/
 .zcode/
 .trae/
