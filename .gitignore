@@ -180,4 +180,4 @@ lute/themes/css/Boox_Leaf5C.css
 .zcode/
 .trae/
 # pytest --basetemp target used when /tmp is unavailable
-.pytest-tmp/
+.pytest-tmp*/
