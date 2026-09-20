@@ -20,6 +20,14 @@ def delete_all_data(session):
     # Setting the pragma first ensures cascade delete.
     statements = [
         "pragma foreign_keys = ON",
+        # Review data goes first.  Nothing cascades into reviewspecs (it
+        # has no foreign key to languages, so specs used to survive a
+        # wipe), and reviewcards references words without an ON DELETE
+        # clause -- so a card left behind makes the language delete below
+        # fail outright with a foreign key error.
+        "delete from reviewlogs",
+        "delete from reviewcards",
+        "delete from reviewspecs",
         "delete from languages",
         "delete from tags",
         "delete from tags2",
