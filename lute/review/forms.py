@@ -4,8 +4,10 @@ ReviewSpec form.
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, TextAreaField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, ValidationError
 
+from lute.db import db
+from lute.models.review import ReviewSpec
 from lute.ankiexport.criteria import validate_criteria
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 
@@ -13,10 +15,12 @@ from lute.ankiexport.exceptions import AnkiExportConfigurationError
 class ReviewSpecForm(FlaskForm):
     "Review spec: which terms are admitted to the queue, as which cards."
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, spec_id=None, **kwargs):
         super().__init__(*args, **kwargs)
         # Flask doesn't allow for "general" errors, so handle those specially.
         self.general_errors = []
+        # Excluded from the name-uniqueness check when editing.
+        self.spec_id = spec_id
 
     name = StringField("Name", validators=[DataRequired(), Length(max=200)])
     criteria = TextAreaField(
@@ -44,6 +48,16 @@ class ReviewSpecForm(FlaskForm):
         ("recall", "card_recall"),
         ("cloze", "card_cloze"),
     ]
+
+    def validate_name(self, field):
+        "Names are unique in the db; catch a clash here instead of on commit."
+        if not field.data:
+            return
+        q = db.session.query(ReviewSpec).filter(ReviewSpec.name == field.data)
+        if self.spec_id is not None:
+            q = q.filter(ReviewSpec.id != self.spec_id)
+        if q.first() is not None:
+            raise ValidationError("A review spec with that name already exists.")
 
     def validate(self, extra_validators=None):
         "Also check the criteria string and card type selection."
