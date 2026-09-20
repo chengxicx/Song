@@ -51,6 +51,16 @@ class FakeEl {
   get className() {
     return [...this.classes].join(" ");
   }
+  // HTMLSelectElement.options: every option, including those nested in
+  // an <optgroup>.  The module matches presets against this.
+  get options() {
+    const out = [];
+    this.children.forEach((c) => {
+      if (c.tagName === "OPTION") out.push(c);
+      else (c.children || []).forEach((o) => out.push(o));
+    });
+    return out;
+  }
   set innerHTML(v) {
     this.html = String(v);
     if (this.html === "") this.children = [];
@@ -195,6 +205,7 @@ process.stdout.write(
       0
     ),
     joiner: byId.criteria_joiner.value,
+    preset_selected: byId.criteria_preset.value,
     textarea: byId.criteria_text.value,
     preview: byId.criteria_preview.textContent,
     warning_hidden: byId.criteria_warning.hidden,

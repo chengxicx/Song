@@ -154,6 +154,30 @@ def test_js_init_renders_the_default_spec():
     assert out["warning_hidden"] is True
 
 
+def test_js_init_selects_the_default_preset():
+    "The dropdown must name the preset the conditions came from."
+    out = _run_harness(
+        {"meta": _demo_meta(), "init": cb.parse_criteria(cb.default_criteria())}
+    )
+    # Not the "(choose a starting point)" placeholder: the conditions
+    # below are already filled in from this preset, and leaving the
+    # dropdown blank reads as "nothing has been set up yet".
+    assert out["preset_selected"] == cb.DEFAULT_PRESET_ID
+
+
+def test_js_preset_selection_drops_when_conditions_are_edited():
+    "Once the conditions are hand-edited, no preset describes them."
+    out = _run_harness(
+        {
+            "meta": _demo_meta(),
+            "init": cb.parse_criteria(cb.default_criteria()),
+            "act": [{"id": "criteria_joiner", "value": "or"}],
+        }
+    )
+    assert out["joiner"] == "or"
+    assert out["preset_selected"] == ""
+
+
 def test_js_preset_list_is_grouped_and_complete():
     "Every preset the server sends must reach the dropdown."
     out = _run_harness(
@@ -180,6 +204,8 @@ def test_js_preset_selection_rewrites_the_textarea():
     assert out["rows"][0]["value"] == "Japanese"
     assert out["textarea"] == 'language == "Japanese"'
     assert out["preview"] == 'language == "Japanese"'
+    # ...and the dropdown keeps naming the preset that produced them.
+    assert out["preset_selected"] == "lang:Japanese"
 
 
 def test_js_empty_criteria_shows_the_all_terms_note():
@@ -188,3 +214,6 @@ def test_js_empty_criteria_shows_the_all_terms_note():
     assert out["row_count"] == 0
     assert "every learning term is included" in out["empty_note"]
     assert out["textarea"] == ""
+    # Blank criteria *is* the "All learning terms" preset, so name it
+    # rather than falling back to the placeholder.
+    assert out["preset_selected"] == "all"
