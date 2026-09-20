@@ -712,6 +712,64 @@ def then_review_spec_row(luteclient, name, criteria):
     assert criteria in table, table
 
 
+# Review session
+#
+# The runner is client-side too: the page ships an empty shell and
+# lute-review.js fills it from POST /review/start, then posts each
+# grade.  A card that never renders looks the same as a card with
+# nothing due unless you read the live DOM.
+
+
+@when("I sync the review queue")
+def when_sync_review_queue(luteclient):
+    status = luteclient.sync_review_queue()
+    assert status == 200, f"sync returned HTTP {status}"
+
+
+@then(parsers.re(r"the review dashboard shows (?P<count>\d+) new cards? waiting"))
+def then_review_new_count(luteclient, count):
+    luteclient.expect_review_new_count(int(count))
+
+
+@then(parsers.parse('the review card shows the term "{text}"'))
+def then_review_card_term(luteclient, text):
+    luteclient.wait_for_review_card()
+    state = luteclient.review_session_state()
+    assert state["error"] is None, f"the session failed: {state['error']}"
+    assert text in (state["question"] or ""), state
+
+
+@when("I reveal the review answer")
+def when_reveal_review_answer(luteclient):
+    luteclient.reveal_review_answer()
+    state = luteclient.review_session_state()
+    assert state["answer_showing"], state
+    assert state["grade_ratings"] == ["1", "2", "3", "4"], state
+
+
+@when(parsers.parse('I grade the card "{label}"'))
+def when_grade_card(luteclient, label):
+    ratings = {"Again": 1, "Hard": 2, "Good": 3, "Easy": 4}
+    assert label in ratings, f"unknown grade {label!r}"
+    luteclient.grade_review_card(ratings[label])
+
+
+@then("the review session is done")
+def then_review_session_done(luteclient):
+    expect(luteclient.page.locator("#review_card")).to_contain_text("Session done")
+
+
+@then("the undo button is available")
+def then_undo_available(luteclient):
+    state = luteclient.review_session_state()
+    assert state["undo_available"], state
+
+
+@when("I undo the last grade")
+def when_undo_last_grade(luteclient):
+    luteclient.undo_last_grade()
+
+
 def pytest_collection_modifyitems(config, items):
     "Skip scenarios tagged skip_without_sudachi when Sudachi is not installed."
     from lute.parse.registry import is_supported
