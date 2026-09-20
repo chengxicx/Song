@@ -1,10 +1,16 @@
 """
-ReviewSpec form.
+ReviewSpec and review settings forms.
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, TextAreaField
-from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms import StringField, BooleanField, TextAreaField, IntegerField, FloatField
+from wtforms.validators import (
+    DataRequired,
+    Length,
+    InputRequired,
+    NumberRange,
+    ValidationError,
+)
 
 from lute.db import db
 from lute.models.review import ReviewSpec
@@ -76,3 +82,35 @@ class ReviewSpecForm(FlaskForm):
     def enabled_card_types(self):
         "Card types whose checkbox is ticked, in canonical order."
         return [ct for ct, fldname in self._TYPE_FIELDS if self[fldname].data]
+
+
+class ReviewSettingsForm(FlaskForm):
+    """
+    Review scheduling settings.
+
+    Field names are the keys in the settings table, as with
+    lute.settings.forms.UserSettingsForm.
+    """
+
+    review_desired_retention = FloatField(
+        "Desired retention",
+        validators=[InputRequired(), NumberRange(min=0.5, max=0.99)],
+        render_kw={
+            "type": "number",
+            "step": "0.01",
+            "min": "0.5",
+            "max": "0.99",
+            "title": "FSRS target memory retention, 0.5 - 0.99.  "
+            "Higher means more frequent reviews.",
+        },
+    )
+    review_max_new_per_day = IntegerField(
+        "Max new cards per day",
+        validators=[InputRequired(), NumberRange(min=0)],
+        render_kw={
+            "type": "number",
+            "step": "1",
+            "min": "0",
+            "title": "New cards a day's session can introduce; 0 means no new cards.",
+        },
+    )

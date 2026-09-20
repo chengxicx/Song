@@ -13,10 +13,15 @@ from flask import (
 
 from lute.db import db
 from lute.models.language import Language
+from lute.models.repositories import (
+    MissingUserSettingKeyException,
+    UserSettingRepository,
+)
 from lute.models.review import ReviewSpec
 from lute.review import criteria_builder, enqueue, scheduler, service
-from lute.review.forms import ReviewSpecForm
+from lute.review.forms import ReviewSettingsForm, ReviewSpecForm
 from lute.review.scheduler import SchedulerUnavailableError
+from lute.settings.current import refresh_global_settings
 
 
 bp = Blueprint("review", __name__, url_prefix="/review")
@@ -54,6 +59,45 @@ def review_index():
 def session_page():
     "Review session page; the cards load via POST /review/start."
     return render_template("/review/session.html")
+
+
+@bp.route("/settings", methods=["GET", "POST"])
+def review_settings():
+    """
+    Review scheduling settings.
+
+    Field ids are the settings-table keys (see ReviewSettingsForm), so
+    the form writes straight through the repository, as
+    lute.settings.routes.edit_settings does.
+    """
+    form = ReviewSettingsForm()
+    repo = UserSettingRepository(db.session)
+
+    if form.validate_on_submit():
+        for field in form:
+            if field.id not in ("csrf_token", "submit"):
+                repo.set_value(field.id, field.data)
+        db.session.commit()
+        refresh_global_settings(db.session)
+        flash("Review settings updated.", "success")
+        return redirect("/review/index", 302)
+
+    # Show what is actually stored, so the form is not the only truth.
+    for field in form:
+        if field.id == "csrf_token":
+            continue
+        try:
+            field.data = repo.get_value(field.id)
+        except MissingUserSettingKeyException:
+            # Restored from an older db: keep the form's default.
+            pass
+
+    return render_template(
+        "/review/settings.html",
+        form=form,
+        fsrs_status=scheduler.fsrs_status(),
+        counts=service.counts(db.session),
+    )
 
 
 @bp.route("/sync", methods=["POST"])
