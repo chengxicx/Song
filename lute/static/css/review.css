@@ -1,12 +1,61 @@
-/* Review queue pages. */
+/* Review queue pages.
+   Surfaces are derived from the theme tokens with color-mix, so the
+   pages read correctly on both light and dark themes (same guard-var
+   approach as the grammar panel in styles.css). */
+
+/* Review-local tokens, declared once on body so every review surface
+   (index table, builder, session card) can read them.  Namespaced to
+   avoid clashing with styles.css. */
+body {
+  --r-card: color-mix(in srgb, var(--font-color, #000) 4%, transparent);
+  --r-border: color-mix(in srgb, var(--font-color, #000) 14%, transparent);
+  --r-text-2: color-mix(in srgb, var(--font-color, #000) 60%, transparent);
+  --r-accent: var(--btn-accent, #007aff);
+  --r-accent-soft: color-mix(in srgb, var(--r-accent) 12%, transparent);
+}
 
 .review-status {
   margin-bottom: 10px;
 }
 
 .review-hint {
-  color: #888;
+  color: var(--r-text-2, #888);
   font-size: 0.9em;
+}
+
+/* ---------- review index ---------- */
+
+.review-stats {
+  display: flex;
+  gap: 28px;
+  align-items: flex-end;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+
+.review-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.review-stat-value {
+  font-size: 2em;
+  line-height: 1.1;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.review-stat-label {
+  font-size: 0.85em;
+  color: var(--r-text-2, #888);
+}
+
+.review-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 24px;
+  flex-wrap: wrap;
 }
 
 .review-specs {
@@ -17,83 +66,371 @@
 .review-specs th,
 .review-specs td {
   text-align: left;
-  padding: 4px 12px 4px 0;
+  padding: 6px 16px 6px 0;
+  border-bottom: 1px solid var(--r-border, #eee);
+  vertical-align: top;
+}
+
+.review-specs code {
+  font-size: 0.92em;
+}
+
+/* ---------- criteria builder ---------- */
+
+.criteria-builder {
+  border: 1px solid var(--r-border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  max-width: 720px;
+}
+
+.criteria-builder.criteria-raw {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.criteria-preset {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--r-border);
+}
+
+.criteria-preset label {
+  font-weight: 600;
+}
+
+.criteria-preset select {
+  min-width: 200px;
+}
+
+.criteria-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.criteria-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-left: 12px;
+  border-left: 2px solid var(--r-accent-soft);
+}
+
+.criteria-row .cb-field {
+  min-width: 150px;
+}
+
+.criteria-row .cb-op {
+  min-width: 90px;
+}
+
+.criteria-row .cb-value {
+  min-width: 140px;
+  flex: 1 1 auto;
+  max-width: 260px;
+}
+
+.criteria-row .cb-remove {
+  border: none;
+  background: none;
+  color: var(--r-text-2);
+  font-size: 1.2em;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.criteria-row .cb-remove:hover {
+  color: #e03131;
+}
+
+.criteria-empty {
+  color: var(--r-text-2);
+  margin: 4px 0 10px;
+  padding-left: 12px;
+}
+
+.criteria-warning {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #f08c00;
+  background: color-mix(in srgb, #f08c00 10%, transparent);
+  font-size: 0.9em;
+}
+
+.criteria-preview {
+  margin: 8px 0 0;
+  font-size: 0.9em;
+  color: var(--r-text-2);
+}
+
+.criteria-preview code {
+  color: var(--font-color, #000);
+}
+
+#criteria_advanced summary {
+  cursor: pointer;
+  color: var(--r-text-2);
+  font-size: 0.9em;
+}
+
+#criteria_advanced .form-largetextarea {
+  width: 100%;
+  max-width: 720px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ---------- review session ---------- */
+
+.rv-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 720px;
+  margin: 16px auto 0;
+}
+
+.rv-progress {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rv-progress-track {
+  flex: 1 1 auto;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--r-card);
+  overflow: hidden;
+}
+
+.rv-progress-fill {
+  height: 100%;
+  background: var(--r-accent);
+  transition: width 0.2s ease;
+}
+
+.rv-progress-text {
+  font-size: 0.85em;
+  color: var(--r-text-2);
+  font-variant-numeric: tabular-nums;
 }
 
 #review_card {
-  max-width: 700px;
-  margin: 20px auto;
+  max-width: 720px;
+  margin: 16px auto 40px;
+}
+
+.rv-card {
+  border: 1px solid var(--r-border);
+  border-radius: 10px;
+  background: var(--panel-bg, #fff);
+  padding: 26px 24px;
   text-align: center;
 }
 
-.review-front-term,
-.review-back-term {
-  font-size: 2.2em;
-  margin: 20px 0;
+.rv-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
-.review-front-translation {
-  font-size: 1.4em;
-  margin: 20px 0;
+.rv-badge {
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  color: var(--r-accent);
+  background: var(--r-accent-soft);
 }
 
-.review-front-sentence,
-.review-sentence {
+.rv-prompt {
+  font-size: 0.85em;
+  color: var(--r-text-2);
+}
+
+.rv-term {
+  font-size: 2.4em;
+  line-height: 1.3;
+  margin: 14px 0;
+}
+
+.rv-translation-front {
+  font-size: 1.5em;
+  line-height: 1.4;
+  margin: 14px 0;
+}
+
+.rv-sentence {
   font-size: 1.3em;
-  line-height: 1.8;
-  margin: 20px 0;
+  line-height: 1.9;
+  margin: 14px 0;
 }
 
-.cloze-blank {
-  background: var(--highlight, #ffee99);
-  padding: 0 6px;
-  border-radius: 3px;
-}
-
-.review-typing {
+.rv-typing {
   font-size: 1.3em;
-  padding: 6px 10px;
-  width: 60%;
-  margin: 10px 0;
+  padding: 8px 12px;
+  width: 70%;
+  max-width: 420px;
+  margin: 8px 0 14px;
+  border: 1px solid var(--r-border);
+  border-radius: var(--form-border-radius, 3px);
+  background: var(--background-color, #fff);
+  color: var(--font-color, #000);
+  text-align: center;
 }
 
-.review-actions {
-  margin: 15px 0;
+.rv-typing:disabled {
+  opacity: 0.7;
 }
 
-.review-actions button {
-  margin: 0 5px;
+.rv-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  min-height: 34px;
 }
 
-.review-banner {
-  font-size: 1.2em;
-  font-weight: bold;
+.rv-answer {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--r-border);
 }
 
-.review-ok {
-  color: #2e7d32;
+.rv-answer-term {
+  font-size: 2em;
 }
 
-.review-bad {
-  color: #c62828;
+.rv-banner {
+  font-size: 1.05em;
+  font-weight: 600;
+  margin: 0 0 6px;
 }
 
-.review-reading {
+.rv-ok {
+  color: #2f9e44;
+}
+
+.rv-bad {
+  color: #e03131;
+}
+
+.rv-reading {
   font-style: italic;
-  color: #666;
+  color: var(--r-text-2);
+  margin: 4px 0;
 }
 
-.review-translation {
-  color: #444;
+.rv-translation {
+  color: var(--font-color, #000);
+  opacity: 0.85;
+  margin: 4px 0;
 }
 
-.review-image {
+.rv-image {
   max-width: 300px;
   max-height: 200px;
   display: block;
-  margin: 10px auto;
+  margin: 12px auto;
 }
 
-.review-grade {
-  margin: 0 4px;
+.rv-grades {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+/* Anki's colours, so the muscle memory carries over. */
+.rv-grade-1 { --rv-grade: #e03131; }
+.rv-grade-2 { --rv-grade: #f08c00; }
+.rv-grade-3 { --rv-grade: #2f9e44; }
+.rv-grade-4 { --rv-grade: #1971c2; }
+
+.rv-grade {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  /* Equal shares of the row, so the four never wrap onto two lines. */
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--rv-grade, var(--r-border));
+  color: var(--rv-grade, inherit);
+  background: color-mix(in srgb, var(--rv-grade, #888) 8%, transparent);
+  cursor: pointer;
+  font: inherit;
+}
+
+.rv-grade:hover {
+  background: color-mix(in srgb, var(--rv-grade, #888) 20%, transparent);
+}
+
+.rv-grade:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.rv-grade-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rv-grade-key {
+  font-size: 0.7em;
+  opacity: 0.6;
+}
+
+.rv-done {
+  text-align: center;
+  font-size: 1.1em;
+}
+
+.rv-error {
+  max-width: 720px;
+  margin: 20px auto;
+  padding: 12px 16px;
+  border: 1px solid #e03131;
+  border-radius: 8px;
+  background: color-mix(in srgb, #e03131 8%, transparent);
+  text-align: center;
+}
+
+kbd {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 5px;
+  border: 1px solid var(--r-border, #ccc);
+  border-radius: 4px;
+  font-size: 0.72em;
+  font-family: inherit;
+  opacity: 0.7;
+}
+
+/* Cloze blank, server-rendered into the sentence. */
+.cloze-blank {
+  background: var(--highlight, #ffee99);
+  color: #000;
+  padding: 0 8px;
+  border-radius: 3px;
 }

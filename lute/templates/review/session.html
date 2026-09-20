@@ -6,11 +6,14 @@
 {% block body %}
 
 <div id="review_session_container">
-  <p id="review_progress"></p>
+  <div class="rv-topbar">
+    <div id="review_progress" class="rv-progress"></div>
+    <button class="btn btn-secondary" id="review_undo" hidden>Undo <kbd>Ctrl+Z</kbd></button>
+  </div>
   <div id="review_card"></div>
 </div>
 
-<div id="review_session_error" style="display: none;"></div>
+<div id="review_session_error" class="rv-error" style="display: none;"></div>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {

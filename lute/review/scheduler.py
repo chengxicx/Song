@@ -12,9 +12,10 @@ works without the package; only scheduling a review needs it.
 
 import importlib.metadata
 import importlib.util
+import json
 import subprocess
 import sys
-from datetime import timezone
+from datetime import datetime, timezone
 
 # py-fsrs 4.x was the first release under the 'fsrs' name on PyPI;
 # anything below that is an abandoned unrelated package.
@@ -211,10 +212,54 @@ def _fmt(value):
 
 
 def log_snapshot(flog):
-    "JSON snapshot of a py-fsrs ReviewLog, for future optimizer imports."
+    "Snapshot of a py-fsrs ReviewLog as a dict, for future optimizer imports."
     try:
-        return flog.to_json()
+        return json.loads(flog.to_json())
     except (AttributeError, TypeError, ValueError):
+        return None
+
+
+def card_state(dbcard):
+    """
+    The persisted scheduling state as a JSON-able dict.
+
+    Saved alongside each review log so the grading can be reversed
+    exactly; fsrs itself cannot reconstruct the previous state.
+    """
+    return {
+        "due": _iso(dbcard.due),
+        "state": int(dbcard.state or 0),
+        "stability": dbcard.stability,
+        "difficulty": dbcard.difficulty,
+        "last_review": _iso(dbcard.last_review),
+        "reps": int(dbcard.reps or 0),
+        "lapses": int(dbcard.lapses or 0),
+    }
+
+
+def restore_card(dbcard, state):
+    "Put a card_state() dict back onto the row (undo)."
+    dbcard.due = _from_iso(state.get("due"))
+    dbcard.state = int(state.get("state") or 0)
+    dbcard.stability = state.get("stability")
+    dbcard.difficulty = state.get("difficulty")
+    dbcard.last_review = _from_iso(state.get("last_review"))
+    dbcard.reps = int(state.get("reps") or 0)
+    dbcard.lapses = int(state.get("lapses") or 0)
+
+
+def _iso(dt):
+    "Naive-UTC datetime -> ISO string, or None."
+    return dt.isoformat() if dt is not None else None
+
+
+def _from_iso(s):
+    "ISO string -> naive-UTC datetime, or None."
+    if not s:
+        return None
+    try:
+        return _naive(datetime.fromisoformat(s))
+    except (TypeError, ValueError):
         return None
 
 
