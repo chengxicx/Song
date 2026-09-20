@@ -326,14 +326,38 @@ def check_book_table(luteclient, content):
     assert content == luteclient.get_book_table_content()
 
 
+def _assert_settles(expected, getter):
+    """
+    Poll ``getter`` until it matches ``expected``, then assert.
+
+    These steps read the db directly, so they can race the write they are
+    checking.  The start date is the worst case: it is set by a
+    fire-and-forget browser beacon -- read/index.html
+    _updateStartDateIfNeeded posts to /read/update_start_date on
+    beforeunload and visibilitychange -- so the write can land just after
+    the step that triggered it.  (Read dates come from a synchronous post,
+    but reading them right after the click can still outrun the request.)
+    """
+    timeout = float(os.environ.get("LUTE_TEST_READ_TIMEOUT", 15))
+    poll_frequency = 0.25
+    start_time = time.time()
+    actual = getter()
+    while actual != expected and time.time() - start_time < timeout:
+        time.sleep(poll_frequency)
+        actual = getter()
+    assert expected == actual
+
+
 @then(parsers.parse("book pages with start dates are:\n{content}"))
 def book_page_start_dates_are(luteclient, content):
-    assert content == luteclient.get_book_page_start_dates()
+    "Start dates come from an async page beacon, so let them land."
+    _assert_settles(content, luteclient.get_book_page_start_dates)
 
 
 @then(parsers.parse("book pages with read dates are:\n{content}"))
 def book_page_read_dates_are(luteclient, content):
-    assert content == luteclient.get_book_page_read_dates()
+    "Check the recorded read dates."
+    _assert_settles(content, luteclient.get_book_page_read_dates)
 
 
 # Terms
@@ -396,16 +420,27 @@ def check_exported_file(luteclient, content):
 def then_read_content(luteclient, content):
     "Check rendered content."
     c = content.replace("\n", "/")
-    timeout = 3  # seconds
+
+    # The pane is repopulated by ajax whenever the page or term state
+    # changes, so poll until the rendered text settles.
+    #
+    # Note the re-read _inside_ the loop: the previous version called
+    # displayed_text() once, before the loop, and never refreshed it --
+    # so the loop only slept, and the assert then ran against that stale
+    # pre-wait snapshot.  On a loaded CI runner that surfaced as a
+    # different handful of tests failing on every retry, which the
+    # nick-fields/retry wrapper in ci.yml only masked.
+    #
+    # A wider cap is safe: the loop exits as soon as the text matches, so
+    # it costs nothing on a warm machine.
+    timeout = float(os.environ.get("LUTE_TEST_READ_TIMEOUT", 15))
     poll_frequency = 0.25
     start_time = time.time()
     displayed = luteclient.displayed_text()
-    while time.time() - start_time < timeout:
-        if c == displayed:
-            break
+    while displayed != c and time.time() - start_time < timeout:
         time.sleep(poll_frequency)
-    else:
-        assert c == displayed
+        displayed = luteclient.displayed_text()
+    assert c == displayed
 
 
 @when(parsers.parse("I change the current text content to:\n{content}"))
