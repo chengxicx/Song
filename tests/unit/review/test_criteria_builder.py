@@ -162,7 +162,12 @@ def test_builder_meta_shape(empty_db, spanish):
     assert "Spanish" in meta["languages"]
     assert "vocab" in meta["tags"]
     assert meta["has_options"] == ["image"]
-    assert meta["default_preset"] == cb.DEFAULT_PRESET_ID
+    # No "default preset" is sent: the builder names the preset by
+    # matching the serialized criteria against each option's own
+    # criteria.  That is the only mechanism that is also right on the
+    # edit page, and a key written but never read is what made the
+    # preset dropdown look broken once already.
+    assert "default_preset" not in meta
     # Statuses come from the statuses table, labelled "id - name".
     assert any(s["value"] == "99" for s in meta["statuses"])
     assert all(set(s) == {"value", "label"} for s in meta["statuses"])
