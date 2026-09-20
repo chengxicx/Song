@@ -128,7 +128,6 @@ def _demo_meta():
         "languages": DEMO_LANGUAGES,
         "tags": DEMO_TAGS,
         "presets": cb.presets(DEMO_LANGUAGES, DEMO_TAGS),
-        "default_preset": cb.DEFAULT_PRESET_ID,
     }
 
 
