@@ -5,12 +5,15 @@ Testing management functions.
 """
 
 import pytest
+from datetime import datetime
 from sqlalchemy import text
 from lute.db import db
 from lute.models.setting import UserSetting
 from lute.models.repositories import UserSettingRepository
+from lute.models.review import ReviewSpec, ReviewCard, ReviewLog
 from lute.db.management import delete_all_data, add_default_user_settings
 from tests.dbasserts import assert_record_count_equals
+from tests.utils import add_terms
 
 
 def test_wiping_db_clears_out_all_tables(app_context):
@@ -52,6 +55,36 @@ def test_can_get_backup_settings_when_db_is_wiped(app_context):
     bs = repo.get_backup_settings()
     assert bs.backup_enabled, "backup is back to being enabled"
     assert bs.backup_dir is not None, "default restored"
+
+
+def test_wiping_db_clears_out_review_data(app_context, spanish):
+    """
+    Review specs, cards and logs are data like any other, so "delete
+    everything" has to include them.
+
+    They were missed when the review tables were added, and nothing
+    cascades into reviewspecs -- it has no foreign key to languages -- so
+    a spec survived every wipe.  That is not just untidy: the acceptance
+    suite wipes the db before each scenario, so a leftover spec made a
+    scenario fail on its second run after passing on its first.
+    """
+    # pylint: disable=unbalanced-tuple-unpacking
+    [term] = add_terms(spanish, ["gato"])
+    spec = ReviewSpec(name="Everything", criteria="")
+    db.session.add(spec)
+    db.session.commit()
+
+    card = ReviewCard(term_id=term.id, card_type="recognition", spec_id=spec.id)
+    db.session.add(card)
+    db.session.commit()
+
+    db.session.add(ReviewLog(card_id=card.id, review_time=datetime.now(), rating=3))
+    db.session.commit()
+
+    delete_all_data(db.session)
+
+    for t in ("reviewspecs", "reviewcards", "reviewlogs"):
+        assert_record_count_equals(t, 0, t)
 
 
 @pytest.fixture(name="us_repo")
