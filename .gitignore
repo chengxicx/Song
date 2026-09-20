@@ -179,3 +179,5 @@ lute/themes/css/Boox_Leaf5C.css
 .workbuddy-ai/
 .zcode/
 .trae/
+# pytest --basetemp target used when /tmp is unavailable
+.pytest-tmp/
