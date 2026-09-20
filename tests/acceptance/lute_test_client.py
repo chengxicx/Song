@@ -14,6 +14,7 @@ This module is "registered" to pytest in ./__init__.py
 to get nicer assertion details.
 """
 
+import os
 import time
 import json
 import requests
@@ -82,6 +83,26 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     def click_link(self, linktext):
         self.page.locator(f'text="{linktext}"').click()
 
+    def wait_for_page_text(self, text, timeout=None):
+        """
+        Wait until the page's HTML contains text, and return that HTML.
+
+        A helper that acts and then checks used to read page.content()
+        once, so a response still in flight looked like a wrong result.
+        That is what made this suite flaky -- a different scenario red on
+        each run, which the retry wrapper in ci.yml only masked.  Poll
+        instead: the loop exits as soon as the text matches, so a warm
+        machine pays nothing.
+        """
+        if timeout is None:
+            timeout = float(os.environ.get("LUTE_TEST_READ_TIMEOUT", 15))
+        deadline = time.time() + timeout
+        content = self.page.content()
+        while text not in content and time.time() < deadline:
+            time.sleep(0.25)
+            content = self.page.content()
+        return content
+
     ################################3
     # Languages
 
@@ -95,8 +116,10 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
         # Partial text match for link
         self.page.get_by_role("link", name=langname, exact=False).click()
-        time.sleep(0.1)  # hack
-        assert f"Edit {langname}" in self.page.content()
+        # Poll for the edit form: the link's response can still be in
+        # flight, and a fixed sleep is just a race with a shorter fuse.
+        content = self.wait_for_page_text(f"Edit {langname}")
+        assert f"Edit {langname}" in content
 
         updates = updates or {}
         for k, v in updates.items():
