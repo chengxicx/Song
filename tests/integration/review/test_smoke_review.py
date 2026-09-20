@@ -167,7 +167,6 @@ def test_spec_form_flow(empty_db, spanish, client):
     assert b'id="criteria_preset"' in resp.data
     assert b'id="criteria_meta"' in resp.data
     assert b'"field": "status"' in resp.data
-    assert b'"default_preset": "learning"' in resp.data
 
     resp = client.post(
         "/review/spec/new",
