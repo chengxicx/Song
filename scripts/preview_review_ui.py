@@ -37,7 +37,6 @@ META = {
     "tags": DEMO_TAGS,
     "has_options": cb._HAS_OPTIONS,  # pylint: disable=protected-access
     "presets": cb.presets(DEMO_LANGUAGES, DEMO_TAGS),
-    "default_preset": cb.DEFAULT_PRESET_ID,
 }
 
 INITIAL = cb.parse_criteria(cb.default_criteria())

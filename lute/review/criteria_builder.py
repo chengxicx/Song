@@ -392,6 +392,14 @@ def builder_meta(session, language_names):
 
     The routes pass this to the template; the JS reads it from a JSON
     script tag, so no template logic has to know about fields or ops.
+
+    There is deliberately no "default preset" key.  The builder names
+    the preset by matching the serialized criteria against each option's
+    own criteria, which is the only thing that is also correct on the
+    edit page, where the spec's criteria need not be the default.  One
+    used to be sent here; the JS never read it, and a value that is
+    written but never read is how the preset dropdown came to look
+    broken in the first place.
     """
     tag_names = _tag_options(session)
     return {
@@ -402,5 +410,4 @@ def builder_meta(session, language_names):
         "tags": tag_names,
         "has_options": _HAS_OPTIONS,
         "presets": presets(language_names, tag_names),
-        "default_preset": DEFAULT_PRESET_ID,
     }
