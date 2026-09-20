@@ -79,8 +79,12 @@ def main():
     print(f"terms (langid {args.langid})      : {total}")
     print(f"  all-hiragana, lemma-less      : {len(kana)} ({pct(len(kana))})")
     print(f"  would get a parent            : {len(linked)} ({pct(len(linked))})")
-    print(f"    of those, status 0          : {sum(1 for _t, _l, s in linked if s == 0)}")
-    print(f"    multi-token (concatenated)  : {len(multi)} ({len(multi) / max(len(linked), 1) * 100:.1f}% of linked)")
+    print(
+        f"    of those, status 0          : {sum(1 for _t, _l, s in linked if s == 0)}"
+    )
+    print(
+        f"    multi-token (concatenated)  : {len(multi)} ({len(multi) / max(len(linked), 1) * 100:.1f}% of linked)"
+    )
     print(f"  parent terms that don't exist : {len(new_parents)} distinct texts")
     print(f"    term rows this would add    : {sum(new_parents.values())} at most")
     if garbled:
@@ -120,10 +124,16 @@ def _vis(text):
 
 def _parse_args():
     p = argparse.ArgumentParser(description="Probe term/lemma (parent) coverage.")
-    p.add_argument("--db", required=True, help="Lute SQLite database (opened read-only).")
+    p.add_argument(
+        "--db", required=True, help="Lute SQLite database (opened read-only)."
+    )
     p.add_argument("--langid", type=int, default=13, help="Language id to probe.")
-    p.add_argument("--samples", type=int, default=10, help="Rows to sample per section.")
-    p.add_argument("--seed", type=int, default=3, help="Sampling seed, for stable reports.")
+    p.add_argument(
+        "--samples", type=int, default=10, help="Rows to sample per section."
+    )
+    p.add_argument(
+        "--seed", type=int, default=3, help="Sampling seed, for stable reports."
+    )
     argv = sys.argv[1:]
     return p.parse_args(argv)
 
