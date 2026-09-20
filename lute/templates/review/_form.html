@@ -19,13 +19,8 @@
 </div>
 {% endfor %}
 
-<p>
-  Criteria use the same syntax as Anki exports:
-  <code>status &gt; 1</code>, <code>language == "Japanese"</code>,
-  <code>tags:["vocab"]</code>, <code>parents.count &gt;= 1</code>,
-  combined with <code>and</code> / <code>or</code>.
-  Language names in this Lute: {{ language_names | join(', ') }}.
-</p>
+<script type="application/json" id="criteria_meta">{{ builder_meta | tojson }}</script>
+<script type="application/json" id="criteria_initial">{{ builder_rows | tojson }}</script>
 
 <form id="review_spec_form" method="POST">
   {{ form.hidden_tag() }}
@@ -35,12 +30,56 @@
 
     <tr>
       <td>{{ form.name.label(class="form-control-label") }}</td>
-      <td>{{ form.name(class="form-control") }}</td>
+      <td>
+        {{ form.name(class="form-control") }}
+        <div class="review-hint">A label for this rule, e.g. "Level 2 and up".</div>
+      </td>
     </tr>
 
     <tr>
-      <td>{{ form.criteria.label(class="form-control-label") }}</td>
-      <td>{{ form.criteria(class="form-largetextarea") }}</td>
+      <td>Which terms?</td>
+      <td>
+        <div id="criteria_builder" class="criteria-builder">
+
+          <div class="criteria-preset">
+            <label for="criteria_preset">Start from</label>
+            <select id="criteria_preset"></select>
+            <span class="review-hint">Pick one to fill the conditions, then adjust.</span>
+          </div>
+
+          <div class="criteria-head">
+            <span>Include a term when</span>
+            <select id="criteria_joiner">
+              <option value="and">all of these are true</option>
+              <option value="or">any of these is true</option>
+            </select>
+          </div>
+
+          <div id="criteria_rows"></div>
+
+          <button type="button" class="btn btn-secondary" id="criteria_add">
+            + Add condition
+          </button>
+
+          <p class="criteria-warning" id="criteria_warning" hidden></p>
+        </div>
+
+        <details id="criteria_advanced" {% if builder_rows is none %}open{% endif %}>
+          <summary>Advanced: write the criteria directly</summary>
+          <p>
+            Criteria use the same syntax as Anki exports:
+            <code>status &gt; 1</code>, <code>language == "Japanese"</code>,
+            <code>tags:["vocab"]</code>, <code>parents.count &gt;= 1</code>,
+            <code>has:image</code>, combined with <code>and</code> / <code>or</code>.
+            Language names in this Lute: {{ language_names | join(', ') }}.
+          </p>
+          {{ form.criteria(class="form-largetextarea", id="criteria_text") }}
+        </details>
+
+        <p class="criteria-preview">
+          Saved as: <code id="criteria_preview"></code>
+        </p>
+      </td>
     </tr>
 
     <tr>
@@ -49,12 +88,16 @@
         <p>{{ form.card_recognition() }} {{ form.card_recognition.label() }}</p>
         <p>{{ form.card_recall() }} {{ form.card_recall.label() }}</p>
         <p>{{ form.card_cloze() }} {{ form.card_cloze.label() }}</p>
+        <div class="review-hint">Cloze cards need the term to appear in a
+          sentence you have read; terms without one are skipped on sync.</div>
       </td>
     </tr>
 
     <tr>
       <td>{{ form.active.label(class="form-control-label") }}</td>
-      <td>{{ form.active(class="form-control") }}</td>
+      <td>{{ form.active(class="form-control") }}
+        <div class="review-hint">Inactive specs are skipped by Sync queue.</div>
+      </td>
     </tr>
 
   </tbody>
