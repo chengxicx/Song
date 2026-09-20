@@ -18,30 +18,44 @@
 </div>
 <div id="review_install_message"></div>
 
-<p>
-  Due now: <b id="review_due_count">{{ counts.due }}</b> &nbsp;|&nbsp;
-  New remaining: <b id="review_new_remaining">{{ counts.new_remaining }}</b>
-  (max {{ counts.max_new_per_day }}/day, {{ counts.new_allowed_today }} left today)
-</p>
+<div class="review-stats">
+  <div class="review-stat">
+    <span class="review-stat-value" id="review_due_count">{{ counts.due }}</span>
+    <span class="review-stat-label">due now</span>
+  </div>
+  <div class="review-stat">
+    <span class="review-stat-value" id="review_new_remaining">{{ counts.new_remaining }}</span>
+    <span class="review-stat-label">new waiting</span>
+  </div>
+  <div class="review-stat">
+    <span class="review-stat-value">{{ counts.new_allowed_today }}</span>
+    <span class="review-stat-label">new left today
+      <span class="review-hint">(max {{ counts.max_new_per_day }}/day)</span></span>
+  </div>
+</div>
 
-<button class="btn btn-primary" id="btn_start_review"
-        onclick="window.location = '/review/session'; return false;">Start review</button>
-<button class="btn btn-secondary" id="btn_sync_review"
-        onclick="LuteReview.sync();">Sync queue</button>
-<span id="review_sync_message"></span>
+<div class="review-actions-bar">
+  <button class="btn btn-primary" id="btn_start_review"
+          onclick="window.location = '/review/session'; return false;">Start review</button>
+  <button class="btn btn-secondary" id="btn_sync_review"
+          onclick="LuteReview.sync();">Sync queue</button>
+  <a class="btn btn-secondary" id="btn_review_settings"
+     href="/review/settings">Settings</a>
+  <span id="review_sync_message"></span>
+</div>
 
 <h3>Queue specs</h3>
-<p>
-  Specs select which terms become review cards, using the same criteria
-  syntax as Anki exports, e.g.
-  <code>status &gt; 1 and language == "Japanese"</code>
-  (language names: {{ language_names | join(', ') }}).
+<p class="review-hint">
+  Each spec is a rule that decides which terms become review cards.
+  Sync queue is additive: it only ever adds cards, so editing or
+  deactivating a spec never disturbs cards you have already reviewed.
 </p>
+
 <table id="review_specs" class="review-specs">
   <thead>
     <tr>
       <th>Name</th>
-      <th>Criteria</th>
+      <th>Which terms</th>
       <th>Card types</th>
       <th>Active</th>
     </tr>
@@ -50,7 +64,7 @@
     {% for spec in specs_json %}
     <tr>
       <td><a id="review_spec_{{ spec.id }}" href="/review/spec/edit/{{ spec.id }}">{{ spec.name }}</a></td>
-      <td><code>{{ spec.criteria if spec.criteria else '(no criteria)' }}</code></td>
+      <td><code>{{ spec.criteria if spec.criteria else '(all learning terms)' }}</code></td>
       <td>{{ spec.card_types }}</td>
       <td>{{ spec.active }}</td>
     </tr>
@@ -59,6 +73,6 @@
     {% endfor %}
   </tbody>
 </table>
-<p><a href="/review/spec/new">Create new review specification</a></p>
+<p><a class="btn btn-primary" href="/review/spec/new">Create new review specification</a></p>
 
 {% endblock %}
