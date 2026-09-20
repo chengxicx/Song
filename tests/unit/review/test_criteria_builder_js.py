@@ -165,6 +165,29 @@ def test_js_init_selects_the_default_preset():
     assert out["preset_selected"] == cb.DEFAULT_PRESET_ID
 
 
+def test_js_builder_works_when_it_loads_before_its_data():
+    """
+    Regression: the file is loaded from base.html's <head>, but the JSON
+    tags it reads are rendered later, by the form partial in <body>.
+
+    Reading them at load time left META empty, so init() bailed at its
+    "no fields" guard and the builder was completely dead on the real
+    page -- while every other test passed, because they all made the
+    data available from the very first call.
+    """
+    out = _run_harness(
+        {
+            "meta": _demo_meta(),
+            "init": cb.parse_criteria(cb.default_criteria()),
+            "data_deferred": True,
+        }
+    )
+    assert out["preset_count"] > 0, "the preset dropdown stayed empty"
+    assert out["row_count"] == 2
+    assert out["preview"] == cb.default_criteria()
+    assert out["preset_selected"] == cb.DEFAULT_PRESET_ID
+
+
 def test_js_preset_selection_drops_when_conditions_are_edited():
     "Once the conditions are hand-edited, no preset describes them."
     out = _run_harness(
