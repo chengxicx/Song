@@ -6,6 +6,7 @@ sentence comes from real read sentences via SentenceLookup, with the
 term wrapped in <b></b>; cloze fronts blank those <b> spans.
 """
 
+import json
 import re
 import unicodedata
 from datetime import datetime, time, timezone
@@ -109,7 +110,7 @@ def start_session(session):
     cards = [
         _card_view(card, lookup, sched, now_aware) for card in due_cards + new_cards
     ]
-    return {"counts": c, "cards": cards}
+    return {"counts": c, "cards": cards, "undo": undo_info(session)}
 
 
 def _card_view(dbcard, lookup, sched, now_aware):
@@ -195,6 +196,9 @@ def grade(session, card_id, rating_int, typed_answer=None):
     now_aware = _utcnow_aware()
     fcard = scheduler.load_card(card)
     reps_before = card.reps
+    # The pre-review state has to be recorded here: fsrs cannot work
+    # backwards from the new state, so undo would otherwise be lossy.
+    state_before = scheduler.card_state(card)
     new_fcard, flog = sched.review_card(
         fcard, scheduler.rating_value(rating_int), now_aware
     )
@@ -206,7 +210,9 @@ def grade(session, card_id, rating_int, typed_answer=None):
             review_time=now_aware.replace(tzinfo=None),
             rating=rating_int,
             reps_before=reps_before,
-            data=scheduler.log_snapshot(flog),
+            data=json.dumps(
+                {"before": state_before, "log": scheduler.log_snapshot(flog)}
+            ),
         )
     )
     session.commit()
@@ -216,4 +222,77 @@ def grade(session, card_id, rating_int, typed_answer=None):
         "answer": (card.term.text or "").replace(ZWS, ""),
         "state": int(new_fcard.state),
         "due": card.due.isoformat() if card.due else None,
+        "undo": undo_info(session),
+    }
+
+
+def _last_log(session):
+    "The most recent grading, or None."
+    return session.query(ReviewLog).order_by(ReviewLog.id.desc()).first()
+
+
+def _log_payload(log):
+    "The RlData envelope as a dict, tolerating old or broken rows."
+    try:
+        payload = json.loads(log.data or "{}")
+    except (TypeError, ValueError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def undo_info(session):
+    """
+    What an undo would reverse, or None when there is nothing to undo.
+
+    Gradings recorded before undo existed have no 'before' snapshot
+    and are reported as not undoable.
+    """
+    log = _last_log(session)
+    if log is None:
+        return None
+    if not _log_payload(log).get("before"):
+        return None
+    card = session.get(ReviewCard, log.card_id)
+    if card is None:
+        return None
+    return {
+        "card_id": card.id,
+        "card_type": card.card_type,
+        "term_text": (card.term.text or "").replace(ZWS, "") if card.term else "",
+        "rating": log.rating,
+    }
+
+
+def undo_last(session):
+    """
+    Reverse the most recent grading: restore the card's scheduling
+    state and drop the log row, so today's new-card count goes back too.
+
+    Raises ValueError when there is nothing that can be undone.
+    """
+    log = _last_log(session)
+    if log is None:
+        raise ValueError("There is nothing to undo.")
+    before = _log_payload(log).get("before")
+    if not before:
+        raise ValueError(
+            "That grading was recorded before undo was supported, so it "
+            "cannot be reversed."
+        )
+    card = session.get(ReviewCard, log.card_id)
+    if card is None:
+        raise ValueError("The graded card no longer exists.")
+
+    # Read everything off the log before deleting it: after the commit
+    # the instance is gone and its attributes are no longer loadable.
+    rating = log.rating
+    scheduler.restore_card(card, before)
+    session.delete(log)
+    session.commit()
+    return {
+        "card_id": card.id,
+        "card_type": card.card_type,
+        "term_text": (card.term.text or "").replace(ZWS, "") if card.term else "",
+        "rating": rating,
+        "undo": undo_info(session),
     }
