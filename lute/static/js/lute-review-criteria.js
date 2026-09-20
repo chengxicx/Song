@@ -253,6 +253,23 @@ window.LuteReviewCriteria = (function () {
     els.builder.classList.toggle("criteria-raw", is_raw);
     els.warning.hidden = !is_raw;
     if (message) els.warning.textContent = message;
+    // Text the builder can't show came from no preset.
+    if (is_raw && els.preset) els.preset.value = "";
+  }
+
+  /**
+   * Point 'Start from' at the preset these conditions came from, and
+   * back at the placeholder once they have been edited by hand.  Every
+   * preset option carries its own criteria string, so this is an exact
+   * match against what would be saved.
+   */
+  function sync_preset_selection(text) {
+    if (!els.preset) return;
+    const match = Array.prototype.find.call(
+      els.preset.options || [],
+      (o) => o.dataset && o.dataset.criteria === text
+    );
+    els.preset.value = match ? match.value : "";
   }
 
   function sync() {
@@ -260,6 +277,7 @@ window.LuteReviewCriteria = (function () {
     const text = serialize();
     els.text.value = text;
     els.preview.textContent = text || "(all learning terms)";
+    sync_preset_selection(text);
   }
 
   function on_raw_input() {
@@ -272,6 +290,7 @@ window.LuteReviewCriteria = (function () {
       set_raw_mode(false, "");
       render_rows();
       els.preview.textContent = text || "(all learning terms)";
+      sync_preset_selection(serialize());
     } else {
       set_raw_mode(
         true,
