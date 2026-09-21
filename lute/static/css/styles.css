@@ -39,6 +39,14 @@ body {
     --status-98-color: #ee8577;
     --status-99-color: #72da88;
 
+    /* Underline marking the line the player is currently reading, drawn
+       in the reading text itself (see #thetext .lute-playing-line).  Amber,
+       not the accent blue: blue is what this app already uses for the
+       unknown-word text colour and for a hovered word's border, and the
+       mark has to be told apart from both. */
+    --playing-underline-color: #ff9f0a;
+    --playing-underline-pulse-color: #ffc76b;
+
     --form-border-color: #ddd;
     --form-border-radius: 3px;
 
@@ -1407,6 +1415,40 @@ span.textsentence {
      /* The weird "font-size: 0%" prevents excess space between the spans! */
      /* span.textitem then re-sets the font size for the words. */
     font-size: 0%;
+}
+
+/* The line the player is reading, underlined in the page text itself so
+   the reader can follow along there and not only in the player's
+   subtitle strip.  Applied by static/js/lute-playing-line.js: to the
+   sentence span for the TTS player, to the paragraph for a media book
+   (where one line is one subtitle cue).
+
+   The thickness and offset are explicit on purpose: a sentence span is
+   font-size: 0%, and an "auto" thickness resolves against that font and
+   paints nothing.  The colour breathes while it is on -- a plain
+   underline is easy to lose among the status backgrounds. */
+#thetext .lute-playing-line {
+    text-decoration: underline;
+    text-decoration-color: var(--playing-underline-color, #ff9f0a);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    animation: lute-playing-underline 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes lute-playing-underline {
+    from {
+        text-decoration-color: var(--playing-underline-color, #ff9f0a);
+    }
+
+    to {
+        text-decoration-color: var(--playing-underline-pulse-color, #ffc76b);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #thetext .lute-playing-line {
+        animation: none;
+    }
 }
 
 /* A word shown in the reading pane.  This is also the first-run default:
