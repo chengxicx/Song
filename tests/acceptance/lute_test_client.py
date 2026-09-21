@@ -527,6 +527,11 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                    done: !!card && card.textContent.indexOf("Session done") >= 0,
                    progress: progress ? progress.textContent.trim() : "",
                    undo_available: !!undo && !undo.hidden,
+                   // `hidden` alone is not enough: any stylesheet that
+                   // sets `display` on the element beats the UA rule
+                   // and leaves a "hidden" button on screen.  Ask the
+                   // layout engine instead.
+                   undo_visible: !!undo && undo.getClientRects().length > 0,
                    error:
                      err && err.style.display !== "none"
                        ? err.textContent.trim()

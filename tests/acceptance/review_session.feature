@@ -27,6 +27,9 @@ Feature: Review session
         Then the review dashboard shows 1 new card waiting
         Given I visit "/review/session"
         Then the review card shows the term "gato"
+        # Nothing has been graded yet, so Undo must not be on screen at
+        # all -- not merely flagged hidden in the markup.
+        And the undo button is hidden
         When I reveal the review answer
         And I grade the card "Good"
         Then the review session is done
