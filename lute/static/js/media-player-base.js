@@ -267,6 +267,9 @@
 
     function ytActivateCue(idx) {
       if (options.beforeActivateCue) options.beforeActivateCue(idx);
+      // Underline this cue's line in the reading text, so the reader can
+      // follow along in the page and not only in the subtitle above it.
+      ytMarkPlayingLine(idx);
       // Single-line scrolling subtitle, reusing the reading-page word
       // spans.  If the word HTML hasn't been loaded yet (WORDS is
       // empty), fall back to the plain cue text so the user sees
@@ -333,7 +336,21 @@
       }
     }
 
+    // Underline the cue's line in the page text (#thetext).  The page's
+    // lines are the cue lines, one <p> each, and the cue index of every
+    // line was handed over by the server (window.LUTE_PAGE_CUE_MAP); the
+    // helper resolves it against the current page and falls back to
+    // matching the cue text.  A cue that is not on the page being read
+    // marks nothing, which is the honest answer while the reader is
+    // somewhere else in the book.
+    function ytMarkPlayingLine(idx) {
+      if (!window.LutePlayingLine) return;
+      var cue = CUES[idx];
+      window.LutePlayingLine.setCueIndex(idx, cue ? cue.text : "");
+    }
+
     function ytDeactivateCue() {
+      if (window.LutePlayingLine) window.LutePlayingLine.clear();
       var rows = els.transcriptList
         ? els.transcriptList.querySelectorAll(".yt-transcript-row")
         : [];

@@ -1,3 +1,11 @@
+{# The cue index of each line on this page, in line order (a media book's
+   text is its cue texts joined by newlines, so one line is one <p>).
+   lute-playing-line.js uses it to underline the line the player is on;
+   empty for books without cues. #}
+<script type="text/javascript">
+  window.LUTE_PAGE_CUE_MAP = {{ page_cue_map | tojson }};
+</script>
+
 {% set sentence_id = 1 %}
 
 {% for para in paragraphs %}
