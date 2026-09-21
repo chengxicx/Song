@@ -1,6 +1,10 @@
 {% extends 'read/term_form_base.html' %}
 
 {% block include_term_form %}
+  {# This document is an iframe: it has no base.html, so the scripts
+     base.html would have brought along have to be loaded here. #}
+  <script type="text/javascript" src="{{ vstatic_js('lute-popups.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-hotkey-utils.js') }}" charset="utf-8"></script>
   {% if term.flash_message %}
     <p class='small-flash-notice'>{{ term.flash_message }}</p>
   {% endif %}
