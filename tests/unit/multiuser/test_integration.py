@@ -41,6 +41,29 @@ def test_unauthenticated_requests_redirect_to_login(mu_client):
     assert resp.status_code == 200
 
 
+def test_public_assets_load_before_login(mu_client):
+    """
+    Assets that are static by nature must load without a session.
+
+    The gate excepts static assets so they load before login, but /sw.js
+    and the web manifests are served from root by their own routes
+    rather than from /static/, so they have to be named too.  Gated, the
+    service worker script answers 302 to the login page and a background
+    update after the session expires fails, leaving the browser on a
+    stale worker.
+    """
+    for path in ("/sw.js", "/manifest.webmanifest", "/manifest.json"):
+        resp = mu_client.get(path)
+        assert resp.status_code == 200, f"{path} must load before login"
+
+    assert "javascript" in mu_client.get("/sw.js").headers["Content-Type"]
+
+    # Not a blanket exemption: real pages are still gated.
+    resp = mu_client.get("/")
+    assert resp.status_code == 302
+    assert "/login" in resp.headers["Location"]
+
+
 def test_login_flow(mu_client):
     resp = mu_client.login("admin", "wrongpass")
     assert resp.status_code == 200, "failed login re-renders the form"
