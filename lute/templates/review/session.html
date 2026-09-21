@@ -24,6 +24,21 @@
   (function () {
     const SRC = "{{ vstatic_js('lute-review.js') | safe }}";
 
+    // One line of facts, because the three ways this fails need three
+    // different fixes: no <script> tag at all means base.html is an old
+    // copy; HTTP 404 means the static file is missing on the server;
+    // a network error means the request never reached it.
+    function facts(status) {
+      const tag = !!document.querySelector('script[src*="lute-review.js"]');
+      return [
+        "script tag in the page: " + (tag ? "yes" : "no"),
+        "re-fetching " + SRC + ": " + status,
+        // Bare identifier: lute-popups.js declares a top-level const,
+        // which is a global binding but NOT a window property.
+        "other first-party JS: LutePopups=" + typeof LutePopups,
+      ].join(" | ");
+    }
+
     function fail(detail) {
       const box = document.getElementById("review_session_error");
       const btn = document.getElementById("review_undo");
@@ -37,22 +52,23 @@
         "<p><a href='/review/index'>Back to review index</a></p>";
     }
 
+    // Loading it by hand recovers a dropped or cache-mangled request --
+    // and also the case where base.html never emitted the tag.
     function rescue() {
       const s = document.createElement("script");
       s.src = SRC;
       s.onload = () => {
         if (typeof LuteReview === "undefined") {
-          fail(SRC + " loaded but did not define LuteReview");
+          fail(facts("loaded, but it did not define LuteReview"));
           return;
         }
         LuteReview.start_session();
       };
-      // onload/onerror give no status, so ask separately: a 404 and a
-      // blocked request are very different problems.
+      // onload/onerror give no status, so ask separately.
       s.onerror = () =>
         fetch(SRC)
-          .then((r) => fail("HTTP " + r.status + " for " + SRC))
-          .catch(() => fail("network error fetching " + SRC));
+          .then((r) => fail(facts("HTTP " + r.status)))
+          .catch(() => fail(facts("network error")));
       document.head.appendChild(s);
     }
 
