@@ -776,6 +776,14 @@ def then_review_session_done(luteclient):
 def then_undo_available(luteclient):
     state = luteclient.review_session_state()
     assert state["undo_available"], state
+    assert state["undo_visible"], state
+
+
+@then("the undo button is hidden")
+def then_undo_hidden(luteclient):
+    state = luteclient.review_session_state()
+    assert not state["undo_available"], state
+    assert not state["undo_visible"], state
 
 
 @when("I undo the last grade")
