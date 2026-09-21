@@ -426,6 +426,15 @@ body {
   text-align: center;
 }
 
+/* The technical detail of a failure (URL, HTTP status): worth showing,
+   but it must not look like part of the message. */
+.rv-detail {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  color: var(--r-text-2, #888);
+  word-break: break-all;
+}
+
 kbd {
   display: inline-block;
   margin-left: 4px;
