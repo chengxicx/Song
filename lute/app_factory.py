@@ -644,7 +644,21 @@ def _create_app(app_config, extra_config):
             return
 
         path = request.path
-        if path == "/login" or path.startswith("/static/") or path == "/favicon.ico":
+        # Static assets are excepted so they load before login.  /sw.js
+        # and the manifests are static files too, but they are served
+        # from root by their own routes rather than from /static/, so
+        # they have to be named here as well: gated, the service worker
+        # script and the manifest answer 302 to the login page, and a
+        # background service-worker update after the session expires
+        # fails -- leaving the browser on a stale worker.
+        public_paths = (
+            "/login",
+            "/favicon.ico",
+            "/sw.js",
+            "/manifest.webmanifest",
+            "/manifest.json",
+        )
+        if path in public_paths or path.startswith("/static/"):
             mu_context.set_current_user(None)
             return
 
