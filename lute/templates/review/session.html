@@ -16,7 +16,24 @@
 <div id="review_session_error" class="rv-error" style="display: none;"></div>
 
 <script>
+  // Everything on this page is built by lute-review.js.  If the script
+  // never arrived -- stale cache, blocked request, half-deployed
+  // static dir -- the page used to sit there showing nothing but the
+  // (hidden) Undo button.  Say so instead.
   document.addEventListener("DOMContentLoaded", () => {
+    if (typeof LuteReview === "undefined") {
+      const box = document.getElementById("review_session_error");
+      const btn = document.getElementById("review_undo");
+      if (btn) btn.hidden = true;
+      if (box) {
+        box.style.display = "block";
+        box.innerHTML =
+          "<p>The review script did not load, so the session cannot start. " +
+          "Reload the page (a hard reload clears a stale cache).</p>" +
+          "<p><a href='/review/index'>Back to review index</a></p>";
+      }
+      return;
+    }
     LuteReview.start_session();
   });
 </script>
