@@ -4,6 +4,10 @@
 
 {% block body %}
 
+{# Marks the line the player is reading in the page text (#thetext).
+   Used by the media players below and by the TTS player. #}
+<script type="text/javascript" src="{{ vstatic_js('lute-playing-line.js') }}" charset="utf-8" defer></script>
+
 {# Shared engine for the media/subtitle players; must load before the
    youtube/bilibili player files below. #}
 <script type="text/javascript" src="{{ vstatic('js/media-player-base.js') }}" charset="utf-8" defer></script>
