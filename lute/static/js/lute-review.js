@@ -124,7 +124,33 @@ window.LuteReview = (function () {
 
   /* ---------- session ---------- */
 
+  function nothing_due_html(counts) {
+    // Say *why* the queue is empty: "new waiting" with nothing served
+    // means the daily new-card limit is the reason, and that is not
+    // obvious from "Nothing due".
+    const c = counts || {};
+    const bits = [];
+    if (c.new_remaining > 0 && !c.new_allowed_today) {
+      bits.push(
+        `${c.new_remaining} new cards are waiting, but today's limit of ${c.max_new_per_day} is used up`
+      );
+    }
+    if (c.due > 0) {
+      bits.push(`${c.due} cards are due`);
+    }
+    const why = bits.length > 0 ? ` ${bits.join("; ")}.` : "";
+    return `<p class="rv-done">Nothing to review right now.${why}
+      <a href="/review/index">Back to review index</a></p>`;
+  }
+
   async function start_session() {
+    // /review/start builds every card up front, so it can take a
+    // moment.  Without this the page is a blank topbar until it lands,
+    // which reads as "the session is broken".
+    const card = el("review_card");
+    if (card) {
+      card.innerHTML = '<p class="rv-done">Loading your cards ...</p>';
+    }
     try {
       const payload = await post_json("/review/start");
       state.cards = payload.cards;
@@ -132,8 +158,7 @@ window.LuteReview = (function () {
       update_undo(payload.undo);
       if (state.cards.length === 0) {
         el("review_progress").innerHTML = "";
-        el("review_card").innerHTML =
-          '<p class="rv-done">Nothing due.  <a href="/review/index">Back to review index</a></p>';
+        el("review_card").innerHTML = nothing_due_html(payload.counts);
         return;
       }
       show_current();
