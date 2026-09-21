@@ -3,6 +3,16 @@
    pages read correctly on both light and dark themes (same guard-var
    approach as the grammar panel in styles.css). */
 
+/* styles.css sets `display` on .btn, and the session card sets it on
+   .rv-grades -- and any author `display` beats the UA stylesheet's
+   [hidden] rule, so `hidden` elements stayed on screen: the Undo button
+   showed on every session even with nothing to undo (which is all a
+   broken session page has left to show).  Give [hidden] back its say. */
+#review_session_container [hidden],
+.criteria-builder [hidden] {
+  display: none !important;
+}
+
 /* Review-local tokens, declared once on body so every review surface
    (index table, builder, session card) can read them.  Namespaced to
    avoid clashing with styles.css. */
