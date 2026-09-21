@@ -456,6 +456,71 @@ def then_read_content(luteclient, content):
     assert c == displayed
 
 
+@when("I press the TTS player's play button")
+def when_press_tts_play(luteclient):
+    "Start the TTS player, which reads the page's sentences in order."
+    luteclient.start_tts_playback()
+
+
+@then("the line being read is underlined in the reading text")
+def then_playing_line_underlined(luteclient):
+    """
+    The player's current line is marked in the page text itself.
+
+    The players already show the current line in their subtitle strip and
+    highlight it in the transcript; this is the mark in the text the
+    reader is actually reading.
+    """
+    state = luteclient.wait_for_playing_line()
+    assert state["text"], f"the marked line has no text: {state}"
+
+
+@then(parsers.parse('the underlined line shows "{text}"'))
+def then_underlined_line_text(luteclient, text):
+    """
+    The mark is on the line the player is reading, and it is underlined.
+
+    Waits for that line rather than for any mark: a media book's player
+    marks the cue at the playhead as soon as it is ready, so "a line is
+    marked" is already true before the reader has played anything.
+    """
+    luteclient.wait_for_playing_line_text(text)
+
+
+@given(parsers.parse('a {lang} mp3 book "{title}" with subtitles:\n{c}'))
+def given_mp3_book(luteclient, lang, title, c):
+    """
+    A media book: a generated silent audio track plus one subtitle per line.
+
+    A media book's text is its cues' text joined by newlines, so line N of
+    the page is cue N -- which is what makes "play line 2" mean something.
+    """
+    luteclient.make_mp3_book(title, c, lang)
+
+
+@then("the reading page maps its lines to the subtitle cues")
+def then_page_cue_map(luteclient):
+    """
+    The page hands the player the cue index of each of its lines.
+
+    This is the media path's primary way of finding the line to mark: the
+    cue's text is matched against it, and a map that is missing or short
+    leaves only the text fallback.  Asserting it here keeps a scenario that
+    would otherwise pass on the fallback alone from hiding a broken map.
+    """
+    state = luteclient.page_cue_map_state()
+    assert len(state["map"]) == state["paragraphs"], (
+        "every line of the page must be named by the map:"
+        f" {len(state['map'])} entries for {state['paragraphs']} lines"
+    )
+
+
+@when(parsers.parse("I play subtitle line {line_number:d} in the media player"))
+def when_play_subtitle_line(luteclient, line_number):
+    "Play a line from the media player's transcript, as a reader would."
+    luteclient.play_subtitle_line(line_number)
+
+
 @when(parsers.parse("I change the current text content to:\n{content}"))
 def when_change_content(luteclient, content):
     "Change the content."
