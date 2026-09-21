@@ -15,11 +15,67 @@ to get nicer assertion details.
 """
 
 import os
+import re
 import time
 import json
+import textwrap
 import requests
 from playwright.sync_api import Keyboard, Mouse, expect
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+
+# A structurally valid MPEG-1 Layer III stream, synthesized rather than
+# committed as a binary fixture.  The header FF FB 90 00 is MPEG-1,
+# Layer III, no CRC, 128 kbps, 44100 Hz, stereo: 417-byte frames of 1152
+# samples each, so one frame is ~26.1 ms.  The payload is zeroes (silence).
+# A decoder only needs the frame headers, so this plays in a real <audio>
+# element -- Edge reports readyState 4 and a 10.4 s duration for 400
+# frames -- which is what lets an acceptance test drive the real media
+# player without shipping an audio asset.
+_MP3_FRAME = bytes([0xFF, 0xFB, 0x90, 0x00]) + bytes(417 - 4)
+
+
+def silent_mp3_bytes(frames=400):
+    "Silent but playable MP3 audio; the default is ~10.4 seconds."
+    return _MP3_FRAME * frames
+
+
+def normalized_text(value):
+    """Text with whitespace and zero-width spaces removed.
+
+    The reading page's text can't be compared verbatim: the renderer appends
+    a &ZeroWidthSpace; span to every paragraph, and the players inject a 🔊
+    button into every sentence.  The mark's own matching normalizes the same
+    way (see static/js/lute-playing-line.js), so an expectation has to.
+    """
+    return re.sub(r"[\s\u200b]+", "", value or "")
+
+
+def _srt_timestamp(seconds):
+    "A seconds value as an SRT timestamp (HH:MM:SS,mmm)."
+    ms = int(round(seconds * 1000))
+    hours, ms = divmod(ms, 3600000)
+    minutes, ms = divmod(ms, 60000)
+    secs, ms = divmod(ms, 1000)
+    return f"{hours:02d}:{minutes:02d}:{secs:02d},{ms:03d}"
+
+
+def srt_text_for_lines(lines, seconds_per_line=3.0):
+    """An SRT with one cue per line, the cues running back to back from 0.
+
+    One cue per line is the shape a media book's page text has: its text is
+    the cue texts joined by newlines (see lute/book/service.py
+    parse_subtitle_content), so page line N is cue N -- which is what lets a
+    test say "play line 2" and expect line 2 of the page to be marked.
+    """
+    blocks = []
+    for i, text in enumerate(lines):
+        start = i * seconds_per_line
+        blocks.append(
+            f"{i + 1}\n"
+            f"{_srt_timestamp(start)} --> {_srt_timestamp(start + seconds_per_line)}\n"
+            f"{text}\n"
+        )
+    return "\n".join(blocks)
 
 
 class LuteTestClient:  # pylint: disable=too-many-public-methods
@@ -589,6 +645,212 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                      || luteStartReadingDone === true""",
             timeout=timeout,
         )
+
+    def start_tts_playback(self):
+        """Press the TTS player's play button.
+
+        The player reads the page's sentences, and marks the one it starts
+        on in the reading text right away, so the mark can be asserted
+        without waiting for any speech to finish (or to be produced at
+        all -- headless browsers have no voices).
+        """
+        self.wait_reading_ready()
+        self.page.click("#tts-play-btn")
+
+    def playing_line_state(self):
+        "The line marked as playing in #thetext, with its computed decoration."
+        return self.page.evaluate(
+            """() => {
+              const el = document.querySelector("#thetext .lute-playing-line");
+              if (!el) return { found: false };
+              // The sentence carries an injected 🔊 button; it is part of
+              // the markup, not of the line's text.
+              const clone = el.cloneNode(true);
+              clone.querySelectorAll(".lute-sentence-play-btn").forEach(
+                (b) => b.remove()
+              );
+              const cs = getComputedStyle(el);
+              return {
+                found: true,
+                text: (clone.textContent || "").replace(/[\\s\\u200b]+/g, ""),
+                decoration: cs.textDecorationLine,
+                thickness: cs.textDecorationThickness,
+              };
+            }"""
+        )
+
+    def wait_for_playing_line(self, timeout=8000):
+        """Wait for a line to be marked, and assert its underline is drawn.
+
+        `state="attached"`, not the default "visible": the TTS mark lands
+        on a span.textsentence, whose own inline box is zero-height
+        (font-size: 0% -- the words inside carry the size), so Playwright
+        would call it invisible while the underline is plainly on screen.
+        """
+        try:
+            self.page.wait_for_selector(
+                "#thetext .lute-playing-line", state="attached", timeout=timeout
+            )
+        except PlaywrightTimeoutError as ex:
+            raise AssertionError(
+                "no line was marked as playing;"
+                f" page state: {self.player_diagnostics()}"
+            ) from ex
+        state = self.playing_line_state()
+        assert state["decoration"] == "underline", f"line not underlined: {state}"
+        assert state["thickness"] == "2px", f"unexpected underline: {state}"
+        return state
+
+    ################################3
+    # Media player (a book with subtitles) and the playing-line mark
+
+    def make_mp3_book(self, title, subtitle_lines, langname):
+        """Create an mp3 book: a generated silent track plus subtitles.
+
+        The audio is synthesized (silent_mp3_bytes) rather than shipped as a
+        fixture; the subtitles get one cue per line, so line N of the reading
+        page is cue N.
+
+        The two lengths are tied together deliberately: the default audio is
+        ~10.4 s and the cues are 3 s each, so playing line 2 seeks to 3 s and
+        the playhead stays inside that cue for a further 3 s.  A test then has
+        that long to see the mark on the line it asked for, instead of racing
+        playback to the next cue.
+        """
+        lines = [ln.strip() for ln in textwrap.dedent(subtitle_lines).splitlines()]
+        srt = srt_text_for_lines([ln for ln in lines if ln])
+        self.visit("book/import_webpage")
+        # The import-type picker is a custom dropdown, and the mp3 form is
+        # display:none until its type is chosen.
+        self.page.locator("#import-type-button").click()
+        self.page.locator('#import-type-menu [data-value="mp3"]').click()
+        self.page.locator("#mp3_file").set_input_files(
+            {
+                "name": "audio.mp3",
+                "mimeType": "audio/mpeg",
+                "buffer": silent_mp3_bytes(),
+            }
+        )
+        self.page.locator("#mp3_srt_file").set_input_files(
+            {
+                "name": "subtitles.srt",
+                "mimeType": "application/x-subrip",
+                "buffer": srt.encode("utf-8"),
+            }
+        )
+        self.page.fill("#mp3_title", title)
+        self.page.select_option("#mp3-language", str(self.language_ids[langname]))
+        self.page.locator("#mp3-import").click(force=True)
+        self.page.wait_for_selector("#thetext .textsentence", state="attached")
+
+    def page_cue_map_state(self, timeout=4000):
+        """The line -> cue map the page handed the player, and its line count.
+
+        The map is set by a <script> inside the htmx-swapped page fragment,
+        and htmx inserts the swapped nodes before it runs their scripts -- so
+        the global lands a tick AFTER the DOM it arrived with, and reading it
+        once as soon as the text appears finds nothing.  Poll for it.
+        """
+        try:
+            self.page.wait_for_function(
+                "() => Array.isArray(window.LUTE_PAGE_CUE_MAP)", timeout=timeout
+            )
+        except PlaywrightTimeoutError as ex:
+            raise AssertionError(
+                "the reading page never set a line -> cue map;"
+                f" state: {self.player_diagnostics()}"
+            ) from ex
+        return self.page.evaluate(
+            """() => ({
+              map: window.LUTE_PAGE_CUE_MAP,
+              paragraphs: document.querySelectorAll("#thetext > p").length,
+            })"""
+        )
+
+    def player_diagnostics(self):
+        """Live state of the reading page, to explain a mark that never appeared.
+
+        Covers both players: the TTS one (sentences, no audio element) and the
+        media one (a transcript, an audio element, a cue list).
+        """
+        return self.page.evaluate(
+            """() => {
+              const audio = document.querySelector("audio");
+              const data = window.LUTE_YT_DATA || {};
+              return {
+                helper: typeof window.LutePlayingLine,
+                marked: document.querySelectorAll("#thetext .lute-playing-line").length,
+                sentences: document.querySelectorAll("#thetext .textsentence").length,
+                cueMap: window.LUTE_PAGE_CUE_MAP,
+                backend: data.backend,
+                cues: (data.cues || []).length,
+                rows: document.querySelectorAll(
+                  "#yt-transcript-list .yt-transcript-row").length,
+                audioReady: audio ? audio.readyState : null,
+                audioError: audio && audio.error ? audio.error.code : null,
+              };
+            }"""
+        )
+
+    def play_subtitle_line(self, line_number, timeout=15000):
+        """Play a subtitle from the media player's own transcript list.
+
+        This is the UI path the mark has to survive: clicking a transcript row
+        runs ytSeekToCue -> ytActivateCue, and ytActivateCue is what marks the
+        line in the page text.  The rows only exist once the player is ready,
+        so wait for them rather than for a fixed delay -- a 30s timeout would
+        otherwise turn "the player never started" into "no line was marked".
+
+        The click's effect is deferred by one double-click window (see
+        bind_line_click, which lets a double-click select a word instead), so
+        the caller polls for the mark rather than asserting here.
+        """
+        try:
+            self.page.wait_for_selector(
+                "#yt-transcript-list .yt-transcript-row",
+                state="attached",
+                timeout=timeout,
+            )
+        except PlaywrightTimeoutError as ex:
+            raise AssertionError(
+                "the media player never built its transcript;"
+                f" state: {self.player_diagnostics()}"
+            ) from ex
+        self.page.locator("#yt-transcript-btn").click(force=True)
+        rows = self.page.locator("#yt-transcript-list .yt-transcript-row")
+        assert rows.count() >= line_number, (
+            f"asked for subtitle line {line_number}, but the player has"
+            f" {rows.count()} lines: {self.player_diagnostics()}"
+        )
+        rows.nth(line_number - 1).click(force=True)
+
+    def wait_for_playing_line_text(self, text, timeout=8000):
+        """Wait until the marked line is the one holding `text`.
+
+        Poll for the line, not merely for *a* mark: the media player marks
+        the cue the playhead is on as soon as it is ready, so on a media
+        book a line is already marked before anything is played -- a wait
+        that returns on the first mark would pass on the wrong line, and
+        pass even if the click did nothing at all.
+
+        Also asserts the mark is actually drawn, since this is the step
+        that claims the line is underlined.
+        """
+        deadline = time.monotonic() + timeout / 1000.0
+        want = normalized_text(text)
+        state = {}
+        while time.monotonic() < deadline:
+            state = self.playing_line_state()
+            if state.get("found") and state["text"] == want:
+                break
+            time.sleep(0.05)
+        assert state.get("text") == want, (
+            f"the line {text!r} was never the marked one; last state: {state};"
+            f" page state: {self.player_diagnostics()}"
+        )
+        assert state["decoration"] == "underline", f"line not underlined: {state}"
+        assert state["thickness"] == "2px", f"unexpected underline: {state}"
+        return state
 
     def displayed_text(self):
         "Return the TextItems, with '/' at token boundaries."
