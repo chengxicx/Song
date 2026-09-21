@@ -58,6 +58,9 @@
   var taTimer = null;
   var apOn = false;       // auto-pause at the end of each line
   var apIdx = -1;         // the cue being played/watched (for auto-pause)
+  // True while apIdx came from a jump (seekToCue) whose start the playhead
+  // has not reached yet -- see the auto-pause in the timeupdate handler.
+  var apJumped = false;
 
   /* ---------- time formatting / parsing ---------- */
 
@@ -234,6 +237,10 @@
     setActiveRow();
   }
 
+  // Tolerance for comparing cue boundaries: retimed edges that were
+  // shared must stay shared, and a seek that lands a hair before the
+  // time asked for still belongs to the cue it was asked for (see
+  // cueIndexAt).
   var EPS = 0.001;
 
   // Retiming keeps shared boundaries contiguous: when a cue's start
@@ -377,10 +384,10 @@
     var playing = audio && !audio.paused && !audio.ended;
     var idx = -1;
     if (playing) {
-      var t = audio.currentTime;
-      for (var k = 0; k < cues.length; k++) {
-        if (t >= cues[k].start) idx = k;
-      }
+      // The cue just jumped to stays the active one until the playhead
+      // really reaches its start: the seek can land short, and the line
+      // the user clicked is the one playing.
+      idx = apJumped && apIdx >= 0 ? apIdx : cueIndexAt(audio.currentTime);
     }
     var kids = rowsBox.children;
     for (var j = 0; j < kids.length; j++) {
@@ -394,11 +401,20 @@
 
   /* ---------- mini player ---------- */
 
-  // Last cue whose start is at or before t (mirrors setActiveRow).
+  // Last cue whose start is at or before t: which line is highlighted,
+  // and which line the auto-pause watches.
+  //
+  // A seek lands on the audio's own frame grid, which can be a hair
+  // BEFORE the time that was asked for: asking for 1:04.070 leaves the
+  // playhead at 1:04.069998.  Without a tolerance the cue that was just
+  // jumped to would not match its own start, and the playhead would be
+  // attributed to the previous cue -- which is what made a line
+  // unplayable with auto-pause on (the previous cue's end has already
+  // gone by, so the auto-pause stopped the line the moment it started).
   function cueIndexAt(t) {
     var idx = -1;
     for (var k = 0; k < cues.length; k++) {
-      if (t >= cues[k].start) idx = k;
+      if (t >= cues[k].start - EPS) idx = k;
     }
     return idx;
   }
@@ -410,6 +426,7 @@
     if (k > cues.length - 1) k = cues.length - 1;
     audio.currentTime = cues[k].start;
     apIdx = k;
+    apJumped = true;
     setActiveRow();
     if (autoplay && audio.paused) audio.play();
   }
@@ -443,7 +460,10 @@
       apBtn.addEventListener("click", function () {
         apOn = !apOn;
         apBtn.classList.toggle("on", apOn);
-        if (apOn) apIdx = cueIndexAt(audio.currentTime);
+        if (apOn) {
+          apIdx = cueIndexAt(audio.currentTime);
+          apJumped = false;
+        }
       });
     }
     var updBtn = function () {
@@ -460,13 +480,21 @@
       // move to the next cue, whose end would never trigger.
       if (apOn && !audio.paused && apIdx >= 0) {
         var c = cues[apIdx];
-        if (c && t >= c.end) {
-          audio.pause();
-          audio.currentTime = c.start;
-          t = c.start;
+        // Just jumped to this cue and the playhead is still short of its
+        // start?  Stay pinned to it: the seek can land a frame before
+        // the requested time, and re-deriving the index from there would
+        // name the PREVIOUS cue, whose end has already gone by -- the
+        // auto-pause would then stop the line at the instant it starts.
+        if (c && !(apJumped && t < c.start - EPS)) {
+          apJumped = false;
+          if (t >= c.end) {
+            audio.pause();
+            audio.currentTime = c.start;
+            t = c.start;
+          }
         }
       }
-      apIdx = cueIndexAt(t);
+      if (!apJumped) apIdx = cueIndexAt(t);
       curTimeEl.textContent = fmtShort(audio.currentTime);
       if (audio.duration && isFinite(audio.duration)) {
         var pct = (audio.currentTime / audio.duration) * 100;
@@ -486,6 +514,7 @@
       audio.currentTime =
         Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)) * audio.duration;
       apIdx = cueIndexAt(audio.currentTime);
+      apJumped = false;
       setActiveRow();
     });
     updBtn();
