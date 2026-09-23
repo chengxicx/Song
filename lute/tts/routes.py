@@ -227,7 +227,18 @@ def tts_speak(lang, text):
             current_app.logger.exception(
                 "edge-tts synthesis failed (lang=%s, voice=%s)", lang, voice
             )
-            return jsonify({"error": "tts synthesis failed"}), 502
+            # 422, not 502.
+            #
+            # The request is well formed but this voice will not voice it --
+            # edge-tts answers NoAudioReceived for fragments like a lone
+            # closing bracket -- so it cannot be processed.  That is what 422
+            # means, and it has to be a 4xx: this deployment sits behind
+            # Cloudflare, which throws away an origin *5xx* body and answers
+            # with its own "error code: 502" page instead.  Clients that
+            # keyed off the old 502 JSON marker therefore never saw this
+            # signal through the public domain, and surfaced a raw HTTP
+            # exception instead of skipping the fragment and reading on.
+            return jsonify({"error": "tts synthesis failed"}), 422
 
     # The URL carries lang + text, the voice comes from the (lang,
     # voice, text) key, and the file never changes once generated: the
