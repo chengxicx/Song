@@ -51,6 +51,10 @@ VOICE_MAP = {
     "sv": "sv-SE-SofieNeural",
     "uk": "uk-UA-PolinaNeural",
     "no": "nb-NO-PernilleNeural",
+    # "nb" as well as "no": LANG_NAME_TO_CODE maps "norwegian" to "nb-NO",
+    # and voice_for_tag() falls back to the primary subtag ("nb"), which had
+    # no entry -- Norwegian silently got the English voice.
+    "nb": "nb-NO-PernilleNeural",
     "fi": "fi-FI-NooraNeural",
     "da": "da-DK-JeppeNeural",
     "ro": "ro-RO-AlinaNeural",
@@ -58,6 +62,15 @@ VOICE_MAP = {
     "ca": "ca-ES-JoanaNeural",
     "bg": "bg-BG-BorislavNeural",
     "hr": "hr-HR-GabrijelaNeural",
+    # These were missing entirely, so the language fell back to
+    # DEFAULT_VOICE (English) and edge-tts answered NoAudioReceived.
+    "fa": "fa-IR-DilaraNeural",
+    "ms": "ms-MY-YasminNeural",
+    # LANG_NAME_TO_CODE maps "tagalog" to the ISO 639-1 code "tl", which is also
+    # what the translate route needs -- so the fix belongs here, in the
+    # TTS-only voice table, not in LANG_NAME_TO_CODE. edge-tts ships no "tl-*"
+    # voice; the Filipino ones are named "fil-PH-*".
+    "tl": "fil-PH-BlessicaNeural",
     "zh-CN": "zh-CN-XiaoxiaoNeural",
     "zh-TW": "zh-TW-HsiaoChenNeural",
     "zh-HK": "zh-HK-HiuMaanNeural",
@@ -198,8 +211,23 @@ def tts_speak(lang, text):
     filename = hashlib.md5(key.encode("utf-8")).hexdigest() + ".mp3"
     filepath = os.path.join(cache_dir, filename)
 
+    # A zero-byte file is a *failed* synthesis, not a cache hit. edge-tts opens
+    # the destination before contacting the service, so any failure (e.g.
+    # NoAudioReceived when the text doesn't match the voice's language) used to
+    # leave an empty file behind; the next request then saw it as cached and
+    # served 200 with an empty body forever, because the response is marked
+    # immutable. Drop it so the next request retries.
+    if os.path.exists(filepath) and os.path.getsize(filepath) == 0:
+        os.remove(filepath)
+
     if not os.path.exists(filepath):
-        _generate_audio(text, voice, filepath)
+        try:
+            _generate_audio(text, voice, filepath)
+        except Exception:
+            current_app.logger.exception(
+                "edge-tts synthesis failed (lang=%s, voice=%s)", lang, voice
+            )
+            return jsonify({"error": "tts synthesis failed"}), 502
 
     # The URL carries lang + text, the voice comes from the (lang,
     # voice, text) key, and the file never changes once generated: the
@@ -217,17 +245,30 @@ def _generate_audio(text, voice, filepath):
     edge-tts is async, so it is run via asyncio.run() within this sync
     Flask route.
 
-    Returns None on success, or an error tuple on failure.
+    Synthesis is written to a sibling ``.part`` file and renamed into place
+    only once it has produced audio, so a failure can never leave a
+    zero-byte file at *filepath* for later requests to mistake for a
+    cache hit.
+
+    Raises on failure.
     """
     if not _EDGE_TTS_AVAILABLE:
-        return jsonify({"error": "edge-tts not installed"}), 500
+        raise RuntimeError("edge-tts not installed")
+
+    tmp_path = filepath + ".part"
 
     async def _run():
         communicate = edge_tts.Communicate(text, voice)
-        await communicate.save(filepath)
+        await communicate.save(tmp_path)
 
-    asyncio.run(_run())
-    return None
+    try:
+        asyncio.run(_run())
+        if not os.path.exists(tmp_path) or os.path.getsize(tmp_path) == 0:
+            raise RuntimeError("edge-tts produced no audio")
+        os.replace(tmp_path, filepath)
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
 
 
 @bp.route("/api/translate/<sl>/<tl>/<path:text>", methods=["GET"])
