@@ -12,14 +12,12 @@ from flask import (
 )
 
 from lute.db import db
-from lute.models.language import Language
 from lute.models.repositories import (
     MissingUserSettingKeyException,
     UserSettingRepository,
 )
-from lute.models.review import ReviewSpec
-from lute.review import criteria_builder, enqueue, scheduler, service
-from lute.review.forms import ReviewSettingsForm, ReviewSpecForm
+from lute.review import enqueue, scheduler, service
+from lute.review.forms import ReviewSettingsForm
 from lute.review.scheduler import SchedulerUnavailableError
 from lute.settings.current import refresh_global_settings
 
@@ -27,31 +25,16 @@ from lute.settings.current import refresh_global_settings
 bp = Blueprint("review", __name__, url_prefix="/review")
 
 
-def _language_names():
-    "Language names, for the criteria builder's dropdowns."
-    return [lang.name for lang in db.session.query(Language).all()]
-
-
 @bp.route("/index")
 def review_index():
-    "Review dashboard: counts, specs, scheduler status."
-    specs = db.session.query(ReviewSpec).all()
-    specs_json = [
-        {
-            "id": spec.id,
-            "name": spec.name,
-            "criteria": spec.criteria,
-            "card_types": ", ".join(spec.card_types_enabled),
-            "active": "yes" if spec.active else "no",
-        }
-        for spec in specs
-    ]
+    "Review dashboard: counts and scheduler status."
+    # Auto-admit before counting, so the numbers include any learning
+    # terms not yet queued.  Additive and idempotent.
+    enqueue.auto_admit(db.session)
     return render_template(
         "/review/index.html",
         fsrs_status=scheduler.fsrs_status(),
         counts=service.counts(db.session),
-        specs_json=specs_json,
-        language_names=_language_names(),
     )
 
 
@@ -64,27 +47,41 @@ def session_page():
 @bp.route("/settings", methods=["GET", "POST"])
 def review_settings():
     """
-    Review scheduling settings.
+    Review scheduling settings and the global card-type switches.
 
     Field ids are the settings-table keys (see ReviewSettingsForm), so
     the form writes straight through the repository, as
-    lute.settings.routes.edit_settings does.
+    lute.settings.routes.edit_settings does.  The card-type checkboxes
+    are not settings keys; they serialize into review_card_types.
     """
     form = ReviewSettingsForm()
     repo = UserSettingRepository(db.session)
 
     if form.validate_on_submit():
         for field in form:
-            if field.id not in ("csrf_token", "submit"):
+            if field.id not in ("csrf_token", "submit", "card_recognition", "card_cloze"):
                 repo.set_value(field.id, field.data)
+        enabled = [
+            ct
+            for ct, field in (
+                ("recognition", form.card_recognition),
+                ("cloze", form.card_cloze),
+            )
+            if field.data
+        ]
+        enqueue.set_enabled_card_types(db.session, enabled)
         db.session.commit()
         refresh_global_settings(db.session)
         flash("Review settings updated.", "success")
         return redirect("/review/index", 302)
 
+    enabled = enqueue.enabled_card_types(db.session)
+    form.card_recognition.data = "recognition" in enabled
+    form.card_cloze.data = "cloze" in enabled
+
     # Show what is actually stored, so the form is not the only truth.
     for field in form:
-        if field.id == "csrf_token":
+        if field.id in ("csrf_token", "card_recognition", "card_cloze"):
             continue
         try:
             field.data = repo.get_value(field.id)
@@ -98,17 +95,6 @@ def review_settings():
         fsrs_status=scheduler.fsrs_status(),
         counts=service.counts(db.session),
     )
-
-
-@bp.route("/sync", methods=["POST"])
-def sync():
-    "Sync the queue from all active specs, and report."
-    result = enqueue.run_sync(commit=True)
-    if result.errors:
-        response = jsonify(result.as_dict())
-        response.status_code = 400
-        return response
-    return jsonify(result.as_dict())
 
 
 @bp.route("/start", methods=["POST"])
@@ -150,63 +136,3 @@ def scheduler_install():
     "One-click pip install of the fsrs package."
     ok, message = scheduler.install_fsrs()
     return jsonify({"ok": ok, "message": message})
-
-
-def _handle_form(spec, form_template_name):
-    "Handle the spec new/edit form."
-    form = ReviewSpecForm(obj=spec, spec_id=spec.id)
-    if request.method == "GET" and spec.id is not None:
-        enabled = spec.card_types_enabled
-        form.card_recognition.data = "recognition" in enabled
-        form.card_recall.data = "recall" in enabled
-        form.card_cloze.data = "cloze" in enabled
-
-    if form.validate_on_submit():
-        spec.name = form.name.data
-        spec.criteria = form.criteria.data or ""
-        spec.active = form.active.data
-        spec.set_card_types(form.enabled_card_types())
-        db.session.add(spec)
-        db.session.commit()
-        return redirect("/review/index", 302)
-
-    language_names = _language_names()
-    criteria_text = form.criteria.data or ""
-    return render_template(
-        form_template_name,
-        form=form,
-        spec=spec,
-        language_names=language_names,
-        # The builder renders itself from this; None means "this
-        # criteria can't be shown as rows, use the raw textarea".
-        builder_meta=criteria_builder.builder_meta(db.session, language_names),
-        builder_rows=criteria_builder.parse_criteria(criteria_text),
-    )
-
-
-@bp.route("/spec/edit/<int:spec_id>", methods=["GET", "POST"])
-def edit_spec(spec_id):
-    "Edit a spec."
-    spec = db.session.get(ReviewSpec, spec_id)
-    return _handle_form(spec, "/review/edit.html")
-
-
-@bp.route("/spec/new", methods=["GET", "POST"])
-def new_spec():
-    "Make a new spec, pre-filled with the default criteria."
-    spec = ReviewSpec()
-    if spec.active is None:
-        spec.active = True
-    if not spec.criteria:
-        spec.criteria = criteria_builder.default_criteria()
-    return _handle_form(spec, "/review/new.html")
-
-
-@bp.route("/spec/delete/<int:spec_id>", methods=["GET", "POST"])
-def delete_spec(spec_id):
-    "Delete a spec.  Cards already queued are kept."
-    spec = db.session.get(ReviewSpec, spec_id)
-    db.session.delete(spec)
-    db.session.commit()
-    flash("Review spec deleted.  Already-queued cards are kept.")
-    return redirect("/review/index", 302)
