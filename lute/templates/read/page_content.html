@@ -26,7 +26,12 @@
 {% endfor %}
 
 <script>
-  // Defined in lute.js
-  parent.reset_cursor_marker();
+  // Defined in lute.js.  restore_*, not reset_cursor_marker(): the swap
+  // already replaced every span, so there are no stale selection marks to
+  // clear -- and clearing would wipe a shift-click made while this fragment
+  // was arriving, because htmx runs a fragment's scripts after inserting its
+  // nodes.  The next status hotkey would then find nothing selected and
+  // silently do nothing.
+  parent.restore_cursor_marker();
   parent.add_status_classes();
 </script>

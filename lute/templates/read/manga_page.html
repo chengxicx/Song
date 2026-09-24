@@ -38,7 +38,10 @@
 <script>
   // Defined in lute.js: restore the current cursor/hover marker and
   // apply term status classes, exactly like read/page_content.html.
-  parent.reset_cursor_marker();
+  // restore_*, not reset_cursor_marker(): this fragment is swapped in, so
+  // its <script> runs after its nodes land, and clearing the selection here
+  // would wipe a shift-click the reader just made.
+  parent.restore_cursor_marker();
   parent.add_status_classes();
 
   // Click behavior, mirroring the mokuro reference: hovering a text box
