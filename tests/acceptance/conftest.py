@@ -314,8 +314,10 @@ def given_book_from_url(luteclient, lang, url):
 @given(parsers.parse('the book table loads "{title}"'))
 def given_book_table_wait(luteclient, title):
     "The book table is loaded via ajax, so there's a delay."
-    _sleep(0.2)  # Hack!
-    assert title in luteclient.page.content()
+    # Was _sleep(0.2) + one read of page.content(): the read-once race that
+    # wait_for_page_text exists to fix.
+    content = luteclient.wait_for_page_text(title)
+    assert title in content, f"the book table never showed {title!r}"
 
 
 @when(parsers.parse('I set the book table filter to "{filt}"'))
@@ -335,21 +337,28 @@ def when_set_book_table_filter(luteclient, filt):
 @then(parsers.parse("the book table contains:\n{content}"))
 def check_book_table(luteclient, content):
     "Check the table, e.g. content like 'Hola; Spanish; ; 4 (0%);'"
-    time.sleep(0.2)
-    assert content == luteclient.get_book_table_content()
+    # The table is rendered by DataTables after an ajax fetch, so a single
+    # read can catch it half-built.  This used to be time.sleep(0.2) + one
+    # read -- the same read-once race that wait_for_page_text and
+    # _assert_settles exist to fix.  On a loaded CI runner it surfaced as
+    # test_disabled_data_is_hidden intermittently reporting another test's
+    # book.  Poll like the other two do.
+    _assert_settles(content, luteclient.get_book_table_content)
 
 
 def _assert_settles(expected, getter):
     """
     Poll ``getter`` until it matches ``expected``, then assert.
 
-    These steps read the db directly, so they can race the write they are
-    checking.  The start date is the worst case: it is set by a
+    Steps that read the db directly can race the write they are checking.
+    The start date is the worst case: it is set by a
     fire-and-forget browser beacon -- read/index.html
     _updateStartDateIfNeeded posts to /read/update_start_date on
     beforeunload and visibilitychange -- so the write can land just after
     the step that triggered it.  (Read dates come from a synchronous post,
     but reading them right after the click can still outrun the request.)
+    check_book_table shares this for the same reason on the DOM side: the
+    table is rendered by DataTables after an ajax fetch.
     """
     timeout = float(os.environ.get("LUTE_TEST_READ_TIMEOUT", 15))
     poll_frequency = 0.25
