@@ -3,15 +3,15 @@
  *
  * A session prefetches all due cards in one /review/start call; each
  * grade is a small /review/grade post.  Recognition cards are graded
- * with the four FSRS buttons; recall/cloze cards can be typed and
- * are auto-graded (Again on a wrong answer), or revealed and
+ * with the two FSRS buttons (Again / Good); cloze cards can be typed
+ * and are auto-graded (Again on a wrong answer), or revealed and
  * self-graded.
  *
  * The card is one fixed shell with three regions (question, answer,
  * grading) so revealing never makes the buttons jump: the shell is
  * built once per card and only its contents change.
  *
- * Keyboard: Space/Enter reveals, 1-4 grade, Enter checks a typed
+ * Keyboard: Space/Enter reveals, 1-2 grade, Enter checks a typed
  * answer, Space/Enter moves on after a typed check.
  */
 window.LuteReview = (function () {
@@ -32,13 +32,11 @@ window.LuteReview = (function () {
 
   const PROMPTS = {
     recognition: "Recall the meaning",
-    recall: "Type the word",
     cloze: "Fill in the blank",
   };
 
   const CARD_TYPE_LABELS = {
     recognition: "Recognition",
-    recall: "Recall",
     cloze: "Cloze",
   };
 
@@ -79,34 +77,6 @@ window.LuteReview = (function () {
   }
 
   /* ---------- index page actions ---------- */
-
-  async function sync() {
-    const msg = el("review_sync_message");
-    if (!msg) return;
-    msg.textContent = "Syncing ...";
-    try {
-      const result = await post_json("/review/sync");
-      const parts = [`Added ${result.cards_added} cards.`];
-      if (result.skipped_no_sentence > 0) {
-        parts.push(
-          `Skipped ${result.skipped_no_sentence} cloze cards (no sentence yet).`
-        );
-      }
-      result.specs.forEach((s) => {
-        parts.push(`${s.name}: matched ${s.terms_matched}.`);
-      });
-      Object.entries(result.errors || {}).forEach(([name, err]) => {
-        parts.push(`ERROR in ${name}: ${err}`);
-      });
-      msg.textContent = parts.join(" ");
-      if (result.cards_added > 0) {
-        window.location.reload();
-      }
-    } catch (err) {
-      const errors = err && err.errors ? Object.values(err.errors) : [err];
-      msg.textContent = `Sync failed: ${errors.join("; ")}`;
-    }
-  }
 
   async function install_fsrs() {
     const msg = el("review_install_message");
@@ -202,7 +172,7 @@ window.LuteReview = (function () {
       }
     } catch (err) {
       if (btn) btn.disabled = false;
-      const msg = el("review_sync_message") || el("review_progress");
+      const msg = el("review_progress");
       if (msg) msg.textContent = `Undo failed: ${err.error || err}`;
     }
   }
@@ -311,18 +281,18 @@ window.LuteReview = (function () {
   }
 
   function grade_buttons_html(c) {
+    // Two grades: Again (key 1) and Good (key 2).  The intervals come
+    // from the server as {again, good} display strings.
     const ratings = [
-      [1, "Again"],
-      [2, "Hard"],
-      [3, "Good"],
-      [4, "Easy"],
+      [1, "Again", c.intervals ? c.intervals.again : ""],
+      [3, "Good", c.intervals ? c.intervals.good : ""],
     ];
     return ratings
-      .map(([rating, label]) => {
-        const interval = c.intervals ? ` (${c.intervals[rating - 1]})` : "";
+      .map(([rating, label, interval], i) => {
+        const iv = interval ? ` (${interval})` : "";
         return `<button class="rv-grade rv-grade-${rating}" data-rating="${rating}">
-                  <span class="rv-grade-key">${rating}</span>
-                  <span class="rv-grade-label">${label}${esc(interval)}</span>
+                  <span class="rv-grade-key">${i + 1}</span>
+                  <span class="rv-grade-label">${label}${esc(iv)}</span>
                 </button>`;
       })
       .join("\n");
@@ -439,9 +409,10 @@ window.LuteReview = (function () {
     const in_input = (e.target.tagName || "").toLowerCase() === "input";
 
     if (state.mode === "answer") {
-      const n = parseInt(e.key, 10);
-      if (n >= 1 && n <= 4) {
-        const btn = document.querySelector(`.rv-grade[data-rating="${n}"]`);
+      // Key 1 = Again, key 2 = Good.
+      if (e.key === "1" || e.key === "2") {
+        const btns = document.querySelectorAll(".rv-grade");
+        const btn = e.key === "1" ? btns[0] : btns[1];
         if (btn) {
           e.preventDefault();
           btn.click();
@@ -475,7 +446,6 @@ window.LuteReview = (function () {
   document.addEventListener("keydown", on_keydown);
 
   return {
-    sync,
     install_fsrs,
     start_session,
     undo,

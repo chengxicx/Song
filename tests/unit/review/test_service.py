@@ -10,7 +10,7 @@ pytest.importorskip("fsrs")
 
 from lute.db import db  # noqa: E402
 from lute.models.repositories import UserSettingRepository  # noqa: E402
-from lute.models.review import ReviewCard, ReviewLog, ReviewSpec  # noqa: E402
+from lute.models.review import ReviewCard, ReviewLog  # noqa: E402
 from lute.review import enqueue, scheduler, service  # noqa: E402
 from lute.review.scheduler import (  # noqa: E402
     SchedulerUnavailableError,
@@ -18,18 +18,6 @@ from lute.review.scheduler import (  # noqa: E402
 )
 
 from tests.utils import add_terms, make_book  # noqa: E402
-
-
-def _make_spec(name="all", criteria="", card_types=("recognition", "cloze")):
-    "Add a spec (recall/typing is opt-in, mirroring the model default)."
-    spec = ReviewSpec()
-    spec.name = name
-    spec.criteria = criteria
-    spec.set_card_types(list(card_types))
-    spec.active = True
-    db.session.add(spec)
-    db.session.commit()
-    return spec
 
 
 def _read_book(spanish, content):
@@ -47,14 +35,14 @@ def _queue(
     book_content="Tengo un gato. El gato es negro.",
     card_types=("recognition", "cloze"),
 ):
-    "Terms + read book + synced queue; returns the terms."
+    "Terms + read book + auto-admitted queue; returns the terms."
     terms = add_terms(spanish, terms_text.split(","))
     terms[0].translation = "cat"
     db.session.add(terms[0])
     db.session.commit()
     _read_book(spanish, book_content)
-    _make_spec(card_types=card_types)
-    enqueue.run_sync(commit=True)
+    enqueue.set_enabled_card_types(db.session, list(card_types))
+    enqueue.auto_admit(db.session)
     return terms
 
 
@@ -71,7 +59,7 @@ def test_grade_moves_card_and_writes_log(empty_db, spanish):
     assert len(cards) == 1
     card_view = cards[0]
     assert card_view["intervals"] is not None
-    assert len(card_view["intervals"]) == 4
+    assert set(card_view["intervals"]) == {"again", "good"}
 
     result = service.grade(db.session, card_view["id"], 3)
 
@@ -87,10 +75,10 @@ def test_grade_moves_card_and_writes_log(empty_db, spanish):
 
 
 def test_wrong_typed_answer_forces_again(empty_db, spanish):
-    "A wrong recall answer is graded Again, with the real answer returned."
-    _queue(spanish, card_types=("recognition", "recall", "cloze"))
+    "A wrong typed cloze answer is graded Again, with the answer returned."
+    _queue(spanish)
     payload = service.start_session(db.session)
-    card_view = next(c for c in payload["cards"] if c["card_type"] == "recall")
+    card_view = next(c for c in payload["cards"] if c["card_type"] == "cloze")
 
     result = service.grade(db.session, card_view["id"], 3, typed_answer="xxx")
 
@@ -98,19 +86,19 @@ def test_wrong_typed_answer_forces_again(empty_db, spanish):
     assert result["answer"] == "gato"
     log = db.session.query(ReviewLog).one()
     assert log.rating == 1
-    card = db.session.query(ReviewCard).filter_by(card_type="recall").one()
+    card = db.session.query(ReviewCard).filter_by(card_type="cloze").one()
     assert card.lapses == 1
 
 
 def test_typed_answer_matches_loosely(empty_db, spanish):
     "Case, surrounding whitespace and zws don't break the check."
-    terms = _queue(spanish, card_types=("recognition", "recall", "cloze"))
+    terms = _queue(spanish)
     terms[0]._text = "ga\u200Bto"  # pylint: disable=protected-access
     db.session.add(terms[0])
     db.session.commit()
 
     payload = service.start_session(db.session)
-    card_view = next(c for c in payload["cards"] if c["card_type"] == "recall")
+    card_view = next(c for c in payload["cards"] if c["card_type"] == "cloze")
 
     result = service.grade(db.session, card_view["id"], 3, typed_answer="  GATO  ")
     assert result["correct"] is True
@@ -173,7 +161,7 @@ def test_counts_report_due_and_new(empty_db, spanish):
     _queue(spanish)
     c = service.counts(db.session)
     assert c["due"] == 0
-    assert c["new_remaining"] == 2  # recall is off by default
+    assert c["new_remaining"] == 2  # recognition + cloze
     assert c["new_allowed_today"] == 20
 
 

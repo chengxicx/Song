@@ -1,55 +1,8 @@
 """
-Review queue entities: admission specs, scheduled cards, review logs.
+Review queue entities: scheduled cards and review logs.
 """
 
-import json
-
 from lute.db import db
-
-
-class ReviewSpec(db.Model):
-    """
-    A rule admitting terms into the review queue.
-
-    criteria is a lute.ankiexport.criteria DSL string, e.g.
-    'status > 1 and language == "Japanese"'.
-    """
-
-    __tablename__ = "reviewspecs"
-
-    id = db.Column("RsID", db.Integer, primary_key=True)
-    name = db.Column("RsName", db.String(200), nullable=False, unique=True)
-    criteria = db.Column("RsCriteria", db.String(1000), nullable=False, default="")
-    card_types = db.Column(
-        "RsCardTypes",
-        db.String(200),
-        nullable=False,
-        default='{"recognition": 1, "recall": 0, "cloze": 1}',
-    )
-    active = db.Column("RsActive", db.Boolean, nullable=False, default=True)
-
-    CARD_TYPES = ["recognition", "recall", "cloze"]
-
-    # Column defaults only apply at insert time; an unflushed spec
-    # must behave the same as a saved one.
-    DEFAULT_CARD_TYPES = '{"recognition": 1, "recall": 0, "cloze": 1}'
-
-    @property
-    def card_types_enabled(self):
-        "Card types turned on for this spec, in canonical order."
-        raw = (
-            self.card_types if self.card_types is not None else self.DEFAULT_CARD_TYPES
-        )
-        try:
-            d = json.loads(raw)
-        except (ValueError, TypeError):
-            d = {}
-        return [ct for ct in self.CARD_TYPES if d.get(ct)]
-
-    def set_card_types(self, enabled_list):
-        "Set the enabled card types from a list."
-        d = {ct: (ct in enabled_list) for ct in self.CARD_TYPES}
-        self.card_types = json.dumps(d)
 
 
 class ReviewCard(db.Model):
@@ -76,7 +29,8 @@ class ReviewCard(db.Model):
     lapses = db.Column("RcLapses", db.Integer, nullable=False, default=0)
     last_review = db.Column("RcLastReview", db.DateTime)
     created = db.Column("RcCreated", db.DateTime)
-    spec_id = db.Column("RcSpecID", db.Integer, db.ForeignKey("reviewspecs.RsID"))
+    # The old RcSpecID column is left in the db but no longer mapped:
+    # cards are auto-admitted, there are no specs.
 
     term = db.relationship("Term")
 
