@@ -12,6 +12,13 @@ The second test restores the old implementation on purpose.  A concurrency
 test that only asserts "no 500" proves nothing if the race simply never
 happened, so this one pins the failing direction too -- and it is what makes
 the passing one meaningful.
+
+The whole file needs the Japanese engine, so it skips without it -- like
+every other grammar-engine test here.  Note that CI installs its
+dependencies with `flit install --deps develop`, which installs the
+dev/doc/test extras but *not* this project's own extras, so these tests do
+not run on CI at all; they run against a developer venv (and would run on CI
+if that install step asked for the extras).
 """
 
 import json
@@ -19,7 +26,11 @@ import threading
 
 import pytest
 
+pytest.importorskip("sudachipy")
+pytest.importorskip("sudachidict_core")
+
 from lute.db import db
+from lute.parse.registry import is_supported
 from lute.read.render import grammar_analysis_ja as grammar_ja
 from tests.utils import make_book
 
@@ -35,6 +46,8 @@ N_ITER = 15
 @pytest.fixture(name="ja_book")
 def fixture_ja_book(app_context, japanese):
     "A Japanese book whose page 1 carries the grammar sample text."
+    if not is_supported("japanese_sudachi"):
+        pytest.skip("japanese_sudachi parser not installed")
     book = make_book("Grammar concurrency", TEXTS, japanese)
     db.session.add(book)
     db.session.commit()
