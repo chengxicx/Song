@@ -12,6 +12,8 @@ A race cannot be reproduced on demand, so this drives the helper
 directly against content that is deliberately late.
 """
 
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+
 from tests.acceptance.conftest import check_book_table, then_page_contains
 
 
@@ -89,3 +91,54 @@ def test_book_table_read_is_a_single_snapshot(luteclient, monkeypatch):
 
     assert luteclient.get_book_table_content() == "a; b\ne; f"
     assert page.evaluates == 1
+
+
+def test_refresh_browser_waits_for_the_reading_pane_first(luteclient, monkeypatch):
+    """
+    _refresh_browser must let the app's swaps land before it rebuilds.
+
+    It rebuilds <body>, which detaches #thetext, and htmx swaps into the
+    element it resolved when the request was issued -- so rebuilding
+    mid-swap makes the response land on a detached node and the pane
+    keeps its old text for good.  The old code covered that window with a
+    blind 0.2s sleep ("Hack for ci"), which wins on an idle laptop and
+    loses on a loaded runner.
+    """
+    order = []
+
+    class StubPage:
+        "Records the rebuild; the wait is stubbed to record itself."
+
+        def evaluate(self, script):
+            order.append("rebuild")
+
+    monkeypatch.setattr(
+        luteclient, "_wait_for_reading_pane", lambda timeout=3000: order.append("wait")
+    )
+    monkeypatch.setattr(luteclient, "page", StubPage())
+
+    luteclient._refresh_browser()
+    assert order == ["wait", "rebuild"]
+
+
+def test_reading_pane_wait_tolerates_a_stuck_flag(luteclient, monkeypatch):
+    """
+    A request that errored never swaps, so its flag is never cleared.
+
+    The wait must not raise -- and must not hang the suite -- in that
+    case: the step that made the request fails on its own assertion
+    instead.  It asks about all three of the app's pending-work globals.
+    """
+    calls = []
+
+    class StubPage:
+        def wait_for_function(self, expression, timeout=None):
+            calls.append(expression)
+            raise PlaywrightTimeoutError("still pending")
+
+    monkeypatch.setattr(luteclient, "page", StubPage())
+    luteclient._wait_for_reading_pane(timeout=5)
+
+    assert len(calls) == 1
+    for flag in ("_pendingStatusUpdate", "_pendingTermFormReload", "_pendingNav"):
+        assert flag in calls[0], f"the wait must consider {flag}"
