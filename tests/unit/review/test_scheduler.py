@@ -105,7 +105,7 @@ def test_save_and_load_roundtrip():
 @pytest.mark.skipif(
     scheduler._installed_version() is None, reason="fsrs package not installed"
 )
-def test_next_intervals_preview():
+def test_preview_intervals():
     "Interval previews don't mutate the card."
     from lute.models.review import ReviewCard
 
@@ -117,7 +117,7 @@ def test_next_intervals_preview():
     fcard = scheduler.load_card(dbcard)
     before_state = int(fcard.state)
 
-    intervals = scheduler.next_intervals(sched, fcard, now)
-    assert len(intervals) == 4
-    assert all(isinstance(i, str) for i in intervals)
+    intervals = scheduler.preview_intervals(sched, fcard, now)
+    assert set(intervals.keys()) == {"again", "good"}
+    assert all(isinstance(i, str) for i in intervals.values())
     assert int(fcard.state) == before_state
