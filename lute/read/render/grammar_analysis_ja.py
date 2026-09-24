@@ -25,20 +25,49 @@ validated against that entry's own examples -- see ``_load_level``.
 import json
 import os
 import re
+import threading
 
 # ---- tokenizer -------------------------------------------------------
 
-_tokenizer = None
+# Tokenizer instances are NOT shareable.  sudachipy's Tokenizer wraps a
+# mutable Rust object, and the Python binding borrows it for the whole of
+# every tokenize() call, so two threads tokenizing at once raise
+# "RuntimeError: Already borrowed".  Lute serves requests from a thread
+# pool (waitress, 12 threads by default -- see lute/main.py), and this
+# module is reached straight from the grammar route, so a shared instance
+# meant that two readers on the same Japanese page -- or one reader
+# double-clicking the panel -- got a 500.
+#
+# The Dictionary *is* shareable and is the expensive part to build, so
+# load exactly one per process and give each thread its own cheap
+# Tokenizer.  This mirrors lute/parse/sudachi_parser.py, which carries
+# the same contract for the reading page.
+_dictionary = None
+_dictionary_lock = threading.Lock()
+_thread_local = threading.local()
 
 
 def _get_tokenizer():
-    "Lazy, process-lifetime Sudachi tokenizer (mode C)."
-    global _tokenizer
-    if _tokenizer is None:
-        from sudachipy import Dictionary
+    "Lazy, process-lifetime Sudachi tokenizer (mode C), one per thread."
+    tokenizer = getattr(_thread_local, "tokenizer", None)
+    if tokenizer is not None:
+        return tokenizer
+    global _dictionary  # pylint: disable=global-statement
+    if _dictionary is None:
+        # Locked, but only around the expensive load: the dictionary must
+        # not be built once per thread, and must be built exactly once
+        # even if several requests arrive together.  The import stays
+        # inside so a base install without the sudachi extra still raises
+        # ImportError here, which is how _load_all() below detects it.
+        with _dictionary_lock:
+            if _dictionary is None:
+                # pylint: disable-next=import-outside-toplevel
+                from sudachipy import Dictionary
 
-        _tokenizer = Dictionary().create()
-    return _tokenizer
+                _dictionary = Dictionary()
+    tokenizer = _dictionary.create()
+    _thread_local.tokenizer = tokenizer
+    return tokenizer
 
 
 def _split_sentences(text):

@@ -1,12 +1,14 @@
 """Tests for the N5 Japanese grammar-analysis engine."""
 
 import re
+import threading
 
 import pytest
 
 pytest.importorskip("sudachipy")
 pytest.importorskip("sudachidict_core")
 
+from lute.read.render import grammar_analysis_ja as grammar_ja
 from lute.read.render.grammar_analysis_ja import (
     _ALL_LEVELS,
     _ALL_RULES,
@@ -18,6 +20,7 @@ from lute.read.render.grammar_analysis_ja import (
     _SLOT_SPECS,
     _VOCAB_IDS,
     _ZH_DESC,
+    _get_tokenizer,
     analyze_japanese,
 )
 from lute.read.render.grammar_analysis import is_japanese_language
@@ -899,3 +902,99 @@ def test_korean_display_translates_aggregates():
     res = analyze_japanese("私は学生です。あれは本です。", "ko")
     basics = next(g for g in res if g["key"] == "basic_forms")
     assert "기초" in basics["desc"]
+
+
+# ---- threading ----
+#
+# The grammar route is reached straight from a waitress worker thread (12
+# of them by default -- see lute/main.py), so two readers on the same
+# Japanese page, or one reader double-clicking the panel, tokenize at the
+# same time.  sudachipy's Tokenizer wraps a mutable Rust object and cannot
+# be shared: concurrent tokenize() calls raise
+# RuntimeError("Already borrowed"), which the route does not catch, so the
+# panel answered 500.  One Dictionary for the process, one Tokenizer per
+# thread -- the same contract lute/parse/sudachi_parser.py carries.
+
+
+def _run_threads(fn, count):
+    "Run fn in `count` threads, joined, re-raising nothing itself."
+    threads = [threading.Thread(target=fn) for _ in range(count)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join(timeout=60)
+    assert not any(t.is_alive() for t in threads), "worker thread hung"
+
+
+def test_tokenizer_is_reused_within_a_thread():
+    "Repeated calls on one thread must not rebuild the tokenizer."
+    first = _get_tokenizer()
+    second = _get_tokenizer()
+    assert first is second
+
+
+def test_dictionary_is_shared_between_threads():
+    "One Dictionary for the process -- loading it is the expensive part."
+    seen = []
+    lock = threading.Lock()
+
+    def record():
+        _get_tokenizer()
+        with lock:
+            seen.append(id(grammar_ja._dictionary))
+
+    _run_threads(record, count=6)
+    assert len(set(seen)) == 1, f"expected one shared dictionary, got {len(set(seen))}"
+
+
+def test_each_thread_gets_its_own_tokenizer():
+    "Threads must not share the Rust-backed Tokenizer object."
+    seen = []
+    lock = threading.Lock()
+
+    def record():
+        t = _get_tokenizer()
+        with lock:
+            # Hold the reference: an id() on its own can be recycled by
+            # the next thread once this one dies.
+            seen.append(t)
+
+    _run_threads(record, count=6)
+    assert len({id(t) for t in seen}) == 6, "each thread should build its own tokenizer"
+
+
+def test_concurrent_analysis_does_not_raise_already_borrowed():
+    """
+    Regression: analyzing from several threads used to fail with
+    RuntimeError("Already borrowed"), which the grammar route turned into
+    a 500.  Every thread must get the same answer as a single-threaded run.
+    """
+    texts = [
+        "この本は高いですが、面白いです。",
+        "今、ご飯を食べています。",
+        "日本語が好きですが、難しいです。",
+    ]
+    expected = {t: analyze_japanese(t) for t in texts}
+    errors = []
+    results = []
+    lock = threading.Lock()
+
+    def work():
+        try:
+            for _ in range(20):
+                for text in texts:
+                    got = analyze_japanese(text)
+                    if got != expected[text]:
+                        with lock:
+                            errors.append(f"wrong result for {text!r}")
+                        return
+        except Exception as e:  # pylint: disable=broad-except
+            with lock:
+                errors.append(f"{type(e).__name__}: {e}")
+            return
+        with lock:
+            results.append(True)
+
+    _run_threads(work, count=8)
+    assert not errors, f"concurrent analysis failed: {errors[:3]}"
+    assert len(results) == 8
