@@ -131,6 +131,7 @@ def add_default_user_settings(session, default_user_backup_path):
         # Review queue:
         "review_desired_retention": "0.9",
         "review_max_new_per_day": 20,
+        "review_card_types": '{"recognition": 1, "cloze": 1}',
     }
     add_initial_vals_if_needed(keys_and_defaults)
 

@@ -7,6 +7,7 @@ import json
 import click
 from flask import Blueprint
 
+from lute.db import db
 from lute.cli.language_term_export import generate_language_file, generate_book_file
 from lute.cli.import_books import import_books_from_csv
 from lute.cli.term_parent_backfill import (
@@ -233,27 +234,14 @@ def parent_backfill_undo_cmd(audit, commit, delete_created_terms):
 
 
 @bp.cli.command("review_sync")
-@click.option(
-    "--commit",
-    is_flag=True,
-    help="""
-    Enqueue the cards.  If not set, report only: nothing is written.
-""",
-)
-@click.option(
-    "--limit",
-    type=int,
-    default=None,
-    help="""
-    Only enqueue the first N cards, for a canary run.
-""",
-)
-def review_sync_cmd(commit, limit):
+def review_sync_cmd():
     """
-    Enqueue review cards from all active review specs.
+    Enqueue review cards for all learning terms.
 
-    Dry-run by default.  Syncing only ever adds: cards already in the
-    queue keep their scheduling, and no card is ever removed.
+    Syncing only ever adds: cards already in the queue keep their
+    scheduling, and no card is ever removed.
     """
-    result = review_enqueue.run_sync(commit=commit, limit=limit)
-    print(review_enqueue.format_report(result))
+    counts = review_enqueue.auto_admit(db.session)
+    total = sum(counts.values())
+    by_type = ", ".join(f"{k}: {v}" for k, v in counts.items())
+    print(f"Added {total} review card(s) ({by_type or 'none new'}).")

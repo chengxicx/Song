@@ -1,30 +1,14 @@
 """
-Review queue tests: enqueue from specs.
+Review queue tests: auto-admission of learning terms.
 """
 
 from datetime import datetime
 
-import pytest
-
 from lute.db import db
-from lute.models.review import ReviewCard, ReviewSpec
+from lute.models.review import ReviewCard
 from lute.review import enqueue
 
 from tests.utils import add_terms, make_book
-
-
-def _make_spec(
-    name, criteria="", card_types=("recognition", "recall", "cloze"), active=True
-):
-    "Add a spec."
-    spec = ReviewSpec()
-    spec.name = name
-    spec.criteria = criteria
-    spec.set_card_types(list(card_types))
-    spec.active = active
-    db.session.add(spec)
-    db.session.commit()
-    return spec
 
 
 def _card_types():
@@ -41,48 +25,29 @@ def _read_book(spanish, content):
     return b
 
 
-def test_default_card_types_are_recognition_and_cloze(empty_db):
-    "Recall (typing) is opt-in."
-    spec = ReviewSpec()
-    assert spec.card_types_enabled == ["recognition", "cloze"]
-
-
-def test_sync_dry_run_writes_nothing(empty_db, spanish):
-    "Default sync is a dry run."
-    add_terms(spanish, ["perro", "gato"])
-    _make_spec("all")
-    result = enqueue.run_sync()
-    assert result.committed is False
-    assert result.cards_added == 4
-    assert len(_card_types()) == 0
-
-
-def test_sync_adds_cards_for_matching_terms(empty_db, spanish):
-    "Criteria filter the candidates; inactive specs do nothing."
-    terms = add_terms(spanish, ["perro", "gato"])
-    terms[1].status = 2
-    db.session.add(terms[1])
+def test_all_learning_statuses_are_admitted(empty_db, spanish):
+    "Statuses 1-5 get cards; unknown (0) and well-known (99) don't."
+    terms = add_terms(spanish, ["uno", "dos", "tres", "cuatro", "cinco"])
+    for term, status in zip(terms, [0, 1, 3, 5, 99]):
+        term.status = status
+    db.session.add_all(terms)
     db.session.commit()
 
-    _make_spec("learning", "status > 1")
-    _make_spec("inactive", active=False)
+    counts = enqueue.auto_admit(db.session)
 
-    result = enqueue.run_sync(commit=True)
-    assert result.cards_added == 2
-    assert _card_types() == {(terms[1].id, "recognition"), (terms[1].id, "recall")}
+    assert counts["recognition"] == 3
+    assert _card_types() == {(t.id, "recognition") for t in terms[1:4]}
 
 
-def test_resync_is_idempotent(empty_db, spanish):
-    "Re-syncing never duplicates cards or resets them."
+def test_re_admission_is_idempotent(empty_db, spanish):
+    "Re-admitting never duplicates cards or resets them."
     add_terms(spanish, ["perro"])
-    _make_spec("all")
-    enqueue.run_sync(commit=True)
-    cards = db.session.query(ReviewCard).all()
-    assert len(cards) == 2
+    enqueue.auto_admit(db.session)
+    assert db.session.query(ReviewCard).count() == 1
 
-    result = enqueue.run_sync(commit=True)
-    assert result.cards_added == 0
-    assert db.session.query(ReviewCard).count() == 2
+    counts = enqueue.auto_admit(db.session)
+    assert counts == {"recognition": 0, "cloze": 0}
+    assert db.session.query(ReviewCard).count() == 1
 
 
 def test_cloze_requires_a_read_sentence(empty_db, spanish):
@@ -90,42 +55,69 @@ def test_cloze_requires_a_read_sentence(empty_db, spanish):
     terms = add_terms(spanish, ["gato", "perro"])
     _read_book(spanish, "Tengo un gato. El gato es negro.")
 
-    _make_spec("cloze-only", card_types=("cloze",))
-    result = enqueue.run_sync(commit=True)
+    counts = enqueue.auto_admit(db.session)
 
-    assert result.cards_added == 1
-    assert result.skipped_no_sentence == 1
-    assert _card_types() == {(terms[0].id, "cloze")}
+    assert counts["cloze"] == 1
+    assert _card_types() == {
+        (terms[0].id, "recognition"),
+        (terms[0].id, "cloze"),
+        (terms[1].id, "recognition"),
+    }
 
 
-def test_blank_criteria_matches_all_learning_terms(empty_db, spanish):
-    "Blank criteria admit everything; other statuses stay out."
-    terms = add_terms(spanish, ["perro"])
-    terms[0].status = 99  # Well known.
-    db.session.add(terms[0])
+def test_cloze_added_once_term_is_read(empty_db, spanish):
+    "A term with no read sentence gets its cloze card after reading."
+    terms = add_terms(spanish, ["gato"])
+    enqueue.auto_admit(db.session)
+    assert (terms[0].id, "cloze") not in _card_types()
+
+    _read_book(spanish, "Tengo un gato. El gato es negro.")
+    counts = enqueue.auto_admit(db.session)
+    assert counts["cloze"] == 1
+    assert (terms[0].id, "cloze") in _card_types()
+
+
+def test_disabled_card_types_are_not_admitted(empty_db, spanish):
+    "A card type switched off in the settings gets no new cards."
+    terms = add_terms(spanish, ["gato"])
+    _read_book(spanish, "Tengo un gato.")
+    enqueue.set_enabled_card_types(db.session, ["recognition"])
+
+    counts = enqueue.auto_admit(db.session)
+
+    assert counts == {"recognition": 1}
+    assert _card_types() == {(terms[0].id, "recognition")}
+
+
+def test_switching_types_off_keeps_existing_cards(empty_db, spanish):
+    "Admission only ever adds: existing cards are never removed."
+    terms = add_terms(spanish, ["gato"])
+    _read_book(spanish, "Tengo un gato.")
+    enqueue.auto_admit(db.session)
+    card = db.session.query(ReviewCard).filter_by(card_type="recognition").one()
+    card.reps = 2
+    card.due = datetime(2027, 1, 2, 3, 4, 5)
+    db.session.add(card)
     db.session.commit()
-    _make_spec("all")
 
-    result = enqueue.run_sync(commit=True)
-    assert result.cards_added == 0
+    enqueue.set_enabled_card_types(db.session, [])
+    counts = enqueue.auto_admit(db.session)
 
-
-def test_invalid_criteria_is_reported_per_spec(empty_db, spanish):
-    "A broken spec doesn't block the others."
-    add_terms(spanish, ["perro"])
-    _make_spec("broken", "status >")
-    _make_spec("good", "status > 0")
-
-    result = enqueue.run_sync(commit=True)
-    assert "broken" in result.errors
-    assert result.cards_added == 2
+    assert counts == {}
+    assert db.session.query(ReviewCard).count() == 2
+    db.session.refresh(card)
+    assert card.reps == 2
 
 
-def test_format_report_mentions_skips(empty_db, spanish):
-    "The report shows skipped cloze cards and dry-run state."
-    add_terms(spanish, ["perro"])
-    _make_spec("cloze-only", card_types=("cloze",))
-    result = enqueue.run_sync()
-    report = enqueue.format_report(result)
-    assert "DRY RUN" in report
-    assert "no read sentence" in report
+def test_enabled_card_types_defaults(empty_db, spanish):
+    "Missing or garbage settings fall back to both types."
+    assert enqueue.enabled_card_types(db.session) == ["recognition", "cloze"]
+
+    from lute.models.repositories import UserSettingRepository
+
+    repo = UserSettingRepository(db.session)
+    repo.set_dynamic_value("review_card_types", "not json")
+    assert enqueue.enabled_card_types(db.session) == ["recognition", "cloze"]
+
+    enqueue.set_enabled_card_types(db.session, ["cloze"])
+    assert enqueue.enabled_card_types(db.session) == ["cloze"]
