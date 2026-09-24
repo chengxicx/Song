@@ -59,7 +59,13 @@ jobs:
       run: |
         pip install flit
         # --only-deps: Installs only the dependencies, not Lute itself
-        # --deps develop: both regular and optional dependencies.
+        # --deps develop: the dev/doc/test extras, NOT this project's own
+        # extras -- flit's 'develop' branch adds a hardcoded
+        # {'dev','doc','test'} and only 'all' walks the extras declared in
+        # pyproject.toml.  So Sudachi, Kiwi, the spaCy models, pythainlp,
+        # pymorphy3 and pyarabic are absent here and every grammar-engine
+        # test skips.  Those engines are covered by the grammar-engines job
+        # in nightly-guardrail.yml instead.
         flit install --only-deps --deps develop
 
     - name: Setup config
