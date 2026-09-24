@@ -640,15 +640,27 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         """Wait until the reading page has finished its async setup.
 
         The reading text arrives asynchronously (htmx.ajax into #thetext),
-        and the post-swap bookkeeping in _finishPageSwap ends by calling
+        and the post-swap bookkeeping in _finishPageSwap runs
         start_hover_mode(), which resets the cursor and hides the term form
         and dictionaries.  A step that interacts with the text before that
         has run gets its work undone underneath it: the hover step finds no
         words to hover, and a term form opened too early is wiped.
 
-        luteStartReadingDone is set by _finishPageSwap, so it becomes true
-        only once the swap (and its resets) have finished.  Tolerates pages
-        that have no such global at all.
+        luteStartReadingDone is set by _finishPageSwap, but do not read that
+        as "the resets have finished" -- two limits bit the bulk-hotkey
+        scenarios, so check them before relying on this:
+
+        * it is set on the FIRST line of _finishPageSwap, *before*
+          start_hover_mode() runs, so this can return ahead of those resets;
+        * a status-update swap never goes through _finishPageSwap at all
+          (the htmx:afterSwap handler only calls it when a page navigation
+          is pending), so here this returns immediately.
+
+        For a swapped-in fragment the cursor restore is
+        restore_cursor_marker(), which deliberately does NOT clear
+        span.kwordmarked -- see test_reading_fragment_swap.py.
+
+        Tolerates pages that have no such global at all.
 
         Uses an explicit timeout rather than the suite's 4s default: that
         default is tuned for assertions, and this is a readiness wait, not a
@@ -974,6 +986,65 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         )
         mouse.up()
 
+    # The reading pane's ajax updates are driven by the app itself: it
+    # records what it has asked for in these globals and clears each one in
+    # its htmx:afterSwap handler once the swap has been applied.  They are
+    # top-level `let` bindings (lute-commands.js, read/index.html), so a
+    # bare name resolves inside the page; the typeof guards keep this
+    # working on a page that never loads the reader, and stop a
+    # ReferenceError when one of them is missing.
+    _READING_PANE_SETTLED = """
+        () => (typeof _pendingStatusUpdate === 'undefined'
+               || _pendingStatusUpdate === null)
+           && (typeof _pendingTermFormReload === 'undefined'
+               || _pendingTermFormReload === null)
+           && (typeof _pendingNav === 'undefined' || _pendingNav === null)
+           && document.querySelectorAll('#thetext > .htmx-added').length === 0
+    """
+
+    def _wait_for_reading_pane(self, timeout=3000):
+        """
+        Wait for the app's own reading-pane swaps to land, and to settle.
+
+        _refresh_browser rebuilds <body>, which DETACHES #thetext.  htmx
+        resolves hx-target when the request is issued and swaps into *that*
+        element, so rebuilding while a swap is in flight makes the response
+        land on a detached node: the pane keeps its old text for good, and
+        the following "the reading pane shows" step times out on an update
+        that was applied to nothing.
+
+        The pending-flag part alone is not enough to know the swap has
+        landed.  Those flags are cleared in the app's own htmx:afterSwap
+        handler, and htmx still has a whole settle phase to run after
+        that: it clones the swapped-out node's attributes onto the new
+        nodes and restores the real ones, runs the fragment's <script>
+        (which is what re-applies the term status colours), and only then
+        fires htmx:afterSettle -- all deferred by the settle delay
+        (20ms by default).  Rebuilding <body> inside that window detaches
+        the freshly swapped nodes, so the settle tasks and the fragment
+        script run against a detached subtree: a script inserted into a
+        detached node never executes, and the attributes htmx restored
+        never reach the on-screen nodes.  The visible text then keeps the
+        previous status colours, and the "the reading pane shows" step
+        fails on a status the app had already saved correctly.
+
+        htmx marks every node it inserts with `htmx-added` and drops that
+        class as the first thing each settle task does, so an empty
+        `#thetext > .htmx-added` means the settle phase has run.  The
+        tasks all run synchronously in one loop, so this can only be
+        observed once the whole settle phase is done.
+
+        The old code covered this with a blind 0.2s sleep ("Hack for ci"),
+        which wins on an idle laptop and loses on a loaded runner.
+        """
+        try:
+            self.page.wait_for_function(self._READING_PANE_SETTLED, timeout=timeout)
+        except PlaywrightTimeoutError:
+            # A request that errored never swaps, so its flag is never
+            # cleared.  Don't hang the suite on that -- rebuild anyway, and
+            # let the step that made the request fail on its own assertion.
+            pass
+
     def _refresh_browser(self):
         """
         Term actions (edits, hotkeys) cause updated content to be ajaxed in.
@@ -986,7 +1057,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         """
         # self.browser.reload()
         # ??? ChatGPT suggested:
-        time.sleep(0.2)  # Hack for ci.
+        self._wait_for_reading_pane()
         self.page.evaluate(
             """
             // Trigger re-render of the entire body
