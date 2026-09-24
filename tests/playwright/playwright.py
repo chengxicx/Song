@@ -632,3 +632,71 @@ def test_page_change_first_word():
 
         context.close()
         browser.close()
+
+
+def test_prepare_text_interactions_is_idempotent():
+    """
+    Re-running prepareTextInteractions() must not multiply the hotkeys.
+
+    It registers a keydown handler on `document`, and `document` outlives an
+    htmx swap of #thetext -- so a second call used to leave TWO handlers
+    bound, and every hotkey fired twice.
+
+    That looks harmless for the absolute status hotkeys: each firing
+    recomputes the same new_status from the same unchanged DOM, so the text
+    ends up right.  But each firing also sent its own
+    /term/bulk_update_status POST, and every response swaps #thetext again.
+    Only the FIRST swap gets the re-marking bookkeeping (the htmx:afterSwap
+    handler consumes _pendingStatusUpdate), so the trailing swaps dropped the
+    reader's span.kwordmarked selection.  The next status hotkey then found
+    nothing selected, and post_bulk_update returns silently on an empty
+    selection -- no request, no error, no log.  That is the acceptance
+    flake: "the reading pane shows" times out on a status change that was
+    never even sent.
+
+    The handler count is asserted directly, so this fails fast and
+    deterministically instead of relying on a loaded machine to lose a race.
+    """
+    showbrowser = os.environ.get("SHOW", "") == "true"
+    with sync_playwright() as sp:
+        browser = _launch(sp.chromium, headless=not showbrowser)
+        context = browser.new_context()
+        page = context.new_page()
+
+        page.goto("http://localhost:5001/dev_api/load_demo")
+        page.goto("http://localhost:5001")
+        page.get_by_role("link", name="Tutorial", exact=True).click()
+        _wait_reading_ready(page)
+        _park_mouse(page)
+
+        def keydown_handlers():
+            return page.evaluate(
+                """() => {
+                const ev = jQuery._data(document, 'events');
+                return ev && ev.keydown ? ev.keydown.length : 0;
+            }"""
+            )
+
+        assert keydown_handlers() == 1, "the reading page binds keydown once"
+
+        # Exactly what the acceptance harness's _refresh_browser() does
+        # after it rebuilds <body>.
+        page.evaluate("prepareTextInteractions()")
+        assert keydown_handlers() == 1, "a second call must not add a handler"
+
+        # One press of the status hotkey must send exactly one update.
+        posts = []
+        page.on(
+            "request",
+            lambda r: posts.append(r.url) if "bulk_update_status" in r.url else None,
+        )
+        page.keyboard.press("ArrowRight")  # put the cursor on a word
+        expect(
+            page.locator("span.word.wordhover, span.word.kwordmarked").first
+        ).to_be_visible()
+        page.keyboard.press("ArrowUp")  # hotkey_StatusUp
+        page.wait_for_timeout(2000)
+        assert len(posts) == 1, f"expected one status update, got {len(posts)}"
+
+        context.close()
+        browser.close()
