@@ -33,10 +33,6 @@ on:
         description: "Python version to test with"
         required: false
         default: "3.11"
-  # TEMPORARY, remove in the next commit: lets the new grammar-engines job
-  # be validated on this push instead of waiting for the 02:00 schedule.
-  push:
-    branches: [ "all-features-combine" ]
 
 permissions:
   contents: read
@@ -158,24 +154,7 @@ jobs:
         echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/lute/config/config.yml
         echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/lute/config/config.yml
 
-    # The output is teed to a file and uploaded as an artifact, because the
-    # job log endpoint requires admin rights on the repo -- the artifact is
-    # the only way to read a failure from outside.  pipefail keeps pytest's
-    # exit code (without it the pipeline reports tee's, and a red suite
-    # would look green).
     - name: Test
       run: |
-        set -o pipefail
         export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
-        pytest --collect-only -q > collected.txt 2>&1 || true
-        pytest -q -rf --tb=short 2>&1 | tee pytest-output.txt
-
-    - name: Upload pytest output
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: grammar-engines-pytest-output
-        path: |
-          pytest-output.txt
-          collected.txt
-        if-no-files-found: error
+        pytest
