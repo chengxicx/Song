@@ -15,7 +15,7 @@ from lute.ankiexport.field_mapping import SentenceLookup
 from lute.models.repositories import UserSettingRepository
 from lute.models.review import ReviewCard, ReviewLog
 from lute.term.model import ReferencesRepository
-from lute.review import scheduler
+from lute.review import enqueue, scheduler
 
 ZWS = "\u200B"
 
@@ -80,8 +80,13 @@ def start_session(session):
     """
     Build the review session: due cards then new cards.
 
+    Cards are auto-admitted first, so learning terms are always in the
+    queue when a session starts.
+
     Raises SchedulerUnavailableError when the fsrs package is missing.
     """
+    enqueue.auto_admit(session)
+
     st = _settings(session)
     sched = scheduler.load_scheduler(st["desired_retention"])
 
@@ -131,7 +136,7 @@ def _card_view(dbcard, lookup, sched, now_aware):
     if dbcard.card_type == "cloze":
         view["sentence_blank"] = _cloze_front(sentence, term)
     fcard = scheduler.load_card(dbcard)
-    view["intervals"] = scheduler.next_intervals(sched, fcard, now_aware)
+    view["intervals"] = scheduler.preview_intervals(sched, fcard, now_aware)
     return view
 
 
@@ -182,8 +187,7 @@ def grade(session, card_id, rating_int, typed_answer=None):
         raise ValueError(f"Invalid rating {rating_int}")
 
     correct = True
-    needs_typing = card.card_type in ("recall", "cloze")
-    if needs_typing and (typed_answer or "").strip() != "":
+    if card.card_type == "cloze" and (typed_answer or "").strip() != "":
         correct = _normalize_answer(typed_answer) == _normalize_answer(
             card.term.text or ""
         )

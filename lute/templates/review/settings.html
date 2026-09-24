@@ -59,6 +59,19 @@
         </div>
       </td>
     </tr>
+
+    <tr>
+      <td>Card types</td>
+      <td>
+        {{ form.card_recognition }} {{ form.card_recognition.label }}<br>
+        {{ form.card_cloze }} {{ form.card_cloze.label }}
+        <div class="review-hint">
+          Which card types new terms get when they enter the queue.
+          Turning a type off does not remove or disable cards already
+          in the queue: they keep their scheduling history.
+        </div>
+      </td>
+    </tr>
   </table>
 
   <div class="form-action-row" data-page-node-id="SrrL7nTE0WGX0ZXGcCULqI">

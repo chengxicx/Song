@@ -16,15 +16,12 @@ Feature: Review session
         And demo languages
 
 
-    Scenario: Sync a spec into the queue, grade a card, and undo the grade
+    Scenario: A learning term is auto-admitted, graded, and ungraded
         Given a new Spanish term:
             text: gato
             translation: cat
-        Given I visit "/review/spec/new"
-        When I choose the review preset "All learning terms"
-        And I save the review spec named "Everything"
-        And I sync the review queue
-        Then the review dashboard shows 1 new card waiting
+        And I visit "/review/index"
+        Then the review dashboard shows 0 due cards
         Given I visit "/review/session"
         Then the review card shows the term "gato"
         # Nothing has been graded yet, so Undo must not be on screen at
