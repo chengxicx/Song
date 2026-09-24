@@ -230,20 +230,35 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         self.page.locator("#save").click(force=True)
 
     def get_book_table_content(self):
-        "Get book table content."
-        rows = self.page.locator("#booktable tbody tr")
-        rowcount = rows.count()
+        """
+        Get book table content, as one consistent snapshot.
+
+        Read every cell in a single evaluate(), not one locator call per
+        cell.  The table is serverSide (book/tablelisting.html), so typing
+        in the search box fires an ajax request and DataTables replaces the
+        whole tbody when the response lands.  A read assembled from
+        rowcount * tdcount separate round-trips can therefore have the rows
+        swapped out from under it -- Playwright then waits its full 4s for
+        a detached node that is never coming back, and *raises* rather than
+        returning stale text.  That is what broke
+        test_reenabled_data_is_still_available once the caller started
+        polling.  One JS call cannot be interleaved by a redraw, and costs
+        one round trip instead of hundreds.
+        """
+        rows = self.page.evaluate(
+            """() => Array.from(
+                document.querySelectorAll("#booktable tbody tr")
+            ).map((row) => Array.from(
+                row.querySelectorAll("td")
+            ).map((td) => td.innerText))"""
+        )
         content = []
 
-        for i in range(rowcount):
-            row = rows.nth(i)
-            tds = row.locator("td")
-            tdcount = tds.count()
-            rowtext = [tds.nth(j).inner_text().strip() for j in range(tdcount)]
+        for rowtext in rows:
             # Skip the last two columns:
             # - "last opened" date is a hassle to check
             # - "actions" is just "..."
-            ret = "; ".join(rowtext[:-2]).strip()
+            ret = "; ".join([t.strip() for t in rowtext[:-2]]).strip()
             # Hacky cleanup ok for tests.
             ret = ret.replace("\u200B", "").replace("\n", "").replace("\\n", "")
             content.append(ret)
