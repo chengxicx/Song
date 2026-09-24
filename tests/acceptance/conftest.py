@@ -20,6 +20,13 @@ from playwright.sync_api import expect, sync_playwright
 from tests.acceptance.lute_test_client import LuteTestClient
 
 
+# The browser context's default timeout is 4s (set below), which is tuned for
+# assertions.  Waiting for a navigation the app has already started is a
+# readiness wait, not a check, so it gets a wider cap -- the same reasoning as
+# LuteTestClient.wait_reading_ready.
+_NAV_TIMEOUT = 10000
+
+
 def pytest_addoption(parser):
     """
     Command-line args for pytest runs.
@@ -558,7 +565,15 @@ def when_add_page(luteclient, position, content):
     p.click(linkid)
     p.fill("#text", content)
     p.click("#submit")
-    p.reload()
+    # #submit is a plain form POST and the server 302s to /read/<id>, so the
+    # click has already started a navigation.  The reload() that used to be
+    # here raced it and, on CI, hit "Page.reload: Protocol error
+    # (Page.reload): Not attached to an active page" -- the whole of
+    # test_user_can_add_and_remove_pages, on all three retries.  Wait for that
+    # navigation to finish instead of forcing a second load.  (Not
+    # wait_for_url: it needs a navigation still to be pending, and by then it
+    # may already have landed.)
+    p.wait_for_load_state("load", timeout=_NAV_TIMEOUT)
 
 
 @when(parsers.parse("I go to the {position} page"))
@@ -590,7 +605,10 @@ def when_delete_current_page(luteclient):
     luteclient.page.click("#page-operations-title")
     luteclient.page.on("dialog", lambda dialog: dialog.accept())
     luteclient.page.click("#readmenu_delete_page")
-    luteclient.page.reload()
+    # delete_current_page() sets window.location to /read/delete_page/...,
+    # which 302s on to /read/<id>/page/<n> -- the same reload()-racing-a-
+    # navigation hazard as when_add_page above.
+    luteclient.page.wait_for_load_state("load", timeout=_NAV_TIMEOUT)
 
 
 # Reading, terms
