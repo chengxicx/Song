@@ -112,6 +112,12 @@ jobs:
   # CHANGELOG tells users to, then run the whole suite, so a regression in
   # the Japanese/Korean/spaCy engines shows up here instead of in a reader's
   # grammar panel.
+  #
+  # The parser *plugins* (lute3-thai, lute3-korean, lute3-mandarin,
+  # lute3-cantonese, lute3-khmer) are deliberately not installed: they are
+  # separate distributions that depend on lute3, so they cannot be extras of
+  # it, and Lute installs them on demand at runtime.  Tests needing them skip
+  # -- which is what `is_supported("<parser>")` guards exist for.
   grammar-engines:
     runs-on: ubuntu-latest
     timeout-minutes: 90
