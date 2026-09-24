@@ -366,6 +366,10 @@ body {
   justify-content: center;
   gap: 6px;
   margin-top: 20px;
+  /* The two grades shouldn't stretch across the whole card. */
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Anki's colours, so the muscle memory carries over. */
@@ -380,7 +384,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  /* Equal shares of the row, so the four never wrap onto two lines. */
+  /* Equal shares of the row, so the two never wrap onto two lines. */
   flex: 1 1 0;
   min-width: 0;
   padding: 8px 6px;

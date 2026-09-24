@@ -6,8 +6,8 @@ requires Python >= 3.10, so it is pip-installed on demand -- mirroring
 the grammar-engine install pattern (status line + one-click install
 button) -- and the review pages degrade gracefully without it.
 
-All fsrs imports are lazy: enqueueing (criteria + sentence lookups)
-works without the package; only scheduling a review needs it.
+All fsrs imports are lazy: admitting cards to the queue works without
+the package; only scheduling a review needs it.
 """
 
 import importlib.metadata
@@ -171,18 +171,18 @@ def rating_value(rating_int):
     }[rating_int]
 
 
-def next_intervals(scheduler, fcard, now):
+def preview_intervals(scheduler, fcard, now):
     """
-    Preview the next due intervals for each rating, as display strings
-    [Again, Hard, Good, Easy].  Does not mutate fcard.
+    Preview the next due intervals for the two ratings, as display
+    strings {"again": "10m", "good": "4d"}.  Does not mutate fcard.
     """
     import copy  # pylint: disable=import-outside-toplevel
 
-    labels = []
-    for rating_int in (1, 2, 3, 4):
+    labels = {}
+    for key, rating_int in (("again", 1), ("good", 3)):
         clone = copy.deepcopy(fcard)
         newcard, _log = scheduler.review_card(clone, rating_value(rating_int), now)
-        labels.append(_format_interval(newcard.due - now))
+        labels[key] = _format_interval(newcard.due - now)
     return labels
 
 
