@@ -14,11 +14,68 @@ This module is "registered" to pytest in ./__init__.py
 to get nicer assertion details.
 """
 
+import os
+import re
 import time
 import json
+import textwrap
 import requests
 from playwright.sync_api import Keyboard, Mouse, expect
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+
+# A structurally valid MPEG-1 Layer III stream, synthesized rather than
+# committed as a binary fixture.  The header FF FB 90 00 is MPEG-1,
+# Layer III, no CRC, 128 kbps, 44100 Hz, stereo: 417-byte frames of 1152
+# samples each, so one frame is ~26.1 ms.  The payload is zeroes (silence).
+# A decoder only needs the frame headers, so this plays in a real <audio>
+# element -- Edge reports readyState 4 and a 10.4 s duration for 400
+# frames -- which is what lets an acceptance test drive the real media
+# player without shipping an audio asset.
+_MP3_FRAME = bytes([0xFF, 0xFB, 0x90, 0x00]) + bytes(417 - 4)
+
+
+def silent_mp3_bytes(frames=400):
+    "Silent but playable MP3 audio; the default is ~10.4 seconds."
+    return _MP3_FRAME * frames
+
+
+def normalized_text(value):
+    """Text with whitespace and zero-width spaces removed.
+
+    The reading page's text can't be compared verbatim: the renderer appends
+    a &ZeroWidthSpace; span to every paragraph, and the players inject a 🔊
+    button into every sentence.  The mark's own matching normalizes the same
+    way (see static/js/lute-playing-line.js), so an expectation has to.
+    """
+    return re.sub(r"[\s\u200b]+", "", value or "")
+
+
+def _srt_timestamp(seconds):
+    "A seconds value as an SRT timestamp (HH:MM:SS,mmm)."
+    ms = int(round(seconds * 1000))
+    hours, ms = divmod(ms, 3600000)
+    minutes, ms = divmod(ms, 60000)
+    secs, ms = divmod(ms, 1000)
+    return f"{hours:02d}:{minutes:02d}:{secs:02d},{ms:03d}"
+
+
+def srt_text_for_lines(lines, seconds_per_line=3.0):
+    """An SRT with one cue per line, the cues running back to back from 0.
+
+    One cue per line is the shape a media book's page text has: its text is
+    the cue texts joined by newlines (see lute/book/service.py
+    parse_subtitle_content), so page line N is cue N -- which is what lets a
+    test say "play line 2" and expect line 2 of the page to be marked.
+    """
+    blocks = []
+    for i, text in enumerate(lines):
+        start = i * seconds_per_line
+        blocks.append(
+            f"{i + 1}\n"
+            f"{_srt_timestamp(start)} --> {_srt_timestamp(start + seconds_per_line)}\n"
+            f"{text}\n"
+        )
+    return "\n".join(blocks)
 
 
 class LuteTestClient:  # pylint: disable=too-many-public-methods
@@ -82,6 +139,26 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     def click_link(self, linktext):
         self.page.locator(f'text="{linktext}"').click()
 
+    def wait_for_page_text(self, text, timeout=None):
+        """
+        Wait until the page's HTML contains text, and return that HTML.
+
+        A helper that acts and then checks used to read page.content()
+        once, so a response still in flight looked like a wrong result.
+        That is what made this suite flaky -- a different scenario red on
+        each run, which the retry wrapper in ci.yml only masked.  Poll
+        instead: the loop exits as soon as the text matches, so a warm
+        machine pays nothing.
+        """
+        if timeout is None:
+            timeout = float(os.environ.get("LUTE_TEST_READ_TIMEOUT", 15))
+        deadline = time.time() + timeout
+        content = self.page.content()
+        while text not in content and time.time() < deadline:
+            time.sleep(0.25)
+            content = self.page.content()
+        return content
+
     ################################3
     # Languages
 
@@ -95,8 +172,10 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
         # Partial text match for link
         self.page.get_by_role("link", name=langname, exact=False).click()
-        time.sleep(0.1)  # hack
-        assert f"Edit {langname}" in self.page.content()
+        # Poll for the edit form: the link's response can still be in
+        # flight, and a fixed sleep is just a race with a shorter fuse.
+        content = self.wait_for_page_text(f"Edit {langname}")
+        assert f"Edit {langname}" in content
 
         updates = updates or {}
         for k, v in updates.items():
@@ -151,20 +230,35 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         self.page.locator("#save").click(force=True)
 
     def get_book_table_content(self):
-        "Get book table content."
-        rows = self.page.locator("#booktable tbody tr")
-        rowcount = rows.count()
+        """
+        Get book table content, as one consistent snapshot.
+
+        Read every cell in a single evaluate(), not one locator call per
+        cell.  The table is serverSide (book/tablelisting.html), so typing
+        in the search box fires an ajax request and DataTables replaces the
+        whole tbody when the response lands.  A read assembled from
+        rowcount * tdcount separate round-trips can therefore have the rows
+        swapped out from under it -- Playwright then waits its full 4s for
+        a detached node that is never coming back, and *raises* rather than
+        returning stale text.  That is what broke
+        test_reenabled_data_is_still_available once the caller started
+        polling.  One JS call cannot be interleaved by a redraw, and costs
+        one round trip instead of hundreds.
+        """
+        rows = self.page.evaluate(
+            """() => Array.from(
+                document.querySelectorAll("#booktable tbody tr")
+            ).map((row) => Array.from(
+                row.querySelectorAll("td")
+            ).map((td) => td.innerText))"""
+        )
         content = []
 
-        for i in range(rowcount):
-            row = rows.nth(i)
-            tds = row.locator("td")
-            tdcount = tds.count()
-            rowtext = [tds.nth(j).inner_text().strip() for j in range(tdcount)]
+        for rowtext in rows:
             # Skip the last two columns:
             # - "last opened" date is a hassle to check
             # - "actions" is just "..."
-            ret = "; ".join(rowtext[:-2]).strip()
+            ret = "; ".join([t.strip() for t in rowtext[:-2]]).strip()
             # Hacky cleanup ok for tests.
             ret = ret.replace("\u200B", "").replace("\n", "").replace("\\n", "")
             content.append(ret)
@@ -400,21 +494,227 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         return "\n".join([r for r in rowstring if r.strip() != ""]).strip()
 
     ################################3
+    # Review
+
+    def expect_review_due_count(self, expected):
+        "Wait for the dashboard's due counter to reach expected."
+        expect(self.page.locator("#review_due_count")).to_have_text(str(expected))
+
+    def review_session_state(self):
+        """
+        The live session DOM: the question, whether the answer is
+        showing, the grade buttons, whether the run is over.
+
+        All of it is built by lute-review.js from a POST to
+        /review/start, so none of it is in the served HTML -- and
+        `error` is captured so a failed start explains itself instead of
+        looking like a missing card.
+        """
+        return self.page.evaluate(
+            """() => {
+                 const card = document.getElementById("review_card");
+                 const q = document.getElementById("review_question");
+                 const answer = document.getElementById("review_answer");
+                 const grades = document.getElementById("review_grades");
+                 const undo = document.getElementById("review_undo");
+                 const err = document.getElementById("review_session_error");
+                 const progress = document.getElementById("review_progress");
+                 return {
+                   question: q ? q.textContent.trim() : null,
+                   answer_showing: !!answer && !answer.hidden,
+                   answer: answer ? answer.textContent.trim() : null,
+                   grades_showing: !!grades && !grades.hidden,
+                   grade_ratings: grades
+                     ? Array.from(grades.querySelectorAll(".rv-grade")).map(
+                         (b) => b.dataset.rating
+                       )
+                     : [],
+                   done: !!card && card.textContent.indexOf("Session done") >= 0,
+                   progress: progress ? progress.textContent.trim() : "",
+                   // The card's own pronunciation: the 🔊 button, and
+                   // whether the TTS layer it calls is actually on the
+                   // page (a button with no engine behind it is a dead
+                   // click that looks fine in the markup).
+                   speak_button: !!card && !!card.querySelector(".rv-speak"),
+                   tts_available: typeof window.luteTtsSpeak === "function",
+                   undo_available: !!undo && !undo.hidden,
+                   // `hidden` alone is not enough: any stylesheet that
+                   // sets `display` on the element beats the UA rule
+                   // and leaves a "hidden" button on screen.  Ask the
+                   // layout engine instead.
+                   undo_visible: !!undo && undo.getClientRects().length > 0,
+                   error:
+                     err && err.style.display !== "none"
+                       ? err.textContent.trim()
+                       : null,
+                 };
+               }"""
+        )
+
+    def wait_for_review_card(self):
+        "Wait until the session has fetched and rendered a card."
+        try:
+            self.page.locator("#review_card .rv-card").wait_for(timeout=8000)
+        except PlaywrightTimeoutError as ex:
+            state = self.review_session_state()
+            raise AssertionError(
+                f"no card was rendered; session state: {state}"
+            ) from ex
+
+    def reveal_review_answer(self):
+        "Click 'Show answer'."
+        self.page.click("#review_reveal")
+
+    def click_review_speaker(self):
+        """
+        Click the card's speaker button; False when there is none.
+
+        The recording is cleared first so review_spoken() reports what
+        this click said: the card may already have pronounced itself as
+        it opened (whether it does depends on whether the tab has been
+        interacted with -- sticky activation survives a navigation in
+        Chromium, so on a reused page it does).
+        """
+        btn = self.page.locator("#review_card .rv-speak")
+        if btn.count() == 0:
+            return False
+        self.page.evaluate("() => { window.__spoken = []; }")
+        btn.first.click()
+        return True
+
+    def record_review_speech(self):
+        """
+        Record what the session page asks the TTS layer to say, from
+        before the page's own scripts run.
+
+        The automatic pronunciation happens as the first card renders --
+        far too early to stub afterwards -- and the real luteTtsSpeak
+        talks to the browser's speech engine, which a headless run
+        cannot hear and which refuses to speak before the page has been
+        interacted with.  So tts.js's assignment is captured by the
+        property's setter, and reads come back as a recorder.  That
+        makes the recording independent of the browser's autoplay policy
+        (the page still decides *whether* to speak, which is what is
+        under test).
+        """
+        self.page.add_init_script(
+            """
+            window.__spoken = [];
+            Object.defineProperty(window, "luteTtsSpeak", {
+              configurable: true,
+              set: (fn) => { window.__realTtsSpeak = fn; },
+              get: () => (text, onStarted, lang) => {
+                window.__spoken.push({ text: text, lang: lang });
+              },
+            });
+            """
+        )
+
+    def review_speak_state(self):
+        """
+        What the pronunciation assertions need to explain a red run:
+        whether the page was allowed to speak, what the switch says, and
+        what is on the card now.
+        """
+        return self.page.evaluate(
+            """() => {
+                 const ua = navigator.userActivation;
+                 const card = document.getElementById("review_card");
+                 const term = card ? card.querySelector(".rv-term") : null;
+                 return {
+                   // Chrome and Safari refuse to speak before the
+                   // document has been activated: this is what decides
+                   // whether a card speaks as it opens or waits for a
+                   // gesture.
+                   page_activated: ua ? ua.hasBeenActive : "n/a",
+                   speak_cards:
+                     typeof window.luteTtsSetting === "function"
+                       ? window.luteTtsSetting("review_speak_cards", true)
+                       : "tts.js is not on the page",
+                   tts_speak: typeof window.luteTtsSpeak,
+                   term: term ? term.textContent.trim() : null,
+                   spoken: window.__spoken || [],
+                 };
+               }"""
+        )
+
+    def pretend_page_untouched(self):
+        """
+        Make the page report that it has not been interacted with.
+
+        Chromium's activation is sticky and survives a navigation, so by
+        the time a scenario reaches the review session the page has
+        always been clicked (creating the term is a click) and
+        navigator.userActivation.hasBeenActive is true -- the card
+        speaks as it opens and the "wait for the first gesture" path is
+        unreachable.  Forcing the flag is how that path gets covered;
+        lute-review.js is the only thing on the page that reads it.
+        """
+        self.page.add_init_script(
+            """
+            Object.defineProperty(navigator, "userActivation", {
+              configurable: true,
+              get: () => ({ hasBeenActive: false, isActive: false }),
+            });
+            """
+        )
+
+    def review_spoken(self):
+        "What the session page has asked the TTS layer to say."
+        return self.page.evaluate("() => window.__spoken || []")
+
+    def set_review_speak_cards(self, enabled):
+        """
+        Tick or untick the review settings page's card-pronunciation
+        switch and save it, as a user would.
+        """
+        self.visit("/review/settings")
+        box = self.page.locator('input[name="review_speak_cards"]')
+        if enabled:
+            box.check()
+        else:
+            box.uncheck()
+        self.page.click('#review_settings_form button[type="submit"]')
+        # The form 302s to the index; wait for that landing rather than
+        # for "load", which is already true on the page being left.
+        expect(self.page).to_have_url(re.compile(r"/review/index$"))
+
+    def grade_review_card(self, rating):
+        "Click the grade button for a rating (1 = Again, 3 = Good)."
+        self.page.click(f'.rv-grade[data-rating="{rating}"]')
+
+    def undo_last_grade(self):
+        "Click Undo in the session top bar."
+        self.page.click("#review_undo")
+
+    ################################3
     # Reading/rendering
 
     def wait_reading_ready(self, timeout=10000):
         """Wait until the reading page has finished its async setup.
 
         The reading text arrives asynchronously (htmx.ajax into #thetext),
-        and the post-swap bookkeeping in _finishPageSwap ends by calling
+        and the post-swap bookkeeping in _finishPageSwap runs
         start_hover_mode(), which resets the cursor and hides the term form
         and dictionaries.  A step that interacts with the text before that
         has run gets its work undone underneath it: the hover step finds no
         words to hover, and a term form opened too early is wiped.
 
-        luteStartReadingDone is set by _finishPageSwap, so it becomes true
-        only once the swap (and its resets) have finished.  Tolerates pages
-        that have no such global at all.
+        luteStartReadingDone is set by _finishPageSwap, but do not read that
+        as "the resets have finished" -- two limits bit the bulk-hotkey
+        scenarios, so check them before relying on this:
+
+        * it is set on the FIRST line of _finishPageSwap, *before*
+          start_hover_mode() runs, so this can return ahead of those resets;
+        * a status-update swap never goes through _finishPageSwap at all
+          (the htmx:afterSwap handler only calls it when a page navigation
+          is pending), so here this returns immediately.
+
+        For a swapped-in fragment the cursor restore is
+        restore_cursor_marker(), which deliberately does NOT clear
+        span.kwordmarked -- see test_reading_fragment_swap.py.
+
+        Tolerates pages that have no such global at all.
 
         Uses an explicit timeout rather than the suite's 4s default: that
         default is tuned for assertions, and this is a readiness wait, not a
@@ -426,6 +726,212 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                      || luteStartReadingDone === true""",
             timeout=timeout,
         )
+
+    def start_tts_playback(self):
+        """Press the TTS player's play button.
+
+        The player reads the page's sentences, and marks the one it starts
+        on in the reading text right away, so the mark can be asserted
+        without waiting for any speech to finish (or to be produced at
+        all -- headless browsers have no voices).
+        """
+        self.wait_reading_ready()
+        self.page.click("#tts-play-btn")
+
+    def playing_line_state(self):
+        "The line marked as playing in #thetext, with its computed decoration."
+        return self.page.evaluate(
+            """() => {
+              const el = document.querySelector("#thetext .lute-playing-line");
+              if (!el) return { found: false };
+              // The sentence carries an injected 🔊 button; it is part of
+              // the markup, not of the line's text.
+              const clone = el.cloneNode(true);
+              clone.querySelectorAll(".lute-sentence-play-btn").forEach(
+                (b) => b.remove()
+              );
+              const cs = getComputedStyle(el);
+              return {
+                found: true,
+                text: (clone.textContent || "").replace(/[\\s\\u200b]+/g, ""),
+                decoration: cs.textDecorationLine,
+                thickness: cs.textDecorationThickness,
+              };
+            }"""
+        )
+
+    def wait_for_playing_line(self, timeout=8000):
+        """Wait for a line to be marked, and assert its underline is drawn.
+
+        `state="attached"`, not the default "visible": the TTS mark lands
+        on a span.textsentence, whose own inline box is zero-height
+        (font-size: 0% -- the words inside carry the size), so Playwright
+        would call it invisible while the underline is plainly on screen.
+        """
+        try:
+            self.page.wait_for_selector(
+                "#thetext .lute-playing-line", state="attached", timeout=timeout
+            )
+        except PlaywrightTimeoutError as ex:
+            raise AssertionError(
+                "no line was marked as playing;"
+                f" page state: {self.player_diagnostics()}"
+            ) from ex
+        state = self.playing_line_state()
+        assert state["decoration"] == "underline", f"line not underlined: {state}"
+        assert state["thickness"] == "2px", f"unexpected underline: {state}"
+        return state
+
+    ################################3
+    # Media player (a book with subtitles) and the playing-line mark
+
+    def make_mp3_book(self, title, subtitle_lines, langname):
+        """Create an mp3 book: a generated silent track plus subtitles.
+
+        The audio is synthesized (silent_mp3_bytes) rather than shipped as a
+        fixture; the subtitles get one cue per line, so line N of the reading
+        page is cue N.
+
+        The two lengths are tied together deliberately: the default audio is
+        ~10.4 s and the cues are 3 s each, so playing line 2 seeks to 3 s and
+        the playhead stays inside that cue for a further 3 s.  A test then has
+        that long to see the mark on the line it asked for, instead of racing
+        playback to the next cue.
+        """
+        lines = [ln.strip() for ln in textwrap.dedent(subtitle_lines).splitlines()]
+        srt = srt_text_for_lines([ln for ln in lines if ln])
+        self.visit("book/import_webpage")
+        # The import-type picker is a custom dropdown, and the mp3 form is
+        # display:none until its type is chosen.
+        self.page.locator("#import-type-button").click()
+        self.page.locator('#import-type-menu [data-value="mp3"]').click()
+        self.page.locator("#mp3_file").set_input_files(
+            {
+                "name": "audio.mp3",
+                "mimeType": "audio/mpeg",
+                "buffer": silent_mp3_bytes(),
+            }
+        )
+        self.page.locator("#mp3_srt_file").set_input_files(
+            {
+                "name": "subtitles.srt",
+                "mimeType": "application/x-subrip",
+                "buffer": srt.encode("utf-8"),
+            }
+        )
+        self.page.fill("#mp3_title", title)
+        self.page.select_option("#mp3-language", str(self.language_ids[langname]))
+        self.page.locator("#mp3-import").click(force=True)
+        self.page.wait_for_selector("#thetext .textsentence", state="attached")
+
+    def page_cue_map_state(self, timeout=4000):
+        """The line -> cue map the page handed the player, and its line count.
+
+        The map is set by a <script> inside the htmx-swapped page fragment,
+        and htmx inserts the swapped nodes before it runs their scripts -- so
+        the global lands a tick AFTER the DOM it arrived with, and reading it
+        once as soon as the text appears finds nothing.  Poll for it.
+        """
+        try:
+            self.page.wait_for_function(
+                "() => Array.isArray(window.LUTE_PAGE_CUE_MAP)", timeout=timeout
+            )
+        except PlaywrightTimeoutError as ex:
+            raise AssertionError(
+                "the reading page never set a line -> cue map;"
+                f" state: {self.player_diagnostics()}"
+            ) from ex
+        return self.page.evaluate(
+            """() => ({
+              map: window.LUTE_PAGE_CUE_MAP,
+              paragraphs: document.querySelectorAll("#thetext > p").length,
+            })"""
+        )
+
+    def player_diagnostics(self):
+        """Live state of the reading page, to explain a mark that never appeared.
+
+        Covers both players: the TTS one (sentences, no audio element) and the
+        media one (a transcript, an audio element, a cue list).
+        """
+        return self.page.evaluate(
+            """() => {
+              const audio = document.querySelector("audio");
+              const data = window.LUTE_YT_DATA || {};
+              return {
+                helper: typeof window.LutePlayingLine,
+                marked: document.querySelectorAll("#thetext .lute-playing-line").length,
+                sentences: document.querySelectorAll("#thetext .textsentence").length,
+                cueMap: window.LUTE_PAGE_CUE_MAP,
+                backend: data.backend,
+                cues: (data.cues || []).length,
+                rows: document.querySelectorAll(
+                  "#yt-transcript-list .yt-transcript-row").length,
+                audioReady: audio ? audio.readyState : null,
+                audioError: audio && audio.error ? audio.error.code : null,
+              };
+            }"""
+        )
+
+    def play_subtitle_line(self, line_number, timeout=15000):
+        """Play a subtitle from the media player's own transcript list.
+
+        This is the UI path the mark has to survive: clicking a transcript row
+        runs ytSeekToCue -> ytActivateCue, and ytActivateCue is what marks the
+        line in the page text.  The rows only exist once the player is ready,
+        so wait for them rather than for a fixed delay -- a 30s timeout would
+        otherwise turn "the player never started" into "no line was marked".
+
+        The click's effect is deferred by one double-click window (see
+        bind_line_click, which lets a double-click select a word instead), so
+        the caller polls for the mark rather than asserting here.
+        """
+        try:
+            self.page.wait_for_selector(
+                "#yt-transcript-list .yt-transcript-row",
+                state="attached",
+                timeout=timeout,
+            )
+        except PlaywrightTimeoutError as ex:
+            raise AssertionError(
+                "the media player never built its transcript;"
+                f" state: {self.player_diagnostics()}"
+            ) from ex
+        self.page.locator("#yt-transcript-btn").click(force=True)
+        rows = self.page.locator("#yt-transcript-list .yt-transcript-row")
+        assert rows.count() >= line_number, (
+            f"asked for subtitle line {line_number}, but the player has"
+            f" {rows.count()} lines: {self.player_diagnostics()}"
+        )
+        rows.nth(line_number - 1).click(force=True)
+
+    def wait_for_playing_line_text(self, text, timeout=8000):
+        """Wait until the marked line is the one holding `text`.
+
+        Poll for the line, not merely for *a* mark: the media player marks
+        the cue the playhead is on as soon as it is ready, so on a media
+        book a line is already marked before anything is played -- a wait
+        that returns on the first mark would pass on the wrong line, and
+        pass even if the click did nothing at all.
+
+        Also asserts the mark is actually drawn, since this is the step
+        that claims the line is underlined.
+        """
+        deadline = time.monotonic() + timeout / 1000.0
+        want = normalized_text(text)
+        state = {}
+        while time.monotonic() < deadline:
+            state = self.playing_line_state()
+            if state.get("found") and state["text"] == want:
+                break
+            time.sleep(0.05)
+        assert state.get("text") == want, (
+            f"the line {text!r} was never the marked one; last state: {state};"
+            f" page state: {self.player_diagnostics()}"
+        )
+        assert state["decoration"] == "underline", f"line not underlined: {state}"
+        assert state["thickness"] == "2px", f"unexpected underline: {state}"
+        return state
 
     def displayed_text(self):
         "Return the TextItems, with '/' at token boundaries."
@@ -534,6 +1040,65 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         )
         mouse.up()
 
+    # The reading pane's ajax updates are driven by the app itself: it
+    # records what it has asked for in these globals and clears each one in
+    # its htmx:afterSwap handler once the swap has been applied.  They are
+    # top-level `let` bindings (lute-commands.js, read/index.html), so a
+    # bare name resolves inside the page; the typeof guards keep this
+    # working on a page that never loads the reader, and stop a
+    # ReferenceError when one of them is missing.
+    _READING_PANE_SETTLED = """
+        () => (typeof _pendingStatusUpdate === 'undefined'
+               || _pendingStatusUpdate === null)
+           && (typeof _pendingTermFormReload === 'undefined'
+               || _pendingTermFormReload === null)
+           && (typeof _pendingNav === 'undefined' || _pendingNav === null)
+           && document.querySelectorAll('#thetext > .htmx-added').length === 0
+    """
+
+    def _wait_for_reading_pane(self, timeout=3000):
+        """
+        Wait for the app's own reading-pane swaps to land, and to settle.
+
+        _refresh_browser rebuilds <body>, which DETACHES #thetext.  htmx
+        resolves hx-target when the request is issued and swaps into *that*
+        element, so rebuilding while a swap is in flight makes the response
+        land on a detached node: the pane keeps its old text for good, and
+        the following "the reading pane shows" step times out on an update
+        that was applied to nothing.
+
+        The pending-flag part alone is not enough to know the swap has
+        landed.  Those flags are cleared in the app's own htmx:afterSwap
+        handler, and htmx still has a whole settle phase to run after
+        that: it clones the swapped-out node's attributes onto the new
+        nodes and restores the real ones, runs the fragment's <script>
+        (which is what re-applies the term status colours), and only then
+        fires htmx:afterSettle -- all deferred by the settle delay
+        (20ms by default).  Rebuilding <body> inside that window detaches
+        the freshly swapped nodes, so the settle tasks and the fragment
+        script run against a detached subtree: a script inserted into a
+        detached node never executes, and the attributes htmx restored
+        never reach the on-screen nodes.  The visible text then keeps the
+        previous status colours, and the "the reading pane shows" step
+        fails on a status the app had already saved correctly.
+
+        htmx marks every node it inserts with `htmx-added` and drops that
+        class as the first thing each settle task does, so an empty
+        `#thetext > .htmx-added` means the settle phase has run.  The
+        tasks all run synchronously in one loop, so this can only be
+        observed once the whole settle phase is done.
+
+        The old code covered this with a blind 0.2s sleep ("Hack for ci"),
+        which wins on an idle laptop and loses on a loaded runner.
+        """
+        try:
+            self.page.wait_for_function(self._READING_PANE_SETTLED, timeout=timeout)
+        except PlaywrightTimeoutError:
+            # A request that errored never swaps, so its flag is never
+            # cleared.  Don't hang the suite on that -- rebuild anyway, and
+            # let the step that made the request fail on its own assertion.
+            pass
+
     def _refresh_browser(self):
         """
         Term actions (edits, hotkeys) cause updated content to be ajaxed in.
@@ -546,7 +1111,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         """
         # self.browser.reload()
         # ??? ChatGPT suggested:
-        time.sleep(0.2)  # Hack for ci.
+        self._wait_for_reading_pane()
         self.page.evaluate(
             """
             // Trigger re-render of the entire body

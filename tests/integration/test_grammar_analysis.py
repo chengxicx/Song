@@ -133,7 +133,16 @@ def test_german_grammar_analysis_uses_de_engine(client, empty_db, german):
 
 def test_thai_grammar_analysis_uses_th_engine(client, empty_db, thai):
     "泰语书籍应走 pythainlp 语法引擎。"
-    pytest.importorskip("pythainlp")
+    # The Thai grammar engine lives in this repo, but the Thai *parser* does
+    # not: it ships in the lute3-thai plugin (entry point lute_thai), a
+    # separate distribution -- the [thai] extra only installs pythainlp, so
+    # importing pythainlp is not enough to build a Thai book.  Lute installs
+    # the plugin on demand at runtime, so a missing plugin is a skip, not a
+    # failure.  Same guard as the Korean/Mandarin/Cantonese tests below; this
+    # one used to check pythainlp instead and blew up with "Unknown parser
+    # type 'lute_thai'" wherever the extra was installed without the plugin.
+    if not is_supported("lute_thai"):
+        pytest.skip("lute_thai parser plugin not installed")
     book = make_book(
         "Thai Grammar Demo",
         ["ผมกำลังอ่านหนังสือ คุณจะไปไหน เขาไม่ชอบกาแฟ"],

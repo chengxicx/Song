@@ -361,3 +361,53 @@ def test_components_only_returned_once(spanish, app_context, service):
 
     d = service.get_popup_data(t.id)
     assert_components(d, ["gato; cat"], "components")
+
+
+def test_popup_data_is_none_when_the_language_goes_away_mid_request(
+    spanish, app_context, service
+):
+    """
+    The popup has to survive a term whose language is no longer readable.
+
+    `words.WoLgID` is NOT NULL and its foreign key cascades, so a term
+    cannot be missing a language *in the database*.  A request can still
+    observe one: the popup window left open by an acceptance scenario
+    asks for its term while the next scenario wipes the db, so the term
+    is loaded before the commit and its language is read after it.
+    find_all_Terms_in_string then reached for the language's parser and
+    the request died with `AttributeError: 'NoneType' object has no
+    attribute 'get_parsed_tokens'` -- a 500 for a popup that is about to
+    be thrown away.
+
+    The interleaving is reproduced here with a second connection, so the
+    state under test is the real one rather than a row that cannot exist.
+    """
+    t = Term(spanish, "gato")
+    t.translation = "cat"
+    db.session.add(t)
+    db.session.commit()
+    termid = t.id
+    langid = spanish.id
+
+    # The request reads the term, with nothing else cached.
+    db.session.expunge_all()
+    term = db.session.get(Term, termid)
+    assert term is not None
+
+    # ... and the wipe commits in between.
+    con = db.engine.raw_connection()
+    try:
+        cur = con.cursor()
+        cur.execute("delete from words where WoID = ?", (termid,))
+        cur.execute("delete from languages where LgID = ?", (langid,))
+        con.commit()
+    finally:
+        con.close()
+
+    # The preconditions, so a green run cannot mean something else: the
+    # term is still in hand (a re-query would return None, and the call
+    # below would pass for the wrong reason) and its language is gone.
+    assert db.session.get(Term, termid) is term, "term still in the identity map"
+    assert term.language is None, "the language is gone underneath it"
+
+    assert service.get_popup_data(termid) is None, "nothing to show"
