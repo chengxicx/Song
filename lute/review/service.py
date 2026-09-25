@@ -16,6 +16,7 @@ from lute.models.repositories import UserSettingRepository
 from lute.models.review import ReviewCard, ReviewLog
 from lute.term.model import ReferencesRepository
 from lute.review import enqueue, scheduler
+from lute.tts.routes import get_lang_code_for
 
 ZWS = "\u200B"
 
@@ -131,6 +132,11 @@ def _card_view(dbcard, lookup, sched, now_aware):
         "romanization": term.romanization or "",
         "sentence": sentence,
         "image": _image_src(term),
+        # BCP-47 tag for speaking this card's term (the page pronounces
+        # it with TTS).  Per card, not per session: one review queue
+        # holds the terms of every language the user studies, and
+        # tts.js's own detection is for the reader's single book.
+        "lang_code": get_lang_code_for(term.language),
         "reps": dbcard.reps,
     }
     if dbcard.card_type == "cloze":
