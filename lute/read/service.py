@@ -1049,6 +1049,15 @@ class Service:
         if term is None:
             return None
 
+        # A term whose language is gone cannot be rendered: the
+        # components need its parser, and a term image's url is scoped
+        # to the language id.  The state is reachable -- a wipe deletes
+        # the languages while a popup request is in flight, so the term
+        # loads before the commit and its language after it -- and the
+        # popup for a term that no longer exists should simply be empty.
+        if term.language is None:
+            return None
+
         repo = UserSettingRepository(self.session)
         show_components = int(repo.get_value("term_popup_show_components")) == 1
         components = []
