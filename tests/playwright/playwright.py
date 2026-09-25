@@ -32,6 +32,8 @@ import time
 import re
 import pytest
 from playwright.sync_api import Playwright, sync_playwright, expect
+from playwright.sync_api import Error as PlaywrightError
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 
 def _launch(browser_type, headless):
@@ -103,6 +105,75 @@ def _wait_reading_ready(page):
     }"""
     )
     page.wait_for_timeout(200)
+
+
+def _reader_state(page):
+    """
+    The reading page's own pagination state, for a failure message.
+
+    Read out of the page's globals rather than inferred from what happens to
+    be visible: "the locator resolved to hidden" says nothing about *why*,
+    and the reader hides paragraphs on purpose (see _splitToScreens in
+    read/index.html, which gives every paragraph outside the current
+    sub-screen `display: none`).
+    """
+    try:
+        return page.evaluate(
+            """() => {
+            const el = document.querySelector('#thetext span.word');
+            const cs = el ? getComputedStyle(el) : null;
+            const box = el ? el.getBoundingClientRect() : null;
+            const p = el ? el.closest('p') : null;
+            const paras = Array.from(document.querySelectorAll('#thetext > p'));
+            return {
+                page_num: document.querySelector('#page_num')?.value,
+                done: typeof luteStartReadingDone !== 'undefined' && luteStartReadingDone,
+                subScreens: typeof subScreens === 'undefined' ? null : subScreens.length,
+                curScreen: typeof curScreen === 'undefined' ? null : curScreen,
+                paragraphs: paras.length,
+                first_word: el ? el.id : null,
+                first_word_text: el ? el.textContent : null,
+                first_word_display: cs ? cs.display : null,
+                first_word_size: box ? [Math.round(box.width), Math.round(box.height)] : null,
+                first_word_paragraph: p ? paras.indexOf(p) : null,
+                paragraph_inline_display: p ? p.style.display : null,
+            };
+        }"""
+        )
+    except PlaywrightError as e:
+        # The page can already be gone by the time we ask (browser closed,
+        # navigation raced us).  Saying so is useful; losing the timeout we
+        # are explaining to it is not -- that is the one way this diagnostic
+        # could hide the very thing it exists to report.
+        return f"<reader state unavailable: {type(e).__name__}: {e}>"
+
+
+def _wait_first_word_visible(page):
+    """
+    Wait for the reading text to be on screen, and say what the reader was
+    doing if it never appears.
+
+    `page.locator("span.word").first` is DOM order, not screen order.  The
+    reader hides every paragraph outside the current sub-screen
+    (_renderScreen in read/index.html), so that locator is only *guaranteed*
+    to be visible at `curScreen === 0` -- measured directly, it is hidden for
+    most of the walk `_turn_to_next_page` performs.  A bare wait_for() then
+    reports only "locator resolved to hidden <span ...>" for 30 seconds,
+    which says nothing about the reader's state.
+
+    That is what happened on CI (see the 2026-09-25 work log: the element was
+    the *destination* page's `ID-0-0`, `data-text="Note"`).  It has not been
+    reproduced here -- not in 20 single-test runs, 31 page turns, a 300-940 px
+    pane-height sweep, a 50 ms sampler across the turn, or 6 fresh-app
+    full-file runs -- so the state is dumped instead of the bare timeout, to
+    make the next occurrence explain itself.
+    """
+    try:
+        page.locator("span.word").first.wait_for()
+    except PlaywrightTimeoutError as e:
+        raise AssertionError(
+            f"the reading text never became visible: {_reader_state(page)}"
+        ) from e
 
 
 def _reveal(page, selector, max_turns=12):
@@ -589,7 +660,7 @@ def test_page_change_first_word():
         page.get_by_role("link", name="Tutorial", exact=True).click()
 
         # Wait until page text is loaded
-        page.locator("span.word").first.wait_for()
+        _wait_first_word_visible(page)
 
         # The click above parked the pointer over the text, which leaves a
         # stray hover on whatever word is under it.  Hovering a word calls
@@ -616,7 +687,7 @@ def test_page_change_first_word():
         _turn_to_next_page(page)
 
         # Wait for the new page content to load
-        page.locator("span.word").first.wait_for()
+        _wait_first_word_visible(page)
 
         # Verify that NO word on the new page is highlighted automatically
         expect(
