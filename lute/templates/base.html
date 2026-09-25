@@ -74,6 +74,7 @@
   {% endif %}
   <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ vstatic('css/player-styles.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('css/review.css') }}" />
 
   {# Content-addressed theme css: the ?v= hash changes whenever the
      theme changes, so the response can be cached effectively forever.
@@ -117,6 +118,7 @@
   <script type="text/javascript" src="{{ vstatic_js('lute-touch.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ vstatic_js('lute-commands.js') }}" charset="utf-8"></script>
   <script type="text/javascript" src="{{ vstatic_js('lute-anki.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-review.js') }}" charset="utf-8"></script>
 
   <script type="text/javascript">
     const LUTE_USER_SETTINGS = {{ user_settings | safe }}
@@ -227,6 +229,7 @@
       <div class="menu-item">
         <span id="menu_terms">Term</span>
         <ul class="sub-menu">
+          <li><a id="review_index" href="/review/index">Review</a></li>
           <li><a id="term_index" href="/term/index">Terms</a></li>
           <li><a id="term_import_index" href="/termimport/index">Import Terms</a></li>
           <li><a href="/termtag/index">Term Tags</a></li>

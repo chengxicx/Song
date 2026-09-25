@@ -6,6 +6,7 @@ import os
 from sqlalchemy import text
 from flask import current_app
 from lute.models.setting import UserSetting
+from lute.settings.current import refresh_global_settings
 from lute.settings.hotkey_data import initial_hotkey_defaults
 from lute.models.repositories import UserSettingRepository
 
@@ -20,6 +21,14 @@ def delete_all_data(session):
     # Setting the pragma first ensures cascade delete.
     statements = [
         "pragma foreign_keys = ON",
+        # Review data goes first.  Nothing cascades into reviewspecs (it
+        # has no foreign key to languages, so specs used to survive a
+        # wipe), and reviewcards references words without an ON DELETE
+        # clause -- so a card left behind makes the language delete below
+        # fail outright with a foreign key error.
+        "delete from reviewlogs",
+        "delete from reviewcards",
+        "delete from reviewspecs",
         "delete from languages",
         "delete from tags",
         "delete from tags2",
@@ -29,6 +38,14 @@ def delete_all_data(session):
         session.execute(text(s))
     session.commit()
     add_default_user_settings(session, current_app.env_config.default_user_backup_path)
+    # "Restore user settings" means in memory too.  Settings are served
+    # from a per-process cache (lute.settings.current), so without this
+    # the deleted values stay in effect for the life of the process --
+    # the db and the app disagree, and every caller (the dev api, the
+    # demo loader, the acceptance suite) inherits the stale ones.  Every
+    # other add_default_user_settings call site refreshes for the same
+    # reason.
+    refresh_global_settings(session)
 
 
 def _revised_mecab_path(repo):
@@ -120,6 +137,11 @@ def add_default_user_settings(session, default_user_backup_path):
         "tts_click_pronunciation": True,
         "tts_show_control_panel": True,
         "tts_show_sentence_buttons": True,
+        # Review queue:
+        "review_desired_retention": "0.9",
+        "review_max_new_per_day": 20,
+        "review_card_types": '{"recognition": 1, "cloze": 1}',
+        "review_speak_cards": True,
     }
     add_initial_vals_if_needed(keys_and_defaults)
 

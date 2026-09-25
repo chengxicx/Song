@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Review session{% endblock %}
+{% block header %}Review{% endblock %}
+
+{% block body %}
+
+{# Cards are pronounced, so the page needs the TTS layer: window.luteTtsSpeak
+   lives in tts.js, which the reading page loads for itself and no other page
+   has.  Deferred, and resolved at call time by lute-review.js, which is
+   loaded (without defer) from base.html. #}
+<script type="text/javascript" src="{{ vstatic_js('tts.js') }}" charset="utf-8" defer></script>
+
+<div id="review_session_container">
+  <div class="rv-topbar">
+    <div id="review_progress" class="rv-progress"></div>
+    <button class="btn btn-secondary" id="review_undo" hidden>Undo <kbd>Ctrl+Z</kbd></button>
+  </div>
+  <div id="review_card"></div>
+</div>
+
+<div id="review_session_error" class="rv-error" style="display: none;"></div>
+
+<script>
+  // Everything on this page is built by lute-review.js, so a script
+  // that never arrived used to leave nothing but the (hidden) Undo
+  // button on screen.  Try loading it by hand once before giving up --
+  // that recovers a cached or dropped request -- and when it still
+  // fails, say what actually happened instead of just "did not load".
+  (function () {
+    const SRC = "{{ vstatic_js('lute-review.js') | safe }}";
+
+    // One line of facts, because the three ways this fails need three
+    // different fixes: no <script> tag at all means base.html is an old
+    // copy; HTTP 404 means the static file is missing on the server;
+    // a network error means the request never reached it.
+    function facts(status) {
+      const tag = !!document.querySelector('script[src*="lute-review.js"]');
+      return [
+        "script tag in the page: " + (tag ? "yes" : "no"),
+        "re-fetching " + SRC + ": " + status,
+        // Bare identifier: lute-popups.js declares a top-level const,
+        // which is a global binding but NOT a window property.
+        "other first-party JS: LutePopups=" + typeof LutePopups,
+      ].join(" | ");
+    }
+
+    function fail(detail) {
+      const box = document.getElementById("review_session_error");
+      const btn = document.getElementById("review_undo");
+      if (btn) btn.hidden = true;
+      if (!box) return;
+      box.style.display = "block";
+      box.innerHTML =
+        "<p>The review script did not load, so the session cannot start.</p>" +
+        "<p class='rv-detail'>" + detail + "</p>" +
+        "<p>Reload the page (a hard reload clears a stale cache).</p>" +
+        "<p><a href='/review/index'>Back to review index</a></p>";
+    }
+
+    // Loading it by hand recovers a dropped or cache-mangled request --
+    // and also the case where base.html never emitted the tag.
+    function rescue() {
+      const s = document.createElement("script");
+      s.src = SRC;
+      s.onload = () => {
+        if (typeof LuteReview === "undefined") {
+          fail(facts("loaded, but it did not define LuteReview"));
+          return;
+        }
+        LuteReview.start_session();
+      };
+      // onload/onerror give no status, so ask separately.
+      s.onerror = () =>
+        fetch(SRC)
+          .then((r) => fail(facts("HTTP " + r.status)))
+          .catch(() => fail(facts("network error")));
+      document.head.appendChild(s);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof LuteReview !== "undefined") {
+        LuteReview.start_session();
+        return;
+      }
+      rescue();
+    });
+  })();
+</script>
+
+{% endblock %}

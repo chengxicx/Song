@@ -33,11 +33,14 @@
   let ttsVoiceLabel = null;
 
   // Cue data: built from #thetext sentences.
-  //   { text, html, start, end, duration, actualDuration }
+  //   { text, html, start, end, duration, actualDuration, sentIdx }
   // `start` / `end` are virtual times in seconds, accumulated across
   // all cues. `duration` is the initial estimate (character-based),
   // `actualDuration` is filled in once the cue has played through.
+  // `sentIdx` is the cue's .textsentence index in #thetext, used to
+  // underline the sentence being read (see ttsMarkPlayingSentence).
   let ttsCues = [];
+  let ttsCueSentenceCount = 0;
   let ttsCueIndex = -1;
   let ttsPlaying = false;
   let ttsPaused = false;
@@ -219,8 +222,11 @@
     if (!textDiv) return;
 
     const sentences = textDiv.querySelectorAll(".textsentence");
+    // Remembered so a later activation can tell whether #thetext still
+    // holds the text these cues were built from (a page turn swaps it).
+    ttsCueSentenceCount = sentences.length;
     let acc = 0;
-    sentences.forEach(function (s) {
+    sentences.forEach(function (s, sentIdx) {
       // Each .textsentence yields 1..N sub-cues; long sentences are
       // split at comma boundaries (see ttsSplitSentenceIntoCues).
       const subCues = ttsSplitSentenceIntoCues(s);
@@ -230,6 +236,7 @@
         ttsCues.push({
           text: sub.text,
           html: sub.html,
+          sentIdx: sentIdx,
           start: acc,
           end: acc + dur,
           duration: dur,
@@ -660,6 +667,9 @@
     for (let r = 0; r < rows.length; r++) {
       rows[r].classList.toggle("active", r === idx);
     }
+    // Underline the sentence in the reading text itself, so the reader
+    // can follow along in the page and not only in the subtitle above.
+    ttsMarkPlayingSentence(idx);
     const row = rows[idx];
     if (row && ttsTranscript && ttsTranscript.style.display !== "none") {
       const rowRect = row.getBoundingClientRect();
@@ -672,7 +682,28 @@
     }
   }
 
+  // Underline the sentence being read in the reading text (#thetext).
+  //
+  // The cue's sentence is resolved against the text on screen rather
+  // than held as an element: a page turn swaps #thetext for a fresh set
+  // of spans, and an element kept from the previous page would take the
+  // mark off screen with it.  When the sentence count no longer matches
+  // the one the cues were built from, the text has been replaced
+  // wholesale (or is still loading), and nothing is marked.
+  function ttsMarkPlayingSentence(idx) {
+    if (!window.LutePlayingLine) return;
+    const cue = ttsCues[idx];
+    const div = document.getElementById("thetext");
+    const sentences = div ? div.querySelectorAll(".textsentence") : [];
+    if (!cue || sentences.length !== ttsCueSentenceCount) {
+      window.LutePlayingLine.clear();
+      return;
+    }
+    window.LutePlayingLine.setElement(sentences[cue.sentIdx] || null);
+  }
+
   function ttsDeactivateCue() {
+    if (window.LutePlayingLine) window.LutePlayingLine.clear();
     const rows = ttsTranscriptList
       ? ttsTranscriptList.querySelectorAll(".yt-transcript-row")
       : [];

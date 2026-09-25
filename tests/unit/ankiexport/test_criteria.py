@@ -32,6 +32,17 @@ def fixture_term():
     [
         ('language:"Spanish"', True),
         ('language:"xxx"', False),
+        ('language == "Spanish"', True),
+        ('language == "spanish"', True),
+        ('language = "Spanish"', True),
+        ('language="xxx"', False),
+        ('language != "English"', True),
+        ('language != "Spanish"', False),
+        ('language != "spanish"', False),
+        ("status <> 3", False),
+        ("status <> 1", True),
+        ('status > 1 and language == "Spanish"', True),
+        ('status < 1 and language == "Spanish"', False),
         ("parents.count=1", True),
         ("parents.count==1", True),
         ("parents.count>=0", True),
@@ -62,7 +73,6 @@ def test_blank_criteria_is_always_true(term):
     "criteria",
     [
         ('lanxguage:"Spanish"'),
-        ('language="xxx"'),
         ("parents=1"),
         ('tags="masc"'),
         ('tags["fem", "masc"]'),
@@ -79,7 +89,6 @@ def test_bad_criteria_throws(criteria, term):
     "criteria",
     [
         ('lanxguage:"Spanish"'),
-        ('language="xxx"'),
         ("parents=1"),
         ('tags="masc"'),
         ('tags["fem", "masc"]'),
