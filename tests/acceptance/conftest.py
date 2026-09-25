@@ -818,6 +818,63 @@ def then_undo_hidden(luteclient):
     assert not state["undo_visible"], state
 
 
+@then("the review card offers pronunciation")
+def then_review_card_offers_pronunciation(luteclient):
+    luteclient.wait_for_review_card()
+    state = luteclient.review_session_state()
+    assert state["error"] is None, f"the session failed: {state['error']}"
+    assert state["speak_button"], f"no speaker button on the card: {state}"
+    # A button with no engine behind it is a dead click, and the markup
+    # looks identical either way -- tts.js is only loaded by the reading
+    # page and this one, so a missing script tag is a real risk.
+    assert state["tts_available"], f"tts.js is not on the session page: {state}"
+
+
+@given("I record what the review session pronounces")
+def given_record_review_speech(luteclient):
+    luteclient.record_review_speech()
+
+
+@given("the page has not been interacted with")
+def given_page_not_interacted_with(luteclient):
+    luteclient.pretend_page_untouched()
+
+
+@when("I click the speaker on the review card")
+def when_click_review_speaker(luteclient):
+    assert luteclient.click_review_speaker(), "the card has no speaker button"
+
+
+@when("I press the space key in the review session")
+def when_press_space_in_review(luteclient):
+    luteclient.page.keyboard.press("Space")
+
+
+@when("I turn off the card pronunciation in the review settings")
+def when_turn_off_card_pronunciation(luteclient):
+    luteclient.set_review_speak_cards(False)
+
+
+@then(parsers.parse('the term "{text}" is spoken as "{lang}"'))
+def then_term_spoken_as(luteclient, text, lang):
+    # Exactly one utterance: whichever path spoke, the term must not be
+    # said twice over.
+    spoken = luteclient.review_spoken()
+    assert spoken == [{"text": text, "lang": lang}], (
+        f"expected one utterance of {text!r} as {lang}, got {spoken}; "
+        f"page state: {luteclient.review_speak_state()}"
+    )
+
+
+@then("nothing was spoken")
+def then_nothing_spoken(luteclient):
+    spoken = luteclient.review_spoken()
+    assert spoken == [], (
+        f"the page should have stayed quiet, but said {spoken}; "
+        f"page state: {luteclient.review_speak_state()}"
+    )
+
+
 @when("I undo the last grade")
 def when_undo_last_grade(luteclient):
     luteclient.undo_last_grade()

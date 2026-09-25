@@ -61,6 +61,18 @@
     </tr>
 
     <tr>
+      <td>{{ form.review_speak_cards.label }}</td>
+      <td>
+        {{ form.review_speak_cards(class="form-control") }}
+        <div class="review-hint">
+          Pronounce the term with text-to-speech when a card opens, in the
+          language of that card's term. The speaker button on the card works
+          either way, so this only turns off the automatic reading.
+        </div>
+      </td>
+    </tr>
+
+    <tr>
       <td>Card types</td>
       <td>
         {{ form.card_recognition }} {{ form.card_recognition.label }}<br>

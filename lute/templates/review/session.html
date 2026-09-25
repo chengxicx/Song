@@ -5,6 +5,12 @@
 
 {% block body %}
 
+{# Cards are pronounced, so the page needs the TTS layer: window.luteTtsSpeak
+   lives in tts.js, which the reading page loads for itself and no other page
+   has.  Deferred, and resolved at call time by lute-review.js, which is
+   loaded (without defer) from base.html. #}
+<script type="text/javascript" src="{{ vstatic_js('tts.js') }}" charset="utf-8" defer></script>
+
 <div id="review_session_container">
   <div class="rv-topbar">
     <div id="review_progress" class="rv-progress"></div>

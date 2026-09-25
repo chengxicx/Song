@@ -6,6 +6,7 @@ import os
 from sqlalchemy import text
 from flask import current_app
 from lute.models.setting import UserSetting
+from lute.settings.current import refresh_global_settings
 from lute.settings.hotkey_data import initial_hotkey_defaults
 from lute.models.repositories import UserSettingRepository
 
@@ -37,6 +38,14 @@ def delete_all_data(session):
         session.execute(text(s))
     session.commit()
     add_default_user_settings(session, current_app.env_config.default_user_backup_path)
+    # "Restore user settings" means in memory too.  Settings are served
+    # from a per-process cache (lute.settings.current), so without this
+    # the deleted values stay in effect for the life of the process --
+    # the db and the app disagree, and every caller (the dev api, the
+    # demo loader, the acceptance suite) inherits the stale ones.  Every
+    # other add_default_user_settings call site refreshes for the same
+    # reason.
+    refresh_global_settings(session)
 
 
 def _revised_mecab_path(repo):
@@ -132,6 +141,7 @@ def add_default_user_settings(session, default_user_backup_path):
         "review_desired_retention": "0.9",
         "review_max_new_per_day": 20,
         "review_card_types": '{"recognition": 1, "cloze": 1}',
+        "review_speak_cards": True,
     }
     add_initial_vals_if_needed(keys_and_defaults)
 
