@@ -114,6 +114,26 @@ def test_cloze_front_blanks_the_term(empty_db, spanish):
     assert "<b>gato</b>" in card_view["sentence"]
 
 
+def test_cards_carry_the_tts_language_of_their_term(empty_db, spanish):
+    "Every card says which language its term is spoken in."
+    _queue(spanish)
+    cards = service.start_session(db.session)["cards"]
+    assert cards, "expected cards"
+    assert all(c["lang_code"] == "es-ES" for c in cards), cards
+
+
+def test_card_tts_language_uses_the_languages_override(empty_db, spanish):
+    "The per-language TTS tag wins over the one derived from its name."
+    spanish.tts_lang = "es-MX"
+    db.session.add(spanish)
+    db.session.commit()
+
+    _queue(spanish)
+    cards = service.start_session(db.session)["cards"]
+    assert cards, "expected cards"
+    assert all(c["lang_code"] == "es-MX" for c in cards), cards
+
+
 def test_new_card_daily_cap(empty_db, spanish):
     "review_max_new_per_day caps the new cards in a session."
     _queue(

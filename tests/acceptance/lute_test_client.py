@@ -531,6 +531,12 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                      : [],
                    done: !!card && card.textContent.indexOf("Session done") >= 0,
                    progress: progress ? progress.textContent.trim() : "",
+                   // The card's own pronunciation: the 🔊 button, and
+                   // whether the TTS layer it calls is actually on the
+                   // page (a button with no engine behind it is a dead
+                   // click that looks fine in the markup).
+                   speak_button: !!card && !!card.querySelector(".rv-speak"),
+                   tts_available: typeof window.luteTtsSpeak === "function",
                    undo_available: !!undo && !undo.hidden,
                    // `hidden` alone is not enough: any stylesheet that
                    // sets `display` on the element beats the UA rule
@@ -558,6 +564,120 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     def reveal_review_answer(self):
         "Click 'Show answer'."
         self.page.click("#review_reveal")
+
+    def click_review_speaker(self):
+        """
+        Click the card's speaker button; False when there is none.
+
+        The recording is cleared first so review_spoken() reports what
+        this click said: the card may already have pronounced itself as
+        it opened (whether it does depends on whether the tab has been
+        interacted with -- sticky activation survives a navigation in
+        Chromium, so on a reused page it does).
+        """
+        btn = self.page.locator("#review_card .rv-speak")
+        if btn.count() == 0:
+            return False
+        self.page.evaluate("() => { window.__spoken = []; }")
+        btn.first.click()
+        return True
+
+    def record_review_speech(self):
+        """
+        Record what the session page asks the TTS layer to say, from
+        before the page's own scripts run.
+
+        The automatic pronunciation happens as the first card renders --
+        far too early to stub afterwards -- and the real luteTtsSpeak
+        talks to the browser's speech engine, which a headless run
+        cannot hear and which refuses to speak before the page has been
+        interacted with.  So tts.js's assignment is captured by the
+        property's setter, and reads come back as a recorder.  That
+        makes the recording independent of the browser's autoplay policy
+        (the page still decides *whether* to speak, which is what is
+        under test).
+        """
+        self.page.add_init_script(
+            """
+            window.__spoken = [];
+            Object.defineProperty(window, "luteTtsSpeak", {
+              configurable: true,
+              set: (fn) => { window.__realTtsSpeak = fn; },
+              get: () => (text, onStarted, lang) => {
+                window.__spoken.push({ text: text, lang: lang });
+              },
+            });
+            """
+        )
+
+    def review_speak_state(self):
+        """
+        What the pronunciation assertions need to explain a red run:
+        whether the page was allowed to speak, what the switch says, and
+        what is on the card now.
+        """
+        return self.page.evaluate(
+            """() => {
+                 const ua = navigator.userActivation;
+                 const card = document.getElementById("review_card");
+                 const term = card ? card.querySelector(".rv-term") : null;
+                 return {
+                   // Chrome and Safari refuse to speak before the
+                   // document has been activated: this is what decides
+                   // whether a card speaks as it opens or waits for a
+                   // gesture.
+                   page_activated: ua ? ua.hasBeenActive : "n/a",
+                   speak_cards:
+                     typeof window.luteTtsSetting === "function"
+                       ? window.luteTtsSetting("review_speak_cards", true)
+                       : "tts.js is not on the page",
+                   tts_speak: typeof window.luteTtsSpeak,
+                   term: term ? term.textContent.trim() : null,
+                   spoken: window.__spoken || [],
+                 };
+               }"""
+        )
+
+    def pretend_page_untouched(self):
+        """
+        Make the page report that it has not been interacted with.
+
+        Chromium's activation is sticky and survives a navigation, so by
+        the time a scenario reaches the review session the page has
+        always been clicked (creating the term is a click) and
+        navigator.userActivation.hasBeenActive is true -- the card
+        speaks as it opens and the "wait for the first gesture" path is
+        unreachable.  Forcing the flag is how that path gets covered;
+        lute-review.js is the only thing on the page that reads it.
+        """
+        self.page.add_init_script(
+            """
+            Object.defineProperty(navigator, "userActivation", {
+              configurable: true,
+              get: () => ({ hasBeenActive: false, isActive: false }),
+            });
+            """
+        )
+
+    def review_spoken(self):
+        "What the session page has asked the TTS layer to say."
+        return self.page.evaluate("() => window.__spoken || []")
+
+    def set_review_speak_cards(self, enabled):
+        """
+        Tick or untick the review settings page's card-pronunciation
+        switch and save it, as a user would.
+        """
+        self.visit("/review/settings")
+        box = self.page.locator('input[name="review_speak_cards"]')
+        if enabled:
+            box.check()
+        else:
+            box.uncheck()
+        self.page.click('#review_settings_form button[type="submit"]')
+        # The form 302s to the index; wait for that landing rather than
+        # for "load", which is already true on the page being left.
+        expect(self.page).to_have_url(re.compile(r"/review/index$"))
 
     def grade_review_card(self, rating):
         "Click the grade button for a rating (1 = Again, 3 = Good)."

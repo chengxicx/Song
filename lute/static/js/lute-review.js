@@ -13,6 +13,15 @@
  *
  * Keyboard: Space/Enter reveals, 1-2 grade, Enter checks a typed
  * answer, Space/Enter moves on after a typed check.
+ *
+ * Cards are pronounced: the term is spoken whenever it is on screen --
+ * when a recognition card opens (its front IS the term) and when a
+ * cloze card's answer is revealed -- and the card carries a 🔊 button
+ * to hear it again.  Each card is spoken in its own term's language
+ * (c["lang_code"]), because one queue holds every language the user
+ * studies; tts.js supplies the voice and the /tts/ fallback.  The
+ * automatic reading can be turned off in the review settings
+ * (review_speak_cards); the button works either way.
  */
 window.LuteReview = (function () {
   "use strict";
@@ -74,6 +83,81 @@ window.LuteReview = (function () {
     if (card) {
       card.style.display = "none";
     }
+  }
+
+  /* ---------- pronunciation ---------- */
+
+  // Browsers only allow speech after the user has interacted with the
+  // document (Chrome and Safari drop an utterance requested before
+  // that).  The first card of a session is exactly that case -- it
+  // arrives from a fetch on a page nobody has touched yet -- so instead
+  // of losing it, remember that it is owed and speak it at the first
+  // key press or click.
+  let owed_speak = false;
+
+  // The speaker SVG from the term form's pronunciation button, so the
+  // two "say this word" buttons look alike.
+  const SPEAKER_SVG =
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M11 4.702a.7.7 0 0 0-1.204-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.7.7 0 0 0 11 19.298z"/>' +
+    '<path d="M16 9a5 5 0 0 1 0 6"/>' +
+    '<path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>' +
+    "</svg>";
+
+  function speak_button_html() {
+    return `<button type="button" class="rv-speak" title="Speak (pronounce the term)"
+              aria-label="Pronounce the term">${SPEAKER_SVG}</button>`;
+  }
+
+  // Speak the term of the card on screen.  tts.js is loaded with defer
+  // (review/session.html) and this is only ever called from a render or
+  // an event, so window.luteTtsSpeak is there; when it is not (an old
+  // cached copy of the page), the button is simply inert rather than
+  // throwing.
+  function speak_term(c) {
+    if (!c || !c.term_text) return;
+    if (typeof window.luteTtsSpeak !== "function") return;
+    window.luteTtsSpeak(c.term_text, null, c.lang_code || null);
+  }
+
+  // The review settings page can turn the automatic reading off; the
+  // 🔊 button works either way.  Read through tts.js's own setting
+  // reader so "0"/"false"/absent parse as they do everywhere else, and
+  // default to on when it is missing.
+  function speak_cards_enabled() {
+    if (typeof window.luteTtsSetting !== "function") return true;
+    return window.luteTtsSetting("review_speak_cards", true) !== false;
+  }
+
+  // Automatic pronunciation, as the settings allow.
+  function auto_speak_term(c) {
+    if (!speak_cards_enabled()) return;
+    speak_term(c);
+  }
+
+  // Auto-pronounce the card just opened.  Only when the term is on the
+  // front: on a cloze card it is the answer, and hearing it before
+  // answering would give it away -- those are spoken at reveal instead.
+  function auto_speak(c) {
+    owed_speak = false;
+    if (!c || c.card_type !== "recognition") return;
+    const ua = navigator.userActivation;
+    if (ua && !ua.hasBeenActive) {
+      owed_speak = true;
+      return;
+    }
+    auto_speak_term(c);
+  }
+
+  // The first interaction of the page releases an owed pronunciation.
+  // A click reaches this after the card's own handler has spoken (the
+  // card is inside the document), so pressing the 🔊 button does not
+  // say the term twice.
+  function on_first_gesture() {
+    if (!owed_speak) return;
+    owed_speak = false;
+    auto_speak_term(state.current);
   }
 
   /* ---------- index page actions ---------- */
@@ -219,7 +303,7 @@ window.LuteReview = (function () {
 
   function question_html(c) {
     if (c.card_type === "recognition") {
-      return `<div class="rv-term">${esc(c.term_text)}</div>`;
+      return `<div class="rv-term">${esc(c.term_text)}${speak_button_html()}</div>`;
     }
     if (c.card_type === "recall") {
       return `<div class="rv-translation-front">${esc(c.translation)}</div>`;
@@ -251,6 +335,8 @@ window.LuteReview = (function () {
       });
       typing.focus();
     }
+
+    auto_speak(c);
   }
 
   function back_html(c, banner) {
@@ -263,7 +349,9 @@ window.LuteReview = (function () {
     // The term is the answer for recall/cloze, but a recognition card
     // already has it on the front -- don't print it twice.
     if (c.card_type !== "recognition") {
-      pieces.push(`<div class="rv-term rv-answer-term">${esc(c.term_text)}</div>`);
+      pieces.push(
+        `<div class="rv-term rv-answer-term">${esc(c.term_text)}${speak_button_html()}</div>`
+      );
     }
     if (c.romanization) {
       pieces.push(`<p class="rv-reading">${esc(c.romanization)}</p>`);
@@ -320,6 +408,9 @@ window.LuteReview = (function () {
     answer.innerHTML = back_html(c, null);
     answer.hidden = false;
     show_grades(c);
+    // On a cloze card the term IS the answer, so it is only now on
+    // screen -- this is where it gets pronounced (see auto_speak).
+    if (c.card_type !== "recognition") auto_speak_term(c);
   }
 
   async function check_typed(c) {
@@ -360,6 +451,7 @@ window.LuteReview = (function () {
       state.mode = "next";
       const next = el("review_next");
       if (next) next.focus();
+      if (c.card_type !== "recognition") auto_speak_term(c);
     } catch (err) {
       show_error(err);
     }
@@ -382,6 +474,7 @@ window.LuteReview = (function () {
   function advance() {
     state.idx += 1;
     if (state.idx >= state.cards.length) {
+      owed_speak = false;
       el("review_progress").innerHTML = "";
       el("review_card").innerHTML =
         '<p class="rv-done">Session done.  <a href="/review/index">Back to review index</a></p>';
@@ -440,10 +533,24 @@ window.LuteReview = (function () {
   function init() {
     const btn = el("review_undo");
     if (btn) btn.addEventListener("click", () => undo());
+
+    // The card is rebuilt with innerHTML per card, so its 🔊 buttons are
+    // bound by delegation on the container that stays put.
+    const card = el("review_card");
+    if (card) {
+      card.addEventListener("click", (e) => {
+        if (!e.target.closest(".rv-speak")) return;
+        e.stopPropagation();
+        owed_speak = false;
+        speak_term(state.current);
+      });
+    }
   }
 
   document.addEventListener("DOMContentLoaded", init);
   document.addEventListener("keydown", on_keydown);
+  document.addEventListener("keydown", on_first_gesture);
+  document.addEventListener("click", on_first_gesture);
 
   return {
     install_fsrs,

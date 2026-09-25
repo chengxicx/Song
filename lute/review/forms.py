@@ -39,6 +39,13 @@ class ReviewSettingsForm(FlaskForm):
             "title": "New cards a day's session can introduce; 0 means no new cards.",
         },
     )
+    review_speak_cards = BooleanField(
+        "Speak each card",
+        default=True,
+        description="Pronounce the term with text-to-speech when a card "
+        "opens (and when a cloze card's answer is revealed).  The card's "
+        "speaker button works either way.",
+    )
     card_recognition = BooleanField(
         "Recognition (see the word, recall the meaning)", default=True
     )

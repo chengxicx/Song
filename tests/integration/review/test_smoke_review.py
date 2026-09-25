@@ -164,3 +164,30 @@ def test_review_index_links_to_settings(empty_db, spanish, client):
     resp = client.get("/review/index")
     assert resp.status_code == 200
     assert b'href="/review/settings"' in resp.data
+
+
+def test_review_speak_cards_setting_round_trips(empty_db, spanish, client):
+    "The card-pronunciation switch saves, and reaches the session page."
+    from lute.models.repositories import UserSettingRepository
+
+    resp = client.get("/review/settings")
+    assert resp.status_code == 200
+    html = resp.data.decode("utf-8")
+    assert "Speak each card" in html
+    box = re.search(r'<input[^>]*name="review_speak_cards"[^>]*>', html).group(0)
+    assert "checked" in box, "cards should be spoken by default"
+
+    # Unticking it is simply an absent field in the POST.
+    resp = client.post(
+        "/review/settings",
+        data={"review_desired_retention": "0.9", "review_max_new_per_day": "20"},
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200
+    stored = UserSettingRepository(db.session).get_value("review_speak_cards")
+    assert str(stored) in ("0", "False"), stored
+
+    # lute-review.js reads it out of the page's user settings.
+    resp = client.get("/review/session")
+    assert resp.status_code == 200
+    assert b'"review_speak_cards": false' in resp.data

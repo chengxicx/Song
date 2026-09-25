@@ -2,6 +2,10 @@
  * Edge-TTS + SpeechSynthesis voice synthesis and Google auto-translation
  * integration for the Lute reading page.
  *
+ * The review session page loads this file too, for window.luteTtsSpeak
+ * alone -- it speaks each card in the language of its own term
+ * (speakText's optional lang argument) and uses none of the player.
+ *
  * The TTS player mirrors the YouTube / MP3 player UI and behaviour:
  *   - play / pause, prev / next sentence, seek timeline, playback rate
  *   - single-sentence loop and auto-pause-at-end-of-sentence
@@ -204,10 +208,15 @@
   // Speak a single short utterance now, picking the best available
   // voice for the current language (never the default mechanical one
   // when a suitable voice exists).
-  function speakNow(cleanText, onStarted) {
+  //
+  // langOverride: BCP-47 tag to speak in, for callers whose text is not
+  // the reading page's -- the review session speaks each card in its
+  // own term's language (see lute-review.js).  The page's own detection
+  // is the fallback.
+  function speakNow(cleanText, onStarted, langOverride) {
     let activeVoice = getSelectedVoice();
     const voices = window.speechSynthesis.getVoices();
-    const detectedLang = getCurrentLangCode();
+    const detectedLang = langOverride || getCurrentLangCode();
 
     if (!activeVoice && voices.length > 0) {
       activeVoice = selectBestVoiceForLang(voices, detectedLang);
@@ -243,7 +252,8 @@
 
   // Lightweight speak used by hover / click pronunciation and the
   // auto-translation flow (single short utterance, no player state).
-  function speakText(text, onStarted) {
+  // langOverride is optional -- see speakNow.
+  function speakText(text, onStarted, langOverride) {
     let cleanText = text.replace(/[#＃]/g, "").trim();
     if (!cleanText) return;
 
@@ -279,18 +289,18 @@
             _pendingWaitText = null;
             const cb = _pendingWaitOnStarted;
             _pendingWaitOnStarted = null;
-            speakNow(t, cb);
+            speakNow(t, cb, langOverride);
           }
         }, 100);
         return;
       }
 
-      speakNow(cleanText, onStarted);
+      speakNow(cleanText, onStarted, langOverride);
       return;
     }
 
     // --- Fallback: backend /tts/ endpoint ---
-    const lang = getCurrentLangCode();
+    const lang = langOverride || getCurrentLangCode();
     const url = "/tts/" + lang + "/" + encodeURIComponent(cleanText);
     const audio = new Audio(url);
     audio.playbackRate = globalSpeed;
@@ -406,6 +416,10 @@
   // Direct one-shot speak for UI buttons, e.g. the term form's
   // pronunciation-row speaker button (click once = one utterance).
   window.luteTtsSpeak = speakText;
+  // The setting reader, for pages that carry their own TTS switch: the
+  // review session reads review_speak_cards with it (lute-review.js),
+  // so "0"/"false"/absent are parsed exactly as they are here.
+  window.luteTtsSetting = getSetting;
 
   // Tap markers (press / ack / pending) are implemented once in lute.js
   // and published as window.luteTapFeedback -- see the "Tap feedback"
