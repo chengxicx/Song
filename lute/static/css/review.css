@@ -278,6 +278,46 @@ body {
   font-size: 2.4em;
   line-height: 1.3;
   margin: 14px 0;
+  /* Holds the term and its speaker button; wrap so a long term still
+     breaks instead of shrinking the button. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* The card's pronunciation button.  The card is spoken as it opens (and
+   a cloze card's term when its answer is revealed); this is for hearing
+   it again -- and the only way in when the browser withheld the
+   automatic utterance because the page had not been touched yet. */
+.rv-speak {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--r-border);
+  border-radius: 50%;
+  background: var(--r-accent-soft);
+  color: var(--r-accent);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.rv-speak:hover {
+  background: var(--r-accent);
+  color: #fff;
+}
+
+.rv-speak:active {
+  transform: scale(0.92);
+}
+
+.rv-speak svg {
+  display: block;
 }
 
 .rv-translation-front {

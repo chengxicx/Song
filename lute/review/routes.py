@@ -59,7 +59,12 @@ def review_settings():
 
     if form.validate_on_submit():
         for field in form:
-            if field.id not in ("csrf_token", "submit", "card_recognition", "card_cloze"):
+            if field.id not in (
+                "csrf_token",
+                "submit",
+                "card_recognition",
+                "card_cloze",
+            ):
                 repo.set_value(field.id, field.data)
         enabled = [
             ct
