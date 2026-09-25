@@ -445,6 +445,30 @@ def _sync_media_page_text_to_cues(book, pagenum, original_text, new_text):
     return "updated"
 
 
+def _cue_line_index(book):
+    """
+    Absolute cue index of each line of a media book's text.
+
+    A media book's text is its cue texts joined by newlines (see
+    lute/book/service.py parse_subtitle_content), so a multi-line cue
+    contributes one entry per line.
+    """
+    line_to_cue = []
+    for idx, cue in enumerate(book.cues):
+        segs = (cue.get("text") or "").replace("\r", "").split("\n")
+        line_to_cue.extend([idx] * len(segs))
+    return line_to_cue
+
+
+def _lines_before_page(book, pagenum):
+    "Number of text lines in the pages before pagenum."
+    total = 0
+    for t in book.texts:
+        if t.order < pagenum:
+            total += len((t.text or "").replace("\r", "").split("\n"))
+    return total
+
+
 def _page_cue_span(book, pagenum, line_count):
     """
     Absolute cue indices covered by a media book page's lines, or None
@@ -462,24 +486,40 @@ def _page_cue_span(book, pagenum, line_count):
     if not cues or not line_count:
         return None
 
-    def _norm(s):
-        return (s or "").replace("\r", "")
-
-    line_to_cue = []
-    for idx, cue in enumerate(cues):
-        segs = _norm(cue.get("text") or "").split("\n")
-        line_to_cue.extend([idx] * len(segs))
-
-    anchor = 0
-    for t in book.texts:
-        if t.order < pagenum:
-            anchor += len(_norm(t.text).split("\n"))
+    line_to_cue = _cue_line_index(book)
+    anchor = _lines_before_page(book, pagenum)
     if anchor + line_count > len(line_to_cue):
         return None
     covered = line_to_cue[anchor : anchor + line_count]
     if covered != list(range(covered[0], covered[0] + line_count)):
         return None
     return covered
+
+
+def _page_cue_line_map(book, pagenum):
+    """
+    Cue index of each line of a media book page, or [] when the page and
+    the cues don't line up.
+
+    The reading page underlines the line the player is on, and it shows
+    one line per paragraph, so this is the page's slice of the cue
+    lines.  Unlike _page_cue_span, which the timing panel needs one cue
+    per line for, a multi-line cue is fine here -- its lines share the
+    cue's index.  Empty for books without cues, and for pages whose
+    lines no longer match the cues (the page text can be hand-edited).
+    """
+    if (book.book_type or "") not in _SUBTITLE_BOOK_TYPES:
+        return []
+    cues = list(book.cues)
+    text = next((t for t in book.texts if t.order == pagenum), None)
+    if not cues or text is None:
+        return []
+    line_count = len((text.text or "").replace("\r", "").split("\n"))
+    line_to_cue = _cue_line_index(book)
+    anchor = _lines_before_page(book, pagenum)
+    if not line_count or anchor + line_count > len(line_to_cue):
+        return []
+    return line_to_cue[anchor : anchor + line_count]
 
 
 def _parse_cue_data(raw):
@@ -815,10 +855,17 @@ def new_page(bookid, position, pagenum):
 
 @bp.route("/save_player_data", methods=["post"])
 def save_player_data():
-    "Save current player position, bookmarks.  Called on a loop by the player."
+    """Save current player position, bookmarks.  Called on a loop by the player.
+
+    A player can outlive its book -- the reader deletes it, or a stale tab
+    keeps posting -- and the position is then not ours to keep.  Answer 404
+    rather than raising: the save is fire-and-forget on the client, so the
+    status only matters to the log.
+    """
     data = request.json
-    bookid = int(data.get("bookid"))
-    book = _find_book(bookid)
+    book = _find_book(int(data.get("bookid")))
+    if book is None:
+        return jsonify("no such book"), 404
     book.audio_current_pos = float(data.get("position"))
     book.audio_bookmarks = data.get("bookmarks")
     db.session.add(book)
@@ -828,10 +875,16 @@ def save_player_data():
 
 @bp.route("/save_youtube_player_data", methods=["post"])
 def save_youtube_player_data():
-    "Save current YouTube video position.  Called on a loop by the player."
+    """Save current YouTube video position.  Called on a loop by the player.
+
+    The shared media engine posts here for every backend it drives, audio
+    included, so a deleted book reached this with `book` None and raised
+    AttributeError on every save the open player made.  See save_player_data.
+    """
     data = request.json
-    bookid = int(data.get("bookid"))
-    book = _find_book(bookid)
+    book = _find_book(int(data.get("bookid")))
+    if book is None:
+        return jsonify("no such book"), 404
     book.video_current_pos = float(data.get("position", 0))
     db.session.add(book)
     db.session.commit()
@@ -1017,15 +1070,23 @@ def start_reading(bookid, pagenum):
     if (book.book_type or "") == "manga":
         ctx = service.manga_page_context(book, pagenum, True)
         if ctx is None:
-            return render_template("read/page_content.html", paragraphs=[])
+            return render_template(
+                "read/page_content.html", paragraphs=[], page_cue_map=[]
+            )
         return render_template("read/manga_page.html", **ctx)
     if (book.book_type or "") == "pdf":
         ctx = service.pdf_page_context(book, pagenum, True)
         if ctx is None:
-            return render_template("read/page_content.html", paragraphs=[])
+            return render_template(
+                "read/page_content.html", paragraphs=[], page_cue_map=[]
+            )
         return render_template("read/pdf_page.html", **ctx)
     paragraphs = service.start_reading(book, pagenum)
-    return render_template("read/page_content.html", paragraphs=paragraphs)
+    return render_template(
+        "read/page_content.html",
+        paragraphs=paragraphs,
+        page_cue_map=_page_cue_line_map(book, pagenum),
+    )
 
 
 @bp.route("/update_start_date/<int:bookid>/<int:pagenum>", methods=["GET", "POST"])
@@ -1061,15 +1122,23 @@ def render_page_fragment(book, pagenum, track_page_open=False):
     if (book.book_type or "") == "manga":
         ctx = service.manga_page_context(book, pagenum, track_page_open)
         if ctx is None:
-            return render_template("read/page_content.html", paragraphs=[])
+            return render_template(
+                "read/page_content.html", paragraphs=[], page_cue_map=[]
+            )
         return render_template("read/manga_page.html", **ctx)
     if (book.book_type or "") == "pdf":
         ctx = service.pdf_page_context(book, pagenum, track_page_open)
         if ctx is None:
-            return render_template("read/page_content.html", paragraphs=[])
+            return render_template(
+                "read/page_content.html", paragraphs=[], page_cue_map=[]
+            )
         return render_template("read/pdf_page.html", **ctx)
     paragraphs = service.get_paragraphs(book, pagenum)
-    return render_template("read/page_content.html", paragraphs=paragraphs)
+    return render_template(
+        "read/page_content.html",
+        paragraphs=paragraphs,
+        page_cue_map=_page_cue_line_map(book, pagenum),
+    )
 
 
 @bp.route("/empty", methods=["GET"])

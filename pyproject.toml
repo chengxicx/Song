@@ -62,13 +62,14 @@ dev = [
   "coverage>=7.3.1,<8",
   "invoke>=2.2.0,<3",
   "pip>=23.0.1",
-  "pipdeptree>=2.13.0,<3",
+  "pipdeptree>=2.13.0,<4",
   "pylint>=2.17.5,<4",
   "pytest-bdd>=7.0.0,<8",
   "pytest-xdist>=3.6.1,<4",
   "playwright>=1.39.0,<2",
   "pre-commit>=3.5.0,<4",
   "black>=23.10.1,<24",
+  "fsrs>=5,<7; python_version>='3.10'",
 ]
 japanese-sudachi = [
   "sudachipy>=0.6.0",
@@ -113,6 +114,12 @@ thai = [
 ]
 arabic = [
   "pyarabic>=0.6,<2",
+]
+# FSRS scheduler for the review queue.  py-fsrs 4+ needs Python >= 3.10;
+# on older interpreters nothing installs here and the review pages
+# show an install prompt instead.
+fsrs = [
+  "fsrs>=5,<7; python_version>='3.10'",
 ]
 
 [project.urls]

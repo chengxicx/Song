@@ -2,18 +2,26 @@ name: nightly-guardrail
 
 # Why this workflow exists
 # ------------------------
-# The main ci.yml only triggers on the upstream branch names
-# (develop / master / github-ci / windows), so it never runs on this
-# fork's working branch.  The browser-level suites are also excluded
-# from `pytest` by .pytest.ini (they are slow), which means nothing
-# exercises the reading page, term form, import or book-list flows
-# unless someone remembers to run `inv accept` by hand.
+# The browser-level suites are excluded from `pytest` by .pytest.ini
+# (they are slow), so nothing exercises the reading page, term form,
+# import or book-list flows unless a ci.yml run gets far enough to
+# reach its "Acceptance testing" steps -- or someone remembers to run
+# `inv accept` by hand.  A red step earlier in a base-ci job means the
+# browser suites never run at all for that commit, so this workflow is
+# the backstop that still covers them.
 #
 # This workflow runs exactly those suites, once a day, so regressions
 # in the high-risk areas surface on their own instead of at deploy time.
 #
 # Run it manually from the Actions tab (workflow_dispatch) before a
 # risky merge if you don't want to wait for the schedule.
+#
+# The grammar-engines job below is the same idea for a second blind spot:
+# base-ci installs its dependencies with `flit --deps develop`, which
+# installs the dev/doc/test extras but *not* this project's own extras
+# (only `--deps all` walks those).  So Sudachi, Kiwi, the spaCy models,
+# pythainlp, pymorphy3 and pyarabic are all absent there, every
+# grammar-engine test skips, and ~205 of them have never run in CI at all.
 
 on:
   schedule:
@@ -93,3 +101,60 @@ jobs:
         name: acceptance-failure-screenshots
         path: tests/acceptance/failure_screenshots/
         if-no-files-found: ignore
+
+  # Runs the suite with the grammar engines actually installed.  base-ci
+  # cannot: `flit install --deps develop` gives it the dev/doc/test extras
+  # only, so every engine test skips there.  Install the engines the way the
+  # CHANGELOG tells users to, then run the whole suite, so a regression in
+  # the Japanese/Korean/spaCy engines shows up here instead of in a reader's
+  # grammar panel.
+  #
+  # The parser *plugins* (lute3-thai, lute3-korean, lute3-mandarin,
+  # lute3-cantonese, lute3-khmer) are deliberately not installed: they are
+  # separate distributions that depend on lute3, so they cannot be extras of
+  # it, and Lute installs them on demand at runtime.  Tests needing them skip
+  # -- which is what `is_supported("<parser>")` guards exist for.
+  grammar-engines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y mecab mecab-ipadic-utf8
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ github.event.inputs.python_version || '3.11' }}
+        cache: 'pip'
+
+    - name: Install packages using flit
+      run: |
+        pip install flit
+        # --only-deps: pytest, invoke, playwright and the rest of the dev
+        # tooling, without installing Lute itself yet.
+        flit install --only-deps --deps develop
+
+    - name: Install Lute with every grammar engine
+      # The extras list from docs/CHANGELOG.md.  -e so the plugin entry
+      # points (the language parsers) are registered, exactly as a
+      # developer venv has them.
+      run: pip install -e ".[japanese-sudachi,korean,english,spanish,french,german,italian,portuguese,russian,thai,arabic]"
+
+    - name: Setup config
+      run: |
+        mkdir ${{ github.workspace }}/data
+        echo "ENV: dev" > ${{ github.workspace }}/lute/config/config.yml
+        echo "DATAPATH: ${{ github.workspace }}/data" >> ${{ github.workspace }}/lute/config/config.yml
+        echo "DBNAME: test_lute.db" >> ${{ github.workspace }}/lute/config/config.yml
+
+    - name: Test
+      run: |
+        export MECAB_PATH=/lib/x86_64-linux-gnu/libmecab.so.2
+        pytest

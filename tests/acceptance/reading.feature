@@ -368,6 +368,29 @@ Feature: User can actually read and stuff.
         ###    Tengo (1)/ /un (5)/ /amigo (5)/.
 
 
+    Scenario: The sentence the player is reading is underlined in the text
+        Given a Spanish book "Hola" with content:
+            Hola. Adios amigo.
+        Then the reading pane shows:
+            Hola/. /Adios/ /amigo/.
+        When I press the TTS player's play button
+        Then the line being read is underlined in the reading text
+        And the underlined line shows "Hola."
+
+
+    Scenario: The line the media player is playing is underlined in the text
+        # A media book's text is its cues joined by newlines, so page line N
+        # is cue N.  The steps below rely on that: "play subtitle line 2" is
+        # expected to mark line 2 of the page.
+        Given a Spanish mp3 book "Cancion" with subtitles:
+            Hola.
+            Adios amigo.
+            Tengo un gato.
+        Then the reading page maps its lines to the subtitle cues
+        When I play subtitle line 2 in the media player
+        Then the underlined line shows "Adios amigo."
+
+
     Scenario: Toggling highlighting only shows highlights on hovered terms
         Given a Spanish book "Hola" with content:
             Tengo un amigo y otro.

@@ -47,13 +47,16 @@
 1. `bookmarks/list.html` 没引 `book-listing-shared.js` ⇒ 书签行的「…」菜单永远打不开，Edit / Delete 点不到。
 2. `read/routes.py:new_page` 渲染 `page_edit_form.html` 时漏传 `page_cues` / `cue_audio_url` ⇒ `{{ page_cues | tojson }}` 抛 `TypeError`，**新增页永远 500**。
 
-### 三条「看着像产品回归、其实是测试没等」的竞态（已修）
+### 四条竞态：看着像产品回归，其实另有原因（已修）
 
-1. **阅读页文本是异步 swap 进来的**：`htmx.ajax` 写入 `#thetext`，而 `_finishPageSwap()` 末尾会调
+1. **阅读页文本是异步 swap 进来的**：`htmx.ajax` 写入 `#thetext`，而 `_finishPageSwap()` 会调
    `start_hover_mode()` → `_hide_term_edit_form()`，把词条表单/词典/光标一起清掉。在 swap 落地前碰文本的步骤会被就地"撤销"。
    - 症状 A：`I hover over "otro"` 的 `count == 1` 断言拿到 **0**（词还没渲染）。
    - 症状 B：词条表单刚打开就被清成 `/read/empty`（空白 iframe）。
    - 修法：`LuteTestClient.wait_reading_ready()`（等 `luteStartReadingDone`）；`click_word()` 内调用，`when_hover` 显式调用。
+   - **别把 `luteStartReadingDone` 读成「收尾已完成」**：它是在 `_finishPageSwap()` 的**第一行**置位的，
+     早于 `start_hover_mode()` 那批重置；而且**状态更新**的 swap 根本不走 `_finishPageSwap()`
+     （`htmx:afterSwap` 只在有待处理翻页时才调它），那条路径上它会立刻返回。见下面第 4 条。
 2. **无效保存的校验提示是随 POST 响应写回 iframe 的**：只读一次 `iframe.content()` 会读到**上一份文档**；
    而 `page.frame(name=...)` 在表单导航的一瞬间还会返回 `None`。
    - 修法：`then_reading_page_term_form_iframe_contains` 改用 `frame_locator("#wordframeid")` + `to_contain_text()`（自动重试）。
@@ -61,6 +64,16 @@
    - 症状：`test_toggling_highlighting_only_shows_highlights_on_hovered_terms` 间歇性在 `displayed_text()` 的
      `wait_for_selector('span[class*="textitem"]')` 上超时。
    - 修法：`press_hotkey()` 结尾 `wait_for_load_state("load", timeout=2000)`（不导航的热键是 no-op）。
+4. **swap 进来的片段脚本会清掉读者的多选**：`read/page_content.html`（以及 manga/pdf 两个兄弟）末尾的
+   `<script>` 调 `parent.reset_cursor_marker()`，而 htmx 是**先插入节点、后执行片段的 `<script>`** ——
+   这次「重置」会盖在读者刚做的 shift 选择上，紧接着的状态热键于是找不到选中项，**静默什么都不做**
+   （`increment_status_for_selected_elements` 与 `post_bulk_update` 在选中集为空时都直接 `return`）。
+   - 症状：`test_pressing_a_hotkey_updates_a_terms_status`、`test_page_start_date_is_set_correctly_during_reading`
+     期望状态 +1 却纹丝不动（轮询满 15s 才报错）；**只在 CI 上复现**，本地跑 5/5、12/12 全过。
+   - 修法（产品侧）：`reset_cursor_marker()` 拆成 `clear_cursor_marks()` + `restore_cursor_marker()`，
+     片段改调 `restore_cursor_marker()` —— swap 已经把旧 span 全换掉了，本来就没有陈旧标记需要清；
+     ESC / 翻页仍走 `reset_cursor_marker()`，照旧清空选择。
+   - 守卫：`tests/acceptance/test_reading_fragment_swap.py`，两个方向都测（片段不清、ESC 仍清）。
 
 > 服务端日志里反复出现的 `StaleDataError / PendingRollbackError`（`app_factory.py:183 inject_menu_bar_vars`）
 > 在整个 run 中持续存在，**通过和失败的用例都会出现**，与上述失败无因果 —— 是独立的既有噪声。

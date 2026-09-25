@@ -7,15 +7,26 @@ let LUTE_CURR_TERM_DATA_ORDER = -1;  // initially not set.
 
 
 /**
- * Reset the cursor.
- *
- * When read/page_content.html is rendered, the current
- * cursor styling etc is wiped off the screen, so it needs
- * to be restored.
+ * Drop the reader's multi-word selection marks.
  */
-function reset_cursor_marker() {
+function clear_cursor_marks() {
   $('span.kwordmarked').removeClass('kwordmarked');
+}
 
+
+/**
+ * Re-apply the cursor marker: the "hover" class and status class on the
+ * current word, plus a window refocus so keyboard events keep working.
+ *
+ * When read/page_content.html is swapped in, the cursor styling is wiped
+ * off the screen, so it needs to be restored.  This does *not* clear the
+ * selection marks: the swap replaced every span, so there is nothing stale
+ * to clear, and htmx runs a fragment's <script>s a tick AFTER inserting its
+ * nodes -- clearing here would land on top of a shift-click the reader made
+ * while the swap was arriving, and the next status hotkey would then find
+ * no selection and silently do nothing.
+ */
+function restore_cursor_marker() {
   const curr_word = $('span.word').filter(function() {
     return _get_order($(this)) == LUTE_CURR_TERM_DATA_ORDER;
   });
@@ -32,6 +43,17 @@ function reset_cursor_marker() {
 
 
 /**
+ * Reset the cursor for a same-DOM reset (ESC, page navigation): drop any
+ * selection marks, then restore the marker.  A swapped-in page fragment
+ * must call restore_cursor_marker() alone, for the reason given above.
+ */
+function reset_cursor_marker() {
+  clear_cursor_marks();
+  restore_cursor_marker();
+}
+
+
+/**
  * When the reading pane is first loaded, it's in "hover mode",
  * meaning that when the user hovers over a word, that word becomes
  * the "active word" -- i.e., status update keyboard shortcuts should
@@ -40,11 +62,6 @@ function reset_cursor_marker() {
  * there can't be any "hover changes", because the user should be
  * editing the word in the Term edit pane, and has to consciously
  * disable the "clicked word" mode by hitting ESC or RETURN.
- *
- * The full page text is often reloaded via ajax, e.g. when the user
- * saves an edited term, or the status is updated with a hotkey.
- * The template lute/templates/read/page_content.html calls
- * this method on reload to reset the cursor etc.
  */
 function start_hover_mode() {
   reset_cursor_marker();
@@ -126,6 +143,16 @@ function prepareTextInteractions() {
     _add_desktop_interactions();
   }
 
+  // Idempotent on purpose: a keydown handler runs once per registration, so
+  // binding this twice makes every hotkey fire twice -- arrowup jumps two
+  // statuses, and a toggle (highlight, theme) fires twice and cancels itself
+  // out.  jQuery does NOT de-duplicate a re-registered handler, and this is
+  // called again whenever the reading pane is set up afresh (the acceptance
+  // harness rebuilds <body> and re-runs it), so drop the old binding first.
+  // Note this is the only handler here that needs it: the ones in
+  // _add_desktop_interactions / _add_mobile_interactions are delegated on
+  // #thetext, and #thetext survives an htmx innerHTML swap.
+  $(document).off('keydown', handle_keydown);
   $(document).on('keydown', handle_keydown);
 
   $('#thetext').tooltip({
