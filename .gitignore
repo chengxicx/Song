@@ -176,5 +176,8 @@ lute/themes/css/Boox_Leaf5C.css
 
 # Local tool / agent working dirs (not part of source)
 .workbuddy/
+.workbuddy-ai/
 .zcode/
 .trae/
+# pytest --basetemp target used when /tmp is unavailable
+.pytest-tmp*/

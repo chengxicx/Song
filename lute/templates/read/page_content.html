@@ -1,3 +1,11 @@
+{# The cue index of each line on this page, in line order (a media book's
+   text is its cue texts joined by newlines, so one line is one <p>).
+   lute-playing-line.js uses it to underline the line the player is on;
+   empty for books without cues. #}
+<script type="text/javascript">
+  window.LUTE_PAGE_CUE_MAP = {{ page_cue_map | tojson }};
+</script>
+
 {% set sentence_id = 1 %}
 
 {% for para in paragraphs %}
@@ -18,7 +26,12 @@
 {% endfor %}
 
 <script>
-  // Defined in lute.js
-  parent.reset_cursor_marker();
+  // Defined in lute.js.  restore_*, not reset_cursor_marker(): the swap
+  // already replaced every span, so there are no stale selection marks to
+  // clear -- and clearing would wipe a shift-click made while this fragment
+  // was arriving, because htmx runs a fragment's scripts after inserting its
+  // nodes.  The next status hotkey would then find nothing selected and
+  // silently do nothing.
+  parent.restore_cursor_marker();
   parent.add_status_classes();
 </script>

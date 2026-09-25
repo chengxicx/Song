@@ -20,6 +20,13 @@ from playwright.sync_api import expect, sync_playwright
 from tests.acceptance.lute_test_client import LuteTestClient
 
 
+# The browser context's default timeout is 4s (set below), which is tuned for
+# assertions.  Waiting for a navigation the app has already started is a
+# readiness wait, not a check, so it gets a wider cap -- the same reasoning as
+# LuteTestClient.wait_reading_ready.
+_NAV_TIMEOUT = 10000
+
+
 def pytest_addoption(parser):
     """
     Command-line args for pytest runs.
@@ -234,7 +241,20 @@ def then_title(luteclient, title):
 
 @then(parsers.parse('the page contains "{text}"'))
 def then_page_contains(luteclient, text):
-    assert text in luteclient.page.content()
+    """
+    Poll, rather than reading once.
+
+    This step usually follows a click whose response may still be in
+    flight, and page.content() is a single snapshot of the current
+    document -- so it failed whenever the response lost that race.
+    book.feature's "invalid.vtt" row was the usual victim: the upload is
+    rejected server-side and the page re-renders with the message, but
+    reading immediately can still see the pre-submit form.  The polling
+    itself lives in wait_for_page_text, which edit_language shares for
+    exactly the same reason.
+    """
+    content = luteclient.wait_for_page_text(text)
+    assert text in content, f"the page never contained {text!r}"
 
 
 # Language
@@ -301,8 +321,10 @@ def given_book_from_url(luteclient, lang, url):
 @given(parsers.parse('the book table loads "{title}"'))
 def given_book_table_wait(luteclient, title):
     "The book table is loaded via ajax, so there's a delay."
-    _sleep(0.2)  # Hack!
-    assert title in luteclient.page.content()
+    # Was _sleep(0.2) + one read of page.content(): the read-once race that
+    # wait_for_page_text exists to fix.
+    content = luteclient.wait_for_page_text(title)
+    assert title in content, f"the book table never showed {title!r}"
 
 
 @when(parsers.parse('I set the book table filter to "{filt}"'))
@@ -322,18 +344,49 @@ def when_set_book_table_filter(luteclient, filt):
 @then(parsers.parse("the book table contains:\n{content}"))
 def check_book_table(luteclient, content):
     "Check the table, e.g. content like 'Hola; Spanish; ; 4 (0%);'"
-    time.sleep(0.2)
-    assert content == luteclient.get_book_table_content()
+    # The table is rendered by DataTables after an ajax fetch, so a single
+    # read can catch it half-built.  This used to be time.sleep(0.2) + one
+    # read -- the same read-once race that wait_for_page_text and
+    # _assert_settles exist to fix.  On a loaded CI runner it surfaced as
+    # test_disabled_data_is_hidden intermittently reporting another test's
+    # book.  Poll like the other two do.
+    _assert_settles(content, luteclient.get_book_table_content)
+
+
+def _assert_settles(expected, getter):
+    """
+    Poll ``getter`` until it matches ``expected``, then assert.
+
+    Steps that read the db directly can race the write they are checking.
+    The start date is the worst case: it is set by a
+    fire-and-forget browser beacon -- read/index.html
+    _updateStartDateIfNeeded posts to /read/update_start_date on
+    beforeunload and visibilitychange -- so the write can land just after
+    the step that triggered it.  (Read dates come from a synchronous post,
+    but reading them right after the click can still outrun the request.)
+    check_book_table shares this for the same reason on the DOM side: the
+    table is rendered by DataTables after an ajax fetch.
+    """
+    timeout = float(os.environ.get("LUTE_TEST_READ_TIMEOUT", 15))
+    poll_frequency = 0.25
+    start_time = time.time()
+    actual = getter()
+    while actual != expected and time.time() - start_time < timeout:
+        time.sleep(poll_frequency)
+        actual = getter()
+    assert expected == actual
 
 
 @then(parsers.parse("book pages with start dates are:\n{content}"))
 def book_page_start_dates_are(luteclient, content):
-    assert content == luteclient.get_book_page_start_dates()
+    "Start dates come from an async page beacon, so let them land."
+    _assert_settles(content, luteclient.get_book_page_start_dates)
 
 
 @then(parsers.parse("book pages with read dates are:\n{content}"))
 def book_page_read_dates_are(luteclient, content):
-    assert content == luteclient.get_book_page_read_dates()
+    "Check the recorded read dates."
+    _assert_settles(content, luteclient.get_book_page_read_dates)
 
 
 # Terms
@@ -396,16 +449,92 @@ def check_exported_file(luteclient, content):
 def then_read_content(luteclient, content):
     "Check rendered content."
     c = content.replace("\n", "/")
-    timeout = 3  # seconds
+
+    # The pane is repopulated by ajax whenever the page or term state
+    # changes, so poll until the rendered text settles.
+    #
+    # Note the re-read _inside_ the loop: the previous version called
+    # displayed_text() once, before the loop, and never refreshed it --
+    # so the loop only slept, and the assert then ran against that stale
+    # pre-wait snapshot.  On a loaded CI runner that surfaced as a
+    # different handful of tests failing on every retry, which the
+    # nick-fields/retry wrapper in ci.yml only masked.
+    #
+    # A wider cap is safe: the loop exits as soon as the text matches, so
+    # it costs nothing on a warm machine.
+    timeout = float(os.environ.get("LUTE_TEST_READ_TIMEOUT", 15))
     poll_frequency = 0.25
     start_time = time.time()
     displayed = luteclient.displayed_text()
-    while time.time() - start_time < timeout:
-        if c == displayed:
-            break
+    while displayed != c and time.time() - start_time < timeout:
         time.sleep(poll_frequency)
-    else:
-        assert c == displayed
+        displayed = luteclient.displayed_text()
+    assert c == displayed
+
+
+@when("I press the TTS player's play button")
+def when_press_tts_play(luteclient):
+    "Start the TTS player, which reads the page's sentences in order."
+    luteclient.start_tts_playback()
+
+
+@then("the line being read is underlined in the reading text")
+def then_playing_line_underlined(luteclient):
+    """
+    The player's current line is marked in the page text itself.
+
+    The players already show the current line in their subtitle strip and
+    highlight it in the transcript; this is the mark in the text the
+    reader is actually reading.
+    """
+    state = luteclient.wait_for_playing_line()
+    assert state["text"], f"the marked line has no text: {state}"
+
+
+@then(parsers.parse('the underlined line shows "{text}"'))
+def then_underlined_line_text(luteclient, text):
+    """
+    The mark is on the line the player is reading, and it is underlined.
+
+    Waits for that line rather than for any mark: a media book's player
+    marks the cue at the playhead as soon as it is ready, so "a line is
+    marked" is already true before the reader has played anything.
+    """
+    luteclient.wait_for_playing_line_text(text)
+
+
+@given(parsers.parse('a {lang} mp3 book "{title}" with subtitles:\n{c}'))
+def given_mp3_book(luteclient, lang, title, c):
+    """
+    A media book: a generated silent audio track plus one subtitle per line.
+
+    A media book's text is its cues' text joined by newlines, so line N of
+    the page is cue N -- which is what makes "play line 2" mean something.
+    """
+    luteclient.make_mp3_book(title, c, lang)
+
+
+@then("the reading page maps its lines to the subtitle cues")
+def then_page_cue_map(luteclient):
+    """
+    The page hands the player the cue index of each of its lines.
+
+    This is the media path's primary way of finding the line to mark: the
+    cue's text is matched against it, and a map that is missing or short
+    leaves only the text fallback.  Asserting it here keeps a scenario that
+    would otherwise pass on the fallback alone from hiding a broken map.
+    """
+    state = luteclient.page_cue_map_state()
+    assert len(state["map"]) == state["paragraphs"], (
+        "every line of the page must be named by the map:"
+        f" {len(state['map'])} entries for {state['paragraphs']} lines"
+    )
+
+
+@when(parsers.parse("I play subtitle line {line_number:d} in the media player"))
+def when_play_subtitle_line(luteclient, line_number):
+    "Play a line from the media player's transcript, as a reader would."
+    luteclient.play_subtitle_line(line_number)
 
 
 @when(parsers.parse("I change the current text content to:\n{content}"))
@@ -436,7 +565,15 @@ def when_add_page(luteclient, position, content):
     p.click(linkid)
     p.fill("#text", content)
     p.click("#submit")
-    p.reload()
+    # #submit is a plain form POST and the server 302s to /read/<id>, so the
+    # click has already started a navigation.  The reload() that used to be
+    # here raced it and, on CI, hit "Page.reload: Protocol error
+    # (Page.reload): Not attached to an active page" -- the whole of
+    # test_user_can_add_and_remove_pages, on all three retries.  Wait for that
+    # navigation to finish instead of forcing a second load.  (Not
+    # wait_for_url: it needs a navigation still to be pending, and by then it
+    # may already have landed.)
+    p.wait_for_load_state("load", timeout=_NAV_TIMEOUT)
 
 
 @when(parsers.parse("I go to the {position} page"))
@@ -468,7 +605,10 @@ def when_delete_current_page(luteclient):
     luteclient.page.click("#page-operations-title")
     luteclient.page.on("dialog", lambda dialog: dialog.accept())
     luteclient.page.click("#readmenu_delete_page")
-    luteclient.page.reload()
+    # delete_current_page() sets window.location to /read/delete_page/...,
+    # which 302s on to /read/<id>/page/<n> -- the same reload()-racing-a-
+    # navigation hazard as when_add_page above.
+    luteclient.page.wait_for_load_state("load", timeout=_NAV_TIMEOUT)
 
 
 # Reading, terms
@@ -620,6 +760,124 @@ def when_click_footer_next_page(luteclient):
     "Go to the next page."
     luteclient.page.click("#navNext")
     time.sleep(0.1)  # Leave this, remove and test fails.
+
+
+# Review session
+#
+# The runner is client-side too: the page ships an empty shell and
+# lute-review.js fills it from POST /review/start, then posts each
+# grade.  A card that never renders looks the same as a card with
+# nothing due unless you read the live DOM.
+
+
+@then(parsers.re(r"the review dashboard shows (?P<count>\d+) due cards?"))
+def then_review_due_count(luteclient, count):
+    luteclient.expect_review_due_count(int(count))
+
+
+@then(parsers.parse('the review card shows the term "{text}"'))
+def then_review_card_term(luteclient, text):
+    luteclient.wait_for_review_card()
+    state = luteclient.review_session_state()
+    assert state["error"] is None, f"the session failed: {state['error']}"
+    assert text in (state["question"] or ""), state
+
+
+@when("I reveal the review answer")
+def when_reveal_review_answer(luteclient):
+    luteclient.reveal_review_answer()
+    state = luteclient.review_session_state()
+    assert state["answer_showing"], state
+    # Two grades: Again (rating 1) and Good (rating 3).
+    assert state["grade_ratings"] == ["1", "3"], state
+
+
+@when(parsers.parse('I grade the card "{label}"'))
+def when_grade_card(luteclient, label):
+    ratings = {"Again": 1, "Hard": 2, "Good": 3, "Easy": 4}
+    assert label in ratings, f"unknown grade {label!r}"
+    luteclient.grade_review_card(ratings[label])
+
+
+@then("the review session is done")
+def then_review_session_done(luteclient):
+    expect(luteclient.page.locator("#review_card")).to_contain_text("Session done")
+
+
+@then("the undo button is available")
+def then_undo_available(luteclient):
+    state = luteclient.review_session_state()
+    assert state["undo_available"], state
+    assert state["undo_visible"], state
+
+
+@then("the undo button is hidden")
+def then_undo_hidden(luteclient):
+    state = luteclient.review_session_state()
+    assert not state["undo_available"], state
+    assert not state["undo_visible"], state
+
+
+@then("the review card offers pronunciation")
+def then_review_card_offers_pronunciation(luteclient):
+    luteclient.wait_for_review_card()
+    state = luteclient.review_session_state()
+    assert state["error"] is None, f"the session failed: {state['error']}"
+    assert state["speak_button"], f"no speaker button on the card: {state}"
+    # A button with no engine behind it is a dead click, and the markup
+    # looks identical either way -- tts.js is only loaded by the reading
+    # page and this one, so a missing script tag is a real risk.
+    assert state["tts_available"], f"tts.js is not on the session page: {state}"
+
+
+@given("I record what the review session pronounces")
+def given_record_review_speech(luteclient):
+    luteclient.record_review_speech()
+
+
+@given("the page has not been interacted with")
+def given_page_not_interacted_with(luteclient):
+    luteclient.pretend_page_untouched()
+
+
+@when("I click the speaker on the review card")
+def when_click_review_speaker(luteclient):
+    assert luteclient.click_review_speaker(), "the card has no speaker button"
+
+
+@when("I press the space key in the review session")
+def when_press_space_in_review(luteclient):
+    luteclient.page.keyboard.press("Space")
+
+
+@when("I turn off the card pronunciation in the review settings")
+def when_turn_off_card_pronunciation(luteclient):
+    luteclient.set_review_speak_cards(False)
+
+
+@then(parsers.parse('the term "{text}" is spoken as "{lang}"'))
+def then_term_spoken_as(luteclient, text, lang):
+    # Exactly one utterance: whichever path spoke, the term must not be
+    # said twice over.
+    spoken = luteclient.review_spoken()
+    assert spoken == [{"text": text, "lang": lang}], (
+        f"expected one utterance of {text!r} as {lang}, got {spoken}; "
+        f"page state: {luteclient.review_speak_state()}"
+    )
+
+
+@then("nothing was spoken")
+def then_nothing_spoken(luteclient):
+    spoken = luteclient.review_spoken()
+    assert spoken == [], (
+        f"the page should have stayed quiet, but said {spoken}; "
+        f"page state: {luteclient.review_speak_state()}"
+    )
+
+
+@when("I undo the last grade")
+def when_undo_last_grade(luteclient):
+    luteclient.undo_last_grade()
 
 
 def pytest_collection_modifyitems(config, items):

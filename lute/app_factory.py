@@ -72,6 +72,7 @@ from lute.multiuser.routes import bp as multiuser_bp
 from lute.term.routes import bp as term_bp
 from lute.termtag.routes import bp as termtag_bp
 from lute.read.routes import bp as read_bp
+from lute.review.routes import bp as review_bp
 from lute.bing.routes import bp as bing_bp
 from lute.userimage.routes import bp as userimage_bp
 from lute.useraudio.routes import bp as useraudio_bp
@@ -643,7 +644,21 @@ def _create_app(app_config, extra_config):
             return
 
         path = request.path
-        if path == "/login" or path.startswith("/static/") or path == "/favicon.ico":
+        # Static assets are excepted so they load before login.  /sw.js
+        # and the manifests are static files too, but they are served
+        # from root by their own routes rather than from /static/, so
+        # they have to be named here as well: gated, the service worker
+        # script and the manifest answer 302 to the login page, and a
+        # background service-worker update after the session expires
+        # fails -- leaving the browser on a stale worker.
+        public_paths = (
+            "/login",
+            "/favicon.ico",
+            "/sw.js",
+            "/manifest.webmanifest",
+            "/manifest.json",
+        )
+        if path in public_paths or path.startswith("/static/"):
             mu_context.set_current_user(None)
             return
 
@@ -738,6 +753,7 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(term_bp)
     app.register_blueprint(termtag_bp)
     app.register_blueprint(read_bp)
+    app.register_blueprint(review_bp)
     app.register_blueprint(bing_bp)
     app.register_blueprint(userimage_bp)
     app.register_blueprint(useraudio_bp)

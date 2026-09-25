@@ -1,8 +1,13 @@
 {# This form is "included" into other .html files. #}
 
-<script type="text/javascript" src="{{ vstatic_js('lute-popups.js') }}" charset="utf-8"></script>
+{# lute-popups.js and lute-hotkey-utils.js are loaded by base.html, and
+   this partial is included from term/form.html which extends it --
+   loading them again redeclared `const LutePopups` and threw
+   "Identifier 'LutePopups' has already been declared" on every new/edit
+   term page.  The other user of this partial, read/term_edit_form.html,
+   is a standalone iframe document with no base.html, so it loads them
+   itself.  dict-tabs.js is in neither base, so it stays here. #}
 <script type="text/javascript" src="{{ vstatic_js('dict-tabs.js') }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ vstatic_js('lute-hotkey-utils.js') }}" charset="utf-8"></script>
 <script type="text/javascript">
   /**
    * Sometimes this file is included within the context of base.html
