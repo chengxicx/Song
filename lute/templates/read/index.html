@@ -387,13 +387,16 @@
       if (typeof open_grammar_analysis === "function") open_grammar_analysis();
     }
 
-    // The term form's "Sentence" button: translate the sentence containing
-    // the word being edited, using the same lookup as the reader's
-    // "translate sentence" hotkey (the clicked word is still .kwordmarked).
-    // The sentence dictionaries open as tabs in the bottom dictionary
-    // frame; repeated clicks do not cycle.
+    // The term form's "Sentence" button toggles sentence lookup: first
+    // click opens the sentence dictionaries as tabs in the bottom
+    // dictionary frame (same lookup as the "translate sentence" hotkey,
+    // no cycling), a second click restores the term dictionaries -- the
+    // exact tab that was active before Sentence was pressed.
     if (event.data.event === "LuteTermFormSentenceRequested") {
-      if (typeof handle_translate === "function") handle_translate("sentence-id");
+      if (LookupButton.sentenceMode && typeof restoreTermLookupButtons === "function")
+        restoreTermLookupButtons();
+      else if (typeof handle_translate === "function")
+        handle_translate("sentence-id");
     }
 
     if (event.data.event === "LuteTermFormOpened" && mediaTablet.matches) {
