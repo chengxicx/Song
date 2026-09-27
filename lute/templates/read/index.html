@@ -388,8 +388,10 @@
     }
 
     // The term form's "Sentence" button: translate the sentence containing
-    // the word being edited, using the same lookup/cycling as the reader's
+    // the word being edited, using the same lookup as the reader's
     // "translate sentence" hotkey (the clicked word is still .kwordmarked).
+    // The sentence dictionaries open as tabs in the bottom dictionary
+    // frame; repeated clicks do not cycle.
     if (event.data.event === "LuteTermFormSentenceRequested") {
       if (typeof handle_translate === "function") handle_translate("sentence-id");
     }
