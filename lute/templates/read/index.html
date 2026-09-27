@@ -387,6 +387,13 @@
       if (typeof open_grammar_analysis === "function") open_grammar_analysis();
     }
 
+    // The term form's "Sentence" button: translate the sentence containing
+    // the word being edited, using the same lookup/cycling as the reader's
+    // "translate sentence" hotkey (the clicked word is still .kwordmarked).
+    if (event.data.event === "LuteTermFormSentenceRequested") {
+      if (typeof handle_translate === "function") handle_translate("sentence-id");
+    }
+
     if (event.data.event === "LuteTermFormOpened" && mediaTablet.matches) {
       readPaneRight.classList.add("open-dict");
       btmMarginCont.classList.add("open-dict");
