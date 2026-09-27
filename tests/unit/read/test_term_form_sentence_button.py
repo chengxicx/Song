@@ -89,8 +89,23 @@ def test_reading_page_translates_the_sentence_for_that_event():
         src = f.read()
 
     assert "LuteTermFormSentenceRequested" in src
-    event_block = src.split('"LuteTermFormSentenceRequested"')[1][:200]
+    event_block = src.split('"LuteTermFormSentenceRequested"')[1][:400]
     assert 'handle_translate("sentence-id")' in event_block
+
+
+def test_sentence_button_toggles_back_to_term_dicts():
+    "A second press while sentence tabs are shown restores the term tabs."
+    with open(_READ_INDEX, encoding="utf-8") as f:
+        src = f.read()
+
+    event_block = src.split('"LuteTermFormSentenceRequested"')[1][:400]
+    # First the "already in sentence mode" branch restores; only otherwise
+    # does it run the sentence lookup.
+    assert "LookupButton.sentenceMode" in event_block
+    assert "restoreTermLookupButtons()" in event_block
+    assert event_block.index("LookupButton.sentenceMode") < event_block.index(
+        'handle_translate("sentence-id")'
+    )
 
 
 def test_button_order_save_delete_grammar_sentence(app_context, client, english, repo):
@@ -160,3 +175,21 @@ def test_opening_a_word_restores_term_dict_tabs():
     loader = src.split("function loadDictionaries()")[1].split("\n}\n", 1)[0]
     assert "LookupButton.sentenceMode" in loader
     assert "createLookupButtons()" in loader
+
+
+def test_toggle_off_restores_the_previously_active_term_dict():
+    "Second Sentence press rebuilds term tabs on the dictionary the user had."
+    with open(_DICT_TABS_JS, encoding="utf-8") as f:
+        src = f.read()
+
+    # Entering sentence mode remembers the active term DictButton.
+    enter = src.split("function createSentenceLookupButtons")[1].split("\nfunction ", 1)[0]
+    assert "lastTermDictID" in enter
+    assert "instanceof SentenceDictButton" in enter
+    # Restoring reuses the saved id.
+    restore = src.split("function restoreTermLookupButtons()")[1].split("\n}\n", 1)[0]
+    assert "LookupButton.lastTermDictID" in restore
+    assert "createLookupButtons(5, saved)" in restore
+    # createLookupButtons must accept and honor the saved id.
+    create = src.split("function createLookupButtons(")[1].split("\n  // Make all", 1)[0]
+    assert "activateDictID" in create
