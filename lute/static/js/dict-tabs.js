@@ -49,6 +49,10 @@ class LookupButton {
   static TERM_DICTS = null;
   static LANG_ID = null;
 
+  /** True while the bottom strip shows sentence dictionaries instead
+   * of term dictionaries (see createSentenceLookupButtons). */
+  static sentenceMode = false;
+
 
   /** All LookupButtons created. */
   static all = [];
@@ -195,10 +199,11 @@ class ImageLookupButton extends GeneralLookupButton {
  */
 class DictButton extends LookupButton {
 
-  constructor(dict, frameName) {
+  constructor(dict, frameName, dictList = LookupButton.TERM_DICTS) {
     super(frameName);
 
-    this.dictID = LookupButton.TERM_DICTS.indexOf(dict);
+    this.dictList = dictList;
+    this.dictID = dictList.indexOf(dict);
     if (this.dictID == -1) {
       console.log(`Error: Dict url ${dict.url} not found (??)`);
       return;
@@ -249,11 +254,21 @@ class DictButton extends LookupButton {
 
   /** LOOKUPS *************************/
 
+  /** The text handed to the dictionary.  Term tabs use the form's #text
+   * value; sentence-translation tabs override it with the full sentence. */
+  lookupTerm() {
+    if (LookupButton.TERM_FORM_CONTAINER == null)
+      return '';
+    return LookupButton.TERM_FORM_CONTAINER.querySelector("#text").value;
+  }
+
   do_lookup() {
-    const dict = LookupButton.TERM_DICTS[this.dictID];
-    if (LookupButton.TERM_FORM_CONTAINER == null || dict == null)
+    const dict = this.dictList[this.dictID];
+    if (dict == null)
       return;
-    const term = LookupButton.TERM_FORM_CONTAINER.querySelector("#text").value;
+    const term = this.lookupTerm();
+    if (term == '')
+      return;
     if (this.isExternal) {
       this._load_popup(dict.url, term);
     }
@@ -316,6 +331,23 @@ class DictButton extends LookupButton {
 
 
 /**
+ * A dictionary tab used in sentence-translation mode: it looks up the
+ * whole sentence (not the form's term) in one of the language's sentence
+ * dictionaries (LUTE_SENTENCE_LOOKUP_DICTS).
+ */
+class SentenceDictButton extends DictButton {
+  constructor(dict, frameName, sentence) {
+    super(dict, frameName, LUTE_SENTENCE_LOOKUP_DICTS);
+    this.sentence = sentence;
+  }
+
+  lookupTerm() {
+    return this.sentence;
+  }
+}
+
+
+/**
  * Load excess buttons in a separate div.
  */
 function _create_dict_dropdown_div(buttons_in_list) {
@@ -350,18 +382,42 @@ function _create_dict_dropdown_div(buttons_in_list) {
 }
 
 /**
- * Create all buttons.
+ * Remove every dictionary tab/frame (term, sentence and static lookup
+ * buttons alike) and forget the button instances.
+ */
+function _teardownLookupButtons() {
+  document.querySelectorAll(".dict-btn").forEach(item => item.remove())
+  document.querySelectorAll(".dictframe").forEach(item => item.remove())
+  const el = document.getElementById("dict-menu-container");
+  if (el)
+    el.remove();
+  LookupButton.all = [];
+}
+
+/**
+ * Lay the given buttons out as tabs in #dicttabslayout; buttons past
+ * tab_count collapse into the "..." dropdown menu.
+ */
+function _layoutDictTabs(buttons, tab_count) {
+  const container = document.getElementById("dicttabslayout");
+  const tab_buttons = buttons.slice(0, tab_count);
+  const list_buttons = buttons.slice(tab_count);
+  let grid_col_count = tab_buttons.length;
+  tab_buttons.forEach(button => container.appendChild(button.btn));
+  if (list_buttons.length > 0) {
+    const dropdown_div = _create_dict_dropdown_div(list_buttons);
+    container.appendChild(dropdown_div);
+    grid_col_count += 1;
+  }
+  container.style.gridTemplateColumns = `repeat(${grid_col_count}, minmax(2rem, 8rem))`;
+}
+
+/**
+ * Create all term-dictionary buttons.
  */
 function createLookupButtons(tab_count = 5) {
-  let destroy_existing_dictTab_controls = function() {
-    document.querySelectorAll(".dict-btn").forEach(item => item.remove())
-    document.querySelectorAll(".dictframe").forEach(item => item.remove())
-    const el = document.getElementById("dict-menu-container");
-    if (el)
-      el.remove();
-  }
-  destroy_existing_dictTab_controls();
-  LookupButton.all = [];
+  _teardownLookupButtons();
+  LookupButton.sentenceMode = false;
 
   if (LookupButton.TERM_DICTS.length <= 0) return;
 
@@ -375,19 +431,7 @@ function createLookupButtons(tab_count = 5) {
 
   // Make all DictButtons, which loads LookupButton.all.
   LookupButton.TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
-  const tab_buttons = LookupButton.all.slice(0, tab_count);
-  const list_buttons = LookupButton.all.slice(tab_count);
-
-  // Add elements to container.
-  const container = document.getElementById("dicttabslayout");
-  let grid_col_count = tab_buttons.length;
-  tab_buttons.forEach(button => container.appendChild(button.btn));
-  if (list_buttons.length > 0) {
-    const dropdown_div = _create_dict_dropdown_div(list_buttons);
-    container.appendChild(dropdown_div);
-    grid_col_count += 1;
-  }
-  container.style.gridTemplateColumns = `repeat(${grid_col_count}, minmax(2rem, 8rem))`;
+  _layoutDictTabs(LookupButton.all, tab_count);
 
   const first_button = LookupButton.all[0];
   if (first_button) {
@@ -403,10 +447,64 @@ function createLookupButtons(tab_count = 5) {
 }
 
 
+/**
+ * Sentence-translation mode: replace the term dictionary tabs with the
+ * language's SENTENCE dictionaries (LUTE_SENTENCE_LOOKUP_DICTS), all
+ * looking up the given sentence in the bottom dictionary frame.  The
+ * first dictionary opens immediately; the others are reached by clicking
+ * their tabs -- invoking this again does NOT cycle through dictionaries
+ * and re-clicking Sentence for another sentence starts from the first tab
+ * again.  The mode lasts until a word's term form opens, at which point
+ * loadDictionaries rebuilds the term tabs.
+ */
+function createSentenceLookupButtons(sentence, tab_count = 5) {
+  const dicts = LUTE_SENTENCE_LOOKUP_DICTS;
+  if ((sentence ?? '') == '' || dicts.length == 0)
+    return false;
+
+  _teardownLookupButtons();
+  LookupButton.sentenceMode = true;
+
+  if (tab_count == (dicts.length - 1)) {
+    // Don't bother making a list with a single item.
+    tab_count += 1;
+  }
+
+  dicts.forEach((dict, index) => {
+    new SentenceDictButton(dict, `sentencedict${index}`, sentence);
+  });
+  _layoutDictTabs(LookupButton.all, tab_count);
+
+  const first_button = LookupButton.all[0];
+  if (first_button) {
+    first_button.activate();
+    first_button.do_lookup();
+  }
+
+  const dictframes = document.getElementById("dictframes");
+  LookupButton.all.forEach((button) => { dictframes.appendChild(button.frame); });
+
+  // The strip is display:none until the first lookup (loadDictionaries
+  // normally reveals it on word click); make sure it's shown here too.
+  const dictContainer = document.querySelector(".dictcontainer");
+  dictContainer.style.display = "flex";
+  dictContainer.style.flexDirection = "column";
+
+  return true;
+}
+
+
 function loadDictionaries() {
   const dictContainer = document.querySelector(".dictcontainer");
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
+  // A word's term form opened while sentence dictionaries were showing:
+  // rebuild the term dictionary tabs.  createLookupButtons loads the
+  // first tab immediately, so the regular reload below must be skipped.
+  if (LookupButton.sentenceMode) {
+    createLookupButtons();
+    return;
+  }
   LookupButton.all.forEach(button => button.contentLoaded = false);
   const active_button = LookupButton.all.find(button => button.is_active);
   if (active_button) {
