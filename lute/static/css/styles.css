@@ -2554,6 +2554,42 @@ button.btn-danger, button.btn-danger:link, button.btn-danger:visited {
     padding: 0.18rem 0.8rem;
 }
 
+/* "Tool chips": reading-frame shortcuts rendered INSIDE the term form
+   (Grammar analysis, Sentence translation).  They navigate a pane or open
+   a lookup -- they never submit the form -- so they must not borrow the
+   blue Save/Cancel action language (that is why Grammar used to look like
+   a stranded Cancel button).  Instead the label stays in the ordinary
+   text colour (readable in every theme), and a soft hue wash plus a
+   matching glyph identify the tool: indigo = Grammar, teal = Sentence.
+   The translucent washes adapt to both the light and dark themes. */
+.btn.btn-tool,
+.btn.btn-tool:link,
+.btn.btn-tool:visited {
+    --tool-hue: var(--btn-accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: color-mix(in srgb, var(--tool-hue) 14%, transparent);
+    border-color: color-mix(in srgb, var(--tool-hue) 42%, transparent);
+    /* Beats the global button.btn color:#fff !important rule above. */
+    color: var(--font-color) !important;
+}
+.btn.btn-tool:hover {
+    background: color-mix(in srgb, var(--tool-hue) 22%, transparent);
+    border-color: color-mix(in srgb, var(--tool-hue) 62%, transparent);
+    color: var(--font-color) !important;
+}
+.btn.btn-tool .btn-tool__icon {
+    color: var(--tool-hue);
+    flex: none;
+}
+.btn.btn-tool--grammar {
+    --tool-hue: #7c74f0;
+}
+.btn.btn-tool--sentence {
+    --tool-hue: #1fb3a3;
+}
+
 /* Buttons laid out in a horizontal row at the bottom of edit forms. */
 .form-action-row {
     display: flex;

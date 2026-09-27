@@ -49,7 +49,10 @@ let show_translation_for_text = function(text) {
     return;
 
   if (LUTE_SENTENCE_LOOKUP_DICTS.length == 0) {
-    console.log('No sentence translation dictionaries configured.');
+    // Same feedback as the LuteForMobile sentence sheet ("No dictionaries
+    // configured"): a silent no-op made both the hotkey and the term
+    // form's Sentence button feel broken.
+    alert('No sentence translation dictionaries are configured for this language.');
     return;
   }
 
