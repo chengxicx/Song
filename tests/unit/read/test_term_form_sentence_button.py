@@ -25,6 +25,10 @@ _FORM_PATH = os.path.join(
     os.path.dirname(__import__("lute").__file__), "templates", "term", "_form.html"
 )
 
+_JS_DIR = os.path.join(os.path.dirname(__import__("lute").__file__), "static", "js")
+_LUTE_COMMANDS_JS = os.path.join(_JS_DIR, "lute-commands.js")
+_DICT_TABS_JS = os.path.join(_JS_DIR, "dict-tabs.js")
+
 
 @pytest.fixture(name="repo")
 def fixture_repo():
@@ -110,3 +114,49 @@ def test_sentence_button_uses_the_tool_chip_style():
     sentence_tag = src.split('id="btn-sentence"', 1)[1].split(">", 1)[0]
     assert "btn-tool" in sentence_tag
     assert "btn-secondary" not in sentence_tag
+
+
+def test_sentence_lookup_opens_in_bottom_dict_frame():
+    "Translation renders in the bottom dict strip, never in the wordframe."
+    with open(_LUTE_COMMANDS_JS, encoding="utf-8") as f:
+        src = f.read()
+
+    lookup = src.split("let show_translation_for_text")[1].split("\n}")[0]
+    assert "createSentenceLookupButtons(text)" in lookup
+    # The old behavior took over the whole right pane (term iframe) and
+    # collapsed the dictionary area.
+    assert "frames.wordframe" not in lookup
+    assert "grid-template-rows" not in lookup
+
+
+def test_sentence_lookup_no_longer_cycles_dictionaries():
+    "Repeated lookups must not rotate Youdao -> Google -> ..."
+    with open(_LUTE_COMMANDS_JS, encoding="utf-8") as f:
+        src = f.read()
+
+    assert "_get_translation_dict_index" not in src
+    assert "LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX" not in src
+    assert "LUTE_LAST_SENTENCE_TRANSLATION_TEXT" not in src
+
+
+def test_dict_tabs_define_sentence_mode():
+    "The bottom strip gets one tab per sentence dictionary."
+    with open(_DICT_TABS_JS, encoding="utf-8") as f:
+        src = f.read()
+
+    assert "class SentenceDictButton extends DictButton" in src
+    assert "LUTE_SENTENCE_LOOKUP_DICTS" in src
+    builder = src.split("function createSentenceLookupButtons")[1].split("\nfunction ", 1)[0]
+    # Every invocation starts from the first dictionary (no cycling).
+    assert "LookupButton.all[0]" in builder
+    assert "sentenceMode = true" in builder
+
+
+def test_opening_a_word_restores_term_dict_tabs():
+    "Leaving sentence lookup rebuilds the regular term tabs."
+    with open(_DICT_TABS_JS, encoding="utf-8") as f:
+        src = f.read()
+
+    loader = src.split("function loadDictionaries()")[1].split("\n}\n", 1)[0]
+    assert "LookupButton.sentenceMode" in loader
+    assert "createLookupButtons()" in loader

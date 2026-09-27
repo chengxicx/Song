@@ -12,37 +12,11 @@
 /** SENTENCE TRANSLATIONS *************************/
 
 // LUTE_SENTENCE_LOOKUP_DICTS is rendered in templates/read/index.html.
-// Hitting "t" repeatedly cycles through the uris.  Moving to a new
-// sentence resets the order.
-
-var LUTE_LAST_SENTENCE_TRANSLATION_TEXT = '';
-var LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX = 0;
-
-/** Cycle through the LUTE_SENTENCE_LOOKUP_DICTS.
- * If the current sentence is the same as the last translation,
- * move to the next sentence dictionary; otherwise start the cycle
- * again (from index 0).
- */
-let _get_translation_dict_index = function(sentence) {
-  const dict_count = LUTE_SENTENCE_LOOKUP_DICTS.length;
-  if (dict_count == 0)
-    return 0;
-  let new_index = LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX;
-  if (LUTE_LAST_SENTENCE_TRANSLATION_TEXT != sentence) {
-    // New sentence, start at beginning.
-    new_index = 0;
-  }
-  else {
-    // Same sentence, next dict.
-    new_index += 1;
-    if (new_index >= dict_count)
-      new_index = 0;
-  }
-  LUTE_LAST_SENTENCE_TRANSLATION_TEXT = sentence;
-  LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX = new_index;
-  return new_index;
-}
-
+// The lookup opens in the reader's bottom dictionary frame as a row of
+// tabs (one per sentence dictionary, see createSentenceLookupButtons in
+// dict-tabs.js): the first dictionary opens immediately, the others are
+// one click away.  Repeating the command does NOT cycle dictionaries,
+// and translating another sentence starts back at the first tab.
 
 let show_translation_for_text = function(text) {
   if (text == '')
@@ -56,22 +30,23 @@ let show_translation_for_text = function(text) {
     return;
   }
 
-  const dict_index = _get_translation_dict_index(text);
-  const dict = LUTE_SENTENCE_LOOKUP_DICTS[dict_index];
+  // Reader page: render the sentence-dictionary tabs in the bottom
+  // dictionary frame, just like word lookups.
+  if (typeof createSentenceLookupButtons === "function") {
+    createSentenceLookupButtons(text);
+    return;
+  }
 
+  // Fallback for pages without the reader tab strip: open the first
+  // dictionary in a popup.
   const lookup = encodeURIComponent(text);
+  const dict = LUTE_SENTENCE_LOOKUP_DICTS[0];
   let url = dict.url.replace('[LUTE]', lookup);
   url = url.replace('###', lookup);  // TODO remove_old_###_placeholder: remove
-  if (dict.dicttype == "popuphtml") {
-    let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
-    if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
-      settings = null;
-    LutePopups.open_popup(url, settings);
-  }
-  else {
-    top.frames.wordframe.location.href = url;
-    $('#read_pane_right').css('grid-template-rows', '1fr 0');
-  }
+  let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
+  if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
+    settings = null;
+  LutePopups.open_popup(url, settings);
 
 };
 
