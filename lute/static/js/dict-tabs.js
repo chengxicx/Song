@@ -53,6 +53,11 @@ class LookupButton {
    * of term dictionaries (see createSentenceLookupButtons). */
   static sentenceMode = false;
 
+  /** DictID of the term-dictionary tab that was active just before the
+   * strip switched to sentence mode, so toggling Sentence off restores
+   * the same dictionary rather than jumping to the first. */
+  static lastTermDictID = null;
+
 
   /** All LookupButtons created. */
   static all = [];
@@ -414,8 +419,12 @@ function _layoutDictTabs(buttons, tab_count) {
 
 /**
  * Create all term-dictionary buttons.
+ *
+ * When activateDictID is given, that dictionary is opened instead of the
+ * first one (used when toggling Sentence mode off to restore the tab the
+ * user was previously on).
  */
-function createLookupButtons(tab_count = 5) {
+function createLookupButtons(tab_count = 5, activateDictID = null) {
   _teardownLookupButtons();
   LookupButton.sentenceMode = false;
 
@@ -433,10 +442,12 @@ function createLookupButtons(tab_count = 5) {
   LookupButton.TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
   _layoutDictTabs(LookupButton.all, tab_count);
 
-  const first_button = LookupButton.all[0];
-  if (first_button) {
-    first_button.activate();
-    first_button.do_lookup();
+  const target_button = (activateDictID == null)
+    ? LookupButton.all[0]
+    : LookupButton.all.find(b => b.dictID === activateDictID) || LookupButton.all[0];
+  if (target_button) {
+    target_button.activate();
+    target_button.do_lookup();
   }
 
   for (let b of [new SentenceLookupButton(), new ImageLookupButton()])
@@ -452,15 +463,23 @@ function createLookupButtons(tab_count = 5) {
  * language's SENTENCE dictionaries (LUTE_SENTENCE_LOOKUP_DICTS), all
  * looking up the given sentence in the bottom dictionary frame.  The
  * first dictionary opens immediately; the others are reached by clicking
- * their tabs -- invoking this again does NOT cycle through dictionaries
- * and re-clicking Sentence for another sentence starts from the first tab
- * again.  The mode lasts until a word's term form opens, at which point
- * loadDictionaries rebuilds the term tabs.
+ * their tabs -- invoking this again does NOT cycle through dictionaries.
+ * Toggling Sentence off (restoreTermLookupButtons, or opening another
+ * word) rebuilds the term tabs.
  */
 function createSentenceLookupButtons(sentence, tab_count = 5) {
   const dicts = LUTE_SENTENCE_LOOKUP_DICTS;
   if ((sentence ?? '') == '' || dicts.length == 0)
     return false;
+
+  // Remember which term dictionary the user was on, so toggling back
+  // restores it.  Only real term DictButtons count, not sentence tabs
+  // (re-entering sentence mode) or the static Sentences/Images buttons.
+  const active_term = LookupButton.all.find(
+    b => b.is_active && b instanceof DictButton && !(b instanceof SentenceDictButton)
+  );
+  if (active_term)
+    LookupButton.lastTermDictID = active_term.dictID;
 
   _teardownLookupButtons();
   LookupButton.sentenceMode = true;
@@ -494,14 +513,26 @@ function createSentenceLookupButtons(sentence, tab_count = 5) {
 }
 
 
+/**
+ * Leave sentence-translation mode and rebuild the term dictionary tabs,
+ * re-opening the dictionary that was active before Sentence was pressed
+ * (the first one if there was none / it is gone).
+ */
+function restoreTermLookupButtons() {
+  const saved = LookupButton.lastTermDictID;
+  createLookupButtons(5, saved);
+}
+
+
 function loadDictionaries() {
   const dictContainer = document.querySelector(".dictcontainer");
   dictContainer.style.display = "flex";
   dictContainer.style.flexDirection = "column";
   // A word's term form opened while sentence dictionaries were showing:
-  // rebuild the term dictionary tabs.  createLookupButtons loads the
-  // first tab immediately, so the regular reload below must be skipped.
+  // rebuild the term dictionary tabs.  A fresh word opens the first tab;
+  // createLookupButtons loads it immediately, so skip the reload below.
   if (LookupButton.sentenceMode) {
+    LookupButton.lastTermDictID = null;
     createLookupButtons();
     return;
   }
