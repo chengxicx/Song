@@ -12,6 +12,7 @@ import secrets
 import sqlite3
 import traceback
 import mimetypes
+from datetime import datetime
 from urllib.parse import quote
 from flask import (
     Flask,
@@ -149,6 +150,33 @@ def _setup_base_app_dirs(app_config):
     ]
     for rec in required_dirs:
         _setup_app_dir(rec[0], rec[1])
+
+
+def _published_apks(static_folder):
+    """
+    Android builds published to the static folder, newest first.
+
+    Scans only the top level of the static folder for *.apk files, so
+    the download links can be served by the normal /static/ route.
+    Returns [] if the folder is missing or nothing has been published.
+    """
+    if not static_folder or not os.path.isdir(static_folder):
+        return []
+    apks = []
+    for name in os.listdir(static_folder):
+        path = os.path.join(static_folder, name)
+        if not name.lower().endswith(".apk") or not os.path.isfile(path):
+            continue
+        stat = os.stat(path)
+        apks.append(
+            {
+                "name": name,
+                "size_mb": round(stat.st_size / (1024 * 1024), 1),
+                "modified": datetime.fromtimestamp(stat.st_mtime),
+            }
+        )
+    apks.sort(key=lambda a: a["modified"], reverse=True)
+    return apks
 
 
 def _add_base_routes(app, app_config):
@@ -319,6 +347,13 @@ def _add_base_routes(app, app_config):
             datapath=ac.datapath,
             database=ac.dbfilename,
             is_docker=ac.is_docker,
+        )
+
+    @app.route("/android")
+    def show_android():
+        "List the Android builds published to the static folder."
+        return render_template(
+            "android.html", apks=_published_apks(current_app.static_folder)
         )
 
     @app.route("/info")
