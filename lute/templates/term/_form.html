@@ -154,7 +154,11 @@
   // term once.  Bound on DOMContentLoaded (ready) because tts.js --
   // which provides window.luteTtsSpeak -- is loaded with defer.
   // Standalone term pages (/term/new, /term/edit) don't load tts.js,
-  // so the button is hidden there rather than dead.
+  // so the button is hidden there rather than dead.  The utterance
+  // prefers the term's annotated reading (the #romanization field,
+  // still valued even when hidden by hide_pronunciation) when it is
+  // kana, so kanji terms whose TTS reading differs from the annotation
+  // sound like the annotation.
   $(document).ready(function () {
     const pron_btn = document.getElementById("term-speak-btn");
     if (!pron_btn) return;
@@ -164,7 +168,13 @@
     }
     pron_btn.addEventListener("click", function () {
       const t = document.getElementById("text");
-      if (t && t.value.trim()) window.luteTtsSpeak(t.value);
+      if (!t || !t.value.trim()) return;
+      const r = document.getElementById("romanization");
+      if (typeof window.luteTtsSpeakTerm === "function") {
+        window.luteTtsSpeakTerm(t.value, r ? r.value : "");
+      } else {
+        window.luteTtsSpeak(t.value);
+      }
     });
   });
 

@@ -112,13 +112,18 @@ window.LuteReview = (function () {
 
   // Speak the term of the card on screen.  tts.js is loaded with defer
   // (review/session.html) and this is only ever called from a render or
-  // an event, so window.luteTtsSpeak is there; when it is not (an old
-  // cached copy of the page), the button is simply inert rather than
-  // throwing.
+  // an event, so the window.luteTts* globals are there; when they are
+  // not (an old cached copy of the page), the button is simply inert
+  // rather than throwing.  luteTtsSpeakTerm prefers the card's
+  // annotated reading (kana) when it has one, so kanji terms whose TTS
+  // reading differs from the annotation sound like the annotation.
   function speak_term(c) {
     if (!c || !c.term_text) return;
-    if (typeof window.luteTtsSpeak !== "function") return;
-    window.luteTtsSpeak(c.term_text, null, c.lang_code || null);
+    if (typeof window.luteTtsSpeakTerm === "function") {
+      window.luteTtsSpeakTerm(c.term_text, c.romanization || "", c.lang_code || null);
+    } else if (typeof window.luteTtsSpeak === "function") {
+      window.luteTtsSpeak(c.term_text, null, c.lang_code || null);
+    }
   }
 
   // The review settings page can turn the automatic reading off; the
