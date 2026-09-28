@@ -225,7 +225,7 @@
 </form>
 
 <form id="mp3-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import audio with subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and audio under 20&#8202;MB is stored locally.</p>
+  <p class="import-desc">Import audio with subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and audio under 20&#8202;MB is stored locally. Supports mp3, m4a, m4b, wav, ogg, opus, aac, flac, webm.</p>
   <div class="iform">
     <div class="irow">
       <label class="ilbl" for="mp3-language">Language</label>
@@ -246,7 +246,7 @@
     <div class="irow">
       <label class="ilbl" for="mp3_file">Audio</label>
       <div class="ictrl isource">
-        <input type="file" id="mp3_file" name="mp3_file" accept=".mp3,.m4a">
+        <input type="file" id="mp3_file" name="mp3_file" accept=".mp3,.m4a,.m4b,.wav,.ogg,.opus,.aac,.flac,.webm">
         <span class="ior">or</span>
         <input type="url" id="mp3_url" name="mp3_url" placeholder="Paste an audio URL">
       </div>

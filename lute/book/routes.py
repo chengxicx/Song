@@ -51,6 +51,7 @@ from lute.book.forms import (
     MangaEditForm,
     BookSettingsForm,
     ALLOWED_AUDIO_EXTENSIONS,
+    AUDIO_VALIDATION_MSG,
     SUBTITLE_BOOK_TYPES,
 )
 from lute.book.types import import_type_choices
@@ -536,7 +537,7 @@ def _import_bilibili_video():
 
 
 def _import_mp3_audio():
-    "Create an audio book (mp3/m4a) from an uploaded file OR an online URL, plus subtitles."
+    "Create an audio book from an uploaded file OR an online URL, plus subtitles."
     mp3_file = request.files.get("mp3_file")
     mp3_url = (request.form.get("mp3_url") or "").strip()
     srt_file = request.files.get("srt_file")
@@ -551,8 +552,9 @@ def _import_mp3_audio():
     source_uri = None
     if mp3_file and mp3_file.filename:
         fname = (mp3_file.filename or "").lower()
-        if not fname.endswith((".mp3", ".m4a")):
-            flash("Please upload a valid audio file (.mp3 or .m4a).", "notice")
+        ext = os.path.splitext(fname)[1].lstrip(".")
+        if ext not in ALLOWED_AUDIO_EXTENSIONS:
+            flash(AUDIO_VALIDATION_MSG, "notice")
             return redirect("/book/import_webpage", 302)
         source_uri = mp3_file.filename
         if not title:
