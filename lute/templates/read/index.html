@@ -541,13 +541,10 @@
   });
 
   // Set the page nav indicator.  Books using fit-to-screen sub-pagination
-  // (see subScreens below) replace the bare parent-page "x/y" with the
-  // reader's preferred display: the whole-book percentage refined by the
-  // sub-screen position (default), or the sub-screen count "n/m" after a
-  // click on the label.  Hovering always reveals the underlying parent
-  // "x/y"; books without sub-screens keep the plain "x/y".
+  // (see subScreens below) show the sub-screen count "n/m"; the label is
+  // static and never changes on hover.  Books without sub-screens keep the
+  // plain parent "x/y".
   let _bookHasSubscreens = false;
-  let _indicatorHovered = false;
 
   let set_page_fraction = function() {
     const pagenum = parseInt($('#page_num').val());
@@ -555,44 +552,12 @@
     const el = $('#page_indicator');
     const inSubMode = _bookHasSubscreens && subScreens.length > 0;
     el.toggleClass('subpage-mode', inSubMode);
-    if (!inSubMode || _indicatorHovered) {
+    if (!inSubMode) {
       el.text(`${pagenum}/${maxpage}`);
       return;
     }
-    if (localStorage.getItem('readPageIndicatorMode') === 'subpage') {
-      el.text(`${curScreen + 1}/${subScreens.length}`);
-      return;
-    }
-    // Whole-book progress with sub-screen granularity; a page that fits
-    // in a single screen counts as one whole page step.
-    const pageFrac = subScreens.length > 1 ? (curScreen + 1) / subScreens.length : 1;
-    el.text(`${Math.min(Math.round(((pagenum - 1) + pageFrac) / maxpage * 100), 100)}%`);
+    el.text(`${curScreen + 1}/${subScreens.length}`);
   };
-
-  // Hover previews the parent-page position, click toggles the preferred
-  // display between percentage and sub-screen count.  Both only act in
-  // sub-page mode (the subpage-mode class also gates the pointer cursor).
-  $('#page_indicator')
-    .on('mouseenter', function() {
-      _indicatorHovered = true;
-      set_page_fraction();
-    })
-    .on('mouseleave', function() {
-      _indicatorHovered = false;
-      set_page_fraction();
-    })
-    .on('click', function() {
-      if (!_bookHasSubscreens || subScreens.length === 0) return;
-      const next =
-        localStorage.getItem('readPageIndicatorMode') === 'subpage'
-          ? 'percent'
-          : 'subpage';
-      localStorage.setItem('readPageIndicatorMode', next);
-      // The click always happens while hovered; clear the hover preview so
-      // the newly selected display shows up immediately.
-      _indicatorHovered = false;
-      set_page_fraction();
-    });
 
   // Enable page nav links, depending on page num.
   let enable_page_nav_links = function() {
