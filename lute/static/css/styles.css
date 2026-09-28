@@ -713,16 +713,10 @@ div#read_pane_right {
     font-variant-numeric: tabular-nums;
 }
 
-/* Sub-page mode: the label is clickable (percentage <-> sub-screen
-   count) and hovering previews the parent-page position. */
+/* Sub-page mode: the label shows the sub-screen count "n/m" and is
+   static (no hover/click interaction). */
 #page_indicator.subpage-mode {
-    cursor: pointer;
     color: var(--read-slider-color, #79b7e7);
-    transition: opacity 0.15s ease;
-}
-
-#page_indicator.subpage-mode:hover {
-    opacity: 0.72;
 }
 
 .reading_header_mid_top {
