@@ -216,6 +216,51 @@ def test_mp3_online_url_creates_mp3_book(app, app_context, client, english):
     assert book.media_url == "https://a.example.com/song.mp3"
 
 
+def test_mp3_upload_accepts_other_audio_formats(app, app_context, client, english):
+    "The mp3 form accepts uploaded audio beyond mp3/m4a (e.g. wav) + a subtitle."
+    resp = client.post(
+        "/book/import_webpage",
+        data={
+            "import_type": "mp3",
+            "mp3_file": (io.BytesIO(b"RIFF\x00\x00\x00\x00WAVEfmt "), "recording.wav"),
+            "srt_file": (io.BytesIO(SAMPLE_SRT.encode("utf-8")), "sub.srt"),
+            "mp3_tag": "my-audio-tag",
+            "language_id": str(english.id),
+        },
+        content_type="multipart/form-data",
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+    assert "/read/" in resp.headers["Location"]
+
+    repo = BookRepository(db.session)
+    book = repo.find_by_title("recording", english.id)
+    assert book is not None
+    assert book.book_type == "mp3"
+    assert book.audio_filename is not None
+    assert book.audio_filename.endswith(".wav")
+
+
+def test_mp3_upload_rejects_unsupported_extension(app, app_context, client, english):
+    "A non-audio upload is rejected and no book is created."
+    resp = client.post(
+        "/book/import_webpage",
+        data={
+            "import_type": "mp3",
+            "mp3_file": (io.BytesIO(b"not audio"), "notes.txt"),
+            "srt_file": (io.BytesIO(SAMPLE_SRT.encode("utf-8")), "sub.srt"),
+            "language_id": str(english.id),
+        },
+        content_type="multipart/form-data",
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"].endswith("/book/import_webpage")
+
+    repo = BookRepository(db.session)
+    assert repo.find_by_title("notes", english.id) is None
+
+
 def _make_video_book(
     app, app_context, english, media_url="https://v.example.com/clip.mp4"
 ):
