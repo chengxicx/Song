@@ -1,3 +1,8 @@
+{# Hidden holder for the term's annotated reading.  lute-tooltip.js
+   copies it into window.LUTE_TERM_READINGS when the popup is cached,
+   and tts.js's hover pronunciation speaks it for terms whose TTS
+   reading differs from the annotation. #}
+<span class="termpopup-reading" style="display:none">{{ data.romanization or '' }}</span>
 <p>
   <b style="font-size:120%">
     {{ data.term_and_parents_text() }}

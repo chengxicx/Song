@@ -320,6 +320,34 @@
     audio.play().catch(notifyStarted);
   }
 
+  // Speak a term, preferring its annotated reading (the pronunciation /
+  // romanization field) when that reading exists and is kana.  Kanji
+  // terms whose stored reading differs from what the TTS engine guesses
+  // (names, irregular readings) then sound like the annotation instead
+  // of the engine's guess.  Romaji / pinyin annotations are never
+  // spoken -- engines read Latin text with the wrong sounds -- so those
+  // fall back to the term text.
+  function speakTermText(termText, readingText, langOverride) {
+    const term = (termText || "").replace(/[#＃]/g, "").trim();
+    const reading = (readingText || "").trim();
+    if (reading && /[\u3040-\u309F\u30A0-\u30FF]/.test(reading)) {
+      speakText(reading, null, langOverride);
+    } else if (term) {
+      speakText(term, null, langOverride);
+    }
+  }
+
+  // Annotated reading for a hovered word, when the term popup cache has
+  // already fetched one -- lute-tooltip.js copies the reading out of
+  // each cached popup (termpopup.html's hidden .termpopup-reading
+  // holder) into this map, keyed by word id.
+  function hoverReadingFor(wordSpan) {
+    const wid = wordSpan.getAttribute("data-wid");
+    if (!wid) return "";
+    const readings = window.LUTE_TERM_READINGS || {};
+    return readings[wid] || "";
+  }
+
   // ------------------------------------------------------------------
   // 3. Text helpers
   // ------------------------------------------------------------------
@@ -391,10 +419,12 @@
   // hovered for SETTINGS.hoverDelay ms before it is spoken, and the
   // isPlaying predicate is checked at hover time and again when the
   // delay fires, so a hover that runs into playback never interrupts
-  // the media audio. Also used by the media-player subtitles
+  // the media audio.  readingText (optional) is the term's annotated
+  // reading; when present and kana it is spoken instead of the word
+  // text (see speakTermText).  Also used by the media-player subtitles
   // (youtube-player.js / bilibili-player.js), which resolve the
   // window.* globals at event time because tts.js loads after them.
-  function luteHoverSpeakStart(rawText, isPlayingFn) {
+  function luteHoverSpeakStart(rawText, isPlayingFn, readingText) {
     if (!SETTINGS.hoverPronunciation) return;
     if (isPlayingFn && isPlayingFn()) return;
     const cleanText = (rawText || "").replace(/[#＃]/g, "").trim();
@@ -402,7 +432,7 @@
     clearTimeout(hoverTimer);
     hoverTimer = setTimeout(function () {
       if (!(isPlayingFn && isPlayingFn())) {
-        speakText(cleanText);
+        speakTermText(cleanText, readingText);
       }
     }, SETTINGS.hoverDelay);
   }
@@ -416,6 +446,9 @@
   // Direct one-shot speak for UI buttons, e.g. the term form's
   // pronunciation-row speaker button (click once = one utterance).
   window.luteTtsSpeak = speakText;
+  // Term-aware speak for UI buttons and card playback: prefers the
+  // term's kana annotated reading when one exists (see speakTermText).
+  window.luteTtsSpeakTerm = speakTermText;
   // The setting reader, for pages that carry their own TTS switch: the
   // review session reads review_speak_cards with it (lute-review.js),
   // so "0"/"false"/absent are parsed exactly as they are here.
@@ -464,7 +497,8 @@
       if (!wordSpan) return;
       luteHoverSpeakStart(
         wordSpan.innerText || wordSpan.textContent || "",
-        function () { return ttsPlaying; }
+        function () { return ttsPlaying; },
+        hoverReadingFor(wordSpan)
       );
     });
 
