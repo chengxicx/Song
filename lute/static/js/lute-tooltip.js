@@ -249,6 +249,26 @@ const _termpopup_queue = [];
 let _termpopup_fetching = false;
 let _termpopup_fetching_wid = null;
 
+// The term's annotated reading for each cached popup, keyed by word
+// id.  tts.js's hover pronunciation prefers the reading (kana) for
+// terms whose TTS reading differs from the annotation.  Filled from
+// the popup's hidden .termpopup-reading holder (termpopup.html) as
+// popups are fetched; cleared together with the popup cache, so a
+// just-saved reading is re-fetched on the next hover.
+window.LUTE_TERM_READINGS = {};
+
+function _store_term_reading(elid, popup_html) {
+  if (!popup_html) return;
+  try {
+    const holder = new DOMParser()
+      .parseFromString(popup_html, "text/html")
+      .querySelector(".termpopup-reading");
+    if (holder) {
+      window.LUTE_TERM_READINGS[elid] = (holder.textContent || "").trim();
+    }
+  } catch (_) {}
+}
+
 // Deliver cached HTML to a waiting tooltip, guarding against the word
 // having been re-rendered/replaced while the request was in flight (e.g.
 // the TTS subtitle is rebuilt on each loop iteration, or the page
@@ -306,6 +326,9 @@ function clear_termpopup_cache() {
   for (const k of Object.keys(_termpopup_cache)) {
     delete _termpopup_cache[k];
   }
+  for (const k of Object.keys(window.LUTE_TERM_READINGS)) {
+    delete window.LUTE_TERM_READINGS[k];
+  }
   for (const k of Object.keys(_termpopup_pending)) {
     delete _termpopup_pending[k];
   }
@@ -329,6 +352,7 @@ document.addEventListener('htmx:afterRequest', function (e) {
   _termpopup_fetching_wid = null;
   if (elid === null) return;
   _termpopup_cache[elid] = detail.successful && detail.target ? detail.target.innerHTML : '';
+  _store_term_reading(elid, _termpopup_cache[elid]);
   _termpopup_deliver(elid);
   _termpopup_pump();
   // Whether it succeeded or failed, the wait is over.
