@@ -528,6 +528,190 @@ _N5_RULES = [
     ),
 ]
 
+# ---- combined constructions (hand-written, N1/N2) -----------------------
+#
+# Merged material entries whose *shape* is two occurrences of the same
+# fragment (AつBつ, AといいBといい, V意志形にも同一Vない形, ...) derive no
+# matcher: the fragmenting logic treats each occurrence as one candidate and
+# cannot express "the same piece twice", so the entries end up skipped
+# (patterns == []) and silent.  These hand-written rules carry the matching
+# for them.  Every spec below was written against a Sudachi tokenization
+# probe of its own example sentence and is pinned by tests that fire each
+# rule on its own examples and probe near-miss sentences.
+#
+# Tokenizations the specs rely on (Sudachi):
+#   抜きつ抜かれつ  -> 抜き(動詞) つ(助詞) 抜か(動詞) れ(助動詞) つ(助詞)
+#   電話するなり...するなり -> する(動詞) なり(助詞,接続助詞) x2
+#   言おうにも言えない -> 言おう(動詞) に(格助詞) も(係助詞) 言え(動詞) ない(助動詞)
+#   行こうが行くまいが -> 行こう(動詞) が(接続助詞) 行く(動詞) まい(助動詞) が
+
+
+def _crule(key, level, pattern, meaning, examples, patterns):
+    "A combined-construction rule: like _rule but with an explicit level."
+    return {
+        "key": key,
+        "pattern": pattern,
+        "level": level,
+        "meaning": meaning,
+        "meaning_ko": "",
+        "examples": examples,
+        "patterns": patterns,
+        "kind": "construction",
+    }
+
+
+_CONSTRUCTION_RULES = [
+    _crule(
+        "a_tsu_b_tsu",
+        "N1",
+        "〜つ〜つ",
+        "alternating actions (A-ing and B-ing) / one after the other",
+        ["両者は抜きつ抜かれつの死闘を繰り広げた。"],
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    _SURF("つ"),
+                    {"pos1": "動詞"},
+                    _OPT({"pos1": "助動詞"}),
+                    _SURF("つ"),
+                ],
+            },
+        ],
+    ),
+    _crule(
+        "to_ii_to_ii",
+        "N1",
+        "〜といい〜といい / 〜といわず〜といわず",
+        "whether X or Y; in both X and Y (no exception anywhere)",
+        [
+            "昼といわず夜といわず、働き続けた。",
+            "北海道は夏といい冬といい、観光にいい。",
+        ],
+        [
+            {"type": "regex", "re": re.compile(r"といわず[^。、]{0,10}といわず")},
+            {"type": "regex", "re": re.compile(r"といい[^。、]{0,10}といい")},
+        ],
+    ),
+    _crule(
+        "a_nari_b_nari",
+        "N1",
+        "〜なり〜なり",
+        "do X or Y -- whichever (list of alternatives to choose from)",
+        ["電話するなりメールするなり、連絡してください。"],
+        [
+            {
+                # The two halves are not contiguous tokens: サ変 verbs split
+                # (電話/する) and a noun may sit between the halves, so this
+                # is a two-anchor spec, not a single token run.
+                "type": "anchors",
+                "before": [
+                    {"pos1": "動詞"},
+                    {"surface": "なり", "pos2": "接続助詞"},
+                ],
+                "after": [
+                    {"pos1": "動詞"},
+                    {"surface": "なり", "pos2": "接続助詞"},
+                ],
+                "maxgap": 3,
+            },
+        ],
+    ),
+    _crule(
+        "mo_ba_mo",
+        "N2",
+        "〜も〜ば〜も",
+        "both X and Y exist (parallel states: XもあればYもある)",
+        ["人生には楽もあれば苦もある。"],
+        [
+            {
+                # Same non-contiguity: 楽もあれば苦もある has the noun 苦
+                # between ば and the second も.
+                "type": "anchors",
+                "before": [_SURF("も"), {"pos1": "動詞"}, _SURF("ば")],
+                "after": [_SURF("も"), {"pos1": "動詞"}],
+                "maxgap": 2,
+            },
+        ],
+    ),
+    _crule(
+        "ba_hodo",
+        "N2",
+        "〜ば〜ほど",
+        "the more X, the more Y",
+        ["聞けば聞くほど分からなくなる。", "早ければ早いほどいい。"],
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    _SURF("ば"),
+                    {"pos1": "動詞"},
+                    _SURF("ほど"),
+                ],
+            },
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "形容詞"},
+                    _SURF("ば"),
+                    {"pos1": "形容詞"},
+                    _SURF("ほど"),
+                ],
+            },
+        ],
+    ),
+    _crule(
+        "volitional_ni_mo_nai",
+        "N1",
+        "〜ようにも〜ない",
+        "cannot do X even if one wanted to (V volitional + にも + same V negative)",
+        ["言おうにも言えない。", "行こうにも行けない。"],
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    _SURF("に"),
+                    _SURF("も"),
+                    {"pos1": "動詞"},
+                    _SURF("ない"),
+                ],
+            },
+        ],
+    ),
+    _crule(
+        "volitional_mai",
+        "N1",
+        "〜（よ）うが〜まいが / 〜（よ）うと〜まいと",
+        "whether one does X or not (V volitional + が/と + same V + まい + が/と)",
+        ["行こうが行くまいが、結果は同じだ。"],
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    _SURF_IN("が", "と"),
+                    {"pos1": "動詞"},
+                    _SURF("まい"),
+                    _SURF_IN("が", "と"),
+                ],
+            },
+        ],
+    ),
+    _crule(
+        "nara_tomo_kaku",
+        "N1",
+        "〜ならともかく",
+        "X might be excusable, but (X is one thing, yet Y is going too far)",
+        ["値段ならともかく、味は正直期待できない。"],
+        [
+            {"type": "regex", "re": re.compile(r"ならともかく")},
+        ],
+    ),
+]
+
 
 # Surface symbol shown for each particle rule when they are aggregated.
 _PARTICLE_SYMBOLS = {
@@ -690,6 +874,101 @@ _VOCAB_IDS = frozenset(
         # lexical adverbs: the row repeats the word's gloss
         "issho-ni-together",
         "ichiban-superlative",
+        # ---- merged N1-N3 material entries reviewed 2026-09-29 ----
+        # onomatopoeia / bare adverbs: the row restates the word popup
+        "zuto",             # ずっと
+        "moto",             # もっと
+        "guto",             # ぐっと
+        "jito",             # じっと
+        "soto",             # そっと
+        "hoto",             # ほっと
+        "hato",             # はっと
+        "zoto",             # ぞっと
+        "zoto-bdfe97",      # ぞっと（毛骨悚然）
+        "zato",             # ざっと
+        "yato",             # やっと
+        "mada",             # まだ
+        "tatoeba",          # たとえば
+        "hajimete",         # はじめて
+        "atari",            # あたり（大致）
+        "zukitozehi",       # 必ず/きっと/ぜひ
+        # lexical words, not constructions
+        "chigaiigaii",      # 気持ちがいい/気分がいい
+        "desu",             # 予定です
+        # standalone verbs whose suffix readings jkindrix already carries
+        # (hajimeru-auxiliary / tsuzukeru-continue / dashi-suddenly-start);
+        # a bare だす/はじめる spec also fires on the standalone verb (本を出す)
+        "hajimeru",
+        "tsuzukeru",
+        "dasu",
+        # duplicates of existing jkindrix rows for the same construction
+        "soudesu",          # そうです（传闻） -> ds_souda
+        "soudesu-6efe6b",   # そうです（样态） -> ds_souda
+        "tsumorida",        # つもりだ -> tsumori-intention
+        "hazudesu",         # はずです -> hazu-expected
+        "naidenakute",      # ないで/なくて -> nai-de (hand + slot spec)
+        "tokorodasuru",     # ところだ（する） -> ta-tokoro / tokorodesu
+        "basoremadedanarasoremadedatarasoremadedatomosoremadeda",
+        #                    -> ba-sore-made already matches every variant on
+        #                    the bare literal それまでだ
+        # ---- merged N4/N5 book entries reviewed 2026-09-29 ----
+        # person/time suffixes: they fire on every 〜さん/〜たち occurrence
+        # (word formation, not a sentence construction).  さん/ちゃん do not
+        # trip the screen's vocab-shape heuristic, so they live here (same
+        # skip semantics) rather than in _VOCAB_IDS, where the screen
+        # invariant would reject them.
+        "tachi", "gata", "sugi",
+    }
+)
+
+# Material entries whose construction jkindrix already carries under a
+# different id (or whose derived spec is so broad it duplicates an existing
+# row).  Same skip semantics as _VOCAB_IDS, but a separate reviewed list:
+# these are *duplicate* silences, not vocabulary silences, so the screen's
+# vocab-flag invariant does not apply to them.
+_DUPLICATE_IDS = frozenset(
+    {
+        "tekarataatode",    # てから/たあとで -> kara_reason (52.2% pages, bare から)
+        "tekuru",           # てくる -> te-kuru (34.6%)
+        "tekureru",         # てくれる -> te-kureru-favor-received (28.3%)
+        "noyouda",          # のようだ -> you-da-appearance (24.5%)
+        "taritarisuru",     # たり~たりする -> tari-tari-suru (10.2%)
+        "temiru",           # てみる -> te-miru (8.0%)
+        "temiru-4eb5b2",    # てみる（尝试） -> te-miru
+        "teoku",            # ておく -> te-oku (2.6%)
+        "naa",              # なあ interjection (2.6%)
+        # duplicates from the N4/N5 book merge (2026-09-29): their derived
+        # spec or displayed name collides with an existing jkindrix rule and
+        # _merge_same_name would otherwise shadow that rule.  Identified by
+        # spec-fingerprint + display-name grouping, not guessed.
+        "tekara", "tekuru-f9236c", "naide", "desu-674648", "masu",
+        "darou", "deshiyou", "nasai", "kadouka", "kamoshirenai",
+        "kotonisuru", "kotoninaru", "nisuru", "nisuru-138b7a", "ninaru",
+        "ninaru-78e038", "nitsuite", "nikui", "yasui", "rashii", "youni",
+        "younisuru", "noni-ed37cd", "naramadashimo", "naraizarazunaratomokaku",
+        "nishite-59525e", "nishiteha-1d2bbe", "toyara", "hoshiitou",
+        "dakedenaku", "okini", "makuru", "taitou", "hougaii",
+        "kotogaaru", "takotogaaru", "kotogadekiru", "sugirusugida",
+        "sugirusugida-be289f", "mashiyou", "mashiyouka", "temiru-75d0e1",
+        "temoiidesu-6734b2", "tekudasai-381e5c", "tearu-3390f7",
+        "teiku-9a9071", "mat-e2eac7", "meru", "waru", "keru",
+        "hokanaiyorihokanaihokahanaihokashikataganai",
+        "toshitetoshitehatoshitemo-1f4501",
+        # N4/N5 book merge 2026-09-29, second pass (measure-driven): rules
+        # that duplicate an existing row or are already reported by the
+        # basic-particle aggregate.
+        "tekuru-9ff820",    # ~てくる -> te-kuru (34.6% pages)
+        "tekurerutekudasaru",  # ~てくれる/てくださる -> te-kureru-favor-received (33.3%)
+        "tou-2f500e",       # ~と言う -> to-iu (23.4%)
+        "teshimau-c89b54",  # ~てしまう -> te-shimau (15.2%)
+        "teiku-f054ed",     # ~ていく -> te-iku (10.6%)
+        "toiu",             # という -> to-iu (15.9%)
+        "niha",             # ~には -> basic_particles aggregate (35.0%)
+        "tame",             # ため -> tame-ni (13.6%)
+        "san",              # ~さん suffix (48.7% pages, word formation)
+        "chiyan",           # ~ちゃん suffix (16.7%, word formation)
+        "noda",             # ~のだ -> n-desu-explanation (all examples are
+        "noda-cd8e33",      #   んです/のです forms, same construction)
     }
 )
 
@@ -790,6 +1069,74 @@ _SLOT_SPECS = {
                 ],
             }
         ],
+    ),
+    # のを見る/のを聞く: the derivation's second spec degraded to a bare 聞く
+    # lemma, which fired on 29% of pages -- every 聞く is not the construction.
+    # Reviewed: the pattern needs の + を in front of the perception verb, and
+    # の/を are contiguous in both readings.
+    "nooruku": (
+        "のを見る・聞く",
+        [
+            {
+                "type": "tokens",
+                "conds": [{"lemma": {"の"}}, {"lemma": {"を"}}, {"lemma": {"見る"}}],
+            },
+            {
+                "type": "tokens",
+                "conds": [{"lemma": {"の"}}, {"lemma": {"を"}}, {"lemma": {"聞く"}}],
+            },
+        ],
+    ),
+    # N4/N5 book merge (2026-09-29).  The derivation turns a two-fragment
+    # pattern like ~から~まで into one spec PER fragment, so each half fires
+    # on its own (から alone: 84% of pages).  Reviewed specs below restate
+    # the construction the entry actually describes.
+    "karamade": (
+        "〜から〜まで",
+        [
+            {
+                "type": "anchors",
+                "before": [{"surface": "から"}],
+                "after": [{"surface": "まで"}],
+                "maxgap": 12,
+            }
+        ],
+    ),
+    "amarinai": (
+        "あまり〜ない",
+        [
+            {
+                # The negative tail surface varies: ない / ません(ん, lemma ぬ) /
+                # ありません(ん).  Match the auxiliary lemma family instead.
+                "type": "anchors",
+                "before": [{"surface": "あまり"}],
+                "after": [{"lemma": {"ない", "ぬ"}}],
+                "maxgap": 8,
+            }
+        ],
+    ),
+    "kunaru": (
+        "〜くなる",
+        # く rides inside the adjective token (明るく), so the condition is
+        # the adjective POS, not a bare く surface.
+        [{"type": "tokens", "conds": [{"pos1": "形容詞"}, {"lemma": {"なる"}}]}],
+    ),
+    "kusuru": (
+        "〜くする",
+        [
+            # く rides inside the adjective token (明るく), so the condition
+            # is the adjective POS, not a bare く surface.  Sudachi also reads
+            # adverbised よく as 副詞, so the kana sequence itself backs the
+            # adjective-POS spec up (each spec is validated against the
+            # entry's own examples; at match time they are alternatives).
+            {"type": "tokens", "conds": [{"pos1": "形容詞"}, {"lemma": {"する"}}]},
+            {"type": "regex", "re": re.compile("くする")},
+        ],
+    ),
+    # なか（形式名词）is the superlative "among these", always なかで.
+    "naka": (
+        "〜なか",
+        [{"type": "tokens", "conds": [{"surface": "なか"}, {"surface": "で"}]}],
     ),
 }
 
@@ -1238,7 +1585,11 @@ def _load_level(level):
         # its spec is derived, so "derived" still records what the derivation
         # produced: _VOCAB_IDS (the word popup already answers it) and
         # _CONCEPT_IDS (a class of forms, not a construction).
-        skipped = item.get("id") in _VOCAB_IDS or item.get("id") in _CONCEPT_IDS
+        skipped = (
+            item.get("id") in _VOCAB_IDS
+            or item.get("id") in _CONCEPT_IDS
+            or item.get("id") in _DUPLICATE_IDS
+        )
         rules.append(
             _make_data_rule(
                 level, item, idx, skipped=skipped, specs=specs, shown=shown, kind=kind
@@ -1266,7 +1617,7 @@ def _load_all():
 
 _DATA_RULES = _load_all()
 
-_ALL_RULES = _N5_RULES + _DATA_RULES
+_ALL_RULES = _N5_RULES + _CONSTRUCTION_RULES + _DATA_RULES
 
 
 # Korean descriptions for the hand-written rules (data rules get theirs
@@ -1296,6 +1647,20 @@ _KO_HAND = {
 for _hand_rule in _N5_RULES:
     _hand_rule["meaning_ko"] = _KO_HAND.get(_hand_rule["key"], "")
 
+# Korean descriptions for the combined-construction rules.
+_KO_HAND_CONSTRUCTION = {
+    "a_tsu_b_tsu": "AつBつ: 번갈아 일어나는 동작(\"~했다가 ~했다가\").",
+    "to_ii_to_ii": "といい~といい/といわず~といわず: 어디에서나 예외 없이(\"~에서도 ~에서도\").",
+    "a_nari_b_nari": "なり~なり: 선택지를 나열(\"~거나 ~거나\").",
+    "mo_ba_mo": "も~ば~も: 공존하는 두 상태(\"~도 있으면 ~도 있다\").",
+    "ba_hodo": "ば~ほど: 비례 증가(\"~하면 할수록\").",
+    "volitional_ni_mo_nai": "의지형+にも+같은 동사 부정: 하고 싶어도 할 수 없음(\"~하려 해도 ~할 수 없다\").",
+    "volitional_mai": "의지형+が/と+같은 동사+まい+が/と: 하든 안 하든(\"~으든 ~으든\").",
+    "nara_tomo_kaku": "ならともかく: ~은 뭐라 할 수 있지만(\"~라면 모를까\").",
+}
+for _hand_rule in _CONSTRUCTION_RULES:
+    _hand_rule["meaning_ko"] = _KO_HAND_CONSTRUCTION.get(_hand_rule["key"], "")
+
 
 # Chinese descriptions for grammar analysis, keyed by rule "pattern".
 # Authoritative table; rules lacking an entry fall back to the English
@@ -1322,6 +1687,15 @@ _ZH_DESC = {
     "〜ましょう": "……吧；一起做某事吧",
     "〜ませんか": "要不要……？……好吗？",
     "〜を（object particle）": "表示动作的直接宾语",
+    # ---- combined constructions (hand-written) ----
+    "〜つ〜つ": "一会儿……一会儿……；交替进行（抜きつ抜かれつ）",
+    "〜といい〜といい / 〜といわず〜といわず": "无论是……还是……（到处都、无一例外）",
+    "〜なり〜なり": "或是……或是……（列举选项任选其一）",
+    "〜も〜ば〜も": "既有……又有……（も～ば～も 并存）",
+    "〜ば〜ほど": "越……越……",
+    "〜ようにも〜ない": "即使想……也不能……",
+    "〜（よ）うが〜まいが / 〜（よ）うと〜まいと": "无论……还是不……（都一样）",
+    "〜ならともかく": "如果是……还说得过去，可偏偏……",
     # ---- N4 ----
     "〜ことにする": "决定做某事",
     "〜ずに": "没有……就；不……而",

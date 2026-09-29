@@ -1,0 +1,2918 @@
+[
+ {
+  "pattern": "（た）ところだ",
+  "level": "N3",
+  "formation": "动词「て」形过去+「た」后",
+  "meaning_zh": "刚刚…",
+  "examples": [
+   {
+    "japanese": "食べたところだ。",
+    "chinese": "刚刚才吃完饭。"
+   }
+  ],
+  "notes": "多和「たった今」一起使用。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "～の時に/ときに",
+  "level": "N3",
+  "formation": "接在用言连体形后面，名词+「の時に」",
+  "meaning_zh": "…的时候",
+  "examples": [
+   {
+    "japanese": "パリへ行くときに、時計を買う。",
+    "chinese": "去巴黎时买表。"
+   },
+   {
+    "japanese": "パリへ行ったときに、時計を買う。",
+    "chinese": "去巴黎的时候买表。"
+   },
+   {
+    "japanese": "子供の時に、パリに住んでいた。",
+    "chinese": "小的时候住在巴黎。"
+   }
+  ],
+  "notes": "とき前面的修饰词可以用现在是或过去时。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ところだ（する）",
+  "level": "N3",
+  "formation": "接在动词基本形后",
+  "meaning_zh": "正要…",
+  "examples": [
+   {
+    "japanese": "今食べるところだ。",
+    "chinese": "现在正要吃饭。"
+   }
+  ],
+  "notes": "这个句型表示开始某件事，还有某件事即将开始。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "のが見える/聞こえる",
+  "level": "N3",
+  "formation": "动词连体形",
+  "meaning_zh": "能看到/听见…",
+  "examples": [
+   {
+    "japanese": "赤ちゃんが泣いているのが聞こえます。",
+    "chinese": "能听到小婴儿正在哭。"
+   },
+   {
+    "japanese": "星が輝いているのが見えます。",
+    "chinese": "能看到闪闪的星星。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "はずだ",
+  "level": "N3",
+  "formation": "接在用言连体形后面，名词+「のはず」",
+  "meaning_zh": "应该…，一定（会）…（表示推测或预测）",
+  "examples": [
+   {
+    "japanese": "兄もう駅に着いたはずです。",
+    "chinese": "哥哥一定到车站了。"
+   },
+   {
+    "japanese": "彼は病気ではなかったはずです。",
+    "chinese": "他一定没病。"
+   }
+  ],
+  "notes": "表示理应如此，该～。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "方（かた）",
+  "level": "N3",
+  "formation": "接在动词连用形后",
+  "meaning_zh": "…的方法",
+  "examples": [
+   {
+    "japanese": "寿司の作り方は分かりますか。",
+    "chinese": "知道做寿司的方法吗？"
+   },
+   {
+    "japanese": "この携带電話の使い方を教えてください。",
+    "chinese": "请告诉我这个手机的使用方法。"
+   }
+  ],
+  "notes": "表示「……方法(作法)」。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ために（目的）",
+  "level": "N3",
+  "formation": "接在用言连体形后面，名词+「のために」",
+  "meaning_zh": "为了…，表目的",
+  "examples": [
+   {
+    "japanese": "車を買うために貯金している。",
+    "chinese": "为了买车在攒钱。"
+   },
+   {
+    "japanese": "受験のために上京した。",
+    "chinese": "为了考试而进京。"
+   }
+  ],
+  "notes": "「～ように」也用于表示目的，但「～ように」的场合不用包含意志的动词，而「～ために」则可以使用包含意志的动词。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ために（原因）",
+  "level": "N3",
+  "formation": "接在用言连体形后面，名词+「のために」",
+  "meaning_zh": "因为…，由于…，表示原因",
+  "examples": [
+   {
+    "japanese": "事故があったために、電車が止まっている。",
+    "chinese": "因为发生了事故，所以电车停了。"
+   },
+   {
+    "japanese": "台風のために、家が壊れた。",
+    "chinese": "因为台风，房子遭到了破坏。"
+   }
+  ],
+  "notes": "当前面是非意志性表现时表示原因理由。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ているところだ",
+  "level": "N3",
+  "formation": "动词的「て」形+「ている」之后",
+  "meaning_zh": "正在…",
+  "examples": [
+   {
+    "japanese": "今食べているところだ。",
+    "chinese": "现在正在吃饭。"
+   }
+  ],
+  "notes": "表示正在进行某种动作，多和「今」一起使用。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "つもりだ",
+  "level": "N3",
+  "formation": "接在动词连体形后面，名词+「のつもり」",
+  "meaning_zh": "打算…，表示意志、计划、打算等，实施可能性很大",
+  "examples": [
+   {
+    "japanese": "今日は何もしないつもりだ。",
+    "chinese": "今天打算什么也不做。"
+   }
+  ],
+  "notes": "辞书形＋つもり 打算～，表示有做某事的意志后打算。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "～め",
+  "level": "N3",
+  "formation": "前数词",
+  "meaning_zh": "第…",
+  "examples": [
+   {
+    "japanese": "2回目",
+    "chinese": "第二次。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "（こ.そ.あ.ど）の",
+  "level": "N3",
+  "formation": "连体词，分近称、中称、远称、疑问称。后必须接体言",
+  "meaning_zh": "这个，那个，那个，哪个",
+  "examples": [
+   {
+    "japanese": "この時計は田中さんのです。",
+    "chinese": "这个表是田中的。（近称）"
+   },
+   {
+    "japanese": "その時計は田中さんのです。",
+    "chinese": "那个表是田中的。（中称）"
+   },
+   {
+    "japanese": "あの時計は田中さんのです。",
+    "chinese": "那个表是田中的。（远称）"
+   },
+   {
+    "japanese": "どの時計は田中さんのです。",
+    "chinese": "哪个表是田中的？（疑问称）"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "など",
+  "level": "N3",
+  "formation": "用于例举事物",
+  "meaning_zh": "用于例举事物",
+  "examples": [
+   {
+    "japanese": "机の上に、本や辞書などがおいてあります。",
+    "chinese": "桌子上面放着书、字典等。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "（こ.そ.あ.ど）れ",
+  "level": "N3",
+  "formation": "指示代词和场所代词，分近称、中称、远称、疑问称",
+  "meaning_zh": "这个，那个，那个，哪个",
+  "examples": [
+   {
+    "japanese": "これは時計です。",
+    "chinese": "这个是表。（近称）"
+   },
+   {
+    "japanese": "それは時計です。",
+    "chinese": "那个是表。（中称）"
+   },
+   {
+    "japanese": "あれは時計です。",
+    "chinese": "那个是表。（远称）"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "の（ん）だ",
+  "level": "N3",
+  "formation": "用言连体形，名词+「のだ」",
+  "meaning_zh": "用于解释和说明某一事物，或者对某一事物作归纳和总结",
+  "examples": [
+   {
+    "japanese": "どうして来なかったんですか。",
+    "chinese": "为什么没来呢？"
+   },
+   {
+    "japanese": "今年の冬は寒いんです。",
+    "chinese": "今年的冬天真冷。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "までに",
+  "level": "N3",
+  "formation": "接在普通体后面",
+  "meaning_zh": "直到…",
+  "examples": [
+   {
+    "japanese": "私が帰るまでに家にいてください。",
+    "chinese": "请在家呆着直到我回来。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ばかり",
+  "level": "N3",
+  "formation": "接在普通体之后",
+  "meaning_zh": "尽…，只…（动词过去式后接「ばかり」表示刚…）",
+  "examples": [
+   {
+    "japanese": "本ばかり読まないでください。",
+    "chinese": "不要只读书。"
+   }
+  ],
+  "notes": "1、表示数量次数特别多；2、表示反复连续做某事，几乎不做其他事；3、表示大概的数量（～左右）。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "とか～とか",
+  "level": "N3",
+  "formation": "接在动词/形容词普通体后面、名词+だ",
+  "meaning_zh": "列举词，…啦…啦（部分列举或并列；とか可以接在最后名词的后面）",
+  "examples": [
+   {
+    "japanese": "日曜日は勉強とか部屋の掃除とかします。",
+    "chinese": "星期日可以学习啦、打扫房间啦。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ほど",
+  "level": "N3",
+  "formation": "动词基本形，名词之后",
+  "meaning_zh": "表示比较的基准，一般是（与什么相比）不、没有…；越…越",
+  "examples": [
+   {
+    "japanese": "八月も暑いですが、七月ほどではありません。",
+    "chinese": "8月很热，7月就没有那么热。"
+   }
+  ],
+  "notes": "（体言）ほど…ありません：1)…不像…那么… 2)没有比…更…的。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "から（组成）",
+  "level": "N3",
+  "formation": "体言后面",
+  "meaning_zh": "由…做成，组成",
+  "examples": [
+   {
+    "japanese": "日本は多くの島からなっています。",
+    "chinese": "日本是由许多岛屿构成的。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "お…ください",
+  "level": "N3",
+  "formation": "お＋动词连用形＋ください",
+  "meaning_zh": "尊敬语，请您…",
+  "examples": [
+   {
+    "japanese": "すぐ戻りますから、お待ちください。",
+    "chinese": "因为马上就回来，请您稍等。"
+   }
+  ],
+  "notes": "构成尊敬语，表示对方的行为动作。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "お…になる",
+  "level": "N3",
+  "formation": "お＋动词连用形＋になる",
+  "meaning_zh": "尊敬语，用于尊长行为，主语是尊长",
+  "examples": [
+   {
+    "japanese": "先生は何時ごろお帰りになりますか。",
+    "chinese": "老师您几点左右回来？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "お…する",
+  "level": "N3",
+  "formation": "お＋动词连用形＋します",
+  "meaning_zh": "自谦语，以谦虚来表示对听话人的尊敬",
+  "examples": [
+   {
+    "japanese": "先生のお荷物は私がお持ちします。",
+    "chinese": "老师的行李，我来替您拿。"
+   }
+  ],
+  "notes": "お+动词连用形+する(いたす)构成自谦语。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "まだ…ていません",
+  "level": "N3",
+  "formation": "动词「て形」的后面",
+  "meaning_zh": "表示还没做某件事",
+  "examples": [
+   {
+    "japanese": "まだ読んでいません。",
+    "chinese": "还没有读。"
+   }
+  ],
+  "notes": "表示动作没有完毕，事情没有发生。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "使役态接续",
+  "level": "N3",
+  "formation": "①五段动词，词尾假名改成あ段假名+せる（行く→行かせる）；②一段动词，词尾る去掉+させる（食べる→食べさせる）；③サ变动词，把する改成させる（説明する→説明させる）；④カ变动词，把来る改成こさせる",
+  "meaning_zh": "让～做～",
+  "examples": [
+   {
+    "japanese": "お母さんは純子さんに部屋を掃除させます。",
+    "chinese": "妈妈让纯子打扫房间。"
+   },
+   {
+    "japanese": "社長は社員を働かせる。",
+    "chinese": "社长让社员工作。"
+   }
+  ],
+  "notes": "谓语是他动词的使役句，使役对象后面用に；谓语是自动词的使役句，使役对象后面用を。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ようだ/な/に",
+  "level": "N3",
+  "formation": "体言+の/用言连体形＋ようだ/な/に",
+  "meaning_zh": "像…一样、好像…（用于根据感觉的判断，属主观判断）",
+  "examples": [
+   {
+    "japanese": "父は子供のようです。",
+    "chinese": "爸爸像个孩子似的。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "受身（被动）接续",
+  "level": "N3",
+  "formation": "①五段动词，词尾假名改成あ段假名+れる（言う→言われる、読む→読まれる）；②一段动词，词尾る去掉＋られる（食べる→食べられる）；③サ变动词，把する改成される（説明する→説明される）；④カ变动词，把来る改成こられる",
+  "meaning_zh": "被～，受～",
+  "examples": [
+   {
+    "japanese": "私は友達に招待されました。",
+    "chinese": "我受到朋友的招待。"
+   },
+   {
+    "japanese": "子供は母にほめられました。",
+    "chinese": "孩子被妈妈表扬了。"
+   }
+  ],
+  "notes": "谓语是自动词的间接被动，表示给主体带来了损害或麻烦。例：私は雨に降られて、風邪を引いてしまった。/我被雨淋，感冒了。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "どんな（に）～ても",
+  "level": "N3",
+  "formation": "接在用言连体形(动词「て形」)的后面",
+  "meaning_zh": "即使…也…（「いくら」と「どんなに」起强调语气作用）",
+  "examples": [
+   {
+    "japanese": "どんなに偉い（えらい）人でも欠点があります。",
+    "chinese": "即使是再伟大的人也会有缺点。"
+   }
+  ],
+  "notes": "无论怎么～都～，无论怎么～也～。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "らしい",
+  "level": "N3",
+  "formation": "体言、用言简体＋らしい",
+  "meaning_zh": "好像…（表示有根据有理由的判断）",
+  "examples": [
+   {
+    "japanese": "このレストランは美味しいらしいよ、いつも客がいっぱいいるから。",
+    "chinese": "这家餐馆的菜好像很可口啊，因为总是客人满堂。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "そうだ（伝聞）",
+  "level": "N3",
+  "formation": "接在普通体之后",
+  "meaning_zh": "听说（传闻助动词，把从别处得来的情报不搀杂自己的意见告诉给听者）",
+  "examples": [
+   {
+    "japanese": "雨が降るそうです。",
+    "chinese": "听说要下雨。"
+   }
+  ],
+  "notes": "前面可与…によると、…によれば等相呼应。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "そうだ（様態）",
+  "level": "N3",
+  "formation": "接在动词去ます型、形容词/形容动词词干之后",
+  "meaning_zh": "好像… 似乎…",
+  "examples": [
+   {
+    "japanese": "雨が降りそうです。",
+    "chinese": "好象要下雨。"
+   }
+  ],
+  "notes": "(1)与动词连接的场合，强调即将发生的状态时使用副词「今にも」；(2)とい形容词、な形容词接续的场合，表示并非做了实际确认，而是从外表上观察好像如此的意思。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ので",
+  "level": "N3",
+  "formation": "接动词或形容词的普通体后",
+  "meaning_zh": "表示事物的原因或理由",
+  "examples": [
+   {
+    "japanese": "雨が降ったので、外出しません。",
+    "chinese": "由于下了雨，就不外出了。"
+   }
+  ],
+  "notes": "它和「から」一样表示原因理由。[から]主观地提出原因加以叙述，而「ので」是对作为自然推移的因果关系加以客观叙述的表达方式，常用于谋求许可时的理由以及柔和地陈述辩解的时候。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "し",
+  "level": "N3",
+  "formation": "接在普通体之后",
+  "meaning_zh": "表示累加（既～又～，也～也～；列举构成后项原因的若干事实）",
+  "examples": [
+   {
+    "japanese": "頭も痛いし、熱もあります。",
+    "chinese": "头又痛又热。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "のに（逆接）",
+  "level": "N3",
+  "formation": "后接动词基本型、名词/形容词词干+な",
+  "meaning_zh": "表示强烈的逆接（表示虽然有前项条件，后项却出现与此不相称的、意外的或不理想的结果，带有不满、埋怨等语气）",
+  "examples": [
+   {
+    "japanese": "若者なのに、元気はありません。",
+    "chinese": "这个年轻人，可却没有精神。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "なら",
+  "level": "N3",
+  "formation": "接在普通体之后",
+  "meaning_zh": "那么、如果是…",
+  "examples": [
+   {
+    "japanese": "部屋を借りるなら、どれがいいですか。",
+    "chinese": "如果借房间，哪个好？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "でしょう/だろう",
+  "level": "N3",
+  "formation": "体言、用言简体＋でしょう/だろう（だろう是简体，でしょう是敬体）",
+  "meaning_zh": "（大概）是...吧（1、表示推测；2、表示不是有把握的推测；3、表示有把握的推测）",
+  "examples": [
+   {
+    "japanese": "フランス料理は美味しいでしょう。",
+    "chinese": "法国菜好吃吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ても",
+  "level": "N3",
+  "formation": "接在动词基本型之后",
+  "meaning_zh": "即使…也…（让步的表现形式）",
+  "examples": [
+   {
+    "japanese": "日本に帰ってもあなたのことを思うよ。",
+    "chinese": "即使回到日本也会想你的。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "と（必然）",
+  "level": "N3",
+  "formation": "接在基本型或ない型之后",
+  "meaning_zh": "一…就…（表示事情发生，某一动作必然引起另一件事情和动作的发生；「と」后面的句子不能用意志、希望、劝诱、委托等表现）",
+  "examples": [
+   {
+    "japanese": "四月になると、桜の花が咲きます。",
+    "chinese": "四月一到樱花就开了。"
+   }
+  ],
+  "notes": "引起后面的事情或动作不是由主观引起的，而是必然的、客观的。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てやる",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "表示说话人（或说话人一方的人）为他人进行某动作、行为",
+  "examples": [
+   {
+    "japanese": "わたしは弟に日本語を教えてやります。",
+    "chinese": "我给弟弟教日语。"
+   }
+  ],
+  "notes": "授受动词やる/あげる/差し上げる。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てもらう",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "表示说话人（或说话人一方的人）接受他人为自己进行某动作、行为",
+  "examples": [
+   {
+    "japanese": "王さんは田中さんに日本語を教えてもらいます。",
+    "chinese": "小王让田中先生给他教日语。"
+   }
+  ],
+  "notes": "授受动词もらう/いただく。[いただきます]是[もらう]的谦语。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てくる",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "表示移动的主体向说话人的方向由远及近「…来」；2、表示某种变化已经开始了「～起来了」",
+  "examples": [
+   {
+    "japanese": "気をつけろ！ボールが飛んできたよ！",
+    "chinese": "小心！球飞过来了！"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ていく",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "表示移动的主体从说话人的视线中由近及远「…去」；2、表示某物渐渐的向某种方向变化（趋于～）",
+  "examples": [
+   {
+    "japanese": "飛行機が遠くへ飛んでいきました。",
+    "chinese": "飞机向远处飞去。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てしまう",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "表示动作、作用全部结束；有时表示彻底完结，无可挽回，感到遗憾的心情",
+  "examples": [
+   {
+    "japanese": "宿題を忘れてしました。",
+    "chinese": "忘了作业了。"
+   }
+  ],
+  "notes": "表示完了了，或者表示意外无可挽回的遗憾心情。～完了，～光了，～了。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ておく",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "表示事先做好某种准备「预先…好」「(做)…好」；也表示继续保持某种状态准备下次使用而完成必要的动作；还表示放任不管、搁置不理",
+  "examples": [
+   {
+    "japanese": "お客さんが来るために、おかしを買っておきました。",
+    "chinese": "客人要来因此事先买好了点心。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てある",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "表示动作已有的现状「已经…了」「…好了」",
+  "examples": [
+   {
+    "japanese": "机の上に辞書が置いてあります。",
+    "chinese": "字典已经放在桌子上了。"
+   }
+  ],
+  "notes": "A に B が ～てあります：稍更详细地陈述某种东西是在怎样的状态中存在着的。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てみる",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "表示试试看的意思，多用于某种经验的尝试「…试试」「…看」",
+  "examples": [
+   {
+    "japanese": "皆おいしいと言っているから、食べてみた。",
+    "chinese": "大家都说好吃，所以尝了尝。"
+   }
+  ],
+  "notes": "表示对某种动作的尝试。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "か（疑问）",
+  "level": "N3",
+  "formation": "接在终止型后面",
+  "meaning_zh": "疑问助词；（疑问词）+か 表示不确定(不表示疑问)",
+  "examples": [
+   {
+    "japanese": "試験が何時に始まるか知っていますか。",
+    "chinese": "知道试验什么时候开始吗？"
+   }
+  ],
+  "notes": "把包含疑问词的疑问句插入句子中的时候用这个句型。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てくれる",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "表示他人为说话人（或说话人一方的人）进行某动作、行为（第一人称是受益者）",
+  "examples": [
+   {
+    "japanese": "彼はそのことをわたしに伝えてくれた。",
+    "chinese": "那件事情他转达给我了。"
+   }
+  ],
+  "notes": "授受动词くれる/くださる。[くださいます]是[くれる]的谦语。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "がる",
+  "level": "N3",
+  "formation": "形容词词干后",
+  "meaning_zh": "表示第三人称的心理状态",
+  "examples": [
+   {
+    "japanese": "張さんは日本へ行きたがっています。",
+    "chinese": "张先生正想去日本。"
+   }
+  ],
+  "notes": "表示第三人称的愿望。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "すぎる",
+  "level": "N3",
+  "formation": "动词连用形，形容词、形容动词词干",
+  "meaning_zh": "表示过度地…，太…（动作行为超过某限度，相当于汉语的「过于……」）",
+  "examples": [
+   {
+    "japanese": "この問題は難しすぎて、だれもできませんよ。",
+    "chinese": "这个问题太难了，谁也没办法哦。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "やすい",
+  "level": "N3",
+  "formation": "接在动词的「ます」形后面",
+  "meaning_zh": "表示容易做…；很容易地变成那样",
+  "examples": [
+   {
+    "japanese": "この辞書はとても使いやすいです。",
+    "chinese": "这个字典非常容易使用。"
+   },
+   {
+    "japanese": "白いシャツは污れやすいです。",
+    "chinese": "白衬衫容易弄脏。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "はじめる",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "开始…（表示动作的开始）",
+  "examples": [
+   {
+    "japanese": "九月になると、気温が下がりはじめる。",
+    "chinese": "一到九月，气温就开始下降。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "にくい",
+  "level": "N3",
+  "formation": "接在动词的「ます」形后面",
+  "meaning_zh": "表示难以做…；怎么也不那样",
+  "examples": [
+   {
+    "japanese": "これはちょっとやりにくいですね。",
+    "chinese": "这个有点难办吧。"
+   },
+   {
+    "japanese": "この薬は苦くて、饮みにくいです。",
+    "chinese": "这个药很苦，不好喝。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "おわる",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "结束…，完成…（表示动作的终了、完了）",
+  "examples": [
+   {
+    "japanese": "あなたが言い終わったら、私の話も聞いてみてください。",
+    "chinese": "你的话说完了，也听听我怎么说。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "のに（目的）",
+  "level": "N3",
+  "formation": "动词连体形",
+  "meaning_zh": "用于…，为了…",
+  "examples": [
+   {
+    "japanese": "これは、紙をきるのに使う機械です。",
+    "chinese": "这个是用于裁纸的机器。"
+   },
+   {
+    "japanese": "会社へ行くのに1時間かかります。",
+    "chinese": "去公司要花1个小时。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "まま",
+  "level": "N3",
+  "formation": "动词「～たまま」形容词「～いまま」形容动词「～なまま」名词「のまま」",
+  "meaning_zh": "①（「まだ」だ）某一种状态的持续；②（「まま（で）」）和前面一样不发生变化（…着，就…，原封不动…）",
+  "examples": [
+   {
+    "japanese": "座ったまま話す。",
+    "chinese": "坐着说话。"
+   },
+   {
+    "japanese": "靴のまま上がってもいいですよ。",
+    "chinese": "穿鞋进来也可以。"
+   }
+  ],
+  "notes": "表示保持着原来的状态，多用于不是出于本意的心情。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "のを見る/聞く",
+  "level": "N3",
+  "formation": "动词连体形",
+  "meaning_zh": "看/听见…",
+  "examples": [
+   {
+    "japanese": "わたしがやるのを見てください。",
+    "chinese": "请看着我做。"
+   },
+   {
+    "japanese": "お父さんがおとうとをほめたのを聞きました。",
+    "chinese": "听父亲表扬哥哥。"
+   }
+  ],
+  "notes": "动词普通形如果接助词「の」能够使用该动词的句子名词化，被名词化了的名词作主语和宾语用于句子中。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "つづける",
+  "level": "N3",
+  "formation": "动词连用形",
+  "meaning_zh": "持续地…（表示动作行为的持续进行）",
+  "examples": [
+   {
+    "japanese": "この仕事をやりつづけます。",
+    "chinese": "一直做这个工作。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "（た）ことがある",
+  "level": "N3",
+  "formation": "接在动词的动去形后",
+  "meaning_zh": "表示曾经有过某种经历",
+  "examples": [
+   {
+    "japanese": "私は富士山にのぼったことがあります。",
+    "chinese": "我爬过富士山。"
+   }
+  ],
+  "notes": "（动词、助动词连体形）+たことがない：从未……过。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ほうがいい",
+  "level": "N3",
+  "formation": "接在过去式后面较多，有时也接在基本形后面",
+  "meaning_zh": "表示建议和劝告，「最好…」「…为好」",
+  "examples": [
+   {
+    "japanese": "寒いですから、コートを着たほうがいいですよ。",
+    "chinese": "因为很冷，最好还是把外套穿上吧。"
+   }
+  ],
+  "notes": "（动词连用形）+た方がいい表示劝诱；（动词未然形）+ない方がいい表示劝诱、主张「最好不要……」。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "かもしれない",
+  "level": "N3",
+  "formation": "用言终止形后面（普通形、形容词和名词的普通体去掉だ）",
+  "meaning_zh": "表示有某种可能，一般是发生可能比较小或者是不愿该事情发生的情况（或许～）",
+  "examples": [
+   {
+    "japanese": "彼はもう知っているかもしれません。",
+    "chinese": "他或许已经知道了。"
+   },
+   {
+    "japanese": "午後から雪が降るかもしれない。",
+    "chinese": "下午可能会下雪。"
+   }
+  ],
+  "notes": "表示有可能，但不确定的判断。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "（よ）うと思う",
+  "level": "N3",
+  "formation": "动词的未然形(意志形)的后面",
+  "meaning_zh": "表示意志，「想…，打算…」",
+  "examples": [
+   {
+    "japanese": "今日はゆっくり休もうと思います。",
+    "chinese": "今天打算要好好的休息一下。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "（よ）うとする",
+  "level": "N3",
+  "formation": "接在动词的未然形(意志形)后面",
+  "meaning_zh": "1、表示一个动作正要开始或结束「正要…」；2、表示努力尝试做某一行为",
+  "examples": [
+   {
+    "japanese": "お風呂に入ろうとしていた時、電話が入った。",
+    "chinese": "正要打算洗澡的时候，电话来了。"
+   },
+   {
+    "japanese": "息子は北京大学に入ろうとしています。",
+    "chinese": "我的儿子打算考入北京大学。"
+   }
+  ],
+  "notes": "～ようとしたとき：表示正处于即将进行某动作或行为的时候（刚要～的时候）。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ようになる",
+  "level": "N3",
+  "formation": "接在动词基本形后面",
+  "meaning_zh": "表示动作的变化，「变得…」（前面常常是可能表现，表示从一种状态变化为另一种状态）",
+  "examples": [
+   {
+    "japanese": "子供ができてから、夫も家事をするようになりました。",
+    "chinese": "因为有了孩子，丈夫也变得会做一些家务了。"
+   }
+  ],
+  "notes": "动词时用辞书形。表示发生了以前没有的变化或状况的转变。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "にする/ことにする",
+  "level": "N3",
+  "formation": "接在名词以及动词连体形后面",
+  "meaning_zh": "表示个人的决定：接在名词后表示决定选择什么，动词后表示决定做件事情（表示说话人按自己的主观意志做出的决定）",
+  "examples": [
+   {
+    "japanese": "飲み物は何にしますか。ジュースにします。",
+    "chinese": "饮料打算喝点什么。就桔子汁吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ように言う",
+  "level": "N3",
+  "formation": "接在动词基本形后面",
+  "meaning_zh": "表示传达的内容（劝告，建议或转告的内容）",
+  "examples": [
+   {
+    "japanese": "会議に遅れないように王さんに伝えてください。",
+    "chinese": "请告诉小王会议不要迟到了。"
+   }
+  ],
+  "notes": "辞书形＋ようにしてください/ない形＋ようにしてください：请～，用于请求习惯地重复从事那个动作。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ことになる",
+  "level": "N3",
+  "formation": "接在动词连体形后面",
+  "meaning_zh": "表示决定…，但与…ことにする不同，是一个组织等作出的决定，不是个人的决定（表示他人或客观决定）",
+  "examples": [
+   {
+    "japanese": "台風のために、試合が中止することになりました。",
+    "chinese": "因为台风，决定中止比赛。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "と違う",
+  "level": "N3",
+  "formation": "体言＋と違う",
+  "meaning_zh": "与…不同",
+  "examples": [
+   {
+    "japanese": "私の考えは王さんと違います。",
+    "chinese": "我的想法与小王不相同。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てもかまわない",
+  "level": "N3",
+  "formation": "动词连用形＋てもかまわない",
+  "meaning_zh": "…也没关系（表示许可，允许；和『…てもいいです』相近）",
+  "examples": [
+   {
+    "japanese": "すこし高くてもかまいません。",
+    "chinese": "再高一点也没关系。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "と同じだ",
+  "level": "N3",
+  "formation": "体言＋と同じだ",
+  "meaning_zh": "与…相同",
+  "examples": [
+   {
+    "japanese": "王さんのカバンは私のカバンと同じです。",
+    "chinese": "小王的包与我的包相同。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "がする",
+  "level": "N3",
+  "formation": "が的前面只能用与感观有关的名词『におい、味、感じ、気など』",
+  "meaning_zh": "相当于，感到～、感觉～；～をしている：长着～，显得～",
+  "examples": [
+   {
+    "japanese": "この肉は変な味がする。",
+    "chinese": "这肉感觉有怪味。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "たらどうか",
+  "level": "N3",
+  "formation": "动词连用形＋たらどうか",
+  "meaning_zh": "劝诱的说法，「做…怎么样」的意思",
+  "examples": [
+   {
+    "japanese": "すこしお酒を飲んでみたらどうですか。",
+    "chinese": "试着喝点酒怎么样？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てばかりいる",
+  "level": "N3",
+  "formation": "动词连用形＋てばかりいる",
+  "meaning_zh": "表示反复持续地做某事，几乎不做其它事（尽～、总～）",
+  "examples": [
+   {
+    "japanese": "そんなに遊んでばかりいると、大学に入れませんよ。",
+    "chinese": "如果尽那么玩的话，考不上大学啊。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "という",
+  "level": "N3",
+  "formation": "叫作…的；或表示内容",
+  "meaning_zh": "叫作…的；或表示内容",
+  "examples": [
+   {
+    "japanese": "おかあさん、中野さんという人から電話があったよ。",
+    "chinese": "妈妈，有个叫中野的打过电话来哦。"
+   }
+  ],
+  "notes": "A は B という意味です：A 是 B 的意思。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "可能态接续",
+  "level": "N3",
+  "formation": "①五段动词，词尾假名改成え段假名＋る（買う→買える、話す→話せる）；②一段动词，词尾る去掉＋られる（調べる→調べられる）；③サ变动词，把する改成できる（説明する→説明できる）；④カ变动词，把来る改成こられる",
+  "meaning_zh": "表示具有某种能力，或某种可能性",
+  "examples": [
+   {
+    "japanese": "私は英語の新聞が読めます。",
+    "chinese": "我能看英文的报纸。"
+   },
+   {
+    "japanese": "この部屋でタバコが吸えますか。",
+    "chinese": "在这个房间里可以抽烟吗？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "にしたがって",
+  "level": "N3",
+  "formation": "名词或动词连体形后面",
+  "meaning_zh": "1、接名词后面「跟随…(指示等)」；2、动词后面「随着…」",
+  "examples": [
+   {
+    "japanese": "命令にしたがってこうどうしてください。",
+    "chinese": "请跟随命令行动。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "～は～より～です",
+  "level": "N3",
+  "formation": "比较句型",
+  "meaning_zh": "～比～",
+  "examples": [
+   {
+    "japanese": "机は椅子より高いです。",
+    "chinese": "桌子比椅子高。"
+   }
+  ],
+  "notes": "基本比较句型。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "～は～ほど～くない/ではない",
+  "level": "N3",
+  "formation": "助词ほど是以某一事例来表示状态、性质的，谓语用形容词或形容动词的否定形式",
+  "meaning_zh": "～不如～",
+  "examples": [
+   {
+    "japanese": "八月も暑いですが、七月ほどではありません。",
+    "chinese": "8月很热，但不如7月那么热。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "Aより B のほうが～です",
+  "level": "N3",
+  "formation": "助词より接在比较的对象后面，谓语上形容词或形容动词",
+  "meaning_zh": "～比～更～",
+  "examples": [
+   {
+    "japanese": "今日より明日のほうが忙しいです。",
+    "chinese": "比今天明天更忙。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "AとBとでは、どちらが～ですか",
+  "level": "N3",
+  "formation": "表示询问A、B相比较时的句型",
+  "meaning_zh": "A 和 B 哪个～",
+  "examples": [
+   {
+    "japanese": "肉と魚とでは、どちらが好きですか。",
+    "chinese": "肉和鱼哪个喜欢？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "～(の中)では、何がいちばん～ですか",
+  "level": "N3",
+  "formation": "在～里",
+  "meaning_zh": "哪个最～",
+  "examples": [
+   {
+    "japanese": "果物の中では、何がいちばん好きですか。",
+    "chinese": "在水果里，哪个最喜欢？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "AとBとCとは(どれ/どこ/いつ/どの)～がいちばん～ですか",
+  "level": "N3",
+  "formation": "～和～和～，哪个／什么地方／什么时候／那种，最～",
+  "meaning_zh": "三者比较",
+  "examples": [
+   {
+    "japanese": "春と夏と秋とは、どれが好きですか。",
+    "chinese": "春、夏、秋哪个最喜欢？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "～のあいで/あとで～する",
+  "level": "N3",
+  "formation": "表示一个动作完成后再做另一个动作，或稍后进行某一动作",
+  "meaning_zh": "～之后／稍后再～",
+  "examples": [
+   {
+    "japanese": "仕事のあとで、映画を見ます。",
+    "chinese": "工作之后看电影。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "たあとで",
+  "level": "N3",
+  "formation": "名词の＋あとで（名词限定为动作性名词）",
+  "meaning_zh": "～之后",
+  "examples": [
+   {
+    "japanese": "仕事が终わったあとで、食事に行きます。",
+    "chinese": "工作结束之后去吃饭。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "たり、たりする",
+  "level": "N3",
+  "formation": "列举",
+  "meaning_zh": "1、表示在许多动作中，列举1、2例说明（又～又～，一会～一会～）；2、表示举出一例，以示还有其他类似的情况（～之类的）",
+  "examples": [
+   {
+    "japanese": "日曜日は本を読んだり、映画を見たりします。",
+    "chinese": "星期天读书啦、看电影啦。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ほうがいい（劝诱）",
+  "level": "N3",
+  "formation": "た形＋ほうがいいです；ない形＋ないほうがいいです",
+  "meaning_zh": "还是～为好（表示劝说或建议）",
+  "examples": [
+   {
+    "japanese": "病院へいったほうがいいです。あまりお酒を飲まないほうがいいです。",
+    "chinese": "还是去医院好。不要喝太多酒。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ませんか",
+  "level": "N3",
+  "formation": "～吗？",
+  "meaning_zh": "表示建议或劝诱",
+  "examples": [
+   {
+    "japanese": "一緒に行きませんか。",
+    "chinese": "一起去吗？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "だから/ですから",
+  "level": "N3",
+  "formation": "表示原因或理由",
+  "meaning_zh": "所以～",
+  "examples": [
+   {
+    "japanese": "雨ですから、行きません。",
+    "chinese": "因为下雨，所以不去。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "けれども/けれど/だが/しかし",
+  "level": "N3",
+  "formation": "表示逆态连接",
+  "meaning_zh": "虽然～但是～，可是～",
+  "examples": [
+   {
+    "japanese": "高いですが、買います。",
+    "chinese": "虽然贵，但是买。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "かもしれない（推测）",
+  "level": "N3",
+  "formation": "表示说话人的推测",
+  "meaning_zh": "也许～",
+  "examples": [
+   {
+    "japanese": "明日は雨かもしれません。",
+    "chinese": "明天也许下雨。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "く(に)なる/く(に)する",
+  "level": "N3",
+  "formation": "く(に)なる表示自然或客观的变化；く(に)する表示主观作用于某事物而使其发生变化",
+  "meaning_zh": "变的～，会变～；把～弄成～，使～成为～",
+  "examples": [
+   {
+    "japanese": "寒くなりました。",
+    "chinese": "变冷了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "さ/み",
+  "level": "N3",
+  "formation": "使形容词或形容动词名词化",
+  "meaning_zh": "～さ、～み",
+  "examples": [
+   {
+    "japanese": "この山の高さは3000メートルです。",
+    "chinese": "这座山的高度是3000米。"
+   }
+  ],
+  "notes": "通过把形容词的词尾「～い」变为「～さ」，能够把它变为表示其性质、状态的抽象名词。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てください",
+  "level": "N3",
+  "formation": "一般用于请求或要求对方做某事",
+  "meaning_zh": "请给我～",
+  "examples": [
+   {
+    "japanese": "ペンをください。",
+    "chinese": "请给我钢笔。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ばかり（概数）",
+  "level": "N3",
+  "formation": "1、表示数量次数特别多；2、表示反复连续做某事，几乎不做其他事；3、表示大概的数量",
+  "meaning_zh": "尽～，只～；～左右",
+  "examples": [
+   {
+    "japanese": "十日ばかりいます。",
+    "chinese": "待十天左右。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "て+から/た+あとで",
+  "level": "N3",
+  "formation": "动词连用型て+から/动词过去式た+あとで",
+  "meaning_zh": "表示一个动作之后，再进行另一个动作",
+  "examples": [
+   {
+    "japanese": "宿題をしてから、遊びます。",
+    "chinese": "做完作业再玩。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てみる（尝试）",
+  "level": "N3",
+  "formation": "～て+みる",
+  "meaning_zh": "表示对某种动作的尝试（～以下，～看）",
+  "examples": [
+   {
+    "japanese": "日本の酒を飲んでみます。",
+    "chinese": "试着喝一下日本酒。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てしまう/てしまいました",
+  "level": "N3",
+  "formation": "表示完了了，或者表示意外无可挽回的遗憾心情",
+  "meaning_zh": "～完了，～光了，～了",
+  "examples": [
+   {
+    "japanese": "財布を忘れてしまいました。",
+    "chinese": "忘带钱包了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ておく",
+  "level": "N3",
+  "formation": "(1)表示预先作好某种准备；(2)后者表示继续保持某种状态,准备下次使用而完成必要的动作；(3)放任不管、搁置不理",
+  "meaning_zh": "～预先，让它～",
+  "examples": [
+   {
+    "japanese": "旅行に行く前に、切符を買っておきます。",
+    "chinese": "旅行之前先买好票。"
+   },
+   {
+    "japanese": "寒いですから、窓を閉めておいてください。",
+    "chinese": "因为冷，请把窗户关上。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てほしい/てもらいたい",
+  "level": "N3",
+  "formation": "表示想请对方为我或我方做某事",
+  "meaning_zh": "请（你）～",
+  "examples": [
+   {
+    "japanese": "手伝ってほしいです。",
+    "chinese": "希望你帮忙。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てくる",
+  "level": "N3",
+  "formation": "1、表示主体在说话人的视线中，从远往近移动；2、表示某种变化已经开始了",
+  "meaning_zh": "～过来；～起来了",
+  "examples": [
+   {
+    "japanese": "犬が走ってきました。",
+    "chinese": "狗跑过来了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ていく",
+  "level": "N3",
+  "formation": "1、主体在说话人的实现中从近往远移动；2、表示某物渐渐的向某种方向变化",
+  "meaning_zh": "～去了；趋于～",
+  "examples": [
+   {
+    "japanese": "鳥が飛んでいきました。",
+    "chinese": "鸟飞走了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "たとえ～ても",
+  "level": "N3",
+  "formation": "表示让步的表现形式",
+  "meaning_zh": "即使～也～",
+  "examples": [
+   {
+    "japanese": "たとえ失敗しても、あきらめません。",
+    "chinese": "即使失败，也不放弃。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てもいいです",
+  "level": "N3",
+  "formation": "表示许可",
+  "meaning_zh": "可以～",
+  "examples": [
+   {
+    "japanese": "帰ってもいいですか。",
+    "chinese": "可以回去吗？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "てはいけない",
+  "level": "N3",
+  "formation": "～ては いけません",
+  "meaning_zh": "不可以～，不准～（表示禁止）",
+  "examples": [
+   {
+    "japanese": "どうぶつをいじめてはいけません。",
+    "chinese": "不可以欺负动物。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "いくら～ても(でも)",
+  "level": "N3",
+  "formation": "和「どんなに～ても」相同",
+  "meaning_zh": "无论怎么～都～",
+  "examples": [
+   {
+    "japanese": "いくら高くても買います。",
+    "chinese": "无论多贵也买。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "やすい/にくい",
+  "level": "N3",
+  "formation": "表示容易和难",
+  "meaning_zh": "容易～，好～；难～，不容易～",
+  "examples": [
+   {
+    "japanese": "この字は読みやすいです。",
+    "chinese": "这个字容易读。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "かた（方）",
+  "level": "N3",
+  "formation": "表示方法",
+  "meaning_zh": "～法",
+  "examples": [
+   {
+    "japanese": "作り方を教えてください。",
+    "chinese": "请教我做法。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "だす",
+  "level": "N3",
+  "formation": "表示动作的开始",
+  "meaning_zh": "开始～，～起来",
+  "examples": [
+   {
+    "japanese": "雨が降りだした。",
+    "chinese": "下起雨来了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ながら",
+  "level": "N3",
+  "formation": "表示一个人同时做两件事（接动词的ます形）",
+  "meaning_zh": "边～边～，一面～一面～",
+  "examples": [
+   {
+    "japanese": "音楽を聞きながら勉強します。",
+    "chinese": "边听音乐边学习。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "しかない",
+  "level": "N3",
+  "formation": "1、表示仅此而已；2、表示别无他法",
+  "meaning_zh": "只 有～，仅～；只能～",
+  "examples": [
+   {
+    "japanese": "歩くしかない。",
+    "chinese": "只能走路。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "おかげで",
+  "level": "N3",
+  "formation": "表示因为此原因而带来好结果的感谢的心情",
+  "meaning_zh": "多亏～",
+  "examples": [
+   {
+    "japanese": "先生のおかげで合格しました。",
+    "chinese": "多亏老师及格了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "授受动词",
+  "level": "N3",
+  "formation": "やる/あげる/差し上げる、もらう/いただく、くれる/くださる",
+  "meaning_zh": "授受表达（我给别人／别人给我／我从别人那里得到）",
+  "examples": [
+   {
+    "japanese": "友達に本をあげました。",
+    "chinese": "送书给朋友。"
+   }
+  ],
+  "notes": "[いただきます]是[もらう]的谦语，[くださいます]是[くれる]的谦语。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ために（目的/原因）",
+  "level": "N3",
+  "formation": "1、表示目的；2、表示原因",
+  "meaning_zh": "为了～；因为～所以～",
+  "examples": [
+   {
+    "japanese": "健康のために運動します。",
+    "chinese": "为了健康运动。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "まま",
+  "level": "N3",
+  "formation": "表示保持着原来的状态。多用于不是出于本意的心情",
+  "meaning_zh": "～着",
+  "examples": [
+   {
+    "japanese": "電気をつけたまま寝ました。",
+    "chinese": "开着灯睡着了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "し（列举）",
+  "level": "N3",
+  "formation": "普通形+し",
+  "meaning_zh": "1、表示列举若干事物后现象（即～又～，也～也～）；2、表示列举构成后项原因的若干事实后条件等（～又～，即～又～）",
+  "examples": [
+   {
+    "japanese": "この店は安いし、おいしいし、よく来ます。",
+    "chinese": "这家店又便宜又好吃，经常来。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "だろう/でしょう",
+  "level": "N3",
+  "formation": "1、表示推测；2、表示不是有把握的推测；3、表示有把握的推测",
+  "meaning_zh": "～吧；大概～吧；肯定～吧",
+  "examples": [
+   {
+    "japanese": "明日は晴れるでしょう。",
+    "chinese": "明天会晴吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "中（ちゅう、じゅう）",
+  "level": "N3",
+  "formation": "表示动作正在进行",
+  "meaning_zh": "正在～",
+  "examples": [
+   {
+    "japanese": "会議中です。",
+    "chinese": "正在开会。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "とき",
+  "level": "N3",
+  "formation": "动词普通形＋とき、い形＋とき、な形＋とき、名の＋とき（用于实际有的或发生的事，とき前面的修饰词可以用现在是或过去时）",
+  "meaning_zh": "～时",
+  "examples": [
+   {
+    "japanese": "外国へいくとき、パスポートを持っていきます。",
+    "chinese": "去外国时带护照。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "场所",
+  "level": "N3",
+  "formation": "用于如果出现或发生的情况，所以「场所」前面的修饰词不能用于过去时",
+  "meaning_zh": "～的场合",
+  "examples": [
+   {
+    "japanese": "火事の場所はここです。",
+    "chinese": "火灾的场合在这里。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "できる",
+  "level": "N3",
+  "formation": "1、表示具有某种技能和可能性；2、表示新的事物或者现象的出现或结束",
+  "meaning_zh": "能～，会～；建成～，出现～，出生～，作好～",
+  "examples": [
+   {
+    "japanese": "日本語ができます。",
+    "chinese": "会日语。"
+   },
+   {
+    "japanese": "新しい駅ができました。",
+    "chinese": "新车站建成了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "する（がする/ている/にする）",
+  "level": "N3",
+  "formation": "～がする：感到～，感觉～；～をしている：长着～，显得～；～にする：表示选定，选定对象后面加に",
+  "meaning_zh": "就～吧",
+  "examples": [
+   {
+    "japanese": "コーヒーにします。",
+    "chinese": "就要咖啡吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ところ（するところ/してところ/たところ/ところが/ところで）",
+  "level": "N3",
+  "formation": "～するところ：表示即将进行某动作或行为；～してところ：表示动作正在进行；～たところ：表示动作刚刚结束；ところが：表示结果出乎意料；ところで：表示突然转换话题",
+  "meaning_zh": "正要～；正在～；刚～完～；可是～；但是～，对了～",
+  "examples": [
+   {
+    "japanese": "ちょうど今からお茶を饮むところです。",
+    "chinese": "正好现在要喝茶。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "それ（それから/それに/それじゃ/それとも/それで/それでも/それなのに）",
+  "level": "N3",
+  "formation": "それから：表示次后；それに：表示提升，即在前项的情况下又加上了后项；それじゃ：那么～；それとも：表两者选一；それで：表示承接前项的原因，叙述后项的结果；それでも：表示即使是前项的情况，也还是出现了后项的结果；それなのに：虽然前项如此，却出现后项的情况，带有不满、埋怨等的语气",
+  "meaning_zh": "然后～；再加上～；那么～；是～还是～；所以～；尽管如此～",
+  "examples": [
+   {
+    "japanese": "それじゃ、始めましょう。",
+    "chinese": "那么，开始吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "とか",
+  "level": "N3",
+  "formation": "～啦～啦、「或」或「它和[や]一样,表示部分列举或并列,但[とか]可以接在最后名词的后面」",
+  "meaning_zh": "～啦～啦、或～或～",
+  "examples": [
+   {
+    "japanese": "土曜日とか日曜日とか、よく映画を見に行きます。",
+    "chinese": "星期六啦星期天啦，常去看电影。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "こと（ことにする/ことになる）",
+  "level": "N3",
+  "formation": "～ことにする：表示说话人的主观决定；～ことになる：表示他人或客观决定",
+  "meaning_zh": "决定～；决定～，结果～，规定～",
+  "examples": [
+   {
+    "japanese": "明日出かけることにしました。",
+    "chinese": "决定明天出门。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "うちに",
+  "level": "N3",
+  "formation": "1、表示在某状态变化之前进行某种行为；2、表示在某期间发生了开始没有的情况",
+  "meaning_zh": "趁～；在～的过程中",
+  "examples": [
+   {
+    "japanese": "若いうちに勉強します。",
+    "chinese": "趁年轻学习。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ないで/なくて",
+  "level": "N3",
+  "formation": "前句表示前提或状态；表示并列或原因",
+  "meaning_zh": "不～而～；不是～而是～，不～而～",
+  "examples": [
+   {
+    "japanese": "傘を持たないで出かけました。",
+    "chinese": "没带伞就出门了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "な（禁止）",
+  "level": "N3",
+  "formation": "辞书形+な",
+  "meaning_zh": "表示禁止：不要～，不可～",
+  "examples": [
+   {
+    "japanese": "行くな。",
+    "chinese": "不要去。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "おきに",
+  "level": "N3",
+  "formation": "表示在一定的时间间隔，反复出现后项",
+  "meaning_zh": "每隔～",
+  "examples": [
+   {
+    "japanese": "一日おきに泳ぎます。",
+    "chinese": "每隔一天游泳。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ずつ",
+  "level": "N3",
+  "formation": "1、表示反复固定的数量；2、同样的平均分配",
+  "meaning_zh": "各～；各～，每～",
+  "examples": [
+   {
+    "japanese": "毎日二時間ずつ勉強します。",
+    "chinese": "每天各学习两小时。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "そうです（传闻）",
+  "level": "N3",
+  "formation": "普通形＋そうです（传闻助动词，这是把从别处得来的情报不搀杂自己的意见告诉给听者的表达方式）",
+  "meaning_zh": "听说～",
+  "examples": [
+   {
+    "japanese": "日本は物価が高いそうです。",
+    "chinese": "听说日本物价高。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "みたいだ/ようだ",
+  "level": "N3",
+  "formation": "1、表示不确定的断定，用于根据感觉的判断，属直感判断；2、表示比喻；3、表示列举",
+  "meaning_zh": "好象～；象～那样；向～那样",
+  "examples": [
+   {
+    "japanese": "彼は眠いみたいだ。",
+    "chinese": "他好像困了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "らしい",
+  "level": "N3",
+  "formation": "表示有根据有理由的判断",
+  "meaning_zh": "好象～",
+  "examples": [
+   {
+    "japanese": "彼は来るらしい。",
+    "chinese": "他好像来。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "まるで～のようだ",
+  "level": "N3",
+  "formation": "表示目的",
+  "meaning_zh": "简直就像…一样（表示比喻）",
+  "examples": [
+   {
+    "japanese": "まるで夢のようだ。",
+    "chinese": "简直像梦一样。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "のようだ",
+  "level": "N3",
+  "formation": "表示列举",
+  "meaning_zh": "向～那样",
+  "examples": [
+   {
+    "japanese": "鳥のように飛びたい。",
+    "chinese": "想鸟一样地飞。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ようになりました",
+  "level": "N3",
+  "formation": "变的～，已经开始～(动词时用辞书形)",
+  "meaning_zh": "表示发生了以前没有的变化或状况的转变",
+  "examples": [
+   {
+    "japanese": "日本語が话せるようになりました。",
+    "chinese": "变得会说日语了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ように（努力）",
+  "level": "N3",
+  "formation": "辞书形＋ように、ない形＋ように（表示为了达到ように前面的目标而努力，意志性的行动）",
+  "meaning_zh": "争取～，为了～，希望～",
+  "examples": [
+   {
+    "japanese": "日本語を話せるように、一生悬命勉强します。",
+    "chinese": "为了会说日语而拼命学习。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ように言う",
+  "level": "N3",
+  "formation": "表示劝告，建议或转告的内容",
+  "meaning_zh": "希望～",
+  "examples": [
+   {
+    "japanese": "すぐ来るように言ってください。",
+    "chinese": "请转告让他马上来。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ようとしたとき",
+  "level": "N3",
+  "formation": "表示正处于即将进行某动作或行为的时候",
+  "meaning_zh": "刚要～的时候",
+  "examples": [
+   {
+    "japanese": "出かけようとしたとき、電話がかかった。",
+    "chinese": "正要出门的时候电话响了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "はずです",
+  "level": "N3",
+  "formation": "表示理应如此",
+  "meaning_zh": "该～",
+  "examples": [
+   {
+    "japanese": "電車は五分前に駅に到着するはずです。",
+    "chinese": "电车应该五分钟前到站。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "のに",
+  "level": "N3",
+  "formation": "表示虽然有前项条件，后项却出现与此不相称的，意外的或不理想的结果",
+  "meaning_zh": "带有不满，埋怨等的语气",
+  "examples": [
+   {
+    "japanese": "お天気がいいのに、出かけません。",
+    "chinese": "天气好却不出门。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "たとえば",
+  "level": "N3",
+  "formation": "表示举例",
+  "meaning_zh": "比如～",
+  "examples": [
+   {
+    "japanese": "たとえば、果物が好きです。",
+    "chinese": "比如，喜欢水果。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "または",
+  "level": "N3",
+  "formation": "表示两者选一",
+  "meaning_zh": "～或～",
+  "examples": [
+   {
+    "japanese": "コーヒーまたはお茶をください。",
+    "chinese": "请给我咖啡或茶。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ただし",
+  "level": "N3",
+  "formation": "用于补充说明前句的例外事项",
+  "meaning_zh": "但是～",
+  "examples": [
+   {
+    "japanese": "売っています。ただし、高いです。",
+    "chinese": "有卖。但是很贵。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "AにBが～てあります",
+  "level": "N3",
+  "formation": "稍更详细地陈述某种东西是在怎样的状态中存在着的",
+  "meaning_zh": "～放着～",
+  "examples": [
+   {
+    "japanese": "ロビーにテレビが置いてあります。",
+    "chinese": "大厅放着电视。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "AはBにであります",
+  "level": "N3",
+  "formation": "稍更详细地陈述某种东西是在怎样的状态中存在着的",
+  "meaning_zh": "～在～放着",
+  "examples": [
+   {
+    "japanese": "テレビはロビーにおいてあります。",
+    "chinese": "电视在大厅放着。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "まだ＋肯定形",
+  "level": "N3",
+  "formation": "还,依然；～ていません：表示动作没有完毕,事情没有发生",
+  "meaning_zh": "雨がまだ降っています。/雨还在下；还没有～",
+  "examples": [
+   {
+    "japanese": "まだ食べていません。",
+    "chinese": "还没吃。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "なあ",
+  "level": "N3",
+  "formation": "用于句末,是自己心被什么东西强烈打击时所发出的独白性语言",
+  "meaning_zh": "～啊（感叹）",
+  "examples": [
+   {
+    "japanese": "きれいだなあ。",
+    "chinese": "真漂亮啊。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "と思っています",
+  "level": "N3",
+  "formation": "表示向形＋と　思っています（表示说话人在说话之前已经下了决心,而且现在依然具有这种意义。它和「～と　思います」有区别:「～と　思います」是说话人说话时的意志）",
+  "meaning_zh": "想～",
+  "examples": [
+   {
+    "japanese": "今度の日曜日は友達を映画を見に行こうと思っています。",
+    "chinese": "这个星期天想和朋友去看电影。（此想法在说话前已经有了）"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "予定です",
+  "level": "N3",
+  "formation": "辞书形＋予定です；名词+の＋予定です",
+  "meaning_zh": "预定～",
+  "examples": [
+   {
+    "japanese": "来週日本へ行く予定です。",
+    "chinese": "预定下周去日本。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "かもしれない（不确实判断）",
+  "level": "N3",
+  "formation": "（普通形.形容词和名词的普通体去掉だ）或许～表示有可能,但不确定的判断",
+  "meaning_zh": "或许～",
+  "examples": [
+   {
+    "japanese": "午後から雪が降るかもしれません。",
+    "chinese": "下午可能下雪。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "AはBという意味です",
+  "level": "N3",
+  "formation": "A 是 B 的意思",
+  "meaning_zh": "A 是 B 的意思",
+  "examples": [
+   {
+    "japanese": "「ありがとう」は中国語で「谢谢」という意味です。",
+    "chinese": "「谢谢」在中文是「谢谢」的意思。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "と言っていました",
+  "level": "N3",
+  "formation": "普通形＋と言っていました（说话人向听者传达第三者说的话）",
+  "meaning_zh": "说话人向听者传达第三者说的话",
+  "examples": [
+   {
+    "japanese": "Aさんは日曜に日本へ行くと言っていました。",
+    "chinese": "A说星期天去日本。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "必ず/きっと/ぜひ",
+  "level": "N3",
+  "formation": "必ず：与肯定形相呼应,表示某事准成立；きっと：表达几乎没错的推测的心情,后面多伴有[～でしょう]和[～と思います]；ぜひ：表示强烈希望某事得以实现,实行的心情,后面多伴有[～たいです]和[～てください]等希望、愿望、请求的表达方式",
+  "meaning_zh": "一定；肯定；务必",
+  "examples": [
+   {
+    "japanese": "彼はあした、必ず帰ってくる。",
+    "chinese": "他明天一定会回来。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "とおりに",
+  "level": "N3",
+  "formation": "名词の＋とおりに 如～一样",
+  "meaning_zh": "如～一样",
+  "examples": [
+   {
+    "japanese": "今私がやったとおりに、エンジンを组み立ててください。",
+    "chinese": "请像我刚才做的组装发动机。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "て形＋（节2）",
+  "level": "N3",
+  "formation": "(节1)　て形＋(节2)；(节1)ない形＋ないで＋(节2)（节1是修饰语即节2的副词文节,表示附属于谓语所指的主要动作,状态。节1说明节2是在怎样的状态下进行的。节1和节2的行为主体是相同的）",
+  "meaning_zh": "～着（表示状态）",
+  "examples": [
+   {
+    "japanese": "傘を持って出かけます。",
+    "chinese": "带着伞出门。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "と（必然条件）",
+  "level": "N3",
+  "formation": "辞书形＋と、ない形＋、～就～（表示事情发生,某一动作而必然引起另一件事情和动作的发生时,即前面所述事情,动作作为后面所述部分的条件。前面所述事情,动作用[と]表示。[と]后面的句子不能用意志,希望,劝诱,委托等表现,引起后面的事情或动作不是由主观引起的,而是必然的,客观的）",
+  "meaning_zh": "一～就～",
+  "examples": [
+   {
+    "japanese": "このボタンを押すと、机械が动きます。",
+    "chinese": "一按这个按钮机器就动。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "たら",
+  "level": "N3",
+  "formation": "普通形过去式＋ら、要是～,假如～（普通形过去时接[ら]表示假定某一事情,动作的发生,而在该条件下,表示说话者的立场,意见,要求,状况等场合）",
+  "meaning_zh": "要是～，假如～",
+  "examples": [
+   {
+    "japanese": "雨が降ったら、旅行に行きません。",
+    "chinese": "要是下雨就不去旅行。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ようにしてください",
+  "level": "N3",
+  "formation": "辞书形＋ようにして　ください；ない形＋ようにして　ください（用于请求习惯地重复从事那个动作,请求继续努力不要从事那个动作的时候;不能用于限于当时的工作）",
+  "meaning_zh": "请～",
+  "examples": [
+   {
+    "japanese": "寝る前に、必ず窓を闭めるようにしてください。",
+    "chinese": "睡觉前请务必关窗户。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "被动动词（直接被动）",
+  "level": "N3",
+  "formation": "名词1(人)は名词2(人)に＋被动动词（这个句型用于以下情况:名词1对名词2做了某个行为,从接受了该行为的名词1的立场出发来捕捉和理解该行为）",
+  "meaning_zh": "被～",
+  "examples": [
+   {
+    "japanese": "私は课长に质问されました。",
+    "chinese": "我被课长提问了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "被动动词（所有物被动）",
+  "level": "N3",
+  "formation": "名词1(人)は名词2(人)に名词3(物)を被动动词（名词2对名词1的所有物名词3做了某种行为,在许多场合,名词1感到那种行为是个麻烦）",
+  "meaning_zh": "～被～（麻烦的被动）",
+  "examples": [
+   {
+    "japanese": "弟は兄にカメラを坏されました。",
+    "chinese": "弟弟的相机被哥哥弄坏了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "比率の「に」",
+  "level": "N3",
+  "formation": "在表示某个范围和期间内以多大比率从事某个行为的时候,用「に」表示期间和范围",
+  "meaning_zh": "每～（比率）",
+  "examples": [
+   {
+    "japanese": "一日に1500台车が生产されています。",
+    "chinese": "一天生产1500台车。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "の（名词化）",
+  "level": "N3",
+  "formation": "动词(普通形)+の（动词普通形如果接助词「の」,能够使用该动词的句子名词化。被名词化了的名词作主语和宾语用于句子中）",
+  "meaning_zh": "～这件事",
+  "examples": [
+   {
+    "japanese": "音楽を闻くのはおもしろいです。",
+    "chinese": "听音乐很有意思。"
+   }
+  ],
+  "notes": "可以用于此句型的形容词有：楽しい、おもしろい、难しい、易しい、大变だ、耻ずかしい、気持ちがいい／好きだ、嫌いだ、上手だ、下手だ、速い、迟い",
+  "source": "private-material"
+ },
+ {
+  "pattern": "のを忘れました",
+  "level": "N3",
+  "formation": "辞书形＋のを　忘れました",
+  "meaning_zh": "忘了～",
+  "examples": [
+   {
+    "japanese": "レポートに名前を书くのを忘れました。",
+    "chinese": "忘了在报告上写名字。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "のを知っています",
+  "level": "N3",
+  "formation": "(动词/い形容词)普通形＋のを　知って　います；(な形容词和名词的普通形)(～だ→～な)＋のを　知って　います（如果用「は」加以表示的主语一旦插入这个句型,则用「が」加以表示）",
+  "meaning_zh": "知道～",
+  "examples": [
+   {
+    "japanese": "センターの近くで火事をあったのを知っていますか。",
+    "chinese": "知道中心附近发生了火灾吗？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "で（原因）",
+  "level": "N3",
+  "formation": "助词「で」有时表示原因。这时使用的名词多是具有引起「事故」「地震」「火事」等某种结果的力量。谓语部分不能使用包含意志的表达方式",
+  "meaning_zh": "因为～",
+  "examples": [
+   {
+    "japanese": "事故で电车が止まりました。",
+    "chinese": "因为事故电车停了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ので（客观原因）",
+  "level": "N3",
+  "formation": "(动词/い形容词)普通形＋ので、(な形容词和名词的普通形)(～だ→～な)＋ので（它和「から」一样表示原因理由。[から]主观地提出原因加以叙述,而「ので」可以说是对作为自然推移的因果关系加以客观叙述的表达方式,常用于谋求许可时的理由以及柔和地陈述辩解的时候）",
+  "meaning_zh": "因为～（客观）",
+  "examples": [
+   {
+    "japanese": "気分が悪いので、先に帰ってもいいですか。",
+    "chinese": "因为不舒服，可以先回去吗？"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "気持ちがいい/気分がいい",
+  "level": "N3",
+  "formation": "気持ちがいい：用于受到外界事物的刺激而感到愉快的时候；気分がいい：用于自身内部产生的心理畅快和生理畅快那样的畅快",
+  "meaning_zh": "舒服（外界刺激）；畅快（自身内部）",
+  "examples": [
+   {
+    "japanese": "今日は気持ちがいい。",
+    "chinese": "今天很舒服。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "か（间接疑问）",
+  "level": "N3",
+  "formation": "(动词/い形容词)普通形＋か（な形容词和名词的普通形）(去掉だ)＋か（把包含疑问词的疑问句插入句子中的时候,用这个句型）",
+  "meaning_zh": "是否～（何时～等）",
+  "examples": [
+   {
+    "japanese": "会议は何时に终わるか、わかりません。",
+    "chinese": "不知道会议什么时候结束。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "かどうか",
+  "level": "N3",
+  "formation": "(动词/い形容词)普通形＋か　どうか（な形容词和名词的普通形）(去掉だ)＋か　どうか（把不包含疑问词的疑问句插入句子中的时候,用这个句型）",
+  "meaning_zh": "是不是～",
+  "examples": [
+   {
+    "japanese": "リーさんは来るかどうか、わかりません。",
+    "chinese": "不知李先生来还是不来。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "さ（名词化）",
+  "level": "N3",
+  "formation": "通过把形容词的词尾「～い」变为「～さ」,能够把它变为表示其性质,状态的抽象名词",
+  "meaning_zh": "～度（抽象名词）",
+  "examples": [
+   {
+    "japanese": "富士山は高さは3000メートルです。",
+    "chinese": "富士山的高度是3000米。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "授受の表达方式（详解）",
+  "level": "N3",
+  "formation": "(1)名词1に名词2をあげます（送给～；给与其他人物品,信息等）；(2)名词1に名词2をもらいます（从名1得到名2；从他人那里得到物品）；(3)名词をくれます（别人给我～）；(4)名词をやります（我给(别人、下辈,晚辈)～）；(5)～て形＋あげます 为(别人)做～；(6)～て形＋もらいます 请(人)做～；(7)～て形＋くれます 我(或我一方)～",
+  "meaning_zh": "授受关系（给/得/为做）",
+  "examples": [
+   {
+    "japanese": "私は田中さんに时计をあげました。",
+    "chinese": "我把表送给田中。"
+   }
+  ],
+  "notes": "[8][いただきます]是[もらう]的谦语；[くださいます]是[くれる]的谦语",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ために（目的详解）",
+  "level": "N3",
+  "formation": "辞书形＋ために；名词＋の＋ために（(1)表示目的 为了～）",
+  "meaning_zh": "为了～",
+  "examples": [
+   {
+    "japanese": "会議のために、资料を准备しています。",
+    "chinese": "为了会议在准备资料。"
+   }
+  ],
+  "notes": "(2)「～ように」也用于表示目的,但是「～ように」的场合不用包含意志的动词,而「～ために」则可以使用包含意志的动词。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "そうです（样态详解）",
+  "level": "N3",
+  "formation": "动词ます形＋そうです；い形容词(去掉い)＋そうです；な形容词(去掉な)＋そうです（(1)与动词连接的场合：用于在视觉上发现某种现象即将发生而说的时候,强调即将发生的状态时,使用副词「今にも」；(2)とい形容词、な形容词接续的场合,表示并非做了实际确认,而是从外表上观察好像如此的意思）",
+  "meaning_zh": "好像～（视觉判断）",
+  "examples": [
+   {
+    "japanese": "今にも雨が降りそうです。",
+    "chinese": "眼看就要下雨。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "て来ます",
+  "level": "N3",
+  "formation": "表示去某地,做某事,再回来的意思",
+  "meaning_zh": "去～再回来",
+  "examples": [
+   {
+    "japanese": "ちょっとたばこをかって来ます。",
+    "chinese": "去买包烟就回来。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "すぎます",
+  "level": "N3",
+  "formation": "ます形＋すぎます；い形容词（去掉い）＋すぎます；な形容词＋すぎます（表示动作和状态和程度超过了限度,一般用于不符合心愿的状态的时候）",
+  "meaning_zh": "～过度",
+  "examples": [
+   {
+    "japanese": "ゆべお酒を饮みすぎました。",
+    "chinese": "昨晚酒喝多了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "やすいです",
+  "level": "N3",
+  "formation": "ます形＋やすいです（(1)那样做很容易；(2)很容易地变成那样）",
+  "meaning_zh": "好～",
+  "examples": [
+   {
+    "japanese": "この辞书は字が大きくて、见やすいです。",
+    "chinese": "这本字典字大好查。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "にくいです",
+  "level": "N3",
+  "formation": "ます形＋にくいです（(1)那么做不容易；(2)怎么也不那样）",
+  "meaning_zh": "不好～",
+  "examples": [
+   {
+    "japanese": "この药は苦くて、饮みにくいです。",
+    "chinese": "这个药很苦，不好喝。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ところです（详解）",
+  "level": "N3",
+  "formation": "辞书形+ところです（这个句型表示开始某件事,还有某件事即将开始）",
+  "meaning_zh": "正要～",
+  "examples": [
+   {
+    "japanese": "ちょうど今からお茶を饮むところです。",
+    "chinese": "正好现在要喝茶。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ているところです",
+  "level": "N3",
+  "formation": "て形＋いる　ところです（这个句型表示正在进行某种动作,或某种动作正在进行之中。多和[今]一起使用）",
+  "meaning_zh": "正在～",
+  "examples": [
+   {
+    "japanese": "今コピーしているところです",
+    "chinese": "现在正在复印。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "たところです",
+  "level": "N3",
+  "formation": "た形＋ところです（这个句型表示刚刚完成某动作,或某动作刚完成不长时间。多和「たった今」一起使用）",
+  "meaning_zh": "刚刚～",
+  "examples": [
+   {
+    "japanese": "たった今帰ったところです。",
+    "chinese": "刚刚回去。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ばかりです",
+  "level": "N3",
+  "formation": "た形＋ばかりです（这个句型表达说话人的这样的心情,自从进行某动作以来还没有经过多长时间。它和[た形＋ところです]的不同在于:[た形＋ところです]只表示动作刚完成不长时间,而[た形＋ばかりです]则是光是用动作刚完成不长时间,时间已经过了一定程度的时候,说话人如果感到这段时间很短,也可以用）",
+  "meaning_zh": "刚刚～（主观感觉时间短）",
+  "examples": [
+   {
+    "japanese": "私も今来たばかりです。",
+    "chinese": "我也刚来。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "はじめて",
+  "level": "N3",
+  "formation": "て形＋はじめて ～之后才～,只有～才(能)～",
+  "meaning_zh": "～之后才～",
+  "examples": [
+   {
+    "japanese": "病気になってはじめて健康のありがたさを知った。",
+    "chinese": "生病之后才知道健康的可贵。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "たために（原因详解）",
+  "level": "N3",
+  "formation": "（活用词连体形;体言)たために 因为～表示原因,理由",
+  "meaning_zh": "因为～",
+  "examples": [
+   {
+    "japanese": "病気のために、会社を休みました。",
+    "chinese": "因为生病没去公司。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "おわります",
+  "level": "N3",
+  "formation": "动ます形＋おわります ～ 结束之后,～完之后",
+  "meaning_zh": "～结束之后",
+  "examples": [
+   {
+    "japanese": "その本、読み终わりました。",
+    "chinese": "那本书读完了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ぜんぜん～ません",
+  "level": "N3",
+  "formation": "全然　～ません　完全不～（「全然」在谓语是形容容词或动词的否定句中使用,全面否定形容词及动词所表示的事情）",
+  "meaning_zh": "完全不～",
+  "examples": [
+   {
+    "japanese": "漢字が全然わかりません。",
+    "chinese": "汉字完全不懂。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "で（场所）",
+  "level": "N3",
+  "formation": "场所名词＋で 表示动作的场所",
+  "meaning_zh": "在～（做）",
+  "examples": [
+   {
+    "japanese": "教室で日本语を勉强します。",
+    "chinese": "在教室学日语。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "に（存在场所）",
+  "level": "N3",
+  "formation": "场所名词＋に 表示物或人存在的场所",
+  "meaning_zh": "～有～",
+  "examples": [
+   {
+    "japanese": "ロビーにテレビがあります。",
+    "chinese": "大厅有电视。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "きっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "1、一定，必定，准；2、严厉，严肃",
+  "examples": [
+   {
+    "japanese": "彼はあした、きっと帰ってくる。",
+    "chinese": "他明天一定会回来。"
+   },
+   {
+    "japanese": "きっとになる/突然变得严厉起来。",
+    "chinese": "突然变得严厉起来"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ぐっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "1、用力，一口气；2、比以前更…，越发",
+  "examples": [
+   {
+    "japanese": "ぐっと飲んだ。",
+    "chinese": "一口气喝了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ざっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "迅速，一下子",
+  "examples": [
+   {
+    "japanese": "こまかく切ってざっとゆでる。",
+    "chinese": "切成丝焯一下。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ぞっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "1、粗略地；2、大约，大致",
+  "examples": [
+   {
+    "japanese": "ぞっと読んだが、いい本だよ。",
+    "chinese": "粗读了一遍，是好书。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "じっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "目不转睛，一动不动",
+  "examples": [
+   {
+    "japanese": "じっと見つめる。",
+    "chinese": "凝视。"
+   }
+  ],
+  "notes": "△そのままじっとしている/一动不动",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ずっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "1、(距离、差距)大;(时间)很长；2、一直，径直",
+  "examples": [
+   {
+    "japanese": "駅はまだずっと先です。",
+    "chinese": "火车站离这儿好远呢。"
+   },
+   {
+    "japanese": "彼とはずっと一緒だ。",
+    "chinese": "一直和他在一起。"
+   }
+  ],
+  "notes": "△これから先はずっと下りだ/打这儿开始一直是下坡。",
+  "source": "private-material"
+ },
+ {
+  "pattern": "そっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "轻轻地，悄悄地，偷偷地",
+  "examples": [
+   {
+    "japanese": "気づかれないようにそっと近づく。",
+    "chinese": "不让人发觉悄悄地靠近。"
+   }
+  ],
+  "notes": "△仕事をそっと運ぶ/偷偷地工作",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ぞっと（毛骨悚然）",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "1、令人毛骨悚然；2、～しない/不怎么样",
+  "examples": [
+   {
+    "japanese": "考えただけでもぞっとする。",
+    "chinese": "只想一想都令人毛骨悚然。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "はっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "1、猛然，突然；2、(因意外而)受惊吓",
+  "examples": [
+   {
+    "japanese": "はっと気がつく。",
+    "chinese": "猛然发觉到。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "ほっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "1、轻微叹气；2、放心，安心",
+  "examples": [
+   {
+    "japanese": "ほっとため息をつく。",
+    "chinese": "叹了一口气。"
+   },
+   {
+    "japanese": "ほっと胸をなでおろした。",
+    "chinese": "放下心来。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ },
+ {
+  "pattern": "もっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "更，更加，进一步",
+  "examples": [
+   {
+    "japanese": "もっと元気を出せ。",
+    "chinese": "再打起点精神来。"
+   }
+  ],
+  "notes": "△もっとください/请再给点",
+  "source": "private-material"
+ },
+ {
+  "pattern": "やっと",
+  "level": "N3",
+  "formation": "[副]",
+  "meaning_zh": "毫不容易，勉勉强强",
+  "examples": [
+   {
+    "japanese": "やっと間に合った。",
+    "chinese": "勉强赶上。"
+   },
+   {
+    "japanese": "やっとできあがった。",
+    "chinese": "好不容易做出。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material"
+ }
+]
