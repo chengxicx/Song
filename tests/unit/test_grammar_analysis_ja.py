@@ -1138,12 +1138,16 @@ def test_panel_entries_omit_empty_reference_fields():
 
 
 def _jkindrix_rule():
-    "A vendored jkindrix rule: English notes, English-only example."
+    """
+    A vendored jkindrix rule: English notes, English-only example, and
+    Chinese wording supplied by zh_enrichment.json.
+    """
     return next(
         r
         for r in _ALL_RULES
-        if r.get("formation_notes")
-        and r.get("reference")
+        if r.get("formation_zh")
+        and r.get("formation_notes_zh")
+        and r.get("reference_zh")
         and not r["reference"]["chinese"]
         and r.get("patterns")
         and r.get("kind") not in ("particle", "basic")
@@ -1152,20 +1156,46 @@ def _jkindrix_rule():
 
 def test_chinese_panel_never_shows_english_enrichment():
     """
-    The vendored jkindrix rows are English prose and their example
-    translations are English-only, so a Chinese panel must drop those
-    fields rather than print English under a Chinese heading -- that was
-    the bug: 「参考例句 · 注意点」 showed "Not yet: まだ + V ていない ..."
-    and "I haven't done my homework yet.".  The Chinese wording is added
-    to the data separately; until then the block simply disappears.
+    A Chinese panel must never print English under a Chinese heading --
+    that was the bug: the vendored jkindrix rows are English prose with
+    English-only example translations, so 「接续 · 参考例句 · 注意点」
+    showed "Not yet: まだ + V ていない ..." and "I haven't done my
+    homework yet.".  The wording now lives in zh_enrichment.json; the
+    invariant is that every field it reaches carries no English word.
     """
     rule = _jkindrix_rule()
     results = analyze_japanese("".join(rule["examples"][:2]), display_lang="zh")
     entry = next(e for e in results if e["key"] == rule["key"])
     assert re.search(r"[\u4e00-\u9fff]", entry["desc"]), entry["desc"]
-    assert "notes" not in entry, entry.get("notes")
-    assert "reference" not in entry, entry.get("reference")
-    assert "formation" not in entry or not re.search(r"[A-Za-z]{3,}", entry["formation"])
+    assert entry["formation"] == rule["formation_zh"]
+    assert entry["notes"] == rule["formation_notes_zh"]
+    # One pre-localized line, never the whole {chinese, english} triple.
+    assert entry["reference"]["text"] == rule["reference_zh"]
+    for field in ("desc", "formation", "notes"):
+        assert not re.search(r"[A-Za-z]{3,}", entry[field]), f"{field}: {entry[field]}"
+    assert not re.search(r"[A-Za-z]{3,}", entry["reference"]["text"])
+
+
+def test_chinese_panel_enrichment_is_never_english():
+    """
+    Library-wide gate on the same invariant: whichever field a Chinese
+    panel ends up showing -- translated where the data has Chinese,
+    filtered out where it does not -- none of them may be English.
+    """
+    for rule in _DATA_RULES:
+        if rule.get("skipped") or not rule.get("examples"):
+            continue
+        results = analyze_japanese("".join(rule["examples"]), display_lang="zh")
+        for entry in results:
+            for field in ("desc", "formation", "notes"):
+                value = entry.get(field) or ""
+                assert not re.search(
+                    r"[A-Za-z]{3,}", value
+                ), f"{rule['key']} {field}: {value}"
+            text = (entry.get("reference") or {}).get("text") or ""
+            assert not re.search(
+                r"[A-Za-z]{3,}", text
+            ), f"{rule['key']} reference: {text}"
 
 
 def test_english_panel_still_shows_the_english_enrichment():

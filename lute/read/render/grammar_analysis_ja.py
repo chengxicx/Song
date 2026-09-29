@@ -16,7 +16,8 @@ Rules come from two places:
   contributors (CC BY-SA 4.0,
   https://github.com/jkindrix/japanese-language-data), vendored verbatim.
   ``zh.json`` beside them holds this project's Chinese glosses, keyed by the
-  upstream entry id.
+  upstream entry id, and ``zh_enrichment.json`` the Chinese wording for the
+  rows' 接续 / 注意点 / 参考例句译文 (the vendored files stay verbatim).
 
 Matcher specs are *derived* from each entry's descriptive pattern and
 validated against that entry's own examples -- see ``_load_level``.
@@ -1488,6 +1489,28 @@ def _load_ko():
 _KO_BY_ID = _load_ko()
 
 
+def _load_zh_enrichment():
+    """
+    Chinese wording for the vendored rows' enrichment fields, keyed by
+    data entry id: ``{"formation", "notes", "examples": {<jp>: <zh>}}``.
+
+    ``zh.json`` only covers the description, so the jkindrix rows' 接续 /
+    注意点 / 例句译文 stayed English and the panel printed English under a
+    Chinese heading.  The wording lives here rather than in the level files
+    for the same reason ``zh.json`` does: those files stay verbatim copies
+    of the upstream data.  Example translations are keyed by the Japanese
+    sentence, so an index shift can never mis-assign one.
+    """
+    path = os.path.join(_DATA_DIR, "zh_enrichment.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+_ZH_ENRICH = _load_zh_enrichment()
+
+
 def _notes_text(notes):
     "Formation notes in one display string; list or scalar, or '' when absent."
     if not notes:
@@ -1526,19 +1549,32 @@ def _make_data_rule(
         # Nothing matchable was derived; the descriptive pattern is kept for
         # the record but the rule never fires.
         name = item.get("pattern") or item.get("id") or f"{level}-{idx}"
+    entry_id = item.get("id") or ""
+    enrichment = _ZH_ENRICH.get(entry_id) or {}
+    reference = _curated_reference(item)
     return {
         "key": "ds_" + _slug(item.get("id") or f"{level}-{idx}"),
         "pattern": name,
         "descriptive": item.get("pattern") or "",
         "level": level,
         "meaning": item.get("meaning_en") or "",
-        "meaning_zh": _ZH_BY_ID.get(item.get("id") or "", ""),
-        "meaning_ko": _KO_BY_ID.get(item.get("id") or "", ""),
+        "meaning_zh": _ZH_BY_ID.get(entry_id, ""),
+        "meaning_ko": _KO_BY_ID.get(entry_id, ""),
         "formation": item.get("formation") or "",
+        # Chinese wording for the 接续 / 注意点 / 例句译文 of the English-only
+        # vendored rows (see _load_zh_enrichment); empty for the merged
+        # material rows, whose own fields are already Chinese.
+        "formation_zh": enrichment.get("formation") or "",
+        "formation_notes_zh": enrichment.get("notes") or "",
+        "reference_zh": (
+            (enrichment.get("examples") or {}).get(reference["japanese"], "")
+            if reference
+            else ""
+        ),
         # jkindrix entries carry notes as a list, materials as a string;
         # normalize to one string so the panel can drop it in verbatim.
         "formation_notes": _notes_text(item.get("formation_notes")),
-        "reference": _curated_reference(item),
+        "reference": reference,
         "examples": [e["japanese"] for e in item.get("examples") or []],
         # "patterns" is what the matcher reads, so an empty list is how a
         # skipped rule stays silent.  "derived" keeps whatever the derivation
@@ -2026,13 +2062,35 @@ def _in_display_language(text, display_lang):
     return True
 
 
-def _reference_text(reference, display_lang):
+def _reference_text(reference, rule, display_lang):
     "The curated example's translation for the display language, or ''."
     if display_lang == "zh":
-        return reference.get("chinese") or ""
+        # Merged rows carry their own Chinese example; the vendored rows get
+        # it from zh_enrichment.json.  No Chinese means no block, rather
+        # than the English sentence under a Chinese heading.
+        return reference.get("chinese") or rule.get("reference_zh") or ""
     if display_lang == "ko":
         return ""
     return reference.get("english") or reference.get("chinese") or ""
+
+
+def _enrichment(rule, field, display_lang):
+    """
+    One enrichment field (``formation`` / ``formation_notes``) for the
+    panel's display language.
+
+    The Chinese wording shipped in zh_enrichment.json wins when present;
+    otherwise a field is shown only when its script already matches the
+    display language -- the filter that kept "Not yet: まだ + V ていない"
+    out of the Chinese panel while the wording was still being written.
+    English is the source language of every field, so it needs neither.
+    """
+    if display_lang == "zh":
+        zh = (rule.get(f"{field}_zh") or "").strip()
+        if zh:
+            return zh
+    text = (rule.get(field) or "").strip()
+    return text if _in_display_language(text, display_lang) else ""
 
 
 def analyze_japanese(page_text, display_lang="en"):
@@ -2090,15 +2148,15 @@ def analyze_japanese(page_text, display_lang="en"):
                 # them *in the display language* -- hand-written rules and
                 # old data carry neither, and the untranslated English
                 # halves of the vendored rows stay out of a zh/ko panel.
-                formation = rule.get("formation") or ""
-                if _in_display_language(formation, display_lang):
+                formation = _enrichment(rule, "formation", display_lang)
+                if formation:
                     entry["formation"] = formation
-                notes = rule.get("formation_notes") or ""
-                if _in_display_language(notes, display_lang):
+                notes = _enrichment(rule, "formation_notes", display_lang)
+                if notes:
                     entry["notes"] = notes
                 reference = rule.get("reference")
                 if reference:
-                    text = _reference_text(reference, display_lang)
+                    text = _reference_text(reference, rule, display_lang)
                     if text:
                         entry["reference"] = {
                             "japanese": reference["japanese"],
