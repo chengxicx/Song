@@ -1,0 +1,2977 @@
+{
+ "ageku-ni-end-up": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ageru-give-outward": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "aida-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "amari-too-much": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "arimasu-existence-inanimate": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "aro-u-koto-ka": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "aro-u-tomo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ashikara-zu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ato-de-after-doing": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ato-wa-rest": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "atte-no-thanks-to": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "n1_materials.json"
+ },
+ "au-together": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ba-ai-in-case": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ba-conditional": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ba-hodo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ba-ii-should": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ba-koso-precisely-because": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ba-sore-made": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ba-yokatta": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "bakari-de-naku": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "bakari-ka-not-only": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "bakari-ni-merely": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "n2_170.json"
+ },
+ "bakari-no": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "bakari-only": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "translated"
+ },
+ "bekarazu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "beki-da": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "beku-in-order-to": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "beku-mo-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "beku-shite": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "buri-ni-first-time": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "buru-pretend": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "causative-form": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "causative-passive": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "chuu-during": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "counter-en-money": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "counter-fun-minute": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "counter-hon-long": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "counter-ji-oclock": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "counter-mai-flat": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "counter-people-nin": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "counter-sai-age": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "counter-tsu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "da-plain-copula": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "dakara-so": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "dake-atte-as-expected": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "dake-de-naku": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "dake-mashi-da": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "dake-nara": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "dake-ni-precisely": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "dake-no-koto-wa-aru": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "dake-only-basic": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "dano-dano": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "darake-full-of": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "darou-deshou-conjecture": {
+  "examples": "n3.json",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "dashi-suddenly-start": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "datte-casual-because": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "de-are-de-are": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "n1_materials.json"
+ },
+ "de-ari-nagara": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "de-atta-to-shitemo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "demo-noun-even": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "translated"
+ },
+ "deshita-past-polite-copula": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "desu-polite-copula": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "desura": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "dewa-arimasen-negative-polite-copula": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "dokoro-dewa-nai-no-time": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "dokoro-ka-far-from": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "doori-just-as": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "dzurai-hard-emotional": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "furi-wo-suru-pretend": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ga-dekiru": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "ga-hayai-ka": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "ga-hoshii-wanting-thing": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "translated"
+ },
+ "ga-kedo-although": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "ga-kikoeru-mieru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ga-sai-go": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ga-suki-kirai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ga-wakaru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "garu-third-person-emotion": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "gatai-difficult": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "gatera-while": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ge-looking": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "gimi-tendency": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "goran-ni-naru-honorific": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "gotoki-like": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "n1.json"
+ },
+ "gotoku-as-if": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "gotoni-each": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "gurumi": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hajimeru-auxiliary": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hanmen-on-other-hand": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hate-ni-after": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hazu-datta-was-supposed": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hazu-expected": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "n4.json"
+ },
+ "hiite-wa": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hitotabi": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hodo-dewa-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hodo-extent": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hodo-no": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hodo-no-mono-dewa-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hoka-nai-no-choice": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hoka-naranu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "hou-ga-comparative": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "humble-o-suru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "i-adj-adverbial-ku": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "i-adj-desu-politeness": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "i-adj-te-joining-kute": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "i-adjective-negative": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "i-adjective-nonpast": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "i-adjective-past": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ichiban-superlative": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "igai-other-than": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "ijou-since": {
+  "examples": "translated",
+  "formation": "n2_bikao.json",
+  "notes": "n2_bikao.json"
+ },
+ "ikan-depending": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ikan-ni-yorazu": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "ikan-se-n": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ikkou-ni-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ikura-how-much": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ikutsu-how-many": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "imasu-existence-animate": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ippou-da-keeps": {
+  "examples": "translated",
+  "formation": "n2_bikao.json",
+  "notes": "translated"
+ },
+ "ippou-de-one-hand": {
+  "examples": "translated",
+  "formation": "n2_bikao.json",
+  "notes": "translated"
+ },
+ "irai-since": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "irassharu-honorific": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "issho-ni-together": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "itadaku-humble-verb": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "n4.json"
+ },
+ "iwaba": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "iyashiku-mo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ja-arumai-shi": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "jidoushi-tadoushi": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "jikan-time-duration": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ka-dou-ka": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ka-nai-ka-no-uchi-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ka-no-you-ni": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "ka-to-iu-to": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "ka-to-omou-to": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "kagiri-as-long-as": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kagiri-da-emotional": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kakeru-halfway": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kamoshirenai-might": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kane-nai-might": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kane-ru-hard-to": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kara-cause": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "n2_170.json"
+ },
+ "kara-iu-to": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kara-koso-precisely-because": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kara-miru-to": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "kara-ni-wa": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kara-shite": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "n2_170.json"
+ },
+ "kara-suru-to": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "kara-to-itte": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "kata-way-of-doing": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "katagata-combining": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "katawara": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "kawari-ni-instead": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kedomo-formal-but": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "kekka-result": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ki-ga-suru-feel-like": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "kiri-only": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "n2_materials.json"
+ },
+ "kitte-no": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kiwamari-nai": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "n1.json"
+ },
+ "kke-casual-wondering": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "kko-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "koko-soko-asoko-doko": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "komi-into": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "konasu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kono-sono-ano-dono-attributive": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "kore-sore-are-demonstratives": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "koso-are": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "koso-precisely": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "koto-da-emphatic": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "koto-dakara": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "koto-ga-dekiru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "koto-kara-from-fact": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "koto-mo-arou-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "koto-nagara": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "n2_170.json"
+ },
+ "koto-nashi-ni": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "n1.json"
+ },
+ "koto-ni-naru-be-decided": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "koto-ni-surprise": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "koto-ni-suru-decide": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "koto-nominalizer": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "koto-tote": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "kudasaru-honorific-verb": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "n4.json"
+ },
+ "kurai-extent": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "kurai-nara-rather": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "kureru-give-toward": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "kuse-ni-despite": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "location-nouns-ue-shita": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ma-no-atari-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mada-not-yet": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "made-da": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "made-mo-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "made-mo-naku": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "made-no-koto-da": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "mae-ni-before-doing": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mai-every-prefix": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mai-ka-wonder": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mai-not-likely": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mairu-humble": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "majiki-unacceptable": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "makuru-extensively": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mama": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mamire-smeared": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "manzara-de-mo-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "masen-polite-negative-verb": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "masendeshita-polite-past-negative-verb": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "masenka-invitation": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mashita-polite-past-verb": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mashou-ka-invitation": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mashou-volitional": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "masu-polite-verb": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mekasu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "meku-have-look": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "n1.json"
+ },
+ "mitai-looks-like": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mo-kamawa-zu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mo-mo-both": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mo-nan-tomo-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mo-saru-koto-nagara": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "mon-casual-because": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mono-da-general": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "mono-dakara": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "mono-ga-aru": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "mono-nara-if-possible": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "mono-no-although": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "mono-reason-assertion": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "mono-to-shite": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mono-wo-if-only": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "morau-receive": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "mou-ta-already": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "mousu-humble": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "muke-targeted-for": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "muki-suitable-for": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "n-bakari": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "n-da-kara-emphatic": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "n-desu-explanation": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "n-ga-tame": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "n-to-bakari-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "n-to-suru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "na-adj-adverbial-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "na-adj-te-joining-de": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "na-adjective-attributive": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "na-adjective-negative": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "na-adjective-nonpast": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "na-adjective-past": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nagara": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nagara-mo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nagara-ni": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "nagara-no": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nai-de-kudasai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nai-de-mo-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nai-de-without-doing": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nai-dewa-irarenai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nai-dewa-okanai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nai-form": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nai-koto-niwa": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nai-koto-wa-nai": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "nai-made-mo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nai-nomi-narazu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nai-wake-ni-ikanai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nakereba-naranai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "naku-mo-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "naku-shite-wa": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "naku-te-nan-de-arou": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nakucha-nakya": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nakute-mo-ii": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nan-ka-dismissive": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "n2_170.json"
+ },
+ "nan-te-how": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "nani-se": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nani-shiro": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nanji-what-time": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nanyoubi-day-of-week": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "naoshi-redo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nara-conditional": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "n4.json"
+ },
+ "nara-iza-shirazu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nara-mada-shimo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "narade-wa-no": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nari-as-soon-as": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "nari-nari": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "nari-ni-in-own-way": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "naritomo": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "nasai-command": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nasaru-honorific": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nashi-ni-without": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "n1.json"
+ },
+ "ni-aki-tarazu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-ari-gachi": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-ataru-correspond": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-atatte-occasion": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "ni-atte": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "ni-chigainai-must": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-hoka-naranai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-itaru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-itaru-made": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "ni-itatte-wa": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "ni-kagirazu-not-only": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-kagitte-only": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "ni-kakatte-iru": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "ni-kakawarazu-regardless": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "n1.json"
+ },
+ "ni-kakawaru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-kakete-through": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-kangamite": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-kanshite-regarding": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "ni-kataku-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-kawatte-instead": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "ni-kimatte-iru": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "ni-kotaete-response": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "ni-kurabete-compared": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "ni-matsuwaru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-mo-hodo-ga-aru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-mo-kakawarazu-despite": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-mo-mashite": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "ni-naru-become": {
+  "examples": "translated",
+  "formation": "n3.json",
+  "notes": "translated"
+ },
+ "ni-nazoraete": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-nottotte": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-oite-in-at": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-oujite-depending": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-sakidatte-prior": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-sakigakete": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-shiro-ni-seyo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-shitagatte": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-shite": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-shite-hajimete": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-shite-mireba": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-shite-wa": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-shitemo-even": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-soku-shite": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-sotte-along": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-soui-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-suginai": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "ni-suru-decide": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-taenai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-taeru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-taishite-toward": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "ni-tari-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-taru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-teihyou-ga-aru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-terashite": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-tomonatte-accompany": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-totte": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "ni-tsuite": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-tsuki-due-to": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-tsurete-as": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "ni-wa-oyoba-nai": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "ni-wataru-span": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ni-yotte": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "nikui-hard": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "no-itari": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "no-kiwami": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "no-minarazu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "no-moto-de": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "no-nominalizer": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "no-ue-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "node-cause": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "n3.json"
+ },
+ "nomi-only": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "noni-although": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "translated"
+ },
+ "noun-modifying-clause": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nuki-de": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "nuku-fully-do": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "o-v-kudasai-polite-honor": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "okage-sei-de": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "okini-intervals": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "oose-ru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ori-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "osore-ga-aru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ossharu-honorific": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "owaru-finish": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "oyoba-zu-nagara": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-de-means": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-e-direction": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-ga-subject": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-ka-question": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-kara-from": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "n2_170.json"
+ },
+ "particle-made-until": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "particle-mo-also": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-ne-seeking-agreement": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-ni-target": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-no-possession": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-o-object": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-to-and-with": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-wa-topic": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "particle-ya-non-exhaustive": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "particle-yo-emphasis": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "passive-form": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "potential-form": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ppoi-seems": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "pponashi-left": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "question-words-basic": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "rashii-seems": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "translated"
+ },
+ "sae-even": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "n1.json"
+ },
+ "sae-sureba-if-only": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sai-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "saichu-in-the-middle": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "sanagara": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "shi-reason-listing": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "shidai-de": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "n2_170.json"
+ },
+ "shidai-depending": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "shika-nai": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "shikamo-moreover": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "shikashi-but": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "shou-ga-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sobakara": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "sobireru-miss-chance": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sonkeigo-reru-rareru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sono-mono": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sorede-and-then": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "soredemo-even-so": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sorekara-after": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sou-da-appearance": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sou-da-hearsay": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sou-iu-kou-iu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sou-ni-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sue-ni-after": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "sugiru-too-much": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ta-bakari": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "translated"
+ },
+ "ta-form": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ta-hou-ga-ii": {
+  "examples": "translated",
+  "formation": "n3.json",
+  "notes": "translated"
+ },
+ "ta-kiri-since-last": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ta-koto-ga-aru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ta-tokoro": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "ta-tokoro-de": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "tabi-ni-every-time": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tada-de-sae": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tagaru-third-person-desire": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tai-desire": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tai-to-omou-want-to-think": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tame-ni": {
+  "examples": "translated",
+  "formation": "n3.json",
+  "notes": "n3.json"
+ },
+ "tara-conditional": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tara-kiri-ga-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tari-mo-shinai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tari-tari-suru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tari-tomo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "taru-mono-as-x": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "taru-yuen": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tatoe-temo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tatte-even-casual": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-ageru-favor-given": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "te-aru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-form-basic": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-goran-try-casual": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-habakaranai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-hajimete-only-after": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-hoshii-want-someone": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "translated"
+ },
+ "te-iku": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-imasu-progressive": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-itadaku-polite-favor-received": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "n4.json"
+ },
+ "te-kara-after-doing": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-kara-denai-to": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-kara-to-iu-mono": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-koso-only-by": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-kudasai-request": {
+  "examples": "translated",
+  "formation": "n3.json",
+  "notes": "translated"
+ },
+ "te-kureru-favor-received": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "te-kuru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-mae": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-mi-se-ru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-miru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-mo-ii-kurai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-mo-ii-permission": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-morau-request-favor": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "te-naranai-cant-help": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-oku": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-shikarubeki": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-shikata-ga-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-shimau": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-shou-ga-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-tamaranai-unbearably": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-wa-ikenai-prohibition": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "te-wa-irarenai": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "te-yamanai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-aimatte": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "to-areba": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "to-atte": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "to-atte-wa": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "n1.json"
+ },
+ "to-bakari-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-conditional": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-exhaustive-listing": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-ieba-speaking-of": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-iedomo": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "n1_materials.json"
+ },
+ "to-itta-such-as": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "to-itta-tokoro-da": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "to-itte-mo-although": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "to-itte-without-particular": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-iu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-iu-ka": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-iu-koto-da": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "to-iu-koto-wa": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "to-iu-mono-da": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-iu-mono-dewa-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-iu-no-wa": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "to-iu-yori-rather": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "to-iwazu-to-iwazu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-mieru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-minasu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-miru-see-as": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-mo-naku": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "to-nareba-if-comes-to": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-naru-to-when-comes": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-oboshii": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-omoi-kiya": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "to-omou": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "to-sareru": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "to-shita-tokoro-de": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "to-sureba": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "to-tan-moment": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-tomoni-together": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-wa": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "to-wa-ie": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "to-wa-iu-mono-no": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-wa-kagiranai": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "to-wa-urahara-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "to-yara": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "toka-listing": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "toki-ni-when-basic": {
+  "examples": "translated",
+  "formation": "n3.json",
+  "notes": "translated"
+ },
+ "tokoro-wo": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tomo-arou": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tomo-nareba": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "toshite-as": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "toshite-mo-even-as": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tou-no": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tsuide-ni": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "tsumori-datta-had-intended": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tsumori-intention": {
+  "examples": "translated",
+  "formation": "n4.json",
+  "notes": "translated"
+ },
+ "tsutsu-aru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tsutsu-while": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tsuzukeru-continue": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "tte-quotation": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "u-mono-nara": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "u-ni-mo": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "uchi-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ue-de-upon": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "ue-ni-in-addition": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "ue-wa-now": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "uru-possible": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "v-temo-even-if": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "volitional-form": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wa-mochiron": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "wa-oroka": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "wa-sate-oki": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wa-tomokaku": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wake-da-meaning": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wake-dewa-nai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wake-ga-nai": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "wake-ni-wa-ikanai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "warini-considering": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-chuushin-ni-centered": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-fumaete": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "wo-hajime-including": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "n2_170.json"
+ },
+ "wo-hete": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "wo-hikiai-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-kaerimi-zu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-kagiri-ni": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "wo-kanete": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-kawakiri-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-keiki-ni": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "wo-kikkake-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-kinjienai": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "wo-kiwameru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-komete": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-mae-ni-shite": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-mono-to-mo-sezu": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "wo-motoni-based-on": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "wo-motte": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "wo-oite": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "wo-shirime-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-towazu-regardless": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-tsuujite-through": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "wo-yogi-naku-sareru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "wo-yoso-ni": {
+  "examples": "translated",
+  "formation": "n1_materials.json",
+  "notes": "translated"
+ },
+ "ya-inaya": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "ya-literary": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "yara-yara": {
+  "examples": "translated",
+  "formation": "n2_materials.json",
+  "notes": "translated"
+ },
+ "yaru-casual-giving": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "yashinai-emphatic": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "yasui-easy": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "yoshi-mi": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "you-da-appearance": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "you-de-seemingly": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "you-dewa-if-its": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "you-ga-nai-no-way": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "you-ka-to-omou": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "you-nara-if-looks": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "you-ni-mo-nai": {
+  "examples": "translated",
+  "formation": "n3_materials.json",
+  "notes": "translated"
+ },
+ "you-ni-purpose": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "you-ni-suru": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "you-to-mai-to": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "you-to-omou-volitional-intent": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ },
+ "you-to-regardless": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "yue-ni-because": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "yue-no": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "zaru-wo-enai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "zu-jimai": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "zu-mogana": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "zu-ni": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "zu-ni-wa-irarenai": {
+  "examples": "translated",
+  "formation": "n2_170.json",
+  "notes": "translated"
+ },
+ "zu-ni-wa-okanai": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "zu-ni-wa-sumanai": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "translated"
+ },
+ "zukume-nothing-but": {
+  "examples": "translated",
+  "formation": "n1.json",
+  "notes": "n1.json"
+ },
+ "zuni-sumu": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "zutomo-even-without": {
+  "examples": "translated",
+  "formation": "translated",
+  "notes": "translated"
+ },
+ "zutsu-each-per": {
+  "examples": "translated",
+  "formation": "n5.json",
+  "notes": "translated"
+ }
+}
