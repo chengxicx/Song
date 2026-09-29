@@ -438,3 +438,73 @@ def test_enrich_keeps_a_gloss_the_row_already_has():
     out = enrich([row])[0]
     assert out["zh"] == "book wording", out["zh"]
     assert out["ko"] == "책 설명", out["ko"]
+
+
+# ---- panel fields (接续 / 注意点) -------------------------------------
+
+
+def _material_rows_by_name():
+    "The books' rows, keyed by the name the merge gives them."
+    from scripts.merge_grammar_ko_materials import load_materials
+
+    return load_materials()
+
+
+def test_merged_rows_carry_the_books_panel_fields():
+    """
+    The books state a 接续 line for every point and 注意点 for most, and the
+    panel renders both.  The merge used to hard-code ``notes: ""`` and drop
+    ``formation`` entirely, which left the Korean panel showing a description
+    where the Japanese one showed 接续 / 参考例句 / 注意点.
+    """
+    by_name = _material_rows_by_name()
+    rows = _merged_rows()
+    assert rows, "expected merged rows"
+    no_formation = [e["key"] for e in rows if not (e.get("formation") or "").strip()]
+    assert not no_formation, f"merged rows without a 接续 line: {no_formation[:10]}"
+    for e in rows:
+        meta = by_name.get(e["name"])
+        assert meta is not None, e["key"]
+        assert e["formation"] == (meta.get("formation") or "").strip(), e["key"]
+        assert (e.get("notes") or "") == (meta.get("notes") or "").strip(), e["key"]
+
+
+def test_panel_enrichment_covers_every_book_field():
+    """
+    A Chinese panel shows the 接续 / 注意点 only when the wording exists, so
+    the enrichment file must cover every field the rows carry -- a missing
+    entry hides a block silently instead of failing.
+    """
+    from lute.read.render.grammar_analysis_ko import _KO_ENRICH
+
+    by_key = {e["key"]: e for e in _library()}
+    stale = sorted(k for k in _KO_ENRICH if k not in by_key)
+    assert not stale, f"enrichment names no such row: {stale}"
+    for e in _merged_rows():
+        entry = _KO_ENRICH.get(e["key"]) or {}
+        for field in ("formation", "notes"):
+            if not (e.get(field) or "").strip():
+                continue
+            want = (entry.get(field) or "").strip()
+            assert want, f"{e['key']}: no Chinese {field}"
+            assert re.search(r"[\u4e00-\u9fff]", want), f"{e['key']} {field}"
+            # The engine's zh filter drops any field carrying a Latin word,
+            # so an English word here would hide the block it was meant to
+            # fill in.
+            assert not re.search(r"[A-Za-z]{3,}", want), f"{e['key']} {field}: {want}"
+
+
+def test_panel_backfill_is_idempotent_and_non_destructive():
+    """
+    Re-running the merge must not touch a row it has already filled, and must
+    never overwrite a value it does not own -- the rule the zh/ko glosses
+    follow.
+    """
+    import copy
+
+    from scripts.merge_grammar_ko_materials import backfill, load_materials
+
+    rows = _library()
+    again = copy.deepcopy(rows)
+    assert backfill(again, load_materials()) == []
+    assert again == rows
