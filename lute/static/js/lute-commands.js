@@ -315,7 +315,9 @@ function open_grammar_analysis() {
           // Folded reference block: the entry's own curated example with its
           // translation, plus usage notes.  Both fields are optional
           // (hand-written rules and older data carry neither), so the whole
-          // block disappears when there is nothing to show.
+          // block disappears when there is nothing to show.  The backend
+          // picks the translation for the panel's display language and drops
+          // the block when the entry has none, so `text` is already right.
           const notes = g.notes
             ? '<div class="grammar-item__notes">' + escapeHtml(g.notes) + "</div>"
             : "";
@@ -323,7 +325,7 @@ function open_grammar_analysis() {
             ? '<div class="grammar-item__refex">' +
               escapeHtml(g.reference.japanese) +
               '<div class="grammar-item__reftr">' +
-              escapeHtml(g.reference.chinese || g.reference.english || "") +
+              escapeHtml(g.reference.text || "") +
               "</div></div>"
             : "";
           const cjk = /[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]/.test(g.desc || "");
