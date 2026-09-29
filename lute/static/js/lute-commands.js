@@ -318,13 +318,17 @@ function open_grammar_analysis() {
           // block disappears when there is nothing to show.  The backend
           // picks the translation for the panel's display language and drops
           // the block when the entry has none, so `text` is already right.
+          // The source sentence is `sentence`; `japanese` is the spelling the
+          // Japanese engine still ships, kept so both engines render here.
           const notes = g.notes
             ? '<div class="grammar-item__notes">' + escapeHtml(g.notes) + "</div>"
             : "";
-          const ref = g.reference && g.reference.japanese
+          const refSentence =
+            g.reference && (g.reference.sentence || g.reference.japanese);
+          const ref = refSentence
             ? '<div class="grammar-item__refex">' +
               renderExample({
-                sentence: g.reference.japanese,
+                sentence: refSentence,
                 matches: g.reference.matches || [],
               }) +
               '<div class="grammar-item__reftr">' +

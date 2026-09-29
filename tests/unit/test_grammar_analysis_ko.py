@@ -1,12 +1,18 @@
 """Tests for the Korean grammar-analysis engine (Kiwi + kimchi-grammar data)."""
 
+import re
 import unicodedata
 
 import pytest
 
 pytest.importorskip("kiwipiepy")
 
-from lute.read.render.grammar_analysis_ko import _KO_RULES, analyze_korean
+from lute.read.render import grammar_analysis_ko as grammar_ko  # noqa: E402
+from lute.read.render.grammar_analysis_ko import (  # noqa: E402
+    _KO_RULES,
+    _get_pattern_rules,
+    analyze_korean,
+)
 from lute.read.render.grammar_analysis import is_korean_language
 
 
@@ -138,3 +144,116 @@ def test_is_korean_language_detects_korean():
 def test_handwritten_rules_are_loaded():
     "The hand-written rule set is populated."
     assert len(_KO_RULES) >= 10
+
+
+# ---- panel blocks (接续 / 参考例句 / 注意点) ---------------------------
+
+
+def _merged_rules():
+    "Pattern-derived rules for the rows merged from the study materials."
+    return [r for r in _get_pattern_rules() if r["key"].startswith("kgm_")]
+
+
+def _panel_entry(rule, display_lang):
+    "The panel entry for one rule, from a page made of its own reference."
+    sentence = rule["reference"]["korean"]
+    return next(
+        e
+        for e in analyze_korean(sentence, display_lang)
+        if e["key"] == rule["key"] or e["name"] == rule["pattern"]
+    )
+
+
+def test_merged_rules_carry_the_panel_blocks():
+    """
+    The rows merged from the private-book books carry a 接续 line
+    and translated examples; the merge used to drop both, which is why the
+    Korean panel showed a description where the Japanese one showed 接续 /
+    参考例句 / 注意点.
+    """
+    rules = _merged_rules()
+    assert rules, "expected merged pattern rules"
+    assert [r for r in rules if r["formation"]], "no 接续 line on any merged rule"
+    assert [r for r in rules if r["reference"]], "no curated example on any merged rule"
+    for rule in rules:
+        ref = rule["reference"]
+        if ref is None:
+            continue
+        assert ref["korean"], rule["key"]
+        assert ref["chinese"] or ref["english"], rule["key"]
+        # The token list was only needed to choose the example.
+        assert "tokens" not in ref, rule["key"]
+
+
+def test_every_reference_example_is_highlightable():
+    """
+    A rule's curated reference must be one of its own examples that the rule
+    actually matches -- not merely the first one in document order.  The
+    derivation only proves a spec matches the row's examples, not every one
+    of them, so choosing by order alone can quote a sentence the matcher
+    cannot mark.
+    """
+    rules = [r for r in _merged_rules() if r["reference"]]
+    assert rules, "expected merged rules with a curated example"
+    for rule in rules:
+        korean = rule["reference"]["korean"]
+        spans = grammar_ko._match_spans(rule, grammar_ko._tokens_for(korean), korean)
+        assert spans, f"{rule['key']} cannot highlight its own reference: {korean}"
+
+
+def test_panel_reference_carries_highlight_offsets():
+    """
+    The reference block ships the same {start, end} offsets the page examples
+    use, so the front-end highlights it with the one renderer it already has.
+    """
+    rule = next(r for r in _merged_rules() if r["reference"] and r["formation_notes"])
+    entry = _panel_entry(rule, "zh")
+    ref = entry["reference"]
+    assert ref["sentence"] == rule["reference"]["korean"]
+    assert ref["text"] == rule["reference"]["chinese"]
+    assert ref["matches"], f"{rule['key']} reference has no offsets"
+    for match in ref["matches"]:
+        assert 0 <= match["start"] < match["end"] <= len(ref["sentence"])
+
+
+def test_panel_entries_omit_empty_reference_fields():
+    "Hand-written rules carry no formation/reference: no empty fields emitted."
+    results = analyze_korean("저는 영화를 보고 있어요.")
+    assert results, "expected at least one hit"
+    for entry in results:
+        assert "formation" not in entry or entry["formation"]
+        assert "notes" not in entry or entry["notes"]
+        assert "reference" not in entry or entry["reference"]["sentence"]
+
+
+def test_chinese_panel_never_shows_untranslated_enrichment():
+    """
+    A Chinese panel must never print Korean or English under a Chinese
+    heading -- the bug the Japanese panel shipped.  The books state
+    ``formation`` in Korean and ``notes`` in English, so the wording lives in
+    grammar_ko_enrichment.json and an untranslated field is hidden instead.
+    """
+    rule = next(r for r in _merged_rules() if r["formation_notes"] and r["reference"])
+    entry = _panel_entry(rule, "zh")
+    assert re.search(r"[\u4e00-\u9fff]", entry["desc"]), entry["desc"]
+    assert entry["formation"] == grammar_ko._KO_ENRICH[rule["key"]]["formation"]
+    assert entry["notes"] == grammar_ko._KO_ENRICH[rule["key"]]["notes"]
+    assert re.search(r"[\u4e00-\u9fff]", entry["reference"]["text"])
+    for field in ("desc", "formation", "notes"):
+        assert not re.search(r"[A-Za-z]{3,}", entry[field]), f"{field}: {entry[field]}"
+    assert not re.search(r"[A-Za-z]{3,}", entry["reference"]["text"])
+
+
+def test_korean_panel_keeps_the_formation_but_hides_the_english_notes():
+    """
+    ``notes`` is English prose that quotes Korean words, so Hangul alone
+    cannot decide the language the way it does for the Japanese engine (whose
+    data holds no Korean at all) -- it is hidden in a 한국어 panel, while the
+    Korean 接续 line stays.  The reference block is hidden too: its sentence
+    is Korean already, so there is no translation to add.
+    """
+    rule = next(r for r in _merged_rules() if r["formation_notes"])
+    entry = _panel_entry(rule, "ko")
+    assert entry["formation"] == rule["formation"]
+    assert "notes" not in entry
+    assert "reference" not in entry
