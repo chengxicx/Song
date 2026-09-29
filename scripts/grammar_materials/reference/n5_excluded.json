@@ -1,0 +1,3393 @@
+[
+ {
+  "pattern": "名",
+  "level": "N5",
+  "formation": "名词，普通体现在时肯定式（「だ/です」的省略形式）",
+  "meaning_zh": "名词句的简体肯定形式，表示疑问时读升调",
+  "examples": [
+   {
+    "japanese": "A「これはなに?」 B「それはデジカメ。」",
+    "chinese": "A\"这是什么?\" B\"那是数码相机。\""
+   },
+   {
+    "japanese": "A「あれはだれの傘?」 B「私の傘。」",
+    "chinese": "A\"那是谁的雨伞?\" B\"我的雨伞。\""
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～だ",
+  "level": "N5",
+  "formation": "普通体现在时肯定式",
+  "meaning_zh": "\"是......\"",
+  "examples": [
+   {
+    "japanese": "今日は八日だ。",
+    "chinese": "今天是八号。"
+   },
+   {
+    "japanese": "今日は日曜日だから、休む。",
+    "chinese": "因为今天是星期天,所以我休息。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～ではない",
+  "level": "N5",
+  "formation": "普通体现在时否定式",
+  "meaning_zh": "\"不是......\"",
+  "examples": [
+   {
+    "japanese": "これ、あなたのものじゃない。ぼくのだ。",
+    "chinese": "这不是你的东西,是我的。"
+   },
+   {
+    "japanese": "休みではない日は毎日働く。",
+    "chinese": "不是休息天的日子里天天上班。"
+   },
+   {
+    "japanese": "あの人は中国人ではなく、韓国人です。",
+    "chinese": "那个人不是中国人,那个人是韩国人。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～だった",
+  "level": "N5",
+  "formation": "普通体过去时肯定式",
+  "meaning_zh": "\"(过去)是......\"",
+  "examples": [
+   {
+    "japanese": "昨日は七日だった。",
+    "chinese": "昨天是七号。"
+   },
+   {
+    "japanese": "昨日は雨だったので、どこへも行かなかった。",
+    "chinese": "因为昨天下雨,所以我哪儿也没去。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～ではなかった",
+  "level": "N5",
+  "formation": "普通体过去时否定式",
+  "meaning_zh": "\"(过去)不是......\"",
+  "examples": [
+   {
+    "japanese": "昨日は八日ではなかった。",
+    "chinese": "昨天不是八号。"
+   },
+   {
+    "japanese": "その時、ここは町じゃなかったので、静かだった。",
+    "chinese": "那时候这一带不是城镇,所以很安静。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～です",
+  "level": "N5",
+  "formation": "礼貌体现在时肯定式",
+  "meaning_zh": "\"是......\"",
+  "examples": [
+   {
+    "japanese": "今日は八日です。",
+    "chinese": "今天是八号。"
+   },
+   {
+    "japanese": "今は午前8時です。",
+    "chinese": "现在是上午8点。"
+   },
+   {
+    "japanese": "明日は休みの日ですから、出かけます。",
+    "chinese": "因为明天是休息天,所以我要出门。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～ではないです/ではありません",
+  "level": "N5",
+  "formation": "礼貌体现在时否定式",
+  "meaning_zh": "\"不是......\"",
+  "examples": [
+   {
+    "japanese": "今日は七日ではありません。",
+    "chinese": "今天不是七号。"
+   },
+   {
+    "japanese": "山田さんは社長じゃありません。部長です。",
+    "chinese": "山田不是社长,是部长。"
+   },
+   {
+    "japanese": "明日は休みの日じゃないですから、働きます。",
+    "chinese": "明天不是休息天,所以要上班。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～でした",
+  "level": "N5",
+  "formation": "礼貌体过去时肯定式",
+  "meaning_zh": "\"(过去)是......\"",
+  "examples": [
+   {
+    "japanese": "昨日までは夏休みでした。",
+    "chinese": "到昨天为止是暑假期间。"
+   },
+   {
+    "japanese": "去年の今は彼は課長でした。",
+    "chinese": "去年这时候他是科长。"
+   },
+   {
+    "japanese": "昨日は雨でしたから、どこへも行きませんでした。",
+    "chinese": "昨天下雨,所以我哪儿也没去。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～ではなかったです/ではありませんでした",
+  "level": "N5",
+  "formation": "礼貌体过去时否定式",
+  "meaning_zh": "\"(过去)不是......\"",
+  "examples": [
+   {
+    "japanese": "昨日は七日ではありませんでした。",
+    "chinese": "昨天不是七号。"
+   },
+   {
+    "japanese": "その時、父は警官じゃありませんでした。",
+    "chinese": "那时候我父亲还不是警察。"
+   },
+   {
+    "japanese": "昔、ここは町じゃなかったですから、静かでした。",
+    "chinese": "从前,这里还不是城镇,所以很安静。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～の",
+  "level": "N5",
+  "formation": "名词+の",
+  "meaning_zh": "\"......的\"",
+  "examples": [
+   {
+    "japanese": "これは先生の本です。",
+    "chinese": "这是老师的书。"
+   },
+   {
+    "japanese": "下の子は女の子です。",
+    "chinese": "我家最小的孩子是个女孩。"
+   },
+   {
+    "japanese": "このかさはわたしのです。",
+    "chinese": "这把雨伞是我的。"
+   }
+  ],
+  "notes": "表示限定、修饰、所属等。",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～で",
+  "level": "N5",
+  "formation": "断定句的中顿",
+  "meaning_zh": "\"是......\"",
+  "examples": [
+   {
+    "japanese": "今日は三日で、雨でした。",
+    "chinese": "今天是三号,有雨。"
+   },
+   {
+    "japanese": "これは「さしみ」で、おいしいです。",
+    "chinese": "这个是\"生鱼片\",很好吃。"
+   },
+   {
+    "japanese": "山田さんは日本人で、東京から来ました。",
+    "chinese": "山田是日本人,从东京过来的。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～な",
+  "level": "N5",
+  "formation": "后续部分助词",
+  "meaning_zh": "后续部分助词（ので/のだ等）",
+  "examples": [
+   {
+    "japanese": "今日は日曜日なので、会社は休みます。",
+    "chinese": "因为今天是星期天,所以公司休息。"
+   },
+   {
+    "japanese": "A「何の病気ですか。」 B「風邪なのです。」",
+    "chinese": "A\"是什么病?\" B\"是感冒。\""
+   },
+   {
+    "japanese": "A「どうして会社へ行かないの?」 B「今日は休みなの。」",
+    "chinese": "A\"为什么不去上班?\" B\"因为今天公司休息。\""
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～だろう",
+  "level": "N5",
+  "formation": "普通体",
+  "meaning_zh": "\"......吧\"",
+  "examples": [
+   {
+    "japanese": "あの人は髪が長いが、たぶん男の人だろう。",
+    "chinese": "虽然那个人留着长发,但可能是个男的。"
+   },
+   {
+    "japanese": "山田さんの娘さんはたぶん二十歳ぐらいだろう。",
+    "chinese": "山田的女儿大概是二十岁左右吧。"
+   }
+  ],
+  "notes": "表示推测。",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "名～でしょう",
+  "level": "N5",
+  "formation": "礼貌体",
+  "meaning_zh": "\"......吧\"",
+  "examples": [
+   {
+    "japanese": "あの人は髪が長いですが、たぶん男の人でしょう。",
+    "chinese": "虽然那个人留着长发,但可能是个男的。"
+   },
+   {
+    "japanese": "山田さんの娘さんはたぶん二十歳ぐらいでしょう。",
+    "chinese": "山田的女儿大概是二十岁左右吧。"
+   }
+  ],
+  "notes": "表示推测。",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形词干",
+  "level": "N5",
+  "formation": "普通体现在时肯定式（「だ/です」的省略形式）",
+  "meaning_zh": "ナ形容词词干直接结句，表示疑问时读升调",
+  "examples": [
+   {
+    "japanese": "ここはとても便利。",
+    "chinese": "这儿很方便。"
+   },
+   {
+    "japanese": "この川の水、とてもきれい。",
+    "chinese": "这条河的水很干净。"
+   },
+   {
+    "japanese": "A「一人で大丈夫?」 B「ええ。大丈夫よ。」",
+    "chinese": "A\"你一个人行吗?\" B\"行,没问题。\""
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～だ",
+  "level": "N5",
+  "formation": "普通体现在时肯定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "この部屋は静かだ。",
+    "chinese": "这个屋子很安静。"
+   },
+   {
+    "japanese": "父はとても元気だから、まだ働いています。",
+    "chinese": "父亲身体很好,所以还在上班。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～ではない",
+  "level": "N5",
+  "formation": "普通体现在时否定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "おばあさんはあまり元気じゃない。",
+    "chinese": "我奶奶身体不太好。"
+   },
+   {
+    "japanese": "この水はきれいじゃないから、飲んではいけません。",
+    "chinese": "这水不干净,所以不可以饮用。"
+   },
+   {
+    "japanese": "あの人は日本語が上手ではなく、とても下手です。",
+    "chinese": "那个人不擅长日语,日语说得很烂。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～だった",
+  "level": "N5",
+  "formation": "普通体过去时肯定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "あの人は元気だった。",
+    "chinese": "他以前身体很好。"
+   },
+   {
+    "japanese": "昔、この川の水がきれいだったので、使う人が多かった。",
+    "chinese": "从前这条河的水很干净,所以用的人很多。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～ではなかった",
+  "level": "N5",
+  "formation": "普通体过去时否定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "あの人は元気ではなかった。",
+    "chinese": "他以前体弱多病。"
+   },
+   {
+    "japanese": "昔、この川の水がきれいじゃなかったので、使う人が少なかった。",
+    "chinese": "从前这条河的水不干净,所以用的人很少。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～です",
+  "level": "N5",
+  "formation": "礼貌体现在时肯定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "この公園は静かです。",
+    "chinese": "这公园很安静。"
+   },
+   {
+    "japanese": "このかばんは丈夫ですから、これにしましょう。",
+    "chinese": "这种皮包很结实,所以就买这种吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～ではないです/ではありません",
+  "level": "N5",
+  "formation": "礼貌体现在时否定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "わたしの部屋はきれいじゃないです。",
+    "chinese": "我的房间不干净。"
+   },
+   {
+    "japanese": "その公園は静かじゃありません。",
+    "chinese": "那个公园不安静。"
+   },
+   {
+    "japanese": "その水はきれいではありませんから、飲んではいけません。",
+    "chinese": "那水不干净,所以不可以饮用。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～でした",
+  "level": "N5",
+  "formation": "礼貌体过去时肯定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "ここはとても便利でした。",
+    "chinese": "这儿以前很方便。"
+   },
+   {
+    "japanese": "今まではおじいさんは元気でしたけど......。",
+    "chinese": "至今为止爷爷他很健康,可是......"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～ではなかったです/ではありませんでした",
+  "level": "N5",
+  "formation": "礼貌体过去时否定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "あの人は元気じゃありませんでした。",
+    "chinese": "他以前体弱多病。"
+   },
+   {
+    "japanese": "あの辺は便利ではありませんでしたね。",
+    "chinese": "从前,那一带不方便呢。"
+   },
+   {
+    "japanese": "子どものとき、野菜が好きじゃなかったです。",
+    "chinese": "小时候我不喜欢吃蔬菜。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～な",
+  "level": "N5",
+  "formation": "后续名词或部分助词",
+  "meaning_zh": "用于限定",
+  "examples": [
+   {
+    "japanese": "うちにとても元気なおじいさんがいます。",
+    "chinese": "家里有一位身体十分健康的爷爷。"
+   },
+   {
+    "japanese": "そこは静かで、きれいなのです。",
+    "chinese": "那一带又安静,景色又很美,所以我很喜欢。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～で",
+  "level": "N5",
+  "formation": "连用形（中顿）",
+  "meaning_zh": "1.并列。\"既......又......\"。2.原因。\"因为......所以......\"",
+  "examples": [
+   {
+    "japanese": "ここは静かで、便利です。",
+    "chinese": "这一带既安静又便利。"
+   },
+   {
+    "japanese": "この部屋はきれいで、広いです。",
+    "chinese": "这房间既干净又宽敞。"
+   },
+   {
+    "japanese": "おじいさんはにぎやかで、おもしろい人です。",
+    "chinese": "我爷爷是个既开朗又很风趣的人。"
+   },
+   {
+    "japanese": "A社の機械は複雑でよく分かりませんが、B社の機械は簡単でよく分かります。",
+    "chinese": "A公司生产的机器构造很复杂,所以不好懂。而B公司生产的机器构造简单,所以很好懂。"
+   },
+   {
+    "japanese": "昔、ここは不便で、たいへんでしたが、今は便利で、好きです。",
+    "chinese": "从前这一带不方便,所以很够呛。但是现在很便利,所以我很喜欢。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～に",
+  "level": "N5",
+  "formation": "后续动词",
+  "meaning_zh": "表示状态。\"......地\"",
+  "examples": [
+   {
+    "japanese": "静かに話します。",
+    "chinese": "悄悄地说话。"
+   },
+   {
+    "japanese": "A「この辞書をどうぞ。」 B「どうもありがとう。大切に使います。」",
+    "chinese": "A\"这本词典给你用吧。\" B\"谢谢。我一定会爱惜的。\""
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～だろう",
+  "level": "N5",
+  "formation": "普通体",
+  "meaning_zh": "\"......吧\"",
+  "examples": [
+   {
+    "japanese": "明日のパーティーはきっとにぎやかだろう。",
+    "chinese": "明天的派对肯定很热闹吧。"
+   },
+   {
+    "japanese": "行く人が少ないところだから、たぶん静かだろう。",
+    "chinese": "因为去的人不多,所以估计那里很安静吧。"
+   }
+  ],
+  "notes": "表示推测。",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "ナ形～でしょう",
+  "level": "N5",
+  "formation": "礼貌体",
+  "meaning_zh": "\"......吧\"",
+  "examples": [
+   {
+    "japanese": "あそこは便利でしょう。",
+    "chinese": "那里大概比较方便吧。"
+   },
+   {
+    "japanese": "行く人が少ないところですから、たぶん静かでしょう。",
+    "chinese": "因为去的人不多,所以估计那里很安静吧。"
+   }
+  ],
+  "notes": "表示推测。",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形",
+  "level": "N5",
+  "formation": "普通体现在时肯定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "A「その本はおもしろい?」 B「ええ、とてもおもしろい。」",
+    "chinese": "A\"那本书好看吗?\" B\"是的,很好看。\""
+   },
+   {
+    "japanese": "とてもおいしい料理を食べた。",
+    "chinese": "品尝了美味佳肴。"
+   },
+   {
+    "japanese": "とても高いから、買わなかった。",
+    "chinese": "因为价钱太贵,所以没买。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～くない",
+  "level": "N5",
+  "formation": "普通体现在时否定式",
+  "meaning_zh": "\"不......\"",
+  "examples": [
+   {
+    "japanese": "その部屋は広くない。",
+    "chinese": "那个屋子不大。"
+   },
+   {
+    "japanese": "部屋は広くないので、安いです。",
+    "chinese": "因为屋子不大,所以租金便宜。"
+   },
+   {
+    "japanese": "部屋は広くなく(=広くなくて)、狭いです。",
+    "chinese": "房间不大,很窄。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～かった",
+  "level": "N5",
+  "formation": "普通体过去时肯定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "昨日は暖かかった。",
+    "chinese": "昨天很暖和。"
+   },
+   {
+    "japanese": "先週の試験は難しかったから、よくできなかった。",
+    "chinese": "上周的考试题目很难,所以我的成绩不理想。"
+   },
+   {
+    "japanese": "この雑誌はつまらなかった。",
+    "chinese": "这本杂志很无聊。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～くなかった",
+  "level": "N5",
+  "formation": "普通体过去时否定式",
+  "meaning_zh": "\"不......\"",
+  "examples": [
+   {
+    "japanese": "昨日は暑くなかった。",
+    "chinese": "昨天不热。"
+   },
+   {
+    "japanese": "昨日は、寒くなかった。",
+    "chinese": "昨天不冷。"
+   },
+   {
+    "japanese": "今週の試験は難しくなかったから、よくできた。",
+    "chinese": "本周的考试题目不难,所以我考得不错。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～です",
+  "level": "N5",
+  "formation": "礼貌体现在时肯定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "春は暖かいです。秋は涼しいです。",
+    "chinese": "春暖秋凉。"
+   },
+   {
+    "japanese": "仕事が忙しいですが、楽しいです。",
+    "chinese": "虽然工作繁忙,但很快乐。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～くないです/くありません",
+  "level": "N5",
+  "formation": "礼貌体现在时否定式",
+  "meaning_zh": "\"不......\"",
+  "examples": [
+   {
+    "japanese": "今日はあまり寒くないです。",
+    "chinese": "今天不太冷。"
+   },
+   {
+    "japanese": "今の部屋は広くありませんが、安いです。",
+    "chinese": "虽然现在这个房间不宽敞,但房租便宜。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～かったです",
+  "level": "N5",
+  "formation": "礼貌体过去时肯定式",
+  "meaning_zh": "用于对状态的说明",
+  "examples": [
+   {
+    "japanese": "昨日は暖かかったです。",
+    "chinese": "昨天很暖和。"
+   },
+   {
+    "japanese": "午前の試験は難しかったです。",
+    "chinese": "上午的考试很难。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～くなかったです/くありませんでした",
+  "level": "N5",
+  "formation": "礼貌体过去时否定式",
+  "meaning_zh": "\"不......\"",
+  "examples": [
+   {
+    "japanese": "今週の試験は難しくなかったですから、よくできました。",
+    "chinese": "本周的考试题目不难,所以我考得不错。"
+   },
+   {
+    "japanese": "中学校のとき、成績があまりよくなかったです。",
+    "chinese": "上中学的时候,成绩不太理想。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～名词",
+  "level": "N5",
+  "formation": "作定语",
+  "meaning_zh": "用于修饰名词",
+  "examples": [
+   {
+    "japanese": "これはおもしろい本です。",
+    "chinese": "这是一本很有趣的书。"
+   },
+   {
+    "japanese": "高い物は買いません。",
+    "chinese": "不买价钱贵的东西。"
+   },
+   {
+    "japanese": "おいしい料理を食べます。",
+    "chinese": "吃好吃的菜。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～く",
+  "level": "N5",
+  "formation": "后续动词",
+  "meaning_zh": "表示状态。\"......地\"",
+  "examples": [
+   {
+    "japanese": "けさは遅く起きました。",
+    "chinese": "今天早上我很晚才起床。"
+   },
+   {
+    "japanese": "疲れたので、いつもより早く寝ました。",
+    "chinese": "因为有点累,所以比平时睡得早。"
+   },
+   {
+    "japanese": "髪はもっと短く切ってください。",
+    "chinese": "头发请再剪短一些。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～くて",
+  "level": "N5",
+  "formation": "连用形",
+  "meaning_zh": "1.并列。\"既......又......\"。2.原因。\"因为......所以......\"",
+  "examples": [
+   {
+    "japanese": "おいしくて安い料理を食べたいです。",
+    "chinese": "想吃味道好又便宜的菜。"
+   },
+   {
+    "japanese": "厚くて丈夫な紙がほしいです。",
+    "chinese": "想要又厚又结实的纸张。"
+   },
+   {
+    "japanese": "遠くて不便な所に住んでいます。",
+    "chinese": "我住在又远,交通又不方便的地方。"
+   },
+   {
+    "japanese": "物がよくて、大好きです。",
+    "chinese": "因为东西质量好,所以我很喜欢。"
+   },
+   {
+    "japanese": "天気が悪くて、外でスポーツができません。",
+    "chinese": "因为天气不好,所以无法在户外运动。"
+   },
+   {
+    "japanese": "部屋には人が多くて、暑いです。",
+    "chinese": "因为房间里有很多人,所以很热。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～だろう",
+  "level": "N5",
+  "formation": "普通体",
+  "meaning_zh": "\"......吧\"",
+  "examples": [
+   {
+    "japanese": "その映画はたぶんおもしろいだろう。",
+    "chinese": "那部电影大概很好看吧。"
+   },
+   {
+    "japanese": "山田さんもこの本がほしいだろう。",
+    "chinese": "山田大概也想要这本书吧。"
+   },
+   {
+    "japanese": "それよりこのほうがよいだろう。",
+    "chinese": "比起那个还是这个好一些吧。"
+   }
+  ],
+  "notes": "表示推测。",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "イ形～でしょう",
+  "level": "N5",
+  "formation": "礼貌体",
+  "meaning_zh": "\"......吧\"",
+  "examples": [
+   {
+    "japanese": "その映画はたぶんおもしろいでしょう。",
+    "chinese": "那部电影大概很好看吧。"
+   },
+   {
+    "japanese": "山田さんもこの本がほしいでしょう。",
+    "chinese": "山田大概也想要这本书吧。"
+   },
+   {
+    "japanese": "それよりこのほうがよいでしょう。",
+    "chinese": "比起那个还是这个好一些吧。"
+   }
+  ],
+  "notes": "表示推测。",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动",
+  "level": "N5",
+  "formation": "普通体现在时肯定式",
+  "meaning_zh": "动词简体现在时肯定形式，表示疑问时读升调",
+  "examples": [
+   {
+    "japanese": "A「これからどこへ行く?」 B「買い物に行く。」",
+    "chinese": "A\"接下来上哪儿去?\" B\"去买东西。\""
+   },
+   {
+    "japanese": "春に雨が降る日が多い。",
+    "chinese": "春天下雨的日子比较多。"
+   },
+   {
+    "japanese": "明日から旅行するから、うちにいない。",
+    "chinese": "明天开始去旅游,所以不在家。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动～ない",
+  "level": "N5",
+  "formation": "普通体现在时否定式",
+  "meaning_zh": "\"不......\"",
+  "examples": [
+   {
+    "japanese": "A「あなたはテレビを見ない?」 B「いいえ、ときどき見るよ。」",
+    "chinese": "A\"你不看电视吗?\" B\"不,有时看一点。\""
+   },
+   {
+    "japanese": "テレビを見ない人が少ないだろう。",
+    "chinese": "从不看电视的人很少吧。"
+   },
+   {
+    "japanese": "テレビは見ないが、新聞は読む。",
+    "chinese": "我虽然不看电视,但是报纸是看的。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动～た",
+  "level": "N5",
+  "formation": "普通体过去时肯定式",
+  "meaning_zh": "表示过去、完了的事情；也可后续名词表示状态或假定完了",
+  "examples": [
+   {
+    "japanese": "今日、花子さんは花を買った。",
+    "chinese": "花子今天买了鲜花。"
+   },
+   {
+    "japanese": "午前9時ごろ東京に着いた。",
+    "chinese": "上午9点左右到达了东京。"
+   },
+   {
+    "japanese": "そのとき、うちにいた。",
+    "chinese": "当时我在家里。"
+   },
+   {
+    "japanese": "山田さんはもう帰った。",
+    "chinese": "山田已经回家了。"
+   },
+   {
+    "japanese": "仕事はいま終わった。",
+    "chinese": "工作刚结束。"
+   },
+   {
+    "japanese": "その事は母に言った。",
+    "chinese": "那件事情我跟妈妈说过了。"
+   },
+   {
+    "japanese": "あのメガネをかけた人(=かけている人)は私たちの先生です。",
+    "chinese": "那位戴着眼镜的人是我们的老师。"
+   },
+   {
+    "japanese": "あのスカートを穿いた人(=穿いている人)は先生の娘さんです。",
+    "chinese": "那位穿着裙子的人是老师的女儿。"
+   },
+   {
+    "japanese": "花が咲いた日(=咲いている日)に花見に行きます。",
+    "chinese": "鲜花盛开的日子里去赏花。"
+   },
+   {
+    "japanese": "そろそろ試験を始めましょう。先に書き終わった人は教室を出よ。",
+    "chinese": "接下来开始考试。先做完的人可以离开教室。"
+   },
+   {
+    "japanese": "パソコンは日本に行ったとき、買いましょう。",
+    "chinese": "电脑还是在去了日本之后再买吧。"
+   },
+   {
+    "japanese": "今は忙しいです。仕事が終わったあとで、ゆっくり話しましょう。",
+    "chinese": "我现在很忙,等工作做完了我们再慢慢聊吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动～なかった",
+  "level": "N5",
+  "formation": "普通体过去时否定式",
+  "meaning_zh": "\"没有......\"",
+  "examples": [
+   {
+    "japanese": "けさ、父はご飯を食べなかった。",
+    "chinese": "爸爸今天早上没吃早饭。"
+   },
+   {
+    "japanese": "けさ、ご飯を食べなかった人は父だ。",
+    "chinese": "今天早上没吃早饭的是爸爸。"
+   },
+   {
+    "japanese": "うちでご飯を食べなかったが、外で食べた。",
+    "chinese": "虽然没有在家里吃饭,但是在外面吃了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动～ます",
+  "level": "N5",
+  "formation": "礼貌体现在时肯定式",
+  "meaning_zh": "动词礼貌体现在时肯定形式",
+  "examples": [
+   {
+    "japanese": "お風呂に入ってから寝ます。",
+    "chinese": "洗完澡后睡觉。"
+   },
+   {
+    "japanese": "まだ時間がありますから、ゆっくり歩きましょう。",
+    "chinese": "因为还有时间,所以我们走慢一点吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动～ません",
+  "level": "N5",
+  "formation": "礼貌体现在时否定式",
+  "meaning_zh": "\"不......\"",
+  "examples": [
+   {
+    "japanese": "仕事のやりかたがわかりません。",
+    "chinese": "不懂工作方法。"
+   },
+   {
+    "japanese": "時間がありませんから、タクシーで行きましょう。",
+    "chinese": "没时间了,我们坐出租车去吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动～ました",
+  "level": "N5",
+  "formation": "礼貌体过去时肯定式",
+  "meaning_zh": "动词礼貌体过去时肯定形式",
+  "examples": [
+   {
+    "japanese": "鈴木さんは掃除をしました。",
+    "chinese": "铃木打扫了(房间)。"
+   },
+   {
+    "japanese": "午前はうちにいましたが、午後は出かけました。",
+    "chinese": "上午在家,不过下午出门了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动～ませんでした",
+  "level": "N5",
+  "formation": "礼貌体过去时否定式",
+  "meaning_zh": "\"没有......\"",
+  "examples": [
+   {
+    "japanese": "誕生日に両親から何ももらいませんでした。",
+    "chinese": "我生日那天父母没有送我任何礼物。"
+   },
+   {
+    "japanese": "けさ、何も食べませんでしたから、今、おなかが空いています。",
+    "chinese": "今天早上我什么也没吃,所以现在肚子饿了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动～名词",
+  "level": "N5",
+  "formation": "作定语",
+  "meaning_zh": "用于修饰名词",
+  "examples": [
+   {
+    "japanese": "春に雨が降る日が多いです。",
+    "chinese": "春天里下雨的日子多。"
+   },
+   {
+    "japanese": "旅行に行く人は何人ですか。",
+    "chinese": "去旅行的人有几个?"
+   },
+   {
+    "japanese": "住むところがないです。",
+    "chinese": "没地方住。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动～连用形",
+  "level": "N5",
+  "formation": "动词连用形",
+  "meaning_zh": "1.后续助词等成分。2.中顿。",
+  "examples": [
+   {
+    "japanese": "音楽を聞きながら、宿題をします。",
+    "chinese": "边听音乐边做作业。"
+   },
+   {
+    "japanese": "私はすぐ帰りたいです。",
+    "chinese": "我想马上回去。"
+   },
+   {
+    "japanese": "仕事のやりかたがわかりません。",
+    "chinese": "不懂工作方法。"
+   },
+   {
+    "japanese": "早く行き(=行って)、早く帰ります。",
+    "chinese": "快去快回。"
+   },
+   {
+    "japanese": "妹がピアノを弾き(=弾いて)、姉が歌を歌います。",
+    "chinese": "妹妹弹琴,姐姐唱歌。"
+   },
+   {
+    "japanese": "起き(=起きて)、顔を洗い(=洗って)、ご飯を食べました。",
+    "chinese": "起床,洗脸,然后吃饭。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "动～て",
+  "level": "N5",
+  "formation": "动词て形",
+  "meaning_zh": "1.中顿。2.动作的相继发生。3.手段、方法、材料等。4.状态。5.原因、理由。",
+  "examples": [
+   {
+    "japanese": "私は早く寝て、早く起きます。",
+    "chinese": "我早睡早起。"
+   },
+   {
+    "japanese": "妹がピアノを弾いて、姉が歌を歌います。",
+    "chinese": "妹妹弹琴,姐姐唱歌。"
+   },
+   {
+    "japanese": "背広を着て、ネクタイをした人は山田課長です。",
+    "chinese": "穿着西服,系着领带的人是山田科长。"
+   },
+   {
+    "japanese": "朝起きて、新聞を読みます。",
+    "chinese": "早上起床后看报。"
+   },
+   {
+    "japanese": "食事をして、家内と散歩します。",
+    "chinese": "吃完饭后和妻子一起散步。"
+   },
+   {
+    "japanese": "駅までは歩いて行きますか、自転車に乗って行きますか。",
+    "chinese": "步行到车站还是骑自行车到车站?"
+   },
+   {
+    "japanese": "辞書を見て漢字を覚えます。",
+    "chinese": "查字典记汉字。"
+   },
+   {
+    "japanese": "木を使って机を作ります。",
+    "chinese": "用木材制作书桌。"
+   },
+   {
+    "japanese": "山へは帽子を被って行きましょう。",
+    "chinese": "戴着帽子去登山吧。"
+   },
+   {
+    "japanese": "靴を履いて外に出ます。",
+    "chinese": "穿着鞋子出门。"
+   },
+   {
+    "japanese": "昨日は風邪を引いて、学校を休みました。",
+    "chinese": "昨天因为感冒,所以没能去学校。"
+   },
+   {
+    "japanese": "雨が降って、サッカーはできませんでした。",
+    "chinese": "因为下雨,所以没能踢成足球。"
+   },
+   {
+    "japanese": "A「遅くなってごめんなさい。」 B「どういたしまして。」",
+    "chinese": "A\"我来晚了,真对不起。\" B\"没事。\""
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "conjugation"
+ },
+ {
+  "pattern": "が",
+  "level": "N5",
+  "formation": "句子+が",
+  "meaning_zh": "1.对比并转折。2.逆接,表示相反、遗憾、异常等心情。3.引言,为后句作铺垫。4.欲言又止,委婉含蓄。",
+  "examples": [
+   {
+    "japanese": "兄は大学生ですが、私はまだ中学生です。",
+    "chinese": "哥哥是大学生,但我还是中学生。"
+   },
+   {
+    "japanese": "母は背が高くないですが、父は高いです。",
+    "chinese": "虽然母亲个子不高,但父亲个子高。"
+   },
+   {
+    "japanese": "今日は郵便局へ行きましたが、銀行へは行きませんでした。",
+    "chinese": "我今天去了邮局,但没有去银行。"
+   },
+   {
+    "japanese": "病気ですが、仕事をしています。",
+    "chinese": "虽然生病了,但还在上班。"
+   },
+   {
+    "japanese": "薬は飲みましたが、病気はよくなっていません。",
+    "chinese": "药是喝了,可病还没有好。"
+   },
+   {
+    "japanese": "雨が降っていますが、彼は傘を持たないで出ました。",
+    "chinese": "尽管外面下着雨,可他没带伞就出去了。"
+   },
+   {
+    "japanese": "すみませんが、あなたはどちらさまですか。",
+    "chinese": "请问,您是哪位?"
+   },
+   {
+    "japanese": "もしもし、山本ですが、木下さんはいますか。",
+    "chinese": "喂,我是山本,木下小姐在吗?"
+   },
+   {
+    "japanese": "ここがちょっと分かりませんが、教えてくださいませんか。",
+    "chinese": "我这里有点搞不懂,您教我好吗?"
+   },
+   {
+    "japanese": "A「いっしょに飲みに行きませんか。」 B「今はちょっと忙しいですが......。」",
+    "chinese": "A\"我们一起去喝一杯怎么样?\" B\"我现在有点忙......\""
+   },
+   {
+    "japanese": "A「ちょっと聞きたいことがありますが......。」 B「はい、何ですか。」",
+    "chinese": "A\"有件事情我想跟您打听一下......\" B\"好的。请问你有什么事?\""
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "が",
+  "level": "N5",
+  "formation": "名+が",
+  "meaning_zh": "1.新信息作主语。2.定语句中的小主语。3.疑问词主语。4.拥有、愿望、能力等的对象语。5.大主题中的小主语。6.动作主体。",
+  "examples": [
+   {
+    "japanese": "春が来ました。花が咲いています。鳥が鳴いています。",
+    "chinese": "春天来了,鲜花开 了,小鸟歌唱。"
+   },
+   {
+    "japanese": "背が高いです。足が長いです。耳が大きいです。",
+    "chinese": "个子高,腿长,耳朵大。"
+   },
+   {
+    "japanese": "この川には魚が多いです(=たくさんいます)。",
+    "chinese": "这条河里有很多鱼。"
+   },
+   {
+    "japanese": "わたしが休みの日に来てください。",
+    "chinese": "在我休息的时候过来吧。"
+   },
+   {
+    "japanese": "あの目がきれいな方はどなたですか。",
+    "chinese": "那位长着一双漂亮眼睛的人是谁?"
+   },
+   {
+    "japanese": "あの背が高い人は山田さんです。",
+    "chinese": "那个高个子是山田。"
+   },
+   {
+    "japanese": "友だちが作った料理を食べました。",
+    "chinese": "我吃了朋友做的饭菜。"
+   },
+   {
+    "japanese": "A「どれがあなたの本ですか。」 B「これがわたしの本です(=これです)。」",
+    "chinese": "A\"哪本是你的书?\" B\"这是我的书。\""
+   },
+   {
+    "japanese": "A「パーティーで、だれがギターを弾きましたか。」 B「山田さんが弾きました(=山田さんです)。」",
+    "chinese": "A\"在派对上,是谁弹的吉他?\" B\"是山田弹的吉他。\""
+   },
+   {
+    "japanese": "彼女は車がありません。",
+    "chinese": "她没有车。"
+   },
+   {
+    "japanese": "あのビルにはエレベーターがあります。",
+    "chinese": "那栋大楼里有电梯。"
+   },
+   {
+    "japanese": "姉は英語が上手です。",
+    "chinese": "我姐姐英语说得很好。"
+   },
+   {
+    "japanese": "わたしはピアノがほしいです。",
+    "chinese": "我想要钢琴。"
+   },
+   {
+    "japanese": "父も料理ができます。",
+    "chinese": "我父亲也会做饭烧菜。"
+   },
+   {
+    "japanese": "その動物は体が大きいです。",
+    "chinese": "那个动物体形高大。"
+   },
+   {
+    "japanese": "その辺は店が多いです。",
+    "chinese": "那一带商店很多。"
+   },
+   {
+    "japanese": "その荷物はわたしが持ちましょう。",
+    "chinese": "那个行李由我来拿吧。"
+   },
+   {
+    "japanese": "トイレの掃除はいつもわたしがします。",
+    "chinese": "厕所的清扫总是由我来干。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "の",
+  "level": "N5",
+  "formation": "名「な」/ナ「な」/イ「辞」/动「辞」/助动词「た」+の",
+  "meaning_zh": "......吗；（用于解释说明、交代原因）是......",
+  "examples": [
+   {
+    "japanese": "A「パーティーはあさっての晩なの?」 B「ええ。」",
+    "chinese": "派对是后天晚上吗? 是的。"
+   },
+   {
+    "japanese": "A「きらいだなあ、あんな人。」 B「おとうさん、だれが嫌いなの?」",
+    "chinese": "那种人真讨厌。 我说老头子,你讨厌谁呀?"
+   },
+   {
+    "japanese": "A「ああ、からかった、からかった。」 B「何がそんなにからいの?」",
+    "chinese": "哎呀,辣死我了,辣死我了。 什么菜有那么辣?"
+   },
+   {
+    "japanese": "A「さっき、どこへ行ったの?」 B「ちょっとスーパーへ行って来た。」",
+    "chinese": "刚才你上哪儿去了? 去逛了一会儿超市。"
+   },
+   {
+    "japanese": "A「パーティーはいつ?」 B「金曜日なの。」",
+    "chinese": "派对是什么时候举办? 是星期五。"
+   },
+   {
+    "japanese": "A「新しい所はどうですか。」 B「そこはとても静かなのよ。」",
+    "chinese": "新的住所怎么样? 那一带确实很安静。"
+   },
+   {
+    "japanese": "A「あ、山田さん、いいセーターを着ていますね。」 B「あ、昨日買ったの。」",
+    "chinese": "哟,山田小姐,你这毛衣真好看啊。 啊,这是昨天买的。"
+   },
+   {
+    "japanese": "A「なぜ会社へ行かないの?」 B「今日は会社が休みなの(=休みだからです)。」",
+    "chinese": "为什么不上班? 因为今天公司休息。"
+   },
+   {
+    "japanese": "A「どうしてその仕事をしたくない?」 B「いやなの(=いやだからです)。」",
+    "chinese": "为什么你不想干那份工作? 因为不喜欢。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "の",
+  "level": "N5",
+  "formation": "名/ナ「な」+の；イ「辞」/动「辞」+の；助动词「た」+の",
+  "meaning_zh": "名词的代用（代替前面已经出现过的物品或事物）",
+  "examples": [
+   {
+    "japanese": "この新聞はおとといの(=おとといのもの)だから、もう要りません。",
+    "chinese": "这份报纸是前天的,所以不要了。"
+   },
+   {
+    "japanese": "この町でいちばんにぎやかなの(=ところ)はこの辺です。",
+    "chinese": "在这个镇上,最繁华的是这一带。"
+   },
+   {
+    "japanese": "A「花瓶はどれがいいですか。」 B「そうですね。あの白いの(=もの)はどうですか。」",
+    "chinese": "花瓶哪个好? 嗯,那个白色的怎么样?"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "の",
+  "level": "N5",
+  "formation": "名+の+名／助词+の+名／名+の",
+  "meaning_zh": "限定(所属、性质等)。\"......的\"；也可表示定语句中的小主语(与「が」同义)",
+  "examples": [
+   {
+    "japanese": "部屋の電気を消してください。",
+    "chinese": "请把房间的电灯关了。"
+   },
+   {
+    "japanese": "駅の向こうに病院があります。",
+    "chinese": "车站前面有家医院。"
+   },
+   {
+    "japanese": "わが国の冬は、あまり寒くありません。",
+    "chinese": "我国的冬天不太冷。"
+   },
+   {
+    "japanese": "アメリカへの旅行は明日から始まります。",
+    "chinese": "前往美国的旅行明天开始。"
+   },
+   {
+    "japanese": "これはおばあさんからの手紙です。",
+    "chinese": "这是外婆寄来的信。"
+   },
+   {
+    "japanese": "ここから駅までの地図を書きました。",
+    "chinese": "画了一张从此地到车站的地图。"
+   },
+   {
+    "japanese": "あの目の(=が)きれいな方はどなたですか。",
+    "chinese": "那位长着一双漂亮眼睛的人是谁?"
+   },
+   {
+    "japanese": "あの背の(=が)高い人は山田さんです。",
+    "chinese": "那个高个子是山田。"
+   },
+   {
+    "japanese": "友だちの(=が)作った料理を食べました。",
+    "chinese": "我吃了朋友做的饭菜。"
+   }
+  ],
+  "notes": "名词构成的定语句中的小主语一般不用「の」替换,否则不自然。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "に",
+  "level": "N5",
+  "formation": "名+に(は)/に(も)",
+  "meaning_zh": "存在场所、到达点、时间点、比例基准、动作对象、提供方、目的、评价基准、用途、改变结果等多种用法",
+  "examples": [
+   {
+    "japanese": "駅の向こうに病院があります。",
+    "chinese": "车站对面有家医院。"
+   },
+   {
+    "japanese": "椅子の下に猫がいます。",
+    "chinese": "椅子下面有只猫。"
+   },
+   {
+    "japanese": "山に動物が多いです(=たくさんいます)。町に動物が少ないです(=多くないです)。",
+    "chinese": "山中动物很多。城市里动物很少。"
+   },
+   {
+    "japanese": "ドアにカレンダーが貼ってあります。",
+    "chinese": "门上贴着日历。"
+   },
+   {
+    "japanese": "教室の壁にきれいな絵がかけてあります。",
+    "chinese": "教室的墙壁上挂着漂亮的画。"
+   },
+   {
+    "japanese": "そこの机にボールペンが置いてあります。",
+    "chinese": "那里的书桌上放着圆珠笔。"
+   },
+   {
+    "japanese": "今、兄はアメリカに行っています。",
+    "chinese": "现在,哥哥去了美国(还在美国)。"
+   },
+   {
+    "japanese": "今、わたしは電車に乗っています。",
+    "chinese": "现在我正在乘电车(还在电车里)。"
+   },
+   {
+    "japanese": "このケーキには砂糖がたくさん入っています。",
+    "chinese": "这种蛋糕里放有很多砂糖。"
+   },
+   {
+    "japanese": "先生は教室に入りました。",
+    "chinese": "老师进了教室。"
+   },
+   {
+    "japanese": "おととい、図書館に行きました。",
+    "chinese": "前天我去了图书馆。"
+   },
+   {
+    "japanese": "けさ、何時ごろ会社に着きましたか。",
+    "chinese": "今天早上你是几点钟到公司的?"
+   },
+   {
+    "japanese": "その角を右に曲がります。",
+    "chinese": "在那个拐角处往右拐。"
+   },
+   {
+    "japanese": "その交差点を左に曲がってください。",
+    "chinese": "请在那个十字路口往左转。"
+   },
+   {
+    "japanese": "鳥が西に飛んで行きました。",
+    "chinese": "鸟儿朝着西面的天空飞走了。"
+   },
+   {
+    "japanese": "自分のノートに名前を書きました。",
+    "chinese": "在自己的笔记本上写了名字。"
+   },
+   {
+    "japanese": "自転車はここに止めないでください。",
+    "chinese": "不要把自行车停在这里。"
+   },
+   {
+    "japanese": "果物を冷蔵庫に入れましょう。",
+    "chinese": "把水果放进冰箱里吧。"
+   },
+   {
+    "japanese": "仕事は9時に始まります。",
+    "chinese": "工作从9点开始。"
+   },
+   {
+    "japanese": "上の子は2007年に生まれました。",
+    "chinese": "我的大儿子是2007年出生的。"
+   },
+   {
+    "japanese": "私は夏に海で泳ぎたいです。",
+    "chinese": "我想在夏天到大海里游泳。"
+   },
+   {
+    "japanese": "一年に(=年に)1回旅行します。",
+    "chinese": "每年去旅行一次。"
+   },
+   {
+    "japanese": "母は1ヵ月に(=月に)1回病院へ行きます。",
+    "chinese": "妈妈她每月去一次医院。"
+   },
+   {
+    "japanese": "りんごを一人に二つずつあげました。",
+    "chinese": "给了每人两个苹果。"
+   },
+   {
+    "japanese": "わたしは友だちに山の写真を見せた。",
+    "chinese": "我给朋友看了在山上拍的照片。"
+   },
+   {
+    "japanese": "図書館にCDを返しました。",
+    "chinese": "把CD还给了图书馆。"
+   },
+   {
+    "japanese": "社長は電気会社に電話をかけました。",
+    "chinese": "社长给电力公司打了电话。"
+   },
+   {
+    "japanese": "私はお金がなくて、友だちに1万円借りました。",
+    "chinese": "我因为没钱花了,于是就跟朋友借了1万日元。"
+   },
+   {
+    "japanese": "学生たちは教室で山田先生に日本語を習っています。",
+    "chinese": "学生们正在教室里跟山田老师学习日语。"
+   },
+   {
+    "japanese": "わたしは友だちにチョコレートをもらいました。",
+    "chinese": "收到了朋友送给我的巧克力。"
+   },
+   {
+    "japanese": "外国に旅行に行きます。",
+    "chinese": "去外国旅行。"
+   },
+   {
+    "japanese": "これからうちへ食事に帰ります。",
+    "chinese": "我这就回家吃饭。"
+   },
+   {
+    "japanese": "ほら、おかあさん。おとうさんも公園へ遊びに来ましたよ。",
+    "chinese": "妈妈你看,爸爸他也来公园玩了。"
+   },
+   {
+    "japanese": "スポーツは体にいいです。",
+    "chinese": "体育运动益于健康。"
+   },
+   {
+    "japanese": "家の近くに店が多いので、買い物に便利です。",
+    "chinese": "我家附近商店很多,所以便于购物。"
+   },
+   {
+    "japanese": "そのアパートは駅に近いです。",
+    "chinese": "那幢公寓楼靠近车站。"
+   },
+   {
+    "japanese": "そのお金は留学にかかりました。",
+    "chinese": "那笔钱花在留学上了。"
+   },
+   {
+    "japanese": "塩やしょう油は料理に使います。",
+    "chinese": "食盐和酱油用于做菜。"
+   },
+   {
+    "japanese": "辞書は勉強に使うものです。",
+    "chinese": "词典是用于学习的工具。"
+   },
+   {
+    "japanese": "メロンを半分にして一緒に食べましょう。",
+    "chinese": "把甜瓜一分为二后一起吃吧。"
+   },
+   {
+    "japanese": "60人のクラスを二つにして教えます。",
+    "chinese": "把60人的班级分成两个班来教学。"
+   },
+   {
+    "japanese": "このナイフでパンを四つに切ってください。",
+    "chinese": "请用这把刀把面包切成四份。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "へ",
+  "level": "N5",
+  "formation": "名+へ",
+  "meaning_zh": "1.动作\"来\"\"去\"的目的地。2.移动的方向、位置。3.动作、作用的对象。",
+  "examples": [
+   {
+    "japanese": "十日の朝、七時に駅へ来てください。",
+    "chinese": "请在十号早上七点到车站来。"
+   },
+   {
+    "japanese": "火曜日に、町の南にある有名な公園へ出かけます。",
+    "chinese": "星期二,去位于镇南的一座有名的公园。"
+   },
+   {
+    "japanese": "長い休みに母と外国へ旅行したいです。",
+    "chinese": "放长假时,想跟母亲一起去外国旅行。"
+   },
+   {
+    "japanese": "その角を右へ曲がります。",
+    "chinese": "在那个拐角处往右拐。"
+   },
+   {
+    "japanese": "銀行はこの道を西へ四キロ行って、左側にあります。",
+    "chinese": "沿着这条路往西走四公里,左边就有一家银行。"
+   },
+   {
+    "japanese": "飛行機は東京のほうへ飛んで行きました。",
+    "chinese": "飞机向东京方向飞走了。"
+   },
+   {
+    "japanese": "A社から物を買ったり、A社へ物を売ったりします。",
+    "chinese": "有时我们购进A公司的产品,有时又把我们的产品出售给A公司。"
+   },
+   {
+    "japanese": "午前は、母へ手紙を出しました。午後は友だちへEメールを送りました。",
+    "chinese": "上午寄出了写给妈妈的信,下午,又给朋友发了电子邮件。"
+   },
+   {
+    "japanese": "子どもたちへは、お菓子をあげましょう。",
+    "chinese": "给孩子们礼物的话还是送糕点吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "で",
+  "level": "N5",
+  "formation": "名+で(は)/で(も)",
+  "meaning_zh": "1.动作场所。2.感受场所。3.事情发生场所。4.工具手段。5.方式方法。6.原料材料。7.限定范围。8.数量合计。9.行为主体状态。10.花费。11.期限、截止点。12.原因理由。",
+  "examples": [
+   {
+    "japanese": "銀行で田中さんに会いました。",
+    "chinese": "在银行遇见了田中小姐。"
+   },
+   {
+    "japanese": "ここではいろいろな国の人が働いています。",
+    "chinese": "有很多国家的人在这里劳动。"
+   },
+   {
+    "japanese": "そんなものはスーパーでも売っていますよ。",
+    "chinese": "那种东西在超市也有卖。"
+   },
+   {
+    "japanese": "パーティーで踊りを踊りました。",
+    "chinese": "在派对现场跳了舞蹈。"
+   },
+   {
+    "japanese": "会議で自分の意見を言いました。",
+    "chinese": "在会上谈了自己的意见。"
+   },
+   {
+    "japanese": "今日の試合で、みんながんばりました。",
+    "chinese": "在今天的比赛中,大家都很努力。"
+   },
+   {
+    "japanese": "テレビであの事故を見ました。",
+    "chinese": "在电视里看到了那场事故。"
+   },
+   {
+    "japanese": "インターネットで買い物をします。",
+    "chinese": "在网上购物。"
+   },
+   {
+    "japanese": "ゆうべ、夢で亡くなった母を見ました。",
+    "chinese": "昨晚,在梦里见到了已经去世的母亲。"
+   },
+   {
+    "japanese": "その女の子は外国で生まれました。",
+    "chinese": "那女孩出生在国外。"
+   },
+   {
+    "japanese": "この国で新しい友だちができました。",
+    "chinese": "在这个国家,我有了新朋友。"
+   },
+   {
+    "japanese": "去年、京都ではよく雨が降りました。大阪でもよく雨が降りました。",
+    "chinese": "去年,京都常常下雨。大阪也经常降雨。"
+   },
+   {
+    "japanese": "毎日バスで駅に行きます。それから電車で会社に行きます。会社はビルの18階にあるので、エレベーターで上がります。",
+    "chinese": "我每天坐公交车到车站。然后坐电车到公司。因为公司在18楼,所以乘电梯上去。"
+   },
+   {
+    "japanese": "みなさん、これから日本語で話しましょう。",
+    "chinese": "同学们,以后请讲日语。"
+   },
+   {
+    "japanese": "わたしたちは手ではしを使います。足で歩きます。口で話します。",
+    "chinese": "我们用手拿筷子,用脚走路,用嘴说话。"
+   },
+   {
+    "japanese": "二人は小さな声で、話しています。",
+    "chinese": "两人在小声谈话。"
+   },
+   {
+    "japanese": "外国の映画で外国語を勉強する人がいます。",
+    "chinese": "有人通过观看外国电影学习外语。"
+   },
+   {
+    "japanese": "どんなやり方で、その仕事をしますか。",
+    "chinese": "你用什么方法做那份工作?"
+   },
+   {
+    "japanese": "この料理は肉と野菜で作ります。",
+    "chinese": "这道菜是用肉和蔬菜做的。"
+   },
+   {
+    "japanese": "木で机を作ります。また、木で家を建てます。",
+    "chinese": "用木材制作书桌,还用木材盖房子。"
+   },
+   {
+    "japanese": "このテーブルはガラスでできているので、重いです。",
+    "chinese": "这张桌子是用玻璃组装的,所以很重。"
+   },
+   {
+    "japanese": "1年で、8月がいちばん暑い月です。",
+    "chinese": "一年里八月份是最热的月份。"
+   },
+   {
+    "japanese": "スポーツの中でテニスがいちばん好きです。",
+    "chinese": "在体育项目中,我最喜欢网球。"
+   },
+   {
+    "japanese": "A「日本では、さとうより塩のほうが安いです。」 B「わたしの国でも同じですよ。」",
+    "chinese": "A\"在日本,比起白砂糖,食盐更便宜。\" B\"其实在我国也一样。\""
+   },
+   {
+    "japanese": "こちらのみかんは全部でいくらですか。",
+    "chinese": "这些橘子一共多少钱?"
+   },
+   {
+    "japanese": "このたまごは6個で300円です。",
+    "chinese": "这种鸡蛋6个一共卖300日元。"
+   },
+   {
+    "japanese": "私の家族は父と母と兄と私で四人です。",
+    "chinese": "我们家有父亲、母亲、哥哥和我,一共是四个人。"
+   },
+   {
+    "japanese": "A「一人で行きますか。」 B「いいえ、わたしと母で(=母と二人で)行きます。」",
+    "chinese": "A\"你一个人去吗?\" B\"不,我跟我妈妈两个人一起去。\""
+   },
+   {
+    "japanese": "日曜日に家族で(=家族全員で)そとで食事をしました。",
+    "chinese": "星期天我们全家人一起在外面吃饭了。"
+   },
+   {
+    "japanese": "料理は自分で作りますか。",
+    "chinese": "饭菜是你自己烧吗?"
+   },
+   {
+    "japanese": "この仕事は10人で二日でできました。",
+    "chinese": "这项工作是用了10个人,花了2天时间完成的。"
+   },
+   {
+    "japanese": "2万円でこの電子辞書を買いました。",
+    "chinese": "花了2万日元买下了这台电子词典。"
+   },
+   {
+    "japanese": "自転車は5回ぐらいでできました。",
+    "chinese": "我练习了5次左右就学会了骑自行车。"
+   },
+   {
+    "japanese": "あと5分で12時ですよ。",
+    "chinese": "再过5分钟就12点了。"
+   },
+   {
+    "japanese": "あ、12時になりましたね。じゃあ、これで(=この時間で)授業を終わろう。",
+    "chinese": "哎呀,都已经12点了。好吧,今天的课就到此结束吧。"
+   },
+   {
+    "japanese": "うちの犬は12歳で死にました。",
+    "chinese": "我家养的小狗12岁时死了。"
+   },
+   {
+    "japanese": "雨で川の水が汚くなりました。",
+    "chinese": "因为下雨,河里的水变脏了。"
+   },
+   {
+    "japanese": "昨日は朝から晩まで掃除や洗濯で忙しかった。",
+    "chinese": "昨天从早上到晚上又是大扫除,又是洗衣服,很忙。"
+   },
+   {
+    "japanese": "強い風で電車が止まりました。",
+    "chinese": "因为大风电车停运了。"
+   }
+  ],
+  "notes": "「で」用于表示客观原因,谓语不能用请求(~てください)、命令(~なさい)、劝诱(~ましょう/ませんか)、推测(~だろう/でしょう)、愿望(~たいと思う)等表达形式。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "と",
+  "level": "N5",
+  "formation": "名A+と+名B",
+  "meaning_zh": "和......",
+  "examples": [
+   {
+    "japanese": "ボールペンとノートは私のです。ほかのものは妹のです。",
+    "chinese": "圆珠笔和笔记本是我的。其他的东西是妹妹的。"
+   },
+   {
+    "japanese": "わたしの家族は母と兄と私の三人です。",
+    "chinese": "我的家人有母亲、哥哥和我三个人。"
+   },
+   {
+    "japanese": "ここに名前と電話番号を書いてください。",
+    "chinese": "请把名字和电话写在这里。"
+   }
+  ],
+  "notes": "并列人物或事物等。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "と",
+  "level": "N5",
+  "formation": "名+と／句子+と",
+  "meaning_zh": "1.动作的同伴、对手、比较对象。\"和......\"\"跟......\"。2.引用说话、思考、读写等的具体内容。",
+  "examples": [
+   {
+    "japanese": "私はよく妹と遊びました。",
+    "chinese": "我以前经常跟妹妹一起玩耍。"
+   },
+   {
+    "japanese": "友だちと一緒に映画を見ました。",
+    "chinese": "我跟朋友一起看了电影。"
+   },
+   {
+    "japanese": "昨日は友だちとは遊びましたが、今日は誰とも遊びませんでした。",
+    "chinese": "昨天跟朋友一起玩耍,但今天没有跟任何人一起玩耍。"
+   },
+   {
+    "japanese": "子どものころ、ときどき弟とけんかしました。",
+    "chinese": "孩童时代,我有时候跟弟弟打架。"
+   },
+   {
+    "japanese": "田中君は鈴木さんと結婚しました。",
+    "chinese": "田中跟铃木小姐结婚了。"
+   },
+   {
+    "japanese": "喫茶店で友だちと会いました。",
+    "chinese": "我在一家咖啡店跟朋友见面了。"
+   },
+   {
+    "japanese": "わたしは妹とおなじ服を買いました。",
+    "chinese": "我买了和妹妹相同款式的衣服。"
+   },
+   {
+    "japanese": "父は母と違うところに住んでいます。",
+    "chinese": "父亲没跟母亲住在一起。"
+   },
+   {
+    "japanese": "そんなやりかたは子どもといっしょです。",
+    "chinese": "那种行为跟不懂事的孩子一样。"
+   },
+   {
+    "japanese": "学生は先生に「おはようございます」と言いました。",
+    "chinese": "学生对老师说:\"老师,您早\"。"
+   },
+   {
+    "japanese": "それよりこのほうがいいと思います。",
+    "chinese": "我认为比起那个还是这个好。"
+   },
+   {
+    "japanese": "「日本」は、「にほん」と読みます。「にっぽん」とも読みます。けれども、「にちほん」とは読みません。",
+    "chinese": "\"日本\"可读作\"にほん\",也可读作\"にっぽん\",但不能读作\"にちほん\"。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "を",
+  "level": "N5",
+  "formation": "名+を",
+  "meaning_zh": "1.他动词的宾语。2.动作移动的场所。3.动作离开、出发的地点。",
+  "examples": [
+   {
+    "japanese": "タクシーを呼んでください。",
+    "chinese": "请叫辆出租车。"
+   },
+   {
+    "japanese": "山田さんは何を言いましたか。",
+    "chinese": "山田他说了什么?"
+   },
+   {
+    "japanese": "あさって、仕事を休みます。",
+    "chinese": "后天我请假,不上班。"
+   },
+   {
+    "japanese": "その交差点を左に曲がってください。",
+    "chinese": "请在前面那个十字路口左转。"
+   },
+   {
+    "japanese": "朝、公園を散歩しました。",
+    "chinese": "早上去公园散步了。"
+   },
+   {
+    "japanese": "この道を歩いて病院へ行きます。",
+    "chinese": "沿着这条路走去医院。"
+   },
+   {
+    "japanese": "魚が川を泳いでいます。",
+    "chinese": "鱼儿正在河中游来游去。"
+   },
+   {
+    "japanese": "いつも7時に家を出て、仕事に行きます。",
+    "chinese": "总是7点出门去上班。"
+   },
+   {
+    "japanese": "大学を卒業して、会社に入りました。",
+    "chinese": "大学毕业后进了公司。"
+   },
+   {
+    "japanese": "みんな、電車を降りました。",
+    "chinese": "大家都下了电车。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "て",
+  "level": "N5",
+  "formation": "イ「て」／动「て」",
+  "meaning_zh": "1.并列。2.原因、理由。3.动作相继发生。4.手段、方法、材料。5.动作的状态、样子。6.轻微的命令。",
+  "examples": [
+   {
+    "japanese": "わたしのアパートは広くて静かです。",
+    "chinese": "我住的公寓不仅房间大,而且周围很安静。"
+   },
+   {
+    "japanese": "この辞書は厚くて重いです。",
+    "chinese": "这本词典不仅厚,而且很沉。"
+   },
+   {
+    "japanese": "この道は狭い。それに車が多くて危ない。",
+    "chinese": "这条路很窄,而且车多,所以危险。"
+   },
+   {
+    "japanese": "忙しくて本を読む暇がありません。",
+    "chinese": "因为太忙,连看书的时间都没有。"
+   },
+   {
+    "japanese": "あのビルはエレベーターがなくて不便です。",
+    "chinese": "那栋大楼里没有安装电梯,所以上下楼不方便。"
+   },
+   {
+    "japanese": "雨が降っていて、風が吹いています。",
+    "chinese": "风雨交加。"
+   },
+   {
+    "japanese": "わたしは学校へ行って、父は会社へ行きます。",
+    "chinese": "我上学,爸爸上班。"
+   },
+   {
+    "japanese": "兄は太っていて、妹は痩せています。",
+    "chinese": "哥哥胖,妹妹瘦。"
+   },
+   {
+    "japanese": "昨日の夜は6時に帰ってご飯を作りました。",
+    "chinese": "昨天晚上,我6点回到家,然后做的饭。"
+   },
+   {
+    "japanese": "ご飯を食べて、散歩しました。",
+    "chinese": "吃完饭后去散步了。"
+   },
+   {
+    "japanese": "町へ行って、友だちと会って、それから買い物をしました。",
+    "chinese": "到了镇上,跟朋友见面,然后去购物了。"
+   },
+   {
+    "japanese": "バスに乗って学校へ行きます。",
+    "chinese": "乘公交车上学。"
+   },
+   {
+    "japanese": "辞書を見て漢字を覚えます。",
+    "chinese": "查词典记汉字。"
+   },
+   {
+    "japanese": "並んでバスに乗りましょう。",
+    "chinese": "请大家排队乘公交车吧。"
+   },
+   {
+    "japanese": "上の息子は毎晩電気を付けて寝ます。",
+    "chinese": "我的大儿子每天晚上总是开着电灯睡觉。"
+   },
+   {
+    "japanese": "山へは帽子を被って行きましょう。",
+    "chinese": "戴好帽子去山上吧。"
+   },
+   {
+    "japanese": "今、メガネをかけて、新聞を読んでいる人は父です。",
+    "chinese": "现在,正戴着眼镜看报纸的人是我的父亲。"
+   },
+   {
+    "japanese": "父はいつもネクタイをしめて会社へ行きます。",
+    "chinese": "爸爸总是系着领带上班。"
+   },
+   {
+    "japanese": "近くに銀行やスーパーができて、便利になりました。",
+    "chinese": "(我家)附近有了银行、超市等设施,所以方便多了。"
+   },
+   {
+    "japanese": "財布をうちに忘れて、困りました。",
+    "chinese": "把钱包忘在了家里,可惨了。"
+   },
+   {
+    "japanese": "うちには小さい子どもがいて、いつもにぎやかです。",
+    "chinese": "因为家里有小孩,所以总是很热闹。"
+   },
+   {
+    "japanese": "もう時間よ。はやく起きて。",
+    "chinese": "时间不早了,快起床。"
+   },
+   {
+    "japanese": "もう遅いから、はやく歩いてよ。",
+    "chinese": "时间不早了,快走!"
+   },
+   {
+    "japanese": "クミちゃん、ちょっと来て。",
+    "chinese": "久美,过来一下。"
+   },
+   {
+    "japanese": "ご飯をもう少し食べてね。",
+    "chinese": "再多吃点饭吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "は",
+  "level": "N5",
+  "formation": "名(+助词)/格助词+助词+は",
+  "meaning_zh": "提示主题；提示成分并作对比",
+  "examples": [
+   {
+    "japanese": "これはせっけんです。",
+    "chinese": "这是肥皂。"
+   },
+   {
+    "japanese": "母は台所にいます。料理を作っています。",
+    "chinese": "妈妈在厨房,正在做饭。"
+   },
+   {
+    "japanese": "日本は中国の東のほうにあります。",
+    "chinese": "日本在中国的东面。"
+   },
+   {
+    "japanese": "車はありますが、一台しかありません。",
+    "chinese": "车子有,不过只有一辆。"
+   },
+   {
+    "japanese": "わたしは肉は好きではありませんが、魚は好きです。",
+    "chinese": "我虽然不喜欢吃肉,但喜欢吃鱼。"
+   },
+   {
+    "japanese": "テニスは外でしてください。",
+    "chinese": "要打网球,请到外面去打。"
+   },
+   {
+    "japanese": "机の上には新聞があります。",
+    "chinese": "书桌上有报纸。"
+   },
+   {
+    "japanese": "日本へは、はじめて行きます。",
+    "chinese": "日本我还是第一次去。"
+   },
+   {
+    "japanese": "現金はありません。カードはあります。",
+    "chinese": "没有现金,但有卡。"
+   },
+   {
+    "japanese": "あの建物は図書館ではありません。",
+    "chinese": "那个建筑物不是图书馆。"
+   },
+   {
+    "japanese": "あそこは静かではありません。うるさいです。",
+    "chinese": "那一带不安静,很吵闹。"
+   },
+   {
+    "japanese": "そのかばんは高くはありませんが、好きではありません。",
+    "chinese": "那个皮包并不贵,不过我不喜欢。"
+   }
+  ],
+  "notes": "「名+はない」「イ「く」+はない」等可引出否定并暗示其他。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "も",
+  "level": "N5",
+  "formation": "名/疑问词/数量词(+助词)+も",
+  "meaning_zh": "也......；都......（全面肯定或否定）",
+  "examples": [
+   {
+    "japanese": "昨日は雨でした。今日も雨でした。",
+    "chinese": "昨天下雨了,今天也下雨了。"
+   },
+   {
+    "japanese": "今日はピアノの練習をしませんでした。ギターの練習もしませんでした。",
+    "chinese": "今天没有练习钢琴,也没有练习吉他。"
+   },
+   {
+    "japanese": "私は日本へ行きたいです。アメリカへも行きたいです。",
+    "chinese": "我想去日本,也想去美国。"
+   },
+   {
+    "japanese": "そんな物はスーパーで売っています。コンビニでも売っています。",
+    "chinese": "那种东西在超市里有卖,在便利店里也有卖。"
+   },
+   {
+    "japanese": "昨日も今日も雨でした。",
+    "chinese": "昨天和今天都下雨了。"
+   },
+   {
+    "japanese": "今日は弟とも妹とも遊びませんでした。",
+    "chinese": "今天没有跟弟弟一起玩耍,也没有跟妹妹一起玩耍。"
+   },
+   {
+    "japanese": "日本は韓国までも中国までも近いです。",
+    "chinese": "日本离韩国离中国都很近。"
+   },
+   {
+    "japanese": "今日は、だれも来ませんでした。",
+    "chinese": "今天没有任何人来过(这里)。"
+   },
+   {
+    "japanese": "私は忙しいから、誰にも会いません。",
+    "chinese": "我很忙,所以不见任何人。"
+   },
+   {
+    "japanese": "朝からまだ何も食べていません。",
+    "chinese": "从早上到现在还没有吃过任何东西。"
+   },
+   {
+    "japanese": "箱の中に何もありません。",
+    "chinese": "箱子里什么东西也没有。"
+   },
+   {
+    "japanese": "その事はだれでも知っています。",
+    "chinese": "那件事情谁都知道。"
+   },
+   {
+    "japanese": "果物は何でも食べます。",
+    "chinese": "水果我什么都吃。"
+   },
+   {
+    "japanese": "東京も大阪もどこも人が多いです。",
+    "chinese": "东京也好大阪也好,人都很多。"
+   },
+   {
+    "japanese": "彼は車が二台あります。どれもいい車です。",
+    "chinese": "他有两辆车。都是高级车。"
+   },
+   {
+    "japanese": "私は忙しいから、だれにも会いません。",
+    "chinese": "我很忙,所以不见任何人。"
+   },
+   {
+    "japanese": "A「外国人の友だちがいますか。」 B「いいえ、一人もいません。」",
+    "chinese": "你有外国朋友吗? 一个人也没有。"
+   },
+   {
+    "japanese": "店にはパンは一つもありません。",
+    "chinese": "店里的面包全卖空了。"
+   },
+   {
+    "japanese": "本屋に行きましたが、本は1冊も買いませんでした。",
+    "chinese": "去了书店,但一本书也没买。"
+   }
+  ],
+  "notes": "「疑问词+でも」后续肯定式谓语，表示全面肯定“谁都......”“什么都......”。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "や",
+  "level": "N5",
+  "formation": "名+や",
+  "meaning_zh": "和......等",
+  "examples": [
+   {
+    "japanese": "デパートでシャツやネクタイなどを買いました。",
+    "chinese": "在百货商店买了衬衫和领带等。"
+   },
+   {
+    "japanese": "テーブルの上にコップやお皿(など)が並べてあります。",
+    "chinese": "餐桌上放着杯子、碟子等。"
+   },
+   {
+    "japanese": "田中さんや小林君や木村君が昨日のパーティーに出ました。",
+    "chinese": "田中、小林和木村参加了昨天的派对。"
+   }
+  ],
+  "notes": "并列并暗示其他。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "か",
+  "level": "N5",
+  "formation": "疑问词+か；名/动「辞」+か",
+  "meaning_zh": "不确定；或......",
+  "examples": [
+   {
+    "japanese": "だれか(が)窓を閉めてください。",
+    "chinese": "请哪位关一下窗户好吗?"
+   },
+   {
+    "japanese": "いつかどこかへ遊びに行きませんか。",
+    "chinese": "改日找个地方出去玩玩吧。"
+   },
+   {
+    "japanese": "何か運動をしていますか。",
+    "chinese": "你有没有在做什么运动?"
+   },
+   {
+    "japanese": "これはだれのかさかわかりません。",
+    "chinese": "不知道这是谁的伞。"
+   },
+   {
+    "japanese": "パーティーは何時に始まるか知っていますか。",
+    "chinese": "你知道聚会是几点开始吗?"
+   },
+   {
+    "japanese": "すみませんが、銀行はどこにあるか教えてください。",
+    "chinese": "请问,银行在哪里?"
+   },
+   {
+    "japanese": "月曜日か火曜日はテストがあります。",
+    "chinese": "星期一或者星期二有考试。"
+   },
+   {
+    "japanese": "アメリカかイギリス(か)へ旅行したいです。",
+    "chinese": "想去美国或英国旅行。"
+   },
+   {
+    "japanese": "A「夏休みにどこへ行きますか。」 B「山に行くか、海で泳ぐかにします。」",
+    "chinese": "暑假里你去哪儿? 去山上游玩或者去海里游泳。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "か",
+  "level": "N5",
+  "formation": "句子+か",
+  "meaning_zh": "......吗？",
+  "examples": [
+   {
+    "japanese": "どちらさまが田中さんですか。",
+    "chinese": "哪位是田中先生?"
+   },
+   {
+    "japanese": "あそこは便利ですか。",
+    "chinese": "那里方便吗?"
+   },
+   {
+    "japanese": "あのレストランの料理はおいしいですか。",
+    "chinese": "那家餐厅的东西好吃吗?"
+   },
+   {
+    "japanese": "これからどこへ行きますか。",
+    "chinese": "你接下来去哪儿?"
+   },
+   {
+    "japanese": "あの人は先生ですか、学生ですか。",
+    "chinese": "那个人是老师还是学生?"
+   },
+   {
+    "japanese": "肉料理は好きですか、嫌いですか。",
+    "chinese": "你喜不喜欢吃肉类食物?"
+   },
+   {
+    "japanese": "その料理は甘いですか、からいですか。",
+    "chinese": "那道菜的味道是甜还是辣?"
+   },
+   {
+    "japanese": "あなたが行きますか、山田さんが来ますか。",
+    "chinese": "是你去还是山田过来?"
+   },
+   {
+    "japanese": "A「ぼくの青いかさ、どこにあるか知っていますか。」 B「青いかさですか。ほら、あそこにありますよ。」",
+    "chinese": "我那把蓝色的雨伞在哪儿你知道吗? 是蓝色的雨伞吗?你看,就在那边啊。"
+   },
+   {
+    "japanese": "A「あそこはとてもきれいですよ。」 B「きれいですか。じゃ、行って見ましょう。」",
+    "chinese": "那个地方的景色可美了。 很好看吗?那就去看看吧。"
+   },
+   {
+    "japanese": "A「山田さんです。」 B「ああ、山田さんですか。久しぶりですね。」",
+    "chinese": "我是山田。 啊,是山田啊。好久不见了。"
+   },
+   {
+    "japanese": "A「新宿に着きましたよ。」 B「そうですか。こんなに速いですか。」",
+    "chinese": "到新宿了。 是吗。这么快就到了啊。"
+   },
+   {
+    "japanese": "ああ、山の水は、こんなにきれいですか。",
+    "chinese": "哎呀,山上的水,这么干净啊。"
+   }
+  ],
+  "notes": "礼貌体疑问；读降调还可表示惊讶或感叹。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "ね(え)",
+  "level": "N5",
+  "formation": "句子+ね(え)",
+  "meaning_zh": "......啊；......吧",
+  "examples": [
+   {
+    "japanese": "わあ、きれいな部屋ですねえ。",
+    "chinese": "哇,好干净的房间啊。"
+   },
+   {
+    "japanese": "今日は昨日より暖かいですね。",
+    "chinese": "今天比昨天缓和啊。"
+   },
+   {
+    "japanese": "部屋が暗いですねえ。窓を開けてください。",
+    "chinese": "房间好暗啊。打开窗户吧。"
+   },
+   {
+    "japanese": "A「このかさはあなたのですね。」 B「ええ、わたしのです。」",
+    "chinese": "这把雨伞是你的吧。 是的,是我的。"
+   },
+   {
+    "japanese": "A「あなたのいえは駅まであまり遠くないですね。」 B「ええ。近いです。」",
+    "chinese": "你的家离车站不太远吧。 是的。很近。"
+   },
+   {
+    "japanese": "A「今週、試験がありますね。」 B「いいえ。来週ですよ。」",
+    "chinese": "本周有考试吧。 没有,是下周。"
+   },
+   {
+    "japanese": "私はこれがいいと思いますね。これにしましょう。",
+    "chinese": "我认为这个好。就买这个吧。"
+   },
+   {
+    "japanese": "タバコを止めてください。体に悪いから(です)ねえ。",
+    "chinese": "别抽烟了。因为吸烟有害健康啊。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "よ",
+  "level": "N5",
+  "formation": "句子+よ",
+  "meaning_zh": "（提醒对方注意其不知道的信息）",
+  "examples": [
+   {
+    "japanese": "これはわたしのかさですよ。ほら、私の名前が書いてあります。",
+    "chinese": "这可是我的雨伞哦。你看,上面写着我的名字呢。"
+   },
+   {
+    "japanese": "太郎、お友だちが来ましたよ。",
+    "chinese": "太郎,你的朋友来了。"
+   },
+   {
+    "japanese": "A「これを持ってくださいませんか。」 B「はい、いいですよ。」",
+    "chinese": "帮我拿一下这个好吗? 好呀。"
+   }
+  ],
+  "notes": "表示叮嘱、提醒对方。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "これ·それ·あれ·どれ",
+  "level": "N5",
+  "formation": "これ·それ·あれ·どれ+助词/です",
+  "meaning_zh": "这个/那个/那个/哪个",
+  "examples": [
+   {
+    "japanese": "あなたのかさはこれですよ。あれはぼくのです。",
+    "chinese": "你的伞是这把,那把是我的。"
+   },
+   {
+    "japanese": "それは二つで五万円です。",
+    "chinese": "那个(商品)两个一共五万日元。"
+   },
+   {
+    "japanese": "これはあなたのノートではありません。あなたのはあれですよ。",
+    "chinese": "这不是你的笔记本。你的是那个。"
+   },
+   {
+    "japanese": "A「どれが駅に行くバスですか。」 B「あのバスです。」",
+    "chinese": "哪辆是开往车站的公交车? 是那辆公交车。"
+   }
+  ],
+  "notes": "指代物品或事物。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "ここ·そこ·あそこ·どこ",
+  "level": "N5",
+  "formation": "ここ·そこ·あそこ·どこ+助词/です",
+  "meaning_zh": "这里/那里/那里/哪里",
+  "examples": [
+   {
+    "japanese": "ここは出口です。入り口はあそこです。",
+    "chinese": "这里是出口,入口在那边。"
+   },
+   {
+    "japanese": "友だちと新宿へ行きました。そこで買い物をしました。",
+    "chinese": "和朋友一起到新宿去了,我们在那里买了东西。"
+   },
+   {
+    "japanese": "あそこを東へ曲がってからずっと行ってください。",
+    "chinese": "在那里往东转,然后径直走。"
+   },
+   {
+    "japanese": "わたしたちはどこから来ましたか。またどこへ行きますか。",
+    "chinese": "我们(人类)来自何方?要去哪里?"
+   }
+  ],
+  "notes": "指代场所。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こちら·そちら·あちら·どちら",
+  "level": "N5",
+  "formation": "こちら·そちら·あちら·どちら+助词/です",
+  "meaning_zh": "这边/那边/这个/那位/哪位（礼貌语）",
+  "examples": [
+   {
+    "japanese": "こちらは東です。",
+    "chinese": "这边是东。"
+   },
+   {
+    "japanese": "今からあなたのうちへ行きますが、そちらまでどれぐらいかかりますか。",
+    "chinese": "我现在上你那儿去,到你那儿需要花多长时间?"
+   },
+   {
+    "japanese": "あちらにペットがいます。",
+    "chinese": "那里有宠物。"
+   },
+   {
+    "japanese": "すみません、出口はどちらですか。",
+    "chinese": "请问,出口在哪里?"
+   },
+   {
+    "japanese": "こちらはりんごです。",
+    "chinese": "这是苹果。"
+   },
+   {
+    "japanese": "果物はどちらにしますか。",
+    "chinese": "水果你要吃什么?"
+   },
+   {
+    "japanese": "こちらさまは東京からいらっしゃった田中さんです。",
+    "chinese": "这位是从东京来的田中先生。"
+   },
+   {
+    "japanese": "すみません、そちらさまはどの国からいらっしゃいましたか。",
+    "chinese": "请问,那位是从哪个国家来的?"
+   },
+   {
+    "japanese": "あちらさまはどなたですか。",
+    "chinese": "那位是谁?"
+   },
+   {
+    "japanese": "どちらさまが山田課長ですか。",
+    "chinese": "哪位是山田科长?"
+   },
+   {
+    "japanese": "こちらは中国の物を売る会社です。",
+    "chinese": "我们公司是销售中国货的公司。"
+   },
+   {
+    "japanese": "お国はどちらですか。",
+    "chinese": "您是哪个国家的?"
+   }
+  ],
+  "notes": "可指代方向、位置、场所、物品、人物及国家、公司、商店等。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こっち·そっち·あっち·どっち",
+  "level": "N5",
+  "formation": "「こちら·そちら·あちら·どちら」的口语体",
+  "meaning_zh": "这边/那边/哪边（口语）",
+  "examples": [],
+  "notes": "「こちら·そちら·あちら·どちら」的口语体。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "この·その·あの·どの",
+  "level": "N5",
+  "formation": "この·その·あの·どの+名",
+  "meaning_zh": "这个/那个/那个/哪个......",
+  "examples": [
+   {
+    "japanese": "この部屋は古いですから、安いです。",
+    "chinese": "这个房间很破旧,所以便宜。"
+   },
+   {
+    "japanese": "さっき、田中さんが来ました。その人は私の友だちです。",
+    "chinese": "刚才田中来过,他是我的朋友。"
+   },
+   {
+    "japanese": "A「山田さんはあの人ですか。」 B「いいえ、違います。」",
+    "chinese": "山田先生是那个人吗? 不,不是。"
+   },
+   {
+    "japanese": "どのコートが田中さんのですか。",
+    "chinese": "哪件大衣是田中的?"
+   }
+  ],
+  "notes": "作定语，指代特定的物品或事物。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こんな·そんな·あんな·どんな",
+  "level": "N5",
+  "formation": "こんな·そんな·あんな·どんな+名",
+  "meaning_zh": "这样的/那样的/哪样的......",
+  "examples": [
+   {
+    "japanese": "A「料理の写真がありますね。あなたは何にしますか。」 B「私はこんなものが食べたいです。」",
+    "chinese": "(菜单上)有菜的照片呢,你点哪个? 我想吃这种菜。"
+   },
+   {
+    "japanese": "A「料理の写真がありますね。あなたは何にしますか。」 B「私はそんなものが食べたいです。」",
+    "chinese": "(菜单上)有菜的照片呢,你点哪个? 我想吃那种菜。"
+   },
+   {
+    "japanese": "A「昨日テレビで見た?あのスポーツ。」 B「見た、見た。あんなスポーツ、おもしろいね。」",
+    "chinese": "昨天你在电视上看了吗?就是那个体育项目。 看了,看了。那种体育项目真有趣啊。"
+   },
+   {
+    "japanese": "A「どんなスポーツをしていますか。」 B「テニスをしています。」",
+    "chinese": "你正在做什么体育项目? 在打网球。"
+   },
+   {
+    "japanese": "こんなおいしいものははじめてです。",
+    "chinese": "这么好吃的东西我还是头一回吃到。"
+   },
+   {
+    "japanese": "京都に行きました。あんなきれいなところははじめてです。",
+    "chinese": "我去了京都,那么干净漂亮的地方我还是生平第一次(看到)。"
+   },
+   {
+    "japanese": "A「山田さんはどんな人ですか。」 B「とても親切な人です。」 A「そんな人が好きです。」",
+    "chinese": "山田是怎样的人? 是个很热情的人。 我喜欢那样的人。"
+   }
+  ],
+  "notes": "既可指代物品、事物等的种类，也可指代人物或事物的性质。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "だれ",
+  "level": "N5",
+  "formation": "だれ+助词",
+  "meaning_zh": "谁",
+  "examples": [
+   {
+    "japanese": "だれが私のケーキを食べましたか。",
+    "chinese": "是谁吃了我的蛋糕?"
+   },
+   {
+    "japanese": "これはだれのカバンですか。",
+    "chinese": "这是谁的包?"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "どなた",
+  "level": "N5",
+  "formation": "どなた+助词",
+  "meaning_zh": "哪位",
+  "examples": [
+   {
+    "japanese": "どなたさまが日本からいらっしゃった田中さんですか。",
+    "chinese": "哪位是从日本来的田中先生?"
+   },
+   {
+    "japanese": "今度の旅行にどなたを連れて行きますか。",
+    "chinese": "这次旅行你打算带谁去?"
+   }
+  ],
+  "notes": "尊敬语，表示不定的人物。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "いつか",
+  "level": "N5",
+  "formation": "いつか+疑问句和肯定句",
+  "meaning_zh": "改日；总有一天",
+  "examples": [
+   {
+    "japanese": "いつかどこかへ遊びに行きませんか。",
+    "chinese": "我们改日上哪儿去玩好吗?"
+   },
+   {
+    "japanese": "いつかまた日本へ来たいです。",
+    "chinese": "总有一天还想来日本。"
+   }
+  ],
+  "notes": "表示不确定的日期。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "いくつ",
+  "level": "N5",
+  "formation": "いくつ+疑问句",
+  "meaning_zh": "多少；几岁",
+  "examples": [
+   {
+    "japanese": "りんごはいくつありますか。",
+    "chinese": "苹果有几个?"
+   },
+   {
+    "japanese": "トマトはいくつ買いますか。",
+    "chinese": "番茄买几个?"
+   },
+   {
+    "japanese": "A「妹さんはいくつですか。」 B「19歳です。」",
+    "chinese": "你妹妹多大了? 19岁。"
+   },
+   {
+    "japanese": "お子さんは今年おいくつですか。",
+    "chinese": "您的孩子今年几岁?"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "いくら",
+  "level": "N5",
+  "formation": "いくら+疑问句",
+  "meaning_zh": "（询问钱款数量）多少钱",
+  "examples": [
+   {
+    "japanese": "こんなテーブルを買いたいです。いくらぐらいかかりますか。",
+    "chinese": "我想买这样的桌子,大约需要多少钱?"
+   },
+   {
+    "japanese": "こっちのリンゴがほしいですが、いくらでいいですか。",
+    "chinese": "我想买这些苹果,多少钱?"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "いかが",
+  "level": "N5",
+  "formation": "いかがですか",
+  "meaning_zh": "......怎么样？",
+  "examples": [
+   {
+    "japanese": "A「新しい仕事はいかがですか。」 B「ええ、おもしろいです。」",
+    "chinese": "新工作怎么样? 嗯,挺有趣。"
+   },
+   {
+    "japanese": "A「昨日の映画はいかがでしたか。」 B「とてもおもしろかったですよ。」",
+    "chinese": "昨天你看的那部电影怎么样? 很好看啊。"
+   },
+   {
+    "japanese": "A「コーヒーは、いかがですか。」 B「はい、いただきます。」",
+    "chinese": "来杯咖啡怎么样? 好的,那就喝咖啡吧。"
+   },
+   {
+    "japanese": "ビールをもう1本いかがでしょうか(=ビールをもう1本飲みませんか)。",
+    "chinese": "再来瓶啤酒怎么样?"
+   },
+   {
+    "japanese": "いかがですか、いっしょに飲みに行きませんか。",
+    "chinese": "怎么样?一起去喝一杯吧。"
+   },
+   {
+    "japanese": "いかがでしょうか、この仕事をお願いしたいですが。",
+    "chinese": "你看怎么样?我想把这项工作交给您来做。"
+   }
+  ],
+  "notes": "是比「どうですか」更礼貌的说法。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "どうやって",
+  "level": "N5",
+  "formation": "どうやって+动词疑问句",
+  "meaning_zh": "怎么......？",
+  "examples": [
+   {
+    "japanese": "A「どうやって帰りましたか。」 B「電車に乗って帰りました。」",
+    "chinese": "你是怎么回家的? 我是乘电车回家的。"
+   },
+   {
+    "japanese": "A「駅まではどうやって行きますか。」 B「遠くないですから、歩いて行きましょう。」",
+    "chinese": "到车站怎么走? 因为不远,走着去吧。"
+   }
+  ],
+  "notes": "询问方式方法。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "なぜ",
+  "level": "N5",
+  "formation": "なぜ+疑问句",
+  "meaning_zh": "“为什么......?”（询问原因）",
+  "examples": [
+   {
+    "japanese": "小林君はなぜまだ来ていませんか。",
+    "chinese": "小林为什么还没有来?"
+   },
+   {
+    "japanese": "田中さんは会社をやめたいと言っていますね。なぜですか。",
+    "chinese": "田中说他想辞职是吧。为什么呢?"
+   }
+  ],
+  "notes": "跟「どうして」同义。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "どのくらい(どのぐらい)",
+  "level": "N5",
+  "formation": "どのくらい(どのぐらい)+疑问句",
+  "meaning_zh": "“多少......?”（询问数量）",
+  "examples": [
+   {
+    "japanese": "ここから駅までどのぐらいありますか。",
+    "chinese": "从这里到车站有多远?"
+   },
+   {
+    "japanese": "その帽子はどのぐらいかかりましたか。",
+    "chinese": "那顶帽子花了多少钱?"
+   },
+   {
+    "japanese": "単語をどのくらい習いましたか。",
+    "chinese": "学了多少单词?"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "どれくらい(どれぐらい)",
+  "level": "N5",
+  "formation": "どれくらい(どれぐらい)+疑问句",
+  "meaning_zh": "“多少......?”（询问数量）",
+  "examples": [
+   {
+    "japanese": "どれくらいお金がかかりましたか。",
+    "chinese": "花了多少钱?"
+   },
+   {
+    "japanese": "あなたのうちから会社までどれくらいかかりますか。",
+    "chinese": "从你家到公司要花多少时间?"
+   },
+   {
+    "japanese": "その会社でどれぐらい働いていましたか。",
+    "chinese": "你在那家公司工作了多少年?"
+   }
+  ],
+  "notes": "跟「どのくらい」同义。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "ほう",
+  "level": "N5",
+  "formation": "名+のほう",
+  "meaning_zh": "大致的方向、方位、位置",
+  "examples": [
+   {
+    "japanese": "駅を出てから、ずっと東のほうへ行ってください。",
+    "chinese": "出了车站后径直向东走。"
+   },
+   {
+    "japanese": "A「ほら、前のほうはまだ空いていますよ。」 B「じゃ、あちらのほうに座りましょう。」",
+    "chinese": "你看,前排有些空位置。 那就坐那边吧。"
+   },
+   {
+    "japanese": "もっと上のほうに置いてください。",
+    "chinese": "把东西再往上放一点。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "要る",
+  "level": "N5",
+  "formation": "名+が要る",
+  "meaning_zh": "“需要......”（金钱、时间、物品等方面的需求）",
+  "examples": [
+   {
+    "japanese": "仕事が多いので、少し時間が要ります。",
+    "chinese": "因为这项工作量多,所以我们需要多一点的时间。"
+   },
+   {
+    "japanese": "A「ノートは何冊要りますか。」 B「1冊だけ買ってください。」",
+    "chinese": "笔记本需要几本? 就买一本吧。"
+   },
+   {
+    "japanese": "この新聞はもう要りません。捨ててもいいです。",
+    "chinese": "这份报纸不要了,可以扔了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "かかる",
+  "level": "N5",
+  "formation": "数量词+かかる；名(+助词)+かかる",
+  "meaning_zh": "“花费......”（金钱、时间上的实际花费、消耗）",
+  "examples": [
+   {
+    "japanese": "このテストは50分ぐらいかかります。",
+    "chinese": "这次考试大约需要50分钟。"
+   },
+   {
+    "japanese": "毎月食事に5万円ぐらいかかります。",
+    "chinese": "每月在吃饭上大约花费五万日元。"
+   },
+   {
+    "japanese": "簡単な仕事ですから、あまり時間はかかりません。",
+    "chinese": "因为工作简单,所以不需要花费很多时间。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "多い/少ない",
+  "level": "N5",
+  "formation": "场所+に(人物、物品)が多い(少ない)",
+  "meaning_zh": "“有很多(很少)......”（表示某场所有人或物品的多寡）",
+  "examples": [
+   {
+    "japanese": "公園に人が多いです。",
+    "chinese": "公园里有很多人。"
+   },
+   {
+    "japanese": "海に魚が多いです。",
+    "chinese": "海洋里有很多鱼。"
+   },
+   {
+    "japanese": "その店に物が少ないです。",
+    "chinese": "那家店里的商品种类很少。"
+   },
+   {
+    "japanese": "さいふに金が少ないです。",
+    "chinese": "囊中羞涩。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "聞こえる",
+  "level": "N5",
+  "formation": "名+が聞こえる",
+  "meaning_zh": "“传来......”“听到......”（声音自然传入耳朵）",
+  "examples": [
+   {
+    "japanese": "だれかの泣いている声が聞こえました。",
+    "chinese": "听到有人在哭。"
+   },
+   {
+    "japanese": "声が小さいので、よく聞こえません。",
+    "chinese": "因为声音小,所以听不清楚。"
+   },
+   {
+    "japanese": "後ろの人もはっきり聞こえる声で話します。",
+    "chinese": "用坐在后排的人也能听清楚的声音说话。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "見える",
+  "level": "N5",
+  "formation": "名+が見える；(场所、方向名词)+に(事物名词)+が見える",
+  "meaning_zh": "“看到......”（物体等自然进入眼帘）",
+  "examples": [
+   {
+    "japanese": "高い山の上から学校が見えます。",
+    "chinese": "从山顶上看得见学校(的建筑)。"
+   },
+   {
+    "japanese": "ホテルの窓から富士山が見えます。",
+    "chinese": "透过宾馆的窗户可以看见富士山。"
+   },
+   {
+    "japanese": "黒板の字が小さいので、よく見えません。",
+    "chinese": "因为黑板上的字写得比较小,所以看不清楚。"
+   },
+   {
+    "japanese": "学校の5階の窓から北に白い山がよく見えます。",
+    "chinese": "从我们学校的5楼窗户可以很清楚地看到位于北面的雪山。"
+   },
+   {
+    "japanese": "向こうに高いビルが見えました。",
+    "chinese": "看见对面有一栋大楼。"
+   },
+   {
+    "japanese": "道の左側に公園が見えました。",
+    "chinese": "在道路的左侧有座公园。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "知る",
+  "level": "N5",
+  "formation": "名+を知っている(は知らない)；普通体句子+と知っている(とは知らない)",
+  "meaning_zh": "“认识......”“知道......”（了解、认识；知晓具体事项）",
+  "examples": [
+   {
+    "japanese": "A「郵便局の電話番号を知っていますか。」 B「いいえ、知りません。」",
+    "chinese": "你知道邮局的电话号码吗? 不,不知道。"
+   },
+   {
+    "japanese": "新聞を読んで、そのニュースを知りました。",
+    "chinese": "看了报纸,才知道那个消息。"
+   },
+   {
+    "japanese": "A「宿題はもう出しましたか。」 B「昨日宿題がありましたか。わたしは知りませんでした。」",
+    "chinese": "作业已经交上去了吗? 昨天老师布置作业了吗?我不知道。"
+   },
+   {
+    "japanese": "手紙を読んで、おばあさんはとても元気(だ)と知りました。",
+    "chinese": "看了来信后,得知外婆身体还很好。"
+   },
+   {
+    "japanese": "彼がそんな悪い人とは知りませんでした。",
+    "chinese": "当初真不知道他是个大坏蛋。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "分かる",
+  "level": "N5",
+  "formation": "名+が分かる；普通体句子+と分かる；独立使用",
+  "meaning_zh": "“懂得......”（通晓技能；明白事理；承诺、答应对方的请求）",
+  "examples": [
+   {
+    "japanese": "A「日本語が分かりますか。」 B「少し分かります。」",
+    "chinese": "你懂日语吗? 懂一点。"
+   },
+   {
+    "japanese": "このゲームは分かりません。",
+    "chinese": "这个游戏我不懂。"
+   },
+   {
+    "japanese": "この言葉の意味が分かりますか。",
+    "chinese": "这个单词的意思你知道吗?"
+   },
+   {
+    "japanese": "あなたの言うことが分かりません。",
+    "chinese": "我听不明白你说的是什么意思。"
+   },
+   {
+    "japanese": "わたしはすぐに、来ている人が山田くみさんだと分かりました。",
+    "chinese": "我马上认了出来的人就是山田久美。"
+   },
+   {
+    "japanese": "足音で来た人が山田さんだと分かりました。",
+    "chinese": "凭着脚步声我就知道来者是山田。"
+   },
+   {
+    "japanese": "A「山田さん、このコピーをお願いします。」 B「はい、分かりました。」",
+    "chinese": "山田,请把这个复印一下。 好的,我知道了。"
+   },
+   {
+    "japanese": "(レストランで) 客「すみません。メニューをください。」 店員「メニューですね。分かりました。」",
+    "chinese": "把菜单拿给我看一下。 菜单吗?知道了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "する",
+  "level": "N5",
+  "formation": "名+をする；名+する；名+をしている",
+  "meaning_zh": "“干、做、进行”；与动名词复合构成动词；从事职业；装束",
+  "examples": [
+   {
+    "japanese": "A「明日、何をしますか。」 B「買い物をしたり、スポーツをしたりします。」",
+    "chinese": "明天做什么? 购物、运动等。"
+   },
+   {
+    "japanese": "A「これから何をしますか。」 B「友だちと中国語の会話の練習をします。」",
+    "chinese": "接下来做什么? 和朋友一起练习说汉语。"
+   },
+   {
+    "japanese": "今年はイギリスへ旅行します。",
+    "chinese": "今年去英国旅行。"
+   },
+   {
+    "japanese": "昨日、一日中、日本語を勉強しました。",
+    "chinese": "昨天学了一整天的日语。"
+   },
+   {
+    "japanese": "A「お父さんは会社で何をしていますか。」 B「父は会社で部長をしています。」",
+    "chinese": "你爸爸在公司里做什么工作? 父亲在公司当部长。"
+   },
+   {
+    "japanese": "A「お兄さんは何をしていますか。」 B「兄は中学校の先生をしています。」",
+    "chinese": "你哥哥在做什么工作? 我哥哥在中学当教师。"
+   },
+   {
+    "japanese": "先生はネクタイをしています。",
+    "chinese": "老师系着领带。"
+   },
+   {
+    "japanese": "手袋をして仕事をします。",
+    "chinese": "戴着手套工作。"
+   },
+   {
+    "japanese": "あのスカーフをしている/をした娘さんはどなたですか。",
+    "chinese": "那位系着方巾的姑娘是谁?"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "やる",
+  "level": "N5",
+  "formation": "名+をやる",
+  "meaning_zh": "“干、做、进行”；经营（商店等）",
+  "examples": [
+   {
+    "japanese": "妻は毎日うちで家事をやっている。",
+    "chinese": "妻子每天在家做家务。"
+   },
+   {
+    "japanese": "わたしはうちで何もやりません。",
+    "chinese": "我在家里什么也不干。"
+   },
+   {
+    "japanese": "午後、友だちとスポーツをやりました。",
+    "chinese": "下午和朋友一起运动了。"
+   },
+   {
+    "japanese": "友だちは本屋をやっています。",
+    "chinese": "我朋友经营着一家书店。"
+   },
+   {
+    "japanese": "ぼくは町でレストランをやっています。",
+    "chinese": "我在镇上开了一家餐馆。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "ない",
+  "level": "N5",
+  "formation": "助词(は、が)+ない；名「で」/ナ「で」+はない；イ「く」+ない",
+  "meaning_zh": "“没有......”（事物的不存在、不拥有）；补助形容词“不(是)......”",
+  "examples": [
+   {
+    "japanese": "今日は暇がない。",
+    "chinese": "今天没空。"
+   },
+   {
+    "japanese": "お金がなくて、困っています。",
+    "chinese": "因为没钱花,很犯愁。"
+   },
+   {
+    "japanese": "時間もお金もなかったので、旅行をやめました。",
+    "chinese": "既没时间又没钱,所以没去旅行。"
+   },
+   {
+    "japanese": "何か食べる物がないですか。",
+    "chinese": "你这里没什么吃的东西吗?"
+   },
+   {
+    "japanese": "お店には赤い帽子がないでしょうか。",
+    "chinese": "你们店里没有红色的帽子吗?"
+   },
+   {
+    "japanese": "何か質問はないですか。",
+    "chinese": "有没有什么要问的?"
+   },
+   {
+    "japanese": "わたしは学生ではない。",
+    "chinese": "我不是学生。"
+   },
+   {
+    "japanese": "わたしは英語が上手ではない。数学もうまくない。",
+    "chinese": "我英语不好,数学也不怎么样。"
+   }
+  ],
+  "notes": "イ形容词「ない」可单独使用；补助形容词「ない」只能接在名词「で形」、ナ形容词「で形」、イ形容词「く形」后面；否定助动词「ない」只能接在动词未然形后面。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "まだ",
+  "level": "N5",
+  "formation": "まだ~(肯定句谓语/否定句谓语)",
+  "meaning_zh": "肯定句“仍然......”；否定句“还没......”",
+  "examples": [
+   {
+    "japanese": "こちらはまだ冬です。ですから、寒いです。",
+    "chinese": "我们这里现在还是冬季,所以很冷。"
+   },
+   {
+    "japanese": "A「図書館の本は返しましたか。」 B「いいえ、まだ読んでいます。」",
+    "chinese": "图书馆的书已经还了吗? 没有。我还在看。"
+   },
+   {
+    "japanese": "A「作文はもう出しましたか。」 B「いいえ、まだ書いていません。」",
+    "chinese": "作文已经交上去了吗? 没有,还没写。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "もう",
+  "level": "N5",
+  "formation": "もう~(肯定句谓语/否定句谓语)",
+  "meaning_zh": "肯定句“已经......”；否定句“已经没有......”",
+  "examples": [
+   {
+    "japanese": "そのニュースはもう知っています。",
+    "chinese": "那条消息我已经知道了。"
+   },
+   {
+    "japanese": "A「Eメールはもう送りましたか。」 B「いいえ、まだ送っていません(=いいえ、まだです)。」",
+    "chinese": "电子邮件已经发送了吗? 不,还没有(发出去)。"
+   },
+   {
+    "japanese": "A「お金を少し貸してくださいませんか。」 B「昨日私はたくさん買い物をしました。今、お金はもうありません。」",
+    "chinese": "借点钱给我好吗? 昨天我买了很多东西,所以现在我已经没有钱了。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "よい/いい",
+  "level": "N5",
+  "formation": "接在～后",
+  "meaning_zh": "“好”（赞赏、羡慕；委婉拒绝；「よかった」感叹；「~がいい」表喜好、合适）",
+  "examples": [
+   {
+    "japanese": "A「そのネクタイ、いいですね。」 B「彼女がくれたのです。」",
+    "chinese": "你那条领带,好漂亮啊。 是我女朋友送给我的。"
+   },
+   {
+    "japanese": "A「今日は天気がいいですね。」 B「そうですね。」",
+    "chinese": "今天天气真好啊。 是啊。"
+   },
+   {
+    "japanese": "A「今年の夏休みに家族でイギリスへ旅行するよ。」 B「そう?いいなあ。」",
+    "chinese": "今年暑假我们全家人要一起到英国旅行。 是吗,那多好啊。"
+   },
+   {
+    "japanese": "A「もう一杯どう?」 B「いや、酒はもういい。」",
+    "chinese": "再来一杯怎么样? 不要了。酒不喝了。"
+   },
+   {
+    "japanese": "山田「ご飯、もう少しいかがですか。」 田中「いいえ、もういいです。」",
+    "chinese": "再给你添点饭吧。 不,不要了。"
+   },
+   {
+    "japanese": "大川「高山さん、荷物は少しわたしが持ちましょう。」 高山「いいえ、いいです。」",
+    "chinese": "高山,我帮你拿点行李吧。 不,不用了。"
+   },
+   {
+    "japanese": "よかった。いい天気になりました。",
+    "chinese": "太好了,天终于放晴了。"
+   },
+   {
+    "japanese": "ああ、よかった。なくなった時計がこんなところにあったよ。",
+    "chinese": "啊,太好了。不见了的手表原来在这里啊。"
+   },
+   {
+    "japanese": "A「風邪はどうでしたか。」 B「よくなりました。」 A「それはよかったですね。」",
+    "chinese": "感冒怎么样了? 全好了。 那太好了。"
+   },
+   {
+    "japanese": "遊びに行きましょう。どこがいいですか。",
+    "chinese": "我们去玩吧。哪里好呢?"
+   },
+   {
+    "japanese": "A「このかばんはどうですか。」 B「もう少し小さいのがいいですね。」",
+    "chinese": "这个包你看怎么样? 再小一点的比较好。"
+   },
+   {
+    "japanese": "日本料理より中国料理のほうがいいです。",
+    "chinese": "比起日本料理,我更喜欢吃中餐。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "いらっしゃいます",
+  "level": "N5",
+  "formation": "名+にいらっしゃいます(“在”)；名+に/へいらっしゃいます(“去/来”)",
+  "meaning_zh": "「いる」的尊敬语，“在……”；也作「行く」「来る」的尊敬语动词，“去……”“来……”。",
+  "examples": [
+   {
+    "japanese": "明日、おうちにいらっしゃいますか。",
+    "chinese": "明天您在家吗？"
+   },
+   {
+    "japanese": "先生 「今、山田先生はどちらですか。」 生徒 「山田先生は教室にいらっしゃいます。」",
+    "chinese": "老师：山田老师现在在哪里？ 学生：山田老师在教室里。"
+   },
+   {
+    "japanese": "A 「お父さんはまだアメリカにいらっしゃいますか。」 B 「いいえ。父はもう日本に帰りました。」",
+    "chinese": "A：你父亲还在美国吗？ B：不，他已经回日本了。"
+   },
+   {
+    "japanese": "生徒 「日曜日にどこへいらっしゃいましたか。」 先生 「ちょっと町へ買い物に行きました。」",
+    "chinese": "学生：星期天您去了哪儿？ 老师：我上街买东西去了。"
+   },
+   {
+    "japanese": "今日、先生も私のパーティーにいらっしゃいました。",
+    "chinese": "今天，老师也来参加了我的派对。"
+   }
+  ],
+  "notes": "在口语中，「いらっしゃってください」常常约音为「いらしてください」。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "おっしゃいます",
+  "level": "N5",
+  "formation": "名+をおっしゃいます；句子+とおっしゃいます",
+  "meaning_zh": "「言う」的尊敬语动词。“说……”。",
+  "examples": [
+   {
+    "japanese": "A 「先生は何をおっしゃいましたか。」 B 「よく勉強しなさいとおっしゃいました。」",
+    "chinese": "A：老师说了什么？ B：老师说：“要好好学习”。"
+   },
+   {
+    "japanese": "A 「お父さんはあなたに何をおっしゃいましたか。」 B 「何も言いませんでした。」",
+    "chinese": "A：您父亲对你说了什么？ B：什么也没说。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "いただきます",
+  "level": "N5",
+  "formation": "名+をいただきます",
+  "meaning_zh": "1.「食べる」「飲む」的谦让语，“吃……”“喝……”。2.动词「もらう」的谦让语，表示“接受、领受”。",
+  "examples": [
+   {
+    "japanese": "昨日、先生のところで、おいしいコーヒーをいただきました。",
+    "chinese": "昨天在老师家喝了好喝的咖啡。"
+   },
+   {
+    "japanese": "A 「何もありませんが、どうぞ食べてください。」 B 「ありがとうございます。いただきます。」",
+    "chinese": "A：没什么可招待的，请吃吧。 B：谢谢，那我就不客气了。"
+   },
+   {
+    "japanese": "奥様からいただいた(=もらった)ミカンをおいしくいただきました(=食べました)。",
+    "chinese": "我吃了夫人送给我的橘子，很好吃。"
+   },
+   {
+    "japanese": "A 「これはうちのおじいさんが作った豆腐です。どうぞ。」 B 「ありがとうございます。じゃあ、いただきます。スープを作う。」",
+    "chinese": "A：这是我爷爷做的豆腐，请收下。 B：谢谢。那我就收下了。就做碗豆腐汤吧。"
+   }
+  ],
+  "notes": "用作「もらう」的谦让语时，多用于接受礼物时说的客气话。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ }
+]
