@@ -1987,6 +1987,54 @@ def _desc(rule, display_lang):
     return rule["meaning"]
 
 
+# Script probes for _in_display_language below.
+_CJK_CHAR = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
+_HANGUL_CHAR = re.compile(r"[\uac00-\ud7af]")
+_LATIN_WORD = re.compile(r"[A-Za-z]{3,}")
+
+
+def _in_display_language(text, display_lang):
+    """
+    Whether a raw source string belongs in the panel's display language.
+
+    The data carries one string per field, not one per language: the
+    vendored jkindrix rows hold English prose ("Not yet: まだ + V ていない
+    / ...") while the merged study-material rows hold Chinese, and only
+    the *description* is translated (zh.json / ko.json).  Passing the
+    jkindrix text straight through is what put English into the Chinese
+    panel (the formation line, the folded reference example's translation
+    and the notes block), so an enrichment field is shown only when its
+    script matches what the reader asked for.  The missing Chinese
+    wording belongs in the data and is being added there; nothing is
+    machine-translated here.
+
+    An empty string is never displayable.  English is the source language
+    of every field, so nothing is filtered in that mode.
+    """
+    text = (text or "").strip()
+    if not text:
+        return False
+    if display_lang == "zh":
+        # Japanese notation («名词+の/动词「た」形+あとで») passes, while
+        # "Noun + に難くない" does not: the Latin run of three or more
+        # letters is the tell, since the notation itself is kana/kanji.
+        return bool(_CJK_CHAR.search(text)) and not _LATIN_WORD.search(text)
+    if display_lang == "ko":
+        # Nothing in the shipped data is Korean yet, so every enrichment
+        # field is hidden rather than shown in English.
+        return bool(_HANGUL_CHAR.search(text))
+    return True
+
+
+def _reference_text(reference, display_lang):
+    "The curated example's translation for the display language, or ''."
+    if display_lang == "zh":
+        return reference.get("chinese") or ""
+    if display_lang == "ko":
+        return ""
+    return reference.get("english") or reference.get("chinese") or ""
+
+
 def analyze_japanese(page_text, display_lang="en"):
     """
     Analyze a page of Japanese text for grammar points.
@@ -2039,13 +2087,23 @@ def analyze_japanese(page_text, display_lang="en"):
                 }
                 # Panel-enrichment fields (formation line, folded reference
                 # block); only emitted when the underlying entry carries
-                # them, so hand-written rules and old data stay unchanged.
-                if rule.get("formation"):
-                    entry["formation"] = rule["formation"]
-                if rule.get("formation_notes"):
-                    entry["notes"] = rule["formation_notes"]
-                if rule.get("reference"):
-                    entry["reference"] = rule["reference"]
+                # them *in the display language* -- hand-written rules and
+                # old data carry neither, and the untranslated English
+                # halves of the vendored rows stay out of a zh/ko panel.
+                formation = rule.get("formation") or ""
+                if _in_display_language(formation, display_lang):
+                    entry["formation"] = formation
+                notes = rule.get("formation_notes") or ""
+                if _in_display_language(notes, display_lang):
+                    entry["notes"] = notes
+                reference = rule.get("reference")
+                if reference:
+                    text = _reference_text(reference, display_lang)
+                    if text:
+                        entry["reference"] = {
+                            "japanese": reference["japanese"],
+                            "text": text,
+                        }
                 matched.append(entry)
             if not any(e["sentence"] == sentence for e in entry["examples"]):
                 if len(entry["examples"]) < _CONSTRUCTION_EXAMPLE_CAP:

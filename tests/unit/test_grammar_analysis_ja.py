@@ -1122,8 +1122,9 @@ def test_panel_entries_carry_reference_block():
     assert entry["formation"] == rule["formation"]
     assert entry["notes"] == rule["formation_notes"]
     assert entry["reference"]["japanese"] == rule["reference"]["japanese"]
-    assert entry["reference"]["chinese"] == rule["reference"]["chinese"]
-    assert entry["reference"]["english"] == rule["reference"]["english"]
+    # The panel gets one translated line, chosen for the display language,
+    # never the whole {chinese, english} triple to sort out client-side.
+    assert entry["reference"]["text"] == rule["reference"]["english"]
 
 
 def test_panel_entries_omit_empty_reference_fields():
@@ -1134,3 +1135,68 @@ def test_panel_entries_omit_empty_reference_fields():
         assert "formation" not in entry or entry["formation"]
         assert "notes" not in entry or entry["notes"]
         assert "reference" not in entry or entry["reference"]["japanese"]
+
+
+def _jkindrix_rule():
+    "A vendored jkindrix rule: English notes, English-only example."
+    return next(
+        r
+        for r in _ALL_RULES
+        if r.get("formation_notes")
+        and r.get("reference")
+        and not r["reference"]["chinese"]
+        and r.get("patterns")
+        and r.get("kind") not in ("particle", "basic")
+    )
+
+
+def test_chinese_panel_never_shows_english_enrichment():
+    """
+    The vendored jkindrix rows are English prose and their example
+    translations are English-only, so a Chinese panel must drop those
+    fields rather than print English under a Chinese heading -- that was
+    the bug: 「参考例句 · 注意点」 showed "Not yet: まだ + V ていない ..."
+    and "I haven't done my homework yet.".  The Chinese wording is added
+    to the data separately; until then the block simply disappears.
+    """
+    rule = _jkindrix_rule()
+    results = analyze_japanese("".join(rule["examples"][:2]), display_lang="zh")
+    entry = next(e for e in results if e["key"] == rule["key"])
+    assert re.search(r"[\u4e00-\u9fff]", entry["desc"]), entry["desc"]
+    assert "notes" not in entry, entry.get("notes")
+    assert "reference" not in entry, entry.get("reference")
+    assert "formation" not in entry or not re.search(r"[A-Za-z]{3,}", entry["formation"])
+
+
+def test_english_panel_still_shows_the_english_enrichment():
+    "The filter is language-scoped: English panels are untouched."
+    rule = _jkindrix_rule()
+    results = analyze_japanese("".join(rule["examples"][:2]))
+    entry = next(e for e in results if e["key"] == rule["key"])
+    assert entry["notes"] == rule["formation_notes"]
+    assert entry["reference"]["text"] == rule["reference"]["english"]
+
+
+def test_korean_panel_hides_untranslated_enrichment():
+    "No Korean enrichment exists yet, so a ko panel shows none rather than English."
+    rule = _jkindrix_rule()
+    results = analyze_japanese("".join(rule["examples"][:2]), display_lang="ko")
+    entry = next(e for e in results if e["key"] == rule["key"])
+    assert "notes" not in entry
+    assert "reference" not in entry
+    assert "formation" not in entry
+
+
+def test_merged_material_rows_stay_visible_in_chinese():
+    "A merged row carries Chinese everywhere, so the zh panel keeps it all."
+    rule = next(
+        r
+        for r in _ALL_RULES
+        if r.get("reference")
+        and r["reference"].get("chinese")
+        and r.get("patterns")
+        and r.get("kind") not in ("particle", "basic")
+    )
+    results = analyze_japanese("".join(rule["examples"][:2]), display_lang="zh")
+    entry = next(e for e in results if e["key"] == rule["key"])
+    assert entry["reference"]["text"] == rule["reference"]["chinese"]
