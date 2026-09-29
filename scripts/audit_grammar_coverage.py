@@ -100,6 +100,13 @@ _EXPLICIT_MATCH = {
     "にしては": "nishiteha-1d2bbe",
     "として/としては/としても": "toshitetoshitehatoshitemo-1f4501",
     "V意志形が/V意志形と": "vgavto-cb117e",
+    # Same collapse as にして above, from the N1/N2/N3 private-material merge
+    # (2026-09-30): して is a slot word (V する の て形 descriptor), so として
+    # slugs to the stop-listed single と and never reaches the index.  Each maps
+    # to the row this merge created from that very entry.
+    "として": "toshite",
+    "としても": "toshitemo",
+    "とする": "tosuru",
 }
 
 # Confusable pairs that must never be auto-merged: the audit maps a material
