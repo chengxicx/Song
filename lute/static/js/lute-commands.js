@@ -306,9 +306,33 @@ function open_grammar_analysis() {
               ? '<span class="grammar-item__level">' + escapeHtml(g.level) + "</span>"
               : "";
           const desc = g.desc ? '<div class="grammar-item__desc">' + escapeHtml(g.desc) + "</div>" : "";
+          const formation = g.formation
+            ? '<div class="grammar-item__formation">' + escapeHtml(g.formation) + "</div>"
+            : "";
           const examples = (g.examples || []).map(function (ex) {
             return '<div class="grammar-item__example">' + renderExample(ex) + "</div>";
           }).join("");
+          // Folded reference block: the entry's own curated example with its
+          // translation, plus usage notes.  Both fields are optional
+          // (hand-written rules and older data carry neither), so the whole
+          // block disappears when there is nothing to show.
+          const notes = g.notes
+            ? '<div class="grammar-item__notes">' + escapeHtml(g.notes) + "</div>"
+            : "";
+          const ref = g.reference && g.reference.japanese
+            ? '<div class="grammar-item__refex">' +
+              escapeHtml(g.reference.japanese) +
+              '<div class="grammar-item__reftr">' +
+              escapeHtml(g.reference.chinese || g.reference.english || "") +
+              "</div></div>"
+            : "";
+          const cjk = /[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]/.test(g.desc || "");
+          const moreLabel = cjk ? "参考例句 · 注意点" : "Reference · notes";
+          const more =
+            ref || notes
+              ? '<details class="grammar-item__more"><summary>' + moreLabel + "</summary>" +
+                ref + notes + "</details>"
+              : "";
           return (
             '<div class="grammar-item grammar-item--' +
             escapeHtml(levelClass(g.level)) +
@@ -319,8 +343,10 @@ function open_grammar_analysis() {
             '<span class="grammar-item__name">' + escapeHtml(g.name) + "</span>" +
             (fold ? '<span class="grammar-item__fold" aria-hidden="true">&#9656;</span>' : "") +
             "</div>" +
+            formation +
             desc +
             '<div class="grammar-item__examples">' + examples + "</div>" +
+            more +
             "</div>"
           );
         }

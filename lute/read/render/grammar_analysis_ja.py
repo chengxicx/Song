@@ -918,6 +918,13 @@ _VOCAB_IDS = frozenset(
         # skip semantics) rather than in _VOCAB_IDS, where the screen
         # invariant would reject them.
         "tachi", "gata", "sugi",
+        # ---- merged N1/N2/N3 book entries reviewed 2026-09-30 ----
+        # honorific verbs: 召す / 存じ上げる are the keigo forms of 着る・食べる
+        # and 知る, i.e. lexicon entries.  The word popup answers 召す outright,
+        # so the row ("「着る、食べる…」等动词的尊敬语动词") repeats it and teaches
+        # no construction.
+        "mat-a81d6a",       # 召す
+        "jigeru",           # 存じ上げる
     }
 )
 
@@ -969,6 +976,43 @@ _DUPLICATE_IDS = frozenset(
         "chiyan",           # ~ちゃん suffix (16.7%, word formation)
         "noda",             # ~のだ -> n-desu-explanation (all examples are
         "noda-cd8e33",      #   んです/のです forms, same construction)
+        # N1/N2/N3 private-material book merge 2026-09-30: same-level entries whose
+        # display name and derived spec both collide with a row that is already
+        # in the library, so _merge_same_name would fold them into that row and
+        # append a second, near-identical gloss ("…之极；极度（の極み）；跟
+        # 「の至り」的意思类似…").  Identified by grouping every derived rule on
+        # (display name, spec fingerprint) and keeping the group members that
+        # arrived in this merge, not guessed.  Two of them
+        # (nakuhanainakumonai-9bc5e0, nishitatenishitemo-a3ea75) are duplicates
+        # *within* this merge -- the book lists the same point twice, and the
+        # id collided so the second got a hash suffix.  Six more
+        # (ageku, mat-150c91 以上, mat-67312c 反面, mat-865ba0 抜く,
+        # mat-fa7d2d 以来, poi) carry a bare-literal regex where the existing
+        # row carries a stricter token spec; the name is the same, so they are
+        # the same row.
+        # N1:
+        "gaika", "gurumi-1758dc", "nikatakunai-453107", "nomi", "nori",
+        "ojinai", "omote", "orini", "sonomono", "taritomo", "teyamanai-4005e7",
+        "zunihaokanainaidehaokanai",
+        # N2:
+        "ageku", "dakenokotohaaru", "karakoso", "karaniha", "kotodakara",
+        "kotokara", "mat-150c91", "mat-67312c", "mat-865ba0",
+        "mokamawazu-6f8ba7", "naikotoniha-c0be26", "nakuhanainakumonai-9bc5e0",
+        "nihokanaranai-4931cc", "nimokakawarazu", "nirazu",
+        "nishitatenishitemo-a3ea75", "nite", "omotonishiteomotonishita",
+        "owazuhawazu", "tenaranai-1884a0", "toiumonoda",
+        "toiumonodehanaitoiumonodemonai", "tsutsuaru", "zaruonai", "zurai",
+        # N3:
+        "buripuri", "mat-fa7d2d", "poi", "tabini", "toshite", "totomoni",
+        # Also from the 2026-09-30 merge, but the collision is with a row in
+        # the same family rather than a same-named one: 〜わけ appears next to
+        # the 〜わけだ / 〜わけではない / 〜わけがない rows it already has, and
+        # 〜のだ next to 〜んです (the N4 〜のだ entries were silenced for the
+        # same reason in the previous round -- plain and polite form of one
+        # construction).  Both fired on ~9% / ~21% of pages with a gloss the
+        # family row already carries.
+        "wake",
+        "noda-e4b5a5",
     }
 )
 
@@ -1137,6 +1181,32 @@ _SLOT_SPECS = {
     "naka": (
         "〜なか",
         [{"type": "tokens", "conds": [{"surface": "なか"}, {"surface": "で"}]}],
+    ),
+    # N1/N2/N3 book merge (2026-09-30).  These entries' descriptive pattern is
+    # the bare form itself ("よう", "なる", "とて", "とも"), so the derivation
+    # fell back to a literal-substring regex and each fired on every occurrence
+    # of that substring -- including words that merely contain it.  The
+    # attachment the entry's own formation field names is what tells them
+    # apart, and Sudachi tags it: 変わりよう/喜びよう take よう as 接尾辞 while
+    # the ようだ / ように reading is 形状詞, 健全なる takes なる as 助動詞
+    # (なり) while 春になる is the verb, 男女とも takes とも as 接尾辞 while
+    # 〜とも思わない is と + も, and とても is one 副詞 token, so a regex とて
+    # matched a different word outright.
+    "you": (
+        "よう",
+        [{"type": "tokens", "conds": [{"pos1": "接尾辞", "surface": "よう"}]}],
+    ),
+    "naru": (
+        "なる",
+        [{"type": "tokens", "conds": [{"pos1": "助動詞", "lemma": {"なり"}}]}],
+    ),
+    "tote": (
+        "とて",
+        [{"type": "tokens", "conds": [{"surface": "とて", "pos1": "助詞"}]}],
+    ),
+    "tomo": (
+        "とも",
+        [{"type": "tokens", "conds": [{"pos1": "接尾辞", "surface": "とも"}]}],
     ),
 }
 
@@ -1418,6 +1488,30 @@ def _load_ko():
 _KO_BY_ID = _load_ko()
 
 
+def _notes_text(notes):
+    "Formation notes in one display string; list or scalar, or '' when absent."
+    if not notes:
+        return ""
+    if isinstance(notes, (list, tuple)):
+        return " ".join(str(n).strip() for n in notes if str(n).strip())
+    return str(notes).strip()
+
+
+def _curated_reference(item):
+    """
+    First curated example that carries a translation, for the panel's
+    folded reference block (书内例句 + 译文).  Returns None when the entry
+    has no usable example; the panel then hides the block.
+    """
+    for ex in item.get("examples") or []:
+        jp = (ex.get("japanese") or "").strip()
+        zh = (ex.get("chinese") or "").strip()
+        en = (ex.get("english") or "").strip()
+        if jp and (zh or en):
+            return {"japanese": jp, "chinese": zh, "english": en}
+    return None
+
+
 def _make_data_rule(
     level, item, idx, skipped, specs=None, shown=None, kind="construction"
 ):
@@ -1441,6 +1535,10 @@ def _make_data_rule(
         "meaning_zh": _ZH_BY_ID.get(item.get("id") or "", ""),
         "meaning_ko": _KO_BY_ID.get(item.get("id") or "", ""),
         "formation": item.get("formation") or "",
+        # jkindrix entries carry notes as a list, materials as a string;
+        # normalize to one string so the panel can drop it in verbatim.
+        "formation_notes": _notes_text(item.get("formation_notes")),
+        "reference": _curated_reference(item),
         "examples": [e["japanese"] for e in item.get("examples") or []],
         # "patterns" is what the matcher reads, so an empty list is how a
         # skipped rule stays silent.  "derived" keeps whatever the derivation
@@ -1939,6 +2037,15 @@ def analyze_japanese(page_text, display_lang="en"):
                     "desc": _desc(rule, display_lang),
                     "examples": [],
                 }
+                # Panel-enrichment fields (formation line, folded reference
+                # block); only emitted when the underlying entry carries
+                # them, so hand-written rules and old data stay unchanged.
+                if rule.get("formation"):
+                    entry["formation"] = rule["formation"]
+                if rule.get("formation_notes"):
+                    entry["notes"] = rule["formation_notes"]
+                if rule.get("reference"):
+                    entry["reference"] = rule["reference"]
                 matched.append(entry)
             if not any(e["sentence"] == sentence for e in entry["examples"]):
                 if len(entry["examples"]) < _CONSTRUCTION_EXAMPLE_CAP:

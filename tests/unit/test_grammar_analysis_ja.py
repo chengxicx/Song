@@ -185,16 +185,16 @@ def test_data_rules_loaded_for_all_levels():
 
 def test_full_jlpt_library_is_loaded():
     "The whole curated JLPT grammar library is present, not just a sample."
-    assert len(_DATA_RULES) >= 820
+    assert len(_DATA_RULES) >= 1300
     by_level = {
         lvl: len([r for r in _DATA_RULES if r["level"] == lvl]) for lvl in _ALL_LEVELS
     }
-    assert by_level == {"N5": 141, "N4": 185, "N3": 256, "N2": 204, "N1": 207}, by_level
+    assert by_level == {"N5": 141, "N4": 185, "N3": 343, "N2": 335, "N1": 306}, by_level
     # The great majority of entries must be usable matchers rather than
     # skipped: entries only get skipped for good reason (see _load_level).
     active = [r for r in _DATA_RULES if not r["skipped"]]
     assert (
-        len(active) >= 480
+        len(active) >= 870
     ), f"only {len(active)} of {len(_DATA_RULES)} rules are active"
 
 
@@ -638,7 +638,7 @@ def test_vocab_ids_are_library_entries():
 
     library = load_library()
     assert _VOCAB_IDS <= set(library), sorted(_VOCAB_IDS - set(library))
-    assert len(_VOCAB_IDS) == 45, "changing the list is a review, not a patch"
+    assert len(_VOCAB_IDS) == 47, "changing the list is a review, not a patch"
 
 
 def test_duplicate_ids_are_library_entries():
@@ -650,7 +650,7 @@ def test_duplicate_ids_are_library_entries():
 
     library = load_library()
     assert _DUPLICATE_IDS <= set(library), sorted(_DUPLICATE_IDS - set(library))
-    assert len(_DUPLICATE_IDS) == 73, "changing the list is a review, not a patch"
+    assert len(_DUPLICATE_IDS) == 118, "changing the list is a review, not a patch"
     assert not (_DUPLICATE_IDS & _VOCAB_IDS), "an id lives in exactly one list"
 
 
@@ -817,6 +817,14 @@ _FORMATION_NAMED = {
     "hoshii",
     "hoshiindesuga",
     "tekudasaimasenka",
+    # N1/N2/N3 book merge (2026-09-30): same class as kasamonakerebakasamonaito
+    # -- the pattern carries a 〜 slot inside the literal (あまり〜に,
+    # いざ〜となると, 〜にかかわらず), so no derived fragment is ever a
+    # substring of it and the headline falls back to the formation text,
+    # which repeats the same construction (〜に/のあまり(に), となると/…).
+    "amarininoamarini",
+    "izatonarutoizatonarebaizatonatara",
+    "nikakawarazunihakakawarinaku",
 }
 
 
@@ -1093,3 +1101,36 @@ def test_zh_table_covers_construction_rules():
         if r["pattern"] not in _ZH_DESC
     ]
     assert missing == [], f"missing zh descriptions: {missing}"
+
+
+def test_panel_entries_carry_reference_block():
+    """
+    Data-rule hits surface the enrichment fields the panel renders
+    (formation line, folded reference example, usage notes); entries
+    without them simply omit the fields.
+    """
+    rule = next(
+        r
+        for r in _ALL_RULES
+        if r.get("formation_notes")
+        and r.get("reference")
+        and r.get("patterns")
+        and r.get("kind") not in ("particle", "basic")
+    )
+    results = analyze_japanese("".join(rule["examples"][:2]))
+    entry = next(e for e in results if e["key"] == rule["key"])
+    assert entry["formation"] == rule["formation"]
+    assert entry["notes"] == rule["formation_notes"]
+    assert entry["reference"]["japanese"] == rule["reference"]["japanese"]
+    assert entry["reference"]["chinese"] == rule["reference"]["chinese"]
+    assert entry["reference"]["english"] == rule["reference"]["english"]
+
+
+def test_panel_entries_omit_empty_reference_fields():
+    "Hand-written rules carry no formation/reference: no empty fields emitted."
+    results = analyze_japanese("私は毎朝六時に起きます。")
+    assert results, "expected at least one hit"
+    for entry in results:
+        assert "formation" not in entry or entry["formation"]
+        assert "notes" not in entry or entry["notes"]
+        assert "reference" not in entry or entry["reference"]["japanese"]

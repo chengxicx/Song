@@ -7178,5 +7178,3109 @@
     "source": "private-material"
    }
   ]
+ },
+ {
+  "id": "youga",
+  "pattern": "(よ)うが",
+  "level": "N1",
+  "meaning_en": "表示无论前项是什么情况或采取什么行为 / 后项都不会受其影响。“不管......”。",
+  "meaning_detailed": "表示无论前项是什么情况或采取什么行为,后项都不会受其影响。“不管......”。",
+  "formation": "各词类「う」+が",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "いかなる理由だろうが/であろうが、テロ事件を起こすのは許すまじきことだ。",
+    "english": "",
+    "chinese": "无论有什么理由,也不允许实施恐怖活动。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "誰が何と言おうが、私の決意は変わりません。",
+    "english": "",
+    "chinese": "无论别人说什么,我的决心也不会改变。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "yougayouga",
+  "pattern": "(よ)うが〜(よ)うが",
+  "level": "N1",
+  "meaning_en": "表示不管是A的情况也好还是B的情况也好 / 后项都不受此约束。“无论是......还是......”。",
+  "meaning_detailed": "表示不管是A的情况也好还是B的情况也好,后项都不受此约束。“无论是......还是......”。",
+  "formation": "各词类「う」+が〜(よ)うが",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "国会議員だろうが、公務員だろうが、税金を納めなければならない。",
+    "english": "",
+    "chinese": "国会议员也好,普通的公务员也好,都必须交税。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "私のやったことは人のためにしたことで、ほめられようが、けなされようが、ちっとも気にしません。",
+    "english": "",
+    "chinese": "我所做的事是为他人服务的,所以被表扬也好被诋毁也好,我都淡然处之。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "yougamaiga",
+  "pattern": "(よ)うが〜まいが",
+  "level": "N1",
+  "meaning_en": "重复使用同一词语 / 表示无论做不做前项 / 结果都是相同的意思。“不管......”“不论......”。",
+  "meaning_detailed": "重复使用同一词语,表示无论做不做前项,结果都是相同的意思。“不管......”“不论......”。",
+  "formation": "动「う」+が〜まいが",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "相手が聞こうが聞くまいが自分の意見をはっきり言うつもりです。",
+    "english": "",
+    "chinese": "不管对方听得进去听不进去,我都要清清楚楚地说出自己的意见。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "これは早急に結論を出さなければならない議題だ。全員集まろうが集まるまいが、予定どおりに審議を始めなくてはならない。",
+    "english": "",
+    "chinese": "这是一个必须尽早拿出结论的议题。不管与会者是否全都到齐,必须按照预定时间开始进入审议程序。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "youtomaito",
+  "pattern": "(よ)うと〜まいと",
+  "level": "N1",
+  "meaning_en": "跟 / よ うが / まいが 的语法意义基本相同。“不管......”“不论......”。",
+  "meaning_detailed": "跟「〜(よ)うが〜まいが」的语法意义基本相同。“不管......”“不论......”。",
+  "formation": "动「う」+と〜まいと",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "周囲の人が反対しようとしまいと、私の気持ちは変わらない。",
+    "english": "",
+    "chinese": "不管周围的人反对与否,我都不会改变我的主意。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "ベストを尽くしてやれば、成功しようとしまいと関係ないのではないか。",
+    "english": "",
+    "chinese": "只要全力以赴,最后成功不成功没有什么关系吧。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "youtoshitatokorode",
+  "pattern": "(よ)うとしたところで",
+  "level": "N1",
+  "meaning_en": "表示“因种种原因 / 即使想做前项也很难做到”的意思 / 后项多为否定或消极意义的谓语。",
+  "meaning_detailed": "表示“因种种原因,即使想做前项也很难做到”的意思,后项多为否定或消极意义的谓语。",
+  "formation": "动「う」+としたところで〜ない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "妻が怒っているところだから、こちらは冷静に話そうとしたところで、聞いてくれないんだ。",
+    "english": "",
+    "chinese": "因为现在我老婆正在气头上,所以即使我想冷静地跟她谈话,她也听不进去。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "うわさを打ち消そうとしたところで、誤解されるだけなんだから、黙っていたほうがいいかもしれない。",
+    "english": "",
+    "chinese": "即使想辟谣,也只会越描越黑,所以干脆保持沉默或许会好一些。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "younimonai",
+  "pattern": "〜(よ)うにも〜ない",
+  "level": "N1",
+  "meaning_en": "即便是想做某事也没办法做到。“想......也不能......”“即使要......也没法......”。",
+  "meaning_detailed": "即便是想做某事也没办法做到。“想......也不能......”“即使要......也没法......”。",
+  "formation": "动「う」+にも〜ない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "こんなに騒がしい部屋では、赤ちゃんを寝かせようにも寝かせられない。",
+    "english": "",
+    "chinese": "在这么吵闹的房间里,想让宝宝睡觉也睡不着。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "大雪で交通が麻痺し、動こうにも動けなかった。",
+    "english": "",
+    "chinese": "由于大雪,交通处于瘫痪状态,车子想动也动弹不了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "kaigaarugaigaarukaimonaku",
+  "pattern": "〜かいがある / がいがある / かいもなく",
+  "level": "N1",
+  "meaning_en": "肯定句表示某行为或动作收到了预期的效果 / 得到了应有的回报 / 否定句则反之。“ 不 worth......”。",
+  "meaning_detailed": "肯定句表示某行为或动作收到了预期的效果,得到了应有的回报,否定句则反之。“(不)值得......”。",
+  "formation": "名「の」/动「た」+かいがある/かいもなく；动「连」+がいがある/かいもなく",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "3時間待ったかいがあって、美しい景色を見ることができた。",
+    "english": "",
+    "chinese": "这三个小时没有白等,我们终于观赏到了美轮美奂的景色。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "応援のかいもなく、私のクラスのチームは一勝もできなかった。",
+    "english": "",
+    "chinese": "真是白去呐喊助威了。因为我们班的队伍一场也没有赢过。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "半年の苦労のしがいもなく、鳥インフルエンザにかかって、羽あまりのトリが全部死んでしまった。",
+    "english": "",
+    "chinese": "半年的辛苦付诸东流。2000多只鸡都因染上了禽流感病毒而死光了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "katagata",
+  "pattern": "〜かたがた",
+  "level": "N1",
+  "meaning_en": "做前项的同时也做后项。借做前项之机兼做后项。“顺便 / ”“借 / 之机”。",
+  "meaning_detailed": "做前项的同时也做后项。借做前项之机兼做后项。“顺便……”“借……之机”。",
+  "formation": "名+かたがた",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": []
+ },
+ {
+  "id": "kaka",
+  "pattern": "〜か否か",
+  "level": "N1",
+  "meaning_en": "かどうか 的书面语 / 用于不确定的疑问。“是不是......”。",
+  "meaning_detailed": "「〜かどうか」的书面语,用于不确定的疑问。“是不是......”。",
+  "formation": "名/ナ「词干」+か否か；イ「辞」/动「辞」+か否か；助动词「た」+か否か",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "その新たな雇用対策が有効であるか否か、結果が出るのはまだ先のことだ。",
+    "english": "",
+    "chinese": "那个新的雇佣政策是否有效,其结果还尚待观察。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "合格するか否かは、君自身の努力にかかっている。",
+    "english": "",
+    "chinese": "能不能考上,全凭你自身的努力。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "garami",
+  "pattern": "〜がらみ",
+  "level": "N1",
+  "meaning_en": "1.表示“所有的物品、所有的人、所有的地方”的意思。“连同 / 一起”。2.表示相互关联的事。“关于 / 方面”。",
+  "meaning_detailed": "1.表示“所有的物品、所有的人、所有的地方”的意思。“连同……一起”。2.表示相互关联的事。“关于……方面”。",
+  "formation": "名+がらみ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "家を土地がらみ1億円で、不動産屋に売ってやった。",
+    "english": "",
+    "chinese": "房子连同地皮以1亿日元的价格统统卖给了房地产开发商。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "最近、耳にしたのは汚職がらみの事件まみれだった。",
+    "english": "",
+    "chinese": "最近听到的都是些有关贪污、渎职等方面的事件新闻。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "gaika",
+  "pattern": "〜が早いか",
+  "level": "N1",
+  "meaning_en": "表示前项刚一发生 / 紧接着就发生了等待已久的后项。“刚 / 就 / ”“一 / 就 / ”。",
+  "meaning_detailed": "表示前项刚一发生，紧接着就发生了等待已久的后项。“刚……就……”“一……就……”。",
+  "formation": "动「辞」+が早いか",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "子供たちは動物園に着くが早いか、おやつを食べ出した。",
+    "english": "",
+    "chinese": "孩子们一到动物园就开始吃起零食。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "授業終了のベルを聞くが早いか、生徒たちは教室を飛び出して行った。",
+    "english": "",
+    "chinese": "刚听到下课的铃声，同学们就飞奔出了教室。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "kiriganai",
+  "pattern": "〜きりがない",
+  "level": "N1",
+  "meaning_en": "表示“如果提起前项来那就没有终结、没有止境了”的意思。",
+  "meaning_detailed": "表示“如果提起前项来那就没有终结、没有止境了”的意思。",
+  "formation": "动「た」+らきりがない；动「ば」+きりがない；动「辞」+ときりがない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼はいつも仕事が雑だ。間違いを挙げればきりがない。",
+    "english": "",
+    "chinese": "他做工作经常杂乱无章。要是列举他犯的错误,那真是举不胜举。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "ほしい物を数えあげるときりがないが、お金がないので、どうしようもない。",
+    "english": "",
+    "chinese": "如果要列举我想要的东西,那简直数也数不清。但因为没钱,所以没办法。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "gurumi-1758dc",
+  "pattern": "〜ぐるみ",
+  "level": "N1",
+  "meaning_en": "跟 / がらみ 类似。“连 / 全都”。",
+  "meaning_detailed": "跟「〜がらみ」类似。“连……全都”。",
+  "formation": "名+ぐるみ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "今日は家族ぐるみで、伊勢神宮を参拝していた。",
+    "english": "",
+    "chinese": "今天全家一起去参拜了伊势神社。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "家を土地ぐるみ1億円で、不動産屋に売ってやった。",
+    "english": "",
+    "chinese": "房子连同地皮以1亿日元的价格统统卖给了房地产开发商。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "zukume",
+  "pattern": "〜ずくめ",
+  "level": "N1",
+  "meaning_en": "表示全都是这些东西或事情。“全都是 / ”。",
+  "meaning_detailed": "表示全都是这些东西或事情。“全都是……”。",
+  "formation": "名+ずくめ；ナ「な」/イ「辞」+こと+ずくめ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "この一年間は良いことずくめだったが、来年はどうだろうか。",
+    "english": "",
+    "chinese": "这一年喜事不断，但不知明年如何。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "おいしい料理ずくめの持て成しをいただいてとても満足しました。",
+    "english": "",
+    "chinese": "全是美味佳肴，让我们一饱口福。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "週末のパーティーに彼女はブラウスもスカートも黑ずくめで出てきた。",
+    "english": "",
+    "chinese": "她穿着一身黑色的衬衫和裙子参加了周末的晚会。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "zunigozarunaidegozaru",
+  "pattern": "〜ずにござる/ないでござる",
+  "level": "N1",
+  "meaning_en": "1.事物等的状态。“还没......”。 / 2.人物的动作状态。“还没......”。",
+  "meaning_detailed": "1.事物等的状态。“还没......”。；2.人物的动作状态。“还没......”。",
+  "formation": "动「未」+ずにござる；动「ない」+でござる；する⇒せずにござる",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "その仕事はまだ完成せずにございます。",
+    "english": "",
+    "chinese": "那项工作至今尚未完成。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "新しいパソコンは買いましたが、まだ使わずにございます。",
+    "english": "",
+    "chinese": "新电脑倒是买回来了,但还一直没有用过。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "卒業してこのかた、(わたしは)彼女とは会わないでございます。",
+    "english": "",
+    "chinese": "毕业至今,我还一直没有跟她见过面。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "被害者を救うために、われわれ救援隊員はもう二日間も寝ずにございます。",
+    "english": "",
+    "chinese": "为了救受灾者,我们这些救援人员已经两天没有睡觉了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "zunihaokanainaidehaokanai",
+  "pattern": "〜ずにはおかない / ないではおかない",
+  "level": "N1",
+  "meaning_en": "表示无论本人意志如何 / 都必然会导致某种情感的出现。“怎不让人......”“肯定会使......”。 / 表示说话人要把事情坚持到底的决心。“一定要......”“必须......”。",
+  "meaning_detailed": "表示无论本人意志如何,都必然会导致某种情感的出现。“怎不让人......”“肯定会使......”。；表示说话人要把事情坚持到底的决心。“一定要......”“必须......”。",
+  "formation": "动「未」+ずにはおかない/ないではおかない；する⇒せずにはおかない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "この映画は評判が高く、見る者を感動させずにはおかない。",
+    "english": "",
+    "chinese": "这部影片受到了较高的评价,所以它肯定能让观众感动不已。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "花が咲くのはまだ先のことですが、それなりの風情があって、人の心を慰めずにはおきません。",
+    "english": "",
+    "chinese": "虽然离花开的时间还有些日子,不过花开之前也有其独特的风韵,也能使人们的心情得到安慰。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "新企画の中止が決まろうとしているが、担当した者たちは反対せずにはおかないだろう。",
+    "english": "",
+    "chinese": "新计划将被终止,这一定会遭到该计划负责人们的反对吧。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "息子は一流の音楽家になると言って家を出た。大変だが、きっと目的を達成せずにはおかないだろう。",
+    "english": "",
+    "chinese": "儿子说要当一流的音乐家,于是离家到外面去闯荡。虽然会吃很多的苦,但他不达到目的是不会罢休的。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "sonomono",
+  "pattern": "〜そのもの",
+  "level": "N1",
+  "meaning_en": "1 用于强调该名词。“ / 其本身”。用于强调该名词 / 表示“不是别的 / 简直就是 / ”的意思。 2 用于强调该形容词 / 表示程度很高。“非常 / ”“extremely / ”。",
+  "meaning_detailed": "（1）用于强调该名词。“……其本身”。用于强调该名词，表示“不是别的，简直就是……”的意思。（2）用于强调该形容词，表示程度很高。“非常……”“极其……”。",
+  "formation": "名+そのもの；ナ「词干」+そのもの",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "お金そのものは悪いものではないと言える。",
+    "english": "",
+    "chinese": "可以说，钱本身并不是什么坏东西。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "先日提出した私の意見書は、単に決定に至るプロセスの問題点を指摘しようとしたにすぎず、決定そのものに反対するものではありません。",
+    "english": "",
+    "chinese": "前几天我递交上去的建议书，只是想指出作出决定的过程是否恰当，对决定本身我并不持反对意见。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "彼女の歌は天使の歌声そのものだ。",
+    "english": "",
+    "chinese": "她的歌声简直就是天籁之音。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "最近、物忘れがひどくなるばかりだ。これこそ老化そのものだ。",
+    "english": "",
+    "chinese": "最近我越来越健忘了，其实这就是人老化的表现。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "彼は誠実そのもので、みんなから信頼されている。",
+    "english": "",
+    "chinese": "他非常诚实，得到了大家的信赖。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "お兄さんは謙遜そのもので、弟さんは傲慢そのものだ。",
+    "english": "",
+    "chinese": "哥哥做人十分谦虚，而弟弟做人却十分傲慢。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "sobakara-105f0d",
+  "pattern": "〜そばから",
+  "level": "N1",
+  "meaning_en": "表示即使重复前项的动作也很快就变得无效。“刚 / 就 / ”。",
+  "meaning_detailed": "表示即使重复前项的动作也很快就变得无效。“刚……就……”。",
+  "formation": "动「辞」/动「た」+そばから",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "私は語学の才能がないようで、新しい言葉を習うそばから忘れてしまう。",
+    "english": "",
+    "chinese": "我好像没有语言天赋，刚学的新单词马上就忘了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "もう遅刻しないと言ったそばからまた遅れるなんて、彼は何を考えているのだろう。",
+    "english": "",
+    "chinese": "刚说过“我再也不迟到了”，可今天又迟到了。真不知道他在想些什么。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "sobireru",
+  "pattern": "〜そびれる",
+  "level": "N1",
+  "meaning_en": "和 / 損なう/損ねる 类似 / 表示因某个原因错过了做某件事的机会。“错过机会没 / ”。",
+  "meaning_detailed": "和「〜損なう/損ねる」类似，表示因某个原因错过了做某件事的机会。“错过机会没……”。",
+  "formation": "动「连」+そびれる",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "ぜひ見ようと思っていた映画だったのに、忙しくて行きそびれた。",
+    "english": "",
+    "chinese": "那是我一直想看的电影，但由于工作太忙，结果没能去看。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "そこへ、邪魔者が来て、私は彼女に言いたいことを言いそびれた。",
+    "english": "",
+    "chinese": "正在这时，“电灯泡”来了。结果我想对她说的话没说成。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "taritomo",
+  "pattern": "〜たりとも",
+  "level": "N1",
+  "meaning_en": "表示“即使 最小数量的...... / 也不能......”的意思。",
+  "meaning_detailed": "表示“即使(最小数量的......),也不能......”的意思。",
+  "formation": "一+量词+たりとも〜ない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "募金で集めたお金は1円たりとも無駄にできない。",
+    "english": "",
+    "chinese": "通过募捐筹集到的钱,哪怕一日元也不能浪费。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今日の午後3時までに原稿を提出しなければならず、今は1分たりともおろそかにできない。",
+    "english": "",
+    "chinese": "必须在今天下午3点之前交稿,所以现在我一分钟也不能耽搁。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "dakemashida",
+  "pattern": "〜だけましだ",
+  "level": "N1",
+  "meaning_en": "表示前项虽然是不好的事 / 但幸亏只停留于此而没有恶化。“幸好......”“好在......”。",
+  "meaning_detailed": "表示前项虽然是不好的事,但幸亏只停留于此而没有恶化。“幸好......”“好在......”。",
+  "formation": "ナ「な」/イ「辞」+だけましだ；动「辞」/各词类「た」+だけましだ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "今年は景気が非常に悪く、ボーナスが出なかった。しかし、給料がもらえるだけましだ。",
+    "english": "",
+    "chinese": "由于今年公司非常不景气,所以没有拿到奖金。但是好在工资可以照常领到。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "石油の価格が上がったために、我が社の業績は下がった。しかし、損失が出ないだけまだましだ。",
+    "english": "",
+    "chinese": "由于石油价格的上升,我们公司的业绩也随之下滑。但幸运的是还没有出现经营亏损。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "tekanawanaitehakanawanai",
+  "pattern": "〜てかなわない / てはかなわない",
+  "level": "N1",
+  "meaning_en": "表示达到了说话人的感情或感觉上无法承受的程度。“......得不得了”“非常......”。 / 表示无法承受某种延续或多次重复的状态、行为等。",
+  "meaning_detailed": "表示达到了说话人的感情或感觉上无法承受的程度。“......得不得了”“非常......”。；表示无法承受某种延续或多次重复的状态、行为等。",
+  "formation": "ナ「で」/イ「て」/动「て」+かなわない；ナ「で」/イ「て」/动「て」+はかなわない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "夕べは暑くてかなわなかったので、寝つかれなかったのだ。",
+    "english": "",
+    "chinese": "昨晚热得实在吃不消,一夜都没睡安稳。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "のどがかわいてかなわないが、飲み物を売るところさえ見つからなくて困った。",
+    "english": "",
+    "chinese": "口干得不得了,但令人伤脑筋的是,连一家卖饮料的店都找不到。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "こう暑くてはかなわない。せめて風があれば少しは涼しいのだろうが。",
+    "english": "",
+    "chinese": "这么热的天怎么吃得消,至少刮点风也能稍微凉快些。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "おもしろいと言われたからといって、同じ冗談を何度も聞かされちゃかなわない。",
+    "english": "",
+    "chinese": "虽说有趣,但同样的玩笑被唠叨几遍的话也让人受不了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "tegozaru",
+  "pattern": "〜てござる",
+  "level": "N1",
+  "meaning_en": "是 / てある 的礼貌语形式 / 表示事先做好了某种准备。",
+  "meaning_detailed": "是「〜てある」的礼貌语形式,表示事先做好了某种准备。",
+  "formation": "动「て」+ござる",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "わたしの車はこの先の駐車場に止めてございます。",
+    "english": "",
+    "chinese": "我的车已经停放在前面的那个停车场了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "社長:あ、君。食事の用意はできてるの。社員:はい、あちらのお部屋にすでに準備してございます。",
+    "english": "",
+    "chinese": "哦,对了,我问你,饭菜都已经准备好了吗?是的。已经在那边的屋子里准备好了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "teshikarubeki",
+  "pattern": "〜てしかるべき",
+  "level": "N1",
+  "meaning_en": "表示“理所当然......”“最适合......”“理应......”等意思。",
+  "meaning_detailed": "表示“理所当然......”“最适合......”“理应......”等意思。",
+  "formation": "动「て」+しかるべき",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "所得が低い人には、税金の負担を軽くするなどの措置が取られてしかるべきだ。",
+    "english": "",
+    "chinese": "对那些低收入的人,应该采取减免税收等措施。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "状況が変わったのだから、会社の経営計画も見直されてしかるべきだ。",
+    "english": "",
+    "chinese": "因为情况发生了变化,所以也必须重新考虑公司的经营计划。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "temotomotodatemomotomotoda",
+  "pattern": "〜てもともとだ / てももともとだ",
+  "level": "N1",
+  "meaning_en": "表示“出现不好的结果也无所谓 / 本来就没有抱多大的希望”的意思。“......也无所谓”“......也没什么”。",
+  "meaning_detailed": "表示“出现不好的结果也无所谓,本来就没有抱多大的希望”的意思。“......也无所谓”“......也没什么”。",
+  "formation": "ナ「で」/动「て」+(も)もともとだ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "採用の条件には合わないが、だめでもともとだから、この会社に履歴書を出してみよう。",
+    "english": "",
+    "chinese": "尽管不符合录用条件,但是因为又没有什么损失,所以试着向这家公司投份简历吧。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "実力はまだそこまでになっていないと分かっている。だから、失敗してももともとだ。",
+    "english": "",
+    "chinese": "我自己清楚,我的实力还没达到应有的水平,所以即使失败了也没什么。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "temoshienai",
+  "pattern": "〜ても差し支えない",
+  "level": "N1",
+  "meaning_en": "表示无论何人、何时、何地等都行的意思。“无论......都行”。 / 表示“即使这样的前项也行”的意思。“即使......也无妨”。",
+  "meaning_detailed": "表示无论何人、何时、何地等都行的意思。“无论......都行”。；表示“即使这样的前项也行”的意思。“即使......也无妨”。",
+  "formation": "疑问词(+名词)+でも差し支えない；名「で」/ナ「で」+も差し支えない；イ「て」/动「て」+も差し支えない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "手伝ってくれる人がいれば、誰でも差し支えないから、来てほしい。",
+    "english": "",
+    "chinese": "只要有人帮我,谁都可以,希望有人来。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "いつでも差し支えありませんから、こちらへ遊びにいらっしゃってください。",
+    "english": "",
+    "chinese": "任何时候都可以,请上我家来玩。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "家賃が安ければ、古いアパートでも差し支えない。",
+    "english": "",
+    "chinese": "只要房租便宜,旧一点的公寓也无妨。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "ここで食事をしても差し支えない。",
+    "english": "",
+    "chinese": "可以在这里用餐。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "この本は、来週の金曜日までお借りして差し支えませんか。",
+    "english": "",
+    "chinese": "这本书我可以借到下周五吗?",
+    "source": "private-material"
+   },
+   {
+    "japanese": "ここに車を止めて差し支えないなら、1時間ぐらい止めさせてもらいたいんですけど。",
+    "english": "",
+    "chinese": "如果这里可以停车,我想停一个小时左右,行吗?",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "temomonainomohanai",
+  "pattern": "〜ても無理もない / のも無理はない",
+  "level": "N1",
+  "meaning_en": "表示出现前项也是合情合理的。“也no wonder......”“当然......”。",
+  "meaning_detailed": "表示出现前项也是合情合理的。“也难怪......”“当然......”。",
+  "formation": "名「で」/ナ「で」+も無理もない；イ「て」/动「て」+も無理もない；形式名词(の)+も無理もない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "あの人はエステ代に給料のほとんどをつぎ込んでいる。肌がきれいでも無理もない/きれいなのも無理はない。",
+    "english": "",
+    "chinese": "她几乎把所有的工资都花费在美容养生上了,所以难怪她的肌肤很好。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "君が悪いから、課長に怒られても無理もない/怒られるのも無理はない。",
+    "english": "",
+    "chinese": "因为是你不好,难怪科长会冲着你发脾气。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "君が悪いから、課長に怒られるのは無理もない。",
+    "english": "",
+    "chinese": "因为是你不好,难怪科长会冲着你发脾气。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "A:山田先生の授業に出る学生が少ないなあ。B:あんなに退屈な講義じゃ、(学生が少ないのも)無理ないよ。",
+    "english": "",
+    "chinese": "去上山田老师课的学生不多啊。那么没意思的课,也难怪(听课的学生少)。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "teyateitadaku",
+  "pattern": "〜てやっていただく",
+  "level": "N1",
+  "meaning_en": "说话人以谦让的语气讲述人物A为人物B做某事。“我请某人......”。",
+  "meaning_detailed": "说话人以谦让的语气讲述人物A为人物B做某事。“我请某人......”。",
+  "formation": "动「て」+やっていただく",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "山田さんから、娘を車に乗せてやっていただきました。",
+    "english": "",
+    "chinese": "请山田先生让我女儿搭乘了他的车。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "出かけていたとき、隣の奥さんに子どもの世話をしてやっていただきました。",
+    "english": "",
+    "chinese": "我出门的时候,请邻居的太太帮我照看了孩子。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "teyateitadakemasenka",
+  "pattern": "〜てやっていただけませんか",
+  "level": "N1",
+  "meaning_en": "说话人以谦让的语气请求对方为属于说话人的一方做某事情。“我能否请求您为......做......”。",
+  "meaning_detailed": "说话人以谦让的语气请求对方为属于说话人的一方做某事情。“我能否请求您为......做......”。",
+  "formation": "动「て」+やっていただけませんか",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "すみませんが、リーさんを郵便局へ連れて行ってやっていただけませんか。",
+    "english": "",
+    "chinese": "对不起,请您陪这位李小姐去一趟邮局好吗?",
+    "source": "private-material"
+   },
+   {
+    "japanese": "そのいい機会を友だちの山田さんに与えてやっていただけませんか。",
+    "english": "",
+    "chinese": "您就把那个好机会给山田好吗?",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "teyatekudasaru",
+  "pattern": "〜てやってくださる",
+  "level": "N1",
+  "meaning_en": "说话人以尊敬的语气讲述人物A为人物B做某事。 / 讲话人以尊敬的语气请对方为属于讲话人一方的人提供帮助。“请你为......做......”。 / 跟上面 / てやってください 的意思相同 / 但语气更委婉。“请你为......做......好吗”。",
+  "meaning_detailed": "说话人以尊敬的语气讲述人物A为人物B做某事。；讲话人以尊敬的语气请对方为属于讲话人一方的人提供帮助。“请你为......做......”。；跟上面「〜てやってください」的意思相同,但语气更委婉。“请你为......做......好吗”。",
+  "formation": "(1)动「て」+やってくださる；(2)动「て」+やってください；(3)动「て」+やってくださいませんか",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "来週から、田中先生が息子に英語を教えてやってくださいます。",
+    "english": "",
+    "chinese": "从下周开始,田中老师开始教我儿子学习英语。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "あの方は弟を車でうちまで送ってやってくださいました。",
+    "english": "",
+    "chinese": "那个人开车把我弟弟送到了我家。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "彼女は若いけれども、とても優秀です。次の仕事はわが社にとって重要ですので、彼女に任せてやってください。",
+    "english": "",
+    "chinese": "她虽然年轻,但还是挺优秀的。这项工作对我们公司很重要,所以就交给她干吧。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "山田さん、お客様を空港まで送ってやってくださいませんか。",
+    "english": "",
+    "chinese": "山田,你把客人送到机场好吗?",
+    "source": "private-material"
+   },
+   {
+    "japanese": "暇だったら山田さんのオートバイを見てやってくださいませんでしょうか。",
+    "english": "",
+    "chinese": "如果你有空的话,帮山田修理一下摩托车好吗?",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "teyatekureru",
+  "pattern": "〜てやってくれる",
+  "level": "N1",
+  "meaning_en": "跟 / てやってくださる 同义 / 但语气稍简慢一些 / 用于讲述人物A为人物B做某事。 / 跟 / てやってください 的意思相同 / 但语气更简慢一些 / 而且带有轻微的命令语气。“请你为......做......”。 / 跟 / てやってくださいませんか 的意思相同 / 但语气略显简慢。“请你为......做...",
+  "meaning_detailed": "跟「〜てやってくださる」同义,但语气稍简慢一些,用于讲述人物A为人物B做某事。；跟「〜てやってください」的意思相同,但语气更简慢一些,而且带有轻微的命令语气。“请你为......做......”。；跟「〜てやってくださいませんか」的意思相同,但语气略显简慢。“请你为......做......好吗”。",
+  "formation": "(1)动「て」+やってくれる；(2)动「て」+やってくれ；(3)动「て」+やってくれませんか",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "山田さんが息子のオートバイを修理してやってくれました。",
+    "english": "",
+    "chinese": "田中帮我儿子修好了摩托车。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "隣さんが二日間うちの子どもの世話をしてやってくれました。",
+    "english": "",
+    "chinese": "邻居家帮我带了两天孩子。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "このケーキを隣のおばあさんに持っていってやってくれ。",
+    "english": "",
+    "chinese": "你把这个蛋糕送给邻居家的奶奶吃吧。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "課長:山田君。よければ、あの新人の仕事を手伝ってやってくれ。うまくできないって。山田:はい、分かりました。",
+    "english": "",
+    "chinese": "我说山田,可以的话你去指导一下那位新职工的工作。他说他不太懂。好的,我知道了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "向こうがちょっと遅く着くかもしれませんから、来るまで待っていてやってくれませんか。",
+    "english": "",
+    "chinese": "对方可能会晚一点到,你就在这里等客人吧。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "会議のことを山田さんに伝えてやってくれませんか。",
+    "english": "",
+    "chinese": "开会的事情请你通知山田吧。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "teyatemorau",
+  "pattern": "〜てやってもらう",
+  "level": "N1",
+  "meaning_en": "跟 / てやっていただく 同义 / 但礼貌程度低。“我请某人......”。",
+  "meaning_detailed": "跟「〜てやっていただく」同义,但礼貌程度低。“我请某人......”。",
+  "formation": "动「て」+やってもらう",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "その日に、おばあちゃんから子どもたちに田舎料理を作ってやってもらいました。",
+    "english": "",
+    "chinese": "那天我请外婆为孩子们做了农家菜。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "友だちに息子の自転車を修理してやってもらいました。",
+    "english": "",
+    "chinese": "我请朋友为儿子修了自行车。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "teyatemoraemasenka",
+  "pattern": "〜てやってもらえませんか",
+  "level": "N1",
+  "meaning_en": "跟 / てやっていただけませんか 的意思相同 / 但语气稍简慢一些。“我能否请求您为......做......”。",
+  "meaning_detailed": "跟「〜てやっていただけませんか」的意思相同,但语气稍简慢一些。“我能否请求您为......做......”。",
+  "formation": "动「て」+やってもらえませんか",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "悪いけど、うちの子を駅まで載せてやってもらえませんか。",
+    "english": "",
+    "chinese": "不好意思,能让我的孩子搭乘您的车到车站吗?",
+    "source": "private-material"
+   },
+   {
+    "japanese": "うちの娘に英語を教えてやってもらえませんか。",
+    "english": "",
+    "chinese": "请您教我女儿英语好吗?",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "teyamanai-4005e7",
+  "pattern": "〜てやまない",
+  "level": "N1",
+  "meaning_en": "表示说话人强烈的愿望或始终不变的态度。礼貌的说法是 / てやみません 。“衷心......”“殷切......”“始终......”。",
+  "meaning_detailed": "表示说话人强烈的愿望或始终不变的态度。礼貌的说法是「〜てやみません」。“衷心......”“殷切......”“始终......”。",
+  "formation": "动「て」+やまない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "結婚する二人の今後の幸せを願ってやまない。",
+    "english": "",
+    "chinese": "衷心祝愿他们婚后幸福。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "その時、みんなは先生の病気を気にかけてやみませんでした。",
+    "english": "",
+    "chinese": "那时,大家非常担心老师的病情。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "dehasumasarenai",
+  "pattern": "〜ではすまされない",
+  "level": "N1",
+  "meaning_en": "表示“如果只是这样是不行的”“如果这样是行不通的”等意思。",
+  "meaning_detailed": "表示“如果只是这样是不行的”“如果这样是行不通的”等意思。",
+  "formation": "名/句子+ではすまされない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "約束したとおりに5千万円もの結納金を受け取ったあとから、伝言を聞いて、驚いた。",
+    "english": "",
+    "chinese": "按约定女方已经收下了我送的5千万日元的聘礼了,可后来又让人传话说:“就这点钱,没门”。我感到很震惊。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "課長である以上、そんな大事な事を知らなかったではすまされないだろう。",
+    "english": "",
+    "chinese": "既然是科长,那么大的事都不知道的话怎么能容忍。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "toiu-ee4dee",
+  "pattern": "〜という",
+  "level": "N1",
+  "meaning_en": "重复同一名词 / 用于表示所有的东西都处于相同的状态。“所有的......”。置于表示日期或次数的名词前后 / 用于强调该名词。 / 强调数量多或少。",
+  "meaning_detailed": "重复同一名词,用于表示所有的东西都处于相同的状态。“所有的......”。置于表示日期或次数的名词前后,用于强调该名词。；强调数量多或少。",
+  "formation": "名+という+名；数量词+という+名词",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼の部屋は壁という壁に美人の写真が貼ってある。",
+    "english": "",
+    "chinese": "他房间的墙壁四周都贴满了美女照片。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "力という力を使い尽くして、溺れた人を救い上げた。",
+    "english": "",
+    "chinese": "竭尽全力,把落水的人救了上来。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今年という今年は、下がりつつある売り上げに困った。",
+    "english": "",
+    "chinese": "今年的销售额连续下滑,很伤脑筋。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今回という今回こそ、N1試験に受かってみせる。",
+    "english": "",
+    "chinese": "这次一定要通过N1考试。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "広場に何千人という人が集まった。",
+    "english": "",
+    "chinese": "广场上聚集了好几千人。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "毎朝5キロというジョギングはわたしにとって、たいしたもんじゃない。",
+    "english": "",
+    "chinese": "每天早上慢跑5公里,这对我来说没什么。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "toiukatoiukatoiuka",
+  "pattern": "〜というか / というか〜というか",
+  "level": "N1",
+  "meaning_en": "就某人或某事给出一个印象性的评价 / 后项多为叙述总结性的判断。“可以说是...... 总之 ”。 / 就某人或某事给出两个印象性的评价 / 后项多为叙述总结性的判断。“说是......也行 / 说是......也行 / 总之 ”。",
+  "meaning_detailed": "就某人或某事给出一个印象性的评价,后项多为叙述总结性的判断。“可以说是......(总之)”。；就某人或某事给出两个印象性的评价,后项多为叙述总结性的判断。“说是......也行,说是......也行,(总之)”。",
+  "formation": "名/ナ「词干」+というか；イ「辞」/动「辞」+というか；助动词「た」+というか；名/ナ「词干」+というか〜というか；イ「辞」/动「辞」+というか〜というか；助动词「た」+というか〜というか",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "ブランド品の腕時計だと言われているのに、そんなに安く売っているなんて。いんちきな商売というか、とにかく疑わしい。引っかからないように気をつけてください。",
+    "english": "",
+    "chinese": "虽然说是名牌手表,却卖得如此便宜,可以说里面可能有猫腻吧,反正值得怀疑,当心上当受骗。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "一人であんな危険な場所へ行くとは、無茶というか、無知というか、とにかく私には理解できない。",
+    "english": "",
+    "chinese": "竟然独自一人到那种危险的地方去,说他是胡闹还是无知呢?真让我难以理解。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "その時の気持ちは悲しいというか、あるいはうれしいというか、どちらもあったといえよう。",
+    "english": "",
+    "chinese": "当时的心情可以说是悲喜交加。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "toiutokorodatoitatokoro",
+  "pattern": "〜というところだ / といったところ",
+  "level": "N1",
+  "meaning_en": "用于表示某事所处的阶段、情况、不高的程度等。“差不多也就是......”。",
+  "meaning_detailed": "用于表示某事所处的阶段、情况、不高的程度等。“差不多也就是......”。",
+  "formation": "名/动「辞」/句子+というところだ/といったところだ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "この教科書の勉強は、来週で終わるというところだ。",
+    "english": "",
+    "chinese": "这本教科书的学习将在下周结束。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今年の米のできは、まあまあといったところだ。",
+    "english": "",
+    "chinese": "今年的大米收成也就马马虎虎吧。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "toitenai",
+  "pattern": "〜といって〜ない",
+  "level": "N1",
+  "meaning_en": "在提示场所、人物、事物、理由等的同时 / 再加以否定。“要问......没有任何......”。 / 表示没有什么特别worth一提的东西 / 或表示没有什么特别worth去做的事。“没有什么特别的......”。",
+  "meaning_detailed": "在提示场所、人物、事物、理由等的同时,再加以否定。“要问......没有任何......”。；表示没有什么特别值得一提的东西,或表示没有什么特别值得去做的事。“没有什么特别的......”。",
+  "formation": "疑问词(+短句)+といって〜ない；これといって〜ない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "今度の対戦相手の守りには、どこといって穴がない。",
+    "english": "",
+    "chinese": "这次作战对手的防守战术没有任何漏洞。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "どんなときが幸せだといって、一家で一緒に暮らせるほど幸せなことはない。",
+    "english": "",
+    "chinese": "要问我什么时候感到最幸福,没有比一家人能团聚在一起生活的日子更令人感到幸福了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "店には入ったが、これといってほしい服はない。",
+    "english": "",
+    "chinese": "虽然进了店里,但没有找到我特别想买的衣服。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "美術展を見に行ったが、これといって賞賛にたえる作品に出会わなかった。",
+    "english": "",
+    "chinese": "虽然去看了美术展,但并没有看到值得称赞的作品。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "適当な人選といえば、これという人がいなくて困っている。",
+    "english": "",
+    "chinese": "说起适当的人选,确实没有合适的人,所以我正在为此发愁。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "これといった自覚症状もなく急に発病した。",
+    "english": "",
+    "chinese": "并没有出现任何前兆就突然发病了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "niazukaru",
+  "pattern": "〜にあずかる",
+  "level": "N1",
+  "meaning_en": "用于谦让地讲述自己或自己一方人员的动作、行为。“承蒙......”。",
+  "meaning_detailed": "用于谦让地讲述自己或自己一方人员的动作、行为。“承蒙......”。",
+  "formation": "ご+名+にあずかる；动「连」+にあずかる",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "恩恵にあずかりまして、感謝の意を申し上げます。",
+    "english": "",
+    "chinese": "承蒙关照,深表感谢。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "日頃お世話にあずかりまして、誠にありがたく存じます。",
+    "english": "",
+    "chinese": "对您平日里的关照,表示真诚的谢意。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "niokaremashitehaniokaremashitemo",
+  "pattern": "〜におかれましては/におかれましても",
+  "level": "N1",
+  "meaning_en": "接在身份、地位高的人的名词后面表示尊敬。",
+  "meaning_detailed": "接在身份、地位高的人的名词后面表示尊敬。",
+  "formation": "名+におかれましては/におかれましても",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "先生におかれましては、ますますお元気そうで何よりです。",
+    "english": "",
+    "chinese": "老师贵体安康,胜过一切。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "貴社におかれましては、ますますご盛栄のこととお喜び申し上げます。",
+    "english": "",
+    "chinese": "贵公司日益兴隆,我们深感高兴。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nikatakunai-453107",
+  "pattern": "〜にかたくない",
+  "level": "N1",
+  "meaning_en": "表示依据当时的状况 / “不难想象......”“不难推测......”“不难体会到......”等意思。",
+  "meaning_detailed": "表示依据当时的状况,“不难想象......”“不难推测......”“不难体会到......”等意思。",
+  "formation": "名/动「辞」+にかたくない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "審査員が彼の作品を見て、そのすばらしさに驚いたことは、想像にかたくない。",
+    "english": "",
+    "chinese": "审查员看了他的作品后,对其作品的精彩之处所表现出的惊讶是不难想象的。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "田舎に住んでいる人が都会に憧れる心情は理解(する)にかたくない。",
+    "english": "",
+    "chinese": "住在乡下的人,他们向往城市的心情是不难理解的。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "言葉もよく分からない外国で一人きりで暮らすときの気持ちは納得するにかたくない。",
+    "english": "",
+    "chinese": "独自一人在语言不通的国外生活时的心情不难理解。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nitaerunitaenai",
+  "pattern": "〜にたえる / にたえない",
+  "level": "N1",
+  "meaning_en": "表示有那样去做的价值。“ 不 worth......”。 / 表示忍耐不了那样去做。“不值......”“不堪......”。 / 表达说话人的感受或感情到了难以言表、难以控制的程度。“不胜......”“非常......”。",
+  "meaning_detailed": "表示有那样去做的价值。“(不)值得......”。；表示忍耐不了那样去做。“不值......”“不堪......”。；表达说话人的感受或感情到了难以言表、难以控制的程度。“不胜......”“非常......”。",
+  "formation": "名/动「辞」+にたえる/たえない；名/动「辞」+にたえない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼の描いた絵は専門家の鑑賞にもたえる作品だった。",
+    "english": "",
+    "chinese": "他画的画,也能经得起专家们的鉴赏。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "近頃の週刊誌はくだらない記事が多く、読むにたえない。",
+    "english": "",
+    "chinese": "最近的一些周刊里所登载的,有很多是一些无聊的“八卦”,不值得一读。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "あの役者の気障な格好はまったく見るにたえない。",
+    "english": "",
+    "chinese": "那个演员矫揉造作的姿态不堪入目。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "あの人の話はいつも人の悪口ばかりで、聞くにたえない。",
+    "english": "",
+    "chinese": "那人老是说别人的坏话,简直不堪入耳。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今回の出版に関してご配慮を賜り、感謝にたえません。",
+    "english": "",
+    "chinese": "有关这次出版事宜,承蒙关照,不胜感谢。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "奥様がお亡くなりになったと伺って、悲しみにたえません。",
+    "english": "",
+    "chinese": "听说您的夫人逝世,为此我深感悲痛。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nitarirunitarinai",
+  "pattern": "〜にたりる / にたりない",
+  "level": "N1",
+  "meaning_en": "表示是否足以达到了某种程度或要求。“ 不 足以......”“ 没有 充分达到......”。",
+  "meaning_detailed": "表示是否足以达到了某种程度或要求。“(不)足以......”“(没有)充分达到......”。",
+  "formation": "名/动「辞」+にたりる/たりない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "はたして彼は信頼するにたりる人間だろうか。",
+    "english": "",
+    "chinese": "他真的是一个值得信赖的人吗?",
+    "source": "private-material"
+   },
+   {
+    "japanese": "これは、まじめに考えるにたりない、くだらない問題だ。",
+    "english": "",
+    "chinese": "这是一个不值得去多想的无聊的问题。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nitarunitaranai",
+  "pattern": "〜にたる / にたらない",
+  "level": "N1",
+  "meaning_en": "跟 / に足りる/に足りない 的语法意义相同。“ 不 足以......”“ 没有 充分达到......”。",
+  "meaning_detailed": "跟「〜に足りる/に足りない」的语法意义相同。“(不)足以......”“(没有)充分达到......”。",
+  "formation": "名/动「辞」+にたる/たらない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "合格と認められるにたる成績を示さなかった者には再検討を課す。",
+    "english": "",
+    "chinese": "如何对待那些不及格的人,需要重新讨论。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "先日提出された調査報告は信頼にたるものではなかった。",
+    "english": "",
+    "chinese": "前几天提交的调查报告,不足以令人信服。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nihabanai",
+  "pattern": "〜には及ばない",
+  "level": "N1",
+  "meaning_en": "表示无须做到某种程度、某种地步。“need not......”“无须......”。",
+  "meaning_detailed": "表示无须做到某种程度、某种地步。“不必......”“无须......”。",
+  "formation": "名/动「辞」+には及ばない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "みんな知っていることだから、二度と説明(する)には及びません。",
+    "english": "",
+    "chinese": "这是大家都知道的事情,用不着说第二遍。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "そんなつまらないことで、わざわざお越しいただくには及びません。",
+    "english": "",
+    "chinese": "这么小的事,不劳驾您专程赶过来。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nihagaaru",
+  "pattern": "〜には無理がある",
+  "level": "N1",
+  "meaning_en": "表示存在着不可能实现的地方 / 或表示有不合乎道理的地方。",
+  "meaning_detailed": "表示存在着不可能实现的地方,或表示有不合乎道理的地方。",
+  "formation": "名/动「辞」+には無理がある",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "町の再開発を一挙に進めるのには無理がある。実情に即して計画を練らなければならない。",
+    "english": "",
+    "chinese": "城镇的再开发不可能一蹴而就,必须根据实际情况反复研究计划。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "麻薬の製造者と販売者をみな死刑に処するという意見がある。その主張には人権上無理がある。",
+    "english": "",
+    "chinese": "有人主张对毒品制造者和毒品贩卖者统统处以极刑。从人权的角度来看,该主张有待商榷。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nishitakotohanai",
+  "pattern": "〜に越したことはない",
+  "level": "N1",
+  "meaning_en": "表示没有比这个更好的了。“最好是......”“莫过于......”。",
+  "meaning_detailed": "表示没有比这个更好的了。“最好是......”“莫过于......”。",
+  "formation": "名/ナ「词干」+に越したことはない；イ「辞」/动「辞」+に越したことはない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "申請書の提出締め切りは明日の午後4時だが、早めに出せればそれにこしたことはない。",
+    "english": "",
+    "chinese": "虽然申请表的提交截止时间是明天下午4点,但如果能提前交的话那是再好不过了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "どんなに安全な地域であれ、ドアの鍵を二つつけるなど用心するにこしたことはない。",
+    "english": "",
+    "chinese": "无论是在多么安全的地方,为了以防万一,门最好是上双保险。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nomi",
+  "pattern": "〜の極み",
+  "level": "N1",
+  "meaning_en": "跟 の至り 的意思类似 / 表示程度达到了极限。“非常......”“......之极”“倍感......”。",
+  "meaning_detailed": "跟「の至り」的意思类似,表示程度达到了极限。“非常......”“......之极”“倍感......”。",
+  "formation": "名+の極み",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "世界的に有名な俳優と握手できたなんて、感激の極みだ。",
+    "english": "",
+    "chinese": "能同世界级名演员握手,这令我非常激动。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "母は買い物、父は散歩に出たきり帰ってこない。この家にいさせられたのはぼく一人だ。ああ、退屈の極みよ。",
+    "english": "",
+    "chinese": "妈妈去买东西了,爸爸出去散步了。留在家里的就我一个人,真没劲。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nori",
+  "pattern": "〜の至り",
+  "level": "N1",
+  "meaning_en": "表示程度达到了极限。“非常......”“......之极”“倍感......”。",
+  "meaning_detailed": "表示程度达到了极限。“非常......”“......之极”“倍感......”。",
+  "formation": "名+の至り",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "本日この席に出席できましたことは誠に光栄の至りです。",
+    "english": "",
+    "chinese": "今天我能出席这次活动,甚感光荣。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "課長が自分の姪をおれの嫁さんにとしきりに勧める。迷惑の至りだ。おれには友だちを通して知り合った、この人と決めた相手がいるんだ。",
+    "english": "",
+    "chinese": "科长再三地把他的侄女介绍给我,这太为难我了。其实我已经通过朋友介绍确定了对象。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "mamire",
+  "pattern": "〜まみれ",
+  "level": "N1",
+  "meaning_en": "1.表示身上或物品上沾满肮脏的液体或细小颗粒状的东西。“沾满 / ”“满是 / ”。2.表示充满了不良习惯、不良作风、不良现象等。",
+  "meaning_detailed": "1.表示身上或物品上沾满肮脏的液体或细小颗粒状的东西。“沾满……”“满是……”。2.表示充满了不良习惯、不良作风、不良现象等。",
+  "formation": "名+まみれ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "泥まみれになって働いても、もらえる金はわずかだ。",
+    "english": "",
+    "chinese": "不管怎么流血流汗地干，能得到的薪水还是很少。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "刑事は犯行現場に残されていた血まみれのナイフをビニール袋に入れた。",
+    "english": "",
+    "chinese": "刑警把遗留在犯罪现场的那把沾满血迹的匕首放进了塑料袋。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "最近、政界の不祥事まみれの話ばかり聞かされて、いやになる。",
+    "english": "",
+    "chinese": "最近，听到的净是些政坛上的舞弊行径，真令人厌恶。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "スキャンダルまみれの芸能界の事はよく人々の話題になっている。",
+    "english": "",
+    "chinese": "丑闻不断的演艺圈，常常成为人们的谈资。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "借りるとき、その部屋はほこりにまみれていた。",
+    "english": "",
+    "chinese": "当初借房子的时候，那间屋子满是灰尘。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "汗にまみれて働いてきたが、少しも楽にはならない。",
+    "english": "",
+    "chinese": "尽管拼命地劳动，生活却没有得到丝毫的改善。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "ブラジルチームに遭遇して、一敗地にまみれた。",
+    "english": "",
+    "chinese": "碰到了巴西球队，结果我们输得一塌糊涂。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "monotou",
+  "pattern": "〜ものと思う",
+  "level": "N1",
+  "meaning_en": "是 / と思う 的郑重说法 / 用于有把握的判断。也可说 / ものと考える 。“认为......”。",
+  "meaning_detailed": "是「〜と思う」的郑重说法,用于有把握的判断。也可说「〜ものと考える」。“认为......”。",
+  "formation": "名/ナ「词干」+であるものと思う；ナ「な」/イ「辞」/动「辞」+ものと思う；助动词「た」+ものと思う",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "そのため、犯人はほかでもなく、山田一郎であるものと考える。",
+    "english": "",
+    "chinese": "因此,我认为犯人不是别人,正是山田一郎。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "母は、子どももいっしょに行くものと考えていた。",
+    "english": "",
+    "chinese": "妈妈原以为孩子们也会一起去。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "monotowarerumonotowareteiru",
+  "pattern": "〜ものと思われる / ものと思われている",
+  "level": "N1",
+  "meaning_en": "是 / と思われる 的郑重说法 / 表示说话人的感受、感觉等。也可说 / ものと考えられる 。“看来......”“感到......”。 / 是 / と思われている 的郑重说法 / 用于多数人对某事物带有结论性的总结、看法、态度、评价、断定等。也可说 / もの考えられている 。“人们认为......”“都认为.....",
+  "meaning_detailed": "是「〜と思われる」的郑重说法,表示说话人的感受、感觉等。也可说「~ものと考えられる」。“看来......”“感到......”。；是「〜と思われている」的郑重说法,用于多数人对某事物带有结论性的总结、看法、态度、评价、断定等。也可说「~もの考えられている」。“人们认为......”“都认为......”。",
+  "formation": "名/ナ「词干」+であるものと思われる；ナ「な」/イ「辞」/动「辞」+ものと思われる；助动词「た」+ものと思われる；名/ナ「词干」+であるものと思われている；ナ「な」/イ「辞」/动「辞」+ものと思われている；助动词「た」+ものと思われている",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "まだ現場に行っていないが、夕べの地震による損失が大きいものと考えられる。",
+    "english": "",
+    "chinese": "虽然我们还没有去过现场,但我感到昨晚的地震所造成的损失很大。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今回の調査で事故の原因が明らかになるものと思われる。",
+    "english": "",
+    "chinese": "我认为经过这次的调查,事故的原因将会明确。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "高かろう良かろう、すなわち値段が高い商品なら、その分、質もよいものと思われているが、そうではないケースがなくはない。",
+    "english": "",
+    "chinese": "人们认为“好货不便宜”,也就是说价钱贵的商品,质量也上乘。不过有时也并非如此。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "日本語の漢字は朝鮮半島を通して日本に伝わったものと考えられているが、日本人によって作り出された漢字も少ないながらある。",
+    "english": "",
+    "chinese": "人们认为日语中的汉字是通过朝鲜半岛传到日本去的,不过虽然数量很少,日语汉字中也有日本人自己创造出来的汉字。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "mat-6df5a3",
+  "pattern": "〜も同然",
+  "level": "N1",
+  "meaning_en": "虽然不是百分之百 / 但简直跟所列举的一样。“almost等同于......”“almost跟......一样”。",
+  "meaning_detailed": "虽然不是百分之百,但简直跟所列举的一样。“几乎等同于......”“几乎跟......一样”。",
+  "formation": "名(+も)+も同然；动「た」+も同然",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "山田先生はわたしにとって親同然の存在だった。",
+    "english": "",
+    "chinese": "山田老师对我来说和父母一样。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "あの二人は戸籍上は他人だが、一緒になっているし、できちゃった子もいるし、事実上は夫婦も同然だ。",
+    "english": "",
+    "chinese": "两人虽然没有办理结婚登记,但他们不仅在一起生活,而且又有了孩子,所以实际上已经是名副其实的夫妻关系。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "あとは表紙をつけるだけだから、クラスの文集はもうできたも同然だ。",
+    "english": "",
+    "chinese": "剩下的只是装订封面的工作,所以这本全班作文集差不多等于完成了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "omote",
+  "pattern": "〜をもって",
+  "level": "N1",
+  "meaning_en": "用于事情的开始或结束。 / をもちまして 为礼貌语说法。“于 / ”“以 / ”。",
+  "meaning_detailed": "用于事情的开始或结束。「〜をもちまして」为礼貌语说法。“于……”“以……”。",
+  "formation": "名+をもって",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "誠に勝手ながら、当店は10月30日をもって閉店いたしました。",
+    "english": "",
+    "chinese": "十分抱歉，本店已于10月30日停止营业。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "ただ今をもちまして、受付は締め切らせていただきます。",
+    "english": "",
+    "chinese": "从现在起停止报名。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "onakusareruonakusaseru",
+  "pattern": "〜を余儀なくされる / を余儀なくさせる",
+  "level": "N1",
+  "meaning_en": "使役被动态形式 / 表示某人因故被迫做某事。也说 / 余儀なくさせられる 。“某人被迫......”。 / 使役态形式 / 表示某事的发生迫使某人做某事。“让某人......”“迫使某人......”。",
+  "meaning_detailed": "使役被动态形式,表示某人因故被迫做某事。也说「~余儀なくさせられる」。“某人被迫......”。；使役态形式,表示某事的发生迫使某人做某事。“让某人......”“迫使某人......”。",
+  "formation": "名+を余儀なくされる；名+を余儀なくさせる",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "夏祭りの計画は、予算不足のため、変更を余儀なくされた。",
+    "english": "",
+    "chinese": "关于开展夏日祭祀活动的计划,由于资金不足,(我们)被迫重新做了调整。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "不正な取引が明らかになり、その取引にかかわった会社役員は辞職を余儀なくされた。",
+    "english": "",
+    "chinese": "违法交易被曝光后,参与交易的公司领导被迫递交了辞呈。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "父の死、母の失業は、私に退学を余儀なくさせた。",
+    "english": "",
+    "chinese": "父亲的去世,加上母亲的失业,迫使我退了学。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "太郎は役者になりたかったが、家庭の事情は、太郎に家業を継ぐことを余儀なくさせた。",
+    "english": "",
+    "chinese": "太郎想当演员、但家庭的情况迫使他不得不继承祖业。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "oeoeteoeta",
+  "pattern": "〜を控え/を控えて/を控えた",
+  "level": "N1",
+  "meaning_en": "表示处于某个事件临近、迫在眉睫的时期。相当于“迫近 / ”“即将 / ”“临近 / ”“靠近 / ”等意思。",
+  "meaning_detailed": "表示处于某个事件临近、迫在眉睫的时期。相当于“迫近……”“即将……”“临近……”“靠近……”等意思。",
+  "formation": "名+を控え/を控えて/を控えた",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "駅前の新しい喫茶店は、明日の開店を控えてすっかり準備が整い、あとは客を待つばかりになっている。",
+    "english": "",
+    "chinese": "车站前新开的咖啡馆，明天正式开张营业，现在是万事俱备，只等客人光临。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "田中君は先週ずっと授業を休んでいて、試験を受けなかった。卒業を控えた身でありながら、海外へ遊びに行っていたらしい。",
+    "english": "",
+    "chinese": "田中他上周一直没来学校上课，也没有参加考试。虽然临近毕业，但听说他还去海外旅行了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "ojinai",
+  "pattern": "〜を禁じ得ない",
+  "level": "N1",
+  "meaning_en": "表示当说话人看到、听到、想到某事时 / 心里就会产生一种按捺不住的感情。“禁不住......”“不禁......”“忍不住......”。",
+  "meaning_detailed": "表示当说话人看到、听到、想到某事时,心里就会产生一种按捺不住的感情。“禁不住......”“不禁......”“忍不住......”。",
+  "formation": "名+を禁じ得ない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "戦争の映画や写真を見るたびに、戦争への怒りを禁じ得ない。",
+    "english": "",
+    "chinese": "每次看到描写战争的影片或照片时,我都会禁不住对战争义愤填膺。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "私たちは、彼の突然の辞職に、戸惑いを禁じ得なかった。",
+    "english": "",
+    "chinese": "我们为他突然的辞职而感到困惑不解。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "oru",
+  "pattern": "〜を賜る",
+  "level": "N1",
+  "meaning_en": "表示“承蒙赏赐......”的意思。",
+  "meaning_detailed": "表示“承蒙赏赐......”的意思。",
+  "formation": "名+を賜る",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "なにかとご教示を賜りまして、まことにありがとうございました。",
+    "english": "",
+    "chinese": "承蒙赐教,深表谢意。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "ご多忙中のところを恐縮に存じますが、ご返事賜りたくお待ちしております。",
+    "english": "",
+    "chinese": "在您百忙之中多有打扰。不过,我们仍然期待着您的答复。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "orini",
+  "pattern": "〜を限りに",
+  "level": "N1",
+  "meaning_en": "表示以某时间为最后的结束时间 / 从今以后再也不继续做以前曾做过的事。",
+  "meaning_detailed": "表示以某时间为最后的结束时间，从今以后再也不继续做以前曾做过的事。",
+  "formation": "名+を限りに",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "明日の大晦日を限りに、当店は閉店いたします。長い間ありがとうございました。",
+    "english": "",
+    "chinese": "明天的大年夜为本店最后一次营业，之后将关门歇业。谢谢诸位长期以来的关照。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "鈴木アナウンサーは今日のサッカーの試合の中継放送を限り引退した。",
+    "english": "",
+    "chinese": "播音员铃木播完今天的足球转播赛后就引退了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nauneru",
+  "pattern": "〜損なう/損ねる",
+  "level": "N1",
+  "meaning_en": "1.跟 / そびれる 类似 / 表示某件事情没有做成功或失去了做该事情的机会。“没能 / ”。2.表示险些发生危险的事态。“险些 / ”“差点就 / ”。",
+  "meaning_detailed": "1.跟「〜そびれる」类似，表示某件事情没有做成功或失去了做该事情的机会。“没能……”。2.表示险些发生危险的事态。“险些……”“差点就……”。",
+  "formation": "动「连」+損なう/損ねる",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "そのとき、部長の機嫌が悪かったので、頼みごとを言い損ないました。",
+    "english": "",
+    "chinese": "由于当时部长的情绪有点不好，所以不便出口拜托他。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "相手からの最後の球を受け損なって銀メダルしか取れなかった。",
+    "english": "",
+    "chinese": "由于没能接到对方的最后一个球，结果只得了银牌。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "一度や二度やり損ねても諦めてはいけない。",
+    "english": "",
+    "chinese": "一两次没能干成也别灰心放弃。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "自動車にひかれて、死に損なった。",
+    "english": "",
+    "chinese": "遇到车祸，差点丢了性命。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "子どもの時、一人で川で泳いでいて、溺れ損なったことがある。",
+    "english": "",
+    "chinese": "我小时候，有一次一个人在河里游泳，差点溺水身亡。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "wazumogana",
+  "pattern": "〜言わずもがな",
+  "level": "N1",
+  "meaning_en": "相当于 言うべきではない 言わないほうがいい 的意思。“不该说的......”。 / 相当于 / は言うまでもないことだ / 言わずとも知れたことだ 的意思 / 即“不说自明、明摆着的事实”等意思。",
+  "meaning_detailed": "相当于「言うべきではない」「言わないほうがいい」的意思。“不该说的......”。；相当于「〜は言うまでもないことだ」「〜言わずとも知れたことだ」的意思,即“不说自明、明摆着的事实”等意思。",
+  "formation": "言わずもがな(の、だ)；名+は言わずもがな(だ、のことだ)",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "あんまり腹が立ったので、つい言わずもがなのことを言ってしまった。",
+    "english": "",
+    "chinese": "由于太气人,说了不该说的话。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "言わずもがなのことはやはり言わないほうがいい。「口は災い門」だよね。",
+    "english": "",
+    "chinese": "不该说的话还是不要说。常言说得好,“祸从口出”嘛。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "言わずもがなだが、これは君とはまったく関係がないことだよ。",
+    "english": "",
+    "chinese": "明摆着的事实,这事跟你毫无关系。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "息子さんが大学の入試に受かったとの知らせに、ご両親が喜んだのは言わずもがなのことだ。",
+    "english": "",
+    "chinese": "得到儿子考上大学的通知,父母感到高兴那是不必说了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "rida",
+  "pattern": "〜限りだ",
+  "level": "N1",
+  "meaning_en": "表示某种感情或心情达到了极限。“非常......”“......极了”“......之至”。",
+  "meaning_detailed": "表示某种感情或心情达到了极限。“非常......”“......极了”“......之至”。",
+  "formation": "名「の」/ナ「な」/イ「辞」+限りだ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "こんなすばらしい賞をいただけるなんて、幸せな限りです。",
+    "english": "",
+    "chinese": "能获得如此大奖,令人感到非常幸福。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "小学校からずっと仲のよかった彼女が遠くに引っ越すのは、寂しい限りだ。",
+    "english": "",
+    "chinese": "从小学开始关系就很好的她要搬到很远的地方去,留下我好孤单啊。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "ikandaikanniyoruikanni",
+  "pattern": "いかんだ / いかんによる / いかんに",
+  "level": "N1",
+  "meaning_en": "表示某事能否达到理想的效果或能否实现 / 取决于某种情况、状态、努力的程度等。“取决于......”“要看......如何”。表示根据前项的情况来决定后项或采取相应的措施。“根据......”“要看......”。",
+  "meaning_detailed": "表示某事能否达到理想的效果或能否实现,取决于某种情况、状态、努力的程度等。“取决于......”“要看......如何”。表示根据前项的情况来决定后项或采取相应的措施。“根据......”“要看......”。",
+  "formation": "名+(の)いかんだ/いかんによる/いかんにかかっている；名+(の)いかんで(は)/いかんによって(は)",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "幸不幸は本人の考え方いかんだ。",
+    "english": "",
+    "chinese": "一个人过得是否幸福,取决于这个人的认识。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今度の野外コンサートの入りは天候のいかんによります/いかんにかかっている",
+    "english": "",
+    "chinese": "这次户外音乐会的入场情况,取决于当天的天气如何。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "話し合いの結果いかんでは、ストライキも辞さない覚悟だ。",
+    "english": "",
+    "chinese": "根据谈判的结果,做好了罢工也在所不辞的心理准备。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "国の情勢いかんによっては訪問を中止することもある。",
+    "english": "",
+    "chinese": "根据国内的形势,有可能取消访问计划。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "izatonarutoizatonarebaizatonatara",
+  "pattern": "いざ〜となると / いざ〜となれば / いざ〜となったら",
+  "level": "N1",
+  "meaning_en": "表示“在实施某事时in the unlikely event of遇上麻烦或问题时”的意思。1.表示“平时这样做就是为了防止关键的时候出问题 / 所以即使真的出现问题也无妨”的意思。“in the unlikely event of......也能......”。2.表示在实施某事的节骨眼上出了不想看到的问题。“到了.",
+  "meaning_detailed": "表示“在实施某事时万一遇上麻烦或问题时”的意思。1.表示“平时这样做就是为了防止关键的时候出问题,所以即使真的出现问题也无妨”的意思。“万一......也能......”。2.表示在实施某事的节骨眼上出了不想看到的问题。“到了......(关键时候)却......”。",
+  "formation": "いざ〜名/动「辞」+となれば/となったら；いざ〜名/动「辞」+となると/となれば/となったら",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "今の研究はわたしの専門でもないし、先生や親の支持ももらっていない。でも、いざとなったら、学校を止めても、この大好きな研究を続けていこうと思うんだ。",
+    "english": "",
+    "chinese": "目前我从事的研究活动既不是我的专业,也没有得到老师和父母的支持。不过,万一遇到麻烦,即使辍学我也要将这个钟爱的研究活动进行下去。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "その計画を断行します。いざ失敗となれば、わたしが責任を取ります。",
+    "english": "",
+    "chinese": "我决心一定要实施那个计划。一旦失败了,我承担全部责任。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "わたしは友だちが多い。いざとなれば、助けてもらえるから、心強い。",
+    "english": "",
+    "chinese": "我交友甚多。万一遇到什么情况,可以请求他们帮忙,所以我不担心。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "私はいつもカードを持っている。いざ現金が足りないとなっても、買い物ができる。",
+    "english": "",
+    "chinese": "我平时总是带着现金卡。一旦身上所带的现金不够,就可以刷卡购物。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "苦痛は承知の分娩だが、いざとなったら、やはり緊張し、不安になるものだ。",
+    "english": "",
+    "chinese": "虽然我也知道分娩时很痛苦,但真到了分娩前还是会感到紧张和不安。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "店には多くの魅力的な品が並んでいたが、いざ買うとなると、なかなか決心がつかなかった。",
+    "english": "",
+    "chinese": "虽然商店里摆满了许多诱人的商品,但一旦到了真要买的时候,还真难以下定决心。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "gotoshi",
+  "pattern": "ごとし",
+  "level": "N1",
+  "meaning_en": "1. 表示比喻。“好像 / ”“宛如 / ”。 2. 表示举例。“像 / 那样的 地 ”。 3. 用于事先预告或事后说明的具体内容。常用名词有 以上/以下/次/右/左 等。“如 / 那样”。 4. 用于引言。“就像 / 事先知道 的那样”“就像 / 所说 的那样”。 2 表示不确切的推量、推断。“好像 / ”“宛如 /",
+  "meaning_detailed": "（1.）表示比喻。“好像……”“宛如……”。（2.）表示举例。“像……那样的(地)”。（3.）用于事先预告或事后说明的具体内容。常用名词有「以上/以下/次/右/左」等。“如……那样”。（4.）用于引言。“就像……(事先知道)的那样”“就像……(所说)的那样”。（2）表示不确切的推量、推断。“好像……”“宛如……”。",
+  "formation": "名「の」+ごとし/ごとく/ごとき；动「辞」(+が)+ごとし/ごとく/ごとき；名+である+かのごとし/ごとく/ごとき；动「辞」+かのごとし/ごとく/ごとき",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "暑い日に草むしりをしていたら、汗が滝のごとく流れてきた。",
+    "english": "",
+    "chinese": "大热天在地里拔草，热得我汗流浃背。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今日の日本には赤貧洗うがごとき家はもうないだろう。",
+    "english": "",
+    "chinese": "如今的日本，已经没有那种所谓“一贫如洗”的特困户了吧。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "その二人は影の形に添うが如し。",
+    "english": "",
+    "chinese": "他们两个人如影随形。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "私ごとき未熟者（＝わたしのような未熟者）にこんな重要な役が果たせるでしょうか。",
+    "english": "",
+    "chinese": "像我这种初出茅庐的人，能担当得起这样的重任吗？",
+    "source": "private-material"
+   },
+   {
+    "japanese": "彼はみんなが思っているがごとき人物ではない。",
+    "english": "",
+    "chinese": "他并非是人们想象中的那种人物。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "以上のごとく述べましたが、何かご意見がありますか。",
+    "english": "",
+    "chinese": "我的话说完了，诸位有什么意见没有？",
+    "source": "private-material"
+   },
+   {
+    "japanese": "上記のごとく、一旦納入したお金は返却されません。",
+    "english": "",
+    "chinese": "如上面所说，钱款一旦缴纳概不退还。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "周知のごとく、日本の人口がだんだん減っている。",
+    "english": "",
+    "chinese": "众所周知，日本的人口正在逐渐减少。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "すでに述べたごとく、今年の売上高は去年より深刻であります。",
+    "english": "",
+    "chinese": "就像刚才所说的，今年的销售额比去年差得多。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "彼は、事件には関係していないかのごとく、知らぬふりをしていた。",
+    "english": "",
+    "chinese": "他好像和事件无关似的装作不知道。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "東京、ニューヨーク、上海などの大都市はあたかもコンクリートジャングルであるかのごとき世界だ。",
+    "english": "",
+    "chinese": "东京、纽约、上海等大都市，宛如由钢筋混凝土浇筑起来的森林世界。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "zaru",
+  "pattern": "ざる",
+  "level": "N1",
+  "meaning_en": "相当于 / ない+名词 的语法意义 / 表示否定。“不 / ”。",
+  "meaning_detailed": "相当于「〜ない+名词」的语法意义，表示否定。“不……”。",
+  "formation": "动「未」+ざる+名（する⇒せざる+名）",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "相容れざる二人の意見は、ついに口論にまで発展した。",
+    "english": "",
+    "chinese": "两人的意见大相径庭，结果吵起来了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今度の成功は諸君の絶えざる努力の成果である。",
+    "english": "",
+    "chinese": "这次的成功，是由大家的不懈努力而换来的。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "sura",
+  "pattern": "すら",
+  "level": "N1",
+  "meaning_en": "1 提示主语 が 或宾语 を 成分 / 用于举出一个极端的事例 / 暗示其他一般性的事例也一样。“连 / ”。 2 提示主题 は 的成分 / 表示极端事例。“甚至连 / ”。",
+  "meaning_detailed": "（1）提示主语「が」或宾语「を」成分，用于举出一个极端的事例，暗示其他一般性的事例也一样。“连……”。（2）提示主题「は」的成分，表示极端事例。“甚至连……”。",
+  "formation": "名(+格助词)+すら；动「连」/动「て」+すら；疑问句+すら；名+ですら",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "あの患者は重い病気のため、一人では食事すらできない。",
+    "english": "",
+    "chinese": "那位患者由于身患重病，连吃饭也不能一个人吃。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "デパートですら売っていないのだから、ましてこんな小さな店で売っているはずがない。",
+    "english": "",
+    "chinese": "就连大商场都没有卖，更不可能在这种小商店有卖。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "あの先生の講義はわたしには難しすぎて、何について話しているのかすら分かりません。",
+    "english": "",
+    "chinese": "那位老师的课对我来说太难了，甚至都不知道老师在讲些什么。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "この寒さで、あの元気な加藤さんですら風邪を引いている。",
+    "english": "",
+    "chinese": "由于太冷，就连身体那么棒的加藤都被冻感冒了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "普段ですら、勉強がきらいな学生は、これらのものを強制されると、なおさらやりたくない。",
+    "english": "",
+    "chinese": "如果向那些平时本就不愿意学习的学生强行灌输这些东西的话，他们会越发不愿意接受。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "zujimaida",
+  "pattern": "ずじまいだ",
+  "level": "N1",
+  "meaning_en": "原本想做的事因某种原因没有做成。“终于没有 能 ......”“结果未能......”。",
+  "meaning_detailed": "原本想做的事因某种原因没有做成。“终于没有(能)......”“结果未能......”。",
+  "formation": "动「未」+ずじまい(だ、になる)；する⇒せずじまい(だ、になる)",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "有名な観光地の近くまで行ったのに、忙しくてどこへも寄らずじまいだった。",
+    "english": "",
+    "chinese": "虽然到了著名的旅游胜地附近,但由于工作太忙,结果也没能去看上一眼。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "いなくなったペットを懸命に探したが、結局、その行方はわからずじまいだった。",
+    "english": "",
+    "chinese": "尽管拼命地找了丢失的宠物,但结果还是没能发现它的踪影。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "taru",
+  "pattern": "たる",
+  "level": "N1",
+  "meaning_en": "1 相当于 である+名词 的语法意义 / 起修饰名词的作用。 2 表示“作为某种特殊身份或职业的人 / 就必须做与此相适应的事”的意思。“作为 / ”。",
+  "meaning_detailed": "（1）相当于「である+名词」的语法意义，起修饰名词的作用。（2）表示“作为某种特殊身份或职业的人，就必须做与此相适应的事”的意思。“作为……”。",
+  "formation": "副词+たる+名；名+たる+(べき)者；名+たる+(べき)名",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "今夜の月は、深い青と煌々たる白色とのコントラストがステキだ。",
+    "english": "",
+    "chinese": "今晚的月光煞是好看。皎洁的月光与深蓝的夜空相映生辉。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "男子たるものは態度堂々たるべしというように、言動は公明正大にしろ。",
+    "english": "",
+    "chinese": "作为男人，做人要堂堂正正，言行要正大光明。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "選手たるもの、試合においては堂々と戦え。",
+    "english": "",
+    "chinese": "作为运动员，比赛时必须敢于拼搏。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "国民の生活をよりよいものにすること、それが政治家たる者の使命だと考えます。",
+    "english": "",
+    "chinese": "我认为，想办法不断地提高国民的生活水平，是政治家们肩负的使命。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "tsutsu",
+  "pattern": "つ〜つ",
+  "level": "N1",
+  "meaning_en": "表示两个动作交替进行。“一会儿......一会儿......”“或......或......”。",
+  "meaning_detailed": "表示两个动作交替进行。“一会儿......一会儿......”“或......或......”。",
+  "formation": "动「连」+つ、动「连」+つ、动「连」+つ、动「未」+(ら)れつ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "事実を言おうか言うまいかと、廊下を行きつ戻りつ考えた。",
+    "english": "",
+    "chinese": "到底要不要说出事实?我在走廊里一边徘徊,一边考虑着这个问题。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "お客さんと勧めつ勧められつで、お酒を飲んだ。",
+    "english": "",
+    "chinese": "和客人你一杯我一杯地喝酒。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "temae",
+  "pattern": "てまえ",
+  "level": "N1",
+  "meaning_en": "表示“在前项的条件或事实面前 / can only去做后项或不能做后项”的意思。“既然......就......”。",
+  "meaning_detailed": "表示“在前项的条件或事实面前,只能去做后项或不能做后项”的意思。“既然......就......”。",
+  "formation": "动「辞」/动「た」+てまえ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "皆の前でこれが正しいと言ってしまったてまえ、今さら自分が間違っていたとは言いにくい。",
+    "english": "",
+    "chinese": "既然在众人面前下了肯定的判断,事到如今叫我怎么收回自己的判断,承认自己错了呢。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "この事はぼくに任せればいいと威張ったてまえ、途中でやめられない。",
+    "english": "",
+    "chinese": "由于在大家面前逞威风说“这件事就交给我吧”,当然不能半途而废。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "dearedeare",
+  "pattern": "であれ〜であれ",
+  "level": "N1",
+  "meaning_en": "表示无论A的场合还是B的场合 或是其他场合 / 情况都一样。",
+  "meaning_detailed": "表示无论A的场合还是B的场合(或是其他场合),情况都一样。",
+  "formation": "名/ナ「词干」+であれ〜であれ；イ「辞」/动「辞」+のであれ〜のであれ",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "男であれ、女であれ、不況の今では就職することが難しい。",
+    "english": "",
+    "chinese": "男性也好女性也好,在经济不景气的现在就业都很困难。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "論文を書くのであれ、研究発表をするのであれ、まずテーマを決めるのが重要だ。",
+    "english": "",
+    "chinese": "无论是写论文还是发表研究(报告),重要的首先要确定主题。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "toaimatetogaaimatemoaimate",
+  "pattern": "とあいまって / とがあいまって / もあいまって",
+  "level": "N1",
+  "meaning_en": "表示某事物与其他事物相得益彰 / 从而带来了某种必然的结果。“与......相配合”“与......相辅相成”。",
+  "meaning_detailed": "表示某事物与其他事物相得益彰,从而带来了某种必然的结果。“与......相配合”“与......相辅相成”。",
+  "formation": "名+と(が)相まって；名+もあいまって",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "急速な少子化は、高齢者の増加とあいまって、日本の人口構造を大きく変えてきている。",
+    "english": "",
+    "chinese": "急速下降的出生率,加上老年人口的增加,使日本的人口结构发生了很大的变化。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "この家具は、機能的なデザインが華やかな色彩とあいまって、素晴らしい製品となっている。",
+    "english": "",
+    "chinese": "这种家具功能性的设计和华丽的色彩相得益彰,使其成为了经典之作。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "好天気も相まって、この日曜日はたいへんな人出でした。",
+    "english": "",
+    "chinese": "又正好遇上了好天气,所以这个礼拜天出门的人很多。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "厳しい経済状況も相まって、就職は非常に困難だった。",
+    "english": "",
+    "chinese": "也正好受到经济萧条的影响,所以找工作非常困难。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "toiitoii",
+  "pattern": "といい〜といい",
+  "level": "N1",
+  "meaning_en": "围绕同一个主体 / 举出这个主体的两个方面并作出“都很出色”的积极评价。",
+  "meaning_detailed": "围绕同一个主体,举出这个主体的两个方面并作出“都很出色”的积极评价。",
+  "formation": "名+といい、名+といい",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "あの店の服は品質といい、デザインといい申し分ない。",
+    "english": "",
+    "chinese": "那家店的服装无论是质量还是款式都无可挑剔。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "この家は、広さといい価格といい新婚夫婦にぴったりだ。",
+    "english": "",
+    "chinese": "这幢房子,面积也好价格也好,都适合新婚夫妇居住。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "toiwazutoiwazu",
+  "pattern": "といわず〜といわず",
+  "level": "N1",
+  "meaning_en": "用于列举同类中具有代表性的两个事物 / 表示“不加区别地全都如此”的意思。“......也好 / ......也好 / 都......”。",
+  "meaning_detailed": "用于列举同类中具有代表性的两个事物,表示“不加区别地全都如此”的意思。“......也好,......也好,都......”。",
+  "formation": "名+といわず、名+といわず",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "部屋の中の物は、机といわず、いすといわず、めちゃくちゃに壊されていた。",
+    "english": "",
+    "chinese": "房间里的东西,无论是写字台还是椅子,都被破坏得乱七八糟。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "領事館に入る人といわず、出る人といわず、ガードマンは神経を尖らせている。",
+    "english": "",
+    "chinese": "门卫警惕地注视着进出领事馆的每一个人。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "tote",
+  "pattern": "とて",
+  "level": "N1",
+  "meaning_en": "1 用于举出极端例子。“即使是 / ”。 2 表示逆接或顺接 / 即无论是怎样的前项都不会改变后项的结果。常跟 たとえ/いくら/どんなに 等副词一起搭配使用。“即使 / ”。 3 表示逆接或顺接。“无论 / 还是 / ”。",
+  "meaning_detailed": "（1）用于举出极端例子。“即使是……”。（2）表示逆接或顺接，即无论是怎样的前项都不会改变后项的结果。常跟「たとえ/いくら/どんなに」等副词一起搭配使用。“即使……”。（3）表示逆接或顺接。“无论……还是……”。",
+  "formation": "名+とて(も)；(疑问词)~名「だ」+とて；(疑问词)~动「た」+とて；名「だ」+とて〜とて；动「た」+とて〜とて",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "最近の電化製品は機能が多すぎる。開発者たちとて、すべての機能が必要とは思わないのではないか。",
+    "english": "",
+    "chinese": "最近的家电产品功能太多。即使是那些开发这类产品的人也未必会认为所有功能都是必需的吧。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "常に冷静な彼とて、やはり人間だから、感情的にどなってしまうこともあるのだろう。",
+    "english": "",
+    "chinese": "即便是平时处事很冷静的他，因为毕竟也是人，所以有时候也会控制不住地发火吧。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "どんなに貧しい人だとて、人間としての尊厳はある。",
+    "english": "",
+    "chinese": "再怎么贫穷的人，也有作为一个人的尊严。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "5人も殺したのだから、たとえ警察に自首したとて、どうにもならない。死刑に処されるに違いない。",
+    "english": "",
+    "chinese": "因为杀死了五个人，所以就算是投案自首也无济于事。肯定会被处以极刑。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今度の選挙は与党だとて、野党だとて、あまり期待できない。",
+    "english": "",
+    "chinese": "这次选举，无论是对执政党还是对在野党，我都不抱多大的希望。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "頭を下げたとて、涙を流したとて、だめなものはだめだ。",
+    "english": "",
+    "chinese": "央求也好哭闹也好，都没用。不行就是不行。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "tobakarini",
+  "pattern": "とばかり(に)",
+  "level": "N1",
+  "meaning_en": "表示嘴上虽没说 / 但神态、表情及动作已显露其意思。“好像在说......”“似乎在说......”。",
+  "meaning_detailed": "表示嘴上虽没说,但神态、表情及动作已显露其意思。“好像在说......”“似乎在说......”。",
+  "formation": "句子+とばかり(に)",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "A社から面接の知らせが来た。いまこそチャンスだとばかりに、彼はスーツを新調した。",
+    "english": "",
+    "chinese": "A公司的面试通知来了。他似乎在说“机会来了。”于是赶紧新做了一套西服。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "山本さんは、意見を求められると、待っていましたとばかりに自分の説を展開し始めた。",
+    "english": "",
+    "chinese": "刚向山本征求意见,只见他似乎等不及似的开始阐述自己的观点。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "naru",
+  "pattern": "なる",
+  "level": "N1",
+  "meaning_en": "1 相当于 / である+名词 的语法意义。“ / 的”。 2 相当于 / というもの 的语法意义 / 表示称谓等。“所谓的 / ”“所说的 / ”。",
+  "meaning_detailed": "（1）相当于「〜である+名词」的语法意义。“……的”。（2）相当于「〜というもの」的语法意义，表示称谓等。“所谓的……”“所说的……”。",
+  "formation": "名+なる+名；ナ「词干」+なる+名；名+なる+もの",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "健全なる精神は健全なる身体に宿る。",
+    "english": "",
+    "chinese": "要想拥有健康的心态，首先需要有健康的体魄。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "みなさんの更なる努力を期待しています。",
+    "english": "",
+    "chinese": "期待大家更大的努力。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "改革なるものこそ、社会の進歩を促すのだ。",
+    "english": "",
+    "chinese": "只有改革才能促使社会进步。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "最近、エコなるものが流行っている。",
+    "english": "",
+    "chinese": "最近，“绿色环保”一词很流行。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nishitatokorode",
+  "pattern": "にしたところで",
+  "level": "N1",
+  "meaning_en": "和 / としたところで 类似 / 表示“无论何人、何地、何时或无论什么场合”等意思。",
+  "meaning_detailed": "和「〜としたところで」类似,表示“无论何人、何地、何时或无论什么场合”等意思。",
+  "formation": "疑问词+にしたところで；疑问词+句子+にしたところで；名/ナ「词干」+にしたところで；イ「辞」/动「辞」+にしたところで",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "どちらにしたところで、そうたいした差があるとは思えない。",
+    "english": "",
+    "chinese": "我感觉无论哪个都差不多,大同小异。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "何をするにしたところで、よく考えてからしなさい。",
+    "english": "",
+    "chinese": "不管做什么事,都要深思熟虑后再行动。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "小さな事にしたところで、まじめにやらなければ失敗するケースが多い。",
+    "english": "",
+    "chinese": "即使是小事情,如果不认真对待的话也可能会失败。这样的例子其实有很多。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "いくらいいものを口にしたところで、十分に吸収しなければ栄養にはならない。",
+    "english": "",
+    "chinese": "无论吃多么好的东西,如果得不到充分的吸收,也不可能转化为身体所需的营养成分。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nisokushitehanisokushitemo",
+  "pattern": "にそくして(は) / にそくしても",
+  "level": "N1",
+  "meaning_en": "1.表示依据法规等。“按照......”“依据......”。2.表示依据事实、情况等。“按照......”“依据......”。",
+  "meaning_detailed": "1.表示依据法规等。“按照......”“依据......”。2.表示依据事实、情况等。“按照......”“依据......”。",
+  "formation": "名+にそくして(は)/にそくしても/にそくした",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "学校の規則に則して生活を律するべし。",
+    "english": "",
+    "chinese": "应当按照校规约束自己的生活。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "外国語教育について、政府の方針に則した計画を立てた。",
+    "english": "",
+    "chinese": "关于外语教育,依据政府的教育方针制订了计划。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "このような規則は、実態に即して柔軟に適用すべきだ。",
+    "english": "",
+    "chinese": "类似这样的规定,要根据实际情况灵活运用。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "新聞には、事実に即して、正確な情報を提供してほしい。",
+    "english": "",
+    "chinese": "希望报纸根据事实的真相,向广大读者提供正确的信息。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nitodomarazu",
+  "pattern": "にとどまらず",
+  "level": "N1",
+  "meaning_en": "表示不仅在前项范围内 / 甚至涉及其他广泛的地域或空间。“不仅......而且”。",
+  "meaning_detailed": "表示不仅在前项范围内,甚至涉及其他广泛的地域或空间。“不仅......而且”。",
+  "formation": "名(+助词)+にとどまらず",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "火山の噴火の影響は、ふもとにとどまらず、周辺地域全体及んだ。",
+    "english": "",
+    "chinese": "火山喷发不仅影响到山脚地带,还波及了整个周边地区。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "今後の交流は留学生の交換だけにとどまらず、共同研究など、さらに広範なものになるのではないかと思います。",
+    "english": "",
+    "chinese": "我个人认为,今后的交流,不仅仅局限于互换留学生,是不是应该扩展到共同参与研究项目等更广泛的领域呢?",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nitorawarezunitorawarerukotonaku",
+  "pattern": "にとらわれず / にとらわれることなく",
+  "level": "N1",
+  "meaning_en": "“不局限于......”“不受......”。",
+  "meaning_detailed": "“不局限于......”“不受......”。",
+  "formation": "名+にとらわれず(に)/にとらわれることなく",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "先入観にとらわれずに、客観的に人を評価するのが望ましい。",
+    "english": "",
+    "chinese": "希望不要受到偏见的束缚,而是客观地去评价一个人。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "女性の高学歴化や民主主義の発展により、性別にとらわれることなく、社会に進出する女性が増えてきた。",
+    "english": "",
+    "chinese": "由于女性的高学历化和民主主义的大力推进,使很多女性不受性别的约束而积极地参与社会活动。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "ninotote",
+  "pattern": "にのっとって",
+  "level": "N1",
+  "meaning_en": "表示以某事情为先例、模范、榜样去做后项的事 / 或表示遵循某原则、惯例、传统习惯等去做某事。",
+  "meaning_detailed": "表示以某事情为先例、模范、榜样去做后项的事,或表示遵循某原则、惯例、传统习惯等去做某事。",
+  "formation": "名+にのっとって(は)/にのっとっても/にのっとった",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "地方の風俗習慣にのっとって、祭りを行う。",
+    "english": "",
+    "chinese": "按照地方的风俗习惯举办庙会活动。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "ビジネス文書は書式があるから、それにのっとって書くなら効率的だ。",
+    "english": "",
+    "chinese": "因为商务文书有一定的格式,所以只要按照格式去写,就可以提高书写效率。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nihikikaetetohikikaeni",
+  "pattern": "にひきかえ(て) / とひきかえに",
+  "level": "N1",
+  "meaning_en": "同前项相反 / 后项是另外一种情况。“与......相反”“......而”。",
+  "meaning_detailed": "同前项相反,后项是另外一种情况。“与......相反”“......而”。",
+  "formation": "名+にひきかえ(て)；名+とひきかえに/とひきかえで",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "周囲の人々の興奮にひきかえ、賞をもらった本人は至って冷静だった。",
+    "english": "",
+    "chinese": "周围的人很激动。与此形成鲜明对照的是,获奖者本人却十分冷静。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "ある企業は技術の開発を軽視し、経営効率を求める規模拡大の路線をひた走るようになり、これとひきかえに、未来への夢が失われていく。",
+    "english": "",
+    "chinese": "有的企业不重视技术开发,一味地走为追求经营效率而扩大企业规模的路线,其结果却恰得其反,企业失去了未来的方向。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "niyorutokorogakii",
+  "pattern": "によるところが大きい",
+  "level": "N1",
+  "meaning_en": "表示某事情在很大程度上依靠某必备条件。“主要依赖于......”“跟......有很大关系”。",
+  "meaning_detailed": "表示某事情在很大程度上依靠某必备条件。“主要依赖于......”“跟......有很大关系”。",
+  "formation": "名+によるところが大きい",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "自然災害の防止は、速やかで正しい予報によるところが大きいと思う。",
+    "english": "",
+    "chinese": "我认为防治自然灾害的工作,和迅速、正确的预警有很大关系。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "かつて映画スターであった山田氏が初挑戦で知事選に勝利したのは、能力というより、人気と知名度によるところが大きい。",
+    "english": "",
+    "chinese": "曾是电影明星的山田,在第一次竞选中就成功当选为县长。与其说是他能力过人,不如说是他的人气和知名度带来的。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "nitehanitemo",
+  "pattern": "に至って(は) / に至っても",
+  "level": "N1",
+  "meaning_en": "直到某种极端事态出现时 / 才发现该做后项或觉察出什么。用于“事情既然已经发展到了这般地步 / 已经无计可施或也can only如此”的场合。表示即使到了一种极端的程度 / 后项仍然没有改变。“即使到了......地步 / 还是......”“虽然到了......程度 / 还是......”。",
+  "meaning_detailed": "直到某种极端事态出现时,才发现该做后项或觉察出什么。用于“事情既然已经发展到了这般地步,已经无计可施或也只能如此”的场合。表示即使到了一种极端的程度,后项仍然没有改变。“即使到了......地步,还是......”“虽然到了......程度,还是......”。",
+  "formation": "名/动「辞」+に至って；名(ことここ、ここまで)+に至っては(もう、もはや)；动「辞」+に至っては(もう、もはや)；名/动「辞」+に至っても",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "卒業するに至って、やっと大学に入った目的が少し見えてきたような気がする。",
+    "english": "",
+    "chinese": "直到毕业,似乎才认识到一点自己上大学的目的。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "実際に事故が起こるに至って、ようやく自動車会社は事故原因の調査を始めた。",
+    "english": "",
+    "chinese": "直到事故发生后,汽车制造商才开始着手调查事故的原因。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "問題がこじれてしまう前に対策を立てるべきだったのに、ことここに至ってはどうしようもない。",
+    "english": "",
+    "chinese": "如果在问题还没有复杂化之前就采取对策的话就好了。事到如今已经毫无办法。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "会社を始めるにいたって、用意した資金ももう底をついたのに気付いた。ことここに至っては、どうにもならない。あとは運を天に任せるだけだ。",
+    "english": "",
+    "chinese": "直到公司开始运营时,才发现准备的资金已经用完。事到如今已经毫无办法,只能听天由命。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "返済期日を半月も過ぎた現在に至っても、いまだに返済されておりません。",
+    "english": "",
+    "chinese": "即使规定的偿还时间已经过去了半个月,我们依然没有收到回款。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "肺癌にかかるに至っても、彼はまだ煙草をやめようとは思っていない。文字通りのヘビースモーカーなんだ。",
+    "english": "",
+    "chinese": "即使身患肺癌,他还是不想戒烟。真是个名副其实的“烟鬼”。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "niutokorogakii",
+  "pattern": "に負うところが大きい",
+  "level": "N1",
+  "meaning_en": "表示承蒙某人某事的恩典。“与......有很大的关系”“多亏了......”。",
+  "meaning_detailed": "表示承蒙某人某事的恩典。“与......有很大的关系”“多亏了......”。",
+  "formation": "名+に負うところが大きい",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "この企画の成功は大野さんの働きに負うところが大きい。",
+    "english": "",
+    "chinese": "这个计划的成功,大野先生发挥了很大作用。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "彼の成功は研究所全員の協力に負うところが大きい。つまり、スタッフの協力があっての結果だ。",
+    "english": "",
+    "chinese": "他的成功,和研究所全体成员的合作是分不开的。也就是说,是整个团队共同努力的结果。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "haizashirazunaraizashirazudataraizashirazu",
+  "pattern": "はいざしらず / ならいざしらず / だったらいざしらず",
+  "level": "N1",
+  "meaning_en": "表示“有关...... 由于我不太清楚 姑且不论”的意思。",
+  "meaning_detailed": "表示“有关......(由于我不太清楚)姑且不论”的意思。",
+  "formation": "名+は/なら/だったらいざしらず",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "小学生ならいざしらず、大学生がこんな簡単な計算ができないなんて信じられない。",
+    "english": "",
+    "chinese": "如果是小学生倒也罢了,一个大学生,竟然连这么简单的计算题都不会做,真是难以置信。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "品物を買うのだったらいざしらず、何も買わないのに、どうのこうのけちばかりつけるのはちょっと......。",
+    "english": "",
+    "chinese": "要是花钱购物的话倒也情有可原,可什么东西也不买,却在那里说三道四地挑毛病,这未免也太......",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "haunioyobazu",
+  "pattern": "は言うにおよばず",
+  "level": "N1",
+  "meaning_en": "表示“前项自不待言 / 后项也同样”的意思。",
+  "meaning_detailed": "表示“前项自不待言,后项也同样”的意思。",
+  "formation": "名+は言うにおよばず、〜も/さえ/まで",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "連休中、海や山は言うにおよばず、公園や博物館まで親子連れ溢れていた。",
+    "english": "",
+    "chinese": "正好赶上放长假,山川海滨等观光地就不用说了,就连一般的公园或博物馆也挤满了拖家带口的游客。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "テレビは言うにおよばず、あらゆるマスコミでは東日本大震災大いに取り上げて報道していた。",
+    "english": "",
+    "chinese": "电视就不用说了,所有的媒体同样就东日本大地震作了大量的报道。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "hawazumogana",
+  "pattern": "は言わずもがな",
+  "level": "N1",
+  "meaning_en": "表示“前项自不待言 / 甚至连后项也是同样”的意思。",
+  "meaning_detailed": "表示“前项自不待言,甚至连后项也是同样”的意思。",
+  "formation": "名+は言わずもがな〜も/さえ/まで",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "浅草という町は、祭日は言わずもがな、ウィークデーも賑やかだ。",
+    "english": "",
+    "chinese": "东京浅草,节日里自不待言,即使是在平日里也很热闹。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "会員は言わずもがな、一般のお客さんさえ割引価格で買うことができる。",
+    "english": "",
+    "chinese": "会员自不待言,即使是一般的客人也可以享受打折优惠。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "beshi",
+  "pattern": "べし",
+  "level": "N1",
+  "meaning_en": "1 相当于 / よ う 劝诱 、 / なさい 命令 、 / なければならない 义务 等语法意义。“应该 / ”“必须 / ”。 2 相当于口语 / してはいけない/ / するな 的意思 / 表示禁止做某事。“禁止 / ”。 3 相当于 / してはいけない+名词 的意思。“不应该 / ”“不可 / ”“不能 / ”。 4",
+  "meaning_detailed": "（1）相当于「〜(よ)う」(劝诱)、「~なさい」(命令)、「〜なければならない」(义务)等语法意义。“应该……”“必须……”。（2）相当于口语「~してはいけない/〜するな」的意思，表示禁止做某事。“禁止……”。（3）相当于「〜してはいけない+名词」的意思。“不应该……”“不可……”“不能……”。（4）表示为了前项的目的而做后项。“为了……”。（5）重复使用相同的动词，表示该情况的出现是必然的或是理所应当的。“本来必然会(发生)……”。（6）因为有前项的原因，所以当然不可能会有后项的发生。“当然无法……”。",
+  "formation": "动「辞」+べし（する→すべし）；动「辞」+べからず（する⇒す(る)べからず）；动「辞」+べからざる+名（する⇒すべからざる+名）；动「辞」+べく（する⇒すべく）；动「辞」+べくして（する⇒すべくして）；动「辞」+べくもない（する⇒すべくもない）",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "学生たる者、勉強に励むべし(だ)。",
+    "english": "",
+    "chinese": "作为学生就应该努力学习。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "明日は7時に集合すべし。",
+    "english": "",
+    "chinese": "明天必须7点钟集合。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "悪いことをしたら、謝るべし。",
+    "english": "",
+    "chinese": "做了不好的事时必须向人道歉。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "無断欠勤するべからず。",
+    "english": "",
+    "chinese": "不许擅自缺勤。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "録音中。ノックすべからず。",
+    "english": "",
+    "chinese": "正在录音，禁止敲门。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "芝生に入るべからず。",
+    "english": "",
+    "chinese": "禁止进入草坪。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "これは争うべからざる事実だ。",
+    "english": "",
+    "chinese": "这是不争的事实。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "彼は学生として許すべからざる行為を行ったとして退学させられた。",
+    "english": "",
+    "chinese": "他做了作为一名学生不能饶恕的事，结果被勒令退学。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "ウイルスの感染経路を明らかにすべく調査が行われた。",
+    "english": "",
+    "chinese": "为查明病毒的感染途径而进行了调查。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "兄は締め切りに間に合わせるべく、昼も夜も論文に取り組んでいる。",
+    "english": "",
+    "chinese": "哥哥为了赶在截止日之前交稿，正在起早摸黑地写论文。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "残るべくして残ったものばかりだ。要らないものは全部捨てた。",
+    "english": "",
+    "chinese": "该留下的都留下了。不要的都扔了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "米国のサブ・プライム(信用度の低い借り手向け住宅ローン)問題は「起きるべくして起きた」と専門家が指摘した。",
+    "english": "",
+    "chinese": "专家指出，美国次贷(指向信用度低的购房户提供按揭贷款)危机的发生是一种必然。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "土地が高い都会では、家などそう簡単に手に入るべくもない。",
+    "english": "",
+    "chinese": "在地价高昂的都市，买房子不是一件容易的事。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "あんな独裁にしてかつ圧制下の国では、国民が自由に発言するべくもない。",
+    "english": "",
+    "chinese": "在那种专政加暴政的国家，国民是不可能有言论自由的。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "yayainaya-61c7e0",
+  "pattern": "や/やいなや",
+  "level": "N1",
+  "meaning_en": "和 / なり N1 、 / とすぐに N4 类似 / 表示前项刚出现 / 紧接着又做了或出现了后项。“刚 / 就 / ”。",
+  "meaning_detailed": "和「〜なり」(N1)、「〜とすぐに」(N4)类似，表示前项刚出现，紧接着又做了或出现了后项。“刚……就……”。",
+  "formation": "动「辞」+や；动「辞」+やいなや",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "いたずらをしていた生徒たちは、教師が来たと見るや一斉に逃げ出した。",
+    "english": "",
+    "chinese": "刚才还在捣蛋的学生们一看见老师，一下子就逃开了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "彼は空港に着くやいなや、恋人の入院先にかけつけた。",
+    "english": "",
+    "chinese": "他一下飞机，就直奔女朋友所进的医院。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "yue",
+  "pattern": "ゆえ",
+  "level": "N1",
+  "meaning_en": "表示原因。“because of X / ”。",
+  "meaning_detailed": "表示原因。“因为……”。",
+  "formation": "名/名「の」+ゆえ(に、の、だ)；ナ「词干」/ナ「な」+ゆえ(に、の、だ)；イ「辞」/动「辞」+(が)ゆえ(に、の、だ)；助动词「た」+(が)ゆえ(に、の、だ)",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "あの大統領は庶民性を備えているがゆえに、人気を集めているという。",
+    "english": "",
+    "chinese": "据说那位总统因为有爱民之心，所以颇受欢迎。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "日本が輸入に頼らざるを得ないのは、資源が乏しいがゆえである。",
+    "english": "",
+    "chinese": "日本之所以依赖进口，是因为国内资源匮乏。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "you",
+  "pattern": "よう",
+  "level": "N1",
+  "meaning_en": "表示动作、状态的样子。 / ようがある 表示有办法做某事。否定形式 / ようがない 表示没有任何办法做某事。用于评价方式、方法的好坏 / 也可用 / ようが上手だ 下手だ 等形式。",
+  "meaning_detailed": "表示动作、状态的样子。「〜ようがある」表示有办法做某事。否定形式「~ようがない」表示没有任何办法做某事。用于评价方式、方法的好坏,也可用「~ようが上手だ(下手だ)」等形式。",
+  "formation": "动「连」+よう；动「连」+ようがある/ようもある；动「连」+ようがよい(悪い)",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "父が私の変わりようを見て、どんなに驚いたか予測(する)にかたくない。",
+    "english": "",
+    "chinese": "不难想象,当父亲看到我的变化时是多么惊讶。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "待っていた返事がやっと来た。その時の彼の喜びようはたいへんなものだった。",
+    "english": "",
+    "chinese": "等待已久的回音终于来了,当时他那高兴的样子真是不得了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "本のタイトルさえ分かれば、探しようもあるのだが。",
+    "english": "",
+    "chinese": "如果知道要借的书的书名,那就有检索的办法了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "証拠はまだ十分とは言えないので、有罪か無罪かは何とも判断のしようがない。",
+    "english": "",
+    "chinese": "证据还不充足,所以有罪还是没罪很难下判断。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "成功するかどうか、今の段階では何とも言いようがない。",
+    "english": "",
+    "chinese": "会不会成功目前还很难说。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "君の詫びようがよいから、彼女は許してあげたのだ。",
+    "english": "",
+    "chinese": "因为你道歉很诚恳,所以她才原谅了你。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "勉強のしようが下手だと、長い時間勉強してもだめです。",
+    "english": "",
+    "chinese": "如果学习方法不好的话,即使花费再长的时间学习也是徒劳。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "ooitenai",
+  "pattern": "をおいて〜ない",
+  "level": "N1",
+  "meaning_en": "表示除此之外没有其他更合适的。“除......之外 / 再也没有......”。",
+  "meaning_detailed": "表示除此之外没有其他更合适的。“除......之外,再也没有......”。",
+  "formation": "名+をおいて〜ない",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "次の首相にふさわしい人物は、彼をおいて、ほかにはいない。",
+    "english": "",
+    "chinese": "适合当下一届首相的人选,除了他没有别人。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "新しく住宅開発を進めるなら、この地域をおいてほかにはない。",
+    "english": "",
+    "chinese": "如果要开发新的住宅区,除了这一带已经没有其他地方了。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "oshiteoshite",
+  "pattern": "を押して / を押し切って",
+  "level": "N1",
+  "meaning_en": "表示顶住或排除来自某人或某方面的压力、反对等 / 坚决地去做后项。“不顾......”“顶住......”。",
+  "meaning_detailed": "表示顶住或排除来自某人或某方面的压力、反对等,坚决地去做后项。“不顾......”“顶住......”。",
+  "formation": "名+を押して/を押し切って",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "私の妹は両親の反対を押して結婚した。",
+    "english": "",
+    "chinese": "我妹妹不顾父母的反对结婚了。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "救援隊を乗せた船が荒波を押し切って遭難者のいる島のほ全速で向かっていった。",
+    "english": "",
+    "chinese": "救援队的船乘风破浪,全速开向遇险者所在的岛屿。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "oni",
+  "pattern": "を機に",
+  "level": "N1",
+  "meaning_en": "表示以某一事件为契机 / 做了从来没有做过的事 / 或发生了前所未有的事。“以......为契机”。",
+  "meaning_detailed": "表示以某一事件为契机,做了从来没有做过的事,或发生了前所未有的事。“以......为契机”。",
+  "formation": "名+を機に(して)",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "ガソリン高騰を機に自動車を手放す動きが広がっていると見られる。",
+    "english": "",
+    "chinese": "普遍认为,由于汽油价格的暴涨,所以放弃购置汽车的现象越来越普遍。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "山川鉄道は、3月で開業90周年を迎えるのを機に、最新型車両を導入し、15日から営業運転を開始する。",
+    "english": "",
+    "chinese": "山川铁路公司,以今年3月即将迎来公司开业90周年为契机,引进了最新型的机车,预计15号开始投入运营。",
+    "source": "private-material"
+   }
+  ]
+ },
+ {
+  "id": "mat-a81d6a",
+  "pattern": "召す",
+  "level": "N1",
+  "meaning_en": "着る、食べる、飲む、買う 等动词的尊敬语动词。",
+  "meaning_detailed": "「着る、食べる、飲む、買う」等动词的尊敬语动词。",
+  "formation": "名+を召す",
+  "formation_notes": [],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "A「先生の奥様はどの方かご存じですか。」B「あそこのお年を召していらっしゃるご婦人です。」",
+    "english": "",
+    "chinese": "哪位是师母您知道吗?是那边那位有点年纪的夫人。",
+    "source": "private-material"
+   },
+   {
+    "japanese": "いかがですか。こちらのお着物はお気に召されたでしょうか。",
+    "english": "",
+    "chinese": "怎么样?这件和服您喜欢吗?",
+    "source": "private-material"
+   }
+  ]
  }
 ]

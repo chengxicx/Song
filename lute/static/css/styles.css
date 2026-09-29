@@ -4877,13 +4877,58 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     transform: rotate(90deg);
 }
 .grammar-item--collapsed .grammar-item__desc,
-.grammar-item--collapsed .grammar-item__examples {
+.grammar-item--collapsed .grammar-item__examples,
+.grammar-item--collapsed .grammar-item__more {
     display: none;
 }
 
 .grammar-item__desc {
     margin-top: 4px;
     font-size: 0.98em;
+    color: var(--g-text-2);
+}
+
+/* Formation line ("Ichidan: drop る, add られる…") between the head and
+   the desc, styled as a quiet chip so it reads as metadata. */
+.grammar-item__formation {
+    margin-top: 6px;
+    font-size: 0.86em;
+    line-height: 1.45;
+    color: var(--g-text-2);
+    background: color-mix(in srgb, var(--font-color, #000) 4%, transparent);
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+/* Folded reference block: curated example + translation, then notes. */
+.grammar-item__more {
+    margin-top: 8px;
+}
+.grammar-item__more summary {
+    cursor: pointer;
+    font-size: 0.86em;
+    font-weight: 600;
+    color: var(--g-accent);
+    user-select: none;
+    list-style-position: inside;
+}
+.grammar-item__refex {
+    margin-top: 8px;
+    font-size: 0.94em;
+    line-height: 1.5;
+    padding: 6px 10px;
+    background: color-mix(in srgb, var(--font-color, #000) 3%, transparent);
+    border-radius: 6px;
+}
+.grammar-item__reftr {
+    margin-top: 2px;
+    font-size: 0.9em;
+    color: var(--g-text-2);
+}
+.grammar-item__notes {
+    margin-top: 8px;
+    font-size: 0.9em;
+    line-height: 1.5;
     color: var(--g-text-2);
 }
 

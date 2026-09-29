@@ -15,15 +15,16 @@ Verbatim copies of the curated JLPT grammar library from
   `examples[].english`, `formality`, `related`, …) are kept so the files stay
   verbatim copies.
 
-### Merged study-material entries (398 entries, 2026-09-29)
+### Merged study-material entries (715 entries, 2026-09-29 / 2026-09-30)
 
-398 further entries were merged from structured transcriptions of six
-Chinese-market JLPT grammar study PDFs (private-material, private-material, N2 private-material, private-material, and private-material N4/N5 grammar material+grammar material by private-authors/private-authors,
-private-press 2014), transcribed into
-`scripts/grammar_materials/n*.json` and merged by
+715 further entries were merged from structured transcriptions of nine
+Chinese-market JLPT grammar study PDFs (private-material, private-material, N2 private-material, private-material, and private-material N1/N2/N3/N4/N5 grammar material+grammar material by
+private-authors/private-authors, private-press 2014), transcribed into
+`scripts/grammar_materials/n*.json` and
+`scripts/grammar_materials/n{1,2,3}_materials.json`, merged by
 `scripts/merge_grammar_materials.py`:
 
-- Counts: N1 57, N2 55, N3 126, N4 96, N5 64 (the jkindrix 595 above are
+- Counts: N1 156, N2 186, N3 213, N4 96, N5 64 (the jkindrix 595 above are
   untouched)
 - Each entry keeps its `id`, `pattern`, `level`, `meaning_en`,
   `meaning_detailed` (Chinese), `formation`, and `examples`
@@ -45,7 +46,7 @@ rules.  Nothing in this directory is hand-tuned per entry.
 
 ## `zh.json`
 
-Simplified-Chinese glosses for all 993 entries above, keyed by the upstream
+Simplified-Chinese glosses for all 1310 entries above, keyed by the upstream
 `id`.  Written for this project (Song), so the reading-page grammar panel can
 describe points in Chinese; the glosses for the jkindrix 595 are a derivative
 of the CC BY-SA 4.0 data above and are distributed under the same license.
@@ -54,7 +55,7 @@ script is the single source of truth).
 
 ## `ko.json`
 
-Korean glosses for all 993 entries, mirroring `zh.json` (한국어 display
+Korean glosses for all 1310 entries, mirroring `zh.json` (한국어 display
 language of the panel).  Same license terms as `zh.json`.
 
 ## N5 hand-written rules
