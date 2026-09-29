@@ -7,6 +7,7 @@ other language falls back to the generic regex rule library.
 """
 
 import json
+import unicodedata
 import pytest
 from lute.db import db
 from lute.parse.registry import is_supported
@@ -305,6 +306,39 @@ def test_grammar_analysis_strips_zws_from_client_snippet(client, empty_db, korea
     assert "-고 있다" in names
     for g in data:
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+def test_korean_decomposed_hangul_is_composed(client, empty_db, korean):
+    if not is_supported("lute_korean"):
+        pytest.skip("lute_korean parser not installed")
+    """
+    导入的书可能把音节的收音存成独立字母（"거세어지" + U+11AF 而不是
+    "거세어질"），这是形态分析器留下的痕迹。Kiwi 会把 ㄹ/ㄴ 尾音当成独立
+    token，返回的偏移落在音节内部，前端按偏移切句子就会把一个字切成两半
+    （书 286 第 3 页的例句就是这个）。分析前必须先组合成 NFC。
+    """
+    broken = (
+        "김 후보자를 임명하면서 동시에 공소취소 문제에도 원론적이\u11ab 답변을 내놓을 경우 야권의 공세는 더 거세어지\u11af 수 있다."
+    )
+    assert not unicodedata.is_normalized("NFC", broken)
+    book = make_book("Korean Decomposed Demo", [broken], korean)
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    entry = next(g for g in data if g["key"] == "ko_su_issda")
+    example = entry["examples"][0]
+    sentence = example["sentence"]
+    assert unicodedata.is_normalized("NFC", sentence), "返回的句子应是组合形式"
+    assert "거세어질" in sentence
+    assert example["matches"], "应给出高亮偏移"
+    for m in example["matches"]:
+        matched = sentence[m["start"] : m["end"]]
+        assert not any(
+            "\u1100" <= ch <= "\u11ff" for ch in matched
+        ), f"高亮落在音节内部，会切字: {matched!r}"
 
 
 def test_korean_grammar_analysis_ko_display_language(client, empty_db, korean):
