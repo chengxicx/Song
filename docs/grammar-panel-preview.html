@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>语法分析面板 · 升级预览（静态稿）</title>
+<style>
+  :root{ --bg:#fff; --ink:#1a1a2e; --mut:#6b7280; --acc:#2563eb; --chip:#eef2ff;
+         --warn:#b45309; --warnbg:#fffbeb; --line:#e5e7eb; --hl:#fef08a; }
+  body{ margin:0; background:#f3f4f6; color:var(--ink);
+        font:15px/1.65 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; }
+  .wrap{ max-width:640px; margin:24px auto 60px; }
+  .note{ background:var(--warnbg); border:1px solid #fde68a; color:var(--warn);
+         border-radius:8px; padding:10px 14px; font-size:13px; margin-bottom:16px; }
+  .panel{ background:var(--bg); border:1px solid var(--line); border-radius:12px;
+          padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  h1{ font-size:18px; margin:0 0 4px; }
+  .sub{ color:var(--mut); font-size:13px; margin-bottom:14px; }
+  .card{ border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:12px 0; }
+  .head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .lv{ background:var(--acc); color:#fff; border-radius:6px; font-size:11px;
+       font-weight:700; padding:2px 7px; letter-spacing:.5px; }
+  .name{ font-weight:700; font-size:16px; }
+  .fmt{ color:var(--mut); font-size:13px; }
+  .tag{ background:var(--chip); color:var(--acc); border-radius:5px;
+        font-size:11px; padding:1px 7px; font-weight:600; }
+  .tag.hot{ background:#fef2f2; color:#b91c1c; }
+  .zh{ margin:8px 0 2px; font-size:15px; }
+  .form{ color:#374151; font-size:13px; background:#f9fafb; border-radius:6px;
+         padding:6px 10px; margin:6px 0; }
+  .ex{ border-left:3px solid var(--line); padding:4px 0 4px 12px; margin:10px 0; }
+  .ex .jp b{ background:var(--hl); border-radius:3px; padding:0 2px; }
+  .ex .zh{ color:var(--mut); font-size:13px; margin:2px 0 0; }
+  details{ margin-top:10px; }
+  summary{ cursor:pointer; color:var(--acc); font-size:13px; font-weight:600; }
+  .notes{ background:#fffbeb; border:1px solid #fde68a; border-radius:8px;
+          padding:8px 12px; font-size:13px; color:#78350f; margin-top:8px; }
+  footer{ color:var(--mut); font-size:12px; margin-top:18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="note">静态预览稿（未实施）。展示建议的面板条目卡新布局；
+    后端字段与 <code>itemHtml</code> 改造方案见本页底部注释，确认后再排期实施。</div>
+  <div class="panel">
+    <h1>语法分析 · 命中 3 条</h1>
+    <div class="sub">页面：即行人（第 12 页） · 语言：日语 · 2026-09-29</div>
+
+    <div class="card">
+      <div class="head">
+        <span class="lv">N2</span>
+        <span class="name">〜わけにはいかない</span>
+        <span class="fmt">動詞辞書形＋わけにはいかない</span>
+        <span class="tag hot">重点</span><span class="tag">易出题点</span>
+      </div>
+      <div class="zh">受情理约束，不可以那样做；双重否定「〜ないわけにはいかない」＝一定得／不能不</div>
+      <div class="form">接续：动词连体形（否定式后表示必须这么做）</div>
+      <div class="ex">
+        <div class="jp">先生に頼まれたことだから、やらない<b>わけにはいかない</b>。</div>
+        <div class="zh">是老师托我干的事，所以不能不干。</div>
+      </div>
+      <details><summary>注意点</summary>
+        <div class="notes">「わけ」是理由的意思；双重否定形式在考题中经常出现。
+          注意与「わけだ」（理所当然）、「わけがない」（不可能）的区别。</div>
+      </details>
+    </div>
+
+    <div class="card">
+      <div class="head">
+        <span class="lv">N1</span>
+        <span class="name">AといいBといい</span>
+        <span class="fmt">体言＋といい〜＋といい</span>
+        <span class="tag hot">重点</span>
+      </div>
+      <div class="zh">不论是…还是…／…也好…也好</div>
+      <div class="form">接续：体言；「AといわずBといわず」范围更广（山といわず野といわず）</div>
+      <div class="ex">
+        <div class="jp">そのレストランは料理<b>といい</b>サービス<b>といい</b>申し分なかった。</div>
+        <div class="zh">这家餐厅不管是菜还是服务都没得说。</div>
+      </div>
+      <details><summary>注意点</summary>
+        <div class="notes">材料注：AといわずBといわず包含的范围更广，可以遍举同类事物。</div>
+      </details>
+    </div>
+
+    <div class="card">
+      <div class="head">
+        <span class="lv">N3</span>
+        <span class="name">〜ように（なる）</span>
+        <span class="fmt">動詞辞書形＋ようになる</span>
+      </div>
+      <div class="zh">状态发生变化，"变得…"（前面常是可能形）</div>
+      <div class="form">接续：动词基本形；动词时用辞书形</div>
+      <div class="ex">
+        <div class="jp">一生懸命勉強して、日本語がわかる<b>ようになりました</b>。</div>
+        <div class="zh">努力学习，终于能听懂日语了。</div>
+      </div>
+      <details><summary>注意点</summary>
+        <div class="notes">表示发生了以前没有的变化或状况的转变。</div>
+      </details>
+    </div>
+
+    <footer>数据源：lute/jlpt_data/grammar/n{1..5}.json + zh.json（本轮已补齐）·
+      引擎：grammar_analysis_ja.py（组合句型已加手写规则）</footer>
+  </div>
+</div>
+<!-- 实施方案（确认后排期）：
+  后端：analyze_japanese() 返回条目 id → 在 _load_level() 读入时合并
+        zh.json 释义、tags（新增字段，向后兼容：缺省为 []）。
+  前端：lute-commands.js open_grammar_analysis 的 itemHtml 改为模板：
+        级别徽标 + pattern + formation 行 + 中文释义（zh.json）+
+        例句（命中片段 <mark> 高亮 + 中文翻译，新增 examples[].chinese）+
+        <details> 折叠「注意点」（formation_notes + 材料注）+ tags 徽标。
+  兼容：display_lang=="zh" 时用中文释义，否则回退 meaning_detailed；
+        tags/chinese 字段缺失时整块隐藏，旧库不受影响。 -->
+</body>
+</html>

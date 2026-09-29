@@ -1,0 +1,108 @@
+[
+ {
+  "pattern": "これだけ·それだけ·あれだけ·どれ",
+  "level": "N2",
+  "formation": "こ(そ、あ、ど)れだけ〜のだから/のに/ば/て；〜ので/ば/たら/と、それだけ",
+  "meaning_zh": "表示程度之高或数量之大。；表示后项与前项的程度成正比。“与此相应地......”。",
+  "examples": [
+   {
+    "japanese": "毎月これだけ貯金しておけば、将来は大丈夫だろう。",
+    "chinese": "如果每月存这么多的钱,将来就无后顾之忧了吧。"
+   },
+   {
+    "japanese": "親にはどれだけ感謝しても、足りないくらいだ。",
+    "chinese": "怎么感谢父母也不为过。"
+   },
+   {
+    "japanese": "懸命にがんばって、N2試験を通ったので、それだけ喜び大きい。",
+    "chinese": "拼命努力通过了N2考试,所以特别高兴。"
+   },
+   {
+    "japanese": "A「インテリはたいてい髪の毛が少ないだろ。だから、髪の毛が減ればそれだけ頭がいいんだ。」",
+    "chinese": "大凡精英人士都头发稀少,是吧。所以说头发少就表示聪明。"
+   },
+   {
+    "japanese": "B「屁理屈で、とんでもない説だよ。」",
+    "chinese": "什么狗屁理论,你在胡说八道!"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "このあたり·そのあたり·あのあたり·どのあたり",
+  "level": "N2",
+  "formation": "こ(そ、あ、ど)のあたり+助词",
+  "meaning_zh": "表示事情进展中的某个阶段、方面、程度等。",
+  "examples": [
+   {
+    "japanese": "それを買うなら、たしか一万円かその辺りで十分だと思います。",
+    "chinese": "如果想买那个,我记得只要花一万日元左右就差不多了。"
+   },
+   {
+    "japanese": "あの辺りのところはよろしくお願いします。",
+    "chinese": "那件事情还请您多多关照。"
+   },
+   {
+    "japanese": "日本語はもうどの辺りまで学習しましたか。",
+    "chinese": "你的日语已经学到什么程度了呢?"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "このへん·そのへん·あのへん·どの",
+  "level": "N2",
+  "formation": "こ(そ、あ、ど)の辺+助词",
+  "meaning_zh": "跟「こ(そ、あ、ど)のあたり」的意思基本相同,表示事情进展中的某个阶段、方面、程度等。",
+  "examples": [
+   {
+    "japanese": "さて、この辺で、次のテーマに移りたいと思います。",
+    "chinese": "接下来的时间,我想进入下一个话题。"
+   },
+   {
+    "japanese": "あの辺まで練習すれば、もう大丈夫でしょう。",
+    "chinese": "如果练习到那种程度,已经没关系了吧。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こんなふうに·そんなふうに·あんなふうに·どんなふうに",
+  "level": "N2",
+  "formation": "こ(そ·あ·ど)んなふうに+动词",
+  "meaning_zh": "和「こ(そ·あ·ど)ういうふうに」的语法意义基本相同。",
+  "examples": [],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こういうふうに·そういうふうに·あういうふうに·どういうふうに",
+  "level": "N2",
+  "formation": "こ(そ·あ·ど)ういうふうに+动词",
+  "meaning_zh": "表示做某事情的方式方法。“这样/那样/那样/怎样”。",
+  "examples": [
+   {
+    "japanese": "仕事をさぼったりするのはよくないよ。いつもああいうふうでは困る。",
+    "chinese": "偷懒、怠工可不好。要老是那样可不好办。"
+   },
+   {
+    "japanese": "A:ポスターはこういうふうに書けばいいですか。",
+    "chinese": "海报这样设计可以吗?"
+   },
+   {
+    "japanese": "B:ええ、そういうふうなものですね。",
+    "chinese": "可以。应该那样做。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ }
+]
