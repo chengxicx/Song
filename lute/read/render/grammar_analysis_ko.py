@@ -31,6 +31,7 @@ Only text (meaning / examples) is consumed; the audio fields are ignored
 import json
 import os
 import re
+import unicodedata
 
 # ---- tokenizer -------------------------------------------------------
 
@@ -877,6 +878,17 @@ def analyze_korean(page_text, display_lang="en"):
     # 🔊 and zero-width spaces are display artifacts of the reader, not
     # grammar; strip them so offsets align with the rendered text.
     page_text = page_text.replace("🔊", "").replace("\u200b", "")
+    # Imported books are not guaranteed to be NFC: some carry a syllable
+    # whose coda was split off as a standalone conjoining jamo
+    # ("거세어지" + U+11AF instead of "거세어질", "원론적이" + U+11AB
+    # instead of "원론적인") -- a morphological-analyser signature.  Kiwi
+    # then sees the ㄹ/ㄴ ending as its own token, so the offset we report
+    # starts *inside* the syllable and the panel's <mark> splits the
+    # character in half.  Composing first makes the tokens, the offsets
+    # and the rendered sentence agree.  (NFD input also matches nothing at
+    # all, so this is what makes those books analysable in the first
+    # place.)
+    page_text = unicodedata.normalize("NFC", page_text)
     sentences = _split_sentences(page_text)
     rules = _ALL_RULES + _get_pattern_rules()
     by_name = {}

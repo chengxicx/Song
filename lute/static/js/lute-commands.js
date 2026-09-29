@@ -443,9 +443,15 @@ function open_grammar_analysis() {
         }
 
         // Match text with only letters/numbers so punctuation or the 🔊
-        // marker never interferes with locating a phrase.
+        // marker never interferes with locating a phrase.  NFC-composed
+        // last: the backend echoes its sentences composed, while a book
+        // may store decomposed Hangul, and only composed text on both
+        // sides compares equal.
         function stripText(t) {
-          return (t || "").replace(/🔊/g, "").replace(/[^\p{L}\p{N}]/gu, "");
+          return (t || "")
+            .replace(/🔊/g, "")
+            .replace(/[^\p{L}\p{N}]/gu, "")
+            .normalize("NFC");
         }
 
         // Full text for offset matching: keep punctuation so the backend's
@@ -453,11 +459,15 @@ function open_grammar_analysis() {
         // reader's display artifacts (🔊 / zero-width space) and line
         // breaks, which never appear inside the DOM cells (a newline in a
         // book becomes a paragraph break, not a rendered character).
+        // Composed last, for the same reason as stripText: the offsets are
+        // counted in the backend's NFC sentence, so the cell text we
+        // index them against must be NFC too.
         function cleanText(t) {
           return (t || "")
             .replace(/🔊/g, "")
             .replace(/\u200b/gi, "")
-            .replace(/\r?\n/g, "");
+            .replace(/\r?\n/g, "")
+            .normalize("NFC");
         }
 
         // Media-driven books (mp3/subtitles) split one example across several
