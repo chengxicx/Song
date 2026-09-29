@@ -1520,19 +1520,35 @@ def _notes_text(notes):
     return str(notes).strip()
 
 
-def _curated_reference(item):
+def _curated_reference(item, specs=None):
     """
     First curated example that carries a translation, for the panel's
     folded reference block (书内例句 + 译文).  Returns None when the entry
     has no usable example; the panel then hides the block.
+
+    When ``specs`` are given, an example this rule actually matches is
+    preferred over mere document order.  The panel highlights the point
+    inside the quoted sentence, and the derivation only guarantees a spec
+    matches the entry's examples *joined*, so first-in-order left the
+    highlight missing on ~10% of entries (じゃない chosen for a row whose
+    example says ではありません).  Every example of an entry carries a
+    translation, so preferring one costs nothing.
     """
+    usable = []
     for ex in item.get("examples") or []:
         jp = (ex.get("japanese") or "").strip()
         zh = (ex.get("chinese") or "").strip()
         en = (ex.get("english") or "").strip()
         if jp and (zh or en):
-            return {"japanese": jp, "chinese": zh, "english": en}
-    return None
+            usable.append({"japanese": jp, "chinese": zh, "english": en})
+    if not usable:
+        return None
+    if specs:
+        matcher = {"patterns": specs}
+        for ref in usable:
+            if _match_spans(matcher, _tokens_for(ref["japanese"]), ref["japanese"]):
+                return ref
+    return usable[0]
 
 
 def _make_data_rule(
@@ -1551,7 +1567,7 @@ def _make_data_rule(
         name = item.get("pattern") or item.get("id") or f"{level}-{idx}"
     entry_id = item.get("id") or ""
     enrichment = _ZH_ENRICH.get(entry_id) or {}
-    reference = _curated_reference(item)
+    reference = _curated_reference(item, None if skipped else specs)
     return {
         "key": "ds_" + _slug(item.get("id") or f"{level}-{idx}"),
         "pattern": name,
@@ -2158,10 +2174,20 @@ def analyze_japanese(page_text, display_lang="en"):
                 if reference:
                     text = _reference_text(reference, rule, display_lang)
                     if text:
+                        japanese = reference["japanese"]
                         entry["reference"] = {
-                            "japanese": reference["japanese"],
+                            "japanese": japanese,
                             "text": text,
                         }
+                        # The same offsets the page examples carry, computed
+                        # by this rule's own matcher against its curated
+                        # sentence, so the folded block highlights the point
+                        # it illustrates instead of quoting it bare.
+                        spans = _match_spans(rule, _tokens_for(japanese), japanese)
+                        if spans:
+                            entry["reference"]["matches"] = [
+                                {"start": s, "end": e} for s, e in spans
+                            ]
                 matched.append(entry)
             if not any(e["sentence"] == sentence for e in entry["examples"]):
                 if len(entry["examples"]) < _CONSTRUCTION_EXAMPLE_CAP:
