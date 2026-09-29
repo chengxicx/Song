@@ -1137,6 +1137,50 @@ def test_panel_entries_omit_empty_reference_fields():
         assert "reference" not in entry or entry["reference"]["japanese"]
 
 
+def test_every_reference_example_is_highlightable():
+    """
+    A rule's curated reference must be one of its own examples that the
+    rule actually matches -- not merely the first one in document order.
+    The derivation only proves a spec matches the entry's examples
+    joined, so picking by order alone left the panel's highlight missing
+    on ~10% of entries (a じゃない row quoting ではありません).
+    """
+    rules = [r for r in _ALL_RULES if r.get("reference") and r.get("patterns")]
+    assert rules, "expected data rules with panel references"
+    for rule in rules:
+        japanese = rule["reference"]["japanese"]
+        spans = grammar_ja._match_spans(
+            rule, grammar_ja._tokens_for(japanese), japanese
+        )
+        assert spans, f"{rule['key']} cannot highlight its own reference: {japanese}"
+
+
+def test_panel_reference_carries_highlight_offsets():
+    """
+    The reference block ships the same {start, end} character offsets the
+    page examples use, so the front-end highlights it with one renderer.
+    """
+    rule = next(
+        r
+        for r in _ALL_RULES
+        if r.get("reference")
+        and r.get("patterns")
+        and r.get("kind") not in ("particle", "basic")
+    )
+    results = analyze_japanese("".join(rule["examples"][:2]))
+    # Rules sharing a headline fold into one row carrying the first rule's
+    # key, so look the row up by name when the key is not the survivor.
+    entry = next(
+        e
+        for e in results
+        if e["key"] == rule["key"] or e["name"] == rule["pattern"]
+    )
+    japanese = entry["reference"]["japanese"]
+    assert entry["reference"]["matches"], f"{rule['key']} reference has no offsets"
+    for match in entry["reference"]["matches"]:
+        assert 0 <= match["start"] < match["end"] <= len(japanese)
+
+
 def _jkindrix_rule():
     """
     A vendored jkindrix rule: English notes, English-only example, and
