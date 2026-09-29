@@ -1,0 +1,161 @@
+[
+ {
+  "pattern": "こういう・そういう・ああいう・どういう",
+  "level": "N3",
+  "formation": "こう(そう、ああ、どう)いう+名词",
+  "meaning_zh": "表示某项事物的内容、性质等。“这样的/那样的/那样的/怎样的”。",
+  "examples": [
+   {
+    "japanese": "こういう仕事をさせると、田中さんの能力が生きる。",
+    "chinese": "如果把这项工作交给田中干的话,他的能力就能得到体现。"
+   },
+   {
+    "japanese": "この言葉はどういう意味ですか。",
+    "chinese": "这个单词是什么意思?"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こういった・そういった・ああいった・どういった",
+  "level": "N3",
+  "formation": "こう(そう、ああ、どう)いった+名词",
+  "meaning_zh": "",
+  "examples": [],
+  "notes": "块尾被页面截断:原文止于「こう(そう、ああ、どう)いった + 名 词」,意义与例句未出现。",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こういう·そういう·ああいう·どういう",
+  "level": "N3",
+  "formation": "こう(そう、ああ、どう)いう+名词",
+  "meaning_zh": "表示某项事物的内容、性质等。这样的/那样的/那样的/怎样的",
+  "examples": [
+   {
+    "japanese": "こういう仕事をさせると、田中さんの能力が生きる。",
+    "chinese": "如果把这项工作交给田中干的话,他的能力就能得到体现。"
+   },
+   {
+    "japanese": "この言葉はどういう意味ですか。",
+    "chinese": "这个单词是什么意思?"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こういった·そういった·ああいった·どういった",
+  "level": "N3",
+  "formation": "こう(そう、ああ、どう)いった+名词",
+  "meaning_zh": "表示多项事物的性质或特征。这样的/那样的/那样的/怎样的",
+  "examples": [
+   {
+    "japanese": "公務員、銀行員などが若者に人気がある。多くの若い人はそういった職業につきたがっている。",
+    "chinese": "公务员、银行职员等职业受到年轻人的青睐。有很多年轻人都想从事那样的职业。"
+   },
+   {
+    "japanese": "授業を休んだり、学校に来てもまじめに勉強しない。ああいった態度だから、困っています。",
+    "chinese": "要么不来上学,即使来了也不好好学习。那样的学习态度,实在令人伤脑筋。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こうした·そうした·ああした·どうした",
+  "level": "N3",
+  "formation": "こう(そう、ああ、どう)した+名词",
+  "meaning_zh": "表示多项事物的性质或特征。这样的/那样的/那样的/怎样的",
+  "examples": [
+   {
+    "japanese": "昼間は学校で勉強する。夜や休みの日にバイトをする。こうした生活はわたしの四年間の留学生活の一部となった。",
+    "chinese": "白天在学校读书,晚上或休息天打工。这样的生活成了我四年留学生活的一部分。"
+   },
+   {
+    "japanese": "どうしたわけか、こんな物を送ってきた。",
+    "chinese": "不知为何,有人送来这个东西。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こうして·そうして·ああして·どうして",
+  "level": "N3",
+  "formation": "こう(そう、ああ、どう)して+动词",
+  "meaning_zh": "方式、方法。这样地/那样地/那样地/怎样地",
+  "examples": [
+   {
+    "japanese": "A「分かった?お箸はこうして持つんだ。」",
+    "chinese": "明白了吗?筷子就这么拿。"
+   },
+   {
+    "japanese": "B「ああ、お箸はそうして持つのか。」",
+    "chinese": "啊,原来筷子是那样拿的啊。"
+   },
+   {
+    "japanese": "新入社員にはああして、こうしてと、いちいち教えなければならない。",
+    "chinese": "这呀那地,对新进员工必须逐一地、不厌其烦地言传身教。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "こうやって·そうやって·ああやって·どうやって",
+  "level": "N3",
+  "formation": "こう(そう、ああ、どう)やって+动词",
+  "meaning_zh": "方式、方法。这样地/那样地/那样地/怎样地",
+  "examples": [
+   {
+    "japanese": "このゲームはこうやって遊びます。",
+    "chinese": "这个游戏是这么玩的。"
+   },
+   {
+    "japanese": "母は家計の穴をどうやって埋めるか苦労している。",
+    "chinese": "妈妈在为如何填补家庭收支的赤字而烦恼。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ },
+ {
+  "pattern": "これほど·それほど·あれほど·どれほど",
+  "level": "N3",
+  "formation": "こ(そ、あ、ど)れほど+の+名词；こ(そ、あ、ど)れほど+(形容词或动词)；それほど～ない",
+  "meaning_zh": "表示程度之高或数量之多。这么/那么/那么/多少；表示程度或数量上并没有达到预想的那样。并不怎么…",
+  "examples": [
+   {
+    "japanese": "あれほどハンサムな男なら、周囲の女性にもてるのも当然なことだろう。",
+    "chinese": "那么帅气的男士,当然会得到周围女性的青睐。"
+   },
+   {
+    "japanese": "その家を買うなら、どれほどの金がかかりますか。",
+    "chinese": "如果购买那套房子,大概需要多少钱?"
+   },
+   {
+    "japanese": "A「ケンさんは本当に日本語が上手ですね。」",
+    "chinese": "阿剑,你的日语说得真好啊。"
+   },
+   {
+    "japanese": "B「いえ、それほどでもありません。」",
+    "chinese": "哪里哪里,不怎么好。"
+   },
+   {
+    "japanese": "この会社に就職するのはそれほど難しいことではない。",
+    "chinese": "进这家公司工作的门槛其实并不那么高。"
+   }
+  ],
+  "notes": "",
+  "source": "private-material",
+  "_excluded": "particle-or-vocab"
+ }
+]
