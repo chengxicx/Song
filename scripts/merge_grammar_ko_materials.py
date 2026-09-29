@@ -6,7 +6,8 @@ entry to ``lute/jlpt_data/grammar_ko.json``, keeping that file's
 kimchi-grammar schema so ``grammar_analysis_ko`` loads the new rows
 unchanged:
 
-    key, name, slug, meaning, type, examples, focus, zh, level, ko
+    key, name, slug, meaning, type, examples, focus, zh, level, ko,
+    formation, notes
 
 Field mapping
 -------------
@@ -17,12 +18,21 @@ Field mapping
   level    the material's TOPIK band
   examples the example sentences, verbatim Korean (list of strings, like the
            kimchi rows); ``example_zh`` / ``example_en`` carry the parallel
-           translations for a future browse page
+           translations the panel's folded reference block quotes
   focus    left empty: the engine derives the matcher from ``name``
   type     derived from the slot marker (V/A -> verb, N -> noun, else
            composite)
   key      ``kgm_<name>__<md5-6>`` -- stable across re-runs, so the merge
            is idempotent
+  formation / notes
+           the book's 接续 line and 注意点, verbatim.  These two were
+           dropped when the merge only kept the kimchi schema, which left
+           the Korean panel showing a description while the Japanese one
+           showed 接续 / 参考例句 / 注意点.  ``notes`` is English book prose
+           and ``formation`` Korean, so the Chinese wording lives in
+           ``grammar_ko_enrichment.json`` (the engine's display-language
+           filter hides an untranslated field rather than printing it under
+           a Chinese heading).
 
 Usage::
 
@@ -95,6 +105,60 @@ def load_missing():
         return json.load(fh)
 
 
+# The three book files, in the order the audit walks them.
+_MATERIAL_FILES = ("beginning.json", "intermediate.json", "advanced.json")
+
+# The panel fields the merge carries from the book, as (row field, material
+# field).  ``backfill`` uses the same list so a re-run repairs both.
+_PANEL_FIELDS = (("formation", "formation"), ("notes", "notes"))
+
+
+def load_materials():
+    """
+    Every material row, keyed by the name the merge gives it.
+
+    First wins on a name collision, walking the patterns in sorted order --
+    the same order and the same rule ``build_rows`` uses (``sorted(missing)``
+    plus ``taken_names``), so a back-fill can only ever reach the row the
+    merge itself would have created.
+    """
+    by_name = {}
+    for fname in _MATERIAL_FILES:
+        path = os.path.join(MATERIALS, fname)
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8") as fh:
+            for meta in sorted(json.load(fh), key=lambda m: m.get("pattern") or ""):
+                name = clean_name(meta.get("pattern") or "")
+                if name and name not in by_name:
+                    by_name[name] = meta
+    return by_name
+
+
+def backfill(entries, materials_by_name):
+    """
+    Fill the panel fields on rows merged before the merge carried them.
+
+    Idempotent and non-destructive: only a *missing* field is filled, so a
+    hand-corrected value survives a re-run -- the same rule the zh/ko glosses
+    follow in ``enrich_grammar_ko``.  Returns the (key, field) pairs changed,
+    which is empty on a second run.
+    """
+    filled = []
+    for e in entries:
+        if not e["key"].startswith("kgm_"):
+            continue
+        meta = materials_by_name.get(e.get("name") or "")
+        if not meta:
+            continue
+        for field, src in _PANEL_FIELDS:
+            want = (meta.get(src) or "").strip()
+            if want and not (e.get(field) or "").strip():
+                e[field] = want
+                filled.append((e["key"], field))
+    return filled
+
+
 def existing(entries):
     return {e["key"] for e in entries}, {e["name"] for e in entries}
 
@@ -141,7 +205,8 @@ def build_rows(missing, taken_keys, taken_names):
                 "level": meta.get("level") or "TOPIK 3-4",
                 "ko": (meta.get("meaning_ko") or "").strip(),
                 "source": meta.get("source") or "private-book",
-                "notes": "",
+                "formation": (meta.get("formation") or "").strip(),
+                "notes": (meta.get("notes") or "").strip(),
             }
         )
         taken_keys.add(key)
@@ -153,15 +218,41 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--write", action="store_true")
     args = ap.parse_args()
+    with open(LIBRARY, encoding="utf-8") as fh:
+        entries = json.load(fh)
+    materials_by_name = load_materials()
+
+    # Repair first, so the run reports the panel fields either way: a
+    # back-fill only touches rows that already exist, while a fresh merge
+    # needs the audit report.
+    filled = backfill(entries, materials_by_name)
+    print(f"panel fields back-filled: {len(filled)}")
+    for key, field in filled[:10]:
+        print(f"  + {key} .{field}")
+    if len(filled) > 10:
+        print(f"  ... and {len(filled) - 10} more")
+
     missing = load_missing()
     if missing is None:
         print("no audit_ko_missing.json yet -- run scripts.audit_grammar_ko_coverage")
+        if args.write and filled:
+            with open(LIBRARY, "w", encoding="utf-8") as fh:
+                json.dump(entries, fh, ensure_ascii=False, indent=1)
+            print(f"{LIBRARY}: back-fill written")
         return 1
     if not missing:
         print("audit_ko_missing.json is empty -- nothing to merge")
+        if args.write:
+            if filled:
+                with open(LIBRARY, "w", encoding="utf-8") as fh:
+                    json.dump(entries, fh, ensure_ascii=False, indent=1)
+                print(f"{LIBRARY}: back-fill written")
+            else:
+                print("(nothing to write: no new rows, no back-fill)")
+        else:
+            print("(dry run: pass --write)")
         return 0
-    with open(LIBRARY, encoding="utf-8") as fh:
-        entries = json.load(fh)
+
     tk, tn = existing(entries)
     rows, skipped = build_rows(missing, tk, tn)
     print(f"new rows: {len(rows)}  skipped: {len(skipped)}")
