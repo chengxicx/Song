@@ -13,7 +13,9 @@ from lute.read.render.grammar_analysis_ja import (
     _ALL_LEVELS,
     _ALL_RULES,
     _CONCEPT_IDS,
+    _CONSTRUCTION_RULES,
     _DATA_RULES,
+    _DUPLICATE_IDS,
     _FUNCTION_WORD_IDS,
     _N5_RULES,
     _PARTICLE_IDS,
@@ -174,16 +176,20 @@ def test_data_rules_loaded_for_all_levels():
         for r in rules:
             assert r["level"] == level
             assert r["meaning"]
-            assert r["examples"]
+            # Merged material entries may legitimately carry no examples
+            # (their source PDF listed none); such rules must be skipped
+            # so they never fire on a matcher derived from nothing.
+            if not r["examples"]:
+                assert r["skipped"], f"{r['key']} has no examples but is active"
 
 
 def test_full_jlpt_library_is_loaded():
     "The whole curated JLPT grammar library is present, not just a sample."
-    assert len(_DATA_RULES) >= 590
+    assert len(_DATA_RULES) >= 820
     by_level = {
         lvl: len([r for r in _DATA_RULES if r["level"] == lvl]) for lvl in _ALL_LEVELS
     }
-    assert by_level == {"N5": 77, "N4": 89, "N3": 130, "N2": 149, "N1": 150}, by_level
+    assert by_level == {"N5": 141, "N4": 185, "N3": 256, "N2": 204, "N1": 207}, by_level
     # The great majority of entries must be usable matchers rather than
     # skipped: entries only get skipped for good reason (see _load_level).
     active = [r for r in _DATA_RULES if not r["skipped"]]
@@ -632,7 +638,20 @@ def test_vocab_ids_are_library_entries():
 
     library = load_library()
     assert _VOCAB_IDS <= set(library), sorted(_VOCAB_IDS - set(library))
-    assert len(_VOCAB_IDS) == 14, "changing the list is a review, not a patch"
+    assert len(_VOCAB_IDS) == 45, "changing the list is a review, not a patch"
+
+
+def test_duplicate_ids_are_library_entries():
+    """
+    _DUPLICATE_IDS holds material entries whose construction jkindrix already
+    carries: silencing is a reviewed decision per entry, same as _VOCAB_IDS.
+    """
+    from scripts.screen_grammar_library import load_library
+
+    library = load_library()
+    assert _DUPLICATE_IDS <= set(library), sorted(_DUPLICATE_IDS - set(library))
+    assert len(_DUPLICATE_IDS) == 73, "changing the list is a review, not a patch"
+    assert not (_DUPLICATE_IDS & _VOCAB_IDS), "an id lives in exactly one list"
 
 
 def test_vocabulary_screen_still_flags_the_vocab_ids():
@@ -640,7 +659,8 @@ def test_vocabulary_screen_still_flags_the_vocab_ids():
     The screen and the list must not drift apart.  If the library is
     re-vendored or the derivation changes, the entries the list removes have
     to still look like vocabulary to the screen -- otherwise the list is stale
-    and should be re-derived, not trusted.
+    and should be re-derived, not trusted.  (Duplicate silences are exempt:
+    they are removed for overlapping with an existing row, not for shape.)
     """
     from scripts.screen_grammar_library import screen
 
@@ -785,6 +805,18 @@ _FORMATION_NAMED = {
     "muki-suitable-for",
     "hoka-nai-no-choice",
     "wo-hajime-including",
+    # か〜さもなければ/か〜さもないと: the pattern carries a 〜 slot inside the
+    # literal, so no derived fragment is ever a substring of it.  The derived
+    # name 〜かさもなければ is the construction read as one word -- correct.
+    "kasamonakerebakasamonaito",
+    # N4/N5 book merge (2026-09-29): short-kana patterns whose headline falls
+    # back to the formation text.  Each derived name is the same construction
+    # in polite or full form (からだ->からです), still the entry's own point.
+    "karada",
+    "nakute",
+    "hoshii",
+    "hoshiindesuga",
+    "tekudasaimasenka",
 }
 
 
@@ -795,6 +827,10 @@ def test_rules_are_named_after_their_own_pattern():
     for an entry describing a form is a list of examples -- and the row is then
     named after an example word.  _SLOT_SPECS and _CONCEPT_IDS fix the three
     that did; this keeps the class from growing back unnoticed.
+
+    Parenthetical readings (かい（甲斐）もなく) are stripped before comparing:
+    the derivation names the row after the bare literal, which is correct
+    even though the parenthesized pattern text differs.
     """
     from scripts.screen_grammar_library import load_library
 
@@ -804,7 +840,7 @@ def test_rules_are_named_after_their_own_pattern():
         rid = rule["key"][3:]
         if rule["skipped"] or rid in _SLOT_SPECS:
             continue
-        pattern = library[rid]["pattern"]
+        pattern = re.sub(r"（[^）]*）", "", library[rid]["pattern"])
         if any(
             frag and frag not in pattern
             for frag in rule["pattern"].lstrip("〜").split("・")
@@ -998,3 +1034,62 @@ def test_concurrent_analysis_does_not_raise_already_borrowed():
     _run_threads(work, count=8)
     assert not errors, f"concurrent analysis failed: {errors[:3]}"
     assert len(results) == 8
+
+
+# ---- combined construction rules (AつBつ, ば~ほど, ...) -------------------
+
+
+def test_construction_rules_carry_data():
+    "Every combined-construction rule carries a level, meaning, and examples."
+    for rule in _CONSTRUCTION_RULES:
+        assert rule["level"] in ("N1", "N2"), rule["key"]
+        assert rule["meaning"], rule["key"]
+        assert rule["examples"], rule["key"]
+
+
+def test_each_construction_rule_matches_its_own_examples():
+    "A combined-construction rule must fire on its own example sentences."
+    for rule in _CONSTRUCTION_RULES:
+        text = "".join(rule["examples"])
+        hits = {e["key"] for e in analyze_japanese(text)}
+        assert rule["key"] in hits, f"{rule['key']} did not match its own examples"
+
+
+def test_construction_rules_are_in_the_full_rule_set():
+    "The combined-construction rules are wired into the engine."
+    keys = {r["key"] for r in _ALL_RULES}
+    for rule in _CONSTRUCTION_RULES:
+        assert rule["key"] in keys
+
+
+@pytest.mark.parametrize(
+    "key, sentence",
+    [
+        # 〜なり as "as soon as" must not read as 〜なり〜なり.
+        ("a_nari_b_nari", "彼は部屋に入るなり、泣き出した。"),
+        # にもまして / にもかかわらず are different constructions.
+        ("volitional_ni_mo_nai", "以前にもまして、忙しくなった。"),
+        ("volitional_ni_mo_nai", "悪天候にもかかわらず、試合は行われた。"),
+        # ばかり is not ば~ほど.
+        ("ba_hodo", "物価は上がるばかりだ。"),
+        ("mo_ba_mo", "雨が降っています。"),
+        # A single といい-like sequence is not the doubled construction.
+        ("to_ii_to_ii", "これはいい値段だと思っています。"),
+        ("volitional_mai", "行こうと思っています。"),
+        ("a_tsu_b_tsu", "手を抜きました。"),
+    ],
+)
+def test_construction_rules_do_not_false_positive(key, sentence):
+    "Near-miss sentences must not report the combined-construction rule."
+    hits = {e["key"] for e in analyze_japanese(sentence)}
+    assert key not in hits, f"{key} should NOT match: {sentence}"
+
+
+def test_zh_table_covers_construction_rules():
+    "Chinese display has an entry for every combined-construction rule."
+    missing = [
+        r["pattern"]
+        for r in _CONSTRUCTION_RULES
+        if r["pattern"] not in _ZH_DESC
+    ]
+    assert missing == [], f"missing zh descriptions: {missing}"
