@@ -6,6 +6,7 @@ import gzip
 import json
 import math
 import os
+import unicodedata
 from flask import (
     Blueprint,
     current_app,
@@ -1184,6 +1185,13 @@ def grammar_analysis(bookid, pagenum):
     # analysis so no tokenizer/analyzer ever sees them (the Japanese and
     # Korean engines do the same internally).
     page_text = page_text.replace("\u200b", "").replace("🔊", "")
+    # Same reason, one step further: an imported book may store decomposed
+    # Hangul (e.g. "지" + U+11AF where the source had the single syllable
+    # "질").  An engine that tokenises such text reports offsets that fall
+    # inside a syllable, and the client -- which slices the sentence at
+    # those offsets -- then renders a half-character.  Composing once here
+    # keeps every engine's tokens, offsets and echoed sentence consistent.
+    page_text = unicodedata.normalize("NFC", page_text)
     display = getattr(lang, "grammar_translate_lang", "") or "en"
     # Every engine runs on optional heavy dependencies (Sudachi, Kiwi,
     # spaCy models, pymorphy3, pythainlp, pyarabic); when one is missing,

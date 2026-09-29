@@ -1,0 +1,38 @@
+[
+ {
+  "pattern": "A/V-(으)ㄹ 뿐이다",
+  "level": "TOPIK 3-4",
+  "formation": "동사·형용사 어간 + -(으)ㄹ 뿐이다",
+  "meaning_en": "practice section for expressing that there is only one action or state and nothing else",
+  "meaning_zh": "仅为使用 -(으)ㄹ 뿐이다 完成对话的练习页。",
+  "meaning_ko": "-(으)ㄹ 뿐이다를 사용해 대화를 완성하는 연습 문제로만 구성된 면.",
+  "examples": [],
+  "notes": "练习/复习页：书中该面只含练习题，无可逐字抄录的语法点例句，因此不参与合并（audit 不递归 reference/，merge 不读该目录）。",
+  "unit": "Expressing Emphasis",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V/A-게, V/A-도록",
+  "level": "TOPIK 3-4",
+  "formation": "동사·형용사 어간 + -게 / -도록",
+  "meaning_en": "review section for the purpose expressions -게 and -도록",
+  "meaning_zh": "为检验 -게 和 -도록 等目的类表达掌握情况的复习页。",
+  "meaning_ko": "-게와 -도록을 포함해 목적 표현 전반을 확인하는 연습 문제로 구성된 면.",
+  "examples": [],
+  "notes": "练习/复习页：书中该面只含练习题，无可逐字抄录的语法点例句，因此不参与合并（audit 不递归 reference/，merge 不读该目录）。",
+  "unit": "Expressing Aims and Intentions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-았/었던",
+  "level": "TOPIK 3-4",
+  "formation": "동사·형용사 어간 + -았/었던",
+  "meaning_en": "practice section for recalling past events or states with -았/었던",
+  "meaning_zh": "仅为使用 -았/었던 完成短文的练习页。",
+  "meaning_ko": "-았/었던을 사용해 이야기를 완성하는 연습 문제로만 구성된 면.",
+  "examples": [],
+  "notes": "练习/复习页：书中该面只含练习题，无可逐字抄录的语法点例句，因此不参与合并（audit 不递归 reference/，merge 不读该目录）。",
+  "unit": "Expressing Completion",
+  "source": "private-book"
+ }
+]
