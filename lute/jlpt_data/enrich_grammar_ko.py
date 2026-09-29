@@ -1211,16 +1211,223 @@ _KO = {
 }
 
 
+# Per-definition Chinese descriptions, keyed by the record's `key`.
+#
+# kimchi gives one `name` to a whole family of senses -- three separate rows
+# are all called "(이)거니", five are all "(으)오/소" -- so a name-keyed lookup
+# hands every sense the same description.  That is wrong for at least one
+# member of most families: the row "(이)거니" glossed "……是当然的；……（推理）"
+# is the *reason/inference* reading, while the sibling row it labels is the
+# "not only ... but also" construction.  Entries here win over _ZH.
+_ZH_BY_KEY = {
+    # ---- 하오체 / 하게체 endings ----
+    "verb_으오_오_소__하오체-present-tense": "하오体陈述：……（现在时）",
+    "verb_으오_오_소__하오체-polite-question": "하오体疑问：……吗",
+    "verb_으오_오_소__하오체-command": "하오体命令：请……",
+    "verb_으오_오_소__하오체-suggestion": "하오体劝诱：……吧",
+    "verb_으오_오_소__하오체-honorific": "하오体敬语：……（含尊敬）",
+    "verb_을세__하게체-simple-statement": "하게体陈述：……（推测）",
+    "verb_을세__하게체-realization": "하게体感叹：原来……啊",
+    "verb_을세__하게체-intention": "하게体意志：我要……",
+    "verb_게__하게체-command": "하게体命令：……吧",
+    "verb_는구려__하오체-new-information": "（하오体）原来……啊（新发现）",
+    "verb_는구려__하오체-polite-command": "（하오体）请……吧",
+    # ---- (이)거니 family: three unrelated constructions ----
+    "verb_거니__not-only-but-also": "不仅……而且……",
+    "verb_거니__past-acknowledgment": "先承认过去的事实，再强调后句",
+    "verb_거니__repetition-alternation": "……来……去（反复/交替）",
+    # ---- (으)리 / (으)랴: the family gloss is only the rebuttal sense ----
+    "verb_으리__prediction": "（推测）会……",
+    "verb_으리__intention": "（意志）要……",
+    "verb_으리__informal-logical-rebuttal": "哪会……；怎么可能",
+    "verb_으랴__busy-with": "又要……又要……（忙得不可开交）",
+    "verb_으랴__rhetorical-question": "哪会……；怎么会……",
+    # ---- (으)ㅁ: nominalisation vs sentence-final ----
+    "verb_음__concept-noun": "（抽象概念名词化）……",
+    "verb_음__nominalization": "（名词化，多用于书面语）……",
+    "verb_음__formal-ending": "（书面语终结）……",
+    # ---- (으)세요: only the command sense is imperative ----
+    "verb_세요_으세요__polite-command": "请……（礼貌命令）",
+    "verb_세요_으세요__polite-question": "……吗？（礼貌疑问）",
+    "verb_세요_으세요__polite-statement": "……（礼貌陈述）",
+    # ---- (이)나: three senses, family gloss covers two ----
+    "noun_이나_나__choice": "或者……（选择）",
+    "noun_이나_나__no-less-than": "多达……；竟然……",
+    "noun_이나_나__at-least": "（退而求其次）……也行",
+    # ---- 게 / 기에 ----
+    "verb_게__making-adverb": "……地（副词化）",
+    "verb_게__expectation": "……得（使……）",
+    "verb_기에__reason-or-cause-written": "因为……（说明行动的理由）",
+    "verb_기에__conditions-for": "……（据此作出判断）",
+    "verb_기에__point-of-view": "（以……来看）……",
+    # ---- 더니 / 던 ----
+    "verb_더니__change-compared-to-the-past": "（过去）……结果现在……",
+    "verb_더니__and-then": "……（接着）结果……",
+    "verb_더니__related-to-past-event": "（补充过去的相关事实）……",
+    "verb_던__past-habitual-experience": "（过去反复/习惯）……的",
+    "verb_던__past-interrupted-action": "（过去做了一半）……的",
+    "verb_던__past-action": "（过去曾）……的",
+    # ---- 아/어 가다 ----
+    "아어_가다__continuely": "（逐渐）……下去",
+    "아어_가다__going-somewhere": "……去（远离说话人）",
+    "아어_가다__almost-done": "（快……完了）",
+    # ---- 에 ----
+    "noun_에__time": "在……（时间）",
+    "noun_에__location": "在……（处所，与 있다/없다 连用）",
+    "noun_에__direction": "往……；朝……（方向）",
+    # ---- misc families whose gloss misleads ----
+    "verb_을까_ㄹ까__suggestion": "要不要一起……呢（提议）",
+    "verb_을까_ㄹ까__asking-opinion": "……怎么样？（征求对方意见）",
+    "verb_을까_ㄹ까__wondering": "会不会……呢（自言自语）",
+    "verb_며_으며__occurring-simultaneously": "一边……一边……",
+    "verb_며_으며__listing-actions-states-or-facts": "……并且……（列举）",
+    "verb_며_으며__listing-things": "（与 이다 连用）既是……又是……",
+    "verb_으니_니__informal-question": "……吗？（口语疑问）",
+    "verb_으니_니__reason-or-cause": "因为……；既然……",
+    "noun_이야__copula": "是……（判断）",
+    "noun_이야__emphasis": "……（强调主题）",
+    "verb_겠__intention": "（意志）我要……",
+    "verb_겠__supposition": "（推测）大概会……",
+    "verb_기는_긴__gentle-refutation": "哪里……；谈不上……",
+    "verb_기는_긴__partial-acknowledgment": "……倒是……（承认但保留）",
+    "verb_느니__better-choice": "与其……不如……",
+    "verb_느니__listing": "……或……（列举相反的内容）",
+    "다가_보니까__realization": "……着就发现……",
+    "다가_보니까__causation": "（因为一直……所以）……",
+    "아어_가지다__time-order-of-two-actions": "……之后（接着）……",
+    "아어_가지다__reasoning": "因为……所以……",
+    "아어_오다__up-till-now": "（从过去）一直……下来",
+    "아어_오다__coming-from-somewhere": "……来（朝说话人方向）",
+    "verb_으니까_니까__reason-or-cause": "因为……；由于……",
+    "verb_으니까_니까__discovery": "（一……发现）……",
+    "verb_으되__but-however": "虽然……但是……",
+    "verb_으되__archaic-quoting": "（古语）说……（直接引用）",
+    "verb_으렷다__educated-guess": "（古语）想必……",
+    "verb_으렷다__command": "（古语）……吧（命令）",
+    "verb_으리라__expressing-will": "（意志）要……",
+    "verb_으리라__strong-prediction": "（强烈推测）一定会……",
+    "verb_거든__reasoning": "因为……（说明缘由）",
+    "verb_거든__conditional": "如果……的话",
+    "verb_거들랑__informing": "（告诉对方不知道的事）……",
+    "verb_거들랑__conditional": "如果……的话",
+}
+
+# The same, for the panel's 한국어 display language.
+_KO_BY_KEY = {
+    "verb_으오_오_소__하오체-present-tense": "하오체로 현재의 동작·상태·사실을 서술하는 종결 어미.",
+    "verb_으오_오_소__하오체-polite-question": "하오체로 정중하게 묻는 종결 어미.",
+    "verb_으오_오_소__하오체-command": "하오체로 명령하거나 요청하는 종결 어미.",
+    "verb_으오_오_소__하오체-suggestion": "하오체로 함께 하자고 권하는 종결 어미.",
+    "verb_으오_오_소__하오체-honorific": "하오체에 존대를 더한 종결 어미.",
+    "verb_을세__하게체-simple-statement": "하게체로 자신의 생각이나 추측을 서술하는 종결 어미.",
+    "verb_을세__하게체-realization": "하게체로 새삼 깨달은 것을 감탄하듯 말하는 종결 어미.",
+    "verb_을세__하게체-intention": "하게체로 자신의 의지를 나타내는 종결 어미.",
+    "verb_게__하게체-command": "하게체로 아랫사람에게 명령하거나 부탁하는 종결 어미.",
+    "verb_는구려__하오체-new-information": "하오체로 새로운 사실을 알게 된 놀라움을 나타내는 종결 어미.",
+    "verb_는구려__하오체-polite-command": "하오체로 정중하게 권하듯 명령하는 종결 어미.",
+    "verb_거니__not-only-but-also": "앞의 사실을 인정하면서 뒤의 사실을 덧붙이는 연결 어미.",
+    "verb_거니__past-acknowledgment": "지난 일이나 사실을 인정한 뒤 뒤의 말을 강조하는 어미.",
+    "verb_거니__repetition-alternation": "동작이 반복되거나 번갈아 일어남을 나타내는 어미.",
+    "verb_으리__prediction": "어떤 상황에 대한 추측이나 짐작을 나타내는 어미.",
+    "verb_으리__intention": "말하는 사람의 의지나 뜻을 나타내는 어미.",
+    "verb_으리__informal-logical-rebuttal": "이치에 비추어 그럴 수 없다고 되묻는 표현.",
+    "verb_으랴__busy-with": "여러 가지 일을 하느라 바쁘고 힘든 상황을 나타내는 어미.",
+    "verb_으랴__rhetorical-question": "이치에 비추어 그럴 수 없다고 반문하는 표현.",
+    "verb_음__concept-noun": "동사·형용사를 추상적인 개념 명사로 만드는 명사형 어미.",
+    "verb_음__nominalization": "동사·형용사를 명사로 만들어 사실을 서술하거나 나열하는 명사형 어미.",
+    "verb_음__formal-ending": "글말에서 사실이나 결론을 맺을 때 쓰는 종결 어미.",
+    "verb_세요_으세요__polite-command": "정중하게 지시하거나 부탁하는 명령형.",
+    "verb_세요_으세요__polite-question": "상대의 동작이나 상태를 정중하게 묻는 표현.",
+    "verb_세요_으세요__polite-statement": "상대의 동작이나 상태를 정중하게 서술하는 표현.",
+    "noun_이나_나__choice": "둘 이상의 선택지를 나열하고 그중 하나를 고를 때 쓰는 조사.",
+    "noun_이나_나__no-less-than": "수량이 예상보다 훨씬 많거나 기준보다 높음을 나타내는 조사.",
+    "noun_이나_나__at-least": "첫 번째 선택은 아니지만 차선으로 괜찮음을 나타내는 조사.",
+    "verb_게__making-adverb": "형용사를 부사로 바꾸거나 뒤 동작의 목적·방법을 나타내는 어미.",
+    "verb_게__expectation": "뒤 동작의 결과나 기준을 기대하며 앞 절의 실현을 이끄는 표현.",
+    "verb_기에__reason-or-cause-written": "말하는 사람의 행동에 대한 이유나 원인을 나타내는 어미.",
+    "verb_기에__conditions-for": "앞 절의 상황을 전제로 뒤 절에서 그에 대한 판단을 나타내는 표현.",
+    "verb_기에__point-of-view": "보다·느끼다·생각하다와 함께 쓰여 자신의 관점을 나타내는 표현.",
+    "verb_더니__change-compared-to-the-past": "과거와 비교하여 달라진 변화를 직접 겪은 대로 나타내는 어미.",
+    "verb_더니__and-then": "직접 관찰한 일이 순서대로 이어짐을 나타내는 어미.",
+    "verb_더니__related-to-past-event": "과거의 일과 관련된 또 다른 사실을 덧붙이는 어미.",
+    "verb_던__past-habitual-experience": "과거에 반복되던 습관적인 일을 나타내는 관형사형 어미.",
+    "verb_던__past-interrupted-action": "과거에 하다 만 동작을 나타내는 관형사형 어미.",
+    "verb_던__past-action": "과거의 동작이 완결되지 않았음을 함축하는 관형사형 어미.",
+    "아어_가다__continuely": "현재의 동작이 앞으로도 계속됨을 나타내는 표현.",
+    "아어_가다__going-somewhere": "동작이 말하는 사람에게서 멀어져 감을 나타내는 표현.",
+    "아어_가다__almost-done": "시작된 동작이 곧 끝나게 됨을 나타내는 표현.",
+    "noun_에__time": "동작이 일어나는 시간을 나타내는 조사.",
+    "noun_에__location": "있다·없다와 함께 쓰여 사람이나 사물의 위치를 나타내는 조사.",
+    "noun_에__direction": "이동 동사와 함께 쓰여 동작의 방향을 나타내는 조사.",
+    "verb_을까_ㄹ까__suggestion": "함께 하자고 제안할 때 쓰는 표현.",
+    "verb_을까_ㄹ까__asking-opinion": "상대의 생각이나 의견을 물을 때 쓰는 표현.",
+    "verb_을까_ㄹ까__wondering": "혼자 속으로 짐작하며 궁금해하는 표현.",
+    "verb_며_으며__occurring-simultaneously": "두 가지 이상의 동작이 동시에 일어남을 나타내는 연결 어미.",
+    "verb_며_으며__listing-actions-states-or-facts": "둘 이상의 동작·상태·사실을 나열하는 연결 어미.",
+    "verb_며_으며__listing-things": "이다와 함께 쓰여 둘 이상의 것을 나열하는 표현.",
+    "verb_으니_니__informal-question": "일상 대화에서 쓰이는 반말 의문 종결 어미.",
+    "verb_으니_니__reason-or-cause": "앞의 말이 뒤의 말에 대한 원인이나 이유가 됨을 나타내는 어미.",
+    "noun_이야__copula": "주어와 서술어가 같음을 나타내는 조사.",
+    "noun_이야__emphasis": "앞말을 강조하는 조사.",
+    "verb_겠__intention": "앞으로 무엇을 하겠다는 말하는 사람의 의지를 나타내는 표현.",
+    "verb_겠__supposition": "어떤 상황에 대한 추측을 나타내는 표현.",
+    "verb_기는_긴__gentle-refutation": "상대의 말을 정중하게 부정하거나 겸손하게 대답하는 표현.",
+    "verb_기는_긴__partial-acknowledgment": "어떤 사실을 인정하면서도 뒤에 이의를 붙이는 표현.",
+    "verb_느니__better-choice": "둘 다 좋지 않지만 뒤의 것이 더 나음을 나타내는 연결 어미.",
+    "verb_느니__listing": "서로 반대되는 말이나 생각을 나열할 때 쓰는 연결 어미.",
+    "다가_보니까__realization": "어떤 행동을 계속하다가 새삼 깨닫게 됨을 나타내는 표현.",
+    "다가_보니까__causation": "이다와 함께 쓰여 뒤 절의 이유나 근거를 제시하는 표현.",
+    "아어_가지다__time-order-of-two-actions": "앞의 동작을 끝낸 뒤 뒤의 동작을 함을 나타내는 표현.",
+    "아어_가지다__reasoning": "어떤 행동을 하는 이유나 원인을 나타내는 표현.",
+    "아어_오다__up-till-now": "과거에 시작된 동작이 현재까지 이어짐을 나타내는 표현.",
+    "아어_오다__coming-from-somewhere": "동작이 다른 곳에서 말하는 사람 쪽으로 옴을 나타내는 표현.",
+    "verb_으니까_니까__reason-or-cause": "어떤 일의 이유나 원인을 나타내는 연결 어미.",
+    "verb_으니까_니까__discovery": "어떤 사실이나 상황을 발견했음을 나타내는 연결 어미.",
+    "verb_으되__but-however": "어떤 사실을 인정하면서 반대되는 사실이나 조건을 덧붙이는 어미.",
+    "verb_으되__archaic-quoting": "직접 인용을 이끄는 옛말투의 어미.",
+    "verb_으렷다__educated-guess": "경험이나 이치에 비추어 틀림없다고 단정하는 옛말투 어미.",
+    "verb_으렷다__command": "명령이나 요구를 나타내는 옛말투 어미.",
+    "verb_으리라__expressing-will": "말하는 사람의 결심이나 의지를 나타내는 어미.",
+    "verb_으리라__strong-prediction": "앞으로의 일을 강하게 추측하는 어미.",
+    "verb_거든__reasoning": "앞말에 대한 이유나 근거를 설명하는 종결 어미.",
+    "verb_거든__conditional": "앞의 말이 사실이라면 뒤의 일이 일어남을 나타내는 어미.",
+    "verb_거들랑__informing": "상대가 모를 만한 정보를 알려 줄 때 쓰는 어미.",
+    "verb_거들랑__conditional": "앞의 말이 사실이라면 뒤의 일이 일어남을 나타내는 어미.",
+}
+
+
 def enrich(entries):
     for e in entries:
+        key = e.get("key", "")
         name = e.get("name", "")
-        zh = _ZH.get(name)
+        # Gloss precedence, mirroring `level` below:
+        #   1. _ZH_BY_KEY / _KO_BY_KEY -- a per-record hand-reviewed decision,
+        #      so it always wins.
+        #   2. the name-keyed family table -- a *fallback* that only fills a
+        #      gap.  It must never overwrite a gloss the record already has,
+        #      because a merged private-book row carries the book's
+        #      own wording, which is more specific than the family's.  This bit
+        #      once: the stale name entry "도록 하다" hijacked the merged
+        #      `kgm_도록하다` row's gloss the moment the merge created a row
+        #      with that name.
+        zh = _ZH_BY_KEY.get(key)
+        if zh is None and not e.get("zh"):
+            zh = _ZH.get(name)
         if zh:
             e["zh"] = zh
-        ko = _KO.get(name)
+        ko = _KO_BY_KEY.get(key)
+        if ko is None and not e.get("ko"):
+            ko = _KO.get(name)
         if ko:
             e["ko"] = ko
-        e["level"] = _level_for(name, e.get("type", ""))
+        # The TOPIK list is authoritative when it knows the name.  Otherwise
+        # only fill a *missing* level: the merged private-book rows
+        # carry the band printed in their own book, and a re-run must not
+        # downgrade that to the coarse type-based fallback.
+        if name in _KFL_GRADE:
+            e["level"] = _band(_KFL_GRADE[name])
+        elif not e.get("level"):
+            e["level"] = _level_for(name, e.get("type", ""))
     return entries
 
 
