@@ -22,7 +22,10 @@ hand-written matcher for each one.
 Rows merged from the "private-book" books (scripts/
 grammar_materials_ko/) carry no focus literals; their matchers are derived
 from the pattern text itself and validated against the row's own examples
-(see _load_pattern_rules).
+(see _load_pattern_rules).  Those rows also carry the panel's optional
+blocks -- a 接续 line, the book's 注意点, and a folded 参考例句 with its
+translation and highlight offsets -- which the Japanese panel has and this
+one did not.
 
 Only text (meaning / examples) is consumed; the audio fields are ignored
 (ElevenLabs commercial license).
@@ -210,7 +213,19 @@ _POS = lambda p: {"pos": p}
 
 
 def _rule(
-    key, name, meaning, patterns, level="TOPIK 1-2", zh="", ko="", kind="construction"
+    key,
+    name,
+    meaning,
+    patterns,
+    level="TOPIK 1-2",
+    zh="",
+    ko="",
+    kind="construction",
+    formation="",
+    formation_zh="",
+    formation_notes="",
+    formation_notes_zh="",
+    reference=None,
 ):
     return {
         "key": key,
@@ -221,6 +236,15 @@ def _rule(
         "ko": ko,
         "patterns": patterns,
         "kind": kind,
+        # Optional panel blocks -- 接续 (formation), the folded 参考例句
+        # (reference) and 注意点 (formation_notes).  Empty for the
+        # hand-written and vendored kimchi rows, which carry none; the panel
+        # omits a block whose fields are all empty.
+        "formation": formation,
+        "formation_zh": formation_zh,
+        "formation_notes": formation_notes,
+        "formation_notes_zh": formation_notes_zh,
+        "reference": reference,
     }
 
 
@@ -370,6 +394,106 @@ _LEVEL_BY_TYPE = {
     "verb": "TOPIK 3-4",
     "composite": "TOPIK 3-4",
 }
+
+_DATA_DIR = os.path.dirname(_DATA_PATH)
+
+
+def _load_ko_enrichment():
+    """
+    Chinese wording for the merged rows' 接续 / 注意点, keyed by row key.
+
+    The books state ``formation`` in Korean and ``notes`` in English, so a
+    Chinese panel would have to print one of those under a Chinese heading
+    (the Japanese panel shipped that bug) or hide the block.  This file
+    supplies the Chinese, mirroring the Japanese line's
+    ``grammar/zh_enrichment.json``.  It lives beside the library rather than
+    inside it for two reasons: ``grammar_ko.json`` stays a faithful merge of
+    the books, and a re-run of the merge cannot drop the wording.
+    """
+    path = os.path.join(_DATA_DIR, "grammar_ko_enrichment.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+_KO_ENRICH = _load_ko_enrichment()
+
+
+def _notes_text(notes):
+    "Formation notes in one display string; list or scalar, or '' when absent."
+    if not notes:
+        return ""
+    if isinstance(notes, (list, tuple)):
+        return " ".join(str(n).strip() for n in notes if str(n).strip())
+    return str(notes).strip()
+
+
+def _curated_reference(examples, translations, specs, tokenised):
+    """
+    The row's own example for the panel's folded 参考例句 block.
+
+    Returns ``{"korean", "chinese", "english"}`` for the first example that
+    carries a translation, or None when the row has no usable example -- the
+    panel then hides the block.
+
+    When ``specs`` are given, an example this rule actually matches is
+    preferred over document order.  The panel highlights the point inside
+    the quoted sentence, and the derivation only proves a spec matches the
+    row's examples, not every one of them, so first-in-order can quote a
+    sentence the matcher cannot mark.
+    """
+    usable = []
+    for i, ko in enumerate(examples or []):
+        ko = (ko or "").strip()
+        if not ko:
+            continue
+        zh, en = translations[i] if i < len(translations) else ("", "")
+        if not (zh or en):
+            continue
+        usable.append(
+            {
+                "korean": ko,
+                "chinese": zh,
+                "english": en,
+                "tokens": tokenised[i] if i < len(tokenised) else None,
+            }
+        )
+    if not usable:
+        return None
+    chosen = usable[0]
+    if specs:
+        matcher = {"patterns": specs}
+        for ref in usable:
+            tokens = ref["tokens"]
+            if tokens is None:
+                tokens = _tokens_for(ref["korean"])
+            if _match_spans(matcher, tokens, ref["korean"]):
+                chosen = ref
+                break
+    # The token list was only needed for the choice above; keep it out of the
+    # rule dict, which is what the panel and the tests introspect.
+    chosen.pop("tokens", None)
+    return chosen
+
+
+def _panel_fields(key, item, specs, examples, tokenised):
+    """
+    The optional panel blocks for one merged row, ready to splat into _rule.
+
+    Only the rows merged from the study materials carry them: the books state
+    a 接续 line, a 注意点 and translated examples, while the vendored kimchi
+    rows carry none of the three.
+    """
+    enrichment = _KO_ENRICH.get(key) or {}
+    translations = list(zip(item.get("example_zh") or [], item.get("example_en") or []))
+    return {
+        "formation": (item.get("formation") or "").strip(),
+        "formation_zh": (enrichment.get("formation") or "").strip(),
+        "formation_notes": _notes_text(item.get("notes")),
+        "formation_notes_zh": (enrichment.get("notes") or "").strip(),
+        "reference": _curated_reference(examples, translations, specs, tokenised),
+    }
 
 
 def _load_data_rules():
@@ -761,6 +885,7 @@ def _load_pattern_rules():
                 or _LEVEL_BY_TYPE.get(item.get("type", ""), "TOPIK 3-4"),
                 zh=item.get("zh") or "",
                 ko=item.get("ko") or "",
+                **_panel_fields(key, item, validated, examples, tokenised),
             )
         )
     return rules
@@ -856,6 +981,76 @@ def _desc(rule, display_lang):
     return _KO_ZH.get(rule["pattern"]) or rule["meaning"]
 
 
+# Script probes for _in_display_language below.
+_CJK_CHAR = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
+_HANGUL_CHAR = re.compile(r"[\uac00-\ud7af]")
+_LATIN_WORD = re.compile(r"[A-Za-z]{3,}")
+
+
+def _in_display_language(text, display_lang):
+    """
+    Whether a raw source string belongs in the panel's display language.
+
+    The books state one string per field, not one per language: ``formation``
+    is Korean prose and ``notes`` English, and only the description is
+    translated (the row's own zh/ko).  Printing either straight through is
+    what put an untranslated line under a Chinese heading in the Japanese
+    panel, so an enrichment field is shown only when its script matches what
+    the reader asked for.  The Chinese wording belongs in
+    grammar_ko_enrichment.json and is added there; nothing is
+    machine-translated here.
+
+    An empty string is never displayable.
+    """
+    text = (text or "").strip()
+    if not text:
+        return False
+    if display_lang == "zh":
+        # Korean notation («어간 + -기가 이를 데 없다») passes, while
+        # "Although the stems of 닫다 ... end in ㄷ" does not: the Latin run
+        # of three or more letters is the tell.
+        return bool(_CJK_CHAR.search(text)) and not _LATIN_WORD.search(text)
+    if display_lang == "ko":
+        # Hangul alone is not enough here the way it is for the Japanese
+        # engine (whose data holds no Korean at all): the books' ``notes``
+        # are English prose that *quotes* Korean ("오전 and 오후 literally
+        # mean ..."), so a Latin word means the line is not Korean.
+        return bool(_HANGUL_CHAR.search(text)) and not _LATIN_WORD.search(text)
+    # English is the source language of ``notes`` but not of ``formation``,
+    # which is Korean by nature; ``en`` shows each field as the book wrote
+    # it rather than dropping the 接续 line for want of a translation.
+    return True
+
+
+def _enrichment(rule, field, display_lang):
+    """
+    One enrichment field (``formation`` / ``formation_notes``) for the
+    panel's display language.
+
+    Chinese wording from grammar_ko_enrichment.json wins when present;
+    otherwise the field is shown only when its script already matches the
+    display language -- the filter that keeps a Korean 接续 line out of a
+    Chinese panel while the wording is still being written.
+    """
+    if display_lang == "zh":
+        zh = (rule.get(f"{field}_zh") or "").strip()
+        if zh:
+            return zh
+    text = (rule.get(field) or "").strip()
+    return text if _in_display_language(text, display_lang) else ""
+
+
+def _reference_text(reference, display_lang):
+    "The curated example's translation for the display language, or ''."
+    if display_lang == "zh":
+        return reference.get("chinese") or ""
+    if display_lang == "ko":
+        # The reference sentence is Korean already, so a Korean panel has
+        # nothing to add and hides the block rather than quote it bare.
+        return ""
+    return reference.get("english") or reference.get("chinese") or ""
+
+
 def _count_loaded_rules():
     "Total rules (hand-written + data-driven + pattern-derived)."
     return len(_ALL_RULES) + len(_get_pattern_rules())
@@ -874,6 +1069,15 @@ def analyze_korean(page_text, display_lang="en"):
     Each example's "matches" is a list of {"start", "end"} character
     offsets (within "sentence") of the matched words / constructions, so
     the front-end can highlight exactly those words in the reading text.
+
+    A row merged from the study materials also carries the panel's optional
+    blocks, emitted only when the row has them *in the display language*:
+      "formation"  the book's 接续 line
+      "notes"      the book's 注意点
+      "reference"  {"sentence", "text", "matches"} -- the row's own curated
+                   example with its translation and the same {start, end}
+                   offsets, so the front-end highlights it with the one
+                   example renderer it already has.
     """
     # 🔊 and zero-width spaces are display artifacts of the reader, not
     # grammar; strip them so offsets align with the rendered text.
@@ -915,6 +1119,27 @@ def analyze_korean(page_text, display_lang="en"):
                     "meanings": [_desc(rule, display_lang)],
                     "examples": [],
                 }
+                formation = _enrichment(rule, "formation", display_lang)
+                if formation:
+                    entry["formation"] = formation
+                notes = _enrichment(rule, "formation_notes", display_lang)
+                if notes:
+                    entry["notes"] = notes
+                reference = rule.get("reference")
+                if reference:
+                    text = _reference_text(reference, display_lang)
+                    if text:
+                        sentence = reference["korean"]
+                        entry["reference"] = {"sentence": sentence, "text": text}
+                        # The same offsets the page examples carry, computed
+                        # by this rule's own matcher against its curated
+                        # sentence, so the folded block highlights the point
+                        # it illustrates instead of quoting it bare.
+                        spans = _match_spans(rule, _tokens_for(sentence), sentence)
+                        if spans:
+                            entry["reference"]["matches"] = [
+                                {"start": s, "end": e} for s, e in spans
+                            ]
                 by_name[name] = entry
                 order.append(name)
             else:
@@ -928,13 +1153,17 @@ def analyze_korean(page_text, display_lang="en"):
     matched = []
     for n in order:
         entry = by_name[n]
-        matched.append(
-            {
-                "key": entry["key"],
-                "name": entry["name"],
-                "level": entry["level"],
-                "desc": " / ".join(entry["meanings"]),
-                "examples": entry["examples"],
-            }
+        out = {
+            "key": entry["key"],
+            "name": entry["name"],
+            "level": entry["level"],
+            "desc": " / ".join(entry["meanings"]),
+            "examples": entry["examples"],
+        }
+        # Optional panel blocks, present only when this row carried them in
+        # the display language (see the docstring above).
+        out.update(
+            {f: entry[f] for f in ("formation", "notes", "reference") if f in entry}
         )
+        matched.append(out)
     return matched

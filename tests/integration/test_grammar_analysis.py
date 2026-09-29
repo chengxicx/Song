@@ -7,6 +7,7 @@ other language falls back to the generic regex rule library.
 """
 
 import json
+import re
 import unicodedata
 import pytest
 from lute.db import db
@@ -362,6 +363,52 @@ def test_korean_grammar_analysis_ko_display_language(client, empty_db, korean):
     go_issda = next(g for g in data if g["key"] == "ko_go_issda")
     assert "진행" in go_issda["desc"]
     assert "is/am/are" not in go_issda["desc"]
+
+
+def test_korean_panel_carries_the_formation_reference_and_notes(
+    client, empty_db, korean
+):
+    if not is_supported("lute_korean"):
+        pytest.skip("lute_korean parser not installed")
+    """
+    韩语面板应与日语面板一样给出 接续 / 参考例句（带高亮）/ 注意点。
+    合并脚本以前把 formation 整个丢掉、把 notes 写死成空串，所以韩语面板
+    只有一条释义。这里走真实路由，确认面板真的拿到这三块，并且 zh 面板里
+    没有漏出未翻译的韩文或英文。
+    """
+    korean.grammar_translate_lang = "zh"
+    db.session.add(korean)
+    db.session.commit()
+    sentence = "그 회사는 무리하게 확장한 나머지 재정적 위기를 맞게 되었다."
+    book = make_book("Korean Panel Blocks Demo", [sentence], korean)
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    entry = next(g for g in data if g["key"] == "kgm_으나머지__282dc4")
+    assert entry["formation"], "缺少接续"
+    assert entry["notes"], "缺少注意点"
+    # The block quotes the row's own curated example (the book's sentence),
+    # not the page sentence that happened to match -- so what is pinned here
+    # is that the highlight lands on the point inside it.
+    ref = entry["reference"]
+    assert ref["sentence"], "参考例句为空"
+    assert ref["text"], "缺少参考例句译文"
+    assert ref["matches"], "参考例句没有高亮偏移"
+    highlighted = []
+    for m in ref["matches"]:
+        assert 0 <= m["start"] < m["end"] <= len(ref["sentence"])
+        highlighted.append(ref["sentence"][m["start"] : m["end"]])
+    assert any("나머지" in h for h in highlighted), highlighted
+
+    # The panel's zh filter would hide any field carrying a Latin word, so a
+    # regression here shows up as a silently missing block rather than as
+    # English text on screen.
+    for blob in (entry["desc"], entry["formation"], entry["notes"], ref["text"]):
+        assert not re.search(r"[A-Za-z]{3,}", blob), blob
+        assert re.search(r"[\u4e00-\u9fff]", blob), blob
 
 
 def test_japanese_grammar_analysis_uses_ja_engine(client, empty_db, japanese):
