@@ -323,7 +323,10 @@ function open_grammar_analysis() {
             : "";
           const ref = g.reference && g.reference.japanese
             ? '<div class="grammar-item__refex">' +
-              escapeHtml(g.reference.japanese) +
+              renderExample({
+                sentence: g.reference.japanese,
+                matches: g.reference.matches || [],
+              }) +
               '<div class="grammar-item__reftr">' +
               escapeHtml(g.reference.text || "") +
               "</div></div>"
