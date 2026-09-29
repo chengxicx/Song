@@ -1,0 +1,3908 @@
+[
+ {
+  "pattern": "N시 N분",
+  "level": "TOPIK 1-2",
+  "formation": "시각을 나타낼 때 시간(시)은 고유어 수로, 분은 한자어 수로 읽으며, 때를 나타내는 명사 뒤에는 조사 에를 붙임.",
+  "meaning_en": "telling the time (hours are read with native Korean numbers, minutes with Sino-Korean numbers)",
+  "meaning_zh": "表示时间（小时用固有词数词，分钟用汉字词数词）。",
+  "meaning_ko": "시각을 말할 때 시는 고유어 수, 분은 한자어 수로 읽는 표현.",
+  "examples": [
+   {
+    "korean": "지금 몇 시예요?",
+    "english": "What time is it now?",
+    "chinese": "现在几点了？"
+   },
+   {
+    "korean": "오전 아홉 시 십 분이에요.",
+    "english": "It's 9:10 in the morning.",
+    "chinese": "是上午九点十分。"
+   },
+   {
+    "korean": "몇 시에 일어나요?",
+    "english": "What time do you wake up?",
+    "chinese": "你几点起床？"
+   },
+   {
+    "korean": "아침 일곱 시에 일어나요.",
+    "english": "I wake up at 7:00 in the morning.",
+    "chinese": "我早上七点起床。"
+   }
+  ],
+  "notes": "오전 and 오후 literally mean 'before noon' and 'after noon', but in Korean 오전 typically means the morning hours and 오후 the afternoon hours; time can also be subdivided into 새벽, 아침, 점심, 저녁, and 밤.",
+  "unit": "Getting Ready",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-(스)ㅂ니다",
+  "level": "TOPIK 1-2",
+  "formation": "동사/형용사 어간이 모음으로 끝나면 -ㅂ니다(의문형 -ㅂ니까?), 자음으로 끝나면 -습니다(의문형 -습니까?)를 붙임.",
+  "meaning_en": "present tense formal polite style (declarative and interrogative)",
+  "meaning_zh": "现在时正式敬语体，主要用于正式或公开场合。",
+  "meaning_ko": "격식체(합쇼체) 현재 시제로, 주로 공식적이거나 공적인 상황에서 사용하는 표현.",
+  "examples": [
+   {
+    "korean": "안녕하십니까?",
+    "english": "Good evening.",
+    "chinese": "您好？"
+   },
+   {
+    "korean": "9시 뉴스입니다.",
+    "english": "This is the 9 o'clock news.",
+    "chinese": "这里是九点新闻。"
+   },
+   {
+    "korean": "질문 있습니까?",
+    "english": "Do you have any questions?",
+    "chinese": "有问题吗？"
+   },
+   {
+    "korean": "이것을 어떻게 생각합니까?",
+    "english": "What's your opinion of this?",
+    "chinese": "你觉得这个怎么样？"
+   },
+   {
+    "korean": "좋습니다.",
+    "english": "I think it's good.",
+    "chinese": "我觉得不错。"
+   }
+  ],
+  "notes": "",
+  "unit": "Tenses",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-아/어요",
+  "level": "TOPIK 1-2",
+  "formation": "어간의 끝 모음이 ㅏ나 ㅗ이면 -아요를, 그 외의 모음이면 -어요를 붙이고, 하다로 끝나면 해요가 됨. 이다 뒤에는 모음으로 끝나면 예요, 자음으로 끝나면 이에요를 씀.",
+  "meaning_en": "present tense informal polite style (declarative and interrogative)",
+  "meaning_zh": "现在时非正式敬语体，日常口语中最常用的礼貌表达。",
+  "meaning_ko": "일상에서 가장 많이 쓰는 두루 높임말(해요체) 현재 시제 표현.",
+  "examples": [
+   {
+    "korean": "맛있어요?",
+    "english": "Does it taste good?",
+    "chinese": "好吃吗？"
+   },
+   {
+    "korean": "네. 맛있어요.",
+    "english": "Yes, it tastes good.",
+    "chinese": "是的，好吃。"
+   },
+   {
+    "korean": "어디에 가요?",
+    "english": "Where are you going?",
+    "chinese": "你去哪儿？"
+   },
+   {
+    "korean": "학교에 가요.",
+    "english": "I'm going to school.",
+    "chinese": "我去学校。"
+   },
+   {
+    "korean": "사랑해요, 캐럴 씨.",
+    "english": "I love you, Carol.",
+    "chinese": "我爱你，卡罗尔。"
+   }
+  ],
+  "notes": "",
+  "unit": "Tenses",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-았/었어요",
+  "level": "TOPIK 1-2",
+  "formation": "어간의 끝 모음이 ㅏ나 ㅗ이면 -았어요를, 그 외의 모음이면 -었어요를 붙이고, 하다로 끝나면 했어요가 됨.",
+  "meaning_en": "past tense (informal polite style)",
+  "meaning_zh": "过去时，表示过去发生的动作或状态。",
+  "meaning_ko": "과거에 일어난 일이나 상태를 나타내는 과거 시제 표현.",
+  "examples": [
+   {
+    "korean": "1981년 3월 5일에 태어났어요.",
+    "english": "The baby was born on March 5, 1981.",
+    "chinese": "（孩子）1981年3月5日出生。"
+   },
+   {
+    "korean": "2004년 2월에 대학교를 졸업했어요.",
+    "english": "I graduated from college in February 2004.",
+    "chinese": "2004年2月大学毕业。"
+   },
+   {
+    "korean": "작년에 결혼했어요.",
+    "english": "We got married last year.",
+    "chinese": "去年结婚了。"
+   },
+   {
+    "korean": "어제 뭐 했어요?",
+    "english": "What did you do yesterday?",
+    "chinese": "昨天做了什么？"
+   },
+   {
+    "korean": "공부했어요.",
+    "english": "I studied.",
+    "chinese": "学习了。"
+   }
+  ],
+  "notes": "While the past tense of 주다 can be written either as 주었어요 or 줬어요, and the past tense of 보다 can be written either as 보았어요 or 봤어요, the past tense of 오다 is written only as 왔어요, not 오았어요.",
+  "unit": "Tenses",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)ㄹ 거예요",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간이 모음으로 끝나면 -ㄹ 거예요를, 자음으로 끝나면 -을 거예요를 붙임.",
+  "meaning_en": "will / going to do (future plan or intention)",
+  "meaning_zh": "将要……；打算……（表将来的计划或意图）。",
+  "meaning_ko": "앞으로의 계획이나 의지를 나타내는 미래 시제 표현.",
+  "examples": [
+   {
+    "korean": "2년 후에 차를 살 거예요.",
+    "english": "I'll buy a car two years from now.",
+    "chinese": "两年后要买车。"
+   },
+   {
+    "korean": "주말에 낚시를 할 거예요.",
+    "english": "I'll go fishing this weekend.",
+    "chinese": "周末要去钓鱼。"
+   },
+   {
+    "korean": "방학에 중국에 갈 거예요.",
+    "english": "I'll visit China during my vacation.",
+    "chinese": "放假要去中国。"
+   },
+   {
+    "korean": "언제 고향에 돌아갈 거예요?",
+    "english": "When will you return to your hometown?",
+    "chinese": "什么时候回老家？"
+   },
+   {
+    "korean": "내년에 돌아갈 거예요.",
+    "english": "I'll return next year.",
+    "chinese": "明年回去。"
+   }
+  ],
+  "notes": "",
+  "unit": "Tenses",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-고 있다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -고 있다",
+  "meaning_en": "is -ing (with wear/put-on verbs, expresses a state resulting from a completed action that continues to the present)",
+  "meaning_zh": "正……着（与穿戴类动词连用，表动作结果持续到现在的状态）",
+  "meaning_ko": "입다, 신다, 쓰다, 끼다, 벗다처럼 옷이나 물건을 착용하거나 벗는 동사와 함께 쓰여, 행동의 결과가 지금까지 그 상태로 이어짐을 나타내는 표현이다.",
+  "examples": [
+   {
+    "korean": "목걸이와 귀걸이를 하고 있어요.",
+    "english": "I'm wearing a necklace and earrings.",
+    "chinese": "我戴着项链和耳环。"
+   },
+   {
+    "korean": "블라우스를 입고 있어요.",
+    "english": "I'm wearing a blouse.",
+    "chinese": "我穿着衬衫。"
+   },
+   {
+    "korean": "치마를 입고 있어요.",
+    "english": "I'm wearing a skirt.",
+    "chinese": "我穿着裙子。"
+   },
+   {
+    "korean": "부츠를 신고 있어요.",
+    "english": "I'm wearing boots.",
+    "chinese": "我穿着靴子。"
+   },
+   {
+    "korean": "안경을 쓰고/끼고 있어요.",
+    "english": "I'm wearing glasses.",
+    "chinese": "我戴着眼镜。"
+   },
+   {
+    "korean": "빨간색 원피스를 입고 있어요.",
+    "english": "She's wearing a red dress.",
+    "chinese": "她穿着红色的连衣裙。"
+   },
+   {
+    "korean": "우리 집은 추워요. 그래서 양말을 신고 있어요.",
+    "english": "Our house is cold. So I'm wearing socks.",
+    "chinese": "我们家很冷，所以穿着袜子。"
+   }
+  ],
+  "notes": "The same meaning can also be expressed by using the past tense form -았/었어요 to indicate a state of completed action (e.g. 치마를 입고 있어요 = 치마를 입었어요).",
+  "unit": "Unit 19. Expressions of State",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-았/었었어요",
+  "level": "TOPIK 1-2",
+  "formation": "어간의 끝 모음이 ㅏ나 ㅗ이면 -았었어요를, 그 외의 모음이면 -었었어요를 붙이고, 하다로 끝나면 했었어요가 됨.",
+  "meaning_en": "past perfect — a past situation that is no longer the case or is disconnected from the present ('used to', 'had done')",
+  "meaning_zh": "曾经……（表过去发生但现已不再持续、与现在断开的状态或事情）。",
+  "meaning_ko": "과거에 있었던 일이 지금은 계속되지 않거나 현재와 단절되어 있음을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "미국에 갔었어요.",
+    "english": "I have been to the U.S.",
+    "chinese": "我去过美国。"
+   },
+   {
+    "korean": "중국에서 살았었어요.",
+    "english": "I had lived in China.",
+    "chinese": "曾在中国生活过。"
+   },
+   {
+    "korean": "아버지가 뚱뚱했었어요.",
+    "english": "My father was overweight.",
+    "chinese": "父亲（过去）很胖。"
+   },
+   {
+    "korean": "작년에는 담배를 피웠었어요. 그렇지만 지금은 안 피워요.",
+    "english": "I smoked last year, but I don't smoke now.",
+    "chinese": "去年抽过烟，但现在不抽了。"
+   },
+   {
+    "korean": "여름에는 사람이 많았었어요.",
+    "english": "There were many people there in the summer.",
+    "chinese": "夏天时（那里）人很多。"
+   }
+  ],
+  "notes": "-았/었어요 simply states that something occurred in the past or that a past state has remained, while -았/었었어요 emphasizes that the past situation is no longer the case or is disconnected from the present.",
+  "unit": "Tenses",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N이/가 아니다, N이/가 없다, N을/를 모르다",
+  "level": "TOPIK 1-2",
+  "formation": "단어를 부정할 때 이다 → 아니다, 있다 → 없다, 알다 → 모르다로 바꿈. 아니다는 이/가 아니다 형태로 쓰임.",
+  "meaning_en": "word negation — negating a word (이다→아니다, 있다→없다, 알다→모르다)",
+  "meaning_zh": "单词否定（把 이다 变为 아니다、있다 变为 없다、알다 变为 모르다）。",
+  "meaning_ko": "문장 전체가 아니라 단어를 부정하여 부정문을 만드는 표현.",
+  "examples": [
+   {
+    "korean": "한국 사람이에요.",
+    "english": "She is Korean.",
+    "chinese": "是韩国人。"
+   },
+   {
+    "korean": "한국 사람이 아니에요.",
+    "english": "She is not Korean.",
+    "chinese": "不是韩国人。"
+   },
+   {
+    "korean": "돈이 없어요.",
+    "english": "I don't have any money.",
+    "chinese": "没有钱。"
+   },
+   {
+    "korean": "한국말을 몰라요.",
+    "english": "I don't know Korean.",
+    "chinese": "不懂韩语。"
+   },
+   {
+    "korean": "아니요, 학생이 아니에요. 선생님이에요.",
+    "english": "No, he's not a student. He's a teacher.",
+    "chinese": "不，他不是学生，是老师。"
+   }
+  ],
+  "notes": "아니다 is written in the form 이/가 아니다, but when used in the spoken form, 이/가 is often omitted.",
+  "unit": "Negative Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "안 A/V (A/V-지 않다)",
+  "level": "TOPIK 1-2",
+  "formation": "동사나 형용사 앞에 안을 붙이거나, 어간 뒤에 -지 않아요를 붙임.",
+  "meaning_en": "negation 'not' — negating an action or state",
+  "meaning_zh": "否定：不……（在动词/形容词前加 안，或在词干后加 -지 않다）。",
+  "meaning_ko": "동사나 형용사에 안을 붙이거나 -지 않다를 붙여 부정하는 표현.",
+  "examples": [
+   {
+    "korean": "저는 오징어를 안 먹어요. (= 저는 오징어를 먹지 않아요.)",
+    "english": "I don't eat squid.",
+    "chinese": "我不吃鱿鱼。"
+   },
+   {
+    "korean": "그 구두는 안 예뻐요. (= 그 구두는 예쁘지 않아요.)",
+    "english": "Those shoes aren't pretty.",
+    "chinese": "那双皮鞋不漂亮。"
+   },
+   {
+    "korean": "방이 안 넓어요. (= 방이 넓지 않아요.)",
+    "english": "The room is not spacious.",
+    "chinese": "房间不宽敞。"
+   },
+   {
+    "korean": "아니요. 저는 고기를 안 먹어요.",
+    "english": "No. I don't eat meat.",
+    "chinese": "不，我不吃肉。"
+   },
+   {
+    "korean": "아니요. 토요일에는 가지 않아요.",
+    "english": "No, on Saturdays, I don't go to work.",
+    "chinese": "不，星期六不去。"
+   }
+  ],
+  "notes": "Although 안 and -지 않다 can be used in declarative and interrogative sentences, they cannot be used in imperative or propositive sentences (e.g. 안 가십시오 (X) / 가지 마십시오 (O)). Also, 좋아하다 and 싫어하다 are written as 안 좋아하다/좋아하지 않다, not 좋아 안 하다.",
+  "unit": "Negative Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "못 V (V-지 못하다)",
+  "level": "TOPIK 1-2",
+  "formation": "동사 앞에 못을 붙이거나, 어간 뒤에 -지 못해요를 붙임.",
+  "meaning_en": "cannot — inability or impossibility due to external factors",
+  "meaning_zh": "不能……（表没有能力或因外部情况而无法做某事）。",
+  "meaning_ko": "능력이 없거나 외부 상황 때문에 어떤 행동을 할 수 없음을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "저는 수영을 못해요. (= 저는 수영하지 못해요.)",
+    "english": "I can't swim.",
+    "chinese": "我不会游泳。"
+   },
+   {
+    "korean": "오늘은 술을 못 마셔요. (= 오늘은 술을 마시지 못해요.)",
+    "english": "I can't drink today.",
+    "chinese": "今天不能喝酒。"
+   },
+   {
+    "korean": "저는 노래를 못 불러요. (= 저는 노래를 부르지 못해요.)",
+    "english": "I can't sing.",
+    "chinese": "我不会唱歌。"
+   },
+   {
+    "korean": "아니요, 운전 못해요. 운전을 안 배웠어요.",
+    "english": "No, I can't drive. I never learned how.",
+    "chinese": "不，我不会开车。没学过开车。"
+   },
+   {
+    "korean": "이가 아파요. 그래서 먹지 못해요.",
+    "english": "My teeth hurt, so I can't eat.",
+    "chinese": "牙疼，所以吃不了。"
+   }
+  ],
+  "notes": "안 (-지 않다) combines with both verbs and adjectives and expresses not doing something regardless of ability or external conditions, whereas 못 (-지 못하다) combines normally with verbs only and is used when one is unable, or it is impossible, to do something.",
+  "unit": "Negative Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N이/가",
+  "level": "TOPIK 1-2",
+  "formation": "받침이 있으면 이, 받침이 없으면 가를 붙임.",
+  "meaning_en": "subject particle (marks the subject; also emphasizes the subject or introduces new information)",
+  "meaning_zh": "主格助词（标记主语，也用于强调主语或引出新信息）。",
+  "meaning_ko": "문장의 주어임을 나타내는 주격 조사.",
+  "examples": [
+   {
+    "korean": "날씨가 좋아요.",
+    "english": "The weather is nice.",
+    "chinese": "天气很好。"
+   },
+   {
+    "korean": "옛날에 공주가 있었어요.",
+    "english": "A long time ago, there was a princess.",
+    "chinese": "很久以前有一位公主。"
+   },
+   {
+    "korean": "저기 재준 씨가 와요.",
+    "english": "There's Jaejun coming (this way).",
+    "chinese": "那边载俊来了。"
+   },
+   {
+    "korean": "조엘 씨가 빵을 먹어요.",
+    "english": "Joel eats bread.",
+    "chinese": "乔尔吃面包。"
+   },
+   {
+    "korean": "배가 아파요.",
+    "english": "My stomach hurts.",
+    "chinese": "肚子疼。"
+   }
+  ],
+  "notes": "When 가 is added to 나, 저, and 누구, they combine as follows: 나 + 가 → 내가, 저 + 가 → 제가, 누구 + 가 → 누가.",
+  "unit": "Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N은/는",
+  "level": "TOPIK 1-2",
+  "formation": "받침이 있으면 은, 받침이 없으면 는을 붙임.",
+  "meaning_en": "topic particle (marks the topic; also used for contrast or for known/old information)",
+  "meaning_zh": "主题助词（标记话题，也用于对比或已知信息）。",
+  "meaning_ko": "문장의 화제(주제)를 나타내는 보조사.",
+  "examples": [
+   {
+    "korean": "형은 키가 커요. 동생은 키가 작아요.",
+    "english": "My older brother is tall. My younger brother is short.",
+    "chinese": "哥哥个子高，弟弟个子矮。"
+   },
+   {
+    "korean": "부디 씨는 운동을 잘해요. 그렇지만 공부는 못해요.",
+    "english": "Budi is good at sports. Studying, however, is not his forte.",
+    "chinese": "布迪擅长运动，但学习不行。"
+   },
+   {
+    "korean": "저는 한국 사람입니다.",
+    "english": "I'm Korean.",
+    "chinese": "我是韩国人。"
+   },
+   {
+    "korean": "리처드 씨는 29살입니다.",
+    "english": "Richard is 29 years old.",
+    "chinese": "理查德29岁。"
+   },
+   {
+    "korean": "아버지는 회사원이에요. 그리고 어머니는 선생님이에요.",
+    "english": "My father is an office worker, and my mother is a teacher.",
+    "chinese": "父亲是公司职员，母亲是老师。"
+   }
+  ],
+  "notes": "When comparing or contrasting two things, 은/는 can be attached not only to subjects but also to objects or other parts of the sentence.",
+  "unit": "Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N을/를",
+  "level": "TOPIK 1-2",
+  "formation": "받침이 있으면 을, 받침이 없으면 를을 붙임.",
+  "meaning_en": "object particle (marks the object of a verb)",
+  "meaning_zh": "宾格助词（标记动词的宾语）。",
+  "meaning_ko": "목적어임을 나타내는 목적격 조사.",
+  "examples": [
+   {
+    "korean": "부디 씨가 영화를 봐요.",
+    "english": "Budi watches a movie.",
+    "chinese": "布迪看电影。"
+   },
+   {
+    "korean": "아버지가 신문을 읽어요.",
+    "english": "Dad reads the newspaper.",
+    "chinese": "爸爸看报纸。"
+   },
+   {
+    "korean": "요코 씨가 음악을 들어요.",
+    "english": "Yoko listens to music.",
+    "chinese": "洋子听音乐。"
+   },
+   {
+    "korean": "축구를 좋아해요.",
+    "english": "I like soccer.",
+    "chinese": "喜欢足球。"
+   },
+   {
+    "korean": "여자 친구를 만나요.",
+    "english": "I'll meet my girlfriend.",
+    "chinese": "见女朋友。"
+   }
+  ],
+  "notes": "When 을/를 is omitted from verbs like 공부를 하다, 수영을 하다, 운동을 하다, and 산책을 하다, the form becomes shortened to a single one-word form: 공부하다, 수영하다, 운동하다, and 산책하다. Also, 무엇을 해요? can be shortened to 뭐 해요? in conversation.",
+  "unit": "Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N와/과, N(이)랑, N하고",
+  "level": "TOPIK 1-2",
+  "formation": "받침이 있으면 과/이랑, 받침이 없으면 와/랑을 쓰고, 하고는 받침에 상관없이 씀.",
+  "meaning_en": "'and' — listing things or people; also 'together with' (와/과 mainly in writing, (이)랑/하고 in conversation)",
+  "meaning_zh": "……和……（并列事物或人；와/과 多用于书面，(이)랑/하고 多用于口语；也可表‘和……一起’）。",
+  "meaning_ko": "여러 사물이나 사람을 나열할 때 쓰는 접속 조사.",
+  "examples": [
+   {
+    "korean": "저는 수박과 딸기를 좋아해요.",
+    "english": "I like watermelons and strawberries.",
+    "chinese": "我喜欢西瓜和草莓。"
+   },
+   {
+    "korean": "어제 가방이랑 모자를 샀어요.",
+    "english": "Yesterday, I bought a bag and a hat.",
+    "chinese": "昨天买了包和帽子。"
+   },
+   {
+    "korean": "햄버거하고 콜라 주세요.",
+    "english": "I'll have a hamburger and coke, please.",
+    "chinese": "请给我汉堡和可乐。"
+   },
+   {
+    "korean": "내일 친구하고 같이 영화를 볼 거예요.",
+    "english": "I plan to see a movie together with my friend tomorrow.",
+    "chinese": "明天要和朋友一起看电影。"
+   },
+   {
+    "korean": "냉면이랑 김밥을 좋아해요.",
+    "english": "I like cold noodles and gimbap.",
+    "chinese": "喜欢冷面和紫菜包饭。"
+   }
+  ],
+  "notes": "When listing things, (이)랑 and 하고 can be added to the final noun in the list, but 와/과 cannot. Although 와/과, (이)랑, and 하고 can all be used similarly, they cannot be mixed within the same sentence.",
+  "unit": "Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N의",
+  "level": "TOPIK 1-2",
+  "formation": "명사 뒤에 의를 붙여 앞의 명사가 뒤의 명사를 소유함을 나타냄. 회화에서는 자주 생략됨.",
+  "meaning_en": "possessive particle ('s / of)",
+  "meaning_zh": "所有格助词，表示‘……的’。",
+  "meaning_ko": "앞의 명사가 뒤의 명사를 소유함을 나타내는 관형격 조사.",
+  "examples": [
+   {
+    "korean": "이것은 웨슬리의 책이에요. (= 이것은 웨슬리 책이에요.)",
+    "english": "This is Wesley's book.",
+    "chinese": "这是韦斯利的书。"
+   },
+   {
+    "korean": "이분은 부디 씨의 선생님입니다. (= 이분은 부디 씨 선생님입니다.)",
+    "english": "This is Budi's teacher.",
+    "chinese": "这位是布迪的老师。"
+   },
+   {
+    "korean": "제 이름은 요코입니다. (= 저의 이름은 요코입니다.)",
+    "english": "My name is Yoko.",
+    "chinese": "我的名字是洋子。"
+   },
+   {
+    "korean": "재준 씨의 우산입니다.",
+    "english": "It's Jaejun's umbrella.",
+    "chinese": "是载俊的雨伞。"
+   },
+   {
+    "korean": "제이슨 씨의 어머니에요.",
+    "english": "It's Jason's mother.",
+    "chinese": "是杰森的母亲。"
+   }
+  ],
+  "notes": "When referring to a group with which one is associated (home, family, company, country, or school), it is common to use 우리/저희 in place of 저/내. When showing respect to the listener, 저희, the humble form of 우리, is used.",
+  "unit": "Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N에",
+  "level": "TOPIK 1-2",
+  "formation": "명사 뒤에 에를 붙여 행동이 향하는 방향이나 사람·사물이 있는 위치를 나타냄.",
+  "meaning_en": "to / in / on — direction of movement or the location of a person or thing",
+  "meaning_zh": "表示方向（往……）或位置（在……）。",
+  "meaning_ko": "행동이 향하는 방향이나 사람·사물이 있는 위치를 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "친구가 한국에 와요.",
+    "english": "My friend is coming to Korea.",
+    "chinese": "朋友来韩国。"
+   },
+   {
+    "korean": "동생이 대학교에 다녀요.",
+    "english": "My little brother goes to school.",
+    "chinese": "弟弟上大学。"
+   },
+   {
+    "korean": "다음 달에 고향에 돌아가요.",
+    "english": "I go back to my hometown next month.",
+    "chinese": "下个月回老家。"
+   },
+   {
+    "korean": "소파 위에 강아지가 있어요.",
+    "english": "The dog is on the sofa.",
+    "chinese": "小狗在沙发上。"
+   },
+   {
+    "korean": "백화점에 가요.",
+    "english": "I'm going to the department store.",
+    "chinese": "去百货商店。"
+   }
+  ],
+  "notes": "에 cannot be added to 그제 (그저께), 어제 (어저께), 오늘, 내일, 모레, or 언제. When more than one noun representing time is used in a sentence, 에 is added only to the final noun.",
+  "unit": "Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N에서",
+  "level": "TOPIK 1-2",
+  "formation": "장소 명사 뒤에 에서를 붙여 동작이나 행동이 일어나는 장소를 나타냄.",
+  "meaning_en": "at / in — the place where an action occurs",
+  "meaning_zh": "表示动作发生的地点（在……）。",
+  "meaning_ko": "어떤 행동이나 동작이 일어나는 장소를 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "학교에서 공부를 해요.",
+    "english": "I study at school.",
+    "chinese": "在学校学习。"
+   },
+   {
+    "korean": "극장에서 영화를 봤어요.",
+    "english": "I saw a movie at the theater.",
+    "chinese": "在电影院看了电影。"
+   },
+   {
+    "korean": "식당에서 밥을 먹을 거예요.",
+    "english": "I'll eat at the cafeteria.",
+    "chinese": "要在食堂吃饭。"
+   },
+   {
+    "korean": "서울에서 살아요.",
+    "english": "I live in Seoul.",
+    "chinese": "住在首尔。"
+   },
+   {
+    "korean": "명동에서 친구를 만났어요.",
+    "english": "I met my friend at Myeongdong.",
+    "chinese": "在明洞见了朋友。"
+   }
+  ],
+  "notes": "When used before the verb 살다, the particles 에 and 에서 can both be used with very little difference in meaning.",
+  "unit": "Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N에서 N까지, N부터 N까지",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 에서 + 명사 + 까지 / 명사 + 부터 + 명사 + 까지",
+  "meaning_en": "from ... to ... (range of locations); from ... until ... (range of times)",
+  "meaning_zh": "从……到……（表地点或时间的范围）",
+  "meaning_ko": "어떤 행동이나 사건이 미치는 장소적·시간적 범위를 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "학교에서 집까지 걸어왔어요.",
+    "english": "I walked home from school.",
+    "chinese": "我从学校走到了家。"
+   },
+   {
+    "korean": "서울에서 부산까지 시간이 얼마나 걸려요?",
+    "english": "How long does it take to get from Seoul to Busan?",
+    "chinese": "从首尔到釜山需要多长时间？"
+   },
+   {
+    "korean": "오전 9시부터 오후 5시까지 일해요.",
+    "english": "I work from 9:00 A.M. until 5:00 P.M.",
+    "chinese": "我从上午9点工作到下午5点。"
+   },
+   {
+    "korean": "여기에서 학교까지 멀어요?",
+    "english": "Is it far from here to school?",
+    "chinese": "从这里到学校远吗？"
+   },
+   {
+    "korean": "네, 토요일은 오전 10시부터 오후 4시까지 엽니다.",
+    "english": "Yes, on Saturdays, it's open from 10 A.M. until 4 P.M.",
+    "chinese": "是的，周六从上午10点开放到下午4点。"
+   }
+  ],
+  "notes": "",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N에게/한테",
+  "level": "TOPIK 1-2",
+  "formation": "명사(사람·동물) + 에게/한테",
+  "meaning_en": "to (a person or animal); marks the recipient or target of an action",
+  "meaning_zh": "给……；向……（表动作的接受者或对象，只用于人或动物）",
+  "meaning_ko": "사람이나 동물을 나타내는 명사에 붙어 그 명사가 행동의 받는 사람이나 대상임을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "재준 씨가 캐럴 씨에게 선물을 줍니다.",
+    "english": "Jaejun gives a present to Carol.",
+    "chinese": "在俊给卡罗尔送礼物。"
+   },
+   {
+    "korean": "선생님이 학생들에게 한국어를 가르칩니다.",
+    "english": "The teacher teaches Korean to the students.",
+    "chinese": "老师教学生们韩语。"
+   },
+   {
+    "korean": "동생이 개한테 밥을 줘요.",
+    "english": "My little sister feeds the dog.",
+    "chinese": "妹妹给狗喂食。"
+   },
+   {
+    "korean": "누구한테 편지를 써요?",
+    "english": "Who are you writing a letter to?",
+    "chinese": "你给谁写信？"
+   },
+   {
+    "korean": "고향 친구한테 편지를 써요.",
+    "english": "I'm writing a letter to my friend back home.",
+    "chinese": "我给家乡的朋友写信。"
+   }
+  ],
+  "notes": "When the target of the action is someone of higher social status to whom the speaker must show respect, the honorific 께 is used in place of 에게/한테 and 드리다 in place of 주다 (e.g. 나는 할아버지께 선물을 드렸습니다). When receiving or learning something from another person, 에게서 받다/배우다 or 한테서 받다/배우다 is used, and 서 can be omitted (에게/한테 받다/배우다); for a person of higher status, 께 is used in place of 에게서/한테서.",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N도",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 도",
+  "meaning_en": "also / too (adds a subject or object to one already mentioned)",
+  "meaning_zh": "也；还（把主语或宾语添加到已提到的事物上）",
+  "meaning_ko": "앞에서 언급한 것에 더하여 주어나 목적어를 나열하거나 추가할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "무쿨 씨는 인도 사람이에요. 그리고 친구도 인도 사람이에요.",
+    "english": "Mukul is Indian. And his friend is also Indian.",
+    "chinese": "穆库尔是印度人。他的朋友也是印度人。"
+   },
+   {
+    "korean": "아버지는 키가 커요. 그리고 저도 키가 커요.",
+    "english": "My father is tall. And I am tall, too.",
+    "chinese": "爸爸个子高。我也个子高。"
+   },
+   {
+    "korean": "왕징 씨는 사과를 좋아해요. 그리고 딸기도 좋아해요.",
+    "english": "Wang Jing likes apples. And she likes strawberries, too.",
+    "chinese": "王静喜欢苹果。也喜欢草莓。"
+   },
+   {
+    "korean": "비빔밥을 먹을 거예요. 그리고 된장찌개도 먹을 거예요.",
+    "english": "I'll have bibimbap. And I'll have doenjang stew, too.",
+    "chinese": "我要吃拌饭。还要吃大酱汤。"
+   },
+   {
+    "korean": "한국어를 배워요. 그리고 태권도도 배워요.",
+    "english": "I study Korean. And I also learn taekwondo.",
+    "chinese": "我学韩语。也学跆拳道。"
+   }
+  ],
+  "notes": "",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N만",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 만",
+  "meaning_en": "only / just (choosing one thing to the exclusion of others)",
+  "meaning_zh": "只；仅（排除其他，只选择某一个）",
+  "meaning_ko": "다른 것은 제외하고 하나만 선택함을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "오늘 학교에 캐럴 씨만 왔어요.",
+    "english": "Today, only Carol came to school.",
+    "chinese": "今天只有卡罗尔来学校了。"
+   },
+   {
+    "korean": "댄 씨는 야채는 안 먹어요. 고기만 먹어요.",
+    "english": "Dane doesn't eat vegetables. He only eats meat.",
+    "chinese": "丹不吃蔬菜。只吃肉。"
+   },
+   {
+    "korean": "5분만 기다려 주세요.",
+    "english": "Please wait just five minutes.",
+    "chinese": "请只等五分钟。"
+   },
+   {
+    "korean": "부디 씨만 안 왔어요.",
+    "english": "Only Budi hasn't arrived.",
+    "chinese": "只有布迪没来。"
+   },
+   {
+    "korean": "설탕만 넣어 주세요.",
+    "english": "Just sugar, please.",
+    "chinese": "请只放糖。"
+   }
+  ],
+  "notes": "만 can be used either in place of the particles 이/가, 은/는, and 을/를, or together with them; when used together, 만 comes first, followed by 이, 은, or 을, forming 만이, 만은, and 만을. With particles other than 이/가, 은/는, and 을/를, 만 comes after the particle, forming 에서만, 에게만, and 까지만.",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N밖에",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 밖에 + 부정 표현(안, 못, 없다, 모르다)",
+  "meaning_en": "only / nothing but (used with a following negative; the amount is less than expected)",
+  "meaning_zh": "只；仅；除了……之外没有（必须与后面的否定形式连用）",
+  "meaning_ko": "다른 가능성 없이 오직 그것뿐임을 나타내며, 반드시 뒤에 부정 표현이 오는 표현.",
+  "examples": [
+   {
+    "korean": "사과가 한 개밖에 안 남았어요.",
+    "english": "There's only one apple left.",
+    "chinese": "苹果只剩一个了。"
+   },
+   {
+    "korean": "냉장고에 우유밖에 없어요.",
+    "english": "There's nothing but milk in the refrigerator.",
+    "chinese": "冰箱里只有牛奶。"
+   },
+   {
+    "korean": "선물을 한 개밖에 못 받았어요.",
+    "english": "I only received one present.",
+    "chinese": "我只收到了一份礼物。"
+   },
+   {
+    "korean": "어려워서 다섯 쪽밖에 못 읽었어요.",
+    "english": "It's difficult, so I could only read five pages.",
+    "chinese": "太难了，我只读了五页。"
+   },
+   {
+    "korean": "30명을 초대했어요. 그런데 20명밖에 안 왔어요.",
+    "english": "I invited 30 people, but only 20 came.",
+    "chinese": "我邀请了30人，可是只来了20人。"
+   }
+  ],
+  "notes": "밖에 is always followed by a negative form (안, 못, 없다, 몰라요), but it cannot be followed by 아니다, nor by imperative or propositive forms (10분밖에 기다리지 맙시다 is wrong; 10분만 기다립시다 is correct). Unlike 만, which can be used in both positive and negative sentences, 밖에 is used in negative sentences only.",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N(으)로",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + (으)로 (받침이 없거나 'ㄹ'로 끝나면 로, 받침이 있으면 으로)",
+  "meaning_en": "to / toward (direction); by / with / using (means of transport, tool, or material)",
+  "meaning_zh": "向……；朝……（表方向）；乘……；用……（表手段、工具、材料）",
+  "meaning_ko": "방향이나 수단·도구·재료를 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "여기에서 오른쪽으로 가세요.",
+    "english": "Please go to the right from here.",
+    "chinese": "请从这里往右走。"
+   },
+   {
+    "korean": "서울에서 제주도까지 비행기로 가요.",
+    "english": "We go from Seoul to Jeju Island by airplane.",
+    "chinese": "从首尔到济州岛坐飞机去。"
+   },
+   {
+    "korean": "가위로 종이를 잘라요.",
+    "english": "I cut the paper with scissors.",
+    "chinese": "用剪刀剪纸。"
+   },
+   {
+    "korean": "땅콩으로 잼을 만들었어요.",
+    "english": "We made jam from peanuts.",
+    "chinese": "用花生做了果酱。"
+   },
+   {
+    "korean": "이 과자는 쌀로 만들었어요.",
+    "english": "This candy is made of rice.",
+    "chinese": "这个点心是用大米做的。"
+   }
+  ],
+  "notes": "When a means of transport is expressed by a verb instead of a noun, -아/어서 is added to the verb, as in 걸어서, 뛰어서, 달려서, 운전해서, and 수영해서 (e.g. 학교에서 집까지 걸어서 가요). Also note the difference between 차로 왔어요 (traveled by car, whether driving or as a passenger) and 운전해서 왔어요 (the subject actually drove the car), and between -(으)로 가다 (focus on direction) and -에 가다 (focus on destination).",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N(이)나",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + (이)나 (받침이 없으면 나, 받침이 있으면 이나)",
+  "meaning_en": "or (choosing one of two or more listed nouns)",
+  "meaning_zh": "或者；……或……（在并列的两个以上名词中选择一个）",
+  "meaning_ko": "둘 이상 나열된 명사 중 하나를 선택함을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "아침에 빵이나 밥을 먹어요.",
+    "english": "In the mornings, I eat bread or rice.",
+    "chinese": "早上吃面包或米饭。"
+   },
+   {
+    "korean": "목이 말라요. 물이나 주스 주세요.",
+    "english": "I'm thirsty. Please give me some water or juice.",
+    "chinese": "我口渴。请给我水或果汁。"
+   },
+   {
+    "korean": "방학에 제주도나 설악산에 가고 싶어요.",
+    "english": "I want to go to Jeju Island or Mt. Seorak during the school vacation.",
+    "chinese": "放假想去济州岛或雪岳山。"
+   },
+   {
+    "korean": "구두나 가방을 살 거예요.",
+    "english": "I plan to buy some shoes or a bag.",
+    "chinese": "我打算买鞋或包。"
+   },
+   {
+    "korean": "이 선생님이나 김 선생님에게 물어보세요.",
+    "english": "Please ask instructor Lee or instructor Kim.",
+    "chinese": "请问李老师或金老师。"
+   }
+  ],
+  "notes": "When (이)나 is added to a subject or object, the subject/object particle is omitted, leaving only (이)나 in place of 이/가 or 을/를 (어머니나 아버지가 요리해요). With the particles 에, 에서, and 에게, (이)나 may be used alone with the first word(s) while 에/에서/에게 is used with the final word, or (이)나 may be combined with them to form 에나, 에서나, 에게나, though using (이)나 alone is more natural. While 밖에 indicates that a number or amount is less than expected or doesn't meet a general standard, (이)나 indicates that it is more than expected or exceeds a general standard. The same quantity can be viewed either way depending on the perspective (e.g. 우리는 아이가 네 명밖에 없어요 vs 네 명이나 있어요?).",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N쯤",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 쯤",
+  "meaning_en": "about / around (approximate number, quantity, or time)",
+  "meaning_zh": "大约；左右（表数量、时间等大致估计）",
+  "meaning_ko": "수, 양, 시간 등을 대략적으로 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "파티에 20명쯤 왔어요.",
+    "english": "About 20 people came to the party.",
+    "chinese": "派对大约来了20人。"
+   },
+   {
+    "korean": "공항에 한 시쯤 도착했어요.",
+    "english": "I arrived at the airport around 1 o'clock.",
+    "chinese": "大约一点到达了机场。"
+   },
+   {
+    "korean": "요즘 토마토가 3,000원쯤 해요.",
+    "english": "These days, tomatoes cost about 3,000 won.",
+    "chinese": "最近西红柿大约3000韩元。"
+   },
+   {
+    "korean": "1시쯤 어때요?",
+    "english": "How's around 1 o'clock?",
+    "chinese": "一点左右怎么样？"
+   },
+   {
+    "korean": "버스로 30분쯤 걸려요.",
+    "english": "It takes me about 30 minutes by bus.",
+    "chinese": "坐公交车大约需要30分钟。"
+   }
+  ],
+  "notes": "When referring to approximate prices, 'Noun쯤 하다' is used more often than 'Noun쯤이다' (e.g. 요즘 3개에 2,000원쯤 해요).",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N처럼, N같이",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 처럼/같이",
+  "meaning_en": "like / as ... as (similarity or comparison)",
+  "meaning_zh": "像……一样；如同……（表相似或比喻）",
+  "meaning_ko": "어떤 행동이나 모습이 앞의 명사와 같거나 매우 비슷함을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "가수처럼 노래를 잘 불러요.",
+    "english": "He sings like a professional singer.",
+    "chinese": "歌唱得像歌手一样好。"
+   },
+   {
+    "korean": "하영 씨는 천사같이 착해요.",
+    "english": "Hayeong is as kind as an angel.",
+    "chinese": "夏英像天使一样善良。"
+   },
+   {
+    "korean": "영화배우같이 잘생겼어요.",
+    "english": "He's as handsome as a movie actor.",
+    "chinese": "长得像电影演员一样帅。"
+   },
+   {
+    "korean": "미스코리아처럼 예뻐요.",
+    "english": "She's as pretty as Miss Korea.",
+    "chinese": "像韩国小姐一样漂亮。"
+   },
+   {
+    "korean": "일본 도쿄처럼 복잡해요.",
+    "english": "It's crowded like Tokyo, Japan.",
+    "chinese": "像日本东京一样拥挤。"
+   }
+  ],
+  "notes": "처럼/같이 are often used metaphorically, comparing people to animals or other things in nature: 호랑이처럼 무섭다 (scary), 토끼처럼 귀엽다 (cute), 거북이처럼 느리다 (slow), 돼지처럼 뚱뚱하다 (overweight), and 바다처럼 마음이 넓다 (generous).",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N보다",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 보다 (비교의 기준)",
+  "meaning_en": "more ... than / -er than (marks the standard of comparison)",
+  "meaning_zh": "比……（表比较的基准）",
+  "meaning_ko": "앞의 명사를 비교의 기준으로 삼아 그보다 더함을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "비행기가 기차보다 빨라요.",
+    "english": "Airplanes are faster than trains.",
+    "chinese": "飞机比火车快。"
+   },
+   {
+    "korean": "동생이 언니보다 더 커요.",
+    "english": "My little sister is bigger than my elder sister.",
+    "chinese": "妹妹比姐姐个子高。"
+   },
+   {
+    "korean": "백화점이 시장보다 더 비싸요.",
+    "english": "The department store is more expensive than the market.",
+    "chinese": "百货商店比市场贵。"
+   },
+   {
+    "korean": "여름보다 봄을 더 좋아해요.",
+    "english": "I like spring more than summer.",
+    "chinese": "比起夏天，我更喜欢春天。"
+   },
+   {
+    "korean": "제주도가 더 따뜻해요.",
+    "english": "Jeju Island is warmer.",
+    "chinese": "济州岛更暖和。"
+   }
+  ],
+  "notes": "보다 is added to a noun to form 'N이/가 N보다 하다', and the order of the subject and the noun with 보다 can be reversed with no change in meaning. The adverbs 더 and 덜 are generally used together with 보다 but can be omitted.",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N마다",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 마다",
+  "meaning_en": "every / each; once every (repetition over a set period, or every one without exception)",
+  "meaning_zh": "每……；每隔……（表反复或无一例外）",
+  "meaning_ko": "일정한 기간마다 같은 상황이나 행동이 반복되거나, 예외 없이 모든 것을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "웨슬리 씨는 일요일마다 교회에 가요.",
+    "english": "Wesley goes to church every Sunday.",
+    "chinese": "韦斯利每个星期天都去教堂。"
+   },
+   {
+    "korean": "기차는 한 시간마다 있어요.",
+    "english": "The train comes once every hour.",
+    "chinese": "火车每小时一班。"
+   },
+   {
+    "korean": "나라마다 국기가 달라요.",
+    "english": "Every country has a different flag.",
+    "chinese": "每个国家的国旗都不同。"
+   },
+   {
+    "korean": "금요일마다 태권도를 배워요.",
+    "english": "I have taekwondo lessons every Friday.",
+    "chinese": "我每周五学跆拳道。"
+   },
+   {
+    "korean": "컴퓨터가 교실마다 있어요?",
+    "english": "Are there computers in every classroom?",
+    "chinese": "每个教室都有电脑吗？"
+   }
+  ],
+  "notes": "날마다, 일주일마다, 달마다, and 해마다 can also be written as 매일, 매주, 매월/매달, and 매년. For the word 집, 집집마다 is used instead of 집마다.",
+  "unit": "3. Particles",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-고",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -고",
+  "meaning_en": "and (lists two or more actions, states, or facts; also 'and then')",
+  "meaning_zh": "……并且……（并列两个以上的动作、状态或事实；也表先后）",
+  "meaning_ko": "둘 이상의 행동이나 상태, 사실을 나열하거나 앞의 행동이 뒤의 행동보다 먼저 일어남을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "캐럴 씨는 키가 크고 날씬해요.",
+    "english": "Carol is tall and slender.",
+    "chinese": "卡罗尔个子高又苗条。"
+   },
+   {
+    "korean": "민우 씨는 한국 사람이고 댄 씨는 영국 사람입니다.",
+    "english": "Minu is Korean, and Dane is British.",
+    "chinese": "民宇是韩国人，丹是英国人。"
+   },
+   {
+    "korean": "어제 파티에서 티루엔 씨가 노래도 부르고 춤도 췄어요.",
+    "english": "At yesterday's party, Tiluen sang songs and danced.",
+    "chinese": "昨天的派对上，蒂鲁恩又唱歌又跳舞。"
+   },
+   {
+    "korean": "오전에는 친구를 만나고 오후에는 도서관에 갈 거예요.",
+    "english": "In the morning, I'll meet a friend, and in the afternoon, I'll go to the library.",
+    "chinese": "上午见朋友，下午去图书馆。"
+   },
+   {
+    "korean": "똑똑하고 예뻐요.",
+    "english": "She's smart and pretty.",
+    "chinese": "又聪明又漂亮。"
+   }
+  ],
+  "notes": "The form 'N도 V-고 N도 V' is used when combining two or more facts about the same subject (형은 수영도 잘하고 농구도 잘해요). Note also that when -고 expresses that the first action was performed before the second, tense is expressed only in the second clause, not the first (어제 밥을 먹고 숙제를 했어요).",
+  "unit": "4. Listing and Contrast",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-거나",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -거나",
+  "meaning_en": "or (a choice between two or more verbs or adjectives)",
+  "meaning_zh": "或者……；要么……要么……（在动词或形容词之间选择）",
+  "meaning_ko": "둘 이상의 동사나 형용사 중 하나를 선택함을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "아침에 빵을 먹거나 우유를 마셔요.",
+    "english": "In the morning, I either eat bread or drink milk.",
+    "chinese": "早上要么吃面包，要么喝牛奶。"
+   },
+   {
+    "korean": "주말에 음악을 듣거나 영화를 볼 거예요.",
+    "english": "On the weekend, I plan to listen to music or watch a movie.",
+    "chinese": "周末打算听音乐或看电影。"
+   },
+   {
+    "korean": "바쁘거나 가방이 무거울 때 택시를 타요.",
+    "english": "I take a taxi when I'm busy or my bag is too heavy.",
+    "chinese": "忙的时候或包太重的时候坐出租车。"
+   },
+   {
+    "korean": "테니스를 치거나 수영을 할 거예요.",
+    "english": "I'll either play tennis or go swimming.",
+    "chinese": "打算打网球或游泳。"
+   },
+   {
+    "korean": "여행을 가거나 외식을 할 거예요.",
+    "english": "I'll take a trip or go out to eat.",
+    "chinese": "打算去旅行或出去吃饭。"
+   }
+  ],
+  "notes": "-거나 is added to the stem of a verb or adjective; for nouns, -이나 is used instead. It is usually used once to connect two verbs or adjectives, but it can also be used to connect three or more.",
+  "unit": "4. Listing and Contrast",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-지만",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -지만 (과거: -았/었지만)",
+  "meaning_en": "but (the second clause is opposite or contrary to the first)",
+  "meaning_zh": "虽然……但是……（表转折或对照）",
+  "meaning_ko": "앞 절의 내용과 반대되거나 대조되는 내용을 뒤 절에 이어 말할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "한국말은 어렵지만 재미있어요.",
+    "english": "Korean is difficult but interesting.",
+    "chinese": "韩语虽然难，但很有趣。"
+   },
+   {
+    "korean": "형은 크지만 동생은 작아요.",
+    "english": "My older brother is big, but my younger brother is small.",
+    "chinese": "哥哥个子大，但弟弟个子小。"
+   },
+   {
+    "korean": "하영 씨는 많이 먹지만 날씬해요.",
+    "english": "Hayeong eats a lot, but she's slim.",
+    "chinese": "夏英吃得很多，但很苗条。"
+   },
+   {
+    "korean": "작지만 깨끗해요.",
+    "english": "It's small but clean.",
+    "chinese": "虽然小，但很干净。"
+   },
+   {
+    "korean": "외국 사람이지만 한국말을 잘해요.",
+    "english": "He's a foreigner, but he can speak Korean well.",
+    "chinese": "虽然是外国人，但韩语说得很好。"
+   }
+  ],
+  "notes": "-지만 is added to the stems of verbs and adjectives, and in the case of the past tense, -았/었지만 is added.",
+  "unit": "4. Listing and Contrast",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-(으)ㄴ/는데",
+  "level": "TOPIK 1-2",
+  "formation": "형용사 어간(받침 없음) + -ㄴ데, 형용사 어간(받침 있음) + -은데, 동사 어간·있다/없다 + -는데, 과거 + -았/었는데",
+  "meaning_en": "but / though (the second clause is opposite to, in contrast with, or an unexpected result of the first)",
+  "meaning_zh": "……但是……（表转折、对照或出乎意料的结果）",
+  "meaning_ko": "앞 절의 내용과 반대되거나 대조되는 내용, 또는 예상하지 못한 결과를 뒤 절에 이어 말할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "낮에는 차가 많은데 밤에는 차가 없어요.",
+    "english": "In the afternoon, there are a lot of cars, but at night, there aren't any.",
+    "chinese": "白天车很多，但晚上没有车。"
+   },
+   {
+    "korean": "저는 오빠는 있는데 언니는 없어요.",
+    "english": "I have an older brother, but not an older sister.",
+    "chinese": "我有哥哥，但没有姐姐。"
+   },
+   {
+    "korean": "노래는 못하는데 춤은 잘 춰요.",
+    "english": "I can't sing, but I can dance well.",
+    "chinese": "我不会唱歌，但舞跳得好。"
+   },
+   {
+    "korean": "가격은 싼데 너무 멀어요.",
+    "english": "The prices are cheap, but it's too far away.",
+    "chinese": "价格便宜，但太远了。"
+   },
+   {
+    "korean": "일은 많은데 월급은 적어요.",
+    "english": "There are many things to do, but the salary is small.",
+    "chinese": "工作多，但工资少。"
+   }
+  ],
+  "notes": "",
+  "unit": "4. Listing and Contrast",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N 전에, V-기 전에",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 전에 / 동사 어간 + -기 전에",
+  "meaning_en": "before (a certain period of time or some action); ago",
+  "meaning_zh": "在……之前（表时间或动作之前）",
+  "meaning_ko": "어떤 시간이나 행동보다 앞선 시점을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "2년 전에 한국에 왔습니다.",
+    "english": "I came to Korea two years ago.",
+    "chinese": "两年前来到了韩国。"
+   },
+   {
+    "korean": "식사 전에 이 약을 드세요.",
+    "english": "Please take this medicine before meals.",
+    "chinese": "请在饭前吃这个药。"
+   },
+   {
+    "korean": "수영하기 전에 준비운동을 해요.",
+    "english": "I do warm-up exercises before swimming.",
+    "chinese": "游泳前做热身运动。"
+   },
+   {
+    "korean": "1시간 전에 식사했어요.",
+    "english": "I ate an hour ago.",
+    "chinese": "一个小时前吃过饭了。"
+   },
+   {
+    "korean": "한국에 오기 전에 어디에 살았어요?",
+    "english": "Where did you live before coming to Korea?",
+    "chinese": "来韩国之前住在哪里？"
+   }
+  ],
+  "notes": "1시 전에 오세요 means the person can come any time before 1:00, such as 12:50, 12:00, or even 11:00, while 1시간 전에 오세요 means exactly one hour before some previously stated time (e.g. 2:00 if the meeting is at 3:00). Also, 'Noun 전에' is used mainly with nouns to which 하다 can be added to make verbs; for all verbs other than 하다-verbs, only -기 전에 can be used.",
+  "unit": "5. Time Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N 후에, V-(으)ㄴ 후에",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 후에 / 동사 어간(모음) + -ㄴ 후에, 동사 어간(자음) + -은 후에 (어간이 'ㄹ'로 끝나면 'ㄹ'이 탈락한 뒤 -ㄴ 후에)",
+  "meaning_en": "after (a certain period of time or some action); later",
+  "meaning_zh": "在……之后（表时间或动作之后）",
+  "meaning_ko": "어떤 시간이나 행동보다 뒤의 시점을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "한 달 후에 아기가 태어나요.",
+    "english": "My baby will be born in one month.",
+    "chinese": "一个月后孩子出生。"
+   },
+   {
+    "korean": "밥을 먹은 후에 이를 닦아요.",
+    "english": "I brush my teeth after dinner.",
+    "chinese": "吃完饭之后刷牙。"
+   },
+   {
+    "korean": "대학교 졸업 후에 취직을 했어요.",
+    "english": "I got a job after college graduation.",
+    "chinese": "大学毕业后找到了工作。"
+   },
+   {
+    "korean": "1년 후에 가요.",
+    "english": "I'll go in one year.",
+    "chinese": "一年后去。"
+   },
+   {
+    "korean": "한국에서 이사한 후에 하는 파티예요.",
+    "english": "It's a Korean housewarming party for someone who just moved into a new house.",
+    "chinese": "这是在韩国搬家之后办的派对。"
+   }
+  ],
+  "notes": "1시 후에 오세요 means the person can come any time after 1:00, such as 1:10, 2:00, or even 3:00, while 1시간 후에 오세요 means exactly one hour after some previously stated time (e.g. 4:00 if the meeting is at 3:00). -(으)ㄴ 다음에 can also be used in place of -(으)ㄴ 후에.",
+  "unit": "5. Time Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-고 나서",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -고 나서",
+  "meaning_en": "and then / after doing (one action is completely finished, and then the next action begins)",
+  "meaning_zh": "……之后（表前一个动作完全结束后再做下一个动作）",
+  "meaning_ko": "앞의 행동을 완전히 끝낸 뒤에 뒤의 행동을 함을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "일을 하고 나서 쉽니다.",
+    "english": "I rest after finishing my work.",
+    "chinese": "工作之后休息。"
+   },
+   {
+    "korean": "텔레비전을 보고 나서 잡니다.",
+    "english": "I sleep after watching TV.",
+    "chinese": "看完电视之后睡觉。"
+   },
+   {
+    "korean": "아침을 먹고 나서 신문을 봅니다.",
+    "english": "I read the newspaper after eating breakfast.",
+    "chinese": "吃完早饭之后看报纸。"
+   },
+   {
+    "korean": "회의가 끝나고 나서 주세요.",
+    "english": "Please give them to me after the meeting.",
+    "chinese": "会议结束之后请给我。"
+   },
+   {
+    "korean": "책을 읽고 나서 쓰는 글이에요.",
+    "english": "It's what you write after you finish reading a book.",
+    "chinese": "是读完书之后写的文章。"
+   }
+  ],
+  "notes": "Because -고 나서 expresses temporal order, it can only be used with verbs. When the subjects of the first and second clauses are the same and the verbs are motion/position verbs such as 가다, 오다, 들어가다, 나가다, 올라가다, 내려가다, 일어나다, 앉다, 눕다, 만나다, -아/어서 is used instead of -고 나서.",
+  "unit": "Time Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-아/어서",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -아서/-어서 (하다 → 해서)",
+  "meaning_en": "and then / in order to (the second action happens right after the first, the two being closely related)",
+  "meaning_zh": "……然后……（表两个紧密相关的动作先后发生）",
+  "meaning_ko": "앞의 행동이 있은 뒤에 뒤의 행동이 일어남을 나타내는 연결 어미로, 두 행동이 밀접하게 관련됨을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "바나나를 까서 먹었어요.",
+    "english": "(The monkey) peeled a banana and ate it.",
+    "chinese": "把香蕉剥了吃掉。"
+   },
+   {
+    "korean": "네 시간 동안 공원에 앉아서 이야기했어요.",
+    "english": "(We) sat in a park for four hours and talked.",
+    "chinese": "在公园坐了四个小时聊天。"
+   },
+   {
+    "korean": "여자 친구에게 목걸이를 사(서) 주었어요.",
+    "english": "I bought a necklace for my girlfriend and gave it to her.",
+    "chinese": "给女朋友买了项链送给她。"
+   },
+   {
+    "korean": "어제 친구를 만나서 영화를 봤어요.",
+    "english": "Yesterday, I met a friend to watch a movie.",
+    "chinese": "昨天见了朋友看电影。"
+   },
+   {
+    "korean": "내일 친구를 만나서 영화를 볼 거예요.",
+    "english": "Tomorrow, I will meet a friend to watch a movie.",
+    "chinese": "明天要见朋友看电影。"
+   }
+  ],
+  "notes": "The tense is expressed only in the second verb, not the first, and the subjects of both verbs must be the same. Unlike -아/어서, which links two closely related actions, -고 connects two unrelated actions that happen sequentially; with verbs for wearing clothes and accessories, -고 is used instead of -아/어서.",
+  "unit": "Time Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N 때, A/V-(으)ㄹ 때",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 때 / 동사·형용사 어간 + -(으)ㄹ 때",
+  "meaning_en": "when / during (the time when an action or state occurs, or its duration)",
+  "meaning_zh": "……的时候（表动作或状态发生的时间或持续期间）",
+  "meaning_ko": "어떤 행동이나 상태가 일어나는 시간이나 그 지속되는 동안을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "방학 때 아르바이트를 해요.",
+    "english": "I work a part-time job during vacation.",
+    "chinese": "放假期间打工。"
+   },
+   {
+    "korean": "4살 때 사진이에요.",
+    "english": "This is a picture of me when I was 4 years old.",
+    "chinese": "是我四岁时的照片。"
+   },
+   {
+    "korean": "시험 볼 때 옆 사람의 시험지를 보지 마세요.",
+    "english": "Don't look at your neighbor's answer sheet when taking the test.",
+    "chinese": "考试时不要看旁边人的答题卡。"
+   },
+   {
+    "korean": "몇 살 때 첫 데이트를 했어요?",
+    "english": "How old were you when you went on your first date?",
+    "chinese": "你几岁的时候第一次约会？"
+   }
+  ],
+  "notes": "Check It Out!: 때 is not used together with 오전, 오후, 아침, or the days of the week (오전 때 공부를 해요 (X) → 오전에 공부를 해요 (O)). For nouns such as 저녁, 점심, and 방학, N 때 and N에 have the same meaning; for holidays such as 크리스마스 and 추석, N에 refers to the specific day(s) while N 때 refers to the approximate period around the holiday.",
+  "unit": "Time Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)면서",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -면서/-으면서",
+  "meaning_en": "while (doing) (the actions of the first and second verbs occur simultaneously by the same subject)",
+  "meaning_zh": "一边……一边……（表同一主语同时进行两个动作）",
+  "meaning_ko": "두 동작이 같은 주체에 의해 동시에 일어남을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "밥을 먹으면서 TV 봅니다.",
+    "english": "I eat while watching TV.",
+    "chinese": "一边吃饭一边看电视。"
+   },
+   {
+    "korean": "우리 언니는 피아노를 치면서 노래를 해요.",
+    "english": "My older sister sings while she plays the piano.",
+    "chinese": "我姐姐一边弹钢琴一边唱歌。"
+   },
+   {
+    "korean": "운전하면서 전화하지 마세요. 위험해요.",
+    "english": "Don't use the phone while driving. It's dangerous.",
+    "chinese": "开车时不要打电话，很危险。"
+   },
+   {
+    "korean": "음악을 들으면서 공부를 해요.",
+    "english": "I listen to music while studying.",
+    "chinese": "一边听音乐一边学习。"
+   },
+   {
+    "korean": "학교에 다니면서 아르바이트를 해요.",
+    "english": "I have a part-time job while attending school.",
+    "chinese": "一边上学一边打工。"
+   }
+  ],
+  "notes": "The subjects of both clauses must be the same person; when the subjects differ, -는 동안 is used. Past and future tense endings are not added to the verb preceding -(으)면서 — it is always written in the present tense.",
+  "unit": "Time Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N 중, V-는 중",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 중 / 동사 어간 + -는 중",
+  "meaning_en": "in the process of / currently doing (the subject is in the middle of performing an action)",
+  "meaning_zh": "正在……中（表某动作正在进行）",
+  "meaning_ko": "어떤 행동이 진행 중임을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "지하철 공사 중입니다.",
+    "english": "The subway is under construction.",
+    "chinese": "地铁正在施工中。"
+   },
+   {
+    "korean": "사장님은 회의 중입니다.",
+    "english": "The president is in a meeting.",
+    "chinese": "社长正在开会中。"
+   },
+   {
+    "korean": "지금 집에 가는 중이에요.",
+    "english": "I'm on the way home.",
+    "chinese": "我正在回家的路上。"
+   },
+   {
+    "korean": "이사할 거예요. 그래서 집을 찾는 중이에요.",
+    "english": "I intend to move, so I'm looking for a new place to live.",
+    "chinese": "我要搬家，所以正在找房子。"
+   }
+  ],
+  "notes": "Check It Out!: -는 중이다 and -고 있다 are used in similar ways, but -는 중이다 cannot be used with subjects representing natural phenomena (비가 오는 중이에요 (X) → 비가 오고 있어요 (O)).",
+  "unit": "Time Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-자마자",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -자마자",
+  "meaning_en": "as soon as / right after (something occurs immediately after an event or action ends)",
+  "meaning_zh": "一……就……（表前一事件刚结束就马上发生后一事件）",
+  "meaning_ko": "어떤 일이 끝난 직후에 다른 일이 바로 일어남을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "너무 피곤해서 집에 오자마자 잤어요.",
+    "english": "I was so tired that I went to sleep as soon as I got home.",
+    "chinese": "太累了，一到家就睡了。"
+   },
+   {
+    "korean": "불이 나자마자 소방차가 왔어요.",
+    "english": "The fire truck arrived as soon as the fire started.",
+    "chinese": "一着火消防车就来了。"
+   },
+   {
+    "korean": "수업이 끝나자마자 학생들은 교실을 나갔어요.",
+    "english": "The students left the classroom right after class was over.",
+    "chinese": "一下课学生们就出了教室。"
+   },
+   {
+    "korean": "대학교를 졸업하자마자 결혼할 거예요.",
+    "english": "We'll get married as soon as we graduate from college.",
+    "chinese": "大学一毕业就结婚。"
+   }
+  ],
+  "notes": "The subjects of the first and second clauses can be either the same or different. Tense is not expressed in the verb of the first clause, but it is in the second (집에 갔자마자 잤어요 (X) → 집에 가자마자 잤어요 (O)).",
+  "unit": "Time Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N 동안, V-는 동안",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 동안 / 동사 어간 + -는 동안",
+  "meaning_en": "during / while (the length of time from when an action begins until it ends)",
+  "meaning_zh": "……期间；在……的时候（表动作从开始到结束持续的时间长度）",
+  "meaning_ko": "어떤 행동이 시작해서 끝날 때까지의 시간 길이를 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "어제 4시간 동안 공부했어요.",
+    "english": "Yesterday, I studied for four hours.",
+    "chinese": "昨天学习了四个小时。"
+   },
+   {
+    "korean": "곰은 겨울 동안에 겨울잠을 자요.",
+    "english": "Bears hibernate during winter.",
+    "chinese": "熊在冬天期间冬眠。"
+   },
+   {
+    "korean": "친구들이 점심을 먹는 동안 나는 숙제를 했어요.",
+    "english": "I did my homework while my friends were eating lunch.",
+    "chinese": "朋友们吃午饭的时候我做了作业。"
+   },
+   {
+    "korean": "(내가) 한국에서 사는 동안 (나는) 좋은 친구들을 많이 만났어요.",
+    "english": "While I lived in Korea, I made a lot of good friends.",
+    "chinese": "我在韩国生活期间交了很多好朋友。"
+   }
+  ],
+  "notes": "What's the Difference?: -(으)면서 is used when one person performs two or more actions simultaneously and requires the same subject in both clauses, whereas -는 동안(에) can be used even when the subjects of the first and second clauses are different.",
+  "unit": "Time Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)ㄴ 지",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -ㄴ 지/-은 지",
+  "meaning_en": "since (how much time has passed since a situation or action occurred)",
+  "meaning_zh": "……以来（表某动作或情况发生后到现在过了多久）",
+  "meaning_ko": "어떤 일이 일어난 후 지금까지 얼마의 시간이 지났음을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "저는 한국에 온 지 2년이 되었습니다.",
+    "english": "It's been two years since I came to Korea.",
+    "chinese": "我来韩国已经两年了。"
+   },
+   {
+    "korean": "담배 끊은 지 한 달 되었어요.",
+    "english": "It's been one month since I stopped smoking.",
+    "chinese": "我戒烟已经一个月了。"
+   },
+   {
+    "korean": "컴퓨터 게임을 한 지 5시간이 넘었어요.",
+    "english": "It's been over five hours since you started playing computer games.",
+    "chinese": "你玩电脑游戏已经超过五个小时了。"
+   },
+   {
+    "korean": "한국어를 공부한 지 6개월이 되었어요.",
+    "english": "It's been six months since I began studying Korean.",
+    "chinese": "我学韩语已经六个月了。"
+   },
+   {
+    "korean": "사귄 지 3년이 넘었어요.",
+    "english": "We've been dating for over three years.",
+    "chinese": "交往已经超过三年了。"
+   }
+  ],
+  "notes": "",
+  "unit": "Time Expressions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)ㄹ 수 있다/없다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)ㄹ 수 있다/없다",
+  "meaning_en": "can / cannot (expressing ability or possibility)",
+  "meaning_zh": "能/不能……；可以/不可以……（表能力或可能性）",
+  "meaning_ko": "어떤 일을 할 수 있는 능력이나 가능성을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "이 영화를 볼 수 있어요.",
+    "english": "We can see this movie.",
+    "chinese": "我们能看这部电影。"
+   },
+   {
+    "korean": "저 영화를 볼 수 없어요.",
+    "english": "We can't see that movie.",
+    "chinese": "我们不能看那部电影。"
+   },
+   {
+    "korean": "한국말을 할 수 있어요.",
+    "english": "I can speak Korean.",
+    "chinese": "我会说韩语。"
+   },
+   {
+    "korean": "한자를 읽을 수 있어요.",
+    "english": "I can read Chinese characters.",
+    "chinese": "我能读汉字。"
+   },
+   {
+    "korean": "한자를 읽을 수 없어요.",
+    "english": "I can't read Chinese characters.",
+    "chinese": "我不能读汉字。"
+   }
+  ],
+  "notes": "Check It Out!: Adding the particle -가 to -(으)ㄹ 수 있다/없다 to form -(으)ㄹ 수가 있다/없다 makes the phrase more emphatic than -(으)ㄹ 수 있다/없다 alone.",
+  "unit": "Ability and Possibility",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)ㄹ 줄 알다/모르다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)ㄹ 줄 알다/모르다",
+  "meaning_en": "know how to / don't know how to (knowing how, or having the ability, to do something)",
+  "meaning_zh": "会/不会……（表知道做某事的方法或有此能力）",
+  "meaning_ko": "어떤 일을 하는 방법을 알고 있거나 그 능력이 있음을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "딸기잼을 만들 줄 알아요.",
+    "english": "I know how to make strawberry jam.",
+    "chinese": "我会做草莓酱。"
+   },
+   {
+    "korean": "휴대전화로 사진을 보낼 줄 알아요.",
+    "english": "I know how to send pictures by mobile phone.",
+    "chinese": "我会用手机发照片。"
+   },
+   {
+    "korean": "된장찌개를 맛있게 끓일 줄 알아요.",
+    "english": "I know how to cook a tasty doenjang stew.",
+    "chinese": "我会做好吃的大酱汤。"
+   },
+   {
+    "korean": "저는 잡채하고 스파게티를 만들 줄 알아요.",
+    "english": "I know how to make Korean japchae and spaghetti.",
+    "chinese": "我会做杂菜和意大利面。"
+   }
+  ],
+  "notes": "What's the Difference?: -(으)ㄹ 줄 알다/모르다 expresses whether one knows how or has the skill to do something, whereas -(으)ㄹ 수 있다/없다 is used not only to express ability but also whether a situation permits something to be done.",
+  "unit": "Ability and Possibility",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)세요",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -세요/-으세요 (일부 동사는 특수 형태)",
+  "meaning_en": "please do (a polite request, command, or instruction to the listener)",
+  "meaning_zh": "请……（礼貌地请求、指示或命令对方做某事）",
+  "meaning_ko": "듣는 사람에게 정중하게 어떤 행동을 하도록 요청하거나 명령할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "여기 앉으세요.",
+    "english": "Please sit here.",
+    "chinese": "请坐这里。"
+   },
+   {
+    "korean": "책 15쪽을 보세요.",
+    "english": "Please look at page 15 in the book.",
+    "chinese": "请看书的第15页。"
+   },
+   {
+    "korean": "이 길로 쭉 가세요.",
+    "english": "Please go straight up this road.",
+    "chinese": "请沿着这条路一直走。"
+   },
+   {
+    "korean": "여기에 이름과 전화번호를 쓰세요.",
+    "english": "Please write down your name and phone number here.",
+    "chinese": "请在这里写下姓名和电话号码。"
+   },
+   {
+    "korean": "여러분, 조용히 하세요!",
+    "english": "Everyone, please be quiet!",
+    "chinese": "大家请安静！"
+   }
+  ],
+  "notes": "When -(으)세요 is used in the imperative sense, it can only be used with verbs, not 이다 or adjectives (의사이세요 (X) → 의사가 되세요 (O); 기쁘세요 (X) → 기뻐하세요 (O)). However, some adjectives ending in 하다 used idiomatically can be used with -으세요, e.g. 건강하세요, 행복하세요.",
+  "unit": "Demands and Obligations, Permission and Prohibition",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-지 마세요",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -지 마세요",
+  "meaning_en": "please don't do (a negative request, persuasion, or command)",
+  "meaning_zh": "请不要……（表否定的请求、劝告或命令）",
+  "meaning_ko": "듣는 사람에게 어떤 행동을 하지 말라고 요청하거나 명령할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "술을 마시지 마세요.",
+    "english": "Please don't drink alcohol.",
+    "chinese": "请不要喝酒。"
+   },
+   {
+    "korean": "전화하지 마세요.",
+    "english": "Please don't use the phone.",
+    "chinese": "请不要打电话。"
+   },
+   {
+    "korean": "수업 시간에 자지 마세요.",
+    "english": "Please don't sleep during class.",
+    "chinese": "上课时间请不要睡觉。"
+   },
+   {
+    "korean": "길이 막히니까 버스를 타지 마세요.",
+    "english": "There's a lot of traffic, so don't take the bus.",
+    "chinese": "路上堵车，请不要坐公交车。"
+   },
+   {
+    "korean": "이 영화를 보지 마세요. 재미없어요.",
+    "english": "Please don't see this movie. It's boring.",
+    "chinese": "请不要看这部电影，没意思。"
+   }
+  ],
+  "notes": "-지 마세요 can only be used with verbs, not 이다 or adjectives (슬프지 마세요 (X) → 슬퍼하세요 (O)).",
+  "unit": "Demands and Obligations, Permission and Prohibition",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-아/어야 되다/하다",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -아야/-어야 되다/하다 (하다 → 해야 되다/하다)",
+  "meaning_en": "must / have to (expressing obligation, necessity, or the necessity of a certain condition)",
+  "meaning_zh": "必须……；得……（表义务、必要或某种情况的必要性）",
+  "meaning_ko": "어떤 일을 해야 할 의무나 필요가 있음을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "내일 시험이 있어요. 그래서 공부해야 돼요.",
+    "english": "I have an exam tomorrow. So I must study.",
+    "chinese": "明天有考试，所以必须学习。"
+   },
+   {
+    "korean": "여자 친구 생일이라서 선물을 사야 돼요.",
+    "english": "It's my girlfriend's birthday, so I have to buy her a present.",
+    "chinese": "因为女朋友过生日，所以要买礼物。"
+   },
+   {
+    "korean": "먹기 전에 돈을 내야 해요.",
+    "english": "You have to pay before you eat.",
+    "chinese": "吃东西之前得先付钱。"
+   },
+   {
+    "korean": "고향에 가야 돼요.",
+    "english": "I have to visit home.",
+    "chinese": "我得回老家。"
+   },
+   {
+    "korean": "미리 예약해야 돼요.",
+    "english": "You have to reserve your ticket in advance.",
+    "chinese": "得提前预订。"
+   }
+  ],
+  "notes": "Check It Out!: -아/어야 되다/하다 has two negative forms — -지 않아도 되다 (don't need to, don't have to) and -(으)면 안 되다 (shouldn't, not allowed to).",
+  "unit": "Demands and Obligations, Permission and Prohibition",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-아/어도 되다",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -아도/-어도 되다 (하다 → 해도 되다)",
+  "meaning_en": "may / be allowed to (expressing permission or approval for a behavior)",
+  "meaning_zh": "可以……；……也行（表许可或同意）",
+  "meaning_ko": "어떤 행동을 해도 괜찮음을 나타내는 허락이나 승인의 표현.",
+  "examples": [
+   {
+    "korean": "사진을 찍어도 돼요?",
+    "english": "May I take a picture?",
+    "chinese": "可以拍照吗？"
+   },
+   {
+    "korean": "여기 앉아도 돼요?",
+    "english": "May I sit here?",
+    "chinese": "可以坐这里吗？"
+   },
+   {
+    "korean": "펜을 써도 돼요?",
+    "english": "May I use that pen?",
+    "chinese": "可以用那支笔吗？"
+   },
+   {
+    "korean": "창문을 열어도 돼요?",
+    "english": "Do you mind if I open the window?",
+    "chinese": "可以开窗户吗？"
+   },
+   {
+    "korean": "라디오를 켜도 돼요?",
+    "english": "May I turn on the radio?",
+    "chinese": "可以开收音机吗？"
+   }
+  ],
+  "notes": "In place of -아/어도 되다, -아/어도 괜찮다 and -아/어도 좋다 can also be used.",
+  "unit": "Demands and Obligations, Permission and Prohibition",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-(으)면 안 되다",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -면/-으면 안 되다",
+  "meaning_en": "may not / not allowed to (expressing prohibition or limitation of a particular action)",
+  "meaning_zh": "不可以……；不能……（表禁止或限制）",
+  "meaning_ko": "어떤 행동을 하면 안 된다는 금지나 제한을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "실내에서 담배를 피우면 안 돼요.",
+    "english": "Smoking indoors is not allowed.",
+    "chinese": "室内不可以抽烟。"
+   },
+   {
+    "korean": "운전 중에 전화하면 안 돼요.",
+    "english": "Using the phone while driving is not allowed.",
+    "chinese": "开车时不可以打电话。"
+   },
+   {
+    "korean": "지금 길을 건너면 안 돼요.",
+    "english": "You may not cross the street now.",
+    "chinese": "现在不可以过马路。"
+   },
+   {
+    "korean": "수업 시간에는 영어로 말하면 안 돼요.",
+    "english": "During class, you may not speak in English.",
+    "chinese": "上课时间不可以说英语。"
+   },
+   {
+    "korean": "도서관에서 얘기하면 안 돼요.",
+    "english": "You're not allowed to talk in the library.",
+    "chinese": "在图书馆不可以说话。"
+   }
+  ],
+  "notes": "Check It Out!: -으면 안 되다 can be used in the double negative form -지 않으면 안 되다 to emphasize that a particular behavior must be performed (사지 않으면 안 돼요 = 사야 돼요).",
+  "unit": "Demands and Obligations, Permission and Prohibition",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-지 않아도 되다 (안 A/V-아/어도 되다)",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -지 않아도 되다 (= 안 -아/어도 되다)",
+  "meaning_en": "don't have to / need not (expressing that a behavior or state is not necessary)",
+  "meaning_zh": "不用……；不必……（表没有必要做某事）",
+  "meaning_ko": "어떤 행동을 하지 않아도 괜찮음을 나타내는 표현으로, '-아/어야 되다/하다'의 부정형.",
+  "examples": [
+   {
+    "korean": "유치원생은 버스 요금을 내지 않아도 돼요.",
+    "english": "Preschool students don't have to pay the bus fare.",
+    "chinese": "幼儿园学生不用付公交车费。"
+   },
+   {
+    "korean": "평일이니까 영화표를 미리 사지 않아도 돼요.",
+    "english": "Because it's a weekday, we don't have to buy tickets in advance.",
+    "chinese": "因为是平日，不用提前买电影票。"
+   },
+   {
+    "korean": "금요일에는 정장을 입지 않아도 돼요.",
+    "english": "On Fridays, we don't have to wear suits.",
+    "chinese": "星期五不用穿正装。"
+   },
+   {
+    "korean": "바쁘면 안 가도 돼요.",
+    "english": "If you're busy, you don't have to go.",
+    "chinese": "忙的话不去也行。"
+   },
+   {
+    "korean": "다이어트하지 않아도 돼요.",
+    "english": "You don't need to diet.",
+    "chinese": "不用减肥。"
+   }
+  ],
+  "notes": "",
+  "unit": "Demands and Obligations, Permission and Prohibition",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-고 싶다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -고 싶다",
+  "meaning_en": "want to (expressing the speaker's wish or hope)",
+  "meaning_zh": "想……；想要……（表说话人的愿望或希望）",
+  "meaning_ko": "말하는 사람의 바람이나 희망을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "한국말을 잘하고 싶어요.",
+    "english": "I want to speak Korean well.",
+    "chinese": "我想把韩语说好。"
+   },
+   {
+    "korean": "가족이 보고 싶어요.",
+    "english": "I want to see my family.",
+    "chinese": "我想见家人。"
+   },
+   {
+    "korean": "딸기를 먹고 싶어요.",
+    "english": "I want to eat strawberries.",
+    "chinese": "我想吃草莓。"
+   },
+   {
+    "korean": "커피를 마시고 싶어요.",
+    "english": "I want to drink some coffee.",
+    "chinese": "我想喝咖啡。"
+   },
+   {
+    "korean": "예쁜 장갑을 받고 싶어요.",
+    "english": "I'd like some nice looking gloves.",
+    "chinese": "我想要漂亮的手套。"
+   }
+  ],
+  "notes": "Check It Out!: When the subject is in the third person, -고 싶어하다 is used (에릭 씨는 자동차를 사고 싶어요 (X) → 사고 싶어해요 (O)). -고 싶다 cannot be added directly to adjectives, but if -아/어지다 is added first to make it a verb, it can be used (날씬하고 싶어요 (X) → 날씬해지고 싶어요 (O)). -고 싶다 can be combined with the particles -을/를 and -이/가.",
+  "unit": "Expressions of Hope",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-았/었으면 좋겠다",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -았/었으면 좋겠다 (하다 → 했으면 좋겠다)",
+  "meaning_en": "I wish / I hope (expressing a wish or hope about something not yet realized)",
+  "meaning_zh": "要是……就好了；希望……（表对尚未实现之事的愿望或希望）",
+  "meaning_ko": "아직 실현되지 않은 일에 대한 바람이나 희망을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "차가 있었으면 좋겠어요.",
+    "english": "I wish I had a car.",
+    "chinese": "要是有车就好了。"
+   },
+   {
+    "korean": "돈이 많았으면 좋겠어요.",
+    "english": "I wish I had a lot of money.",
+    "chinese": "要是有很多钱就好了。"
+   },
+   {
+    "korean": "크리스마스에 눈이 왔으면 좋겠어요.",
+    "english": "I hope it snows on Christmas.",
+    "chinese": "希望圣诞节下雪。"
+   },
+   {
+    "korean": "30살 전에 결혼했으면 좋겠어요.",
+    "english": "I'd like to get married before I'm 30.",
+    "chinese": "希望在30岁之前结婚。"
+   },
+   {
+    "korean": "좀 쉬었으면 좋겠어요.",
+    "english": "I wish I could have some time off.",
+    "chinese": "希望能休息一下。"
+   }
+  ],
+  "notes": "Check It Out!: -(으)면 좋겠다 can be used in the same sense as -았/었으면 좋겠다, but because -았/었으면 좋겠다 supposes the realization of an as yet unrealized state, it more strongly emphasizes the wish.",
+  "unit": "Expressions of Hope",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-아/어서",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -아/어서 (어간의 모음이 ㅏ/ㅗ이면 -아서, 그 외에는 -어서, 하다→해서, 이다→이어서/이라서)",
+  "meaning_en": "because / so / on account of (the first clause is the reason or cause of the second)",
+  "meaning_zh": "因为……；所以……（表原因或理由）",
+  "meaning_ko": "앞 절의 내용이 뒤 절의 이유나 원인이 됨을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "만나서 반갑습니다.",
+    "english": "Nice to meet you.",
+    "chinese": "见到你很高兴。"
+   },
+   {
+    "korean": "기분이 좋아서 춤을 췄어요.",
+    "english": "I was in such a good mood that I danced.",
+    "chinese": "因为心情好，所以跳舞了。"
+   },
+   {
+    "korean": "늦어서 죄송합니다.",
+    "english": "I'm sorry for arriving late.",
+    "chinese": "对不起，我来晚了。"
+   },
+   {
+    "korean": "이번 주는 바빠서 시간이 없어요.",
+    "english": "This week I'm busy, so I don't have time.",
+    "chinese": "这周很忙，所以没有时间。"
+   },
+   {
+    "korean": "그 옷은 작아서 못 입어요.",
+    "english": "Those clothes are so small that I can't wear them.",
+    "chinese": "那件衣服太小了，穿不了。"
+   }
+  ],
+  "notes": "-아/어서 cannot be used in imperative or propositive sentences (use -(으)니까 instead). Tense markers such as -았/었- and -겠- cannot come before -아/어서.",
+  "unit": "Unit 9: Reasons and Causes",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-(으)니까",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -(으)니까 (어간이 모음으로 끝나면 -니까, 자음으로 끝나면 -으니까)",
+  "meaning_en": "because / so (expressing a reason or cause)",
+  "meaning_zh": "因为……；所以……（表原因或理由）",
+  "meaning_ko": "앞 절이 뒤 절의 이유나 원인이 됨을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "길이 막히니까 지하철을 탑시다.",
+    "english": "The roads are full of traffic, so let's take the subway.",
+    "chinese": "路上堵车，所以坐地铁吧。"
+   },
+   {
+    "korean": "추우니까 창문 좀 닫아 주세요.",
+    "english": "It's cold, so please close the window.",
+    "chinese": "很冷，请把窗户关上。"
+   },
+   {
+    "korean": "샤워를 하니까 기분이 좋아요.",
+    "english": "I took a shower, so now I feel good.",
+    "chinese": "洗了个澡，所以心情很好。"
+   },
+   {
+    "korean": "이번 주는 바쁘니까 다음 주에 합시다.",
+    "english": "This week I'm busy, so let's do it next week.",
+    "chinese": "这周很忙，所以下周做吧。"
+   },
+   {
+    "korean": "여자들은 꽃을 좋아하니까 꽃을 선물하세요.",
+    "english": "Girls like flowers, so give her some flowers.",
+    "chinese": "女孩子喜欢花，所以送花吧。"
+   }
+  ],
+  "notes": "Unlike -아/어서, -(으)니까 can be used with imperative and propositive sentences, and tense markers such as -았/었- and -겠- can precede it.",
+  "unit": "Unit 9: Reasons and Causes",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N 때문에, A/V-기 때문에",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 때문에 / 동사·형용사 어간 + -기 때문에",
+  "meaning_en": "because of (N) / because (A/V) — reason or cause",
+  "meaning_zh": "因为……（名词后用 때문에，动词/形容词后用 -기 때문에）",
+  "meaning_ko": "앞 절이 뒤 절 상황의 이유나 원인임을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "눈 때문에 길이 미끄러워요.",
+    "english": "The road is slippery because of the snow.",
+    "chinese": "因为下雪，路很滑。"
+   },
+   {
+    "korean": "아이 때문에 피곤해요.",
+    "english": "I'm tired because of the children.",
+    "chinese": "因为孩子，很累。"
+   },
+   {
+    "korean": "외국인이기 때문에 한국말을 잘 못해요.",
+    "english": "I can't speak Korean well because I'm a foreigner.",
+    "chinese": "因为我是外国人，所以韩语说得不好。"
+   },
+   {
+    "korean": "비 때문에 차가 많이 막혔어요.",
+    "english": "There was a lot of traffic due to the rain.",
+    "chinese": "因为下雨，车堵得很厉害。"
+   },
+   {
+    "korean": "토요일은 친구 생일이기 때문에 만날 수 없어요.",
+    "english": "Saturday is my friend's birthday, so I won't be able to meet you.",
+    "chinese": "周六是我朋友的生日，所以见不了面。"
+   }
+  ],
+  "notes": "-기 때문에 cannot be used in imperative or propositive sentences (use -(으)니까 instead).",
+  "unit": "Unit 9: Reasons and Causes",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-아/어 주세요, V-아/어 주시겠어요?",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -아/어 주세요 / -아/어 주시겠어요? (어간의 모음이 ㅏ/ㅗ이면 -아 주세요, 그 외에는 -어 주세요, 하다→해 주세요; 높임 대상에는 -아/어 드리세요)",
+  "meaning_en": "please do (something for me/someone); would you please do ... — making a request",
+  "meaning_zh": "请……（为某人做某事）",
+  "meaning_ko": "다른 사람에게 어떤 행동을 해 줄 것을 요청하는 표현.",
+  "examples": [
+   {
+    "korean": "문 좀 닫아 주세요.",
+    "english": "Please close the door.",
+    "chinese": "请把门关上。"
+   },
+   {
+    "korean": "사진 좀 찍어 주시겠어요?",
+    "english": "Would you please take our picture?",
+    "chinese": "能请您帮我们拍张照吗？"
+   },
+   {
+    "korean": "자리를 안내해 드리세요.",
+    "english": "Please show her to a seat.",
+    "chinese": "请带她就座。"
+   },
+   {
+    "korean": "저 좀 도와주시겠어요?",
+    "english": "Excuse me, could you please help me out?",
+    "chinese": "能请您帮我一下吗？"
+   },
+   {
+    "korean": "왕단 씨, 이 문법 좀 가르쳐 주세요.",
+    "english": "Wang Dan, please teach me this grammar.",
+    "chinese": "王丹，请教我一下这个语法。"
+   }
+  ],
+  "notes": "-아/어 주다/드리다 is used when the speaker or the subject of the sentence performs an action that assists the listener or another person. When the assistance has already been completed, -아/어 줬어요 or -아/어 드렸어요 is used.",
+  "unit": "Unit 10: Making Requests and Assisting",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-아/어 줄게요, V-아/어 줄까요?",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -아/어 줄게요 / -아/어 줄까요? (어간의 모음이 ㅏ/ㅗ이면 -아 줄게요, 그 외에는 -어 줄게요, 하다→해 줄게요; 높임 대상에는 -아/어 드릴게요/드릴까요?)",
+  "meaning_en": "shall I / let me / I'll do (something for you) — offering help",
+  "meaning_zh": "我（来）给你……吧；要我帮你……吗？",
+  "meaning_ko": "다른 사람을 돕기 위해 어떤 행동을 하겠다는 뜻을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "우산이 두 개 있는데 빌려 줄까요?",
+    "english": "I have two umbrellas, so shall I lend you one?",
+    "chinese": "我有两把伞，要借给你一把吗？"
+   },
+   {
+    "korean": "제가 도와 드릴게요.",
+    "english": "Let me help you with that.",
+    "chinese": "我来帮您吧。"
+   },
+   {
+    "korean": "선생님, 제가 들어 드릴까요?",
+    "english": "Teacher, shall I help you out?",
+    "chinese": "老师，要我帮您拿吗？"
+   },
+   {
+    "korean": "네, 손님, 금방 치워 드릴게요.",
+    "english": "Okay, I'll clear it off right away.",
+    "chinese": "好的，客人，我马上给您收拾。"
+   },
+   {
+    "korean": "네, 켜 드릴게요.",
+    "english": "Sure, I'll turn it on.",
+    "chinese": "好的，我给您打开。"
+   }
+  ],
+  "notes": "",
+  "unit": "Unit 10: Making Requests and Assisting",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-아/어 보다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -아/어 보다 (어간의 모음이 ㅏ/ㅗ이면 -아 보다, 그 외에는 -어 보다, 하다→해 보다)",
+  "meaning_en": "to try doing (something); to have the experience of doing",
+  "meaning_zh": "尝试做……；（曾经）做过……",
+  "meaning_ko": "어떤 행동을 시도하거나 경험해 봄을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "갈비를 먹어 봤어요?",
+    "english": "Have you tried Korean ribs?",
+    "chinese": "你吃过（韩式）排骨吗？"
+   },
+   {
+    "korean": "한번 입어 보세요.",
+    "english": "Please try it on.",
+    "chinese": "请试穿一下。"
+   },
+   {
+    "korean": "제주도에 가 보고 싶어요.",
+    "english": "I want to visit Jeju Island.",
+    "chinese": "我想去济州岛看看。"
+   },
+   {
+    "korean": "이 신발 신어 봐도 돼요?",
+    "english": "May I try on these shoes?",
+    "chinese": "我可以试穿一下这双鞋吗？"
+   },
+   {
+    "korean": "네, 신어 보세요.",
+    "english": "Yes, please try them on.",
+    "chinese": "好的，请试穿一下。"
+   }
+  ],
+  "notes": "When -아/어 보다 is used to express the experiencing of something, it is not used together with the verb 보다 (e.g., 한국 영화를 봐 봤어요 (X) → 한국 영화를 본 적이 있어요 (O)).",
+  "unit": "Unit 11: Trying New Things and Experiences",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)ㄴ 적이 있다/없다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)ㄴ 적이 있다/없다 (어간이 모음으로 끝나면 -ㄴ 적이 있다/없다, 자음으로 끝나면 -은 적이 있다/없다)",
+  "meaning_en": "to have / have not (ever) done; expressing past experience",
+  "meaning_zh": "（曾经）做过……／（从未）做过……（表过去经历）",
+  "meaning_ko": "과거에 어떤 일을 경험했거나 경험하지 않았음을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "인도 영화를 본 적이 있어요.",
+    "english": "I've seen an Indian movie.",
+    "chinese": "我看过印度电影。"
+   },
+   {
+    "korean": "회사에 지각한 적이 없어요.",
+    "english": "I've never been late to work.",
+    "chinese": "我上班从没迟到过。"
+   },
+   {
+    "korean": "이탈리아에 가 본 적이 있어요?",
+    "english": "Have you ever been to Italy?",
+    "chinese": "你去过意大利吗？"
+   },
+   {
+    "korean": "와, 난 지금까지 한 번도 연예인을 만난 적이 없어요.",
+    "english": "Wow, I've never met a celebrity.",
+    "chinese": "哇，我到现在一次都没见过艺人。"
+   },
+   {
+    "korean": "아니요, 깎아 본 적이 없어요.",
+    "english": "No, I've never been able to bargain.",
+    "chinese": "没有，我从没砍过价。"
+   }
+  ],
+  "notes": "-(으)ㄴ 적이 있다 is not used when describing things that are often repeated or are everyday occurrences.",
+  "unit": "Unit 11: Trying New Things and Experiences",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)ㄹ까요?",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)ㄹ까요? (어간이 모음이나 ㄹ로 끝나면 -ㄹ까요?, 자음으로 끝나면 -을까요?)",
+  "meaning_en": "shall we ...? (suggesting doing something together with the listener)",
+  "meaning_zh": "我们……好吗？（表提议一起做某事）",
+  "meaning_ko": "함께 무엇을 하자고 제안하거나 상대방의 의견을 물을 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "같이 농구할까요?",
+    "english": "Shall we play some basketball?",
+    "chinese": "一起打篮球好吗？"
+   },
+   {
+    "korean": "여기에서 좀 쉴까요?",
+    "english": "Why don't we rest over here?",
+    "chinese": "在这儿休息一下好吗？"
+   },
+   {
+    "korean": "무슨 영화를 볼까요?",
+    "english": "Which movie shall we see?",
+    "chinese": "我们看什么电影好呢？"
+   },
+   {
+    "korean": "주말에 같이 노래방에 갈까요?",
+    "english": "Shall we go sing karaoke over the weekend?",
+    "chinese": "周末一起去练歌房好吗？"
+   },
+   {
+    "korean": "퇴근 후에 술 한 잔 할까요?",
+    "english": "Would you like to go for a drink after work?",
+    "chinese": "下班后去喝一杯怎么样？"
+   }
+  ],
+  "notes": "",
+  "unit": "Unit 12: Asking Opinions and Making Suggestions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)ㅂ시다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)ㅂ시다 (어간이 모음으로 끝나면 -ㅂ시다, 자음으로 끝나면 -읍시다); 부정은 -지 맙시다/-지 마요",
+  "meaning_en": "let's ... (suggesting or proposing to do something together)",
+  "meaning_zh": "让我们……吧（表提议或劝诱）",
+  "meaning_ko": "함께 무엇을 하자고 제안하거나 권유할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "한식을 먹읍시다.",
+    "english": "Let's eat Korean food.",
+    "chinese": "我们吃韩餐吧。"
+   },
+   {
+    "korean": "버스를 타지 마요. 지하철을 탑시다.",
+    "english": "Let's not take the bus. Let's take the subway.",
+    "chinese": "别坐公交车，我们坐地铁吧。"
+   },
+   {
+    "korean": "영화를 보지 맙시다.",
+    "english": "Let's not see a movie.",
+    "chinese": "我们别看那部电影了。"
+   },
+   {
+    "korean": "10분 후에 출발합시다.",
+    "english": "Let's leave in 10 minutes.",
+    "chinese": "我们10分钟后出发吧。"
+   },
+   {
+    "korean": "월요일에 시험이 있으니까 클럽에 가지 맙시다. 같이 공부합시다.",
+    "english": "We have a test on Monday, so let's not go to a club. Let's study together.",
+    "chinese": "周一有考试，所以我们别去夜店了。一起学习吧。"
+   }
+  ],
+  "notes": "-(으)ㅂ시다 can be used in formal situations when suggesting or urging a group of people to do something, or when the listener is younger or of lower status than the speaker. It cannot be used toward someone older or of higher status than the speaker; in such cases 같이 -(으)세요 is appropriate.",
+  "unit": "Unit 12: Asking Opinions and Making Suggestions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)시겠어요?",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)시겠어요? (어간이 모음으로 끝나면 -시겠어요?, 자음으로 끝나면 -으시겠어요?)",
+  "meaning_en": "would you (like to) ...? (polite suggestion or asking about the listener's intention)",
+  "meaning_zh": "您要……吗？／您愿意……吗？（礼貌地提议或询问意向）",
+  "meaning_ko": "상대방에게 공손하게 제안하거나 그 의향을 물을 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "도넛 좀 드시겠어요?",
+    "english": "Would you like a donut?",
+    "chinese": "您要来个甜甜圈吗？"
+   },
+   {
+    "korean": "방을 예약하시겠어요?",
+    "english": "Would you like to reserve a room?",
+    "chinese": "您要预订房间吗？"
+   },
+   {
+    "korean": "커피에 설탕을 넣으시겠어요?",
+    "english": "Would you like sugar in your coffee?",
+    "chinese": "您的咖啡要加糖吗？"
+   },
+   {
+    "korean": "내일 몇 시에 오시겠어요?",
+    "english": "What time will you come tomorrow?",
+    "chinese": "您明天几点来呢？"
+   },
+   {
+    "korean": "30분 후에 다시 전화해 주시겠어요?",
+    "english": "Would you mind calling me in 30 minutes?",
+    "chinese": "能请您30分钟后再打给我吗？"
+   }
+  ],
+  "notes": "",
+  "unit": "Unit 12: Asking Opinions and Making Suggestions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)ㄹ래요?",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)ㄹ래요? (어간이 모음이나 ㄹ로 끝나면 -ㄹ래요?, 자음으로 끝나면 -을래요?)",
+  "meaning_en": "do you want to ...? / how about ...? (asking the listener's preference or intention)",
+  "meaning_zh": "你想……吗？／……怎么样？（询问对方意向或偏好）",
+  "meaning_ko": "상대방의 의향이나 취향을 묻거나 부드럽게 요청할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "등산 같이 갈래요?",
+    "english": "Do you want to go hiking?",
+    "chinese": "你想一起去爬山吗？"
+   },
+   {
+    "korean": "커피 한 잔 하실래요?",
+    "english": "Would you like to have a cup of coffee?",
+    "chinese": "您想喝杯咖啡吗？"
+   },
+   {
+    "korean": "한강에서 배를 타지 않을래요?",
+    "english": "Would you like to go ride a boat on the Han River?",
+    "chinese": "你想去汉江坐船吗？"
+   },
+   {
+    "korean": "저는 갈비탕을 먹을래요.",
+    "english": "I'll have beef rib soup.",
+    "chinese": "我想吃排骨汤。"
+   },
+   {
+    "korean": "그럼 저녁에 서울타워에 같이 갈래요?",
+    "english": "In that case, how about going to Seoul Tower this evening?",
+    "chinese": "那今晚一起去首尔塔怎么样？"
+   }
+  ],
+  "notes": "",
+  "unit": "Unit 12: Asking Opinions and Making Suggestions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-겠어요",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -겠어요 (부정: -지 않겠어요 / 안 -겠어요)",
+  "meaning_en": "I will / I'm going to (the speaker's intention or will); also 'should/will' for something about to happen",
+  "meaning_zh": "我要……；我会……（表说话人的意志）；也表即将发生的事",
+  "meaning_ko": "화자의 의지나 의도를 나타내거나, 곧 일어날 일을 추측할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "올해에는 담배를 꼭 끊겠습니다.",
+    "english": "This year I'm going to stop smoking.",
+    "chinese": "今年我一定要戒烟。"
+   },
+   {
+    "korean": "제가 출장을 가겠습니다.",
+    "english": "I'll go on the business trip.",
+    "chinese": "我去出差。"
+   },
+   {
+    "korean": "잠시 후에 인천공항에 도착하겠습니다.",
+    "english": "We will soon arrive at Incheon Airport.",
+    "chinese": "我们马上就要到达仁川机场了。"
+   },
+   {
+    "korean": "아침마다 운동하겠어요.",
+    "english": "I plan to exercise every morning.",
+    "chinese": "我打算每天早上运动。"
+   },
+   {
+    "korean": "내일부터는 일찍 오겠습니다.",
+    "english": "I will arrive early starting tomorrow.",
+    "chinese": "从明天起我会早点来。"
+   }
+  ],
+  "notes": "When -겠어요 is used to express intention or will, the subject cannot be in the third person. -겠- is also used idiomatically in expressions such as 처음 뵙겠습니다 (Nice to meet you), 잘 먹겠습니다 (Thank you for the food), and 학교 다녀오겠습니다 (I'm off to school), and when the speaker wants to be less assertive and more gentle and polite.",
+  "unit": "Unit 13: Intentions and Plans",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)ㄹ게요",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)ㄹ게요 (어간이 모음이나 ㄹ로 끝나면 -ㄹ게요, 자음으로 끝나면 -을게요)",
+  "meaning_en": "I will (do) — expressing the speaker's decision, intention, or a promise to the listener",
+  "meaning_zh": "我会……的（表说话人的决心、意志或对对方的承诺）",
+  "meaning_ko": "화자가 앞으로 할 일에 대한 결정이나 의지를 상대방에게 약속하듯 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "제가 전화 받을게요.",
+    "english": "I'll answer the phone.",
+    "chinese": "我来接电话。"
+   },
+   {
+    "korean": "죄송합니다. 일이 있어서 먼저 갈게요.",
+    "english": "Sorry, I have work to do, so I'll be leaving now.",
+    "chinese": "抱歉，我有事，先走了。"
+   },
+   {
+    "korean": "저녁에 전화할게요.",
+    "english": "I'll call you in the evening.",
+    "chinese": "我晚上给你打电话。"
+   },
+   {
+    "korean": "내일은 꼭 가지고 올게요.",
+    "english": "I'll definitely bring it tomorrow.",
+    "chinese": "我明天一定带来。"
+   },
+   {
+    "korean": "네, 알아요. 제가 종이에 써 드릴게요.",
+    "english": "Yes, I do. I'll write it down (on paper) for you.",
+    "chinese": "嗯，知道。我给您写在纸上。"
+   }
+  ],
+  "notes": "This expression can be used only with verbs that express the will of the subject (it cannot be used with adjectives), only with first-person subjects, and cannot be used in questions.",
+  "unit": "Unit 13: Intentions and Plans",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)ㄹ래요",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)ㄹ래요 (어간이 모음이나 ㄹ로 끝나면 -ㄹ래요, 자음으로 끝나면 -을래요)",
+  "meaning_en": "I will / I'm going to (expressing the speaker's will or intention)",
+  "meaning_zh": "我要……；我打算……（表说话人的意志或打算）",
+  "meaning_ko": "화자가 무엇을 하겠다는 의지나 의향을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "너무 배가 불러요. 그만 먹을래요.",
+    "english": "I'm so full. I'm not going to eat any more.",
+    "chinese": "太饱了。我不吃了。"
+   },
+   {
+    "korean": "커피 마실래요.",
+    "english": "I'll have some coffee.",
+    "chinese": "我要喝咖啡。"
+   },
+   {
+    "korean": "이번 방학에는 여행을 할래요.",
+    "english": "This vacation, I'm going on a trip.",
+    "chinese": "这个假期我要去旅行。"
+   },
+   {
+    "korean": "저는 커피를 마실래요.",
+    "english": "I'd like some coffee.",
+    "chinese": "我想喝咖啡。"
+   },
+   {
+    "korean": "네, 안 갈래요. 피곤해서 집에서 쉴래요.",
+    "english": "No, I'm not going. I'm tired, so I plan on resting at home.",
+    "chinese": "嗯，不去了。我累了，想在家休息。"
+   }
+  ],
+  "notes": "This expression can be used only with verbs, and only with first-person subjects.",
+  "unit": "Unit 13: Intentions and Plans",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)니까",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)니까 (어간이 모음으로 끝나면 -니까, 자음으로 끝나면 -으니까)",
+  "meaning_en": "when / only to discover — expressing the discovery of a fact as a result of performing an action",
+  "meaning_zh": "（做了某事）结果发现／才知道……",
+  "meaning_ko": "앞 절의 행동을 한 결과 뒤 절의 사실을 발견하게 됨을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "집에 들어오니까 맛있는 냄새가 나요.",
+    "english": "I arrived home to discover the smell of something tasty.",
+    "chinese": "一进家门就闻到香喷喷的味道。"
+   },
+   {
+    "korean": "아침에 일어나니까 선물이 있었어요.",
+    "english": "When I woke up in the morning, the gift had already arrived.",
+    "chinese": "早上起来一看，礼物已经到了。"
+   },
+   {
+    "korean": "집에 오니까 밤 12시였어요.",
+    "english": "When I arrived home, it was midnight.",
+    "chinese": "回到家一看，已经是晚上12点了。"
+   },
+   {
+    "korean": "네, 그런데 전화하니까 안 받아요.",
+    "english": "Yes, but only to find he did not answer.",
+    "chinese": "嗯，可是打过去发现他不接。"
+   },
+   {
+    "korean": "만 원이요. 어제 백화점에 가니까 세일을 하고 있었어요.",
+    "english": "10,000 won. When I went to the department store yesterday, they were having a sale.",
+    "chinese": "一万韩元。昨天去百货商店一看，正在打折。"
+   }
+  ],
+  "notes": "When -(으)니까 expresses the result of an action (discovery), -았/었- and -겠- cannot precede it.",
+  "unit": "Unit 14: Background Information and Explanations",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)러 가다/오다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)러 가다/오다 (어간이 모음이나 ㄹ로 끝나면 -러 가다/오다, 자음으로 끝나면 -으러 가다/오다)",
+  "meaning_en": "to go / come in order to (do something)",
+  "meaning_zh": "去／来（做某事）（表目的）",
+  "meaning_ko": "어떤 행동을 하기 위해 장소로 가거나 옴을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "옷을 사러 동대문 시장에 가요.",
+    "english": "We're going to Dongdaemun Market to buy clothes.",
+    "chinese": "我们去东大门市场买衣服。"
+   },
+   {
+    "korean": "한국 팬들을 만나러 한국에 왔어요.",
+    "english": "I came to Korea to see my Korean fans.",
+    "chinese": "我为了见韩国粉丝来到了韩国。"
+   },
+   {
+    "korean": "은행에 돈을 찾으러 가요.",
+    "english": "I'm going to the bank to withdraw some money.",
+    "chinese": "我去银行取钱。"
+   },
+   {
+    "korean": "주말에 우리 집에 놀러 오세요.",
+    "english": "Please come to visit over the weekend.",
+    "chinese": "周末请来我家玩。"
+   },
+   {
+    "korean": "한국 춤을 배우러 학원에 다녀요.",
+    "english": "I'm attending an academy to learn Korean dance.",
+    "chinese": "我去学院学韩国舞蹈。"
+   }
+  ],
+  "notes": "Only movement verbs such as 가다, 오다, and 다니다 can be used after -(으)러. Other movement verbs such as 가다, 오다, 올라가다, 내려가다, 들어가다, 나가다, 여행하다, and 이사하다 cannot be used before -(으)러.",
+  "unit": "Unit 15: Purpose and Intention",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)려고",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)려고 (어간이 모음으로 끝나면 -려고, 자음으로 끝나면 -으려고)",
+  "meaning_en": "in order to / so that (expresses the speaker's intention or plan)",
+  "meaning_zh": "为了……；打算……（表说话人的意图或计划）",
+  "meaning_ko": "말하는 사람의 의도나 계획을 나타내는 표현으로, 뒤 절의 내용을 이루기 위해 앞 절의 행동을 함을 나타낸다.",
+  "examples": [
+   {
+    "korean": "살을 빼려고 매일 세 시간씩 운동을 해요.",
+    "english": "I exercise three hours a day to try to lose weight.",
+    "chinese": "为了减肥，我每天运动三个小时。"
+   },
+   {
+    "korean": "아내에게 주려고 선물을 샀어요.",
+    "english": "I bought a present to give to my wife.",
+    "chinese": "我买了一份礼物，打算送给妻子。"
+   },
+   {
+    "korean": "잠을 자지 않으려고 커피를 5잔이나 마셨어요.",
+    "english": "I drank five cups of coffee so that I wouldn't go to sleep.",
+    "chinese": "为了不睡着，我喝了整整五杯咖啡。"
+   },
+   {
+    "korean": "네, 컴퓨터를 배우려고 하원에 다니고 있어요.",
+    "english": "Yes, I go to an academy to learn how to use computers.",
+    "chinese": "是的，我为了学电脑而去学院上课。"
+   },
+   {
+    "korean": "당신 목소리를 들으려고 전화했어요.",
+    "english": "I called so that I could hear your voice.",
+    "chinese": "我打电话是为了听你的声音。"
+   }
+  ],
+  "notes": "Compared with -(으)러: -(으)러 is used only with movement verbs such as 가다, 오다, 다니다, 올라가다 and 나가다, whereas -(으)려고 can be used with all verbs. -(으)러 can follow present, past and future tense verbs, but -(으)려고 sounds awkward with a future tense verb. -(으)러 can combine with -(으)ㅂ시다 and -(으)세요, while -(으)려고 cannot.",
+  "unit": "Unit 15. Purpose and Intention",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)려고 하다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)려고 하다 (어간이 모음으로 끝나면 -려고 하다, 자음으로 끝나면 -으려고 하다)",
+  "meaning_en": "plan to / intend to (the subject's intention or plan not yet acted upon)",
+  "meaning_zh": "打算……；计划……（表主语的意图或尚未实行的计划）",
+  "meaning_ko": "주어의 의도나 아직 행동으로 옮기지 않은 계획을 나타내는 표현이다.",
+  "examples": [
+   {
+    "korean": "여름휴가 때 여행을 하려고 해요.",
+    "english": "I plan to travel during the summer vacation.",
+    "chinese": "我打算暑假去旅行。"
+   },
+   {
+    "korean": "결혼하면 아이를 두 명 낳으려고 해요.",
+    "english": "I intend to have two children once I'm married.",
+    "chinese": "我打算结婚后生两个孩子。"
+   },
+   {
+    "korean": "방학 동안 운전을 배우려고 했어요. 그런데 팔을 다쳐서 못 배웠어요.",
+    "english": "I had planned on learning how to drive during the vacation. But I injured my arm and wasn't able to.",
+    "chinese": "我本来打算假期学开车，但胳膊受了伤，没能学成。"
+   },
+   {
+    "korean": "새 차를 사려고 해요.",
+    "english": "I plan to buy a new car.",
+    "chinese": "我打算买辆新车。"
+   },
+   {
+    "korean": "저는 회사에 취직하려고 해요.",
+    "english": "I plan on getting a job at a company.",
+    "chinese": "我打算进公司工作。"
+   }
+  ],
+  "notes": "-(으)려고 했다 is the past tense form of -(으)려고 하다; it is used when the intended action or plan did not materialize as expected.",
+  "unit": "Unit 15. Purpose and Intention",
+  "source": "private-book"
+ },
+ {
+  "pattern": "N을/를 위해(서), V-기 위해(서)",
+  "level": "TOPIK 1-2",
+  "formation": "명사 + 을/를 위해(서); 동사 어간 + -기 위해(서)",
+  "meaning_en": "for the sake of / in order to (do something for the sake of or to accomplish something)",
+  "meaning_zh": "为了……（表为了某事或为达成某目的而行动）",
+  "meaning_ko": "어떤 일을 위해서나 어떤 것을 이루기 위해서 행동함을 나타내는 표현이다.",
+  "examples": [
+   {
+    "korean": "건강을 위해서 매일 비타민을 먹고 있습니다.",
+    "english": "I take vitamins daily for my health.",
+    "chinese": "为了健康，我每天吃维生素。"
+   },
+   {
+    "korean": "군인은 나라를 위해서 일하는 사람입니다.",
+    "english": "Soldiers are people who work for their country.",
+    "chinese": "军人是为国家工作的人。"
+   },
+   {
+    "korean": "훌륭한 스케이트 선수가 되기 위해 열심히 연습을 합니다.",
+    "english": "I practice hard to become a great skater.",
+    "chinese": "为了成为优秀的滑冰选手，我努力练习。"
+   },
+   {
+    "korean": "저는 가족을 위해서 매일 기도하고 있어요.",
+    "english": "I pray for my family every day.",
+    "chinese": "我每天为家人祈祷。"
+   },
+   {
+    "korean": "이 집을 사기 위해서 우리 부부가 열심히 돈을 모았어요.",
+    "english": "We both worked hard to save money to buy this home.",
+    "chinese": "为了买这套房子，我们夫妻俩努力攒钱。"
+   }
+  ],
+  "notes": "-기 위해서 cannot be added directly to adjectives; however, if -아/어지다 has been added to an adjective, making it a verb, then it can be used with -기 위해서 (e.g. 건강해지기 위해서 운동을 합니다, not 건강하기 위해서). Compared with -(으)려고, -기 위해서 can be used with -아/어야 해요, -(으)ㅂ시다, -(으)세요 and -(으)ㄹ까요?, while -(으)려고 cannot.",
+  "unit": "Unit 15. Purpose and Intention",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-기로 하다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -기로 하다",
+  "meaning_en": "decide to / make a promise to (do something)",
+  "meaning_zh": "决定……；约定……（表与他人约定或自己下决心）",
+  "meaning_ko": "다른 사람과 약속을 하거나 스스로 결심한 내용을 나타내는 표현이다.",
+  "examples": [
+   {
+    "korean": "건강 때문에 올해부터 담배를 끊기로 했어요.",
+    "english": "I made the decision to stop smoking for my health starting this year.",
+    "chinese": "因为健康原因，我决定从今年开始戒烟。"
+   },
+   {
+    "korean": "주말에 친구하고 같이 등산하기로 했어요.",
+    "english": "I decided to go hiking with my friend over the weekend.",
+    "chinese": "我决定周末和朋友一起去爬山。"
+   },
+   {
+    "korean": "우리는 3년 후에 결혼하기로 했습니다.",
+    "english": "We've decided to get married three years from now.",
+    "chinese": "我们决定三年后结婚。"
+   },
+   {
+    "korean": "이번 주말에 캐럴 씨와 데이트하기로 했어요.",
+    "english": "Carol and I have decided to go on a date this weekend.",
+    "chinese": "我和卡萝尔决定这个周末去约会。"
+   },
+   {
+    "korean": "부디 씨가 가져오기로 했어요.",
+    "english": "Budi decided to bring one.",
+    "chinese": "布迪决定带来（相机）。"
+   }
+  ],
+  "notes": "While -기로 하다 is mainly used in its past tense forms of -기로 했어요/했습니다, it is sometimes used in its present tense form of -기로 해요. In such cases, it refers to the speaker and listener making a promise to do something.",
+  "unit": "Unit 15. Purpose and Intention",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-(으)면",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -(으)면 (어간이 모음으로 끝나면 -면, 자음으로 끝나면 -으면)",
+  "meaning_en": "if / when / once (expresses a condition or a supposition)",
+  "meaning_zh": "如果……；（如果）……的话（表条件或假设）",
+  "meaning_ko": "어떤 사실이나 반복되는 상황의 조건을 나타내거나 아직 실현되지 않은 상황을 가정할 때 쓰는 표현이다.",
+  "examples": [
+   {
+    "korean": "컴퓨터를 많이 하면 눈이 아파요.",
+    "english": "If you spend too much time on the computer, your eyes hurt.",
+    "chinese": "电脑玩多了，眼睛会疼。"
+   },
+   {
+    "korean": "나는 기분이 좋으면 춤을 춰요.",
+    "english": "I dance when I'm in a good mood.",
+    "chinese": "我心情好的时候就跳舞。"
+   },
+   {
+    "korean": "돈을 많이 벌면 집을 살 거예요.",
+    "english": "If I make a lot of money, I'm going to buy a house.",
+    "chinese": "如果赚很多钱，我就买房子。"
+   },
+   {
+    "korean": "날씨가 좋으면 등산을 해요. 그렇지만 비나 눈이 오면 집에서 텔레비전을 봐요.",
+    "english": "If the weather's nice, I go hiking. But if it rains or snows, then I watch TV at home.",
+    "chinese": "天气好的话就去爬山，但下雨或下雪的话就在家看电视。"
+   },
+   {
+    "korean": "고향에 돌아가면 연락하세요.",
+    "english": "Please stay in touch when you're back home.",
+    "chinese": "回到家乡后请跟我联系。"
+   }
+  ],
+  "notes": "Information about something that happened in the past cannot come before -(으)면; when an action occurs only once, -(으)ㄹ 때 is used instead (e.g. 어제 영화를 볼 때 울었어요, not 보면). Also, when the subjects of the first and second clauses are different, the particle following the subject of the first clause changes from 은/는 to 이/가.",
+  "unit": "Unit 16. Conditions and Suppositions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-(으)려면",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -(으)려면 (어간이 모음으로 끝나면 -려면, 자음으로 끝나면 -으려면)",
+  "meaning_en": "if you want to / if your intention is to",
+  "meaning_zh": "如果想……的话（表为达成某意图所需的条件）",
+  "meaning_ko": "앞 절에서 어떤 계획이나 의도를 말하고, 그 계획을 이루기 위해 필요한 조건을 뒤 절에서 제시하는 표현이다.",
+  "examples": [
+   {
+    "korean": "농구를 잘하려면 점프를 잘해야 돼요.",
+    "english": "If you want to play basketball well, you have to be able to jump high.",
+    "chinese": "要想篮球打得好，就得跳得高。"
+   },
+   {
+    "korean": "동대문에 가려면 지하철 4호선을 타세요.",
+    "english": "If you're trying to get to Dongdaemun, then please take subway line 4.",
+    "chinese": "如果要去东大门，请坐地铁4号线。"
+   },
+   {
+    "korean": "이 선생님을 만나려면 월요일에 학교로 가세요.",
+    "english": "If you want to meet with teacher Lee, then come to school on Monday.",
+    "chinese": "如果想见李老师，请周一去学校。"
+   },
+   {
+    "korean": "한국말을 잘하려면 매일 한국말로만 이야기하세요.",
+    "english": "If you want to speak Korean well, then only speak Korean every day.",
+    "chinese": "要想韩语说得好，就每天只用韩语对话。"
+   },
+   {
+    "korean": "잃어버리지 않으려면 펜에 이름을 쓰세요.",
+    "english": "If you don't want to lose your pen, then write your name on it.",
+    "chinese": "如果不想弄丢笔，就在上面写上名字。"
+   }
+  ],
+  "notes": "-(으)려면 is the shortened form of -(으)려고 하면. It is common for the following forms to be used in the second clause: -아/어야 해요/돼요, -(으)면 돼요, -(으)세요, 이/가 필요해요 and -는 게 좋아요.",
+  "unit": "Unit 16. Conditions and Suppositions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-아/어도",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -아/어도 (어간 끝 모음이 ㅏ/ㅗ이면 -아도, 그 외에는 -어도, 하다이면 -해도)",
+  "meaning_en": "even if / regardless of whether",
+  "meaning_zh": "即使……也……；不管……都……",
+  "meaning_ko": "앞 절의 행동이나 상태와 상관없이 뒤 절의 상황이 일어남을 나타내는 표현이다.",
+  "examples": [
+   {
+    "korean": "크게 말해도 할머니가 못 들어요.",
+    "english": "Grandma can't hear you even if you speak loudly.",
+    "chinese": "就算大声说，奶奶也听不见。"
+   },
+   {
+    "korean": "이 옷이 마음에 들어요. 비싸도 사고 싶어요.",
+    "english": "I like these clothes. I want to buy them even if they are expensive.",
+    "chinese": "我喜欢这件衣服。就算贵也想买。"
+   },
+   {
+    "korean": "뉴스를 들어도 이해하지 못해요.",
+    "english": "Even if I listen to the news, I can't understand it.",
+    "chinese": "就算听新闻，我也听不懂。"
+   },
+   {
+    "korean": "지금 2시 50분이에요. 택시를 타도 3시까지 못 가요.",
+    "english": "It's 2:50 right now. We won't make it by 3:00 even if we take a taxi.",
+    "chinese": "现在2点50分。就算打车，3点前也到不了。"
+   },
+   {
+    "korean": "바빠도 아침 식사를 꼭 해야 해요.",
+    "english": "You have to eat breakfast even if you're busy.",
+    "chinese": "就算忙，也一定要吃早饭。"
+   }
+  ],
+  "notes": "The meaning of -아/어도 can be emphasized by using 아무리 in front of the verb, giving the expression the meaning of 'no matter how (much)'.",
+  "unit": "Unit 16. Conditions and Suppositions",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-(으)ㄹ 거예요",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -(으)ㄹ 거예요 (어간이 모음으로 끝나면 -ㄹ 거예요, 자음으로 끝나면 -을 거예요; 과거 추측은 -았/었을 거예요)",
+  "meaning_en": "think / will (the speaker's supposition based on personal experience or on something seen or heard)",
+  "meaning_zh": "（我）想会……；大概会……（表有依据的推测）",
+  "meaning_ko": "개인적인 경험이나 보고 들은 것을 근거로 한 추측을 나타내는 표현이다.",
+  "examples": [
+   {
+    "korean": "그 옷을 입으면 더울 거예요.",
+    "english": "You'll be hot if you wear that.",
+    "chinese": "穿那件衣服的话会很热。"
+   },
+   {
+    "korean": "하영 씨에게는 보라색 티셔츠가 잘 어울릴 거예요.",
+    "english": "I think Hayeong would look good in a violet T-shirt.",
+    "chinese": "我觉得紫色T恤会很适合夏英。"
+   },
+   {
+    "korean": "7시니까 댄 씨는 벌써 퇴근했을 거예요.",
+    "english": "I think Dane has already left work because it's 7:00.",
+    "chinese": "现在7点了，丹应该已经下班了。"
+   },
+   {
+    "korean": "네, 그렇지만 자주 안 와서 지하철이 더 편할 거예요.",
+    "english": "Yes, there is, but it doesn't come very often, so the subway may be more convenient.",
+    "chinese": "有，但不常来，所以坐地铁可能更方便。"
+   },
+   {
+    "korean": "매일 음악을 들으면서 다니니까 좋아할 거예요.",
+    "english": "He listens to music every day on the way to school, so I think he'd like it.",
+    "chinese": "他每天上学路上都听音乐，所以应该会喜欢。"
+   }
+  ],
+  "notes": "When used to indicate supposition, -(으)ㄹ 거예요 cannot be used in questions; for questions -(으)ㄹ까요? is used.",
+  "unit": "Unit 17. Conjecture",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-(으)ㄹ까요?",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -(으)ㄹ까요? (어간이 모음으로 끝나면 -ㄹ까요?, 자음으로 끝나면 -을까요?; 과거 추측은 -았/었을까요?)",
+  "meaning_en": "I wonder if... / do you think...? (supposition in question form)",
+  "meaning_zh": "会……吗？；（你）觉得会……吗？（表推测的疑问句）",
+  "meaning_ko": "아직 일어나지 않은 일에 대한 추측을 의문문으로 나타내는 표현이다.",
+  "examples": [
+   {
+    "korean": "주말에 날씨가 더울까요?",
+    "english": "Do you think the weather will be hot this weekend?",
+    "chinese": "周末天气会热吗？"
+   },
+   {
+    "korean": "캐럴 씨가 오늘 나올까요?",
+    "english": "Will Carol show up today?",
+    "chinese": "卡萝尔今天会来吗？"
+   },
+   {
+    "korean": "댄 씨가 이 책을 읽었을까요?",
+    "english": "Do you think Dan has read this book?",
+    "chinese": "丹读过这本书吗？"
+   },
+   {
+    "korean": "요즘 꽃이 비쌀까요?",
+    "english": "Do you think flowers are expensive these days?",
+    "chinese": "最近花会很贵吗？"
+   },
+   {
+    "korean": "지금 가면 길이 막힐까요?",
+    "english": "Do you think there will be much traffic if we go now?",
+    "chinese": "现在去的话路上会堵吗？"
+   }
+  ],
+  "notes": "In response, -(으)ㄹ 거예요 and (으)ㄴ/는 것 같아요 are often used.",
+  "unit": "Unit 17. Conjecture",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-(으)ㄴ/는/(으)ㄹ 것 같다",
+  "level": "TOPIK 1-2",
+  "formation": "형용사 현재 -(으)ㄴ 것 같다; 동사 현재 -는 것 같다; 동사 과거 -(으)ㄴ 것 같다; 동사 미래 -(으)ㄹ 것 같다",
+  "meaning_en": "it looks / sounds / seems like (supposition; also used to state one's opinion politely and indirectly)",
+  "meaning_zh": "好像……；似乎……（表推测，也用于委婉表达个人看法）",
+  "meaning_ko": "어떤 일이 일어난 것 같거나 앞으로 일어날 것이라고 추측할 때, 또는 자신의 생각을 완곡하게 말할 때 쓰는 표현이다.",
+  "examples": [
+   {
+    "korean": "어제 비가 온 것 같아요.",
+    "english": "It looks like it rained yesterday.",
+    "chinese": "昨天好像下雨了。"
+   },
+   {
+    "korean": "지금 비가 오는 것 같아요.",
+    "english": "It looks like it's raining right now.",
+    "chinese": "现在好像在下雨。"
+   },
+   {
+    "korean": "비가 올 것 같아요.",
+    "english": "It looks like it's going to rain.",
+    "chinese": "好像要下雨了。"
+   },
+   {
+    "korean": "좀짠 것 같아요.",
+    "english": "It seems a little salty.",
+    "chinese": "好像有点咸。"
+   },
+   {
+    "korean": "일주일이 빨리 가는 것 같아요.",
+    "english": "It seems like the week is just flying by.",
+    "chinese": "感觉一周过得很快。"
+   },
+   {
+    "korean": "그 식당 주인이 친절한 것 같아요.",
+    "english": "That restaurant owner seems nice.",
+    "chinese": "那家餐厅的老板好像很亲切。"
+   }
+  ],
+  "notes": "-(으)ㄴ 것 같다 is a more direct expression and is used when the speaker has a clear and definite basis for the supposition. -(으)ㄹ 것 같다, on the other hand, is more indirect and is therefore used when making a vague supposition.",
+  "unit": "Unit 17. Conjecture",
+  "source": "private-book"
+ },
+ {
+  "pattern": "관형형 -(으)ㄴ/-는/-(으)ㄹ N",
+  "level": "TOPIK 1-2",
+  "formation": "형용사 현재 -(으)ㄴ N; 동사 현재 -는 N; 동사 과거 -(으)ㄴ N; 동사 미래 -(으)ㄹ N (부정형: 형용사 -지 않은 N, 동사 -지 않는 N)",
+  "meaning_en": "noun-modifying form 'that / who' (allows verbs and adjectives to modify nouns)",
+  "meaning_zh": "……的（定语形，使动词、形容词修饰名词）",
+  "meaning_ko": "동사나 형용사가 명사를 수식할 수 있게 하는 관형사형 표현이다.",
+  "examples": [
+   {
+    "korean": "예쁜 가방을 사고 싶어요.",
+    "english": "I want to buy a pretty purse.",
+    "chinese": "我想买一个漂亮的包。"
+   },
+   {
+    "korean": "소파에서 자는 사람이 누구예요?",
+    "english": "Who is that person (who is) sleeping on the sofa?",
+    "chinese": "在沙发上睡觉的人是谁？"
+   },
+   {
+    "korean": "오늘 저녁에 먹을 한국 음식이 뭐예요?",
+    "english": "What's the Korean dish (that) we'll have for dinner today?",
+    "chinese": "今晚要吃的韩国菜是什么？"
+   },
+   {
+    "korean": "재미있는 영화를 좋아해요.",
+    "english": "I like funny movies.",
+    "chinese": "我喜欢有趣的电影。"
+   },
+   {
+    "korean": "지금 커피를 마시는 사람이 누구예요?",
+    "english": "Who is the person (who is) drinking coffee?",
+    "chinese": "现在正在喝咖啡的人是谁？"
+   },
+   {
+    "korean": "할 일이 너무 많아서 못 만나요.",
+    "english": "I have so many things (that I have) to do that I can't meet up.",
+    "chinese": "要做的事太多，所以见不了面。"
+   }
+  ],
+  "notes": "When two or more adjectives are used in succession, only the final adjective is conjugated to the noun modifier form (e.g. 착하고 예쁜 여자를 좋아해요, not 착한 예쁜 여자를 좋아해요).",
+  "unit": "Unit 18. Changes in Parts of Speech",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-기",
+  "level": "TOPIK 1-2",
+  "formation": "동사·형용사 어간 + -기",
+  "meaning_en": "nominaliser -ing (turns verbs and adjectives into nouns)",
+  "meaning_zh": "……（把动词、形容词名词化，相当于“做……这件事”）",
+  "meaning_ko": "동사나 형용사를 명사로 바꾸어 주는 표현으로, 문장에서 주어나 목적어 등 여러 성분으로 쓰인다.",
+  "examples": [
+   {
+    "korean": "한국말을 공부하기가 어려워요.",
+    "english": "Studying Korean is difficult.",
+    "chinese": "学韩语很难。"
+   },
+   {
+    "korean": "제 취미는 요리하기예요.",
+    "english": "My hobby is cooking.",
+    "chinese": "我的爱好是做饭。"
+   },
+   {
+    "korean": "다리가 아파서 걷기가 힘들어요.",
+    "english": "My legs hurt, so walking is hard.",
+    "chinese": "腿疼，所以走路很吃力。"
+   },
+   {
+    "korean": "집이 멀어서 학교에 오기가 힘들어요.",
+    "english": "My house is far away, so coming to school is difficult.",
+    "chinese": "家太远，所以来学校很费劲。"
+   },
+   {
+    "korean": "말하기가 제일 어려워요.",
+    "english": "Speaking is most difficult.",
+    "chinese": "说（韩语）最难。"
+   },
+   {
+    "korean": "그 옷은 입기가 불편해요.",
+    "english": "Wearing it is uncomfortable.",
+    "chinese": "那件衣服穿着不舒服。"
+   }
+  ],
+  "notes": "-기 can be combined with a number of particles to form subjects, objects and adverbials in a sentence, e.g. -기(를) 좋아하다/싫어하다, -기(를) 바라다/원하다, -기(를) 시작하다/끝내다/그만두다, -기가 쉽다/어렵다/좋다/편하다/불편하다/힘들다, -기에 좋다/나쁘다.",
+  "unit": "Unit 18. Changes in Parts of Speech",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A-게",
+  "level": "TOPIK 1-2",
+  "formation": "형용사 어간 + -게",
+  "meaning_en": "adverbial '-ly' / 'in a ... manner' (turns adjectives into adverbs)",
+  "meaning_zh": "……地（把形容词变成副词，表方式、程度等）",
+  "meaning_ko": "형용사 어간에 붙어 문장에서 부사어로 쓰이며, 뒤에 오는 행동의 목적·기준·정도·방법 등을 나타내는 표현이다.",
+  "examples": [
+   {
+    "korean": "머리를 짧게 잘랐어요.",
+    "english": "I cut my hair short.",
+    "chinese": "我把头发剪短了。"
+   },
+   {
+    "korean": "오늘 아침에 늦게 일어났어요.",
+    "english": "I woke up late this morning.",
+    "chinese": "今天早上起晚了。"
+   },
+   {
+    "korean": "크게 읽으세요.",
+    "english": "Please read it loudly.",
+    "chinese": "请大声读。"
+   },
+   {
+    "korean": "화장실 청소를 해 주세요. 깨끗하게 해 주세요.",
+    "english": "Please tidy up the bathroom. Make it clean.",
+    "chinese": "请打扫一下卫生间。弄干净一点。"
+   },
+   {
+    "korean": "세일해서 싸게 샀어요.",
+    "english": "I bought it cheap on sale.",
+    "chinese": "因为打折，买得很便宜。"
+   },
+   {
+    "korean": "추우니까 따뜻하게 입어.",
+    "english": "It's going to be cold, so dress warmly.",
+    "chinese": "天冷，穿暖和点。"
+   }
+  ],
+  "notes": "Although the adverbial form of an adjective is made by adding -게 to the stem, in the case of 많다 and 이르다 the forms 많이 and 일찍 are used in favor of 많게 and 이르게. There are also cases in which both the -게 form and a different form are used (빠르다 → 빠르게/빨리, 적다 → 적게/조금, 느리다 → 느리게/천천히).",
+  "unit": "Unit 18. Changes in Parts of Speech",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A-아/어하다",
+  "level": "TOPIK 1-2",
+  "formation": "형용사 어간 + -아/어하다 (어간 끝 모음이 ㅏ/ㅗ이면 -아하다, 그 외에는 -어하다, 하다이면 -해하다)",
+  "meaning_en": "appears (to be) / seems (to feel) (turns some adjectives into verbs expressing the subject's feeling or outward appearance)",
+  "meaning_zh": "显得……；看起来（表对他人感受或外在表现的观察）",
+  "meaning_ko": "일부 형용사에 붙어 동사로 바꾸어, 말하는 사람이 관찰한 느낌이나 겉으로 드러난 모습을 나타내는 표현이다.",
+  "examples": [
+   {
+    "korean": "아이들이 배고파해요.",
+    "english": "The children are hungry.",
+    "chinese": "孩子们饿了。"
+   },
+   {
+    "korean": "요즘 아버지가 피곤해하세요.",
+    "english": "Recently, my father has been tired.",
+    "chinese": "最近爸爸看起来很累。"
+   },
+   {
+    "korean": "아이가 심심해해요.",
+    "english": "The child is bored.",
+    "chinese": "孩子觉得无聊。"
+   },
+   {
+    "korean": "부디 씨는 롤러코스터를 무서워해요.",
+    "english": "Budi is afraid of roller coasters.",
+    "chinese": "布迪害怕坐过山车。"
+   },
+   {
+    "korean": "네, 재미있어 해요.",
+    "english": "Yes, they find it amusing.",
+    "chinese": "是的，他们觉得很有趣。"
+   }
+  ],
+  "notes": "When adding -지 마세요 to the adjective stem, the pattern becomes -아/어하지 마세요 (e.g. 무서워하지 마세요, not 무섭지 마세요). Also, when -아/어하다 is added to 예쁘다 and 귀엽다 to form 예뻐하다 and 귀여워하다, the meaning becomes 'to hold dear' or 'to treat with love and affection'.",
+  "unit": "Unit 18. Changes in Parts of Speech",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-아/어 있다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -아/어 있다 (어간 끝 모음이 ㅏ/ㅗ이면 -아 있다, 그 외에는 -어 있다, 하다이면 해 있다)",
+  "meaning_en": "is -ed / is in a -ed state (a continuing state of a completed action)",
+  "meaning_zh": "……着（表动作完成后其状态持续，常与被动动词连用）",
+  "meaning_ko": "완료된 동작이 계속 유지되는 상태를 나타내는 표현으로, 주로 피동 동사와 함께 쓰인다.",
+  "examples": [
+   {
+    "korean": "선생님이 서 있어요.",
+    "english": "The teacher is standing.",
+    "chinese": "老师站着。"
+   },
+   {
+    "korean": "학생들이 앉아 있어요.",
+    "english": "The students are sitting.",
+    "chinese": "学生们坐着。"
+   },
+   {
+    "korean": "환자들이 병원에 누워 있어요.",
+    "english": "The patients are lying down in the hospital.",
+    "chinese": "病人们躺在医院里。"
+   },
+   {
+    "korean": "우산에 이름이 써 있어요.",
+    "english": "His name is written on the umbrella.",
+    "chinese": "伞上写着名字。"
+   },
+   {
+    "korean": "지갑 안에 뭐가 들어 있었어요?",
+    "english": "Was there anything inside the wallet?",
+    "chinese": "钱包里装着什么？"
+   },
+   {
+    "korean": "학교 앞에 광고가 붙어 있었어요.",
+    "english": "There was an advertisement put up in front of school.",
+    "chinese": "学校前面贴着广告。"
+   },
+   {
+    "korean": "문이 닫혀 있어요.",
+    "english": "It's closed.",
+    "chinese": "门关着。"
+   }
+  ],
+  "notes": "For verbs meaning to put on or wear, such as 입다, 신다 and 쓰다, -고 있다 is added to the stem to form 입고 있다, 신고 있다 and 쓰고 있다 instead of 입어 있다, 신어 있다 and 써 있다. Also, -아/어 있다 is used only with verbs that do not require a direct object. Compared with -고 있다 (an action currently in progress), -아/어 있다 expresses the continuing state of a completed action.",
+  "unit": "Unit 19. Expressions of State",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A-아/어지다",
+  "level": "TOPIK 1-2",
+  "formation": "형용사 어간 + -아/어지다 (어간 끝 모음이 ㅏ/ㅗ이면 -아지다, 그 외에는 -어지다, 하다이면 해지다)",
+  "meaning_en": "become / turn (a change in state over time)",
+  "meaning_zh": "变得……（表状态随时间发生变化）",
+  "meaning_ko": "시간이 지남에 따라 상태가 변함을 나타내는 표현이다.",
+  "examples": [
+   {
+    "korean": "풍선이 커졌어요.",
+    "english": "The balloon became bigger.",
+    "chinese": "气球变大了。"
+   },
+   {
+    "korean": "언니가 날씬해졌어요.",
+    "english": "My elder sister became thinner.",
+    "chinese": "姐姐变苗条了。"
+   },
+   {
+    "korean": "피노키오는 거짓말을 하면 코가 길어져요.",
+    "english": "Pinocchio's nose grows longer when he tells a lie.",
+    "chinese": "匹诺曹一撒谎鼻子就会变长。"
+   },
+   {
+    "korean": "옛날에는 멀었는데 이사해서 가까워졌어요.",
+    "english": "It used to be far, but since I've moved, it has become closer.",
+    "chinese": "以前很远，但搬家后变近了。"
+   },
+   {
+    "korean": "비가 오고 나서 추워졌어요.",
+    "english": "After it rained, the weather turned cold.",
+    "chinese": "下过雨之后变冷了。"
+   },
+   {
+    "korean": "당근을 많이 먹으면 눈이 좋아져요.",
+    "english": "If you eat a lot of carrots, your vision will get better.",
+    "chinese": "多吃胡萝卜的话，视力会变好。"
+   }
+  ],
+  "notes": "This expression is always used with adjectives and cannot be used with verbs (e.g. 요코 씨가 예뻐졌습니다 O; 요코 씨가 한국말을 잘해졌습니다 X → 잘하게 되었습니다 O). The past tense form -아/어졌어요 expresses a change resulting from an action performed in the past, while the present tense form -아/어져요 is used to describe a change that generally occurs when a particular action is performed.",
+  "unit": "Unit 19. Expressions of State",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-게 되다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -게 되다",
+  "meaning_en": "to come to / to become / to end up doing (a change of state or situation, often not by the subject's own will)",
+  "meaning_zh": "变得……；逐渐……；结果……（表状态或情况发生变化，常与主语意志无关）",
+  "meaning_ko": "어떤 상태나 상황이 다른 사람의 행동이나 환경 때문에 주어의 의지와 상관없이 변하게 되었음을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "요리를 잘하게 되었어요.",
+    "english": "I became good at cooking.",
+    "chinese": "我变得擅长做菜了。"
+   },
+   {
+    "korean": "축구를 좋아하게 되었어요.",
+    "english": "I came to like soccer.",
+    "chinese": "我变得喜欢足球了。"
+   },
+   {
+    "korean": "외국으로 출장을 가게 됐어요.",
+    "english": "(It's been decided) I will go abroad on a business trip.",
+    "chinese": "（结果定下来）我要去国外出差了。"
+   },
+   {
+    "korean": "회사에 다닌 후부터 일찍 일어나게 되었어요.",
+    "english": "After starting to work at a company, I came to get up early.",
+    "chinese": "自从在公司上班以后，我就变得早起了。"
+   },
+   {
+    "korean": "한국에 오기 전에는 몰랐는데 한국에 와서 알게 되었어요.",
+    "english": "I hadn't heard of him before coming to Korea, but after coming here, I came to know of him.",
+    "chinese": "来韩国之前我不知道，来韩国之后才认识了他。"
+   }
+  ],
+  "notes": "",
+  "unit": "19. Expressions of State",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-(으)ㄴ/는지",
+  "level": "TOPIK 1-2",
+  "formation": "형용사 어간 + -(으)ㄴ지 / 동사 어간 + -는지 (과거 -았/었는지, 미래 -(으)ㄹ 건지)",
+  "meaning_en": "whether / what / where / when / how (a clause of unknown or uncertain information, before verbs like 알다/모르다)",
+  "meaning_zh": "是否……；……（表不确定或需要确认的内容，接在알다/모르다等词前）",
+  "meaning_ko": "알고 싶거나 확실하지 않은 내용을 뒤의 동사에 연결할 때 쓰는 표현으로, '무엇/어디/언제/어떻게/인지'에 해당한다.",
+  "examples": [
+   {
+    "korean": "명동에 어떻게 가는지 알아요?",
+    "english": "Do you know how to get to Myeongdong?",
+    "chinese": "你知道怎么去明洞吗？"
+   },
+   {
+    "korean": "저 분이 누구인지 모르겠어요.",
+    "english": "I don't know who that person is.",
+    "chinese": "我不知道那位是谁。"
+   },
+   {
+    "korean": "어제 무엇을 했는지 생각이 안 나요.",
+    "english": "I can't remember what I did yesterday.",
+    "chinese": "我想不起来昨天做了什么。"
+   },
+   {
+    "korean": "어디가 아픈지 알아요?",
+    "english": "Do you know what's wrong (where it hurts)?",
+    "chinese": "你知道（他）哪里不舒服吗？"
+   },
+   {
+    "korean": "이거 어떻게 만들었는지 가르쳐 주세요.",
+    "english": "Please tell me how you made this.",
+    "chinese": "请告诉我这个是怎么做的。"
+   }
+  ],
+  "notes": "-는지 is used in the following forms: (1) Interrogative + V-(으)ㄴ/는지, e.g. 우리 아이가 방에서 무엇을 하는지 모르겠어요; (2) V1-(으)ㄴ/는지 V2-(으)ㄴ/는지, e.g. 우리 아이가 방에서 자는지 공부하는지 모르겠어요; (3) V-(으)ㄴ/는지 안 V-(으)ㄴ/는지, e.g. 우리 아이가 공부를 하는지 안 하는지 모르겠어요.",
+  "unit": "20. Confirming Information",
+  "source": "private-book"
+ },
+ {
+  "pattern": "V-는 데 걸리다/들다",
+  "level": "TOPIK 1-2",
+  "formation": "동사 어간 + -는 데 걸리다/들다",
+  "meaning_en": "to take (time) / to cost (money) to do something",
+  "meaning_zh": "做……需要（花费）……（表做某事所需的时间、金钱或努力）",
+  "meaning_ko": "어떤 일을 하는 데 필요한 시간이나 돈, 노력의 양을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "운전을 배우는 데 두 달 걸렸어요.",
+    "english": "It took (me) two months to learn to drive.",
+    "chinese": "学开车花了两个月。"
+   },
+   {
+    "korean": "숙제하는 데 한 시간 걸려요.",
+    "english": "It takes (me) an hour to finish my homework.",
+    "chinese": "做作业要花一个小时。"
+   },
+   {
+    "korean": "차를 고치는 데 30만 원 들었어요.",
+    "english": "It cost (me) 300,000 won to repair my car.",
+    "chinese": "修车花了30万韩元。"
+   },
+   {
+    "korean": "여기에서 명동까지 가는 데 얼마나 걸려요?",
+    "english": "How long does it take to get to Myeongdong from here?",
+    "chinese": "从这里到明洞需要多长时间？"
+   },
+   {
+    "korean": "이사하는 데 얼마 들었어요?",
+    "english": "How much did it cost to move?",
+    "chinese": "搬家花了多少钱？"
+   }
+  ],
+  "notes": "",
+  "unit": "20. Confirming Information",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-지요?",
+  "level": "TOPIK 1-2",
+  "formation": "형용사/동사 어간 + -지요? (과거 -았/었지요?, 미래 -(으)ㄹ 거지요?, 준말 -죠?)",
+  "meaning_en": "isn't it? / aren't you? / don't you? (confirming or seeking agreement about something already known)",
+  "meaning_zh": "……吧？；不是吗？（表对已知事实的确认或征求同意）",
+  "meaning_ko": "이미 알고 있는 사실을 상대방에게 확인하거나 동의를 구할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "중국 사람이지요?",
+    "english": "You're Chinese, right?",
+    "chinese": "你是中国人吧？"
+   },
+   {
+    "korean": "불고기가 맛있지요?",
+    "english": "Isn't bulgogi tasty?",
+    "chinese": "烤肉很好吃吧？"
+   },
+   {
+    "korean": "한국어를 배우지요?",
+    "english": "You study Korean, don't you?",
+    "chinese": "你在学韩语吧？"
+   },
+   {
+    "korean": "세월이 참 빠르지요?",
+    "english": "Doesn't time just fly by?",
+    "chinese": "岁月过得真快吧？"
+   },
+   {
+    "korean": "내일 회의에 참석할 거지요?",
+    "english": "You'll attend the meeting tomorrow, won't you?",
+    "chinese": "你明天会参加会议吧？"
+   }
+  ],
+  "notes": "",
+  "unit": "20. Confirming Information",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V-군요/는군요",
+  "level": "TOPIK 1-2",
+  "formation": "형용사 어간 + -군요 / 동사 어간 + -는군요 (명사 + (이)군요, 과거 -았/었군요)",
+  "meaning_en": "I see (that) / indeed / how ...! (expressing surprise or wonder at newly learned information)",
+  "meaning_zh": "原来……啊；真是……啊（表对新得知的事实感到惊讶或感叹）",
+  "meaning_ko": "직접 보거나 경험하거나 다른 사람에게 들은 새로운 사실에 대해 놀라움이나 감탄을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "눈이 나쁘군요.",
+    "english": "Your vision is bad indeed.",
+    "chinese": "你视力真不好啊。"
+   },
+   {
+    "korean": "아이스크림을 좋아하는군요.",
+    "english": "You really like ice cream!",
+    "chinese": "原来你喜欢冰淇淋啊！"
+   },
+   {
+    "korean": "감기에 걸렸군요.",
+    "english": "I see you've caught a cold.",
+    "chinese": "原来你感冒了啊。"
+   },
+   {
+    "korean": "부디 씨는 정말 돈이 많군요.",
+    "english": "Budi really does have a lot of money!",
+    "chinese": "布迪真是很有钱啊！"
+   },
+   {
+    "korean": "정말 비가 오는군요, 우산이 없는데 어떻게 하죠?",
+    "english": "Wow, it's really raining; I don't have an umbrella, so what shall I do?",
+    "chinese": "真的在下雨啊，我没带伞，该怎么办好呢？"
+   }
+  ],
+  "notes": "In the informal plain style, -군요 changes to -구나/-군 in the case of adjectives, -는구나/-는군 in the case of verbs, and -(이)구나/(이)군 in the case of nouns.",
+  "unit": "21. Discovery and Surprise",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V/N-네요",
+  "level": "TOPIK 1-2",
+  "formation": "형용사/동사 어간 + -네요 (명사 + (이)네요)",
+  "meaning_en": "really / certainly / wow (expressing surprise or agreement based on direct experience)",
+  "meaning_zh": "真是……啊；的确……（表基于亲身体验的惊讶、感叹或对对方话语的认同）",
+  "meaning_ko": "직접 경험한 사실에 대한 놀라움이나 감탄, 또는 상대방의 말에 동의할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "벌써 여름이네요.",
+    "english": "Wow, it's already summer.",
+    "chinese": "哇，已经是夏天了。"
+   },
+   {
+    "korean": "가족이 많네요.",
+    "english": "You certainly have a large family.",
+    "chinese": "你家人真多啊。"
+   },
+   {
+    "korean": "글씨를 잘 쓰네요.",
+    "english": "You really have good handwriting.",
+    "chinese": "你字写得真好啊。"
+   },
+   {
+    "korean": "책을 많이 읽었네요.",
+    "english": "You really have read a lot of books.",
+    "chinese": "你读的书真多啊。"
+   },
+   {
+    "korean": "남편이 키가 크시네요.",
+    "english": "Your husband is really tall.",
+    "chinese": "你丈夫个子真高啊。"
+   },
+   {
+    "korean": "예쁜 목도리네요. 고마워요.",
+    "english": "What a beautiful scarf! Thank you.",
+    "chinese": "好漂亮的围巾啊，谢谢。"
+   }
+  ],
+  "notes": "-군요 is used mostly in books and other written texts and expresses surprise or wonder upon learning something new either by direct experience or by hearing about it from someone else. -네요 is used mostly in daily conversation and cannot be used to express something not learned directly by the speaker's own experience. (Compare with Unit 21, A/V-군요/는군요.)",
+  "unit": "21. Discovery and Surprise",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A-(으)ㄴ가요?, V-나요?",
+  "level": "TOPIK 1-2",
+  "formation": "형용사 어간 + -(으)ㄴ가요? / 동사 어간 + -나요? (과거 -았/었나요?, 미래 -(으)ㄹ 건가요?)",
+  "meaning_en": "is/are ...? did ...? (a polite and gentle question)",
+  "meaning_zh": "……吗？（表礼貌、柔和的提问）",
+  "meaning_ko": "상대방에게 공손하고 부드럽게 질문할 때 쓰는 표현.",
+  "examples": [
+   {
+    "korean": "한국 친구가 많은가요?",
+    "english": "Do you have a lot of Korean friends?",
+    "chinese": "你有很多韩国朋友吗？"
+   },
+   {
+    "korean": "나를 사랑하나요?",
+    "english": "Do you love me?",
+    "chinese": "你爱我吗？"
+   },
+   {
+    "korean": "주말에 재미있게 보내셨나요?",
+    "english": "Did you have a pleasant weekend?",
+    "chinese": "周末过得愉快吗？"
+   },
+   {
+    "korean": "오늘 시간이 있나요?",
+    "english": "Do you have time today?",
+    "chinese": "你今天有时间吗？"
+   },
+   {
+    "korean": "요즘 바쁜가요?",
+    "english": "Are you busy these days?",
+    "chinese": "你最近忙吗？"
+   }
+  ],
+  "notes": "",
+  "unit": "22. Additional Endings",
+  "source": "private-book"
+ },
+ {
+  "pattern": "A/V/N-(으)ㄴ/는데요",
+  "level": "TOPIK 1-2",
+  "formation": "형용사 어간 + -(으)ㄴ데요 / 동사 어간 + -는데요 (명사 + 인데요, 과거 -았/었는데요)",
+  "meaning_en": "well, in my case ... / but ... / I'm surprised that ... (mild disagreement, awaiting a response, or surprise)",
+  "meaning_zh": "可是……；不过……；真是……啊（表委婉的反驳、等待回应或对意外情况的惊讶）",
+  "meaning_ko": "상대방의 말에 부드럽게 반대하거나, 대답을 기다리거나, 예상 밖의 사실에 놀람을 나타내는 표현.",
+  "examples": [
+   {
+    "korean": "저는 재미있는데요.",
+    "english": "I think it's interesting.",
+    "chinese": "我觉得挺有趣的。"
+   },
+   {
+    "korean": "민우 씨는 지금 자리에 없는데요.",
+    "english": "Minu is not at his desk right now.",
+    "chinese": "珉宇现在不在座位上。"
+   },
+   {
+    "korean": "정말 높은데요!",
+    "english": "We're really high up!",
+    "chinese": "真高啊！"
+   },
+   {
+    "korean": "내일은 시간이 없는데요.",
+    "english": "Well, tomorrow I don't have any time.",
+    "chinese": "我明天没有时间。"
+   },
+   {
+    "korean": "와, 멋있는데요.",
+    "english": "Wow, it's really nice.",
+    "chinese": "哇，真帅气。"
+   }
+  ],
+  "notes": "",
+  "unit": "22. Additional Endings",
+  "source": "private-book"
+ },
+ {
+  "pattern": "직접 인용 (하고/라고 하다)",
+  "level": "TOPIK 1-2",
+  "formation": "인용문 + 하고/라고 + 말하다/물어보다/생각하다/쓰다 등",
+  "meaning_en": "direct quotation (word-for-word quoting with quotation marks, followed by 하고/라고)",
+  "meaning_zh": "直接引语（用引号逐字引用，后接하고/라고）",
+  "meaning_ko": "말이나 글, 생각을 그대로 인용 부호와 함께 옮길 때 쓰는 표현으로, 인용문 뒤에 하고/라고를 쓴다.",
+  "examples": [
+   {
+    "korean": "에디슨은 \"실패는 성공의 어머니입니다.\"라고 했어요.",
+    "english": "To paraphrase Edison, \"Failure is the mother of success.\"",
+    "chinese": "爱迪生说：\"失败是成功之母。\""
+   },
+   {
+    "korean": "예수님은 \"서로 사랑하세요.\"라고 말씀했어요.",
+    "english": "Jesus said, \"Love each other.\"",
+    "chinese": "耶稣说：\"要彼此相爱。\""
+   },
+   {
+    "korean": "왕징 씨는 저에게 \"내일 몇 시에 와요?\" 하고 물어봤어요.",
+    "english": "Wang Jing asked me, \"What time will you come tomorrow?\"",
+    "chinese": "王晶问我：\"明天几点来？\""
+   },
+   {
+    "korean": "부디 씨는 \"문제가 너무 어려워.\" 하고 생각했어요.",
+    "english": "\"This problem is too hard,\" Budi thought.",
+    "chinese": "布迪想：\"这题太难了。\""
+   },
+   {
+    "korean": "민우 씨가 \"요즘 너무 바빠서 만날 수 없어요.\"라고 그랬어요.",
+    "english": "Minu said, \"I've been too busy recently to be able to meet you.\"",
+    "chinese": "珉宇说：\"最近太忙了，见不了面。\""
+   }
+  ],
+  "notes": "하고 했어요 is not used after a quotation when the part inside the quotation marks ends in 하다, and it is common practice to avoid using 하다 as the verb directly following 하고, because it sounds awkward when 하다 is repeated consecutively. Also, 하고 conveys not just the cited text but also the original intonation, emotion, and feeling (used in fairy tales, children's stories, and onomatopoeia), while 라고 is used often in everyday conversations and speech.",
+  "unit": "23. Quotations",
+  "source": "private-book"
+ },
+ {
+  "pattern": "간접 인용 (-다고/-(이)라고/-냐고/-자고/-(으)라고 하다)",
+  "level": "TOPIK 1-2",
+  "formation": "인용 내용 + -고 하다 (평서 -다고, 의문 -냐고, 청유 -자고, 명령 -(으)라고)",
+  "meaning_en": "indirect quotation (reporting speech or thought without quotation marks, using -다고/-냐고/-자고/-(으)라고 하다)",
+  "meaning_zh": "间接引语（不用引号转述话语或想法，依句型使用-다고/-냐고/-자고/-(으)라고 하다）",
+  "meaning_ko": "말이나 글, 생각을 인용 부호 없이 전달할 때 쓰는 표현으로, 인용의 종류에 따라 -다고/-냐고/-자고/-(으)라고 하다를 쓴다.",
+  "examples": [
+   {
+    "korean": "민우 씨가 저에게 정말 아름답다고 했어요.",
+    "english": "Minu said I was really beautiful.",
+    "chinese": "珉宇说我真漂亮。"
+   },
+   {
+    "korean": "하영 씨가 저에게 사랑한다고 그랬어요.",
+    "english": "Hayeong said she loves me.",
+    "chinese": "河英说她爱我。"
+   },
+   {
+    "korean": "민우 씨가 결혼하자고 했어요.",
+    "english": "Minu said we should get married.",
+    "chinese": "珉宇说我们结婚吧。"
+   },
+   {
+    "korean": "제이슨 씨가 오면 식당으로 오라고 전해 주세요.",
+    "english": "When Jason gets here, please tell him to come to the cafeteria.",
+    "chinese": "杰森来了的话，请转告他去食堂。"
+   },
+   {
+    "korean": "먹어 본 친구들이 맛있다고 해요.",
+    "english": "My friends who have tried it said it was delicious.",
+    "chinese": "尝过的朋友说很好吃。"
+   }
+  ],
+  "notes": "When indirect quotations are made from sentences that originally end in 주세요 or -아/어 주세요, these parts change to 달라고 하다 and -아/어 달라고 하다, or 주라고 하다 and -아/어 주라고 하다, respectively. 달라고 하다/-아/어 달라고 하다 is used when the speaker makes the request directly to the listener, while 주라고 하다/-아/어 주라고 하다 is used when the speaker asks the listener to help a third party. Also, when the first-person pronoun 나/내 or 저/제 appears inside an indirect quotation, it changes to 자기.",
+  "unit": "23. Quotations",
+  "source": "private-book"
+ },
+ {
+  "pattern": "간접 인용 축약형 (-대요/-냬요/-재요/-래요)",
+  "level": "TOPIK 1-2",
+  "formation": "-다고 해요→-대요 / -냐고 해요→-냬요 / -자고 해요→-재요 / -(으)라고 해요→-(으)래요",
+  "meaning_en": "contracted indirect quotation (colloquial short forms such as -대요/-냬요/-재요/-래요)",
+  "meaning_zh": "间接引语缩略形（口语中常用的-대요/-냬요/-재요/-래요等形式）",
+  "meaning_ko": "간접 인용을 줄여서 일상 대화에서 자주 쓰는 표현으로, -대요/-냬요/-재요/-래요 등의 형태가 있다.",
+  "examples": [
+   {
+    "korean": "요코 씨는 한국어가 재미있대요.",
+    "english": "Yoko said Korean is interesting.",
+    "chinese": "洋子说韩语很有趣。"
+   },
+   {
+    "korean": "티루엔 씨는 다음 달에 결혼한대요.",
+    "english": "Tluen said she's getting married next month.",
+    "chinese": "蒂鲁恩说她下个月结婚。"
+   },
+   {
+    "korean": "웨슬리 씨는 저녁에 전화하래요.",
+    "english": "Wesley said to call this evening.",
+    "chinese": "韦斯利说晚上打电话。"
+   },
+   {
+    "korean": "재준 씨는 내일 같이 테니스를 치재요.",
+    "english": "Jaejun said we should play tennis tomorrow.",
+    "chinese": "在俊说我们明天一起打网球吧。"
+   },
+   {
+    "korean": "부디 씨는 뭐 먹고 싶내요.",
+    "english": "Budi wants to know what (you) want to eat.",
+    "chinese": "布迪（问）想吃什么。"
+   },
+   {
+    "korean": "요즘 한국어를 배운대요.",
+    "english": "He said he's been studying Korean.",
+    "chinese": "他说最近在学韩语。"
+   },
+   {
+    "korean": "유키 씨가 숙제를 좀 도와 달래요.",
+    "english": "Yuki said she wants help on her homework.",
+    "chinese": "由纪说让我帮她做作业。"
+   }
+  ],
+  "notes": "",
+  "unit": "23. Quotations",
+  "source": "private-book"
+ },
+ {
+  "pattern": "'ㅡ' 불규칙",
+  "level": "TOPIK 1-2",
+  "formation": "어간 끝 'ㅡ' + '아/어'로 시작하는 어미 → 'ㅡ' 탈락 (예: 바쁘다→바빠요, 예쁘다→예뻐서)",
+  "meaning_en": "the 'ㅡ' irregular conjugation: ㅡ is dropped before endings beginning with 아/어",
+  "meaning_zh": "'ㅡ'不规则活用：词干以ㅡ结尾时，后接아/어开头的词尾，ㅡ脱落",
+  "meaning_ko": "어간이 'ㅡ'로 끝나는 형용사와 동사에 '아/어'로 시작하는 어미가 붙을 때 'ㅡ'가 탈락하는 불규칙 활용.",
+  "examples": [
+   {
+    "korean": "민우 씨는 요즘 많이 바빠요.",
+    "english": "Minu is really busy these days.",
+    "chinese": "珉宇最近很忙。"
+   },
+   {
+    "korean": "불 좀 꺼 주세요.",
+    "english": "Please turn off the lights.",
+    "chinese": "请把灯关一下。"
+   },
+   {
+    "korean": "배가 고파요.",
+    "english": "I'm hungry.",
+    "chinese": "我肚子饿了。"
+   },
+   {
+    "korean": "영화가 너무 슬퍼서 울고 있어요.",
+    "english": "I'm crying because the movie was so sad.",
+    "chinese": "电影太悲伤了，我正在哭。"
+   },
+   {
+    "korean": "날씨가 나빠서 소풍을 못 갔어요.",
+    "english": "The weather was bad, so I couldn't go on the picnic.",
+    "chinese": "天气不好，所以没能去郊游。"
+   }
+  ],
+  "notes": "",
+  "unit": "24. Irregular Conjugations",
+  "source": "private-book"
+ },
+ {
+  "pattern": "'ㄹ' 불규칙",
+  "level": "TOPIK 1-2",
+  "formation": "어간 끝 'ㄹ' + 'ㄴ/ㅂ/ㅅ'로 시작하는 어미 → 'ㄹ' 탈락 (예: 살다→삽니다, 만들다→만드세요)",
+  "meaning_en": "the 'ㄹ' irregular conjugation: ㄹ is dropped before endings beginning with ㄴ, ㅂ, or ㅅ",
+  "meaning_zh": "'ㄹ'不规则活用：词干以ㄹ结尾时，后接ㄴ/ㅂ/ㅅ开头的词尾，ㄹ脱落",
+  "meaning_ko": "어간이 'ㄹ'로 끝나는 동사와 형용사에 'ㄴ, ㅂ, ㅅ'으로 시작하는 어미가 붙을 때 'ㄹ'이 탈락하는 불규칙 활용.",
+  "examples": [
+   {
+    "korean": "아이가 혼자서 잘 놉니다.",
+    "english": "The girl plays well by herself.",
+    "chinese": "孩子一个人玩得很好。"
+   },
+   {
+    "korean": "백화점이 몇 시에 여는지 알고 싶어요.",
+    "english": "I'd like to know what time the department store opens.",
+    "chinese": "我想知道百货商店几点开门。"
+   },
+   {
+    "korean": "지금 만드는 게 뭐예요?",
+    "english": "What are you making?",
+    "chinese": "你现在做的是什么？"
+   },
+   {
+    "korean": "전자 사전을 어디에서 싸게 파는지 아세요?",
+    "english": "Do you know where I can get an electronic dictionary for a good price?",
+    "chinese": "你知道哪里有卖便宜的电子词典吗？"
+   },
+   {
+    "korean": "우리 집은 머니까 학교 다니기 힘들어요.",
+    "english": "Our house is far from school, so it's hard to commute.",
+    "chinese": "我家离学校远，所以上学很辛苦。"
+   }
+  ],
+  "notes": "When -(으)ㄹ is added to stems ending in ㄹ, such as -(으)ㄹ 때, -(으)게요, and -(으)ㄹ 래요?, ㄹ is omitted and the stem attaches directly to the ending. e.g. 살다 + -(으)ㄹ 때 → 살 때; 만들다 + -(으)ㄹ 래요? → 만들래요?",
+  "unit": "24. Irregular Conjugations",
+  "source": "private-book"
+ },
+ {
+  "pattern": "'ㅂ' 불규칙",
+  "level": "TOPIK 1-2",
+  "formation": "어간 끝 'ㅂ' + 모음으로 시작하는 어미 → '우'로 변함 (돕다/곱다는 '오'로 변함)",
+  "meaning_en": "the 'ㅂ' irregular conjugation: ㅂ changes to 우 (or 오) before vowel endings",
+  "meaning_zh": "'ㅂ'不规则活用：词干以ㅂ结尾时，后接元音开头的词尾，ㅂ变为우（돕다/곱다变为오）",
+  "meaning_ko": "어간이 'ㅂ'으로 끝나는 동사와 형용사에 모음으로 시작하는 어미가 붙을 때 'ㅂ'이 '우'로 바뀌는 불규칙 활용('돕다/곱다'는 '오'로 바뀜).",
+  "examples": [
+   {
+    "korean": "커피가 뜨거우니까 조심하세요.",
+    "english": "The coffee is hot, so be careful.",
+    "chinese": "咖啡很烫，请小心。"
+   },
+   {
+    "korean": "날씨가 추워서 집에 있었어요.",
+    "english": "It's cold outside, so I stayed home.",
+    "chinese": "天气冷，所以我待在家里了。"
+   },
+   {
+    "korean": "저는 매운 음식을 좋아해요.",
+    "english": "I like spicy food.",
+    "chinese": "我喜欢吃辣的食物。"
+   },
+   {
+    "korean": "어떤 영화를 좋아하세요?",
+    "english": "What kind of movies do you like?",
+    "chinese": "你喜欢什么样的电影？"
+   },
+   {
+    "korean": "음식이 싱거운데 소금 좀 주세요.",
+    "english": "The food is a little bland, so could I have some salt?",
+    "chinese": "菜有点淡，请给我点盐。"
+   }
+  ],
+  "notes": "돕다 (to assist) and 곱다 (lovely/charming) are the only two words that change ㅂ to 오; all others change to 우. Although the stems of 좁다, 입다, 씹다, and 잡다 end in ㅂ, they are conjugated regularly.",
+  "unit": "24. Irregular Conjugations",
+  "source": "private-book"
+ },
+ {
+  "pattern": "'ㄷ' 불규칙",
+  "level": "TOPIK 1-2",
+  "formation": "어간 끝 'ㄷ' + 모음으로 시작하는 어미 → 'ㄹ'로 변함 (예: 듣다→들어요, 묻다→물어요, 걷다→걸어요)",
+  "meaning_en": "the 'ㄷ' irregular conjugation: ㄷ changes to ㄹ before vowel endings",
+  "meaning_zh": "'ㄷ'不规则活用：部分词干以ㄷ结尾的动词后接元音开头的词尾时，ㄷ变为ㄹ",
+  "meaning_ko": "일부 어간이 'ㄷ'으로 끝나는 동사에 모음으로 시작하는 어미가 붙을 때 'ㄷ'이 'ㄹ'로 바뀌는 불규칙 활용.",
+  "examples": [
+   {
+    "korean": "음악을 들으면서 운동해요.",
+    "english": "I listen to music while I exercise.",
+    "chinese": "我一边听音乐一边运动。"
+   },
+   {
+    "korean": "돈이 없어서 걸어서 갔어요.",
+    "english": "I had no money, so I went by foot.",
+    "chinese": "我没钱，所以走着去了。"
+   },
+   {
+    "korean": "그 여자에게 전화번호를 물어봤어요.",
+    "english": "I asked her for her phone number.",
+    "chinese": "我问了那个女人的电话号码。"
+   },
+   {
+    "korean": "날씨가 좋은데 밖에 나가서 좀 걸을까요?",
+    "english": "The weather's nice, so why don't we go for a walk outside?",
+    "chinese": "天气很好，我们出去散散步怎么样？"
+   },
+   {
+    "korean": "이 노래 들어 봤어요? 정말 좋아요.",
+    "english": "Have you heard this song? It's really good.",
+    "chinese": "你听过这首歌吗？真的很好。"
+   }
+  ],
+  "notes": "Although the stems of 닫다 (to close), 받다 (to receive), and 믿다 (to believe) end in ㄷ, they are conjugated regularly.",
+  "unit": "24. Irregular Conjugations",
+  "source": "private-book"
+ },
+ {
+  "pattern": "'르' 불규칙",
+  "level": "TOPIK 1-2",
+  "formation": "어간 끝 '르' + '아/어'로 시작하는 어미 → 'ㅡ' 탈락 + 'ㄹ' 덧남 (예: 다르다→달라요, 부르다→불러요)",
+  "meaning_en": "the '르' irregular conjugation: ㅡ is dropped and ㄹ is added before 아/어 endings",
+  "meaning_zh": "'르'不规则活用：词干以르结尾时，后接아/어开头的词尾，ㅡ脱落并添加ㄹ",
+  "meaning_ko": "어간이 '르'로 끝나는 동사와 형용사에 '아/어'로 시작하는 어미가 붙을 때 'ㅡ'가 탈락하고 'ㄹ'이 덧나는 불규칙 활용.",
+  "examples": [
+   {
+    "korean": "댄 씨는 노래를 잘 불러서 인기가 많아요.",
+    "english": "Dane is popular because he can sing well.",
+    "chinese": "丹很会唱歌，所以很受欢迎。"
+   },
+   {
+    "korean": "출근 시간에는 지하철이 버스보다 빨라요.",
+    "english": "The subway is faster than the bus during rush hour.",
+    "chinese": "上班时间地铁比公交车快。"
+   },
+   {
+    "korean": "저는 영어를 몰라요.",
+    "english": "I don't speak English.",
+    "chinese": "我不会英语。"
+   },
+   {
+    "korean": "머리 잘랐어요? 멋있네요.",
+    "english": "Did you cut your hair? It's stylish.",
+    "chinese": "你剪头发了？真帅。"
+   },
+   {
+    "korean": "성격도 많이 달라요.",
+    "english": "Their personalities are very different too.",
+    "chinese": "性格也很不一样。"
+   }
+  ],
+  "notes": "",
+  "unit": "24. Irregular Conjugations",
+  "source": "private-book"
+ },
+ {
+  "pattern": "'ㅎ' 불규칙",
+  "level": "TOPIK 1-2",
+  "formation": "어간 끝 'ㅎ' + 모음으로 시작하는 어미 → 'ㅎ' 탈락 (아/어 계열은 'ㅐ'로 변함, 예: 하얗다→하얀/하얘요)",
+  "meaning_en": "the 'ㅎ' irregular conjugation: ㅎ is dropped before vowel endings (and the 아/어 ending becomes ㅐ)",
+  "meaning_zh": "'ㅎ'不规则活用：词干以ㅎ结尾的形容词后接元音开头的词尾时，ㅎ脱落（아/어类词尾变为ㅐ）",
+  "meaning_ko": "어간이 'ㅎ'으로 끝나는 형용사에 모음으로 시작하는 어미가 붙을 때 'ㅎ'이 탈락하는 불규칙 활용.",
+  "examples": [
+   {
+    "korean": "백설공주는 머리는 까맣고 피부는 하애요.",
+    "english": "Snow White has black hair and a white complexion.",
+    "chinese": "白雪公主头发乌黑，皮肤白皙。"
+   },
+   {
+    "korean": "왕비는 백설 공주에게 빨간 사과를 줬어요.",
+    "english": "The queen gave Snow White a red apple.",
+    "chinese": "王后给了白雪公主一个红苹果。"
+   },
+   {
+    "korean": "왕자는 크고 파란 눈으로 공주를 봤어요.",
+    "english": "The prince looked at Snow White with his big blue eyes.",
+    "chinese": "王子用又大又蓝的眼睛看着公主。"
+   },
+   {
+    "korean": "가을 하늘이 정말 파래요.",
+    "english": "The autumn sky is really blue.",
+    "chinese": "秋天的天空真蓝。"
+   },
+   {
+    "korean": "하늘은 파랗고 구름은 하애서 그림 같아요.",
+    "english": "The sky is blue and the clouds are white, just like a painting.",
+    "chinese": "天空湛蓝，云朵洁白，就像一幅画。"
+   }
+  ],
+  "notes": "When the stems of 이렇다, 그렇다, 저렇다, and 어떻다 are added to endings that begin with -아/어, they conjugate to 이래, 그래, 저래, and 어때 instead of 이레, 그레, 저레, and 어레. Also, although the stems of 좋다, 많다, 낳다, and 넣다 end in ㅎ, they are conjugated regularly.",
+  "unit": "24. Irregular Conjugations",
+  "source": "private-book"
+ },
+ {
+  "pattern": "'ㅅ' 불규칙",
+  "level": "TOPIK 1-2",
+  "formation": "어간 끝 'ㅅ' + 모음으로 시작하는 어미 → 'ㅅ' 탈락 (예: 짓다→지어요, 낫다→나아요)",
+  "meaning_en": "the 'ㅅ' irregular conjugation: ㅅ is dropped before vowel endings",
+  "meaning_zh": "'ㅅ'不规则活用：部分词干以ㅅ结尾时，后接元音开头的词尾，ㅅ脱落",
+  "meaning_ko": "일부 어간이 'ㅅ'으로 끝나는 동사와 형용사에 모음으로 시작하는 어미가 붙을 때 'ㅅ'이 탈락하는 불규칙 활용.",
+  "examples": [
+   {
+    "korean": "모기가 물어서 눈이 부었어요.",
+    "english": "A mosquito bit me, so my eye became swollen.",
+    "chinese": "被蚊子咬了，眼睛肿了。"
+   },
+   {
+    "korean": "컵에 커피와 크림, 설탕을 넣고 저어요.",
+    "english": "I put coffee, cream, and sugar in the cup and stir it all together.",
+    "chinese": "在杯子里放入咖啡、奶油和糖，然后搅拌。"
+   },
+   {
+    "korean": "어느 옷이 더 나아요?",
+    "english": "Which outfit is better?",
+    "chinese": "哪件衣服更好？"
+   },
+   {
+    "korean": "아이 이름을 누가 지었어요?",
+    "english": "Who named your child?",
+    "chinese": "孩子的名字是谁起的？"
+   },
+   {
+    "korean": "감기 다 나았어요?",
+    "english": "Did you get over your cold?",
+    "chinese": "感冒都好了吗？"
+   }
+  ],
+  "notes": "In Korean, vowels often combine when they meet (e.g. 배우 + -어요 → 배워요). However, in the case of irregular ㅅ stems, even though vowels may meet after the ㅅ is deleted, they do not combine. e.g. 짓다 + -어요 → 지어요 (O) / 저요 (X); 낫다 + -아요 → 나아요 (O) / 나요 (X). Also, although the stems of 벗다, 웃다, and 씻다 end in ㅅ, they are conjugated regularly.",
+  "unit": "24. Irregular Conjugations",
+  "source": "private-book"
+ }
+]

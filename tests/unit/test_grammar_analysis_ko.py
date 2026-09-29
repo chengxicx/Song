@@ -1,5 +1,7 @@
 """Tests for the Korean grammar-analysis engine (Kiwi + kimchi-grammar data)."""
 
+import unicodedata
+
 import pytest
 
 pytest.importorskip("kiwipiepy")
@@ -47,6 +49,27 @@ def test_handwritten_rule_offsets_are_precise():
             # "할 수 있" (Kiwi decomposes 할 into 하 + ᆯ, so the anchor is
             # Kiwi's character offset, not the surface lengths).
             assert example["sentence"][start:end] == "할 수 있"
+
+
+def test_decomposed_hangul_is_composed_before_matching():
+    """
+    A book may store a syllable with its coda split off as a standalone
+    jamo ("거세어지" + U+11AF instead of "거세어질", "원론적이" + U+11AB
+    instead of "원론적인") -- a morphological-analyser signature.  Kiwi
+    then reports the ㄹ/ㄴ ending at the bare jamo, so the highlighted
+    slice was "ᆯ 수 있" and the panel cut the syllable in half.
+    """
+    broken = (
+        "김 후보자를 임명하면서 동시에 공소취소 문제에도 원론적이\u11ab 답변을 내놓을 경우 야권의 공세는 더 거세어지\u11af 수 있다."
+    )
+    assert not unicodedata.is_normalized("NFC", broken)
+    entries = {e["key"]: e for e in analyze_korean(broken)}
+    example = entries["ko_su_issda"]["examples"][0]
+    sentence = example["sentence"]
+    assert unicodedata.is_normalized("NFC", sentence), "返回的句子应是组合形式"
+    assert "거세어질" in sentence
+    (match,) = example["matches"]
+    assert sentence[match["start"] : match["end"]] == "질 수 있"
 
 
 def test_display_language_switches_desc():
