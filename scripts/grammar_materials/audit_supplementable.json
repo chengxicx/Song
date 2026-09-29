@@ -1,4 +1,40 @@
 {
+ "agaru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "あがる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "あがる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "agaru",
+   "level": "N2",
+   "pattern": "あがる"
+  }
+ },
+ "ageku": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜あげく"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "ageku",
+   "level": "N2",
+   "pattern": "〜あげく"
+  }
+ },
  "ageku-ni-end-up": {
   "from": [
    {
@@ -138,6 +174,10 @@
  "aida-ni": {
   "from": [
    {
+    "material": "n3_materials.json",
+    "pattern": "～ている"
+   },
+   {
     "material": "n4.json",
     "pattern": "～ている"
    },
@@ -211,6 +251,22 @@
    "pattern": "あまり~ない"
   }
  },
+ "amarininoamarini": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "あまり〜に/のあまり(に)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "amarininoamarini",
+   "level": "N3",
+   "pattern": "あまり〜に/のあまり(に)"
+  }
+ },
  "anaribnari": {
   "from": [
    {
@@ -241,6 +297,22 @@
    "id": "anibgatearimasu",
    "level": "N3",
    "pattern": "AにBが～てあります"
+  }
+ },
+ "aro-u-tomo": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "とも"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "aro-u-tomo",
+   "level": "N1",
+   "pattern": "V volitional + とも / あろうとも"
   }
  },
  "atari": {
@@ -328,6 +400,10 @@
    {
     "material": "n1.json",
     "pattern": "あっての"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "あっての / ての"
    }
   ],
   "gaps": [
@@ -414,6 +490,10 @@
     "pattern": "ほど"
    },
    {
+    "material": "n3_materials.json",
+    "pattern": "ほど"
+   },
+   {
     "material": "n4.json",
     "pattern": "ほど"
    }
@@ -434,7 +514,15 @@
     "pattern": "こそ…ない/まい/こそあれ"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "こそ"
+   },
+   {
     "material": "n2_170.json",
+    "pattern": "こそ"
+   },
+   {
+    "material": "n3_materials.json",
     "pattern": "こそ"
    }
   ],
@@ -447,11 +535,31 @@
    "pattern": "V ば-form + こそ"
   }
  },
+ "badake": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ば〜だけ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "badake",
+   "level": "N2",
+   "pattern": "〜ば〜だけ"
+  }
+ },
  "bahodo": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "ば～ほど"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ば〜ほど"
    }
   ],
   "gaps": [
@@ -486,8 +594,16 @@
  "bakari-de-naku": {
   "from": [
    {
+    "material": "n1_materials.json",
+    "pattern": "ひとり〜だけでなく(ばかりでなく、のみでなく、のみならず)"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "ばかりか/ばかりでなく"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ばかりでなく"
    }
   ],
   "gaps": [
@@ -504,6 +620,10 @@
    {
     "material": "n2_170.json",
     "pattern": "ばかりか/ばかりでなく"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ばかりか"
    }
   ],
   "gaps": [
@@ -542,12 +662,20 @@
     "pattern": "〜て（は）いられない/〜で（は）いられない"
    },
    {
+    "material": "n2_materials.json",
+    "pattern": "ばかり"
+   },
+   {
     "material": "n3.json",
     "pattern": "ばかり"
    },
    {
     "material": "n3.json",
     "pattern": "ばかり（概数）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ばかり"
    },
    {
     "material": "n4.json",
@@ -583,10 +711,30 @@
    "pattern": "ばかりです"
   }
  },
+ "bakarini": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ばかりに"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "bakarini",
+   "level": "N2",
+   "pattern": "〜ばかりに"
+  }
+ },
  "bakoso": {
   "from": [
    {
     "material": "n1.json",
+    "pattern": "ばこそ"
+   },
+   {
+    "material": "n1_materials.json",
     "pattern": "ばこそ"
    }
   ],
@@ -615,6 +763,22 @@
    "pattern": "ばそれまでだ/ならそれまでだ/たらそれまでだ/ともそれまでだ"
   }
  },
+ "bayokatatarayokatatoyokata": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ばよかった/たらよかった/とよかった"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "bayokatatarayokatatoyokata",
+   "level": "N3",
+   "pattern": "ばよかった/たらよかった/とよかった"
+  }
+ },
  "bekarazu": {
   "from": [
    {
@@ -636,6 +800,10 @@
    {
     "material": "n2_170.json",
     "pattern": "べき/べきだ/べきではない"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "べきだ/べきではない"
    }
   ],
   "gaps": [
@@ -695,6 +863,38 @@
    "pattern": "Verb dict-form + べくして"
   }
  },
+ "beshi": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "べし"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "beshi",
+   "level": "N1",
+   "pattern": "べし"
+  }
+ },
+ "buripuri": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～ぶり(っぷり)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "buripuri",
+   "level": "N3",
+   "pattern": "～ぶり(っぷり)"
+  }
+ },
  "chigaiigaii": {
   "from": [
    {
@@ -725,6 +925,22 @@
    "id": "chiyan",
    "level": "N5",
    "pattern": "~ちゃん"
+  }
+ },
+ "chiyoudai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ちょうだい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "chiyoudai",
+   "level": "N3",
+   "pattern": "ちょうだい"
   }
  },
  "chuu-during": {
@@ -828,6 +1044,10 @@
    {
     "material": "n1.json",
     "pattern": "ただ…のみならず/ただ…だけでなく/ひとり…のみならず"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "だけでなく"
    }
   ],
   "gaps": [
@@ -878,6 +1098,14 @@
     "pattern": "だけ/だけあって/だけに/だけの"
    },
    {
+    "material": "n2_materials.json",
+    "pattern": "だけ"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "だけ"
+   },
+   {
     "material": "n5.json",
     "pattern": "だけ"
    }
@@ -889,6 +1117,70 @@
    "id": "dake-only-basic",
    "level": "N5",
    "pattern": "Noun (or number + counter) + だけ"
+  }
+ },
+ "dakeatedakenokotohaate": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜だけあって / だけのことはあって"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dakeatedakenokotohaate",
+   "level": "N2",
+   "pattern": "〜だけあって / だけのことはあって"
+  }
+ },
+ "dakededakedeha": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "だけで/だけでは"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dakededakedeha",
+   "level": "N3",
+   "pattern": "だけで/だけでは"
+  }
+ },
+ "dakedehaikenaidakedehadame": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "だけではいけない/だけではだめ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dakedehaikenaidakedehadame",
+   "level": "N3",
+   "pattern": "だけではいけない/だけではだめ"
+  }
+ },
+ "dakedeiidakedeyoroshii": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "だけでいい/だけでよろしい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dakedeiidakedeyoroshii",
+   "level": "N3",
+   "pattern": "だけでいい/だけでよろしい"
   }
  },
  "dakedenaku": {
@@ -907,10 +1199,78 @@
    "pattern": "～だけでなく"
   }
  },
+ "dakehadakenokotoha": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜だけは / だけのことは"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dakehadakenokotoha",
+   "level": "N2",
+   "pattern": "〜だけは / だけのことは"
+  }
+ },
+ "dakemashida": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜だけましだ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dakemashida",
+   "level": "N1",
+   "pattern": "〜だけましだ"
+  }
+ },
+ "dakeni": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜だけに"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dakeni",
+   "level": "N2",
+   "pattern": "〜だけに"
+  }
+ },
+ "dakenokotohaaru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜だけのことはある"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dakenokotohaaru",
+   "level": "N2",
+   "pattern": "〜だけのことはある"
+  }
+ },
  "dani": {
   "from": [
    {
     "material": "n1.json",
+    "pattern": "だに"
+   },
+   {
+    "material": "n1_materials.json",
     "pattern": "だに"
    }
   ],
@@ -928,6 +1288,10 @@
    {
     "material": "n1.json",
     "pattern": "...だの...だの"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "だの"
    }
   ],
   "gaps": [
@@ -937,6 +1301,22 @@
    "id": "dano-dano",
    "level": "N2",
    "pattern": "X だの Y だの"
+  }
+ },
+ "darake": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜だらけ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "darake",
+   "level": "N2",
+   "pattern": "〜だらけ"
   }
  },
  "darake-full-of": {
@@ -986,6 +1366,10 @@
     "pattern": "だろう/でしょう"
    },
    {
+    "material": "n3_materials.json",
+    "pattern": "ことだろう/だろう"
+   },
+   {
     "material": "n4.json",
     "pattern": "～だろう / でしょう"
    }
@@ -1013,6 +1397,22 @@
    "id": "daroukadeshiyouka",
    "level": "N4",
    "pattern": "～だろうか / でしょうか"
+  }
+ },
+ "darouni": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜だろうに"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "darouni",
+   "level": "N2",
+   "pattern": "〜だろうに"
   }
  },
  "daroutou": {
@@ -1063,6 +1463,22 @@
    "pattern": "だったら"
   }
  },
+ "datte-casual-because": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "だって"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "datte-casual-because",
+   "level": "N2",
+   "pattern": "だって (sentence-initial, casual)"
+  }
+ },
  "de-are-de-are": {
   "from": [
    {
@@ -1072,6 +1488,10 @@
    {
     "material": "n1.json",
     "pattern": "…であれ…であれ/であろうと…であろうと"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "であれ"
    }
   ],
   "gaps": [
@@ -1081,6 +1501,22 @@
    "id": "de-are-de-are",
    "level": "N1",
    "pattern": "Noun + であれ + noun + であれ"
+  }
+ },
+ "dearedeare": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "であれ〜であれ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dearedeare",
+   "level": "N1",
+   "pattern": "であれ〜であれ"
   }
  },
  "dedoregaka": {
@@ -1120,6 +1556,10 @@
    {
     "material": "n1.json",
     "pattern": "ではあるまいし/ではあるまいに"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "ではあるまいし / でもあるまいし"
    }
   ],
   "gaps": [
@@ -1129,6 +1569,42 @@
    "id": "dehaarumaishidehaarumaini",
    "level": "N1",
    "pattern": "ではあるまいし/ではあるまいに"
+  }
+ },
+ "dehaniyoteda": {
+  "from": [
+   {
+    "material": "n2_170.json",
+    "pattern": "次第だ/次第で/次第では"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜次第で(は) / 次第によって / 次第だ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dehaniyoteda",
+   "level": "N2",
+   "pattern": "〜次第で(は) / 次第によって / 次第だ"
+  }
+ },
+ "dehasumasarenai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ではすまされない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dehasumasarenai",
+   "level": "N1",
+   "pattern": "〜ではすまされない"
   }
  },
  "deii": {
@@ -1163,11 +1639,31 @@
    "pattern": "〜でいらっしゃる"
   }
  },
+ "deiru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜でいる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "deiru",
+   "level": "N2",
+   "pattern": "〜でいる"
+  }
+ },
  "demo-noun-even": {
   "from": [
    {
     "material": "n3.json",
     "pattern": "いくら～ても(でも)"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "でも"
    },
    {
     "material": "n4.json",
@@ -1181,6 +1677,38 @@
    "id": "demo-noun-even",
    "level": "N4",
    "pattern": "Noun + でも"
+  }
+ },
+ "denakutenandarou": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜でなくてなんだろう"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "denakutenandarou",
+   "level": "N2",
+   "pattern": "〜でなくてなんだろう"
+  }
+ },
+ "deshikanai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜でしかない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "deshikanai",
+   "level": "N2",
+   "pattern": "〜でしかない"
   }
  },
  "deshiyou": {
@@ -1234,6 +1762,10 @@
  "desu-674648": {
   "from": [
    {
+    "material": "n3_materials.json",
+    "pattern": "お(ご)〜です"
+   },
+   {
     "material": "n5.json",
     "pattern": "~です"
    }
@@ -1284,6 +1816,10 @@
    {
     "material": "n2_170.json",
     "pattern": "どころか"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "どころか"
    }
   ],
   "gaps": [
@@ -1293,6 +1829,38 @@
    "id": "dokoro-ka-far-from",
    "level": "N3",
    "pattern": "Plain form + どころか"
+  }
+ },
+ "dokorodehanaidokoronodeha": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜どころではない/どころの話では"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "dokorodehanaidokoronodeha",
+   "level": "N2",
+   "pattern": "〜どころではない/どころの話では"
+  }
+ },
+ "domo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ども"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "domo",
+   "level": "N2",
+   "pattern": "〜ども"
   }
  },
  "donnanitemo": {
@@ -1347,6 +1915,22 @@
    "pattern": "どのように～ても"
   }
  },
+ "doori": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～どおり"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "doori",
+   "level": "N3",
+   "pattern": "～どおり"
+  }
+ },
  "doori-just-as": {
   "from": [
    {
@@ -1384,6 +1968,10 @@
    {
     "material": "n1.json",
     "pattern": "〜ふう、ふうだ、ふうをする"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "ふうだ"
    }
   ],
   "gaps": [
@@ -1496,6 +2084,10 @@
    {
     "material": "n1.json",
     "pattern": "（た）が最後"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "が最後 / たら最後"
    }
   ],
   "gaps": [
@@ -1505,6 +2097,22 @@
    "id": "ga-sai-go",
    "level": "N1",
    "pattern": "V-たら / V dict + が最後"
+  }
+ },
+ "gachi": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～がち"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "gachi",
+   "level": "N3",
+   "pattern": "～がち"
   }
  },
  "gachidagachino": {
@@ -1521,6 +2129,38 @@
    "id": "gachidagachino",
    "level": "N2",
    "pattern": "がちだ/がちの"
+  }
+ },
+ "gaika": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜が早いか"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "gaika",
+   "level": "N1",
+   "pattern": "〜が早いか"
+  }
+ },
+ "garami": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜がらみ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "garami",
+   "level": "N1",
+   "pattern": "〜がらみ"
   }
  },
  "garu-third-person-emotion": {
@@ -1587,6 +2227,22 @@
    "pattern": "~がた"
   }
  },
+ "gatai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～がたい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "gatai",
+   "level": "N3",
+   "pattern": "～がたい"
+  }
+ },
  "gatai-difficult": {
   "from": [
    {
@@ -1607,6 +2263,10 @@
   "from": [
    {
     "material": "n1.json",
+    "pattern": "がてら"
+   },
+   {
+    "material": "n1_materials.json",
     "pattern": "がてら"
    }
   ],
@@ -1635,6 +2295,38 @@
    "pattern": "i-adj / na-adj / V stem + げ"
   }
  },
+ "geda": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜げだ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "geda",
+   "level": "N2",
+   "pattern": "〜げだ"
+  }
+ },
+ "gimi": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～ぎみ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "gimi",
+   "level": "N3",
+   "pattern": "～ぎみ"
+  }
+ },
  "gimi-tendency": {
   "from": [
    {
@@ -1651,8 +2343,28 @@
    "pattern": "Noun / V ます-stem + 気味"
   }
  },
+ "gonireru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "ご覧に入れる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "gonireru",
+   "level": "N2",
+   "pattern": "ご覧に入れる"
+  }
+ },
  "goran-ni-naru-honorific": {
   "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "見る"
+   },
    {
     "material": "n4.json",
     "pattern": "ご覧になる/ご覧くださる"
@@ -1681,6 +2393,22 @@
    "id": "goro",
    "level": "N5",
    "pattern": "~ごろ"
+  }
+ },
+ "goto": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ごと"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "goto",
+   "level": "N2",
+   "pattern": "〜ごと"
   }
  },
  "gotoki-like": {
@@ -1713,6 +2441,42 @@
    "id": "gotoku-as-if",
    "level": "N1",
    "pattern": "Plain form / noun + の + ごとく"
+  }
+ },
+ "gotoshi": {
+  "from": [
+   {
+    "material": "n1.json",
+    "pattern": "ごとき/ごとく/ごとし"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "ごとし"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "gotoshi",
+   "level": "N1",
+   "pattern": "ごとし"
+  }
+ },
+ "gurumi-1758dc": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ぐるみ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "gurumi-1758dc",
+   "level": "N1",
+   "pattern": "〜ぐるみ"
   }
  },
  "guto": {
@@ -1763,6 +2527,22 @@
    "pattern": "～は～ほど～くない/ではない"
   }
  },
+ "haizashirazunaraizashirazudataraizashirazu": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "はいざしらず / ならいざしらず / だったらいざしらず"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "haizashirazunaraizashirazudataraizashirazu",
+   "level": "N1",
+   "pattern": "はいざしらず / ならいざしらず / だったらいざしらず"
+  }
+ },
  "hajimeru": {
   "from": [
    {
@@ -1811,6 +2591,22 @@
    "pattern": "~は~ことだ"
   }
  },
+ "hamotoyori": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜はもとより"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "hamotoyori",
+   "level": "N2",
+   "pattern": "〜はもとより"
+  }
+ },
  "hanmen-on-other-hand": {
   "from": [
    {
@@ -1827,6 +2623,26 @@
    "pattern": "Plain form + 反面"
   }
  },
+ "hanukinishiteonukinishite": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜はぬきにして(は)〜ない / をぬきにして(は)〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜はぬきにして/をぬきにして"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "hanukinishiteonukinishite",
+   "level": "N2",
+   "pattern": "〜はぬきにして/をぬきにして"
+  }
+ },
  "hato": {
   "from": [
    {
@@ -1841,6 +2657,70 @@
    "id": "hato",
    "level": "N3",
    "pattern": "はっと"
+  }
+ },
+ "hatomokakutoshitenaratomokakutoshite": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜はともかく(として)/ならともかく(として)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "hatomokakutoshitenaratomokakutoshite",
+   "level": "N2",
+   "pattern": "〜はともかく(として)/ならともかく(として)"
+  }
+ },
+ "hatoshitehanishite": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "は別として/は別にして"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "hatoshitehanishite",
+   "level": "N3",
+   "pattern": "は別として/は別にして"
+  }
+ },
+ "haunioyobazu": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "は言うにおよばず"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "haunioyobazu",
+   "level": "N1",
+   "pattern": "は言うにおよばず"
+  }
+ },
+ "hawazumogana": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "は言わずもがな"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "hawazumogana",
+   "level": "N1",
+   "pattern": "は言わずもがな"
   }
  },
  "hayoridesu": {
@@ -1889,6 +2769,10 @@
  },
  "hazu-expected": {
   "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "はず"
+   },
    {
     "material": "n4.json",
     "pattern": "はず（形式名词）"
@@ -1962,6 +2846,10 @@
  "hodo-extent": {
   "from": [
    {
+    "material": "n1_materials.json",
+    "pattern": "〜として〜ない"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "ほどだ/ほど/ほどの"
    },
@@ -1970,7 +2858,19 @@
     "pattern": "ほど"
    },
    {
+    "material": "n2_materials.json",
+    "pattern": "〜ぬきで(は)〜ない / ぬきに(は)〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜はぬきにして(は)〜ない / をぬきにして(は)〜ない"
+   },
+   {
     "material": "n3.json",
+    "pattern": "ほど"
+   },
+   {
+    "material": "n3_materials.json",
     "pattern": "ほど"
    },
    {
@@ -2040,6 +2940,14 @@
    {
     "material": "n1.json",
     "pattern": "こそ…ない/まい/こそあれ"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ほか(は)ない"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "より"
    },
    {
     "material": "n4.json",
@@ -2234,6 +3142,10 @@
  "hou-ga-comparative": {
   "from": [
    {
+    "material": "n3_materials.json",
+    "pattern": "より"
+   },
+   {
     "material": "n4.json",
     "pattern": "より"
    },
@@ -2274,6 +3186,26 @@
  "humble-o-suru": {
   "from": [
    {
+    "material": "n2_materials.json",
+    "pattern": "お(ご)〜になれる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "お(ご)〜願う"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "お(ご)〜できる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "お(ご)〜申し上げる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "お(ご)〜申す"
+   },
+   {
     "material": "n3.json",
     "pattern": "お…ください"
    },
@@ -2284,6 +3216,22 @@
    {
     "material": "n3.json",
     "pattern": "お…する"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "お(ご)〜くださる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "お(ご)〜なさる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "お(ご)〜です"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "お(ご)〜いただく"
    },
    {
     "material": "n4.json",
@@ -2391,6 +3339,38 @@
    "pattern": "い-adjective stem + かった(です)"
   }
  },
+ "idaigasuruiosuru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "思いだ/思いがする/思いをする"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "idaigasuruiosuru",
+   "level": "N2",
+   "pattern": "思いだ/思いがする/思いをする"
+  }
+ },
+ "igai-other-than": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "には/にも"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "igai-other-than",
+   "level": "N3",
+   "pattern": "Noun + 以外(に / には / は)"
+  }
+ },
  "ijou-since": {
   "from": [
    {
@@ -2400,6 +3380,10 @@
    {
     "material": "n2_bikao.json",
     "pattern": "以上（は）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "以上"
    }
   ],
   "gaps": [
@@ -2432,6 +3416,10 @@
    {
     "material": "n1.json",
     "pattern": "いかんによらず/いかんにかかわらず/いかんを問わず"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "いかんによらず / いかんにかかわらず / いかんを問わず"
    }
   ],
   "gaps": [
@@ -2441,6 +3429,50 @@
    "id": "ikan-ni-yorazu",
    "level": "N1",
    "pattern": "Noun + (の) + いかんによらず / いかんを問わず / いかんにかかわらず"
+  }
+ },
+ "ikandaikanniyoruikanni": {
+  "from": [
+   {
+    "material": "n1.json",
+    "pattern": "いかんで/いかんでは/いかんによっては/いかんだ"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "いかんだ / いかんによる / いかんに"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "ikandaikanniyoruikanni",
+   "level": "N1",
+   "pattern": "いかんだ / いかんによる / いかんに"
+  }
+ },
+ "ikkou-ni-nai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜として〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ぬきで(は)〜ない / ぬきに(は)〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜はぬきにして(は)〜ない / をぬきにして(は)〜ない"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "ikkou-ni-nai",
+   "level": "N1",
+   "pattern": "いっこうに + V 〜ない"
   }
  },
  "ikuratemo": {
@@ -2500,6 +3532,10 @@
    {
     "material": "n2_bikao.json",
     "pattern": "一方/一方で（は）"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜一方/一方で(は)"
    }
   ],
   "gaps": [
@@ -2579,6 +3615,54 @@
    "pattern": "いただく (humble of もらう / 食べる / 飲む)"
   }
  },
+ "izatonarutoizatonarebaizatonatara": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "いざ〜となると / いざ〜となれば / いざ〜となったら"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "izatonarutoizatonarebaizatonatara",
+   "level": "N1",
+   "pattern": "いざ〜となると / いざ〜となれば / いざ〜となったら"
+  }
+ },
+ "jigasurujida": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "感じがする/感じだ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "jigasurujida",
+   "level": "N3",
+   "pattern": "感じがする/感じだ"
+  }
+ },
+ "jigeru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "存じ上げる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "jigeru",
+   "level": "N3",
+   "pattern": "存じ上げる"
+  }
+ },
  "jin": {
   "from": [
    {
@@ -2599,6 +3683,26 @@
    "pattern": "~人(じん)"
   }
  },
+ "jiru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ことと思う(存じる)"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "存じる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "jiru",
+   "level": "N3",
+   "pattern": "存じる"
+  }
+ },
  "jito": {
   "from": [
    {
@@ -2613,6 +3717,22 @@
    "id": "jito",
    "level": "N3",
    "pattern": "じっと"
+  }
+ },
+ "jiyou": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～上(じょう)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "jiyou",
+   "level": "N3",
+   "pattern": "～上(じょう)"
   }
  },
  "ka-dou-ka": {
@@ -2638,6 +3758,10 @@
     "pattern": "こそ…ない/まい/こそあれ"
    },
    {
+    "material": "n2_materials.json",
+    "pattern": "〜ほか(は)ない"
+   },
+   {
     "material": "n5.json",
     "pattern": "ない (否定助动词)"
    }
@@ -2656,6 +3780,10 @@
    {
     "material": "n2_170.json",
     "pattern": "かのようだ"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "かのようだ"
    }
   ],
   "gaps": [
@@ -2667,11 +3795,35 @@
    "pattern": "Plain form + かのように"
   }
  },
+ "ka-to-iu-to": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "かというと/かといえば"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "ka-to-iu-to",
+   "level": "N2",
+   "pattern": "Plain form + かというと / かといえば"
+  }
+ },
  "ka-to-omou-to": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "かと思うと/かと思ったら/と思うと/と思ったら"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜かと思うと / かと思えば / かと思ったら"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜かと思うと / かと思えば / かと思ったら"
    }
   ],
   "gaps": [
@@ -2697,6 +3849,22 @@
    "id": "kadouka",
    "level": "N5",
    "pattern": "~かどうか"
+  }
+ },
+ "kagiri": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "かぎり"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kagiri",
+   "level": "N3",
+   "pattern": "かぎり"
   }
  },
  "kagiri-as-long-as": {
@@ -2731,6 +3899,22 @@
    "pattern": "i-adj / na-adj + 限りだ"
   }
  },
+ "kaigaarugaigaarukaimonaku": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜かいがある / がいがある / かいもなく"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kaigaarugaigaarukaimonaku",
+   "level": "N1",
+   "pattern": "〜かいがある / がいがある / かいもなく"
+  }
+ },
  "kaimonaku": {
   "from": [
    {
@@ -2747,11 +3931,31 @@
    "pattern": "〜かい（甲斐）もなく"
   }
  },
+ "kaka": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜か否か"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kaka",
+   "level": "N1",
+   "pattern": "〜か否か"
+  }
+ },
  "kakeru-halfway": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "かけだ/かけの/かける"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "～かけ/かける"
    }
   ],
   "gaps": [
@@ -2835,6 +4039,22 @@
    "pattern": "か～ないかのうちに"
   }
  },
+ "kanaikanouchini-590419": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜か〜ないかのうちに"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kanaikanouchini-590419",
+   "level": "N2",
+   "pattern": "〜か〜ないかのうちに"
+  }
+ },
  "kane-nai-might": {
   "from": [
    {
@@ -2844,6 +4064,10 @@
    {
     "material": "n2_170.json",
     "pattern": "かねない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜かねる/かねない"
    }
   ],
   "gaps": [
@@ -2882,6 +4106,10 @@
     "pattern": "からある/からする/からの"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "〜からある / からいる / からする / から"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "からして"
    },
@@ -2892,6 +4120,14 @@
    {
     "material": "n3.json",
     "pattern": "から（组成）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "からすると(すれば、したら、して、しても)"
    },
    {
     "material": "n4.json",
@@ -2920,6 +4156,10 @@
    {
     "material": "n2_170.json",
     "pattern": "から見ると/から見れば/から見て/から見ても"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から見ると(見れば、見たら、見て、見ても)"
    }
   ],
   "gaps": [
@@ -2954,6 +4194,10 @@
     "pattern": "からある/からする/からの"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "〜からある / からいる / からする / から"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "からして"
    },
@@ -2964,6 +4208,14 @@
    {
     "material": "n3.json",
     "pattern": "から（组成）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "からすると(すれば、したら、して、しても)"
    },
    {
     "material": "n4.json",
@@ -2994,6 +4246,10 @@
     "pattern": "からある/からする/からの"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "〜からある / からいる / からする / から"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "からして"
    },
@@ -3004,6 +4260,14 @@
    {
     "material": "n3.json",
     "pattern": "から（组成）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "からすると(すれば、したら、して、しても)"
    },
    {
     "material": "n4.json",
@@ -3032,6 +4296,10 @@
    {
     "material": "n2_170.json",
     "pattern": "からといって"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "からといって"
    }
   ],
   "gaps": [
@@ -3059,6 +4327,54 @@
    "pattern": "~からだ"
   }
  },
+ "karaheto": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "から〜へと"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "karaheto",
+   "level": "N3",
+   "pattern": "から〜へと"
+  }
+ },
+ "karaiiyounamononokarayokatamonono": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜からいいようなものの / からよかったものの"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "karaiiyounamononokarayokatamonono",
+   "level": "N2",
+   "pattern": "〜からいいようなものの / からよかったものの"
+  }
+ },
+ "karakoso": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜からこそ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "karakoso",
+   "level": "N2",
+   "pattern": "〜からこそ"
+  }
+ },
  "karamade": {
   "from": [
    {
@@ -3075,11 +4391,47 @@
    "pattern": "~から~まで"
   }
  },
+ "karanarukaradekiru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "からなる/からできる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "karanarukaradekiru",
+   "level": "N3",
+   "pattern": "からなる/からできる"
+  }
+ },
+ "karaniha": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜からには"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "karaniha",
+   "level": "N2",
+   "pattern": "〜からには"
+  }
+ },
  "karanikakete": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "から～にかけて"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から〜にかけて"
    }
   ],
   "gaps": [
@@ -3091,11 +4443,31 @@
    "pattern": "から～にかけて"
   }
  },
+ "karatoitenai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "からといって〜ない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "karatoitenai",
+   "level": "N3",
+   "pattern": "からといって〜ない"
+  }
+ },
  "karautokaraebakarate": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "から言うと/から言えば/から言って"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から言うと(言えば、言ったら、言って、言っても)"
    }
   ],
   "gaps": [
@@ -3167,10 +4539,31 @@
    "pattern": "Verb ます-stem + 方"
   }
  },
+ "katagata": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜かたがた"
+   }
+  ],
+  "gaps": [
+   "no-examples",
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "katagata",
+   "level": "N1",
+   "pattern": "〜かたがた"
+  }
+ },
  "katagata-combining": {
   "from": [
    {
     "material": "n1.json",
+    "pattern": "かたがた"
+   },
+   {
+    "material": "n1_materials.json",
     "pattern": "かたがた"
    }
   ],
@@ -3188,6 +4581,10 @@
    {
     "material": "n1.json",
     "pattern": "かたわら"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "かたわら"
    }
   ],
   "gaps": [
@@ -3199,8 +4596,52 @@
    "pattern": "V plain / noun + の + かたわら"
   }
  },
+ "katouguraikatouhodo": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "かと思うぐらい/かと思うほど"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "katouguraikatouhodo",
+   "level": "N3",
+   "pattern": "かと思うぐらい/かと思うほど"
+  }
+ },
+ "katoutokatoeba": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜かと思うと / かと思えば / かと思ったら"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜かと思うと / かと思えば / かと思ったら"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜かと思うと/かと思えば"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "katoutokatoeba",
+   "level": "N2",
+   "pattern": "〜かと思うと/かと思えば"
+  }
+ },
  "kawari": {
   "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "かわり"
+   },
    {
     "material": "n4.json",
     "pattern": "の（形式名词）"
@@ -3335,6 +4776,22 @@
    "pattern": "～続ける"
   }
  },
+ "ki-ga-suru-feel-like": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "気がする"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "ki-ga-suru-feel-like",
+   "level": "N3",
+   "pattern": "Plain form + 気がする"
+  }
+ },
  "kidakinikino": {
   "from": [
    {
@@ -3356,6 +4813,10 @@
    {
     "material": "n1.json",
     "pattern": "きらいがある"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "きらいがある"
    }
   ],
   "gaps": [
@@ -3372,6 +4833,10 @@
    {
     "material": "n2_170.json",
     "pattern": "きり/きりだ"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "きり"
    }
   ],
   "gaps": [
@@ -3381,6 +4846,22 @@
    "id": "kiri-only",
    "level": "N3",
    "pattern": "Noun / number + 切り / きり"
+  }
+ },
+ "kiriganai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜きりがない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kiriganai",
+   "level": "N1",
+   "pattern": "〜きりがない"
   }
  },
  "kirukirerukirenai": {
@@ -3440,6 +4921,10 @@
    {
     "material": "n1.json",
     "pattern": "極まる/極まりない/の極み"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜極まる / 極まりない"
    }
   ],
   "gaps": [
@@ -3501,6 +4986,22 @@
    "id": "koko-soko-asoko-doko",
    "level": "N5",
    "pattern": "ここ / そこ / あそこ / どこ"
+  }
+ },
+ "konai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜っこない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "konai",
+   "level": "N2",
+   "pattern": "〜っこない"
   }
  },
  "kono-sono-ano-dono-attributive": {
@@ -3578,7 +5079,15 @@
     "pattern": "こそ…ない/まい/こそあれ"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "こそ"
+   },
+   {
     "material": "n2_170.json",
+    "pattern": "こそ"
+   },
+   {
+    "material": "n3_materials.json",
     "pattern": "こそ"
    }
   ],
@@ -3652,6 +5161,10 @@
    {
     "material": "n2_170.json",
     "pattern": "ことだ"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "ことだ"
    }
   ],
   "gaps": [
@@ -3706,8 +5219,20 @@
     "pattern": "ながら（も）"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "ながら"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "ながら"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "ながら(も)"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "こと"
    },
    {
     "material": "n3.json",
@@ -3716,6 +5241,10 @@
    {
     "material": "n3.json",
     "pattern": "こと（ことにする/ことになる）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "こと"
    },
    {
     "material": "n4.json",
@@ -3744,6 +5273,14 @@
    {
     "material": "n1.json",
     "pattern": "ことなく/ことなしに（は）/ことなくして（は）"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "なしに / ことなしに"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜なしに(は) / ことなしに(は)"
    }
   ],
   "gaps": [
@@ -3760,6 +5297,10 @@
    {
     "material": "n1.json",
     "pattern": "こそ…ない/まい/こそあれ"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ほか(は)ない"
    },
    {
     "material": "n3.json",
@@ -3787,6 +5328,10 @@
   "from": [
    {
     "material": "n2_170.json",
+    "pattern": "ことに/ことには"
+   },
+   {
+    "material": "n2_materials.json",
     "pattern": "ことに/ことには"
    },
    {
@@ -3834,6 +5379,14 @@
     "pattern": "ことに/ことには"
    },
    {
+    "material": "n2_materials.json",
+    "pattern": "〜ほか(は)ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "ことに/ことには"
+   },
+   {
     "material": "n3.json",
     "pattern": "にする/ことにする"
    },
@@ -3858,6 +5411,10 @@
  "koto-nominalizer": {
   "from": [
    {
+    "material": "n2_materials.json",
+    "pattern": "こと"
+   },
+   {
     "material": "n3.json",
     "pattern": "ようだ/な/に"
    },
@@ -3868,6 +5425,10 @@
    {
     "material": "n3.json",
     "pattern": "な（禁止）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "こと"
    },
    {
     "material": "n4.json",
@@ -3900,6 +5461,10 @@
    {
     "material": "n1.json",
     "pattern": "ことだから/こととて/ことだし/こともあって"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "こととて"
    }
   ],
   "gaps": [
@@ -3909,6 +5474,78 @@
    "id": "koto-tote",
    "level": "N2",
    "pattern": "Plain form / noun + の + こととて"
+  }
+ },
+ "kotodakara": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ことだから"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kotodakara",
+   "level": "N2",
+   "pattern": "〜ことだから"
+  }
+ },
+ "kotodanaikotoda": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ことだ / ないことだ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kotodanaikotoda",
+   "level": "N2",
+   "pattern": "〜ことだ / ないことだ"
+  }
+ },
+ "kotodashi": {
+  "from": [
+   {
+    "material": "n1.json",
+    "pattern": "ことだから/こととて/ことだし/こともあって"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ことだし"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kotodashi",
+   "level": "N3",
+   "pattern": "ことだし"
+  }
+ },
+ "kotode": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ことで"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ことで"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kotode",
+   "level": "N3",
+   "pattern": "ことで"
   }
  },
  "kotogaaru": {
@@ -3943,10 +5580,30 @@
    "pattern": "~ことができる"
   }
  },
+ "kotohaga": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ことは〜が"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kotohaga",
+   "level": "N3",
+   "pattern": "ことは〜が"
+  }
+ },
  "kotoka": {
   "from": [
    {
     "material": "n2_170.json",
+    "pattern": "ことか"
+   },
+   {
+    "material": "n3_materials.json",
     "pattern": "ことか"
    }
   ],
@@ -3959,6 +5616,22 @@
    "pattern": "ことか"
   }
  },
+ "kotokara": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ことから"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kotokara",
+   "level": "N2",
+   "pattern": "〜ことから"
+  }
+ },
  "kotonaku": {
   "from": [
    {
@@ -3966,8 +5639,16 @@
     "pattern": "ことなく/ことなしに（は）/ことなくして（は）"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "〜なくして(は) / ことなくして(は)"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "ことなく"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ことなく/こともなく"
    }
   ],
   "gaps": [
@@ -3981,6 +5662,14 @@
  },
  "kotoninaru": {
   "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ことになる/ことにはならない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ことになる / ことにはならない"
+   },
    {
     "material": "n4.json",
     "pattern": "〜ことになる"
@@ -4027,6 +5716,26 @@
    "pattern": "〜ことにする"
   }
  },
+ "kototoujiru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ことと思う(存じる)"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "存じる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kototoujiru",
+   "level": "N3",
+   "pattern": "ことと思う(存じる)"
+  }
+ },
  "kudasaru-honorific-verb": {
   "from": [
    {
@@ -4070,6 +5779,10 @@
     "pattern": "くらい/ぐらい/くらいだ/ぐらいだ"
    },
    {
+    "material": "n3_materials.json",
+    "pattern": "くらい(ぐらい)"
+   },
+   {
     "material": "n5.json",
     "pattern": "くらい(ぐらい)"
    }
@@ -4087,6 +5800,10 @@
   "from": [
    {
     "material": "n1.json",
+    "pattern": "くらいなら"
+   },
+   {
+    "material": "n3_materials.json",
     "pattern": "くらいなら"
    }
   ],
@@ -4119,11 +5836,31 @@
    "pattern": "Giver が (Receiver に) Object を くれる"
   }
  },
+ "kusai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜くさい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "kusai",
+   "level": "N2",
+   "pattern": "〜くさい"
+  }
+ },
  "kuse-ni-despite": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "くせに"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "くせに/くせして"
    }
   ],
   "gaps": [
@@ -4194,6 +5931,10 @@
     "pattern": "まだ…ていません"
    },
    {
+    "material": "n3_materials.json",
+    "pattern": "～ている"
+   },
+   {
     "material": "n4.json",
     "pattern": "～ている"
    },
@@ -4216,6 +5957,10 @@
    {
     "material": "n1.json",
     "pattern": "までだ/までのことだ"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜までだ / までのことだ"
    }
   ],
   "gaps": [
@@ -4264,6 +6009,10 @@
    {
     "material": "n1.json",
     "pattern": "までだ/までのことだ"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜までだ / までのことだ"
    }
   ],
   "gaps": [
@@ -4289,6 +6038,22 @@
    "id": "madehanai",
    "level": "N4",
    "pattern": "～までは～ない"
+  }
+ },
+ "mademonaimadenokotomonai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜までもない / までのこともない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mademonaimadenokotomonai",
+   "level": "N2",
+   "pattern": "〜までもない / までのこともない"
   }
  },
  "madeni": {
@@ -4368,6 +6133,10 @@
    {
     "material": "n2_170.json",
     "pattern": "まい/まいか"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "まい"
    }
   ],
   "gaps": [
@@ -4379,11 +6148,31 @@
    "pattern": "Verb dict / ます-stem + まい"
   }
  },
+ "maika": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜まいか"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "maika",
+   "level": "N2",
+   "pattern": "〜まいか"
+  }
+ },
  "majiki-unacceptable": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "まじ/まじき/あるまじき"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "まじき"
    }
   ],
   "gaps": [
@@ -4433,6 +6222,22 @@
    "id": "mama",
    "level": "N3",
    "pattern": "Verb-た / noun-の / i-adj / demonstrative + まま"
+  }
+ },
+ "mamire": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜まみれ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mamire",
+   "level": "N1",
+   "pattern": "〜まみれ"
   }
  },
  "mamire-smeared": {
@@ -4485,6 +6290,14 @@
  },
  "masenka-invitation": {
   "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "(さ)せてやってください(ませんか)"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "てやってください(ませんか)"
+   },
    {
     "material": "n3.json",
     "pattern": "ませんか"
@@ -4595,6 +6408,22 @@
    "pattern": "被动动词（直接被动）"
   }
  },
+ "mat-150c91": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜以上(は)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-150c91",
+   "level": "N2",
+   "pattern": "〜以上(は)"
+  }
+ },
  "mat-1960ce": {
   "from": [
    {
@@ -4640,6 +6469,10 @@
    {
     "material": "n1.json",
     "pattern": "始末だ"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "始末だ"
    }
   ],
   "gaps": [
@@ -4649,6 +6482,22 @@
    "id": "mat-2a62c5",
    "level": "N1",
    "pattern": "始末だ"
+  }
+ },
+ "mat-2cf646": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜次第"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-2cf646",
+   "level": "N2",
+   "pattern": "〜次第"
   }
  },
  "mat-32ab88": {
@@ -4743,6 +6592,22 @@
    "pattern": "で（场所）"
   }
  },
+ "mat-49ef11": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜放題"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-49ef11",
+   "level": "N2",
+   "pattern": "〜放題"
+  }
+ },
  "mat-4ca58b": {
   "from": [
    {
@@ -4759,8 +6624,76 @@
    "pattern": "か（疑问）"
   }
  },
+ "mat-510d37": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜得る"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-510d37",
+   "level": "N2",
+   "pattern": "〜得る"
+  }
+ },
+ "mat-51adc0": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜限り(は) / ない限り(は)"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜限り(で) / 限りでは"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜限り"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-51adc0",
+   "level": "N2",
+   "pattern": "〜限り"
+  }
+ },
  "mat-57059e": {
   "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜(さ)せてやってくださる"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜(さ)せてやってください/(さ)せてやってくださいませんか"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜(さ)せてやっていただけませんか"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜(さ)せてやってもらえませんか"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "(さ)せる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "(さ)せてあげる/(さ)せてやる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "(さ)せてやってください(ませんか)"
+   },
    {
     "material": "n3.json",
     "pattern": "さ/み"
@@ -4772,6 +6705,46 @@
    {
     "material": "n3.json",
     "pattern": "さ（名词化）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せられる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてくださる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてくださいませんか"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてくれる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてくれませんか"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せていただく"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せていただけませんか"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてもらう"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてもらえませんか"
    },
    {
     "material": "n4.json",
@@ -4815,6 +6788,38 @@
    "pattern": "授受の表达方式（详解）"
   }
  },
+ "mat-67312c": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜反面"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-67312c",
+   "level": "N2",
+   "pattern": "〜反面"
+  }
+ },
+ "mat-6df5a3": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜も同然"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-6df5a3",
+   "level": "N1",
+   "pattern": "〜も同然"
+  }
+ },
  "mat-74e191": {
   "from": [
    {
@@ -4831,6 +6836,86 @@
    "pattern": "と（必然）"
   }
  },
+ "mat-865ba0": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜抜く"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-865ba0",
+   "level": "N2",
+   "pattern": "〜抜く"
+  }
+ },
+ "mat-8b36b4": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～切る"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-8b36b4",
+   "level": "N3",
+   "pattern": "～切る"
+  }
+ },
+ "mat-8c61a1": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜次第だ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-8c61a1",
+   "level": "N2",
+   "pattern": "〜次第だ"
+  }
+ },
+ "mat-8e3334": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～み"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-8e3334",
+   "level": "N3",
+   "pattern": "～み"
+  }
+ },
+ "mat-93c8e7": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜最中"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-93c8e7",
+   "level": "N2",
+   "pattern": "〜最中"
+  }
+ },
  "mat-94f0f3": {
   "from": [
    {
@@ -4845,6 +6930,22 @@
    "id": "mat-94f0f3",
    "level": "N3",
    "pattern": "授受动词"
+  }
+ },
+ "mat-99a0a4": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜一方だ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-99a0a4",
+   "level": "N2",
+   "pattern": "〜一方だ"
   }
  },
  "mat-a46db5": {
@@ -4887,6 +6988,22 @@
    "pattern": "可能态接续"
   }
  },
+ "mat-a81d6a": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "召す"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-a81d6a",
+   "level": "N1",
+   "pattern": "召す"
+  }
+ },
  "mat-af8270": {
   "from": [
    {
@@ -4927,6 +7044,10 @@
   "from": [
    {
     "material": "n3.json",
+    "pattern": "～め"
+   },
+   {
+    "material": "n3_materials.json",
     "pattern": "～め"
    }
   ],
@@ -5039,6 +7160,22 @@
    "pattern": "使役态接续"
   }
  },
+ "mat-d26c40": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～向き"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-d26c40",
+   "level": "N3",
+   "pattern": "～向き"
+  }
+ },
  "mat-d713bf": {
   "from": [
    {
@@ -5071,6 +7208,22 @@
    "pattern": "～出す"
   }
  },
+ "mat-e459cf": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～向け"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-e459cf",
+   "level": "N3",
+   "pattern": "～向け"
+  }
+ },
  "mat-eb6041": {
   "from": [
    {
@@ -5085,6 +7238,22 @@
    "id": "mat-eb6041",
    "level": "N3",
    "pattern": "か（间接疑问）"
+  }
+ },
+ "mat-fa7d2d": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～以来"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mat-fa7d2d",
+   "level": "N3",
+   "pattern": "～以来"
   }
  },
  "mat-fd53d7": {
@@ -5208,6 +7377,10 @@
    {
     "material": "n1.json",
     "pattern": "もさることながら"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "もさることながら / もさるものながら"
    }
   ],
   "gaps": [
@@ -5240,6 +7413,10 @@
    {
     "material": "n2_170.json",
     "pattern": "も～ば～も/も～なら～も"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "も〜ば〜も"
    }
   ],
   "gaps": [
@@ -5267,11 +7444,47 @@
    "pattern": "もかまわず"
   }
  },
+ "mokamawazu-6f8ba7": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜もかまわず"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "mokamawazu-6f8ba7",
+   "level": "N2",
+   "pattern": "〜もかまわず"
+  }
+ },
+ "monaramomodagamo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜も〜なら〜も/も〜だが〜も"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "monaramomodagamo",
+   "level": "N2",
+   "pattern": "〜も〜なら〜も/も〜だが〜も"
+  }
+ },
  "mono-da-general": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "ものだ/ものではない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "ものだ"
    }
   ],
   "gaps": [
@@ -5287,6 +7500,10 @@
   "from": [
    {
     "material": "n2_170.json",
+    "pattern": "ものだから"
+   },
+   {
+    "material": "n3_materials.json",
     "pattern": "ものだから"
    }
   ],
@@ -5304,6 +7521,10 @@
    {
     "material": "n2_170.json",
     "pattern": "ものがある"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "ものがある"
    }
   ],
   "gaps": [
@@ -5320,6 +7541,10 @@
    {
     "material": "n2_170.json",
     "pattern": "ものなら"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "ものなら"
    }
   ],
   "gaps": [
@@ -5335,6 +7560,10 @@
   "from": [
    {
     "material": "n2_170.json",
+    "pattern": "ものの"
+   },
+   {
+    "material": "n2_materials.json",
     "pattern": "ものの"
    }
   ],
@@ -5354,6 +7583,14 @@
     "pattern": "もの"
    },
    {
+    "material": "n3_materials.json",
+    "pattern": "もの"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "もの"
+   },
+   {
     "material": "n5.json",
     "pattern": "もの"
    }
@@ -5367,10 +7604,30 @@
    "pattern": "Plain form + もの / もん"
   }
  },
+ "mono-to-shite": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ものとして / ものとする"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "mono-to-shite",
+   "level": "N2",
+   "pattern": "Noun + ものとして"
+  }
+ },
  "mono-wo-if-only": {
   "from": [
    {
     "material": "n1.json",
+    "pattern": "ものを"
+   },
+   {
+    "material": "n1_materials.json",
     "pattern": "ものを"
    }
   ],
@@ -5383,10 +7640,34 @@
    "pattern": "Plain form + ものを"
   }
  },
+ "monodamonodehanai": {
+  "from": [
+   {
+    "material": "n2_170.json",
+    "pattern": "ものだ/ものではない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ものだ / ものではない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "monodamonodehanai",
+   "level": "N2",
+   "pattern": "〜ものだ / ものではない"
+  }
+ },
  "monoka": {
   "from": [
    {
     "material": "n2_170.json",
+    "pattern": "ものか"
+   },
+   {
+    "material": "n2_materials.json",
     "pattern": "ものか"
    }
   ],
@@ -5399,11 +7680,47 @@
    "pattern": "ものか"
   }
  },
+ "monotou": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ものと思う"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "monotou",
+   "level": "N1",
+   "pattern": "〜ものと思う"
+  }
+ },
+ "monotowarerumonotowareteiru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ものと思われる / ものと思われている"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "monotowarerumonotowareteiru",
+   "level": "N1",
+   "pattern": "〜ものと思われる / ものと思われている"
+  }
+ },
  "morau-receive": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "からある/からする/からの"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜からある / からいる / からする / から"
    },
    {
     "material": "n2_170.json",
@@ -5416,6 +7733,14 @@
    {
     "material": "n3.json",
     "pattern": "から（组成）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "からすると(すれば、したら、して、しても)"
    },
    {
     "material": "n4.json",
@@ -5463,11 +7788,31 @@
    "pattern": "もっと"
   }
  },
+ "n-bakari": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "んばかり"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "n-bakari",
+   "level": "N1",
+   "pattern": "V ない-stem + んばかり(に)"
+  }
+ },
  "n-ga-tame": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "んがため/んがために/んがための"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "んがため"
    }
   ],
   "gaps": [
@@ -5578,8 +7923,16 @@
     "pattern": "ながら（も）"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "ながら"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "ながら"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "ながら(も)"
    },
    {
     "material": "n3.json",
@@ -5647,10 +8000,62 @@
    "pattern": "～以外～ない"
   }
  },
+ "nai-de-kudasai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜として〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ぬきで(は)〜ない / ぬきに(は)〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜はぬきにして(は)〜ない / をぬきにして(は)〜ない"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "nai-de-kudasai",
+   "level": "N5",
+   "pattern": "Verb-ない + でください"
+  }
+ },
+ "nai-form": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜として〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ぬきで(は)〜ない / ぬきに(は)〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜はぬきにして(は)〜ない / をぬきにして(は)〜ない"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "nai-form",
+   "level": "N5",
+   "pattern": "Verb-ない"
+  }
+ },
  "nai-koto-niwa": {
   "from": [
    {
     "material": "n2_170.json",
+    "pattern": "ことに/ことには"
+   },
+   {
+    "material": "n2_materials.json",
     "pattern": "ことに/ことには"
    }
   ],
@@ -5672,6 +8077,14 @@
    {
     "material": "n2_170.json",
     "pattern": "ことはない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ほか(は)ない"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ことがない/ことはない/こともない"
    },
    {
     "material": "n5.json",
@@ -5698,8 +8111,20 @@
     "pattern": "こそ…ない/まい/こそあれ"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "ひとり〜だけでなく(ばかりでなく、のみでなく、のみならず)"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "のみならず"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜のみか/のみでなく/のみならず"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ほか(は)ない"
    },
    {
     "material": "n5.json",
@@ -5752,6 +8177,10 @@
    {
     "material": "n2_170.json",
     "pattern": "ないではいられない"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ずにはいられない/ないではいられない"
    }
   ],
   "gaps": [
@@ -5761,6 +8190,22 @@
    "id": "naidehairarenai",
    "level": "N2",
    "pattern": "ないではいられない"
+  }
+ },
+ "naidehanainaidemonai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ないではない / ないでもない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "naidehanainaidemonai",
+   "level": "N2",
+   "pattern": "〜ないではない / ないでもない"
   }
  },
  "naidenakute": {
@@ -5783,11 +8228,31 @@
    "pattern": "ないで/なくて"
   }
  },
+ "naikashiranaikana": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ないかしら/ないかな"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "naikashiranaikana",
+   "level": "N3",
+   "pattern": "ないかしら/ないかな"
+  }
+ },
  "naikotohanainaikotomonai": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "ないことはない/ないこともない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ないことはない / ないこともない"
    }
   ],
   "gaps": [
@@ -5815,10 +8280,30 @@
    "pattern": "ないことには"
   }
  },
+ "naikotoniha-c0be26": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ないことには"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "naikotoniha-c0be26",
+   "level": "N2",
+   "pattern": "〜ないことには"
+  }
+ },
  "naimademo": {
   "from": [
    {
     "material": "n1.json",
+    "pattern": "ないまでも"
+   },
+   {
+    "material": "n1_materials.json",
     "pattern": "ないまでも"
    }
   ],
@@ -5836,6 +8321,10 @@
    {
     "material": "n1.json",
     "pattern": "ないものでもない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ないものではない / ないものでもない"
    }
   ],
   "gaps": [
@@ -5911,6 +8400,30 @@
    "pattern": "なか（形式名词）"
   }
  },
+ "nakereba-naranai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜として〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ぬきで(は)〜ない / ぬきに(は)〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜はぬきにして(は)〜ない / をぬきにして(は)〜ない"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "nakereba-naranai",
+   "level": "N4",
+   "pattern": "Verb-ない stem + なければならない"
+  }
+ },
  "nakerebadamedanakutehadameda": {
   "from": [
    {
@@ -5975,6 +8488,70 @@
    "pattern": "Noun + なくして(は)"
   }
  },
+ "nakucha-nakya": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜として〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ぬきで(は)〜ない / ぬきに(は)〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜はぬきにして(は)〜ない / をぬきにして(は)〜ない"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "nakucha-nakya",
+   "level": "N3",
+   "pattern": "Verb-ない stem + なくちゃ / なきゃ (+ いけない / ならない)"
+  }
+ },
+ "nakuhanainakumonai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜なくはない / なくもない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "なくはない/なくもない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nakuhanainakumonai",
+   "level": "N2",
+   "pattern": "〜なくはない / なくもない"
+  }
+ },
+ "nakuhanainakumonai-9bc5e0": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜なくはない / なくもない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "なくはない/なくもない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nakuhanainakumonai-9bc5e0",
+   "level": "N2",
+   "pattern": "なくはない/なくもない"
+  }
+ },
  "nakunaru": {
   "from": [
    {
@@ -6007,6 +8584,22 @@
    "pattern": "~なくて"
   }
  },
+ "nakute-mo-ii": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜なくして(は) / ことなくして(は)"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "nakute-mo-ii",
+   "level": "N4",
+   "pattern": "Verb-なく + てもいい"
+  }
+ },
  "nakutemoiinakutemokamawanainakutemoda": {
   "from": [
    {
@@ -6028,6 +8621,10 @@
    {
     "material": "n2_170.json",
     "pattern": "など/なんか/なんて"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "なんか"
    }
   ],
   "gaps": [
@@ -6044,6 +8641,10 @@
    {
     "material": "n2_170.json",
     "pattern": "など/なんか/なんて"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "なんて"
    }
   ],
   "gaps": [
@@ -6079,11 +8680,47 @@
    "pattern": "X + なら"
   }
  },
+ "nara-mada-shimo": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "はまだしも / ならまだしも / だったらまだしも"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "nara-mada-shimo",
+   "level": "N1",
+   "pattern": "Noun / plain form + ならまだしも"
+  }
+ },
+ "naradaganarahadaga": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "なら別だが/なら話は別だが"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "naradaganarahadaga",
+   "level": "N3",
+   "pattern": "なら別だが/なら話は別だが"
+  }
+ },
  "narade-wa-no": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "ならでは/ならではの"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "ならでは / ならではの"
    }
   ],
   "gaps": [
@@ -6132,6 +8769,14 @@
    {
     "material": "n1.json",
     "pattern": "なり/たなり"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "なり"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "なり/なりと/なりとも"
    }
   ],
   "gaps": [
@@ -6148,6 +8793,14 @@
    {
     "material": "n1.json",
     "pattern": "なり/たなり"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "なり"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "なり/なりと/なりとも"
    }
   ],
   "gaps": [
@@ -6164,6 +8817,10 @@
    {
     "material": "n1.json",
     "pattern": "なりに/なりの"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "なりに / なりの"
    }
   ],
   "gaps": [
@@ -6191,6 +8848,42 @@
    "pattern": "〜なり〜なり"
   }
  },
+ "naritomo": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "なり/なりと/なりとも"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "naritomo",
+   "level": "N1",
+   "pattern": "Noun + なりとも"
+  }
+ },
+ "naru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "なる"
+   },
+   {
+    "material": "n3.json",
+    "pattern": "く(に)なる/く(に)する"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "naru",
+   "level": "N1",
+   "pattern": "なる"
+  }
+ },
  "nasai": {
   "from": [
    {
@@ -6212,6 +8905,10 @@
    {
     "material": "n1.json",
     "pattern": "なくして（は）/なしに（は）"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "なしに / ことなしに"
    }
   ],
   "gaps": [
@@ -6221,6 +8918,22 @@
    "id": "nashi-ni-without",
    "level": "N1",
    "pattern": "Noun + なしに(は)"
+  }
+ },
+ "nauneru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜損なう/損ねる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nauneru",
+   "level": "N1",
+   "pattern": "〜損なう/損ねる"
   }
  },
  "nbakaridanbakarininbakarino": {
@@ -6239,11 +8952,31 @@
    "pattern": "んばかりだ/んばかりに/んばかりの"
   }
  },
+ "ndate": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "んだって"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "ndate",
+   "level": "N3",
+   "pattern": "んだって"
+  }
+ },
  "ni-atatte-occasion": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "にあたって/にあたり"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にあたって / にあたり"
    }
   ],
   "gaps": [
@@ -6260,6 +8993,10 @@
    {
     "material": "n1.json",
     "pattern": "にあって"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "にあって(は) / にあっても"
    }
   ],
   "gaps": [
@@ -6276,6 +9013,10 @@
    {
     "material": "n1.json",
     "pattern": "に至る/に至るまで/に至って/に至った"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "に至る / に至るまで"
    }
   ],
   "gaps": [
@@ -6292,6 +9033,10 @@
    {
     "material": "n1.json",
     "pattern": "に至る/に至るまで/に至って/に至った"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "に至る / に至るまで"
    }
   ],
   "gaps": [
@@ -6308,6 +9053,10 @@
    {
     "material": "n1.json",
     "pattern": "に至っては/に至ると/に至っても"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "に至っては"
    }
   ],
   "gaps": [
@@ -6351,6 +9100,22 @@
    "pattern": "Noun + に限って"
   }
  },
+ "ni-kakatte-iru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にかかる/にかかっている"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "ni-kakatte-iru",
+   "level": "N2",
+   "pattern": "Noun + にかかっている"
+  }
+ },
  "ni-kakawarazu-regardless": {
   "from": [
    {
@@ -6378,6 +9143,10 @@
     "pattern": "からある/からする/からの"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "〜からある / からいる / からする / から"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "からして"
    },
@@ -6386,8 +9155,20 @@
     "pattern": "からすると/からすれば"
    },
    {
+    "material": "n2_materials.json",
+    "pattern": "〜にかけたら / にかけて"
+   },
+   {
     "material": "n3.json",
     "pattern": "から（组成）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "からすると(すれば、したら、して、しても)"
    },
    {
     "material": "n4.json",
@@ -6416,6 +9197,10 @@
    {
     "material": "n2_170.json",
     "pattern": "に関して/に関しては/に関しても/に関する"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "に関して/に関する"
    }
   ],
   "gaps": [
@@ -6432,6 +9217,10 @@
    {
     "material": "n2_170.json",
     "pattern": "にかわって/にかわり"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "にかわり/にかわって"
    }
   ],
   "gaps": [
@@ -6441,6 +9230,22 @@
    "id": "ni-kawatte-instead",
    "level": "N3",
    "pattern": "Noun + にかわって / にかわり"
+  }
+ },
+ "ni-kimatte-iru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "に決まっている"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "ni-kimatte-iru",
+   "level": "N3",
+   "pattern": "Plain form + に決まっている"
   }
  },
  "ni-kotaete-response": {
@@ -6464,6 +9269,10 @@
    {
     "material": "n2_170.json",
     "pattern": "に比べて/に比べ"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "に比べて/に比べると"
    }
   ],
   "gaps": [
@@ -6491,6 +9300,22 @@
    "pattern": "Plain form + にもかかわらず"
   }
  },
+ "ni-mo-mashite": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "にもまして"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "ni-mo-mashite",
+   "level": "N1",
+   "pattern": "Noun + にもまして"
+  }
+ },
  "ni-naru-become": {
   "from": [
    {
@@ -6512,6 +9337,10 @@
    {
     "material": "n2_170.json",
     "pattern": "において/においては/においても/における"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜において / における"
    }
   ],
   "gaps": [
@@ -6528,6 +9357,10 @@
    {
     "material": "n2_170.json",
     "pattern": "に応じて/に応じ/に応じた"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に応じ / に応じて / に応じる"
    }
   ],
   "gaps": [
@@ -6544,6 +9377,10 @@
    {
     "material": "n2_170.json",
     "pattern": "に先立って/に先立ち/に先立つ"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に先立ち / に先立って / に先立つ"
    }
   ],
   "gaps": [
@@ -6560,6 +9397,14 @@
    {
     "material": "n2_170.json",
     "pattern": "にしろ/にせよ/にもせよ"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしろ / にせよ / にもせよ"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしろ/にせよ/にもせよ"
    }
   ],
   "gaps": [
@@ -6573,6 +9418,14 @@
  },
  "ni-shitagatte": {
   "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしたがい / にしたがって"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしたがい/にしたがって"
+   },
    {
     "material": "n3.json",
     "pattern": "にしたがって"
@@ -6608,6 +9461,10 @@
    {
     "material": "n2_170.json",
     "pattern": "に沿って/に沿い/に沿う/に沿った"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に沿い / に沿って / に沿う"
    }
   ],
   "gaps": [
@@ -6640,6 +9497,10 @@
    {
     "material": "n2_170.json",
     "pattern": "にすぎない"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "にすぎない"
    }
   ],
   "gaps": [
@@ -6660,6 +9521,14 @@
    {
     "material": "n2_170.json",
     "pattern": "に対して/に対し/に対する"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に対して/に対する"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "に対して/対する"
    }
   ],
   "gaps": [
@@ -6692,6 +9561,10 @@
    {
     "material": "n2_170.json",
     "pattern": "に伴って/に伴い"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に伴い/に伴って/に伴う"
    }
   ],
   "gaps": [
@@ -6708,6 +9581,10 @@
    {
     "material": "n2_170.json",
     "pattern": "にとって/にとっては/にとっても/にとっての"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "にとって"
    }
   ],
   "gaps": [
@@ -6724,6 +9601,10 @@
    {
     "material": "n2_170.json",
     "pattern": "について/につき/についての"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜につき/について"
    }
   ],
   "gaps": [
@@ -6772,6 +9653,10 @@
    {
     "material": "n1.json",
     "pattern": "までもない/までもなく/には及ばない"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "には及ばない"
    }
   ],
   "gaps": [
@@ -6788,6 +9673,10 @@
    {
     "material": "n2_170.json",
     "pattern": "にわたって/にわたり/にわたる/にわたった"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にわたり / にわたって / にわたる"
    }
   ],
   "gaps": [
@@ -6804,6 +9693,14 @@
    {
     "material": "n2_170.json",
     "pattern": "によって/により/によっては/による/によると/によれば"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "により/によって/による"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "により/によって/による"
    }
   ],
   "gaps": [
@@ -6831,6 +9728,22 @@
    "pattern": "にあたらない/にはあたらない"
   }
  },
+ "niazukaru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜にあずかる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "niazukaru",
+   "level": "N1",
+   "pattern": "〜にあずかる"
+  }
+ },
  "nida": {
   "from": [
    {
@@ -6847,11 +9760,31 @@
    "pattern": "最中に/最中だ"
   }
  },
+ "nienietenieru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に応え / に応えて / に応える"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nienietenieru",
+   "level": "N2",
+   "pattern": "〜に応え / に応えて / に応える"
+  }
+ },
  "nietenie": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "に加えて/に加え"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に加え/に加えて"
    }
   ],
   "gaps": [
@@ -6879,6 +9812,98 @@
    "pattern": "～には"
   }
  },
+ "nihabanai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜には及ばない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nihabanai",
+   "level": "N1",
+   "pattern": "〜には及ばない"
+  }
+ },
+ "nihaga": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "には〜が"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nihaga",
+   "level": "N3",
+   "pattern": "には〜が"
+  }
+ },
+ "nihagaaru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜には無理がある"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nihagaaru",
+   "level": "N1",
+   "pattern": "〜には無理がある"
+  }
+ },
+ "nihaha": {
+  "from": [
+   {
+    "material": "n2_170.json",
+    "pattern": "際/際に/際は"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "～際に(は)/際は"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nihaha",
+   "level": "N3",
+   "pattern": "～際に(は)/際は"
+  }
+ },
+ "nihikikaetetohikikaeni": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "にひきかえ(て) / とひきかえに"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ていられる / て(は)いられない"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "につれ(て)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nihikikaetetohikikaeni",
+   "level": "N1",
+   "pattern": "にひきかえ(て) / とひきかえに"
+  }
+ },
  "nihokanaranai": {
   "from": [
    {
@@ -6895,10 +9920,30 @@
    "pattern": "にほかならない"
   }
  },
+ "nihokanaranai-4931cc": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にほかならない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nihokanaranai-4931cc",
+   "level": "N2",
+   "pattern": "〜にほかならない"
+  }
+ },
  "niinai": {
   "from": [
    {
     "material": "n2_170.json",
+    "pattern": "に違いない"
+   },
+   {
+    "material": "n3_materials.json",
     "pattern": "に違いない"
    }
   ],
@@ -6909,6 +9954,54 @@
    "id": "niinai",
    "level": "N2",
    "pattern": "に違いない"
+  }
+ },
+ "nikainikatenikau": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に向かい/に向かって/に向かう"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nikainikatenikau",
+   "level": "N2",
+   "pattern": "〜に向かい/に向かって/に向かう"
+  }
+ },
+ "nikakawarazunihakakawarinaku": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にかかわらず/に(は)かかわりなく"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nikakawarazunihakakawarinaku",
+   "level": "N2",
+   "pattern": "〜にかかわらず/に(は)かかわりなく"
+  }
+ },
+ "nikakawaru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にかかわる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nikakawaru",
+   "level": "N2",
+   "pattern": "〜にかかわる"
   }
  },
  "nikaketehanikaketemo": {
@@ -6941,6 +10034,38 @@
    "id": "nikatakunai",
    "level": "N1",
    "pattern": "にかたくない"
+  }
+ },
+ "nikatakunai-453107": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜にかたくない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nikatakunai-453107",
+   "level": "N1",
+   "pattern": "〜にかたくない"
+  }
+ },
+ "nikeniketenikeru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に向け/に向けて/に向ける"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nikeniketenikeru",
+   "level": "N2",
+   "pattern": "〜に向け/に向けて/に向ける"
   }
  },
  "nikimateiru": {
@@ -7011,6 +10136,38 @@
    "pattern": "にくいです"
   }
  },
+ "nimarenimaretenimareru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に恵まれ / に恵まれて / に恵まれる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nimarenimaretenimareru",
+   "level": "N2",
+   "pattern": "〜に恵まれ / に恵まれて / に恵まれる"
+  }
+ },
+ "nimokakawarazu": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にもかかわらず"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nimokakawarazu",
+   "level": "N2",
+   "pattern": "〜にもかかわらず"
+  }
+ },
  "nimomashite": {
   "from": [
    {
@@ -7025,6 +10182,22 @@
    "id": "nimomashite",
    "level": "N1",
    "pattern": "に（も）まして"
+  }
+ },
+ "ninai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に相違ない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "ninai",
+   "level": "N2",
+   "pattern": "〜に相違ない"
   }
  },
  "ninaru": {
@@ -7075,11 +10248,131 @@
    "pattern": "〜になる"
   }
  },
+ "ninotote": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "にのっとって"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "ninotote",
+   "level": "N1",
+   "pattern": "にのっとって"
+  }
+ },
+ "niokaremashitehaniokaremashitemo": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜におかれましては/におかれましても"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "niokaremashitehaniokaremashitemo",
+   "level": "N1",
+   "pattern": "〜におかれましては/におかれましても"
+  }
+ },
+ "nirazu": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に限らず"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nirazu",
+   "level": "N2",
+   "pattern": "〜に限らず"
+  }
+ },
+ "niru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に限る"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "niru",
+   "level": "N2",
+   "pattern": "〜に限る"
+  }
+ },
+ "niru-071752": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "に限る"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "niru-071752",
+   "level": "N3",
+   "pattern": "に限る"
+  }
+ },
+ "nishironishironiseyoniseyo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしろ〜にしろ / にせよ〜にせよ"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしろ〜にしろ/にせよ〜にせよ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nishironishironiseyoniseyo",
+   "level": "N2",
+   "pattern": "〜にしろ〜にしろ/にせよ〜にせよ"
+  }
+ },
+ "nishitakotohanai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜に越したことはない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nishitakotohanai",
+   "level": "N1",
+   "pattern": "〜に越したことはない"
+  }
+ },
  "nishitaranisurebanishitemo": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "にしたら/にすれば/にしても"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしたら/にすれば"
    }
   ],
   "gaps": [
@@ -7091,10 +10384,78 @@
    "pattern": "にしたら/にすれば/にしても"
   }
  },
+ "nishitatenishitemo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしたって / にしても"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしたって/にしても"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nishitatenishitemo",
+   "level": "N2",
+   "pattern": "〜にしたって / にしても"
+  }
+ },
+ "nishitatenishitemo-a3ea75": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしたって / にしても"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしたって/にしても"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nishitatenishitemo-a3ea75",
+   "level": "N2",
+   "pattern": "〜にしたって/にしても"
+  }
+ },
+ "nishitatokorode": {
+  "from": [
+   {
+    "material": "n1.json",
+    "pattern": "としたところで/としたって/にしたところで/にしたって"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "にしたところで"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nishitatokorode",
+   "level": "N1",
+   "pattern": "にしたところで"
+  }
+ },
  "nishite-59525e": {
   "from": [
    {
     "material": "n1.json",
+    "pattern": "にして"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "にして"
+   },
+   {
+    "material": "n1_materials.json",
     "pattern": "にして"
    }
   ],
@@ -7105,6 +10466,22 @@
    "id": "nishite-59525e",
    "level": "N1",
    "pattern": "にして"
+  }
+ },
+ "nishite-8d1c26": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に際して"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nishite-8d1c26",
+   "level": "N2",
+   "pattern": "〜に際して"
   }
  },
  "nishiteha-1d2bbe": {
@@ -7144,6 +10521,10 @@
    {
     "material": "n2_170.json",
     "pattern": "に反して/に反し/に反する/に反した"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に反し/に反して/に反する"
    }
   ],
   "gaps": [
@@ -7155,8 +10536,48 @@
    "pattern": "に反して/に反し/に反する/に反した"
   }
  },
+ "nisokushitehanisokushitemo": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "にそくして(は) / にそくしても"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nisokushitehanisokushitemo",
+   "level": "N1",
+   "pattern": "にそくして(は) / にそくしても"
+  }
+ },
  "nisuru": {
   "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜にして"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜にして"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜に(は)あたらない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしても〜にしても"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしては"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にして見たら/にして見れば/にして見ると/にして見ても"
+   },
    {
     "material": "n4.json",
     "pattern": "〜にする"
@@ -7178,6 +10599,30 @@
  "nisuru-138b7a": {
   "from": [
    {
+    "material": "n1_materials.json",
+    "pattern": "〜にして"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜にして"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜に(は)あたらない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしても〜にしても"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にしては"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にして見たら/にして見れば/にして見ると/にして見ても"
+   },
+   {
     "material": "n4.json",
     "pattern": "〜にする"
    },
@@ -7193,6 +10638,22 @@
    "id": "nisuru-138b7a",
    "level": "N4",
    "pattern": "〜にする"
+  }
+ },
+ "nitaerunitaenai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜にたえる / にたえない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nitaerunitaenai",
+   "level": "N1",
+   "pattern": "〜にたえる / にたえない"
   }
  },
  "nitaerutaenai": {
@@ -7211,6 +10672,94 @@
    "pattern": "にたえる/たえない"
   }
  },
+ "nitarirunitarinai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜にたりる / にたりない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nitarirunitarinai",
+   "level": "N1",
+   "pattern": "〜にたりる / にたりない"
+  }
+ },
+ "nitarunitaranai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜にたる / にたらない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nitarunitaranai",
+   "level": "N1",
+   "pattern": "〜にたる / にたらない"
+  }
+ },
+ "nite": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に限って"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nite",
+   "level": "N2",
+   "pattern": "〜に限って"
+  }
+ },
+ "nite-ff2882": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "にて"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nite-ff2882",
+   "level": "N3",
+   "pattern": "にて"
+  }
+ },
+ "nitehanitemo": {
+  "from": [
+   {
+    "material": "n1.json",
+    "pattern": "に至る/に至るまで/に至って/に至った"
+   },
+   {
+    "material": "n1.json",
+    "pattern": "に至っては/に至ると/に至っても"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "に至って(は) / に至っても"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nitehanitemo",
+   "level": "N1",
+   "pattern": "に至って(は) / に至っても"
+  }
+ },
  "nitenii": {
   "from": [
    {
@@ -7225,6 +10774,38 @@
    "id": "nitenii",
    "level": "N2",
    "pattern": "に従って/に従い"
+  }
+ },
+ "nitodomarazu": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "にとどまらず"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nitodomarazu",
+   "level": "N1",
+   "pattern": "にとどまらず"
+  }
+ },
+ "nitorawarezunitorawarerukotonaku": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "にとらわれず / にとらわれることなく"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nitorawarezunitorawarerukotonaku",
+   "level": "N1",
+   "pattern": "にとらわれず / にとらわれることなく"
   }
  },
  "nitsuite": {
@@ -7243,11 +10824,31 @@
    "pattern": "～について"
   }
  },
+ "nitsukenitsuke": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜につけ〜につけ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nitsukenitsuke",
+   "level": "N2",
+   "pattern": "〜につけ〜につけ"
+  }
+ },
  "nitsukenitsuketehanitsuketemo": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "につけ/につけては/につけても"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜につけ / につけて(は) / につけても"
    }
   ],
   "gaps": [
@@ -7257,6 +10858,106 @@
    "id": "nitsukenitsuketehanitsuketemo",
    "level": "N2",
    "pattern": "につけ/につけては/につけても"
+  }
+ },
+ "nitsukinitsukimashite": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜につき / につきまして"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜につき / につきまして"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜につき/について"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nitsukinitsukimashite",
+   "level": "N2",
+   "pattern": "〜につき / につきまして"
+  }
+ },
+ "nitsunagaru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜につながる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nitsunagaru",
+   "level": "N2",
+   "pattern": "〜につながる"
+  }
+ },
+ "nitsurete": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "にひきかえ(て) / とひきかえに"
+   },
+   {
+    "material": "n2_170.json",
+    "pattern": "につれて/につれ"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ていられる / て(は)いられない"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "につれ(て)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nitsurete",
+   "level": "N3",
+   "pattern": "につれ(て)"
+  }
+ },
+ "niutokorogakii": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "に負うところが大きい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "niutokorogakii",
+   "level": "N1",
+   "pattern": "に負うところが大きい"
+  }
+ },
+ "niyorutokorogakii": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "によるところが大きい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "niyorutokorogakii",
+   "level": "N1",
+   "pattern": "によるところが大きい"
   }
  },
  "niyorutoniyoreba": {
@@ -7284,6 +10985,10 @@
    {
     "material": "n2_170.json",
     "pattern": "に基づいて/に基づき/に基づいた"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜に基づき / に基づいて / に基づく"
    }
   ],
   "gaps": [
@@ -7334,8 +11039,16 @@
     "pattern": "ただ…のみならず/ただ…だけでなく/ひとり…のみならず"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "ひとり〜だけでなく(ばかりでなく、のみでなく、のみならず)"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "のみならず"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜のみか/のみでなく/のみならず"
    }
   ],
   "gaps": [
@@ -7352,6 +11065,10 @@
    {
     "material": "n2_170.json",
     "pattern": "のもとで/のもとに"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜のもとで / のもとに"
    }
   ],
   "gaps": [
@@ -7463,6 +11180,42 @@
    "pattern": "～のだ"
   }
  },
+ "noda-e4b5a5": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "のだ"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "のだ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "noda-e4b5a5",
+   "level": "N3",
+   "pattern": "のだ"
+  }
+ },
+ "nodakara": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "のだから"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nodakara",
+   "level": "N3",
+   "pattern": "のだから"
+  }
+ },
  "nodaroukanodeshiyouka": {
   "from": [
    {
@@ -7567,6 +11320,22 @@
    "pattern": "Plain form + ので"
   }
  },
+ "nodehaarumaika": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜のではあるまいか"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nodehaarumaika",
+   "level": "N2",
+   "pattern": "〜のではあるまいか"
+  }
+ },
  "nodehagaichibandesuka": {
   "from": [
    {
@@ -7583,6 +11352,22 @@
    "pattern": "～(の中)では、何がいちばん～ですか"
   }
  },
+ "nodehanaikanodehanaidarou": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "のではないか/のではないだろう"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nodehanaikanodehanaidarou",
+   "level": "N3",
+   "pattern": "のではないか/のではないだろう"
+  }
+ },
  "nohanodakaradatameda": {
   "from": [
    {
@@ -7597,6 +11382,38 @@
    "id": "nohanodakaradatameda",
    "level": "N4",
    "pattern": "～のは～のだ/からだ/ためだ"
+  }
+ },
+ "nomi": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜の極み"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nomi",
+   "level": "N1",
+   "pattern": "〜の極み"
+  }
+ },
+ "nomi-only": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "のみ"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "nomi-only",
+   "level": "N1",
+   "pattern": "Noun / V plain + のみ"
   }
  },
  "nonannotenantemonjiyanai": {
@@ -7755,6 +11572,22 @@
    "pattern": "のを知っています"
   }
  },
+ "nori": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜の至り"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "nori",
+   "level": "N1",
+   "pattern": "〜の至り"
+  }
+ },
  "noyouda": {
   "from": [
    {
@@ -7776,6 +11609,14 @@
    {
     "material": "n2_170.json",
     "pattern": "ぬきで/ぬきでは/ぬきに/ぬきには/ぬきの"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ぬきで(は)〜ない / ぬきに(は)〜ない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ぬきで/ぬきに/ぬきの"
    }
   ],
   "gaps": [
@@ -7806,6 +11647,26 @@
  "o-v-kudasai-polite-honor": {
   "from": [
    {
+    "material": "n2_materials.json",
+    "pattern": "お(ご)〜になれる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "お(ご)〜願う"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "お(ご)〜できる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "お(ご)〜申し上げる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "お(ご)〜申す"
+   },
+   {
     "material": "n3.json",
     "pattern": "お…ください"
    },
@@ -7820,6 +11681,22 @@
    {
     "material": "n3.json",
     "pattern": "ようにしてください"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "お(ご)〜くださる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "お(ご)〜なさる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "お(ご)〜です"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "お(ご)〜いただく"
    },
    {
     "material": "n4.json",
@@ -7863,6 +11740,58 @@
    "pattern": "お + V ます-stem + ください (or ご + Sino-Japanese noun + ください)"
   }
  },
+ "oeoeteoeta": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜を控え/を控えて/を控えた"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "を控えて"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "oeoeteoeta",
+   "level": "N1",
+   "pattern": "〜を控え/を控えて/を控えた"
+  }
+ },
+ "ojinai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜を禁じ得ない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "ojinai",
+   "level": "N1",
+   "pattern": "〜を禁じ得ない"
+  }
+ },
+ "okage": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "おかげ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "okage",
+   "level": "N3",
+   "pattern": "おかげ"
+  }
+ },
  "okage-sei-de": {
   "from": [
    {
@@ -7885,6 +11814,22 @@
    "id": "okage-sei-de",
    "level": "N3",
    "pattern": "V plain / noun-の + おかげで (positive) or せいで (negative)"
+  }
+ },
+ "okaneteokaneru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜をかねて/をかねる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "okaneteokaneru",
+   "level": "N2",
+   "pattern": "〜をかねて/をかねる"
   }
  },
  "okini": {
@@ -7951,6 +11896,22 @@
    "pattern": "をこめて"
   }
  },
+ "okometeokometa": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜をこめて/をこめた"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "okometeokometa",
+   "level": "N2",
+   "pattern": "〜をこめて/をこめた"
+  }
+ },
  "okudasai": {
   "from": [
    {
@@ -7988,6 +11949,10 @@
    {
     "material": "n2_170.json",
     "pattern": "をめぐって/をめぐる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜をめぐって/をめぐる"
    }
   ],
   "gaps": [
@@ -8015,6 +11980,170 @@
    "pattern": "をものともせずに"
   }
  },
+ "omote": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜をもって"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "omote",
+   "level": "N1",
+   "pattern": "〜をもって"
+  }
+ },
+ "omotonishiteomotonishita": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜をもとに(して) / をもとにした"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "omotonishiteomotonishita",
+   "level": "N2",
+   "pattern": "〜をもとに(して) / をもとにした"
+  }
+ },
+ "onakusareruonakusaseru": {
+  "from": [
+   {
+    "material": "n1.json",
+    "pattern": "を余儀なくされる/を余儀なくさせる"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜を余儀なくされる / を余儀なくさせる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "onakusareruonakusaseru",
+   "level": "N1",
+   "pattern": "〜を余儀なくされる / を余儀なくさせる"
+  }
+ },
+ "oneteoneru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜を重ねて / を重ねる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "oneteoneru",
+   "level": "N2",
+   "pattern": "〜を重ねて / を重ねる"
+  }
+ },
+ "oni": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "を機に"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "oni",
+   "level": "N1",
+   "pattern": "を機に"
+  }
+ },
+ "oniganinate": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜を契機に / が契機になって"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "oniganinate",
+   "level": "N2",
+   "pattern": "〜を契機に / が契機になって"
+  }
+ },
+ "onikakaru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "お目にかかる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "onikakaru",
+   "level": "N3",
+   "pattern": "お目にかかる"
+  }
+ },
+ "onikakeru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "お目にかける"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "onikakeru",
+   "level": "N2",
+   "pattern": "お目にかける"
+  }
+ },
+ "onisuru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "を〜にする"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "onisuru",
+   "level": "N3",
+   "pattern": "を〜にする"
+  }
+ },
+ "ooitenai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "をおいて〜ない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "ooitenai",
+   "level": "N1",
+   "pattern": "をおいて〜ない"
+  }
+ },
  "opikunishiteosakainishite": {
   "from": [
    {
@@ -8029,6 +12158,102 @@
    "id": "opikunishiteosakainishite",
    "level": "N1",
    "pattern": "をピークにして、をさかいにして"
+  }
+ },
+ "orini": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜を限りに"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "orini",
+   "level": "N1",
+   "pattern": "〜を限りに"
+  }
+ },
+ "orinishiteoritoshite": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜を頼りに(して) / を頼りとして"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "orinishiteoritoshite",
+   "level": "N2",
+   "pattern": "〜を頼りに(して) / を頼りとして"
+  }
+ },
+ "oru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜を賜る"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "oru",
+   "level": "N1",
+   "pattern": "〜を賜る"
+  }
+ },
+ "oshikudasai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "お越しください"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "oshikudasai",
+   "level": "N2",
+   "pattern": "お越しください"
+  }
+ },
+ "oshikudasaruoshininaru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "お越しくださる/お越しになる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "oshikudasaruoshininaru",
+   "level": "N2",
+   "pattern": "お越しくださる/お越しになる"
+  }
+ },
+ "oshiteoshite": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "を押して / を押し切って"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "oshiteoshite",
+   "level": "N1",
+   "pattern": "を押して / を押し切って"
   }
  },
  "osore-ga-aru": {
@@ -8052,6 +12277,10 @@
    {
     "material": "n2_170.json",
     "pattern": "を～として/をとする/を～とした"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "を〜とする"
    }
   ],
   "gaps": [
@@ -8095,11 +12324,51 @@
    "pattern": "おわる"
   }
  },
+ "owazuhawazu": {
+  "from": [
+   {
+    "material": "n2_170.json",
+    "pattern": "を問わず/は問わず"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜を問わず/は問わず"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "owazuhawazu",
+   "level": "N2",
+   "pattern": "〜を問わず/は問わず"
+  }
+ },
+ "panashi": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜っぱなし"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "panashi",
+   "level": "N2",
+   "pattern": "〜っぱなし"
+  }
+ },
  "particle-kara-from": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "からある/からする/からの"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜からある / からいる / からする / から"
    },
    {
     "material": "n2_170.json",
@@ -8112,6 +12381,14 @@
    {
     "material": "n3.json",
     "pattern": "から（组成）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "からすると(すれば、したら、して、しても)"
    },
    {
     "material": "n4.json",
@@ -8137,6 +12414,14 @@
  },
  "particle-made-until": {
   "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "まで"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "まで"
+   },
    {
     "material": "n4.json",
     "pattern": "まで"
@@ -8166,6 +12451,10 @@
     "pattern": "など"
    },
    {
+    "material": "n3_materials.json",
+    "pattern": "など"
+   },
+   {
     "material": "n5.json",
     "pattern": "など"
    }
@@ -8177,6 +12466,22 @@
    "id": "particle-ya-non-exhaustive",
    "level": "N5",
    "pattern": "X や Y (など)"
+  }
+ },
+ "poi": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～っぽい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "poi",
+   "level": "N3",
+   "pattern": "～っぽい"
   }
  },
  "ppoi-seems": {
@@ -8287,6 +12592,94 @@
    "pattern": "Plain form / noun + らしい"
   }
  },
+ "regaaru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜恐れがある"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "regaaru",
+   "level": "N2",
+   "pattern": "〜恐れがある"
+  }
+ },
+ "rida": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜限りだ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "rida",
+   "level": "N1",
+   "pattern": "〜限りだ"
+  }
+ },
+ "riderideha": {
+  "from": [
+   {
+    "material": "n2_170.json",
+    "pattern": "限り/限りは/限りでは/ない限り"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜限り(は) / ない限り(は)"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜限り(で) / 限りでは"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜限り"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "riderideha",
+   "level": "N2",
+   "pattern": "〜限り(で) / 限りでは"
+  }
+ },
+ "rihanairiha": {
+  "from": [
+   {
+    "material": "n2_170.json",
+    "pattern": "限り/限りは/限りでは/ない限り"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜限り(は) / ない限り(は)"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜限り(で) / 限りでは"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜限り"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "rihanairiha",
+   "level": "N2",
+   "pattern": "〜限り(は) / ない限り(は)"
+  }
+ },
  "sae-even": {
   "from": [
    {
@@ -8296,6 +12689,10 @@
    {
     "material": "n2_170.json",
     "pattern": "さえ/でさえ"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "さえ"
    }
   ],
   "gaps": [
@@ -8316,6 +12713,10 @@
    {
     "material": "n2_170.json",
     "pattern": "さえ/でさえ"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "さえ"
    }
   ],
   "gaps": [
@@ -8343,6 +12744,22 @@
    "pattern": "さえ～ば"
   }
  },
+ "saeba-8f639e": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜さえ〜ば"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "saeba-8f639e",
+   "level": "N2",
+   "pattern": "〜さえ〜ば"
+  }
+ },
  "sai-ni": {
   "from": [
    {
@@ -8361,6 +12778,10 @@
  },
  "saichu-in-the-middle": {
   "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～ている"
+   },
    {
     "material": "n4.json",
     "pattern": "～ている"
@@ -8382,12 +12803,80 @@
  "sami": {
   "from": [
    {
+    "material": "n1_materials.json",
+    "pattern": "〜(さ)せてやってくださる"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜(さ)せてやってください/(さ)せてやってくださいませんか"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜(さ)せてやっていただけませんか"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜(さ)せてやってもらえませんか"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "(さ)せる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "(さ)せてあげる/(さ)せてやる"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "(さ)せてやってください(ませんか)"
+   },
+   {
     "material": "n3.json",
     "pattern": "さ/み"
    },
    {
     "material": "n3.json",
     "pattern": "さ（名词化）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せられる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてくださる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてくださいませんか"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてくれる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてくれませんか"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せていただく"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せていただけませんか"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてもらう"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "(さ)せてもらえませんか"
    },
    {
     "material": "n4.json",
@@ -8425,6 +12914,42 @@
    "id": "san",
    "level": "N5",
    "pattern": "~さん"
+  }
+ },
+ "sei": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "せい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "sei",
+   "level": "N3",
+   "pattern": "せい"
+  }
+ },
+ "seru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "見せる"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "見せる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "seru",
+   "level": "N3",
+   "pattern": "見せる"
   }
  },
  "shi-reason-listing": {
@@ -8508,6 +13033,10 @@
    {
     "material": "n3.json",
     "pattern": "しかない"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "しかない"
    }
   ],
   "gaps": [
@@ -8551,6 +13080,38 @@
    "pattern": "Verb plain / V-た form + そばから"
   }
  },
+ "sobakara-105f0d": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜そばから"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "sobakara-105f0d",
+   "level": "N1",
+   "pattern": "〜そばから"
+  }
+ },
+ "sobireru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜そびれる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "sobireru",
+   "level": "N1",
+   "pattern": "〜そびれる"
+  }
+ },
  "sonnaninai": {
   "from": [
    {
@@ -8565,6 +13126,22 @@
    "id": "sonnaninai",
    "level": "N4",
    "pattern": "そんなに～ない"
+  }
+ },
+ "sonomono": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜そのもの"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "sonomono",
+   "level": "N1",
+   "pattern": "〜そのもの"
   }
  },
  "sorede-and-then": {
@@ -8698,6 +13275,10 @@
     "pattern": "そうだ（様態）"
    },
    {
+    "material": "n3_materials.json",
+    "pattern": "そうだ"
+   },
+   {
     "material": "n4.json",
     "pattern": "そうだ（传闻助动词）"
    },
@@ -8724,6 +13305,10 @@
    {
     "material": "n3.json",
     "pattern": "そうだ（様態）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "そうだ"
    },
    {
     "material": "n4.json",
@@ -8797,6 +13382,38 @@
    "id": "sounai",
    "level": "N4",
    "pattern": "そう～ない"
+  }
+ },
+ "souninaru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "そうになる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "souninaru",
+   "level": "N3",
+   "pattern": "そうになる"
+  }
+ },
+ "sue": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜すえ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "sue",
+   "level": "N2",
+   "pattern": "〜すえ"
   }
  },
  "sugi": {
@@ -8887,6 +13504,26 @@
    "pattern": "～すぎる/すぎだ"
   }
  },
+ "sura": {
+  "from": [
+   {
+    "material": "n1.json",
+    "pattern": "すら/さえ"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "すら"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "sura",
+   "level": "N1",
+   "pattern": "すら"
+  }
+ },
  "surugasuruteirunisuru": {
   "from": [
    {
@@ -8906,12 +13543,20 @@
  "ta-bakari": {
   "from": [
    {
+    "material": "n2_materials.json",
+    "pattern": "ばかり"
+   },
+   {
     "material": "n3.json",
     "pattern": "ばかり"
    },
    {
     "material": "n3.json",
     "pattern": "ばかり（概数）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ばかり"
    },
    {
     "material": "n4.json",
@@ -8952,6 +13597,10 @@
    {
     "material": "n2_170.json",
     "pattern": "きり/きりだ"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "きり"
    }
   ],
   "gaps": [
@@ -8986,6 +13635,14 @@
     "pattern": "ところ（するところ/してところ/たところ/ところが/ところで）"
    },
    {
+    "material": "n3_materials.json",
+    "pattern": "ところ(が)"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ところ"
+   },
+   {
     "material": "n4.json",
     "pattern": "ところ（形式名词）"
    },
@@ -9008,6 +13665,10 @@
    {
     "material": "n3.json",
     "pattern": "ところ（するところ/してところ/たところ/ところが/ところで）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ところで"
    }
   ],
   "gaps": [
@@ -9049,6 +13710,22 @@
    "id": "tabi-ni-every-time",
    "level": "N3",
    "pattern": "V plain non-past / noun-の + たびに"
+  }
+ },
+ "tabini": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～たびに"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tabini",
+   "level": "N3",
+   "pattern": "～たびに"
   }
  },
  "tachi": {
@@ -9239,6 +13916,22 @@
    "pattern": "～たくても～ない"
   }
  },
+ "tamae": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "たまえ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tamae",
+   "level": "N2",
+   "pattern": "たまえ"
+  }
+ },
  "tame": {
   "from": [
    {
@@ -9331,8 +14024,28 @@
    "pattern": "V plain / noun + の + ために"
   }
  },
+ "tameniha": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ためには"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tameniha",
+   "level": "N3",
+   "pattern": "ためには"
+  }
+ },
  "tara-conditional": {
   "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "(ら)れる"
+   },
    {
     "material": "n4.json",
     "pattern": "（ら）れる（可能助动词）"
@@ -9422,6 +14135,10 @@
     "pattern": "（た）ことがある"
    },
    {
+    "material": "n3_materials.json",
+    "pattern": "はしない/やしない/もしない"
+   },
+   {
     "material": "n5.json",
     "pattern": "た (过去完了助动词)"
    }
@@ -9475,6 +14192,38 @@
    "pattern": "たり、たりする"
   }
  },
+ "taritomo": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜たりとも"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "taritomo",
+   "level": "N1",
+   "pattern": "〜たりとも"
+  }
+ },
+ "taru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "たる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "taru",
+   "level": "N1",
+   "pattern": "たる"
+  }
+ },
  "tarumonotomoaroumonogatoshitakotoga": {
   "from": [
    {
@@ -9521,6 +14270,22 @@
    "id": "tatameni",
    "level": "N3",
    "pattern": "たために（原因详解）"
+  }
+ },
+ "tate": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜たて"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tate",
+   "level": "N2",
+   "pattern": "〜たて"
   }
  },
  "tatoe-temo": {
@@ -9572,6 +14337,10 @@
    {
     "material": "n3.json",
     "pattern": "たとえ～ても"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "たとえ〜ても"
    }
   ],
   "gaps": [
@@ -9649,6 +14418,22 @@
    "id": "tatotantatotanni",
    "level": "N2",
    "pattern": "たとたん/たとたんに"
+  }
+ },
+ "tatte-even-casual": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "たって"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "tatte-even-casual",
+   "level": "N2",
+   "pattern": "Plain form + (っ)たって"
   }
  },
  "te-ageru-favor-given": {
@@ -9922,6 +14707,10 @@
     "pattern": "〜て（は）いられない/〜で（は）いられない"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "〜からある / からいる / からする / から"
+   },
+   {
     "material": "n2_170.json",
     "pattern": "からして"
    },
@@ -9932,6 +14721,14 @@
    {
     "material": "n3.json",
     "pattern": "から（组成）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "からすると(すれば、したら、して、しても)"
    },
    {
     "material": "n4.json",
@@ -10022,7 +14819,15 @@
     "pattern": "〜て（は）いられない/〜で（は）いられない"
    },
    {
+    "material": "n1_materials.json",
+    "pattern": "こそ"
+   },
+   {
     "material": "n2_170.json",
+    "pattern": "こそ"
+   },
+   {
+    "material": "n3_materials.json",
     "pattern": "こそ"
    },
    {
@@ -10458,6 +15263,10 @@
     "pattern": "〜て（は）いられない/〜で（は）いられない"
    },
    {
+    "material": "n2_materials.json",
+    "pattern": "〜ていられる / て(は)いられない"
+   },
+   {
     "material": "n5.json",
     "pattern": "~て/ないで"
    }
@@ -10567,6 +15376,22 @@
    "pattern": "～てある"
   }
  },
+ "tebakarihairarenaitebakari": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜てばかりはいられない / てばかり"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tebakarihairarenaitebakari",
+   "level": "N2",
+   "pattern": "〜てばかりはいられない / てばかり"
+  }
+ },
  "tebakariiru": {
   "from": [
    {
@@ -10583,10 +15408,30 @@
    "pattern": "てばかりいる"
   }
  },
+ "techiyoudai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "てちょうだい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "techiyoudai",
+   "level": "N3",
+   "pattern": "てちょうだい"
+  }
+ },
  "tedemo": {
   "from": [
    {
     "material": "n1.json",
+    "pattern": "〜てでも"
+   },
+   {
+    "material": "n2_materials.json",
     "pattern": "〜てでも"
    }
   ],
@@ -10615,8 +15460,60 @@
    "pattern": "〜て見える"
   }
  },
+ "tegokudasarutegoninaru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "てご覧くださる/てご覧になる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tegokudasarutegoninaru",
+   "level": "N3",
+   "pattern": "てご覧くださる/てご覧になる"
+  }
+ },
+ "tegotegonasaitegokudasai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "てご覧/てご覧なさい/てご覧ください"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tegotegonasaitegokudasai",
+   "level": "N3",
+   "pattern": "てご覧/てご覧なさい/てご覧ください"
+  }
+ },
+ "tegozaru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てござる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tegozaru",
+   "level": "N1",
+   "pattern": "〜てござる"
+  }
+ },
  "teha": {
   "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "ては"
+   },
    {
     "material": "n4.json",
     "pattern": "ては"
@@ -10699,11 +15596,51 @@
    "pattern": "～てはいけない / てはだめだ"
   }
  },
+ "tehajimete": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～てはじめて"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tehajimete",
+   "level": "N3",
+   "pattern": "～てはじめて"
+  }
+ },
+ "tehanaranai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "てはならない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tehanaranai",
+   "level": "N3",
+   "pattern": "てはならない"
+  }
+ },
  "tehoshiitemoraitai": {
   "from": [
    {
     "material": "n3.json",
     "pattern": "てほしい/てもらいたい"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "てほしい"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "てもらいたい"
    }
   ],
   "gaps": [
@@ -10823,6 +15760,54 @@
    "pattern": "ているところです"
   }
  },
+ "teitadakemasenka": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ていただけませんか"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teitadakemasenka",
+   "level": "N3",
+   "pattern": "ていただけませんか"
+  }
+ },
+ "teitadakitai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ていただきたい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teitadakitai",
+   "level": "N3",
+   "pattern": "ていただきたい"
+  }
+ },
+ "tekanawanaitehakanawanai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てかなわない / てはかなわない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tekanawanaitehakanawanai",
+   "level": "N1",
+   "pattern": "〜てかなわない / てはかなわない"
+  }
+ },
  "tekara": {
   "from": [
    {
@@ -10844,6 +15829,10 @@
    {
     "material": "n2_170.json",
     "pattern": "てからでないと/てからでなければ"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "てからでないと/てからでなければ/てからでなかったら"
    }
   ],
   "gaps": [
@@ -11043,6 +16032,38 @@
    "pattern": "〜てまで"
   }
  },
+ "temae": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "てまえ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temae",
+   "level": "N1",
+   "pattern": "てまえ"
+  }
+ },
+ "temairu": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "てまいる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temairu",
+   "level": "N3",
+   "pattern": "てまいる"
+  }
+ },
  "temasu": {
   "from": [
    {
@@ -11155,6 +16176,22 @@
    "pattern": "ても"
   }
  },
+ "temodanomoda": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ても当然だ / のも当然だ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temodanomoda",
+   "level": "N2",
+   "pattern": "〜ても当然だ / のも当然だ"
+  }
+ },
  "temoiidesu": {
   "from": [
    {
@@ -11227,6 +16264,70 @@
    "pattern": "〜ても始まらない"
   }
  },
+ "temomonainomohanai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ても無理もない / のも無理はない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temomonainomohanai",
+   "level": "N1",
+   "pattern": "〜ても無理もない / のも無理はない"
+  }
+ },
+ "temoraemasenka": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "てもらえませんか"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temoraemasenka",
+   "level": "N3",
+   "pattern": "てもらえませんか"
+  }
+ },
+ "temoraerutokaruteitadakerutokaru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "てもらえると助かる/ていただけると助かる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temoraerutokaruteitadakerutokaru",
+   "level": "N2",
+   "pattern": "てもらえると助かる/ていただけると助かる"
+  }
+ },
+ "temoraoukateitadakouka": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "てもらおうか/ていただこうか"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temoraoukateitadakouka",
+   "level": "N2",
+   "pattern": "てもらおうか/ていただこうか"
+  }
+ },
  "temorau": {
   "from": [
    {
@@ -11259,6 +16360,62 @@
    "pattern": "〜てもらう/ていただく"
   }
  },
+ "temoshienai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ても差し支えない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temoshienai",
+   "level": "N1",
+   "pattern": "〜ても差し支えない"
+  }
+ },
+ "temoshikataganaitemoshiyouganainomoshikataganainomoshiyou": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜てもしかたがない / てもしようがない / 〜のもしかたがない / のもしよう"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "てもしかたがない/てもしようがない/のもしかたがない/のもしようがない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temoshikataganaitemoshiyouganainomoshikataganainomoshiyou",
+   "level": "N2",
+   "pattern": "〜てもしかたがない / てもしようがない / 〜のもしかたがない / のもしよう"
+  }
+ },
+ "temoshikataganaitemoshiyouganainomoshikataganainomoshiyouganai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜てもしかたがない / てもしようがない / 〜のもしかたがない / のもしよう"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "てもしかたがない/てもしようがない/のもしかたがない/のもしようがない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temoshikataganaitemoshiyouganainomoshikataganainomoshiyouganai",
+   "level": "N3",
+   "pattern": "てもしかたがない/てもしようがない/のもしかたがない/のもしようがない"
+  }
+ },
  "temotemo": {
   "from": [
    {
@@ -11275,6 +16432,38 @@
    "pattern": "～ても～ても"
   }
  },
+ "temotomotodatemomotomotoda": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てもともとだ / てももともとだ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temotomotodatemomotomotoda",
+   "level": "N1",
+   "pattern": "〜てもともとだ / てももともとだ"
+  }
+ },
+ "temoyamuonainomoyamuonai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜てもやむを得ない / のもやむを得ない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "temoyamuonainomoyamuonai",
+   "level": "N2",
+   "pattern": "〜てもやむを得ない / のもやむを得ない"
+  }
+ },
  "tenaranai": {
   "from": [
    {
@@ -11289,6 +16478,22 @@
    "id": "tenaranai",
    "level": "N2",
    "pattern": "てならない"
+  }
+ },
+ "tenaranai-1884a0": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜てならない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tenaranai-1884a0",
+   "level": "N2",
+   "pattern": "〜てならない"
   }
  },
  "teoku": {
@@ -11341,6 +16546,38 @@
    "id": "teoru",
    "level": "N4",
    "pattern": "〜ておる"
+  }
+ },
+ "teshikarubeki": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てしかるべき"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teshikarubeki",
+   "level": "N1",
+   "pattern": "〜てしかるべき"
+  }
+ },
+ "teshikataganaiteshiyouganaitehashikataganaitehashiyouganai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜てしかたがない / てしようがない / てはしかたがない / てはしようがない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teshikataganaiteshiyouganaitehashikataganaitehashiyouganai",
+   "level": "N2",
+   "pattern": "〜てしかたがない / てしようがない / てはしかたがない / てはしようがない"
   }
  },
  "teshimau": {
@@ -11431,11 +16668,31 @@
    "pattern": "てしょうがない"
   }
  },
+ "tesumutehasumanaitesumukoto": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜てすむ / てはすまない / てすむこと"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tesumutehasumanaitesumukoto",
+   "level": "N2",
+   "pattern": "〜てすむ / てはすまない / てすむこと"
+  }
+ },
  "tetamaranai": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "てたまらない"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "てたまらない/てはたまらない"
    }
   ],
   "gaps": [
@@ -11461,6 +16718,22 @@
    "id": "teyamanai",
    "level": "N1",
    "pattern": "てやまない"
+  }
+ },
+ "teyamanai-4005e7": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てやまない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teyamanai-4005e7",
+   "level": "N1",
+   "pattern": "〜てやまない"
   }
  },
  "teyaru": {
@@ -11493,6 +16766,102 @@
    "id": "teyaruteagerutesashiageru",
    "level": "N4",
    "pattern": "〜てやる/てあげる/てさしあげる"
+  }
+ },
+ "teyateitadakemasenka": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てやっていただけませんか"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teyateitadakemasenka",
+   "level": "N1",
+   "pattern": "〜てやっていただけませんか"
+  }
+ },
+ "teyateitadaku": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てやっていただく"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teyateitadaku",
+   "level": "N1",
+   "pattern": "〜てやっていただく"
+  }
+ },
+ "teyatekudasaru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てやってくださる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teyatekudasaru",
+   "level": "N1",
+   "pattern": "〜てやってくださる"
+  }
+ },
+ "teyatekureru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てやってくれる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teyatekureru",
+   "level": "N1",
+   "pattern": "〜てやってくれる"
+  }
+ },
+ "teyatemoraemasenka": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てやってもらえませんか"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teyatemoraemasenka",
+   "level": "N1",
+   "pattern": "〜てやってもらえませんか"
+  }
+ },
+ "teyatemorau": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜てやってもらう"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "teyatemorau",
+   "level": "N1",
+   "pattern": "〜てやってもらう"
   }
  },
  "teyokata": {
@@ -11532,6 +16901,10 @@
    {
     "material": "n1.json",
     "pattern": "とあっては、とあれば"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "とあれば"
    }
   ],
   "gaps": [
@@ -11547,6 +16920,10 @@
   "from": [
    {
     "material": "n1.json",
+    "pattern": "とあって"
+   },
+   {
+    "material": "n1_materials.json",
     "pattern": "とあって"
    }
   ],
@@ -11596,6 +16973,10 @@
    {
     "material": "n1.json",
     "pattern": "といえども"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "といえども"
    }
   ],
   "gaps": [
@@ -11605,6 +16986,22 @@
    "id": "to-iedomo",
    "level": "N1",
    "pattern": "Plain form + といえども"
+  }
+ },
+ "to-itta-such-as": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "という/といった"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "to-itta-such-as",
+   "level": "N3",
+   "pattern": "Noun + といった + noun"
   }
  },
  "to-itta-tokoro-da": {
@@ -11623,11 +17020,51 @@
    "pattern": "Number / noun + といったところだ"
   }
  },
+ "to-itte-mo-although": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "と言っても"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "to-itte-mo-although",
+   "level": "N3",
+   "pattern": "Plain form + と言っても"
+  }
+ },
+ "to-iu-ka": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "というか / というか〜というか"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "to-iu-ka",
+   "level": "N2",
+   "pattern": "X というか Y"
+  }
+ },
  "to-iu-koto-da": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "ということだ"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "というのだ/ということだ"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "という/ということだ"
    }
   ],
   "gaps": [
@@ -11637,6 +17074,22 @@
    "id": "to-iu-koto-da",
    "level": "N2",
    "pattern": "Plain form + ということだ"
+  }
+ },
+ "to-iu-koto-wa": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ということは"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "to-iu-koto-wa",
+   "level": "N2",
+   "pattern": "Plain form + ということは"
   }
  },
  "to-iu-mono-da": {
@@ -11671,10 +17124,30 @@
    "pattern": "Plain form + というものではない"
   }
  },
+ "to-iu-no-wa": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "というのは"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "to-iu-no-wa",
+   "level": "N2",
+   "pattern": "Noun / plain form + というのは"
+  }
+ },
  "to-iu-yori-rather": {
   "from": [
    {
     "material": "n2_170.json",
+    "pattern": "というより"
+   },
+   {
+    "material": "n3_materials.json",
     "pattern": "というより"
    }
   ],
@@ -11708,6 +17181,10 @@
    {
     "material": "n1.json",
     "pattern": "Aともなく/ともなしに（+Aしていると/しているうちに）"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "ともなく / ともなしに"
    }
   ],
   "gaps": [
@@ -11719,11 +17196,31 @@
    "pattern": "Verb dict-form + ともなく / ともなしに"
   }
  },
+ "to-nareba-if-comes-to": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜となると / となれば / となったら / となっては"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "to-nareba-if-comes-to",
+   "level": "N1",
+   "pattern": "Plain form + となれば"
+  }
+ },
  "to-omoi-kiya": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "と思いきや"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "と思いきや / とばかり思いきや"
    }
   ],
   "gaps": [
@@ -11751,11 +17248,31 @@
    "pattern": "Plain form + と思う"
   }
  },
+ "to-sareru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "とされる/とされている"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "to-sareru",
+   "level": "N1",
+   "pattern": "Plain form + とされる / とされている"
+  }
+ },
  "to-shita-tokoro-de": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "としたところで/としたって/にしたところで/にしたって"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "としたところで"
    }
   ],
   "gaps": [
@@ -11772,6 +17289,10 @@
    {
     "material": "n2_170.json",
     "pattern": "としたら/とすれば"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "とすると/とすれば/としたら"
    }
   ],
   "gaps": [
@@ -11804,6 +17325,14 @@
    {
     "material": "n1.json",
     "pattern": "とは"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "とは"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "とは"
    }
   ],
   "gaps": [
@@ -11813,6 +17342,102 @@
    "id": "to-wa",
    "level": "N1",
    "pattern": "Plain form + とは"
+  }
+ },
+ "to-wa-ie": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "とはいえ"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "to-wa-ie",
+   "level": "N2",
+   "pattern": "Plain form + とはいえ"
+  }
+ },
+ "to-wa-kagiranai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "とは限らない/とも限らない"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "to-wa-kagiranai",
+   "level": "N3",
+   "pattern": "Plain form + とは限らない"
+  }
+ },
+ "toaimatetogaaimatemoaimate": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "とあいまって / とがあいまって / もあいまって"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toaimatetogaaimatemoaimate",
+   "level": "N1",
+   "pattern": "とあいまって / とがあいまって / もあいまって"
+  }
+ },
+ "tobakarini": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "とばかり(に)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tobakarini",
+   "level": "N1",
+   "pattern": "とばかり(に)"
+  }
+ },
+ "tobetetoberuto": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "と比べて/と比べると"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tobetetoberuto",
+   "level": "N3",
+   "pattern": "と比べて/と比べると"
+  }
+ },
+ "toerarerutorareru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "と考えられる/と見られる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toerarerutorareru",
+   "level": "N2",
+   "pattern": "と考えられる/と見られる"
   }
  },
  "toerutohaenai": {
@@ -11831,6 +17456,38 @@
    "pattern": "～と言える / とは言えない"
   }
  },
+ "toetetoerutohaenai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "と見えて/と見える/とは見えない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toetetoerutohaenai",
+   "level": "N3",
+   "pattern": "と見えて/と見える/とは見えない"
+  }
+ },
+ "toeyoutomoeyou": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "と言えよう/とも言えよう"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toeyoutomoeyou",
+   "level": "N2",
+   "pattern": "と言えよう/とも言えよう"
+  }
+ },
  "tohaetohatemotohaumonono": {
   "from": [
    {
@@ -11845,6 +17502,38 @@
    "id": "tohaetohatemotohaumonono",
    "level": "N1",
    "pattern": "とは言え/とは言っても/とは言うものの"
+  }
+ },
+ "tohani": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "とは別に"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tohani",
+   "level": "N3",
+   "pattern": "とは別に"
+  }
+ },
+ "toiebaga": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "といえば〜が"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiebaga",
+   "level": "N3",
+   "pattern": "といえば〜が"
   }
  },
  "toii": {
@@ -11867,11 +17556,31 @@
    "pattern": "～といい"
   }
  },
+ "toiitoii": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "といい〜といい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiitoii",
+   "level": "N1",
+   "pattern": "といい〜といい"
+  }
+ },
  "toitaranaitoitaraarihashinaitara": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "といったらない/といったらありはしない/ったら"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜といったらありはしない / といったらない / ったらない"
    }
   ],
   "gaps": [
@@ -11899,11 +17608,35 @@
    "pattern": "といっても"
   }
  },
+ "toitenai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜といって〜ない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toitenai",
+   "level": "N1",
+   "pattern": "〜といって〜ない"
+  }
+ },
  "toiu": {
   "from": [
    {
     "material": "n3.json",
     "pattern": "という"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "という/といった"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "という/ということだ"
    }
   ],
   "gaps": [
@@ -11913,6 +17646,58 @@
    "id": "toiu",
    "level": "N3",
    "pattern": "という"
+  }
+ },
+ "toiu-ee4dee": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜という"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiu-ee4dee",
+   "level": "N1",
+   "pattern": "〜という"
+  }
+ },
+ "toiuhododehanaitoiuhododemonai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "というほどではない/というほどでもない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiuhododehanaitoiuhododemonai",
+   "level": "N3",
+   "pattern": "というほどではない/というほどでもない"
+  }
+ },
+ "toiukatoiukatoiuka": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "というか / というか〜というか"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜というか / というか〜というか"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiukatoiukatoiuka",
+   "level": "N1",
+   "pattern": "〜というか / というか〜というか"
   }
  },
  "toiukoto": {
@@ -11971,8 +17756,44 @@
    "pattern": "～ということだ / という意味だ"
   }
  },
+ "toiukotodehanaitoiukotodemonai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ということではない/ということでもない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiukotodehanaitoiukotodemonai",
+   "level": "N3",
+   "pattern": "ということではない/ということでもない"
+  }
+ },
+ "toiukotohanaitoiukotomonai": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ということはない/ということもない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiukotohanaitoiukotomonai",
+   "level": "N3",
+   "pattern": "ということはない/ということもない"
+  }
+ },
  "toiumono": {
   "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜というもの/〜てからというもの"
+   },
    {
     "material": "n5.json",
     "pattern": "~というもの"
@@ -11985,6 +17806,90 @@
    "id": "toiumono",
    "level": "N5",
    "pattern": "~というもの"
+  }
+ },
+ "toiumonoda": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜というものだ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiumonoda",
+   "level": "N2",
+   "pattern": "〜というものだ"
+  }
+ },
+ "toiumonodehanaitoiumonodemonai": {
+  "from": [
+   {
+    "material": "n2_170.json",
+    "pattern": "というものではない/というものでもない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜というものではない / というものでもない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiumonodehanaitoiumonodemonai",
+   "level": "N2",
+   "pattern": "〜というものではない / というものでもない"
+  }
+ },
+ "toiumonoha": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "というものは"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiumonoha",
+   "level": "N3",
+   "pattern": "というものは"
+  }
+ },
+ "toiunode": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "というので"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiunode",
+   "level": "N3",
+   "pattern": "というので"
+  }
+ },
+ "toiunoni": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "というのに"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiunoni",
+   "level": "N3",
+   "pattern": "というのに"
   }
  },
  "toiutokoro": {
@@ -12003,11 +17908,31 @@
    "pattern": "~というところ"
   }
  },
+ "toiutokorodatoitatokoro": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜というところだ / といったところ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiutokorodatoitatokoro",
+   "level": "N1",
+   "pattern": "〜というところだ / といったところ"
+  }
+ },
  "toiutotoiebatoitara": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "というと/といえば/といったら"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "というと/といえば"
    }
   ],
   "gaps": [
@@ -12017,6 +17942,22 @@
    "id": "toiutotoiebatoitara",
    "level": "N2",
    "pattern": "というと/といえば/といったら"
+  }
+ },
+ "toiwazutoiwazu": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "といわず〜といわず"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toiwazutoiwazu",
+   "level": "N1",
+   "pattern": "といわず〜といわず"
   }
  },
  "tojida": {
@@ -12046,6 +17987,10 @@
     "pattern": "とか"
    },
    {
+    "material": "n3_materials.json",
+    "pattern": "とか"
+   },
+   {
     "material": "n4.json",
     "pattern": "とか"
    }
@@ -12057,6 +18002,22 @@
    "id": "toka-listing",
    "level": "N4",
    "pattern": "X とか Y (とか)"
+  }
+ },
+ "tokaiutokaiukotodatokaiuda": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜とかいう / とかいうことだ / とかいう話だ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tokaiutokaiukotodatokaiuda",
+   "level": "N2",
+   "pattern": "〜とかいう / とかいうことだ / とかいう話だ"
   }
  },
  "tokatoka": {
@@ -12116,6 +18077,10 @@
    {
     "material": "n1.json",
     "pattern": "ときたら/ときては/ときている"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "とくると / ときたら / ときては"
    }
   ],
   "gaps": [
@@ -12183,6 +18148,22 @@
    "pattern": "〜ところだった"
   }
  },
+ "tokorodata-df8a13": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ところだった"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tokorodata-df8a13",
+   "level": "N3",
+   "pattern": "ところだった"
+  }
+ },
  "tokorodesu": {
   "from": [
    {
@@ -12203,11 +18184,191 @@
    "pattern": "ところです（详解）"
   }
  },
+ "tokorokara": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ところから"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tokorokara",
+   "level": "N2",
+   "pattern": "〜ところから"
+  }
+ },
+ "tokorokararutorebataratetemo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にして見たら/にして見れば/にして見ると/にして見ても"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ところから見ると(見れば、見たら、見て、見ても)"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ところを見ると(見れば、見たら、見て、見ても)"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から見ると(見れば、見たら、見て、見ても)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tokorokararutorebataratetemo",
+   "level": "N2",
+   "pattern": "〜ところから見ると(見れば、見たら、見て、見ても)"
+  }
+ },
+ "tokoronitokorohe": {
+  "from": [
+   {
+    "material": "n2_170.json",
+    "pattern": "ところに/ところへ/ところを"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "～ところに/ところへ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tokoronitokorohe",
+   "level": "N3",
+   "pattern": "～ところに/ところへ"
+  }
+ },
+ "tokoroo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ところを"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ところを"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tokoroo",
+   "level": "N2",
+   "pattern": "〜ところを"
+  }
+ },
+ "tokoroorutorebataratetemo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜にして見たら/にして見れば/にして見ると/にして見ても"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ところから見ると(見れば、見たら、見て、見ても)"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ところを見ると(見れば、見たら、見て、見ても)"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "から見ると(見れば、見たら、見て、見ても)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tokoroorutorebataratetemo",
+   "level": "N2",
+   "pattern": "〜ところを見ると(見れば、見たら、見て、見ても)"
+  }
+ },
+ "tokorotokorodehatokoroniyoru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ところ / ところでは / ところによる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tokorotokorodehatokoroniyoru",
+   "level": "N2",
+   "pattern": "〜ところ / ところでは / ところによる"
+  }
+ },
+ "tomadehaikanaigatomadehaikanaitoshitemo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜とまではいかないが/とまではいかないとしても"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tomadehaikanaigatomadehaikanaitoshitemo",
+   "level": "N2",
+   "pattern": "〜とまではいかないが/とまではいかないとしても"
+  }
+ },
+ "tomadehawanaigatomadehawanaitoshitemo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜とまでは言わないが/とまでは言わないとしても"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tomadehawanaigatomadehawanaitoshitemo",
+   "level": "N2",
+   "pattern": "〜とまでは言わないが/とまでは言わないとしても"
+  }
+ },
+ "tomo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜とも"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tomo",
+   "level": "N2",
+   "pattern": "〜とも"
+  }
+ },
  "tomo-nareba": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "ともなると/ともなれば/ともなっては"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "ともなると / ともなれば"
    }
   ],
   "gaps": [
@@ -12217,6 +18378,106 @@
    "id": "tomo-nareba",
    "level": "N1",
    "pattern": "Noun / V plain + ともなれば"
+  }
+ },
+ "tonaru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～となる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tonaru",
+   "level": "N3",
+   "pattern": "～となる"
+  }
+ },
+ "toni": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "と反対に"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toni",
+   "level": "N3",
+   "pattern": "と反対に"
+  }
+ },
+ "toni-d47d0f": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～と同時に"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toni-d47d0f",
+   "level": "N3",
+   "pattern": "～と同時に"
+  }
+ },
+ "tono": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜との"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tono",
+   "level": "N2",
+   "pattern": "〜との"
+  }
+ },
+ "tonokotoda": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜とのことだ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tonokotoda",
+   "level": "N2",
+   "pattern": "〜とのことだ"
+  }
+ },
+ "toori": {
+  "from": [
+   {
+    "material": "n2_170.json",
+    "pattern": "とおり/とおりに/どおり/どおりに"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "とおり"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toori",
+   "level": "N3",
+   "pattern": "とおり"
   }
  },
  "toorini": {
@@ -12239,11 +18500,47 @@
    "pattern": "とおりに"
   }
  },
+ "tosaseteitadaku": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "とさせていただく"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tosaseteitadaku",
+   "level": "N2",
+   "pattern": "とさせていただく"
+  }
+ },
+ "toshikanai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜としか〜ない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toshikanai",
+   "level": "N2",
+   "pattern": "〜としか〜ない"
+  }
+ },
  "toshitaratosurutotosureba": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "〜としたら、〜とすると 〜とすれば"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜として〜ない"
    }
   ],
   "gaps": [
@@ -12253,6 +18550,54 @@
    "id": "toshitaratosurutotosureba",
    "level": "N1",
    "pattern": "〜としたら、〜とすると 〜とすれば"
+  }
+ },
+ "toshitate": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜としたって"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toshitate",
+   "level": "N2",
+   "pattern": "〜としたって"
+  }
+ },
+ "toshite": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "として"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toshite",
+   "level": "N3",
+   "pattern": "として"
+  }
+ },
+ "toshitemo": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "としても"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "toshitemo",
+   "level": "N3",
+   "pattern": "としても"
   }
  },
  "toshitetoshitehatoshitemo-1f4501": {
@@ -12269,6 +18614,94 @@
    "id": "toshitetoshitehatoshitemo-1f4501",
    "level": "N2",
    "pattern": "として/としては/としても"
+  }
+ },
+ "tosuru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "とする"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "とする"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "とする"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tosuru",
+   "level": "N3",
+   "pattern": "とする"
+  }
+ },
+ "totanni": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜とたん(に)"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "totanni",
+   "level": "N2",
+   "pattern": "〜とたん(に)"
+  }
+ },
+ "totara": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "と言ったら"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "totara",
+   "level": "N3",
+   "pattern": "と言ったら"
+  }
+ },
+ "totaratotarasoudemonai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜と思ったら / と思ったらそうでもない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "totaratotarasoudemonai",
+   "level": "N2",
+   "pattern": "〜と思ったら / と思ったらそうでもない"
+  }
+ },
+ "tote": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "とて"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tote",
+   "level": "N1",
+   "pattern": "とて"
   }
  },
  "toteiitotemoii": {
@@ -12335,6 +18768,22 @@
    "pattern": "～と言っている"
   }
  },
+ "totemo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜と言っても"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "totemo",
+   "level": "N2",
+   "pattern": "〜と言っても"
+  }
+ },
  "totodochiragaka": {
   "from": [
    {
@@ -12349,6 +18798,22 @@
    "id": "totodochiragaka",
    "level": "N5",
    "pattern": "~と~とどちらが~か"
+  }
+ },
+ "totomoni": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～とともに"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "totomoni",
+   "level": "N3",
+   "pattern": "～とともに"
   }
  },
  "tou": {
@@ -12415,6 +18880,22 @@
    "pattern": "～と言われる"
   }
  },
+ "towarerutoerutojirareru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "と思われる/と思える/と感じられる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "towarerutoerutojirareru",
+   "level": "N2",
+   "pattern": "と思われる/と思える/と感じられる"
+  }
+ },
  "towareteiru": {
   "from": [
    {
@@ -12429,6 +18910,22 @@
    "id": "towareteiru",
    "level": "N4",
    "pattern": "～と言われている"
+  }
+ },
+ "towareteirutoerareteirutorareteiru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "と思われている/と考えられている/と見られている"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "towareteirutoerareteirutorareteiru",
+   "level": "N2",
+   "pattern": "と思われている/と考えられている/と見られている"
   }
  },
  "toyara": {
@@ -12452,6 +18949,10 @@
    {
     "material": "n2_170.json",
     "pattern": "ついでに"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ついでに"
    }
   ],
   "gaps": [
@@ -12461,6 +18962,22 @@
    "id": "tsuide-ni",
    "level": "N3",
    "pattern": "V plain / noun + の + ついでに"
+  }
+ },
+ "tsumori": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜つもり"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tsumori",
+   "level": "N2",
+   "pattern": "〜つもり"
   }
  },
  "tsumori-intention": {
@@ -12495,6 +19012,22 @@
    "pattern": "つもりだ"
   }
  },
+ "tsutsu": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "つ〜つ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tsutsu",
+   "level": "N1",
+   "pattern": "つ〜つ"
+  }
+ },
  "tsutsu-aru": {
   "from": [
    {
@@ -12516,6 +19049,10 @@
    {
     "material": "n2_170.json",
     "pattern": "つつ/つつも"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "つつ"
    }
   ],
   "gaps": [
@@ -12525,6 +19062,22 @@
    "id": "tsutsu-while",
    "level": "N2",
    "pattern": "Verb ます-stem + つつ"
+  }
+ },
+ "tsutsuaru": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜つつある"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "tsutsuaru",
+   "level": "N2",
+   "pattern": "〜つつある"
   }
  },
  "tsuzukeru": {
@@ -12543,10 +19096,38 @@
    "pattern": "つづける"
   }
  },
+ "tte-quotation": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "って"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "って"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "って"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "tte-quotation",
+   "level": "N4",
+   "pattern": "Plain form / phrase + って"
+  }
+ },
  "u-mono-nara": {
   "from": [
    {
     "material": "n2_170.json",
+    "pattern": "ものなら"
+   },
+   {
+    "material": "n2_materials.json",
     "pattern": "ものなら"
    }
   ],
@@ -12559,8 +19140,32 @@
    "pattern": "Verb volitional + ものなら"
   }
  },
+ "u-ni-mo": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "には/にも"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "にも"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "u-ni-mo",
+   "level": "N1",
+   "pattern": "Verb volitional + にも"
+  }
+ },
  "uchi": {
   "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "うち"
+   },
    {
     "material": "n4.json",
     "pattern": "の（形式名词）"
@@ -12670,6 +19275,18 @@
     "pattern": "う（意向形）ではないか（じゃないか）"
    },
    {
+    "material": "n2_materials.json",
+    "pattern": "(よ)う"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ではないか/じゃないか"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ではないか/じゃないか"
+   },
+   {
     "material": "n4.json",
     "pattern": "（よ）う（意向助动词）"
    }
@@ -12692,6 +19309,10 @@
    {
     "material": "n2_bikao.json",
     "pattern": "上で（は）"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "うえで(は)"
    }
   ],
   "gaps": [
@@ -12712,6 +19333,10 @@
    {
     "material": "n2_bikao.json",
     "pattern": "上に"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "うえに"
    }
   ],
   "gaps": [
@@ -12745,6 +19370,38 @@
    "id": "ue-wa-now",
    "level": "N2",
    "pattern": "V plain + 上は"
+  }
+ },
+ "uede": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "～うえで"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "uede",
+   "level": "N3",
+   "pattern": "～うえで"
+  }
+ },
+ "ueha": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜うえは"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "ueha",
+   "level": "N2",
+   "pattern": "〜うえは"
   }
  },
  "uru-possible": {
@@ -12840,6 +19497,10 @@
    {
     "material": "n2_170.json",
     "pattern": "はもちろん/はもとより"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "はもちろん"
    }
   ],
   "gaps": [
@@ -12856,6 +19517,10 @@
    {
     "material": "n1.json",
     "pattern": "はおろか/は言うまでもなく/は言うに及ばず"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "はおろか"
    }
   ],
   "gaps": [
@@ -12865,6 +19530,22 @@
    "id": "wa-oroka",
    "level": "N2",
    "pattern": "Noun + はおろか"
+  }
+ },
+ "wa-sate-oki": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "はさておき / はさておいて"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "wa-sate-oki",
+   "level": "N2",
+   "pattern": "Noun + はさておき"
   }
  },
  "wa-tomokaku": {
@@ -12881,6 +19562,22 @@
    "id": "wa-tomokaku",
    "level": "N2",
    "pattern": "Noun + はともかく(として)"
+  }
+ },
+ "wake": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "わけ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "wake",
+   "level": "N3",
+   "pattern": "わけ"
   }
  },
  "wake-da-meaning": {
@@ -12947,11 +19644,31 @@
    "pattern": "V plain non-past + わけにはいかない"
   }
  },
+ "wakedakara": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "わけだから"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "wakedakara",
+   "level": "N3",
+   "pattern": "わけだから"
+  }
+ },
  "warini-considering": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "わりに/わりには"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜わりに/わりには"
    }
   ],
   "gaps": [
@@ -12979,11 +19696,31 @@
    "pattern": "～終わる"
   }
  },
+ "wazumogana": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜言わずもがな"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "wazumogana",
+   "level": "N1",
+   "pattern": "〜言わずもがな"
+  }
+ },
  "wo-chuushin-ni-centered": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "を中心に/を中心として/を中心にして"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "を中心にして/が中心となって"
    }
   ],
   "gaps": [
@@ -12995,11 +19732,31 @@
    "pattern": "Noun + を中心に(して)"
   }
  },
+ "wo-fumaete": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "を踏まえ / を踏まえて"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "wo-fumaete",
+   "level": "N2",
+   "pattern": "Noun + を踏まえて"
+  }
+ },
  "wo-hajime-including": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "をはじめ/を初めとする"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "をはじめ(とする)"
    }
   ],
   "gaps": [
@@ -13011,11 +19768,47 @@
    "pattern": "Noun + をはじめ(として / とする)"
   }
  },
+ "wo-hete": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "を経て"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "wo-hete",
+   "level": "N2",
+   "pattern": "Noun + を経て"
+  }
+ },
+ "wo-kaerimi-zu": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "を顧みず / も顧みず"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "wo-kaerimi-zu",
+   "level": "N1",
+   "pattern": "Noun + を顧みず"
+  }
+ },
  "wo-kagiri-ni": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "を限りに/を潮に"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "を限りに"
    }
   ],
   "gaps": [
@@ -13032,6 +19825,10 @@
    {
     "material": "n1.json",
     "pattern": "を皮切りに/を皮切りにして/を皮切りとして"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "を皮切りに(して) / を皮切りとして"
    }
   ],
   "gaps": [
@@ -13064,6 +19861,10 @@
    {
     "material": "n2_170.json",
     "pattern": "をきっかけに/をきっかけとして/をきっかけにして"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "をきっかけに(して)/がきっかけになって"
    }
   ],
   "gaps": [
@@ -13091,6 +19892,38 @@
    "pattern": "Noun (emotion) + を禁じ得ない"
   }
  },
+ "wo-mae-ni-shite": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜を前に(して) / を前にする / を前にした"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "wo-mae-ni-shite",
+   "level": "N1",
+   "pattern": "Noun + を前にして"
+  }
+ },
+ "wo-mono-to-mo-sezu": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "をものともせず(に)"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "wo-mono-to-mo-sezu",
+   "level": "N1",
+   "pattern": "Noun + をものともせず(に)"
+  }
+ },
  "wo-motoni-based-on": {
   "from": [
    {
@@ -13112,6 +19945,10 @@
    {
     "material": "n1.json",
     "pattern": "をもって"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "をもって / をもってすれば"
    }
   ],
   "gaps": [
@@ -13160,6 +19997,14 @@
    {
     "material": "n2_170.json",
     "pattern": "を通じて/を通して"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "を通じて/を通して"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "を通じて/を通して"
    }
   ],
   "gaps": [
@@ -13192,6 +20037,10 @@
    {
     "material": "n1.json",
     "pattern": "をよそに"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "をよそに"
    }
   ],
   "gaps": [
@@ -13201,6 +20050,22 @@
    "id": "wo-yoso-ni",
    "level": "N2",
    "pattern": "Noun + をよそに"
+  }
+ },
+ "yara-yara": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "やら"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "yara-yara",
+   "level": "N2",
+   "pattern": "Noun + やら + noun + やら"
   }
  },
  "yarayara": {
@@ -13233,6 +20098,22 @@
    "id": "yaru-casual-giving",
    "level": "N4",
    "pattern": "Giver が Receiver に Object を やる"
+  }
+ },
+ "yashinai-emphatic": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "はしない/やしない/もしない"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "yashinai-emphatic",
+   "level": "N2",
+   "pattern": "V ます-stem + やしない"
   }
  },
  "yasui": {
@@ -13319,11 +20200,47 @@
    "pattern": "や/否や（いなや）"
   }
  },
+ "yayainaya-61c7e0": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "や/やいなや"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "yayainaya-61c7e0",
+   "level": "N1",
+   "pattern": "や/やいなや"
+  }
+ },
+ "yoi": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜よい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "yoi",
+   "level": "N2",
+   "pattern": "〜よい"
+  }
+ },
  "yorihokahanaiyorihokahanai": {
   "from": [
    {
     "material": "n1.json",
     "pattern": "よりほかはない、よりほかはない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜よりほかない / よりほかにない / よりほかはない"
    }
   ],
   "gaps": [
@@ -13351,8 +20268,48 @@
    "pattern": "~より~ほうが/~ほうが~より"
   }
  },
+ "yorishikataganaiyorishiyouganai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜よりしかたがない / よりしようがない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "yorishikataganaiyorishiyouganai",
+   "level": "N2",
+   "pattern": "〜よりしかたがない / よりしようがない"
+  }
+ },
+ "you": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "よう"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "よう"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "you",
+   "level": "N1",
+   "pattern": "よう"
+  }
+ },
  "you-da-appearance": {
   "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "ようだ / よう次第だ / ようによる / ようによって"
+   },
    {
     "material": "n3.json",
     "pattern": "ようだ/な/に"
@@ -13360,6 +20317,10 @@
    {
     "material": "n3.json",
     "pattern": "みたいだ/ようだ"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ようだ"
    },
    {
     "material": "n4.json",
@@ -13375,11 +20336,31 @@
    "pattern": "Plain form + ようだ"
   }
  },
+ "you-dewa-if-its": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ようなら/ようだったら/ようでは"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "you-dewa-if-its",
+   "level": "N2",
+   "pattern": "Plain form + ようでは"
+  }
+ },
  "you-ga-nai-no-way": {
   "from": [
    {
     "material": "n2_170.json",
     "pattern": "ようがない/ようもない"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ようがない / ようもない"
    }
   ],
   "gaps": [
@@ -13394,6 +20375,10 @@
  "you-nara-if-looks": {
   "from": [
    {
+    "material": "n3_materials.json",
+    "pattern": "ようなら/ようだったら/ようでは"
+   },
+   {
     "material": "n4.json",
     "pattern": "ば"
    }
@@ -13405,6 +20390,26 @@
    "id": "you-nara-if-looks",
    "level": "N2",
    "pattern": "Plain form + ようなら(ば)"
+  }
+ },
+ "you-ni-mo-nai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "には/にも"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "にも"
+   }
+  ],
+  "gaps": [
+   "example-missing-chinese"
+  ],
+  "library": {
+   "id": "you-ni-mo-nai",
+   "level": "N1",
+   "pattern": "V volitional + にも + V potential negative"
   }
  },
  "you-ni-purpose": {
@@ -13472,6 +20477,10 @@
    {
     "material": "n2_170.json",
     "pattern": "まい/まいか"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "まい"
    }
   ],
   "gaps": [
@@ -13504,6 +20513,10 @@
    {
     "material": "n2_bikao.json",
     "pattern": "（よ）うではないか/（よ）うではありませんか/（よ）うじゃないか"
+   },
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜(よ)うではないか"
    }
   ],
   "gaps": [
@@ -13513,6 +20526,62 @@
    "id": "youdehanaikayoudehaarimasenkayoujiyanaika",
    "level": "N2",
    "pattern": "（よ）うではないか/（よ）うではありませんか/（よ）うじゃないか"
+  }
+ },
+ "youga": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "(よ)うが"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "(よ)うが〜(よ)うが"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "youga",
+   "level": "N1",
+   "pattern": "(よ)うが"
+  }
+ },
+ "yougamaiga": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "(よ)うが〜まいが"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "yougamaiga",
+   "level": "N1",
+   "pattern": "(よ)うが〜まいが"
+  }
+ },
+ "yougayouga": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "(よ)うが"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "(よ)うが〜(よ)うが"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "yougayouga",
+   "level": "N1",
+   "pattern": "(よ)うが〜(よ)うが"
   }
  },
  "youka": {
@@ -13529,6 +20598,22 @@
    "id": "youka",
    "level": "N4",
    "pattern": "～(よ)うか"
+  }
+ },
+ "youkamaika": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜(よ)うか〜まいか"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "youkamaika",
+   "level": "N2",
+   "pattern": "〜(よ)うか〜まいか"
   }
  },
  "youkatou": {
@@ -13565,6 +20650,22 @@
    "id": "youni",
    "level": "N4",
    "pattern": "～ように"
+  }
+ },
+ "younimonai": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜(よ)うにも〜ない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "younimonai",
+   "level": "N1",
+   "pattern": "〜(よ)うにも〜ない"
   }
  },
  "youninarimashita": {
@@ -13671,6 +20772,70 @@
    "pattern": "～ように言う"
   }
  },
+ "youniuyounijiru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ように思う/ように感じる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "youniuyounijiru",
+   "level": "N3",
+   "pattern": "ように思う/ように感じる"
+  }
+ },
+ "youniwareruyounieruyounijirareru": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "ように思われる/ように思える/ように感じられる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "youniwareruyounieruyounijirareru",
+   "level": "N3",
+   "pattern": "ように思われる/ように思える/ように感じられる"
+  }
+ },
+ "youtohawanakata": {
+  "from": [
+   {
+    "material": "n3_materials.json",
+    "pattern": "(よ)うとは思わなかった"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "youtohawanakata",
+   "level": "N3",
+   "pattern": "(よ)うとは思わなかった"
+  }
+ },
+ "youtomaito": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "(よ)うと〜まいと"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "youtomaito",
+   "level": "N1",
+   "pattern": "(よ)うと〜まいと"
+  }
+ },
  "youtoshinai": {
   "from": [
    {
@@ -13703,8 +20868,32 @@
    "pattern": "ようとしたとき"
   }
  },
+ "youtoshitatokorode": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "(よ)うとしたところで"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "youtoshitatokorode",
+   "level": "N1",
+   "pattern": "(よ)うとしたところで"
+  }
+ },
  "youtosuru": {
   "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "(よ)うと(も)"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "(よ)うと〜(よ)うと"
+   },
    {
     "material": "n3.json",
     "pattern": "（よ）うとする"
@@ -13743,6 +20932,26 @@
    "pattern": "（よ）うと思う"
   }
  },
+ "yue": {
+  "from": [
+   {
+    "material": "n1.json",
+    "pattern": "ゆえ/ゆえに/ゆえの"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "ゆえ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "yue",
+   "level": "N1",
+   "pattern": "ゆえ"
+  }
+ },
  "yue-ni-because": {
   "from": [
    {
@@ -13775,6 +20984,22 @@
    "pattern": "Noun + (が)ゆえの / ゆえの + noun"
   }
  },
+ "zaru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "ざる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "zaru",
+   "level": "N1",
+   "pattern": "ざる"
+  }
+ },
  "zaruoenai": {
   "from": [
    {
@@ -13789,6 +21014,22 @@
    "id": "zaruoenai",
    "level": "N2",
    "pattern": "ざるをえない"
+  }
+ },
+ "zaruonai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ざるを得ない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "zaruonai",
+   "level": "N2",
+   "pattern": "〜ざるを得ない"
   }
  },
  "zato": {
@@ -13884,6 +21125,10 @@
    {
     "material": "n2_170.json",
     "pattern": "ずにはいられない"
+   },
+   {
+    "material": "n3_materials.json",
+    "pattern": "ずにはいられない/ないではいられない"
    }
   ],
   "gaps": [
@@ -13916,6 +21161,10 @@
    {
     "material": "n1.json",
     "pattern": "ずにはすまない/ないではすまない"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ずにはすまない / ないではすまない"
    }
   ],
   "gaps": [
@@ -13925,6 +21174,22 @@
    "id": "zu-ni-wa-sumanai",
    "level": "N1",
    "pattern": "V negative stem + ずにはすまない / ないではすまない"
+  }
+ },
+ "zujimaida": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "ずじまいだ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "zujimaida",
+   "level": "N1",
+   "pattern": "ずじまいだ"
   }
  },
  "zukitozehi": {
@@ -13947,6 +21212,22 @@
    "pattern": "必ず/きっと/ぜひ"
   }
  },
+ "zukume": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ずくめ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "zukume",
+   "level": "N1",
+   "pattern": "〜ずくめ"
+  }
+ },
  "zukume-nothing-but": {
   "from": [
    {
@@ -13961,6 +21242,74 @@
    "id": "zukume-nothing-but",
    "level": "N2",
    "pattern": "Noun + ずくめ"
+  }
+ },
+ "zunigozarunaidegozaru": {
+  "from": [
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ずにござる/ないでござる"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "zunigozarunaidegozaru",
+   "level": "N1",
+   "pattern": "〜ずにござる/ないでござる"
+  }
+ },
+ "zunihaokanainaidehaokanai": {
+  "from": [
+   {
+    "material": "n1.json",
+    "pattern": "ずにはおかない/ないではおかない"
+   },
+   {
+    "material": "n1_materials.json",
+    "pattern": "〜ずにはおかない / ないではおかない"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "zunihaokanainaidehaokanai",
+   "level": "N1",
+   "pattern": "〜ずにはおかない / ないではおかない"
+  }
+ },
+ "zunisumunaidesumunakutesumu": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜ずにすむ / ないですむ / なくてすむ"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "zunisumunaidesumunakutesumu",
+   "level": "N2",
+   "pattern": "〜ずにすむ / ないですむ / なくてすむ"
+  }
+ },
+ "zurai": {
+  "from": [
+   {
+    "material": "n2_materials.json",
+    "pattern": "〜づらい"
+   }
+  ],
+  "gaps": [
+   "no-formation-notes"
+  ],
+  "library": {
+   "id": "zurai",
+   "level": "N2",
+   "pattern": "〜づらい"
   }
  },
  "zuto": {
