@@ -13,9 +13,13 @@ import threading
 import time
 from unittest.mock import patch
 
+import pytest
+
 from lute.db import db
 from lute.book import whisper_transcribe
 from lute.models.repositories import BookRepository
+
+# pylint: disable=protected-access
 
 
 # ---------------------------------------------------------------------
@@ -237,6 +241,105 @@ def test_delete_model_unknown_size():
     ok, message = whisper_transcribe.delete_model("giant")
     assert ok is False
     assert "Unknown model size" in message
+
+
+# ---------------------------------------------------------------------
+# Idle unload of the in-process model
+# ---------------------------------------------------------------------
+
+
+@pytest.fixture(name="model_cache_state")
+def fixture_model_cache_state():
+    "Save and restore the module's model-cache globals around a test."
+    saved = (
+        dict(whisper_transcribe._MODEL_CACHE),
+        whisper_transcribe._MODEL_LAST_USED,
+        whisper_transcribe._MODEL_USES,
+        whisper_transcribe._IDLE_REAPER_STARTED,
+    )
+    yield
+    whisper_transcribe._MODEL_CACHE.clear()
+    whisper_transcribe._MODEL_CACHE.update(saved[0])
+    (
+        whisper_transcribe._MODEL_LAST_USED,
+        whisper_transcribe._MODEL_USES,
+        whisper_transcribe._IDLE_REAPER_STARTED,
+    ) = saved[1], saved[2], saved[3]
+
+
+def _cache_a_model(size="small", idle_seconds=0):
+    "Put a stand-in model in the cache, last used idle_seconds ago."
+    whisper_transcribe._MODEL_CACHE.clear()
+    whisper_transcribe._MODEL_CACHE[size] = object()
+    whisper_transcribe._MODEL_USES = 0
+    whisper_transcribe._MODEL_LAST_USED = time.monotonic() - idle_seconds
+
+
+def test_unload_idle_model_drops_a_stale_model(model_cache_state):
+    """
+    Past the timeout the instance goes: one transcription must not pin
+    ~500 MB in the process for the rest of its life.
+    """
+    timeout = whisper_transcribe.MODEL_IDLE_TIMEOUT_SECONDS
+    _cache_a_model(idle_seconds=timeout + 1)
+    assert whisper_transcribe.unload_idle_model() == "small"
+    assert whisper_transcribe._MODEL_CACHE == {}
+
+
+def test_unload_idle_model_keeps_a_recently_used_model(model_cache_state):
+    "Between takes the model stays: a reload costs seconds on every clip."
+    timeout = whisper_transcribe.MODEL_IDLE_TIMEOUT_SECONDS
+    _cache_a_model(idle_seconds=timeout - 60)
+    assert whisper_transcribe.unload_idle_model() is None
+    assert "small" in whisper_transcribe._MODEL_CACHE
+
+
+def test_unload_idle_model_never_drops_a_model_in_use(model_cache_state):
+    """
+    A take longer than the timeout keeps its model.  Evicting it frees
+    nothing (the caller still holds it) and the next load would build a
+    second ~500 MB instance beside it.
+    """
+    timeout = whisper_transcribe.MODEL_IDLE_TIMEOUT_SECONDS
+    _cache_a_model(idle_seconds=timeout + 1)
+    with whisper_transcribe.model_in_use():
+        assert whisper_transcribe.unload_idle_model() is None
+    assert "small" in whisper_transcribe._MODEL_CACHE
+
+
+def test_model_in_use_releases_when_the_take_fails(model_cache_state):
+    "A crash mid-transcription must not pin the cache forever."
+    timeout = whisper_transcribe.MODEL_IDLE_TIMEOUT_SECONDS
+    _cache_a_model(idle_seconds=timeout + 1)
+    with pytest.raises(RuntimeError):
+        with whisper_transcribe.model_in_use():
+            raise RuntimeError("transcription blew up")
+    assert whisper_transcribe._MODEL_USES == 0
+    # The clock restarts as the take ends, so age it again: the point is
+    # that the released cache is droppable, not permanently pinned.
+    whisper_transcribe._MODEL_LAST_USED = time.monotonic() - (timeout + 1)
+    assert whisper_transcribe.unload_idle_model() == "small"
+
+
+def test_load_model_refreshes_the_idle_clock(model_cache_state):
+    """
+    A cache hit counts as use: reading for a while between takes must not
+    make the next take pay a reload.
+    """
+    timeout = whisper_transcribe.MODEL_IDLE_TIMEOUT_SECONDS
+    _cache_a_model(idle_seconds=timeout - 1)
+    before = whisper_transcribe._MODEL_LAST_USED
+    model = whisper_transcribe._load_model("small")
+    assert model is whisper_transcribe._MODEL_CACHE["small"]
+    assert whisper_transcribe._MODEL_LAST_USED > before
+
+
+def test_unload_idle_model_with_an_empty_cache(model_cache_state):
+    "Nothing cached, nothing to unload."
+    whisper_transcribe._MODEL_CACHE.clear()
+    whisper_transcribe._MODEL_USES = 0
+    whisper_transcribe._MODEL_LAST_USED = 0.0
+    assert whisper_transcribe.unload_idle_model() is None
 
 
 def test_models_endpoint(app, client):
