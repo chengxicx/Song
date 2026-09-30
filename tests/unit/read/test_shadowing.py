@@ -12,7 +12,16 @@ import os
 import time
 from unittest.mock import patch
 
+import pytest
+
 from lute.read import shadowing
+
+
+@pytest.fixture(autouse=True)
+def _no_real_model_load():
+    "Never load a real faster-whisper model: the task loads it up front."
+    with patch.object(shadowing, "_load_model", return_value=object()):
+        yield
 
 
 def _wait_for_task(task_id, timeout=10.0):
@@ -205,17 +214,13 @@ def test_empty_original_tokens_returns_neutral_result():
 # ---------------------------------------------------------------------
 
 
-def test_transcribe_clip_uses_greedy_word_timestamps():
-    "Greedy + word timestamps + no initial_prompt (echoing would inflate scores)."
+def test_transcribe_clip_uses_greedy_decoding_without_word_timestamps():
+    "Greedy + no word timestamps + no initial_prompt (echoing would inflate scores)."
     captured = {}
-
-    class _Word:
-        def __init__(self, word, start, end):
-            self.word, self.start, self.end = word, start, end
 
     class _Seg:
         text = " Hello world."
-        words = [_Word(" Hello", 0.0, 0.5), _Word(" world.", 0.5, 1.0)]
+        words = None
 
     class _Info:
         duration = 1.5
@@ -226,18 +231,16 @@ def test_transcribe_clip_uses_greedy_word_timestamps():
             return iter([_Seg()]), _Info()
 
     with patch.object(shadowing, "_load_model", return_value=_FakeModel()):
-        text, duration, words = shadowing.transcribe_clip("/tmp/x.wav", "en", "small")
+        text, duration = shadowing.transcribe_clip("/tmp/x.wav", "en", "small")
 
     assert captured["beam_size"] == 1
-    assert captured["word_timestamps"] is True
+    # The diff only needs the text; the alignment pass would only add
+    # CPU time to an already CPU-bound step.
+    assert captured["word_timestamps"] is False
     assert captured["language"] == "en"
     assert "initial_prompt" not in captured
     assert text == "Hello world."
     assert duration == 1.5
-    assert words == [
-        {"word": "Hello", "start": 0.0, "end": 0.5},
-        {"word": "world.", "start": 0.5, "end": 1.0},
-    ]
 
 
 # ---------------------------------------------------------------------
@@ -301,7 +304,7 @@ def test_route_scores_recording(app, app_context, client, english):
         assert os.path.exists(audio_path)
         assert os.path.basename(audio_path).startswith("shadowing_")
         assert model_size == "small"
-        return "The calm cat.", 6.0, []
+        return "The calm cat.", 6.0
 
     with patch.object(
         shadowing, "whisper_status", return_value={"installed": True}
@@ -346,7 +349,7 @@ def test_route_unknown_model_falls_back_to_default(app, app_context, client, eng
 
     def _fake_clip(audio_path, lang_code, model_size="small"):
         sizes.append(model_size)
-        return "The calm cat.", 6.0, []
+        return "The calm cat.", 6.0
 
     with patch.object(
         shadowing, "whisper_status", return_value={"installed": True}
@@ -373,7 +376,7 @@ def test_route_no_speech_fails_the_task(app, app_context, client, english):
     tempdir = app.env_config.temppath
 
     def _fake_clip(audio_path, lang_code, model_size="small"):
-        return "", 2.0, []
+        return "", 2.0
 
     with patch.object(
         shadowing, "whisper_status", return_value={"installed": True}
