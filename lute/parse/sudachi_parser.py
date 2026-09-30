@@ -17,6 +17,7 @@ This parser is independent of the MeCab-based JapaneseParser.
 Users select it as the "Parse as" type for their Japanese language.
 """
 
+import importlib.util
 import re
 import threading
 from typing import List
@@ -43,10 +44,11 @@ class JapaneseSudachiParser(AbstractParser):
     """
 
     _is_supported = None
-    # Cache key for the _is_supported result.  Kept separate from the
-    # dictionary cache key below: they hold different key formats
-    # ("core|C" vs "core"), and sharing one attribute made
-    # is_supported() miss its cache on every call.
+    # Cache key for the _is_supported result: the dictionary name, the
+    # only setting the support check depends on.  Kept separate from
+    # the dictionary cache key below because they guard different
+    # caches, and sharing one attribute made is_supported() miss its
+    # cache on every call.
     _support_key = None
 
     # Tokenizer instances are NOT shareable: sudachipy's Tokenizer wraps
@@ -66,26 +68,40 @@ class JapaneseSudachiParser(AbstractParser):
     @classmethod
     def is_supported(cls):
         """
-        True if sudachipy can be imported and a dictionary loaded.
+        True if sudachipy and a Sudachi dictionary are installed.
+
+        Cheap on purpose.  This runs for every parser at app start-up
+        (lute.parse.registry.supported_parsers), so it must not build
+        the dictionary: that costs ~33MB of private memory plus a read
+        of the 200MB+ system.dic, all wasted on users with no Japanese
+        books.  The dictionary is built by the first real parse instead
+        (see _build_tokenizer).
         """
         dict_type = cls._get_dict_setting()
-        mode = cls._get_mode_setting()
-        cache_key = f"{dict_type}|{mode}"
 
         if (
             JapaneseSudachiParser._is_supported is not None
-            and JapaneseSudachiParser._support_key == cache_key
+            and JapaneseSudachiParser._support_key == dict_type
         ):
             return JapaneseSudachiParser._is_supported
 
-        try:
-            cls._build_tokenizer(dict_type)
-            JapaneseSudachiParser._is_supported = True
-        except Exception:  # pylint: disable=broad-except
-            JapaneseSudachiParser._is_supported = False
-
-        JapaneseSudachiParser._support_key = cache_key
+        JapaneseSudachiParser._is_supported = cls._dictionary_is_installed(dict_type)
+        JapaneseSudachiParser._support_key = dict_type
         return JapaneseSudachiParser._is_supported
+
+    @staticmethod
+    def _dictionary_is_installed(dict_type: str) -> bool:
+        """
+        True if sudachipy and one of the sudachidict packages can be
+        imported.  Any of the three will do: _load_dictionary falls
+        back to whichever one is installed.
+        """
+        if importlib.util.find_spec("sudachipy") is None:
+            return False
+
+        names = ["sudachidict_core", "sudachidict_small", "sudachidict_full"]
+        names.insert(0, f"sudachidict_{dict_type}")
+        return any(importlib.util.find_spec(n) is not None for n in names)
 
     @classmethod
     def _invalidate_cache(cls):

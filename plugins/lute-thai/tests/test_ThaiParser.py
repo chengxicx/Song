@@ -3,6 +3,9 @@ ThaiParser tests.
 """
 
 
+import subprocess
+import sys
+
 import pytest
 
 # pylint: disable=wrong-import-order
@@ -84,3 +87,19 @@ def test_carriage_returns_treated_as_reverse_p_character(thai):
         ("แล้ว", True, False),
     ]
     assert_tokens_equals(s, thai, expected)
+
+
+def test_importing_the_parser_does_not_import_pythainlp():
+    """
+    The app imports every parser plugin at start-up
+    (lute.parse.registry), so the heavy dependency must stay out of
+    the module import: importing pythainlp alone costs ~220MB of
+    resident memory.
+    """
+    code = (
+        "import sys;"
+        "import lute_thai_parser.parser;"
+        "assert 'pythainlp' not in sys.modules, "
+        "'importing the parser pulled in pythainlp'"
+    )
+    subprocess.check_call([sys.executable, "-c", code])
