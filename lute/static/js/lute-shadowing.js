@@ -851,17 +851,28 @@ async function shadowingSubmit(blob, unit) {
       );
       return;
     }
+    if (!data.task_id) {
+      shadowingRenderPanelMessage("No task id returned by the server.", true);
+      return;
+    }
 
-    shadowingPaintVerdicts(unit, data);
-    shadowingRenderResult(unit, data);
+    const outcome = await shadowingPollTask(data.task_id);
+    if (outcome.state === "error") {
+      shadowingRenderPanelMessage(outcome.error, true);
+      return;
+    }
+    const d = outcome.result || {};
+
+    shadowingPaintVerdicts(unit, d);
+    shadowingRenderResult(unit, d);
 
     const rate =
-      data.tokens_per_minute != null ? data.tokens_per_minute : null;
+      d.tokens_per_minute != null ? d.tokens_per_minute : null;
     shadowingHistory.unshift({
       text: unit.fullText.slice(0, 40),
-      score: Number(data.score || 0),
+      score: Number(d.score || 0),
       rate: rate,
-      duration: data.duration,
+      duration: d.duration,
     });
     shadowingRenderHistory();
 
@@ -871,6 +882,55 @@ async function shadowingSubmit(blob, unit) {
   } finally {
     shadowingBusy = false;
   }
+}
+
+// Poll a scoring task until it settles.  Transient network errors are
+// tolerated (the backend worker keeps running); the task is lost only
+// if the server restarted ("unknown").  First runs can take minutes --
+// the whisper model may be downloading on the server -- so the panel
+// shows the elapsed wait instead of failing.
+async function shadowingPollTask(taskId) {
+  const started = Date.now();
+  const MAX_MS = 10 * 60 * 1000;
+  while (Date.now() - started < MAX_MS) {
+    await new Promise(function (r) {
+      setTimeout(r, 1500);
+    });
+    let data;
+    try {
+      const resp = await fetch("/read/shadowing/status/" + taskId);
+      data = await resp.json();
+    } catch (_) {
+      continue;
+    }
+    if (data.state === "finished") {
+      return { state: "finished", result: data.result };
+    }
+    if (data.state === "error") {
+      return { state: "error", error: data.error || "Transcription failed." };
+    }
+    if (data.state === "unknown") {
+      return {
+        state: "error",
+        error: "The scoring task was lost (server restart?) — try again.",
+      };
+    }
+    const el = document.getElementById("shadowing-result");
+    if (el) {
+      const secs = Math.floor((Date.now() - started) / 1000);
+      const hint =
+        secs > 20
+          ? " — first run loads the whisper model, this can take a while"
+          : "";
+      el.innerHTML =
+        '<div class="shadowing-panel__state">Transcribing… ' +
+        secs +
+        "s" +
+        hint +
+        "</div>";
+    }
+  }
+  return { state: "error", error: "Transcription timed out." };
 }
 
 function shadowingAutoAdvance() {
