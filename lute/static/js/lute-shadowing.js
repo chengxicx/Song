@@ -514,12 +514,13 @@ function shadowingPaintVerdicts(unit, data) {
   if (!unit || !unit.el.isConnected) return;
   const statuses = data.statuses || [];
   const fuzzySpoken = data.spoken_for_fuzzy || {};
+  // 0 miss / 1 fuzzy / 2 match / 3 skip (punctuation -- unmarked).
+  const CLASSES = { 0: "shadow-miss", 1: "shadow-fuzzy", 2: "shadow-ok" };
 
   unit.spans.forEach(function (sp, i) {
     const st = i < statuses.length ? statuses[i] : 0;
-    sp.classList.add(
-      st === 2 ? "shadow-ok" : st === 1 ? "shadow-fuzzy" : "shadow-miss"
-    );
+    const cls = CLASSES[st];
+    if (cls) sp.classList.add(cls);
   });
 
   const box = document.getElementById("shadowing-current");
@@ -527,9 +528,8 @@ function shadowingPaintVerdicts(unit, data) {
     box.querySelectorAll(".shadow-tok").forEach(function (tok) {
       const i = parseInt(tok.getAttribute("data-idx"), 10);
       const st = i < statuses.length ? statuses[i] : 0;
-      tok.classList.add(
-        st === 2 ? "shadow-ok" : st === 1 ? "shadow-fuzzy" : "shadow-miss"
-      );
+      const cls = CLASSES[st];
+      if (cls) tok.classList.add(cls);
       if (st === 1 && fuzzySpoken[i] != null) {
         tok.insertAdjacentHTML(
           "beforeend",

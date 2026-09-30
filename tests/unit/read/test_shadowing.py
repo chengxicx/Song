@@ -147,10 +147,37 @@ def test_zws_stripped_from_tokens():
 
 
 def test_empty_original_tokens_are_skipped():
-    "Rendering artifacts (empty word spans) neither match nor punish."
+    "Rendering artifacts (empty word spans) are skipped, not scored."
     lang = _FakeLanguage(["cat"])
     res = shadowing.compare_tokens(["cat", "", ""], "cat", lang)
-    assert res["statuses"] == [2, 2, 2]
+    assert res["statuses"] == [2, 3, 3]
+    assert res["total"] == 1
+    assert res["score"] == 100
+
+
+def test_punctuation_original_tokens_are_neutral():
+    "Punctuation on the original side is never scored nor marked."
+    lang = _FakeLanguage(["你好", "世界"])
+    res = shadowing.compare_tokens(["你好", "。", "世界"], "你好世界", lang)
+    assert res["statuses"] == [2, 3, 2]
+    assert res["total"] == 2
+    assert res["score"] == 100
+
+
+def test_spoken_punctuation_dropped_even_if_marked_as_word():
+    "A parser tagging punctuation is_word=True cannot make it scoreable."
+    lang = _FakeLanguage([("。", True), ("你好", True)])
+    res = shadowing.compare_tokens(["你好"], "你好。", lang)
+    assert res["statuses"] == [2]
+    assert res["spoken_count"] == 1
+    assert res["extras"] == []
+
+
+def test_all_punctuation_originals_score_100():
+    lang = _FakeLanguage(["你好"])
+    res = shadowing.compare_tokens(["。", "、"], "你好", lang)
+    assert res["statuses"] == [3, 3]
+    assert res["total"] == 0
     assert res["score"] == 100
 
 
