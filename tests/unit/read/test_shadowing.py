@@ -1,0 +1,368 @@
+"""
+Tests for the shadowing (read-aloud) scoring feature.
+
+The real faster-whisper dependency is never loaded: transcribe_clip is
+monkeypatched (or given a fake model), and the tests cover the token
+diff and the /read/shadowing/transcribe route.
+"""
+
+import io
+import json
+import os
+from unittest.mock import patch
+
+from lute.read import shadowing
+
+
+# ---------------------------------------------------------------------
+# Duck-typed Language for the diff tests: the spoken tokens are fixed
+# per instance, so tests control exactly what whisper "heard".
+# ---------------------------------------------------------------------
+
+
+class _FakeParsedToken:
+    def __init__(self, token, is_word=True):
+        self.token = token
+        self.is_word = is_word
+
+
+class _FakeParser:
+    "Duck-typed parser: fixed readings + plain lowercase."
+
+    def __init__(self, readings=None):
+        self.readings = readings or {}
+
+    def get_reading(self, text):
+        return self.readings.get(text)
+
+    def get_lowercase(self, text):
+        return text.lower()
+
+
+class _FakeLanguage:
+    "Duck-typed Language.  Entries may be strings or (token, is_word)."
+
+    def __init__(self, spoken_tokens, parser_type="spacedel", readings=None):
+        self.parser_type = parser_type
+        self.spoken_tokens = spoken_tokens
+        self._parser = _FakeParser(readings)
+
+    @property
+    def parser(self):
+        return self._parser
+
+    def get_parsed_tokens(self, _text):
+        toks = []
+        for t in self.spoken_tokens:
+            if isinstance(t, tuple):
+                toks.append(_FakeParsedToken(t[0], t[1]))
+            else:
+                toks.append(_FakeParsedToken(t))
+        return toks
+
+
+# ---------------------------------------------------------------------
+# Token diff
+# ---------------------------------------------------------------------
+
+
+def test_perfect_match():
+    lang = _FakeLanguage(["The", "calm", "cat"])
+    res = shadowing.compare_tokens(["The", "calm", "cat"], "The calm cat.", lang)
+    assert res["statuses"] == [2, 2, 2]
+    assert res["score"] == 100
+    assert res["extras"] == []
+
+
+def test_missed_word():
+    "A skipped word stays a miss; the score rounds to the nearest percent."
+    lang = _FakeLanguage(["the", "cat"])
+    res = shadowing.compare_tokens(["The", "calm", "cat"], "the cat", lang)
+    assert res["statuses"] == [2, 0, 2]
+    assert res["score"] == 67
+
+
+def test_nothing_spoken_marks_all_missed():
+    lang = _FakeLanguage([])
+    res = shadowing.compare_tokens(["the", "cat"], "", lang)
+    assert res["statuses"] == [0, 0]
+    assert res["score"] == 0
+
+
+def test_misread_word_is_fuzzy():
+    "A near-match token (ratio >= 0.6) counts as a misread attempt."
+    lang = _FakeLanguage(["the", "cam", "cat"])
+    res = shadowing.compare_tokens(["The", "calm", "Cat"], "the cam cat", lang)
+    assert res["statuses"] == [2, 1, 2]
+    assert res["spoken_for_fuzzy"] == {1: "cam"}
+    assert res["score"] == 83
+
+
+def test_replace_below_ratio_is_miss():
+    "A token that is too far from anything spoken is just a miss."
+    lang = _FakeLanguage(["the", "dog", "cat"])
+    res = shadowing.compare_tokens(["The", "calm", "cat"], "the dog cat", lang)
+    assert res["statuses"] == [2, 0, 2]
+    assert res["spoken_for_fuzzy"] == {}
+
+
+def test_extra_spoken_words():
+    lang = _FakeLanguage(["the", "very", "calm", "cat"])
+    res = shadowing.compare_tokens(["The", "calm", "cat"], "the very calm cat", lang)
+    assert res["statuses"] == [2, 2, 2]
+    assert res["extras"] == ["very"]
+
+
+def test_japanese_matches_by_reading():
+    "良い spoken as いい is the correct reading of the kanji, not a miss."
+    lang = _FakeLanguage(
+        ["今日", "は", "いい", "天気", "です"],
+        parser_type="japanese",
+        readings={"良い": "いい", "天気": "テンキ"},
+    )
+    res = shadowing.compare_tokens(
+        ["今日", "は", "良い", "天気", "です"], "今日はいい天気です", lang
+    )
+    assert res["statuses"] == [2, 2, 2, 2, 2]
+    assert res["score"] == 100
+
+
+def test_japanese_reading_katakana_normalized():
+    "IPADIC-style katakana readings compare equal to hiragana speech."
+    lang = _FakeLanguage(["てんき"], parser_type="japanese", readings={"天気": "テンキ"})
+    res = shadowing.compare_tokens(["天気"], "てんき", lang)
+    assert res["statuses"] == [2]
+
+
+def test_spoken_punctuation_ignored():
+    lang = _FakeLanguage([("。", False), ("cat", True)])
+    res = shadowing.compare_tokens(["cat"], "。cat", lang)
+    assert res["statuses"] == [2]
+
+
+def test_zws_stripped_from_tokens():
+    lang = _FakeLanguage(["ca\u200Bt"])
+    res = shadowing.compare_tokens(["cat"], "cat", lang)
+    assert res["statuses"] == [2]
+
+
+def test_empty_original_tokens_are_skipped():
+    "Rendering artifacts (empty word spans) neither match nor punish."
+    lang = _FakeLanguage(["cat"])
+    res = shadowing.compare_tokens(["cat", "", ""], "cat", lang)
+    assert res["statuses"] == [2, 2, 2]
+    assert res["score"] == 100
+
+
+def test_empty_original_tokens_returns_neutral_result():
+    lang = _FakeLanguage(["cat"])
+    res = shadowing.compare_tokens([], "cat", lang)
+    assert res["statuses"] == []
+    assert res["spoken_count"] == 1
+
+
+# ---------------------------------------------------------------------
+# transcribe_clip (fake model; faster-whisper is never imported)
+# ---------------------------------------------------------------------
+
+
+def test_transcribe_clip_uses_greedy_word_timestamps():
+    "Greedy + word timestamps + no initial_prompt (echoing would inflate scores)."
+    captured = {}
+
+    class _Word:
+        def __init__(self, word, start, end):
+            self.word, self.start, self.end = word, start, end
+
+    class _Seg:
+        text = " Hello world."
+        words = [_Word(" Hello", 0.0, 0.5), _Word(" world.", 0.5, 1.0)]
+
+    class _Info:
+        duration = 1.5
+
+    class _FakeModel:
+        def transcribe(self, path, **kwargs):
+            captured.update(kwargs)
+            return iter([_Seg()]), _Info()
+
+    with patch.object(shadowing, "_load_model", return_value=_FakeModel()):
+        text, duration, words = shadowing.transcribe_clip("/tmp/x.wav", "en", "small")
+
+    assert captured["beam_size"] == 1
+    assert captured["word_timestamps"] is True
+    assert captured["language"] == "en"
+    assert "initial_prompt" not in captured
+    assert text == "Hello world."
+    assert duration == 1.5
+    assert words == [
+        {"word": "Hello", "start": 0.0, "end": 0.5},
+        {"word": "world.", "start": 0.5, "end": 1.0},
+    ]
+
+
+# ---------------------------------------------------------------------
+# Route validation
+# ---------------------------------------------------------------------
+
+
+def test_route_requires_whisper(app, client, english):
+    with patch.object(shadowing, "whisper_status", return_value={"installed": False}):
+        resp = client.post("/read/shadowing/transcribe", data={})
+    assert resp.status_code == 400
+    assert "not installed" in resp.get_json()["error"]
+
+
+def test_route_requires_audio(app, client, english):
+    with patch.object(shadowing, "whisper_status", return_value={"installed": True}):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={"language_id": str(english.id), "tokens": "[]"},
+        )
+    assert resp.status_code == 400
+    assert "no audio" in resp.get_json()["error"]
+
+
+def test_route_requires_language(app, client):
+    with patch.object(shadowing, "whisper_status", return_value={"installed": True}):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={"tokens": "[]", "audio": (io.BytesIO(b"x"), "clip.webm")},
+            content_type="multipart/form-data",
+        )
+    assert resp.status_code == 400
+    assert "language" in resp.get_json()["error"]
+
+
+def test_route_rejects_bad_tokens(app, client, english):
+    with patch.object(shadowing, "whisper_status", return_value={"installed": True}):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(english.id),
+                "tokens": "not json",
+                "audio": (io.BytesIO(b"x"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+    assert resp.status_code == 400
+    assert "tokens" in resp.get_json()["error"]
+
+
+# ---------------------------------------------------------------------
+# Route happy path + temp-file lifecycle
+# ---------------------------------------------------------------------
+
+
+def test_route_scores_recording(app, app_context, client, english):
+    tempdir = app.env_config.temppath
+
+    def _fake_clip(audio_path, lang_code, model_size="small"):
+        assert os.path.exists(audio_path)
+        assert os.path.basename(audio_path).startswith("shadowing_")
+        assert model_size == "small"
+        return "The calm cat.", 6.0, []
+
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(shadowing, "transcribe_clip", side_effect=_fake_clip):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(english.id),
+                "tokens": json.dumps(["The", "calm", "cat"]),
+                "audio": (io.BytesIO(b"fake webm bytes"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["transcription"] == "The calm cat."
+    assert body["statuses"] == [2, 2, 2]
+    assert body["score"] == 100
+    assert body["duration"] == 6.0
+    # 3 tokens over 6 seconds = 30 tokens/minute.
+    assert body["tokens_per_minute"] == 30.0
+    assert body["token_kind"] == "word"
+
+    # The temp clip was cleaned up.
+    leftovers = [f for f in os.listdir(tempdir) if f.startswith("shadowing_")]
+    assert leftovers == []
+
+
+def test_route_unknown_model_falls_back_to_default(app, app_context, client, english):
+    sizes = []
+
+    def _fake_clip(audio_path, lang_code, model_size="small"):
+        sizes.append(model_size)
+        return "The calm cat.", 6.0, []
+
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(shadowing, "transcribe_clip", side_effect=_fake_clip):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(english.id),
+                "tokens": json.dumps(["The", "calm", "cat"]),
+                "model": "giant",
+                "audio": (io.BytesIO(b"x"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+
+    assert resp.status_code == 200
+    assert sizes == ["small"]
+
+
+def test_route_no_speech_is_422(app, app_context, client, english):
+    tempdir = app.env_config.temppath
+
+    def _fake_clip(audio_path, lang_code, model_size="small"):
+        return "", 2.0, []
+
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(shadowing, "transcribe_clip", side_effect=_fake_clip):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(english.id),
+                "tokens": json.dumps(["The", "calm", "cat"]),
+                "audio": (io.BytesIO(b"x"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+
+    assert resp.status_code == 422
+    assert "no speech" in resp.get_json()["error"]
+    leftovers = [f for f in os.listdir(tempdir) if f.startswith("shadowing_")]
+    assert leftovers == []
+
+
+def test_route_transcription_error_is_500_and_cleans_temp(
+    app, app_context, client, english
+):
+    tempdir = app.env_config.temppath
+
+    def _boom(audio_path, lang_code, model_size="small"):
+        raise RuntimeError("model exploded")
+
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(shadowing, "transcribe_clip", side_effect=_boom):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(english.id),
+                "tokens": json.dumps(["The", "calm", "cat"]),
+                "audio": (io.BytesIO(b"x"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+
+    assert resp.status_code == 500
+    assert "model exploded" in resp.get_json()["error"]
+    leftovers = [f for f in os.listdir(tempdir) if f.startswith("shadowing_")]
+    assert leftovers == []
