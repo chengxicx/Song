@@ -226,6 +226,21 @@
       if (ytPlaying && ytCueIndex >= 0) {
         var curCue = CUES[ytCueIndex];
         if (curCue && t >= curCue.end) {
+          // Cue end crossed: fire before the loop / auto-pause branches
+          // so the shadowing auto-record can attach to this moment in
+          // every case (see lute-shadowing.js).
+          try {
+            window.dispatchEvent(
+              new CustomEvent("lute:cue-ended", {
+                detail: {
+                  source: "media",
+                  index: ytCueIndex,
+                  start: curCue.start,
+                  end: curCue.end,
+                },
+              })
+            );
+          } catch (e) { /* ignore */ }
           if (ytLoop) {
             ytPlayer.seekTo(curCue.start, true);
             ytUpdateMarquee(curCue.start);
@@ -347,9 +362,24 @@
       if (!window.LutePlayingLine) return;
       var cue = CUES[idx];
       window.LutePlayingLine.setCueIndex(idx, cue ? cue.text : "");
+      // Shadowing practice area follows the playhead (lute-shadowing.js).
+      try {
+        window.dispatchEvent(
+          new CustomEvent("lute:cue-changed", {
+            detail: { source: "media", index: idx, text: cue ? cue.text : "" },
+          })
+        );
+      } catch (e) { /* no CustomEvent -- shadowing just won't follow */ }
     }
 
     function ytDeactivateCue() {
+      try {
+        window.dispatchEvent(
+          new CustomEvent("lute:cue-changed", {
+            detail: { source: "media", index: -1, text: "" },
+          })
+        );
+      } catch (e) { /* ignore */ }
       if (window.LutePlayingLine) window.LutePlayingLine.clear();
       var rows = els.transcriptList
         ? els.transcriptList.querySelectorAll(".yt-transcript-row")
