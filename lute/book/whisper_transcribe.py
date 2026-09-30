@@ -18,7 +18,9 @@ import shutil
 import subprocess
 import sys
 import threading
+import time
 import uuid
+from contextlib import contextmanager
 
 from lute.book.model import Book
 from lute.book.service import Service as BookService
@@ -61,6 +63,20 @@ _TASKS_LOCK = threading.Lock()
 # imports at the same size (multi-part podcasts) then skip the load.
 _MODEL_CACHE = {}
 _MODEL_CACHE_LOCK = threading.Lock()
+
+# A loaded model is ~500 MB that the process never gives back on its own.
+# Left alone it sits there forever, which is what pushes the 4 GB server
+# into swap between takes, so drop it after this long without a
+# transcription.  The weights stay in the HuggingFace cache on disk: the
+# next transcription reloads them locally in seconds, no re-download.
+MODEL_IDLE_TIMEOUT_SECONDS = 15 * 60
+_IDLE_CHECK_INTERVAL_SECONDS = 60
+
+# Monotonic time of the last transcription start/finish, and how many are
+# running.  Both guarded by _MODEL_CACHE_LOCK.
+_MODEL_LAST_USED = 0.0
+_MODEL_USES = 0
+_IDLE_REAPER_STARTED = False
 
 
 def whisper_status():
@@ -129,24 +145,104 @@ def whisper_lang_code(language):
 
 def _load_model(model_size):
     "Load (or reuse a cached) WhisperModel.  Blocking; may download on first use."
+    global _MODEL_LAST_USED  # pylint: disable=global-statement
+
     with _MODEL_CACHE_LOCK:
+        # Counted as "used" on the way in, not just on the way out: a
+        # take that takes longer than the idle timeout must not have the
+        # model dropped underneath it.
+        _MODEL_LAST_USED = time.monotonic()
         model = _MODEL_CACHE.get(model_size)
         if model is not None:
             # Logged so a slow take can be told apart: a hit means the
             # wait is pure CPU inference, a miss means the model is being
             # re-read (or re-downloaded) and the cache is not surviving.
             logger.info("whisper: reusing cached model '%s'", model_size)
-            return model
-        logger.info("whisper: cache miss, loading model '%s'", model_size)
-        # Delayed: only import the heavy package when actually transcribing.
-        from faster_whisper import WhisperModel  # pylint: disable=import-error,import-outside-toplevel
+        else:
+            logger.info("whisper: cache miss, loading model '%s'", model_size)
+            # Delayed: only import the heavy package when actually
+            # transcribing.
+            from faster_whisper import WhisperModel  # pylint: disable=import-error,import-outside-toplevel
 
-        # CPU + int8: no GPU assumed on a self-hosted box, int8 is the
-        # fastest accurate quantization for CPU inference.
-        model = WhisperModel(model_size, device="cpu", compute_type="int8")
+            # CPU + int8: no GPU assumed on a self-hosted box, int8 is the
+            # fastest accurate quantization for CPU inference.
+            model = WhisperModel(model_size, device="cpu", compute_type="int8")
+            _MODEL_CACHE.clear()
+            _MODEL_CACHE[model_size] = model
+            _MODEL_LAST_USED = time.monotonic()
+
+    # Outside the lock: it is held for the whole load above.
+    _ensure_idle_reaper_started()
+    return model
+
+
+def _ensure_idle_reaper_started():
+    "Start the idle-unload thread once, on the first successful load."
+    global _IDLE_REAPER_STARTED  # pylint: disable=global-statement
+
+    with _MODEL_CACHE_LOCK:
+        if _IDLE_REAPER_STARTED:
+            return
+        _IDLE_REAPER_STARTED = True
+    threading.Thread(
+        target=_idle_reaper_loop, name="whisper-idle-reaper", daemon=True
+    ).start()
+
+
+def _idle_reaper_loop():
+    "Drop the cached model once nothing has transcribed for a while."
+    while True:
+        time.sleep(_IDLE_CHECK_INTERVAL_SECONDS)
+        unload_idle_model()
+
+
+def unload_idle_model():
+    """
+    Drop the cached model if it has been idle for MODEL_IDLE_TIMEOUT_SECONDS.
+
+    Returns the size that was unloaded, or None if nothing was (still in
+    use, or not idle long enough).  Only the in-process instance goes:
+    the weights are still in the HuggingFace cache on disk.
+    """
+    with _MODEL_CACHE_LOCK:
+        if not _MODEL_CACHE or _MODEL_USES > 0:
+            return None
+        if time.monotonic() - _MODEL_LAST_USED < MODEL_IDLE_TIMEOUT_SECONDS:
+            return None
+        sizes = ", ".join(sorted(_MODEL_CACHE))
         _MODEL_CACHE.clear()
-        _MODEL_CACHE[model_size] = model
-        return model
+
+    logger.info(
+        "whisper: unloaded model(s) %s after %d min idle; the next "
+        "transcription reloads them from the local cache",
+        sizes,
+        MODEL_IDLE_TIMEOUT_SECONDS // 60,
+    )
+    return sizes
+
+
+@contextmanager
+def model_in_use():
+    """
+    Hold the loaded model for the duration of a transcription.
+
+    The idle reaper skips the cache while this is held.  Without it a
+    take longer than MODEL_IDLE_TIMEOUT_SECONDS would be evicted midway:
+    the caller's own reference keeps that instance alive and the next
+    _load_model builds a second one beside it -- two ~500 MB copies on a
+    box with room for neither.
+    """
+    global _MODEL_USES, _MODEL_LAST_USED  # pylint: disable=global-statement
+
+    with _MODEL_CACHE_LOCK:
+        _MODEL_USES += 1
+        _MODEL_LAST_USED = time.monotonic()
+    try:
+        yield
+    finally:
+        with _MODEL_CACHE_LOCK:
+            _MODEL_USES -= 1
+            _MODEL_LAST_USED = time.monotonic()
 
 
 def transcribe_to_cues(
@@ -161,26 +257,27 @@ def transcribe_to_cues(
     """
     model = _load_model(model_size)
 
-    segments_iter, info = model.transcribe(
-        audio_path,
-        language=lang_code,
-        # vad_filter skips silence/music gaps, which otherwise produce
-        # hallucinated text on podcast interludes.
-        vad_filter=True,
-        # Not conditioning on previous text keeps hallucination loops
-        # from compounding across long audio (community-standard for
-        # long-form transcription).
-        condition_on_previous_text=False,
-    )
-
-    duration = info.duration or 0.0
-    cues = []
-    for seg in segments_iter:  # lazy: transcription happens while iterating
-        cues.append(
-            {"start": seg.start, "end": seg.end, "text": (seg.text or "").strip()}
+    with model_in_use():
+        segments_iter, info = model.transcribe(
+            audio_path,
+            language=lang_code,
+            # vad_filter skips silence/music gaps, which otherwise produce
+            # hallucinated text on podcast interludes.
+            vad_filter=True,
+            # Not conditioning on previous text keeps hallucination loops
+            # from compounding across long audio (community-standard for
+            # long-form transcription).
+            condition_on_previous_text=False,
         )
-        if progress_cb is not None and duration > 0:
-            progress_cb(min(99, int(seg.end / duration * 100)))
+
+        duration = info.duration or 0.0
+        cues = []
+        for seg in segments_iter:  # lazy: transcription happens while iterating
+            cues.append(
+                {"start": seg.start, "end": seg.end, "text": (seg.text or "").strip()}
+            )
+            if progress_cb is not None and duration > 0:
+                progress_cb(min(99, int(seg.end / duration * 100)))
 
     text = "\n".join(c["text"] for c in cues if c["text"])
     return text, json.dumps(cues, ensure_ascii=False)
