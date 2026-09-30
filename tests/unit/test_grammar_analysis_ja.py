@@ -1096,9 +1096,7 @@ def test_construction_rules_do_not_false_positive(key, sentence):
 def test_zh_table_covers_construction_rules():
     "Chinese display has an entry for every combined-construction rule."
     missing = [
-        r["pattern"]
-        for r in _CONSTRUCTION_RULES
-        if r["pattern"] not in _ZH_DESC
+        r["pattern"] for r in _CONSTRUCTION_RULES if r["pattern"] not in _ZH_DESC
     ]
     assert missing == [], f"missing zh descriptions: {missing}"
 
@@ -1171,9 +1169,7 @@ def test_panel_reference_carries_highlight_offsets():
     # Rules sharing a headline fold into one row carrying the first rule's
     # key, so look the row up by name when the key is not the survivor.
     entry = next(
-        e
-        for e in results
-        if e["key"] == rule["key"] or e["name"] == rule["pattern"]
+        e for e in results if e["key"] == rule["key"] or e["name"] == rule["pattern"]
     )
     japanese = entry["reference"]["japanese"]
     assert entry["reference"]["matches"], f"{rule['key']} reference has no offsets"
@@ -1251,14 +1247,37 @@ def test_english_panel_still_shows_the_english_enrichment():
     assert entry["reference"]["text"] == rule["reference"]["english"]
 
 
-def test_korean_panel_hides_untranslated_enrichment():
-    "No Korean enrichment exists yet, so a ko panel shows none rather than English."
+def test_korean_panel_shows_korean_enrichment():
+    """
+    ko_enrichment.json now ships Korean wording for every data row, so a
+    ko panel shows it rather than hiding the block: formation, notes and
+    the reference translation all come from the ko enrichment fields.
+    """
     rule = _jkindrix_rule()
     results = analyze_japanese("".join(rule["examples"][:2]), display_lang="ko")
     entry = next(e for e in results if e["key"] == rule["key"])
-    assert "notes" not in entry
-    assert "reference" not in entry
-    assert "formation" not in entry
+    assert entry["formation"] == rule["formation_ko"]
+    assert entry["notes"] == rule["formation_notes_ko"]
+    assert entry["reference"]["text"] == rule["reference_ko"]
+
+
+def test_korean_enrichment_is_never_english():
+    """
+    Library-wide gate on the same invariant as the zh panel: whichever
+    Korean field a rule carries, none of them may contain an English
+    word -- a ko panel must never print English under a Korean heading.
+    """
+    for rule in _DATA_RULES:
+        for field in (
+            "formation_ko",
+            "formation_notes_ko",
+            "reference_ko",
+            "meaning_ko",
+        ):
+            value = rule.get(field) or ""
+            assert not re.search(
+                r"[A-Za-z]{3,}", value
+            ), f"{rule['key']} {field}: {value}"
 
 
 def test_merged_material_rows_stay_visible_in_chinese():
