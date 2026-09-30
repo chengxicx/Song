@@ -347,10 +347,10 @@ function shadowingOpenPanel() {
     '<span class="shadowing-panel__title">Shadowing</span>' +
     '<button type="button" id="shadowing-auto-btn" class="shadowing-auto-btn"' +
     ' title="Auto: record at every sentence end, score, then advance">Auto</button>' +
-    '<select id="shadowing-model" class="shadowing-panel__model" title="Whisper model">' +
-    '<option value="base">base</option>' +
-    '<option value="small">small</option>' +
-    '<option value="medium">medium</option>' +
+    '<select id="shadowing-model" class="shadowing-panel__model" title="Whisper model: bigger is more accurate but ~3x slower">' +
+    '<option value="base">base · fastest</option>' +
+    '<option value="small">small · balanced</option>' +
+    '<option value="medium">medium · slowest</option>' +
     "</select>" +
     '<button type="button" class="shadowing-panel__close" aria-label="Close">&times;</button>' +
     "</div>" +
@@ -933,16 +933,24 @@ async function shadowingPollTask(taskId) {
     const el = document.getElementById("shadowing-result");
     if (el) {
       const secs = Math.floor((Date.now() - started) / 1000);
-      const hint =
-        secs > 20
-          ? " — first run loads the whisper model, this can take a while"
-          : "";
-      el.innerHTML =
-        '<div class="shadowing-panel__state">Transcribing… ' +
-        secs +
-        "s" +
-        hint +
-        "</div>";
+      if (data.state === "loading_model") {
+        // Only the first take of a session waits here (the model is
+        // cached afterwards, per size), so say so rather than blaming
+        // the model for every slow transcription.
+        el.innerHTML =
+          '<div class="shadowing-panel__state">Loading the whisper model… ' +
+          secs +
+          "s" +
+          (secs > 20
+            ? " (first run downloads it, this can take minutes)"
+            : "") +
+          "</div>";
+      } else {
+        el.innerHTML =
+          '<div class="shadowing-panel__state">Transcribing… ' +
+          secs +
+          "s</div>";
+      }
     }
   }
   return { state: "error", error: "Transcription timed out." };

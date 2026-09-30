@@ -47,9 +47,9 @@ def transcribe_clip(audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE):
     """
     Transcribe one short recording.
 
-    Returns (text, duration_secs, words) where words is
-    [{"word": str, "start": secs, "end": secs}] (may be empty when the
-    model produces no word timestamps).
+    Returns (text, duration_secs).  The caller loads the model first
+    (see _run_task) so it can report a cold start separately; this call
+    then finds it in the cache.
     """
     model = _load_model(model_size)
     segments_iter, info = model.transcribe(
@@ -58,7 +58,10 @@ def transcribe_clip(audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE):
         # Greedy decoding: on a few seconds of speech the accuracy loss
         # vs beam search is negligible and CPU inference is ~2x faster.
         beam_size=1,
-        word_timestamps=True,
+        # No word timestamps: the diff only needs the text, and the
+        # alignment pass costs ~15% extra inference on a CPU that is
+        # already the bottleneck.
+        word_timestamps=False,
         # Same guards as the audiobook transcription (see there).
         vad_filter=True,
         condition_on_previous_text=False,
@@ -67,15 +70,10 @@ def transcribe_clip(audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE):
     )
 
     texts = []
-    words = []
     for seg in segments_iter:
         if seg.text:
             texts.append(seg.text)
-        for w in seg.words or []:
-            token = (w.word or "").strip()
-            if token:
-                words.append({"word": token, "start": w.start, "end": w.end})
-    return "".join(texts).strip(), (info.duration or 0.0), words
+    return "".join(texts).strip(), (info.duration or 0.0)
 
 
 def _clean_token(token):
@@ -290,11 +288,26 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
         # multi-user mode the ContextVar does not cross threads, so the
         # scope must be re-set here or the db creator raises.
         with app.app_context(), mu_context.user_scope(username):
-            _set_task(task_id, "transcribing")
             lang = LanguageRepository(db.session).find(language_id)
             if lang is None:
                 raise RuntimeError("language not found")
-            text, duration, _words = transcribe_clip(
+            # Two states, because they mean different waits: a cold
+            # model load (possibly a several-hundred-MB download) can
+            # dwarf the transcription itself, and the reading page says
+            # which one it is waiting on.  On a warm cache this is a
+            # dictionary lookup and the state flips immediately.
+            _set_task(task_id, "loading_model")
+            try:
+                _load_model(model_size)
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                raise RuntimeError(
+                    f"could not load the whisper model '{model_size}': {e}  "
+                    "(If this was a network timeout downloading the model, set "
+                    "HF_ENDPOINT=https://hf-mirror.com in the server environment "
+                    "and retry.)"
+                ) from e
+            _set_task(task_id, "transcribing")
+            text, duration = transcribe_clip(
                 audio_path, whisper_lang_code(lang), model_size
             )
             if not (text or "").strip():
