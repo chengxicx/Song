@@ -28,6 +28,7 @@ from lute.book.whisper_transcribe import (
 )
 from lute.db import db
 from lute.models.repositories import LanguageRepository
+from lute.multiuser import context as mu_context
 from lute.read.render.grammar_analysis import is_japanese_language
 
 # Per-word verdicts, parallel to the sentence's word spans.
@@ -261,29 +262,34 @@ def purge_finished_tasks():
             del _TASKS[tid]
 
 
-def start_task(app, audio_path, language_id, tokens, model_size):
+def start_task(app, audio_path, language_id, tokens, model_size, username=None):
     """
     Register and launch a background scoring task.
 
     audio_path is a temp file (already on disk); the task deletes it.
-    Returns the task_id.
+    username is the requesting user (multi-user mode); the task thread
+    re-enters that user's scope so its db access lands on the user's
+    own sqlite file.  Returns the task_id.
     """
     purge_finished_tasks()
     task_id = uuid.uuid4().hex
     _set_task(task_id, "queued")
     thread = threading.Thread(
         target=_run_task,
-        args=(app, task_id, audio_path, language_id, tokens, model_size),
+        args=(app, task_id, audio_path, language_id, tokens, model_size, username),
         daemon=True,
     )
     thread.start()
     return task_id
 
 
-def _run_task(app, task_id, audio_path, language_id, tokens, model_size):
+def _run_task(app, task_id, audio_path, language_id, tokens, model_size, username):
     "Thread body: transcribe, diff, store the result. Cleans its temp file."
     try:
-        with app.app_context():
+        # user_scope is a no-op in single-user mode (username=None); in
+        # multi-user mode the ContextVar does not cross threads, so the
+        # scope must be re-set here or the db creator raises.
+        with app.app_context(), mu_context.user_scope(username):
             _set_task(task_id, "transcribing")
             lang = LanguageRepository(db.session).find(language_id)
             if lang is None:
