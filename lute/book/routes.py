@@ -59,6 +59,7 @@ from lute.book.types import import_type_choices
 from lute.book.stats import Service as StatsService
 from lute.book.stats import get_difficulty_label
 from lute.book import whisper_transcribe
+from lute.multiuser.context import get_current_user
 import lute.utils.formutils
 from lute.utils.formutils import book_tag_choices
 from lute.db import db
@@ -735,6 +736,7 @@ def whisper_prepare():
             "source_uri": source_uri,
         },
         media_url=media_url,
+        username=get_current_user(),
     )
     return jsonify({"task_id": task_id})
 
