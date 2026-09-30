@@ -49,7 +49,7 @@ def test_handwritten_rule_offsets_are_precise():
     for e in analyze_korean("한국어를 할 수 있어요."):
         if e["key"] == "ko_su_issda":
             example = e["examples"][0]
-            (start, end) = example["matches"][0]["start"], example["matches"][0]["end"]
+            start, end = example["matches"][0]["start"], example["matches"][0]["end"]
             # The rule starts at the ㄹ-ending (ETM) on the verb and runs to
             # the 있다 stem, so the matched slice spans the construction
             # "할 수 있" (Kiwi decomposes 할 into 하 + ᆯ, so the anchor is
@@ -65,9 +65,7 @@ def test_decomposed_hangul_is_composed_before_matching():
     then reports the ㄹ/ㄴ ending at the bare jamo, so the highlighted
     slice was "ᆯ 수 있" and the panel cut the syllable in half.
     """
-    broken = (
-        "김 후보자를 임명하면서 동시에 공소취소 문제에도 원론적이\u11ab 답변을 내놓을 경우 야권의 공세는 더 거세어지\u11af 수 있다."
-    )
+    broken = "김 후보자를 임명하면서 동시에 공소취소 문제에도 원론적이\u11ab 답변을 내놓을 경우 야권의 공세는 더 거세어지\u11af 수 있다."
     assert not unicodedata.is_normalized("NFC", broken)
     entries = {e["key"]: e for e in analyze_korean(broken)}
     example = entries["ko_su_issda"]["examples"][0]
@@ -257,3 +255,52 @@ def test_korean_panel_keeps_the_formation_but_hides_the_english_notes():
     assert entry["formation"] == rule["formation"]
     assert "notes" not in entry
     assert "reference" not in entry
+
+
+# ---- vendored rows' 参考例句 (backfilled example_en) --------------------
+
+
+def test_vendored_rows_carry_a_reference():
+    """
+    kimchi ships a translation for every one of its examples, but the
+    generator used to drop it -- so the folded 参考例句 block appeared only
+    on the merged material rows, and an ordinary page, where every matched
+    point is a vendored row, showed none.  With ``example_en`` backfilled
+    every vendored row that has examples curates one.
+    """
+    rules = [r for r in grammar_ko._DATA_RULES if r["reference"]]
+    assert len(rules) >= 300, f"only {len(rules)} vendored rules carry a reference"
+    for rule in rules:
+        ref = rule["reference"]
+        assert ref["korean"], rule["key"]
+        assert ref["english"], rule["key"]
+
+
+def test_vendored_reference_is_highlightable():
+    """
+    The curated example must be one the rule's own focus-literal matcher can
+    mark -- the regex spec is passed to the choice so document order cannot
+    quote a sentence the matcher cannot highlight.
+    """
+    rules = [r for r in grammar_ko._DATA_RULES if r["reference"]]
+    for rule in rules:
+        korean = rule["reference"]["korean"]
+        spans = grammar_ko._match_spans(rule, grammar_ko._tokens_for(korean), korean)
+        assert spans, f"{rule['key']} cannot highlight its own reference: {korean}"
+
+
+def test_vendored_reference_shows_on_the_english_panel_only():
+    """
+    The backfilled translation is English: the English panel quotes it, the
+    Chinese panel -- which would print English under a Chinese heading --
+    hides the block, the same rule that hides the merged rows' English
+    notes on a Chinese panel.
+    """
+    rule = next(r for r in grammar_ko._DATA_RULES if r["reference"])
+    sentence = rule["reference"]["korean"]
+    en = next(e for e in analyze_korean(sentence, "en") if e["name"] == rule["pattern"])
+    assert en["reference"]["sentence"] == sentence
+    assert en["reference"]["text"] == rule["reference"]["english"]
+    assert en["reference"]["matches"]
+    zh = next(e for e in analyze_korean(sentence, "zh") if e["name"] == rule["pattern"])
+    assert "reference" not in zh
