@@ -56,7 +56,7 @@ from lute.read import bilibili_stream
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form, serialize_term_form_data
 from lute.settings.current import current_settings
-from lute.multiuser.context import current_scope_key
+from lute.multiuser.context import current_scope_key, get_current_user
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
 from lute.models.term import Term
@@ -1288,6 +1288,7 @@ def shadowing_transcribe():
         lang.id,
         tokens,
         model_size,
+        username=get_current_user(),
     )
     return jsonify({"task_id": task_id})
 

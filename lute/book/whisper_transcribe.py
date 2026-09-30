@@ -22,6 +22,7 @@ import uuid
 from lute.book.model import Book
 from lute.book.service import Service as BookService
 from lute.db import db
+from lute.multiuser import context as mu_context
 
 # Concrete pip requirements, mirroring the "whisper" extra in
 # pyproject.toml (kept in sync by hand).
@@ -204,14 +205,18 @@ def _safe_remove(path):
         pass
 
 
-def start_task(app, audio_path, lang_code, model_size, book_params, media_url=None):  # pylint: disable=too-many-arguments,too-many-positional-arguments
+def start_task(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    app, audio_path, lang_code, model_size, book_params, media_url=None, username=None
+):
     """
     Register and launch a background transcription task.
 
     audio_path is a temp file (already on disk); it is moved into the
     created book (small files) or deleted (large remote-streamed ones)
     by the task itself.  book_params: {language_id, title, tags,
-    source_uri}.  Returns the task_id.
+    source_uri}.  username is the requesting user (multi-user mode);
+    the task thread re-enters that user's scope so its db access lands
+    on the user's own sqlite file.  Returns the task_id.
     """
     task_id = uuid.uuid4().hex
     _set_state(task_id, "queued", message="Queued.")
@@ -221,7 +226,16 @@ def start_task(app, audio_path, lang_code, model_size, book_params, media_url=No
 
     thread = threading.Thread(
         target=_run_task,
-        args=(app, task_id, audio_path, lang_code, model_size, book_params, media_url),
+        args=(
+            app,
+            task_id,
+            audio_path,
+            lang_code,
+            model_size,
+            book_params,
+            media_url,
+            username,
+        ),
         daemon=True,
     )
     thread.start()
@@ -229,21 +243,24 @@ def start_task(app, audio_path, lang_code, model_size, book_params, media_url=No
 
 
 def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    app, task_id, audio_path, lang_code, model_size, book_params, media_url
+    app, task_id, audio_path, lang_code, model_size, book_params, media_url, username
 ):
     """
     Thread body: transcribe, then import the book.
 
     Holds the app context for the whole run (import_book needs
-    current_app.env_config and db.session).  The scoped db session is
-    keyed to the app context, so it is removed while the context is
-    still alive; the temp file is dropped on success (it has been
-    copied into the book) and failure alike.  Error state is set last,
-    after cleanup, so a poller that sees the terminal state also sees
-    the cleaned-up disk.
+    current_app.env_config and db.session); user_scope re-enters the
+    requesting user's identity -- the multiuser ContextVar does not
+    cross threads, and without it both the db connection creator and
+    the user-scoped env_config paths fail in multi-user mode.  The
+    scoped db session is keyed to the app context, so it is removed
+    while the context is still alive; the temp file is dropped on
+    success (it has been copied into the book) and failure alike.
+    Error state is set last, after cleanup, so a poller that sees the
+    terminal state also sees the cleaned-up disk.
     """
     try:
-        with app.app_context():
+        with app.app_context(), mu_context.user_scope(username):
             try:
                 _set_state(
                     task_id,
