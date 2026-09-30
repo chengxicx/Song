@@ -296,11 +296,47 @@ def task_status(task_id):
 
 
 def has_running_task():
-    "True while any transcription is queued/loading/transcribing."
+    "True while any transcription or model download is in flight."
     with _TASKS_LOCK:
         return any(
             t.get("state") in ("queued", "loading_model", "transcribing")
             for t in _TASKS.values()
+        )
+
+
+def start_model_download(app, model_size):
+    """
+    Pre-download the selected model in the background so the first real
+    transcription starts fast.  The download happens inside the
+    WhisperModel constructor; on success the instance sits in
+    _MODEL_CACHE and is reused.  Returns the task_id.
+    """
+    task_id = uuid.uuid4().hex
+    _set_state(
+        task_id,
+        "loading_model",
+        message=f"Downloading model '{model_size}' (hundreds of MB, one time only).",
+    )
+    thread = threading.Thread(
+        target=_run_model_download, args=(task_id, model_size), daemon=True
+    )
+    thread.start()
+    return task_id
+
+
+def _run_model_download(task_id, model_size):
+    try:
+        _load_model(model_size)
+        _set_state(task_id, "finished", percent=100)
+    except Exception as e:  # pylint: disable=broad-except
+        _set_state(
+            task_id,
+            "error",
+            error=(
+                f"{e}  (If this was a network timeout downloading the model, "
+                "set HF_ENDPOINT=https://hf-mirror.com in the server environment "
+                "and retry.)"
+            ),
         )
 
 
