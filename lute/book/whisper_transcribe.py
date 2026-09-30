@@ -12,6 +12,7 @@ task_status(task_id) until the book is created (or an error surfaces).
 
 import importlib.util
 import json
+import logging
 import os
 import shutil
 import subprocess
@@ -23,6 +24,8 @@ from lute.book.model import Book
 from lute.book.service import Service as BookService
 from lute.db import db
 from lute.multiuser import context as mu_context
+
+logger = logging.getLogger(__name__)
 
 # Concrete pip requirements, mirroring the "whisper" extra in
 # pyproject.toml (kept in sync by hand).
@@ -129,7 +132,12 @@ def _load_model(model_size):
     with _MODEL_CACHE_LOCK:
         model = _MODEL_CACHE.get(model_size)
         if model is not None:
+            # Logged so a slow take can be told apart: a hit means the
+            # wait is pure CPU inference, a miss means the model is being
+            # re-read (or re-downloaded) and the cache is not surviving.
+            logger.info("whisper: reusing cached model '%s'", model_size)
             return model
+        logger.info("whisper: cache miss, loading model '%s'", model_size)
         # Delayed: only import the heavy package when actually transcribing.
         from faster_whisper import WhisperModel  # pylint: disable=import-error,import-outside-toplevel
 
