@@ -9,7 +9,6 @@ Includes classes:
 
 import re
 import os
-import pythainlp
 
 from typing import List
 
@@ -42,6 +41,11 @@ class ThaiParser(AbstractParser):
         """
         Returns ParsedToken array for given language.
         """
+        # Imported here, not at module level: the app loads every
+        # parser plugin at start-up (lute.parse.registry) and just
+        # importing pythainlp costs ~220MB of resident memory.
+        import pythainlp  # pylint: disable=import-outside-toplevel
+
         text = text.replace("\r\n", "\n")
 
         words = pythainlp.word_tokenize(text)
