@@ -4,6 +4,8 @@ MandarinParser tests.
 
 import tempfile
 import os
+import subprocess
+import sys
 import pytest
 
 # pylint: disable=wrong-import-order
@@ -151,3 +153,21 @@ def test_term_found_in_exceptions_file_is_split(mandarin_chinese, _datadir):
 
     set_parse_exceptions(["清华, 大学", " 大 ,  学 "])
     assert ["清华", "大", "学"] == parsed_tokens(), "Spaces are ignored"
+
+
+def test_importing_the_parser_does_not_import_the_heavy_deps():
+    """
+    The app imports every parser plugin at start-up
+    (lute.parse.registry), so the heavy dependencies must stay out of
+    the module import: importing jieba alone costs ~70MB of resident
+    memory.
+    """
+    code = (
+        "import sys;"
+        "import lute_mandarin_parser.parser;"
+        "assert 'jieba' not in sys.modules, "
+        "'importing the parser pulled in jieba';"
+        "assert 'pypinyin' not in sys.modules, "
+        "'importing the parser pulled in pypinyin'"
+    )
+    subprocess.check_call([sys.executable, "-c", code])
