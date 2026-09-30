@@ -14,7 +14,10 @@ from flask import (
 from wtforms import BooleanField
 from lute.models.language import Language
 from lute.models.setting import UserSetting
-from lute.models.repositories import UserSettingRepository
+from lute.models.repositories import (
+    MissingUserSettingKeyException,
+    UserSettingRepository,
+)
 from lute.themes.service import Service as ThemeService
 from lute.settings.forms import UserSettingsForm, UserShortcutsForm
 from lute.settings.current import refresh_global_settings
@@ -139,7 +142,14 @@ def test_sudachi():
 def set_key_value(key, value):
     "Set a UserSetting key to value."
     repo = UserSettingRepository(db.session)
-    old_value = repo.get_value(key)
+    try:
+        old_value = repo.get_value(key)
+    except MissingUserSettingKeyException:
+        # Unknown key: a client built against a different version is
+        # posting a setting this build does not define (e.g. a stale
+        # cached page).  Answer with a plain failure rather than letting
+        # the lookup raise a 500.
+        return jsonify({"result": "failure", "message": f"Unknown setting: {key}"}), 404
     try:
         repo.set_value(key, value)
         result = {"result": "success", "message": "OK"}
