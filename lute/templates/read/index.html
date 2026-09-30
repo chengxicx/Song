@@ -38,6 +38,7 @@
 <script type="text/javascript" src="{{ vstatic('js/tts-translate.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/tts-player.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/tts-ui.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/lute-shadowing.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/player-dock.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
@@ -372,9 +373,11 @@
 
   let _lute_form_event_handler = function(event) {
     if (event.data.event === "LuteTermFormOpened") {
-      // A grammar-analysis view may be filling the right pane; clicking a
-      // word restores the pane to its default term-form + dictionary state.
+      // A grammar-analysis or shadowing view may be filling the right
+      // pane; clicking a word restores the pane to its default
+      // term-form + dictionary state.
       if (window.closeGrammarAnalysis) window.closeGrammarAnalysis();
+      if (window.closeShadowingPanel) window.closeShadowingPanel();
       LookupButton.TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
       loadDictionaries();
     }
@@ -758,6 +761,12 @@
     // visibly jump on every term-save.  No-op when sentence buttons are off.
     if (typeof window.luteInjectSentenceButtons === "function") {
       window.luteInjectSentenceButtons();
+    }
+
+    // Same for the shadowing mic buttons, plus stale-mark/panel
+    // cleanup when the swapped-out sentence was being scored.
+    if (typeof window.luteShadowingAfterSwap === "function") {
+      window.luteShadowingAfterSwap();
     }
 
     // Page navigation (goto_relative_page).

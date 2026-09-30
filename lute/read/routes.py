@@ -7,6 +7,7 @@ import json
 import math
 import os
 import unicodedata
+import uuid
 from flask import (
     Blueprint,
     current_app,
@@ -20,6 +21,7 @@ from flask import (
 )
 from lute.read.service import Service
 from lute.read.render.service import Service as RenderService
+from lute.read import shadowing
 from lute.read.render.grammar_analysis import (
     analyze as analyze_grammar,
     is_japanese_language,
@@ -1229,6 +1231,97 @@ def grammar_analysis(bookid, pagenum):
         "".join(ti.text for ti in sentence) for para in paragraphs for sentence in para
     ]
     return jsonify(analyze_grammar(sentences))
+
+
+@bp.route("/shadowing/transcribe", methods=["POST"])
+def shadowing_transcribe():
+    """
+    Score one shadowing recording: transcribe the uploaded clip with
+    whisper, then diff the transcription against the sentence's word
+    tokens the client collected from the reading pane.
+
+    Multipart fields: audio (the recording blob), language_id, tokens
+    (JSON array of the sentence's word spans' data-text, in DOM order),
+    model (optional whisper size).  Synchronous: a sentence recording is
+    a few seconds of audio, and the model is cached in-process after the
+    first load, so a task/poll flow would only add moving parts.
+    """
+    if not shadowing.whisper_status()["installed"]:
+        return jsonify(
+            {"error": "whisper is not installed (see Settings > Whisper)."}
+        ), 400
+
+    audio = request.files.get("audio")
+    if audio is None or not (audio.filename or "").strip():
+        return jsonify({"error": "no audio uploaded"}), 400
+
+    try:
+        tokens = json.loads(request.form.get("tokens", "[]"))
+    except ValueError:
+        return jsonify({"error": "invalid tokens payload"}), 400
+    if not isinstance(tokens, list) or not all(isinstance(t, str) for t in tokens):
+        return jsonify({"error": "invalid tokens payload"}), 400
+
+    lang = LanguageRepository(db.session).find(
+        request.form.get("language_id", type=int) or 0
+    )
+    if lang is None:
+        return jsonify({"error": "language not found"}), 400
+
+    model_size = (request.form.get("model") or "").strip()
+    if model_size not in shadowing.ALLOWED_MODEL_SIZES:
+        model_size = shadowing.DEFAULT_MODEL_SIZE
+
+    temppath = current_app.env_config.temppath
+    os.makedirs(temppath, exist_ok=True)
+    ext = os.path.splitext((audio.filename or "").lower())[1].lstrip(".")
+    if ext not in ("webm", "mp4", "m4a", "ogg", "oga", "wav", "mp3"):
+        ext = "bin"
+    audio_path = os.path.join(temppath, f"shadowing_{uuid.uuid4().hex}.{ext}")
+    audio.save(audio_path)
+    try:
+        text, duration, _words = shadowing.transcribe_clip(
+            audio_path, shadowing.whisper_lang_code(lang), model_size
+        )
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        current_app.logger.warning("shadowing transcription failed: %s", e)
+        return jsonify({"error": f"transcription failed: {e}"}), 500
+    finally:
+        try:
+            os.remove(audio_path)
+        except OSError:
+            pass
+
+    if not (text or "").strip():
+        return jsonify({"error": "no speech detected in the recording"}), 422
+
+    try:
+        comparison = shadowing.compare_tokens(tokens, text, lang)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        current_app.logger.warning("shadowing diff failed: %s", e)
+        return jsonify({"error": f"could not compare with the sentence: {e}"}), 500
+
+    rate = None
+    if duration and duration > 0:
+        rate = round(comparison["spoken_count"] / (duration / 60.0), 1)
+
+    return jsonify(
+        {
+            "transcription": text,
+            "statuses": comparison["statuses"],
+            "spoken_for_fuzzy": {
+                str(k): v for k, v in comparison["spoken_for_fuzzy"].items()
+            },
+            "extras": comparison["extras"],
+            "score": comparison["score"],
+            "matched": comparison["matched"],
+            "fuzzy": comparison["fuzzy"],
+            "total": comparison["total"],
+            "duration": round(duration or 0.0, 2),
+            "tokens_per_minute": rate,
+            "token_kind": "morpheme" if is_japanese_language(lang) else "word",
+        }
+    )
 
 
 def _manga_page_text(book, pagenum):
