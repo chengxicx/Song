@@ -7,6 +7,9 @@ boundaries (and 5.x may group sentence punctuation into a word
 token, which the parser normalizes away).
 """
 
+import subprocess
+import sys
+
 import pytest
 
 # pylint: disable=wrong-import-order
@@ -160,3 +163,19 @@ def test_parser_declares_cantonese():
     "Parser is language-specific."
     assert CantoneseParser.languages() is not None
     assert "cantonese" in CantoneseParser.languages()
+
+
+def test_importing_the_parser_does_not_import_pycantonese():
+    """
+    The app imports every parser plugin at start-up
+    (lute.parse.registry), so the heavy dependency must stay out of
+    the module import: importing pycantonese alone costs ~45MB of
+    resident memory.
+    """
+    code = (
+        "import sys;"
+        "import lute_cantonese_parser.parser;"
+        "assert 'pycantonese' not in sys.modules, "
+        "'importing the parser pulled in pycantonese'"
+    )
+    subprocess.check_call([sys.executable, "-c", code])

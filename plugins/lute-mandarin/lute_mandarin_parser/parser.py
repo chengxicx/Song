@@ -12,8 +12,6 @@ Includes classes:
 import re
 import os
 from typing import List
-import jieba
-from pypinyin import pinyin
 from lute.parse.base import ParsedToken, AbstractParser
 
 
@@ -103,6 +101,12 @@ class MandarinParser(AbstractParser):
         Returns ParsedToken array for given language.
         """
 
+        # Imported here, not at module level: the app loads every
+        # parser plugin at start-up (lute.parse.registry) and just
+        # importing jieba costs ~70MB of resident memory (its word
+        # dictionary trie).
+        import jieba  # pylint: disable=import-outside-toplevel
+
         exceptions_map = self._build_parser_exceptions_map()
 
         # Ensure standard carriage returns so that paragraph
@@ -133,6 +137,10 @@ class MandarinParser(AbstractParser):
         Returns None if the text is all Chinese characters, or the pinyin
         doesn't add value (same as text).
         """
+        # Imported here, not at module level: the app loads every
+        # parser plugin at start-up (lute.parse.registry).
+        from pypinyin import pinyin  # pylint: disable=import-outside-toplevel
+
         # Use pypinyin to get the pinyin of the text
         pinyin_list = pinyin(text)
         # Flatten the list of lists to a single list
