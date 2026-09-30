@@ -67,7 +67,19 @@ def install_whisper():
     """
     try:
         proc = subprocess.run(
-            [sys.executable, "-m", "pip", "install", *_WHISPER_INSTALL_SPECS],
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                # Wheels only: building PyAV from source needs ffmpeg
+                # headers, Cython and a C toolchain, which a typical
+                # server does not have (prod: av-14.4.0.tar.gz build
+                # died).  Every supported Python has prebuilt wheels
+                # within the pinned ranges, so let pip pick one.
+                "--only-binary=:all:",
+                *_WHISPER_INSTALL_SPECS,
+            ],
             capture_output=True,
             text=True,
             timeout=_PIP_TIMEOUT_SECONDS,
@@ -81,7 +93,9 @@ def install_whisper():
         output = (proc.stdout or "") + (proc.stderr or "")
         return (
             False,
-            f"pip install of faster-whisper failed:\n{output.strip()[-2000:]}",
+            "pip install of faster-whisper failed (wheels-only; a C build "
+            "of PyAV is not attempted):\n"
+            + output.strip()[-2000:],
         )
     return True, (
         "Installed faster-whisper.  "
