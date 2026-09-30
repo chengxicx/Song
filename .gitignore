@@ -174,6 +174,11 @@ lute_data/
 # both and emit the identical CSS twice (see lute/themes/service.py).
 lute/themes/css/Boox_Leaf5C.css
 
+# Per-language session handoff notes: internal working docs (absolute local
+# paths, deploy state, source provenance).  Kept on disk, never published.
+scripts/grammar_materials/HANDOFF.md
+scripts/grammar_materials_ko/HANDOFF.md
+
 # Local tool / agent working dirs (not part of source)
 .workbuddy/
 .workbuddy-ai/
