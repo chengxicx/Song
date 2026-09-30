@@ -152,7 +152,9 @@ def literal_head_pos(literal):
 
 def screen():
     """The candidates, as (id, rule, entry, literals, head_pos) tuples."""
-    derived = {r["key"][3:]: r for r in G._DATA_RULES if r["key"].startswith("ds_")}
+    derived = {
+        r["key"][3:]: r for r in G._get_data_rules() if r["key"].startswith("ds_")
+    }
     lib = load_library()
     out = []
     for rid, rule in sorted(derived.items()):
