@@ -23,6 +23,7 @@ from lute.book.whisper_transcribe import (
     ALLOWED_MODEL_SIZES,
     DEFAULT_MODEL_SIZE,
     _load_model,
+    model_in_use,
     whisper_lang_code,
     whisper_status,
 )
@@ -52,27 +53,28 @@ def transcribe_clip(audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE):
     then finds it in the cache.
     """
     model = _load_model(model_size)
-    segments_iter, info = model.transcribe(
-        audio_path,
-        language=lang_code,
-        # Greedy decoding: on a few seconds of speech the accuracy loss
-        # vs beam search is negligible and CPU inference is ~2x faster.
-        beam_size=1,
-        # No word timestamps: the diff only needs the text, and the
-        # alignment pass costs ~15% extra inference on a CPU that is
-        # already the bottleneck.
-        word_timestamps=False,
-        # Same guards as the audiobook transcription (see there).
-        vad_filter=True,
-        condition_on_previous_text=False,
-        # No initial_prompt: hinting the expected sentence would let the
-        # model echo it back, inflating the score.
-    )
+    with model_in_use():
+        segments_iter, info = model.transcribe(
+            audio_path,
+            language=lang_code,
+            # Greedy decoding: on a few seconds of speech the accuracy loss
+            # vs beam search is negligible and CPU inference is ~2x faster.
+            beam_size=1,
+            # No word timestamps: the diff only needs the text, and the
+            # alignment pass costs ~15% extra inference on a CPU that is
+            # already the bottleneck.
+            word_timestamps=False,
+            # Same guards as the audiobook transcription (see there).
+            vad_filter=True,
+            condition_on_previous_text=False,
+            # No initial_prompt: hinting the expected sentence would let the
+            # model echo it back, inflating the score.
+        )
 
-    texts = []
-    for seg in segments_iter:
-        if seg.text:
-            texts.append(seg.text)
+        texts = []
+        for seg in segments_iter:
+            if seg.text:
+                texts.append(seg.text)
     return "".join(texts).strip(), (info.duration or 0.0)
 
 
