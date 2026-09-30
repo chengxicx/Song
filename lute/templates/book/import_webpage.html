@@ -58,6 +58,16 @@
   .iform { display: flex; flex-direction: column; gap: .95rem; }
   .irow { display: grid; grid-template-columns: minmax(110px,150px) 1fr; gap: .9rem 1rem; align-items: center; }
   .irow .ilbl { font-weight: 600; color: var(--font-color, #2a2a2a); font-size: .92rem; }
+
+  /* Whisper auto-transcription progress. */
+  .whisper-progress-track {
+    margin-top: .45rem; height: 8px; border-radius: 4px; overflow: hidden;
+    background: var(--panel-bg-2, rgba(0,0,0,.1));
+  }
+  .whisper-progress-bar {
+    height: 100%; width: 0%; border-radius: 4px;
+    background: #3d7ecc; transition: width .6s ease;
+  }
   .ictrl { min-width: 0; } /* allow children to shrink and avoid overflow */
 
   .ictrl select, .ictrl input[type=text], .ictrl input[type=url] {
@@ -257,6 +267,32 @@
         <input type="file" id="mp3_srt_file" name="srt_file" accept=".srt,.vtt,.txt">
         <span class="ior">or</span>
         <input type="url" id="mp3_srt_url" name="mp3_srt_url" placeholder="Paste an SRT / VTT / TXT URL">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="mp3_whisper">No subtitles?</label>
+      <div class="ictrl isource">
+        <label><input type="checkbox" id="mp3_whisper"> Auto-transcribe with Whisper (local, no subtitle file needed)</label>
+        <span class="ior">model</span>
+        <select id="mp3_whisper_model">
+          <option value="base">base (fastest)</option>
+          <option value="small" selected>small (recommended)</option>
+          <option value="medium">medium (most accurate)</option>
+        </select>
+      </div>
+    </div>
+    <div class="irow" id="whisper_panel_row" style="display: none;">
+      <label class="ilbl"></label>
+      <div class="ictrl" id="whisper_panel">
+        <span id="whisper_missing" style="display: none;">
+          Local transcription needs the faster-whisper package (~200 MB).
+          <button type="button" id="whisper_install" class="btn btn-secondary">Install</button>
+          <span id="whisper_install_status"></span>
+        </span>
+        <span id="whisper_progress" style="display: none;">
+          <span id="whisper_status_text"></span>
+          <div class="whisper-progress-track"><div class="whisper-progress-bar" id="whisper_progress_bar"></div></div>
+        </span>
       </div>
     </div>
     <div class="irow">
@@ -805,6 +841,151 @@
           btn.prop('disabled', false);
           $('#epub-import').prop('disabled', false);
           $('#epub-confirm-status').text('Import failed.').css('color', 'red');
+        });
+    });
+
+    // --- Whisper auto-transcription (mp3 form). ---
+    // Checked + no subtitle provided: the import posts to
+    // /book/whisper/prepare instead, and the page polls the task until
+    // the book exists.  An explicitly provided subtitle always wins.
+    let whisperInstalled = null; // tri-state until the availability check answers.
+    const whisperBtn = $('#mp3-import');
+    const whisperStatusText = $('#whisper_status_text');
+    const whisperStatusMsg = $('#whisper_install_status');
+    const whisperPanelRow = $('#whisper_panel_row');
+
+    const showWhisperPanel = function (missing) {
+      whisperPanelRow.show();
+      $('#whisper_missing').toggle(!!missing);
+      $('#whisper_progress').toggle(!missing);
+    };
+
+    fetch('/book/whisper/available')
+      .then(r => r.json())
+      .then(d => { whisperInstalled = !!d.installed; })
+      .catch(() => { whisperInstalled = true; }); // never block the plain import path
+
+    const refreshWhisperPanel = function () {
+      if (!$('#mp3_whisper').prop('checked')) { whisperPanelRow.hide(); return; }
+      showWhisperPanel(whisperInstalled === false);
+    };
+    $('#mp3_whisper').on('change', refreshWhisperPanel);
+
+    $('#whisper_install').on('click', function () {
+      const btn = $(this);
+      btn.prop('disabled', true);
+      whisperStatusMsg.text('Installing faster-whisper (this can take a minute)…').css('color', '');
+      fetch('/book/whisper/install', { method: 'POST' })
+        .then(r => r.json())
+        .then(d => {
+          whisperStatusMsg.text(d.message || '').css('color', d.ok ? 'green' : 'red');
+          if (d.ok) {
+            whisperInstalled = true;
+            refreshWhisperPanel();
+          } else {
+            btn.prop('disabled', false);
+          }
+        })
+        .catch(() => {
+          whisperStatusMsg.text('Install failed -- see the server log.').css('color', 'red');
+          btn.prop('disabled', false);
+        });
+    });
+
+    const pollWhisperTask = function (taskId) {
+      const timer = setInterval(() => {
+        fetch('/book/whisper/status/' + taskId)
+          .then(r => r.json())
+          .then(d => {
+            if (d.state === 'finished' && d.book_id) {
+              clearInterval(timer);
+              $('#whisper_progress_bar').css('width', '100%');
+              whisperStatusText.text('Done! Opening the book…').css('color', 'green');
+              window.location.href = '/read/' + d.book_id + '/page/1';
+              return;
+            }
+            if (d.state === 'error') {
+              clearInterval(timer);
+              $('#whisper_progress_bar').css('width', '0%');
+              whisperStatusText.text('Transcription failed: ' + (d.error || 'unknown error')).css('color', 'red');
+              whisperBtn.prop('disabled', false);
+              return;
+            }
+            if (d.state === 'unknown') {
+              clearInterval(timer);
+              whisperStatusText.text('The transcription task was lost (server restart?). Please try again.').css('color', 'red');
+              whisperBtn.prop('disabled', false);
+              return;
+            }
+            if (d.state === 'transcribing') {
+              whisperStatusText.text('Transcribing… ' + d.percent + '%').css('color', '');
+              $('#whisper_progress_bar').css('width', (d.percent || 0) + '%');
+            } else {
+              whisperStatusText.text(d.message || 'Queued…').css('color', '');
+            }
+          })
+          .catch(() => {}); // transient network hiccups: keep polling
+      }, 2000);
+    };
+
+    mp3Form.on('submit', function (e) {
+      if (!$('#mp3_whisper').prop('checked')) return;
+      const srtInput = document.getElementById('mp3_srt_file');
+      const srtUrl = ($('#mp3_srt_url').val() || '').trim();
+      if ((srtInput.files && srtInput.files.length > 0) || srtUrl !== '') return;
+
+      e.preventDefault();
+      const audioInput = document.getElementById('mp3_file');
+      const audioUrl = ($('#mp3_url').val() || '').trim();
+      if (!(audioInput.files && audioInput.files[0]) && audioUrl === '') {
+        whisperPanelRow.show();
+        $('#whisper_missing').hide();
+        $('#whisper_progress').show();
+        whisperStatusText.text('Please provide an audio file (upload or an online URL).').css('color', 'red');
+        return;
+      }
+      if (!$('#mp3-language').val()) {
+        whisperPanelRow.show();
+        $('#whisper_missing').hide();
+        $('#whisper_progress').show();
+        whisperStatusText.text('Please choose a language.').css('color', 'red');
+        return;
+      }
+
+      whisperBtn.prop('disabled', true);
+      const fd = new FormData();
+      fd.append('language_id', $('#mp3-language').val());
+      fd.append('whisper_model', $('#mp3_whisper_model').val());
+      if (audioInput.files && audioInput.files[0]) {
+        fd.append('mp3_file', audioInput.files[0]);
+      }
+      if (audioUrl !== '') {
+        fd.append('mp3_url', audioUrl);
+      }
+      fd.append('mp3_title', $('#mp3_title').val() || '');
+      fd.append('mp3_tag', $('#mp3_tag').val() || '');
+
+      fetch('/book/whisper/prepare', { method: 'POST', body: fd })
+        .then(r => r.json().then(data => ({ ok: r.ok, data })))
+        .then(({ ok, data }) => {
+          if (!ok || !data.task_id) {
+            whisperPanelRow.show();
+            $('#whisper_missing').hide();
+            $('#whisper_progress').show();
+            whisperStatusText.text(data.error || 'Could not start the transcription.').css('color', 'red');
+            whisperBtn.prop('disabled', false);
+            return;
+          }
+          showWhisperPanel(false);
+          whisperStatusText.text('Queued…').css('color', '');
+          pollWhisperTask(data.task_id);
+        })
+        .catch(() => {
+          whisperPanelRow.show();
+          $('#whisper_missing').hide();
+          $('#whisper_progress').show();
+          whisperStatusText.text('Could not start the transcription.').css('color', 'red');
+          whisperBtn.prop('disabled', false);
         });
     });
   });

@@ -121,6 +121,14 @@ arabic = [
 fsrs = [
   "fsrs>=5,<7; python_version>='3.10'",
 ]
+# Local speech-to-text for auto-generating audiobook subtitles.
+# faster-whisper 1.x covers CTranslate2-based CPU inference (int8).
+# av is capped below 15: PyAV 15 drops decode_audio's metadata_errors
+# kwarg, which faster-whisper 1.x still passes (crash on open).
+whisper = [
+  "faster-whisper>=1.0,<2",
+  "av>=11,<15",
+]
 
 [project.urls]
 Home = "https://github.com/luteorg/lute-v3"

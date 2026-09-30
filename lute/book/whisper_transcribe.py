@@ -1,0 +1,301 @@
+"""
+Auto-generate audiobook subtitles with faster-whisper.
+
+Mirrors the grammar-engine optional-dependency pattern
+(lute/read/render/grammar_analysis.py): the heavy dependency is pip
+installed on demand, detected with importlib.util.find_spec, and only
+imported lazily when a transcription actually runs.
+
+A transcription runs on a daemon thread; the import page polls
+task_status(task_id) until the book is created (or an error surfaces).
+"""
+
+import importlib.util
+import json
+import os
+import subprocess
+import sys
+import threading
+import uuid
+
+from lute.book.model import Book
+from lute.book.service import Service as BookService
+from lute.db import db
+
+# Concrete pip requirements, mirroring the "whisper" extra in
+# pyproject.toml (kept in sync by hand).
+_WHISPER_INSTALL_SPECS = ["faster-whisper>=1.0,<2", "av>=11,<15"]
+_PIP_TIMEOUT_SECONDS = 900
+
+ALLOWED_MODEL_SIZES = ["base", "small", "medium"]
+DEFAULT_MODEL_SIZE = "small"
+
+MAX_CONCURRENT_TRANSCRIPTIONS = 1
+
+# Remote audio larger than the local-storage cutoff is still downloaded
+# to a temp file for transcription (transcription needs a local file),
+# but only up to this hard cap.
+WHISPER_MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024 * 1024
+
+# Task states surfaced to the import page's poller.
+#   queued -> loading_model -> transcribing -> finished
+# any state -> error
+_TASKS = {}
+_TASKS_LOCK = threading.Lock()
+
+# Loaded WhisperModel instances, keyed by model size.  Only the most
+# recent size is kept: small/int8 is ~500 MB resident, and consecutive
+# imports at the same size (multi-part podcasts) then skip the load.
+_MODEL_CACHE = {}
+_MODEL_CACHE_LOCK = threading.Lock()
+
+
+def whisper_status():
+    """
+    UI summary of the whisper dependency:
+      {"installed": bool, "missing": [package names]}
+    """
+    missing = ["faster_whisper"] if importlib.util.find_spec("faster_whisper") is None else []
+    return {"installed": not missing, "missing": missing}
+
+
+def install_whisper():
+    """
+    pip-install faster-whisper.
+
+    Returns (ok, message).  Same contract as install_grammar_engine.
+    """
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-m", "pip", "install", *_WHISPER_INSTALL_SPECS],
+            capture_output=True,
+            text=True,
+            timeout=_PIP_TIMEOUT_SECONDS,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return False, "pip install of faster-whisper timed out"
+    except OSError as e:
+        return False, f"Could not run pip: {e}"
+    if proc.returncode != 0:
+        output = (proc.stdout or "") + (proc.stderr or "")
+        return (
+            False,
+            f"pip install of faster-whisper failed:\n{output.strip()[-2000:]}",
+        )
+    return True, (
+        "Installed faster-whisper.  "
+        "If the import page still says it is missing, restart the app."
+    )
+
+
+def whisper_lang_code(language):
+    """
+    Map a Language to a whisper language code ("ja", "zh", ...), or
+    None to let whisper auto-detect.  Uses tts_lang (e.g. "zh-CN")
+    because the language name is not an ISO code.
+    """
+    if language is None:
+        return None
+    return ((language.tts_lang or "").split("-")[0].lower()) or None
+
+
+def _load_model(model_size):
+    "Load (or reuse a cached) WhisperModel.  Blocking; may download on first use."
+    with _MODEL_CACHE_LOCK:
+        model = _MODEL_CACHE.get(model_size)
+        if model is not None:
+            return model
+        # Delayed: only import the heavy package when actually transcribing.
+        from faster_whisper import WhisperModel  # pylint: disable=import-error,import-outside-toplevel
+
+        # CPU + int8: no GPU assumed on a self-hosted box, int8 is the
+        # fastest accurate quantization for CPU inference.
+        model = WhisperModel(model_size, device="cpu", compute_type="int8")
+        _MODEL_CACHE.clear()
+        _MODEL_CACHE[model_size] = model
+        return model
+
+
+def transcribe_to_cues(
+    audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE, progress_cb=None
+):
+    """
+    Transcribe an audio file into subtitle cues.
+
+    Returns (text, cues_json), matching the output shape of
+    parse_subtitle_content: text is the cue texts joined by newlines,
+    cues_json is a JSON string of [{"start": secs, "end": secs, "text": str}].
+    """
+    model = _load_model(model_size)
+
+    segments_iter, info = model.transcribe(
+        audio_path,
+        language=lang_code,
+        # vad_filter skips silence/music gaps, which otherwise produce
+        # hallucinated text on podcast interludes.
+        vad_filter=True,
+        # Not conditioning on previous text keeps hallucination loops
+        # from compounding across long audio (community-standard for
+        # long-form transcription).
+        condition_on_previous_text=False,
+    )
+
+    duration = info.duration or 0.0
+    cues = []
+    for seg in segments_iter:  # lazy: transcription happens while iterating
+        cues.append(
+            {"start": seg.start, "end": seg.end, "text": (seg.text or "").strip()}
+        )
+        if progress_cb is not None and duration > 0:
+            progress_cb(min(99, int(seg.end / duration * 100)))
+
+    text = "\n".join(c["text"] for c in cues if c["text"])
+    return text, json.dumps(cues, ensure_ascii=False)
+
+
+# ---------------------------------------------------------------------------
+# Background task machinery.
+
+
+def _set_state(task_id, state, percent=0, error=None, book_id=None, message=None):
+    with _TASKS_LOCK:
+        task = _TASKS.get(task_id, {})
+        task.update(
+            {
+                "state": state,
+                "percent": percent,
+                "error": error,
+                "book_id": book_id,
+                "message": message,
+            }
+        )
+        _TASKS[task_id] = task
+
+
+def _safe_remove(path):
+    try:
+        if path and os.path.exists(path):
+            os.remove(path)
+    except OSError:
+        pass
+
+
+def start_task(app, audio_path, lang_code, model_size, book_params, media_url=None):  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    """
+    Register and launch a background transcription task.
+
+    audio_path is a temp file (already on disk); it is moved into the
+    created book (small files) or deleted (large remote-streamed ones)
+    by the task itself.  book_params: {language_id, title, tags,
+    source_uri}.  Returns the task_id.
+    """
+    task_id = uuid.uuid4().hex
+    _set_state(task_id, "queued", message="Queued.")
+    with _TASKS_LOCK:
+        _TASKS[task_id]["audio_path"] = audio_path
+        _TASKS[task_id]["media_url"] = media_url
+
+    thread = threading.Thread(
+        target=_run_task,
+        args=(app, task_id, audio_path, lang_code, model_size, book_params, media_url),
+        daemon=True,
+    )
+    thread.start()
+    return task_id
+
+
+def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    app, task_id, audio_path, lang_code, model_size, book_params, media_url
+):
+    """
+    Thread body: transcribe, then import the book.
+
+    Holds the app context for the whole run (import_book needs
+    current_app.env_config and db.session).  The scoped db session is
+    keyed to the app context, so it is removed while the context is
+    still alive; the temp file is dropped on success (it has been
+    copied into the book) and failure alike.  Error state is set last,
+    after cleanup, so a poller that sees the terminal state also sees
+    the cleaned-up disk.
+    """
+    try:
+        with app.app_context():
+            try:
+                _set_state(
+                    task_id,
+                    "loading_model",
+                    message="Loading model (first run downloads ~500 MB).",
+                )
+                text, cues_json = transcribe_to_cues(
+                    audio_path,
+                    lang_code,
+                    model_size,
+                    progress_cb=lambda p: _set_state(task_id, "transcribing", percent=p),
+                )
+                if not (text and text.strip()):
+                    raise RuntimeError("The transcription produced no text.")
+
+                b = Book()
+                b.language_id = book_params.get("language_id")
+                b.title = book_params.get("title")
+                b.source_uri = book_params.get("source_uri")
+                b.text = text
+                b.srt_data = cues_json
+                b.book_type = "mp3"
+                b.book_tags = book_params.get("tags") or []
+                b.threshold_page_tokens = 250
+                b.split_by = "paragraphs"
+                if media_url:
+                    # Large remote audio: keep streaming from the URL, the
+                    # temp download was only needed for transcription.
+                    b.media_url = media_url
+                else:
+                    # Small/local audio: import_book copies the temp file
+                    # into the user audio dir under a unique name.
+                    b.audio_source_path = audio_path
+
+                book = BookService().import_book(b, db.session)
+                _set_state(task_id, "finished", percent=100, book_id=book.id)
+            finally:
+                db.session.remove()
+                # The temp download has been copied into the book
+                # (success) or is no longer needed (failure).
+                _safe_remove(audio_path)
+    except Exception as e:  # pylint: disable=broad-except
+        _set_state(task_id, "error", error=str(e))
+
+
+def task_status(task_id):
+    "Poller payload for one task; unknown ids report state=unknown."
+    with _TASKS_LOCK:
+        task = _TASKS.get(task_id)
+        if task is None:
+            return {"state": "unknown"}
+        return {
+            "state": task.get("state"),
+            "percent": task.get("percent", 0),
+            "error": task.get("error"),
+            "book_id": task.get("book_id"),
+            "message": task.get("message"),
+        }
+
+
+def has_running_task():
+    "True while any transcription is queued/loading/transcribing."
+    with _TASKS_LOCK:
+        return any(
+            t.get("state") in ("queued", "loading_model", "transcribing")
+            for t in _TASKS.values()
+        )
+
+
+def purge_finished_tasks():
+    "Drop terminal-state tasks; called before starting a new one."
+    with _TASKS_LOCK:
+        for task_id in [
+            tid
+            for tid, t in _TASKS.items()
+            if t.get("state") in ("finished", "error")
+        ]:
+            del _TASKS[task_id]
