@@ -504,14 +504,29 @@ function shadowingRenderPanelMessage(msg, isError) {
 }
 
 function shadowingClearMarks(unit) {
-  if (!unit) return;
-  unit.spans.forEach(function (sp) {
-    sp.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
+  if (unit) {
+    unit.spans.forEach(function (sp) {
+      sp.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
+    });
+  }
+  // The display box tokens persist across re-recordings of the same
+  // sentence: scrub stale verdict classes and any "→ heard" insertions
+  // left by previous runs (added in shadowingPaintVerdicts).
+  const box = document.getElementById("shadowing-current");
+  if (!box) return;
+  box.querySelectorAll(".shadow-tok").forEach(function (tok) {
+    tok.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
+    tok.querySelectorAll(".shadow-tok__heard").forEach(function (h) {
+      h.remove();
+    });
   });
 }
 
 function shadowingPaintVerdicts(unit, data) {
   if (!unit || !unit.el.isConnected) return;
+  // Paint on a clean canvas: drop verdicts from previous recordings first,
+  // otherwise fuzzy "→ heard" spans and classes pile up across runs.
+  shadowingClearMarks(unit);
   const statuses = data.statuses || [];
   const fuzzySpoken = data.spoken_for_fuzzy || {};
   // 0 miss / 1 fuzzy / 2 match / 3 skip (punctuation -- unmarked).
