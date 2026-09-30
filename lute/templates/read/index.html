@@ -763,8 +763,8 @@
       window.luteInjectSentenceButtons();
     }
 
-    // Same for the shadowing mic buttons, plus stale-mark/panel
-    // cleanup when the swapped-out sentence was being scored.
+    // Shadowing practice: if the mode is active, re-resolve the current
+    // sentence on the swapped-in text (see lute-shadowing.js).
     if (typeof window.luteShadowingAfterSwap === "function") {
       window.luteShadowingAfterSwap();
     }
