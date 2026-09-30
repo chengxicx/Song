@@ -351,6 +351,30 @@
       </td>
     </tr>
 
+    <tr>
+      <td>
+        <h2>Whisper (auto-subtitles)</h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Local speech-to-text for the <a href="/book/import_webpage">mp3 import</a>:
+        transcribes audio into subtitle cues on this server (no cloud, no
+        subtitle file needed).  Install the package once, then pre-download
+        the model size you plan to use &mdash; transcription reuses it.
+      </td>
+      <td>
+        <div id="whisper_settings_status">Checking&hellip;</div>
+        <div id="whisper_settings_install_wrap" style="display: none; margin-top: 8px;">
+          <button id="whisper_settings_install" class="btn btn-secondary" onclick="whisperInstall(); return false;">
+            Install faster-whisper
+          </button>
+        </div>
+        <div id="whisper_models_box" style="display: none; margin-top: 8px;"></div>
+        <div id="whisper_settings_msg" style="margin-top: 6px;"></div>
+      </td>
+    </tr>
+
   </table>
 
   <div class="form-action-row">
@@ -651,6 +675,125 @@
   }
 
   document.addEventListener('DOMContentLoaded', netease_refresh_status);
+
+  // --- Whisper (auto-subtitles) management. ---
+  function whisperMsg(text, ok) {
+    const el = document.getElementById('whisper_settings_msg');
+    el.textContent = text;
+    el.style.color = ok ? 'green' : 'red';
+  }
+
+  function whisperRefresh() {
+    fetch('/book/whisper/models')
+      .then(r => r.json())
+      .then(d => {
+        const statusEl = document.getElementById('whisper_settings_status');
+        const installWrap = document.getElementById('whisper_settings_install_wrap');
+        const modelsBox = document.getElementById('whisper_models_box');
+        if (!d.installed) {
+          statusEl.textContent = 'faster-whisper is not installed.';
+          installWrap.style.display = '';
+          modelsBox.style.display = 'none';
+          return;
+        }
+        statusEl.textContent = 'faster-whisper is installed.';
+        installWrap.style.display = 'none';
+        modelsBox.style.display = '';
+        modelsBox.innerHTML = '';
+        d.models.forEach(m => {
+          const row = document.createElement('div');
+          row.style.marginTop = '4px';
+          const state = document.createElement('span');
+          state.textContent = m.size + ' — ' + (m.cached ? 'cached, ' + m.size_mb + ' MB' : 'not downloaded');
+          row.appendChild(state);
+
+          const dl = document.createElement('button');
+          dl.className = 'btn btn-secondary';
+          dl.style.marginLeft = '8px';
+          dl.textContent = m.cached ? 'Re-download' : 'Download';
+          dl.onclick = () => whisperDownload(m.size);
+
+          const del = document.createElement('button');
+          del.className = 'btn btn-danger';
+          del.style.marginLeft = '6px';
+          del.textContent = 'Delete';
+          del.disabled = !m.cached;
+          del.title = 'Remove the model from disk to free space.';
+          del.onclick = () => whisperDelete(m.size);
+
+          row.appendChild(dl);
+          row.appendChild(del);
+          modelsBox.appendChild(row);
+        });
+      })
+      .catch(() => {
+        document.getElementById('whisper_settings_status').textContent = 'Could not load Whisper status.';
+      });
+  }
+
+  function whisperInstall() {
+    whisperMsg('Installing faster-whisper (this can take a minute)…', true);
+    fetch('/book/whisper/install', { method: 'POST' })
+      .then(r => r.json())
+      .then(d => {
+        whisperMsg(d.message || (d.ok ? 'Installed.' : 'Install failed.'), d.ok);
+        whisperRefresh();
+      })
+      .catch(() => whisperMsg('Install failed -- see the server log.', false));
+  }
+
+  function whisperDownload(size) {
+    whisperMsg("Downloading model '" + size + "' (this can take a few minutes)…", true);
+    fetch('/book/whisper/download_model', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'whisper_model=' + encodeURIComponent(size),
+    })
+      .then(r => r.json().then(data => ({ ok: r.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok || !data.task_id) {
+          whisperMsg(data.error || 'Could not start the download.', false);
+          return;
+        }
+        const timer = setInterval(() => {
+          fetch('/book/whisper/status/' + data.task_id)
+            .then(r => r.json())
+            .then(d => {
+              if (d.state === 'finished') {
+                clearInterval(timer);
+                whisperMsg("Model '" + size + "' is ready.", true);
+                whisperRefresh();
+                return;
+              }
+              if (d.state === 'error') {
+                clearInterval(timer);
+                whisperMsg('Model download failed: ' + (d.error || 'unknown error'), false);
+                return;
+              }
+              whisperMsg(d.message || 'Downloading…', true);
+            })
+            .catch(() => {});
+        }, 2000);
+      })
+      .catch(() => whisperMsg('Could not start the download.', false));
+  }
+
+  function whisperDelete(size) {
+    whisperMsg("Deleting model '" + size + "'…", true);
+    fetch('/book/whisper/delete_model', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'whisper_model=' + encodeURIComponent(size),
+    })
+      .then(r => r.json())
+      .then(d => {
+        whisperMsg(d.message || (d.ok ? 'Deleted.' : 'Delete failed.'), d.ok);
+        whisperRefresh();
+      })
+      .catch(() => whisperMsg('Delete failed.', false));
+  }
+
+  document.addEventListener('DOMContentLoaded', whisperRefresh);
 
 </script>
 
