@@ -1870,9 +1870,36 @@ def _load_all():
     return rules
 
 
-_DATA_RULES = _load_all()
+# The data rules are built on first use, not at import.  _load_all()
+# tokenizes every data row's examples, which builds the Sudachi dictionary
+# (~33MB of private memory plus a 217MB mmap of system.dic).  This module is
+# imported at app start-up (lute/read/routes.py), so building it here made
+# every process pay that cost even with no Japanese books at all.
+_rules_lock = threading.RLock()
+_data_rules_cache = None
+_all_rules_cache = None
 
-_ALL_RULES = _N5_RULES + _CONSTRUCTION_RULES + _DATA_RULES
+
+def _get_data_rules():
+    """
+    The data-driven rules, built on first use and memoised for the
+    process lifetime.  _load_all() needs the Sudachi dictionary, so this
+    is deliberately not computed at import.
+    """
+    global _data_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _data_rules_cache is None:
+            _data_rules_cache = _load_all()
+        return _data_rules_cache
+
+
+def _get_all_rules():
+    "Hand-written plus data-driven rules, built and memoised on first use."
+    global _all_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _all_rules_cache is None:
+            _all_rules_cache = _N5_RULES + _CONSTRUCTION_RULES + _get_data_rules()
+        return _all_rules_cache
 
 
 # Korean descriptions for the hand-written rules (data rules get theirs
@@ -2068,7 +2095,7 @@ def _aggregate_symbols(buckets):
     particles next to the real ones.  A trailing … marks a truncated list.
     """
     symbols = []
-    for rule in _ALL_RULES:
+    for rule in _get_all_rules():
         if rule["key"] not in buckets:
             continue
         symbol = _PARTICLE_SYMBOLS.get(rule["key"]) or rule["pattern"].lstrip("〜")
@@ -2250,7 +2277,7 @@ def analyze_japanese(page_text, display_lang="en"):
         if not sentence:
             continue
         tokens = _tokens_for(sentence)
-        for rule in _ALL_RULES:
+        for rule in _get_all_rules():
             spans = _match_spans(rule, tokens, sentence)
             if not spans:
                 continue

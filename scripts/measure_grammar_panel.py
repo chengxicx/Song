@@ -141,7 +141,7 @@ def report(state, top, keys):
         % (state["duplicate_name_pages_pct"], state["entries"])
     )
 
-    index = {r["key"]: r for r in G._ALL_RULES}
+    index = {r["key"]: r for r in G._get_all_rules()}
     share = state["page_share"]
 
     if keys:
