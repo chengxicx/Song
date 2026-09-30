@@ -238,8 +238,10 @@ def _rule(
         "kind": kind,
         # Optional panel blocks -- 接续 (formation), the folded 参考例句
         # (reference) and 注意点 (formation_notes).  Empty for the
-        # hand-written and vendored kimchi rows, which carry none; the panel
-        # omits a block whose fields are all empty.
+        # hand-written rules, and for 接续/注意点 also for the vendored
+        # kimchi rows (only the merged material rows state them); the
+        # vendored rows do carry a reference since their example_en was
+        # backfilled.  The panel omits a block whose fields are all empty.
         "formation": formation,
         "formation_zh": formation_zh,
         "formation_notes": formation_notes,
@@ -267,7 +269,12 @@ _KO_RULES = [
         "ko_su_issda",
         "-(으)ㄹ 수 있다/없다",
         "can / cannot do; be possible / impossible",
-        [{"type": "tokens", "conds": [_POS("ETM"), _SURF("수"), _LEMMA("있다", "없다")]}],
+        [
+            {
+                "type": "tokens",
+                "conds": [_POS("ETM"), _SURF("수"), _LEMMA("있다", "없다")],
+            }
+        ],
         zh="能够/不能做……；有可能",
         ko="능력이나 가능성을 나타내는 표현.",
     ),
@@ -477,16 +484,39 @@ def _curated_reference(examples, translations, specs, tokenised):
     return chosen
 
 
+def _translations(item):
+    """
+    The row's example translations as index-aligned (zh, en) pairs.
+
+    The merged material rows carry both halves; the vendored kimchi rows
+    carry only the English one (kimchi ships a translation for every
+    example -- the generator used to drop it).  Strict zip would lose the
+    English half wherever the Chinese half is absent, so the sides are
+    filled in by index and either may be "".
+    """
+    zh_list = item.get("example_zh") or []
+    en_list = item.get("example_en") or []
+    return [
+        (
+            (zh_list[i] if i < len(zh_list) else "") or "",
+            (en_list[i] if i < len(en_list) else "") or "",
+        )
+        for i in range(max(len(zh_list), len(en_list)))
+    ]
+
+
 def _panel_fields(key, item, specs, examples, tokenised):
     """
     The optional panel blocks for one merged row, ready to splat into _rule.
 
-    Only the rows merged from the study materials carry them: the books state
-    a 接续 line, a 注意点 and translated examples, while the vendored kimchi
-    rows carry none of the three.
+    Only the rows merged from the study materials carry a 接续 line and a
+    注意点: the books state them, the vendored kimchi rows do not.  The
+    参考例句 block is not merged-row-only any more -- the vendored rows'
+    kimchi translations are backfilled into ``example_en``, so their rules
+    carry a reference too (see _load_data_rules).
     """
     enrichment = _KO_ENRICH.get(key) or {}
-    translations = list(zip(item.get("example_zh") or [], item.get("example_en") or []))
+    translations = _translations(item)
     return {
         "formation": (item.get("formation") or "").strip(),
         "formation_zh": (enrichment.get("formation") or "").strip(),
@@ -518,16 +548,25 @@ def _load_data_rules():
         if not foci:
             continue
         alternation = re.compile("|".join(foci))
+        specs = [{"type": "regex", "re": alternation}]
+        # kimchi ships a translation for every example; backfilled into
+        # example_en, it gives the vendored rows a curated 参考例句 too.
+        # The regex spec is passed so the chosen example is one this rule
+        # actually highlights, not merely the first in document order.
+        reference = _curated_reference(
+            item.get("examples"), _translations(item), specs, []
+        )
         rules.append(
             _rule(
                 item.get("key") or name,
                 name,
                 (item.get("meaning") or "").strip() or name,
-                [{"type": "regex", "re": alternation}],
+                specs,
                 level=item.get("level")
                 or _LEVEL_BY_TYPE.get(item.get("type", ""), "TOPIK 3-4"),
                 zh=item.get("zh") or "",
                 ko=item.get("ko") or "",
+                reference=reference,
             )
         )
     return rules
@@ -624,7 +663,10 @@ _ENDING_CONDS = {
 # Chunks whose surface the pattern spells out but Kiwi reports as two
 # morphemes with a contracted stem (해서 = 하 + 어서, 했 = 하 + 았).
 _CHUNK_ALIAS = {
-    "해서": [{"lemma": {"하", "하다"}}, {"pos": "EC", "surface": ("어서", "아서", "여서")}],
+    "해서": [
+        {"lemma": {"하", "하다"}},
+        {"pos": "EC", "surface": ("어서", "아서", "여서")},
+    ],
     "해": [{"lemma": {"하", "하다"}}],
     "했": [{"lemma": {"하", "하다"}}, {"pos": "EP", "surface": ("았", "었")}],
     "돼": [{"lemma": {"되", "되다"}}],
@@ -638,7 +680,10 @@ _CHUNK_ALIAS = {
     "라고": [{"surface": ("라고", "이라고")}],
     "하": [{"lemma": {"하", "하다"}}],
     "그래": [{"lemma": {"그렇", "그렇다"}}],
-    "그래요": [{"lemma": {"그렇", "그렇다"}}, {"pos": "EF", "surface": ("어요", "아요", "여요")}],
+    "그래요": [
+        {"lemma": {"그렇", "그렇다"}},
+        {"pos": "EF", "surface": ("어요", "아요", "여요")},
+    ],
     "그랬": [{"lemma": {"그렇", "그렇다"}}, {"pos": "EP", "surface": ("았", "었")}],
     "못해": [{"lemma": {"못하", "못하다"}}],
     "셈치": [{"lemma": {"셈", "셈이다"}}, {"lemma": {"치", "치다"}}],
