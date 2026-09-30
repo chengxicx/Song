@@ -155,14 +155,13 @@ These three books are **scanned, copyrighted print works**.  What is stored here
 is a small set of grammar-point names plus short example sentences transcribed
 by OCR, used to close gaps in the CC BY 4.0 snapshot above; the `source` field on
 each row records which book it came from.  The structured intermediate materials
-(`scripts/grammar_materials_ko/*.json`) carry the same provenance, and
-`scripts/grammar_materials_ko/HANDOFF.md` documents the extraction pipeline.
+(`scripts/grammar_materials_ko/*.json`) carry the same provenance.
 No book text beyond short illustrative examples is reproduced, and the merged
 rows are matched by specs **derived from the pattern text and validated against
 each row's own examples** — see `_load_pattern_rules()` in
 `lute/read/render/grammar_analysis_ko.py`.
 
-The count grew in three steps, all recorded in the handoff: a first pass merged
+The count grew in three steps: a first pass merged
 40 rows, of which 3 were removed because the points they name are already in the
 kimchi snapshot above under a different name (`A/V-거니와`, `V-지 그래요?`,
 `V-되` — the materials files still list them, since they are genuine book pages);
