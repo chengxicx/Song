@@ -5,6 +5,7 @@
 import json
 import os
 import urllib.parse
+import uuid
 from flask import (
     Blueprint,
     request,
@@ -57,6 +58,7 @@ from lute.book.forms import (
 from lute.book.types import import_type_choices
 from lute.book.stats import Service as StatsService
 from lute.book.stats import get_difficulty_label
+from lute.book import whisper_transcribe
 import lute.utils.formutils
 from lute.utils.formutils import book_tag_choices
 from lute.db import db
@@ -617,6 +619,130 @@ def _import_mp3_audio():
         flash(e.message, "notice")
         return redirect("/book/import_webpage", 302)
     return redirect(f"/read/{book.id}/page/1", 302)
+
+
+@bp.route("/whisper/available", methods=["GET"])
+def whisper_available():
+    "Whether the optional faster-whisper dependency is installed."
+    return jsonify(whisper_transcribe.whisper_status())
+
+
+@bp.route("/whisper/install", methods=["POST"])
+def whisper_install():
+    """
+    pip-install faster-whisper on demand.
+
+    Answers JSON (not flash+redirect) so the import page keeps the
+    files the user has already chosen.
+    """
+    ok, message = whisper_transcribe.install_whisper()
+    return jsonify({"ok": ok, "message": message})
+
+
+@bp.route("/whisper/prepare", methods=["POST"])
+def whisper_prepare():
+    """
+    Start a background whisper transcription that creates an mp3 book.
+
+    Takes the mp3 form's fields (language_id, audio file or URL, title,
+    tags) plus whisper_model.  The audio is saved to a temp file within
+    this request (the upload stream cannot outlive it), and a daemon
+    thread transcribes it and imports the book; the page polls
+    /whisper/status/<task_id> until the book id comes back.
+    """
+    if not whisper_transcribe.whisper_status()["installed"]:
+        return jsonify({"error": "faster-whisper is not installed yet."}), 400
+    if whisper_transcribe.has_running_task():
+        return (
+            jsonify(
+                {
+                    "error": "A transcription is already running "
+                    "-- please wait for it to finish."
+                }
+            ),
+            409,
+        )
+    whisper_transcribe.purge_finished_tasks()
+
+    language_id = request.form.get("language_id")
+    if not language_id:
+        return jsonify({"error": "Please choose a language."}), 400
+    language = db.session.get(Language, int(language_id))
+    if language is None:
+        return jsonify({"error": "Please choose a valid language."}), 400
+
+    mp3_file = request.files.get("mp3_file")
+    mp3_url = (request.form.get("mp3_url") or "").strip()
+    model_size = (request.form.get("whisper_model") or "").strip()
+    if model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES:
+        model_size = whisper_transcribe.DEFAULT_MODEL_SIZE
+
+    temppath = current_app.env_config.temppath
+    os.makedirs(temppath, exist_ok=True)
+
+    audio_temp_path = None
+    media_url = None
+    source_uri = None
+    title = (request.form.get("mp3_title") or "").strip()
+
+    if mp3_file and mp3_file.filename:
+        fname = (mp3_file.filename or "").lower()
+        ext = os.path.splitext(fname)[1].lstrip(".")
+        if ext not in ALLOWED_AUDIO_EXTENSIONS:
+            return jsonify({"error": AUDIO_VALIDATION_MSG}), 400
+        task_ref = uuid.uuid4().hex
+        audio_temp_path = os.path.join(temppath, f"whisper_{task_ref}.{ext}")
+        mp3_file.save(audio_temp_path)
+        source_uri = mp3_file.filename
+        if not title:
+            base = mp3_file.filename or "MP3 audio"
+            title = ".".join(base.split(".")[:-1]) or base
+    elif mp3_url:
+        # Transcription needs a local file, so the audio is downloaded
+        # regardless of size (capped); files beyond the local-storage
+        # cutoff stream from the URL once the book exists.
+        try:
+            size = _url_content_length(mp3_url)
+            fname = download_url_to_file(
+                mp3_url,
+                temppath,
+                max_bytes=whisper_transcribe.WHISPER_MAX_DOWNLOAD_BYTES,
+            )
+        except BookImportException as e:
+            return jsonify({"error": e.message}), 400
+        audio_temp_path = os.path.join(temppath, fname)
+        if size is not None and size > MEDIA_LOCAL_MAX_BYTES:
+            media_url = mp3_url
+        source_uri = mp3_url
+        if not title:
+            base = os.path.basename(urllib.parse.urlparse(mp3_url).path)
+            title = base or "MP3 audio"
+    else:
+        return (
+            jsonify({"error": "Please provide an audio file (upload or an online URL)."}),
+            400,
+        )
+
+    task_id = whisper_transcribe.start_task(
+        current_app._get_current_object(),  # pylint: disable=protected-access
+        audio_temp_path,
+        whisper_transcribe.whisper_lang_code(language),
+        model_size,
+        {
+            "language_id": int(language_id),
+            "title": title[:200],
+            "tags": _parse_tagify_tags(request.form.get("mp3_tag", "")),
+            "source_uri": source_uri,
+        },
+        media_url=media_url,
+    )
+    return jsonify({"task_id": task_id})
+
+
+@bp.route("/whisper/status/<task_id>", methods=["GET"])
+def whisper_task_status(task_id):
+    "Poller payload for a transcription task."
+    return jsonify(whisper_transcribe.task_status(task_id))
 
 
 def _import_netease_music():
