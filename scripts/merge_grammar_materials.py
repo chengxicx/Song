@@ -219,7 +219,7 @@ def build_rows(missing):
             "related": [],
             "examples": [
                 {"japanese": ex["japanese"], "english": "",
-                 "chinese": ex["chinese"], "source": meta.get("source", "")}
+                 "chinese": ex["chinese"]}
                 for ex in meta.get("examples", [])
             ],
         })
