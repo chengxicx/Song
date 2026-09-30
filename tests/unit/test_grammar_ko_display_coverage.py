@@ -6,7 +6,12 @@ import os
 import pytest
 
 from lute.read.render import grammar_analysis_matcher as matcher
-from lute.read.render.grammar_analysis_ja import _ALL_RULES, _DATA_RULES
+from lute.read.render import grammar_analysis_ja as grammar_ja
+
+# Built on first use by the engine (see its _get_data_rules), so pull them
+# out once here rather than at every use site.
+_DATA_RULES = grammar_ja._get_data_rules()
+_ALL_RULES = grammar_ja._get_all_rules()
 
 # Every engine that renders through the shared matcher's _desc (the
 # Japanese engine has its own driver and is covered separately below).

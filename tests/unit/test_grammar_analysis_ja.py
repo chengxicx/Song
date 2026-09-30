@@ -11,10 +11,8 @@ pytest.importorskip("sudachidict_core")
 from lute.read.render import grammar_analysis_ja as grammar_ja
 from lute.read.render.grammar_analysis_ja import (
     _ALL_LEVELS,
-    _ALL_RULES,
     _CONCEPT_IDS,
     _CONSTRUCTION_RULES,
-    _DATA_RULES,
     _DUPLICATE_IDS,
     _FUNCTION_WORD_IDS,
     _N5_RULES,
@@ -26,6 +24,12 @@ from lute.read.render.grammar_analysis_ja import (
     analyze_japanese,
 )
 from lute.read.render.grammar_analysis import is_japanese_language
+
+# The engine builds its rules on first use (see _get_data_rules) rather than
+# at import, so that an app start-up with no Japanese books doesn't pay for
+# the Sudachi dictionary.  Build them once here for the whole test session.
+_DATA_RULES = grammar_ja._get_data_rules()
+_ALL_RULES = grammar_ja._get_all_rules()
 
 
 @pytest.fixture(name="rules")
