@@ -656,8 +656,8 @@ def whisper_prepare():
         return (
             jsonify(
                 {
-                    "error": "A transcription is already running "
-                    "-- please wait for it to finish."
+                    "error": "A transcription or model download is already "
+                    "running -- please wait for it to finish."
                 }
             ),
             409,
@@ -743,6 +743,46 @@ def whisper_prepare():
 def whisper_task_status(task_id):
     "Poller payload for a transcription task."
     return jsonify(whisper_transcribe.task_status(task_id))
+
+
+@bp.route("/whisper/download_model", methods=["POST"])
+def whisper_download_model():
+    """
+    Pre-download the selected model so the first transcription starts
+    fast.  Runs on the same background machinery and mutex as
+    transcriptions; poll /whisper/status/<task_id> for completion.
+    """
+    if not whisper_transcribe.whisper_status()["installed"]:
+        return jsonify({"error": "faster-whisper is not installed yet."}), 400
+    if whisper_transcribe.has_running_task():
+        return (
+            jsonify(
+                {
+                    "error": "A transcription or model download is already "
+                    "running -- please wait for it to finish."
+                }
+            ),
+            409,
+        )
+    whisper_transcribe.purge_finished_tasks()
+
+    model_size = (request.form.get("whisper_model") or "").strip()
+    if model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES:
+        return (
+            jsonify(
+                {
+                    "error": "Unknown model size.  Pick one of: "
+                    + ", ".join(whisper_transcribe.ALLOWED_MODEL_SIZES)
+                }
+            ),
+            400,
+        )
+
+    task_id = whisper_transcribe.start_model_download(
+        current_app._get_current_object(),  # pylint: disable=protected-access
+        model_size,
+    )
+    return jsonify({"task_id": task_id})
 
 
 def _import_netease_music():
