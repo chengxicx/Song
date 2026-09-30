@@ -34,6 +34,7 @@ Only text (meaning / examples) is consumed; the audio fields are ignored
 import json
 import os
 import re
+import threading
 import unicodedata
 
 # ---- tokenizer -------------------------------------------------------
@@ -577,8 +578,6 @@ def _load_data_rules():
     return rules
 
 
-_DATA_RULES = _load_data_rules()
-
 # ---- pattern-derived rules ------------------------------------------
 #
 # Rows merged from the "private-book" materials (scripts/
@@ -956,7 +955,32 @@ def _get_pattern_rules():
     return _pattern_rules_cache
 
 
-_ALL_RULES = _KO_RULES + _DATA_RULES
+# The data rules are built on first use, not at import: _load_data_rules()
+# tokenizes the rows' examples, which builds the Kiwi instance (~270MB
+# resident).  This module is imported at app start-up (lute/read/routes.py),
+# so building it here made every process pay that cost even with no Korean
+# books at all.  Same reasoning as _get_pattern_rules above.
+_rules_lock = threading.RLock()
+_data_rules_cache = None
+_all_rules_cache = None
+
+
+def _get_data_rules():
+    "The data-driven rules, built on first use and memoised."
+    global _data_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _data_rules_cache is None:
+            _data_rules_cache = _load_data_rules()
+        return _data_rules_cache
+
+
+def _get_all_rules():
+    "Hand-written plus data-driven rules, built and memoised on first use."
+    global _all_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _all_rules_cache is None:
+            _all_rules_cache = _KO_RULES + _get_data_rules()
+        return _all_rules_cache
 
 
 # ---- display ---------------------------------------------------------
@@ -1103,7 +1127,7 @@ def _reference_text(reference, display_lang):
 
 def _count_loaded_rules():
     "Total rules (hand-written + data-driven + pattern-derived)."
-    return len(_ALL_RULES) + len(_get_pattern_rules())
+    return len(_get_all_rules()) + len(_get_pattern_rules())
 
 
 # ---------------------------------------------------------------------
@@ -1144,7 +1168,7 @@ def analyze_korean(page_text, display_lang="en"):
     # place.)
     page_text = unicodedata.normalize("NFC", page_text)
     sentences = _split_sentences(page_text)
-    rules = _ALL_RULES + _get_pattern_rules()
+    rules = _get_all_rules() + _get_pattern_rules()
     by_name = {}
     order = []
     for sentence in sentences:

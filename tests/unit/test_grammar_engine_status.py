@@ -1,10 +1,38 @@
 """Tests for the grammar-engine status helpers and the install function."""
 
 import importlib.util
+import subprocess
+import sys
 
 import pytest
 
 from lute.read.render import grammar_analysis
+
+
+def test_importing_the_read_routes_does_not_build_the_grammar_tokenizers():
+    """
+    The JA/KO grammar engines derive their rules (and so build the Sudachi
+    dictionary / Kiwi) on first analysis, not at import.  lute.read.routes
+    is imported by app start-up and pulls both engine modules in, so if
+    either tokenizer were built at import time every process would pay
+    ~270MB for a feature most users never open.
+
+    Runs in a subprocess: this test process has other tests' imports in it.
+    """
+    code = (
+        "import sys\n"
+        "import lute.read.routes  # noqa: F401  (the app start-up import)\n"
+        "heavy = [m for m in ('sudachipy', 'sudachidict_core', 'kiwipiepy')\n"
+        "         if m in sys.modules]\n"
+        "print(','.join(heavy))\n"
+    )
+    proc = subprocess.run(
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert proc.stdout.strip() == "", f"built at import: {proc.stdout.strip()}"
 
 
 class StubLanguage:

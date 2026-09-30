@@ -15,6 +15,11 @@ from lute.read.render.grammar_analysis_ko import (  # noqa: E402
 )
 from lute.read.render.grammar_analysis import is_korean_language
 
+# The engine builds its data rules on first use (see _get_data_rules) so
+# that an app start-up with no Korean books doesn't build Kiwi; build them
+# once here for the whole test session.
+_DATA_RULES = grammar_ko._get_data_rules()
+
 
 def _keys(text, lang="en"):
     return {e["key"] for e in analyze_korean(text, lang)}
@@ -270,7 +275,7 @@ def test_vendored_rows_carry_a_reference():
     point is a vendored row, showed none.  With ``example_en`` backfilled
     every vendored row that has examples curates one.
     """
-    rules = [r for r in grammar_ko._DATA_RULES if r["reference"]]
+    rules = [r for r in _DATA_RULES if r["reference"]]
     assert len(rules) >= 300, f"only {len(rules)} vendored rules carry a reference"
     for rule in rules:
         ref = rule["reference"]
@@ -287,7 +292,7 @@ def test_vendored_reference_is_highlightable_where_possible():
     missing mark is cosmetic.  The guard below just pins the machinery:
     wherever the chosen example IS matchable the offsets are present.
     """
-    rules = [r for r in grammar_ko._DATA_RULES if r["reference"]]
+    rules = [r for r in _DATA_RULES if r["reference"]]
     highlightable = 0
     for rule in rules:
         korean = rule["reference"]["korean"]
@@ -306,9 +311,7 @@ def test_panel_references_are_marked_or_bare_never_half_marked():
     all and the front-end quotes it bare -- never an empty matches list.
     """
     marked = 0
-    sentences = [
-        r["reference"]["korean"] for r in grammar_ko._DATA_RULES if r["reference"]
-    ]
+    sentences = [r["reference"]["korean"] for r in _DATA_RULES if r["reference"]]
     for sentence in sentences:
         for e in analyze_korean(sentence, "en"):
             ref = e.get("reference")
@@ -331,7 +334,7 @@ def test_vendored_reference_shows_on_both_translation_panels():
     panel -- which must never print English under a Chinese heading --
     quotes the Chinese half in proper Hanzi.
     """
-    rules = [r for r in grammar_ko._DATA_RULES if r["reference"]]
+    rules = [r for r in _DATA_RULES if r["reference"]]
     with_zh = [r for r in rules if r["reference"].get("chinese")]
     assert len(with_zh) >= 340, f"only {len(with_zh)} references carry a zh half"
     # Sibling senses merge into one panel entry (랑/이랑 = "and" / "together
