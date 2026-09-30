@@ -280,11 +280,12 @@ def test_vendored_rows_carry_a_reference():
 
 def test_vendored_reference_is_highlightable_where_possible():
     """
-    The regex spec is passed to the choice, so whenever ANY of the row's
-    examples can be marked the curated one is -- document order cannot win.
-    Some rows' focus only ever occurs mid-word in their own examples (the
-    word-end regex misses it), and those quote their example bare: the
-    panel still shows sentence + translation, just without the mark.
+    The curated choice prefers the zh-carrying example (each vendored row
+    translates only its first one), so a row whose first example is not
+    spec-matchable quotes it bare rather than switching to a later,
+    matchable example -- the Chinese panel reads the translation, the
+    missing mark is cosmetic.  The guard below just pins the machinery:
+    wherever the chosen example IS matchable the offsets are present.
     """
     rules = [r for r in grammar_ko._DATA_RULES if r["reference"]]
     highlightable = 0
@@ -293,7 +294,7 @@ def test_vendored_reference_is_highlightable_where_possible():
         spans = grammar_ko._match_spans(rule, grammar_ko._tokens_for(korean), korean)
         if spans:
             highlightable += 1
-    assert highlightable >= 200, f"only {highlightable} references highlightable"
+    assert highlightable >= 170, f"only {highlightable} references highlightable"
 
 
 def test_panel_references_are_marked_or_bare_never_half_marked():
@@ -318,21 +319,53 @@ def test_panel_references_are_marked_or_bare_never_half_marked():
                 continue
             assert matches, f"{e['key']}: empty matches on {sentence}"
             marked += 1
-    assert marked >= 200, f"only {marked} references carry offsets"
+    assert marked >= 170, f"only {marked} references carry offsets"
 
 
-def test_vendored_reference_shows_on_the_english_panel_only():
+def test_vendored_reference_shows_on_both_translation_panels():
     """
-    The backfilled translation is English: the English panel quotes it, the
-    Chinese panel -- which would print English under a Chinese heading --
-    hides the block, the same rule that hides the merged rows' English
-    notes on a Chinese panel.
+    The backfilled translations are English for every example and Chinese
+    for each row's first one, and the curated choice prefers a zh-carrying
+    example (the en half exists for every index, so the English panel loses
+    nothing).  So the English panel quotes the English half, and the Chinese
+    panel -- which must never print English under a Chinese heading --
+    quotes the Chinese half in proper Hanzi.
     """
-    rule = next(r for r in grammar_ko._DATA_RULES if r["reference"])
-    sentence = rule["reference"]["korean"]
-    en = next(e for e in analyze_korean(sentence, "en") if e["name"] == rule["pattern"])
-    assert en["reference"]["sentence"] == sentence
-    assert en["reference"]["text"] == rule["reference"]["english"]
-    assert en["reference"]["matches"]
-    zh = next(e for e in analyze_korean(sentence, "zh") if e["name"] == rule["pattern"])
-    assert "reference" not in zh
+    rules = [r for r in grammar_ko._DATA_RULES if r["reference"]]
+    with_zh = [r for r in rules if r["reference"].get("chinese")]
+    assert len(with_zh) >= 340, f"only {len(with_zh)} references carry a zh half"
+    # Sibling senses merge into one panel entry (랑/이랑 = "and" / "together
+    # with"), so the quoted example may come from whichever sibling fired
+    # first -- what must hold is that every quoted sentence is paired with
+    # its OWN translation.
+    en_by_sentence = {
+        r["reference"]["korean"]: r["reference"]["english"] for r in rules
+    }
+    zh_by_sentence = {
+        r["reference"]["korean"]: r["reference"]["chinese"] for r in with_zh
+    }
+    verified = 0
+    for rule in with_zh:
+        sentence = rule["reference"]["korean"]
+        en_hits = [
+            e for e in analyze_korean(sentence, "en") if e["name"] == rule["pattern"]
+        ]
+        if not en_hits:
+            # The rule cannot fire on its own first example; the block still
+            # shows on a page that matches elsewhere, but there is nothing
+            # to assert through the panel path here.
+            continue
+        en = en_hits[0]
+        assert (
+            en_by_sentence.get(en["reference"]["sentence"]) == en["reference"]["text"]
+        )
+        zh = next(
+            e for e in analyze_korean(sentence, "zh") if e["name"] == rule["pattern"]
+        )
+        assert (
+            zh_by_sentence.get(zh["reference"]["sentence"]) == zh["reference"]["text"]
+        )
+        assert re.search(r"[\u4e00-\u9fff]", zh["reference"]["text"]), rule["key"]
+        assert not re.search(r"[A-Za-z]{3,}", zh["reference"]["text"]), rule["key"]
+        verified += 1
+    assert verified >= 100, f"only {verified} zh references verified end to end"
