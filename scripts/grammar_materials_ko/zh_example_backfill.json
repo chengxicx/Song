@@ -1,0 +1,2420 @@
+[
+ {
+  "key": "noun_간__duration",
+  "ko": "묻지마 방화가 일어나는 바람에 지하철 운행이 30분간 중단되었다.",
+  "en": "Due to an unprovoked arson, the subway did not run for 30 minutes.",
+  "zh": "因无端纵火，地铁停运了30分钟。"
+ },
+ {
+  "key": "noun_같이__similarity",
+  "ko": "그녀는 너같이 예쁜다.",
+  "en": "She is as pretty as you.",
+  "zh": "她像你一样漂亮。"
+ },
+ {
+  "key": "noun_경__around-time",
+  "ko": "아마 작년 4월경이었을 거예요.",
+  "en": "It would have been around April last year.",
+  "zh": "大概是去年4月左右吧。"
+ },
+ {
+  "key": "noun_까지__range",
+  "ko": "오늘은 6시까지 일할 거에요.",
+  "en": "I will work until 6 o'clock today.",
+  "zh": "今天我要工作到6点。"
+ },
+ {
+  "key": "noun_껏__to-the-fullest",
+  "ko": "주말에는 마음껏 쉬고 싶어요.",
+  "en": "I want to rest to my heart's content on the weekend.",
+  "zh": "周末我想尽情地休息。"
+ },
+ {
+  "key": "noun_께__target",
+  "ko": "선생님께 인사를 드렸습니다.",
+  "en": "I greeted the teacher.",
+  "zh": "我向老师问了好。"
+ },
+ {
+  "key": "noun_께서__subject",
+  "ko": "아버지께서 뭘 읽고 계세요?",
+  "en": "What is my father reading?",
+  "zh": "父亲在看什么呢？"
+ },
+ {
+  "key": "noun_끼리__group-together",
+  "ko": "친구들끼리 영화를 봤어요.",
+  "en": "The friends watched a movie together.",
+  "zh": "朋友们一起看了电影。"
+ },
+ {
+  "key": "noun_네__collective",
+  "ko": "민수네 가게는 항상 손님이 많아요.",
+  "en": "Minsu's store always has many customers.",
+  "zh": "民洙的店总是客人很多。"
+ },
+ {
+  "key": "noun_님__honorific",
+  "ko": "옆집에 사는 아저씨가 선생님이래요.",
+  "en": "I heard that the man who lives next door is a teacher.",
+  "zh": "听说住在隔壁的大叔是老师。"
+ },
+ {
+  "key": "noun_답다__has-quality-of",
+  "ko": "정말 신사답게 행동하네요.",
+  "en": "They acts like a gentleman.",
+  "zh": "他的行为真有绅士风度。"
+ },
+ {
+  "key": "noun_당__for-each",
+  "ko": "핫도그 하나당 5천원이래.",
+  "en": "The hot dogs are 5,000won each.",
+  "zh": "热狗一个5千韩元。"
+ },
+ {
+  "key": "noun_당하다__experience-consequence",
+  "ko": "좋아하는 여자한테 고백했다가 거절당했다.",
+  "en": "I asked out the girl I liked and got rejected.",
+  "zh": "向喜欢的女生告白后被拒绝了。"
+ },
+ {
+  "key": "noun_대로__according-to",
+  "ko": "모든 것이 예정대로 진행되고 있습니다.",
+  "en": "Everything is proceeding as planned.",
+  "zh": "一切都按计划进行着。"
+ },
+ {
+  "key": "noun_더러__target-person",
+  "ko": "그것은 형더러 물어봐.",
+  "en": "Ask my brother about that.",
+  "zh": "那个事你去问哥哥。"
+ },
+ {
+  "key": "noun_도__addition",
+  "ko": "저도 아직 확신이 사실은 없어요.",
+  "en": "I actually don't have confidence yet either.",
+  "zh": "其实我也还没有把握。"
+ },
+ {
+  "key": "noun_되다__to-become",
+  "ko": "제가 야구 팀에 선택됐어요!",
+  "en": "I was selected for the baseball team!",
+  "zh": "我入选棒球队了！"
+ },
+ {
+  "key": "noun_드리다__do-respectfully",
+  "ko": "일단 부모님께 문안드려야 합니다.",
+  "en": "You must first greet your parents.",
+  "zh": "首先要向父母请安。"
+ },
+ {
+  "key": "noun_들__plural",
+  "ko": "옆방 애들이랑 싸웠어?",
+  "en": "Did you fight with the kids next door?",
+  "zh": "和隔壁的孩子们打架了吗？"
+ },
+ {
+  "key": "noun_따라__unusually",
+  "ko": "오늘따라 날씨가 왜 이래?",
+  "en": "Why's the weather like this today?",
+  "zh": "今天天气怎么这样？"
+ },
+ {
+  "key": "noun_랑_이랑__enumeration",
+  "ko": "아저씨, 식빵이랑 꽈배기 주세요.",
+  "en": "Sir, please give me a bread and twisted doughnuts.",
+  "zh": "老板，请给我面包和麻花。"
+ },
+ {
+  "key": "noun_랑_이랑__companionship",
+  "ko": "옆방 애들이랑 싸웠어?",
+  "en": "Did you get into a fight with the guys in the next room?",
+  "zh": "和隔壁房间的孩子们吵架了？"
+ },
+ {
+  "key": "noun_로_으로__method",
+  "ko": "자전거로 다녀요.",
+  "en": "I go by bike.",
+  "zh": "我骑自行车出行。"
+ },
+ {
+  "key": "noun_로_으로__direction",
+  "ko": "우리 집 창밖으로 서울 타워가 보여요.",
+  "en": "You can see the Seoul Tower from the window of our house.",
+  "zh": "从我们家的窗外能看到首尔塔。"
+ },
+ {
+  "key": "noun_로써_으로써__means-or-method",
+  "ko": "고기를 식칼로써 토막을 내요.",
+  "en": "Cut the meat into pieces with a knife.",
+  "zh": "用菜刀把肉切成块。"
+ },
+ {
+  "key": "noun_마다__repetition",
+  "ko": "3시간마다 확인하십시오.",
+  "en": "Check every 3 hours.",
+  "zh": "请每3小时确认一次。"
+ },
+ {
+  "key": "noun_마다__all",
+  "ko": "나라마다 국기가 달라요.",
+  "en": "Each country has a different flag.",
+  "zh": "每个国家的国旗都不同。"
+ },
+ {
+  "key": "noun_마따나__according-to",
+  "ko": "자네 말마따나 쉬는 게 좋겠네.",
+  "en": "As you said, I think I'd better get some rest.",
+  "zh": "正如你所说，还是休息一下比较好。"
+ },
+ {
+  "key": "noun_마저__even-this-too",
+  "ko": "가족마저 나를 믿지 않았다.",
+  "en": "Even my family doesn't believe me.",
+  "zh": "连家人都不相信我。"
+ },
+ {
+  "key": "noun_만__limitation",
+  "ko": "제 남동생은 액션 영화만 보고 다른 영화는 안 봐요.",
+  "en": "My younger brother only watches action movies and doesn't watch other movies.",
+  "zh": "我弟弟只看动作片，不看其他电影。"
+ },
+ {
+  "key": "noun_만큼__as-much-as",
+  "ko": "우리 집은 공원만큼 조용해요.",
+  "en": "Our house is as quiet as a park.",
+  "zh": "我们家像公园一样安静。"
+ },
+ {
+  "key": "noun_밖에__exclusion",
+  "ko": "푸른 구슬은 세상에 하나밖에 없습니다.",
+  "en": "This is the only blue-green marble in the world.",
+  "zh": "蓝色的地球在世界上只有一个。"
+ },
+ {
+  "key": "noun_받다__receive-action",
+  "ko": "현우는 모든 사람에게 사랑받아요.",
+  "en": "Hyunwoo is loved by everyone.",
+  "zh": "贤宇深受大家的喜爱。"
+ },
+ {
+  "key": "noun_보고__target-person",
+  "ko": "회선 씨가 세훈 씨보고 보고서 쓰는 설 도와 달라고 하던데요.",
+  "en": "Heesun asked Sehun to help write the report.",
+  "zh": "熙善让世勋帮忙写报告。"
+ },
+ {
+  "key": "noun_보다__compare",
+  "ko": "택시가 버스보다 빠릅니다.",
+  "en": "Taxis are faster than buses.",
+  "zh": "出租车比公交车快。"
+ },
+ {
+  "key": "noun_부__starting-from",
+  "ko": "7월 1일부로 새로운 규정이 시행됩니다.",
+  "en": "The new regulation takes effect as of July 1.",
+  "zh": "新规定自7月1日起施行。"
+ },
+ {
+  "key": "noun_부터__starting-point",
+  "ko": "지금부터 시작합니다.",
+  "en": "I will start now.",
+  "zh": "现在开始。"
+ },
+ {
+  "key": "noun_뿐__nothing-more",
+  "ko": "하루 종일 먹은 게 김밥 한 줄뿐이라서 너무 배가 고파요.",
+  "en": "I'm so hungry because I only ate a piece of kimbap all day.",
+  "zh": "一整天只吃了一条紫菜包饭，肚子好饿。"
+ },
+ {
+  "key": "noun_스럽다__has-quality-of",
+  "ko": "강아지가 너무 사랑스럽게 웃어요.",
+  "en": "The puppy smiles in such a lovable way.",
+  "zh": "小狗笑得非常可爱。"
+ },
+ {
+  "key": "noun_시키다__order",
+  "ko": "사장님이 직원들에게 일을 시켰어요.",
+  "en": "The boss made the employees work.",
+  "zh": "老板让员工们干活。"
+ },
+ {
+  "key": "noun_씩__equally-distributed",
+  "ko": "학생들에게 책을 한 권씩 나눠주세요.",
+  "en": "Please distribute one book to each student.",
+  "zh": "请给学生们每人分一本书。"
+ },
+ {
+  "key": "noun_아_야__informal-address",
+  "ko": "야, 이 멍청아! 제대로 공부 안 해?",
+  "en": "Hey, you idiot! Won't you study properly?",
+  "zh": "喂，你这个笨蛋！不好好学习吗？"
+ },
+ {
+  "key": "noun_어치__amount-that-corresponds-to-price",
+  "ko": "그 가게에서 책 20,000원어치를 샀어요.",
+  "en": "I bought 20,000 won worth of books at that store.",
+  "zh": "我在那家店买了两万韩元的书。"
+ },
+ {
+  "key": "noun_에__time",
+  "ko": "비행기는 아홉 시에 출발합니다.",
+  "en": "The plane leaves at nine o'clock.",
+  "zh": "飞机9点出发。"
+ },
+ {
+  "key": "noun_에__location",
+  "ko": "소파 위에 고양이가 있어요.",
+  "en": "There is a cat on the sofa.",
+  "zh": "沙发上有只猫。"
+ },
+ {
+  "key": "noun_에__direction",
+  "ko": "저기 빈자리에 가서 앉고.",
+  "en": "Go sit in the empty seat over there.",
+  "zh": "去那边的空位坐吧。"
+ },
+ {
+  "key": "noun_에게__target",
+  "ko": "저는 친구에게 빌려준 책을 달라고 했어요.",
+  "en": "I asked my friend for the book I lent him.",
+  "zh": "我让朋友把借给他的书还给我。"
+ },
+ {
+  "key": "noun_에다가__onto-into",
+  "ko": "테이블에다가 노트북을 놨어요.",
+  "en": "I put the laptop on the table.",
+  "zh": "我把笔记本电脑放在桌子上了。"
+ },
+ {
+  "key": "noun_에서__action-place",
+  "ko": "서울에서 멀어요?",
+  "en": "Is it far from Seoul?",
+  "zh": "离首尔远吗？"
+ },
+ {
+  "key": "noun_와_과__enumeration",
+  "ko": "초가집에는 어머니와 어린 삼 남매가 살았다.",
+  "en": "In the straw-thatched house lived a mother and her three young siblings.",
+  "zh": "茅草屋里住着母亲和三个年幼的兄妹。"
+ },
+ {
+  "key": "noun_와_과__companionship",
+  "ko": "너와 난 평생을 함께할 친구야.",
+  "en": "You and I are friends for the rest of our lives.",
+  "zh": "你我是会相伴一生的朋友。"
+ },
+ {
+  "key": "noun_요__politeness-ending",
+  "ko": "꽃향기를 맡고 있었어요.",
+  "en": "I was smelling the scent of flowers.",
+  "zh": "我刚才在闻花香。"
+ },
+ {
+  "key": "noun_요__short-reply",
+  "ko": "어디까지 가세요? 서울역이요.",
+  "en": "Where are you going? Seoul Station.",
+  "zh": "您去哪儿？首尔站。"
+ },
+ {
+  "key": "noun_으로서__role-capacity",
+  "ko": "학생으로서 책임을 다해야 합니다.",
+  "en": "You must fulfill your responsibilities **as a student**.",
+  "zh": "作为学生要尽到自己的责任。"
+ },
+ {
+  "key": "noun_은_는__topic",
+  "ko": "저는 학생입니다.",
+  "en": "I am a student.",
+  "zh": "我是学生。"
+ },
+ {
+  "key": "noun_을_를__object",
+  "ko": "그때부터 10년을 기다렸어요.",
+  "en": "I have been waiting for 10 years since then.",
+  "zh": "从那时起等了10年。"
+ },
+ {
+  "key": "noun_의__relation",
+  "ko": "친구의 집.",
+  "en": "Friend's house.",
+  "zh": "朋友的家。"
+ },
+ {
+  "key": "noun_이_가__subject",
+  "ko": "눈이 펑펑 내려요.",
+  "en": "The snow is falling heavily.",
+  "zh": "雪下得很大。"
+ },
+ {
+  "key": "noun_이나_나__choice",
+  "ko": "한가할 때는 책이나 영화를 봅니다.",
+  "en": "When I have free time, I either read books or watch movies.",
+  "zh": "有空的时候我看看书或看看电影。"
+ },
+ {
+  "key": "noun_이나_나__no-less-than",
+  "ko": "저는 남동생 다섯 명이나 있어요.",
+  "en": "I have as many as five younger brothers.",
+  "zh": "我有五个弟弟呢。"
+ },
+ {
+  "key": "noun_이나_나__at-least",
+  "ko": "오늘 오후에 시간 있으면 카페에나 갑시다.",
+  "en": "If you have time this afternoon, let's, at least, go to a cafe.",
+  "zh": "今天下午有空的话，至少去趟咖啡店吧。"
+ },
+ {
+  "key": "noun_이다__copula",
+  "ko": "저는 학생이에요.",
+  "en": "I am a student.",
+  "zh": "我是学生。"
+ },
+ {
+  "key": "noun_이라도_라도__sufficient-choice",
+  "ko": "과자라도 먹을래요?",
+  "en": "Do you want some snack <f>at least</f>?",
+  "zh": "要不要吃点零食？"
+ },
+ {
+  "key": "noun_이랍시고__pretending-to-be",
+  "ko": "그는 의사랍시고 조언을 했지만 도움이 되지 않았다.",
+  "en": "He pretended to be a doctor and gave advice, but it wasn't helpful.",
+  "zh": "他自以为是医生似的提了建议，但没什么用。"
+ },
+ {
+  "key": "noun_이시여__polite-address",
+  "ko": "전능자시여 우리에게 자비를 베풀어 주옵소서.",
+  "en": "Almighty God, have mercy on us.",
+  "zh": "全能的主啊，请赐予我们慈悲。"
+ },
+ {
+  "key": "noun_이야__copula",
+  "ko": "지금은 쉬는 시간이야.",
+  "en": "Now is break time.",
+  "zh": "现在是休息时间。"
+ },
+ {
+  "key": "noun_이야__emphasis",
+  "ko": "커피야 늘 한 잔씩 마시고 있어.",
+  "en": "I always have a cup of coffee.",
+  "zh": "咖啡我总是每天喝一杯。"
+ },
+ {
+  "key": "noun_이야말로_야말로__prime-example",
+  "ko": "한글이야말로 세계에서 가장 우수한 문자예요.",
+  "en": "Hangul really is the best alphabet in the world.",
+  "zh": "韩文正是世界上最优秀的文字。"
+ },
+ {
+  "key": "noun_이여__polite-address",
+  "ko": "주여, 잘못을 용서하여 주소서.",
+  "en": "Lord, forgive me for my sins.",
+  "zh": "主啊，请宽恕我的罪过。"
+ },
+ {
+  "key": "noun_이자__dual-roles",
+  "ko": "그는 나의 선생님이자 친구이다.",
+  "en": "He is both my teacher and friend.",
+  "zh": "他既是我的老师，也是我的朋友。"
+ },
+ {
+  "key": "noun_이자__first-and-last",
+  "ko": "그 사람은 우리 나라의 처음이자 마지막 공주였어요.",
+  "en": "That person was our country's first and last princess.",
+  "zh": "那个人是我国第一位也是最后一位公主。"
+ },
+ {
+  "key": "noun_조차__extreme-cases",
+  "ko": "엄마조차 저를 못 믿으시는 거예요?",
+  "en": "Even my mom doesn't believe me?",
+  "zh": "连妈妈都不相信我吗？"
+ },
+ {
+  "key": "noun_짜리__such-a-number-or-amount",
+  "ko": "이 신발로 6사이즈짜리 있나요?",
+  "en": "Do you have these shoes in size 6?",
+  "zh": "这种鞋有6码的吗？"
+ },
+ {
+  "key": "noun_째__the-nth",
+  "ko": "세 번째 노크 후에 문이 열렸다.",
+  "en": "The door opened after the third knock.",
+  "zh": "敲了三次门后，门开了。"
+ },
+ {
+  "key": "noun_쯤__approximation",
+  "ko": "공항에 한 시쯤 도착했어요.",
+  "en": "I arrived at the airport around one o'clock.",
+  "zh": "我1点左右到了机场。"
+ },
+ {
+  "key": "noun_처럼__similarity",
+  "ko": "설탕은 사탕처럼 단맛이에요.",
+  "en": "Sugar tastes sweet like candy.",
+  "zh": "糖像糖果一样甜。"
+ },
+ {
+  "key": "noun_치고__exception",
+  "ko": "그는 학생치고는 김치를 정말 잘 담가요.",
+  "en": "For a student, he makes kimchi remarkably well.",
+  "zh": "作为学生来说，他腌的泡菜真的很好。"
+ },
+ {
+  "key": "noun_커녕__not-even",
+  "ko": "유경은 대학교커녕 초등학교도 다니지 못했다.",
+  "en": "Yugyeong wasn't able to attend elementary school, much less college.",
+  "zh": "有京别说上大学，连小学都没能上。"
+ },
+ {
+  "key": "noun_하고__enumeration",
+  "ko": "책하고 잡지를 샀어요.",
+  "en": "I bought books and magazines.",
+  "zh": "我买了书和杂志。"
+ },
+ {
+  "key": "noun_하고__companionship",
+  "ko": "어제 회사 동료하고 저녁을 먹었어요.",
+  "en": "I had dinner with my colleague yesterday.",
+  "zh": "昨天和公司同事吃了晚饭。"
+ },
+ {
+  "key": "noun_하다__to-do",
+  "ko": "저는 매일 아침 요가를 해요.",
+  "en": "I do yoga every morning.",
+  "zh": "我每天早上做瑜伽。"
+ },
+ {
+  "key": "noun_한테__target",
+  "ko": "친구한테 선물을 보냈어요.",
+  "en": "I sent a gift to my friend.",
+  "zh": "我给朋友寄了礼物。"
+ },
+ {
+  "key": "verb_ㄴ_은_는_ㄹ_을__noun-modifiers",
+  "ko": "호수 주변에는 예쁜 꽃밭이 있어요.",
+  "en": "There is a beautiful flower garden around the lake.",
+  "zh": "湖边有美丽的花园。"
+ },
+ {
+  "key": "verb_ㄴ데_은데_는데__background-information",
+  "ko": "신발이 조금 작은데 더 큰 사이즈 있어요?",
+  "en": "My shoes are a little small. Do you have a bigger size?",
+  "zh": "鞋子有点小，有再大一点的尺码吗？"
+ },
+ {
+  "key": "verb_ㄴ데_은데_는데__await-response",
+  "ko": "오늘은 좀 바쁜데...",
+  "en": "Today is a bit busy...",
+  "zh": "今天有点忙……"
+ },
+ {
+  "key": "verb_ㄴ지_은지_는지__vague-reasoning",
+  "ko": "시험 문제가 어려웠는지 점수가 좋은 학생이 적어요.",
+  "en": "Fewer students scored well because the test questions were difficult.",
+  "zh": "可能是因为考试题太难，得高分的学生很少。"
+ },
+ {
+  "key": "verb_거나__choice",
+  "ko": "저는 주말에 책을 읽거나 영화를 봐요.",
+  "en": "I read books or watch movies on weekends.",
+  "zh": "我周末读书或看电影。"
+ },
+ {
+  "key": "verb_거늘__reason-or-cause",
+  "ko": "그는 열심히 노력했거늘 왜 실패했을까?",
+  "en": "Considering that he worked hard, why did he fail?",
+  "zh": "他那么努力，为什么会失败呢？"
+ },
+ {
+  "key": "verb_거니__not-only-but-also",
+  "ko": "그는 친절하거니와 지혜로워요.",
+  "en": "He is not only kind but also wise.",
+  "zh": "他不仅善良，而且富有智慧。"
+ },
+ {
+  "key": "verb_거니__past-acknowledgment",
+  "ko": "내가 잘못했거니 후회가 남았어요.",
+  "en": "Yes, I was wrong, and I have regrets about it.",
+  "zh": "是啊，是我不对，我很后悔。"
+ },
+ {
+  "key": "verb_거니__repetition-alternation",
+  "ko": "사람들이 모임에 오거니 가거니 합니다.",
+  "en": "People come and go to the gathering.",
+  "zh": "人们来来去去参加聚会。"
+ },
+ {
+  "key": "verb_거든__reasoning",
+  "ko": "오늘은 공부해야 해요. 내일 중간시험을 보거든요.",
+  "en": "I have to study today. Because I have a midterm exam tomorrow.",
+  "zh": "今天得学习，因为明天有期中考试。"
+ },
+ {
+  "key": "verb_거든__conditional",
+  "ko": "바쁘거든 먼저 가십시오.",
+  "en": "If you're busy, please go first.",
+  "zh": "要是忙的话，请先走吧。"
+ },
+ {
+  "key": "verb_거들랑__informing",
+  "ko": "그 무렵 우리는 서울에서 살았거들랑.",
+  "en": "We were living in Seoul around then.",
+  "zh": "那时候我们住在首尔。"
+ },
+ {
+  "key": "verb_거들랑__conditional",
+  "ko": "철수를 만나거들랑 내 말을 전해라.",
+  "en": "If you see Chul-soo, please give him my regards.",
+  "zh": "如果见到哲洙，请转达我的问候。"
+ },
+ {
+  "key": "verb_거라__commanding-old-fashioned",
+  "ko": "빨리 먹거라.",
+  "en": "Eat quickly.",
+  "zh": "快吃吧。"
+ },
+ {
+  "key": "verb_건__casual-choice",
+  "ko": "커피 마실래? 커피건 차건 다른 음료 마시고 싶은 거 있어?",
+  "en": "Do you want a coffee? Or would you like tea or something else?",
+  "zh": "要喝咖啡吗？还是想喝点茶或别的饮料？"
+ },
+ {
+  "key": "verb_건대__heres-what-I-think",
+  "ko": "맹세코 말하건대 나는 하지 않았어.",
+  "en": "I swear to you, I didn't do it.",
+  "zh": "我发誓，那不是我干的。"
+ },
+ {
+  "key": "verb_게__making-adverb",
+  "ko": "오늘 학교 늦게 갔어요.",
+  "en": "I went to school late today.",
+  "zh": "今天上学去晚了。"
+ },
+ {
+  "key": "verb_게__expectation",
+  "ko": "저녁 같이 먹게 빨리 오세요.",
+  "en": "Come quickly so that we can eat dinner together.",
+  "zh": "为了一起吃晚饭，请快点来。"
+ },
+ {
+  "key": "verb_게__하게체-command",
+  "ko": "자네 이것 좀 보게.",
+  "en": "Take a look at this.",
+  "zh": "你看看这个。"
+ },
+ {
+  "key": "verb_게끔__expectation-emphasized",
+  "ko": "아무도 눈치를 채지 못하게끔 조심스럽게 과자를 훔쳐먹었다.",
+  "en": "I ate the snacks stealthily such that no one would notice.",
+  "zh": "为了不让任何人察觉，我小心翼翼地偷吃了零食。"
+ },
+ {
+  "key": "verb_게나__하게체-command",
+  "ko": "어서 오게나.",
+  "en": "Come on in.",
+  "zh": "快进来吧。"
+ },
+ {
+  "key": "verb_겠__intention",
+  "ko": "시술 시작하겠습니다.",
+  "en": "I will start the treatment.",
+  "zh": "我这就开始操作。"
+ },
+ {
+  "key": "verb_겠__supposition",
+  "ko": "이 음식 정말 맛있겠다!",
+  "en": "This food looks really delicious!",
+  "zh": "这食物一定很好吃！"
+ },
+ {
+  "key": "verb_겠거니__i-figured",
+  "ko": "다른 조원들이 지정된 일을 하겠거니 하고 컴퓨터 껐는데 다음 날에 등교했더니 아무것도 안 했더라고요.",
+  "en": "I figured my other project members would do their assigned work and turned my computer off, but when I came to school the next day I found they hadn't done anything.",
+  "zh": "我以为其他组员会做分配好的工作就把电脑关了，结果第二天到学校发现他们什么都没做。"
+ },
+ {
+  "key": "verb_고__listing",
+  "ko": "그 모임은 아주 즐겁고 좋았어요.",
+  "en": "The meeting was very pleasant and nice.",
+  "zh": "那次聚会非常愉快、美好。"
+ },
+ {
+  "key": "verb_고__sequential",
+  "ko": "친구를 만나고 영화를 봤어요.",
+  "en": "I met my friend and watched a movie.",
+  "zh": "我见了朋友，然后看了电影。"
+ },
+ {
+  "key": "verb_고말고__positive-response",
+  "ko": "기쁜 일이고말고.",
+  "en": "That’s certainly good news.",
+  "zh": "当然是件高兴的事。"
+ },
+ {
+  "key": "verb_고서__sequence",
+  "ko": "저 문을 뚫고서 궁전으로 돌진합시다!",
+  "en": "Let's break through that door and rush into the palace!",
+  "zh": "让我们冲破那扇门，冲进宫殿吧！"
+ },
+ {
+  "key": "verb_고자__purpose",
+  "ko": "저는 오늘 시민 여러분들의 의견을 듣고자 이 자리에 섰습니다.",
+  "en": "I am here to listen to the opinions of the citizens today.",
+  "zh": "我今天站在这里，是想聆听市民们的意见。"
+ },
+ {
+  "key": "verb_고프다__desire",
+  "ko": "나도 춤추고파!",
+  "en": "I want to dance too!",
+  "zh": "我也想跳舞！"
+ },
+ {
+  "key": "verb_군_구나__new-information",
+  "ko": "한 달 배운 것치고는 운전을 꽤 잘하는구나.",
+  "en": "You're quite good at driving for only having learned for a month.",
+  "zh": "才学了一个月，车开得挺好的嘛。"
+ },
+ {
+  "key": "verb_그려__emphasis",
+  "ko": "앞으로는 자주 만납시다그려.",
+  "en": "Let's meet up more often from now on.",
+  "zh": "以后我们常常见面吧。"
+ },
+ {
+  "key": "verb_기__verb-to-noun",
+  "ko": "그 약은 작아서 먹기가 편해요.",
+  "en": "The pill is small, so it's easy to take.",
+  "zh": "那个药很小，容易服用。"
+ },
+ {
+  "key": "verb_기는_긴__gentle-refutation",
+  "ko": "잘하기는요. 저보다 잘하는 사람이 많아요.",
+  "en": "I'm not that good. There are many people who are better than me.",
+  "zh": "哪里做得好呀，比我做得好的人多着呢。"
+ },
+ {
+  "key": "verb_기는_긴__partial-acknowledgment",
+  "ko": "니 말대로 이 라면이 맛이 좀 없긴 하네.",
+  "en": "Like you said, this ramen really is kind of bad.",
+  "zh": "如你所说，这泡面确实不太好吃。"
+ },
+ {
+  "key": "verb_기에__reason-or-cause-written",
+  "ko": "날씨가 따뜻하기에 산책을 했다.",
+  "en": "Since the weather was warm, I went for a walk.",
+  "zh": "因为天气暖和，就去散步了。"
+ },
+ {
+  "key": "verb_기에__conditions-for",
+  "ko": "바다 가기에는 날씨가 딱 좋아요.",
+  "en": "The weather is just right for going to the beach.",
+  "zh": "这天气正适合去海边。"
+ },
+ {
+  "key": "verb_기에__point-of-view",
+  "ko": "너가 보기엔 어때?",
+  "en": "What do you think about it?",
+  "zh": "在你看来怎么样？"
+ },
+ {
+  "key": "verb_길래__reason-or-cause",
+  "ko": "날씨가 따뜻하길래 산책을 했어요.",
+  "en": "Since the weather was warm, I went for a walk.",
+  "zh": "天气暖和，所以就出去散步了。"
+ },
+ {
+  "key": "verb_나니__background-information",
+  "ko": "자네를 믿나니 나를 실망시키지 말게.",
+  "en": "I trust you, so don’t let me down.",
+  "zh": "我相信你，别让我失望。"
+ },
+ {
+  "key": "verb_나니__reason",
+  "ko": "네가 진심으로 사과하나니 내가 용서하겠다.",
+  "en": "Since you're sincerely apologizing, I will forgive you.",
+  "zh": "既然你真心道歉，我就原谅你。"
+ },
+ {
+  "key": "verb_나이까__question",
+  "ko": "어찌 감히 어명을 거역하겠나이까?",
+  "en": "How could I possibly dare to disobey the royal command?",
+  "zh": "我怎敢违抗王命呢？"
+ },
+ {
+  "key": "verb_나이다__simple-statement",
+  "ko": "나라를 위하여 죽는 것이 제 영광이옵나이다.",
+  "en": "It is my honor to die for my country.",
+  "zh": "为国捐躯是我的荣光。"
+ },
+ {
+  "key": "verb_냐__informal-question",
+  "ko": "상담 한 번 받아보면 어떻겠냐?",
+  "en": "How about trying a consultation once?",
+  "zh": "去咨询一次怎么样？"
+ },
+ {
+  "key": "verb_냐고__quoting-questions",
+  "ko": "저한테 어디 가냐고 물었어요.",
+  "en": "They asked me where I was going.",
+  "zh": "他问我要去哪儿。"
+ },
+ {
+  "key": "verb_네__discovery",
+  "ko": "꼭 드라마 한 장면 같네요.",
+  "en": "It's just like a scene from a drama.",
+  "zh": "简直像电视剧里的一幕啊。"
+ },
+ {
+  "key": "verb_노라__informal statement",
+  "ko": "이기고 돌아왔노라.",
+  "en": "I have returned victorious.",
+  "zh": "（我）凯旋归来。"
+ },
+ {
+  "key": "verb_노라면_느라면__result-of-consistency",
+  "ko": "열심히 사노라면 좋은 날도 있겠지.",
+  "en": "If you work hard, good days will come.",
+  "zh": "努力生活的话，总会有好日子的。"
+ },
+ {
+  "key": "verb_느니__better-choice",
+  "ko": "비가 오는 날에 걷느니 차라리 집에 있을래요.",
+  "en": "Rather than walking on a rainy day, I'd rather stay at home.",
+  "zh": "下雨天与其走路，我宁愿待在家里。"
+ },
+ {
+  "key": "verb_느니__listing",
+  "ko": "그 두 사람 정말 결혼 할 수 있을까요? 결혼을 하느니 마느니 정말 말이 많던데요?",
+  "en": "Can those two really get married? There's been so much talk about whether they should or shouldn't get married.",
+  "zh": "那两个人真的能结婚吗？说要结也罢、不结也罢，大家议论得很多呢。"
+ },
+ {
+  "key": "verb_느라고_느라__indicating-the-cause",
+  "ko": "샤워를 하느라고 전화를 못 받았어요.",
+  "en": "I couldn't answer the phone because I was taking a shower.",
+  "zh": "因为洗澡，没能接电话。"
+ },
+ {
+  "key": "verb_는고__soft-question",
+  "ko": "선물로 무엇이 좋은고?",
+  "en": "What would be a good gift?",
+  "zh": "什么礼物好呢？"
+ },
+ {
+  "key": "verb_는고__pondering",
+  "ko": "얼마나 훌륭한 일인고!",
+  "en": "What a wonderful thing!",
+  "zh": "这是多么了不起的事啊！"
+ },
+ {
+  "key": "verb_는구려__하오체-new-information",
+  "ko": "정말 깨끗한 동네이구려.",
+  "en": "Wow, this is a really clean neighborhood.",
+  "zh": "这街区真干净啊。"
+ },
+ {
+  "key": "verb_는구려__하오체-polite-command",
+  "ko": "더 늦으면 어두워질 테니 어서 가구려.",
+  "en": "It'll get dark soon so let's get going.",
+  "zh": "再晚天就要黑了，快走吧。"
+ },
+ {
+  "key": "verb_는다기보다는__more-appropriate-description",
+  "ko": "이 장소가 시끄럽다기보다는 사람들이 많이 모여서 복잡해요.",
+  "en": "Rather than saying this place is noisy, it's more accurate to say it is crowded because many people gather here.",
+  "zh": "与其说这地方吵，不如说人聚得多、很拥挤。"
+ },
+ {
+  "key": "verb_는다는_ㄴ다는_다는_라는__quote",
+  "ko": "이 분수에 동전을 던지면 행복해진다는 이야기가 있어요.",
+  "en": "There is a story that you will be happy if you throw a coin into this fountain.",
+  "zh": "有个传说，往这个喷泉里扔硬币就会变得幸福。"
+ },
+ {
+  "key": "verb_는다면_ㄴ다면_다면__hypothetical-situation",
+  "ko": "10년 전 돌아간다면 더 열심히 공부하고 싶어.",
+  "en": "If I could go back 10 years, I would want to study harder.",
+  "zh": "如果能回到10年前，我想更努力学习。"
+ },
+ {
+  "key": "verb_는답시고__attempting-but-failing",
+  "ko": "동생이 휴대폰을 고친답시고 만지다가 망가뜨렸어.",
+  "en": "My brother tried to fix the phone but ended up breaking it.",
+  "zh": "弟弟说要修手机，结果摆弄一通反而把它弄坏了。"
+ },
+ {
+  "key": "verb_는지라__reason-or-cause",
+  "ko": "선생님께서 고집을 굽히지 않으시는지라 우리도 어쩔 수 없었다.",
+  "en": "Since the teacher won't budge, there was nothing we could do.",
+  "zh": "老师不肯让步，我们也没有办法。"
+ },
+ {
+  "key": "verb_다_ㄴ다_는다__plain-form",
+  "ko": "바람이 시원하다.",
+  "en": "The wind is cool.",
+  "zh": "风很凉快。"
+ },
+ {
+  "key": "verb_다가__change-of-action",
+  "ko": "밥을 먹다가 전화를 받았습니다.",
+  "en": "I was eating when I received a phone call.",
+  "zh": "我正吃着饭接了个电话。"
+ },
+ {
+  "key": "verb_다가__transition-of-action",
+  "ko": "잠을 자다가 무서운 꿈을 꿨어요.",
+  "en": "I was sleeping and had a scary dream.",
+  "zh": "睡觉时做了个噩梦。"
+ },
+ {
+  "key": "verb_다가는__precaution",
+  "ko": "실수했다가는 큰일난다.",
+  "en": "You'll be in big trouble if you make a mistake.",
+  "zh": "一旦失手就会出大事。"
+ },
+ {
+  "key": "verb_다거나__or-something",
+  "ko": "다솜은 친구랑 통화한다거나 좋아하는 웹툰을 정주행한다거나 하는 것으로 스트레스를 푼다.",
+  "en": "Dasom relieves stress by doing things like calling a friend or binging a favorite webtoon.",
+  "zh": "多松靠和朋友通电话，或者追喜欢的网漫之类的来解压。"
+ },
+ {
+  "key": "verb_다고__quote-declarative-sentence",
+  "ko": "내일 한국에 간다고 들었는데요.",
+  "en": "I heard that you're going to Korea tomorrow.",
+  "zh": "我听说你明天要去韩国。"
+ },
+ {
+  "key": "verb_다니_라니_냐니_자니__reaction",
+  "ko": "두 달 동안 살을 10kg이나 빼다니 정말이에요?",
+  "en": "You lost 10kg in two months, really?",
+  "zh": "两个月瘦了10公斤，真的吗？"
+ },
+ {
+  "key": "verb_다니까__confirming-prior-information",
+  "ko": "약속 취소했다고 말했다니까, 왜 기다렸어?",
+  "en": "I told you I canceled the appointment, why did you wait?",
+  "zh": "我都说了预约取消了，你还等什么？"
+ },
+ {
+  "key": "verb_다든가__or-theoretical",
+  "ko": "집에 누군가 찾아오지는 않았습니까? 아니면 전화가 걸려왔다든가...",
+  "en": "Did no one come by the house? Or make a call or something...",
+  "zh": "没有人来过家里吗？还是说打来过电话什么的……"
+ },
+ {
+  "key": "verb_다든지__whether-theoretical",
+  "ko": "유학 생활이 힘들다든지 한국어 공부가 어렵다든지 하며 불평만 하지 마세요.",
+  "en": "Don't just complain about studying abroad being tough or Korean learning being difficult.",
+  "zh": "别光抱怨留学生活辛苦、韩语学习难什么的。"
+ },
+ {
+  "key": "verb_다마다__positive-response",
+  "ko": "암, 네 말이 맞다마다.",
+  "en": "Yeah, you’re right.",
+  "zh": "嗯，你说得对。"
+ },
+ {
+  "key": "verb_다면서_라면서_다며__fact-checking",
+  "ko": "한국 사람들이 거의 날마다 김치를 먹는다면서요?",
+  "en": "I heard that Korean people eat kimchi almost every day, is it true?",
+  "zh": "听说韩国人几乎天天吃泡菜，是真的吗？"
+ },
+ {
+  "key": "verb_다시피__confirmation",
+  "ko": "보다시피 날씨가 좋아요.",
+  "en": "As you can see, the weather is nice.",
+  "zh": "如你所见，天气很好。"
+ },
+ {
+  "key": "verb_더__recalling-experience",
+  "ko": "그날은 다들 신이 나더라.",
+  "en": "As I remember, everyone was excited that day.",
+  "zh": "记得那天大家都兴奋得很。"
+ },
+ {
+  "key": "verb_더냐__asking-about-a-personal-experience",
+  "ko": "일본에 도착하니까 눈이 오더냐?",
+  "en": "Was it snowing when you arrived in Japan?",
+  "zh": "你到日本的时候下雪了吗？"
+ },
+ {
+  "key": "verb_더니__change-compared-to-the-past",
+  "ko": "아침에는 하늘에 구름 한 점 없는 게 하루 종일 맑을 것 같더니, 금방 비가 쏟아지네.",
+  "en": "In the morning, there wasn't a single cloud in the sky, so it looked like it would be clear all day, but not long after it started to pour.",
+  "zh": "早上天上一点云都没有，看样子一整天都会晴，可很快就下起了大雨。"
+ },
+ {
+  "key": "verb_더니__and-then",
+  "ko": "미나는 부엌에 가더니 5분 만에 라면을 만들어 냈다.",
+  "en": "Mina went to the kitchen and made ramen in just 5 minutes.",
+  "zh": "美娜进了厨房，5分钟就做出了拉面。"
+ },
+ {
+  "key": "verb_더니__related-to-past-event",
+  "ko": "요즘 부동산에 집 보러 다니더니 좋은 집을 찾았어요?",
+  "en": "You've been looking at houses lately. Did you find a good one?",
+  "zh": "你最近在看房子，找到好的了吗？"
+ },
+ {
+  "key": "verb_더라고__recollecting-a-personal-experience",
+  "ko": "일본에 도착하니까 눈이 왔더라고요.",
+  "en": "When I arrived in Japan, it was snowing.",
+  "zh": "我到日本的时候，正下着雪呢。"
+ },
+ {
+  "key": "verb_더라고__confirming-a-forgotten-experience",
+  "ko": "우리가 처음으로 언제 만났더라?",
+  "en": "When did we first meet again?",
+  "zh": "我们第一次见面是在什么时候来着？"
+ },
+ {
+  "key": "verb_더라도__strong-inevitable-outcome",
+  "ko": "식당에 일찍 가서 줄 서 있더라도 웨이팅이 오래 걸릴 수도 있어요.",
+  "en": "Even if we go to the restaurant early and stand in line, it might take a while to get in.",
+  "zh": "就算早早去餐厅排队，也可能要等很久。"
+ },
+ {
+  "key": "verb_더라면__hypothetical-past-situation",
+  "ko": "제가 키가 컸더라면 모델이 되었을 거예요.",
+  "en": "If I had been taller, I would have become a model.",
+  "zh": "我要是个子高一点，就当上模特了。"
+ },
+ {
+  "key": "verb_던__past-habitual-experience",
+  "ko": "어릴 때 엄마가 해주시던 밥이 정말 맛있었어.",
+  "en": "The food my mom would make for me when I was little was really delicious.",
+  "zh": "小时候妈妈常做给我的饭真的很好吃。"
+ },
+ {
+  "key": "verb_던__past-interrupted-action",
+  "ko": "내가 먹던 라면을 동생이 훔쳐먹었다.",
+  "en": "My little brother stole and ate the ramen I had been eating.",
+  "zh": "我吃到一半的拉面被弟弟偷吃了。"
+ },
+ {
+  "key": "verb_던__past-action",
+  "ko": "'김'이라는 성은 신라에 살고 있던 귀족들의 성씨였어요.",
+  "en": "The surname '김' was the surname of the nobles who lived in Silla.",
+  "zh": "「金」这个姓是新罗时期贵族的姓氏。"
+ },
+ {
+  "key": "verb_던가__asking-about-the-past",
+  "ko": "그 식당이 맛있던가?",
+  "en": "Was that restaurant good?",
+  "zh": "那家餐厅好吃吗？"
+ },
+ {
+  "key": "verb_던가__asking-oneself-about-the-past",
+  "ko": "내가 그랬던가?",
+  "en": "Did I say that?",
+  "zh": "我那么说过吗？"
+ },
+ {
+  "key": "verb_던데__surprise",
+  "ko": "그 사람은 축구도 제법 잘하던데요.",
+  "en": "(I saw that) That person was quite good at soccer.",
+  "zh": "那人足球踢得还挺不错的呢。"
+ },
+ {
+  "key": "verb_던데__relating-experience",
+  "ko": "너 요즘 이상한 사람들이랑 어울리던데 괜찮아?",
+  "en": "I've noticed you've been hanging out with some strange people recently. Are you okay?",
+  "zh": "你最近总和一些奇怪的人混在一起，没事吧？"
+ },
+ {
+  "key": "verb_데__recollecting-a-personal-experience",
+  "ko": "일본 사람들은 타코야끼를 자주 먹데.",
+  "en": "Japanese people frequently eat takoyaki.",
+  "zh": "（听说）日本人经常吃章鱼烧。"
+ },
+ {
+  "key": "verb_도다__admiration",
+  "ko": "평생을 조국을 위해 헌신하였으니 참으로 애국자도다.",
+  "en": "Having devoted his entire life to his country, he is truly a patriot.",
+  "zh": "他一生为祖国奉献，真乃爱国志士啊。"
+ },
+ {
+  "key": "verb_도록__objective",
+  "ko": "아침에 일찍 일어나도록 어젯밤에 일찍 잤어요.",
+  "en": "I went to bed early last night so that I could wake up early in the morning.",
+  "zh": "为了早上能早起，昨晚睡得很早。"
+ },
+ {
+  "key": "verb_든가__or-suggestion",
+  "ko": "아, 들으라고 한 소리는 아니구나? 그럼 말소리를 좀 작게 소곤대면서 하든가. 아니면 어디 구석에 찌그러져서 지껄이든가.",
+  "en": "Oh, [what you just said] wasn't meant to be heard? Then maybe you should whisper it. Or squish yourselves into a corner before prattling on.",
+  "zh": "哦，刚才那话不是要说给人听的？那你就小声嘀咕着说，要么就缩到哪个角落里去念叨。"
+ },
+ {
+  "key": "verb_든지__regardless",
+  "ko": "누구든지 언제든지 참여하실 수 있는 챌린지니까.",
+  "en": "Anyone can participate whenever.",
+  "zh": "任何人任何时候都可以参加这个挑战。"
+ },
+ {
+  "key": "verb_듯이__similarity",
+  "ko": "왜 이렇게 싸우듯이 마시나요?",
+  "en": "Why are you drinking like you're fighting?",
+  "zh": "你怎么喝得像打架一样？"
+ },
+ {
+  "key": "verb_라고__quote-declarative-sentence",
+  "ko": "가족이 모두 4명이라고 하요.",
+  "en": "They said their family has four members.",
+  "zh": "他们说家里一共有4口人。"
+ },
+ {
+  "key": "verb_라고__quote-imperative-sentence",
+  "ko": "일곱 시까지 돌아오라고 일렀거늘 왜 늦었느냐?",
+  "en": "I told you to come back by seven, why are you late?",
+  "zh": "叫你7点前回来，怎么迟到了？"
+ },
+ {
+  "key": "verb_려거든__conditional-intention",
+  "ko": "건강한 치아를 유지하려거든 하루에 두번 이 닦아야 해요.",
+  "en": "If you want to maintain your dental health, you have to brush your teeth twice a day.",
+  "zh": "要想保持牙齿健康，每天得刷两次牙。"
+ },
+ {
+  "key": "verb_로구나__new-information-strong-reaction",
+  "ko": "그 남자 말이로군요.",
+  "en": "Ah, you're talking about that man. (That's who you're talking about)",
+  "zh": "啊，你说的是那个男人啊。"
+ },
+ {
+  "key": "verb_마는__contrasting",
+  "ko": "얼마 되겠느냐마는 보태어 쓰도록 해라.",
+  "en": "It probably isn't much, but please use it to supplement your needs.",
+  "zh": "虽然没多少，但拿去贴补着用吧。"
+ },
+ {
+  "key": "verb_며_으며__occurring-simultaneously",
+  "ko": "노래를 하며 공부를 한다.",
+  "en": "I study while singing.",
+  "zh": "我一边唱歌一边学习。"
+ },
+ {
+  "key": "verb_며_으며__listing-actions-states-or-facts",
+  "ko": "그곳은 마치 고향처럼 아늑하고 포근하며 정겨운 느낌을 주는 곳이다.",
+  "en": "That place is cozy, warm, and give a feeling like home.",
+  "zh": "那个地方像故乡一样安逸温馨，充满人情味。"
+ },
+ {
+  "key": "verb_며_으며__listing-things",
+  "ko": "돈이며 명예며 관심없다.",
+  "en": "I don't care about money or fame.",
+  "zh": "无论是钱还是名誉，我都不关心。"
+ },
+ {
+  "key": "verb_면_으면__condition",
+  "ko": "공부를 열심히 하면 좋은 성적이 좋아집니다.",
+  "en": "If you study hard, your grades will improve.",
+  "zh": "努力学习的话，成绩就会变好。"
+ },
+ {
+  "key": "verb_면_으면__supposition",
+  "ko": "내가 죽으면 우리 아이들은 누가 돌보니?",
+  "en": "When I die, who will take care of our children?",
+  "zh": "我死后，谁来照顾我们的孩子？"
+ },
+ {
+  "key": "verb_면_으면__repetitive",
+  "ko": "남편은 내가 잠들어 있으면 깨우지 않으려고 살금살금 걸어 다닌다.",
+  "en": "My husband walks around quietly so as not to wake me up when I'm asleep.",
+  "zh": "我睡着的时候，丈夫为了不吵醒我会蹑手蹑脚地走动。"
+ },
+ {
+  "key": "verb_면서_으면서__simultaneous",
+  "ko": "밥을 먹으면서 이야기를 했어요.",
+  "en": "We talked while eating.",
+  "zh": "我们边吃饭边聊天。"
+ },
+ {
+  "key": "verb_세요_으세요__polite-command",
+  "ko": "여기 앉으세요.",
+  "en": "Please sit here.",
+  "zh": "请坐这里。"
+ },
+ {
+  "key": "verb_세요_으세요__polite-question",
+  "ko": "지금 어디에 계세요?",
+  "en": "Where are you now?",
+  "zh": "您现在在哪儿？"
+ },
+ {
+  "key": "verb_세요_으세요__polite-statement",
+  "ko": "선생님은 한국어를 가르치세요.",
+  "en": "The teacher teaches Korean.",
+  "zh": "老师教韩语。"
+ },
+ {
+  "key": "verb_소서__solemn-request",
+  "ko": "신이시여, 우리를 버리지 마소서!",
+  "en": "O Lord, do not forsake us!",
+  "zh": "神啊，请不要抛弃我们！"
+ },
+ {
+  "key": "verb_습니까_ㅂ니까__polite-question",
+  "ko": "보통 몇 시에 잡니까?",
+  "en": "What time do you usually go to bed?",
+  "zh": "您通常几点睡？"
+ },
+ {
+  "key": "verb_습니다_ㅂ니다__present-tense",
+  "ko": "할아버지가 칭찬하셨습니다.",
+  "en": "Grandfather praised me.",
+  "zh": "爷爷表扬了我。"
+ },
+ {
+  "key": "verb_습니다만__polite-contrast",
+  "ko": "이 연구는 중요한 의미가 있습니다만 아직 한계점이 많이 존재합니다.",
+  "en": "This research has significant meaning, but there are still many limitations.",
+  "zh": "这项研究意义重大，但目前还存在很多局限。"
+ },
+ {
+  "key": "verb_시_으시__honorific",
+  "ko": "국에 소금을 더 넣으시겠어요?",
+  "en": "Would you like to add more salt to the soup?",
+  "zh": "汤里要再加点盐吗？"
+ },
+ {
+  "key": "verb_아_어_여__present-tense",
+  "ko": "학교에 가요.",
+  "en": "I go to school.",
+  "zh": "我去上学。"
+ },
+ {
+  "key": "verb_아다가_어다가_해다가__sequential-actions",
+  "ko": "케이크를 만들어다가 친구에게 줬어요.",
+  "en": "I made a cake and gave it to my friend.",
+  "zh": "我做了个蛋糕，送给了朋友。"
+ },
+ {
+  "key": "verb_아도_어도_여도__inevitable-outcome",
+  "ko": "책을 사도 공부는 안해요.",
+  "en": "I don't study <f>even if</f> I buy books.",
+  "zh": "就算买了书我也不学习。"
+ },
+ {
+  "key": "verb_아라_어라_해라__commanding",
+  "ko": "밥을 먹어라.",
+  "en": "Eat your rice.",
+  "zh": "吃饭吧。"
+ },
+ {
+  "key": "verb_아서_어서_해서__reason-or-cause",
+  "ko": "그 옷은 작아서 못 입어요.",
+  "en": "I can't wear these clothes because they're too small.",
+  "zh": "那件衣服太小，穿不了。"
+ },
+ {
+  "key": "verb_아서_어서_해서__sequence-of-events",
+  "ko": "내일 친구를 만나서 영화를 볼 거예요.",
+  "en": "I'm going to meet my friend tomorrow in order to watch a movie.",
+  "zh": "我明天打算见朋友，然后一起看电影。"
+ },
+ {
+  "key": "verb_았_었_했__past-tense",
+  "ko": "어제 배가 아팠어요. 그래서 잠을 못 잤어요.",
+  "en": "My stomach hurt yesterday. So I couldn't sleep.",
+  "zh": "昨天肚子疼，所以没睡好。"
+ },
+ {
+  "key": "verb_았던_었던_했던__past-completed",
+  "ko": "시끄러웠던 교실이 요즘에 아주 조용해요.",
+  "en": "The classroom that used to be noisy is very quiet these days.",
+  "zh": "曾经吵闹的教室如今非常安静。"
+ },
+ {
+  "key": "verb_았었_었었_했었__past-tense",
+  "ko": "10년 전까지는 외국에 살았었어요.",
+  "en": "I lived abroad until 10 years ago.",
+  "zh": "直到10年前我一直住在国外。"
+ },
+ {
+  "key": "verb_어서인지__perhaps-because",
+  "ko": "열심히 공부해서인지 학교에서 좋은 성적을 받고 있어요.",
+  "en": "Perhaps because I'm studying hard, I'm getting good grades at school.",
+  "zh": "也许是因为学习努力，我在学校成绩很好。"
+ },
+ {
+  "key": "verb_어야_아야__condition",
+  "ko": "날씨가 추워졌으니까 옷을 따뜻하게 입어야겠어요.",
+  "en": "Since the weather has gotten cold, I should wear warm clothes.",
+  "zh": "天气变冷了，得穿暖和点。"
+ },
+ {
+  "key": "verb_어야지__strong-intention",
+  "ko": "영화가 너무 재미있다고 했어. 나도 봐야지.",
+  "en": "I heard the movie is very interesting. I must go see it.",
+  "zh": "听说那部电影特别好看，我也得去看看。"
+ },
+ {
+  "key": "verb_었더니__and-then",
+  "ko": "어제 오랜만에 하체를 했더니 다리가 너무 아파.",
+  "en": "Yesterday I did leg day for the first time in a while, so now my legs really hurt.",
+  "zh": "昨天久违地练了腿，腿疼得不行。"
+ },
+ {
+  "key": "verb_으나__although-but",
+  "ko": "이 음식은 건강에 좋으나 맛이 조금 밍밍해요.",
+  "en": "This food is healthy, but it's a bit bland.",
+  "zh": "这个食物有益健康，但味道有点淡。"
+ },
+ {
+  "key": "verb_으나마__reluctant-acceptance",
+  "ko": "너나마 와 주어서 다행이다.",
+  "en": "I'm glad at least you came.",
+  "zh": "好歹你来了，真是万幸。"
+ },
+ {
+  "key": "verb_으니_니__informal-question",
+  "ko": "넌 어느 게 더 비싸 보이니?",
+  "en": "Which one looks more expensive to you?",
+  "zh": "你觉得哪个看起来更贵？"
+ },
+ {
+  "key": "verb_으니_니__reason-or-cause",
+  "ko": "시간이 없으니 빨리 이동합시다.",
+  "en": "Since we don't have time, let's move quickly.",
+  "zh": "没时间了，我们快走吧。"
+ },
+ {
+  "key": "verb_으니까_니까__reason-or-cause",
+  "ko": "이번 주는 바쁘니까 다음 주에 합시다.",
+  "en": "I'm busy this week, so let's do that next week.",
+  "zh": "这周很忙，下周再做吧。"
+ },
+ {
+  "key": "verb_으니까_니까__discovery",
+  "ko": "아침에 회사에 가니까 아무도 없었어요.",
+  "en": "When I went to the office in the morning, no one was there.",
+  "zh": "早上到公司一看，一个人都没有。"
+ },
+ {
+  "key": "verb_으되__but-however",
+  "ko": "한국 드라마를 당연히 보시되 영어 자막만 쓰지 마셔요.",
+  "en": "Watch K-dramas, of course, just don't use English subtitles.",
+  "zh": "看韩剧当然可以，只是别用英文字幕。"
+ },
+ {
+  "key": "verb_으되__archaic-quoting",
+  "ko": "임금님이 말씀하시되, \"들라 하라!\"",
+  "en": "The king said, \"let him in!\"",
+  "zh": "国王说道：「让他进来！」"
+ },
+ {
+  "key": "verb_으랴__busy-with",
+  "ko": "음식 만들랴 집안 청소하랴 쉴 틈이 없다.",
+  "en": "Between preparing food and cleaning the house, I can't get a second of rest.",
+  "zh": "又要做饭又要打扫屋子，一刻不得闲。"
+ },
+ {
+  "key": "verb_으랴__rhetorical-question",
+  "ko": "웃는 낯에 침 뱉으랴.",
+  "en": "Would you spit on a smiling face? (You can't treat someone badly who treats you well)",
+  "zh": "哪能朝笑脸吐口水呢。（不能亏待对自己好的人）"
+ },
+ {
+  "key": "verb_으러_러__movement-with-intention",
+  "ko": "나 지금 도서관에 책 빌리러 가는데 같이 갈래?",
+  "en": "I'm going to the library to borrow a book, do you want to come with me?",
+  "zh": "我现在去图书馆借书，要不要一起去？"
+ },
+ {
+  "key": "verb_으려고_려고__intention",
+  "ko": "드라마를 보려고 한국어를 배우고 있어요.",
+  "en": "I'm learning Korean in order to watch dramas.",
+  "zh": "为了看韩剧，我正在学韩语。"
+ },
+ {
+  "key": "verb_으려나__wondering",
+  "ko": "비가 올려나?",
+  "en": "I wonder if it will rain.",
+  "zh": "会下雨吗？"
+ },
+ {
+  "key": "verb_으려다가__interrupted-intention",
+  "ko": "그 영화를 DVD 대여점에서 빌려 보려다가 텔레비전에서 오늘 방영한다는 것을 알고는 그만두었다.",
+  "en": "I intended to rent that movie from a DVD store, but decided not to when I learned that it will be broadcast tonight on TV.",
+  "zh": "本打算在影碟店租那部电影，后来听说今晚电视要播，就作罢了。"
+ },
+ {
+  "key": "verb_으려던_려던__interruption",
+  "ko": "라면을 끓이는군요. 저도 마침 라면을 먹으려던 참이었어요.",
+  "en": "I see you're making ramen, I was just about to eat ramen too.",
+  "zh": "你在煮拉面啊，我正好也正要吃拉面呢。"
+ },
+ {
+  "key": "verb_으려면_려면__assume-intention",
+  "ko": "덜렁대는 버릇을 고치려면 어떻게 해야 할까요?",
+  "en": "What should I do to fix my habit of being indecisive?",
+  "zh": "要改掉毛手毛脚的习惯，该怎么做呢？"
+ },
+ {
+  "key": "verb_으려무나__friendly-command",
+  "ko": "밥 먹으렴.",
+  "en": "Please eat.",
+  "zh": "快吃饭吧。"
+ },
+ {
+  "key": "verb_으렷다__educated-guess",
+  "ko": "그는 다시는 두말 못 하렷다.",
+  "en": "He won't be complaining again.",
+  "zh": "他再也不敢多嘴了。"
+ },
+ {
+  "key": "verb_으렷다__command",
+  "ko": "다시는 내 앞에 나타나지 말렷다.",
+  "en": "Don't ever show your face here again.",
+  "zh": "不准再出现在我面前。"
+ },
+ {
+  "key": "verb_으리__prediction",
+  "ko": "그는 뭐든 열심히 일하니 꼭 성공하리라.",
+  "en": "That guy works hard at everything so he’s bound to succeed.",
+  "zh": "他做什么都那么努力，一定会成功的。"
+ },
+ {
+  "key": "verb_으리__intention",
+  "ko": "잠시 기다리면 내가 곧 처리해 주리다.",
+  "en": "If you wait a moment I will take care of it right away.",
+  "zh": "你稍等，我马上处理。"
+ },
+ {
+  "key": "verb_으리__informal-logical-rebuttal",
+  "ko": "그런 사람이 무슨 애국자이리?",
+  "en": "How could someone like that be a patriot?",
+  "zh": "那种人算什么爱国者？"
+ },
+ {
+  "key": "verb_으리라__expressing-will",
+  "ko": "반드시 성공하리라.",
+  "en": "I will definitely succeed.",
+  "zh": "我必定成功。"
+ },
+ {
+  "key": "verb_으리라__strong-prediction",
+  "ko": "곧 여름이 오리라.",
+  "en": "Summer shall come soon.",
+  "zh": "夏天很快就会到来。"
+ },
+ {
+  "key": "verb_으리만치__so-much-so-that",
+  "ko": "우연치고는 너무 이상하리만치 자꾸 엮이는 것 같아요.",
+  "en": "We keep running into each other -- it's too strange to be just a coincidence.",
+  "zh": "我们总是碰面，奇怪得不像巧合。"
+ },
+ {
+  "key": "verb_으리오__expressing-impossibility",
+  "ko": "내 어찌 고향을 잊으리오.",
+  "en": "How could I forget my home?",
+  "zh": "我怎能忘记故乡。"
+ },
+ {
+  "key": "verb_으마__intention-old-fashioned",
+  "ko": "오전에 가마.",
+  "en": "I'll go in the morning.",
+  "zh": "我上午去。"
+ },
+ {
+  "key": "verb_으므로__cause-or-reason",
+  "ko": "이 프로젝트는 중요하므로 모두가 참여해야 합니다.",
+  "en": "Since this project is important, everyone must participate.",
+  "zh": "这个项目很重要，所以所有人都必须参与。"
+ },
+ {
+  "key": "verb_으세__하게체-suggestion",
+  "ko": "우리 힘껏 일해 보세.",
+  "en": "Let’s do our best.",
+  "zh": "让我们全力以赴吧。"
+ },
+ {
+  "key": "verb_으십시오_십시오__politely-asking",
+  "ko": "여기서 내리십시오.",
+  "en": "Please get off here.",
+  "zh": "请在这里下车。"
+ },
+ {
+  "key": "verb_으오_오_소__하오체-present-tense",
+  "ko": "날씨가 참 좋소.",
+  "en": "The weather is really nice.",
+  "zh": "天气真好啊。"
+ },
+ {
+  "key": "verb_으오_오_소__하오체-polite-question",
+  "ko": "어디로 가오?",
+  "en": "Where are you going?",
+  "zh": "您要去哪儿？"
+ },
+ {
+  "key": "verb_으오_오_소__하오체-command",
+  "ko": "이쪽으로 오시오.",
+  "en": "Please come this way.",
+  "zh": "请这边走。"
+ },
+ {
+  "key": "verb_으오_오_소__하오체-suggestion",
+  "ko": "함께 식사하오.",
+  "en": "Let's have a meal together.",
+  "zh": "我们一起用餐吧。"
+ },
+ {
+  "key": "verb_으오_오_소__하오체-honorific",
+  "ko": "건강하시오.",
+  "en": "Please stay healthy.",
+  "zh": "请保重身体。"
+ },
+ {
+  "key": "verb_으오_으옵_사오_사옵_자오_자옵__humility",
+  "ko": "여기 그런 게 없으와.",
+  "en": "We don't have that here.",
+  "zh": "我们这儿没有那种东西。"
+ },
+ {
+  "key": "verb_으오이까_사오이까__humble-question",
+  "ko": "이 마을에 그런 사람이 있겠사오이까?",
+  "en": "Surely there is no such person in this village?",
+  "zh": "这村里哪会有这样的人呢？"
+ },
+ {
+  "key": "verb_으오이다_사오이다__humble-statement",
+  "ko": "그만 가겠쇠다.",
+  "en": "I'm heading out.",
+  "zh": "我就先告辞了。"
+ },
+ {
+  "key": "verb_으옵시_사옵시_자옵시__humility",
+  "ko": "부모님의 은혜는 깊으옵시어 갚을 길이 없어라.",
+  "en": "My parents' favour is so deep I cannot repay it.",
+  "zh": "父母恩深似海，无以为报。"
+ },
+ {
+  "key": "verb_으이__하게체-description",
+  "ko": "그것 참 좋의.",
+  "en": "That's really great.",
+  "zh": "那真是太好了。"
+ },
+ {
+  "key": "verb_은가_ㄴ가_나__soft-question",
+  "ko": "여러분도 혹시 명상을 하시나요?",
+  "en": "Do you guys also happen to meditate?",
+  "zh": "各位也偶尔冥想吗？"
+ },
+ {
+  "key": "verb_은가_ㄴ가_나__pondering",
+  "ko": "그 아이는 자라면 언젠가 범인이 되나?",
+  "en": "When that kid grows up, I wonder if they'll become a criminal someday.",
+  "zh": "那孩子长大后会不会哪天变成罪犯呢？"
+ },
+ {
+  "key": "verb_은들__no-matter",
+  "ko": "돈을 많이 번들 저금하기만 하고 안 쓰면 아무 소용이 없지 않나요?",
+  "en": "Even if you make a lot of money, if you only save it and never use it, isn't it worthless?",
+  "zh": "就算赚了很多钱，光存着不花，不也没有用吗？"
+ },
+ {
+  "key": "verb_을걸_ㄹ걸__guessing",
+  "ko": "출퇴근 시간이니까 지하철을 타는 게 더 빠를걸요.",
+  "en": "Since it's rush hour, I think it would be faster to take the subway.",
+  "zh": "现在是上下班高峰，坐地铁应该更快。"
+ },
+ {
+  "key": "verb_을게_ㄹ게__intention",
+  "ko": "제가 전화를 받을게요.",
+  "en": "I will answer the phone.",
+  "zh": "我来接电话。"
+ },
+ {
+  "key": "verb_을까_ㄹ까__suggestion",
+  "ko": "비가 많이 와요. 택시를 탈까요?",
+  "en": "It's raining a lot. Shall we take a taxi?",
+  "zh": "雨下得很大，要不要打车？"
+ },
+ {
+  "key": "verb_을까_ㄹ까__asking-opinion",
+  "ko": "제가 몇 시에 전화할까요?",
+  "en": "What time shall I call you?",
+  "zh": "我几点给你打电话好呢？"
+ },
+ {
+  "key": "verb_을까_ㄹ까__wondering",
+  "ko": "이게 맛있을까?",
+  "en": "I wonder if this will taste good?",
+  "zh": "这个会好吃吗？"
+ },
+ {
+  "key": "verb_을꼬__asking-opinion",
+  "ko": "영희야, 너는 무슨 노래를 부를꼬?",
+  "en": "Young-hee, what song are you going to sing?",
+  "zh": "英熙，你要唱什么歌呀？"
+ },
+ {
+  "key": "verb_을꼬__wondering",
+  "ko": "이제 나는 무엇을 하여 먹고살꼬?",
+  "en": "What am I going to do to make a living now?",
+  "zh": "今后我该怎么谋生呢？"
+ },
+ {
+  "key": "verb_을라__expresses-concern",
+  "ko": "쉿! 이쭉 쳐다볼라.",
+  "en": "Shush! He might look this way.",
+  "zh": "嘘！他可能会朝这边看。"
+ },
+ {
+  "key": "verb_을라치면__whenever",
+  "ko": "무슨 BL 드라마를 볼라치면 어머니가 내 방에 들어오셔.",
+  "en": "Whenever I try to watch some BL drama, my mom comes into my room.",
+  "zh": "每次想看什么BL剧，我妈就进我房间。"
+ },
+ {
+  "key": "verb_을래_ㄹ래__intention",
+  "ko": "어른이 되면 우선 운전 면허를 딸래요.",
+  "en": "When I become an adult, I will get a driver's license first.",
+  "zh": "成年后我要先考驾照。"
+ },
+ {
+  "key": "verb_을래_ㄹ래__asking-opinion",
+  "ko": "내일 시간이 있으면 같이 영화를 볼래요?",
+  "en": "If you have time tomorrow, how about watching a movie together?",
+  "zh": "明天有时间的话，要不要一起看电影？"
+ },
+ {
+  "key": "verb_을망정_을지언정__even-though",
+  "ko": "그는 나를 돕지는 못할망정 방해는 하지 말아야지요.",
+  "en": "Even though he can't help me, he shouldn't hinder me.",
+  "zh": "他就算帮不了我，也不该妨碍我。"
+ },
+ {
+  "key": "verb_을밖에__no-choice-but-to",
+  "ko": "어른들이 다 가시니 나도 갈밖에.",
+  "en": "Since all the adults have left, I guess I have to go too.",
+  "zh": "大人们都走了，我也只能跟着去。"
+ },
+ {
+  "key": "verb_을세__하게체-simple-statement",
+  "ko": "내 가게 문 닫으면 그 자가 춤출세.",
+  "en": "If my shop closes, that guy will be dancing for joy.",
+  "zh": "我的店一关门，那家伙就该高兴得跳舞了。"
+ },
+ {
+  "key": "verb_을세__하게체-realization",
+  "ko": "어머, 그게 바로 오늘일세.",
+  "en": "Oh my, that’s today.",
+  "zh": "哎呀，那不就是今天嘛。"
+ },
+ {
+  "key": "verb_을세__하게체-intention",
+  "ko": "그럼 이따가 기별할세. 잘 가게.",
+  "en": "I'll let you know later then. Take care.",
+  "zh": "那我回头告诉你。慢走。"
+ },
+ {
+  "key": "verb_을수록__the-more",
+  "ko": "빨리 걸을수록 더 피곤해요.",
+  "en": "The faster you walk, the more tired you get.",
+  "zh": "走得越快，越累。"
+ },
+ {
+  "key": "verb_을지_ㄹ지__vague-doubt",
+  "ko": "내일 있을 중요한 시험을 잘 볼 수 있을지 걱정이 되어 잠을 설쳤다.",
+  "en": "I was worried about the important exam tomorrow and couldn't sleep.",
+  "zh": "担心明天的重要考试能不能考好，一夜没睡好。"
+ },
+ {
+  "key": "verb_음__concept-noun",
+  "ko": "죽음이 두렵다.",
+  "en": "Death is frightening.",
+  "zh": "死亡令人恐惧。"
+ },
+ {
+  "key": "verb_음__nominalization",
+  "ko": "공부함이 즐겁다.",
+  "en": "Studying is enjoyable.",
+  "zh": "学习是快乐的。"
+ },
+ {
+  "key": "verb_음__formal-ending",
+  "ko": "이상으로 보고를 마치겠음.",
+  "en": "I will conclude the report here.",
+  "zh": "报告到此结束。"
+ },
+ {
+  "key": "verb_음세__future-intention",
+  "ko": "곧 밥을 먹음세.",
+  "en": "I'll eat soon!",
+  "zh": "我马上就吃饭！"
+ },
+ {
+  "key": "verb_읍시다_ㅂ시다__suggestion",
+  "ko": "경치가 좋아요. 여기에서 사진을 찍읍시다.",
+  "en": "The view is nice. Let's take a picture here.",
+  "zh": "风景真好，我们在这里拍张照吧。"
+ },
+ {
+  "key": "verb_이라서_라서__reason-or-cause",
+  "ko": "어머니 생신이라서 고향에 가야 돼요.",
+  "en": "I have to go to my hometown because it's my mother's birthday.",
+  "zh": "因为今天是母亲的生日，我得回老家。"
+ },
+ {
+  "key": "verb_자__suggestion",
+  "ko": "오늘 저녁엔 생선구이 실컷 먹자!",
+  "en": "Let's eat grilled fish to our heart's content tonight!",
+  "zh": "今晚烤鱼管够吃！"
+ },
+ {
+  "key": "verb_자__simultaneous-action",
+  "ko": "창문을 열자 바람이 들어왔다.",
+  "en": "As I opened the window, the wind came in.",
+  "zh": "窗户一开，风就吹了进来。"
+ },
+ {
+  "key": "verb_자고__quote-suggestion",
+  "ko": "아빠가 밥을 먹자고 했어.",
+  "en": "Dad suggested we eat.",
+  "zh": "爸爸说一起吃饭吧。"
+ },
+ {
+  "key": "verb_자꾸나__suggestion",
+  "ko": "너만 먹지 말고 나도 좀 먹자꾸나.",
+  "en": "Don't just eat it all yourself, let me have some too.",
+  "zh": "别光你自己吃，也让我吃点嘛。"
+ },
+ {
+  "key": "verb_자마자__as-soon-as",
+  "ko": "비가 그치자마자 날씨가 추워졌다.",
+  "en": "The weather got cold as soon as the rain stopped.",
+  "zh": "雨一停，天就变冷了。"
+ },
+ {
+  "key": "verb_잖아__reminding",
+  "ko": "지하철을 탑시다. 출퇴근 시간에는 차가 많이 밀리잖아요.",
+  "en": "Let's take the subway. There surely are a lot of traffic during rush hours.",
+  "zh": "坐地铁吧。上下班高峰期路上肯定很堵的呀。"
+ },
+ {
+  "key": "verb_지__confirmation",
+  "ko": "설마 그 사람이랑 다시 사귀고 싶은 건 아니지?",
+  "en": "You don't want to get back together with that person, do you?",
+  "zh": "你不会还想和那个人复合吧？"
+ },
+ {
+  "key": "verb_지만__contrast",
+  "ko": "조금 비싸지만 그래도 너무 맛있어요.",
+  "en": "It's a bit expensive, but it's still very delicious.",
+  "zh": "虽然有点贵，但还是很好吃。"
+ },
+ {
+  "key": "ㄹ_것이다__future-plan",
+  "ko": "저는 내일 학교에 갈 것입니다.",
+  "en": "I will go to school tomorrow.",
+  "zh": "我明天要去学校。"
+ },
+ {
+  "key": "ㄹ_것이다__supposition",
+  "ko": "생일 선물로는 스마트폰을 좋아할 거예요.",
+  "en": "I think he will like a smartphone as a birthday present.",
+  "zh": "生日礼物的话，我觉得他会喜欢智能手机。"
+ },
+ {
+  "key": "ㄹ_바라다__hope",
+  "ko": "여러분의 성공을 기원하며 행복한 미래를 가지시길 바랍니다.",
+  "en": "I hope for your success and wish you a happy future.",
+  "zh": "祝愿各位取得成功，拥有幸福的未来。"
+ },
+ {
+  "key": "ㄹ_뻔하다__something-almost-happened",
+  "ko": "친구와 통화하다가 음식을 다 태울 뻔했어요.",
+  "en": "I was talking with my friend on the phone and almost burned all my food.",
+  "zh": "和朋友打电话，差点把菜全烧糊了。"
+ },
+ {
+  "key": "ㄹ_수_있다__ability-or-possibility",
+  "ko": "운전할 수 있어요.",
+  "en": "I can drive.",
+  "zh": "我会开车。"
+ },
+ {
+  "key": "ㄹ_수도_있다__possibility",
+  "ko": "저 내일 시간이 없을 수도 있어요.",
+  "en": "I might not have time tomorrow.",
+  "zh": "我明天可能没时间。"
+ },
+ {
+  "key": "거나_말거나__whether-or-not",
+  "ko": "그녀가 이번 연구를 끝내거나 말거나 이미 많은 여성들한테 롤 모델이 되고 있어요.",
+  "en": "Whether she finishes the research or not, she’s already a role model for many women.",
+  "zh": "不管她这次研究能不能完成，她已经是许多女性的榜样了。"
+ },
+ {
+  "key": "건_말건__whether-or-not",
+  "ko": "비가 오건 말건 산책은 할 거예요.",
+  "en": "Whether it rains or not, I’ll go out for a walk.",
+  "zh": "不管下不下雨，我都要去散步。"
+ },
+ {
+  "key": "게_되다__made-to-become-a-certain-way",
+  "ko": "요리를 잘하게 되었어요.",
+  "en": "I became good at cooking.",
+  "zh": "我做菜做得好了。"
+ },
+ {
+  "key": "게_하다__To-influence-someone",
+  "ko": "선생님은 학생들이 열심히 공부하게 했어요.",
+  "en": "The teacher made the students study hard.",
+  "zh": "老师让学生们努力学习。"
+ },
+ {
+  "key": "고_나니까__sequence-of-actions",
+  "ko": "요리를 하고 나니까 주방이 매우 더러워졌어요.",
+  "en": "After cooking, the kitchen became very dirty.",
+  "zh": "做完饭一看，厨房变得很脏。"
+ },
+ {
+  "key": "고_나면__sequence-of-actions",
+  "ko": "일을 다 마치고 나면 집에 갈 거예요.",
+  "en": "I will go home after finishing work.",
+  "zh": "做完事情后我就回家。"
+ },
+ {
+  "key": "고_나서__sequence-of-actions",
+  "ko": "저는 밥을 먹고 나서 숙제를 할 거예요.",
+  "en": "I will do my homework after eating.",
+  "zh": "我吃完饭后要写作业。"
+ },
+ {
+  "key": "고_말겠다__strong-determination",
+  "ko": "이번 프로젝트를 성공시키고 말겠습니다.",
+  "en": "I will definitely make this project a success.",
+  "zh": "我一定要让这个项目成功。"
+ },
+ {
+  "key": "고_말다__unintentional-result",
+  "ko": "그만 화를 내고 말았어요.",
+  "en": "I ended up losing my temper.",
+  "zh": "我最后还是没忍住发了火。"
+ },
+ {
+  "key": "고_보니까__realizing-something-after-acting",
+  "ko": "지하철에서 내리고 보니 가방이 없더라고요.",
+  "en": "I got off the subway and found I didn't have my bag with me.",
+  "zh": "下了地铁才发现包不见了。"
+ },
+ {
+  "key": "고_싶다__desire",
+  "ko": "한 친구를 만나고 싶습니다.",
+  "en": "I want to meet a friend.",
+  "zh": "我想见一位朋友。"
+ },
+ {
+  "key": "고_있다__ongoing-state",
+  "ko": "지금 이메일를 쓰고 있어요.",
+  "en": "I am writing an email now.",
+  "zh": "我现在正在写邮件。"
+ },
+ {
+  "key": "곤_하다__habit",
+  "ko": "사무실에서 퇴근하고 운동하곤 해요.",
+  "en": "I use to work out after work at the office.",
+  "zh": "我常在下班后运动。"
+ },
+ {
+  "key": "기_마련이다__is-natural-or-inevitable",
+  "ko": "겨울이 아무리 추워도 봄은 오기 마련이다.",
+  "en": "Regardless of how cold winter is, spring will naturally come.",
+  "zh": "冬天再冷，春天也终会到来。"
+ },
+ {
+  "key": "기_일쑤이다__often-happens-in-a-negative-way",
+  "ko": "친구가 약속을 잊기 일쑤예요.",
+  "en": "My friend often forgets appointments.",
+  "zh": "我朋友经常忘记约定。"
+ },
+ {
+  "key": "기도_하다__Sometimes-it-happens",
+  "ko": "저는 주말에는 맛있는 음식을 만들어 먹기도 해요.",
+  "en": "Sometimes on weekends, I cook and eat delicious food.",
+  "zh": "周末我有时会做好吃的吃。"
+ },
+ {
+  "key": "기로_하다__make-a-promise-with-another-person-or-oneself",
+  "ko": "건강 때문에 올해부터 담배를 끊기로 했어요.",
+  "en": "I made the decision to stop smoking for my health from this year.",
+  "zh": "为了健康，我决定从今年开始戒烟。"
+ },
+ {
+  "key": "는_것__change-sentence-to-noun",
+  "ko": "책을 읽는 것을 좋아해요.",
+  "en": "I like the act of reading books.",
+  "zh": "我喜欢读书。"
+ },
+ {
+  "key": "는_것_같다__it-seems-like",
+  "ko": "날씨가 추을 것 같아요.",
+  "en": "It seems like the weather will be cold.",
+  "zh": "天气好像会变冷。"
+ },
+ {
+  "key": "는_길에__while-on-my-way",
+  "ko": "집에 가는 길에 빵을 샀어요.",
+  "en": "I bought bread on my way home.",
+  "zh": "回家路上买了面包。"
+ },
+ {
+  "key": "는_길이다__on-my-way",
+  "ko": "제가 집에 가는 길이에요.",
+  "en": "I am on my way home.",
+  "zh": "我正在回家的路上。"
+ },
+ {
+  "key": "는_김에__while-at-it",
+  "ko": "시장에 가는 김에 새로운 옷을 구경했어요.",
+  "en": "Since I was going to the market anyway, I also browsed some new clothes.",
+  "zh": "反正要去市场，顺便看了看新衣服。"
+ },
+ {
+  "key": "는_모양이다__guess-a-situation-after-observation",
+  "ko": "하늘을 보니 곧 비가 올 모양이에요.",
+  "en": "Looking at the sky, it looks like it will rain soon.",
+  "zh": "看天色，好像马上要下雨了。"
+ },
+ {
+  "key": "는_바람에__unintended-consequence",
+  "ko": "비가 오는 바람에 소풍을 취소했어요.",
+  "en": "Because of the rain, we canceled the picnic.",
+  "zh": "因为下雨，野餐取消了。"
+ },
+ {
+  "key": "는_반면에__expressing-contrast",
+  "ko": "이 보고서는 이해하기 쉬운 반면에 다른 보고서들은 복잡합니다.",
+  "en": "This report is easy to understand, whereas other reports are complex.",
+  "zh": "这份报告容易理解，而其他报告则很复杂。"
+ },
+ {
+  "key": "는_법이다__expressing-inevitability",
+  "ko": "기대가 크면 실망도 큰 법이지.",
+  "en": "If you have high expectations, disappointment is inevitable.",
+  "zh": "期望越大，失望就越大，这是必然的。"
+ },
+ {
+  "key": "는_셈이다__equivalent-to",
+  "ko": "이번 촬영은 꽤 잘된 셈이에요.",
+  "en": "It is as though I did well on this shoot.",
+  "zh": "这次拍摄算是拍得相当不错了。"
+ },
+ {
+  "key": "는_셈이다__calculated-as",
+  "ko": "이 식당의 가격을 생각하면 정말 싼 셈이에요.",
+  "en": "Considering the prices of this restaurant, it is really cheap.",
+  "zh": "考虑到这家店的价格，真的算是便宜了。"
+ },
+ {
+  "key": "는_편이다__tendency-to-do-something",
+  "ko": "저는 다른 사람들보다 커피를 많이 마시는 편이에요.",
+  "en": "I tend to drink more coffee than other people.",
+  "zh": "我和别人相比，咖啡喝得比较多。"
+ },
+ {
+  "key": "다가_보니까__realization",
+  "ko": "책을 읽다가 보니 시간이 훌쩍 지나갔어요.",
+  "en": "While reading the book, I realized time had flown by.",
+  "zh": "读书读着读着，发现时间一下子就过去了。"
+ },
+ {
+  "key": "다가_보니까__causation",
+  "ko": "열아홉 살이다 보니까 솔직히 유치할 줄 알았는데 생각이 깊더라.",
+  "en": "Honestly, I thought he would be immature since he's only 19, but it turns out he's a deep thinker.",
+  "zh": "因为才19岁，说实话本以为会很幼稚，没想到思想挺成熟。"
+ },
+ {
+  "key": "다가_보면__result-of-consistency",
+  "ko": "강력계 형사로 활동하다 보면 위험에 처할 때도 있어서 호신술로 합기도 배웠죠.",
+  "en": "In my career as a homicide detective, there are times I'm put in danger, so I learned hapkido for self-defense.",
+  "zh": "做重案组刑警，有时会陷入危险，所以学了合气道防身。"
+ },
+ {
+  "key": "다고_치다__assumption-hypothesis",
+  "ko": "모든 학생이 숙제를 마쳤다고 치고 발표를 시작합시다.",
+  "en": "Let’s start the presentation assuming all the students finished their homework.",
+  "zh": "假设所有学生都完成了作业，我们开始发表吧。"
+ },
+ {
+  "key": "다시피_하다__almost",
+  "ko": "그 남자는 매일 집에서 살다시피 해요.",
+  "en": "He practically lives at home every day.",
+  "zh": "他几乎每天都住在家里的样子。"
+ },
+ {
+  "key": "단_말__Asking-for-confirmation",
+  "ko": "날씨가 춥고 스키를 가겠단 말이에요?",
+  "en": "Are you saying you're going skiing even though it's cold?",
+  "zh": "你是说天气那么冷还要去滑雪？"
+ },
+ {
+  "key": "단_말__Emphasizing",
+  "ko": "다시 해보란 말이야",
+  "en": "I said try again!",
+  "zh": "我说了，重做一遍！"
+ },
+ {
+  "key": "대신에__replace-an-action",
+  "ko": "저 대신에 주문좀 해주시겠어요?",
+  "en": "Could you order instead of me?",
+  "zh": "能替我点一下单吗？"
+ },
+ {
+  "key": "동안__for-a-period-of-time",
+  "ko": "어제 12 시간 동안 잤어요.",
+  "en": "Yesterday, I slept for 12 hours.",
+  "zh": "昨天睡了12个小时。"
+ },
+ {
+  "key": "때__when-an-action-occurs",
+  "ko": "방학 때 아르바이트를 해요.",
+  "en": "I work part-time during vacation.",
+  "zh": "放假期间我打工。"
+ },
+ {
+  "key": "때문에__reason-or-cause",
+  "ko": "눈 때문에 길이 미끄러워요.",
+  "en": "The road is slippery because of the snow.",
+  "zh": "因为下雪，路很滑。"
+ },
+ {
+  "key": "만_해도__as-recently-as",
+  "ko": "10년 전만 해도, 우리 나라가 이렇게 양극화되지는 않았다.",
+  "en": "Even just 10 years ago, our country was not this polarized.",
+  "zh": "就在10年前，我们国家还没有这么两极分化。"
+ },
+ {
+  "key": "아어_가다__continuely",
+  "ko": "한국어를 공부해 가겠습니다!",
+  "en": "I will keep studying Korean! (now and in the future)",
+  "zh": "我会继续学习韩语的！"
+ },
+ {
+  "key": "아어_가다__going-somewhere",
+  "ko": "식당까지 걸어 갔어요.",
+  "en": "I walked to the restaurant.",
+  "zh": "我走路去的餐厅。"
+ },
+ {
+  "key": "아어_가다__almost-done",
+  "ko": "드라마가 다 끝나 가요.",
+  "en": "The TV show is about to end.",
+  "zh": "电视剧快结束了。"
+ },
+ {
+  "key": "아어_가지다__time-order-of-two-actions",
+  "ko": "빨래해 가지고 걸고 있어요.",
+  "en": "I washed my clothes and am hanging them now.",
+  "zh": "把衣服洗了，现在正晾着。"
+ },
+ {
+  "key": "아어_가지다__reasoning",
+  "ko": "많이 먹어 가지고 너무 배불러요.",
+  "en": "I am so full because I ate a lot.",
+  "zh": "吃得太多，肚子好撑。"
+ },
+ {
+  "key": "아어_나가다__in-progress-action",
+  "ko": "아무것도 없어도 너만 있으면 살아 나가겠지.",
+  "en": "Even if I don't have anything, if I just have you I can keep on living.",
+  "zh": "就算什么都没有，只要有你我就能活下去。"
+ },
+ {
+  "key": "아어_내다__overcoming-difficulty",
+  "ko": "김치리더 덕분에 드디어 그 어려운 책을 읽어 냈습니다!",
+  "en": "Thanks to Kimchi Reader, I finally read that difficult book.",
+  "zh": "多亏了这个阅读工具，我终于啃完了那本难懂的书！"
+ },
+ {
+  "key": "아어_놓다__maintain",
+  "ko": "음식 냄새가 많이 나서 창문을 열어 놨어요.",
+  "en": "The smell of food was strong, so I opened the window.",
+  "zh": "饭菜味很大，所以我把窗户打开了。"
+ },
+ {
+  "key": "아어_달다__request",
+  "ko": "친구가 갑자기 큰돈을 빌려 달라는데 어떻게 해야 할지 모르겠어.",
+  "en": "My friend suddenly asked me to lend him a lot of money, and I don't know what to do.",
+  "zh": "朋友突然要我借他一大笔钱，我不知道该怎么办。"
+ },
+ {
+  "key": "아어_달라고__quote-favor-request",
+  "ko": "아빠가 쓰레기 버려달라고 하셨어요.",
+  "en": "Dad asked you to take out the trash (for him).",
+  "zh": "爸爸让我把垃圾扔了。"
+ },
+ {
+  "key": "아어_대다__excessive-action",
+  "ko": "동생이 계속 울어 대서 머리가 아파요.",
+  "en": "My younger sibling kept crying too much, so I have a headache.",
+  "zh": "弟妹一直哭个不停，我头都疼了。"
+ },
+ {
+  "key": "아어_두다__maintain",
+  "ko": "서랍 안에 중요한 것이 많아서 항상 잠가 둡니다.",
+  "en": "There are many important things in the drawer, so I always lock it.",
+  "zh": "抽屉里有很多重要的东西，所以我总是锁着。"
+ },
+ {
+  "key": "아어_두다__prepare",
+  "ko": "발표할 때 실수하지 않으려면 연습을 많이 해 두세요.",
+  "en": "If you don't want to make a mistake during the presentation, practice a lot in advance.",
+  "zh": "要想发表时不出错，就要提前多加练习。"
+ },
+ {
+  "key": "아어_드리다__favor-request",
+  "ko": "에어컨을 켜 드릴까요?",
+  "en": "Do you want me to turn on the air conditioner?",
+  "zh": "要我帮您开空调吗？"
+ },
+ {
+  "key": "아어_마지않다__sincerely",
+  "ko": "올해는 좋은 일만 있으시길 바라 마지않습니다.",
+  "en": "I sincerely wish you only the best this year.",
+  "zh": "衷心祝愿您今年只有好事发生。"
+ },
+ {
+  "key": "아어_버리다__completed",
+  "ko": "그 사람이 드디어 떠나 버렸어요.",
+  "en": "That person finally left. (And so I feel relieved)",
+  "zh": "那个人终于离开了。（如释重负）"
+ },
+ {
+  "key": "아어_보다__try",
+  "ko": "김치를 먹어보세요.",
+  "en": "Try eating kimchi.",
+  "zh": "请尝尝泡菜。"
+ },
+ {
+  "key": "아어_보이다__feelings-based-on-outward-appearance",
+  "ko": "마크 씨, 얼굴이 피곤해 보여요. 무슨 일 있어요?",
+  "en": "Mark, you look tired. Did something happen?",
+  "zh": "马克，你看起来很疲惫。发生什么事了吗？"
+ },
+ {
+  "key": "아어_봤자__no-use",
+  "ko": "권력이나 돈이 많아봤자 다 부질없더라고요.",
+  "en": "I've found that <f>even</f> if you have a lot of money or influence, it's futile.",
+  "zh": "我发现就算有很多权力或钱，也都是徒劳。"
+ },
+ {
+  "key": "아어_빠지다__fall-into",
+  "ko": "그 그림이 너무 아름다워서 바라봐 빠져버렸어요.",
+  "en": "The painting was so beautiful that I became completely absorbed in looking at it.",
+  "zh": "那幅画太美了，我看得入了迷。"
+ },
+ {
+  "key": "아어_오다__up-till-now",
+  "ko": "10년부터 한국에서 살아 왔어요.",
+  "en": "I've lived in Korea as of 10 years ago (so far even till now now)",
+  "zh": "我从10年前起一直在韩国生活到现在。"
+ },
+ {
+  "key": "아어_오다__coming-from-somewhere",
+  "ko": "치킨을 먹고 싶어? 그럼 지금 사 올게.",
+  "en": "You want to eat some fried chicken? Then I'll go buy some now (and then come back here).",
+  "zh": "想吃炸鸡？那我现在去买回来。"
+ },
+ {
+  "key": "아어_있다__continuing-state",
+  "ko": "얼굴에 상처가 아직 남아 있습니다.",
+  "en": "The wound is still there on the face.",
+  "zh": "脸上的伤还留着。"
+ },
+ {
+  "key": "아어_주다__favor-request",
+  "ko": "할아버지는 잉어를 강물에 놓아주었다.",
+  "en": "The grandfather put the fish in the river.",
+  "zh": "爷爷把鲤鱼放回了江里。"
+ },
+ {
+  "key": "아어_지다__change-in-state",
+  "ko": "요즘 운동을 해서 살이 많이 빠졌어요.",
+  "en": "I've lost a lot of weight recently because I've been exercising.",
+  "zh": "最近坚持运动，瘦了很多。"
+ },
+ {
+  "key": "아어_하다__perceived-action",
+  "ko": "동생은 한국어 공부를 재미있어해요.",
+  "en": "My younger sibling seems to enjoy studying Korean.",
+  "zh": "弟妹觉得学韩语很有意思。"
+ },
+ {
+  "key": "아어도_되다__permission-or-approval-for-a-behaviour",
+  "ko": "사진을 찍어도 돼요?",
+  "en": "May I take a picture?",
+  "zh": "可以拍照吗？"
+ },
+ {
+  "key": "안_아요__negative-expression",
+  "ko": "저는 생선을 안 좋아해요.",
+  "en": "I don't like fish.",
+  "zh": "我不喜欢鱼。"
+ },
+ {
+  "key": "어야_되다__necessity-to-do-something",
+  "ko": "내일 시험이 있어요. 그래서 공부해야 돼요.",
+  "en": "I have an exam tomorrow. So I must study.",
+  "zh": "明天有考试，所以必须学习。"
+ },
+ {
+  "key": "었으면_좋겠다__person-wish-or-hope",
+  "ko": "따뜻한 봄에 결혼했으면 좋겠어요.",
+  "en": "It would be nice to get married in the warm spring.",
+  "zh": "希望能在温暖的春天结婚。"
+ },
+ {
+  "key": "었을_것__past-assumption",
+  "ko": "날씨가 좀 더 따뜻했다면 나갔을 거예요.",
+  "en": "If the weather was a little warmer, I would have gone out.",
+  "zh": "要是天气再暖和一点，我就出去了。"
+ },
+ {
+  "key": "에_대해서__about",
+  "ko": "한국 패션 스타일에 대해 어떻게 생각해요?",
+  "en": "What do you think about Korean fashion style?",
+  "zh": "你觉得韩国的时尚风格怎么样？"
+ },
+ {
+  "key": "에_따라서__depending-on",
+  "ko": "날씨에 따라서 우산을 가져가요.",
+  "en": "Bring an umbrella depending on the weather.",
+  "zh": "根据天气情况带伞。"
+ },
+ {
+  "key": "에_비해서__compared-to",
+  "ko": "택시를 타는 거에 비해 기차를 타는 건 더 싸요.",
+  "en": "Taking the train is much cheaper than taking a taxi.",
+  "zh": "坐火车比坐出租车便宜。"
+ },
+ {
+  "key": "에도_불구하고__despite-in-spite-of",
+  "ko": "비에도 불구하고 그는 출근했다.",
+  "en": "Despite the rain, he went to work.",
+  "zh": "尽管下雨，他还是去上班了。"
+ },
+ {
+  "key": "으나_마나__no-use",
+  "ko": "지금 가나 마나 그녀는 없을 거예요.",
+  "en": "Even if you go now, she won't be there.",
+  "zh": "现在去不去，她都不会在。"
+ },
+ {
+  "key": "으려고_하다__intending-to",
+  "ko": "염색을 하려고 하는데 요즘 무슨 색이 유행이에요?",
+  "en": "I'm planning to dye my hair, what color is popular these days?",
+  "zh": "我打算染头发，最近流行什么颜色？"
+ },
+ {
+  "key": "으려던_참이다__be-just-about-to",
+  "ko": "기차를 타려던 참에 그를 만났다.",
+  "en": "As I was just about to get on the train, I met him.",
+  "zh": "正要上火车的时候遇到了他。"
+ },
+ {
+  "key": "으로_인하다__due-to",
+  "ko": "비로 인해 경기가 취소되었습니다.",
+  "en": "The game was canceled due to rain.",
+  "zh": "比赛因下雨取消了。"
+ },
+ {
+  "key": "으면_안_되다__not-allowed-to-do-an-action",
+  "ko": "실내에서 담배를 피우면 안 돼요.",
+  "en": "Smoking indoors is not allowed.",
+  "zh": "室内禁止吸烟。"
+ },
+ {
+  "key": "은_적이_있다__have-done",
+  "ko": "어릴 때 병원에 입원한 적이 있어요.",
+  "en": "I was hospitalized when I was a child.",
+  "zh": "我小时候住过院。"
+ },
+ {
+  "key": "은_적이_있다__have-not-done",
+  "ko": "회사에 지각한 적이 없어요.",
+  "en": "I have never been late to work.",
+  "zh": "我上班从没迟到过。"
+ },
+ {
+  "key": "은_지__time-passed",
+  "ko": "저는 한국에 온 지 2년이 됐습니다.",
+  "en": "It's been two years since I came to Korea.",
+  "zh": "我来韩国已经两年了。"
+ },
+ {
+  "key": "은_채로__in-the-state-of",
+  "ko": "옷을 입은 채로 물에 들어가세요.",
+  "en": "Enter the water with clothes on.",
+  "zh": "穿着衣服下水。"
+ },
+ {
+  "key": "을_길이_없다__no-way-of",
+  "ko": "그 사실을 확인할 길이 없다.",
+  "en": "There is no way of verifying that fact.",
+  "zh": "那个事实无从确认。"
+ },
+ {
+  "key": "을_리가_없다__impossible-reasoning",
+  "ko": "친구가 늦을 리가 없어요.",
+  "en": "There's no way my friend would be late.",
+  "zh": "朋友不可能迟到。"
+ },
+ {
+  "key": "을_막론하고__regardless-of",
+  "ko": "성별을 막론하고 지원할 수 있습니다.",
+  "en": "You can apply regardless of gender.",
+  "zh": "不分性别都可以报名。"
+ },
+ {
+  "key": "을_만하다__be-worth-doing",
+  "ko": "이 영화가 정말 볼 만해요.",
+  "en": "This movie is really worth watching.",
+  "zh": "这部电影真的值得一看。"
+ },
+ {
+  "key": "을_바에야__better-choice",
+  "ko": "그 영화를 볼 바에야 차라리 책을 읽겠어요.",
+  "en": "Rather than watching that movie, I would prefer to read a book.",
+  "zh": "与其看那部电影，我宁可读书。"
+ },
+ {
+  "key": "을_뿐만_아니라__not-only-but-also",
+  "ko": "정원에 점핑스파이더가 많을 뿐만 아니라 애완동물로도 키워요.",
+  "en": "Not only do I have a lot of jumping spiders in my yard, I also have one as a pet.",
+  "zh": "院子里不仅有好多跳蛛，我还养了一只当宠物。"
+ },
+ {
+  "key": "을_수밖에_없다__no-choice-but-to",
+  "ko": "너무 빨리 운전해서, 차 손잡이를 꽉 잡을 수밖에 없었다.",
+  "en": "They were driving so fast I had no choice but to grip the car handle tightly.",
+  "zh": "车开得太快，我只好紧紧抓住车把手。"
+ },
+ {
+  "key": "을_위해서__purpose",
+  "ko": "군인은 나라를 위해서 일하는 사람이에요.",
+  "en": "Soldiers are people who work for their country.",
+  "zh": "军人是为国家工作的人。"
+ },
+ {
+  "key": "을_정도로__extent-of-an-action",
+  "ko": "너무 피곤할 정도로 많이 일했어요.",
+  "en": "I worked so much that I am extremely tired.",
+  "zh": "工作太多，累得不行。"
+ },
+ {
+  "key": "을_정도이다__to-the-extent-that",
+  "ko": "그는 너무 피곤해서 쓰러질 정도예요.",
+  "en": "He is so tired that he could collapse.",
+  "zh": "他累得都快晕倒了。"
+ },
+ {
+  "key": "을_줄_알다__knows-how-to-do-something",
+  "ko": "된장찌개를 맛있게 끓일 줄 알아요.",
+  "en": "I know how to cook a tasty doenjang stew.",
+  "zh": "我会做大酱汤，而且做得很好喝。"
+ },
+ {
+  "key": "을_줄_알다__doesn't-know-how-to-do-something",
+  "ko": "휴대 전화로 사진을 보낼 줄 몰라요.",
+  "en": "I don't know how to dsend pictures by mobile phone.",
+  "zh": "我不会用手机发照片。"
+ },
+ {
+  "key": "을_테니까__reason-for-suggestion",
+  "ko": "비가 올 테니까 우산을 가져 가세요.",
+  "en": "Since it will rain, please bring an umbrella.",
+  "zh": "要下雨了，带上伞吧。"
+ },
+ {
+  "key": "을_텐데__expected-future-situation",
+  "ko": "내일 비가 올 텐데 우산을 챙겨 가세요.",
+  "en": "It's probably going to rain tomorrow, so make sure to bring an umbrella.",
+  "zh": "明天可能会下雨，记得带伞。"
+ },
+ {
+  "key": "을까_말까__whether-to-do-or-not",
+  "ko": "오늘 학교에 갈까 말까 생각 중이에요.",
+  "en": "I'm thinking about whether to go to school today or not.",
+  "zh": "我在想要不要去学校。"
+ },
+ {
+  "key": "을까_봐__concern-about-something",
+  "ko": "주말에 날씨가 나쁠까 봐 걱정이에요.",
+  "en": "I am worried that the weather would be bad in weekend",
+  "zh": "担心周末天气不好。"
+ },
+ {
+  "key": "을까_하다__be-thinking-of",
+  "ko": "오늘 저녁에 피자를 먹을까 해요.",
+  "en": "I'm thinking about eating pizza tonight.",
+  "zh": "我在想要不要今晚吃披萨。"
+ },
+ {
+  "key": "을락_말락__close-to-happening",
+  "ko": "비가 올락 말락 하는 날씨가 제일 싫거든요.",
+  "en": "I hate it when it seems like it will rain.",
+  "zh": "我最讨厌这种要下不下的天气。"
+ },
+ {
+  "key": "을지도_모르다__possible-outcome",
+  "ko": "오늘 오후에 비가 올지도 몰라요.",
+  "en": "It might rain this afternoon.",
+  "zh": "今天下午可能会下雨。"
+ },
+ {
+  "key": "전에__before-a-certain-time",
+  "ko": "5년 전에 한국에 왔어요.",
+  "en": "I came to Korea 5 years ago.",
+  "zh": "我5年前来的韩国。"
+ },
+ {
+  "key": "중__when-an-action-occurs",
+  "ko": "나는 수업 중이에요. 나중에 전화할게요.",
+  "en": "I am in class now. I will call you later.",
+  "zh": "我正在上课，稍后给你打电话。"
+ },
+ {
+  "key": "지_그렇다__gentle-suggestion",
+  "ko": "그 단어를 모르면 사전에 찾아보지 그래요?",
+  "en": "If you don't know that word, how about you look it up?",
+  "zh": "不知道那个单词的话，查查词典怎么样？"
+ },
+ {
+  "key": "지_말다__prohibition",
+  "ko": "기대도 하지 마.",
+  "en": "Don't expect anything.",
+  "zh": "别指望什么。"
+ },
+ {
+  "key": "지_못하다__lack-of-ability",
+  "ko": "제 동생은 스케이트를 타지 못해요.",
+  "en": "My younger sibling cannot skate.",
+  "zh": "我的弟妹不会滑冰。"
+ },
+ {
+  "key": "지_않다__negative-expression",
+  "ko": "보고서를 오늘까지 내지 않아도 돼요.",
+  "en": "You don't have to submit the report by today.",
+  "zh": "报告不必今天交。"
+ },
+ {
+  "key": "지_않아도_되다__behaviour-is-not-necessary",
+  "ko": "유치원생은 버스 요금을 내지 않아도 돼요.",
+  "en": "Preschool students don't have to pay the bus fare.",
+  "zh": "幼儿园学生不用交公交车费。"
+ },
+ {
+  "key": "후에__after-a-certain-period-of-time",
+  "ko": "한 달 후에 아기가 태어나요.",
+  "en": "My baby will be born one month later.",
+  "zh": "宝宝一个月后出生。"
+ }
+]
