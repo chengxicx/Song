@@ -785,6 +785,34 @@ def whisper_download_model():
     return jsonify({"task_id": task_id})
 
 
+@bp.route("/whisper/models", methods=["GET"])
+def whisper_models():
+    "Install state + per-size model cache status, for the Settings page."
+    return jsonify(
+        {
+            "installed": whisper_transcribe.whisper_status()["installed"],
+            "models": whisper_transcribe.model_cache_info(),
+        }
+    )
+
+
+@bp.route("/whisper/delete_model", methods=["POST"])
+def whisper_delete_model():
+    "Remove a downloaded model from the server's cache."
+    if whisper_transcribe.has_running_task():
+        return (
+            jsonify(
+                {
+                    "error": "A transcription or model download is already "
+                    "running -- please wait for it to finish."
+                }
+            ),
+            409,
+        )
+    ok, message = whisper_transcribe.delete_model(request.form.get("whisper_model") or "")
+    return jsonify({"ok": ok, "message": message}), (200 if ok else 400)
+
+
 def _import_netease_music():
     """
     Create a NetEase Cloud Music book from a song URL.
