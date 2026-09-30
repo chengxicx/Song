@@ -9,9 +9,21 @@ diff and the /read/shadowing/transcribe route.
 import io
 import json
 import os
+import time
 from unittest.mock import patch
 
 from lute.read import shadowing
+
+
+def _wait_for_task(task_id, timeout=10.0):
+    "Poll a task until it reaches a terminal state."
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        status = shadowing.task_status(task_id)
+        if status["state"] in ("finished", "error"):
+            return status
+        time.sleep(0.05)
+    raise AssertionError(f"task {task_id} did not finish in time: {status}")
 
 
 # ---------------------------------------------------------------------
@@ -282,6 +294,7 @@ def test_route_rejects_bad_tokens(app, client, english):
 
 
 def test_route_scores_recording(app, app_context, client, english):
+    "Happy path: POST returns a task id; the task scores and cleans up."
     tempdir = app.env_config.temppath
 
     def _fake_clip(audio_path, lang_code, model_size="small"):
@@ -303,8 +316,12 @@ def test_route_scores_recording(app, app_context, client, english):
             content_type="multipart/form-data",
         )
 
-    assert resp.status_code == 200
-    body = resp.get_json()
+        assert resp.status_code == 200
+        task_id = resp.get_json()["task_id"]
+        status = _wait_for_task(task_id)
+
+    assert status["state"] == "finished"
+    body = status["result"]
     assert body["transcription"] == "The calm cat."
     assert body["statuses"] == [2, 2, 2]
     assert body["score"] == 100
@@ -316,6 +333,12 @@ def test_route_scores_recording(app, app_context, client, english):
     # The temp clip was cleaned up.
     leftovers = [f for f in os.listdir(tempdir) if f.startswith("shadowing_")]
     assert leftovers == []
+
+
+def test_status_endpoint_reports_unknown(app, client):
+    resp = client.get("/read/shadowing/status/not-a-task")
+    assert resp.status_code == 200
+    assert resp.get_json()["state"] == "unknown"
 
 
 def test_route_unknown_model_falls_back_to_default(app, app_context, client, english):
@@ -339,11 +362,14 @@ def test_route_unknown_model_falls_back_to_default(app, app_context, client, eng
             content_type="multipart/form-data",
         )
 
-    assert resp.status_code == 200
+        assert resp.status_code == 200
+        status = _wait_for_task(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
     assert sizes == ["small"]
 
 
-def test_route_no_speech_is_422(app, app_context, client, english):
+def test_route_no_speech_fails_the_task(app, app_context, client, english):
     tempdir = app.env_config.temppath
 
     def _fake_clip(audio_path, lang_code, model_size="small"):
@@ -362,13 +388,16 @@ def test_route_no_speech_is_422(app, app_context, client, english):
             content_type="multipart/form-data",
         )
 
-    assert resp.status_code == 422
-    assert "no speech" in resp.get_json()["error"]
+        assert resp.status_code == 200
+        status = _wait_for_task(resp.get_json()["task_id"])
+
+    assert status["state"] == "error"
+    assert "no speech" in status["error"]
     leftovers = [f for f in os.listdir(tempdir) if f.startswith("shadowing_")]
     assert leftovers == []
 
 
-def test_route_transcription_error_is_500_and_cleans_temp(
+def test_route_transcription_error_fails_the_task_and_cleans_temp(
     app, app_context, client, english
 ):
     tempdir = app.env_config.temppath
@@ -389,7 +418,10 @@ def test_route_transcription_error_is_500_and_cleans_temp(
             content_type="multipart/form-data",
         )
 
-    assert resp.status_code == 500
-    assert "model exploded" in resp.get_json()["error"]
+        assert resp.status_code == 200
+        status = _wait_for_task(resp.get_json()["task_id"])
+
+    assert status["state"] == "error"
+    assert "model exploded" in status["error"]
     leftovers = [f for f in os.listdir(tempdir) if f.startswith("shadowing_")]
     assert leftovers == []
