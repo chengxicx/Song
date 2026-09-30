@@ -468,10 +468,15 @@ def _curated_reference(examples, translations, specs, tokenised):
         )
     if not usable:
         return None
-    chosen = usable[0]
+    # The zh panel only quotes a reference it can show in Chinese, so prefer
+    # the examples that carry a Chinese half.  The English half exists for
+    # every index (kimchi ships it for all of its examples), so this costs
+    # the English panel nothing and wins the Chinese panel the block.
+    candidates = [ref for ref in usable if ref["chinese"]] or usable
+    chosen = candidates[0]
     if specs:
         matcher = {"patterns": specs}
-        for ref in usable:
+        for ref in candidates:
             tokens = ref["tokens"]
             if tokens is None:
                 tokens = _tokens_for(ref["korean"])
@@ -1174,16 +1179,25 @@ def analyze_korean(page_text, display_lang="en"):
                 if reference:
                     text = _reference_text(reference, display_lang)
                     if text:
-                        sentence = reference["korean"]
-                        entry["reference"] = {"sentence": sentence, "text": text}
+                        # Distinct names -- rebinding the loop's `sentence`
+                        # here once poisoned every later rule's page match
+                        # with the reference text and its offsets (the page
+                        # examples then quoted sentences not in the text at
+                        # all).  The zh backfill made vendored rows take this
+                        # path on the Chinese panel too, which is what
+                        # finally caught it.
+                        ref_sentence = reference["korean"]
+                        entry["reference"] = {"sentence": ref_sentence, "text": text}
                         # The same offsets the page examples carry, computed
                         # by this rule's own matcher against its curated
                         # sentence, so the folded block highlights the point
                         # it illustrates instead of quoting it bare.
-                        spans = _match_spans(rule, _tokens_for(sentence), sentence)
-                        if spans:
+                        ref_spans = _match_spans(
+                            rule, _tokens_for(ref_sentence), ref_sentence
+                        )
+                        if ref_spans:
                             entry["reference"]["matches"] = [
-                                {"start": s, "end": e} for s, e in spans
+                                {"start": s, "end": e} for s, e in ref_spans
                             ]
                 by_name[name] = entry
                 order.append(name)
