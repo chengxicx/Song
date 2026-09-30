@@ -1,19 +1,30 @@
 /* lute-shadowing.js
    --------------------------------------------------------------
-   影子跟读 (shadowing): a per-sentence mic button in the reading
-   pane.  One click starts a MediaRecorder capture, a second click
-   stops it; the clip goes to /read/shadowing/transcribe, which
-   whisper-transcribes it and diffs the result against the
-   sentence's own word tokens.  Verdicts are painted onto the
-   sentence's word spans as underline-only marks (the words' status
-   background colours stay untouched), and the full comparison --
-   transcription, missed / misread lists, speech rate, playback of
-   the user's own recording -- opens in the right pane, mirroring
-   the grammar-analysis panel.
+   影子跟读 (shadowing) practice area, entered from the player's
+   "Shadow" toggle (tts_player.html / youtube_player.html, next to
+   the voice/settings gear).
 
-   Deliberately NOT wrapped in an IIFE: like tts.js / tts-ui.js it
-   shares the read page's single global scope and is loaded after
-   them (see lute/templates/read/index.html).
+   While active, the right pane becomes the practice area:
+     - the current sentence, following the player's playhead via the
+       lute:cue-changed events dispatched by media-player-base.js and
+       tts-player.js,
+     - a big record button (MediaRecorder -> /read/shadowing/transcribe,
+       which whisper-transcribes the clip and diffs it against the
+       sentence's own word tokens),
+     - the diff result (score, speech rate, what whisper heard),
+     - a session history of attempts.
+
+   Verdicts are painted onto the sentence's word spans in the reading
+   text as underline-only marks (the words' status background colours
+   stay untouched) and onto the tokens shown in the panel.
+
+   Auto mode: with it on (and the engine's Auto-pause on), the cue-end
+   event (lute:cue-ended) starts a recording by itself; stopping the
+   take scores it and advances to the next sentence.
+
+   Deliberately NOT wrapped in an IIFE: like tts.js / tts-player.js it
+   shares the read page's single global scope and is loaded after them
+   (see lute/templates/read/index.html).
    --------------------------------------------------------------
 */
 "use strict";
@@ -22,148 +33,267 @@
  * 1. State
  * ------------------------------------------------------------------ */
 
-let shadowingButtonsVisible = true;
+let shadowingActive = false;
+let shadowingAuto = false;
+let shadowingBusy = false;
+let shadowingStartPending = false;
 let shadowingRecorder = null;
 let shadowingStream = null;
 let shadowingChunks = [];
-let shadowingActiveBtn = null;
-let shadowingActiveSentence = null;
-let shadowingTimerInterval = null;
-let shadowingRecordingStart = 0;
-let shadowingBusy = false;
-let shadowingStartPending = false;
-let shadowingMarkedSentence = null;
+let shadowingRecording = false;
+let shadowingRecStart = 0;
+let shadowingRecTimer = null;
+let shadowingRecCapTimer = null;
+let shadowingUnit = null; // { lines, el, spans, texts, fullText, langId, src }
+let shadowingLastCue = null; // last lute:cue-changed detail
+let shadowingHistory = [];
 let shadowingRecordingBlob = null;
 let shadowingRecordingUrl = null;
-let _shadowingObserver = null;
 
 const SHADOWING_MODEL_KEY = "shadowingModel";
+const SHADOWING_AUTO_KEY = "shadowingAuto";
+const SHADOWING_REC_CAP_MS = 30000;
 
 const MIC_SVG =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3z"></path><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-2.08A7 7 0 0 0 19 11z"></path></svg>';
 const STOP_SVG =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>';
+const PREV_SVG =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6h2v12H7zM20 6l-8.5 6 8.5 6z"></path></svg>';
+const NEXT_SVG =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6h2v12h-2zM4 6l8.5 6L4 18z"></path></svg>';
+const SPEAKER_SVG =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4a1 1 0 0 0 1 1h3l4 4a1 1 0 0 0 1.7-.7V5.7A1 1 0 0 0 11 5L7 9H4a1 1 0 0 0-1 1z"></path><path d="M16 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 6a8.5 8.5 0 0 1 0 12"></path></svg>';
 
 /* ------------------------------------------------------------------
- * 2. Mic button injection (same lifecycle as the sentence 🔊
- *    buttons: initial pass + observer + the synchronous afterSwap
- *    hook the reading page calls before it measures paragraphs).
+ * 2. Practice-unit resolution
+ *
+ * A "unit" is one practiceable sentence: the word spans to diff
+ * against (and to paint marks on), the plain text for the panel and
+ * TTS, and the language id.  TTS cues carry a sentence index into
+ * #thetext .textsentence spans; media cues are resolved to page lines
+ * through window.LUTE_PAGE_CUE_MAP (same verification as
+ * lute-playing-line.js -- one cue can own several lines).
  * ------------------------------------------------------------------ */
 
-function injectShadowingButtons() {
-  if (!shadowingButtonsVisible) return;
-  const textDiv = document.getElementById("thetext");
-  if (!textDiv) return;
-
-  textDiv.querySelectorAll(".textsentence").forEach(function (s) {
-    if (s.querySelector(".lute-shadowing-btn")) return;
-    // Same readability check as the 🔊 buttons: skip ghost /
-    // punctuation-only sentences.
-    const text = cleanSentenceText(s.textContent || "");
-    if (text === "" || !/[\p{L}\p{N}]/u.test(text)) return;
-
-    const btn = document.createElement("span");
-    btn.className = "lute-shadowing-btn";
-    btn.title = "Shadowing: record yourself reading this sentence";
-    btn.innerHTML = MIC_SVG;
-    // Right after the sentence's 🔊 button when present, else first.
-    const playBtn = s.querySelector(".lute-sentence-play-btn");
-    if (playBtn) {
-      playBtn.insertAdjacentElement("afterend", btn);
-    } else if (s.firstChild) {
-      s.insertBefore(btn, s.firstChild);
-    } else {
-      s.appendChild(btn);
-    }
-  });
+function shadowingSentences() {
+  const div = document.getElementById("thetext");
+  return div
+    ? Array.prototype.slice.call(div.querySelectorAll(".textsentence"))
+    : [];
 }
-window.luteInjectShadowingButtons = injectShadowingButtons;
 
-function startShadowingObserver() {
-  const textDiv = document.getElementById("thetext");
-  if (!textDiv || _shadowingObserver) return;
+function shadowingLineText(el) {
+  const clone = el.cloneNode(true);
+  clone
+    .querySelectorAll(".lute-sentence-play-btn")
+    .forEach(function (b) {
+      b.remove();
+    });
+  return (clone.textContent || "").replace(/[\s\u200b]+/g, "");
+}
 
-  _shadowingObserver = new MutationObserver(function (mutations) {
-    let needsUpdate = false;
-    for (const m of mutations) {
-      if (m.addedNodes.length > 0) {
-        needsUpdate = true;
-        break;
+function shadowingLinesForCue(index, text) {
+  // lute-playing-line.js setCueIndex resolution, returning the matched
+  // <p> elements instead of marking them.
+  const div = document.getElementById("thetext");
+  if (!div) return [];
+  const ps = Array.prototype.slice.call(div.querySelectorAll(":scope > p"));
+  if (!ps.length) return [];
+  const want = (text || "").replace(/[\s\u200b]+/g, "");
+  const map = window.LUTE_PAGE_CUE_MAP;
+
+  if (Array.isArray(map) && map.length === ps.length) {
+    const hits = ps.filter(function (p, k) {
+      return map[k] === index;
+    });
+    if (hits.length) {
+      let joined = "";
+      hits.forEach(function (h) {
+        joined += shadowingLineText(h);
+      });
+      if (joined === want) return hits;
+    }
+  }
+  if (!want) return [];
+  for (let j = 0; j < ps.length; j++) {
+    if (shadowingLineText(ps[j]) === want) return [ps[j]];
+  }
+  return [];
+}
+
+function shadowingUnitFromEl(el, src) {
+  if (!el || !el.isConnected) return null;
+  const spans = Array.prototype.slice.call(el.querySelectorAll("span.word"));
+  if (!spans.length) return null;
+  const clone = el.cloneNode(true);
+  clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
+    b.remove();
+  });
+  const langSpan = el.querySelector("span.word[data-lang-id]");
+  return {
+    el: el,
+    lines: [el],
+    spans: spans,
+    texts: spans.map(function (sp) {
+      return (sp.getAttribute("data-text") || sp.textContent || "").replace(
+        /\u200B/g,
+        ""
+      );
+    }),
+    fullText: (clone.textContent || "")
+      .replace(/\u200B/g, "")
+      .replace(/🔊/g, "")
+      .trim(),
+    langId: langSpan ? langSpan.getAttribute("data-lang-id") : "",
+    src: src || null,
+  };
+}
+
+function shadowingUnitFromLines(lines, src) {
+  if (!lines || !lines.length) return null;
+  const spans = [];
+  lines.forEach(function (l) {
+    Array.prototype.push.apply(spans, l.querySelectorAll("span.word"));
+  });
+  if (!spans.length) return null;
+  let fullText = "";
+  lines.forEach(function (l) {
+    const clone = l.cloneNode(true);
+    clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
+      b.remove();
+    });
+    fullText += (fullText ? "\n" : "") + clone.textContent;
+  });
+  const langSpan = spans[0];
+  return {
+    el: lines[0],
+    lines: lines,
+    spans: spans,
+    texts: spans.map(function (sp) {
+      return (sp.getAttribute("data-text") || sp.textContent || "").replace(
+        /\u200B/g,
+        ""
+      );
+    }),
+    fullText: fullText.replace(/\u200B/g, "").replace(/🔊/g, "").trim(),
+    langId: langSpan ? langSpan.getAttribute("data-lang-id") : "",
+    src: src || null,
+  };
+}
+
+function shadowingSetUnit(unit) {
+  if (shadowingUnit) shadowingClearMarks(shadowingUnit);
+  shadowingUnit = unit;
+  shadowingRenderCurrent();
+  shadowingRenderResultIdle();
+}
+
+/* ------------------------------------------------------------------
+ * 3. Cue-event following
+ * ------------------------------------------------------------------ */
+
+function shadowingApplyCue(d) {
+  if (!d || d.index == null || d.index < 0) return false;
+  if (d.source === "tts") {
+    if (!(d.sentenceCount > 0)) return false;
+    const sents = shadowingSentences();
+    if (sents.length !== d.sentenceCount) return false; // stale after page swap
+    const unit = shadowingUnitFromEl(
+      sents[d.sentIdx] || null,
+      { type: "tts", sentIdx: d.sentIdx, cueIndex: d.index }
+    );
+    if (unit) shadowingSetUnit(unit);
+    return !!unit;
+  }
+  if (d.source === "media") {
+    const lines = shadowingLinesForCue(d.index, d.text);
+    const unit = shadowingUnitFromLines(lines, {
+      type: "media",
+      cueIndex: d.index,
+      text: d.text,
+    });
+    if (unit) shadowingSetUnit(unit);
+    return !!unit;
+  }
+  return false;
+}
+
+function shadowingOnCueChanged(e) {
+  shadowingLastCue = e.detail || null;
+  if (!shadowingActive || shadowingRecording) return;
+  shadowingApplyCue(shadowingLastCue);
+}
+
+// Auto mode: the engine paused (or looped) at the cue end -- start the
+// take for the sentence that just played.
+function shadowingOnCueEnded(e) {
+  if (!shadowingActive || !shadowingAuto) return;
+  if (shadowingRecording || shadowingBusy || shadowingStartPending) return;
+  const d = e.detail || {};
+  if (!shadowingUnit || !shadowingUnit.el || !shadowingUnit.el.isConnected) {
+    if (!shadowingApplyCue(shadowingLastCue)) return;
+  }
+  shadowingStartRecording();
+}
+
+/* ------------------------------------------------------------------
+ * 4. Mode (player "Shadow" toggle)
+ * ------------------------------------------------------------------ */
+
+function shadowingSetMode(on) {
+  shadowingActive = on;
+  const btn =
+    document.getElementById("tts-shadowing-btn") ||
+    document.getElementById("yt-shadowing-btn");
+  if (btn) btn.classList.toggle("on", on);
+
+  if (on) {
+    shadowingOpenPanel();
+    // Initial sentence: the last known cue if it still resolves,
+    // otherwise the first readable sentence on the page.
+    if (!shadowingUnit || !shadowingUnit.el || !shadowingUnit.el.isConnected) {
+      if (!shadowingApplyCue(shadowingLastCue)) {
+        const first = shadowingSentences().find(function (s) {
+          return s.querySelector("span.word");
+        });
+        shadowingSetUnit(shadowingUnitFromEl(first, null));
       }
     }
-    if (!needsUpdate) return;
-
-    if (startShadowingObserver._t) clearTimeout(startShadowingObserver._t);
-    startShadowingObserver._t = setTimeout(function () {
-      startShadowingObserver._t = null;
-      injectShadowingButtons();
-    }, 100);
-  });
-
-  _shadowingObserver.observe(textDiv, { childList: true });
-}
-
-// Called from the reading page's htmx:afterSwap handler.  A page turn
-// or term-save replaces #thetext, so any marks/panel tied to the old
-// sentence must go, and the new text needs its mic buttons.
-window.luteShadowingAfterSwap = function () {
-  if (shadowingMarkedSentence && !document.contains(shadowingMarkedSentence)) {
-    shadowingMarkedSentence = null;
+  } else {
+    shadowingCancelRecording();
+    if (shadowingUnit) shadowingClearMarks(shadowingUnit);
+    shadowingUnit = null;
     shadowingClosePanel();
   }
-  if (shadowingButtonsVisible) injectShadowingButtons();
+}
+
+function shadowingToggleMode() {
+  shadowingSetMode(!shadowingActive);
+}
+
+window.luteShadowingAfterSwap = function () {
+  // Page turn / term-save: the old sentence is gone.  Clear marks (they
+  // lived on the swapped-out spans), then re-resolve -- the players
+  // rebuild their cues on the new text and refire lute:cue-changed,
+  // which takes precedence; the first sentence is the fallback.
+  if (!shadowingActive) return;
+  if (shadowingUnit) {
+    shadowingUnit.spans.forEach(function (sp) {
+      sp.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
+    });
+    shadowingUnit = null;
+  }
+  if (!shadowingApplyCue(shadowingLastCue)) {
+    const first = shadowingSentences().find(function (s) {
+      return s.querySelector("span.word");
+    });
+    shadowingSetUnit(shadowingUnitFromEl(first, null));
+  }
 };
 
 /* ------------------------------------------------------------------
- * 3. Reading-menu toggle (mirrors the Sentence 🔊 toggle)
- * ------------------------------------------------------------------ */
-
-function setShadowingButtonsVisible(visible) {
-  shadowingButtonsVisible = visible;
-  if (visible) injectShadowingButtons();
-  document.querySelectorAll(".lute-shadowing-btn").forEach(function (btn) {
-    btn.style.display = visible ? "" : "none";
-  });
-  const toggle = document.getElementById("shadowing-buttons-toggle");
-  if (toggle) toggle.checked = visible;
-  if (document.body) {
-    if (visible) document.body.classList.add("shadowing-buttons-active");
-    else document.body.classList.remove("shadowing-buttons-active");
-  }
-
-  try {
-    localStorage.setItem("shadowingButtonsVisible", visible ? "1" : "0");
-  } catch (_) {}
-  try {
-    fetch("/settings/set/shadowing_show_buttons/" + (visible ? "1" : "0"), {
-      method: "POST",
-    });
-  } catch (_) {}
-}
-
-function setupShadowingToggle() {
-  const toggle = document.getElementById("shadowing-buttons-toggle");
-  if (!toggle) return;
-
-  let saved = null;
-  try {
-    saved = localStorage.getItem("shadowingButtonsVisible");
-  } catch (_) {}
-  shadowingButtonsVisible = saved !== null ? saved !== "0" : true;
-
-  toggle.checked = shadowingButtonsVisible;
-  if (shadowingButtonsVisible) {
-    document.body.classList.add("shadowing-buttons-active");
-  }
-
-  toggle.addEventListener("change", function () {
-    setShadowingButtonsVisible(toggle.checked);
-  });
-}
-
-/* ------------------------------------------------------------------
- * 4. Result panel (mirrors the grammar-analysis panel: fills
- *    #read_pane_right while the default wordframe/dict are hidden)
+ * 5. Panel (fills #read_pane_right, mirroring the grammar panel)
  * ------------------------------------------------------------------ */
 
 function shadowingEscapeHtml(s) {
@@ -192,7 +322,11 @@ function shadowingClosePanel() {
     if (btm) btm.classList.remove("open-dict");
   }
 }
-window.closeShadowingPanel = shadowingClosePanel;
+window.closeShadowingPanel = function () {
+  // Exposed for the LuteTermFormOpened hook: looking a word up leaves
+  // shadowing mode entirely, so the player toggle stays in sync.
+  shadowingSetMode(false);
+};
 
 function shadowingGetModel() {
   let m = null;
@@ -202,7 +336,7 @@ function shadowingGetModel() {
   return ["base", "small", "medium"].indexOf(m) !== -1 ? m : "small";
 }
 
-function shadowingOpenPanel(stateHtml) {
+function shadowingOpenPanel() {
   shadowingClosePanel();
   const pane = document.getElementById("read_pane_right");
   const panel = document.createElement("div");
@@ -211,6 +345,8 @@ function shadowingOpenPanel(stateHtml) {
   panel.innerHTML =
     '<div class="shadowing-panel__header">' +
     '<span class="shadowing-panel__title">Shadowing</span>' +
+    '<button type="button" id="shadowing-auto-btn" class="shadowing-auto-btn"' +
+    ' title="Auto: record at every sentence end, score, then advance">Auto</button>' +
     '<select id="shadowing-model" class="shadowing-panel__model" title="Whisper model">' +
     '<option value="base">base</option>' +
     '<option value="small">small</option>' +
@@ -219,7 +355,24 @@ function shadowingOpenPanel(stateHtml) {
     '<button type="button" class="shadowing-panel__close" aria-label="Close">&times;</button>' +
     "</div>" +
     '<div class="shadowing-panel__body">' +
-    (stateHtml || '<div class="shadowing-panel__state">…</div>') +
+    '<div id="shadowing-current" class="shadowing-current"></div>' +
+    '<div class="shadowing-controls">' +
+    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="-1" title="Previous sentence">' +
+    PREV_SVG +
+    "</button>" +
+    '<button type="button" id="shadowing-listen-btn" class="shadowing-nav-btn" title="Listen to this sentence">' +
+    SPEAKER_SVG +
+    "</button>" +
+    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="1" title="Next sentence">' +
+    NEXT_SVG +
+    "</button>" +
+    '<button type="button" id="shadowing-rec-btn" class="shadowing-rec-btn" title="Record / stop">' +
+    MIC_SVG +
+    '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>' +
+    "</button>" +
+    "</div>" +
+    '<div id="shadowing-result" class="shadowing-result"></div>' +
+    '<div id="shadowing-history" class="shadowing-history"></div>' +
     "</div>";
 
   if (pane) {
@@ -259,38 +412,142 @@ function shadowingOpenPanel(stateHtml) {
   });
   panel
     .querySelector(".shadowing-panel__close")
-    .addEventListener("click", shadowingClosePanel);
-  return panel;
+    .addEventListener("click", function () {
+      shadowingSetMode(false);
+    });
+
+  const autoBtn = panel.querySelector("#shadowing-auto-btn");
+  autoBtn.classList.toggle("on", shadowingAuto);
+  autoBtn.addEventListener("click", function () {
+    shadowingSetAuto(!shadowingAuto);
+  });
+
+  panel.querySelectorAll("[data-shadowing-nav]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      shadowingNav(parseInt(b.getAttribute("data-shadowing-nav"), 10));
+    });
+  });
+  panel
+    .querySelector("#shadowing-listen-btn")
+    .addEventListener("click", shadowingListen);
+  panel
+    .querySelector("#shadowing-rec-btn")
+    .addEventListener("click", shadowingToggleRecording);
+
+  shadowingRenderHistory();
+  shadowingRenderCurrent();
+  shadowingRenderResultIdle();
 }
 
-function shadowingPanelBody() {
-  const panel = document.getElementById("shadowing-panel");
-  return panel ? panel.querySelector(".shadowing-panel__body") : null;
+function shadowingSetAuto(on) {
+  shadowingAuto = on;
+  const btn = document.getElementById("shadowing-auto-btn");
+  if (btn) btn.classList.toggle("on", on);
+  try {
+    localStorage.setItem(SHADOWING_AUTO_KEY, on ? "1" : "0");
+  } catch (_) {}
+  if (on) shadowingPrepareEngine();
 }
 
-function shadowingRenderPanelError(msg) {
-  const html =
-    '<div class="shadowing-panel__state shadowing-panel__error">' +
+function shadowingPrepareEngine() {
+  // The auto loop leans on auto-pause (record while paused at the cue
+  // end); loop would replay over the take, so turn it off.
+  const ap =
+    document.getElementById("tts-autopause-btn") ||
+    document.getElementById("yt-autopause-btn");
+  if (ap && !ap.classList.contains("on")) ap.click();
+  const loop =
+    document.getElementById("tts-loop-btn") ||
+    document.getElementById("yt-loop-btn");
+  if (loop && loop.classList.contains("on")) loop.click();
+}
+
+/* ------------------------------------------------------------------
+ * 6. Panel rendering
+ * ------------------------------------------------------------------ */
+
+function shadowingRenderCurrent() {
+  const box = document.getElementById("shadowing-current");
+  if (!box) return;
+  if (!shadowingUnit) {
+    box.innerHTML =
+      '<div class="shadowing-panel__state">Play the player, or pick a sentence with the arrows below.</div>';
+    return;
+  }
+  box.innerHTML = shadowingUnit.texts
+    .map(function (t, i) {
+      return (
+        '<span class="shadow-tok" data-idx="' + i + '">' +
+        shadowingEscapeHtml(t) +
+        "</span>"
+      );
+    })
+    .join(" ");
+}
+
+function shadowingRenderResultIdle() {
+  const box = document.getElementById("shadowing-result");
+  if (!box) return;
+  box.innerHTML =
+    '<div class="shadowing-result__hint">Record yourself reading the sentence to score it.</div>';
+}
+
+function shadowingRenderPanelMessage(msg, isError) {
+  const box = document.getElementById("shadowing-result");
+  if (!box) return;
+  box.innerHTML =
+    '<div class="shadowing-panel__state' +
+    (isError ? " shadowing-panel__error" : "") +
+    '">' +
     shadowingEscapeHtml(msg) +
     "</div>";
-  const body = shadowingPanelBody();
-  if (!body) {
-    shadowingOpenPanel(html);
-  } else {
-    body.innerHTML = html;
+}
+
+function shadowingClearMarks(unit) {
+  if (!unit) return;
+  unit.spans.forEach(function (sp) {
+    sp.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
+  });
+}
+
+function shadowingPaintVerdicts(unit, data) {
+  if (!unit || !unit.el.isConnected) return;
+  const statuses = data.statuses || [];
+  const fuzzySpoken = data.spoken_for_fuzzy || {};
+
+  unit.spans.forEach(function (sp, i) {
+    const st = i < statuses.length ? statuses[i] : 0;
+    sp.classList.add(
+      st === 2 ? "shadow-ok" : st === 1 ? "shadow-fuzzy" : "shadow-miss"
+    );
+  });
+
+  const box = document.getElementById("shadowing-current");
+  if (box) {
+    box.querySelectorAll(".shadow-tok").forEach(function (tok) {
+      const i = parseInt(tok.getAttribute("data-idx"), 10);
+      const st = i < statuses.length ? statuses[i] : 0;
+      tok.classList.add(
+        st === 2 ? "shadow-ok" : st === 1 ? "shadow-fuzzy" : "shadow-miss"
+      );
+      if (st === 1 && fuzzySpoken[i] != null) {
+        tok.insertAdjacentHTML(
+          "beforeend",
+          '<span class="shadow-tok__heard">→ ' +
+            shadowingEscapeHtml(fuzzySpoken[i]) +
+            "</span>"
+        );
+      }
+    });
   }
 }
 
-function shadowingRenderResult(sentenceEl, wordTexts, data) {
-  const body = shadowingPanelBody();
-  if (!body) return;
-
-  const statuses = data.statuses || [];
-  const fuzzySpoken = data.spoken_for_fuzzy || {};
+function shadowingRenderResult(unit, data) {
+  const box = document.getElementById("shadowing-result");
+  if (!box) return;
   const extras = data.extras || [];
   const isMorpheme = data.token_kind === "morpheme";
-  const kindLabel = isMorpheme ? "morphemes" : "words";
-  const extraJoin = isMorpheme ? "" : " ";
+  const kindLabel = isMorpheme ? "morphemes/min" : "words/min";
 
   let html = '<div class="shadowing-score">';
   html +=
@@ -301,69 +558,56 @@ function shadowingRenderResult(sentenceEl, wordTexts, data) {
       data.tokens_per_minute +
       " " +
       kindLabel +
-      "/min · " +
+      " · " +
       data.duration +
       "s</span>";
   }
   html += "</div>";
-
   html +=
-    '<div class="shadowing-label">Heard</div>' +
     '<div class="shadowing-heard">' +
     shadowingEscapeHtml(data.transcription || "—") +
     "</div>";
-
-  html += '<div class="shadowing-label">Sentence</div><div class="shadowing-tokens">';
-  for (let i = 0; i < wordTexts.length; i++) {
-    const st = i < statuses.length ? statuses[i] : 0;
-    const cls = st === 2 ? "shadow-ok" : st === 1 ? "shadow-fuzzy" : "shadow-miss";
-    let chip = shadowingEscapeHtml(wordTexts[i]);
-    if (st === 1 && fuzzySpoken[i] != null) {
-      chip +=
-        '<span class="shadowing-token__heard">→ ' +
-        shadowingEscapeHtml(fuzzySpoken[i]) +
-        "</span>";
-    }
-    html += '<span class="shadowing-token ' + cls + '">' + chip + "</span>";
-  }
-  html += "</div>";
-
   if (extras.length) {
     html +=
-      '<div class="shadowing-extras"><span class="shadowing-label">Also heard</span> ' +
-      shadowingEscapeHtml(extras.join(extraJoin)) +
+      '<div class="shadowing-extras"><span class="shadowing-extras__label">Also heard</span> ' +
+      shadowingEscapeHtml(
+        extras.join(isMorpheme ? "" : " ")
+      ) +
       "</div>";
   }
+  box.innerHTML = html;
+}
 
-  html +=
-    '<div class="shadowing-actions">' +
-    '<button type="button" class="shadowing-btn" data-shadowing-action="mine">▶ ' +
-    (shadowingRecordingBlob ? "Your recording" : "Recording") +
-    "</button>" +
-    '<button type="button" class="shadowing-btn" data-shadowing-action="sentence">▶ Sentence</button>' +
-    '<button type="button" class="shadowing-btn" data-shadowing-action="again">Record again</button>' +
-    "</div>";
-
-  body.innerHTML = html;
-
-  body
-    .querySelector('[data-shadowing-action="mine"]')
-    .addEventListener("click", shadowingPlayRecording);
-  body
-    .querySelector('[data-shadowing-action="sentence"]')
-    .addEventListener("click", function () {
-      shadowingPlayOriginal(sentenceEl);
-    });
-  body
-    .querySelector('[data-shadowing-action="again"]')
-    .addEventListener("click", function () {
-      const btn = sentenceEl.querySelector(".lute-shadowing-btn");
-      shadowingStart(sentenceEl, btn);
-    });
+function shadowingRenderHistory() {
+  const box = document.getElementById("shadowing-history");
+  if (!box) return;
+  if (!shadowingHistory.length) {
+    box.innerHTML =
+      '<div class="shadowing-history__empty">No attempts yet.</div>';
+    return;
+  }
+  box.innerHTML =
+    '<div class="shadowing-history__head">This session</div>' +
+    shadowingHistory
+      .slice(0, 30)
+      .map(function (h) {
+        return (
+          '<div class="shadowing-history__row">' +
+          '<span class="shadowing-history__score">' + h.score + "%</span>" +
+          '<span class="shadowing-history__text">' +
+          shadowingEscapeHtml(h.text) +
+          "</span>" +
+          (h.rate != null
+            ? '<span class="shadowing-history__rate">' + h.rate + "/min</span>"
+            : "") +
+          "</div>"
+        );
+      })
+      .join("");
 }
 
 /* ------------------------------------------------------------------
- * 5. Recording (MediaRecorder), one capture at a time
+ * 7. Recording (MediaRecorder), one capture at a time
  * ------------------------------------------------------------------ */
 
 function shadowingCanRecord() {
@@ -417,24 +661,35 @@ function shadowingTeardownStream() {
   }
 }
 
-async function shadowingStart(sentenceEl, btn) {
+function shadowingRecBtn() {
+  return document.getElementById("shadowing-rec-btn");
+}
+
+async function shadowingStartRecording() {
+  const btn = shadowingRecBtn();
+  if (!btn || shadowingBusy || shadowingStartPending || shadowingRecording) {
+    return;
+  }
+  if (!shadowingUnit || !shadowingUnit.el || !shadowingUnit.el.isConnected) {
+    return;
+  }
+  if (!shadowingCanRecord()) {
+    shadowingRenderPanelMessage(
+      "Microphone recording needs a secure context (open Lute on localhost or HTTPS) and a browser with MediaRecorder support.",
+      true
+    );
+    return;
+  }
+
   // A second click during the getUserMedia await would otherwise start
   // two captures; collapse it.
-  if (!btn || shadowingBusy || shadowingStartPending) return;
   shadowingStartPending = true;
   try {
-    if (!shadowingCanRecord()) {
-      shadowingRenderPanelError(
-        "Microphone recording needs a secure context (open Lute on localhost or HTTPS) and a browser with MediaRecorder support."
-      );
-      return;
-    }
-
     let stream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
-      shadowingRenderPanelError(shadowingPermissionMessage(err));
+      shadowingRenderPanelMessage(shadowingPermissionMessage(err), true);
       return;
     }
     shadowingStream = stream;
@@ -448,143 +703,136 @@ async function shadowingStart(sentenceEl, btn) {
         : new MediaRecorder(stream);
     } catch (err) {
       shadowingTeardownStream();
-      shadowingRenderPanelError(shadowingPermissionMessage(err));
+      shadowingRenderPanelMessage(shadowingPermissionMessage(err), true);
       return;
     }
 
     shadowingRecorder = recorder;
-    shadowingActiveBtn = btn;
-    shadowingActiveSentence = sentenceEl;
-    shadowingRecordingStart = Date.now();
+    shadowingRecording = true;
+    shadowingRecStart = Date.now();
     recorder.ondataavailable = function (e) {
       if (e.data && e.data.size > 0) shadowingChunks.push(e.data);
     };
     recorder.onstop = shadowingOnStop;
 
-    btn.classList.add("shadowing-recording");
-    btn.classList.remove("shadowing-busy");
-    btn.innerHTML = STOP_SVG;
-    shadowingTimerInterval = setInterval(function () {
-      const secs = Math.floor((Date.now() - shadowingRecordingStart) / 1000);
-      btn.textContent = secs + "s";
+    btn.classList.add("recording");
+    btn.innerHTML = STOP_SVG + '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>';
+    shadowingRecTimer = setInterval(function () {
+      const secs = Math.floor((Date.now() - shadowingRecStart) / 1000);
+      const el = document.getElementById("shadowing-rec-time");
+      if (el) el.textContent = secs + "s";
     }, 250);
-    shadowingOpenPanel(
-      '<div class="shadowing-panel__state">Recording — tap the mic again to stop.</div>'
-    );
+    // Auto mode keeps hands free: cap the take so a forgotten stop
+    // cannot block the loop forever.
+    if (shadowingAuto) {
+      shadowingRecCapTimer = setTimeout(function () {
+        if (shadowingRecording) shadowingStopRecording();
+      }, SHADOWING_REC_CAP_MS);
+    }
     recorder.start();
   } finally {
     shadowingStartPending = false;
   }
 }
 
-function shadowingStop() {
-  if (shadowingTimerInterval) {
-    clearInterval(shadowingTimerInterval);
-    shadowingTimerInterval = null;
+function shadowingStopRecording() {
+  if (!shadowingRecording) return;
+  shadowingRecording = false;
+  if (shadowingRecTimer) {
+    clearInterval(shadowingRecTimer);
+    shadowingRecTimer = null;
+  }
+  if (shadowingRecCapTimer) {
+    clearTimeout(shadowingRecCapTimer);
+    shadowingRecCapTimer = null;
+  }
+  const btn = shadowingRecBtn();
+  if (btn) {
+    btn.classList.remove("recording");
+    btn.innerHTML = MIC_SVG + '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>';
   }
   const rec = shadowingRecorder;
-  const btn = shadowingActiveBtn;
-  if (btn) {
-    btn.classList.remove("shadowing-recording");
-    btn.innerHTML = MIC_SVG;
-    if (rec && rec.state === "recording") btn.classList.add("shadowing-busy");
-  }
   if (rec && rec.state === "recording") {
     try {
       rec.stop();
     } catch (_) {
-      if (btn) btn.classList.remove("shadowing-busy");
-      shadowingTeardownStream();
       shadowingRecorder = null;
-      shadowingActiveBtn = null;
-      shadowingActiveSentence = null;
+      shadowingTeardownStream();
     }
   } else {
-    // Nothing was actually recording; just reset the bookkeeping.
-    shadowingTeardownStream();
     shadowingRecorder = null;
-    shadowingActiveBtn = null;
-    shadowingActiveSentence = null;
+    shadowingTeardownStream();
+  }
+}
+
+function shadowingCancelRecording() {
+  // Leaving the mode mid-take: drop the capture without scoring it.
+  if (!shadowingRecording) {
+    shadowingTeardownStream();
+    return;
+  }
+  shadowingRecording = false;
+  if (shadowingRecTimer) {
+    clearInterval(shadowingRecTimer);
+    shadowingRecTimer = null;
+  }
+  if (shadowingRecCapTimer) {
+    clearTimeout(shadowingRecCapTimer);
+    shadowingRecCapTimer = null;
+  }
+  const rec = shadowingRecorder;
+  shadowingRecorder = null;
+  if (rec) {
+    rec.onstop = null;
+    try {
+      if (rec.state !== "inactive") rec.stop();
+    } catch (_) {}
+  }
+  shadowingChunks = [];
+  shadowingTeardownStream();
+}
+
+function shadowingToggleRecording() {
+  if (shadowingRecording) {
+    shadowingStopRecording();
+  } else {
+    shadowingStartRecording();
   }
 }
 
 function shadowingOnStop() {
-  const btn = shadowingActiveBtn;
-  const sentence = shadowingActiveSentence;
+  const rec = shadowingRecorder;
   const chunks = shadowingChunks;
-  const mime = shadowingRecorder ? shadowingRecorder.mimeType : "";
+  const mime = rec ? rec.mimeType : "";
+  const unit = shadowingUnit; // captured: the cue may move while scoring
 
   shadowingRecorder = null;
-  shadowingActiveBtn = null;
-  shadowingActiveSentence = null;
   shadowingChunks = [];
   shadowingTeardownStream();
-  if (btn) btn.classList.remove("shadowing-busy");
-
-  // The page was swapped while recording; the clip has no sentence
-  // to score against anymore.
-  if (!sentence || !document.contains(sentence)) return;
 
   const blob = new Blob(chunks, { type: mime || "audio/webm" });
   if (!blob.size) {
-    shadowingRenderPanelError("The recording was empty — try again.");
+    shadowingRenderPanelMessage("The recording was empty — try again.", true);
     return;
   }
   shadowingRecordingBlob = blob;
-  shadowingSubmit(blob, sentence, btn);
-}
-
-function shadowingToggle(sentenceEl, btn) {
-  if (shadowingRecorder && shadowingRecorder.state === "recording") {
-    if (sentenceEl === shadowingActiveSentence) {
-      shadowingStop();
-    } else {
-      shadowingRenderPanelError(
-        "Already recording — tap the pulsing mic to stop first."
-      );
-    }
-    return;
-  }
-  shadowingStart(sentenceEl, btn);
+  shadowingSubmit(blob, unit);
 }
 
 /* ------------------------------------------------------------------
- * 6. Submit + paint results
+ * 8. Submit + results
  * ------------------------------------------------------------------ */
 
-function sentenceWordTexts(sentenceEl) {
-  return Array.from(sentenceEl.querySelectorAll("span.word")).map(function (sp) {
-    return (sp.getAttribute("data-text") || sp.textContent || "").replace(
-      /\u200B/g,
-      ""
-    );
-  });
-}
-
-function sentenceLangId(sentenceEl) {
-  const sp = sentenceEl.querySelector("span.word[data-lang-id]");
-  return sp ? sp.getAttribute("data-lang-id") : "";
-}
-
-function shadowingClearMarks(sentenceEl) {
-  if (!sentenceEl) return;
-  sentenceEl.querySelectorAll("span.word").forEach(function (sp) {
-    sp.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
-  });
-}
-
-async function shadowingSubmit(blob, sentenceEl, btn) {
+async function shadowingSubmit(blob, unit) {
+  if (!unit || !unit.texts.length) return;
   shadowingBusy = true;
-  shadowingClearMarks(sentenceEl);
-  shadowingOpenPanel(
-    '<div class="shadowing-panel__state">Transcribing…</div>'
-  );
+  shadowingClearMarks(unit);
+  shadowingRenderPanelMessage("Transcribing…", false);
 
-  const words = sentenceWordTexts(sentenceEl);
   const fd = new FormData();
   fd.append("audio", blob, "shadowing." + shadowingExtForMime(blob.type));
-  fd.append("language_id", sentenceLangId(sentenceEl) || "");
-  fd.append("tokens", JSON.stringify(words));
+  fd.append("language_id", unit.langId || "");
+  fd.append("tokens", JSON.stringify(unit.texts));
   fd.append("model", shadowingGetModel());
 
   try {
@@ -597,96 +845,108 @@ async function shadowingSubmit(blob, sentenceEl, btn) {
       data = await resp.json();
     } catch (_) {}
     if (!resp.ok) {
-      shadowingRenderPanelError(
-        data.error || "Request failed (" + resp.status + ")"
+      shadowingRenderPanelMessage(
+        data.error || "Request failed (" + resp.status + ")",
+        true
       );
       return;
     }
-    shadowingApplyResults(sentenceEl, words, data);
+
+    shadowingPaintVerdicts(unit, data);
+    shadowingRenderResult(unit, data);
+
+    const rate =
+      data.tokens_per_minute != null ? data.tokens_per_minute : null;
+    shadowingHistory.unshift({
+      text: unit.fullText.slice(0, 40),
+      score: Number(data.score || 0),
+      rate: rate,
+      duration: data.duration,
+    });
+    shadowingRenderHistory();
+
+    if (shadowingActive && shadowingAuto) shadowingAutoAdvance();
   } catch (err) {
-    shadowingRenderPanelError("Network error: " + err);
+    shadowingRenderPanelMessage("Network error: " + err, true);
   } finally {
     shadowingBusy = false;
   }
 }
 
-function shadowingApplyResults(sentenceEl, wordTexts, data) {
-  if (shadowingMarkedSentence && shadowingMarkedSentence !== sentenceEl) {
-    shadowingClearMarks(shadowingMarkedSentence);
+function shadowingAutoAdvance() {
+  // Advance to the next cue and play it; the next cue-end starts the
+  // next take.  Auto-pause semantics autoplay the next cue in both
+  // engines (media: the next-cue button; tts: seekToCue with autoplay).
+  if (typeof ttsSeekToCue === "function" &&
+      document.getElementById("tts-player-container") &&
+      typeof ttsCues !== "undefined" && ttsCues.length) {
+    const next = shadowingLastCue && shadowingLastCue.source === "tts"
+      ? shadowingLastCue.index + 1
+      : -1;
+    if (next >= 0 && next < ttsCues.length) {
+      ttsSeekToCue(next, true);
+      return;
+    }
+    shadowingRenderPanelMessage("End of the text — auto stopped.", false);
+    return;
   }
-  shadowingMarkedSentence = sentenceEl;
-
-  const spans = sentenceEl.querySelectorAll("span.word");
-  const statuses = data.statuses || [];
-  for (let i = 0; i < spans.length; i++) {
-    const st = i < statuses.length ? statuses[i] : 0;
-    spans[i].classList.add(
-      st === 2 ? "shadow-ok" : st === 1 ? "shadow-fuzzy" : "shadow-miss"
-    );
+  const nextBtn = document.getElementById("yt-next-cue-btn");
+  if (nextBtn) {
+    nextBtn.click();
+    return;
   }
-  shadowingRenderResult(sentenceEl, wordTexts, data);
-}
-
-function shadowingPlayRecording() {
-  if (!shadowingRecordingBlob) return;
-  if (shadowingRecordingUrl) {
-    try {
-      URL.revokeObjectURL(shadowingRecordingUrl);
-    } catch (_) {}
-  }
-  shadowingRecordingUrl = URL.createObjectURL(shadowingRecordingBlob);
-  const audio = new Audio(shadowingRecordingUrl);
-  audio.play().catch(function () {});
-}
-
-function shadowingPlayOriginal(sentenceEl) {
-  if (!sentenceEl) return;
-  // textContent (not innerText): the clone is detached, and the
-  // paragraph's space tokens live in their own spans, so spacing
-  // survives for alphabetic languages too.
-  const clone = sentenceEl.cloneNode(true);
-  clone
-    .querySelectorAll(".lute-sentence-play-btn, .lute-shadowing-btn")
-    .forEach(function (b) {
-      b.remove();
-    });
-  const text = (clone.textContent || "")
-    .replace(/🔊/g, "")
-    .replace(/\u200B/g, "")
-    .trim();
-  if (!text || typeof speakText !== "function") return;
-  if (typeof ttsPlaying !== "undefined" && ttsPlaying && typeof ttsStop === "function") {
-    ttsStop();
-  }
-  speakText(text);
+  shadowingRenderPanelMessage("No player cues to advance to.", true);
 }
 
 /* ------------------------------------------------------------------
- * 7. Event delegation + boot
+ * 9. Panel actions
  * ------------------------------------------------------------------ */
 
-function setupShadowingDelegation() {
-  const textDiv = document.getElementById("thetext");
-  // #thetext survives htmx innerHTML swaps, so guard against re-binding.
-  if (!textDiv || textDiv.shadowingDelegation) return;
-  textDiv.shadowingDelegation = true;
-
-  textDiv.addEventListener("click", function (e) {
-    const btn = e.target.closest(".lute-shadowing-btn");
-    if (!btn) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const sentence = btn.closest(".textsentence") || btn.parentElement;
-    if (sentence) shadowingToggle(sentence, btn);
+function shadowingNav(delta) {
+  const sents = shadowingSentences().filter(function (s) {
+    return s.querySelector("span.word");
   });
+  if (!sents.length) return;
+  const anchor =
+    shadowingUnit && shadowingUnit.el
+      ? shadowingUnit.spans[0].closest(".textsentence") || shadowingUnit.el
+      : null;
+  let idx = anchor ? sents.indexOf(anchor) : -1;
+  idx = Math.max(0, Math.min(sents.length - 1, idx + delta));
+  shadowingSetUnit(shadowingUnitFromEl(sents[idx], null));
 }
 
+function shadowingListen() {
+  if (!shadowingUnit || typeof speakText !== "function") return;
+  if (
+    typeof ttsPlaying !== "undefined" &&
+    ttsPlaying &&
+    typeof ttsStop === "function"
+  ) {
+    ttsStop();
+  }
+  speakText(shadowingUnit.fullText);
+}
+
+/* ------------------------------------------------------------------
+ * 10. Boot
+ * ------------------------------------------------------------------ */
+
 function shadowingBoot() {
-  setupShadowingToggle();
-  if (document.getElementById("thetext")) {
-    if (shadowingButtonsVisible) injectShadowingButtons();
-    startShadowingObserver();
-    setupShadowingDelegation();
+  let savedAuto = null;
+  try {
+    savedAuto = localStorage.getItem(SHADOWING_AUTO_KEY);
+  } catch (_) {}
+  shadowingAuto = savedAuto === "1";
+
+  window.addEventListener("lute:cue-changed", shadowingOnCueChanged);
+  window.addEventListener("lute:cue-ended", shadowingOnCueEnded);
+
+  const btn =
+    document.getElementById("tts-shadowing-btn") ||
+    document.getElementById("yt-shadowing-btn");
+  if (btn) {
+    btn.addEventListener("click", shadowingToggleMode);
   }
 }
 

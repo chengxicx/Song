@@ -892,7 +892,6 @@ span.hamburger {
 #tap_sets_status-container,
 #tts-toggle-container,
 #tts-sentence-buttons-toggle-container,
-#shadowing-buttons-toggle-container,
 #arrow_marks_known-container,
 #tap_haptics-container {
     display: flex;
@@ -909,7 +908,6 @@ span.hamburger {
 #tap_sets_status,
 #tts-player-toggle,
 #tts-sentence-buttons-toggle,
-#shadowing-buttons-toggle,
 #arrow_marks_known,
 #tap_haptics {
     appearance: none;
@@ -928,7 +926,6 @@ span.hamburger {
 #tap_sets_status-container label,
 #tts-toggle-container label,
 #tts-sentence-buttons-toggle-container label,
-#shadowing-buttons-toggle-container label,
 #arrow_marks_known-container label,
 #tap_haptics-container label {
     font-weight: bold;
@@ -948,7 +945,6 @@ span.hamburger {
 #tap_sets_status::after,
 #tts-player-toggle::after,
 #tts-sentence-buttons-toggle::after,
-#shadowing-buttons-toggle::after,
 #arrow_marks_known::after,
 #tap_haptics::after {
     content: "";
@@ -965,7 +961,6 @@ span.hamburger {
 .tap_sets_status-active #tap_sets_status::after,
 .tts-player-active #tts-player-toggle::after,
 .tts-sentence-buttons-active #tts-sentence-buttons-toggle::after,
-.shadowing-buttons-active #shadowing-buttons-toggle::after,
 .arrow_marks_known-active #arrow_marks_known::after,
 .tap_haptics-active #tap_haptics::after {
     transform: translate(100%, 0);
@@ -976,7 +971,6 @@ span.hamburger {
 .tap_sets_status-active #tap_sets_status,
 .tts-player-active #tts-player-toggle,
 .tts-sentence-buttons-active #tts-sentence-buttons-toggle,
-.shadowing-buttons-active #shadowing-buttons-toggle,
 .arrow_marks_known-active #arrow_marks_known,
 .tap_haptics-active #tap_haptics {
     background-color: #40916c;
@@ -5011,47 +5005,11 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 }
 
 /* ==============================================================
-   Shadowing (影子跟读): per-sentence record button, underline-only
-   verdict marks (the words' learning-status background colours
-   stay untouched), and the right-pane result panel.
+   Shadowing (影子跟读): the player's "Shadow" toggle opens the
+   right-pane practice area.  Verdict marks on the reading text are
+   underline-only (the words' learning-status background colours
+   stay untouched).
    ============================================================== */
-.lute-shadowing-btn {
-    display: inline-block;
-    cursor: pointer;
-    margin-left: 3px;
-    vertical-align: middle;
-    user-select: none;
-    opacity: 0.7;
-    color: inherit;
-}
-.lute-shadowing-btn:hover {
-    opacity: 1;
-}
-.lute-shadowing-btn svg {
-    display: block;
-    width: 13px;
-    height: 13px;
-    fill: currentColor;
-}
-.lute-shadowing-btn.shadowing-recording {
-    color: #e03131;
-    opacity: 1;
-    font-size: 10px;
-    font-weight: 700;
-    animation: shadowing-pulse 1.1s ease-in-out infinite;
-}
-@keyframes shadowing-pulse {
-    50% { transform: scale(1.3); }
-}
-.lute-shadowing-btn.shadowing-busy {
-    color: var(--btn-accent, #007aff);
-    opacity: 1;
-    animation: shadowing-spin 1s linear infinite;
-}
-@keyframes shadowing-spin {
-    to { transform: rotate(360deg); }
-}
-
 /* Verdict marks on the reading text: underline / border only. */
 span.word.shadow-ok {
     border-bottom: 2px solid rgba(55, 178, 77, 0.75);
@@ -5067,7 +5025,7 @@ span.word.shadow-miss {
     text-underline-offset: 4px;
 }
 
-/* The result panel fills #read_pane_right like the grammar panel. */
+/* The practice area fills #read_pane_right like the grammar panel. */
 #read_pane_right.shadowing-mode > .wordframecontainer,
 #read_pane_right.shadowing-mode > .dictcontainer {
     display: none !important;
@@ -5101,6 +5059,22 @@ span.word.shadow-miss {
     font-size: 1.12em;
     font-weight: 700;
 }
+.shadowing-auto-btn {
+    font: inherit;
+    font-size: 0.8em;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--s-text-2);
+    background: var(--s-card);
+    border: 1px solid var(--s-rule);
+    border-radius: 999px;
+    padding: 3px 10px;
+}
+.shadowing-auto-btn.on {
+    color: #fff;
+    background: var(--btn-accent, #007aff);
+    border-color: var(--btn-accent, #007aff);
+}
 .shadowing-panel__model {
     font: inherit;
     font-size: 0.85em;
@@ -5129,18 +5103,127 @@ span.word.shadow-miss {
     padding: 12px 14px 18px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 .shadowing-panel__state {
-    padding: 26px 12px;
+    padding: 18px 12px;
     text-align: center;
     color: var(--s-text-2);
-    font-size: 0.98em;
+    font-size: 0.95em;
 }
 .shadowing-panel__error {
     color: #e03131;
 }
 
+/* The sentence under practice, large, tokens colored by verdict. */
+.shadowing-current {
+    font-size: 1.5em;
+    line-height: 1.9;
+    word-break: break-word;
+    padding: 10px 12px;
+    background: var(--s-card);
+    border: 1px solid var(--s-rule);
+    border-radius: 10px;
+    min-height: 3.2em;
+}
+.shadow-tok {
+    border-radius: 4px;
+    padding: 0 1px;
+}
+.shadow-tok.shadow-ok {
+    border-bottom: 2px solid rgba(55, 178, 77, 0.75);
+}
+.shadow-tok.shadow-fuzzy {
+    border-bottom: 2px dashed rgba(240, 140, 0, 0.85);
+}
+.shadow-tok.shadow-miss {
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: rgba(224, 49, 49, 0.8);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 5px;
+}
+.shadow-tok__heard {
+    color: var(--s-text-2);
+    font-size: 0.6em;
+    margin-left: 2px;
+}
+
+.shadowing-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+}
+.shadowing-nav-btn {
+    font: inherit;
+    cursor: pointer;
+    color: var(--font-color, #000);
+    background: var(--s-card);
+    border: 1px solid var(--s-rule);
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.shadowing-nav-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+.shadowing-nav-btn:hover {
+    border-color: var(--btn-accent, #007aff);
+    color: var(--btn-accent, #007aff);
+}
+.shadowing-rec-btn {
+    font: inherit;
+    cursor: pointer;
+    color: #fff;
+    background: #e03131;
+    border: none;
+    border-radius: 50%;
+    width: 58px;
+    height: 58px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.shadowing-rec-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+.shadowing-rec-btn:hover {
+    filter: brightness(1.08);
+}
+.shadowing-rec-btn.recording {
+    animation: shadowing-pulse 1.1s ease-in-out infinite;
+}
+.shadowing-rec-time {
+    font-size: 0.55em;
+    font-weight: 700;
+    line-height: 1;
+    min-height: 1em;
+}
+@keyframes shadowing-pulse {
+    50% { transform: scale(1.08); }
+}
+
+.shadowing-result {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.shadowing-result__hint {
+    text-align: center;
+    color: var(--s-text-2);
+    font-size: 0.92em;
+    padding: 6px 0;
+}
 .shadowing-score {
     display: flex;
     align-items: baseline;
@@ -5154,13 +5237,6 @@ span.word.shadow-miss {
     color: var(--s-text-2);
     font-size: 0.9em;
 }
-.shadowing-label {
-    font-size: 0.78em;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--s-text-2);
-}
 .shadowing-heard {
     background: var(--s-card);
     border: 1px solid var(--s-rule);
@@ -5169,59 +5245,66 @@ span.word.shadow-miss {
     line-height: 1.6;
     word-break: break-word;
 }
-.shadowing-tokens {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-.shadowing-token {
-    padding: 2px 8px;
-    border-radius: 6px;
-    background: var(--s-card);
-    border: 1px solid var(--s-rule);
-    word-break: break-word;
-}
-.shadowing-token.shadow-ok {
-    border-color: rgba(55, 178, 77, 0.6);
-}
-.shadowing-token.shadow-fuzzy {
-    border-color: rgba(240, 140, 0, 0.7);
-}
-.shadowing-token.shadow-miss {
-    border-color: rgba(224, 49, 49, 0.7);
-    text-decoration-line: underline;
-    text-decoration-style: wavy;
-    text-decoration-color: rgba(224, 49, 49, 0.6);
-    text-decoration-thickness: 1.5px;
-    text-underline-offset: 3px;
-}
-.shadowing-token__heard {
+.shadowing-heard::before {
+    content: "Heard";
+    display: block;
+    font-size: 0.72em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--s-text-2);
-    font-size: 0.85em;
-    margin-left: 3px;
+    margin-bottom: 3px;
 }
 .shadowing-extras {
     font-size: 0.92em;
     color: var(--s-text-2);
 }
-.shadowing-actions {
+.shadowing-extras__label {
+    font-size: 0.78em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-right: 4px;
+}
+
+.shadowing-history {
+    border-top: 1px solid var(--s-rule);
+    padding-top: 8px;
+}
+.shadowing-history__head {
+    font-size: 0.78em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--s-text-2);
+    margin-bottom: 6px;
+}
+.shadowing-history__empty {
+    color: var(--s-text-2);
+    font-size: 0.88em;
+    text-align: center;
+    padding: 4px 0;
+}
+.shadowing-history__row {
     display: flex;
-    flex-wrap: wrap;
+    align-items: baseline;
     gap: 8px;
-    margin-top: 4px;
+    padding: 3px 0;
+    font-size: 0.92em;
 }
-.shadowing-btn {
-    font: inherit;
-    font-size: 0.9em;
-    cursor: pointer;
-    color: var(--font-color, #000);
-    background: var(--s-card);
-    border: 1px solid var(--s-rule);
-    border-radius: 8px;
-    padding: 6px 12px;
+.shadowing-history__score {
+    font-weight: 700;
+    min-width: 3.2em;
 }
-.shadowing-btn:hover {
-    border-color: var(--btn-accent, #007aff);
-    color: var(--btn-accent, #007aff);
+.shadowing-history__text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
+.shadowing-history__rate {
+    color: var(--s-text-2);
+    font-size: 0.88em;
+}
+
 
