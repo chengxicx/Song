@@ -22,18 +22,15 @@
   "examples": [
    {
     "japanese": "誰もいないようだ。",
-    "english": "It seems nobody is here.",
-    "source": "original"
+    "english": "It seems nobody is here."
    },
    {
     "japanese": "彼は疲れているようだった。",
-    "english": "He appeared to be tired.",
-    "source": "original"
+    "english": "He appeared to be tired."
    },
    {
     "japanese": "この部屋は事務所のようだ。",
-    "english": "This room is like an office.",
-    "source": "original"
+    "english": "This room is like an office."
    }
   ],
   "review_status": "draft",
@@ -62,18 +59,15 @@
   "examples": [
    {
     "japanese": "彼は日本人みたいだ。",
-    "english": "He seems like a Japanese person.",
-    "source": "original"
+    "english": "He seems like a Japanese person."
    },
    {
     "japanese": "雨が降るみたいですよ。",
-    "english": "It looks like it's going to rain.",
-    "source": "original"
+    "english": "It looks like it's going to rain."
    },
    {
     "japanese": "子供みたいに笑った。",
-    "english": "I laughed like a child.",
-    "source": "original"
+    "english": "I laughed like a child."
    }
   ],
   "review_status": "draft",
@@ -103,18 +97,15 @@
   "examples": [
    {
     "japanese": "彼は来ないらしい。",
-    "english": "Apparently he's not coming.",
-    "source": "original"
+    "english": "Apparently he's not coming."
    },
    {
     "japanese": "彼女は学生らしく真面目だ。",
-    "english": "She's as diligent as you'd expect of a student.",
-    "source": "original"
+    "english": "She's as diligent as you'd expect of a student."
    },
    {
     "japanese": "今日は春らしい天気だ。",
-    "english": "Today's weather is typical of spring.",
-    "source": "original"
+    "english": "Today's weather is typical of spring."
    }
   ],
   "review_status": "draft",
@@ -145,18 +136,15 @@
   "examples": [
    {
     "japanese": "明日のためにビールを買っておきました。",
-    "english": "I bought beer in advance for tomorrow.",
-    "source": "original"
+    "english": "I bought beer in advance for tomorrow."
    },
    {
     "japanese": "窓を開けておいてください。",
-    "english": "Please leave the window open.",
-    "source": "original"
+    "english": "Please leave the window open."
    },
    {
     "japanese": "名前を覚えておいてね。",
-    "english": "Remember the name, OK?",
-    "source": "original"
+    "english": "Remember the name, OK?"
    }
   ],
   "review_status": "draft",
@@ -186,18 +174,15 @@
   "examples": [
    {
     "japanese": "宿題を全部やってしまいました。",
-    "english": "I finished all my homework.",
-    "source": "original"
+    "english": "I finished all my homework."
    },
    {
     "japanese": "電車の中で寝てしまった。",
-    "english": "I ended up falling asleep on the train.",
-    "source": "original"
+    "english": "I ended up falling asleep on the train."
    },
    {
     "japanese": "ケーキを全部食べちゃった。",
-    "english": "I went and ate the whole cake.",
-    "source": "original"
+    "english": "I went and ate the whole cake."
    }
   ],
   "review_status": "draft",
@@ -227,18 +212,15 @@
   "examples": [
    {
     "japanese": "ドアが開けてあります。",
-    "english": "The door has been opened (and is still open).",
-    "source": "original"
+    "english": "The door has been opened (and is still open)."
    },
    {
     "japanese": "黒板に名前が書いてある。",
-    "english": "A name is written on the blackboard.",
-    "source": "original"
+    "english": "A name is written on the blackboard."
    },
    {
     "japanese": "明日のパーティーの準備がしてある。",
-    "english": "Preparations for tomorrow's party have been made.",
-    "source": "original"
+    "english": "Preparations for tomorrow's party have been made."
    }
   ],
   "review_status": "draft",
@@ -268,18 +250,15 @@
   "examples": [
    {
     "japanese": "新しい料理を作ってみた。",
-    "english": "I tried making a new dish.",
-    "source": "original"
+    "english": "I tried making a new dish."
    },
    {
     "japanese": "このくつを履いてみてもいいですか。",
-    "english": "May I try on these shoes?",
-    "source": "original"
+    "english": "May I try on these shoes?"
    },
    {
     "japanese": "一度日本に行ってみたい。",
-    "english": "I want to try going to Japan once.",
-    "source": "original"
+    "english": "I want to try going to Japan once."
    }
   ],
   "review_status": "draft",
@@ -308,18 +287,15 @@
   "examples": [
    {
     "japanese": "子供たちは元気に学校へ走っていった。",
-    "english": "The children ran off to school full of energy.",
-    "source": "original"
+    "english": "The children ran off to school full of energy."
    },
    {
     "japanese": "季節が変わっていく。",
-    "english": "The seasons are changing (progressively).",
-    "source": "original"
+    "english": "The seasons are changing (progressively)."
    },
    {
     "japanese": "これからも日本語を勉強していきます。",
-    "english": "I will continue studying Japanese from now on.",
-    "source": "original"
+    "english": "I will continue studying Japanese from now on."
    }
   ],
   "review_status": "draft",
@@ -348,18 +324,15 @@
   "examples": [
    {
     "japanese": "彼が駅から走ってきた。",
-    "english": "He came running from the station.",
-    "source": "original"
+    "english": "He came running from the station."
    },
    {
     "japanese": "だんだん暖かくなってきました。",
-    "english": "It has been gradually warming up.",
-    "source": "original"
+    "english": "It has been gradually warming up."
    },
    {
     "japanese": "ちょっとパンを買ってきます。",
-    "english": "I'll go get some bread (and come back).",
-    "source": "original"
+    "english": "I'll go get some bread (and come back)."
    }
   ],
   "review_status": "draft",
@@ -389,18 +362,15 @@
   "examples": [
    {
     "japanese": "音楽を聞きながら勉強します。",
-    "english": "I study while listening to music.",
-    "source": "original"
+    "english": "I study while listening to music."
    },
    {
     "japanese": "歩きながら話した。",
-    "english": "We talked while walking.",
-    "source": "original"
+    "english": "We talked while walking."
    },
    {
     "japanese": "テレビを見ながら食事するのは良くない。",
-    "english": "It's not good to eat while watching TV.",
-    "source": "original"
+    "english": "It's not good to eat while watching TV."
    }
   ],
   "review_status": "draft",
@@ -430,18 +400,15 @@
   "examples": [
    {
     "japanese": "若いうちに色々なことを経験しなさい。",
-    "english": "Experience many things while you're young.",
-    "source": "original"
+    "english": "Experience many things while you're young."
    },
    {
     "japanese": "雨が降らないうちに帰りましょう。",
-    "english": "Let's go home before it rains.",
-    "source": "original"
+    "english": "Let's go home before it rains."
    },
    {
     "japanese": "忘れないうちにメモしておく。",
-    "english": "I'll make a note before I forget.",
-    "source": "original"
+    "english": "I'll make a note before I forget."
    }
   ],
   "review_status": "draft",
@@ -470,18 +437,15 @@
   "examples": [
    {
     "japanese": "私が留守の間に誰か来ましたか。",
-    "english": "Did someone come while I was out?",
-    "source": "original"
+    "english": "Did someone come while I was out?"
    },
    {
     "japanese": "夏休みの間、ずっと旅行していました。",
-    "english": "I was traveling the whole time during summer vacation.",
-    "source": "original"
+    "english": "I was traveling the whole time during summer vacation."
    },
    {
     "japanese": "母が料理している間に、宿題をした。",
-    "english": "While my mother was cooking, I did my homework.",
-    "source": "original"
+    "english": "While my mother was cooking, I did my homework."
    }
   ],
   "review_status": "draft",
@@ -511,18 +475,15 @@
   "examples": [
    {
     "japanese": "日本に来たばかりです。",
-    "english": "I just came to Japan (recently).",
-    "source": "original"
+    "english": "I just came to Japan (recently)."
    },
    {
     "japanese": "さっき食べたばかりだから、お腹がいっぱいだ。",
-    "english": "I just ate, so I'm full.",
-    "source": "original"
+    "english": "I just ate, so I'm full."
    },
    {
     "japanese": "彼はこの会社に入ったばかりだ。",
-    "english": "He just joined this company.",
-    "source": "original"
+    "english": "He just joined this company."
    }
   ],
   "review_status": "draft",
@@ -552,18 +513,15 @@
   "examples": [
    {
     "japanese": "今、駅に着いたところです。",
-    "english": "I just arrived at the station (right now).",
-    "source": "original"
+    "english": "I just arrived at the station (right now)."
    },
    {
     "japanese": "ちょうどご飯を食べているところです。",
-    "english": "I'm in the middle of eating right now.",
-    "source": "original"
+    "english": "I'm in the middle of eating right now."
    },
    {
     "japanese": "今から出かけるところだ。",
-    "english": "I'm just about to go out.",
-    "source": "original"
+    "english": "I'm just about to go out."
    }
   ],
   "review_status": "draft",
@@ -594,18 +552,15 @@
   "examples": [
    {
     "japanese": "健康のために毎日運動します。",
-    "english": "I exercise every day for my health.",
-    "source": "original"
+    "english": "I exercise every day for my health."
    },
    {
     "japanese": "大学に入るために一生懸命勉強した。",
-    "english": "I studied hard in order to get into university.",
-    "source": "original"
+    "english": "I studied hard in order to get into university."
    },
    {
     "japanese": "台風のために学校が休みになった。",
-    "english": "Because of the typhoon, school was canceled.",
-    "source": "original"
+    "english": "Because of the typhoon, school was canceled."
    }
   ],
   "review_status": "draft",
@@ -635,18 +590,15 @@
   "examples": [
    {
     "japanese": "よく聞こえるように大きい声で話してください。",
-    "english": "Please speak loudly so (we) can hear well.",
-    "source": "original"
+    "english": "Please speak loudly so (we) can hear well."
    },
    {
     "japanese": "忘れないようにメモしておく。",
-    "english": "I'll make a note so I don't forget.",
-    "source": "original"
+    "english": "I'll make a note so I don't forget."
    },
    {
     "japanese": "日本語が話せるように毎日練習している。",
-    "english": "I practice every day so I can speak Japanese.",
-    "source": "original"
+    "english": "I practice every day so I can speak Japanese."
    }
   ],
   "review_status": "draft",
@@ -676,18 +628,15 @@
   "examples": [
    {
     "japanese": "一生懸命勉強したのに、試験に落ちてしまった。",
-    "english": "I studied hard, yet I failed the exam.",
-    "source": "original"
+    "english": "I studied hard, yet I failed the exam."
    },
    {
     "japanese": "彼は医者なのに健康に気をつけない。",
-    "english": "He's a doctor, yet he doesn't take care of his health.",
-    "source": "original"
+    "english": "He's a doctor, yet he doesn't take care of his health."
    },
    {
     "japanese": "雨なのに出かけた。",
-    "english": "I went out even though it was raining.",
-    "source": "original"
+    "english": "I went out even though it was raining."
    }
   ],
   "review_status": "draft",
@@ -722,18 +671,15 @@
   "examples": [
    {
     "japanese": "あなたのおかげで合格できました。",
-    "english": "Thanks to you, I was able to pass.",
-    "source": "original"
+    "english": "Thanks to you, I was able to pass."
    },
    {
     "japanese": "彼のせいで試合に負けた。",
-    "english": "We lost the match because of him.",
-    "source": "original"
+    "english": "We lost the match because of him."
    },
    {
     "japanese": "雨のせいで遅れました。",
-    "english": "I was late because of the rain.",
-    "source": "original"
+    "english": "I was late because of the rain."
    }
   ],
   "review_status": "draft",
@@ -763,18 +709,15 @@
   "examples": [
    {
     "japanese": "息子はゲームばかりしている。",
-    "english": "My son does nothing but play video games.",
-    "source": "original"
+    "english": "My son does nothing but play video games."
    },
    {
     "japanese": "泣いてばかりいないで、何か食べなさい。",
-    "english": "Stop just crying and eat something.",
-    "source": "original"
+    "english": "Stop just crying and eat something."
    },
    {
     "japanese": "物価は上がるばかりだ。",
-    "english": "Prices just keep going up.",
-    "source": "original"
+    "english": "Prices just keep going up."
    }
   ],
   "review_status": "draft",
@@ -804,18 +747,15 @@
   "examples": [
    {
     "japanese": "読みかけの本が机の上にある。",
-    "english": "There's a book I haven't finished on the desk.",
-    "source": "original"
+    "english": "There's a book I haven't finished on the desk."
    },
    {
     "japanese": "ケーキを食べかけたところで電話が鳴った。",
-    "english": "Just as I started eating the cake, the phone rang.",
-    "source": "original"
+    "english": "Just as I started eating the cake, the phone rang."
    },
    {
     "japanese": "彼は何か言いかけてやめた。",
-    "english": "He started to say something but stopped.",
-    "source": "original"
+    "english": "He started to say something but stopped."
    }
   ],
   "review_status": "draft",
@@ -845,18 +785,15 @@
   "examples": [
    {
     "japanese": "今日は死ぬほど疲れた。",
-    "english": "I'm dead tired today.",
-    "source": "original"
+    "english": "I'm dead tired today."
    },
    {
     "japanese": "東京は大阪ほど暑くない。",
-    "english": "Tokyo isn't as hot as Osaka.",
-    "source": "original"
+    "english": "Tokyo isn't as hot as Osaka."
    },
    {
     "japanese": "彼ほど日本語が上手な外国人は少ない。",
-    "english": "There are few foreigners as good at Japanese as him.",
-    "source": "original"
+    "english": "There are few foreigners as good at Japanese as him."
    }
   ],
   "review_status": "draft",
@@ -885,18 +822,15 @@
   "examples": [
    {
     "japanese": "駅まで歩いて20分くらいかかります。",
-    "english": "It takes about 20 minutes to walk to the station.",
-    "source": "original"
+    "english": "It takes about 20 minutes to walk to the station."
    },
    {
     "japanese": "泣きたいくらい嬉しかった。",
-    "english": "I was so happy I could have cried.",
-    "source": "original"
+    "english": "I was so happy I could have cried."
    },
    {
     "japanese": "それくらい自分でやってください。",
-    "english": "At least do that much yourself.",
-    "source": "original"
+    "english": "At least do that much yourself."
    }
   ],
   "review_status": "draft",
@@ -926,18 +860,15 @@
   "examples": [
    {
     "japanese": "日本語を勉強することは楽しいです。",
-    "english": "Studying Japanese is fun.",
-    "source": "original"
+    "english": "Studying Japanese is fun."
    },
    {
     "japanese": "彼が来ないことを知らなかった。",
-    "english": "I didn't know that he wasn't coming.",
-    "source": "original"
+    "english": "I didn't know that he wasn't coming."
    },
    {
     "japanese": "早く起きることは大切だ。",
-    "english": "Rising early is important.",
-    "source": "original"
+    "english": "Rising early is important."
    }
   ],
   "review_status": "draft",
@@ -966,18 +897,15 @@
   "examples": [
    {
     "japanese": "彼が走るのを見た。",
-    "english": "I saw him running.",
-    "source": "original"
+    "english": "I saw him running."
    },
    {
     "japanese": "雨が降っているのが聞こえる。",
-    "english": "I can hear the rain falling.",
-    "source": "original"
+    "english": "I can hear the rain falling."
    },
    {
     "japanese": "絵を描くのが好きです。",
-    "english": "I like drawing pictures.",
-    "source": "original"
+    "english": "I like drawing pictures."
    }
   ],
   "review_status": "draft",
@@ -1005,18 +933,15 @@
   "examples": [
    {
     "japanese": "彼に会うたびに、昔を思い出す。",
-    "english": "Every time I see him, I remember the past.",
-    "source": "original"
+    "english": "Every time I see him, I remember the past."
    },
    {
     "japanese": "旅行のたびに写真を撮る。",
-    "english": "I take photos every time I travel.",
-    "source": "original"
+    "english": "I take photos every time I travel."
    },
    {
     "japanese": "この曲を聞くたびに泣きたくなる。",
-    "english": "Every time I hear this song I want to cry.",
-    "source": "original"
+    "english": "Every time I hear this song I want to cry."
    }
   ],
   "review_status": "draft",
@@ -1046,18 +971,15 @@
   "examples": [
    {
     "japanese": "彼が来るかどうか分からない。",
-    "english": "I don't know whether he'll come or not.",
-    "source": "original"
+    "english": "I don't know whether he'll come or not."
    },
    {
     "japanese": "この答えが正しいかどうか確認してください。",
-    "english": "Please check whether this answer is correct.",
-    "source": "original"
+    "english": "Please check whether this answer is correct."
    },
    {
     "japanese": "学生かどうかは関係ない。",
-    "english": "Whether (you're) a student or not doesn't matter.",
-    "source": "original"
+    "english": "Whether (you're) a student or not doesn't matter."
    }
   ],
   "review_status": "draft",
@@ -1086,18 +1008,15 @@
   "examples": [
    {
     "japanese": "日本の文化について勉強しています。",
-    "english": "I'm studying Japanese culture.",
-    "source": "original"
+    "english": "I'm studying Japanese culture."
    },
    {
     "japanese": "その問題について話し合った。",
-    "english": "We discussed that problem.",
-    "source": "original"
+    "english": "We discussed that problem."
    },
    {
     "japanese": "環境問題についての本を読んだ。",
-    "english": "I read a book about environmental issues.",
-    "source": "original"
+    "english": "I read a book about environmental issues."
    }
   ],
   "review_status": "draft",
@@ -1126,18 +1045,15 @@
   "examples": [
    {
     "japanese": "家族は私にとって一番大切な存在です。",
-    "english": "Family is the most important thing to me.",
-    "source": "original"
+    "english": "Family is the most important thing to me."
    },
    {
     "japanese": "この本は学生にとって必要だ。",
-    "english": "This book is necessary for students.",
-    "source": "original"
+    "english": "This book is necessary for students."
    },
    {
     "japanese": "彼女にとって日本は第二の故郷だ。",
-    "english": "For her, Japan is a second home.",
-    "source": "original"
+    "english": "For her, Japan is a second home."
    }
   ],
   "review_status": "draft",
@@ -1167,18 +1083,15 @@
   "examples": [
    {
     "japanese": "意見は人によって違う。",
-    "english": "Opinions differ depending on the person.",
-    "source": "original"
+    "english": "Opinions differ depending on the person."
    },
    {
     "japanese": "この問題は話し合いによって解決した。",
-    "english": "We resolved this problem through discussion.",
-    "source": "original"
+    "english": "We resolved this problem through discussion."
    },
    {
     "japanese": "この絵はピカソによって描かれた。",
-    "english": "This painting was painted by Picasso.",
-    "source": "original"
+    "english": "This painting was painted by Picasso."
    }
   ],
   "review_status": "draft",
@@ -1207,18 +1120,15 @@
   "examples": [
    {
     "japanese": "学生は勉強すべきだ。",
-    "english": "Students should study.",
-    "source": "original"
+    "english": "Students should study."
    },
    {
     "japanese": "約束は守るべきだ。",
-    "english": "You should keep your promises.",
-    "source": "original"
+    "english": "You should keep your promises."
    },
    {
     "japanese": "そんなことを言うべきではない。",
-    "english": "You shouldn't say things like that.",
-    "source": "original"
+    "english": "You shouldn't say things like that."
    }
   ],
   "review_status": "draft",
@@ -1248,18 +1158,15 @@
   "examples": [
    {
     "japanese": "早く寝たほうがいいよ。",
-    "english": "You'd better go to bed early.",
-    "source": "original"
+    "english": "You'd better go to bed early."
    },
    {
     "japanese": "医者に行ったほうがいいです。",
-    "english": "You should go to the doctor.",
-    "source": "original"
+    "english": "You should go to the doctor."
    },
    {
     "japanese": "あんまり食べないほうがいい。",
-    "english": "You'd better not eat too much.",
-    "source": "original"
+    "english": "You'd better not eat too much."
    }
   ],
   "review_status": "draft",
@@ -1288,18 +1195,15 @@
   "examples": [
    {
     "japanese": "もう帰らなきゃ。",
-    "english": "I have to go home now.",
-    "source": "original"
+    "english": "I have to go home now."
    },
    {
     "japanese": "明日までに宿題をやらなくちゃ。",
-    "english": "I have to do my homework by tomorrow.",
-    "source": "original"
+    "english": "I have to do my homework by tomorrow."
    },
    {
     "japanese": "早く起きなきゃいけない。",
-    "english": "I have to get up early.",
-    "source": "original"
+    "english": "I have to get up early."
    }
   ],
   "review_status": "draft",
@@ -1329,18 +1233,15 @@
   "examples": [
    {
     "japanese": "もっと勉強すればよかった。",
-    "english": "I should have studied more.",
-    "source": "original"
+    "english": "I should have studied more."
    },
    {
     "japanese": "あの時買っておけばよかった。",
-    "english": "I should have bought it then.",
-    "source": "original"
+    "english": "I should have bought it then."
    },
    {
     "japanese": "そんなこと、言わなければよかった。",
-    "english": "I shouldn't have said such a thing.",
-    "source": "original"
+    "english": "I shouldn't have said such a thing."
    }
   ],
   "review_status": "draft",
@@ -1369,18 +1270,15 @@
   "examples": [
    {
     "japanese": "日本語は勉強すればするほど面白くなる。",
-    "english": "The more you study Japanese, the more interesting it gets.",
-    "source": "original"
+    "english": "The more you study Japanese, the more interesting it gets."
    },
    {
     "japanese": "この本は読めば読むほど理解できる。",
-    "english": "The more you read this book, the more you understand.",
-    "source": "original"
+    "english": "The more you read this book, the more you understand."
    },
    {
     "japanese": "値段が高ければ高いほど、品質もいい。",
-    "english": "The higher the price, the better the quality.",
-    "source": "original"
+    "english": "The higher the price, the better the quality."
    }
   ],
   "review_status": "draft",
@@ -1409,18 +1307,15 @@
   "examples": [
    {
     "japanese": "私は母に野菜を食べさせられた。",
-    "english": "I was made to eat vegetables by my mother.",
-    "source": "original"
+    "english": "I was made to eat vegetables by my mother."
    },
    {
     "japanese": "先生に1時間待たされた。",
-    "english": "I was made to wait for an hour by the teacher.",
-    "source": "original"
+    "english": "I was made to wait for an hour by the teacher."
    },
    {
     "japanese": "毎日宿題をさせられる。",
-    "english": "I'm made to do homework every day.",
-    "source": "original"
+    "english": "I'm made to do homework every day."
    }
   ],
   "review_status": "draft",
@@ -1449,18 +1344,15 @@
   "examples": [
    {
     "japanese": "電気をつけたまま寝てしまった。",
-    "english": "I fell asleep with the light still on.",
-    "source": "original"
+    "english": "I fell asleep with the light still on."
    },
    {
     "japanese": "昔のままの町。",
-    "english": "A town still the way it used to be.",
-    "source": "original"
+    "english": "A town still the way it used to be."
    },
    {
     "japanese": "そのままにしておいてください。",
-    "english": "Please leave it as is.",
-    "source": "original"
+    "english": "Please leave it as is."
    }
   ],
   "review_status": "draft",
@@ -1489,18 +1381,15 @@
   "examples": [
    {
     "japanese": "朝ごはんを食べずに学校へ行った。",
-    "english": "I went to school without eating breakfast.",
-    "source": "original"
+    "english": "I went to school without eating breakfast."
    },
    {
     "japanese": "辞書を使わずに文章を書いた。",
-    "english": "I wrote the passage without using a dictionary.",
-    "source": "original"
+    "english": "I wrote the passage without using a dictionary."
    },
    {
     "japanese": "何も言わずに去っていった。",
-    "english": "He left without saying anything.",
-    "source": "original"
+    "english": "He left without saying anything."
    }
   ],
   "review_status": "draft",
@@ -1530,18 +1419,15 @@
   "examples": [
    {
     "japanese": "子供は甘いものを食べたがる。",
-    "english": "Children want to eat sweet things.",
-    "source": "original"
+    "english": "Children want to eat sweet things."
    },
    {
     "japanese": "彼は行きたがっているようだ。",
-    "english": "It seems he wants to go.",
-    "source": "original"
+    "english": "It seems he wants to go."
    },
    {
     "japanese": "妹は新しい服を買いたがっている。",
-    "english": "My little sister wants to buy new clothes.",
-    "source": "original"
+    "english": "My little sister wants to buy new clothes."
    }
   ],
   "review_status": "draft",
@@ -1571,18 +1457,15 @@
   "examples": [
    {
     "japanese": "子供さえ知っている。",
-    "english": "Even a child knows.",
-    "source": "original"
+    "english": "Even a child knows."
    },
    {
     "japanese": "お金さえあれば、買えるのに。",
-    "english": "If only I had money, I could buy it.",
-    "source": "original"
+    "english": "If only I had money, I could buy it."
    },
    {
     "japanese": "彼は名前さえ書けなかった。",
-    "english": "He couldn't even write his name.",
-    "source": "original"
+    "english": "He couldn't even write his name."
    }
   ],
   "review_status": "draft",
@@ -1611,18 +1494,15 @@
   "examples": [
    {
     "japanese": "今度こそ合格する。",
-    "english": "This time for sure, I'll pass.",
-    "source": "original"
+    "english": "This time for sure, I'll pass."
    },
    {
     "japanese": "こちらこそ、ありがとうございます。",
-    "english": "No, thank YOU.",
-    "source": "original"
+    "english": "No, thank YOU."
    },
    {
     "japanese": "あなただからこそ、話せる。",
-    "english": "It's precisely because it's you that I can talk about it.",
-    "source": "original"
+    "english": "It's precisely because it's you that I can talk about it."
    }
   ],
   "review_status": "draft",
@@ -1652,18 +1532,15 @@
   "examples": [
    {
     "japanese": "ドアを開けたとたん、猫が飛び出した。",
-    "english": "The moment I opened the door, the cat jumped out.",
-    "source": "original"
+    "english": "The moment I opened the door, the cat jumped out."
    },
    {
     "japanese": "家に着いたとたんに、雨が降り始めた。",
-    "english": "Just as I got home, it started raining.",
-    "source": "original"
+    "english": "Just as I got home, it started raining."
    },
    {
     "japanese": "彼の顔を見たとたん、昔を思い出した。",
-    "english": "The moment I saw his face, I remembered the past.",
-    "source": "original"
+    "english": "The moment I saw his face, I remembered the past."
    }
   ],
   "review_status": "draft",
@@ -1692,18 +1569,15 @@
   "examples": [
    {
     "japanese": "結果次第で、計画を変える。",
-    "english": "Depending on the result, I'll change the plan.",
-    "source": "original"
+    "english": "Depending on the result, I'll change the plan."
    },
    {
     "japanese": "着き次第、電話します。",
-    "english": "I'll call as soon as I arrive.",
-    "source": "original"
+    "english": "I'll call as soon as I arrive."
    },
    {
     "japanese": "天気次第では、中止になるかもしれない。",
-    "english": "Depending on the weather, it may be canceled.",
-    "source": "original"
+    "english": "Depending on the weather, it may be canceled."
    }
   ],
   "review_status": "draft",
@@ -1733,18 +1607,15 @@
   "examples": [
    {
     "japanese": "生きている限り、希望はある。",
-    "english": "As long as you're alive, there's hope.",
-    "source": "original"
+    "english": "As long as you're alive, there's hope."
    },
    {
     "japanese": "知っている限り、教えてあげる。",
-    "english": "I'll tell you as much as I know.",
-    "source": "original"
+    "english": "I'll tell you as much as I know."
    },
    {
     "japanese": "努力しない限り、成功できない。",
-    "english": "Unless you make an effort, you can't succeed.",
-    "source": "original"
+    "english": "Unless you make an effort, you can't succeed."
    }
   ],
   "review_status": "draft",
@@ -1773,18 +1644,15 @@
   "examples": [
    {
     "japanese": "子供は泥だらけになって帰ってきた。",
-    "english": "The child came home covered in mud.",
-    "source": "original"
+    "english": "The child came home covered in mud."
    },
    {
     "japanese": "このレポートは間違いだらけだ。",
-    "english": "This report is full of mistakes.",
-    "source": "original"
+    "english": "This report is full of mistakes."
    },
    {
     "japanese": "部屋はほこりだらけだった。",
-    "english": "The room was covered with dust.",
-    "source": "original"
+    "english": "The room was covered with dust."
    }
   ],
   "review_status": "draft",
@@ -1813,18 +1681,15 @@
   "examples": [
    {
     "japanese": "寝たふりをした。",
-    "english": "I pretended to be asleep.",
-    "source": "original"
+    "english": "I pretended to be asleep."
    },
    {
     "japanese": "分からないふりをしないで。",
-    "english": "Don't pretend you don't understand.",
-    "source": "original"
+    "english": "Don't pretend you don't understand."
    },
    {
     "japanese": "元気なふりをしていた。",
-    "english": "He was pretending to be well.",
-    "source": "original"
+    "english": "He was pretending to be well."
    }
   ],
   "review_status": "draft",
@@ -1853,18 +1718,15 @@
   "examples": [
    {
     "japanese": "子供のくせに、大人のような口をきく。",
-    "english": "Despite being a child, he talks like an adult.",
-    "source": "original"
+    "english": "Despite being a child, he talks like an adult."
    },
    {
     "japanese": "知らないくせに、知っているふりをする。",
-    "english": "He pretends to know despite not knowing.",
-    "source": "original"
+    "english": "He pretends to know despite not knowing."
    },
    {
     "japanese": "男のくせに泣くな。",
-    "english": "Don't cry — you're a man.",
-    "source": "original"
+    "english": "Don't cry — you're a man."
    }
   ],
   "review_status": "draft",
@@ -1893,18 +1755,15 @@
   "examples": [
    {
     "japanese": "雪が降っているから、寒いわけだ。",
-    "english": "No wonder it's cold — it's snowing.",
-    "source": "original"
+    "english": "No wonder it's cold — it's snowing."
    },
    {
     "japanese": "5時間も勉強した。だから、合格したわけだ。",
-    "english": "I studied for 5 hours. So that's why I passed.",
-    "source": "original"
+    "english": "I studied for 5 hours. So that's why I passed."
    },
    {
     "japanese": "彼女はイギリス人だ。だから、英語が上手なわけだ。",
-    "english": "She's British. No wonder her English is good.",
-    "source": "original"
+    "english": "She's British. No wonder her English is good."
    }
   ],
   "review_status": "draft",
@@ -1934,18 +1793,15 @@
   "examples": [
    {
     "japanese": "嫌いなわけじゃないけど、今日は食べたくない。",
-    "english": "It's not that I dislike it, I just don't feel like eating it today.",
-    "source": "original"
+    "english": "It's not that I dislike it, I just don't feel like eating it today."
    },
    {
     "japanese": "毎日忙しいわけではない。",
-    "english": "I'm not necessarily busy every day.",
-    "source": "original"
+    "english": "I'm not necessarily busy every day."
    },
    {
     "japanese": "日本語が話せないわけじゃない。",
-    "english": "It's not that I can't speak Japanese.",
-    "source": "original"
+    "english": "It's not that I can't speak Japanese."
    }
   ],
   "review_status": "draft",
@@ -1974,18 +1830,15 @@
   "examples": [
    {
     "japanese": "電話番号が分からないから、連絡のしようがない。",
-    "english": "I don't know his number, so there's no way to contact him.",
-    "source": "original"
+    "english": "I don't know his number, so there's no way to contact him."
    },
    {
     "japanese": "この気持ちは言いようがない。",
-    "english": "There's no way to describe this feeling.",
-    "source": "original"
+    "english": "There's no way to describe this feeling."
    },
    {
     "japanese": "壊れてしまって、直しようがない。",
-    "english": "It's broken and there's no way to fix it.",
-    "source": "original"
+    "english": "It's broken and there's no way to fix it."
    }
   ],
   "review_status": "draft",
@@ -2015,18 +1868,15 @@
   "examples": [
    {
     "japanese": "電気をつけっぱなしで出かけた。",
-    "english": "I went out with the light left on.",
-    "source": "original"
+    "english": "I went out with the light left on."
    },
    {
     "japanese": "電車の中で立ちっぱなしだった。",
-    "english": "I stood the whole time on the train.",
-    "source": "original"
+    "english": "I stood the whole time on the train."
    },
    {
     "japanese": "一日中話しっぱなしで疲れた。",
-    "english": "I was talking non-stop all day and got tired.",
-    "source": "original"
+    "english": "I was talking non-stop all day and got tired."
    }
   ],
   "review_status": "draft",
@@ -2056,18 +1906,15 @@
   "examples": [
    {
     "japanese": "失敗するにしても、挑戦するべきだ。",
-    "english": "Even if you fail, you should try.",
-    "source": "original"
+    "english": "Even if you fail, you should try."
    },
    {
     "japanese": "どちらにしても、結果は同じだ。",
-    "english": "Either way, the result is the same.",
-    "source": "original"
+    "english": "Either way, the result is the same."
    },
    {
     "japanese": "子供にしても、それくらい分かる。",
-    "english": "Even a child can understand that much.",
-    "source": "original"
+    "english": "Even a child can understand that much."
    }
   ],
   "review_status": "draft",
@@ -2096,18 +1943,15 @@
   "examples": [
    {
     "japanese": "高いものがいいとは限らない。",
-    "english": "Expensive things are not necessarily good.",
-    "source": "original"
+    "english": "Expensive things are not necessarily good."
    },
    {
     "japanese": "日本人全員がお寿司が好きだとは限らない。",
-    "english": "Not all Japanese people like sushi.",
-    "source": "original"
+    "english": "Not all Japanese people like sushi."
    },
    {
     "japanese": "勉強すれば必ず成功するとは限らない。",
-    "english": "Studying doesn't necessarily guarantee success.",
-    "source": "original"
+    "english": "Studying doesn't necessarily guarantee success."
    }
   ],
   "review_status": "draft",
@@ -2136,18 +1980,15 @@
   "examples": [
    {
     "japanese": "行けないことはないけど、あまり行きたくない。",
-    "english": "It's not that I can't go, but I don't really want to.",
-    "source": "original"
+    "english": "It's not that I can't go, but I don't really want to."
    },
    {
     "japanese": "食べられないことはない。",
-    "english": "It's not that I can't eat it.",
-    "source": "original"
+    "english": "It's not that I can't eat it."
    },
    {
     "japanese": "忙しくないことはないが、なんとかなる。",
-    "english": "It's not that I'm not busy, but I'll manage.",
-    "source": "original"
+    "english": "It's not that I'm not busy, but I'll manage."
    }
   ],
   "review_status": "draft",
@@ -2176,18 +2017,15 @@
   "examples": [
    {
     "japanese": "日本に来て以来、毎日日本語を勉強している。",
-    "english": "Ever since I came to Japan, I've been studying Japanese every day.",
-    "source": "original"
+    "english": "Ever since I came to Japan, I've been studying Japanese every day."
    },
    {
     "japanese": "卒業以来、彼に会っていない。",
-    "english": "I haven't seen him since graduation.",
-    "source": "original"
+    "english": "I haven't seen him since graduation."
    },
    {
     "japanese": "あの事件以来、彼は人を信じられなくなった。",
-    "english": "Ever since that incident, he hasn't been able to trust people.",
-    "source": "original"
+    "english": "Ever since that incident, he hasn't been able to trust people."
    }
   ],
   "review_status": "draft",
@@ -2217,18 +2055,15 @@
   "examples": [
    {
     "japanese": "親に対して、失礼な態度を取ってはいけない。",
-    "english": "You mustn't take a disrespectful attitude toward your parents.",
-    "source": "original"
+    "english": "You mustn't take a disrespectful attitude toward your parents."
    },
    {
     "japanese": "兄が静かなのに対して、弟はにぎやかだ。",
-    "english": "Whereas the older brother is quiet, the younger one is lively.",
-    "source": "original"
+    "english": "Whereas the older brother is quiet, the younger one is lively."
    },
    {
     "japanese": "質問に対して丁寧に答えた。",
-    "english": "He answered the questions politely.",
-    "source": "original"
+    "english": "He answered the questions politely."
    }
   ],
   "review_status": "draft",
@@ -2257,18 +2092,15 @@
   "examples": [
    {
     "japanese": "この問題に関して、意見がありますか。",
-    "english": "Do you have any opinions regarding this issue?",
-    "source": "original"
+    "english": "Do you have any opinions regarding this issue?"
    },
    {
     "japanese": "環境問題に関する本を読んだ。",
-    "english": "I read a book on environmental issues.",
-    "source": "original"
+    "english": "I read a book on environmental issues."
    },
    {
     "japanese": "契約に関しては、後ほどご連絡いたします。",
-    "english": "Regarding the contract, I will contact you later.",
-    "source": "original"
+    "english": "Regarding the contract, I will contact you later."
    }
   ],
   "review_status": "draft",
@@ -2297,18 +2129,15 @@
   "examples": [
    {
     "japanese": "社長にかわって、私がご挨拶いたします。",
-    "english": "On behalf of the president, I will give the greeting.",
-    "source": "original"
+    "english": "On behalf of the president, I will give the greeting."
    },
    {
     "japanese": "父にかわって、弟を迎えに行った。",
-    "english": "I went to pick up my little brother on behalf of my father.",
-    "source": "original"
+    "english": "I went to pick up my little brother on behalf of my father."
    },
    {
     "japanese": "お茶にかわり、コーヒーをお出しします。",
-    "english": "In place of tea, we'll serve coffee.",
-    "source": "original"
+    "english": "In place of tea, we'll serve coffee."
    }
   ],
   "review_status": "draft",
@@ -2337,18 +2166,15 @@
   "examples": [
    {
     "japanese": "彼は医者として働いている。",
-    "english": "He works as a doctor.",
-    "source": "original"
+    "english": "He works as a doctor."
    },
    {
     "japanese": "日本人として、それを知らないのは恥ずかしい。",
-    "english": "As a Japanese person, it's embarrassing not to know that.",
-    "source": "original"
+    "english": "As a Japanese person, it's embarrassing not to know that."
    },
    {
     "japanese": "プレゼントとして花をもらった。",
-    "english": "I received flowers as a present.",
-    "source": "original"
+    "english": "I received flowers as a present."
    }
   ],
   "review_status": "draft",
@@ -2377,18 +2203,15 @@
   "examples": [
    {
     "japanese": "会議において、この問題について話し合った。",
-    "english": "At the meeting, we discussed this issue.",
-    "source": "original"
+    "english": "At the meeting, we discussed this issue."
    },
    {
     "japanese": "現代社会においては、情報が重要だ。",
-    "english": "In modern society, information is important.",
-    "source": "original"
+    "english": "In modern society, information is important."
    },
    {
     "japanese": "日本における教育制度を研究している。",
-    "english": "I'm researching the education system in Japan.",
-    "source": "original"
+    "english": "I'm researching the education system in Japan."
    }
   ],
   "review_status": "draft",
@@ -2417,18 +2240,15 @@
   "examples": [
    {
     "japanese": "子供向けの本を買いました。",
-    "english": "I bought a book for children.",
-    "source": "original"
+    "english": "I bought a book for children."
    },
    {
     "japanese": "この商品は若者向けに作られた。",
-    "english": "This product was made targeting young people.",
-    "source": "original"
+    "english": "This product was made targeting young people."
    },
    {
     "japanese": "初心者向けの日本語クラス。",
-    "english": "Japanese class for beginners.",
-    "source": "original"
+    "english": "Japanese class for beginners."
    }
   ],
   "review_status": "draft",
@@ -2457,18 +2277,15 @@
   "examples": [
    {
     "japanese": "この仕事は彼女向きだ。",
-    "english": "This job is suited to her.",
-    "source": "original"
+    "english": "This job is suited to her."
    },
    {
     "japanese": "南向きの部屋は明るい。",
-    "english": "South-facing rooms are bright.",
-    "source": "original"
+    "english": "South-facing rooms are bright."
    },
    {
     "japanese": "彼は先生向きの性格だ。",
-    "english": "He has a personality suited to being a teacher.",
-    "source": "original"
+    "english": "He has a personality suited to being a teacher."
    }
   ],
   "review_status": "draft",
@@ -2497,18 +2314,15 @@
   "examples": [
    {
     "japanese": "年を取るにつれて、時間の流れが早く感じる。",
-    "english": "As I get older, time feels like it's passing faster.",
-    "source": "original"
+    "english": "As I get older, time feels like it's passing faster."
    },
    {
     "japanese": "経験を積むにつれて、自信がついてきた。",
-    "english": "As I've gained experience, I've grown more confident.",
-    "source": "original"
+    "english": "As I've gained experience, I've grown more confident."
    },
    {
     "japanese": "日が暮れるにつれて、寒くなってきた。",
-    "english": "As the sun set, it became colder.",
-    "source": "original"
+    "english": "As the sun set, it became colder."
    }
   ],
   "review_status": "draft",
@@ -2537,18 +2351,15 @@
   "examples": [
    {
     "japanese": "家族とともに新年を迎えた。",
-    "english": "I welcomed the new year together with my family.",
-    "source": "original"
+    "english": "I welcomed the new year together with my family."
    },
    {
     "japanese": "時代が変わるとともに、価値観も変わる。",
-    "english": "As the times change, values change too.",
-    "source": "original"
+    "english": "As the times change, values change too."
    },
    {
     "japanese": "彼は感謝とともに、そのお礼を受け取った。",
-    "english": "He received the thank-you gift with gratitude.",
-    "source": "original"
+    "english": "He received the thank-you gift with gratitude."
    }
   ],
   "review_status": "draft",
@@ -2578,18 +2389,15 @@
   "examples": [
    {
     "japanese": "二人きりで話したい。",
-    "english": "I want to talk just the two of us.",
-    "source": "original"
+    "english": "I want to talk just the two of us."
    },
    {
     "japanese": "彼は一人きりで生きている。",
-    "english": "He lives all alone.",
-    "source": "original"
+    "english": "He lives all alone."
    },
    {
     "japanese": "これっきりで最後にする。",
-    "english": "I'll make this the last time.",
-    "source": "original"
+    "english": "I'll make this the last time."
    }
   ],
   "review_status": "draft",
@@ -2619,18 +2427,15 @@
   "examples": [
    {
     "japanese": "昨日家を出たきり、まだ帰ってこない。",
-    "english": "He left the house yesterday and still hasn't come back.",
-    "source": "original"
+    "english": "He left the house yesterday and still hasn't come back."
    },
    {
     "japanese": "卒業したきり、彼と会っていない。",
-    "english": "I haven't seen him since graduating.",
-    "source": "original"
+    "english": "I haven't seen him since graduating."
    },
    {
     "japanese": "その本を借りたきり、返していない。",
-    "english": "I borrowed the book and haven't returned it.",
-    "source": "original"
+    "english": "I borrowed the book and haven't returned it."
    }
   ],
   "review_status": "draft",
@@ -2660,18 +2465,15 @@
   "examples": [
    {
     "japanese": "プロだけに、演奏が素晴らしい。",
-    "english": "Being a pro, his performance is all the more splendid.",
-    "source": "original"
+    "english": "Being a pro, his performance is all the more splendid."
    },
    {
     "japanese": "努力しただけに、合格できて嬉しい。",
-    "english": "Precisely because I worked hard, I'm happy to have passed.",
-    "source": "original"
+    "english": "Precisely because I worked hard, I'm happy to have passed."
    },
    {
     "japanese": "期待していただけに、失望が大きい。",
-    "english": "Precisely because I had expectations, the disappointment is great.",
-    "source": "original"
+    "english": "Precisely because I had expectations, the disappointment is great."
    }
   ],
   "review_status": "draft",
@@ -2700,18 +2502,15 @@
   "examples": [
    {
     "japanese": "10年練習しただけあって、演奏が見事だ。",
-    "english": "Having practiced for 10 years, his performance is splendid.",
-    "source": "original"
+    "english": "Having practiced for 10 years, his performance is splendid."
    },
    {
     "japanese": "留学しただけあって、英語がペラペラだ。",
-    "english": "As one would expect from having studied abroad, he's fluent in English.",
-    "source": "original"
+    "english": "As one would expect from having studied abroad, he's fluent in English."
    },
    {
     "japanese": "高いだけあって、品質がいい。",
-    "english": "As befits its price, the quality is good.",
-    "source": "original"
+    "english": "As befits its price, the quality is good."
    }
   ],
   "review_status": "draft",
@@ -2741,18 +2540,15 @@
   "examples": [
    {
     "japanese": "急いでいたばかりに、大切なものを忘れた。",
-    "english": "Merely because I was in a hurry, I forgot something important.",
-    "source": "original"
+    "english": "Merely because I was in a hurry, I forgot something important."
    },
    {
     "japanese": "一言言わなかったばかりに、誤解された。",
-    "english": "Just because I didn't say one word, I was misunderstood.",
-    "source": "original"
+    "english": "Just because I didn't say one word, I was misunderstood."
    },
    {
     "japanese": "彼を信じたばかりに、ひどい目にあった。",
-    "english": "Just because I trusted him, I had a terrible experience.",
-    "source": "original"
+    "english": "Just because I trusted him, I had a terrible experience."
    }
   ],
   "review_status": "draft",
@@ -2781,18 +2577,15 @@
   "examples": [
    {
     "japanese": "彼は英語ばかりか、フランス語も話せる。",
-    "english": "He can speak not only English but also French.",
-    "source": "original"
+    "english": "He can speak not only English but also French."
    },
    {
     "japanese": "雨が降るばかりか、雷も鳴り始めた。",
-    "english": "Not only was it raining, but thunder also began.",
-    "source": "original"
+    "english": "Not only was it raining, but thunder also began."
    },
    {
     "japanese": "彼女は頭がいいばかりか、美人だ。",
-    "english": "She is not only smart but also beautiful.",
-    "source": "original"
+    "english": "She is not only smart but also beautiful."
    }
   ],
   "review_status": "draft",
@@ -2822,18 +2615,15 @@
   "examples": [
    {
     "japanese": "彼は勉強しているというより、遊んでいる。",
-    "english": "Rather than studying, he's (actually) playing around.",
-    "source": "original"
+    "english": "Rather than studying, he's (actually) playing around."
    },
    {
     "japanese": "この料理は辛いというより、痛い。",
-    "english": "This dish is painful rather than just spicy.",
-    "source": "original"
+    "english": "This dish is painful rather than just spicy."
    },
    {
     "japanese": "彼女は友達というより、家族のようだ。",
-    "english": "She's more like family than just a friend.",
-    "source": "original"
+    "english": "She's more like family than just a friend."
    }
   ],
   "review_status": "draft",
@@ -2862,18 +2652,15 @@
   "examples": [
    {
     "japanese": "日本の食べ物と言えば、やっぱり寿司だろう。",
-    "english": "Speaking of Japanese food, it's got to be sushi, right?",
-    "source": "original"
+    "english": "Speaking of Japanese food, it's got to be sushi, right?"
    },
    {
     "japanese": "夏と言えば、花火大会だ。",
-    "english": "When it comes to summer, it's fireworks festivals.",
-    "source": "original"
+    "english": "When it comes to summer, it's fireworks festivals."
    },
    {
     "japanese": "田中さんと言えば、最近見かけないね。",
-    "english": "Speaking of Mr. Tanaka, I haven't seen him around lately.",
-    "source": "original"
+    "english": "Speaking of Mr. Tanaka, I haven't seen him around lately."
    }
   ],
   "review_status": "draft",
@@ -2902,18 +2689,15 @@
   "examples": [
    {
     "japanese": "日本語を勉強していると言っても、まだ初心者です。",
-    "english": "Although I say I'm studying Japanese, I'm still a beginner.",
-    "source": "original"
+    "english": "Although I say I'm studying Japanese, I'm still a beginner."
    },
    {
     "japanese": "社長と言っても、小さな会社です。",
-    "english": "Although I'm called 'president', it's a small company.",
-    "source": "original"
+    "english": "Although I'm called 'president', it's a small company."
    },
    {
     "japanese": "料理と言っても、簡単なものしか作れない。",
-    "english": "Although I say 'cooking', I can only make simple things.",
-    "source": "original"
+    "english": "Although I say 'cooking', I can only make simple things."
    }
   ],
   "review_status": "draft",
@@ -2942,18 +2726,15 @@
   "examples": [
    {
     "japanese": "日本にはリンゴやみかんといった果物がたくさんある。",
-    "english": "Japan has many fruits such as apples and oranges.",
-    "source": "original"
+    "english": "Japan has many fruits such as apples and oranges."
    },
    {
     "japanese": "医者や弁護士といった職業に興味がある。",
-    "english": "I'm interested in professions such as doctor and lawyer.",
-    "source": "original"
+    "english": "I'm interested in professions such as doctor and lawyer."
    },
    {
     "japanese": "英語や中国語といった言語を勉強したい。",
-    "english": "I'd like to study languages such as English and Chinese.",
-    "source": "original"
+    "english": "I'd like to study languages such as English and Chinese."
    }
   ],
   "review_status": "draft",
@@ -2983,18 +2764,15 @@
   "examples": [
    {
     "japanese": "彼はまだ子供っぽい。",
-    "english": "He's still childish.",
-    "source": "original"
+    "english": "He's still childish."
    },
    {
     "japanese": "年を取って、忘れっぽくなった。",
-    "english": "As I've aged, I've become forgetful.",
-    "source": "original"
+    "english": "As I've aged, I've become forgetful."
    },
    {
     "japanese": "その話は嘘っぽい。",
-    "english": "That story sounds fake.",
-    "source": "original"
+    "english": "That story sounds fake."
    }
   ],
   "review_status": "draft",
@@ -3024,18 +2802,15 @@
   "examples": [
    {
     "japanese": "彼女は悲しげな顔をしている。",
-    "english": "She has a sad-looking face.",
-    "source": "original"
+    "english": "She has a sad-looking face."
    },
    {
     "japanese": "子供は嬉しげに笑った。",
-    "english": "The child laughed happily.",
-    "source": "original"
+    "english": "The child laughed happily."
    },
    {
     "japanese": "彼は意味ありげに微笑んだ。",
-    "english": "He smiled meaningfully.",
-    "source": "original"
+    "english": "He smiled meaningfully."
    }
   ],
   "review_status": "draft",
@@ -3065,18 +2840,15 @@
   "examples": [
    {
     "japanese": "彼は日本語どころか、英語も話せない。",
-    "english": "Far from speaking Japanese, he can't even speak English.",
-    "source": "original"
+    "english": "Far from speaking Japanese, he can't even speak English."
    },
    {
     "japanese": "痩せるどころか、太ってしまった。",
-    "english": "Far from losing weight, I've gained weight.",
-    "source": "original"
+    "english": "Far from losing weight, I've gained weight."
    },
    {
     "japanese": "楽しいどころか、ひどかった。",
-    "english": "Far from being fun, it was terrible.",
-    "source": "original"
+    "english": "Far from being fun, it was terrible."
    }
   ],
   "review_status": "draft",
@@ -3105,18 +2877,15 @@
   "examples": [
    {
     "japanese": "試験が近いので、遊ぶどころではない。",
-    "english": "The exam is coming up, so I have no time to play around.",
-    "source": "original"
+    "english": "The exam is coming up, so I have no time to play around."
    },
    {
     "japanese": "仕事が忙しくて、旅行どころではなかった。",
-    "english": "I was too busy with work to even think of a trip.",
-    "source": "original"
+    "english": "I was too busy with work to even think of a trip."
    },
    {
     "japanese": "頭が痛くて、勉強どころではない。",
-    "english": "My head hurts — I can't afford to study.",
-    "source": "original"
+    "english": "My head hurts — I can't afford to study."
    }
   ],
   "review_status": "draft",
@@ -3146,18 +2915,15 @@
   "examples": [
    {
     "japanese": "彼は優しい一方で、厳しいところもある。",
-    "english": "He's kind, but on the other hand, he has a strict side.",
-    "source": "original"
+    "english": "He's kind, but on the other hand, he has a strict side."
    },
    {
     "japanese": "都市が発展する一方で、環境問題も深刻になる。",
-    "english": "While cities develop, environmental problems also become serious.",
-    "source": "original"
+    "english": "While cities develop, environmental problems also become serious."
    },
    {
     "japanese": "仕事が忙しい一方で、家族との時間も大切にしている。",
-    "english": "While work is busy, I also value family time.",
-    "source": "original"
+    "english": "While work is busy, I also value family time."
    }
   ],
   "review_status": "draft",
@@ -3186,18 +2952,15 @@
   "examples": [
    {
     "japanese": "物価は上がる一方だ。",
-    "english": "Prices keep rising.",
-    "source": "original"
+    "english": "Prices keep rising."
    },
    {
     "japanese": "日本の人口は減る一方だ。",
-    "english": "Japan's population keeps decreasing.",
-    "source": "original"
+    "english": "Japan's population keeps decreasing."
    },
    {
     "japanese": "彼の病気は悪くなる一方だった。",
-    "english": "His illness kept getting worse.",
-    "source": "original"
+    "english": "His illness kept getting worse."
    }
   ],
   "review_status": "draft",
@@ -3226,18 +2989,15 @@
   "examples": [
    {
     "japanese": "よく考えた上で決めてください。",
-    "english": "Please decide after thinking carefully.",
-    "source": "original"
+    "english": "Please decide after thinking carefully."
    },
    {
     "japanese": "ご検討の上、ご返事をお願いします。",
-    "english": "Please reply after consideration.",
-    "source": "original"
+    "english": "Please reply after consideration."
    },
    {
     "japanese": "両親と相談した上で、留学することにした。",
-    "english": "After consulting with my parents, I decided to study abroad.",
-    "source": "original"
+    "english": "After consulting with my parents, I decided to study abroad."
    }
   ],
   "review_status": "draft",
@@ -3266,18 +3026,15 @@
   "examples": [
    {
     "japanese": "このレストランは値段のわりにおいしい。",
-    "english": "For the price, this restaurant is (surprisingly) delicious.",
-    "source": "original"
+    "english": "For the price, this restaurant is (surprisingly) delicious."
    },
    {
     "japanese": "彼は若いわりに、落ち着いている。",
-    "english": "For his young age, he is very composed.",
-    "source": "original"
+    "english": "For his young age, he is very composed."
    },
    {
     "japanese": "勉強したわりには、点数が悪かった。",
-    "english": "Considering how much I studied, my score was bad.",
-    "source": "original"
+    "english": "Considering how much I studied, my score was bad."
    }
   ],
   "review_status": "draft",
@@ -3306,18 +3063,15 @@
   "examples": [
    {
     "japanese": "お腹がすいてたまらない。",
-    "english": "I'm unbearably hungry.",
-    "source": "original"
+    "english": "I'm unbearably hungry."
    },
    {
     "japanese": "今日は暑くてたまらない。",
-    "english": "Today is unbearably hot.",
-    "source": "original"
+    "english": "Today is unbearably hot."
    },
    {
     "japanese": "新しいゲームがやりたくてたまらない。",
-    "english": "I can't stand how much I want to play the new game.",
-    "source": "original"
+    "english": "I can't stand how much I want to play the new game."
    }
   ],
   "review_status": "draft",
@@ -3346,18 +3100,15 @@
   "examples": [
    {
     "japanese": "彼のことが気になってならない。",
-    "english": "I can't stop thinking about him.",
-    "source": "original"
+    "english": "I can't stop thinking about him."
    },
    {
     "japanese": "試験の結果が心配でならない。",
-    "english": "I can't help worrying about the exam results.",
-    "source": "original"
+    "english": "I can't help worrying about the exam results."
    },
    {
     "japanese": "彼女が帰ってこないのが不思議でならない。",
-    "english": "I can't help but find it strange that she's not coming back.",
-    "source": "original"
+    "english": "I can't help but find it strange that she's not coming back."
    }
   ],
   "review_status": "draft",
@@ -3386,18 +3137,15 @@
   "examples": [
    {
     "japanese": "今、会議中です。",
-    "english": "I'm in a meeting right now.",
-    "source": "original"
+    "english": "I'm in a meeting right now."
    },
    {
     "japanese": "一日中、雨が降っていた。",
-    "english": "It was raining all day long.",
-    "source": "original"
+    "english": "It was raining all day long."
    },
    {
     "japanese": "日本中を旅行したい。",
-    "english": "I want to travel throughout Japan.",
-    "source": "original"
+    "english": "I want to travel throughout Japan."
    }
   ],
   "review_status": "draft",
@@ -3426,18 +3174,15 @@
   "examples": [
    {
     "japanese": "最近、疲れ気味です。",
-    "english": "I've been feeling somewhat tired lately.",
-    "source": "original"
+    "english": "I've been feeling somewhat tired lately."
    },
    {
     "japanese": "風邪気味なので、早く帰ります。",
-    "english": "I'm feeling a bit under the weather, so I'll go home early.",
-    "source": "original"
+    "english": "I'm feeling a bit under the weather, so I'll go home early."
    },
    {
     "japanese": "最近、太り気味だ。",
-    "english": "I've been gaining a bit of weight lately.",
-    "source": "original"
+    "english": "I've been gaining a bit of weight lately."
    }
   ],
   "review_status": "draft",
@@ -3466,18 +3211,15 @@
   "examples": [
    {
     "japanese": "雨が降り続けている。",
-    "english": "It keeps raining.",
-    "source": "original"
+    "english": "It keeps raining."
    },
    {
     "japanese": "10年間、日本語を勉強し続けている。",
-    "english": "I have been studying Japanese continuously for 10 years.",
-    "source": "original"
+    "english": "I have been studying Japanese continuously for 10 years."
    },
    {
     "japanese": "諦めずに走り続けた。",
-    "english": "I kept running without giving up.",
-    "source": "original"
+    "english": "I kept running without giving up."
    }
   ],
   "review_status": "draft",
@@ -3506,18 +3248,15 @@
   "examples": [
    {
     "japanese": "レポートを書き直した。",
-    "english": "I rewrote the report.",
-    "source": "original"
+    "english": "I rewrote the report."
    },
    {
     "japanese": "計画を立て直す必要がある。",
-    "english": "We need to redo the plan.",
-    "source": "original"
+    "english": "We need to redo the plan."
    },
    {
     "japanese": "もう一度考え直してください。",
-    "english": "Please reconsider (think it over again).",
-    "source": "original"
+    "english": "Please reconsider (think it over again)."
    }
   ],
   "review_status": "draft",
@@ -3546,18 +3285,15 @@
   "examples": [
    {
     "japanese": "問題について話し合いましょう。",
-    "english": "Let's discuss the problem together.",
-    "source": "original"
+    "english": "Let's discuss the problem together."
    },
    {
     "japanese": "困ったときは助け合うことが大切だ。",
-    "english": "When in trouble, it's important to help each other.",
-    "source": "original"
+    "english": "When in trouble, it's important to help each other."
    },
    {
     "japanese": "二人は愛し合っている。",
-    "english": "The two love each other.",
-    "source": "original"
+    "english": "The two love each other."
    }
   ],
   "review_status": "draft",
@@ -3586,18 +3322,15 @@
   "examples": [
    {
     "japanese": "急に雨が降り出した。",
-    "english": "It suddenly started raining.",
-    "source": "original"
+    "english": "It suddenly started raining."
    },
    {
     "japanese": "赤ちゃんが泣き出した。",
-    "english": "The baby burst into tears.",
-    "source": "original"
+    "english": "The baby burst into tears."
    },
    {
     "japanese": "彼は突然走り出した。",
-    "english": "He suddenly started running.",
-    "source": "original"
+    "english": "He suddenly started running."
    }
   ],
   "review_status": "draft",
@@ -3626,18 +3359,15 @@
   "examples": [
    {
     "japanese": "プールに飛び込んだ。",
-    "english": "I jumped into the pool.",
-    "source": "original"
+    "english": "I jumped into the pool."
    },
    {
     "japanese": "大切なことをノートに書き込んだ。",
-    "english": "I wrote important things into my notebook.",
-    "source": "original"
+    "english": "I wrote important things into my notebook."
    },
    {
     "japanese": "彼は一人で考え込んでいた。",
-    "english": "He was lost in deep thought alone.",
-    "source": "original"
+    "english": "He was lost in deep thought alone."
    }
   ],
   "review_status": "draft",
@@ -3667,18 +3397,15 @@
   "examples": [
    {
     "japanese": "食事の最中に電話が鳴った。",
-    "english": "The phone rang right in the middle of the meal.",
-    "source": "original"
+    "english": "The phone rang right in the middle of the meal."
    },
    {
     "japanese": "会議の最中に、社長が入ってきた。",
-    "english": "In the middle of the meeting, the president walked in.",
-    "source": "original"
+    "english": "In the middle of the meeting, the president walked in."
    },
    {
     "japanese": "試験の最中、集中できなかった。",
-    "english": "Right in the middle of the exam, I couldn't concentrate.",
-    "source": "original"
+    "english": "Right in the middle of the exam, I couldn't concentrate."
    }
   ],
   "review_status": "draft",
@@ -3707,18 +3434,15 @@
   "examples": [
    {
     "japanese": "明日、何時からだっけ？",
-    "english": "What time is it from tomorrow again?",
-    "source": "original"
+    "english": "What time is it from tomorrow again?"
    },
    {
     "japanese": "彼の名前、何だっけ？",
-    "english": "What was his name again?",
-    "source": "original"
+    "english": "What was his name again?"
    },
    {
     "japanese": "昨日、何を食べたっけ？",
-    "english": "What did I eat yesterday?",
-    "source": "original"
+    "english": "What did I eat yesterday?"
    }
   ],
   "review_status": "draft",
@@ -3748,18 +3472,15 @@
   "examples": [
    {
     "japanese": "行きたくない。だって、疲れているもの。",
-    "english": "I don't want to go. Because I'm tired, that's why.",
-    "source": "original"
+    "english": "I don't want to go. Because I'm tired, that's why."
    },
    {
     "japanese": "寒いんだもの、コートを着るよ。",
-    "english": "It's cold, so I'll wear a coat.",
-    "source": "original"
+    "english": "It's cold, so I'll wear a coat."
    },
    {
     "japanese": "忙しいんだもの、遊べないよ。",
-    "english": "I'm busy, so I can't play.",
-    "source": "original"
+    "english": "I'm busy, so I can't play."
    }
   ],
   "review_status": "draft",
@@ -3789,18 +3510,15 @@
   "examples": [
    {
     "japanese": "疲れたんだもん、もう寝るよ。",
-    "english": "I'm tired, so I'm going to bed.",
-    "source": "original"
+    "english": "I'm tired, so I'm going to bed."
    },
    {
     "japanese": "知らなかったんだもん、仕方ないでしょ。",
-    "english": "I didn't know — it can't be helped.",
-    "source": "original"
+    "english": "I didn't know — it can't be helped."
    },
    {
     "japanese": "だって、好きなんだもん。",
-    "english": "But it's because I like it.",
-    "source": "original"
+    "english": "But it's because I like it."
    }
   ],
   "review_status": "draft",
@@ -3830,18 +3548,15 @@
   "examples": [
    {
     "japanese": "朝ごはんを食べないで、学校へ行った。",
-    "english": "I went to school without eating breakfast.",
-    "source": "original"
+    "english": "I went to school without eating breakfast."
    },
    {
     "japanese": "何も言わないで出ていった。",
-    "english": "He left without saying anything.",
-    "source": "original"
+    "english": "He left without saying anything."
    },
    {
     "japanese": "勉強しないで、遊んでいた。",
-    "english": "I was playing instead of studying.",
-    "source": "original"
+    "english": "I was playing instead of studying."
    }
   ],
   "review_status": "draft",
@@ -3871,18 +3586,15 @@
   "examples": [
    {
     "japanese": "彼が犯人にちがいない。",
-    "english": "He must be the culprit.",
-    "source": "original"
+    "english": "He must be the culprit."
    },
    {
     "japanese": "この問題は難しいにちがいない。",
-    "english": "This problem must be difficult.",
-    "source": "original"
+    "english": "This problem must be difficult."
    },
    {
     "japanese": "忘れてしまったにちがいない。",
-    "english": "He must have forgotten.",
-    "source": "original"
+    "english": "He must have forgotten."
    }
   ],
   "review_status": "draft",
@@ -3912,18 +3624,15 @@
   "examples": [
    {
     "japanese": "健康のためには、早く寝ることだ。",
-    "english": "For your health, you should go to bed early.",
-    "source": "original"
+    "english": "For your health, you should go to bed early."
    },
    {
     "japanese": "試験に合格したければ、毎日勉強することだ。",
-    "english": "If you want to pass the exam, you should study every day.",
-    "source": "original"
+    "english": "If you want to pass the exam, you should study every day."
    },
    {
     "japanese": "疲れたら、休むことだ。",
-    "english": "When you're tired, you should rest.",
-    "source": "original"
+    "english": "When you're tired, you should rest."
    }
   ],
   "review_status": "draft",
@@ -3952,18 +3661,15 @@
   "examples": [
    {
     "japanese": "こうなっては、諦めるほかない。",
-    "english": "Now that it's come to this, there's no choice but to give up.",
-    "source": "original"
+    "english": "Now that it's come to this, there's no choice but to give up."
    },
    {
     "japanese": "電車が止まったので、歩いて帰るよりほかない。",
-    "english": "The train stopped, so there's no choice but to walk home.",
-    "source": "original"
+    "english": "The train stopped, so there's no choice but to walk home."
    },
    {
     "japanese": "自分で解決するほかない。",
-    "english": "There's no choice but to solve it myself.",
-    "source": "original"
+    "english": "There's no choice but to solve it myself."
    }
   ],
   "review_status": "draft",
@@ -3992,18 +3698,15 @@
   "examples": [
    {
     "japanese": "驚いたことに、彼は試験に合格した。",
-    "english": "To my surprise, he passed the exam.",
-    "source": "original"
+    "english": "To my surprise, he passed the exam."
    },
    {
     "japanese": "残念なことに、雨で試合が中止になった。",
-    "english": "Unfortunately, the match was canceled due to rain.",
-    "source": "original"
+    "english": "Unfortunately, the match was canceled due to rain."
    },
    {
     "japanese": "嬉しいことに、友達が日本に来てくれた。",
-    "english": "To my delight, my friend came to Japan.",
-    "source": "original"
+    "english": "To my delight, my friend came to Japan."
    }
   ],
   "review_status": "draft",
@@ -4032,18 +3735,15 @@
   "examples": [
    {
     "japanese": "謝るくらいなら、最初からしない。",
-    "english": "Rather than apologizing, I wouldn't do it in the first place.",
-    "source": "original"
+    "english": "Rather than apologizing, I wouldn't do it in the first place."
    },
    {
     "japanese": "そんな仕事をするくらいなら、辞めた方がいい。",
-    "english": "Rather than doing a job like that, it's better to quit.",
-    "source": "original"
+    "english": "Rather than doing a job like that, it's better to quit."
    },
    {
     "japanese": "待たされるくらいなら、自分で行く。",
-    "english": "Rather than being made to wait, I'll go myself.",
-    "source": "original"
+    "english": "Rather than being made to wait, I'll go myself."
    }
   ],
   "review_status": "draft",
@@ -4072,18 +3772,15 @@
   "examples": [
    {
     "japanese": "3月から5月にかけて、桜が咲く。",
-    "english": "From March through May, cherry blossoms bloom.",
-    "source": "original"
+    "english": "From March through May, cherry blossoms bloom."
    },
    {
     "japanese": "関東から東北にかけて、雨が降るでしょう。",
-    "english": "It will rain from the Kanto region through Tohoku.",
-    "source": "original"
+    "english": "It will rain from the Kanto region through Tohoku."
    },
    {
     "japanese": "料理にかけては、彼女が一番だ。",
-    "english": "When it comes to cooking, she's the best.",
-    "source": "original"
+    "english": "When it comes to cooking, she's the best."
    }
   ],
   "review_status": "draft",
@@ -4112,18 +3809,15 @@
   "examples": [
    {
     "japanese": "彼以外、誰もその事を知らない。",
-    "english": "No one besides him knows about it.",
-    "source": "original"
+    "english": "No one besides him knows about it."
    },
    {
     "japanese": "日本語以外に、何語が話せますか。",
-    "english": "What languages can you speak other than Japanese?",
-    "source": "original"
+    "english": "What languages can you speak other than Japanese?"
    },
    {
     "japanese": "日曜日以外は、毎日働いている。",
-    "english": "I work every day except Sunday.",
-    "source": "original"
+    "english": "I work every day except Sunday."
    }
   ],
   "review_status": "draft",
@@ -4152,18 +3846,15 @@
   "examples": [
    {
     "japanese": "1日おきにジムに行きます。",
-    "english": "I go to the gym every other day.",
-    "source": "original"
+    "english": "I go to the gym every other day."
    },
    {
     "japanese": "5分おきに電車が来る。",
-    "english": "Trains come at 5-minute intervals.",
-    "source": "original"
+    "english": "Trains come at 5-minute intervals."
    },
    {
     "japanese": "3メートルおきに木が植えられている。",
-    "english": "Trees are planted at 3-meter intervals.",
-    "source": "original"
+    "english": "Trees are planted at 3-meter intervals."
    }
   ],
   "review_status": "draft",
@@ -4192,18 +3883,15 @@
   "examples": [
    {
     "japanese": "1年ごとに、試験があります。",
-    "english": "There is an exam every year.",
-    "source": "original"
+    "english": "There is an exam every year."
    },
    {
     "japanese": "会うごとに、彼は元気になっていく。",
-    "english": "Each time we meet, he's getting more cheerful.",
-    "source": "original"
+    "english": "Each time we meet, he's getting more cheerful."
    },
    {
     "japanese": "人ごとに意見が違う。",
-    "english": "Opinions differ from person to person.",
-    "source": "original"
+    "english": "Opinions differ from person to person."
    }
   ],
   "review_status": "draft",
@@ -4232,18 +3920,15 @@
   "examples": [
    {
     "japanese": "お茶の代わりにコーヒーを飲んだ。",
-    "english": "I drank coffee instead of tea.",
-    "source": "original"
+    "english": "I drank coffee instead of tea."
    },
    {
     "japanese": "旅行に行く代わりに、家でゆっくり休んだ。",
-    "english": "Instead of going on a trip, I rested at home.",
-    "source": "original"
+    "english": "Instead of going on a trip, I rested at home."
    },
    {
     "japanese": "手伝う代わりに、お菓子をもらった。",
-    "english": "In exchange for helping, I got some sweets.",
-    "source": "original"
+    "english": "In exchange for helping, I got some sweets."
    }
   ],
   "review_status": "draft",
@@ -4273,18 +3958,15 @@
   "examples": [
    {
     "japanese": "疲れているんだから、早く寝なさい。",
-    "english": "You're tired, so go to bed early.",
-    "source": "original"
+    "english": "You're tired, so go to bed early."
    },
    {
     "japanese": "子供なんだから、大目に見てあげて。",
-    "english": "He's (just) a child, so be lenient with him.",
-    "source": "original"
+    "english": "He's (just) a child, so be lenient with him."
    },
    {
     "japanese": "時間がないんだから、急いで。",
-    "english": "We don't have time, so hurry up.",
-    "source": "original"
+    "english": "We don't have time, so hurry up."
    }
   ],
   "review_status": "draft",
@@ -4314,18 +3996,15 @@
   "examples": [
    {
     "japanese": "彼がそんなことを言うわけがない。",
-    "english": "There's no way he would say such a thing.",
-    "source": "original"
+    "english": "There's no way he would say such a thing."
    },
    {
     "japanese": "こんな簡単な問題が解けないわけがない。",
-    "english": "There's no way you can't solve such an easy problem.",
-    "source": "original"
+    "english": "There's no way you can't solve such an easy problem."
    },
    {
     "japanese": "知らないわけがない。",
-    "english": "There's no way (he) doesn't know.",
-    "source": "original"
+    "english": "There's no way (he) doesn't know."
    }
   ],
   "review_status": "draft",
@@ -4354,18 +4033,15 @@
   "examples": [
    {
     "japanese": "雨が降ってしまった。しょうがない。",
-    "english": "It started raining. It can't be helped.",
-    "source": "original"
+    "english": "It started raining. It can't be helped."
    },
    {
     "japanese": "もう遅いから、しょうがない。",
-    "english": "It's already late, so there's nothing to be done.",
-    "source": "original"
+    "english": "It's already late, so there's nothing to be done."
    },
    {
     "japanese": "しょうがないから、歩いて帰る。",
-    "english": "Since it can't be helped, I'll walk home.",
-    "source": "original"
+    "english": "Since it can't be helped, I'll walk home."
    }
   ],
   "review_status": "draft",
@@ -4396,18 +4072,15 @@
   "examples": [
    {
     "japanese": "眠くてしょうがない。",
-    "english": "I'm unbearably sleepy.",
-    "source": "original"
+    "english": "I'm unbearably sleepy."
    },
    {
     "japanese": "彼のことが気になってしょうがない。",
-    "english": "I can't stop thinking about him.",
-    "source": "original"
+    "english": "I can't stop thinking about him."
    },
    {
     "japanese": "暑くてしょうがない。",
-    "english": "It's unbearably hot.",
-    "source": "original"
+    "english": "It's unbearably hot."
    }
   ],
   "review_status": "draft",
@@ -4437,18 +4110,15 @@
   "examples": [
    {
     "japanese": "子供のことが心配でしかたがない。",
-    "english": "I'm unbearably worried about my child.",
-    "source": "original"
+    "english": "I'm unbearably worried about my child."
    },
    {
     "japanese": "結果が気になってしかたがない。",
-    "english": "I can't help being anxious about the result.",
-    "source": "original"
+    "english": "I can't help being anxious about the result."
    },
    {
     "japanese": "暑くてしかたがない。",
-    "english": "It's unbearably hot.",
-    "source": "original"
+    "english": "It's unbearably hot."
    }
   ],
   "review_status": "draft",
@@ -4477,18 +4147,15 @@
   "examples": [
    {
     "japanese": "そんな難しい問題、私に分かりっこない。",
-    "english": "There's no way I can understand such a difficult problem.",
-    "source": "original"
+    "english": "There's no way I can understand such a difficult problem."
    },
    {
     "japanese": "あの大会で勝てっこないよ。",
-    "english": "There's no way we can win that tournament.",
-    "source": "original"
+    "english": "There's no way we can win that tournament."
    },
    {
     "japanese": "こんな雨の中、彼は来っこない。",
-    "english": "There's no way he's coming in this kind of rain.",
-    "source": "original"
+    "english": "There's no way he's coming in this kind of rain."
    }
   ],
   "review_status": "draft",
@@ -4517,18 +4184,15 @@
   "examples": [
    {
     "japanese": "なんてきれいな花でしょう！",
-    "english": "What a beautiful flower!",
-    "source": "original"
+    "english": "What a beautiful flower!"
    },
    {
     "japanese": "宿題なんて、やりたくない。",
-    "english": "I don't want to do something like homework.",
-    "source": "original"
+    "english": "I don't want to do something like homework."
    },
    {
     "japanese": "彼が来ないなんて、信じられない。",
-    "english": "I can't believe he's not coming.",
-    "source": "original"
+    "english": "I can't believe he's not coming."
    }
   ],
   "review_status": "draft",
@@ -4557,18 +4221,15 @@
   "examples": [
    {
     "japanese": "私なんか、とても出来ません。",
-    "english": "Someone like me can't possibly do that.",
-    "source": "original"
+    "english": "Someone like me can't possibly do that."
    },
    {
     "japanese": "あんな人なんか、もう二度と会いたくない。",
-    "english": "I never want to see someone like that again.",
-    "source": "original"
+    "english": "I never want to see someone like that again."
    },
    {
     "japanese": "お茶なんか、どうですか。",
-    "english": "How about something like tea?",
-    "source": "original"
+    "english": "How about something like tea?"
    }
   ],
   "review_status": "draft",
@@ -4597,18 +4258,15 @@
   "examples": [
    {
     "japanese": "10年ぶりに故郷に帰った。",
-    "english": "I returned home for the first time in 10 years.",
-    "source": "original"
+    "english": "I returned home for the first time in 10 years."
    },
    {
     "japanese": "久しぶりに友達に会った。",
-    "english": "I met my friend after a long time.",
-    "source": "original"
+    "english": "I met my friend after a long time."
    },
    {
     "japanese": "3日ぶりの晴れだ。",
-    "english": "It's the first sunny day in 3 days.",
-    "source": "original"
+    "english": "It's the first sunny day in 3 days."
    }
   ],
   "review_status": "draft",
@@ -4638,18 +4296,15 @@
   "examples": [
    {
     "japanese": "友達の結婚式だから、行かないわけにはいかない。",
-    "english": "It's my friend's wedding, so I can't not go.",
-    "source": "original"
+    "english": "It's my friend's wedding, so I can't not go."
    },
    {
     "japanese": "約束したから、守らないわけにはいかない。",
-    "english": "I promised, so I have to keep it.",
-    "source": "original"
+    "english": "I promised, so I have to keep it."
    },
    {
     "japanese": "上司に頼まれたら、断らないわけにはいかない。",
-    "english": "When the boss asks, I can't refuse.",
-    "source": "original"
+    "english": "When the boss asks, I can't refuse."
    }
   ],
   "review_status": "draft",
@@ -4679,18 +4334,15 @@
   "examples": [
    {
     "japanese": "大事な会議だから、休むわけにはいかない。",
-    "english": "It's an important meeting, so I can't afford to take the day off.",
-    "source": "original"
+    "english": "It's an important meeting, so I can't afford to take the day off."
    },
    {
     "japanese": "ここで諦めるわけにはいかない。",
-    "english": "I can't just give up here.",
-    "source": "original"
+    "english": "I can't just give up here."
    },
    {
     "japanese": "約束したから、忘れるわけにはいかない。",
-    "english": "I promised, so I can't just forget.",
-    "source": "original"
+    "english": "I promised, so I can't just forget."
    }
   ],
   "review_status": "draft",
@@ -4719,18 +4371,15 @@
   "examples": [
    {
     "japanese": "買い物のついでに、手紙を出した。",
-    "english": "While I was shopping, I also sent a letter.",
-    "source": "original"
+    "english": "While I was shopping, I also sent a letter."
    },
    {
     "japanese": "散歩のついでに、公園に寄った。",
-    "english": "On my walk, I stopped by the park.",
-    "source": "original"
+    "english": "On my walk, I stopped by the park."
    },
    {
     "japanese": "東京に行ったついでに、友達に会った。",
-    "english": "While I was in Tokyo, I met my friend.",
-    "source": "original"
+    "english": "While I was in Tokyo, I met my friend."
    }
   ],
   "review_status": "draft",
@@ -4759,18 +4408,15 @@
   "examples": [
    {
     "japanese": "社長をはじめ、全社員が出席した。",
-    "english": "Starting with the president, all employees attended.",
-    "source": "original"
+    "english": "Starting with the president, all employees attended."
    },
    {
     "japanese": "東京をはじめとする大都市では、人口が増えている。",
-    "english": "In big cities, starting with Tokyo, the population is increasing.",
-    "source": "original"
+    "english": "In big cities, starting with Tokyo, the population is increasing."
    },
    {
     "japanese": "先生をはじめ、生徒たちもみんな喜んだ。",
-    "english": "Starting with the teacher, all the students were happy.",
-    "source": "original"
+    "english": "Starting with the teacher, all the students were happy."
    }
   ],
   "review_status": "draft",
@@ -4800,18 +4446,15 @@
   "examples": [
    {
     "japanese": "努力してこそ、成功できる。",
-    "english": "It's only by making an effort that one can succeed.",
-    "source": "original"
+    "english": "It's only by making an effort that one can succeed."
    },
    {
     "japanese": "経験してこそ、本当の意味が分かる。",
-    "english": "Only by experiencing it do you understand its true meaning.",
-    "source": "original"
+    "english": "Only by experiencing it do you understand its true meaning."
    },
    {
     "japanese": "失敗してこそ、学ぶことがある。",
-    "english": "It is by failing that one learns.",
-    "source": "original"
+    "english": "It is by failing that one learns."
    }
   ],
   "review_status": "draft",
@@ -4841,18 +4484,15 @@
   "examples": [
    {
     "japanese": "彼は勉強ができるばかりでなく、スポーツも得意だ。",
-    "english": "Not only is he good at studying, but he's also good at sports.",
-    "source": "original"
+    "english": "Not only is he good at studying, but he's also good at sports."
    },
    {
     "japanese": "この料理は美味しいばかりでなく、健康にもいい。",
-    "english": "This dish is not only delicious but also good for you.",
-    "source": "original"
+    "english": "This dish is not only delicious but also good for you."
    },
    {
     "japanese": "雨ばかりでなく、風も強い。",
-    "english": "Not only is it raining, the wind is also strong.",
-    "source": "original"
+    "english": "Not only is it raining, the wind is also strong."
    }
   ],
   "review_status": "draft",
@@ -4882,18 +4522,15 @@
   "examples": [
    {
     "japanese": "この本は面白いだけでなく、勉強にもなる。",
-    "english": "This book is not only interesting but also educational.",
-    "source": "original"
+    "english": "This book is not only interesting but also educational."
    },
    {
     "japanese": "彼女は日本語だけでなく、英語も話せる。",
-    "english": "She can speak not only Japanese but also English.",
-    "source": "original"
+    "english": "She can speak not only Japanese but also English."
    },
    {
     "japanese": "週末だけでなく、平日も忙しい。",
-    "english": "Not only on weekends, but weekdays are also busy.",
-    "source": "original"
+    "english": "Not only on weekends, but weekdays are also busy."
    }
   ],
   "review_status": "draft",
@@ -4923,18 +4560,15 @@
   "examples": [
    {
     "japanese": "そんなの、嘘に決まっている。",
-    "english": "That's obviously a lie.",
-    "source": "original"
+    "english": "That's obviously a lie."
    },
    {
     "japanese": "彼は来るに決まっている。",
-    "english": "Of course he'll come.",
-    "source": "original"
+    "english": "Of course he'll come."
    },
    {
     "japanese": "この問題は難しいに決まっている。",
-    "english": "This problem is definitely difficult.",
-    "source": "original"
+    "english": "This problem is definitely difficult."
    }
   ],
   "review_status": "draft",
@@ -4963,18 +4597,15 @@
   "examples": [
    {
     "japanese": "手伝ってもらったので、徹夜せずに済んだ。",
-    "english": "Since I got help, I didn't have to pull an all-nighter.",
-    "source": "original"
+    "english": "Since I got help, I didn't have to pull an all-nighter."
    },
    {
     "japanese": "傘を持っていたから、濡れずに済んだ。",
-    "english": "I had an umbrella, so I didn't end up getting wet.",
-    "source": "original"
+    "english": "I had an umbrella, so I didn't end up getting wet."
    },
    {
     "japanese": "早めに出発したので、遅刻せずに済んだ。",
-    "english": "I left early, so I didn't end up being late.",
-    "source": "original"
+    "english": "I left early, so I didn't end up being late."
    }
   ],
   "review_status": "draft",
@@ -5003,18 +4634,15 @@
   "examples": [
    {
     "japanese": "去年に比べて、今年は暖かい。",
-    "english": "Compared to last year, this year is warmer.",
-    "source": "original"
+    "english": "Compared to last year, this year is warmer."
    },
    {
     "japanese": "兄に比べて、弟は背が高い。",
-    "english": "Compared to his older brother, the younger is taller.",
-    "source": "original"
+    "english": "Compared to his older brother, the younger is taller."
    },
    {
     "japanese": "以前に比べて、仕事が楽になった。",
-    "english": "Compared to before, work has become easier.",
-    "source": "original"
+    "english": "Compared to before, work has become easier."
    }
   ],
   "review_status": "draft",
@@ -5044,18 +4672,15 @@
   "examples": [
    {
     "japanese": "日本に来て初めて、日本の文化を理解した。",
-    "english": "It was only after coming to Japan that I understood Japanese culture.",
-    "source": "original"
+    "english": "It was only after coming to Japan that I understood Japanese culture."
    },
    {
     "japanese": "失って初めて、その大切さが分かった。",
-    "english": "It was only after losing it that I realized how important it was.",
-    "source": "original"
+    "english": "It was only after losing it that I realized how important it was."
    },
    {
     "japanese": "親になって初めて、親の気持ちが分かる。",
-    "english": "It's only after becoming a parent that you understand how parents feel.",
-    "source": "original"
+    "english": "It's only after becoming a parent that you understand how parents feel."
    }
   ],
   "review_status": "draft",
@@ -5084,18 +4709,15 @@
   "examples": [
    {
     "japanese": "今日は父の誕生日に当たる。",
-    "english": "Today corresponds to my father's birthday.",
-    "source": "original"
+    "english": "Today corresponds to my father's birthday."
    },
    {
     "japanese": "彼は私の叔父に当たる。",
-    "english": "He is my uncle (corresponds to my uncle).",
-    "source": "original"
+    "english": "He is my uncle (corresponds to my uncle)."
    },
    {
     "japanese": "1ドルは約110円に当たる。",
-    "english": "One dollar corresponds to about 110 yen.",
-    "source": "original"
+    "english": "One dollar corresponds to about 110 yen."
    }
   ],
   "review_status": "draft",
@@ -5124,18 +4746,15 @@
   "examples": [
    {
     "japanese": "たとえ雨が降っても、行きます。",
-    "english": "Even if it rains, I'll go.",
-    "source": "original"
+    "english": "Even if it rains, I'll go."
    },
    {
     "japanese": "たとえ難しくても、諦めません。",
-    "english": "Even if it's difficult, I won't give up.",
-    "source": "original"
+    "english": "Even if it's difficult, I won't give up."
    },
    {
     "japanese": "たとえお金があっても、幸せとは限らない。",
-    "english": "Even if you have money, you're not necessarily happy.",
-    "source": "original"
+    "english": "Even if you have money, you're not necessarily happy."
    }
   ],
   "review_status": "draft",
@@ -5165,18 +4784,15 @@
   "examples": [
    {
     "japanese": "この本を読んでごらん。面白いよ。",
-    "english": "Try reading this book. It's interesting.",
-    "source": "original"
+    "english": "Try reading this book. It's interesting."
    },
    {
     "japanese": "やってごらんなさい。",
-    "english": "Go on, try it.",
-    "source": "original"
+    "english": "Go on, try it."
    },
    {
     "japanese": "食べてごらん、おいしいから。",
-    "english": "Try eating it, it's delicious.",
-    "source": "original"
+    "english": "Try eating it, it's delicious."
    }
   ],
   "review_status": "draft",
@@ -5205,18 +4821,15 @@
   "examples": [
    {
     "japanese": "子供は元気なものだ。",
-    "english": "Children are naturally energetic.",
-    "source": "original"
+    "english": "Children are naturally energetic."
    },
    {
     "japanese": "時間が経つのは早いものだ。",
-    "english": "Time passes quickly. (general truth)",
-    "source": "original"
+    "english": "Time passes quickly. (general truth)"
    },
    {
     "japanese": "昔はよくここで遊んだものだ。",
-    "english": "I used to play here a lot long ago. (nostalgic)",
-    "source": "original"
+    "english": "I used to play here a lot long ago. (nostalgic)"
    }
   ],
   "review_status": "draft",
@@ -5246,18 +4859,15 @@
   "examples": [
    {
     "japanese": "雨が降る気がする。",
-    "english": "I have a feeling it's going to rain.",
-    "source": "original"
+    "english": "I have a feeling it's going to rain."
    },
    {
     "japanese": "誰かに見られている気がする。",
-    "english": "I feel like someone's watching me.",
-    "source": "original"
+    "english": "I feel like someone's watching me."
    },
    {
     "japanese": "彼は来ない気がする。",
-    "english": "I have a feeling he's not coming.",
-    "source": "original"
+    "english": "I have a feeling he's not coming."
    }
   ],
   "review_status": "draft",
@@ -5279,8 +4889,7 @@
    {
     "japanese": "肉と魚とでは、どちらが好きですか。",
     "english": "",
-    "chinese": "肉和鱼哪个喜欢？",
-    "source": "private-material"
+    "chinese": "肉和鱼哪个喜欢？"
    }
   ]
  },
@@ -5298,8 +4907,7 @@
    {
     "japanese": "ロビーにテレビが置いてあります。",
     "english": "",
-    "chinese": "大厅放着电视。",
-    "source": "private-material"
+    "chinese": "大厅放着电视。"
    }
   ]
  },
@@ -5317,8 +4925,7 @@
    {
     "japanese": "「ありがとう」は中国語で「谢谢」という意味です。",
     "english": "",
-    "chinese": "「谢谢」在中文是「谢谢」的意思。",
-    "source": "private-material"
+    "chinese": "「谢谢」在中文是「谢谢」的意思。"
    }
   ]
  },
@@ -5336,8 +4943,7 @@
    {
     "japanese": "テレビはロビーにおいてあります。",
     "english": "",
-    "chinese": "电视在大厅放着。",
-    "source": "private-material"
+    "chinese": "电视在大厅放着。"
    }
   ]
  },
@@ -5355,8 +4961,7 @@
    {
     "japanese": "今日より明日のほうが忙しいです。",
     "english": "",
-    "chinese": "比今天明天更忙。",
-    "source": "private-material"
+    "chinese": "比今天明天更忙。"
    }
   ]
  },
@@ -5374,8 +4979,7 @@
    {
     "japanese": "その本、読み终わりました。",
     "english": "",
-    "chinese": "那本书读完了。",
-    "source": "private-material"
+    "chinese": "那本书读完了。"
    }
   ]
  },
@@ -5393,8 +4997,7 @@
    {
     "japanese": "あなたが言い終わったら、私の話も聞いてみてください。",
     "english": "",
-    "chinese": "你的话说完了，也听听我怎么说。",
-    "source": "private-material"
+    "chinese": "你的话说完了，也听听我怎么说。"
    }
   ]
  },
@@ -5412,8 +5015,7 @@
    {
     "japanese": "試験が何時に始まるか知っていますか。",
     "english": "",
-    "chinese": "知道试验什么时候开始吗？",
-    "source": "private-material"
+    "chinese": "知道试验什么时候开始吗？"
    }
   ]
  },
@@ -5431,8 +5033,7 @@
    {
     "japanese": "会议は何时に终わるか、わかりません。",
     "english": "",
-    "chinese": "不知道会议什么时候结束。",
-    "source": "private-material"
+    "chinese": "不知道会议什么时候结束。"
    }
   ]
  },
@@ -5462,8 +5063,7 @@
    {
     "japanese": "彼はあした、必ず帰ってくる。",
     "english": "",
-    "chinese": "他明天一定会回来。",
-    "source": "private-material"
+    "chinese": "他明天一定会回来。"
    }
   ]
  },
@@ -5481,8 +5081,7 @@
    {
     "japanese": "ぐっと飲んだ。",
     "english": "",
-    "chinese": "一口气喝了。",
-    "source": "private-material"
+    "chinese": "一口气喝了。"
    }
   ]
  },
@@ -5500,8 +5099,7 @@
    {
     "japanese": "この山の高さは3000メートルです。",
     "english": "",
-    "chinese": "这座山的高度是3000米。",
-    "source": "private-material"
+    "chinese": "这座山的高度是3000米。"
    }
   ]
  },
@@ -5519,8 +5117,7 @@
    {
     "japanese": "この山の高さは3000メートルです。",
     "english": "",
-    "chinese": "这座山的高度是3000米。",
-    "source": "private-material"
+    "chinese": "这座山的高度是3000米。"
    }
   ]
  },
@@ -5538,8 +5135,7 @@
    {
     "japanese": "こまかく切ってざっとゆでる。",
     "english": "",
-    "chinese": "切成丝焯一下。",
-    "source": "private-material"
+    "chinese": "切成丝焯一下。"
    }
   ]
  },
@@ -5557,8 +5153,7 @@
    {
     "japanese": "歩くしかない。",
     "english": "",
-    "chinese": "只能走路。",
-    "source": "private-material"
+    "chinese": "只能走路。"
    }
   ]
  },
@@ -5576,8 +5171,7 @@
    {
     "japanese": "じっと見つめる。",
     "english": "",
-    "chinese": "凝视。",
-    "source": "private-material"
+    "chinese": "凝视。"
    }
   ]
  },
@@ -5595,8 +5189,7 @@
    {
     "japanese": "ゆべお酒を饮みすぎました。",
     "english": "",
-    "chinese": "昨晚酒喝多了。",
-    "source": "private-material"
+    "chinese": "昨晚酒喝多了。"
    }
   ]
  },
@@ -5614,8 +5207,7 @@
    {
     "japanese": "コーヒーにします。",
     "english": "",
-    "chinese": "就要咖啡吧。",
-    "source": "private-material"
+    "chinese": "就要咖啡吧。"
    }
   ]
  },
@@ -5633,14 +5225,12 @@
    {
     "japanese": "駅はまだずっと先です。",
     "english": "",
-    "chinese": "火车站离这儿好远呢。",
-    "source": "private-material"
+    "chinese": "火车站离这儿好远呢。"
    },
    {
     "japanese": "彼とはずっと一緒だ。",
     "english": "",
-    "chinese": "一直和他在一起。",
-    "source": "private-material"
+    "chinese": "一直和他在一起。"
    }
   ]
  },
@@ -5658,8 +5248,7 @@
    {
     "japanese": "漢字が全然わかりません。",
     "english": "",
-    "chinese": "汉字完全不懂。",
-    "source": "private-material"
+    "chinese": "汉字完全不懂。"
    }
   ]
  },
@@ -5677,8 +5266,7 @@
    {
     "japanese": "雨が降るそうです。",
     "english": "",
-    "chinese": "听说要下雨。",
-    "source": "private-material"
+    "chinese": "听说要下雨。"
    }
   ]
  },
@@ -5696,8 +5284,7 @@
    {
     "japanese": "雨が降るそうです。",
     "english": "",
-    "chinese": "听说要下雨。",
-    "source": "private-material"
+    "chinese": "听说要下雨。"
    }
   ]
  },
@@ -5715,8 +5302,7 @@
    {
     "japanese": "日本は物価が高いそうです。",
     "english": "",
-    "chinese": "听说日本物价高。",
-    "source": "private-material"
+    "chinese": "听说日本物价高。"
    }
   ]
  },
@@ -5734,8 +5320,7 @@
    {
     "japanese": "日本は物価が高いそうです。",
     "english": "",
-    "chinese": "听说日本物价高。",
-    "source": "private-material"
+    "chinese": "听说日本物价高。"
    }
   ]
  },
@@ -5753,8 +5338,7 @@
    {
     "japanese": "気づかれないようにそっと近づく。",
     "english": "",
-    "chinese": "不让人发觉悄悄地靠近。",
-    "source": "private-material"
+    "chinese": "不让人发觉悄悄地靠近。"
    }
   ]
  },
@@ -5772,8 +5356,7 @@
    {
     "japanese": "ぞっと読んだが、いい本だよ。",
     "english": "",
-    "chinese": "粗读了一遍，是好书。",
-    "source": "private-material"
+    "chinese": "粗读了一遍，是好书。"
    }
   ]
  },
@@ -5791,8 +5374,7 @@
    {
     "japanese": "ぞっと読んだが、いい本だよ。",
     "english": "",
-    "chinese": "粗读了一遍，是好书。",
-    "source": "private-material"
+    "chinese": "粗读了一遍，是好书。"
    }
   ]
  },
@@ -5810,8 +5392,7 @@
    {
     "japanese": "仕事が终わったあとで、食事に行きます。",
     "english": "",
-    "chinese": "工作结束之后去吃饭。",
-    "source": "private-material"
+    "chinese": "工作结束之后去吃饭。"
    }
   ]
  },
@@ -5829,8 +5410,7 @@
    {
     "japanese": "病気のために、会社を休みました。",
     "english": "",
-    "chinese": "因为生病没去公司。",
-    "source": "private-material"
+    "chinese": "因为生病没去公司。"
    }
   ]
  },
@@ -5848,8 +5428,7 @@
    {
     "japanese": "売っています。ただし、高いです。",
     "english": "",
-    "chinese": "有卖。但是很贵。",
-    "source": "private-material"
+    "chinese": "有卖。但是很贵。"
    }
   ]
  },
@@ -5867,8 +5446,7 @@
    {
     "japanese": "たとえば、果物が好きです。",
     "english": "",
-    "chinese": "比如，喜欢水果。",
-    "source": "private-material"
+    "chinese": "比如，喜欢水果。"
    }
   ]
  },
@@ -5886,8 +5464,7 @@
    {
     "japanese": "たとえ失敗しても、あきらめません。",
     "english": "",
-    "chinese": "即使失败，也不放弃。",
-    "source": "private-material"
+    "chinese": "即使失败，也不放弃。"
    }
   ]
  },
@@ -5905,8 +5482,7 @@
    {
     "japanese": "たった今帰ったところです。",
     "english": "",
-    "chinese": "刚刚回去。",
-    "source": "private-material"
+    "chinese": "刚刚回去。"
    }
   ]
  },
@@ -5924,8 +5500,7 @@
    {
     "japanese": "すこしお酒を飲んでみたらどうですか。",
     "english": "",
-    "chinese": "试着喝点酒怎么样？",
-    "source": "private-material"
+    "chinese": "试着喝点酒怎么样？"
    }
   ]
  },
@@ -5943,8 +5518,7 @@
    {
     "japanese": "日曜日は本を読んだり、映画を見たりします。",
     "english": "",
-    "chinese": "星期天读书啦、看电影啦。",
-    "source": "private-material"
+    "chinese": "星期天读书啦、看电影啦。"
    }
   ]
  },
@@ -5962,8 +5536,7 @@
    {
     "japanese": "雨が降りだした。",
     "english": "",
-    "chinese": "下起雨来了。",
-    "source": "private-material"
+    "chinese": "下起雨来了。"
    }
   ]
  },
@@ -5981,8 +5554,7 @@
    {
     "japanese": "この仕事をやりつづけます。",
     "english": "",
-    "chinese": "一直做这个工作。",
-    "source": "private-material"
+    "chinese": "一直做这个工作。"
    }
   ]
  },
@@ -6000,8 +5572,7 @@
    {
     "japanese": "今日は何もしないつもりだ。",
     "english": "",
-    "chinese": "今天打算什么也不做。",
-    "source": "private-material"
+    "chinese": "今天打算什么也不做。"
    }
   ]
  },
@@ -6019,8 +5590,7 @@
    {
     "japanese": "宿題をしてから、遊びます。",
     "english": "",
-    "chinese": "做完作业再玩。",
-    "source": "private-material"
+    "chinese": "做完作业再玩。"
    }
   ]
  },
@@ -6038,8 +5608,7 @@
    {
     "japanese": "机の上に辞書が置いてあります。",
     "english": "",
-    "chinese": "字典已经放在桌子上了。",
-    "source": "private-material"
+    "chinese": "字典已经放在桌子上了。"
    }
   ]
  },
@@ -6057,8 +5626,7 @@
    {
     "japanese": "鳥が飛んでいきました。",
     "english": "",
-    "chinese": "鸟飞走了。",
-    "source": "private-material"
+    "chinese": "鸟飞走了。"
    }
   ]
  },
@@ -6076,8 +5644,7 @@
    {
     "japanese": "今食べているところだ。",
     "english": "",
-    "chinese": "现在正在吃饭。",
-    "source": "private-material"
+    "chinese": "现在正在吃饭。"
    }
   ]
  },
@@ -6095,8 +5662,7 @@
    {
     "japanese": "今コピーしているところです",
     "english": "",
-    "chinese": "现在正在复印。",
-    "source": "private-material"
+    "chinese": "现在正在复印。"
    }
   ]
  },
@@ -6114,14 +5680,12 @@
    {
     "japanese": "旅行に行く前に、切符を買っておきます。",
     "english": "",
-    "chinese": "旅行之前先买好票。",
-    "source": "private-material"
+    "chinese": "旅行之前先买好票。"
    },
    {
     "japanese": "寒いですから、窓を閉めておいてください。",
     "english": "",
-    "chinese": "因为冷，请把窗户关上。",
-    "source": "private-material"
+    "chinese": "因为冷，请把窗户关上。"
    }
   ]
  },
@@ -6139,8 +5703,7 @@
    {
     "japanese": "ペンをください。",
     "english": "",
-    "chinese": "请给我钢笔。",
-    "source": "private-material"
+    "chinese": "请给我钢笔。"
    }
   ]
  },
@@ -6158,8 +5721,7 @@
    {
     "japanese": "犬が走ってきました。",
     "english": "",
-    "chinese": "狗跑过来了。",
-    "source": "private-material"
+    "chinese": "狗跑过来了。"
    }
   ]
  },
@@ -6177,8 +5739,7 @@
    {
     "japanese": "彼はそのことをわたしに伝えてくれた。",
     "english": "",
-    "chinese": "那件事情他转达给我了。",
-    "source": "private-material"
+    "chinese": "那件事情他转达给我了。"
    }
   ]
  },
@@ -6196,8 +5757,7 @@
    {
     "japanese": "宿題を忘れてしました。",
     "english": "",
-    "chinese": "忘了作业了。",
-    "source": "private-material"
+    "chinese": "忘了作业了。"
    }
   ]
  },
@@ -6215,8 +5775,7 @@
    {
     "japanese": "宿題を忘れてしました。",
     "english": "",
-    "chinese": "忘了作业了。",
-    "source": "private-material"
+    "chinese": "忘了作业了。"
    }
   ]
  },
@@ -6234,8 +5793,7 @@
    {
     "japanese": "どうぶつをいじめてはいけません。",
     "english": "",
-    "chinese": "不可以欺负动物。",
-    "source": "private-material"
+    "chinese": "不可以欺负动物。"
    }
   ]
  },
@@ -6253,8 +5811,7 @@
    {
     "japanese": "そんなに遊んでばかりいると、大学に入れませんよ。",
     "english": "",
-    "chinese": "如果尽那么玩的话，考不上大学啊。",
-    "source": "private-material"
+    "chinese": "如果尽那么玩的话，考不上大学啊。"
    }
   ]
  },
@@ -6272,8 +5829,7 @@
    {
     "japanese": "手伝ってほしいです。",
     "english": "",
-    "chinese": "希望你帮忙。",
-    "source": "private-material"
+    "chinese": "希望你帮忙。"
    }
   ]
  },
@@ -6291,8 +5847,7 @@
    {
     "japanese": "皆おいしいと言っているから、食べてみた。",
     "english": "",
-    "chinese": "大家都说好吃，所以尝了尝。",
-    "source": "private-material"
+    "chinese": "大家都说好吃，所以尝了尝。"
    }
   ]
  },
@@ -6310,8 +5865,7 @@
    {
     "japanese": "皆おいしいと言っているから、食べてみた。",
     "english": "",
-    "chinese": "大家都说好吃，所以尝了尝。",
-    "source": "private-material"
+    "chinese": "大家都说好吃，所以尝了尝。"
    }
   ]
  },
@@ -6329,8 +5883,7 @@
    {
     "japanese": "日本に帰ってもあなたのことを思うよ。",
     "english": "",
-    "chinese": "即使回到日本也会想你的。",
-    "source": "private-material"
+    "chinese": "即使回到日本也会想你的。"
    }
   ]
  },
@@ -6348,8 +5901,7 @@
    {
     "japanese": "帰ってもいいですか。",
     "english": "",
-    "chinese": "可以回去吗？",
-    "source": "private-material"
+    "chinese": "可以回去吗？"
    }
   ]
  },
@@ -6367,8 +5919,7 @@
    {
     "japanese": "すこし高くてもかまいません。",
     "english": "",
-    "chinese": "再高一点也没关系。",
-    "source": "private-material"
+    "chinese": "再高一点也没关系。"
    }
   ]
  },
@@ -6386,8 +5937,7 @@
    {
     "japanese": "王さんは田中さんに日本語を教えてもらいます。",
     "english": "",
-    "chinese": "小王让田中先生给他教日语。",
-    "source": "private-material"
+    "chinese": "小王让田中先生给他教日语。"
    }
   ]
  },
@@ -6405,8 +5955,7 @@
    {
     "japanese": "わたしは弟に日本語を教えてやります。",
     "english": "",
-    "chinese": "我给弟弟教日语。",
-    "source": "private-material"
+    "chinese": "我给弟弟教日语。"
    }
   ]
  },
@@ -6424,8 +5973,7 @@
    {
     "japanese": "傘を持って出かけます。",
     "english": "",
-    "chinese": "带着伞出门。",
-    "source": "private-material"
+    "chinese": "带着伞出门。"
    }
   ]
  },
@@ -6443,8 +5991,7 @@
    {
     "japanese": "ちょっとたばこをかって来ます。",
     "english": "",
-    "chinese": "去买包烟就回来。",
-    "source": "private-material"
+    "chinese": "去买包烟就回来。"
    }
   ]
  },
@@ -6462,14 +6009,12 @@
    {
     "japanese": "事故があったために、電車が止まっている。",
     "english": "",
-    "chinese": "因为发生了事故，所以电车停了。",
-    "source": "private-material"
+    "chinese": "因为发生了事故，所以电车停了。"
    },
    {
     "japanese": "台風のために、家が壊れた。",
     "english": "",
-    "chinese": "因为台风，房子遭到了破坏。",
-    "source": "private-material"
+    "chinese": "因为台风，房子遭到了破坏。"
    }
   ]
  },
@@ -6487,8 +6032,7 @@
    {
     "japanese": "火事の場所はここです。",
     "english": "",
-    "chinese": "火灾的场合在这里。",
-    "source": "private-material"
+    "chinese": "火灾的场合在这里。"
    }
   ]
  },
@@ -6506,8 +6050,7 @@
    {
     "japanese": "おかあさん、中野さんという人から電話があったよ。",
     "english": "",
-    "chinese": "妈妈，有个叫中野的打过电话来哦。",
-    "source": "private-material"
+    "chinese": "妈妈，有个叫中野的打过电话来哦。"
    }
   ]
  },
@@ -6525,14 +6068,12 @@
    {
     "japanese": "結果は報告どおりです。",
     "english": "",
-    "chinese": "结果如报告所示。",
-    "source": "private-material"
+    "chinese": "结果如报告所示。"
    },
    {
     "japanese": "先生がやるとおりに、やってください。",
     "english": "",
-    "chinese": "照老师做的那样做。",
-    "source": "private-material"
+    "chinese": "照老师做的那样做。"
    }
   ]
  },
@@ -6550,8 +6091,7 @@
    {
     "japanese": "日曜日は勉強とか部屋の掃除とかします。",
     "english": "",
-    "chinese": "星期日可以学习啦、打扫房间啦。",
-    "source": "private-material"
+    "chinese": "星期日可以学习啦、打扫房间啦。"
    }
   ]
  },
@@ -6569,8 +6109,7 @@
    {
     "japanese": "食べたところだ。",
     "english": "",
-    "chinese": "刚刚才吃完饭。",
-    "source": "private-material"
+    "chinese": "刚刚才吃完饭。"
    }
   ]
  },
@@ -6588,8 +6127,7 @@
    {
     "japanese": "私は田中さんに时计をあげました。",
     "english": "",
-    "chinese": "我把表送给田中。",
-    "source": "private-material"
+    "chinese": "我把表送给田中。"
    }
   ]
  },
@@ -6607,8 +6145,7 @@
    {
     "japanese": "王さんのカバンは私のカバンと同じです。",
     "english": "",
-    "chinese": "小王的包与我的包相同。",
-    "source": "private-material"
+    "chinese": "小王的包与我的包相同。"
    }
   ]
  },
@@ -6626,8 +6163,7 @@
    {
     "japanese": "今度の日曜日は友達を映画を見に行こうと思っています。",
     "english": "",
-    "chinese": "这个星期天想和朋友去看电影。（此想法在说话前已经有了）",
-    "source": "private-material"
+    "chinese": "这个星期天想和朋友去看电影。（此想法在说话前已经有了）"
    }
   ]
  },
@@ -6645,8 +6181,7 @@
    {
     "japanese": "Aさんは日曜に日本へ行くと言っていました。",
     "english": "",
-    "chinese": "A说星期天去日本。",
-    "source": "private-material"
+    "chinese": "A说星期天去日本。"
    }
   ]
  },
@@ -6664,8 +6199,7 @@
    {
     "japanese": "私の考えは王さんと違います。",
     "english": "",
-    "chinese": "我的想法与小王不相同。",
-    "source": "private-material"
+    "chinese": "我的想法与小王不相同。"
    }
   ]
  },
@@ -6683,8 +6217,7 @@
    {
     "japanese": "このボタンを押すと、机械が动きます。",
     "english": "",
-    "chinese": "一按这个按钮机器就动。",
-    "source": "private-material"
+    "chinese": "一按这个按钮机器就动。"
    }
   ]
  },
@@ -6702,8 +6235,7 @@
    {
     "japanese": "四月になると、桜の花が咲きます。",
     "english": "",
-    "chinese": "四月一到樱花就开了。",
-    "source": "private-material"
+    "chinese": "四月一到樱花就开了。"
    }
   ]
  },
@@ -6721,14 +6253,12 @@
    {
     "japanese": "たとい親が反対しても、結婚する。",
     "english": "",
-    "chinese": "即使父母反对也要结婚。",
-    "source": "private-material"
+    "chinese": "即使父母反对也要结婚。"
    },
    {
     "japanese": "たとえ一億円払うといっても、売らない。",
     "english": "",
-    "chinese": "即使你出一亿元，我也不卖。",
-    "source": "private-material"
+    "chinese": "即使你出一亿元，我也不卖。"
    }
   ]
  },
@@ -6746,8 +6276,7 @@
    {
     "japanese": "きれいだなあ。",
     "english": "",
-    "chinese": "真漂亮啊。",
-    "source": "private-material"
+    "chinese": "真漂亮啊。"
    }
   ]
  },
@@ -6765,8 +6294,7 @@
    {
     "japanese": "傘を持たないで出かけました。",
     "english": "",
-    "chinese": "没带伞就出门了。",
-    "source": "private-material"
+    "chinese": "没带伞就出门了。"
    }
   ]
  },
@@ -6784,8 +6312,7 @@
    {
     "japanese": "この药は苦くて、饮みにくいです。",
     "english": "",
-    "chinese": "这个药很苦，不好喝。",
-    "source": "private-material"
+    "chinese": "这个药很苦，不好喝。"
    }
   ]
  },
@@ -6803,8 +6330,7 @@
    {
     "japanese": "ロビーにテレビがあります。",
     "english": "",
-    "chinese": "大厅有电视。",
-    "source": "private-material"
+    "chinese": "大厅有电视。"
    }
   ]
  },
@@ -6822,8 +6348,7 @@
    {
     "japanese": "鳥のように飛びたい。",
     "english": "",
-    "chinese": "想鸟一样地飞。",
-    "source": "private-material"
+    "chinese": "想鸟一样地飞。"
    }
   ]
  },
@@ -6841,8 +6366,7 @@
    {
     "japanese": "レポートに名前を书くのを忘れました。",
     "english": "",
-    "chinese": "忘了在报告上写名字。",
-    "source": "private-material"
+    "chinese": "忘了在报告上写名字。"
    }
   ]
  },
@@ -6860,8 +6384,7 @@
    {
     "japanese": "センターの近くで火事をあったのを知っていますか。",
     "english": "",
-    "chinese": "知道中心附近发生了火灾吗？",
-    "source": "private-material"
+    "chinese": "知道中心附近发生了火灾吗？"
    }
   ]
  },
@@ -6879,14 +6402,12 @@
    {
     "japanese": "わたしがやるのを見てください。",
     "english": "",
-    "chinese": "请看着我做。",
-    "source": "private-material"
+    "chinese": "请看着我做。"
    },
    {
     "japanese": "お父さんがおとうとをほめたのを聞きました。",
     "english": "",
-    "chinese": "听父亲表扬哥哥。",
-    "source": "private-material"
+    "chinese": "听父亲表扬哥哥。"
    }
   ]
  },
@@ -6904,8 +6425,7 @@
    {
     "japanese": "音楽を闻くのはおもしろいです。",
     "english": "",
-    "chinese": "听音乐很有意思。",
-    "source": "private-material"
+    "chinese": "听音乐很有意思。"
    }
   ]
  },
@@ -6923,8 +6443,7 @@
    {
     "japanese": "病気になってはじめて健康のありがたさを知った。",
     "english": "",
-    "chinese": "生病之后才知道健康的可贵。",
-    "source": "private-material"
+    "chinese": "生病之后才知道健康的可贵。"
    }
   ]
  },
@@ -6942,8 +6461,7 @@
    {
     "japanese": "九月になると、気温が下がりはじめる。",
     "english": "",
-    "chinese": "一到九月，气温就开始下降。",
-    "source": "private-material"
+    "chinese": "一到九月，气温就开始下降。"
    }
   ]
  },
@@ -6961,14 +6479,12 @@
    {
     "japanese": "兄もう駅に着いたはずです。",
     "english": "",
-    "chinese": "哥哥一定到车站了。",
-    "source": "private-material"
+    "chinese": "哥哥一定到车站了。"
    },
    {
     "japanese": "彼は病気ではなかったはずです。",
     "english": "",
-    "chinese": "他一定没病。",
-    "source": "private-material"
+    "chinese": "他一定没病。"
    }
   ]
  },
@@ -6986,8 +6502,7 @@
    {
     "japanese": "電車は五分前に駅に到着するはずです。",
     "english": "",
-    "chinese": "电车应该五分钟前到站。",
-    "source": "private-material"
+    "chinese": "电车应该五分钟前到站。"
    }
   ]
  },
@@ -7005,8 +6520,7 @@
    {
     "japanese": "はっと気がつく。",
     "english": "",
-    "chinese": "猛然发觉到。",
-    "source": "private-material"
+    "chinese": "猛然发觉到。"
    }
   ]
  },
@@ -7024,8 +6538,7 @@
    {
     "japanese": "私も今来たばかりです。",
     "english": "",
-    "chinese": "我也刚来。",
-    "source": "private-material"
+    "chinese": "我也刚来。"
    }
   ]
  },
@@ -7043,14 +6556,12 @@
    {
     "japanese": "ほっとため息をつく。",
     "english": "",
-    "chinese": "叹了一口气。",
-    "source": "private-material"
+    "chinese": "叹了一口气。"
    },
    {
     "japanese": "ほっと胸をなでおろした。",
     "english": "",
-    "chinese": "放下心来。",
-    "source": "private-material"
+    "chinese": "放下心来。"
    }
   ]
  },
@@ -7068,8 +6579,7 @@
    {
     "japanese": "コーヒーまたはお茶をください。",
     "english": "",
-    "chinese": "请给我咖啡或茶。",
-    "source": "private-material"
+    "chinese": "请给我咖啡或茶。"
    }
   ]
  },
@@ -7087,8 +6597,7 @@
    {
     "japanese": "まだ食べていません。",
     "english": "",
-    "chinese": "还没吃。",
-    "source": "private-material"
+    "chinese": "还没吃。"
    }
   ]
  },
@@ -7106,8 +6615,7 @@
    {
     "japanese": "私が帰るまでに家にいてください。",
     "english": "",
-    "chinese": "请在家呆着直到我回来。",
-    "source": "private-material"
+    "chinese": "请在家呆着直到我回来。"
    }
   ]
  },
@@ -7125,8 +6633,7 @@
    {
     "japanese": "まるで夢のようだ。",
     "english": "",
-    "chinese": "简直像梦一样。",
-    "source": "private-material"
+    "chinese": "简直像梦一样。"
    }
   ]
  },
@@ -7144,8 +6651,7 @@
    {
     "japanese": "もっと元気を出せ。",
     "english": "",
-    "chinese": "再打起点精神来。",
-    "source": "private-material"
+    "chinese": "再打起点精神来。"
    }
   ]
  },
@@ -7163,8 +6669,7 @@
    {
     "japanese": "この辞书は字が大きくて、见やすいです。",
     "english": "",
-    "chinese": "这本字典字大好查。",
-    "source": "private-material"
+    "chinese": "这本字典字大好查。"
    }
   ]
  },
@@ -7182,14 +6687,12 @@
    {
     "japanese": "やっと間に合った。",
     "english": "",
-    "chinese": "勉强赶上。",
-    "source": "private-material"
+    "chinese": "勉强赶上。"
    },
    {
     "japanese": "やっとできあがった。",
     "english": "",
-    "chinese": "好不容易做出。",
-    "source": "private-material"
+    "chinese": "好不容易做出。"
    }
   ]
  },
@@ -7207,8 +6710,7 @@
    {
     "japanese": "出かけようとしたとき、電話がかかった。",
     "english": "",
-    "chinese": "正要出门的时候电话响了。",
-    "source": "private-material"
+    "chinese": "正要出门的时候电话响了。"
    }
   ]
  },
@@ -7226,8 +6728,7 @@
    {
     "japanese": "日本語が话せるようになりました。",
     "english": "",
-    "chinese": "变得会说日语了。",
-    "source": "private-material"
+    "chinese": "变得会说日语了。"
    }
   ]
  },
@@ -7245,8 +6746,7 @@
    {
     "japanese": "子供ができてから、夫も家事をするようになりました。",
     "english": "",
-    "chinese": "因为有了孩子，丈夫也变得会做一些家务了。",
-    "source": "private-material"
+    "chinese": "因为有了孩子，丈夫也变得会做一些家务了。"
    }
   ]
  },
@@ -7264,8 +6764,7 @@
    {
     "japanese": "すぐ来るように言ってください。",
     "english": "",
-    "chinese": "请转告让他马上来。",
-    "source": "private-material"
+    "chinese": "请转告让他马上来。"
    }
   ]
  },
@@ -7283,8 +6782,7 @@
    {
     "japanese": "来週日本へ行く予定です。",
     "english": "",
-    "chinese": "预定下周去日本。",
-    "source": "private-material"
+    "chinese": "预定下周去日本。"
    }
   ]
  },
@@ -7302,14 +6800,12 @@
    {
     "japanese": "お母さんは純子さんに部屋を掃除させます。",
     "english": "",
-    "chinese": "妈妈让纯子打扫房间。",
-    "source": "private-material"
+    "chinese": "妈妈让纯子打扫房间。"
    },
    {
     "japanese": "社長は社員を働かせる。",
     "english": "",
-    "chinese": "社长让社员工作。",
-    "source": "private-material"
+    "chinese": "社长让社员工作。"
    }
   ]
  },
@@ -7327,14 +6823,12 @@
    {
     "japanese": "私は友達に招待されました。",
     "english": "",
-    "chinese": "我受到朋友的招待。",
-    "source": "private-material"
+    "chinese": "我受到朋友的招待。"
    },
    {
     "japanese": "子供は母にほめられました。",
     "english": "",
-    "chinese": "孩子被妈妈表扬了。",
-    "source": "private-material"
+    "chinese": "孩子被妈妈表扬了。"
    }
   ]
  },
@@ -7352,14 +6846,12 @@
    {
     "japanese": "私は友達に招待されました。",
     "english": "",
-    "chinese": "我受到朋友的招待。",
-    "source": "private-material"
+    "chinese": "我受到朋友的招待。"
    },
    {
     "japanese": "子供は母にほめられました。",
     "english": "",
-    "chinese": "孩子被妈妈表扬了。",
-    "source": "private-material"
+    "chinese": "孩子被妈妈表扬了。"
    }
   ]
  },
@@ -7377,8 +6869,7 @@
    {
     "japanese": "火事の場所はここです。",
     "english": "",
-    "chinese": "火灾的场合在这里。",
-    "source": "private-material"
+    "chinese": "火灾的场合在这里。"
    }
   ]
  },
@@ -7396,8 +6887,7 @@
    {
     "japanese": "彼はあした、必ず帰ってくる。",
     "english": "",
-    "chinese": "他明天一定会回来。",
-    "source": "private-material"
+    "chinese": "他明天一定会回来。"
    }
   ]
  },
@@ -7415,8 +6905,7 @@
    {
     "japanese": "私は田中さんに时计をあげました。",
     "english": "",
-    "chinese": "我把表送给田中。",
-    "source": "private-material"
+    "chinese": "我把表送给田中。"
    }
   ]
  },
@@ -7434,8 +6923,7 @@
    {
     "japanese": "友達に本をあげました。",
     "english": "",
-    "chinese": "送书给朋友。",
-    "source": "private-material"
+    "chinese": "送书给朋友。"
    }
   ]
  },
@@ -7453,8 +6941,7 @@
    {
     "japanese": "一日に1500台车が生产されています。",
     "english": "",
-    "chinese": "一天生产1500台车。",
-    "source": "private-material"
+    "chinese": "一天生产1500台车。"
    }
   ]
  },
@@ -7472,8 +6959,7 @@
    {
     "japanese": "今日は気持ちがいい。",
     "english": "",
-    "chinese": "今天很舒服。",
-    "source": "private-material"
+    "chinese": "今天很舒服。"
    }
   ]
  },
@@ -7491,8 +6977,7 @@
    {
     "japanese": "弟は兄にカメラを坏されました。",
     "english": "",
-    "chinese": "弟弟的相机被哥哥弄坏了。",
-    "source": "private-material"
+    "chinese": "弟弟的相机被哥哥弄坏了。"
    }
   ]
  },
@@ -7510,8 +6995,7 @@
    {
     "japanese": "私は课长に质问されました。",
     "english": "",
-    "chinese": "我被课长提问了。",
-    "source": "private-material"
+    "chinese": "我被课长提问了。"
    }
   ]
  },
@@ -7529,26 +7013,22 @@
    {
     "japanese": "この時計は田中さんのです。",
     "english": "",
-    "chinese": "这个表是田中的。（近称）",
-    "source": "private-material"
+    "chinese": "这个表是田中的。（近称）"
    },
    {
     "japanese": "その時計は田中さんのです。",
     "english": "",
-    "chinese": "那个表是田中的。（中称）",
-    "source": "private-material"
+    "chinese": "那个表是田中的。（中称）"
    },
    {
     "japanese": "あの時計は田中さんのです。",
     "english": "",
-    "chinese": "那个表是田中的。（远称）",
-    "source": "private-material"
+    "chinese": "那个表是田中的。（远称）"
    },
    {
     "japanese": "どの時計は田中さんのです。",
     "english": "",
-    "chinese": "哪个表是田中的？（疑问称）",
-    "source": "private-material"
+    "chinese": "哪个表是田中的？（疑问称）"
    }
   ]
  },
@@ -7566,26 +7046,22 @@
    {
     "japanese": "この時計は田中さんのです。",
     "english": "",
-    "chinese": "这个表是田中的。（近称）",
-    "source": "private-material"
+    "chinese": "这个表是田中的。（近称）"
    },
    {
     "japanese": "その時計は田中さんのです。",
     "english": "",
-    "chinese": "那个表是田中的。（中称）",
-    "source": "private-material"
+    "chinese": "那个表是田中的。（中称）"
    },
    {
     "japanese": "あの時計は田中さんのです。",
     "english": "",
-    "chinese": "那个表是田中的。（远称）",
-    "source": "private-material"
+    "chinese": "那个表是田中的。（远称）"
    },
    {
     "japanese": "どの時計は田中さんのです。",
     "english": "",
-    "chinese": "哪个表是田中的？（疑问称）",
-    "source": "private-material"
+    "chinese": "哪个表是田中的？（疑问称）"
    }
   ]
  },
@@ -7603,14 +7079,12 @@
    {
     "japanese": "お風呂に入ろうとしていた時、電話が入った。",
     "english": "",
-    "chinese": "正要打算洗澡的时候，电话来了。",
-    "source": "private-material"
+    "chinese": "正要打算洗澡的时候，电话来了。"
    },
    {
     "japanese": "息子は北京大学に入ろうとしています。",
     "english": "",
-    "chinese": "我的儿子打算考入北京大学。",
-    "source": "private-material"
+    "chinese": "我的儿子打算考入北京大学。"
    }
   ]
  },
@@ -7628,8 +7102,7 @@
    {
     "japanese": "今日はゆっくり休もうと思います。",
     "english": "",
-    "chinese": "今天打算要好好的休息一下。",
-    "source": "private-material"
+    "chinese": "今天打算要好好的休息一下。"
    }
   ]
  },
@@ -7647,8 +7120,7 @@
    {
     "japanese": "果物の中では、何がいちばん好きですか。",
     "english": "",
-    "chinese": "在水果里，哪个最喜欢？",
-    "source": "private-material"
+    "chinese": "在水果里，哪个最喜欢？"
    }
   ]
  },
@@ -7666,8 +7138,7 @@
    {
     "japanese": "仕事のあとで、映画を見ます。",
     "english": "",
-    "chinese": "工作之后看电影。",
-    "source": "private-material"
+    "chinese": "工作之后看电影。"
    }
   ]
  },
@@ -7685,20 +7156,17 @@
    {
     "japanese": "パリへ行くときに、時計を買う。",
     "english": "",
-    "chinese": "去巴黎时买表。",
-    "source": "private-material"
+    "chinese": "去巴黎时买表。"
    },
    {
     "japanese": "パリへ行ったときに、時計を買う。",
     "english": "",
-    "chinese": "去巴黎的时候买表。",
-    "source": "private-material"
+    "chinese": "去巴黎的时候买表。"
    },
    {
     "japanese": "子供の時に、パリに住んでいた。",
     "english": "",
-    "chinese": "小的时候住在巴黎。",
-    "source": "private-material"
+    "chinese": "小的时候住在巴黎。"
    }
   ]
  },
@@ -7716,8 +7184,7 @@
    {
     "japanese": "八月も暑いですが、七月ほどではありません。",
     "english": "",
-    "chinese": "8月很热，但不如7月那么热。",
-    "source": "private-material"
+    "chinese": "8月很热，但不如7月那么热。"
    }
   ]
  },
@@ -7735,8 +7202,7 @@
    {
     "japanese": "机は椅子より高いです。",
     "english": "",
-    "chinese": "桌子比椅子高。",
-    "source": "private-material"
+    "chinese": "桌子比椅子高。"
    }
   ]
  },
@@ -7754,8 +7220,7 @@
    {
     "japanese": "2回目",
     "english": "",
-    "chinese": "第二次。",
-    "source": "private-material"
+    "chinese": "第二次。"
    }
   ]
  },
@@ -7773,8 +7238,7 @@
    {
     "japanese": "この肉は変な味がする。",
     "english": "",
-    "chinese": "这肉感觉有怪味。",
-    "source": "private-material"
+    "chinese": "这肉感觉有怪味。"
    }
   ]
  },
@@ -7792,14 +7256,12 @@
    {
     "japanese": "二人はこんな結果になろうとは思わなかった。",
     "english": "",
-    "chinese": "没想到他俩会是这样的结果。",
-    "source": "private-material"
+    "chinese": "没想到他俩会是这样的结果。"
    },
    {
     "japanese": "君にはそんな高い技術があろうとは思わなかった。",
     "english": "",
-    "chinese": "没想到你有如此高超的技艺。",
-    "source": "private-material"
+    "chinese": "没想到你有如此高超的技艺。"
    }
   ]
  },
@@ -7817,32 +7279,27 @@
    {
     "japanese": "あまりの美しさに息を飲んだ。",
     "english": "",
-    "chinese": "为美丽的景色而惊叹。",
-    "source": "private-material"
+    "chinese": "为美丽的景色而惊叹。"
    },
    {
     "japanese": "あまりの暑さに数人も倒れてしまった。",
     "english": "",
-    "chinese": "由于天气太热,竟然有好几个人都中暑昏倒了。",
-    "source": "private-material"
+    "chinese": "由于天气太热,竟然有好几个人都中暑昏倒了。"
    },
    {
     "japanese": "あの時は、あまりの心労で水さえ喉を通らなかった。",
     "english": "",
-    "chinese": "当时,由于操劳过度,连喝水的力气都没有了。",
-    "source": "private-material"
+    "chinese": "当时,由于操劳过度,连喝水的力气都没有了。"
    },
    {
     "japanese": "彼女は一番行きたかった大学に合格し、うれしさのあまり飛び上がった。",
     "english": "",
-    "chinese": "她终于考上了最想进的大学,竟然兴奋得跳了起来。",
-    "source": "private-material"
+    "chinese": "她终于考上了最想进的大学,竟然兴奋得跳了起来。"
    },
    {
     "japanese": "試験の結果を気にするあまりに、夜眠れなくなってしまった。",
     "english": "",
-    "chinese": "由于太担心考试的结果,夜不能寐。",
-    "source": "private-material"
+    "chinese": "由于太担心考试的结果,夜不能寐。"
    }
   ]
  },
@@ -7860,20 +7317,17 @@
    {
     "japanese": "この国の物価が安いおかげで、ここ数年、少し貯金がある。",
     "english": "",
-    "chinese": "因为这个国家的物价便宜,所以这几年我们有了一点点积蓄。",
-    "source": "private-material"
+    "chinese": "因为这个国家的物价便宜,所以这几年我们有了一点点积蓄。"
    },
    {
     "japanese": "家の近くに新しい駅ができたおかげで、便利になってうれしい。",
     "english": "",
-    "chinese": "由于我家附近新建了车站,所以很方便,为此我很开心。",
-    "source": "private-material"
+    "chinese": "由于我家附近新建了车站,所以很方便,为此我很开心。"
    },
    {
     "japanese": "多くの人の通勤が便利になったのは新幹線ができたおかげだという。",
     "english": "",
-    "chinese": "很多人上班变得便捷了,听说这是因为新干线的建成而带来的。",
-    "source": "private-material"
+    "chinese": "很多人上班变得便捷了,听说这是因为新干线的建成而带来的。"
    }
   ]
  },
@@ -7891,14 +7345,12 @@
    {
     "japanese": "山田社長にお目にかかりたいのですが。",
     "english": "",
-    "chinese": "我想拜见山田社长。",
-    "source": "private-material"
+    "chinese": "我想拜见山田社长。"
    },
    {
     "japanese": "お目にかかれてたいへん嬉しいです。",
     "english": "",
-    "chinese": "能见到您我很高兴。",
-    "source": "private-material"
+    "chinese": "能见到您我很高兴。"
    }
   ]
  },
@@ -7916,14 +7368,12 @@
    {
     "japanese": "これから聴解の時間です。放送は二回限りで、あとは繰返しません。",
     "english": "",
-    "chinese": "接下来是听力时间。录音只放两遍,之后不重复。",
-    "source": "private-material"
+    "chinese": "接下来是听力时间。录音只放两遍,之后不重复。"
    },
    {
     "japanese": "来場は無料です。ただし、若い女性限りです。",
     "english": "",
-    "chinese": "进场免费。但只限年轻女性。",
-    "source": "private-material"
+    "chinese": "进场免费。但只限年轻女性。"
    }
   ]
  },
@@ -7941,14 +7391,12 @@
    {
     "japanese": "山田さんは、プロかと思うぐらい上手に野球をやっている。",
     "english": "",
-    "chinese": "山田的棒球打得很好,简直让人以为他是个专业运动员。",
-    "source": "private-material"
+    "chinese": "山田的棒球打得很好,简直让人以为他是个专业运动员。"
    },
    {
     "japanese": "リーさんは、日本人かと思うほどぺらぺら日本語を話している。",
     "english": "",
-    "chinese": "小李的日语说得十分流利,简直让人以为他是日本人。",
-    "source": "private-material"
+    "chinese": "小李的日语说得十分流利,简直让人以为他是日本人。"
    }
   ]
  },
@@ -7966,20 +7414,17 @@
    {
     "japanese": "この病気は人から人へと移る可能性がある。",
     "english": "",
-    "chinese": "这种病可能会在人与人之间传染。",
-    "source": "private-material"
+    "chinese": "这种病可能会在人与人之间传染。"
    },
    {
     "japanese": "白黑からカラーへ、さらに3Dへと、映画は進化し、今や4Dの時代だ。",
     "english": "",
-    "chinese": "从黑白到彩色,又从彩色到3D,就这样电影技术一步一步地发展,到如今已经进入了4D时代。",
-    "source": "private-material"
+    "chinese": "从黑白到彩色,又从彩色到3D,就这样电影技术一步一步地发展,到如今已经进入了4D时代。"
    },
    {
     "japanese": "日本の人気バンド「Z」は、ヨーロッパでコンサートを行なうなど、活動を世界へと広げている。",
     "english": "",
-    "chinese": "在日本深受欢迎的乐队“Z”不仅在欧洲举办音乐会等,还将其活动逐步扩展到了世界各地。",
-    "source": "private-material"
+    "chinese": "在日本深受欢迎的乐队“Z”不仅在欧洲举办音乐会等,还将其活动逐步扩展到了世界各地。"
    }
   ]
  },
@@ -7997,20 +7442,17 @@
    {
     "japanese": "試験に落ちたからといって、がっかりしないでください。",
     "english": "",
-    "chinese": "不要因为考试没考好就泄气。",
-    "source": "private-material"
+    "chinese": "不要因为考试没考好就泄气。"
    },
    {
     "japanese": "首相が変わったからといって、政治がすぐによくなるわけではない。",
     "english": "",
-    "chinese": "虽说首相换了,但政治环境不会因此马上变好。",
-    "source": "private-material"
+    "chinese": "虽说首相换了,但政治环境不会因此马上变好。"
    },
    {
     "japanese": "こんな格好をしているからって、変な目で見ないでください。",
     "english": "",
-    "chinese": "就算我穿成这样,也不要这么奇怪地看着我。",
-    "source": "private-material"
+    "chinese": "就算我穿成这样,也不要这么奇怪地看着我。"
    }
   ]
  },
@@ -8028,14 +7470,12 @@
    {
     "japanese": "そのグループは10人からなっている。",
     "english": "",
-    "chinese": "该小组由10人组成。",
-    "source": "private-material"
+    "chinese": "该小组由10人组成。"
    },
    {
     "japanese": "そのビルは本館と別館からできている。",
     "english": "",
-    "chinese": "那幢大楼由主楼和副楼构成。",
-    "source": "private-material"
+    "chinese": "那幢大楼由主楼和副楼构成。"
    }
   ]
  },
@@ -8053,14 +7493,12 @@
    {
     "japanese": "デザインも素材もすべてが申し分のないことだし、1等賞を得られるでしょう。",
     "english": "",
-    "chinese": "款式也好材料也好都无可挑剔,所以能获得一等奖吧。",
-    "source": "private-material"
+    "chinese": "款式也好材料也好都无可挑剔,所以能获得一等奖吧。"
    },
    {
     "japanese": "まあ、今日のプールをやめておきましょう。お子さんも風邪を引いていることですし。",
     "english": "",
-    "chinese": "我看今天我们不去游泳了吧。因为您家的孩子也感冒了嘛。",
-    "source": "private-material"
+    "chinese": "我看今天我们不去游泳了吧。因为您家的孩子也感冒了嘛。"
    }
   ]
  },
@@ -8078,14 +7516,12 @@
    {
     "japanese": "大人なのに、そんなつまらないことでけんかするのは子供っぽい。",
     "english": "",
-    "chinese": "这么大的人,却因那一点点小事而吵架,真有点孩子气。",
-    "source": "private-material"
+    "chinese": "这么大的人,却因那一点点小事而吵架,真有点孩子气。"
    },
    {
     "japanese": "中田さんは、去年の国際バイオリンコンクールで優勝したことで、初めて人々に知られるようになった。",
     "english": "",
-    "chinese": "中田小姐因去年在国际小提琴比赛中获得了第一名,从此便受到了人们的关注。",
-    "source": "private-material"
+    "chinese": "中田小姐因去年在国际小提琴比赛中获得了第一名,从此便受到了人们的关注。"
    }
   ]
  },
@@ -8103,14 +7539,12 @@
    {
     "japanese": "ごぶさたしておりますが、先生にはお変わりなくお過ごしのことと存じます。",
     "english": "",
-    "chinese": "久疏问候,想必老师您一切安好。",
-    "source": "private-material"
+    "chinese": "久疏问候,想必老师您一切安好。"
    },
    {
     "japanese": "年末中、みなさんもさぞお忙しいことと思います。",
     "english": "",
-    "chinese": "年关临近,想必大家都很忙吧。",
-    "source": "private-material"
+    "chinese": "年关临近,想必大家都很忙吧。"
    }
   ]
  },
@@ -8128,14 +7562,12 @@
    {
     "japanese": "安いことは安いけど、本物かなあと心配して買わないことにした。",
     "english": "",
-    "chinese": "价格便宜倒是便宜,但又担心不是真货,所以就没买。",
-    "source": "private-material"
+    "chinese": "价格便宜倒是便宜,但又担心不是真货,所以就没买。"
    },
    {
     "japanese": "レポートは最後まで書いたことは書いたんですが、まだ足りない部分もあります。",
     "english": "",
-    "chinese": "报告倒是写好了,可还是有不够完整的地方。",
-    "source": "private-material"
+    "chinese": "报告倒是写好了,可还是有不够完整的地方。"
    }
   ]
  },
@@ -8153,20 +7585,17 @@
    {
     "japanese": "長雨のせいで、せっかく育てた野菜もだめになってしまった。",
     "english": "",
-    "chinese": "由于长时间下雨,好不容易培育出来的蔬菜也泡汤了。",
-    "source": "private-material"
+    "chinese": "由于长时间下雨,好不容易培育出来的蔬菜也泡汤了。"
    },
    {
     "japanese": "天気が悪いせいかどうかわからないが、どうも体の調子が変だ。",
     "english": "",
-    "chinese": "是不是天气的原因我也说不清楚,反正觉得身体有些不舒服。",
-    "source": "private-material"
+    "chinese": "是不是天气的原因我也说不清楚,反正觉得身体有些不舒服。"
    },
    {
     "japanese": "彼女が怒ったのは私の言葉が足りなかったせいだ。",
     "english": "",
-    "chinese": "她之所以生气,是因为我没把话说清楚。",
-    "source": "private-material"
+    "chinese": "她之所以生气,是因为我没把话说清楚。"
    }
   ]
  },
@@ -8184,14 +7613,12 @@
    {
     "japanese": "寝坊して、遅刻しそうになった。",
     "english": "",
-    "chinese": "由于睡懒觉,险些迟到了。",
-    "source": "private-material"
+    "chinese": "由于睡懒觉,险些迟到了。"
    },
    {
     "japanese": "先輩からひどいことを言われて、泣いてしまいそうになった。",
     "english": "",
-    "chinese": "被前辈训了一顿的她,快要哭了。",
-    "source": "private-material"
+    "chinese": "被前辈训了一顿的她,快要哭了。"
    }
   ]
  },
@@ -8209,14 +7636,12 @@
    {
     "japanese": "経済の安定した発展のためには、周辺の国々との協力が必要である。",
     "english": "",
-    "chinese": "为了经济的稳定发展,需要跟周边国家通力合作。",
-    "source": "private-material"
+    "chinese": "为了经济的稳定发展,需要跟周边国家通力合作。"
    },
    {
     "japanese": "その会議に出席するためには、10時の飛行機に乗らなければなりません。",
     "english": "",
-    "chinese": "要参加那个会议,必须坐10点的飞机才赶得上。",
-    "source": "private-material"
+    "chinese": "要参加那个会议,必须坐10点的飞机才赶得上。"
    }
   ]
  },
@@ -8234,26 +7659,22 @@
    {
     "japanese": "それは今までの経験だけで、いいか悪いか判断できる。",
     "english": "",
-    "chinese": "仅仅凭以往的经验,就能判断那是对的还是错的。",
-    "source": "private-material"
+    "chinese": "仅仅凭以往的经验,就能判断那是对的还是错的。"
    },
    {
     "japanese": "ただ毎日30分泳ぐだけで、体が丈夫になります。",
     "english": "",
-    "chinese": "只要坚持每天游泳半小时,身体就会变得强壮起来。",
-    "source": "private-material"
+    "chinese": "只要坚持每天游泳半小时,身体就会变得强壮起来。"
    },
    {
     "japanese": "能力だけでは成功しないことがある。",
     "english": "",
-    "chinese": "有时候单凭能力是不会成功的。",
-    "source": "private-material"
+    "chinese": "有时候单凭能力是不会成功的。"
    },
    {
     "japanese": "事物は表面を見ただけでは、分からない。",
     "english": "",
-    "chinese": "事物光看表面是不能了解的。",
-    "source": "private-material"
+    "chinese": "事物光看表面是不能了解的。"
    }
   ]
  },
@@ -8271,14 +7692,12 @@
    {
     "japanese": "飲み物は水だけでよろしいです。",
     "english": "",
-    "chinese": "我只要水就可以了。",
-    "source": "private-material"
+    "chinese": "我只要水就可以了。"
    },
    {
     "japanese": "昔は料理がおいしいだけでいいと思っていたようです。",
     "english": "",
-    "chinese": "好像从前人们认为,菜只要烧得好吃就行了。",
-    "source": "private-material"
+    "chinese": "好像从前人们认为,菜只要烧得好吃就行了。"
    }
   ]
  },
@@ -8296,14 +7715,12 @@
    {
     "japanese": "交通が便利なだけではだめです。周りの環境も考えなければなりません。",
     "english": "",
-    "chinese": "只是交通便利可不行,周围的环境也得考虑。",
-    "source": "private-material"
+    "chinese": "只是交通便利可不行,周围的环境也得考虑。"
    },
    {
     "japanese": "口で言うだけではいけない。自分でやりなさい。",
     "english": "",
-    "chinese": "光嘴上说可不行,你得自己动手干。",
-    "source": "private-material"
+    "chinese": "光嘴上说可不行,你得自己动手干。"
    }
   ]
  },
@@ -8321,14 +7738,12 @@
    {
     "japanese": "その電気スタンドが要らなければ、わたしにちょうだい。",
     "english": "",
-    "chinese": "那盏台灯如果你不要了就送给我吧。",
-    "source": "private-material"
+    "chinese": "那盏台灯如果你不要了就送给我吧。"
    },
    {
     "japanese": "すみません。お水をちょうだい。",
     "english": "",
-    "chinese": "不好意思,给我一杯水。",
-    "source": "private-material"
+    "chinese": "不好意思,给我一杯水。"
    }
   ]
  },
@@ -8346,38 +7761,32 @@
    {
     "japanese": "彼の現在の苦しい立場を察していただきたい。",
     "english": "",
-    "chinese": "希望您体谅一下他目前的窘境。",
-    "source": "private-material"
+    "chinese": "希望您体谅一下他目前的窘境。"
    },
    {
     "japanese": "A「ミスをしてしまいまして、すみません。」",
     "english": "",
-    "chinese": "我出错了,真对不起。",
-    "source": "private-material"
+    "chinese": "我出错了,真对不起。"
    },
    {
     "japanese": "B「これから間違えないでいただきたいですね。」",
     "english": "",
-    "chinese": "希望你以后不要出错。",
-    "source": "private-material"
+    "chinese": "希望你以后不要出错。"
    },
    {
     "japanese": "プレゼントなので、包んでいただきたいんですが。",
     "english": "",
-    "chinese": "因为是送人的礼物,所以希望能帮我包装一下。",
-    "source": "private-material"
+    "chinese": "因为是送人的礼物,所以希望能帮我包装一下。"
    },
    {
     "japanese": "A「15分も遅れましたよ。これから遅れないでいただきたいんですが。」",
     "english": "",
-    "chinese": "你竟然迟到了一刻钟。希望你以后不要迟到了。",
-    "source": "private-material"
+    "chinese": "你竟然迟到了一刻钟。希望你以后不要迟到了。"
    },
    {
     "japanese": "B「はい。本当に申し訳ありませんでした。」",
     "english": "",
-    "chinese": "知道了。今天实在对不起。",
-    "source": "private-material"
+    "chinese": "知道了。今天实在对不起。"
    }
   ]
  },
@@ -8395,14 +7804,12 @@
    {
     "japanese": "何があったのか、話していただけませんか。",
     "english": "",
-    "chinese": "到底发生了什么?请您谈谈好吗?",
-    "source": "private-material"
+    "chinese": "到底发生了什么?请您谈谈好吗?"
    },
    {
     "japanese": "すみませんが、荷物はここに置かないでいただけませんか。",
     "english": "",
-    "chinese": "对不起,请您不要把行李放在这里好吗?",
-    "source": "private-material"
+    "chinese": "对不起,请您不要把行李放在这里好吗?"
    }
   ]
  },
@@ -8420,20 +7827,17 @@
    {
     "japanese": "一人でやってご覧。ここで見てあげるから。",
     "english": "",
-    "chinese": "你自己试着做做看,我在旁边帮你看着。",
-    "source": "private-material"
+    "chinese": "你自己试着做做看,我在旁边帮你看着。"
    },
    {
     "japanese": "まあ、その問題は自分で考えてご覧なさい。",
     "english": "",
-    "chinese": "那道题目你自己动动脑筋看看吧。",
-    "source": "private-material"
+    "chinese": "那道题目你自己动动脑筋看看吧。"
    },
    {
     "japanese": "そのポスターを描いてご覧ください。君に頼むから。",
     "english": "",
-    "chinese": "那幅广告画你来画画看吧,拜托了。",
-    "source": "private-material"
+    "chinese": "那幅广告画你来画画看吧,拜托了。"
    }
   ]
  },
@@ -8451,20 +7855,17 @@
    {
     "japanese": "その映画はとてもおもしろいので、一度見てご覧になってください。",
     "english": "",
-    "chinese": "那部电影很好看,建议你去看一看吧。",
-    "source": "private-material"
+    "chinese": "那部电影很好看,建议你去看一看吧。"
    },
    {
     "japanese": "どうですか。この歌を歌ってご覧くださいませんか。",
     "english": "",
-    "chinese": "怎么样?这首歌你来唱唱看好吗?",
-    "source": "private-material"
+    "chinese": "怎么样?这首歌你来唱唱看好吗?"
    },
    {
     "japanese": "新幹線に乗ってご覧になる外国人の観光客が多いようです。",
     "english": "",
-    "chinese": "乘新干线的外国游客好像很多。",
-    "source": "private-material"
+    "chinese": "乘新干线的外国游客好像很多。"
    }
   ]
  },
@@ -8482,20 +7883,17 @@
    {
     "japanese": "肉も食べてちょうだい。野菜ばかり食べないでちょうだい。",
     "english": "",
-    "chinese": "你也得吃肉,不要净吃蔬菜。",
-    "source": "private-material"
+    "chinese": "你也得吃肉,不要净吃蔬菜。"
    },
    {
     "japanese": "一人で寂しいから、いっしょに行ってちょうだい。",
     "english": "",
-    "chinese": "我一个人没劲,你也一起去吧。",
-    "source": "private-material"
+    "chinese": "我一个人没劲,你也一起去吧。"
    },
    {
     "japanese": "騒がないでちょうだい。静かにしてちょうだい。兄が勉強しているから。",
     "english": "",
-    "chinese": "别闹了。安静点。因为你哥哥在学习呢。",
-    "source": "private-material"
+    "chinese": "别闹了。安静点。因为你哥哥在学习呢。"
    }
   ]
  },
@@ -8513,14 +7911,12 @@
    {
     "japanese": "人の物を黙って使ってはならない。",
     "english": "",
-    "chinese": "不要不经同意就使用别人的东西。",
-    "source": "private-material"
+    "chinese": "不要不经同意就使用别人的东西。"
    },
    {
     "japanese": "政治家は国民全体の利益を考えるべきだ。自分の利益のために法律を変えることがあってはならない。",
     "english": "",
-    "chinese": "政治家应该考虑全国人民的利益问题,不允许存在为了个人利益而改变法律的现象。",
-    "source": "private-material"
+    "chinese": "政治家应该考虑全国人民的利益问题,不允许存在为了个人利益而改变法律的现象。"
    }
   ]
  },
@@ -8538,50 +7934,42 @@
    {
     "japanese": "A「その日にパーティーへ子どもを連れてまいるつもりでございますが、よろしいでしょうか。」",
     "english": "",
-    "chinese": "那天,我打算带孩子去参加派对,您看行吗?",
-    "source": "private-material"
+    "chinese": "那天,我打算带孩子去参加派对,您看行吗?"
    },
    {
     "japanese": "B「どうぞ、ごいっしょにいらっしゃってください。」",
     "english": "",
-    "chinese": "行,你们一起来吧。",
-    "source": "private-material"
+    "chinese": "行,你们一起来吧。"
    },
    {
     "japanese": "A「うちでご飯を食べてまいります。」",
     "english": "",
-    "chinese": "我在家吃完饭后再过去。",
-    "source": "private-material"
+    "chinese": "我在家吃完饭后再过去。"
    },
    {
     "japanese": "B「分かりました。じゃ、うちでいらっしゃるのを待っています。」",
     "english": "",
-    "chinese": "知道了。那我在家等你过来。",
-    "source": "private-material"
+    "chinese": "知道了。那我在家等你过来。"
    },
    {
     "japanese": "先生の説明を聞いて、私も分かってまいりました。",
     "english": "",
-    "chinese": "听了老师的解释后,我也开始明白了。",
-    "source": "private-material"
+    "chinese": "听了老师的解释后,我也开始明白了。"
    },
    {
     "japanese": "帰りにちょっと本屋に寄ってまいります。",
     "english": "",
-    "chinese": "回去的路上,我要到书店逛一逛后再回家。",
-    "source": "private-material"
+    "chinese": "回去的路上,我要到书店逛一逛后再回家。"
    },
    {
     "japanese": "暖かくなってまいりましたが、いかがお過ごしでしょうか。",
     "english": "",
-    "chinese": "天气开始转暖了。您过得好吗?",
-    "source": "private-material"
+    "chinese": "天气开始转暖了。您过得好吗?"
    },
    {
     "japanese": "太陽も雲から顔を出してまいりました。",
     "english": "",
-    "chinese": "太阳从云层里露了出来。",
-    "source": "private-material"
+    "chinese": "太阳从云层里露了出来。"
    }
   ]
  },
@@ -8599,14 +7987,12 @@
    {
     "japanese": "財布が厳しいから、借りる家が古いアパートでもしようがありません。",
     "english": "",
-    "chinese": "因为财力有限,所以也只能租借破旧的公寓。",
-    "source": "private-material"
+    "chinese": "因为财力有限,所以也只能租借破旧的公寓。"
    },
    {
     "japanese": "就職難の今では、仕事があれば、給料が少なくても/少ないのもしかたがない。",
     "english": "",
-    "chinese": "现在就业形势很严峻,所以如果找得到工作,工资低也没有办法。",
-    "source": "private-material"
+    "chinese": "现在就业形势很严峻,所以如果找得到工作,工资低也没有办法。"
    }
   ]
  },
@@ -8624,14 +8010,12 @@
    {
     "japanese": "すみません。えんぴつを忘れてしまったんですが、ちょっと貸してもらえませんか。",
     "english": "",
-    "chinese": "对不起。我忘带铅笔了,能否把您的铅笔借给我用一下?",
-    "source": "private-material"
+    "chinese": "对不起。我忘带铅笔了,能否把您的铅笔借给我用一下?"
    },
    {
     "japanese": "すみませんが、車をここに止めないでもらえませんか。",
     "english": "",
-    "chinese": "对不起,请您别把车停在这里好吗?",
-    "source": "private-material"
+    "chinese": "对不起,请您别把车停在这里好吗?"
    }
   ]
  },
@@ -8649,14 +8033,12 @@
    {
     "japanese": "わたしは甘いものがあまり好きではない。といっても、クッキーやケーキをまったく食べないということではない。",
     "english": "",
-    "chinese": "我不太喜欢吃甜食。不过,诸如饼干、蛋糕这类的东西也不是一点都不吃。",
-    "source": "private-material"
+    "chinese": "我不太喜欢吃甜食。不过,诸如饼干、蛋糕这类的东西也不是一点都不吃。"
    },
    {
     "japanese": "今年の冬は暖かくて過ごしやすいということだが、風邪が流行らないということでもないようだ。",
     "english": "",
-    "chinese": "今年的冬天比较暖和,很舒服。但是,这并不等于说感冒就不会流行了。",
-    "source": "private-material"
+    "chinese": "今年的冬天比较暖和,很舒服。但是,这并不等于说感冒就不会流行了。"
    }
   ]
  },
@@ -8674,14 +8056,12 @@
    {
     "japanese": "デパートで働いても、商品が安く買えるということはない。",
     "english": "",
-    "chinese": "并不是说在百货公司上班就能买到便宜货。",
-    "source": "private-material"
+    "chinese": "并不是说在百货公司上班就能买到便宜货。"
    },
    {
     "japanese": "新人だが、何もできないということはない。",
     "english": "",
-    "chinese": "虽然是新手,但并不意味着什么都不会。",
-    "source": "private-material"
+    "chinese": "虽然是新手,但并不意味着什么都不会。"
    }
   ]
  },
@@ -8699,20 +8079,17 @@
    {
     "japanese": "あの先生の授業はおもしろみがなく退屈だというので、サボる学生が多い。",
     "english": "",
-    "chinese": "说是因为那位老师的课没劲,很无聊,所以有不少学生逃课。",
-    "source": "private-material"
+    "chinese": "说是因为那位老师的课没劲,很无聊,所以有不少学生逃课。"
    },
    {
     "japanese": "田舎より都会のほうがいいというので、上京した息子は今どうなっているだろう。",
     "english": "",
-    "chinese": "说是城市比乡下好,我那个去了东京的儿子,也不知道他现在怎么样了。",
-    "source": "private-material"
+    "chinese": "说是城市比乡下好,我那个去了东京的儿子,也不知道他现在怎么样了。"
    },
    {
     "japanese": "友だちを迎えるというので、彼は空港へ行った。",
     "english": "",
-    "chinese": "说是要接朋友,他去了机场。",
-    "source": "private-material"
+    "chinese": "说是要接朋友,他去了机场。"
    }
   ]
  },
@@ -8730,26 +8107,22 @@
    {
     "japanese": "さっきご飯を食べたばかりだというのに、もうおなかが空いてきた。",
     "english": "",
-    "chinese": "刚刚吃过饭,可又开始觉得肚子饿了。",
-    "source": "private-material"
+    "chinese": "刚刚吃过饭,可又开始觉得肚子饿了。"
    },
    {
     "japanese": "賞をもらったのは弟だというのに、彼女の喜ぶ様子は自分が賞をもらったかのようだ。",
     "english": "",
-    "chinese": "虽说得奖的是弟弟,但是她那开心的样子,就像她本人获奖了一样。",
-    "source": "private-material"
+    "chinese": "虽说得奖的是弟弟,但是她那开心的样子,就像她本人获奖了一样。"
    },
    {
     "japanese": "黙れと言うのに、どうしてまだくどくどとしゃべっているのか。",
     "english": "",
-    "chinese": "叫你闭嘴,可你为什么还在那里唠唠叨叨?",
-    "source": "private-material"
+    "chinese": "叫你闭嘴,可你为什么还在那里唠唠叨叨?"
    },
    {
     "japanese": "眠いでしょう。だからさ、ゆうべ早く寝なさいと言ったのに。",
     "english": "",
-    "chinese": "困了吧?所以嘛,我昨晚叫你早点睡觉,可是你……",
-    "source": "private-material"
+    "chinese": "困了吧?所以嘛,我昨晚叫你早点睡觉,可是你……"
    }
   ]
  },
@@ -8767,14 +8140,12 @@
    {
     "japanese": "成績はいいけど、いつもクラスで一番というほどではないんですよ。",
     "english": "",
-    "chinese": "成绩是很好,但也没有达到始终在班里排第一的程度。",
-    "source": "private-material"
+    "chinese": "成绩是很好,但也没有达到始终在班里排第一的程度。"
    },
    {
     "japanese": "うまいというほどでもないが、いくつか料理ができる。",
     "english": "",
-    "chinese": "虽然称不上烧得好吃,但会烧几个菜。",
-    "source": "private-material"
+    "chinese": "虽然称不上烧得好吃,但会烧几个菜。"
    }
   ]
  },
@@ -8792,14 +8163,12 @@
    {
     "japanese": "いい本というものは、いつ読んでも感動を与えてくる。",
     "english": "",
-    "chinese": "一本好书,不管是何时阅读,都会给你带来感动。",
-    "source": "private-material"
+    "chinese": "一本好书,不管是何时阅读,都会给你带来感动。"
    },
    {
     "japanese": "欠点というものは、まず本人がそれを自覚しないと直せない。",
     "english": "",
-    "chinese": "缺点这东西,如果本人都没有意识到的话,就不可能改正。",
-    "source": "private-material"
+    "chinese": "缺点这东西,如果本人都没有意识到的话,就不可能改正。"
    }
   ]
  },
@@ -8817,26 +8186,22 @@
    {
     "japanese": "あの子は天才といえば天才だが、ご両親ともピアニストだから、そんな成績を取ったのは当たり前だと言えるだろう。",
     "english": "",
-    "chinese": "要说那孩子还真是天才,不过因为他的父母都是钢琴家,所以可以说他取得那样的优异成绩也是理所当然的吧。",
-    "source": "private-material"
+    "chinese": "要说那孩子还真是天才,不过因为他的父母都是钢琴家,所以可以说他取得那样的优异成绩也是理所当然的吧。"
    },
    {
     "japanese": "日本語は難しいといえば難しいが、よく勉強すればだれでも身につけられる。",
     "english": "",
-    "chinese": "说日语不好学还真是不好学,不过只要努力学习,无论是谁都能学会。",
-    "source": "private-material"
+    "chinese": "说日语不好学还真是不好学,不过只要努力学习,无论是谁都能学会。"
    },
    {
     "japanese": "社長になったといえば、聞こえがいいですが、やることがないですから、つまらないですよ。",
     "english": "",
-    "chinese": "说起当社长,听起来好听,但是由于无所事事,所以可无聊呢。",
-    "source": "private-material"
+    "chinese": "说起当社长,听起来好听,但是由于无所事事,所以可无聊呢。"
    },
    {
     "japanese": "5分間といえば確かに短いですけれども、うまく利用すればたくさんのことができます。",
     "english": "",
-    "chinese": "要说5分钟的时间确实很短,但是如果能够善于利用,就可以做很多事情。",
-    "source": "private-material"
+    "chinese": "要说5分钟的时间确实很短,但是如果能够善于利用,就可以做很多事情。"
    }
   ]
  },
@@ -8854,50 +8219,42 @@
    {
     "japanese": "説明書の手順のとおりにやれば、誰でも簡単にできる。",
     "english": "",
-    "chinese": "只要按照说明书上的步骤,谁都能运用自如。",
-    "source": "private-material"
+    "chinese": "只要按照说明书上的步骤,谁都能运用自如。"
    },
    {
     "japanese": "これから私が言うとおりにパソコンを操作してください。",
     "english": "",
-    "chinese": "现在开始就按照我教你的去操作电脑吧。",
-    "source": "private-material"
+    "chinese": "现在开始就按照我教你的去操作电脑吧。"
    },
    {
     "japanese": "予測したとおり、Aチームは優勝した。",
     "english": "",
-    "chinese": "正如事先预测的那样,A队获胜了。",
-    "source": "private-material"
+    "chinese": "正如事先预测的那样,A队获胜了。"
    },
    {
     "japanese": "物事は自分の考えているとおりにはうまく進まない場合が多い。",
     "english": "",
-    "chinese": "有很多时候,事情并不会随心所愿。",
-    "source": "private-material"
+    "chinese": "有很多时候,事情并不会随心所愿。"
    },
    {
     "japanese": "A「山田さんはとても立派な男ですよ。」",
     "english": "",
-    "chinese": "山田是个十分出色的男人呢。",
-    "source": "private-material"
+    "chinese": "山田是个十分出色的男人呢。"
    },
    {
     "japanese": "B「ええ、おっしゃったとおりです。」",
     "english": "",
-    "chinese": "是的,您说对了。",
-    "source": "private-material"
+    "chinese": "是的,您说对了。"
    },
    {
     "japanese": "申し込みに関しての注意点は以上のとおりでした。",
     "english": "",
-    "chinese": "以上,就是有关申请时的注意事项。",
-    "source": "private-material"
+    "chinese": "以上,就是有关申请时的注意事项。"
    },
    {
     "japanese": "お問い合わせの件、以下のとおりに、お知らせします。",
     "english": "",
-    "chinese": "您所咨询的事宜,谨答复如下。",
-    "source": "private-material"
+    "chinese": "您所咨询的事宜,谨答复如下。"
    }
   ]
  },
@@ -8915,14 +8272,12 @@
    {
     "japanese": "ちゃんと前を見て運転してよ。今、隣の車にぶつかるところだったよ。本当に危なかったんだから。",
     "english": "",
-    "chinese": "好好地看着前面开。刚才差一点碰到旁边的车子了。真的好危险啊。",
-    "source": "private-material"
+    "chinese": "好好地看着前面开。刚才差一点碰到旁边的车子了。真的好危险啊。"
    },
    {
     "japanese": "店内も広くて初めてだったから、あぶなく迷子になるところだったのよ。",
     "english": "",
-    "chinese": "店堂内很大,再加上又是第一次到那家店里去,所以我差点都迷路了。",
-    "source": "private-material"
+    "chinese": "店堂内很大,再加上又是第一次到那家店里去,所以我差点都迷路了。"
    }
   ]
  },
@@ -8940,20 +8295,17 @@
    {
     "japanese": "昔、ここは港町として繁栄していた。",
     "english": "",
-    "chinese": "从前,这一带作为港口城市十分繁华。",
-    "source": "private-material"
+    "chinese": "从前,这一带作为港口城市十分繁华。"
    },
    {
     "japanese": "あの人に女優としての才能があるかどうかは疑問だ。",
     "english": "",
-    "chinese": "她是否具备作为一名演员的才能,值得怀疑。",
-    "source": "private-material"
+    "chinese": "她是否具备作为一名演员的才能,值得怀疑。"
    },
    {
     "japanese": "わが社としては、従来の方針を通すつもりだ。",
     "english": "",
-    "chinese": "作为本公司而言,我们坚持一贯的经营方针不变。",
-    "source": "private-material"
+    "chinese": "作为本公司而言,我们坚持一贯的经营方针不变。"
    }
   ]
  },
@@ -8971,14 +8323,12 @@
    {
     "japanese": "たとえ不合格だとしても、君の今までの努力は無駄ではないよ。",
     "english": "",
-    "chinese": "就算是不及格,你至今的努力也并没有白费。",
-    "source": "private-material"
+    "chinese": "就算是不及格,你至今的努力也并没有白费。"
    },
    {
     "japanese": "今週は忙しいから、彼女と会えるとしても、週末だなあ。",
     "english": "",
-    "chinese": "本周我很忙,所以即使能见到她,估计也要等到周末吧。",
-    "source": "private-material"
+    "chinese": "本周我很忙,所以即使能见到她,估计也要等到周末吧。"
    }
   ]
  },
@@ -8996,14 +8346,12 @@
    {
     "japanese": "ここに時間を止められる機械があるとします。あなたならそれを使って何をしますか。",
     "english": "",
-    "chinese": "假如这里有一台能让时间停止的机器。如果是你的话,你会用它来做什么?",
-    "source": "private-material"
+    "chinese": "假如这里有一台能让时间停止的机器。如果是你的话,你会用它来做什么?"
    },
    {
     "japanese": "仮に1ドルを120円として費用を計算してみよう。",
     "english": "",
-    "chinese": "假设1美元换120日元,以此汇率来计算费用吧。",
-    "source": "private-material"
+    "chinese": "假设1美元换120日元,以此汇率来计算费用吧。"
    }
   ]
  },
@@ -9021,26 +8369,22 @@
    {
     "japanese": "親切なご主人は、給料とは別に、小遣いとして三千円の入った袋を、使用人の私に渡してくれたのだ。",
     "english": "",
-    "chinese": "善良的主人除了工资外,在信封里多放了3,000日元作为小费,然后给了我。",
-    "source": "private-material"
+    "chinese": "善良的主人除了工资外,在信封里多放了3,000日元作为小费,然后给了我。"
    },
    {
     "japanese": "午前届いたのとは別に、午後もう一つ小包が来ている。",
     "english": "",
-    "chinese": "除了上午送来的包裹之外,下午又送来了一个包裹。",
-    "source": "private-material"
+    "chinese": "除了上午送来的包裹之外,下午又送来了一个包裹。"
    },
    {
     "japanese": "先週買ったのとは別に、今日は赤いカバンを買った。",
     "english": "",
-    "chinese": "跟上周买的不一样,今天买的是红色皮包。",
-    "source": "private-material"
+    "chinese": "跟上周买的不一样,今天买的是红色皮包。"
    },
    {
     "japanese": "彼女は、民宿にしたわたしたちとは別に、町にある豪華なホテルに泊まった。",
     "english": "",
-    "chinese": "和选择寄宿“农家旅馆”的我们不同,她住在镇上一家豪华宾馆里。",
-    "source": "private-material"
+    "chinese": "和选择寄宿“农家旅馆”的我们不同,她住在镇上一家豪华宾馆里。"
    }
   ]
  },
@@ -9058,14 +8402,12 @@
    {
     "japanese": "妻はほがらかな人だが、彼女と反対に、夫はとても静かだ。",
     "english": "",
-    "chinese": "妻子是个开朗的人,与此相反,丈夫是个安静的人。",
-    "source": "private-material"
+    "chinese": "妻子是个开朗的人,与此相反,丈夫是个安静的人。"
    },
    {
     "japanese": "保険会社が儲かっているのとは反対に、機械メーカーは経営が厳しくなってきた。",
     "english": "",
-    "chinese": "保险公司大赚特赚,而机器制造业的日子越来越难过。",
-    "source": "private-material"
+    "chinese": "保险公司大赚特赚,而机器制造业的日子越来越难过。"
    }
   ]
  },
@@ -9083,14 +8425,12 @@
    {
     "japanese": "昔と比べて、ここの環境もだいぶ変化してきた。",
     "english": "",
-    "chinese": "跟从前比,这里的环境发生了很大的变化。",
-    "source": "private-material"
+    "chinese": "跟从前比,这里的环境发生了很大的变化。"
    },
    {
     "japanese": "昨日と比べると、今日は川の水の色が微妙に違っている。",
     "english": "",
-    "chinese": "跟昨天比,今天这河水的颜色发生了微妙的变化。",
-    "source": "private-material"
+    "chinese": "跟昨天比,今天这河水的颜色发生了微妙的变化。"
    }
   ]
  },
@@ -9108,26 +8448,22 @@
    {
     "japanese": "最近、忙しいと見えて、いつ電話をしても留守だ。",
     "english": "",
-    "chinese": "看来他最近很忙,打电话给他总是不在家。",
-    "source": "private-material"
+    "chinese": "看来他最近很忙,打电话给他总是不在家。"
    },
    {
     "japanese": "雨が降ったと見えて、道が濡れています。",
     "english": "",
-    "chinese": "看来下过雨了,路上湿漉漉的。",
-    "source": "private-material"
+    "chinese": "看来下过雨了,路上湿漉漉的。"
    },
    {
     "japanese": "昨日けんかをしたばかりの二人が今日は手をつないでいっしょに散歩している。もう大丈夫だと見える。",
     "english": "",
-    "chinese": "昨天刚吵架的两个人,今天又手拉手地一起散步。看来已经没事了。",
-    "source": "private-material"
+    "chinese": "昨天刚吵架的两个人,今天又手拉手地一起散步。看来已经没事了。"
    },
    {
     "japanese": "あのおばさんは若い娘さんのような肌をしていて、とても50歳(だ)とは見えませんね。",
     "english": "",
-    "chinese": "那位阿姨的皮肤就像年轻姑娘的皮肤似的,怎么也看不出有50岁。",
-    "source": "private-material"
+    "chinese": "那位阿姨的皮肤就像年轻姑娘的皮肤似的,怎么也看不出有50岁。"
    }
   ]
  },
@@ -9145,14 +8481,12 @@
    {
     "japanese": "その時の喜びといったら、言葉では表わせない。",
     "english": "",
-    "chinese": "说起当时喜悦的心情,简直难以言表。",
-    "source": "private-material"
+    "chinese": "说起当时喜悦的心情,简直难以言表。"
    },
    {
     "japanese": "日本の道路のきれいさといったら、感心しますね。",
     "english": "",
-    "chinese": "说起日本道路的清洁度,真是令人佩服。",
-    "source": "private-material"
+    "chinese": "说起日本道路的清洁度,真是令人佩服。"
    }
   ]
  },
@@ -9170,38 +8504,32 @@
    {
     "japanese": "どうも分からないの。もう少し分かりやすく説明してくれないかしら。",
     "english": "",
-    "chinese": "还是觉得有点不懂。你能不能解释得再简单一些。",
-    "source": "private-material"
+    "chinese": "还是觉得有点不懂。你能不能解释得再简单一些。"
    },
    {
     "japanese": "社長のスピーチ、早く終わらないかな。いつも長くて困るよ。",
     "english": "",
-    "chinese": "社长的演讲就不能快点结束吗?总是冗长乏味,让人郁闷。",
-    "source": "private-material"
+    "chinese": "社长的演讲就不能快点结束吗?总是冗长乏味,让人郁闷。"
    },
    {
     "japanese": "A「向こうからやって来る人は君の昔の恋人じゃないかしら。」",
     "english": "",
-    "chinese": "从对面走过来的那位不是你从前的恋人吗?",
-    "source": "private-material"
+    "chinese": "从对面走过来的那位不是你从前的恋人吗?"
    },
    {
     "japanese": "B「いいえ、違います。」",
     "english": "",
-    "chinese": "不,不是。",
-    "source": "private-material"
+    "chinese": "不,不是。"
    },
    {
     "japanese": "A「その仕事は君にはちょっと難しくないかな。」",
     "english": "",
-    "chinese": "那份工作对你有点难度吧。",
-    "source": "private-material"
+    "chinese": "那份工作对你有点难度吧。"
    },
    {
     "japanese": "B「ええ。でも、やってみます。」",
     "english": "",
-    "chinese": "是啊。不过我试试看。",
-    "source": "private-material"
+    "chinese": "是啊。不过我试试看。"
    }
   ]
  },
@@ -9219,14 +8547,12 @@
    {
     "japanese": "遅刻なら別だが、声もかけずに仕事を休むのが許せない。",
     "english": "",
-    "chinese": "如果只是迟到的话倒也罢了,招呼也不打就不来上班,这怎么能原谅。",
-    "source": "private-material"
+    "chinese": "如果只是迟到的话倒也罢了,招呼也不打就不来上班,这怎么能原谅。"
    },
    {
     "japanese": "詳しく調べたのなら話は別だが、何も分からないのに、どうのこうの意見を言うなんて、何のつもりなんだ。",
     "english": "",
-    "chinese": "如果经过了详细调查倒也罢了,什么都不知道,还在那里叽叽喳喳地胡说八道,你到底要干什么?",
-    "source": "private-material"
+    "chinese": "如果经过了详细调查倒也罢了,什么都不知道,还在那里叽叽喳喳地胡说八道,你到底要干什么?"
    }
   ]
  },
@@ -9244,20 +8570,17 @@
    {
     "japanese": "収入の減少につれて、生活が厳しくなってきた。",
     "english": "",
-    "chinese": "随着收入的减少,生活开始严峻起来了。",
-    "source": "private-material"
+    "chinese": "随着收入的减少,生活开始严峻起来了。"
    },
    {
     "japanese": "時間が経つにつれて、悲しいことは忘れていった。",
     "english": "",
-    "chinese": "随着时间的流逝,也忘却了悲痛的事情。",
-    "source": "private-material"
+    "chinese": "随着时间的流逝,也忘却了悲痛的事情。"
    },
    {
     "japanese": "あたりが暗くなるにつれて、だんだん眠くなってきた。",
     "english": "",
-    "chinese": "随着周围渐渐地暗下来,我有些犯困了。",
-    "source": "private-material"
+    "chinese": "随着周围渐渐地暗下来,我有些犯困了。"
    }
   ]
  },
@@ -9275,38 +8598,32 @@
    {
     "japanese": "70周年記念式典は午前10時、講堂にて挙行されます。",
     "english": "",
-    "chinese": "70周年纪念盛典将于上午10点在大会堂举行。",
-    "source": "private-material"
+    "chinese": "70周年纪念盛典将于上午10点在大会堂举行。"
    },
    {
     "japanese": "シンポジウムはアジア研究センターにて(=で)開かれると掲示板に書いてある。",
     "english": "",
-    "chinese": "告示牌上写着:研讨会在亚洲研究中心举行。",
-    "source": "private-material"
+    "chinese": "告示牌上写着:研讨会在亚洲研究中心举行。"
    },
    {
     "japanese": "この番組についての率直なご意見をお待ちしております。なお、お便りは葉書にてお寄せください。",
     "english": "",
-    "chinese": "关于本节目,本台殷切希望能得到观众们中肯的意见。如果您有什么建议,请用明信片的方式寄到本台。",
-    "source": "private-material"
+    "chinese": "关于本节目,本台殷切希望能得到观众们中肯的意见。如果您有什么建议,请用明信片的方式寄到本台。"
    },
    {
     "japanese": "私の落とした運転免許証をご親切に郵便にてお送りくださり、本当にありがとうございました。",
     "english": "",
-    "chinese": "衷心感谢您热心地把我丢失的驾照通过信件寄送给我。",
-    "source": "private-material"
+    "chinese": "衷心感谢您热心地把我丢失的驾照通过信件寄送给我。"
    },
    {
     "japanese": "申し込みは3月20日にて締め切らせていただきます。",
     "english": "",
-    "chinese": "报名申请将于3月20日截止。",
-    "source": "private-material"
+    "chinese": "报名申请将于3月20日截止。"
    },
    {
     "japanese": "当店は本月の31日にて、このサービスを終わらせていただきます。",
     "english": "",
-    "chinese": "本店将于本月31日结束这次优惠活动。",
-    "source": "private-material"
+    "chinese": "本店将于本月31日结束这次优惠活动。"
    }
   ]
  },
@@ -9324,14 +8641,12 @@
    {
     "japanese": "問題は簡単には簡単だけど、100点は取れないよ。",
     "english": "",
-    "chinese": "考题简单是简单,但100分是拿不到的。",
-    "source": "private-material"
+    "chinese": "考题简单是简单,但100分是拿不到的。"
    },
    {
     "japanese": "この文章は読むには読んだが、意味が分からない。",
     "english": "",
-    "chinese": "这篇文章读是读了,但不明其意。",
-    "source": "private-material"
+    "chinese": "这篇文章读是读了,但不明其意。"
    }
   ]
  },
@@ -9349,14 +8664,12 @@
    {
     "japanese": "お葉書をお送りくださった皆様の中から100名様に限り、素敵な商品をプレゼントいたします。",
     "english": "",
-    "chinese": "从给我们邮寄明信片的人中限定100名,我们将赠送绝佳的礼品。",
-    "source": "private-material"
+    "chinese": "从给我们邮寄明信片的人中限定100名,我们将赠送绝佳的礼品。"
    },
    {
     "japanese": "この切符は、発売の日から1か月に限り、有効です。",
     "english": "",
-    "chinese": "这张车票,从发售当天算起,一个月内有效。",
-    "source": "private-material"
+    "chinese": "这张车票,从发售当天算起,一个月内有效。"
    }
   ]
  },
@@ -9374,26 +8687,22 @@
    {
     "japanese": "やはりそのやり方がよかったんだ。",
     "english": "",
-    "chinese": "还是那样的做法妥当。",
-    "source": "private-material"
+    "chinese": "还是那样的做法妥当。"
    },
    {
     "japanese": "みんなに反対されても、ぼくは最後までやるのだ。",
     "english": "",
-    "chinese": "哪怕别人都反对,我还是要干到底。",
-    "source": "private-material"
+    "chinese": "哪怕别人都反对,我还是要干到底。"
    },
    {
     "japanese": "通行禁止は、車がその通りを通ってはいけないのだ。",
     "english": "",
-    "chinese": "禁止通行,也就是说车辆不可以在那条道路上行驶。",
-    "source": "private-material"
+    "chinese": "禁止通行,也就是说车辆不可以在那条道路上行驶。"
    },
    {
     "japanese": "今、財布が厳しい。つまり、家計が苦しいということなのだ。",
     "english": "",
-    "chinese": "我现在是囊中羞涩。也就是说家里的日子不好过。",
-    "source": "private-material"
+    "chinese": "我现在是囊中羞涩。也就是说家里的日子不好过。"
    }
   ]
  },
@@ -9411,32 +8720,27 @@
    {
     "japanese": "もし失敗しても、初めてなんだからしかたがない。",
     "english": "",
-    "chinese": "万一失败了,因为是第一次,所以也没辙。",
-    "source": "private-material"
+    "chinese": "万一失败了,因为是第一次,所以也没辙。"
    },
    {
     "japanese": "とても忙しいんですから、手伝ってください。",
     "english": "",
-    "chinese": "太忙了,所以你过来帮帮我吧。",
-    "source": "private-material"
+    "chinese": "太忙了,所以你过来帮帮我吧。"
    },
    {
     "japanese": "せっかく休みを取って旅行に来たんだから、仕事のことを考えるのはやめよう。",
     "english": "",
-    "chinese": "好不容易请了假出来旅行,我们就不要去想工作的事情了吧。",
-    "source": "private-material"
+    "chinese": "好不容易请了假出来旅行,我们就不要去想工作的事情了吧。"
    },
    {
     "japanese": "どうせ汚すのだから、子どもに高価な服は必要ないだろう。",
     "english": "",
-    "chinese": "反正很快会穿脏的,所以没有必要给孩子买高档衣服吧。",
-    "source": "private-material"
+    "chinese": "反正很快会穿脏的,所以没有必要给孩子买高档衣服吧。"
    },
    {
     "japanese": "今のところは元気そうに見えるかもしれないが、なにしろこんな年なのだから、年に一度健康診断を受ける必要があると思っている。",
     "english": "",
-    "chinese": "目前看上去或许还很健康,但是毕竟上了年纪,所以我想有必要每年做一次体检。",
-    "source": "private-material"
+    "chinese": "目前看上去或许还很健康,但是毕竟上了年纪,所以我想有必要每年做一次体检。"
    }
   ]
  },
@@ -9454,26 +8758,22 @@
    {
     "japanese": "この二、三日、山田君の顔を見ませんでしたね。病気なのではないでしょうか。",
     "english": "",
-    "chinese": "这两三天没有见到山田,会不会是生病了。",
-    "source": "private-material"
+    "chinese": "这两三天没有见到山田,会不会是生病了。"
    },
    {
     "japanese": "プレゼントをあげたのだから、山田君は鈴木さんが好きなのではないか。",
     "english": "",
-    "chinese": "都送礼物了,所以我猜是不是山田喜欢上铃木小姐了?",
-    "source": "private-material"
+    "chinese": "都送礼物了,所以我猜是不是山田喜欢上铃木小姐了?"
    },
    {
     "japanese": "A「佐藤さんは昨日来たかなあ。」",
     "english": "",
-    "chinese": "佐藤昨天来过吗?",
-    "source": "private-material"
+    "chinese": "佐藤昨天来过吗?"
    },
    {
     "japanese": "B「さあ、来たんじゃないかと思うけど。」",
     "english": "",
-    "chinese": "不知道,大概来过吧。",
-    "source": "private-material"
+    "chinese": "不知道,大概来过吧。"
    }
   ]
  },
@@ -9491,20 +8791,17 @@
    {
     "japanese": "私は別として、ほかのクラスメートはみな勉強家です。",
     "english": "",
-    "chinese": "我属于例外,不过其他的同班同学个个都是勤奋好学的学生。",
-    "source": "private-material"
+    "chinese": "我属于例外,不过其他的同班同学个个都是勤奋好学的学生。"
    },
    {
     "japanese": "今度私は旅行に行けない。費用は別にして、だいいち時間がない。",
     "english": "",
-    "chinese": "这次旅行我去不了了。费用是另一回事,首先我没有时间。",
-    "source": "private-material"
+    "chinese": "这次旅行我去不了了。费用是另一回事,首先我没有时间。"
    },
    {
     "japanese": "好きか嫌いかは別として、彼が当代一流の作家であることは間違いない。",
     "english": "",
-    "chinese": "先不说喜欢不喜欢这个人,他是当代一流作家,这一点是毫无疑问的。",
-    "source": "private-material"
+    "chinese": "先不说喜欢不喜欢这个人,他是当代一流作家,这一点是毫无疑问的。"
    }
   ]
  },
@@ -9522,26 +8819,22 @@
    {
     "japanese": "学生のとき、もっと勉強しておけばよかったと後悔している。",
     "english": "",
-    "chinese": "我后悔道:“在校的时候,我要是再多学点知识就好了。”",
-    "source": "private-material"
+    "chinese": "我后悔道:“在校的时候,我要是再多学点知识就好了。”"
    },
    {
     "japanese": "出かけていた間に泥棒に入られた。その日に出かけないとよかった。",
     "english": "",
-    "chinese": "我出门期间家里被小偷光顾了。那天我要是不出门就好了。",
-    "source": "private-material"
+    "chinese": "我出门期间家里被小偷光顾了。那天我要是不出门就好了。"
    },
    {
     "japanese": "新しいカメラを買わないで、わたしのを使えばよかったのに。",
     "english": "",
-    "chinese": "你用不着买新照相机,用我的就是了嘛,真是的。",
-    "source": "private-material"
+    "chinese": "你用不着买新照相机,用我的就是了嘛,真是的。"
    },
    {
     "japanese": "とても楽しいパーティーだったわよ。あなたも参加するとよかったのに。",
     "english": "",
-    "chinese": "派对玩得可开心呢。你要是也参加该多好啊。",
-    "source": "private-material"
+    "chinese": "派对玩得可开心呢。你要是也参加该多好啊。"
    }
   ]
  },
@@ -9559,14 +8852,12 @@
    {
     "japanese": "それ以外にもういい方法がないように思う。",
     "english": "",
-    "chinese": "我感觉除此之外已经没有别的好办法了。",
-    "source": "private-material"
+    "chinese": "我感觉除此之外已经没有别的好办法了。"
    },
    {
     "japanese": "大学の入試に落ちたとき、どうも地獄に落ちたように感じたけど。",
     "english": "",
-    "chinese": "当高考失败后,我有一种掉进地狱的感觉。",
-    "source": "private-material"
+    "chinese": "当高考失败后,我有一种掉进地狱的感觉。"
    }
   ]
  },
@@ -9584,14 +8875,12 @@
    {
     "japanese": "まだ秋なのに、今日は寒くてまるで冬のように感じられる。",
     "english": "",
-    "chinese": "虽然还是秋天,但今天冷得让我觉得是在冬季。",
-    "source": "private-material"
+    "chinese": "虽然还是秋天,但今天冷得让我觉得是在冬季。"
    },
    {
     "japanese": "犬さえぼくをばかにしているように思われる。",
     "english": "",
-    "chinese": "我觉得连小狗都在欺负我。",
-    "source": "private-material"
+    "chinese": "我觉得连小狗都在欺负我。"
    }
   ]
  },
@@ -9609,122 +8898,102 @@
    {
     "japanese": "彼女の父親は私の母の弟だ。つまり彼女と私はいとこなわけだ。",
     "english": "",
-    "chinese": "她的父亲是我母亲的弟弟,也就是说,她跟我是表亲。",
-    "source": "private-material"
+    "chinese": "她的父亲是我母亲的弟弟,也就是说,她跟我是表亲。"
    },
    {
     "japanese": "家賃は1か月5万円だから、1年で60万円も払うわけだ。",
     "english": "",
-    "chinese": "因为房租每月是5万日元,所以也就是1年要支付60万日元。",
-    "source": "private-material"
+    "chinese": "因为房租每月是5万日元,所以也就是1年要支付60万日元。"
    },
    {
     "japanese": "40問の文法問題のうち、25問解答した。これでやっと半分あまりが終わったというわけだ。",
     "english": "",
-    "chinese": "40道语法试题做了25题,也就是说完成了一半以上。",
-    "source": "private-material"
+    "chinese": "40道语法试题做了25题,也就是说完成了一半以上。"
    },
    {
     "japanese": "A「へえ、銀行はまだ開いてないのか。もう10時なのに。」",
     "english": "",
-    "chinese": "怎么?银行还没有开门?都10点钟了。",
-    "source": "private-material"
+    "chinese": "怎么?银行还没有开门?都10点钟了。"
    },
    {
     "japanese": "B「今日は日曜日よ。」",
     "english": "",
-    "chinese": "今天是星期天呀。",
-    "source": "private-material"
+    "chinese": "今天是星期天呀。"
    },
    {
     "japanese": "A「それなら、休みなわけだ。」",
     "english": "",
-    "chinese": "那怪不得不营业。",
-    "source": "private-material"
+    "chinese": "那怪不得不营业。"
    },
    {
     "japanese": "A「キムさんは日本に30年も住んでいたそうよ。」",
     "english": "",
-    "chinese": "听说小金在日本住了30年。",
-    "source": "private-material"
+    "chinese": "听说小金在日本住了30年。"
    },
    {
     "japanese": "B「だから、日本語が得意なわけですね。」",
     "english": "",
-    "chinese": "所以她的日语才说得很棒呀。",
-    "source": "private-material"
+    "chinese": "所以她的日语才说得很棒呀。"
    },
    {
     "japanese": "スポーツが苦手だといっても、スポーツ番組を見るのが嫌いだというわけではない。",
     "english": "",
-    "chinese": "虽说我不擅长体育,但并不意味着我连体育节目都不喜欢看。",
-    "source": "private-material"
+    "chinese": "虽说我不擅长体育,但并不意味着我连体育节目都不喜欢看。"
    },
    {
     "japanese": "安い店は色々あるが、安ければどこでもいいというわけではない。",
     "english": "",
-    "chinese": "卖便宜货的商店有很多。但是,并非是只要价格便宜哪个商店都可以。",
-    "source": "private-material"
+    "chinese": "卖便宜货的商店有很多。但是,并非是只要价格便宜哪个商店都可以。"
    },
    {
     "japanese": "会社の不景気が不安じゃないわけでもないが、なにしろ平の社員なんだから、どうしようもない。",
     "english": "",
-    "chinese": "公司不景气,我们不可能不担心,但是因为我们都是普普通通的职工,又有什么办法呢。",
-    "source": "private-material"
+    "chinese": "公司不景气,我们不可能不担心,但是因为我们都是普普通通的职工,又有什么办法呢。"
    },
    {
     "japanese": "最近の子どもはテレビゲームばかりしているようだが、必ずしも外で遊ばないわけではない。",
     "english": "",
-    "chinese": "最近的孩子似乎老是待在家里玩电玩,但这并不是说他们不在外面玩耍。",
-    "source": "private-material"
+    "chinese": "最近的孩子似乎老是待在家里玩电玩,但这并不是说他们不在外面玩耍。"
    },
    {
     "japanese": "うちの子は加害者なわけはない。間違ったんじゃない、おまわりさん。",
     "english": "",
-    "chinese": "我家的孩子绝对不可能是加害者。警察先生,你们有没有搞错哦。",
-    "source": "private-material"
+    "chinese": "我家的孩子绝对不可能是加害者。警察先生,你们有没有搞错哦。"
    },
    {
     "japanese": "お酒の好きな田中さんが来るんだから、これだけで足りるわけがない。",
     "english": "",
-    "chinese": "因为好酒的田中要来,所以这点酒根本不够喝。",
-    "source": "private-material"
+    "chinese": "因为好酒的田中要来,所以这点酒根本不够喝。"
    },
    {
     "japanese": "今は真冬なんだから、北海道は寒くないわけはない。",
     "english": "",
-    "chinese": "因为目前正值冬季,所以北海道不可能不冷。",
-    "source": "private-material"
+    "chinese": "因为目前正值冬季,所以北海道不可能不冷。"
    },
    {
     "japanese": "このマンガは若い人の間で、すごく流行っているので、高校生が知らないわけがないよ。",
     "english": "",
-    "chinese": "这本漫画在年轻人中间很流行,所以高中生不可能不知道。",
-    "source": "private-material"
+    "chinese": "这本漫画在年轻人中间很流行,所以高中生不可能不知道。"
    },
    {
     "japanese": "あしたはほかの仕事をしなければならないのだから、この仕事をやりかけのまま、帰るわけにはいかない。",
     "english": "",
-    "chinese": "因为明天必须做其他事,所以眼下的这份工作不能没做完就回家。",
-    "source": "private-material"
+    "chinese": "因为明天必须做其他事,所以眼下的这份工作不能没做完就回家。"
    },
    {
     "japanese": "われわれは、彼のした無責任な行動を見逃すわけにはいかないのである。",
     "english": "",
-    "chinese": "我们不能放任他那不负责任的行为。",
-    "source": "private-material"
+    "chinese": "我们不能放任他那不负责任的行为。"
    },
    {
     "japanese": "約束したんですから、行かないわけにはいきません。",
     "english": "",
-    "chinese": "因为约好了,所以不去不行。",
-    "source": "private-material"
+    "chinese": "因为约好了,所以不去不行。"
    },
    {
     "japanese": "家族がいますから、いくら疲れても働き続けないわけにはいきません。",
     "english": "",
-    "chinese": "因为还有老婆孩子呢,所以再苦再累我也要继续工作下去。",
-    "source": "private-material"
+    "chinese": "因为还有老婆孩子呢,所以再苦再累我也要继续工作下去。"
    }
   ]
  },
@@ -9742,14 +9011,12 @@
    {
     "japanese": "自分の子なわけだから、世話をするのは当然だ。",
     "english": "",
-    "chinese": "因为是自家的孩子,所以照顾孩子是理所当然的事情。",
-    "source": "private-material"
+    "chinese": "因为是自家的孩子,所以照顾孩子是理所当然的事情。"
    },
    {
     "japanese": "4人ともそれぞれ車で来るわけだから、うちの前にずらりと止まることになるね。",
     "english": "",
-    "chinese": "因为他们四个人都是要开车过来,所以到时候我们家门口就会并排停四辆车。",
-    "source": "private-material"
+    "chinese": "因为他们四个人都是要开车过来,所以到时候我们家门口就会并排停四辆车。"
    }
   ]
  },
@@ -9767,38 +9034,32 @@
    {
     "japanese": "親を人生の先生にする子どももいる。",
     "english": "",
-    "chinese": "也有孩子把父母当作人生的老师。",
-    "source": "private-material"
+    "chinese": "也有孩子把父母当作人生的老师。"
    },
    {
     "japanese": "地震で家が倒れたため、車を家にして住んでいる人もいる。",
     "english": "",
-    "chinese": "因为地震,房屋倒塌了,所以有的人只好把汽车当作临时的家住在里面。",
-    "source": "private-material"
+    "chinese": "因为地震,房屋倒塌了,所以有的人只好把汽车当作临时的家住在里面。"
    },
    {
     "japanese": "毎朝、出かける前に新聞に目を通すのを日課にしている。",
     "english": "",
-    "chinese": "我把每天早上出门前看报纸作为每天的必修课。",
-    "source": "private-material"
+    "chinese": "我把每天早上出门前看报纸作为每天的必修课。"
    },
    {
     "japanese": "この服のデザインは、欧米の流行を参考にしているそうだ。",
     "english": "",
-    "chinese": "据说这件衣服的款式是参考了欧美的流行趋势设计出来的。",
-    "source": "private-material"
+    "chinese": "据说这件衣服的款式是参考了欧美的流行趋势设计出来的。"
    },
    {
     "japanese": "彼は人生を航海にして生きている。",
     "english": "",
-    "chinese": "他把人生比作航海而生活着。",
-    "source": "private-material"
+    "chinese": "他把人生比作航海而生活着。"
    },
    {
     "japanese": "満開の桜を雲にして言っている言い方がある。",
     "english": "",
-    "chinese": "有把盛开的樱花比作云彩的说法。",
-    "source": "private-material"
+    "chinese": "有把盛开的樱花比作云彩的说法。"
    }
   ]
  },
@@ -9816,50 +9077,42 @@
    {
     "japanese": "A「パーティーは再来週の金曜日なんだって。」",
     "english": "",
-    "chinese": "听说派对在下周五举办。",
-    "source": "private-material"
+    "chinese": "听说派对在下周五举办。"
    },
    {
     "japanese": "B「そうですか。」",
     "english": "",
-    "chinese": "是吗?",
-    "source": "private-material"
+    "chinese": "是吗?"
    },
    {
     "japanese": "A「天気予報によると、明日は天気がいいんだって。」",
     "english": "",
-    "chinese": "据天气预报说,明天是个好天气。",
-    "source": "private-material"
+    "chinese": "据天气预报说,明天是个好天气。"
    },
    {
     "japanese": "B「それはよかった。」",
     "english": "",
-    "chinese": "那太好了。",
-    "source": "private-material"
+    "chinese": "那太好了。"
    },
    {
     "japanese": "山下「田中君、きみ、また大阪に出張なんだって?」",
     "english": "",
-    "chinese": "田中,听说你又要到大阪出差,是吗?",
-    "source": "private-material"
+    "chinese": "田中,听说你又要到大阪出差,是吗?"
    },
    {
     "japanese": "田中「ええ、そうなんですよ。ついこの前も出張に行かされたばかりなんですけどねえ。」",
     "english": "",
-    "chinese": "是的,几天前也是刚让我出过差。",
-    "source": "private-material"
+    "chinese": "是的,几天前也是刚让我出过差。"
    },
    {
     "japanese": "A「宝くじに当たったんだって?おめでとう。で、いくら当たったの?」",
     "english": "",
-    "chinese": "听说你彩票中奖了?祝贺你啊。那你中了多少?",
-    "source": "private-material"
+    "chinese": "听说你彩票中奖了?祝贺你啊。那你中了多少?"
    },
    {
     "japanese": "B「1,000円だ。」",
     "english": "",
-    "chinese": "1,000日元。",
-    "source": "private-material"
+    "chinese": "1,000日元。"
    }
   ]
  },
@@ -9877,38 +9130,32 @@
    {
     "japanese": "そのことならよく存じております。",
     "english": "",
-    "chinese": "那件事情我很了解。",
-    "source": "private-material"
+    "chinese": "那件事情我很了解。"
    },
    {
     "japanese": "A「あの方をご存じですか。」",
     "english": "",
-    "chinese": "那个人您认识吗?",
-    "source": "private-material"
+    "chinese": "那个人您认识吗?"
    },
    {
     "japanese": "B「いいえ、存じません。」",
     "english": "",
-    "chinese": "不认识。",
-    "source": "private-material"
+    "chinese": "不认识。"
    },
    {
     "japanese": "林先生にご指導していただけて、本当に幸せに存じます。",
     "english": "",
-    "chinese": "能得到林老师的指教,深感荣幸。",
-    "source": "private-material"
+    "chinese": "能得到林老师的指教,深感荣幸。"
    },
    {
     "japanese": "案内していただけると、ありがたく存じます。",
     "english": "",
-    "chinese": "非常感谢您能带我去。",
-    "source": "private-material"
+    "chinese": "非常感谢您能带我去。"
    },
    {
     "japanese": "仕事は来月完成すると存じます。",
     "english": "",
-    "chinese": "我估计工作在下个月可以完成。",
-    "source": "private-material"
+    "chinese": "我估计工作在下个月可以完成。"
    }
   ]
  },
@@ -9926,32 +9173,27 @@
    {
     "japanese": "A「そのことはご存じですか。」",
     "english": "",
-    "chinese": "那件事情您知道吗?",
-    "source": "private-material"
+    "chinese": "那件事情您知道吗?"
    },
    {
     "japanese": "B「いいえ、全然存じ上げません。」",
     "english": "",
-    "chinese": "不,完全不知道。",
-    "source": "private-material"
+    "chinese": "不,完全不知道。"
    },
    {
     "japanese": "お父さんのことは以前からよく存じ上げております。",
     "english": "",
-    "chinese": "我很早以前就认识您爸爸了。",
-    "source": "private-material"
+    "chinese": "我很早以前就认识您爸爸了。"
    },
    {
     "japanese": "お会いできてうれしく存じ上げます。",
     "english": "",
-    "chinese": "很高兴能见到您。",
-    "source": "private-material"
+    "chinese": "很高兴能见到您。"
    },
    {
     "japanese": "私が明日社長のところへうかがうので、報告書はそのときお渡しできると存じ上げます。",
     "english": "",
-    "chinese": "我明天要去社长那里,所以我想你这份报告我到时候可以交给他。",
-    "source": "private-material"
+    "chinese": "我明天要去社长那里,所以我想你这份报告我到时候可以交给他。"
    }
   ]
  },
@@ -9969,44 +9211,37 @@
    {
     "japanese": "A「彼に会って、どんな感じがしましたか。」",
     "english": "",
-    "chinese": "你见到他后是什么感觉?",
-    "source": "private-material"
+    "chinese": "你见到他后是什么感觉?"
    },
    {
     "japanese": "B「ちょっと生意気な感じがしました。」",
     "english": "",
-    "chinese": "感觉他有点傲慢。",
-    "source": "private-material"
+    "chinese": "感觉他有点傲慢。"
    },
    {
     "japanese": "悩んでいるのは自分だけではないと知って、世界が開けた感じがした。",
     "english": "",
-    "chinese": "当我知道烦恼的人不止我一个时,觉得心里忽然开朗了好多。",
-    "source": "private-material"
+    "chinese": "当我知道烦恼的人不止我一个时,觉得心里忽然开朗了好多。"
    },
    {
     "japanese": "あの子どもはどうも十数年も行方不明になった弟のような感じがする。",
     "english": "",
-    "chinese": "总觉得那个孩子是我失踪十多年的弟弟。",
-    "source": "private-material"
+    "chinese": "总觉得那个孩子是我失踪十多年的弟弟。"
    },
    {
     "japanese": "顔色を見ると、おじいさんは元気そうな/元気なような感じがしません。",
     "english": "",
-    "chinese": "看脸色,感觉不出爷爷他还很健康。",
-    "source": "private-material"
+    "chinese": "看脸色,感觉不出爷爷他还很健康。"
    },
    {
     "japanese": "山田さんが読んでいる本は難しそうな/難しいような気がします。",
     "english": "",
-    "chinese": "感觉山田读的书有点难度。",
-    "source": "private-material"
+    "chinese": "感觉山田读的书有点难度。"
    },
    {
     "japanese": "何か恐ろしいことが起こりそうな/起こるような感じだね。",
     "english": "",
-    "chinese": "我感觉似乎要发生可怕的事情。",
-    "source": "private-material"
+    "chinese": "我感觉似乎要发生可怕的事情。"
    }
   ]
  },
@@ -10024,20 +9259,17 @@
    {
     "japanese": "元気に見せるために、声を上げて話した。",
     "english": "",
-    "chinese": "为了让人看到自己身体还行,说话时故意提高了声音。",
-    "source": "private-material"
+    "chinese": "为了让人看到自己身体还行,说话时故意提高了声音。"
    },
    {
     "japanese": "彼女はよく足を長く見せるジーンズをはいている。",
     "english": "",
-    "chinese": "她经常穿着能使腿看上去显得修长的牛仔裤。",
-    "source": "private-material"
+    "chinese": "她经常穿着能使腿看上去显得修长的牛仔裤。"
    },
    {
     "japanese": "大統領がまだ生きているように見せるために、前に録画し放送した。",
     "english": "",
-    "chinese": "为了让人觉得总统还活着,故意把以前录好的录像通过电视播放出去。",
-    "source": "private-material"
+    "chinese": "为了让人觉得总统还活着,故意把以前录好的录像通过电视播放出去。"
    }
   ]
  },
@@ -10055,14 +9287,12 @@
    {
     "japanese": "休日は混雑が予想されますので、お電話でご予約の上、ご来店ください。",
     "english": "",
-    "chinese": "预计节假日里顾客很多,所以建议您电话预约后光临本店。",
-    "source": "private-material"
+    "chinese": "预计节假日里顾客很多,所以建议您电话预约后光临本店。"
    },
    {
     "japanese": "それぞれの説明を聞いた上で、旅行のコースを選びたいと思います。",
     "english": "",
-    "chinese": "我想听完各类介绍后,再选择旅行线路。",
-    "source": "private-material"
+    "chinese": "我想听完各类介绍后,再选择旅行线路。"
    }
   ]
  },
@@ -10080,14 +9310,12 @@
    {
     "japanese": "どのコンピューターを買ったらよいか、なかなか一つには決めがたい。",
     "english": "",
-    "chinese": "到底买哪种电脑好,一时难以决定。",
-    "source": "private-material"
+    "chinese": "到底买哪种电脑好,一时难以决定。"
    },
    {
     "japanese": "これだけ景気が悪いのに、税金を上げようとするのは、わたしたち国民には理解しがたい。",
     "english": "",
-    "chinese": "经济如此不景气,还要提高税金,这对于我们国民来说难以理解。",
-    "source": "private-material"
+    "chinese": "经济如此不景气,还要提高税金,这对于我们国民来说难以理解。"
    }
   ]
  },
@@ -10105,20 +9333,17 @@
    {
     "japanese": "先日、病気がちのおばを見舞いに行った。",
     "english": "",
-    "chinese": "前两天去探望了老病号,就是我的阿姨。",
-    "source": "private-material"
+    "chinese": "前两天去探望了老病号,就是我的阿姨。"
    },
    {
     "japanese": "このごろはいつも曇りがちの天気で、本当に嫌になるわ。",
     "english": "",
-    "chinese": "这段时间老是阴天,真讨厌。",
-    "source": "private-material"
+    "chinese": "这段时间老是阴天,真讨厌。"
    },
    {
     "japanese": "結婚して何十年もたつと、結婚記念日さえ忘れがちになる。",
     "english": "",
-    "chinese": "结婚后经过数十年,往往连结婚纪念日都会忘记。",
-    "source": "private-material"
+    "chinese": "结婚后经过数十年,往往连结婚纪念日都会忘记。"
    }
   ]
  },
@@ -10136,14 +9361,12 @@
    {
     "japanese": "今日は風邪ぎみだから、家にいよう。",
     "english": "",
-    "chinese": "今天我有点感冒,所以就待在家里吧。",
-    "source": "private-material"
+    "chinese": "今天我有点感冒,所以就待在家里吧。"
    },
    {
     "japanese": "最近仕事が忙しくて、社員は過労ぎみだ。",
     "english": "",
-    "chinese": "最近由于工作繁忙,职工们都有点过度劳累。",
-    "source": "private-material"
+    "chinese": "最近由于工作繁忙,职工们都有点过度劳累。"
    }
   ]
  },
@@ -10161,14 +9384,12 @@
    {
     "japanese": "父は海外出張のたびに、その国の人形を買ってくれる。",
     "english": "",
-    "chinese": "爸爸他每次到国外出差都会给我买该国的洋娃娃。",
-    "source": "private-material"
+    "chinese": "爸爸他每次到国外出差都会给我买该国的洋娃娃。"
    },
    {
     "japanese": "内田さんは会うたびに髪形が違う。",
     "english": "",
-    "chinese": "每次见到内田时,她的发型都不一样。",
-    "source": "private-material"
+    "chinese": "每次见到内田时,她的发型都不一样。"
    }
   ]
  },
@@ -10186,20 +9407,17 @@
    {
     "japanese": "おじの持ち込んだ儲け話は、どうもうそっぽいです。",
     "english": "",
-    "chinese": "叔叔谈论的有关赚钱的话题里,我总觉得有点掺假的成分。",
-    "source": "private-material"
+    "chinese": "叔叔谈论的有关赚钱的话题里,我总觉得有点掺假的成分。"
    },
    {
     "japanese": "本棚の本の背が日に焼けて白っぽくなった。",
     "english": "",
-    "chinese": "书架上的书,由于阳光的照射,书脊都有些发白了。",
-    "source": "private-material"
+    "chinese": "书架上的书,由于阳光的照射,书脊都有些发白了。"
    },
    {
     "japanese": "最近、うちの親父は忘れっぽくなった。時々、お隣さんの名前も思い出せなくて。ちょっと心配だね。",
     "english": "",
-    "chinese": "最近,我家老父亲开始有些健忘。有时候就连邻居的名字也想不起来。真让人有些担心。",
-    "source": "private-material"
+    "chinese": "最近,我家老父亲开始有些健忘。有时候就连邻居的名字也想不起来。真让人有些担心。"
    }
   ]
  },
@@ -10217,26 +9435,22 @@
    {
     "japanese": "大学に入ってはじめてこの図書館を利用した。",
     "english": "",
-    "chinese": "进入大学之后还是第一次利用这个图书馆。",
-    "source": "private-material"
+    "chinese": "进入大学之后还是第一次利用这个图书馆。"
    },
    {
     "japanese": "生まれてはじめてこんなひどい目にあった。",
     "english": "",
-    "chinese": "有生以来第一次倒这么大的霉。",
-    "source": "private-material"
+    "chinese": "有生以来第一次倒这么大的霉。"
    },
    {
     "japanese": "一人で暮らすようになってはじめて、家族がどんなにありがたいかが分かった。",
     "english": "",
-    "chinese": "当自己开始独立生活后,方才懂得了一家人在一起是多么地幸福。",
-    "source": "private-material"
+    "chinese": "当自己开始独立生活后,方才懂得了一家人在一起是多么地幸福。"
    },
    {
     "japanese": "実際に読んでみてはじめて、古典のおもしろさを知った。",
     "english": "",
-    "chinese": "自己阅读了之后,才知道了古典的乐趣所在。",
-    "source": "private-material"
+    "chinese": "自己阅读了之后,才知道了古典的乐趣所在。"
    }
   ]
  },
@@ -10254,26 +9468,22 @@
    {
     "japanese": "隣の家でまさお君とゲームをして、楽しみのところにお母さんが来て、お使いに行かされた。",
     "english": "",
-    "chinese": "跟邻居家的雅夫玩游戏,玩得正开心的时候妈妈来了,硬要我去买东西。",
-    "source": "private-material"
+    "chinese": "跟邻居家的雅夫玩游戏,玩得正开心的时候妈妈来了,硬要我去买东西。"
    },
    {
     "japanese": "みんなが楽しそうに遊んでいるところへ、先生がひょっこり顔を出しました。",
     "english": "",
-    "chinese": "大家玩得正起劲的时候,老师突然出现了。",
-    "source": "private-material"
+    "chinese": "大家玩得正起劲的时候,老师突然出现了。"
    },
    {
     "japanese": "おや、山田君。ちょうどいいところへ来てくれたね。誰かに手伝ってもらおうと思っていたところだよ。",
     "english": "",
-    "chinese": "哎呀,山田,你来得正巧。我正想有人来帮帮我呢。",
-    "source": "private-material"
+    "chinese": "哎呀,山田,你来得正巧。我正想有人来帮帮我呢。"
    },
    {
     "japanese": "財布を落として、困っているところに友だちが来て貸してくれた。",
     "english": "",
-    "chinese": "丢了钱包,正一筹莫展的时候,朋友过来解决了我的燃眉之急。",
-    "source": "private-material"
+    "chinese": "丢了钱包,正一筹莫展的时候,朋友过来解决了我的燃眉之急。"
    }
   ]
  },
@@ -10291,32 +9501,27 @@
    {
     "japanese": "都市では、人口の増加とともに、住宅問題が深刻になってきた。",
     "english": "",
-    "chinese": "在城市,人口增加的同时,住房问题也随之严峻起来。",
-    "source": "private-material"
+    "chinese": "在城市,人口增加的同时,住房问题也随之严峻起来。"
    },
    {
     "japanese": "日差しが強まり、気温が高くなるとともに花が次々と咲き始めた。",
     "english": "",
-    "chinese": "日照越来越强,随着气温的升高,花也陆陆续续绽放了。",
-    "source": "private-material"
+    "chinese": "日照越来越强,随着气温的升高,花也陆陆续续绽放了。"
    },
    {
     "japanese": "学ぶことには、苦痛とともに喜びがある。",
     "english": "",
-    "chinese": "学习是一种痛苦,同时也伴随着喜悦。",
-    "source": "private-material"
+    "chinese": "学习是一种痛苦,同时也伴随着喜悦。"
    },
    {
     "japanese": "学校を卒業することは嬉しいとともに寂しい感じがする。",
     "english": "",
-    "chinese": "毕业了,高兴的同时也感到一份惆怅。",
-    "source": "private-material"
+    "chinese": "毕业了,高兴的同时也感到一份惆怅。"
    },
    {
     "japanese": "彼は家族とともに、シンガポールに行くことになった。",
     "english": "",
-    "chinese": "他将和家人一起去新加坡。",
-    "source": "private-material"
+    "chinese": "他将和家人一起去新加坡。"
    }
   ]
  },
@@ -10334,32 +9539,27 @@
    {
     "japanese": "私は47歳、妻が35歳で父と母となった。",
     "english": "",
-    "chinese": "我47岁,妻子35岁,那年我们当上了父亲和母亲。",
-    "source": "private-material"
+    "chinese": "我47岁,妻子35岁,那年我们当上了父亲和母亲。"
    },
    {
     "japanese": "アフリカ系の黒人がはじめてアメリカの大統領となった。",
     "english": "",
-    "chinese": "非洲裔的黑人,历史上第一次当上了美国总统。",
-    "source": "private-material"
+    "chinese": "非洲裔的黑人,历史上第一次当上了美国总统。"
    },
    {
     "japanese": "この事件の証拠となるものは見つからない。",
     "english": "",
-    "chinese": "找不到跟此事件有关联的证据。",
-    "source": "private-material"
+    "chinese": "找不到跟此事件有关联的证据。"
    },
    {
     "japanese": "中学生は今度のアンケートの対象となっている。",
     "english": "",
-    "chinese": "中学生成了这次问卷调查的对象。",
-    "source": "private-material"
+    "chinese": "中学生成了这次问卷调查的对象。"
    },
    {
     "japanese": "この店は一昨年からの不景気で、ついに店を閉めることとなった。",
     "english": "",
-    "chinese": "这家店从前年开始就不景气,最终不得不关门歇业。",
-    "source": "private-material"
+    "chinese": "这家店从前年开始就不景气,最终不得不关门歇业。"
    }
   ]
  },
@@ -10377,26 +9577,22 @@
    {
     "japanese": "地震の発生と同時に(=地震が発生した。それと同時に)あちこちで火事が起こった。",
     "english": "",
-    "chinese": "发生地震的同时,到处都发生了火灾。",
-    "source": "private-material"
+    "chinese": "发生地震的同时,到处都发生了火灾。"
    },
    {
     "japanese": "信号が変わると同時に、車が走り出した。",
     "english": "",
-    "chinese": "信号灯变成绿灯的同时,车子开动了。",
-    "source": "private-material"
+    "chinese": "信号灯变成绿灯的同时,车子开动了。"
    },
    {
     "japanese": "登山は愉快(である)と同時に、危険も伴う活動である。",
     "english": "",
-    "chinese": "登山是一项很愉快的运动,但同时也伴随着危险。",
-    "source": "private-material"
+    "chinese": "登山是一项很愉快的运动,但同时也伴随着危险。"
    },
    {
     "japanese": "工業は、快適な生活を実現すると同時に、環境を破壊する危険性を含んでいる。",
     "english": "",
-    "chinese": "工业的发展,一方面可以让我们的生活变得更舒适,但另一方面也存在破坏环境的危险。",
-    "source": "private-material"
+    "chinese": "工业的发展,一方面可以让我们的生活变得更舒适,但另一方面也存在破坏环境的危险。"
    }
   ]
  },
@@ -10414,26 +9610,22 @@
    {
     "japanese": "始めの原則どおりに仕事を進めよう。",
     "english": "",
-    "chinese": "依照一开始所拟定的原则开展工作吧。",
-    "source": "private-material"
+    "chinese": "依照一开始所拟定的原则开展工作吧。"
    },
    {
     "japanese": "課長の命令どおりにやればいい。",
     "english": "",
-    "chinese": "部长怎么说你就怎么做吧。",
-    "source": "private-material"
+    "chinese": "部长怎么说你就怎么做吧。"
    },
    {
     "japanese": "予想どおりの結果になった。",
     "english": "",
-    "chinese": "得到了正如事先所预测到的结果。",
-    "source": "private-material"
+    "chinese": "得到了正如事先所预测到的结果。"
    },
    {
     "japanese": "そんな粗い計画では、予定どおり終わらないだろう。",
     "english": "",
-    "chinese": "那么不严密的计划,恐怕不会在预定时间内完成吧。",
-    "source": "private-material"
+    "chinese": "那么不严密的计划,恐怕不会在预定时间内完成吧。"
    }
   ]
  },
@@ -10451,32 +9643,27 @@
    {
     "japanese": "10年ぶりに会った彼女は、少しも変わっていなかった。",
     "english": "",
-    "chinese": "时隔10年,这次见到她发现她跟10年前一模一样。",
-    "source": "private-material"
+    "chinese": "时隔10年,这次见到她发现她跟10年前一模一样。"
    },
    {
     "japanese": "台風で電車が不通になっていたが、10時間ぶりに運転を始めたそうだ。",
     "english": "",
-    "chinese": "因为台风,电车停了,不过听说10小时后又重新开了。",
-    "source": "private-material"
+    "chinese": "因为台风,电车停了,不过听说10小时后又重新开了。"
    },
    {
     "japanese": "あの池の向こうにある松、いい枝ぶりだね。",
     "english": "",
-    "chinese": "那个池塘对面的松树,树枝长得真好看啊。",
-    "source": "private-material"
+    "chinese": "那个池塘对面的松树,树枝长得真好看啊。"
    },
    {
     "japanese": "今の生活ぶりにもう満足だとおじいさんは言っている。",
     "english": "",
-    "chinese": "爷爷说,对现在的生活状况很满意。",
-    "source": "private-material"
+    "chinese": "爷爷说,对现在的生活状况很满意。"
    },
    {
     "japanese": "あいつは飲みっぷりが悪いなあ。",
     "english": "",
-    "chinese": "那家伙喝酒的样子真难看。",
-    "source": "private-material"
+    "chinese": "那家伙喝酒的样子真难看。"
    }
   ]
  },
@@ -10494,14 +9681,12 @@
    {
     "japanese": "この料理はちょっと甘みが足りない。",
     "english": "",
-    "chinese": "这道菜的甜味不够。",
-    "source": "private-material"
+    "chinese": "这道菜的甜味不够。"
    },
    {
     "japanese": "新鮮みが足りない魚は買わないほうがいい。",
     "english": "",
-    "chinese": "还是不要买不太新鲜的鱼。",
-    "source": "private-material"
+    "chinese": "还是不要买不太新鲜的鱼。"
    }
   ]
  },
@@ -10519,14 +9704,12 @@
    {
     "japanese": "見かけ上ならまあまあだが、中身が分からないなあ。",
     "english": "",
-    "chinese": "外观还可以,就是不知道内部如何。",
-    "source": "private-material"
+    "chinese": "外观还可以,就是不知道内部如何。"
    },
    {
     "japanese": "戸籍上は3月1日生まれとなっているが、実は2月29日に生まれたのだ。",
     "english": "",
-    "chinese": "户口本上写着3月1日出生,但实际上是2月29日出生。",
-    "source": "private-material"
+    "chinese": "户口本上写着3月1日出生,但实际上是2月29日出生。"
    }
   ]
  },
@@ -10544,32 +9727,27 @@
    {
     "japanese": "こんな重い病気にかかったのは生まれて以来はじめてだ。",
     "english": "",
-    "chinese": "生这么重的病,是我有生以来头一回。",
-    "source": "private-material"
+    "chinese": "生这么重的病,是我有生以来头一回。"
    },
    {
     "japanese": "A「お久しぶりですね。」",
     "english": "",
-    "chinese": "好久不见了。",
-    "source": "private-material"
+    "chinese": "好久不见了。"
    },
    {
     "japanese": "B「ええ。卒業以来(=卒業して以来)ですね。」",
     "english": "",
-    "chinese": "是啊,毕业以来第一次见吧。",
-    "source": "private-material"
+    "chinese": "是啊,毕业以来第一次见吧。"
    },
    {
     "japanese": "自慢するほどのことではないが、私は入社以来10年、一度も遅刻をしたことがない。",
     "english": "",
-    "chinese": "不是我吹牛,自从上班以来,这10年我从来没有迟到过。",
-    "source": "private-material"
+    "chinese": "不是我吹牛,自从上班以来,这10年我从来没有迟到过。"
    },
    {
     "japanese": "乱暴な運転をしていた彼も事故に遭って以来、安全運転をするようになった。",
     "english": "",
-    "chinese": "原来开车很粗暴的他,自从上次出了事故以后,开车就规矩了。",
-    "source": "private-material"
+    "chinese": "原来开车很粗暴的他,自从上次出了事故以后,开车就规矩了。"
    }
   ]
  },
@@ -10587,62 +9765,52 @@
    {
     "japanese": "ペットはあっという間にやった食べ物を食べ切った。",
     "english": "",
-    "chinese": "一眨眼的工夫,宠物小狗就把我给它的食物吃了个精光。",
-    "source": "private-material"
+    "chinese": "一眨眼的工夫,宠物小狗就把我给它的食物吃了个精光。"
    },
    {
     "japanese": "その小説を読み切らないまま、本棚に入れた。",
     "english": "",
-    "chinese": "那本小说还没有全部看完,就放进了书架。",
-    "source": "private-material"
+    "chinese": "那本小说还没有全部看完,就放进了书架。"
    },
    {
     "japanese": "A「Kチームのファンは今度の試合は必ずAチームが勝つと信じ切っている。」",
     "english": "",
-    "chinese": "K队的球迷们坚信这次比赛肯定是K队赢。",
-    "source": "private-material"
+    "chinese": "K队的球迷们坚信这次比赛肯定是K队赢。"
    },
    {
     "japanese": "B「そう言い切っているらしいね。」",
     "english": "",
-    "chinese": "好像他们是那样断言的。",
-    "source": "private-material"
+    "chinese": "好像他们是那样断言的。"
    },
    {
     "japanese": "彼女は新しい職場で張り切って働いている。",
     "english": "",
-    "chinese": "她在新工作岗位上干劲十足。",
-    "source": "private-material"
+    "chinese": "她在新工作岗位上干劲十足。"
    },
    {
     "japanese": "この店のお菓子はとてもおいしいから、すぐ売り切れてしまう。",
     "english": "",
-    "chinese": "因为这家店的糕点很好吃,一上柜就会马上售罄。",
-    "source": "private-material"
+    "chinese": "因为这家店的糕点很好吃,一上柜就会马上售罄。"
    },
    {
     "japanese": "こんなに長い小説は、1日では読み切れない。",
     "english": "",
-    "chinese": "这么长的小说,一天是看不完的。",
-    "source": "private-material"
+    "chinese": "这么长的小说,一天是看不完的。"
    },
    {
     "japanese": "A「今晩の試合は、必ずAチームが勝つと言い切れます。」",
     "english": "",
-    "chinese": "今晚的比赛,我能断言A队必胜。",
-    "source": "private-material"
+    "chinese": "今晚的比赛,我能断言A队必胜。"
    },
    {
     "japanese": "B「そうとは言い切れませんよ。」",
     "english": "",
-    "chinese": "不能把话说得那么绝对嘛。",
-    "source": "private-material"
+    "chinese": "不能把话说得那么绝对嘛。"
    },
    {
     "japanese": "また失敗したが、どうしても諦め切れないので、もう一度チャレンジしてみる。",
     "english": "",
-    "chinese": "虽然又失败了,但是我还没有彻底死心,所以还要再挑战一次。",
-    "source": "private-material"
+    "chinese": "虽然又失败了,但是我还没有彻底死心,所以还要再挑战一次。"
    }
   ]
  },
@@ -10660,14 +9828,12 @@
    {
     "japanese": "このような家は核家族向きで、大家族向きではないと思う。",
     "english": "",
-    "chinese": "我认为这样的房型适合小家庭居住,不适合大家庭居住。",
-    "source": "private-material"
+    "chinese": "我认为这样的房型适合小家庭居住,不适合大家庭居住。"
    },
    {
     "japanese": "夏向きの生地を買って、子どもにシャツを作ってやった。",
     "english": "",
-    "chinese": "买了适合夏天穿的布料,给孩子缝制了一件衬衫。",
-    "source": "private-material"
+    "chinese": "买了适合夏天穿的布料,给孩子缝制了一件衬衫。"
    }
   ]
  },
@@ -10685,14 +9851,12 @@
    {
     "japanese": "その映画は万人向けだ。",
     "english": "",
-    "chinese": "那部电影面向所有的人群。",
-    "source": "private-material"
+    "chinese": "那部电影面向所有的人群。"
    },
    {
     "japanese": "輸出向けの製品はサイズが大きい。使う人は主に西洋人だから。",
     "english": "",
-    "chinese": "为出口制作的产品尺寸都偏大。因为消费者主要是西方人。",
-    "source": "private-material"
+    "chinese": "为出口制作的产品尺寸都偏大。因为消费者主要是西方人。"
    }
   ]
  },
@@ -10710,14 +9874,12 @@
    {
     "japanese": "お近くにお越しの際には、ぜひわが家にお寄りください。",
     "english": "",
-    "chinese": "您到我们这边来的时候,请务必顺道到我家来玩。",
-    "source": "private-material"
+    "chinese": "您到我们这边来的时候,请务必顺道到我家来玩。"
    },
    {
     "japanese": "館内を見学する際には、写真撮影はご遠慮ください。",
     "english": "",
-    "chinese": "在馆内参观的时候请不要拍照片或摄影。",
-    "source": "private-material"
+    "chinese": "在馆内参观的时候请不要拍照片或摄影。"
    }
   ]
  }

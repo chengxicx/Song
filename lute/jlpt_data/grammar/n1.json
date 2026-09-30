@@ -20,18 +20,15 @@
   "examples": [
    {
     "japanese": "彼の苦労は想像に難くない。",
-    "english": "His hardship is easy to imagine.",
-    "source": "original"
+    "english": "His hardship is easy to imagine."
    },
    {
     "japanese": "結果は予想するに難くない。",
-    "english": "The result is not hard to predict.",
-    "source": "original"
+    "english": "The result is not hard to predict."
    },
    {
     "japanese": "親の気持ちは察するに難くない。",
-    "english": "A parent's feelings are easy to infer.",
-    "source": "original"
+    "english": "A parent's feelings are easy to infer."
    }
   ],
   "review_status": "draft",
@@ -61,18 +58,15 @@
   "examples": [
    {
     "japanese": "台風のため、会議の中止を余儀なくされた。",
-    "english": "Due to the typhoon, we were forced to cancel the meeting.",
-    "source": "original"
+    "english": "Due to the typhoon, we were forced to cancel the meeting."
    },
    {
     "japanese": "経営悪化で、社長は辞任を余儀なくされた。",
-    "english": "Due to poor management, the president was forced to resign.",
-    "source": "original"
+    "english": "Due to poor management, the president was forced to resign."
    },
    {
     "japanese": "怪我で、計画変更を余儀なくされた。",
-    "english": "Due to injury, we had no choice but to change the plan.",
-    "source": "original"
+    "english": "Due to injury, we had no choice but to change the plan."
    }
   ],
   "review_status": "draft",
@@ -102,18 +96,15 @@
   "examples": [
    {
     "japanese": "その話を聞いて、涙を禁じ得なかった。",
-    "english": "Hearing the story, I couldn't hold back my tears.",
-    "source": "original"
+    "english": "Hearing the story, I couldn't hold back my tears."
    },
    {
     "japanese": "彼の態度に、怒りを禁じ得ない。",
-    "english": "I cannot suppress my anger at his attitude.",
-    "source": "original"
+    "english": "I cannot suppress my anger at his attitude."
    },
    {
     "japanese": "被害者に対して同情を禁じ得ない。",
-    "english": "I can't help feeling sympathy for the victims.",
-    "source": "original"
+    "english": "I can't help feeling sympathy for the victims."
    }
   ],
   "review_status": "draft",
@@ -143,18 +134,15 @@
   "examples": [
    {
     "japanese": "この事実を世に知らしめずにはおかない。",
-    "english": "I will not rest without making this fact known to the world.",
-    "source": "original"
+    "english": "I will not rest without making this fact known to the world."
    },
    {
     "japanese": "彼の発言は波紋を広げずにはおかない。",
-    "english": "His remarks will inevitably cause ripples.",
-    "source": "original"
+    "english": "His remarks will inevitably cause ripples."
    },
    {
     "japanese": "真実を明らかにせずにはおかない。",
-    "english": "I will not stop until the truth is made clear.",
-    "source": "original"
+    "english": "I will not stop until the truth is made clear."
    }
   ],
   "review_status": "draft",
@@ -183,18 +171,15 @@
   "examples": [
    {
     "japanese": "彼に一言言わないではおかない。",
-    "english": "I will not leave without saying a word to him.",
-    "source": "original"
+    "english": "I will not leave without saying a word to him."
    },
    {
     "japanese": "この発見は歴史を変えないではおかない。",
-    "english": "This discovery will inevitably change history.",
-    "source": "original"
+    "english": "This discovery will inevitably change history."
    },
    {
     "japanese": "真相を明らかにしないではおかない。",
-    "english": "I won't rest until the truth is revealed.",
-    "source": "original"
+    "english": "I won't rest until the truth is revealed."
    }
   ],
   "review_status": "draft",
@@ -223,18 +208,15 @@
   "examples": [
    {
     "japanese": "以前にもまして、忙しくなった。",
-    "english": "I've become busier than before.",
-    "source": "original"
+    "english": "I've become busier than before."
    },
    {
     "japanese": "今年は去年にもまして暑い。",
-    "english": "This year is even hotter than last year.",
-    "source": "original"
+    "english": "This year is even hotter than last year."
    },
    {
     "japanese": "誰にもまして、彼女が頑張っている。",
-    "english": "More than anyone, she's working hard.",
-    "source": "original"
+    "english": "More than anyone, she's working hard."
    }
   ],
   "review_status": "draft",
@@ -264,18 +246,15 @@
   "examples": [
    {
     "japanese": "彼は困難をものともせず、目標を達成した。",
-    "english": "Undaunted by difficulties, he achieved his goal.",
-    "source": "original"
+    "english": "Undaunted by difficulties, he achieved his goal."
    },
    {
     "japanese": "大雨をものともせず、試合は続けられた。",
-    "english": "Braving the heavy rain, the match continued.",
-    "source": "original"
+    "english": "Braving the heavy rain, the match continued."
    },
    {
     "japanese": "反対をものともせず、彼は自分の道を進んだ。",
-    "english": "In defiance of opposition, he followed his own path.",
-    "source": "original"
+    "english": "In defiance of opposition, he followed his own path."
    }
   ],
   "review_status": "draft",
@@ -305,18 +284,15 @@
   "examples": [
    {
     "japanese": "理由のいかんによらず、遅刻は許されない。",
-    "english": "Regardless of the reason, tardiness is not allowed.",
-    "source": "original"
+    "english": "Regardless of the reason, tardiness is not allowed."
    },
    {
     "japanese": "結果のいかんを問わず、挑戦する。",
-    "english": "Regardless of the outcome, I will try.",
-    "source": "original"
+    "english": "Regardless of the outcome, I will try."
    },
    {
     "japanese": "性別のいかんにかかわらず、誰でも応募できる。",
-    "english": "Regardless of gender, anyone can apply.",
-    "source": "original"
+    "english": "Regardless of gender, anyone can apply."
    }
   ],
   "review_status": "draft",
@@ -346,18 +322,15 @@
   "examples": [
    {
     "japanese": "先生ともあろう者が、嘘をつくとは。",
-    "english": "For a teacher of all people to tell a lie!",
-    "source": "original"
+    "english": "For a teacher of all people to tell a lie!"
    },
    {
     "japanese": "大人ともあろう者が、そんな行動をとるべきではない。",
-    "english": "A grown adult shouldn't behave that way.",
-    "source": "original"
+    "english": "A grown adult shouldn't behave that way."
    },
    {
     "japanese": "社長ともあろう人が、約束を破るなんて。",
-    "english": "For the president, of all people, to break his word!",
-    "source": "original"
+    "english": "For the president, of all people, to break his word!"
    }
   ],
   "review_status": "draft",
@@ -386,18 +359,15 @@
   "examples": [
    {
     "japanese": "京都ならではの美しい景色だ。",
-    "english": "It's beautiful scenery unique to Kyoto.",
-    "source": "original"
+    "english": "It's beautiful scenery unique to Kyoto."
    },
    {
     "japanese": "子供ならではの発想が面白い。",
-    "english": "The ideas unique to children are interesting.",
-    "source": "original"
+    "english": "The ideas unique to children are interesting."
    },
    {
     "japanese": "この味は日本ならではだ。",
-    "english": "This flavor is distinctively Japanese.",
-    "source": "original"
+    "english": "This flavor is distinctively Japanese."
    }
   ],
   "review_status": "draft",
@@ -426,18 +396,15 @@
   "examples": [
    {
     "japanese": "このグローバル時代にあって、英語は必須だ。",
-    "english": "In this global age, English is essential.",
-    "source": "original"
+    "english": "In this global age, English is essential."
    },
    {
     "japanese": "困難な状況にあって、彼は冷静を保った。",
-    "english": "In a difficult situation, he kept calm.",
-    "source": "original"
+    "english": "In a difficult situation, he kept calm."
    },
    {
     "japanese": "平和な時代にあっても、危機管理は必要だ。",
-    "english": "Even in peaceful times, crisis management is necessary.",
-    "source": "original"
+    "english": "Even in peaceful times, crisis management is necessary."
    }
   ],
   "review_status": "draft",
@@ -467,18 +434,15 @@
   "examples": [
    {
     "japanese": "リーダーたる者、部下の模範となるべきだ。",
-    "english": "As a leader, one should be a model for subordinates.",
-    "source": "original"
+    "english": "As a leader, one should be a model for subordinates."
    },
    {
     "japanese": "教師たる者、常に学び続けなければならない。",
-    "english": "As a teacher, one must always keep learning.",
-    "source": "original"
+    "english": "As a teacher, one must always keep learning."
    },
    {
     "japanese": "武士たる者、名誉を重んじるべきだ。",
-    "english": "As a samurai, one should value honor.",
-    "source": "original"
+    "english": "As a samurai, one should value honor."
    }
   ],
   "review_status": "draft",
@@ -508,18 +472,15 @@
   "examples": [
    {
     "japanese": "電話するなりメールするなり、連絡してください。",
-    "english": "Contact me by phone or email, whichever.",
-    "source": "original"
+    "english": "Contact me by phone or email, whichever."
    },
    {
     "japanese": "親に相談するなり、先生に聞くなりしなさい。",
-    "english": "Talk to your parents or ask your teacher, whichever.",
-    "source": "original"
+    "english": "Talk to your parents or ask your teacher, whichever."
    },
    {
     "japanese": "休むなり、薬を飲むなりしたほうがいい。",
-    "english": "You should rest, or take medicine, one or the other.",
-    "source": "original"
+    "english": "You should rest, or take medicine, one or the other."
    }
   ],
   "review_status": "draft",
@@ -549,18 +510,15 @@
   "examples": [
    {
     "japanese": "昼といわず夜といわず、働き続けた。",
-    "english": "Day and night alike, he kept working.",
-    "source": "original"
+    "english": "Day and night alike, he kept working."
    },
    {
     "japanese": "手といわず顔といわず、泥だらけだった。",
-    "english": "His hands, his face — everywhere was covered in mud.",
-    "source": "original"
+    "english": "His hands, his face — everywhere was covered in mud."
    },
    {
     "japanese": "子供といわず大人といわず、みんな楽しんでいた。",
-    "english": "Children and adults alike, everyone was enjoying it.",
-    "source": "original"
+    "english": "Children and adults alike, everyone was enjoying it."
    }
   ],
   "review_status": "draft",
@@ -590,18 +548,15 @@
   "examples": [
    {
     "japanese": "男であれ女であれ、誰もが平等だ。",
-    "english": "Whether man or woman, everyone is equal.",
-    "source": "original"
+    "english": "Whether man or woman, everyone is equal."
    },
    {
     "japanese": "プロであれアマであれ、基本が大切だ。",
-    "english": "Whether pro or amateur, the basics are important.",
-    "source": "original"
+    "english": "Whether pro or amateur, the basics are important."
    },
    {
     "japanese": "大人であれ子供であれ、ルールを守るべきだ。",
-    "english": "Whether adult or child, one should follow the rules.",
-    "source": "original"
+    "english": "Whether adult or child, one should follow the rules."
    }
   ],
   "review_status": "draft",
@@ -631,18 +586,15 @@
   "examples": [
    {
     "japanese": "だめなら、諦めるまでだ。",
-    "english": "If it doesn't work, I'll just give up.",
-    "source": "original"
+    "english": "If it doesn't work, I'll just give up."
    },
    {
     "japanese": "できないなら、自分でやるまでだ。",
-    "english": "If no one can, I'll just do it myself.",
-    "source": "original"
+    "english": "If no one can, I'll just do it myself."
    },
    {
     "japanese": "嫌なら、帰るまでだ。",
-    "english": "If you don't like it, I'll just go home.",
-    "source": "original"
+    "english": "If you don't like it, I'll just go home."
    }
   ],
   "review_status": "draft",
@@ -672,18 +624,15 @@
   "examples": [
    {
     "japanese": "お礼を言われることではない。当然のことをしたまでのことです。",
-    "english": "No need to thank me — I just did what was natural.",
-    "source": "original"
+    "english": "No need to thank me — I just did what was natural."
    },
    {
     "japanese": "私は本当のことを言ったまでのことだ。",
-    "english": "I was only telling the truth.",
-    "source": "original"
+    "english": "I was only telling the truth."
    },
    {
     "japanese": "指示に従ったまでのことです。",
-    "english": "I was just following instructions.",
-    "source": "original"
+    "english": "I was just following instructions."
    }
   ],
   "review_status": "draft",
@@ -713,18 +662,15 @@
   "examples": [
    {
     "japanese": "彼が来るとは思わなかった。",
-    "english": "I never thought he'd come.",
-    "source": "original"
+    "english": "I never thought he'd come."
    },
    {
     "japanese": "友情とは、助け合うことだ。",
-    "english": "Friendship means helping each other.",
-    "source": "original"
+    "english": "Friendship means helping each other."
    },
    {
     "japanese": "こんなことが起こるとは、信じられない。",
-    "english": "That something like this would happen — I can't believe it.",
-    "source": "original"
+    "english": "That something like this would happen — I can't believe it."
    }
   ],
   "review_status": "draft",
@@ -754,18 +700,15 @@
   "examples": [
    {
     "japanese": "彼の遅刻に至っては、もう許せない。",
-    "english": "When it comes to his tardiness, I can no longer forgive it.",
-    "source": "original"
+    "english": "When it comes to his tardiness, I can no longer forgive it."
    },
    {
     "japanese": "私に至っては、一度も行ったことがない。",
-    "english": "As for me, I've never even been there.",
-    "source": "original"
+    "english": "As for me, I've never even been there."
    },
    {
     "japanese": "最後の試験に至っては、完全に失敗した。",
-    "english": "When it came to the last exam, I failed completely.",
-    "source": "original"
+    "english": "When it came to the last exam, I failed completely."
    }
   ],
   "review_status": "draft",
@@ -795,18 +738,15 @@
   "examples": [
    {
     "japanese": "彼をおいて、適任者はいない。",
-    "english": "There's no one suitable other than him.",
-    "source": "original"
+    "english": "There's no one suitable other than him."
    },
    {
     "japanese": "この役は彼女をおいて他にいない。",
-    "english": "There's no one for this role other than her.",
-    "source": "original"
+    "english": "There's no one for this role other than her."
    },
    {
     "japanese": "今をおいて、他にチャンスはない。",
-    "english": "There's no chance other than now.",
-    "source": "original"
+    "english": "There's no chance other than now."
    }
   ],
   "review_status": "draft",
@@ -836,18 +776,15 @@
   "examples": [
    {
     "japanese": "努力することなしに、成功はあり得ない。",
-    "english": "Without making an effort, success is impossible.",
-    "source": "original"
+    "english": "Without making an effort, success is impossible."
    },
    {
     "japanese": "苦労することなしに、何も得られない。",
-    "english": "Without hardship, nothing is gained.",
-    "source": "original"
+    "english": "Without hardship, nothing is gained."
    },
    {
     "japanese": "一度も休むことなしに、最後まで走り切った。",
-    "english": "He ran to the end without resting even once.",
-    "source": "original"
+    "english": "He ran to the end without resting even once."
    }
   ],
   "review_status": "draft",
@@ -876,18 +813,15 @@
   "examples": [
    {
     "japanese": "彼はこの会社きっての専門家だ。",
-    "english": "He is the foremost expert in this company.",
-    "source": "original"
+    "english": "He is the foremost expert in this company."
    },
    {
     "japanese": "この町きっての名医を紹介します。",
-    "english": "I'll introduce the town's most distinguished doctor.",
-    "source": "original"
+    "english": "I'll introduce the town's most distinguished doctor."
    },
    {
     "japanese": "彼女は世界きってのピアニストだ。",
-    "english": "She is the world's most distinguished pianist.",
-    "source": "original"
+    "english": "She is the world's most distinguished pianist."
    }
   ],
   "review_status": "draft",
@@ -916,18 +850,15 @@
   "examples": [
    {
     "japanese": "大人ともなれば、責任を持たなければならない。",
-    "english": "Once one is an adult, one must bear responsibility.",
-    "source": "original"
+    "english": "Once one is an adult, one must bear responsibility."
    },
    {
     "japanese": "社長ともなれば、多くの判断が求められる。",
-    "english": "Once one is a company president, many judgments are demanded.",
-    "source": "original"
+    "english": "Once one is a company president, many judgments are demanded."
    },
    {
     "japanese": "親ともなれば、心配が尽きない。",
-    "english": "Once one is a parent, worries are endless.",
-    "source": "original"
+    "english": "Once one is a parent, worries are endless."
    }
   ],
   "review_status": "draft",
@@ -957,18 +888,15 @@
   "examples": [
    {
     "japanese": "このような賞をいただき、光栄の至りです。",
-    "english": "Receiving such an award is the height of honor.",
-    "source": "original"
+    "english": "Receiving such an award is the height of honor."
    },
    {
     "japanese": "初めての出版で、感激の至りです。",
-    "english": "With my first publication, I'm overwhelmed with emotion.",
-    "source": "original"
+    "english": "With my first publication, I'm overwhelmed with emotion."
    },
    {
     "japanese": "お恥ずかしい限りで、赤面の至りです。",
-    "english": "I'm so embarrassed I could blush.",
-    "source": "original"
+    "english": "I'm so embarrassed I could blush."
    }
   ],
   "review_status": "draft",
@@ -998,18 +926,15 @@
   "examples": [
    {
     "japanese": "彼は会社で働くかたわら、夜は大学で学んでいる。",
-    "english": "He works at a company, while also studying at university at night.",
-    "source": "original"
+    "english": "He works at a company, while also studying at university at night."
    },
    {
     "japanese": "子育てのかたわら、趣味を続けている。",
-    "english": "While raising children, she continues her hobby.",
-    "source": "original"
+    "english": "While raising children, she continues her hobby."
    },
    {
     "japanese": "仕事のかたわら、ボランティアをしている。",
-    "english": "Alongside work, I do volunteer activities.",
-    "source": "original"
+    "english": "Alongside work, I do volunteer activities."
    }
   ],
   "review_status": "draft",
@@ -1039,18 +964,15 @@
   "examples": [
    {
     "japanese": "散歩がてら、買い物に行った。",
-    "english": "While on a walk, I also went shopping.",
-    "source": "original"
+    "english": "While on a walk, I also went shopping."
    },
    {
     "japanese": "仕事がてら、観光を楽しんだ。",
-    "english": "On a work trip, I enjoyed some sightseeing.",
-    "source": "original"
+    "english": "On a work trip, I enjoyed some sightseeing."
    },
    {
     "japanese": "お礼がてら、手土産を持って行った。",
-    "english": "To express thanks, I brought a gift.",
-    "source": "original"
+    "english": "To express thanks, I brought a gift."
    }
   ],
   "review_status": "draft",
@@ -1080,18 +1002,15 @@
   "examples": [
    {
     "japanese": "ここに立ち入るべからず。",
-    "english": "No entry here.",
-    "source": "original"
+    "english": "No entry here."
    },
    {
     "japanese": "これは許すべからざる行為だ。",
-    "english": "This is an unforgivable act.",
-    "source": "original"
+    "english": "This is an unforgivable act."
    },
    {
     "japanese": "彼は欠くべからざる存在だ。",
-    "english": "He is an indispensable presence.",
-    "source": "original"
+    "english": "He is an indispensable presence."
    }
   ],
   "review_status": "draft",
@@ -1121,18 +1040,15 @@
   "examples": [
    {
     "japanese": "謝らずにはすまないだろう。",
-    "english": "He'll have no choice but to apologize.",
-    "source": "original"
+    "english": "He'll have no choice but to apologize."
    },
    {
     "japanese": "この問題は解決せずにはすまない。",
-    "english": "This problem must inevitably be resolved.",
-    "source": "original"
+    "english": "This problem must inevitably be resolved."
    },
    {
     "japanese": "責任を取らずにはすまない。",
-    "english": "He cannot get by without taking responsibility.",
-    "source": "original"
+    "english": "He cannot get by without taking responsibility."
    }
   ],
   "review_status": "draft",
@@ -1162,18 +1078,15 @@
   "examples": [
    {
     "japanese": "参加者は50人といったところだ。",
-    "english": "The participants are about 50 people.",
-    "source": "original"
+    "english": "The participants are about 50 people."
    },
    {
     "japanese": "今週末は少し休めるといったところだ。",
-    "english": "This weekend I can rest a little, roughly speaking.",
-    "source": "original"
+    "english": "This weekend I can rest a little, roughly speaking."
    },
    {
     "japanese": "勉強時間は1日2時間といったところです。",
-    "english": "My study time is roughly 2 hours per day.",
-    "source": "original"
+    "english": "My study time is roughly 2 hours per day."
    }
   ],
   "review_status": "draft",
@@ -1203,18 +1116,15 @@
   "examples": [
    {
     "japanese": "言おうにも言えない状況だ。",
-    "english": "It's a situation where I can't speak even if I wanted to.",
-    "source": "original"
+    "english": "It's a situation where I can't speak even if I wanted to."
    },
    {
     "japanese": "行こうにも足が痛くて行けない。",
-    "english": "Even if I wanted to go, my leg hurts so I can't.",
-    "source": "original"
+    "english": "Even if I wanted to go, my leg hurts so I can't."
    },
    {
     "japanese": "忘れようにも忘れられない。",
-    "english": "Even if I wanted to forget, I can't.",
-    "source": "original"
+    "english": "Even if I wanted to forget, I can't."
    }
   ],
   "review_status": "draft",
@@ -1244,18 +1154,15 @@
   "examples": [
    {
     "japanese": "真実を知らんがために、調査を続けた。",
-    "english": "In order to know the truth, he continued the investigation.",
-    "source": "original"
+    "english": "In order to know the truth, he continued the investigation."
    },
    {
     "japanese": "夢を実現せんがため、努力している。",
-    "english": "For the purpose of realizing his dream, he is working hard.",
-    "source": "original"
+    "english": "For the purpose of realizing his dream, he is working hard."
    },
    {
     "japanese": "勝利を得んがために、全力を尽くした。",
-    "english": "In order to gain victory, he gave his all.",
-    "source": "original"
+    "english": "In order to gain victory, he gave his all."
    }
   ],
   "review_status": "draft",
@@ -1285,18 +1192,15 @@
   "examples": [
    {
     "japanese": "彼女は泣かんばかりの表情だった。",
-    "english": "She had an expression as if she were about to cry.",
-    "source": "original"
+    "english": "She had an expression as if she were about to cry."
    },
    {
     "japanese": "彼は飛び上がらんばかりに喜んだ。",
-    "english": "He rejoiced as if about to jump for joy.",
-    "source": "original"
+    "english": "He rejoiced as if about to jump for joy."
    },
    {
     "japanese": "叫ばんばかりに抗議した。",
-    "english": "He protested as if about to scream.",
-    "source": "original"
+    "english": "He protested as if about to scream."
    }
   ],
   "review_status": "draft",
@@ -1326,18 +1230,15 @@
   "examples": [
    {
     "japanese": "寝ようにも、眠れない。",
-    "english": "Even if I try to sleep, I can't sleep.",
-    "source": "original"
+    "english": "Even if I try to sleep, I can't sleep."
    },
    {
     "japanese": "帰ろうにも、終電が終わってしまった。",
-    "english": "Even if I wanted to go home, the last train is gone.",
-    "source": "original"
+    "english": "Even if I wanted to go home, the last train is gone."
    },
    {
     "japanese": "説明しようにも、言葉が見つからない。",
-    "english": "Even if I try to explain, I can't find the words.",
-    "source": "original"
+    "english": "Even if I try to explain, I can't find the words."
    }
   ],
   "review_status": "draft",
@@ -1367,18 +1268,15 @@
   "examples": [
    {
     "japanese": "遅刻しようものなら、上司に叱られる。",
-    "english": "If you dare to be late, the boss will scold you.",
-    "source": "original"
+    "english": "If you dare to be late, the boss will scold you."
    },
    {
     "japanese": "文句を言おうものなら、すぐ怒り出す。",
-    "english": "If you complain, he'll get angry right away.",
-    "source": "original"
+    "english": "If you complain, he'll get angry right away."
    },
    {
     "japanese": "失敗しようものなら、大変なことになる。",
-    "english": "If you fail, it'll be a disaster.",
-    "source": "original"
+    "english": "If you fail, it'll be a disaster."
    }
   ],
   "review_status": "draft",
@@ -1407,18 +1305,15 @@
   "examples": [
    {
     "japanese": "一瞬たりとも油断できない。",
-    "english": "I can't let my guard down for even a moment.",
-    "source": "original"
+    "english": "I can't let my guard down for even a moment."
    },
    {
     "japanese": "一円たりとも無駄にしない。",
-    "english": "I won't waste even a single yen.",
-    "source": "original"
+    "english": "I won't waste even a single yen."
    },
    {
     "japanese": "一度たりとも彼を疑ったことはない。",
-    "english": "I've never doubted him, not even once.",
-    "source": "original"
+    "english": "I've never doubted him, not even once."
    }
   ],
   "review_status": "draft",
@@ -1448,18 +1343,15 @@
   "examples": [
    {
     "japanese": "許可なしに、ここに入ってはいけない。",
-    "english": "You must not enter here without permission.",
-    "source": "original"
+    "english": "You must not enter here without permission."
    },
    {
     "japanese": "努力なしには、成功できない。",
-    "english": "Without effort, you cannot succeed.",
-    "source": "original"
+    "english": "Without effort, you cannot succeed."
    },
    {
     "japanese": "彼女の助けなしに、やり遂げられなかった。",
-    "english": "Without her help, I couldn't have completed it.",
-    "source": "original"
+    "english": "Without her help, I couldn't have completed it."
    }
   ],
   "review_status": "draft",
@@ -1489,18 +1381,15 @@
   "examples": [
    {
     "japanese": "愛なくして、人生は語れない。",
-    "english": "Life cannot be spoken of without love.",
-    "source": "original"
+    "english": "Life cannot be spoken of without love."
    },
    {
     "japanese": "彼の協力なくしては、成功は不可能だった。",
-    "english": "Without his cooperation, success would have been impossible.",
-    "source": "original"
+    "english": "Without his cooperation, success would have been impossible."
    },
    {
     "japanese": "努力なくして、目標は達成できない。",
-    "english": "Without effort, goals cannot be achieved.",
-    "source": "original"
+    "english": "Without effort, goals cannot be achieved."
    }
   ],
   "review_status": "draft",
@@ -1530,18 +1419,15 @@
   "examples": [
    {
     "japanese": "彼は家を出るや、走り出した。",
-    "english": "The moment he left the house, he ran off.",
-    "source": "original"
+    "english": "The moment he left the house, he ran off."
    },
    {
     "japanese": "目を開けるや否や、眩しい光が差し込んだ。",
-    "english": "The moment I opened my eyes, bright light poured in.",
-    "source": "original"
+    "english": "The moment I opened my eyes, bright light poured in."
    },
    {
     "japanese": "話を聞くや、彼は立ち上がった。",
-    "english": "The moment he heard the story, he stood up.",
-    "source": "original"
+    "english": "The moment he heard the story, he stood up."
    }
   ],
   "review_status": "draft",
@@ -1571,18 +1457,15 @@
   "examples": [
    {
     "japanese": "このホテルは贅沢の極みだ。",
-    "english": "This hotel is the height of luxury.",
-    "source": "original"
+    "english": "This hotel is the height of luxury."
    },
    {
     "japanese": "疲労の極みに達した。",
-    "english": "I reached the extreme of fatigue.",
-    "source": "original"
+    "english": "I reached the extreme of fatigue."
    },
    {
     "japanese": "子供の笑顔は幸せの極みだ。",
-    "english": "A child's smile is the ultimate happiness.",
-    "source": "original"
+    "english": "A child's smile is the ultimate happiness."
    }
   ],
   "review_status": "draft",
@@ -1612,18 +1495,15 @@
   "examples": [
    {
     "japanese": "約束した手前、引き下がれない。",
-    "english": "Having promised, I can't back down.",
-    "source": "original"
+    "english": "Having promised, I can't back down."
    },
    {
     "japanese": "子供の手前、ちゃんとしなければならない。",
-    "english": "For the sake of the children, I have to behave properly.",
-    "source": "original"
+    "english": "For the sake of the children, I have to behave properly."
    },
    {
     "japanese": "みんなの手前、断れなかった。",
-    "english": "In front of everyone, I couldn't refuse.",
-    "source": "original"
+    "english": "In front of everyone, I couldn't refuse."
    }
   ],
   "review_status": "draft",
@@ -1653,18 +1533,15 @@
   "examples": [
    {
     "japanese": "伝統に則って、式を行った。",
-    "english": "We held the ceremony in accordance with tradition.",
-    "source": "original"
+    "english": "We held the ceremony in accordance with tradition."
    },
    {
     "japanese": "法律に則り、処理した。",
-    "english": "I handled it in accordance with the law.",
-    "source": "original"
+    "english": "I handled it in accordance with the law."
    },
    {
     "japanese": "規則に則って行動してください。",
-    "english": "Please act in accordance with the rules.",
-    "source": "original"
+    "english": "Please act in accordance with the rules."
    }
   ],
   "review_status": "draft",
@@ -1694,18 +1571,15 @@
   "examples": [
    {
     "japanese": "これをもって、会議を終わります。",
-    "english": "With this, we conclude the meeting.",
-    "source": "original"
+    "english": "With this, we conclude the meeting."
    },
    {
     "japanese": "努力をもって、成功を勝ち取った。",
-    "english": "By means of effort, he achieved success.",
-    "source": "original"
+    "english": "By means of effort, he achieved success."
    },
    {
     "japanese": "本日をもって、退職いたします。",
-    "english": "As of today, I am retiring.",
-    "source": "original"
+    "english": "As of today, I am retiring."
    }
   ],
   "review_status": "draft",
@@ -1735,18 +1609,15 @@
   "examples": [
    {
     "japanese": "お忙しいところを、ありがとうございます。",
-    "english": "Thank you for your time despite being busy.",
-    "source": "original"
+    "english": "Thank you for your time despite being busy."
    },
    {
     "japanese": "お休みのところをすみません。",
-    "english": "I'm sorry to disturb your rest.",
-    "source": "original"
+    "english": "I'm sorry to disturb your rest."
    },
    {
     "japanese": "お食事中のところを失礼します。",
-    "english": "Excuse me for interrupting your meal.",
-    "source": "original"
+    "english": "Excuse me for interrupting your meal."
    }
   ],
   "review_status": "draft",
@@ -1776,18 +1647,15 @@
   "examples": [
    {
     "japanese": "彼は自分が一番だと言ってはばからない。",
-    "english": "He openly declares he's the best.",
-    "source": "original"
+    "english": "He openly declares he's the best."
    },
    {
     "japanese": "その政治家は改革を主張してはばからなかった。",
-    "english": "The politician unhesitatingly advocated for reform.",
-    "source": "original"
+    "english": "The politician unhesitatingly advocated for reform."
    },
    {
     "japanese": "彼女は意見を言ってはばからない性格だ。",
-    "english": "She has a personality that doesn't hesitate to voice opinions.",
-    "source": "original"
+    "english": "She has a personality that doesn't hesitate to voice opinions."
    }
   ],
   "review_status": "draft",
@@ -1817,18 +1685,15 @@
   "examples": [
    {
     "japanese": "彼の意図を知るべくもない。",
-    "english": "There's no way to know his intentions.",
-    "source": "original"
+    "english": "There's no way to know his intentions."
    },
    {
     "japanese": "結果を予測すべくもない。",
-    "english": "There's no way to predict the result.",
-    "source": "original"
+    "english": "There's no way to predict the result."
    },
    {
     "japanese": "真実を知るべくもなかった。",
-    "english": "There was no way to know the truth.",
-    "source": "original"
+    "english": "There was no way to know the truth."
    }
   ],
   "review_status": "draft",
@@ -1858,18 +1723,15 @@
   "examples": [
    {
     "japanese": "田中さんとやらは、どこの人ですか。",
-    "english": "This Tanaka person — where is he from?",
-    "source": "original"
+    "english": "This Tanaka person — where is he from?"
    },
    {
     "japanese": "何とやらいう病気にかかったらしい。",
-    "english": "It seems he caught some kind of illness.",
-    "source": "original"
+    "english": "It seems he caught some kind of illness."
    },
    {
     "japanese": "彼は新しい会社を作ったとやら。",
-    "english": "I hear he started a new company or something.",
-    "source": "original"
+    "english": "I hear he started a new company or something."
    }
   ],
   "review_status": "draft",
@@ -1899,18 +1761,15 @@
   "examples": [
    {
     "japanese": "行かないでもないが、気が進まない。",
-    "english": "It's not that I won't go, but I'm not enthusiastic.",
-    "source": "original"
+    "english": "It's not that I won't go, but I'm not enthusiastic."
    },
    {
     "japanese": "分からないでもない。",
-    "english": "It's not that I don't understand.",
-    "source": "original"
+    "english": "It's not that I don't understand."
    },
    {
     "japanese": "できないでもないけど、時間がかかる。",
-    "english": "It's not impossible, but it would take time.",
-    "source": "original"
+    "english": "It's not impossible, but it would take time."
    }
   ],
   "review_status": "draft",
@@ -1940,18 +1799,15 @@
   "examples": [
    {
     "japanese": "東京を皮切りに、全国ツアーが始まる。",
-    "english": "Starting with Tokyo, the national tour begins.",
-    "source": "original"
+    "english": "Starting with Tokyo, the national tour begins."
    },
    {
     "japanese": "彼の発言を皮切りに、議論が始まった。",
-    "english": "Starting with his remark, the discussion began.",
-    "source": "original"
+    "english": "Starting with his remark, the discussion began."
    },
    {
     "japanese": "初日を皮切りに、多くの観客が訪れた。",
-    "english": "Starting on the first day, many spectators visited.",
-    "source": "original"
+    "english": "Starting on the first day, many spectators visited."
    }
   ],
   "review_status": "draft",
@@ -1980,18 +1836,15 @@
   "examples": [
    {
     "japanese": "今月を限りに、この店は閉店します。",
-    "english": "As of this month, this store will close.",
-    "source": "original"
+    "english": "As of this month, this store will close."
    },
    {
     "japanese": "今日を限りに、タバコをやめる。",
-    "english": "As of today, I'll quit smoking.",
-    "source": "original"
+    "english": "As of today, I'll quit smoking."
    },
    {
     "japanese": "今年を限りに引退する。",
-    "english": "I'll retire as of this year.",
-    "source": "original"
+    "english": "I'll retire as of this year."
    }
   ],
   "review_status": "draft",
@@ -2021,18 +1874,15 @@
   "examples": [
    {
     "japanese": "お近くにお越しの折には、お寄りください。",
-    "english": "When you come near us, please drop by.",
-    "source": "original"
+    "english": "When you come near us, please drop by."
    },
    {
     "japanese": "結婚式の折には、彼も出席した。",
-    "english": "On the occasion of the wedding, he also attended.",
-    "source": "original"
+    "english": "On the occasion of the wedding, he also attended."
    },
    {
     "japanese": "ご入り用の折には、ご連絡ください。",
-    "english": "When you need it, please contact us.",
-    "source": "original"
+    "english": "When you need it, please contact us."
    }
   ],
   "review_status": "draft",
@@ -2062,18 +1912,15 @@
   "examples": [
    {
     "japanese": "彼は生まれながらにして、才能があった。",
-    "english": "He had talent from birth.",
-    "source": "original"
+    "english": "He had talent from birth."
    },
    {
     "japanese": "彼女は涙ながらに語った。",
-    "english": "She spoke through tears.",
-    "source": "original"
+    "english": "She spoke through tears."
    },
    {
     "japanese": "彼は生まれながらにして才能に恵まれている。",
-    "english": "He has been blessed with talent since birth.",
-    "source": "original"
+    "english": "He has been blessed with talent since birth."
    }
   ],
   "review_status": "draft",
@@ -2102,18 +1949,15 @@
   "examples": [
    {
     "japanese": "犯人は警察から逃げおおせた。",
-    "english": "The criminal succeeded in escaping the police.",
-    "source": "original"
+    "english": "The criminal succeeded in escaping the police."
    },
    {
     "japanese": "何とかやりおおせた。",
-    "english": "Somehow I managed to accomplish it.",
-    "source": "original"
+    "english": "Somehow I managed to accomplish it."
    },
    {
     "japanese": "嘘をつきおおせるのは難しい。",
-    "english": "It's hard to successfully maintain a lie.",
-    "source": "original"
+    "english": "It's hard to successfully maintain a lie."
    }
   ],
   "review_status": "draft",
@@ -2143,18 +1987,15 @@
   "examples": [
    {
     "japanese": "彼は英語を使いこなしている。",
-    "english": "He has mastered the use of English.",
-    "source": "original"
+    "english": "He has mastered the use of English."
    },
    {
     "japanese": "新しいソフトを使いこなすのに時間がかかった。",
-    "english": "It took time to master the new software.",
-    "source": "original"
+    "english": "It took time to master the new software."
    },
    {
     "japanese": "彼女は着物を美しく着こなしている。",
-    "english": "She wears kimono beautifully.",
-    "source": "original"
+    "english": "She wears kimono beautifully."
    }
   ],
   "review_status": "draft",
@@ -2183,18 +2024,15 @@
   "examples": [
    {
     "japanese": "彼は冗談めかして話した。",
-    "english": "He spoke with a joking air.",
-    "source": "original"
+    "english": "He spoke with a joking air."
    },
    {
     "japanese": "彼女は秘密めかして微笑んだ。",
-    "english": "She smiled with a mysterious air.",
-    "source": "original"
+    "english": "She smiled with a mysterious air."
    },
    {
     "japanese": "皮肉めかした言い方をやめてほしい。",
-    "english": "I wish he'd stop speaking with that ironic air.",
-    "source": "original"
+    "english": "I wish he'd stop speaking with that ironic air."
    }
   ],
   "review_status": "draft",
@@ -2224,18 +2062,15 @@
   "examples": [
    {
     "japanese": "これは努力の結果に他ならない。",
-    "english": "This is nothing but the result of effort.",
-    "source": "original"
+    "english": "This is nothing but the result of effort."
    },
    {
     "japanese": "成功は運ではなく、準備に他ならない。",
-    "english": "Success is not luck but preparation, nothing else.",
-    "source": "original"
+    "english": "Success is not luck but preparation, nothing else."
    },
    {
     "japanese": "この問題の原因は無関心に他ならない。",
-    "english": "The cause of this problem is nothing but indifference.",
-    "source": "original"
+    "english": "The cause of this problem is nothing but indifference."
    }
   ],
   "review_status": "draft",
@@ -2265,18 +2100,15 @@
   "examples": [
    {
     "japanese": "味もさることながら、雰囲気も素晴らしい。",
-    "english": "The flavor is excellent, and so is the atmosphere.",
-    "source": "original"
+    "english": "The flavor is excellent, and so is the atmosphere."
    },
    {
     "japanese": "実力もさることながら、努力も素晴らしい。",
-    "english": "His ability is notable, and so is his effort.",
-    "source": "original"
+    "english": "His ability is notable, and so is his effort."
    },
    {
     "japanese": "値段もさることながら、品質も気になる。",
-    "english": "The price matters, but so does the quality.",
-    "source": "original"
+    "english": "The price matters, but so does the quality."
    }
   ],
   "review_status": "draft",
@@ -2306,18 +2138,15 @@
   "examples": [
    {
     "japanese": "言うまでもなく、彼は天才だ。",
-    "english": "Needless to say, he is a genius.",
-    "source": "original"
+    "english": "Needless to say, he is a genius."
    },
    {
     "japanese": "調べるまでもなく、答えは明らかだ。",
-    "english": "Without even needing to check, the answer is obvious.",
-    "source": "original"
+    "english": "Without even needing to check, the answer is obvious."
    },
    {
     "japanese": "聞くまでもなく、理由は分かっている。",
-    "english": "Without even needing to ask, I know the reason.",
-    "source": "original"
+    "english": "Without even needing to ask, I know the reason."
    }
   ],
   "review_status": "draft",
@@ -2347,18 +2176,15 @@
   "examples": [
    {
     "japanese": "一度ならまだしも、何度も遅刻するのは困る。",
-    "english": "Once I could accept, but being late repeatedly is a problem.",
-    "source": "original"
+    "english": "Once I could accept, but being late repeatedly is a problem."
    },
    {
     "japanese": "無料ならまだしも、有料でこれはひどい。",
-    "english": "If it were free it'd be OK, but for pay, this is awful.",
-    "source": "original"
+    "english": "If it were free it'd be OK, but for pay, this is awful."
    },
    {
     "japanese": "子供ならまだしも、大人がそんなことをするとは。",
-    "english": "If it were a child it would be understandable, but for an adult to do that!",
-    "source": "original"
+    "english": "If it were a child it would be understandable, but for an adult to do that!"
    }
   ],
   "review_status": "draft",
@@ -2387,18 +2213,15 @@
   "examples": [
    {
     "japanese": "子供ならいざ知らず、大人がそんな失敗をするなんて。",
-    "english": "If it were a child I wouldn't know, but for an adult to make such a mistake!",
-    "source": "original"
+    "english": "If it were a child I wouldn't know, but for an adult to make such a mistake!"
    },
    {
     "japanese": "初心者ならいざ知らず、プロがミスするとは。",
-    "english": "For a beginner, maybe — but for a pro to make a mistake!",
-    "source": "original"
+    "english": "For a beginner, maybe — but for a pro to make a mistake!"
    },
    {
     "japanese": "昔ならいざ知らず、今の時代に合わない。",
-    "english": "For olden times maybe, but it doesn't fit this era.",
-    "source": "original"
+    "english": "For olden times maybe, but it doesn't fit this era."
    }
   ],
   "review_status": "draft",
@@ -2428,18 +2251,15 @@
   "examples": [
    {
     "japanese": "ひとたび決めたら、最後までやり遂げる。",
-    "english": "Once I've decided, I see it through to the end.",
-    "source": "original"
+    "english": "Once I've decided, I see it through to the end."
    },
    {
     "japanese": "ひとたび約束したら、守るべきだ。",
-    "english": "Once you've promised, you should keep it.",
-    "source": "original"
+    "english": "Once you've promised, you should keep it."
    },
    {
     "japanese": "ひとたび火がつくと、消すのが大変だ。",
-    "english": "Once a fire starts, it's hard to put out.",
-    "source": "original"
+    "english": "Once a fire starts, it's hard to put out."
    }
   ],
   "review_status": "draft",
@@ -2469,18 +2289,15 @@
   "examples": [
    {
     "japanese": "仮に成功したとしたところで、喜べない。",
-    "english": "Even if we assume it succeeded, I can't be happy.",
-    "source": "original"
+    "english": "Even if we assume it succeeded, I can't be happy."
    },
    {
     "japanese": "行ったとしたところで、何も変わらない。",
-    "english": "Even assuming I went, nothing would change.",
-    "source": "original"
+    "english": "Even assuming I went, nothing would change."
    },
    {
     "japanese": "彼が謝ったとしたところで、許せない。",
-    "english": "Even if he apologized, I couldn't forgive.",
-    "source": "original"
+    "english": "Even if he apologized, I couldn't forgive."
    }
   ],
   "review_status": "draft",
@@ -2510,18 +2327,15 @@
   "examples": [
    {
     "japanese": "これほどの大事件は初めてだ。",
-    "english": "An incident of this magnitude is a first.",
-    "source": "original"
+    "english": "An incident of this magnitude is a first."
    },
    {
     "japanese": "涙が出るほどの感動だった。",
-    "english": "It was emotion to the extent of tears.",
-    "source": "original"
+    "english": "It was emotion to the extent of tears."
    },
    {
     "japanese": "彼は奇跡と呼べるほどの回復を見せた。",
-    "english": "He showed a recovery you could call a miracle.",
-    "source": "original"
+    "english": "He showed a recovery you could call a miracle."
    }
   ],
   "review_status": "draft",
@@ -2551,18 +2365,15 @@
   "examples": [
    {
     "japanese": "言わずもがなのことを言ってしまった。",
-    "english": "I said something that would have been better left unsaid.",
-    "source": "original"
+    "english": "I said something that would have been better left unsaid."
    },
    {
     "japanese": "言わずもがな、健康が一番大切だ。",
-    "english": "Needless to say, health is most important.",
-    "source": "original"
+    "english": "Needless to say, health is most important."
    },
    {
     "japanese": "それは言わずもがなのことだ。",
-    "english": "That goes without saying.",
-    "source": "original"
+    "english": "That goes without saying."
    }
   ],
   "review_status": "draft",
@@ -2591,18 +2402,15 @@
   "examples": [
    {
     "japanese": "彼にまつわる噂を聞いた。",
-    "english": "I heard rumors surrounding him.",
-    "source": "original"
+    "english": "I heard rumors surrounding him."
    },
    {
     "japanese": "この城にまつわる伝説がある。",
-    "english": "There's a legend related to this castle.",
-    "source": "original"
+    "english": "There's a legend related to this castle."
    },
    {
     "japanese": "お金にまつわる問題が多い。",
-    "english": "There are many problems related to money.",
-    "source": "original"
+    "english": "There are many problems related to money."
    }
   ],
   "review_status": "draft",
@@ -2632,18 +2440,15 @@
   "examples": [
    {
     "japanese": "散歩を兼ねて、買い物に行った。",
-    "english": "I went shopping, also taking it as a walk.",
-    "source": "original"
+    "english": "I went shopping, also taking it as a walk."
    },
    {
     "japanese": "挨拶を兼ねて、お土産を持っていった。",
-    "english": "I brought a gift, also serving as a greeting.",
-    "source": "original"
+    "english": "I brought a gift, also serving as a greeting."
    },
    {
     "japanese": "観光を兼ねた出張だった。",
-    "english": "It was a business trip that also served as sightseeing.",
-    "source": "original"
+    "english": "It was a business trip that also served as sightseeing."
    }
   ],
   "review_status": "draft",
@@ -2673,18 +2478,15 @@
   "examples": [
    {
     "japanese": "子供でありながら、大人のように話す。",
-    "english": "Even though he's a child, he talks like an adult.",
-    "source": "original"
+    "english": "Even though he's a child, he talks like an adult."
    },
    {
     "japanese": "プロでありながら、基本的なミスをした。",
-    "english": "Even though he's a pro, he made a basic mistake.",
-    "source": "original"
+    "english": "Even though he's a pro, he made a basic mistake."
    },
    {
     "japanese": "医者でありながら、自分の健康を気にしない。",
-    "english": "Although he's a doctor, he doesn't care about his own health.",
-    "source": "original"
+    "english": "Although he's a doctor, he doesn't care about his own health."
    }
   ],
   "review_status": "draft",
@@ -2714,18 +2516,15 @@
   "examples": [
    {
     "japanese": "絶対に合格してみせる。",
-    "english": "I'll definitely pass, you'll see.",
-    "source": "original"
+    "english": "I'll definitely pass, you'll see."
    },
    {
     "japanese": "必ず成功してみせます。",
-    "english": "I will definitely succeed.",
-    "source": "original"
+    "english": "I will definitely succeed."
    },
    {
     "japanese": "この困難を乗り越えてみせる。",
-    "english": "I'll overcome this difficulty, just watch.",
-    "source": "original"
+    "english": "I'll overcome this difficulty, just watch."
    }
   ],
   "review_status": "draft",
@@ -2755,18 +2554,15 @@
   "examples": [
    {
     "japanese": "30歳にして初めて、親の苦労が分かった。",
-    "english": "Only at 30 did I understand my parents' hardship.",
-    "source": "original"
+    "english": "Only at 30 did I understand my parents' hardship."
    },
    {
     "japanese": "彼にして初めてできる技だ。",
-    "english": "It's a technique only someone of his level can do.",
-    "source": "original"
+    "english": "It's a technique only someone of his level can do."
    },
    {
     "japanese": "プロにして初めて、これが分かる。",
-    "english": "Only as a pro do you understand this.",
-    "source": "original"
+    "english": "Only as a pro do you understand this."
    }
   ],
   "review_status": "draft",
@@ -2796,18 +2592,15 @@
   "examples": [
    {
     "japanese": "この店は昔ながらの味を守っている。",
-    "english": "This shop has preserved its traditional flavor.",
-    "source": "original"
+    "english": "This shop has preserved its traditional flavor."
    },
    {
     "japanese": "彼女には生まれながらの才能がある。",
-    "english": "She has innate, natural talent.",
-    "source": "original"
+    "english": "She has innate, natural talent."
    },
    {
     "japanese": "昔ながらの風景が残っている。",
-    "english": "The traditional scenery remains.",
-    "source": "original"
+    "english": "The traditional scenery remains."
    }
   ],
   "review_status": "draft",
@@ -2836,18 +2629,15 @@
   "examples": [
    {
     "japanese": "やりたいが、いかんせん、時間がない。",
-    "english": "I want to, but unfortunately, I have no time.",
-    "source": "original"
+    "english": "I want to, but unfortunately, I have no time."
    },
    {
     "japanese": "いかんせん、予算が足りない。",
-    "english": "The trouble is, the budget is insufficient.",
-    "source": "original"
+    "english": "The trouble is, the budget is insufficient."
    },
    {
     "japanese": "努力はしたが、いかんせん、結果が出なかった。",
-    "english": "I made an effort, but regrettably, no result came.",
-    "source": "original"
+    "english": "I made an effort, but regrettably, no result came."
    }
   ],
   "review_status": "draft",
@@ -2877,18 +2667,15 @@
   "examples": [
    {
     "japanese": "冗談にもほどがある。",
-    "english": "There's a limit to joking — this has gone too far.",
-    "source": "original"
+    "english": "There's a limit to joking — this has gone too far."
    },
    {
     "japanese": "失礼にもほどがある。",
-    "english": "That's rude beyond limits.",
-    "source": "original"
+    "english": "That's rude beyond limits."
    },
    {
     "japanese": "遅刻にもほどがある。",
-    "english": "Being late has its limits — this is too much.",
-    "source": "original"
+    "english": "Being late has its limits — this is too much."
    }
   ],
   "review_status": "draft",
@@ -2918,18 +2705,15 @@
   "examples": [
    {
     "japanese": "失敗すればそれまでだ。",
-    "english": "If you fail, that's the end of it.",
-    "source": "original"
+    "english": "If you fail, that's the end of it."
    },
    {
     "japanese": "バッテリーが切れれば、それまでだ。",
-    "english": "If the battery dies, that's it.",
-    "source": "original"
+    "english": "If the battery dies, that's it."
    },
    {
     "japanese": "諦めればそれまでだ。",
-    "english": "If you give up, that's the end.",
-    "source": "original"
+    "english": "If you give up, that's the end."
    }
   ],
   "review_status": "draft",
@@ -2959,18 +2743,15 @@
   "examples": [
    {
     "japanese": "寒くもなんともない。",
-    "english": "I'm not cold at all.",
-    "source": "original"
+    "english": "I'm not cold at all."
    },
    {
     "japanese": "大したことでもなんでもない。",
-    "english": "It's nothing important at all.",
-    "source": "original"
+    "english": "It's nothing important at all."
    },
    {
     "japanese": "面白くもなんともなかった。",
-    "english": "It wasn't interesting at all.",
-    "source": "original"
+    "english": "It wasn't interesting at all."
    }
   ],
   "review_status": "draft",
@@ -2999,18 +2780,15 @@
   "examples": [
    {
     "japanese": "この店は味に定評がある。",
-    "english": "This restaurant has a solid reputation for flavor.",
-    "source": "original"
+    "english": "This restaurant has a solid reputation for flavor."
    },
    {
     "japanese": "彼女は演技に定評がある女優だ。",
-    "english": "She's an actress known for her acting skill.",
-    "source": "original"
+    "english": "She's an actress known for her acting skill."
    },
    {
     "japanese": "この会社は品質に定評がある。",
-    "english": "This company has a reputation for quality.",
-    "source": "original"
+    "english": "This company has a reputation for quality."
    }
   ],
   "review_status": "draft",
@@ -3040,18 +2818,15 @@
   "examples": [
    {
     "japanese": "それは取るに足りないことだ。",
-    "english": "That's not worth mentioning.",
-    "source": "original"
+    "english": "That's not worth mentioning."
    },
    {
     "japanese": "彼は恐れるに足りない相手だ。",
-    "english": "He's not an opponent worth fearing.",
-    "source": "original"
+    "english": "He's not an opponent worth fearing."
    },
    {
     "japanese": "その情報は信頼するに足りない。",
-    "english": "That information is not worthy of trust.",
-    "source": "original"
+    "english": "That information is not worthy of trust."
    }
   ],
   "review_status": "draft",
@@ -3081,18 +2856,15 @@
   "examples": [
    {
     "japanese": "試験を前にして、緊張している。",
-    "english": "Facing the exam, I'm nervous.",
-    "source": "original"
+    "english": "Facing the exam, I'm nervous."
    },
    {
     "japanese": "大勢の観客を前にして、彼は堂々と話した。",
-    "english": "Before a large audience, he spoke with confidence.",
-    "source": "original"
+    "english": "Before a large audience, he spoke with confidence."
    },
    {
     "japanese": "卒業を前にして、感慨深い。",
-    "english": "With graduation approaching, I'm deeply moved.",
-    "source": "original"
+    "english": "With graduation approaching, I'm deeply moved."
    }
   ],
   "review_status": "draft",
@@ -3122,18 +2894,15 @@
   "examples": [
    {
     "japanese": "彼は謝ったりもしない。",
-    "english": "He doesn't even apologize.",
-    "source": "original"
+    "english": "He doesn't even apologize."
    },
    {
     "japanese": "連絡したりもしないで、勝手に来た。",
-    "english": "Without even contacting, he came on his own.",
-    "source": "original"
+    "english": "Without even contacting, he came on his own."
    },
    {
     "japanese": "考えたりもしなかった。",
-    "english": "I didn't even think about it.",
-    "source": "original"
+    "english": "I didn't even think about it."
    }
   ],
   "review_status": "draft",
@@ -3163,18 +2932,15 @@
   "examples": [
    {
     "japanese": "それは若者にありがちな失敗だ。",
-    "english": "That's a mistake typical of young people.",
-    "source": "original"
+    "english": "That's a mistake typical of young people."
    },
    {
     "japanese": "初心者にありがちな間違いを犯した。",
-    "english": "I made a mistake common among beginners.",
-    "source": "original"
+    "english": "I made a mistake common among beginners."
    },
    {
     "japanese": "現代人にありがちな悩みだ。",
-    "english": "It's a worry common to modern people.",
-    "source": "original"
+    "english": "It's a worry common to modern people."
    }
   ],
   "review_status": "draft",
@@ -3204,18 +2970,15 @@
   "examples": [
    {
     "japanese": "彼は親切そのものだ。",
-    "english": "He is kindness itself.",
-    "source": "original"
+    "english": "He is kindness itself."
    },
    {
     "japanese": "彼女は健康そのものだ。",
-    "english": "She is the picture of health.",
-    "source": "original"
+    "english": "She is the picture of health."
    },
    {
     "japanese": "その景色は美しさそのものだった。",
-    "english": "That scenery was beauty itself.",
-    "source": "original"
+    "english": "That scenery was beauty itself."
    }
   ],
   "review_status": "draft",
@@ -3245,18 +3008,15 @@
   "examples": [
    {
     "japanese": "お礼かたがた、ご挨拶に伺います。",
-    "english": "I will visit you for a greeting, which also serves as thanks.",
-    "source": "original"
+    "english": "I will visit you for a greeting, which also serves as thanks."
    },
    {
     "japanese": "ご報告かたがた、お手紙を差し上げます。",
-    "english": "I'm sending a letter that also serves as a report.",
-    "source": "original"
+    "english": "I'm sending a letter that also serves as a report."
    },
    {
     "japanese": "散歩かたがた、郵便局へ行った。",
-    "english": "I went to the post office, which was also a walk.",
-    "source": "original"
+    "english": "I went to the post office, which was also a walk."
    }
   ],
   "review_status": "draft",
@@ -3286,18 +3046,15 @@
   "examples": [
    {
     "japanese": "彼の言わんとするところを理解した。",
-    "english": "I understood what he was trying to say.",
-    "source": "original"
+    "english": "I understood what he was trying to say."
    },
    {
     "japanese": "太陽が沈まんとしている。",
-    "english": "The sun is about to set.",
-    "source": "original"
+    "english": "The sun is about to set."
    },
    {
     "japanese": "新たな時代が始まらんとしている。",
-    "english": "A new era is about to begin.",
-    "source": "original"
+    "english": "A new era is about to begin."
    }
   ],
   "review_status": "draft",
@@ -3327,18 +3084,15 @@
   "examples": [
    {
     "japanese": "彼が犯人に相違ない。",
-    "english": "There's no doubt he's the culprit.",
-    "source": "original"
+    "english": "There's no doubt he's the culprit."
    },
    {
     "japanese": "この話は事実に相違ない。",
-    "english": "This story is certainly true.",
-    "source": "original"
+    "english": "This story is certainly true."
    },
    {
     "japanese": "成功するに相違ないと信じている。",
-    "english": "I believe he'll certainly succeed.",
-    "source": "original"
+    "english": "I believe he'll certainly succeed."
    }
   ],
   "review_status": "draft",
@@ -3368,18 +3122,15 @@
   "examples": [
    {
     "japanese": "それは貧しさゆえの苦労だった。",
-    "english": "It was a hardship stemming from poverty.",
-    "source": "original"
+    "english": "It was a hardship stemming from poverty."
    },
    {
     "japanese": "若さゆえの失敗は、誰にでもある。",
-    "english": "Mistakes stemming from youth — everyone has them.",
-    "source": "original"
+    "english": "Mistakes stemming from youth — everyone has them."
    },
    {
     "japanese": "彼の成功は努力ゆえのものだ。",
-    "english": "His success is something stemming from effort.",
-    "source": "original"
+    "english": "His success is something stemming from effort."
    }
   ],
   "review_status": "draft",
@@ -3409,18 +3160,15 @@
   "examples": [
    {
     "japanese": "緊急事態とあっては、すぐ駆けつけなければならない。",
-    "english": "If it's an emergency, I have to rush over right away.",
-    "source": "original"
+    "english": "If it's an emergency, I have to rush over right away."
    },
    {
     "japanese": "彼の頼みとあっては、断れない。",
-    "english": "If it's his request, I can't refuse.",
-    "source": "original"
+    "english": "If it's his request, I can't refuse."
    },
    {
     "japanese": "子供のためとあっては、仕方がない。",
-    "english": "If it's for the children, it can't be helped.",
-    "source": "original"
+    "english": "If it's for the children, it can't be helped."
    }
   ],
   "review_status": "draft",
@@ -3450,18 +3198,15 @@
   "examples": [
    {
     "japanese": "これは命に関わる問題だ。",
-    "english": "This is a matter of life and death.",
-    "source": "original"
+    "english": "This is a matter of life and death."
    },
    {
     "japanese": "会社の信用に関わるから、慎重に対応すべきだ。",
-    "english": "It concerns the company's credibility, so we should handle it carefully.",
-    "source": "original"
+    "english": "It concerns the company's credibility, so we should handle it carefully."
    },
    {
     "japanese": "名誉に関わる事件が起こった。",
-    "english": "An incident affecting honor has occurred.",
-    "source": "original"
+    "english": "An incident affecting honor has occurred."
    }
   ],
   "review_status": "draft",
@@ -3491,18 +3236,15 @@
   "examples": [
    {
     "japanese": "早く言ってくれればよかったものを。",
-    "english": "If only you had told me sooner.",
-    "source": "original"
+    "english": "If only you had told me sooner."
    },
    {
     "japanese": "素直に謝ればいいものを、彼は頑なだ。",
-    "english": "He should just apologize, but he's stubborn.",
-    "source": "original"
+    "english": "He should just apologize, but he's stubborn."
    },
    {
     "japanese": "少し休めばよかったものを、無理してしまった。",
-    "english": "I should have rested a bit, but I pushed myself.",
-    "source": "original"
+    "english": "I should have rested a bit, but I pushed myself."
    }
   ],
   "review_status": "draft",
@@ -3531,18 +3273,15 @@
   "examples": [
    {
     "japanese": "無断欠席は退学とみなされる。",
-    "english": "Unexcused absence will be regarded as withdrawal.",
-    "source": "original"
+    "english": "Unexcused absence will be regarded as withdrawal."
    },
    {
     "japanese": "返事がない場合は、同意とみなします。",
-    "english": "If there's no reply, we will consider it as consent.",
-    "source": "original"
+    "english": "If there's no reply, we will consider it as consent."
    },
    {
     "japanese": "彼を犯人とみなすのは早すぎる。",
-    "english": "It's too early to regard him as the culprit.",
-    "source": "original"
+    "english": "It's too early to regard him as the culprit."
    }
   ],
   "review_status": "draft",
@@ -3572,18 +3311,15 @@
   "examples": [
    {
     "japanese": "これは間違いではあるまいか。",
-    "english": "I wonder if this isn't a mistake.",
-    "source": "original"
+    "english": "I wonder if this isn't a mistake."
    },
    {
     "japanese": "彼が知っているのではあるまいか。",
-    "english": "I wonder if he might know.",
-    "source": "original"
+    "english": "I wonder if he might know."
    },
    {
     "japanese": "今が最後のチャンスではあるまいか。",
-    "english": "I wonder if now isn't the last chance.",
-    "source": "original"
+    "english": "I wonder if now isn't the last chance."
    }
   ],
   "review_status": "draft",
@@ -3612,18 +3348,15 @@
   "examples": [
    {
     "japanese": "ほかならぬあなたの頼みだから、引き受けよう。",
-    "english": "Since it's a request from none other than you, I'll take it on.",
-    "source": "original"
+    "english": "Since it's a request from none other than you, I'll take it on."
    },
    {
     "japanese": "これはほかならぬ私自身の決断だ。",
-    "english": "This is a decision from none other than myself.",
-    "source": "original"
+    "english": "This is a decision from none other than myself."
    },
    {
     "japanese": "ほかならぬ家族のためだ。",
-    "english": "It's for none other than my family.",
-    "source": "original"
+    "english": "It's for none other than my family."
    }
   ],
   "review_status": "draft",
@@ -3653,18 +3386,15 @@
   "examples": [
    {
     "japanese": "彼は現状に飽き足らず、新しい挑戦を始めた。",
-    "english": "Not content with the status quo, he began a new challenge.",
-    "source": "original"
+    "english": "Not content with the status quo, he began a new challenge."
    },
    {
     "japanese": "国内市場に飽き足らず、海外進出を図った。",
-    "english": "Not satisfied with the domestic market, they pursued overseas expansion.",
-    "source": "original"
+    "english": "Not satisfied with the domestic market, they pursued overseas expansion."
    },
    {
     "japanese": "小さな成功に飽き足らず、さらに上を目指した。",
-    "english": "Not content with small successes, he aimed higher.",
-    "source": "original"
+    "english": "Not content with small successes, he aimed higher."
    }
   ],
   "review_status": "draft",
@@ -3694,18 +3424,15 @@
   "examples": [
    {
     "japanese": "この事件は起こるべくして起こった。",
-    "english": "This incident happened as it was destined to happen.",
-    "source": "original"
+    "english": "This incident happened as it was destined to happen."
    },
    {
     "japanese": "彼は勝つべくして勝った。",
-    "english": "He won as he was bound to win.",
-    "source": "original"
+    "english": "He won as he was bound to win."
    },
    {
     "japanese": "失敗するべくして失敗した。",
-    "english": "He failed as he was destined to.",
-    "source": "original"
+    "english": "He failed as he was destined to."
    }
   ],
   "review_status": "draft",
@@ -3734,18 +3461,15 @@
   "examples": [
    {
     "japanese": "考えることこそ、人間たるゆえんだ。",
-    "english": "Thinking is what makes us human.",
-    "source": "original"
+    "english": "Thinking is what makes us human."
    },
    {
     "japanese": "誠実さが、教師たるゆえんだ。",
-    "english": "Sincerity is what makes a teacher a teacher.",
-    "source": "original"
+    "english": "Sincerity is what makes a teacher a teacher."
    },
    {
     "japanese": "責任感がリーダーたるゆえんだ。",
-    "english": "A sense of responsibility is what makes a leader.",
-    "source": "original"
+    "english": "A sense of responsibility is what makes a leader."
    }
   ],
   "review_status": "draft",
@@ -3775,18 +3499,15 @@
   "examples": [
    {
     "japanese": "いやしくも教師であるなら、模範となるべきだ。",
-    "english": "If one is truly a teacher, one should be a model.",
-    "source": "original"
+    "english": "If one is truly a teacher, one should be a model."
    },
    {
     "japanese": "いやしくも社会人である以上、責任を持つべきだ。",
-    "english": "If one is truly a working adult, one should take responsibility.",
-    "source": "original"
+    "english": "If one is truly a working adult, one should take responsibility."
    },
    {
     "japanese": "いやしくもプロフェッショナルなら、妥協してはならない。",
-    "english": "If one is truly a professional, one must not compromise.",
-    "source": "original"
+    "english": "If one is truly a professional, one must not compromise."
    }
   ],
   "review_status": "draft",
@@ -3816,18 +3537,15 @@
   "examples": [
    {
     "japanese": "彼は今にも泣かんとばかりの表情だった。",
-    "english": "He had an expression as if about to cry at any moment.",
-    "source": "original"
+    "english": "He had an expression as if about to cry at any moment."
    },
    {
     "japanese": "叫ばんとばかりに、彼は拳を振り上げた。",
-    "english": "He raised his fist as if about to shout.",
-    "source": "original"
+    "english": "He raised his fist as if about to shout."
    },
    {
     "japanese": "飛び掛からんとばかりに、犬が吠えた。",
-    "english": "The dog barked as if about to jump.",
-    "source": "original"
+    "english": "The dog barked as if about to jump."
    }
   ],
   "review_status": "draft",
@@ -3857,18 +3575,15 @@
   "examples": [
    {
     "japanese": "その景色はまるで夢さながらだった。",
-    "english": "The scenery was just like a dream.",
-    "source": "original"
+    "english": "The scenery was just like a dream."
    },
    {
     "japanese": "戦場さながらの現場だった。",
-    "english": "It was a scene just like a battlefield.",
-    "source": "original"
+    "english": "It was a scene just like a battlefield."
    },
    {
     "japanese": "彼女はプロさながらの演奏を見せた。",
-    "english": "She showed a performance just like a pro's.",
-    "source": "original"
+    "english": "She showed a performance just like a pro's."
    }
   ],
   "review_status": "draft",
@@ -3898,18 +3613,15 @@
   "examples": [
    {
     "japanese": "それが本当であったとしても、驚かない。",
-    "english": "Even if that were true, I wouldn't be surprised.",
-    "source": "original"
+    "english": "Even if that were true, I wouldn't be surprised."
    },
    {
     "japanese": "彼が犯人であったとしても、信じられない。",
-    "english": "Even if he were the culprit, I couldn't believe it.",
-    "source": "original"
+    "english": "Even if he were the culprit, I couldn't believe it."
    },
    {
     "japanese": "成功であったとしても、喜べなかっただろう。",
-    "english": "Even if it had been a success, I probably couldn't have been happy.",
-    "source": "original"
+    "english": "Even if it had been a success, I probably couldn't have been happy."
    }
   ],
   "review_status": "draft",
@@ -3939,18 +3651,15 @@
   "examples": [
    {
     "japanese": "会員のみ入場できます。",
-    "english": "Only members may enter.",
-    "source": "original"
+    "english": "Only members may enter."
    },
    {
     "japanese": "ただ努力するのみだ。",
-    "english": "I can only strive.",
-    "source": "original"
+    "english": "I can only strive."
    },
    {
     "japanese": "結果を待つのみだ。",
-    "english": "All we can do is wait for the result.",
-    "source": "original"
+    "english": "All we can do is wait for the result."
    }
   ],
   "review_status": "draft",
@@ -3980,18 +3689,15 @@
   "examples": [
    {
     "japanese": "彼はいわば現代の芸術家だ。",
-    "english": "He is, so to speak, a modern artist.",
-    "source": "original"
+    "english": "He is, so to speak, a modern artist."
    },
    {
     "japanese": "これはいわば試金石のようなものだ。",
-    "english": "This is, as it were, a kind of touchstone.",
-    "source": "original"
+    "english": "This is, as it were, a kind of touchstone."
    },
    {
     "japanese": "いわば彼は家族の大黒柱だ。",
-    "english": "So to speak, he is the pillar of the family.",
-    "source": "original"
+    "english": "So to speak, he is the pillar of the family."
    }
   ],
   "review_status": "draft",
@@ -4021,18 +3727,15 @@
   "examples": [
    {
     "japanese": "彼は雨も構わず走り続けた。",
-    "english": "He kept running despite the rain.",
-    "source": "original"
+    "english": "He kept running despite the rain."
    },
    {
     "japanese": "人目も構わず、彼女は泣き出した。",
-    "english": "Without caring who was watching, she burst into tears.",
-    "source": "original"
+    "english": "Without caring who was watching, she burst into tears."
    },
    {
     "japanese": "危険も構わず、子供を助けに行った。",
-    "english": "Without regard to the danger, he went to save the child.",
-    "source": "original"
+    "english": "Without regard to the danger, he went to save the child."
    }
   ],
   "review_status": "draft",
@@ -4061,18 +3764,15 @@
   "examples": [
    {
     "japanese": "事故の瞬間を目の当たりにした。",
-    "english": "I witnessed the moment of the accident firsthand.",
-    "source": "original"
+    "english": "I witnessed the moment of the accident firsthand."
    },
    {
     "japanese": "彼の努力を目の当たりにして、感動した。",
-    "english": "Witnessing his effort firsthand, I was moved.",
-    "source": "original"
+    "english": "Witnessing his effort firsthand, I was moved."
    },
    {
     "japanese": "歴史的な瞬間を目の当たりにした。",
-    "english": "I witnessed a historic moment firsthand.",
-    "source": "original"
+    "english": "I witnessed a historic moment firsthand."
    }
   ],
   "review_status": "draft",
@@ -4102,18 +3802,15 @@
   "examples": [
    {
     "japanese": "及ばずながら、お手伝いさせていただきます。",
-    "english": "Though my ability may fall short, please let me help.",
-    "source": "original"
+    "english": "Though my ability may fall short, please let me help."
    },
    {
     "japanese": "及ばずながら、お力添えいたします。",
-    "english": "To the best of my humble ability, I will support you.",
-    "source": "original"
+    "english": "To the best of my humble ability, I will support you."
    },
    {
     "japanese": "及ばずながら、努力いたします。",
-    "english": "Though I may fall short, I will do my best.",
-    "source": "original"
+    "english": "Though I may fall short, I will do my best."
    }
   ],
   "review_status": "draft",
@@ -4143,18 +3840,15 @@
   "examples": [
    {
     "japanese": "これが愛でなくてなんであろう。",
-    "english": "If this isn't love, what else could it be?",
-    "source": "original"
+    "english": "If this isn't love, what else could it be?"
    },
    {
     "japanese": "これが奇跡でなくてなんであろうか。",
-    "english": "If this isn't a miracle, what else?",
-    "source": "original"
+    "english": "If this isn't a miracle, what else?"
    },
    {
     "japanese": "これが幸せでなくてなんであろう。",
-    "english": "If this isn't happiness, then what is?",
-    "source": "original"
+    "english": "If this isn't happiness, then what is?"
    }
   ],
   "review_status": "draft",
@@ -4183,18 +3877,15 @@
   "examples": [
    {
     "japanese": "こともあろうに、父の誕生日を忘れてしまった。",
-    "english": "Of all things, I forgot my father's birthday.",
-    "source": "original"
+    "english": "Of all things, I forgot my father's birthday."
    },
    {
     "japanese": "こともあろうに、彼はそこで転んだ。",
-    "english": "Of all places, he fell there.",
-    "source": "original"
+    "english": "Of all places, he fell there."
    },
    {
     "japanese": "こともあろうに、大事な会議に遅刻した。",
-    "english": "Of all things, I was late to an important meeting.",
-    "source": "original"
+    "english": "Of all things, I was late to an important meeting."
    }
   ],
   "review_status": "draft",
@@ -4223,18 +3914,15 @@
   "examples": [
    {
     "japanese": "ご心配には及びません。",
-    "english": "There's no need for concern.",
-    "source": "original"
+    "english": "There's no need for concern."
    },
    {
     "japanese": "お礼を言うには及ばない。",
-    "english": "No need to thank me.",
-    "source": "original"
+    "english": "No need to thank me."
    },
    {
     "japanese": "私の実力は彼には及ばない。",
-    "english": "My ability doesn't match his.",
-    "source": "original"
+    "english": "My ability doesn't match his."
    }
   ],
   "review_status": "draft",
@@ -4264,18 +3952,15 @@
   "examples": [
    {
     "japanese": "現実に即した対策が必要だ。",
-    "english": "We need countermeasures in line with reality.",
-    "source": "original"
+    "english": "We need countermeasures in line with reality."
    },
    {
     "japanese": "事実に即して話してください。",
-    "english": "Please speak in accordance with the facts.",
-    "source": "original"
+    "english": "Please speak in accordance with the facts."
    },
    {
     "japanese": "状況に即した判断を下した。",
-    "english": "We made a judgment in line with the situation.",
-    "source": "original"
+    "english": "We made a judgment in line with the situation."
    }
   ],
   "review_status": "draft",
@@ -4305,18 +3990,15 @@
   "examples": [
    {
     "japanese": "美しい景色と相まって、素晴らしい体験だった。",
-    "english": "Combined with the beautiful scenery, it was a wonderful experience.",
-    "source": "original"
+    "english": "Combined with the beautiful scenery, it was a wonderful experience."
    },
    {
     "japanese": "努力と才能が相まって、成功を収めた。",
-    "english": "Effort combined with talent, he achieved success.",
-    "source": "original"
+    "english": "Effort combined with talent, he achieved success."
    },
    {
     "japanese": "天候と相まって、売上が伸びた。",
-    "english": "Combined with the weather, sales grew.",
-    "source": "original"
+    "english": "Combined with the weather, sales grew."
    }
   ],
   "review_status": "draft",
@@ -4345,18 +4027,15 @@
   "examples": [
    {
     "japanese": "欠点を挙げたらきりがない。",
-    "english": "If you list the flaws, there's no end.",
-    "source": "original"
+    "english": "If you list the flaws, there's no end."
    },
    {
     "japanese": "言いたいことを言ったらきりがない。",
-    "english": "If I said everything I wanted, there'd be no end.",
-    "source": "original"
+    "english": "If I said everything I wanted, there'd be no end."
    },
    {
     "japanese": "考えだしたらきりがない。",
-    "english": "Once you start thinking about it, there's no end.",
-    "source": "original"
+    "english": "Once you start thinking about it, there's no end."
    }
   ],
   "review_status": "draft",
@@ -4386,18 +4065,15 @@
   "examples": [
    {
     "japanese": "彼は寝たが最後、朝まで起きない。",
-    "english": "Once he falls asleep, he won't wake until morning.",
-    "source": "original"
+    "english": "Once he falls asleep, he won't wake until morning."
    },
    {
     "japanese": "言ってしまったら最後、もう戻れない。",
-    "english": "Once you say it, there's no going back.",
-    "source": "original"
+    "english": "Once you say it, there's no going back."
    },
    {
     "japanese": "始めたが最後、最後までやり遂げるつもりだ。",
-    "english": "Once I've started, I intend to see it through.",
-    "source": "original"
+    "english": "Once I've started, I intend to see it through."
    }
   ],
   "review_status": "draft",
@@ -4427,18 +4103,15 @@
   "examples": [
    {
     "japanese": "お会いできて光栄この上ない。",
-    "english": "To meet you is the utmost honor.",
-    "source": "original"
+    "english": "To meet you is the utmost honor."
    },
    {
     "japanese": "幸せこの上ない人生だ。",
-    "english": "Nothing could make my life more fortunate.",
-    "source": "original"
+    "english": "Nothing could make my life more fortunate."
    },
    {
     "japanese": "彼と結婚できるなんて、嬉しいこの上ない。",
-    "english": "To be able to marry him — I couldn't be happier.",
-    "source": "original"
+    "english": "To be able to marry him — I couldn't be happier."
    }
   ],
   "review_status": "draft",
@@ -4468,18 +4141,15 @@
   "examples": [
    {
     "japanese": "彼は天才とされている。",
-    "english": "He is considered a genius.",
-    "source": "original"
+    "english": "He is considered a genius."
    },
    {
     "japanese": "この薬は安全だとされている。",
-    "english": "This medicine is considered safe.",
-    "source": "original"
+    "english": "This medicine is considered safe."
    },
    {
     "japanese": "事故の原因は運転ミスとされた。",
-    "english": "The cause of the accident was deemed driver error.",
-    "source": "original"
+    "english": "The cause of the accident was deemed driver error."
    }
   ],
   "review_status": "draft",
@@ -4509,18 +4179,15 @@
   "examples": [
    {
     "japanese": "犯人とおぼしき男が現場から逃げた。",
-    "english": "A man presumed to be the culprit fled the scene.",
-    "source": "original"
+    "english": "A man presumed to be the culprit fled the scene."
    },
    {
     "japanese": "記者とおぼしき人々が集まっていた。",
-    "english": "People apparently journalists were gathered.",
-    "source": "original"
+    "english": "People apparently journalists were gathered."
    },
    {
     "japanese": "外国人とおぼしき観光客がいた。",
-    "english": "There was a tourist who seemed to be a foreigner.",
-    "source": "original"
+    "english": "There was a tourist who seemed to be a foreigner."
    }
   ],
   "review_status": "draft",
@@ -4549,18 +4216,15 @@
   "examples": [
    {
     "japanese": "彼は歴史を引き合いに出して説明した。",
-    "english": "He explained by citing history as an example.",
-    "source": "original"
+    "english": "He explained by citing history as an example."
    },
    {
     "japanese": "他国を引き合いに、日本の問題を論じた。",
-    "english": "Citing other countries, he discussed Japan's problems.",
-    "source": "original"
+    "english": "Citing other countries, he discussed Japan's problems."
    },
    {
     "japanese": "過去の事例を引き合いに出して、反論した。",
-    "english": "He argued back by citing past cases.",
-    "source": "original"
+    "english": "He argued back by citing past cases."
    }
   ],
   "review_status": "draft",
@@ -4590,18 +4254,15 @@
   "examples": [
    {
     "japanese": "あろうことか、彼は約束を破った。",
-    "english": "Unbelievably, he broke his promise.",
-    "source": "original"
+    "english": "Unbelievably, he broke his promise."
    },
    {
     "japanese": "あろうことか、先生が生徒に手を出した。",
-    "english": "Of all things, the teacher struck a student.",
-    "source": "original"
+    "english": "Of all things, the teacher struck a student."
    },
    {
     "japanese": "あろうことか、重要な書類をなくした。",
-    "english": "Unbelievably, I lost the important documents.",
-    "source": "original"
+    "english": "Unbelievably, I lost the important documents."
    }
   ],
   "review_status": "draft",
@@ -4631,18 +4292,15 @@
   "examples": [
    {
     "japanese": "違いこそあれ、目的は同じだ。",
-    "english": "Although there are differences, the goal is the same.",
-    "source": "original"
+    "english": "Although there are differences, the goal is the same."
    },
    {
     "japanese": "困難こそあれ、諦めない。",
-    "english": "Although there are difficulties, I won't give up.",
-    "source": "original"
+    "english": "Although there are difficulties, I won't give up."
    },
    {
     "japanese": "程度の差こそあれ、みんな同じ問題を抱えている。",
-    "english": "Although to varying degrees, everyone has the same problem.",
-    "source": "original"
+    "english": "Although to varying degrees, everyone has the same problem."
    }
   ],
   "review_status": "draft",
@@ -4672,18 +4330,15 @@
   "examples": [
    {
     "japanese": "どうあろうとも、私は自分の道を歩む。",
-    "english": "Whatever may happen, I will walk my own path.",
-    "source": "original"
+    "english": "Whatever may happen, I will walk my own path."
    },
    {
     "japanese": "何があろうとも、諦めない。",
-    "english": "Whatever happens, I won't give up.",
-    "source": "original"
+    "english": "Whatever happens, I won't give up."
    },
    {
     "japanese": "困難があろうとも、乗り越えてみせる。",
-    "english": "Whatever difficulties, I will overcome them.",
-    "source": "original"
+    "english": "Whatever difficulties, I will overcome them."
    }
   ],
   "review_status": "draft",
@@ -4712,18 +4367,15 @@
   "examples": [
    {
     "japanese": "家族ぐるみで付き合っている。",
-    "english": "We interact as whole families (family to family).",
-    "source": "original"
+    "english": "We interact as whole families (family to family)."
    },
    {
     "japanese": "地域ぐるみで、この問題に取り組んでいる。",
-    "english": "The whole community is working on this problem.",
-    "source": "original"
+    "english": "The whole community is working on this problem."
    },
    {
     "japanese": "会社ぐるみで不正をしていた。",
-    "english": "The whole company was involved in the fraud.",
-    "source": "original"
+    "english": "The whole company was involved in the fraud."
    }
   ],
   "review_status": "draft",
@@ -4751,18 +4403,15 @@
   "examples": [
    {
     "japanese": "状況はいっこうに改善しない。",
-    "english": "The situation doesn't improve at all.",
-    "source": "original"
+    "english": "The situation doesn't improve at all."
    },
    {
     "japanese": "何度言ってもいっこうに変わらない。",
-    "english": "No matter how many times I say it, nothing changes at all.",
-    "source": "original"
+    "english": "No matter how many times I say it, nothing changes at all."
    },
    {
     "japanese": "薬を飲んでも、いっこうに効かない。",
-    "english": "Even taking the medicine, it has no effect at all.",
-    "source": "original"
+    "english": "Even taking the medicine, it has no effect at all."
    }
   ],
   "review_status": "draft",
@@ -4792,18 +4441,15 @@
   "examples": [
    {
     "japanese": "人生を旅になぞらえて表現した。",
-    "english": "He expressed life by comparing it to a journey.",
-    "source": "original"
+    "english": "He expressed life by comparing it to a journey."
    },
    {
     "japanese": "恋を花になぞらえた詩だ。",
-    "english": "It's a poem that likens love to a flower.",
-    "source": "original"
+    "english": "It's a poem that likens love to a flower."
    },
    {
     "japanese": "時の流れを川になぞらえている。",
-    "english": "He likens the flow of time to a river.",
-    "source": "original"
+    "english": "He likens the flow of time to a river."
    }
   ],
   "review_status": "draft",
@@ -4833,18 +4479,15 @@
   "examples": [
    {
     "japanese": "ワサビ抜きで、お願いします。",
-    "english": "Without wasabi, please.",
-    "source": "original"
+    "english": "Without wasabi, please."
    },
    {
     "japanese": "冗談抜きで、本当に困っている。",
-    "english": "Joking aside, I'm really in trouble.",
-    "source": "original"
+    "english": "Joking aside, I'm really in trouble."
    },
    {
     "japanese": "彼抜きでは、このプロジェクトは進まない。",
-    "english": "Without him, this project can't move forward.",
-    "source": "original"
+    "english": "Without him, this project can't move forward."
    }
   ],
   "review_status": "draft",
@@ -4873,18 +4516,15 @@
   "examples": [
    {
     "japanese": "当の本人は全く気にしていない。",
-    "english": "The person in question isn't bothered at all.",
-    "source": "original"
+    "english": "The person in question isn't bothered at all."
    },
    {
     "japanese": "当の先生が最も驚いていた。",
-    "english": "The teacher in question was the most surprised.",
-    "source": "original"
+    "english": "The teacher in question was the most surprised."
    },
    {
     "japanese": "当の犯人はまだ捕まっていない。",
-    "english": "The culprit in question still hasn't been caught.",
-    "source": "original"
+    "english": "The culprit in question still hasn't been caught."
    }
   ],
   "review_status": "draft",
@@ -4914,18 +4554,15 @@
   "examples": [
    {
     "japanese": "彼は剣道の技を極めた。",
-    "english": "He mastered the craft of kendo.",
-    "source": "original"
+    "english": "He mastered the craft of kendo."
    },
    {
     "japanese": "救助活動は困難を極めた。",
-    "english": "The rescue operation reached extreme difficulty.",
-    "source": "original"
+    "english": "The rescue operation reached extreme difficulty."
    },
    {
     "japanese": "現場は混乱を極めていた。",
-    "english": "The scene was in utter confusion.",
-    "source": "original"
+    "english": "The scene was in utter confusion."
    }
   ],
   "review_status": "draft",
@@ -4955,18 +4592,15 @@
   "examples": [
    {
     "japanese": "期待とは裏腹に、結果は散々だった。",
-    "english": "Contrary to expectations, the result was terrible.",
-    "source": "original"
+    "english": "Contrary to expectations, the result was terrible."
    },
    {
     "japanese": "見た目とは裏腹に、彼は優しい。",
-    "english": "Contrary to appearances, he is kind.",
-    "source": "original"
+    "english": "Contrary to appearances, he is kind."
    },
    {
     "japanese": "言葉とは裏腹に、心の中では悲しんでいた。",
-    "english": "Contrary to his words, he was sad in his heart.",
-    "source": "original"
+    "english": "Contrary to his words, he was sad in his heart."
    }
   ],
   "review_status": "draft",
@@ -4996,18 +4630,15 @@
   "examples": [
    {
     "japanese": "健康は自分のためであり、ひいては家族のためでもある。",
-    "english": "Health is for yourself, and by extension, for your family.",
-    "source": "original"
+    "english": "Health is for yourself, and by extension, for your family."
    },
    {
     "japanese": "教育は個人の成長、ひいては社会の発展につながる。",
-    "english": "Education leads to personal growth and, by extension, societal development.",
-    "source": "original"
+    "english": "Education leads to personal growth and, by extension, societal development."
    },
    {
     "japanese": "努力は今の成功、ひいては将来の幸せをもたらす。",
-    "english": "Effort brings present success and, by extension, future happiness.",
-    "source": "original"
+    "english": "Effort brings present success and, by extension, future happiness."
    }
   ],
   "review_status": "draft",
@@ -5036,18 +4667,15 @@
   "examples": [
    {
     "japanese": "昔のよしみで、手伝ってくれないか。",
-    "english": "For old times' sake, won't you help?",
-    "source": "original"
+    "english": "For old times' sake, won't you help?"
    },
    {
     "japanese": "友人のよしみで、お願いします。",
-    "english": "For the sake of our friendship, please.",
-    "source": "original"
+    "english": "For the sake of our friendship, please."
    },
    {
     "japanese": "同窓のよしみで、会ってくれた。",
-    "english": "He met with me as a fellow alumnus.",
-    "source": "original"
+    "english": "He met with me as a fellow alumnus."
    }
   ],
   "review_status": "draft",
@@ -5077,18 +4705,15 @@
   "examples": [
    {
     "japanese": "小さいながらも、立派な家だ。",
-    "english": "Small though it is, it's a splendid house.",
-    "source": "original"
+    "english": "Small though it is, it's a splendid house."
    },
    {
     "japanese": "子供ながらも、しっかりしている。",
-    "english": "Although he's a child, he's very reliable.",
-    "source": "original"
+    "english": "Although he's a child, he's very reliable."
    },
    {
     "japanese": "貧しいながらも、幸せに暮らしている。",
-    "english": "Although poor, they live happily.",
-    "source": "original"
+    "english": "Although poor, they live happily."
    }
   ],
   "review_status": "draft",
@@ -5117,18 +4742,15 @@
   "examples": [
    {
     "japanese": "ただでさえ忙しいのに、追加の仕事が来た。",
-    "english": "Even normally busy, on top of that, extra work came.",
-    "source": "original"
+    "english": "Even normally busy, on top of that, extra work came."
    },
    {
     "japanese": "ただでさえ狭い部屋に、家具が増えた。",
-    "english": "Even the normally cramped room, and now more furniture.",
-    "source": "original"
+    "english": "Even the normally cramped room, and now more furniture."
    },
    {
     "japanese": "ただでさえ眠いのに、会議が長い。",
-    "english": "Already tired as it is, and the meeting is long.",
-    "source": "original"
+    "english": "Already tired as it is, and the meeting is long."
    }
   ],
   "review_status": "draft",
@@ -5157,18 +4779,15 @@
   "examples": [
    {
     "japanese": "今回はご要望にお応えできかねます。あしからず。",
-    "english": "This time we cannot meet your request. Please understand.",
-    "source": "original"
+    "english": "This time we cannot meet your request. Please understand."
    },
    {
     "japanese": "参加できませんが、あしからずご了承ください。",
-    "english": "I cannot participate; please understand without taking offense.",
-    "source": "original"
+    "english": "I cannot participate; please understand without taking offense."
    },
    {
     "japanese": "ご期待に添えず、あしからずご了承願います。",
-    "english": "I'm unable to meet your expectations; please excuse me.",
-    "source": "original"
+    "english": "I'm unable to meet your expectations; please excuse me."
    }
   ],
   "review_status": "draft",
@@ -5198,18 +4817,15 @@
   "examples": [
    {
     "japanese": "褒められて、彼はまんざらでもない顔をしていた。",
-    "english": "Being praised, he looked not entirely displeased.",
-    "source": "original"
+    "english": "Being praised, he looked not entirely displeased."
    },
    {
     "japanese": "嫌がっていたが、まんざらでもなさそうだ。",
-    "english": "He was protesting, but he didn't seem entirely unhappy.",
-    "source": "original"
+    "english": "He was protesting, but he didn't seem entirely unhappy."
    },
    {
     "japanese": "その申し出は、まんざら悪い話でもない。",
-    "english": "That offer isn't an entirely bad proposal.",
-    "source": "original"
+    "english": "That offer isn't an entirely bad proposal."
    }
   ],
   "review_status": "draft",
@@ -5239,18 +4855,15 @@
   "examples": [
    {
     "japanese": "子供ですら知っていることだ。",
-    "english": "It's something even a child knows.",
-    "source": "original"
+    "english": "It's something even a child knows."
    },
    {
     "japanese": "専門家ですら分からない問題だ。",
-    "english": "It's a problem even experts don't understand.",
-    "source": "original"
+    "english": "It's a problem even experts don't understand."
    },
    {
     "japanese": "彼の親ですら驚いた。",
-    "english": "Even his parents were surprised.",
-    "source": "original"
+    "english": "Even his parents were surprised."
    }
   ],
   "review_status": "draft",
@@ -5280,18 +4893,15 @@
   "examples": [
    {
     "japanese": "彼は周囲の心配を尻目に、計画を進めた。",
-    "english": "Paying no heed to everyone's worries, he pushed forward with the plan.",
-    "source": "original"
+    "english": "Paying no heed to everyone's worries, he pushed forward with the plan."
    },
    {
     "japanese": "反対を尻目に、彼は独断で決めた。",
-    "english": "Disregarding opposition, he decided unilaterally.",
-    "source": "original"
+    "english": "Disregarding opposition, he decided unilaterally."
    },
    {
     "japanese": "不況を尻目に、その会社は業績を伸ばした。",
-    "english": "Paying no heed to the recession, that company grew its results.",
-    "source": "original"
+    "english": "Paying no heed to the recession, that company grew its results."
    }
   ],
   "review_status": "draft",
@@ -5320,18 +4930,15 @@
   "examples": [
    {
     "japanese": "毎度のことながら、彼は遅刻した。",
-    "english": "As always, he was late.",
-    "source": "original"
+    "english": "As always, he was late."
    },
    {
     "japanese": "いつものことながら、素晴らしい演奏だった。",
-    "english": "As always, it was a splendid performance.",
-    "source": "original"
+    "english": "As always, it was a splendid performance."
    },
    {
     "japanese": "彼の繊細な気遣いは、毎回のことながら感心する。",
-    "english": "His delicate consideration — each time, I'm impressed.",
-    "source": "original"
+    "english": "His delicate consideration — each time, I'm impressed."
    }
   ],
   "review_status": "draft",
@@ -5361,18 +4968,15 @@
   "examples": [
    {
     "japanese": "留学するとなれば、準備が必要だ。",
-    "english": "If it comes to studying abroad, preparation is necessary.",
-    "source": "original"
+    "english": "If it comes to studying abroad, preparation is necessary."
    },
    {
     "japanese": "結婚するとなれば、両親に相談しなければならない。",
-    "english": "If it comes to getting married, I have to consult with my parents.",
-    "source": "original"
+    "english": "If it comes to getting married, I have to consult with my parents."
    },
    {
     "japanese": "辞めるとなれば、早めに上司に言うべきだ。",
-    "english": "If it comes to quitting, you should tell your boss early.",
-    "source": "original"
+    "english": "If it comes to quitting, you should tell your boss early."
    }
   ],
   "review_status": "draft",
@@ -5402,18 +5006,15 @@
   "examples": [
    {
     "japanese": "留学となると、お金が心配だ。",
-    "english": "When it comes to studying abroad, I worry about money.",
-    "source": "original"
+    "english": "When it comes to studying abroad, I worry about money."
    },
    {
     "japanese": "いざ話すとなると、緊張する。",
-    "english": "When it actually comes to speaking, I get nervous.",
-    "source": "original"
+    "english": "When it actually comes to speaking, I get nervous."
    },
    {
     "japanese": "子供のこととなると、彼女は真剣だ。",
-    "english": "When it comes to her children, she's serious.",
-    "source": "original"
+    "english": "When it comes to her children, she's serious."
    }
   ],
   "review_status": "draft",
@@ -5442,18 +5043,15 @@
   "examples": [
    {
     "japanese": "それは教師にあるまじき行為だ。",
-    "english": "That's behavior unbecoming of a teacher.",
-    "source": "original"
+    "english": "That's behavior unbecoming of a teacher."
    },
    {
     "japanese": "医者としてあるまじき発言だ。",
-    "english": "That's an unacceptable statement from a doctor.",
-    "source": "original"
+    "english": "That's an unacceptable statement from a doctor."
    },
    {
     "japanese": "公務員にあるまじきふるまいだった。",
-    "english": "It was behavior unbecoming of a civil servant.",
-    "source": "original"
+    "english": "It was behavior unbecoming of a civil servant."
    }
   ],
   "review_status": "draft",
@@ -5483,18 +5081,15 @@
   "examples": [
    {
     "japanese": "矢のごとく、時間が過ぎていく。",
-    "english": "Time passes just like an arrow.",
-    "source": "original"
+    "english": "Time passes just like an arrow."
    },
    {
     "japanese": "彼は狂ったごとく働き続けた。",
-    "english": "He kept working as if possessed.",
-    "source": "original"
+    "english": "He kept working as if possessed."
    },
    {
     "japanese": "夢のごとく美しい景色だ。",
-    "english": "It's a scene beautiful like a dream.",
-    "source": "original"
+    "english": "It's a scene beautiful like a dream."
    }
   ],
   "review_status": "draft",
@@ -5524,18 +5119,15 @@
   "examples": [
    {
     "japanese": "私ごとき者にはもったいないお言葉です。",
-    "english": "Such kind words are wasted on someone like me.",
-    "source": "original"
+    "english": "Such kind words are wasted on someone like me."
    },
    {
     "japanese": "お前ごときに負けはしない。",
-    "english": "I won't lose to someone like you.",
-    "source": "original"
+    "english": "I won't lose to someone like you."
    },
    {
     "japanese": "子供ごときに負けて悔しい。",
-    "english": "I'm frustrated to lose to a mere child.",
-    "source": "original"
+    "english": "I'm frustrated to lose to a mere child."
    }
   ],
   "review_status": "draft",
@@ -5565,18 +5157,15 @@
   "examples": [
    {
     "japanese": "彼は信頼に足る人物だ。",
-    "english": "He is a person worthy of trust.",
-    "source": "original"
+    "english": "He is a person worthy of trust."
    },
    {
     "japanese": "これは一読に足る本だ。",
-    "english": "This is a book worth reading.",
-    "source": "original"
+    "english": "This is a book worth reading."
    },
    {
     "japanese": "驚くに足る話ではない。",
-    "english": "It's not a story worth being surprised about.",
-    "source": "original"
+    "english": "It's not a story worth being surprised about."
    }
   ],
   "review_status": "draft",
@@ -5605,18 +5194,15 @@
   "examples": [
    {
     "japanese": "この作品は鑑賞に堪える。",
-    "english": "This work is worth appreciating.",
-    "source": "original"
+    "english": "This work is worth appreciating."
    },
    {
     "japanese": "彼の演奏は聞くに堪える。",
-    "english": "His performance is worth listening to.",
-    "source": "original"
+    "english": "His performance is worth listening to."
    },
    {
     "japanese": "子供の絵だが、見るに堪える出来栄えだ。",
-    "english": "It's a child's drawing, but worth viewing.",
-    "source": "original"
+    "english": "It's a child's drawing, but worth viewing."
    }
   ],
   "review_status": "draft",
@@ -5645,18 +5231,15 @@
   "examples": [
    {
     "japanese": "その映画はひどすぎて、見るに堪えなかった。",
-    "english": "The movie was so bad it was unbearable to watch.",
-    "source": "original"
+    "english": "The movie was so bad it was unbearable to watch."
    },
    {
     "japanese": "彼の話は聞くに堪えない。",
-    "english": "His talk is unbearable to listen to.",
-    "source": "original"
+    "english": "His talk is unbearable to listen to."
    },
    {
     "japanese": "久しぶりの再会に、感慨に堪えなかった。",
-    "english": "At the long-awaited reunion, I was overcome with emotion.",
-    "source": "original"
+    "english": "At the long-awaited reunion, I was overcome with emotion."
    }
   ],
   "review_status": "draft",
@@ -5685,18 +5268,15 @@
   "examples": [
    {
     "japanese": "ご成功を祈ってやみません。",
-    "english": "I pray endlessly for your success.",
-    "source": "original"
+    "english": "I pray endlessly for your success."
    },
    {
     "japanese": "彼の活躍を期待してやまない。",
-    "english": "I have unending expectations for his success.",
-    "source": "original"
+    "english": "I have unending expectations for his success."
    },
    {
     "japanese": "故郷を愛してやまない。",
-    "english": "I will never stop loving my hometown.",
-    "source": "original"
+    "english": "I will never stop loving my hometown."
    }
   ],
   "review_status": "draft",
@@ -5725,18 +5305,15 @@
   "examples": [
    {
     "japanese": "危険を顧みず、子供を助けた。",
-    "english": "Disregarding the danger, he helped the child.",
-    "source": "original"
+    "english": "Disregarding the danger, he helped the child."
    },
    {
     "japanese": "家庭を顧みず、仕事に没頭した。",
-    "english": "Without regard to his family, he threw himself into work.",
-    "source": "original"
+    "english": "Without regard to his family, he threw himself into work."
    },
    {
     "japanese": "自分の健康を顧みず、働き続けた。",
-    "english": "Without regard to his own health, he kept working.",
-    "source": "original"
+    "english": "Without regard to his own health, he kept working."
    }
   ],
   "review_status": "draft",
@@ -5765,18 +5342,15 @@
   "examples": [
    {
     "japanese": "業界に先駆けて、新商品を発売した。",
-    "english": "Ahead of the industry, we launched the new product.",
-    "source": "original"
+    "english": "Ahead of the industry, we launched the new product."
    },
    {
     "japanese": "他社に先駆けて、サービスを開始した。",
-    "english": "Ahead of other companies, we started the service.",
-    "source": "original"
+    "english": "Ahead of other companies, we started the service."
    },
    {
     "japanese": "世界に先駆けて、この技術を開発した。",
-    "english": "Ahead of the world, we developed this technology.",
-    "source": "original"
+    "english": "Ahead of the world, we developed this technology."
    }
   ],
   "review_status": "draft",
@@ -5806,18 +5380,15 @@
   "examples": [
    {
     "japanese": "子供といえども、約束は守るべきだ。",
-    "english": "Even a child should keep a promise.",
-    "source": "original"
+    "english": "Even a child should keep a promise."
    },
    {
     "japanese": "プロといえども、失敗することはある。",
-    "english": "Even a professional sometimes fails.",
-    "source": "original"
+    "english": "Even a professional sometimes fails."
    },
    {
     "japanese": "王様といえども、ルールには従うべきだ。",
-    "english": "Even a king should follow the rules.",
-    "source": "original"
+    "english": "Even a king should follow the rules."
    }
   ],
   "review_status": "draft",
@@ -5847,18 +5418,15 @@
   "examples": [
    {
     "japanese": "簡単と思いきや、意外に難しかった。",
-    "english": "I thought it would be easy, but it was surprisingly hard.",
-    "source": "original"
+    "english": "I thought it would be easy, but it was surprisingly hard."
    },
    {
     "japanese": "晴れると思いきや、雨が降ってきた。",
-    "english": "I thought it would be sunny, but it started raining.",
-    "source": "original"
+    "english": "I thought it would be sunny, but it started raining."
    },
    {
     "japanese": "勝てると思いきや、逆転負けしてしまった。",
-    "english": "I thought I'd win, but I ended up losing in an upset.",
-    "source": "original"
+    "english": "I thought I'd win, but I ended up losing in an upset."
    }
   ],
   "review_status": "draft",
@@ -5888,18 +5456,15 @@
   "examples": [
    {
     "japanese": "少しなりともお役に立ちたい。",
-    "english": "I'd like to be of at least some help.",
-    "source": "original"
+    "english": "I'd like to be of at least some help."
    },
    {
     "japanese": "一言なりとも、挨拶すべきだった。",
-    "english": "I should have at least said a word of greeting.",
-    "source": "original"
+    "english": "I should have at least said a word of greeting."
    },
    {
     "japanese": "多少なりともご協力いたします。",
-    "english": "I will offer at least some cooperation.",
-    "source": "original"
+    "english": "I will offer at least some cooperation."
    }
   ],
   "review_status": "draft",
@@ -5929,18 +5494,15 @@
   "examples": [
    {
     "japanese": "彼は部屋に入るなり、泣き出した。",
-    "english": "As soon as he entered the room, he burst into tears.",
-    "source": "original"
+    "english": "As soon as he entered the room, he burst into tears."
    },
    {
     "japanese": "彼女は私を見るなり、逃げ出した。",
-    "english": "As soon as she saw me, she ran away.",
-    "source": "original"
+    "english": "As soon as she saw me, she ran away."
    },
    {
     "japanese": "家に着くなり、すぐ寝てしまった。",
-    "english": "As soon as I got home, I fell right asleep.",
-    "source": "original"
+    "english": "As soon as I got home, I fell right asleep."
    }
   ],
   "review_status": "draft",
@@ -5969,18 +5531,15 @@
   "examples": [
    {
     "japanese": "私なりに一生懸命頑張った。",
-    "english": "I tried my best in my own way.",
-    "source": "original"
+    "english": "I tried my best in my own way."
    },
    {
     "japanese": "子供には子供なりの悩みがある。",
-    "english": "Children have their own kind of worries.",
-    "source": "original"
+    "english": "Children have their own kind of worries."
    },
    {
     "japanese": "初心者なりに、工夫してみた。",
-    "english": "As a beginner, I tried to be creative in my own way.",
-    "source": "original"
+    "english": "As a beginner, I tried to be creative in my own way."
    }
   ],
   "review_status": "draft",
@@ -6010,18 +5569,15 @@
   "examples": [
    {
     "japanese": "ベルが鳴るが早いか、生徒たちは走り出した。",
-    "english": "The moment the bell rang, the students ran out.",
-    "source": "original"
+    "english": "The moment the bell rang, the students ran out."
    },
    {
     "japanese": "彼は座るが早いか、居眠りを始めた。",
-    "english": "As soon as he sat down, he began to doze off.",
-    "source": "original"
+    "english": "As soon as he sat down, he began to doze off."
    },
    {
     "japanese": "ドアを開けるが早いか、猫が飛び出した。",
-    "english": "The moment I opened the door, the cat jumped out.",
-    "source": "original"
+    "english": "The moment I opened the door, the cat jumped out."
    }
   ],
   "review_status": "draft",
@@ -6051,18 +5607,15 @@
   "examples": [
    {
     "japanese": "現状に鑑みて、計画を見直す必要がある。",
-    "english": "In view of the current situation, we need to review the plan.",
-    "source": "original"
+    "english": "In view of the current situation, we need to review the plan."
    },
    {
     "japanese": "社会情勢に鑑みて、新しい政策を導入した。",
-    "english": "In view of the social situation, we introduced a new policy.",
-    "source": "original"
+    "english": "In view of the social situation, we introduced a new policy."
    },
    {
     "japanese": "過去の経験に鑑みて、慎重に行動すべきだ。",
-    "english": "Considering past experience, we should act carefully.",
-    "source": "original"
+    "english": "Considering past experience, we should act carefully."
    }
   ],
   "review_status": "draft",
@@ -6091,18 +5644,15 @@
   "examples": [
    {
     "japanese": "彼には謝罪があってしかるべきだ。",
-    "english": "There ought to be an apology from him.",
-    "source": "original"
+    "english": "There ought to be an apology from him."
    },
    {
     "japanese": "その程度の配慮はあってしかるべきだ。",
-    "english": "That level of consideration ought to exist.",
-    "source": "original"
+    "english": "That level of consideration ought to exist."
    },
    {
     "japanese": "責任者には辞任を求めてしかるべきだ。",
-    "english": "The person in charge should fittingly be asked to resign.",
-    "source": "original"
+    "english": "The person in charge should fittingly be asked to resign."
    }
   ],
   "review_status": "draft",
@@ -6124,8 +5674,7 @@
    {
     "japanese": "この法律は市民たると外国人たるとを問わず等しく適用される。",
     "english": "",
-    "chinese": "这个法律无论对市民，还是对外国人都是一律适用的。",
-    "source": "private-material"
+    "chinese": "这个法律无论对市民，还是对外国人都是一律适用的。"
    }
   ]
  },
@@ -6143,8 +5692,7 @@
    {
     "japanese": "Aさんと私の成績は毎回抜きつ抜かれつで、お互いにいいライバルだ。",
     "english": "",
-    "chinese": "小A和我的成绩每次都是你追我赶，是很好的竞争对手。",
-    "source": "private-material"
+    "chinese": "小A和我的成绩每次都是你追我赶，是很好的竞争对手。"
    }
   ]
  },
@@ -6162,8 +5710,7 @@
    {
     "japanese": "そのレストランは料理といいサービスといい申し分なかった。",
     "english": "",
-    "chinese": "这家餐厅不管是菜还是服务都没得说。",
-    "source": "private-material"
+    "chinese": "这家餐厅不管是菜还是服务都没得说。"
    }
   ]
  },
@@ -6181,8 +5728,7 @@
    {
     "japanese": "熱があるなら、薬を飲むなり、氷で冷やすなりしてください。",
     "english": "",
-    "chinese": "如果发烧了，吃药也好，用冰敷也好，总之要处理。",
-    "source": "private-material"
+    "chinese": "如果发烧了，吃药也好，用冰敷也好，总之要处理。"
    }
   ]
  },
@@ -6212,8 +5758,7 @@
    {
     "japanese": "親が反対しようとしまいと、私は彼と結婚します。",
     "english": "",
-    "chinese": "不管亲人是否反对，我还是和他结婚。",
-    "source": "private-material"
+    "chinese": "不管亲人是否反对，我还是和他结婚。"
    }
   ]
  },
@@ -6231,8 +5776,7 @@
    {
     "japanese": "仕事が終わらないから、帰ろうにも帰れない。",
     "english": "",
-    "chinese": "因为工作还没有做完，即使想回也不能回。",
-    "source": "private-material"
+    "chinese": "因为工作还没有做完，即使想回也不能回。"
    }
   ]
  },
@@ -6250,8 +5794,7 @@
    {
     "japanese": "無理して早起きしたかいもなく、始発の電車に間に合わなかった。",
     "english": "",
-    "chinese": "虽然起了个大早，但还是没能赶上头班车。",
-    "source": "private-material"
+    "chinese": "虽然起了个大早，但还是没能赶上头班车。"
    }
   ]
  },
@@ -6269,8 +5812,7 @@
    {
     "japanese": "赤ちゃんが朝から泣いてしょうがない。",
     "english": "",
-    "chinese": "婴儿从早上开始哭得不得了。",
-    "source": "private-material"
+    "chinese": "婴儿从早上开始哭得不得了。"
    }
   ]
  },
@@ -6288,8 +5830,7 @@
    {
     "japanese": "仕事をやめてでも、親の介護をしなければならない。",
     "english": "",
-    "chinese": "即便辞去工作，也必定要照顾父母。",
-    "source": "private-material"
+    "chinese": "即便辞去工作，也必定要照顾父母。"
    }
   ]
  },
@@ -6307,8 +5848,7 @@
    {
     "japanese": "借金をしてまで、車を買う必要があるもんか。",
     "english": "",
-    "chinese": "没有必要为了买车而去借钱吧。",
-    "source": "private-material"
+    "chinese": "没有必要为了买车而去借钱吧。"
    }
   ]
  },
@@ -6326,8 +5866,7 @@
    {
     "japanese": "ばかにしないでください、今度、勝ってみせる。",
     "english": "",
-    "chinese": "别小看人，这次我一定要赢给你看。",
-    "source": "private-material"
+    "chinese": "别小看人，这次我一定要赢给你看。"
    }
   ]
  },
@@ -6345,8 +5884,7 @@
    {
     "japanese": "こういうところに至っては、どう悔やんでも始まらない。",
     "english": "",
-    "chinese": "事已至此，再后悔也无济于事。",
-    "source": "private-material"
+    "chinese": "事已至此，再后悔也无济于事。"
    }
   ]
  },
@@ -6364,8 +5902,7 @@
    {
     "japanese": "もう少しで原稿の締め切りに間に合わなくなるところだった。",
     "english": "",
-    "chinese": "差点没赶上截稿日期。",
-    "source": "private-material"
+    "chinese": "差点没赶上截稿日期。"
    }
   ]
  },
@@ -6383,8 +5920,7 @@
    {
     "japanese": "ここ二百万あるとしたら、どう使いますか。",
     "english": "",
-    "chinese": "如果有二百万的话，你会怎么用呢？",
-    "source": "private-material"
+    "chinese": "如果有二百万的话，你会怎么用呢？"
    }
   ]
  },
@@ -6402,8 +5938,7 @@
    {
     "japanese": "模擬試験とやらをやるそうだ。",
     "english": "",
-    "chinese": "据说要进行模拟考试什么的。",
-    "source": "private-material"
+    "chinese": "据说要进行模拟考试什么的。"
    }
   ]
  },
@@ -6421,8 +5956,7 @@
    {
     "japanese": "新入社員ならいざ知らず、入社８年にもなる君がこんなミスをするとは信じられない。",
     "english": "",
-    "chinese": "如果是新入职的职员，那还不好说；对于已入职8年的你来说，竟然还犯这样的错，难以置信。",
-    "source": "private-material"
+    "chinese": "如果是新入职的职员，那还不好说；对于已入职8年的你来说，竟然还犯这样的错，难以置信。"
    }
   ]
  },
@@ -6440,8 +5974,7 @@
    {
     "japanese": "単なる冗談ならまだしも、彼の話はたまに人を嫌がらせる。",
     "english": "",
-    "chinese": "单单开玩笑还好，他的话有时很让人生气。",
-    "source": "private-material"
+    "chinese": "单单开玩笑还好，他的话有时很让人生气。"
    }
   ]
  },
@@ -6459,8 +5992,7 @@
    {
     "japanese": "彼の父親なり母親なりに相談しなければならないだろう。",
     "english": "",
-    "chinese": "必须和他的父亲或母亲商量吧。",
-    "source": "private-material"
+    "chinese": "必须和他的父亲或母亲商量吧。"
    }
   ]
  },
@@ -6478,8 +6010,7 @@
    {
     "japanese": "驚いたのなんのって、すっかり変わっちゃってるんだ。",
     "english": "",
-    "chinese": "还说什么吓不吓一跳呢，简直是变了一个样。",
-    "source": "private-material"
+    "chinese": "还说什么吓不吓一跳呢，简直是变了一个样。"
    }
   ]
  },
@@ -6497,8 +6028,7 @@
    {
     "japanese": "あの男は何気ないふうを装って近づいてきた。",
     "english": "",
-    "chinese": "那个男人装作若无其事的样子向我靠了过来。",
-    "source": "private-material"
+    "chinese": "那个男人装作若无其事的样子向我靠了过来。"
    }
   ]
  },
@@ -6516,8 +6046,7 @@
    {
     "japanese": "もうあきらめるほかしかたがない。彼もいないので君が行くほかない。",
     "english": "",
-    "chinese": "现在只好放弃了。他也不在，只能你去了。",
-    "source": "private-material"
+    "chinese": "现在只好放弃了。他也不在，只能你去了。"
    }
   ]
  },
@@ -6535,8 +6064,7 @@
    {
     "japanese": "医者に行くほどのけがではない。",
     "english": "",
-    "chinese": "这伤很轻，还没到去看医生的地步。",
-    "source": "private-material"
+    "chinese": "这伤很轻，还没到去看医生的地步。"
    }
   ]
  },
@@ -6554,8 +6082,7 @@
    {
     "japanese": "機械まがいにスタッフを取り扱う。恐喝まがいの手段を取って相手を脅す。",
     "english": "",
-    "chinese": "把职员当成机器来看待。用近乎恐吓的手段威胁对方。",
-    "source": "private-material"
+    "chinese": "把职员当成机器来看待。用近乎恐吓的手段威胁对方。"
    }
   ]
  },
@@ -6573,8 +6100,7 @@
    {
     "japanese": "おいしくて食べまくっている。二人はしゃべりまくって話が弾んでいる。",
     "english": "",
-    "chinese": "因为好吃，所以一个劲儿地吃。两个人一个劲儿地聊，越聊越起劲。",
-    "source": "private-material"
+    "chinese": "因为好吃，所以一个劲儿地吃。两个人一个劲儿地聊，越聊越起劲。"
    }
   ]
  },
@@ -6592,8 +6118,7 @@
    {
     "japanese": "時もあろうに、試験中、トイレにいきたくてたまらない。",
     "english": "",
-    "chinese": "偏偏就是在考试的时候想上厕所。",
-    "source": "private-material"
+    "chinese": "偏偏就是在考试的时候想上厕所。"
    }
   ]
  },
@@ -6611,8 +6136,7 @@
    {
     "japanese": "来週あたりでき上がると思います。",
     "english": "",
-    "chinese": "大致下周就可以完成了。",
-    "source": "private-material"
+    "chinese": "大致下周就可以完成了。"
    }
   ]
  },
@@ -6630,8 +6154,7 @@
    {
     "japanese": "そんなことをするのは天才かさもなければ狂人だ。",
     "english": "",
-    "chinese": "能做这样事的人，不是天才就是疯子。",
-    "source": "private-material"
+    "chinese": "能做这样事的人，不是天才就是疯子。"
    }
   ]
  },
@@ -6649,8 +6172,7 @@
    {
     "japanese": "彼はクラスきっての成績を取った。",
     "english": "",
-    "chinese": "他取得了全班第一的成绩。",
-    "source": "private-material"
+    "chinese": "他取得了全班第一的成绩。"
    }
   ]
  },
@@ -6668,8 +6190,7 @@
    {
     "japanese": "彼は人の話を聞かないきらいがある。",
     "english": "",
-    "chinese": "他有点听不进别人的话。",
-    "source": "private-material"
+    "chinese": "他有点听不进别人的话。"
    }
   ]
  },
@@ -6687,8 +6208,7 @@
    {
     "japanese": "ただ女性のみが子供を産むことができる。",
     "english": "",
-    "chinese": "只有女性才会生孩子。",
-    "source": "private-material"
+    "chinese": "只有女性才会生孩子。"
    }
   ]
  },
@@ -6706,8 +6226,7 @@
    {
     "japanese": "何回やったところで、勝てないよ。相手は強すぎるんだから。",
     "english": "",
-    "chinese": "即使做多少次，也胜不了，因为对手太强大了。",
-    "source": "private-material"
+    "chinese": "即使做多少次，也胜不了，因为对手太强大了。"
    }
   ]
  },
@@ -6725,8 +6244,7 @@
    {
     "japanese": "「男たる者、女の前で涙は流せない」と彼は強がりを言った。",
     "english": "",
-    "chinese": "他说了「身为男人，就不能在女人面前流泪」的逞强的话。",
-    "source": "private-material"
+    "chinese": "他说了「身为男人，就不能在女人面前流泪」的逞强的话。"
    }
   ]
  },
@@ -6744,8 +6262,7 @@
    {
     "japanese": "立ち上がった拍子に頭をぶつけた。",
     "english": "",
-    "chinese": "站起来的瞬间，磕了脑袋。",
-    "source": "private-material"
+    "chinese": "站起来的瞬间，磕了脑袋。"
    }
   ]
  },
@@ -6763,8 +6280,7 @@
    {
     "japanese": "彼のことは、もうすっかり忘れた。夢にだに見ない。",
     "english": "",
-    "chinese": "他的事已全部忘记，就连梦也没梦过。",
-    "source": "private-material"
+    "chinese": "他的事已全部忘记，就连梦也没梦过。"
    }
   ]
  },
@@ -6782,8 +6298,7 @@
    {
     "japanese": "事業の成功を祈ってやまない。",
     "english": "",
-    "chinese": "由衷祝愿事业的成功。",
-    "source": "private-material"
+    "chinese": "由衷祝愿事业的成功。"
    }
   ]
  },
@@ -6801,8 +6316,7 @@
    {
     "japanese": "赤ちゃんではあるまいし、自分のことは自分でしなさい。",
     "english": "",
-    "chinese": "因为又不是小孩子，所以自己的事情请自己做。",
-    "source": "private-material"
+    "chinese": "因为又不是小孩子，所以自己的事情请自己做。"
    }
   ]
  },
@@ -6820,8 +6334,7 @@
    {
     "japanese": "彼は不潔だといったらありゃしない、風呂は一ヶ月に1回だそうだ。",
     "english": "",
-    "chinese": "他脏得没法说，据说一个月才洗一次澡。",
-    "source": "private-material"
+    "chinese": "他脏得没法说，据说一个月才洗一次澡。"
    }
   ]
  },
@@ -6839,8 +6352,7 @@
    {
     "japanese": "最近若者ときたら、礼儀も知らない。",
     "english": "",
-    "chinese": "说到现在的年轻人，连礼仪也不知道。",
-    "source": "private-material"
+    "chinese": "说到现在的年轻人，连礼仪也不知道。"
    }
   ]
  },
@@ -6858,8 +6370,7 @@
    {
     "japanese": "4月になったとはいえ、まだ寒い日もある。",
     "english": "",
-    "chinese": "虽说已是4月，寒冷的天气还是有。",
-    "source": "private-material"
+    "chinese": "虽说已是4月，寒冷的天气还是有。"
    }
   ]
  },
@@ -6877,8 +6388,7 @@
    {
     "japanese": "億万長者だとは言わないまでも、彼はかなりのお金持ちらしい。",
     "english": "",
-    "chinese": "即使不能说他是亿万富翁，好像也是相当富有的大款。",
-    "source": "private-material"
+    "chinese": "即使不能说他是亿万富翁，好像也是相当富有的大款。"
    }
   ]
  },
@@ -6896,8 +6406,7 @@
    {
     "japanese": "一生懸命働けばマイホームが手に入らないものでもない。",
     "english": "",
-    "chinese": "如果拼命工作的话，也并非不能买上房子。",
-    "source": "private-material"
+    "chinese": "如果拼命工作的话，也并非不能买上房子。"
    }
   ]
  },
@@ -6915,8 +6424,7 @@
    {
     "japanese": "今度の試験が悪かったといって悲観するにあたらない。",
     "english": "",
-    "chinese": "虽说这次的考试不好，但也不必悲观。",
-    "source": "private-material"
+    "chinese": "虽说这次的考试不好，但也不必悲观。"
    }
   ]
  },
@@ -6934,8 +6442,7 @@
    {
     "japanese": "田舎に住んでいる人が都会に憧れる心情は理解にかたくない。",
     "english": "",
-    "chinese": "住在乡下的人向往城里，是不难理解的。",
-    "source": "private-material"
+    "chinese": "住在乡下的人向往城里，是不难理解的。"
    }
   ]
  },
@@ -6965,8 +6472,7 @@
    {
     "japanese": "彼のスピーチは聞くにたえないものだった。",
     "english": "",
-    "chinese": "他的演讲实在不值得听。",
-    "source": "private-material"
+    "chinese": "他的演讲实在不值得听。"
    }
   ]
  },
@@ -6984,8 +6490,7 @@
    {
     "japanese": "12月になり、前にもまして寒くなってきた。",
     "english": "",
-    "chinese": "到了12月，比以前更加冷了。",
-    "source": "private-material"
+    "chinese": "到了12月，比以前更加冷了。"
    }
   ]
  },
@@ -7003,8 +6508,7 @@
    {
     "japanese": "お金があればこそ、留学できるのです。",
     "english": "",
-    "chinese": "正因为有钱，才能够留学。",
-    "source": "private-material"
+    "chinese": "正因为有钱，才能够留学。"
    }
   ]
  },
@@ -7022,8 +6526,7 @@
    {
     "japanese": "一生懸命勉強しても、試験に落ちてしまえばそれまでだ。",
     "english": "",
-    "chinese": "即使拼命学习，考试不及格的话也无话可说。",
-    "source": "private-material"
+    "chinese": "即使拼命学习，考试不及格的话也无话可说。"
    }
   ]
  },
@@ -7041,8 +6544,7 @@
    {
     "japanese": "ラッシュ時のホームではドアが開くや否や乗客が、どっと電車から雪崩（なだれ）出た。",
     "english": "",
-    "chinese": "在高峰的站台，门一开，乘客就一下子从电车里一拥而出。",
-    "source": "private-material"
+    "chinese": "在高峰的站台，门一开，乘客就一下子从电车里一拥而出。"
    }
   ]
  },
@@ -7060,8 +6562,7 @@
    {
     "japanese": "彼までもう言うなら、僕もう黙っているよりほかはない。",
     "english": "",
-    "chinese": "连他都这么说的话，我只有默不作声了。",
-    "source": "private-material"
+    "chinese": "连他都这么说的话，我只有默不作声了。"
    }
   ]
  },
@@ -7079,8 +6580,7 @@
    {
     "japanese": "彼は周囲（しゅうい）の反対をものともせず、自分が正しいと思う道を歩み（あゆみ）続けた。",
     "english": "",
-    "chinese": "他不在乎周围人的反对，继续走自己认为正确的道路。",
-    "source": "private-material"
+    "chinese": "他不在乎周围人的反对，继续走自己认为正确的道路。"
    }
   ]
  },
@@ -7098,8 +6598,7 @@
    {
     "japanese": "選挙の勝利をピークにして、彼は政治生涯が花盛りだ。",
     "english": "",
-    "chinese": "以选举胜利为巅峰，他的政治生涯开花结果了。",
-    "source": "private-material"
+    "chinese": "以选举胜利为巅峰，他的政治生涯开花结果了。"
    }
   ]
  },
@@ -7117,8 +6616,7 @@
    {
     "japanese": "今にも雨が降り出さんばかりの空模様（そらもよう）になってきた。",
     "english": "",
-    "chinese": "眼看就要下雨的天气来了。",
-    "source": "private-material"
+    "chinese": "眼看就要下雨的天气来了。"
    }
   ]
  },
@@ -7136,8 +6634,7 @@
    {
     "japanese": "事業を始めたが失敗して借金だけ残る始末だった。",
     "english": "",
-    "chinese": "事业刚开始就失败了，结果只剩下债务。",
-    "source": "private-material"
+    "chinese": "事业刚开始就失败了，结果只剩下债务。"
    }
   ]
  },
@@ -7155,8 +6652,7 @@
    {
     "japanese": "彼が困ろうが、私には関係がない。",
     "english": "",
-    "chinese": "无论他多困惑，都与我无关。",
-    "source": "private-material"
+    "chinese": "无论他多困惑，都与我无关。"
    }
   ]
  },
@@ -7174,8 +6670,7 @@
    {
     "japanese": "先生にして解けない問題なのだから、私はできるわけがない。",
     "english": "",
-    "chinese": "因为是就连老师也无法解答的问题，我当然不会。",
-    "source": "private-material"
+    "chinese": "因为是就连老师也无法解答的问题，我当然不会。"
    }
   ]
  },
@@ -7193,14 +6688,12 @@
    {
     "japanese": "いかなる理由だろうが/であろうが、テロ事件を起こすのは許すまじきことだ。",
     "english": "",
-    "chinese": "无论有什么理由,也不允许实施恐怖活动。",
-    "source": "private-material"
+    "chinese": "无论有什么理由,也不允许实施恐怖活动。"
    },
    {
     "japanese": "誰が何と言おうが、私の決意は変わりません。",
     "english": "",
-    "chinese": "无论别人说什么,我的决心也不会改变。",
-    "source": "private-material"
+    "chinese": "无论别人说什么,我的决心也不会改变。"
    }
   ]
  },
@@ -7218,14 +6711,12 @@
    {
     "japanese": "国会議員だろうが、公務員だろうが、税金を納めなければならない。",
     "english": "",
-    "chinese": "国会议员也好,普通的公务员也好,都必须交税。",
-    "source": "private-material"
+    "chinese": "国会议员也好,普通的公务员也好,都必须交税。"
    },
    {
     "japanese": "私のやったことは人のためにしたことで、ほめられようが、けなされようが、ちっとも気にしません。",
     "english": "",
-    "chinese": "我所做的事是为他人服务的,所以被表扬也好被诋毁也好,我都淡然处之。",
-    "source": "private-material"
+    "chinese": "我所做的事是为他人服务的,所以被表扬也好被诋毁也好,我都淡然处之。"
    }
   ]
  },
@@ -7243,14 +6734,12 @@
    {
     "japanese": "相手が聞こうが聞くまいが自分の意見をはっきり言うつもりです。",
     "english": "",
-    "chinese": "不管对方听得进去听不进去,我都要清清楚楚地说出自己的意见。",
-    "source": "private-material"
+    "chinese": "不管对方听得进去听不进去,我都要清清楚楚地说出自己的意见。"
    },
    {
     "japanese": "これは早急に結論を出さなければならない議題だ。全員集まろうが集まるまいが、予定どおりに審議を始めなくてはならない。",
     "english": "",
-    "chinese": "这是一个必须尽早拿出结论的议题。不管与会者是否全都到齐,必须按照预定时间开始进入审议程序。",
-    "source": "private-material"
+    "chinese": "这是一个必须尽早拿出结论的议题。不管与会者是否全都到齐,必须按照预定时间开始进入审议程序。"
    }
   ]
  },
@@ -7268,14 +6757,12 @@
    {
     "japanese": "周囲の人が反対しようとしまいと、私の気持ちは変わらない。",
     "english": "",
-    "chinese": "不管周围的人反对与否,我都不会改变我的主意。",
-    "source": "private-material"
+    "chinese": "不管周围的人反对与否,我都不会改变我的主意。"
    },
    {
     "japanese": "ベストを尽くしてやれば、成功しようとしまいと関係ないのではないか。",
     "english": "",
-    "chinese": "只要全力以赴,最后成功不成功没有什么关系吧。",
-    "source": "private-material"
+    "chinese": "只要全力以赴,最后成功不成功没有什么关系吧。"
    }
   ]
  },
@@ -7293,14 +6780,12 @@
    {
     "japanese": "妻が怒っているところだから、こちらは冷静に話そうとしたところで、聞いてくれないんだ。",
     "english": "",
-    "chinese": "因为现在我老婆正在气头上,所以即使我想冷静地跟她谈话,她也听不进去。",
-    "source": "private-material"
+    "chinese": "因为现在我老婆正在气头上,所以即使我想冷静地跟她谈话,她也听不进去。"
    },
    {
     "japanese": "うわさを打ち消そうとしたところで、誤解されるだけなんだから、黙っていたほうがいいかもしれない。",
     "english": "",
-    "chinese": "即使想辟谣,也只会越描越黑,所以干脆保持沉默或许会好一些。",
-    "source": "private-material"
+    "chinese": "即使想辟谣,也只会越描越黑,所以干脆保持沉默或许会好一些。"
    }
   ]
  },
@@ -7318,14 +6803,12 @@
    {
     "japanese": "こんなに騒がしい部屋では、赤ちゃんを寝かせようにも寝かせられない。",
     "english": "",
-    "chinese": "在这么吵闹的房间里,想让宝宝睡觉也睡不着。",
-    "source": "private-material"
+    "chinese": "在这么吵闹的房间里,想让宝宝睡觉也睡不着。"
    },
    {
     "japanese": "大雪で交通が麻痺し、動こうにも動けなかった。",
     "english": "",
-    "chinese": "由于大雪,交通处于瘫痪状态,车子想动也动弹不了。",
-    "source": "private-material"
+    "chinese": "由于大雪,交通处于瘫痪状态,车子想动也动弹不了。"
    }
   ]
  },
@@ -7343,20 +6826,17 @@
    {
     "japanese": "3時間待ったかいがあって、美しい景色を見ることができた。",
     "english": "",
-    "chinese": "这三个小时没有白等,我们终于观赏到了美轮美奂的景色。",
-    "source": "private-material"
+    "chinese": "这三个小时没有白等,我们终于观赏到了美轮美奂的景色。"
    },
    {
     "japanese": "応援のかいもなく、私のクラスのチームは一勝もできなかった。",
     "english": "",
-    "chinese": "真是白去呐喊助威了。因为我们班的队伍一场也没有赢过。",
-    "source": "private-material"
+    "chinese": "真是白去呐喊助威了。因为我们班的队伍一场也没有赢过。"
    },
    {
     "japanese": "半年の苦労のしがいもなく、鳥インフルエンザにかかって、羽あまりのトリが全部死んでしまった。",
     "english": "",
-    "chinese": "半年的辛苦付诸东流。2000多只鸡都因染上了禽流感病毒而死光了。",
-    "source": "private-material"
+    "chinese": "半年的辛苦付诸东流。2000多只鸡都因染上了禽流感病毒而死光了。"
    }
   ]
  },
@@ -7386,14 +6866,12 @@
    {
     "japanese": "その新たな雇用対策が有効であるか否か、結果が出るのはまだ先のことだ。",
     "english": "",
-    "chinese": "那个新的雇佣政策是否有效,其结果还尚待观察。",
-    "source": "private-material"
+    "chinese": "那个新的雇佣政策是否有效,其结果还尚待观察。"
    },
    {
     "japanese": "合格するか否かは、君自身の努力にかかっている。",
     "english": "",
-    "chinese": "能不能考上,全凭你自身的努力。",
-    "source": "private-material"
+    "chinese": "能不能考上,全凭你自身的努力。"
    }
   ]
  },
@@ -7411,14 +6889,12 @@
    {
     "japanese": "家を土地がらみ1億円で、不動産屋に売ってやった。",
     "english": "",
-    "chinese": "房子连同地皮以1亿日元的价格统统卖给了房地产开发商。",
-    "source": "private-material"
+    "chinese": "房子连同地皮以1亿日元的价格统统卖给了房地产开发商。"
    },
    {
     "japanese": "最近、耳にしたのは汚職がらみの事件まみれだった。",
     "english": "",
-    "chinese": "最近听到的都是些有关贪污、渎职等方面的事件新闻。",
-    "source": "private-material"
+    "chinese": "最近听到的都是些有关贪污、渎职等方面的事件新闻。"
    }
   ]
  },
@@ -7436,14 +6912,12 @@
    {
     "japanese": "子供たちは動物園に着くが早いか、おやつを食べ出した。",
     "english": "",
-    "chinese": "孩子们一到动物园就开始吃起零食。",
-    "source": "private-material"
+    "chinese": "孩子们一到动物园就开始吃起零食。"
    },
    {
     "japanese": "授業終了のベルを聞くが早いか、生徒たちは教室を飛び出して行った。",
     "english": "",
-    "chinese": "刚听到下课的铃声，同学们就飞奔出了教室。",
-    "source": "private-material"
+    "chinese": "刚听到下课的铃声，同学们就飞奔出了教室。"
    }
   ]
  },
@@ -7461,14 +6935,12 @@
    {
     "japanese": "彼はいつも仕事が雑だ。間違いを挙げればきりがない。",
     "english": "",
-    "chinese": "他做工作经常杂乱无章。要是列举他犯的错误,那真是举不胜举。",
-    "source": "private-material"
+    "chinese": "他做工作经常杂乱无章。要是列举他犯的错误,那真是举不胜举。"
    },
    {
     "japanese": "ほしい物を数えあげるときりがないが、お金がないので、どうしようもない。",
     "english": "",
-    "chinese": "如果要列举我想要的东西,那简直数也数不清。但因为没钱,所以没办法。",
-    "source": "private-material"
+    "chinese": "如果要列举我想要的东西,那简直数也数不清。但因为没钱,所以没办法。"
    }
   ]
  },
@@ -7486,14 +6958,12 @@
    {
     "japanese": "今日は家族ぐるみで、伊勢神宮を参拝していた。",
     "english": "",
-    "chinese": "今天全家一起去参拜了伊势神社。",
-    "source": "private-material"
+    "chinese": "今天全家一起去参拜了伊势神社。"
    },
    {
     "japanese": "家を土地ぐるみ1億円で、不動産屋に売ってやった。",
     "english": "",
-    "chinese": "房子连同地皮以1亿日元的价格统统卖给了房地产开发商。",
-    "source": "private-material"
+    "chinese": "房子连同地皮以1亿日元的价格统统卖给了房地产开发商。"
    }
   ]
  },
@@ -7511,20 +6981,17 @@
    {
     "japanese": "この一年間は良いことずくめだったが、来年はどうだろうか。",
     "english": "",
-    "chinese": "这一年喜事不断，但不知明年如何。",
-    "source": "private-material"
+    "chinese": "这一年喜事不断，但不知明年如何。"
    },
    {
     "japanese": "おいしい料理ずくめの持て成しをいただいてとても満足しました。",
     "english": "",
-    "chinese": "全是美味佳肴，让我们一饱口福。",
-    "source": "private-material"
+    "chinese": "全是美味佳肴，让我们一饱口福。"
    },
    {
     "japanese": "週末のパーティーに彼女はブラウスもスカートも黑ずくめで出てきた。",
     "english": "",
-    "chinese": "她穿着一身黑色的衬衫和裙子参加了周末的晚会。",
-    "source": "private-material"
+    "chinese": "她穿着一身黑色的衬衫和裙子参加了周末的晚会。"
    }
   ]
  },
@@ -7542,26 +7009,22 @@
    {
     "japanese": "その仕事はまだ完成せずにございます。",
     "english": "",
-    "chinese": "那项工作至今尚未完成。",
-    "source": "private-material"
+    "chinese": "那项工作至今尚未完成。"
    },
    {
     "japanese": "新しいパソコンは買いましたが、まだ使わずにございます。",
     "english": "",
-    "chinese": "新电脑倒是买回来了,但还一直没有用过。",
-    "source": "private-material"
+    "chinese": "新电脑倒是买回来了,但还一直没有用过。"
    },
    {
     "japanese": "卒業してこのかた、(わたしは)彼女とは会わないでございます。",
     "english": "",
-    "chinese": "毕业至今,我还一直没有跟她见过面。",
-    "source": "private-material"
+    "chinese": "毕业至今,我还一直没有跟她见过面。"
    },
    {
     "japanese": "被害者を救うために、われわれ救援隊員はもう二日間も寝ずにございます。",
     "english": "",
-    "chinese": "为了救受灾者,我们这些救援人员已经两天没有睡觉了。",
-    "source": "private-material"
+    "chinese": "为了救受灾者,我们这些救援人员已经两天没有睡觉了。"
    }
   ]
  },
@@ -7579,26 +7042,22 @@
    {
     "japanese": "この映画は評判が高く、見る者を感動させずにはおかない。",
     "english": "",
-    "chinese": "这部影片受到了较高的评价,所以它肯定能让观众感动不已。",
-    "source": "private-material"
+    "chinese": "这部影片受到了较高的评价,所以它肯定能让观众感动不已。"
    },
    {
     "japanese": "花が咲くのはまだ先のことですが、それなりの風情があって、人の心を慰めずにはおきません。",
     "english": "",
-    "chinese": "虽然离花开的时间还有些日子,不过花开之前也有其独特的风韵,也能使人们的心情得到安慰。",
-    "source": "private-material"
+    "chinese": "虽然离花开的时间还有些日子,不过花开之前也有其独特的风韵,也能使人们的心情得到安慰。"
    },
    {
     "japanese": "新企画の中止が決まろうとしているが、担当した者たちは反対せずにはおかないだろう。",
     "english": "",
-    "chinese": "新计划将被终止,这一定会遭到该计划负责人们的反对吧。",
-    "source": "private-material"
+    "chinese": "新计划将被终止,这一定会遭到该计划负责人们的反对吧。"
    },
    {
     "japanese": "息子は一流の音楽家になると言って家を出た。大変だが、きっと目的を達成せずにはおかないだろう。",
     "english": "",
-    "chinese": "儿子说要当一流的音乐家,于是离家到外面去闯荡。虽然会吃很多的苦,但他不达到目的是不会罢休的。",
-    "source": "private-material"
+    "chinese": "儿子说要当一流的音乐家,于是离家到外面去闯荡。虽然会吃很多的苦,但他不达到目的是不会罢休的。"
    }
   ]
  },
@@ -7616,38 +7075,32 @@
    {
     "japanese": "お金そのものは悪いものではないと言える。",
     "english": "",
-    "chinese": "可以说，钱本身并不是什么坏东西。",
-    "source": "private-material"
+    "chinese": "可以说，钱本身并不是什么坏东西。"
    },
    {
     "japanese": "先日提出した私の意見書は、単に決定に至るプロセスの問題点を指摘しようとしたにすぎず、決定そのものに反対するものではありません。",
     "english": "",
-    "chinese": "前几天我递交上去的建议书，只是想指出作出决定的过程是否恰当，对决定本身我并不持反对意见。",
-    "source": "private-material"
+    "chinese": "前几天我递交上去的建议书，只是想指出作出决定的过程是否恰当，对决定本身我并不持反对意见。"
    },
    {
     "japanese": "彼女の歌は天使の歌声そのものだ。",
     "english": "",
-    "chinese": "她的歌声简直就是天籁之音。",
-    "source": "private-material"
+    "chinese": "她的歌声简直就是天籁之音。"
    },
    {
     "japanese": "最近、物忘れがひどくなるばかりだ。これこそ老化そのものだ。",
     "english": "",
-    "chinese": "最近我越来越健忘了，其实这就是人老化的表现。",
-    "source": "private-material"
+    "chinese": "最近我越来越健忘了，其实这就是人老化的表现。"
    },
    {
     "japanese": "彼は誠実そのもので、みんなから信頼されている。",
     "english": "",
-    "chinese": "他非常诚实，得到了大家的信赖。",
-    "source": "private-material"
+    "chinese": "他非常诚实，得到了大家的信赖。"
    },
    {
     "japanese": "お兄さんは謙遜そのもので、弟さんは傲慢そのものだ。",
     "english": "",
-    "chinese": "哥哥做人十分谦虚，而弟弟做人却十分傲慢。",
-    "source": "private-material"
+    "chinese": "哥哥做人十分谦虚，而弟弟做人却十分傲慢。"
    }
   ]
  },
@@ -7665,14 +7118,12 @@
    {
     "japanese": "私は語学の才能がないようで、新しい言葉を習うそばから忘れてしまう。",
     "english": "",
-    "chinese": "我好像没有语言天赋，刚学的新单词马上就忘了。",
-    "source": "private-material"
+    "chinese": "我好像没有语言天赋，刚学的新单词马上就忘了。"
    },
    {
     "japanese": "もう遅刻しないと言ったそばからまた遅れるなんて、彼は何を考えているのだろう。",
     "english": "",
-    "chinese": "刚说过“我再也不迟到了”，可今天又迟到了。真不知道他在想些什么。",
-    "source": "private-material"
+    "chinese": "刚说过“我再也不迟到了”，可今天又迟到了。真不知道他在想些什么。"
    }
   ]
  },
@@ -7690,14 +7141,12 @@
    {
     "japanese": "ぜひ見ようと思っていた映画だったのに、忙しくて行きそびれた。",
     "english": "",
-    "chinese": "那是我一直想看的电影，但由于工作太忙，结果没能去看。",
-    "source": "private-material"
+    "chinese": "那是我一直想看的电影，但由于工作太忙，结果没能去看。"
    },
    {
     "japanese": "そこへ、邪魔者が来て、私は彼女に言いたいことを言いそびれた。",
     "english": "",
-    "chinese": "正在这时，“电灯泡”来了。结果我想对她说的话没说成。",
-    "source": "private-material"
+    "chinese": "正在这时，“电灯泡”来了。结果我想对她说的话没说成。"
    }
   ]
  },
@@ -7715,14 +7164,12 @@
    {
     "japanese": "募金で集めたお金は1円たりとも無駄にできない。",
     "english": "",
-    "chinese": "通过募捐筹集到的钱,哪怕一日元也不能浪费。",
-    "source": "private-material"
+    "chinese": "通过募捐筹集到的钱,哪怕一日元也不能浪费。"
    },
    {
     "japanese": "今日の午後3時までに原稿を提出しなければならず、今は1分たりともおろそかにできない。",
     "english": "",
-    "chinese": "必须在今天下午3点之前交稿,所以现在我一分钟也不能耽搁。",
-    "source": "private-material"
+    "chinese": "必须在今天下午3点之前交稿,所以现在我一分钟也不能耽搁。"
    }
   ]
  },
@@ -7740,14 +7187,12 @@
    {
     "japanese": "今年は景気が非常に悪く、ボーナスが出なかった。しかし、給料がもらえるだけましだ。",
     "english": "",
-    "chinese": "由于今年公司非常不景气,所以没有拿到奖金。但是好在工资可以照常领到。",
-    "source": "private-material"
+    "chinese": "由于今年公司非常不景气,所以没有拿到奖金。但是好在工资可以照常领到。"
    },
    {
     "japanese": "石油の価格が上がったために、我が社の業績は下がった。しかし、損失が出ないだけまだましだ。",
     "english": "",
-    "chinese": "由于石油价格的上升,我们公司的业绩也随之下滑。但幸运的是还没有出现经营亏损。",
-    "source": "private-material"
+    "chinese": "由于石油价格的上升,我们公司的业绩也随之下滑。但幸运的是还没有出现经营亏损。"
    }
   ]
  },
@@ -7765,26 +7210,22 @@
    {
     "japanese": "夕べは暑くてかなわなかったので、寝つかれなかったのだ。",
     "english": "",
-    "chinese": "昨晚热得实在吃不消,一夜都没睡安稳。",
-    "source": "private-material"
+    "chinese": "昨晚热得实在吃不消,一夜都没睡安稳。"
    },
    {
     "japanese": "のどがかわいてかなわないが、飲み物を売るところさえ見つからなくて困った。",
     "english": "",
-    "chinese": "口干得不得了,但令人伤脑筋的是,连一家卖饮料的店都找不到。",
-    "source": "private-material"
+    "chinese": "口干得不得了,但令人伤脑筋的是,连一家卖饮料的店都找不到。"
    },
    {
     "japanese": "こう暑くてはかなわない。せめて風があれば少しは涼しいのだろうが。",
     "english": "",
-    "chinese": "这么热的天怎么吃得消,至少刮点风也能稍微凉快些。",
-    "source": "private-material"
+    "chinese": "这么热的天怎么吃得消,至少刮点风也能稍微凉快些。"
    },
    {
     "japanese": "おもしろいと言われたからといって、同じ冗談を何度も聞かされちゃかなわない。",
     "english": "",
-    "chinese": "虽说有趣,但同样的玩笑被唠叨几遍的话也让人受不了。",
-    "source": "private-material"
+    "chinese": "虽说有趣,但同样的玩笑被唠叨几遍的话也让人受不了。"
    }
   ]
  },
@@ -7802,14 +7243,12 @@
    {
     "japanese": "わたしの車はこの先の駐車場に止めてございます。",
     "english": "",
-    "chinese": "我的车已经停放在前面的那个停车场了。",
-    "source": "private-material"
+    "chinese": "我的车已经停放在前面的那个停车场了。"
    },
    {
     "japanese": "社長:あ、君。食事の用意はできてるの。社員:はい、あちらのお部屋にすでに準備してございます。",
     "english": "",
-    "chinese": "哦,对了,我问你,饭菜都已经准备好了吗?是的。已经在那边的屋子里准备好了。",
-    "source": "private-material"
+    "chinese": "哦,对了,我问你,饭菜都已经准备好了吗?是的。已经在那边的屋子里准备好了。"
    }
   ]
  },
@@ -7827,14 +7266,12 @@
    {
     "japanese": "所得が低い人には、税金の負担を軽くするなどの措置が取られてしかるべきだ。",
     "english": "",
-    "chinese": "对那些低收入的人,应该采取减免税收等措施。",
-    "source": "private-material"
+    "chinese": "对那些低收入的人,应该采取减免税收等措施。"
    },
    {
     "japanese": "状況が変わったのだから、会社の経営計画も見直されてしかるべきだ。",
     "english": "",
-    "chinese": "因为情况发生了变化,所以也必须重新考虑公司的经营计划。",
-    "source": "private-material"
+    "chinese": "因为情况发生了变化,所以也必须重新考虑公司的经营计划。"
    }
   ]
  },
@@ -7852,14 +7289,12 @@
    {
     "japanese": "採用の条件には合わないが、だめでもともとだから、この会社に履歴書を出してみよう。",
     "english": "",
-    "chinese": "尽管不符合录用条件,但是因为又没有什么损失,所以试着向这家公司投份简历吧。",
-    "source": "private-material"
+    "chinese": "尽管不符合录用条件,但是因为又没有什么损失,所以试着向这家公司投份简历吧。"
    },
    {
     "japanese": "実力はまだそこまでになっていないと分かっている。だから、失敗してももともとだ。",
     "english": "",
-    "chinese": "我自己清楚,我的实力还没达到应有的水平,所以即使失败了也没什么。",
-    "source": "private-material"
+    "chinese": "我自己清楚,我的实力还没达到应有的水平,所以即使失败了也没什么。"
    }
   ]
  },
@@ -7877,38 +7312,32 @@
    {
     "japanese": "手伝ってくれる人がいれば、誰でも差し支えないから、来てほしい。",
     "english": "",
-    "chinese": "只要有人帮我,谁都可以,希望有人来。",
-    "source": "private-material"
+    "chinese": "只要有人帮我,谁都可以,希望有人来。"
    },
    {
     "japanese": "いつでも差し支えありませんから、こちらへ遊びにいらっしゃってください。",
     "english": "",
-    "chinese": "任何时候都可以,请上我家来玩。",
-    "source": "private-material"
+    "chinese": "任何时候都可以,请上我家来玩。"
    },
    {
     "japanese": "家賃が安ければ、古いアパートでも差し支えない。",
     "english": "",
-    "chinese": "只要房租便宜,旧一点的公寓也无妨。",
-    "source": "private-material"
+    "chinese": "只要房租便宜,旧一点的公寓也无妨。"
    },
    {
     "japanese": "ここで食事をしても差し支えない。",
     "english": "",
-    "chinese": "可以在这里用餐。",
-    "source": "private-material"
+    "chinese": "可以在这里用餐。"
    },
    {
     "japanese": "この本は、来週の金曜日までお借りして差し支えませんか。",
     "english": "",
-    "chinese": "这本书我可以借到下周五吗?",
-    "source": "private-material"
+    "chinese": "这本书我可以借到下周五吗?"
    },
    {
     "japanese": "ここに車を止めて差し支えないなら、1時間ぐらい止めさせてもらいたいんですけど。",
     "english": "",
-    "chinese": "如果这里可以停车,我想停一个小时左右,行吗?",
-    "source": "private-material"
+    "chinese": "如果这里可以停车,我想停一个小时左右,行吗?"
    }
   ]
  },
@@ -7926,26 +7355,22 @@
    {
     "japanese": "あの人はエステ代に給料のほとんどをつぎ込んでいる。肌がきれいでも無理もない/きれいなのも無理はない。",
     "english": "",
-    "chinese": "她几乎把所有的工资都花费在美容养生上了,所以难怪她的肌肤很好。",
-    "source": "private-material"
+    "chinese": "她几乎把所有的工资都花费在美容养生上了,所以难怪她的肌肤很好。"
    },
    {
     "japanese": "君が悪いから、課長に怒られても無理もない/怒られるのも無理はない。",
     "english": "",
-    "chinese": "因为是你不好,难怪科长会冲着你发脾气。",
-    "source": "private-material"
+    "chinese": "因为是你不好,难怪科长会冲着你发脾气。"
    },
    {
     "japanese": "君が悪いから、課長に怒られるのは無理もない。",
     "english": "",
-    "chinese": "因为是你不好,难怪科长会冲着你发脾气。",
-    "source": "private-material"
+    "chinese": "因为是你不好,难怪科长会冲着你发脾气。"
    },
    {
     "japanese": "A:山田先生の授業に出る学生が少ないなあ。B:あんなに退屈な講義じゃ、(学生が少ないのも)無理ないよ。",
     "english": "",
-    "chinese": "去上山田老师课的学生不多啊。那么没意思的课,也难怪(听课的学生少)。",
-    "source": "private-material"
+    "chinese": "去上山田老师课的学生不多啊。那么没意思的课,也难怪(听课的学生少)。"
    }
   ]
  },
@@ -7963,14 +7388,12 @@
    {
     "japanese": "山田さんから、娘を車に乗せてやっていただきました。",
     "english": "",
-    "chinese": "请山田先生让我女儿搭乘了他的车。",
-    "source": "private-material"
+    "chinese": "请山田先生让我女儿搭乘了他的车。"
    },
    {
     "japanese": "出かけていたとき、隣の奥さんに子どもの世話をしてやっていただきました。",
     "english": "",
-    "chinese": "我出门的时候,请邻居的太太帮我照看了孩子。",
-    "source": "private-material"
+    "chinese": "我出门的时候,请邻居的太太帮我照看了孩子。"
    }
   ]
  },
@@ -7988,14 +7411,12 @@
    {
     "japanese": "すみませんが、リーさんを郵便局へ連れて行ってやっていただけませんか。",
     "english": "",
-    "chinese": "对不起,请您陪这位李小姐去一趟邮局好吗?",
-    "source": "private-material"
+    "chinese": "对不起,请您陪这位李小姐去一趟邮局好吗?"
    },
    {
     "japanese": "そのいい機会を友だちの山田さんに与えてやっていただけませんか。",
     "english": "",
-    "chinese": "您就把那个好机会给山田好吗?",
-    "source": "private-material"
+    "chinese": "您就把那个好机会给山田好吗?"
    }
   ]
  },
@@ -8013,32 +7434,27 @@
    {
     "japanese": "来週から、田中先生が息子に英語を教えてやってくださいます。",
     "english": "",
-    "chinese": "从下周开始,田中老师开始教我儿子学习英语。",
-    "source": "private-material"
+    "chinese": "从下周开始,田中老师开始教我儿子学习英语。"
    },
    {
     "japanese": "あの方は弟を車でうちまで送ってやってくださいました。",
     "english": "",
-    "chinese": "那个人开车把我弟弟送到了我家。",
-    "source": "private-material"
+    "chinese": "那个人开车把我弟弟送到了我家。"
    },
    {
     "japanese": "彼女は若いけれども、とても優秀です。次の仕事はわが社にとって重要ですので、彼女に任せてやってください。",
     "english": "",
-    "chinese": "她虽然年轻,但还是挺优秀的。这项工作对我们公司很重要,所以就交给她干吧。",
-    "source": "private-material"
+    "chinese": "她虽然年轻,但还是挺优秀的。这项工作对我们公司很重要,所以就交给她干吧。"
    },
    {
     "japanese": "山田さん、お客様を空港まで送ってやってくださいませんか。",
     "english": "",
-    "chinese": "山田,你把客人送到机场好吗?",
-    "source": "private-material"
+    "chinese": "山田,你把客人送到机场好吗?"
    },
    {
     "japanese": "暇だったら山田さんのオートバイを見てやってくださいませんでしょうか。",
     "english": "",
-    "chinese": "如果你有空的话,帮山田修理一下摩托车好吗?",
-    "source": "private-material"
+    "chinese": "如果你有空的话,帮山田修理一下摩托车好吗?"
    }
   ]
  },
@@ -8056,38 +7472,32 @@
    {
     "japanese": "山田さんが息子のオートバイを修理してやってくれました。",
     "english": "",
-    "chinese": "田中帮我儿子修好了摩托车。",
-    "source": "private-material"
+    "chinese": "田中帮我儿子修好了摩托车。"
    },
    {
     "japanese": "隣さんが二日間うちの子どもの世話をしてやってくれました。",
     "english": "",
-    "chinese": "邻居家帮我带了两天孩子。",
-    "source": "private-material"
+    "chinese": "邻居家帮我带了两天孩子。"
    },
    {
     "japanese": "このケーキを隣のおばあさんに持っていってやってくれ。",
     "english": "",
-    "chinese": "你把这个蛋糕送给邻居家的奶奶吃吧。",
-    "source": "private-material"
+    "chinese": "你把这个蛋糕送给邻居家的奶奶吃吧。"
    },
    {
     "japanese": "課長:山田君。よければ、あの新人の仕事を手伝ってやってくれ。うまくできないって。山田:はい、分かりました。",
     "english": "",
-    "chinese": "我说山田,可以的话你去指导一下那位新职工的工作。他说他不太懂。好的,我知道了。",
-    "source": "private-material"
+    "chinese": "我说山田,可以的话你去指导一下那位新职工的工作。他说他不太懂。好的,我知道了。"
    },
    {
     "japanese": "向こうがちょっと遅く着くかもしれませんから、来るまで待っていてやってくれませんか。",
     "english": "",
-    "chinese": "对方可能会晚一点到,你就在这里等客人吧。",
-    "source": "private-material"
+    "chinese": "对方可能会晚一点到,你就在这里等客人吧。"
    },
    {
     "japanese": "会議のことを山田さんに伝えてやってくれませんか。",
     "english": "",
-    "chinese": "开会的事情请你通知山田吧。",
-    "source": "private-material"
+    "chinese": "开会的事情请你通知山田吧。"
    }
   ]
  },
@@ -8105,14 +7515,12 @@
    {
     "japanese": "その日に、おばあちゃんから子どもたちに田舎料理を作ってやってもらいました。",
     "english": "",
-    "chinese": "那天我请外婆为孩子们做了农家菜。",
-    "source": "private-material"
+    "chinese": "那天我请外婆为孩子们做了农家菜。"
    },
    {
     "japanese": "友だちに息子の自転車を修理してやってもらいました。",
     "english": "",
-    "chinese": "我请朋友为儿子修了自行车。",
-    "source": "private-material"
+    "chinese": "我请朋友为儿子修了自行车。"
    }
   ]
  },
@@ -8130,14 +7538,12 @@
    {
     "japanese": "悪いけど、うちの子を駅まで載せてやってもらえませんか。",
     "english": "",
-    "chinese": "不好意思,能让我的孩子搭乘您的车到车站吗?",
-    "source": "private-material"
+    "chinese": "不好意思,能让我的孩子搭乘您的车到车站吗?"
    },
    {
     "japanese": "うちの娘に英語を教えてやってもらえませんか。",
     "english": "",
-    "chinese": "请您教我女儿英语好吗?",
-    "source": "private-material"
+    "chinese": "请您教我女儿英语好吗?"
    }
   ]
  },
@@ -8155,14 +7561,12 @@
    {
     "japanese": "結婚する二人の今後の幸せを願ってやまない。",
     "english": "",
-    "chinese": "衷心祝愿他们婚后幸福。",
-    "source": "private-material"
+    "chinese": "衷心祝愿他们婚后幸福。"
    },
    {
     "japanese": "その時、みんなは先生の病気を気にかけてやみませんでした。",
     "english": "",
-    "chinese": "那时,大家非常担心老师的病情。",
-    "source": "private-material"
+    "chinese": "那时,大家非常担心老师的病情。"
    }
   ]
  },
@@ -8180,14 +7584,12 @@
    {
     "japanese": "約束したとおりに5千万円もの結納金を受け取ったあとから、伝言を聞いて、驚いた。",
     "english": "",
-    "chinese": "按约定女方已经收下了我送的5千万日元的聘礼了,可后来又让人传话说:“就这点钱,没门”。我感到很震惊。",
-    "source": "private-material"
+    "chinese": "按约定女方已经收下了我送的5千万日元的聘礼了,可后来又让人传话说:“就这点钱,没门”。我感到很震惊。"
    },
    {
     "japanese": "課長である以上、そんな大事な事を知らなかったではすまされないだろう。",
     "english": "",
-    "chinese": "既然是科长,那么大的事都不知道的话怎么能容忍。",
-    "source": "private-material"
+    "chinese": "既然是科长,那么大的事都不知道的话怎么能容忍。"
    }
   ]
  },
@@ -8205,38 +7607,32 @@
    {
     "japanese": "彼の部屋は壁という壁に美人の写真が貼ってある。",
     "english": "",
-    "chinese": "他房间的墙壁四周都贴满了美女照片。",
-    "source": "private-material"
+    "chinese": "他房间的墙壁四周都贴满了美女照片。"
    },
    {
     "japanese": "力という力を使い尽くして、溺れた人を救い上げた。",
     "english": "",
-    "chinese": "竭尽全力,把落水的人救了上来。",
-    "source": "private-material"
+    "chinese": "竭尽全力,把落水的人救了上来。"
    },
    {
     "japanese": "今年という今年は、下がりつつある売り上げに困った。",
     "english": "",
-    "chinese": "今年的销售额连续下滑,很伤脑筋。",
-    "source": "private-material"
+    "chinese": "今年的销售额连续下滑,很伤脑筋。"
    },
    {
     "japanese": "今回という今回こそ、N1試験に受かってみせる。",
     "english": "",
-    "chinese": "这次一定要通过N1考试。",
-    "source": "private-material"
+    "chinese": "这次一定要通过N1考试。"
    },
    {
     "japanese": "広場に何千人という人が集まった。",
     "english": "",
-    "chinese": "广场上聚集了好几千人。",
-    "source": "private-material"
+    "chinese": "广场上聚集了好几千人。"
    },
    {
     "japanese": "毎朝5キロというジョギングはわたしにとって、たいしたもんじゃない。",
     "english": "",
-    "chinese": "每天早上慢跑5公里,这对我来说没什么。",
-    "source": "private-material"
+    "chinese": "每天早上慢跑5公里,这对我来说没什么。"
    }
   ]
  },
@@ -8254,20 +7650,17 @@
    {
     "japanese": "ブランド品の腕時計だと言われているのに、そんなに安く売っているなんて。いんちきな商売というか、とにかく疑わしい。引っかからないように気をつけてください。",
     "english": "",
-    "chinese": "虽然说是名牌手表,却卖得如此便宜,可以说里面可能有猫腻吧,反正值得怀疑,当心上当受骗。",
-    "source": "private-material"
+    "chinese": "虽然说是名牌手表,却卖得如此便宜,可以说里面可能有猫腻吧,反正值得怀疑,当心上当受骗。"
    },
    {
     "japanese": "一人であんな危険な場所へ行くとは、無茶というか、無知というか、とにかく私には理解できない。",
     "english": "",
-    "chinese": "竟然独自一人到那种危险的地方去,说他是胡闹还是无知呢?真让我难以理解。",
-    "source": "private-material"
+    "chinese": "竟然独自一人到那种危险的地方去,说他是胡闹还是无知呢?真让我难以理解。"
    },
    {
     "japanese": "その時の気持ちは悲しいというか、あるいはうれしいというか、どちらもあったといえよう。",
     "english": "",
-    "chinese": "当时的心情可以说是悲喜交加。",
-    "source": "private-material"
+    "chinese": "当时的心情可以说是悲喜交加。"
    }
   ]
  },
@@ -8285,14 +7678,12 @@
    {
     "japanese": "この教科書の勉強は、来週で終わるというところだ。",
     "english": "",
-    "chinese": "这本教科书的学习将在下周结束。",
-    "source": "private-material"
+    "chinese": "这本教科书的学习将在下周结束。"
    },
    {
     "japanese": "今年の米のできは、まあまあといったところだ。",
     "english": "",
-    "chinese": "今年的大米收成也就马马虎虎吧。",
-    "source": "private-material"
+    "chinese": "今年的大米收成也就马马虎虎吧。"
    }
   ]
  },
@@ -8310,38 +7701,32 @@
    {
     "japanese": "今度の対戦相手の守りには、どこといって穴がない。",
     "english": "",
-    "chinese": "这次作战对手的防守战术没有任何漏洞。",
-    "source": "private-material"
+    "chinese": "这次作战对手的防守战术没有任何漏洞。"
    },
    {
     "japanese": "どんなときが幸せだといって、一家で一緒に暮らせるほど幸せなことはない。",
     "english": "",
-    "chinese": "要问我什么时候感到最幸福,没有比一家人能团聚在一起生活的日子更令人感到幸福了。",
-    "source": "private-material"
+    "chinese": "要问我什么时候感到最幸福,没有比一家人能团聚在一起生活的日子更令人感到幸福了。"
    },
    {
     "japanese": "店には入ったが、これといってほしい服はない。",
     "english": "",
-    "chinese": "虽然进了店里,但没有找到我特别想买的衣服。",
-    "source": "private-material"
+    "chinese": "虽然进了店里,但没有找到我特别想买的衣服。"
    },
    {
     "japanese": "美術展を見に行ったが、これといって賞賛にたえる作品に出会わなかった。",
     "english": "",
-    "chinese": "虽然去看了美术展,但并没有看到值得称赞的作品。",
-    "source": "private-material"
+    "chinese": "虽然去看了美术展,但并没有看到值得称赞的作品。"
    },
    {
     "japanese": "適当な人選といえば、これという人がいなくて困っている。",
     "english": "",
-    "chinese": "说起适当的人选,确实没有合适的人,所以我正在为此发愁。",
-    "source": "private-material"
+    "chinese": "说起适当的人选,确实没有合适的人,所以我正在为此发愁。"
    },
    {
     "japanese": "これといった自覚症状もなく急に発病した。",
     "english": "",
-    "chinese": "并没有出现任何前兆就突然发病了。",
-    "source": "private-material"
+    "chinese": "并没有出现任何前兆就突然发病了。"
    }
   ]
  },
@@ -8359,14 +7744,12 @@
    {
     "japanese": "恩恵にあずかりまして、感謝の意を申し上げます。",
     "english": "",
-    "chinese": "承蒙关照,深表感谢。",
-    "source": "private-material"
+    "chinese": "承蒙关照,深表感谢。"
    },
    {
     "japanese": "日頃お世話にあずかりまして、誠にありがたく存じます。",
     "english": "",
-    "chinese": "对您平日里的关照,表示真诚的谢意。",
-    "source": "private-material"
+    "chinese": "对您平日里的关照,表示真诚的谢意。"
    }
   ]
  },
@@ -8384,14 +7767,12 @@
    {
     "japanese": "先生におかれましては、ますますお元気そうで何よりです。",
     "english": "",
-    "chinese": "老师贵体安康,胜过一切。",
-    "source": "private-material"
+    "chinese": "老师贵体安康,胜过一切。"
    },
    {
     "japanese": "貴社におかれましては、ますますご盛栄のこととお喜び申し上げます。",
     "english": "",
-    "chinese": "贵公司日益兴隆,我们深感高兴。",
-    "source": "private-material"
+    "chinese": "贵公司日益兴隆,我们深感高兴。"
    }
   ]
  },
@@ -8409,20 +7790,17 @@
    {
     "japanese": "審査員が彼の作品を見て、そのすばらしさに驚いたことは、想像にかたくない。",
     "english": "",
-    "chinese": "审查员看了他的作品后,对其作品的精彩之处所表现出的惊讶是不难想象的。",
-    "source": "private-material"
+    "chinese": "审查员看了他的作品后,对其作品的精彩之处所表现出的惊讶是不难想象的。"
    },
    {
     "japanese": "田舎に住んでいる人が都会に憧れる心情は理解(する)にかたくない。",
     "english": "",
-    "chinese": "住在乡下的人,他们向往城市的心情是不难理解的。",
-    "source": "private-material"
+    "chinese": "住在乡下的人,他们向往城市的心情是不难理解的。"
    },
    {
     "japanese": "言葉もよく分からない外国で一人きりで暮らすときの気持ちは納得するにかたくない。",
     "english": "",
-    "chinese": "独自一人在语言不通的国外生活时的心情不难理解。",
-    "source": "private-material"
+    "chinese": "独自一人在语言不通的国外生活时的心情不难理解。"
    }
   ]
  },
@@ -8440,38 +7818,32 @@
    {
     "japanese": "彼の描いた絵は専門家の鑑賞にもたえる作品だった。",
     "english": "",
-    "chinese": "他画的画,也能经得起专家们的鉴赏。",
-    "source": "private-material"
+    "chinese": "他画的画,也能经得起专家们的鉴赏。"
    },
    {
     "japanese": "近頃の週刊誌はくだらない記事が多く、読むにたえない。",
     "english": "",
-    "chinese": "最近的一些周刊里所登载的,有很多是一些无聊的“八卦”,不值得一读。",
-    "source": "private-material"
+    "chinese": "最近的一些周刊里所登载的,有很多是一些无聊的“八卦”,不值得一读。"
    },
    {
     "japanese": "あの役者の気障な格好はまったく見るにたえない。",
     "english": "",
-    "chinese": "那个演员矫揉造作的姿态不堪入目。",
-    "source": "private-material"
+    "chinese": "那个演员矫揉造作的姿态不堪入目。"
    },
    {
     "japanese": "あの人の話はいつも人の悪口ばかりで、聞くにたえない。",
     "english": "",
-    "chinese": "那人老是说别人的坏话,简直不堪入耳。",
-    "source": "private-material"
+    "chinese": "那人老是说别人的坏话,简直不堪入耳。"
    },
    {
     "japanese": "今回の出版に関してご配慮を賜り、感謝にたえません。",
     "english": "",
-    "chinese": "有关这次出版事宜,承蒙关照,不胜感谢。",
-    "source": "private-material"
+    "chinese": "有关这次出版事宜,承蒙关照,不胜感谢。"
    },
    {
     "japanese": "奥様がお亡くなりになったと伺って、悲しみにたえません。",
     "english": "",
-    "chinese": "听说您的夫人逝世,为此我深感悲痛。",
-    "source": "private-material"
+    "chinese": "听说您的夫人逝世,为此我深感悲痛。"
    }
   ]
  },
@@ -8489,14 +7861,12 @@
    {
     "japanese": "はたして彼は信頼するにたりる人間だろうか。",
     "english": "",
-    "chinese": "他真的是一个值得信赖的人吗?",
-    "source": "private-material"
+    "chinese": "他真的是一个值得信赖的人吗?"
    },
    {
     "japanese": "これは、まじめに考えるにたりない、くだらない問題だ。",
     "english": "",
-    "chinese": "这是一个不值得去多想的无聊的问题。",
-    "source": "private-material"
+    "chinese": "这是一个不值得去多想的无聊的问题。"
    }
   ]
  },
@@ -8514,14 +7884,12 @@
    {
     "japanese": "合格と認められるにたる成績を示さなかった者には再検討を課す。",
     "english": "",
-    "chinese": "如何对待那些不及格的人,需要重新讨论。",
-    "source": "private-material"
+    "chinese": "如何对待那些不及格的人,需要重新讨论。"
    },
    {
     "japanese": "先日提出された調査報告は信頼にたるものではなかった。",
     "english": "",
-    "chinese": "前几天提交的调查报告,不足以令人信服。",
-    "source": "private-material"
+    "chinese": "前几天提交的调查报告,不足以令人信服。"
    }
   ]
  },
@@ -8539,14 +7907,12 @@
    {
     "japanese": "みんな知っていることだから、二度と説明(する)には及びません。",
     "english": "",
-    "chinese": "这是大家都知道的事情,用不着说第二遍。",
-    "source": "private-material"
+    "chinese": "这是大家都知道的事情,用不着说第二遍。"
    },
    {
     "japanese": "そんなつまらないことで、わざわざお越しいただくには及びません。",
     "english": "",
-    "chinese": "这么小的事,不劳驾您专程赶过来。",
-    "source": "private-material"
+    "chinese": "这么小的事,不劳驾您专程赶过来。"
    }
   ]
  },
@@ -8564,14 +7930,12 @@
    {
     "japanese": "町の再開発を一挙に進めるのには無理がある。実情に即して計画を練らなければならない。",
     "english": "",
-    "chinese": "城镇的再开发不可能一蹴而就,必须根据实际情况反复研究计划。",
-    "source": "private-material"
+    "chinese": "城镇的再开发不可能一蹴而就,必须根据实际情况反复研究计划。"
    },
    {
     "japanese": "麻薬の製造者と販売者をみな死刑に処するという意見がある。その主張には人権上無理がある。",
     "english": "",
-    "chinese": "有人主张对毒品制造者和毒品贩卖者统统处以极刑。从人权的角度来看,该主张有待商榷。",
-    "source": "private-material"
+    "chinese": "有人主张对毒品制造者和毒品贩卖者统统处以极刑。从人权的角度来看,该主张有待商榷。"
    }
   ]
  },
@@ -8589,14 +7953,12 @@
    {
     "japanese": "申請書の提出締め切りは明日の午後4時だが、早めに出せればそれにこしたことはない。",
     "english": "",
-    "chinese": "虽然申请表的提交截止时间是明天下午4点,但如果能提前交的话那是再好不过了。",
-    "source": "private-material"
+    "chinese": "虽然申请表的提交截止时间是明天下午4点,但如果能提前交的话那是再好不过了。"
    },
    {
     "japanese": "どんなに安全な地域であれ、ドアの鍵を二つつけるなど用心するにこしたことはない。",
     "english": "",
-    "chinese": "无论是在多么安全的地方,为了以防万一,门最好是上双保险。",
-    "source": "private-material"
+    "chinese": "无论是在多么安全的地方,为了以防万一,门最好是上双保险。"
    }
   ]
  },
@@ -8614,14 +7976,12 @@
    {
     "japanese": "世界的に有名な俳優と握手できたなんて、感激の極みだ。",
     "english": "",
-    "chinese": "能同世界级名演员握手,这令我非常激动。",
-    "source": "private-material"
+    "chinese": "能同世界级名演员握手,这令我非常激动。"
    },
    {
     "japanese": "母は買い物、父は散歩に出たきり帰ってこない。この家にいさせられたのはぼく一人だ。ああ、退屈の極みよ。",
     "english": "",
-    "chinese": "妈妈去买东西了,爸爸出去散步了。留在家里的就我一个人,真没劲。",
-    "source": "private-material"
+    "chinese": "妈妈去买东西了,爸爸出去散步了。留在家里的就我一个人,真没劲。"
    }
   ]
  },
@@ -8639,14 +7999,12 @@
    {
     "japanese": "本日この席に出席できましたことは誠に光栄の至りです。",
     "english": "",
-    "chinese": "今天我能出席这次活动,甚感光荣。",
-    "source": "private-material"
+    "chinese": "今天我能出席这次活动,甚感光荣。"
    },
    {
     "japanese": "課長が自分の姪をおれの嫁さんにとしきりに勧める。迷惑の至りだ。おれには友だちを通して知り合った、この人と決めた相手がいるんだ。",
     "english": "",
-    "chinese": "科长再三地把他的侄女介绍给我,这太为难我了。其实我已经通过朋友介绍确定了对象。",
-    "source": "private-material"
+    "chinese": "科长再三地把他的侄女介绍给我,这太为难我了。其实我已经通过朋友介绍确定了对象。"
    }
   ]
  },
@@ -8664,44 +8022,37 @@
    {
     "japanese": "泥まみれになって働いても、もらえる金はわずかだ。",
     "english": "",
-    "chinese": "不管怎么流血流汗地干，能得到的薪水还是很少。",
-    "source": "private-material"
+    "chinese": "不管怎么流血流汗地干，能得到的薪水还是很少。"
    },
    {
     "japanese": "刑事は犯行現場に残されていた血まみれのナイフをビニール袋に入れた。",
     "english": "",
-    "chinese": "刑警把遗留在犯罪现场的那把沾满血迹的匕首放进了塑料袋。",
-    "source": "private-material"
+    "chinese": "刑警把遗留在犯罪现场的那把沾满血迹的匕首放进了塑料袋。"
    },
    {
     "japanese": "最近、政界の不祥事まみれの話ばかり聞かされて、いやになる。",
     "english": "",
-    "chinese": "最近，听到的净是些政坛上的舞弊行径，真令人厌恶。",
-    "source": "private-material"
+    "chinese": "最近，听到的净是些政坛上的舞弊行径，真令人厌恶。"
    },
    {
     "japanese": "スキャンダルまみれの芸能界の事はよく人々の話題になっている。",
     "english": "",
-    "chinese": "丑闻不断的演艺圈，常常成为人们的谈资。",
-    "source": "private-material"
+    "chinese": "丑闻不断的演艺圈，常常成为人们的谈资。"
    },
    {
     "japanese": "借りるとき、その部屋はほこりにまみれていた。",
     "english": "",
-    "chinese": "当初借房子的时候，那间屋子满是灰尘。",
-    "source": "private-material"
+    "chinese": "当初借房子的时候，那间屋子满是灰尘。"
    },
    {
     "japanese": "汗にまみれて働いてきたが、少しも楽にはならない。",
     "english": "",
-    "chinese": "尽管拼命地劳动，生活却没有得到丝毫的改善。",
-    "source": "private-material"
+    "chinese": "尽管拼命地劳动，生活却没有得到丝毫的改善。"
    },
    {
     "japanese": "ブラジルチームに遭遇して、一敗地にまみれた。",
     "english": "",
-    "chinese": "碰到了巴西球队，结果我们输得一塌糊涂。",
-    "source": "private-material"
+    "chinese": "碰到了巴西球队，结果我们输得一塌糊涂。"
    }
   ]
  },
@@ -8719,14 +8070,12 @@
    {
     "japanese": "そのため、犯人はほかでもなく、山田一郎であるものと考える。",
     "english": "",
-    "chinese": "因此,我认为犯人不是别人,正是山田一郎。",
-    "source": "private-material"
+    "chinese": "因此,我认为犯人不是别人,正是山田一郎。"
    },
    {
     "japanese": "母は、子どももいっしょに行くものと考えていた。",
     "english": "",
-    "chinese": "妈妈原以为孩子们也会一起去。",
-    "source": "private-material"
+    "chinese": "妈妈原以为孩子们也会一起去。"
    }
   ]
  },
@@ -8744,26 +8093,22 @@
    {
     "japanese": "まだ現場に行っていないが、夕べの地震による損失が大きいものと考えられる。",
     "english": "",
-    "chinese": "虽然我们还没有去过现场,但我感到昨晚的地震所造成的损失很大。",
-    "source": "private-material"
+    "chinese": "虽然我们还没有去过现场,但我感到昨晚的地震所造成的损失很大。"
    },
    {
     "japanese": "今回の調査で事故の原因が明らかになるものと思われる。",
     "english": "",
-    "chinese": "我认为经过这次的调查,事故的原因将会明确。",
-    "source": "private-material"
+    "chinese": "我认为经过这次的调查,事故的原因将会明确。"
    },
    {
     "japanese": "高かろう良かろう、すなわち値段が高い商品なら、その分、質もよいものと思われているが、そうではないケースがなくはない。",
     "english": "",
-    "chinese": "人们认为“好货不便宜”,也就是说价钱贵的商品,质量也上乘。不过有时也并非如此。",
-    "source": "private-material"
+    "chinese": "人们认为“好货不便宜”,也就是说价钱贵的商品,质量也上乘。不过有时也并非如此。"
    },
    {
     "japanese": "日本語の漢字は朝鮮半島を通して日本に伝わったものと考えられているが、日本人によって作り出された漢字も少ないながらある。",
     "english": "",
-    "chinese": "人们认为日语中的汉字是通过朝鲜半岛传到日本去的,不过虽然数量很少,日语汉字中也有日本人自己创造出来的汉字。",
-    "source": "private-material"
+    "chinese": "人们认为日语中的汉字是通过朝鲜半岛传到日本去的,不过虽然数量很少,日语汉字中也有日本人自己创造出来的汉字。"
    }
   ]
  },
@@ -8781,20 +8126,17 @@
    {
     "japanese": "山田先生はわたしにとって親同然の存在だった。",
     "english": "",
-    "chinese": "山田老师对我来说和父母一样。",
-    "source": "private-material"
+    "chinese": "山田老师对我来说和父母一样。"
    },
    {
     "japanese": "あの二人は戸籍上は他人だが、一緒になっているし、できちゃった子もいるし、事実上は夫婦も同然だ。",
     "english": "",
-    "chinese": "两人虽然没有办理结婚登记,但他们不仅在一起生活,而且又有了孩子,所以实际上已经是名副其实的夫妻关系。",
-    "source": "private-material"
+    "chinese": "两人虽然没有办理结婚登记,但他们不仅在一起生活,而且又有了孩子,所以实际上已经是名副其实的夫妻关系。"
    },
    {
     "japanese": "あとは表紙をつけるだけだから、クラスの文集はもうできたも同然だ。",
     "english": "",
-    "chinese": "剩下的只是装订封面的工作,所以这本全班作文集差不多等于完成了。",
-    "source": "private-material"
+    "chinese": "剩下的只是装订封面的工作,所以这本全班作文集差不多等于完成了。"
    }
   ]
  },
@@ -8812,14 +8154,12 @@
    {
     "japanese": "誠に勝手ながら、当店は10月30日をもって閉店いたしました。",
     "english": "",
-    "chinese": "十分抱歉，本店已于10月30日停止营业。",
-    "source": "private-material"
+    "chinese": "十分抱歉，本店已于10月30日停止营业。"
    },
    {
     "japanese": "ただ今をもちまして、受付は締め切らせていただきます。",
     "english": "",
-    "chinese": "从现在起停止报名。",
-    "source": "private-material"
+    "chinese": "从现在起停止报名。"
    }
   ]
  },
@@ -8837,26 +8177,22 @@
    {
     "japanese": "夏祭りの計画は、予算不足のため、変更を余儀なくされた。",
     "english": "",
-    "chinese": "关于开展夏日祭祀活动的计划,由于资金不足,(我们)被迫重新做了调整。",
-    "source": "private-material"
+    "chinese": "关于开展夏日祭祀活动的计划,由于资金不足,(我们)被迫重新做了调整。"
    },
    {
     "japanese": "不正な取引が明らかになり、その取引にかかわった会社役員は辞職を余儀なくされた。",
     "english": "",
-    "chinese": "违法交易被曝光后,参与交易的公司领导被迫递交了辞呈。",
-    "source": "private-material"
+    "chinese": "违法交易被曝光后,参与交易的公司领导被迫递交了辞呈。"
    },
    {
     "japanese": "父の死、母の失業は、私に退学を余儀なくさせた。",
     "english": "",
-    "chinese": "父亲的去世,加上母亲的失业,迫使我退了学。",
-    "source": "private-material"
+    "chinese": "父亲的去世,加上母亲的失业,迫使我退了学。"
    },
    {
     "japanese": "太郎は役者になりたかったが、家庭の事情は、太郎に家業を継ぐことを余儀なくさせた。",
     "english": "",
-    "chinese": "太郎想当演员、但家庭的情况迫使他不得不继承祖业。",
-    "source": "private-material"
+    "chinese": "太郎想当演员、但家庭的情况迫使他不得不继承祖业。"
    }
   ]
  },
@@ -8874,14 +8210,12 @@
    {
     "japanese": "駅前の新しい喫茶店は、明日の開店を控えてすっかり準備が整い、あとは客を待つばかりになっている。",
     "english": "",
-    "chinese": "车站前新开的咖啡馆，明天正式开张营业，现在是万事俱备，只等客人光临。",
-    "source": "private-material"
+    "chinese": "车站前新开的咖啡馆，明天正式开张营业，现在是万事俱备，只等客人光临。"
    },
    {
     "japanese": "田中君は先週ずっと授業を休んでいて、試験を受けなかった。卒業を控えた身でありながら、海外へ遊びに行っていたらしい。",
     "english": "",
-    "chinese": "田中他上周一直没来学校上课，也没有参加考试。虽然临近毕业，但听说他还去海外旅行了。",
-    "source": "private-material"
+    "chinese": "田中他上周一直没来学校上课，也没有参加考试。虽然临近毕业，但听说他还去海外旅行了。"
    }
   ]
  },
@@ -8899,14 +8233,12 @@
    {
     "japanese": "戦争の映画や写真を見るたびに、戦争への怒りを禁じ得ない。",
     "english": "",
-    "chinese": "每次看到描写战争的影片或照片时,我都会禁不住对战争义愤填膺。",
-    "source": "private-material"
+    "chinese": "每次看到描写战争的影片或照片时,我都会禁不住对战争义愤填膺。"
    },
    {
     "japanese": "私たちは、彼の突然の辞職に、戸惑いを禁じ得なかった。",
     "english": "",
-    "chinese": "我们为他突然的辞职而感到困惑不解。",
-    "source": "private-material"
+    "chinese": "我们为他突然的辞职而感到困惑不解。"
    }
   ]
  },
@@ -8924,14 +8256,12 @@
    {
     "japanese": "なにかとご教示を賜りまして、まことにありがとうございました。",
     "english": "",
-    "chinese": "承蒙赐教,深表谢意。",
-    "source": "private-material"
+    "chinese": "承蒙赐教,深表谢意。"
    },
    {
     "japanese": "ご多忙中のところを恐縮に存じますが、ご返事賜りたくお待ちしております。",
     "english": "",
-    "chinese": "在您百忙之中多有打扰。不过,我们仍然期待着您的答复。",
-    "source": "private-material"
+    "chinese": "在您百忙之中多有打扰。不过,我们仍然期待着您的答复。"
    }
   ]
  },
@@ -8949,14 +8279,12 @@
    {
     "japanese": "明日の大晦日を限りに、当店は閉店いたします。長い間ありがとうございました。",
     "english": "",
-    "chinese": "明天的大年夜为本店最后一次营业，之后将关门歇业。谢谢诸位长期以来的关照。",
-    "source": "private-material"
+    "chinese": "明天的大年夜为本店最后一次营业，之后将关门歇业。谢谢诸位长期以来的关照。"
    },
    {
     "japanese": "鈴木アナウンサーは今日のサッカーの試合の中継放送を限り引退した。",
     "english": "",
-    "chinese": "播音员铃木播完今天的足球转播赛后就引退了。",
-    "source": "private-material"
+    "chinese": "播音员铃木播完今天的足球转播赛后就引退了。"
    }
   ]
  },
@@ -8974,32 +8302,27 @@
    {
     "japanese": "そのとき、部長の機嫌が悪かったので、頼みごとを言い損ないました。",
     "english": "",
-    "chinese": "由于当时部长的情绪有点不好，所以不便出口拜托他。",
-    "source": "private-material"
+    "chinese": "由于当时部长的情绪有点不好，所以不便出口拜托他。"
    },
    {
     "japanese": "相手からの最後の球を受け損なって銀メダルしか取れなかった。",
     "english": "",
-    "chinese": "由于没能接到对方的最后一个球，结果只得了银牌。",
-    "source": "private-material"
+    "chinese": "由于没能接到对方的最后一个球，结果只得了银牌。"
    },
    {
     "japanese": "一度や二度やり損ねても諦めてはいけない。",
     "english": "",
-    "chinese": "一两次没能干成也别灰心放弃。",
-    "source": "private-material"
+    "chinese": "一两次没能干成也别灰心放弃。"
    },
    {
     "japanese": "自動車にひかれて、死に損なった。",
     "english": "",
-    "chinese": "遇到车祸，差点丢了性命。",
-    "source": "private-material"
+    "chinese": "遇到车祸，差点丢了性命。"
    },
    {
     "japanese": "子どもの時、一人で川で泳いでいて、溺れ損なったことがある。",
     "english": "",
-    "chinese": "我小时候，有一次一个人在河里游泳，差点溺水身亡。",
-    "source": "private-material"
+    "chinese": "我小时候，有一次一个人在河里游泳，差点溺水身亡。"
    }
   ]
  },
@@ -9017,26 +8340,22 @@
    {
     "japanese": "あんまり腹が立ったので、つい言わずもがなのことを言ってしまった。",
     "english": "",
-    "chinese": "由于太气人,说了不该说的话。",
-    "source": "private-material"
+    "chinese": "由于太气人,说了不该说的话。"
    },
    {
     "japanese": "言わずもがなのことはやはり言わないほうがいい。「口は災い門」だよね。",
     "english": "",
-    "chinese": "不该说的话还是不要说。常言说得好,“祸从口出”嘛。",
-    "source": "private-material"
+    "chinese": "不该说的话还是不要说。常言说得好,“祸从口出”嘛。"
    },
    {
     "japanese": "言わずもがなだが、これは君とはまったく関係がないことだよ。",
     "english": "",
-    "chinese": "明摆着的事实,这事跟你毫无关系。",
-    "source": "private-material"
+    "chinese": "明摆着的事实,这事跟你毫无关系。"
    },
    {
     "japanese": "息子さんが大学の入試に受かったとの知らせに、ご両親が喜んだのは言わずもがなのことだ。",
     "english": "",
-    "chinese": "得到儿子考上大学的通知,父母感到高兴那是不必说了。",
-    "source": "private-material"
+    "chinese": "得到儿子考上大学的通知,父母感到高兴那是不必说了。"
    }
   ]
  },
@@ -9054,14 +8373,12 @@
    {
     "japanese": "こんなすばらしい賞をいただけるなんて、幸せな限りです。",
     "english": "",
-    "chinese": "能获得如此大奖,令人感到非常幸福。",
-    "source": "private-material"
+    "chinese": "能获得如此大奖,令人感到非常幸福。"
    },
    {
     "japanese": "小学校からずっと仲のよかった彼女が遠くに引っ越すのは、寂しい限りだ。",
     "english": "",
-    "chinese": "从小学开始关系就很好的她要搬到很远的地方去,留下我好孤单啊。",
-    "source": "private-material"
+    "chinese": "从小学开始关系就很好的她要搬到很远的地方去,留下我好孤单啊。"
    }
   ]
  },
@@ -9079,26 +8396,22 @@
    {
     "japanese": "幸不幸は本人の考え方いかんだ。",
     "english": "",
-    "chinese": "一个人过得是否幸福,取决于这个人的认识。",
-    "source": "private-material"
+    "chinese": "一个人过得是否幸福,取决于这个人的认识。"
    },
    {
     "japanese": "今度の野外コンサートの入りは天候のいかんによります/いかんにかかっている",
     "english": "",
-    "chinese": "这次户外音乐会的入场情况,取决于当天的天气如何。",
-    "source": "private-material"
+    "chinese": "这次户外音乐会的入场情况,取决于当天的天气如何。"
    },
    {
     "japanese": "話し合いの結果いかんでは、ストライキも辞さない覚悟だ。",
     "english": "",
-    "chinese": "根据谈判的结果,做好了罢工也在所不辞的心理准备。",
-    "source": "private-material"
+    "chinese": "根据谈判的结果,做好了罢工也在所不辞的心理准备。"
    },
    {
     "japanese": "国の情勢いかんによっては訪問を中止することもある。",
     "english": "",
-    "chinese": "根据国内的形势,有可能取消访问计划。",
-    "source": "private-material"
+    "chinese": "根据国内的形势,有可能取消访问计划。"
    }
   ]
  },
@@ -9116,38 +8429,32 @@
    {
     "japanese": "今の研究はわたしの専門でもないし、先生や親の支持ももらっていない。でも、いざとなったら、学校を止めても、この大好きな研究を続けていこうと思うんだ。",
     "english": "",
-    "chinese": "目前我从事的研究活动既不是我的专业,也没有得到老师和父母的支持。不过,万一遇到麻烦,即使辍学我也要将这个钟爱的研究活动进行下去。",
-    "source": "private-material"
+    "chinese": "目前我从事的研究活动既不是我的专业,也没有得到老师和父母的支持。不过,万一遇到麻烦,即使辍学我也要将这个钟爱的研究活动进行下去。"
    },
    {
     "japanese": "その計画を断行します。いざ失敗となれば、わたしが責任を取ります。",
     "english": "",
-    "chinese": "我决心一定要实施那个计划。一旦失败了,我承担全部责任。",
-    "source": "private-material"
+    "chinese": "我决心一定要实施那个计划。一旦失败了,我承担全部责任。"
    },
    {
     "japanese": "わたしは友だちが多い。いざとなれば、助けてもらえるから、心強い。",
     "english": "",
-    "chinese": "我交友甚多。万一遇到什么情况,可以请求他们帮忙,所以我不担心。",
-    "source": "private-material"
+    "chinese": "我交友甚多。万一遇到什么情况,可以请求他们帮忙,所以我不担心。"
    },
    {
     "japanese": "私はいつもカードを持っている。いざ現金が足りないとなっても、買い物ができる。",
     "english": "",
-    "chinese": "我平时总是带着现金卡。一旦身上所带的现金不够,就可以刷卡购物。",
-    "source": "private-material"
+    "chinese": "我平时总是带着现金卡。一旦身上所带的现金不够,就可以刷卡购物。"
    },
    {
     "japanese": "苦痛は承知の分娩だが、いざとなったら、やはり緊張し、不安になるものだ。",
     "english": "",
-    "chinese": "虽然我也知道分娩时很痛苦,但真到了分娩前还是会感到紧张和不安。",
-    "source": "private-material"
+    "chinese": "虽然我也知道分娩时很痛苦,但真到了分娩前还是会感到紧张和不安。"
    },
    {
     "japanese": "店には多くの魅力的な品が並んでいたが、いざ買うとなると、なかなか決心がつかなかった。",
     "english": "",
-    "chinese": "虽然商店里摆满了许多诱人的商品,但一旦到了真要买的时候,还真难以下定决心。",
-    "source": "private-material"
+    "chinese": "虽然商店里摆满了许多诱人的商品,但一旦到了真要买的时候,还真难以下定决心。"
    }
   ]
  },
@@ -9165,68 +8472,57 @@
    {
     "japanese": "暑い日に草むしりをしていたら、汗が滝のごとく流れてきた。",
     "english": "",
-    "chinese": "大热天在地里拔草，热得我汗流浃背。",
-    "source": "private-material"
+    "chinese": "大热天在地里拔草，热得我汗流浃背。"
    },
    {
     "japanese": "今日の日本には赤貧洗うがごとき家はもうないだろう。",
     "english": "",
-    "chinese": "如今的日本，已经没有那种所谓“一贫如洗”的特困户了吧。",
-    "source": "private-material"
+    "chinese": "如今的日本，已经没有那种所谓“一贫如洗”的特困户了吧。"
    },
    {
     "japanese": "その二人は影の形に添うが如し。",
     "english": "",
-    "chinese": "他们两个人如影随形。",
-    "source": "private-material"
+    "chinese": "他们两个人如影随形。"
    },
    {
     "japanese": "私ごとき未熟者（＝わたしのような未熟者）にこんな重要な役が果たせるでしょうか。",
     "english": "",
-    "chinese": "像我这种初出茅庐的人，能担当得起这样的重任吗？",
-    "source": "private-material"
+    "chinese": "像我这种初出茅庐的人，能担当得起这样的重任吗？"
    },
    {
     "japanese": "彼はみんなが思っているがごとき人物ではない。",
     "english": "",
-    "chinese": "他并非是人们想象中的那种人物。",
-    "source": "private-material"
+    "chinese": "他并非是人们想象中的那种人物。"
    },
    {
     "japanese": "以上のごとく述べましたが、何かご意見がありますか。",
     "english": "",
-    "chinese": "我的话说完了，诸位有什么意见没有？",
-    "source": "private-material"
+    "chinese": "我的话说完了，诸位有什么意见没有？"
    },
    {
     "japanese": "上記のごとく、一旦納入したお金は返却されません。",
     "english": "",
-    "chinese": "如上面所说，钱款一旦缴纳概不退还。",
-    "source": "private-material"
+    "chinese": "如上面所说，钱款一旦缴纳概不退还。"
    },
    {
     "japanese": "周知のごとく、日本の人口がだんだん減っている。",
     "english": "",
-    "chinese": "众所周知，日本的人口正在逐渐减少。",
-    "source": "private-material"
+    "chinese": "众所周知，日本的人口正在逐渐减少。"
    },
    {
     "japanese": "すでに述べたごとく、今年の売上高は去年より深刻であります。",
     "english": "",
-    "chinese": "就像刚才所说的，今年的销售额比去年差得多。",
-    "source": "private-material"
+    "chinese": "就像刚才所说的，今年的销售额比去年差得多。"
    },
    {
     "japanese": "彼は、事件には関係していないかのごとく、知らぬふりをしていた。",
     "english": "",
-    "chinese": "他好像和事件无关似的装作不知道。",
-    "source": "private-material"
+    "chinese": "他好像和事件无关似的装作不知道。"
    },
    {
     "japanese": "東京、ニューヨーク、上海などの大都市はあたかもコンクリートジャングルであるかのごとき世界だ。",
     "english": "",
-    "chinese": "东京、纽约、上海等大都市，宛如由钢筋混凝土浇筑起来的森林世界。",
-    "source": "private-material"
+    "chinese": "东京、纽约、上海等大都市，宛如由钢筋混凝土浇筑起来的森林世界。"
    }
   ]
  },
@@ -9244,14 +8540,12 @@
    {
     "japanese": "相容れざる二人の意見は、ついに口論にまで発展した。",
     "english": "",
-    "chinese": "两人的意见大相径庭，结果吵起来了。",
-    "source": "private-material"
+    "chinese": "两人的意见大相径庭，结果吵起来了。"
    },
    {
     "japanese": "今度の成功は諸君の絶えざる努力の成果である。",
     "english": "",
-    "chinese": "这次的成功，是由大家的不懈努力而换来的。",
-    "source": "private-material"
+    "chinese": "这次的成功，是由大家的不懈努力而换来的。"
    }
   ]
  },
@@ -9269,32 +8563,27 @@
    {
     "japanese": "あの患者は重い病気のため、一人では食事すらできない。",
     "english": "",
-    "chinese": "那位患者由于身患重病，连吃饭也不能一个人吃。",
-    "source": "private-material"
+    "chinese": "那位患者由于身患重病，连吃饭也不能一个人吃。"
    },
    {
     "japanese": "デパートですら売っていないのだから、ましてこんな小さな店で売っているはずがない。",
     "english": "",
-    "chinese": "就连大商场都没有卖，更不可能在这种小商店有卖。",
-    "source": "private-material"
+    "chinese": "就连大商场都没有卖，更不可能在这种小商店有卖。"
    },
    {
     "japanese": "あの先生の講義はわたしには難しすぎて、何について話しているのかすら分かりません。",
     "english": "",
-    "chinese": "那位老师的课对我来说太难了，甚至都不知道老师在讲些什么。",
-    "source": "private-material"
+    "chinese": "那位老师的课对我来说太难了，甚至都不知道老师在讲些什么。"
    },
    {
     "japanese": "この寒さで、あの元気な加藤さんですら風邪を引いている。",
     "english": "",
-    "chinese": "由于太冷，就连身体那么棒的加藤都被冻感冒了。",
-    "source": "private-material"
+    "chinese": "由于太冷，就连身体那么棒的加藤都被冻感冒了。"
    },
    {
     "japanese": "普段ですら、勉強がきらいな学生は、これらのものを強制されると、なおさらやりたくない。",
     "english": "",
-    "chinese": "如果向那些平时本就不愿意学习的学生强行灌输这些东西的话，他们会越发不愿意接受。",
-    "source": "private-material"
+    "chinese": "如果向那些平时本就不愿意学习的学生强行灌输这些东西的话，他们会越发不愿意接受。"
    }
   ]
  },
@@ -9312,14 +8601,12 @@
    {
     "japanese": "有名な観光地の近くまで行ったのに、忙しくてどこへも寄らずじまいだった。",
     "english": "",
-    "chinese": "虽然到了著名的旅游胜地附近,但由于工作太忙,结果也没能去看上一眼。",
-    "source": "private-material"
+    "chinese": "虽然到了著名的旅游胜地附近,但由于工作太忙,结果也没能去看上一眼。"
    },
    {
     "japanese": "いなくなったペットを懸命に探したが、結局、その行方はわからずじまいだった。",
     "english": "",
-    "chinese": "尽管拼命地找了丢失的宠物,但结果还是没能发现它的踪影。",
-    "source": "private-material"
+    "chinese": "尽管拼命地找了丢失的宠物,但结果还是没能发现它的踪影。"
    }
   ]
  },
@@ -9337,26 +8624,22 @@
    {
     "japanese": "今夜の月は、深い青と煌々たる白色とのコントラストがステキだ。",
     "english": "",
-    "chinese": "今晚的月光煞是好看。皎洁的月光与深蓝的夜空相映生辉。",
-    "source": "private-material"
+    "chinese": "今晚的月光煞是好看。皎洁的月光与深蓝的夜空相映生辉。"
    },
    {
     "japanese": "男子たるものは態度堂々たるべしというように、言動は公明正大にしろ。",
     "english": "",
-    "chinese": "作为男人，做人要堂堂正正，言行要正大光明。",
-    "source": "private-material"
+    "chinese": "作为男人，做人要堂堂正正，言行要正大光明。"
    },
    {
     "japanese": "選手たるもの、試合においては堂々と戦え。",
     "english": "",
-    "chinese": "作为运动员，比赛时必须敢于拼搏。",
-    "source": "private-material"
+    "chinese": "作为运动员，比赛时必须敢于拼搏。"
    },
    {
     "japanese": "国民の生活をよりよいものにすること、それが政治家たる者の使命だと考えます。",
     "english": "",
-    "chinese": "我认为，想办法不断地提高国民的生活水平，是政治家们肩负的使命。",
-    "source": "private-material"
+    "chinese": "我认为，想办法不断地提高国民的生活水平，是政治家们肩负的使命。"
    }
   ]
  },
@@ -9374,14 +8657,12 @@
    {
     "japanese": "事実を言おうか言うまいかと、廊下を行きつ戻りつ考えた。",
     "english": "",
-    "chinese": "到底要不要说出事实?我在走廊里一边徘徊,一边考虑着这个问题。",
-    "source": "private-material"
+    "chinese": "到底要不要说出事实?我在走廊里一边徘徊,一边考虑着这个问题。"
    },
    {
     "japanese": "お客さんと勧めつ勧められつで、お酒を飲んだ。",
     "english": "",
-    "chinese": "和客人你一杯我一杯地喝酒。",
-    "source": "private-material"
+    "chinese": "和客人你一杯我一杯地喝酒。"
    }
   ]
  },
@@ -9399,14 +8680,12 @@
    {
     "japanese": "皆の前でこれが正しいと言ってしまったてまえ、今さら自分が間違っていたとは言いにくい。",
     "english": "",
-    "chinese": "既然在众人面前下了肯定的判断,事到如今叫我怎么收回自己的判断,承认自己错了呢。",
-    "source": "private-material"
+    "chinese": "既然在众人面前下了肯定的判断,事到如今叫我怎么收回自己的判断,承认自己错了呢。"
    },
    {
     "japanese": "この事はぼくに任せればいいと威張ったてまえ、途中でやめられない。",
     "english": "",
-    "chinese": "由于在大家面前逞威风说“这件事就交给我吧”,当然不能半途而废。",
-    "source": "private-material"
+    "chinese": "由于在大家面前逞威风说“这件事就交给我吧”,当然不能半途而废。"
    }
   ]
  },
@@ -9424,14 +8703,12 @@
    {
     "japanese": "男であれ、女であれ、不況の今では就職することが難しい。",
     "english": "",
-    "chinese": "男性也好女性也好,在经济不景气的现在就业都很困难。",
-    "source": "private-material"
+    "chinese": "男性也好女性也好,在经济不景气的现在就业都很困难。"
    },
    {
     "japanese": "論文を書くのであれ、研究発表をするのであれ、まずテーマを決めるのが重要だ。",
     "english": "",
-    "chinese": "无论是写论文还是发表研究(报告),重要的首先要确定主题。",
-    "source": "private-material"
+    "chinese": "无论是写论文还是发表研究(报告),重要的首先要确定主题。"
    }
   ]
  },
@@ -9449,26 +8726,22 @@
    {
     "japanese": "急速な少子化は、高齢者の増加とあいまって、日本の人口構造を大きく変えてきている。",
     "english": "",
-    "chinese": "急速下降的出生率,加上老年人口的增加,使日本的人口结构发生了很大的变化。",
-    "source": "private-material"
+    "chinese": "急速下降的出生率,加上老年人口的增加,使日本的人口结构发生了很大的变化。"
    },
    {
     "japanese": "この家具は、機能的なデザインが華やかな色彩とあいまって、素晴らしい製品となっている。",
     "english": "",
-    "chinese": "这种家具功能性的设计和华丽的色彩相得益彰,使其成为了经典之作。",
-    "source": "private-material"
+    "chinese": "这种家具功能性的设计和华丽的色彩相得益彰,使其成为了经典之作。"
    },
    {
     "japanese": "好天気も相まって、この日曜日はたいへんな人出でした。",
     "english": "",
-    "chinese": "又正好遇上了好天气,所以这个礼拜天出门的人很多。",
-    "source": "private-material"
+    "chinese": "又正好遇上了好天气,所以这个礼拜天出门的人很多。"
    },
    {
     "japanese": "厳しい経済状況も相まって、就職は非常に困難だった。",
     "english": "",
-    "chinese": "也正好受到经济萧条的影响,所以找工作非常困难。",
-    "source": "private-material"
+    "chinese": "也正好受到经济萧条的影响,所以找工作非常困难。"
    }
   ]
  },
@@ -9486,14 +8759,12 @@
    {
     "japanese": "あの店の服は品質といい、デザインといい申し分ない。",
     "english": "",
-    "chinese": "那家店的服装无论是质量还是款式都无可挑剔。",
-    "source": "private-material"
+    "chinese": "那家店的服装无论是质量还是款式都无可挑剔。"
    },
    {
     "japanese": "この家は、広さといい価格といい新婚夫婦にぴったりだ。",
     "english": "",
-    "chinese": "这幢房子,面积也好价格也好,都适合新婚夫妇居住。",
-    "source": "private-material"
+    "chinese": "这幢房子,面积也好价格也好,都适合新婚夫妇居住。"
    }
   ]
  },
@@ -9511,14 +8782,12 @@
    {
     "japanese": "部屋の中の物は、机といわず、いすといわず、めちゃくちゃに壊されていた。",
     "english": "",
-    "chinese": "房间里的东西,无论是写字台还是椅子,都被破坏得乱七八糟。",
-    "source": "private-material"
+    "chinese": "房间里的东西,无论是写字台还是椅子,都被破坏得乱七八糟。"
    },
    {
     "japanese": "領事館に入る人といわず、出る人といわず、ガードマンは神経を尖らせている。",
     "english": "",
-    "chinese": "门卫警惕地注视着进出领事馆的每一个人。",
-    "source": "private-material"
+    "chinese": "门卫警惕地注视着进出领事馆的每一个人。"
    }
   ]
  },
@@ -9536,38 +8805,32 @@
    {
     "japanese": "最近の電化製品は機能が多すぎる。開発者たちとて、すべての機能が必要とは思わないのではないか。",
     "english": "",
-    "chinese": "最近的家电产品功能太多。即使是那些开发这类产品的人也未必会认为所有功能都是必需的吧。",
-    "source": "private-material"
+    "chinese": "最近的家电产品功能太多。即使是那些开发这类产品的人也未必会认为所有功能都是必需的吧。"
    },
    {
     "japanese": "常に冷静な彼とて、やはり人間だから、感情的にどなってしまうこともあるのだろう。",
     "english": "",
-    "chinese": "即便是平时处事很冷静的他，因为毕竟也是人，所以有时候也会控制不住地发火吧。",
-    "source": "private-material"
+    "chinese": "即便是平时处事很冷静的他，因为毕竟也是人，所以有时候也会控制不住地发火吧。"
    },
    {
     "japanese": "どんなに貧しい人だとて、人間としての尊厳はある。",
     "english": "",
-    "chinese": "再怎么贫穷的人，也有作为一个人的尊严。",
-    "source": "private-material"
+    "chinese": "再怎么贫穷的人，也有作为一个人的尊严。"
    },
    {
     "japanese": "5人も殺したのだから、たとえ警察に自首したとて、どうにもならない。死刑に処されるに違いない。",
     "english": "",
-    "chinese": "因为杀死了五个人，所以就算是投案自首也无济于事。肯定会被处以极刑。",
-    "source": "private-material"
+    "chinese": "因为杀死了五个人，所以就算是投案自首也无济于事。肯定会被处以极刑。"
    },
    {
     "japanese": "今度の選挙は与党だとて、野党だとて、あまり期待できない。",
     "english": "",
-    "chinese": "这次选举，无论是对执政党还是对在野党，我都不抱多大的希望。",
-    "source": "private-material"
+    "chinese": "这次选举，无论是对执政党还是对在野党，我都不抱多大的希望。"
    },
    {
     "japanese": "頭を下げたとて、涙を流したとて、だめなものはだめだ。",
     "english": "",
-    "chinese": "央求也好哭闹也好，都没用。不行就是不行。",
-    "source": "private-material"
+    "chinese": "央求也好哭闹也好，都没用。不行就是不行。"
    }
   ]
  },
@@ -9585,14 +8848,12 @@
    {
     "japanese": "A社から面接の知らせが来た。いまこそチャンスだとばかりに、彼はスーツを新調した。",
     "english": "",
-    "chinese": "A公司的面试通知来了。他似乎在说“机会来了。”于是赶紧新做了一套西服。",
-    "source": "private-material"
+    "chinese": "A公司的面试通知来了。他似乎在说“机会来了。”于是赶紧新做了一套西服。"
    },
    {
     "japanese": "山本さんは、意見を求められると、待っていましたとばかりに自分の説を展開し始めた。",
     "english": "",
-    "chinese": "刚向山本征求意见,只见他似乎等不及似的开始阐述自己的观点。",
-    "source": "private-material"
+    "chinese": "刚向山本征求意见,只见他似乎等不及似的开始阐述自己的观点。"
    }
   ]
  },
@@ -9610,26 +8871,22 @@
    {
     "japanese": "健全なる精神は健全なる身体に宿る。",
     "english": "",
-    "chinese": "要想拥有健康的心态，首先需要有健康的体魄。",
-    "source": "private-material"
+    "chinese": "要想拥有健康的心态，首先需要有健康的体魄。"
    },
    {
     "japanese": "みなさんの更なる努力を期待しています。",
     "english": "",
-    "chinese": "期待大家更大的努力。",
-    "source": "private-material"
+    "chinese": "期待大家更大的努力。"
    },
    {
     "japanese": "改革なるものこそ、社会の進歩を促すのだ。",
     "english": "",
-    "chinese": "只有改革才能促使社会进步。",
-    "source": "private-material"
+    "chinese": "只有改革才能促使社会进步。"
    },
    {
     "japanese": "最近、エコなるものが流行っている。",
     "english": "",
-    "chinese": "最近，“绿色环保”一词很流行。",
-    "source": "private-material"
+    "chinese": "最近，“绿色环保”一词很流行。"
    }
   ]
  },
@@ -9647,26 +8904,22 @@
    {
     "japanese": "どちらにしたところで、そうたいした差があるとは思えない。",
     "english": "",
-    "chinese": "我感觉无论哪个都差不多,大同小异。",
-    "source": "private-material"
+    "chinese": "我感觉无论哪个都差不多,大同小异。"
    },
    {
     "japanese": "何をするにしたところで、よく考えてからしなさい。",
     "english": "",
-    "chinese": "不管做什么事,都要深思熟虑后再行动。",
-    "source": "private-material"
+    "chinese": "不管做什么事,都要深思熟虑后再行动。"
    },
    {
     "japanese": "小さな事にしたところで、まじめにやらなければ失敗するケースが多い。",
     "english": "",
-    "chinese": "即使是小事情,如果不认真对待的话也可能会失败。这样的例子其实有很多。",
-    "source": "private-material"
+    "chinese": "即使是小事情,如果不认真对待的话也可能会失败。这样的例子其实有很多。"
    },
    {
     "japanese": "いくらいいものを口にしたところで、十分に吸収しなければ栄養にはならない。",
     "english": "",
-    "chinese": "无论吃多么好的东西,如果得不到充分的吸收,也不可能转化为身体所需的营养成分。",
-    "source": "private-material"
+    "chinese": "无论吃多么好的东西,如果得不到充分的吸收,也不可能转化为身体所需的营养成分。"
    }
   ]
  },
@@ -9684,26 +8937,22 @@
    {
     "japanese": "学校の規則に則して生活を律するべし。",
     "english": "",
-    "chinese": "应当按照校规约束自己的生活。",
-    "source": "private-material"
+    "chinese": "应当按照校规约束自己的生活。"
    },
    {
     "japanese": "外国語教育について、政府の方針に則した計画を立てた。",
     "english": "",
-    "chinese": "关于外语教育,依据政府的教育方针制订了计划。",
-    "source": "private-material"
+    "chinese": "关于外语教育,依据政府的教育方针制订了计划。"
    },
    {
     "japanese": "このような規則は、実態に即して柔軟に適用すべきだ。",
     "english": "",
-    "chinese": "类似这样的规定,要根据实际情况灵活运用。",
-    "source": "private-material"
+    "chinese": "类似这样的规定,要根据实际情况灵活运用。"
    },
    {
     "japanese": "新聞には、事実に即して、正確な情報を提供してほしい。",
     "english": "",
-    "chinese": "希望报纸根据事实的真相,向广大读者提供正确的信息。",
-    "source": "private-material"
+    "chinese": "希望报纸根据事实的真相,向广大读者提供正确的信息。"
    }
   ]
  },
@@ -9721,14 +8970,12 @@
    {
     "japanese": "火山の噴火の影響は、ふもとにとどまらず、周辺地域全体及んだ。",
     "english": "",
-    "chinese": "火山喷发不仅影响到山脚地带,还波及了整个周边地区。",
-    "source": "private-material"
+    "chinese": "火山喷发不仅影响到山脚地带,还波及了整个周边地区。"
    },
    {
     "japanese": "今後の交流は留学生の交換だけにとどまらず、共同研究など、さらに広範なものになるのではないかと思います。",
     "english": "",
-    "chinese": "我个人认为,今后的交流,不仅仅局限于互换留学生,是不是应该扩展到共同参与研究项目等更广泛的领域呢?",
-    "source": "private-material"
+    "chinese": "我个人认为,今后的交流,不仅仅局限于互换留学生,是不是应该扩展到共同参与研究项目等更广泛的领域呢?"
    }
   ]
  },
@@ -9746,14 +8993,12 @@
    {
     "japanese": "先入観にとらわれずに、客観的に人を評価するのが望ましい。",
     "english": "",
-    "chinese": "希望不要受到偏见的束缚,而是客观地去评价一个人。",
-    "source": "private-material"
+    "chinese": "希望不要受到偏见的束缚,而是客观地去评价一个人。"
    },
    {
     "japanese": "女性の高学歴化や民主主義の発展により、性別にとらわれることなく、社会に進出する女性が増えてきた。",
     "english": "",
-    "chinese": "由于女性的高学历化和民主主义的大力推进,使很多女性不受性别的约束而积极地参与社会活动。",
-    "source": "private-material"
+    "chinese": "由于女性的高学历化和民主主义的大力推进,使很多女性不受性别的约束而积极地参与社会活动。"
    }
   ]
  },
@@ -9771,14 +9016,12 @@
    {
     "japanese": "地方の風俗習慣にのっとって、祭りを行う。",
     "english": "",
-    "chinese": "按照地方的风俗习惯举办庙会活动。",
-    "source": "private-material"
+    "chinese": "按照地方的风俗习惯举办庙会活动。"
    },
    {
     "japanese": "ビジネス文書は書式があるから、それにのっとって書くなら効率的だ。",
     "english": "",
-    "chinese": "因为商务文书有一定的格式,所以只要按照格式去写,就可以提高书写效率。",
-    "source": "private-material"
+    "chinese": "因为商务文书有一定的格式,所以只要按照格式去写,就可以提高书写效率。"
    }
   ]
  },
@@ -9796,14 +9039,12 @@
    {
     "japanese": "周囲の人々の興奮にひきかえ、賞をもらった本人は至って冷静だった。",
     "english": "",
-    "chinese": "周围的人很激动。与此形成鲜明对照的是,获奖者本人却十分冷静。",
-    "source": "private-material"
+    "chinese": "周围的人很激动。与此形成鲜明对照的是,获奖者本人却十分冷静。"
    },
    {
     "japanese": "ある企業は技術の開発を軽視し、経営効率を求める規模拡大の路線をひた走るようになり、これとひきかえに、未来への夢が失われていく。",
     "english": "",
-    "chinese": "有的企业不重视技术开发,一味地走为追求经营效率而扩大企业规模的路线,其结果却恰得其反,企业失去了未来的方向。",
-    "source": "private-material"
+    "chinese": "有的企业不重视技术开发,一味地走为追求经营效率而扩大企业规模的路线,其结果却恰得其反,企业失去了未来的方向。"
    }
   ]
  },
@@ -9821,14 +9062,12 @@
    {
     "japanese": "自然災害の防止は、速やかで正しい予報によるところが大きいと思う。",
     "english": "",
-    "chinese": "我认为防治自然灾害的工作,和迅速、正确的预警有很大关系。",
-    "source": "private-material"
+    "chinese": "我认为防治自然灾害的工作,和迅速、正确的预警有很大关系。"
    },
    {
     "japanese": "かつて映画スターであった山田氏が初挑戦で知事選に勝利したのは、能力というより、人気と知名度によるところが大きい。",
     "english": "",
-    "chinese": "曾是电影明星的山田,在第一次竞选中就成功当选为县长。与其说是他能力过人,不如说是他的人气和知名度带来的。",
-    "source": "private-material"
+    "chinese": "曾是电影明星的山田,在第一次竞选中就成功当选为县长。与其说是他能力过人,不如说是他的人气和知名度带来的。"
    }
   ]
  },
@@ -9846,38 +9085,32 @@
    {
     "japanese": "卒業するに至って、やっと大学に入った目的が少し見えてきたような気がする。",
     "english": "",
-    "chinese": "直到毕业,似乎才认识到一点自己上大学的目的。",
-    "source": "private-material"
+    "chinese": "直到毕业,似乎才认识到一点自己上大学的目的。"
    },
    {
     "japanese": "実際に事故が起こるに至って、ようやく自動車会社は事故原因の調査を始めた。",
     "english": "",
-    "chinese": "直到事故发生后,汽车制造商才开始着手调查事故的原因。",
-    "source": "private-material"
+    "chinese": "直到事故发生后,汽车制造商才开始着手调查事故的原因。"
    },
    {
     "japanese": "問題がこじれてしまう前に対策を立てるべきだったのに、ことここに至ってはどうしようもない。",
     "english": "",
-    "chinese": "如果在问题还没有复杂化之前就采取对策的话就好了。事到如今已经毫无办法。",
-    "source": "private-material"
+    "chinese": "如果在问题还没有复杂化之前就采取对策的话就好了。事到如今已经毫无办法。"
    },
    {
     "japanese": "会社を始めるにいたって、用意した資金ももう底をついたのに気付いた。ことここに至っては、どうにもならない。あとは運を天に任せるだけだ。",
     "english": "",
-    "chinese": "直到公司开始运营时,才发现准备的资金已经用完。事到如今已经毫无办法,只能听天由命。",
-    "source": "private-material"
+    "chinese": "直到公司开始运营时,才发现准备的资金已经用完。事到如今已经毫无办法,只能听天由命。"
    },
    {
     "japanese": "返済期日を半月も過ぎた現在に至っても、いまだに返済されておりません。",
     "english": "",
-    "chinese": "即使规定的偿还时间已经过去了半个月,我们依然没有收到回款。",
-    "source": "private-material"
+    "chinese": "即使规定的偿还时间已经过去了半个月,我们依然没有收到回款。"
    },
    {
     "japanese": "肺癌にかかるに至っても、彼はまだ煙草をやめようとは思っていない。文字通りのヘビースモーカーなんだ。",
     "english": "",
-    "chinese": "即使身患肺癌,他还是不想戒烟。真是个名副其实的“烟鬼”。",
-    "source": "private-material"
+    "chinese": "即使身患肺癌,他还是不想戒烟。真是个名副其实的“烟鬼”。"
    }
   ]
  },
@@ -9895,14 +9128,12 @@
    {
     "japanese": "この企画の成功は大野さんの働きに負うところが大きい。",
     "english": "",
-    "chinese": "这个计划的成功,大野先生发挥了很大作用。",
-    "source": "private-material"
+    "chinese": "这个计划的成功,大野先生发挥了很大作用。"
    },
    {
     "japanese": "彼の成功は研究所全員の協力に負うところが大きい。つまり、スタッフの協力があっての結果だ。",
     "english": "",
-    "chinese": "他的成功,和研究所全体成员的合作是分不开的。也就是说,是整个团队共同努力的结果。",
-    "source": "private-material"
+    "chinese": "他的成功,和研究所全体成员的合作是分不开的。也就是说,是整个团队共同努力的结果。"
    }
   ]
  },
@@ -9920,14 +9151,12 @@
    {
     "japanese": "小学生ならいざしらず、大学生がこんな簡単な計算ができないなんて信じられない。",
     "english": "",
-    "chinese": "如果是小学生倒也罢了,一个大学生,竟然连这么简单的计算题都不会做,真是难以置信。",
-    "source": "private-material"
+    "chinese": "如果是小学生倒也罢了,一个大学生,竟然连这么简单的计算题都不会做,真是难以置信。"
    },
    {
     "japanese": "品物を買うのだったらいざしらず、何も買わないのに、どうのこうのけちばかりつけるのはちょっと......。",
     "english": "",
-    "chinese": "要是花钱购物的话倒也情有可原,可什么东西也不买,却在那里说三道四地挑毛病,这未免也太......",
-    "source": "private-material"
+    "chinese": "要是花钱购物的话倒也情有可原,可什么东西也不买,却在那里说三道四地挑毛病,这未免也太......"
    }
   ]
  },
@@ -9945,14 +9174,12 @@
    {
     "japanese": "連休中、海や山は言うにおよばず、公園や博物館まで親子連れ溢れていた。",
     "english": "",
-    "chinese": "正好赶上放长假,山川海滨等观光地就不用说了,就连一般的公园或博物馆也挤满了拖家带口的游客。",
-    "source": "private-material"
+    "chinese": "正好赶上放长假,山川海滨等观光地就不用说了,就连一般的公园或博物馆也挤满了拖家带口的游客。"
    },
    {
     "japanese": "テレビは言うにおよばず、あらゆるマスコミでは東日本大震災大いに取り上げて報道していた。",
     "english": "",
-    "chinese": "电视就不用说了,所有的媒体同样就东日本大地震作了大量的报道。",
-    "source": "private-material"
+    "chinese": "电视就不用说了,所有的媒体同样就东日本大地震作了大量的报道。"
    }
   ]
  },
@@ -9970,14 +9197,12 @@
    {
     "japanese": "浅草という町は、祭日は言わずもがな、ウィークデーも賑やかだ。",
     "english": "",
-    "chinese": "东京浅草,节日里自不待言,即使是在平日里也很热闹。",
-    "source": "private-material"
+    "chinese": "东京浅草,节日里自不待言,即使是在平日里也很热闹。"
    },
    {
     "japanese": "会員は言わずもがな、一般のお客さんさえ割引価格で買うことができる。",
     "english": "",
-    "chinese": "会员自不待言,即使是一般的客人也可以享受打折优惠。",
-    "source": "private-material"
+    "chinese": "会员自不待言,即使是一般的客人也可以享受打折优惠。"
    }
   ]
  },
@@ -9995,86 +9220,72 @@
    {
     "japanese": "学生たる者、勉強に励むべし(だ)。",
     "english": "",
-    "chinese": "作为学生就应该努力学习。",
-    "source": "private-material"
+    "chinese": "作为学生就应该努力学习。"
    },
    {
     "japanese": "明日は7時に集合すべし。",
     "english": "",
-    "chinese": "明天必须7点钟集合。",
-    "source": "private-material"
+    "chinese": "明天必须7点钟集合。"
    },
    {
     "japanese": "悪いことをしたら、謝るべし。",
     "english": "",
-    "chinese": "做了不好的事时必须向人道歉。",
-    "source": "private-material"
+    "chinese": "做了不好的事时必须向人道歉。"
    },
    {
     "japanese": "無断欠勤するべからず。",
     "english": "",
-    "chinese": "不许擅自缺勤。",
-    "source": "private-material"
+    "chinese": "不许擅自缺勤。"
    },
    {
     "japanese": "録音中。ノックすべからず。",
     "english": "",
-    "chinese": "正在录音，禁止敲门。",
-    "source": "private-material"
+    "chinese": "正在录音，禁止敲门。"
    },
    {
     "japanese": "芝生に入るべからず。",
     "english": "",
-    "chinese": "禁止进入草坪。",
-    "source": "private-material"
+    "chinese": "禁止进入草坪。"
    },
    {
     "japanese": "これは争うべからざる事実だ。",
     "english": "",
-    "chinese": "这是不争的事实。",
-    "source": "private-material"
+    "chinese": "这是不争的事实。"
    },
    {
     "japanese": "彼は学生として許すべからざる行為を行ったとして退学させられた。",
     "english": "",
-    "chinese": "他做了作为一名学生不能饶恕的事，结果被勒令退学。",
-    "source": "private-material"
+    "chinese": "他做了作为一名学生不能饶恕的事，结果被勒令退学。"
    },
    {
     "japanese": "ウイルスの感染経路を明らかにすべく調査が行われた。",
     "english": "",
-    "chinese": "为查明病毒的感染途径而进行了调查。",
-    "source": "private-material"
+    "chinese": "为查明病毒的感染途径而进行了调查。"
    },
    {
     "japanese": "兄は締め切りに間に合わせるべく、昼も夜も論文に取り組んでいる。",
     "english": "",
-    "chinese": "哥哥为了赶在截止日之前交稿，正在起早摸黑地写论文。",
-    "source": "private-material"
+    "chinese": "哥哥为了赶在截止日之前交稿，正在起早摸黑地写论文。"
    },
    {
     "japanese": "残るべくして残ったものばかりだ。要らないものは全部捨てた。",
     "english": "",
-    "chinese": "该留下的都留下了。不要的都扔了。",
-    "source": "private-material"
+    "chinese": "该留下的都留下了。不要的都扔了。"
    },
    {
     "japanese": "米国のサブ・プライム(信用度の低い借り手向け住宅ローン)問題は「起きるべくして起きた」と専門家が指摘した。",
     "english": "",
-    "chinese": "专家指出，美国次贷(指向信用度低的购房户提供按揭贷款)危机的发生是一种必然。",
-    "source": "private-material"
+    "chinese": "专家指出，美国次贷(指向信用度低的购房户提供按揭贷款)危机的发生是一种必然。"
    },
    {
     "japanese": "土地が高い都会では、家などそう簡単に手に入るべくもない。",
     "english": "",
-    "chinese": "在地价高昂的都市，买房子不是一件容易的事。",
-    "source": "private-material"
+    "chinese": "在地价高昂的都市，买房子不是一件容易的事。"
    },
    {
     "japanese": "あんな独裁にしてかつ圧制下の国では、国民が自由に発言するべくもない。",
     "english": "",
-    "chinese": "在那种专政加暴政的国家，国民是不可能有言论自由的。",
-    "source": "private-material"
+    "chinese": "在那种专政加暴政的国家，国民是不可能有言论自由的。"
    }
   ]
  },
@@ -10092,14 +9303,12 @@
    {
     "japanese": "いたずらをしていた生徒たちは、教師が来たと見るや一斉に逃げ出した。",
     "english": "",
-    "chinese": "刚才还在捣蛋的学生们一看见老师，一下子就逃开了。",
-    "source": "private-material"
+    "chinese": "刚才还在捣蛋的学生们一看见老师，一下子就逃开了。"
    },
    {
     "japanese": "彼は空港に着くやいなや、恋人の入院先にかけつけた。",
     "english": "",
-    "chinese": "他一下飞机，就直奔女朋友所进的医院。",
-    "source": "private-material"
+    "chinese": "他一下飞机，就直奔女朋友所进的医院。"
    }
   ]
  },
@@ -10117,14 +9326,12 @@
    {
     "japanese": "あの大統領は庶民性を備えているがゆえに、人気を集めているという。",
     "english": "",
-    "chinese": "据说那位总统因为有爱民之心，所以颇受欢迎。",
-    "source": "private-material"
+    "chinese": "据说那位总统因为有爱民之心，所以颇受欢迎。"
    },
    {
     "japanese": "日本が輸入に頼らざるを得ないのは、資源が乏しいがゆえである。",
     "english": "",
-    "chinese": "日本之所以依赖进口，是因为国内资源匮乏。",
-    "source": "private-material"
+    "chinese": "日本之所以依赖进口，是因为国内资源匮乏。"
    }
   ]
  },
@@ -10142,44 +9349,37 @@
    {
     "japanese": "父が私の変わりようを見て、どんなに驚いたか予測(する)にかたくない。",
     "english": "",
-    "chinese": "不难想象,当父亲看到我的变化时是多么惊讶。",
-    "source": "private-material"
+    "chinese": "不难想象,当父亲看到我的变化时是多么惊讶。"
    },
    {
     "japanese": "待っていた返事がやっと来た。その時の彼の喜びようはたいへんなものだった。",
     "english": "",
-    "chinese": "等待已久的回音终于来了,当时他那高兴的样子真是不得了。",
-    "source": "private-material"
+    "chinese": "等待已久的回音终于来了,当时他那高兴的样子真是不得了。"
    },
    {
     "japanese": "本のタイトルさえ分かれば、探しようもあるのだが。",
     "english": "",
-    "chinese": "如果知道要借的书的书名,那就有检索的办法了。",
-    "source": "private-material"
+    "chinese": "如果知道要借的书的书名,那就有检索的办法了。"
    },
    {
     "japanese": "証拠はまだ十分とは言えないので、有罪か無罪かは何とも判断のしようがない。",
     "english": "",
-    "chinese": "证据还不充足,所以有罪还是没罪很难下判断。",
-    "source": "private-material"
+    "chinese": "证据还不充足,所以有罪还是没罪很难下判断。"
    },
    {
     "japanese": "成功するかどうか、今の段階では何とも言いようがない。",
     "english": "",
-    "chinese": "会不会成功目前还很难说。",
-    "source": "private-material"
+    "chinese": "会不会成功目前还很难说。"
    },
    {
     "japanese": "君の詫びようがよいから、彼女は許してあげたのだ。",
     "english": "",
-    "chinese": "因为你道歉很诚恳,所以她才原谅了你。",
-    "source": "private-material"
+    "chinese": "因为你道歉很诚恳,所以她才原谅了你。"
    },
    {
     "japanese": "勉強のしようが下手だと、長い時間勉強してもだめです。",
     "english": "",
-    "chinese": "如果学习方法不好的话,即使花费再长的时间学习也是徒劳。",
-    "source": "private-material"
+    "chinese": "如果学习方法不好的话,即使花费再长的时间学习也是徒劳。"
    }
   ]
  },
@@ -10197,14 +9397,12 @@
    {
     "japanese": "次の首相にふさわしい人物は、彼をおいて、ほかにはいない。",
     "english": "",
-    "chinese": "适合当下一届首相的人选,除了他没有别人。",
-    "source": "private-material"
+    "chinese": "适合当下一届首相的人选,除了他没有别人。"
    },
    {
     "japanese": "新しく住宅開発を進めるなら、この地域をおいてほかにはない。",
     "english": "",
-    "chinese": "如果要开发新的住宅区,除了这一带已经没有其他地方了。",
-    "source": "private-material"
+    "chinese": "如果要开发新的住宅区,除了这一带已经没有其他地方了。"
    }
   ]
  },
@@ -10222,14 +9420,12 @@
    {
     "japanese": "私の妹は両親の反対を押して結婚した。",
     "english": "",
-    "chinese": "我妹妹不顾父母的反对结婚了。",
-    "source": "private-material"
+    "chinese": "我妹妹不顾父母的反对结婚了。"
    },
    {
     "japanese": "救援隊を乗せた船が荒波を押し切って遭難者のいる島のほ全速で向かっていった。",
     "english": "",
-    "chinese": "救援队的船乘风破浪,全速开向遇险者所在的岛屿。",
-    "source": "private-material"
+    "chinese": "救援队的船乘风破浪,全速开向遇险者所在的岛屿。"
    }
   ]
  },
@@ -10247,14 +9443,12 @@
    {
     "japanese": "ガソリン高騰を機に自動車を手放す動きが広がっていると見られる。",
     "english": "",
-    "chinese": "普遍认为,由于汽油价格的暴涨,所以放弃购置汽车的现象越来越普遍。",
-    "source": "private-material"
+    "chinese": "普遍认为,由于汽油价格的暴涨,所以放弃购置汽车的现象越来越普遍。"
    },
    {
     "japanese": "山川鉄道は、3月で開業90周年を迎えるのを機に、最新型車両を導入し、15日から営業運転を開始する。",
     "english": "",
-    "chinese": "山川铁路公司,以今年3月即将迎来公司开业90周年为契机,引进了最新型的机车,预计15号开始投入运营。",
-    "source": "private-material"
+    "chinese": "山川铁路公司,以今年3月即将迎来公司开业90周年为契机,引进了最新型的机车,预计15号开始投入运营。"
    }
   ]
  },
@@ -10272,14 +9466,12 @@
    {
     "japanese": "A「先生の奥様はどの方かご存じですか。」B「あそこのお年を召していらっしゃるご婦人です。」",
     "english": "",
-    "chinese": "哪位是师母您知道吗?是那边那位有点年纪的夫人。",
-    "source": "private-material"
+    "chinese": "哪位是师母您知道吗?是那边那位有点年纪的夫人。"
    },
    {
     "japanese": "いかがですか。こちらのお着物はお気に召されたでしょうか。",
     "english": "",
-    "chinese": "怎么样?这件和服您喜欢吗?",
-    "source": "private-material"
+    "chinese": "怎么样?这件和服您喜欢吗?"
    }
   ]
  }
