@@ -47,6 +47,23 @@ def test_parser_is_supported(parser):
     assert KoreanParser.is_supported() is True
 
 
+def test_is_supported_does_not_build_a_kiwi_instance(monkeypatch):
+    """
+    is_supported() runs for every parser at app start-up
+    (lute.parse.registry), so it must stay a package check: a Kiwi
+    instance is ~270MB of resident memory, all of it wasted on users
+    with no Korean books.
+    """
+
+    def _boom(*_args, **_kwargs):
+        raise AssertionError("is_supported() built a Kiwi instance")
+
+    monkeypatch.setattr(KoreanParser, "_get_kiwi", classmethod(_boom))
+    monkeypatch.setattr(KoreanParser, "_is_supported", None)
+
+    assert KoreanParser.is_supported() is True
+
+
 def test_default_morpheme_tokenization(parser, korean):
     "Default mode splits into morphemes, keeps spaces, marks sentence end."
     tokens = parser.get_parsed_tokens("예상했었는데 먹었어.", korean)
