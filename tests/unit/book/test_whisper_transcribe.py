@@ -9,6 +9,7 @@ state machine, the /book/whisper/* routes, and the temp-file lifecycle.
 import io
 import json
 import os
+import threading
 import time
 from unittest.mock import patch
 
@@ -108,6 +109,75 @@ def test_available_endpoint(app, client):
     resp = client.get("/book/whisper/available")
     assert resp.status_code == 200
     assert "installed" in resp.get_json()
+
+
+# ---------------------------------------------------------------------
+# Model pre-download
+# ---------------------------------------------------------------------
+
+
+def test_download_model_requires_whisper_installed(app, client):
+    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": False}):
+        resp = client.post("/book/whisper/download_model", data={"whisper_model": "small"})
+    assert resp.status_code == 400
+    assert "not installed" in resp.get_json()["error"]
+
+
+def test_download_model_rejects_unknown_size(app, client):
+    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}):
+        resp = client.post("/book/whisper/download_model", data={"whisper_model": "giant"})
+    assert resp.status_code == 400
+    assert "Unknown model size" in resp.get_json()["error"]
+
+
+def test_download_model_busy_returns_409(app, client):
+    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}), patch.object(
+        whisper_transcribe, "has_running_task", return_value=True
+    ):
+        resp = client.post("/book/whisper/download_model", data={"whisper_model": "small"})
+    assert resp.status_code == 409
+
+
+def test_download_model_completes(app, app_context, client):
+    "Happy path with a fake loader: task finishes and caches nothing."
+    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}), patch.object(
+        whisper_transcribe, "_load_model", return_value=object()
+    ) as fake_load:
+        resp = client.post("/book/whisper/download_model", data={"whisper_model": "small"})
+        assert resp.status_code == 200
+        task_id = resp.get_json()["task_id"]
+        status = _wait_for_terminal(task_id)
+    assert status["state"] == "finished"
+    fake_load.assert_called_once_with("small")
+
+
+def test_prepare_409_while_model_downloads(app, client, english):
+    "A running model download blocks a new transcription (mutex = 1)."
+    started = threading.Event()
+    release = threading.Event()
+
+    def _slow_load(model_size):
+        started.set()
+        release.wait(timeout=10)
+        return object()
+
+    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}), patch.object(
+        whisper_transcribe, "_load_model", side_effect=_slow_load
+    ):
+        resp = client.post("/book/whisper/download_model", data={"whisper_model": "small"})
+        task_id = resp.get_json()["task_id"]
+        assert started.wait(timeout=10)
+
+        with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}):
+            resp2 = client.post(
+                "/book/whisper/prepare",
+                data={"language_id": str(english.id), "mp3_url": "https://a.example.com/x.mp3"},
+            )
+        assert resp2.status_code == 409
+
+        release.set()
+        status = _wait_for_terminal(task_id)
+        assert status["state"] == "finished"
 
 
 # ---------------------------------------------------------------------
