@@ -204,7 +204,6 @@ def build_rows(missing, taken_keys, taken_names):
                 "zh": (meta.get("meaning_zh") or "").strip(),
                 "level": meta.get("level") or "TOPIK 3-4",
                 "ko": (meta.get("meaning_ko") or "").strip(),
-                "source": meta.get("source") or "private-book",
                 "formation": (meta.get("formation") or "").strip(),
                 "notes": (meta.get("notes") or "").strip(),
             }
