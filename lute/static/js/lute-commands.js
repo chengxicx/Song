@@ -437,7 +437,14 @@ function open_grammar_analysis() {
 
         function updateActiveRings() {
           activeRings.forEach(function (r) {
-            var u = unionRect(r.cells.map(function (el) { return el.getBoundingClientRect(); }));
+            // Fragment rects, not the bounding box: a band's cells must
+            // never re-union into the full multi-line rectangle.
+            var rects = [];
+            r.cells.forEach(function (el) {
+              var rs = el.getClientRects();
+              for (var i = 0; i < rs.length; i++) rects.push(rs[i]);
+            });
+            var u = unionRect(rects);
             if (u) positionRing(r.ring, u);
           });
         }
@@ -466,6 +473,50 @@ function open_grammar_analysis() {
           });
           if (top === Infinity) return null;
           return { top: top, left: left, width: right - left, height: bottom - top };
+        }
+
+        // Ring per rendered line, not per bounding box: a sentence wrapped
+        // across two lines has one bounding box spanning the full width of
+        // both lines, which visually swallows the neighbouring sentences on
+        // them (e.g. a sentence ending mid-line-2 rings all of line 1 too).
+        // Split the elements' client rects into line bands -- rects whose
+        // vertical extents overlap sit on the same line -- and return one
+        // {rect, els} per band, so each ring hugs the text it marks.
+        function bandRects(els) {
+          var items = [];
+          els.forEach(function (el) {
+            var rs = el.getClientRects();
+            for (var i = 0; i < rs.length; i++) items.push({ rect: rs[i], el: el });
+          });
+          items = items.filter(function (it) {
+            return it.rect.width || it.rect.height;
+          });
+          items.sort(function (a, b) { return a.rect.top - b.rect.top; });
+          var bands = [];
+          items.forEach(function (it) {
+            var r = it.rect;
+            var b = bands.length ? bands[bands.length - 1] : null;
+            if (b && r.top <= b.bottom + 2) {
+              if (r.bottom > b.bottom) b.bottom = r.bottom;
+              if (r.left < b.left) b.left = r.left;
+              if (r.right > b.right) b.right = r.right;
+              b.els.push(it.el);
+            } else {
+              bands.push({
+                top: r.top, bottom: r.bottom, left: r.left, right: r.right,
+                els: [it.el]
+              });
+            }
+          });
+          return bands.map(function (b) {
+            return {
+              rect: {
+                top: b.top, left: b.left,
+                width: b.right - b.left, height: b.bottom - b.top
+              },
+              els: b.els
+            };
+          });
         }
 
         function positionRing(ring, rect, pad) {
@@ -563,26 +614,30 @@ function open_grammar_analysis() {
                   while (j + 1 < idxs.length && idxs[j + 1] === idxs[j] + 1) j++;
                   var runEls = [];
                   for (var k = i; k <= j; k++) runEls.push(cells[idxs[k]].el);
-                  var u = unionRect(runEls.map(function (el) { return el.getBoundingClientRect(); }));
-                  if (u) wordBoxes.push({ rect: u, els: runEls });
+                  bandRects(runEls).forEach(function (b) {
+                    wordBoxes.push(b);
+                  });
                   i = j;
                 }
               });
-              var all = cells.map(function (c) { return c.el.getBoundingClientRect(); });
-              var uAll = unionRect(all);
-              if (uAll) {
-                plan.push({
-                  rect: uAll,
-                  els: cells.map(function (c) { return c.el; }),
-                  wordBoxes: wordBoxes
+              // One ring per rendered line the run occupies.
+              bandRects(cells.map(function (c) { return c.el; }))
+                .forEach(function (b, bi) {
+                  plan.push({
+                    rect: b.rect,
+                    els: b.els,
+                    // The word boxes ride on the first band entry so
+                    // showRings draws them once for the run.
+                    wordBoxes: bi === 0 ? wordBoxes : []
+                  });
                 });
-              }
             }
           }
           if (!plan.length) {
-            var all2 = cells.map(function (c) { return c.el.getBoundingClientRect(); });
-            var u2 = unionRect(all2);
-            if (u2) plan.push({ rect: u2, els: cells.map(function (c) { return c.el; }), wordBoxes: [] });
+            bandRects(cells.map(function (c) { return c.el; }))
+              .forEach(function (b) {
+                plan.push({ rect: b.rect, els: b.els, wordBoxes: [] });
+              });
           }
           return plan;
         }
