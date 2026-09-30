@@ -877,25 +877,25 @@ _VOCAB_IDS = frozenset(
         "ichiban-superlative",
         # ---- merged N1-N3 material entries reviewed 2026-09-29 ----
         # onomatopoeia / bare adverbs: the row restates the word popup
-        "zuto",             # ずっと
-        "moto",             # もっと
-        "guto",             # ぐっと
-        "jito",             # じっと
-        "soto",             # そっと
-        "hoto",             # ほっと
-        "hato",             # はっと
-        "zoto",             # ぞっと
-        "zoto-bdfe97",      # ぞっと（毛骨悚然）
-        "zato",             # ざっと
-        "yato",             # やっと
-        "mada",             # まだ
-        "tatoeba",          # たとえば
-        "hajimete",         # はじめて
-        "atari",            # あたり（大致）
-        "zukitozehi",       # 必ず/きっと/ぜひ
+        "zuto",  # ずっと
+        "moto",  # もっと
+        "guto",  # ぐっと
+        "jito",  # じっと
+        "soto",  # そっと
+        "hoto",  # ほっと
+        "hato",  # はっと
+        "zoto",  # ぞっと
+        "zoto-bdfe97",  # ぞっと（毛骨悚然）
+        "zato",  # ざっと
+        "yato",  # やっと
+        "mada",  # まだ
+        "tatoeba",  # たとえば
+        "hajimete",  # はじめて
+        "atari",  # あたり（大致）
+        "zukitozehi",  # 必ず/きっと/ぜひ
         # lexical words, not constructions
-        "chigaiigaii",      # 気持ちがいい/気分がいい
-        "desu",             # 予定です
+        "chigaiigaii",  # 気持ちがいい/気分がいい
+        "desu",  # 予定です
         # standalone verbs whose suffix readings jkindrix already carries
         # (hajimeru-auxiliary / tsuzukeru-continue / dashi-suddenly-start);
         # a bare だす/はじめる spec also fires on the standalone verb (本を出す)
@@ -903,12 +903,12 @@ _VOCAB_IDS = frozenset(
         "tsuzukeru",
         "dasu",
         # duplicates of existing jkindrix rows for the same construction
-        "soudesu",          # そうです（传闻） -> ds_souda
-        "soudesu-6efe6b",   # そうです（样态） -> ds_souda
-        "tsumorida",        # つもりだ -> tsumori-intention
-        "hazudesu",         # はずです -> hazu-expected
-        "naidenakute",      # ないで/なくて -> nai-de (hand + slot spec)
-        "tokorodasuru",     # ところだ（する） -> ta-tokoro / tokorodesu
+        "soudesu",  # そうです（传闻） -> ds_souda
+        "soudesu-6efe6b",  # そうです（样态） -> ds_souda
+        "tsumorida",  # つもりだ -> tsumori-intention
+        "hazudesu",  # はずです -> hazu-expected
+        "naidenakute",  # ないで/なくて -> nai-de (hand + slot spec)
+        "tokorodasuru",  # ところだ（する） -> ta-tokoro / tokorodesu
         "basoremadedanarasoremadedatarasoremadedatomosoremadeda",
         #                    -> ba-sore-made already matches every variant on
         #                    the bare literal それまでだ
@@ -918,14 +918,16 @@ _VOCAB_IDS = frozenset(
         # trip the screen's vocab-shape heuristic, so they live here (same
         # skip semantics) rather than in _VOCAB_IDS, where the screen
         # invariant would reject them.
-        "tachi", "gata", "sugi",
+        "tachi",
+        "gata",
+        "sugi",
         # ---- merged N1/N2/N3 book entries reviewed 2026-09-30 ----
         # honorific verbs: 召す / 存じ上げる are the keigo forms of 着る・食べる
         # and 知る, i.e. lexicon entries.  The word popup answers 召す outright,
         # so the row ("「着る、食べる…」等动词的尊敬语动词") repeats it and teaches
         # no construction.
-        "mat-a81d6a",       # 召す
-        "jigeru",           # 存じ上げる
+        "mat-a81d6a",  # 召す
+        "jigeru",  # 存じ上げる
     }
 )
 
@@ -936,47 +938,86 @@ _VOCAB_IDS = frozenset(
 # vocab-flag invariant does not apply to them.
 _DUPLICATE_IDS = frozenset(
     {
-        "tekarataatode",    # てから/たあとで -> kara_reason (52.2% pages, bare から)
-        "tekuru",           # てくる -> te-kuru (34.6%)
-        "tekureru",         # てくれる -> te-kureru-favor-received (28.3%)
-        "noyouda",          # のようだ -> you-da-appearance (24.5%)
-        "taritarisuru",     # たり~たりする -> tari-tari-suru (10.2%)
-        "temiru",           # てみる -> te-miru (8.0%)
-        "temiru-4eb5b2",    # てみる（尝试） -> te-miru
-        "teoku",            # ておく -> te-oku (2.6%)
-        "naa",              # なあ interjection (2.6%)
+        "tekarataatode",  # てから/たあとで -> kara_reason (52.2% pages, bare から)
+        "tekuru",  # てくる -> te-kuru (34.6%)
+        "tekureru",  # てくれる -> te-kureru-favor-received (28.3%)
+        "noyouda",  # のようだ -> you-da-appearance (24.5%)
+        "taritarisuru",  # たり~たりする -> tari-tari-suru (10.2%)
+        "temiru",  # てみる -> te-miru (8.0%)
+        "temiru-4eb5b2",  # てみる（尝试） -> te-miru
+        "teoku",  # ておく -> te-oku (2.6%)
+        "naa",  # なあ interjection (2.6%)
         # duplicates from the N4/N5 book merge (2026-09-29): their derived
         # spec or displayed name collides with an existing jkindrix rule and
         # _merge_same_name would otherwise shadow that rule.  Identified by
         # spec-fingerprint + display-name grouping, not guessed.
-        "tekara", "tekuru-f9236c", "naide", "desu-674648", "masu",
-        "darou", "deshiyou", "nasai", "kadouka", "kamoshirenai",
-        "kotonisuru", "kotoninaru", "nisuru", "nisuru-138b7a", "ninaru",
-        "ninaru-78e038", "nitsuite", "nikui", "yasui", "rashii", "youni",
-        "younisuru", "noni-ed37cd", "naramadashimo", "naraizarazunaratomokaku",
-        "nishite-59525e", "nishiteha-1d2bbe", "toyara", "hoshiitou",
-        "dakedenaku", "okini", "makuru", "taitou", "hougaii",
-        "kotogaaru", "takotogaaru", "kotogadekiru", "sugirusugida",
-        "sugirusugida-be289f", "mashiyou", "mashiyouka", "temiru-75d0e1",
-        "temoiidesu-6734b2", "tekudasai-381e5c", "tearu-3390f7",
-        "teiku-9a9071", "mat-e2eac7", "meru", "waru", "keru",
+        "tekara",
+        "tekuru-f9236c",
+        "naide",
+        "desu-674648",
+        "masu",
+        "darou",
+        "deshiyou",
+        "nasai",
+        "kadouka",
+        "kamoshirenai",
+        "kotonisuru",
+        "kotoninaru",
+        "nisuru",
+        "nisuru-138b7a",
+        "ninaru",
+        "ninaru-78e038",
+        "nitsuite",
+        "nikui",
+        "yasui",
+        "rashii",
+        "youni",
+        "younisuru",
+        "noni-ed37cd",
+        "naramadashimo",
+        "naraizarazunaratomokaku",
+        "nishite-59525e",
+        "nishiteha-1d2bbe",
+        "toyara",
+        "hoshiitou",
+        "dakedenaku",
+        "okini",
+        "makuru",
+        "taitou",
+        "hougaii",
+        "kotogaaru",
+        "takotogaaru",
+        "kotogadekiru",
+        "sugirusugida",
+        "sugirusugida-be289f",
+        "mashiyou",
+        "mashiyouka",
+        "temiru-75d0e1",
+        "temoiidesu-6734b2",
+        "tekudasai-381e5c",
+        "tearu-3390f7",
+        "teiku-9a9071",
+        "mat-e2eac7",
+        "meru",
+        "waru",
+        "keru",
         "hokanaiyorihokanaihokahanaihokashikataganai",
         "toshitetoshitehatoshitemo-1f4501",
         # N4/N5 book merge 2026-09-29, second pass (measure-driven): rules
         # that duplicate an existing row or are already reported by the
         # basic-particle aggregate.
-        "tekuru-9ff820",    # ~てくる -> te-kuru (34.6% pages)
+        "tekuru-9ff820",  # ~てくる -> te-kuru (34.6% pages)
         "tekurerutekudasaru",  # ~てくれる/てくださる -> te-kureru-favor-received (33.3%)
-        "tou-2f500e",       # ~と言う -> to-iu (23.4%)
+        "tou-2f500e",  # ~と言う -> to-iu (23.4%)
         "teshimau-c89b54",  # ~てしまう -> te-shimau (15.2%)
-        "teiku-f054ed",     # ~ていく -> te-iku (10.6%)
-        "toiu",             # という -> to-iu (15.9%)
-        "niha",             # ~には -> basic_particles aggregate (35.0%)
-        "tame",             # ため -> tame-ni (13.6%)
-        "san",              # ~さん suffix (48.7% pages, word formation)
-        "chiyan",           # ~ちゃん suffix (16.7%, word formation)
-        "noda",             # ~のだ -> n-desu-explanation (all examples are
-        "noda-cd8e33",      #   んです/のです forms, same construction)
+        "teiku-f054ed",  # ~ていく -> te-iku (10.6%)
+        "toiu",  # という -> to-iu (15.9%)
+        "niha",  # ~には -> basic_particles aggregate (35.0%)
+        "tame",  # ため -> tame-ni (13.6%)
+        "san",  # ~さん suffix (48.7% pages, word formation)
+        "chiyan",  # ~ちゃん suffix (16.7%, word formation)
+        "noda",  # ~のだ -> n-desu-explanation (all examples are
+        "noda-cd8e33",  #   んです/のです forms, same construction)
         # N1/N2/N3 private-material book merge 2026-09-30: same-level entries whose
         # display name and derived spec both collide with a row that is already
         # in the library, so _merge_same_name would fold them into that row and
@@ -992,19 +1033,51 @@ _DUPLICATE_IDS = frozenset(
         # row carries a stricter token spec; the name is the same, so they are
         # the same row.
         # N1:
-        "gaika", "gurumi-1758dc", "nikatakunai-453107", "nomi", "nori",
-        "ojinai", "omote", "orini", "sonomono", "taritomo", "teyamanai-4005e7",
+        "gaika",
+        "gurumi-1758dc",
+        "nikatakunai-453107",
+        "nomi",
+        "nori",
+        "ojinai",
+        "omote",
+        "orini",
+        "sonomono",
+        "taritomo",
+        "teyamanai-4005e7",
         "zunihaokanainaidehaokanai",
         # N2:
-        "ageku", "dakenokotohaaru", "karakoso", "karaniha", "kotodakara",
-        "kotokara", "mat-150c91", "mat-67312c", "mat-865ba0",
-        "mokamawazu-6f8ba7", "naikotoniha-c0be26", "nakuhanainakumonai-9bc5e0",
-        "nihokanaranai-4931cc", "nimokakawarazu", "nirazu",
-        "nishitatenishitemo-a3ea75", "nite", "omotonishiteomotonishita",
-        "owazuhawazu", "tenaranai-1884a0", "toiumonoda",
-        "toiumonodehanaitoiumonodemonai", "tsutsuaru", "zaruonai", "zurai",
+        "ageku",
+        "dakenokotohaaru",
+        "karakoso",
+        "karaniha",
+        "kotodakara",
+        "kotokara",
+        "mat-150c91",
+        "mat-67312c",
+        "mat-865ba0",
+        "mokamawazu-6f8ba7",
+        "naikotoniha-c0be26",
+        "nakuhanainakumonai-9bc5e0",
+        "nihokanaranai-4931cc",
+        "nimokakawarazu",
+        "nirazu",
+        "nishitatenishitemo-a3ea75",
+        "nite",
+        "omotonishiteomotonishita",
+        "owazuhawazu",
+        "tenaranai-1884a0",
+        "toiumonoda",
+        "toiumonodehanaitoiumonodemonai",
+        "tsutsuaru",
+        "zaruonai",
+        "zurai",
         # N3:
-        "buripuri", "mat-fa7d2d", "poi", "tabini", "toshite", "totomoni",
+        "buripuri",
+        "mat-fa7d2d",
+        "poi",
+        "tabini",
+        "toshite",
+        "totomoni",
         # Also from the 2026-09-30 merge, but the collision is with a row in
         # the same family rather than a same-named one: 〜わけ appears next to
         # the 〜わけだ / 〜わけではない / 〜わけがない rows it already has, and
@@ -1511,6 +1584,27 @@ def _load_zh_enrichment():
 _ZH_ENRICH = _load_zh_enrichment()
 
 
+def _load_ko_enrichment():
+    """
+    Korean wording for the data rows' enrichment fields, keyed by data
+    entry id: ``{"formation", "notes", "examples": {<jp>: <ko>}}``.
+
+    Same shape and rationale as zh_enrichment.json above: ``ko.json`` only
+    covers the description, so the 接续 / 注意点 / 例句译文 fields stayed
+    English or Chinese and the panel printed the wrong language under a
+    Korean heading.  Example translations are keyed by the Japanese
+    sentence, so an index shift can never mis-assign one.
+    """
+    path = os.path.join(_DATA_DIR, "ko_enrichment.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+_KO_ENRICH = _load_ko_enrichment()
+
+
 def _notes_text(notes):
     "Formation notes in one display string; list or scalar, or '' when absent."
     if not notes:
@@ -1567,6 +1661,7 @@ def _make_data_rule(
         name = item.get("pattern") or item.get("id") or f"{level}-{idx}"
     entry_id = item.get("id") or ""
     enrichment = _ZH_ENRICH.get(entry_id) or {}
+    ko_enrichment = _KO_ENRICH.get(entry_id) or {}
     reference = _curated_reference(item, None if skipped else specs)
     return {
         "key": "ds_" + _slug(item.get("id") or f"{level}-{idx}"),
@@ -1584,6 +1679,16 @@ def _make_data_rule(
         "formation_notes_zh": enrichment.get("notes") or "",
         "reference_zh": (
             (enrichment.get("examples") or {}).get(reference["japanese"], "")
+            if reference
+            else ""
+        ),
+        # Korean wording for the same three fields of every data row (see
+        # _load_ko_enrichment); empty only where an entry has no reference
+        # sentence to translate.
+        "formation_ko": ko_enrichment.get("formation") or "",
+        "formation_notes_ko": ko_enrichment.get("notes") or "",
+        "reference_ko": (
+            (ko_enrichment.get("examples") or {}).get(reference["japanese"], "")
             if reference
             else ""
         ),
@@ -1799,14 +1904,14 @@ for _hand_rule in _N5_RULES:
 
 # Korean descriptions for the combined-construction rules.
 _KO_HAND_CONSTRUCTION = {
-    "a_tsu_b_tsu": "AつBつ: 번갈아 일어나는 동작(\"~했다가 ~했다가\").",
-    "to_ii_to_ii": "といい~といい/といわず~といわず: 어디에서나 예외 없이(\"~에서도 ~에서도\").",
-    "a_nari_b_nari": "なり~なり: 선택지를 나열(\"~거나 ~거나\").",
-    "mo_ba_mo": "も~ば~も: 공존하는 두 상태(\"~도 있으면 ~도 있다\").",
-    "ba_hodo": "ば~ほど: 비례 증가(\"~하면 할수록\").",
-    "volitional_ni_mo_nai": "의지형+にも+같은 동사 부정: 하고 싶어도 할 수 없음(\"~하려 해도 ~할 수 없다\").",
-    "volitional_mai": "의지형+が/と+같은 동사+まい+が/と: 하든 안 하든(\"~으든 ~으든\").",
-    "nara_tomo_kaku": "ならともかく: ~은 뭐라 할 수 있지만(\"~라면 모를까\").",
+    "a_tsu_b_tsu": 'AつBつ: 번갈아 일어나는 동작("~했다가 ~했다가").',
+    "to_ii_to_ii": 'といい~といい/といわず~といわず: 어디에서나 예외 없이("~에서도 ~에서도").',
+    "a_nari_b_nari": 'なり~なり: 선택지를 나열("~거나 ~거나").',
+    "mo_ba_mo": 'も~ば~も: 공존하는 두 상태("~도 있으면 ~도 있다").',
+    "ba_hodo": 'ば~ほど: 비례 증가("~하면 할수록").',
+    "volitional_ni_mo_nai": '의지형+にも+같은 동사 부정: 하고 싶어도 할 수 없음("~하려 해도 ~할 수 없다").',
+    "volitional_mai": '의지형+が/と+같은 동사+まい+が/と: 하든 안 하든("~으든 ~으든").',
+    "nara_tomo_kaku": 'ならともかく: ~은 뭐라 할 수 있지만("~라면 모를까").',
 }
 for _hand_rule in _CONSTRUCTION_RULES:
     _hand_rule["meaning_ko"] = _KO_HAND_CONSTRUCTION.get(_hand_rule["key"], "")
@@ -2072,8 +2177,10 @@ def _in_display_language(text, display_lang):
         # letters is the tell, since the notation itself is kana/kanji.
         return bool(_CJK_CHAR.search(text)) and not _LATIN_WORD.search(text)
     if display_lang == "ko":
-        # Nothing in the shipped data is Korean yet, so every enrichment
-        # field is hidden rather than shown in English.
+        # The Korean wording from ko_enrichment.json wins in _enrichment
+        # before this filter runs, so the Hangul probe here only guards the
+        # fallback path -- a field with no Korean translation yet stays
+        # hidden rather than showing English under a Korean heading.
         return bool(_HANGUL_CHAR.search(text))
     return True
 
@@ -2086,7 +2193,10 @@ def _reference_text(reference, rule, display_lang):
         # than the English sentence under a Chinese heading.
         return reference.get("chinese") or rule.get("reference_zh") or ""
     if display_lang == "ko":
-        return ""
+        # Data rows carry a Korean translation from ko_enrichment.json;
+        # hand-written rules have none, so their block stays hidden rather
+        # than showing Japanese/English under a Korean heading.
+        return rule.get("reference_ko") or ""
     return reference.get("english") or reference.get("chinese") or ""
 
 
@@ -2096,7 +2206,8 @@ def _enrichment(rule, field, display_lang):
     panel's display language.
 
     The Chinese wording shipped in zh_enrichment.json wins when present;
-    otherwise a field is shown only when its script already matches the
+    likewise the Korean wording from ko_enrichment.json for ``ko``.
+    Otherwise a field is shown only when its script already matches the
     display language -- the filter that kept "Not yet: まだ + V ていない"
     out of the Chinese panel while the wording was still being written.
     English is the source language of every field, so it needs neither.
@@ -2105,6 +2216,10 @@ def _enrichment(rule, field, display_lang):
         zh = (rule.get(f"{field}_zh") or "").strip()
         if zh:
             return zh
+    if display_lang == "ko":
+        ko = (rule.get(f"{field}_ko") or "").strip()
+        if ko:
+            return ko
     text = (rule.get(field) or "").strip()
     return text if _in_display_language(text, display_lang) else ""
 
