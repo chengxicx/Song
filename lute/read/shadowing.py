@@ -11,6 +11,11 @@ rendered sentence spans the client sends back.
 """
 
 import difflib
+import logging
+import os
+import threading
+import time
+import uuid
 
 import jaconv
 
@@ -21,6 +26,8 @@ from lute.book.whisper_transcribe import (
     whisper_lang_code,
     whisper_status,
 )
+from lute.db import db
+from lute.models.repositories import LanguageRepository
 from lute.read.render.grammar_analysis import is_japanese_language
 
 # Per-word verdicts, parallel to the sentence's word spans.
@@ -214,3 +221,121 @@ def compare_tokens(original_tokens, spoken_text, language):
             100 * (result["matched"] + 0.5 * result["fuzzy"]) / result["total"]
         )
     return result
+
+
+# ---------------------------------------------------------------------------
+# Background task machinery.
+#
+# Scoring runs on a daemon thread instead of in the request: the first
+# transcription loads the whisper model (hundreds of MB, possibly
+# downloaded on the spot), which is far beyond any reverse proxy's
+# timeout.  The POST returns a task_id immediately and the reading page
+# polls task_status.
+# ---------------------------------------------------------------------------
+
+_TASKS = {}
+_TASKS_LOCK = threading.Lock()
+_TASK_TTL_SECONDS = 10 * 60  # terminal tasks stay queryable for 10 minutes
+
+
+def _set_task(task_id, state, result=None, error=None):
+    with _TASKS_LOCK:
+        _TASKS[task_id] = {
+            "state": state,
+            "result": result,
+            "error": error,
+            "ts": time.time(),
+        }
+
+
+def purge_finished_tasks():
+    "Drop terminal tasks past the TTL so the registry stays small."
+    cutoff = time.time() - _TASK_TTL_SECONDS
+    with _TASKS_LOCK:
+        stale = [
+            tid
+            for tid, t in _TASKS.items()
+            if t["state"] in ("finished", "error") and t["ts"] < cutoff
+        ]
+        for tid in stale:
+            del _TASKS[tid]
+
+
+def start_task(app, audio_path, language_id, tokens, model_size):
+    """
+    Register and launch a background scoring task.
+
+    audio_path is a temp file (already on disk); the task deletes it.
+    Returns the task_id.
+    """
+    purge_finished_tasks()
+    task_id = uuid.uuid4().hex
+    _set_task(task_id, "queued")
+    thread = threading.Thread(
+        target=_run_task,
+        args=(app, task_id, audio_path, language_id, tokens, model_size),
+        daemon=True,
+    )
+    thread.start()
+    return task_id
+
+
+def _run_task(app, task_id, audio_path, language_id, tokens, model_size):
+    "Thread body: transcribe, diff, store the result. Cleans its temp file."
+    try:
+        with app.app_context():
+            _set_task(task_id, "transcribing")
+            lang = LanguageRepository(db.session).find(language_id)
+            if lang is None:
+                raise RuntimeError("language not found")
+            text, duration, _words = transcribe_clip(
+                audio_path, whisper_lang_code(lang), model_size
+            )
+            if not (text or "").strip():
+                raise RuntimeError("no speech detected in the recording")
+            comparison = compare_tokens(tokens, text, lang)
+            rate = None
+            if duration and duration > 0:
+                rate = round(comparison["spoken_count"] / (duration / 60.0), 1)
+            result = {
+                "transcription": text,
+                "statuses": comparison["statuses"],
+                "spoken_for_fuzzy": {
+                    str(k): v
+                    for k, v in comparison["spoken_for_fuzzy"].items()
+                },
+                "extras": comparison["extras"],
+                "score": comparison["score"],
+                "matched": comparison["matched"],
+                "fuzzy": comparison["fuzzy"],
+                "total": comparison["total"],
+                "duration": round(duration or 0.0, 2),
+                "tokens_per_minute": rate,
+                "token_kind": "morpheme"
+                if is_japanese_language(lang)
+                else "word",
+            }
+            _set_task(task_id, "finished", result=result)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logging.getLogger(__name__).warning(
+            "shadowing transcription task failed: %s", e
+        )
+        _set_task(task_id, "error", error=str(e))
+    finally:
+        try:
+            os.remove(audio_path)
+        except OSError:
+            pass
+
+
+def task_status(task_id):
+    "Poller payload: {state, result, error} or state=unknown for lost ids."
+    with _TASKS_LOCK:
+        t = _TASKS.get(task_id)
+        if t is None:
+            return {"state": "unknown", "result": None, "error": None}
+        return {
+            "state": t["state"],
+            "result": t["result"],
+            "error": t["error"],
+        }
