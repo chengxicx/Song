@@ -27,6 +27,7 @@ from lute.read.render.grammar_analysis import is_japanese_language
 STATUS_MISS = 0  # never spoken (漏读)
 STATUS_FUZZY = 1  # probably misread: near-match token (错读)
 STATUS_MATCH = 2  # spoken as-is
+STATUS_SKIP = 3  # punctuation etc.: never scored, never marked
 
 # In a replace block, a near-match pair still counts as an attempt
 # (misread) instead of a skip.  Pairs are compared on the diff keys,
@@ -74,6 +75,18 @@ def _clean_token(token):
     return (token or "").replace("\u200B", "").replace("🔊", "").strip()
 
 
+def _has_word_chars(token):
+    """
+    True if the token contains any letter or digit (Unicode-aware).
+
+    Punctuation-only tokens are never scored: some parsers can attach
+    punctuation to a word token or mark it as a word, and whisper's
+    transcription is full of punctuation -- neither side may let it
+    affect the verdicts or the score.
+    """
+    return any(ch.isalnum() for ch in token)
+
+
 def _make_key_fn(language):
     """
     Return token -> comparable diff key, with the parser resolved once.
@@ -119,6 +132,10 @@ def compare_tokens(original_tokens, spoken_text, language):
       "matched": int, "fuzzy": int, "total": int,
       "spoken_count": int, "score": 0-100,
     }
+
+    Tokens without any letter/digit (punctuation, on either side) are
+    never scored and get STATUS_SKIP, so parser quirks that attach or
+    tag punctuation cannot skew the verdicts.
     """
     statuses = [STATUS_MISS] * len(original_tokens)
     result = {
@@ -127,9 +144,9 @@ def compare_tokens(original_tokens, spoken_text, language):
         "extras": [],
         "matched": 0,
         "fuzzy": 0,
-        "total": len(original_tokens),
+        "total": 0,
         "spoken_count": 0,
-        "score": 0,
+        "score": 100,
     }
 
     key_of = _make_key_fn(language)
@@ -140,7 +157,7 @@ def compare_tokens(original_tokens, spoken_text, language):
             for pt in language.get_parsed_tokens(spoken_text or "")
             if pt.is_word
         )
-        if s
+        if s and _has_word_chars(s)
     ]
     result["spoken_count"] = len(spoken)
 
@@ -150,16 +167,18 @@ def compare_tokens(original_tokens, spoken_text, language):
     orig_keys = [key_of(t) for t in original_tokens]
     spoken_keys = [key_of(s) for s in spoken]
 
-    # Empty original tokens (rendering artifacts) can never match any
-    # spoken token; count them as read so they don't drag the score
-    # down, and diff only the real tokens.
+    # Punctuation-only or empty original tokens (parser quirks,
+    # rendering artifacts) can never be spoken; skip them entirely --
+    # no mark, and out of the score.
     scored = []
     for i, k in enumerate(orig_keys):
-        if k:
+        raw = _clean_token(original_tokens[i])
+        if k and _has_word_chars(raw):
             scored.append(i)
         else:
-            statuses[i] = STATUS_MATCH
+            statuses[i] = STATUS_SKIP
     keyed = [orig_keys[i] for i in scored]
+    result["total"] = len(keyed)
 
     def align_replace(i1, i2, j1, j2):
         "Pair a replace block positionally; near-matches become misreads."
@@ -190,7 +209,8 @@ def compare_tokens(original_tokens, spoken_text, language):
     result["matched"] = sum(1 for s in statuses if s == STATUS_MATCH)
     result["fuzzy"] = sum(1 for s in statuses if s == STATUS_FUZZY)
     # Near-misses get half credit: the word was recognisably attempted.
-    result["score"] = round(
-        100 * (result["matched"] + 0.5 * result["fuzzy"]) / len(original_tokens)
-    )
+    if result["total"] > 0:
+        result["score"] = round(
+            100 * (result["matched"] + 0.5 * result["fuzzy"]) / result["total"]
+        )
     return result
