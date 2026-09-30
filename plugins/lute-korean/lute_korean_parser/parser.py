@@ -39,6 +39,7 @@ adds these settings), and otherwise falls back to the defaults below:
     returns None and the raw surface form is used directly.
 """
 
+import importlib.util
 import re
 from typing import List, Optional
 
@@ -64,16 +65,18 @@ class KoreanParser(AbstractParser):
     @classmethod
     def is_supported(cls):
         """
-        True if kiwipiepy can be imported and a Kiwi instance created.
-        """
-        if KoreanParser._is_supported is not None:
-            return KoreanParser._is_supported
+        True if kiwipiepy is installed.
 
-        try:
-            cls._get_kiwi()
-            KoreanParser._is_supported = True
-        except Exception:  # pylint: disable=broad-except
-            KoreanParser._is_supported = False
+        Cheap on purpose.  The app runs this for every parser at
+        start-up (lute.parse.registry.supported_parsers), and building
+        a Kiwi instance costs ~270MB of resident memory -- all of it
+        wasted on users with no Korean books.  The instance is built by
+        the first real parse instead (see _get_kiwi).
+        """
+        if KoreanParser._is_supported is None:
+            KoreanParser._is_supported = (
+                importlib.util.find_spec("kiwipiepy") is not None
+            )
 
         return KoreanParser._is_supported
 

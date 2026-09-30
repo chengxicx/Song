@@ -13,7 +13,6 @@ Includes classes:
 import re
 from typing import List
 
-import pycantonese
 from lute.parse.base import ParsedToken, AbstractParser
 
 
@@ -39,6 +38,10 @@ class CantoneseParser(AbstractParser):
         """
         Returns ParsedToken array for given language.
         """
+        # Imported here, not at module level: the app loads every
+        # parser plugin at start-up (lute.parse.registry) and just
+        # importing pycantonese costs ~45MB of resident memory.
+        import pycantonese  # pylint: disable=import-outside-toplevel
 
         # Ensure standard carriage returns so that paragraph
         # markers are used correctly.  Lute uses paragraph markers
@@ -85,6 +88,8 @@ class CantoneseParser(AbstractParser):
         Returns None if the text has no romanizable characters
         (e.g. it is all punctuation or latin script).
         """
+        import pycantonese  # pylint: disable=import-outside-toplevel
+
         pairs = pycantonese.characters_to_jyutping(text)
         if not pairs:
             return None

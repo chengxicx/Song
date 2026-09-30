@@ -226,6 +226,25 @@ def test_invalidate_cache_forces_a_reload(app_context):
     assert JapaneseSudachiParser._get_dictionary("core") is not first
 
 
+def test_is_supported_does_not_build_the_dictionary(app_context, monkeypatch):
+    """
+    The support check runs for every parser at app start
+    (lute.parse.registry.supported_parsers), so it must stay a package
+    check.  Building the dictionary there cost ~33MB of private memory
+    plus a read of the 200MB+ system.dic, even for users with no
+    Japanese books.
+    """
+
+    def _boom(*_args, **_kwargs):
+        raise AssertionError("is_supported() built the dictionary")
+
+    monkeypatch.setattr(JapaneseSudachiParser, "_build_tokenizer", classmethod(_boom))
+    monkeypatch.setattr(JapaneseSudachiParser, "_get_dictionary", classmethod(_boom))
+    JapaneseSudachiParser._invalidate_cache()
+
+    assert JapaneseSudachiParser.is_supported() is True
+
+
 def test_parsed_tokens_carry_text_and_flags(app_context):
     "Sanity check on the ParsedToken fields used downstream."
     p = _make_parser()
