@@ -181,6 +181,98 @@ def test_prepare_409_while_model_downloads(app, client, english):
 
 
 # ---------------------------------------------------------------------
+# Model cache management (Settings page).
+# ---------------------------------------------------------------------
+
+
+class _FakeRepo:
+    "Duck-typed huggingface_hub CachedRepo."
+
+    def __init__(self, repo_id, size_mb, path):
+        self.repo_id = repo_id
+        self.size_on_disk = size_mb * 1024 * 1024
+        self.repo_path = path
+
+
+class _FakeCache:
+    def __init__(self, repos):
+        self.repos = repos
+
+
+def test_model_cache_info_reports_cached_sizes():
+    fake = _FakeCache([_FakeRepo("Systran/faster-whisper-small", 460, "/tmp/x")])
+    with patch("huggingface_hub.scan_cache_dir", return_value=fake):
+        info = whisper_transcribe.model_cache_info()
+    by_size = {e["size"]: e for e in info}
+    assert by_size["small"]["cached"] is True
+    assert by_size["small"]["size_mb"] == 460
+    assert by_size["base"]["cached"] is False
+
+
+def test_model_cache_info_without_cache_dir():
+    with patch("huggingface_hub.scan_cache_dir", side_effect=OSError("no cache")):
+        info = whisper_transcribe.model_cache_info()
+    assert all(e["cached"] is False for e in info)
+
+
+def test_delete_model_removes_directory(tmp_path):
+    target = tmp_path / "models--Systran--faster-whisper-small"
+    target.mkdir()
+    fake = _FakeCache([_FakeRepo("Systran/faster-whisper-small", 460, str(target))])
+    with patch("huggingface_hub.scan_cache_dir", return_value=fake):
+        ok, message = whisper_transcribe.delete_model("small")
+    assert ok is True
+    assert not target.exists()
+    assert "Deleted" in message
+
+
+def test_delete_model_not_downloaded():
+    with patch("huggingface_hub.scan_cache_dir", return_value=_FakeCache([])):
+        ok, message = whisper_transcribe.delete_model("medium")
+    assert ok is False
+    assert "not downloaded" in message
+
+
+def test_delete_model_unknown_size():
+    ok, message = whisper_transcribe.delete_model("giant")
+    assert ok is False
+    assert "Unknown model size" in message
+
+
+def test_models_endpoint(app, client):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(whisper_transcribe, "model_cache_info", return_value=[{"size": "base", "cached": False, "size_mb": 0}]):
+        resp = client.get("/book/whisper/models")
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["installed"] is True
+    assert body["models"][0]["size"] == "base"
+
+
+def test_delete_model_endpoint_busy(app, client):
+    with patch.object(whisper_transcribe, "has_running_task", return_value=True):
+        resp = client.post("/book/whisper/delete_model", data={"whisper_model": "small"})
+    assert resp.status_code == 409
+
+
+def test_delete_model_endpoint_ok(app, client):
+    with patch.object(whisper_transcribe, "has_running_task", return_value=False), patch.object(
+        whisper_transcribe, "delete_model", return_value=(True, "Deleted model 'small'.")
+    ) as fake_del:
+        resp = client.post("/book/whisper/delete_model", data={"whisper_model": "small"})
+    assert resp.status_code == 200
+    assert resp.get_json()["ok"] is True
+    fake_del.assert_called_once_with("small")
+
+
+def test_delete_model_endpoint_rejects_unknown(app, client):
+    with patch.object(whisper_transcribe, "has_running_task", return_value=False):
+        resp = client.post("/book/whisper/delete_model", data={"whisper_model": "giant"})
+    assert resp.status_code == 400
+
+
+# ---------------------------------------------------------------------
 # End-to-end task flow (fake transcription)
 # ---------------------------------------------------------------------
 

@@ -13,6 +13,7 @@ task_status(task_id) until the book is created (or an error surfaces).
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
 import threading
@@ -29,6 +30,14 @@ _PIP_TIMEOUT_SECONDS = 900
 
 ALLOWED_MODEL_SIZES = ["base", "small", "medium"]
 DEFAULT_MODEL_SIZE = "small"
+
+# Model repos published by the faster-whisper project, keyed by the
+# size names shown in the UI.
+_MODEL_REPOS = {
+    "base": "Systran/faster-whisper-base",
+    "small": "Systran/faster-whisper-small",
+    "medium": "Systran/faster-whisper-medium",
+}
 
 MAX_CONCURRENT_TRANSCRIPTIONS = 1
 
@@ -349,3 +358,56 @@ def purge_finished_tasks():
             if t.get("state") in ("finished", "error")
         ]:
             del _TASKS[task_id]
+
+
+# ---------------------------------------------------------------------------
+# Model cache management (Settings page).
+
+
+def model_cache_info():
+    """
+    Per-size model cache status:
+      [{"size": "small", "cached": bool, "size_mb": int}, ...]
+    Sizes are reported via huggingface_hub's cache scan (the same cache
+    faster-whisper's WhisperModel downloads into).
+    """
+    info = [{"size": s, "cached": False, "size_mb": 0} for s in ALLOWED_MODEL_SIZES]
+    try:
+        # Delayed: heavy optional dependency chain.
+        from huggingface_hub import scan_cache_dir  # pylint: disable=import-error,import-outside-toplevel
+
+        repos = {}
+        for repo in scan_cache_dir().repos:
+            repos[repo.repo_id] = repo
+        for entry in info:
+            repo = repos.get(_MODEL_REPOS[entry["size"]])
+            if repo is not None:
+                entry["cached"] = True
+                entry["size_mb"] = int(repo.size_on_disk / (1024 * 1024))
+    except Exception:  # pylint: disable=broad-except
+        # No cache dir / huggingface_hub missing: nothing is cached.
+        pass
+    return info
+
+
+def delete_model(model_size):
+    """
+    Remove a downloaded model from disk (and drop any loaded instance).
+    Returns (ok, message).
+    """
+    if model_size not in _MODEL_REPOS:
+        return False, "Unknown model size."
+    with _MODEL_CACHE_LOCK:
+        _MODEL_CACHE.pop(model_size, None)
+
+    repo_id = _MODEL_REPOS[model_size]
+    try:
+        from huggingface_hub import scan_cache_dir  # pylint: disable=import-error,import-outside-toplevel
+
+        for repo in scan_cache_dir().repos:
+            if repo.repo_id == repo_id:
+                shutil.rmtree(repo.repo_path, ignore_errors=True)
+                return True, f"Deleted model '{model_size}' ({repo_id})."
+    except Exception as e:  # pylint: disable=broad-except
+        return False, f"Could not scan the model cache: {e}"
+    return False, f"Model '{model_size}' was not downloaded."
