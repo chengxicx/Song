@@ -274,7 +274,7 @@
       <div class="ictrl isource">
         <label><input type="checkbox" id="mp3_whisper"> Auto-transcribe with Whisper (local, no subtitle file needed)</label>
         <span class="ior">model</span>
-        <select id="mp3_whisper_model">
+        <select id="mp3_whisper_model" title="Model used for transcription (base = fastest, medium = most accurate). The model file downloads automatically on the first transcription.">
           <option value="base">base (fastest)</option>
           <option value="small" selected>small (recommended)</option>
           <option value="medium">medium (most accurate)</option>
@@ -285,14 +285,14 @@
       <label class="ilbl"></label>
       <div class="ictrl" id="whisper_panel">
         <span id="whisper_missing" style="display: none;">
-          Local transcription needs the faster-whisper package (~200 MB).
+          Local transcription needs the faster-whisper package, installed once:
           <button type="button" id="whisper_install" class="btn btn-secondary">Install</button>
-          <span id="whisper_install_status"></span>
         </span>
         <span id="whisper_progress" style="display: none;">
           <span id="whisper_status_text"></span>
           <div class="whisper-progress-track"><div class="whisper-progress-bar" id="whisper_progress_bar"></div></div>
         </span>
+        <span id="whisper_install_status"></span>
       </div>
     </div>
     <div class="irow">
@@ -878,11 +878,12 @@
       fetch('/book/whisper/install', { method: 'POST' })
         .then(r => r.json())
         .then(d => {
-          whisperStatusMsg.text(d.message || '').css('color', d.ok ? 'green' : 'red');
           if (d.ok) {
             whisperInstalled = true;
-            refreshWhisperPanel();
+            $('#whisper_missing').hide();
+            whisperStatusMsg.text('Installed — ready. The model you picked above downloads automatically on the first transcription.').css('color', 'green');
           } else {
+            whisperStatusMsg.text(d.message || 'Install failed.').css('color', 'red');
             btn.prop('disabled', false);
           }
         })
