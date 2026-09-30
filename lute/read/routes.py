@@ -1236,15 +1236,17 @@ def grammar_analysis(bookid, pagenum):
 @bp.route("/shadowing/transcribe", methods=["POST"])
 def shadowing_transcribe():
     """
-    Score one shadowing recording: transcribe the uploaded clip with
-    whisper, then diff the transcription against the sentence's word
-    tokens the client collected from the reading pane.
+    Start scoring one shadowing recording as a background task.
 
     Multipart fields: audio (the recording blob), language_id, tokens
     (JSON array of the sentence's word spans' data-text, in DOM order),
-    model (optional whisper size).  Synchronous: a sentence recording is
-    a few seconds of audio, and the model is cached in-process after the
-    first load, so a task/poll flow would only add moving parts.
+    model (optional whisper size).
+
+    Async on purpose: the first transcription loads the whisper model
+    (hundreds of MB, possibly downloaded on the spot) and CPU inference
+    takes seconds more -- far beyond a reverse proxy's timeout, which
+    used to surface as a 502.  Returns {"task_id"}; poll
+    /read/shadowing/status/<task_id> until finished/error.
     """
     if not shadowing.whisper_status()["installed"]:
         return jsonify(
@@ -1275,53 +1277,25 @@ def shadowing_transcribe():
     temppath = current_app.env_config.temppath
     os.makedirs(temppath, exist_ok=True)
     ext = os.path.splitext((audio.filename or "").lower())[1].lstrip(".")
-    if ext not in ("webm", "mp4", "m4a", "ogg", "oga", "wav", "mp3"):
+    if ext not in ("webm", "mp4", "m4a", "ogg", "oga", "wav", "mp3", "aiff"):
         ext = "bin"
     audio_path = os.path.join(temppath, f"shadowing_{uuid.uuid4().hex}.{ext}")
     audio.save(audio_path)
-    try:
-        text, duration, _words = shadowing.transcribe_clip(
-            audio_path, shadowing.whisper_lang_code(lang), model_size
-        )
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        current_app.logger.warning("shadowing transcription failed: %s", e)
-        return jsonify({"error": f"transcription failed: {e}"}), 500
-    finally:
-        try:
-            os.remove(audio_path)
-        except OSError:
-            pass
 
-    if not (text or "").strip():
-        return jsonify({"error": "no speech detected in the recording"}), 422
-
-    try:
-        comparison = shadowing.compare_tokens(tokens, text, lang)
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        current_app.logger.warning("shadowing diff failed: %s", e)
-        return jsonify({"error": f"could not compare with the sentence: {e}"}), 500
-
-    rate = None
-    if duration and duration > 0:
-        rate = round(comparison["spoken_count"] / (duration / 60.0), 1)
-
-    return jsonify(
-        {
-            "transcription": text,
-            "statuses": comparison["statuses"],
-            "spoken_for_fuzzy": {
-                str(k): v for k, v in comparison["spoken_for_fuzzy"].items()
-            },
-            "extras": comparison["extras"],
-            "score": comparison["score"],
-            "matched": comparison["matched"],
-            "fuzzy": comparison["fuzzy"],
-            "total": comparison["total"],
-            "duration": round(duration or 0.0, 2),
-            "tokens_per_minute": rate,
-            "token_kind": "morpheme" if is_japanese_language(lang) else "word",
-        }
+    task_id = shadowing.start_task(
+        current_app._get_current_object(),  # pylint: disable=protected-access
+        audio_path,
+        lang.id,
+        tokens,
+        model_size,
     )
+    return jsonify({"task_id": task_id})
+
+
+@bp.route("/shadowing/status/<task_id>", methods=["GET"])
+def shadowing_task_status(task_id):
+    "Poller payload for a shadowing scoring task."
+    return jsonify(shadowing.task_status(task_id))
 
 
 def _manga_page_text(book, pagenum):
