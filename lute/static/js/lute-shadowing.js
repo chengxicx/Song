@@ -360,7 +360,11 @@ function shadowingGetModel() {
   try {
     m = localStorage.getItem(SHADOWING_MODEL_KEY);
   } catch (_) {}
-  return ["base", "small", "medium"].indexOf(m) !== -1 ? m : "small";
+  return (
+    ["base", "small", "medium", "large-v3-turbo"].indexOf(m) !== -1
+      ? m
+      : "small"
+  );
 }
 
 function shadowingOpenPanel() {
@@ -378,6 +382,7 @@ function shadowingOpenPanel() {
     '<option value="base">base · fastest</option>' +
     '<option value="small">small · balanced</option>' +
     '<option value="medium">medium · slowest</option>' +
+    '<option value="large-v3-turbo">large-v3-turbo · Cantonese (粤语)</option>' +
     "</select>" +
     '<button type="button" class="shadowing-panel__close" aria-label="Close">&times;</button>' +
     "</div>" +
@@ -660,6 +665,14 @@ function shadowingRenderResult(unit, data) {
       "s</span>";
   }
   html += "</div>";
+  // Server-side warning for a model/language combo that transcribes
+  // poorly (Cantonese on a non-yue model comes back as Mandarin).
+  if (data.language_note) {
+    html +=
+      '<div class="shadowing-result__hint">' +
+      shadowingEscapeHtml(data.language_note) +
+      "</div>";
+  }
   // The "heard" sentence: word tokens with furigana when the server could
   // annotate them (the same treatment as the practised sentence), the raw
   // transcription as a fallback.
