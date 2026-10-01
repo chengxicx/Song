@@ -34,8 +34,16 @@ logger = logging.getLogger(__name__)
 _WHISPER_INSTALL_SPECS = ["faster-whisper>=1.0,<2", "av>=11,<15"]
 _PIP_TIMEOUT_SECONDS = 900
 
-ALLOWED_MODEL_SIZES = ["base", "small", "medium"]
+ALLOWED_MODEL_SIZES = ["base", "small", "medium", "large-v3-turbo"]
 DEFAULT_MODEL_SIZE = "small"
+
+# Whisper only transcribes Cantonese ("yue") with the large-v3 family:
+# their tokenizers carry the yue token, and the weights were actually
+# trained on it.  On base/small/medium the token exists too, but it is
+# untrained -- forcing language="yue" there empirically yields an empty
+# transcription or English; language="zh" yields a written-Mandarin
+# rewrite, which is the best those models can do.
+YUE_CAPABLE_MODEL_SIZES = ["large-v3", "large-v3-turbo"]
 
 # Model repos published by the faster-whisper project, keyed by the
 # size names shown in the UI.
@@ -43,6 +51,7 @@ _MODEL_REPOS = {
     "base": "Systran/faster-whisper-base",
     "small": "Systran/faster-whisper-small",
     "medium": "Systran/faster-whisper-medium",
+    "large-v3-turbo": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
 }
 
 MAX_CONCURRENT_TRANSCRIPTIONS = 1
@@ -132,7 +141,7 @@ def install_whisper():
     )
 
 
-def whisper_lang_code(language):
+def whisper_lang_code(language, model_size=None):
     """
     Map a Language to a whisper language code ("ja", "zh", ...), or None
     to let whisper auto-detect.
@@ -148,6 +157,11 @@ def whisper_lang_code(language):
 
     Not reusing get_lang_code_for directly because it falls back to
     DEFAULT_LANG_TAG ("en-US") for unknown names.
+
+    Cantonese is special-cased by model: "yue" only on the large-v3
+    family (see YUE_CAPABLE_MODEL_SIZES); base/small/medium get "zh"
+    (a written-Mandarin rewrite -- not Cantonese, but the best those
+    models can produce).
     """
     if language is None:
         return None
@@ -158,11 +172,47 @@ def whisper_lang_code(language):
 
     custom = (getattr(language, "tts_lang", None) or "").strip()
     if custom:
-        return custom.split("-")[0].lower() or None
-    tag = LANG_NAME_TO_CODE.get(
-        (getattr(language, "name", "") or "").strip().lower()
+        code = custom.split("-")[0].lower() or None
+        is_cantonese = custom.lower().startswith("zh-hk")
+    else:
+        tag = LANG_NAME_TO_CODE.get(
+            (getattr(language, "name", "") or "").strip().lower()
+        )
+        code = tag.split("-")[0].lower() if tag else None
+        is_cantonese = tag == "zh-HK"
+
+    if is_cantonese:
+        return "yue" if model_size in YUE_CAPABLE_MODEL_SIZES else "zh"
+    return code
+
+
+def whisper_language_note(language, model_size):
+    """
+    A client-displayable warning for a language/model combination that
+    will transcribe poorly, or None when everything is fine.
+
+    Only Cantonese today: on a non-yue-capable model the transcription
+    comes back as a Mandarin rewrite, which silently tanks shadowing
+    scores -- the UIs say so up front instead.
+    """
+    if language is None or whisper_lang_code(language, model_size) != "zh":
+        return None
+    from lute.tts.routes import LANG_NAME_TO_CODE
+
+    custom = (getattr(language, "tts_lang", None) or "").strip()
+    is_cantonese = custom.lower().startswith("zh-hk") or (
+        LANG_NAME_TO_CODE.get(
+            (getattr(language, "name", "") or "").strip().lower()
+        )
+        == "zh-HK"
     )
-    return tag.split("-")[0].lower() if tag else None
+    if not is_cantonese:
+        return None
+    return (
+        f"Cantonese transcription needs the large-v3-turbo whisper "
+        f"model (current: {model_size}).  With this model Cantonese is "
+        f"transcribed as Mandarin, so scores will read low."
+    )
 
 
 def _load_model(model_size):

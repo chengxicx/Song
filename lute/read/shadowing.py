@@ -25,6 +25,7 @@ from lute.book.whisper_transcribe import (
     _load_model,
     model_in_use,
     whisper_lang_code,
+    whisper_language_note,
     whisper_status,
 )
 from lute.db import db
@@ -367,7 +368,7 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
                 ) from e
             _set_task(task_id, "transcribing")
             text, duration = transcribe_clip(
-                audio_path, whisper_lang_code(lang), model_size
+                audio_path, whisper_lang_code(lang, model_size), model_size
             )
             if not (text or "").strip():
                 raise RuntimeError("no speech detected in the recording")
@@ -380,6 +381,10 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
                 rate = round(comparison["spoken_count"] / (duration / 60.0), 1)
             result = {
                 "transcription": text,
+                # Client-displayable warning for a model/language combo
+                # that transcribes poorly (Cantonese on a non-yue model
+                # comes back as Mandarin); None most of the time.
+                "language_note": whisper_language_note(lang, model_size),
                 # The "heard" sentence, tokenised and annotated with
                 # furigana readings so the panel can render and pronounce
                 # it word by word (same as the original sentence).
