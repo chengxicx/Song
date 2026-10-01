@@ -29,6 +29,11 @@ Bugfixes:
   Traditional/Simplified fold the diff relies on) moved from the
   sensevoice extra to a core dependency so it can no longer be missing
   silently.  Existing installs need one `pip install opencc-python-reimplemented`.
+* Shadowing flags Chinese misreads as misreads: a character that is
+  graphically unrelated to the target is now re-judged on the parser's
+  romanization (jyutping for Cantonese, pinyin for Mandarin), so 頭髮
+  read as 投髮 or 你 as 李 shows the orange "→ heard" near-miss instead
+  of a flat red miss.  Genuinely different syllables stay misses.
 
 
 # 3.10.3 (2026-07-06)
