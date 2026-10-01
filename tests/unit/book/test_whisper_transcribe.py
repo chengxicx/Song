@@ -41,7 +41,12 @@ def test_whisper_status_installed():
 
 
 def test_lang_code_mapping(app_context):
-    "tts_lang is reduced to a bare ISO code; empty becomes None."
+    """
+    tts_lang is reduced to a bare ISO code; when tts_lang is unset the
+    language name is looked up in the TTS name table (Japanese/Korean
+    ship without a tts_lang and must not fall through to whisper's
+    auto-detect, which misfires on short shadowing takes).
+    """
 
     class _Lang:
         tts_lang = "zh-CN"
@@ -52,6 +57,30 @@ def test_lang_code_mapping(app_context):
         tts_lang = "ja"
 
     assert whisper_transcribe.whisper_lang_code(_Ja()) == "ja"
+
+    class _Cantonese:
+        tts_lang = "zh-HK"
+
+    assert whisper_transcribe.whisper_lang_code(_Cantonese()) == "zh"
+
+    class _ByName:
+        tts_lang = None
+        name = "Japanese"
+
+    assert whisper_transcribe.whisper_lang_code(_ByName()) == "ja"
+
+    class _KoreanByName:
+        tts_lang = ""
+        name = "korean"
+
+    assert whisper_transcribe.whisper_lang_code(_KoreanByName()) == "ko"
+
+    # Unknown name: auto-detect, never the TTS table's "en" default.
+    class _Unknown:
+        tts_lang = None
+        name = "Sanskrit"
+
+    assert whisper_transcribe.whisper_lang_code(_Unknown()) is None
 
     class _NoLang:
         tts_lang = None
