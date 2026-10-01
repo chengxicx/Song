@@ -5075,15 +5075,6 @@ span.word.shadow-miss {
     background: var(--btn-accent, #007aff);
     border-color: var(--btn-accent, #007aff);
 }
-.shadowing-panel__model {
-    font: inherit;
-    font-size: 0.85em;
-    color: var(--font-color, #000);
-    background: var(--s-card);
-    border: 1px solid var(--s-rule);
-    border-radius: 6px;
-    padding: 2px 6px;
-}
 .shadowing-panel__close {
     border: none;
     background: transparent;
@@ -5145,7 +5136,7 @@ span.word.shadow-miss {
 }
 .shadow-tok__heard {
     color: var(--s-text-2);
-    font-size: 0.6em;
+    font-size: 0.72em;
     margin-left: 2px;
 }
 /* Every word in the panel is a click-to-hear button: the reading (when
@@ -5270,6 +5261,10 @@ span.word.shadow-miss {
     border: 1px solid var(--s-rule);
     border-radius: 8px;
     padding: 8px 10px;
+    /* Scaled up from the plain body size: this box is the "what did I
+       actually say" reference, its kanji and furigana must be legible
+       at a glance. */
+    font-size: 1.3em;
     /* Roomy enough for the furigana row above each word. */
     line-height: 2.1;
     word-break: break-word;
