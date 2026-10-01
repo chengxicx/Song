@@ -13,6 +13,7 @@ rendered sentence spans the client sends back.
 import difflib
 import logging
 import os
+import re
 import threading
 import time
 import uuid
@@ -315,26 +316,82 @@ def _normalize_reading(reading):
     )
 
 
+def _reading_syllables(reading):
+    """
+    A normalized sound key -> its syllables.
+
+    Jyutping and digit-toned pinyin syllables both end in a tone digit,
+    the only digit in a key, so the split needs no dictionary
+    (si2jing1waa4 -> [si2, jing1, waa4]).  Raw characters that leaked
+    into the key (unromanizable pieces) contribute nothing, which just
+    keeps those pairs out of the syllable checks.
+    """
+    return re.findall(r"[a-z]+\d", reading or "")
+
+
+def _syllables_contained(needle, haystack):
+    """
+    True if the needle's syllables all match a contiguous run of the
+    haystack's syllables, each pair at least FUZZY_MATCH_RATIO similar.
+    """
+    if not needle or len(needle) > len(haystack):
+        return False
+    for start in range(len(haystack) - len(needle) + 1):
+        run = haystack[start : start + len(needle)]
+        if all(
+            difflib.SequenceMatcher(None, a, b).ratio() >= FUZZY_MATCH_RATIO
+            for a, b in zip(needle, run)
+        ):
+            return True
+    return False
+
+
 def _make_sound_fn(language):
     """
-    Return token -> romanization for the fuzzy rescue, or None.
+    Return token -> normalized reading candidates for the fuzzy rescue,
+    or None.
 
     The diff keys for Chinese are Han surface forms, so a misread
     character is graphically unrelated to the target and scores a flat
     miss.  The rescue re-judges such a pair through the parser's own
-    reading -- jyutping for Cantonese, pinyin for Mandarin -- so 你 read
+    readings -- jyutping for Cantonese, pinyin for Mandarin -- so 你 read
     as 李 (nei5/lei5) is the misread it sounds like, not a skipped word.
+
+    The parser may offer several readings per token (get_readings): a
+    dictionary's single pick can be the wrong sense of a polyphone (阿
+    filed under o1, while the name prefix is aa3), which would score a
+    correctly pronounced word a flat miss.  Pairs are judged on their
+    most similar candidate; with no get_readings, the plain
+    get_reading answer is the only candidate.
     """
     if not _is_chinese_language(language):
         return None
     parser = language.parser
+    readings_of = getattr(parser, "get_readings", None)
 
     def sound(token):
+        token = _clean_token(token)
+        if not token:
+            return []
+        if readings_of is not None:
+            try:
+                raw = readings_of(token)
+            except Exception:  # pylint: disable=broad-exception-caught
+                raw = None
+            if raw:
+                out = []
+                for r in raw:
+                    key = _normalize_reading(r)
+                    if key and key not in out:
+                        out.append(key)
+                if out:
+                    return out
         try:
-            reading = parser.get_reading(_clean_token(token))
+            reading = parser.get_reading(token)
         except Exception:  # pylint: disable=broad-exception-caught
-            return None
-        return _normalize_reading(reading)
+            reading = None
+        key = _normalize_reading(reading)
+        return [key] if key else []
 
     return sound
 
@@ -419,6 +476,11 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
         + 系阿乐.  Scan for points where the joined keys from both sides
         meet; each such run was spoken correctly and is a match, and
         only the genuinely different remainder is paired positionally.
+
+        The pairing is 1:1, so a word inside a spoken chunk that covered
+        several words at once (侍應話 heard as the name 史英華) has no
+        counterpart of its own; those left behind get a final
+        containment pass before being called misses.
         """
         if i2 - i1 == 1 and j2 - j1 > 1 and keyed[i1] == "".join(
             spoken_keys[j1:j2]
@@ -469,20 +531,79 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
             elif ratio < FUZZY_MATCH_RATIO and sound_of is not None:
                 # A Chinese misread is a different character, so the
                 # surface forms share nothing; re-judge the pair on the
-                # romanization before calling it a skip.
-                oread = sound_of(original_tokens[scored[oi + k]])
-                sread = sound_of(spoken[si + k])
-                if oread and sread:
-                    voiced = difflib.SequenceMatcher(
-                        None, oread, sread
-                    ).ratio()
-                    if voiced >= FUZZY_MATCH_RATIO:
-                        ratio = voiced
+                # romanization before calling it a skip.  Pairs are
+                # judged on their most similar readings: the dictionary
+                # pick can be the wrong polyphone sense (阿 o1 vs the
+                # name-prefix aa3).
+                best = 0.0
+                for oread in sound_of(original_tokens[scored[oi + k]]):
+                    for sread in sound_of(spoken[si + k]):
+                        voiced = difflib.SequenceMatcher(
+                            None, oread, sread
+                        ).ratio()
+                        if voiced > best:
+                            best = voiced
+                if best >= FUZZY_MATCH_RATIO:
+                    ratio = best
             if ratio >= FUZZY_MATCH_RATIO:
                 orig_index = scored[oi + k]
                 statuses[orig_index] = STATUS_FUZZY
                 result["spoken_for_fuzzy"][orig_index] = spoken[si + k]
             # else: too far apart -- stays a miss.
+
+        # A last pass for the words the 1:1 pairing left behind.  The
+        # spoken side can cover several sentence words with one chunk
+        # that is not the exact join of their keys -- the drift runs
+        # above need every piece to agree -- because SenseVoice glues
+        # adjacent words into one token: 侍應話 heard as the name 史英華,
+        # or 拍手 + 大聲笑 as the non-word 拍笑大聲笑.  A left-behind word
+        # whose key occurs verbatim inside one of the block's spoken
+        # tokens was said as-is; one whose syllables occur there was at
+        # least attempted.  Verbatim claims are tracked per spoken token
+        # so two left-behind words cannot share the same characters.
+        claimed = {j: [] for j in range(j1, j2)}
+        for k in range(i1, i2):
+            orig_index = scored[k]
+            if statuses[orig_index] != STATUS_MISS:
+                continue
+            okey = keyed[k]
+            oreads = sound_of(original_tokens[orig_index]) if sound_of else []
+            for j in range(j1, j2):
+                skey = spoken_keys[j]
+                if not skey:
+                    continue
+                hit = False
+                if len(okey) > 1:
+                    pos = skey.find(okey)
+                    while pos != -1:
+                        span = (pos, pos + len(okey))
+                        if all(
+                            pos >= end or pos + len(okey) <= start
+                            for start, end in claimed[j]
+                        ):
+                            claimed[j].append(span)
+                            hit = True
+                            break
+                        pos = skey.find(okey, pos + 1)
+                if hit:
+                    statuses[orig_index] = STATUS_MATCH
+                    break
+                sreads = sound_of(spoken[j]) if sound_of else []
+                for oread in oreads:
+                    osyls = _reading_syllables(oread)
+                    if not osyls:
+                        continue
+                    if any(
+                        _syllables_contained(osyls, _reading_syllables(sread))
+                        for sread in sreads
+                    ):
+                        statuses[orig_index] = STATUS_FUZZY
+                        result["spoken_for_fuzzy"][orig_index] = spoken[j]
+                        hit = True
+                        break
+                if hit:
+                    break
+
         # Spoken tokens without an original counterpart are extras.
         result["extras"].extend(spoken[si + n : j2])
 
