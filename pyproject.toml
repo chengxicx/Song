@@ -38,7 +38,13 @@ dependencies = [
   "subtitle-parser>=1.3.0",
   "ahocorapy>=1.6.2",
   "edge-tts>=6.1.0",
-  "qrcode>=7.4.2,<9"
+  "qrcode>=7.4.2,<9",
+  # Folds Traditional/Simplified Han for the shadowing diff: the ASR
+  # engines (SenseVoice and whisper alike) emit Simplified even for
+  # Cantonese and Traditional book text, and without the fold every
+  # correctly-read 天氣/係 scores as a miss.  Core, not an extra: the
+  # degradation is silent wrong scores, not a missing feature.
+  "opencc-python-reimplemented>=0.1.7",
 ]
 
 [project.scripts]
@@ -132,11 +138,10 @@ whisper = [
 # SenseVoice-Small (sherpa-onnx): the first-choice transcription engine
 # for zh/yue/en/ja/ko (faster than whisper small, and the only engine
 # trained on Cantonese); whisper covers the other languages.
-# opencc folds Traditional/Simplified Han for the shadowing diff
-# (SenseVoice emits simplified even for Cantonese book text).
+# (opencc, the Traditional/Simplified fold for the shadowing diff, is a
+# core dependency -- see the main dependencies list.)
 sensevoice = [
   "sherpa-onnx>=1.10",
-  "opencc-python-reimplemented>=0.1.7",
 ]
 
 [project.urls]

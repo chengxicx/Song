@@ -21,6 +21,15 @@ Feature changes:
   show authored Korean descriptions, and the Japanese engine explains
   every curated JLPT entry in Korean (ko.json, mirroring zh.json).
 
+Bugfixes:
+
+* Shadowing scores Chinese takes correctly when the ASR re-cuts word
+  boundaries: SenseVoice's 呢个 + 系阿乐 now matches the sentence's
+  呢 + 個 + 係 + 阿樂 instead of scoring misses, and opencc (the
+  Traditional/Simplified fold the diff relies on) moved from the
+  sensevoice extra to a core dependency so it can no longer be missing
+  silently.  Existing installs need one `pip install opencc-python-reimplemented`.
+
 
 # 3.10.3 (2026-07-06)
 
