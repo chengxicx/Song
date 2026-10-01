@@ -89,6 +89,41 @@ def test_reading_and_lemma(app_context):
     assert p.get_lemma("広がっ") == "広がる"
 
 
+def test_context_readings_follow_the_sentence(app_context):
+    """
+    get_context_readings reads each morpheme as the sentence around it
+    disambiguates it.  A lone 一 is いち, but the 一 opening 一つ is ひと
+    -- which is the whole reason the shadowing panel sends its sentence
+    along instead of looking each token up on its own.
+    """
+    current_settings()["japanese_reading"] = "hiragana"
+    p = _make_parser()
+
+    assert p.get_reading("一") == "いち"
+
+    morphs = p.get_context_readings("広い宇宙の、数ある一つ")
+    assert morphs is not None
+    assert ("広い", "ひろい") in morphs
+    assert ("一", "ひと") in morphs
+    # Kana morphemes read as themselves; punctuation has no reading.
+    assert ("の", "の") in morphs
+    assert ("、", None) in morphs
+
+
+def test_context_readings_need_the_reading_setting(app_context):
+    "No japanese_reading setting means no furigana to give."
+    current_settings()["japanese_reading"] = ""
+    p = _make_parser()
+    assert p.get_context_readings("広い宇宙の、数ある一つ") is None
+
+
+def test_context_readings_skip_all_kana_text(app_context):
+    "An all-kana sentence has nothing to annotate."
+    current_settings()["japanese_reading"] = "hiragana"
+    p = _make_parser()
+    assert p.get_context_readings("あなたのもとへ") is None
+
+
 # ---- threading ----
 
 
