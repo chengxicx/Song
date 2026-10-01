@@ -219,11 +219,15 @@ def _recognizer(lang_code):
 
 
 def _ensure_reaper_started():
+    """
+    Start the idle-unload thread once.  Caller must hold _RECOG_LOCK
+    (this runs from inside _recognizer's locked section; Lock is not
+    reentrant, so this must not take it again).
+    """
     global _REAPER_STARTED  # pylint: disable=global-statement
-    with _RECOG_LOCK:
-        if _REAPER_STARTED:
-            return
-        _REAPER_STARTED = True
+    if _REAPER_STARTED:
+        return
+    _REAPER_STARTED = True
     threading.Thread(target=_reaper_loop, name="sensevoice-idle-reaper", daemon=True).start()
 
 
