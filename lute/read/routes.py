@@ -1299,6 +1299,30 @@ def shadowing_task_status(task_id):
     return jsonify(shadowing.task_status(task_id))
 
 
+@bp.route("/shadowing/readings", methods=["POST"])
+def shadowing_readings():
+    """
+    Pair the shadowing panel's sentence tokens with kana readings.
+
+    JSON body: {language_id, tokens: [surface, ...]}.  Returns
+    {"tokens": [{"text", "reading"}, ...]} parallel to the input, so the
+    panel can draw furigana above each word (and speak the reading when
+    the word is tapped).  Synchronous and cheap -- no audio, no model.
+    """
+    payload = request.get_json(silent=True) or {}
+    tokens = payload.get("tokens") or []
+    if not isinstance(tokens, list) or not all(
+        isinstance(t, str) for t in tokens
+    ):
+        return jsonify({"error": "invalid tokens payload"}), 400
+
+    lang = LanguageRepository(db.session).find(payload.get("language_id") or 0)
+    if lang is None:
+        return jsonify({"error": "language not found"}), 400
+
+    return jsonify({"tokens": shadowing.annotate_tokens(tokens, lang)})
+
+
 def _manga_page_text(book, pagenum):
     """
     Rebuild the natural text of one manga page from its .mokuro OCR data.
