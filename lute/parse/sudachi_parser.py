@@ -377,6 +377,78 @@ class JapaneseSudachiParser(AbstractParser):
             return jaconv.kata2alphabet(ret)
         raise RuntimeError(f"Bad reading type {jp_reading_setting}")
 
+    def get_context_readings(self, text: str):
+        """
+        Per-morpheme readings from one contextual tokenize of `text`.
+
+        Returns [(surface, reading-or-None), ...]: each morpheme read as
+        the surrounding sentence disambiguates it (一つ -> 一=ヒト), not
+        as the isolated surface would be re-read (一 -> イチ).  Applies
+        the same japanese_reading setting as get_reading; None when that
+        setting is unset.
+        """
+        zws = "\u200B"
+        text = text.replace(zws, "")
+
+        if self._string_is_hiragana(text):
+            return None
+
+        jp_reading_setting = current_settings().get("japanese_reading", "").strip()
+        if jp_reading_setting == "":
+            return None
+
+        dict_type = self._get_dict_setting()
+        mode = self._get_mode_setting()
+        tok = self._build_tokenizer(dict_type)
+        split_mode = self._get_split_mode(mode)
+
+        out = []
+        for m in tok.tokenize(text, mode=split_mode):
+            surface = m.surface()
+            if surface == "":
+                continue
+            reading = m.reading_form()
+            kana = reading if reading and reading != "*" else surface
+            if not kana or kana == surface:
+                # Kana read as themselves: the surface is the reading.
+                out.append((surface, self._self_reading(surface, jp_reading_setting)))
+                continue
+            if jp_reading_setting == "katakana":
+                ret = kana
+            elif jp_reading_setting == "hiragana":
+                ret = jaconv.kata2hira(kana)
+            elif jp_reading_setting == "alphabet":
+                ret = jaconv.kata2alphabet(kana)
+            else:
+                raise RuntimeError(f"Bad reading type {jp_reading_setting}")
+            # A particle or okurigana morpheme's yomi converts back to
+            # the surface itself (の <- ノ).
+            if ret == surface:
+                ret = self._self_reading(surface, jp_reading_setting)
+            out.append((surface, ret))
+        return out or None
+
+    @staticmethod
+    def _string_is_kana(s: str) -> bool:
+        "True if every character is hiragana or katakana (incl. ー)."
+        return bool(s) and all("\u3040" <= c <= "\u30FF" for c in s)
+
+    @classmethod
+    def _self_reading(cls, surface: str, setting: str):
+        """
+        A kana morpheme's reading under the setting; None for other
+        surfaces (symbols, kanji the dictionary has no kana for).
+        """
+        if not cls._string_is_kana(surface):
+            return None
+        if setting == "katakana":
+            return jaconv.hira2kata(surface)
+        if setting == "hiragana":
+            return surface
+        if setting == "alphabet":
+            return jaconv.kata2alphabet(surface)
+        raise RuntimeError(f"Bad reading type {setting}")
+
     # ---- lemma ----
 
     def get_lemma(self, text: str):

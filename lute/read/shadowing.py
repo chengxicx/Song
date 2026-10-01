@@ -92,9 +92,26 @@ def transcribe_clip(audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE):
     return "".join(texts).strip(), (info.duration or 0.0)
 
 
+# Punctuation parsers glue onto the edges of tokens: a page's 100% is
+# one non-word token reading ' 100%," ', and transcriptions come back
+# with their own trailing punctuation.  Stripped from both sides so the
+# two spellings of the same spoken thing compare equal.  Symbols that
+# are part of what was said (%, $, +) are kept.
+_EDGE_JUNK = (
+    " \t\n\r\u00a0.,!?;:\"'`“”‘’«»„()[]{}/\\…·•*|~^\u2013\u2014-"
+    "，。、！？：；（）【】「」『』"
+)
+
+
 def _clean_token(token):
-    "Strip display artifacts that must never reach the diff."
-    return (token or "").replace("\u200B", "").replace("🔊", "").strip()
+    "Strip display artifacts and glued-on edge punctuation from a token."
+    return (
+        (token or "")
+        .replace("\u200B", "")
+        .replace("🔊", "")
+        .strip()
+        .strip(_EDGE_JUNK)
+    )
 
 
 def _has_word_chars(token):
@@ -116,36 +133,109 @@ def _spoken_tokens(spoken_text, language):
     Shared by the diff (which aligns them against the sentence's own
     tokens) and by the furigana annotation of the "heard" sentence, so
     both see exactly the same token space.
+
+    Non-word parsed tokens that still contain letters or digits are
+    kept: many languages' word characters exclude digits, so a spoken
+    "100%" is one non-word token -- dropping it would make a word the
+    user actually said unscoreable.
     """
     return [
         s
         for s in (
             _clean_token(pt.token)
             for pt in language.get_parsed_tokens(spoken_text or "")
-            if pt.is_word
+            if pt.is_word or _has_word_chars(pt.token)
         )
         if s and _has_word_chars(s)
     ]
 
 
-def annotate_tokens(tokens, language):
+def _align_context_readings(tokens, morphs):
+    """
+    Spread a contextual parse's morpheme readings across the panel's tokens.
+
+    morphs is the parser's get_context_readings answer for the sentence:
+    [(surface, reading-or-None)] in morpheme order.  The panel's tokens
+    are the reading page's spans, cut by the same parser, so each token
+    is the join of one or more morphemes; its reading is the join of
+    those morphemes' readings (一 + つ -> ひとつ).  Punctuation-only
+    spans are never sent as tokens, so pure-punctuation morphemes are
+    skipped between tokens.
+
+    Returns [{"text", "reading"}] parallel to the input tokens, or None
+    when the two sides drift apart (a token the morphemes can't rebuild
+    exactly) -- the caller then falls back to per-token readings rather
+    than show a misaligned furigana.
+    """
+    out = []
+    mi = 0
+    for raw in tokens:
+        text = _clean_token(raw)
+        if not text:
+            out.append({"text": text, "reading": None})
+            continue
+        while mi < len(morphs) and not _has_word_chars(morphs[mi][0]):
+            mi += 1  # punctuation/whitespace between spans, unsent
+        acc = ""
+        readings = []
+        covered = True
+        j = mi
+        while j < len(morphs) and len(acc) < len(text):
+            surface, reading = morphs[j]
+            j += 1
+            if not surface.strip():
+                continue
+            acc += surface
+            if reading:
+                readings.append(reading)
+            else:
+                # Symbols, or kanji the dictionary has no kana for: a
+                # partial reading would hang wrong furigana.
+                covered = False
+        if acc != text:
+            return None
+        # A kana token's own kana is no furigana.
+        joined = "".join(readings) if covered else None
+        out.append({"text": text, "reading": joined if joined != text else None})
+        mi = j
+    return out
+
+
+def annotate_tokens(tokens, language, full_text=None):
     """
     Pair each token with its kana reading for the shadowing panel.
 
     Returns [{"text": surface, "reading": kana-or-None}, ...], parallel to
     the input.  The panel draws the reading above the word (furigana) and
-    speaks it when the word is tapped; readings come from the language's
-    own parser, the same source term lookups use.  Non-Japanese languages
-    (and the japanese_reading setting being off) yield reading=None, so
-    the panel simply shows the plain word.
+    speaks it when the word is tapped.
+
+    When full_text (the whole sentence the tokens belong to) is given,
+    the parser reads it as one piece and the per-morpheme readings are
+    aligned onto the tokens, so readings follow the sentence's context
+    (一つ -> 一=ひと, not the isolated 一=いち).  Tokens that can't be
+    covered that way fall back to the per-token reading -- the same
+    source term lookups use.  Non-Japanese languages (and the
+    japanese_reading setting being off) yield reading=None, so the panel
+    simply shows the plain word.
     """
+    cleaned = [{"text": _clean_token(t), "reading": None} for t in tokens]
     if not is_japanese_language(language):
-        return [{"text": _clean_token(t), "reading": None} for t in tokens]
+        return cleaned
 
     parser = language.parser
+    if full_text:
+        try:
+            morphs = parser.get_context_readings(full_text)
+        except Exception:  # pylint: disable=broad-exception-caught
+            morphs = None
+        if morphs:
+            aligned = _align_context_readings(tokens, morphs)
+            if aligned is not None:
+                return aligned
+
     out = []
-    for t in tokens:
-        text = _clean_token(t)
+    for entry in cleaned:
+        text = entry["text"]
         reading = None
         if text:
             try:
@@ -762,8 +852,11 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
                 ),
                 # The "heard" sentence, tokenised and annotated with
                 # furigana readings so the panel can render and pronounce
-                # it word by word (same as the original sentence).
-                "transcription_tokens": annotate_tokens(spoken_tokens, lang),
+                # it word by word (same as the original sentence).  The
+                # transcription itself is the reading context.
+                "transcription_tokens": annotate_tokens(
+                    spoken_tokens, lang, full_text=text
+                ),
                 "statuses": comparison["statuses"],
                 "spoken_for_fuzzy": {
                     str(k): v
