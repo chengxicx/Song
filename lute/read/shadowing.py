@@ -179,7 +179,15 @@ def _simplified_converter():
 
             _OPENCC_T2S = OpenCC("t2s")
         except Exception:  # pylint: disable=broad-exception-caught
+            # Logged once: without the fold, a traditional sentence is
+            # scored against a simplified transcription character by
+            # character, and correctly-read words come back as misses.
             _OPENCC_T2S = None
+            logging.getLogger(__name__).warning(
+                "opencc is not installed: Traditional Chinese text will "
+                "not match the Simplified transcriptions when scoring "
+                "shadowing takes (pip install opencc-python-reimplemented)"
+            )
     return _OPENCC_T2S
 
 
@@ -307,6 +315,12 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
         scores as a miss plus a bogus extra.  When one side of the block
         is a single token and exactly the join of the other side's keys,
         the word was said right.
+
+        The same drift can re-cut several words at once: SenseVoice may
+        answer the sentence's 呢 + 個 + 係 + 阿樂 with the parser's 呢个
+        + 系阿乐.  Scan for points where the joined keys from both sides
+        meet; each such run was spoken correctly and is a match, and
+        only the genuinely different remainder is paired positionally.
         """
         if i2 - i1 == 1 and j2 - j1 > 1 and keyed[i1] == "".join(
             spoken_keys[j1:j2]
@@ -320,9 +334,31 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
                 statuses[scored[k]] = STATUS_MATCH
             return
 
-        n = min(i2 - i1, j2 - j1)
+        oi, si = i1, j1
+        while oi < i2 and si < j2:
+            no, ns = oi, si
+            ojoin, sjoin = "", ""
+            while (no < i2 or ns < j2) and not (ojoin and ojoin == sjoin):
+                if len(ojoin) <= len(sjoin) and no < i2:
+                    ojoin += keyed[no]
+                    no += 1
+                elif ns < j2:
+                    sjoin += spoken_keys[ns]
+                    ns += 1
+                else:
+                    ojoin += keyed[no]
+                    no += 1
+            if not (ojoin and ojoin == sjoin):
+                # The joins never meet: a real difference.  Pair the
+                # rest positionally, as if the block had no drift.
+                break
+            for k in range(oi, no):
+                statuses[scored[k]] = STATUS_MATCH
+            oi, si = no, ns
+
+        n = min(i2 - oi, j2 - si)
         for k in range(n):
-            okey, skey = keyed[i1 + k], spoken_keys[j1 + k]
+            okey, skey = keyed[oi + k], spoken_keys[si + k]
             ratio = difflib.SequenceMatcher(None, okey, skey).ratio()
             if ratio < FUZZY_MATCH_RATIO and is_japanese:
                 # Voicing is the one difference a ratio of 0 hides:
@@ -333,12 +369,12 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
                 if voiced >= FUZZY_MATCH_RATIO:
                     ratio = voiced
             if ratio >= FUZZY_MATCH_RATIO:
-                orig_index = scored[i1 + k]
+                orig_index = scored[oi + k]
                 statuses[orig_index] = STATUS_FUZZY
-                result["spoken_for_fuzzy"][orig_index] = spoken[j1 + k]
+                result["spoken_for_fuzzy"][orig_index] = spoken[si + k]
             # else: too far apart -- stays a miss.
         # Spoken tokens without an original counterpart are extras.
-        result["extras"].extend(spoken[j1 + n : j2])
+        result["extras"].extend(spoken[si + n : j2])
 
     matcher = difflib.SequenceMatcher(a=keyed, b=spoken_keys, autojunk=False)
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
