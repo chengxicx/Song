@@ -727,7 +727,7 @@ def whisper_prepare():
     task_id = whisper_transcribe.start_task(
         current_app._get_current_object(),  # pylint: disable=protected-access
         audio_temp_path,
-        whisper_transcribe.whisper_lang_code(language),
+        whisper_transcribe.whisper_lang_code(language, model_size),
         model_size,
         {
             "language_id": int(language_id),

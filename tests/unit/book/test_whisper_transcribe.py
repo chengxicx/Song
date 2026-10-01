@@ -61,7 +61,14 @@ def test_lang_code_mapping(app_context):
     class _Cantonese:
         tts_lang = "zh-HK"
 
+    # yue only on the large-v3 family; smaller models get the Mandarin
+    # rewrite (the yue token exists but is untrained there).
     assert whisper_transcribe.whisper_lang_code(_Cantonese()) == "zh"
+    assert whisper_transcribe.whisper_lang_code(_Cantonese(), "small") == "zh"
+    assert (
+        whisper_transcribe.whisper_lang_code(_Cantonese(), "large-v3-turbo")
+        == "yue"
+    )
 
     class _ByName:
         tts_lang = None
@@ -74,6 +81,28 @@ def test_lang_code_mapping(app_context):
         name = "korean"
 
     assert whisper_transcribe.whisper_lang_code(_KoreanByName()) == "ko"
+
+    class _CantoneseByName:
+        tts_lang = None
+        name = "Cantonese Chinese"
+
+    assert whisper_transcribe.whisper_lang_code(_CantoneseByName()) == "zh"
+    assert (
+        whisper_transcribe.whisper_lang_code(
+            _CantoneseByName(), "large-v3-turbo"
+        )
+        == "yue"
+    )
+
+    # Cantonese on a non-yue model is surfaced as a client hint.
+    assert whisper_transcribe.whisper_language_note(_Cantonese(), "small")
+    assert (
+        whisper_transcribe.whisper_language_note(
+            _Cantonese(), "large-v3-turbo"
+        )
+        is None
+    )
+    assert whisper_transcribe.whisper_language_note(_ByName(), "small") is None
 
     # Unknown name: auto-detect, never the TTS table's "en" default.
     class _Unknown:
