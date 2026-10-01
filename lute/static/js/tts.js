@@ -143,6 +143,9 @@
   let _voicesWaitActive = false;
   let _pendingWaitText = null;
   let _pendingWaitOnStarted = null;
+  // Bumped on every speakNow: a queued sequence uses it to notice that
+  // the user started some other speech mid-sequence and stop queueing.
+  let speakEpoch = 0;
 
   function selectBestVoiceForLang(voices, targetLang) {
     if (!voices || voices.length === 0) return null;
@@ -213,10 +216,13 @@
   // the reading page's -- the review session speaks each card in its
   // own term's language (see lute-review.js).  The page's own detection
   // is the fallback.
-  function speakNow(cleanText, onStarted, langOverride) {
+  function speakNow(cleanText, onStarted, langOverride, onEnded) {
     let activeVoice = getSelectedVoice();
     const voices = window.speechSynthesis.getVoices();
     const detectedLang = langOverride || getCurrentLangCode();
+
+    speakEpoch += 1;
+    const epoch = speakEpoch;
 
     if (!activeVoice && voices.length > 0) {
       activeVoice = selectBestVoiceForLang(voices, detectedLang);
@@ -239,6 +245,21 @@
       utterance.onstart = function () {
         try { onStarted(); } catch (_) {}
       };
+    }
+    // onEnded lets a caller chain another utterance onto this one
+    // (shadowing's "correct word, then what was heard").  A cancel()
+    // also fires onend/onerror on the displaced utterance -- the epoch
+    // check keeps a superseded speaker from chain-starting over the
+    // speech that displaced it.
+    if (typeof onEnded === "function") {
+      let ended = false;
+      const fire = function () {
+        if (ended || speakEpoch !== epoch) return;
+        ended = true;
+        try { onEnded(); } catch (_) {}
+      };
+      utterance.onend = fire;
+      utterance.onerror = fire;
     }
 
     try {
@@ -336,6 +357,80 @@
       speakText(term, null, langOverride);
     }
   }
+
+  // speakText with an onEnded callback: same voice selection and
+  // fallback paths, but resolves when the sound finishes, not when it
+  // starts.  Used to chain utterances (shadowing plays the correct
+  // word and then the misheard one back to back).
+  function speakTextEnd(text, onEnded, langOverride) {
+    const cleanText = (text || "").replace(/[#＃]/g, "").trim();
+    const done = function () {
+      if (typeof onEnded === "function") {
+        try { onEnded(); } catch (_) {}
+      }
+    };
+    if (!cleanText) {
+      done();
+      return;
+    }
+
+    if ("speechSynthesis" in window) {
+      const voices = window.speechSynthesis.getVoices();
+      if (getSelectedVoice() || (voices && voices.length > 0)) {
+        speakNow(cleanText, null, langOverride, done);
+        return;
+      }
+      // Voices not loaded yet (first seconds in Chromium): speak via
+      // the plain path and resolve on a rough timer rather than
+      // stalling the sequence entirely.
+      speakText(cleanText, null, langOverride);
+      setTimeout(done, 1200);
+      return;
+    }
+
+    // --- Fallback: backend /tts/ endpoint ---
+    const lang = langOverride || getCurrentLangCode();
+    const url = "/tts/" + lang + "/" + encodeURIComponent(cleanText);
+    const audio = new Audio(url);
+    audio.playbackRate = globalSpeed;
+    let fired = false;
+    const fire = function () {
+      if (!fired) {
+        fired = true;
+        done();
+      }
+    };
+    audio.addEventListener("ended", fire, { once: true });
+    audio.addEventListener("error", fire, { once: true });
+    audio.play().catch(fire);
+  }
+
+  // Speak a list of short items back to back: [{text, reading}, ...].
+  // The kana-reading preference of speakTermText applies per item.
+  // Any other speech started mid-sequence (the epoch bump in speakNow)
+  // stops the rest of the queue -- the user took over.
+  function speakSequence(items, langOverride) {
+    const list = (items || [])
+      .map(function (it) {
+        const term = ((it && it.text) || "").replace(/[#＃]/g, "").trim();
+        const reading = ((it && it.reading) || "").trim();
+        if (reading && /[\u3040-\u309F\u30A0-\u30FF]/.test(reading)) {
+          return reading;
+        }
+        return term;
+      })
+      .filter(function (t) {
+        return t;
+      });
+    const step = function (i) {
+      if (i >= list.length) return;
+      speakTextEnd(list[i], function () {
+        step(i + 1);
+      }, langOverride);
+    };
+    step(0);
+  }
+  window.luteTtsSpeakSequence = speakSequence;
 
   // Annotated reading for a hovered word, when the term popup cache has
   // already fetched one -- lute-tooltip.js copies the reading out of
