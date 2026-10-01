@@ -57,11 +57,15 @@ class _FakeParsedToken:
 class _FakeParser:
     "Duck-typed parser: fixed readings + plain lowercase."
 
-    def __init__(self, readings=None):
+    def __init__(self, readings=None, multi_readings=None):
         self.readings = readings or {}
+        self.multi_readings = multi_readings or {}
 
     def get_reading(self, text):
         return self.readings.get(text)
+
+    def get_readings(self, text):
+        return self.multi_readings.get(text) or []
 
     def get_lowercase(self, text):
         return text.lower()
@@ -70,10 +74,12 @@ class _FakeParser:
 class _FakeLanguage:
     "Duck-typed Language.  Entries may be strings or (token, is_word)."
 
-    def __init__(self, spoken_tokens, parser_type="spacedel", readings=None):
+    def __init__(
+        self, spoken_tokens, parser_type="spacedel", readings=None, multi_readings=None
+    ):
         self.parser_type = parser_type
         self.spoken_tokens = spoken_tokens
-        self._parser = _FakeParser(readings)
+        self._parser = _FakeParser(readings, multi_readings)
 
     @property
     def parser(self):
@@ -238,6 +244,100 @@ def test_pinyin_tone_marks_count_for_the_sound_rescue():
     res = shadowing.compare_tokens(["妈"], "骂", lang)
     assert res["statuses"] == [1]
     assert res["spoken_for_fuzzy"] == {0: "骂"}
+
+
+def test_word_left_inside_a_glued_spoken_token_is_a_match():
+    """
+    The engines can glue adjacent words into one chunk that is not the
+    exact join of their keys: 拍手 + 大聲笑 heard as the non-word
+    拍笑大聲笑.  The 1:1 pairing consumes the whole chunk on 拍手, which
+    would leave 大聲笑 -- verbatim inside the chunk -- a flat miss; the
+    containment pass finds it.  拍手 itself shares only its first
+    syllable with the chunk and stays a miss.
+    """
+    lang = _FakeLanguage(
+        ["同學", "仔", "都", "拍笑大聲笑"],
+        readings={
+            "拍手": "paak3 sau2",
+            "拍笑大聲笑": "paak3 siu3 daai6 sing1 siu3",
+        },
+    )
+    lang.tts_lang = "zh-HK"
+    res = shadowing.compare_tokens(
+        ["同學", "仔", "都", "拍手", "大聲笑"],
+        "同學仔都拍笑大聲笑",
+        lang,
+    )
+    assert res["statuses"] == [2, 2, 2, 0, 2]
+    assert res["extras"] == []
+    assert res["score"] == 80
+
+
+def test_leftover_word_rescued_by_syllables_inside_a_merged_token():
+    """
+    A left-behind word need not be verbatim in the chunk to count:
+    夠 + 喇 heard as the single token 夠啦.  夠 pairs with the chunk on
+    its surface form; 喇 has no counterpart left, but its syllable is
+    in the chunk's reading (gau3 laa1), so it is the near-miss it
+    sounds like instead of a skip.
+    """
+    lang = _FakeLanguage(
+        ["夠啦"], readings={"夠": "gau3", "喇": "laa3", "夠啦": "gau3 laa1"}
+    )
+    lang.tts_lang = "zh-HK"
+    res = shadowing.compare_tokens(["夠", "喇"], "夠啦", lang)
+    assert res["statuses"] == [1, 1]
+    assert res["spoken_for_fuzzy"] == {0: "夠啦", 1: "夠啦"}
+    assert res["score"] == 50
+
+
+def test_chinese_rescue_judges_on_every_reading_the_parser_offers():
+    """
+    The parser's single dictionary pick can be the wrong sense of a
+    polyphone: 阿 filed under o1 misses that the name prefix is read
+    aa3.  With every reading offered, 阿明答 heard as 亞面達 is the
+    near-miss it sounds like; with only the dictionary pick it is a
+    flat miss (next test).
+    """
+    lang = _FakeLanguage(
+        ["亞面達"],
+        multi_readings={
+            "阿明答": ["o1 ming4 daap3", "aa3 ming4 daap3"],
+            "亞面達": ["aa3 min6 daat6"],
+        },
+    )
+    lang.tts_lang = "zh-HK"
+    res = shadowing.compare_tokens(["阿明答"], "亞面達", lang)
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "亞面達"}
+    assert res["score"] == 50
+
+
+def test_chinese_rescue_without_a_matching_reading_stays_a_miss():
+    "Offering readings must not paper over a genuinely different sound."
+    lang = _FakeLanguage(
+        ["亞面達"],
+        multi_readings={
+            "阿明答": ["o1 ming4 daap3"],
+            "亞面達": ["aa3 min6 daat6"],
+        },
+    )
+    lang.tts_lang = "zh-HK"
+    res = shadowing.compare_tokens(["阿明答"], "亞面達", lang)
+    assert res["statuses"] == [0]
+    assert res["score"] == 0
+
+
+def test_containment_pass_needs_every_syllable_of_the_word():
+    "A chunk sharing only part of the word is not the word: no rescue."
+    lang = _FakeLanguage(
+        ["你聽"],
+        readings={"你好": "nei5 hou2", "你聽": "nei5 teng1"},
+    )
+    lang.tts_lang = "zh-HK"
+    res = shadowing.compare_tokens(["你好"], "你聽", lang)
+    assert res["statuses"] == [0]
+    assert res["score"] == 0
 
 
 def test_extra_spoken_words():
