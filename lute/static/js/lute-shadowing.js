@@ -355,6 +355,10 @@ window.closeShadowingPanel = function () {
   shadowingSetMode(false);
 };
 
+// The model picker is gone from the panel: SenseVoice transcribes
+// zh/yue/en/ja/ko and whisper's default "small" covers the rest.  A
+// preference left over from before is still honored (it only affects
+// the whisper-only languages), but there is no UI to change it.
 function shadowingGetModel() {
   let m = null;
   try {
@@ -376,11 +380,6 @@ function shadowingOpenPanel() {
     '<span class="shadowing-panel__title">Shadowing</span>' +
     '<button type="button" id="shadowing-auto-btn" class="shadowing-auto-btn"' +
     ' title="Auto: record at every sentence end, score, then advance">Auto</button>' +
-    '<select id="shadowing-model" class="shadowing-panel__model" title="Whisper model: bigger is more accurate but ~3x slower">' +
-    '<option value="base">base · fastest</option>' +
-    '<option value="small">small · balanced</option>' +
-    '<option value="medium">medium · slowest</option>' +
-    "</select>" +
     '<button type="button" class="shadowing-panel__close" aria-label="Close">&times;</button>' +
     "</div>" +
     '<div class="shadowing-panel__body">' +
@@ -436,13 +435,6 @@ function shadowingOpenPanel() {
   // sentence and "heard" sentence alike) pronounces itself on click.
   panel.addEventListener("click", shadowingOnPanelClick);
 
-  const sel = panel.querySelector("#shadowing-model");
-  sel.value = shadowingGetModel();
-  sel.addEventListener("change", function () {
-    try {
-      localStorage.setItem(SHADOWING_MODEL_KEY, sel.value);
-    } catch (_) {}
-  });
   panel
     .querySelector(".shadowing-panel__close")
     .addEventListener("click", function () {
@@ -550,10 +542,7 @@ function shadowingRenderCurrent() {
 // when it exists (kanji whose TTS guess is wrong then sounds right);
 // otherwise the word itself is spoken.  Fallback for pages without
 // tts.js's term-aware speaker is the plain reader.
-function shadowingSpeakToken(tok) {
-  const text = tok.getAttribute("data-speak") || "";
-  if (!text) return;
-  const reading = tok.getAttribute("data-reading") || "";
+function shadowingSpeakItem(text, reading) {
   if (typeof window.luteTtsSpeakTerm === "function") {
     window.luteTtsSpeakTerm(text, reading, null);
   } else if (typeof speakText === "function") {
@@ -561,12 +550,39 @@ function shadowingSpeakToken(tok) {
   }
 }
 
+function shadowingSpeakToken(tok, heardOnly) {
+  const text = tok.getAttribute("data-speak") || "";
+  if (!text) return;
+  const reading = tok.getAttribute("data-reading") || "";
+  const heard = tok.getAttribute("data-heard") || "";
+  // A fuzzy token carries what the engine actually heard: clicking the
+  // "→ heard" part speaks that word alone, clicking the word itself
+  // plays the correct pronunciation and then the misheard one back to
+  // back, so the difference is audible.
+  if (heardOnly && heard) {
+    shadowingSpeakItem(heard, "");
+    return;
+  }
+  if (heard && typeof window.luteTtsSpeakSequence === "function") {
+    window.luteTtsSpeakSequence([
+      { text: text, reading: reading },
+      { text: heard, reading: "" },
+    ]);
+    return;
+  }
+  shadowingSpeakItem(text, reading);
+}
+
 function shadowingOnPanelClick(e) {
   const tok =
     e.target && e.target.closest
       ? e.target.closest(".shadow-tok, .shadow-heard-tok")
       : null;
-  if (tok) shadowingSpeakToken(tok);
+  if (!tok) return;
+  const heardPart = e.target.closest
+    ? e.target.closest(".shadow-tok__heard")
+    : null;
+  shadowingSpeakToken(tok, Boolean(heardPart));
 }
 
 function shadowingRenderResultIdle() {
@@ -600,6 +616,10 @@ function shadowingClearMarks(unit) {
   if (!box) return;
   box.querySelectorAll(".shadow-tok").forEach(function (tok) {
     tok.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
+    if (tok.getAttribute("data-heard")) {
+      tok.removeAttribute("data-heard");
+      tok.setAttribute("title", "Click to hear this word");
+    }
     tok.querySelectorAll(".shadow-tok__heard").forEach(function (h) {
       h.remove();
     });
@@ -630,6 +650,11 @@ function shadowingPaintVerdicts(unit, data) {
       const cls = CLASSES[st];
       if (cls) tok.classList.add(cls);
       if (st === 1 && fuzzySpoken[i] != null) {
+        // Carried on the token: clicking it then speaks the correct
+        // word and the misheard one back to back (see
+        // shadowingSpeakToken); the "→ heard" part speaks alone.
+        tok.setAttribute("data-heard", fuzzySpoken[i]);
+        tok.setAttribute("title", "Click: correct word, then what was heard");
         tok.insertAdjacentHTML(
           "beforeend",
           '<span class="shadow-tok__heard">→ ' +
