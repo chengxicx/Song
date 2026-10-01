@@ -208,6 +208,38 @@ def test_voicing_swap_never_rescues_unrelated_words():
     assert res["score"] == 0
 
 
+def test_chinese_misread_by_sound_is_fuzzy_not_miss():
+    """
+    A Chinese misread is a different character, so the surface forms
+    share nothing and the plain ratio is 0.  The parser's romanization
+    decides: 你 (nei5) read as 李 (lei5) is the near-miss it sounds like.
+    """
+    lang = _FakeLanguage(["李"], readings={"你": "nei5", "李": "lei5"})
+    lang.tts_lang = "zh-HK"
+    res = shadowing.compare_tokens(["你"], "李", lang)
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "李"}
+    assert res["score"] == 50
+
+
+def test_chinese_different_sound_stays_a_miss():
+    "The romanization rescue must not paper over genuinely different syllables."
+    lang = _FakeLanguage(["嘅"], readings={"你": "nei5", "嘅": "ge3"})
+    lang.tts_lang = "zh-HK"
+    res = shadowing.compare_tokens(["你"], "嘅", lang)
+    assert res["statuses"] == [0]
+    assert res["score"] == 0
+
+
+def test_pinyin_tone_marks_count_for_the_sound_rescue():
+    "pypinyin's marked vowels fold to digit tones before comparing."
+    lang = _FakeLanguage(["骂"], readings={"妈": "mā", "骂": "mà"})
+    lang.tts_lang = "zh-HK"
+    res = shadowing.compare_tokens(["妈"], "骂", lang)
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "骂"}
+
+
 def test_extra_spoken_words():
     lang = _FakeLanguage(["the", "very", "calm", "cat"])
     res = shadowing.compare_tokens(["The", "calm", "cat"], "the very calm cat", lang)

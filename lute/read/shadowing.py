@@ -292,6 +292,53 @@ def _make_key_fn(language):
     return key
 
 
+# Pinyin tone marks -> plain vowel + tone digit.  pypinyin emits marked
+# vowels (mā) while pycantonese emits digits (maa1); folding both to
+# syllable+digit gives the fuzzy rescue one comparable shape, and keeps
+# a tone slip (妈 mā read as 骂 mà) eligible as a near-miss.
+_TONE_MARKS = {
+    "ā": "a1", "á": "a2", "ǎ": "a3", "à": "a4",
+    "ē": "e1", "é": "e2", "ě": "e3", "è": "e4",
+    "ī": "i1", "í": "i2", "ǐ": "i3", "ì": "i4",
+    "ō": "o1", "ó": "o2", "ǒ": "o3", "ò": "o4",
+    "ū": "u1", "ú": "u2", "ǔ": "u3", "ù": "u4",
+    "ǖ": "v1", "ǘ": "v2", "ǚ": "v3", "ǜ": "v4",
+}
+
+
+def _normalize_reading(reading):
+    "A parser reading -> compact sound key (lowercase, digit tones, no spaces)."
+    return (
+        "".join(_TONE_MARKS.get(ch, ch) for ch in (reading or "").lower())
+        .replace(" ", "")
+        or None
+    )
+
+
+def _make_sound_fn(language):
+    """
+    Return token -> romanization for the fuzzy rescue, or None.
+
+    The diff keys for Chinese are Han surface forms, so a misread
+    character is graphically unrelated to the target and scores a flat
+    miss.  The rescue re-judges such a pair through the parser's own
+    reading -- jyutping for Cantonese, pinyin for Mandarin -- so 你 read
+    as 李 (nei5/lei5) is the misread it sounds like, not a skipped word.
+    """
+    if not _is_chinese_language(language):
+        return None
+    parser = language.parser
+
+    def sound(token):
+        try:
+            reading = parser.get_reading(_clean_token(token))
+        except Exception:  # pylint: disable=broad-exception-caught
+            return None
+        return _normalize_reading(reading)
+
+    return sound
+
+
 def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
     """
     Diff the user's transcription against the sentence's word tokens.
@@ -328,6 +375,7 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
     }
 
     key_of = _make_key_fn(language)
+    sound_of = _make_sound_fn(language)
     is_japanese = is_japanese_language(language)
     spoken = (
         spoken_tokens
@@ -418,6 +466,18 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
                 ).ratio()
                 if voiced >= FUZZY_MATCH_RATIO:
                     ratio = voiced
+            elif ratio < FUZZY_MATCH_RATIO and sound_of is not None:
+                # A Chinese misread is a different character, so the
+                # surface forms share nothing; re-judge the pair on the
+                # romanization before calling it a skip.
+                oread = sound_of(original_tokens[scored[oi + k]])
+                sread = sound_of(spoken[si + k])
+                if oread and sread:
+                    voiced = difflib.SequenceMatcher(
+                        None, oread, sread
+                    ).ratio()
+                    if voiced >= FUZZY_MATCH_RATIO:
+                        ratio = voiced
             if ratio >= FUZZY_MATCH_RATIO:
                 orig_index = scored[oi + k]
                 statuses[orig_index] = STATUS_FUZZY
