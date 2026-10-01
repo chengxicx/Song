@@ -191,6 +191,56 @@ def _simplified_converter():
     return _OPENCC_T2S
 
 
+_OPENCC_S2T = None
+_OPENCC_S2T_CHECKED = False
+
+
+def _traditional_converter():
+    """
+    A Simplified->Traditional Han converter, or None when opencc is not
+    installed.  Used only for display: the engines emit simplified Han,
+    but a traditional book sentence should not come back in the "heard"
+    panel looking like a different sentence.
+    """
+    global _OPENCC_S2T, _OPENCC_S2T_CHECKED  # pylint: disable=global-statement
+    if not _OPENCC_S2T_CHECKED:
+        _OPENCC_S2T_CHECKED = True
+        try:
+            from opencc import OpenCC  # pylint: disable=import-error,import-outside-toplevel
+
+            _OPENCC_S2T = OpenCC("s2t")
+        except Exception:  # pylint: disable=broad-exception-caught
+            _OPENCC_S2T = None
+    return _OPENCC_S2T
+
+
+def _match_book_script(text, original_tokens, language):
+    """
+    Convert a Chinese transcription to the book's Han script for display.
+
+    SenseVoice (and whisper zh) answer in simplified Han even when the
+    book text is traditional -- Cantonese courses usually are.  Scoring
+    folds both sides to simplified (see _make_key_fn), but the "heard"
+    panel shows the transcription verbatim, and 个个 都 唔 一样 next to
+    a 個個 都 唔 一樣 sentence reads as wrong even at 100%.  When the
+    sentence itself is traditional, convert the transcription back;
+    a simplified book sentence needs no conversion (the engines already
+    emit simplified).  No-op when opencc is missing or the language is
+    not Chinese.
+    """
+    if not _is_chinese_language(language):
+        return text
+    t2s = _simplified_converter()
+    s2t = _traditional_converter()
+    if t2s is None or s2t is None:
+        return text
+    sample = "".join(t or "" for t in (original_tokens or []))
+    if t2s.convert(sample) == sample:
+        # The sentence is already simplified -- nothing to restore.
+        return text
+    return s2t.convert(text or "")
+
+
 # Unvoiced base of each voiced kana.  ASR very commonly swaps voicing
 # on weak syllables (そうですか heard as そうです が); a key pair that
 # matches once the dakuten/handakuten marks are stripped is a near-miss
@@ -506,6 +556,11 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
                 )
             if not (text or "").strip():
                 raise RuntimeError("no speech detected in the recording")
+            # Display-side script restore: a traditional book sentence
+            # gets its transcription back in traditional Han (SenseVoice
+            # emits simplified even for Cantonese).  Scoring is
+            # unaffected -- the diff keys fold to simplified regardless.
+            text = _match_book_script(text, tokens, lang)
             spoken_tokens = _spoken_tokens(text, lang)
             comparison = compare_tokens(
                 tokens, text, lang, spoken_tokens=spoken_tokens
