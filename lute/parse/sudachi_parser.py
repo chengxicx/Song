@@ -377,6 +377,79 @@ class JapaneseSudachiParser(AbstractParser):
             return jaconv.kata2alphabet(ret)
         raise RuntimeError(f"Bad reading type {jp_reading_setting}")
 
+    def _reading_from_kana(self, surface: str, kana: str, setting: str):
+        """
+        One morpheme's yomi (katakana) as the display reading under the
+        japanese_reading setting; None when it adds nothing over the
+        surface (symbols, kanji the dictionary has no kana for).
+        """
+        if not kana or kana == surface:
+            # Kana read as themselves: the surface is the reading.
+            return self._self_reading(surface, setting)
+        if setting == "katakana":
+            ret = kana
+        elif setting == "hiragana":
+            ret = jaconv.kata2hira(kana)
+        elif setting == "alphabet":
+            ret = jaconv.kata2alphabet(kana)
+        else:
+            raise RuntimeError(f"Bad reading type {setting}")
+        # A particle or okurigana morpheme's yomi converts back to the
+        # surface itself (の <- ノ).
+        if ret == surface:
+            return self._self_reading(surface, setting)
+        return ret
+
+    @staticmethod
+    def _string_has_kanji(s: str) -> bool:
+        "True if any character is a kanji (incl. the 々 iteration mark)."
+        return any("\u4E00" <= c <= "\u9FFF" or c == "\u3005" for c in s)
+
+    def _neighbour_window_kana(self, tok, morphs, index, split_mode):
+        """
+        The yomi this morpheme gets when read together with its immediate
+        neighbours, or None when that window cannot be trusted.
+
+        Reading the whole sentence at once is what makes 一つ -> 一=ヒト
+        work, but the further a morpheme sits from the start of a long
+        string the more its reading can drift: 数ある with 一つ one
+        morpheme later comes back 数=スウ, while those same two morphemes
+        read on their own give the correct カズ.  A window of the
+        morpheme plus its neighbours keeps the local context that
+        disambiguates without the distance that drifts.
+
+        The left neighbour is kept when there is one because it is often
+        what fixes the reading -- 杯 is バイ in 一杯 but サカズキ alone,
+        日 is ニチ in 一日 but ヒ alone -- so a window that dropped it
+        would break exactly those.  It is allowed to be absent at the
+        start of the text, where there is no left context to preserve.
+        The right neighbour is required: it is the side that does the
+        disambiguating, and a window that stops at the end of the text
+        knows no more than the morpheme on its own.
+
+        Returns None unless the window tokenizes back to a morpheme with
+        exactly this surface at exactly this offset, so a window that
+        merges or splits differently leaves the sentence's own reading
+        standing and nothing is guessed.
+        """
+        if index + 1 >= len(morphs):
+            return None
+        start = max(0, index - 1)
+        window = morphs[start : index + 2]
+        surface = morphs[index][0]
+        left_text = "".join(s for s, _ in window[: index - start])
+        try:
+            got = list(tok.tokenize("".join(s for s, _ in window), mode=split_mode))
+        except Exception:  # pylint: disable=broad-exception-caught
+            return None
+        seen = ""
+        for m in got:
+            if seen == left_text and m.surface() == surface:
+                reading = m.reading_form()
+                return reading if reading and reading != "*" else None
+            seen += m.surface()
+        return None
+
     def get_context_readings(self, text: str):
         """
         Per-morpheme readings from one contextual tokenize of `text`.
@@ -386,6 +459,10 @@ class JapaneseSudachiParser(AbstractParser):
         as the isolated surface would be re-read (一 -> イチ).  Applies
         the same japanese_reading setting as get_reading; None when that
         setting is unset.
+
+        A kanji morpheme's reading is taken from the window it forms with
+        its immediate neighbours rather than from the whole sentence,
+        which is what keeps 数ある at カズ; see _neighbour_window_kana.
         """
         zws = "\u200B"
         text = text.replace(zws, "")
@@ -402,30 +479,24 @@ class JapaneseSudachiParser(AbstractParser):
         tok = self._build_tokenizer(dict_type)
         split_mode = self._get_split_mode(mode)
 
+        morphs = [
+            (m.surface(), m.reading_form())
+            for m in tok.tokenize(text, mode=split_mode)
+            if m.surface()
+        ]
+
         out = []
-        for m in tok.tokenize(text, mode=split_mode):
-            surface = m.surface()
-            if surface == "":
-                continue
-            reading = m.reading_form()
+        for i, (surface, reading) in enumerate(morphs):
             kana = reading if reading and reading != "*" else surface
-            if not kana or kana == surface:
-                # Kana read as themselves: the surface is the reading.
-                out.append((surface, self._self_reading(surface, jp_reading_setting)))
-                continue
-            if jp_reading_setting == "katakana":
-                ret = kana
-            elif jp_reading_setting == "hiragana":
-                ret = jaconv.kata2hira(kana)
-            elif jp_reading_setting == "alphabet":
-                ret = jaconv.kata2alphabet(kana)
-            else:
-                raise RuntimeError(f"Bad reading type {jp_reading_setting}")
-            # A particle or okurigana morpheme's yomi converts back to
-            # the surface itself (の <- ノ).
-            if ret == surface:
-                ret = self._self_reading(surface, jp_reading_setting)
-            out.append((surface, ret))
+            if self._string_has_kanji(surface):
+                # Only a kanji morpheme can be mis-read; kana read as
+                # themselves, so the extra window parse would be wasted.
+                window_kana = self._neighbour_window_kana(tok, morphs, i, split_mode)
+                if window_kana:
+                    kana = window_kana
+            out.append(
+                (surface, self._reading_from_kana(surface, kana, jp_reading_setting))
+            )
         return out or None
 
     @staticmethod
