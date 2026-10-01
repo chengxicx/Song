@@ -577,6 +577,54 @@ def test_cantonese_traditional_matches_sensevoice_simplified():
     assert res["score"] == 68
 
 
+def test_match_book_script_converts_simplified_heard_to_traditional():
+    """
+    SenseVoice answers 个个 都 唔 一样 for the traditional sentence
+    個個 都 唔 一樣; the "heard" panel shows the transcription verbatim,
+    so it is restored to the book's script (scoring is unaffected -- the
+    diff keys fold to simplified either way).
+    """
+    try:
+        from opencc import OpenCC  # noqa: F401
+    except ImportError:
+        pytest.skip("opencc not installed")
+
+    lang = _FakeLanguage([], readings={})
+    lang.tts_lang = "zh-HK"
+    original = ["個個", "都", "唔", "一樣"]
+    out = shadowing._match_book_script("个个都唔一样", original, lang)
+    assert out == "個個都唔一樣"
+
+
+def test_match_book_script_leaves_simplified_book_text_alone():
+    "A simplified book sentence already matches the engines' output."
+    try:
+        from opencc import OpenCC  # noqa: F401
+    except ImportError:
+        pytest.skip("opencc not installed")
+
+    lang = _FakeLanguage([], readings={})
+    lang.tts_lang = "zh-HK"
+    out = shadowing._match_book_script("个个都唔一样", ["个个", "都", "唔", "一样"], lang)
+    assert out == "个个都唔一样"
+
+
+def test_match_book_script_noop_for_non_chinese():
+    "English (etc.) transcriptions are never touched."
+    lang = _FakeLanguage(["the", "cat"])
+    out = shadowing._match_book_script("the cat", ["The", "cat"], lang)
+    assert out == "the cat"
+
+
+def test_match_book_script_tolerates_missing_opencc():
+    "Without opencc the transcription passes through unchanged."
+    lang = _FakeLanguage([], readings={})
+    lang.tts_lang = "zh-HK"
+    with patch.object(shadowing, "_simplified_converter", return_value=None):
+        out = shadowing._match_book_script("个个", ["個個"], lang)
+    assert out == "个个"
+
+
 # ---------------------------------------------------------------------
 # Furigana readings route
 # ---------------------------------------------------------------------
