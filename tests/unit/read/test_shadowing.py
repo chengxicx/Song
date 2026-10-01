@@ -57,15 +57,25 @@ class _FakeParsedToken:
 class _FakeParser:
     "Duck-typed parser: fixed readings + plain lowercase."
 
-    def __init__(self, readings=None, multi_readings=None):
+    def __init__(
+        self, readings=None, multi_readings=None, context_readings=None
+    ):
         self.readings = readings or {}
         self.multi_readings = multi_readings or {}
+        # [(surface, reading-or-None)] a get_context_readings call answers,
+        # or None to simulate a parser without contextual readings.
+        self.context_readings = context_readings
+        self.context_calls = []
 
     def get_reading(self, text):
         return self.readings.get(text)
 
     def get_readings(self, text):
         return self.multi_readings.get(text) or []
+
+    def get_context_readings(self, text):
+        self.context_calls.append(text)
+        return self.context_readings
 
     def get_lowercase(self, text):
         return text.lower()
@@ -75,11 +85,16 @@ class _FakeLanguage:
     "Duck-typed Language.  Entries may be strings or (token, is_word)."
 
     def __init__(
-        self, spoken_tokens, parser_type="spacedel", readings=None, multi_readings=None
+        self,
+        spoken_tokens,
+        parser_type="spacedel",
+        readings=None,
+        multi_readings=None,
+        context_readings=None,
     ):
         self.parser_type = parser_type
         self.spoken_tokens = spoken_tokens
-        self._parser = _FakeParser(readings, multi_readings)
+        self._parser = _FakeParser(readings, multi_readings, context_readings)
 
     @property
     def parser(self):
@@ -407,6 +422,53 @@ def test_spoken_punctuation_dropped_even_if_marked_as_word():
     assert res["extras"] == []
 
 
+def test_number_token_outside_word_chars_is_scored():
+    """
+    Many languages' word characters exclude digits, so the page's 100%
+    is one non-word token (' 100%," '), and the engine may answer with
+    the same run.  It is still something the user said: kept on both
+    sides and scored like any word, not filtered out.
+    """
+    lang = _FakeLanguage(
+        [("give", True), (' 100%," ', False), ("she", True), ("said", True)]
+    )
+    res = shadowing.compare_tokens(
+        ["give", "100%", "she", "said"], "give 100% she said", lang
+    )
+    assert res["statuses"] == [2, 2, 2, 2]
+    assert res["score"] == 100
+
+
+def test_number_token_misheard_counts_as_a_miss():
+    """
+    The take that found the filter: "my 100%" heard as "mine".  The
+    number stays in the total, so the misread costs score instead of
+    vanishing.
+    """
+    lang = _FakeLanguage(
+        [("give", True), ("mine", True), ("she", True), ("said", True)]
+    )
+    res = shadowing.compare_tokens(
+        ["give", "my", "100%", "she", "said"], "give mine she said", lang
+    )
+    assert res["statuses"] == [2, 0, 0, 2, 2]
+    assert res["score"] == 60
+
+
+def test_clean_token_trims_glued_edge_punctuation():
+    "The same spoken words with different glued punctuation compare equal."
+    assert shadowing._clean_token(' 100%," ') == "100%"
+    assert shadowing._clean_token("100%") == "100%"
+    assert shadowing._clean_token("(cat)") == "cat"
+    assert shadowing._clean_token("。") == ""
+
+
+def test_spoken_tokens_keep_nonword_digit_tokens():
+    "A non-word token with digits survives transcription parsing."
+    lang = _FakeLanguage([(' 100%," ', False), ("cat", True)])
+    assert shadowing._spoken_tokens("ignored", lang) == ["100%", "cat"]
+
+
 def test_all_punctuation_originals_score_100():
     lang = _FakeLanguage(["你好"])
     res = shadowing.compare_tokens(["。", "、"], "你好", lang)
@@ -464,6 +526,92 @@ def test_annotate_tokens_strips_zws_from_text():
     lang = _FakeLanguage([], parser_type="japanese", readings={})
     annotated = shadowing.annotate_tokens(["ca\u200Bt"], lang)
     assert annotated == [{"text": "cat", "reading": None}]
+
+
+# The morphemes a Japanese parser would answer for 広い宇宙の数ある一つ
+# when it reads the whole sentence: 数 is かず here, and 一つ splits into
+# 一(ひと) + つ.
+_CONTEXT_READINGS = [
+    ("広い", "ひろい"),
+    ("宇宙", "うちゅう"),
+    ("の", None),
+    ("、", None),
+    ("数", "かず"),
+    ("ある", None),
+    ("一", "ひと"),
+    ("つ", None),
+]
+
+
+def test_annotate_tokens_full_text_reads_in_context():
+    "With the sentence, readings come from the contextual parse."
+    lang = _FakeLanguage(
+        [], parser_type="japanese", context_readings=_CONTEXT_READINGS
+    )
+    annotated = shadowing.annotate_tokens(
+        ["広い", "宇宙", "の", "数", "ある", "一", "つ"],
+        lang,
+        full_text="広い宇宙の、数ある一つ",
+    )
+    assert annotated == [
+        {"text": "広い", "reading": "ひろい"},
+        {"text": "宇宙", "reading": "うちゅう"},
+        {"text": "の", "reading": None},
+        {"text": "数", "reading": "かず"},
+        {"text": "ある", "reading": None},
+        {"text": "一", "reading": "ひと"},
+        {"text": "つ", "reading": None},
+    ]
+
+
+def test_annotate_tokens_context_merges_split_morphemes():
+    "A panel token spanning several morphemes gets their joined reading."
+    lang = _FakeLanguage(
+        [], parser_type="japanese", context_readings=[("一", "ひと"), ("つ", "つ")]
+    )
+    annotated = shadowing.annotate_tokens(["一つ"], lang, full_text="一つ")
+    assert annotated == [{"text": "一つ", "reading": "ひとつ"}]
+
+
+def test_annotate_tokens_context_mismatch_falls_back_per_token():
+    "Tokens the morphemes can't rebuild use the per-token readings."
+    lang = _FakeLanguage(
+        [],
+        parser_type="japanese",
+        readings={"数": "すう"},
+        context_readings=[("完全に", "別の")],
+    )
+    annotated = shadowing.annotate_tokens(["数"], lang, full_text="数")
+    assert annotated == [{"text": "数", "reading": "すう"}]
+
+
+def test_annotate_tokens_no_full_text_skips_context_parse():
+    lang = _FakeLanguage(
+        [],
+        parser_type="japanese",
+        readings={"天気": "てんき"},
+        context_readings=[("天気", "てんき")],
+    )
+    annotated = shadowing.annotate_tokens(["天気"], lang)
+    assert annotated == [{"text": "天気", "reading": "てんき"}]
+    assert lang.parser.context_calls == []
+
+
+def test_annotate_tokens_context_parse_error_falls_back_per_token():
+    def _boom(_text):
+        raise RuntimeError("parser broke")
+
+    lang = _FakeLanguage([], parser_type="japanese", readings={"数": "かず"})
+    lang.parser.get_context_readings = _boom
+    annotated = shadowing.annotate_tokens(["数"], lang, full_text="数")
+    assert annotated == [{"text": "数", "reading": "かず"}]
+
+
+def test_annotate_tokens_non_japanese_ignores_full_text():
+    lang = _FakeLanguage([], readings={"Where": "どこ"})
+    annotated = shadowing.annotate_tokens(["Where"], lang, full_text="Where")
+    assert annotated == [{"text": "Where", "reading": None}]
+    assert lang.parser.context_calls == []
 
 
 # ---------------------------------------------------------------------
@@ -790,6 +938,40 @@ def test_readings_route_requires_language(app, client):
     )
     assert resp.status_code == 400
     assert "language" in resp.get_json()["error"]
+
+
+def test_readings_route_rejects_bad_full_text(app, client, english):
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={"language_id": english.id, "tokens": ["a"], "full_text": 42},
+    )
+    assert resp.status_code == 400
+    assert "tokens" in resp.get_json()["error"]
+
+
+def test_readings_route_japanese_reads_in_context(app, client, japanese):
+    """
+    The sentence rides along with its tokens, so the parser reads it as
+    a whole: 一つ comes back as ひとつ, not the isolated 一's いち.
+    (Tokens are cut the way both backends would render the span.)
+    """
+    from lute.settings.current import current_settings
+
+    current_settings()["japanese_reading"] = "hiragana"
+    tokens = ["広い", "宇宙", "の", "数", "ある", "一つ"]
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={
+            "language_id": japanese.id,
+            "tokens": tokens,
+            "full_text": "広い宇宙の数ある一つ",
+        },
+    )
+    assert resp.status_code == 200
+    out = resp.get_json()["tokens"]
+    assert [t["text"] for t in out] == tokens
+    by_text = {t["text"]: t["reading"] for t in out}
+    assert by_text["一つ"] == "ひとつ"
 
 
 def test_route_unknown_model_falls_back_to_default(app, app_context, client, english):
