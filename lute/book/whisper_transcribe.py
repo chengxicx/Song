@@ -34,16 +34,8 @@ logger = logging.getLogger(__name__)
 _WHISPER_INSTALL_SPECS = ["faster-whisper>=1.0,<2", "av>=11,<15"]
 _PIP_TIMEOUT_SECONDS = 900
 
-ALLOWED_MODEL_SIZES = ["base", "small", "medium", "large-v3-turbo"]
+ALLOWED_MODEL_SIZES = ["base", "small", "medium"]
 DEFAULT_MODEL_SIZE = "small"
-
-# Whisper only transcribes Cantonese ("yue") with the large-v3 family:
-# their tokenizers carry the yue token, and the weights were actually
-# trained on it.  On base/small/medium the token exists too, but it is
-# untrained -- forcing language="yue" there empirically yields an empty
-# transcription or English; language="zh" yields a written-Mandarin
-# rewrite, which is the best those models can do.
-YUE_CAPABLE_MODEL_SIZES = ["large-v3", "large-v3-turbo"]
 
 # Model repos published by the faster-whisper project, keyed by the
 # size names shown in the UI.
@@ -51,7 +43,6 @@ _MODEL_REPOS = {
     "base": "Systran/faster-whisper-base",
     "small": "Systran/faster-whisper-small",
     "medium": "Systran/faster-whisper-medium",
-    "large-v3-turbo": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
 }
 
 MAX_CONCURRENT_TRANSCRIPTIONS = 1
@@ -141,30 +132,24 @@ def install_whisper():
     )
 
 
-def whisper_lang_code(language, model_size=None):
+def resolve_language_tag(language):
     """
-    Map a Language to a whisper language code ("ja", "zh", ...), or None
-    to let whisper auto-detect.
+    A language's BCP-47-ish tag ("zh-HK", "ja", ...) or "" when unknown.
 
     Resolution order: the language's custom tts_lang (e.g. "zh-HK"),
     then a lookup of the language name in the TTS name table (so
     "Japanese" resolves even without a tts_lang configured).  That name
-    fallback matters: languages without a tts_lang used to return None
-    here, and whisper's auto-detect on a few seconds of speech
+    fallback matters: languages without a tts_lang used to resolve to
+    nothing, and whisper's auto-detect on a few seconds of speech
     regularly misfires (shadowing takes were read as the wrong
-    language).  An unknown name returns None rather than an "en"
-    default -- auto-detect beats guessing English.
+    language).  An unknown name yields "" rather than an "en" default
+    -- auto-detect beats guessing English.
 
     Not reusing get_lang_code_for directly because it falls back to
     DEFAULT_LANG_TAG ("en-US") for unknown names.
-
-    Cantonese is special-cased by model: "yue" only on the large-v3
-    family (see YUE_CAPABLE_MODEL_SIZES); base/small/medium get "zh"
-    (a written-Mandarin rewrite -- not Cantonese, but the best those
-    models can produce).
     """
     if language is None:
-        return None
+        return ""
     # Imported here: lute.tts.routes pulls in the flask app machinery,
     # which must not be loaded at module import time (this module is
     # imported from background threads and task contexts too).
@@ -172,46 +157,52 @@ def whisper_lang_code(language, model_size=None):
 
     custom = (getattr(language, "tts_lang", None) or "").strip()
     if custom:
-        code = custom.split("-")[0].lower() or None
-        is_cantonese = custom.lower().startswith("zh-hk")
-    else:
-        tag = LANG_NAME_TO_CODE.get(
-            (getattr(language, "name", "") or "").strip().lower()
-        )
-        code = tag.split("-")[0].lower() if tag else None
-        is_cantonese = tag == "zh-HK"
-
-    if is_cantonese:
-        return "yue" if model_size in YUE_CAPABLE_MODEL_SIZES else "zh"
-    return code
-
-
-def whisper_language_note(language, model_size):
-    """
-    A client-displayable warning for a language/model combination that
-    will transcribe poorly, or None when everything is fine.
-
-    Only Cantonese today: on a non-yue-capable model the transcription
-    comes back as a Mandarin rewrite, which silently tanks shadowing
-    scores -- the UIs say so up front instead.
-    """
-    if language is None or whisper_lang_code(language, model_size) != "zh":
-        return None
-    from lute.tts.routes import LANG_NAME_TO_CODE
-
-    custom = (getattr(language, "tts_lang", None) or "").strip()
-    is_cantonese = custom.lower().startswith("zh-hk") or (
+        return custom
+    return (
         LANG_NAME_TO_CODE.get(
             (getattr(language, "name", "") or "").strip().lower()
         )
-        == "zh-HK"
+        or ""
     )
-    if not is_cantonese:
+
+
+def whisper_lang_code(language):
+    """
+    Map a Language to a whisper language code ("ja", "zh", ...), or None
+    to let whisper auto-detect.
+
+    Cantonese (zh-HK) maps to "zh": the yue token in base/small/medium
+    tokenizers is untrained, so those models either produce English or
+    an empty transcription under language="yue"; "zh" at least returns
+    the written-Mandarin reading, which is the best whisper can do
+    here.  SenseVoice (see lute.book.sensevoice) is the yue-capable
+    engine and is preferred before this mapping ever runs.
+    """
+    tag = resolve_language_tag(language)
+    if not tag:
+        return None
+    return tag.split("-")[0].lower() or None
+
+
+def whisper_language_note(language):
+    """
+    A client-displayable warning for a language that whisper will
+    transcribe poorly, or None when everything is fine.
+
+    Only Cantonese today: whisper base/small/medium rewrite it as
+    Mandarin, which silently tanks shadowing scores.  This note only
+    surfaces when the SenseVoice engine is unavailable (elsewhere
+    Cantonese never reaches whisper).
+    """
+    if language is None or whisper_lang_code(language) != "zh":
+        return None
+    tag = resolve_language_tag(language)
+    if not tag.lower().startswith("zh-hk"):
         return None
     return (
-        f"Cantonese transcription needs the large-v3-turbo whisper "
-        f"model (current: {model_size}).  With this model Cantonese is "
-        f"transcribed as Mandarin, so scores will read low."
+        "Cantonese is transcribed as Mandarin (whisper cannot do "
+        "Cantonese, and the SenseVoice engine is not available on the "
+        "server), so scores will read low."
     )
 
 
@@ -383,17 +374,20 @@ def _safe_remove(path):
 
 
 def start_task(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    app, audio_path, lang_code, model_size, book_params, media_url=None, username=None
+    app, audio_path, language, model_size, book_params, media_url=None, username=None
 ):
     """
     Register and launch a background transcription task.
 
     audio_path is a temp file (already on disk); it is moved into the
     created book (small files) or deleted (large remote-streamed ones)
-    by the task itself.  book_params: {language_id, title, tags,
-    source_uri}.  username is the requesting user (multi-user mode);
-    the task thread re-enters that user's scope so its db access lands
-    on the user's own sqlite file.  Returns the task_id.
+    by the task itself.  language is the Language object; the task picks
+    the engine (SenseVoice where supported and available, whisper
+    otherwise) and derives the language code itself.  book_params:
+    {language_id, title, tags, source_uri}.  username is the requesting
+    user (multi-user mode); the task thread re-enters that user's scope
+    so its db access lands on the user's own sqlite file.  Returns the
+    task_id.
     """
     task_id = uuid.uuid4().hex
     _set_state(task_id, "queued", message="Queued.")
@@ -407,7 +401,7 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
             app,
             task_id,
             audio_path,
-            lang_code,
+            language,
             model_size,
             book_params,
             media_url,
@@ -420,7 +414,7 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
 
 
 def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    app, task_id, audio_path, lang_code, model_size, book_params, media_url, username
+    app, task_id, audio_path, language, model_size, book_params, media_url, username
 ):
     """
     Thread body: transcribe, then import the book.
@@ -439,17 +433,46 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
     try:
         with app.app_context(), mu_context.user_scope(username):
             try:
-                _set_state(
-                    task_id,
-                    "loading_model",
-                    message="Loading model (first run downloads ~500 MB).",
-                )
-                text, cues_json = transcribe_to_cues(
-                    audio_path,
-                    lang_code,
-                    model_size,
-                    progress_cb=lambda p: _set_state(task_id, "transcribing", percent=p),
-                )
+                # Engine choice: SenseVoice-Small is faster than whisper and
+                # the only engine trained on Cantonese; whisper covers the
+                # rest of the language roster and any SenseVoice outage.
+                from lute.book import sensevoice
+
+                sv_lang = sensevoice.lang_code_for(language)
+                if sv_lang is not None and sensevoice.available():
+                    _set_state(
+                        task_id,
+                        "loading_model",
+                        message=(
+                            "Preparing the SenseVoice model "
+                            "(first run downloads ~300 MB)."
+                        ),
+                    )
+                    sensevoice.ensure_model_downloaded()
+                    _set_state(task_id, "transcribing")
+                    text, cues_json = sensevoice.transcribe_to_cues(
+                        audio_path,
+                        sv_lang,
+                        progress_cb=lambda p: _set_state(
+                            task_id, "transcribing", percent=p
+                        ),
+                    )
+                else:
+                    lang_code = whisper_lang_code(language)
+                    _set_state(
+                        task_id,
+                        "loading_model",
+                        message="Loading model (first run downloads ~500 MB).",
+                    )
+                    _set_state(task_id, "transcribing")
+                    text, cues_json = transcribe_to_cues(
+                        audio_path,
+                        lang_code,
+                        model_size,
+                        progress_cb=lambda p: _set_state(
+                            task_id, "transcribing", percent=p
+                        ),
+                    )
                 if not (text and text.strip()):
                     raise RuntimeError("The transcription produced no text.")
 
@@ -473,13 +496,19 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
                     b.audio_source_path = audio_path
 
                 book = BookService().import_book(b, db.session)
-                _set_state(task_id, "finished", percent=100, book_id=book.id)
+                # The id must be read while the book is still
+                # session-bound; below, the session is gone.
+                book_id = book.id
             finally:
                 db.session.remove()
                 # The temp download has been copied into the book
                 # (success) or is no longer needed (failure).
                 _safe_remove(audio_path)
+            # Terminal states come last: a poller that sees one must also
+            # see the cleaned-up disk.
+            _set_state(task_id, "finished", percent=100, book_id=book_id)
     except Exception as e:  # pylint: disable=broad-except
+        logger.exception("whisper transcription task %s failed", task_id)
         _set_state(task_id, "error", error=str(e))
 
 
@@ -512,14 +541,16 @@ def start_model_download(app, model_size):
     Pre-download the selected model in the background so the first real
     transcription starts fast.  The download happens inside the
     WhisperModel constructor; on success the instance sits in
-    _MODEL_CACHE and is reused.  Returns the task_id.
+    _MODEL_CACHE and is reused.  "sensevoice" downloads the SenseVoice
+    model files instead.  Returns the task_id.
     """
     task_id = uuid.uuid4().hex
-    _set_state(
-        task_id,
-        "loading_model",
-        message=f"Downloading model '{model_size}' (hundreds of MB, one time only).",
+    message = (
+        "Downloading the SenseVoice model (~300 MB, one time only)."
+        if model_size == "sensevoice"
+        else f"Downloading model '{model_size}' (hundreds of MB, one time only)."
     )
+    _set_state(task_id, "loading_model", message=message)
     thread = threading.Thread(
         target=_run_model_download, args=(task_id, model_size), daemon=True
     )
@@ -529,7 +560,12 @@ def start_model_download(app, model_size):
 
 def _run_model_download(task_id, model_size):
     try:
-        _load_model(model_size)
+        if model_size == "sensevoice":
+            from lute.book import sensevoice
+
+            sensevoice.ensure_model_downloaded()
+        else:
+            _load_model(model_size)
         _set_state(task_id, "finished", percent=100)
     except Exception as e:  # pylint: disable=broad-except
         _set_state(
@@ -589,6 +625,10 @@ def delete_model(model_size):
     Remove a downloaded model from disk (and drop any loaded instance).
     Returns (ok, message).
     """
+    if model_size == "sensevoice":
+        from lute.book import sensevoice
+
+        return sensevoice.delete_model_files()
     if model_size not in _MODEL_REPOS:
         return False, "Unknown model size."
     with _MODEL_CACHE_LOCK:

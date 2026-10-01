@@ -5258,6 +5258,13 @@ span.word.shadow-miss {
     color: var(--s-text-2);
     font-size: 0.9em;
 }
+.shadowing-score__engine {
+    color: var(--s-text-3, var(--s-text-2));
+    font-size: 0.8em;
+    border: 1px solid var(--s-rule);
+    border-radius: 4px;
+    padding: 0 5px;
+}
 .shadowing-heard {
     background: var(--s-card);
     border: 1px solid var(--s-rule);

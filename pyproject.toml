@@ -129,6 +129,15 @@ whisper = [
   "faster-whisper>=1.0,<2",
   "av>=11,<15",
 ]
+# SenseVoice-Small (sherpa-onnx): the first-choice transcription engine
+# for zh/yue/en/ja/ko (faster than whisper small, and the only engine
+# trained on Cantonese); whisper covers the other languages.
+# opencc folds Traditional/Simplified Han for the shadowing diff
+# (SenseVoice emits simplified even for Cantonese book text).
+sensevoice = [
+  "sherpa-onnx>=1.10",
+  "opencc-python-reimplemented>=0.1.7",
+]
 
 [project.urls]
 Home = "https://github.com/luteorg/lute-v3"

@@ -725,6 +725,37 @@
           row.appendChild(del);
           modelsBox.appendChild(row);
         });
+        // SenseVoice (primary engine for zh/yue/en/ja/ko) management.
+        if (d.sensevoice) {
+          const sv = d.sensevoice;
+          const row = document.createElement('div');
+          row.style.marginTop = '8px';
+          const state = document.createElement('span');
+          let stateText = 'sensevoice (zh/yue/en/ja/ko · fastest) — ';
+          if (!sv.installed) stateText += 'sherpa-onnx package not installed';
+          else if (sv.cached) stateText += 'cached, ' + sv.size_mb + ' MB';
+          else stateText += 'not downloaded';
+          state.textContent = stateText;
+          row.appendChild(state);
+
+          const dl = document.createElement('button');
+          dl.className = 'btn btn-secondary';
+          dl.style.marginLeft = '8px';
+          dl.textContent = sv.cached ? 'Re-download' : 'Download';
+          dl.onclick = () => whisperDownload('sensevoice');
+
+          const del = document.createElement('button');
+          del.className = 'btn btn-danger';
+          del.style.marginLeft = '6px';
+          del.textContent = 'Delete';
+          del.disabled = !sv.cached;
+          del.title = 'Remove the model from disk to free space.';
+          del.onclick = () => whisperDelete('sensevoice');
+
+          row.appendChild(dl);
+          row.appendChild(del);
+          modelsBox.appendChild(row);
+        }
       })
       .catch(() => {
         document.getElementById('whisper_settings_status').textContent = 'Could not load Whisper status.';

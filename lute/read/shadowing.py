@@ -19,6 +19,7 @@ import uuid
 
 import jaconv
 
+from lute.book import sensevoice
 from lute.book.whisper_transcribe import (
     ALLOWED_MODEL_SIZES,
     DEFAULT_MODEL_SIZE,
@@ -154,16 +155,46 @@ def annotate_tokens(tokens, language):
     return out
 
 
+def _is_chinese_language(language):
+    "Mandarin, Cantonese, Classical Chinese -- anything whisper codes zh."
+    return whisper_lang_code(language) == "zh"
+
+
+_OPENCC_T2S = None
+_OPENCC_CHECKED = False
+
+
+def _simplified_converter():
+    """
+    A Traditional->Simplified Han converter, or None when opencc is not
+    installed.  SenseVoice emits simplified Chinese even for Cantonese,
+    while book text is often traditional; both diff sides are folded to
+    simplified so 天氣/天气, 係/系 etc. compare equal.
+    """
+    global _OPENCC_T2S, _OPENCC_CHECKED  # pylint: disable=global-statement
+    if not _OPENCC_CHECKED:
+        _OPENCC_CHECKED = True
+        try:
+            from opencc import OpenCC  # pylint: disable=import-error,import-outside-toplevel
+
+            _OPENCC_T2S = OpenCC("t2s")
+        except Exception:  # pylint: disable=broad-exception-caught
+            _OPENCC_T2S = None
+    return _OPENCC_T2S
+
+
 def _make_key_fn(language):
     """
     Return token -> comparable diff key, with the parser resolved once.
 
     Japanese compares kana readings, so 良い read as いい still matches;
-    everything else compares lowercased surface forms.  When no reading
-    is available (e.g. the japanese_reading setting is unset) the
-    surface form is used as-is.
+    Chinese languages fold both sides to simplified Han (see
+    _simplified_converter); everything else compares lowercased surface
+    forms.  When no reading is available (e.g. the japanese_reading
+    setting is unset) the surface form is used as-is.
     """
     parser = language.parser
+    t2s = _simplified_converter() if _is_chinese_language(language) else None
 
     def key(token):
         token = _clean_token(token)
@@ -177,9 +208,10 @@ def _make_key_fn(language):
             if reading:
                 return jaconv.kata2hira(reading.strip())
         try:
-            return parser.get_lowercase(token)
+            out = parser.get_lowercase(token)
         except Exception:  # pylint: disable=broad-exception-caught
-            return token.lower()
+            out = token.lower()
+        return t2s.convert(out) if t2s is not None else out
 
     return key
 
@@ -356,20 +388,39 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
             # dwarf the transcription itself, and the reading page says
             # which one it is waiting on.  On a warm cache this is a
             # dictionary lookup and the state flips immediately.
-            _set_task(task_id, "loading_model")
-            try:
-                _load_model(model_size)
-            except Exception as e:  # pylint: disable=broad-exception-caught
-                raise RuntimeError(
-                    f"could not load the whisper model '{model_size}': {e}  "
-                    "(If this was a network timeout downloading the model, set "
-                    "HF_ENDPOINT=https://hf-mirror.com in the server environment "
-                    "and retry.)"
-                ) from e
-            _set_task(task_id, "transcribing")
-            text, duration = transcribe_clip(
-                audio_path, whisper_lang_code(lang, model_size), model_size
-            )
+            #
+            # Engine choice: SenseVoice-Small is the primary engine for
+            # zh/yue/en/ja/ko (faster than whisper, and the only engine
+            # trained on Cantonese); whisper covers the other languages
+            # and any SenseVoice outage.
+            sv_lang = sensevoice.lang_code_for(lang)
+            if sv_lang is not None and sensevoice.available():
+                engine = "sensevoice"
+                _set_task(task_id, "loading_model")
+                try:
+                    sensevoice.ensure_model_downloaded()
+                except Exception as e:  # pylint: disable=broad-exception-caught
+                    raise RuntimeError(
+                        f"could not download the SenseVoice model: {e}"
+                    ) from e
+                _set_task(task_id, "transcribing")
+                text, duration = sensevoice.transcribe_clip(audio_path, sv_lang)
+            else:
+                engine = "whisper"
+                _set_task(task_id, "loading_model")
+                try:
+                    _load_model(model_size)
+                except Exception as e:  # pylint: disable=broad-exception-caught
+                    raise RuntimeError(
+                        f"could not load the whisper model '{model_size}': {e}  "
+                        "(If this was a network timeout downloading the model, set "
+                        "HF_ENDPOINT=https://hf-mirror.com in the server environment "
+                        "and retry.)"
+                    ) from e
+                _set_task(task_id, "transcribing")
+                text, duration = transcribe_clip(
+                    audio_path, whisper_lang_code(lang), model_size
+                )
             if not (text or "").strip():
                 raise RuntimeError("no speech detected in the recording")
             spoken_tokens = _spoken_tokens(text, lang)
@@ -381,10 +432,15 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
                 rate = round(comparison["spoken_count"] / (duration / 60.0), 1)
             result = {
                 "transcription": text,
-                # Client-displayable warning for a model/language combo
-                # that transcribes poorly (Cantonese on a non-yue model
-                # comes back as Mandarin); None most of the time.
-                "language_note": whisper_language_note(lang, model_size),
+                # Which engine produced the transcription ("sensevoice"
+                # or "whisper") -- diagnostic, not scored.
+                "engine": engine,
+                # Client-displayable warning for a language the chosen
+                # engine transcribes poorly (Cantonese via whisper comes
+                # back as Mandarin); None most of the time.
+                "language_note": (
+                    whisper_language_note(lang) if engine == "whisper" else None
+                ),
                 # The "heard" sentence, tokenised and annotated with
                 # furigana readings so the panel can render and pronounce
                 # it word by word (same as the original sentence).
