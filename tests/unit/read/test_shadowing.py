@@ -14,13 +14,20 @@ from unittest.mock import patch
 
 import pytest
 
+from lute.book import sensevoice
 from lute.read import shadowing
 
 
 @pytest.fixture(autouse=True)
 def _no_real_model_load():
-    "Never load a real faster-whisper model: the task loads it up front."
-    with patch.object(shadowing, "_load_model", return_value=object()):
+    """
+    Never load a real model: tasks load them up front.  SenseVoice is
+    also disabled by default (no sherpa-onnx/model files on CI); tests
+    covering that path override it.
+    """
+    with patch.object(shadowing, "_load_model", return_value=object()), patch.object(
+        sensevoice, "available", return_value=False
+    ):
         yield
 
 
@@ -370,6 +377,9 @@ def test_route_scores_recording(app, app_context, client, english):
     assert status["state"] == "finished"
     body = status["result"]
     assert body["transcription"] == "The calm cat."
+    # English has SenseVoice files unavailable in the test env: whisper ran.
+    assert body["engine"] == "whisper"
+    assert body["language_note"] is None
     # The heard sentence is annotated token-by-token for the panel's
     # furigana + click-to-pronounce rendering (no readings for English).
     assert body["transcription_tokens"] == [
@@ -393,6 +403,76 @@ def test_status_endpoint_reports_unknown(app, client):
     resp = client.get("/read/shadowing/status/not-a-task")
     assert resp.status_code == 200
     assert resp.get_json()["state"] == "unknown"
+
+
+def test_route_uses_sensevoice_when_available(app, app_context, client, english):
+    "A supported language transcribes via SenseVoice when it is ready."
+
+    def _fake_sv(audio_path, lang_code):
+        assert lang_code == "en"
+        return "The calm cat.", 6.0
+
+    with patch.object(shadowing, "whisper_status", return_value={"installed": True}), patch.object(
+        sensevoice, "available", return_value=True
+    ), patch.object(
+        sensevoice, "ensure_model_downloaded"
+    ), patch.object(sensevoice, "transcribe_clip", side_effect=_fake_sv):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(english.id),
+                "tokens": json.dumps(["The", "calm", "cat"]),
+                "audio": (io.BytesIO(b"fake webm bytes"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        status = _wait_for_task(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    body = status["result"]
+    assert body["engine"] == "sensevoice"
+    assert body["transcription"] == "The calm cat."
+    assert body["language_note"] is None
+    assert body["score"] == 100
+
+
+def test_route_chinese_matches_across_simplified_traditional(app, app_context, client):
+    """
+    SenseVoice emits simplified Han even for Cantonese; the diff folds
+    both sides so 天氣/天气 (and 係/系) compare equal.
+    """
+    try:
+        from opencc import OpenCC  # noqa: F401
+    except ImportError:
+        pytest.skip("opencc not installed")
+
+    class _ZhParser:
+        def get_lowercase(self, text):
+            return text.lower()
+
+    class _ZhLanguage:
+        parser_type = "spacedel"
+        tts_lang = "zh-HK"
+        spoken_tokens = ["今天", "天氣", "好好"]
+
+        def __init__(self):
+            self._parser = _ZhParser()
+
+        @property
+        def parser(self):
+            return self._parser
+
+        def get_parsed_tokens(self, _text):
+            return [
+                type("T", (), {"token": t, "is_word": True})()
+                for t in self.spoken_tokens
+            ]
+
+    lang = _ZhLanguage()
+    res = shadowing.compare_tokens(["今天", "天氣", "好好"], "今天天气好好", lang)
+    assert res["statuses"] == [2, 2, 2]
+    assert res["score"] == 100
 
 
 # ---------------------------------------------------------------------

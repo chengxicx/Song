@@ -361,9 +361,7 @@ function shadowingGetModel() {
     m = localStorage.getItem(SHADOWING_MODEL_KEY);
   } catch (_) {}
   return (
-    ["base", "small", "medium", "large-v3-turbo"].indexOf(m) !== -1
-      ? m
-      : "small"
+    ["base", "small", "medium"].indexOf(m) !== -1 ? m : "small"
   );
 }
 
@@ -382,7 +380,6 @@ function shadowingOpenPanel() {
     '<option value="base">base · fastest</option>' +
     '<option value="small">small · balanced</option>' +
     '<option value="medium">medium · slowest</option>' +
-    '<option value="large-v3-turbo">large-v3-turbo · Cantonese (粤语)</option>' +
     "</select>" +
     '<button type="button" class="shadowing-panel__close" aria-label="Close">&times;</button>' +
     "</div>" +
@@ -664,9 +661,12 @@ function shadowingRenderResult(unit, data) {
       data.duration +
       "s</span>";
   }
+  if (data.engine === "sensevoice") {
+    html += '<span class="shadowing-score__engine">SenseVoice</span>';
+  }
   html += "</div>";
-  // Server-side warning for a model/language combo that transcribes
-  // poorly (Cantonese on a non-yue model comes back as Mandarin).
+  // Server-side warning for a language the chosen engine transcribes
+  // poorly (Cantonese via whisper comes back as Mandarin).
   if (data.language_note) {
     html +=
       '<div class="shadowing-result__hint">' +
