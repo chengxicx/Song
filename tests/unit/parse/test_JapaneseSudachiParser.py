@@ -110,6 +110,39 @@ def test_context_readings_follow_the_sentence(app_context):
     assert ("、", None) in morphs
 
 
+def test_context_readings_use_the_local_window_not_the_whole_sentence(app_context):
+    """
+    A morpheme's reading is settled from the window it forms with its
+    immediate neighbours, not from the whole sentence: read as part of
+    広い宇宙の、数ある一つ sudachi returns 数=スウ, while the same
+    morphemes in a shorter window give the correct カズ.  This is the
+    bug the shadowing panel showed as すう above 数 in 数ある.
+    """
+    current_settings()["japanese_reading"] = "hiragana"
+    p = _make_parser()
+
+    morphs = p.get_context_readings("広い宇宙の、数ある一つ")
+    assert ("数", "かず") in morphs
+
+
+def test_context_readings_keep_a_compound_together(app_context):
+    """
+    The window keeps the left neighbour, so a kanji that only reads the
+    way it does because of the morpheme before it is not broken: 杯 is
+    ばい in 一杯 (but さかずき alone) and 日 is にち in 一日 (but ひ
+    alone).  Dropping the left neighbour is what would turn these into
+    the standalone readings.
+    """
+    current_settings()["japanese_reading"] = "hiragana"
+    p = _make_parser()
+
+    assert p.get_reading("杯") == "さかずき"
+    assert p.get_reading("日") == "ひ"
+
+    assert ("杯", "ばい") in p.get_context_readings("一杯のコーヒー")
+    assert ("日", "にち") in p.get_context_readings("一日が長かった")
+
+
 def test_context_readings_need_the_reading_setting(app_context):
     "No japanese_reading setting means no furigana to give."
     current_settings()["japanese_reading"] = ""
