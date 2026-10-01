@@ -95,6 +95,53 @@ def _has_word_chars(token):
     return any(ch.isalnum() for ch in token)
 
 
+def _spoken_tokens(spoken_text, language):
+    """
+    The word tokens of a transcription, in spoken order.
+
+    Shared by the diff (which aligns them against the sentence's own
+    tokens) and by the furigana annotation of the "heard" sentence, so
+    both see exactly the same token space.
+    """
+    return [
+        s
+        for s in (
+            _clean_token(pt.token)
+            for pt in language.get_parsed_tokens(spoken_text or "")
+            if pt.is_word
+        )
+        if s and _has_word_chars(s)
+    ]
+
+
+def annotate_tokens(tokens, language):
+    """
+    Pair each token with its kana reading for the shadowing panel.
+
+    Returns [{"text": surface, "reading": kana-or-None}, ...], parallel to
+    the input.  The panel draws the reading above the word (furigana) and
+    speaks it when the word is tapped; readings come from the language's
+    own parser, the same source term lookups use.  Non-Japanese languages
+    (and the japanese_reading setting being off) yield reading=None, so
+    the panel simply shows the plain word.
+    """
+    if not is_japanese_language(language):
+        return [{"text": _clean_token(t), "reading": None} for t in tokens]
+
+    parser = language.parser
+    out = []
+    for t in tokens:
+        text = _clean_token(t)
+        reading = None
+        if text:
+            try:
+                reading = parser.get_reading(text)
+            except Exception:  # pylint: disable=broad-exception-caught
+                reading = None
+        out.append({"text": text, "reading": (reading or "").strip() or None})
+    return out
+
+
 def _make_key_fn(language):
     """
     Return token -> comparable diff key, with the parser resolved once.
@@ -125,13 +172,16 @@ def _make_key_fn(language):
     return key
 
 
-def compare_tokens(original_tokens, spoken_text, language):
+def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
     """
     Diff the user's transcription against the sentence's word tokens.
 
     original_tokens: the sentence's word spans' data-text, in DOM order
       (the ground truth the verdict indexes are aligned against).
     spoken_text: raw whisper transcription of the user's recording.
+    spoken_tokens: optional pre-parsed transcription tokens (from
+      _spoken_tokens); the caller may already have them for the furigana
+      annotation and re-parsing would only repeat the parser work.
 
     Returns {
       "statuses": [STATUS_* per original token],
@@ -158,15 +208,11 @@ def compare_tokens(original_tokens, spoken_text, language):
     }
 
     key_of = _make_key_fn(language)
-    spoken = [
-        s
-        for s in (
-            _clean_token(pt.token)
-            for pt in language.get_parsed_tokens(spoken_text or "")
-            if pt.is_word
-        )
-        if s and _has_word_chars(s)
-    ]
+    spoken = (
+        spoken_tokens
+        if spoken_tokens is not None
+        else _spoken_tokens(spoken_text, language)
+    )
     result["spoken_count"] = len(spoken)
 
     if not original_tokens:
@@ -314,12 +360,19 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
             )
             if not (text or "").strip():
                 raise RuntimeError("no speech detected in the recording")
-            comparison = compare_tokens(tokens, text, lang)
+            spoken_tokens = _spoken_tokens(text, lang)
+            comparison = compare_tokens(
+                tokens, text, lang, spoken_tokens=spoken_tokens
+            )
             rate = None
             if duration and duration > 0:
                 rate = round(comparison["spoken_count"] / (duration / 60.0), 1)
             result = {
                 "transcription": text,
+                # The "heard" sentence, tokenised and annotated with
+                # furigana readings so the panel can render and pronounce
+                # it word by word (same as the original sentence).
+                "transcription_tokens": annotate_tokens(spoken_tokens, lang),
                 "statuses": comparison["statuses"],
                 "spoken_for_fuzzy": {
                     str(k): v

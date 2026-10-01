@@ -187,6 +187,33 @@ function shadowingSetUnit(unit) {
   shadowingUnit = unit;
   shadowingRenderCurrent();
   shadowingRenderResultIdle();
+  shadowingLoadReadings(unit);
+}
+
+// Ask the server for the sentence's kana readings so the panel can draw
+// furigana above the kanji.  Cheap and synchronous server-side (no audio,
+// no model); the panel renders plain words first and swaps in the ruby
+// when the answer lands.  A stale response (the cue moved on) is dropped.
+function shadowingLoadReadings(unit) {
+  if (!unit || !unit.langId || !unit.texts.length) return;
+  fetch("/read/shadowing/readings", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      language_id: parseInt(unit.langId, 10) || 0,
+      tokens: unit.texts,
+    }),
+  })
+    .then(function (resp) {
+      return resp.ok ? resp.json() : null;
+    })
+    .then(function (data) {
+      if (!data || !Array.isArray(data.tokens)) return;
+      if (unit !== shadowingUnit) return; // the cue already moved on
+      unit.readings = data.tokens;
+      shadowingRenderCurrent();
+    })
+    .catch(function () {});
 }
 
 /* ------------------------------------------------------------------
@@ -403,6 +430,10 @@ function shadowingOpenPanel() {
     document.body.appendChild(panel);
   }
 
+  // One delegated listener: every word token in the panel (practised
+  // sentence and "heard" sentence alike) pronounces itself on click.
+  panel.addEventListener("click", shadowingOnPanelClick);
+
   const sel = panel.querySelector("#shadowing-model");
   sel.value = shadowingGetModel();
   sel.addEventListener("change", function () {
@@ -466,6 +497,36 @@ function shadowingPrepareEngine() {
  * 6. Panel rendering
  * ------------------------------------------------------------------ */
 
+// One word of the panel, as a clickable token: the reading (when the
+// language supplies one) sits above the word as ruby furigana, and a tap
+// pronounces it.  data-speak / data-reading feed the click handler so it
+// works the same for the sentence's own words and for the "heard" ones.
+// Only kana counts as furigana: with the "pronunciation characters"
+// setting on romaji the reading comes back in Latin letters, which is not
+// something to hang above the kanji -- show the plain word then.
+function shadowingKanaReading(reading) {
+  const r = (reading || "").trim();
+  return /[\u3040-\u309F\u30A0-\u30FF]/.test(r) ? r : "";
+}
+
+function shadowingTokenHtml(text, reading, idx, cls) {
+  reading = shadowingKanaReading(reading);
+  const inner = reading
+    ? "<ruby>" +
+      shadowingEscapeHtml(text) +
+      "<rt>" +
+      shadowingEscapeHtml(reading) +
+      "</rt></ruby>"
+    : shadowingEscapeHtml(text);
+  let attrs = ' class="' + (cls || "shadow-tok") + '"';
+  attrs += ' data-speak="' + shadowingEscapeHtml(text) + '"';
+  if (reading) attrs += ' data-reading="' + shadowingEscapeHtml(reading) + '"';
+  if (idx != null) attrs += ' data-idx="' + idx + '"';
+  return (
+    "<span" + attrs + ' title="Click to hear this word">' + inner + "</span>"
+  );
+}
+
 function shadowingRenderCurrent() {
   const box = document.getElementById("shadowing-current");
   if (!box) return;
@@ -474,15 +535,36 @@ function shadowingRenderCurrent() {
       '<div class="shadowing-panel__state">Play the player, or pick a sentence with the arrows below.</div>';
     return;
   }
+  const readings = shadowingUnit.readings || [];
   box.innerHTML = shadowingUnit.texts
     .map(function (t, i) {
-      return (
-        '<span class="shadow-tok" data-idx="' + i + '">' +
-        shadowingEscapeHtml(t) +
-        "</span>"
-      );
+      const r = readings[i] ? readings[i].reading : null;
+      return shadowingTokenHtml(t, r, i, "shadow-tok");
     })
     .join(" ");
+}
+
+// Speak one word of the panel.  The annotated kana reading is preferred
+// when it exists (kanji whose TTS guess is wrong then sounds right);
+// otherwise the word itself is spoken.  Fallback for pages without
+// tts.js's term-aware speaker is the plain reader.
+function shadowingSpeakToken(tok) {
+  const text = tok.getAttribute("data-speak") || "";
+  if (!text) return;
+  const reading = tok.getAttribute("data-reading") || "";
+  if (typeof window.luteTtsSpeakTerm === "function") {
+    window.luteTtsSpeakTerm(text, reading, null);
+  } else if (typeof speakText === "function") {
+    speakText(text);
+  }
+}
+
+function shadowingOnPanelClick(e) {
+  const tok =
+    e.target && e.target.closest
+      ? e.target.closest(".shadow-tok, .shadow-heard-tok")
+      : null;
+  if (tok) shadowingSpeakToken(tok);
 }
 
 function shadowingRenderResultIdle() {
@@ -578,10 +660,26 @@ function shadowingRenderResult(unit, data) {
       "s</span>";
   }
   html += "</div>";
-  html +=
-    '<div class="shadowing-heard">' +
-    shadowingEscapeHtml(data.transcription || "—") +
-    "</div>";
+  // The "heard" sentence: word tokens with furigana when the server could
+  // annotate them (the same treatment as the practised sentence), the raw
+  // transcription as a fallback.
+  const heard = data.transcription_tokens || [];
+  let heardHtml;
+  if (heard.length) {
+    heardHtml = heard
+      .map(function (t) {
+        return shadowingTokenHtml(
+          t.text || "",
+          t.reading || null,
+          null,
+          "shadow-heard-tok"
+        );
+      })
+      .join(" ");
+  } else {
+    heardHtml = shadowingEscapeHtml(data.transcription || "—");
+  }
+  html += '<div class="shadowing-heard">' + heardHtml + "</div>";
   if (extras.length) {
     html +=
       '<div class="shadowing-extras"><span class="shadowing-extras__label">Also heard</span> ' +
