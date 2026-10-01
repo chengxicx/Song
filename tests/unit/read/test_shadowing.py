@@ -134,6 +134,53 @@ def test_replace_below_ratio_is_miss():
     assert res["spoken_for_fuzzy"] == {}
 
 
+def test_split_spoken_tokens_join_to_a_match():
+    """
+    Tokenization drift, not a misread: the page's term 見たい comes back
+    as the parser's 見 + たい.  The exact join of the spoken keys is the
+    original's key, so the word is a match and there is no bogus extra.
+    """
+    lang = _FakeLanguage(
+        ["そう", "です", "か", "日本", "の", "桜", "が", "見", "たい", "です", "ね"],
+        parser_type="japanese",
+        readings={"見たい": "みたい", "見": "み", "たい": "たい"},
+    )
+    res = shadowing.compare_tokens(
+        ["そう", "です", "か", "日本", "の", "桜", "が", "見たい", "です", "ね"],
+        "そう です か 日本 の 桜 が 見たい です ね",
+        lang,
+    )
+    assert res["statuses"] == [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+    assert res["extras"] == []
+    assert res["score"] == 100
+
+
+def test_merged_spoken_token_splits_to_a_match():
+    "Mirror drift: two page terms come back as one parser token."
+    lang = _FakeLanguage(["the", "calmcat"], readings={})
+    res = shadowing.compare_tokens(["The", "calm", "cat"], "the calmcat", lang)
+    assert res["statuses"] == [2, 2, 2]
+    assert res["extras"] == []
+    assert res["score"] == 100
+
+
+def test_voicing_swap_is_fuzzy_not_miss():
+    "か heard as が is the classic ASR voicing swap: half credit."
+    lang = _FakeLanguage(["そう", "です", "が"], parser_type="japanese")
+    res = shadowing.compare_tokens(["そう", "です", "か"], "そう です が", lang)
+    assert res["statuses"] == [2, 2, 1]
+    assert res["spoken_for_fuzzy"] == {2: "が"}
+    assert res["score"] == 83
+
+
+def test_voicing_swap_never_rescues_unrelated_words():
+    "Stripping dakuten must not make genuinely different words match."
+    lang = _FakeLanguage(["cat"], parser_type="japanese")
+    res = shadowing.compare_tokens(["dog"], "cat", lang)
+    assert res["statuses"] == [0]
+    assert res["score"] == 0
+
+
 def test_extra_spoken_words():
     lang = _FakeLanguage(["the", "very", "calm", "cat"])
     res = shadowing.compare_tokens(["The", "calm", "cat"], "the very calm cat", lang)
