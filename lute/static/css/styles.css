@@ -5010,14 +5010,19 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
    underline-only (the words' learning-status background colours
    stay untouched).
    ============================================================== */
-/* Verdict marks on the reading text: underline / border only. */
-span.word.shadow-ok {
+/* Verdict marks on the reading text: underline / border only.  Also
+   painted on non-word textitems (e.g. "100%" on a page whose word
+   characters exclude digits). */
+span.word.shadow-ok,
+span.textitem.shadow-ok {
     border-bottom: 2px solid rgba(55, 178, 77, 0.75);
 }
-span.word.shadow-fuzzy {
+span.word.shadow-fuzzy,
+span.textitem.shadow-fuzzy {
     border-bottom: 2px dashed rgba(240, 140, 0, 0.85);
 }
-span.word.shadow-miss {
+span.word.shadow-miss,
+span.textitem.shadow-miss {
     text-decoration-line: underline;
     text-decoration-style: wavy;
     text-decoration-color: rgba(224, 49, 49, 0.8);
