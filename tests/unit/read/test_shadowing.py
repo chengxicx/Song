@@ -209,6 +209,50 @@ def test_empty_original_tokens_returns_neutral_result():
     assert res["spoken_count"] == 1
 
 
+def test_compare_tokens_accepts_preparsed_spoken_tokens():
+    "The caller's already-parsed tokens are reused instead of re-parsing."
+    lang = _FakeLanguage(["the", "cat"])
+    res = shadowing.compare_tokens(
+        ["The", "cat"], "the cat", lang, spoken_tokens=["the", "cat"]
+    )
+    assert res["statuses"] == [2, 2]
+    assert res["score"] == 100
+
+
+# ---------------------------------------------------------------------
+# Furigana annotation
+# ---------------------------------------------------------------------
+
+
+def test_annotate_tokens_japanese_includes_readings():
+    lang = _FakeLanguage(
+        [],
+        parser_type="japanese",
+        readings={"天気": "てんき", "良い": "いい"},
+    )
+    annotated = shadowing.annotate_tokens(["天気", "は", "良い"], lang)
+    assert annotated == [
+        {"text": "天気", "reading": "てんき"},
+        {"text": "は", "reading": None},
+        {"text": "良い", "reading": "いい"},
+    ]
+
+
+def test_annotate_tokens_non_japanese_has_no_readings():
+    lang = _FakeLanguage([], readings={"Where": "どこ"})
+    annotated = shadowing.annotate_tokens(["Where", "are"], lang)
+    assert annotated == [
+        {"text": "Where", "reading": None},
+        {"text": "are", "reading": None},
+    ]
+
+
+def test_annotate_tokens_strips_zws_from_text():
+    lang = _FakeLanguage([], parser_type="japanese", readings={})
+    annotated = shadowing.annotate_tokens(["ca\u200Bt"], lang)
+    assert annotated == [{"text": "cat", "reading": None}]
+
+
 # ---------------------------------------------------------------------
 # transcribe_clip (fake model; faster-whisper is never imported)
 # ---------------------------------------------------------------------
@@ -326,6 +370,13 @@ def test_route_scores_recording(app, app_context, client, english):
     assert status["state"] == "finished"
     body = status["result"]
     assert body["transcription"] == "The calm cat."
+    # The heard sentence is annotated token-by-token for the panel's
+    # furigana + click-to-pronounce rendering (no readings for English).
+    assert body["transcription_tokens"] == [
+        {"text": "The", "reading": None},
+        {"text": "calm", "reading": None},
+        {"text": "cat", "reading": None},
+    ]
     assert body["statuses"] == [2, 2, 2]
     assert body["score"] == 100
     assert body["duration"] == 6.0
@@ -342,6 +393,41 @@ def test_status_endpoint_reports_unknown(app, client):
     resp = client.get("/read/shadowing/status/not-a-task")
     assert resp.status_code == 200
     assert resp.get_json()["state"] == "unknown"
+
+
+# ---------------------------------------------------------------------
+# Furigana readings route
+# ---------------------------------------------------------------------
+
+
+def test_readings_route_returns_parallel_tokens(app, client, english):
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={"language_id": english.id, "tokens": ["The", "calm", "cat"]},
+    )
+    assert resp.status_code == 200
+    assert resp.get_json()["tokens"] == [
+        {"text": "The", "reading": None},
+        {"text": "calm", "reading": None},
+        {"text": "cat", "reading": None},
+    ]
+
+
+def test_readings_route_rejects_bad_tokens(app, client, english):
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={"language_id": english.id, "tokens": "nope"},
+    )
+    assert resp.status_code == 400
+    assert "tokens" in resp.get_json()["error"]
+
+
+def test_readings_route_requires_language(app, client):
+    resp = client.post(
+        "/read/shadowing/readings", json={"tokens": ["a"]}
+    )
+    assert resp.status_code == 400
+    assert "language" in resp.get_json()["error"]
 
 
 def test_route_unknown_model_falls_back_to_default(app, app_context, client, english):
