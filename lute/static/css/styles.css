@@ -5148,6 +5148,27 @@ span.word.shadow-miss {
     font-size: 0.6em;
     margin-left: 2px;
 }
+/* Every word in the panel is a click-to-hear button: the reading (when
+   the language has one) rides above the word as ruby furigana. */
+.shadow-tok,
+.shadow-heard-tok {
+    cursor: pointer;
+}
+.shadow-heard-tok {
+    border-radius: 4px;
+    padding: 0 1px;
+}
+.shadow-tok rt,
+.shadow-heard-tok rt {
+    font-size: 0.5em;
+    line-height: 1.15;
+    font-weight: 400;
+    color: var(--s-text-2);
+}
+.shadow-tok:hover,
+.shadow-heard-tok:hover {
+    background: rgba(127, 127, 127, 0.16);
+}
 
 .shadowing-controls {
     display: flex;
@@ -5242,7 +5263,8 @@ span.word.shadow-miss {
     border: 1px solid var(--s-rule);
     border-radius: 8px;
     padding: 8px 10px;
-    line-height: 1.6;
+    /* Roomy enough for the furigana row above each word. */
+    line-height: 2.1;
     word-break: break-word;
 }
 .shadowing-heard::before {
