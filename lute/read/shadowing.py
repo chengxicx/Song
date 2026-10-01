@@ -183,6 +183,24 @@ def _simplified_converter():
     return _OPENCC_T2S
 
 
+# Unvoiced base of each voiced kana.  ASR very commonly swaps voicing
+# on weak syllables (そうですか heard as そうです が); a key pair that
+# matches once the dakuten/handakuten marks are stripped is a near-miss
+# (fuzzy), not a complete mismatch (miss).
+_DAKUTEN_BASE = {
+    "が": "か", "ぎ": "き", "ぐ": "く", "げ": "け", "ご": "こ",
+    "ざ": "さ", "じ": "し", "ず": "す", "ぜ": "せ", "ぞ": "そ",
+    "だ": "た", "ぢ": "ち", "づ": "つ", "で": "て", "ど": "と",
+    "ば": "は", "び": "ひ", "ぶ": "ふ", "べ": "へ", "ぼ": "ほ",
+    "ぱ": "は", "ぴ": "ひ", "ぷ": "ふ", "ぺ": "へ", "ぽ": "ほ",
+    "ゔ": "う",
+}
+
+
+def _strip_dakuten(key):
+    return "".join(_DAKUTEN_BASE.get(ch, ch) for ch in key)
+
+
 def _make_key_fn(language):
     """
     Return token -> comparable diff key, with the parser resolved once.
@@ -252,6 +270,7 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
     }
 
     key_of = _make_key_fn(language)
+    is_japanese = is_japanese_language(language)
     spoken = (
         spoken_tokens
         if spoken_tokens is not None
@@ -279,12 +298,40 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
     result["total"] = len(keyed)
 
     def align_replace(i1, i2, j1, j2):
-        "Pair a replace block positionally; near-matches become misreads."
+        """
+        Pair a replace block positionally; near-matches become misreads.
+
+        Before the positional pairing, absorb tokenization drift: a word
+        spoken correctly can come back split or merged (the page's term
+        見たい vs the parser's 見 + たい), which positional pairing alone
+        scores as a miss plus a bogus extra.  When one side of the block
+        is a single token and exactly the join of the other side's keys,
+        the word was said right.
+        """
+        if i2 - i1 == 1 and j2 - j1 > 1 and keyed[i1] == "".join(
+            spoken_keys[j1:j2]
+        ):
+            statuses[scored[i1]] = STATUS_MATCH
+            return
+        if j2 - j1 == 1 and i2 - i1 > 1 and spoken_keys[j1] == "".join(
+            keyed[i1:i2]
+        ):
+            for k in range(i1, i2):
+                statuses[scored[k]] = STATUS_MATCH
+            return
+
         n = min(i2 - i1, j2 - j1)
         for k in range(n):
-            ratio = difflib.SequenceMatcher(
-                None, keyed[i1 + k], spoken_keys[j1 + k]
-            ).ratio()
+            okey, skey = keyed[i1 + k], spoken_keys[j1 + k]
+            ratio = difflib.SequenceMatcher(None, okey, skey).ratio()
+            if ratio < FUZZY_MATCH_RATIO and is_japanese:
+                # Voicing is the one difference a ratio of 0 hides:
+                # か heard as が is a near-miss, not a different word.
+                voiced = difflib.SequenceMatcher(
+                    None, _strip_dakuten(okey), _strip_dakuten(skey)
+                ).ratio()
+                if voiced >= FUZZY_MATCH_RATIO:
+                    ratio = voiced
             if ratio >= FUZZY_MATCH_RATIO:
                 orig_index = scored[i1 + k]
                 statuses[orig_index] = STATUS_FUZZY
