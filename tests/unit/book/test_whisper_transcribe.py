@@ -16,10 +16,21 @@ from unittest.mock import patch
 import pytest
 
 from lute.db import db
-from lute.book import whisper_transcribe
+from lute.book import sensevoice, whisper_transcribe
 from lute.models.repositories import BookRepository
 
 # pylint: disable=protected-access
+
+
+@pytest.fixture(autouse=True)
+def _sensevoice_unavailable():
+    """
+    Default tests to the whisper engine: the SenseVoice path needs the
+    sherpa-onnx package plus downloaded model files, which no CI box
+    has.  Tests that exercise the SenseVoice path override this.
+    """
+    with patch.object(sensevoice, "available", return_value=False):
+        yield
 
 
 # ---------------------------------------------------------------------
@@ -45,7 +56,9 @@ def test_lang_code_mapping(app_context):
     tts_lang is reduced to a bare ISO code; when tts_lang is unset the
     language name is looked up in the TTS name table (Japanese/Korean
     ship without a tts_lang and must not fall through to whisper's
-    auto-detect, which misfires on short shadowing takes).
+    auto-detect, which misfires on short shadowing takes).  Cantonese
+    maps to "zh": the yue token in the smaller whisper models is
+    untrained, so Cantonese is served by SenseVoice instead.
     """
 
     class _Lang:
@@ -61,14 +74,7 @@ def test_lang_code_mapping(app_context):
     class _Cantonese:
         tts_lang = "zh-HK"
 
-    # yue only on the large-v3 family; smaller models get the Mandarin
-    # rewrite (the yue token exists but is untrained there).
     assert whisper_transcribe.whisper_lang_code(_Cantonese()) == "zh"
-    assert whisper_transcribe.whisper_lang_code(_Cantonese(), "small") == "zh"
-    assert (
-        whisper_transcribe.whisper_lang_code(_Cantonese(), "large-v3-turbo")
-        == "yue"
-    )
 
     class _ByName:
         tts_lang = None
@@ -87,22 +93,12 @@ def test_lang_code_mapping(app_context):
         name = "Cantonese Chinese"
 
     assert whisper_transcribe.whisper_lang_code(_CantoneseByName()) == "zh"
-    assert (
-        whisper_transcribe.whisper_lang_code(
-            _CantoneseByName(), "large-v3-turbo"
-        )
-        == "yue"
-    )
 
-    # Cantonese on a non-yue model is surfaced as a client hint.
-    assert whisper_transcribe.whisper_language_note(_Cantonese(), "small")
-    assert (
-        whisper_transcribe.whisper_language_note(
-            _Cantonese(), "large-v3-turbo"
-        )
-        is None
-    )
-    assert whisper_transcribe.whisper_language_note(_ByName(), "small") is None
+    # Cantonese via whisper is surfaced as a client hint (the SenseVoice
+    # engine is the Cantonese-capable path and never shows this).
+    assert whisper_transcribe.whisper_language_note(_Cantonese())
+    assert whisper_transcribe.whisper_language_note(_CantoneseByName())
+    assert whisper_transcribe.whisper_language_note(_ByName()) is None
 
     # Unknown name: auto-detect, never the TTS table's "en" default.
     class _Unknown:
@@ -211,6 +207,61 @@ def test_download_model_completes(app, app_context, client):
         status = _wait_for_terminal(task_id)
     assert status["state"] == "finished"
     fake_load.assert_called_once_with("small")
+
+
+def test_download_sensevoice_model_completes(app, app_context, client):
+    """
+    The SenseVoice download bypasses the faster-whisper install check
+    (the model files are independent of that package).
+    """
+    with patch.object(sensevoice, "ensure_model_downloaded") as fake_dl, patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": False}
+    ):
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "sensevoice"}
+        )
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+    assert status["state"] == "finished"
+    fake_dl.assert_called_once_with()
+
+
+def test_delete_sensevoice_model(tmp_path, monkeypatch):
+    "Deleting 'sensevoice' removes the model directory."
+    monkeypatch.setattr(sensevoice, "model_dir", lambda: str(tmp_path))
+    (tmp_path / "model.int8.onnx").write_bytes(b"x")
+    ok, message = whisper_transcribe.delete_model("sensevoice")
+    assert ok is True
+    assert not tmp_path.exists()
+
+
+def test_prepare_routes_to_sensevoice(app, app_context, client, english):
+    "A supported language transcribes via SenseVoice when it is available."
+    tempdir = app.env_config.temppath
+
+    def _fake_cues(audio_path, lang_code, progress_cb=None):
+        assert lang_code == "en"
+        return "Hello.", json.dumps([{"start": 0.0, "end": 1.0, "text": "Hello."}])
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(sensevoice, "available", return_value=True), patch.object(
+        sensevoice, "ensure_model_downloaded"
+    ), patch.object(sensevoice, "transcribe_to_cues", side_effect=_fake_cues):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"fake audio bytes"), "sv.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+    assert status["state"] == "finished"
+    assert status["book_id"] is not None
+    leftovers = [f for f in os.listdir(tempdir) if f.startswith("whisper_")]
+    assert leftovers == []
 
 
 def test_prepare_409_while_model_downloads(app, client, english):
