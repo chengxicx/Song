@@ -122,9 +122,42 @@ function shadowingLinesForCue(index, text) {
   return [];
 }
 
+/* Punctuation parsers glue onto the edges of non-word tokens (an
+   English page's "100%" is one token reading ` 100%," `), trimmed for
+   display and scoring; symbols that are part of what was said (%, $)
+   are kept.  Kept in sync with shadowing.py's _EDGE_JUNK. */
+const SHADOWING_EDGE_JUNK_RE =
+  /^[\s.,!?;:"'`“”‘’«»„()[\]{}/\\…·•*|~^\u2013\u2014\-，。、！？：；（）【】「」『』]+|[\s.,!?;:"'`“”‘’«»„()[\]{}/\\…·•*|~^\u2013\u2014\-，。、！？：；（）【】「」『』]+$/g;
+
+// The text to show and score for a sentence span.  Word spans pass
+// through verbatim; non-word spans (punctuation runs, plus words like
+// "100%" whose characters fall outside the language's word chars) are
+// only speakable when something readable survives the trim.
+function shadowingTokenText(sp) {
+  const raw =
+    (sp.getAttribute("data-text") || sp.textContent || "").replace(
+      /\u200B/g,
+      ""
+    );
+  if (sp.classList.contains("word")) return raw;
+  return raw.replace(SHADOWING_EDGE_JUNK_RE, "");
+}
+
+function shadowingReadable(t) {
+  return /[\p{L}\p{N}]/u.test(t);
+}
+
+function shadowingCollectable(sp) {
+  return (
+    sp.classList.contains("word") || shadowingReadable(shadowingTokenText(sp))
+  );
+}
+
 function shadowingUnitFromEl(el, src) {
   if (!el || !el.isConnected) return null;
-  const spans = Array.prototype.slice.call(el.querySelectorAll("span.word"));
+  const spans = Array.prototype.slice
+    .call(el.querySelectorAll("span.textitem"))
+    .filter(shadowingCollectable);
   if (!spans.length) return null;
   const clone = el.cloneNode(true);
   clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
@@ -135,12 +168,7 @@ function shadowingUnitFromEl(el, src) {
     el: el,
     lines: [el],
     spans: spans,
-    texts: spans.map(function (sp) {
-      return (sp.getAttribute("data-text") || sp.textContent || "").replace(
-        /\u200B/g,
-        ""
-      );
-    }),
+    texts: spans.map(shadowingTokenText),
     fullText: (clone.textContent || "")
       .replace(/\u200B/g, "")
       .replace(/🔊/g, "")
@@ -154,7 +182,12 @@ function shadowingUnitFromLines(lines, src) {
   if (!lines || !lines.length) return null;
   const spans = [];
   lines.forEach(function (l) {
-    Array.prototype.push.apply(spans, l.querySelectorAll("span.word"));
+    Array.prototype.push.apply(
+      spans,
+      Array.prototype.slice.call(l.querySelectorAll("span.textitem")).filter(
+        shadowingCollectable
+      )
+    );
   });
   if (!spans.length) return null;
   let fullText = "";
@@ -170,12 +203,7 @@ function shadowingUnitFromLines(lines, src) {
     el: lines[0],
     lines: lines,
     spans: spans,
-    texts: spans.map(function (sp) {
-      return (sp.getAttribute("data-text") || sp.textContent || "").replace(
-        /\u200B/g,
-        ""
-      );
-    }),
+    texts: spans.map(shadowingTokenText),
     fullText: fullText.replace(/\u200B/g, "").replace(/🔊/g, "").trim(),
     langId: langSpan ? langSpan.getAttribute("data-lang-id") : "",
     src: src || null,
@@ -202,6 +230,9 @@ function shadowingLoadReadings(unit) {
     body: JSON.stringify({
       language_id: parseInt(unit.langId, 10) || 0,
       tokens: unit.texts,
+      // The sentence as a whole: the server parses it once so readings
+      // follow context (一つ -> 一=ひとつ, not the isolated 一=いち).
+      full_text: unit.fullText,
     }),
   })
     .then(function (resp) {

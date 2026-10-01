@@ -125,6 +125,17 @@ class AbstractParser(ABC):
         """
         return None
 
+    def get_context_readings(self, text: str):  # pylint: disable=unused-argument
+        """
+        Per-morpheme readings from a single parse of the whole text.
+
+        Returns [(surface, reading-or-None), ...] in morpheme order, so
+        callers can attach readings that respect the surrounding context
+        (e.g. 一つ read as ひとつ, not いち + つ).  None when the parser
+        does not support it.
+        """
+        return None
+
     def get_lemma(self, text: str):  # pylint: disable=unused-argument
         """
         Get the dictionary/lemma form of the given text.
