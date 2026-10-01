@@ -727,7 +727,7 @@ def whisper_prepare():
     task_id = whisper_transcribe.start_task(
         current_app._get_current_object(),  # pylint: disable=protected-access
         audio_temp_path,
-        whisper_transcribe.whisper_lang_code(language, model_size),
+        language,
         model_size,
         {
             "language_id": int(language_id),
@@ -754,8 +754,6 @@ def whisper_download_model():
     fast.  Runs on the same background machinery and mutex as
     transcriptions; poll /whisper/status/<task_id> for completion.
     """
-    if not whisper_transcribe.whisper_status()["installed"]:
-        return jsonify({"error": "faster-whisper is not installed yet."}), 400
     if whisper_transcribe.has_running_task():
         return (
             jsonify(
@@ -769,12 +767,21 @@ def whisper_download_model():
     whisper_transcribe.purge_finished_tasks()
 
     model_size = (request.form.get("whisper_model") or "").strip()
+    if model_size == "sensevoice":
+        # The SenseVoice model files are independent of faster-whisper.
+        task_id = whisper_transcribe.start_model_download(
+            current_app._get_current_object(),  # pylint: disable=protected-access
+            model_size,
+        )
+        return jsonify({"task_id": task_id})
+    if not whisper_transcribe.whisper_status()["installed"]:
+        return jsonify({"error": "faster-whisper is not installed yet."}), 400
     if model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES:
         return (
             jsonify(
                 {
                     "error": "Unknown model size.  Pick one of: "
-                    + ", ".join(whisper_transcribe.ALLOWED_MODEL_SIZES)
+                    + ", ".join(whisper_transcribe.ALLOWED_MODEL_SIZES + ["sensevoice"])
                 }
             ),
             400,
@@ -794,8 +801,19 @@ def whisper_models():
         {
             "installed": whisper_transcribe.whisper_status()["installed"],
             "models": whisper_transcribe.model_cache_info(),
+            "sensevoice": _sensevoice_status(),
         }
     )
+
+
+def _sensevoice_status():
+    "SenseVoice engine state for the Settings page; None when unknown."
+    try:
+        from lute.book import sensevoice
+
+        return sensevoice.status()
+    except Exception:  # pylint: disable=broad-except
+        return None
 
 
 @bp.route("/whisper/delete_model", methods=["POST"])
