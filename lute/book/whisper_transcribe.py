@@ -134,13 +134,35 @@ def install_whisper():
 
 def whisper_lang_code(language):
     """
-    Map a Language to a whisper language code ("ja", "zh", ...), or
-    None to let whisper auto-detect.  Uses tts_lang (e.g. "zh-CN")
-    because the language name is not an ISO code.
+    Map a Language to a whisper language code ("ja", "zh", ...), or None
+    to let whisper auto-detect.
+
+    Resolution order: the language's custom tts_lang (e.g. "zh-HK"),
+    then a lookup of the language name in the TTS name table (so
+    "Japanese" resolves even without a tts_lang configured).  That name
+    fallback matters: languages without a tts_lang used to return None
+    here, and whisper's auto-detect on a few seconds of speech
+    regularly misfires (shadowing takes were read as the wrong
+    language).  An unknown name returns None rather than an "en"
+    default -- auto-detect beats guessing English.
+
+    Not reusing get_lang_code_for directly because it falls back to
+    DEFAULT_LANG_TAG ("en-US") for unknown names.
     """
     if language is None:
         return None
-    return ((language.tts_lang or "").split("-")[0].lower()) or None
+    # Imported here: lute.tts.routes pulls in the flask app machinery,
+    # which must not be loaded at module import time (this module is
+    # imported from background threads and task contexts too).
+    from lute.tts.routes import LANG_NAME_TO_CODE
+
+    custom = (getattr(language, "tts_lang", None) or "").strip()
+    if custom:
+        return custom.split("-")[0].lower() or None
+    tag = LANG_NAME_TO_CODE.get(
+        (getattr(language, "name", "") or "").strip().lower()
+    )
+    return tag.split("-")[0].lower() if tag else None
 
 
 def _load_model(model_size):
