@@ -164,6 +164,33 @@ def test_merged_spoken_token_splits_to_a_match():
     assert res["score"] == 100
 
 
+def test_several_merged_spoken_tokens_join_to_matches():
+    """
+    Drift across several words at once: the sentence's 呢 + 个 + 系 + 阿乐
+    comes back as the parser's 呢个 + 系阿乐 (pycantonese re-cuts particle
+    + name).  Each run whose joined keys agree is a match, not a pile of
+    misses with a bogus extra.
+    """
+    lang = _FakeLanguage(["呢个", "系阿乐"])
+    res = shadowing.compare_tokens(["呢", "个", "系", "阿乐"], "呢个 系阿乐", lang)
+    assert res["statuses"] == [2, 2, 2, 2]
+    assert res["extras"] == []
+    assert res["score"] == 100
+
+
+def test_drift_runs_leave_a_genuinely_unspoken_word_a_miss():
+    "Words absorbed by a drift run match; a different word after stays judged."
+    lang = _FakeLanguage(["呢个", "系阿乐", "唔该"])
+    res = shadowing.compare_tokens(
+        ["呢", "个", "系", "阿乐", "唔好"], "呢个 系阿乐 唔该", lang
+    )
+    assert res["statuses"] == [2, 2, 2, 2, 0]
+    # 唔该 was paired against 唔好 as its attempted misread, so it is
+    # not also counted as an extra.
+    assert res["spoken_for_fuzzy"] == {}
+    assert res["extras"] == []
+
+
 def test_voicing_swap_is_fuzzy_not_miss():
     "か heard as が is the classic ASR voicing swap: half credit."
     lang = _FakeLanguage(["そう", "です", "が"], parser_type="japanese")
@@ -520,6 +547,34 @@ def test_route_chinese_matches_across_simplified_traditional(app, app_context, c
     res = shadowing.compare_tokens(["今天", "天氣", "好好"], "今天天气好好", lang)
     assert res["statuses"] == [2, 2, 2]
     assert res["score"] == 100
+
+
+def test_cantonese_traditional_matches_sensevoice_simplified():
+    """
+    Regression from a real Cantonese take.  The sentence 呢個係阿樂佢嘅...
+    is traditional; SenseVoice answers in simplified with its own token
+    boundaries (呢个 系阿乐 ... 剪了).  With the t2s fold plus the
+    multi-token drift runs, everything actually heard matches; only the
+    garbled 頭髮好長 (heard as 道法口层) and the unheard 喇 stay misses.
+    """
+    try:
+        from opencc import OpenCC  # noqa: F401
+    except ImportError:
+        pytest.skip("opencc not installed")
+
+    lang = _FakeLanguage(
+        ["呢个", "系阿乐", "佢", "嘅", "道法口层", "要", "剪了"],
+        parser_type="lute_cantonese",
+    )
+    lang.tts_lang = "zh-HK"
+    res = shadowing.compare_tokens(
+        ["呢", "個", "係", "阿樂", "佢", "嘅", "頭髮", "好長", "要", "剪", "喇"],
+        "呢个系阿乐佢嘅道法口层要剪了",
+        lang,
+    )
+    assert res["statuses"] == [2, 2, 2, 2, 2, 2, 0, 0, 2, 1, 0]
+    assert res["spoken_for_fuzzy"] == {9: "剪了"}
+    assert res["score"] == 68
 
 
 # ---------------------------------------------------------------------
