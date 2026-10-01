@@ -75,6 +75,17 @@ def transcribe_clip(audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE):
         for seg in segments_iter:
             if seg.text:
                 texts.append(seg.text)
+        # Logged so a wrong-language transcription can be told apart:
+        # a forced language here means the code mapping was wrong, a
+        # low probability means whisper drifted despite the hint.
+        logging.getLogger(__name__).info(
+            "shadowing transcribe: requested language=%r, detected=%r "
+            "(p=%.2f), duration=%.1fs",
+            lang_code,
+            getattr(info, "language", None),
+            getattr(info, "language_probability", None) or 0.0,
+            getattr(info, "duration", None) or 0.0,
+        )
     return "".join(texts).strip(), (info.duration or 0.0)
 
 
