@@ -159,6 +159,29 @@ def test_readings():
         assert actual.replace(" ", "") == expected, text
 
 
+def test_get_readings_offers_attested_polyphone_readings():
+    """
+    The dictionary files 阿 under o1, but the corpus attests the name
+    prefix reading aa3 (330 of its 330 occurrences).  The candidates
+    must include both, so the shadowing rescue can judge 阿明 read the
+    everyday way instead of scoring it a flat miss.
+    """
+    p = CantoneseParser()
+    readings = p.get_readings("阿明答")
+    assert readings, "no readings at all"
+    # The plain dictionary reading comes first.
+    assert readings[0] == p.get_reading("阿明答")
+    assert len(readings) >= 2, readings
+    assert any(r.replace(" ", "").startswith("aa3") for r in readings), readings
+
+
+def test_get_readings_empty_when_nothing_romanizes():
+    "Punctuation-only and foreign text yield no candidates."
+    p = CantoneseParser()
+    for text in ["。", "Hello", "2024"]:
+        assert p.get_readings(text) == [], text
+
+
 def test_parser_declares_cantonese():
     "Parser is language-specific."
     assert CantoneseParser.languages() is not None
