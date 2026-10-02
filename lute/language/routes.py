@@ -10,6 +10,7 @@ from lute.models.repositories import UserSettingRepository
 from lute.language.service import Service
 from lute.language.forms import LanguageForm
 from lute.db import db
+from lute.multiuser.permissions import admin_only_if_multiuser
 from lute.parse.registry import selectable_parsers, supported_parsers
 from lute.parse.plugin_installer import ensure_parser_available
 from lute.read.render import grammar_analysis
@@ -19,6 +20,7 @@ bp = Blueprint("language", __name__, url_prefix="/language")
 
 
 @bp.route("/index")
+@admin_only_if_multiuser
 def index():
     """
     List all languages, with book and term counts.
@@ -173,6 +175,7 @@ def _dropdown_parser_choices(language=None):
 
 
 @bp.route("/edit/<int:langid>", methods=["GET", "POST"])
+@admin_only_if_multiuser
 def edit(langid):
     """
     Edit a language.
@@ -203,6 +206,7 @@ def edit(langid):
 
 
 @bp.route("/grammar_engine/install/<string:extra>", methods=["POST"])
+@admin_only_if_multiuser
 def grammar_engine_install(extra):
     """
     Pip-install the packages providing one language's grammar engine.
@@ -214,6 +218,7 @@ def grammar_engine_install(extra):
 
 @bp.route("/new", defaults={"langname": None}, methods=["GET", "POST"])
 @bp.route("/new/<string:langname>", methods=["GET", "POST"])
+@admin_only_if_multiuser
 def new(langname):
     """
     Create a new language.
@@ -253,6 +258,7 @@ def new(langname):
 
 
 @bp.route("/toggle_active/<int:langid>", methods=["POST"])
+@admin_only_if_multiuser
 def toggle_active(langid):
     """
     Toggle a language's active (frozen/thawed) state.
@@ -271,6 +277,7 @@ def toggle_active(langid):
 
 
 @bp.route("/delete/<int:langid>", methods=["POST"])
+@admin_only_if_multiuser
 def delete(langid):
     """
     Delete a language.
@@ -294,6 +301,7 @@ def delete(langid):
 
 
 @bp.route("/list_predefined", methods=["GET"])
+@admin_only_if_multiuser
 def list_predefined():
     "Show predefined languages that are not already in the db."
     service = Service(db.session)
@@ -307,6 +315,7 @@ def list_predefined():
 
 
 @bp.route("/load_predefined/<langname>", methods=["GET"])
+@admin_only_if_multiuser
 def load_predefined(langname):
     "Load a predefined language and its stories."
     service = Service(db.session)

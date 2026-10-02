@@ -239,7 +239,9 @@
       <div class="menu-item">
         <span id="menu_settings">Setting</span>
         <ul class="sub-menu">
+          {% if not multiuser_enabled or is_admin %}
           <li><a id="lang_index" href="/language/index">Languages</a></li>
+          {% endif %}
           <li><a href="/settings/index">Settings</a></li>
           <li><a href="/settings/shortcuts">Keyboard shortcuts</a></li>
           {% if multiuser_enabled %}
