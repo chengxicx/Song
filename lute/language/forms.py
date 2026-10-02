@@ -8,14 +8,28 @@ from wtforms import (
     IntegerField,
     BooleanField,
     SelectField,
+    SelectMultipleField,
     FormField,
     FieldList,
     Form,
     ValidationError,
 )
 from wtforms.validators import DataRequired
+from wtforms.widgets import ListWidget, CheckboxInput
 from lute.language.langtags import tag_choices
 from lute.models.language import LanguageDictionary
+
+
+class MultiCheckboxField(SelectMultipleField):
+    """
+    A SelectMultipleField rendered as a list of checkboxes.
+
+    The value is a list of the checked choice values, which is what
+    Language.hidden_grammar_levels expects.
+    """
+
+    widget = ListWidget(prefix_label=False)
+    option_widget = CheckboxInput()
 
 
 class LanguageDictionaryForm(Form):
@@ -84,6 +98,16 @@ class LanguageForm(FlaskForm):
         "Grammar Analysis Language",
         choices=[("en", "English"), ("zh", "中文"), ("ko", "한국어")],
         default="en",
+    )
+    # Grammar levels / groups to hide in the reading-page panel.  The
+    # choices depend on the language's grammar taxonomy (JLPT, TOPIK,
+    # CEFR) plus the Japanese aggregate rows, so they are set in the
+    # routes -- same reason as parser_type above.
+    hidden_grammar_levels = MultiCheckboxField(
+        "Hide in grammar panel",
+        choices=[],
+        default=[],
+        render_kw={"style": "list-style:none; padding-left:0; margin:0;"},
     )
 
     # --- Korean / Kiwi-specific settings.
