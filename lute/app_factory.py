@@ -54,6 +54,7 @@ from lute.models.book import Book
 from lute.models.language import Language
 from lute.multiuser import context as mu_context
 from lute.multiuser import paths as mu_paths
+from lute.multiuser import permissions as mu_permissions
 from lute.multiuser import store as mu_store
 from lute.multiuser.config_proxy import UserScopedAppConfig
 from lute.settings.current import (
@@ -209,6 +210,7 @@ def _add_base_routes(app, app_config):
                 "multiuser_enabled": True,
                 "current_username": None,
                 "is_admin": False,
+                "can_manage_server": False,
             }
         us_repo = UserSettingRepository(db.session)
         bs = us_repo.get_backup_settings()
@@ -243,6 +245,11 @@ def _add_base_routes(app, app_config):
             "multiuser_enabled": mu_store.enabled(),
             "current_username": req_username,
             "is_admin": mu_store.enabled() and mu_store.is_admin(req_username),
+            # Server-level config (MeCab path, Sudachi dict, languages,
+            # Whisper, the mode switch) is admin-owned when multi-user
+            # mode is on, and always available when it's off.  is_admin
+            # alone can't express this: it is False in single-user mode.
+            "can_manage_server": mu_permissions.is_admin_request(),
         }
         return ret
 

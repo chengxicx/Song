@@ -60,6 +60,7 @@ from lute.book.stats import Service as StatsService
 from lute.book.stats import get_difficulty_label
 from lute.book import whisper_transcribe
 from lute.multiuser.context import get_current_user
+from lute.multiuser.permissions import admin_only_if_multiuser_json
 import lute.utils.formutils
 from lute.utils.formutils import book_tag_choices
 from lute.db import db
@@ -629,6 +630,7 @@ def whisper_available():
 
 
 @bp.route("/whisper/install", methods=["POST"])
+@admin_only_if_multiuser_json
 def whisper_install():
     """
     pip-install faster-whisper on demand.
@@ -748,6 +750,7 @@ def whisper_task_status(task_id):
 
 
 @bp.route("/whisper/download_model", methods=["POST"])
+@admin_only_if_multiuser_json
 def whisper_download_model():
     """
     Pre-download the selected model so the first transcription starts
@@ -817,6 +820,7 @@ def _sensevoice_status():
 
 
 @bp.route("/whisper/delete_model", methods=["POST"])
+@admin_only_if_multiuser_json
 def whisper_delete_model():
     "Remove a downloaded model from the server's cache."
     if whisper_transcribe.has_running_task():
