@@ -51,6 +51,7 @@ from lute.read.render.grammar_analysis_it import analyze_italian
 from lute.read.render.grammar_analysis_pt import analyze_portuguese
 from lute.read.render.grammar_analysis_th import analyze_thai
 from lute.read.render.grammar_analysis_ar import analyze_arabic
+from lute.read.render.grammar_levels import filter_hidden_grammar
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
 from lute.term.model import Repository
@@ -1195,6 +1196,11 @@ def grammar_analysis(bookid, pagenum):
     # keeps every engine's tokens, offsets and echoed sentence consistent.
     page_text = unicodedata.normalize("NFC", page_text)
     display = getattr(lang, "grammar_translate_lang", "") or "en"
+    # Levels / groups this language hides in the panel -- an advanced
+    # reader drops N5, or just the two frequent aggregate rows ("Basic
+    # forms", "Particles").  Applied to whatever the engine returns, so
+    # every engine honours it without knowing about the setting.
+    hidden = set(getattr(lang, "hidden_grammar_levels", []) or [])
     # Every engine runs on optional heavy dependencies (Sudachi, Kiwi,
     # spaCy models, pymorphy3, pythainlp, pyarabic); when one is missing,
     # fall back to the generic regex rule library instead of failing
@@ -1216,7 +1222,7 @@ def grammar_analysis(bookid, pagenum):
     ):
         if detector(lang):
             try:
-                return jsonify(engine(page_text, display_lang=display))
+                results = engine(page_text, display_lang=display)
             except (ImportError, OSError):
                 current_app.logger.warning(
                     "%s grammar engine not installed; using the basic regex rules. "
@@ -1225,12 +1231,13 @@ def grammar_analysis(bookid, pagenum):
                     extra,
                 )
                 break
+            return jsonify(filter_hidden_grammar(results, hidden))
     render_service = RenderService(db.session)
     paragraphs = render_service.get_paragraphs(page_text, lang)
     sentences = [
         "".join(ti.text for ti in sentence) for para in paragraphs for sentence in para
     ]
-    return jsonify(analyze_grammar(sentences))
+    return jsonify(filter_hidden_grammar(analyze_grammar(sentences), hidden))
 
 
 @bp.route("/shadowing/transcribe", methods=["POST"])
