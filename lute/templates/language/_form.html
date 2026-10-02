@@ -63,14 +63,41 @@
     </tr>
 
     {% set _kiwi_fields = ('kiwi_tokenizer_mode', 'kiwi_stemming', 'kiwi_filter_particles', 'kiwi_join_compound_nouns') %}
+    {# Fields rendered by a hand-written block below, not by the loop. #}
+    {% set _custom_fields = ('hidden_grammar_levels',) %}
     {% for field in form %}
-    {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields %}
+    {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields and field.name not in _custom_fields %}
     <tr>
       <td>{{ field.label(class="form-control-label") }}</td>
       <td>{{ field(class="form-control") }}</td>
     </tr>
     {% endif %}
     {% endfor %}
+
+    {# --- Grammar panel: groups to hide. -----------------------------------
+       The choices depend on the language's grammar taxonomy (JLPT N5..N1,
+       TOPIK bands, CEFR A1..C2) plus the Japanese aggregate rows, so they
+       are set in routes.py.  A language with no dedicated grammar engine
+       has nothing to hide and the block disappears.
+    ---------------------------------------------------------------------- #}
+    {% if form.hidden_grammar_levels.choices %}
+    <tr>
+      <td colspan="2">
+        <h3 style="margin-top:14px; margin-bottom:6px;">Grammar panel: groups to hide</h3>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        {{ form.hidden_grammar_levels.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          Checked groups disappear from the Analyze grammar panel for this
+          language.  Hiding a level also hides the aggregate rows tagged
+          with it &mdash; JLPT N5 covers both Basic forms and Particles.
+        </div>
+      </td>
+      <td>{{ form.hidden_grammar_levels() }}</td>
+    </tr>
+    {% endif %}
 
     {# --- Korean / Kiwi-specific section. ----------------------------------
        Only shown when the language's parser_type is 'lute_korean'.
