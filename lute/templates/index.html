@@ -34,8 +34,12 @@
 {% endif %}
 
 {% if not have_languages %}
+  {% if can_manage_server %}
   <p>To get started using Lute, first <a href="/language/list_predefined">load a predefined language and sample text</a>, or <a href="/language/new">create your language.</a>
 </p>
+  {% else %}
+  <p>No languages have been set up on this server yet.  Ask an admin to add one.</p>
+  {% endif %}
 {% else %}
   {% include "book/tablelisting.html" %}
 {% endif %}
