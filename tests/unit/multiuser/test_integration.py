@@ -190,6 +190,10 @@ def test_menu_placement(mu_client):
     html = resp.get_data(as_text=True)
     assert "Log out (admin)" in html, "logout in menu"
     assert 'href="/users/index"' in html, "Users menu item present"
+    # Server-level config is admin-owned: an admin must keep the
+    # Languages entry (see test_server_settings_gate.py for the
+    # non-admin side).
+    assert 'href="/language/index"' in html, "Languages menu item present for admin"
     assert "/users/me/password" not in html, "no Change password menu item"
 
 
