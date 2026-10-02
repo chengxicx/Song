@@ -76,6 +76,13 @@ class Language(
     # Display language for grammar analysis results ("en" default, "zh" Chinese).
     grammar_translate_lang = db.Column("LgGrammarTranslateLang", db.String(20))
 
+    # Grammar-panel groups the reader hides for this language: a
+    # pipe-delimited list of level tokens (JLPT N5..N1, TOPIK bands,
+    # CEFR A1..C2) and the Japanese aggregate keys (basic_forms,
+    # basic_particles).  One string column backs the
+    # `hidden_grammar_levels` list property below.
+    _hidden_grammar_levels = db.Column("LgHiddenGrammarLevels", db.String(500))
+
     def __init__(self):
         self.character_substitutions = "´='|`='|’='|‘='|...=…|..=‥"
         self.regexp_split_sentences = ".!?"
@@ -121,6 +128,30 @@ class Language(
     @word_characters.setter
     def word_characters(self, s):
         self._word_characters = self._get_python_regex_pattern(s)
+
+    @property
+    def hidden_grammar_levels(self):
+        """
+        Grammar levels/groups hidden in the reading-page grammar panel.
+
+        Returned as a list of tokens; each is either a level name
+        ("N5", "TOPIK 1-2", "A1") or one of the Japanese aggregate keys
+        ("basic_forms", "basic_particles").  Empty means nothing is
+        hidden.
+        """
+        raw = self._hidden_grammar_levels or ""
+        return [t.strip() for t in raw.split("|") if t.strip()]
+
+    @hidden_grammar_levels.setter
+    def hidden_grammar_levels(self, tokens):
+        if not tokens:
+            self._hidden_grammar_levels = ""
+        elif isinstance(tokens, str):
+            self._hidden_grammar_levels = tokens
+        else:
+            self._hidden_grammar_levels = "|".join(
+                t.strip() for t in tokens if t and t.strip()
+            )
 
     def active_dict_uris(self, use_for):
         "Get sorted uris for active dicts of correct type."

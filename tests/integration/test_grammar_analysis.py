@@ -587,3 +587,119 @@ def test_portuguese_grammar_analysis_uses_pt_engine(client, empty_db):
     assert "pt_imperfeito" in keys
     for g in data:
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+# ---- hidden grammar levels / groups -----------------------------------
+
+
+def test_hidden_japanese_level_removes_every_row_at_that_level(
+    client, empty_db, japanese
+):
+    if not is_supported("japanese_sudachi"):
+        pytest.skip("japanese_sudachi parser not installed")
+    """
+    隐藏 N5 后，面板里不该再有任何 N5 条目——包括两条 level 也是 N5 的
+    聚合行（Basic forms / Particles）。
+    """
+    book = make_book(
+        "Japanese Hidden Level Demo",
+        ["日本に行きたいです。今、ご飯を食べています。"],
+        japanese,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    url = f"/read/grammar_analysis/{book.id}/1"
+    baseline = json.loads(client.get(url).data.decode("utf-8"))
+    assert baseline, "sanity: 这一页本应识别出语法点"
+    assert any(g["level"] == "N5" for g in baseline), "sanity: 本页有 N5 条目"
+
+    japanese.hidden_grammar_levels = ["N5"]
+    db.session.add(japanese)
+    db.session.commit()
+
+    data = json.loads(client.get(url).data.decode("utf-8"))
+    assert all(g.get("level") != "N5" for g in data), "N5 条目应全部被隐藏"
+    keys = {g["key"] for g in data}
+    assert "basic_forms" not in keys, "聚合行 level 是 N5，应随 N5 一起隐藏"
+    assert "basic_particles" not in keys
+
+
+def test_hidden_aggregate_key_leaves_the_rest_of_the_level(client, empty_db, japanese):
+    if not is_supported("japanese_sudachi"):
+        pytest.skip("japanese_sudachi parser not installed")
+    "只隐藏 Basic forms 时，同级别的其它 N5 语法点仍然显示。"
+    book = make_book(
+        "Japanese Hidden Aggregate Demo",
+        ["日本に行きたいです。今、ご飯を食べています。"],
+        japanese,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    url = f"/read/grammar_analysis/{book.id}/1"
+    baseline = json.loads(client.get(url).data.decode("utf-8"))
+    assert "basic_forms" in {g["key"] for g in baseline}, "sanity: 本页有聚合行"
+
+    japanese.hidden_grammar_levels = ["basic_forms"]
+    db.session.add(japanese)
+    db.session.commit()
+
+    data = json.loads(client.get(url).data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "basic_forms" not in keys, "被隐藏的聚合行应消失"
+    assert data, "同级别的其它条目应保留"
+    assert any(g.get("level") == "N5" for g in data), "N5 本身没有被隐藏"
+
+
+def test_hidden_topik_band_filters_korean_results(client, empty_db, korean):
+    if not is_supported("lute_korean"):
+        pytest.skip("lute_korean parser not installed")
+    "隐藏某个 TOPIK 段后，该段的条目全部消失。"
+    book = make_book(
+        "Korean Hidden Band Demo",
+        ["그 회사는 무리하게 확장한 나머지 재정적 위기를 맞게 되었다."],
+        korean,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    url = f"/read/grammar_analysis/{book.id}/1"
+    baseline = json.loads(client.get(url).data.decode("utf-8"))
+    levels = {g["level"] for g in baseline if g.get("level")}
+    assert levels, "sanity: 这一页本应识别出带级别的语法点"
+
+    hidden = sorted(levels)[0]
+    korean.hidden_grammar_levels = [hidden]
+    db.session.add(korean)
+    db.session.commit()
+
+    data = json.loads(client.get(url).data.decode("utf-8"))
+    assert all(g.get("level") != hidden for g in data), f"{hidden} 应被隐藏"
+
+
+def test_hidden_cefr_level_filters_english_results(client, empty_db):
+    "隐藏某个 CEFR 级别后，该级别的条目全部消失。"
+    pytest.importorskip("spacy")
+    pytest.importorskip("en_core_web_sm")
+    english = _get_or_create_language("English")
+    book = make_book(
+        "English Hidden CEFR Demo",
+        ["The box is too heavy to lift. She is as tall as her brother."],
+        english,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    url = f"/read/grammar_analysis/{book.id}/1"
+    baseline = json.loads(client.get(url).data.decode("utf-8"))
+    levels = {g["level"] for g in baseline if g.get("level")}
+    assert levels, "sanity: 这一页本应识别出带级别的语法点"
+
+    hidden = sorted(levels)[0]
+    english.hidden_grammar_levels = [hidden]
+    db.session.add(english)
+    db.session.commit()
+
+    data = json.loads(client.get(url).data.decode("utf-8"))
+    assert all(g.get("level") != hidden for g in data), f"{hidden} 应被隐藏"

@@ -731,6 +731,12 @@ _PARTICLE_SYMBOLS = {
 # same point is never reported twice.
 _ALL_LEVELS = ["N5", "N4", "N3", "N2", "N1"]
 
+# Public alias.  The language settings page offers these levels as
+# "hide in the panel" choices, and that list must not drift from the
+# levels this engine actually emits, so it is read from here rather
+# than duplicated.
+ALL_LEVELS = _ALL_LEVELS
+
 # Where the grammar JSON lives, relative to this module:
 #   lute/read/render/grammar_analysis_ja.py  ->  lute/jlpt_data/grammar/
 _DATA_DIR = os.path.normpath(
