@@ -36,6 +36,7 @@
     </tr>
     {% endfor %}
 
+    {% if can_manage_server %}
     <tr>
       <td>
         <h2>Multi-user mode</h2>
@@ -45,6 +46,7 @@
         <span style="margin-left: 8px;">Currently <strong>{{ "ON" if multiuser_enabled else "OFF" }}</strong></span>
       </td>
     </tr>
+    {% endif %}
 
     <tr>
       <td>
@@ -161,6 +163,7 @@
       </td>
     </tr>
 
+    {% if can_manage_server %}
     <tr>
       <td>
         {{ form.mecab_path.label }}
@@ -198,6 +201,7 @@
         <div style="margin-top: 5px" id="parse_result"></div>
       </td>
     </tr>
+    {% endif %}
     <tr>
       <td>
         {{ form.japanese_dict.label }}
@@ -226,6 +230,7 @@
       <td>{{ form.japanese_reading }}</td>
     </tr>
 
+    {% if can_manage_server %}
     <tr>
       <td>
         <h3>Sudachi (alternative Japanese parser)</h3>
@@ -288,6 +293,7 @@
         <div style="margin-top: 5px" id="sudachi_result"></div>
       </td>
     </tr>
+    {% endif %}
 
     <tr>
       <td>
@@ -351,6 +357,7 @@
       </td>
     </tr>
 
+    {% if can_manage_server %}
     <tr>
       <td>
         <h2>Whisper (auto-subtitles)</h2>
@@ -374,6 +381,7 @@
         <div id="whisper_settings_msg" style="margin-top: 6px;"></div>
       </td>
     </tr>
+    {% endif %}
 
   </table>
 
@@ -676,6 +684,7 @@
 
   document.addEventListener('DOMContentLoaded', netease_refresh_status);
 
+  {% if can_manage_server %}
   // --- Whisper (auto-subtitles) management. ---
   function whisperMsg(text, ok) {
     const el = document.getElementById('whisper_settings_msg');
@@ -825,6 +834,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', whisperRefresh);
+  {% endif %}
 
 </script>
 
