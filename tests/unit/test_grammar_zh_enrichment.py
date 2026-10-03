@@ -47,9 +47,9 @@ def test_provenance_names_real_materials():
     materials = {name for name, _ in enrich.load_materials()}
     for entry_id, source in _load(enrich.SOURCES).items():
         for field, origin in source.items():
-            assert origin == "translated" or origin in materials, (
-                f"{entry_id} {field}: unknown source {origin!r}"
-            )
+            assert (
+                origin == "translated" or origin in materials
+            ), f"{entry_id} {field}: unknown source {origin!r}"
 
 
 def test_material_sourced_text_is_verbatim_from_that_material():
