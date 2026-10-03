@@ -958,6 +958,71 @@ def test_route_uses_sensevoice_when_available(app, app_context, client, english)
     assert body["score"] == 100
 
 
+def test_route_hears_kana_in_the_book_script(app, app_context, client, japanese):
+    """
+    Regression from a real Japanese take.  The sentence writes the
+    onomatopoeia わくわく in hiragana; SenseVoice answered ワクワク.  The
+    word is the one that was said (100%), and the panel's "heard" line
+    now spells it the way the sentence above it does, instead of looking
+    like a mis-transcription.
+    """
+    if not shadowing.is_japanese_language(japanese):
+        pytest.skip("the test database's Japanese language is unavailable")
+
+    heard = "2ダスティンは冬休みでワクワクしています"
+
+    def _fake_sv(audio_path, lang_code):
+        assert lang_code == "ja"
+        return heard, 6.0
+
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(sensevoice, "available", return_value=True), patch.object(
+        sensevoice, "ensure_model_downloaded"
+    ), patch.object(
+        sensevoice, "transcribe_clip", side_effect=_fake_sv
+    ):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(japanese.id),
+                "tokens": json.dumps(
+                    ["2", "ダスティン", "は", "冬休み", "で", "わくわく", "し", "て", "います"]
+                ),
+                "full_text": "2ダスティンは冬休みでわくわくしています",
+                "audio": (io.BytesIO(b"fake webm bytes"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        status = _wait_for_task(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    body = status["result"]
+    assert body["engine"] == "sensevoice"
+    # The transcription itself stays what the engine returned ...
+    assert body["transcription"] == heard
+    # ... but every word the panel shows is in the book's script.  (The
+    # parser cuts the transcription's しています into four morphemes
+    # where the book's span is one; the drift absorption still scores it
+    # as the one word it is.)
+    assert [t["text"] for t in body["transcription_tokens"]] == [
+        "2",
+        "ダスティン",
+        "は",
+        "冬休み",
+        "で",
+        "わくわく",
+        "し",
+        "て",
+        "い",
+        "ます",
+    ]
+    # The display restore must not move the score.
+    assert body["statuses"] == [2, 2, 2, 2, 2, 2, 2, 2, 2]
+    assert body["score"] == 100
+
+
 def test_route_chinese_matches_across_simplified_traditional(app, app_context, client):
     """
     SenseVoice emits simplified Han even for Cantonese; the diff folds
@@ -1070,6 +1135,57 @@ def test_match_book_script_tolerates_missing_opencc():
     with patch.object(shadowing, "_simplified_converter", return_value=None):
         out = shadowing._match_book_script("个个", ["個個"], lang)
     assert out == "个个"
+
+
+# ---------------------------------------------------------------------
+# Kana script restore (display only)
+# ---------------------------------------------------------------------
+
+
+def test_is_kana_only():
+    "Mixed kanji/kana and non-kana tokens are never rewritten."
+    assert shadowing._is_kana_only("わくわく")
+    assert shadowing._is_kana_only("ワクワク")
+    assert shadowing._is_kana_only("コーヒー")
+    assert not shadowing._is_kana_only("冬休み")
+    assert not shadowing._is_kana_only("2")
+    assert not shadowing._is_kana_only("")
+
+
+def test_kana_script_restore_follows_a_hiragana_book():
+    "The 'heard' word is spelled the way the sentence spells it."
+    lang = _FakeLanguage([], parser_type="japanese")
+    restore = shadowing._kana_script_restorer(["わくわく", "し", "て"], lang)
+    assert restore("ワクワク") == "わくわく"
+    assert restore("シ") == "し"
+
+
+def test_kana_script_restore_follows_a_katakana_book():
+    "A katakana loanword the book spells in katakana stays katakana."
+    lang = _FakeLanguage([], parser_type="japanese")
+    restore = shadowing._kana_script_restorer(["コーヒー", "を"], lang)
+    assert restore("こーひー") == "コーヒー"
+
+
+def test_kana_script_restore_leaves_unrelated_words_alone():
+    "A word the sentence doesn't have keeps the script the engine used."
+    lang = _FakeLanguage([], parser_type="japanese")
+    restore = shadowing._kana_script_restorer(["わくわく"], lang)
+    assert restore("ドキドキ") == "ドキドキ"
+
+
+def test_kana_script_restore_ignores_kanji_okurigana():
+    "Rewriting must not flip a kanji word's okurigana (冬休み -> 冬休ミ)."
+    lang = _FakeLanguage([], parser_type="japanese")
+    restore = shadowing._kana_script_restorer(["冬休み", "2"], lang)
+    assert restore("冬休み") == "冬休み"
+    assert restore("2") == "2"
+
+
+def test_kana_script_restore_noop_for_non_japanese():
+    lang = _FakeLanguage([], readings={})
+    restore = shadowing._kana_script_restorer(["わくわく"], lang)
+    assert restore("ワクワク") == "ワクワク"
 
 
 # ---------------------------------------------------------------------
