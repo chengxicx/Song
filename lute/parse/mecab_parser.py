@@ -382,9 +382,7 @@ class JapaneseParser(AbstractParser):
     @staticmethod
     def _string_is_kana(s: str) -> bool:
         "True if every character is hiragana or katakana (incl. ー)."
-        return bool(s) and all(
-            "\u3040" <= c <= "\u30FF" for c in s
-        )
+        return bool(s) and all("\u3040" <= c <= "\u30FF" for c in s)
 
     def _display_reading(self, surface: str, kana: str, setting: str):
         """
