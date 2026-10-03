@@ -375,6 +375,52 @@ def test_japanese_reading_katakana_normalized():
     assert res["statuses"] == [2]
 
 
+def test_japanese_kana_only_word_matches_across_scripts():
+    """
+    A kana word is its own reading: the parser answers None for it
+    (Sudachi only reports a reading when it differs from the surface),
+    so the surface must be folded as well.  A book's わくわく heard as
+    ワクワク is the word that was said, not a missed one -- the two
+    unfoldable keys share no characters at all.
+    """
+    lang = _FakeLanguage(["ワクワク"], parser_type="japanese")
+    res = shadowing.compare_tokens(["わくわく"], "ワクワク", lang)
+    assert res["statuses"] == [2]
+    assert res["score"] == 100
+
+
+def test_japanese_katakana_book_word_matches_hiragana_speech():
+    "The fold is not one-directional: a katakana word is heard as kana too."
+    lang = _FakeLanguage(["わくわく"], parser_type="japanese")
+    res = shadowing.compare_tokens(["ワクワク"], "わくわく", lang)
+    assert res["statuses"] == [2]
+    assert res["score"] == 100
+
+
+def test_japanese_kana_fold_does_not_merge_different_words():
+    "Folding the script must not make unrelated kana words compare equal."
+    lang = _FakeLanguage(["ドキドキ"], parser_type="japanese")
+    res = shadowing.compare_tokens(["わくわく"], "ドキドキ", lang)
+    assert res["statuses"] == [0]
+    assert res["score"] == 0
+
+
+def test_japanese_kana_fold_survives_the_context_parse():
+    """
+    A kana token gets no reading from the contextual parse either ("a
+    kana token's own kana is no furigana"), so _context_keys falls back
+    to the per-token key -- which has to fold the script as well.
+    """
+    lang = _FakeLanguage(
+        ["ワクワク"],
+        parser_type="japanese",
+        context_readings=[("わくわく", "わくわく")],
+    )
+    res = shadowing.compare_tokens(["わくわく"], "ワクワク", lang, original_full_text="わくわく")
+    assert res["statuses"] == [2]
+    assert res["score"] == 100
+
+
 def test_japanese_keys_follow_the_displayed_context_readings():
     """
     The panel's furigana is the contextual parse (香山 is こうやま in its
