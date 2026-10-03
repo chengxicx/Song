@@ -385,7 +385,8 @@ def _make_key_fn(language):
     Chinese languages fold both sides to simplified Han (see
     _simplified_converter); everything else compares lowercased surface
     forms.  When no reading is available (e.g. the japanese_reading
-    setting is unset) the surface form is used as-is.
+    setting is unset) the surface form is used as-is -- folded to
+    hiragana, since a kana word is its own reading (see below).
     """
     parser = language.parser
     t2s = _simplified_converter() if _is_chinese_language(language) else None
@@ -399,8 +400,15 @@ def _make_key_fn(language):
                 reading = parser.get_reading(token)
             except Exception:  # pylint: disable=broad-exception-caught
                 reading = None
-            if reading:
-                return jaconv.kata2hira(reading.strip())
+            # The parser answers None for a token that is already kana
+            # (Sudachi reports a reading only when it differs from the
+            # surface), so the surface is the reading and must be folded
+            # too: without that, a book's わくわく never matches the
+            # ワクワク an ASR engine returns for the same word, and the
+            # two keys share no characters at all (ratio 0.0, a flat
+            # miss).  kata2hira leaves kanji alone, so the reading path
+            # is unaffected.
+            return jaconv.kata2hira((reading or token).strip())
         try:
             out = parser.get_lowercase(token)
         except Exception:  # pylint: disable=broad-exception-caught
