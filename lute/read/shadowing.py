@@ -339,6 +339,59 @@ def _match_book_script(text, original_tokens, language):
     return s2t.convert(text or "")
 
 
+# A token written entirely in kana, the prolonged sound mark and the kana
+# iteration marks included.  The kana script restore below only ever
+# rewrites tokens that match this: hira2kata would turn a kanji word's
+# okurigana into katakana too (冬休み -> 冬休ミ).
+_KANA_ONLY_RE = re.compile(r"^[\u3041-\u309F\u30A1-\u30FA\u30FC-\u30FE]+$")
+
+
+def _is_kana_only(token):
+    "True for a token written entirely in hiragana/katakana."
+    return bool(token) and _KANA_ONLY_RE.match(token) is not None
+
+
+def _kana_script_restorer(original_tokens, language):
+    """
+    Return token -> token, re-rendering the transcription's kana in the
+    script the book wrote the same word in.
+
+    Scoring folds kana on both sides (see _make_key_fn), so a book's
+    わくわく and an engine's ワクワク are the same word; the difference
+    shows up only in the panel, where a "heard" line spelling a word
+    differently from the sentence right above it reads as a
+    mis-transcription.  SenseVoice is especially prone to it: it answers
+    hiragana onomatopoeia (わくわく) in katakana.
+
+    The sentence's own tokens decide, word by word, keyed on the same
+    hiragana-folded form scoring compares on.  A kana token with no
+    counterpart in the sentence (something the engine invented) keeps
+    whatever script it came back in, and a mixed kanji/kana token never
+    sets a script.  Non-Japanese languages are a no-op.
+    """
+    scripts = {}
+    if is_japanese_language(language):
+        for raw in original_tokens or []:
+            token = _clean_token(raw)
+            if not _is_kana_only(token):
+                continue
+            folded = jaconv.kata2hira(token)
+            scripts.setdefault(folded, "katakana" if folded != token else "hiragana")
+
+    def restore(token):
+        cleaned = _clean_token(token)
+        script = (
+            scripts.get(jaconv.kata2hira(cleaned)) if _is_kana_only(cleaned) else None
+        )
+        if script == "katakana":
+            return jaconv.hira2kata(token)
+        if script == "hiragana":
+            return jaconv.kata2hira(token)
+        return token
+
+    return restore
+
+
 # Unvoiced base of each voiced kana.  ASR very commonly swaps voicing
 # on weak syllables (そうですか heard as そうです が); a key pair that
 # matches once the dakuten/handakuten marks are stripped is a near-miss
@@ -980,6 +1033,12 @@ def _run_task(
             rate = None
             if duration and duration > 0:
                 rate = round(comparison["spoken_count"] / (duration / 60.0), 1)
+            # Display-side kana restore, the Japanese counterpart of the
+            # Han one above: the panel shows the word in the script the
+            # book used for it.  Applied to the display fields only --
+            # scoring folds kana on both sides regardless, so the
+            # verdicts are the same either way.
+            restore_kana = _kana_script_restorer(tokens, lang)
             result = {
                 "transcription": text,
                 # Which engine produced the transcription ("sensevoice"
@@ -996,13 +1055,14 @@ def _run_task(
                 # it word by word (same as the original sentence).  The
                 # transcription itself is the reading context.
                 "transcription_tokens": annotate_tokens(
-                    spoken_tokens, lang, full_text=text
+                    [restore_kana(t) for t in spoken_tokens], lang, full_text=text
                 ),
                 "statuses": comparison["statuses"],
                 "spoken_for_fuzzy": {
-                    str(k): v for k, v in comparison["spoken_for_fuzzy"].items()
+                    str(k): restore_kana(v)
+                    for k, v in comparison["spoken_for_fuzzy"].items()
                 },
-                "extras": comparison["extras"],
+                "extras": [restore_kana(t) for t in comparison["extras"]],
                 "score": comparison["score"],
                 "matched": comparison["matched"],
                 "fuzzy": comparison["fuzzy"],
