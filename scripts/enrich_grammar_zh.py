@@ -158,9 +158,9 @@ def _rank(row, name, entry):
     want = {(x.get("japanese") or "").strip() for x in row.get("examples") or []}
     have = {(x.get("japanese") or "").strip() for x in entry.get("examples") or []}
     return (
-        0 if want & have else 1,                        # shares example sentences
-        0 if _notes_of(row, entry) else 1,              # carries a usable 注意点
-        -len(_formation_of(row, entry)),                # more detailed 接续
+        0 if want & have else 1,  # shares example sentences
+        0 if _notes_of(row, entry) else 1,  # carries a usable 注意点
+        -len(_formation_of(row, entry)),  # more detailed 接续
         name,
         entry.get("pattern", ""),
     )
@@ -183,8 +183,11 @@ def build(base, library, materials):
     for entry_id, current in base.items():
         row = library.get(entry_id)
         upgraded = dict(current)
-        source = {"formation": "translated", "notes": "translated",
-                  "examples": "translated"}
+        source = {
+            "formation": "translated",
+            "notes": "translated",
+            "examples": "translated",
+        }
         chosen = pick(row, materials) if row else None
         if chosen:
             name, material = chosen
@@ -196,8 +199,10 @@ def build(base, library, materials):
             if notes:
                 upgraded["notes"] = notes
                 source["notes"] = name
-            by_jp = {(x.get("japanese") or "").strip(): (x.get("chinese") or "").strip()
-                     for x in material.get("examples") or []}
+            by_jp = {
+                (x.get("japanese") or "").strip(): (x.get("chinese") or "").strip()
+                for x in material.get("examples") or []
+            }
             examples = dict(upgraded.get("examples") or {})
             taken = 0
             for jp, zh in examples.items():
@@ -214,8 +219,11 @@ def build(base, library, materials):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--write", action="store_true",
-                    help="write zh_enrichment.json (default: report only)")
+    ap.add_argument(
+        "--write",
+        action="store_true",
+        help="write zh_enrichment.json (default: report only)",
+    )
     args = ap.parse_args()
 
     with open(ENRICHMENT, encoding="utf-8") as fh:
@@ -229,8 +237,10 @@ def main():
             counts[(field, origin != "translated")] += 1
     print(f"rows: {len(enrichment)}")
     for field in ("formation", "notes", "examples"):
-        print(f"  {field}: material {counts[(field, True)]}, "
-              f"translated {counts[(field, False)]}")
+        print(
+            f"  {field}: material {counts[(field, True)]}, "
+            f"translated {counts[(field, False)]}"
+        )
 
     if not args.write:
         print("(dry run: pass --write)")

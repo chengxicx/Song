@@ -84,9 +84,7 @@ def test_available_requires_package_and_files(model_dir_tmp):
     (model_dir_tmp / "model.int8.onnx").write_bytes(b"x")
     (model_dir_tmp / "tokens.txt").write_bytes(b"x")
     (model_dir_tmp / "silero_vad.onnx").write_bytes(b"x")
-    with patch.object(
-        sensevoice, "installed", return_value=False
-    ):
+    with patch.object(sensevoice, "installed", return_value=False):
         assert sensevoice.available() is False
     with patch.object(sensevoice, "installed", return_value=True):
         assert sensevoice.available() is True
@@ -160,7 +158,9 @@ def test_transcribe_clip_returns_text_and_duration(model_dir_tmp):
         container.mux(packet)
     container.close()
 
-    with patch.object(sensevoice, "_recognizer", return_value=_FakeRecognizer(" Hello.")):
+    with patch.object(
+        sensevoice, "_recognizer", return_value=_FakeRecognizer(" Hello.")
+    ):
         text, duration = sensevoice.transcribe_clip(str(wav), "en")
     assert text == "Hello."
     assert 0.9 <= duration <= 1.1

@@ -84,7 +84,9 @@ def whisper_status():
     UI summary of the whisper dependency:
       {"installed": bool, "missing": [package names]}
     """
-    missing = ["faster_whisper"] if importlib.util.find_spec("faster_whisper") is None else []
+    missing = (
+        ["faster_whisper"] if importlib.util.find_spec("faster_whisper") is None else []
+    )
     return {"installed": not missing, "missing": missing}
 
 
@@ -123,8 +125,7 @@ def install_whisper():
         return (
             False,
             "pip install of faster-whisper failed (wheels-only; a C build "
-            "of PyAV is not attempted):\n"
-            + output.strip()[-2000:],
+            "of PyAV is not attempted):\n" + output.strip()[-2000:],
         )
     return True, (
         "Installed faster-whisper.  "
@@ -159,9 +160,7 @@ def resolve_language_tag(language):
     if custom:
         return custom
     return (
-        LANG_NAME_TO_CODE.get(
-            (getattr(language, "name", "") or "").strip().lower()
-        )
+        LANG_NAME_TO_CODE.get((getattr(language, "name", "") or "").strip().lower())
         or ""
     )
 
@@ -225,7 +224,9 @@ def _load_model(model_size):
             logger.info("whisper: cache miss, loading model '%s'", model_size)
             # Delayed: only import the heavy package when actually
             # transcribing.
-            from faster_whisper import WhisperModel  # pylint: disable=import-error,import-outside-toplevel
+            from faster_whisper import (
+                WhisperModel,
+            )  # pylint: disable=import-error,import-outside-toplevel
 
             # CPU + int8: no GPU assumed on a self-hosted box, int8 is the
             # fastest accurate quantization for CPU inference.
@@ -583,9 +584,7 @@ def purge_finished_tasks():
     "Drop terminal-state tasks; called before starting a new one."
     with _TASKS_LOCK:
         for task_id in [
-            tid
-            for tid, t in _TASKS.items()
-            if t.get("state") in ("finished", "error")
+            tid for tid, t in _TASKS.items() if t.get("state") in ("finished", "error")
         ]:
             del _TASKS[task_id]
 
@@ -604,7 +603,9 @@ def model_cache_info():
     info = [{"size": s, "cached": False, "size_mb": 0} for s in ALLOWED_MODEL_SIZES]
     try:
         # Delayed: heavy optional dependency chain.
-        from huggingface_hub import scan_cache_dir  # pylint: disable=import-error,import-outside-toplevel
+        from huggingface_hub import (
+            scan_cache_dir,
+        )  # pylint: disable=import-error,import-outside-toplevel
 
         repos = {}
         for repo in scan_cache_dir().repos:
@@ -636,7 +637,9 @@ def delete_model(model_size):
 
     repo_id = _MODEL_REPOS[model_size]
     try:
-        from huggingface_hub import scan_cache_dir  # pylint: disable=import-error,import-outside-toplevel
+        from huggingface_hub import (
+            scan_cache_dir,
+        )  # pylint: disable=import-error,import-outside-toplevel
 
         for repo in scan_cache_dir().repos:
             if repo.repo_id == repo_id:

@@ -54,9 +54,7 @@ def _settings_form_data(resp):
     data = {}
     for m in re.finditer(r'<input[^>]*name="([^"]+)"[^>]*value="([^"]*)"', html):
         data[m.group(1)] = m.group(2)
-    for m in re.finditer(
-        r'<select[^>]*name="([^"]+)"[^>]*>(.*?)</select>', html, re.S
-    ):
+    for m in re.finditer(r'<select[^>]*name="([^"]+)"[^>]*>(.*?)</select>', html, re.S):
         name, body = m.group(1), m.group(2)
         sel = re.search(r'<option[^>]*selected[^>]*value="([^"]*)"', body)
         if sel:
@@ -365,7 +363,9 @@ def test_whisper_install_is_admin_only(as_mei, monkeypatch):
 
     called = []
     monkeypatch.setattr(
-        whisper_transcribe, "install_whisper", lambda: (called.append(1), (True, "x"))[1]
+        whisper_transcribe,
+        "install_whisper",
+        lambda: (called.append(1), (True, "x"))[1],
     )
     resp = as_mei.post("/book/whisper/install")
     assert resp.status_code == 403

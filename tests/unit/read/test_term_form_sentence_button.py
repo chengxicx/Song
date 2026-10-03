@@ -67,7 +67,9 @@ def test_reading_frame_new_term_form_also_offers_it(app_context, client, english
     assert 'id="btn-sentence"' in body
 
 
-def test_standalone_edit_page_has_no_sentence_button(app_context, client, english, repo):
+def test_standalone_edit_page_has_no_sentence_button(
+    app_context, client, english, repo
+):
     "Outside the reading screen there is no reader to do the lookup."
     term = _save_term(repo, english, "sentencebtn2")
     body = client.get(f"/term/edit/{term.id}").get_data(as_text=True)
@@ -161,7 +163,9 @@ def test_dict_tabs_define_sentence_mode():
 
     assert "class SentenceDictButton extends DictButton" in src
     assert "LUTE_SENTENCE_LOOKUP_DICTS" in src
-    builder = src.split("function createSentenceLookupButtons")[1].split("\nfunction ", 1)[0]
+    builder = src.split("function createSentenceLookupButtons")[1].split(
+        "\nfunction ", 1
+    )[0]
     # Every invocation starts from the first dictionary (no cycling).
     assert "LookupButton.all[0]" in builder
     assert "sentenceMode = true" in builder
@@ -183,7 +187,9 @@ def test_toggle_off_restores_the_previously_active_term_dict():
         src = f.read()
 
     # Entering sentence mode remembers the active term DictButton.
-    enter = src.split("function createSentenceLookupButtons")[1].split("\nfunction ", 1)[0]
+    enter = src.split("function createSentenceLookupButtons")[1].split(
+        "\nfunction ", 1
+    )[0]
     assert "lastTermDictID" in enter
     assert "instanceof SentenceDictButton" in enter
     # Restoring reuses the saved id.
@@ -191,5 +197,7 @@ def test_toggle_off_restores_the_previously_active_term_dict():
     assert "LookupButton.lastTermDictID" in restore
     assert "createLookupButtons(5, saved)" in restore
     # createLookupButtons must accept and honor the saved id.
-    create = src.split("function createLookupButtons(")[1].split("\n  // Make all", 1)[0]
+    create = src.split("function createLookupButtons(")[1].split("\n  // Make all", 1)[
+        0
+    ]
     assert "activateDictID" in create
