@@ -57,9 +57,7 @@ class _FakeParsedToken:
 class _FakeParser:
     "Duck-typed parser: fixed readings + plain lowercase."
 
-    def __init__(
-        self, readings=None, multi_readings=None, context_readings=None
-    ):
+    def __init__(self, readings=None, multi_readings=None, context_readings=None):
         self.readings = readings or {}
         self.multi_readings = multi_readings or {}
         # [(surface, reading-or-None)] a get_context_readings call answers,
@@ -202,9 +200,7 @@ def test_several_merged_spoken_tokens_join_to_matches():
 def test_drift_runs_leave_a_genuinely_unspoken_word_a_miss():
     "Words absorbed by a drift run match; a different word after stays judged."
     lang = _FakeLanguage(["呢个", "系阿乐", "唔该"])
-    res = shadowing.compare_tokens(
-        ["呢", "个", "系", "阿乐", "唔好"], "呢个 系阿乐 唔该", lang
-    )
+    res = shadowing.compare_tokens(["呢", "个", "系", "阿乐", "唔好"], "呢个 系阿乐 唔该", lang)
     assert res["statuses"] == [2, 2, 2, 2, 0]
     # 唔该 was paired against 唔好 as its attempted misread, so it is
     # not also counted as an extra.
@@ -296,9 +292,7 @@ def test_leftover_word_rescued_by_syllables_inside_a_merged_token():
     in the chunk's reading (gau3 laa1), so it is the near-miss it
     sounds like instead of a skip.
     """
-    lang = _FakeLanguage(
-        ["夠啦"], readings={"夠": "gau3", "喇": "laa3", "夠啦": "gau3 laa1"}
-    )
+    lang = _FakeLanguage(["夠啦"], readings={"夠": "gau3", "喇": "laa3", "夠啦": "gau3 laa1"})
     lang.tts_lang = "zh-HK"
     res = shadowing.compare_tokens(["夠", "喇"], "夠啦", lang)
     assert res["statuses"] == [1, 1]
@@ -369,9 +363,7 @@ def test_japanese_matches_by_reading():
         parser_type="japanese",
         readings={"良い": "いい", "天気": "テンキ"},
     )
-    res = shadowing.compare_tokens(
-        ["今日", "は", "良い", "天気", "です"], "今日はいい天気です", lang
-    )
+    res = shadowing.compare_tokens(["今日", "は", "良い", "天気", "です"], "今日はいい天気です", lang)
     assert res["statuses"] == [2, 2, 2, 2, 2]
     assert res["score"] == 100
 
@@ -381,6 +373,97 @@ def test_japanese_reading_katakana_normalized():
     lang = _FakeLanguage(["てんき"], parser_type="japanese", readings={"天気": "テンキ"})
     res = shadowing.compare_tokens(["天気"], "てんき", lang)
     assert res["statuses"] == [2]
+
+
+def test_japanese_keys_follow_the_displayed_context_readings():
+    """
+    The panel's furigana is the contextual parse (香山 is こうやま in its
+    sentence, かやま alone); scoring must judge against the same reading.
+    Heard as 高山 (こうざん), the word is the half-credit misread it
+    looks like against こうやま -- not a flat miss against かやま.
+    """
+    lang = _FakeLanguage(
+        ["高山", "へ"],
+        parser_type="japanese",
+        readings={"香山": "かやま", "高山": "こうざん"},
+        context_readings=[("香山", "こうやま"), ("へ", "へ")],
+    )
+    res = shadowing.compare_tokens(["香山", "へ"], "高山へ", lang, original_full_text="香山へ")
+    assert res["statuses"] == [1, 2]
+    assert res["spoken_for_fuzzy"] == {0: "高山"}
+
+
+def test_japanese_keys_stay_per_token_without_the_sentence():
+    "Old clients send no full_text: the isolated readings decide, as before."
+    lang = _FakeLanguage(
+        ["高山", "へ"],
+        parser_type="japanese",
+        readings={"香山": "かやま", "高山": "こうざん"},
+        context_readings=[("香山", "こうやま"), ("へ", "へ")],
+    )
+    res = shadowing.compare_tokens(["香山", "へ"], "高山へ", lang)
+    assert res["statuses"] == [0, 2]
+
+
+def test_japanese_heard_side_also_reads_in_context():
+    """
+    The transcription is a sentence too: its keys follow the same
+    contextual parse the "heard" furigana is drawn from.  私 read alone
+    is わたくし, but both sentences read it わたし -- the user said the
+    word the panel displays, and it scores as one.
+    """
+    lang = _FakeLanguage(
+        ["私", "は"],
+        parser_type="japanese",
+        readings={"私": "わたくし"},
+        context_readings=[("私", "わたし"), ("は", "は")],
+    )
+    res = shadowing.compare_tokens(["私", "は"], "私は", lang, original_full_text="私は")
+    assert res["statuses"] == [2, 2]
+    assert res["score"] == 100
+
+
+def test_japanese_word_inside_glued_heard_chunk_is_a_match():
+    """
+    The engine transcribed こうやま as the non-word chunk 紅う山 (reading
+    あこうやま): the word's kana sits verbatim inside the chunk's
+    reading, so the word was said -- a match, not a misread.
+    """
+    lang = _FakeLanguage(
+        ["紅う山"],
+        parser_type="japanese",
+        readings={"香山": "こうやま", "紅う山": "あこうやま"},
+        context_readings=[("香山", "こうやま")],
+    )
+    res = shadowing.compare_tokens(["香山"], "紅う山", lang, original_full_text="香山")
+    assert res["statuses"] == [2]
+    assert res["score"] == 100
+
+
+def test_japanese_containment_rescue_needs_the_whole_word():
+    "A chunk sharing only part of the word's kana is not the word."
+    lang = _FakeLanguage(
+        ["こうざん"],
+        parser_type="japanese",
+        readings={"香山": "こうやま", "高山": "こうざん"},
+        context_readings=[("香山", "こうやま")],
+    )
+    # こうやま vs こうざん: no containment (ん never appears), ratio 0.5
+    # → half-credit misread, not a match.
+    res = shadowing.compare_tokens(["香山"], "こうざん", lang, original_full_text="香山")
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "こうざん"}
+
+
+def test_japanese_one_mora_words_are_not_containment_matched():
+    "A single-mora key must not match every chunk that happens to contain it."
+    lang = _FakeLanguage(
+        ["ばか"], parser_type="japanese", readings={"か": "か", "ばか": "ばか"}
+    )
+    # か (1 mora) inside ばか: without the length gate this would match.
+    res = shadowing.compare_tokens(["か"], "ばか", lang, original_full_text="か")
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "ばか"}
 
 
 def test_spoken_punctuation_ignored():
@@ -545,9 +628,7 @@ _CONTEXT_READINGS = [
 
 def test_annotate_tokens_full_text_reads_in_context():
     "With the sentence, readings come from the contextual parse."
-    lang = _FakeLanguage(
-        [], parser_type="japanese", context_readings=_CONTEXT_READINGS
-    )
+    lang = _FakeLanguage([], parser_type="japanese", context_readings=_CONTEXT_READINGS)
     annotated = shadowing.annotate_tokens(
         ["広い", "宇宙", "の", "数", "ある", "一", "つ"],
         lang,
@@ -759,6 +840,44 @@ def test_status_endpoint_reports_unknown(app, client):
     assert resp.get_json()["state"] == "unknown"
 
 
+def test_route_passes_full_text_to_the_scorer(app, app_context, client, english):
+    "The sentence rides along to the diff, or arrives as None when absent."
+    calls = []
+
+    real = shadowing.compare_tokens
+
+    def _spy(*args, **kwargs):
+        calls.append(kwargs.get("original_full_text"))
+        return real(*args, **kwargs)
+
+    def _fake_clip(audio_path, lang_code, model_size="small"):
+        return "The calm cat.", 6.0
+
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(shadowing, "transcribe_clip", side_effect=_fake_clip), patch.object(
+        shadowing, "compare_tokens", side_effect=_spy
+    ):
+        for full_text in ("The calm cat.", None):
+            data = {
+                "language_id": str(english.id),
+                "tokens": json.dumps(["The", "calm", "cat"]),
+                "audio": (io.BytesIO(b"fake webm bytes"), "clip.webm"),
+            }
+            if full_text is not None:
+                data["full_text"] = full_text
+            resp = client.post(
+                "/read/shadowing/transcribe",
+                data=data,
+                content_type="multipart/form-data",
+            )
+            assert resp.status_code == 200
+            status = _wait_for_task(resp.get_json()["task_id"])
+            assert status["state"] == "finished"
+
+    assert calls == ["The calm cat.", None]
+
+
 def test_route_uses_sensevoice_when_available(app, app_context, client, english):
     "A supported language transcribes via SenseVoice when it is ready."
 
@@ -766,11 +885,13 @@ def test_route_uses_sensevoice_when_available(app, app_context, client, english)
         assert lang_code == "en"
         return "The calm cat.", 6.0
 
-    with patch.object(shadowing, "whisper_status", return_value={"installed": True}), patch.object(
-        sensevoice, "available", return_value=True
-    ), patch.object(
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(sensevoice, "available", return_value=True), patch.object(
         sensevoice, "ensure_model_downloaded"
-    ), patch.object(sensevoice, "transcribe_clip", side_effect=_fake_sv):
+    ), patch.object(
+        sensevoice, "transcribe_clip", side_effect=_fake_sv
+    ):
         resp = client.post(
             "/read/shadowing/transcribe",
             data={
@@ -933,9 +1054,7 @@ def test_readings_route_rejects_bad_tokens(app, client, english):
 
 
 def test_readings_route_requires_language(app, client):
-    resp = client.post(
-        "/read/shadowing/readings", json={"tokens": ["a"]}
-    )
+    resp = client.post("/read/shadowing/readings", json={"tokens": ["a"]})
     assert resp.status_code == 400
     assert "language" in resp.get_json()["error"]
 
