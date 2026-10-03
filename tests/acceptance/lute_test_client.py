@@ -596,17 +596,27 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         makes the recording independent of the browser's autoplay policy
         (the page still decides *whether* to speak, which is what is
         under test).
+
+        Both entry points get the same treatment: lute-review.js
+        prefers luteTtsSpeakTerm (the annotated-reading-aware wrapper,
+        which is what kana annotations ride on) and falls back to
+        luteTtsSpeak.  Both take (text, <ignored>, lang), so one
+        recorder shape fits.
         """
         self.page.add_init_script(
             """
             window.__spoken = [];
-            Object.defineProperty(window, "luteTtsSpeak", {
-              configurable: true,
-              set: (fn) => { window.__realTtsSpeak = fn; },
-              get: () => (text, onStarted, lang) => {
-                window.__spoken.push({ text: text, lang: lang });
-              },
-            });
+            const spy = (propName) => {
+              Object.defineProperty(window, propName, {
+                configurable: true,
+                set: (fn) => { window.__realTtsSpeak = fn; },
+                get: () => (text, ignored, lang) => {
+                  window.__spoken.push({ text: text, lang: lang });
+                },
+              });
+            };
+            spy("luteTtsSpeak");
+            spy("luteTtsSpeakTerm");
             """
         )
 
