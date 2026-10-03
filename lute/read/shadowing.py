@@ -46,6 +46,14 @@ STATUS_SKIP = 3  # punctuation etc.: never scored, never marked
 # i.e. readings for Japanese.
 FUZZY_MATCH_RATIO = 0.6
 
+# Japanese diff keys are hiragana strings a few morae long, where
+# SequenceMatcher ratios quantize coarsely: half the morae of a word
+# matching lands at exactly 0.5, which the 0.6 threshold would call a
+# flat miss.  A learner judged against what the panel heard should get
+# the half-credit "misread" verdict (with the heard word shown) rather
+# than a silent miss, so Japanese pairs near-match from 0.45 up.
+FUZZY_MATCH_RATIO_JA = 0.45
+
 
 def transcribe_clip(audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE):
     """
@@ -98,19 +106,14 @@ def transcribe_clip(audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE):
 # two spellings of the same spoken thing compare equal.  Symbols that
 # are part of what was said (%, $, +) are kept.
 _EDGE_JUNK = (
-    " \t\n\r\u00a0.,!?;:\"'`“”‘’«»„()[]{}/\\…·•*|~^\u2013\u2014-"
-    "，。、！？：；（）【】「」『』"
+    " \t\n\r\u00a0.,!?;:\"'`“”‘’«»„()[]{}/\\…·•*|~^\u2013\u2014-" "，。、！？：；（）【】「」『』"
 )
 
 
 def _clean_token(token):
     "Strip display artifacts and glued-on edge punctuation from a token."
     return (
-        (token or "")
-        .replace("\u200B", "")
-        .replace("🔊", "")
-        .strip()
-        .strip(_EDGE_JUNK)
+        (token or "").replace("\u200B", "").replace("🔊", "").strip().strip(_EDGE_JUNK)
     )
 
 
@@ -266,7 +269,9 @@ def _simplified_converter():
     if not _OPENCC_CHECKED:
         _OPENCC_CHECKED = True
         try:
-            from opencc import OpenCC  # pylint: disable=import-error,import-outside-toplevel
+            from opencc import (
+                OpenCC,
+            )  # pylint: disable=import-error,import-outside-toplevel
 
             _OPENCC_T2S = OpenCC("t2s")
         except Exception:  # pylint: disable=broad-exception-caught
@@ -297,7 +302,9 @@ def _traditional_converter():
     if not _OPENCC_S2T_CHECKED:
         _OPENCC_S2T_CHECKED = True
         try:
-            from opencc import OpenCC  # pylint: disable=import-error,import-outside-toplevel
+            from opencc import (
+                OpenCC,
+            )  # pylint: disable=import-error,import-outside-toplevel
 
             _OPENCC_S2T = OpenCC("s2t")
         except Exception:  # pylint: disable=broad-exception-caught
@@ -337,11 +344,31 @@ def _match_book_script(text, original_tokens, language):
 # matches once the dakuten/handakuten marks are stripped is a near-miss
 # (fuzzy), not a complete mismatch (miss).
 _DAKUTEN_BASE = {
-    "が": "か", "ぎ": "き", "ぐ": "く", "げ": "け", "ご": "こ",
-    "ざ": "さ", "じ": "し", "ず": "す", "ぜ": "せ", "ぞ": "そ",
-    "だ": "た", "ぢ": "ち", "づ": "つ", "で": "て", "ど": "と",
-    "ば": "は", "び": "ひ", "ぶ": "ふ", "べ": "へ", "ぼ": "ほ",
-    "ぱ": "は", "ぴ": "ひ", "ぷ": "ふ", "ぺ": "へ", "ぽ": "ほ",
+    "が": "か",
+    "ぎ": "き",
+    "ぐ": "く",
+    "げ": "け",
+    "ご": "こ",
+    "ざ": "さ",
+    "じ": "し",
+    "ず": "す",
+    "ぜ": "せ",
+    "ぞ": "そ",
+    "だ": "た",
+    "ぢ": "ち",
+    "づ": "つ",
+    "で": "て",
+    "ど": "と",
+    "ば": "は",
+    "び": "ひ",
+    "ぶ": "ふ",
+    "べ": "へ",
+    "ぼ": "ほ",
+    "ぱ": "は",
+    "ぴ": "ひ",
+    "ぷ": "ふ",
+    "ぺ": "へ",
+    "ぽ": "ほ",
     "ゔ": "う",
 }
 
@@ -383,25 +410,79 @@ def _make_key_fn(language):
     return key
 
 
+def _context_keys(tokens, full_text, language, base_key_of):
+    """
+    Token keys from one contextual parse of the sentence, falling back to
+    the per-token base keys.
+
+    The panel's furigana is drawn from a contextual parse of the whole
+    sentence (annotate_tokens), and scoring must judge the user against
+    the SAME readings: the isolated per-token lookup can pick a different
+    morpheme split than the sentence does (香山 is かやま alone but
+    こうやま in its sentence), which would grade a correctly-read word
+    against a reading the user was never shown.  The transcription side
+    runs the same machinery with the heard text as its context, so the
+    "heard" furigana and the spoken keys agree as well.
+
+    A token the morphemes cannot rebuild (or a sentence that fails to
+    parse) falls back to the base key, per token.
+    """
+    if not is_japanese_language(language) or not (full_text or "").strip():
+        return [base_key_of(t) for t in tokens]
+    try:
+        morphs = language.parser.get_context_readings(full_text)
+    except Exception:  # pylint: disable=broad-exception-caught
+        morphs = None
+    if not morphs:
+        return [base_key_of(t) for t in tokens]
+    aligned = _align_context_readings(tokens, morphs)
+    if aligned is None:
+        return [base_key_of(t) for t in tokens]
+    keys = []
+    for entry, raw in zip(aligned, tokens):
+        reading = (entry.get("reading") or "").strip()
+        keys.append(jaconv.kata2hira(reading) if reading else base_key_of(raw))
+    return keys
+
+
 # Pinyin tone marks -> plain vowel + tone digit.  pypinyin emits marked
 # vowels (mā) while pycantonese emits digits (maa1); folding both to
 # syllable+digit gives the fuzzy rescue one comparable shape, and keeps
 # a tone slip (妈 mā read as 骂 mà) eligible as a near-miss.
 _TONE_MARKS = {
-    "ā": "a1", "á": "a2", "ǎ": "a3", "à": "a4",
-    "ē": "e1", "é": "e2", "ě": "e3", "è": "e4",
-    "ī": "i1", "í": "i2", "ǐ": "i3", "ì": "i4",
-    "ō": "o1", "ó": "o2", "ǒ": "o3", "ò": "o4",
-    "ū": "u1", "ú": "u2", "ǔ": "u3", "ù": "u4",
-    "ǖ": "v1", "ǘ": "v2", "ǚ": "v3", "ǜ": "v4",
+    "ā": "a1",
+    "á": "a2",
+    "ǎ": "a3",
+    "à": "a4",
+    "ē": "e1",
+    "é": "e2",
+    "ě": "e3",
+    "è": "e4",
+    "ī": "i1",
+    "í": "i2",
+    "ǐ": "i3",
+    "ì": "i4",
+    "ō": "o1",
+    "ó": "o2",
+    "ǒ": "o3",
+    "ò": "o4",
+    "ū": "u1",
+    "ú": "u2",
+    "ǔ": "u3",
+    "ù": "u4",
+    "ǖ": "v1",
+    "ǘ": "v2",
+    "ǚ": "v3",
+    "ǜ": "v4",
 }
 
 
 def _normalize_reading(reading):
     "A parser reading -> compact sound key (lowercase, digit tones, no spaces)."
     return (
-        "".join(_TONE_MARKS.get(ch, ch) for ch in (reading or "").lower())
-        .replace(" ", "")
+        "".join(_TONE_MARKS.get(ch, ch) for ch in (reading or "").lower()).replace(
+            " ", ""
+        )
         or None
     )
 
@@ -486,7 +567,13 @@ def _make_sound_fn(language):
     return sound
 
 
-def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
+def compare_tokens(
+    original_tokens,
+    spoken_text,
+    language,
+    spoken_tokens=None,
+    original_full_text=None,
+):
     """
     Diff the user's transcription against the sentence's word tokens.
 
@@ -496,6 +583,11 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
     spoken_tokens: optional pre-parsed transcription tokens (from
       _spoken_tokens); the caller may already have them for the furigana
       annotation and re-parsing would only repeat the parser work.
+    original_full_text: the sentence the tokens belong to, when the
+      client sent it.  Japanese keys are then read in sentence context
+      (see _context_keys), judging the user against the readings the
+      panel actually displays; without it the isolated per-token
+      readings are used, as before.
 
     Returns {
       "statuses": [STATUS_* per original token],
@@ -521,7 +613,7 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
         "score": 100,
     }
 
-    key_of = _make_key_fn(language)
+    base_key_of = _make_key_fn(language)
     sound_of = _make_sound_fn(language)
     is_japanese = is_japanese_language(language)
     spoken = (
@@ -534,8 +626,14 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
     if not original_tokens:
         return result
 
-    orig_keys = [key_of(t) for t in original_tokens]
-    spoken_keys = [key_of(s) for s in spoken]
+    orig_keys = _context_keys(
+        original_tokens, original_full_text, language, base_key_of
+    )
+    # The transcription is a sentence too: its keys follow the same
+    # contextual parse the "heard" furigana is drawn from, so a word the
+    # engine kanji-ized is judged by the reading the panel shows the
+    # user, not by an isolated dictionary lookup.
+    spoken_keys = _context_keys(spoken, spoken_text, language, base_key_of)
 
     # Punctuation-only or empty original tokens (parser quirks,
     # rendering artifacts) can never be spoken; skip them entirely --
@@ -572,14 +670,10 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
         counterpart of its own; those left behind get a final
         containment pass before being called misses.
         """
-        if i2 - i1 == 1 and j2 - j1 > 1 and keyed[i1] == "".join(
-            spoken_keys[j1:j2]
-        ):
+        if i2 - i1 == 1 and j2 - j1 > 1 and keyed[i1] == "".join(spoken_keys[j1:j2]):
             statuses[scored[i1]] = STATUS_MATCH
             return
-        if j2 - j1 == 1 and i2 - i1 > 1 and spoken_keys[j1] == "".join(
-            keyed[i1:i2]
-        ):
+        if j2 - j1 == 1 and i2 - i1 > 1 and spoken_keys[j1] == "".join(keyed[i1:i2]):
             for k in range(i1, i2):
                 statuses[scored[k]] = STATUS_MATCH
             return
@@ -609,16 +703,25 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
         n = min(i2 - oi, j2 - si)
         for k in range(n):
             okey, skey = keyed[oi + k], spoken_keys[si + k]
+            if is_japanese and len(okey) > 1 and okey in skey:
+                # The heard chunk contains the word's kana verbatim: the
+                # word was said, with the engine gluing extra material
+                # around it (こうやま transcribed as the non-word 紅う山,
+                # whose reading あこうやま wraps the kana).  Said as-is,
+                # not a near-miss.
+                statuses[scored[oi + k]] = STATUS_MATCH
+                continue
+            threshold = FUZZY_MATCH_RATIO_JA if is_japanese else FUZZY_MATCH_RATIO
             ratio = difflib.SequenceMatcher(None, okey, skey).ratio()
-            if ratio < FUZZY_MATCH_RATIO and is_japanese:
+            if ratio < threshold and is_japanese:
                 # Voicing is the one difference a ratio of 0 hides:
                 # か heard as が is a near-miss, not a different word.
                 voiced = difflib.SequenceMatcher(
                     None, _strip_dakuten(okey), _strip_dakuten(skey)
                 ).ratio()
-                if voiced >= FUZZY_MATCH_RATIO:
+                if voiced >= threshold:
                     ratio = voiced
-            elif ratio < FUZZY_MATCH_RATIO and sound_of is not None:
+            elif ratio < threshold and sound_of is not None:
                 # A Chinese misread is a different character, so the
                 # surface forms share nothing; re-judge the pair on the
                 # romanization before calling it a skip.  Pairs are
@@ -628,14 +731,12 @@ def compare_tokens(original_tokens, spoken_text, language, spoken_tokens=None):
                 best = 0.0
                 for oread in sound_of(original_tokens[scored[oi + k]]):
                     for sread in sound_of(spoken[si + k]):
-                        voiced = difflib.SequenceMatcher(
-                            None, oread, sread
-                        ).ratio()
+                        voiced = difflib.SequenceMatcher(None, oread, sread).ratio()
                         if voiced > best:
                             best = voiced
-                if best >= FUZZY_MATCH_RATIO:
+                if best >= threshold:
                     ratio = best
-            if ratio >= FUZZY_MATCH_RATIO:
+            if ratio >= threshold:
                 orig_index = scored[oi + k]
                 statuses[orig_index] = STATUS_FUZZY
                 result["spoken_for_fuzzy"][orig_index] = spoken[si + k]
@@ -756,28 +857,56 @@ def purge_finished_tasks():
             del _TASKS[tid]
 
 
-def start_task(app, audio_path, language_id, tokens, model_size, username=None):
+def start_task(
+    app,
+    audio_path,
+    language_id,
+    tokens,
+    model_size,
+    username=None,
+    full_text=None,
+):
     """
     Register and launch a background scoring task.
 
     audio_path is a temp file (already on disk); the task deletes it.
     username is the requesting user (multi-user mode); the task thread
     re-enters that user's scope so its db access lands on the user's
-    own sqlite file.  Returns the task_id.
+    own sqlite file.  full_text is the sentence the tokens belong to
+    (Japanese reads its keys in context -- see compare_tokens).
+    Returns the task_id.
     """
     purge_finished_tasks()
     task_id = uuid.uuid4().hex
     _set_task(task_id, "queued")
     thread = threading.Thread(
         target=_run_task,
-        args=(app, task_id, audio_path, language_id, tokens, model_size, username),
+        args=(
+            app,
+            task_id,
+            audio_path,
+            language_id,
+            tokens,
+            model_size,
+            username,
+            full_text,
+        ),
         daemon=True,
     )
     thread.start()
     return task_id
 
 
-def _run_task(app, task_id, audio_path, language_id, tokens, model_size, username):
+def _run_task(
+    app,
+    task_id,
+    audio_path,
+    language_id,
+    tokens,
+    model_size,
+    username,
+    full_text=None,
+):
     "Thread body: transcribe, diff, store the result. Cleans its temp file."
     try:
         # user_scope is a no-op in single-user mode (username=None); in
@@ -834,7 +963,11 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
             text = _match_book_script(text, tokens, lang)
             spoken_tokens = _spoken_tokens(text, lang)
             comparison = compare_tokens(
-                tokens, text, lang, spoken_tokens=spoken_tokens
+                tokens,
+                text,
+                lang,
+                spoken_tokens=spoken_tokens,
+                original_full_text=full_text,
             )
             rate = None
             if duration and duration > 0:
@@ -859,8 +992,7 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
                 ),
                 "statuses": comparison["statuses"],
                 "spoken_for_fuzzy": {
-                    str(k): v
-                    for k, v in comparison["spoken_for_fuzzy"].items()
+                    str(k): v for k, v in comparison["spoken_for_fuzzy"].items()
                 },
                 "extras": comparison["extras"],
                 "score": comparison["score"],
@@ -869,9 +1001,7 @@ def _run_task(app, task_id, audio_path, language_id, tokens, model_size, usernam
                 "total": comparison["total"],
                 "duration": round(duration or 0.0, 2),
                 "tokens_per_minute": rate,
-                "token_kind": "morpheme"
-                if is_japanese_language(lang)
-                else "word",
+                "token_kind": "morpheme" if is_japanese_language(lang) else "word",
             }
             _set_task(task_id, "finished", result=result)
     except Exception as e:  # pylint: disable=broad-exception-caught

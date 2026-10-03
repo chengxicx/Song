@@ -1247,7 +1247,9 @@ def shadowing_transcribe():
 
     Multipart fields: audio (the recording blob), language_id, tokens
     (JSON array of the sentence's word spans' data-text, in DOM order),
-    model (optional whisper size).
+    model (optional whisper size), full_text (optional sentence the
+    tokens belong to; Japanese scores its keys against the contextual
+    readings the panel displays).
 
     Async on purpose: the first transcription loads the whisper model
     (hundreds of MB, possibly downloaded on the spot) and CPU inference
@@ -1256,9 +1258,10 @@ def shadowing_transcribe():
     /read/shadowing/status/<task_id> until finished/error.
     """
     if not shadowing.whisper_status()["installed"]:
-        return jsonify(
-            {"error": "whisper is not installed (see Settings > Whisper)."}
-        ), 400
+        return (
+            jsonify({"error": "whisper is not installed (see Settings > Whisper)."}),
+            400,
+        )
 
     audio = request.files.get("audio")
     if audio is None or not (audio.filename or "").strip():
@@ -1270,6 +1273,8 @@ def shadowing_transcribe():
         return jsonify({"error": "invalid tokens payload"}), 400
     if not isinstance(tokens, list) or not all(isinstance(t, str) for t in tokens):
         return jsonify({"error": "invalid tokens payload"}), 400
+
+    full_text = (request.form.get("full_text") or "").strip() or None
 
     lang = LanguageRepository(db.session).find(
         request.form.get("language_id", type=int) or 0
@@ -1296,6 +1301,7 @@ def shadowing_transcribe():
         tokens,
         model_size,
         username=get_current_user(),
+        full_text=full_text,
     )
     return jsonify({"task_id": task_id})
 
@@ -1320,9 +1326,7 @@ def shadowing_readings():
     """
     payload = request.get_json(silent=True) or {}
     tokens = payload.get("tokens") or []
-    if not isinstance(tokens, list) or not all(
-        isinstance(t, str) for t in tokens
-    ):
+    if not isinstance(tokens, list) or not all(isinstance(t, str) for t in tokens):
         return jsonify({"error": "invalid tokens payload"}), 400
     full_text = payload.get("full_text")
     if full_text is not None and not isinstance(full_text, str):
