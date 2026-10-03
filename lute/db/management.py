@@ -36,7 +36,20 @@ def delete_all_data(session):
     ]
     for s in statements:
         session.execute(text(s))
-    session.commit()
+    # The deletes went in as raw SQL, so the ORM still holds the rows it
+    # loaded earlier: without this, re-adding the defaults inserts keys the
+    # identity map already has, and SQLAlchemy warns about every one of
+    # them.  Everything really is gone, so forget what the session knew.
+    session.expunge_all()
+    # No commit here: the deletes and the default re-insert have to publish
+    # together.  Committing the deletes on their own left a window in which
+    # another connection saw a settings table with no rows at all, and the
+    # reading page's term-popup prefetch is exactly such a reader -- a wipe
+    # landing mid-request 500'd it with MissingUserSettingKeyException
+    # (seen intermittently in `inv accept --kflag=reading`).
+    # add_default_user_settings commits, and its key_exists checks run
+    # inside this transaction, so it still sees the deletes and re-adds
+    # every key.
     add_default_user_settings(session, current_app.env_config.default_user_backup_path)
     # "Restore user settings" means in memory too.  Settings are served
     # from a per-process cache (lute.settings.current), so without this
