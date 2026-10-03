@@ -611,6 +611,32 @@ div.toolbar {
     color: #212529;
 }
 
+/* On the reading screen the notice sits above the reading pane, and the
+   dictionary pane (#read_pane_right) is fixed over the right half of the
+   viewport -- so it painted over the notice's right half.  With a long
+   book title the tail of the message ("re-imported: the manga pages were
+   replaced.") was hidden behind the pane.  Lift the notice above it: the
+   pane has z-index: auto on desktop, while the narrow-screen bottom
+   sheet keeps its 1003, so an opened sheet still wins. */
+body:has(#read_pane_container) .flash-notice {
+    position: relative;
+    z-index: 2;
+}
+
+/* Narrow screens stack differently: #reading-header is fixed at the top of
+   the viewport (4rem tall, z-index 1001), and only #read_pane_left is
+   shifted below it -- the notice, which lives outside that container, ends
+   up underneath it.  Measured at 420x800: the notice's text line sat at
+   y 51-69 with the header's bottom edge at 64, so the top of the message
+   was painted over.  Keep the notice above the header (1001) and below the
+   dictionary sheet (1003) and the side menu (1004); tooltips (1002) tie
+   and win on DOM order, which is what we want for an interactive popup. */
+@media screen and (max-width: 980px) {
+    body:has(#read_pane_container) .flash-notice {
+        z-index: 1002;
+    }
+}
+
 .flash-notice-narrow {
     margin-top: 2px;
     padding: 2px;
