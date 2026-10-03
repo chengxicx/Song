@@ -2,6 +2,8 @@
 Tests for the language form TTS / translate target dropdowns.
 """
 
+import pytest
+
 from lute.language.langtags import LANGUAGE_TAGS, tag_choices
 from lute.language.forms import LanguageForm
 
@@ -111,6 +113,21 @@ def _japanese_like_language():
     return lang
 
 
+def _require_sudachi_in_form_choices():
+    """
+    The POST tests need the language's own parser to be a valid form
+    choice, and the edit form only offers selectable parsers:
+    japanese_sudachi is an optional extra (the fallback MeCab parser is
+    legacy and so not offered), so on a base install without sudachipy
+    the POST would fail validation.  Skips there; nightly-guardrail
+    runs these with the grammar engines installed.
+    """
+    from lute.parse.registry import supported_parser_types
+
+    if "japanese_sudachi" not in supported_parser_types():
+        pytest.skip("japanese_sudachi parser not installed (optional extra)")
+
+
 def test_hidden_grammar_choices_depend_on_the_language(app_context):
     "Japanese offers JLPT plus the aggregates; no-engine languages offer none."
     from lute.language.forms import LanguageForm
@@ -150,6 +167,7 @@ def test_stored_unknown_hidden_token_stays_selectable(app_context):
 
 def test_form_post_persists_hidden_grammar_levels(client, empty_db, japanese):
     "Posting the checked boxes saves them to the language."
+    _require_sudachi_in_form_choices()
     from lute.db import db
     from lute.models.language import Language
 
@@ -181,6 +199,7 @@ def test_form_post_persists_hidden_grammar_levels(client, empty_db, japanese):
 
 def test_form_post_with_no_boxes_checked_clears_the_setting(client, empty_db, japanese):
     "Omitting the field (nothing checked) hides nothing again."
+    _require_sudachi_in_form_choices()
     from lute.db import db
     from lute.models.language import Language
 
