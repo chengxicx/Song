@@ -722,7 +722,9 @@ def whisper_prepare():
             title = base or "MP3 audio"
     else:
         return (
-            jsonify({"error": "Please provide an audio file (upload or an online URL)."}),
+            jsonify(
+                {"error": "Please provide an audio file (upload or an online URL)."}
+            ),
             400,
         )
 
@@ -833,7 +835,9 @@ def whisper_delete_model():
             ),
             409,
         )
-    ok, message = whisper_transcribe.delete_model(request.form.get("whisper_model") or "")
+    ok, message = whisper_transcribe.delete_model(
+        request.form.get("whisper_model") or ""
+    )
     return jsonify({"ok": ok, "message": message}), (200 if ok else 400)
 
 

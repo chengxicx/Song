@@ -10,6 +10,7 @@ thread its own tokenizer while sharing the dictionary.
 """
 
 import threading
+from typing import List, Optional, Tuple
 
 import pytest
 
@@ -26,6 +27,15 @@ def _make_parser():
     if not JapaneseSudachiParser.is_supported():
         pytest.skip("sudachipy and a sudachi dictionary are required")
     return JapaneseSudachiParser()
+
+
+def _context_readings(parser, text):
+    "get_context_readings narrowed to its list form, asserting it exists."
+    morphs = parser.get_context_readings(text)
+    assert morphs is not None, f"expected context readings for {text!r}"
+    readings: List[Tuple[str, Optional[str]]] = []
+    readings.extend(morphs)
+    return readings
 
 
 @pytest.fixture(autouse=True)
@@ -101,8 +111,7 @@ def test_context_readings_follow_the_sentence(app_context):
 
     assert p.get_reading("一") == "いち"
 
-    morphs = p.get_context_readings("広い宇宙の、数ある一つ")
-    assert morphs is not None
+    morphs = _context_readings(p, "広い宇宙の、数ある一つ")
     assert ("広い", "ひろい") in morphs
     assert ("一", "ひと") in morphs
     # Kana morphemes read as themselves; punctuation has no reading.
@@ -121,7 +130,7 @@ def test_context_readings_use_the_local_window_not_the_whole_sentence(app_contex
     current_settings()["japanese_reading"] = "hiragana"
     p = _make_parser()
 
-    morphs = p.get_context_readings("広い宇宙の、数ある一つ")
+    morphs = _context_readings(p, "広い宇宙の、数ある一つ")
     assert ("数", "かず") in morphs
 
 
@@ -139,8 +148,8 @@ def test_context_readings_keep_a_compound_together(app_context):
     assert p.get_reading("杯") == "さかずき"
     assert p.get_reading("日") == "ひ"
 
-    assert ("杯", "ばい") in p.get_context_readings("一杯のコーヒー")
-    assert ("日", "にち") in p.get_context_readings("一日が長かった")
+    assert ("杯", "ばい") in _context_readings(p, "一杯のコーヒー")
+    assert ("日", "にち") in _context_readings(p, "一日が長かった")
 
 
 def test_context_readings_need_the_reading_setting(app_context):
