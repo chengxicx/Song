@@ -53,23 +53,96 @@ LIBRARY_DIR = os.path.join(BASE, "lute", "jlpt_data", "grammar")
 # Tilde variants and filler punctuation unified before fragmenting.
 _TILDES = re.compile(r"[〜～~−-]")
 _SLOT_WORDS = [
-    "Plain form", "polite form", "past form", "te form", "ta form",
-    "dict form", "dictionary form", "ます-stem", "nai form", "ない form",
-    "V", "Verb", "Adj", "Noun", "Na", "N", "い-adj", "な-adj",
-    "动词", "動詞", "名詞", "名词", "形容詞", "形容词", "形容動詞",
-    "形容动词", "副詞", "副词", "体言", "体言+", "用言", "活用语",
-    "连体形", "连用形", "终止形", "未然形", "假定形", "意志形",
-    "可能态", "被动", "使役", "简体", "敬体", "普通形", "各类品词",
-    "各种品词", "疑问词", "助词", "接尾词", "形式体言", "动词ます形",
-    "动词て形", "动词た形", "动词原形", "动词未然形", "动词连体形",
-    "动词连用形", "动词简体", "活用词连体形", "活用语终止形",
-    "用言连体形", "用言终止形", "形容词词干", "形容动词词干",
-    "サ变动词", "サ变动词词干", "サ变动词词干+こ", "五段动词",
-    "一段动词", "カ变动词", "する", "する・す", "して", "されている",
-    "前面加", "前面接", "接在", "接续法同", "接法同上", "接续同上",
-    "与接名词的用法相同", "名词性结构", "体言结构", "体言或连体形",
-    "体言,活用语连体形", "连体形/体言+の", "连体形/体言",
-    "体言+が/活用语连体形", "体言/动词连体形", "体言/活用语连体形",
+    "Plain form",
+    "polite form",
+    "past form",
+    "te form",
+    "ta form",
+    "dict form",
+    "dictionary form",
+    "ます-stem",
+    "nai form",
+    "ない form",
+    "V",
+    "Verb",
+    "Adj",
+    "Noun",
+    "Na",
+    "N",
+    "い-adj",
+    "な-adj",
+    "动词",
+    "動詞",
+    "名詞",
+    "名词",
+    "形容詞",
+    "形容词",
+    "形容動詞",
+    "形容动词",
+    "副詞",
+    "副词",
+    "体言",
+    "体言+",
+    "用言",
+    "活用语",
+    "连体形",
+    "连用形",
+    "终止形",
+    "未然形",
+    "假定形",
+    "意志形",
+    "可能态",
+    "被动",
+    "使役",
+    "简体",
+    "敬体",
+    "普通形",
+    "各类品词",
+    "各种品词",
+    "疑问词",
+    "助词",
+    "接尾词",
+    "形式体言",
+    "动词ます形",
+    "动词て形",
+    "动词た形",
+    "动词原形",
+    "动词未然形",
+    "动词连体形",
+    "动词连用形",
+    "动词简体",
+    "活用词连体形",
+    "活用语终止形",
+    "用言连体形",
+    "用言终止形",
+    "形容词词干",
+    "形容动词词干",
+    "サ变动词",
+    "サ变动词词干",
+    "サ变动词词干+こ",
+    "五段动词",
+    "一段动词",
+    "カ变动词",
+    "する",
+    "する・す",
+    "して",
+    "されている",
+    "前面加",
+    "前面接",
+    "接在",
+    "接续法同",
+    "接法同上",
+    "接续同上",
+    "与接名词的用法相同",
+    "名词性结构",
+    "体言结构",
+    "体言或连体形",
+    "体言,活用语连体形",
+    "连体形/体言+の",
+    "连体形/体言",
+    "体言+が/活用语连体形",
+    "体言/动词连体形",
+    "体言/活用语连体形",
 ]
 _NOISE = re.compile(r"[\s/／、，,;；()（）\[\]【】「」『』…・.。0-9]+")
 _JP = re.compile(r"[\u3040-\u30ff\u30fc\u3005\u4e00-\u9fff]")
@@ -78,11 +151,20 @@ _JP = re.compile(r"[\u3040-\u30ff\u30fc\u3005\u4e00-\u9fff]")
 # same point; both sides are folded before fragmenting.  Kept explicit and
 # small -- every row here was observed in a real audit miss, not guessed.
 _VARIANT_FOLD = {
-    "上に": "うえに", "上で": "うえで", "上は": "うえは", "上も": "うえも",
-    "上の": "うえの", "上でも": "うえでも", "上では": "うえでは",
-    "代わりに": "かわりに", "かのように": "かのようだ",
-    "わりに(は)": "わりには", "あまりに": "あまり",
-    "出来る": "できる", "頂く": "いただく", "下さる": "くださる",
+    "上に": "うえに",
+    "上で": "うえで",
+    "上は": "うえは",
+    "上も": "うえも",
+    "上の": "うえの",
+    "上でも": "うえでも",
+    "上では": "うえでは",
+    "代わりに": "かわりに",
+    "かのように": "かのようだ",
+    "わりに(は)": "わりには",
+    "あまりに": "あまり",
+    "出来る": "できる",
+    "頂く": "いただく",
+    "下さる": "くださる",
 }
 
 # Single-kana particles are pure noise as index keys: 「わりに(は)」 yields a
@@ -202,8 +284,7 @@ def _match(entry, entries, idx):
     for frag in frags:
         hits |= idx.get(frag, set())
     hits &= entries.keys()
-    exact = {eid for eid in hits
-             if frags & _slug(entries[eid]["pattern"])}
+    exact = {eid for eid in hits if frags & _slug(entries[eid]["pattern"])}
     if exact:
         return "covered", sorted(exact)
     if hits:
@@ -253,24 +334,39 @@ def run(write=True, print_summary=False):
                     for eid in ids:
                         gaps = _gaps(e, entries[eid])
                         if gaps:
-                            supplementable.setdefault(eid, {
-                                "library": {"id": eid,
-                                            "pattern": entries[eid]["pattern"],
-                                            "level": entries[eid]["level"]},
-                                "from": [], "gaps": gaps})
+                            supplementable.setdefault(
+                                eid,
+                                {
+                                    "library": {
+                                        "id": eid,
+                                        "pattern": entries[eid]["pattern"],
+                                        "level": entries[eid]["level"],
+                                    },
+                                    "from": [],
+                                    "gaps": gaps,
+                                },
+                            )
                             supplementable[eid]["from"].append(
-                                {"material": os.path.basename(path),
-                                 "pattern": e["pattern"]})
+                                {
+                                    "material": os.path.basename(path),
+                                    "pattern": e["pattern"],
+                                }
+                            )
                         else:
                             covered[eid] = ids
                 elif kind == "supplementable":
                     n_suppl += 1
                     for eid in ids:
-                        confusables.append({
-                            "material_pattern": e["pattern"],
-                            "library": {"id": eid,
-                                        "pattern": entries[eid]["pattern"]},
-                            "reason": "fragment-overlap-only"})
+                        confusables.append(
+                            {
+                                "material_pattern": e["pattern"],
+                                "library": {
+                                    "id": eid,
+                                    "pattern": entries[eid]["pattern"],
+                                },
+                                "reason": "fragment-overlap-only",
+                            }
+                        )
                 else:
                     n_missing += 1
                     missing[e["pattern"]] = {
@@ -278,17 +374,18 @@ def run(write=True, print_summary=False):
                         "formation": e.get("formation"),
                         "meaning_zh": e.get("meaning_zh"),
                         "examples": e.get("examples", []),
-                        "source": e.get("source")}
+                        "source": e.get("source"),
+                    }
                     unmapped.append((os.path.basename(path), e["pattern"]))
-    reports = {"audit_missing.json": missing,
-               "audit_supplementable.json": supplementable,
-               "audit_confusables.json": confusables}
+    reports = {
+        "audit_missing.json": missing,
+        "audit_supplementable.json": supplementable,
+        "audit_confusables.json": confusables,
+    }
     if write:
         for name, data in reports.items():
-            with open(os.path.join(MATERIALS_DIR, name), "w",
-                      encoding="utf-8") as fh:
-                json.dump(data, fh, ensure_ascii=False, indent=1,
-                          sort_keys=True)
+            with open(os.path.join(MATERIALS_DIR, name), "w", encoding="utf-8") as fh:
+                json.dump(data, fh, ensure_ascii=False, indent=1, sort_keys=True)
     if print_summary:
         print(f"material entries: {n} from {len(material_files)} files")
         print(f"library entries:  {len(entries)}")
@@ -298,26 +395,32 @@ def run(write=True, print_summary=False):
         print(f"confusable hits:  {len(confusables)}")
         if skipped:
             print(f"skipped (宿題):    {skipped}")
-    return {"total": n, "covered": n_covered,
-            "supplementable": n_suppl,
-            "missing": n_missing, "confusables": len(confusables),
-            "skipped": skipped}
+    return {
+        "total": n,
+        "covered": n_covered,
+        "supplementable": n_suppl,
+        "missing": n_missing,
+        "confusables": len(confusables),
+        "skipped": skipped,
+    }
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--print", action="store_true",
-                    help="print the coverage summary")
-    ap.add_argument("--check", action="store_true",
-                    help="fail unless every material entry is mapped "
-                         "(covered / supplementable / missing) -- the "
-                         "acceptance gate for the material merge")
+    ap.add_argument("--print", action="store_true", help="print the coverage summary")
+    ap.add_argument(
+        "--check",
+        action="store_true",
+        help="fail unless every material entry is mapped "
+        "(covered / supplementable / missing) -- the "
+        "acceptance gate for the material merge",
+    )
     args = ap.parse_args()
     res = run(print_summary=args.print)
     if args.check:
-        assert res["total"] == (res["covered"] + res["supplementable"]
-                                + res["missing"]
-                                + res["skipped"]), "unmapped entries remain"
+        assert res["total"] == (
+            res["covered"] + res["supplementable"] + res["missing"] + res["skipped"]
+        ), "unmapped entries remain"
         print("OK: every material entry is mapped exactly once")
     return 0
 

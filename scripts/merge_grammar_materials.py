@@ -44,31 +44,101 @@ BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MATERIALS = os.path.join(BASE, "scripts", "grammar_materials")
 LIBRARY = os.path.join(BASE, "lute", "jlpt_data", "grammar")
 ZH_SCRIPT = os.path.join(BASE, "scripts", "generate_grammar_zh.py")
-LEVEL_FILE = {"N1": "n1.json", "N2": "n2.json", "N3": "n3.json",
-              "N4": "n4.json", "N5": "n5.json"}
+LEVEL_FILE = {
+    "N1": "n1.json",
+    "N2": "n2.json",
+    "N3": "n3.json",
+    "N4": "n4.json",
+    "N5": "n5.json",
+}
 
 # Hiragana -> romaji, for id generation.  Grammar patterns are mostly kana
 # and particles, so this yields readable ids (あっての -> atte-no); katakana
 # sit a fixed offset above hiragana; kanji are dropped and a stable hash
 # suffix covers pure-kanji or colliding patterns.
 _KANA_ROMAJI = {
-    "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
-    "か": "ka", "き": "ki", "く": "ku", "け": "ke", "こ": "ko",
-    "さ": "sa", "し": "shi", "す": "su", "せ": "se", "そ": "so",
-    "た": "ta", "ち": "chi", "つ": "tsu", "て": "te", "と": "to",
-    "な": "na", "に": "ni", "ぬ": "nu", "ね": "ne", "の": "no",
-    "は": "ha", "ひ": "hi", "ふ": "fu", "へ": "he", "ほ": "ho",
-    "ま": "ma", "み": "mi", "む": "mu", "め": "me", "も": "mo",
-    "や": "ya", "ゆ": "yu", "よ": "yo",
-    "ら": "ra", "り": "ri", "る": "ru", "れ": "re", "ろ": "ro",
-    "わ": "wa", "ゐ": "i", "ゑ": "e", "を": "o", "ん": "n",
-    "が": "ga", "ぎ": "gi", "ぐ": "gu", "げ": "ge", "ご": "go",
-    "ざ": "za", "じ": "ji", "ず": "zu", "ぜ": "ze", "ぞ": "zo",
-    "だ": "da", "ぢ": "ji", "づ": "zu", "で": "de", "ど": "do",
-    "ば": "ba", "び": "bi", "ぶ": "bu", "べ": "be", "ぼ": "bo",
-    "ぱ": "pa", "ぴ": "pi", "ぷ": "pu", "ぺ": "pe", "ぽ": "po",
-    "ゃ": "ya", "ゅ": "yu", "ょ": "yo",
-    "ぁ": "a", "ぃ": "i", "ぅ": "u", "ぇ": "e", "ぉ": "o", "っ": "",
+    "あ": "a",
+    "い": "i",
+    "う": "u",
+    "え": "e",
+    "お": "o",
+    "か": "ka",
+    "き": "ki",
+    "く": "ku",
+    "け": "ke",
+    "こ": "ko",
+    "さ": "sa",
+    "し": "shi",
+    "す": "su",
+    "せ": "se",
+    "そ": "so",
+    "た": "ta",
+    "ち": "chi",
+    "つ": "tsu",
+    "て": "te",
+    "と": "to",
+    "な": "na",
+    "に": "ni",
+    "ぬ": "nu",
+    "ね": "ne",
+    "の": "no",
+    "は": "ha",
+    "ひ": "hi",
+    "ふ": "fu",
+    "へ": "he",
+    "ほ": "ho",
+    "ま": "ma",
+    "み": "mi",
+    "む": "mu",
+    "め": "me",
+    "も": "mo",
+    "や": "ya",
+    "ゆ": "yu",
+    "よ": "yo",
+    "ら": "ra",
+    "り": "ri",
+    "る": "ru",
+    "れ": "re",
+    "ろ": "ro",
+    "わ": "wa",
+    "ゐ": "i",
+    "ゑ": "e",
+    "を": "o",
+    "ん": "n",
+    "が": "ga",
+    "ぎ": "gi",
+    "ぐ": "gu",
+    "げ": "ge",
+    "ご": "go",
+    "ざ": "za",
+    "じ": "ji",
+    "ず": "zu",
+    "ぜ": "ze",
+    "ぞ": "zo",
+    "だ": "da",
+    "ぢ": "ji",
+    "づ": "zu",
+    "で": "de",
+    "ど": "do",
+    "ば": "ba",
+    "び": "bi",
+    "ぶ": "bu",
+    "べ": "be",
+    "ぼ": "bo",
+    "ぱ": "pa",
+    "ぴ": "pi",
+    "ぷ": "pu",
+    "ぺ": "pe",
+    "ぽ": "po",
+    "ゃ": "ya",
+    "ゅ": "yu",
+    "ょ": "yo",
+    "ぁ": "a",
+    "ぃ": "i",
+    "ぅ": "u",
+    "ぇ": "e",
+    "ぉ": "o",
+    "っ": "",
 }
 _KATA_OFFSET = 0x60  # katakana block sits 0x60 above hiragana
 
@@ -144,9 +214,9 @@ def _romaji(pattern):
     out = []
     for ch in pattern:
         cp = ord(ch)
-        if 0x3041 <= cp <= 0x3096:            # hiragana
+        if 0x3041 <= cp <= 0x3096:  # hiragana
             out.append(_KANA_ROMAJI.get(ch, ""))
-        elif 0x30A1 <= cp <= 0x30F6:          # katakana
+        elif 0x30A1 <= cp <= 0x30F6:  # katakana
             out.append(_KANA_ROMAJI.get(chr(cp - _KATA_OFFSET), ""))
         elif ch in "ー~〜":
             out.append("")
@@ -207,22 +277,27 @@ def build_rows(missing):
             continue
         taken.add(eid)
         level = meta.get("level") or "N1"
-        rows[level].append({
-            "id": eid,
-            "pattern": pattern,
-            "level": level,
-            "meaning_en": en,
-            "meaning_detailed": meta.get("meaning_zh", ""),
-            "formation": meta.get("formation", ""),
-            "formation_notes": [meta["notes"]] if meta.get("notes") else [],
-            "formality": "neutral",
-            "related": [],
-            "examples": [
-                {"japanese": ex["japanese"], "english": "",
-                 "chinese": ex["chinese"]}
-                for ex in meta.get("examples", [])
-            ],
-        })
+        rows[level].append(
+            {
+                "id": eid,
+                "pattern": pattern,
+                "level": level,
+                "meaning_en": en,
+                "meaning_detailed": meta.get("meaning_zh", ""),
+                "formation": meta.get("formation", ""),
+                "formation_notes": [meta["notes"]] if meta.get("notes") else [],
+                "formality": "neutral",
+                "related": [],
+                "examples": [
+                    {
+                        "japanese": ex["japanese"],
+                        "english": "",
+                        "chinese": ex["chinese"],
+                    }
+                    for ex in meta.get("examples", [])
+                ],
+            }
+        )
     return rows, skipped
 
 
@@ -251,15 +326,17 @@ def append_zh(_unused=None):
         print("ZH dict already covers every new id")
         return 0
     lines = "".join(f'    "{k}": "{v}",\n' for k, v in sorted(new.items()))
-    marker = re.search(r'^ZH = \{\n', src, re.M)
+    marker = re.search(r"^ZH = \{\n", src, re.M)
     if not marker:
         print("cannot locate ZH dict opening in", ZH_SCRIPT)
         return 1
-    src = src[:marker.end()] + lines + src[marker.end():]
+    src = src[: marker.end()] + lines + src[marker.end() :]
     with open(ZH_SCRIPT, "w", encoding="utf-8") as fh:
         fh.write(src)
-    print(f"generate_grammar_zh.py: +{len(new)} ZH lines "
-          f"(now run `python -m scripts.generate_grammar_zh --write`)")
+    print(
+        f"generate_grammar_zh.py: +{len(new)} ZH lines "
+        f"(now run `python -m scripts.generate_grammar_zh --write`)"
+    )
     return 0
 
 
@@ -274,8 +351,10 @@ def main():
         return 1
     rows, skipped = build_rows(missing)
     zh = zh_additions(rows)
-    print(f"new rows: {sum(len(v) for v in rows.values())} "
-          f"across {', '.join(f'{k}:{len(v)}' for k, v in sorted(rows.items()))}")
+    print(
+        f"new rows: {sum(len(v) for v in rows.values())} "
+        f"across {', '.join(f'{k}:{len(v)}' for k, v in sorted(rows.items()))}"
+    )
     print(f"skipped (no EN gloss derivable): {len(skipped)}")
     for p in skipped:
         print("  -", p)
@@ -313,11 +392,14 @@ def main():
         with open(path, "w", encoding="utf-8") as fh:
             json.dump(data, fh, ensure_ascii=False, indent=1)
         print(f"{path}: +{len(added)} rows, {updated} fields backfilled")
-    with open(os.path.join(MATERIALS, "zh_additions.json"), "w",
-              encoding="utf-8") as fh:
+    with open(
+        os.path.join(MATERIALS, "zh_additions.json"), "w", encoding="utf-8"
+    ) as fh:
         json.dump(zh, fh, ensure_ascii=False, indent=1, sort_keys=True)
-    print(f"zh_additions.json: {len(zh)} glosses "
-          f"(regenerate zh.json via generate_grammar_zh --write)")
+    print(
+        f"zh_additions.json: {len(zh)} glosses "
+        f"(regenerate zh.json via generate_grammar_zh --write)"
+    )
     return 0
 
 

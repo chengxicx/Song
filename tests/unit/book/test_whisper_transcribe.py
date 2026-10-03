@@ -120,7 +120,9 @@ def test_lang_code_mapping(app_context):
 
 
 def test_prepare_requires_whisper_installed(app, client, english):
-    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": False}):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": False}
+    ):
         resp = client.post(
             "/book/whisper/prepare",
             data={"language_id": str(english.id)},
@@ -130,7 +132,9 @@ def test_prepare_requires_whisper_installed(app, client, english):
 
 
 def test_prepare_requires_language(app, client):
-    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ):
         resp = client.post("/book/whisper/prepare", data={})
     assert resp.status_code == 400
     assert "language" in resp.get_json()["error"].lower()
@@ -138,7 +142,9 @@ def test_prepare_requires_language(app, client):
 
 def test_prepare_rejects_bad_extension(app, client, english):
     "Non-audio uploads are rejected before any task starts."
-    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ):
         resp = client.post(
             "/book/whisper/prepare",
             data={
@@ -152,12 +158,15 @@ def test_prepare_rejects_bad_extension(app, client, english):
 
 
 def test_prepare_busy_returns_409(app, client, english):
-    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}), patch.object(
-        whisper_transcribe, "has_running_task", return_value=True
-    ):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(whisper_transcribe, "has_running_task", return_value=True):
         resp = client.post(
             "/book/whisper/prepare",
-            data={"language_id": str(english.id), "mp3_url": "https://a.example.com/x.mp3"},
+            data={
+                "language_id": str(english.id),
+                "mp3_url": "https://a.example.com/x.mp3",
+            },
         )
     assert resp.status_code == 409
     assert "already running" in resp.get_json()["error"]
@@ -175,33 +184,47 @@ def test_available_endpoint(app, client):
 
 
 def test_download_model_requires_whisper_installed(app, client):
-    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": False}):
-        resp = client.post("/book/whisper/download_model", data={"whisper_model": "small"})
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": False}
+    ):
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "small"}
+        )
     assert resp.status_code == 400
     assert "not installed" in resp.get_json()["error"]
 
 
 def test_download_model_rejects_unknown_size(app, client):
-    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}):
-        resp = client.post("/book/whisper/download_model", data={"whisper_model": "giant"})
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ):
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "giant"}
+        )
     assert resp.status_code == 400
     assert "Unknown model size" in resp.get_json()["error"]
 
 
 def test_download_model_busy_returns_409(app, client):
-    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}), patch.object(
-        whisper_transcribe, "has_running_task", return_value=True
-    ):
-        resp = client.post("/book/whisper/download_model", data={"whisper_model": "small"})
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(whisper_transcribe, "has_running_task", return_value=True):
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "small"}
+        )
     assert resp.status_code == 409
 
 
 def test_download_model_completes(app, app_context, client):
     "Happy path with a fake loader: task finishes and caches nothing."
-    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}), patch.object(
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
         whisper_transcribe, "_load_model", return_value=object()
     ) as fake_load:
-        resp = client.post("/book/whisper/download_model", data={"whisper_model": "small"})
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "small"}
+        )
         assert resp.status_code == 200
         task_id = resp.get_json()["task_id"]
         status = _wait_for_terminal(task_id)
@@ -247,7 +270,9 @@ def test_prepare_routes_to_sensevoice(app, app_context, client, english):
         whisper_transcribe, "whisper_status", return_value={"installed": True}
     ), patch.object(sensevoice, "available", return_value=True), patch.object(
         sensevoice, "ensure_model_downloaded"
-    ), patch.object(sensevoice, "transcribe_to_cues", side_effect=_fake_cues):
+    ), patch.object(
+        sensevoice, "transcribe_to_cues", side_effect=_fake_cues
+    ):
         resp = client.post(
             "/book/whisper/prepare",
             data={
@@ -274,17 +299,24 @@ def test_prepare_409_while_model_downloads(app, client, english):
         release.wait(timeout=10)
         return object()
 
-    with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}), patch.object(
-        whisper_transcribe, "_load_model", side_effect=_slow_load
-    ):
-        resp = client.post("/book/whisper/download_model", data={"whisper_model": "small"})
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(whisper_transcribe, "_load_model", side_effect=_slow_load):
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "small"}
+        )
         task_id = resp.get_json()["task_id"]
         assert started.wait(timeout=10)
 
-        with patch.object(whisper_transcribe, "whisper_status", return_value={"installed": True}):
+        with patch.object(
+            whisper_transcribe, "whisper_status", return_value={"installed": True}
+        ):
             resp2 = client.post(
                 "/book/whisper/prepare",
-                data={"language_id": str(english.id), "mp3_url": "https://a.example.com/x.mp3"},
+                data={
+                    "language_id": str(english.id),
+                    "mp3_url": "https://a.example.com/x.mp3",
+                },
             )
         assert resp2.status_code == 409
 
@@ -373,7 +405,11 @@ def fixture_model_cache_state():
         whisper_transcribe._MODEL_LAST_USED,
         whisper_transcribe._MODEL_USES,
         whisper_transcribe._IDLE_REAPER_STARTED,
-    ) = saved[1], saved[2], saved[3]
+    ) = (
+        saved[1],
+        saved[2],
+        saved[3],
+    )
 
 
 def _cache_a_model(size="small", idle_seconds=0):
@@ -454,7 +490,11 @@ def test_unload_idle_model_with_an_empty_cache(model_cache_state):
 def test_models_endpoint(app, client):
     with patch.object(
         whisper_transcribe, "whisper_status", return_value={"installed": True}
-    ), patch.object(whisper_transcribe, "model_cache_info", return_value=[{"size": "base", "cached": False, "size_mb": 0}]):
+    ), patch.object(
+        whisper_transcribe,
+        "model_cache_info",
+        return_value=[{"size": "base", "cached": False, "size_mb": 0}],
+    ):
         resp = client.get("/book/whisper/models")
     assert resp.status_code == 200
     body = resp.get_json()
@@ -464,15 +504,23 @@ def test_models_endpoint(app, client):
 
 def test_delete_model_endpoint_busy(app, client):
     with patch.object(whisper_transcribe, "has_running_task", return_value=True):
-        resp = client.post("/book/whisper/delete_model", data={"whisper_model": "small"})
+        resp = client.post(
+            "/book/whisper/delete_model", data={"whisper_model": "small"}
+        )
     assert resp.status_code == 409
 
 
 def test_delete_model_endpoint_ok(app, client):
-    with patch.object(whisper_transcribe, "has_running_task", return_value=False), patch.object(
-        whisper_transcribe, "delete_model", return_value=(True, "Deleted model 'small'.")
+    with patch.object(
+        whisper_transcribe, "has_running_task", return_value=False
+    ), patch.object(
+        whisper_transcribe,
+        "delete_model",
+        return_value=(True, "Deleted model 'small'."),
     ) as fake_del:
-        resp = client.post("/book/whisper/delete_model", data={"whisper_model": "small"})
+        resp = client.post(
+            "/book/whisper/delete_model", data={"whisper_model": "small"}
+        )
     assert resp.status_code == 200
     assert resp.get_json()["ok"] is True
     fake_del.assert_called_once_with("small")
@@ -480,7 +528,9 @@ def test_delete_model_endpoint_ok(app, client):
 
 def test_delete_model_endpoint_rejects_unknown(app, client):
     with patch.object(whisper_transcribe, "has_running_task", return_value=False):
-        resp = client.post("/book/whisper/delete_model", data={"whisper_model": "giant"})
+        resp = client.post(
+            "/book/whisper/delete_model", data={"whisper_model": "giant"}
+        )
     assert resp.status_code == 400
 
 
@@ -514,7 +564,9 @@ def test_prepare_transcribes_and_creates_book(app, app_context, client, english)
 
     with patch.object(
         whisper_transcribe, "whisper_status", return_value={"installed": True}
-    ), patch.object(whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe):
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe
+    ):
         resp = client.post(
             "/book/whisper/prepare",
             data={
@@ -535,9 +587,13 @@ def test_prepare_transcribes_and_creates_book(app, app_context, client, english)
     book = repo.find_by_title("podcast", english.id)
     assert book is not None
     assert book.book_type == "mp3"
-    assert json.loads(book.srt_data) == [{"start": 1.0, "end": 4.2, "text": "Hello world."}]
+    assert json.loads(book.srt_data) == [
+        {"start": 1.0, "end": 4.2, "text": "Hello world."}
+    ]
     assert book.audio_filename is not None
-    assert os.path.exists(os.path.join(app.env_config.useraudiopath, book.audio_filename))
+    assert os.path.exists(
+        os.path.join(app.env_config.useraudiopath, book.audio_filename)
+    )
 
     # The temp file was moved into the book's audio dir and cleaned up.
     leftovers = [f for f in os.listdir(tempdir) if f.startswith("whisper_")]
@@ -583,7 +639,9 @@ def test_prepare_error_state_cleans_temp(app, app_context, client, english):
     assert repo.find_by_title("broken", english.id) is None
 
 
-def test_consecutive_transcriptions_allowed_after_finish(app, app_context, client, english):
+def test_consecutive_transcriptions_allowed_after_finish(
+    app, app_context, client, english
+):
     "A finished task no longer counts as running (concurrency = 1 while active)."
 
     def _fake_transcribe(audio_path, lang_code, model_size="small", progress_cb=None):
@@ -591,7 +649,9 @@ def test_consecutive_transcriptions_allowed_after_finish(app, app_context, clien
 
     with patch.object(
         whisper_transcribe, "whisper_status", return_value={"installed": True}
-    ), patch.object(whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe):
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe
+    ):
         resp = client.post(
             "/book/whisper/prepare",
             data={

@@ -57,9 +57,8 @@ _REAPER_STARTED = False
 
 def model_dir():
     "Directory holding the model files."
-    return (
-        os.environ.get("LUTE_SENSEVOICE_DIR")
-        or os.path.expanduser("~/.cache/lute/sensevoice")
+    return os.environ.get("LUTE_SENSEVOICE_DIR") or os.path.expanduser(
+        "~/.cache/lute/sensevoice"
     )
 
 
@@ -165,9 +164,7 @@ def ensure_model_downloaded():
     missing = [k for k, p in paths.items() if not os.path.exists(p)]
     if missing:
         raise RuntimeError(f"SenseVoice model download incomplete: {missing}")
-    logger.info(
-        "sensevoice: model ready in %s (%d MB)", d, model_size_mb()
-    )
+    logger.info("sensevoice: model ready in %s (%d MB)", d, model_size_mb())
 
 
 def _download(url, dest):
@@ -228,10 +225,13 @@ def _ensure_reaper_started():
     if _REAPER_STARTED:
         return
     _REAPER_STARTED = True
-    threading.Thread(target=_reaper_loop, name="sensevoice-idle-reaper", daemon=True).start()
+    threading.Thread(
+        target=_reaper_loop, name="sensevoice-idle-reaper", daemon=True
+    ).start()
 
 
 def _reaper_loop():
+    global _RECOG, _RECOG_LANG  # pylint: disable=global-statement
     while True:
         time.sleep(60)
         with _RECOG_LOCK:
@@ -241,7 +241,10 @@ def _reaper_loop():
                 continue
             _RECOG = None
             _RECOG_LANG = None
-        logger.info("sensevoice: unloaded recognizer after %d min idle", MODEL_IDLE_TIMEOUT_SECONDS // 60)
+        logger.info(
+            "sensevoice: unloaded recognizer after %d min idle",
+            MODEL_IDLE_TIMEOUT_SECONDS // 60,
+        )
 
 
 def _decode_16k_mono(audio_path):
@@ -283,7 +286,9 @@ def transcribe_clip(audio_path, lang_code):
         text = (stream.result.text or "").strip()
     logger.info(
         "sensevoice: transcribed %.1fs clip (language=%r) -> %r",
-        duration, lang_code, text[:80],
+        duration,
+        lang_code,
+        text[:80],
     )
     return text, duration
 

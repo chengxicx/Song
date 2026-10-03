@@ -81,9 +81,10 @@ def test_hover_reading_is_served_from_the_popup_cache():
     assert "window.LUTE_TERM_READINGS" in tooltip
     assert 'querySelector(".termpopup-reading")' in tooltip
     # Cleared with the popup cache so a just-saved reading re-fetches.
-    assert "window.LUTE_TERM_READINGS" in tooltip.split(
-        "function clear_termpopup_cache"
-    )[1].split("\n}", 1)[0]
+    assert (
+        "window.LUTE_TERM_READINGS"
+        in tooltip.split("function clear_termpopup_cache")[1].split("\n}", 1)[0]
+    )
 
     reader = _read(_TTS_JS).split("function hoverReadingFor")[1].split("\n  }")[0]
     assert 'getAttribute("data-wid")' in reader
@@ -120,7 +121,7 @@ def test_term_form_speaker_button_speaks_the_annotation(
     body = client.get(f"/read/edit_term/{term.id}").get_data(as_text=True)
 
     assert 'id="term-speak-btn"' in body
-    assert "window.luteTtsSpeakTerm(t.value, r ? r.value : \"\")" in body
+    assert 'window.luteTtsSpeakTerm(t.value, r ? r.value : "")' in body
     # The form carries the reading, hidden or not.
     assert 'id="romanization"' in body
 
