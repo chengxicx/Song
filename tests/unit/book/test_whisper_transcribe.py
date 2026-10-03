@@ -9,8 +9,11 @@ state machine, the /book/whisper/* routes, and the temp-file lifecycle.
 import io
 import json
 import os
+import sys
 import threading
 import time
+import types
+from contextlib import contextmanager
 from unittest.mock import patch
 
 import pytest
@@ -344,9 +347,27 @@ class _FakeCache:
         self.repos = repos
 
 
+@contextmanager
+def _stub_huggingface_hub(scan_cache_dir):
+    """
+    Put a huggingface_hub stub in sys.modules for the calls under test.
+
+    The production code imports the package lazily inside
+    model_cache_info / delete_model, and it is a heavy optional
+    dependency that the CI base install doesn't have -- patching the
+    real module ("patch('huggingface_hub.scan_cache_dir')") imports it,
+    so those tests crashed with ModuleNotFoundError on CI.  The stub
+    keeps the tests running (with identical semantics) everywhere.
+    """
+    stub = types.ModuleType("huggingface_hub")
+    stub.scan_cache_dir = scan_cache_dir
+    with patch.dict(sys.modules, {"huggingface_hub": stub}):
+        yield
+
+
 def test_model_cache_info_reports_cached_sizes():
     fake = _FakeCache([_FakeRepo("Systran/faster-whisper-small", 460, "/tmp/x")])
-    with patch("huggingface_hub.scan_cache_dir", return_value=fake):
+    with _stub_huggingface_hub(lambda: fake):
         info = whisper_transcribe.model_cache_info()
     by_size = {e["size"]: e for e in info}
     assert by_size["small"]["cached"] is True
@@ -355,7 +376,10 @@ def test_model_cache_info_reports_cached_sizes():
 
 
 def test_model_cache_info_without_cache_dir():
-    with patch("huggingface_hub.scan_cache_dir", side_effect=OSError("no cache")):
+    def _no_cache():
+        raise OSError("no cache")
+
+    with _stub_huggingface_hub(_no_cache):
         info = whisper_transcribe.model_cache_info()
     assert all(e["cached"] is False for e in info)
 
@@ -364,7 +388,7 @@ def test_delete_model_removes_directory(tmp_path):
     target = tmp_path / "models--Systran--faster-whisper-small"
     target.mkdir()
     fake = _FakeCache([_FakeRepo("Systran/faster-whisper-small", 460, str(target))])
-    with patch("huggingface_hub.scan_cache_dir", return_value=fake):
+    with _stub_huggingface_hub(lambda: fake):
         ok, message = whisper_transcribe.delete_model("small")
     assert ok is True
     assert not target.exists()
@@ -372,7 +396,7 @@ def test_delete_model_removes_directory(tmp_path):
 
 
 def test_delete_model_not_downloaded():
-    with patch("huggingface_hub.scan_cache_dir", return_value=_FakeCache([])):
+    with _stub_huggingface_hub(lambda: _FakeCache([])):
         ok, message = whisper_transcribe.delete_model("medium")
     assert ok is False
     assert "not downloaded" in message
