@@ -153,6 +153,39 @@ def test_replace_below_ratio_is_miss():
     assert res["spoken_for_fuzzy"] == {}
 
 
+def test_miss_records_what_was_heard():
+    """
+    A too-far pair is still a miss, but it reports the token that was
+    heard: the panel draws it as "-> heard" so the learner can see what
+    they actually said.
+    """
+    lang = _FakeLanguage(["the", "dog", "cat"])
+    res = shadowing.compare_tokens(["The", "calm", "cat"], "the dog cat", lang)
+    assert res["statuses"] == [2, 0, 2]
+    assert res["spoken_for_fuzzy"] == {}
+    assert res["spoken_for_miss"] == {1: "dog"}
+
+
+def test_unspoken_word_has_no_heard_entry():
+    "A word that was never spoken has no counterpart to report."
+    lang = _FakeLanguage(["the", "cat"])
+    res = shadowing.compare_tokens(["The", "calm", "cat"], "the cat", lang)
+    assert res["statuses"] == [2, 0, 2]
+    assert res["spoken_for_miss"] == {}
+
+
+def test_rescued_miss_drops_the_heard_entry():
+    """
+    The containment pass can rescue a word the positional pairing had
+    called a miss (the word glued into a longer chunk).  It is a match
+    then, and the stale miss readout must not survive.
+    """
+    lang = _FakeLanguage(["foobarxyz"])
+    res = shadowing.compare_tokens(["foo", "bar"], "foobarxyz", lang)
+    assert res["statuses"] == [2, 2]
+    assert res["spoken_for_miss"] == {}
+
+
 def test_split_spoken_tokens_join_to_a_match():
     """
     Tokenization drift, not a misread: the page's term 見たい comes back
@@ -922,6 +955,31 @@ def test_route_passes_full_text_to_the_scorer(app, app_context, client, english)
             assert status["state"] == "finished"
 
     assert calls == ["The calm cat.", None]
+
+
+def test_route_reports_what_was_heard_for_a_miss(app, app_context, client, english):
+    "A word scored as a miss still carries the heard token in the payload."
+
+    def _fake_clip(audio_path, lang_code, model_size="small"):
+        return "The dog cat.", 6.0
+
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(shadowing, "transcribe_clip", side_effect=_fake_clip):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(english.id),
+                "tokens": json.dumps(["The", "calm", "cat"]),
+                "audio": (io.BytesIO(b"fake webm bytes"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        status = _wait_for_task(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    assert status["result"]["spoken_for_miss"] == {"1": "dog"}
 
 
 def test_route_uses_sensevoice_when_available(app, app_context, client, english):
