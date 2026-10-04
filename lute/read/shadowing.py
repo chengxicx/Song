@@ -653,6 +653,10 @@ def compare_tokens(
     Returns {
       "statuses": [STATUS_* per original token],
       "spoken_for_fuzzy": {original index: spoken token},
+      "spoken_for_miss": {original index: spoken token}, for pairs that
+        were too far apart to count as a near-miss: the word was
+        attempted, so the panel can still show what was heard.  A word
+        that was never spoken at all has no counterpart and no entry.
       "extras": [spoken tokens that aren't part of the sentence],
       "matched": int, "fuzzy": int, "total": int,
       "spoken_count": int, "score": 0-100,
@@ -666,6 +670,7 @@ def compare_tokens(
     result = {
         "statuses": statuses,
         "spoken_for_fuzzy": {},
+        "spoken_for_miss": {},
         "extras": [],
         "matched": 0,
         "fuzzy": 0,
@@ -801,7 +806,12 @@ def compare_tokens(
                 orig_index = scored[oi + k]
                 statuses[orig_index] = STATUS_FUZZY
                 result["spoken_for_fuzzy"][orig_index] = spoken[si + k]
-            # else: too far apart -- stays a miss.
+            else:
+                # Too far apart to be a near-miss, but the pair still has a
+                # counterpart: showing it tells the learner what they
+                # actually said, which is the point of the readout (the
+                # panel draws it as "-> heard" on the word).
+                result["spoken_for_miss"][scored[oi + k]] = spoken[si + k]
 
         # A last pass for the words the 1:1 pairing left behind.  The
         # spoken side can cover several sentence words with one chunk
@@ -839,6 +849,10 @@ def compare_tokens(
                         pos = skey.find(okey, pos + 1)
                 if hit:
                     statuses[orig_index] = STATUS_MATCH
+                    # This pass can rescue a word the positional pairing
+                    # had recorded as a miss: drop the miss readout, or
+                    # the payload would claim a green word was misheard.
+                    result["spoken_for_miss"].pop(orig_index, None)
                     break
                 sreads = sound_of(spoken[j]) if sound_of else []
                 for oread in oreads:
@@ -851,6 +865,7 @@ def compare_tokens(
                     ):
                         statuses[orig_index] = STATUS_FUZZY
                         result["spoken_for_fuzzy"][orig_index] = spoken[j]
+                        result["spoken_for_miss"].pop(orig_index, None)
                         hit = True
                         break
                 if hit:
@@ -1061,6 +1076,10 @@ def _run_task(
                 "spoken_for_fuzzy": {
                     str(k): restore_kana(v)
                     for k, v in comparison["spoken_for_fuzzy"].items()
+                },
+                "spoken_for_miss": {
+                    str(k): restore_kana(v)
+                    for k, v in comparison["spoken_for_miss"].items()
                 },
                 "extras": [restore_kana(t) for t in comparison["extras"]],
                 "score": comparison["score"],
