@@ -25,7 +25,7 @@
 </div>
 
 <script>
-  $(document).ready(function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // The route adds a flash message about the new file.
 
     $.post('/backup/do_backup', { type: '{{ backuptype }}' })

@@ -88,37 +88,40 @@
 
   {% block preloadassets %}{% endblock %}
 
+  {# jQuery stays parser-blocking: several pages run top-level $() inline
+   code at parse time.  It is one cached file; the heavy vendors below are
+   the ones worth deferring. #}
   <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.scrollTo.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery-ui.min.js') }}"  charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.scrollTo.min.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery-ui.min.js') }}"  defer charset="utf-8"></script>
   {% if not _reading_page %}
-  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.jeditable.mini.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.polyfills.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic('vendor/datatables/datatables.min.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic('vendor/datatables/datatables.button.download.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.jeditable.mini.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.min.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/tagify/tagify.polyfills.min.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/datatables/datatables.min.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/datatables/datatables.button.download.js') }}" defer charset="utf-8"></script>
   {% endif %}
-  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.hoverIntent.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.hoverIntent.js') }}" defer charset="utf-8"></script>
 
   <!-- HTMX + Alpine.js: progressive enhancement for partial-page interactions
        and reactive UI state. Loaded before the custom scripts so they can use
        htmx.* / Alpine. They coexist with jQuery (used by DataTables, tooltips,
        jPlayer, etc.). -->
-  <script type="text/javascript" src="{{ vstatic('vendor/htmx/htmx.min.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic('vendor/htmx/htmx.min.js') }}" defer charset="utf-8"></script>
   <script type="text/javascript" src="{{ vstatic('vendor/alpine/alpine.min.js') }}" defer charset="utf-8"></script>
 
   <!-- Lute's own JS: vstatic_js() adds ?v=<content hash>, so editing a
        file changes its URL and the year-long immutable cache is busted
        without anyone having to remember a version bump. -->
-  <script type="text/javascript" src="{{ vstatic_js('lute-hotkey-utils.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic_js('lute-popups.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic_js('lute.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic_js('lute-tooltip.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic_js('lute-cursor.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic_js('lute-touch.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic_js('lute-commands.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic_js('lute-anki.js') }}" charset="utf-8"></script>
-  <script type="text/javascript" src="{{ vstatic_js('lute-review.js') }}" charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-hotkey-utils.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-popups.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-tooltip.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-cursor.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-touch.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-commands.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-anki.js') }}" defer charset="utf-8"></script>
+  <script type="text/javascript" src="{{ vstatic_js('lute-review.js') }}" defer charset="utf-8"></script>
 
   <script type="text/javascript">
     const LUTE_USER_SETTINGS = {{ user_settings | safe }}
@@ -290,7 +293,7 @@
 </body>
 
 <script>
-  $(document).ready(function() {
+  document.addEventListener('DOMContentLoaded', function() {
     if (LUTE_USER_SETTINGS["use_ankiconnect"] == false) {
       $("#anki_export_index").css('display', 'none');
     }
