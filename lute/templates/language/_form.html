@@ -203,7 +203,7 @@
 </form>
 
 <script>
-  $(document).ready(function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // --- Show/hide the Kiwi section when the parser dropdown changes.
     var parserSel = document.querySelector("select#parser_type");
     function toggleKiwiRows() {
