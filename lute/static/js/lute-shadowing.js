@@ -712,6 +712,7 @@ function shadowingPaintVerdicts(unit, data) {
   shadowingClearMarks(unit);
   const statuses = data.statuses || [];
   const fuzzySpoken = data.spoken_for_fuzzy || {};
+  const missSpoken = data.spoken_for_miss || {};
   // 0 miss / 1 fuzzy / 2 match / 3 skip (punctuation -- unmarked).
   const CLASSES = { 0: "shadow-miss", 1: "shadow-fuzzy", 2: "shadow-ok" };
 
@@ -728,16 +729,20 @@ function shadowingPaintVerdicts(unit, data) {
       const st = i < statuses.length ? statuses[i] : 0;
       const cls = CLASSES[st];
       if (cls) tok.classList.add(cls);
-      if (st === 1 && fuzzySpoken[i] != null) {
+      // Both near-misses and flat misses carry what was heard: the
+      // readout is what the learner actually needs.  A word that was
+      // never spoken has no entry, so it stays a bare red mark.
+      const heard = st === 1 ? fuzzySpoken[i] : st === 0 ? missSpoken[i] : null;
+      if (heard != null) {
         // Carried on the token: clicking it then speaks the correct
         // word and the misheard one back to back (see
         // shadowingSpeakToken); the "→ heard" part speaks alone.
-        tok.setAttribute("data-heard", fuzzySpoken[i]);
+        tok.setAttribute("data-heard", heard);
         tok.setAttribute("title", "Click: correct word, then what was heard");
         tok.insertAdjacentHTML(
           "beforeend",
           '<span class="shadow-tok__heard">→ ' +
-            shadowingEscapeHtml(fuzzySpoken[i]) +
+            shadowingEscapeHtml(heard) +
             "</span>"
         );
       }
