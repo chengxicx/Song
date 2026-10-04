@@ -77,7 +77,7 @@ doing these edits from the term index.
     }
   };
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     const txtAddTags_tagify = setup_tags_tagify('txtAddTags', 'Add tags', false);
     const txtRemoveTags_tagify = setup_tags_tagify('txtRemoveTags', 'Remove tags', true);
 

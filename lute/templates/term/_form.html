@@ -159,7 +159,7 @@
   // still valued even when hidden by hide_pronunciation) when it is
   // kana, so kanji terms whose TTS reading differs from the annotation
   // sound like the annotation.
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     const pron_btn = document.getElementById("term-speak-btn");
     if (!pron_btn) return;
     if (typeof window.luteTtsSpeak !== "function") {
@@ -239,7 +239,7 @@
 
   var TAGS = {{ tags | safe }};
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
 
     // "Save" shortcut
     $(document).keydown(function(event) {

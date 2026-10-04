@@ -113,7 +113,7 @@
     return `<span id="deltermtag${tgid}" onclick="confirm_delete(${tgid})"><img src="{{ vstatic('icn/minus-button.png') }}" title="Delete" /></span>`;
   }
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     setup_datatable();
   });
 

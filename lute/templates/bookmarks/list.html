@@ -132,7 +132,7 @@
     }
   }
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     setup_bookmark_datatable("{{ initial_search or '' }}");
     move_datatables_controls_to_config_widget();
 
