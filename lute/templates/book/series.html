@@ -88,7 +88,10 @@
   { l: 'y', r: 1 },
   { l: 'yy', d: 'year' }
   ];
-  dayjs.extend(dayjs_plugin_relativeTime, { thresholds: thresholds });
+  // dayjs and the plugin are deferred (see base.html); register on DCL.
+  document.addEventListener('DOMContentLoaded', function () {
+    dayjs.extend(dayjs_plugin_relativeTime, { thresholds: thresholds });
+  });
 
   var book_listing_table;
 
