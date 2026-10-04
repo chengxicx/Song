@@ -20,6 +20,11 @@ Feature changes:
   French, German, Italian, Portuguese, Thai, Arabic, Mandarin, Cantonese)
   show authored Korean descriptions, and the Japanese engine explains
   every curated JLPT entry in Korean (ko.json, mirroring zh.json).
+* Shadowing shows what was heard for a miss too, not just a near-miss: a
+  word the engine heard as something unrelated now carries the same
+  "→ heard" readout the orange marker already had, so a learner can see
+  what they actually said.  A word that was never spoken at all has no
+  counterpart and still shows no readout.
 
 Bugfixes:
 
