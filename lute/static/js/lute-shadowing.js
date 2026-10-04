@@ -45,6 +45,7 @@ let shadowingRecStart = 0;
 let shadowingRecTimer = null;
 let shadowingRecCapTimer = null;
 let shadowingUnit = null; // { lines, el, spans, texts, fullText, langId, src }
+let shadowingClickedWord = null; // word span the reader last opened a form on
 let shadowingLastCue = null; // last lute:cue-changed detail
 let shadowingHistory = [];
 let shadowingRecordingBlob = null;
@@ -210,6 +211,47 @@ function shadowingUnitFromLines(lines, src) {
   };
 }
 
+/* Remember the word the reader just opened a term form on.  Called by
+   lute-tooltip.js's show_term_edit_form -- the single place every
+   "open this word" gesture (click, tap, long press, keyboard cursor)
+   funnels through.  Accepts the jQuery object or the bare element. */
+window.luteShadowingRememberWord = function (el) {
+  const node = el && el.jquery ? el[0] : el;
+  shadowingClickedWord =
+    node && node.classList && node.classList.contains("word") ? node : null;
+};
+
+/* The .textsentence that owns a word.  The reading page wraps every
+   sentence in one (read/page_content.html), and it is the same element
+   the panel's prev/next arrows and the TTS cues use, so a panel seeded
+   from a click behaves exactly like one seeded from the player.  A word
+   in a player's scrolling subtitle is a clone of the reading-page span
+   and carries the same data-order, so it is joined back to #thetext
+   through that instead of its (absent) .textsentence parent. */
+function shadowingSentenceForWord(el) {
+  if (!el || !el.isConnected) return null;
+  const div = document.getElementById("thetext");
+  if (!div) return null;
+  const inside = el.closest(".textsentence");
+  if (inside && div.contains(inside)) return inside;
+  const order = el.getAttribute("data-order");
+  if (order == null) return null;
+  const twin = div.querySelector('span.textitem[data-order="' + order + '"]');
+  return twin ? twin.closest(".textsentence") : null;
+}
+
+/* The practice unit for the clicked word, consumed on read: it is used
+   once for the sentence the reader was looking at, and the next time
+   the mode is turned on without a click the player's cue wins again.
+   Returns null when there is nothing usable -- nothing was clicked, or
+   the page turned and took the span with it. */
+function shadowingTakeClickedWordUnit() {
+  const el = shadowingClickedWord;
+  shadowingClickedWord = null;
+  const sentence = shadowingSentenceForWord(el);
+  return sentence ? shadowingUnitFromEl(sentence, { type: "word" }) : null;
+}
+
 function shadowingSetUnit(unit) {
   if (shadowingUnit) shadowingClearMarks(shadowingUnit);
   shadowingUnit = unit;
@@ -308,9 +350,15 @@ function shadowingSetMode(on) {
 
   if (on) {
     shadowingOpenPanel();
-    // Initial sentence: the last known cue if it still resolves,
-    // otherwise the first readable sentence on the page.
-    if (!shadowingUnit || !shadowingUnit.el || !shadowingUnit.el.isConnected) {
+    // Initial sentence.  A word the reader clicked first wins, so
+    // looking a word up and then hitting Shadow practises that word's
+    // sentence instead of starting at the top of the page.  Failing
+    // that, the last known cue if it still resolves, otherwise the
+    // first readable sentence on the page.
+    const clicked = shadowingTakeClickedWordUnit();
+    if (clicked) {
+      shadowingSetUnit(clicked);
+    } else if (!shadowingUnit || !shadowingUnit.el || !shadowingUnit.el.isConnected) {
       if (!shadowingApplyCue(shadowingLastCue)) {
         const first = shadowingSentences().find(function (s) {
           return s.querySelector("span.word");
