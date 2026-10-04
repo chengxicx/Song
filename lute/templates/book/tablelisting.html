@@ -116,7 +116,11 @@
   var config = {
     thresholds: thresholds
   }
-  dayjs.extend(dayjs_plugin_relativeTime, config);
+  // dayjs and the plugin are deferred; they have executed by the time
+  // DOMContentLoaded fires.  Extending at parse time fails silently.
+  document.addEventListener('DOMContentLoaded', function () {
+    dayjs.extend(dayjs_plugin_relativeTime, config);
+  });
 </script>
 
 <script>
