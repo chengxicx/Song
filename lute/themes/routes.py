@@ -32,6 +32,11 @@ def _immutable_css(content):
     # strong etags to W/"..." and the browser echoes that back.
     if request.if_none_match.contains_weak(etag):
         response = Response(status=304)
+        # A bare 304 inherits Flask's default text/html mimetype, so the
+        # app-wide no-store hook would rewrite its Cache-Control -- and per
+        # RFC 9111 a 304's headers update the stored entry, poisoning the
+        # immutable cache.  Keep it text/css so the hook skips it.
+        response.content_type = "text/css; charset=utf-8"
     else:
         response = Response(content, 200)
         response.content_type = "text/css; charset=utf-8"

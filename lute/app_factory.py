@@ -523,6 +523,11 @@ def _create_app(app_config, extra_config):
         "MAX_CONTENT_LENGTH": 200 * 1024 * 1024,
         "SESSION_COOKIE_SAMESITE": "Lax",
         "PERMANENT_SESSION_LIFETIME": 86400 * 30,
+        # Flask's default (True) re-signs the permanent session cookie with a
+        # fresh timestamp on every response, so the cookie value never stands
+        # still and browsers can never reuse Vary: Cookie responses like
+        # /theme/current.  Only send the cookie when the session changes.
+        "SESSION_REFRESH_EACH_REQUEST": False,
     }
     if app_config.env == "prod":
         config["SESSION_COOKIE_SECURE"] = True
