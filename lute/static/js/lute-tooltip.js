@@ -454,6 +454,15 @@ function _show_wordframe_url(url) {
 }
 
 function show_term_edit_form(el) {
+  // Remember which word the reader opened.  Every "open this word"
+  // gesture funnels through here -- a click, a tap, a long press, the
+  // keyboard cursor -- so this is the one place that has to record it.
+  // lute-shadowing.js (reading page only, hence the guard) then starts
+  // the shadowing panel on this word's sentence instead of the page's
+  // first one.
+  if (typeof window.luteShadowingRememberWord === "function") {
+    window.luteShadowingRememberWord(el);
+  }
   const wid = parseInt(el.data('wid'));
   if (isNaN(wid)) {
     // The term hasn't been saved to the DB yet (status 0 with no ID).
