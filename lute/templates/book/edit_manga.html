@@ -71,7 +71,7 @@
 <script type="text/javascript">
   var TAGS = {{ tags | safe }};
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     new Tagify(document.getElementById('book_tags'), {
       placeholder: 'Tags',
       editTags: false,

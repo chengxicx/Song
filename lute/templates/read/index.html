@@ -507,7 +507,7 @@
     }
   });
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
       if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
     });
