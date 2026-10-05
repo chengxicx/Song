@@ -177,3 +177,40 @@ def test_every_card_carries_a_stable_key(commands):
     "The active card must be nameable without depending on group order."
     body = _after(commands, "function itemHtml(g, withLevelChip) {", 3000)
     assert 'data-grammar-key="' in body
+
+
+def test_a_click_elsewhere_drops_the_selection_but_keeps_the_panel(commands):
+    """
+    The pinned selection is a "look at this" cue, not a mode: clicking
+    anywhere -- the reading text, a toolbar button, another card, or the
+    panel's own background -- drops the selected style and the rings.  The
+    panel stays open, so hovering a card still cross-highlights afterwards.
+    """
+    start = commands.index("function clearPinnedSelection(ev) {")
+    body = commands[start : commands.index("document.addEventListener", start)]
+    assert 'classList.remove("grammar-item--active")' in body
+    assert "pinnedRuns = null" in body
+    assert "pinnedItemEl = null" in body
+    assert "hideAllRings()" in body
+    # It clears a highlight, not a view: the panel must survive the click.
+    assert "closeGrammarAnalysis" not in body
+    # ...except on the close button, which is already tearing it down.
+    assert 'closest(".grammar-analysis-panel__close")' in body
+    # Capture phase, so the clear lands before whatever the click was for.
+    assert 'document.addEventListener("click", clearPinnedSelection, true)' in commands
+
+
+def test_the_click_listener_does_not_outlive_the_panel(commands):
+    """
+    clearPinnedSelection is a closure over one panel's state, so a listener
+    left behind holds the whole detached panel -- and a re-open would stack
+    another one on top.  The element is the only handle on the closure, so
+    the unhook rides on the element and must run before remove() drops it.
+    """
+    assert "panel[0].luteGrammarCleanup = function () {" in commands
+    assert (
+        'document.removeEventListener("click", clearPinnedSelection, true)' in commands
+    )
+    close_body = _after(commands, "function closeGrammarAnalysis() {", 900)
+    assert "stale.luteGrammarCleanup()" in close_body
+    assert close_body.index("luteGrammarCleanup") < close_body.index(".remove()")
