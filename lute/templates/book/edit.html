@@ -72,7 +72,7 @@
     </tr>
 
     <tr>
-      <td>{{ form.audiofile.label }}  <i>(.mp3, .m4a, .wav, .ogg, .opus, .aac, .flac, .webm)</i></td>
+      <td>{{ form.audiofile.label }}  <i>(audio: .mp3, .m4a, .wav, .ogg, .opus, .aac, .flac, .webm &mdash; video: .mp4, .webm, .mov, .ogv, .m4v)</i></td>
       <td>
         {{ form.audiofile() }}
         {{ form.audio_filename() }}
@@ -80,7 +80,7 @@
         <div id="current_file_div" style="margin: 5px">
         <span class="smallfilename">Current file: {{ book.audio_filename }}</span>
         <img src="{{ vstatic('icn/minus-button.png') }}"
-             title="Delete audio file"
+             title="Delete media file"
              style="margin-left: 5px"
              onclick="confirm_delete(this)" />
         </div>
@@ -102,10 +102,10 @@
   </div>
 </form>
 
-{% if book.book_type == 'mp3' and (book.audio_filename or book.media_url) %}
+{% if book.book_type in ('mp3', 'video') and (book.audio_filename or book.media_url) %}
 <div id="retranscribe_box">
   <div class="retranscribe-row">
-    <strong>Re-transcribe audio</strong>
+    <strong>Re-transcribe {{ 'video' if book.book_type == 'video' else 'audio' }}</strong>
     <select id="retranscribe_model" class="form-control">
       <option value="sensevoice" {% if not sensevoice_supported %}disabled{% endif %}>SenseVoice (zh/yue/en/ja/ko &middot; fastest)</option>
       <option value="small">whisper small</option>
@@ -118,7 +118,7 @@
     <div class="retranscribe-track"><div id="retranscribe_bar"></div></div>
     <div id="retranscribe_status"></div>
   </div>
-  <div class="formfieldcomment">Re-runs speech recognition on this book's audio and replaces the text and subtitle cues &mdash; all pages are re-parsed and reading progress resets. The audio file is kept.</div>
+  <div class="formfieldcomment">Re-runs speech recognition on this book's media and replaces the text and subtitle cues &mdash; all pages are re-parsed and reading progress resets. The media file is kept.</div>
 </div>
 <style>
   #retranscribe_box { border: 1px solid var(--border-color, #ccc); border-radius: 6px;
@@ -194,7 +194,7 @@
     };
 
     btn.addEventListener('click', function () {
-      if (!confirm('Re-transcribe the audio?\n\nThe text and subtitle cues will be replaced and all pages re-parsed (reading progress resets). The audio file is kept.')) {
+      if (!confirm('Re-transcribe the media?\n\nThe text and subtitle cues will be replaced and all pages re-parsed (reading progress resets). The media file is kept.')) {
         return;
       }
       btn.disabled = true;
@@ -293,6 +293,7 @@
       else if (t === 'bilibili') srcLabel = 'Bilibili video URL';
       else if (t === 'mp3') srcLabel = 'Audio file name';
       else if (t === 'netease') srcLabel = 'NetEase Cloud Music URL';
+      else if (t === 'video') srcLabel = 'Video file name / URL';
       $('#source_uri').closest('tr').find('td').first().text(srcLabel);
       // The text field holds the SRT subtitles for youtube / bilibili / mp3 / video books.
       $('#textRow').find('td').first().text(hasSubtitles ? 'Subtitle text (SRT, editable)' : 'Text');
