@@ -463,6 +463,12 @@ function show_term_edit_form(el) {
   if (typeof window.luteShadowingRememberWord === "function") {
     window.luteShadowingRememberWord(el);
   }
+  // The term form's Grammar button needs the same target: the analysis panel
+  // is opened by the parent page, so the parent has to know which word (and
+  // therefore which sentence) is being edited.
+  if (typeof window.luteGrammarRememberWord === "function") {
+    window.luteGrammarRememberWord(el);
+  }
   const wid = parseInt(el.data('wid'));
   if (isNaN(wid)) {
     // The term hasn't been saved to the DB yet (status 0 with no ID).
