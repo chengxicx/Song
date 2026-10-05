@@ -10,6 +10,8 @@ import io
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 import threading
 import time
@@ -18,6 +20,8 @@ from contextlib import contextmanager
 from unittest.mock import patch
 
 import pytest
+from werkzeug.datastructures import FileStorage
+from wtforms.validators import StopValidation
 
 from lute.db import db
 from lute.book import sensevoice, whisper_transcribe
@@ -892,3 +896,277 @@ def test_retranscribe_busy_returns_409(app, client, english):
     with patch.object(whisper_transcribe, "has_running_task", return_value=True):
         resp = client.post(f"/book/whisper/retranscribe/{book.id}")
     assert resp.status_code == 409
+
+
+# ---------------------------------------------------------------------
+# The video form gets the same auto-transcribe / re-transcribe flow as
+# the mp3 form: import_type picks the form's field names and the book
+# type the task creates.
+# ---------------------------------------------------------------------
+
+
+def _fake_video_transcribe(text="Hello world.", cues=None):
+    "A transcribe_to_cues stand-in that returns fixed cues."
+    if cues is None:
+        cues = [{"start": 1.0, "end": 4.2, "text": text}]
+
+    def _fn(audio_path, lang_code, model_size="small", progress_cb=None):
+        assert os.path.exists(audio_path)
+        if progress_cb is not None:
+            progress_cb(50)
+        return text, json.dumps(cues, ensure_ascii=False)
+
+    return _fn
+
+
+def _create_video_book(app, client, english, text="Hello world."):
+    "Auto-transcribe a video upload through the normal flow."
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe,
+        "transcribe_to_cues",
+        side_effect=_fake_video_transcribe(text),
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "import_type": "video",
+                "language_id": str(english.id),
+                "video_file": (io.BytesIO(b"fake video bytes"), "clip.mp4"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        assert _wait_for_terminal(resp.get_json()["task_id"])["state"] == "finished"
+
+    whisper_transcribe.purge_finished_tasks()
+    return BookRepository(db.session).find_by_title("clip", english.id)
+
+
+def test_prepare_video_upload_creates_video_book(app, app_context, client, english):
+    "Video upload -> transcription -> a book of type video with its file stored."
+    book = _create_video_book(app, client, english)
+    assert book is not None
+    assert book.book_type == "video"
+    assert json.loads(book.srt_data) == [
+        {"start": 1.0, "end": 4.2, "text": "Hello world."}
+    ]
+    assert book.audio_filename is not None
+    assert book.audio_filename.endswith(".mp4")
+    assert os.path.exists(
+        os.path.join(app.env_config.useraudiopath, book.audio_filename)
+    )
+    # The temp download was copied into the book, not left behind.
+    tempdir = app.env_config.temppath
+    assert [f for f in os.listdir(tempdir) if f.startswith("whisper_")] == []
+
+
+def test_prepare_video_rejects_an_audio_extension(app, client, english):
+    "The video form validates against the video whitelist, not the audio one."
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "import_type": "video",
+                "language_id": str(english.id),
+                "video_file": (io.BytesIO(b"fake audio"), "song.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+    assert resp.status_code == 400
+    assert "valid video file" in resp.get_json()["error"]
+
+
+def test_prepare_video_ignores_the_mp3_fields(app, client, english):
+    "import_type=video reads video_file / video_url, not the mp3 field names."
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "import_type": "video",
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"fake audio"), "podcast.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+    assert resp.status_code == 400
+    assert "video file" in resp.get_json()["error"]
+
+
+def test_prepare_without_import_type_still_makes_an_mp3_book(
+    app, app_context, client, english
+):
+    "The mp3 form omits import_type in older pages; the default keeps working."
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_video_transcribe()
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"fake audio"), "podcast.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        assert _wait_for_terminal(resp.get_json()["task_id"])["state"] == "finished"
+
+    book = BookRepository(db.session).find_by_title("podcast", english.id)
+    assert book.book_type == "mp3"
+
+
+def test_retranscribe_video_book_updates_in_place(app, app_context, client, english):
+    "A video book can be re-transcribed from the edit page; its file survives."
+    book = _create_video_book(app, client, english)
+    media_name = book.audio_filename
+    useraudio = app.env_config.useraudiopath
+    assert os.path.exists(os.path.join(useraudio, media_name))
+
+    def _fake_transcribe(audio_path, lang_code, model_size="small", progress_cb=None):
+        # The task transcribes the book's own stored media, not a temp copy.
+        assert audio_path == os.path.join(useraudio, media_name)
+        cues = [{"start": 0.5, "end": 2.5, "text": "Updated text."}]
+        return "Updated text.", json.dumps(cues, ensure_ascii=False)
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe
+    ):
+        resp = client.post(f"/book/whisper/retranscribe/{book.id}")
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    assert status["book_id"] == book.id
+
+    db.session.expire_all()
+    dbbook = db.session.get(DBBook, book.id)
+    assert dbbook.book_type == "video"
+    assert "Updated text." in "\n".join(t.text for t in dbbook.texts)
+    assert dbbook.audio_filename == media_name
+    assert os.path.exists(os.path.join(useraudio, media_name))
+
+
+def test_retranscribe_rejects_a_non_media_book(app, app_context, client, english):
+    "Only mp3 and video books can be re-transcribed."
+    from lute.book.model import Book
+    from lute.book.service import Service as BookService
+
+    b = Book()
+    b.title = "Just text"
+    b.language_id = english.id
+    b.text = "Hello world."
+    b.book_type = ""
+    text_book = BookService().import_book(b, db.session)
+
+    resp = client.post(f"/book/whisper/retranscribe/{text_book.id}")
+    assert resp.status_code == 400
+    assert "mp3 and video" in resp.get_json()["error"]
+
+
+def test_video_edit_page_offers_retranscribe_button(app, app_context, client, english):
+    "The edit page of a video book renders the re-transcribe controls."
+    book = _create_video_book(app, client, english)
+    resp = client.get(f"/book/edit/{book.id}")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'id="retranscribe_btn"' in body
+    assert f"/book/whisper/retranscribe/{book.id}" in body
+    assert "Re-transcribe video" in body
+
+
+class _UploadField:
+    "A stub wtforms field carrying a FileStorage, for calling validators."
+
+    def __init__(self, data):
+        self.data = data
+
+
+def _upload(filename):
+    return FileStorage(stream=io.BytesIO(b"x"), filename=filename)
+
+
+def test_edit_page_accepts_a_video_media_file(app, app_context, client, english):
+    "The edit form's media field takes video extensions for a video book."
+    from lute.book.forms import (
+        ALLOWED_MEDIA_EXTENSIONS,
+        MEDIA_VALIDATION_MSG,
+        EditBookForm,
+    )
+
+    assert "mp4" in ALLOWED_MEDIA_EXTENSIONS
+    assert "mp3" in ALLOWED_MEDIA_EXTENSIONS
+    assert "mp4" in MEDIA_VALIDATION_MSG
+
+    # The field's validators accept a .mp4 and still reject a non-media
+    # extension: the whitelist is the union of audio and video.
+    # (FileAllowed signals a rejection with StopValidation, not
+    # ValidationError.)
+    validators = getattr(EditBookForm.audiofile, "kwargs", {})["validators"]
+    assert validators, "the media field must have a validator"
+    for validator in validators:
+        validator(None, _UploadField(_upload("clip.mp4")))
+    with pytest.raises(StopValidation):
+        for validator in validators:
+            validator(None, _UploadField(_upload("clip.exe")))
+
+    # And the edit page renders the media hint mentioning video formats.
+    book = _create_video_book(app, client, english)
+    body = client.get(f"/book/edit/{book.id}").get_data(as_text=True)
+    assert ".mp4" in body
+    assert 'name="audiofile"' in body
+
+
+def test_import_page_video_form_offers_auto_transcribe(app, client, english):
+    "The video form carries the same auto-transcribe controls as the mp3 form."
+    from lute.models.repositories import UserSettingRepository
+
+    UserSettingRepository(db.session).set_value("current_language_id", english.id)
+    resp = client.get("/book/import_webpage")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+
+    assert re.search(r'<input type="checkbox" id="video_whisper" checked', body)
+    assert 'id="video_whisper_model"' in body
+    assert 'id="video_whisper_missing"' in body
+    assert 'id="video_sensevoice_missing"' in body
+    assert 'id="video_whisper_progress"' in body
+    # Both forms offer the model picker with SenseVoice available.
+    assert body.count('name="whisper_model"') == 2
+    assert body.count('<option value="sensevoice"') == 2
+
+
+def test_import_page_inline_js_parses(app, client, tmp_path):
+    """
+    Every inline script on the import page must parse.
+
+    A syntax error in this block aborts the whole DOMContentLoaded
+    handler, so the forms silently lose their XHR bindings and the
+    progress bars (exactly the TDZ bug fixed in dfb63215).
+    """
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("node is not on PATH")
+
+    body = client.get("/book/import_webpage").get_data(as_text=True)
+    scripts = re.findall(r"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>", body, re.S)
+    assert scripts, "no inline scripts found on the import page"
+
+    for index, source in enumerate(scripts):
+        path = tmp_path / f"inline_{index}.js"
+        path.write_text(source, encoding="utf-8")
+        proc = subprocess.run(
+            [node, "--check", str(path)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert proc.returncode == 0, f"inline script {index} failed: {proc.stderr}"

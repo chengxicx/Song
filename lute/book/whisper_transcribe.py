@@ -435,9 +435,11 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
     by the task itself.  language is the Language object; model_size is
     "sensevoice" (SenseVoice-Small for zh/yue/en/ja/ko) or a whisper
     size, and the task derives the language code itself.  book_params:
-    {language_id, title, tags, source_uri}.  username is the requesting
-    user (multi-user mode); the task thread re-enters that user's scope
-    so its db access lands on the user's own sqlite file.
+    {language_id, title, tags, source_uri, book_type} -- book_type is
+    the type of book to create ("mp3" for audio, "video" for the
+    HTML5-video book type), defaulting to mp3.  username is the
+    requesting user (multi-user mode); the task thread re-enters that
+    user's scope so its db access lands on the user's own sqlite file.
 
     With retranscribe_book_id the task updates that existing book's
     text and cues instead of creating one (edit page re-transcribe);
@@ -579,7 +581,10 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
                     b.source_uri = book_params.get("source_uri")
                     b.text = text
                     b.srt_data = cues_json
-                    b.book_type = "mp3"
+                    # The media is the same file either way; only the
+                    # book type decides which player the reader picks
+                    # (mp3 = HTML5 audio, video = HTML5 video).
+                    b.book_type = book_params.get("book_type") or "mp3"
                     b.book_tags = book_params.get("tags") or []
                     b.threshold_page_tokens = 250
                     b.split_by = "paragraphs"
