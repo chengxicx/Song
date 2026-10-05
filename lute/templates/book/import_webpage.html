@@ -930,12 +930,10 @@
       whisperBtn.prop('disabled', false);
     };
 
-    fetch('/book/whisper/models')
-      .then(r => r.json())
-      .then(d => { engineStatus = d; })
-      .catch(() => { engineStatus = { installed: true, sensevoice: null }; }) // never block the plain import path
-      .finally(refreshWhisperPanel);
-
+    // Must be defined before the fetch chain below: .finally(refreshWhisperPanel)
+    // evaluates the identifier synchronously while the chain is built, and a
+    // const still in the temporal dead zone would abort this whole DOMContentLoaded
+    // handler (leaving the forms with no XHR submit bindings).
     const refreshWhisperPanel = function () {
       if (!$('#mp3_whisper').prop('checked')) { whisperPanelRow.hide(); return; }
       if (engineStatus === null) { whisperPanelRow.hide(); return; }
@@ -949,6 +947,13 @@
         whisperPanelRow.hide(); // nothing to show until a submit starts
       }
     };
+
+    fetch('/book/whisper/models')
+      .then(r => r.json())
+      .then(d => { engineStatus = d; })
+      .catch(() => { engineStatus = { installed: true, sensevoice: null }; }) // never block the plain import path
+      .finally(refreshWhisperPanel);
+
     $('#mp3_whisper').on('change', refreshWhisperPanel);
     modelSelect.on('change', refreshWhisperPanel);
     $('#mp3-language').on('change', syncModelToLanguage);
