@@ -36,6 +36,32 @@ AUDIO_VALIDATION_MSG = (
     f"Please upload a valid audio file ({', '.join(ALLOWED_AUDIO_EXTENSIONS)})"
 )
 
+# Global configuration for allowed video files (the "Online video" book
+# type: the file is stored like audio and played by the HTML5 <video>
+# backend of the unified media player).
+ALLOWED_VIDEO_EXTENSIONS = [
+    "mp4",
+    "webm",
+    "mov",
+    "ogv",
+    "ogg",
+    "m4v",
+]
+VIDEO_VALIDATION_MSG = (
+    f"Please upload a valid video file ({', '.join(ALLOWED_VIDEO_EXTENSIONS)})"
+)
+
+# The edit form's media field replaces the stored file for any media
+# book type (audio for mp3 / netease, a video for "Online video"), so it
+# accepts both whitelists (deduped -- webm and ogg are in both).
+ALLOWED_MEDIA_EXTENSIONS = list(
+    dict.fromkeys(ALLOWED_AUDIO_EXTENSIONS + ALLOWED_VIDEO_EXTENSIONS)
+)
+MEDIA_VALIDATION_MSG = (
+    "Please upload a valid audio or video file "
+    f"({', '.join(ALLOWED_MEDIA_EXTENSIONS)})"
+)
+
 # Book types whose reading text is generated from subtitles: the text
 # field holds the SRT original and the player follows srt_data cues.
 # Kept as a module-level name (used by routes too); derived from the
@@ -163,12 +189,14 @@ class EditBookForm(FlaskForm):
     )
     source_uri = StringField("Source URI", validators=[Length(max=1000)])
     book_tags = StringField("Tags")
+    # The stored media: audio for mp3 / netease books, a video for the
+    # "Online video" type.
     audiofile = FileField(
-        "Audio file",
+        "Media file",
         validators=[
             FileAllowed(
-                ALLOWED_AUDIO_EXTENSIONS,
-                AUDIO_VALIDATION_MSG,
+                ALLOWED_MEDIA_EXTENSIONS,
+                MEDIA_VALIDATION_MSG,
             )
         ],
     )

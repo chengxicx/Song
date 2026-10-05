@@ -53,6 +53,8 @@ from lute.book.forms import (
     BookSettingsForm,
     ALLOWED_AUDIO_EXTENSIONS,
     AUDIO_VALIDATION_MSG,
+    ALLOWED_VIDEO_EXTENSIONS,
+    VIDEO_VALIDATION_MSG,
     SUBTITLE_BOOK_TYPES,
 )
 from lute.book.types import import_type_choices
@@ -697,17 +699,55 @@ def _engine_error(model_size, language):
     return None
 
 
+# The media import forms that can hand their file/URL to the
+# transcription queue.  The field names and the extension whitelist
+# differ per type, so both the create-time auto-transcribe
+# (/whisper/prepare) and the import page's JS read them from here.
+TRANSCRIBE_IMPORT_TYPES = {
+    "mp3": {
+        "file": "mp3_file",
+        "url": "mp3_url",
+        "title": "mp3_title",
+        "tag": "mp3_tag",
+        "extensions": ALLOWED_AUDIO_EXTENSIONS,
+        "extension_error": AUDIO_VALIDATION_MSG,
+        "source_label": "audio",
+        "fallback_title": "MP3 audio",
+    },
+    "video": {
+        "file": "video_file",
+        "url": "video_url",
+        "title": "video_title",
+        "tag": "video_tag",
+        "extensions": ALLOWED_VIDEO_EXTENSIONS,
+        "extension_error": VIDEO_VALIDATION_MSG,
+        "source_label": "video",
+        "fallback_title": "Online video",
+    },
+}
+
+# Book types that may be re-transcribed from the edit page.
+RETRANSCRIBE_BOOK_TYPES = tuple(TRANSCRIBE_IMPORT_TYPES.keys())
+
+
+def _transcribe_import_spec(import_type):
+    "Field names and extension rules for the media form being transcribed."
+    return TRANSCRIBE_IMPORT_TYPES.get(import_type) or TRANSCRIBE_IMPORT_TYPES["mp3"]
+
+
 @bp.route("/whisper/prepare", methods=["POST"])
 def whisper_prepare():
     """
-    Start a background whisper transcription that creates an mp3 book.
+    Start a background transcription that creates an mp3 or video book.
 
-    Takes the mp3 form's fields (language_id, audio file or URL, title,
-    tags) plus whisper_model ("sensevoice", or a whisper size).  The
-    audio is saved to a temp file within this request (the upload stream
-    cannot outlive it), and a daemon thread transcribes it and imports
-    the book; the page polls /whisper/status/<task_id> until the book id
-    comes back.
+    Takes the media form's fields (import_type, language_id, file or
+    URL, title, tags) plus whisper_model ("sensevoice", or a whisper
+    size).  The media is saved to a temp file within this request (the
+    upload stream cannot outlive it), and a daemon thread transcribes it
+    and imports the book; the page polls /whisper/status/<task_id> until
+    the book id comes back.  import_type picks which form's field names
+    are read and which book type is created ("mp3" -> HTML5 audio,
+    "video" -> HTML5 video); it defaults to mp3.
     """
     if whisper_transcribe.has_running_task():
         return (
@@ -728,8 +768,12 @@ def whisper_prepare():
     if language is None:
         return jsonify({"error": "Please choose a valid language."}), 400
 
-    mp3_file = request.files.get("mp3_file")
-    mp3_url = (request.form.get("mp3_url") or "").strip()
+    import_type = (request.form.get("import_type") or "mp3").strip()
+    spec = _transcribe_import_spec(import_type)
+    book_type = "video" if import_type == "video" else "mp3"
+
+    media_file = request.files.get(spec["file"])
+    media_url_in = (request.form.get(spec["url"]) or "").strip()
     model_size = (request.form.get("whisper_model") or "").strip()
     if (
         model_size != "sensevoice"
@@ -747,28 +791,28 @@ def whisper_prepare():
     audio_temp_path = None
     media_url = None
     source_uri = None
-    title = (request.form.get("mp3_title") or "").strip()
+    title = (request.form.get(spec["title"]) or "").strip()
 
-    if mp3_file and mp3_file.filename:
-        fname = (mp3_file.filename or "").lower()
+    if media_file and media_file.filename:
+        fname = (media_file.filename or "").lower()
         ext = os.path.splitext(fname)[1].lstrip(".")
-        if ext not in ALLOWED_AUDIO_EXTENSIONS:
-            return jsonify({"error": AUDIO_VALIDATION_MSG}), 400
+        if ext not in spec["extensions"]:
+            return jsonify({"error": spec["extension_error"]}), 400
         task_ref = uuid.uuid4().hex
         audio_temp_path = os.path.join(temppath, f"whisper_{task_ref}.{ext}")
-        mp3_file.save(audio_temp_path)
-        source_uri = mp3_file.filename
+        media_file.save(audio_temp_path)
+        source_uri = media_file.filename
         if not title:
-            base = mp3_file.filename or "MP3 audio"
+            base = media_file.filename or spec["fallback_title"]
             title = ".".join(base.split(".")[:-1]) or base
-    elif mp3_url:
-        # Transcription needs a local file, so the audio is downloaded
+    elif media_url_in:
+        # Transcription needs a local file, so the media is downloaded
         # regardless of size (capped); files beyond the local-storage
         # cutoff stream from the URL once the book exists.
         try:
-            size = _url_content_length(mp3_url)
+            size = _url_content_length(media_url_in)
             fname = download_url_to_file(
-                mp3_url,
+                media_url_in,
                 temppath,
                 max_bytes=whisper_transcribe.WHISPER_MAX_DOWNLOAD_BYTES,
             )
@@ -776,15 +820,18 @@ def whisper_prepare():
             return jsonify({"error": e.message}), 400
         audio_temp_path = os.path.join(temppath, fname)
         if size is not None and size > MEDIA_LOCAL_MAX_BYTES:
-            media_url = mp3_url
-        source_uri = mp3_url
+            media_url = media_url_in
+        source_uri = media_url_in
         if not title:
-            base = os.path.basename(urllib.parse.urlparse(mp3_url).path)
-            title = base or "MP3 audio"
+            base = os.path.basename(urllib.parse.urlparse(media_url_in).path)
+            title = base or spec["fallback_title"]
     else:
         return (
             jsonify(
-                {"error": "Please provide an audio file (upload or an online URL)."}
+                {
+                    "error": f"Please provide a {spec['source_label']} file "
+                    "(upload or an online URL)."
+                }
             ),
             400,
         )
@@ -797,8 +844,9 @@ def whisper_prepare():
         {
             "language_id": int(language_id),
             "title": title[:200],
-            "tags": _parse_tagify_tags(request.form.get("mp3_tag", "")),
+            "tags": _parse_tagify_tags(request.form.get(spec["tag"], "")),
             "source_uri": source_uri,
+            "book_type": book_type,
         },
         media_url=media_url,
         username=get_current_user(),
@@ -809,10 +857,11 @@ def whisper_prepare():
 @bp.route("/whisper/retranscribe/<int:bookid>", methods=["POST"])
 def whisper_retranscribe(bookid):
     """
-    Re-run transcription on an existing mp3 book's audio, replacing the
-    book's text and subtitle cues in place (edit page button).
+    Re-run transcription on an existing mp3 / video book's media,
+    replacing the book's text and subtitle cues in place (edit page
+    button).
 
-    The book's own stored audio file is never touched; only a
+    The book's own stored media file is never touched; only a
     remote-URL book downloads a disposable temp copy for the
     transcription.  The page polls /whisper/status/<task_id>; the task
     updates the book (same flow as saving the edit form) instead of
@@ -833,8 +882,11 @@ def whisper_retranscribe(bookid):
     dbbook = _find_book(bookid)
     if dbbook is None:
         return jsonify({"error": "Book not found."}), 404
-    if (dbbook.book_type or "") != "mp3":
-        return jsonify({"error": "Only mp3 books can be re-transcribed."}), 400
+    if (dbbook.book_type or "") not in RETRANSCRIBE_BOOK_TYPES:
+        return (
+            jsonify({"error": "Only mp3 and video books can be re-transcribed."}),
+            400,
+        )
 
     language = db.session.get(Language, dbbook.language_id)
     if language is None:
@@ -857,7 +909,7 @@ def whisper_retranscribe(bookid):
         )
         if not os.path.exists(audio_path):
             return (
-                jsonify({"error": "The book's audio file is missing on disk."}),
+                jsonify({"error": "The book's media file is missing on disk."}),
                 400,
             )
     elif dbbook.media_url:
@@ -873,7 +925,7 @@ def whisper_retranscribe(bookid):
         audio_path = os.path.join(temppath, fname)
         temp_audio = True
     else:
-        return jsonify({"error": "This book has no audio to transcribe."}), 400
+        return jsonify({"error": "This book has no media to transcribe."}), 400
 
     task_id = whisper_transcribe.start_task(
         current_app._get_current_object(),  # pylint: disable=protected-access
@@ -1104,7 +1156,8 @@ def _import_online_video():
 
     if not (text and text.strip()):
         return _import_form_failure(
-            "Please provide subtitles (upload a file or an online URL)."
+            "Please provide subtitles (upload a file or an online URL), or tick "
+            "Auto-transcribe to generate them from the video."
         )
 
     # --- Media: uploaded video file OR online video URL. ---
@@ -1114,10 +1167,9 @@ def _import_online_video():
     svc = BookService()
     if video_file and video_file.filename:
         fname = (video_file.filename or "").lower()
-        if not fname.endswith((".mp4", ".webm", ".mov", ".ogv", ".ogg", ".m4v")):
-            return _import_form_failure(
-                "Please upload a valid video file (.mp4, .webm, .mov, .ogv, .ogg)."
-            )
+        ext = os.path.splitext(fname)[1].lstrip(".")
+        if ext not in ALLOWED_VIDEO_EXTENSIONS:
+            return _import_form_failure(VIDEO_VALIDATION_MSG)
         audio_filename = svc.save_audio_file(video_file)
         source_uri = video_file.filename
         if not title:
