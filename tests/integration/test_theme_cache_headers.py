@@ -30,9 +30,9 @@ def test_theme_200_is_immutable(client):
 def test_theme_200_does_not_rotate_session_cookie(client):
     "Per-response cookie re-issuing defeats Vary: Cookie reuse (see app config)."
     resp = _current_theme_response(client)
-    assert "Set-Cookie" not in resp.headers, (
-        "theme responses must not rotate the session cookie"
-    )
+    assert (
+        "Set-Cookie" not in resp.headers
+    ), "theme responses must not rotate the session cookie"
 
 
 def test_theme_304_keeps_immutable_cache_control(client):
