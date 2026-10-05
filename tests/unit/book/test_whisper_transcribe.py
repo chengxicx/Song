@@ -183,14 +183,32 @@ def test_available_endpoint(app, client):
 
 
 def test_import_form_offers_sensevoice_default(app, client, english):
-    "The mp3 form lists SenseVoice and knows English is a supported language."
+    """
+    The mp3 form lists SenseVoice, knows English is supported, ticks
+    Auto-transcribe by default, and server-renders SenseVoice selected.
+    """
+    from lute.models.repositories import UserSettingRepository
+
+    UserSettingRepository(db.session).set_value(
+        "current_language_id", english.id
+    )
     resp = client.get("/book/import_webpage")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
-    assert 'value="sensevoice"' in body
     match = re.search(r"const sensevoiceLangIds = new Set\((\[.*?\])\.map", body)
     assert match is not None
     assert english.id in json.loads(match.group(1))
+
+    sv_option = re.search(
+        r'<option value="sensevoice"([^>]*)>', body
+    )
+    assert sv_option is not None
+    assert "selected" in sv_option.group(1)
+    assert re.search(
+        r'<input type="checkbox" id="mp3_whisper" checked', body
+    )
+    # The video form carries its own upload-progress panel.
+    assert 'id="video_progress_bar"' in body
 
 
 # ---------------------------------------------------------------------
