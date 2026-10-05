@@ -751,6 +751,44 @@ def test_term_form_grammar_button_selects_the_current_sentence():
         expect(page.locator(".grammar-ring").first).to_be_visible()
         expect(active).to_have_attribute("data-grammar-key", "zz_covers_the_word")
 
+        # A click cancels the selection -- and the panel itself is one of the
+        # places that counts, which is the case the reader actually hits when
+        # they click a card to read it.  The panel must stay open: this
+        # clears a highlight, not a view.
+        page.locator(".grammar-analysis-panel__title").click()
+        expect(active).to_have_count(0)
+        expect(page.locator(".grammar-ring")).to_have_count(0)
+        expect(page.locator("#grammar-analysis-panel")).to_be_visible()
+
+        # Hovering still cross-highlights -- it just has no pin to come back
+        # to, so leaving clears instead of restoring.
+        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + 12, steps=6)
+        expect(page.locator(".grammar-ring").first).to_be_visible()
+        expect(active).to_have_count(0)
+        _park_mouse(page)
+        expect(page.locator(".grammar-ring")).to_have_count(0)
+
+        # Re-open the jump to get a pin back, and prove a click *outside* the
+        # panel clears it too: the listener is on the document, not on the
+        # panel.  #page_indicator is a static label -- nothing else reacts.
+        page.locator(".grammar-analysis-panel__close").click()
+        expect(page.locator("#grammar-analysis-panel")).to_have_count(0)
+        # A click on the word toggles the card, and the word is still marked
+        # from the first open -- so the next click would *close* the form
+        # instead of re-opening it.  Un-mark it, then ask for it again.
+        expect(word).to_have_class(re.compile(r"kwordmarked"))
+        word.click()
+        _open_term_form(page, word)
+        frame.get_by_role("button", name="Grammar").click()
+        expect(active).to_have_count(1)
+        expect(active).to_have_attribute("data-grammar-key", "zz_covers_the_word")
+        expect(page.locator(".grammar-ring").first).to_be_visible()
+
+        page.locator("#page_indicator").click()
+        expect(active).to_have_count(0)
+        expect(page.locator(".grammar-ring")).to_have_count(0)
+        expect(page.locator("#grammar-analysis-panel")).to_be_visible()
+
         # Closing the panel takes the rings with it.
         page.locator(".grammar-analysis-panel__close").click()
         expect(page.locator(".grammar-ring")).to_have_count(0)
