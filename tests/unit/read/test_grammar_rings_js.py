@@ -43,9 +43,7 @@ def _rings():
                 "desc": "ring geometry fixture",
                 # Second sentence of a two-sentence node; span covers "BB",
                 # the first two characters of a four-character cell.
-                "examples": [
-                    {"sentence": "BBB。", "matches": [{"start": 0, "end": 2}]}
-                ],
+                "examples": [{"sentence": "BBB。", "matches": [{"start": 0, "end": 2}]}],
             }
         ]
     }
