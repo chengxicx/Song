@@ -382,9 +382,9 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
 
     audio_path is a temp file (already on disk); it is moved into the
     created book (small files) or deleted (large remote-streamed ones)
-    by the task itself.  language is the Language object; the task picks
-    the engine (SenseVoice where supported and available, whisper
-    otherwise) and derives the language code itself.  book_params:
+    by the task itself.  language is the Language object; model_size is
+    "sensevoice" (SenseVoice-Small for zh/yue/en/ja/ko) or a whisper
+    size, and the task derives the language code itself.  book_params:
     {language_id, title, tags, source_uri}.  username is the requesting
     user (multi-user mode); the task thread re-enters that user's scope
     so its db access lands on the user's own sqlite file.  Returns the
@@ -434,13 +434,26 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
     try:
         with app.app_context(), mu_context.user_scope(username):
             try:
-                # Engine choice: SenseVoice-Small is faster than whisper and
-                # the only engine trained on Cantonese; whisper covers the
-                # rest of the language roster and any SenseVoice outage.
+                # Engine choice follows the model picked on the import
+                # form: "sensevoice" runs SenseVoice-Small (the default
+                # for the zh/yue/en/ja/ko languages it was trained on);
+                # base/small/medium run faster-whisper, which covers the
+                # rest of the language roster.
                 from lute.book import sensevoice
 
-                sv_lang = sensevoice.lang_code_for(language)
-                if sv_lang is not None and sensevoice.available():
+                if model_size == "sensevoice":
+                    sv_lang = sensevoice.lang_code_for(language)
+                    if sv_lang is None:
+                        raise RuntimeError(
+                            "SenseVoice transcribes Chinese, Cantonese, "
+                            "English, Japanese and Korean only -- pick a "
+                            "whisper model for this language."
+                        )
+                    if not sensevoice.installed():
+                        raise RuntimeError(
+                            "SenseVoice isn't installed -- set it up under "
+                            "Settings -> Whisper (auto-subtitles)."
+                        )
                     _set_state(
                         task_id,
                         "loading_model",
