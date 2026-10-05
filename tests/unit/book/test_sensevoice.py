@@ -305,9 +305,7 @@ def test_transcribe_to_cues_streams_and_reports_progress(model_dir_tmp, monkeypa
 
     _install_fake_sherpa(monkeypatch)
     pcts = []
-    with patch.object(
-        sensevoice, "_recognizer", return_value=_CountingRecognizer()
-    ):
+    with patch.object(sensevoice, "_recognizer", return_value=_CountingRecognizer()):
         text, cues_json = sensevoice.transcribe_to_cues(
             str(wav), "ja", progress_cb=pcts.append
         )
@@ -337,9 +335,7 @@ def test_transcribe_to_cues_short_pause_marks_clause(model_dir_tmp, monkeypatch)
     _write_wav(str(wav), 6)  # 2 s speech + 0.4 s pause, twice
 
     _install_fake_sherpa(monkeypatch, silence_secs=0.4)
-    with patch.object(
-        sensevoice, "_recognizer", return_value=_CountingRecognizer()
-    ):
+    with patch.object(sensevoice, "_recognizer", return_value=_CountingRecognizer()):
         text, cues_json = sensevoice.transcribe_to_cues(str(wav), "ja")
 
     cues = json.loads(cues_json)
