@@ -46,6 +46,9 @@ SUPPORTED_CODES = ("zh", "yue", "en", "ja", "ko")
 # gives back on its own.
 MODEL_IDLE_TIMEOUT_SECONDS = 15 * 60
 
+# The silero VAD must be fed small pieces: see transcribe_to_cues.
+VAD_FEED_SECS = 0.5
+
 # Cached OfflineRecognizer: one instance, keyed by language code.
 _RECOG = None
 _RECOG_LANG = None
@@ -331,14 +334,14 @@ def transcribe_to_cues(audio_path, lang_code, progress_cb=None):
     """
     Transcribe an audio file into subtitle cues (audiobook import).
 
-    The file is stream-decoded and fed to the VAD chunk by chunk; every
-    speech segment the VAD yields is recognized and popped before the
-    next chunk is decoded, so peak memory is one chunk plus the model
-    rather than the whole decoded file.  The VAD still sees one
-    continuous stream, so its segmentation is identical to feeding
-    everything at once, and cue timestamps are the VAD boundaries --
-    same shape as whisper_transcribe.transcribe_to_cues' output.
-
+    The file is stream-decoded and the VAD is fed sub-second slices;
+    every speech segment the VAD yields is recognized and popped as it
+    appears, so peak memory is one decode chunk plus the model rather
+    than the whole decoded file.  The VAD still sees one continuous
+    stream, so its segmentation is identical to feeding everything at
+    once, and cue timestamps are the VAD boundaries -- same shape as
+    whisper_transcribe.transcribe_to_cues' output.  Cue texts get
+    pause-inferred punctuation appended (see whisper_transcribe).
     Percent progress is computed against the container-reported
     duration; a container without one simply never reports percent.
 
@@ -380,16 +383,30 @@ def transcribe_to_cues(audio_path, lang_code, progress_cb=None):
             progress_cb(min(99, int(end / duration * 100)))
 
     with _recog_in_use():
+        # The silero VAD mis-segments when fed large blocks: 10 s
+        # accepts produced 70-180 s "segments" with max_speech_duration
+        # ignored (its window state advances only a little per accept,
+        # so boundaries quantize to chunk edges).  Slice every decoded
+        # chunk into sub-second feeds; segmentation then matches
+        # feeding the whole file.
+        feed = int(VAD_FEED_SECS * sr)
         for chunk in _iter_16k_mono(audio_path):
-            vad.accept_waveform(chunk)
-            while not vad.empty():
-                _take(vad.front)
-                vad.pop()
+            for i in range(0, len(chunk), feed):
+                vad.accept_waveform(chunk[i : i + feed])
+                while not vad.empty():
+                    _take(vad.front)
+                    vad.pop()
         vad.flush()
         while not vad.empty():
             _take(vad.front)
             vad.pop()
 
+    # SenseVoice emits almost no punctuation for Japanese/Chinese; the
+    # VAD pauses stand in for clause/sentence ends (shared with the
+    # whisper engine, whose cues keep their own marks).
+    from lute.book.whisper_transcribe import punctuate_cues
+
+    punctuate_cues(cues, lang_code)
     text = "\n".join(c["text"] for c in cues)
     return text, json.dumps(cues, ensure_ascii=False)
 
