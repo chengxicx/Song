@@ -10,7 +10,12 @@
     --tag-border-radius: 2px;
     --tags-border-color: var(--form-border-color);
     --tags-focus-border-color: var(--tagify__tag-bg);
-    --placeholder-color: #D8D8D8;
+    /* Placeholder + field fill come from the theme tokens (styles.css
+       defaults, Default / Default-Light override).  No `color` here on
+       purpose: .tagify__input inherits --font-color, which both themes
+       already set correctly. */
+    --placeholder-color: var(--input-placeholder-color, #D8D8D8);
+    --placeholder-color-focus: var(--input-placeholder-color-focus, rgba(0, 0, 0, 0.25));
 
     display: flex;
     align-items: center;
@@ -18,6 +23,8 @@
 
     font-size: 0.8rem;
     font-family: inherit;
+
+    background-color: var(--tagify-bg, transparent);
 
     border-radius: var(--form-border-radius);
     padding: 0.1rem;
@@ -58,9 +65,14 @@
     background: transparent !important;
 }
 
+/* Guard-var pattern (see themes/css/README.md): the !important still
+   beats Tagify's own `.tagify__dropdown__wrapper` background, while the
+   value comes from the theme tokens so Default (dark) stops painting a
+   white panel.  Legacy themes don't define them -> white/black, i.e.
+   exactly today's look. */
 .tagify__dropdown {
-    background: white !important;
-    color: black !important;
+    background: var(--input-bg, white) !important;
+    color: var(--input-fg, black) !important;
     min-width: 400px !important;
     max-width: 600px;
     text-overflow: ellipsis;

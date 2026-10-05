@@ -32,6 +32,16 @@ body {
   --panel-bg: #2c2c2e;            /* 悬浮卡片/表格底色 */
   --font-color: #e5e5ea;           /* 文本亮灰/白 */
 
+  /* 表单控件：输入框复用面板底色，不另造新色阶 */
+  --input-bg: #2c2c2e;
+  --input-fg: #f2f2f7;                 /* 与本主题其它控件文字一致 */
+  --tagify-bg: #2c2c2e;
+  --input-placeholder-color: #8e8e93;  /* 本主题的次级文字色 */
+  --input-placeholder-color-focus: #8e8e93;
+  --status-ign-bg: #2c2c2e;            /* 原为 var(--background-color) #1c1c1e */
+  /* 暗色下 #ddd 会成为整个表单最亮的东西；Dark_slate / Dusk 也是这么做的 */
+  --form-border-color: rgba(255, 255, 255, 0.15);
+
   /* Links and menu text (consumed by styles.css guard-var rules). */
   --link-color: #0a84ff;
   --menu-link-color: #8e8e93;
