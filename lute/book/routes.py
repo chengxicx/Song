@@ -366,6 +366,7 @@ def import_webpage():
     form.language_id.choices = language_choices
     form.language_id.data = current_language_id
 
+    sensevoice_lang_ids = _sensevoice_language_ids()
     return render_template(
         "book/import_webpage.html",
         language_choices=language_choices,
@@ -376,7 +377,8 @@ def import_webpage():
         rtl_map=json.dumps(_language_is_rtl_map()),
         show_language_selector=True,
         import_types_json=json.dumps(import_type_choices()),
-        sensevoice_lang_ids=json.dumps(_sensevoice_language_ids()),
+        sensevoice_lang_ids=json.dumps(sensevoice_lang_ids),
+        sensevoice_default=current_language_id in sensevoice_lang_ids,
     )
 
 
@@ -541,6 +543,32 @@ def _import_bilibili_video():
     return redirect(f"/read/{book.id}/page/1", 302)
 
 
+def _form_post_is_xhr():
+    "True for the import forms' JS submissions (they upload via XHR for progress)."
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+
+def _import_form_failure(message):
+    """
+    Reject an import-form POST.  Plain posts keep the historical
+    flash + redirect back to the form; XHR posts get a JSON 400 so the
+    page can show the error inline without losing the picked files
+    (and without a confusing redirect back to an empty form).
+    """
+    flash(message, "notice")
+    if _form_post_is_xhr():
+        return jsonify({"ok": False, "error": message}), 400
+    return redirect("/book/import_webpage", 302)
+
+
+def _import_form_success(book_id):
+    "Successful import: redirect target for plain posts, JSON for XHR."
+    target = f"/read/{book_id}/page/1"
+    if _form_post_is_xhr():
+        return jsonify({"ok": True, "redirect": target})
+    return redirect(target, 302)
+
+
 def _import_mp3_audio():
     "Create an audio book from an uploaded file OR an online URL, plus subtitles."
     mp3_file = request.files.get("mp3_file")
@@ -559,8 +587,7 @@ def _import_mp3_audio():
         fname = (mp3_file.filename or "").lower()
         ext = os.path.splitext(fname)[1].lstrip(".")
         if ext not in ALLOWED_AUDIO_EXTENSIONS:
-            flash(AUDIO_VALIDATION_MSG, "notice")
-            return redirect("/book/import_webpage", 302)
+            return _import_form_failure(AUDIO_VALIDATION_MSG)
         source_uri = mp3_file.filename
         if not title:
             base = mp3_file.filename or "MP3 audio"
@@ -572,8 +599,9 @@ def _import_mp3_audio():
             base = os.path.basename(urllib.parse.urlparse(mp3_url).path)
             title = base or "MP3 audio"
     else:
-        flash("Please provide an audio file (upload or an online URL).", "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure(
+            "Please provide an audio file (upload or an online URL)."
+        )
 
     # --- Subtitles: an uploaded file OR an online subtitle URL. ---
     try:
@@ -584,16 +612,15 @@ def _import_mp3_audio():
         else:
             text, cues_json = "", None
     except BookImportException as e:
-        flash(e.message, "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure(e.message)
     except Exception as e:  # pylint: disable=broad-except
-        msg = f"Could not parse subtitle (error: {str(e)})"
-        flash(msg, "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure(f"Could not parse subtitle (error: {str(e)})")
 
     if not (text and text.strip()):
-        flash("Please provide subtitles (upload a file or an online URL).", "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure(
+            "Please provide subtitles (upload a file or an online URL), or tick "
+            "Auto-transcribe to generate them from the audio."
+        )
 
     title = title[:200]
 
@@ -619,9 +646,8 @@ def _import_mp3_audio():
             b.media_url = media_url
         book = svc.import_book(b, db.session)
     except BookImportException as e:
-        flash(e.message, "notice")
-        return redirect("/book/import_webpage", 302)
-    return redirect(f"/read/{book.id}/page/1", 302)
+        return _import_form_failure(e.message)
+    return _import_form_success(book.id)
 
 
 @bp.route("/whisper/available", methods=["GET"])
@@ -986,16 +1012,14 @@ def _import_online_video():
         else:
             text, cues_json = "", None
     except BookImportException as e:
-        flash(e.message, "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure(e.message)
     except Exception as e:  # pylint: disable=broad-except
-        msg = f"Could not parse subtitle (error: {str(e)})"
-        flash(msg, "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure(f"Could not parse subtitle (error: {str(e)})")
 
     if not (text and text.strip()):
-        flash("Please provide subtitles (upload a file or an online URL).", "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure(
+            "Please provide subtitles (upload a file or an online URL)."
+        )
 
     # --- Media: uploaded video file OR online video URL. ---
     source_uri = None
@@ -1005,11 +1029,9 @@ def _import_online_video():
     if video_file and video_file.filename:
         fname = (video_file.filename or "").lower()
         if not fname.endswith((".mp4", ".webm", ".mov", ".ogv", ".ogg", ".m4v")):
-            flash(
-                "Please upload a valid video file (.mp4, .webm, .mov, .ogv, .ogg).",
-                "notice",
+            return _import_form_failure(
+                "Please upload a valid video file (.mp4, .webm, .mov, .ogv, .ogg)."
             )
-            return redirect("/book/import_webpage", 302)
         audio_filename = svc.save_audio_file(video_file)
         source_uri = video_file.filename
         if not title:
@@ -1021,8 +1043,9 @@ def _import_online_video():
             base = os.path.basename(urllib.parse.urlparse(video_url).path)
             title = base or "Online video"
     else:
-        flash("Please provide a video (upload a file or an online URL).", "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure(
+            "Please provide a video (upload a file or an online URL)."
+        )
 
     title = title[:200]
 
@@ -1044,9 +1067,8 @@ def _import_online_video():
     try:
         book = svc.import_book(b, db.session)
     except BookImportException as e:
-        flash(e.message, "notice")
-        return redirect("/book/import_webpage", 302)
-    return redirect(f"/read/{book.id}/page/1", 302)
+        return _import_form_failure(e.message)
+    return _import_form_success(book.id)
 
 
 def _find_book(bookid):
