@@ -343,8 +343,50 @@ def transcribe_to_cues(
             if progress_cb is not None and duration > 0:
                 progress_cb(min(99, int(seg.end / duration * 100)))
 
+    punctuate_cues(cues, lang_code)
     text = "\n".join(c["text"] for c in cues if c["text"])
     return text, json.dumps(cues, ensure_ascii=False)
+
+
+# ---------------------------------------------------------------------------
+# Pause-based cue punctuation.
+#
+# SenseVoice emits almost no punctuation for Japanese/Chinese, so a
+# transcribed audiobook reads as an unbroken wall of text.  The VAD
+# pause that follows each cue is a usable proxy for the boundary type:
+# dramatic readings pause longer at sentence ends than at clause ends.
+# Whisper cues usually carry their own punctuation and are left alone
+# when they do.
+
+SENTENCE_GAP_SECONDS = 0.7
+
+_CUE_SENTENCE_MARKS = {"ja": "。", "zh": "。", "yue": "。"}
+_CUE_CLAUSE_MARKS = {"ja": "、", "zh": "、", "yue": "、"}
+
+_CUE_ALREADY_TERMINAL = "。．.、，,！!？?…」』）)]"
+
+
+def punctuate_cues(cues, lang_code):
+    """
+    Append sentence/clause punctuation to cue texts in place, judging
+    the boundary type by the VAD pause before the next cue (>=
+    SENTENCE_GAP_SECONDS a sentence, otherwise a clause).  Cues whose
+    text already ends in punctuation are untouched; the last cue gets
+    a sentence mark.
+    """
+    lang = (lang_code or "").lower()
+    sent = _CUE_SENTENCE_MARKS.get(lang, ".")
+    clause = _CUE_CLAUSE_MARKS.get(lang, ",")
+    for i, cue in enumerate(cues):
+        text = cue["text"]
+        if not text or text[-1] in _CUE_ALREADY_TERMINAL:
+            continue
+        if i + 1 >= len(cues):
+            cue["text"] = text + sent
+            continue
+        gap = cues[i + 1]["start"] - cue["end"]
+        cue["text"] = text + (sent if gap >= SENTENCE_GAP_SECONDS else clause)
+    return cues
 
 
 # ---------------------------------------------------------------------------
