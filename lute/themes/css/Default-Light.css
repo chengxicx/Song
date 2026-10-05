@@ -22,6 +22,17 @@ body {
   --panel-bg: #ffffff;            /* 悬浮卡片/表格底色 */
   --font-color: #2c2a29;           /* 文本深色 */
 
+  /* Explicit light values, identical to today's look (the styles.css
+     defaults); pinned here so the light theme can't drift if those
+     defaults ever move.  --status-ign-bg and --form-border-color stay
+     unset on purpose: they fall back to var(--background-color) and
+     #ddd, exactly as today. */
+  --input-bg: #ffffff;
+  --input-fg: #000000;
+  --tagify-bg: transparent;
+  --input-placeholder-color: #D8D8D8;
+  --input-placeholder-color-focus: rgba(0, 0, 0, 0.25);
+
   /* Chart.js 图表适配颜色 */
   --chart-tick-color: #636366;
   --chart-tick-major-color: #1c1c1e;
