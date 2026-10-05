@@ -417,7 +417,15 @@ def _safe_remove(path):
 
 
 def start_task(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    app, audio_path, language, model_size, book_params, media_url=None, username=None
+    app,
+    audio_path,
+    language,
+    model_size,
+    book_params,
+    media_url=None,
+    username=None,
+    retranscribe_book_id=None,
+    temp_audio=True,
 ):
     """
     Register and launch a background transcription task.
@@ -429,14 +437,21 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
     size, and the task derives the language code itself.  book_params:
     {language_id, title, tags, source_uri}.  username is the requesting
     user (multi-user mode); the task thread re-enters that user's scope
-    so its db access lands on the user's own sqlite file.  Returns the
-    task_id.
+    so its db access lands on the user's own sqlite file.
+
+    With retranscribe_book_id the task updates that existing book's
+    text and cues instead of creating one (edit page re-transcribe);
+    temp_audio says whether audio_path is a disposable temp file (an
+    upload or URL download) or the book's own stored audio, which must
+    survive the task.  Returns the task_id.
     """
     task_id = uuid.uuid4().hex
     _set_state(task_id, "queued", message="Queued.")
     with _TASKS_LOCK:
         _TASKS[task_id]["audio_path"] = audio_path
         _TASKS[task_id]["media_url"] = media_url
+        _TASKS[task_id]["retranscribe_book_id"] = retranscribe_book_id
+        _TASKS[task_id]["temp_audio"] = temp_audio
 
     thread = threading.Thread(
         target=_run_task,
@@ -449,6 +464,8 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
             book_params,
             media_url,
             username,
+            retranscribe_book_id,
+            temp_audio,
         ),
         daemon=True,
     )
@@ -457,10 +474,19 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
 
 
 def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    app, task_id, audio_path, language, model_size, book_params, media_url, username
+    app,
+    task_id,
+    audio_path,
+    language,
+    model_size,
+    book_params,
+    media_url,
+    username,
+    retranscribe_book_id=None,
+    temp_audio=True,
 ):
     """
-    Thread body: transcribe, then import the book.
+    Thread body: transcribe, then import (or update) the book.
 
     Holds the app context for the whole run (import_book needs
     current_app.env_config and db.session); user_scope re-enters the
@@ -468,19 +494,20 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
     cross threads, and without it both the db connection creator and
     the user-scoped env_config paths fail in multi-user mode.  The
     scoped db session is keyed to the app context, so it is removed
-    while the context is still alive; the temp file is dropped on
-    success (it has been copied into the book) and failure alike.
-    Error state is set last, after cleanup, so a poller that sees the
-    terminal state also sees the cleaned-up disk.
+    while the context is still alive; a disposable temp file is dropped
+    on success (it has been copied into the book) and failure alike,
+    while the book's own stored audio is never touched.  Error state is
+    set last, after cleanup, so a poller that sees the terminal state
+    also sees the cleaned-up disk.
     """
     try:
         with app.app_context(), mu_context.user_scope(username):
             try:
-                # Engine choice follows the model picked on the import
-                # form: "sensevoice" runs SenseVoice-Small (the default
-                # for the zh/yue/en/ja/ko languages it was trained on);
-                # base/small/medium run faster-whisper, which covers the
-                # rest of the language roster.
+                # Engine choice follows the model picked on the form:
+                # "sensevoice" runs SenseVoice-Small (the default for
+                # the zh/yue/en/ja/ko languages it was trained on);
+                # base/small/medium run faster-whisper, which covers
+                # the rest of the language roster.
                 from lute.book import sensevoice
 
                 if model_size == "sensevoice":
@@ -532,34 +559,50 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
                 if not (text and text.strip()):
                     raise RuntimeError("The transcription produced no text.")
 
-                b = Book()
-                b.language_id = book_params.get("language_id")
-                b.title = book_params.get("title")
-                b.source_uri = book_params.get("source_uri")
-                b.text = text
-                b.srt_data = cues_json
-                b.book_type = "mp3"
-                b.book_tags = book_params.get("tags") or []
-                b.threshold_page_tokens = 250
-                b.split_by = "paragraphs"
-                if media_url:
-                    # Large remote audio: keep streaming from the URL, the
-                    # temp download was only needed for transcription.
-                    b.media_url = media_url
-                else:
-                    # Small/local audio: import_book copies the temp file
-                    # into the user audio dir under a unique name.
-                    b.audio_source_path = audio_path
+                if retranscribe_book_id is not None:
+                    # Re-transcribe (edit page): replace the existing
+                    # book's text and cues, same flow as saving the edit
+                    # form, so pages are re-parsed in place.  Audio,
+                    # title, tags etc. stay untouched.
+                    from lute.book.model import Repository
 
-                book = BookService().import_book(b, db.session)
+                    b = Repository(db.session).load(retranscribe_book_id)
+                    if b is None:
+                        raise RuntimeError("The book was deleted.")
+                    b.text = text
+                    b.srt_data = cues_json
+                    book = BookService().import_book(b, db.session)
+                else:
+                    b = Book()
+                    b.language_id = book_params.get("language_id")
+                    b.title = book_params.get("title")
+                    b.source_uri = book_params.get("source_uri")
+                    b.text = text
+                    b.srt_data = cues_json
+                    b.book_type = "mp3"
+                    b.book_tags = book_params.get("tags") or []
+                    b.threshold_page_tokens = 250
+                    b.split_by = "paragraphs"
+                    if media_url:
+                        # Large remote audio: keep streaming from the URL, the
+                        # temp download was only needed for transcription.
+                        b.media_url = media_url
+                    else:
+                        # Small/local audio: import_book copies the temp file
+                        # into the user audio dir under a unique name.
+                        b.audio_source_path = audio_path
+
+                    book = BookService().import_book(b, db.session)
                 # The id must be read while the book is still
                 # session-bound; below, the session is gone.
                 book_id = book.id
             finally:
                 db.session.remove()
-                # The temp download has been copied into the book
-                # (success) or is no longer needed (failure).
-                _safe_remove(audio_path)
+                # A disposable temp download has been copied into the
+                # book (success) or is no longer needed (failure); the
+                # book's own stored audio must survive.
+                if temp_audio:
+                    _safe_remove(audio_path)
             # Terminal states come last: a poller that sees one must also
             # see the cleaned-up disk.
             _set_state(task_id, "finished", percent=100, book_id=book_id)

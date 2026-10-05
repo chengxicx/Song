@@ -58,7 +58,7 @@ from lute.book.forms import (
 from lute.book.types import import_type_choices
 from lute.book.stats import Service as StatsService
 from lute.book.stats import get_difficulty_label
-from lute.book import whisper_transcribe
+from lute.book import sensevoice, whisper_transcribe
 from lute.multiuser.context import get_current_user
 from lute.multiuser.permissions import admin_only_if_multiuser_json
 import lute.utils.formutils
@@ -273,6 +273,7 @@ def edit(bookid):
         tags=repo.get_book_tags(),
         allowed_extensions=ALLOWED_AUDIO_EXTENSIONS,
         cue_audio_url=cue_audio_url,
+        sensevoice_supported=sensevoice.lang_code_for(lang) is not None,
     )
 
 
@@ -669,6 +670,33 @@ def whisper_install():
     return jsonify({"ok": ok, "message": message})
 
 
+def _engine_error(model_size, language):
+    """
+    Why the picked transcription engine can't run for this language, or
+    None when it can.  SenseVoice (sherpa-onnx) and faster-whisper are
+    independent optional installs, so the availability gate follows the
+    engine the form actually picked.  SenseVoice only covers
+    zh/yue/en/ja/ko.
+    """
+    if model_size == "sensevoice":
+        from lute.book import sensevoice
+
+        if not sensevoice.installed():
+            return (
+                "SenseVoice isn't installed on this server yet "
+                "-- set it up under Settings -> Whisper (auto-subtitles)."
+            )
+        if sensevoice.lang_code_for(language) is None:
+            return (
+                "SenseVoice transcribes Chinese, Cantonese, "
+                "English, Japanese and Korean only -- pick a whisper "
+                "model for this language."
+            )
+    elif not whisper_transcribe.whisper_status()["installed"]:
+        return "faster-whisper is not installed yet."
+    return None
+
+
 @bp.route("/whisper/prepare", methods=["POST"])
 def whisper_prepare():
     """
@@ -703,39 +731,15 @@ def whisper_prepare():
     mp3_file = request.files.get("mp3_file")
     mp3_url = (request.form.get("mp3_url") or "").strip()
     model_size = (request.form.get("whisper_model") or "").strip()
-    use_sensevoice = model_size == "sensevoice"
-    if not use_sensevoice and model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES:
+    if (
+        model_size != "sensevoice"
+        and model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES
+    ):
         model_size = whisper_transcribe.DEFAULT_MODEL_SIZE
 
-    # SenseVoice (sherpa-onnx) and faster-whisper are independent
-    # optional installs, so the availability gate follows the engine
-    # the form actually picked.  SenseVoice only covers zh/yue/en/ja/ko.
-    if use_sensevoice:
-        from lute.book import sensevoice
-
-        if not sensevoice.installed():
-            return (
-                jsonify(
-                    {
-                        "error": "SenseVoice isn't installed on this server yet "
-                        "-- set it up under Settings -> Whisper (auto-subtitles)."
-                    }
-                ),
-                400,
-            )
-        if sensevoice.lang_code_for(language) is None:
-            return (
-                jsonify(
-                    {
-                        "error": "SenseVoice transcribes Chinese, Cantonese, "
-                        "English, Japanese and Korean only -- pick a whisper "
-                        "model for this language."
-                    }
-                ),
-                400,
-            )
-    elif not whisper_transcribe.whisper_status()["installed"]:
-        return jsonify({"error": "faster-whisper is not installed yet."}), 400
+    engine_error = _engine_error(model_size, language)
+    if engine_error:
+        return jsonify({"error": engine_error}), 400
 
     temppath = current_app.env_config.temppath
     os.makedirs(temppath, exist_ok=True)
@@ -798,6 +802,88 @@ def whisper_prepare():
         },
         media_url=media_url,
         username=get_current_user(),
+    )
+    return jsonify({"task_id": task_id})
+
+
+@bp.route("/whisper/retranscribe/<int:bookid>", methods=["POST"])
+def whisper_retranscribe(bookid):
+    """
+    Re-run transcription on an existing mp3 book's audio, replacing the
+    book's text and subtitle cues in place (edit page button).
+
+    The book's own stored audio file is never touched; only a
+    remote-URL book downloads a disposable temp copy for the
+    transcription.  The page polls /whisper/status/<task_id>; the task
+    updates the book (same flow as saving the edit form) instead of
+    creating a new one.
+    """
+    if whisper_transcribe.has_running_task():
+        return (
+            jsonify(
+                {
+                    "error": "A transcription or model download is already "
+                    "running -- please wait for it to finish."
+                }
+            ),
+            409,
+        )
+    whisper_transcribe.purge_finished_tasks()
+
+    dbbook = _find_book(bookid)
+    if dbbook is None:
+        return jsonify({"error": "Book not found."}), 404
+    if (dbbook.book_type or "") != "mp3":
+        return jsonify({"error": "Only mp3 books can be re-transcribed."}), 400
+
+    language = db.session.get(Language, dbbook.language_id)
+    if language is None:
+        return jsonify({"error": "The book's language is missing."}), 400
+
+    model_size = (request.form.get("whisper_model") or "").strip()
+    if model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES + ["sensevoice"]:
+        model_size = whisper_transcribe.DEFAULT_MODEL_SIZE
+    engine_error = _engine_error(model_size, language)
+    if engine_error:
+        return jsonify({"error": engine_error}), 400
+
+    temppath = current_app.env_config.temppath
+    os.makedirs(temppath, exist_ok=True)
+
+    temp_audio = False
+    if dbbook.audio_filename:
+        audio_path = os.path.join(
+            current_app.env_config.useraudiopath, dbbook.audio_filename
+        )
+        if not os.path.exists(audio_path):
+            return (
+                jsonify({"error": "The book's audio file is missing on disk."}),
+                400,
+            )
+    elif dbbook.media_url:
+        # Transcription needs a local file: stream a disposable copy.
+        try:
+            fname = download_url_to_file(
+                dbbook.media_url,
+                temppath,
+                max_bytes=whisper_transcribe.WHISPER_MAX_DOWNLOAD_BYTES,
+            )
+        except BookImportException as e:
+            return jsonify({"error": e.message}), 400
+        audio_path = os.path.join(temppath, fname)
+        temp_audio = True
+    else:
+        return jsonify({"error": "This book has no audio to transcribe."}), 400
+
+    task_id = whisper_transcribe.start_task(
+        current_app._get_current_object(),  # pylint: disable=protected-access
+        audio_path,
+        language,
+        model_size,
+        None,  # book_params: unused, the book already exists
+        username=get_current_user(),
+        retranscribe_book_id=bookid,
+        temp_audio=temp_audio,
     )
     return jsonify({"task_id": task_id})
 

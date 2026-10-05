@@ -21,6 +21,7 @@ import pytest
 
 from lute.db import db
 from lute.book import sensevoice, whisper_transcribe
+from lute.models.book import Book as DBBook
 from lute.models.repositories import BookRepository
 
 # pylint: disable=protected-access
@@ -797,3 +798,103 @@ def test_consecutive_transcriptions_allowed_after_finish(
         task_id2 = resp2.get_json()["task_id"]
         status2 = _wait_for_terminal(task_id2)
         assert status2["state"] == "finished"
+
+
+# ---------------------------------------------------------------------
+# Re-transcribe an existing book (edit page button)
+# ---------------------------------------------------------------------
+
+
+def _create_mp3_book(app, client, english, text="Hello world."):
+    "Import an mp3 book through the normal flow; returns the DBBook."
+    cues = [{"start": 1.0, "end": 4.2, "text": text}]
+
+    def _fake_transcribe(audio_path, lang_code, model_size="small", progress_cb=None):
+        return text, json.dumps(cues, ensure_ascii=False)
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"fake audio bytes"), "podcast.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        assert _wait_for_terminal(resp.get_json()["task_id"])["state"] == "finished"
+
+    whisper_transcribe.purge_finished_tasks()
+    return BookRepository(db.session).find_by_title("podcast", english.id)
+
+
+def test_retranscribe_updates_book_in_place(app, app_context, client, english):
+    """
+    The edit-page re-transcribe replaces the book's text and cues via
+    the same flow as saving the edit form: no second book is created,
+    and the book's own audio file survives untouched.
+    """
+    book = _create_mp3_book(app, client, english)
+    audio_name = book.audio_filename
+    useraudio = app.env_config.useraudiopath
+    assert os.path.exists(os.path.join(useraudio, audio_name))
+
+    def _fake_transcribe(audio_path, lang_code, model_size="small", progress_cb=None):
+        # The task must transcribe the book's stored audio, not a temp copy.
+        assert audio_path == os.path.join(useraudio, audio_name)
+        if progress_cb is not None:
+            progress_cb(50)
+        cues = [{"start": 0.5, "end": 2.5, "text": "Updated text."}]
+        return "Updated text.", json.dumps(cues, ensure_ascii=False)
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe
+    ):
+        resp = client.post(f"/book/whisper/retranscribe/{book.id}")
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    assert status["book_id"] == book.id
+
+    repo = BookRepository(db.session)
+    # The task committed in its own session; drop this session's cache.
+    db.session.expire_all()
+    dbbook = db.session.get(DBBook, book.id)
+    full_text = "\n".join(t.text for t in dbbook.texts)
+    assert "Updated text." in full_text
+    assert json.loads(dbbook.srt_data) == [
+        {"start": 0.5, "end": 2.5, "text": "Updated text."}
+    ]
+    # Still exactly one book of that title, same audio file, still on disk.
+    assert repo.find_by_title("podcast", english.id).id == book.id
+    assert dbbook.audio_filename == audio_name
+    assert os.path.exists(os.path.join(useraudio, audio_name))
+
+
+def test_retranscribe_edit_page_offers_button(app, app_context, client, english):
+    "The edit page of an mp3 book renders the re-transcribe controls."
+    book = _create_mp3_book(app, client, english)
+    resp = client.get(f"/book/edit/{book.id}")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'id="retranscribe_btn"' in body
+    assert f"/book/whisper/retranscribe/{book.id}" in body
+
+
+def test_retranscribe_unknown_book_404(app, client):
+    resp = client.post("/book/whisper/retranscribe/999999")
+    assert resp.status_code == 404
+
+
+def test_retranscribe_busy_returns_409(app, client, english):
+    book = _create_mp3_book(app, client, english)
+    with patch.object(whisper_transcribe, "has_running_task", return_value=True):
+        resp = client.post(f"/book/whisper/retranscribe/{book.id}")
+    assert resp.status_code == 409
