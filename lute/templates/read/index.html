@@ -387,7 +387,17 @@
     // hidden), so closing the analysis -- or clicking a word -- brings it
     // straight back.
     if (event.data.event === "LuteTermFormGrammarRequested") {
-      if (typeof open_grammar_analysis === "function") open_grammar_analysis();
+      if (typeof open_grammar_analysis === "function") {
+        // Claim the current sub-screen for the panel first: the request
+        // arrives with the pane about to be shown for a screen that
+        // _renderScreen() may re-evaluate, and a plain re-open (no opts)
+        // would drop the jump the reader just asked for.
+        window.__grammarPaneKey =
+          parseInt($("#page_num").val(), 10) + ":" + curScreen;
+        // selectTarget: jump to the grammar of the sentence the term being
+        // edited lives in, and pin its highlight.
+        open_grammar_analysis({ selectTarget: true });
+      }
     }
 
     // The term form's "Sentence" button toggles sentence lookup: first

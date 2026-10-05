@@ -4853,10 +4853,20 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     border-radius: 8px;
     background-color: var(--g-card);
     transition: border-color 0.12s ease, background-color 0.12s ease;
+    /* Keep the auto-scrolled card clear of the sticky level header. */
+    scroll-margin-top: 42px;
 }
 .grammar-item:hover {
     border-color: var(--g-accent-line);
     background-color: color-mix(in srgb, var(--g-accent-soft) 40%, var(--g-card));
+}
+/* The card the term form's Grammar button jumped to.  Persists until the
+   reader hovers another card, opens another word, or closes the panel --
+   hence a class rather than :hover. */
+.grammar-item--active {
+    border-color: var(--g-accent-line);
+    background-color: color-mix(in srgb, var(--g-accent-soft) 40%, var(--g-card));
+    box-shadow: 0 0 0 2px var(--g-accent-line);
 }
 
 .grammar-item__head {
