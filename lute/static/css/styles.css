@@ -739,10 +739,21 @@ div#read_pane_right {
     font-variant-numeric: tabular-nums;
 }
 
-/* Sub-page mode: the label shows the sub-screen count "n/m" and is
-   static (no hover/click interaction). */
+/* Sub-page mode: the label is clickable -- it toggles between the
+   sub-screen count "n/m" (default) and the whole-book percentage.  The
+   feedback is CSS-only on purpose: a JS hover preview used to rewrite the
+   label itself, which made it flicker under the cursor. */
 #page_indicator.subpage-mode {
     color: var(--read-slider-color, #79b7e7);
+    cursor: pointer;
+    /* A toggle, not text to be selected (a double click would otherwise
+       highlight the count). */
+    user-select: none;
+    transition: opacity 0.15s ease;
+}
+
+#page_indicator.subpage-mode:hover {
+    opacity: 0.72;
 }
 
 .reading_header_mid_top {
