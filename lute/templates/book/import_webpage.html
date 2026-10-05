@@ -272,12 +272,13 @@
     <div class="irow">
       <label class="ilbl" for="mp3_whisper">No subtitles?</label>
       <div class="ictrl isource">
-        <label><input type="checkbox" id="mp3_whisper"> Auto-transcribe with Whisper (local, no subtitle file needed)</label>
+        <label><input type="checkbox" id="mp3_whisper"> Auto-transcribe (local, no subtitle file needed)</label>
         <span class="ior">model</span>
-        <select id="mp3_whisper_model" title="Model used for transcription (base = fastest, medium = most accurate). The model file downloads automatically on the first transcription.">
-          <option value="base">base (fastest)</option>
-          <option value="small" selected>small (recommended)</option>
-          <option value="medium">medium (most accurate)</option>
+        <select id="mp3_whisper_model" title="Transcription engine: SenseVoice is fastest for Chinese, Cantonese, English, Japanese and Korean; whisper covers every other language (base = fastest, medium = most accurate). The model downloads automatically on the first transcription.">
+          <option value="sensevoice">SenseVoice (zh / yue / en / ja / ko &middot; fastest)</option>
+          <option value="base">whisper base (fastest)</option>
+          <option value="small" selected>whisper small (recommended)</option>
+          <option value="medium">whisper medium (most accurate)</option>
         </select>
       </div>
     </div>
@@ -286,7 +287,11 @@
       <div class="ictrl" id="whisper_panel">
         <span id="whisper_missing" style="display: none;">
           Whisper isn't installed on this server yet &mdash; install it (and pre-download
-          models) under <a href="/settings">Settings &rarr; Whisper</a>.
+          models) under <a href="/settings">Settings &rarr; Whisper (auto-subtitles)</a>.
+        </span>
+        <span id="sensevoice_missing" style="display: none;">
+          SenseVoice isn't installed on this server yet &mdash; set it up (and pre-download
+          the model) under <a href="/settings">Settings &rarr; Whisper (auto-subtitles)</a>.
         </span>
         <span id="whisper_progress" style="display: none;">
           <span id="whisper_status_text"></span>
@@ -843,36 +848,67 @@
         });
     });
 
-    // --- Whisper auto-transcription (mp3 form). ---
+    // --- Auto-transcription (mp3 form). ---
     // Checked + no subtitle provided: the import posts to
     // /book/whisper/prepare instead, and the page polls the task until
     // the book exists.  An explicitly provided subtitle always wins.
     // Package install and model management live in Settings -> Whisper.
-    let whisperInstalled = null; // tri-state until the availability check answers.
+    const sensevoiceLangIds = new Set({{ sensevoice_lang_ids|safe }}.map(String));
+    let engineStatus = null; // /whisper/models payload until the check answers.
     const whisperBtn = $('#mp3-import');
     const whisperStatusText = $('#whisper_status_text');
     const whisperPanelRow = $('#whisper_panel_row');
+    const modelSelect = $('#mp3_whisper_model');
+
+    const selectedEngine = function () {
+      return modelSelect.val() === 'sensevoice' ? 'sensevoice' : 'whisper';
+    };
+
+    // SenseVoice is the default model for the languages it was trained
+    // on (zh / yue / en / ja / ko); the other languages stay on whisper.
+    const syncModelToLanguage = function () {
+      const supported = sensevoiceLangIds.has(String($('#mp3-language').val() || ''));
+      modelSelect.find('option[value="sensevoice"]').prop('disabled', !supported);
+      if (supported) {
+        modelSelect.val('sensevoice');
+      } else if (modelSelect.val() === 'sensevoice') {
+        modelSelect.val('small');
+      }
+      refreshWhisperPanel();
+    };
 
     // Two panel states: install hint, and transcription progress.
     const showWhisperPanel = function (mode) {
+      const engine = selectedEngine();
       whisperPanelRow.show();
-      $('#whisper_missing').toggle(mode === 'missing');
+      $('#whisper_missing').toggle(mode === 'missing' && engine === 'whisper');
+      $('#sensevoice_missing').toggle(mode === 'missing' && engine === 'sensevoice');
       $('#whisper_progress').toggle(mode === 'progress');
     };
 
-    fetch('/book/whisper/available')
+    fetch('/book/whisper/models')
       .then(r => r.json())
-      .then(d => { whisperInstalled = !!d.installed; })
-      .catch(() => { whisperInstalled = true; }); // never block the plain import path
+      .then(d => { engineStatus = d; })
+      .catch(() => { engineStatus = { installed: true, sensevoice: null }; }) // never block the plain import path
+      .finally(refreshWhisperPanel);
 
     const refreshWhisperPanel = function () {
       if (!$('#mp3_whisper').prop('checked')) { whisperPanelRow.hide(); return; }
-      showWhisperPanel(whisperInstalled === false ? 'missing' : 'progress');
-      if (whisperInstalled !== false) {
+      if (engineStatus === null) { whisperPanelRow.hide(); return; }
+      const engine = selectedEngine();
+      const engineReady = engine === 'sensevoice'
+        ? !!(engineStatus.sensevoice && engineStatus.sensevoice.installed)
+        : !!engineStatus.installed;
+      if (!engineReady) {
+        showWhisperPanel('missing'); // install hint for the picked engine
+      } else {
         whisperPanelRow.hide(); // nothing to show until a transcription starts
       }
     };
     $('#mp3_whisper').on('change', refreshWhisperPanel);
+    modelSelect.on('change', refreshWhisperPanel);
+    $('#mp3-language').on('change', syncModelToLanguage);
+    syncModelToLanguage();
 
     const pollWhisperTask = function (taskId) {
       const timer = setInterval(() => {
