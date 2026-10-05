@@ -206,37 +206,41 @@ class _Seg:
 
 class _FakeVad:
     """
-    Deterministic VoiceActivityDetector: one speech segment per 3 s of
-    fed audio; flush() emits the tail.  Timestamps are absolute sample
-    counts, like the real thing.
+    Deterministic VoiceActivityDetector: every cycle emits `speech_secs`
+    as a segment and drops the following `silence_secs` as silence, so
+    consecutive cues are separated by a pause like the real thing.
     """
 
-    _SEG = 3 * 16000
+    def __init__(self, _config=None, buffer_size_in_seconds=120, silence_secs=1.0):
+        import numpy as np
 
-    def __init__(self, _config=None, buffer_size_in_seconds=120):
+        self._np = np
+        self._speech = int(2.0 * 16000)
+        self._cycle = self._speech + int(silence_secs * 16000)
         self._queue = []
         self._buf = []
         self._buf_len = 0
-        self._emitted = 0
+        self._pos = 0  # absolute fed samples
 
     def accept_waveform(self, samples):
-        import numpy as np
-
+        np = self._np
         self._buf.append(samples)
         self._buf_len += len(samples)
-        while self._buf_len >= self._SEG:
+        self._pos += len(samples)
+        while self._buf_len >= self._cycle:
             data = np.concatenate(self._buf)
-            self._queue.append(_Seg(self._emitted, data[: self._SEG].copy()))
-            rest = data[self._SEG :]
+            start = self._pos - self._buf_len
+            self._queue.append(_Seg(start, data[: self._speech].copy()))
+            rest = data[self._cycle :]
             self._buf = [rest]
             self._buf_len = rest.size
-            self._emitted += self._SEG
 
     def flush(self):
-        import numpy as np
-
+        np = self._np
         if self._buf_len:
-            self._queue.append(_Seg(self._emitted, np.concatenate(self._buf)))
+            data = np.concatenate(self._buf)
+            n = min(self._speech, self._buf_len)
+            self._queue.append(_Seg(self._pos - self._buf_len, data[:n].copy()))
             self._buf, self._buf_len = [], 0
 
     def empty(self):
@@ -264,7 +268,7 @@ class _CountingRecognizer:
         pass
 
 
-def _install_fake_sherpa(monkeypatch):
+def _install_fake_sherpa(monkeypatch, silence_secs=1.0):
     "Swap in a fake sherpa_onnx module providing only the VAD surface."
     fake = types.ModuleType("sherpa_onnx")
 
@@ -277,7 +281,9 @@ def _install_fake_sherpa(monkeypatch):
             self.sample_rate = 16000
 
     fake.VadModelConfig = _FakeVadModelConfig
-    fake.VoiceActivityDetector = _FakeVad
+    fake.VoiceActivityDetector = lambda cfg, buffer_size_in_seconds=120: _FakeVad(
+        silence_secs=silence_secs
+    )
     monkeypatch.setitem(sys.modules, "sherpa_onnx", fake)
 
 
@@ -295,7 +301,7 @@ def test_transcribe_to_cues_streams_and_reports_progress(model_dir_tmp, monkeypa
 
     model_dir_tmp.mkdir()
     wav = model_dir_tmp / "book.wav"
-    _write_wav(str(wav), 7)  # 7 s -> 3 s segments at 0/3/6 + a 1 s flush
+    _write_wav(str(wav), 7)  # cycles of 2 s speech + 1 s silence
 
     _install_fake_sherpa(monkeypatch)
     pcts = []
@@ -307,12 +313,53 @@ def test_transcribe_to_cues_streams_and_reports_progress(model_dir_tmp, monkeypa
         )
 
     cues = json.loads(cues_json)
+    # 7 s -> speech at 0-2, 3-5, and a 1 s flush tail at 6-7.
     assert [c["start"] for c in cues] == [0.0, 3.0, 6.0]
-    assert [c["text"] for c in cues] == ["seg 1", "seg 2", "seg 3"]
-    assert text == "seg 1\nseg 2\nseg 3"
+    # 1 s pauses are >= SENTENCE_GAP_SECONDS: every cue ends like a
+    # sentence, and the text reads as punctuated lines.
+    assert [c["text"] for c in cues] == ["seg 1。", "seg 2。", "seg 3。"]
+    assert text == "seg 1。\nseg 2。\nseg 3。"
     # Percent climbs monotonically and is capped at 99 before completion.
     assert pcts == sorted(pcts)
     assert pcts[-1] == 99
+
+
+def test_transcribe_to_cues_short_pause_marks_clause(model_dir_tmp, monkeypatch):
+    "A sub-0.7 s pause is a clause boundary (、 for Japanese)."
+    try:
+        import numpy  # noqa: F401
+        import av  # noqa: F401
+    except ImportError:
+        pytest.skip("PyAV/numpy not installed")
+
+    model_dir_tmp.mkdir()
+    wav = model_dir_tmp / "book.wav"
+    _write_wav(str(wav), 6)  # 2 s speech + 0.4 s pause, twice
+
+    _install_fake_sherpa(monkeypatch, silence_secs=0.4)
+    with patch.object(
+        sensevoice, "_recognizer", return_value=_CountingRecognizer()
+    ):
+        text, cues_json = sensevoice.transcribe_to_cues(str(wav), "ja")
+
+    cues = json.loads(cues_json)
+    # Cues at 0-2 and 2.4-4.4 (0.4 s pauses -> clause marks), plus the
+    # 4.8-6 flush tail, which gets the final sentence mark.
+    assert [c["text"] for c in cues] == ["seg 1、", "seg 2、", "seg 3。"]
+    assert text == "seg 1、\nseg 2、\nseg 3。"
+
+
+def test_punctuate_cues_respects_existing_punctuation_and_languages():
+    from lute.book.whisper_transcribe import punctuate_cues
+
+    cues = [
+        {"start": 0.0, "end": 2.0, "text": "_already？"},
+        {"start": 3.0, "end": 5.0, "text": "hello world"},
+        {"start": 5.2, "end": 7.0, "text": "hi"},
+    ]
+    punctuate_cues(cues, "en")
+    # 0.2 s gap -> clause comma; the final cue gets a sentence mark.
+    assert [c["text"] for c in cues] == ["_already？", "hello world,", "hi."]
 
 
 def test_iter_16k_mono_chunks(model_dir_tmp):
