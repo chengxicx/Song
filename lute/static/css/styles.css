@@ -54,6 +54,17 @@ body {
     --btn-accent: #007aff;
     --btn-accent-hover: #0071e3;
 
+    /* Form-control colours.  These are the light, no-theme defaults; the
+       Default / Default-Light themes supply their own values.  Themes
+       that don't define them keep their own field rules -- those load
+       after this file at equal specificity and still win. */
+    --input-bg: #fff;                          /* text fields / textareas */
+    --input-fg: #000;
+    --tagify-bg: transparent;                  /* Tagify fields (Parents/Tags) */
+    --input-placeholder-color: #D8D8D8;
+    --input-placeholder-color-focus: rgba(0, 0, 0, 0.25);
+    --status-ign-bg: var(--background-color);  /* Ign (⊘) status button fill */
+
     background-color: var(--background-color);
     color: var(--font-color);
 
@@ -2442,6 +2453,24 @@ div.code pre {
     box-sizing: border-box;
 }
 
+/* Field colours.  Deliberately TYPE selectors, NOT folded into the #id
+   rule above: legacy themes (Dark_slate / Dusk / Night / Apple_Books)
+   style input[type="text"] / textarea and load after this file, so at
+   equal specificity they keep winning and their look is untouched.
+   `select` is here because the language / dictionary pickers are fields
+   too and would otherwise stay UA-white on a dark page; every select the
+   themes care about is painted by a higher-specificity rule of their own
+   (#defaultLanguageSelect, .dt-length select, #dict-select:hover, ...).
+   input[type="search"] is excluded on purpose -- that is DataTables'
+   search box, which the themes style themselves. */
+input[type="text"],
+input[type="url"],
+textarea,
+select {
+    background-color: var(--input-bg, #fff);
+    color: var(--input-fg, #000);
+}
+
 /* GENERAL FORM STYLES */
 input,
 select,
@@ -2485,7 +2514,7 @@ form input[type="file"]:focus {
 ::placeholder {
     font-family: inherit;
     font-size: 0.8rem;
-    color: #D8D8D8;
+    color: var(--input-placeholder-color, #D8D8D8);
     opacity: 0.7;
 }
 
@@ -3268,7 +3297,7 @@ input[type="checkbox"][disabled] + label {
 }
 
 #status label[for="status-6"] {
-    background-color: var(--background-color);
+    background-color: var(--status-ign-bg, var(--background-color));
 
     border-radius: var(--form-border-radius);
 
