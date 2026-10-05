@@ -709,6 +709,27 @@ def test_slot_specs_match_their_own_examples():
             assert _spec_matches(spec, tokens, joined), rid
 
 
+def test_shika_nai_requires_the_negative_tail():
+    """
+    〜しか is a negative-polarity "only": it is licensed by a following
+    negative predicate.  The derivation's unanchored `しか` regex also matched
+    the しかし conjunction ("しか" sits inside しかし), so a sentence like
+    しかし、誰もいません showed both 〜しかし and a wrong 〜しか card.
+    """
+    for sentence in (
+        "お金が100円しかない。",
+        "日本語しか話せません。",
+        "一つしか残っていない。",
+    ):
+        assert "ds_shika-nai" in _keys(sentence), sentence
+    # しかし is the conjunction, not the construction; its own card stays.
+    hit = _keys("しかし、誰もいません。")
+    assert "ds_shika-nai" not in hit
+    assert "ds_shikashi-but" in hit
+    # しかも must not be claimed either.
+    assert "ds_shika-nai" not in _keys("しかも、それは安い。")
+
+
 def test_i_adjective_nonpast_gets_no_row():
     """
     Whether an い-adjective is in its dictionary form is a property of the
