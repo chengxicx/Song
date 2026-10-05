@@ -614,17 +614,13 @@ function open_grammar_analysis(opts) {
           runs.forEach(function (run) {
             planRun(run).forEach(function (p) {
               var ring = document.createElement("div");
-              ring.className = "grammar-ring";
+              ring.className = p.amber ? "grammar-word-ring" : "grammar-ring";
               ringLayer.appendChild(ring);
-              positionRing(ring, p.rect);
-              rings.push({ ring: ring, cells: p.els });
-              // One amber box per contiguous run of matched words.
-              p.wordBoxes.forEach(function (wb) {
-                var w = document.createElement("div");
-                w.className = "grammar-word-ring";
-                ringLayer.appendChild(w);
-                positionRing(w, wb.rect, 1);
-                rings.push({ ring: w, cells: wb.els });
+              var pad = p.amber ? 1 : 3;
+              positionRing(ring, p.rect, pad);
+              rings.push({
+                ring: ring, pad: pad,
+                cells: p.cells, starts: p.starts, s: p.s, e: p.e, bi: p.bi
               });
             });
           });
@@ -649,15 +645,13 @@ function open_grammar_analysis(opts) {
 
         function updateActiveRings() {
           activeRings.forEach(function (r) {
-            // Fragment rects, not the bounding box: a band's cells must
-            // never re-union into the full multi-line rectangle.
-            var rects = [];
-            r.cells.forEach(function (el) {
-              var rs = el.getClientRects();
-              for (var i = 0; i < rs.length; i++) rects.push(rs[i]);
-            });
-            var u = unionRect(rects);
-            if (u) positionRing(r.ring, u);
+            // Re-band the same character range, then keep this ring's own
+            // band: a ring must never re-union into the full multi-line
+            // rectangle, and a scroll that reflows the text must not leave it
+            // on the wrong line.
+            var bands = rangeBands(r.cells, r.starts, r.s, r.e);
+            var b = bands[r.bi] || bands[0];
+            if (b) positionRing(r.ring, b.rect, r.pad);
           });
         }
         window.addEventListener("scroll", updateActiveRings, { passive: true });
@@ -674,49 +668,26 @@ function open_grammar_analysis(opts) {
           activeRings = [];
         }
 
-        function unionRect(rects) {
-          var top = Infinity, left = Infinity, bottom = -Infinity, right = -Infinity;
-          rects.forEach(function (r) {
-            if (!r.width && !r.height) return;
-            top = Math.min(top, r.top);
-            left = Math.min(left, r.left);
-            bottom = Math.max(bottom, r.bottom);
-            right = Math.max(right, r.right);
-          });
-          if (top === Infinity) return null;
-          return { top: top, left: left, width: right - left, height: bottom - top };
-        }
-
         // Ring per rendered line, not per bounding box: a sentence wrapped
         // across two lines has one bounding box spanning the full width of
         // both lines, which visually swallows the neighbouring sentences on
         // them (e.g. a sentence ending mid-line-2 rings all of line 1 too).
-        // Split the elements' client rects into line bands -- rects whose
-        // vertical extents overlap sit on the same line -- and return one
-        // {rect, els} per band, so each ring hugs the text it marks.
-        function bandRects(els) {
-          var items = [];
-          els.forEach(function (el) {
-            var rs = el.getClientRects();
-            for (var i = 0; i < rs.length; i++) items.push({ rect: rs[i], el: el });
-          });
-          items = items.filter(function (it) {
-            return it.rect.width || it.rect.height;
-          });
-          items.sort(function (a, b) { return a.rect.top - b.rect.top; });
+        // Split client rects into line bands -- rects whose vertical extents
+        // overlap sit on the same line -- and return one rect per band, so
+        // each ring hugs the text it marks.
+        function bandsFromRects(rects) {
+          var items = rects.filter(function (r) { return r.width || r.height; });
+          items.sort(function (a, b) { return a.top - b.top; });
           var bands = [];
-          items.forEach(function (it) {
-            var r = it.rect;
+          items.forEach(function (r) {
             var b = bands.length ? bands[bands.length - 1] : null;
             if (b && r.top <= b.bottom + 2) {
               if (r.bottom > b.bottom) b.bottom = r.bottom;
               if (r.left < b.left) b.left = r.left;
               if (r.right > b.right) b.right = r.right;
-              b.els.push(it.el);
             } else {
               bands.push({
-                top: r.top, bottom: r.bottom, left: r.left, right: r.right,
-                els: [it.el]
+                top: r.top, bottom: r.bottom, left: r.left, right: r.right
               });
             }
           });
@@ -725,10 +696,90 @@ function open_grammar_analysis(opts) {
               rect: {
                 top: b.top, left: b.left,
                 width: b.right - b.left, height: b.bottom - b.top
-              },
-              els: b.els
+              }
             };
           });
+        }
+
+        // UTF-16 code units of a raw text node that grammarCleanText drops
+        // (the 🔊 marker is a surrogate pair).  Returns how many units to
+        // skip at k.
+        function _cleanDropUnits(raw, k) {
+          var ch = raw[k];
+          if (ch === "\u200b" || ch === "\n" || ch === "\r") return 1;
+          if (ch === "\uD83D" && raw[k + 1] === "\uDD0A") return 2;
+          return 0;
+        }
+
+        // Client rects of the kept characters [a, b) inside one .textitem,
+        // indexed in the SAME cleaned text grammarRunCells concatenates
+        // (artifacts removed, NFC).  A DOM Range is the only way to ring part
+        // of a cell: a cell may hold several words (a saved multi-word term
+        // such as 気のせい) and a match may cover only some of them, so the
+        // element's own box is too big.
+        function cellCharRects(el, a, b) {
+          var pieces = [];
+          var total = 0;
+          var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+          var n;
+          while ((n = walker.nextNode())) {
+            var t = grammarCleanText(n.data);
+            pieces.push({ node: n, raw: n.data, t: t });
+            total += t.length;
+          }
+          if (!total) return [];
+          a = Math.max(0, a);
+          b = Math.min(total, b);
+          if (b <= a) return [];
+          // Raw offset inside one piece at which its `want`-th kept character
+          // starts.  Counting via the NFC'd prefix (not one code unit per
+          // kept char) keeps this right when the DOM stores decomposed text:
+          // NFD Hangul uses several raw units per NFC syllable, and every
+          // offset the panel indexes against is NFC.
+          function rawOffset(piece, want) {
+            var off = 0, k = 0;
+            while (k < piece.raw.length) {
+              if (grammarCleanText(piece.raw.slice(0, off)).length >= want) break;
+              var skip = _cleanDropUnits(piece.raw, k);
+              if (skip) { k += skip; off += skip; continue; }
+              k++; off++;
+            }
+            return off;
+          }
+          function locate(idx) {
+            var acc = 0;
+            for (var i = 0; i < pieces.length; i++) {
+              var p = pieces[i];
+              if (idx <= acc + p.t.length) {
+                return { node: p.node, off: rawOffset(p, idx - acc) };
+              }
+              acc += p.t.length;
+            }
+            var last = pieces[pieces.length - 1];
+            return { node: last.node, off: last.raw.length };
+          }
+          var st = locate(a), en = locate(b);
+          var r = document.createRange();
+          r.setStart(st.node, st.off);
+          r.setEnd(en.node, en.off);
+          return Array.prototype.slice.call(r.getClientRects());
+        }
+
+        // Per-rendered-line bands for the character range [s, e) of the run's
+        // concatenated cell text.  Each cell contributes only its intersecting
+        // sub-range, so a blue ring hugs just the example sentence (never the
+        // whole multi-sentence node) and an amber box hugs just the matched
+        // characters inside a cell.
+        function rangeBands(cells, starts, s, e) {
+          var rects = [];
+          cells.forEach(function (c, idx) {
+            var cStart = starts[idx], cEnd = cStart + c.t.length;
+            if (cEnd <= s || cStart >= e) return;
+            var a = Math.max(s, cStart) - cStart;
+            var b = Math.min(e, cEnd) - cStart;
+            rects = rects.concat(cellCharRects(c.el, a, b));
+          });
+          return bandsFromRects(rects);
         }
 
         function positionRing(ring, rect, pad) {
@@ -762,60 +813,52 @@ function open_grammar_analysis(opts) {
           return { el: el, t: stripText(el.textContent) };
         });
 
-        // Ring the whole sentence that contains a match (blue outline), and
-        // draw one amber box around each contiguous run of matched words,
-        // using the backend's exact character offsets.  Adjacent cells (a
-        // word plus its trailing space) merge into a single box so a phrase
-        // like "는 것" never looks like several separate boxes.  Falls back
-        // to ringing the whole run when the example text can't be located.
+        // Ring the example sentence only (blue outline) and draw one amber
+        // box around each matched span, using the backend's exact character
+        // offsets.  Every ring carries its own character range plus its band
+        // index, so updateActiveRings can re-band it after a scroll/reflow.
+        // Falls back to ringing the whole node when the example text can't be
+        // located (or the node has no cells).
         function planRun(run) {
           var example = run.example || "";
           var spans = run.spans || [[0, example.length]];
           var cells = grammarRunCells(run.nodes);
           var plan = [];
-          if (example && cells.length) {
-            var full = "", starts = [];
-            cells.forEach(function (c) { starts.push(full.length); full += c.t; });
-            var pos = full.indexOf(example);
-            if (pos !== -1) {
-              var wordBoxes = [];
-              spans.forEach(function (sp) {
-                var s = pos + sp[0], e = pos + sp[1];
-                // Cell indices overlapping the span, then grouped into
-                // contiguous runs (consecutive cells) for one box per run.
-                var idxs = [];
-                cells.forEach(function (c, idx) {
-                  var cStart = starts[idx], cEnd = cStart + c.t.length;
-                  if (cEnd > s && cStart < e) idxs.push(idx);
+          var full = "", starts = [];
+          cells.forEach(function (c) { starts.push(full.length); full += c.t; });
+          var pos = example ? full.indexOf(example) : -1;
+          if (pos !== -1) {
+            // Blue: bands of the example's own character range, so an example
+            // that is one sentence inside a multi-sentence node never rings
+            // the neighbouring sentences.
+            rangeBands(cells, starts, pos, pos + example.length)
+              .forEach(function (b, bi) {
+                plan.push({
+                  rect: b.rect, amber: false,
+                  cells: cells, starts: starts,
+                  s: pos, e: pos + example.length, bi: bi
                 });
-                for (var i = 0; i < idxs.length; i++) {
-                  var j = i;
-                  while (j + 1 < idxs.length && idxs[j + 1] === idxs[j] + 1) j++;
-                  var runEls = [];
-                  for (var k = i; k <= j; k++) runEls.push(cells[idxs[k]].el);
-                  bandRects(runEls).forEach(function (b) {
-                    wordBoxes.push(b);
-                  });
-                  i = j;
-                }
               });
-              // One ring per rendered line the run occupies.
-              bandRects(cells.map(function (c) { return c.el; }))
-                .forEach(function (b, bi) {
-                  plan.push({
-                    rect: b.rect,
-                    els: b.els,
-                    // The word boxes ride on the first band entry so
-                    // showRings draws them once for the run.
-                    wordBoxes: bi === 0 ? wordBoxes : []
-                  });
+            // Amber: one tight box per rendered line of each matched span.
+            spans.forEach(function (sp) {
+              var s = pos + sp[0], e = pos + sp[1];
+              rangeBands(cells, starts, s, e).forEach(function (b, bi) {
+                plan.push({
+                  rect: b.rect, amber: true,
+                  cells: cells, starts: starts,
+                  s: s, e: e, bi: bi
                 });
-            }
-          }
-          if (!plan.length) {
-            bandRects(cells.map(function (c) { return c.el; }))
-              .forEach(function (b) {
-                plan.push({ rect: b.rect, els: b.els, wordBoxes: [] });
+              });
+            });
+          } else if (cells.length) {
+            // Example not located: ring the whole node, but still per line.
+            rangeBands(cells, starts, 0, full.length)
+              .forEach(function (b, bi) {
+                plan.push({
+                  rect: b.rect, amber: false,
+                  cells: cells, starts: starts,
+                  s: 0, e: full.length, bi: bi
+                });
               });
           }
           return plan;

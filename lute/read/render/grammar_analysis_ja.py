@@ -1288,6 +1288,23 @@ _SLOT_SPECS = {
         "とも",
         [{"type": "tokens", "conds": [{"pos1": "接尾辞", "surface": "とも"}]}],
     ),
+    # 〜しか〜ない: the derivation produced an unanchored `しか` regex, which
+    # also matched the しかし conjunction ("しか" sits inside しかし).  The
+    # entry describes a two-anchor construction -- しか licensed by a negative
+    # predicate -- so match it as one, like あまり〜ない.
+    "shika-nai": (
+        "しか",
+        [
+            {
+                "type": "anchors",
+                "before": [{"surface": "しか"}],
+                # ない itself, ん (lemma ぬ) as in ません / 話せません, and the
+                # ん of ありません.
+                "after": [{"lemma": {"ない", "ぬ"}}],
+                "maxgap": 8,
+            }
+        ],
+    ),
 }
 
 # The て-form connective: Sudachi reports both the て of 知っ+て and the で of
