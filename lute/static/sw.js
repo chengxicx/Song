@@ -1,7 +1,7 @@
 /* Lute Service Worker - PWA offline support */
 // NOTE: bump this name whenever shipped static assets change, so all
 // clients drop the old offline cache and re-precache fresh copies.
-const CACHE_NAME = 'lute-v3.10.5.4.20261005a';
+const CACHE_NAME = 'lute-v3.10.5.4.20261005b';
 
 const STATIC_ASSETS = [
   '/manifest.webmanifest',

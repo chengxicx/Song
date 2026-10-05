@@ -304,6 +304,13 @@ function open_grammar_analysis(opts) {
   // (term-form + dictionary) state.  Exposed globally so clicking a word
   // (LuteTermFormOpened) can restore the default view.
   function closeGrammarAnalysis() {
+    // The per-open "click elsewhere" listener (see clearPinnedSelection) is a
+    // closure over that panel's own state, and the panel element is the only
+    // handle on it -- so unhook it here, before remove() drops the handle.
+    // Without this every open leaks one listener that still holds the whole
+    // detached panel.
+    const stale = document.getElementById("grammar-analysis-panel");
+    if (stale && stale.luteGrammarCleanup) stale.luteGrammarCleanup();
     $("#grammar-analysis-panel").remove();
     // The hover rings live in their own layer on document.body, so removing the
     // panel did not remove them: a ring shown when the panel closes stayed
@@ -667,6 +674,34 @@ function open_grammar_analysis(opts) {
           activeRings.forEach(function (r) { r.ring.remove(); });
           activeRings = [];
         }
+
+        // "I am done with this sentence": a click anywhere -- the reading
+        // text, a toolbar button, another card, or the panel's own background
+        // -- drops the selected style and the rings.  The panel stays open,
+        // so hovering a card still cross-highlights after the click; it just
+        // no longer comes back to a pin.  Capture phase, so the clear lands
+        // before whatever the click was actually for.  The close button is
+        // exempt because it is already tearing the whole panel down.
+        function clearPinnedSelection(ev) {
+          if (
+            ev &&
+            ev.target &&
+            ev.target.closest &&
+            ev.target.closest(".grammar-analysis-panel__close")
+          ) {
+            return;
+          }
+          if (pinnedItemEl) pinnedItemEl.classList.remove("grammar-item--active");
+          pinnedRuns = null;
+          pinnedItemEl = null;
+          hideAllRings();
+        }
+        document.addEventListener("click", clearPinnedSelection, true);
+        // closeGrammarAnalysis() reaches the listener through this hook: once
+        // the panel element is gone the closure is otherwise unreachable.
+        panel[0].luteGrammarCleanup = function () {
+          document.removeEventListener("click", clearPinnedSelection, true);
+        };
 
         // Ring per rendered line, not per bounding box: a sentence wrapped
         // across two lines has one bounding box spanning the full width of
