@@ -89,8 +89,38 @@ def test_reading_page_opens_the_analysis_for_that_event():
         src = f.read()
 
     assert "LuteTermFormGrammarRequested" in src
-    event_block = src.split('"LuteTermFormGrammarRequested"')[1][:200]
+    # The slice must cover the whole branch: the handler claims the screen
+    # for the panel first, then asks for the jump.
+    event_block = src.split('"LuteTermFormGrammarRequested"')[1][:800]
     assert "open_grammar_analysis" in event_block
+    assert "selectTarget: true" in event_block
+
+
+def test_reading_page_claims_the_screen_before_selecting():
+    """
+    The request lands while _renderScreen() can still re-evaluate the
+    screen.  Without claiming the pane key first, that refresh re-opens the
+    panel with no opts -- replacing the panel and dropping the jump the
+    reader just asked for.
+    """
+    with open(_READ_INDEX, encoding="utf-8") as f:
+        src = f.read()
+
+    event_block = src.split('"LuteTermFormGrammarRequested"')[1][:800]
+    assert "__grammarPaneKey" in event_block
+
+
+def test_only_the_term_form_request_asks_for_a_jump():
+    """
+    The reading menu's entry and the sub-screen refresh keep the plain
+    "analyse this screen" behaviour: the menu has no word to target, and a
+    refresh that jumped would fight the reader's own navigation.
+    """
+    with open(_READ_INDEX, encoding="utf-8") as f:
+        src = f.read()
+
+    assert src.count("{ selectTarget: true }") == 1
+    assert "open_grammar_analysis();" in src
 
 
 def test_edit_form_button_order_save_delete_grammar(app_context, client, english, repo):

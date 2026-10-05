@@ -79,6 +79,17 @@ def test_panel_renders_every_entry_the_backend_sends():
     assert out["item_count"] == 2, out["html"][:400]
 
 
+def test_every_rendered_card_carries_its_stable_key():
+    """
+    Each card carries the backend's `key` as data-grammar-key.  The term
+    form's Grammar button marks the card it jumped to by element identity,
+    but the anchor is what lets a test (or a future deep link) name a card
+    without depending on its position in the level grouping.
+    """
+    out = _render([_entry(), _entry(name="는 통에", key="kgm_는통에__2fe634")])
+    assert out["keys"] == ["kgm_으나머지__282dc4", "kgm_는통에__2fe634"], out["html"][:400]
+
+
 def test_reference_block_renders_and_highlights_the_korean_sentence():
     """
     The Korean engine's payload names the sentence ``sentence``; the block

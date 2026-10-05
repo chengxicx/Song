@@ -32,6 +32,12 @@ class FakeEl {
     this.children = [];
     this.classes = new Set();
     this.style = {};
+    // The panel's callbacks bail out when the panel has been detached while
+    // the request was in flight (a real DOM element's isConnected).  Fake
+    // elements are attached as far as these tests are concerned, so without
+    // this the whole .done branch is skipped and every render assertion
+    // reads the "Analyzing…" placeholder.
+    this.isConnected = true;
   }
   get classList() {
     const s = this.classes;
@@ -151,5 +157,8 @@ process.stdout.write(
     notes: firstMatch(/grammar-item__notes">([\s\S]*?)<\/div>/),
     more_label: firstMatch(/<summary>([\s\S]*?)<\/summary>/),
     item_count: (html.match(/class="grammar-item /g) || []).length,
+    // The term form's Grammar button marks the card it jumped to, and tests
+    // address cards by key, so the anchor has to survive into the markup.
+    keys: [...html.matchAll(/data-grammar-key="([^"]*)"/g)].map((m) => m[1]),
   })
 );
