@@ -9,6 +9,7 @@ state machine, the /book/whisper/* routes, and the temp-file lifecycle.
 import io
 import json
 import os
+import re
 import sys
 import threading
 import time
@@ -181,6 +182,17 @@ def test_available_endpoint(app, client):
     assert "installed" in resp.get_json()
 
 
+def test_import_form_offers_sensevoice_default(app, client, english):
+    "The mp3 form lists SenseVoice and knows English is a supported language."
+    resp = client.get("/book/import_webpage")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'value="sensevoice"' in body
+    match = re.search(r"const sensevoiceLangIds = new Set\((\[.*?\])\.map", body)
+    assert match is not None
+    assert english.id in json.loads(match.group(1))
+
+
 # ---------------------------------------------------------------------
 # Model pre-download
 # ---------------------------------------------------------------------
@@ -262,7 +274,7 @@ def test_delete_sensevoice_model(tmp_path, monkeypatch):
 
 
 def test_prepare_routes_to_sensevoice(app, app_context, client, english):
-    "A supported language transcribes via SenseVoice when it is available."
+    "Picking sensevoice for a supported language transcribes via SenseVoice."
     tempdir = app.env_config.temppath
 
     def _fake_cues(audio_path, lang_code, progress_cb=None):
@@ -271,7 +283,7 @@ def test_prepare_routes_to_sensevoice(app, app_context, client, english):
 
     with patch.object(
         whisper_transcribe, "whisper_status", return_value={"installed": True}
-    ), patch.object(sensevoice, "available", return_value=True), patch.object(
+    ), patch.object(sensevoice, "installed", return_value=True), patch.object(
         sensevoice, "ensure_model_downloaded"
     ), patch.object(
         sensevoice, "transcribe_to_cues", side_effect=_fake_cues
@@ -280,6 +292,7 @@ def test_prepare_routes_to_sensevoice(app, app_context, client, english):
             "/book/whisper/prepare",
             data={
                 "language_id": str(english.id),
+                "whisper_model": "sensevoice",
                 "mp3_file": (io.BytesIO(b"fake audio bytes"), "sv.mp3"),
             },
             content_type="multipart/form-data",
@@ -290,6 +303,68 @@ def test_prepare_routes_to_sensevoice(app, app_context, client, english):
     assert status["book_id"] is not None
     leftovers = [f for f in os.listdir(tempdir) if f.startswith("whisper_")]
     assert leftovers == []
+
+
+def test_prepare_sensevoice_requires_package(app, client, english):
+    "SenseVoice selected without sherpa-onnx installed is a clear 400."
+    with patch.object(sensevoice, "installed", return_value=False):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "whisper_model": "sensevoice",
+                "mp3_url": "https://a.example.com/x.mp3",
+            },
+        )
+    assert resp.status_code == 400
+    assert "SenseVoice" in resp.get_json()["error"]
+
+
+def test_prepare_sensevoice_rejects_unsupported_language(app, client, spanish):
+    "SenseVoice only covers zh/yue/en/ja/ko; other languages must use whisper."
+    with patch.object(sensevoice, "installed", return_value=True):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(spanish.id),
+                "whisper_model": "sensevoice",
+                "mp3_url": "https://a.example.com/x.mp3",
+            },
+        )
+    assert resp.status_code == 400
+    assert "Korean" in resp.get_json()["error"]
+
+
+def test_prepare_explicit_whisper_bypasses_sensevoice(
+    app, app_context, client, english
+):
+    "A whisper size is honored even for a SenseVoice-supported language."
+
+    def _fake_cues(audio_path, lang_code, model_size="small", progress_cb=None):
+        assert model_size == "small"
+        return "Hello.", json.dumps([{"start": 0.0, "end": 1.0, "text": "Hello."}])
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_cues
+    ), patch.object(
+        sensevoice,
+        "transcribe_to_cues",
+        side_effect=AssertionError("SenseVoice must not be used"),
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "whisper_model": "small",
+                "mp3_file": (io.BytesIO(b"fake audio bytes"), "w.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+    assert status["state"] == "finished"
 
 
 def test_prepare_409_while_model_downloads(app, client, english):

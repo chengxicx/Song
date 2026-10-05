@@ -376,6 +376,7 @@ def import_webpage():
         rtl_map=json.dumps(_language_is_rtl_map()),
         show_language_selector=True,
         import_types_json=json.dumps(import_type_choices()),
+        sensevoice_lang_ids=json.dumps(_sensevoice_language_ids()),
     )
 
 
@@ -648,13 +649,12 @@ def whisper_prepare():
     Start a background whisper transcription that creates an mp3 book.
 
     Takes the mp3 form's fields (language_id, audio file or URL, title,
-    tags) plus whisper_model.  The audio is saved to a temp file within
-    this request (the upload stream cannot outlive it), and a daemon
-    thread transcribes it and imports the book; the page polls
-    /whisper/status/<task_id> until the book id comes back.
+    tags) plus whisper_model ("sensevoice", or a whisper size).  The
+    audio is saved to a temp file within this request (the upload stream
+    cannot outlive it), and a daemon thread transcribes it and imports
+    the book; the page polls /whisper/status/<task_id> until the book id
+    comes back.
     """
-    if not whisper_transcribe.whisper_status()["installed"]:
-        return jsonify({"error": "faster-whisper is not installed yet."}), 400
     if whisper_transcribe.has_running_task():
         return (
             jsonify(
@@ -677,8 +677,39 @@ def whisper_prepare():
     mp3_file = request.files.get("mp3_file")
     mp3_url = (request.form.get("mp3_url") or "").strip()
     model_size = (request.form.get("whisper_model") or "").strip()
-    if model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES:
+    use_sensevoice = model_size == "sensevoice"
+    if not use_sensevoice and model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES:
         model_size = whisper_transcribe.DEFAULT_MODEL_SIZE
+
+    # SenseVoice (sherpa-onnx) and faster-whisper are independent
+    # optional installs, so the availability gate follows the engine
+    # the form actually picked.  SenseVoice only covers zh/yue/en/ja/ko.
+    if use_sensevoice:
+        from lute.book import sensevoice
+
+        if not sensevoice.installed():
+            return (
+                jsonify(
+                    {
+                        "error": "SenseVoice isn't installed on this server yet "
+                        "-- set it up under Settings -> Whisper (auto-subtitles)."
+                    }
+                ),
+                400,
+            )
+        if sensevoice.lang_code_for(language) is None:
+            return (
+                jsonify(
+                    {
+                        "error": "SenseVoice transcribes Chinese, Cantonese, "
+                        "English, Japanese and Korean only -- pick a whisper "
+                        "model for this language."
+                    }
+                ),
+                400,
+            )
+    elif not whisper_transcribe.whisper_status()["installed"]:
+        return jsonify({"error": "faster-whisper is not installed yet."}), 400
 
     temppath = current_app.env_config.temppath
     os.makedirs(temppath, exist_ok=True)
@@ -819,6 +850,25 @@ def _sensevoice_status():
         return sensevoice.status()
     except Exception:  # pylint: disable=broad-except
         return None
+
+
+def _sensevoice_language_ids():
+    """
+    IDs of the active selectable languages SenseVoice can transcribe
+    (zh / yue / en / ja / ko), for the mp3 import form's model default.
+    """
+    try:
+        from lute.book import sensevoice
+
+        return [
+            lang.id
+            for lang in db.session.query(Language)
+            .filter(Language.is_active == True)  # noqa: E712
+            .all()
+            if lang.is_supported and sensevoice.lang_code_for(lang) is not None
+        ]
+    except Exception:  # pylint: disable=broad-except
+        return []
 
 
 @bp.route("/whisper/delete_model", methods=["POST"])
