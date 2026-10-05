@@ -208,6 +208,9 @@ def _recognizer(lang_code):
             tokens=paths["tokens"],
             use_itn=True,
             language=lang_code or "",
+            # The prod box has 2 cores; the default single inference
+            # thread leaves one of them idle through every decode.
+            num_threads=2,
         )
         _RECOG, _RECOG_LANG = rec, lang_code
         _RECOG_LAST_USED = time.monotonic()
@@ -247,28 +250,59 @@ def _reaper_loop():
         )
 
 
-def _decode_16k_mono(audio_path):
+def _iter_16k_mono(audio_path, chunk_secs=10):
     """
-    Decode any audio file to (sample_rate, float32 mono samples,
-    duration_secs) via PyAV -- the same decoder whisper's PyAV wheels
-    already provide, so no new binary dependency.
+    Stream-decode any audio file into 16 kHz mono float32 chunks of
+    ~chunk_secs each (the last one short) via PyAV -- the same decoder
+    whisper's PyAV wheels already provide, so no new binary dependency.
+
+    A generator on purpose: holding a long file's decoded samples in
+    full is ~230 MB per hour, which is what pushed the 4 GB prod box
+    into swap during audiobook imports.
     """
     import av  # pylint: disable=import-error,import-outside-toplevel
     import numpy as np  # pylint: disable=import-error,import-outside-toplevel
 
     resampler = av.AudioResampler(format="flt", layout="mono", rate=16000)
-    chunks = []
-    total = 0
+    chunk, filled = [], 0
     with av.open(audio_path) as container:
         for packet in container.demux(audio=0):
             for frame in packet.decode():
                 for rf in resampler.resample(frame):
                     arr = rf.to_ndarray().reshape(-1)
-                    chunks.append(arr)
-                    total += arr.size
+                    chunk.append(arr)
+                    filled += arr.size
+                    if filled >= chunk_secs * 16000:
+                        yield np.concatenate(chunk)
+                        chunk, filled = [], 0
+    if chunk:
+        yield np.concatenate(chunk)
+
+
+def _decode_16k_mono(audio_path):
+    """
+    Decode a whole (short) file to (sample_rate, float32 mono samples,
+    duration_secs).  For clips only: long files must be streamed via
+    _iter_16k_mono rather than landed in RAM in full.
+    """
+    import numpy as np  # pylint: disable=import-outside-toplevel
+
+    chunks = list(_iter_16k_mono(audio_path, chunk_secs=60))
     if not chunks:
         return 16000, np.zeros(0, dtype=np.float32), 0.0
-    return 16000, np.concatenate(chunks).astype(np.float32), total / 16000.0
+    samples = np.concatenate(chunks)
+    return 16000, samples, samples.size / 16000.0
+
+
+def _container_duration_secs(audio_path):
+    "Duration from container metadata (seconds), or 0.0 when unknown."
+    import av  # pylint: disable=import-error,import-outside-toplevel
+
+    try:
+        with av.open(audio_path) as container:
+            return (container.duration or 0) / av.time_base
+    except Exception:  # pylint: disable=broad-except
+        return 0.0
 
 
 def transcribe_clip(audio_path, lang_code):
@@ -297,17 +331,27 @@ def transcribe_to_cues(audio_path, lang_code, progress_cb=None):
     """
     Transcribe an audio file into subtitle cues (audiobook import).
 
-    Speech segments come from silero VAD; each is recognized on its own,
-    so cue timestamps are the VAD boundaries -- same shape as
-    whisper_transcribe.transcribe_to_cues' output.
+    The file is stream-decoded and fed to the VAD chunk by chunk; every
+    speech segment the VAD yields is recognized and popped before the
+    next chunk is decoded, so peak memory is one chunk plus the model
+    rather than the whole decoded file.  The VAD still sees one
+    continuous stream, so its segmentation is identical to feeding
+    everything at once, and cue timestamps are the VAD boundaries --
+    same shape as whisper_transcribe.transcribe_to_cues' output.
+
+    Percent progress is computed against the container-reported
+    duration; a container without one simply never reports percent.
+
     Returns (text, cues_json).
     """
     import json
 
     import sherpa_onnx  # pylint: disable=import-error,import-outside-toplevel
 
-    sr, samples, duration = _decode_16k_mono(audio_path)
+    sr = 16000
     rec = _recognizer(lang_code)
+
+    duration = _container_duration_secs(audio_path)
 
     paths = model_paths()
     cfg = sherpa_onnx.VadModelConfig()
@@ -336,11 +380,8 @@ def transcribe_to_cues(audio_path, lang_code, progress_cb=None):
             progress_cb(min(99, int(end / duration * 100)))
 
     with _recog_in_use():
-        # Feed in chunks so a multi-hour audiobook never sits in the VAD
-        # buffer in full (a decoded hour of float32 is hundreds of MB).
-        step = 10 * sr
-        for i in range(0, len(samples), step):
-            vad.accept_waveform(samples[i : i + step])
+        for chunk in _iter_16k_mono(audio_path):
+            vad.accept_waveform(chunk)
             while not vad.empty():
                 _take(vad.front)
                 vad.pop()

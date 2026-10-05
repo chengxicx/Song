@@ -960,6 +960,22 @@
     syncModelToLanguage();
 
     const pollWhisperTask = function (taskId) {
+      // Elapsed/ETA alongside the percent: on a slow server the first
+      // percent of a long audiobook can take many minutes, and a bare
+      // "0%" reads as hung.
+      const startedAt = Date.now();
+      const fmtDuration = function (secs) {
+        secs = Math.max(0, Math.round(secs));
+        const mins = Math.floor(secs / 60);
+        if (mins >= 60) {
+          return Math.floor(mins / 60) + ' h ' + (mins % 60) + ' min';
+        }
+        if (mins > 0) return mins + ' min';
+        return secs + ' s';
+      };
+      const elapsedText = function () {
+        return fmtDuration((Date.now() - startedAt) / 1000) + ' elapsed';
+      };
       const timer = setInterval(() => {
         fetch('/book/whisper/status/' + taskId)
           .then(r => r.json())
@@ -985,10 +1001,15 @@
               return;
             }
             if (d.state === 'transcribing') {
-              whisperStatusText.text('Transcribing… ' + d.percent + '%').css('color', '');
-              whisperProgressBar.css('width', (d.percent || 0) + '%');
+              const pct = d.percent || 0;
+              let text = 'Transcribing… ' + pct + '% (' + elapsedText();
+              if (pct >= 3) {
+                text += ', ~' + fmtDuration((Date.now() - startedAt) / 1000 * (100 - pct) / pct) + ' left';
+              }
+              whisperStatusText.text(text + ')').css('color', '');
+              whisperProgressBar.css('width', pct + '%');
             } else {
-              whisperStatusText.text(d.message || 'Queued…').css('color', '');
+              whisperStatusText.text((d.message || 'Queued…') + ' (' + elapsedText() + ')').css('color', '');
             }
           })
           .catch(() => {}); // transient network hiccups: keep polling
