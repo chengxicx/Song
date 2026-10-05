@@ -770,7 +770,8 @@ def test_term_form_grammar_button_selects_the_current_sentence():
 
         # Re-open the jump to get a pin back, and prove a click *outside* the
         # panel clears it too: the listener is on the document, not on the
-        # panel.  #page_indicator is a static label -- nothing else reacts.
+        # panel.  #page_indicator only rewrites its own text -- nothing else
+        # reacts.
         page.locator(".grammar-analysis-panel__close").click()
         expect(page.locator("#grammar-analysis-panel")).to_have_count(0)
         # A click on the word toggles the card, and the word is still marked
