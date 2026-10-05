@@ -396,3 +396,22 @@ def test_read_page_renders_video_backend(app, app_context, client, english):
     assert '"video"' in content  # LUTE_YT_DATA.backend
     assert 'id="yt-video-player"' in content
     assert "https://v.example.com/clip.mp4" in content
+
+
+def test_read_page_streams_a_locally_stored_video(app, app_context, client, english):
+    """
+    A video book whose file is stored locally (what the auto-transcribe
+    flow creates) plays from /useraudio/stream, not from a remote URL.
+    """
+    dbbook = _make_video_book(app, app_context, english)
+    # Exactly what whisper_transcribe's task leaves behind: a copied file
+    # in the user audio dir and no media_url.
+    dbbook.media_url = None
+    dbbook.audio_filename = "clip.mp4"
+    db.session.commit()
+
+    resp = client.get(f"/read/{dbbook.id}/page/1")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+    assert '"video"' in content  # still the HTML5 <video> backend
+    assert f"/useraudio/stream/{dbbook.id}" in content
