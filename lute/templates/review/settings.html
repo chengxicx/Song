@@ -61,6 +61,19 @@
     </tr>
 
     <tr>
+      <td>{{ form.review_max_shadowing_per_day.label }}</td>
+      <td>
+        {{ form.review_max_shadowing_per_day(class="form-control") }}
+        <div class="review-hint">
+          Shadowing cards have you read a real sentence aloud and score the
+          recording, so they take tens of seconds each -- this caps how many
+          one day's sessions serve, due or new, on top of the new-card limit
+          above.  0 serves none without disabling the card type.
+        </div>
+      </td>
+    </tr>
+
+    <tr>
       <td>{{ form.review_speak_cards.label }}</td>
       <td>
         {{ form.review_speak_cards(class="form-control") }}
@@ -76,11 +89,15 @@
       <td>Card types</td>
       <td>
         {{ form.card_recognition }} {{ form.card_recognition.label }}<br>
-        {{ form.card_cloze }} {{ form.card_cloze.label }}
+        {{ form.card_cloze }} {{ form.card_cloze.label }}<br>
+        {{ form.card_shadowing }} {{ form.card_shadowing.label }}
         <div class="review-hint">
           Which card types new terms get when they enter the queue.
           Turning a type off does not remove or disable cards already
           in the queue: they keep their scheduling history.
+          Shadowing needs a transcription engine on the server
+          (SenseVoice or whisper, see Settings); where none is available
+          the card falls back to read-and-self-grade.
         </div>
       </td>
     </tr>

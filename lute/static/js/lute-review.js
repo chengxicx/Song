@@ -5,7 +5,10 @@
  * grade is a small /review/grade post.  Recognition cards are graded
  * with the two FSRS buttons (Again / Good); cloze cards can be typed
  * and are auto-graded (Again on a wrong answer), or revealed and
- * self-graded.
+ * self-graded.  Shadowing cards play the sentence, record a take
+ * (shared LuteRecorder), have it transcribed and diffed word by word,
+ * suggest a grade from the score -- the user's buttons stay live --
+ * and offer one-click "add the stumbled word to your learning words".
  *
  * The card is one fixed shell with three regions (question, answer,
  * grading) so revealing never makes the buttons jump: the shell is
@@ -17,8 +20,10 @@
  * Cards are pronounced: the term is spoken whenever it is on screen --
  * when a recognition card opens (its front IS the term) and when a
  * cloze card's answer is revealed -- and the card carries a 🔊 button
- * to hear it again.  Each card is spoken in its own term's language
- * (c["lang_code"]), because one queue holds every language the user
+ * to hear it again.  A shadowing card plays its sentence when it
+ * opens (that is the model audio) and speaks the term at reveal.
+ * Each card is spoken in its own term's language (c["lang_code"]),
+ * because one queue holds the terms of every language the user
  * studies; tts.js supplies the voice and the /tts/ fallback.  The
  * automatic reading can be turned off in the review settings
  * (review_speak_cards); the button works either way.
@@ -42,12 +47,23 @@ window.LuteReview = (function () {
   const PROMPTS = {
     recognition: "Recall the meaning",
     cloze: "Fill in the blank",
+    shadowing: "Read the sentence aloud",
   };
 
   const CARD_TYPE_LABELS = {
     recognition: "Recognition",
     cloze: "Cloze",
+    shadowing: "Shadowing",
   };
+
+  // Score -> suggested FSRS grade.  Advisory only: the buttons stay
+  // live, and an ASR mishear must never force the user's hand.
+  function shadowing_suggested_rating(score) {
+    if (score == null) return null;
+    if (score >= 85) return 3;
+    if (score < 60) return 1;
+    return null;
+  }
 
   async function post_json(url, data) {
     const resp = await fetch(url, {
@@ -126,6 +142,26 @@ window.LuteReview = (function () {
     }
   }
 
+  // The model audio of a shadowing card is the whole sentence.
+  function speak_sentence(c) {
+    if (!c || !c.sentence_plain) return;
+    if (typeof window.luteTtsSpeak === "function") {
+      window.luteTtsSpeak(c.sentence_plain, null, c.lang_code || null);
+    } else if (typeof speakText === "function") {
+      speakText(c.sentence_plain, null, c.lang_code || null);
+    }
+  }
+
+  // What pronouncing "the card" means, per type: recognition says the
+  // term, shadowing plays the sentence to shadow, cloze is only spoken
+  // at reveal (its front would give the answer away).
+  function card_speaker(c) {
+    if (!c) return null;
+    if (c.card_type === "recognition") return () => speak_term(c);
+    if (c.card_type === "shadowing") return () => speak_sentence(c);
+    return null;
+  }
+
   // The review settings page can turn the automatic reading off; the
   // 🔊 button works either way.  Read through tts.js's own setting
   // reader so "0"/"false"/absent parse as they do everywhere else, and
@@ -141,18 +177,21 @@ window.LuteReview = (function () {
     speak_term(c);
   }
 
-  // Auto-pronounce the card just opened.  Only when the term is on the
-  // front: on a cloze card it is the answer, and hearing it before
-  // answering would give it away -- those are spoken at reveal instead.
+  // Auto-pronounce the card just opened, as the settings allow.  Only
+  // when the front is not the answer: recognition says the term,
+  // shadowing plays the sentence; a cloze card's front hides the term,
+  // so it waits for the reveal (see reveal()).
   function auto_speak(c) {
     owed_speak = false;
-    if (!c || c.card_type !== "recognition") return;
+    if (!speak_cards_enabled()) return;
+    const speak = card_speaker(c);
+    if (!speak) return;
     const ua = navigator.userActivation;
     if (ua && !ua.hasBeenActive) {
       owed_speak = true;
       return;
     }
-    auto_speak_term(c);
+    speak();
   }
 
   // The first interaction of the page releases an owed pronunciation.
@@ -162,7 +201,8 @@ window.LuteReview = (function () {
   function on_first_gesture() {
     if (!owed_speak) return;
     owed_speak = false;
-    auto_speak_term(state.current);
+    const speak = card_speaker(state.current);
+    if (speak) speak();
   }
 
   /* ---------- index page actions ---------- */
@@ -281,12 +321,20 @@ window.LuteReview = (function () {
   function card_shell(c) {
     const badge = CARD_TYPE_LABELS[c.card_type] || c.card_type;
     const prompt = PROMPTS[c.card_type] || "";
-    const typing = c.card_type === "recognition" ? "" : `<input type="text" id="review_typing" class="rv-typing" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="your answer">`;
-    // Recognition has nothing to check, so it gets a single action.
+    // Recognition has nothing to check and shadowing records instead,
+    // so only cloze gets the typed-answer input and Check button.
+    const typing =
+      c.card_type === "cloze"
+        ? `<input type="text" id="review_typing" class="rv-typing" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="your answer">`
+        : "";
     const check =
-      c.card_type === "recognition"
-        ? ""
-        : '<button class="btn btn-primary" id="review_check">Check</button>';
+      c.card_type === "cloze"
+        ? '<button class="btn btn-primary" id="review_check">Check</button>'
+        : "";
+    const rec =
+      c.card_type === "shadowing"
+        ? '<button class="btn btn-primary" id="review_rec_btn" title="Record / stop">&#9679; Record <span id="review_rec_time"></span></button>'
+        : "";
     return `
       <div class="rv-card">
         <div class="rv-card-head">
@@ -297,9 +345,11 @@ window.LuteReview = (function () {
         ${typing}
         <div class="rv-actions">
           ${check}
+          ${rec}
           <button class="btn btn-secondary" id="review_reveal">Show answer
             <kbd>Space</kbd></button>
         </div>
+        <div id="review_shadow_result" class="rv-shadow-result"></div>
         <div class="rv-answer" id="review_answer" hidden></div>
         <div class="rv-grades" id="review_grades" hidden></div>
       </div>
@@ -312,6 +362,9 @@ window.LuteReview = (function () {
     }
     if (c.card_type === "recall") {
       return `<div class="rv-translation-front">${esc(c.translation)}</div>`;
+    }
+    if (c.card_type === "shadowing") {
+      return `<div class="rv-sentence rv-shadow-sentence" id="review_shadow_tokens"></div>`;
     }
     // cloze: server-rendered sentence with the term blanked out.
     return `<div class="rv-sentence rv-sentence-front">${c.sentence_blank}</div>`;
@@ -340,6 +393,8 @@ window.LuteReview = (function () {
       });
       typing.focus();
     }
+
+    if (c.card_type === "shadowing") shadowing_bind(c);
 
     auto_speak(c);
   }
@@ -376,6 +431,10 @@ window.LuteReview = (function () {
   function grade_buttons_html(c) {
     // Two grades: Again (key 1) and Good (key 2).  The intervals come
     // from the server as {again, good} display strings.
+    const suggested =
+      c.card_type === "shadowing"
+        ? shadowing_suggested_rating(shadowing.score)
+        : null;
     const ratings = [
       [1, "Again", c.intervals ? c.intervals.again : ""],
       [3, "Good", c.intervals ? c.intervals.good : ""],
@@ -383,7 +442,11 @@ window.LuteReview = (function () {
     return ratings
       .map(([rating, label, interval], i) => {
         const iv = interval ? ` (${interval})` : "";
-        return `<button class="rv-grade rv-grade-${rating}" data-rating="${rating}">
+        const hint =
+          rating === suggested
+            ? ' title="The take score suggests this grade -- your call"'
+            : "";
+        return `<button class="rv-grade rv-grade-${rating}${rating === suggested ? " rv-grade-suggested" : ""}" data-rating="${rating}"${hint}>
                   <span class="rv-grade-key">${i + 1}</span>
                   <span class="rv-grade-label">${label}${esc(iv)}</span>
                 </button>`;
@@ -409,6 +472,11 @@ window.LuteReview = (function () {
     const reveal_btn = el("review_reveal");
     if (check) check.style.display = "none";
     if (reveal_btn) reveal_btn.style.display = "none";
+    const rec_btn = el("review_rec_btn");
+    if (rec_btn) rec_btn.style.display = "none";
+    // Leaving a shadowing card mid-take: the take is abandoned, the
+    // grade is the user's own.
+    if (c.card_type === "shadowing") shadowing_cancel();
     const answer = el("review_answer");
     answer.innerHTML = back_html(c, null);
     answer.hidden = false;
@@ -464,11 +532,13 @@ window.LuteReview = (function () {
 
   async function grade(c, rating) {
     try {
-      const res = await post_json("/review/grade", {
-        card_id: c.id,
-        rating,
-        typed: null,
-      });
+      const payload = { card_id: c.id, rating, typed: null };
+      if (c.card_type === "shadowing" && shadowing.score != null) {
+        // Reported on the log for the stats page; it never changes
+        // the grade itself.
+        payload.shadowing_score = shadowing.score;
+      }
+      const res = await post_json("/review/grade", payload);
       update_undo(res.undo);
       advance();
     } catch (err) {
@@ -478,6 +548,7 @@ window.LuteReview = (function () {
 
   function advance() {
     state.idx += 1;
+    shadowing_reset();
     if (state.idx >= state.cards.length) {
       owed_speak = false;
       el("review_progress").innerHTML = "";
@@ -486,6 +557,278 @@ window.LuteReview = (function () {
       return;
     }
     show_current();
+  }
+
+  /* ---------- shadowing cards ---------- */
+
+  // Transient per-card state, reset on every advance(): the recorder,
+  // its UI timer, the take's score (advisory, reported with the
+  // grade), and the furigana answer for the sentence's tokens.
+  const shadowing = {
+    recorder: null,
+    timer: null,
+    recBtn: null,
+    score: null,
+    readings: null,
+  };
+
+  function shadowing_reset() {
+    if (shadowing.recorder) shadowing.recorder.cancel();
+    shadowing.recorder = null;
+    if (shadowing.timer) {
+      clearInterval(shadowing.timer);
+      shadowing.timer = null;
+    }
+    shadowing.recBtn = null;
+    shadowing.score = null;
+    shadowing.readings = null;
+  }
+
+  function shadowing_reset_rec_button() {
+    if (shadowing.timer) {
+      clearInterval(shadowing.timer);
+      shadowing.timer = null;
+    }
+    if (shadowing.recBtn) {
+      shadowing.recBtn.innerHTML = "&#9679; Record <span id=\"review_rec_time\"></span>";
+    }
+  }
+
+  // Abandon a take that is still in flight -- the answer was revealed
+  // (by hand or by the take that just scored), so the recording is
+  // dropped rather than submitted.  A score already computed is kept:
+  // it rides along on the grade the user is about to press.
+  function shadowing_cancel() {
+    if (shadowing.recorder) {
+      shadowing.recorder.cancel();
+      shadowing.recorder = null;
+    }
+    shadowing_reset_rec_button();
+  }
+
+  // The sentence as word spans, so the take's verdicts can paint onto
+  // the same indexes the server diffed.  Furigana readings arrive
+  // asynchronously and are swapped in (Japanese only; the server
+  // answers reading=null for everything else).
+  function shadowing_render_tokens(c) {
+    const box = el("review_shadow_tokens");
+    if (!box) return;
+    const readings = shadowing.readings || [];
+    box.innerHTML = (c.sentence_tokens || [])
+      .map((t, i) => {
+        const r = readings[i] ? readings[i].reading : null;
+        const text = esc(t);
+        const inner =
+          r && /[\u3040-\u309F\u30A0-\u30FF]/.test(r)
+            ? `<ruby>${text}<rt>${esc(r)}</rt></ruby>`
+            : text;
+        return `<span class="rv-shadow-tok" data-idx="${i}">${inner}</span>`;
+      })
+      .join(" ");
+  }
+
+  function shadowing_paint_verdicts(c, data) {
+    const box = el("review_shadow_tokens");
+    if (!box) return;
+    const statuses = data.statuses || [];
+    const fuzzySpoken = data.spoken_for_fuzzy || {};
+    const missSpoken = data.spoken_for_miss || {};
+    // 0 miss / 1 fuzzy / 2 match / 3 skip.
+    const CLASSES = { 0: "shadow-miss", 1: "shadow-fuzzy", 2: "shadow-ok" };
+    box.querySelectorAll(".rv-shadow-tok").forEach((tok) => {
+      const i = parseInt(tok.dataset.idx, 10);
+      const st = i < statuses.length ? statuses[i] : 3;
+      const cls = CLASSES[st];
+      if (cls) tok.classList.add(cls);
+      const heard = st === 1 ? fuzzySpoken[i] : st === 0 ? missSpoken[i] : null;
+      if (heard != null) {
+        tok.title = `heard: ${heard}`;
+      }
+    });
+  }
+
+  function shadowing_render_status(html, isError) {
+    const box = el("review_shadow_result");
+    if (!box) return;
+    box.innerHTML = `<p class="rv-shadow-state${isError ? " rv-shadow-error" : ""}">${esc(html)}</p>`;
+  }
+
+  function shadowing_mark_words_html(c, data) {
+    const statuses = data.statuses || [];
+    const seen = {};
+    const missed = [];
+    (c.sentence_tokens || []).forEach((t, i) => {
+      const st = i < statuses.length ? statuses[i] : 3;
+      if ((st === 0 || st === 1) && !seen[t]) {
+        seen[t] = true;
+        missed.push(t);
+      }
+    });
+    if (!missed.length) return "";
+    return (
+      '<div class="rv-shadow-words">Add a stumbled word to your learning words: ' +
+      missed
+        .map(
+          (t) =>
+            `<span class="rv-shadow-chip">${esc(t)}<button type="button" class="rv-shadow-add" data-word="${esc(t)}" data-lang="${c.language_id || ""}" title="Add to your learning words">+</button></span>`
+        )
+        .join(" ") +
+      "</div>"
+    );
+  }
+
+  async function shadowing_mark_word(btn) {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    try {
+      const res = await LuteRecorder.markWord(
+        btn.dataset.lang,
+        btn.dataset.word
+      );
+      btn.textContent = res.outcome === "created" || res.outcome === "promoted" ? "✓" : "·";
+      btn.title =
+        {
+          created: "added",
+          promoted: "added",
+          learning: "already learning",
+          known: "known — left alone",
+          invalid: "?",
+        }[res.outcome] || res.outcome;
+    } catch (err) {
+      btn.disabled = false;
+      btn.title = String(err);
+    }
+  }
+
+  function shadowing_bind(c) {
+    shadowing_reset();
+
+    const canRecord = typeof LuteRecorder !== "undefined" && LuteRecorder.canRecord();
+    if (canRecord && c.transcribe_available === false) {
+      shadowing_render_status(
+        "No transcription engine on the server (install SenseVoice or whisper in Settings) -- read the sentence aloud on your own, then self-grade.",
+        false
+      );
+    } else if (canRecord && !(c.sentence_tokens || []).length) {
+      shadowing_render_status(
+        "This sentence has no scorable words -- read it aloud on your own, then self-grade.",
+        false
+      );
+    } else if (!canRecord) {
+      shadowing_render_status(
+        "Microphone recording needs a secure context (localhost or HTTPS) and a browser with MediaRecorder support -- read the sentence aloud on your own, then self-grade.",
+        false
+      );
+    }
+
+    const recBtn = el("review_rec_btn");
+    if (recBtn && canRecord) {
+      recBtn.addEventListener("click", () => shadowing_toggle_record(c));
+    }
+
+    // Kana readings for the sentence's words (same endpoint the
+    // reading page's panel uses; cheap, no audio, no model).
+    if ((c.sentence_tokens || []).length) {
+      fetch("/read/shadowing/readings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          language_id: c.language_id || 0,
+          tokens: c.sentence_tokens,
+          full_text: c.sentence_plain || "",
+        }),
+      })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (!data || !Array.isArray(data.tokens)) return;
+          if (state.current !== c) return; // the card moved on
+          shadowing.readings = data.tokens;
+          shadowing_render_tokens(c);
+        })
+        .catch(() => {});
+    }
+  }
+
+  async function shadowing_toggle_record(c) {
+    if (shadowing.recorder && shadowing.recorder.recording) {
+      shadowing.recorder.stop();
+      return;
+    }
+    if (shadowing.recorder) return; // a take is already being scored
+    if (!c.sentence_tokens || !c.sentence_tokens.length) return;
+
+    const recBtn = el("review_rec_btn");
+    shadowing.recBtn = recBtn;
+    const rec = new LuteRecorder.Recorder({
+      capMs: 30000, // a forgotten stop cannot block the session forever
+      onStop: (blob) => {
+        shadowing_reset_rec_button();
+        shadowing.recorder = null;
+        shadowing_score_take(c, blob);
+      },
+      onFail: (msg) => {
+        shadowing_reset_rec_button();
+        shadowing.recorder = null;
+        shadowing_render_status(msg, true);
+      },
+    });
+    const ok = await rec.start();
+    if (!ok) return; // onFail already rendered the reason
+    shadowing.recorder = rec;
+    shadowing.score = null; // a fresh take replaces any earlier one
+    if (recBtn) {
+      recBtn.innerHTML = "&#9632; Stop <span id=\"review_rec_time\"></span>";
+    }
+    const t0 = Date.now();
+    shadowing.timer = setInterval(() => {
+      const t = el("review_rec_time");
+      if (t) t.textContent = Math.floor((Date.now() - t0) / 1000) + "s";
+    }, 250);
+    shadowing_render_status("Recording…", false);
+  }
+
+  async function shadowing_score_take(c, blob) {
+    shadowing_render_status("Transcribing…", false);
+    try {
+      const outcome = await LuteRecorder.scoreTake({
+        blob,
+        languageId: c.language_id,
+        tokens: c.sentence_tokens,
+        fullText: c.sentence_plain,
+        source: "review",
+        onProgress: (state, secs) => {
+          const label =
+            state === "loading_model"
+              ? `Loading the speech model… ${secs}s (first run downloads it)`
+              : `Transcribing… ${secs}s`;
+          shadowing_render_status(label, false);
+        },
+      });
+      if (outcome.state === "error") {
+        shadowing_render_status(outcome.error, true);
+        return;
+      }
+      const d = outcome.result || {};
+      shadowing.score = d.score != null ? Number(d.score) : null;
+      shadowing_paint_verdicts(c, d);
+      shadowing_render_status(
+        `Score ${shadowing.score == null ? "--" : shadowing.score}%` +
+          (d.language_note ? " -- " + d.language_note : ""),
+        false
+      );
+      const wordsBox = el("review_shadow_result");
+      if (wordsBox) {
+        wordsBox.insertAdjacentHTML(
+          "beforeend",
+          shadowing_mark_words_html(c, d)
+        );
+      }
+      // The user may have moved on while the take was scoring -- only
+      // auto-reveal the card the take belonged to.
+      if (state.current === c && state.mode === "question") reveal(c);
+    } catch (err) {
+      shadowing_render_status("Network error: " + err, true);
+    }
   }
 
   /* ---------- keyboard ---------- */
@@ -539,11 +882,18 @@ window.LuteReview = (function () {
     const btn = el("review_undo");
     if (btn) btn.addEventListener("click", () => undo());
 
-    // The card is rebuilt with innerHTML per card, so its 🔊 buttons are
-    // bound by delegation on the container that stays put.
+    // The card is rebuilt with innerHTML per card, so its 🔊 buttons and
+    // its shadowing chips are bound by delegation on the container that
+    // stays put.
     const card = el("review_card");
     if (card) {
       card.addEventListener("click", (e) => {
+        const add = e.target.closest(".rv-shadow-add");
+        if (add) {
+          e.stopPropagation();
+          shadowing_mark_word(add);
+          return;
+        }
         if (!e.target.closest(".rv-speak")) return;
         e.stopPropagation();
         owed_speak = false;

@@ -497,3 +497,94 @@ kbd {
   padding: 0 8px;
   border-radius: 3px;
 }
+
+/* ---------- shadowing cards ---------- */
+
+.rv-shadow-sentence {
+  /* Room for the underline verdict marks below the words. */
+  padding-bottom: 6px;
+}
+
+.rv-shadow-tok {
+  cursor: default;
+  padding: 0 1px;
+}
+
+.rv-shadow-tok.shadow-miss {
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: rgba(224, 49, 49, 0.8);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+}
+
+.rv-shadow-tok.shadow-fuzzy {
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: rgba(240, 140, 0, 0.9);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+}
+
+.rv-shadow-tok.shadow-ok {
+  text-decoration-line: underline;
+  text-decoration-color: rgba(47, 158, 68, 0.7);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+}
+
+.rv-shadow-result {
+  margin-top: 12px;
+}
+
+.rv-shadow-result:empty {
+  display: none;
+}
+
+.rv-shadow-state {
+  font-size: 1em;
+  color: var(--r-text-2);
+  margin: 4px 0;
+}
+
+.rv-shadow-error {
+  color: #e03131;
+}
+
+.rv-shadow-words {
+  font-size: 0.92em;
+  color: var(--r-text-2);
+  margin-top: 6px;
+}
+
+.rv-shadow-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid var(--r-border);
+  border-radius: 4px;
+  padding: 0 3px 0 6px;
+  margin: 2px 4px 2px 0;
+  color: var(--font-color, #000);
+}
+
+.rv-shadow-add {
+  border: none;
+  background: none;
+  color: var(--r-accent);
+  font-size: 1.05em;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 3px;
+  line-height: 1.4;
+}
+
+.rv-shadow-add:disabled {
+  cursor: default;
+}
+
+/* The grade the take's score suggests -- advisory: the button is only
+   tinted, never disabled, and the other stays fully live. */
+.rv-grade-suggested {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rv-grade) 45%, transparent);
+}
