@@ -87,6 +87,7 @@ from lute.stats.routes import bp as stats_bp
 from lute.cli.commands import bp as cli_bp
 from lute.tts.routes import bp as tts_bp
 from lute.netease.routes import bp as netease_bp
+from lute.whisper.routes import bp as whisper_bp
 
 
 def _setup_app_dir(dirname, readme_content):
@@ -796,6 +797,7 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(language_bp)
     app.register_blueprint(anki_bp)
     app.register_blueprint(book_bp)
+    app.register_blueprint(whisper_bp)
     app.register_blueprint(bookmarks_bp)
     app.register_blueprint(term_bp)
     app.register_blueprint(termtag_bp)
