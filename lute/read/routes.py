@@ -1249,17 +1249,34 @@ def shadowing_transcribe():
     (JSON array of the sentence's word spans' data-text, in DOM order),
     model (optional whisper size), full_text (optional sentence the
     tokens belong to; Japanese scores its keys against the contextual
-    readings the panel displays).
+    readings the panel displays), source (optional "read"/"review"),
+    book_id (optional, reading-page takes only).
 
-    Async on purpose: the first transcription loads the whisper model
+    Async on purpose: the first transcription loads the speech model
     (hundreds of MB, possibly downloaded on the spot) and CPU inference
     takes seconds more -- far beyond a reverse proxy's timeout, which
     used to surface as a 502.  Returns {"task_id"}; poll
     /read/shadowing/status/<task_id> until finished/error.
     """
-    if not shadowing.whisper_status()["installed"]:
+    try:
+        lang = LanguageRepository(db.session).find(
+            request.form.get("language_id", type=int) or 0
+        )
+    except ValueError:
+        lang = None
+    if lang is None:
+        return jsonify({"error": "language not found"}), 400
+
+    # SenseVoice first, whisper as the fallback -- the same order the
+    # task itself uses, so a take is only accepted when it can score.
+    if not shadowing.transcription_available(lang):
         return (
-            jsonify({"error": "whisper is not installed (see Settings > Whisper)."}),
+            jsonify(
+                {
+                    "error": "No transcription engine available "
+                    "(install SenseVoice or whisper in Settings)."
+                }
+            ),
             400,
         )
 
@@ -1276,15 +1293,12 @@ def shadowing_transcribe():
 
     full_text = (request.form.get("full_text") or "").strip() or None
 
-    lang = LanguageRepository(db.session).find(
-        request.form.get("language_id", type=int) or 0
-    )
-    if lang is None:
-        return jsonify({"error": "language not found"}), 400
-
     model_size = (request.form.get("model") or "").strip()
     if model_size not in shadowing.ALLOWED_MODEL_SIZES:
         model_size = shadowing.DEFAULT_MODEL_SIZE
+
+    source = (request.form.get("source") or "").strip() or "read"
+    book_id = request.form.get("book_id", type=int)
 
     temppath = current_app.env_config.temppath
     os.makedirs(temppath, exist_ok=True)
@@ -1302,6 +1316,8 @@ def shadowing_transcribe():
         model_size,
         username=get_current_user(),
         full_text=full_text,
+        source=source,
+        book_id=book_id,
     )
     return jsonify({"task_id": task_id})
 
@@ -1310,6 +1326,28 @@ def shadowing_transcribe():
 def shadowing_task_status(task_id):
     "Poller payload for a shadowing scoring task."
     return jsonify(shadowing.task_status(task_id))
+
+
+@bp.route("/shadowing/mark_unknown", methods=["POST"])
+def shadowing_mark_unknown():
+    """
+    One click on a misread word: put it into the learning pile so the
+    review queue picks it up (this closes the read-aloud loop -- a word
+    you stumbled over becomes tomorrow's review card).
+
+    JSON body: {language_id, text}.  New and unknown terms become
+    learning (status 1); words already learning are left alone (they
+    are queued already); ignored and well-known words are never
+    demoted silently.  Returns {outcome, term_id, term_status}.
+    """
+    payload = request.get_json(silent=True) or {}
+    text = payload.get("text")
+    if not isinstance(text, str):
+        return jsonify({"error": "invalid payload"}), 400
+    lang = LanguageRepository(db.session).find(payload.get("language_id") or 0)
+    if lang is None:
+        return jsonify({"error": "language not found"}), 400
+    return jsonify(shadowing.mark_word_for_review(db.session, lang, text))
 
 
 @bp.route("/shadowing/readings", methods=["POST"])
