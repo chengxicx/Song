@@ -51,11 +51,13 @@ class ReviewSettingsForm(FlaskForm):
         },
     )
     review_speak_cards = BooleanField(
-        "Speak each card",
+        "Speak each card's answer",
         default=True,
-        description="Pronounce the term with text-to-speech when a card "
-        "opens (and when a cloze card's answer is revealed).  The card's "
-        "speaker button works either way.",
+        description="Pronounce the term with text-to-speech when a card's "
+        "answer is revealed, never on the front -- so the word is not read "
+        "out before you have recalled it.  A shadowing card also plays its "
+        "sentence when it opens, because that is the model audio.  The "
+        "card's speaker button works either way.",
     )
     card_recognition = BooleanField(
         "Recognition (see the word, recall the meaning)", default=True
