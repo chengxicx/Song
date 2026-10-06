@@ -17,38 +17,14 @@ import re
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
     make_rule,
+    make_spacy_tokenizer,
     spec_lemma,
     spec_morph,
     spec_pos,
     spec_surface,
 )
 
-_NLP = None
-
-
-def _nlp():
-    "Lazy, process-lifetime spaCy pipeline."
-    global _NLP
-    if _NLP is None:
-        import spacy  # pylint: disable=import-outside-toplevel
-
-        _NLP = spacy.load("fr_core_news_sm", exclude=["parser", "senter", "ner"])
-    return _NLP
-
-
-def _tokens_for(sentence):
-    "Tokenize a sentence; return a list of token dicts."
-    doc = _nlp()(sentence)
-    return [
-        {
-            "surface": t.text,
-            "lemma": t.lemma_,
-            "pos": t.pos_,
-            "morph": t.morph.to_dict(),
-            "idx": t.idx,
-        }
-        for t in doc
-    ]
+_tokens_for = make_spacy_tokenizer("fr_core_news_sm")
 
 
 # ---- rules -------------------------------------------------------------
