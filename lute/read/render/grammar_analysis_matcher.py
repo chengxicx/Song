@@ -65,6 +65,42 @@ def split_sentences(text):
     return [p.strip() for p in parts if p and p.strip()]
 
 
+# ---- spaCy tokenizer factory ------------------------------------------
+
+
+def make_spacy_tokenizer(model_name):
+    """
+    Lazy spaCy tokenizer shared by the spaCy-based engines
+    (en/es/fr/de/it/pt), which differ only in the model name.
+
+    Returns _tokens_for(sentence) -> list of token dicts.  spaCy is
+    imported on first use, so importing this module works without it;
+    the route falls back to the generic rule library on ImportError.
+    """
+    nlp = None
+
+    def _tokens_for(sentence):
+        "Tokenize a sentence; return a list of token dicts."
+        nonlocal nlp
+        if nlp is None:
+            import spacy  # pylint: disable=import-outside-toplevel
+
+            nlp = spacy.load(model_name, exclude=["parser", "senter", "ner"])
+        doc = nlp(sentence)
+        return [
+            {
+                "surface": t.text,
+                "lemma": t.lemma_,
+                "pos": t.pos_,
+                "morph": t.morph.to_dict(),
+                "idx": t.idx,
+            }
+            for t in doc
+        ]
+
+    return _tokens_for
+
+
 # ---- condition matching ----------------------------------------------
 
 

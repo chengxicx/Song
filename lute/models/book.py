@@ -4,7 +4,7 @@ Book entity.
 
 import json
 import sqlite3
-from contextlib import closing
+import threading
 from lute.db import db
 
 booktags = db.Table(
@@ -340,6 +340,25 @@ class WordsRead(db.Model):
         self.word_count = word_count
 
 
+# One shared :memory: connection per thread for _sql_lower(): it runs
+# once per sentence while sentences are being loaded (first page reads,
+# data cleanup), and opening a fresh in-memory database for every
+# sentence was a measurable cost on long books.  sqlite3 connections
+# default to check_same_thread=True, so each thread gets its own.
+_sql_lower_tls = threading.local()
+
+
+def _sql_lower(input_string):
+    "SQLite's LOWER() of input_string, via the per-thread connection."
+    if input_string is None:
+        return None
+    conn = getattr(_sql_lower_tls, "conn", None)
+    if conn is None:
+        conn = sqlite3.connect(":memory:")
+        _sql_lower_tls.conn = conn
+    return conn.execute("SELECT LOWER(?)", (input_string,)).fetchone()[0]
+
+
 class Sentence(db.Model):
     """
     Parsed sentences for a given Text.
@@ -370,18 +389,8 @@ class Sentence(db.Model):
 
         This method is public for use in the data_cleanup module.
         """
-
-        def _get_sql_lower(input_string):
-            "Returns result of sqlite LOWER call of input_string."
-            if input_string is None:
-                return None
-            with sqlite3.connect(":memory:") as conn, closing(conn.cursor()) as cur:
-                cur.execute("SELECT LOWER(?)", (input_string,))
-                result = cur.fetchone()
-                return result[0]
-
         lcased = parser.get_lowercase(self.text_content)
-        if lcased == _get_sql_lower(self.text_content):
+        if lcased == _sql_lower(self.text_content):
             lcased = "*"
         self.textlc_content = lcased
 
