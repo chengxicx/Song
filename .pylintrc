@@ -17,9 +17,10 @@ notes=FIXME,XXX
 [TYPECHECK]
 
 # Optional heavy dependencies (Sudachi, spaCy, Kiwi, pymorphy3, pythainlp,
-# pyarabic, jieba) are not installed in every environment -- CI lints the
-# base install -- so their imports must not fail the lint.
-ignored-modules=sudachipy,sudachidict_core,spacy,kiwipiepy,pymorphy3,pythainlp,pyarabic,jieba
+# pyarabic, jieba, faster-whisper, huggingface_hub, sherpa-onnx, av, numpy)
+# are not installed in every environment -- CI lints the base install --
+# so their imports must not fail the lint.
+ignored-modules=sudachipy,sudachidict_core,spacy,kiwipiepy,pymorphy3,pythainlp,pyarabic,jieba,faster_whisper,huggingface_hub,sherpa_onnx,av,numpy
 
 [MESSAGES CONTROL]
 

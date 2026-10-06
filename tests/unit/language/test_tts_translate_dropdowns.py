@@ -2,6 +2,8 @@
 Tests for the language form TTS / translate target dropdowns.
 """
 
+import pytest
+
 from lute.language.langtags import LANGUAGE_TAGS, tag_choices
 from lute.language.forms import LanguageForm
 
@@ -97,3 +99,132 @@ def test_form_post_persists_selected_tags(client):
         lang = db.session.get(Language, langid)
         assert lang.tts_lang == "zh-HK"
         assert lang.translate_target_lang == "zh-CN"
+
+
+# ---- hidden grammar groups --------------------------------------------
+
+
+def _japanese_like_language():
+    from lute.models.language import Language
+
+    lang = Language()
+    lang.name = "Japanese"
+    lang.parser_type = "japanese_sudachi"
+    return lang
+
+
+def _require_sudachi_in_form_choices():
+    """
+    The POST tests need the language's own parser to be a valid form
+    choice, and the edit form only offers selectable parsers:
+    japanese_sudachi is an optional extra (the fallback MeCab parser is
+    legacy and so not offered), so on a base install without sudachipy
+    the POST would fail validation.  Skips there; nightly-guardrail
+    runs these with the grammar engines installed.
+    """
+    from lute.parse.registry import supported_parser_types
+
+    if "japanese_sudachi" not in supported_parser_types():
+        pytest.skip("japanese_sudachi parser not installed (optional extra)")
+
+
+def test_hidden_grammar_choices_depend_on_the_language(app_context):
+    "Japanese offers JLPT plus the aggregates; no-engine languages offer none."
+    from lute.language.forms import LanguageForm
+    from lute.language.routes import _set_hidden_grammar_choices
+    from lute.models.language import Language
+
+    japanese = _japanese_like_language()
+    form = LanguageForm(obj=japanese)
+    _set_hidden_grammar_choices(form, japanese)
+    tokens = [c[0] for c in form.hidden_grammar_levels.choices]
+    assert tokens[:5] == ["N5", "N4", "N3", "N2", "N1"]
+    assert tokens[5:] == ["basic_forms", "basic_particles"]
+
+    turkish = Language()
+    turkish.name = "Turkish"
+    form2 = LanguageForm(obj=turkish)
+    _set_hidden_grammar_choices(form2, turkish)
+    assert form2.hidden_grammar_levels.choices == []
+
+
+def test_stored_unknown_hidden_token_stays_selectable(app_context):
+    "A stale token is still offered so the user can see and clear it."
+    from lute.language.forms import LanguageForm
+    from lute.language.routes import _set_hidden_grammar_choices
+
+    lang = _japanese_like_language()
+    lang.hidden_grammar_levels = ["N5", "N9-retired"]
+    form = LanguageForm(obj=lang)
+    _set_hidden_grammar_choices(form, lang)
+
+    choices = dict(form.hidden_grammar_levels.choices)
+    assert choices["N9-retired"].endswith("(current setting)")
+    assert form.hidden_grammar_levels.data == ["N5", "N9-retired"]
+    # The shared class-level default is untouched.
+    assert LanguageForm().hidden_grammar_levels.choices == []
+
+
+def test_form_post_persists_hidden_grammar_levels(client, empty_db, japanese):
+    "Posting the checked boxes saves them to the language."
+    _require_sudachi_in_form_choices()
+    from lute.db import db
+    from lute.models.language import Language
+
+    langid = japanese.id
+    data = {
+        "name": japanese.name,
+        "parser_type": japanese.parser_type,
+        # The tag dropdowns are selects, and a SelectField whose value is
+        # absent falls back to the object's (None) and fails validation.
+        "tts_lang": "",
+        "translate_target_lang": "",
+        "grammar_translate_lang": "en",
+        "hidden_grammar_levels": ["N5", "basic_forms"],
+    }
+    for i, d in enumerate(japanese.dictionaries):
+        data[f"dictionaries-{i}-usefor"] = d.usefor
+        data[f"dictionaries-{i}-dicttype"] = d.dicttype
+        data[f"dictionaries-{i}-dicturi"] = d.dicturi
+        data[f"dictionaries-{i}-is_active"] = "y"
+        data[f"dictionaries-{i}-sort_order"] = str(i + 1)
+
+    resp = client.post(f"/language/edit/{langid}", data=data, follow_redirects=False)
+    assert resp.status_code == 302, "successful save redirects"
+
+    with client.application.app_context():
+        lang = db.session.get(Language, langid)
+        assert lang.hidden_grammar_levels == ["N5", "basic_forms"]
+
+
+def test_form_post_with_no_boxes_checked_clears_the_setting(client, empty_db, japanese):
+    "Omitting the field (nothing checked) hides nothing again."
+    _require_sudachi_in_form_choices()
+    from lute.db import db
+    from lute.models.language import Language
+
+    japanese.hidden_grammar_levels = ["N5"]
+    db.session.add(japanese)
+    db.session.commit()
+    langid = japanese.id
+
+    data = {
+        "name": japanese.name,
+        "parser_type": japanese.parser_type,
+        "tts_lang": "",
+        "translate_target_lang": "",
+        "grammar_translate_lang": "en",
+    }
+    for i, d in enumerate(japanese.dictionaries):
+        data[f"dictionaries-{i}-usefor"] = d.usefor
+        data[f"dictionaries-{i}-dicttype"] = d.dicttype
+        data[f"dictionaries-{i}-dicturi"] = d.dicturi
+        data[f"dictionaries-{i}-is_active"] = "y"
+        data[f"dictionaries-{i}-sort_order"] = str(i + 1)
+
+    resp = client.post(f"/language/edit/{langid}", data=data, follow_redirects=False)
+    assert resp.status_code == 302, "successful save redirects"
+
+    with client.application.app_context():
+        lang = db.session.get(Language, langid)
+        assert lang.hidden_grammar_levels == []

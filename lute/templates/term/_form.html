@@ -108,13 +108,36 @@
           {% endif %}
           {% if embedded_in_reading_frame %}
           {#
-            Shortcut to the reading page's grammar analysis, which replaces
-            the right pane's contents.  Only meaningful inside the reading
-            frame -- the standalone /term/edit pages have no grammar view.
+            Reading-frame shortcuts.  Grammar replaces the right pane's
+            contents with the page's grammar analysis; Sentence looks up
+            the sentence containing this term in the language's sentence
+            dictionaries.  Only meaningful inside the reading frame -- the
+            standalone /term/edit pages have neither view.
           #}
-          <button id="btn-grammar" type="button" class="btn btn-secondary"
+          <button id="btn-grammar" type="button" class="btn btn-tool btn-tool--grammar"
                   title="Show the grammar analysis for this page"
-                  onclick="openGrammarFromTermForm()">Grammar</button>
+                  onclick="openGrammarFromTermForm()">
+            <svg class="btn-tool__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+            Grammar
+          </button>
+          <button id="btn-sentence" type="button" class="btn btn-tool btn-tool--sentence"
+                  title="Translate the sentence containing this term"
+                  onclick="translateSentenceFromTermForm()">
+            <svg class="btn-tool__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m5 8 6 6"/>
+              <path d="m4 14 6-6 2-3"/>
+              <path d="M2 5h12"/>
+              <path d="M7 2h1"/>
+              <path d="m22 22-5-10-5 10"/>
+              <path d="M14 18h6"/>
+            </svg>
+            Sentence
+          </button>
           {% endif %}
       </div>
     </div>
@@ -131,8 +154,12 @@
   // term once.  Bound on DOMContentLoaded (ready) because tts.js --
   // which provides window.luteTtsSpeak -- is loaded with defer.
   // Standalone term pages (/term/new, /term/edit) don't load tts.js,
-  // so the button is hidden there rather than dead.
-  $(document).ready(function () {
+  // so the button is hidden there rather than dead.  The utterance
+  // prefers the term's annotated reading (the #romanization field,
+  // still valued even when hidden by hide_pronunciation) when it is
+  // kana, so kanji terms whose TTS reading differs from the annotation
+  // sound like the annotation.
+  document.addEventListener('DOMContentLoaded', function () {
     const pron_btn = document.getElementById("term-speak-btn");
     if (!pron_btn) return;
     if (typeof window.luteTtsSpeak !== "function") {
@@ -141,7 +168,13 @@
     }
     pron_btn.addEventListener("click", function () {
       const t = document.getElementById("text");
-      if (t && t.value.trim()) window.luteTtsSpeak(t.value);
+      if (!t || !t.value.trim()) return;
+      const r = document.getElementById("romanization");
+      if (typeof window.luteTtsSpeakTerm === "function") {
+        window.luteTtsSpeakTerm(t.value, r ? r.value : "");
+      } else {
+        window.luteTtsSpeak(t.value);
+      }
     });
   });
 
@@ -206,7 +239,7 @@
 
   var TAGS = {{ tags | safe }};
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
 
     // "Save" shortcut
     $(document).keydown(function(event) {
@@ -435,9 +468,11 @@
       del.className = "btn btn-danger";
       del.setAttribute("onclick", "deleteTerm()");
       del.textContent = "Delete";
-      // Keep the server-rendered order Save / Delete / Grammar: the
-      // container may hold a Grammar button (reading-frame forms), and
-      // appending here would slot Delete after it.
+      // Keep the server-rendered order Save / Delete / Grammar / Sentence:
+      // the container may hold Grammar/Sentence buttons (reading-frame
+      // forms), and appending here would slot Delete after them.
+      // Grammar always precedes Sentence, so anchoring on Grammar keeps
+      // Delete before both.
       const grammar_btn = document.getElementById("btn-grammar");
       if (grammar_btn) btn_container.insertBefore(del, grammar_btn);
       else btn_container.appendChild(del);
@@ -598,6 +633,22 @@
     if (!EMBEDDED_IN_READING_FRAME)
       return;
     window.parent.postMessage({ event: "LuteTermFormGrammarRequested" }, "*");
+  }
+
+
+  // =============================
+  // Sentence translation.
+
+  // The Sentence button (reading frame only).  Mirrors the LuteForMobile
+  // word card's Sentence action: look up the sentence containing the term
+  // currently being edited in the language's sentence dictionaries.  The
+  // parent reading page owns the parsed text (sentence spans) and the
+  // configured dictionaries, so ask it to run the same lookup as its
+  // "translate sentence" hotkey (handle_translate in lute-commands.js).
+  function translateSentenceFromTermForm() {
+    if (!EMBEDDED_IN_READING_FRAME)
+      return;
+    window.parent.postMessage({ event: "LuteTermFormSentenceRequested" }, "*");
   }
 
 

@@ -58,6 +58,16 @@
   .iform { display: flex; flex-direction: column; gap: .95rem; }
   .irow { display: grid; grid-template-columns: minmax(110px,150px) 1fr; gap: .9rem 1rem; align-items: center; }
   .irow .ilbl { font-weight: 600; color: var(--font-color, #2a2a2a); font-size: .92rem; }
+
+  /* Media upload / auto-transcription progress (mp3 + video forms). */
+  .import-progress-track {
+    margin-top: .45rem; height: 8px; border-radius: 4px; overflow: hidden;
+    background: var(--panel-bg-2, rgba(0,0,0,.1));
+  }
+  .import-progress-bar {
+    height: 100%; width: 0%; border-radius: 4px;
+    background: #3d7ecc; transition: width .25s ease;
+  }
   .ictrl { min-width: 0; } /* allow children to shrink and avoid overflow */
 
   .ictrl select, .ictrl input[type=text], .ictrl input[type=url] {
@@ -225,7 +235,7 @@
 </form>
 
 <form id="mp3-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import audio with subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and audio under 20&#8202;MB is stored locally.</p>
+  <p class="import-desc">Import audio with subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and audio under 20&#8202;MB is stored locally. Supports mp3, m4a, m4b, wav, ogg, opus, aac, flac, webm.</p>
   <div class="iform">
     <div class="irow">
       <label class="ilbl" for="mp3-language">Language</label>
@@ -246,7 +256,7 @@
     <div class="irow">
       <label class="ilbl" for="mp3_file">Audio</label>
       <div class="ictrl isource">
-        <input type="file" id="mp3_file" name="mp3_file" accept=".mp3,.m4a">
+        <input type="file" id="mp3_file" name="mp3_file" accept=".mp3,.m4a,.m4b,.wav,.ogg,.opus,.aac,.flac,.webm">
         <span class="ior">or</span>
         <input type="url" id="mp3_url" name="mp3_url" placeholder="Paste an audio URL">
       </div>
@@ -257,6 +267,36 @@
         <input type="file" id="mp3_srt_file" name="srt_file" accept=".srt,.vtt,.txt">
         <span class="ior">or</span>
         <input type="url" id="mp3_srt_url" name="mp3_srt_url" placeholder="Paste an SRT / VTT / TXT URL">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="mp3_whisper">No subtitles?</label>
+      <div class="ictrl isource">
+        <label><input type="checkbox" id="mp3_whisper" checked> Auto-transcribe (local, no subtitle file needed)</label>
+        <span class="ior">model</span>
+        <select id="mp3_whisper_model" name="whisper_model" title="Transcription engine: SenseVoice is fastest for Chinese, Cantonese, English, Japanese and Korean; whisper covers every other language (base = fastest, medium = most accurate). The model downloads automatically on the first transcription.">
+          <option value="sensevoice" {% if sensevoice_default %}selected{% endif %}>SenseVoice (zh / yue / en / ja / ko &middot; fastest)</option>
+          <option value="base">whisper base (fastest)</option>
+          <option value="small" {% if not sensevoice_default %}selected{% endif %}>whisper small (recommended)</option>
+          <option value="medium">whisper medium (most accurate)</option>
+        </select>
+      </div>
+    </div>
+    <div class="irow" id="whisper_panel_row" style="display: none;">
+      <label class="ilbl"></label>
+      <div class="ictrl" id="whisper_panel">
+        <span id="whisper_missing" style="display: none;">
+          Whisper isn't installed on this server yet &mdash; install it (and pre-download
+          models) under <a href="/settings">Settings &rarr; Whisper (auto-subtitles)</a>.
+        </span>
+        <span id="sensevoice_missing" style="display: none;">
+          SenseVoice isn't installed on this server yet &mdash; set it up (and pre-download
+          the model) under <a href="/settings">Settings &rarr; Whisper (auto-subtitles)</a>.
+        </span>
+        <span id="whisper_progress" style="display: none;">
+          <span id="whisper_status_text" class="import-status-text"></span>
+          <div class="import-progress-track"><div class="import-progress-bar" id="whisper_progress_bar"></div></div>
+        </span>
       </div>
     </div>
     <div class="irow">
@@ -305,7 +345,7 @@
 </form>
 
 <form id="video-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import a video with its subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and video under 20&#8202;MB is stored locally.</p>
+  <p class="import-desc">Import a video with its subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and video under 20&#8202;MB is stored locally. No subtitles? Tick Auto-transcribe and the speech is turned into timed subtitles locally.</p>
   <div class="iform">
     <div class="irow">
       <label class="ilbl" for="video-language">Language</label>
@@ -337,6 +377,36 @@
         <input type="file" id="video_srt_file" name="video_srt_file" accept=".srt,.vtt,.txt">
         <span class="ior">or</span>
         <input type="url" id="video_srt_url" name="video_srt_url" placeholder="Paste an SRT / VTT / TXT URL">
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="video_whisper">No subtitles?</label>
+      <div class="ictrl isource">
+        <label><input type="checkbox" id="video_whisper" checked> Auto-transcribe (local, no subtitle file needed)</label>
+        <span class="ior">model</span>
+        <select id="video_whisper_model" name="whisper_model" title="Transcription engine: SenseVoice is fastest for Chinese, Cantonese, English, Japanese and Korean; whisper covers every other language (base = fastest, medium = most accurate). The model downloads automatically on the first transcription.">
+          <option value="sensevoice" {% if sensevoice_default %}selected{% endif %}>SenseVoice (zh / yue / en / ja / ko &middot; fastest)</option>
+          <option value="base">whisper base (fastest)</option>
+          <option value="small" {% if not sensevoice_default %}selected{% endif %}>whisper small (recommended)</option>
+          <option value="medium">whisper medium (most accurate)</option>
+        </select>
+      </div>
+    </div>
+    <div class="irow" id="video_panel_row" style="display: none;">
+      <label class="ilbl"></label>
+      <div class="ictrl" id="video_panel">
+        <span id="video_whisper_missing" style="display: none;">
+          Whisper isn't installed on this server yet &mdash; install it (and pre-download
+          models) under <a href="/settings">Settings &rarr; Whisper (auto-subtitles)</a>.
+        </span>
+        <span id="video_sensevoice_missing" style="display: none;">
+          SenseVoice isn't installed on this server yet &mdash; set it up (and pre-download
+          the model) under <a href="/settings">Settings &rarr; Whisper (auto-subtitles)</a>.
+        </span>
+        <span id="video_whisper_progress" style="display: none;">
+          <span id="video_status_text" class="import-status-text"></span>
+          <div class="import-progress-track"><div class="import-progress-bar" id="video_progress_bar"></div></div>
+        </span>
       </div>
     </div>
     <div class="irow">
@@ -501,7 +571,7 @@
     });
   }
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     const textForm = $('#text-form');
     const webpageForm = $('#webpage-form');
     const youtubeForm = $('#youtube-form');
@@ -806,6 +876,343 @@
           $('#epub-import').prop('disabled', false);
           $('#epub-confirm-status').text('Import failed.').css('color', 'red');
         });
+    });
+
+    // --- Shared XHR uploader. fetch() cannot report upload progress, so
+    // the media forms POST multipart through XMLHttpRequest: the upload
+    // fills 0-90%, then the bar waits at 95% for the server's JSON
+    // answer (transcription queue / saved book / inline error).
+    const postFormUpload = function (formEl, url, handlers) {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      xhr.upload.onprogress = function (ev) {
+        if (ev.lengthComputable && handlers.onUpload) {
+          handlers.onUpload(Math.min(90, Math.round(ev.loaded / ev.total * 90)));
+        }
+      };
+      xhr.onload = function () {
+        let data = null;
+        try { data = JSON.parse(xhr.responseText); } catch (err) { data = null; }
+        if (xhr.status >= 200 && xhr.status < 300 && data && data.ok !== false) {
+          handlers.onSuccess(data);
+        } else {
+          handlers.onError(
+            (data && data.error) || ('Upload failed (HTTP ' + xhr.status + ').')
+          );
+        }
+      };
+      xhr.onerror = function () { handlers.onError('Network error while uploading.'); };
+      xhr.send(new FormData(formEl));
+    };
+
+    // --- Auto-transcription + upload progress (mp3 / video forms). ---
+    // Auto-transcribe is on by default: with no subtitle file/URL the
+    // media posts to /whisper/prepare and the page polls the task until
+    // the book exists.  An explicitly provided subtitle always wins and
+    // the plain import path runs.  Package/model management lives in
+    // Settings -> Whisper (auto-subtitles).
+    const sensevoiceLangIds = new Set({{ sensevoice_lang_ids|safe }}.map(String));
+    let engineStatus = null; // /whisper/models payload until the check answers.
+    // Factories register here so the /whisper/models answer can refresh
+    // every form's install hint.  Declared before the fetch chain: its
+    // .finally callback runs after this block, but the identifier must
+    // exist while the chain is built.
+    const transcribeForms = [];
+
+    // True when the picked engine is usable.  An unknown engineStatus
+    // never blocks the plain import path.
+    const engineReady = function (engine) {
+      if (engineStatus === null) return true;
+      return engine === 'sensevoice'
+        ? !!(engineStatus.sensevoice && engineStatus.sensevoice.installed)
+        : !!engineStatus.installed;
+    };
+
+    fetch('/book/whisper/models')
+      .then(r => r.json())
+      .then(d => { engineStatus = d; })
+      .catch(() => { engineStatus = { installed: true, sensevoice: null }; }) // never block the plain import path
+      .finally(() => { transcribeForms.forEach(f => f.refresh()); });
+
+    // Poll the transcription task.  Elapsed/ETA alongside the percent:
+    // on a slow server the first percent of a long recording can take
+    // many minutes, and a bare "0%" reads as hung.
+    const pollWhisperTask = function (taskId, ui) {
+      const startedAt = Date.now();
+      const fmtDuration = function (secs) {
+        secs = Math.max(0, Math.round(secs));
+        const mins = Math.floor(secs / 60);
+        if (mins >= 60) {
+          return Math.floor(mins / 60) + ' h ' + (mins % 60) + ' min';
+        }
+        if (mins > 0) return mins + ' min';
+        return secs + ' s';
+      };
+      const elapsedText = function () {
+        return fmtDuration((Date.now() - startedAt) / 1000) + ' elapsed';
+      };
+      const timer = setInterval(() => {
+        fetch('/book/whisper/status/' + taskId)
+          .then(r => r.json())
+          .then(d => {
+            if (d.state === 'finished' && d.book_id) {
+              clearInterval(timer);
+              ui.progressBar.css('width', '100%');
+              ui.statusText.text('Done! Opening the book…').css('color', 'green');
+              window.location.href = '/read/' + d.book_id + '/page/1';
+              return;
+            }
+            if (d.state === 'error') {
+              clearInterval(timer);
+              ui.progressBar.css('width', '0%');
+              ui.statusText.text('Transcription failed: ' + (d.error || 'unknown error')).css('color', 'red');
+              ui.btn.prop('disabled', false);
+              return;
+            }
+            if (d.state === 'unknown') {
+              clearInterval(timer);
+              ui.statusText.text('The transcription task was lost (server restart?). Please try again.').css('color', 'red');
+              ui.btn.prop('disabled', false);
+              return;
+            }
+            if (d.state === 'transcribing') {
+              const pct = d.percent || 0;
+              let text = 'Transcribing… ' + pct + '% (' + elapsedText();
+              if (pct >= 3) {
+                text += ', ~' + fmtDuration((Date.now() - startedAt) / 1000 * (100 - pct) / pct) + ' left';
+              }
+              ui.statusText.text(text + ')').css('color', '');
+              ui.progressBar.css('width', pct + '%');
+            } else {
+              ui.statusText.text((d.message || 'Queued…') + ' (' + elapsedText() + ')').css('color', '');
+            }
+          })
+          .catch(() => {}); // transient network hiccups: keep polling
+      }, 2000);
+    };
+
+    // One factory drives both media forms; they differ only in field ids
+    // and the import_type /whisper/prepare should build the book as.
+    const setupTranscribeForm = function (cfg) {
+      const modelSelect = cfg.modelSelect;
+      const selectedEngine = function () {
+        return modelSelect.val() === 'sensevoice' ? 'sensevoice' : 'whisper';
+      };
+
+      // Two panel states: install hint, and transcription/upload progress.
+      const showPanel = function (mode) {
+        cfg.panelRow.show();
+        cfg.missingWhisper.toggle(mode === 'missing' && selectedEngine() === 'whisper');
+        cfg.missingSensevoice.toggle(mode === 'missing' && selectedEngine() === 'sensevoice');
+        cfg.progress.toggle(mode === 'progress');
+      };
+
+      const fail = function (msg) {
+        showPanel('progress');
+        cfg.progressBar.css('width', '0%');
+        cfg.statusText.text(msg).css('color', 'red');
+        cfg.btn.prop('disabled', false);
+      };
+
+      const refreshPanel = function () {
+        if (!cfg.checkbox.prop('checked')) { cfg.panelRow.hide(); return; }
+        if (engineStatus === null) { cfg.panelRow.hide(); return; }
+        if (!engineReady(selectedEngine())) {
+          showPanel('missing'); // install hint for the picked engine
+        } else {
+          cfg.panelRow.hide(); // nothing to show until a submit starts
+        }
+      };
+
+      // SenseVoice is the default model for the languages it was trained
+      // on (zh / yue / en / ja / ko); the other languages stay on whisper.
+      const syncModelToLanguage = function () {
+        const supported = sensevoiceLangIds.has(String(cfg.langSelect.val() || ''));
+        modelSelect.find('option[value="sensevoice"]').prop('disabled', !supported);
+        if (supported) {
+          modelSelect.val('sensevoice');
+        } else if (modelSelect.val() === 'sensevoice') {
+          modelSelect.val('small');
+        }
+        refreshPanel();
+      };
+
+      // No subtitles + auto-transcribe: upload to the transcription queue.
+      const startTranscribeUpload = function () {
+        cfg.btn.prop('disabled', true);
+        showPanel('progress');
+        cfg.progressBar.css('width', '0%');
+        cfg.statusText.text('Uploading… 0%').css('color', '');
+        postFormUpload(cfg.form[0], '/book/whisper/prepare', {
+          onUpload: p => {
+            cfg.progressBar.css('width', p + '%');
+            cfg.statusText.text('Uploading… ' + p + '%').css('color', '');
+          },
+          onSuccess: data => {
+            if (!data.task_id) {
+              fail(data.error || 'Could not start the transcription.');
+              return;
+            }
+            cfg.progressBar.css('width', '95%');
+            cfg.statusText.text('Queued…').css('color', '');
+            pollWhisperTask(data.task_id, cfg);
+          },
+          onError: fail,
+        });
+      };
+
+      // The engine install hint must follow the model/language the user
+      // picks, not just the checkbox.
+      cfg.checkbox.on('change', refreshPanel);
+      modelSelect.on('change', refreshPanel);
+      cfg.langSelect.on('change', syncModelToLanguage);
+
+      const api = {
+        refresh: refreshPanel,
+        sync: syncModelToLanguage,
+        show: showPanel,
+        fail: fail,
+        selectedEngine: selectedEngine,
+        startTranscribeUpload: startTranscribeUpload,
+      };
+      transcribeForms.push(api);
+      return api;
+    };
+
+    // Subtitles provided (or auto-transcribe off): the plain import
+    // creates the book in the request and answers with a redirect target.
+    const startPlainMediaImport = function (form, btn, panel) {
+      btn.prop('disabled', true);
+      panel.show();
+      panel.find('.import-progress-bar').css('width', '0%');
+      panel.find('.import-status-text').text('Uploading… 0%').css('color', '');
+      postFormUpload(form[0], form.attr('action'), {
+        onUpload: p => {
+          panel.find('.import-progress-bar').css('width', p + '%');
+          panel.find('.import-status-text')
+            .text('Uploading… ' + p + '%')
+            .css('color', '');
+        },
+        onSuccess: data => {
+          panel.find('.import-progress-bar').css('width', '100%');
+          panel.find('.import-status-text')
+            .text('Done! Opening the book…')
+            .css('color', 'green');
+          window.location.href = data.redirect;
+        },
+        onError: msg => {
+          panel.find('.import-progress-bar').css('width', '0%');
+          panel.find('.import-status-text').text(msg).css('color', 'red');
+          btn.prop('disabled', false);
+        },
+      });
+    };
+
+    const mp3Whisper = setupTranscribeForm({
+      form: mp3Form,
+      btn: $('#mp3-import'),
+      panelRow: $('#whisper_panel_row'),
+      progress: $('#whisper_progress'),
+      progressBar: $('#whisper_progress_bar'),
+      statusText: $('#whisper_status_text'),
+      missingWhisper: $('#whisper_missing'),
+      missingSensevoice: $('#sensevoice_missing'),
+      modelSelect: $('#mp3_whisper_model'),
+      checkbox: $('#mp3_whisper'),
+      langSelect: $('#mp3-language'),
+    });
+    const videoWhisper = setupTranscribeForm({
+      form: videoForm,
+      btn: $('#video-import'),
+      panelRow: $('#video_panel_row'),
+      progress: $('#video_whisper_progress'),
+      progressBar: $('#video_progress_bar'),
+      statusText: $('#video_status_text'),
+      missingWhisper: $('#video_whisper_missing'),
+      missingSensevoice: $('#video_sensevoice_missing'),
+      modelSelect: $('#video_whisper_model'),
+      checkbox: $('#video_whisper'),
+      langSelect: $('#video-language'),
+    });
+    mp3Whisper.sync();
+    videoWhisper.sync();
+
+    // Shared submit-time validation: media source, language, and (when
+    // transcribing) that the picked engine is actually installed.
+    const engineNotReadyMsg = function () {
+      return 'The selected transcription engine is not installed on this server yet '
+        + '-- set it up under Settings -> Whisper (auto-subtitles).';
+    };
+
+    mp3Form.on('submit', function (e) {
+      e.preventDefault(); // always XHR: real upload progress + inline errors
+      const srtInput = document.getElementById('mp3_srt_file');
+      const srtUrl = ($('#mp3_srt_url').val() || '').trim();
+      const hasSubs = (srtInput.files && srtInput.files.length > 0) || srtUrl !== '';
+      const transcribe = $('#mp3_whisper').prop('checked') && !hasSubs;
+
+      const audioInput = document.getElementById('mp3_file');
+      const audioUrl = ($('#mp3_url').val() || '').trim();
+      if (!(audioInput.files && audioInput.files[0]) && audioUrl === '') {
+        mp3Whisper.fail('Please provide an audio file (upload or an online URL).');
+        return;
+      }
+      const langVal = $('#mp3-language').val();
+      if (!langVal || langVal === '0') {
+        mp3Whisper.fail('Please choose a language.');
+        return;
+      }
+      if (!hasSubs && !transcribe) {
+        mp3Whisper.fail('Provide subtitles, or tick Auto-transcribe to generate them.');
+        return;
+      }
+      if (transcribe && !engineReady(mp3Whisper.selectedEngine())) {
+        mp3Whisper.fail(engineNotReadyMsg());
+        return;
+      }
+
+      if (transcribe) {
+        mp3Whisper.startTranscribeUpload();
+      } else {
+        mp3Whisper.show('progress');
+        startPlainMediaImport(mp3Form, $('#mp3-import'), $('#whisper_panel'));
+      }
+    });
+
+    videoForm.on('submit', function (e) {
+      e.preventDefault();
+      const srtInput = document.getElementById('video_srt_file');
+      const srtUrl = ($('#video_srt_url').val() || '').trim();
+      const hasSubs = (srtInput.files && srtInput.files.length > 0) || srtUrl !== '';
+      const transcribe = $('#video_whisper').prop('checked') && !hasSubs;
+
+      const vidInput = document.getElementById('video_file');
+      const vidUrl = ($('#video_url').val() || '').trim();
+      if (!(vidInput.files && vidInput.files[0]) && vidUrl === '') {
+        videoWhisper.fail('Please provide a video (upload a file or an online URL).');
+        return;
+      }
+      const langVal = $('#video-language').val();
+      if (!langVal || langVal === '0') {
+        videoWhisper.fail('Please choose a language.');
+        return;
+      }
+      if (!hasSubs && !transcribe) {
+        videoWhisper.fail('Provide subtitles, or tick Auto-transcribe to generate them.');
+        return;
+      }
+      if (transcribe && !engineReady(videoWhisper.selectedEngine())) {
+        videoWhisper.fail(engineNotReadyMsg());
+        return;
+      }
+
+      if (transcribe) {
+        videoWhisper.startTranscribeUpload();
+      } else {
+        videoWhisper.show('progress');
+        startPlainMediaImport(videoForm, $('#video-import'), $('#video_panel'));
+      }
     });
   });
 </script>

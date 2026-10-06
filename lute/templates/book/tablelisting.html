@@ -95,10 +95,10 @@
   </div>
 </div>
 
-<script type="text/javascript" src="{{ vstatic('vendor/dayjs/dayjs.min.js') }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ vstatic('vendor/dayjs/relativeTime.js') }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ vstatic('js/book-type-icons.js') }}" charset="utf-8"></script>
-<script type="text/javascript" src="{{ vstatic('js/book-listing-shared.js') }}" charset="utf-8"></script>
+<script type="text/javascript" src="{{ vstatic('vendor/dayjs/dayjs.min.js') }}" defer charset="utf-8"></script>
+<script type="text/javascript" src="{{ vstatic('vendor/dayjs/relativeTime.js') }}" defer charset="utf-8"></script>
+<script type="text/javascript" src="{{ vstatic('js/book-type-icons.js') }}" defer charset="utf-8"></script>
+<script type="text/javascript" src="{{ vstatic('js/book-listing-shared.js') }}" defer charset="utf-8"></script>
 <script>
   var thresholds = [
   { l: 's', r: 1 },
@@ -116,7 +116,11 @@
   var config = {
     thresholds: thresholds
   }
-  dayjs.extend(dayjs_plugin_relativeTime, config);
+  // dayjs and the plugin are deferred; they have executed by the time
+  // DOMContentLoaded fires.  Extending at parse time fails silently.
+  document.addEventListener('DOMContentLoaded', function () {
+    dayjs.extend(dayjs_plugin_relativeTime, config);
+  });
 </script>
 
 <script>
@@ -385,7 +389,7 @@
     }
   });
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     // Type display mode must be set before the table's first draw so the
     // renderers pick it up.  Only this page reads the saved preference
     // (the header toggle lives here); the series overview stays icons.

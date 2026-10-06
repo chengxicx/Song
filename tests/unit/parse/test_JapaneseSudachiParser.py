@@ -10,6 +10,7 @@ thread its own tokenizer while sharing the dictionary.
 """
 
 import threading
+from typing import List, Optional, Tuple
 
 import pytest
 
@@ -26,6 +27,15 @@ def _make_parser():
     if not JapaneseSudachiParser.is_supported():
         pytest.skip("sudachipy and a sudachi dictionary are required")
     return JapaneseSudachiParser()
+
+
+def _context_readings(parser, text):
+    "get_context_readings narrowed to its list form, asserting it exists."
+    morphs = parser.get_context_readings(text)
+    assert morphs is not None, f"expected context readings for {text!r}"
+    readings: List[Tuple[str, Optional[str]]] = []
+    readings.extend(morphs)
+    return readings
 
 
 @pytest.fixture(autouse=True)
@@ -87,6 +97,73 @@ def test_reading_and_lemma(app_context):
     p = _make_parser()
     assert p.get_reading("強い") == "つよい"
     assert p.get_lemma("広がっ") == "広がる"
+
+
+def test_context_readings_follow_the_sentence(app_context):
+    """
+    get_context_readings reads each morpheme as the sentence around it
+    disambiguates it.  A lone 一 is いち, but the 一 opening 一つ is ひと
+    -- which is the whole reason the shadowing panel sends its sentence
+    along instead of looking each token up on its own.
+    """
+    current_settings()["japanese_reading"] = "hiragana"
+    p = _make_parser()
+
+    assert p.get_reading("一") == "いち"
+
+    morphs = _context_readings(p, "広い宇宙の、数ある一つ")
+    assert ("広い", "ひろい") in morphs
+    assert ("一", "ひと") in morphs
+    # Kana morphemes read as themselves; punctuation has no reading.
+    assert ("の", "の") in morphs
+    assert ("、", None) in morphs
+
+
+def test_context_readings_use_the_local_window_not_the_whole_sentence(app_context):
+    """
+    A morpheme's reading is settled from the window it forms with its
+    immediate neighbours, not from the whole sentence: read as part of
+    広い宇宙の、数ある一つ sudachi returns 数=スウ, while the same
+    morphemes in a shorter window give the correct カズ.  This is the
+    bug the shadowing panel showed as すう above 数 in 数ある.
+    """
+    current_settings()["japanese_reading"] = "hiragana"
+    p = _make_parser()
+
+    morphs = _context_readings(p, "広い宇宙の、数ある一つ")
+    assert ("数", "かず") in morphs
+
+
+def test_context_readings_keep_a_compound_together(app_context):
+    """
+    The window keeps the left neighbour, so a kanji that only reads the
+    way it does because of the morpheme before it is not broken: 杯 is
+    ばい in 一杯 (but さかずき alone) and 日 is にち in 一日 (but ひ
+    alone).  Dropping the left neighbour is what would turn these into
+    the standalone readings.
+    """
+    current_settings()["japanese_reading"] = "hiragana"
+    p = _make_parser()
+
+    assert p.get_reading("杯") == "さかずき"
+    assert p.get_reading("日") == "ひ"
+
+    assert ("杯", "ばい") in _context_readings(p, "一杯のコーヒー")
+    assert ("日", "にち") in _context_readings(p, "一日が長かった")
+
+
+def test_context_readings_need_the_reading_setting(app_context):
+    "No japanese_reading setting means no furigana to give."
+    current_settings()["japanese_reading"] = ""
+    p = _make_parser()
+    assert p.get_context_readings("広い宇宙の、数ある一つ") is None
+
+
+def test_context_readings_skip_all_kana_text(app_context):
+    "An all-kana sentence has nothing to annotate."
+    current_settings()["japanese_reading"] = "hiragana"
+    p = _make_parser()
+    assert p.get_context_readings("あなたのもとへ") is None
 
 
 # ---- threading ----
@@ -224,6 +301,25 @@ def test_invalidate_cache_forces_a_reload(app_context):
 
     assert JapaneseSudachiParser.is_supported() is True
     assert JapaneseSudachiParser._get_dictionary("core") is not first
+
+
+def test_is_supported_does_not_build_the_dictionary(app_context, monkeypatch):
+    """
+    The support check runs for every parser at app start
+    (lute.parse.registry.supported_parsers), so it must stay a package
+    check.  Building the dictionary there cost ~33MB of private memory
+    plus a read of the 200MB+ system.dic, even for users with no
+    Japanese books.
+    """
+
+    def _boom(*_args, **_kwargs):
+        raise AssertionError("is_supported() built the dictionary")
+
+    monkeypatch.setattr(JapaneseSudachiParser, "_build_tokenizer", classmethod(_boom))
+    monkeypatch.setattr(JapaneseSudachiParser, "_get_dictionary", classmethod(_boom))
+    JapaneseSudachiParser._invalidate_cache()
+
+    assert JapaneseSudachiParser.is_supported() is True
 
 
 def test_parsed_tokens_carry_text_and_flags(app_context):

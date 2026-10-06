@@ -317,31 +317,20 @@ class JapaneseParser(AbstractParser):
                 return idx
         return -1
 
-    def get_reading(self, text: str):
+    def _morpheme_kana(self, text: str):
         """
-        Get the pronunciation for the given text.
+        One MeCab parse of `text`, paired as [(surface, katakana yomi)].
 
-        Returns None if the text is all hiragana, or the pronunciation
-        doesn't add value (same as text).
+        IPADIC's -O yomi output and Unidic's kana feature both answer
+        how each morpheme of THIS text is pronounced -- the sentence
+        context is already baked into the analysis (数ある -> 数=カズ).
+        Symbols and unparsed tokens come back with the surface as their
+        own yomi.  Shared by get_reading and get_context_readings so
+        both see exactly the same analysis.
         """
-        # Strip zero-width spaces (zws) that mark token boundaries in
-        # multiword terms. MeCab treats zws as a separate token, which
-        # would pollute the reading with spurious characters and
-        # break the "same as text" check below.
-        zws = "\u200B"
-        text = text.replace(zws, "")
-
-        if self._string_is_hiragana(text):
-            return None
-
-        jp_reading_setting = current_settings().get("japanese_reading", "").strip()
-        if jp_reading_setting == "":
-            # Don't set reading if nothing specified.
-            return None
-
         dict_type = self._detect_dict_type()
 
-        readings = []
+        pairs = []
         if dict_type == "unidic":
             # Unidic: the reading of the surface form (i.e. how the
             # token is actually pronounced in its conjugated form,
@@ -375,19 +364,89 @@ class JapaneseParser(AbstractParser):
                 kana_idx = self._find_unidic_kana_index(features)
                 reading = features[kana_idx].strip() if kana_idx >= 0 else ""
                 if reading and reading != "*":
-                    readings.append(reading)
+                    pairs.append((surface, reading))
                 else:
                     # Match IPADIC -O yomi behaviour: non-reading
                     # tokens (symbols, punctuation) pass through as
                     # their surface form.
-                    readings.append(surface)
+                    pairs.append((surface, surface))
         else:
             # IPADIC: use the built-in "yomi" output format.
             nm = self._get_mecab_yomi()
             with JapaneseParser._mecab_lock:
                 yomi_nodes = list(nm.parse(text, as_nodes=True))
             for n in yomi_nodes:
-                readings.append(n.feature)
+                pairs.append((n.surface, n.feature))
+        return [(s, (r or "").strip()) for s, r in pairs if s is not None]
+
+    @staticmethod
+    def _string_is_kana(s: str) -> bool:
+        "True if every character is hiragana or katakana (incl. ー)."
+        return bool(s) and all("\u3040" <= c <= "\u30FF" for c in s)
+
+    def _display_reading(self, surface: str, kana: str, setting: str):
+        """
+        One morpheme's yomi under the japanese_reading setting.
+
+        None when the reading adds no value over the surface (symbols,
+        kanji the dictionary has no kana for), mirroring get_reading's
+        whole-string checks applied morpheme by morpheme.  A kana
+        morpheme reads as itself: its own kana comes back as the
+        reading, so a multi-morpheme token's joined reading stays
+        complete (一 + つ -> ひとつ, お + 城 -> おしろ).
+        """
+        if not kana or kana == surface:
+            return self._self_reading(surface, setting)
+        if setting == "katakana":
+            ret = kana
+        elif setting == "hiragana":
+            ret = jaconv.kata2hira(kana)
+        elif setting == "alphabet":
+            ret = jaconv.kata2alphabet(kana)
+        else:
+            raise RuntimeError(f"Bad reading type {setting}")
+        # A particle or okurigana morpheme's yomi converts back to the
+        # surface itself (の <- ノ).
+        if ret == surface:
+            return self._self_reading(surface, setting)
+        return ret
+
+    @classmethod
+    def _self_reading(cls, surface: str, setting: str):
+        "A kana morpheme's reading under the setting; None for other surfaces."
+        if not cls._string_is_kana(surface):
+            return None
+        if setting == "katakana":
+            return jaconv.hira2kata(surface)
+        if setting == "hiragana":
+            return surface
+        if setting == "alphabet":
+            return jaconv.kata2alphabet(surface)
+        raise RuntimeError(f"Bad reading type {setting}")
+
+    def get_reading(self, text: str):
+        """
+        Get the pronunciation for the given text.
+
+        Returns None if the text is all hiragana, or the pronunciation
+        doesn't add value (same as text).
+        """
+        # Strip zero-width spaces (zws) that mark token boundaries in
+        # multiword terms. MeCab treats zws as a separate token, which
+        # would pollute the reading with spurious characters and
+        # break the "same as text" check below.
+        zws = "\u200B"
+        text = text.replace(zws, "")
+
+        if self._string_is_hiragana(text):
+            return None
+
+        jp_reading_setting = current_settings().get("japanese_reading", "").strip()
+        if jp_reading_setting == "":
+            # Don't set reading if nothing specified.
+            return None
+
+        readings = [r if r else s for s, r in self._morpheme_kana(text)]
         readings = [r.strip() for r in readings if r is not None and r.strip() != ""]
 
         ret = "".join(readings).strip()
@@ -401,6 +460,34 @@ class JapaneseParser(AbstractParser):
         if jp_reading_setting == "alphabet":
             return jaconv.kata2alphabet(ret)
         raise RuntimeError(f"Bad reading type {jp_reading_setting}")
+
+    def get_context_readings(self, text: str):
+        """
+        Per-morpheme readings from one contextual parse of `text`.
+
+        Returns [(surface, reading-or-None), ...]: each morpheme read as
+        the surrounding sentence disambiguates it (一つ -> 一=ヒト), not
+        as the isolated surface would be re-read (一 -> イチ).  Applies
+        the same japanese_reading setting as get_reading; None when that
+        setting is unset.
+        """
+        zws = "\u200B"
+        text = text.replace(zws, "")
+
+        if self._string_is_hiragana(text):
+            return None
+
+        jp_reading_setting = current_settings().get("japanese_reading", "").strip()
+        if jp_reading_setting == "":
+            return None
+
+        out = []
+        for surface, kana in self._morpheme_kana(text):
+            if not surface:
+                continue
+            reading = self._display_reading(surface, kana, jp_reading_setting)
+            out.append((surface, reading))
+        return out or None
 
     # Standardize unidic-specific lemma orthographies to the common
     # dictionary forms users expect.  Unidic's 語彙素 field occasionally

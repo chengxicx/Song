@@ -6,6 +6,8 @@ import gzip
 import json
 import math
 import os
+import unicodedata
+import uuid
 from flask import (
     Blueprint,
     current_app,
@@ -19,6 +21,7 @@ from flask import (
 )
 from lute.read.service import Service
 from lute.read.render.service import Service as RenderService
+from lute.read import shadowing
 from lute.read.render.grammar_analysis import (
     analyze as analyze_grammar,
     is_japanese_language,
@@ -48,12 +51,13 @@ from lute.read.render.grammar_analysis_it import analyze_italian
 from lute.read.render.grammar_analysis_pt import analyze_portuguese
 from lute.read.render.grammar_analysis_th import analyze_thai
 from lute.read.render.grammar_analysis_ar import analyze_arabic
+from lute.read.render.grammar_levels import filter_hidden_grammar
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form, serialize_term_form_data
 from lute.settings.current import current_settings
-from lute.multiuser.context import current_scope_key
+from lute.multiuser.context import current_scope_key, get_current_user
 from lute.models.book import Text
 from lute.models.repositories import BookRepository, LanguageRepository
 from lute.models.term import Term
@@ -1184,7 +1188,19 @@ def grammar_analysis(bookid, pagenum):
     # analysis so no tokenizer/analyzer ever sees them (the Japanese and
     # Korean engines do the same internally).
     page_text = page_text.replace("\u200b", "").replace("🔊", "")
+    # Same reason, one step further: an imported book may store decomposed
+    # Hangul (e.g. "지" + U+11AF where the source had the single syllable
+    # "질").  An engine that tokenises such text reports offsets that fall
+    # inside a syllable, and the client -- which slices the sentence at
+    # those offsets -- then renders a half-character.  Composing once here
+    # keeps every engine's tokens, offsets and echoed sentence consistent.
+    page_text = unicodedata.normalize("NFC", page_text)
     display = getattr(lang, "grammar_translate_lang", "") or "en"
+    # Levels / groups this language hides in the panel -- an advanced
+    # reader drops N5, or just the two frequent aggregate rows ("Basic
+    # forms", "Particles").  Applied to whatever the engine returns, so
+    # every engine honours it without knowing about the setting.
+    hidden = set(getattr(lang, "hidden_grammar_levels", []) or [])
     # Every engine runs on optional heavy dependencies (Sudachi, Kiwi,
     # spaCy models, pymorphy3, pythainlp, pyarabic); when one is missing,
     # fall back to the generic regex rule library instead of failing
@@ -1206,7 +1222,7 @@ def grammar_analysis(bookid, pagenum):
     ):
         if detector(lang):
             try:
-                return jsonify(engine(page_text, display_lang=display))
+                results = engine(page_text, display_lang=display)
             except (ImportError, OSError):
                 current_app.logger.warning(
                     "%s grammar engine not installed; using the basic regex rules. "
@@ -1215,12 +1231,114 @@ def grammar_analysis(bookid, pagenum):
                     extra,
                 )
                 break
+            return jsonify(filter_hidden_grammar(results, hidden))
     render_service = RenderService(db.session)
     paragraphs = render_service.get_paragraphs(page_text, lang)
     sentences = [
         "".join(ti.text for ti in sentence) for para in paragraphs for sentence in para
     ]
-    return jsonify(analyze_grammar(sentences))
+    return jsonify(filter_hidden_grammar(analyze_grammar(sentences), hidden))
+
+
+@bp.route("/shadowing/transcribe", methods=["POST"])
+def shadowing_transcribe():
+    """
+    Start scoring one shadowing recording as a background task.
+
+    Multipart fields: audio (the recording blob), language_id, tokens
+    (JSON array of the sentence's word spans' data-text, in DOM order),
+    model (optional whisper size), full_text (optional sentence the
+    tokens belong to; Japanese scores its keys against the contextual
+    readings the panel displays).
+
+    Async on purpose: the first transcription loads the whisper model
+    (hundreds of MB, possibly downloaded on the spot) and CPU inference
+    takes seconds more -- far beyond a reverse proxy's timeout, which
+    used to surface as a 502.  Returns {"task_id"}; poll
+    /read/shadowing/status/<task_id> until finished/error.
+    """
+    if not shadowing.whisper_status()["installed"]:
+        return (
+            jsonify({"error": "whisper is not installed (see Settings > Whisper)."}),
+            400,
+        )
+
+    audio = request.files.get("audio")
+    if audio is None or not (audio.filename or "").strip():
+        return jsonify({"error": "no audio uploaded"}), 400
+
+    try:
+        tokens = json.loads(request.form.get("tokens", "[]"))
+    except ValueError:
+        return jsonify({"error": "invalid tokens payload"}), 400
+    if not isinstance(tokens, list) or not all(isinstance(t, str) for t in tokens):
+        return jsonify({"error": "invalid tokens payload"}), 400
+
+    full_text = (request.form.get("full_text") or "").strip() or None
+
+    lang = LanguageRepository(db.session).find(
+        request.form.get("language_id", type=int) or 0
+    )
+    if lang is None:
+        return jsonify({"error": "language not found"}), 400
+
+    model_size = (request.form.get("model") or "").strip()
+    if model_size not in shadowing.ALLOWED_MODEL_SIZES:
+        model_size = shadowing.DEFAULT_MODEL_SIZE
+
+    temppath = current_app.env_config.temppath
+    os.makedirs(temppath, exist_ok=True)
+    ext = os.path.splitext((audio.filename or "").lower())[1].lstrip(".")
+    if ext not in ("webm", "mp4", "m4a", "ogg", "oga", "wav", "mp3", "aiff"):
+        ext = "bin"
+    audio_path = os.path.join(temppath, f"shadowing_{uuid.uuid4().hex}.{ext}")
+    audio.save(audio_path)
+
+    task_id = shadowing.start_task(
+        current_app._get_current_object(),  # pylint: disable=protected-access
+        audio_path,
+        lang.id,
+        tokens,
+        model_size,
+        username=get_current_user(),
+        full_text=full_text,
+    )
+    return jsonify({"task_id": task_id})
+
+
+@bp.route("/shadowing/status/<task_id>", methods=["GET"])
+def shadowing_task_status(task_id):
+    "Poller payload for a shadowing scoring task."
+    return jsonify(shadowing.task_status(task_id))
+
+
+@bp.route("/shadowing/readings", methods=["POST"])
+def shadowing_readings():
+    """
+    Pair the shadowing panel's sentence tokens with kana readings.
+
+    JSON body: {language_id, tokens: [surface, ...], full_text}.  Returns
+    {"tokens": [{"text", "reading"}, ...]} parallel to the input, so the
+    panel can draw furigana above each word (and speak the reading when
+    the word is tapped).  full_text is the sentence the tokens belong to;
+    parsing it whole lets Japanese readings follow context (一つ reads
+    ひとつ, not いち + つ).  Synchronous and cheap -- no audio, no model.
+    """
+    payload = request.get_json(silent=True) or {}
+    tokens = payload.get("tokens") or []
+    if not isinstance(tokens, list) or not all(isinstance(t, str) for t in tokens):
+        return jsonify({"error": "invalid tokens payload"}), 400
+    full_text = payload.get("full_text")
+    if full_text is not None and not isinstance(full_text, str):
+        return jsonify({"error": "invalid tokens payload"}), 400
+
+    lang = LanguageRepository(db.session).find(payload.get("language_id") or 0)
+    if lang is None:
+        return jsonify({"error": "language not found"}), 400
+
+    return jsonify(
+        {"tokens": shadowing.annotate_tokens(tokens, lang, full_text=full_text)}
+    )
 
 
 def _manga_page_text(book, pagenum):

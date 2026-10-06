@@ -5,7 +5,14 @@ kimchi-grammar (https://github.com/Alaanor/kimchi-grammar, CC-BY 4.0).
 The generator pulls the `name`, per-definition English `meaning`,
 example sentences and their translations from each point/*.yaml, strips
 Kimchi's custom markdown (<f>…</f>, :grammar, :dict, ::example, headers),
-and emits one flat record per definition.
+and emits one flat record per definition.  Each example's `translated`
+lands in `example_en`, index-aligned with `examples`; without it the
+grammar panel has nothing to quote in its 参考例句 block.
+
+This writes the whole file, so it is NOT the way to update the shipped
+library: re-running it would drop the merged material rows and the
+enrichment fields.  Run it only to rebuild from scratch, and use
+`scripts/backfill_grammar_ko_examples.py` to top up an existing file.
 
 For each definition it also stores a `focus` list: the literal phrases
 that the Kimchi authors wrapped in <f>…</f> inside that definition's
@@ -44,9 +51,11 @@ def _focus_phrases(sentence):
 def _entry(key, name, defi, etype):
     focus = []
     examples = []
+    translations = []
     for ex in defi.get("examples") or []:
         sentence = ex.get("sentence") or ""
         examples.append(_clean(sentence))
+        translations.append((ex.get("translated") or "").strip())
         focus.extend(_focus_phrases(sentence))
     # Longest-first so the engine can prefer the most specific literal.
     focus = sorted(set(focus), key=len, reverse=True)
@@ -57,6 +66,13 @@ def _entry(key, name, defi, etype):
         "meaning": (defi.get("meaning") or "").strip(),
         "type": etype,
         "examples": examples,
+        # Index-aligned with `examples`.  Kimchi ships a translation for every
+        # example and this used to be dropped, which is why the grammar panel
+        # had no 参考例句 for any of these rows: the reference block needs a
+        # translation to show.  The merged material rows spell the same two
+        # lists `example_ko`/`example_en`/`example_zh`; these are the English
+        # half only, with the Chinese added by grammar_ko_enrichment.json.
+        "example_en": translations,
         "focus": focus,
     }
 

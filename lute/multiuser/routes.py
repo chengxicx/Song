@@ -27,6 +27,7 @@ from lute.db import db
 from lute.db.management import add_default_user_settings
 from lute.db.setup.main import setup_db
 from lute.multiuser import context, paths, store, switching
+from lute.multiuser.permissions import admin_only_if_multiuser
 from lute.multiuser.switching import SwitchError
 
 bp = Blueprint("multiuser", __name__, template_folder="templates")
@@ -270,6 +271,7 @@ def change_own_password():
 
 
 @bp.route("/multiuser/switch")
+@admin_only_if_multiuser
 def switch_page():
     "Enable/disable multi-user mode."
     admin_names = (
@@ -285,6 +287,7 @@ def switch_page():
 
 
 @bp.route("/multiuser/enable", methods=["POST"])
+@admin_only_if_multiuser
 def enable():
     "Enable multi-user mode, migrating current data into the admin account."
     try:
@@ -314,6 +317,7 @@ def enable():
 
 
 @bp.route("/multiuser/disable", methods=["POST"])
+@admin_only_if_multiuser
 def disable():
     "Disable multi-user mode; the admin's data returns to single-user."
     try:

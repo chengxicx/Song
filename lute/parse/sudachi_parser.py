@@ -17,6 +17,7 @@ This parser is independent of the MeCab-based JapaneseParser.
 Users select it as the "Parse as" type for their Japanese language.
 """
 
+import importlib.util
 import re
 import threading
 from typing import List
@@ -43,10 +44,11 @@ class JapaneseSudachiParser(AbstractParser):
     """
 
     _is_supported = None
-    # Cache key for the _is_supported result.  Kept separate from the
-    # dictionary cache key below: they hold different key formats
-    # ("core|C" vs "core"), and sharing one attribute made
-    # is_supported() miss its cache on every call.
+    # Cache key for the _is_supported result: the dictionary name, the
+    # only setting the support check depends on.  Kept separate from
+    # the dictionary cache key below because they guard different
+    # caches, and sharing one attribute made is_supported() miss its
+    # cache on every call.
     _support_key = None
 
     # Tokenizer instances are NOT shareable: sudachipy's Tokenizer wraps
@@ -66,26 +68,40 @@ class JapaneseSudachiParser(AbstractParser):
     @classmethod
     def is_supported(cls):
         """
-        True if sudachipy can be imported and a dictionary loaded.
+        True if sudachipy and a Sudachi dictionary are installed.
+
+        Cheap on purpose.  This runs for every parser at app start-up
+        (lute.parse.registry.supported_parsers), so it must not build
+        the dictionary: that costs ~33MB of private memory plus a read
+        of the 200MB+ system.dic, all wasted on users with no Japanese
+        books.  The dictionary is built by the first real parse instead
+        (see _build_tokenizer).
         """
         dict_type = cls._get_dict_setting()
-        mode = cls._get_mode_setting()
-        cache_key = f"{dict_type}|{mode}"
 
         if (
             JapaneseSudachiParser._is_supported is not None
-            and JapaneseSudachiParser._support_key == cache_key
+            and JapaneseSudachiParser._support_key == dict_type
         ):
             return JapaneseSudachiParser._is_supported
 
-        try:
-            cls._build_tokenizer(dict_type)
-            JapaneseSudachiParser._is_supported = True
-        except Exception:  # pylint: disable=broad-except
-            JapaneseSudachiParser._is_supported = False
-
-        JapaneseSudachiParser._support_key = cache_key
+        JapaneseSudachiParser._is_supported = cls._dictionary_is_installed(dict_type)
+        JapaneseSudachiParser._support_key = dict_type
         return JapaneseSudachiParser._is_supported
+
+    @staticmethod
+    def _dictionary_is_installed(dict_type: str) -> bool:
+        """
+        True if sudachipy and one of the sudachidict packages can be
+        imported.  Any of the three will do: _load_dictionary falls
+        back to whichever one is installed.
+        """
+        if importlib.util.find_spec("sudachipy") is None:
+            return False
+
+        names = ["sudachidict_core", "sudachidict_small", "sudachidict_full"]
+        names.insert(0, f"sudachidict_{dict_type}")
+        return any(importlib.util.find_spec(n) is not None for n in names)
 
     @classmethod
     def _invalidate_cache(cls):
@@ -360,6 +376,149 @@ class JapaneseSudachiParser(AbstractParser):
         if jp_reading_setting == "alphabet":
             return jaconv.kata2alphabet(ret)
         raise RuntimeError(f"Bad reading type {jp_reading_setting}")
+
+    def _reading_from_kana(self, surface: str, kana: str, setting: str):
+        """
+        One morpheme's yomi (katakana) as the display reading under the
+        japanese_reading setting; None when it adds nothing over the
+        surface (symbols, kanji the dictionary has no kana for).
+        """
+        if not kana or kana == surface:
+            # Kana read as themselves: the surface is the reading.
+            return self._self_reading(surface, setting)
+        if setting == "katakana":
+            ret = kana
+        elif setting == "hiragana":
+            ret = jaconv.kata2hira(kana)
+        elif setting == "alphabet":
+            ret = jaconv.kata2alphabet(kana)
+        else:
+            raise RuntimeError(f"Bad reading type {setting}")
+        # A particle or okurigana morpheme's yomi converts back to the
+        # surface itself (の <- ノ).
+        if ret == surface:
+            return self._self_reading(surface, setting)
+        return ret
+
+    @staticmethod
+    def _string_has_kanji(s: str) -> bool:
+        "True if any character is a kanji (incl. the 々 iteration mark)."
+        return any("\u4E00" <= c <= "\u9FFF" or c == "\u3005" for c in s)
+
+    def _neighbour_window_kana(self, tok, morphs, index, split_mode):
+        """
+        The yomi this morpheme gets when read together with its immediate
+        neighbours, or None when that window cannot be trusted.
+
+        Reading the whole sentence at once is what makes 一つ -> 一=ヒト
+        work, but the further a morpheme sits from the start of a long
+        string the more its reading can drift: 数ある with 一つ one
+        morpheme later comes back 数=スウ, while those same two morphemes
+        read on their own give the correct カズ.  A window of the
+        morpheme plus its neighbours keeps the local context that
+        disambiguates without the distance that drifts.
+
+        The left neighbour is kept when there is one because it is often
+        what fixes the reading -- 杯 is バイ in 一杯 but サカズキ alone,
+        日 is ニチ in 一日 but ヒ alone -- so a window that dropped it
+        would break exactly those.  It is allowed to be absent at the
+        start of the text, where there is no left context to preserve.
+        The right neighbour is required: it is the side that does the
+        disambiguating, and a window that stops at the end of the text
+        knows no more than the morpheme on its own.
+
+        Returns None unless the window tokenizes back to a morpheme with
+        exactly this surface at exactly this offset, so a window that
+        merges or splits differently leaves the sentence's own reading
+        standing and nothing is guessed.
+        """
+        if index + 1 >= len(morphs):
+            return None
+        start = max(0, index - 1)
+        window = morphs[start : index + 2]
+        surface = morphs[index][0]
+        left_text = "".join(s for s, _ in window[: index - start])
+        try:
+            got = list(tok.tokenize("".join(s for s, _ in window), mode=split_mode))
+        except Exception:  # pylint: disable=broad-exception-caught
+            return None
+        seen = ""
+        for m in got:
+            if seen == left_text and m.surface() == surface:
+                reading = m.reading_form()
+                return reading if reading and reading != "*" else None
+            seen += m.surface()
+        return None
+
+    def get_context_readings(self, text: str):
+        """
+        Per-morpheme readings from one contextual tokenize of `text`.
+
+        Returns [(surface, reading-or-None), ...]: each morpheme read as
+        the surrounding sentence disambiguates it (一つ -> 一=ヒト), not
+        as the isolated surface would be re-read (一 -> イチ).  Applies
+        the same japanese_reading setting as get_reading; None when that
+        setting is unset.
+
+        A kanji morpheme's reading is taken from the window it forms with
+        its immediate neighbours rather than from the whole sentence,
+        which is what keeps 数ある at カズ; see _neighbour_window_kana.
+        """
+        zws = "\u200B"
+        text = text.replace(zws, "")
+
+        if self._string_is_hiragana(text):
+            return None
+
+        jp_reading_setting = current_settings().get("japanese_reading", "").strip()
+        if jp_reading_setting == "":
+            return None
+
+        dict_type = self._get_dict_setting()
+        mode = self._get_mode_setting()
+        tok = self._build_tokenizer(dict_type)
+        split_mode = self._get_split_mode(mode)
+
+        morphs = [
+            (m.surface(), m.reading_form())
+            for m in tok.tokenize(text, mode=split_mode)
+            if m.surface()
+        ]
+
+        out = []
+        for i, (surface, reading) in enumerate(morphs):
+            kana = reading if reading and reading != "*" else surface
+            if self._string_has_kanji(surface):
+                # Only a kanji morpheme can be mis-read; kana read as
+                # themselves, so the extra window parse would be wasted.
+                window_kana = self._neighbour_window_kana(tok, morphs, i, split_mode)
+                if window_kana:
+                    kana = window_kana
+            out.append(
+                (surface, self._reading_from_kana(surface, kana, jp_reading_setting))
+            )
+        return out or None
+
+    @staticmethod
+    def _string_is_kana(s: str) -> bool:
+        "True if every character is hiragana or katakana (incl. ー)."
+        return bool(s) and all("\u3040" <= c <= "\u30FF" for c in s)
+
+    @classmethod
+    def _self_reading(cls, surface: str, setting: str):
+        """
+        A kana morpheme's reading under the setting; None for other
+        surfaces (symbols, kanji the dictionary has no kana for).
+        """
+        if not cls._string_is_kana(surface):
+            return None
+        if setting == "katakana":
+            return jaconv.hira2kata(surface)
+        if setting == "hiragana":
+            return surface
+        if setting == "alphabet":
+            return jaconv.kata2alphabet(surface)
+        raise RuntimeError(f"Bad reading type {setting}")
 
     # ---- lemma ----
 

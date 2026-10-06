@@ -35,7 +35,7 @@
 
     <tr>
       <td>{{ form.audiofile.label }}<br />
-        <span class="formfieldcomment">mp3, m4a, wav, ogg, opus, aac, flac, webm</span>
+        <span class="formfieldcomment">mp3, m4a, m4b, wav, ogg, opus, aac, flac, webm</span>
       </td>
       <td>{{ form.audiofile() }}</td>
     </tr>
@@ -89,7 +89,7 @@
     $('#title, #text').css('direction', direction);
   };
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     var tagslist = document.getElementById('book_tags');
     var tags_tagify = setup_book_tags_tagify(tagslist);
 

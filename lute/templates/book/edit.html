@@ -72,7 +72,7 @@
     </tr>
 
     <tr>
-      <td>{{ form.audiofile.label }}  <i>(.mp3, .m4a, .wav, .ogg, .opus, .aac, .flac, .webm)</i></td>
+      <td>{{ form.audiofile.label }}  <i>(audio: .mp3, .m4a, .wav, .ogg, .opus, .aac, .flac, .webm &mdash; video: .mp4, .webm, .mov, .ogv, .m4v)</i></td>
       <td>
         {{ form.audiofile() }}
         {{ form.audio_filename() }}
@@ -80,7 +80,7 @@
         <div id="current_file_div" style="margin: 5px">
         <span class="smallfilename">Current file: {{ book.audio_filename }}</span>
         <img src="{{ vstatic('icn/minus-button.png') }}"
-             title="Delete audio file"
+             title="Delete media file"
              style="margin-left: 5px"
              onclick="confirm_delete(this)" />
         </div>
@@ -101,6 +101,126 @@
     <button class="btn btn-secondary" onclick="window.location = '/'; return false;">Cancel</button>
   </div>
 </form>
+
+{% if book.book_type in ('mp3', 'video') and (book.audio_filename or book.media_url) %}
+<div id="retranscribe_box">
+  <div class="retranscribe-row">
+    <strong>Re-transcribe {{ 'video' if book.book_type == 'video' else 'audio' }}</strong>
+    <select id="retranscribe_model" class="form-control">
+      <option value="sensevoice" {% if not sensevoice_supported %}disabled{% endif %}>SenseVoice (zh/yue/en/ja/ko &middot; fastest)</option>
+      <option value="small">whisper small</option>
+      <option value="base">whisper base</option>
+      <option value="medium">whisper medium</option>
+    </select>
+    <button type="button" id="retranscribe_btn" class="btn btn-secondary">Re-transcribe</button>
+  </div>
+  <div id="retranscribe_progress" style="display: none;">
+    <div class="retranscribe-track"><div id="retranscribe_bar"></div></div>
+    <div id="retranscribe_status"></div>
+  </div>
+  <div class="formfieldcomment">Re-runs speech recognition on this book's media and replaces the text and subtitle cues &mdash; all pages are re-parsed and reading progress resets. The media file is kept.</div>
+</div>
+<style>
+  #retranscribe_box { border: 1px solid var(--border-color, #ccc); border-radius: 6px;
+    padding: 10px 14px; margin: 16px 0; max-width: 900px; }
+  .retranscribe-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .retranscribe-track { width: 100%; height: 8px; background: rgba(128,128,128,.25);
+    border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .retranscribe-track > div { height: 100%; width: 0%; background: #4a90d9; }
+  #retranscribe_status { margin-top: 4px; }
+</style>
+<script type="text/javascript">
+  (function () {
+    const btn = document.getElementById('retranscribe_btn');
+    if (!btn) return;
+    const modelSel = document.getElementById('retranscribe_model');
+    modelSel.value = {{ ('sensevoice' if sensevoice_supported else 'small') | tojson }};
+    const panel = document.getElementById('retranscribe_progress');
+    const bar = document.getElementById('retranscribe_bar');
+    const status = document.getElementById('retranscribe_status');
+    let startedAt = null;
+
+    const fmt = function (secs) {
+      secs = Math.max(0, Math.round(secs));
+      const mins = Math.floor(secs / 60);
+      if (mins >= 60) return Math.floor(mins / 60) + ' h ' + (mins % 60) + ' min';
+      if (mins > 0) return mins + ' min';
+      return secs + ' s';
+    };
+    const fail = function (msg) {
+      bar.style.width = '0%';
+      status.textContent = msg;
+      status.style.color = 'red';
+      btn.disabled = false;
+    };
+    const poll = function (taskId) {
+      const timer = setInterval(() => {
+        fetch('/book/whisper/status/' + taskId)
+          .then(r => r.json())
+          .then(d => {
+            if (d.state === 'finished' && d.book_id) {
+              clearInterval(timer);
+              bar.style.width = '100%';
+              status.textContent = 'Done! Reloading…';
+              status.style.color = 'green';
+              window.location.reload();
+              return;
+            }
+            if (d.state === 'error') {
+              clearInterval(timer);
+              fail('Transcription failed: ' + (d.error || 'unknown error'));
+              return;
+            }
+            if (d.state === 'unknown') {
+              clearInterval(timer);
+              fail('The transcription task was lost (server restart?). Please try again.');
+              return;
+            }
+            const elapsed = (Date.now() - startedAt) / 1000;
+            if (d.state === 'transcribing') {
+              const pct = d.percent || 0;
+              let text = 'Transcribing… ' + pct + '% (' + fmt(elapsed) + ' elapsed';
+              if (pct >= 3) text += ', ~' + fmt(elapsed * (100 - pct) / pct) + ' left';
+              status.textContent = text + ')';
+              status.style.color = '';
+              bar.style.width = pct + '%';
+            } else {
+              status.textContent = (d.message || 'Queued…') + ' (' + fmt(elapsed) + ' elapsed)';
+              status.style.color = '';
+            }
+          })
+          .catch(() => {});  // transient network hiccups: keep polling
+      }, 2000);
+    };
+
+    btn.addEventListener('click', function () {
+      if (!confirm('Re-transcribe the media?\n\nThe text and subtitle cues will be replaced and all pages re-parsed (reading progress resets). The media file is kept.')) {
+        return;
+      }
+      btn.disabled = true;
+      startedAt = Date.now();
+      panel.style.display = 'block';
+      bar.style.width = '0%';
+      status.textContent = 'Starting…';
+      status.style.color = '';
+      fetch('/book/whisper/retranscribe/{{ book.id }}', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: new URLSearchParams({ whisper_model: modelSel.value })
+      })
+        .then(r => r.json().then(d => ({ ok: r.ok, d })))
+        .then(({ ok, d }) => {
+          if (!ok || !d.task_id) {
+            fail(d.error || 'Could not start the transcription.');
+            return;
+          }
+          poll(d.task_id);
+        })
+        .catch(() => fail('Network error.'));
+    });
+  })();
+</script>
+{% endif %}
 
 {# Fixed left panel for editing lyric timing + text line by line.
    Rows are built by book-edit-cues.js from the SRT text in #text;
@@ -155,7 +275,7 @@
     return tagify;
   };
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     var tagslist = document.getElementById('book_tags');
     var tags_tagify = setup_book_tags_tagify(tagslist);
 
@@ -173,6 +293,7 @@
       else if (t === 'bilibili') srcLabel = 'Bilibili video URL';
       else if (t === 'mp3') srcLabel = 'Audio file name';
       else if (t === 'netease') srcLabel = 'NetEase Cloud Music URL';
+      else if (t === 'video') srcLabel = 'Video file name / URL';
       $('#source_uri').closest('tr').find('td').first().text(srcLabel);
       // The text field holds the SRT subtitles for youtube / bilibili / mp3 / video books.
       $('#textRow').find('td').first().text(hasSubtitles ? 'Subtitle text (SRT, editable)' : 'Text');

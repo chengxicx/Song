@@ -54,6 +54,17 @@ body {
     --btn-accent: #007aff;
     --btn-accent-hover: #0071e3;
 
+    /* Form-control colours.  These are the light, no-theme defaults; the
+       Default / Default-Light themes supply their own values.  Themes
+       that don't define them keep their own field rules -- those load
+       after this file at equal specificity and still win. */
+    --input-bg: #fff;                          /* text fields / textareas */
+    --input-fg: #000;
+    --tagify-bg: transparent;                  /* Tagify fields (Parents/Tags) */
+    --input-placeholder-color: #D8D8D8;
+    --input-placeholder-color-focus: rgba(0, 0, 0, 0.25);
+    --status-ign-bg: var(--background-color);  /* Ign (⊘) status button fill */
+
     background-color: var(--background-color);
     color: var(--font-color);
 
@@ -611,6 +622,32 @@ div.toolbar {
     color: #212529;
 }
 
+/* On the reading screen the notice sits above the reading pane, and the
+   dictionary pane (#read_pane_right) is fixed over the right half of the
+   viewport -- so it painted over the notice's right half.  With a long
+   book title the tail of the message ("re-imported: the manga pages were
+   replaced.") was hidden behind the pane.  Lift the notice above it: the
+   pane has z-index: auto on desktop, while the narrow-screen bottom
+   sheet keeps its 1003, so an opened sheet still wins. */
+body:has(#read_pane_container) .flash-notice {
+    position: relative;
+    z-index: 2;
+}
+
+/* Narrow screens stack differently: #reading-header is fixed at the top of
+   the viewport (4rem tall, z-index 1001), and only #read_pane_left is
+   shifted below it -- the notice, which lives outside that container, ends
+   up underneath it.  Measured at 420x800: the notice's text line sat at
+   y 51-69 with the header's bottom edge at 64, so the top of the message
+   was painted over.  Keep the notice above the header (1001) and below the
+   dictionary sheet (1003) and the side menu (1004); tooltips (1002) tie
+   and win on DOM order, which is what we want for an interactive popup. */
+@media screen and (max-width: 980px) {
+    body:has(#read_pane_container) .flash-notice {
+        z-index: 1002;
+    }
+}
+
 .flash-notice-narrow {
     margin-top: 2px;
     padding: 2px;
@@ -713,11 +750,16 @@ div#read_pane_right {
     font-variant-numeric: tabular-nums;
 }
 
-/* Sub-page mode: the label is clickable (percentage <-> sub-screen
-   count) and hovering previews the parent-page position. */
+/* Sub-page mode: the label is clickable -- it toggles between the
+   sub-screen count "n/m" (default) and the whole-book percentage.  The
+   feedback is CSS-only on purpose: a JS hover preview used to rewrite the
+   label itself, which made it flicker under the cursor. */
 #page_indicator.subpage-mode {
-    cursor: pointer;
     color: var(--read-slider-color, #79b7e7);
+    cursor: pointer;
+    /* A toggle, not text to be selected (a double click would otherwise
+       highlight the count). */
+    user-select: none;
     transition: opacity 0.15s ease;
 }
 
@@ -2411,6 +2453,24 @@ div.code pre {
     box-sizing: border-box;
 }
 
+/* Field colours.  Deliberately TYPE selectors, NOT folded into the #id
+   rule above: legacy themes (Dark_slate / Dusk / Night / Apple_Books)
+   style input[type="text"] / textarea and load after this file, so at
+   equal specificity they keep winning and their look is untouched.
+   `select` is here because the language / dictionary pickers are fields
+   too and would otherwise stay UA-white on a dark page; every select the
+   themes care about is painted by a higher-specificity rule of their own
+   (#defaultLanguageSelect, .dt-length select, #dict-select:hover, ...).
+   input[type="search"] is excluded on purpose -- that is DataTables'
+   search box, which the themes style themselves. */
+input[type="text"],
+input[type="url"],
+textarea,
+select {
+    background-color: var(--input-bg, #fff);
+    color: var(--input-fg, #000);
+}
+
 /* GENERAL FORM STYLES */
 input,
 select,
@@ -2454,7 +2514,7 @@ form input[type="file"]:focus {
 ::placeholder {
     font-family: inherit;
     font-size: 0.8rem;
-    color: #D8D8D8;
+    color: var(--input-placeholder-color, #D8D8D8);
     opacity: 0.7;
 }
 
@@ -2552,6 +2612,42 @@ button.btn-danger, button.btn-danger:link, button.btn-danger:visited {
     font-size: 0.75rem;
     font-weight: 600;
     padding: 0.18rem 0.8rem;
+}
+
+/* "Tool chips": reading-frame shortcuts rendered INSIDE the term form
+   (Grammar analysis, Sentence translation).  They navigate a pane or open
+   a lookup -- they never submit the form -- so they must not borrow the
+   blue Save/Cancel action language (that is why Grammar used to look like
+   a stranded Cancel button).  Instead the label stays in the ordinary
+   text colour (readable in every theme), and a soft hue wash plus a
+   matching glyph identify the tool: indigo = Grammar, teal = Sentence.
+   The translucent washes adapt to both the light and dark themes. */
+.btn.btn-tool,
+.btn.btn-tool:link,
+.btn.btn-tool:visited {
+    --tool-hue: var(--btn-accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: color-mix(in srgb, var(--tool-hue) 14%, transparent);
+    border-color: color-mix(in srgb, var(--tool-hue) 42%, transparent);
+    /* Beats the global button.btn color:#fff !important rule above. */
+    color: var(--font-color) !important;
+}
+.btn.btn-tool:hover {
+    background: color-mix(in srgb, var(--tool-hue) 22%, transparent);
+    border-color: color-mix(in srgb, var(--tool-hue) 62%, transparent);
+    color: var(--font-color) !important;
+}
+.btn.btn-tool .btn-tool__icon {
+    color: var(--tool-hue);
+    flex: none;
+}
+.btn.btn-tool--grammar {
+    --tool-hue: #7c74f0;
+}
+.btn.btn-tool--sentence {
+    --tool-hue: #1fb3a3;
 }
 
 /* Buttons laid out in a horizontal row at the bottom of edit forms. */
@@ -3201,7 +3297,7 @@ input[type="checkbox"][disabled] + label {
 }
 
 #status label[for="status-6"] {
-    background-color: var(--background-color);
+    background-color: var(--status-ign-bg, var(--background-color));
 
     border-radius: var(--form-border-radius);
 
@@ -4797,10 +4893,20 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     border-radius: 8px;
     background-color: var(--g-card);
     transition: border-color 0.12s ease, background-color 0.12s ease;
+    /* Keep the auto-scrolled card clear of the sticky level header. */
+    scroll-margin-top: 42px;
 }
 .grammar-item:hover {
     border-color: var(--g-accent-line);
     background-color: color-mix(in srgb, var(--g-accent-soft) 40%, var(--g-card));
+}
+/* The card the term form's Grammar button jumped to.  Persists until the
+   reader hovers another card, opens another word, or closes the panel --
+   hence a class rather than :hover. */
+.grammar-item--active {
+    border-color: var(--g-accent-line);
+    background-color: color-mix(in srgb, var(--g-accent-soft) 40%, var(--g-card));
+    box-shadow: 0 0 0 2px var(--g-accent-line);
 }
 
 .grammar-item__head {
@@ -4847,13 +4953,58 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     transform: rotate(90deg);
 }
 .grammar-item--collapsed .grammar-item__desc,
-.grammar-item--collapsed .grammar-item__examples {
+.grammar-item--collapsed .grammar-item__examples,
+.grammar-item--collapsed .grammar-item__more {
     display: none;
 }
 
 .grammar-item__desc {
     margin-top: 4px;
     font-size: 0.98em;
+    color: var(--g-text-2);
+}
+
+/* Formation line ("Ichidan: drop る, add られる…") between the head and
+   the desc, styled as a quiet chip so it reads as metadata. */
+.grammar-item__formation {
+    margin-top: 6px;
+    font-size: 0.86em;
+    line-height: 1.45;
+    color: var(--g-text-2);
+    background: color-mix(in srgb, var(--font-color, #000) 4%, transparent);
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+/* Folded reference block: curated example + translation, then notes. */
+.grammar-item__more {
+    margin-top: 8px;
+}
+.grammar-item__more summary {
+    cursor: pointer;
+    font-size: 0.86em;
+    font-weight: 600;
+    color: var(--g-accent);
+    user-select: none;
+    list-style-position: inside;
+}
+.grammar-item__refex {
+    margin-top: 8px;
+    font-size: 0.94em;
+    line-height: 1.5;
+    padding: 6px 10px;
+    background: color-mix(in srgb, var(--font-color, #000) 3%, transparent);
+    border-radius: 6px;
+}
+.grammar-item__reftr {
+    margin-top: 2px;
+    font-size: 0.9em;
+    color: var(--g-text-2);
+}
+.grammar-item__notes {
+    margin-top: 8px;
+    font-size: 0.9em;
+    line-height: 1.5;
     color: var(--g-text-2);
 }
 
@@ -4928,3 +5079,337 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     padding: 0 1px;
     box-shadow: inset 0 0 0 1px rgba(255, 214, 90, 0.45);
 }
+
+/* ==============================================================
+   Shadowing (影子跟读): the player's "Shadow" toggle opens the
+   right-pane practice area.  Verdict marks on the reading text are
+   underline-only (the words' learning-status background colours
+   stay untouched).
+   ============================================================== */
+/* Verdict marks on the reading text: underline / border only.  Also
+   painted on non-word textitems (e.g. "100%" on a page whose word
+   characters exclude digits). */
+span.word.shadow-ok,
+span.textitem.shadow-ok {
+    border-bottom: 2px solid rgba(55, 178, 77, 0.75);
+}
+span.word.shadow-fuzzy,
+span.textitem.shadow-fuzzy {
+    border-bottom: 2px dashed rgba(240, 140, 0, 0.85);
+}
+span.word.shadow-miss,
+span.textitem.shadow-miss {
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: rgba(224, 49, 49, 0.8);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+}
+
+/* The practice area fills #read_pane_right like the grammar panel. */
+#read_pane_right.shadowing-mode > .wordframecontainer,
+#read_pane_right.shadowing-mode > .dictcontainer {
+    display: none !important;
+}
+
+.shadowing-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background-color, #fff);
+    color: var(--font-color, #000);
+    overflow: hidden;
+    font: 100%/1.4 "Lucida Grande", Arial, sans-serif, STHeiti,
+        "Arial Unicode MS", MingLiu;
+    font-size: 14px;
+    --s-rule: color-mix(in srgb, var(--font-color, #000) 16%, transparent);
+    --s-card: color-mix(in srgb, var(--font-color, #000) 4%, transparent);
+    --s-text-2: color-mix(in srgb, var(--font-color, #000) 64%, transparent);
+}
+.shadowing-panel__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--s-rule);
+}
+.shadowing-panel__title {
+    flex: 1;
+    font-size: 1.12em;
+    font-weight: 700;
+}
+.shadowing-auto-btn {
+    font: inherit;
+    font-size: 0.8em;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--s-text-2);
+    background: var(--s-card);
+    border: 1px solid var(--s-rule);
+    border-radius: 999px;
+    padding: 3px 10px;
+}
+.shadowing-auto-btn.on {
+    color: #fff;
+    background: var(--btn-accent, #007aff);
+    border-color: var(--btn-accent, #007aff);
+}
+.shadowing-panel__close {
+    border: none;
+    background: transparent;
+    color: var(--font-color, #000);
+    font-size: 1.5em;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 3px;
+    opacity: 0.55;
+    border-radius: 4px;
+}
+.shadowing-panel__close:hover {
+    opacity: 1;
+}
+.shadowing-panel__body {
+    overflow-y: auto;
+    padding: 12px 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.shadowing-panel__state {
+    padding: 18px 12px;
+    text-align: center;
+    color: var(--s-text-2);
+    font-size: 0.95em;
+}
+.shadowing-panel__error {
+    color: #e03131;
+}
+
+/* The sentence under practice, large, tokens colored by verdict. */
+.shadowing-current {
+    font-size: 1.5em;
+    line-height: 1.9;
+    word-break: break-word;
+    padding: 10px 12px;
+    background: var(--s-card);
+    border: 1px solid var(--s-rule);
+    border-radius: 10px;
+    min-height: 3.2em;
+}
+.shadow-tok {
+    border-radius: 4px;
+    padding: 0 1px;
+}
+.shadow-tok.shadow-ok {
+    border-bottom: 2px solid rgba(55, 178, 77, 0.75);
+}
+.shadow-tok.shadow-fuzzy {
+    border-bottom: 2px dashed rgba(240, 140, 0, 0.85);
+}
+.shadow-tok.shadow-miss {
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: rgba(224, 49, 49, 0.8);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 5px;
+}
+.shadow-tok__heard {
+    color: var(--s-text-2);
+    font-size: 0.72em;
+    margin-left: 2px;
+}
+/* Every word in the panel is a click-to-hear button: the reading (when
+   the language has one) rides above the word as ruby furigana. */
+.shadow-tok,
+.shadow-heard-tok {
+    cursor: pointer;
+}
+.shadow-heard-tok {
+    border-radius: 4px;
+    padding: 0 1px;
+}
+.shadow-tok rt,
+.shadow-heard-tok rt {
+    font-size: 0.5em;
+    line-height: 1.15;
+    font-weight: 400;
+    color: var(--s-text-2);
+}
+.shadow-tok:hover,
+.shadow-heard-tok:hover {
+    background: rgba(127, 127, 127, 0.16);
+}
+
+.shadowing-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+}
+.shadowing-nav-btn {
+    font: inherit;
+    cursor: pointer;
+    color: var(--font-color, #000);
+    background: var(--s-card);
+    border: 1px solid var(--s-rule);
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.shadowing-nav-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+.shadowing-nav-btn:hover {
+    border-color: var(--btn-accent, #007aff);
+    color: var(--btn-accent, #007aff);
+}
+.shadowing-rec-btn {
+    font: inherit;
+    cursor: pointer;
+    color: #fff;
+    background: #e03131;
+    border: none;
+    border-radius: 50%;
+    width: 58px;
+    height: 58px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.shadowing-rec-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+.shadowing-rec-btn:hover {
+    filter: brightness(1.08);
+}
+.shadowing-rec-btn.recording {
+    animation: shadowing-pulse 1.1s ease-in-out infinite;
+}
+.shadowing-rec-time {
+    font-size: 0.55em;
+    font-weight: 700;
+    line-height: 1;
+    min-height: 1em;
+}
+@keyframes shadowing-pulse {
+    50% { transform: scale(1.08); }
+}
+
+.shadowing-result {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.shadowing-result__hint {
+    text-align: center;
+    color: var(--s-text-2);
+    font-size: 0.92em;
+    padding: 6px 0;
+}
+.shadowing-score {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+.shadowing-score__value {
+    font-size: 1.6em;
+    font-weight: 700;
+}
+.shadowing-score__rate {
+    color: var(--s-text-2);
+    font-size: 0.9em;
+}
+.shadowing-score__engine {
+    color: var(--s-text-3, var(--s-text-2));
+    font-size: 0.8em;
+    border: 1px solid var(--s-rule);
+    border-radius: 4px;
+    padding: 0 5px;
+}
+.shadowing-heard {
+    background: var(--s-card);
+    border: 1px solid var(--s-rule);
+    border-radius: 8px;
+    padding: 8px 10px;
+    /* Scaled up from the plain body size: this box is the "what did I
+       actually say" reference, its kanji and furigana must be legible
+       at a glance. */
+    font-size: 1.3em;
+    /* Roomy enough for the furigana row above each word. */
+    line-height: 2.1;
+    word-break: break-word;
+}
+.shadowing-heard::before {
+    content: "Heard";
+    display: block;
+    font-size: 0.72em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--s-text-2);
+    margin-bottom: 3px;
+}
+.shadowing-extras {
+    font-size: 0.92em;
+    color: var(--s-text-2);
+}
+.shadowing-extras__label {
+    font-size: 0.78em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-right: 4px;
+}
+
+.shadowing-history {
+    border-top: 1px solid var(--s-rule);
+    padding-top: 8px;
+}
+.shadowing-history__head {
+    font-size: 0.78em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--s-text-2);
+    margin-bottom: 6px;
+}
+.shadowing-history__empty {
+    color: var(--s-text-2);
+    font-size: 0.88em;
+    text-align: center;
+    padding: 4px 0;
+}
+.shadowing-history__row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 3px 0;
+    font-size: 0.92em;
+}
+.shadowing-history__score {
+    font-weight: 700;
+    min-width: 3.2em;
+}
+.shadowing-history__text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.shadowing-history__rate {
+    color: var(--s-text-2);
+    font-size: 0.88em;
+}
+
+

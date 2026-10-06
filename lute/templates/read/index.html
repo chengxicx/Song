@@ -38,6 +38,7 @@
 <script type="text/javascript" src="{{ vstatic('js/tts-translate.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/tts-player.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/tts-ui.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/lute-shadowing.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/player-dock.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
@@ -372,9 +373,11 @@
 
   let _lute_form_event_handler = function(event) {
     if (event.data.event === "LuteTermFormOpened") {
-      // A grammar-analysis view may be filling the right pane; clicking a
-      // word restores the pane to its default term-form + dictionary state.
+      // A grammar-analysis or shadowing view may be filling the right
+      // pane; clicking a word restores the pane to its default
+      // term-form + dictionary state.
       if (window.closeGrammarAnalysis) window.closeGrammarAnalysis();
+      if (window.closeShadowingPanel) window.closeShadowingPanel();
       LookupButton.TERM_FORM_CONTAINER = wordFrame.contentDocument.getElementById("term-form-container");
       loadDictionaries();
     }
@@ -384,7 +387,29 @@
     // hidden), so closing the analysis -- or clicking a word -- brings it
     // straight back.
     if (event.data.event === "LuteTermFormGrammarRequested") {
-      if (typeof open_grammar_analysis === "function") open_grammar_analysis();
+      if (typeof open_grammar_analysis === "function") {
+        // Claim the current sub-screen for the panel first: the request
+        // arrives with the pane about to be shown for a screen that
+        // _renderScreen() may re-evaluate, and a plain re-open (no opts)
+        // would drop the jump the reader just asked for.
+        window.__grammarPaneKey =
+          parseInt($("#page_num").val(), 10) + ":" + curScreen;
+        // selectTarget: jump to the grammar of the sentence the term being
+        // edited lives in, and pin its highlight.
+        open_grammar_analysis({ selectTarget: true });
+      }
+    }
+
+    // The term form's "Sentence" button toggles sentence lookup: first
+    // click opens the sentence dictionaries as tabs in the bottom
+    // dictionary frame (same lookup as the "translate sentence" hotkey,
+    // no cycling), a second click restores the term dictionaries -- the
+    // exact tab that was active before Sentence was pressed.
+    if (event.data.event === "LuteTermFormSentenceRequested") {
+      if (LookupButton.sentenceMode && typeof restoreTermLookupButtons === "function")
+        restoreTermLookupButtons();
+      else if (typeof handle_translate === "function")
+        handle_translate("sentence-id");
     }
 
     if (event.data.event === "LuteTermFormOpened" && mediaTablet.matches) {
@@ -492,7 +517,7 @@
     }
   });
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
       if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
     });
@@ -528,59 +553,68 @@
     goto_relative_page(0, true);
   });
 
-  // Set the page nav indicator.  Books using fit-to-screen sub-pagination
-  // (see subScreens below) replace the bare parent-page "x/y" with the
-  // reader's preferred display: the whole-book percentage refined by the
-  // sub-screen position (default), or the sub-screen count "n/m" after a
-  // click on the label.  Hovering always reveals the underlying parent
-  // "x/y"; books without sub-screens keep the plain "x/y".
+  // ---- Page nav indicator -------------------------------------------
+  // Books using fit-to-screen sub-pagination (see subScreens below) show
+  // the sub-screen count "n/m" by default; clicking the label switches it
+  // to the whole-book percentage, refined by the sub-screen position, and
+  // a second click switches back (the choice is remembered in
+  // localStorage).  The label is deliberately never rewritten on hover:
+  // the old mouseenter/mouseleave preview made it flicker under the
+  // cursor, which is why it was dropped in a76ed1ab.  Books without
+  // sub-screens keep the plain parent "x/y".
   let _bookHasSubscreens = false;
-  let _indicatorHovered = false;
+  const PAGE_INDICATOR_MODE_KEY = 'readPageIndicatorMode';
+
+  // Only "percent" is ever stored.  Anything else -- no key at all, or
+  // the legacy 'subpage' value written by the removed hover/click version
+  // -- means the default sub-screen count.
+  let _indicator_shows_percent = function() {
+    return localStorage.getItem(PAGE_INDICATOR_MODE_KEY) === 'percent';
+  };
+
+  // The label's text.  `preview`, when given, is a page the reader is
+  // scrubbing to with the slider: its sub-screens aren't known yet, so a
+  // preview always reads as the parent "x/y".
+  //
+  // The sub-screen count is only meaningful while the current page really
+  // is split into more than one screen.  _bookHasSubscreens is sticky for
+  // the whole session (set by the first page that split), so it must not
+  // be the only gate: a later page that fits in a single screen would
+  // label itself "1/1", which reads as "page 1 of 1".
+  let _page_indicator_text = function(pagenum, maxpage, preview) {
+    if (preview || !_bookHasSubscreens) return `${pagenum}/${maxpage}`;
+    const pageFrac =
+      subScreens.length > 1 ? (curScreen + 1) / subScreens.length : 1;
+    if (_indicator_shows_percent()) {
+      // Whole-book progress with sub-screen granularity; a page that fits
+      // in a single screen counts as one whole page step.
+      const pct = Math.round((((pagenum - 1) + pageFrac) / maxpage) * 100);
+      return `${Math.min(pct, 100)}%`;
+    }
+    return subScreens.length > 1
+      ? `${curScreen + 1}/${subScreens.length}`
+      : `${pagenum}/${maxpage}`;
+  };
 
   let set_page_fraction = function() {
     const pagenum = parseInt($('#page_num').val());
     const maxpage = parseInt($('#page_count').val());
     const el = $('#page_indicator');
-    const inSubMode = _bookHasSubscreens && subScreens.length > 0;
-    el.toggleClass('subpage-mode', inSubMode);
-    if (!inSubMode || _indicatorHovered) {
-      el.text(`${pagenum}/${maxpage}`);
-      return;
-    }
-    if (localStorage.getItem('readPageIndicatorMode') === 'subpage') {
-      el.text(`${curScreen + 1}/${subScreens.length}`);
-      return;
-    }
-    // Whole-book progress with sub-screen granularity; a page that fits
-    // in a single screen counts as one whole page step.
-    const pageFrac = subScreens.length > 1 ? (curScreen + 1) / subScreens.length : 1;
-    el.text(`${Math.min(Math.round(((pagenum - 1) + pageFrac) / maxpage * 100), 100)}%`);
+    // The class gates the pointer cursor and the hover feedback in
+    // styles.css, so it follows the book rather than the current page:
+    // the toggle stays available on a page that fits in a single screen.
+    el.toggleClass('subpage-mode', _bookHasSubscreens);
+    el.text(_page_indicator_text(pagenum, maxpage));
   };
 
-  // Hover previews the parent-page position, click toggles the preferred
-  // display between percentage and sub-screen count.  Both only act in
-  // sub-page mode (the subpage-mode class also gates the pointer cursor).
-  $('#page_indicator')
-    .on('mouseenter', function() {
-      _indicatorHovered = true;
-      set_page_fraction();
-    })
-    .on('mouseleave', function() {
-      _indicatorHovered = false;
-      set_page_fraction();
-    })
-    .on('click', function() {
-      if (!_bookHasSubscreens || subScreens.length === 0) return;
-      const next =
-        localStorage.getItem('readPageIndicatorMode') === 'subpage'
-          ? 'percent'
-          : 'subpage';
-      localStorage.setItem('readPageIndicatorMode', next);
-      // The click always happens while hovered; clear the hover preview so
-      // the newly selected display shows up immediately.
-      _indicatorHovered = false;
-      set_page_fraction();
-    });
+  $('#page_indicator').on('click', function() {
+    if (!_bookHasSubscreens) return;
+    localStorage.setItem(
+      PAGE_INDICATOR_MODE_KEY,
+      _indicator_shows_percent() ? 'subpage' : 'percent'
+    );
+    set_page_fraction();
+  });
 
   // Enable page nav links, depending on page num.
   let enable_page_nav_links = function() {
@@ -648,7 +682,8 @@
     readSlider.style.backgroundSize = `${frac * 100}% 100%`;
     const p = Math.round(Number(readSlider.value)) + 1 - pagenum;
     const actualPage = getActualPage(p);
-    document.getElementById("page_indicator").textContent = `${actualPage}/${maxpage}`;
+    document.getElementById("page_indicator").textContent =
+      _page_indicator_text(actualPage, maxpage, true);
   })
 
   readSlider.addEventListener("change", function() {
@@ -747,6 +782,14 @@
   // status updates (see lute.js post_bulk_update).
   function _finishPageSwap(actualPage, initial) {
     luteStartReadingDone = true;
+    // The swapped-in content replaces the page the existing sub-screen
+    // groups were measured on, and curScreen indexes into them: drop both
+    // before touching the UI, or the indicator (and the side arrows) are
+    // computed from the *previous* page's split for a frame -- the reader
+    // sees the old page's "n/m" flash before the rAF below rebuilds the
+    // groups for this page.
+    subScreens = [];
+    curScreen = 0;
     add_status_classes();
     start_hover_mode();
     $('#page_num').val(actualPage);
@@ -781,6 +824,12 @@
     // visibly jump on every term-save.  No-op when sentence buttons are off.
     if (typeof window.luteInjectSentenceButtons === "function") {
       window.luteInjectSentenceButtons();
+    }
+
+    // Shadowing practice: if the mode is active, re-resolve the current
+    // sentence on the swapped-in text (see lute-shadowing.js).
+    if (typeof window.luteShadowingAfterSwap === "function") {
+      window.luteShadowingAfterSwap();
     }
 
     // Page navigation (goto_relative_page).
@@ -1483,6 +1532,55 @@
     })
   }
 
+</script>
+
+{# Flash notices (e.g. '"X" re-imported: the manga pages were replaced.')
+   report the action that just finished, not the reading session.  The
+   reading pane is a fixed 100vh box, so a notice left in the flow sits
+   above it and every page turn scrolls back to the top and puts it back
+   on screen: it reads as the same notice on every page.  Show it once --
+   drop it on the first page turn (or after a few seconds, if the reader
+   just reads), and let a click dismiss it.  Removing it also removes the
+   document's scrollbar, so the reader is a clean 100vh again. #}
+<script>
+  (function () {
+    const notices = Array.from(document.querySelectorAll(".flash-notice"));
+    if (!notices.length) return;
+
+    let dismissed = false;
+    function dismiss_flash_notices() {
+      if (dismissed) return;
+      dismissed = true;
+      notices.forEach(function (el) {
+        el.style.transition = "opacity .4s";
+        el.style.opacity = "0";
+        setTimeout(function () { el.remove(); }, 450);
+      });
+    }
+
+    notices.forEach(function (el) {
+      el.style.cursor = "pointer";
+      el.title = "Dismiss";
+      el.addEventListener("click", dismiss_flash_notices);
+    });
+
+    // Backstop for a reader who reads the first page without touching
+    // anything.
+    setTimeout(dismiss_flash_notices, 6000);
+
+    // #thetext is swapped by the reader's own initial load as well as by
+    // every page turn; the notice belongs to the page it arrived with, so
+    // skip that first swap and go on the next one.
+    let seen_initial_swap = false;
+    document.body.addEventListener("htmx:afterSwap", function (e) {
+      if (!e.target || e.target.id !== "thetext") return;
+      if (!seen_initial_swap) {
+        seen_initial_swap = true;
+        return;
+      }
+      dismiss_flash_notices();
+    });
+  })();
 </script>
 
 {% endblock %}

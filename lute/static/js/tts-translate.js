@@ -173,10 +173,24 @@
       if (formState === _lastFormState) return;
       _lastFormState = formState;
 
-      // Speak the word (only from the top/main frame)
-      var isTopFrame = (window === window.top);
-      if (isTopFrame && SETTINGS.clickPronunciation && globalCache.lastWord !== word) {
-        speakText(word);
+      // Speak the word.  The instance that found the form speaks it --
+      // in the reading screen that is the wordframe (the top page has
+      // no #text input), so an "only from the top frame" guard would
+      // leave the utterance dead.  Both script instances (top page +
+      // wordframe) share globalCache via window.top.__LUTE_TTS_CACHE__,
+      // so lastWord keeps them from speaking twice.  The utterance
+      // prefers the term's annotated reading (#romanization field)
+      // when it is kana.
+      if (SETTINGS.clickPronunciation && globalCache.lastWord !== word) {
+        var readingInput =
+          doc.getElementById("romanization") ||
+          doc.querySelector('input[name="romanization"]');
+        var reading = readingInput ? readingInput.value : "";
+        if (typeof window.luteTtsSpeakTerm === "function") {
+          window.luteTtsSpeakTerm(word, reading);
+        } else {
+          speakText(word);
+        }
         globalCache.lastWord = word;
       }
 

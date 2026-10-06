@@ -24,6 +24,10 @@
 {% if term.language_id is none %}
 
   <script>
+    // Lute globals (LookupButton, createLookupButtons) come from deferred
+    // scripts, which run before DOMContentLoaded -- this must not touch
+    // them at parse time.
+    document.addEventListener('DOMContentLoaded', function () {
     const dictTabsContainer = document.getElementById("dicttabs");
     const loadDictsBtn = document.getElementById("load-dicts-btn");
     const langSelect = document.getElementById("language_id");
@@ -59,19 +63,22 @@
 
       old_term = termField.value;
       old_langid = selected_lang_id;
-      
+
     })
+    });
   </script>
 
 {% else %}
 
   <script>
+    document.addEventListener('DOMContentLoaded', function () {
     const ALL_DICTS = {{ language_dicts | safe }};
     LookupButton.TERM_FORM_CONTAINER = document.getElementById("term-form-container");
     LookupButton.LANG_ID = $('#language_id').val();
     LookupButton.TERM_DICTS = ALL_DICTS[LookupButton.LANG_ID].term;
     createLookupButtons();
     loadDictionaries();
+    });
   </script>
 
 {% endif %}

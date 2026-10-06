@@ -14,17 +14,40 @@ from flask import (
 from wtforms import BooleanField
 from lute.models.language import Language
 from lute.models.setting import UserSetting
-from lute.models.repositories import UserSettingRepository
+from lute.models.repositories import (
+    MissingUserSettingKeyException,
+    UserSettingRepository,
+)
 from lute.themes.service import Service as ThemeService
 from lute.settings.forms import UserSettingsForm, UserShortcutsForm
 from lute.settings.current import refresh_global_settings
 from lute.settings.hotkey_data import categorized_hotkeys, hotkey_descriptions
 from lute.db import db
+from lute.multiuser.permissions import (
+    admin_only_if_multiuser_json,
+    is_admin_request,
+)
 from lute.parse.mecab_parser import JapaneseParser
 from lute.parse.sudachi_parser import JapaneseSudachiParser
 
 
 bp = Blueprint("settings", __name__, url_prefix="/settings")
+
+
+# Settings that describe the server rather than the user: the MeCab
+# library path, and the Sudachi dictionary/split mode (the packages
+# they name are pip-installed into the server's venv).  In multi-user
+# mode only an admin changes these; in single-user mode everyone does.
+#
+# The form keeps the fields either way, so validation and rendering are
+# unchanged -- non-admins just don't see the rows (see
+# templates/settings/form.html).  The write loop below must skip these
+# keys, because a hidden field is absent from the POST and WTForms would
+# then write the field default over the stored value (None for
+# mecab_path, "core"/"C" for the sudachi fields).
+SERVER_LEVEL_KEYS = frozenset(
+    {"mecab_path", "japanese_sudachi_dict", "japanese_sudachi_mode"}
+)
 
 
 @bp.route("/index", methods=["GET", "POST"])
@@ -46,12 +69,19 @@ def edit_settings():
     repo = UserSettingRepository(db.session)
     if form.validate_on_submit():
         # Update the settings in the database
+        can_edit_server = is_admin_request()
         for field in form:
-            if field.id not in ("csrf_token", "submit"):
-                val = field.data
-                if isinstance(field, BooleanField):
-                    val = "1" if val else "0"
-                repo.set_value(field.id, val)
+            if field.id in ("csrf_token", "submit"):
+                continue
+            if field.id in SERVER_LEVEL_KEYS and not can_edit_server:
+                # Not rendered for this user, so the POST carries no
+                # value; writing it now would store the WTForms default
+                # (None / "core" / "C") over the real one.
+                continue
+            val = field.data
+            if isinstance(field, BooleanField):
+                val = "1" if val else "0"
+            repo.set_value(field.id, val)
         db.session.commit()
         refresh_global_settings(db.session)
 
@@ -78,6 +108,7 @@ def edit_settings():
 
 
 @bp.route("/test_mecab", methods=["GET"])
+@admin_only_if_multiuser_json
 def test_parse():
     """
     Do a test parse for the JapaneseParser using the
@@ -110,6 +141,7 @@ def test_parse():
 
 
 @bp.route("/test_sudachi", methods=["GET"])
+@admin_only_if_multiuser_json
 def test_sudachi():
     """
     Do a test parse for the JapaneseSudachiParser using the
@@ -138,8 +170,29 @@ def test_sudachi():
 @bp.route("/set/<key>/<value>", methods=["POST"])
 def set_key_value(key, value):
     "Set a UserSetting key to value."
+    if key in SERVER_LEVEL_KEYS and not is_admin_request():
+        # Not reachable from the UI for a non-admin, but the endpoint
+        # takes an arbitrary key, so it is a direct-URL bypass of the
+        # settings form.  Refuse it with the same JSON shape the
+        # endpoint already uses.
+        return (
+            jsonify(
+                {
+                    "result": "failure",
+                    "message": f"Only an admin can change '{key}'.",
+                }
+            ),
+            403,
+        )
     repo = UserSettingRepository(db.session)
-    old_value = repo.get_value(key)
+    try:
+        old_value = repo.get_value(key)
+    except MissingUserSettingKeyException:
+        # Unknown key: a client built against a different version is
+        # posting a setting this build does not define (e.g. a stale
+        # cached page).  Answer with a plain failure rather than letting
+        # the lookup raise a 500.
+        return jsonify({"result": "failure", "message": f"Unknown setting: {key}"}), 404
     try:
         repo.set_value(key, value)
         result = {"result": "success", "message": "OK"}
@@ -171,10 +224,14 @@ def edit_shortcuts():
     repo = UserSettingRepository(db.session)
     form = UserShortcutsForm()
     if form.validate_on_submit():
-        # print(request.form, flush=True)
-        # Update the settings in the database
+        # Only hotkey keys.  This endpoint writes request.form verbatim,
+        # and UserShortcutsForm has no fields of its own, so without the
+        # filter any extra field in the POST (mecab_path, ...) would be
+        # written to the settings table.
+        hotkey_keys = {k for keylist in categorized_hotkeys().values() for k in keylist}
         for k, v in request.form.items():
-            # print(f"{k} = {v}", flush=True)
+            if k not in hotkey_keys:
+                continue
             repo.set_value(k, v)
         db.session.commit()
         refresh_global_settings(db.session)
