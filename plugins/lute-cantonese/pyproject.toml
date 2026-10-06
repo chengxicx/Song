@@ -9,7 +9,7 @@ name = "lute_cantonese_parser"
 name = "lute3-cantonese"
 dynamic = ['version']
 description = "Learning Using Texts - Cantonese Parser"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
   {name = "chengxicn"}
 ]
