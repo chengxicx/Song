@@ -850,6 +850,18 @@ def when_press_space_in_review(luteclient):
     luteclient.page.keyboard.press("Space")
 
 
+@when("I click on the review card")
+def when_click_review_card(luteclient):
+    """
+    A click on the card itself, which reveals nothing.
+
+    The card header is inert markup, so this exercises the page's
+    first-gesture path (an owed pronunciation is released) without
+    touching the reveal button the space key would hit.
+    """
+    luteclient.page.click("#review_card .rv-card-head")
+
+
 @when("I turn off the card pronunciation in the review settings")
 def when_turn_off_card_pronunciation(luteclient):
     luteclient.set_review_speak_cards(False)
@@ -863,6 +875,17 @@ def then_term_spoken_as(luteclient, text, lang):
     assert spoken == [{"text": text, "lang": lang}], (
         f"expected one utterance of {text!r} as {lang}, got {spoken}; "
         f"page state: {luteclient.review_speak_state()}"
+    )
+
+
+@then(parsers.parse('the review session spoke the sentence "{text}"'))
+def then_review_spoke_sentence(luteclient, text):
+    # Exactly one utterance, and it is the model sentence: the shadowing
+    # card's audio is the sentence, not the term.
+    spoken = luteclient.review_spoken()
+    assert [u["text"] for u in spoken] == [text], (
+        f"expected the model sentence {text!r} and nothing else, got "
+        f"{spoken}; page state: {luteclient.review_speak_state()}"
     )
 
 

@@ -17,11 +17,13 @@
  * Keyboard: Space/Enter reveals, 1-2 grade, Enter checks a typed
  * answer, Space/Enter moves on after a typed check.
  *
- * Cards are pronounced: the term is spoken whenever it is on screen --
- * when a recognition card opens (its front IS the term) and when a
- * cloze card's answer is revealed -- and the card carries a 🔊 button
- * to hear it again.  A shadowing card plays its sentence when it
- * opens (that is the model audio) and speaks the term at reveal.
+ * Cards are pronounced at the answer: the term is spoken when a card
+ * is revealed -- recognition, cloze and recall alike -- so the front
+ * is never read out before the user has had a chance to recall it.
+ * The card carries a 🔊 button on the front and on the answer to hear
+ * the term on demand.  A shadowing card is the one exception: it plays
+ * its sentence when it opens, because that IS the model audio to
+ * shadow, and it speaks the term at reveal too.
  * Each card is spoken in its own term's language (c["lang_code"]),
  * because one queue holds the terms of every language the user
  * studies; tts.js supplies the voice and the /tts/ fallback.  The
@@ -152,12 +154,13 @@ window.LuteReview = (function () {
     }
   }
 
-  // What pronouncing "the card" means, per type: recognition says the
-  // term, shadowing plays the sentence to shadow, cloze is only spoken
-  // at reveal (its front would give the answer away).
-  function card_speaker(c) {
+  // What a card says when it OPENS.  Only shadowing: its model audio is
+  // the sentence to shadow, and hearing it is the exercise.  Every other
+  // type stays silent until the answer is on screen (see
+  // auto_speak_term), so a recognition card is not read aloud before the
+  // user has had a chance to recall it.
+  function open_speaker(c) {
     if (!c) return null;
-    if (c.card_type === "recognition") return () => speak_term(c);
     if (c.card_type === "shadowing") return () => speak_sentence(c);
     return null;
   }
@@ -171,20 +174,21 @@ window.LuteReview = (function () {
     return window.luteTtsSetting("review_speak_cards", true) !== false;
   }
 
-  // Automatic pronunciation, as the settings allow.
+  // Automatic pronunciation, as the settings allow.  Called from
+  // reveal() and check_typed(): the term is spoken once its answer is on
+  // screen, never on the front.
   function auto_speak_term(c) {
     if (!speak_cards_enabled()) return;
     speak_term(c);
   }
 
-  // Auto-pronounce the card just opened, as the settings allow.  Only
-  // when the front is not the answer: recognition says the term,
-  // shadowing plays the sentence; a cloze card's front hides the term,
-  // so it waits for the reveal (see reveal()).
+  // Auto-pronounce the card just opened, as the settings allow.  Only a
+  // shadowing card says anything here -- its model sentence; everything
+  // else waits for the reveal.
   function auto_speak(c) {
     owed_speak = false;
     if (!speak_cards_enabled()) return;
-    const speak = card_speaker(c);
+    const speak = open_speaker(c);
     if (!speak) return;
     const ua = navigator.userActivation;
     if (ua && !ua.hasBeenActive) {
@@ -201,7 +205,7 @@ window.LuteReview = (function () {
   function on_first_gesture() {
     if (!owed_speak) return;
     owed_speak = false;
-    const speak = card_speaker(state.current);
+    const speak = open_speaker(state.current);
     if (speak) speak();
   }
 
@@ -481,9 +485,10 @@ window.LuteReview = (function () {
     answer.innerHTML = back_html(c, null);
     answer.hidden = false;
     show_grades(c);
-    // On a cloze card the term IS the answer, so it is only now on
-    // screen -- this is where it gets pronounced (see auto_speak).
-    if (c.card_type !== "recognition") auto_speak_term(c);
+    // The answer is on screen now, so this is where the term gets
+    // pronounced (see auto_speak_term).  On a cloze card the term IS the
+    // answer; on a recognition card it was the front all along.
+    auto_speak_term(c);
   }
 
   async function check_typed(c) {
@@ -524,7 +529,7 @@ window.LuteReview = (function () {
       state.mode = "next";
       const next = el("review_next");
       if (next) next.focus();
-      if (c.card_type !== "recognition") auto_speak_term(c);
+      auto_speak_term(c);
     } catch (err) {
       show_error(err);
     }

@@ -57,6 +57,31 @@ Feature: Shadowing review cards
         And the shadowing card suggests the grade "Again"
 
 
+    Scenario: A shadowing card's model sentence waits for the first gesture
+        Given a new Spanish term:
+            text: gato
+            translation: cat
+        And a Spanish book "Shadow" with content:
+            Tengo un gato.
+        And the pages have been read
+        Given I set the review card types to "shadowing"
+        And I record what the review session pronounces
+        And the page has not been interacted with
+        Given I visit "/review/session"
+        Then the review card is a shadowing card for "Tengo un gato"
+        # The model sentence is the one thing a card says as it opens --
+        # every other type waits for the reveal -- and Chrome and Safari
+        # drop speech requested before the document has been activated, so
+        # it is held back and released by the first interaction rather
+        # than lost.
+        And nothing was spoken
+        When I click on the review card
+        # The spoken text is the sentence itself, punctuation included --
+        # not the token list the verdicts are painted onto, which drops
+        # it (that is why the step above reads "Tengo un gato").
+        Then the review session spoke the sentence "Tengo un gato."
+
+
     Scenario: The daily cap turns shadowing cards off without disabling the type
         Given a new Spanish term:
             text: gato
