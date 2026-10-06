@@ -75,8 +75,8 @@ def refresh_global_settings(session, scope=None):
         "tts_click_pronunciation",
         "tts_show_control_panel",
         "tts_show_sentence_buttons",
-        # Read by lute-review.js: the review session pronounces each card
-        # as it opens (see the review settings page).
+        # Read by lute-review.js: the review session pronounces a card's
+        # term when its answer is revealed (see the review settings page).
         "review_speak_cards",
     ]
     true_vals = {"1", "true", "True", "yes", "Yes", "on"}
