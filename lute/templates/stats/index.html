@@ -284,6 +284,46 @@
   .empty-msg { color: #adb5bd; font-style: italic; font-size: 13px; padding: 20px 0; text-align: center; }
   .chart-loading { color: #adb5bd; font-style: italic; font-size: 13px; padding: 40px 0; text-align: center; }
 
+  /* Review (FSRS) statistics */
+  .review-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .review-card {
+    background: var(--chart-card-bg, #fff);
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 14px 10px;
+    text-align: center;
+    min-width: 0;
+  }
+  .review-card-num {
+    font-size: 26px;
+    font-weight: 600;
+    color: #228be6;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+  }
+  .review-card-num.ok { color: #2f9e44; }
+  .review-card-num.warn { color: #e8590c; }
+  .review-card-label { font-size: 12px; color: #6c757d; margin-top: 4px; }
+  .review-card-sub { font-size: 11px; color: #adb5bd; margin-top: 3px; min-height: 14px; }
+  .review-foot {
+    font-size: 12px;
+    color: #6c757d;
+    line-height: 1.6;
+    margin: -10px 0 28px 0;
+  }
+  .review-foot code { font-size: 11px; }
+  .review-empty {
+    background: var(--chart-card-bg, #fff);
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 28px;
+  }
+
   /* Words read table alignment */
   .statsWordsRead {
     width: 100%;
@@ -308,6 +348,9 @@
     .term-charts-grid,
     .jlpt-macro {
       grid-template-columns: 1fr;
+    }
+    .review-cards {
+      grid-template-columns: repeat(2, 1fr);
     }
     .summary-levels {
       grid-template-columns: repeat(2, 1fr);
@@ -745,6 +788,46 @@
   </div>
 </div>
 
+<!-- Review queue (FSRS) statistics -->
+<h2 id="review" style="margin-top: 24px;">Review</h2>
+
+<div class="review-cards" id="review-cards">
+  <div class="chart-loading">Loading...</div>
+</div>
+
+<div class="term-charts-grid" id="review-charts">
+  <div class="chart-card">
+    <h3>Reviews</h3>
+    <div class="chart-wrap"><canvas id="reviewVolumeChart"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Rating distribution</h3>
+    <div class="chart-wrap"><canvas id="reviewRatingChart"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Forgetting curve</h3>
+    <div class="chart-wrap"><canvas id="reviewCurveChart"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Retention by group</h3>
+    <div class="chart-wrap"><canvas id="reviewGroupChart"></canvas></div>
+  </div>
+</div>
+
+<div class="review-foot" id="review-foot">
+  <b>On time</b> = graded within a day of falling due (learning cards come back
+  minutes later, so a stricter rule would flag every one of them).
+  <b>Retention</b> = share of gradings that were not <i>Again</i>.
+  Cards, rating distribution and on-time rate follow the period/language filters above;
+  the <b>forgetting curve</b> and <b>retention by group</b> always use every review, and the
+  predicted curve is the FSRS-6 retrievability <code>(1 + 0.9806·t/S)^-0.1542</code>.
+  Reviews logged before undo existed carry no scheduling snapshot, so they count towards
+  volume and retention but not towards on-time rate or the curve.
+</div>
+
 <!-- Original words read section -->
 <h2 style="margin-top: 24px;">Words read</h2>
 
@@ -805,12 +888,14 @@
     this.querySelectorAll('button').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     loadTermData();
+    loadReviewStats();
   });
 
   document.getElementById('ov-lang').addEventListener('change', function(e) {
     currentLang = e.target.value;
     updateJpButton();
     loadTermData();
+    loadReviewStats();
   });
 
   // --- JLPT uses the generic level-report engine (see jlptReport below) ---
@@ -1407,6 +1492,331 @@
     .catch(function(err) { console.error('Failed to load word data:', err); });
 
   loadTermData();
+  loadReviewStats();
+
+  // --- Review (FSRS) statistics ---
+  // The queue tables already know when a card was due and when it was
+  // graded; these charts turn that into the three numbers the review
+  // page cannot show on its own (on-time rate, retention, and the
+  // forgetting curve).
+  const RATING_COLORS = { again: '#e03131', hard: '#f76707', good: '#2f9e44', easy: '#1c7ed6' };
+  const RATING_LABELS = { again: 'Again', hard: 'Hard', good: 'Good', easy: 'Easy' };
+
+  function fmtPct(v) {
+    if (v === null || v === undefined) return '&mdash;';
+    return (v * 100).toFixed(1) + '%';
+  }
+
+  function loadReviewStats() {
+    fetch('/stats/review_data?period=' + currentPeriod + '&lang_id=' + currentLang)
+      .then(function(r) { return r.json(); })
+      .then(renderReviewStats)
+      .catch(function(err) {
+        console.error('Failed to load review stats:', err);
+        document.getElementById('review-cards').innerHTML =
+          '<div class="empty-msg">Failed to load review data.</div>';
+      });
+  }
+
+  function renderReviewStats(data) {
+    renderReviewCards(data);
+    const charts = document.getElementById('review-charts');
+    if (!data.has_data) {
+      // Nothing to plot: hide the whole grid rather than leave four
+      // empty frames under the message.
+      charts.style.display = 'none';
+      ['reviewVolumeChart', 'reviewRatingChart', 'reviewCurveChart', 'reviewGroupChart'].forEach(destroyChart);
+      return;
+    }
+    charts.style.display = '';
+    renderReviewVolume(data.daily, data.period);
+    renderReviewRatings(data.ratings);
+    renderReviewCurve(data.forgetting);
+    renderReviewGroups(data.by_state, data.by_card_type);
+  }
+
+  function renderReviewCards(data) {
+    const el = document.getElementById('review-cards');
+    if (!data.has_data) {
+      el.innerHTML = '<div class="review-empty"><div class="empty-msg">' +
+        'No reviews recorded for this filter yet. Grade a few cards and these charts fill in.' +
+        '</div></div>';
+      el.style.gridTemplateColumns = '1fr';
+      return;
+    }
+    const s = data.summary;
+    const onTimeCls = s.on_time_rate === null ? '' :
+      (s.on_time_rate >= 0.8 ? 'ok' : (s.on_time_rate < 0.6 ? 'warn' : ''));
+    const retCls = s.retention === null ? '' :
+      (s.retention >= 0.85 ? 'ok' : (s.retention < 0.8 ? 'warn' : ''));
+    const cards = [
+      { num: s.reviews.toLocaleString(), label: 'reviews', sub: 'all time ' + s.reviews_all_time.toLocaleString() },
+      { num: fmtPct(s.on_time_rate), label: 'on time', cls: onTimeCls,
+        sub: s.on_time + ' on time / ' + s.late + ' late' },
+      { num: fmtPct(s.retention), label: 'retention', cls: retCls,
+        sub: 'all time ' + fmtPct(s.retention_all_time) },
+      { num: s.cards_due_now.toLocaleString(), label: 'due now', sub: 'new ' + s.cards_new.toLocaleString() },
+      { num: s.cards_total.toLocaleString(), label: 'cards', sub: s.lapses.toLocaleString() + ' lapses' },
+    ];
+    el.style.gridTemplateColumns = '';
+    el.innerHTML = cards.map(function(c) {
+      return '<div class="review-card">' +
+        '<div class="review-card-num ' + (c.cls || '') + '">' + c.num + '</div>' +
+        '<div class="review-card-label">' + c.label + '</div>' +
+        '<div class="review-card-sub">' + c.sub + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function destroyChart(canvasId) {
+    if (window[canvasId + '_instance']) {
+      window[canvasId + '_instance'].destroy();
+      window[canvasId + '_instance'] = null;
+    }
+  }
+
+  function reviewXScale(period, monthlyUnit) {
+    // Same date-window rules as renderBarChart, so the review bars line
+    // up with the term bars when the period changes.
+    const unit = period === 'monthly' ? (monthlyUnit || 'month') : 'day';
+    const scale = {
+      type: 'time',
+      time: { unit: unit },
+      stacked: true,
+      grid: { display: false },
+      ticks: { color: CHART_COLORS.tick },
+    };
+    if (period === '7days') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      scale.min = new Date(today.getTime() - 6 * 86400000);
+      scale.max = today;
+    } else if (period === 'today') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      scale.min = today;
+      scale.max = today;
+    }
+    return scale;
+  }
+
+  function renderReviewVolume(daily, period) {
+    const canvas = document.getElementById('reviewVolumeChart');
+    destroyChart('reviewVolumeChart');
+    const onTime = daily.map(function(d) { return { x: d.date, y: d.on_time }; });
+    const late = daily.map(function(d) { return { x: d.date, y: d.late }; });
+    window.reviewVolumeChart_instance = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        datasets: [
+          { label: 'On time', data: onTime, backgroundColor: '#2f9e44', stack: 'r' },
+          { label: 'Late', data: late, backgroundColor: '#e8590c', stack: 'r' },
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: reviewXScale(period),
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            ticks: { precision: 0, color: CHART_COLORS.tick },
+            grid: { color: CHART_COLORS.grid }
+          }
+        },
+        plugins: {
+          legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y; }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderReviewRatings(ratings) {
+    const canvas = document.getElementById('reviewRatingChart');
+    destroyChart('reviewRatingChart');
+    const keys = ['again', 'hard', 'good', 'easy'];
+    const values = keys.map(function(k) { return ratings[k] || 0; });
+    const total = values.reduce(function(a, b) { return a + b; }, 0);
+    window.reviewRatingChart_instance = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: keys.map(function(k) { return RATING_LABELS[k]; }),
+        datasets: [{
+          data: values,
+          backgroundColor: keys.map(function(k) { return RATING_COLORS[k]; }),
+          borderRadius: 3,
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: { grid: { display: false }, ticks: { color: CHART_COLORS.tick } },
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0, color: CHART_COLORS.tick },
+            grid: { color: CHART_COLORS.grid }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const v = ctx.parsed.y;
+                const share = total ? ' (' + (v / total * 100).toFixed(1) + '%)' : '';
+                return v + ' cards' + share;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderReviewCurve(forgetting) {
+    const canvas = document.getElementById('reviewCurveChart');
+    destroyChart('reviewCurveChart');
+    const buckets = (forgetting && forgetting.buckets) || [];
+    const actual = [];
+    const predicted = [];
+    const sampleCounts = {};
+    buckets.forEach(function(b) {
+      sampleCounts[b.days] = b.reviews;
+      if (b.retention !== null && b.retention !== undefined) {
+        actual.push({ x: b.days, y: b.retention * 100 });
+      }
+      if (b.predicted !== null && b.predicted !== undefined) {
+        predicted.push({ x: b.days, y: b.predicted * 100 });
+      }
+    });
+    window.reviewCurveChart_instance = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        datasets: [
+          {
+            label: 'Actual',
+            data: actual,
+            borderColor: '#228be6',
+            backgroundColor: '#228be6',
+            pointRadius: 4,
+            borderWidth: 2,
+            tension: 0.25,
+          },
+          {
+            label: 'FSRS predicted',
+            data: predicted,
+            borderColor: '#adb5bd',
+            backgroundColor: '#adb5bd',
+            borderDash: [5, 4],
+            pointRadius: 0,
+            borderWidth: 2,
+            tension: 0.25,
+          },
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: {
+            type: 'logarithmic',
+            title: { display: true, text: 'days since last review', color: CHART_COLORS.title, font: { size: 11 } },
+            grid: { color: CHART_COLORS.grid },
+            ticks: {
+              color: CHART_COLORS.tick,
+              maxRotation: 0,
+              // A logarithmic scale picks its own ticks and draws no
+              // others, so they all have to be labelled -- a whitelist
+              // leaves the axis blank.  Limit the count instead, or the
+              // sub-day ticks crowd into an unreadable "0.6d0.8d1d".
+              maxTicksLimit: 7,
+              callback: function(v) {
+                if (v >= 1) return Math.round(v) + 'd';
+                return v + 'd';
+              }
+            }
+          },
+          y: {
+            min: 0,
+            max: 100,
+            title: { display: true, text: 'retention %', color: CHART_COLORS.title, font: { size: 11 } },
+            ticks: { color: CHART_COLORS.tick, callback: function(v) { return v + '%'; } },
+            grid: { color: CHART_COLORS.grid }
+          }
+        },
+        plugins: {
+          legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const n = sampleCounts[ctx.parsed.x];
+                const extra = n ? ' (n=' + n + ')' : '';
+                return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%' + extra;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderReviewGroups(byState, byCardType) {
+    const canvas = document.getElementById('reviewGroupChart');
+    destroyChart('reviewGroupChart');
+    const states = byState || [];
+    const types = byCardType || [];
+    const labels = states.map(function(g) { return g.label; })
+      .concat(types.map(function(g) { return g.label; }));
+    const stateData = states.map(function(g) { return g.retention * 100; })
+      .concat(types.map(function() { return null; }));
+    const typeData = states.map(function() { return null; })
+      .concat(types.map(function(g) { return g.retention * 100; }));
+    const counts = states.map(function(g) { return g.reviews; })
+      .concat(types.map(function(g) { return g.reviews; }));
+    window.reviewGroupChart_instance = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'Card state', data: stateData, backgroundColor: '#845ef7', borderRadius: 3 },
+          { label: 'Card type', data: typeData, backgroundColor: '#22b8cf', borderRadius: 3 },
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { color: CHART_COLORS.tick, callback: function(v) { return v + '%'; } },
+            grid: { color: CHART_COLORS.grid }
+          },
+          y: { grid: { display: false }, ticks: { color: CHART_COLORS.tick } }
+        },
+        plugins: {
+          legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const n = counts[ctx.dataIndex];
+                const extra = n ? ' (n=' + n + ')' : '';
+                return ctx.dataset.label + ': ' + ctx.parsed.x.toFixed(1) + '%' + extra;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 
   function renderWordChart(data) {
     var ctx = document.getElementById('wordCountChart').getContext('2d');
