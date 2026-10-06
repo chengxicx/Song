@@ -4,6 +4,8 @@ auth gate, per-user data isolation, user management permissions.
 """
 
 import os
+import time
+from unittest.mock import patch
 
 from lute.db import db
 from lute.app_factory import create_app
@@ -12,6 +14,19 @@ from lute.book.model import Book as ServiceBook, Repository as ServiceRepository
 from lute.models.repositories import UserSettingRepository
 from lute.multiuser import context, store
 from lute.language.service import Service as LanguageService
+from lute.read import shadowing
+
+
+def _wait_for_shadowing_task(task_id, timeout=10):
+    "Poll a background scoring task until it finishes."
+    deadline = time.time() + timeout
+    status = None
+    while time.time() < deadline:
+        status = shadowing.task_status(task_id)
+        if status["state"] in ("finished", "error"):
+            return status
+        time.sleep(0.05)
+    raise AssertionError(f"task {task_id} did not finish in time: {status}")
 
 
 def _make_book(session, language, title):
@@ -175,6 +190,10 @@ def test_menu_placement(mu_client):
     html = resp.get_data(as_text=True)
     assert "Log out (admin)" in html, "logout in menu"
     assert 'href="/users/index"' in html, "Users menu item present"
+    # Server-level config is admin-owned: an admin must keep the
+    # Languages entry (see test_server_settings_gate.py for the
+    # non-admin side).
+    assert 'href="/language/index"' in html, "Languages menu item present for admin"
     assert "/users/me/password" not in html, "no Change password menu item"
 
 
@@ -265,3 +284,37 @@ def test_restart_while_multiuser_enabled(mu_datapath):
     assert not os.path.exists(
         os.path.join(datapath, "test_mu.db")
     ), "no stray base db in multi-user mode"
+
+
+def test_background_shadowing_task_runs_in_the_requesting_users_scope(mu_enabled_app):
+    """
+    Regression: the multiuser identity ContextVar does not cross
+    threads, so the background scoring thread must re-enter the
+    requesting user's scope itself.  Without it the task died with
+    "Multi-user mode is on, but no user scope is set".
+    """
+    with mu_enabled_app.app_context(), context.user_scope("admin"):
+        lang_id = _make_language(db.session, "English").id
+
+    seen = {}
+
+    def _fake_clip(*_args, **_kwargs):
+        seen["scope"] = context.get_current_user()
+        return "Hello world.", 3.0
+
+    with patch.object(
+        shadowing, "transcribe_clip", side_effect=_fake_clip
+    ), patch.object(shadowing, "_load_model", return_value=object()):
+        task_id = shadowing.start_task(
+            mu_enabled_app,
+            "/tmp/does-not-exist.wav",
+            lang_id,
+            ["Hello", "world"],
+            "small",
+            username="admin",
+        )
+        status = _wait_for_shadowing_task(task_id)
+
+    assert status["state"] == "finished", status
+    assert seen["scope"] == "admin", "task ran without the user's scope"
+    assert status["result"]["transcription"] == "Hello world."

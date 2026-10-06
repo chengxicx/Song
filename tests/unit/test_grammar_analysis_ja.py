@@ -11,9 +11,9 @@ pytest.importorskip("sudachidict_core")
 from lute.read.render import grammar_analysis_ja as grammar_ja
 from lute.read.render.grammar_analysis_ja import (
     _ALL_LEVELS,
-    _ALL_RULES,
     _CONCEPT_IDS,
-    _DATA_RULES,
+    _CONSTRUCTION_RULES,
+    _DUPLICATE_IDS,
     _FUNCTION_WORD_IDS,
     _N5_RULES,
     _PARTICLE_IDS,
@@ -24,6 +24,12 @@ from lute.read.render.grammar_analysis_ja import (
     analyze_japanese,
 )
 from lute.read.render.grammar_analysis import is_japanese_language
+
+# The engine builds its rules on first use (see _get_data_rules) rather than
+# at import, so that an app start-up with no Japanese books doesn't pay for
+# the Sudachi dictionary.  Build them once here for the whole test session.
+_DATA_RULES = grammar_ja._get_data_rules()
+_ALL_RULES = grammar_ja._get_all_rules()
 
 
 @pytest.fixture(name="rules")
@@ -174,21 +180,25 @@ def test_data_rules_loaded_for_all_levels():
         for r in rules:
             assert r["level"] == level
             assert r["meaning"]
-            assert r["examples"]
+            # Merged material entries may legitimately carry no examples
+            # (their source PDF listed none); such rules must be skipped
+            # so they never fire on a matcher derived from nothing.
+            if not r["examples"]:
+                assert r["skipped"], f"{r['key']} has no examples but is active"
 
 
 def test_full_jlpt_library_is_loaded():
     "The whole curated JLPT grammar library is present, not just a sample."
-    assert len(_DATA_RULES) >= 590
+    assert len(_DATA_RULES) >= 1300
     by_level = {
         lvl: len([r for r in _DATA_RULES if r["level"] == lvl]) for lvl in _ALL_LEVELS
     }
-    assert by_level == {"N5": 77, "N4": 89, "N3": 130, "N2": 149, "N1": 150}, by_level
+    assert by_level == {"N5": 141, "N4": 185, "N3": 343, "N2": 335, "N1": 306}, by_level
     # The great majority of entries must be usable matchers rather than
     # skipped: entries only get skipped for good reason (see _load_level).
     active = [r for r in _DATA_RULES if not r["skipped"]]
     assert (
-        len(active) >= 480
+        len(active) >= 870
     ), f"only {len(active)} of {len(_DATA_RULES)} rules are active"
 
 
@@ -632,7 +642,20 @@ def test_vocab_ids_are_library_entries():
 
     library = load_library()
     assert _VOCAB_IDS <= set(library), sorted(_VOCAB_IDS - set(library))
-    assert len(_VOCAB_IDS) == 14, "changing the list is a review, not a patch"
+    assert len(_VOCAB_IDS) == 47, "changing the list is a review, not a patch"
+
+
+def test_duplicate_ids_are_library_entries():
+    """
+    _DUPLICATE_IDS holds material entries whose construction jkindrix already
+    carries: silencing is a reviewed decision per entry, same as _VOCAB_IDS.
+    """
+    from scripts.screen_grammar_library import load_library
+
+    library = load_library()
+    assert _DUPLICATE_IDS <= set(library), sorted(_DUPLICATE_IDS - set(library))
+    assert len(_DUPLICATE_IDS) == 118, "changing the list is a review, not a patch"
+    assert not (_DUPLICATE_IDS & _VOCAB_IDS), "an id lives in exactly one list"
 
 
 def test_vocabulary_screen_still_flags_the_vocab_ids():
@@ -640,7 +663,8 @@ def test_vocabulary_screen_still_flags_the_vocab_ids():
     The screen and the list must not drift apart.  If the library is
     re-vendored or the derivation changes, the entries the list removes have
     to still look like vocabulary to the screen -- otherwise the list is stale
-    and should be re-derived, not trusted.
+    and should be re-derived, not trusted.  (Duplicate silences are exempt:
+    they are removed for overlapping with an existing row, not for shape.)
     """
     from scripts.screen_grammar_library import screen
 
@@ -683,6 +707,27 @@ def test_slot_specs_match_their_own_examples():
         tokens = _tokens_for(joined)
         for spec in specs:
             assert _spec_matches(spec, tokens, joined), rid
+
+
+def test_shika_nai_requires_the_negative_tail():
+    """
+    〜しか is a negative-polarity "only": it is licensed by a following
+    negative predicate.  The derivation's unanchored `しか` regex also matched
+    the しかし conjunction ("しか" sits inside しかし), so a sentence like
+    しかし、誰もいません showed both 〜しかし and a wrong 〜しか card.
+    """
+    for sentence in (
+        "お金が100円しかない。",
+        "日本語しか話せません。",
+        "一つしか残っていない。",
+    ):
+        assert "ds_shika-nai" in _keys(sentence), sentence
+    # しかし is the conjunction, not the construction; its own card stays.
+    hit = _keys("しかし、誰もいません。")
+    assert "ds_shika-nai" not in hit
+    assert "ds_shikashi-but" in hit
+    # しかも must not be claimed either.
+    assert "ds_shika-nai" not in _keys("しかも、それは安い。")
 
 
 def test_i_adjective_nonpast_gets_no_row():
@@ -785,6 +830,26 @@ _FORMATION_NAMED = {
     "muki-suitable-for",
     "hoka-nai-no-choice",
     "wo-hajime-including",
+    # か〜さもなければ/か〜さもないと: the pattern carries a 〜 slot inside the
+    # literal, so no derived fragment is ever a substring of it.  The derived
+    # name 〜かさもなければ is the construction read as one word -- correct.
+    "kasamonakerebakasamonaito",
+    # N4/N5 book merge (2026-09-29): short-kana patterns whose headline falls
+    # back to the formation text.  Each derived name is the same construction
+    # in polite or full form (からだ->からです), still the entry's own point.
+    "karada",
+    "nakute",
+    "hoshii",
+    "hoshiindesuga",
+    "tekudasaimasenka",
+    # N1/N2/N3 book merge (2026-09-30): same class as kasamonakerebakasamonaito
+    # -- the pattern carries a 〜 slot inside the literal (あまり〜に,
+    # いざ〜となると, 〜にかかわらず), so no derived fragment is ever a
+    # substring of it and the headline falls back to the formation text,
+    # which repeats the same construction (〜に/のあまり(に), となると/…).
+    "amarininoamarini",
+    "izatonarutoizatonarebaizatonatara",
+    "nikakawarazunihakakawarinaku",
 }
 
 
@@ -795,6 +860,10 @@ def test_rules_are_named_after_their_own_pattern():
     for an entry describing a form is a list of examples -- and the row is then
     named after an example word.  _SLOT_SPECS and _CONCEPT_IDS fix the three
     that did; this keeps the class from growing back unnoticed.
+
+    Parenthetical readings (かい（甲斐）もなく) are stripped before comparing:
+    the derivation names the row after the bare literal, which is correct
+    even though the parenthesized pattern text differs.
     """
     from scripts.screen_grammar_library import load_library
 
@@ -804,7 +873,7 @@ def test_rules_are_named_after_their_own_pattern():
         rid = rule["key"][3:]
         if rule["skipped"] or rid in _SLOT_SPECS:
             continue
-        pattern = library[rid]["pattern"]
+        pattern = re.sub(r"（[^）]*）", "", library[rid]["pattern"])
         if any(
             frag and frag not in pattern
             for frag in rule["pattern"].lstrip("〜").split("・")
@@ -998,3 +1067,254 @@ def test_concurrent_analysis_does_not_raise_already_borrowed():
     _run_threads(work, count=8)
     assert not errors, f"concurrent analysis failed: {errors[:3]}"
     assert len(results) == 8
+
+
+# ---- combined construction rules (AつBつ, ば~ほど, ...) -------------------
+
+
+def test_construction_rules_carry_data():
+    "Every combined-construction rule carries a level, meaning, and examples."
+    for rule in _CONSTRUCTION_RULES:
+        assert rule["level"] in ("N1", "N2"), rule["key"]
+        assert rule["meaning"], rule["key"]
+        assert rule["examples"], rule["key"]
+
+
+def test_each_construction_rule_matches_its_own_examples():
+    "A combined-construction rule must fire on its own example sentences."
+    for rule in _CONSTRUCTION_RULES:
+        text = "".join(rule["examples"])
+        hits = {e["key"] for e in analyze_japanese(text)}
+        assert rule["key"] in hits, f"{rule['key']} did not match its own examples"
+
+
+def test_construction_rules_are_in_the_full_rule_set():
+    "The combined-construction rules are wired into the engine."
+    keys = {r["key"] for r in _ALL_RULES}
+    for rule in _CONSTRUCTION_RULES:
+        assert rule["key"] in keys
+
+
+@pytest.mark.parametrize(
+    "key, sentence",
+    [
+        # 〜なり as "as soon as" must not read as 〜なり〜なり.
+        ("a_nari_b_nari", "彼は部屋に入るなり、泣き出した。"),
+        # にもまして / にもかかわらず are different constructions.
+        ("volitional_ni_mo_nai", "以前にもまして、忙しくなった。"),
+        ("volitional_ni_mo_nai", "悪天候にもかかわらず、試合は行われた。"),
+        # ばかり is not ば~ほど.
+        ("ba_hodo", "物価は上がるばかりだ。"),
+        ("mo_ba_mo", "雨が降っています。"),
+        # A single といい-like sequence is not the doubled construction.
+        ("to_ii_to_ii", "これはいい値段だと思っています。"),
+        ("volitional_mai", "行こうと思っています。"),
+        ("a_tsu_b_tsu", "手を抜きました。"),
+    ],
+)
+def test_construction_rules_do_not_false_positive(key, sentence):
+    "Near-miss sentences must not report the combined-construction rule."
+    hits = {e["key"] for e in analyze_japanese(sentence)}
+    assert key not in hits, f"{key} should NOT match: {sentence}"
+
+
+def test_zh_table_covers_construction_rules():
+    "Chinese display has an entry for every combined-construction rule."
+    missing = [
+        r["pattern"] for r in _CONSTRUCTION_RULES if r["pattern"] not in _ZH_DESC
+    ]
+    assert missing == [], f"missing zh descriptions: {missing}"
+
+
+def test_panel_entries_carry_reference_block():
+    """
+    Data-rule hits surface the enrichment fields the panel renders
+    (formation line, folded reference example, usage notes); entries
+    without them simply omit the fields.
+    """
+    rule = next(
+        r
+        for r in _ALL_RULES
+        if r.get("formation_notes")
+        and r.get("reference")
+        and r.get("patterns")
+        and r.get("kind") not in ("particle", "basic")
+    )
+    results = analyze_japanese("".join(rule["examples"][:2]))
+    entry = next(e for e in results if e["key"] == rule["key"])
+    assert entry["formation"] == rule["formation"]
+    assert entry["notes"] == rule["formation_notes"]
+    assert entry["reference"]["japanese"] == rule["reference"]["japanese"]
+    # The panel gets one translated line, chosen for the display language,
+    # never the whole {chinese, english} triple to sort out client-side.
+    assert entry["reference"]["text"] == rule["reference"]["english"]
+
+
+def test_panel_entries_omit_empty_reference_fields():
+    "Hand-written rules carry no formation/reference: no empty fields emitted."
+    results = analyze_japanese("私は毎朝六時に起きます。")
+    assert results, "expected at least one hit"
+    for entry in results:
+        assert "formation" not in entry or entry["formation"]
+        assert "notes" not in entry or entry["notes"]
+        assert "reference" not in entry or entry["reference"]["japanese"]
+
+
+def test_every_reference_example_is_highlightable():
+    """
+    A rule's curated reference must be one of its own examples that the
+    rule actually matches -- not merely the first one in document order.
+    The derivation only proves a spec matches the entry's examples
+    joined, so picking by order alone left the panel's highlight missing
+    on ~10% of entries (a じゃない row quoting ではありません).
+    """
+    rules = [r for r in _ALL_RULES if r.get("reference") and r.get("patterns")]
+    assert rules, "expected data rules with panel references"
+    for rule in rules:
+        japanese = rule["reference"]["japanese"]
+        spans = grammar_ja._match_spans(
+            rule, grammar_ja._tokens_for(japanese), japanese
+        )
+        assert spans, f"{rule['key']} cannot highlight its own reference: {japanese}"
+
+
+def test_panel_reference_carries_highlight_offsets():
+    """
+    The reference block ships the same {start, end} character offsets the
+    page examples use, so the front-end highlights it with one renderer.
+    """
+    rule = next(
+        r
+        for r in _ALL_RULES
+        if r.get("reference")
+        and r.get("patterns")
+        and r.get("kind") not in ("particle", "basic")
+    )
+    results = analyze_japanese("".join(rule["examples"][:2]))
+    # Rules sharing a headline fold into one row carrying the first rule's
+    # key, so look the row up by name when the key is not the survivor.
+    entry = next(
+        e for e in results if e["key"] == rule["key"] or e["name"] == rule["pattern"]
+    )
+    japanese = entry["reference"]["japanese"]
+    assert entry["reference"]["matches"], f"{rule['key']} reference has no offsets"
+    for match in entry["reference"]["matches"]:
+        assert 0 <= match["start"] < match["end"] <= len(japanese)
+
+
+def _jkindrix_rule():
+    """
+    A vendored jkindrix rule: English notes, English-only example, and
+    Chinese wording supplied by zh_enrichment.json.
+    """
+    return next(
+        r
+        for r in _ALL_RULES
+        if r.get("formation_zh")
+        and r.get("formation_notes_zh")
+        and r.get("reference_zh")
+        and not r["reference"]["chinese"]
+        and r.get("patterns")
+        and r.get("kind") not in ("particle", "basic")
+    )
+
+
+def test_chinese_panel_never_shows_english_enrichment():
+    """
+    A Chinese panel must never print English under a Chinese heading --
+    that was the bug: the vendored jkindrix rows are English prose with
+    English-only example translations, so 「接续 · 参考例句 · 注意点」
+    showed "Not yet: まだ + V ていない ..." and "I haven't done my
+    homework yet.".  The wording now lives in zh_enrichment.json; the
+    invariant is that every field it reaches carries no English word.
+    """
+    rule = _jkindrix_rule()
+    results = analyze_japanese("".join(rule["examples"][:2]), display_lang="zh")
+    entry = next(e for e in results if e["key"] == rule["key"])
+    assert re.search(r"[\u4e00-\u9fff]", entry["desc"]), entry["desc"]
+    assert entry["formation"] == rule["formation_zh"]
+    assert entry["notes"] == rule["formation_notes_zh"]
+    # One pre-localized line, never the whole {chinese, english} triple.
+    assert entry["reference"]["text"] == rule["reference_zh"]
+    for field in ("desc", "formation", "notes"):
+        assert not re.search(r"[A-Za-z]{3,}", entry[field]), f"{field}: {entry[field]}"
+    assert not re.search(r"[A-Za-z]{3,}", entry["reference"]["text"])
+
+
+def test_chinese_panel_enrichment_is_never_english():
+    """
+    Library-wide gate on the same invariant: whichever field a Chinese
+    panel ends up showing -- translated where the data has Chinese,
+    filtered out where it does not -- none of them may be English.
+    """
+    for rule in _DATA_RULES:
+        if rule.get("skipped") or not rule.get("examples"):
+            continue
+        results = analyze_japanese("".join(rule["examples"]), display_lang="zh")
+        for entry in results:
+            for field in ("desc", "formation", "notes"):
+                value = entry.get(field) or ""
+                assert not re.search(
+                    r"[A-Za-z]{3,}", value
+                ), f"{rule['key']} {field}: {value}"
+            text = (entry.get("reference") or {}).get("text") or ""
+            assert not re.search(
+                r"[A-Za-z]{3,}", text
+            ), f"{rule['key']} reference: {text}"
+
+
+def test_english_panel_still_shows_the_english_enrichment():
+    "The filter is language-scoped: English panels are untouched."
+    rule = _jkindrix_rule()
+    results = analyze_japanese("".join(rule["examples"][:2]))
+    entry = next(e for e in results if e["key"] == rule["key"])
+    assert entry["notes"] == rule["formation_notes"]
+    assert entry["reference"]["text"] == rule["reference"]["english"]
+
+
+def test_korean_panel_shows_korean_enrichment():
+    """
+    ko_enrichment.json now ships Korean wording for every data row, so a
+    ko panel shows it rather than hiding the block: formation, notes and
+    the reference translation all come from the ko enrichment fields.
+    """
+    rule = _jkindrix_rule()
+    results = analyze_japanese("".join(rule["examples"][:2]), display_lang="ko")
+    entry = next(e for e in results if e["key"] == rule["key"])
+    assert entry["formation"] == rule["formation_ko"]
+    assert entry["notes"] == rule["formation_notes_ko"]
+    assert entry["reference"]["text"] == rule["reference_ko"]
+
+
+def test_korean_enrichment_is_never_english():
+    """
+    Library-wide gate on the same invariant as the zh panel: whichever
+    Korean field a rule carries, none of them may contain an English
+    word -- a ko panel must never print English under a Korean heading.
+    """
+    for rule in _DATA_RULES:
+        for field in (
+            "formation_ko",
+            "formation_notes_ko",
+            "reference_ko",
+            "meaning_ko",
+        ):
+            value = rule.get(field) or ""
+            assert not re.search(
+                r"[A-Za-z]{3,}", value
+            ), f"{rule['key']} {field}: {value}"
+
+
+def test_merged_material_rows_stay_visible_in_chinese():
+    "A merged row carries Chinese everywhere, so the zh panel keeps it all."
+    rule = next(
+        r
+        for r in _ALL_RULES
+        if r.get("reference")
+        and r["reference"].get("chinese")
+        and r.get("patterns")
+        and r.get("kind") not in ("particle", "basic")
+    )
+    results = analyze_japanese("".join(rule["examples"][:2]), display_lang="zh")
+    entry = next(e for e in results if e["key"] == rule["key"])
+    assert entry["reference"]["text"] == rule["reference"]["chinese"]

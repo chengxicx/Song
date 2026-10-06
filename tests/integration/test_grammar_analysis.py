@@ -7,6 +7,8 @@ other language falls back to the generic regex rule library.
 """
 
 import json
+import re
+import unicodedata
 import pytest
 from lute.db import db
 from lute.parse.registry import is_supported
@@ -307,6 +309,39 @@ def test_grammar_analysis_strips_zws_from_client_snippet(client, empty_db, korea
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
 
 
+def test_korean_decomposed_hangul_is_composed(client, empty_db, korean):
+    if not is_supported("lute_korean"):
+        pytest.skip("lute_korean parser not installed")
+    """
+    导入的书可能把音节的收音存成独立字母（"거세어지" + U+11AF 而不是
+    "거세어질"），这是形态分析器留下的痕迹。Kiwi 会把 ㄹ/ㄴ 尾音当成独立
+    token，返回的偏移落在音节内部，前端按偏移切句子就会把一个字切成两半
+    （书 286 第 3 页的例句就是这个）。分析前必须先组合成 NFC。
+    """
+    broken = (
+        "김 후보자를 임명하면서 동시에 공소취소 문제에도 원론적이\u11ab 답변을 내놓을 경우 야권의 공세는 더 거세어지\u11af 수 있다."
+    )
+    assert not unicodedata.is_normalized("NFC", broken)
+    book = make_book("Korean Decomposed Demo", [broken], korean)
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    entry = next(g for g in data if g["key"] == "ko_su_issda")
+    example = entry["examples"][0]
+    sentence = example["sentence"]
+    assert unicodedata.is_normalized("NFC", sentence), "返回的句子应是组合形式"
+    assert "거세어질" in sentence
+    assert example["matches"], "应给出高亮偏移"
+    for m in example["matches"]:
+        matched = sentence[m["start"] : m["end"]]
+        assert not any(
+            "\u1100" <= ch <= "\u11ff" for ch in matched
+        ), f"高亮落在音节内部，会切字: {matched!r}"
+
+
 def test_korean_grammar_analysis_ko_display_language(client, empty_db, korean):
     if not is_supported("lute_korean"):
         pytest.skip("lute_korean parser not installed")
@@ -328,6 +363,52 @@ def test_korean_grammar_analysis_ko_display_language(client, empty_db, korean):
     go_issda = next(g for g in data if g["key"] == "ko_go_issda")
     assert "진행" in go_issda["desc"]
     assert "is/am/are" not in go_issda["desc"]
+
+
+def test_korean_panel_carries_the_formation_reference_and_notes(
+    client, empty_db, korean
+):
+    if not is_supported("lute_korean"):
+        pytest.skip("lute_korean parser not installed")
+    """
+    韩语面板应与日语面板一样给出 接续 / 参考例句（带高亮）/ 注意点。
+    合并脚本以前把 formation 整个丢掉、把 notes 写死成空串，所以韩语面板
+    只有一条释义。这里走真实路由，确认面板真的拿到这三块，并且 zh 面板里
+    没有漏出未翻译的韩文或英文。
+    """
+    korean.grammar_translate_lang = "zh"
+    db.session.add(korean)
+    db.session.commit()
+    sentence = "그 회사는 무리하게 확장한 나머지 재정적 위기를 맞게 되었다."
+    book = make_book("Korean Panel Blocks Demo", [sentence], korean)
+    db.session.add(book)
+    db.session.commit()
+
+    resp = client.get(f"/read/grammar_analysis/{book.id}/1")
+    assert resp.status_code == 200, resp.data
+    data = json.loads(resp.data.decode("utf-8"))
+    entry = next(g for g in data if g["key"] == "kgm_으나머지__282dc4")
+    assert entry["formation"], "缺少接续"
+    assert entry["notes"], "缺少注意点"
+    # The block quotes the row's own curated example (the book's sentence),
+    # not the page sentence that happened to match -- so what is pinned here
+    # is that the highlight lands on the point inside it.
+    ref = entry["reference"]
+    assert ref["sentence"], "参考例句为空"
+    assert ref["text"], "缺少参考例句译文"
+    assert ref["matches"], "参考例句没有高亮偏移"
+    highlighted = []
+    for m in ref["matches"]:
+        assert 0 <= m["start"] < m["end"] <= len(ref["sentence"])
+        highlighted.append(ref["sentence"][m["start"] : m["end"]])
+    assert any("나머지" in h for h in highlighted), highlighted
+
+    # The panel's zh filter would hide any field carrying a Latin word, so a
+    # regression here shows up as a silently missing block rather than as
+    # English text on screen.
+    for blob in (entry["desc"], entry["formation"], entry["notes"], ref["text"]):
+        assert not re.search(r"[A-Za-z]{3,}", blob), blob
+        assert re.search(r"[\u4e00-\u9fff]", blob), blob
 
 
 def test_japanese_grammar_analysis_uses_ja_engine(client, empty_db, japanese):
@@ -506,3 +587,119 @@ def test_portuguese_grammar_analysis_uses_pt_engine(client, empty_db):
     assert "pt_imperfeito" in keys
     for g in data:
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
+
+
+# ---- hidden grammar levels / groups -----------------------------------
+
+
+def test_hidden_japanese_level_removes_every_row_at_that_level(
+    client, empty_db, japanese
+):
+    if not is_supported("japanese_sudachi"):
+        pytest.skip("japanese_sudachi parser not installed")
+    """
+    隐藏 N5 后，面板里不该再有任何 N5 条目——包括两条 level 也是 N5 的
+    聚合行（Basic forms / Particles）。
+    """
+    book = make_book(
+        "Japanese Hidden Level Demo",
+        ["日本に行きたいです。今、ご飯を食べています。"],
+        japanese,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    url = f"/read/grammar_analysis/{book.id}/1"
+    baseline = json.loads(client.get(url).data.decode("utf-8"))
+    assert baseline, "sanity: 这一页本应识别出语法点"
+    assert any(g["level"] == "N5" for g in baseline), "sanity: 本页有 N5 条目"
+
+    japanese.hidden_grammar_levels = ["N5"]
+    db.session.add(japanese)
+    db.session.commit()
+
+    data = json.loads(client.get(url).data.decode("utf-8"))
+    assert all(g.get("level") != "N5" for g in data), "N5 条目应全部被隐藏"
+    keys = {g["key"] for g in data}
+    assert "basic_forms" not in keys, "聚合行 level 是 N5，应随 N5 一起隐藏"
+    assert "basic_particles" not in keys
+
+
+def test_hidden_aggregate_key_leaves_the_rest_of_the_level(client, empty_db, japanese):
+    if not is_supported("japanese_sudachi"):
+        pytest.skip("japanese_sudachi parser not installed")
+    "只隐藏 Basic forms 时，同级别的其它 N5 语法点仍然显示。"
+    book = make_book(
+        "Japanese Hidden Aggregate Demo",
+        ["日本に行きたいです。今、ご飯を食べています。"],
+        japanese,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    url = f"/read/grammar_analysis/{book.id}/1"
+    baseline = json.loads(client.get(url).data.decode("utf-8"))
+    assert "basic_forms" in {g["key"] for g in baseline}, "sanity: 本页有聚合行"
+
+    japanese.hidden_grammar_levels = ["basic_forms"]
+    db.session.add(japanese)
+    db.session.commit()
+
+    data = json.loads(client.get(url).data.decode("utf-8"))
+    keys = {g["key"] for g in data}
+    assert "basic_forms" not in keys, "被隐藏的聚合行应消失"
+    assert data, "同级别的其它条目应保留"
+    assert any(g.get("level") == "N5" for g in data), "N5 本身没有被隐藏"
+
+
+def test_hidden_topik_band_filters_korean_results(client, empty_db, korean):
+    if not is_supported("lute_korean"):
+        pytest.skip("lute_korean parser not installed")
+    "隐藏某个 TOPIK 段后，该段的条目全部消失。"
+    book = make_book(
+        "Korean Hidden Band Demo",
+        ["그 회사는 무리하게 확장한 나머지 재정적 위기를 맞게 되었다."],
+        korean,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    url = f"/read/grammar_analysis/{book.id}/1"
+    baseline = json.loads(client.get(url).data.decode("utf-8"))
+    levels = {g["level"] for g in baseline if g.get("level")}
+    assert levels, "sanity: 这一页本应识别出带级别的语法点"
+
+    hidden = sorted(levels)[0]
+    korean.hidden_grammar_levels = [hidden]
+    db.session.add(korean)
+    db.session.commit()
+
+    data = json.loads(client.get(url).data.decode("utf-8"))
+    assert all(g.get("level") != hidden for g in data), f"{hidden} 应被隐藏"
+
+
+def test_hidden_cefr_level_filters_english_results(client, empty_db):
+    "隐藏某个 CEFR 级别后，该级别的条目全部消失。"
+    pytest.importorskip("spacy")
+    pytest.importorskip("en_core_web_sm")
+    english = _get_or_create_language("English")
+    book = make_book(
+        "English Hidden CEFR Demo",
+        ["The box is too heavy to lift. She is as tall as her brother."],
+        english,
+    )
+    db.session.add(book)
+    db.session.commit()
+
+    url = f"/read/grammar_analysis/{book.id}/1"
+    baseline = json.loads(client.get(url).data.decode("utf-8"))
+    levels = {g["level"] for g in baseline if g.get("level")}
+    assert levels, "sanity: 这一页本应识别出带级别的语法点"
+
+    hidden = sorted(levels)[0]
+    english.hidden_grammar_levels = [hidden]
+    db.session.add(english)
+    db.session.commit()
+
+    data = json.loads(client.get(url).data.decode("utf-8"))
+    assert all(g.get("level") != hidden for g in data), f"{hidden} 应被隐藏"

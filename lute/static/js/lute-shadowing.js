@@ -1,0 +1,1260 @@
+/* lute-shadowing.js
+   --------------------------------------------------------------
+   影子跟读 (shadowing) practice area, entered from the player's
+   "Shadow" toggle (tts_player.html / youtube_player.html, next to
+   the voice/settings gear).
+
+   While active, the right pane becomes the practice area:
+     - the current sentence, following the player's playhead via the
+       lute:cue-changed events dispatched by media-player-base.js and
+       tts-player.js,
+     - a big record button (MediaRecorder -> /read/shadowing/transcribe,
+       which whisper-transcribes the clip and diffs it against the
+       sentence's own word tokens),
+     - the diff result (score, speech rate, what whisper heard),
+     - a session history of attempts.
+
+   Verdicts are painted onto the sentence's word spans in the reading
+   text as underline-only marks (the words' status background colours
+   stay untouched) and onto the tokens shown in the panel.
+
+   Auto mode: with it on (and the engine's Auto-pause on), the cue-end
+   event (lute:cue-ended) starts a recording by itself; stopping the
+   take scores it and advances to the next sentence.
+
+   Deliberately NOT wrapped in an IIFE: like tts.js / tts-player.js it
+   shares the read page's single global scope and is loaded after them
+   (see lute/templates/read/index.html).
+   --------------------------------------------------------------
+*/
+"use strict";
+
+/* ------------------------------------------------------------------
+ * 1. State
+ * ------------------------------------------------------------------ */
+
+let shadowingActive = false;
+let shadowingAuto = false;
+let shadowingBusy = false;
+let shadowingStartPending = false;
+let shadowingRecorder = null;
+let shadowingStream = null;
+let shadowingChunks = [];
+let shadowingRecording = false;
+let shadowingRecStart = 0;
+let shadowingRecTimer = null;
+let shadowingRecCapTimer = null;
+let shadowingUnit = null; // { lines, el, spans, texts, fullText, langId, src }
+let shadowingClickedWord = null; // word span the reader last opened a form on
+let shadowingLastCue = null; // last lute:cue-changed detail
+let shadowingHistory = [];
+let shadowingRecordingBlob = null;
+let shadowingRecordingUrl = null;
+
+const SHADOWING_MODEL_KEY = "shadowingModel";
+const SHADOWING_AUTO_KEY = "shadowingAuto";
+const SHADOWING_REC_CAP_MS = 30000;
+
+const MIC_SVG =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3z"></path><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-2.08A7 7 0 0 0 19 11z"></path></svg>';
+const STOP_SVG =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>';
+const PREV_SVG =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6h2v12H7zM20 6l-8.5 6 8.5 6z"></path></svg>';
+const NEXT_SVG =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6h2v12h-2zM4 6l8.5 6L4 18z"></path></svg>';
+const SPEAKER_SVG =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4a1 1 0 0 0 1 1h3l4 4a1 1 0 0 0 1.7-.7V5.7A1 1 0 0 0 11 5L7 9H4a1 1 0 0 0-1 1z"></path><path d="M16 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 6a8.5 8.5 0 0 1 0 12"></path></svg>';
+
+/* ------------------------------------------------------------------
+ * 2. Practice-unit resolution
+ *
+ * A "unit" is one practiceable sentence: the word spans to diff
+ * against (and to paint marks on), the plain text for the panel and
+ * TTS, and the language id.  TTS cues carry a sentence index into
+ * #thetext .textsentence spans; media cues are resolved to page lines
+ * through window.LUTE_PAGE_CUE_MAP (same verification as
+ * lute-playing-line.js -- one cue can own several lines).
+ * ------------------------------------------------------------------ */
+
+function shadowingSentences() {
+  const div = document.getElementById("thetext");
+  return div
+    ? Array.prototype.slice.call(div.querySelectorAll(".textsentence"))
+    : [];
+}
+
+function shadowingLineText(el) {
+  const clone = el.cloneNode(true);
+  clone
+    .querySelectorAll(".lute-sentence-play-btn")
+    .forEach(function (b) {
+      b.remove();
+    });
+  return (clone.textContent || "").replace(/[\s\u200b]+/g, "");
+}
+
+function shadowingLinesForCue(index, text) {
+  // lute-playing-line.js setCueIndex resolution, returning the matched
+  // <p> elements instead of marking them.
+  const div = document.getElementById("thetext");
+  if (!div) return [];
+  const ps = Array.prototype.slice.call(div.querySelectorAll(":scope > p"));
+  if (!ps.length) return [];
+  const want = (text || "").replace(/[\s\u200b]+/g, "");
+  const map = window.LUTE_PAGE_CUE_MAP;
+
+  if (Array.isArray(map) && map.length === ps.length) {
+    const hits = ps.filter(function (p, k) {
+      return map[k] === index;
+    });
+    if (hits.length) {
+      let joined = "";
+      hits.forEach(function (h) {
+        joined += shadowingLineText(h);
+      });
+      if (joined === want) return hits;
+    }
+  }
+  if (!want) return [];
+  for (let j = 0; j < ps.length; j++) {
+    if (shadowingLineText(ps[j]) === want) return [ps[j]];
+  }
+  return [];
+}
+
+/* Punctuation parsers glue onto the edges of non-word tokens (an
+   English page's "100%" is one token reading ` 100%," `), trimmed for
+   display and scoring; symbols that are part of what was said (%, $)
+   are kept.  Kept in sync with shadowing.py's _EDGE_JUNK. */
+const SHADOWING_EDGE_JUNK_RE =
+  /^[\s.,!?;:"'`“”‘’«»„()[\]{}/\\…·•*|~^\u2013\u2014\-，。、！？：；（）【】「」『』]+|[\s.,!?;:"'`“”‘’«»„()[\]{}/\\…·•*|~^\u2013\u2014\-，。、！？：；（）【】「」『』]+$/g;
+
+// The text to show and score for a sentence span.  Word spans pass
+// through verbatim; non-word spans (punctuation runs, plus words like
+// "100%" whose characters fall outside the language's word chars) are
+// only speakable when something readable survives the trim.
+function shadowingTokenText(sp) {
+  const raw =
+    (sp.getAttribute("data-text") || sp.textContent || "").replace(
+      /\u200B/g,
+      ""
+    );
+  if (sp.classList.contains("word")) return raw;
+  return raw.replace(SHADOWING_EDGE_JUNK_RE, "");
+}
+
+function shadowingReadable(t) {
+  return /[\p{L}\p{N}]/u.test(t);
+}
+
+function shadowingCollectable(sp) {
+  return (
+    sp.classList.contains("word") || shadowingReadable(shadowingTokenText(sp))
+  );
+}
+
+function shadowingUnitFromEl(el, src) {
+  if (!el || !el.isConnected) return null;
+  const spans = Array.prototype.slice
+    .call(el.querySelectorAll("span.textitem"))
+    .filter(shadowingCollectable);
+  if (!spans.length) return null;
+  const clone = el.cloneNode(true);
+  clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
+    b.remove();
+  });
+  const langSpan = el.querySelector("span.word[data-lang-id]");
+  return {
+    el: el,
+    lines: [el],
+    spans: spans,
+    texts: spans.map(shadowingTokenText),
+    fullText: (clone.textContent || "")
+      .replace(/\u200B/g, "")
+      .replace(/🔊/g, "")
+      .trim(),
+    langId: langSpan ? langSpan.getAttribute("data-lang-id") : "",
+    src: src || null,
+  };
+}
+
+function shadowingUnitFromLines(lines, src) {
+  if (!lines || !lines.length) return null;
+  const spans = [];
+  lines.forEach(function (l) {
+    Array.prototype.push.apply(
+      spans,
+      Array.prototype.slice.call(l.querySelectorAll("span.textitem")).filter(
+        shadowingCollectable
+      )
+    );
+  });
+  if (!spans.length) return null;
+  let fullText = "";
+  lines.forEach(function (l) {
+    const clone = l.cloneNode(true);
+    clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
+      b.remove();
+    });
+    fullText += (fullText ? "\n" : "") + clone.textContent;
+  });
+  const langSpan = spans[0];
+  return {
+    el: lines[0],
+    lines: lines,
+    spans: spans,
+    texts: spans.map(shadowingTokenText),
+    fullText: fullText.replace(/\u200B/g, "").replace(/🔊/g, "").trim(),
+    langId: langSpan ? langSpan.getAttribute("data-lang-id") : "",
+    src: src || null,
+  };
+}
+
+/* Remember the word the reader just opened a term form on.  Called by
+   lute-tooltip.js's show_term_edit_form -- the single place every
+   "open this word" gesture (click, tap, long press, keyboard cursor)
+   funnels through.  Accepts the jQuery object or the bare element. */
+window.luteShadowingRememberWord = function (el) {
+  const node = el && el.jquery ? el[0] : el;
+  shadowingClickedWord =
+    node && node.classList && node.classList.contains("word") ? node : null;
+};
+
+/* The .textsentence that owns a word.  The reading page wraps every
+   sentence in one (read/page_content.html), and it is the same element
+   the panel's prev/next arrows and the TTS cues use, so a panel seeded
+   from a click behaves exactly like one seeded from the player.  A word
+   in a player's scrolling subtitle is a clone of the reading-page span
+   and carries the same data-order, so it is joined back to #thetext
+   through that instead of its (absent) .textsentence parent. */
+function shadowingSentenceForWord(el) {
+  if (!el || !el.isConnected) return null;
+  const div = document.getElementById("thetext");
+  if (!div) return null;
+  const inside = el.closest(".textsentence");
+  if (inside && div.contains(inside)) return inside;
+  const order = el.getAttribute("data-order");
+  if (order == null) return null;
+  const twin = div.querySelector('span.textitem[data-order="' + order + '"]');
+  return twin ? twin.closest(".textsentence") : null;
+}
+
+/* The practice unit for the clicked word, consumed on read: it is used
+   once for the sentence the reader was looking at, and the next time
+   the mode is turned on without a click the player's cue wins again.
+   Returns null when there is nothing usable -- nothing was clicked, or
+   the page turned and took the span with it. */
+function shadowingTakeClickedWordUnit() {
+  const el = shadowingClickedWord;
+  shadowingClickedWord = null;
+  const sentence = shadowingSentenceForWord(el);
+  return sentence ? shadowingUnitFromEl(sentence, { type: "word" }) : null;
+}
+
+function shadowingSetUnit(unit) {
+  if (shadowingUnit) shadowingClearMarks(shadowingUnit);
+  shadowingUnit = unit;
+  shadowingRenderCurrent();
+  shadowingRenderResultIdle();
+  shadowingLoadReadings(unit);
+}
+
+// Ask the server for the sentence's kana readings so the panel can draw
+// furigana above the kanji.  Cheap and synchronous server-side (no audio,
+// no model); the panel renders plain words first and swaps in the ruby
+// when the answer lands.  A stale response (the cue moved on) is dropped.
+function shadowingLoadReadings(unit) {
+  if (!unit || !unit.langId || !unit.texts.length) return;
+  fetch("/read/shadowing/readings", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      language_id: parseInt(unit.langId, 10) || 0,
+      tokens: unit.texts,
+      // The sentence as a whole: the server parses it once so readings
+      // follow context (一つ -> 一=ひとつ, not the isolated 一=いち).
+      full_text: unit.fullText,
+    }),
+  })
+    .then(function (resp) {
+      return resp.ok ? resp.json() : null;
+    })
+    .then(function (data) {
+      if (!data || !Array.isArray(data.tokens)) return;
+      if (unit !== shadowingUnit) return; // the cue already moved on
+      unit.readings = data.tokens;
+      shadowingRenderCurrent();
+    })
+    .catch(function () {});
+}
+
+/* ------------------------------------------------------------------
+ * 3. Cue-event following
+ * ------------------------------------------------------------------ */
+
+function shadowingApplyCue(d) {
+  if (!d || d.index == null || d.index < 0) return false;
+  if (d.source === "tts") {
+    if (!(d.sentenceCount > 0)) return false;
+    const sents = shadowingSentences();
+    if (sents.length !== d.sentenceCount) return false; // stale after page swap
+    const unit = shadowingUnitFromEl(
+      sents[d.sentIdx] || null,
+      { type: "tts", sentIdx: d.sentIdx, cueIndex: d.index }
+    );
+    if (unit) shadowingSetUnit(unit);
+    return !!unit;
+  }
+  if (d.source === "media") {
+    const lines = shadowingLinesForCue(d.index, d.text);
+    const unit = shadowingUnitFromLines(lines, {
+      type: "media",
+      cueIndex: d.index,
+      text: d.text,
+    });
+    if (unit) shadowingSetUnit(unit);
+    return !!unit;
+  }
+  return false;
+}
+
+function shadowingOnCueChanged(e) {
+  shadowingLastCue = e.detail || null;
+  if (!shadowingActive || shadowingRecording) return;
+  shadowingApplyCue(shadowingLastCue);
+}
+
+// Auto mode: the engine paused (or looped) at the cue end -- start the
+// take for the sentence that just played.
+function shadowingOnCueEnded(e) {
+  if (!shadowingActive || !shadowingAuto) return;
+  if (shadowingRecording || shadowingBusy || shadowingStartPending) return;
+  const d = e.detail || {};
+  if (!shadowingUnit || !shadowingUnit.el || !shadowingUnit.el.isConnected) {
+    if (!shadowingApplyCue(shadowingLastCue)) return;
+  }
+  shadowingStartRecording();
+}
+
+/* ------------------------------------------------------------------
+ * 4. Mode (player "Shadow" toggle)
+ * ------------------------------------------------------------------ */
+
+function shadowingSetMode(on) {
+  shadowingActive = on;
+  const btn =
+    document.getElementById("tts-shadowing-btn") ||
+    document.getElementById("yt-shadowing-btn");
+  if (btn) btn.classList.toggle("on", on);
+
+  if (on) {
+    shadowingOpenPanel();
+    // Initial sentence.  A word the reader clicked first wins, so
+    // looking a word up and then hitting Shadow practises that word's
+    // sentence instead of starting at the top of the page.  Failing
+    // that, the last known cue if it still resolves, otherwise the
+    // first readable sentence on the page.
+    const clicked = shadowingTakeClickedWordUnit();
+    if (clicked) {
+      shadowingSetUnit(clicked);
+    } else if (!shadowingUnit || !shadowingUnit.el || !shadowingUnit.el.isConnected) {
+      if (!shadowingApplyCue(shadowingLastCue)) {
+        const first = shadowingSentences().find(function (s) {
+          return s.querySelector("span.word");
+        });
+        shadowingSetUnit(shadowingUnitFromEl(first, null));
+      }
+    }
+  } else {
+    shadowingCancelRecording();
+    if (shadowingUnit) shadowingClearMarks(shadowingUnit);
+    shadowingUnit = null;
+    shadowingClosePanel();
+  }
+}
+
+function shadowingToggleMode() {
+  shadowingSetMode(!shadowingActive);
+}
+
+window.luteShadowingAfterSwap = function () {
+  // Page turn / term-save: the old sentence is gone.  Clear marks (they
+  // lived on the swapped-out spans), then re-resolve -- the players
+  // rebuild their cues on the new text and refire lute:cue-changed,
+  // which takes precedence; the first sentence is the fallback.
+  if (!shadowingActive) return;
+  if (shadowingUnit) {
+    shadowingUnit.spans.forEach(function (sp) {
+      sp.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
+    });
+    shadowingUnit = null;
+  }
+  if (!shadowingApplyCue(shadowingLastCue)) {
+    const first = shadowingSentences().find(function (s) {
+      return s.querySelector("span.word");
+    });
+    shadowingSetUnit(shadowingUnitFromEl(first, null));
+  }
+};
+
+/* ------------------------------------------------------------------
+ * 5. Panel (fills #read_pane_right, mirroring the grammar panel)
+ * ------------------------------------------------------------------ */
+
+function shadowingEscapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    }[c];
+  });
+}
+
+function shadowingClosePanel() {
+  const panel = document.getElementById("shadowing-panel");
+  if (panel) panel.remove();
+  const pane = document.getElementById("read_pane_right");
+  if (!pane) return;
+  pane.classList.remove("shadowing-mode");
+  if (window.matchMedia && window.matchMedia("(max-width: 980px)").matches) {
+    pane.classList.remove("open-dict");
+    pane.style.removeProperty("transform");
+    pane.style.removeProperty("opacity");
+    const btm = document.querySelector(".btm-margin-container");
+    if (btm) btm.classList.remove("open-dict");
+  }
+}
+window.closeShadowingPanel = function () {
+  // Exposed for the LuteTermFormOpened hook: looking a word up leaves
+  // shadowing mode entirely, so the player toggle stays in sync.
+  shadowingSetMode(false);
+};
+
+// The model picker is gone from the panel: SenseVoice transcribes
+// zh/yue/en/ja/ko and whisper's default "small" covers the rest.  A
+// preference left over from before is still honored (it only affects
+// the whisper-only languages), but there is no UI to change it.
+function shadowingGetModel() {
+  let m = null;
+  try {
+    m = localStorage.getItem(SHADOWING_MODEL_KEY);
+  } catch (_) {}
+  return (
+    ["base", "small", "medium"].indexOf(m) !== -1 ? m : "small"
+  );
+}
+
+function shadowingOpenPanel() {
+  shadowingClosePanel();
+  const pane = document.getElementById("read_pane_right");
+  const panel = document.createElement("div");
+  panel.id = "shadowing-panel";
+  panel.className = "shadowing-panel";
+  panel.innerHTML =
+    '<div class="shadowing-panel__header">' +
+    '<span class="shadowing-panel__title">Shadowing</span>' +
+    '<button type="button" id="shadowing-auto-btn" class="shadowing-auto-btn"' +
+    ' title="Auto: record at every sentence end, score, then advance">Auto</button>' +
+    '<button type="button" class="shadowing-panel__close" aria-label="Close">&times;</button>' +
+    "</div>" +
+    '<div class="shadowing-panel__body">' +
+    '<div id="shadowing-current" class="shadowing-current"></div>' +
+    '<div class="shadowing-controls">' +
+    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="-1" title="Previous sentence">' +
+    PREV_SVG +
+    "</button>" +
+    '<button type="button" id="shadowing-listen-btn" class="shadowing-nav-btn" title="Listen to this sentence">' +
+    SPEAKER_SVG +
+    "</button>" +
+    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="1" title="Next sentence">' +
+    NEXT_SVG +
+    "</button>" +
+    '<button type="button" id="shadowing-rec-btn" class="shadowing-rec-btn" title="Record / stop">' +
+    MIC_SVG +
+    '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>' +
+    "</button>" +
+    "</div>" +
+    '<div id="shadowing-result" class="shadowing-result"></div>' +
+    '<div id="shadowing-history" class="shadowing-history"></div>' +
+    "</div>";
+
+  if (pane) {
+    pane.classList.add("shadowing-mode");
+    // The pane's width is set inline by resize.js on page load (the
+    // stylesheet's calc fallback resolves to 0).  If that init raced
+    // the first paint, the pane computes to 0 wide and the panel would
+    // be invisible -- give it the default width.
+    if (
+      !window.matchMedia ||
+      !window.matchMedia("(max-width: 980px)").matches
+    ) {
+      if (pane.getBoundingClientRect().width < 50) {
+        pane.style.width = "50%";
+      }
+    }
+    pane.appendChild(panel);
+    // Small screens keep the pane translated off-screen until a term
+    // opens; bring it up so the panel is actually visible.
+    if (window.matchMedia && window.matchMedia("(max-width: 980px)").matches) {
+      pane.classList.add("open-dict");
+      pane.style.transform = "translateY(0)";
+      pane.style.opacity = "1";
+      const btm = document.querySelector(".btm-margin-container");
+      if (btm) btm.classList.add("open-dict");
+    }
+  } else {
+    document.body.appendChild(panel);
+  }
+
+  // One delegated listener: every word token in the panel (practised
+  // sentence and "heard" sentence alike) pronounces itself on click.
+  panel.addEventListener("click", shadowingOnPanelClick);
+
+  panel
+    .querySelector(".shadowing-panel__close")
+    .addEventListener("click", function () {
+      shadowingSetMode(false);
+    });
+
+  const autoBtn = panel.querySelector("#shadowing-auto-btn");
+  autoBtn.classList.toggle("on", shadowingAuto);
+  autoBtn.addEventListener("click", function () {
+    shadowingSetAuto(!shadowingAuto);
+  });
+
+  panel.querySelectorAll("[data-shadowing-nav]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      shadowingNav(parseInt(b.getAttribute("data-shadowing-nav"), 10));
+    });
+  });
+  panel
+    .querySelector("#shadowing-listen-btn")
+    .addEventListener("click", shadowingListen);
+  panel
+    .querySelector("#shadowing-rec-btn")
+    .addEventListener("click", shadowingToggleRecording);
+
+  shadowingRenderHistory();
+  shadowingRenderCurrent();
+  shadowingRenderResultIdle();
+}
+
+function shadowingSetAuto(on) {
+  shadowingAuto = on;
+  const btn = document.getElementById("shadowing-auto-btn");
+  if (btn) btn.classList.toggle("on", on);
+  try {
+    localStorage.setItem(SHADOWING_AUTO_KEY, on ? "1" : "0");
+  } catch (_) {}
+  if (on) shadowingPrepareEngine();
+}
+
+function shadowingPrepareEngine() {
+  // The auto loop leans on auto-pause (record while paused at the cue
+  // end); loop would replay over the take, so turn it off.
+  const ap =
+    document.getElementById("tts-autopause-btn") ||
+    document.getElementById("yt-autopause-btn");
+  if (ap && !ap.classList.contains("on")) ap.click();
+  const loop =
+    document.getElementById("tts-loop-btn") ||
+    document.getElementById("yt-loop-btn");
+  if (loop && loop.classList.contains("on")) loop.click();
+}
+
+/* ------------------------------------------------------------------
+ * 6. Panel rendering
+ * ------------------------------------------------------------------ */
+
+// One word of the panel, as a clickable token: the reading (when the
+// language supplies one) sits above the word as ruby furigana, and a tap
+// pronounces it.  data-speak / data-reading feed the click handler so it
+// works the same for the sentence's own words and for the "heard" ones.
+// Only kana counts as furigana: with the "pronunciation characters"
+// setting on romaji the reading comes back in Latin letters, which is not
+// something to hang above the kanji -- show the plain word then.
+function shadowingKanaReading(reading) {
+  const r = (reading || "").trim();
+  return /[\u3040-\u309F\u30A0-\u30FF]/.test(r) ? r : "";
+}
+
+function shadowingTokenHtml(text, reading, idx, cls) {
+  reading = shadowingKanaReading(reading);
+  const inner = reading
+    ? "<ruby>" +
+      shadowingEscapeHtml(text) +
+      "<rt>" +
+      shadowingEscapeHtml(reading) +
+      "</rt></ruby>"
+    : shadowingEscapeHtml(text);
+  let attrs = ' class="' + (cls || "shadow-tok") + '"';
+  attrs += ' data-speak="' + shadowingEscapeHtml(text) + '"';
+  if (reading) attrs += ' data-reading="' + shadowingEscapeHtml(reading) + '"';
+  if (idx != null) attrs += ' data-idx="' + idx + '"';
+  return (
+    "<span" + attrs + ' title="Click to hear this word">' + inner + "</span>"
+  );
+}
+
+function shadowingRenderCurrent() {
+  const box = document.getElementById("shadowing-current");
+  if (!box) return;
+  if (!shadowingUnit) {
+    box.innerHTML =
+      '<div class="shadowing-panel__state">Play the player, or pick a sentence with the arrows below.</div>';
+    return;
+  }
+  const readings = shadowingUnit.readings || [];
+  box.innerHTML = shadowingUnit.texts
+    .map(function (t, i) {
+      const r = readings[i] ? readings[i].reading : null;
+      return shadowingTokenHtml(t, r, i, "shadow-tok");
+    })
+    .join(" ");
+}
+
+// Speak one word of the panel.  The annotated kana reading is preferred
+// when it exists (kanji whose TTS guess is wrong then sounds right);
+// otherwise the word itself is spoken.  Fallback for pages without
+// tts.js's term-aware speaker is the plain reader.
+function shadowingSpeakItem(text, reading) {
+  if (typeof window.luteTtsSpeakTerm === "function") {
+    window.luteTtsSpeakTerm(text, reading, null);
+  } else if (typeof speakText === "function") {
+    speakText(text);
+  }
+}
+
+function shadowingSpeakToken(tok, heardOnly) {
+  const text = tok.getAttribute("data-speak") || "";
+  if (!text) return;
+  const reading = tok.getAttribute("data-reading") || "";
+  const heard = tok.getAttribute("data-heard") || "";
+  // A fuzzy token carries what the engine actually heard: clicking the
+  // "→ heard" part speaks that word alone, clicking the word itself
+  // plays the correct pronunciation and then the misheard one back to
+  // back, so the difference is audible.
+  if (heardOnly && heard) {
+    shadowingSpeakItem(heard, "");
+    return;
+  }
+  if (heard && typeof window.luteTtsSpeakSequence === "function") {
+    window.luteTtsSpeakSequence([
+      { text: text, reading: reading },
+      { text: heard, reading: "" },
+    ]);
+    return;
+  }
+  shadowingSpeakItem(text, reading);
+}
+
+function shadowingOnPanelClick(e) {
+  const tok =
+    e.target && e.target.closest
+      ? e.target.closest(".shadow-tok, .shadow-heard-tok")
+      : null;
+  if (!tok) return;
+  const heardPart = e.target.closest
+    ? e.target.closest(".shadow-tok__heard")
+    : null;
+  shadowingSpeakToken(tok, Boolean(heardPart));
+}
+
+function shadowingRenderResultIdle() {
+  const box = document.getElementById("shadowing-result");
+  if (!box) return;
+  box.innerHTML =
+    '<div class="shadowing-result__hint">Record yourself reading the sentence to score it.</div>';
+}
+
+function shadowingRenderPanelMessage(msg, isError) {
+  const box = document.getElementById("shadowing-result");
+  if (!box) return;
+  box.innerHTML =
+    '<div class="shadowing-panel__state' +
+    (isError ? " shadowing-panel__error" : "") +
+    '">' +
+    shadowingEscapeHtml(msg) +
+    "</div>";
+}
+
+function shadowingClearMarks(unit) {
+  if (unit) {
+    unit.spans.forEach(function (sp) {
+      sp.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
+    });
+  }
+  // The display box tokens persist across re-recordings of the same
+  // sentence: scrub stale verdict classes and any "→ heard" insertions
+  // left by previous runs (added in shadowingPaintVerdicts).
+  const box = document.getElementById("shadowing-current");
+  if (!box) return;
+  box.querySelectorAll(".shadow-tok").forEach(function (tok) {
+    tok.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
+    if (tok.getAttribute("data-heard")) {
+      tok.removeAttribute("data-heard");
+      tok.setAttribute("title", "Click to hear this word");
+    }
+    tok.querySelectorAll(".shadow-tok__heard").forEach(function (h) {
+      h.remove();
+    });
+  });
+}
+
+function shadowingPaintVerdicts(unit, data) {
+  if (!unit || !unit.el.isConnected) return;
+  // Paint on a clean canvas: drop verdicts from previous recordings first,
+  // otherwise fuzzy "→ heard" spans and classes pile up across runs.
+  shadowingClearMarks(unit);
+  const statuses = data.statuses || [];
+  const fuzzySpoken = data.spoken_for_fuzzy || {};
+  const missSpoken = data.spoken_for_miss || {};
+  // 0 miss / 1 fuzzy / 2 match / 3 skip (punctuation -- unmarked).
+  const CLASSES = { 0: "shadow-miss", 1: "shadow-fuzzy", 2: "shadow-ok" };
+
+  unit.spans.forEach(function (sp, i) {
+    const st = i < statuses.length ? statuses[i] : 0;
+    const cls = CLASSES[st];
+    if (cls) sp.classList.add(cls);
+  });
+
+  const box = document.getElementById("shadowing-current");
+  if (box) {
+    box.querySelectorAll(".shadow-tok").forEach(function (tok) {
+      const i = parseInt(tok.getAttribute("data-idx"), 10);
+      const st = i < statuses.length ? statuses[i] : 0;
+      const cls = CLASSES[st];
+      if (cls) tok.classList.add(cls);
+      // Both near-misses and flat misses carry what was heard: the
+      // readout is what the learner actually needs.  A word that was
+      // never spoken has no entry, so it stays a bare red mark.
+      const heard = st === 1 ? fuzzySpoken[i] : st === 0 ? missSpoken[i] : null;
+      if (heard != null) {
+        // Carried on the token: clicking it then speaks the correct
+        // word and the misheard one back to back (see
+        // shadowingSpeakToken); the "→ heard" part speaks alone.
+        tok.setAttribute("data-heard", heard);
+        tok.setAttribute("title", "Click: correct word, then what was heard");
+        tok.insertAdjacentHTML(
+          "beforeend",
+          '<span class="shadow-tok__heard">→ ' +
+            shadowingEscapeHtml(heard) +
+            "</span>"
+        );
+      }
+    });
+  }
+}
+
+function shadowingRenderResult(unit, data) {
+  const box = document.getElementById("shadowing-result");
+  if (!box) return;
+  const extras = data.extras || [];
+  const isMorpheme = data.token_kind === "morpheme";
+  const kindLabel = isMorpheme ? "morphemes/min" : "words/min";
+
+  let html = '<div class="shadowing-score">';
+  html +=
+    '<span class="shadowing-score__value">' + Number(data.score || 0) + "%</span>";
+  if (data.tokens_per_minute != null) {
+    html +=
+      '<span class="shadowing-score__rate">' +
+      data.tokens_per_minute +
+      " " +
+      kindLabel +
+      " · " +
+      data.duration +
+      "s</span>";
+  }
+  if (data.engine === "sensevoice") {
+    html += '<span class="shadowing-score__engine">SenseVoice</span>';
+  }
+  html += "</div>";
+  // Server-side warning for a language the chosen engine transcribes
+  // poorly (Cantonese via whisper comes back as Mandarin).
+  if (data.language_note) {
+    html +=
+      '<div class="shadowing-result__hint">' +
+      shadowingEscapeHtml(data.language_note) +
+      "</div>";
+  }
+  // The "heard" sentence: word tokens with furigana when the server could
+  // annotate them (the same treatment as the practised sentence), the raw
+  // transcription as a fallback.
+  const heard = data.transcription_tokens || [];
+  let heardHtml;
+  if (heard.length) {
+    heardHtml = heard
+      .map(function (t) {
+        return shadowingTokenHtml(
+          t.text || "",
+          t.reading || null,
+          null,
+          "shadow-heard-tok"
+        );
+      })
+      .join(" ");
+  } else {
+    heardHtml = shadowingEscapeHtml(data.transcription || "—");
+  }
+  html += '<div class="shadowing-heard">' + heardHtml + "</div>";
+  if (extras.length) {
+    html +=
+      '<div class="shadowing-extras"><span class="shadowing-extras__label">Also heard</span> ' +
+      shadowingEscapeHtml(
+        extras.join(isMorpheme ? "" : " ")
+      ) +
+      "</div>";
+  }
+  box.innerHTML = html;
+}
+
+function shadowingRenderHistory() {
+  const box = document.getElementById("shadowing-history");
+  if (!box) return;
+  if (!shadowingHistory.length) {
+    box.innerHTML =
+      '<div class="shadowing-history__empty">No attempts yet.</div>';
+    return;
+  }
+  box.innerHTML =
+    '<div class="shadowing-history__head">This session</div>' +
+    shadowingHistory
+      .slice(0, 30)
+      .map(function (h) {
+        return (
+          '<div class="shadowing-history__row">' +
+          '<span class="shadowing-history__score">' + h.score + "%</span>" +
+          '<span class="shadowing-history__text">' +
+          shadowingEscapeHtml(h.text) +
+          "</span>" +
+          (h.rate != null
+            ? '<span class="shadowing-history__rate">' + h.rate + "/min</span>"
+            : "") +
+          "</div>"
+        );
+      })
+      .join("");
+}
+
+/* ------------------------------------------------------------------
+ * 7. Recording (MediaRecorder), one capture at a time
+ * ------------------------------------------------------------------ */
+
+function shadowingCanRecord() {
+  return !!(
+    window.isSecureContext &&
+    navigator.mediaDevices &&
+    navigator.mediaDevices.getUserMedia &&
+    typeof MediaRecorder !== "undefined"
+  );
+}
+
+function shadowingPickMimeType() {
+  if (typeof MediaRecorder === "undefined") return "";
+  const candidates = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
+  for (let i = 0; i < candidates.length; i++) {
+    try {
+      if (MediaRecorder.isTypeSupported(candidates[i])) return candidates[i];
+    } catch (_) {}
+  }
+  return "";
+}
+
+function shadowingExtForMime(mime) {
+  mime = mime || "";
+  if (mime.indexOf("mp4") !== -1 || mime.indexOf("m4a") !== -1) return "mp4";
+  if (mime.indexOf("ogg") !== -1) return "ogg";
+  return "webm";
+}
+
+function shadowingPermissionMessage(err) {
+  if (err && (err.name === "NotAllowedError" || err.name === "SecurityError")) {
+    return "Microphone permission denied.  Allow microphone access for this site to use shadowing.";
+  }
+  if (err && err.name === "NotFoundError") {
+    return "No microphone found.";
+  }
+  return (
+    "Could not start recording" +
+    (err && err.message ? ": " + err.message : ".")
+  );
+}
+
+function shadowingTeardownStream() {
+  if (shadowingStream) {
+    shadowingStream.getTracks().forEach(function (t) {
+      try {
+        t.stop();
+      } catch (_) {}
+    });
+    shadowingStream = null;
+  }
+}
+
+function shadowingRecBtn() {
+  return document.getElementById("shadowing-rec-btn");
+}
+
+async function shadowingStartRecording() {
+  const btn = shadowingRecBtn();
+  if (!btn || shadowingBusy || shadowingStartPending || shadowingRecording) {
+    return;
+  }
+  if (!shadowingUnit || !shadowingUnit.el || !shadowingUnit.el.isConnected) {
+    return;
+  }
+  if (!shadowingCanRecord()) {
+    shadowingRenderPanelMessage(
+      "Microphone recording needs a secure context (open Lute on localhost or HTTPS) and a browser with MediaRecorder support.",
+      true
+    );
+    return;
+  }
+
+  // A second click during the getUserMedia await would otherwise start
+  // two captures; collapse it.
+  shadowingStartPending = true;
+  try {
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      shadowingRenderPanelMessage(shadowingPermissionMessage(err), true);
+      return;
+    }
+    shadowingStream = stream;
+    shadowingChunks = [];
+
+    const mime = shadowingPickMimeType();
+    let recorder;
+    try {
+      recorder = mime
+        ? new MediaRecorder(stream, { mimeType: mime })
+        : new MediaRecorder(stream);
+    } catch (err) {
+      shadowingTeardownStream();
+      shadowingRenderPanelMessage(shadowingPermissionMessage(err), true);
+      return;
+    }
+
+    shadowingRecorder = recorder;
+    shadowingRecording = true;
+    shadowingRecStart = Date.now();
+    recorder.ondataavailable = function (e) {
+      if (e.data && e.data.size > 0) shadowingChunks.push(e.data);
+    };
+    recorder.onstop = shadowingOnStop;
+
+    btn.classList.add("recording");
+    btn.innerHTML = STOP_SVG + '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>';
+    shadowingRecTimer = setInterval(function () {
+      const secs = Math.floor((Date.now() - shadowingRecStart) / 1000);
+      const el = document.getElementById("shadowing-rec-time");
+      if (el) el.textContent = secs + "s";
+    }, 250);
+    // Auto mode keeps hands free: cap the take so a forgotten stop
+    // cannot block the loop forever.
+    if (shadowingAuto) {
+      shadowingRecCapTimer = setTimeout(function () {
+        if (shadowingRecording) shadowingStopRecording();
+      }, SHADOWING_REC_CAP_MS);
+    }
+    recorder.start();
+  } finally {
+    shadowingStartPending = false;
+  }
+}
+
+function shadowingStopRecording() {
+  if (!shadowingRecording) return;
+  shadowingRecording = false;
+  if (shadowingRecTimer) {
+    clearInterval(shadowingRecTimer);
+    shadowingRecTimer = null;
+  }
+  if (shadowingRecCapTimer) {
+    clearTimeout(shadowingRecCapTimer);
+    shadowingRecCapTimer = null;
+  }
+  const btn = shadowingRecBtn();
+  if (btn) {
+    btn.classList.remove("recording");
+    btn.innerHTML = MIC_SVG + '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>';
+  }
+  const rec = shadowingRecorder;
+  if (rec && rec.state === "recording") {
+    try {
+      rec.stop();
+    } catch (_) {
+      shadowingRecorder = null;
+      shadowingTeardownStream();
+    }
+  } else {
+    shadowingRecorder = null;
+    shadowingTeardownStream();
+  }
+}
+
+function shadowingCancelRecording() {
+  // Leaving the mode mid-take: drop the capture without scoring it.
+  if (!shadowingRecording) {
+    shadowingTeardownStream();
+    return;
+  }
+  shadowingRecording = false;
+  if (shadowingRecTimer) {
+    clearInterval(shadowingRecTimer);
+    shadowingRecTimer = null;
+  }
+  if (shadowingRecCapTimer) {
+    clearTimeout(shadowingRecCapTimer);
+    shadowingRecCapTimer = null;
+  }
+  const rec = shadowingRecorder;
+  shadowingRecorder = null;
+  if (rec) {
+    rec.onstop = null;
+    try {
+      if (rec.state !== "inactive") rec.stop();
+    } catch (_) {}
+  }
+  shadowingChunks = [];
+  shadowingTeardownStream();
+}
+
+function shadowingToggleRecording() {
+  if (shadowingRecording) {
+    shadowingStopRecording();
+  } else {
+    shadowingStartRecording();
+  }
+}
+
+function shadowingOnStop() {
+  const rec = shadowingRecorder;
+  const chunks = shadowingChunks;
+  const mime = rec ? rec.mimeType : "";
+  const unit = shadowingUnit; // captured: the cue may move while scoring
+
+  shadowingRecorder = null;
+  shadowingChunks = [];
+  shadowingTeardownStream();
+
+  const blob = new Blob(chunks, { type: mime || "audio/webm" });
+  if (!blob.size) {
+    shadowingRenderPanelMessage("The recording was empty — try again.", true);
+    return;
+  }
+  shadowingRecordingBlob = blob;
+  shadowingSubmit(blob, unit);
+}
+
+/* ------------------------------------------------------------------
+ * 8. Submit + results
+ * ------------------------------------------------------------------ */
+
+async function shadowingSubmit(blob, unit) {
+  if (!unit || !unit.texts.length) return;
+  shadowingBusy = true;
+  shadowingClearMarks(unit);
+  shadowingRenderPanelMessage("Transcribing…", false);
+
+  const fd = new FormData();
+  fd.append("audio", blob, "shadowing." + shadowingExtForMime(blob.type));
+  fd.append("language_id", unit.langId || "");
+  fd.append("tokens", JSON.stringify(unit.texts));
+  fd.append("model", shadowingGetModel());
+
+  try {
+    const resp = await fetch("/read/shadowing/transcribe", {
+      method: "POST",
+      body: fd,
+    });
+    let data = {};
+    try {
+      data = await resp.json();
+    } catch (_) {}
+    if (!resp.ok) {
+      shadowingRenderPanelMessage(
+        data.error || "Request failed (" + resp.status + ")",
+        true
+      );
+      return;
+    }
+    if (!data.task_id) {
+      shadowingRenderPanelMessage("No task id returned by the server.", true);
+      return;
+    }
+
+    const outcome = await shadowingPollTask(data.task_id);
+    if (outcome.state === "error") {
+      shadowingRenderPanelMessage(outcome.error, true);
+      return;
+    }
+    const d = outcome.result || {};
+
+    shadowingPaintVerdicts(unit, d);
+    shadowingRenderResult(unit, d);
+
+    const rate =
+      d.tokens_per_minute != null ? d.tokens_per_minute : null;
+    shadowingHistory.unshift({
+      text: unit.fullText.slice(0, 40),
+      score: Number(d.score || 0),
+      rate: rate,
+      duration: d.duration,
+    });
+    shadowingRenderHistory();
+
+    if (shadowingActive && shadowingAuto) shadowingAutoAdvance();
+  } catch (err) {
+    shadowingRenderPanelMessage("Network error: " + err, true);
+  } finally {
+    shadowingBusy = false;
+  }
+}
+
+// Poll a scoring task until it settles.  Transient network errors are
+// tolerated (the backend worker keeps running); the task is lost only
+// if the server restarted ("unknown").  First runs can take minutes --
+// the whisper model may be downloading on the server -- so the panel
+// shows the elapsed wait instead of failing.
+async function shadowingPollTask(taskId) {
+  const started = Date.now();
+  const MAX_MS = 10 * 60 * 1000;
+  while (Date.now() - started < MAX_MS) {
+    await new Promise(function (r) {
+      setTimeout(r, 1500);
+    });
+    let data;
+    try {
+      const resp = await fetch("/read/shadowing/status/" + taskId);
+      data = await resp.json();
+    } catch (_) {
+      continue;
+    }
+    if (data.state === "finished") {
+      return { state: "finished", result: data.result };
+    }
+    if (data.state === "error") {
+      return { state: "error", error: data.error || "Transcription failed." };
+    }
+    if (data.state === "unknown") {
+      return {
+        state: "error",
+        error: "The scoring task was lost (server restart?) — try again.",
+      };
+    }
+    const el = document.getElementById("shadowing-result");
+    if (el) {
+      const secs = Math.floor((Date.now() - started) / 1000);
+      if (data.state === "loading_model") {
+        // Only the first take of a session waits here (the model is
+        // cached afterwards, per size), so say so rather than blaming
+        // the model for every slow transcription.
+        el.innerHTML =
+          '<div class="shadowing-panel__state">Loading the whisper model… ' +
+          secs +
+          "s" +
+          (secs > 20
+            ? " (first run downloads it, this can take minutes)"
+            : "") +
+          "</div>";
+      } else {
+        el.innerHTML =
+          '<div class="shadowing-panel__state">Transcribing… ' +
+          secs +
+          "s</div>";
+      }
+    }
+  }
+  return { state: "error", error: "Transcription timed out." };
+}
+
+function shadowingAutoAdvance() {
+  // Advance to the next cue and play it; the next cue-end starts the
+  // next take.  Auto-pause semantics autoplay the next cue in both
+  // engines (media: the next-cue button; tts: seekToCue with autoplay).
+  if (typeof ttsSeekToCue === "function" &&
+      document.getElementById("tts-player-container") &&
+      typeof ttsCues !== "undefined" && ttsCues.length) {
+    const next = shadowingLastCue && shadowingLastCue.source === "tts"
+      ? shadowingLastCue.index + 1
+      : -1;
+    if (next >= 0 && next < ttsCues.length) {
+      ttsSeekToCue(next, true);
+      return;
+    }
+    shadowingRenderPanelMessage("End of the text — auto stopped.", false);
+    return;
+  }
+  const nextBtn = document.getElementById("yt-next-cue-btn");
+  if (nextBtn) {
+    nextBtn.click();
+    return;
+  }
+  shadowingRenderPanelMessage("No player cues to advance to.", true);
+}
+
+/* ------------------------------------------------------------------
+ * 9. Panel actions
+ * ------------------------------------------------------------------ */
+
+function shadowingNav(delta) {
+  const sents = shadowingSentences().filter(function (s) {
+    return s.querySelector("span.word");
+  });
+  if (!sents.length) return;
+  const anchor =
+    shadowingUnit && shadowingUnit.el
+      ? shadowingUnit.spans[0].closest(".textsentence") || shadowingUnit.el
+      : null;
+  let idx = anchor ? sents.indexOf(anchor) : -1;
+  idx = Math.max(0, Math.min(sents.length - 1, idx + delta));
+  shadowingSetUnit(shadowingUnitFromEl(sents[idx], null));
+}
+
+function shadowingListen() {
+  if (!shadowingUnit || typeof speakText !== "function") return;
+  if (
+    typeof ttsPlaying !== "undefined" &&
+    ttsPlaying &&
+    typeof ttsStop === "function"
+  ) {
+    ttsStop();
+  }
+  speakText(shadowingUnit.fullText);
+}
+
+/* ------------------------------------------------------------------
+ * 10. Boot
+ * ------------------------------------------------------------------ */
+
+function shadowingBoot() {
+  let savedAuto = null;
+  try {
+    savedAuto = localStorage.getItem(SHADOWING_AUTO_KEY);
+  } catch (_) {}
+  shadowingAuto = savedAuto === "1";
+
+  window.addEventListener("lute:cue-changed", shadowingOnCueChanged);
+  window.addEventListener("lute:cue-ended", shadowingOnCueEnded);
+
+  const btn =
+    document.getElementById("tts-shadowing-btn") ||
+    document.getElementById("yt-shadowing-btn");
+  if (btn) {
+    btn.addEventListener("click", shadowingToggleMode);
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", shadowingBoot);
+} else {
+  shadowingBoot();
+}

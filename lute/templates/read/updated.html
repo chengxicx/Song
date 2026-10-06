@@ -23,7 +23,7 @@
     </div>
 
     <script>
-      $(document).ready(function() {
+      document.addEventListener('DOMContentLoaded', function() {
         window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
         $('#flash').delay(1000).fadeOut();
       });

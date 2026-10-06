@@ -12,63 +12,41 @@
 /** SENTENCE TRANSLATIONS *************************/
 
 // LUTE_SENTENCE_LOOKUP_DICTS is rendered in templates/read/index.html.
-// Hitting "t" repeatedly cycles through the uris.  Moving to a new
-// sentence resets the order.
-
-var LUTE_LAST_SENTENCE_TRANSLATION_TEXT = '';
-var LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX = 0;
-
-/** Cycle through the LUTE_SENTENCE_LOOKUP_DICTS.
- * If the current sentence is the same as the last translation,
- * move to the next sentence dictionary; otherwise start the cycle
- * again (from index 0).
- */
-let _get_translation_dict_index = function(sentence) {
-  const dict_count = LUTE_SENTENCE_LOOKUP_DICTS.length;
-  if (dict_count == 0)
-    return 0;
-  let new_index = LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX;
-  if (LUTE_LAST_SENTENCE_TRANSLATION_TEXT != sentence) {
-    // New sentence, start at beginning.
-    new_index = 0;
-  }
-  else {
-    // Same sentence, next dict.
-    new_index += 1;
-    if (new_index >= dict_count)
-      new_index = 0;
-  }
-  LUTE_LAST_SENTENCE_TRANSLATION_TEXT = sentence;
-  LUTE_CURR_SENTENCE_TRANSLATION_DICT_INDEX = new_index;
-  return new_index;
-}
-
+// The lookup opens in the reader's bottom dictionary frame as a row of
+// tabs (one per sentence dictionary, see createSentenceLookupButtons in
+// dict-tabs.js): the first dictionary opens immediately, the others are
+// one click away.  Repeating the command does NOT cycle dictionaries,
+// and translating another sentence starts back at the first tab.
 
 let show_translation_for_text = function(text) {
   if (text == '')
     return;
 
   if (LUTE_SENTENCE_LOOKUP_DICTS.length == 0) {
-    console.log('No sentence translation dictionaries configured.');
+    // Same feedback as the LuteForMobile sentence sheet ("No dictionaries
+    // configured"): a silent no-op made both the hotkey and the term
+    // form's Sentence button feel broken.
+    alert('No sentence translation dictionaries are configured for this language.');
     return;
   }
 
-  const dict_index = _get_translation_dict_index(text);
-  const dict = LUTE_SENTENCE_LOOKUP_DICTS[dict_index];
+  // Reader page: render the sentence-dictionary tabs in the bottom
+  // dictionary frame, just like word lookups.
+  if (typeof createSentenceLookupButtons === "function") {
+    createSentenceLookupButtons(text);
+    return;
+  }
 
+  // Fallback for pages without the reader tab strip: open the first
+  // dictionary in a popup.
   const lookup = encodeURIComponent(text);
+  const dict = LUTE_SENTENCE_LOOKUP_DICTS[0];
   let url = dict.url.replace('[LUTE]', lookup);
   url = url.replace('###', lookup);  // TODO remove_old_###_placeholder: remove
-  if (dict.dicttype == "popuphtml") {
-    let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
-    if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
-      settings = null;
-    LutePopups.open_popup(url, settings);
-  }
-  else {
-    top.frames.wordframe.location.href = url;
-    $('#read_pane_right').css('grid-template-rows', '1fr 0');
-  }
+  let settings = 'width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no';
+  if (LUTE_USER_SETTINGS.open_popup_in_new_tab)
+    settings = null;
+  LutePopups.open_popup(url, settings);
 
 };
 
@@ -147,12 +125,149 @@ function handle_translate(span_attribute) {
 }
 
 
+/** GRAMMAR ANALYSIS *****************************/
+
+// The word the reader most recently opened a term form on.  Set by
+// lute-tooltip.js's show_term_edit_form -- the single place every "open this
+// word" gesture (click, tap, long press, keyboard cursor) funnels through --
+// so the term form's Grammar button knows which sentence to jump to.  Kept
+// apart from lute-shadowing.js's copy of the same value: shadowing consumes
+// its own when the mode starts, and sharing it would make the Grammar target
+// depend on whether Shadow happened to be toggled in between.
+let grammarClickedWord = null;
+
+window.luteGrammarRememberWord = function (el) {
+  const node = el && el.jquery ? el[0] : el;
+  grammarClickedWord =
+    node && node.classList && node.classList.contains("word") ? node : null;
+};
+
+// Take-once: the term form's Grammar button consumes the target, so the
+// panel's later sub-screen refresh (which passes no opts) does not jump
+// again -- the reader has already moved on from that screen.
+function grammarTakeClickedWord() {
+  const el = grammarClickedWord;
+  grammarClickedWord = null;
+  return el;
+}
+
+// The .textsentence that owns a word.  lute-shadowing.js already solves this,
+// including joining a player-subtitle clone back to #thetext through
+// data-order, and it is loaded on every reading page, so prefer it.  The
+// local copy is only a guard: base.html loads this file site-wide, and the
+// shadowing helper does not exist on the non-reading pages.
+function grammarTargetSentence(el) {
+  if (!el || !el.isConnected) return null;
+  if (typeof window.shadowingSentenceForWord === "function") {
+    return window.shadowingSentenceForWord(el);
+  }
+  const div = document.getElementById("thetext");
+  if (!div) return null;
+  const inside = el.closest(".textsentence");
+  if (inside && div.contains(inside)) return inside;
+  const order = el.getAttribute("data-order");
+  if (order == null) return null;
+  const twin = div.querySelector('span.textitem[data-order="' + order + '"]');
+  return twin ? twin.closest(".textsentence") : null;
+}
+
+// Full text for offset matching: keep punctuation so the backend's character
+// offsets line up with the rendered cells; drop only the reader's display
+// artifacts (🔊 / zero-width space) and line breaks, which never appear
+// inside the DOM cells (a newline in a book becomes a paragraph break, not a
+// rendered character).  Composed last, for the same reason as stripText: the
+// offsets are counted in the backend's NFC sentence, so the cell text we
+// index them against must be NFC too.
+function grammarCleanText(t) {
+  return (t || "")
+    .replace(/🔊/g, "")
+    .replace(/\u200b/gi, "")
+    .replace(/\r?\n/g, "")
+    .normalize("NFC");
+}
+
+// All .textitem cells of a node run, with their cleaned text and offsets
+// inside the run's concatenated text.
+function grammarRunCells(nodes) {
+  var cells = [];
+  nodes.forEach(function (n) {
+    var items = n.querySelectorAll(".textitem");
+    if (items.length) {
+      items.forEach(function (it) {
+        cells.push({ el: it, t: grammarCleanText(it.textContent) });
+      });
+    } else {
+      cells.push({ el: n, t: grammarCleanText(n.textContent) });
+    }
+  });
+  return cells;
+}
+
+// Does this run's backend-reported match span cover the clicked word?
+// planRun maps the same spans onto the same cells, but it also does the
+// banding/layout work this yes/no question does not need.
+function grammarRunCoversWord(run, wordEl) {
+  if (!wordEl) return false;
+  var cells = grammarRunCells(run.nodes);
+  var example = run.example || "";
+  var spans = run.spans || [[0, example.length]];
+  var full = "";
+  var starts = [];
+  cells.forEach(function (c) {
+    starts.push(full.length);
+    full += c.t;
+  });
+  var pos = full.indexOf(example);
+  if (pos === -1) return false;
+  for (var si = 0; si < spans.length; si++) {
+    var s = pos + spans[si][0];
+    var e = pos + spans[si][1];
+    for (var ci = 0; ci < cells.length; ci++) {
+      var cStart = starts[ci];
+      var cEnd = cStart + cells[ci].t.length;
+      if (cEnd > s && cStart < e) {
+        var cellEl = cells[ci].el;
+        if (cellEl === wordEl || cellEl.contains(wordEl)) return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Which card to jump to, in the panel's own order (N5 -> N1): prefer the
+// example whose matched span covers the clicked word -- that is the grammar
+// of the word the reader actually asked about -- and fall back to the first
+// example that merely shares the sentence.
+function grammarPickTarget(boundItems, targetSentence, targetWordEl) {
+  var fallback = null;
+  for (var i = 0; i < boundItems.length; i++) {
+    var item = boundItems[i];
+    for (var j = 0; j < item.examples.length; j++) {
+      var ex = item.examples[j];
+      if (ex.nodes.indexOf(targetSentence) === -1) continue;
+      if (!fallback) fallback = { itemEl: item.itemEl, runs: ex.runs };
+      if (grammarRunCoversWord(ex.runs[0], targetWordEl)) {
+        return { itemEl: item.itemEl, runs: ex.runs };
+      }
+    }
+  }
+  return fallback;
+}
+
+
 /**
  * 调用后端 /read/grammar_analysis 分析当前页语法。结果不是悬浮浮层，而是
  * 直接渲染在阅读页右侧栏 #read_pane_right 内，占满整列（顶部词形编辑区 +
  * 底部词典区）。点击单词会恢复右侧栏默认的词形表单 + 词典视图。
+ *
+ * opts.selectTarget is a one-shot flag set by the term form's Grammar
+ * button: the panel then scrolls to -- and pins the rings on -- the card
+ * matching the sentence of the word that opened the form.  The reading
+ * menu's entry and the sub-screen refresh pass no opts and keep the plain
+ * "analyse everything on this screen" behaviour.
  */
-function open_grammar_analysis() {
+function open_grammar_analysis(opts) {
+  const targetWordEl = opts && opts.selectTarget ? grammarTakeClickedWord() : null;
   const bookid = $("#book_id").val();
   const pagenum = $("#page_num").val();
   // Analyse only the current sub-screen: the reader splits one Lute page
@@ -189,6 +304,13 @@ function open_grammar_analysis() {
   // (term-form + dictionary) state.  Exposed globally so clicking a word
   // (LuteTermFormOpened) can restore the default view.
   function closeGrammarAnalysis() {
+    // The per-open "click elsewhere" listener (see clearPinnedSelection) is a
+    // closure over that panel's own state, and the panel element is the only
+    // handle on it -- so unhook it here, before remove() drops the handle.
+    // Without this every open leaks one listener that still holds the whole
+    // detached panel.
+    const stale = document.getElementById("grammar-analysis-panel");
+    if (stale && stale.luteGrammarCleanup) stale.luteGrammarCleanup();
     $("#grammar-analysis-panel").remove();
     // The hover rings live in their own layer on document.body, so removing the
     // panel did not remove them: a ring shown when the panel closes stayed
@@ -268,8 +390,19 @@ function open_grammar_analysis() {
 
   panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
 
+  // The panel can be closed while this request is in flight -- clicking a
+  // word does it, and the term form re-posts LuteTermFormOpened when it
+  // finishes rendering.  Rendering into the detached panel is harmless, but
+  // the ring layer is appended to document.body, so an unguarded callback
+  // painted rings for a panel that no longer exists: stray boxes with no
+  // panel to hover, and no way to clear them.
+  function panelIsGone() {
+    return !panel[0].isConnected;
+  }
+
   $.getJSON(url)
     .done(function (data) {
+      if (panelIsGone()) return;
       let bodyHtml;
       if (!data || data.length === 0) {
         bodyHtml = '<div class="grammar-analysis-panel__state">No known grammar points detected on this page.</div>';
@@ -328,21 +461,59 @@ function open_grammar_analysis() {
               ? '<span class="grammar-item__level">' + escapeHtml(g.level) + "</span>"
               : "";
           const desc = g.desc ? '<div class="grammar-item__desc">' + escapeHtml(g.desc) + "</div>" : "";
+          const formation = g.formation
+            ? '<div class="grammar-item__formation">' + escapeHtml(g.formation) + "</div>"
+            : "";
           const examples = (g.examples || []).map(function (ex) {
             return '<div class="grammar-item__example">' + renderExample(ex) + "</div>";
           }).join("");
+          // Folded reference block: the entry's own curated example with its
+          // translation, plus usage notes.  Both fields are optional
+          // (hand-written rules and older data carry neither), so the whole
+          // block disappears when there is nothing to show.  The backend
+          // picks the translation for the panel's display language and drops
+          // the block when the entry has none, so `text` is already right.
+          // The source sentence is `sentence`; `japanese` is the spelling the
+          // Japanese engine still ships, kept so both engines render here.
+          const notes = g.notes
+            ? '<div class="grammar-item__notes">' + escapeHtml(g.notes) + "</div>"
+            : "";
+          const refSentence =
+            g.reference && (g.reference.sentence || g.reference.japanese);
+          const ref = refSentence
+            ? '<div class="grammar-item__refex">' +
+              renderExample({
+                sentence: refSentence,
+                matches: g.reference.matches || [],
+              }) +
+              '<div class="grammar-item__reftr">' +
+              escapeHtml(g.reference.text || "") +
+              "</div></div>"
+            : "";
+          const cjk = /[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]/.test(g.desc || "");
+          const moreLabel = cjk ? "参考例句 · 注意点" : "Reference · notes";
+          const more =
+            ref || notes
+              ? '<details class="grammar-item__more"><summary>' + moreLabel + "</summary>" +
+                ref + notes + "</details>"
+              : "";
           return (
             '<div class="grammar-item grammar-item--' +
             escapeHtml(levelClass(g.level)) +
             (fold ? " grammar-item--fold grammar-item--collapsed" : "") +
-            '">' +
+            // Stable anchor: the backend's `key` survives re-analysis, so
+            // tests and any future deep-link can name a card without
+            // depending on its position in the level grouping.
+            '" data-grammar-key="' + escapeHtml(g.key || "") + '">' +
             '<div class="grammar-item__head"' + (fold ? ' role="button"' : "") + ">" +
             level +
             '<span class="grammar-item__name">' + escapeHtml(g.name) + "</span>" +
             (fold ? '<span class="grammar-item__fold" aria-hidden="true">&#9656;</span>' : "") +
             "</div>" +
+            formation +
             desc +
             '<div class="grammar-item__examples">' + examples + "</div>" +
+            more +
             "</div>"
           );
         }
@@ -421,11 +592,73 @@ function open_grammar_analysis() {
         ringLayer.className = "grammar-ring-layer";
         document.body.appendChild(ringLayer);
         var activeRings = [];
+        // The auto-selected run (see opts.selectTarget) and the card carrying
+        // .grammar-item--active.  Pinned means "drawn until something else
+        // takes over": a hover on another card shows that card's rings
+        // instead, and mouseleave comes back here rather than clearing.
+        var pinnedRuns = null;
+        var pinnedItemEl = null;
+
+        // A pointer that has not moved cannot have entered anything.  When the
+        // jump below scrolls the panel, Chrome fires mouseenter for whatever
+        // card slides under the stationary cursor, with no mouseleave on the
+        // card that left -- so the panel would ring the wrong card for the
+        // first frame after the click, which is exactly when the reader is
+        // looking.  Real hovers always arrive after a mousemove, so gating on
+        // "has the pointer moved since the panel opened" drops the artefact
+        // and leaves ordinary hovering untouched.  once:true means one
+        // listener, removed by the first move.
+        var pointerHasMoved = false;
+        document.addEventListener(
+          "mousemove",
+          function () { pointerHasMoved = true; },
+          { once: true }
+        );
+
+        function showRings(runs) {
+          hideAllRings();
+          var rings = [];
+          runs.forEach(function (run) {
+            planRun(run).forEach(function (p) {
+              var ring = document.createElement("div");
+              ring.className = p.amber ? "grammar-word-ring" : "grammar-ring";
+              ringLayer.appendChild(ring);
+              var pad = p.amber ? 1 : 3;
+              positionRing(ring, p.rect, pad);
+              rings.push({
+                ring: ring, pad: pad,
+                cells: p.cells, starts: p.starts, s: p.s, e: p.e, bi: p.bi
+              });
+            });
+          });
+          activeRings = rings;
+        }
+
+        function restorePinned() {
+          if (pinnedRuns) showRings(pinnedRuns);
+          else hideAllRings();
+        }
+
+        function setPinned(runs, itemEl) {
+          if (pinnedItemEl && pinnedItemEl !== itemEl) {
+            pinnedItemEl.classList.remove("grammar-item--active");
+          }
+          pinnedRuns = runs;
+          pinnedItemEl = itemEl || null;
+          if (pinnedItemEl) pinnedItemEl.classList.add("grammar-item--active");
+          if (runs) showRings(runs);
+          else hideAllRings();
+        }
 
         function updateActiveRings() {
           activeRings.forEach(function (r) {
-            var u = unionRect(r.cells.map(function (el) { return el.getBoundingClientRect(); }));
-            if (u) positionRing(r.ring, u);
+            // Re-band the same character range, then keep this ring's own
+            // band: a ring must never re-union into the full multi-line
+            // rectangle, and a scroll that reflows the text must not leave it
+            // on the wrong line.
+            var bands = rangeBands(r.cells, r.starts, r.s, r.e);
+            var b = bands[r.bi] || bands[0];
+            if (b) positionRing(r.ring, b.rect, r.pad);
           });
         }
         window.addEventListener("scroll", updateActiveRings, { passive: true });
@@ -442,17 +675,146 @@ function open_grammar_analysis() {
           activeRings = [];
         }
 
-        function unionRect(rects) {
-          var top = Infinity, left = Infinity, bottom = -Infinity, right = -Infinity;
-          rects.forEach(function (r) {
-            if (!r.width && !r.height) return;
-            top = Math.min(top, r.top);
-            left = Math.min(left, r.left);
-            bottom = Math.max(bottom, r.bottom);
-            right = Math.max(right, r.right);
+        // "I am done with this sentence": a click anywhere -- the reading
+        // text, a toolbar button, another card, or the panel's own background
+        // -- drops the selected style and the rings.  The panel stays open,
+        // so hovering a card still cross-highlights after the click; it just
+        // no longer comes back to a pin.  Capture phase, so the clear lands
+        // before whatever the click was actually for.  The close button is
+        // exempt because it is already tearing the whole panel down.
+        function clearPinnedSelection(ev) {
+          if (
+            ev &&
+            ev.target &&
+            ev.target.closest &&
+            ev.target.closest(".grammar-analysis-panel__close")
+          ) {
+            return;
+          }
+          if (pinnedItemEl) pinnedItemEl.classList.remove("grammar-item--active");
+          pinnedRuns = null;
+          pinnedItemEl = null;
+          hideAllRings();
+        }
+        document.addEventListener("click", clearPinnedSelection, true);
+        // closeGrammarAnalysis() reaches the listener through this hook: once
+        // the panel element is gone the closure is otherwise unreachable.
+        panel[0].luteGrammarCleanup = function () {
+          document.removeEventListener("click", clearPinnedSelection, true);
+        };
+
+        // Ring per rendered line, not per bounding box: a sentence wrapped
+        // across two lines has one bounding box spanning the full width of
+        // both lines, which visually swallows the neighbouring sentences on
+        // them (e.g. a sentence ending mid-line-2 rings all of line 1 too).
+        // Split client rects into line bands -- rects whose vertical extents
+        // overlap sit on the same line -- and return one rect per band, so
+        // each ring hugs the text it marks.
+        function bandsFromRects(rects) {
+          var items = rects.filter(function (r) { return r.width || r.height; });
+          items.sort(function (a, b) { return a.top - b.top; });
+          var bands = [];
+          items.forEach(function (r) {
+            var b = bands.length ? bands[bands.length - 1] : null;
+            if (b && r.top <= b.bottom + 2) {
+              if (r.bottom > b.bottom) b.bottom = r.bottom;
+              if (r.left < b.left) b.left = r.left;
+              if (r.right > b.right) b.right = r.right;
+            } else {
+              bands.push({
+                top: r.top, bottom: r.bottom, left: r.left, right: r.right
+              });
+            }
           });
-          if (top === Infinity) return null;
-          return { top: top, left: left, width: right - left, height: bottom - top };
+          return bands.map(function (b) {
+            return {
+              rect: {
+                top: b.top, left: b.left,
+                width: b.right - b.left, height: b.bottom - b.top
+              }
+            };
+          });
+        }
+
+        // UTF-16 code units of a raw text node that grammarCleanText drops
+        // (the 🔊 marker is a surrogate pair).  Returns how many units to
+        // skip at k.
+        function _cleanDropUnits(raw, k) {
+          var ch = raw[k];
+          if (ch === "\u200b" || ch === "\n" || ch === "\r") return 1;
+          if (ch === "\uD83D" && raw[k + 1] === "\uDD0A") return 2;
+          return 0;
+        }
+
+        // Client rects of the kept characters [a, b) inside one .textitem,
+        // indexed in the SAME cleaned text grammarRunCells concatenates
+        // (artifacts removed, NFC).  A DOM Range is the only way to ring part
+        // of a cell: a cell may hold several words (a saved multi-word term
+        // such as 気のせい) and a match may cover only some of them, so the
+        // element's own box is too big.
+        function cellCharRects(el, a, b) {
+          var pieces = [];
+          var total = 0;
+          var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+          var n;
+          while ((n = walker.nextNode())) {
+            var t = grammarCleanText(n.data);
+            pieces.push({ node: n, raw: n.data, t: t });
+            total += t.length;
+          }
+          if (!total) return [];
+          a = Math.max(0, a);
+          b = Math.min(total, b);
+          if (b <= a) return [];
+          // Raw offset inside one piece at which its `want`-th kept character
+          // starts.  Counting via the NFC'd prefix (not one code unit per
+          // kept char) keeps this right when the DOM stores decomposed text:
+          // NFD Hangul uses several raw units per NFC syllable, and every
+          // offset the panel indexes against is NFC.
+          function rawOffset(piece, want) {
+            var off = 0, k = 0;
+            while (k < piece.raw.length) {
+              if (grammarCleanText(piece.raw.slice(0, off)).length >= want) break;
+              var skip = _cleanDropUnits(piece.raw, k);
+              if (skip) { k += skip; off += skip; continue; }
+              k++; off++;
+            }
+            return off;
+          }
+          function locate(idx) {
+            var acc = 0;
+            for (var i = 0; i < pieces.length; i++) {
+              var p = pieces[i];
+              if (idx <= acc + p.t.length) {
+                return { node: p.node, off: rawOffset(p, idx - acc) };
+              }
+              acc += p.t.length;
+            }
+            var last = pieces[pieces.length - 1];
+            return { node: last.node, off: last.raw.length };
+          }
+          var st = locate(a), en = locate(b);
+          var r = document.createRange();
+          r.setStart(st.node, st.off);
+          r.setEnd(en.node, en.off);
+          return Array.prototype.slice.call(r.getClientRects());
+        }
+
+        // Per-rendered-line bands for the character range [s, e) of the run's
+        // concatenated cell text.  Each cell contributes only its intersecting
+        // sub-range, so a blue ring hugs just the example sentence (never the
+        // whole multi-sentence node) and an amber box hugs just the matched
+        // characters inside a cell.
+        function rangeBands(cells, starts, s, e) {
+          var rects = [];
+          cells.forEach(function (c, idx) {
+            var cStart = starts[idx], cEnd = cStart + c.t.length;
+            if (cEnd <= s || cStart >= e) return;
+            var a = Math.max(s, cStart) - cStart;
+            var b = Math.min(e, cEnd) - cStart;
+            rects = rects.concat(cellCharRects(c.el, a, b));
+          });
+          return bandsFromRects(rects);
         }
 
         function positionRing(ring, rect, pad) {
@@ -465,21 +827,15 @@ function open_grammar_analysis() {
         }
 
         // Match text with only letters/numbers so punctuation or the 🔊
-        // marker never interferes with locating a phrase.
+        // marker never interferes with locating a phrase.  NFC-composed
+        // last: the backend echoes its sentences composed, while a book
+        // may store decomposed Hangul, and only composed text on both
+        // sides compares equal.
         function stripText(t) {
-          return (t || "").replace(/🔊/g, "").replace(/[^\p{L}\p{N}]/gu, "");
-        }
-
-        // Full text for offset matching: keep punctuation so the backend's
-        // character offsets line up with the rendered cells; drop only the
-        // reader's display artifacts (🔊 / zero-width space) and line
-        // breaks, which never appear inside the DOM cells (a newline in a
-        // book becomes a paragraph break, not a rendered character).
-        function cleanText(t) {
           return (t || "")
             .replace(/🔊/g, "")
-            .replace(/\u200b/gi, "")
-            .replace(/\r?\n/g, "");
+            .replace(/[^\p{L}\p{N}]/gu, "")
+            .normalize("NFC");
         }
 
         // Media-driven books (mp3/subtitles) split one example across several
@@ -492,74 +848,53 @@ function open_grammar_analysis() {
           return { el: el, t: stripText(el.textContent) };
         });
 
-        // All .textitem cells of a node run, with their cleaned text and
-        // offsets inside the run's concatenated text.
-        function runCells(nodes) {
-          var cells = [];
-          nodes.forEach(function (n) {
-            var items = n.querySelectorAll(".textitem");
-            if (items.length) {
-              items.forEach(function (it) {
-                cells.push({ el: it, t: cleanText(it.textContent) });
-              });
-            } else {
-              cells.push({ el: n, t: cleanText(n.textContent) });
-            }
-          });
-          return cells;
-        }
-
-        // Ring the whole sentence that contains a match (blue outline), and
-        // draw one amber box around each contiguous run of matched words,
-        // using the backend's exact character offsets.  Adjacent cells (a
-        // word plus its trailing space) merge into a single box so a phrase
-        // like "는 것" never looks like several separate boxes.  Falls back
-        // to ringing the whole run when the example text can't be located.
+        // Ring the example sentence only (blue outline) and draw one amber
+        // box around each matched span, using the backend's exact character
+        // offsets.  Every ring carries its own character range plus its band
+        // index, so updateActiveRings can re-band it after a scroll/reflow.
+        // Falls back to ringing the whole node when the example text can't be
+        // located (or the node has no cells).
         function planRun(run) {
           var example = run.example || "";
           var spans = run.spans || [[0, example.length]];
-          var cells = runCells(run.nodes);
+          var cells = grammarRunCells(run.nodes);
           var plan = [];
-          if (example && cells.length) {
-            var full = "", starts = [];
-            cells.forEach(function (c) { starts.push(full.length); full += c.t; });
-            var pos = full.indexOf(example);
-            if (pos !== -1) {
-              var wordBoxes = [];
-              spans.forEach(function (sp) {
-                var s = pos + sp[0], e = pos + sp[1];
-                // Cell indices overlapping the span, then grouped into
-                // contiguous runs (consecutive cells) for one box per run.
-                var idxs = [];
-                cells.forEach(function (c, idx) {
-                  var cStart = starts[idx], cEnd = cStart + c.t.length;
-                  if (cEnd > s && cStart < e) idxs.push(idx);
-                });
-                for (var i = 0; i < idxs.length; i++) {
-                  var j = i;
-                  while (j + 1 < idxs.length && idxs[j + 1] === idxs[j] + 1) j++;
-                  var runEls = [];
-                  for (var k = i; k <= j; k++) runEls.push(cells[idxs[k]].el);
-                  var u = unionRect(runEls.map(function (el) { return el.getBoundingClientRect(); }));
-                  if (u) wordBoxes.push({ rect: u, els: runEls });
-                  i = j;
-                }
-              });
-              var all = cells.map(function (c) { return c.el.getBoundingClientRect(); });
-              var uAll = unionRect(all);
-              if (uAll) {
+          var full = "", starts = [];
+          cells.forEach(function (c) { starts.push(full.length); full += c.t; });
+          var pos = example ? full.indexOf(example) : -1;
+          if (pos !== -1) {
+            // Blue: bands of the example's own character range, so an example
+            // that is one sentence inside a multi-sentence node never rings
+            // the neighbouring sentences.
+            rangeBands(cells, starts, pos, pos + example.length)
+              .forEach(function (b, bi) {
                 plan.push({
-                  rect: uAll,
-                  els: cells.map(function (c) { return c.el; }),
-                  wordBoxes: wordBoxes
+                  rect: b.rect, amber: false,
+                  cells: cells, starts: starts,
+                  s: pos, e: pos + example.length, bi: bi
                 });
-              }
-            }
-          }
-          if (!plan.length) {
-            var all2 = cells.map(function (c) { return c.el.getBoundingClientRect(); });
-            var u2 = unionRect(all2);
-            if (u2) plan.push({ rect: u2, els: cells.map(function (c) { return c.el; }), wordBoxes: [] });
+              });
+            // Amber: one tight box per rendered line of each matched span.
+            spans.forEach(function (sp) {
+              var s = pos + sp[0], e = pos + sp[1];
+              rangeBands(cells, starts, s, e).forEach(function (b, bi) {
+                plan.push({
+                  rect: b.rect, amber: true,
+                  cells: cells, starts: starts,
+                  s: s, e: e, bi: bi
+                });
+              });
+            });
+          } else if (cells.length) {
+            // Example not located: ring the whole node, but still per line.
+            rangeBands(cells, starts, 0, full.length)
+              .forEach(function (b, bi) {
+                plan.push({
+                  rect: b.rect, amber: false,
+                  cells: cells, starts: starts,
+                  s: 0, e: full.length, bi: bi
+                });
+              });
           }
           return plan;
         }
@@ -613,6 +948,9 @@ function open_grammar_analysis() {
             });
           });
         }
+        // One record per rendered card, in DOM order, so the auto-select
+        // below can ask "which card matches the sentence I came from?".
+        var boundItems = [];
         Array.prototype.forEach.call(
           panel[0].querySelectorAll(".grammar-item"),
           function (item, itemIdx) {
@@ -629,29 +967,9 @@ function open_grammar_analysis() {
               }
             }
             if (!g) return;
+            var rec = { itemEl: item, examples: [] };
+            boundItems.push(rec);
             var exampleEls = item.querySelectorAll(".grammar-item__example");
-            function showRings(runs) {
-              hideAllRings();
-              var rings = [];
-              runs.forEach(function (run) {
-                planRun(run).forEach(function (p) {
-                  var ring = document.createElement("div");
-                  ring.className = "grammar-ring";
-                  ringLayer.appendChild(ring);
-                  positionRing(ring, p.rect);
-                  rings.push({ ring: ring, cells: p.els });
-                  // One amber box per contiguous run of matched words.
-                  p.wordBoxes.forEach(function (wb) {
-                    var w = document.createElement("div");
-                    w.className = "grammar-word-ring";
-                    ringLayer.appendChild(w);
-                    positionRing(w, wb.rect, 1);
-                    rings.push({ ring: w, cells: wb.els });
-                  });
-                });
-              });
-              activeRings = rings;
-            }
 
             // Hovering one example highlights only that example's sentence
             // (blue ring + amber boxes on its matched words) -- never every
@@ -664,11 +982,11 @@ function open_grammar_analysis() {
               // example sentence; fall back to the whole sentence when no
               // match info is available.
               var rawExample = ex.sentence || exEl.textContent;
-              var example = cleanText(rawExample);
+              var example = grammarCleanText(rawExample);
               if (!example) return;
               // A multi-line example (line break inside the sentence, e.g.
               // from subtitle books or an older analysis) has its backend
-              // offsets in the raw text, while cleanText drops the newlines;
+              // offsets in the raw text, while grammarCleanText drops the newlines;
               // shift each offset by the newlines removed before it.
               var spans = (ex.matches || [])
                 .map(function (m) {
@@ -688,21 +1006,46 @@ function open_grammar_analysis() {
               var nodes = findRuns(stripText(example));
               if (!nodes.length) return;
               var runs = [{ example: example, spans: spans, nodes: nodes }];
+              rec.examples.push({ runs: runs, nodes: nodes });
               if (!firstRuns) firstRuns = runs;
-              exEl.addEventListener("mouseenter", function () { showRings(runs); });
-              exEl.addEventListener("mouseleave", hideAllRings);
+              exEl.addEventListener("mouseenter", function () {
+                if (pointerHasMoved) showRings(runs);
+              });
+              exEl.addEventListener("mouseleave", restorePinned);
             });
             if (!firstRuns) return;
             var headEl = item.querySelector(".grammar-item__head");
             if (headEl) {
-              headEl.addEventListener("mouseenter", function () { showRings(firstRuns); });
-              headEl.addEventListener("mouseleave", hideAllRings);
+              headEl.addEventListener("mouseenter", function () {
+                if (pointerHasMoved) showRings(firstRuns);
+              });
+              headEl.addEventListener("mouseleave", restorePinned);
             }
           }
         );
+
+        // The term form's Grammar button: jump straight to the card for the
+        // sentence the reader was in, and pin its rings so the highlight
+        // stays put.  Nothing to do when the sentence carries no known
+        // grammar -- the panel then reads exactly as it did before.
+        if (targetWordEl && targetWordEl.isConnected) {
+          var targetSentence = grammarTargetSentence(targetWordEl);
+          var picked = targetSentence
+            ? grammarPickTarget(boundItems, targetSentence, targetWordEl)
+            : null;
+          if (picked) {
+            // A collapsed aggregate row hides its examples (display:none),
+            // and getClientRects() on hidden cells is empty, so the rings
+            // would be invisible.  Open it first.
+            picked.itemEl.classList.remove("grammar-item--collapsed");
+            setPinned(picked.runs, picked.itemEl);
+            picked.itemEl.scrollIntoView({ block: "nearest" });
+          }
+        }
       }
     })
     .fail(function () {
+      if (panelIsGone()) return;
       panel.html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">Analysis failed. Please try again.</div></div>');
       panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
     });

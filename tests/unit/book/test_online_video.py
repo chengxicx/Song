@@ -216,6 +216,51 @@ def test_mp3_online_url_creates_mp3_book(app, app_context, client, english):
     assert book.media_url == "https://a.example.com/song.mp3"
 
 
+def test_mp3_upload_accepts_other_audio_formats(app, app_context, client, english):
+    "The mp3 form accepts uploaded audio beyond mp3/m4a (e.g. wav) + a subtitle."
+    resp = client.post(
+        "/book/import_webpage",
+        data={
+            "import_type": "mp3",
+            "mp3_file": (io.BytesIO(b"RIFF\x00\x00\x00\x00WAVEfmt "), "recording.wav"),
+            "srt_file": (io.BytesIO(SAMPLE_SRT.encode("utf-8")), "sub.srt"),
+            "mp3_tag": "my-audio-tag",
+            "language_id": str(english.id),
+        },
+        content_type="multipart/form-data",
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+    assert "/read/" in resp.headers["Location"]
+
+    repo = BookRepository(db.session)
+    book = repo.find_by_title("recording", english.id)
+    assert book is not None
+    assert book.book_type == "mp3"
+    assert book.audio_filename is not None
+    assert book.audio_filename.endswith(".wav")
+
+
+def test_mp3_upload_rejects_unsupported_extension(app, app_context, client, english):
+    "A non-audio upload is rejected and no book is created."
+    resp = client.post(
+        "/book/import_webpage",
+        data={
+            "import_type": "mp3",
+            "mp3_file": (io.BytesIO(b"not audio"), "notes.txt"),
+            "srt_file": (io.BytesIO(SAMPLE_SRT.encode("utf-8")), "sub.srt"),
+            "language_id": str(english.id),
+        },
+        content_type="multipart/form-data",
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"].endswith("/book/import_webpage")
+
+    repo = BookRepository(db.session)
+    assert repo.find_by_title("notes", english.id) is None
+
+
 def _make_video_book(
     app, app_context, english, media_url="https://v.example.com/clip.mp4"
 ):
@@ -239,6 +284,107 @@ def _make_video_book(
     return BookService().import_book(b, db.session)
 
 
+# ---------------------------------------------------------------------
+# XHR submissions: the forms upload via XHR for a real progress bar, so
+# validation errors come back as inline JSON instead of a redirect that
+# wipes the picked files.
+# ---------------------------------------------------------------------
+
+XHR_HEADERS = {"X-Requested-With": "XMLHttpRequest"}
+
+
+def test_xhr_mp3_without_subtitles_returns_json_error(app, client, english):
+    "Audio + no subtitles over XHR is an inline 400, not a redirect bounce."
+    resp = client.post(
+        "/book/import_webpage",
+        data={
+            "import_type": "mp3",
+            "mp3_url": "https://a.example.com/song.mp3",
+            "language_id": str(english.id),
+        },
+        headers=XHR_HEADERS,
+    )
+    assert resp.status_code == 400
+    payload = resp.get_json()
+    assert payload["ok"] is False
+    assert "Auto-transcribe" in payload["error"]
+
+
+def test_xhr_mp3_upload_success_returns_json_redirect(app, client, english):
+    "A valid XHR mp3 upload answers with the read-page redirect target."
+    resp = client.post(
+        "/book/import_webpage",
+        data={
+            "import_type": "mp3",
+            "mp3_file": (io.BytesIO(b"RIFF\x00\x00\x00\x00WAVEfmt "), "recording.wav"),
+            "srt_file": (io.BytesIO(SAMPLE_SRT.encode("utf-8")), "sub.srt"),
+            "language_id": str(english.id),
+        },
+        content_type="multipart/form-data",
+        headers=XHR_HEADERS,
+    )
+    assert resp.status_code == 200
+    payload = resp.get_json()
+    assert payload["ok"] is True
+    assert "/read/" in payload["redirect"]
+
+
+def test_xhr_video_missing_subtitles_returns_json_error(app, client, english):
+    "Video + no subtitles over XHR is an inline 400, not a redirect bounce."
+    resp = client.post(
+        "/book/import_webpage",
+        data={
+            "import_type": "video",
+            "video_url": "https://v.example.com/a.mp4",
+            "language_id": str(english.id),
+        },
+        headers=XHR_HEADERS,
+    )
+    assert resp.status_code == 400
+    payload = resp.get_json()
+    assert payload["ok"] is False
+    assert "subtitles" in payload["error"]
+
+
+def test_xhr_video_success_returns_json_redirect(app, client, english):
+    "A valid XHR video import answers with the read-page redirect target."
+    with patch(
+        "lute.book.routes.parse_subtitle_from_url", return_value=("Hello text.", "[]")
+    ), patch(
+        "lute.book.routes._url_content_length",
+        return_value=MEDIA_LOCAL_MAX_BYTES + 1,
+    ):
+        resp = client.post(
+            "/book/import_webpage",
+            data={
+                "import_type": "video",
+                "video_url": "https://v.example.com/a.mp4",
+                "video_srt_url": "https://v.example.com/sub.srt",
+                "language_id": str(english.id),
+            },
+            headers=XHR_HEADERS,
+        )
+    assert resp.status_code == 200
+    payload = resp.get_json()
+    assert payload["ok"] is True
+    assert "/read/" in payload["redirect"]
+
+
+def test_plain_post_still_redirects(app, client, english):
+    "Non-XHR posts keep the historical flash + redirect behavior."
+    resp = client.post(
+        "/book/import_webpage",
+        data={
+            "import_type": "video",
+            "video_url": "https://v.example.com/a.mp4",
+            "language_id": str(english.id),
+        },
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"].endswith("/book/import_webpage")
+
+
 def test_read_page_renders_video_backend(app, app_context, client, english):
     "Reading a video book renders the HTML5 video player with the media URL."
     dbbook = _make_video_book(app, app_context, english)
@@ -250,3 +396,22 @@ def test_read_page_renders_video_backend(app, app_context, client, english):
     assert '"video"' in content  # LUTE_YT_DATA.backend
     assert 'id="yt-video-player"' in content
     assert "https://v.example.com/clip.mp4" in content
+
+
+def test_read_page_streams_a_locally_stored_video(app, app_context, client, english):
+    """
+    A video book whose file is stored locally (what the auto-transcribe
+    flow creates) plays from /useraudio/stream, not from a remote URL.
+    """
+    dbbook = _make_video_book(app, app_context, english)
+    # Exactly what whisper_transcribe's task leaves behind: a copied file
+    # in the user audio dir and no media_url.
+    dbbook.media_url = None
+    dbbook.audio_filename = "clip.mp4"
+    db.session.commit()
+
+    resp = client.get(f"/read/{dbbook.id}/page/1")
+    assert resp.status_code == 200
+    content = resp.get_data(as_text=True)
+    assert '"video"' in content  # still the HTML5 <video> backend
+    assert f"/useraudio/stream/{dbbook.id}" in content

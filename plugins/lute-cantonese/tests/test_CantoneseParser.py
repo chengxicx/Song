@@ -7,6 +7,9 @@ boundaries (and 5.x may group sentence punctuation into a word
 token, which the parser normalizes away).
 """
 
+import subprocess
+import sys
+
 import pytest
 
 # pylint: disable=wrong-import-order
@@ -156,7 +159,46 @@ def test_readings():
         assert actual.replace(" ", "") == expected, text
 
 
+def test_get_readings_offers_attested_polyphone_readings():
+    """
+    The dictionary files 阿 under o1, but the corpus attests the name
+    prefix reading aa3 (330 of its 330 occurrences).  The candidates
+    must include both, so the shadowing rescue can judge 阿明 read the
+    everyday way instead of scoring it a flat miss.
+    """
+    p = CantoneseParser()
+    readings = p.get_readings("阿明答")
+    assert readings, "no readings at all"
+    # The plain dictionary reading comes first.
+    assert readings[0] == p.get_reading("阿明答")
+    assert len(readings) >= 2, readings
+    assert any(r.replace(" ", "").startswith("aa3") for r in readings), readings
+
+
+def test_get_readings_empty_when_nothing_romanizes():
+    "Punctuation-only and foreign text yield no candidates."
+    p = CantoneseParser()
+    for text in ["。", "Hello", "2024"]:
+        assert p.get_readings(text) == [], text
+
+
 def test_parser_declares_cantonese():
     "Parser is language-specific."
     assert CantoneseParser.languages() is not None
     assert "cantonese" in CantoneseParser.languages()
+
+
+def test_importing_the_parser_does_not_import_pycantonese():
+    """
+    The app imports every parser plugin at start-up
+    (lute.parse.registry), so the heavy dependency must stay out of
+    the module import: importing pycantonese alone costs ~45MB of
+    resident memory.
+    """
+    code = (
+        "import sys;"
+        "import lute_cantonese_parser.parser;"
+        "assert 'pycantonese' not in sys.modules, "
+        "'importing the parser pulled in pycantonese'"
+    )
+    subprocess.check_call([sys.executable, "-c", code])

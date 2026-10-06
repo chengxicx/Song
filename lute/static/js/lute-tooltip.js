@@ -249,6 +249,26 @@ const _termpopup_queue = [];
 let _termpopup_fetching = false;
 let _termpopup_fetching_wid = null;
 
+// The term's annotated reading for each cached popup, keyed by word
+// id.  tts.js's hover pronunciation prefers the reading (kana) for
+// terms whose TTS reading differs from the annotation.  Filled from
+// the popup's hidden .termpopup-reading holder (termpopup.html) as
+// popups are fetched; cleared together with the popup cache, so a
+// just-saved reading is re-fetched on the next hover.
+window.LUTE_TERM_READINGS = {};
+
+function _store_term_reading(elid, popup_html) {
+  if (!popup_html) return;
+  try {
+    const holder = new DOMParser()
+      .parseFromString(popup_html, "text/html")
+      .querySelector(".termpopup-reading");
+    if (holder) {
+      window.LUTE_TERM_READINGS[elid] = (holder.textContent || "").trim();
+    }
+  } catch (_) {}
+}
+
 // Deliver cached HTML to a waiting tooltip, guarding against the word
 // having been re-rendered/replaced while the request was in flight (e.g.
 // the TTS subtitle is rebuilt on each loop iteration, or the page
@@ -306,6 +326,9 @@ function clear_termpopup_cache() {
   for (const k of Object.keys(_termpopup_cache)) {
     delete _termpopup_cache[k];
   }
+  for (const k of Object.keys(window.LUTE_TERM_READINGS)) {
+    delete window.LUTE_TERM_READINGS[k];
+  }
   for (const k of Object.keys(_termpopup_pending)) {
     delete _termpopup_pending[k];
   }
@@ -329,6 +352,7 @@ document.addEventListener('htmx:afterRequest', function (e) {
   _termpopup_fetching_wid = null;
   if (elid === null) return;
   _termpopup_cache[elid] = detail.successful && detail.target ? detail.target.innerHTML : '';
+  _store_term_reading(elid, _termpopup_cache[elid]);
   _termpopup_deliver(elid);
   _termpopup_pump();
   // Whether it succeeded or failed, the wait is over.
@@ -430,6 +454,21 @@ function _show_wordframe_url(url) {
 }
 
 function show_term_edit_form(el) {
+  // Remember which word the reader opened.  Every "open this word"
+  // gesture funnels through here -- a click, a tap, a long press, the
+  // keyboard cursor -- so this is the one place that has to record it.
+  // lute-shadowing.js (reading page only, hence the guard) then starts
+  // the shadowing panel on this word's sentence instead of the page's
+  // first one.
+  if (typeof window.luteShadowingRememberWord === "function") {
+    window.luteShadowingRememberWord(el);
+  }
+  // The term form's Grammar button needs the same target: the analysis panel
+  // is opened by the parent page, so the parent has to know which word (and
+  // therefore which sentence) is being edited.
+  if (typeof window.luteGrammarRememberWord === "function") {
+    window.luteGrammarRememberWord(el);
+  }
   const wid = parseInt(el.data('wid'));
   if (isNaN(wid)) {
     // The term hasn't been saved to the DB yet (status 0 with no ID).

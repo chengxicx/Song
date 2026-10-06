@@ -924,6 +924,77 @@ def test_manga_edit_reimports_archive_over_the_book(app, app_context, japanese, 
     assert f'src="/static/{reloaded.manga_path}/hanabira_manga_01.jpg"' in content
 
 
+def test_manga_reimport_notice_is_shown_once(app, app_context, japanese, client):
+    """
+    The re-import confirmation is a one-shot notice.
+
+    The reading pane is a fixed 100vh box, so a notice left in the flow
+    sits above it, and every page turn scrolls back to the top and puts
+    it back on screen -- the reader saw the same notice on every page.
+    Two halves to the contract: the notice arrives with the full reading
+    page only (never with the per-page fragment, so a page turn cannot
+    re-issue it), and the reading screen ships the script that takes it
+    out of the flow.
+    """
+    book = _import_and_get_book(app, app_context, japanese, client)
+    resp = _post_manga_edit(client, book.id, archive=make_archive(".cbz", 3))
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == f"/read/{book.id}/page/1"
+
+    # The notice is delivered with the full page ...
+    content = client.get(resp.headers["Location"]).get_data(as_text=True)
+    assert "re-imported: the manga pages were replaced." in content
+    # ... together with the dismissal wiring (drop it on the first page
+    # turn or after a few seconds; see read/index.html).
+    assert "dismiss_flash_notices" in content
+    assert 'querySelectorAll(".flash-notice")' in content
+    assert "htmx:afterSwap" in content
+
+    # The per-page fragment the reader swaps in carries no notice, so the
+    # only way it could appear again is by staying in the DOM.
+    for page in (1, 2, 3):
+        fragment = client.get(f"/read/start_reading/{book.id}/{page}").get_data(
+            as_text=True
+        )
+        assert "re-imported" not in fragment
+        assert "flash-notice" not in fragment
+
+    # ... and on the reading screen the notice must paint above the
+    # dictionary pane, which is fixed over the right half of the viewport:
+    # with a long title the tail of the message was hidden behind it.
+    import pathlib
+
+    from flask import current_app
+
+    css = pathlib.Path(current_app.static_folder, "css", "styles.css").read_text(
+        encoding="utf-8"
+    )
+    rule = re.search(
+        r"body:has\(#read_pane_container\)\s*\.flash-notice\s*\{([^}]*)\}", css
+    )
+    assert rule, "the reading screen's flash-notice rule is gone"
+    assert "z-index" in rule.group(1)
+
+    # On narrow screens the layout stacks the other way: #reading-header is
+    # fixed at the top of the viewport (z-index 1001) and only
+    # #read_pane_left is pushed below it, so the notice -- which lives
+    # outside that container -- was painted over by the header (measured at
+    # 420x800: the text line sat at y 51-69, the header's bottom edge at
+    # 64).  It needs its own narrow-screen z-index: above the header, below
+    # the dictionary sheet (1003).
+    media = re.search(r"@media[^{]*max-width:\s*980px[^{]*\{(.*?)\n\}", css, re.S)
+    assert media, "the narrow-screen media block is gone"
+    narrow = re.search(
+        r"body:has\(#read_pane_container\)\s*\.flash-notice\s*\{([^}]*)\}",
+        media.group(1),
+    )
+    assert narrow, "no narrow-screen rule for the notice: the header covers it"
+    narrow_z = re.search(r"z-index:\s*(\d+)", narrow.group(1))
+    assert narrow_z, "the narrow-screen rule sets no z-index"
+    assert int(narrow_z.group(1)) > 1001, "must paint above the fixed header"
+    assert int(narrow_z.group(1)) < 1003, "must stay under the dictionary sheet"
+
+
 def test_manga_edit_reimport_shrinks_to_the_new_page_count(
     app, app_context, japanese, client
 ):

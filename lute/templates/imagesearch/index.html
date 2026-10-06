@@ -97,7 +97,7 @@
     }
 
 
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
       $('#manual_image_upload').submit(function(event) {
         event.preventDefault();
         var formData = new FormData(this);
@@ -136,7 +136,7 @@
 
     });
 
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
       const searchUrl = '{{ search_url }}';
       const container = document.getElementById('termimagesearch');
 
