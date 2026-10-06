@@ -537,6 +537,16 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
                    // click that looks fine in the markup).
                    speak_button: !!card && !!card.querySelector(".rv-speak"),
                    tts_available: typeof window.luteTtsSpeak === "function",
+                   // Shadowing cards: the badge text, the sentence
+                   // spans and the record button.
+                   badge: card && card.querySelector(".rv-badge")
+                     ? card.querySelector(".rv-badge").textContent.trim()
+                     : null,
+                   record_button: !!card && !!card.querySelector("#review_rec_btn"),
+                   shadow_tokens: (function () {
+                     const t = document.getElementById("review_shadow_tokens");
+                     return t ? t.textContent.replace(/\\s+/g, " ").trim() : null;
+                   })(),
                    undo_available: !!undo && !undo.hidden,
                    // `hidden` alone is not enough: any stylesheet that
                    // sets `display` on the element beats the UA rule
@@ -696,6 +706,232 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     def undo_last_grade(self):
         "Click Undo in the session top bar."
         self.page.click("#review_undo")
+
+    ################################3
+    # Shadowing review cards
+
+    def set_review_settings(self, card_types=None, max_shadowing_per_day=None):
+        """
+        Apply review settings through the real settings form, as a user
+        would, and wait for the save to land on the index page.
+
+        card_types is the set of card types to leave enabled; the others
+        are unticked.  Only the fields passed are touched, so a scenario
+        can change one thing at a time.
+        """
+        self.visit("/review/settings")
+        if card_types is not None:
+            for ct in ("recognition", "cloze", "shadowing"):
+                box = self.page.locator(f'input[name="card_{ct}"]')
+                if ct in card_types:
+                    box.check()
+                else:
+                    box.uncheck()
+        if max_shadowing_per_day is not None:
+            self.page.fill(
+                'input[name="review_max_shadowing_per_day"]',
+                str(max_shadowing_per_day),
+            )
+        self.page.click('#review_settings_form button[type="submit"]')
+        # The form 302s to the index; wait for that landing rather than
+        # for "load", which is already true on the page being left.
+        expect(self.page).to_have_url(re.compile(r"/review/index$"))
+
+    def mark_all_texts_read(self):
+        """
+        Mark every text as read.
+
+        Shadowing (like cloze) is only admitted for a term that occurs in
+        a sentence the user has actually read -- the card reads a real
+        sentence, so there has to be one.  The reading page sets this
+        date when a page is finished; here the scenario wants the queue,
+        not the reading session, so the date is set directly.
+        """
+        sql = "update texts set txreaddate = '2026-01-01 00:00:00'"
+        resp = requests.get(f"{self.home}/dev_api/execsql/{sql}", timeout=5)
+        assert resp.status_code == 200, resp.text
+
+    def term_status(self, word):
+        """
+        The status of a term (None when no such term exists).
+
+        0 unknown, 1-5 learning, 98 ignored, 99 well-known.
+        """
+        sql = f"select WoStatus from words where WoTextLC = '{word.lower()}'"
+        rows = requests.get(f"{self.home}/dev_api/sqlresult/{sql}", timeout=5).json()
+        if not rows:
+            return None
+        return int(rows[0])
+
+    def stub_shadowing_take(self, score, miss, heard=None):
+        """
+        Replace the microphone with a canned, already-scored take.
+
+        A headless browser has no microphone, and the transcription
+        engine is not what these scenarios are about, so the recorder
+        hands back a fixed clip and scoreTake resolves it exactly as the
+        server would.  markWord is deliberately left real: the
+        stumble -> learning-word loop is the thing under test, and it
+        has to reach the real /read/shadowing/mark_unknown.
+
+        miss is the list of sentence words the take was heard to get
+        wrong; the verdicts are built against the tokens actually on the
+        card, so the step does not have to know the tokenisation.
+
+        The stub is one-shot: it is armed in sessionStorage and the init
+        script consumes the flag on the next navigation, so a scenario
+        that runs after this one gets the real recorder back.
+        """
+        if not getattr(self, "_shadow_stub_installed", False):
+            self.page.add_init_script(
+                """
+                try {
+                  const stub = sessionStorage.getItem("luteShadowStub");
+                  if (stub) {
+                    sessionStorage.removeItem("luteShadowStub");
+                    window.__shadowTake = JSON.parse(stub);
+                    // Intercept the module assignment so the page's own
+                    // code sees a recorder; the real markWord is kept.
+                    Object.defineProperty(window, "LuteRecorder", {
+                      configurable: true,
+                      set: (obj) => { window.__realRecorder = obj; },
+                      get: () => {
+                        const real = window.__realRecorder || {};
+                        return {
+                          canRecord: () => true,
+                          Recorder: function (opts) {
+                            const self = this;
+                            this.recording = false;
+                            this.start = () => {
+                              self.recording = true;
+                              setTimeout(() => {
+                                self.recording = false;
+                                if (opts && opts.onStop) {
+                                  opts.onStop(new Blob(["take"]), "audio/webm");
+                                }
+                              }, 20);
+                              return Promise.resolve(true);
+                            };
+                            this.stop = () => { self.recording = false; };
+                            this.cancel = () => { self.recording = false; };
+                          },
+                          scoreTake: () => {
+                            const spec = window.__shadowTake;
+                            const toks = Array.from(
+                              document.querySelectorAll(
+                                "#review_shadow_tokens .rv-shadow-tok"
+                              )
+                            ).map((t) => t.textContent.trim());
+                            const heard = {};
+                            const statuses = toks.map((t, i) => {
+                              if (spec.miss.indexOf(t) < 0) return 2;
+                              heard[String(i)] = spec.heard || t;
+                              return 0;
+                            });
+                            return Promise.resolve({
+                              state: "finished",
+                              result: {
+                                score: spec.score,
+                                statuses: statuses,
+                                spoken_for_miss: heard,
+                                spoken_for_fuzzy: {},
+                              },
+                            });
+                          },
+                          markWord: real.markWord,
+                        };
+                      },
+                    });
+                  }
+                } catch (e) {}
+                """
+            )
+            self._shadow_stub_installed = True
+        payload = json.dumps({"score": score, "miss": miss, "heard": heard})
+        self.page.evaluate(
+            "(p) => sessionStorage.setItem('luteShadowStub', p)", payload
+        )
+
+    def wait_for_shadowing_sentence(self, timeout=8000):
+        "Wait until the sentence's word spans are on the card."
+        try:
+            self.page.locator("#review_shadow_tokens .rv-shadow-tok").first.wait_for(
+                timeout=timeout
+            )
+        except PlaywrightTimeoutError as ex:
+            state = self.shadowing_card_state()
+            raise AssertionError(
+                f"the sentence never rendered; card state: {state}"
+            ) from ex
+
+    def record_shadowing_take(self):
+        "Press the shadowing card's record button; the stub scores it."
+        self.wait_for_shadowing_sentence()
+        self.page.click("#review_rec_btn")
+
+    def wait_for_shadowing_score(self, score, timeout=8000):
+        "Wait until the scored take has been reported on the card."
+        try:
+            expect(self.page.locator("#review_shadow_result")).to_contain_text(
+                f"Score {score}", timeout=timeout
+            )
+        except AssertionError as ex:
+            state = self.shadowing_card_state()
+            raise AssertionError(
+                f"the take was never scored; card state: {state}"
+            ) from ex
+
+    def shadowing_card_state(self):
+        """
+        The live shadowing card: the sentence's tokens with their
+        verdicts, the scored-take line, the stumbled-word chips, and the
+        grade the score suggests.  All of it is built by lute-review.js,
+        so none of it is in the served HTML.
+        """
+        return self.page.evaluate(
+            """() => {
+                 const toks = Array.from(
+                   document.querySelectorAll("#review_shadow_tokens .rv-shadow-tok")
+                 ).map((t) => ({
+                   text: t.textContent.trim(),
+                   classes: Array.from(t.classList),
+                   heard: t.title || null,
+                 }));
+                 const result = document.getElementById("review_shadow_result");
+                 const chips = Array.from(
+                   document.querySelectorAll(".rv-shadow-add")
+                 ).map((b) => ({
+                   word: b.dataset.word,
+                   title: b.title || null,
+                   disabled: !!b.disabled,
+                 }));
+                 const suggested = document.querySelector(".rv-grade-suggested");
+                 return {
+                   tokens: toks,
+                   result: result ? result.textContent.trim() : "",
+                   chips: chips,
+                   suggested_rating: suggested ? suggested.dataset.rating : null,
+                   rec_button: !!document.getElementById("review_rec_btn"),
+                 };
+               }"""
+        )
+
+    def add_stumbled_word(self, word):
+        "Click the + on a stumbled-word chip."
+        self.page.click(f'.rv-shadow-add[data-word="{word}"]')
+
+    def chip_state(self, word):
+        "The chip button for one word: its outcome title and disabled flag."
+        return self.page.evaluate(
+            """(w) => {
+                 const b = document.querySelector(
+                   '.rv-shadow-add[data-word="' + w + '"]'
+                 );
+                 return b ? { title: b.title || null, disabled: !!b.disabled,
+                              text: b.textContent.trim() } : null;
+               }""",
+            word,
+        )
 
     ################################3
     # Reading/rendering

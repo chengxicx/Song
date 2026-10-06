@@ -880,6 +880,133 @@ def when_undo_last_grade(luteclient):
     luteclient.undo_last_grade()
 
 
+# Shadowing review cards
+#
+# A shadowing card is built by lute-review.js from the /review/start
+# payload: the sentence is server-tokenised and the verdicts are painted
+# onto those same tokens, so the assertions read the live DOM.  The take
+# itself is stubbed (a headless browser has no microphone); the
+# stumble -> learning-word post is not, because that loop is the point.
+
+
+@given("the pages have been read")
+def given_pages_have_been_read(luteclient):
+    """
+    Mark every text as read.
+
+    Shadowing, like cloze, is only admitted for a term that occurs in a
+    sentence the user has actually read -- the card reads a real
+    sentence, so one has to exist.
+    """
+    luteclient.mark_all_texts_read()
+
+
+@given(parsers.parse('I set the review card types to "{types}"'))
+def given_set_review_card_types(luteclient, types):
+    "Enable exactly these card types, through the real settings form."
+    luteclient.set_review_settings(card_types=[t.strip() for t in types.split(",")])
+
+
+@given(parsers.parse("I set the shadowing cards per day to {count:d}"))
+def given_set_shadowing_cap(luteclient, count):
+    "Set the per-day shadowing cap through the real settings form."
+    luteclient.set_review_settings(max_shadowing_per_day=count)
+
+
+@given(parsers.parse('the next shadowing take misreads "{word}" and scores {score:d}'))
+def given_stub_shadowing_take(luteclient, word, score):
+    "Arm the canned take; the next navigation consumes it."
+    luteclient.stub_shadowing_take(score=score, miss=[word], heard=f"not {word}")
+
+
+@then(parsers.parse('the review card is a shadowing card for "{sentence}"'))
+def then_shadowing_card_for(luteclient, sentence):
+    luteclient.wait_for_review_card()
+    state = luteclient.review_session_state()
+    assert state["error"] is None, f"the session failed: {state['error']}"
+    assert state["badge"] == "Shadowing", state
+    # The sentence's spans arrive with the kana readings, so wait for
+    # them before reading the tokens back.
+    luteclient.wait_for_shadowing_sentence()
+    state = luteclient.review_session_state()
+    # The tokens are the same word space the take is diffed in, so the
+    # sentence on screen and the sentence scored are one string.
+    assert state["shadow_tokens"] == sentence, state
+
+
+@then("the review card offers a recording button")
+def then_shadowing_rec_button(luteclient):
+    state = luteclient.review_session_state()
+    assert state["record_button"], f"no record button on the card: {state}"
+
+
+@when("I record a shadowing take")
+def when_record_shadowing_take(luteclient):
+    luteclient.record_shadowing_take()
+
+
+@then(parsers.parse("the shadowing card shows the score {score:d}"))
+def then_shadowing_score(luteclient, score):
+    luteclient.wait_for_shadowing_score(score)
+
+
+@then(parsers.parse('the shadowing card marks the token "{word}" as missed'))
+def then_shadowing_token_missed(luteclient, word):
+    state = luteclient.shadowing_card_state()
+    hit = next((t for t in state["tokens"] if t["text"] == word), None)
+    assert hit is not None, f"{word!r} is not on the card: {state}"
+    assert "shadow-miss" in hit["classes"], state
+    # The verdict says what the take was heard as, which is what makes
+    # an ASR mishear distinguishable from a real mistake.
+    assert hit["heard"], state
+
+
+@then(parsers.parse('the shadowing card offers the stumbled word "{word}"'))
+def then_shadowing_offers_word(luteclient, word):
+    state = luteclient.shadowing_card_state()
+    assert word in [c["word"] for c in state["chips"]], state
+
+
+@when(parsers.parse('I add the stumbled word "{word}"'))
+def when_add_stumbled_word(luteclient, word):
+    luteclient.add_stumbled_word(word)
+    # The click posts and the button reports the outcome in place.
+    expect(
+        luteclient.page.locator(f'.rv-shadow-add[data-word="{word}"]')
+    ).to_have_attribute("title", re.compile(r"added|already learning|known"))
+
+
+@given(parsers.parse('the word "{word}" is not yet a learning word'))
+def given_word_not_learning(luteclient, word):
+    status = luteclient.term_status(word)
+    assert status is None or status == 0, f"{word!r} is already status {status}"
+
+
+@then(parsers.parse('the word "{word}" is a learning word'))
+def then_word_is_learning(luteclient, word):
+    status = luteclient.term_status(word)
+    # 1-5 are the learning statuses, and those are exactly what the
+    # review queue auto-admits: this is the loop closing.
+    assert (
+        status is not None and 1 <= status <= 5
+    ), f"{word!r} is status {status}, so the queue will not pick it up"
+
+
+@then(parsers.parse('the shadowing card suggests the grade "{label}"'))
+def then_shadowing_suggests(luteclient, label):
+    ratings = {"Again": "1", "Hard": "2", "Good": "3", "Easy": "4"}
+    assert label in ratings, f"unknown grade {label!r}"
+    state = luteclient.shadowing_card_state()
+    assert state["suggested_rating"] == ratings[label], state
+
+
+@then("the review session has nothing to do")
+def then_review_nothing_due(luteclient):
+    expect(luteclient.page.locator("#review_card")).to_contain_text(
+        "Nothing to review right now"
+    )
+
+
 def pytest_collection_modifyitems(config, items):
     "Skip scenarios tagged skip_without_sudachi when Sudachi is not installed."
     from lute.parse.registry import is_supported

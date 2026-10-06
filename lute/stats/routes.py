@@ -43,6 +43,7 @@ from lute.stats.service import get_hsk2_words as _get_hsk2_words
 from lute.stats.service import get_hsk3_data as _get_hsk3_data
 from lute.stats.service import get_hsk3_words as _get_hsk3_words
 from lute.stats.review_stats import get_review_stats
+from lute.stats.shadowing_stats import get_shadowing_stats
 from lute.db import db
 import lute.utils.formutils
 
@@ -105,6 +106,15 @@ def review_data():
     if period not in ("today", "7days", "monthly"):
         period = "7days"
     return jsonify(get_review_stats(db.session, _request_lang_id(), period))
+
+
+@bp.route("/shadowing_data")
+def shadowing_data():
+    "Ajax call for the shadowing (read-aloud) statistics."
+    period = request.args.get("period", "7days")
+    if period not in ("today", "7days", "monthly"):
+        period = "7days"
+    return jsonify(get_shadowing_stats(db.session, _request_lang_id(), period))
 
 
 @bp.route("/jlpt_data")
