@@ -11,12 +11,14 @@ rendered sentence spans the client sends back.
 """
 
 import difflib
+import json
 import logging
 import os
 import re
 import threading
 import time
 import uuid
+from datetime import datetime, timezone
 
 import jaconv
 
@@ -32,6 +34,7 @@ from lute.book.whisper_transcribe import (
 )
 from lute.db import db
 from lute.models.repositories import LanguageRepository
+from lute.models.shadowing import ShadowAttempt
 from lute.multiuser import context as mu_context
 from lute.read.render.grammar_analysis import is_japanese_language
 
@@ -53,6 +56,17 @@ FUZZY_MATCH_RATIO = 0.6
 # the half-credit "misread" verdict (with the heard word shown) rather
 # than a silent miss, so Japanese pairs near-match from 0.45 up.
 FUZZY_MATCH_RATIO_JA = 0.45
+
+
+def tokenize_for_diff(text, language):
+    """
+    The diff-side token list for a sentence the client has not rendered
+    itself: the review session has no reading page to collect data-text
+    word spans from, so the card's sentence is tokenized here, into the
+    same word-token space _spoken_tokens produces from transcriptions
+    (same parser, same cleaning, same punctuation guards).
+    """
+    return _spoken_tokens(text or "", language)
 
 
 def transcribe_clip(audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE):
@@ -933,6 +947,96 @@ def purge_finished_tasks():
             del _TASKS[tid]
 
 
+def transcription_available(language):
+    """
+    True when some engine can transcribe this language: SenseVoice for
+    its trained languages (zh/yue/en/ja/ko, installed AND model on
+    disk), faster-whisper otherwise and as the fallback.  The same
+    order _run_task uses, so a True here means a take will actually
+    score; the review queue gates its shadowing cards on it.
+    """
+    if sensevoice.lang_code_for(language) is not None and sensevoice.available():
+        return True
+    return whisper_status()["installed"]
+
+
+def persist_attempt(
+    language_id,
+    score,
+    source="read",
+    book_id=None,
+    sentence=None,
+    duration=None,
+    tokens_per_min=None,
+    engine=None,
+    tokens_statuses=None,
+):
+    """
+    Store one finished take.  Runs inside the caller's app context and
+    commits: the background task is the only writer and a failed write
+    must not lose the score it just computed -- the task result is
+    already stored when this runs.
+    """
+    attempt = ShadowAttempt(
+        language_id=language_id,
+        book_id=book_id,
+        source=source if source in ("read", "review") else "read",
+        sentence=sentence,
+        score=int(score or 0),
+        duration=duration,
+        tokens_per_min=tokens_per_min,
+        engine=engine,
+        tokens=json.dumps(tokens_statuses or [], ensure_ascii=False),
+        created=datetime.now(timezone.utc).replace(tzinfo=None),
+    )
+    db.session.add(attempt)
+    db.session.commit()
+
+
+def mark_word_for_review(session, language, text):
+    """
+    One click on a misread word: put it into the learning pile so the
+    review queue picks it up on the next sync.
+
+    A new or unknown (0) term becomes status 1 (learning -> auto-admitted
+    by lute.review.enqueue).  A word already in learning statuses 1-5 is
+    already queued material, so it is left alone; ignored (98) and
+    well-known (99) words are never demoted silently -- a misclick on a
+    name or a truly known word should not rewrite the user's text
+    highlighting -- and are reported as such.
+
+    Returns {"outcome": created|promoted|learning|known|invalid,
+    "term_id", "term_status"}.
+    """
+    from lute.term.model import (  # pylint: disable=import-outside-toplevel
+        Repository,
+    )
+
+    text = _clean_token(text)
+    if not text or not _has_word_chars(text):
+        return {"outcome": "invalid", "term_id": None, "term_status": None}
+
+    repo = Repository(session)
+    term = repo.find_or_new(language.id, text)
+    if term.id is None:
+        term.status = 1
+        outcome = "created"
+    elif term.status == 0:
+        term.status = 1
+        outcome = "promoted"
+    elif 1 <= term.status <= 5:
+        outcome = "learning"
+    else:
+        return {
+            "outcome": "known",
+            "term_id": term.id,
+            "term_status": term.status,
+        }
+    repo.add(term)
+    repo.commit()
+    return {"outcome": outcome, "term_id": term.id, "term_status": term.status}
+
+
 def start_task(
     app,
     audio_path,
@@ -941,6 +1045,8 @@ def start_task(
     model_size,
     username=None,
     full_text=None,
+    source="read",
+    book_id=None,
 ):
     """
     Register and launch a background scoring task.
@@ -950,7 +1056,9 @@ def start_task(
     re-enters that user's scope so its db access lands on the user's
     own sqlite file.  full_text is the sentence the tokens belong to
     (Japanese reads its keys in context -- see compare_tokens).
-    Returns the task_id.
+    source/book_id describe where the take came from ("read" page or
+    "review" card, and the book on the reading page) and land on the
+    persisted attempt.  Returns the task_id.
     """
     purge_finished_tasks()
     task_id = uuid.uuid4().hex
@@ -966,6 +1074,8 @@ def start_task(
             model_size,
             username,
             full_text,
+            source,
+            book_id,
         ),
         daemon=True,
     )
@@ -982,6 +1092,8 @@ def _run_task(
     model_size,
     username,
     full_text=None,
+    source="read",
+    book_id=None,
 ):
     "Thread body: transcribe, diff, store the result. Cleans its temp file."
     try:
@@ -1091,6 +1203,28 @@ def _run_task(
                 "token_kind": "morpheme" if is_japanese_language(lang) else "word",
             }
             _set_task(task_id, "finished", result=result)
+            # The take is history: persist it (best-effort -- a failed
+            # write must not turn a scored take into an error page).
+            try:
+                persist_attempt(
+                    language_id,
+                    comparison["score"],
+                    source=source,
+                    book_id=book_id,
+                    sentence=full_text or "".join(_clean_token(t) for t in tokens),
+                    duration=round(duration or 0.0, 2),
+                    tokens_per_min=rate,
+                    engine=engine,
+                    tokens_statuses=[
+                        {"text": restore_kana(t), "status": result["statuses"][i]}
+                        for i, t in enumerate(tokens)
+                    ],
+                )
+            except Exception:  # pylint: disable=broad-exception-caught
+                logging.getLogger(__name__).warning(
+                    "could not persist the shadowing attempt", exc_info=True
+                )
+                db.session.rollback()
     except Exception as e:  # pylint: disable=broad-exception-caught
         logging.getLogger(__name__).warning(
             "shadowing transcription task failed: %s", e

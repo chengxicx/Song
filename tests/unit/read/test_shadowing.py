@@ -15,7 +15,10 @@ from unittest.mock import patch
 import pytest
 
 from lute.book import sensevoice
+from lute.db import db
 from lute.read import shadowing
+
+from tests.utils import add_terms
 
 
 @pytest.fixture(autouse=True)
@@ -813,11 +816,31 @@ def test_transcribe_clip_uses_greedy_decoding_without_word_timestamps():
 # ---------------------------------------------------------------------
 
 
-def test_route_requires_whisper(app, client, english):
-    with patch.object(shadowing, "whisper_status", return_value={"installed": False}):
-        resp = client.post("/read/shadowing/transcribe", data={})
+def test_route_requires_an_engine(app, client, english):
+    "No engine at all: SenseVoice unavailable AND whisper not installed."
+    with patch.object(sensevoice, "lang_code_for", return_value="en"), patch.object(
+        sensevoice, "available", return_value=False
+    ), patch.object(shadowing, "whisper_status", return_value={"installed": False}):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={"language_id": str(english.id), "tokens": "[]"},
+        )
     assert resp.status_code == 400
-    assert "not installed" in resp.get_json()["error"]
+    assert "No transcription engine" in resp.get_json()["error"]
+
+
+def test_route_sensevoice_counts_as_an_engine(app, client, english):
+    "SenseVoice primary: available() alone satisfies the pre-check."
+    with patch.object(sensevoice, "lang_code_for", return_value="en"), patch.object(
+        sensevoice, "available", return_value=True
+    ), patch.object(shadowing, "whisper_status", return_value={"installed": False}):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={"language_id": str(english.id), "tokens": "[]"},
+        )
+    assert resp.status_code == 400
+    # Past the engine gate, into the next validation.
+    assert "no audio" in resp.get_json()["error"]
 
 
 def test_route_requires_audio(app, client, english):
@@ -1397,3 +1420,136 @@ def test_route_transcription_error_fails_the_task_and_cleans_temp(
     assert "model exploded" in status["error"]
     leftovers = [f for f in os.listdir(tempdir) if f.startswith("shadowing_")]
     assert leftovers == []
+
+
+# ---------------------------------------------------------------------
+# Attempt persistence, word marking and availability
+# (real db: these run against empty_db with the demo languages)
+# ---------------------------------------------------------------------
+
+
+def test_persist_attempt_stores_the_take(empty_db, spanish):
+    "A finished take lands in shadowattempts with its verdicts."
+    shadowing.persist_attempt(
+        spanish.id,
+        87,
+        source="review",
+        sentence="Tengo un gato.",
+        duration=3.2,
+        tokens_per_min=42.0,
+        engine="sensevoice",
+        tokens_statuses=[
+            {"text": "Tengo", "status": 2},
+            {"text": "un", "status": 0},
+            {"text": "gato", "status": 1},
+        ],
+    )
+
+    from lute.models.shadowing import ShadowAttempt
+
+    row = db.session.query(ShadowAttempt).one()
+    assert row.language_id == spanish.id
+    assert row.source == "review"
+    assert row.score == 87
+    assert row.engine == "sensevoice"
+    stored = json.loads(row.tokens)
+    assert [t["status"] for t in stored] == [2, 0, 1]
+
+
+def test_persist_attempt_rejects_a_bogus_source(empty_db, spanish):
+    "An unknown source falls back to 'read' rather than failing."
+    shadowing.persist_attempt(spanish.id, 50, source="somewhere-else")
+
+    from lute.models.shadowing import ShadowAttempt
+
+    row = db.session.query(ShadowAttempt).one()
+    assert row.source == "read"
+
+
+def test_mark_word_creates_a_learning_term(empty_db, spanish):
+    "A stumble on a word nobody has seen creates it as learning (1)."
+    res = shadowing.mark_word_for_review(db.session, spanish, "perro")
+
+    assert res["outcome"] == "created"
+    from lute.models.term import Term
+
+    term = db.session.query(Term).filter_by(text_lc="perro").one()
+    assert term.status == 1
+
+
+def test_mark_word_promotes_an_unknown_term(empty_db, spanish):
+    "An unknown (0) term is promoted to learning; 1-5 words are left alone."
+    terms = add_terms(spanish, ["gato", "perro"])
+    terms[0].status = 0
+    terms[1].status = 4
+    db.session.add_all(terms)
+    db.session.commit()
+
+    assert shadowing.mark_word_for_review(db.session, spanish, "gato")["outcome"] == (
+        "promoted"
+    )
+    assert shadowing.mark_word_for_review(db.session, spanish, "perro")["outcome"] == (
+        "learning"
+    )
+    db.session.refresh(terms[0])
+    db.session.refresh(terms[1])
+    assert terms[0].status == 1
+    assert terms[1].status == 4
+
+
+def test_mark_word_never_demotes_known_words(empty_db, spanish):
+    "Well-known and ignored words are reported, not rewritten."
+    terms = add_terms(spanish, ["casa", "mesa"])
+    terms[0].status = 99
+    terms[1].status = 98
+    db.session.add_all(terms)
+    db.session.commit()
+
+    res = shadowing.mark_word_for_review(db.session, spanish, "casa")
+    assert res["outcome"] == "known"
+    db.session.refresh(terms[0])
+    assert terms[0].status == 99
+
+
+def test_mark_word_ignores_junk(empty_db, spanish):
+    "Punctuation-only or empty clicks are reported as invalid."
+    res = shadowing.mark_word_for_review(db.session, spanish, "。")
+    assert res["outcome"] == "invalid"
+
+
+def test_mark_word_endpoint(app, client, empty_db, spanish):
+    "The route answers with the outcome payload."
+    resp = client.post(
+        "/read/shadowing/mark_unknown",
+        json={"language_id": spanish.id, "text": "perro"},
+    )
+    assert resp.status_code == 200
+    assert resp.get_json()["outcome"] == "created"
+
+
+def test_tokenize_for_diff_uses_the_language_parser(empty_db, spanish):
+    "The review-side tokens come out in the same space the diff scores."
+    toks = shadowing.tokenize_for_diff("Tengo un gato. El gato es negro.", spanish)
+    assert "gato" in toks
+    # Punctuation never becomes a token of its own.
+    assert all(t not in (".", ",") for t in toks)
+
+
+def test_transcription_available_needs_sensevoice_or_whisper(
+    empty_db, spanish, monkeypatch
+):
+    "SenseVoice-first: available SenseVoice says yes; else whisper decides."
+    monkeypatch.setattr(
+        sensevoice,
+        "lang_code_for",
+        lambda lang: "es" if lang is spanish else None,
+    )
+    monkeypatch.setattr(sensevoice, "available", lambda: True)
+    assert shadowing.transcription_available(spanish) is True
+
+    monkeypatch.setattr(sensevoice, "available", lambda: False)
+    monkeypatch.setattr(shadowing, "whisper_status", lambda: {"installed": True})
+    assert shadowing.transcription_available(spanish) is True
+
+    monkeypatch.setattr(shadowing, "whisper_status", lambda: {"installed": False})
+    assert shadowing.transcription_available(spanish) is False

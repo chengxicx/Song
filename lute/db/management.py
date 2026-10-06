@@ -29,6 +29,10 @@ def delete_all_data(session):
         "delete from reviewlogs",
         "delete from reviewcards",
         "delete from reviewspecs",
+        # Shadowing takes would cascade on the language delete, but every
+        # new table must be listed here or a wipe leaves it alive (the
+        # lesson the reviewspecs survival taught).
+        "delete from shadowattempts",
         "delete from languages",
         "delete from tags",
         "delete from tags2",
@@ -153,6 +157,7 @@ def add_default_user_settings(session, default_user_backup_path):
         # Review queue:
         "review_desired_retention": "0.9",
         "review_max_new_per_day": 20,
+        "review_max_shadowing_per_day": 10,
         "review_card_types": '{"recognition": 1, "cloze": 1}',
         "review_speak_cards": True,
     }

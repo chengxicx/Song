@@ -39,6 +39,17 @@ class ReviewSettingsForm(FlaskForm):
             "title": "New cards a day's session can introduce; 0 means no new cards.",
         },
     )
+    review_max_shadowing_per_day = IntegerField(
+        "Max shadowing cards per day",
+        validators=[InputRequired(), NumberRange(min=0)],
+        render_kw={
+            "type": "number",
+            "step": "1",
+            "min": "0",
+            "title": "Shadowing cards a day's session can serve, due or new; "
+            "0 turns them off without disabling the card type.",
+        },
+    )
     review_speak_cards = BooleanField(
         "Speak each card",
         default=True,
@@ -51,4 +62,8 @@ class ReviewSettingsForm(FlaskForm):
     )
     card_cloze = BooleanField(
         "Cloze (the word is blanked out of a real sentence)", default=True
+    )
+    card_shadowing = BooleanField(
+        "Shadowing (hear a real sentence, read it aloud, get it scored)",
+        default=False,
     )

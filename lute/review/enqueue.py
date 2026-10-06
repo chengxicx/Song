@@ -20,7 +20,10 @@ from lute.models.repositories import UserSettingRepository
 # well-known (99) terms are not review material.
 _LEARNING_STATUSES = [1, 2, 3, 4, 5]
 
-CARD_TYPES = ["recognition", "cloze"]
+CARD_TYPES = ["recognition", "cloze", "shadowing"]
+# Shadowing is opt-in: it only makes sense when a transcription engine
+# (SenseVoice or whisper) is installed, and its takes are slow enough
+# that a user who never asked for them would notice.
 DEFAULT_CARD_TYPES = ["recognition", "cloze"]
 
 _SETTING_KEY = "review_card_types"
@@ -98,7 +101,10 @@ def auto_admit(session):
             "now": now,
             "zws": _ZWS,
         }
-        if card_type == "cloze":
+        # Cloze blanks the term inside a real read sentence, and
+        # shadowing reads one aloud -- both need the term to actually
+        # occur in something the user has read.
+        if card_type in ("cloze", "shadowing"):
             extras = f" AND {_CLOZE_SENTENCE_EXISTS}"
         sql = text(
             f"""

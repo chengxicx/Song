@@ -828,6 +828,34 @@
   volume and retention but not towards on-time rate or the curve.
 </div>
 
+<!-- Shadowing (read-aloud) statistics -->
+<h2 id="shadowing" style="margin-top: 24px;">Shadowing</h2>
+
+<div class="review-cards" id="shadowing-cards">
+  <div class="chart-loading">Loading...</div>
+</div>
+
+<div class="term-charts-grid" id="shadowing-charts">
+  <div class="chart-card">
+    <h3>Takes and average score</h3>
+    <div class="chart-wrap"><canvas id="shadowingTrendChart"></canvas></div>
+  </div>
+
+  <div class="chart-card" style="grid-column: span 2;">
+    <h3>Most stumbled words (all time)</h3>
+    <div id="shadowing-missed" class="chart-wrap" style="overflow:auto; max-height: 260px;"></div>
+  </div>
+</div>
+
+<div class="review-foot">
+  One row per scored <b>take</b>, from the reading page's shadowing panel and
+  from shadowing review cards alike; summary cards and the trend follow the
+  period/language filters above, while the <b>most stumbled words</b> always
+  use every take. A word is <i>stumbled</i> when a take missed or misread it
+  (at most once per take); these are the words a follow-up repetition pays
+  off for most.
+</div>
+
 <!-- Original words read section -->
 <h2 style="margin-top: 24px;">Words read</h2>
 
@@ -889,6 +917,7 @@
     btn.classList.add('active');
     loadTermData();
     loadReviewStats();
+    loadShadowingStats();
   });
 
   document.getElementById('ov-lang').addEventListener('change', function(e) {
@@ -896,6 +925,7 @@
     updateJpButton();
     loadTermData();
     loadReviewStats();
+    loadShadowingStats();
   });
 
   // --- JLPT uses the generic level-report engine (see jlptReport below) ---
@@ -1493,6 +1523,7 @@
 
   loadTermData();
   loadReviewStats();
+  loadShadowingStats();
 
   // --- Review (FSRS) statistics ---
   // The queue tables already know when a card was due and when it was
@@ -1815,6 +1846,131 @@
           }
         }
       }
+    });
+  }
+
+  // --- Shadowing (read-aloud) statistics ---
+  // One row per scored take (shadowattempts), from the reading page's
+  // panel and from shadowing review cards alike: volume + score trend,
+  // spoken time, and the words takes most often stumble over.
+  function loadShadowingStats() {
+    fetch('/stats/shadowing_data?period=' + currentPeriod + '&lang_id=' + currentLang)
+      .then(function(r) { return r.json(); })
+      .then(renderShadowingStats)
+      .catch(function(err) {
+        console.error('Failed to load shadowing stats:', err);
+        document.getElementById('shadowing-cards').innerHTML =
+          '<div class="empty-msg">Failed to load shadowing data.</div>';
+      });
+  }
+
+  function renderShadowingStats(data) {
+    renderShadowingCards(data);
+    const charts = document.getElementById('shadowing-charts');
+    if (!data.has_data) {
+      charts.style.display = 'none';
+      destroyChart('shadowingTrendChart');
+      return;
+    }
+    charts.style.display = '';
+    renderShadowingTrend(data.daily, data.period);
+    renderShadowingMissed(data.top_missed);
+  }
+
+  function renderShadowingCards(data) {
+    const el = document.getElementById('shadowing-cards');
+    if (!data.has_data) {
+      el.innerHTML = '<div class="review-empty"><div class="empty-msg">' +
+        'No shadowing takes recorded for this filter yet. Record a take in the reading page\'s shadowing panel (or on a shadowing review card) and these fill in.' +
+        '</div></div>';
+      el.style.gridTemplateColumns = '1fr';
+      return;
+    }
+    const s = data.summary;
+    const avgCls = s.avg_score === null ? '' :
+      (s.avg_score >= 85 ? 'ok' : (s.avg_score < 60 ? 'warn' : ''));
+    const cards = [
+      { num: s.attempts.toLocaleString(), label: 'takes', sub: 'all time ' + s.attempts_all_time.toLocaleString() },
+      { num: s.avg_score === null ? '&mdash;' : s.avg_score + '%', label: 'avg score', cls: avgCls,
+        sub: 'all time ' + (s.avg_score_all_time === null ? '&mdash;' : s.avg_score_all_time + '%') },
+      { num: s.best_score === null ? '&mdash;' : s.best_score + '%', label: 'best take', sub: 'this period' },
+      { num: (s.minutes || 0).toLocaleString(), label: 'minutes read aloud', sub: 'this period' },
+    ];
+    el.style.gridTemplateColumns = '';
+    el.innerHTML = cards.map(function(c) {
+      return '<div class="review-card">' +
+        '<div class="review-card-num ' + (c.cls || '') + '">' + c.num + '</div>' +
+        '<div class="review-card-label">' + c.label + '</div>' +
+        '<div class="review-card-sub">' + c.sub + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderShadowingTrend(daily, period) {
+    const canvas = document.getElementById('shadowingTrendChart');
+    destroyChart('shadowingTrendChart');
+    const takes = daily.map(function(d) { return { x: d.date, y: d.attempts }; });
+    const scores = daily.map(function(d) {
+      return d.avg_score === null ? null : { x: d.date, y: d.avg_score };
+    }).filter(function(v) { return v !== null; });
+    window.shadowingTrendChart_instance = new Chart(canvas.getContext('2d'), {
+      data: {
+        datasets: [
+          { type: 'bar', label: 'Takes', data: takes, backgroundColor: '#1c7ed6', yAxisID: 'takes' },
+          { type: 'line', label: 'Avg score', data: scores, borderColor: '#2f9e44',
+            backgroundColor: '#2f9e44', borderWidth: 2, pointRadius: 3, tension: 0.25, yAxisID: 'score' },
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: reviewXScale(period),
+          takes: {
+            position: 'left', beginAtZero: true,
+            ticks: { precision: 0, color: CHART_COLORS.tick },
+            grid: { color: CHART_COLORS.grid },
+          },
+          score: {
+            position: 'right', beginAtZero: true, max: 100,
+            ticks: { precision: 0, color: CHART_COLORS.tick, callback: function(v) { return v + '%'; } },
+            grid: { display: false },
+          },
+        },
+        plugins: {
+          legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const unit = ctx.dataset.yAxisID === 'score' ? '%' : '';
+                return ctx.dataset.label + ': ' + ctx.parsed.y + unit;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderShadowingMissed(topMissed) {
+    const el = document.getElementById('shadowing-missed');
+    const rows = topMissed || [];
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty-msg">No stumbled words yet.</div>';
+      return;
+    }
+    el.innerHTML = '<table class="statsWordsRead" style="width:100%">' +
+      '<tr><th>word</th><th>language</th><th>stumbles</th></tr>' +
+      rows.map(function(g) {
+        return '<tr><td>' + escapeHtmlStats(g.text) + '</td><td>' +
+          escapeHtmlStats(g.language) + '</td><td>' + g.misses + '</td></tr>';
+      }).join('') +
+      '</table>';
+  }
+
+  function escapeHtmlStats(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
 
