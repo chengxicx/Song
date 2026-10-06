@@ -27,11 +27,14 @@ Menu sub-items are only visible after hovering over the menu, e.g.:
   page.locator("#book_new").click()
 """
 
+import json
 import os
 import time
 import re
 import pytest
 from playwright.sync_api import Playwright, sync_playwright, expect
+from playwright.sync_api import Error as PlaywrightError
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 
 def _launch(browser_type, headless):
@@ -105,6 +108,75 @@ def _wait_reading_ready(page):
     page.wait_for_timeout(200)
 
 
+def _reader_state(page):
+    """
+    The reading page's own pagination state, for a failure message.
+
+    Read out of the page's globals rather than inferred from what happens to
+    be visible: "the locator resolved to hidden" says nothing about *why*,
+    and the reader hides paragraphs on purpose (see _splitToScreens in
+    read/index.html, which gives every paragraph outside the current
+    sub-screen `display: none`).
+    """
+    try:
+        return page.evaluate(
+            """() => {
+            const el = document.querySelector('#thetext span.word');
+            const cs = el ? getComputedStyle(el) : null;
+            const box = el ? el.getBoundingClientRect() : null;
+            const p = el ? el.closest('p') : null;
+            const paras = Array.from(document.querySelectorAll('#thetext > p'));
+            return {
+                page_num: document.querySelector('#page_num')?.value,
+                done: typeof luteStartReadingDone !== 'undefined' && luteStartReadingDone,
+                subScreens: typeof subScreens === 'undefined' ? null : subScreens.length,
+                curScreen: typeof curScreen === 'undefined' ? null : curScreen,
+                paragraphs: paras.length,
+                first_word: el ? el.id : null,
+                first_word_text: el ? el.textContent : null,
+                first_word_display: cs ? cs.display : null,
+                first_word_size: box ? [Math.round(box.width), Math.round(box.height)] : null,
+                first_word_paragraph: p ? paras.indexOf(p) : null,
+                paragraph_inline_display: p ? p.style.display : null,
+            };
+        }"""
+        )
+    except PlaywrightError as e:
+        # The page can already be gone by the time we ask (browser closed,
+        # navigation raced us).  Saying so is useful; losing the timeout we
+        # are explaining to it is not -- that is the one way this diagnostic
+        # could hide the very thing it exists to report.
+        return f"<reader state unavailable: {type(e).__name__}: {e}>"
+
+
+def _wait_first_word_visible(page):
+    """
+    Wait for the reading text to be on screen, and say what the reader was
+    doing if it never appears.
+
+    `page.locator("span.word").first` is DOM order, not screen order.  The
+    reader hides every paragraph outside the current sub-screen
+    (_renderScreen in read/index.html), so that locator is only *guaranteed*
+    to be visible at `curScreen === 0` -- measured directly, it is hidden for
+    most of the walk `_turn_to_next_page` performs.  A bare wait_for() then
+    reports only "locator resolved to hidden <span ...>" for 30 seconds,
+    which says nothing about the reader's state.
+
+    That is what happened on CI (see the 2026-09-25 work log: the element was
+    the *destination* page's `ID-0-0`, `data-text="Note"`).  It has not been
+    reproduced here -- not in 20 single-test runs, 31 page turns, a 300-940 px
+    pane-height sweep, a 50 ms sampler across the turn, or 6 fresh-app
+    full-file runs -- so the state is dumped instead of the bare timeout, to
+    make the next occurrence explain itself.
+    """
+    try:
+        page.locator("span.word").first.wait_for()
+    except PlaywrightTimeoutError as e:
+        raise AssertionError(
+            f"the reading text never became visible: {_reader_state(page)}"
+        ) from e
+
+
 def _reveal(page, selector, max_turns=12):
     """
     Turn the reading screen until `selector` is on screen, and return it.
@@ -125,6 +197,37 @@ def _reveal(page, selector, max_turns=12):
         page.wait_for_timeout(400)
     expect(target).to_be_visible()
     return target
+
+
+def _open_term_form(page, word):
+    """
+    Click `word` and wait until the term form has finished rendering.
+
+    The form lives in the wordframe iframe and posts LuteTermFormOpened when
+    it is done; the reading page reads that as "clicking a word restores the
+    default pane" and closes any grammar analysis.  A Grammar click that
+    lands before the message therefore opens the panel only for the late
+    message to close it again.
+
+    Waiting on #text does not win that race -- measured, the form fills it
+    *before* it posts, so the panel was already gone while the message was
+    still pending.  Arm the flag first, then click, then wait: the reading
+    page registered its listener at load and so runs before the one armed
+    here, which means the flag only flips once the page has already handled
+    the message and closed whatever it was going to close.
+    """
+    page.evaluate(
+        """() => {
+             window.__luteTermFormOpened = false;
+             window.addEventListener('message', (e) => {
+               if (e.data && e.data.event === 'LuteTermFormOpened') {
+                 window.__luteTermFormOpened = true;
+               }
+             });
+           }"""
+    )
+    word.click()
+    page.wait_for_function("() => window.__luteTermFormOpened === true")
 
 
 def _turn_to_next_page(page, max_turns=12):
@@ -489,7 +592,10 @@ def test_term_form_grammar_button():
         page.goto("http://localhost:5001")
         page.get_by_role("link", name="Tutorial", exact=True).click()
         _park_mouse(page)
-        _reveal(page, "#thetext span.word").click()
+        # _open_term_form, not a bare .click(): the form's LuteTermFormOpened
+        # closes the pane and would close the analysis opened by the Grammar
+        # click below if it arrived late.
+        _open_term_form(page, _reveal(page, "#thetext span.word"))
 
         frame = page.frame_locator('iframe[name="wordframe"]')
         grammar_btn = frame.get_by_role("button", name="Grammar")
@@ -512,6 +618,181 @@ def test_term_form_grammar_button():
             re.compile(r"grammar-mode")
         )
         expect(grammar_btn).to_be_visible()
+
+        context.close()
+        browser.close()
+
+
+def test_term_form_grammar_button_selects_the_current_sentence():
+    """
+    The term form's Grammar button jumps to the grammar of the sentence the
+    term being edited lives in: the panel scrolls to that card and marks it,
+    and the sentence/word rings are drawn -- and pinned -- on the reading
+    text.
+
+    The grammar payload is stubbed.  The real engines sit behind optional
+    extras that CI does not install (the route then falls back to a handful
+    of regex rules, and this Tutorial page matches none of them), so the
+    engine would decide whether this test runs at all.  Stubbing it makes
+    the assertion about the wiring -- which is what this feature is -- and
+    is the only way to reach the two-cards-on-one-sentence case that the
+    "prefer the card covering the clicked word" rule exists for.
+    """
+
+    showbrowser = os.environ.get("SHOW", "") == "true"
+    with sync_playwright() as sp:
+        browser = _launch(sp.chromium, headless=not showbrowser)
+        # service_workers="block": the app registers /sw.js at scope "/" and
+        # its fetch handler proxies every /read/* GET through the worker.
+        # Playwright cannot intercept requests a service worker handles, so
+        # with the worker active page.route below silently never fires and
+        # the real engine's payload wins -- which is exactly what happened
+        # on the first run of this test.  Nothing here tests the worker.
+        context = browser.new_context(service_workers="block")
+        context.set_default_timeout(30000)
+        page = context.new_page()
+
+        page.goto("http://localhost:5001/dev_api/load_demo")
+        page.goto("http://localhost:5001")
+        page.get_by_role("link", name="Tutorial", exact=True).click()
+        _park_mouse(page)
+        _reveal(page, "#thetext span.word")
+
+        # The sentence the word lives in, read off the page, so the stub
+        # cannot drift from the rendered text.  Built from the .textitem
+        # cells, not from .textsentence.textContent: tts.js prepends a 🔊
+        # play button and the template leaves whitespace inside the
+        # sentence span, so its textContent is "🔊\n    \n    This short…"
+        # while the renderer -- and the backend's echoed sentence -- is the
+        # cells' concatenation.  The front-end indexes the backend's
+        # character offsets against exactly that.
+        word = page.locator("#thetext span.word", has_text="should").first
+        expect(word).to_be_visible()
+        sentence = word.evaluate(
+            """el => Array.from(
+                   el.closest('.textsentence').querySelectorAll('.textitem')
+               ).map((c) => c.textContent).join('')"""
+        )
+        start = sentence.index("should")
+
+        payload = [
+            # Panel order is level order, so the A1 card comes first -- but
+            # it marks another word of the same sentence and must lose to
+            # the A2 card that covers the clicked one.
+            {
+                "key": "zz_same_sentence_other_word",
+                "name": "same sentence, other word",
+                "level": "A1",
+                "desc": "test fixture",
+                "examples": [
+                    {"sentence": sentence, "matches": [{"start": 0, "end": 4}]}
+                ],
+            },
+            {
+                "key": "zz_covers_the_word",
+                "name": "covers the word",
+                "level": "A2",
+                "desc": "test fixture",
+                "examples": [
+                    {
+                        "sentence": sentence,
+                        "matches": [{"start": start, "end": start + 6}],
+                    }
+                ],
+            },
+        ]
+        page.route(
+            "**/read/grammar_analysis/**",
+            lambda route: route.fulfill(
+                status=200,
+                content_type="application/json",
+                body=json.dumps(payload),
+            ),
+        )
+
+        # _open_term_form waits for the form's LuteTermFormOpened before
+        # returning; see its docstring for why pressing Grammar any earlier
+        # loses the panel to that message.
+        _open_term_form(page, word)
+        frame = page.frame_locator('iframe[name="wordframe"]')
+        # The form must be showing the term that was clicked: the Grammar
+        # button belongs to the term being edited, and the jump keys off it.
+        expect(frame.locator("#text")).to_have_value("should")
+        frame.get_by_role("button", name="Grammar").click()
+
+        expect(page.locator("#grammar-analysis-panel")).to_be_visible()
+        active = page.locator(".grammar-item--active")
+        expect(active).to_have_count(1)
+        expect(active).to_have_attribute("data-grammar-key", "zz_covers_the_word")
+
+        # The rings live on the reading text, not in the panel.
+        expect(page.locator(".grammar-ring").first).to_be_visible()
+        expect(page.locator(".grammar-word-ring").first).to_be_visible()
+
+        # Pinned: moving the pointer off the cards does not clear them.
+        _park_mouse(page)
+        expect(page.locator(".grammar-ring").first).to_be_visible()
+
+        # Hovering another card overrides the rings but must not steal the
+        # selection -- the pin is what the jump chose, and a hover is only a
+        # temporary interruption.  This is also the guard on the hover path
+        # itself: the jump's scroll can slide a card under a stationary
+        # pointer, so the panel ignores a mouseenter that no mousemove
+        # preceded, and an over-eager gate would silently kill hovering.
+        other = page.locator(".grammar-item").first
+        box = other.bounding_box()
+        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + 12, steps=6)
+        expect(page.locator(".grammar-ring").first).to_be_visible()
+        expect(active).to_have_count(1)
+        expect(active).to_have_attribute("data-grammar-key", "zz_covers_the_word")
+
+        # Leaving brings the pinned rings back.
+        _park_mouse(page)
+        expect(page.locator(".grammar-ring").first).to_be_visible()
+        expect(active).to_have_attribute("data-grammar-key", "zz_covers_the_word")
+
+        # A click cancels the selection -- and the panel itself is one of the
+        # places that counts, which is the case the reader actually hits when
+        # they click a card to read it.  The panel must stay open: this
+        # clears a highlight, not a view.
+        page.locator(".grammar-analysis-panel__title").click()
+        expect(active).to_have_count(0)
+        expect(page.locator(".grammar-ring")).to_have_count(0)
+        expect(page.locator("#grammar-analysis-panel")).to_be_visible()
+
+        # Hovering still cross-highlights -- it just has no pin to come back
+        # to, so leaving clears instead of restoring.
+        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + 12, steps=6)
+        expect(page.locator(".grammar-ring").first).to_be_visible()
+        expect(active).to_have_count(0)
+        _park_mouse(page)
+        expect(page.locator(".grammar-ring")).to_have_count(0)
+
+        # Re-open the jump to get a pin back, and prove a click *outside* the
+        # panel clears it too: the listener is on the document, not on the
+        # panel.  #page_indicator only rewrites its own text -- nothing else
+        # reacts.
+        page.locator(".grammar-analysis-panel__close").click()
+        expect(page.locator("#grammar-analysis-panel")).to_have_count(0)
+        # A click on the word toggles the card, and the word is still marked
+        # from the first open -- so the next click would *close* the form
+        # instead of re-opening it.  Un-mark it, then ask for it again.
+        expect(word).to_have_class(re.compile(r"kwordmarked"))
+        word.click()
+        _open_term_form(page, word)
+        frame.get_by_role("button", name="Grammar").click()
+        expect(active).to_have_count(1)
+        expect(active).to_have_attribute("data-grammar-key", "zz_covers_the_word")
+        expect(page.locator(".grammar-ring").first).to_be_visible()
+
+        page.locator("#page_indicator").click()
+        expect(active).to_have_count(0)
+        expect(page.locator(".grammar-ring")).to_have_count(0)
+        expect(page.locator("#grammar-analysis-panel")).to_be_visible()
+
+        # Closing the panel takes the rings with it.
+        page.locator(".grammar-analysis-panel__close").click()
+        expect(page.locator(".grammar-ring")).to_have_count(0)
 
         context.close()
         browser.close()
@@ -589,7 +870,7 @@ def test_page_change_first_word():
         page.get_by_role("link", name="Tutorial", exact=True).click()
 
         # Wait until page text is loaded
-        page.locator("span.word").first.wait_for()
+        _wait_first_word_visible(page)
 
         # The click above parked the pointer over the text, which leaves a
         # stray hover on whatever word is under it.  Hovering a word calls
@@ -616,7 +897,7 @@ def test_page_change_first_word():
         _turn_to_next_page(page)
 
         # Wait for the new page content to load
-        page.locator("span.word").first.wait_for()
+        _wait_first_word_visible(page)
 
         # Verify that NO word on the new page is highlighted automatically
         expect(

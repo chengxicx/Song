@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Android App{% endblock %}
+{% block header %}Android App{% endblock %}
+
+{% block body %}
+
+<p>LuteForMobile releases. Tap a file below to download and install it on
+an Android device.</p>
+
+<div style="margin-top:20px;">
+  {% if apks %}
+  <ul style="list-style:none;padding-left:0;">
+    {% for apk in apks %}
+    <li style="margin-bottom:12px;">
+      <a href="{{ url_for('static', filename=apk.name) }}"
+         download="{{ apk.name }}">{{ apk.name }}</a>
+      {% if loop.first %}<b>Latest</b>{% endif %}
+      <div style="font-size:0.85em;color:#666;">
+        {{ apk.size_mb }} MB &middot; {{ apk.modified.strftime('%Y-%m-%d %H:%M') }}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p><i>No Android build has been published yet.</i></p>
+  {% endif %}
+</div>
+
+{% endblock %}

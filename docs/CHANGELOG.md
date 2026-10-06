@@ -20,6 +20,25 @@ Feature changes:
   French, German, Italian, Portuguese, Thai, Arabic, Mandarin, Cantonese)
   show authored Korean descriptions, and the Japanese engine explains
   every curated JLPT entry in Korean (ko.json, mirroring zh.json).
+* Shadowing shows what was heard for a miss too, not just a near-miss: a
+  word the engine heard as something unrelated now carries the same
+  "→ heard" readout the orange marker already had, so a learner can see
+  what they actually said.  A word that was never spoken at all has no
+  counterpart and still shows no readout.
+
+Bugfixes:
+
+* Shadowing scores Chinese takes correctly when the ASR re-cuts word
+  boundaries: SenseVoice's 呢个 + 系阿乐 now matches the sentence's
+  呢 + 個 + 係 + 阿樂 instead of scoring misses, and opencc (the
+  Traditional/Simplified fold the diff relies on) moved from the
+  sensevoice extra to a core dependency so it can no longer be missing
+  silently.  Existing installs need one `pip install opencc-python-reimplemented`.
+* Shadowing flags Chinese misreads as misreads: a character that is
+  graphically unrelated to the target is now re-judged on the parser's
+  romanization (jyutping for Cantonese, pinyin for Mandarin), so 頭髮
+  read as 投髮 or 你 as 李 shows the orange "→ heard" near-miss instead
+  of a flat red miss.  Genuinely different syllables stay misses.
 
 
 # 3.10.3 (2026-07-06)

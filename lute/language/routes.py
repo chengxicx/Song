@@ -10,14 +10,17 @@ from lute.models.repositories import UserSettingRepository
 from lute.language.service import Service
 from lute.language.forms import LanguageForm
 from lute.db import db
+from lute.multiuser.permissions import admin_only_if_multiuser
 from lute.parse.registry import selectable_parsers, supported_parsers
 from lute.parse.plugin_installer import ensure_parser_available
 from lute.read.render import grammar_analysis
+from lute.read.render import grammar_levels
 
 bp = Blueprint("language", __name__, url_prefix="/language")
 
 
 @bp.route("/index")
+@admin_only_if_multiuser
 def index():
     """
     List all languages, with book and term counts.
@@ -88,6 +91,27 @@ def _ensure_tag_choices_include_current(form, language):
             field.choices = field.choices + [(val, f"{val} -- (current setting)")]
 
 
+def _set_hidden_grammar_choices(form, language):
+    """
+    Set the hideable grammar groups offered for this language.
+
+    The list depends on the language's grammar taxonomy (JLPT, TOPIK,
+    CEFR) and the Japanese aggregate rows, so it can only be built once
+    the language is known.  A stored token that is no longer offered is
+    appended so the user can still see and clear it.  Assigns a new
+    list so the shared class-level choices are untouched.
+
+    Must run before the form is validated, otherwise validate_choice
+    rejects the submitted tokens.
+    """
+    choices = list(grammar_levels.hideable_grammar_groups(language))
+    known = {tok for tok, _ in choices}
+    for tok in getattr(language, "hidden_grammar_levels", []) or []:
+        if tok not in known:
+            choices.append((tok, f"{tok} -- (current setting)"))
+    form.hidden_grammar_levels.choices = choices
+
+
 def _add_hidden_dictionary_template_entry(form):
     "Add a dummy placeholder dictionary to be used as a template."
     # Add a dummy dictionary entry with dicturi __TEMPLATE__.
@@ -151,6 +175,7 @@ def _dropdown_parser_choices(language=None):
 
 
 @bp.route("/edit/<int:langid>", methods=["GET", "POST"])
+@admin_only_if_multiuser
 def edit(langid):
     """
     Edit a language.
@@ -164,6 +189,7 @@ def edit(langid):
     form = LanguageForm(obj=language)
     form.parser_type.choices = _dropdown_parser_choices(language)
     _ensure_tag_choices_include_current(form, language)
+    _set_hidden_grammar_choices(form, language)
 
     if _handle_form(language, form):
         return redirect("/")
@@ -180,6 +206,7 @@ def edit(langid):
 
 
 @bp.route("/grammar_engine/install/<string:extra>", methods=["POST"])
+@admin_only_if_multiuser
 def grammar_engine_install(extra):
     """
     Pip-install the packages providing one language's grammar engine.
@@ -191,6 +218,7 @@ def grammar_engine_install(extra):
 
 @bp.route("/new", defaults={"langname": None}, methods=["GET", "POST"])
 @bp.route("/new/<string:langname>", methods=["GET", "POST"])
+@admin_only_if_multiuser
 def new(langname):
     """
     Create a new language.
@@ -206,6 +234,7 @@ def new(langname):
     form = LanguageForm(obj=language)
     form.parser_type.choices = _dropdown_parser_choices(language)
     _ensure_tag_choices_include_current(form, language)
+    _set_hidden_grammar_choices(form, language)
 
     if _handle_form(language, form):
         # New language, so show everything b/c user should re-choose
@@ -229,6 +258,7 @@ def new(langname):
 
 
 @bp.route("/toggle_active/<int:langid>", methods=["POST"])
+@admin_only_if_multiuser
 def toggle_active(langid):
     """
     Toggle a language's active (frozen/thawed) state.
@@ -247,6 +277,7 @@ def toggle_active(langid):
 
 
 @bp.route("/delete/<int:langid>", methods=["POST"])
+@admin_only_if_multiuser
 def delete(langid):
     """
     Delete a language.
@@ -270,6 +301,7 @@ def delete(langid):
 
 
 @bp.route("/list_predefined", methods=["GET"])
+@admin_only_if_multiuser
 def list_predefined():
     "Show predefined languages that are not already in the db."
     service = Service(db.session)
@@ -283,6 +315,7 @@ def list_predefined():
 
 
 @bp.route("/load_predefined/<langname>", methods=["GET"])
+@admin_only_if_multiuser
 def load_predefined(langname):
     "Load a predefined language and its stories."
     service = Service(db.session)

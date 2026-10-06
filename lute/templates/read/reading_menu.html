@@ -256,7 +256,7 @@
     });
   }
 
-  $(document).ready(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     _handle_top_level_menu_clicks_for_mobile();
     if (LUTE_USER_SETTINGS["use_ankiconnect"] == false) {
       $("#sendTermsToAnki").css('display', 'none');

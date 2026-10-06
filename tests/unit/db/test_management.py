@@ -6,6 +6,7 @@ Testing management functions.
 
 import pytest
 from datetime import datetime
+import sqlite3
 from sqlalchemy import text
 from lute.db import db
 from lute.models.setting import UserSetting
@@ -56,6 +57,62 @@ def test_can_get_backup_settings_when_db_is_wiped(app_context):
     bs = repo.get_backup_settings()
     assert bs.backup_enabled, "backup is back to being enabled"
     assert bs.backup_dir is not None, "default restored"
+
+
+def test_wiping_db_never_exposes_an_empty_settings_table(app_context, monkeypatch):
+    """
+    A concurrent reader must never see the settings table empty.
+
+    delete_all_data deletes every setting and then re-inserts the defaults.
+    While the deletes were committed on their own, another connection saw a
+    settings table with no rows for that instant -- and the reading page's
+    term-popup prefetch reads a user setting, so a wipe landing mid-request
+    died with MissingUserSettingKeyException (intermittent, seen in
+    `inv accept --kflag=reading`).
+
+    The read below is taken from a second connection, at the one moment
+    that matters: just before the defaults are re-added.
+    """
+    from lute.db import management
+
+    def user_settings_rows():
+        "What another connection can see of the settings table right now."
+        con = db.engine.raw_connection()
+        try:
+            cur = con.cursor()
+            cur.execute("select count(*) from settings where stkeytype = 'user'")
+            return cur.fetchone()[0]
+        finally:
+            con.close()
+
+    seen = {}
+    real_add_defaults = management.add_default_user_settings
+
+    def spy(session, default_user_backup_path):
+        "Record the other connection's view, then do the real re-insert."
+        try:
+            seen["rows"] = user_settings_rows()
+        except sqlite3.OperationalError as ex:
+            # Measured: in the shared-cache in-memory test db the reader is
+            # *locked* here (table-level locks) rather than shown the
+            # pre-wipe snapshot, as a file-backed db would.  Either way it
+            # cannot see a half-done wipe, which is the invariant under
+            # test.
+            seen["rows"] = f"locked: {ex}"
+        return real_add_defaults(session, default_user_backup_path)
+
+    monkeypatch.setattr(management, "add_default_user_settings", spy)
+
+    assert user_settings_rows() > 0, "precondition: the settings are loaded"
+
+    delete_all_data(db.session)
+
+    # The preconditions, so a green run cannot mean the spy never ran.
+    assert "rows" in seen, "the wipe did not re-add the defaults"
+    assert (
+        seen["rows"] != 0
+    ), f"another connection saw {seen['rows']!r} user settings mid-wipe"
+    assert user_settings_rows() > 0, "and the wipe still restored them"
 
 
 def test_wiping_db_restores_the_in_memory_settings_cache(app_context):

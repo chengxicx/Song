@@ -404,6 +404,16 @@
   // Decide what to play after the current cue ends.
   function ttsAdvance() {
     if (!ttsPlaying) return;
+    // Cue end reached: shadowing auto-record attaches here
+    // (lute-shadowing.js).  Fired before the loop / auto-pause branches
+    // so it happens in every case.
+    try {
+      window.dispatchEvent(
+        new CustomEvent("lute:cue-ended", {
+          detail: { source: "tts", index: ttsCueIndex },
+        })
+      );
+    } catch (error) { /* ignore */ }
     const curIdx = ttsCueIndex;
     const curCue = ttsCues[curIdx];
 
@@ -700,9 +710,31 @@
       return;
     }
     window.LutePlayingLine.setElement(sentences[cue.sentIdx] || null);
+    // Shadowing practice area follows the playhead (lute-shadowing.js).
+    // Same sentence-count guard: a stale sentIdx after a page swap must
+    // not select a wrong sentence.
+    try {
+      window.dispatchEvent(
+        new CustomEvent("lute:cue-changed", {
+          detail: {
+            source: "tts",
+            index: idx,
+            sentIdx: cue.sentIdx != null ? cue.sentIdx : -1,
+            sentenceCount: ttsCueSentenceCount,
+          },
+        })
+      );
+    } catch (error) { /* no CustomEvent -- shadowing just won't follow */ }
   }
 
   function ttsDeactivateCue() {
+    try {
+      window.dispatchEvent(
+        new CustomEvent("lute:cue-changed", {
+          detail: { source: "tts", index: -1, sentIdx: -1, sentenceCount: 0 },
+        })
+      );
+    } catch (error) { /* ignore */ }
     if (window.LutePlayingLine) window.LutePlayingLine.clear();
     const rows = ttsTranscriptList
       ? ttsTranscriptList.querySelectorAll(".yt-transcript-row")

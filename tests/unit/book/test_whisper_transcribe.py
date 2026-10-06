@@ -1,0 +1,1172 @@
+"""
+Tests for the whisper auto-subtitle import feature.
+
+The real faster-whisper dependency is never imported here: the
+transcription function is monkeypatched, and the tests cover the task
+state machine, the /book/whisper/* routes, and the temp-file lifecycle.
+"""
+
+import io
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import threading
+import time
+import types
+from contextlib import contextmanager
+from unittest.mock import patch
+
+import pytest
+from werkzeug.datastructures import FileStorage
+from wtforms.validators import StopValidation
+
+from lute.db import db
+from lute.book import sensevoice, whisper_transcribe
+from lute.models.book import Book as DBBook
+from lute.models.repositories import BookRepository
+
+# pylint: disable=protected-access
+
+
+@pytest.fixture(autouse=True)
+def _sensevoice_unavailable():
+    """
+    Default tests to the whisper engine: the SenseVoice path needs the
+    sherpa-onnx package plus downloaded model files, which no CI box
+    has.  Tests that exercise the SenseVoice path override this.
+    """
+    with patch.object(sensevoice, "available", return_value=False):
+        yield
+
+
+# ---------------------------------------------------------------------
+# Pure helpers
+# ---------------------------------------------------------------------
+
+
+def test_whisper_status_not_installed():
+    "find_spec miss is reported as not installed."
+    with patch("importlib.util.find_spec", return_value=None):
+        status = whisper_transcribe.whisper_status()
+    assert status == {"installed": False, "missing": ["faster_whisper"]}
+
+
+def test_whisper_status_installed():
+    with patch("importlib.util.find_spec", return_value=object()):
+        status = whisper_transcribe.whisper_status()
+    assert status == {"installed": True, "missing": []}
+
+
+def test_lang_code_mapping(app_context):
+    """
+    tts_lang is reduced to a bare ISO code; when tts_lang is unset the
+    language name is looked up in the TTS name table (Japanese/Korean
+    ship without a tts_lang and must not fall through to whisper's
+    auto-detect, which misfires on short shadowing takes).  Cantonese
+    maps to "zh": the yue token in the smaller whisper models is
+    untrained, so Cantonese is served by SenseVoice instead.
+    """
+
+    class _Lang:
+        tts_lang = "zh-CN"
+
+    assert whisper_transcribe.whisper_lang_code(_Lang()) == "zh"
+
+    class _Ja:
+        tts_lang = "ja"
+
+    assert whisper_transcribe.whisper_lang_code(_Ja()) == "ja"
+
+    class _Cantonese:
+        tts_lang = "zh-HK"
+
+    assert whisper_transcribe.whisper_lang_code(_Cantonese()) == "zh"
+
+    class _ByName:
+        tts_lang = None
+        name = "Japanese"
+
+    assert whisper_transcribe.whisper_lang_code(_ByName()) == "ja"
+
+    class _KoreanByName:
+        tts_lang = ""
+        name = "korean"
+
+    assert whisper_transcribe.whisper_lang_code(_KoreanByName()) == "ko"
+
+    class _CantoneseByName:
+        tts_lang = None
+        name = "Cantonese Chinese"
+
+    assert whisper_transcribe.whisper_lang_code(_CantoneseByName()) == "zh"
+
+    # Cantonese via whisper is surfaced as a client hint (the SenseVoice
+    # engine is the Cantonese-capable path and never shows this).
+    assert whisper_transcribe.whisper_language_note(_Cantonese())
+    assert whisper_transcribe.whisper_language_note(_CantoneseByName())
+    assert whisper_transcribe.whisper_language_note(_ByName()) is None
+
+    # Unknown name: auto-detect, never the TTS table's "en" default.
+    class _Unknown:
+        tts_lang = None
+        name = "Sanskrit"
+
+    assert whisper_transcribe.whisper_lang_code(_Unknown()) is None
+
+    class _NoLang:
+        tts_lang = None
+
+    assert whisper_transcribe.whisper_lang_code(_NoLang()) is None
+    assert whisper_transcribe.whisper_lang_code(None) is None
+
+
+# ---------------------------------------------------------------------
+# Route validation
+# ---------------------------------------------------------------------
+
+
+def test_prepare_requires_whisper_installed(app, client, english):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": False}
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={"language_id": str(english.id)},
+        )
+    assert resp.status_code == 400
+    assert "not installed" in resp.get_json()["error"]
+
+
+def test_prepare_requires_language(app, client):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ):
+        resp = client.post("/book/whisper/prepare", data={})
+    assert resp.status_code == 400
+    assert "language" in resp.get_json()["error"].lower()
+
+
+def test_prepare_rejects_bad_extension(app, client, english):
+    "Non-audio uploads are rejected before any task starts."
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"not audio"), "notes.txt"),
+            },
+            content_type="multipart/form-data",
+        )
+    assert resp.status_code == 400
+    assert resp.get_json()["error"]
+
+
+def test_prepare_busy_returns_409(app, client, english):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(whisper_transcribe, "has_running_task", return_value=True):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_url": "https://a.example.com/x.mp3",
+            },
+        )
+    assert resp.status_code == 409
+    assert "already running" in resp.get_json()["error"]
+
+
+def test_available_endpoint(app, client):
+    resp = client.get("/book/whisper/available")
+    assert resp.status_code == 200
+    assert "installed" in resp.get_json()
+
+
+def test_import_form_offers_sensevoice_default(app, client, english):
+    """
+    The mp3 form lists SenseVoice, knows English is supported, ticks
+    Auto-transcribe by default, and server-renders SenseVoice selected.
+    """
+    from lute.models.repositories import UserSettingRepository
+
+    UserSettingRepository(db.session).set_value("current_language_id", english.id)
+    resp = client.get("/book/import_webpage")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    match = re.search(r"const sensevoiceLangIds = new Set\((\[.*?\])\.map", body)
+    assert match is not None
+    assert english.id in json.loads(match.group(1))
+
+    sv_option = re.search(r'<option value="sensevoice"([^>]*)>', body)
+    assert sv_option is not None
+    assert "selected" in sv_option.group(1)
+    assert re.search(r'<input type="checkbox" id="mp3_whisper" checked', body)
+    # The video form carries its own upload-progress panel.
+    assert 'id="video_progress_bar"' in body
+
+
+# ---------------------------------------------------------------------
+# Model pre-download
+# ---------------------------------------------------------------------
+
+
+def test_download_model_requires_whisper_installed(app, client):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": False}
+    ):
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "small"}
+        )
+    assert resp.status_code == 400
+    assert "not installed" in resp.get_json()["error"]
+
+
+def test_download_model_rejects_unknown_size(app, client):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ):
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "giant"}
+        )
+    assert resp.status_code == 400
+    assert "Unknown model size" in resp.get_json()["error"]
+
+
+def test_download_model_busy_returns_409(app, client):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(whisper_transcribe, "has_running_task", return_value=True):
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "small"}
+        )
+    assert resp.status_code == 409
+
+
+def test_download_model_completes(app, app_context, client):
+    "Happy path with a fake loader: task finishes and caches nothing."
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "_load_model", return_value=object()
+    ) as fake_load:
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "small"}
+        )
+        assert resp.status_code == 200
+        task_id = resp.get_json()["task_id"]
+        status = _wait_for_terminal(task_id)
+    assert status["state"] == "finished"
+    fake_load.assert_called_once_with("small")
+
+
+def test_download_sensevoice_model_completes(app, app_context, client):
+    """
+    The SenseVoice download bypasses the faster-whisper install check
+    (the model files are independent of that package).
+    """
+    with patch.object(sensevoice, "ensure_model_downloaded") as fake_dl, patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": False}
+    ):
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "sensevoice"}
+        )
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+    assert status["state"] == "finished"
+    fake_dl.assert_called_once_with()
+
+
+def test_delete_sensevoice_model(tmp_path, monkeypatch):
+    "Deleting 'sensevoice' removes the model directory."
+    monkeypatch.setattr(sensevoice, "model_dir", lambda: str(tmp_path))
+    (tmp_path / "model.int8.onnx").write_bytes(b"x")
+    ok, message = whisper_transcribe.delete_model("sensevoice")
+    assert ok is True
+    assert not tmp_path.exists()
+
+
+def test_prepare_routes_to_sensevoice(app, app_context, client, english):
+    "Picking sensevoice for a supported language transcribes via SenseVoice."
+    tempdir = app.env_config.temppath
+
+    def _fake_cues(audio_path, lang_code, progress_cb=None):
+        assert lang_code == "en"
+        return "Hello.", json.dumps([{"start": 0.0, "end": 1.0, "text": "Hello."}])
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(sensevoice, "installed", return_value=True), patch.object(
+        sensevoice, "ensure_model_downloaded"
+    ), patch.object(
+        sensevoice, "transcribe_to_cues", side_effect=_fake_cues
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "whisper_model": "sensevoice",
+                "mp3_file": (io.BytesIO(b"fake audio bytes"), "sv.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+    assert status["state"] == "finished"
+    assert status["book_id"] is not None
+    leftovers = [f for f in os.listdir(tempdir) if f.startswith("whisper_")]
+    assert leftovers == []
+
+
+def test_prepare_sensevoice_requires_package(app, client, english):
+    "SenseVoice selected without sherpa-onnx installed is a clear 400."
+    with patch.object(sensevoice, "installed", return_value=False):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "whisper_model": "sensevoice",
+                "mp3_url": "https://a.example.com/x.mp3",
+            },
+        )
+    assert resp.status_code == 400
+    assert "SenseVoice" in resp.get_json()["error"]
+
+
+def test_prepare_sensevoice_rejects_unsupported_language(app, client, spanish):
+    "SenseVoice only covers zh/yue/en/ja/ko; other languages must use whisper."
+    with patch.object(sensevoice, "installed", return_value=True):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(spanish.id),
+                "whisper_model": "sensevoice",
+                "mp3_url": "https://a.example.com/x.mp3",
+            },
+        )
+    assert resp.status_code == 400
+    assert "Korean" in resp.get_json()["error"]
+
+
+def test_prepare_explicit_whisper_bypasses_sensevoice(
+    app, app_context, client, english
+):
+    "A whisper size is honored even for a SenseVoice-supported language."
+
+    def _fake_cues(audio_path, lang_code, model_size="small", progress_cb=None):
+        assert model_size == "small"
+        return "Hello.", json.dumps([{"start": 0.0, "end": 1.0, "text": "Hello."}])
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_cues
+    ), patch.object(
+        sensevoice,
+        "transcribe_to_cues",
+        side_effect=AssertionError("SenseVoice must not be used"),
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "whisper_model": "small",
+                "mp3_file": (io.BytesIO(b"fake audio bytes"), "w.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+    assert status["state"] == "finished"
+
+
+def test_prepare_409_while_model_downloads(app, client, english):
+    "A running model download blocks a new transcription (mutex = 1)."
+    started = threading.Event()
+    release = threading.Event()
+
+    def _slow_load(model_size):
+        started.set()
+        release.wait(timeout=10)
+        return object()
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(whisper_transcribe, "_load_model", side_effect=_slow_load):
+        resp = client.post(
+            "/book/whisper/download_model", data={"whisper_model": "small"}
+        )
+        task_id = resp.get_json()["task_id"]
+        assert started.wait(timeout=10)
+
+        with patch.object(
+            whisper_transcribe, "whisper_status", return_value={"installed": True}
+        ):
+            resp2 = client.post(
+                "/book/whisper/prepare",
+                data={
+                    "language_id": str(english.id),
+                    "mp3_url": "https://a.example.com/x.mp3",
+                },
+            )
+        assert resp2.status_code == 409
+
+        release.set()
+        status = _wait_for_terminal(task_id)
+        assert status["state"] == "finished"
+
+
+# ---------------------------------------------------------------------
+# Model cache management (Settings page).
+# ---------------------------------------------------------------------
+
+
+class _FakeRepo:
+    "Duck-typed huggingface_hub CachedRepo."
+
+    def __init__(self, repo_id, size_mb, path):
+        self.repo_id = repo_id
+        self.size_on_disk = size_mb * 1024 * 1024
+        self.repo_path = path
+
+
+class _FakeCache:
+    def __init__(self, repos):
+        self.repos = repos
+
+
+@contextmanager
+def _stub_huggingface_hub(scan_cache_dir):
+    """
+    Put a huggingface_hub stub in sys.modules for the calls under test.
+
+    The production code imports the package lazily inside
+    model_cache_info / delete_model, and it is a heavy optional
+    dependency that the CI base install doesn't have -- patching the
+    real module ("patch('huggingface_hub.scan_cache_dir')") imports it,
+    so those tests crashed with ModuleNotFoundError on CI.  The stub
+    keeps the tests running (with identical semantics) everywhere.
+    """
+    stub = types.ModuleType("huggingface_hub")
+    stub.scan_cache_dir = scan_cache_dir
+    with patch.dict(sys.modules, {"huggingface_hub": stub}):
+        yield
+
+
+def test_model_cache_info_reports_cached_sizes():
+    fake = _FakeCache([_FakeRepo("Systran/faster-whisper-small", 460, "/tmp/x")])
+    with _stub_huggingface_hub(lambda: fake):
+        info = whisper_transcribe.model_cache_info()
+    by_size = {e["size"]: e for e in info}
+    assert by_size["small"]["cached"] is True
+    assert by_size["small"]["size_mb"] == 460
+    assert by_size["base"]["cached"] is False
+
+
+def test_model_cache_info_without_cache_dir():
+    def _no_cache():
+        raise OSError("no cache")
+
+    with _stub_huggingface_hub(_no_cache):
+        info = whisper_transcribe.model_cache_info()
+    assert all(e["cached"] is False for e in info)
+
+
+def test_delete_model_removes_directory(tmp_path):
+    target = tmp_path / "models--Systran--faster-whisper-small"
+    target.mkdir()
+    fake = _FakeCache([_FakeRepo("Systran/faster-whisper-small", 460, str(target))])
+    with _stub_huggingface_hub(lambda: fake):
+        ok, message = whisper_transcribe.delete_model("small")
+    assert ok is True
+    assert not target.exists()
+    assert "Deleted" in message
+
+
+def test_delete_model_not_downloaded():
+    with _stub_huggingface_hub(lambda: _FakeCache([])):
+        ok, message = whisper_transcribe.delete_model("medium")
+    assert ok is False
+    assert "not downloaded" in message
+
+
+def test_delete_model_unknown_size():
+    ok, message = whisper_transcribe.delete_model("giant")
+    assert ok is False
+    assert "Unknown model size" in message
+
+
+# ---------------------------------------------------------------------
+# Idle unload of the in-process model
+# ---------------------------------------------------------------------
+
+
+@pytest.fixture(name="model_cache_state")
+def fixture_model_cache_state():
+    "Save and restore the module's model-cache globals around a test."
+    saved = (
+        dict(whisper_transcribe._MODEL_CACHE),
+        whisper_transcribe._MODEL_LAST_USED,
+        whisper_transcribe._MODEL_USES,
+        whisper_transcribe._IDLE_REAPER_STARTED,
+    )
+    yield
+    whisper_transcribe._MODEL_CACHE.clear()
+    whisper_transcribe._MODEL_CACHE.update(saved[0])
+    (
+        whisper_transcribe._MODEL_LAST_USED,
+        whisper_transcribe._MODEL_USES,
+        whisper_transcribe._IDLE_REAPER_STARTED,
+    ) = (
+        saved[1],
+        saved[2],
+        saved[3],
+    )
+
+
+def _cache_a_model(size="small", idle_seconds=0):
+    "Put a stand-in model in the cache, last used idle_seconds ago."
+    whisper_transcribe._MODEL_CACHE.clear()
+    whisper_transcribe._MODEL_CACHE[size] = object()
+    whisper_transcribe._MODEL_USES = 0
+    whisper_transcribe._MODEL_LAST_USED = time.monotonic() - idle_seconds
+
+
+def test_unload_idle_model_drops_a_stale_model(model_cache_state):
+    """
+    Past the timeout the instance goes: one transcription must not pin
+    ~500 MB in the process for the rest of its life.
+    """
+    timeout = whisper_transcribe.MODEL_IDLE_TIMEOUT_SECONDS
+    _cache_a_model(idle_seconds=timeout + 1)
+    assert whisper_transcribe.unload_idle_model() == "small"
+    assert whisper_transcribe._MODEL_CACHE == {}
+
+
+def test_unload_idle_model_keeps_a_recently_used_model(model_cache_state):
+    "Between takes the model stays: a reload costs seconds on every clip."
+    timeout = whisper_transcribe.MODEL_IDLE_TIMEOUT_SECONDS
+    _cache_a_model(idle_seconds=timeout - 60)
+    assert whisper_transcribe.unload_idle_model() is None
+    assert "small" in whisper_transcribe._MODEL_CACHE
+
+
+def test_unload_idle_model_never_drops_a_model_in_use(model_cache_state):
+    """
+    A take longer than the timeout keeps its model.  Evicting it frees
+    nothing (the caller still holds it) and the next load would build a
+    second ~500 MB instance beside it.
+    """
+    timeout = whisper_transcribe.MODEL_IDLE_TIMEOUT_SECONDS
+    _cache_a_model(idle_seconds=timeout + 1)
+    with whisper_transcribe.model_in_use():
+        assert whisper_transcribe.unload_idle_model() is None
+    assert "small" in whisper_transcribe._MODEL_CACHE
+
+
+def test_model_in_use_releases_when_the_take_fails(model_cache_state):
+    "A crash mid-transcription must not pin the cache forever."
+    timeout = whisper_transcribe.MODEL_IDLE_TIMEOUT_SECONDS
+    _cache_a_model(idle_seconds=timeout + 1)
+    with pytest.raises(RuntimeError):
+        with whisper_transcribe.model_in_use():
+            raise RuntimeError("transcription blew up")
+    assert whisper_transcribe._MODEL_USES == 0
+    # The clock restarts as the take ends, so age it again: the point is
+    # that the released cache is droppable, not permanently pinned.
+    whisper_transcribe._MODEL_LAST_USED = time.monotonic() - (timeout + 1)
+    assert whisper_transcribe.unload_idle_model() == "small"
+
+
+def test_load_model_refreshes_the_idle_clock(model_cache_state):
+    """
+    A cache hit counts as use: reading for a while between takes must not
+    make the next take pay a reload.
+    """
+    timeout = whisper_transcribe.MODEL_IDLE_TIMEOUT_SECONDS
+    _cache_a_model(idle_seconds=timeout - 1)
+    before = whisper_transcribe._MODEL_LAST_USED
+    model = whisper_transcribe._load_model("small")
+    assert model is whisper_transcribe._MODEL_CACHE["small"]
+    assert whisper_transcribe._MODEL_LAST_USED > before
+
+
+def test_unload_idle_model_with_an_empty_cache(model_cache_state):
+    "Nothing cached, nothing to unload."
+    whisper_transcribe._MODEL_CACHE.clear()
+    whisper_transcribe._MODEL_USES = 0
+    whisper_transcribe._MODEL_LAST_USED = 0.0
+    assert whisper_transcribe.unload_idle_model() is None
+
+
+def test_models_endpoint(app, client):
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe,
+        "model_cache_info",
+        return_value=[{"size": "base", "cached": False, "size_mb": 0}],
+    ):
+        resp = client.get("/book/whisper/models")
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["installed"] is True
+    assert body["models"][0]["size"] == "base"
+
+
+def test_delete_model_endpoint_busy(app, client):
+    with patch.object(whisper_transcribe, "has_running_task", return_value=True):
+        resp = client.post(
+            "/book/whisper/delete_model", data={"whisper_model": "small"}
+        )
+    assert resp.status_code == 409
+
+
+def test_delete_model_endpoint_ok(app, client):
+    with patch.object(
+        whisper_transcribe, "has_running_task", return_value=False
+    ), patch.object(
+        whisper_transcribe,
+        "delete_model",
+        return_value=(True, "Deleted model 'small'."),
+    ) as fake_del:
+        resp = client.post(
+            "/book/whisper/delete_model", data={"whisper_model": "small"}
+        )
+    assert resp.status_code == 200
+    assert resp.get_json()["ok"] is True
+    fake_del.assert_called_once_with("small")
+
+
+def test_delete_model_endpoint_rejects_unknown(app, client):
+    with patch.object(whisper_transcribe, "has_running_task", return_value=False):
+        resp = client.post(
+            "/book/whisper/delete_model", data={"whisper_model": "giant"}
+        )
+    assert resp.status_code == 400
+
+
+# ---------------------------------------------------------------------
+# End-to-end task flow (fake transcription)
+# ---------------------------------------------------------------------
+
+
+def _wait_for_terminal(task_id, timeout=10.0):
+    "Poll a task until it reaches a terminal state."
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        status = whisper_transcribe.task_status(task_id)
+        if status["state"] in ("finished", "error"):
+            return status
+        time.sleep(0.05)
+    raise AssertionError(f"task {task_id} did not finish in time: {status}")
+
+
+def test_prepare_transcribes_and_creates_book(app, app_context, client, english):
+    "Happy path: audio upload -> transcription -> mp3 book with cues."
+    tempdir = app.env_config.temppath
+
+    def _fake_transcribe(audio_path, lang_code, model_size="small", progress_cb=None):
+        assert os.path.exists(audio_path)
+        assert audio_path.startswith(os.path.join(tempdir, "whisper_"))
+        if progress_cb is not None:
+            progress_cb(50)
+        cues = [{"start": 1.0, "end": 4.2, "text": "Hello world."}]
+        return "Hello world.", json.dumps(cues, ensure_ascii=False)
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"fake audio bytes"), "podcast.mp3"),
+                "mp3_tag": '[{"value":"whisper-test"}]',
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        task_id = resp.get_json()["task_id"]
+
+        status = _wait_for_terminal(task_id)
+        assert status["state"] == "finished"
+        assert status["book_id"] is not None
+
+    repo = BookRepository(db.session)
+    book = repo.find_by_title("podcast", english.id)
+    assert book is not None
+    assert book.book_type == "mp3"
+    assert json.loads(book.srt_data) == [
+        {"start": 1.0, "end": 4.2, "text": "Hello world."}
+    ]
+    assert book.audio_filename is not None
+    assert os.path.exists(
+        os.path.join(app.env_config.useraudiopath, book.audio_filename)
+    )
+
+    # The temp file was moved into the book's audio dir and cleaned up.
+    leftovers = [f for f in os.listdir(tempdir) if f.startswith("whisper_")]
+    assert leftovers == []
+
+    # Tags were carried over.
+    assert any(t.text == "whisper-test" for t in book.book_tags)
+
+    # Terminal tasks are purgeable so a new import starts clean.
+    whisper_transcribe.purge_finished_tasks()
+    assert whisper_transcribe.task_status(task_id)["state"] == "unknown"
+
+
+def test_prepare_error_state_cleans_temp(app, app_context, client, english):
+    "A failing transcription reports the error and removes the temp file."
+
+    def _boom(audio_path, lang_code, model_size="small", progress_cb=None):
+        raise RuntimeError("model exploded")
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(whisper_transcribe, "transcribe_to_cues", side_effect=_boom):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"fake audio bytes"), "broken.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        task_id = resp.get_json()["task_id"]
+
+        status = _wait_for_terminal(task_id)
+        assert status["state"] == "error"
+        assert "model exploded" in status["error"]
+
+    tempdir = app.env_config.temppath
+    leftovers = [f for f in os.listdir(tempdir) if f.startswith("whisper_")]
+    assert leftovers == []
+
+    repo = BookRepository(db.session)
+    assert repo.find_by_title("broken", english.id) is None
+
+
+def test_consecutive_transcriptions_allowed_after_finish(
+    app, app_context, client, english
+):
+    "A finished task no longer counts as running (concurrency = 1 while active)."
+
+    def _fake_transcribe(audio_path, lang_code, model_size="small", progress_cb=None):
+        return "Hello.", json.dumps([{"start": 0.0, "end": 1.0, "text": "Hello."}])
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"audio one"), "first.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        task_id = resp.get_json()["task_id"]
+        status = _wait_for_terminal(task_id)
+        assert status["state"] == "finished"
+
+        # has_running_task is False once the task finished.
+        assert whisper_transcribe.has_running_task() is False
+
+        # And a second prepare is accepted.
+        resp2 = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"audio two"), "second.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp2.status_code == 200
+        task_id2 = resp2.get_json()["task_id"]
+        status2 = _wait_for_terminal(task_id2)
+        assert status2["state"] == "finished"
+
+
+# ---------------------------------------------------------------------
+# Re-transcribe an existing book (edit page button)
+# ---------------------------------------------------------------------
+
+
+def _create_mp3_book(app, client, english, text="Hello world."):
+    "Import an mp3 book through the normal flow; returns the DBBook."
+    cues = [{"start": 1.0, "end": 4.2, "text": text}]
+
+    def _fake_transcribe(audio_path, lang_code, model_size="small", progress_cb=None):
+        return text, json.dumps(cues, ensure_ascii=False)
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"fake audio bytes"), "podcast.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        assert _wait_for_terminal(resp.get_json()["task_id"])["state"] == "finished"
+
+    whisper_transcribe.purge_finished_tasks()
+    return BookRepository(db.session).find_by_title("podcast", english.id)
+
+
+def test_retranscribe_updates_book_in_place(app, app_context, client, english):
+    """
+    The edit-page re-transcribe replaces the book's text and cues via
+    the same flow as saving the edit form: no second book is created,
+    and the book's own audio file survives untouched.
+    """
+    book = _create_mp3_book(app, client, english)
+    audio_name = book.audio_filename
+    useraudio = app.env_config.useraudiopath
+    assert os.path.exists(os.path.join(useraudio, audio_name))
+
+    def _fake_transcribe(audio_path, lang_code, model_size="small", progress_cb=None):
+        # The task must transcribe the book's stored audio, not a temp copy.
+        assert audio_path == os.path.join(useraudio, audio_name)
+        if progress_cb is not None:
+            progress_cb(50)
+        cues = [{"start": 0.5, "end": 2.5, "text": "Updated text."}]
+        return "Updated text.", json.dumps(cues, ensure_ascii=False)
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe
+    ):
+        resp = client.post(f"/book/whisper/retranscribe/{book.id}")
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    assert status["book_id"] == book.id
+
+    repo = BookRepository(db.session)
+    # The task committed in its own session; drop this session's cache.
+    db.session.expire_all()
+    dbbook = db.session.get(DBBook, book.id)
+    full_text = "\n".join(t.text for t in dbbook.texts)
+    assert "Updated text." in full_text
+    assert json.loads(dbbook.srt_data) == [
+        {"start": 0.5, "end": 2.5, "text": "Updated text."}
+    ]
+    # Still exactly one book of that title, same audio file, still on disk.
+    assert repo.find_by_title("podcast", english.id).id == book.id
+    assert dbbook.audio_filename == audio_name
+    assert os.path.exists(os.path.join(useraudio, audio_name))
+
+
+def test_retranscribe_edit_page_offers_button(app, app_context, client, english):
+    "The edit page of an mp3 book renders the re-transcribe controls."
+    book = _create_mp3_book(app, client, english)
+    resp = client.get(f"/book/edit/{book.id}")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'id="retranscribe_btn"' in body
+    assert f"/book/whisper/retranscribe/{book.id}" in body
+
+
+def test_retranscribe_unknown_book_404(app, client):
+    resp = client.post("/book/whisper/retranscribe/999999")
+    assert resp.status_code == 404
+
+
+def test_retranscribe_busy_returns_409(app, client, english):
+    book = _create_mp3_book(app, client, english)
+    with patch.object(whisper_transcribe, "has_running_task", return_value=True):
+        resp = client.post(f"/book/whisper/retranscribe/{book.id}")
+    assert resp.status_code == 409
+
+
+# ---------------------------------------------------------------------
+# The video form gets the same auto-transcribe / re-transcribe flow as
+# the mp3 form: import_type picks the form's field names and the book
+# type the task creates.
+# ---------------------------------------------------------------------
+
+
+def _fake_video_transcribe(text="Hello world.", cues=None):
+    "A transcribe_to_cues stand-in that returns fixed cues."
+    if cues is None:
+        cues = [{"start": 1.0, "end": 4.2, "text": text}]
+
+    def _fn(audio_path, lang_code, model_size="small", progress_cb=None):
+        assert os.path.exists(audio_path)
+        if progress_cb is not None:
+            progress_cb(50)
+        return text, json.dumps(cues, ensure_ascii=False)
+
+    return _fn
+
+
+def _create_video_book(app, client, english, text="Hello world."):
+    "Auto-transcribe a video upload through the normal flow."
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe,
+        "transcribe_to_cues",
+        side_effect=_fake_video_transcribe(text),
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "import_type": "video",
+                "language_id": str(english.id),
+                "video_file": (io.BytesIO(b"fake video bytes"), "clip.mp4"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        assert _wait_for_terminal(resp.get_json()["task_id"])["state"] == "finished"
+
+    whisper_transcribe.purge_finished_tasks()
+    return BookRepository(db.session).find_by_title("clip", english.id)
+
+
+def test_prepare_video_upload_creates_video_book(app, app_context, client, english):
+    "Video upload -> transcription -> a book of type video with its file stored."
+    book = _create_video_book(app, client, english)
+    assert book is not None
+    assert book.book_type == "video"
+    assert json.loads(book.srt_data) == [
+        {"start": 1.0, "end": 4.2, "text": "Hello world."}
+    ]
+    assert book.audio_filename is not None
+    assert book.audio_filename.endswith(".mp4")
+    assert os.path.exists(
+        os.path.join(app.env_config.useraudiopath, book.audio_filename)
+    )
+    # The temp download was copied into the book, not left behind.
+    tempdir = app.env_config.temppath
+    assert [f for f in os.listdir(tempdir) if f.startswith("whisper_")] == []
+
+
+def test_prepare_video_rejects_an_audio_extension(app, client, english):
+    "The video form validates against the video whitelist, not the audio one."
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "import_type": "video",
+                "language_id": str(english.id),
+                "video_file": (io.BytesIO(b"fake audio"), "song.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+    assert resp.status_code == 400
+    assert "valid video file" in resp.get_json()["error"]
+
+
+def test_prepare_video_ignores_the_mp3_fields(app, client, english):
+    "import_type=video reads video_file / video_url, not the mp3 field names."
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "import_type": "video",
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"fake audio"), "podcast.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+    assert resp.status_code == 400
+    assert "video file" in resp.get_json()["error"]
+
+
+def test_prepare_without_import_type_still_makes_an_mp3_book(
+    app, app_context, client, english
+):
+    "The mp3 form omits import_type in older pages; the default keeps working."
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_video_transcribe()
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "mp3_file": (io.BytesIO(b"fake audio"), "podcast.mp3"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        assert _wait_for_terminal(resp.get_json()["task_id"])["state"] == "finished"
+
+    book = BookRepository(db.session).find_by_title("podcast", english.id)
+    assert book.book_type == "mp3"
+
+
+def test_retranscribe_video_book_updates_in_place(app, app_context, client, english):
+    "A video book can be re-transcribed from the edit page; its file survives."
+    book = _create_video_book(app, client, english)
+    media_name = book.audio_filename
+    useraudio = app.env_config.useraudiopath
+    assert os.path.exists(os.path.join(useraudio, media_name))
+
+    def _fake_transcribe(audio_path, lang_code, model_size="small", progress_cb=None):
+        # The task transcribes the book's own stored media, not a temp copy.
+        assert audio_path == os.path.join(useraudio, media_name)
+        cues = [{"start": 0.5, "end": 2.5, "text": "Updated text."}]
+        return "Updated text.", json.dumps(cues, ensure_ascii=False)
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        whisper_transcribe, "transcribe_to_cues", side_effect=_fake_transcribe
+    ):
+        resp = client.post(f"/book/whisper/retranscribe/{book.id}")
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    assert status["book_id"] == book.id
+
+    db.session.expire_all()
+    dbbook = db.session.get(DBBook, book.id)
+    assert dbbook.book_type == "video"
+    assert "Updated text." in "\n".join(t.text for t in dbbook.texts)
+    assert dbbook.audio_filename == media_name
+    assert os.path.exists(os.path.join(useraudio, media_name))
+
+
+def test_retranscribe_rejects_a_non_media_book(app, app_context, client, english):
+    "Only mp3 and video books can be re-transcribed."
+    from lute.book.model import Book
+    from lute.book.service import Service as BookService
+
+    b = Book()
+    b.title = "Just text"
+    b.language_id = english.id
+    b.text = "Hello world."
+    b.book_type = ""
+    text_book = BookService().import_book(b, db.session)
+
+    resp = client.post(f"/book/whisper/retranscribe/{text_book.id}")
+    assert resp.status_code == 400
+    assert "mp3 and video" in resp.get_json()["error"]
+
+
+def test_video_edit_page_offers_retranscribe_button(app, app_context, client, english):
+    "The edit page of a video book renders the re-transcribe controls."
+    book = _create_video_book(app, client, english)
+    resp = client.get(f"/book/edit/{book.id}")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'id="retranscribe_btn"' in body
+    assert f"/book/whisper/retranscribe/{book.id}" in body
+    assert "Re-transcribe video" in body
+
+
+class _UploadField:
+    "A stub wtforms field carrying a FileStorage, for calling validators."
+
+    def __init__(self, data):
+        self.data = data
+
+
+def _upload(filename):
+    return FileStorage(stream=io.BytesIO(b"x"), filename=filename)
+
+
+def test_edit_page_accepts_a_video_media_file(app, app_context, client, english):
+    "The edit form's media field takes video extensions for a video book."
+    from lute.book.forms import (
+        ALLOWED_MEDIA_EXTENSIONS,
+        MEDIA_VALIDATION_MSG,
+        EditBookForm,
+    )
+
+    assert "mp4" in ALLOWED_MEDIA_EXTENSIONS
+    assert "mp3" in ALLOWED_MEDIA_EXTENSIONS
+    assert "mp4" in MEDIA_VALIDATION_MSG
+
+    # The field's validators accept a .mp4 and still reject a non-media
+    # extension: the whitelist is the union of audio and video.
+    # (FileAllowed signals a rejection with StopValidation, not
+    # ValidationError.)
+    validators = getattr(EditBookForm.audiofile, "kwargs", {})["validators"]
+    assert validators, "the media field must have a validator"
+    for validator in validators:
+        validator(None, _UploadField(_upload("clip.mp4")))
+    with pytest.raises(StopValidation):
+        for validator in validators:
+            validator(None, _UploadField(_upload("clip.exe")))
+
+    # And the edit page renders the media hint mentioning video formats.
+    book = _create_video_book(app, client, english)
+    body = client.get(f"/book/edit/{book.id}").get_data(as_text=True)
+    assert ".mp4" in body
+    assert 'name="audiofile"' in body
+
+
+def test_import_page_video_form_offers_auto_transcribe(app, client, english):
+    "The video form carries the same auto-transcribe controls as the mp3 form."
+    from lute.models.repositories import UserSettingRepository
+
+    UserSettingRepository(db.session).set_value("current_language_id", english.id)
+    resp = client.get("/book/import_webpage")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+
+    assert re.search(r'<input type="checkbox" id="video_whisper" checked', body)
+    assert 'id="video_whisper_model"' in body
+    assert 'id="video_whisper_missing"' in body
+    assert 'id="video_sensevoice_missing"' in body
+    assert 'id="video_whisper_progress"' in body
+    # Both forms offer the model picker with SenseVoice available.
+    assert body.count('name="whisper_model"') == 2
+    assert body.count('<option value="sensevoice"') == 2
+
+
+def test_import_page_inline_js_parses(app, client, tmp_path):
+    """
+    Every inline script on the import page must parse.
+
+    A syntax error in this block aborts the whole DOMContentLoaded
+    handler, so the forms silently lose their XHR bindings and the
+    progress bars (exactly the TDZ bug fixed in dfb63215).
+    """
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("node is not on PATH")
+
+    body = client.get("/book/import_webpage").get_data(as_text=True)
+    scripts = re.findall(r"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>", body, re.S)
+    assert scripts, "no inline scripts found on the import page"
+
+    for index, source in enumerate(scripts):
+        path = tmp_path / f"inline_{index}.js"
+        path.write_text(source, encoding="utf-8")
+        proc = subprocess.run(
+            [node, "--check", str(path)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert proc.returncode == 0, f"inline script {index} failed: {proc.stderr}"

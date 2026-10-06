@@ -12,6 +12,7 @@ import secrets
 import sqlite3
 import traceback
 import mimetypes
+from datetime import datetime
 from urllib.parse import quote
 from flask import (
     Flask,
@@ -53,6 +54,7 @@ from lute.models.book import Book
 from lute.models.language import Language
 from lute.multiuser import context as mu_context
 from lute.multiuser import paths as mu_paths
+from lute.multiuser import permissions as mu_permissions
 from lute.multiuser import store as mu_store
 from lute.multiuser.config_proxy import UserScopedAppConfig
 from lute.settings.current import (
@@ -151,6 +153,33 @@ def _setup_base_app_dirs(app_config):
         _setup_app_dir(rec[0], rec[1])
 
 
+def _published_apks(static_folder):
+    """
+    Android builds published to the static folder, newest first.
+
+    Scans only the top level of the static folder for *.apk files, so
+    the download links can be served by the normal /static/ route.
+    Returns [] if the folder is missing or nothing has been published.
+    """
+    if not static_folder or not os.path.isdir(static_folder):
+        return []
+    apks = []
+    for name in os.listdir(static_folder):
+        path = os.path.join(static_folder, name)
+        if not name.lower().endswith(".apk") or not os.path.isfile(path):
+            continue
+        stat = os.stat(path)
+        apks.append(
+            {
+                "name": name,
+                "size_mb": round(stat.st_size / (1024 * 1024), 1),
+                "modified": datetime.fromtimestamp(stat.st_mtime),
+            }
+        )
+    apks.sort(key=lambda a: a["modified"], reverse=True)
+    return apks
+
+
 def _add_base_routes(app, app_config):
     """
     Add some basic routes.
@@ -181,6 +210,7 @@ def _add_base_routes(app, app_config):
                 "multiuser_enabled": True,
                 "current_username": None,
                 "is_admin": False,
+                "can_manage_server": False,
             }
         us_repo = UserSettingRepository(db.session)
         bs = us_repo.get_backup_settings()
@@ -215,6 +245,11 @@ def _add_base_routes(app, app_config):
             "multiuser_enabled": mu_store.enabled(),
             "current_username": req_username,
             "is_admin": mu_store.enabled() and mu_store.is_admin(req_username),
+            # Server-level config (MeCab path, Sudachi dict, languages,
+            # Whisper, the mode switch) is admin-owned when multi-user
+            # mode is on, and always available when it's off.  is_admin
+            # alone can't express this: it is False in single-user mode.
+            "can_manage_server": mu_permissions.is_admin_request(),
         }
         return ret
 
@@ -319,6 +354,13 @@ def _add_base_routes(app, app_config):
             datapath=ac.datapath,
             database=ac.dbfilename,
             is_docker=ac.is_docker,
+        )
+
+    @app.route("/android")
+    def show_android():
+        "List the Android builds published to the static folder."
+        return render_template(
+            "android.html", apks=_published_apks(current_app.static_folder)
         )
 
     @app.route("/info")
@@ -481,6 +523,11 @@ def _create_app(app_config, extra_config):
         "MAX_CONTENT_LENGTH": 200 * 1024 * 1024,
         "SESSION_COOKIE_SAMESITE": "Lax",
         "PERMANENT_SESSION_LIFETIME": 86400 * 30,
+        # Flask's default (True) re-signs the permanent session cookie with a
+        # fresh timestamp on every response, so the cookie value never stands
+        # still and browsers can never reuse Vary: Cookie responses like
+        # /theme/current.  Only send the cookie when the session changes.
+        "SESSION_REFRESH_EACH_REQUEST": False,
     }
     if app_config.env == "prod":
         config["SESSION_COOKIE_SECURE"] = True
