@@ -9,7 +9,7 @@ name = "lute_mandarin_parser"
 name = "lute3-mandarin"
 dynamic = ['version']
 description = "Learning Using Texts - Chinese Parser"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
   {name = "Chris Ghyzel"}
 ]

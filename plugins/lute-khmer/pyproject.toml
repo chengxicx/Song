@@ -10,7 +10,7 @@ name = "lute_khmer_parser"
 name = "lute3-khmer"
 dynamic = ['version']
 description = "Learning Using Texts - Khmer Parser"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
   {name = "Justin Dom"}
 ]

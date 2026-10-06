@@ -10,7 +10,7 @@ name = "lute_langname_parser"
 name = "lute3-langname"
 dynamic = ['version']
 description = "Learning Using Texts - LangName Parser"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
   {name = "TODO your_name>"}
 ]

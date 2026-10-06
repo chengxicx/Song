@@ -39,7 +39,14 @@ def get_string_indexes(strings, content):
     strings and content must be lowercased!
     """
     searchcontent = zws + content + zws
-    zwsindexes = [index for index, letter in enumerate(searchcontent) if letter == zws]
+    # Position of each zws -> its ordinal (token index): a dict lookup
+    # per match instead of a list.index() linear scan.
+    zws_position_to_ordinal = {
+        position: ordinal
+        for ordinal, position in enumerate(
+            i for i, letter in enumerate(searchcontent) if letter == zws
+        )
+    }
 
     ret = []
 
@@ -50,7 +57,7 @@ def get_string_indexes(strings, content):
         #   how-to-use-regex-to-find-all-overlapping-matches
         pattern = rf"(?=({re.escape(zws + s + zws)}))"
         add_matches = [
-            (s, zwsindexes.index(m.start()))
+            (s, zws_position_to_ordinal[m.start()])
             for m in re.finditer(pattern, searchcontent)
         ]
         ret.extend(add_matches)
