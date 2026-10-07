@@ -590,8 +590,15 @@
     textDiv.addEventListener("mouseover", function (e) {
       const wordSpan = e.target.closest("span.word, span[id^=\"w\"]");
       if (!wordSpan) return;
+      // A split piece renders only its own column's fragment; speak the
+      // whole word the pieces share (data-tts-text, see textitem.html).
+      const spoken =
+        wordSpan.getAttribute("data-tts-text") ||
+        wordSpan.innerText ||
+        wordSpan.textContent ||
+        "";
       luteHoverSpeakStart(
-        wordSpan.innerText || wordSpan.textContent || "",
+        spoken,
         function () { return ttsPlaying; },
         hoverReadingFor(wordSpan)
       );

@@ -117,6 +117,21 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
             return "status0"
         return f"status{self.wo_status}"
 
+    @property
+    def tts_text(self):
+        """
+        What TTS should pronounce for this item, or None to speak the
+        rendered text.
+
+        A split piece renders only its own column's fragment ("プレゼン"
+        of プレゼント), but the reader expects the whole word spoken.
+        The pieces share the full Term, so hand its text to the speech
+        layer (token-boundary zero-width spaces stripped).
+        """
+        if self.is_split_piece and self._term is not None:
+            return self._term.text.replace(zws, "")
+        return None
+
     def add_html_class(self, c):
         "Add extra class to term."
         self.extra_html_classes.append(c)

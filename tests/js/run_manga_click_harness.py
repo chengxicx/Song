@@ -9,7 +9,9 @@ Checks, against the real lute-cursor.js / lute-tooltip.js:
   3. a drag across a split piece and a normal word offers a multiword
      term that does not include the piece;
   4. clicking a normal word is unchanged;
-  5. hovering a split piece shows a (non-empty-rendering) popup card.
+  5. hovering a split piece shows a (non-empty-rendering) popup card;
+  6. hovering a split piece SPEAKS the whole word (data-tts-text),
+     while a normal word is still spoken as itself.
 """
 
 import json
@@ -113,6 +115,29 @@ def main():
         except Exception:
             visible = False
         check("hovering a split piece shows a popup card", visible)
+
+        # --- 5. hover pronunciation speaks the WHOLE word, not the piece ---
+        # The hover from check 4 already started the (5ms-delayed) utterance.
+        page.wait_for_timeout(500)
+        spoken = page.evaluate("window.__spoken")
+        check(
+            "hovering a split piece speaks the whole word",
+            len(spoken) >= 1 and spoken[0] == "プレゼント",
+            " spoken=%r" % (spoken,),
+        )
+
+        # --- 6. a normal word is still spoken as itself ---
+        page.evaluate("window.__spoken = []")
+        reveal()
+        c = center("#ID-1-2")
+        page.mouse.move(c["x"], c["y"])
+        page.wait_for_timeout(400)
+        spoken = page.evaluate("window.__spoken")
+        check(
+            "hovering a normal word speaks its own text",
+            len(spoken) >= 1 and spoken[0] == "です",
+            " spoken=%r" % (spoken,),
+        )
         browser.close()
 
     print()

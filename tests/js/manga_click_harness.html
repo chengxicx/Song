@@ -5,8 +5,31 @@
 <title>manga click harness</title>
 <script>
   // lute.js reads these at load; the reading page injects them server-side.
-  window.LUTE_USER_SETTINGS = {};
+  // tts_hover_delay "5" -> getSetting passes it through and the hover
+  // utterance fires in 5ms instead of the 200ms default.
+  window.LUTE_USER_SETTINGS = { tts_hover_delay: "5" };
   window.LUTE_USER_HOTKEYS = {};
+  // Capture what TTS would speak.  tts.js speaks through speechSynthesis
+  // when it is present, so present a recorder instead of leaving it out.
+  // NOTE: plain assignment `window.speechSynthesis = ...` silently fails
+  // -- it is a getter-only accessor on Window.prototype -- so it takes
+  // defineProperty to shadow the real one.
+  window.__spoken = [];
+  window.ttsPlaying = false;  // normally a top-level let in tts-ui.js
+  Object.defineProperty(window, "speechSynthesis", {
+    configurable: true,
+    writable: true,
+    value: {
+      speak: function (u) { window.__spoken.push(u.text); },
+      cancel: function () {},
+      getVoices: function () {
+        return [{ lang: "ja-JP", name: "Test Ja Voice", default: true }];
+      },
+    },
+  });
+  window.SpeechSynthesisUtterance = function (text) {
+    this.text = text;
+  };
   // htmx is not loaded in this harness.  ajax() simulates the server
   // response for /read/termpopup/... by firing the same htmx:afterRequest
   // event the real htmx does, so lute-tooltip.js's full delivery path
@@ -37,6 +60,7 @@
 <script src="../../lute/static/js/lute-tooltip.js"></script>
 <script src="../../lute/static/js/lute-cursor.js"></script>
 <script src="../../lute/static/js/lute-touch.js"></script>
+<script src="../../lute/static/js/tts.js"></script>
 <script>
   // Record what the cursor layer actually did, instead of loading the
   // wordframe machinery.
@@ -57,6 +81,10 @@
 
   window.addEventListener("load", function () {
     prepareTextInteractions();
+    // tts.js's word-hover handler is wired here on the reading page
+    // (tts-ui.js calls it); do it directly so the harness covers the
+    // hover-pronunciation path too.
+    setupEventDelegation();
     window.LUTE_HARNESS_READY = true;
   });
 </script>
@@ -75,16 +103,18 @@
     <div class="manga-text-line">
       <!-- The production shape: OCR split プレゼント across two rows,
            so both halves carry data-split-piece and the same data-wid. -->
-      <span id="ID-1-0" class="textitem click word word2694"
+      <span id="ID-1-0" class="textitem click word word2694 splitpiece"
             data-lang-id="1" data-paragraph-id="1" data-sentence-id="1"
             data-text="プレゼン" data-status-class="status99"
-            data-order="0" data-wid="2694" data-split-piece="1">プレゼン</span>
+            data-order="0" data-wid="2694" data-split-piece="1"
+            data-tts-text="プレゼント">プレゼン</span>
     </div>
     <div class="manga-text-line">
-      <span id="ID-1-1" class="textitem click word word2694"
+      <span id="ID-1-1" class="textitem click word word2694 splitpiece"
             data-lang-id="1" data-paragraph-id="1" data-sentence-id="1"
             data-text="ト" data-status-class="status99"
-            data-order="1" data-wid="2694" data-split-piece="1">ト</span>
+            data-order="1" data-wid="2694" data-split-piece="1"
+            data-tts-text="プレゼント">ト</span>
       <span id="ID-1-2" class="textitem click word word28"
             data-lang-id="1" data-paragraph-id="1" data-sentence-id="1"
             data-text="です" data-status-class="status99"
