@@ -9,4 +9,6 @@
       data-order="{{ item.index }}"
       {% if item.wo_id is not none -%}
       data-wid="{{ item.wo_id }}"
-      {% endif %}>{{ item.html_display_text | safe }}</span>
+      {% endif %}
+      {%- if item.is_split_piece %} data-split-piece="1"{% endif %}
+      >{{ item.html_display_text | safe }}</span>
