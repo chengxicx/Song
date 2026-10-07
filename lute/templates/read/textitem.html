@@ -11,4 +11,5 @@
       data-wid="{{ item.wo_id }}"
       {% endif %}
       {%- if item.is_split_piece %} data-split-piece="1"{% endif %}
+      {%- if item.tts_text %} data-tts-text="{{ item.tts_text }}"{% endif %}
       >{{ item.html_display_text | safe }}</span>
