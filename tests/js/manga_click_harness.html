@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>manga click harness</title>
+<script>
+  // lute.js reads these at load; the reading page injects them server-side.
+  window.LUTE_USER_SETTINGS = {};
+  window.LUTE_USER_HOTKEYS = {};
+  // htmx is not loaded in this harness.  ajax() simulates the server
+  // response for /read/termpopup/... by firing the same htmx:afterRequest
+  // event the real htmx does, so lute-tooltip.js's full delivery path
+  // (event -> cache -> setContent -> card) runs for real.
+  window.htmx = {
+    ajax: function (verb, url, cfg) {
+      const detail = {
+        successful: true,
+        pathInfo: { requestPath: url },
+        target: {
+          innerHTML: '<div class="termpopup"><b>プレゼント</b> mock popup content</div>',
+        },
+      };
+      document.dispatchEvent(
+        new CustomEvent("htmx:afterRequest", { detail: detail })
+      );
+    },
+  };
+  // lute.js's prepareTextInteractions() binds handle_keydown, which the
+  // reading page gets from lute-commands.js. Not under test here - stub it.
+  window.handle_keydown = function (e) {};
+</script>
+<script src="../../lute/static/vendor/jquery/jquery.js"></script>
+<script src="../../lute/static/vendor/jquery/jquery-ui.min.js"></script>
+<script src="../../lute/static/js/lute-hotkey-utils.js"></script>
+<script src="../../lute/static/js/lute-popups.js"></script>
+<script src="../../lute/static/js/lute.js"></script>
+<script src="../../lute/static/js/lute-tooltip.js"></script>
+<script src="../../lute/static/js/lute-cursor.js"></script>
+<script src="../../lute/static/js/lute-touch.js"></script>
+<script>
+  // Record what the cursor layer actually did, instead of loading the
+  // wordframe machinery.
+  window.__opened_forms = [];
+  window.__multiword_calls = [];
+  window.show_term_edit_form = function (el) {
+    window.__opened_forms.push({
+      id: el.attr("id"),
+      wid: el.attr("data-wid"),
+      text: el.attr("data-text"),
+    });
+  };
+  window.show_multiword_term_edit_form = function (selected) {
+    window.__multiword_calls.push(selected.toArray().map(function (s) {
+      return $(s).attr("data-text");
+    }));
+  };
+
+  window.addEventListener("load", function () {
+    prepareTextInteractions();
+    window.LUTE_HARNESS_READY = true;
+  });
+</script>
+<style>
+  /* Minimal stand-in for the manga block: lines are hidden until the
+     block is hovered, exactly like the reading screen. */
+  .manga-text-block { position: relative; padding: 4px; }
+  .manga-text-line { display: none; }
+  .manga-text-block:hover .manga-text-line { display: table; }
+  span.textitem { cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="thetext">
+  <div class="manga-text-block">
+    <div class="manga-text-line">
+      <!-- The production shape: OCR split プレゼント across two rows,
+           so both halves carry data-split-piece and the same data-wid. -->
+      <span id="ID-1-0" class="textitem click word word2694"
+            data-lang-id="1" data-paragraph-id="1" data-sentence-id="1"
+            data-text="プレゼン" data-status-class="status99"
+            data-order="0" data-wid="2694" data-split-piece="1">プレゼン</span>
+    </div>
+    <div class="manga-text-line">
+      <span id="ID-1-1" class="textitem click word word2694"
+            data-lang-id="1" data-paragraph-id="1" data-sentence-id="1"
+            data-text="ト" data-status-class="status99"
+            data-order="1" data-wid="2694" data-split-piece="1">ト</span>
+      <span id="ID-1-2" class="textitem click word word28"
+            data-lang-id="1" data-paragraph-id="1" data-sentence-id="1"
+            data-text="です" data-status-class="status99"
+            data-order="2" data-wid="28">です</span>
+      <span id="ID-1-3" class="textitem" data-lang-id="1"
+            data-paragraph-id="1" data-sentence-id="1" data-text="。"
+            data-status-class="" data-order="3">。</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
