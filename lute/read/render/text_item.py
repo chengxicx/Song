@@ -35,6 +35,13 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
 
         self.extra_html_classes = []
 
+        # True on a piece of a word that was split for rendering (a manga
+        # word straddling two OCR columns renders as one span per column).
+        # The pieces share the original Term, so lookups work, but a piece
+        # must not take part in a multi-word selection: the drag would
+        # fuse halves of two different words into one nonsense term.
+        self.is_split_piece = False
+
         # TODO code
         # # The flash message can be None, so we need an extra flag
         # # to determine if it has been loaded or not.
@@ -132,5 +139,7 @@ class TextItem:  # pylint: disable=too-many-instance-attributes
         if self.display_text != self.text:
             classes.append("overlapped")
         classes.extend(self.extra_html_classes)
+        if self.is_split_piece:
+            classes.append("splitpiece")
 
         return " ".join(classes)
