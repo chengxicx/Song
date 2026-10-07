@@ -32,6 +32,11 @@ the same language.  What happens to it depends on the two statuses:
         Leave both.  Merging two words nobody knows would invent a
         study history out of nothing.
 
+One more guard sits outside those rules: a fragment with scheduled SRS
+review cards is never deleted, whatever its status.  The cards are the
+reader's study history and the reviewcards table has no cascade, so
+such a fragment is skipped rather than merged away.
+
 Note that statuses are *not* on a single scale: Status.IGNORED is 98 and
 Status.WELLKNOWN is 99, so "a higher number is further along" is false
 and the rules above are spelled out per status instead.
@@ -58,9 +63,15 @@ import sys
 from lute.app_factory import create_app
 from lute.db import db
 from lute.models.language import Language
+from lute.models.review import ReviewCard
 from lute.models.term import Term, Status
 from lute.multiuser import context as mu_context
 from lute.multiuser import store as mu_store
+
+
+def _srs_card_count(session, term):
+    "How many scheduled review cards hang off this term."
+    return session.query(ReviewCard).filter(ReviewCard.term_id == term.id).count()
 
 
 def corpus_rows(static_folder):
@@ -307,11 +318,32 @@ def main():
 
             acted = 0
             for frag, tgt in sorted(pairs, key=lambda p: p[0].text_lc):
+                # reviewcards rows reference the term with no ON DELETE
+                # CASCADE, and the cards are the reader's study history
+                # -- deleting the term would either fail the FK or throw
+                # that history away.  Such a fragment stays.
+                cards = _srs_card_count(db.session, frag)
+                if cards:
+                    print(
+                        "  skip  %-16s (of %-16s)  fragment has %d SRS "
+                        "review card(s); kept" % (frag.text_lc, tgt.text_lc, cards)
+                    )
+                    counts[SKIP] += 1
+                    continue
+
                 action, new_status, reason = plan(frag, tgt)
                 counts[action] += 1
 
                 if action == DROP:
-                    verb = "drop " if frag.status == Status.UNKNOWN else "carry-ignore "
+                    if frag.status == Status.IGNORED:
+                        verb = "carry-ignore "
+                    elif frag.status == Status.UNKNOWN:
+                        verb = "drop "
+                    else:
+                        # A learning-status DROP ("same learning status
+                        # on both"): the status already lives on the
+                        # target, so the fragment is surplus.
+                        verb = "drop-learning "
                     print(
                         "  %s %-16s (of %-16s)  %s"
                         % (verb, frag.text_lc, tgt.text_lc, reason)
