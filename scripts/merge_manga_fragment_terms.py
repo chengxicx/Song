@@ -238,6 +238,14 @@ def main():
             "what the guard is holding back."
         ),
     )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        help=(
+            "only act on the first N candidates (per language).  Use for "
+            "a canary run before the full pass."
+        ),
+    )
     args = parser.parse_args()
 
     app = create_app()
@@ -263,10 +271,13 @@ def main():
 
         for lang in languages:
             pairs = find_fragments(db.session, lang, corpus)
+            if args.limit is not None:
+                pairs = pairs[: args.limit]
             if not pairs:
                 continue
             print("=== %s ===" % lang.name)
 
+            acted = 0
             for frag, tgt in sorted(pairs, key=lambda p: p[0].text_lc):
                 action, new_status, reason = plan(frag, tgt)
                 counts[action] += 1
@@ -277,6 +288,7 @@ def main():
                         "  %s %-16s (of %-16s)  %s"
                         % (verb, frag.text_lc, tgt.text_lc, reason)
                     )
+                    acted += 1
                     if args.apply:
                         if new_status is not None:
                             tgt.status = new_status
@@ -286,6 +298,7 @@ def main():
                         "  carry %-16s -> %-16s  %s"
                         % (frag.text_lc, tgt.text_lc, reason)
                     )
+                    acted += 1
                     if args.apply:
                         tgt.status = new_status
                         db.session.delete(frag)
@@ -308,7 +321,12 @@ def main():
                 counts[SKIP],
             )
         )
-        if not args.apply:
+        if args.limit is not None and args.apply:
+            print(
+                "Canary run: capped at %d per language.  Re-run without "
+                "--limit for the rest." % args.limit
+            )
+        elif not args.apply:
             print("Re-run with --apply to write these changes.")
 
     return 0
