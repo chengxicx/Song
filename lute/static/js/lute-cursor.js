@@ -138,19 +138,19 @@ let clear_newmultiterm_elements = function() {
 }
 
 /**
- * True for a piece of a word that was split for rendering.
- *
  * A manga word can straddle two OCR columns (mokuro cuts its rows
  * wherever the balloon ran out of room, which is often mid-word), and
- * then renders as one span per column -- all sharing the whole word's
- * Term, so hovering or clicking any piece shows the right word.  What
- * they must not do is take part in a multi-word selection: the drag
- * would join the tail of one word to the head of the next ("プ" +
- * "ゼン" -> "プゼン") and offer it as a new term.
+ * then renders as one span per column -- all carrying the whole word's
+ * data-wid, so hovering or clicking any piece shows the right word.
+ *
+ * What the pieces must not do is join a multi-word selection: the drag
+ * would splice the tail of one word to the head of the next ("プ" +
+ * "ゼン" -> "プゼン") and offer it as a new term.  So
+ * get_selected_in_range() skips spans marked data-split-piece (the
+ * template stamps it on these, see manga_columns.py).  A plain click on
+ * a piece is untouched: it opens the whole word's edit form via its
+ * data-wid, like any other word.
  */
-let _is_split_piece = function(el) {
-  return !!el && el.is('[data-split-piece]');
-}
 
 function handle_select_started(e) {
   // Immediate "pressed" answer on mouse-down / touch-down.  Not in
@@ -162,13 +162,6 @@ function handle_select_started(e) {
 
 function select_started(el, e) {
   _hide_element_message_tooltips();
-  // A split piece opens its word like any other click; it just can't
-  // anchor a selection, because the halves are separate spans.
-  if (_is_split_piece(el)) {
-    el.addClass('wordhover');
-    clear_newmultiterm_elements();
-    return;
-  }
   clear_newmultiterm_elements();
   el.addClass('newmultiterm');
   selection_start_el = el;
