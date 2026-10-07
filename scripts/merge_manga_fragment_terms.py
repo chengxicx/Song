@@ -43,9 +43,12 @@ characters.
 Usage:
     venv/bin/python scripts/merge_manga_fragment_terms.py --dry-run
     venv/bin/python scripts/merge_manga_fragment_terms.py --apply
+    # multi-user mode (each user has their own database):
+    venv/bin/python scripts/merge_manga_fragment_terms.py --apply --user <name>
 """
 
 import argparse
+import contextlib
 import glob
 import json
 import os
@@ -56,6 +59,8 @@ from lute.app_factory import create_app
 from lute.db import db
 from lute.models.language import Language
 from lute.models.term import Term, Status
+from lute.multiuser import context as mu_context
+from lute.multiuser import store as mu_store
 
 
 def corpus_rows(static_folder):
@@ -246,10 +251,33 @@ def main():
             "a canary run before the full pass."
         ),
     )
+    parser.add_argument(
+        "--user",
+        help=(
+            "multi-user mode: run as this user (their own database is "
+            "read and, with --apply, written).  Required for --apply "
+            "when multi-user mode is on."
+        ),
+    )
     args = parser.parse_args()
 
     app = create_app()
-    with app.app_context():
+
+    if args.apply and not args.user and mu_store.enabled():
+        print(
+            "Multi-user mode is on: --apply writes into one user's own "
+            "database, so it needs --user <name> to pick which one.",
+            file=sys.stderr,
+        )
+        return 1
+
+    # In multi-user mode every db connection is opened against the
+    # CURRENT scope's per-user database file (see app_factory's
+    # _connect_current_db), so the whole run -- reads included -- must
+    # happen inside that user's scope.  Single-user mode ignores it.
+    scope = mu_context.user_scope(args.user) if args.user else contextlib.nullcontext()
+
+    with app.app_context(), scope:
         corpus = None
         if not args.no_corpus_check:
             corpus = corpus_rows(app.static_folder)
