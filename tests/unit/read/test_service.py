@@ -377,6 +377,13 @@ def test_manga_word_split_across_ocr_columns_keeps_its_term(japanese, app_contex
     assert halves[0].term.text == "プレゼント"
     assert halves[0].term.text_lc in {t.text_lc for t in db.session.query(Term).all()}
 
+    # TTS speaks the whole word from either piece, not the rendered
+    # fragment; an ordinary word speaks its own text.
+    assert halves[0].tts_text == "プレゼント"
+    assert halves[1].tts_text == "プレゼント"
+    desu = [ti for row in blocks[0]["line_items"] for ti in row if ti.text == "です"][0]
+    assert desu.tts_text is None
+
     # The fragments are not saved as words in their own right: プレゼン
     # and ト must never appear as terms.
     all_texts = {t.text for t in db.session.query(Term).all()}
