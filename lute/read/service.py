@@ -16,6 +16,7 @@ from lute.models.repositories import BookRepository, UserSettingRepository
 from lute.book.stats import Service as StatsService
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
+from lute.read import manga_columns
 from lute.term.model import Repository
 from lute.utils.manga_images import image_path_for_page
 
@@ -238,7 +239,15 @@ def _pdf_page_items(word_contexts):
 
 
 def _manga_page_items(blocks):
-    "The TextItems of a tokenized manga page (see Service._manga_page_blocks)."
+    """
+    The TextItems of a tokenized manga page (see Service._manga_page_blocks).
+
+    Includes the split pieces: a word the OCR cut across two columns is
+    rendered as one item per column, and every piece carries the whole
+    word's Term, so the pieces are what "the words on this page" means
+    here.  Both consumers de-duplicate by term text, so the extra
+    entries cost nothing.
+    """
     return [
         ti
         for block in blocks
@@ -846,28 +855,26 @@ class Service:
         order = 0
         for bi, block in enumerate(page.get("blocks") or []):
             box = block.get("box") or [0, 0, 0, 0]
+            # Tokenize the block as the single run of text it is, then cut
+            # the result back at the row boundaries.  OCR splits rows
+            # mid-word often enough that tokenizing them one by one
+            # ("プレゼン" + "トです。") left the reader hovering a word
+            # that matched nothing in the database -- an empty card -- and
+            # TTS pronouncing half a word.  See manga_columns.
+            per_row = manga_columns.tokenize_block(rs, block, lang, mw)
             line_items = []
-            for li, line in enumerate(block.get("lines") or []):
-                # A mokuro "line" can hold several physical text rows
-                # joined by newlines or the "¶" paragraph marker; split
-                # them so each row renders on its own line in the box
-                # instead of a single unbroken row.
-                for phys in re.split(r"[¶\r\n]+", line):
-                    if not phys.strip():
-                        continue
-                    items = rs.get_textitems(phys, lang, mw)
-                    kept = []
-                    for it in items:
-                        # Guard against paragraph markers leaking through
-                        # from the parser.
-                        if it.text == "¶":
-                            continue
-                        it.paragraph_number = bi + 1
-                        it.sentence_number = li + 1
-                        it.index = order
-                        order += 1
-                        kept.append(it)
-                    line_items.append(kept)
+            for kept in per_row:
+                for it in kept:
+                    it.paragraph_number = bi + 1
+                    # One sentence per block (a speech balloon), not per
+                    # OCR row: sentence_number drives "copy sentence" /
+                    # "translate sentence" and the reading-line highlight,
+                    # and a word split across two rows would otherwise
+                    # read back as two half-sentences.
+                    it.sentence_number = bi + 1
+                    it.index = order
+                    order += 1
+                line_items.append(kept)
             blocks.append(
                 {
                     "box": box,

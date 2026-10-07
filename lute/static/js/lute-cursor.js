@@ -137,6 +137,21 @@ let clear_newmultiterm_elements = function() {
   selection_start_shift_held = false;
 }
 
+/**
+ * True for a piece of a word that was split for rendering.
+ *
+ * A manga word can straddle two OCR columns (mokuro cuts its rows
+ * wherever the balloon ran out of room, which is often mid-word), and
+ * then renders as one span per column -- all sharing the whole word's
+ * Term, so hovering or clicking any piece shows the right word.  What
+ * they must not do is take part in a multi-word selection: the drag
+ * would join the tail of one word to the head of the next ("プ" +
+ * "ゼン" -> "プゼン") and offer it as a new term.
+ */
+let _is_split_piece = function(el) {
+  return !!el && el.is('[data-split-piece]');
+}
+
 function handle_select_started(e) {
   // Immediate "pressed" answer on mouse-down / touch-down.  Not in
   // select_started() itself: that is also called by the mobile
@@ -147,6 +162,13 @@ function handle_select_started(e) {
 
 function select_started(el, e) {
   _hide_element_message_tooltips();
+  // A split piece opens its word like any other click; it just can't
+  // anchor a selection, because the halves are separate spans.
+  if (_is_split_piece(el)) {
+    el.addClass('wordhover');
+    clear_newmultiterm_elements();
+    return;
+  }
   clear_newmultiterm_elements();
   el.addClass('newmultiterm');
   selection_start_el = el;
@@ -173,6 +195,11 @@ let get_selected_in_range = function(start_el, end_el) {
   const container = start_el.closest('#thetext, #yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner');
   const search_root = container.length ? container : $(document);
   const selected = search_root.find('span.textitem').filter(function() {
+    // Split pieces are excluded: they are halves of words that the
+    // manga renderer split across columns, so including them would
+    // splice unrelated fragments into the new term.  See
+    // _is_split_piece.
+    if ($(this).is('[data-split-piece]')) return false;
     const ord = _get_order($(this));
     return ord >= startord && ord <= endord;
   });
