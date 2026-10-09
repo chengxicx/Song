@@ -110,6 +110,31 @@ def test_negative_examples_do_not_false_positive(key, sentence):
     assert key not in hits, f"rule {key} should NOT match: {sentence}"
 
 
+@pytest.mark.parametrize(
+    "key, sentence",
+    [
+        # もので (the short form of 〜ものだから) is a literal *prefix* of
+        # ものです (もの + です), and ので (〜ので) sits inside it as well, so
+        # both rows claimed a plain 〜ものです sentence -- reported from a
+        # reader page: 写真は祖父母が若いときのものです。 showed 〜ものだから
+        # (N2) with the sentence as its example.
+        ("ds_mono-dakara", "写真は祖父母が若いときのものです。"),
+        ("ds_node-cause", "写真は祖父母が若いときのものです。"),
+        ("ds_mono-dakara", "これは子供のころのものです。"),
+    ],
+)
+def test_a_literal_ending_inside_a_longer_word_is_not_a_match(key, sentence):
+    "A literal may not end mid-token (see _match_spans)."
+    assert key not in _keys(sentence), f"rule {key} should NOT match: {sentence}"
+
+
+def test_the_guarded_literals_still_match_where_they_are_real():
+    "The end-of-token guard must not cost the real constructions."
+    assert "ds_mono-dakara" in _keys("最近忙しいもので、連絡が遅くなりました。")
+    assert "ds_node-cause" in _keys("雨が降っているので、中止します。")
+    assert "ds_mono-dakara" in _keys("急いでいたものだから、挨拶もせずに帰ってしまった。")
+
+
 def test_subtitle_line_ending_in_match_does_not_overflow():
     """
     A subtitle/transcript line with no trailing 。 may end exactly on a

@@ -230,6 +230,7 @@ def _match_spans(rule, tokens, sentence_text):
     spans = []
     offsets = _token_offsets(tokens)
     token_ends = [o + len(t["surface"]) for o, t in zip(offsets, tokens)]
+    token_end_set = set(token_ends)
     for spec in rule["patterns"]:
         if spec["type"] == "regex":
             for m in spec["re"].finditer(sentence_text):
@@ -242,6 +243,16 @@ def _match_spans(rule, tokens, sentence_text):
                 if spec.get("anchor") and not _on_token_edges(
                     m.start(), m.end(), offsets, token_ends
                 ):
+                    continue
+                # A literal may not *end* inside a token either, whatever it
+                # starts with: an end that is not a token boundary means the
+                # literal is a prefix of a longer word, not the construction.
+                # もので (the short form of 〜ものだから) is a literal prefix of
+                # ものです (もの + です), so 〜ものだから was reported for
+                # 写真は祖父母が若いときのものです。; the same hole gave ので
+                # (〜ので) and もの (〜もの) a free hit on that sentence.
+                # Starting inside a token stays allowed -- see above.
+                if m.end() not in token_end_set:
                     continue
                 # Neither may any literal start inside a 動詞 (see above).
                 if _starts_inside_verb(m.start(), tokens, offsets):
