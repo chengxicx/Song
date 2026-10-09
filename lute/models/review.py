@@ -2,7 +2,36 @@
 Review queue entities: scheduled cards and review logs.
 """
 
+from sqlalchemy import event, text
+
 from lute.db import db
+from lute.models.term import Term
+
+
+def _purge_review_rows_for_term(mapper, connection, target):
+    """
+    Before a Term row is deleted, purge its review cards and logs.
+
+    reviewcards references words and reviewlogs references reviewcards,
+    neither with an ON DELETE CASCADE clause, so leaving any of these
+    rows behind fails the term delete with an IntegrityError (e.g. the
+    Delete button on the term form or reading screen).  Logs must go
+    first because their FK points at the cards.
+    """
+    connection.execute(
+        text(
+            "delete from reviewlogs "
+            "where RlRcID in (select RcID from reviewcards where RcWoID = :wid)"
+        ),
+        {"wid": target.id},
+    )
+    connection.execute(
+        text("delete from reviewcards where RcWoID = :wid"),
+        {"wid": target.id},
+    )
+
+
+event.listen(Term, "before_delete", _purge_review_rows_for_term)
 
 
 class ReviewCard(db.Model):
