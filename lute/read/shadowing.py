@@ -873,6 +873,7 @@ def compare_tokens(
     base_key_of = _make_key_fn(language)
     sound_of = _make_sound_fn(language)
     is_japanese = is_japanese_language(language)
+    is_zh = _is_chinese_language(language)
     spoken = (
         spoken_tokens
         if spoken_tokens is not None
@@ -960,12 +961,15 @@ def compare_tokens(
         n = min(i2 - oi, j2 - si)
         for k in range(n):
             okey, skey = keyed[oi + k], spoken_keys[si + k]
-            if is_japanese and len(okey) > 1 and okey in skey:
-                # The heard chunk contains the word's kana verbatim: the
-                # word was said, with the engine gluing extra material
-                # around it (こうやま transcribed as the non-word 紅う山,
-                # whose reading あこうやま wraps the kana).  Said as-is,
-                # not a near-miss.
+            # The heard chunk contains the word's key verbatim: the word
+            # was said, with the engine gluing extra material around it
+            # (Japanese こうやま transcribed as the non-word 紅う山, whose
+            # reading wraps the kana; Chinese 馀里 answered as the
+            # parser's single token 余里, which wraps the single-char
+            # words).  A Han character is a whole word, so containment
+            # counts for it alone; a single Japanese mora is not, and a
+            # latin letter even less.
+            if okey in skey and ((is_japanese and len(okey) > 1) or (is_zh and okey)):
                 statuses[scored[oi + k]] = STATUS_MATCH
                 continue
             threshold = FUZZY_MATCH_RATIO_JA if is_japanese else FUZZY_MATCH_RATIO
@@ -1003,6 +1007,16 @@ def compare_tokens(
                             best = voiced
                 if best >= threshold:
                     ratio = best
+            if (
+                ratio < threshold
+                and okey.isdigit()
+                and skey.isdigit()
+                and (okey.startswith(skey) or skey.startswith(okey))
+            ):
+                # Partial numeric capture: the engine wrote 二 0 for a
+                # spoken 二千 -- some digits landed, some did not.  An
+                # attempt on the number, not a different word.
+                ratio = FUZZY_MATCH_RATIO
             if ratio >= threshold:
                 orig_index = scored[oi + k]
                 statuses[orig_index] = STATUS_FUZZY
@@ -1036,7 +1050,10 @@ def compare_tokens(
                 if not skey:
                     continue
                 hit = False
-                if len(okey) > 1:
+                if len(okey) > 1 or (is_zh and okey):
+                    # A multi-char key, or any Chinese one: a Han
+                    # character is a whole word, so its verbatim
+                    # occurrence inside a glued chunk is the word said.
                     pos = skey.find(okey)
                     while pos != -1:
                         span = (pos, pos + len(okey))
