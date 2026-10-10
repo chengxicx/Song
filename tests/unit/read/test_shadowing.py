@@ -261,6 +261,40 @@ def test_voicing_swap_never_rescues_unrelated_words():
     assert res["score"] == 0
 
 
+def test_hangul_to_romaja():
+    "Unicode composes each syllable from jamo indices; no dictionary needed."
+    assert shadowing._hangul_to_romaja("선배") == "seonbae"
+    assert shadowing._hangul_to_romaja("한국") == "hanguk"
+    assert shadowing._hangul_to_romaja("です") == "です"
+    assert shadowing._hangul_to_romaja("선배べ") == "seonbaeべ"
+
+
+def test_japanese_korean_cognate_leakage_is_fuzzy():
+    """
+    SenseVoice trains Japanese and Korean on one model, and a Japanese
+    word with a Korean cognate can come back in hangul (先輩 せんぱい ->
+    선배).  Romaja against the reading's romaji makes it the near-miss it
+    sounds like, with the hangul shown as what was heard.
+    """
+    lang = _FakeLanguage(
+        ["上田", "선배", "です"],
+        parser_type="japanese",
+        readings={"先輩": "せんぱい"},
+    )
+    res = shadowing.compare_tokens(["上田", "先輩", "です"], "上田 선배 です", lang)
+    assert res["statuses"] == [2, 1, 2]
+    assert res["spoken_for_fuzzy"] == {1: "선배"}
+    assert res["score"] == 83
+
+
+def test_japanese_korean_leakage_with_a_different_sound_stays_a_miss():
+    "The romaja rescue must not paper over genuinely different sounds."
+    lang = _FakeLanguage(["방"], parser_type="japanese", readings={"犬": "いぬ"})
+    res = shadowing.compare_tokens(["犬"], "방", lang)
+    assert res["statuses"] == [0]
+    assert res["score"] == 0
+
+
 def test_chinese_misread_by_sound_is_fuzzy_not_miss():
     """
     A Chinese misread is a different character, so the surface forms
@@ -291,6 +325,57 @@ def test_pinyin_tone_marks_count_for_the_sound_rescue():
     res = shadowing.compare_tokens(["妈"], "骂", lang)
     assert res["statuses"] == [1]
     assert res["spoken_for_fuzzy"] == {0: "骂"}
+
+
+def test_han_numeral_run_values():
+    "Digits concatenate, units multiply and add; no digits before a unit means one."
+    f = shadowing._han_numeral_run_value
+    assert f("二十") == 20
+    assert f("二千") == 2000
+    assert f("两千零二十五") == 2025
+    assert f("二〇二五") == 2025
+    assert f("十九") == 19
+    assert f("一千万") == 10000000
+    assert f("二万五千") == 25000
+
+
+def test_chinese_arabic_numerals_match_han_numerals():
+    """
+    SenseVoice's ITN writes numbers as digits: 二千/二十 come back as
+    2000/20.  The diff keys fold Han numeral runs to their value, so the
+    鲁迅 sentence's 二千馀里 matches the transcribed 2000余里, variant
+    馀 included.
+    """
+    lang = _FakeLanguage(["我", "冒", "了", "严寒", "回到", "相隔", "2000", "余", "里"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(
+        ["我", "冒", "了", "严寒", "回到", "相隔", "二千", "馀", "里"],
+        "我冒了严寒回到相隔2000余里",
+        lang,
+    )
+    assert res["statuses"] == [2] * 9
+    assert res["score"] == 100
+
+
+def test_chinese_digit_by_digit_year_folds_to_the_same_value():
+    "The digit-by-digit year reading and the cardinal share the value."
+    lang = _FakeLanguage(["2025"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["二〇二五"], "2025", lang)
+    assert res["statuses"] == [2]
+
+
+def test_chinese_variant_yu_is_a_match_not_a_near_miss():
+    """
+    馀 is the simplified variant of 餘 (余) that opencc's t2s table
+    misses: the book's 馀 against the engine's 余 is the same word, a
+    full match -- not the same-pinyin near-miss the sound rescue gave.
+    """
+    lang = _FakeLanguage(["余"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["馀"], "余", lang)
+    assert res["statuses"] == [2]
+    assert res["spoken_for_fuzzy"] == {}
 
 
 def test_word_left_inside_a_glued_spoken_token_is_a_match():

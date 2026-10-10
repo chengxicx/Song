@@ -444,16 +444,189 @@ def _strip_dakuten(key):
     return "".join(_DAKUTEN_BASE.get(ch, ch) for ch in key)
 
 
+# Hangul leakage: SenseVoice trains Japanese and Korean on one model, and
+# a Japanese word whose sound has a Korean cognate can come back written
+# in hangul (先輩 せんぱい -> 선배).  Unicode composes every syllable from
+# its (initial, medial, final) jamo indices, so the Revised Romanization
+# needs no dictionary -- and the romaja can be matched against the romaji
+# of the kana reading in the fuzzy rescue.
+_HANGUL_RE = re.compile(r"[\uAC00-\uD7A3]")
+
+_HANGUL_INITIALS = (
+    "g",
+    "kk",
+    "n",
+    "d",
+    "tt",
+    "r",
+    "m",
+    "b",
+    "pp",
+    "s",
+    "ss",
+    "",
+    "j",
+    "jj",
+    "ch",
+    "k",
+    "t",
+    "p",
+    "h",
+)
+_HANGUL_MEDIALS = (
+    "a",
+    "ae",
+    "ya",
+    "yae",
+    "eo",
+    "e",
+    "yeo",
+    "ye",
+    "o",
+    "wa",
+    "wae",
+    "oe",
+    "yo",
+    "u",
+    "wo",
+    "we",
+    "wi",
+    "yu",
+    "eu",
+    "ui",
+    "i",
+)
+_HANGUL_FINALS = (
+    "",
+    "k",
+    "k",
+    "k",
+    "n",
+    "n",
+    "n",
+    "t",
+    "l",
+    "k",
+    "m",
+    "p",
+    "l",
+    "l",
+    "p",
+    "l",
+    "m",
+    "p",
+    "p",
+    "t",
+    "t",
+    "ng",
+    "t",
+    "t",
+    "k",
+    "t",
+    "p",
+    "t",
+)
+
+
+def _hangul_to_romaja(text):
+    "Hangul syllables -> Revised Romanization; other characters pass through."
+    if not _HANGUL_RE.search(text or ""):
+        return text or ""
+    out = []
+    for ch in text:
+        offset = ord(ch) - 0xAC00
+        if not 0 <= offset <= 11171:
+            out.append(ch)
+            continue
+        out.append(
+            _HANGUL_INITIALS[offset // 588]
+            + _HANGUL_MEDIALS[(offset % 588) // 28]
+            + _HANGUL_FINALS[offset % 28]
+        )
+    return "".join(out)
+
+
+# Simplified-text variants opencc's t2s table misses.  馀 is the standard
+# simplified variant of 餘 (余) -- the 鲁迅 sentence runs 二千馀里 -- while
+# the engines emit 余, and 妳 likewise for 你.  Same word, same sound:
+# without the fold a correctly-read character scores a near-miss at best
+# (same pinyin, different glyph).
+_ZH_VARIANT_FOLD = {"馀": "余", "妳": "你"}
+
+# Han numerals fold to their numeric VALUE on the Chinese diff keys:
+# SenseVoice's ITN answers 二千/二十 as 2000/20, and a correctly-read
+# number must not miss just because the glyphs differ.  Folding on value
+# rather than spelling also unifies the digit-by-digit year reading
+# (二〇二五) with the cardinal one (两千零二十五) -- both are 2025.  Runs
+# convert mechanically, not semantically: the 一 in 一直 becomes 1 on
+# both sides alike, so the keys still compare equal.
+_ZH_NUMERAL_RE = re.compile(r"[零〇一二三四五六七八九兩两十百千万萬亿億]+")
+_ZH_NUMERAL_DIGITS = {
+    "零": 0,
+    "〇": 0,
+    "一": 1,
+    "二": 2,
+    "兩": 2,
+    "两": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
+}
+_ZH_NUMERAL_UNITS = {
+    "十": 10,
+    "百": 100,
+    "千": 1000,
+    "万": 10000,
+    "萬": 10000,
+    "亿": 10**8,
+    "億": 10**8,
+}
+
+
+def _han_numeral_run_value(run):
+    """
+    The integer a run of Han numeral characters stands for.
+
+    Digits concatenate (二〇二五 -> 2025); units multiply the digits
+    before them and add into the running total (二千 -> 2000, 一千万 ->
+    10000000); a unit with no digits before it counts as one (十九 -> 19).
+    """
+    total, section, num = 0, 0, 0
+    for ch in run:
+        if ch in _ZH_NUMERAL_DIGITS:
+            num = num * 10 + _ZH_NUMERAL_DIGITS[ch]
+        else:
+            unit = _ZH_NUMERAL_UNITS[ch]
+            if unit >= 10000:
+                total = (total + section + num) * unit
+                section, num = 0, 0
+            else:
+                section += (num or 1) * unit
+                num = 0
+    return total + section + num
+
+
+def _zh_numeral_key(text):
+    "Replace every Han numeral run with its Arabic value."
+    return _ZH_NUMERAL_RE.sub(lambda m: str(_han_numeral_run_value(m.group())), text)
+
+
 def _make_key_fn(language):
     """
     Return token -> comparable diff key, with the parser resolved once.
 
     Japanese compares kana readings, so 良い read as いい still matches;
     Chinese languages fold both sides to simplified Han (see
-    _simplified_converter); everything else compares lowercased surface
-    forms.  When no reading is available (e.g. the japanese_reading
-    setting is unset) the surface form is used as-is -- folded to
-    hiragana, since a kana word is its own reading (see below).
+    _simplified_converter), then to the opencc-missing variants and the
+    values of Han numeral runs (see _ZH_VARIANT_FOLD and
+    _zh_numeral_key); everything else compares lowercased surface forms.
+    When no reading is available (e.g. the japanese_reading setting is
+    unset) the surface form is used as-is -- folded to hiragana, since a
+    kana word is its own reading (see below).
     """
     parser = language.parser
     t2s = _simplified_converter() if _is_chinese_language(language) else None
@@ -480,7 +653,11 @@ def _make_key_fn(language):
             out = parser.get_lowercase(token)
         except Exception:  # pylint: disable=broad-exception-caught
             out = token.lower()
-        return t2s.convert(out) if t2s is not None else out
+        if t2s is not None:
+            out = t2s.convert(out)
+            out = "".join(_ZH_VARIANT_FOLD.get(ch, ch) for ch in out)
+            out = _zh_numeral_key(out)
+        return out
 
     return key
 
@@ -801,6 +978,16 @@ def compare_tokens(
                 ).ratio()
                 if voiced >= threshold:
                     ratio = voiced
+                if ratio < threshold and _HANGUL_RE.search(skey):
+                    # Korean leakage (see _hangul_to_romaja): the heard
+                    # form's romaja against the reading's romaji judges
+                    # 先輩 せんぱい heard as 선배 the near-miss it sounds
+                    # like (senpai vs seonbae), not a flat miss.
+                    romaji = jaconv.kana2alphabet(okey)
+                    if romaji:
+                        ratio = difflib.SequenceMatcher(
+                            None, romaji, _hangul_to_romaja(skey)
+                        ).ratio()
             elif ratio < threshold and sound_of is not None:
                 # A Chinese misread is a different character, so the
                 # surface forms share nothing; re-judge the pair on the
