@@ -973,6 +973,11 @@ def compare_tokens(
                 statuses[scored[oi + k]] = STATUS_MATCH
                 continue
             threshold = FUZZY_MATCH_RATIO_JA if is_japanese else FUZZY_MATCH_RATIO
+            # A rescue can prove the sound was said exactly (a homophone
+            # transcription, or the cognate written in the wrong script);
+            # such a pair is a match, not the near-miss the rescues
+            # otherwise cap at.
+            exact_sound = False
             ratio = difflib.SequenceMatcher(None, okey, skey).ratio()
             if ratio < threshold and is_japanese:
                 # Voicing is the one difference a ratio of 0 hides:
@@ -992,13 +997,17 @@ def compare_tokens(
                         ratio = difflib.SequenceMatcher(
                             None, romaji, _hangul_to_romaja(skey)
                         ).ratio()
+                        exact_sound = ratio >= 1.0
             elif ratio < threshold and sound_of is not None:
                 # A Chinese misread is a different character, so the
                 # surface forms share nothing; re-judge the pair on the
                 # romanization before calling it a skip.  Pairs are
                 # judged on their most similar readings: the dictionary
                 # pick can be the wrong polyphone sense (阿 o1 vs the
-                # name-prefix aa3).
+                # name-prefix aa3).  An IDENTICAL reading is no
+                # near-miss at all: the engine cannot tell homophones
+                # apart (观潮 guan1chao2 answered as 官潮), so the sound
+                # was right.
                 best = 0.0
                 for oread in sound_of(original_tokens[scored[oi + k]]):
                     for sread in sound_of(spoken[si + k]):
@@ -1007,6 +1016,7 @@ def compare_tokens(
                             best = voiced
                 if best >= threshold:
                     ratio = best
+                    exact_sound = best >= 1.0
             if (
                 ratio < threshold
                 and okey.isdigit()
@@ -1019,8 +1029,11 @@ def compare_tokens(
                 ratio = FUZZY_MATCH_RATIO
             if ratio >= threshold:
                 orig_index = scored[oi + k]
-                statuses[orig_index] = STATUS_FUZZY
-                result["spoken_for_fuzzy"][orig_index] = spoken[si + k]
+                if exact_sound:
+                    statuses[orig_index] = STATUS_MATCH
+                else:
+                    statuses[orig_index] = STATUS_FUZZY
+                    result["spoken_for_fuzzy"][orig_index] = spoken[si + k]
             else:
                 # Too far apart to be a near-miss, but the pair still has a
                 # counterpart: showing it tells the learner what they
