@@ -3,17 +3,19 @@ Edge-TTS voice synthesis and Google auto-translation routes.
 
 Provides:
   * GET /tts/<lang>/<path:text>  -- generate (and cache) an mp3 using edge-tts.
+    An optional ?voice=<name> overrides the language's default voice.
   * GET /api/translate/<sl>/<tl>/<path:text>  -- translate text via Google's
     free translate API, cached in memory.
 """
 
 import os
+import re
 import asyncio
 import hashlib
 import urllib.parse
 
 import requests
-from flask import Blueprint, current_app, send_file, jsonify
+from flask import Blueprint, current_app, send_file, jsonify, request
 
 try:
     import edge_tts
@@ -185,6 +187,35 @@ def voice_for_tag(tag):
     return voice or DEFAULT_VOICE
 
 
+# edge-tts voice names look like "ja-JP-NanamiNeural" / "en-US-AriaNeural" /
+# "zh-HK-HiuMaanNeural": locale subtags followed by a personal name ending in
+# "Neural". Anything else is rejected outright -- the voice is interpolated
+# into a shell-out to the edge-tts CLI and a filesystem cache key, so free-form
+# client input is not welcome.
+_VOICE_NAME_RE = re.compile(r"^[A-Za-z]{2,4}-[A-Za-z0-9]{2,6}-[A-Za-z]+Neural$")
+
+
+def _requested_voice_is_acceptable(voice, lang):
+    """
+    Whether a client-supplied ?voice= may override the language's default.
+
+    Two gates: the name must match the edge-tts naming pattern, and its
+    locale's primary subtag must agree with the requested language (a
+    "ja-JP-..." voice may not be requested for /tts/en/...). The second gate
+    keeps the endpoint from working as an unrestricted synthesizer for
+    arbitrary (voice, text) combinations while still allowing every
+    same-language voice choice.
+    """
+    if not voice or not _VOICE_NAME_RE.match(voice):
+        return False
+    voice_primary = primary_subtag(voice)
+    lang_primary = primary_subtag(lang)
+    # "zh" covers zh-CN/zh-HK/... alike; anything else must match exactly.
+    if voice_primary == "zh" or lang_primary == "zh":
+        return voice_primary == lang_primary
+    return voice_primary == lang_primary
+
+
 # In-memory translation cache:  "{sl}_{tl}_{text}" -> translation string.
 trans_cache = {}
 
@@ -194,12 +225,21 @@ def tts_speak(lang, text):
     """
     Generate speech for *text* using edge-tts, returning an mp3.
 
+    An optional ``?voice=<name>`` query parameter overrides the language's
+    default voice (e.g. ``/tts/ja-JP/...?voice=ja-JP-KeitaNeural``).  Only
+    well-formed same-language edge-tts voice names are accepted
+    (see `_requested_voice_is_acceptable`); anything else silently falls back
+    to the default, so old clients and the web reader are unaffected.
+
     Audio files are cached on disk in DATAPATH/tts_cache, keyed by the
     MD5 of ``f"{lang}_{voice}_{text}"`` so repeated requests are served
     instantly.  The voice is part of the key: changing a language's TTS
     voice setting must produce new audio, not the old cached file.
     """
     voice = voice_for_tag(lang)
+    requested = request.args.get("voice", "").strip()
+    if _requested_voice_is_acceptable(requested, lang):
+        voice = requested
 
     # env_config is the user-scoped proxy: per-user tts cache.
     datapath = current_app.env_config.datapath
