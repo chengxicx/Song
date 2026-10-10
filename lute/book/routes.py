@@ -839,13 +839,11 @@ def _import_mokuro_manga():
     title = (request.form.get("manga_title") or "").strip()
 
     if manga_file is None or manga_file.filename == "":
-        flash("Please upload a Mokuro manga archive (.zip or .cbz).", "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure("Please upload a Mokuro manga archive (.zip or .cbz).")
 
     fname = (manga_file.filename or "").lower()
     if not fname.endswith((".zip", ".cbz")):
-        flash("Please upload a valid Mokuro manga archive (.zip or .cbz).", "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure("Please upload a valid Mokuro manga archive (.zip or .cbz).")
 
     if not title:
         base = manga_file.filename or "Mokuro manga"
@@ -867,9 +865,8 @@ def _import_mokuro_manga():
         b.manga_stream_filename = manga_file.filename
         book = svc.import_book(b, db.session)
     except BookImportException as e:
-        flash(e.message, "notice")
-        return redirect("/book/import_webpage", 302)
-    return redirect(f"/read/{book.id}/page/1", 302)
+        return _import_form_failure(e.message)
+    return _import_form_success(book.id)
 
 
 def _import_pdf():
