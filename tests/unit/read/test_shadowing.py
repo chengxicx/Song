@@ -365,6 +365,19 @@ def test_chinese_digit_by_digit_year_folds_to_the_same_value():
     assert res["statuses"] == [2]
 
 
+def test_chinese_homophone_heard_is_a_match():
+    """
+    The engine cannot tell homophones apart: 观潮 (guāncháo) answered as
+    官潮 is the sound said exactly, so a full match -- not the near-miss
+    the romanization rescue used to cap at.
+    """
+    lang = _FakeLanguage(["官潮"], readings={"观潮": "guān cháo", "官潮": "guān cháo"})
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["观潮"], "官潮", lang)
+    assert res["statuses"] == [2]
+    assert res["spoken_for_fuzzy"] == {}
+
+
 def test_chinese_variant_yu_is_a_match_not_a_near_miss():
     """
     馀 is the simplified variant of 餘 (余) that opencc's t2s table
