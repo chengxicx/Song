@@ -455,6 +455,13 @@
         <input type="text" id="manga_tag" name="manga_tag" class="form-control">
       </div>
     </div>
+    <div class="irow" id="manga_panel_row" style="display: none;">
+      <label class="ilbl"></label>
+      <div class="ictrl" id="manga_panel">
+        <span id="manga_status_text" class="import-status-text"></span>
+        <div class="import-progress-track"><div class="import-progress-bar" id="manga_progress_bar"></div></div>
+      </div>
+    </div>
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="manga">
@@ -1213,6 +1220,28 @@
         videoWhisper.show('progress');
         startPlainMediaImport(videoForm, $('#video-import'), $('#video_panel'));
       }
+    });
+
+    // Manga archives can be large; same XHR upload progress as the media forms.
+    mangaForm.on('submit', function (e) {
+      e.preventDefault(); // always XHR: real upload progress + inline errors
+      const mangaInput = document.getElementById('manga_file');
+      if (!(mangaInput.files && mangaInput.files[0])) {
+        $('#manga_panel_row').show();
+        $('#manga_progress_bar').css('width', '0%');
+        $('#manga_status_text')
+          .text('Please upload a Mokuro manga archive (.zip or .cbz).')
+          .css('color', 'red');
+        return;
+      }
+      const langVal = $('#manga-language').val();
+      if (!langVal || langVal === '0') {
+        $('#manga_panel_row').show();
+        $('#manga_progress_bar').css('width', '0%');
+        $('#manga_status_text').text('Please choose a language.').css('color', 'red');
+        return;
+      }
+      startPlainMediaImport(mangaForm, $('#manga-import'), $('#manga_panel'));
     });
   });
 </script>
