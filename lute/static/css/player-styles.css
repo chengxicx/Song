@@ -1166,8 +1166,11 @@
   text-overflow: ellipsis;
 }
 
+/* Hover uses a fixed light blue, NOT var(--yt-color-5): the dropdown
+   panel is hard-coded light (#fff bg, #333 text), but --yt-color-5
+   resolves to a dark color in dark themes -> dark-on-dark unreadable. */
 .tts-voice-option:hover {
-  background-color: var(--yt-color-5, #d6edff);
+  background-color: #d6edff;
 }
 
 /* Shown only while speechSynthesis has not yet reported its voices (common
