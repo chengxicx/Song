@@ -378,6 +378,37 @@ def test_chinese_variant_yu_is_a_match_not_a_near_miss():
     assert res["spoken_for_fuzzy"] == {}
 
 
+def test_chinese_single_chars_glued_into_a_heard_chunk_match():
+    """
+    The engine answers 馀 + 里 with the parser's single token 余里: each
+    Han character is a whole word, so its verbatim occurrence inside the
+    glued chunk is the word said -- matches, not syllable half-credit.
+    """
+    lang = _FakeLanguage(["相隔", "二", "0", "余里"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["相隔", "二千", "馀", "里"], "相隔 二 0 余里", lang)
+    # 二千 was only partially captured (二 0): an attempted number.
+    assert res["statuses"] == [2, 1, 2, 2]
+    assert res["spoken_for_fuzzy"] == {1: "二"}
+
+
+def test_chinese_partial_numeric_capture_is_fuzzy():
+    "The engine's 二 0 for 二千 lands some digits: attempted, half credit."
+    lang = _FakeLanguage(["二"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["二千"], "二", lang)
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "二"}
+
+
+def test_chinese_unrelated_digit_stays_a_miss():
+    "A digit that is no prefix of the target's value is still a miss."
+    lang = _FakeLanguage(["0"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["二千"], "0", lang)
+    assert res["statuses"] == [0]
+
+
 def test_word_left_inside_a_glued_spoken_token_is_a_match():
     """
     The engines can glue adjacent words into one chunk that is not the
@@ -407,18 +438,18 @@ def test_word_left_inside_a_glued_spoken_token_is_a_match():
 
 def test_leftover_word_rescued_by_syllables_inside_a_merged_token():
     """
-    A left-behind word need not be verbatim in the chunk to count:
-    夠 + 喇 heard as the single token 夠啦.  夠 pairs with the chunk on
-    its surface form; 喇 has no counterpart left, but its syllable is
-    in the chunk's reading (gau3 laa1), so it is the near-miss it
-    sounds like instead of a skip.
+    A left-behind word need not appear in the chunk to count: 夠 + 喇
+    heard as the single token 夠剌.  夠 is verbatim in the chunk, so it
+    is a match; 喇 is not, but its syllable is in the chunk's reading
+    (gau3 laa1), so it is the near-miss it sounds like instead of a
+    skip.
     """
-    lang = _FakeLanguage(["夠啦"], readings={"夠": "gau3", "喇": "laa3", "夠啦": "gau3 laa1"})
+    lang = _FakeLanguage(["夠剌"], readings={"夠": "gau3", "喇": "laa3", "夠剌": "gau3 laa1"})
     lang.tts_lang = "zh-HK"
-    res = shadowing.compare_tokens(["夠", "喇"], "夠啦", lang)
-    assert res["statuses"] == [1, 1]
-    assert res["spoken_for_fuzzy"] == {0: "夠啦", 1: "夠啦"}
-    assert res["score"] == 50
+    res = shadowing.compare_tokens(["夠", "喇"], "夠剌", lang)
+    assert res["statuses"] == [2, 1]
+    assert res["spoken_for_fuzzy"] == {1: "夠剌"}
+    assert res["score"] == 75
 
 
 def test_chinese_rescue_judges_on_every_reading_the_parser_offers():
@@ -1232,8 +1263,9 @@ def test_cantonese_traditional_matches_sensevoice_simplified():
     Regression from a real Cantonese take.  The sentence 呢個係阿樂佢嘅...
     is traditional; SenseVoice answers in simplified with its own token
     boundaries (呢个 系阿乐 ... 剪了).  With the t2s fold plus the
-    multi-token drift runs, everything actually heard matches; only the
-    garbled 頭髮好長 (heard as 道法口层) and the unheard 喇 stay misses.
+    multi-token drift runs, everything actually heard matches -- 剪
+    verbatim inside the glued 剪了 included; only the garbled 頭髮好長
+    (heard as 道法口层) and the unheard 喇 stay misses.
     """
     try:
         from opencc import OpenCC  # noqa: F401
@@ -1250,9 +1282,9 @@ def test_cantonese_traditional_matches_sensevoice_simplified():
         "呢个系阿乐佢嘅道法口层要剪了",
         lang,
     )
-    assert res["statuses"] == [2, 2, 2, 2, 2, 2, 0, 0, 2, 1, 0]
-    assert res["spoken_for_fuzzy"] == {9: "剪了"}
-    assert res["score"] == 68
+    assert res["statuses"] == [2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 0]
+    assert res["spoken_for_fuzzy"] == {}
+    assert res["score"] == 73
 
 
 def test_match_book_script_converts_simplified_heard_to_traditional():
