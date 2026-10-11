@@ -29,15 +29,26 @@ Feature changes:
   An admin uploads a `.mdx` file from the Settings page; the server converts
   it once into a small SQLite database published under `static/dict/`, and
   the reading page then looks words up offline with no network call.
-  Definitions show up in the term popup ("Show local dictionary definitions",
-  on by default) and in a "Local" tab at the head of the dictionary strip
-  below the reading page.  The database can also be built ahead of time with
-  `python tools/mdx_to_sqlite.py <file.mdx> <out.db>`.  MDict 1.2/2.0 files
-  are supported with no block compression, zlib or LZO1X, in UTF-8, UTF-16
-  or GB18030; encrypted files and MDict 3.0 record sections are not.
+  Several dictionaries can sit side by side in that folder, and each language
+  chooses its own on the language edit page -- a Korean book is no longer
+  offered the Japanese dictionary.  A dictionary a language is still reading
+  is not deleted without a confirmation.  Definitions show up in the term
+  popup (per language, "Show dictionary definitions in the term popup", on by
+  default; the old global "Show local dictionary definitions" setting is
+  gone) and in a "Local" tab at the head of the dictionary strip below the
+  reading page.  Naming a file `ja_zh_shogakukan_v2.db` keeps the phone app's
+  default download URL working with no setup.  A dictionary can also be built
+  ahead of time with `python tools/mdx_to_sqlite.py <file.mdx> <out.db>`.
+  MDict 1.2/2.0 files are supported with no block compression, zlib or LZO1X,
+  in UTF-8, UTF-16 or GB18030; encrypted files and MDict 3.0 record sections
+  are not.
 
 Bugfixes:
 
+* Local dictionary definitions no longer end with a stray NUL character:
+  the record slice runs to the next entry's start and swallowed the
+  terminator that ends the current one, which reached the term popup and
+  the dictionary tab.  Both the web converter and the phone app strip it.
 * Shadowing scores Chinese takes correctly when the ASR re-cuts word
   boundaries: SenseVoice's 呢个 + 系阿乐 now matches the sentence's
   呢 + 個 + 係 + 阿樂 instead of scoring misses, and opencc (the

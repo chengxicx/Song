@@ -144,10 +144,9 @@ def add_default_user_settings(session, default_user_backup_path):
         # Term popups:
         "term_popup_promote_parent_translation": True,
         "term_popup_show_components": True,
-        # The local dictionary's gloss, for terms with no translation yet.
-        # On by default: it is empty until a dictionary is imported (see
-        # the settings page's Local dictionary section).
-        "term_popup_show_dict_gloss": True,
+        # The local dictionary's gloss is no longer a user setting: it is
+        # per language (Language.term_popup_show_dict_gloss), because the
+        # dictionary itself is now chosen per language.
         # Anki:
         "use_ankiconnect": False,
         "ankiconnect_url": "http://127.0.0.1:8765",

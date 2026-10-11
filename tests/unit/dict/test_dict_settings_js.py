@@ -1,13 +1,15 @@
 """
-The settings page's "Local dictionary (MDX)" card (static/js/dict-settings.js).
+The settings page's "Local dictionaries (MDX)" card (static/js/dict-settings.js).
 
 The card is the only consumer of the /dict endpoints' JSON, and the field
-names are a contract: the Python side sends `installed`, `entries`,
-`size_mb`, `source`, `url`, `task_id`, `state`, `processed`, `error` and
-`dictionary.entries`.  Rename one on either side and nothing throws -- the
-card renders blank, or the progress poll never settles, and no Python test
-can see it.  So the real module is run against a stub DOM and a stubbed
-network (dict_settings_js_harness.js) and the rendered strings are pinned.
+names are a contract: the Python side sends `dictionaries[].filename`,
+`.title`, `.entries`, `.size_mb`, `.source`, `.url`, `.is_default`, plus
+`task_id`, `state`, `processed`, `error`, `dictionary.entries` and the
+remove payload's `result`/`removed`.  Rename one on either side and
+nothing throws -- the card renders blank, or the progress poll never
+settles, and no Python test can see it.  So the real module is run
+against a stub DOM and a stubbed network
+(dict_settings_js_harness.js) and the rendered strings are pinned.
 
 Skips when node is not on PATH.
 """
@@ -32,6 +34,7 @@ INSTALLED = {
     "installed": True,
     "filename": "ja_zh_shogakukan_v2.db",
     "url": "/static/dict/ja_zh_shogakukan_v2.db",
+    "is_default": True,
     "size_mb": 42.5,
     "modified": "2026-10-11 18:40",
     "source": "shogakukan_v2.mdx",
@@ -41,14 +44,17 @@ INSTALLED = {
     "imported_at": "2026-10-11 18:40",
 }
 
-NOT_INSTALLED = {
-    "installed": False,
-    "filename": "ja_zh_shogakukan_v2.db",
-    "url": "/static/dict/ja_zh_shogakukan_v2.db",
-    "size_mb": None,
+BARE = {
+    "installed": True,
+    "filename": "ko_zh_basic.db",
+    "url": "/static/dict/ko_zh_basic.db",
+    "is_default": False,
+    "size_mb": 12.0,
+    "modified": "2026-10-11 18:40",
     "source": None,
     "title": None,
     "entries": None,
+    "terms": None,
     "imported_at": None,
 }
 
@@ -69,38 +75,30 @@ def _run(payload):
     return result
 
 
-def test_status_line_describes_the_installed_dictionary():
-    text = _run({"scenario": "status_text", "status": INSTALLED})["text"]
-
-    assert "小学馆V2日汉辞典" in text
-    assert "69,425 entries" in text
-    assert "42.5 MB" in text
-    assert "shogakukan_v2.mdx" in text
-    assert "2026-10-11 18:40" in text
+# --- the one-line summary ---------------------------------------------------
 
 
-def test_status_line_says_so_when_nothing_is_installed():
-    text = _run({"scenario": "status_text", "status": NOT_INSTALLED})["text"]
-    assert text == "No dictionary imported yet."
+def test_status_line_describes_the_dictionary():
+    result = _run({"scenario": "status_text", "status": INSTALLED})
+
+    assert "小学馆V2日汉辞典" in result["text"]
+    assert "69,425 entries" in result["text"]
+    assert "42.5 MB" in result["text"]
+    assert "shogakukan_v2.mdx" in result["text"]
+    assert "2026-10-11 18:40" in result["text"]
+
+
+def test_status_line_says_so_when_there_is_no_dictionary():
+    assert _run({"scenario": "status_text"})["text"] == "No dictionary imported yet."
 
 
 def test_status_line_falls_back_to_the_file_name_for_a_cli_built_dictionary():
     # A dictionary built with tools/mdx_to_sqlite.py and dropped into
-    # place has no metadata sidecar: no title, no counts.
-    bare = {
-        "installed": True,
-        "filename": "ja_zh_shogakukan_v2.db",
-        "url": "/static/dict/ja_zh_shogakukan_v2.db",
-        "size_mb": 42.5,
-        "source": None,
-        "title": None,
-        "entries": None,
-        "imported_at": None,
-    }
+    # the folder has no metadata sidecar: no title, no counts.
+    result = _run({"scenario": "status_text", "status": BARE})
 
-    assert _run({"scenario": "status_text", "status": bare})["text"] == (
-        "ja_zh_shogakukan_v2.db \u00b7 42.5 MB"
-    )
+    assert result["text"] == "ko_zh_basic.db \u00b7 12 MB"
+    assert result["described"] == "12 MB"
 
 
 def test_status_line_copes_with_a_bare_status():
@@ -108,21 +106,52 @@ def test_status_line_copes_with_a_bare_status():
     assert _run({"scenario": "status_text", "status": {}})["text"]
 
 
-def test_render_shows_the_download_url_when_installed():
-    dom = _run({"scenario": "render", "status": INSTALLED})["dom"]
-
-    assert dom["dict_settings_installed"]["style"]["display"] == ""
-    assert dom["dict_settings_url"]["text"] == "/static/dict/ja_zh_shogakukan_v2.db"
-    assert dom["dict_settings_url"]["href"] == "/static/dict/ja_zh_shogakukan_v2.db"
-    assert dom["dict_settings_remove"]["disabled"] is False
+# --- the list ---------------------------------------------------------------
 
 
-def test_render_hides_the_url_and_disables_remove_when_not_installed():
-    dom = _run({"scenario": "render", "status": NOT_INSTALLED})["dom"]
+def test_render_lists_every_dictionary_in_the_pool():
+    dom = _run({"scenario": "render", "dictionaries": [INSTALLED, BARE]})["dom"]
+    html = dom["dict_settings_list"]["html"]
 
-    assert dom["dict_settings_installed"]["style"]["display"] == "none"
-    assert dom["dict_settings_remove"]["disabled"] is True
-    assert dom["dict_settings_status"]["text"] == "No dictionary imported yet."
+    assert "小学馆V2日汉辞典" in html
+    assert "ja_zh_shogakukan_v2.db" in html
+    assert "ko_zh_basic.db" in html
+    assert "69,425 entries" in html
+    # The download URL is what a browser -- or the phone -- fetches.
+    assert 'href="/static/dict/ja_zh_shogakukan_v2.db"' in html
+
+
+def test_render_marks_the_phones_default_file():
+    dom = _run({"scenario": "render", "dictionaries": [INSTALLED, BARE]})["dom"]
+    html = dom["dict_settings_list"]["html"]
+
+    assert html.count("phone default") == 1
+    assert "phone default" in html.split("ko_zh_basic.db")[0]
+
+
+def test_render_says_so_when_the_pool_is_empty():
+    dom = _run({"scenario": "render", "dictionaries": []})["dom"]
+
+    assert "No dictionary imported yet." in dom["dict_settings_list"]["html"]
+
+
+def test_each_row_removes_its_own_dictionary():
+    html = _run({"scenario": "row_html", "status": BARE})["html"]
+
+    assert "DictSettings.remove('ko_zh_basic.db')" in html
+
+
+def test_the_row_escapes_the_title_from_the_dictionary_file():
+    # The title is whatever the .mdx carried, and it is written into the
+    # list with innerHTML.
+    hostile = dict(INSTALLED, title='<img src=x onerror="alert(1)">')
+    html = _run({"scenario": "row_html", "status": hostile})["html"]
+
+    assert "<img" not in html
+    assert "&lt;img" in html
+
+
+# --- the conversion poll ----------------------------------------------------
 
 
 def test_poll_resolves_when_the_conversion_finishes():
@@ -162,6 +191,9 @@ def test_poll_rejects_with_the_server_message():
     assert result["rejected"] == "MDX: encrypted dictionary is not supported"
 
 
+# --- import -----------------------------------------------------------------
+
+
 def test_import_reports_the_upload_then_the_finished_count():
     result = _run(
         {
@@ -186,6 +218,38 @@ def test_import_reports_the_upload_then_the_finished_count():
     assert any("25%" in m for m in result["progress"])
     # The card is interactive again when the import is over.
     assert result["dom"]["dict_settings_import"]["disabled"] is False
+
+
+def test_import_sends_the_chosen_name():
+    result = _run({"scenario": "import", "name": "ko_zh_basic.db"})
+
+    assert result["fields"] == [
+        [["mdx", {"name": "fixture.mdx"}], ["name", "ko_zh_basic.db"]]
+    ]
+    # The card says which file it is building, not just "converting".
+    assert any("into ko_zh_basic.db" in m for m in result["messageLog"])
+
+
+def test_import_without_a_name_lets_the_server_derive_one():
+    result = _run({"scenario": "import"})
+
+    assert result["fields"] == [[["mdx", {"name": "fixture.mdx"}]]]
+    # The response carries the name the server chose.
+    assert any("into fixture.db" in m for m in result["messageLog"])
+
+
+def test_import_selected_takes_the_name_from_the_text_box():
+    result = _run(
+        {
+            "scenario": "import_selected",
+            "selectedFile": {"name": "fixture.mdx"},
+            "typedName": "my_dict.db",
+        }
+    )
+
+    assert result["fields"] == [
+        [["mdx", {"name": "fixture.mdx"}], ["name", "my_dict.db"]]
+    ]
 
 
 def test_import_surfaces_an_upload_rejection():
@@ -213,11 +277,15 @@ def test_import_without_a_file_asks_for_one():
     assert result["dom"]["dict_settings_msg"]["text"] == "Choose an .mdx file first."
 
 
-def test_remove_posts_and_refreshes():
-    result = _run({"scenario": "remove"})
+# --- remove -----------------------------------------------------------------
+
+
+def test_remove_posts_the_file_name_and_refreshes():
+    result = _run({"scenario": "remove", "removeName": "ko_zh_basic.db"})
 
     assert [c["url"] for c in result["calls"]] == ["/dict/remove", "/dict/status"]
     assert result["calls"][0]["method"] == "POST"
+    assert result["calls"][0]["body"] == [["name", "ko_zh_basic.db"]]
     assert result["dom"]["dict_settings_msg"]["text"] == "Dictionary removed."
 
 
@@ -225,4 +293,55 @@ def test_remove_does_nothing_when_cancelled():
     result = _run({"scenario": "remove_cancelled", "confirm": False})
 
     assert result["calls"] == []
+    assert result["dom"]["dict_settings_msg"]["text"] == ""
+
+
+def test_remove_asks_again_when_a_language_still_uses_it():
+    "The server refuses; confirming the refusal deletes with force."
+    result = _run(
+        {
+            "scenario": "remove",
+            "removeName": "ja_zh_shogakukan_v2.db",
+            "removeBody": [
+                {
+                    "status": 409,
+                    "body": {
+                        "result": "in_use",
+                        "message": "ja_zh_shogakukan_v2.db is still the "
+                        "dictionary for: Japanese.",
+                    },
+                },
+                {"body": {"result": "success", "removed": True}},
+            ],
+            "confirm": [True, True],
+        }
+    )
+
+    assert [c["url"] for c in result["calls"]] == [
+        "/dict/remove",
+        "/dict/remove",
+        "/dict/status",
+    ]
+    assert result["calls"][0]["body"] == [["name", "ja_zh_shogakukan_v2.db"]]
+    assert result["calls"][1]["body"] == [
+        ["name", "ja_zh_shogakukan_v2.db"],
+        ["force", "1"],
+    ]
+    assert result["dom"]["dict_settings_msg"]["text"] == "Dictionary removed."
+
+
+def test_remove_keeps_the_dictionary_when_the_refusal_is_declined():
+    result = _run(
+        {
+            "scenario": "remove",
+            "removeName": "ja_zh_shogakukan_v2.db",
+            "removeBody": {
+                "status": 409,
+                "body": {"result": "in_use", "message": "still in use."},
+            },
+            "confirm": [True, False],
+        }
+    )
+
+    assert [c["url"] for c in result["calls"]] == ["/dict/remove", "/dict/status"]
     assert result["dom"]["dict_settings_msg"]["text"] == ""

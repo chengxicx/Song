@@ -12,12 +12,23 @@ server builds once from an MDX (MDict) dictionary:
 ``def`` is the definition already flattened to plain text (see
 MdxReader.clean_definition), so neither client has to strip HTML.
 
-The file is published into the static folder, under the name the phone's
-default download URL points at, so a phone pointed at this server picks
-it up with no configuration:
+Every converted file lives in one folder inside the static folder -- a
+*pool* of dictionaries, since a server can serve more than one language:
 
     <static>/dict/ja_zh_shogakukan_v2.db
     /static/dict/ja_zh_shogakukan_v2.db
+
+The name ``ja_zh_shogakukan_v2.db`` is special only in that it is the
+file the phone's default download URL points at, so a phone pointed at
+this server picks that one up with no configuration.  Any other
+``*.db`` in the folder is usable too; a language chooses one of them by
+file name (``Language.local_dict``), and an empty choice means that
+language has no local dictionary.
+
+Every function here takes the file name as its last argument, and
+``None`` means "the default one" -- the phone's file.  The name always
+comes from a language row or a form field, so it is validated before it
+is joined onto the folder (see ``_is_pool_name``).
 
 Lookups open the file read-only, per call: a few sub-milliseconds of
 sqlite3 setup against a user-driven popup, in exchange for never holding
@@ -42,13 +53,21 @@ from lute.dict import importer
 # what this module promises about the published dictionary.
 from lute.dict.importer import MAX_DEFINITION_CHARS  # pylint: disable=unused-import
 
-# The published file name.  It is the name the phone app's default
+# The default dictionary's file name -- the one the phone app's
 # dictionary URL uses (DictRepository.urlOnServer in LuteForMobile), so
-# publishing under it means the phone works with no setup at all.  The
-# installed dictionary's real identity is in the metadata sidecar.
+# having it in the pool means the phone works with no setup at all.
+# Other dictionaries may sit beside it; this one is what a caller gets
+# when it does not name one.  A dictionary's real identity (title,
+# entry count, where it came from) is in its metadata sidecar.
 DB_FILENAME = "ja_zh_shogakukan_v2.db"
 
 DICT_SUBDIR = "dict"
+
+# A dictionary's file name: a plain "<something>.db" that can only ever
+# name a file inside the pool.  The name is stored per language and
+# comes back through a form field, so it is checked before being joined
+# onto the folder -- no separators, no "..", no hidden files.
+_POOL_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*\.db$")
 
 # Leading honorifics are not part of a dictionary key: the key for
 # おひさしぶり is ひさしぶり.
@@ -75,52 +94,102 @@ def dict_dir():
     return os.path.join(current_app.static_folder, DICT_SUBDIR)
 
 
-def db_path():
-    "Absolute path of the published dictionary."
-    return os.path.join(dict_dir(), DB_FILENAME)
+def is_pool_name(name):
+    """
+    True when ``name`` may name a file in the dictionary pool.
+
+    The value round-trips through a language row and a form field, so it
+    is untrusted: a name with a separator or a ".." would let a caller
+    read or delete anything the server user can.
+    """
+    return (
+        bool(name) and isinstance(name, str) and _POOL_NAME_RE.match(name) is not None
+    )
 
 
-def metadata_path():
-    "Absolute path of the published dictionary's metadata sidecar."
-    return os.path.join(dict_dir(), f"{DB_FILENAME}.json")
+def resolve_name(filename):
+    """
+    The pool file name a caller means, or None when it is not a usable
+    name.  ``None`` means the default dictionary -- the phone's file --
+    but "" does *not*: an empty name is the value a language row holds
+    when it has no dictionary, and falling back to the default there is
+    exactly the bug the per-language setting exists to fix.
+    """
+    if filename is None:
+        return DB_FILENAME
+    return filename if is_pool_name(filename) else None
 
 
-def download_url():
+def suggested_filename(source_name):
+    """
+    A pool file name derived from the name of an uploaded .mdx.
+
+    A file name may carry things a pool name may not -- folders, spaces,
+    non-ASCII -- so they collapse to "-": the derived default is always
+    usable, instead of failing a validation the user never asked for.
+    """
+    stem = os.path.splitext(os.path.basename(source_name or ""))[0]
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "-", stem).strip("-._")
+    return f"{stem or 'dictionary'}.db"
+
+
+def db_path(filename=None):
+    "Absolute path of one pool dictionary, or None for an unusable name."
+    name = resolve_name(filename)
+    return os.path.join(dict_dir(), name) if name else None
+
+
+def metadata_path(filename=None):
+    "Absolute path of one pool dictionary's metadata sidecar, or None."
+    path = db_path(filename)
+    return f"{path}.json" if path else None
+
+
+def download_url(filename=None):
     "The URL the phone (and any browser) can fetch the dictionary from."
+    name = resolve_name(filename)
+    if name is None:
+        return None
     try:
-        return url_for("static", filename=f"{DICT_SUBDIR}/{DB_FILENAME}")
+        return url_for("static", filename=f"{DICT_SUBDIR}/{name}")
     except RuntimeError:
         # No request context (a CLI or a background task): the static
         # route's own path is fixed, so this is the same answer.
-        return f"/static/{DICT_SUBDIR}/{DB_FILENAME}"
+        return f"/static/{DICT_SUBDIR}/{name}"
 
 
-def is_installed():
-    "True when a dictionary has been imported."
-    return os.path.isfile(db_path())
+def is_installed(filename=None):
+    "True when that dictionary has been imported."
+    path = db_path(filename)
+    return path is not None and os.path.isfile(path)
 
 
-def _read_metadata():
+def _read_metadata(filename=None):
     "The sidecar written at import time, or an empty dict."
+    path = metadata_path(filename)
+    if path is None:
+        return {}
     try:
-        with open(metadata_path(), "r", encoding="utf-8") as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
         return data if isinstance(data, dict) else {}
     except (OSError, ValueError):
         return {}
 
 
-def status():
+def status(filename=None):
     """
-    What the settings page shows: whether a dictionary is installed, and
-    what is in it.  Never raises -- a half-copied file reads as
-    "not installed" rather than breaking the page.
+    What the settings page and the language form show about one
+    dictionary: whether it is installed, and what is in it.  Never
+    raises -- a half-copied file reads as "not installed" rather than
+    breaking the page.
     """
-    path = db_path()
+    name = resolve_name(filename)
     info = {
         "installed": False,
-        "filename": DB_FILENAME,
-        "url": download_url(),
+        "filename": name if name is not None else filename,
+        "url": download_url(filename),
+        "is_default": name == DB_FILENAME,
         "size_mb": None,
         "modified": None,
         "source": None,
@@ -129,6 +198,9 @@ def status():
         "terms": None,
         "imported_at": None,
     }
+    path = db_path(filename)
+    if path is None:
+        return info
     try:
         stat = os.stat(path)
     except OSError:
@@ -137,19 +209,39 @@ def status():
     info["installed"] = True
     info["size_mb"] = round(stat.st_size / (1024 * 1024), 1)
     info["modified"] = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M")
-    meta = _read_metadata()
+    meta = _read_metadata(filename)
     for key in ("source", "title", "entries", "terms", "imported_at"):
         info[key] = meta.get(key)
     return info
 
 
-def remove():
+def list_installed():
     """
-    Delete the published dictionary and its metadata.  Returns True when
-    something was removed.
+    Every dictionary in the pool, the phone's default file first and the
+    rest alphabetically.
+
+    This is what the language form's dropdown is built from, so a
+    dictionary that was dropped into the folder by hand (the CLI path in
+    tools/mdx_to_sqlite.py) shows up with no extra bookkeeping.
+    """
+    try:
+        names = [n for n in os.listdir(dict_dir()) if n.endswith(".db")]
+    except OSError:
+        return []
+    names = [n for n in names if is_pool_name(n)]
+    names.sort(key=lambda n: (n != DB_FILENAME, n.lower()))
+    return [status(n) for n in names]
+
+
+def remove(filename=None):
+    """
+    Delete one dictionary and its metadata.  Returns True when something
+    was removed.
     """
     removed = False
-    for path in (db_path(), metadata_path()):
+    for path in (db_path(filename), metadata_path(filename)):
+        if path is None:
+            continue
         try:
             os.remove(path)
             removed = True
@@ -195,16 +287,22 @@ def _connect_read_only(path):
     return sqlite3.connect(uri, uri=True)
 
 
-def lookup(term, reading=None):
+def lookup(term, reading=None, filename=None):
     """
-    The definition for ``term``, or None.  Never raises: a missing or
-    damaged dictionary simply means no gloss.
+    The definition for ``term`` in one pool dictionary, or None.  Never
+    raises: a missing, unusable or damaged dictionary simply means no
+    gloss.
+
+    ``filename`` is the language's ``local_dict``.  A caller that has a
+    language in hand must pass it -- falling back to the default
+    dictionary is how the *old* single-dictionary code ended up serving
+    the Japanese dictionary under a Korean book.
     """
     candidates = lookup_candidates(term, reading)
     if not candidates:
         return None
-    path = db_path()
-    if not os.path.isfile(path):
+    path = db_path(filename)
+    if path is None or not os.path.isfile(path):
         return None
     try:
         conn = _connect_read_only(path)
@@ -283,15 +381,16 @@ def task_status(task_id):
         return dict(task)
 
 
-def _convert(mdx_path, source_name, progress=None):
+def _convert(mdx_path, source_name, filename=None, progress=None):
     """
-    Convert ``mdx_path`` into the published dictionary and record what is
-    in it.  Returns the metadata dict.
+    Convert ``mdx_path`` into one pool dictionary and record what is in
+    it.  Returns the metadata dict.
     """
-    metadata = importer.convert(mdx_path, db_path(), progress=progress)
+    out_path = db_path(filename)
+    metadata = importer.convert(mdx_path, out_path, progress=progress)
     metadata["source"] = source_name
     metadata["imported_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
-    with open(metadata_path(), "w", encoding="utf-8") as f:
+    with open(metadata_path(filename), "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
     return metadata
 
@@ -303,7 +402,7 @@ def _remove_quietly(path):
         pass
 
 
-def _run_import(app, task_id, mdx_path, source_name):
+def _run_import(app, task_id, mdx_path, source_name, filename=None):
     "The background thread body."
     with app.app_context():
         try:
@@ -311,6 +410,7 @@ def _run_import(app, task_id, mdx_path, source_name):
             metadata = _convert(
                 mdx_path,
                 source_name,
+                filename,
                 progress=lambda n: _set_progress(task_id, n),
             )
         except Exception as e:  # pylint: disable=broad-except
@@ -323,18 +423,26 @@ def _run_import(app, task_id, mdx_path, source_name):
         _set_task(task_id, "finished", result=metadata)
 
 
-def start_import(app, mdx_path, source_name):
+def start_import(app, mdx_path, source_name, filename=None):
     """
-    Convert the MDX at ``mdx_path`` in the background and return the
+    Convert the MDX at ``mdx_path`` in the background into the pool
+    dictionary ``filename`` (the default one when None), and return the
     task_id.  The caller owns ``mdx_path``: the task deletes it when it
     finishes, successfully or not.
+
+    An existing dictionary of the same name is left alone until the
+    conversion succeeds (importer.convert builds beside the target and
+    renames), so re-importing never leaves a language with no
+    dictionary to read.
     """
+    if resolve_name(filename) is None:
+        raise ValueError(f"Not a dictionary file name: {filename!r}")
     purge_finished_tasks()
     task_id = uuid.uuid4().hex
     _set_task(task_id, "queued", processed=0)
     thread = threading.Thread(
         target=_run_import,
-        args=(app, task_id, mdx_path, source_name),
+        args=(app, task_id, mdx_path, source_name, filename),
         daemon=True,
     )
     thread.start()
