@@ -122,6 +122,32 @@ def _dict_pool_files():
     return [info["filename"] for info in dict_service.list_installed()]
 
 
+def _dict_pool_details():
+    """
+    The same pool, with what is in each dictionary (title, entry count,
+    size).  A Local dictionary row's URL control is a dropdown built
+    from this, so the option labels can name the dictionary a human
+    recognises instead of the pool file name -- which for an .mdx with
+    a non-ASCII name is a mangled ASCII stand-in.
+
+    Each entry carries a ready-made ``label``; the template stays dumb.
+    """
+    details = []
+    for info in dict_service.list_installed():
+        entry = dict(info)
+        label = info.get("title") or info["filename"]
+        facts = []
+        if info.get("entries") is not None:
+            facts.append(f"{info['entries']:,} entries")
+        if info.get("size_mb") is not None:
+            facts.append(f"{info['size_mb']} MB")
+        if facts:
+            label = f"{label} · {' · '.join(facts)}"
+        entry["label"] = label
+        details.append(entry)
+    return details
+
+
 def _add_hidden_dictionary_template_entry(form):
     "Add a dummy placeholder dictionary to be used as a template."
     # Add a dummy dictionary entry with dicturi __TEMPLATE__.
@@ -213,6 +239,7 @@ def edit(langid):
         engine_status=grammar_analysis.grammar_engine_status(language),
         engine_note=grammar_analysis.grammar_engine_note(language),
         dict_pool_files=_dict_pool_files(),
+        dict_pool=_dict_pool_details(),
     )
 
 
@@ -269,6 +296,7 @@ def new(langname):
         language=language,
         predefined=predefined,
         dict_pool_files=_dict_pool_files(),
+        dict_pool=_dict_pool_details(),
     )
 
 

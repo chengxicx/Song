@@ -1377,6 +1377,15 @@ input[type=text].form-control-narrower {
     box-sizing: border-box;
 }
 
+/* The Local dictionary row's URL is a <select> (see language/_form.html):
+   the option labels carry the dictionary's title and size, so it gets a
+   wider box than the text input beside it. */
+select.dict-uri.form-control-narrower {
+    min-width: 10rem;
+    max-width: 26rem;
+    margin: 2px 0;
+}
+
 .formfieldcomment {
     font-size: 0.85em;
     font-style: italic;
