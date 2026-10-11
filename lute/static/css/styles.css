@@ -1377,12 +1377,22 @@ input[type=text].form-control-narrower {
     box-sizing: border-box;
 }
 
-/* The Local dictionary row's URL is a <select> (see language/_form.html):
-   the option labels carry the dictionary's title and size, so it gets a
-   wider box than the text input beside it. */
+/* The Local dictionary row's URL is a <select> (see language/_form.html).
+   It replaces the text input in the same flex row, so it takes the input's
+   box exactly -- `table input:not([type=checkbox])` makes those inputs
+   width:100%, and `#language input` sets the font, padding, border and
+   radius; a bare select is UA-styled (no padding, no radius, shorter) and
+   sits visibly out of line with the fields around it.  min-width matches
+   the input's, so both shrink the same way when the row is tight. */
 select.dict-uri.form-control-narrower {
-    min-width: 10rem;
-    max-width: 26rem;
+    width: 100%;
+    min-width: 8rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    padding: 0.2rem 0.2rem;
+    border: 1px solid var(--form-border-color);
+    border-radius: var(--form-border-radius);
+    box-sizing: border-box;
     margin: 2px 0;
 }
 
