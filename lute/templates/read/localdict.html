@@ -13,29 +13,112 @@
     <style>
       body {
         margin: 0;
-        padding: 1rem 1.5rem;
+        padding: 1.1rem 1.4rem 1.4rem;
       }
+
+      .localdict-card {
+        max-width: 46rem;
+      }
+
+      /* Eyebrow label above the term: small, spaced-out, muted. */
+      .localdict-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--font-color, #888) 55%, transparent);
+        margin: 0 0 0.35rem 0;
+      }
+      .localdict-eyebrow svg {
+        width: 0.9rem;
+        height: 0.9rem;
+        flex: none;
+        opacity: 0.75;
+      }
+
+      /* The term itself.  A short accent underline marks it as the
+         lookup key without needing a heavy heading background. */
       .localdict-head {
-        font-size: 120%;
-        font-weight: bold;
-        margin: 0 0 0.5rem 0;
+        font-size: 1.45rem;
+        font-weight: 700;
+        line-height: 1.25;
+        margin: 0;
+        padding-bottom: 0.55rem;
+        margin-bottom: 0.85rem;
+        position: relative;
+        overflow-wrap: anywhere;
       }
+      .localdict-head::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 2.6rem;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--link-color, #4a90d9);
+        opacity: 0.85;
+      }
+
       /* Same treatment as the popup's gloss (see styles.css): a rule
          down the left edge, no filled background, so it stays readable
-         under the dark themes. */
+         under the dark themes.  Softened with the font colour at low
+         alpha instead of a hardcoded grey, so it follows the theme. */
       .localdict-gloss {
-        border-left: 3px solid #c8c8c8;
-        padding-left: 0.6rem;
+        border-left: 3px solid
+          color-mix(in srgb, var(--link-color, #4a90d9) 55%, transparent);
+        padding: 0.15rem 0 0.15rem 0.8rem;
         white-space: pre-line;
+        line-height: 1.65;
+        font-size: 0.95rem;
+        color: color-mix(in srgb, var(--font-color, #000) 88%, transparent);
+        overflow-wrap: anywhere;
+      }
+
+      /* Empty state: quiet, centred, unmistakably "no result". */
+      .localdict-empty {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        border-left: 3px solid
+          color-mix(in srgb, var(--font-color, #888) 22%, transparent);
+        padding: 0.15rem 0 0.15rem 0.8rem;
+        color: color-mix(in srgb, var(--font-color, #888) 62%, transparent);
+        font-size: 0.95rem;
+      }
+      .localdict-empty svg {
+        width: 1.05rem;
+        height: 1.05rem;
+        flex: none;
+        margin-top: 0.18rem;
+        opacity: 0.65;
       }
     </style>
   </head>
   <body>
-    <p class="localdict-head">{{ text }}</p>
-    {% if gloss %}
-    <div class="localdict-gloss">{{ gloss }}</div>
-    {% else %}
-    <p><i>Not in the installed dictionary.</i></p>
-    {% endif %}
+    <div class="localdict-card">
+      <p class="localdict-eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>Local dictionary</span>
+      </p>
+      <p class="localdict-head">{{ text }}</p>
+      {% if gloss %}
+      <div class="localdict-gloss">{{ gloss }}</div>
+      {% else %}
+      <div class="localdict-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>Not in the installed dictionary.</span>
+      </div>
+      {% endif %}
+    </div>
   </body>
 </html>
