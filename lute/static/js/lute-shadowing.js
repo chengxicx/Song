@@ -206,6 +206,38 @@ function shadowingUnitFromLines(lines, src) {
   };
 }
 
+/* The practice unit for the player's clause cues: a long sentence is
+   read (and looped, auto-paused, shadowed) one clause at a time, and
+   the TTS player hands over the clause's own nodes (the cue's spanEls).
+   Building the unit from those nodes keeps every mark on live, in-page
+   spans -- the verdict underlines land on exactly the words that were
+   read -- while the unit's el stays the .textsentence, so the
+   connectivity checks and prev/next navigation keep working as
+   before. */
+function shadowingUnitFromCueNodes(nodes, src) {
+  const spans = [];
+  let fullText = "";
+  (nodes || []).forEach(function (n) {
+    fullText += n.textContent || "";
+    if (n.nodeType === 1 && shadowingCollectable(n)) spans.push(n);
+  });
+  if (!spans.length) return null;
+  const langSpan =
+    spans.find(function (sp) {
+      return sp.getAttribute("data-lang-id") != null;
+    }) || null;
+  const el = spans[0].closest(".textsentence");
+  return {
+    el: el,
+    lines: el ? [el] : [],
+    spans: spans,
+    texts: spans.map(shadowingTokenText),
+    fullText: fullText.replace(/\u200B/g, "").replace(/🔊/g, "").trim(),
+    langId: langSpan ? langSpan.getAttribute("data-lang-id") : "",
+    src: src || null,
+  };
+}
+
 /* Remember the word the reader just opened a term form on.  Called by
    lute-tooltip.js's show_term_edit_form -- the single place every
    "open this word" gesture (click, tap, long press, keyboard cursor)
@@ -294,6 +326,25 @@ function shadowingApplyCue(d) {
     if (!(d.sentenceCount > 0)) return false;
     const sents = shadowingSentences();
     if (sents.length !== d.sentenceCount) return false; // stale after page swap
+    // A long sentence's cue covers one clause of it; the player hands
+    // over the clause's own live nodes (spanEls), so practise the
+    // clause rather than the whole long sentence.  Falls back to the
+    // sentence when the cue carries no nodes (whole-sentence cue) or
+    // they are no longer on the page.
+    const nodes = (d.spanEls || []).filter(function (n) {
+      return n.isConnected;
+    });
+    if (nodes.length) {
+      const clause = shadowingUnitFromCueNodes(nodes, {
+        type: "tts",
+        sentIdx: d.sentIdx,
+        cueIndex: d.index,
+      });
+      if (clause) {
+        shadowingSetUnit(clause);
+        return true;
+      }
+    }
     const unit = shadowingUnitFromEl(
       sents[d.sentIdx] || null,
       { type: "tts", sentIdx: d.sentIdx, cueIndex: d.index }
