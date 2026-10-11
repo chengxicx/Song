@@ -5,6 +5,7 @@
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
+from lute.dict import service as dict_service
 from lute.models.language import Language
 from lute.models.repositories import UserSettingRepository
 from lute.language.service import Service
@@ -112,6 +113,42 @@ def _set_hidden_grammar_choices(form, language):
     form.hidden_grammar_levels.choices = choices
 
 
+def _local_dict_label(info):
+    "One line for the local-dictionary dropdown, from a service.status()."
+    parts = [info["filename"]]
+    if info.get("is_default"):
+        parts.append("phone default")
+    if info.get("title"):
+        parts.append(info["title"])
+    if info.get("entries"):
+        parts.append(f"{info['entries']:,} entries")
+    return " \u2014 ".join(parts)
+
+
+def _set_local_dict_choices(form, language):
+    """
+    Offer the dictionaries installed on this server, plus "none".
+
+    The pool is a folder (see lute/dict), so the list can only be built
+    at request time -- hence choices set here rather than on the field.
+    A stored file name that is no longer installed is appended anyway:
+    otherwise opening the page would silently drop the setting (the
+    select would show "none"), and validate_choice would reject the
+    submission the moment the file was removed.
+
+    Must run before the form is validated.
+    """
+    choices = [("", "-- none --")]
+    known = set()
+    for info in dict_service.list_installed():
+        known.add(info["filename"])
+        choices.append((info["filename"], _local_dict_label(info)))
+    current = (getattr(language, "local_dict", "") or "").strip()
+    if current and current not in known:
+        choices.append((current, f"{current} \u2014 (not installed)"))
+    form.local_dict.choices = choices
+
+
 def _add_hidden_dictionary_template_entry(form):
     "Add a dummy placeholder dictionary to be used as a template."
     # Add a dummy dictionary entry with dicturi __TEMPLATE__.
@@ -190,6 +227,7 @@ def edit(langid):
     form.parser_type.choices = _dropdown_parser_choices(language)
     _ensure_tag_choices_include_current(form, language)
     _set_hidden_grammar_choices(form, language)
+    _set_local_dict_choices(form, language)
 
     if _handle_form(language, form):
         return redirect("/")
@@ -235,6 +273,7 @@ def new(langname):
     form.parser_type.choices = _dropdown_parser_choices(language)
     _ensure_tag_choices_include_current(form, language)
     _set_hidden_grammar_choices(form, language)
+    _set_local_dict_choices(form, language)
 
     if _handle_form(language, form):
         # New language, so show everything b/c user should re-choose

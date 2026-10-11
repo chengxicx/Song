@@ -62,9 +62,46 @@
       </td>
     </tr>
 
+    {# --- Local (MDX) dictionary. ------------------------------------------
+       The dictionaries themselves live on the server -- a pool in
+       <static>/dict/, managed on the settings page (see lute/dict).  A
+       language only picks one, so the choices are built in routes.py.
+    ---------------------------------------------------------------------- #}
+    <tr>
+      <td colspan="2">
+        <h3 style="margin-top:14px; margin-bottom:6px;">Local dictionary (MDX)</h3>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        {{ form.local_dict.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          {% if form.local_dict.choices|length > 1 %}
+          Shown in the reading page's <b>Local</b> dictionary tab and, if the
+          box below is checked, in the term popup &mdash; for words Lute has no
+          translation for yet.
+          {% else %}
+          No dictionary has been imported on this server yet.  Add one in
+          <a href="/settings/index">Settings</a>.
+          {% endif %}
+        </div>
+      </td>
+      <td>{{ form.local_dict(class="form-control") }}</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        {{ form.term_popup_show_dict_gloss.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          Adds the definition to the popup as well.  The dictionary tab is
+          unaffected.
+        </div>
+      </td>
+      <td>{{ form.term_popup_show_dict_gloss() }}</td>
+    </tr>
+
     {% set _kiwi_fields = ('kiwi_tokenizer_mode', 'kiwi_stemming', 'kiwi_filter_particles', 'kiwi_join_compound_nouns') %}
     {# Fields rendered by a hand-written block below, not by the loop. #}
-    {% set _custom_fields = ('hidden_grammar_levels',) %}
+    {% set _custom_fields = ('hidden_grammar_levels', 'local_dict', 'term_popup_show_dict_gloss') %}
     {% for field in form %}
     {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields and field.name not in _custom_fields %}
     <tr>
@@ -234,7 +271,10 @@
       window.removeEventListener("beforeunload", confirm_leave_page);
     })
 
-    let edit_inputs = edit_form.querySelectorAll("input");
+    // Both inputs and selects: the dictionary usefor/type, the parser and
+    // the local dictionary are all <select>s, and changing one is a change
+    // worth warning about on the way out.
+    let edit_inputs = edit_form.querySelectorAll("input, select");
     edit_inputs.forEach(ele => {
       ele.addEventListener("change", e => {
         dirty = true;

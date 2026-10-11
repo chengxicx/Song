@@ -83,6 +83,20 @@ class Language(
     # `hidden_grammar_levels` list property below.
     _hidden_grammar_levels = db.Column("LgHiddenGrammarLevels", db.String(500))
 
+    # The local (MDX) dictionary this language reads: the file name of
+    # one entry in the server's dictionary pool (see lute/dict).  The
+    # pool lives in <static>/dict/ and is managed on the settings page;
+    # a language only chooses from it.  Empty means no local dictionary.
+    local_dict = db.Column("LgLocalDict", db.String(200))
+
+    # Whether the term popup adds this language's local dictionary
+    # definition, for terms with no translation yet.  Per language
+    # rather than global: a reader of two languages rarely wants the
+    # same answer for both.
+    term_popup_show_dict_gloss = db.Column(
+        "LgTermPopupShowDictGloss", db.Boolean, default=True
+    )
+
     def __init__(self):
         self.character_substitutions = "´='|`='|’='|‘='|...=…|..=‥"
         self.regexp_split_sentences = ".!?"
@@ -97,6 +111,8 @@ class Language(
         self.kiwi_stemming = True
         self.kiwi_filter_particles = False
         self.kiwi_join_compound_nouns = False
+        self.local_dict = ""
+        self.term_popup_show_dict_gloss = True
 
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"

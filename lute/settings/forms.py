@@ -45,16 +45,10 @@ class UserSettingsForm(FlaskForm):
         "Promote parent translation to term translation if possible"
     )
     term_popup_show_components = BooleanField("Show component terms")
-    term_popup_show_dict_gloss = BooleanField(
-        "Show local dictionary definitions",
-        render_kw={
-            "title": (
-                "Add the local dictionary's definition to the popup, for "
-                "terms with no translation yet (see the Local dictionary "
-                "section)."
-            )
-        },
-    )
+    # The local dictionary gloss used to be a global setting here.  It is
+    # per language now (Language.term_popup_show_dict_gloss): one user
+    # reads several languages, and a single switch could only ever be
+    # right for one of them.
 
     mecab_path = StringField("MECAB_PATH environment variable")
     dict_choices = [

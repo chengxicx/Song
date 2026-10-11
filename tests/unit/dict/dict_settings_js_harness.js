@@ -3,11 +3,12 @@
  *
  * Runs the real lute/static/js/dict-settings.js against a stub DOM,
  * fetch and XMLHttpRequest.  What needs pinning is the contract with
- * lute/dict/routes.py: the card reads `status.installed`, `status.title`,
- * `status.entries`, `status.size_mb`, `status.source`, `status.url`,
- * `task_id`, `state`, `processed`, `error` and `dictionary.entries`.  A
- * renamed field on either side does not throw -- it renders an empty
- * card, or a poll that never settles -- and no Python test can see that.
+ * lute/dict/routes.py: the card reads `dictionaries[].filename`,
+ * `.title`, `.entries`, `.size_mb`, `.source`, `.url`, `.is_default`,
+ * plus `task_id`, `state`, `processed`, `error`, `dictionary.entries`
+ * and the remove payload's `result`/`removed`/`message`.  A renamed
+ * field on either side does not throw -- it renders an empty card, or a
+ * poll that never settles -- and no Python test can see that.
  *
  * One scenario per process; a JSON payload on stdin:
  *
@@ -24,23 +25,35 @@ const modPath = process.argv[2];
 /* ---------- a very small DOM ---------- */
 
 const CARD_IDS = [
-  "dict_settings_status",
-  "dict_settings_installed",
-  "dict_settings_url",
+  "dict_settings_list",
   "dict_settings_msg",
   "dict_settings_file",
+  "dict_settings_name",
   "dict_settings_import",
-  "dict_settings_remove",
 ];
+
+// Every message the card shows, in order.  The last one is what stays
+// on screen, so a test that cares about an intermediate line ("building
+// x.db", "4,000 entries read") needs the history, not the final value.
+const messageLog = [];
 
 class FakeEl {
   constructor(id) {
     this.id = id;
-    this.textContent = "";
+    this._text = "";
+    this.innerHTML = "";
+    this.value = "";
     this.attrs = {};
     this.style = {};
     this.disabled = false;
     this.files = [];
+  }
+  get textContent() {
+    return this._text;
+  }
+  set textContent(value) {
+    this._text = value;
+    if (this.id === "dict_settings_msg") messageLog.push(value);
   }
   setAttribute(name, value) {
     this.attrs[name] = value;
@@ -54,8 +67,11 @@ const elements = {};
 CARD_IDS.forEach(id => {
   elements[id] = new FakeEl(id);
 });
-if (input.installed === true) {
-  elements.dict_settings_installed.style.display = "none";
+if (input.selectedFile !== undefined) {
+  elements.dict_settings_file.files = [input.selectedFile];
+}
+if (input.typedName !== undefined) {
+  elements.dict_settings_name.value = input.typedName;
 }
 
 const document = {
@@ -63,8 +79,18 @@ const document = {
   addEventListener: () => {},
 };
 
+const confirmAnswers = Array.isArray(input.confirm)
+  ? input.confirm.slice()
+  : null;
+let confirmCalls = 0;
 const window = {
-  confirm: () => (input.confirm === undefined ? true : input.confirm),
+  confirm: () => {
+    confirmCalls += 1;
+    if (confirmAnswers === null) {
+      return input.confirm === undefined ? true : input.confirm;
+    }
+    return confirmAnswers.length ? confirmAnswers.shift() : true;
+  },
 };
 
 /* ---------- stubbed network ---------- */
@@ -81,10 +107,16 @@ function jsonResponse(body, status) {
 }
 
 function fetch(url, opts) {
-  fetchLog.push({ url: url, method: (opts && opts.method) || "GET" });
+  fetchLog.push({
+    url: url,
+    method: (opts && opts.method) || "GET",
+    body: opts && opts.body ? opts.body.fields.slice() : null,
+  });
   if (url.indexOf("/dict/status") === 0) {
     return Promise.resolve(
-      jsonResponse(input.statusBody || { result: "success", status: {} })
+      jsonResponse(
+        input.statusBody || { result: "success", dictionaries: [] }
+      )
     );
   }
   if (url.indexOf("/dict/import_status") === 0) {
@@ -94,13 +126,20 @@ function fetch(url, opts) {
     return Promise.resolve(jsonResponse(statusQueue.shift()));
   }
   if (url.indexOf("/dict/remove") === 0) {
-    return Promise.resolve(jsonResponse(input.removeBody || { result: "success", removed: true }));
+    // An array runs one plan per call (last one repeats), so the
+    // "a language still uses it" flow can be driven end to end.
+    const plans = Array.isArray(input.removeBody)
+      ? input.removeBody
+      : [input.removeBody || { body: { result: "success", removed: true } }];
+    const plan = plans.length > 1 ? plans.shift() : plans[0];
+    return Promise.resolve(jsonResponse(plan.body, plan.status));
   }
   return Promise.reject(new Error("unexpected url " + url));
 }
 
 const uploadProgress = [];
 const xhrLog = [];
+const formDataLog = [];
 
 class FakeXHR {
   constructor() {
@@ -113,8 +152,19 @@ class FakeXHR {
     this.url = url;
     xhrLog.push({ method: method, url: url });
   }
-  send() {
-    const plan = input.xhr || { status: 200, body: { result: "success", task_id: "t1", source: "fixture.mdx" } };
+  send(form) {
+    // The default plan echoes the name the card asked for, the way the
+    // server does (it derives one from the .mdx when none was sent).
+    const asked = (form.fields || []).find(f => f[0] === "name");
+    const plan = input.xhr || {
+      status: 200,
+      body: {
+        result: "success",
+        task_id: "t1",
+        source: "fixture.mdx",
+        filename: asked ? asked[1] : "fixture.db",
+      },
+    };
     if (this.upload.onprogress) {
       this.upload.onprogress({ lengthComputable: true, loaded: 1, total: 4 });
       uploadProgress.push(elements.dict_settings_msg.textContent);
@@ -126,7 +176,13 @@ class FakeXHR {
 }
 
 class FakeFormData {
-  append() {}
+  constructor() {
+    this.fields = [];
+    formDataLog.push(this);
+  }
+  append(key, value) {
+    this.fields.push([key, value]);
+  }
 }
 
 /* ---------- load the module ---------- */
@@ -159,6 +215,8 @@ function snapshot() {
   CARD_IDS.forEach(id => {
     out[id] = {
       text: elements[id].textContent,
+      html: elements[id].innerHTML,
+      value: elements[id].value,
       style: elements[id].style,
       disabled: elements[id].disabled,
       href: elements[id].attrs.href || null,
@@ -172,11 +230,17 @@ async function run() {
 
   if (input.scenario === "status_text") {
     result.text = DictSettings.statusText(input.status);
+    result.described = DictSettings.describe(input.status);
+    return result;
+  }
+
+  if (input.scenario === "row_html") {
+    result.html = DictSettings.rowHtml(input.status);
     return result;
   }
 
   if (input.scenario === "render") {
-    DictSettings.render(input.status);
+    DictSettings.render(input.dictionaries);
     result.dom = snapshot();
     return result;
   }
@@ -192,11 +256,22 @@ async function run() {
   }
 
   if (input.scenario === "import") {
-    await DictSettings.importFile({ name: "fixture.mdx" });
+    await DictSettings.importFile({ name: "fixture.mdx" }, input.name);
     result.dom = snapshot();
     result.progress = uploadProgress;
     result.calls = fetchLog;
     result.uploads = xhrLog;
+    result.fields = formDataLog.map(f => f.fields);
+    result.messageLog = messageLog;
+    return result;
+  }
+
+  if (input.scenario === "import_selected") {
+    await DictSettings.importSelected();
+    result.dom = snapshot();
+    result.uploads = xhrLog;
+    result.fields = formDataLog.map(f => f.fields);
+    result.messageLog = messageLog;
     return result;
   }
 
@@ -207,16 +282,19 @@ async function run() {
   }
 
   if (input.scenario === "remove") {
-    await DictSettings.remove();
+    await DictSettings.remove(input.removeName || "fixture.db");
     result.dom = snapshot();
     result.calls = fetchLog;
+    result.fields = formDataLog.map(f => f.fields);
+    result.confirms = confirmCalls;
     return result;
   }
 
   if (input.scenario === "remove_cancelled") {
-    await DictSettings.remove();
+    await DictSettings.remove(input.removeName || "fixture.db");
     result.dom = snapshot();
     result.calls = fetchLog;
+    result.confirms = confirmCalls;
     return result;
   }
 

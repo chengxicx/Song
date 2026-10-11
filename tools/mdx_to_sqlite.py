@@ -5,11 +5,15 @@ Convert an MDX (MDict) dictionary into the SQLite file Lute reads.
 
 The output is the two-table dictionary (entries/terms) that both the
 reading page's dictionary tab and the phone app query, so a dictionary
-converted here can be dropped straight into the server's static folder
-for the phone to download:
+converted here can be dropped straight into the server's static folder:
 
     python tools/mdx_to_sqlite.py shogakukan_v2.mdx \
         lute/static/dict/ja_zh_shogakukan_v2.db
+
+That folder is a pool: every *.db in it is offered on each language's
+settings page, and the language picks the one it reads.  Naming the file
+ja_zh_shogakukan_v2.db is what makes the phone app's built-in download
+URL work with no setup; any other name is fine for the web reader.
 
 The settings page can also import an MDX, which is easier for anything
 under the 200 MB upload limit; this tool is the way in for the larger
