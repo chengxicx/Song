@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Dictionary</title>
+    <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
+    {% if theme_css_hash %}
+    <link rel="stylesheet" type="text/css" href="/theme/current?v={{ theme_css_hash }}">
+    {% endif %}
+    {% if custom_styles %}
+    <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ custom_styles_hash }}">
+    {% endif %}
+    <style>
+      body {
+        margin: 0;
+        padding: 1rem 1.5rem;
+      }
+      .localdict-head {
+        font-size: 120%;
+        font-weight: bold;
+        margin: 0 0 0.5rem 0;
+      }
+      /* Same treatment as the popup's gloss (see styles.css): a rule
+         down the left edge, no filled background, so it stays readable
+         under the dark themes. */
+      .localdict-gloss {
+        border-left: 3px solid #c8c8c8;
+        padding-left: 0.6rem;
+        white-space: pre-line;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="localdict-head">{{ text }}</p>
+    {% if gloss %}
+    <div class="localdict-gloss">{{ gloss }}</div>
+    {% else %}
+    <p><i>Not in the installed dictionary.</i></p>
+    {% endif %}
+  </body>
+</html>

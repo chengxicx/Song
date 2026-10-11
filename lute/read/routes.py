@@ -54,6 +54,7 @@ from lute.read.render.grammar_analysis_ar import analyze_arabic
 from lute.read.render.grammar_levels import filter_hidden_grammar
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
+from lute.dict import service as dict_service
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form, serialize_term_form_data
 from lute.settings.current import current_settings
@@ -597,6 +598,44 @@ def _apply_media_page_cue_data(book, pagenum, new_text, cue_data):
     return "updated"
 
 
+def _term_dicts_for(lang):
+    """
+    The reading page's dictionary tabs: the language's own dictionaries,
+    with the local dictionary (see lute/dict) in front when one has been
+    imported.
+
+    It goes first because it is the only tab that works offline and the
+    only one that can say anything about a word with no translation yet.
+    The tab names itself (``label``/``title``) -- its URL is a route on
+    this server, not a hostname for dict-tabs.js to shorten.
+    """
+    dicts = list(LanguageRepository(db.session).all_dictionaries()[lang.id]["term"])
+    if dict_service.is_installed():
+        dicts.insert(
+            0,
+            {
+                "url": f"/read/localdict/{lang.id}/[LUTE]",
+                "dicttype": "html",
+                "label": "Local",
+                "title": "The MDX dictionary imported on this server",
+            },
+        )
+    return dicts
+
+
+def _reading_for(langid, text):
+    """
+    The stored reading for a term, or None.
+
+    The dictionary strip hands over the term's text, and the reading is
+    only needed so that a kanji spelling can find a kana-keyed entry.
+    Repository.find tokenizes and lowercases the text exactly the way the
+    reader does, and -- unlike find_or_new -- never creates a term.
+    """
+    term = Repository(db.session).find(langid, text)
+    return term.romanization if term is not None else None
+
+
 def _render_book_page(book, pagenum, track_page_open=True):
     """
     Render a particular book page.
@@ -610,8 +649,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
 
     lang = book.language
     show_highlights = current_settings()["show_highlights"]
-    lang_repo = LanguageRepository(db.session)
-    term_dicts = lang_repo.all_dictionaries()[lang.id]["term"]
+    term_dicts = _term_dicts_for(lang)
 
     book_type = book.book_type or ""
     yt_video_id = None
@@ -1486,6 +1524,26 @@ def term_popup(termid):
     return render_template(
         "read/termpopup.html",
         data=d,
+    )
+
+
+@bp.route("/localdict/<int:langid>/<text>", methods=["GET"])
+def local_dict(langid, text):
+    """
+    The local dictionary's entry for a term, for the reading page's
+    dictionary strip (see _term_dicts_for).
+
+    The strip hands over the term's text, not its id -- the same way the
+    other tabs look terms up, so that a multi-word phrase can be checked
+    before Lute has a term for it.  The term is resolved back to its
+    reading only so that a kanji spelling can find a kana-keyed entry;
+    nothing is created.
+    """
+    gloss = dict_service.lookup(text, _reading_for(langid, text))
+    return render_template(
+        "read/localdict.html",
+        text=text,
+        gloss=gloss,
     )
 
 

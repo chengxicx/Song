@@ -19,6 +19,7 @@ from lute.models.repositories import (
     UserSettingRepository,
 )
 from lute.themes.service import Service as ThemeService
+from lute.dict import service as dict_service
 from lute.settings.forms import UserSettingsForm, UserShortcutsForm
 from lute.settings.current import refresh_global_settings
 from lute.settings.hotkey_data import categorized_hotkeys, hotkey_descriptions
@@ -104,7 +105,11 @@ def edit_settings():
             str_val = str(field.data or "")
             field.data = 1 if str_val in true_vals else 0
 
-    return render_template("settings/form.html", form=form)
+    return render_template(
+        "settings/form.html",
+        form=form,
+        dict_filename=dict_service.DB_FILENAME,
+    )
 
 
 @bp.route("/test_mecab", methods=["GET"])

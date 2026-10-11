@@ -26,6 +26,15 @@
 
 {% if data.translation != "" %}<p>{{ data.translation | safe }}</p>{% endif %}
 
+{# The local dictionary's definition (see the settings page's Local
+   dictionary section).  A term with no translation yet -- the word you
+   have never studied -- has nothing else in the popup, so this is what
+   makes clicking it worth anything.  Plain text, already flattened by
+   the importer, so it is escaped rather than piped through |safe. #}
+{% if data.dict_gloss %}
+<div class="termpopup-dict-gloss">{{ data.dict_gloss }}</div>
+{% endif %}
+
 {% if data.parents | length > 0 %}
 <div style="margin-top: 1.5em;">
   {% for p in data.parents %}
