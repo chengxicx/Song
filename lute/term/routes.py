@@ -680,3 +680,70 @@ def delete(termid):
 
     invalidate_yt_subtitle_cache()
     return redirect("/term/index", 302)
+
+
+@bp.route("/sync", methods=["GET"])
+def sync_terms():
+    """
+    Full dump of this user's terms, for the mobile app's offline sync.
+
+    Returns {"hash": <md5hex>, "terms": [<term dict>...]} where each term
+    dict carries the keys the app's TermCacheEntry.fromServerJson expects
+    (WoID/WoText/WoTranslation/WoRomanization/StID/LgID/ParentText).
+    When the client passes ?hash=<its stored hash> and nothing has changed,
+    returns {"hash": ..., "unchanged": true} instead of the ~1MB payload.
+
+    The hash is computed over every synced column of every row on each
+    request (16k rows cost a few ms).  It deliberately does NOT key off
+    WoStatusChanged as an increment marker: that column only moves when a
+    term's status changes (trig_words_update_WoStatusChanged fires on
+    WoStatus only), so translation-only edits -- most of what gets polished
+    in the web UI -- would never reach the phone.
+    """
+    import hashlib
+
+    rows = db.session.execute(
+        db.text(
+            "SELECT WoID, WoText, WoTranslation, WoRomanization, WoStatus, "
+            "WoLgID FROM words ORDER BY WoID"
+        )
+    ).all()
+    parent_rows = db.session.execute(
+        db.text(
+            "SELECT WpWoID, p.WoText FROM wordparents "
+            "JOIN words p ON p.WoID = wordparents.WpParentWoID "
+            "ORDER BY WpWoID, p.WoID"
+        )
+    ).all()
+
+    parents_by_wid = {}
+    for wid, ptext in parent_rows:
+        parents_by_wid.setdefault(wid, []).append(ptext)
+
+    digest = hashlib.md5()
+    terms = []
+    for wid, wtext, wtrans, wrom, wstatus, wlgid in rows:
+        wparents = parents_by_wid.get(wid, [])
+        digest.update(
+            f"{wid}\x1f{wtext}\x1f{wtrans or ''}\x1f{wrom or ''}\x1f"
+            f"{wstatus or 0}\x1f{wlgid}\x1f{'|'.join(wparents)}\x1e".encode(
+                "utf-8"
+            )
+        )
+        terms.append(
+            {
+                "WoID": wid,
+                "WoText": wtext,
+                "WoTranslation": wtrans,
+                "WoRomanization": wrom,
+                "StID": wstatus,
+                "LgID": wlgid,
+                "ParentText": ", ".join(wparents) if wparents else None,
+            }
+        )
+
+    client_hash = request.args.get("hash", "")
+    payload_hash = digest.hexdigest()
+    if client_hash == payload_hash:
+        return jsonify({"hash": payload_hash, "unchanged": True})
+    return jsonify({"hash": payload_hash, "terms": terms})
