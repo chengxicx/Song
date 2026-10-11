@@ -444,6 +444,11 @@ def handle_term_form(
         hide_pronunciation=hide_pronunciation,
         tags=repo.get_term_tags(),
         embedded_in_reading_frame=embedded_in_reading_frame,
+        term_fill_source=(
+            (term_language.term_translation_source or "online")
+            if term_language is not None
+            else "online"
+        ),
     )
 
     # Failed post from the reading frame's in-place form: hand the

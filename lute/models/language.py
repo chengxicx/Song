@@ -23,6 +23,9 @@ class LanguageDictionary(db.Model):
     dicttype = db.Column("LdType", db.String(20), nullable=False)
     dicturi = db.Column("LdDictURI", db.String(200), nullable=False)
     is_active = db.Column("LdIsActive", db.Boolean, default=True)
+    # Kept configured but no tab in the reading page's dictionary strip:
+    # for dictionaries that are rarely used but not worth re-entering.
+    is_hidden = db.Column("LdIsHidden", db.Boolean, default=False)
     sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
 
 
@@ -97,6 +100,19 @@ class Language(
         "LgTermPopupShowDictGloss", db.Boolean, default=True
     )
 
+    # Where the reading page puts the Local dictionary tab: 'first' (the
+    # old hard-coded behaviour) or 'last'.
+    local_dict_position = db.Column(
+        "LgLocalDictPosition", db.String(10), default="first"
+    )
+
+    # What fills a new term's translation: 'online' (machine
+    # translation, the old behaviour) or 'local_dict' -- the language's
+    # local dictionary first, online as fallback when it has no entry.
+    term_translation_source = db.Column(
+        "LgTermTranslationSource", db.String(20), default="online"
+    )
+
     def __init__(self):
         self.character_substitutions = "´='|`='|’='|‘='|...=…|..=‥"
         self.regexp_split_sentences = ".!?"
@@ -113,6 +129,8 @@ class Language(
         self.kiwi_join_compound_nouns = False
         self.local_dict = ""
         self.term_popup_show_dict_gloss = True
+        self.local_dict_position = "first"
+        self.term_translation_source = "online"
 
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"
@@ -171,7 +189,13 @@ class Language(
 
     def active_dict_uris(self, use_for):
         "Get sorted uris for active dicts of correct type."
-        actives = [d for d in self.dictionaries if d.is_active and d.usefor == use_for]
+        # Hidden dicts stay configured (and pass the "must have an active
+        # dictionary" validation) but offer no tab anywhere.
+        actives = [
+            d
+            for d in self.dictionaries
+            if d.is_active and not d.is_hidden and d.usefor == use_for
+        ]
         sorted_actives = sorted(actives, key=lambda x: x.sort_order)
         return [{"url": d.dicturi, "dicttype": d.dicttype} for d in sorted_actives]
 

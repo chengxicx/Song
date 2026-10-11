@@ -66,6 +66,9 @@ def test_a_new_language_has_no_dictionary(app_context):
 
     assert lang.local_dict == ""
     assert lang.term_popup_show_dict_gloss is True
+    # The old hard-coded behaviours, now spelled out.
+    assert lang.local_dict_position == "first"
+    assert lang.term_translation_source == "online"
 
 
 def test_the_choice_persists_across_a_reload(app_context, empty_db):
@@ -73,6 +76,8 @@ def test_the_choice_persists_across_a_reload(app_context, empty_db):
     lang.name = "Local Dict Persist"
     lang.local_dict = "ja_zh_shogakukan_v2.db"
     lang.term_popup_show_dict_gloss = False
+    lang.local_dict_position = "last"
+    lang.term_translation_source = "local_dict"
     db.session.add(lang)
     db.session.commit()
     langid = lang.id
@@ -81,6 +86,8 @@ def test_the_choice_persists_across_a_reload(app_context, empty_db):
     reloaded = db.session.get(Language, langid)
     assert reloaded.local_dict == "ja_zh_shogakukan_v2.db"
     assert reloaded.term_popup_show_dict_gloss is False
+    assert reloaded.local_dict_position == "last"
+    assert reloaded.term_translation_source == "local_dict"
 
 
 # --- the dropdown -----------------------------------------------------------
@@ -152,6 +159,8 @@ def test_the_edit_page_shows_the_dropdown(client, app_context, pool, japanese):
     # The stored choice is what the dropdown opens on.
     assert f'<option selected value="{service.DB_FILENAME}">' in html
     assert 'name="term_popup_show_dict_gloss"' in html
+    assert 'name="local_dict_position"' in html
+    assert 'name="term_translation_source"' in html
 
 
 def test_the_edit_page_says_so_when_the_pool_is_empty(
@@ -218,6 +227,24 @@ def test_saving_the_popup_switch_stores_it(client, app_context, pool, japanese):
     client.post(_edit_url(japanese), data=_form_data(japanese))
 
     assert db.session.get(Language, japanese.id).term_popup_show_dict_gloss is False
+
+
+def test_saving_the_new_dropdowns_stores_them(client, app_context, pool, japanese):
+    _touch(pool, "ko_zh_basic.db")
+
+    client.post(
+        _edit_url(japanese),
+        data=_form_data(
+            japanese,
+            local_dict="ko_zh_basic.db",
+            local_dict_position="last",
+            term_translation_source="local_dict",
+        ),
+    )
+
+    lang = db.session.get(Language, japanese.id)
+    assert lang.local_dict_position == "last"
+    assert lang.term_translation_source == "local_dict"
 
 
 def test_the_switch_is_checked_on_by_default(client, app_context, pool, japanese):
