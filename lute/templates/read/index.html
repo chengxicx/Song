@@ -61,6 +61,10 @@
   // is used in lute.js.
   var LUTE_SENTENCE_LOOKUP_DICTS = {{ sentence_dict_uris|safe }};
   var LUTE_BOOK_TYPE = {{ book_type|tojson }};
+  // What auto-fills a new term's translation (see tts-translate.js):
+  // 'online', or 'local_dict' = this language's local dictionary first,
+  // online as fallback.
+  var LUTE_TERM_FILL = { source: {{ term_translation_source|tojson }}, langId: {{ lang_id }} };
 </script>
 
 

@@ -24,6 +24,13 @@
   if (typeof LUTE_USER_HOTKEYS === "undefined") {
     window.LUTE_USER_HOTKEYS = {{ user_hotkeys | safe }};
   }
+  // What auto-fills the translation (see tts-translate.js): the term's
+  // language picks 'online' machine translation or its local dictionary
+  // (which still falls back to online when it has no entry).
+  window.LUTE_TERM_FILL = {
+    source: {{ (term_fill_source or 'online') | tojson }},
+    langId: {{ term.language_id or 0 }},
+  };
 </script>
 
 

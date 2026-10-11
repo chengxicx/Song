@@ -50,6 +50,11 @@ class LanguageDictionaryForm(Form):
     )
     dicturi = StringField("URL", validators=[DataRequired()])
     is_active = BooleanField("Is active", render_kw={"title": "Is active?"})
+    # Kept configured but no tab in the reading page's dictionary strip.
+    is_hidden = BooleanField(
+        "Hide",
+        render_kw={"title": "Keep this dictionary but hide its tab"},
+    )
     sort_order = IntegerField("Sort", render_kw={"style": "display: none"})
 
 
@@ -118,6 +123,29 @@ class LanguageForm(FlaskForm):
                 "Add this language's dictionary definition to the popup, for "
                 "terms with no translation yet.  The reading page's dictionary "
                 "tab is unaffected."
+            )
+        },
+    )
+    local_dict_position = SelectField(
+        "Local dictionary tab position",
+        choices=[("first", "First"), ("last", "Last")],
+        default="first",
+        render_kw={
+            "title": "Where the reading page's dictionary strip puts the Local tab"
+        },
+    )
+    # What fills a new term's translation.  'local_dict' tries the local
+    # dictionary first and falls back to online translation when it has
+    # no entry -- only meaningful when a local dictionary is chosen above.
+    term_translation_source = SelectField(
+        "Term translation source",
+        choices=[("online", "Online translation"), ("local_dict", "Local dictionary")],
+        default="online",
+        render_kw={
+            "title": (
+                "What auto-fills a new term's translation: online machine "
+                "translation, or this language's local dictionary first "
+                "(online as fallback)"
             )
         },
     )

@@ -46,6 +46,10 @@
             {{ dictionary.dicttype(class="dict-type") }}
             {{ dictionary.dicturi(class="dict-uri form-control-narrower") }}
             {{ dictionary.is_active }}
+            <label class="dict-hidden-toggle" style="white-space: nowrap;"
+                   title="Keep this dictionary but hide its tab from the reading page">
+              {{ dictionary.is_hidden }} <span style="font-size:0.85em;">Hide</span>
+            </label>
             {{ dictionary.sort_order }}
             <span class="test-dict-entity" title="Test dictionary" style="margin-left: 20px">
               <img src="{{ vstatic('icn/external.png') }}">
@@ -98,10 +102,31 @@
       </td>
       <td>{{ form.term_popup_show_dict_gloss() }}</td>
     </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        {{ form.local_dict_position.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          Where the reading page's dictionary strip puts the
+          <b>Local</b> tab.
+        </div>
+      </td>
+      <td>{{ form.local_dict_position(class="form-control") }}</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        {{ form.term_translation_source.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          What auto-fills a new term's translation.  <b>Local dictionary</b>
+          uses this language's dictionary above first, and falls back to
+          online translation when it has no entry.
+        </div>
+      </td>
+      <td>{{ form.term_translation_source(class="form-control") }}</td>
+    </tr>
 
     {% set _kiwi_fields = ('kiwi_tokenizer_mode', 'kiwi_stemming', 'kiwi_filter_particles', 'kiwi_join_compound_nouns') %}
     {# Fields rendered by a hand-written block below, not by the loop. #}
-    {% set _custom_fields = ('hidden_grammar_levels', 'local_dict', 'term_popup_show_dict_gloss') %}
+    {% set _custom_fields = ('hidden_grammar_levels', 'local_dict', 'term_popup_show_dict_gloss', 'local_dict_position', 'term_translation_source') %}
     {% for field in form %}
     {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields and field.name not in _custom_fields %}
     <tr>

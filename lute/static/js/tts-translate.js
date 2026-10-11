@@ -46,6 +46,53 @@
     setTimeout(function () { _isFilling = false; }, 50);
   }
 
+  // The form's translation textarea within doc, falling back to this
+  // document (an in-place form update may have moved between frames).
+  function translationBoxFor(doc) {
+    var el =
+      doc.getElementById("translation") ||
+      doc.querySelector('textarea[name="translation"]');
+    if (el) return el;
+    return (
+      document.getElementById("translation") ||
+      document.querySelector('textarea[name="translation"]')
+    );
+  }
+
+  // Per-language fill config, injected by the reading page
+  // (read/index.html) and the term form (term/_form.html):
+  //   { source: "online" | "local_dict", langId: <id> }
+  // The instance doing the filling lives in the wordframe, so fall back
+  // to the top page's copy (same origin, both set by Lute templates).
+  function fillConfig() {
+    var cfg = window.LUTE_TERM_FILL || null;
+    if (!cfg) {
+      try {
+        if (window.top && window.top !== window)
+          cfg = window.top.LUTE_TERM_FILL || null;
+      } catch (_) { cfg = null; }
+    }
+    return cfg;
+  }
+
+  // The local dictionary's definition for word, or null when the
+  // language is not configured to use it (caller falls back to online
+  // translation).  A dictionary without the word also resolves to ""
+  // -- the same fallback.
+  function lookupLocalDict(word) {
+    var cfg = fillConfig();
+    if (!cfg || cfg.source !== "local_dict" || !cfg.langId) return null;
+    var clean = String(word).replace(/\u200b/g, "");
+    var url =
+      "/read/localdict_lookup/" + cfg.langId + "/" + encodeURIComponent(clean);
+    return withTimeout(
+      fetch(url).then(function (r) { return r.json(); }),
+      5000
+    ).then(function (data) {
+      return data && data.gloss ? data.gloss : "";
+    }).catch(function () { return ""; });
+  }
+
   // ------------------------------------------------------------------
   // 6b. Client-side translation with multiple API fallbacks
   // ------------------------------------------------------------------
@@ -208,48 +255,60 @@
           const sl = getCurrentLangCode();
           const tl = TL;
 
-          translateText(sl, tl, word)
-            .then(function (translated) {
-              if (translated) {
-                globalCache.trans[word] = translated;
-                let freshTarget =
-                  doc.getElementById("translation") ||
-                  doc.querySelector('textarea[name="translation"]');
-                if (!freshTarget) {
-                  freshTarget =
-                    document.getElementById("translation") ||
-                    document.querySelector('textarea[name="translation"]');
+          // Online machine translation (the original path): Google ->
+          // MyMemory -> backend, filling the box, or clearing the
+          // "Translating..." placeholder when everything fails.
+          const translateOnline = function () {
+            translateText(sl, tl, word)
+              .then(function (translated) {
+                if (translated) {
+                  globalCache.trans[word] = translated;
+                  let freshTarget = translationBoxFor(doc);
+                  // Skip when the form now shows another word, or the
+                  // user typed a translation while the request ran.
+                  if (currentFormWord(doc) !== word) return;
+                  if (freshTarget && freshTarget.value &&
+                      freshTarget.value !== "Translating...") return;
+                  forceFill(freshTarget, translated);
+                } else {
+                  let freshTarget = translationBoxFor(doc);
+                  if (currentFormWord(doc) === word &&
+                      freshTarget && freshTarget.value === "Translating...") {
+                    forceFill(freshTarget, "");
+                  }
                 }
-                // Skip when the form now shows another word, or the
-                // user typed a translation while the request ran.
-                if (currentFormWord(doc) !== word) return;
-                if (freshTarget && freshTarget.value &&
-                    freshTarget.value !== "Translating...") return;
-                forceFill(freshTarget, translated);
-              } else {
-                let freshTarget =
-                  doc.getElementById("translation") ||
-                  doc.querySelector('textarea[name="translation"]');
-                if (!freshTarget) {
-                  freshTarget =
-                    document.getElementById("translation") ||
-                    document.querySelector('textarea[name="translation"]');
-                }
+              })
+              .catch(function () {
+                let freshTarget = translationBoxFor(doc);
                 if (currentFormWord(doc) === word &&
                     freshTarget && freshTarget.value === "Translating...") {
                   forceFill(freshTarget, "");
                 }
+              });
+          };
+
+          // The language's local dictionary first when configured;
+          // online translation only when it has no entry (or is not
+          // configured -- lookupLocalDict returns null then).
+          const localP = lookupLocalDict(word);
+          if (localP) {
+            localP.then(function (gloss) {
+              if (gloss) {
+                globalCache.trans[word] = gloss;
+                let freshTarget = translationBoxFor(doc);
+                if (currentFormWord(doc) !== word) return;
+                if (freshTarget && freshTarget.value &&
+                    freshTarget.value !== "Translating...") return;
+                forceFill(freshTarget, gloss);
+                return;
               }
-            })
-            .catch(function () {
-              let freshTarget =
-                doc.getElementById("translation") ||
-                doc.querySelector('textarea[name="translation"]');
-              if (currentFormWord(doc) === word &&
-                  freshTarget && freshTarget.value === "Translating...") {
-                forceFill(freshTarget, "");
-              }
+              translateOnline();
+            }).catch(function () {
+              translateOnline();
             });
+          } else {
+            translateOnline();
+          }
         }
       }
       return;
