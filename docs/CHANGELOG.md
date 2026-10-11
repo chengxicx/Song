@@ -25,6 +25,16 @@ Feature changes:
   "→ heard" readout the orange marker already had, so a learner can see
   what they actually said.  A word that was never spoken at all has no
   counterpart and still shows no readout.
+* Local dictionary (MDX) support in the web reader, matching the mobile app.
+  An admin uploads a `.mdx` file from the Settings page; the server converts
+  it once into a small SQLite database published under `static/dict/`, and
+  the reading page then looks words up offline with no network call.
+  Definitions show up in the term popup ("Show local dictionary definitions",
+  on by default) and in a "Local" tab at the head of the dictionary strip
+  below the reading page.  The database can also be built ahead of time with
+  `python tools/mdx_to_sqlite.py <file.mdx> <out.db>`.  MDict 1.2/2.0 files
+  are supported with no block compression, zlib or LZO1X, in UTF-8, UTF-16
+  or GB18030; encrypted files and MDict 3.0 record sections are not.
 
 Bugfixes:
 

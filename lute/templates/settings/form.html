@@ -125,6 +125,7 @@
     {% for f in [
     form.term_popup_promote_parent_translation,
     form.term_popup_show_components,
+    form.term_popup_show_dict_gloss,
     ]%}
     <tr>
       <td>{{ f.label }}</td>
@@ -383,6 +384,47 @@
     </tr>
     {% endif %}
 
+    {% if can_manage_server %}
+    <tr>
+      <td>
+        <h2>Local dictionary (MDX)</h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Show a definition for words Lute has no translation for yet &mdash;
+        the word you have never studied.  Import an MDX (MDict) dictionary
+        once and this server converts it into a lookup file; the reading
+        page's popup and dictionary strip then show the gloss, and the
+        phone app downloads the same file to work offline.
+      </td>
+      <td>
+        <div id="dict_settings_status">Checking&hellip;</div>
+        <div id="dict_settings_installed" style="display: none; margin-top: 8px;">
+          <a id="dict_settings_url" href="#"></a>
+          <div style="font-size: 0.85em; color: #666; margin-top: 2px;">
+            The phone app's default dictionary URL &mdash; a phone pointed at
+            this server picks the file up with no setup.
+          </div>
+        </div>
+        <div style="margin-top: 8px;">
+          <input type="file" id="dict_settings_file" accept=".mdx">
+          <button type="button" id="dict_settings_import" class="btn btn-secondary"
+                  onclick="DictSettings.importSelected(); return false;">Import</button>
+          <button type="button" id="dict_settings_remove" class="btn btn-danger"
+                  onclick="DictSettings.remove(); return false;">Remove</button>
+        </div>
+        <div style="font-size: 0.85em; color: #666; margin-top: 6px;">
+          Up to 200&nbsp;MB through the browser.  For a bigger dictionary, run
+          <code>tools/mdx_to_sqlite.py &lt;file.mdx&gt; &lt;out.db&gt;</code> on the
+          server and put the result in the dictionary folder as
+          <code>{{ dict_filename }}</code>.
+        </div>
+        <div id="dict_settings_msg" style="margin-top: 6px;"></div>
+      </td>
+    </tr>
+    {% endif %}
+
   </table>
 
   <div class="form-action-row">
@@ -390,6 +432,10 @@
     <button class="btn btn-secondary" onclick="window.location = '/'; return false;">Cancel</button>
   </div>
 </form>
+
+{% if can_manage_server %}
+<script type="text/javascript" src="{{ vstatic_js('dict-settings.js') }}" charset="utf-8"></script>
+{% endif %}
 
 
 <script>

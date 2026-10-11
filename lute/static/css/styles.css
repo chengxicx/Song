@@ -2076,6 +2076,22 @@ ul.sentencelist {
     border: 1px solid darkgrey;
 }
 
+/* The local dictionary's definition in the term popup (see lute/dict).
+   Deliberately not a filled block: the popup sits on the theme's own
+   background and the bundled themes do not override popup colours, so a
+   background here would be unreadable under the dark themes.  A rule
+   down the left edge marks it as quoted reference material without
+   touching the contrast.  pre-line keeps the line breaks the importer
+   flattened the dictionary's HTML into. */
+.termpopup-dict-gloss {
+    margin-top: 0.6em;
+    padding-left: 0.6em;
+    border-left: 3px solid #c8c8c8;
+    color: inherit;
+    white-space: pre-line;
+    font-size: 90%;
+}
+
 /* Book listing tag pills */
 .book-tag-list {
     display: inline-flex;
