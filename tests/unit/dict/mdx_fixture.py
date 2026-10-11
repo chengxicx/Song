@@ -31,10 +31,17 @@ is easy to get wrong:
 - v2.0: 8-byte numbers, zlib-compressed key block info, unit counts with
   one terminator unit, and a 4-byte adler32 after the five header
   numbers.
+
+``encrypted_info`` stamps the export lock (``Encrypted="2"``) on a v2
+file: the key block info's zlib stream is transformed, everything else
+stays in the clear -- exactly what MDict writes with "Allow export to
+text" unchecked.
 """
 
 import struct
 import zlib
+
+from lute.dict.mdx_decrypt import ripemd128
 
 
 def _be(value, width):
@@ -78,6 +85,29 @@ def _block(payload, compression):
     )
 
 
+# The inverse of lute.dict.mdx_decrypt.fast_decrypt, needed to stamp the
+# export lock on a fixture.  Validated against a real file: encrypting
+# the New Century Japanese-Chinese dictionary's key block info plaintext
+# reproduces its stored ciphertext byte for byte, so a fixture built
+# with this is what MDict itself would have written.
+def _fast_encrypt(data, key):
+    out = bytearray(data)
+    key = bytearray(key)
+    previous = 0x36
+    for i in range(len(out)):
+        t = out[i] ^ previous ^ (i & 0xFF) ^ key[i % len(key)]
+        t = ((t >> 4) | (t << 4)) & 0xFF
+        previous = t
+        out[i] = t
+    return bytes(out)
+
+
+def _encrypt_info_block(block):
+    "MDict's export lock (Encrypted=2) over one key block info block."
+    key = ripemd128(block[4:8] + b"\x95\x36\x00\x00")
+    return block[:8] + _fast_encrypt(block[8:], key)
+
+
 def _record_stream(entries, utf16):
     """
     The decompressed record section: every definition concatenated in the
@@ -112,7 +142,14 @@ def _key_payload(entries, offsets, number_width, utf16):
     return payload
 
 
-def build_mdx(entries, version="2.0", encoding="UTF-8", compress=0, title="Fixture"):
+def build_mdx(
+    entries,
+    version="2.0",
+    encoding="UTF-8",
+    compress=0,
+    title="Fixture",
+    encrypted_info=False,
+):
     """
     Assemble a minimal but valid MDX file holding ``entries``, an ordered
     sequence of (key, definition) pairs.
@@ -120,10 +157,17 @@ def build_mdx(entries, version="2.0", encoding="UTF-8", compress=0, title="Fixtu
     ``compress`` is the block compression: 0 (none) or 2 (zlib).  LZO is
     not built here -- there is no LZO compressor in the test environment;
     the decompressor is covered directly in test_lzo1x.py.
+
+    ``encrypted_info`` (v2 only) stamps ``Encrypted="2"`` on the header
+    and transforms the key block info, the way MDict writes a file with
+    "Allow export to text" unchecked.  Everything else -- key blocks,
+    record blocks -- stays in the clear, exactly as in a real file.
     """
     entries = list(entries)
     if not entries:
         raise ValueError("an MDX fixture needs at least one entry")
+    if encrypted_info and float(version) < 2:
+        raise ValueError("the export lock (Encrypted=2) is a v2 feature")
 
     v2 = float(version) >= 2
     number_width = 8 if v2 else 4
@@ -133,7 +177,7 @@ def build_mdx(entries, version="2.0", encoding="UTF-8", compress=0, title="Fixtu
     header_text = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<Dictionary GeneratedByEngineVersion="{version}" '
-        'RequiredEngineVersion="2.0" Encrypted="No" '
+        f'RequiredEngineVersion="2.0" Encrypted="{"2" if encrypted_info else "No"}" '
         f'Encoding="{encoding}" Title="{title}"/>'
     )
     header_bytes = _encode(header_text, True) + b"\x00\x00"
@@ -174,6 +218,8 @@ def build_mdx(entries, version="2.0", encoding="UTF-8", compress=0, title="Fixtu
         info_payload += _be(len(key_block), number_width)
         info_payload += _be(len(key_payload), number_width)
         key_block_info = _block(info_payload, 2)
+        if encrypted_info:
+            key_block_info = _encrypt_info_block(key_block_info)
     else:
         # v1: 1-byte size, no terminator, no compression.
         info_payload += bytes([units(head)])

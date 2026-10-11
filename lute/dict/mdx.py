@@ -7,9 +7,17 @@ dictionary contains.  Supports MDX v1.2 / v2.0 / v3.0, UTF-8 / UTF-16
 (and GB18030, which the built-in codec handles and the Dart version
 rejects), with uncompressed / zlib / LZO1X blocks.
 
-Encrypted dictionaries (Encrypted=1 or 2, or a regcode/UUID-keyed
-"Encrypted=No" header) are NOT supported -- the free dictionaries from
-mdict.org are almost all unencrypted.
+Dictionaries saved with MDict's "Allow export to text" box unchecked
+(Encrypted=2) are supported: that flag transforms only the key block
+info, and lute/dict/mdx_decrypt.py undoes the transform.  The keyed
+schemes (Encrypted=1/3/"Yes", and the regcode-keyed files that still
+claim Encrypted=No) are NOT supported -- the free dictionaries from
+mdict.org are almost all unencrypted or export-locked only.
+
+The phone's copy of this reader predates the Encrypted=2 support and
+will still refuse an export-locked .mdx imported on the device itself;
+that does not matter for dictionaries converted on the server, which
+the phone downloads as SQLite.
 
 Usage::
 
@@ -27,6 +35,7 @@ import re
 import zlib
 
 from lute.dict.lzo1x import lzo1x_decompress
+from lute.dict.mdx_decrypt import decrypt_key_info_block
 
 
 _TAG_RE = re.compile(r"<[^>]+>")
@@ -191,10 +200,14 @@ class MdxReader:  # pylint: disable=too-many-instance-attributes
         try:
             self._encrypt = 0 if encrypted == "No" else int(encrypted)
         except ValueError:
-            # v1 spelled it "Yes"/"No"; "Yes" means the same unsupported
-            # keyed encryption as Encrypted=2.
-            self._encrypt = 2 if encrypted.lower() == "yes" else 0
-        if self._encrypt != 0:
+            # v1 spelled it "Yes"/"No"; "Yes" is the record-block
+            # encryption, the same keyed scheme as 1.
+            self._encrypt = 1 if encrypted.lower() == "yes" else 0
+        if self._encrypt & 1:
+            # 1 and 3 lock the record blocks behind a per-user
+            # registration code.  2 is the export lock, which only
+            # transforms the key block info and is undone at read
+            # time (see _decode_key_block_info).
             raise MdxError(
                 f"MDX: encrypted dictionary is not supported (Encrypted={encrypted})"
             )
@@ -236,6 +249,12 @@ class MdxReader:  # pylint: disable=too-many-instance-attributes
         if self.version >= 2:
             # zlib-compressed; the first 4 bytes are 02 00 00 00, the
             # next 4 an adler32, then the zlib stream.
+            if self._encrypt & 2:
+                # Encrypted=2 ("allow export to text" left unchecked)
+                # transforms this section and only this one: the 8-byte
+                # block header stays in the clear, the zlib stream
+                # behind it is the ciphertext.
+                info = decrypt_key_info_block(info)
             decompressed = zlib.decompress(info[8:])
             byte_width = 2
             text_term = 1
@@ -317,8 +336,6 @@ class MdxReader:  # pylint: disable=too-many-instance-attributes
         else:
             header_size = self._number_width * 4
         block = data[offset : offset + header_size]
-        if self._encrypt & 1:
-            raise MdxError("MDX: encrypted dictionary is not supported")
 
         pos = 0
         pos += self._number_width  # key block count (the key list is authoritative)

@@ -123,12 +123,38 @@ def test_clean_definition_truncates():
     assert MdxReader.clean_definition("x" * 2000, max_chars=10) == "x" * 10
 
 
-def test_encrypted_dictionary_is_rejected():
+@pytest.mark.parametrize("encrypted", ["1", "3", "Yes"])
+def test_keyed_encryption_is_still_rejected(encrypted):
+    """
+    Encrypted=1/3 (and v1's "Yes") lock the record blocks behind a
+    per-user registration code.  Only the export lock (2) is
+    decryptable -- see test_reads_an_export_locked_file.
+    """
     data = build_header_only_mdx(
-        {"GeneratedByEngineVersion": "2.0", "Encrypted": "2", "Encoding": "UTF-8"}
+        {"GeneratedByEngineVersion": "2.0", "Encrypted": encrypted, "Encoding": "UTF-8"}
     )
     with pytest.raises(MdxError, match="encrypted"):
         MdxReader(data)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"version": "2.0", "encoding": "UTF-8", "compress": 0},
+        {"version": "2.0", "encoding": "UTF-8", "compress": 2},
+        {"version": "2.0", "encoding": "UTF-16", "compress": 2},
+    ],
+)
+def test_reads_an_export_locked_file(kwargs):
+    """
+    Encrypted="2" is MDict's "Allow export to text" checkbox left
+    unchecked: only the key block info is transformed, so the file reads
+    normally once that section is decrypted.
+    """
+    with MdxReader(build_mdx(ENTRIES, encrypted_info=True, **kwargs)) as reader:
+        assert reader.entry_count == len(ENTRIES)
+        assert [k for k, _d in reader.entries()] == [k for k, _d in ENTRIES]
+        assert [d for _k, d in reader.entries()] == [d for _k, d in ENTRIES]
 
 
 def test_unsupported_encoding_is_rejected():

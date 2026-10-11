@@ -192,19 +192,20 @@ def test_an_independent_implementation_reads_every_fixture_variant():
         ("箱", "はこ"),
     ]
     variants = [
-        ("2.0", "UTF-8", 0),
-        ("2.0", "UTF-8", 2),
-        ("2.0", "UTF-16", 0),
-        ("1.2", "UTF-8", 0),
-        ("1.2", "UTF-16", 0),
+        ("2.0", "UTF-8", 0, False),
+        ("2.0", "UTF-8", 2, False),
+        ("2.0", "UTF-16", 0, False),
+        ("2.0", "UTF-8", 2, True),  # export lock (Encrypted=2)
+        ("1.2", "UTF-8", 0, False),
+        ("1.2", "UTF-16", 0, False),
     ]
 
     # Not pytest's tmp_path: the sandbox this repo is developed in cannot
     # create directories under the system temp root.
     scratch = tempfile.mkdtemp(dir=os.path.dirname(__file__))
     try:
-        for version, encoding, compress in variants:
-            name = f"{version}_{encoding}_{compress}.mdx"
+        for version, encoding, compress, encrypted_info in variants:
+            name = f"{version}_{encoding}_{compress}_{'enc' if encrypted_info else 'plain'}.mdx"
             path = os.path.join(scratch, name)
             with open(path, "wb") as f:
                 f.write(
@@ -213,6 +214,7 @@ def test_an_independent_implementation_reads_every_fixture_variant():
                         version=version,
                         encoding=encoding,
                         compress=compress,
+                        encrypted_info=encrypted_info,
                     )
                 )
 
