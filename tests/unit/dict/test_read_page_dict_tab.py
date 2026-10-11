@@ -385,3 +385,54 @@ def test_the_local_tab_frame_escapes_the_gloss(
 
     assert "&lt;script&gt;" in html
     assert "<script>alert(1)</script>" not in html
+
+
+def test_the_frame_drops_the_duplicated_headword_line(
+    client, app, app_context, dict_dirs, japanese
+):
+    """
+    The card's head is the looked-up term, and a converted definition
+    opens with the dictionary's own headword: showing both says the
+    same word twice.
+    """
+    _import(
+        app,
+        dict_dirs[1],
+        entries=[("終わり", "<div>終わり【おわり◎】<br/>名<br/>终，终了。</div>")],
+        name="shogakukan.mdx",
+        target=service.DB_FILENAME,
+    )
+    _use(japanese, service.DB_FILENAME)
+
+    html = client.get(f"/read/localdict/{japanese.id}/{quote('終わり')}").data.decode(
+        "utf-8"
+    )
+
+    assert "localdict-head" in html and ">終わり<" in html
+    assert "【おわり◎】" not in html, "the headword line is a repeat of the head"
+    assert "终，终了。" in html
+
+
+def test_the_frame_keeps_an_entry_found_through_its_reading(
+    client, app, app_context, dict_dirs, japanese
+):
+    """
+    The kana spelling was looked up and the entry answers under its
+    kanji headword: that headword is part of the answer, not a repeat
+    of what was clicked.
+    """
+    _import(
+        app,
+        dict_dirs[1],
+        entries=[("おわり", "<div>終わり【おわり◎】<br/>名<br/>终，终了。</div>")],
+        name="kana.mdx",
+        target=service.DB_FILENAME,
+    )
+    _use(japanese, service.DB_FILENAME)
+
+    html = client.get(f"/read/localdict/{japanese.id}/{quote('おわり')}").data.decode(
+        "utf-8"
+    )
+
+    assert "終わり【おわり◎】" in html
+    assert "终，终了。" in html

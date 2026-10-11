@@ -297,3 +297,53 @@ def test_suggested_filename_is_always_usable():
     assert service.suggested_filename("") == "dictionary.db"
     for name in ("shogakukan_v2.db", "b.db", "dictionary.db", "My-Dict-v2.db"):
         assert service.is_pool_name(name) is True, name
+
+
+# --- the readers' copy of a definition --------------------------------------
+#
+# A converted definition leads with the dictionary's own headword
+# ("目覚まし時計【めざましどけい⑤】").  Every reader that shows a gloss
+# shows the looked-up word above it, so that line is dropped there --
+# but only when it really is the same word.
+
+
+def test_strip_duplicate_headword_drops_the_headword_line():
+    gloss = "目覚まし時計【めざましどけい⑤】\n名\n闹钟。"
+    assert service.strip_duplicate_headword(gloss, "目覚まし時計") == "名\n闹钟。"
+
+
+def test_strip_duplicate_headword_drops_a_bare_headword_line():
+    gloss = "たのしい\n愉快yúkuài"
+    assert service.strip_duplicate_headword(gloss, "たのしい") == "愉快yúkuài"
+
+
+def test_strip_duplicate_headword_keeps_a_different_headword():
+    """
+    The kana spelling was looked up and the entry answers under its
+    kanji headword: that headword is part of the answer, not a repeat.
+    """
+    gloss = "終わり【おわり◎】\n名\n终，终了。"
+    assert service.strip_duplicate_headword(gloss, "おわり") == gloss
+
+
+def test_strip_duplicate_headword_keeps_a_first_line_with_content():
+    "Not every definition opens with a bare headword."
+    assert service.strip_duplicate_headword("箱は\n名\n箱子", "箱") == "箱は\n名\n箱子"
+    assert service.strip_duplicate_headword("終わりです。\n名", "終わり") == "終わりです。\n名"
+
+
+def test_strip_duplicate_headword_keeps_a_headword_only_entry():
+    gloss = "たのしい"
+    assert service.strip_duplicate_headword(gloss, "たのしい") == gloss
+
+
+def test_strip_duplicate_headword_ignores_zero_width_spaces():
+    "Lute joins multi-token terms with one; a dictionary key never has it."
+    assert service.strip_duplicate_headword("たのしい\n愉快", "たの\u200bしい") == "愉快"
+
+
+def test_strip_duplicate_headword_passes_empty_input_through():
+    assert service.strip_duplicate_headword(None, "たのしい") is None
+    assert service.strip_duplicate_headword("", "たのしい") == ""
+    assert service.strip_duplicate_headword(" gloss\nmore", "") == " gloss\nmore"
+    assert service.strip_duplicate_headword(" gloss\nmore", "\u200b") == " gloss\nmore"

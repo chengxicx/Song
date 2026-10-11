@@ -257,6 +257,28 @@ def _manga_page_items(blocks):
     ]
 
 
+# A converted dictionary entry is the headword, the part of speech,
+# the senses and then a long tail of example sentences -- dozens of
+# lines for a common word.  The popup is a glance, not a reading
+# pane, and the full entry is one click away in the dictionary
+# strip, so the popup's copy is capped here, at display time: the
+# stored definition, and every other reader of it, is untouched.
+DICT_GLOSS_POPUP_MAX_LINES = 5
+
+
+def _popup_dict_gloss(gloss):
+    """
+    The dictionary definition as the popup shows it: the first lines,
+    with a trailing "…" when more was cut.  None stays None.
+    """
+    if not gloss:
+        return gloss
+    lines = gloss.split("\n")
+    if len(lines) <= DICT_GLOSS_POPUP_MAX_LINES:
+        return gloss
+    return "\n".join([*lines[:DICT_GLOSS_POPUP_MAX_LINES], "…"])
+
+
 class TermPopup:
     "Popup data for a term."
 
@@ -1096,11 +1118,14 @@ class Service:
         lang = term.language
         if lang.term_popup_show_dict_gloss:
             for filename in lang.local_dict_files():
-                gloss = dict_service.lookup(
-                    term.text, term.romanization, filename
-                )
+                gloss = dict_service.lookup(term.text, term.romanization, filename)
                 if gloss:
-                    t.dict_gloss = gloss
+                    # The entry's own headword line repeats the term
+                    # and reading already shown above it, and the
+                    # example-sentence tail is for the strip.
+                    t.dict_gloss = _popup_dict_gloss(
+                        dict_service.strip_duplicate_headword(gloss, term.text)
+                    )
                     break
 
         if (
