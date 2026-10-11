@@ -146,17 +146,18 @@ def test_the_block_checksum_is_big_endian_over_the_uncompressed_payload():
     word with ``<L`` and the checksum with ``>L``.
     """
     definition = "<div>x</div>"
+    # The record section carries each definition *plus* its NUL terminator
+    # (see mdx_fixture._record_stream), and the checksum covers the whole
+    # payload -- terminator included.
+    payload = definition.encode("utf-8") + b"\x00"
     data = build_mdx([("key", definition)], version="2.0", compress=2)
     block = _record_block(data)
 
     assert block[:4] == V2_HEADER
-    assert (
-        int.from_bytes(block[4:8], "big")
-        == zlib.adler32(definition.encode("utf-8")) & 0xFFFFFFFF
-    )
+    assert int.from_bytes(block[4:8], "big") == zlib.adler32(payload) & 0xFFFFFFFF
     # The body really is compressed, so the checksum above cannot have
     # been computed over what is stored.
-    assert block[8:] == zlib.compress(definition.encode("utf-8"))
+    assert block[8:] == zlib.compress(payload)
 
 
 def _mdict_utils():
