@@ -69,6 +69,7 @@ def refresh_global_settings(session, scope=None):
         "show_highlights",
         "term_popup_promote_parent_translation",
         "term_popup_show_components",
+        "term_popup_show_dict_gloss",
         "use_ankiconnect",
         "show_streak_on_home",
         "tts_hover_pronunciation",

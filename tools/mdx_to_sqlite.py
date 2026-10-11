@@ -1,65 +1,62 @@
-import hashlib, html, re, sqlite3, sys
-from mdict_utils.reader import MDX
+"""
+Convert an MDX (MDict) dictionary into the SQLite file Lute reads.
 
-src, out = sys.argv[1], sys.argv[2]
-mdx = MDX(src)
+    python tools/mdx_to_sqlite.py <file.mdx> <out.db>
 
-TAG = re.compile(r"<[^>]+>")
-def clean_key(k):
-    if isinstance(k, bytes):
-        k = k.decode("utf-8", "ignore")
-    k = TAG.sub("", k)
-    k = html.unescape(k)
-    return k.replace("\r", "").replace("\n", "").strip()
+The output is the two-table dictionary (entries/terms) that both the
+reading page's dictionary tab and the phone app query, so a dictionary
+converted here can be dropped straight into the server's static folder
+for the phone to download:
 
-def clean_def(d):
-    if isinstance(d, bytes):
-        d = d.decode("utf-8", "ignore")
-    d = re.sub(r"(?i)<br\s*/?>", "\n", d)
-    d = re.sub(r"(?i)</(p|div|li|tr|h\d)>", "\n", d)
-    d = TAG.sub("", d)
-    d = html.unescape(d)
-    lines = [ln.strip() for ln in d.split("\n") if ln.strip()]
-    return "\n".join(lines)[:800]
+    python tools/mdx_to_sqlite.py shogakukan_v2.mdx \
+        lute/static/dict/ja_zh_shogakukan_v2.db
 
-db = sqlite3.connect(out)
-db.execute("PRAGMA journal_mode=OFF")
-db.execute("PRAGMA synchronous=OFF")
-db.execute("CREATE TABLE entries(eid INTEGER PRIMARY KEY, def TEXT)")
-db.execute("CREATE TABLE terms(word TEXT NOT NULL, eid INTEGER NOT NULL)")
-db.execute("CREATE INDEX idx_terms ON terms(word)")
+The settings page can also import an MDX, which is easier for anything
+under the 200 MB upload limit; this tool is the way in for the larger
+dictionaries.  Both paths run the same converter
+(lute/dict/importer.py), so the result is identical.
 
-def_hash = {}
-n_e = n_t = 0
-seen = set()
-batch_e, batch_t = [], []
+No third-party dependency: the MDX reader is Lute's own (lute/dict),
+ported from the phone app's parser.
+"""
 
-def flush():
-    global n_e, n_t
-    if batch_e:
-        db.executemany("INSERT INTO entries VALUES(?,?)", batch_e)
-        db.executemany("INSERT INTO terms VALUES(?,?)", batch_t)
-        n_e += len(batch_e); n_t += len(batch_t)
-        batch_e.clear(); batch_t.clear()
+import os
+import sys
 
-for key, definition in mdx.items():
-    word = clean_key(key)
-    if not word or word in seen:
-        continue
-    seen.add(word)
-    text = clean_def(definition)
-    if not text:
-        continue
-    dh = hashlib.md5(text.encode()).hexdigest()
-    eid = def_hash.get(dh)
-    if eid is None:
-        eid = len(def_hash) + 1
-        def_hash[dh] = eid
-        batch_e.append((eid, text))
-    batch_t.append((word, eid))
-    if len(batch_e) >= 5000:
-        flush()
-flush()
-db.commit()
-db.execute("VACUUM")
-print("entries:", n_e, "terms:", n_t)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from lute.dict.importer import convert  # pylint: disable=wrong-import-position
+
+
+def _report(processed):
+    print(f"  {processed:,} entries read", flush=True)
+
+
+def main():
+    "Convert argv[1] to argv[2], reporting progress as it goes."
+    if len(sys.argv) != 3:
+        print(__doc__.strip())
+        sys.exit(1)
+
+    src, out = sys.argv[1], sys.argv[2]
+    if not os.path.isfile(src):
+        print(f"No such file: {src}")
+        sys.exit(1)
+
+    os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+    print(f"Converting {src} ...")
+    try:
+        metadata = convert(src, out, progress=_report)
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Failed: {e}")
+        sys.exit(1)
+
+    print(f"Wrote {out}")
+    print(f"  title:   {metadata['title'] or '(none)'}")
+    print(f"  terms:   {metadata['terms']:,}")
+    print(f"  entries: {metadata['entries']:,}")
+    print(f"  size:    {metadata['bytes'] / (1024 * 1024):.1f} MB")
+
+
+if __name__ == "__main__":
+    main()

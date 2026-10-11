@@ -14,6 +14,7 @@ from lute.models.term import Term, Status
 from lute.models.book import Text, WordsRead
 from lute.models.repositories import BookRepository, UserSettingRepository
 from lute.book.stats import Service as StatsService
+from lute.dict import service as dict_service
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.read import manga_columns
@@ -274,6 +275,9 @@ class TermPopup:
         # Final data to include in popup.
         self.parents = []
         self.components = []
+        # The local dictionary's definition, filled in by get_popup_data
+        # when a dictionary is installed (see lute/dict).
+        self.dict_gloss = None
 
     def _clean(self, t):
         "Clean text for popup usage."
@@ -1077,9 +1081,19 @@ class Service:
             ]
 
         t = TermPopup(term)
+
+        # The local dictionary gloss.  A word you have never studied has
+        # no translation, no tags and no romanization yet, so the
+        # dictionary is often the only thing the popup has to show --
+        # which is why it counts towards "is there anything to show"
+        # below, not just towards the popup body.
+        if int(repo.get_value("term_popup_show_dict_gloss")) == 1:
+            t.dict_gloss = dict_service.lookup(term.text, term.romanization)
+
         if (
             t.show is False
             and t.image is None
+            and t.dict_gloss is None
             and len(term.parents) == 0
             and len(components) == 0
         ):

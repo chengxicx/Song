@@ -69,6 +69,7 @@ from lute.stats.service import get_reading_streak
 from lute.ankiexport.routes import bp as anki_bp
 from lute.book.routes import bp as book_bp
 from lute.bookmarks.routes import bp as bookmarks_bp
+from lute.dict.routes import bp as dict_bp
 from lute.language.routes import bp as language_bp
 from lute.multiuser.routes import bp as multiuser_bp
 from lute.term.routes import bp as term_bp
@@ -799,6 +800,7 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(book_bp)
     app.register_blueprint(whisper_bp)
     app.register_blueprint(bookmarks_bp)
+    app.register_blueprint(dict_bp)
     app.register_blueprint(term_bp)
     app.register_blueprint(termtag_bp)
     app.register_blueprint(read_bp)
