@@ -83,8 +83,17 @@ def _record_stream(entries, utf16):
     The decompressed record section: every definition concatenated in the
     file's own encoding, plus the byte offset each one starts at (the key
     block stores those offsets, and they point into this stream).
+
+    Each record ends with a NUL terminator, the way real files do -- both
+    writemdict and MdxBuilder write one.  It matters because the record
+    slice runs to the *next* record's start, so the terminator lands
+    inside the text the reader decodes, and the reader is expected to
+    strip it (mdict_utils does, in MDX._treat_record_data).  A fixture
+    without terminators makes a reader that leaks a trailing \\x00 into
+    every definition look correct.
     """
-    parts = [_encode(definition, utf16) for _key, definition in entries]
+    terminator = b"\x00\x00" if utf16 else b"\x00"
+    parts = [_encode(definition, utf16) + terminator for _key, definition in entries]
     offsets = []
     acc = 0
     for part in parts:

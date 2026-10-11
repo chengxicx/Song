@@ -426,7 +426,15 @@ class MdxReader:  # pylint: disable=too-many-instance-attributes
                 key_text = key_list[key_index][1]
                 key_index += 1
                 raw = block[record_start - offset : record_end - offset]
-                yield key_text, self._decode_text(raw)
+                # The slice runs to the *next* record's start, so it
+                # swallows the NUL that terminates this one -- real files
+                # end every record with one (writemdict and MdxBuilder
+                # both write it), and _split_key_block already skips the
+                # same terminator for keys.  Left in, it survives
+                # str.strip() (a NUL is not whitespace) and reaches the
+                # card as a trailing \x00.  mdict_utils does the same
+                # strip in MDX._treat_record_data.
+                yield key_text, self._decode_text(raw).strip("\x00")
             offset += len(block)
 
     # -- text helpers --
