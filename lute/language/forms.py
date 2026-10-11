@@ -45,10 +45,22 @@ class LanguageDictionaryForm(Form):
         choices=[
             ("embeddedhtml", "Embedded"),
             ("popuphtml", "Pop-up window"),
+            ("localdict", "Local"),
         ],
         render_kw={"title": "Show as"},
     )
-    dicturi = StringField("URL", validators=[DataRequired()])
+    dicturi = StringField(
+        "URL",
+        validators=[DataRequired()],
+        render_kw={
+            "list": "dict-pool-files",
+            "title": (
+                "Online dictionaries: a lookup URL with [LUTE] for the term.  "
+                "Local dictionaries: a pool file name (see Settings > Local "
+                "dictionaries)"
+            ),
+        },
+    )
     is_active = BooleanField("Is active", render_kw={"title": "Is active?"})
     # Kept configured but no tab in the reading page's dictionary strip.
     is_hidden = BooleanField(
@@ -104,18 +116,13 @@ class LanguageForm(FlaskForm):
         choices=[("en", "English"), ("zh", "中文"), ("ko", "한국어")],
         default="en",
     )
-    # --- Local (MDX) dictionary.
-    # The dictionary pool is a folder on the server (see lute/dict), so
-    # the choices can only be listed at request time: they are set in
-    # the routes, same reason as parser_type above.
-    local_dict = SelectField(
-        "Local dictionary",
-        choices=[("", "-- none --")],
-        default="",
-        render_kw={
-            "title": "Show a definition for words this language has no translation for yet"
-        },
-    )
+    # --- Local (MDX) dictionaries.
+    # Local dictionaries are ordinary rows in the dictionary list above
+    # (type "Local"; the URL is a pool file name -- the pool is a folder
+    # on the server, managed on the settings page, see lute/dict), so
+    # there is nothing to choose here: several are allowed, and they
+    # order and hide like every other tab.
+
     term_popup_show_dict_gloss = BooleanField(
         "Show dictionary definitions in the term popup",
         render_kw={
@@ -126,17 +133,10 @@ class LanguageForm(FlaskForm):
             )
         },
     )
-    local_dict_position = SelectField(
-        "Local dictionary tab position",
-        choices=[("first", "First"), ("last", "Last")],
-        default="first",
-        render_kw={
-            "title": "Where the reading page's dictionary strip puts the Local tab"
-        },
-    )
     # What fills a new term's translation.  'local_dict' tries the local
-    # dictionary first and falls back to online translation when it has
-    # no entry -- only meaningful when a local dictionary is chosen above.
+    # dictionaries in tab order and falls back to online translation
+    # when none has an entry -- only meaningful when the language has
+    # dictionaries of type Local above.
     term_translation_source = SelectField(
         "Term translation source",
         choices=[("online", "Online translation"), ("local_dict", "Local dictionary")],
@@ -189,6 +189,21 @@ class LanguageForm(FlaskForm):
                 for d in self.dictionaries.data
                 if d.get("usefor", "") == usefor and d.get("is_active")
             ]
+
+        # A Local row's URL is a file name in the server's dictionary
+        # pool, not a web URL: it round-trips into filesystem paths, so
+        # it is held to the pool's own name rules.
+        from lute.dict.service import is_pool_name  # pylint: disable=import-outside-toplevel
+
+        for d in self.dictionaries.data:
+            if d.get("dicttype", "") == "localdict" and not is_pool_name(
+                (d.get("dicturi") or "").strip()
+            ):
+                raise ValidationError(
+                    f'"{d.get("dicturi")}" is not a valid Local dictionary '
+                    "name -- use a file name from Settings > Local "
+                    "dictionaries, ending in .db."
+                )
 
         term_dicts = _get_actives("terms")
         sentence_dicts = _get_actives("sentences")

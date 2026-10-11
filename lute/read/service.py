@@ -1088,15 +1088,20 @@ class Service:
         # which is why it counts towards "is there anything to show"
         # below, not just towards the popup body.
         #
-        # Both the switch and the dictionary are the *term's language's*
-        # (see lute/models/language.py): one user reads several
-        # languages, and a Korean popup has no business showing the
-        # Japanese dictionary.
+        # Both the switch and the dictionaries are the *term's
+        # language's* (see lute/models/language.py): one user reads
+        # several languages, and a Korean popup has no business showing
+        # the Japanese dictionary.  The language's local dictionaries
+        # are tried in tab order; the first entry wins.
         lang = term.language
-        if lang.term_popup_show_dict_gloss and lang.local_dict:
-            t.dict_gloss = dict_service.lookup(
-                term.text, term.romanization, lang.local_dict
-            )
+        if lang.term_popup_show_dict_gloss:
+            for filename in lang.local_dict_files():
+                gloss = dict_service.lookup(
+                    term.text, term.romanization, filename
+                )
+                if gloss:
+                    t.dict_gloss = gloss
+                    break
 
         if (
             t.show is False

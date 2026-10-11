@@ -16,7 +16,7 @@ from flask import Blueprint, current_app, jsonify, request
 
 from lute.db import db
 from lute.dict import service
-from lute.models.language import Language
+from lute.models.language import LanguageDictionary
 from lute.multiuser.permissions import admin_only_if_multiuser_json
 
 
@@ -30,8 +30,13 @@ def _failure(message, code=400):
 
 def _languages_using(name):
     "The names of the languages whose local dictionary is this file."
-    rows = db.session.query(Language).filter(Language.local_dict == name).all()
-    return [lang.name for lang in rows]
+    rows = (
+        db.session.query(LanguageDictionary)
+        .filter(LanguageDictionary.dicttype == "localdict")
+        .filter(LanguageDictionary.dicturi == name)
+        .all()
+    )
+    return [d.language.name for d in rows]
 
 
 @bp.route("/status", methods=["GET"])
