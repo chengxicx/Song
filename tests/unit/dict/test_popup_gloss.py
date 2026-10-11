@@ -6,9 +6,9 @@ translation, no tags and no romanization, so before this the popup for it
 was either empty or not shown at all.  These tests pin both halves --
 the gloss reaching the popup, and the popup being *shown* because of it.
 
-Both the switch and the dictionary are the term's *language's* now (see
-Language.local_dict / Language.term_popup_show_dict_gloss), so the tests
-also pin that a language which chose nothing gets nothing.
+Both the switch and the dictionaries are the term's *language's* now
+(see Language.local_dict_files / Language.term_popup_show_dict_gloss),
+so the tests also pin that a language which has none gets nothing.
 """
 
 import os
@@ -16,7 +16,7 @@ import time
 
 from lute.db import db
 from lute.dict import service
-from lute.models.language import Language
+from lute.models.language import Language, LanguageDictionary
 from lute.models.term import Term
 from lute.read.service import Service
 
@@ -45,8 +45,14 @@ def _import(app, scratch, entries=ENTRIES, name="fixture.mdx", target=None):
 
 
 def _use(language, filename=service.DB_FILENAME, gloss=True):
-    "Point a language at a dictionary, and set the popup switch."
-    language.local_dict = filename
+    "Give the language a Local dictionary row, and set the popup switch."
+    d = LanguageDictionary()
+    d.usefor = "terms"
+    d.dicttype = "localdict"
+    d.dicturi = filename
+    d.is_active = True
+    d.sort_order = 0
+    language.dictionaries.append(d)
     language.term_popup_show_dict_gloss = gloss
     db.session.commit()
     return language
@@ -154,6 +160,37 @@ def test_the_gloss_comes_from_the_languages_own_dictionary(
     db.session.commit()
 
     assert _service().get_popup_data(t.id).dict_gloss == "别的词典"
+
+
+def test_the_gloss_comes_from_the_first_dictionary_with_an_entry(
+    app, app_context, dict_dirs, japanese
+):
+    "Two local dictionaries: tab order decides, the first hit wins."
+    _import(
+        app,
+        dict_dirs[1],
+        entries=[("ひさしぶり", "<div>好久不见</div>")],
+        name="narrow.mdx",
+        target="narrow.db",
+    )
+    _import(app, dict_dirs[1], target="wide.db")
+    _use(japanese, "narrow.db")
+    wide = LanguageDictionary()
+    wide.usefor = "terms"
+    wide.dicttype = "localdict"
+    wide.dicturi = "wide.db"
+    wide.is_active = True
+    wide.sort_order = 1
+    japanese.dictionaries.append(wide)
+    db.session.commit()
+    t = Term(japanese, "たのしい")
+    t.translation = "fun"
+    db.session.add(t)
+    db.session.commit()
+
+    d = _service().get_popup_data(t.id)
+
+    assert d.dict_gloss == "楽しい\n愉快yúkuài", "narrow.db has no たのしい entry"
 
 
 def test_the_languages_setting_turns_the_gloss_off(
