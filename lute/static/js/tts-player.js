@@ -52,6 +52,12 @@
   let ttsVirtualTime = 0;          // current virtual playhead (seconds)
   let ttsCueStartedAt = 0;         // performance.now() when current cue started
   let ttsCurrentUtterance = null;
+  // Generation token for speech playback, bumped by every cancel.  A
+  // play that is interrupted this way can recognise its own stale
+  // utterance events and queued part timers and drop them: an index
+  // check alone cannot do that, because pausing and replaying the SAME
+  // cue leaves ttsCueIndex unchanged.
+  let ttsPlayGen = 0;
   let ttsPollTimer = null;
   // Voice-list load detection. On mobile browsers getVoices() can stay
   // empty for a long time (chromium populates it lazily), and
@@ -111,25 +117,39 @@
     return Math.max(0.5, (cjk * CHAR_RATE_CJK + other * CHAR_RATE_OTHER) / effRate);
   }
 
-  // Split a long .textsentence into multiple sub-cues at comma
-  // boundaries so each cue fits within the subtitle's max-height
-  // (~7rem) without a vertical scrollbar. Short sentences are
-  // returned as a single-cue array. Each sub-cue preserves the
+  // The rest held between two cues of one sentence (see
+  // ttsSplitSentenceIntoCues), on top of the pause the engine gives
+  // the punctuation itself.
+  const TTS_PART_PAUSE_MS = 300;
+
+  // Split a long .textsentence into multiple sub-cues at clause
+  // punctuation so each cue stays short.  Every consumer of a cue then
+  // works on a clause instead of the whole sentence: the subtitle fits
+  // its max-height (~7rem) without a vertical scrollbar, SpeechSynthesis
+  // leaves a natural break between utterances, ttsAdvance holds a
+  // TTS_PART_PAUSE_MS rest between a sentence's own cues (an audible
+  // comma break), and loop / auto-pause / shadowing operate on the
+  // clause rather than a 12-second sentence.  Short sentences are
+  // returned as a single-cue array.  Each sub-cue preserves the
   // reading-page tokenization (span.textitem spans) so hover,
   // click-to-lookup and status colours continue to work in the
-  // subtitle, and SpeechSynthesis pauses naturally between adjacent
-  // utterances (the onend -> ttsAdvance() -> speak() flow leaves a
-  // ~20 ms gap that reads as a comma break).
+  // subtitle.
   //
   // Splitting rules:
-  //   - Only split when the sentence's clean text length exceeds
-  //     LONG_SENTENCE_CHARS (~140). Short sentences stay whole.
-  //   - A split point is a child whose text contains an ASCII comma
-  //     "," or fullwidth "，". Whitespace-only text nodes are skipped.
+  //   - Only split when the sentence's clean text length exceeds the
+  //     script's threshold.  CJK packs far more information per
+  //     character, so 50 characters is already a very long read
+  //     (~9s at CHAR_RATE_CJK) where Latin needs ~140.  Short
+  //     sentences stay whole.
+  //   - A split point is a child whose text contains a break char:
+  //     ASCII or fullwidth comma, semicolon, colon, exclamation /
+  //     question mark, 、and the mid-sentence 。.  Whitespace-only
+  //     text nodes are skipped.
   //   - We require the running text length to reach MIN_SUBCUE_CHARS
-  //     before we'll split, so the first sub-cue isn't a tiny
-  //     fragment when the only comma comes very early on.
-  //   - A sentence with no usable commas at all stays as one cue
+  //     before we'll split, so neither the first sub-cue nor a middle
+  //     one is a tiny fragment -- small clauses ("呜呜的响，") and
+  //     、-list items stay glued to the text that follows them.
+  //   - A sentence with no usable break chars at all stays as one cue
   //     (better a scrollable cue than no split point).
   function ttsSplitSentenceIntoCues(sentenceEl) {
     const clone = sentenceEl.cloneNode(true);
@@ -140,8 +160,29 @@
     const fullText = cleanSentenceText(clone.textContent || "");
     if (!fullText) return [];
 
-    const LONG_SENTENCE_CHARS = 140;
-    const MIN_SUBCUE_CHARS = 40;
+    // The sentence's own children, the injected 🔊 button filtered
+    // out.  Index i here is index i in the clone's children, so a
+    // sub-cue can hand shadowing the ORIGINAL spans (live, in-page)
+    // of the clause it covers, not clones of them.
+    const sentNodes = Array.prototype.filter.call(
+      sentenceEl.childNodes,
+      function (n) {
+        return !(
+          n.nodeType === 1 &&
+          n.classList &&
+          n.classList.contains("lute-sentence-play-btn")
+        );
+      }
+    );
+    const elementsOnly = function (nodes) {
+      return nodes.filter(function (n) { return n.nodeType === 1; });
+    };
+
+    const cjk = (fullText.match(/[\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF]/g) || []).length;
+    const isCjk = cjk * 2 >= fullText.length;
+    const LONG_SENTENCE_CHARS = isCjk ? 50 : 140;
+    const MIN_SUBCUE_CHARS = isCjk ? 10 : 40;
+    const BREAK_RE = /[,，、;；:：。!！?？…]/;
 
     if (fullText.length <= LONG_SENTENCE_CHARS) {
       return [{ text: fullText, html: clone.innerHTML }];
@@ -161,7 +202,7 @@
         ? (c.textContent || "").replace(/\s+/g, "")
         : ((c.textContent || "").replace(/\s+/g, ""));
       runningLen += t.length;
-      if (/[,，]/.test(c.textContent || "") && runningLen >= MIN_SUBCUE_CHARS) {
+      if (BREAK_RE.test(c.textContent || "") && runningLen >= MIN_SUBCUE_CHARS) {
         splitIndices.push(i);
         runningLen = 0;
       }
@@ -179,28 +220,27 @@
     // existing span IDs / status classes intact.
     const out = [];
     let prev = 0;
+    const pushCue = function (from, to) {
+      const tmp = document.createElement("span");
+      allChildren.slice(from, to).forEach(function (c) {
+        tmp.appendChild(c.cloneNode(true));
+      });
+      out.push({
+        text: cleanSentenceText(tmp.textContent || ""),
+        html: tmp.innerHTML,
+        // The clause's own nodes in the reading text (elements only;
+        // bare whitespace text nodes are of no use downstream).
+        spanEls: elementsOnly(sentNodes.slice(from, to)),
+      });
+    };
     for (let k = 0; k < splitIndices.length; k++) {
       const end = splitIndices[k];
       if (end < prev) continue;
-      const tmp = document.createElement("span");
-      allChildren.slice(prev, end + 1).forEach(function (c) {
-        tmp.appendChild(c.cloneNode(true));
-      });
-      out.push({
-        text: cleanSentenceText(tmp.textContent || ""),
-        html: tmp.innerHTML,
-      });
+      pushCue(prev, end + 1);
       prev = end + 1;
     }
     if (prev < allChildren.length) {
-      const tmp = document.createElement("span");
-      allChildren.slice(prev).forEach(function (c) {
-        tmp.appendChild(c.cloneNode(true));
-      });
-      out.push({
-        text: cleanSentenceText(tmp.textContent || ""),
-        html: tmp.innerHTML,
-      });
+      pushCue(prev, allChildren.length);
     }
     return out;
   }
@@ -209,9 +249,11 @@
   // Each cue's `html` is the sentence's innerHTML (textitem spans
   // included), so the scrolling subtitle reuses the reading-page
   // tokenization and click-to-lookup behaviour -- no extra backend
-  // request needed. Long sentences are split at comma boundaries via
-  // ttsSplitSentenceIntoCues() so the long text doesn't overflow the
-  // subtitle's max-height and produce a vertical scrollbar.
+  // request needed.  Long sentences are split into clause cues via
+  // ttsSplitSentenceIntoCues(); every cue but the last of its
+  // sentence carries pauseAfter, the rest the player holds before the
+  // next cue (baked into the cue's timeline span, so seeks and the
+  // total stay honest about what playback costs).
   function ttsBuildCues() {
     ttsCues = [];
     ttsTotalDuration = 0;
@@ -227,16 +269,22 @@
     ttsCueSentenceCount = sentences.length;
     let acc = 0;
     sentences.forEach(function (s, sentIdx) {
-      // Each .textsentence yields 1..N sub-cues; long sentences are
-      // split at comma boundaries (see ttsSplitSentenceIntoCues).
+      // Each .textsentence yields 1..N clause cues; long sentences are
+      // split at clause punctuation (see ttsSplitSentenceIntoCues).
       const subCues = ttsSplitSentenceIntoCues(s);
-      subCues.forEach(function (sub) {
+      subCues.forEach(function (sub, subIdx) {
         if (!sub.text) return;
-        const dur = ttsEstimateDuration(sub.text, ttsRate);
+        const pauseAfter =
+          subIdx < subCues.length - 1 ? TTS_PART_PAUSE_MS / 1000 : 0;
+        const dur = ttsEstimateDuration(sub.text, ttsRate) + pauseAfter;
         ttsCues.push({
           text: sub.text,
           html: sub.html,
           sentIdx: sentIdx,
+          // The clause's own nodes in the reading text, for shadowing
+          // (absent when the cue is a whole sentence).
+          spanEls: sub.spanEls || null,
+          pauseAfter: pauseAfter,
           start: acc,
           end: acc + dur,
           duration: dur,
@@ -273,15 +321,19 @@
    * ------------------------------------------------------------------ */
 
   function ttsCancelSpeech() {
+    ttsPlayGen += 1;
     if ("speechSynthesis" in window) {
       try { window.speechSynthesis.cancel(); } catch (_) {}
     }
     ttsCurrentUtterance = null;
   }
 
-  // Play a single cue through SpeechSynthesis. Sets up boundary / end
-  // handlers that drive the virtual playhead and advance to the next
-  // cue when finished.
+  // Play a single cue through SpeechSynthesis.  A cue is one clause
+  // (long sentences are split by ttsSplitSentenceIntoCues), so one
+  // utterance per cue keeps the unit the player controls -- loop,
+  // auto-pause, shadowing, prev/next -- on the clause, and the
+  // TTS_PART_PAUSE_MS rest between a sentence's own cues is held by
+  // ttsAdvance.
   function ttsPlayCue(idx) {
     if (idx < 0 || idx >= ttsCues.length) {
       ttsStop();
@@ -305,6 +357,7 @@
 
     if ("speechSynthesis" in window) {
       ttsCancelSpeech();
+      const gen = ttsPlayGen;
       const utterance = new SpeechSynthesisUtterance();
       utterance.text = cleanText;
 
@@ -331,7 +384,7 @@
       // Not all browsers fire them (Chrome does, Safari partial, FF
       // not at all), so we also poll elapsed time as a fallback.
       utterance.onboundary = function (ev) {
-        if (ttsCueIndex !== idx) return; // stale event
+        if (gen !== ttsPlayGen) return; // stale event
         if (ev.name === "word" || ev.name === "sentence") {
           // Use the charIndex to estimate progress through the cue.
           const total = cleanText.length || 1;
@@ -343,19 +396,21 @@
         }
       };
       utterance.onend = function () {
-        if (ttsCueIndex !== idx) return; // stale event (user jumped)
+        if (gen !== ttsPlayGen) return; // stale event (user jumped)
         // Record the real duration so the timeline is accurate on
-        // subsequent plays and after rate changes.
+        // subsequent plays and after rate changes.  The clause rest
+        // that follows is part of it: the cue's timeline span covers
+        // speech + rest, and the wall-clock pause is about to happen.
         const elapsed = (performance.now() - ttsCueStartedAt) / 1000;
         if (elapsed > 0.3 && isFinite(elapsed)) {
-          cue.actualDuration = elapsed;
+          cue.actualDuration = elapsed + (cue.pauseAfter || 0);
           ttsRecomputeTimeline();
         }
         ttsVirtualTime = cue.end;
         ttsAdvance();
       };
       utterance.onerror = function () {
-        if (ttsCueIndex !== idx) return;
+        if (gen !== ttsPlayGen) return;
         ttsAdvance();
       };
 
@@ -363,7 +418,7 @@
       // Small delay (matches the previous module) avoids a Chrome bug
       // where rapid cancel() + speak() can leave synthesis stuck.
       setTimeout(function () {
-        if (ttsCueIndex !== idx) return; // user jumped while we waited
+        if (gen !== ttsPlayGen) return; // user jumped while we waited
         try { window.speechSynthesis.speak(utterance); }
         catch (e) { ttsAdvance(); }
       }, 20);
@@ -439,6 +494,18 @@
     if (next >= ttsCues.length) {
       // End of stream.
       ttsStop();
+      return;
+    }
+    if (curCue && curCue.pauseAfter) {
+      // The current cue ends mid-sentence: hold the clause rest before
+      // the next cue so the break is audible.  The timer is killed by
+      // any cancel (pause / stop / seek bumps ttsPlayGen), and the
+      // ttsPlaying check covers a state change that didn't cancel.
+      const gen = ttsPlayGen;
+      setTimeout(function () {
+        if (gen !== ttsPlayGen || !ttsPlaying) return;
+        ttsPlayCue(next);
+      }, curCue.pauseAfter * 1000);
       return;
     }
     ttsPlayCue(next);
@@ -556,7 +623,7 @@
     // Re-estimate durations for cues that haven't been measured yet.
     ttsCues.forEach(function (c) {
       if (c.actualDuration == null) {
-        c.duration = ttsEstimateDuration(c.text, ttsRate);
+        c.duration = ttsEstimateDuration(c.text, ttsRate) + (c.pauseAfter || 0);
       }
     });
     ttsRecomputeTimeline();
@@ -577,7 +644,7 @@
     globalSpeed = ttsRate;
     ttsCues.forEach(function (c) {
       if (c.actualDuration == null) {
-        c.duration = ttsEstimateDuration(c.text, ttsRate);
+        c.duration = ttsEstimateDuration(c.text, ttsRate) + (c.pauseAfter || 0);
       }
     });
     ttsRecomputeTimeline();
@@ -712,7 +779,9 @@
     window.LutePlayingLine.setElement(sentences[cue.sentIdx] || null);
     // Shadowing practice area follows the playhead (lute-shadowing.js).
     // Same sentence-count guard: a stale sentIdx after a page swap must
-    // not select a wrong sentence.
+    // not select a wrong sentence.  A clause cue also carries the
+    // clause's own live spans (spanEls), so shadowing practises the
+    // clause instead of the whole long sentence.
     try {
       window.dispatchEvent(
         new CustomEvent("lute:cue-changed", {
@@ -721,6 +790,7 @@
             index: idx,
             sentIdx: cue.sentIdx != null ? cue.sentIdx : -1,
             sentenceCount: ttsCueSentenceCount,
+            spanEls: cue.spanEls || null,
           },
         })
       );
