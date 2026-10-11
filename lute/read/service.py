@@ -1087,8 +1087,16 @@ class Service:
         # dictionary is often the only thing the popup has to show --
         # which is why it counts towards "is there anything to show"
         # below, not just towards the popup body.
-        if int(repo.get_value("term_popup_show_dict_gloss")) == 1:
-            t.dict_gloss = dict_service.lookup(term.text, term.romanization)
+        #
+        # Both the switch and the dictionary are the *term's language's*
+        # (see lute/models/language.py): one user reads several
+        # languages, and a Korean popup has no business showing the
+        # Japanese dictionary.
+        lang = term.language
+        if lang.term_popup_show_dict_gloss and lang.local_dict:
+            t.dict_gloss = dict_service.lookup(
+                term.text, term.romanization, lang.local_dict
+            )
 
         if (
             t.show is False

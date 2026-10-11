@@ -99,6 +99,29 @@ class LanguageForm(FlaskForm):
         choices=[("en", "English"), ("zh", "中文"), ("ko", "한국어")],
         default="en",
     )
+    # --- Local (MDX) dictionary.
+    # The dictionary pool is a folder on the server (see lute/dict), so
+    # the choices can only be listed at request time: they are set in
+    # the routes, same reason as parser_type above.
+    local_dict = SelectField(
+        "Local dictionary",
+        choices=[("", "-- none --")],
+        default="",
+        render_kw={
+            "title": "Show a definition for words this language has no translation for yet"
+        },
+    )
+    term_popup_show_dict_gloss = BooleanField(
+        "Show dictionary definitions in the term popup",
+        render_kw={
+            "title": (
+                "Add this language's dictionary definition to the popup, for "
+                "terms with no translation yet.  The reading page's dictionary "
+                "tab is unaffected."
+            )
+        },
+    )
+
     # Grammar levels / groups to hide in the reading-page panel.  The
     # choices depend on the language's grammar taxonomy (JLPT, TOPIK,
     # CEFR) plus the Japanese aggregate rows, so they are set in the

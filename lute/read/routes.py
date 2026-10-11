@@ -60,6 +60,7 @@ from lute.term.routes import handle_term_form, serialize_term_form_data
 from lute.settings.current import current_settings
 from lute.multiuser.context import current_scope_key, get_current_user
 from lute.models.book import Text
+from lute.models.language import Language
 from lute.models.repositories import BookRepository, LanguageRepository
 from lute.models.term import Term
 from lute.book.service import (
@@ -601,23 +602,27 @@ def _apply_media_page_cue_data(book, pagenum, new_text, cue_data):
 def _term_dicts_for(lang):
     """
     The reading page's dictionary tabs: the language's own dictionaries,
-    with the local dictionary (see lute/dict) in front when one has been
-    imported.
+    with the language's local dictionary (see lute/dict) in front when
+    it has one and that file is still installed.
 
     It goes first because it is the only tab that works offline and the
     only one that can say anything about a word with no translation yet.
     The tab names itself (``label``/``title``) -- its URL is a route on
     this server, not a hostname for dict-tabs.js to shorten.
+
+    The dictionary is per language: ``local_dict`` is one file name out
+    of the server's pool, so a Korean book is not offered the Japanese
+    dictionary.
     """
     dicts = list(LanguageRepository(db.session).all_dictionaries()[lang.id]["term"])
-    if dict_service.is_installed():
+    if lang.local_dict and dict_service.is_installed(lang.local_dict):
         dicts.insert(
             0,
             {
                 "url": f"/read/localdict/{lang.id}/[LUTE]",
                 "dicttype": "html",
                 "label": "Local",
-                "title": "The MDX dictionary imported on this server",
+                "title": "This language's local dictionary",
             },
         )
     return dicts
@@ -1539,7 +1544,10 @@ def local_dict(langid, text):
     reading only so that a kanji spelling can find a kana-keyed entry;
     nothing is created.
     """
-    gloss = dict_service.lookup(text, _reading_for(langid, text))
+    lang = db.session.get(Language, langid)
+    gloss = None
+    if lang is not None and lang.local_dict:
+        gloss = dict_service.lookup(text, _reading_for(langid, text), lang.local_dict)
     return render_template(
         "read/localdict.html",
         text=text,

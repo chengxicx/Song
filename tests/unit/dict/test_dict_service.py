@@ -27,12 +27,12 @@ def _wait(task_id, timeout=10.0):
     raise AssertionError(f"import task {task_id} never finished")
 
 
-def _import(app, scratch_dir, mdx_bytes, name="fixture.mdx"):
+def _import(app, scratch_dir, mdx_bytes, name="fixture.mdx", target=None):
     "Write the MDX, run the import, and return the finished task."
     path = os.path.join(scratch_dir, name)
     with open(path, "wb") as f:
         f.write(mdx_bytes)
-    task_id = service.start_import(app, path, name)
+    task_id = service.start_import(app, path, name, target)
     return _wait(task_id)
 
 
@@ -191,3 +191,109 @@ def test_lookup_candidates_order():
 
 def test_lookup_candidates_are_deduplicated():
     assert service.lookup_candidates("たのしい", "たのしい") == ["たのしい"]
+
+
+# ---------------------------------------------------------------------------
+# The pool: several dictionaries side by side
+# ---------------------------------------------------------------------------
+
+
+def test_a_second_dictionary_is_a_separate_file(app, app_context, dict_dirs):
+    _static, scratch = dict_dirs
+    _import(app, scratch, build_mdx(ENTRIES), target=service.DB_FILENAME)
+    other = [("안녕", "<div>你好</div>")]
+    _import(app, scratch, build_mdx(other), name="ko.mdx", target="ko_zh_basic.db")
+
+    # Each lookup only ever sees its own file.
+    assert service.lookup("たのしい") == "楽しい\n愉快yúkuài"
+    assert service.lookup("たのしい", None, "ko_zh_basic.db") is None
+    assert service.lookup("안녕", None, "ko_zh_basic.db") == "你好"
+    assert service.lookup("안녕") is None
+
+
+def test_list_installed_puts_the_phones_file_first(app, app_context, dict_dirs):
+    _static, scratch = dict_dirs
+    assert service.list_installed() == []
+
+    for target in ("zz_other.db", service.DB_FILENAME, "aa_other.db"):
+        _import(app, scratch, build_mdx(ENTRIES), name="fixture.mdx", target=target)
+
+    names = [d["filename"] for d in service.list_installed()]
+    assert names == [service.DB_FILENAME, "aa_other.db", "zz_other.db"]
+    assert service.list_installed()[0]["is_default"] is True
+
+
+def test_list_installed_ignores_files_that_are_not_dictionaries(
+    app, app_context, dict_dirs
+):
+    _static, scratch = dict_dirs
+    _import(app, scratch, build_mdx(ENTRIES))
+    with open(
+        os.path.join(service.dict_dir(), "notes.txt"), "w", encoding="utf-8"
+    ) as f:
+        f.write("not a dictionary")
+
+    assert [d["filename"] for d in service.list_installed()] == [service.DB_FILENAME]
+
+
+def test_remove_only_touches_the_named_dictionary(app, app_context, dict_dirs):
+    _static, scratch = dict_dirs
+    _import(app, scratch, build_mdx(ENTRIES), target="a.db")
+    _import(app, scratch, build_mdx(ENTRIES), name="b.mdx", target="b.db")
+
+    assert service.remove("a.db") is True
+    assert service.is_installed("a.db") is False
+    assert service.is_installed("b.db") is True
+    assert [d["filename"] for d in service.list_installed()] == ["b.db"]
+
+
+def test_an_unusable_name_never_touches_a_file(app_context, dict_dirs):
+    """
+    The name is stored per language and comes back through a form, so a
+    bad one must resolve to "no dictionary" -- not to a path outside the
+    pool, and not to the default file.
+    """
+    for bad in ("../secret.db", "/etc/passwd", ".hidden.db", "a/b.db", "a.txt"):
+        assert service.is_pool_name(bad) is False, bad
+        assert service.db_path(bad) is None, bad
+        assert service.is_installed(bad) is False, bad
+        assert service.lookup("x", None, bad) is None, bad
+        assert service.remove(bad) is False, bad
+        assert service.status(bad)["installed"] is False, bad
+
+
+def test_an_empty_name_does_not_fall_back_to_the_default(app, app_context, dict_dirs):
+    """
+    "" is what a language row holds when it has no dictionary.  It must
+    not resolve to the phone's file -- showing the Japanese dictionary
+    under a Korean book is the bug this setting exists to fix.
+    """
+    _static, scratch = dict_dirs
+    _import(app, scratch, build_mdx(ENTRIES))
+
+    assert service.is_installed(None) is True
+    assert service.is_pool_name("") is False
+    assert service.db_path("") is None
+    assert service.is_installed("") is False
+    assert service.lookup("たのしい", None, "") is None
+    assert service.remove("") is False
+
+
+def test_start_import_refuses_a_name_outside_the_pool(app_context, dict_dirs):
+    try:
+        service.start_import(None, "/tmp/nope.mdx", "nope.mdx", "../evil.db")
+    except ValueError as e:
+        assert "Not a dictionary file name" in str(e)
+    else:  # pragma: no cover
+        raise AssertionError("start_import accepted a name outside the pool")
+
+
+def test_suggested_filename_is_always_usable():
+    assert service.suggested_filename("shogakukan_v2.mdx") == "shogakukan_v2.db"
+    assert service.suggested_filename("/tmp/a/b.mdx") == "b.db"
+    # Spaces and non-ASCII collapse rather than failing validation.
+    assert service.suggested_filename("小学館 日本語.mdx") == "dictionary.db"
+    assert service.suggested_filename("My Dict (v2).mdx") == "My-Dict-v2.db"
+    assert service.suggested_filename("") == "dictionary.db"
+    for name in ("shogakukan_v2.db", "b.db", "dictionary.db", "My-Dict-v2.db"):
+        assert service.is_pool_name(name) is True, name
