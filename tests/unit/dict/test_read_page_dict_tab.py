@@ -123,6 +123,75 @@ def test_the_local_tab_url_carries_the_language_and_a_placeholder(
     assert f"/read/localdict/{japanese.id}/[LUTE]" in dicts
 
 
+def test_the_local_tab_can_go_last(client, app, app_context, dict_dirs, japanese):
+    """
+    The language's local_dict_position = 'last' appends the tab: a reader
+    who mostly lives in the online dictionaries does not have to click
+    past Local every time.  'first' (the default) is the old behaviour,
+    covered by test_the_local_dictionary_is_the_first_tab.
+    """
+    _import(app, dict_dirs[1], target=service.DB_FILENAME)
+    _use(japanese, service.DB_FILENAME)
+    japanese.local_dict_position = "last"
+    db.session.commit()
+    book = _make_book(japanese)
+
+    dicts = _term_dicts_json(client, book)
+
+    assert "/read/localdict/" in dicts
+    # The language's own dictionaries open the strip; Local trails.
+    assert dicts.index("jisho.org") < dicts.index("/read/localdict/")
+
+
+# --- the JSON lookup the term form's auto-fill uses -------------------------
+
+
+def test_the_lookup_endpoint_returns_the_gloss(
+    client, app, app_context, dict_dirs, japanese
+):
+    _import(app, dict_dirs[1], target=service.DB_FILENAME)
+    _use(japanese, service.DB_FILENAME)
+
+    data = client.get(
+        f"/read/localdict_lookup/{japanese.id}/{quote('たのしい')}"
+    ).get_json()
+
+    assert data["gloss"] is not None
+    assert "楽しい" in data["gloss"]
+
+
+def test_the_lookup_endpoint_uses_the_term_reading(
+    client, app, app_context, dict_dirs, japanese
+):
+    "A kanji spelling finds the kana-keyed entry, same as the Local tab."
+    _import(app, dict_dirs[1], target=service.DB_FILENAME)
+    _use(japanese, service.DB_FILENAME)
+    term = Term(japanese, "楽しい")
+    term.romanization = "たのしい"
+    db.session.add(term)
+    db.session.commit()
+
+    data = client.get(
+        f"/read/localdict_lookup/{japanese.id}/{quote('楽しい')}"
+    ).get_json()
+
+    assert "愉快yúkuài" in data["gloss"]
+
+
+def test_the_lookup_endpoint_returns_null_for_an_unknown_word(
+    client, app, app_context, dict_dirs, japanese
+):
+    "No entry: gloss null, the caller falls back to online translation."
+    _import(app, dict_dirs[1], target=service.DB_FILENAME)
+    _use(japanese, service.DB_FILENAME)
+
+    data = client.get(
+        f"/read/localdict_lookup/{japanese.id}/{quote('存在しない')}"
+    ).get_json()
+
+    assert data == {"gloss": None}
+
+
 def test_the_local_tab_frame_shows_the_gloss(
     client, app, app_context, dict_dirs, japanese
 ):

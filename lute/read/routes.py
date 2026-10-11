@@ -602,11 +602,16 @@ def _apply_media_page_cue_data(book, pagenum, new_text, cue_data):
 def _term_dicts_for(lang):
     """
     The reading page's dictionary tabs: the language's own dictionaries,
-    with the language's local dictionary (see lute/dict) in front when
-    it has one and that file is still installed.
+    with the language's local dictionary (see lute/dict) added when it
+    has one and that file is still installed.
 
-    It goes first because it is the only tab that works offline and the
-    only one that can say anything about a word with no translation yet.
+    Where the Local tab goes is the language's ``local_dict_position``:
+    'first' (the default, and the old hard-coded behaviour) puts it in
+    front -- it is the only tab that works offline and the only one that
+    can say anything about a word with no translation yet -- while
+    'last' appends it for readers who mostly live in the online
+    dictionaries.
+
     The tab names itself (``label``/``title``) -- its URL is a route on
     this server, not a hostname for dict-tabs.js to shorten.
 
@@ -616,15 +621,16 @@ def _term_dicts_for(lang):
     """
     dicts = list(LanguageRepository(db.session).all_dictionaries()[lang.id]["term"])
     if lang.local_dict and dict_service.is_installed(lang.local_dict):
-        dicts.insert(
-            0,
-            {
-                "url": f"/read/localdict/{lang.id}/[LUTE]",
-                "dicttype": "html",
-                "label": "Local",
-                "title": "This language's local dictionary",
-            },
-        )
+        entry = {
+            "url": f"/read/localdict/{lang.id}/[LUTE]",
+            "dicttype": "html",
+            "label": "Local",
+            "title": "This language's local dictionary",
+        }
+        if (lang.local_dict_position or "first") == "last":
+            dicts.append(entry)
+        else:
+            dicts.insert(0, entry)
     return dicts
 
 
@@ -727,6 +733,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         lang_id=lang.id,
         lang_code=get_lang_code_for(lang),
         translate_target_lang=(lang.translate_target_lang or ""),
+        term_translation_source=(lang.term_translation_source or "online"),
         track_page_open=track_page_open,
         term_dicts=term_dicts,
         book_type=book_type,
@@ -1553,6 +1560,26 @@ def local_dict(langid, text):
         text=text,
         gloss=gloss,
     )
+
+
+@bp.route("/localdict_lookup/<int:langid>/<text>", methods=["GET"])
+def local_dict_lookup(langid, text):
+    """
+    The local dictionary's entry for a term, as JSON.
+
+    The term form's auto-fill uses this when the language's
+    ``term_translation_source`` is 'local_dict': the dictionary's own
+    definition is often the better answer than machine translation.
+    Same lookup rules as the Local tab (/read/localdict): the term text,
+    never creating a term, reading resolved so a kanji spelling can find
+    a kana-keyed entry.  ``gloss`` is null when the dictionary has no
+    entry -- the caller falls back to online translation.
+    """
+    lang = db.session.get(Language, langid)
+    gloss = None
+    if lang is not None and lang.local_dict:
+        gloss = dict_service.lookup(text, _reading_for(langid, text), lang.local_dict)
+    return jsonify({"gloss": gloss})
 
 
 @bp.route("/flashcopied", methods=["GET"])
