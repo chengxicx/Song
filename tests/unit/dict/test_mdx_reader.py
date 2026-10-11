@@ -63,6 +63,30 @@ def test_entries_are_streamed_in_file_order():
     assert parsed == entries
 
 
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"version": "2.0", "encoding": "UTF-8", "compress": 0},
+        {"version": "2.0", "encoding": "UTF-16", "compress": 2},
+        {"version": "1.2", "encoding": "UTF-8", "compress": 0},
+        {"version": "1.2", "encoding": "UTF-16", "compress": 2},
+    ],
+)
+def test_the_record_terminator_never_reaches_the_definition(kwargs):
+    """
+    Every record ends with a NUL terminator, and the record slice runs to
+    the *next* record's start -- so the terminator lands inside the text
+    the reader decodes.  str.strip() does not remove a NUL, so a reader
+    that forgets hands every definition a trailing "\\x00"; that is what
+    shipped, and the fixture hid it by not writing terminators at all.
+    mdict_utils strips it in MDX._treat_record_data.
+    """
+    _title, _version, _count, entries = _read(ENTRIES, **kwargs)
+
+    assert entries == ENTRIES
+    assert not any("\x00" in definition for _key, definition in entries)
+
+
 def test_from_file_reads_the_same_thing():
     # Not tmp_path: the sandbox this repo is developed in cannot create
     # directories under the system temp root, so the fixture file goes
