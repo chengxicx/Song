@@ -99,6 +99,11 @@
 <script type="text/javascript" src="{{ vstatic('vendor/dayjs/relativeTime.js') }}" defer charset="utf-8"></script>
 <script type="text/javascript" src="{{ vstatic('js/book-type-icons.js') }}" defer charset="utf-8"></script>
 <script type="text/javascript" src="{{ vstatic('js/book-listing-shared.js') }}" defer charset="utf-8"></script>
+{# ^ deferred, so it executes AFTER the inline script below, which defines
+   the real setTagFilter / setNewWordFilter / setTypeFilter.  Anything in
+   the shared file that declares those names at top level would clobber
+   them (it must provide guarded defaults instead) -- that is why the tag,
+   new-word and type click-filters once did nothing. #}
 <script>
   var thresholds = [
   { l: 's', r: 1 },

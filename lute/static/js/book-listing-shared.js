@@ -9,14 +9,31 @@
 /* Tag / new-word / type filter state; the home page's setTagFilter /
    setNewWordFilter / setTypeFilter keep these updated.  Defined here so
    the shared renderers work on pages without the filter header. */
-var currentTagFilter = "";
-var currentNewWordFilter = "";
-var currentTypeFilter = "";
+var currentTagFilter = window.currentTagFilter || "";
+var currentNewWordFilter = window.currentNewWordFilter || "";
+var currentTypeFilter = window.currentTypeFilter || "";
 
-/* No-op defaults; the home page overrides all of these. */
-function setTagFilter(tag) {}
-function setNewWordFilter(filter) {}
-function setTypeFilter(btype) {}
+/*
+ * No-op defaults; the home page (book/tablelisting.html) defines the real
+ * ones in its own inline <script>.
+ *
+ * These MUST NOT be plain top-level declarations.  The home page loads
+ * this file with `defer`, so it runs *after* that inline script, and a
+ * top-level `function setTagFilter(tag) {}` here replaces the global
+ * binding the page just created -- silently turning every tag / new-word /
+ * type click into a no-op (the click handlers below are the shared file's
+ * own, so they call the stub).  Only install a default when the page has
+ * not supplied one.  Pinned by tests/unit/book/test_book_listing_shared_js.py.
+ */
+if (typeof window.setTagFilter !== "function") {
+  window.setTagFilter = function (tag) {};
+}
+if (typeof window.setNewWordFilter !== "function") {
+  window.setNewWordFilter = function (filter) {};
+}
+if (typeof window.setTypeFilter !== "function") {
+  window.setTypeFilter = function (btype) {};
+}
 
 let render_tag_list = function(data, type, row, meta) {
   if (!data) return '';
