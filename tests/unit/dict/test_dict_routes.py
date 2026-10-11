@@ -173,6 +173,20 @@ def test_remove_without_a_name_is_refused(
     assert "No dictionary named" in json.loads(resp.data)["message"]
 
 
+def _language_reads(language, filename):
+    "Give the language a Local dictionary row reading this pool file."
+    from lute.models.language import LanguageDictionary
+
+    d = LanguageDictionary()
+    d.usefor = "terms"
+    d.dicttype = "localdict"
+    d.dicturi = filename
+    d.is_active = True
+    d.sort_order = 0
+    language.dictionaries.append(d)
+    db.session.commit()
+
+
 def test_remove_refuses_a_dictionary_a_language_still_reads(
     client, app_context, dict_dirs, japanese
 ):  # pylint: disable=unused-argument
@@ -180,8 +194,7 @@ def test_remove_refuses_a_dictionary_a_language_still_reads(
         "task_id"
     ]
     _wait_for_import(client, task_id)
-    japanese.local_dict = "a.db"
-    db.session.commit()
+    _language_reads(japanese, "a.db")
 
     resp = client.post("/dict/remove", data={"name": "a.db"})
 
@@ -200,8 +213,7 @@ def test_remove_with_force_deletes_it_anyway(
         "task_id"
     ]
     _wait_for_import(client, task_id)
-    japanese.local_dict = "a.db"
-    db.session.commit()
+    _language_reads(japanese, "a.db")
 
     body = json.loads(
         client.post("/dict/remove", data={"name": "a.db", "force": "1"}).data

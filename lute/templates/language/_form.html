@@ -66,59 +66,61 @@
       </td>
     </tr>
 
-    {# --- Local (MDX) dictionary. ------------------------------------------
+    {# --- Local (MDX) dictionaries. ----------------------------------------
        The dictionaries themselves live on the server -- a pool in
        <static>/dict/, managed on the settings page (see lute/dict).  A
-       language only picks one, so the choices are built in routes.py.
+       language uses one or more of them via rows of type "Local" in the
+       dictionary list above; the row's URL is the pool file name, and
+       the tabs order and hide like every other dictionary's.
     ---------------------------------------------------------------------- #}
     <tr>
       <td colspan="2">
-        <h3 style="margin-top:14px; margin-bottom:6px;">Local dictionary (MDX)</h3>
+        <h3 style="margin-top:14px; margin-bottom:6px;">Local dictionaries (MDX)</h3>
       </td>
     </tr>
     <tr>
       <td style="vertical-align: top;">
-        {{ form.local_dict.label(class="form-control-label") }}
         <div style="color:#666; font-size:0.85em; max-width:24em;">
-          {% if form.local_dict.choices|length > 1 %}
-          Shown in the reading page's <b>Local</b> dictionary tab and, if the
-          box below is checked, in the term popup &mdash; for words Lute has no
-          translation for yet.
+          {% if dict_pool_files %}
+          Add rows of type <b>Local</b> to the dictionary list above.  The
+          row's URL is a pool file name (the input suggests the installed
+          ones), the tab shows in the list's order, and &mdash; if the box
+          below is checked &mdash; the first matching entry also appears in
+          the term popup for words Lute has no translation for yet.
           {% else %}
           No dictionary has been imported on this server yet.  Add one in
-          <a href="/settings/index">Settings</a>.
+          <a href="/settings/index">Settings</a>, then add rows of type
+          <b>Local</b> to the dictionary list above.
           {% endif %}
         </div>
       </td>
-      <td>{{ form.local_dict(class="form-control") }}</td>
+      <td>
+        {% if dict_pool_files %}
+        <datalist id="dict-pool-files">
+          {% for f in dict_pool_files %}
+          <option value="{{ f }}"></option>
+          {% endfor %}
+        </datalist>
+        {% endif %}
+      </td>
     </tr>
     <tr>
       <td style="vertical-align: top;">
         {{ form.term_popup_show_dict_gloss.label(class="form-control-label") }}
         <div style="color:#666; font-size:0.85em; max-width:24em;">
-          Adds the definition to the popup as well.  The dictionary tab is
-          unaffected.
+          Adds the definition to the popup as well (first local dictionary
+          with an entry wins).  The dictionary tabs are unaffected.
         </div>
       </td>
       <td>{{ form.term_popup_show_dict_gloss() }}</td>
     </tr>
     <tr>
       <td style="vertical-align: top;">
-        {{ form.local_dict_position.label(class="form-control-label") }}
-        <div style="color:#666; font-size:0.85em; max-width:24em;">
-          Where the reading page's dictionary strip puts the
-          <b>Local</b> tab.
-        </div>
-      </td>
-      <td>{{ form.local_dict_position(class="form-control") }}</td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">
         {{ form.term_translation_source.label(class="form-control-label") }}
         <div style="color:#666; font-size:0.85em; max-width:24em;">
           What auto-fills a new term's translation.  <b>Local dictionary</b>
-          uses this language's dictionary above first, and falls back to
-          online translation when it has no entry.
+          tries this language's Local dictionaries in tab order, and falls
+          back to online translation when none has an entry.
         </div>
       </td>
       <td>{{ form.term_translation_source(class="form-control") }}</td>
@@ -126,7 +128,7 @@
 
     {% set _kiwi_fields = ('kiwi_tokenizer_mode', 'kiwi_stemming', 'kiwi_filter_particles', 'kiwi_join_compound_nouns') %}
     {# Fields rendered by a hand-written block below, not by the loop. #}
-    {% set _custom_fields = ('hidden_grammar_levels', 'local_dict', 'term_popup_show_dict_gloss', 'local_dict_position', 'term_translation_source') %}
+    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'term_translation_source') %}
     {% for field in form %}
     {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields and field.name not in _custom_fields %}
     <tr>
@@ -429,6 +431,17 @@ if not, change the type to "Pop-up window".</p>
       case 'embeddedhtml':
         test_embedded_dict_lookup(testurl);
         break;
+      case 'localdict': {
+        // A Local row's URL is a pool file name; test it through the
+        // server route that serves one local dictionary's entry.
+        const langid = {{ language.id or 0 }};
+        if (!langid) {
+          alert('Save the language first, then test its Local dictionaries.');
+          break;
+        }
+        test_embedded_dict_lookup(`/read/localdict/${langid}/${encodeURIComponent(dicturi)}/test`);
+        break;
+      }
       default:
         alert(`Unhandled dict type ${dict_type}, don't know how to test!`);
       }

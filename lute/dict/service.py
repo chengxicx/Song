@@ -21,9 +21,10 @@ Every converted file lives in one folder inside the static folder -- a
 The name ``ja_zh_shogakukan_v2.db`` is special only in that it is the
 file the phone's default download URL points at, so a phone pointed at
 this server picks that one up with no configuration.  Any other
-``*.db`` in the folder is usable too; a language chooses one of them by
-file name (``Language.local_dict``), and an empty choice means that
-language has no local dictionary.
+``*.db`` in the folder is usable too; a language uses any of them via
+'localdict' rows in its dictionary list (``LanguageDictionary`` with
+``dicttype == "localdict"``, the dicturi holding the file name), and a
+language with no such rows has no local dictionary.
 
 Every function here takes the file name as its last argument, and
 ``None`` means "the default one" -- the phone's file.  The name always

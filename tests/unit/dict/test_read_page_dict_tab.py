@@ -1,12 +1,11 @@
 """
-The reading page's local dictionary tab.
+The reading page's local dictionary tabs.
 
 The bottom dictionary strip is built in the browser from
 LUTE_TERM_DICTS, which the server fills in (see _term_dicts_for in
-lute/read/routes.py).  The local dictionary is one file out of the
-server's pool, chosen *per language* (Language.local_dict), so these
-tests cover the injection, the language's own choice, the tab's label,
-and the frame the tab loads.
+lute/read/routes.py).  Local dictionaries are 'localdict' rows in the
+language's regular dictionary list (Language.active_dict_uris converts
+them), so several are allowed and they order with the online tabs.
 """
 
 import os
@@ -15,6 +14,7 @@ from urllib.parse import quote
 
 from lute.db import db
 from lute.dict import service
+from lute.models.language import LanguageDictionary
 from lute.models.term import Term
 
 from tests.utils import make_book
@@ -42,11 +42,23 @@ def _import(app, scratch, entries=ENTRIES, name="fixture.mdx", target=None):
     raise AssertionError("import never finished")
 
 
-def _use(language, filename):
-    "Point a language at one of the pool's dictionaries."
-    language.local_dict = filename
+def _add_local(language, filename, order=0, hidden=False):
+    "Give the language a local dictionary row (the tab's sort position)."
+    d = LanguageDictionary()
+    d.usefor = "terms"
+    d.dicttype = "localdict"
+    d.dicturi = filename
+    d.is_active = True
+    d.is_hidden = hidden
+    d.sort_order = order
+    language.dictionaries.append(d)
     db.session.commit()
-    return language
+    return d
+
+
+def _use(language, filename, order=0):
+    "Point a language at one of the pool's dictionaries."
+    return _add_local(language, filename, order=order)
 
 
 def _make_book(language):
@@ -66,52 +78,55 @@ def _term_dicts_json(client, book):
 
 def test_no_local_tab_without_a_dictionary(client, app_context, dict_dirs, japanese):
     book = _make_book(japanese)
-    assert "localdict" not in _term_dicts_json(client, book)
+    assert "/read/localdict/" not in _term_dicts_json(client, book)
 
 
-def test_no_local_tab_when_the_language_has_not_chosen_one(
+def test_no_local_tab_when_the_language_has_no_local_row(
     client, app, app_context, dict_dirs, japanese
 ):
     """
     An imported dictionary on its own is not enough: the language has to
-    pick it.  Otherwise a Korean language would be offered the Japanese
-    dictionary again, which is what the setting replaces.
+    have a Local dictionary row.  Otherwise a Korean language would be
+    offered the Japanese dictionary again, which is what the rows
+    replace.
     """
     _import(app, dict_dirs[1], target=service.DB_FILENAME)
     book = _make_book(japanese)
 
-    assert "localdict" not in _term_dicts_json(client, book)
+    assert "/read/localdict/" not in _term_dicts_json(client, book)
 
 
 def test_no_local_tab_when_the_chosen_file_is_gone(
     client, app, app_context, dict_dirs, japanese
 ):
-    "The language's file was removed from the pool: no tab, no crash."
+    "The row's file was removed from the pool: no tab, no crash."
     _import(app, dict_dirs[1], target="gone.db")
     _use(japanese, "gone.db")
     service.remove("gone.db")
     book = _make_book(japanese)
 
-    assert "localdict" not in _term_dicts_json(client, book)
+    assert "/read/localdict/" not in _term_dicts_json(client, book)
 
 
-def test_the_local_dictionary_is_the_first_tab(
+def test_the_local_dictionary_can_be_the_first_tab(
     client, app, app_context, dict_dirs, japanese
 ):
+    "A Local row at sort order 0 opens the strip (the offline-capable tab)."
     _import(app, dict_dirs[1], target=service.DB_FILENAME)
-    _use(japanese, service.DB_FILENAME)
+    _use(japanese, service.DB_FILENAME, order=0)
     book = _make_book(japanese)
 
     dicts = _term_dicts_json(client, book)
 
     assert "/read/localdict/" in dicts
-    # First, so the one tab that works offline is the default lookup.
     assert dicts.strip().startswith("[{")
     assert "/read/localdict/" in dicts[: dicts.index("}")]
-    assert "'label': 'Local'" in dicts
+    # The tab names itself after the dictionary, not a generic "Local".
+    assert "'label'" in dicts
+    assert "jisho.org" not in dicts[: dicts.index("}")]
 
 
-def test_the_local_tab_url_carries_the_language_and_a_placeholder(
+def test_the_local_tab_url_carries_the_language_file_and_placeholder(
     client, app, app_context, dict_dirs, japanese
 ):
     _import(app, dict_dirs[1], target=service.DB_FILENAME)
@@ -120,27 +135,45 @@ def test_the_local_tab_url_carries_the_language_and_a_placeholder(
 
     dicts = _term_dicts_json(client, book)
 
-    assert f"/read/localdict/{japanese.id}/[LUTE]" in dicts
+    assert f"/read/localdict/{japanese.id}/{service.DB_FILENAME}/[LUTE]" in dicts
 
 
-def test_the_local_tab_can_go_last(client, app, app_context, dict_dirs, japanese):
+def test_local_tabs_follow_the_row_order(client, app, app_context, dict_dirs, japanese):
     """
-    The language's local_dict_position = 'last' appends the tab: a reader
-    who mostly lives in the online dictionaries does not have to click
-    past Local every time.  'first' (the default) is the old behaviour,
-    covered by test_the_local_dictionary_is_the_first_tab.
+    Several local dictionaries per language, positioned by drag-and-drop
+    like the online tabs: order 0 opens the strip, order 99 trails it.
     """
     _import(app, dict_dirs[1], target=service.DB_FILENAME)
-    _use(japanese, service.DB_FILENAME)
-    japanese.local_dict_position = "last"
+    _import(
+        app,
+        dict_dirs[1],
+        entries=[("たのしい", "<div>第二本词典</div>")],
+        name="second.mdx",
+        target="second.db",
+    )
+    _use(japanese, service.DB_FILENAME, order=0)
+    _use(japanese, "second.db", order=99)
+    book = _make_book(japanese)
+
+    dicts = _term_dicts_json(client, book)
+
+    first = dicts.index(f"/read/localdict/{japanese.id}/{service.DB_FILENAME}/")
+    online = dicts.index("jisho.org")
+    second = dicts.index(f"/read/localdict/{japanese.id}/second.db/")
+    assert first < online < second
+
+
+def test_a_hidden_local_row_offers_no_tab(
+    client, app, app_context, dict_dirs, japanese
+):
+    _import(app, dict_dirs[1], target=service.DB_FILENAME)
+    # The relationship sorts by sort_order, so keep the row object.
+    row = _use(japanese, service.DB_FILENAME)
+    row.is_hidden = True
     db.session.commit()
     book = _make_book(japanese)
 
-    dicts = _term_dicts_json(client, book)
-
-    assert "/read/localdict/" in dicts
-    # The language's own dictionaries open the strip; Local trails.
-    assert dicts.index("jisho.org") < dicts.index("/read/localdict/")
+    assert "/read/localdict/" not in _term_dicts_json(client, book)
 
 
 # --- the JSON lookup the term form's auto-fill uses -------------------------
@@ -158,6 +191,30 @@ def test_the_lookup_endpoint_returns_the_gloss(
 
     assert data["gloss"] is not None
     assert "楽しい" in data["gloss"]
+
+
+def test_the_lookup_endpoint_tries_the_dictionaries_in_tab_order(
+    client, app, app_context, dict_dirs, japanese
+):
+    "Two local dictionaries: the first one with an entry answers."
+    # The tab-order-first dictionary has no たのしい entry.
+    _import(
+        app,
+        dict_dirs[1],
+        entries=[("ひさしぶり", "<div>好久不见</div>")],
+        name="narrow.mdx",
+        target="narrow.db",
+    )
+    _import(app, dict_dirs[1], target="wide.db")
+    _use(japanese, "narrow.db", order=0)
+    _use(japanese, "wide.db", order=1)
+
+    data = client.get(
+        f"/read/localdict_lookup/{japanese.id}/{quote('たのしい')}"
+    ).get_json()
+
+    assert "楽しい" in data["gloss"]
+    assert "好久不见" not in data["gloss"]
 
 
 def test_the_lookup_endpoint_uses_the_term_reading(
@@ -192,6 +249,9 @@ def test_the_lookup_endpoint_returns_null_for_an_unknown_word(
     assert data == {"gloss": None}
 
 
+# --- the frame the tab loads ------------------------------------------------
+
+
 def test_the_local_tab_frame_shows_the_gloss(
     client, app, app_context, dict_dirs, japanese
 ):
@@ -205,6 +265,52 @@ def test_the_local_tab_frame_shows_the_gloss(
     assert "楽しい" in html
     assert "愉快yúkuài" in html
     assert "Not in the installed dictionary" not in html
+
+
+def test_the_named_tab_frame_serves_that_one_dictionary(
+    client, app, app_context, dict_dirs, japanese
+):
+    "The 3-segment URL names the pool file, so each tab reads its own db."
+    _import(app, dict_dirs[1], target=service.DB_FILENAME)
+    _import(
+        app,
+        dict_dirs[1],
+        entries=[("たのしい", "<div>第二本词典</div>")],
+        name="second.mdx",
+        target="second.db",
+    )
+    _use(japanese, service.DB_FILENAME, order=0)
+    _use(japanese, "second.db", order=1)
+
+    first = client.get(
+        f"/read/localdict/{japanese.id}/{service.DB_FILENAME}/{quote('たのしい')}"
+    ).data.decode("utf-8")
+    second = client.get(
+        f"/read/localdict/{japanese.id}/second.db/{quote('たのしい')}"
+    ).data.decode("utf-8")
+
+    assert "愉快yúkuài" in first
+    assert "第二本词典" not in first
+    assert "第二本词典" in second
+    assert "愉快yúkuài" not in second
+
+
+def test_the_named_tab_frame_refuses_an_out_of_pool_name(
+    client, app, app_context, dict_dirs, japanese
+):
+    "The file name lands in filesystem paths: pool names only."
+
+    # A name with a separator never even routes (werkzeug 404s the
+    # traversal); a malformed name routes but matches no pool file.
+    resp = client.get(
+        f"/read/localdict/{japanese.id}/..%2Fescape/{quote('たのしい')}"
+    )
+    assert resp.status_code == 404
+
+    html = client.get(
+        f"/read/localdict/{japanese.id}/bad%2Aname.db/{quote('たのしい')}"
+    ).data.decode("utf-8")
+    assert "Not in the installed dictionary" in html
 
 
 def test_the_local_tab_frame_uses_the_term_reading(
@@ -225,10 +331,10 @@ def test_the_local_tab_frame_uses_the_term_reading(
     assert "愉快yúkuài" in html
 
 
-def test_the_frame_reads_the_languages_own_dictionary(
+def test_the_frame_reads_the_languages_own_dictionaries(
     client, app, app_context, dict_dirs, japanese
 ):
-    "Two dictionaries, and the language's choice decides which one answers."
+    "The pre-multi-dictionary URL answers from the language's own rows."
     _import(app, dict_dirs[1], target="ja.db")
     _import(
         app,
