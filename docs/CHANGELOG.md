@@ -40,8 +40,14 @@ Feature changes:
   default download URL working with no setup.  A dictionary can also be built
   ahead of time with `python tools/mdx_to_sqlite.py <file.mdx> <out.db>`.
   MDict 1.2/2.0 files are supported with no block compression, zlib or LZO1X,
-  in UTF-8, UTF-16 or GB18030; encrypted files and MDict 3.0 record sections
-  are not.
+  in UTF-8, UTF-16 or GB18030, including the export-locked ones
+  (`Encrypted="2"`, MDict's "Allow export to text" left unchecked -- the New
+  Century Japanese-Chinese dictionary on mdict.org is one); files locked
+  with a registration code and MDict 3.0 record sections are still not.
+  MDict redirect entries (`@@@LINK=`) are resolved to their target's entry
+  at conversion, so a dictionary that leans on them (the New Century one
+  redirects 62% of its headwords) reads normally instead of showing the raw
+  redirect text.
 
 Bugfixes:
 

@@ -9,6 +9,7 @@ writes, so the two paths must not drift.
 """
 
 import os
+import re
 import sqlite3
 import uuid
 
@@ -24,6 +25,66 @@ PROGRESS_EVERY = 2000
 
 # Rows per commit.
 _BATCH_SIZE = 4000
+
+# MDict redirect entries: the whole definition is a pointer at another
+# entry's key.  Bilingual dictionaries lean on them heavily -- the New
+# Century Japanese-Chinese dictionary redirects 62% of its headwords
+# (みひらき -> みひらき【見開き】) -- and a dictionary converted without
+# resolving them shows the raw "@@@LINK=..." text in the popup for
+# every one of those headwords.
+_REDIRECT_PREFIX = "@@@LINK="
+_REDIRECT_RE = re.compile(r"^@@@LINK=(.*)$", re.S)
+
+
+def _resolve_redirects(conn):
+    """
+    Point every ``@@@LINK=<key>`` headword at the entry it redirects
+    to, in place, as UPDATEs over the terms table.
+
+    Runs after the tables are built.  Repointing the headword (rather
+    than copying the target's definition text under the redirect's own
+    entry) keeps the deduplication the converter already does: the New
+    Century dictionary redirects 62% of its headwords, and copying
+    would store every one of those definitions twice.
+
+    Repeated until a pass changes nothing: that resolves the rare
+    redirect chains -- two hops in the whole New Century dictionary --
+    and stops on a cycle or a dangling target instead of spinning.
+    Anything left unresolved keeps its raw text.  Entries no headword
+    points at (the redirect definitions, once repointed away from) are
+    dropped at the end.
+    """
+    while True:
+        rows = conn.execute(
+            "SELECT terms.word, entries.def FROM terms"
+            " JOIN entries ON entries.eid = terms.eid"
+            " WHERE substr(entries.def, 1, 8) = ?",
+            (_REDIRECT_PREFIX,),
+        ).fetchall()
+        if not rows:
+            break
+        changed = 0
+        for word, definition in rows:
+            match = _REDIRECT_RE.match(definition)
+            if match is None:
+                continue
+            target = conn.execute(
+                "SELECT terms.eid FROM terms"
+                " JOIN entries ON entries.eid = terms.eid"
+                " WHERE terms.word = ?"
+                "   AND substr(entries.def, 1, 8) != ?"
+                " LIMIT 1",
+                (match.group(1).strip(), _REDIRECT_PREFIX),
+            ).fetchone()
+            if target is None:
+                # Dangling target, or the target is itself still a
+                # redirect (a later pass resolves it): leave as found.
+                continue
+            conn.execute("UPDATE terms SET eid = ? WHERE word = ?", (target[0], word))
+            changed += 1
+        if changed == 0:
+            break
+    conn.execute("DELETE FROM entries WHERE eid NOT IN (SELECT eid FROM terms)")
 
 
 def convert(  # pylint: disable=too-many-locals,too-many-statements
@@ -97,7 +158,9 @@ def convert(  # pylint: disable=too-many-locals,too-many-statements
                         flush()
                 flush()
                 conn.commit()
-                entries = len(eid_by_def)
+                _resolve_redirects(conn)
+                conn.commit()
+                entries = conn.execute("SELECT COUNT(*) FROM entries").fetchone()[0]
             finally:
                 conn.close()
 
