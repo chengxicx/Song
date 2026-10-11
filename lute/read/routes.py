@@ -1551,7 +1551,10 @@ def local_dict_file(langid, filename, text):
     return render_template(
         "read/localdict.html",
         text=text,
-        gloss=gloss,
+        # The card's head is the term; the definition need not open
+        # by repeating it (an entry reached through its reading keeps
+        # its own headword -- see strip_duplicate_headword).
+        gloss=dict_service.strip_duplicate_headword(gloss, text),
     )
 
 
@@ -1567,7 +1570,7 @@ def local_dict(langid, text):
     return render_template(
         "read/localdict.html",
         text=text,
-        gloss=gloss,
+        gloss=dict_service.strip_duplicate_headword(gloss, text),
     )
 
 

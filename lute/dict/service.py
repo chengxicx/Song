@@ -326,6 +326,39 @@ def lookup(term, reading=None, filename=None):
         conn.close()
 
 
+# A converted definition leads with the dictionary's own headword --
+# "目覚まし時計【めざましどけい⑤】" -- and every reader that shows a
+# gloss shows the looked-up word above it, so that line is pure
+# repetition there.  Only that exact line is ever dropped.
+_HEADWORD_LINE_REST_RE = re.compile(r"\s*(?:【[^】]*】)?\s*")
+
+
+def strip_duplicate_headword(gloss, text):
+    """
+    ``gloss`` without its first line, when that line only restates
+    ``text`` -- the headword plus an optional 【reading】 annotation.
+
+    The definition comes back unchanged when its first line is
+    anything else: a different headword (the entry was found through
+    its reading, so its own headword is part of the answer), a part
+    of speech, or the definition itself.  A dictionary whose entries
+    do not lead with the headword therefore loses nothing, and
+    neither does one whose entry is nothing but the headword.
+    """
+    if not gloss or not text:
+        return gloss
+    lines = gloss.split("\n")
+    key = text.replace(_ZERO_WIDTH_SPACE, "").strip()
+    first = lines[0].replace(_ZERO_WIDTH_SPACE, "").strip()
+    if not key or not first.startswith(key):
+        return gloss
+    if _HEADWORD_LINE_REST_RE.fullmatch(first[len(key) :]) is None:
+        return gloss
+    if not any(line.strip() for line in lines[1:]):
+        return gloss
+    return "\n".join(lines[1:])
+
+
 # ---------------------------------------------------------------------------
 # Import
 # ---------------------------------------------------------------------------
