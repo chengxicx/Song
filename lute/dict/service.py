@@ -282,13 +282,45 @@ def lookup_candidates(term, reading):
     return words
 
 
+# Trailing accent numbers on a reading: 下【もと②】's key may drop the ②.
+_ACCENT_RE = re.compile(r"[①-⑳]+$")
+
+
+def _homograph_candidates(term, reading):
+    """
+    The words to try when a cross-reference named a specific reading:
+    reading-qualified keys first, the bare term last.
+
+    A homograph disambiguation entry (下 as a whole) is itself keyed on
+    the bare term, so with an explicit reading in hand the composite
+    keys (下【か】, 下(か), the reading alone) must all outrank it --
+    otherwise the lookup just re-serves the same list the reader came
+    from.  Accented and unaccented readings are both tried, since
+    dictionaries vary on whether the key carries the accent mark.
+    """
+    words = []
+
+    def add(word):
+        word = (word or "").replace(_ZERO_WIDTH_SPACE, "").strip()
+        if word and word not in words:
+            words.append(word)
+
+    stripped = _ACCENT_RE.sub("", reading)
+    for r in dict.fromkeys([reading, stripped]):
+        add(f"{term}【{r}】")
+        add(f"{term}({r})")
+        add(r)
+    add(term)
+    return words
+
+
 def _connect_read_only(path):
     "Read-only sqlite3 connection to the published dictionary."
     uri = f"file:{urllib.request.pathname2url(path)}?mode=ro"
     return sqlite3.connect(uri, uri=True)
 
 
-def lookup(term, reading=None, filename=None):
+def lookup(term, reading=None, filename=None, prefer_reading=False):
     """
     The definition for ``term`` in one pool dictionary, or None.  Never
     raises: a missing, unusable or damaged dictionary simply means no
@@ -298,8 +330,15 @@ def lookup(term, reading=None, filename=None):
     language in hand must pass it -- falling back to the default
     dictionary is how the *old* single-dictionary code ended up serving
     the Japanese dictionary under a Korean book.
+
+    ``prefer_reading``: the reading is known to pick out one specific
+    entry (a clicked cross-reference), so reading-qualified keys are
+    tried before the bare term -- see _homograph_candidates.
     """
-    candidates = lookup_candidates(term, reading)
+    if prefer_reading and (reading or "").strip():
+        candidates = _homograph_candidates(term, reading)
+    else:
+        candidates = lookup_candidates(term, reading)
     if not candidates:
         return None
     path = db_path(filename)

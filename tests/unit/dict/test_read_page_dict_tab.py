@@ -331,6 +331,53 @@ def test_the_local_tab_frame_uses_the_term_reading(
     assert "愉快yúkuài" in html
 
 
+def test_xref_links_carry_their_reading(
+    client, app, app_context, dict_dirs, japanese
+):
+    "The rendered See-also links pass the reading back as a query param."
+    _import(
+        app,
+        dict_dirs[1],
+        entries=[("ありがとう", "<div>See also: 有り難う【ありがとう②】</div>")],
+        target=service.DB_FILENAME,
+    )
+    _use(japanese, service.DB_FILENAME)
+
+    html = client.get(
+        f"/read/localdict/{japanese.id}/{quote('ありがとう')}"
+    ).data.decode("utf-8")
+
+    assert "ld-xref" in html
+    assert "?reading=" in html
+
+
+def test_an_xref_click_resolves_the_homograph(
+    client, app, app_context, dict_dirs, japanese
+):
+    "下【か】's link must land on the か entry, not the same list again."
+    _import(
+        app,
+        dict_dirs[1],
+        entries=[
+            ("下", "<div>See also: 下【か】</div>"),
+            ("下【か】", "<div>下级。（位が下のもの。）</div>"),
+        ],
+        target=service.DB_FILENAME,
+    )
+    _use(japanese, service.DB_FILENAME)
+
+    plain = client.get(
+        f"/read/localdict/{japanese.id}/{quote('下')}"
+    ).data.decode("utf-8")
+    clicked = client.get(
+        f"/read/localdict/{japanese.id}/{quote('下')}?reading=か"
+    ).data.decode("utf-8")
+
+    assert '<a class="ld-xref"' in plain  # the disambiguation list of links
+    assert "位が下のもの" in clicked
+    assert '<a class="ld-xref"' not in clicked
+
+
 def test_the_frame_reads_the_languages_own_dictionaries(
     client, app, app_context, dict_dirs, japanese
 ):
