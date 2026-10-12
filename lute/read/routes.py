@@ -1516,17 +1516,23 @@ def term_popup(termid):
     )
 
 
-def _local_gloss(lang, langid, text):
+def _local_gloss(lang, langid, text, reading=None):
     """
     The first gloss for ``text`` across the language's local
     dictionaries, in tab order -- or None when the language has none or
     none of them has an entry.
+
+    ``reading`` is an explicit xref reading: it outranks the term's
+    stored reading and makes the lookup prefer reading-qualified keys
+    (a homograph's See-also list must not win over its target).
     """
     if lang is None:
         return None
-    reading = _reading_for(langid, text)
+    use_reading = reading or _reading_for(langid, text)
     for filename in lang.local_dict_files():
-        gloss = dict_service.lookup(text, reading, filename)
+        gloss = dict_service.lookup(
+            text, use_reading, filename, prefer_reading=bool(reading)
+        )
         if gloss:
             return gloss
     return None
@@ -1546,9 +1552,15 @@ def local_dict_file(langid, filename, text):
     validated before it is joined onto the pool folder.
     """
     lang = db.session.get(Language, langid)
+    xref_reading = request.args.get("reading")
     gloss = None
     if lang is not None and dict_service.is_pool_name(filename):
-        gloss = dict_service.lookup(text, _reading_for(langid, text), filename)
+        gloss = dict_service.lookup(
+            text,
+            xref_reading or _reading_for(langid, text),
+            filename,
+            prefer_reading=bool(xref_reading),
+        )
     return render_template(
         "read/localdict.html",
         text=text,
@@ -1568,10 +1580,11 @@ def local_dict(langid, text):
     """
     The language's local dictionary entry for a term -- the pre-multi-
     dictionary URL, kept working: it answers from the language's local
-    dictionaries in tab order, like _local_gloss.
+    dictionaries in tab order, like _local_gloss.  The xref links in
+    the rendered card come back here with ?reading= set.
     """
     lang = db.session.get(Language, langid)
-    gloss = _local_gloss(lang, langid, text)
+    gloss = _local_gloss(lang, langid, text, reading=request.args.get("reading"))
     stripped = dict_service.strip_duplicate_headword(gloss, text)
     return render_template(
         "read/localdict.html",
