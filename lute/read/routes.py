@@ -55,6 +55,7 @@ from lute.read.render.grammar_levels import filter_hidden_grammar
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
 from lute.dict import service as dict_service
+from lute.dict import gloss_format
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form, serialize_term_form_data
 from lute.settings.current import current_settings
@@ -1555,6 +1556,10 @@ def local_dict_file(langid, filename, text):
         # by repeating it (an entry reached through its reading keeps
         # its own headword -- see strip_duplicate_headword).
         gloss=dict_service.strip_duplicate_headword(gloss, text),
+        blocks=gloss_format.parse_gloss(
+            dict_service.strip_duplicate_headword(gloss, text)
+        ),
+        langid=langid,
     )
 
 
@@ -1567,10 +1572,13 @@ def local_dict(langid, text):
     """
     lang = db.session.get(Language, langid)
     gloss = _local_gloss(lang, langid, text)
+    stripped = dict_service.strip_duplicate_headword(gloss, text)
     return render_template(
         "read/localdict.html",
         text=text,
-        gloss=dict_service.strip_duplicate_headword(gloss, text),
+        gloss=stripped,
+        blocks=gloss_format.parse_gloss(stripped),
+        langid=langid,
     )
 
 
