@@ -80,6 +80,56 @@ def test_lookup_strips_the_zero_width_spaces_between_tokens(
     assert service.lookup("たの\u200bしい") == "楽しい\n愉快yúkuài"
 
 
+HOMOGRAPH_ENTRIES = [
+    # The bare-kanji key holds the homograph disambiguation list, as
+    # MOJi serves it; the reading-qualified keys hold the real entries.
+    ("下", "<div>See also: 下【か】</div>"),
+    ("下【か】", "<div>下级。（位が下のもの。）</div>"),
+    ("下【もと②】", "<div>下面。（物の下部。）</div>"),
+]
+
+
+def test_homograph_lookup_defaults_to_the_bare_key(app, app_context, dict_dirs):
+    "Without an explicit reading the disambiguation list is the answer."
+    _static, scratch = dict_dirs
+    _import(app, scratch, build_mdx(HOMOGRAPH_ENTRIES))
+
+    assert service.lookup("下", "か") == "See also: 下【か】"
+
+
+def test_homograph_lookup_prefers_the_reading_qualified_key(
+    app, app_context, dict_dirs
+):
+    "A clicked xref names a reading, so the bare key must not win."
+    _static, scratch = dict_dirs
+    _import(app, scratch, build_mdx(HOMOGRAPH_ENTRIES))
+
+    assert (
+        service.lookup("下", "か", prefer_reading=True) == "下级。（位が下のもの。）"
+    )
+    # Accent mark: the composite key is tried as-is and accent-stripped.
+    assert (
+        service.lookup("下", "もと②", prefer_reading=True)
+        == "下面。（物の下部。）"
+    )
+    # No reading-qualified key for this reading: falls back to the bare term.
+    assert (
+        service.lookup("下", "しも", prefer_reading=True) == "See also: 下【か】"
+    )
+
+
+def test_homograph_candidates_put_the_bare_term_last():
+    assert service._homograph_candidates("下", "もと②") == [
+        "下【もと②】",
+        "下(もと②)",
+        "もと②",
+        "下【もと】",
+        "下(もと)",
+        "もと",
+        "下",
+    ]
+
+
 def test_lookup_returns_none_without_a_dictionary(app_context, dict_dirs):
     assert service.lookup("たのしい") is None
 

@@ -228,7 +228,7 @@
           {% elif b.t == 'note' %}
         <div class="ld-note">{{ b.text }}</div>
           {% elif b.t == 'xref' %}
-        <a class="ld-xref" href="/read/localdict/{{ langid }}/{{ b.text | urlencode }}">→ {{ b.text }}<span class="ld-xref-reading"> 【{{ b.reading }}】</span></a>
+        <a class="ld-xref" href="/read/localdict/{{ langid }}/{{ b.text | urlencode }}?reading={{ b.reading | urlencode }}">→ {{ b.text }}<span class="ld-xref-reading"> 【{{ b.reading }}】</span></a>
           {% else %}
         <div class="ld-plain">{{ b.text }}</div>
           {% endif %}
