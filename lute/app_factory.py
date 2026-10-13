@@ -403,24 +403,6 @@ def _add_base_routes(app, app_config):
         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
         return response
 
-    @app.route("/sw.js")
-    def service_worker():
-        "Serve the PWA service worker from root scope."
-        response = make_response(send_from_directory("static", "sw.js"))
-        response.headers["Content-Type"] = "application/javascript; charset=utf-8"
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        response.headers["Service-Worker-Allowed"] = "/"
-        return response
-
-    @app.route("/manifest.webmanifest")
-    @app.route("/manifest.json")
-    def pwa_manifest():
-        "Serve the PWA web manifest with the correct MIME type."
-        response = make_response(send_from_directory("static", "manifest.json"))
-        response.headers["Content-Type"] = "application/manifest+json; charset=utf-8"
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        return response
-
     @app.errorhandler(500)
     def _internal_server_error(e):  # pylint: disable=unused-argument
         """
@@ -702,19 +684,13 @@ def _create_app(app_config, extra_config):
             return
 
         path = request.path
-        # Static assets are excepted so they load before login.  /sw.js
-        # and the manifests are static files too, but they are served
-        # from root by their own routes rather than from /static/, so
-        # they have to be named here as well: gated, the service worker
-        # script and the manifest answer 302 to the login page, and a
-        # background service-worker update after the session expires
-        # fails -- leaving the browser on a stale worker.
+        # Static assets are excepted so they load before login.  The
+        # retired PWA endpoints (/sw.js, the web manifests) used to be
+        # listed here too; they are gone now, so like any other unknown
+        # path they fall through to the login redirect.
         public_paths = (
             "/login",
             "/favicon.ico",
-            "/sw.js",
-            "/manifest.webmanifest",
-            "/manifest.json",
         )
         if path in public_paths or path.startswith("/static/"):
             mu_context.set_current_user(None)
