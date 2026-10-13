@@ -1,14 +1,16 @@
 /* Furigana above reading-page words.
  *
  * Enabled per language (Language > "Show furigana above words"), and only
- * for Japanese-capable parsers; the flag reaches us via LUTE_FURIGANA in
- * read/index.html.  Readings come from the same endpoint the shadowing
- * panel uses (/read/shadowing/readings), which pairs each token with the
- * contextual kana reading of the sentence it sits in (一つ reads ひとつ,
- * not いち + つ).  Every kanji-bearing word span gets its display text
- * wrapped in <ruby>text<rt>reading</rt></ruby>; pure-kana words are left
- * alone -- they already show their own reading, and the endpoint answers
- * with one anyway.
+ * for parsers that can supply readings -- Japanese (kana via Sudachi/
+ * MeCab), Mandarin (pinyin) and Cantonese (jyutping) via their plugins;
+ * the flag reaches us via LUTE_FURIGANA in read/index.html.  Readings
+ * come from the same endpoint the shadowing panel uses
+ * (/read/shadowing/readings), which pairs each token with the
+ * contextual reading of the sentence it sits in (Japanese 一つ reads
+ * ひとつ, not いち + つ).  Every Han-character-bearing word span gets
+ * its display text wrapped in <ruby>text<rt>reading</rt></ruby>;
+ * words without Han characters (kana, hangul, Latin text) are left
+ * alone -- they already show their own pronunciation.
  */
 (function () {
   "use strict";

@@ -906,6 +906,70 @@ def test_annotate_tokens_non_japanese_ignores_full_text():
     assert lang.parser.context_calls == []
 
 
+def test_supports_readings_by_parser_type():
+    "Only parsers with a readings source count (Japanese, Mandarin, Cantonese)."
+    assert shadowing.supports_readings(_FakeLanguage([], parser_type="japanese"))
+    assert shadowing.supports_readings(
+        _FakeLanguage([], parser_type="japanese_sudachi")
+    )
+    assert shadowing.supports_readings(
+        _FakeLanguage([], parser_type="lute_mandarin")
+    )
+    assert shadowing.supports_readings(
+        _FakeLanguage([], parser_type="lute_cantonese")
+    )
+    assert not shadowing.supports_readings(_FakeLanguage([], parser_type="spacedel"))
+    assert not shadowing.supports_readings(_FakeLanguage([], parser_type="korean"))
+    assert not shadowing.supports_readings(None)
+
+
+def test_supports_readings_classical_chinese_excluded():
+    "文言文 uses no plugin parser, so name-based matching must not claim it."
+    lang = _FakeLanguage([], parser_type="spacedel", readings={"學": "xué"})
+    lang.name = "Classical Chinese"
+    assert not shadowing.supports_readings(lang)
+
+
+def test_annotate_tokens_mandarin_pinyin_readings():
+    "The lute-mandarin plugin's pinyin answers become furigana readings."
+    lang = _FakeLanguage([], parser_type="lute_mandarin", readings={"银行": "yín háng", "吗": "ma"})
+    annotated = shadowing.annotate_tokens(["银行", "吗"], lang)
+    assert annotated == [
+        {"text": "银行", "reading": "yín háng"},
+        {"text": "吗", "reading": "ma"},
+    ]
+
+
+def test_annotate_tokens_cantonese_jyutping_readings():
+    "The lute-cantonese plugin's jyutping answers become furigana readings."
+    lang = _FakeLanguage([], parser_type="lute_cantonese", readings={"你好": "nei5 hou2"})
+    annotated = shadowing.annotate_tokens(["你好"], lang)
+    assert annotated == [{"text": "你好", "reading": "nei5 hou2"}]
+
+
+def test_annotate_tokens_chinese_has_no_context_parse():
+    "Chinese parsers answer per token; full_text never triggers a context parse."
+    lang = _FakeLanguage(
+        [],
+        parser_type="lute_mandarin",
+        readings={"天氣": "tiān qì"},
+        context_readings=[("天氣", "完全不同")],
+    )
+    annotated = shadowing.annotate_tokens(["天氣"], lang, full_text="天氣")
+    assert annotated == [{"text": "天氣", "reading": "tiān qì"}]
+    assert lang.parser.context_calls == []
+
+
+def test_annotate_tokens_chinese_missing_reading_is_none():
+    "Tokens the parser has no reading for show plain."
+    lang = _FakeLanguage([], parser_type="lute_mandarin", readings={"天氣": "tiān qì"})
+    annotated = shadowing.annotate_tokens(["天氣", "很好"], lang)
+    assert annotated == [
+        {"text": "天氣", "reading": "tiān qì"},
+        {"text": "很好", "reading": None},
+    ]
+
+
 # ---------------------------------------------------------------------
 # transcribe_clip (fake model; faster-whisper is never imported)
 # ---------------------------------------------------------------------

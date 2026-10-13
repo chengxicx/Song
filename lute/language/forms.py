@@ -80,16 +80,20 @@ class LanguageForm(FlaskForm):
         FormField(LanguageDictionaryForm, default=LanguageDictionary)
     )
     show_romanization = BooleanField("Show Pronunciation field")
-    # Furigana (kana readings above words) on the reading page.  Only
-    # rendered for Japanese-capable parsers -- see _form.html -- but the
-    # field must always exist so populate_obj round-trips cleanly.
+    # Furigana (pronunciation readings above words) on the reading page.
+    # Only rendered for parsers that can supply readings -- Japanese
+    # (kana), Mandarin (pinyin), Cantonese (jyutping) -- see _form.html
+    # -- but the field must always exist so populate_obj round-trips
+    # cleanly.
     show_furigana = BooleanField(
         "Show furigana above words",
         render_kw={
             "title": (
-                "Draw kana readings above kanji words while reading "
-                "(Japanese only).  Uses the Pronunciation characters "
-                "setting (Settings > Preferences) for the reading script."
+                "Draw pronunciation readings above words while reading "
+                "(kana for Japanese, pinyin for Mandarin, jyutping for "
+                "Cantonese).  Japanese readings use the Pronunciation "
+                "characters setting (Settings > Preferences) for their "
+                "script."
             )
         },
     )
