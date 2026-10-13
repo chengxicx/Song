@@ -8,14 +8,14 @@
      {% if is_rtl %}dir="rtl"{% endif %}>
   <div class="yt-player-controls">
     <div class="yt-controls-left">
-      <button id="tts-prev-cue-btn" class="audio-button yt-cue-btn" title="Previous sentence">
+      <button id="tts-prev-cue-btn" class="audio-button yt-cue-btn" title="{{ t('Previous sentence') }}">
         <svg viewBox="0 0 24 24" class="yt-icn"><path d="M7 6h2v12H7zM20 6l-8.5 6 8.5 6z"></path></svg>
       </button>
-      <button id="tts-play-btn" class="audio-button yt-play-btn" title="Play / pause">
+      <button id="tts-play-btn" class="audio-button yt-play-btn" title="{{ t('Play / pause') }}">
         <svg viewBox="0 0 24 24" class="yt-icn yt-icn-play"><path d="M8 5v14l11-7z"></path></svg>
         <svg viewBox="0 0 24 24" class="yt-icn yt-icn-pause"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>
       </button>
-      <button id="tts-next-cue-btn" class="audio-button yt-cue-btn" title="Next sentence">
+      <button id="tts-next-cue-btn" class="audio-button yt-cue-btn" title="{{ t('Next sentence') }}">
         <svg viewBox="0 0 24 24" class="yt-icn"><path d="M15 6h2v12h-2zM4 6l8.5 6L4 18z"></path></svg>
       </button>
     </div>
@@ -32,7 +32,7 @@
          rate container (matches the MP3/YouTube right-side controls row). #}
       <div class="tts-voice-wrap">
         <button id="tts-voice-btn" class="audio-button yt-cue-btn tts-voice-btn"
-                type="button" title="Select voice">
+                type="button" title="{{ t('Select voice') }}">
           <svg viewBox="0 0 24 24" class="yt-icn" aria-hidden="true">
             <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path>
           </svg>
@@ -43,31 +43,31 @@
          (lute-shadowing.js).  Sits next to the voice gear, matching the
          Loop / Auto-pause toggle styling. #}
       <button id="tts-shadowing-btn" class="yt-toggle-btn tts-shadowing-btn" type="button"
-              title="Shadowing: practice reading each sentence aloud">
+              title="{{ t('Shadowing: practice reading each sentence aloud') }}">
         <svg viewBox="0 0 24 24" class="yt-icn" aria-hidden="true">
           <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3z"></path>
           <path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-2.08A7 7 0 0 0 19 11z"></path>
         </svg>
-        <span class="yt-toggle-label">Shadow</span>
+        <span class="yt-toggle-label">{{ t('Shadow') }}</span>
       </button>
-      <div id="tts-playback-rate-container" title="Playback rate. Click the number to reset">
+      <div id="tts-playback-rate-container" title="{{ t('Playback rate. Click the number to reset') }}">
         <button id="tts-rate-dec" class="audio-button yt-rate-btn"><span>−</span></button>
         <div id="tts-rate-indicator">1</div>
         <button id="tts-rate-inc" class="audio-button yt-rate-btn"><span>+</span></button>
       </div>
-      <button id="tts-loop-btn" class="yt-toggle-btn" title="Loop current sentence">
+      <button id="tts-loop-btn" class="yt-toggle-btn" title="{{ t('Loop current sentence') }}">
         <svg viewBox="0 0 24 24" class="yt-icn"><path d="M17 2l4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
-        <span class="yt-toggle-label">Loop</span>
+        <span class="yt-toggle-label">{{ t('Loop') }}</span>
       </button>
-      <button id="tts-autopause-btn" class="yt-toggle-btn" title="Auto-pause at the end of each sentence">
+      <button id="tts-autopause-btn" class="yt-toggle-btn" title="{{ t('Auto-pause at the end of each sentence') }}">
         <svg viewBox="0 0 24 24" class="yt-icn"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path><path d="M9 9h2v6H9zM13 9h2v6h-2z"></path></svg>
-        <span class="yt-toggle-label">Auto-pause</span>
+        <span class="yt-toggle-label">{{ t('Auto-pause') }}</span>
       </button>
-      <button id="tts-transcript-btn" class="yt-transcript-btn">Transcript</button>
+      <button id="tts-transcript-btn" class="yt-transcript-btn">{{ t('Transcript') }}</button>
     </div>
     {# Mobile bottom mini-player expand chevron (player-dock.js); hidden
        on desktop via CSS. #}
-    <button type="button" class="player-expand-btn" title="Expand player" aria-label="Expand player">
+    <button type="button" class="player-expand-btn" title="{{ t('Expand player') }}" aria-label="{{ t('Expand player') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
            stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"></polyline></svg>
     </button>

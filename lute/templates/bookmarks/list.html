@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Bookmarks{% endblock %}
-{% block header %}Bookmarks{% endblock %}
+{% block title %}{{ t('Bookmarks') }}{% endblock %}
+{% block header %}{{ t('Bookmarks') }}{% endblock %}
 
 {% block body %}
 
@@ -10,9 +10,9 @@
 <table id="bookmarkstable" class="table dataTable stripe">
   <thead>
     <tr>
-      <th style="text-align: left">Page</th>
-      <th style="text-align: left">Description</th>
-      <th style="text-align: left">Actions</th>
+      <th style="text-align: left">{{ t('Page') }}</th>
+      <th style="text-align: left">{{ t('Description') }}</th>
+      <th style="text-align: left">{{ t('Actions') }}</th>
     </tr>
   </thead>
 </table>
@@ -21,7 +21,7 @@
 <div id="datatables_config_widget">
   <img
     src="{{ vstatic('icn/settings-gear-icon.svg') }}"
-    title="configuration"
+    title="{{ t('configuration') }}"
     id="datatables_config_toggle"
     style="width: 1rem"
     />
@@ -29,7 +29,7 @@
 
 <div id="datatables_config_items" style="display: none;"></div>
 
-<p>Return to <a href="/read/{{ book.id }}">{{ book.title }}</a></p>
+<p>{{ t('Return to') }} <a href="/read/{{ book.id }}">{{ book.title }}</a></p>
 
 <script>
   var bookmark_listing_table;
@@ -143,7 +143,7 @@
 
   const edit_bookmark = async function(e) {
     let title = e.dataset.title;
-    const new_title = prompt("Update the bookmark description.", title);
+    const new_title = prompt(I18N.t("Update the bookmark description."), title);
 
     if (new_title) {
       await fetch("/bookmarks/edit", {
@@ -163,14 +163,14 @@
           // TODO: fix this hacky page reload
           window.location = ""
         } else {
-          alert(`Unable to edit bookmark. ${json?.reason || "Unknown reason"}`);
+          alert(`${I18N.t('Unable to edit bookmark.')} ${json?.reason || I18N.t('Unknown reason')}`);
         }
       })
     }
   }
 
   const delete_bookmark = async function(e) {
-    let confirmed = confirm("Delete bookmark?")
+    let confirmed = confirm(I18N.t("Delete bookmark?"))
     if (confirmed) {
       await fetch("/bookmarks/delete", {
         method: "POST",
@@ -188,7 +188,7 @@
           // TODO: fix this hacky page reload
           window.location = ""
         } else {
-          alert(`Unable to delete bookmark. ${json?.reason || "Unknown reason"}`);
+          alert(`${I18N.t('Unable to delete bookmark.')} ${json?.reason || I18N.t('Unknown reason')}`);
         }
       })
 
@@ -202,8 +202,8 @@
       links.push(s);
     };
 
-    make_link('Edit', "edit_bookmark", row);
-    make_link('Delete', "delete_bookmark", row);
+    make_link(I18N.t('Edit'), "edit_bookmark", row);
+    make_link(I18N.t('Delete'), "delete_bookmark", row);
 
     return `<div class="book-action-dropdown"><span>&hellip;</span>
       <div class="book-action-dropdown-content">${links.join('')}</div>

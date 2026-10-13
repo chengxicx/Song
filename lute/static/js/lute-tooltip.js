@@ -492,7 +492,7 @@ function show_bulk_term_edit_form(count_of_terms) {
     const frameDocument = wordFrame.document;
     const spanElement = $(frameDocument).find('#bulkUpdateCount');
     if (spanElement.length) {
-      spanElement.text(`Updating ${count_of_terms} term(s)`);
+      spanElement.text(I18N.t('Updating ') + count_of_terms + I18N.t(' term(s)'));
     }
   }
 

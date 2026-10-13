@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<h2>Edit {{ language.name }}</h2>
+<h2>{{ t('Edit') }} {{ language.name }}</h2>
 
 {% include "language/_form.html" %}
 
@@ -10,34 +10,31 @@
 {% if engine_status.label %}
 <div style="margin-top:14px; padding:10px 14px; border:1px solid #ccc; border-radius:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
   {% if engine_status.installed %}
-    <span title="All engine dependencies are installed.">&#9989;</span>
-    <span>{{ engine_status.label }} grammar engine installed
-      (<code>{{ engine_status.extra }}</code>) &mdash; the Analyze grammar
-      menu uses the full engine on this language.</span>
+    <span title="{{ t('All engine dependencies are installed.') }}">&#9989;</span>
+    <span>{{ engine_status.label }} {{ t('grammar engine installed') }}
+      (<code>{{ engine_status.extra }}</code>) {{ t('— the Analyze grammar menu uses the full engine on this language.') }}</span>
   {% else %}
-    <span title="Missing: {{ engine_status.missing|join(', ') }}">&#9888;&#65039;</span>
+    <span title="{{ t('Missing:') }} {{ engine_status.missing|join(', ') }}">&#9888;&#65039;</span>
     <span style="flex:1;">
-      {{ engine_status.label }} grammar engine <strong>not installed</strong>
-      (missing: <code>{{ engine_status.missing|join(', ') }}</code>) &mdash;
-      the grammar panel will fall back to the basic rules.
+      {{ engine_status.label }} {{ t('grammar engine') }} <strong>{{ t('not installed') }}</strong>
+      ({{ t('missing:') }} <code>{{ engine_status.missing|join(', ') }}</code>) {{ t('— the grammar panel will fall back to the basic rules.') }}
     </span>
     <form method="post" style="margin:0;"
           action="{{ url_for('language.grammar_engine_install', extra=engine_status.extra) }}">
-      <button type="submit" class="btn btn-primary btn-sm">Install</button>
+      <button type="submit" class="btn btn-primary btn-sm">{{ t('Install') }}</button>
     </form>
   {% endif %}
 </div>
 {% elif engine_note %}
 <div style="margin-top:14px; padding:10px 14px; border:1px solid #ccc; border-radius:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-  <span title="The engine ships with the language's parser.">&#9989;</span>
-  <span>The Analyze grammar menu uses the full {{ engine_note.tokenizer }}
-    grammar engine on this language &mdash; it ships with the
-    {{ engine_note.label }} parser, so there is nothing extra to install.</span>
+  <span title="{{ t("The engine ships with the language's parser.") }}">&#9989;</span>
+  <span>{{ t('The Analyze grammar menu uses the full') }} {{ engine_note.tokenizer }}
+    {{ t('grammar engine on this language — it ships with the') }}
+    {{ engine_note.label }} {{ t('parser, so there is nothing extra to install.') }}</span>
 </div>
 {% else %}
 <div style="margin-top:14px; padding:10px 14px; border:1px dashed #ccc; border-radius:8px; color:#666;">
-  No dedicated grammar engine for this language &mdash; the Analyze grammar
-  menu uses the basic rules.
+  {{ t('No dedicated grammar engine for this language — the Analyze grammar menu uses the basic rules.') }}
 </div>
 {% endif %}
 

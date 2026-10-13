@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>Sentences</title>
+    <title>{{ t('Sentences') }}</title>
     <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
     {% if theme_css_hash %}
     <link rel="stylesheet" type="text/css" href="/theme/current?v={{ theme_css_hash }}">
@@ -26,14 +26,12 @@
   <body>
 
     {% if no_references %}
-    <p>No references found for "{{ text }}":</p>
+    <p>{{ t('No references found for') }} "{{ text }}":</p>
     <ul>
-      <li>This may be a new term.</li>
-      <li>The page containing this word may not be marked as "read" (see
-        <a href="https://luteorg.github.io/lute-manual/faq/terms/sentences-only-shown-when-page-is-read.html"
-           target="_blank">the manual</a>).
+      <li>{{ t('This may be a new term.') }}</li>
+      <li>{{ t('The page containing this word may not be marked as "read" (see <a href="https://luteorg.github.io/lute-manual/faq/terms/sentences-only-shown-when-page-is-read.html" target="_blank">the manual</a>).') }}
       </li>
-      <li>Books containing this term may have been deleted.</li>
+      <li>{{ t('Books containing this term may have been deleted.') }}</li>
     </ul>
     {% endif %}
 
@@ -59,4 +57,3 @@
   </body>
 
 </html>
-

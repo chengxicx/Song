@@ -40,7 +40,7 @@
   See DUPLICATE_TERM_CHECK comments in other files.
 #}
 <div class="flash-notice-narrow">
-  Term <a href="/term/edit/{{ duplicated_term.id }}">{{ duplicated_term.text }}</a> already exists.
+  {{ t('Term') }} <a href="/term/edit/{{ duplicated_term.id }}">{{ duplicated_term.text }}</a> {{ t('already exists.') }}
 </div>
 {% else %}
   {% for field_name, field_errors in form.errors.items() %}
@@ -63,7 +63,7 @@
         style="display:none;"
         {% endif %}>
         {{ form.language_id(class="form-control") }}
-        <button id="load-dicts-btn" title="Load dictionaries for the new term" type="button"></button>
+        <button id="load-dicts-btn" title="{{ t('Load dictionaries for the new term') }}" type="button"></button>
       </div>
   
       {{ form.original_text }}
@@ -91,10 +91,10 @@
         {{ form.status(class="form-control") }}
         <div id="sync-status-container">
           {{ form.sync_status(class="form-control", disabled=True) }}
-          <label for="sync_status">Link to parent</label>
+          <label for="sync_status">{{ t('Link to parent') }}</label>
         </div>
         <button type="button" id="term-speak-btn" class="term-speak-btn"
-                title="Speak the term (click to pronounce once)">
+                title="{{ t('Speak the term (click to pronounce once)') }}">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M11 4.702a.7.7 0 0 0-1.204-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.7.7 0 0 0 11 19.298z"/>
@@ -109,9 +109,9 @@
       <div>{{ form.termtagslist(class="form-control") }}</div>
 
       <div id="term-button-container">
-          <button id="btnsubmit" type="submit" title="Shortcut: Control+Enter" class="btn btn-primary">Save</button>
+          <button id="btnsubmit" type="submit" title="{{ t('Shortcut: Control+Enter') }}" class="btn btn-primary">{{ t('Save') }}</button>
           {% if term.id %}
-          <button id="delete" type="button" class="btn btn-danger" onclick="deleteTerm()">Delete</button>
+          <button id="delete" type="button" class="btn btn-danger" onclick="deleteTerm()">{{ t('Delete') }}</button>
           {% endif %}
           {% if embedded_in_reading_frame %}
           {#
@@ -122,17 +122,17 @@
             standalone /term/edit pages have neither view.
           #}
           <button id="btn-grammar" type="button" class="btn btn-tool btn-tool--grammar"
-                  title="Show the grammar analysis for this page"
+                  title="{{ t('Show the grammar analysis for this page') }}"
                   onclick="openGrammarFromTermForm()">
             <svg class="btn-tool__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
-            Grammar
+            {{ t('Grammar') }}
           </button>
           <button id="btn-sentence" type="button" class="btn btn-tool btn-tool--sentence"
-                  title="Translate the sentence containing this term"
+                  title="{{ t('Translate the sentence containing this term') }}"
                   onclick="translateSentenceFromTermForm()">
             <svg class="btn-tool__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -143,7 +143,7 @@
               <path d="m22 22-5-10-5 10"/>
               <path d="M14 18h6"/>
             </svg>
-            Sentence
+            {{ t('Sentence') }}
           </button>
           {% endif %}
       </div>
@@ -259,7 +259,7 @@
     var term_image = $("#term_image");
 
     term_image.hover(
-      function(){ $(this).attr("title", "Click and hit Delete to remove, then Save."); },
+      function(){ $(this).attr("title", I18N.t("Click and hit Delete to remove, then Save.")); },
       function(){ $(this).removeClass('clickedZoomableImage') }
     );
 
@@ -280,7 +280,7 @@
     const this_term_text = $("#original_text").val();
     const lang_id_func = () => parseInt($('#language_id').val());
     let override_settings = {
-      placeholder: 'Parents',
+      placeholder: I18N.t('Parents'),
     };
     parents_tagify = lute_tagify_utils_setup_parent_tagify(
       parentslist, lang_id_func, this_term_text, override_settings
@@ -295,7 +295,7 @@
       }
 
       if (form_changed) {
-        const msg = 'You have unsaved changes.  Click OK to save these changes and go to the parent term, or Cancel to continue editing.';
+        const msg = I18N.t('You have unsaved changes.  Click OK to save these changes and go to the parent term, or Cancel to continue editing.');
         if (!confirm(msg))
           return;
       }
@@ -347,7 +347,7 @@
 
     var termtagslist = document.getElementById('termtagslist');
     const overrides = {
-      placeholder: 'Tags'
+      placeholder: I18N.t('Tags')
     };
     var termtags_tagify = lute_tagify_utils_setup_term_tag_tagify(
       termtagslist, TAGS, overrides
@@ -474,7 +474,7 @@
       del.type = "button";
       del.className = "btn btn-danger";
       del.setAttribute("onclick", "deleteTerm()");
-      del.textContent = "Delete";
+      del.textContent = I18N.t('Delete');
       // Keep the server-rendered order Save / Delete / Grammar / Sentence:
       // the container may hold Grammar/Sentence buttons (reading-frame
       // forms), and appending here would slot Delete after them.
@@ -565,7 +565,7 @@
         flash.className = "small-flash-notice";
         container.parentNode.insertBefore(flash, container);
       }
-      flash.textContent = '"' + resp.term_text + '" updated.';
+      flash.textContent = '"' + resp.term_text + '" ' + I18N.t('updated.');
       $(flash).show().delay(1000).fadeOut();
       container.style.display = "none";
     }
@@ -663,8 +663,8 @@
   // Delete.
 
   function deleteTerm() {
-    const msg = "Are you sure you want to delete this term?\n\n" +
-          "This action cannot be undone, and if this term has children, they will be orphaned.";
+    const msg = I18N.t("Are you sure you want to delete this term?") + "\n\n" +
+          I18N.t("This action cannot be undone, and if this term has children, they will be orphaned.");
     if (!confirm(msg))
       return;
 

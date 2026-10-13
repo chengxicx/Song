@@ -1,24 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Languages{% endblock %}
+{% block title %}{{ t('Languages') }}{% endblock %}
 
-{% block header %}Languages{% endblock %}
+{% block header %}{{ t('Languages') }}{% endblock %}
 
 {% block body %}
 
 {% if language_data|length == 0 %}
-  <p>No languages defined.</p>
+  <p>{{ t('No languages defined.') }}</p>
 {% else %}
 
 <div class="languagetable-wrap">
 <table id="languagetable" class="table dataTable no-footer" style="margin: 0;">
   <thead>
     <tr>
-      <th>Language</th>
-      <th>Books</th>
-      <th>Terms</th>
-      <th>Status</th>
-      <th style="width: 130px;">Actions</th>
+      <th>{{ t('Language') }}</th>
+      <th>{{ t('Books') }}</th>
+      <th>{{ t('Terms') }}</th>
+      <th>{{ t('Status') }}</th>
+      <th style="width: 130px;">{{ t('Actions') }}</th>
     </tr>
   </thead>
   <tbody>
@@ -33,18 +33,18 @@
       <td>{{ lang.term_count or '-' }}</td>
       <td>
         {% if lang.LgIsActive %}
-        <span style="color: #37b24d; font-size: 12px;">● Active</span>
+        <span style="color: #37b24d; font-size: 12px;">● {{ t('Active') }}</span>
         {% else %}
-        <span style="color: #868e96; font-size: 12px;">● Frozen</span>
+        <span style="color: #868e96; font-size: 12px;">● {{ t('Frozen') }}</span>
         {% endif %}
       </td>
       <td>
         <form method="POST" action="/language/toggle_active/{{ lang.LgID }}"
               style="display:inline;">
-          <button type="submit" title="{% if lang.LgIsActive %}Freeze language{% else %}Activate language{% endif %}"
+          <button type="submit" title="{% if lang.LgIsActive %}{{ t('Freeze language') }}{% else %}{{ t('Activate language') }}{% endif %}"
                   style="padding:2px 8px;background:{% if lang.LgIsActive %}#fab005{% else %}#37b24d{% endif %};color:#fff;border:none;
                          border-radius:4px;cursor:pointer;font-size:12px;">
-            {% if lang.LgIsActive %}Freeze{% else %}Activate{% endif %}
+            {% if lang.LgIsActive %}{{ t('Freeze') }}{% else %}{{ t('Activate') }}{% endif %}
           </button>
         </form>
       </td>
@@ -57,8 +57,8 @@
 {% endif %}
 
 <br />
-<p><a href="{{ url_for('language.list_predefined') }}">Load predefined language and sample stories</a></p>
-<p><a href="{{ url_for('language.new') }}">Create new</a></p>
+<p><a href="{{ url_for('language.list_predefined') }}">{{ t('Load predefined language and sample stories') }}</a></p>
+<p><a href="{{ url_for('language.new') }}">{{ t('Create new') }}</a></p>
 
 <script>
   let setup_lang_datatable = function() {

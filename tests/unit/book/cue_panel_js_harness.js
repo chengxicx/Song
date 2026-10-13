@@ -30,6 +30,12 @@ const fs = require("fs");
 
 const input = JSON.parse(fs.readFileSync(0, "utf8"));
 const modPath = process.argv[2];
+
+/* The reading page injects window.I18N via base.html; the harness runs
+   the module bare in Node, so provide the identity fallback it uses. */
+globalThis.LUTE_I18N = {};
+globalThis.I18N = { t: (k) => k };
+
 const QUANTIZE = input.quantize || 0;
 
 /* ---------- a very small DOM ---------- */

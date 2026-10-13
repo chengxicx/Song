@@ -153,7 +153,7 @@ class SentenceLookupButton extends GeneralLookupButton {
       iframe.setAttribute("src", `/term/sentences/${LookupButton.LANG_ID}/${t}`);
     };
 
-    super("sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", handler);
+    super("sentences-btn", I18N.t("Sentences"), I18N.t("See term usage"), "dict-sentences-btn", handler);
   }
 }
 
@@ -173,7 +173,7 @@ class ImageLookupButton extends GeneralLookupButton {
       const text = LookupButton.TERM_FORM_CONTAINER.querySelector("#text").value;
       const lang_id = LookupButton.LANG_ID;
       if (lang_id == null || lang_id == '' || parseInt(lang_id) == 0 || text == null || text == '') {
-        alert('Please select a language and enter the term.');
+        alert(I18N.t('Please select a language and enter the term.'));
         return;
       }
       let use_text = text;
@@ -190,7 +190,7 @@ class ImageLookupButton extends GeneralLookupButton {
       iframe.setAttribute("src", url);
     };  // end handler
 
-    super("dict-image-btn", null, "Lookup images", "dict-image-btn", handler);
+    super("dict-image-btn", null, I18N.t("Lookup images"), "dict-image-btn", handler);
   }
 }
 
@@ -382,7 +382,7 @@ function _create_dict_dropdown_div(buttons_in_list) {
   const btn = document.createElement("button");
   btn.classList.add("dict-btn", "dict-btn-select");
   btn.innerHTML = "&hellip; &#9660;"
-  btn.setAttribute("title", "More dictionaries");
+  btn.setAttribute("title", I18N.t("More dictionaries"));
   btn.addEventListener("click", (e) => {
     list_div.classList.toggle("dict-list-hide");
   });

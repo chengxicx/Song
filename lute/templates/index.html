@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Song index{% endblock %}
+{% block title %}{{ t('Song index') }}{% endblock %}
 
 {% block preloadassets %}
   {# No GIF preload needed since CSS skeleton screen is used instead of waiting2.gif. #}
@@ -13,32 +13,31 @@
 
 {% if tutorial_book_id %}
 <div class="flash-notice">
-  <p>The Lute database has been loaded with a
-    <a href="/read/{{ tutorial_book_id }}/page/1" style="text-decoration: underline;">brief tutorial</a>,
-    and some languages and short texts for you to try out.
+  <p>{{ t('The Lute database has been loaded with a') }}
+    <a href="/read/{{ tutorial_book_id }}/page/1" style="text-decoration: underline;">{{ t('brief tutorial') }}</a>,
+    {{ t('and some languages and short texts for you to try out.') }}
   </p>
-  <p>When you're done trying out the demo, <a href="/wipe_database"
-  style="text-decoration: underline;">click here</a> to clear out the
-  database.  <i>Note: this removes everything in the db.</i></p>
-  <p>Or instead,
-    <a href="/remove_demo_flag" style="text-decoration: underline;">dismiss</a>
-    this message.
+  <p>{{ t("When you're done trying out the demo,") }} <a href="/wipe_database"
+  style="text-decoration: underline;">{{ t('click here') }}</a> {{ t('to clear out the database.') }}  <i>{{ t('Note: this removes everything in the db.') }}</i></p>
+  <p>{{ t('Or instead,') }}
+    <a href="/remove_demo_flag" style="text-decoration: underline;">{{ t('dismiss') }}</a>
+    {{ t('this message.') }}
   </p>
 </div>
 {% endif %}
 
 {% if is_production_data and backup_show_warning %}
 <div class="flash-notice">
-  <p>Warning: {{ backup_warning_msg }} <a href="/backup/backup">Create a backup.</a></p>
+  <p>{{ t('Warning:') }} {{ backup_warning_msg }} <a href="/backup/backup">{{ t('Create a backup.') }}</a></p>
 </div>
 {% endif %}
 
 {% if not have_languages %}
   {% if can_manage_server %}
-  <p>To get started using Lute, first <a href="/language/list_predefined">load a predefined language and sample text</a>, or <a href="/language/new">create your language.</a>
+  <p>{{ t('To get started using Lute, first') }} <a href="/language/list_predefined">{{ t('load a predefined language and sample text') }}</a>, {{ t('or') }} <a href="/language/new">{{ t('create your language.') }}</a>
 </p>
   {% else %}
-  <p>No languages have been set up on this server yet.  Ask an admin to add one.</p>
+  <p>{{ t('No languages have been set up on this server yet. Ask an admin to add one.') }}</p>
   {% endif %}
 {% else %}
   {% include "book/tablelisting.html" %}
@@ -46,7 +45,7 @@
 
 {% if reading_streak > 0 and show_streak_on_home %}
 <div style="text-align: center; margin-top: 20px; font-size: 1.2em;">
-  <strong>Reading Streak: {{ reading_streak }} day{{ reading_streak != 1 and 's' or '' }}</strong>
+  <strong>{{ t('Reading Streak:') }} {{ reading_streak }} {{ t('day') }}{{ reading_streak != 1 and 's' or '' }}</strong>
 </div>
 {% endif %}
 

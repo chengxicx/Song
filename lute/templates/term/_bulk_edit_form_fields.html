@@ -9,17 +9,17 @@ doing these edits from the term index.
 </div>
 {% if in_term_index_listing %}
   <div>
-    <input type="checkbox" name="lowercase_terms" id="chkLowercaseTerms" /> <label for="chkLowercaseTerms">Convert terms to lowercase</label>
+    <input type="checkbox" name="lowercase_terms" id="chkLowercaseTerms" /> <label for="chkLowercaseTerms">{{ t('Convert terms to lowercase') }}</label>
   </div>
 {% endif %}
 <div>
-  <input type="checkbox" name="remove_parents" id="chkRemoveParents" /> <label for="chkRemoveParents">Remove parents</label>
+  <input type="checkbox" name="remove_parents" id="chkRemoveParents" /> <label for="chkRemoveParents">{{ t('Remove parents') }}</label>
 </div>
 <div>
   <input id="txtSetParent" name="parent" />
 </div>
 <div>
-  <input type="checkbox" name="change_status" id="chkChangeStatus" /> <label for="chkChangeStatus">Change status</label>
+  <input type="checkbox" name="change_status" id="chkChangeStatus" /> <label for="chkChangeStatus">{{ t('Change status') }}</label>
 </div>
 <div id="status-container">
   <ul id="status">
@@ -28,8 +28,8 @@ doing these edits from the term index.
     <li><input id="status-2" name="status" type="radio" value="3"> <label for="status-2">3</label></li>
     <li><input id="status-3" name="status" type="radio" value="4"> <label for="status-3">4</label></li>
     <li><input id="status-4" name="status" type="radio" value="5"> <label for="status-4">5</label></li>
-    <li><input id="status-5" name="status" type="radio" value="99"> <label for="status-5">Wkn</label></li>
-    <li><input id="status-6" name="status" type="radio" value="98"> <label for="status-6">Ign</label></li>
+    <li><input id="status-5" name="status" type="radio" value="99"> <label for="status-5">{{ t('Wkn') }}</label></li>
+    <li><input id="status-6" name="status" type="radio" value="98"> <label for="status-6">{{ t('Ign') }}</label></li>
   </ul>
 </div>
 <div>
@@ -78,8 +78,8 @@ doing these edits from the term index.
   };
 
   document.addEventListener('DOMContentLoaded', function () {
-    const txtAddTags_tagify = setup_tags_tagify('txtAddTags', 'Add tags', false);
-    const txtRemoveTags_tagify = setup_tags_tagify('txtRemoveTags', 'Remove tags', true);
+    const txtAddTags_tagify = setup_tags_tagify('txtAddTags', I18N.t('Add tags'), false);
+    const txtRemoveTags_tagify = setup_tags_tagify('txtRemoveTags', I18N.t('Remove tags'), true);
 
     handle_change_status_checkbox_change(false);
     $('#chkChangeStatus').change(function () {
@@ -95,7 +95,7 @@ doing these edits from the term index.
       const input = document.getElementById('txtSetParent');
       const this_term_text = null;  // bulk edits = no "master term"
       let override_settings = {
-        placeholder: 'Set parent (limit one)',
+        placeholder: I18N.t('Set parent (limit one)'),
         maxTags: 1,
         addTagOnBlur: false,
       };

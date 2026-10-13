@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Settings{% endblock %}
-{% block header %}Settings{% endblock %}
+{% block title %}{{ t('Settings') }}{% endblock %}
+{% block header %}{{ t('Settings') }}{% endblock %}
 
 {% block body %}
 
@@ -19,7 +19,7 @@
 
     <tr>
       <td>
-        <h2>Backup</h2>
+        <h2>{{ t('Backup') }}</h2>
       </td>
     </tr>
 
@@ -39,18 +39,18 @@
     {% if can_manage_server %}
     <tr>
       <td>
-        <h2>Multi-user mode</h2>
+        <h2>{{ t('Multi-user mode') }}</h2>
       </td>
       <td>
-        <a href="/multiuser/switch" class="btn btn-secondary" style="text-decoration: none;">Configure</a>
-        <span style="margin-left: 8px;">Currently <strong>{{ "ON" if multiuser_enabled else "OFF" }}</strong></span>
+        <a href="/multiuser/switch" class="btn btn-secondary" style="text-decoration: none;">{{ t('Configure') }}</a>
+        <span style="margin-left: 8px;">{{ t('Currently') }} <strong>{{ t("ON") if multiuser_enabled else t("OFF") }}</strong></span>
       </td>
     </tr>
     {% endif %}
 
     <tr>
       <td>
-        <h2>Appearance</h2>
+        <h2>{{ t('Appearance') }}</h2>
       </td>
     </tr>
 
@@ -61,9 +61,9 @@
       <td>
         <div class="theme-btn-row" style="display: flex; align-items: center; gap: 0.5rem;">
           {{ form.current_theme }}
-          <button type="button" class="btn btn-secondary" onclick="downloadTheme();">Download</button>
-          <button type="button" class="btn btn-secondary" onclick="document.getElementById('theme_upload').click();">Upload</button>
-          <button type="button" class="btn btn-danger" onclick="deleteUploadedTheme();">Delete</button>
+          <button type="button" class="btn btn-secondary" onclick="downloadTheme();">{{ t('Download') }}</button>
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('theme_upload').click();">{{ t('Upload') }}</button>
+          <button type="button" class="btn btn-danger" onclick="deleteUploadedTheme();">{{ t('Delete') }}</button>
           <input type="file" id="theme_upload" accept=".css" style="display: none;" onchange="handleThemeUpload(this);">
         </div>
         <div id="theme_action_result" style="margin-top: 5px; color: green;"></div>
@@ -75,20 +75,25 @@
         <img
           id="about_custom_styles" style="margin-right:10px;"
           src="{{ vstatic('icn/question-balloon.png') }}"
-          title="Click for details"
+          title="{{ t('Click for details') }}"
           onclick="$('#custom_styles_help').toggle();"
           />
         <blockquote id="custom_styles_help" style="width:60%; display: none;">
-          <p>Use this field to define custom styles to be applied to
-          Lute.</p>
-          <p>See examples
-          in <a href="https://luteorg.github.io/lute-manual/usage/themes/custom-styles.html"
-          target="_blank">the manual</a>.</p>
+          <p>{{ t('Use this field to define custom styles to be applied to Lute.') }}</p>
+          <p>{{ t('See examples in <a href="https://luteorg.github.io/lute-manual/usage/themes/custom-styles.html" target="_blank">the manual</a>.') }}</p>
         </blockquote>
       </td>
       </td>
       <td>
         {{ form.custom_styles(class="form-largetextarea") }}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {{ form.ui_language.label }}
+      </td>
+      <td>
+        {{ form.ui_language }}
       </td>
     </tr>
     <tr>
@@ -102,7 +107,7 @@
 
     <tr>
       <td>
-        <h2>Behaviour</h2>
+        <h2>{{ t('Behaviour') }}</h2>
       </td>
     </tr>
     {% for f in [
@@ -119,7 +124,7 @@
 
     <tr>
       <td>
-        <h2>Term Popups</h2>
+        <h2>{{ t('Term Popups') }}</h2>
       </td>
     </tr>
     {% for f in [
@@ -134,7 +139,7 @@
 
     <tr>
       <td>
-        <h2>Anki</h2>
+        <h2>{{ t('Anki') }}</h2>
       </td>
     </tr>
     {% for f in [
@@ -151,7 +156,7 @@
       </td>
       <td>
         <button id="test_ankiconnect_btn" class="btn btn-secondary" onclick="test_ankiconnect_setup(); return false;">
-          Test AnkiConnect connection
+          {{ t('Test AnkiConnect connection') }}
         </button>
         <div style="margin-top: 5px" id="ankiconnect_result"></div>
       </td>
@@ -159,7 +164,7 @@
 
     <tr>
       <td>
-        <h2>Japanese</h2>
+        <h2>{{ t('Japanese') }}</h2>
       </td>
     </tr>
 
@@ -170,23 +175,13 @@
         <img
           id="about_mecab_path" style="margin-right:10px;"
           src="{{ vstatic('icn/question-balloon.png') }}"
-          title="Click for details"
+          title="{{ t('Click for details') }}"
           onclick="$('#mecab_path_help').toggle();"
           />
         <blockquote id="mecab_path_help" style="width:60%; display: none;">
-          <p>Lute uses MeCab to parse Japanese, so MeCab needs to be
-            installed on your machine (see notes
-            in <a href="https://luteorg.github.io/lute-manual/install/mecab.html"
-            target="_blank">the manual</a>).</p>
-          <p>Lute includes the Python
-            library <a href="https://github.com/buruzaemon/natto-py">natto-py</a>
-            to interact with MeCab.  natto-py can usually find MeCab
-            automatically, but you <i>may</i> need to set the MECAB_PATH, per
-            <a href="https://luteorg.github.io/lute-manual/install/mecab.html#lute-configuration"
-            target="_blank">the manual</a>.</p>
-          <p>Try different values for MECAB_PATH, including leaving
-            the field blank, until clicking the &quot;test&quot;
-            button returns a &quot;success&quot; message.</p>
+          <p>{{ t('Lute uses MeCab to parse Japanese, so MeCab needs to be installed on your machine (see notes in <a href="https://luteorg.github.io/lute-manual/install/mecab.html" target="_blank">the manual</a>).') }}</p>
+          <p>{{ t('Lute includes the Python library <a href="https://github.com/buruzaemon/natto-py">natto-py</a> to interact with MeCab.  natto-py can usually find MeCab automatically, but you <i>may</i> need to set the MECAB_PATH, per <a href="https://luteorg.github.io/lute-manual/install/mecab.html#lute-configuration" target="_blank">the manual</a>.') }}</p>
+          <p>{{ t('Try different values for MECAB_PATH, including leaving the field blank, until clicking the "test" button returns a "success" message.') }}</p>
         </blockquote>
       </td>
       <td>{{ form.mecab_path(class="form-control") }}</td>
@@ -196,7 +191,7 @@
       </td>
       <td>
         <button id="test_mecab_btn" class="btn btn-secondary" onclick="test_mecab_setup(); return false;">
-          Test my MeCab configuration
+          {{ t('Test my MeCab configuration') }}
         </button>
         <div style="margin-top: 5px" id="parse_result"></div>
       </td>
@@ -208,19 +203,13 @@
         <img
           id="about_japanese_dict" style="margin-right:10px;"
           src="{{ vstatic('icn/question-balloon.png') }}"
-          title="Click for details"
+          title="{{ t('Click for details') }}"
           onclick="$('#japanese_dict_help').toggle();"
           />
         <blockquote id="japanese_dict_help" style="width:60%; display: none;">
-          <p>Lute supports two MeCab dictionary types:
-            <b>IPADIC</b> (older, widely used, default) and
-            <b>Unidic</b> (newer, more accurate for modern Japanese).</p>
-          <p>Set to &quot;Auto-detect&quot; and Lute will figure it out
-            automatically based on your installed MeCab dictionary.
-            Only set it explicitly if auto-detection is wrong.</p>
-          <p>Changing this only affects how <i>readings</i> (pronunciation)
-            are extracted.  Tokenization always works regardless of
-            dictionary type.</p>
+          <p>{{ t('Lute supports two MeCab dictionary types: <b>IPADIC</b> (older, widely used, default) and <b>Unidic</b> (newer, more accurate for modern Japanese).') }}</p>
+          <p>{{ t('Set to "Auto-detect" and Lute will figure it out automatically based on your installed MeCab dictionary. Only set it explicitly if auto-detection is wrong.') }}</p>
+          <p>{{ t('Changing this only affects how <i>readings</i> (pronunciation) are extracted.  Tokenization always works regardless of dictionary type.') }}</p>
         </blockquote>
       </td>
       <td>{{ form.japanese_dict }}</td>
@@ -233,7 +222,7 @@
     {% if can_manage_server %}
     <tr>
       <td>
-        <h3>Sudachi (alternative Japanese parser)</h3>
+        <h3>{{ t('Sudachi (alternative Japanese parser)') }}</h3>
       </td>
     </tr>
     <tr>
@@ -242,20 +231,13 @@
         <img
           id="about_japanese_sudachi_dict" style="margin-right:10px;"
           src="{{ vstatic('icn/question-balloon.png') }}"
-          title="Click for details"
+          title="{{ t('Click for details') }}"
           onclick="$('#japanese_sudachi_dict_help').toggle();"
           />
         <blockquote id="japanese_sudachi_dict_help" style="width:60%; display: none;">
-          <p><b>SudachiPy</b> is an alternative Japanese morphological
-            analyzer, independent of MeCab.  It offers three dictionary
-            sizes: <b>Small</b> (fastest, basic vocabulary),
-            <b>Core</b> (balanced, recommended), and
-            <b>Full</b> (largest, most coverage).</p>
-          <p>To use Sudachi, install the <code>sudachipy</code> and
-            <code>sudachidict_&lt;size&gt;</code> packages, then select
-            "Japanese (Sudachi)" as the parser type for your Japanese
-            language.</p>
-          <p>These settings do <i>not</i> affect the MeCab parser.</p>
+          <p>{{ t('<b>SudachiPy</b> is an alternative Japanese morphological analyzer, independent of MeCab.  It offers three dictionary sizes: <b>Small</b> (fastest, basic vocabulary), <b>Core</b> (balanced, recommended), and <b>Full</b> (largest, most coverage).') }}</p>
+          <p>{{ t('To use Sudachi, install the <code>sudachipy</code> and <code>sudachidict_<size></code> packages, then select "Japanese (Sudachi)" as the parser type for your Japanese language.') }}</p>
+          <p>{{ t('These settings do <i>not</i> affect the MeCab parser.') }}</p>
         </blockquote>
       </td>
       <td>{{ form.japanese_sudachi_dict }}</td>
@@ -266,18 +248,15 @@
         <img
           id="about_japanese_sudachi_mode" style="margin-right:10px;"
           src="{{ vstatic('icn/question-balloon.png') }}"
-          title="Click for details"
+          title="{{ t('Click for details') }}"
           onclick="$('#japanese_sudachi_mode_help').toggle();"
           />
         <blockquote id="japanese_sudachi_mode_help" style="width:60%; display: none;">
-          <p>Sudachi split modes control how aggressively text is
-            segmented:</p>
+          <p>{{ t('Sudachi split modes control how aggressively text is segmented:') }}</p>
           <ul>
-            <li><b>A (shortest)</b> — finest granularity, breaks
-              compounds into smallest units.</li>
-            <li><b>B (middle)</b> — balanced, good for general use.</li>
-            <li><b>C (longest)</b> — coarsest, keeps compounds intact
-              (recommended for language learners).</li>
+            <li>{{ t('<b>A (shortest)</b> — finest granularity, breaks compounds into smallest units.') }}</li>
+            <li>{{ t('<b>B (middle)</b> — balanced, good for general use.') }}</li>
+            <li>{{ t('<b>C (longest)</b> — coarsest, keeps compounds intact (recommended for language learners).') }}</li>
           </ul>
         </blockquote>
       </td>
@@ -288,7 +267,7 @@
       </td>
       <td>
         <button id="test_sudachi_btn" class="btn btn-secondary" onclick="test_sudachi_setup(); return false;">
-          Test my Sudachi configuration
+          {{ t('Test my Sudachi configuration') }}
         </button>
         <div style="margin-top: 5px" id="sudachi_result"></div>
       </td>
@@ -297,7 +276,7 @@
 
     <tr>
       <td>
-        <h2>TTS (Text-to-Speech)</h2>
+        <h2>{{ t('TTS (Text-to-Speech)') }}</h2>
       </td>
     </tr>
     {% for f in [
@@ -318,23 +297,21 @@
 
     <tr>
       <td>
-        <h2>NetEase Cloud Music</h2>
+        <h2>{{ t('NetEase Cloud Music') }}</h2>
       </td>
     </tr>
     <tr>
       <td>
-        Login for the <a href="/book/import_webpage">NetEase Cloud Music import</a>:
-        songs the logged-in account can play (incl. VIP) can be imported
-        with their lyrics.  Without a login, only freely playable songs work.
+        {{ t('Login for the <a href="/book/import_webpage">NetEase Cloud Music import</a>: songs the logged-in account can play (incl. VIP) can be imported with their lyrics.  Without a login, only freely playable songs work.') }}
       </td>
       <td>
-        <div id="netease_status_line">Checking login status&hellip;</div>
+        <div id="netease_status_line">{{ t('Checking login status…') }}</div>
         <div style="margin-top: 8px;">
           <button id="netease_qr_btn" class="btn btn-secondary" onclick="netease_start_qr(); return false;">
-            Scan QR to log in
+            {{ t('Scan QR to log in') }}
           </button>
           <button id="netease_logout_btn" class="btn btn-danger" style="display: none;" onclick="netease_logout(); return false;">
-            Log out
+            {{ t('Log out') }}
           </button>
         </div>
         <div id="netease_qr_area" style="display: none; margin-top: 10px;">
@@ -342,16 +319,13 @@
           <div id="netease_qr_status" style="margin-top: 5px;"></div>
         </div>
         <details style="margin-top: 10px;">
-          <summary>Or log in on the NetEase site and paste the cookie</summary>
+          <summary>{{ t('Or log in on the NetEase site and paste the cookie') }}</summary>
           <div style="margin-top: 6px;">
             <p style="margin: 4px 0;">
-              1. <a href="https://music.163.com/#/login" target="_blank">Open music.163.com and log in</a>
-              (complete any slider / verification there).<br>
-              2. Press F12 &rarr; Application (Storage) &rarr; Cookies &rarr; https://music.163.com.<br>
-              3. Copy the value of the <code>MUSIC_U</code> cookie and paste it below.
+              {{ t('1. <a href="https://music.163.com/#/login" target="_blank">Open music.163.com and log in</a> (complete any slider / verification there).<br>2. Press F12 → Application (Storage) → Cookies → https://music.163.com.<br>3. Copy the value of the <code>MUSIC_U</code> cookie and paste it below.') }}
             </p>
-            <input type="text" id="netease_cookie_input" class="form-control" placeholder="MUSIC_U=... (or the whole cookie header)" style="width: 60%;">
-            <button class="btn btn-secondary" style="margin-top: 6px;" onclick="netease_save_cookie(); return false;">Save cookie</button>
+            <input type="text" id="netease_cookie_input" class="form-control" placeholder="{{ t('MUSIC_U=... (or the whole cookie header)') }}" style="width: 60%;">
+            <button class="btn btn-secondary" style="margin-top: 6px;" onclick="netease_save_cookie(); return false;">{{ t('Save cookie') }}</button>
           </div>
         </details>
       </td>
@@ -360,21 +334,18 @@
     {% if can_manage_server %}
     <tr>
       <td>
-        <h2>Whisper (auto-subtitles)</h2>
+        <h2>{{ t('Whisper (auto-subtitles)') }}</h2>
       </td>
     </tr>
     <tr>
       <td>
-        Local speech-to-text for the <a href="/book/import_webpage">mp3 import</a>:
-        transcribes audio into subtitle cues on this server (no cloud, no
-        subtitle file needed).  Install the package once, then pre-download
-        the model size you plan to use &mdash; transcription reuses it.
+        {{ t('Local speech-to-text for the <a href="/book/import_webpage">mp3 import</a>: transcribes audio into subtitle cues on this server (no cloud, no subtitle file needed).  Install the package once, then pre-download the model size you plan to use — transcription reuses it.') }}
       </td>
       <td>
-        <div id="whisper_settings_status">Checking&hellip;</div>
+        <div id="whisper_settings_status">{{ t('Checking…') }}</div>
         <div id="whisper_settings_install_wrap" style="display: none; margin-top: 8px;">
           <button id="whisper_settings_install" class="btn btn-secondary" onclick="whisperInstall(); return false;">
-            Install faster-whisper
+            {{ t('Install faster-whisper') }}
           </button>
         </div>
         <div id="whisper_models_box" style="display: none; margin-top: 8px;"></div>
@@ -386,31 +357,24 @@
     {% if can_manage_server %}
     <tr>
       <td>
-        <h2>Local dictionaries (MDX)</h2>
+        <h2>{{ t('Local dictionaries (MDX)') }}</h2>
       </td>
     </tr>
     <tr>
       <td>
-        Show a definition for words Lute has no translation for yet &mdash;
-        the word you have never studied.  Import an MDX (MDict) dictionary
-        once and this server converts it into a lookup file.  Each language
-        then picks one of them on its own settings page, and the phone app
-        downloads <code>{{ dict_filename }}</code> to work offline.
+        {{ t('Show a definition for words Lute has no translation for yet — the word you have never studied.  Import an MDX (MDict) dictionary once and this server converts it into a lookup file.  Each language then picks one of them on its own settings page, and the phone app downloads') }} <code>{{ dict_filename }}</code> {{ t('to work offline.') }}
       </td>
       <td>
-        <div id="dict_settings_list">Checking&hellip;</div>
+        <div id="dict_settings_list">{{ t('Checking…') }}</div>
         <div style="margin-top: 8px;">
           <input type="file" id="dict_settings_file" accept=".mdx">
           <input type="text" id="dict_settings_name" class="form-control-narrower"
-                 placeholder="name it after the .mdx file">
+                 placeholder="{{ t('name it after the .mdx file') }}">
           <button type="button" id="dict_settings_import" class="btn btn-secondary"
-                  onclick="DictSettings.importSelected(); return false;">Import</button>
+                  onclick="DictSettings.importSelected(); return false;">{{ t('Import') }}</button>
         </div>
         <div style="font-size: 0.85em; color: #666; margin-top: 6px;">
-          Up to 200&nbsp;MB through the browser.  For a bigger dictionary, run
-          <code>tools/mdx_to_sqlite.py &lt;file.mdx&gt; &lt;out.db&gt;</code> on the
-          server and put the result in the dictionary folder.  Name it
-          <code>{{ dict_filename }}</code> to serve the phone app with no setup.
+          {{ t('Up to 200 MB through the browser.  For a bigger dictionary, run <code>tools/mdx_to_sqlite.py <file.mdx> <out.db></code> on the server and put the result in the dictionary folder.  Name it') }} <code>{{ dict_filename }}</code> {{ t('to serve the phone app with no setup.') }}
         </div>
         <div id="dict_settings_msg" style="margin-top: 6px;"></div>
       </td>
@@ -420,8 +384,8 @@
   </table>
 
   <div class="form-action-row">
-    <button type="submit" class="btn btn-primary">Save</button>
-    <button class="btn btn-secondary" onclick="window.location = '/'; return false;">Cancel</button>
+    <button type="submit" class="btn btn-primary">{{ t('Save') }}</button>
+    <button class="btn btn-secondary" onclick="window.location = '/'; return false;">{{ t('Cancel') }}</button>
   </div>
 </form>
 
@@ -435,7 +399,7 @@
     const themeSelect = document.getElementById('current_theme');
     const themeName = themeSelect.value;
     if (themeName === '-') {
-      alert('Please select a theme to download.');
+      alert(I18N.t('Please select a theme to download.'));
       return;
     }
     const url = '/theme/download/' + encodeURIComponent(themeName);
@@ -457,16 +421,16 @@
     .then(data => {
       const resultEl = document.getElementById('theme_action_result');
       if (data.success) {
-        resultEl.textContent = 'Theme uploaded successfully: ' + data.filename;
+        resultEl.textContent = I18N.t('Theme uploaded successfully: ') + data.filename;
         resultEl.style.color = 'green';
         location.reload();
       } else {
-        resultEl.textContent = 'Error: ' + data.error;
+        resultEl.textContent = I18N.t('Error: ') + data.error;
         resultEl.style.color = 'red';
       }
     })
     .catch(error => {
-      document.getElementById('theme_action_result').textContent = 'Upload failed: ' + error;
+      document.getElementById('theme_action_result').textContent = I18N.t('Upload failed: ') + error;
       document.getElementById('theme_action_result').style.color = 'red';
     });
 
@@ -477,11 +441,11 @@
     const themeSelect = document.getElementById('current_theme');
     const themeName = themeSelect.value;
     if (themeName === '-') {
-      alert('Please select a theme to delete.');
+      alert(I18N.t('Please select a theme to delete.'));
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this theme?')) {
+    if (!confirm(I18N.t('Are you sure you want to delete this theme?'))) {
       return;
     }
 
@@ -492,16 +456,16 @@
     .then(data => {
       const resultEl = document.getElementById('theme_action_result');
       if (data.success) {
-        resultEl.textContent = 'Theme deleted successfully.';
+        resultEl.textContent = I18N.t('Theme deleted successfully.');
         resultEl.style.color = 'green';
         location.reload();
       } else {
-        resultEl.textContent = 'Error: ' + data.error + ' (Only user-uploaded themes can be deleted)';
+        resultEl.textContent = I18N.t('Error: ') + data.error + I18N.t(' (Only user-uploaded themes can be deleted)');
         resultEl.style.color = 'red';
       }
     })
     .catch(error => {
-      document.getElementById('theme_action_result').textContent = 'Delete failed: ' + error;
+      document.getElementById('theme_action_result').textContent = I18N.t('Delete failed: ') + error;
       document.getElementById('theme_action_result').style.color = 'red';
     });
   }
@@ -522,7 +486,7 @@
           color = 'green';
         }
         else {
-          msg += "<br/><br/>Also, ensure you have MeCab installed and on your PATH.";
+          msg += "<br/><br/>" + I18N.t('Also, ensure you have MeCab installed and on your PATH.');
         }
 
         el = $('#parse_result');
@@ -530,7 +494,7 @@
         el.css('border', `2px solid ${color}`);
       },
       error: function() {
-        alert('Error occured');
+        alert(I18N.t('Error occured'));
       }
     });
   }
@@ -539,13 +503,13 @@
     const ac_url = $('#ankiconnect_url').val().trim();
     const el = $('#ankiconnect_result');
     if (ac_url == "") {
-      alert("Please specify the AnkiConnect URL.");
+      alert(I18N.t('Please specify the AnkiConnect URL.'));
       $("#ankiconnect_url").focus();
       return;
     }
     LuteAnki.get_anki_specs(ac_url)
       .then(() => {
-        el.text(`Connected successfully to AnkiConnect at ${ac_url}.`);
+        el.text(I18N.t('Connected successfully to AnkiConnect at') + ' ' + ac_url + '.');
         el.css('border', `2px solid green`);
       })
       .catch(error => {
@@ -568,7 +532,7 @@
           color = 'green';
         }
         else {
-          msg += "<br/><br/>Ensure you have installed 'sudachipy' and a 'sudachidict_*' package.";
+          msg += "<br/><br/>" + I18N.t("Ensure you have installed 'sudachipy' and a 'sudachidict_*' package.");
         }
 
         el = $('#sudachi_result');
@@ -576,7 +540,7 @@
         el.css('border', `2px solid ${color}`);
       },
       error: function() {
-        alert('Error occured');
+        alert(I18N.t('Error occured'));
       }
     });
   }
@@ -594,17 +558,17 @@
     if (loggedIn) {
       el.textContent = '';
       const nameEl = document.createElement('span');
-      nameEl.textContent = 'Logged in as ' + nickname;
+      nameEl.textContent = I18N.t('Logged in as') + ' ' + nickname;
       el.appendChild(nameEl);
       if (vip) {
         const vipEl = document.createElement('span');
         vipEl.style.color = '#C20C0C';
-        vipEl.textContent = ' (VIP)';
+        vipEl.textContent = ' ' + I18N.t('(VIP)');
         el.appendChild(vipEl);
       }
       logoutBtn.style.display = '';
     } else {
-      el.textContent = 'Not logged in (only freely playable songs can be imported).';
+      el.textContent = I18N.t('Not logged in (only freely playable songs can be imported).');
       logoutBtn.style.display = 'none';
     }
   }
@@ -615,7 +579,7 @@
       .then(d => netease_set_status(d.logged_in, d.nickname, d.vip))
       .catch(() => {
         document.getElementById('netease_status_line').textContent =
-          'Could not check login status.';
+          I18N.t('Could not check login status.');
       });
   }
 
@@ -625,12 +589,12 @@
     const statusEl = document.getElementById('netease_qr_status');
     area.style.display = '';
     imgHost.innerHTML = '';
-    statusEl.textContent = 'Loading QR code…';
+    statusEl.textContent = I18N.t('Loading QR code…');
     fetch('/netease/login/qr')
       .then(r => r.json())
       .then(d => {
         if (!d.ok) {
-          statusEl.textContent = d.message || 'Could not start QR login.';
+          statusEl.textContent = d.message || I18N.t('Could not start QR login.');
           return;
         }
         neteaseQrKey = d.key;
@@ -642,11 +606,11 @@
           svg.style.width = '200px';
           svg.style.height = 'auto';
         }
-        statusEl.textContent = 'Scan with the NetEase Cloud Music app…';
+        statusEl.textContent = I18N.t('Scan with the NetEase Cloud Music app…');
         clearTimeout(neteasePollTimer);
         neteasePollTimer = setTimeout(netease_poll_qr, 2000);
       })
-      .catch(() => { statusEl.textContent = 'Could not start QR login.'; });
+      .catch(() => { statusEl.textContent = I18N.t('Could not start QR login.'); });
   }
 
   function netease_poll_qr() {
@@ -659,13 +623,13 @@
       .then(d => {
         const statusEl = document.getElementById('netease_qr_status');
         if (!d.ok) {
-          statusEl.textContent = d.message || 'QR login failed.';
+          statusEl.textContent = d.message || I18N.t('QR login failed.');
           return;
         }
         if (d.state === 'waiting') {
           neteasePollTimer = setTimeout(netease_poll_qr, 2000);
         } else if (d.state === 'scanned') {
-          statusEl.textContent = 'Scanned — confirm in the NetEase app.';
+          statusEl.textContent = I18N.t('Scanned — confirm in the NetEase app.');
           neteasePollTimer = setTimeout(netease_poll_qr, 2000);
         } else if (d.state === 'verify') {
           // Risk control blocked the login; the slider is NOT shown on
@@ -674,25 +638,22 @@
           neteaseVerifyPolls += 1;
           if (neteaseVerifyPolls <= 6) {
             statusEl.textContent =
-              'NetEase risk control blocked this login (no prompt appears ' +
-              'on the phone).  Retrying…';
+              I18N.t('NetEase risk control blocked this login (no prompt appears on the phone).  Retrying…');
             neteasePollTimer = setTimeout(netease_poll_qr, 2500);
           } else {
             statusEl.textContent =
-              'NetEase keeps blocking the QR login (risk control).  Click ' +
-              '"Scan QR to log in" to try again — or use the cookie steps ' +
-              'below, which always work.';
+              I18N.t('NetEase keeps blocking the QR login (risk control).  Click "Scan QR to log in" to try again — or use the cookie steps below, which always work.');
           }
         } else if (d.state === 'expired') {
           netease_start_qr();  // Show a fresh QR when this one expires.
         } else if (d.state === 'confirmed') {
-          statusEl.textContent = 'Login confirmed.';
+          statusEl.textContent = I18N.t('Login confirmed.');
           netease_refresh_status();
           setTimeout(() => {
             document.getElementById('netease_qr_area').style.display = 'none';
           }, 1500);
         } else {
-          statusEl.textContent = 'Unexpected state: ' + d.state;
+          statusEl.textContent = I18N.t('Unexpected state:') + ' ' + d.state;
         }
       })
       .catch(() => { neteasePollTimer = setTimeout(netease_poll_qr, 4000); });
@@ -715,7 +676,7 @@
           input.value = '';
           netease_refresh_status();
         } else {
-          alert(d.message || 'Could not save the cookie.');
+          alert(d.message || I18N.t('Could not save the cookie.'));
         }
       });
   }
@@ -738,12 +699,12 @@
         const installWrap = document.getElementById('whisper_settings_install_wrap');
         const modelsBox = document.getElementById('whisper_models_box');
         if (!d.installed) {
-          statusEl.textContent = 'faster-whisper is not installed.';
+          statusEl.textContent = I18N.t('faster-whisper is not installed.');
           installWrap.style.display = '';
           modelsBox.style.display = 'none';
           return;
         }
-        statusEl.textContent = 'faster-whisper is installed.';
+        statusEl.textContent = I18N.t('faster-whisper is installed.');
         installWrap.style.display = 'none';
         modelsBox.style.display = '';
         modelsBox.innerHTML = '';
@@ -751,21 +712,21 @@
           const row = document.createElement('div');
           row.style.marginTop = '4px';
           const state = document.createElement('span');
-          state.textContent = m.size + ' — ' + (m.cached ? 'cached, ' + m.size_mb + ' MB' : 'not downloaded');
+          state.textContent = m.size + ' — ' + (m.cached ? I18N.t('cached,') + ' ' + m.size_mb + ' MB' : I18N.t('not downloaded'));
           row.appendChild(state);
 
           const dl = document.createElement('button');
           dl.className = 'btn btn-secondary';
           dl.style.marginLeft = '8px';
-          dl.textContent = m.cached ? 'Re-download' : 'Download';
+          dl.textContent = m.cached ? I18N.t('Re-download') : I18N.t('Download');
           dl.onclick = () => whisperDownload(m.size);
 
           const del = document.createElement('button');
           del.className = 'btn btn-danger';
           del.style.marginLeft = '6px';
-          del.textContent = 'Delete';
+          del.textContent = I18N.t('Delete');
           del.disabled = !m.cached;
-          del.title = 'Remove the model from disk to free space.';
+          del.title = I18N.t('Remove the model from disk to free space.');
           del.onclick = () => whisperDelete(m.size);
 
           row.appendChild(dl);
@@ -778,25 +739,25 @@
           const row = document.createElement('div');
           row.style.marginTop = '8px';
           const state = document.createElement('span');
-          let stateText = 'sensevoice (zh/yue/en/ja/ko · fastest) — ';
-          if (!sv.installed) stateText += 'sherpa-onnx package not installed';
-          else if (sv.cached) stateText += 'cached, ' + sv.size_mb + ' MB';
-          else stateText += 'not downloaded';
+          let stateText = I18N.t('sensevoice (zh/yue/en/ja/ko · fastest) — ');
+          if (!sv.installed) stateText += I18N.t('sherpa-onnx package not installed');
+          else if (sv.cached) stateText += I18N.t('cached,') + ' ' + sv.size_mb + ' MB';
+          else stateText += I18N.t('not downloaded');
           state.textContent = stateText;
           row.appendChild(state);
 
           const dl = document.createElement('button');
           dl.className = 'btn btn-secondary';
           dl.style.marginLeft = '8px';
-          dl.textContent = sv.cached ? 'Re-download' : 'Download';
+          dl.textContent = sv.cached ? I18N.t('Re-download') : I18N.t('Download');
           dl.onclick = () => whisperDownload('sensevoice');
 
           const del = document.createElement('button');
           del.className = 'btn btn-danger';
           del.style.marginLeft = '6px';
-          del.textContent = 'Delete';
+          del.textContent = I18N.t('Delete');
           del.disabled = !sv.cached;
-          del.title = 'Remove the model from disk to free space.';
+          del.title = I18N.t('Remove the model from disk to free space.');
           del.onclick = () => whisperDelete('sensevoice');
 
           row.appendChild(dl);
@@ -805,23 +766,23 @@
         }
       })
       .catch(() => {
-        document.getElementById('whisper_settings_status').textContent = 'Could not load Whisper status.';
+        document.getElementById('whisper_settings_status').textContent = I18N.t('Could not load Whisper status.');
       });
   }
 
   function whisperInstall() {
-    whisperMsg('Installing faster-whisper (this can take a minute)…', true);
+    whisperMsg(I18N.t('Installing faster-whisper (this can take a minute)…'), true);
     fetch('/book/whisper/install', { method: 'POST' })
       .then(r => r.json())
       .then(d => {
-        whisperMsg(d.message || (d.ok ? 'Installed.' : 'Install failed.'), d.ok);
+        whisperMsg(d.message || (d.ok ? I18N.t('Installed.') : I18N.t('Install failed.')), d.ok);
         whisperRefresh();
       })
-      .catch(() => whisperMsg('Install failed -- see the server log.', false));
+      .catch(() => whisperMsg(I18N.t('Install failed -- see the server log.'), false));
   }
 
   function whisperDownload(size) {
-    whisperMsg("Downloading model '" + size + "' (this can take a few minutes)…", true);
+    whisperMsg(I18N.t("Downloading model '") + size + I18N.t("' (this can take a few minutes)…"), true);
     fetch('/book/whisper/download_model', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -830,7 +791,7 @@
       .then(r => r.json().then(data => ({ ok: r.ok, data })))
       .then(({ ok, data }) => {
         if (!ok || !data.task_id) {
-          whisperMsg(data.error || 'Could not start the download.', false);
+          whisperMsg(data.error || I18N.t('Could not start the download.'), false);
           return;
         }
         const timer = setInterval(() => {
@@ -839,25 +800,25 @@
             .then(d => {
               if (d.state === 'finished') {
                 clearInterval(timer);
-                whisperMsg("Model '" + size + "' is ready.", true);
+                whisperMsg(I18N.t("Model '") + size + I18N.t("' is ready."), true);
                 whisperRefresh();
                 return;
               }
               if (d.state === 'error') {
                 clearInterval(timer);
-                whisperMsg('Model download failed: ' + (d.error || 'unknown error'), false);
+                whisperMsg(I18N.t('Model download failed: ') + (d.error || I18N.t('unknown error')), false);
                 return;
               }
-              whisperMsg(d.message || 'Downloading…', true);
+              whisperMsg(d.message || I18N.t('Downloading…'), true);
             })
             .catch(() => {});
         }, 2000);
       })
-      .catch(() => whisperMsg('Could not start the download.', false));
+      .catch(() => whisperMsg(I18N.t('Could not start the download.'), false));
   }
 
   function whisperDelete(size) {
-    whisperMsg("Deleting model '" + size + "'…", true);
+    whisperMsg(I18N.t("Deleting model '") + size + I18N.t("'…"), true);
     fetch('/book/whisper/delete_model', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -865,10 +826,10 @@
     })
       .then(r => r.json())
       .then(d => {
-        whisperMsg(d.message || (d.ok ? 'Deleted.' : 'Delete failed.'), d.ok);
+        whisperMsg(d.message || (d.ok ? I18N.t('Deleted.') : I18N.t('Delete failed.')), d.ok);
         whisperRefresh();
       })
-      .catch(() => whisperMsg('Delete failed.', false));
+      .catch(() => whisperMsg(I18N.t('Delete failed.'), false));
   }
 
   document.addEventListener('DOMContentLoaded', whisperRefresh);

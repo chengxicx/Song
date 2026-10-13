@@ -5,6 +5,8 @@ All customizable user hotkeys.
 import pprint
 import yaml
 
+from lute.i18n import t
+
 
 # Hotkeys and descriptions.
 _ALL_HOTKEY_DATA = """
@@ -162,7 +164,9 @@ def hotkey_descriptions():
     Get hotkeys and descriptions.  Used by routes.
     """
     y = yaml.safe_load(_ALL_HOTKEY_DATA)
-    return {key["hotkey"]: key["desc"] for group in y.values() for key in group}
+    return {
+        key["hotkey"]: t(key["desc"]) for group in y.values() for key in group
+    }
 
 
 if __name__ == "__main__":

@@ -74,13 +74,13 @@ const DictSettings = (function () {
     if (!d) return "";
     const parts = [];
     if (d.entries !== null && d.entries !== undefined) {
-      parts.push(d.entries.toLocaleString() + " entries");
+      parts.push(d.entries.toLocaleString() + " " + I18N.t("entries"));
     }
     if (d.size_mb !== null && d.size_mb !== undefined) {
       parts.push(d.size_mb + " MB");
     }
-    if (d.source) parts.push("imported from " + d.source);
-    if (d.imported_at) parts.push("on " + d.imported_at);
+    if (d.source) parts.push(I18N.t("imported from ") + d.source);
+    if (d.imported_at) parts.push(I18N.t("on ") + d.imported_at);
     return parts.join(" \u00b7 ");
   }
 
@@ -89,7 +89,7 @@ const DictSettings = (function () {
    * describe().  A missing key must not throw and blank the card.
    */
   function statusText(d) {
-    if (!d || !d.filename) return "No dictionary imported yet.";
+    if (!d || !d.filename) return I18N.t("No dictionary imported yet.");
     const label = d.title || d.filename;
     const facts = describe(d);
     return facts ? label + " \u00b7 " + facts : label;
@@ -117,8 +117,8 @@ const DictSettings = (function () {
     if (d.is_default) {
       parts.push(
         ' <span style="font-size: 0.8em; border: 1px solid #999;' +
-        ' border-radius: 3px; padding: 0 4px;">phone default</span>'
-      );
+      ' border-radius: 3px; padding: 0 4px;">' + I18N.t("phone default") + "</span>"
+    );
     }
     parts.push(
       '<div style="font-size: 0.85em; color: #666;">' + _esc(name) +
@@ -132,7 +132,7 @@ const DictSettings = (function () {
     }
     parts.push(
       '<button type="button" class="btn btn-danger" onclick="DictSettings.remove(\'' +
-      name + "'); return false;\">Remove</button>"
+      name + "'); return false;\">" + I18N.t("Remove") + "</button>"
     );
     parts.push("</div>");
     return parts.join("");
@@ -143,7 +143,7 @@ const DictSettings = (function () {
     if (!list) return;
     const dicts = dictionaries || [];
     if (dicts.length === 0) {
-      list.innerHTML = "<i>No dictionary imported yet.</i>";
+      list.innerHTML = "<i>" + I18N.t("No dictionary imported yet.") + "</i>";
       return;
     }
     list.innerHTML = dicts.map(rowHtml).join("");
@@ -157,7 +157,7 @@ const DictSettings = (function () {
         return d.dictionaries;
       })
       .catch(() => {
-        _setMessage("Could not load the dictionary list.", false);
+        _setMessage(I18N.t("Could not load the dictionary list."), false);
         return null;
       });
   }
@@ -189,10 +189,10 @@ const DictSettings = (function () {
         if (xhr.status >= 200 && xhr.status < 300 && body.task_id) {
           resolve(body);
         } else {
-          reject(new Error(body.message || "The import could not be started."));
+          reject(new Error(body.message || I18N.t("The import could not be started.")));
         }
       };
-      xhr.onerror = () => reject(new Error("Upload failed -- the server did not answer."));
+      xhr.onerror = () => reject(new Error(I18N.t("Upload failed -- the server did not answer.")));
       xhr.send(form);
     });
   }
@@ -217,12 +217,12 @@ const DictSettings = (function () {
               return;
             }
             const read = d.processed
-              ? d.processed.toLocaleString() + " entries read"
-              : "starting";
-            _setMessage("Converting\u2026 " + read + ".  This can take a few minutes.", true);
+              ? d.processed.toLocaleString() + " " + I18N.t("entries read")
+              : I18N.t("starting");
+            _setMessage(I18N.t("Converting\u2026 ") + read + I18N.t(".  This can take a few minutes."), true);
             setTimeout(tick, wait);
           })
-          .catch(() => reject(new Error("Lost contact with the server during the conversion.")));
+          .catch(() => reject(new Error(I18N.t("Lost contact with the server during the conversion."))));
       };
       tick();
     });
@@ -230,21 +230,21 @@ const DictSettings = (function () {
 
   function importFile(file, name) {
     if (!file) {
-      _setMessage("Choose an .mdx file first.", false);
+      _setMessage(I18N.t("Choose an .mdx file first."), false);
       return Promise.resolve();
     }
     _setBusy(true);
-    _setMessage("Uploading " + file.name + "\u2026", true);
+    _setMessage(I18N.t("Uploading ") + file.name + I18N.t("\u2026"), true);
     return upload(file, name, fraction => {
       _setMessage(
-        "Uploading " + file.name + " \u2014 " + Math.round(fraction * 100) + "%",
+        I18N.t("Uploading ") + file.name + I18N.t(" \u2014 ") + Math.round(fraction * 100) + I18N.t("%"),
         true
       );
     })
       .then(d => {
         _setMessage(
-          "Converting " + (d.source || file.name) + " into " +
-          (d.filename || "the dictionary") + "\u2026 this can take a few minutes.",
+          I18N.t("Converting ") + (d.source || file.name) + I18N.t(" into ") +
+          (d.filename || I18N.t("the dictionary")) + I18N.t("\u2026 this can take a few minutes."),
           true
         );
         return poll(d.task_id);
@@ -252,7 +252,7 @@ const DictSettings = (function () {
       .then(d => {
         const n = d.dictionary && d.dictionary.entries;
         _setMessage(
-          n ? "Imported " + n.toLocaleString() + " entries." : "Dictionary imported.",
+          n ? I18N.t("Imported ") + n.toLocaleString() + I18N.t(" entries.") : I18N.t("Dictionary imported."),
           true
         );
         return refresh();
@@ -279,8 +279,7 @@ const DictSettings = (function () {
    */
   function remove(name, force) {
     if (!force && !window.confirm(
-      "Delete " + name + "?  The phone app can no longer download it, and " +
-      "any language using it loses its dictionary gloss."
+      I18N.t("Delete ") + name + I18N.t("?  The phone app can no longer download it, and any language using it loses its dictionary gloss.")
     )) {
       return Promise.resolve();
     }
@@ -292,20 +291,20 @@ const DictSettings = (function () {
       .then(r => r.json().then(body => ({ status: r.status, body: body })))
       .then(res => {
         if (res.body && res.body.result === "in_use") {
-          if (window.confirm(res.body.message + "  Delete it anyway?")) {
+          if (window.confirm(res.body.message + I18N.t("  Delete it anyway?"))) {
             return remove(name, true);
           }
           return refresh();
         }
         _setMessage(
           res.body && res.body.removed
-            ? "Dictionary removed."
-            : "There was nothing to remove.",
+            ? I18N.t("Dictionary removed.")
+            : I18N.t("There was nothing to remove."),
           true
         );
         return refresh();
       })
-      .catch(() => _setMessage("Could not remove the dictionary.", false))
+      .catch(() => _setMessage(I18N.t("Could not remove the dictionary."), false))
       .then(() => _setBusy(false));
   }
 

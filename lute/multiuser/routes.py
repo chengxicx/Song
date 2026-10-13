@@ -29,6 +29,7 @@ from lute.db.setup.main import setup_db
 from lute.multiuser import context, paths, store, switching
 from lute.multiuser.permissions import admin_only_if_multiuser
 from lute.multiuser.switching import SwitchError
+from lute.i18n import t
 
 bp = Blueprint("multiuser", __name__, template_folder="templates")
 
@@ -48,10 +49,10 @@ def admin_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         if not store.enabled():
-            flash("Multi-user mode is off.")
+            flash(t("Multi-user mode is off."))
             return redirect("/")
         if not store.is_admin(session.get("user")):
-            flash("Only an admin can manage users.")
+            flash(t("Only an admin can manage users."))
             return redirect("/")
         return view(*args, **kwargs)
 
@@ -136,7 +137,7 @@ def login():
         username = (request.form.get("username") or "").strip()
         password = request.form.get("password") or ""
         if _too_many_failures(ip, username):
-            flash("Too many failed attempts.  Try again in a minute.")
+            flash(t("Too many failed attempts.  Try again in a minute."))
         elif store.authenticate(username, password):
             _login_failures.pop((ip, username), None)
             session.clear()
@@ -145,7 +146,7 @@ def login():
             return redirect(_local_next())
         else:
             _record_failure(ip, username)
-            flash("Wrong username or password.")
+            flash(t("Wrong username or password."))
 
     return render_template("multiuser/login.html", next=_local_next())
 
@@ -170,7 +171,7 @@ def users_index():
     their own account, with a change-password action.
     """
     if not store.enabled():
-        flash("Multi-user mode is off.")
+        flash(t("Multi-user mode is off."))
         return redirect("/")
     username = session.get("user")
     if not username or not store.get_user(username):
@@ -192,7 +193,7 @@ def users_new():
         confirm = request.form.get("confirm") or ""
         role = request.form.get("role") or "user"
         if password != confirm:
-            flash("Passwords do not match.")
+            flash(t("Passwords do not match."))
         else:
             try:
                 store.create_user(username, password, role)
@@ -228,7 +229,7 @@ def users_reset_password(name):
         password = request.form.get("password") or ""
         confirm = request.form.get("confirm") or ""
         if password != confirm:
-            flash("Passwords do not match.")
+            flash(t("Passwords do not match."))
         else:
             try:
                 store.set_password(name, password)
@@ -243,7 +244,7 @@ def users_reset_password(name):
 def change_own_password():
     "Change own password (multi-user mode only)."
     if not store.enabled():
-        flash("Multi-user mode is off.")
+        flash(t("Multi-user mode is off."))
         return redirect("/")
     username = session.get("user")
     if not username or not store.get_user(username):
@@ -253,13 +254,13 @@ def change_own_password():
         password = request.form.get("password") or ""
         confirm = request.form.get("confirm") or ""
         if not store.authenticate(username, current):
-            flash("Current password is wrong.")
+            flash(t("Current password is wrong."))
         elif password != confirm:
-            flash("Passwords do not match.")
+            flash(t("Passwords do not match."))
         else:
             try:
                 store.set_password(username, password)
-                flash("Your password was changed.")
+                flash(t("Your password was changed."))
                 return redirect("/")
             except ValueError as e:
                 flash(str(e))
@@ -309,7 +310,7 @@ def enable():
                 from lute.settings.current import refresh_global_settings
 
                 refresh_global_settings(db.session)
-        flash("Multi-user mode is on.  Your data was migrated to your account.")
+        flash(t("Multi-user mode is on.  Your data was migrated to your account."))
         return redirect("/")
     except SwitchError as e:
         flash(str(e))
@@ -327,7 +328,7 @@ def disable():
         with switching.MIGRATION_LOCK:
             switching.disable(_base_config(), username)
             session.clear()
-        flash("Multi-user mode is off.  Other accounts are kept but frozen.")
+        flash(t("Multi-user mode is off.  Other accounts are kept but frozen."))
         return redirect("/")
     except SwitchError as e:
         flash(str(e))

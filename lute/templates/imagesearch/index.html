@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>Images</title>
+    <title>{{ t('Images') }}</title>
     <script type="text/javascript" src="{{ vstatic('vendor/jquery/jquery.js') }}" charset="utf-8"></script>
     <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
     {% if theme_css_hash %}
@@ -24,13 +24,13 @@
       </form>
 
       <p class="termimagesearchtitle">
-        Click an image below,
-        <span id="upload_image_link" class="imageAction">upload an image</span>, or
-        <span class="imageAction" title="Click to set focus in this window">click here</span>
-        then paste from your clipboard.
+        {{ t('Click an image below,') }}
+        <span id="upload_image_link" class="imageAction">{{ t('upload an image') }}</span>, {{ t('or') }}
+        <span class="imageAction" title="{{ t('Click to set focus in this window') }}">{{ t('click here') }}</span>
+        {{ t('then paste from your clipboard.') }}
       </p>
 
-      <p id="image_search_feedback"><i>Searching ...</i></p>
+      <p id="image_search_feedback"><i>{{ t('Searching ...') }}</i></p>
 
     </div>
   </body>
@@ -83,7 +83,7 @@
         },
         error: function(data) {
           // console.log("Got error: " + data.responseJSON);
-          alert("Unable to save image: " + data.responseJSON?.reason);
+          alert(I18N.t('Unable to save image: ') + data.responseJSON?.reason);
         },
       });
     }
@@ -146,7 +146,7 @@
         dataType: 'json',
         success: function(data) {
           if (data.error_message !== "") {
-            const msg = `Error: ${data.error_message}`;
+            const msg = I18N.t('Error:') + ' ' + data.error_message;
             console.error(msg);
             $("#image_search_feedback").text(msg);
             return;
@@ -155,7 +155,7 @@
           $("#image_search_feedback").hide();
           if (data.images.length === 0) {
             const p = document.createElement('p');
-            p.textContent = 'No images found.';
+            p.textContent = I18N.t('No images found.');
             container.appendChild(p);
             return;
           }
@@ -168,7 +168,7 @@
           });
         },
         error: function(xhr, status, error) {
-          const msg = `Error ${error}; ${status}; ${xhr.responseText}`;
+          const msg = I18N.t('Error') + ` ${error}; ${status}; ${xhr.responseText}`;
           console.error(msg);
           $("#image_search_feedback").val(msg);
         }

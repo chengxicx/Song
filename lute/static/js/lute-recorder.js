@@ -55,14 +55,14 @@ window.LuteRecorder = (function () {
 
   function permissionMessage(err) {
     if (err && (err.name === "NotAllowedError" || err.name === "SecurityError")) {
-      return "Microphone permission denied.  Allow microphone access for this site to use shadowing.";
+      return I18N.t("Microphone permission denied.  Allow microphone access for this site to use shadowing.");
     }
     if (err && err.name === "NotFoundError") {
-      return "No microphone found.";
+      return I18N.t("No microphone found.");
     }
     return (
-      "Could not start recording" +
-      (err && err.message ? ": " + err.message : ".")
+      I18N.t("Could not start recording") +
+      (err && err.message ? I18N.t(": ") + err.message : I18N.t("."))
     );
   }
 
@@ -97,7 +97,7 @@ window.LuteRecorder = (function () {
       if (!canRecord()) {
         if (this.onFail) {
           this.onFail(
-            "Microphone recording needs a secure context (open Lute on localhost or HTTPS) and a browser with MediaRecorder support."
+            I18N.t("Microphone recording needs a secure context (open Lute on localhost or HTTPS) and a browser with MediaRecorder support.")
           );
         }
         return false;
@@ -195,7 +195,7 @@ window.LuteRecorder = (function () {
       this._cleanup();
       const blob = new Blob(chunks, { type: mime || "audio/webm" });
       if (!blob.size) {
-        if (this.onFail) this.onFail("The recording was empty — try again.");
+        if (this.onFail) this.onFail(I18N.t("The recording was empty — try again."));
         return;
       }
       if (this.onStop) this.onStop(blob, mime);
@@ -231,14 +231,14 @@ window.LuteRecorder = (function () {
         data = await resp.json();
       } catch (_) {}
       if (!resp.ok) {
-        return { state: "error", error: data.error || "Request failed (" + resp.status + ")" };
+        return { state: "error", error: data.error || I18N.t("Request failed (") + resp.status + I18N.t(")") };
       }
       taskId = data.task_id;
     } catch (err) {
-      return { state: "error", error: "Network error: " + err };
+      return { state: "error", error: I18N.t("Network error: ") + err };
     }
     if (!taskId) {
-      return { state: "error", error: "No task id returned by the server." };
+      return { state: "error", error: I18N.t("No task id returned by the server.") };
     }
     return pollTask(taskId, args.onProgress || null);
   }
@@ -266,17 +266,17 @@ window.LuteRecorder = (function () {
         return { state: "finished", result: data.result };
       }
       if (data.state === "error") {
-        return { state: "error", error: data.error || "Transcription failed." };
+        return { state: "error", error: data.error || I18N.t("Transcription failed.") };
       }
       if (data.state === "unknown") {
         return {
           state: "error",
-          error: "The scoring task was lost (server restart?) — try again.",
+          error: I18N.t("The scoring task was lost (server restart?) — try again."),
         };
       }
       if (onProgress) onProgress(data.state, Math.floor((Date.now() - started) / 1000));
     }
-    return { state: "error", error: "Transcription timed out." };
+    return { state: "error", error: I18N.t("Transcription timed out.") };
   }
 
   // One click on a misread word: put it into the learning pile so the
@@ -296,7 +296,7 @@ window.LuteRecorder = (function () {
       data = await resp.json();
     } catch (_) {}
     if (!resp.ok) {
-      throw data.error || "Request failed (" + resp.status + ")";
+      throw data.error || I18N.t("Request failed (") + resp.status + I18N.t(")");
     }
     return data;
   }

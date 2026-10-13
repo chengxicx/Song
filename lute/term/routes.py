@@ -35,6 +35,7 @@ from lute.term.service import (
 )
 from lute.db import db
 from lute.term.forms import TermForm
+from lute.i18n import t
 import lute.utils.formutils
 from werkzeug.wrappers import Response as WerkzeugResponse
 
@@ -223,7 +224,7 @@ def bulk_edit_from_index():
     try:
         svc.apply_bulk_updates(bud)
     except TermServiceException as ex:
-        flash(f"Error: {str(ex)}", "notice")
+        flash(t("Error") + f": {str(ex)}", "notice")
     return redirect("/term/index", 302)
 
 
@@ -235,7 +236,7 @@ def bulk_edit_from_reading_pane():
     try:
         svc.apply_bulk_updates(bud)
     except TermServiceException as ex:
-        flash(f"Error: {str(ex)}", "notice")
+        flash(t("Error") + f": {str(ex)}", "notice")
         return redirect("/read/term_bulk_edit_form", 302)
     return render_template("/read/updated.html", term_text=None)
 
@@ -263,9 +264,9 @@ def ajax_edit_from_index():
         return jsonify({"error": str(ex)}), 400
     except ValueError as ex:
         print(ex, flush=True)
-        return jsonify({"error": f"Invalid input ({ex})"}), 400
+        return jsonify({"error": t("Invalid input") + f" ({ex})"}), 400
     except Exception as ex:  # pylint: disable=broad-exception-caught
-        return jsonify({"error": f"An unexpected error occurred ({ex})"}), 500
+        return jsonify({"error": t("An unexpected error occurred") + f" ({ex})"}), 500
 
     return jsonify({"status": updated_term.status})
 

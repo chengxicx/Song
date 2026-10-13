@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script>
+      window.LUTE_I18N = {{ i18n_dict_json|safe }};
+      window.I18N = { t: function(k) { return (window.LUTE_I18N && window.LUTE_I18N[k]) || k; } };
+    </script>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>Form</title>
+    <title>{{ t('Form') }}</title>
     
     <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/jquery/jquery-ui.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ vstatic('vendor/tagify/tagify.css') }}" />

@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block header %}
-{% if term.language_id is none %}New Term{% else %}Edit Term{% endif %}
+{% if term.language_id is none %}{{ t('New Term') }}{% else %}{{ t('Edit Term') }}{% endif %}
 {% endblock %}
 
 {% block body %}
 <div id="term_form_left">
   {% include('term/_form.html') %}
-  <a href="/term/index">Back to list</a>
+  <a href="/term/index">{{ t('Back to list') }}</a>
 </div>
 
 

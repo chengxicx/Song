@@ -24,10 +24,10 @@ const LuteAnki = (function() {
       return response.result;
     } catch (error) {
       const lute_origin = window.location.origin;
-      const msg = `Unable to connect to AnkiConnect at\n${anki_connect_url}.\n\n`
-            + `Ensure Anki is running and AnkiConnect is installed,\n`
-            + `and "${lute_origin}" (your Lute url) is in AnkiConnect's webCorsOriginList in its config.\n`
-            + `(Remember to restart Anki if you change the AnkiConnect config.)`
+      const msg = I18N.t('Unable to connect to AnkiConnect at') + '\n' + anki_connect_url + I18N.t('.') + '\n\n'
+            + I18N.t('Ensure Anki is running and AnkiConnect is installed,') + '\n'
+            + I18N.t('and') + ' "' + lute_origin + '" ' + I18N.t("(your Lute url) is in AnkiConnect's webCorsOriginList in its config.") + '\n'
+            + I18N.t('(Remember to restart Anki if you change the AnkiConnect config.)')
       ;
       throw new Error(msg);
     }
@@ -136,7 +136,7 @@ const LuteAnki = (function() {
       const errorMessage = jqXHR.responseJSON?.error ||
             jqXHR.responseText ||
             jqXHR.statusText;
-      throw new Error(`Failure: ${errorMessage}`);
+      throw new Error(I18N.t('Failure: ') + errorMessage);
     }
   }
 
@@ -199,7 +199,7 @@ const LuteAnki = (function() {
     // [ "success", "... duplicate" ]
     const flat_results = results.flat().map(entry => 
       entry && typeof entry === "object" && "error" in entry ?
-        entry.error : "success"
+        entry.error : I18N.t("success")
     );
 
     // Adds the final flat_result to its corresponding name_and_action_array.
@@ -249,12 +249,12 @@ const LuteAnki = (function() {
         const results = await Promise.all(postPromises);
         const addNote_results = _get_addNote_results(name_to_posts, results);
         const msg = addNote_results.length === 0 ?
-              "no cards created" :
+              I18N.t("no cards created") :
               addNote_results.join("\n");
         callback(term_id, msg);
       } catch (error) {
         console.error(`Error processing ID ${term_id}:`, error);
-        callback(term_id, "Unknown error ...");
+        callback(term_id, I18N.t("Unknown error ..."));
       }
     }
   }

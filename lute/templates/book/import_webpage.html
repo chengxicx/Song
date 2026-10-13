@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Create new{% endblock %}
-{% block header %}Create new{% endblock %}
+{% block title %}{{ t('Create new') }}{% endblock %}
+{% block header %}{{ t('Create new') }}{% endblock %}
 
 {% block body %}
 <style>
@@ -116,15 +116,15 @@
 </style>
 
 <div class="import-type-bar">
-  <label for="import-type-button">Import type:</label>
+  <label for="import-type-button">{{ t('Import type:') }}</label>
   <div class="import-type-dd">
     <button type="button" id="import-type-button" class="import-type-btn"
             aria-haspopup="listbox" aria-expanded="false">
       <span class="itd-ico" id="import-type-button-ico" aria-hidden="true"></span>
-      <span id="import-type-label">Text</span>
+      <span id="import-type-label">{{ t('Text') }}</span>
       <svg class="itd-caret" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
-    <ul id="import-type-menu" class="import-type-menu" role="listbox" aria-label="Import type" hidden></ul>
+    <ul id="import-type-menu" class="import-type-menu" role="listbox" aria-label="{{ t('Import type') }}" hidden></ul>
   </div>
 </div>
 
@@ -133,10 +133,10 @@
 </div>
 
 <form id="webpage-form" class="import-form" action="/book/import_webpage" method="post" style="display: none;">
-  <p class="import-desc">This import is primitive — it grabs all the headings and text from an HTML page, so edit the Book form afterwards to trim it.</p>
+  <p class="import-desc">{{ t('This import is primitive — it grabs all the headings and text from an HTML page, so edit the Book form afterwards to trim it.') }}</p>
   <div class="iform">
     <div class="irow">
-      <label class="ilbl" for="webpage-language">Language</label>
+      <label class="ilbl" for="webpage-language">{{ t('Language') }}</label>
       <div class="ictrl">
         <select id="webpage-language" name="language_id">
           {% for id, name in language_choices %}
@@ -146,7 +146,7 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="importurl">URL</label>
+      <label class="ilbl" for="importurl">{{ t('URL') }}</label>
       <div class="ictrl">
         <input type="url" id="importurl" name="importurl" placeholder="https://example.com/article" autofocus>
       </div>
@@ -154,15 +154,15 @@
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="webpage">
-    <button type="submit" id="import" class="btn btn-primary">Import</button>
+    <button type="submit" id="import" class="btn btn-primary">{{ t('Import') }}</button>
   </div>
 </form>
 
 <form id="youtube-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import a YouTube video with its subtitle (SRT / VTT). The subtitles become the book text so you can look up words while the video plays.</p>
+  <p class="import-desc">{{ t('Import a YouTube video with its subtitle (SRT / VTT). The subtitles become the book text so you can look up words while the video plays.') }}</p>
   <div class="iform">
     <div class="irow">
-      <label class="ilbl" for="youtube-language">Language</label>
+      <label class="ilbl" for="youtube-language">{{ t('Language') }}</label>
       <div class="ictrl">
         <select id="youtube-language" name="language_id">
           {% for id, name in language_choices %}
@@ -172,19 +172,19 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="youtube_url">Video URL</label>
+      <label class="ilbl" for="youtube_url">{{ t('Video URL') }}</label>
       <div class="ictrl">
         <input type="url" id="youtube_url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=...">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="srt_file">Subtitles</label>
+      <label class="ilbl" for="srt_file">{{ t('Subtitles') }}</label>
       <div class="ictrl">
         <input type="file" id="srt_file" name="srt_file" accept=".srt,.vtt">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="youtube_tag">Tags</label>
+      <label class="ilbl" for="youtube_tag">{{ t('Tags') }}</label>
       <div class="ictrl">
         <input type="text" id="youtube_tag" name="youtube_tag" class="form-control">
       </div>
@@ -192,15 +192,15 @@
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="youtube">
-    <button type="submit" id="youtube-import" class="btn btn-primary">Import</button>
+    <button type="submit" id="youtube-import" class="btn btn-primary">{{ t('Import') }}</button>
   </div>
 </form>
 
 <form id="bilibili-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import a Bilibili video with its subtitle (SRT / VTT). The subtitles become the book text so you can look up words while the video plays.</p>
+  <p class="import-desc">{{ t('Import a Bilibili video with its subtitle (SRT / VTT). The subtitles become the book text so you can look up words while the video plays.') }}</p>
   <div class="iform">
     <div class="irow">
-      <label class="ilbl" for="bilibili-language">Language</label>
+      <label class="ilbl" for="bilibili-language">{{ t('Language') }}</label>
       <div class="ictrl">
         <select id="bilibili-language" name="language_id">
           {% for id, name in language_choices %}
@@ -210,19 +210,19 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="bilibili_url">Video URL</label>
+      <label class="ilbl" for="bilibili_url">{{ t('Video URL') }}</label>
       <div class="ictrl">
         <input type="url" id="bilibili_url" name="bilibili_url" placeholder="https://www.bilibili.com/video/BV...">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="srt_file">Subtitles</label>
+      <label class="ilbl" for="srt_file">{{ t('Subtitles') }}</label>
       <div class="ictrl">
         <input type="file" id="srt_file" name="srt_file" accept=".srt,.vtt">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="bilibili_tag">Tags</label>
+      <label class="ilbl" for="bilibili_tag">{{ t('Tags') }}</label>
       <div class="ictrl">
         <input type="text" id="bilibili_tag" name="bilibili_tag" class="form-control">
       </div>
@@ -230,15 +230,15 @@
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="bilibili">
-    <button type="submit" id="bilibili-import" class="btn btn-primary">Import</button>
+    <button type="submit" id="bilibili-import" class="btn btn-primary">{{ t('Import') }}</button>
   </div>
 </form>
 
 <form id="mp3-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import audio with subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and audio under 20&#8202;MB is stored locally. Supports mp3, m4a, m4b, wav, ogg, opus, aac, flac, webm.</p>
+  <p class="import-desc">{{ t('Import audio with subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and audio under 20 MB is stored locally. Supports mp3, m4a, m4b, wav, ogg, opus, aac, flac, webm.') }}</p>
   <div class="iform">
     <div class="irow">
-      <label class="ilbl" for="mp3-language">Language</label>
+      <label class="ilbl" for="mp3-language">{{ t('Language') }}</label>
       <div class="ictrl">
         <select id="mp3-language" name="language_id">
           {% for id, name in language_choices %}
@@ -248,37 +248,37 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="mp3_title">Title</label>
+      <label class="ilbl" for="mp3_title">{{ t('Title') }}</label>
       <div class="ictrl">
-        <input type="text" id="mp3_title" name="mp3_title" placeholder="Optional, defaults to file / URL name">
+        <input type="text" id="mp3_title" name="mp3_title" placeholder="{{ t('Optional, defaults to file / URL name') }}">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="mp3_file">Audio</label>
+      <label class="ilbl" for="mp3_file">{{ t('Audio') }}</label>
       <div class="ictrl isource">
         <input type="file" id="mp3_file" name="mp3_file" accept=".mp3,.m4a,.m4b,.wav,.ogg,.opus,.aac,.flac,.webm">
-        <span class="ior">or</span>
-        <input type="url" id="mp3_url" name="mp3_url" placeholder="Paste an audio URL">
+        <span class="ior">{{ t('or') }}</span>
+        <input type="url" id="mp3_url" name="mp3_url" placeholder="{{ t('Paste an audio URL') }}">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="mp3_srt_file">Subtitles</label>
+      <label class="ilbl" for="mp3_srt_file">{{ t('Subtitles') }}</label>
       <div class="ictrl isource">
         <input type="file" id="mp3_srt_file" name="srt_file" accept=".srt,.vtt,.txt">
-        <span class="ior">or</span>
-        <input type="url" id="mp3_srt_url" name="mp3_srt_url" placeholder="Paste an SRT / VTT / TXT URL">
+        <span class="ior">{{ t('or') }}</span>
+        <input type="url" id="mp3_srt_url" name="mp3_srt_url" placeholder="{{ t('Paste an SRT / VTT / TXT URL') }}">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="mp3_whisper">No subtitles?</label>
+      <label class="ilbl" for="mp3_whisper">{{ t('No subtitles?') }}</label>
       <div class="ictrl isource">
-        <label><input type="checkbox" id="mp3_whisper" checked> Auto-transcribe (local, no subtitle file needed)</label>
-        <span class="ior">model</span>
-        <select id="mp3_whisper_model" name="whisper_model" title="Transcription engine: SenseVoice is fastest for Chinese, Cantonese, English, Japanese and Korean; whisper covers every other language (base = fastest, medium = most accurate). The model downloads automatically on the first transcription.">
-          <option value="sensevoice" {% if sensevoice_default %}selected{% endif %}>SenseVoice (zh / yue / en / ja / ko &middot; fastest)</option>
-          <option value="base">whisper base (fastest)</option>
-          <option value="small" {% if not sensevoice_default %}selected{% endif %}>whisper small (recommended)</option>
-          <option value="medium">whisper medium (most accurate)</option>
+        <label><input type="checkbox" id="mp3_whisper" checked> {{ t('Auto-transcribe (local, no subtitle file needed)') }}</label>
+        <span class="ior">{{ t('model') }}</span>
+        <select id="mp3_whisper_model" name="whisper_model" title="{{ t('Transcription engine: SenseVoice is fastest for Chinese, Cantonese, English, Japanese and Korean; whisper covers every other language (base = fastest, medium = most accurate). The model downloads automatically on the first transcription.') }}">
+          <option value="sensevoice" {% if sensevoice_default %}selected{% endif %}>{{ t('SenseVoice (zh / yue / en / ja / ko · fastest)') }}</option>
+          <option value="base">{{ t('whisper base (fastest)') }}</option>
+          <option value="small" {% if not sensevoice_default %}selected{% endif %}>{{ t('whisper small (recommended)') }}</option>
+          <option value="medium">{{ t('whisper medium (most accurate)') }}</option>
         </select>
       </div>
     </div>
@@ -286,12 +286,10 @@
       <label class="ilbl"></label>
       <div class="ictrl" id="whisper_panel">
         <span id="whisper_missing" style="display: none;">
-          Whisper isn't installed on this server yet &mdash; install it (and pre-download
-          models) under <a href="/settings">Settings &rarr; Whisper (auto-subtitles)</a>.
+          {{ t("Whisper isn't installed on this server yet — install it (and pre-download models) under <a href=\"/settings\">Settings → Whisper (auto-subtitles)</a>.") }}
         </span>
         <span id="sensevoice_missing" style="display: none;">
-          SenseVoice isn't installed on this server yet &mdash; set it up (and pre-download
-          the model) under <a href="/settings">Settings &rarr; Whisper (auto-subtitles)</a>.
+          {{ t("SenseVoice isn't installed on this server yet — set it up (and pre-download the model) under <a href=\"/settings\">Settings → Whisper (auto-subtitles)</a>.") }}
         </span>
         <span id="whisper_progress" style="display: none;">
           <span id="whisper_status_text" class="import-status-text"></span>
@@ -300,7 +298,7 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="mp3_tag">Tags</label>
+      <label class="ilbl" for="mp3_tag">{{ t('Tags') }}</label>
       <div class="ictrl">
         <input type="text" id="mp3_tag" name="mp3_tag" class="form-control">
       </div>
@@ -308,15 +306,15 @@
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="mp3">
-    <button type="submit" id="mp3-import" class="btn btn-primary">Import</button>
+    <button type="submit" id="mp3-import" class="btn btn-primary">{{ t('Import') }}</button>
   </div>
 </form>
 
 <form id="netease-form" class="import-form" action="/book/import_webpage" method="post" style="display: none;">
-  <p class="import-desc">Import a song from NetEase Cloud Music: the audio is downloaded to your library and its LRC lyrics become the book text, synced line by line with playback. VIP / copyright-restricted songs require logging in via Settings first.</p>
+  <p class="import-desc">{{ t('Import a song from NetEase Cloud Music: the audio is downloaded to your library and its LRC lyrics become the book text, synced line by line with playback. VIP / copyright-restricted songs require logging in via Settings first.') }}</p>
   <div class="iform">
     <div class="irow">
-      <label class="ilbl" for="netease-language">Language</label>
+      <label class="ilbl" for="netease-language">{{ t('Language') }}</label>
       <div class="ictrl">
         <select id="netease-language" name="language_id">
           {% for id, name in language_choices %}
@@ -326,13 +324,13 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="netease_url">Song URL</label>
+      <label class="ilbl" for="netease_url">{{ t('Song URL') }}</label>
       <div class="ictrl">
         <input type="url" id="netease_url" name="netease_url" placeholder="https://music.163.com/#/song?id=..." autofocus>
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="netease_tag">Tags</label>
+      <label class="ilbl" for="netease_tag">{{ t('Tags') }}</label>
       <div class="ictrl">
         <input type="text" id="netease_tag" name="netease_tag" class="form-control">
       </div>
@@ -340,15 +338,15 @@
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="netease">
-    <button type="submit" id="netease-import" class="btn btn-primary">Import</button>
+    <button type="submit" id="netease-import" class="btn btn-primary">{{ t('Import') }}</button>
   </div>
 </form>
 
 <form id="video-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import a video with its subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and video under 20&#8202;MB is stored locally. No subtitles? Tick Auto-transcribe and the speech is turned into timed subtitles locally.</p>
+  <p class="import-desc">{{ t('Import a video with its subtitles (SRT / VTT / TXT). Upload the files or paste online URLs — subtitles are pulled to your library, and video under 20 MB is stored locally. No subtitles? Tick Auto-transcribe and the speech is turned into timed subtitles locally.') }}</p>
   <div class="iform">
     <div class="irow">
-      <label class="ilbl" for="video-language">Language</label>
+      <label class="ilbl" for="video-language">{{ t('Language') }}</label>
       <div class="ictrl">
         <select id="video-language" name="language_id">
           {% for id, name in language_choices %}
@@ -358,37 +356,37 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="video_title">Title</label>
+      <label class="ilbl" for="video_title">{{ t('Title') }}</label>
       <div class="ictrl">
-        <input type="text" id="video_title" name="video_title" placeholder="Optional, defaults to file / URL name">
+        <input type="text" id="video_title" name="video_title" placeholder="{{ t('Optional, defaults to file / URL name') }}">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="video_file">Video</label>
+      <label class="ilbl" for="video_file">{{ t('Video') }}</label>
       <div class="ictrl isource">
         <input type="file" id="video_file" name="video_file" accept=".mp4,.webm,.mov,.ogv,.ogg,.m4v">
-        <span class="ior">or</span>
-        <input type="url" id="video_url" name="video_url" placeholder="Paste a video URL">
+        <span class="ior">{{ t('or') }}</span>
+        <input type="url" id="video_url" name="video_url" placeholder="{{ t('Paste a video URL') }}">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="video_srt_file">Subtitles</label>
+      <label class="ilbl" for="video_srt_file">{{ t('Subtitles') }}</label>
       <div class="ictrl isource">
         <input type="file" id="video_srt_file" name="video_srt_file" accept=".srt,.vtt,.txt">
-        <span class="ior">or</span>
-        <input type="url" id="video_srt_url" name="video_srt_url" placeholder="Paste an SRT / VTT / TXT URL">
+        <span class="ior">{{ t('or') }}</span>
+        <input type="url" id="video_srt_url" name="video_srt_url" placeholder="{{ t('Paste an SRT / VTT / TXT URL') }}">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="video_whisper">No subtitles?</label>
+      <label class="ilbl" for="video_whisper">{{ t('No subtitles?') }}</label>
       <div class="ictrl isource">
-        <label><input type="checkbox" id="video_whisper" checked> Auto-transcribe (local, no subtitle file needed)</label>
-        <span class="ior">model</span>
-        <select id="video_whisper_model" name="whisper_model" title="Transcription engine: SenseVoice is fastest for Chinese, Cantonese, English, Japanese and Korean; whisper covers every other language (base = fastest, medium = most accurate). The model downloads automatically on the first transcription.">
-          <option value="sensevoice" {% if sensevoice_default %}selected{% endif %}>SenseVoice (zh / yue / en / ja / ko &middot; fastest)</option>
-          <option value="base">whisper base (fastest)</option>
-          <option value="small" {% if not sensevoice_default %}selected{% endif %}>whisper small (recommended)</option>
-          <option value="medium">whisper medium (most accurate)</option>
+        <label><input type="checkbox" id="video_whisper" checked> {{ t('Auto-transcribe (local, no subtitle file needed)') }}</label>
+        <span class="ior">{{ t('model') }}</span>
+        <select id="video_whisper_model" name="whisper_model" title="{{ t('Transcription engine: SenseVoice is fastest for Chinese, Cantonese, English, Japanese and Korean; whisper covers every other language (base = fastest, medium = most accurate). The model downloads automatically on the first transcription.') }}">
+          <option value="sensevoice" {% if sensevoice_default %}selected{% endif %}>{{ t('SenseVoice (zh / yue / en / ja / ko · fastest)') }}</option>
+          <option value="base">{{ t('whisper base (fastest)') }}</option>
+          <option value="small" {% if not sensevoice_default %}selected{% endif %}>{{ t('whisper small (recommended)') }}</option>
+          <option value="medium">{{ t('whisper medium (most accurate)') }}</option>
         </select>
       </div>
     </div>
@@ -396,12 +394,10 @@
       <label class="ilbl"></label>
       <div class="ictrl" id="video_panel">
         <span id="video_whisper_missing" style="display: none;">
-          Whisper isn't installed on this server yet &mdash; install it (and pre-download
-          models) under <a href="/settings">Settings &rarr; Whisper (auto-subtitles)</a>.
+          {{ t("Whisper isn't installed on this server yet — install it (and pre-download models) under <a href=\"/settings\">Settings → Whisper (auto-subtitles)</a>.") }}
         </span>
         <span id="video_sensevoice_missing" style="display: none;">
-          SenseVoice isn't installed on this server yet &mdash; set it up (and pre-download
-          the model) under <a href="/settings">Settings &rarr; Whisper (auto-subtitles)</a>.
+          {{ t("SenseVoice isn't installed on this server yet — set it up (and pre-download the model) under <a href=\"/settings\">Settings → Whisper (auto-subtitles)</a>.") }}
         </span>
         <span id="video_whisper_progress" style="display: none;">
           <span id="video_status_text" class="import-status-text"></span>
@@ -410,7 +406,7 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="video_tag">Tags</label>
+      <label class="ilbl" for="video_tag">{{ t('Tags') }}</label>
       <div class="ictrl">
         <input type="text" id="video_tag" name="video_tag" class="form-control">
       </div>
@@ -418,17 +414,15 @@
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="video">
-    <button type="submit" id="video-import" class="btn btn-primary">Import</button>
+    <button type="submit" id="video-import" class="btn btn-primary">{{ t('Import') }}</button>
   </div>
 </form>
 
 <form id="manga-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import a Mokuro manga archive — generated with
-    <a href="https://github.com/kha-white/mokuro" target="_blank" rel="noreferrer">mokuro</a> —
-    as a .zip / .cbz file. (Sample: <code>hanabira_manga_01.mokuro</code> packaged as a zip.)</p>
+  <p class="import-desc">{{ t('Import a Mokuro manga archive — generated with <a href="https://github.com/kha-white/mokuro" target="_blank" rel="noreferrer">mokuro</a> — as a .zip / .cbz file. (Sample: <code>hanabira_manga_01.mokuro</code> packaged as a zip.)') }}</p>
   <div class="iform">
     <div class="irow">
-      <label class="ilbl" for="manga-language">Language</label>
+      <label class="ilbl" for="manga-language">{{ t('Language') }}</label>
       <div class="ictrl">
         <select id="manga-language" name="language_id">
           {% for id, name in language_choices %}
@@ -438,19 +432,19 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="manga_title">Title</label>
+      <label class="ilbl" for="manga_title">{{ t('Title') }}</label>
       <div class="ictrl">
-        <input type="text" id="manga_title" name="manga_title" placeholder="Optional, defaults to archive name">
+        <input type="text" id="manga_title" name="manga_title" placeholder="{{ t('Optional, defaults to archive name') }}">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="manga_file">Archive</label>
+      <label class="ilbl" for="manga_file">{{ t('Archive') }}</label>
       <div class="ictrl">
         <input type="file" id="manga_file" name="manga_file" accept=".zip,.cbz">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="manga_tag">Tags</label>
+      <label class="ilbl" for="manga_tag">{{ t('Tags') }}</label>
       <div class="ictrl">
         <input type="text" id="manga_tag" name="manga_tag" class="form-control">
       </div>
@@ -465,15 +459,15 @@
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="manga">
-    <button type="submit" id="manga-import" class="btn btn-primary">Import</button>
+    <button type="submit" id="manga-import" class="btn btn-primary">{{ t('Import') }}</button>
   </div>
 </form>
 
 <form id="pdf-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import a PDF file. The original PDF is shown unchanged, but the words become clickable so you can look them up and highlight them while reading.</p>
+  <p class="import-desc">{{ t('Import a PDF file. The original PDF is shown unchanged, but the words become clickable so you can look them up and highlight them while reading.') }}</p>
   <div class="iform">
     <div class="irow">
-      <label class="ilbl" for="pdf-language">Language</label>
+      <label class="ilbl" for="pdf-language">{{ t('Language') }}</label>
       <div class="ictrl">
         <select id="pdf-language" name="language_id">
           {% for id, name in language_choices %}
@@ -483,19 +477,19 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="pdf_title">Title</label>
+      <label class="ilbl" for="pdf_title">{{ t('Title') }}</label>
       <div class="ictrl">
-        <input type="text" id="pdf_title" name="pdf_title" placeholder="Optional, defaults to file name">
+        <input type="text" id="pdf_title" name="pdf_title" placeholder="{{ t('Optional, defaults to file name') }}">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="pdf_file">PDF file</label>
+      <label class="ilbl" for="pdf_file">{{ t('PDF file') }}</label>
       <div class="ictrl">
         <input type="file" id="pdf_file" name="pdf_file" accept=".pdf">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="pdf_tag">Tags</label>
+      <label class="ilbl" for="pdf_tag">{{ t('Tags') }}</label>
       <div class="ictrl">
         <input type="text" id="pdf_tag" name="pdf_tag" class="form-control">
       </div>
@@ -503,15 +497,15 @@
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="pdf">
-    <button type="submit" id="pdf-import" class="btn btn-primary">Import</button>
+    <button type="submit" id="pdf-import" class="btn btn-primary">{{ t('Import') }}</button>
   </div>
 </form>
 
 <form id="epub-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">Import an EPUB as a series — each chapter becomes its own book, tagged with the book title, and shown as one aggregated row on the home page. Leave "Preview &amp; confirm" checked to review and select chapters before importing.</p>
+  <p class="import-desc">{{ t('Import an EPUB as a series — each chapter becomes its own book, tagged with the book title, and shown as one aggregated row on the home page. Leave "Preview & confirm" checked to review and select chapters before importing.') }}</p>
   <div class="iform">
     <div class="irow">
-      <label class="ilbl" for="epub-language">Language</label>
+      <label class="ilbl" for="epub-language">{{ t('Language') }}</label>
       <div class="ictrl">
         <select id="epub-language" name="language_id">
           {% for id, name in language_choices %}
@@ -521,19 +515,19 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="epub_title">Title</label>
+      <label class="ilbl" for="epub_title">{{ t('Title') }}</label>
       <div class="ictrl">
-        <input type="text" id="epub_title" name="epub_title" placeholder="Optional, defaults to EPUB metadata or file name">
+        <input type="text" id="epub_title" name="epub_title" placeholder="{{ t('Optional, defaults to EPUB metadata or file name') }}">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="epub_file">EPUB file</label>
+      <label class="ilbl" for="epub_file">{{ t('EPUB file') }}</label>
       <div class="ictrl">
         <input type="file" id="epub_file" name="epub_file" accept=".epub">
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="epub_tag">Tags</label>
+      <label class="ilbl" for="epub_tag">{{ t('Tags') }}</label>
       <div class="ictrl">
         <input type="text" id="epub_tag" name="epub_tag" class="form-control">
       </div>
@@ -541,23 +535,23 @@
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="epub">
-    <button type="submit" id="epub-import" class="btn btn-primary">Import</button>
-    <label class="epub-preview-toggle"><input type="checkbox" id="epub_preview_toggle" checked> Preview &amp; confirm</label>
+    <button type="submit" id="epub-import" class="btn btn-primary">{{ t('Import') }}</button>
+    <label class="epub-preview-toggle"><input type="checkbox" id="epub_preview_toggle" checked> {{ t('Preview & confirm') }}</label>
     <span class="hint" id="epub-preview-status"></span>
   </div>
 </form>
 
 <div id="epub-preview-panel" class="import-form" style="display: none;">
-  <p class="import-desc" style="margin-bottom: .6rem;">Preview — check the chapters to import (all selected by default), then confirm. The file is re-uploaded on confirm; nothing is saved until then.</p>
+  <p class="import-desc" style="margin-bottom: .6rem;">{{ t('Preview — check the chapters to import (all selected by default), then confirm. The file is re-uploaded on confirm; nothing is saved until then.') }}</p>
   <div id="epub-preview-meta" class="epub-preview-meta"></div>
   <div class="epub-chapter-tools">
-    <label><input type="checkbox" id="epub-select-all" checked> Select all</label>
+    <label><input type="checkbox" id="epub-select-all" checked> {{ t('Select all') }}</label>
     <span class="hint" id="epub-chapter-count"></span>
   </div>
   <div id="epub-chapter-list" class="epub-chapter-list"></div>
   <div class="import-actions">
-    <button type="button" id="epub-confirm" class="btn btn-primary">Confirm import</button>
-    <button type="button" id="epub-cancel" class="btn btn-secondary">Cancel</button>
+    <button type="button" id="epub-confirm" class="btn btn-primary">{{ t('Confirm import') }}</button>
+    <button type="button" id="epub-cancel" class="btn btn-secondary">{{ t('Cancel') }}</button>
     <span class="hint" id="epub-confirm-status"></span>
   </div>
 </div>
@@ -569,7 +563,7 @@
   // Shared Tagify config for the youtube / bilibili / mp3 tag inputs.
   function setupTagsTagify(input) {
     return new Tagify(input, {
-      placeholder: 'Tags (press Enter or comma to add)',
+      placeholder: I18N.t('Tags (press Enter or comma to add)'),
       editTags: true,
       autoComplete: { rightKey: true, tabKey: true },
       dropdown: { enabled: 1 },
@@ -790,12 +784,12 @@
       const fileInput = document.getElementById('epub_file');
       const status = $('#epub-preview-status');
       if (!fileInput.files || !fileInput.files[0]) {
-        status.text('Please choose an EPUB file first.').css('color', 'red');
+        status.text(I18N.t('Please choose an EPUB file first.')).css('color', 'red');
         return;
       }
       const btn = $('#epub-import');
       btn.prop('disabled', true);
-      status.text('Parsing…').css('color', '');
+      status.text(I18N.t('Parsing…')).css('color', '');
       const fd = new FormData();
       fd.append('epub_file', fileInput.files[0]);
       fetch('/book/import/epub/preview', { method: 'POST', body: fd })
@@ -803,7 +797,7 @@
         .then(data => {
           btn.prop('disabled', false);
           if (!data.success) {
-            status.text(data.error || 'Could not parse the EPUB file.').css('color', 'red');
+            status.text(data.error || I18N.t('Could not parse the EPUB file.')).css('color', 'red');
             return;
           }
           status.text('');
@@ -811,8 +805,8 @@
             $('#epub_title').val(data.title);
           }
           $('#epub-preview-meta').html(
-            '<div class="epub-meta-line"><strong>Title:</strong> ' + escapeHtml(data.title || '(unknown)') + '</div>' +
-            '<div class="epub-meta-line"><strong>Author:</strong> ' + escapeHtml(data.author || '(unknown)') + '</div>'
+            '<div class="epub-meta-line"><strong>' + I18N.t('Title:') + '</strong> ' + escapeHtml(data.title || I18N.t('(unknown)')) + '</div>' +
+            '<div class="epub-meta-line"><strong>' + I18N.t('Author:') + '</strong> ' + escapeHtml(data.author || I18N.t('(unknown)')) + '</div>'
           );
           const list = $('#epub-chapter-list').empty();
           data.chapters.forEach(ch => {
@@ -821,14 +815,14 @@
               '<span class="chapnum">' + (ch.index + 1) + '</span><span>' + escapeHtml(ch.title) + '</span></label>'
             );
           });
-          $('#epub-chapter-count').text(data.chapters.length + ' chapter(s) found');
+          $('#epub-chapter-count').text(data.chapters.length + ' ' + I18N.t('chapter(s) found'));
           $('#epub-select-all').prop('checked', true);
           $('#epub-confirm-status').text('');
           epubPreviewPanel.show();
         })
         .catch(() => {
           btn.prop('disabled', false);
-          status.text('Could not parse the EPUB file.').css('color', 'red');
+          status.text(I18N.t('Could not parse the EPUB file.')).css('color', 'red');
         });
     });
 
@@ -849,13 +843,13 @@
         selected.push(parseInt(this.value, 10));
       });
       if (selected.length === 0) {
-        $('#epub-confirm-status').text('Please select at least one chapter.').css('color', 'red');
+        $('#epub-confirm-status').text(I18N.t('Please select at least one chapter.')).css('color', 'red');
         return;
       }
       const btn = $(this);
       btn.prop('disabled', true);
       $('#epub-import').prop('disabled', true);
-      $('#epub-confirm-status').text('Importing ' + selected.length + ' chapter(s)…').css('color', '');
+      $('#epub-confirm-status').text(I18N.t('Importing') + ' ' + selected.length + ' ' + I18N.t('chapter(s)…')).css('color', '');
       const fd = new FormData();
       fd.append('epub_file', fileInput.files[0]);
       fd.append('language_id', $('#epub-language').val());
@@ -868,12 +862,12 @@
           btn.prop('disabled', false);
           $('#epub-import').prop('disabled', false);
           if (!data.success) {
-            $('#epub-confirm-status').text(data.error || 'Import failed.').css('color', 'red');
+            $('#epub-confirm-status').text(data.error || I18N.t('Import failed.')).css('color', 'red');
             return;
           }
-          let msg = 'Imported ' + data.imported + ' chapter(s).';
+          let msg = I18N.t('Imported') + ' ' + data.imported + ' ' + I18N.t('chapter(s).');
           if (data.failed) {
-            msg += ' ' + data.failed + ' failed.';
+            msg += ' ' + data.failed + ' ' + I18N.t('failed.');
           }
           $('#epub-confirm-status').text(msg).css('color', 'green');
           window.location.href = '/book/series/' + encodeURIComponent(data.series_tag);
@@ -881,7 +875,7 @@
         .catch(() => {
           btn.prop('disabled', false);
           $('#epub-import').prop('disabled', false);
-          $('#epub-confirm-status').text('Import failed.').css('color', 'red');
+          $('#epub-confirm-status').text(I18N.t('Import failed.')).css('color', 'red');
         });
     });
 
@@ -905,11 +899,11 @@
           handlers.onSuccess(data);
         } else {
           handlers.onError(
-            (data && data.error) || ('Upload failed (HTTP ' + xhr.status + ').')
+            (data && data.error) || (I18N.t('Upload failed (HTTP') + ' ' + xhr.status + ').')
           );
         }
       };
-      xhr.onerror = function () { handlers.onError('Network error while uploading.'); };
+      xhr.onerror = function () { handlers.onError(I18N.t('Network error while uploading.')); };
       xhr.send(new FormData(formEl));
     };
 
@@ -957,7 +951,7 @@
         return secs + ' s';
       };
       const elapsedText = function () {
-        return fmtDuration((Date.now() - startedAt) / 1000) + ' elapsed';
+        return fmtDuration((Date.now() - startedAt) / 1000) + ' ' + I18N.t('elapsed');
       };
       const timer = setInterval(() => {
         fetch('/book/whisper/status/' + taskId)
@@ -966,33 +960,33 @@
             if (d.state === 'finished' && d.book_id) {
               clearInterval(timer);
               ui.progressBar.css('width', '100%');
-              ui.statusText.text('Done! Opening the book…').css('color', 'green');
+              ui.statusText.text(I18N.t('Done! Opening the book…')).css('color', 'green');
               window.location.href = '/read/' + d.book_id + '/page/1';
               return;
             }
             if (d.state === 'error') {
               clearInterval(timer);
               ui.progressBar.css('width', '0%');
-              ui.statusText.text('Transcription failed: ' + (d.error || 'unknown error')).css('color', 'red');
+              ui.statusText.text(I18N.t('Transcription failed:') + ' ' + (d.error || I18N.t('unknown error'))).css('color', 'red');
               ui.btn.prop('disabled', false);
               return;
             }
             if (d.state === 'unknown') {
               clearInterval(timer);
-              ui.statusText.text('The transcription task was lost (server restart?). Please try again.').css('color', 'red');
+              ui.statusText.text(I18N.t('The transcription task was lost (server restart?). Please try again.')).css('color', 'red');
               ui.btn.prop('disabled', false);
               return;
             }
             if (d.state === 'transcribing') {
               const pct = d.percent || 0;
-              let text = 'Transcribing… ' + pct + '% (' + elapsedText();
+              let text = I18N.t('Transcribing…') + ' ' + pct + '% (' + elapsedText();
               if (pct >= 3) {
-                text += ', ~' + fmtDuration((Date.now() - startedAt) / 1000 * (100 - pct) / pct) + ' left';
+                text += ', ~' + fmtDuration((Date.now() - startedAt) / 1000 * (100 - pct) / pct) + ' ' + I18N.t('left');
               }
               ui.statusText.text(text + ')').css('color', '');
               ui.progressBar.css('width', pct + '%');
             } else {
-              ui.statusText.text((d.message || 'Queued…') + ' (' + elapsedText() + ')').css('color', '');
+              ui.statusText.text((d.message || I18N.t('Queued…')) + ' (' + elapsedText() + ')').css('color', '');
             }
           })
           .catch(() => {}); // transient network hiccups: keep polling
@@ -1050,19 +1044,19 @@
         cfg.btn.prop('disabled', true);
         showPanel('progress');
         cfg.progressBar.css('width', '0%');
-        cfg.statusText.text('Uploading… 0%').css('color', '');
+        cfg.statusText.text(I18N.t('Uploading…') + ' 0%').css('color', '');
         postFormUpload(cfg.form[0], '/book/whisper/prepare', {
           onUpload: p => {
             cfg.progressBar.css('width', p + '%');
-            cfg.statusText.text('Uploading… ' + p + '%').css('color', '');
+            cfg.statusText.text(I18N.t('Uploading…') + ' ' + p + '%').css('color', '');
           },
           onSuccess: data => {
             if (!data.task_id) {
-              fail(data.error || 'Could not start the transcription.');
+              fail(data.error || I18N.t('Could not start the transcription.'));
               return;
             }
             cfg.progressBar.css('width', '95%');
-            cfg.statusText.text('Queued…').css('color', '');
+            cfg.statusText.text(I18N.t('Queued…')).css('color', '');
             pollWhisperTask(data.task_id, cfg);
           },
           onError: fail,
@@ -1093,18 +1087,18 @@
       btn.prop('disabled', true);
       panel.show();
       panel.find('.import-progress-bar').css('width', '0%');
-      panel.find('.import-status-text').text('Uploading… 0%').css('color', '');
+      panel.find('.import-status-text').text(I18N.t('Uploading…') + ' 0%').css('color', '');
       postFormUpload(form[0], form.attr('action'), {
         onUpload: p => {
           panel.find('.import-progress-bar').css('width', p + '%');
           panel.find('.import-status-text')
-            .text('Uploading… ' + p + '%')
+            .text(I18N.t('Uploading…') + ' ' + p + '%')
             .css('color', '');
         },
         onSuccess: data => {
           panel.find('.import-progress-bar').css('width', '100%');
           panel.find('.import-status-text')
-            .text('Done! Opening the book…')
+            .text(I18N.t('Done! Opening the book…'))
             .css('color', 'green');
           window.location.href = data.redirect;
         },
@@ -1148,8 +1142,7 @@
     // Shared submit-time validation: media source, language, and (when
     // transcribing) that the picked engine is actually installed.
     const engineNotReadyMsg = function () {
-      return 'The selected transcription engine is not installed on this server yet '
-        + '-- set it up under Settings -> Whisper (auto-subtitles).';
+      return I18N.t('The selected transcription engine is not installed on this server yet -- set it up under Settings -> Whisper (auto-subtitles).');
     };
 
     mp3Form.on('submit', function (e) {
@@ -1162,16 +1155,16 @@
       const audioInput = document.getElementById('mp3_file');
       const audioUrl = ($('#mp3_url').val() || '').trim();
       if (!(audioInput.files && audioInput.files[0]) && audioUrl === '') {
-        mp3Whisper.fail('Please provide an audio file (upload or an online URL).');
+        mp3Whisper.fail(I18N.t('Please provide an audio file (upload or an online URL).'));
         return;
       }
       const langVal = $('#mp3-language').val();
       if (!langVal || langVal === '0') {
-        mp3Whisper.fail('Please choose a language.');
+        mp3Whisper.fail(I18N.t('Please choose a language.'));
         return;
       }
       if (!hasSubs && !transcribe) {
-        mp3Whisper.fail('Provide subtitles, or tick Auto-transcribe to generate them.');
+        mp3Whisper.fail(I18N.t('Provide subtitles, or tick Auto-transcribe to generate them.'));
         return;
       }
       if (transcribe && !engineReady(mp3Whisper.selectedEngine())) {
@@ -1197,16 +1190,16 @@
       const vidInput = document.getElementById('video_file');
       const vidUrl = ($('#video_url').val() || '').trim();
       if (!(vidInput.files && vidInput.files[0]) && vidUrl === '') {
-        videoWhisper.fail('Please provide a video (upload a file or an online URL).');
+        videoWhisper.fail(I18N.t('Please provide a video (upload a file or an online URL).'));
         return;
       }
       const langVal = $('#video-language').val();
       if (!langVal || langVal === '0') {
-        videoWhisper.fail('Please choose a language.');
+        videoWhisper.fail(I18N.t('Please choose a language.'));
         return;
       }
       if (!hasSubs && !transcribe) {
-        videoWhisper.fail('Provide subtitles, or tick Auto-transcribe to generate them.');
+        videoWhisper.fail(I18N.t('Provide subtitles, or tick Auto-transcribe to generate them.'));
         return;
       }
       if (transcribe && !engineReady(videoWhisper.selectedEngine())) {
@@ -1230,7 +1223,7 @@
         $('#manga_panel_row').show();
         $('#manga_progress_bar').css('width', '0%');
         $('#manga_status_text')
-          .text('Please upload a Mokuro manga archive (.zip or .cbz).')
+          .text(I18N.t('Please upload a Mokuro manga archive (.zip or .cbz).'))
           .css('color', 'red');
         return;
       }
@@ -1238,7 +1231,7 @@
       if (!langVal || langVal === '0') {
         $('#manga_panel_row').show();
         $('#manga_progress_bar').css('width', '0%');
-        $('#manga_status_text').text('Please choose a language.').css('color', 'red');
+        $('#manga_status_text').text(I18N.t('Please choose a language.')).css('color', 'red');
         return;
       }
       startPlainMediaImport(mangaForm, $('#manga-import'), $('#manga_panel'));

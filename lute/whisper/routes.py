@@ -31,6 +31,7 @@ from lute.db import db
 from lute.models.language import Language
 from lute.multiuser.context import get_current_user
 from lute.multiuser.permissions import admin_only_if_multiuser_json
+from lute.i18n import t
 
 bp = Blueprint("whisper", __name__, url_prefix="/book/whisper")
 
@@ -67,17 +68,17 @@ def _engine_error(model_size, language):
 
         if not sensevoice.installed():
             return (
-                "SenseVoice isn't installed on this server yet "
-                "-- set it up under Settings -> Whisper (auto-subtitles)."
+                t("SenseVoice isn't installed on this server yet "
+                "-- set it up under Settings -> Whisper (auto-subtitles).")
             )
         if sensevoice.lang_code_for(language) is None:
             return (
-                "SenseVoice transcribes Chinese, Cantonese, "
+                t("SenseVoice transcribes Chinese, Cantonese, "
                 "English, Japanese and Korean only -- pick a whisper "
-                "model for this language."
+                "model for this language.")
             )
     elif not whisper_transcribe.whisper_status()["installed"]:
-        return "faster-whisper is not installed yet."
+        return t("faster-whisper is not installed yet.")
     return None
 
 
@@ -135,8 +136,8 @@ def whisper_prepare():
         return (
             jsonify(
                 {
-                    "error": "A transcription or model download is already "
-                    "running -- please wait for it to finish."
+                    "error": t("A transcription or model download is already "
+                    "running -- please wait for it to finish.")
                 }
             ),
             409,
@@ -145,10 +146,10 @@ def whisper_prepare():
 
     language_id = request.form.get("language_id")
     if not language_id:
-        return jsonify({"error": "Please choose a language."}), 400
+        return jsonify({"error": t("Please choose a language.")}), 400
     language = db.session.get(Language, int(language_id))
     if language is None:
-        return jsonify({"error": "Please choose a valid language."}), 400
+        return jsonify({"error": t("Please choose a valid language.")}), 400
 
     import_type = (request.form.get("import_type") or "mp3").strip()
     spec = _transcribe_import_spec(import_type)
@@ -253,8 +254,8 @@ def whisper_retranscribe(bookid):
         return (
             jsonify(
                 {
-                    "error": "A transcription or model download is already "
-                    "running -- please wait for it to finish."
+                    "error": t("A transcription or model download is already "
+                    "running -- please wait for it to finish.")
                 }
             ),
             409,
@@ -263,16 +264,16 @@ def whisper_retranscribe(bookid):
 
     dbbook = _find_book(bookid)
     if dbbook is None:
-        return jsonify({"error": "Book not found."}), 404
+        return jsonify({"error": t("Book not found.")}), 404
     if (dbbook.book_type or "") not in RETRANSCRIBE_BOOK_TYPES:
         return (
-            jsonify({"error": "Only mp3 and video books can be re-transcribed."}),
+            jsonify({"error": t("Only mp3 and video books can be re-transcribed.")}),
             400,
         )
 
     language = db.session.get(Language, dbbook.language_id)
     if language is None:
-        return jsonify({"error": "The book's language is missing."}), 400
+        return jsonify({"error": t("The book's language is missing.")}), 400
 
     model_size = (request.form.get("whisper_model") or "").strip()
     if model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES + ["sensevoice"]:
@@ -291,7 +292,7 @@ def whisper_retranscribe(bookid):
         )
         if not os.path.exists(audio_path):
             return (
-                jsonify({"error": "The book's media file is missing on disk."}),
+                jsonify({"error": t("The book's media file is missing on disk.")}),
                 400,
             )
     elif dbbook.media_url:
@@ -307,7 +308,7 @@ def whisper_retranscribe(bookid):
         audio_path = os.path.join(temppath, fname)
         temp_audio = True
     else:
-        return jsonify({"error": "This book has no media to transcribe."}), 400
+        return jsonify({"error": t("This book has no media to transcribe.")}), 400
 
     task_id = whisper_transcribe.start_task(
         current_app._get_current_object(),  # pylint: disable=protected-access
@@ -340,8 +341,8 @@ def whisper_download_model():
         return (
             jsonify(
                 {
-                    "error": "A transcription or model download is already "
-                    "running -- please wait for it to finish."
+                    "error": t("A transcription or model download is already "
+                    "running -- please wait for it to finish.")
                 }
             ),
             409,
@@ -357,12 +358,12 @@ def whisper_download_model():
         )
         return jsonify({"task_id": task_id})
     if not whisper_transcribe.whisper_status()["installed"]:
-        return jsonify({"error": "faster-whisper is not installed yet."}), 400
+        return jsonify({"error": t("faster-whisper is not installed yet.")}), 400
     if model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES:
         return (
             jsonify(
                 {
-                    "error": "Unknown model size.  Pick one of: "
+                    "error": t("Unknown model size.  Pick one of: ")
                     + ", ".join(whisper_transcribe.ALLOWED_MODEL_SIZES + ["sensevoice"])
                 }
             ),
@@ -406,8 +407,8 @@ def whisper_delete_model():
         return (
             jsonify(
                 {
-                    "error": "A transcription or model download is already "
-                    "running -- please wait for it to finish."
+                    "error": t("A transcription or model download is already "
+                    "running -- please wait for it to finish.")
                 }
             ),
             409,

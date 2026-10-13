@@ -131,6 +131,8 @@ def add_default_user_settings(session, default_user_backup_path):
         "japanese_sudachi_mode": "C",
         "japanese_reading": "hiragana",
         "current_theme": "Default.css",
+        # UI display language (lute.i18n): "en", "zh", "ja" or "ko".
+        "ui_language": "en",
         "custom_styles": "/* Custom css to modify Lute's appearance. */",
         "show_highlights": True,
         "current_language_id": 0,

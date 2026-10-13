@@ -16,9 +16,9 @@
 
     <div id="flash" class="flash">
       {% if term_text %}
-      <p>&quot;{{ term_text }}&quot; updated.</p>
+      <p>&quot;{{ term_text }}&quot; {{ t('updated.') }}</p>
       {% else %}
-      <p>Updated.</p>
+      <p>{{ t('Updated.') }}</p>
       {% endif %}
     </div>
 

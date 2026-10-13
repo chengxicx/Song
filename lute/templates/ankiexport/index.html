@@ -1,24 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}AnkiConnect{% endblock %}
-{% block header %}AnkiConnect{% endblock %}
+{% block title %}{{ t('AnkiConnect') }}{% endblock %}
+{% block header %}{{ t('AnkiConnect') }}{% endblock %}
 
 {% block body %}
 
-<button class="btn btn-primary" onclick="validate_exports();">Validate exports</button>&nbsp;<span id="validation_message"></span>
+<button class="btn btn-primary" onclick="validate_exports();">{{ t('Validate exports') }}</button>&nbsp;<span id="validation_message"></span>
 <table id="export_specs" class="display" width="100%"></table>
-<p><a href="/ankiexport/spec/new">Create new export specification</a></p>
+<p><a href="/ankiexport/spec/new">{{ t('Create new export specification') }}</a></p>
 
 <script>
 
   document.addEventListener('DOMContentLoaded', function() {
     new DataTable('#export_specs', {
       columns: [
-        { title: 'Export_id', data: 'id', visible: false },
-        { title: 'Export name', render: render_export_name },
-        { title: 'Specification', width: '40%', render: render_export_spec },
-        { title: 'Mapping', width: '40%', render: render_mapping },
-        { title: 'Active', data: 'active' }
+        { title: I18N.t('Export_id'), data: 'id', visible: false },
+        { title: I18N.t('Export name'), render: render_export_name },
+        { title: I18N.t('Specification'), width: '40%', render: render_export_spec },
+        { title: I18N.t('Mapping'), width: '40%', render: render_mapping },
+        { title: I18N.t('Active'), data: 'active' }
       ],
       data: {{ export_specs_json | tojson | safe }}
     });
@@ -37,12 +37,12 @@
   let render_export_spec = function( data, type, row, meta ) {
     let c = `${row['criteria']}`.trim();
     if (c == "")
-      c = "(no criteria)";
+      c = I18N.t('(no criteria)');
     else
       c = `<code>${c}</code>`;
-    const crit = `Criteria: ${c}`;
-    const dn = `Deck: ${row['deck_name']}`;
-    const nt = `Note type: ${row['note_type']}`;
+    const crit = I18N.t('Criteria:') + ` ${c}`;
+    const dn = I18N.t('Deck:') + ` ${row['deck_name']}`;
+    const nt = I18N.t('Note type:') + ` ${row['note_type']}`;
     const ret = [crit, dn, nt].map(el => `<p>${el}</p>`);
     return ret.join("\n");
   };
@@ -59,7 +59,7 @@
       fmjson = `${fmjson_array.join('<br />')}`;
     }
     catch {
-      fmjson = '(error, unable to parse)'
+      fmjson = I18N.t('(error, unable to parse)')
     }
     return fmjson;
   };
@@ -67,10 +67,10 @@
   function _show_validation_message(results) {
     const el = $("#validation_message");
     const failcount = Object.keys(results).length;
-    let msg = "All active exports ok.";
+    let msg = I18N.t('All active exports ok.');
     let color = "green";
     if (failcount > 0) {
-      msg = `${failcount} active export(s) are invalid.`;
+      msg = `${failcount} ` + I18N.t('active export(s) are invalid.');
       color = "red";
     }
     el.text(msg);
