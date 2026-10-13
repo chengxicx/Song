@@ -40,6 +40,7 @@
 <script type="text/javascript" src="{{ vstatic('js/tts-ui.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/lute-recorder.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/lute-shadowing.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/lute-furigana.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/player-dock.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
@@ -65,6 +66,10 @@
   // 'online', or 'local_dict' = this language's local dictionary first,
   // online as fallback.
   var LUTE_TERM_FILL = { source: {{ term_translation_source|tojson }}, langId: {{ lang_id }} };
+  // Furigana above reading-page words (per-language toggle; see
+  // lute-furigana.js).  False unless the language is Japanese with the
+  // language's "show furigana" box checked.
+  var LUTE_FURIGANA = { enabled: {{ show_furigana | tojson }}, langId: {{ lang_id }} };
 </script>
 
 

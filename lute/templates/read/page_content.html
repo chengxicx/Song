@@ -34,4 +34,7 @@
   // silently do nothing.
   parent.restore_cursor_marker();
   parent.add_status_classes();
+  // Furigana: the swap replaced every word span, so re-draw the ruby
+  // readings for the fresh content (no-op unless enabled -- lute-furigana.js).
+  if (parent.lute_furigana_annotate) parent.lute_furigana_annotate();
 </script>

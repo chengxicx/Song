@@ -1528,6 +1528,24 @@ span.textitem {
     border-bottom: 1px solid transparent;
 }
 
+/* Furigana above reading-page words (per-language "show furigana"
+   toggle, drawn by lute-furigana.js).  #thetext gets .furigana-on as
+   soon as the pane renders, so the roomier line height is reserved
+   before the ruby arrives and the text doesn't jump when the readings
+   land.  rt styling follows the shadowing panel's ruby row. */
+div#thetext.furigana-on span.textitem {
+    line-height: 2.1;
+}
+
+div#thetext.furigana-on span.textitem rt {
+    font-size: 0.5em;
+    line-height: 1.15;
+    font-weight: 400;
+    color: var(--font-color);
+    opacity: 0.65;
+    user-select: none;
+}
+
 /* ========================================= */
 /* Mokuro manga reading pane.
 
