@@ -642,12 +642,11 @@ def test_term_form_grammar_button_selects_the_current_sentence():
     showbrowser = os.environ.get("SHOW", "") == "true"
     with sync_playwright() as sp:
         browser = _launch(sp.chromium, headless=not showbrowser)
-        # service_workers="block": the app registers /sw.js at scope "/" and
-        # its fetch handler proxies every /read/* GET through the worker.
-        # Playwright cannot intercept requests a service worker handles, so
-        # with the worker active page.route below silently never fires and
-        # the real engine's payload wins -- which is exactly what happened
-        # on the first run of this test.  Nothing here tests the worker.
+        # service_workers="block": the PWA was retired, but any browser
+        # profile that still holds an old registration would proxy fetches
+        # through it, and Playwright cannot intercept service-worker
+        # requests -- with a worker active, page.route below silently never
+        # fires.  Blocking keeps the harness deterministic either way.
         context = browser.new_context(service_workers="block")
         context.set_default_timeout(30000)
         page = context.new_page()

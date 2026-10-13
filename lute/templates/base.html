@@ -27,21 +27,12 @@
   {% endif %}
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials" />
   <meta name="theme-color" content="#2563eb" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="application-name" content="Song" />
-  <meta name="apple-mobile-web-app-title" content="Song" />
-  {# iOS "Add to Home Screen" prefers apple-touch-icon over manifest icons;
-     without it Safari falls back to a page screenshot (showing the old
-     Lute header logo). #}
-  <link rel="apple-touch-icon" sizes="180x180" href="{{ vstatic('img/icon-192.png') }}" />
 
   {# Clean the address bar: if the URL contains BasicAuth credentials, replace
      the URL in the history (no reload). The <base> tag above already ensures
-     sub-resources load from the clean URL, and the Service Worker also strips
-     credentials, so we only need to clean what the user sees in the address bar. #}
+     sub-resources load from the clean URL, so we only need to clean what the
+     user sees in the address bar. #}
   <script data-cfasync="false">
     (function() {
       try {
@@ -395,50 +386,16 @@
 </script>
 
 <script data-cfasync="false">
-  // PWA service worker registration
+  // PWA retired (the Song Android app replaces browser offline reading).
+  // Unregister any service worker left over from older builds so it stops
+  // intercepting fetches; once every client has loaded this once, this
+  // script can be removed entirely.
   if ('serviceWorker' in navigator) {
-    // On first load, aggressively clear ALL existing SW registrations.
-    // This ensures no stale BasicAuth-credentialed SWs remain to intercept fetches.
     window.addEventListener('load', function() {
-      var origin = location.origin;
       navigator.serviceWorker.getRegistrations().then(function(regs) {
-        var unregisterPromises = [];
-        regs.forEach(function(r) {
-          // Always unregister if the script URL has credentials or origin mismatch
-          var url = r.active ? r.active.scriptURL : r.scope;
-          try {
-            var parsed = new URL(url, location.href);
-            var stale = !!(parsed.username || parsed.password) || parsed.origin !== origin;
-            if (stale) {
-              unregisterPromises.push(r.unregister());
-            }
-          } catch(e) {
-            unregisterPromises.push(r.unregister());
-          }
-        });
-        return Promise.all(unregisterPromises);
-      }).then(function() {
-        // Also check if any active SW has credentials in its URL
-        // and force-clear it by unregistering all
-        return navigator.serviceWorker.getRegistrations();
-      }).then(function(regs) {
-        var stillStale = false;
-        regs.forEach(function(r) {
-          var url = r.active ? r.active.scriptURL : r.scope;
-          try {
-            var parsed = new URL(url, location.href);
-            if (parsed.username || parsed.password || parsed.origin !== origin) {
-              stillStale = true;
-            }
-          } catch(e) { stillStale = true; }
-        });
-        if (stillStale) {
-          return Promise.all(regs.map(function(r) { return r.unregister(); }));
-        }
-      }).then(function() {
-        return navigator.serviceWorker.register('/sw.js', { scope: '/' });
+        regs.forEach(function(r) { r.unregister(); });
       }).catch(function(err) {
-        console.warn('SW registration failed:', err);
+        console.warn('SW unregister failed:', err);
       });
     });
   }
