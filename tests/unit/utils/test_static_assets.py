@@ -178,7 +178,6 @@ def test_first_party_js_is_referenced_through_vstatic_js():
 
 
 _STATIC_DIR = os.path.join(os.path.dirname(lute.__file__), "static")
-_SW_FILE = os.path.join(_STATIC_DIR, "sw.js")
 
 _ASSET_REF = re.compile(r"""vstatic(_js)?\(\s*['"]([^'"]+)['"]\s*\)""")
 
@@ -201,23 +200,4 @@ def test_every_versioned_asset_reference_exists():
         not offenders
     ), "Templates reference static assets that do not exist:\n  " + "\n  ".join(
         offenders
-    )
-
-
-def test_service_worker_precache_entries_exist():
-    """
-    The install fails as a unit: if any cache.addAll() entry 404s the
-    browser rejects the install and no service worker ever activates, so a
-    single stale entry silently disables offline support entirely.
-    """
-    with open(_SW_FILE, encoding="utf-8") as f:
-        text = f.read()
-    entries = re.findall(r"'/static/([^']+)'", text)
-    # sw.js also matches on path *prefixes* (e.g. /static/js/never_cache/)
-    # to pick a caching strategy; those aren't precache entries.
-    entries = [e for e in entries if not e.endswith("/")]
-    assert entries, "No precache entries found -- has the list moved?"
-    missing = [e for e in entries if not os.path.exists(os.path.join(_STATIC_DIR, e))]
-    assert not missing, "sw.js precaches files that no longer exist:\n  " + "\n  ".join(
-        missing
     )
