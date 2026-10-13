@@ -6,8 +6,9 @@
  * panel uses (/read/shadowing/readings), which pairs each token with the
  * contextual kana reading of the sentence it sits in (一つ reads ひとつ,
  * not いち + つ).  Every kanji-bearing word span gets its display text
- * wrapped in <ruby>text<rt>reading</rt></ruby>; kana words are untouched
- * (the endpoint answers reading=None for them, same as the panel).
+ * wrapped in <ruby>text<rt>reading</rt></ruby>; pure-kana words are left
+ * alone -- they already show their own reading, and the endpoint answers
+ * with one anyway.
  */
 (function () {
   "use strict";
@@ -17,13 +18,27 @@
       ? LUTE_FURIGANA
       : { enabled: false, langId: 0 };
 
-  function mark_annotated(sp) {
-    sp.dataset.furigana = "1";
+  // Spans claimed by an in-flight request.  Claiming is synchronous, at
+  // collection time: annotate() has several entry points that can fire
+  // back-to-back over the same fresh content (DOMContentLoaded, the
+  // htmx:afterSwap listener, and page_content's explicit call), and
+  // marking only after the fetch resolved let a second pass re-read an
+  // already-wrapped span.  ruby flattens under textContent, so the
+  // reading was appended to the base text ("夜" became "夜よる") and the
+  // word was wrapped again.
+  const in_flight = new Set();
+
+  // Furigana exists to make kanji readable; a word without kanji
+  // (聞こえ's kana is already visible, トントン is all katakana) needs no
+  // reading above it.
+  function has_kanji(text) {
+    return /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/.test(text);
   }
 
-  function wrap_ruby(sp, reading) {
-    const text = sp.textContent;
+  function wrap_ruby(sp, text, reading) {
     if (!reading || reading === text) return;
+    if (!has_kanji(text)) return;
+    if (sp.querySelector("ruby")) return;
     const ruby = document.createElement("ruby");
     ruby.appendChild(document.createTextNode(text));
     const rt = document.createElement("rt");
@@ -34,8 +49,11 @@
   }
 
   function annotate_paragraph(spans) {
-    // data-text is the parser's canonical token text; textContent can
-    // drift from it after a term edit re-renders display text.
+    // Capture the display text up front: once a span is wrapped, its
+    // textContent includes the reading, and dataset.text (the parser's
+    // canonical token) can drift from the display text after a term edit
+    // re-renders it.
+    const captured = spans.map((sp) => sp.textContent);
     const tokens = spans.map((sp) => sp.dataset.text || sp.textContent.trim());
     const full_text = tokens.join("");
     return fetch("/read/shadowing/readings", {
@@ -53,11 +71,16 @@
         spans.forEach((sp, i) => {
           const entry = data.tokens[i];
           if (!entry || entry.reading == null) return;
-          wrap_ruby(sp, entry.reading);
-          mark_annotated(sp);
+          wrap_ruby(sp, captured[i], entry.reading);
+          sp.dataset.furigana = "1";
         });
       })
-      .catch(() => {});
+      .catch(() => {})
+      .then(() => {
+        // Release the claim either way: on failure the span stays
+        // unannotated and unmarked, so a later pass retries it.
+        spans.forEach((sp) => in_flight.delete(sp));
+      });
   }
 
   function annotate() {
@@ -76,12 +99,13 @@
     textDiv.classList.add("furigana-on");
     const spans = Array.from(
       textDiv.querySelectorAll("span.word:not([data-furigana])")
-    );
+    ).filter((sp) => !in_flight.has(sp));
     if (spans.length === 0) return;
     // One request per paragraph: readings follow sentence context, and a
     // paragraph is the natural batch a page breaks into.
     const paras = new Map();
     spans.forEach((sp) => {
+      in_flight.add(sp);
       const pid = sp.dataset.paragraphId || "0";
       if (!paras.has(pid)) paras.set(pid, []);
       paras.get(pid).push(sp);
@@ -91,8 +115,8 @@
 
   // Called by the page_content fragment after every swap (read/
   // page_content.html), and by the listener below as a safety net for
-  // the reader's own initial load.  Idempotent: already-annotated spans
-  // carry data-furigana and are skipped.
+  // the reader's own initial load.  Idempotent: annotated spans carry
+  // data-furigana and in-flight ones are claimed.
   window.lute_furigana_annotate = annotate;
 
   if (window.htmx) {

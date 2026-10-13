@@ -1534,7 +1534,16 @@ span.textitem {
    before the ruby arrives and the text doesn't jump when the readings
    land.  rt styling follows the shadowing panel's ruby row. */
 div#thetext.furigana-on span.textitem {
-    line-height: 2.1;
+    line-height: 1.7;
+}
+
+/* The ruby base inherits the pane's line-height, which centers the
+   glyphs in a tall inline box -- the annotation is placed above that
+   box, so it floated a half-character above the word.  A tight
+   line-height on the ruby itself glues the reading to the glyphs while
+   the pane's line-height still reserves the row. */
+div#thetext.furigana-on ruby {
+    line-height: 1;
 }
 
 div#thetext.furigana-on span.textitem rt {
