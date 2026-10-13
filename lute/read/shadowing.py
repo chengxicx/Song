@@ -36,7 +36,11 @@ from lute.db import db
 from lute.models.repositories import LanguageRepository
 from lute.models.shadowing import ShadowAttempt
 from lute.multiuser import context as mu_context
-from lute.read.render.grammar_analysis import is_japanese_language
+from lute.read.render.grammar_analysis import (
+    is_cantonese_language,
+    is_japanese_language,
+    is_mandarin_chinese_language,
+)
 
 # Per-word verdicts, parallel to the sentence's word spans.
 STATUS_MISS = 0  # never spoken (漏读)
@@ -218,29 +222,47 @@ def _align_context_readings(tokens, morphs):
     return out
 
 
+def supports_readings(language):
+    """
+    True when the language's parser can supply pronunciation readings,
+    i.e. drawing furigana above words is meaningful: Japanese (kana via
+    Sudachi/MeCab), Mandarin (pinyin) and Cantonese (jyutping) via the
+    plugin parsers.  Other languages' scripts already show their own
+    pronunciation, so a reading above the word adds nothing.
+    """
+    return (
+        is_japanese_language(language)
+        or is_mandarin_chinese_language(language)
+        or is_cantonese_language(language)
+    )
+
+
 def annotate_tokens(tokens, language, full_text=None):
     """
-    Pair each token with its kana reading for the shadowing panel.
+    Pair each token with its pronunciation reading for the shadowing
+    panel.
 
-    Returns [{"text": surface, "reading": kana-or-None}, ...], parallel to
+    Returns [{"text": surface, "reading": reading-or-None}, ...], parallel to
     the input.  The panel draws the reading above the word (furigana) and
     speaks it when the word is tapped.
 
     When full_text (the whole sentence the tokens belong to) is given,
-    the parser reads it as one piece and the per-morpheme readings are
-    aligned onto the tokens, so readings follow the sentence's context
-    (一つ -> 一=ひと, not the isolated 一=いち).  Tokens that can't be
-    covered that way fall back to the per-token reading -- the same
-    source term lookups use.  Non-Japanese languages (and the
-    japanese_reading setting being off) yield reading=None, so the panel
-    simply shows the plain word.
+    the Japanese parser reads it as one piece and the per-morpheme
+    readings are aligned onto the tokens, so readings follow the
+    sentence's context (一つ -> 一=ひと, not the isolated 一=いち).
+    Tokens that can't be covered that way fall back to the per-token
+    reading -- the same source term lookups use.  Chinese parsers
+    (pinyin / jyutping) have no contextual parse, so they always answer
+    per token -- word-level input already resolves most polyphones
+    (银行 -> háng).  Languages without reading support yield
+    reading=None, so the panel simply shows the plain word.
     """
     cleaned = [{"text": _clean_token(t), "reading": None} for t in tokens]
-    if not is_japanese_language(language):
+    if not supports_readings(language):
         return cleaned
 
     parser = language.parser
-    if full_text:
+    if full_text and is_japanese_language(language):
         try:
             morphs = parser.get_context_readings(full_text)
         except Exception:  # pylint: disable=broad-exception-caught
