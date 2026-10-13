@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Reading &quot;{{ html_title }}&quot;{% endblock %}
+{% block title %}{{ t('Reading') }} &quot;{{ html_title }}&quot;{% endblock %}
 
 {% block body %}
 
@@ -157,15 +157,15 @@
     <button type="button" class="end-icon-btn known"
             id="endMarkRestAsKnown"
             onclick="handle_page_done(true, 0, END_OF_BOOK_MARKS_ALL_PAGES)"
-            title="Mark the remaining words on all pages of the book as known and finish the book">
+            title="{{ t('Mark the remaining words on all pages of the book as known and finish the book') }}">
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>
     </button>
     {% if series_tag %}
-    <a class="end-icon-btn toc" href="/book/series/{{ series_tag | urlencode }}" title="Back to book set: {{ series_tag }}">
+    <a class="end-icon-btn toc" href="/book/series/{{ series_tag | urlencode }}" title="{{ t('Back to book set:') }} {{ series_tag }}">
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/></svg>
     </a>
     {% else %}
-    <a class="end-icon-btn toc" href="/" title="Back to Home">
+    <a class="end-icon-btn toc" href="/" title="{{ t('Back to Home') }}">
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/></svg>
     </a>
     {% endif %}
@@ -185,7 +185,7 @@
     style="height: 35%; width: 100%"
     frameborder="0"
   >
-    Frame support required.
+    {{ t('Frame support required.') }}
   </iframe>
   </div>
   <div class="dictcontainer">
@@ -199,10 +199,10 @@
 
 </div>
 
-<div id="navSidePrev" class="side-page-nav hide" onclick="navigatePrev()" title="Go to previous page">
+<div id="navSidePrev" class="side-page-nav hide" onclick="navigatePrev()" title="{{ t('Go to previous page') }}">
   <svg viewBox="7.5 3.5 15 25" width="18" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>
 </div>
-<div id="navSideNext" class="side-page-nav hide" onclick="navigateNext()" title="Go to next page">
+<div id="navSideNext" class="side-page-nav hide" onclick="navigateNext()" title="{{ t('Go to next page') }}">
   <svg viewBox="7.5 3.5 15 25" width="18" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
 </div>
 
@@ -233,8 +233,8 @@
   const endMarkRestAsKnown = document.getElementById("endMarkRestAsKnown");
   if (endMarkRestAsKnown) {
     endMarkRestAsKnown.title = END_OF_BOOK_MARKS_ALL_PAGES
-      ? "Mark the remaining words on all pages of the book as known and finish the book"
-      : "Mark the remaining words on this page as known and finish the page";
+      ? I18N.t("Mark the remaining words on all pages of the book as known and finish the book")
+      : I18N.t("Mark the remaining words on this page as known and finish the page");
   }
 
   function _layout_side_nav() {
@@ -1480,8 +1480,8 @@
   function update_arrow_titles() {
     const on = localStorage.getItem("arrow_marks_known") === "true";
     const t = on
-      ? "Mark this screen as known and continue"
-      : "Go to next page";
+      ? I18N.t("Mark this screen as known and continue")
+      : I18N.t("Go to next page");
     ["navSideNext", "navNext"].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.title = t;
@@ -1511,7 +1511,7 @@
   function add_bookmark() {
     const book_id = document.querySelector('#book_id')?.value;
     const page_num = document.querySelector('#page_num')?.value;
-    let title = prompt(`Enter bookmark title, or Cancel to quit`);
+    let title = prompt(I18N.t('Enter bookmark title, or Cancel to quit'));
 
     if (!title)
       return;
@@ -1530,9 +1530,9 @@
       })
     }).then((resp) => resp.json()).then(json => {
       if (json?.success === true) {
-        alert(`Bookmark "${title}" added.`)
+        alert(`${I18N.t('Bookmark')} "${title}" ${I18N.t('added.')}`)
       } else {
-        alert(`Unable to add bookmark. ${json?.reason || "Unknown reason"}`)
+        alert(`${I18N.t('Unable to add bookmark.')} ${json?.reason || I18N.t('Unknown reason')}`)
       }
     })
   }
@@ -1565,7 +1565,7 @@
 
     notices.forEach(function (el) {
       el.style.cursor = "pointer";
-      el.title = "Dismiss";
+      el.title = I18N.t('Dismiss');
       el.addEventListener("click", dismiss_flash_notices);
     });
 

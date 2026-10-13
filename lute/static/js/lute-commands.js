@@ -26,7 +26,7 @@ let show_translation_for_text = function(text) {
     // Same feedback as the LuteForMobile sentence sheet ("No dictionaries
     // configured"): a silent no-op made both the hotkey and the term
     // form's Sentence button feel broken.
-    alert('No sentence translation dictionaries are configured for this language.');
+    alert(I18N.t('No sentence translation dictionaries are configured for this language.'));
     return;
   }
 
@@ -81,7 +81,7 @@ function send_selected_terms_to_anki() {
     $('.ui-tooltip').remove();
     elements.forEach(function(el) {
       if ($(el).data("wid") == term_id) {
-        _show_element_message_tooltip(el, "Anki exports", results, 0);
+        _show_element_message_tooltip(el, I18N.t("Anki exports"), results, 0);
       }
     });
   }
@@ -357,9 +357,9 @@ function open_grammar_analysis(opts) {
   function header() {
     return (
       '<div class="grammar-analysis-panel__header">' +
-      '<span class="grammar-analysis-panel__title">Grammar Analysis</span>' +
+      '<span class="grammar-analysis-panel__title">' + I18N.t('Grammar Analysis') + '</span>' +
       '<span id="grammar-count" class="grammar-analysis-panel__badge">…</span>' +
-      '<button type="button" class="grammar-analysis-panel__close" aria-label="Close">&times;</button>' +
+      '<button type="button" class="grammar-analysis-panel__close" aria-label="' + I18N.t('Close') + '">&times;</button>' +
       "</div>"
     );
   }
@@ -367,7 +367,7 @@ function open_grammar_analysis(opts) {
   const panel = $("<div/>", {
     id: "grammar-analysis-panel",
     class: "grammar-analysis-panel",
-  }).html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">Analyzing…</div></div>');
+  }).html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">' + I18N.t('Analyzing…') + '</div></div>');
 
   if (pane) {
     pane.classList.add("grammar-mode");
@@ -405,7 +405,7 @@ function open_grammar_analysis(opts) {
       if (panelIsGone()) return;
       let bodyHtml;
       if (!data || data.length === 0) {
-        bodyHtml = '<div class="grammar-analysis-panel__state">No known grammar points detected on this page.</div>';
+        bodyHtml = '<div class="grammar-analysis-panel__state">' + I18N.t('No known grammar points detected on this page.') + '</div>';
       } else {
         // Render one example sentence, wrapping the backend-reported matched
         // words (exact character offsets) in <mark>.
@@ -491,7 +491,7 @@ function open_grammar_analysis(opts) {
               "</div></div>"
             : "";
           const cjk = /[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]/.test(g.desc || "");
-          const moreLabel = cjk ? "参考例句 · 注意点" : "Reference · notes";
+          const moreLabel = cjk ? "参考例句 · 注意点" : I18N.t("Reference · notes");
           const more =
             ref || notes
               ? '<details class="grammar-item__more"><summary>' + moreLabel + "</summary>" +
@@ -579,7 +579,7 @@ function open_grammar_analysis(opts) {
       }
       panel.html(header() + bodyHtml);
       panel.find("#grammar-count").text(
-        data.length + (data.length === 1 ? " point" : " points")
+        data.length + (data.length === 1 ? I18N.t(' point') : I18N.t(' points'))
       );
       panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
 
@@ -1046,7 +1046,7 @@ function open_grammar_analysis(opts) {
     })
     .fail(function () {
       if (panelIsGone()) return;
-      panel.html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">Analysis failed. Please try again.</div></div>');
+      panel.html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">' + I18N.t('Analysis failed. Please try again.') + '</div></div>');
       panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
     });
 }
@@ -1134,7 +1134,7 @@ function _page_data() {
 }
 
 function delete_current_page() {
-  if (!confirm("Delete current page?"))
+  if (!confirm(I18N.t("Delete current page?")))
     return;
   const d = _page_data()
   window.location = `/read/delete_page/${d.bookid}/${d.pagenum}`;

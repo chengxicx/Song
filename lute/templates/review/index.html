@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %}Review{% endblock %}
-{% block header %}Review{% endblock %}
+{% block title %}{{ t('Review') }}{% endblock %}
+{% block header %}{{ t('Review') }}{% endblock %}
 
 {% block body %}
 
 <div id="review_fsrs_status" class="review-status">
   {% if fsrs_status.installed %}
-  <span>Scheduler: FSRS (fsrs package {{ fsrs_status.version }}).</span>
+  <span>{{ t('Scheduler: FSRS (fsrs package') }} {{ fsrs_status.version }}{{ t(').') }}</span>
   {% else %}
-  <span>Scheduler: the <code>fsrs</code> package is not installed.
+  <span>{{ t('Scheduler: the <code>fsrs</code> package is not installed.') }}
     <button class="btn btn-secondary" id="btn_install_fsrs"
-            onclick="LuteReview.install_fsrs();">Install</button>
-    <span class="review-hint">(needs Python 3.10+, installs {{ fsrs_status.pip_spec }})</span>
+            onclick="LuteReview.install_fsrs();">{{ t('Install') }}</button>
+    <span class="review-hint">{{ t('(needs Python 3.10+, installs') }} {{ fsrs_status.pip_spec }}{{ t(')') }}</span>
   </span>
   {% endif %}
 </div>
@@ -21,22 +21,22 @@
 <div class="review-stats">
   <div class="review-stat">
     <span class="review-stat-value" id="review_due_count">{{ counts.due }}</span>
-    <span class="review-stat-label">due now</span>
+    <span class="review-stat-label">{{ t('due now') }}</span>
   </div>
   <div class="review-stat">
     <span class="review-stat-value">{{ counts.new_allowed_today }}</span>
-    <span class="review-stat-label">new left today
-      <span class="review-hint">(max {{ counts.max_new_per_day }}/day)</span></span>
+    <span class="review-stat-label">{{ t('new left today') }}
+      <span class="review-hint">{{ t('(max') }} {{ counts.max_new_per_day }}{{ t('/day)') }}</span></span>
   </div>
 </div>
 
 <div class="review-actions-bar">
   <button class="btn btn-primary" id="btn_start_review"
-          onclick="window.location = '/review/session'; return false;">Start review</button>
+          onclick="window.location = '/review/session'; return false;">{{ t('Start review') }}</button>
   <a class="btn btn-secondary" id="btn_review_settings"
-     href="/review/settings">Settings</a>
+     href="/review/settings">{{ t('Settings') }}</a>
   <a class="btn btn-secondary" id="btn_review_stats"
-     href="/stats#review">Statistics</a>
+     href="/stats#review">{{ t('Statistics') }}</a>
 </div>
 
 {% endblock %}

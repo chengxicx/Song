@@ -10,6 +10,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from lute.termimport.service import Service, BadImportFileError
 from lute.db import db
+from lute.i18n import t
 
 
 bp = Blueprint("termimport", __name__, url_prefix="/termimport")
@@ -51,6 +52,6 @@ def term_import_index():
                 )
                 return redirect("/term/index", 302)
             except BadImportFileError as e:
-                flash(f"Error on import: {str(e)}", "notice")
+                flash(t("Error on import") + f": {str(e)}", "notice")
 
     return render_template("termimport/index.html", form=form)

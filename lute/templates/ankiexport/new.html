@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}New Anki export{% endblock %}
+{% block title %}{{ t('New Anki export') }}{% endblock %}
 
 {% block body %}
-<h2>Create new Anki export</h2>
+<h2>{{ t('Create new Anki export') }}</h2>
 
 {% include "ankiexport/_form.html" %}
 

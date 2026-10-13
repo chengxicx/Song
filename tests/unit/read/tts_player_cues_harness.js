@@ -63,6 +63,12 @@
 const fsShimLike = typeof require === "function" ? require("fs") : null;
 
 /* A deterministic clock: the player's playback chain is entirely
+
+/* The reading page injects window.I18N via base.html; the harness runs
+   the module bare in Node, so provide the identity fallback it uses. */
+globalThis.LUTE_I18N = {};
+globalThis.I18N = { t: (k) => k };
+
    setTimeout-driven, so the harness owns time and runs it by hand.
    These shadow the runtime's own timers inside this file's scope, and
    the eval'd player code resolves them through the scope chain. */

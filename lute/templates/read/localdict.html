@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>Dictionary</title>
+    <title>{{ t('Dictionary') }}</title>
     <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
     {% if theme_css_hash %}
     <link rel="stylesheet" type="text/css" href="/theme/current?v={{ theme_css_hash }}">
@@ -206,7 +206,7 @@
           <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
           <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
         </svg>
-        <span>Local dictionary</span>
+        <span>{{ t('Local dictionary') }}</span>
       </p>
       <p class="localdict-head">{{ text }}</p>
       {% if blocks %}
@@ -242,7 +242,7 @@
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <span>Not in the installed dictionary.</span>
+        <span>{{ t('Not in the installed dictionary.') }}</span>
       </div>
       {% endif %}
     </div>

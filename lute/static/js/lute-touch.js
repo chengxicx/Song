@@ -621,7 +621,7 @@ let copy_text_to_clipboard = function(textitemspans) {
   setTimeout(() => removeFlash(), 1000);
 
   const last_el = textitemspans[textitemspans.length - 1];
-  _show_element_message_tooltip(last_el, null, "Copied to clipboard.", 1000);
+  _show_element_message_tooltip(last_el, null, I18N.t('Copied to clipboard.'), 1000);
 }
 
 

@@ -29,6 +29,8 @@ class UserSettingsForm(FlaskForm):
     )
 
     current_theme = SelectField("Theme")
+    # UI display language (lute.i18n).  Choices are set in the route.
+    ui_language = SelectField("UI language")
     custom_styles = TextAreaField("Custom styles")
     show_highlights = BooleanField("Highlight terms by status")
 

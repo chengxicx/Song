@@ -502,24 +502,24 @@ function shadowingOpenPanel() {
   panel.className = "shadowing-panel";
   panel.innerHTML =
     '<div class="shadowing-panel__header">' +
-    '<span class="shadowing-panel__title">Shadowing</span>' +
+    '<span class="shadowing-panel__title">' + I18N.t('Shadowing') + '</span>' +
     '<button type="button" id="shadowing-auto-btn" class="shadowing-auto-btn"' +
-    ' title="Auto: record at every sentence end, score, then advance">Auto</button>' +
-    '<button type="button" class="shadowing-panel__close" aria-label="Close">&times;</button>' +
+    ' title="' + I18N.t('Auto: record at every sentence end, score, then advance') + '">' + I18N.t('Auto') + '</button>' +
+    '<button type="button" class="shadowing-panel__close" aria-label="' + I18N.t('Close') + '">&times;</button>' +
     "</div>" +
     '<div class="shadowing-panel__body">' +
     '<div id="shadowing-current" class="shadowing-current"></div>' +
     '<div class="shadowing-controls">' +
-    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="-1" title="Previous sentence">' +
+    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="-1" title="' + I18N.t('Previous sentence') + '">' +
     PREV_SVG +
     "</button>" +
-    '<button type="button" id="shadowing-listen-btn" class="shadowing-nav-btn" title="Listen to this sentence">' +
+    '<button type="button" id="shadowing-listen-btn" class="shadowing-nav-btn" title="' + I18N.t('Listen to this sentence') + '">' +
     SPEAKER_SVG +
     "</button>" +
-    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="1" title="Next sentence">' +
+    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="1" title="' + I18N.t('Next sentence') + '">' +
     NEXT_SVG +
     "</button>" +
-    '<button type="button" id="shadowing-rec-btn" class="shadowing-rec-btn" title="Record / stop">' +
+    '<button type="button" id="shadowing-rec-btn" class="shadowing-rec-btn" title="' + I18N.t('Record / stop') + '">' +
     MIC_SVG +
     '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>' +
     "</button>" +
@@ -642,7 +642,7 @@ function shadowingTokenHtml(text, reading, idx, cls) {
   if (reading) attrs += ' data-reading="' + shadowingEscapeHtml(reading) + '"';
   if (idx != null) attrs += ' data-idx="' + idx + '"';
   return (
-    "<span" + attrs + ' title="Click to hear this word">' + inner + "</span>"
+    "<span" + attrs + ' title="' + I18N.t('Click to hear this word') + '">' + inner + "</span>"
   );
 }
 
@@ -651,7 +651,7 @@ function shadowingRenderCurrent() {
   if (!box) return;
   if (!shadowingUnit) {
     box.innerHTML =
-      '<div class="shadowing-panel__state">Play the player, or pick a sentence with the arrows below.</div>';
+      '<div class="shadowing-panel__state">' + I18N.t('Play the player, or pick a sentence with the arrows below.') + '</div>';
     return;
   }
   const readings = shadowingUnit.readings || [];
@@ -725,10 +725,10 @@ async function shadowingMarkWord(btn) {
   try {
     const res = await LuteRecorder.markWord(shadowingUnit.langId, word);
     const messages = {
-      created: "added",
-      promoted: "added",
-      learning: "already learning",
-      known: "known — left alone",
+      created: I18N.t("added"),
+      promoted: I18N.t("added"),
+      learning: I18N.t("already learning"),
+      known: I18N.t("known — left alone"),
       invalid: "?",
     };
     btn.textContent = res.outcome === "created" || res.outcome === "promoted" ? "✓" : "·";
@@ -743,7 +743,7 @@ function shadowingRenderResultIdle() {
   const box = document.getElementById("shadowing-result");
   if (!box) return;
   box.innerHTML =
-    '<div class="shadowing-result__hint">Record yourself reading the sentence to score it.</div>';
+    '<div class="shadowing-result__hint">' + I18N.t('Record yourself reading the sentence to score it.') + '</div>';
 }
 
 function shadowingRenderPanelMessage(msg, isError) {
@@ -772,7 +772,7 @@ function shadowingClearMarks(unit) {
     tok.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
     if (tok.getAttribute("data-heard")) {
       tok.removeAttribute("data-heard");
-      tok.setAttribute("title", "Click to hear this word");
+      tok.setAttribute("title", I18N.t("Click to hear this word"));
     }
     tok.querySelectorAll(".shadow-tok__heard").forEach(function (h) {
       h.remove();
@@ -813,7 +813,7 @@ function shadowingPaintVerdicts(unit, data) {
         // word and the misheard one back to back (see
         // shadowingSpeakToken); the "→ heard" part speaks alone.
         tok.setAttribute("data-heard", heard);
-        tok.setAttribute("title", "Click: correct word, then what was heard");
+        tok.setAttribute("title", I18N.t("Click: correct word, then what was heard"));
         tok.insertAdjacentHTML(
           "beforeend",
           '<span class="shadow-tok__heard">→ ' +
@@ -830,7 +830,7 @@ function shadowingRenderResult(unit, data) {
   if (!box) return;
   const extras = data.extras || [];
   const isMorpheme = data.token_kind === "morpheme";
-  const kindLabel = isMorpheme ? "morphemes/min" : "words/min";
+  const kindLabel = isMorpheme ? I18N.t("morphemes/min") : I18N.t("words/min");
 
   let html = '<div class="shadowing-score">';
   html +=
@@ -879,7 +879,7 @@ function shadowingRenderResult(unit, data) {
   html += '<div class="shadowing-heard">' + heardHtml + "</div>";
   if (extras.length) {
     html +=
-      '<div class="shadowing-extras"><span class="shadowing-extras__label">Also heard</span> ' +
+      '<div class="shadowing-extras"><span class="shadowing-extras__label">' + I18N.t('Also heard') + '</span> ' +
       shadowingEscapeHtml(
         extras.join(isMorpheme ? "" : " ")
       ) +
@@ -907,7 +907,7 @@ function shadowingMarkWordsHtml(unit, data) {
   });
   if (!missed.length) return "";
   return (
-    '<div class="shadowing-words"><span class="shadowing-extras__label">Add a stumbled word to your learning words:</span> ' +
+    '<div class="shadowing-words"><span class="shadowing-extras__label">' + I18N.t('Add a stumbled word to your learning words:') + '</span> ' +
     missed
       .map(function (t) {
         return (
@@ -915,7 +915,7 @@ function shadowingMarkWordsHtml(unit, data) {
           shadowingEscapeHtml(t) +
           '<button type="button" class="shadow-word-add" data-word="' +
           shadowingEscapeHtml(t) +
-          '" title="Add to your learning words">+</button></span>'
+          '" title="' + I18N.t('Add to your learning words') + '">+</button></span>'
         );
       })
       .join(" ") +
@@ -928,11 +928,11 @@ function shadowingRenderHistory() {
   if (!box) return;
   if (!shadowingHistory.length) {
     box.innerHTML =
-      '<div class="shadowing-history__empty">No attempts yet.</div>';
+      '<div class="shadowing-history__empty">' + I18N.t('No attempts yet.') + '</div>';
     return;
   }
   box.innerHTML =
-    '<div class="shadowing-history__head">This session</div>' +
+    '<div class="shadowing-history__head">' + I18N.t('This session') + '</div>' +
     shadowingHistory
       .slice(0, 30)
       .map(function (h) {
@@ -1055,7 +1055,7 @@ async function shadowingSubmit(blob, unit) {
   if (!unit || !unit.texts.length) return;
   shadowingBusy = true;
   shadowingClearMarks(unit);
-  shadowingRenderPanelMessage("Transcribing…", false);
+  shadowingRenderPanelMessage(I18N.t("Transcribing…"), false);
 
   try {
     const outcome = await LuteRecorder.scoreTake({
@@ -1073,16 +1073,16 @@ async function shadowingSubmit(blob, unit) {
           // cached afterwards, per size), so say so rather than blaming
           // the model for every slow transcription.
           el.innerHTML =
-            '<div class="shadowing-panel__state">Loading the whisper model… ' +
+            '<div class="shadowing-panel__state">' + I18N.t('Loading the whisper model… ') +
             secs +
             "s" +
             (secs > 20
-              ? " (first run downloads it, this can take minutes)"
+              ? I18N.t(" (first run downloads it, this can take minutes)")
               : "") +
             "</div>";
         } else {
           el.innerHTML =
-            '<div class="shadowing-panel__state">Transcribing… ' +
+            '<div class="shadowing-panel__state">' + I18N.t('Transcribing… ') +
             secs +
             "s</div>";
         }
@@ -1109,7 +1109,7 @@ async function shadowingSubmit(blob, unit) {
 
     if (shadowingActive && shadowingAuto) shadowingAutoAdvance();
   } catch (err) {
-    shadowingRenderPanelMessage("Network error: " + err, true);
+    shadowingRenderPanelMessage(I18N.t("Network error: ") + err, true);
   } finally {
     shadowingBusy = false;
   }
@@ -1129,7 +1129,7 @@ function shadowingAutoAdvance() {
       ttsSeekToCue(next, true);
       return;
     }
-    shadowingRenderPanelMessage("End of the text — auto stopped.", false);
+    shadowingRenderPanelMessage(I18N.t("End of the text — auto stopped."), false);
     return;
   }
   const nextBtn = document.getElementById("yt-next-cue-btn");
@@ -1137,7 +1137,7 @@ function shadowingAutoAdvance() {
     nextBtn.click();
     return;
   }
-  shadowingRenderPanelMessage("No player cues to advance to.", true);
+  shadowingRenderPanelMessage(I18N.t("No player cues to advance to."), true);
 }
 
 /* ------------------------------------------------------------------

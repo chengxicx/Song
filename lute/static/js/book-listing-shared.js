@@ -46,7 +46,7 @@ let render_tag_list = function(data, type, row, meta) {
   return '<span class="book-tag-list">' + visibleTags.map(function(t, i) {
     const sep = i > 0 ? '<span class="tag-sep" aria-hidden="true">·</span>' : '';
     return sep + '<span class="book-tag" data-tag="' + t + '" ' +
-      'title="Click to filter by this tag">' +
+      'title="' + I18N.t('Click to filter by this tag') + '">' +
       t + '</span>';
   }).join('') + '</span>';
 };
@@ -73,11 +73,11 @@ let render_book_progress = function (data, type, row, meta) {
   if (row['SeriesTag']) {
     const n = parseInt(row['SeriesBookCount']) || 0;
     const r = parseInt(row['SeriesReadCount']) || 0;
-    tip = `${r} of ${n} books read`;
+    tip = `${r} ${I18N.t('of')} ${n} ${I18N.t('books read')}`;
   } else {
     const p = parseInt(row['PageNum']) || 1;
     const n = parseInt(row['PageCount']) || 0;
-    tip = n > 0 ? `page ${p} of ${n}` : 'no pages';
+    tip = n > 0 ? `${I18N.t('page')} ${p} ${I18N.t('of')} ${n}` : I18N.t('no pages');
   }
 
   const fillClass = pct >= 100 ? ' book-progress-fill-complete' : '';
@@ -110,10 +110,10 @@ let render_book_type = function(data, type, row, meta) {
   const m = BOOK_TYPE_META[btype] || BOOK_TYPE_META.text;
   if (book_type_display_mode === 'text') {
     return `<span class="type-chip-text" style="color:${m.color};background:${book_type_tint(btype, 0.12)}" ` +
-      `data-type="${btype}" title="Click to filter by this type (${m.label})">${m.short}</span>`;
+      `data-type="${btype}" title="${I18N.t('Click to filter by this type')} (${m.label})">${m.short}</span>`;
   }
   return `<span class="type-chip" style="background:${book_type_tint(btype, 0.12)}" ` +
-    `data-type="${btype}" title="Click to filter by this type (${m.label})">` +
+    `data-type="${btype}" title="${I18N.t('Click to filter by this type')} (${m.label})">` +
     `${book_type_icon_svg(btype)}</span>`;
 };
 
@@ -190,7 +190,7 @@ function toggle_book_type_display(e) {
   } catch (err) { /* private mode etc. — session-only toggle still works */ }
   const btn = document.getElementById('typeDisplayToggle');
   if (btn) {
-    btn.title = (book_type_display_mode === 'text') ? 'Show icons' : 'Show text labels';
+    btn.title = (book_type_display_mode === 'text') ? I18N.t('Show icons') : I18N.t('Show text labels');
   }
   if (typeof book_listing_table === 'undefined' || !book_listing_table) return;
   const col = book_listing_table.column('BookType:name');
@@ -213,7 +213,7 @@ let render_book_title = function ( data, type, row, meta ) {
     const r = parseInt(row['SeriesReadCount']);
     return `<div class="series-titlebox">` +
       `<a class="book-title series-title" href="/book/series/${tag}">${row['SeriesTag']}</a>` +
-      `<div class="series-sub">${n} eps &middot; ${r}/${n} read</div>` +
+      `<div class="series-sub">${n} ${I18N.t('eps')} &middot; ${r}/${n} ${I18N.t('read')}</div>` +
       `</div>`;
   }
 
@@ -234,7 +234,7 @@ let render_book_stats_graph_placeholder = function(data, type, row, meta) {
       const n = parseInt(row['SeriesBookCount']) || 0;
       const r = parseInt(row['SeriesReadCount']) || 0;
       const pct = n > 0 ? Math.round(r * 100 / n) : 0;
-      return `<div class="series-progress" title="${r} of ${n} episodes read">` +
+      return `<div class="series-progress" title="${r} ${I18N.t('of')} ${n} ${I18N.t('episodes read')}">` +
         `<div class="series-progress-fill" style="width:${pct}%"></div></div>`;
     }
     const sd = row['StatusDistribution'];
@@ -293,7 +293,7 @@ let render_stats_graph = function(statuscounts) {
 
   let make_bar = function(stid, title) {
     const p = statuspct[stid];
-    const msg = `${p}% (${countsCopy[stid]} words)`;
+    const msg = `${p}% (${countsCopy[stid]} ${I18N.t('words')})`;
     const smallestP = window.matchMedia("(max-width: 980px)").matches ? 2 : 1;
     let display = "inline-flex"
     if (p < smallestP)
@@ -306,9 +306,9 @@ let render_stats_graph = function(statuscounts) {
   };
 
   const bar_titles = {
-    "0": "Unknown",
+    "0": I18N.t("Unknown"),
     "1": 1, "2": 2, "3": 3, "4": 4, "5": 5,
-    "99": "Well Known or Ignored"
+    "99": I18N.t("Well Known or Ignored")
   };
   const countsJson = JSON.stringify(statuscounts).replace(/"/g, '&quot;');
   ret = `<div class="status-bar-container" data-status-counts="${countsJson}" style="cursor:pointer;">`;
@@ -347,8 +347,8 @@ let render_book_actions = function ( data, type, row, meta ) {
     const n = parseInt(row['SeriesBookCount']) || 0;
     return `<div class="book-action-dropdown"><span>&hellip;</span>
       <div class="book-action-dropdown-content">
-        <a href="/book/settings">Configure</a>
-        <a href="#" data-seriestag="${tag}" data-count="${n}" onclick="confirm_delete_series(this)">Delete</a>
+        <a href="/book/settings">${I18N.t('Configure')}</a>
+        <a href="#" data-seriestag="${tag}" data-count="${n}" onclick="confirm_delete_series(this)">${I18N.t('Delete')}</a>
       </div>
     </div>`;
   }
@@ -364,14 +364,14 @@ let render_book_actions = function ( data, type, row, meta ) {
     links.push(s);
   };
 
-  make_link('Edit', "edit_book");
+  make_link(I18N.t('Edit'), "edit_book");
   if (is_active) {
-    make_link('Archive', "confirm_archive");
+    make_link(I18N.t('Archive'), "confirm_archive");
   }
   else {
-    make_link('Unarchive', "confirm_unarchive");
+    make_link(I18N.t('Unarchive'), "confirm_unarchive");
   }
-  make_link('Delete', "confirm_delete");
+  make_link(I18N.t('Delete'), "confirm_delete");
 
   return `<div class="book-action-dropdown"><span>&hellip;</span>
     <div class="book-action-dropdown-content">${links.join('')}</div>
@@ -395,7 +395,7 @@ function do_action_post(action, bookid, redirect) {
 function confirm_archive(el) {
   const booktitle = decodeURIComponent($(el).data('bktitle'));
   const bookid = $(el).data('bkid');
-  if (!confirm(`Archiving "${booktitle}".  Click OK to proceed, or Cancel.`)) {
+  if (!confirm(I18N.t('Archiving "') + booktitle + I18N.t('".  Click OK to proceed, or Cancel.'))) {
     return;
   }
   do_action_post('archive', bookid);
@@ -414,7 +414,7 @@ function edit_book(el) {
 function confirm_delete(el) {
   const booktitle = decodeURIComponent($(el).data('bktitle'));
   const bookid = $(el).data('bkid');
-  if (!confirm(`Deleting "${booktitle}".  Click OK to proceed, or Cancel.`)) {
+  if (!confirm(I18N.t('Deleting "') + booktitle + I18N.t('".  Click OK to proceed, or Cancel.'))) {
     return;
   }
   // Stay on the current page (e.g. a book set overview) after deleting
@@ -425,7 +425,7 @@ function confirm_delete(el) {
 function confirm_delete_series(el) {
   const seriestag = decodeURIComponent($(el).data('seriestag'));
   const count = $(el).data('count');
-  if (!confirm(`Deleting all ${count} books in series "${seriestag}".  Click OK to proceed, or Cancel.`)) {
+  if (!confirm(I18N.t('Deleting all ') + count + I18N.t(' books in series "') + seriestag + I18N.t('".  Click OK to proceed, or Cancel.'))) {
     return;
   }
   let f = $('#actionposter');
@@ -459,14 +459,14 @@ $(document).on('click', '.status-bar-container', function(e) {
   let html = '<div style="padding:10px 0;">';
   html += '<h4 style="margin:0 0 12px 0;font-size:15px;">' + title + '</h4>';
   html += '<table style="width:100%;font-size:13px;border-collapse:collapse;">';
-  html += '<tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid #e9ecef;">Status</th>';
-  html += '<th style="text-align:right;padding:4px 8px;border-bottom:1px solid #e9ecef;">Words</th>';
-  html += '<th style="text-align:right;padding:4px 8px;border-bottom:1px solid #e9ecef;">%</th></tr>';
+  html += '<tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid #e9ecef;">' + I18N.t('Status') + '</th>';
+  html += '<th style="text-align:right;padding:4px 8px;border-bottom:1px solid #e9ecef;">' + I18N.t('Words') + '</th>';
+  html += '<th style="text-align:right;padding:4px 8px;border-bottom:1px solid #e9ecef;">' + I18N.t('%') + '</th></tr>';
 
   const statusLabels = {
-    '0': 'Unknown', '1': 'Level 1', '2': 'Level 2',
-    '3': 'Level 3', '4': 'Level 4', '5': 'Level 5',
-    '98': 'Ignored', '99': 'Well-known'
+    '0': I18N.t('Unknown'), '1': I18N.t('Level 1'), '2': I18N.t('Level 2'),
+    '3': I18N.t('Level 3'), '4': I18N.t('Level 4'), '5': I18N.t('Level 5'),
+    '98': I18N.t('Ignored'), '99': I18N.t('Well-known')
   };
   const statusColors = {
     '0': '#ced4da', '1': '#ff6b6b', '2': '#ffa94d',
@@ -489,7 +489,7 @@ $(document).on('click', '.status-bar-container', function(e) {
     html += '</tr>';
   }
   html += '<tr style="font-weight:bold;border-top:2px solid #e9ecef;">';
-  html += '<td style="padding:6px 8px;">Total</td>';
+  html += '<td style="padding:6px 8px;">' + I18N.t('Total') + '</td>';
   html += '<td style="text-align:right;padding:6px 8px;">' + total + '</td>';
   html += '<td style="text-align:right;padding:6px 8px;">100%</td>';
   html += '</tr>';
@@ -770,7 +770,7 @@ let ajax_in_book_stats = function(settings) {
               const graph = render_stats_graph(result);
               $(nodes.stats).html(graph);
             } else {
-              $(nodes.stats).text('No data');
+              $(nodes.stats).text(I18N.t('No data'));
             }
           }
           if (nodes.newWord) {
@@ -786,11 +786,11 @@ let ajax_in_book_stats = function(settings) {
         } catch (e) {
           console.error('table_stats error for book ' + bid + ':', e);
           if (nodes.stats) {
-            $(nodes.stats).text('Error loading data');
+            $(nodes.stats).text(I18N.t('Error loading data'));
             $(nodes.stats).removeClass("refreshed");
           }
           if (nodes.newWord) {
-            $(nodes.newWord).text('Error');
+            $(nodes.newWord).text(I18N.t('Error'));
             $(nodes.newWord).removeClass("refreshed");
           }
         }

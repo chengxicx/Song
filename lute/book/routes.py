@@ -62,6 +62,7 @@ from lute.book.stats import get_difficulty_label
 from lute.book import sensevoice
 from lute.multiuser.context import get_current_user
 from lute.multiuser.permissions import admin_only_if_multiuser_json
+from lute.i18n import t
 import lute.utils.formutils
 from lute.utils.formutils import book_tag_choices
 from lute.db import db
@@ -144,7 +145,7 @@ def book_settings():
         tags = ",".join(form.book_series_tags.data or [])
         repo.set_dynamic_value("book_series_tags", tags)
         db.session.commit()
-        flash("Group into Set updated", "success")
+        flash(t("Group into Set updated"), "success")
         return redirect("/", 302)
 
     current = repo.get_dynamic_value("book_series_tags") or ""
@@ -157,7 +158,7 @@ def series(tagtext):
     "Series overview: all books carrying the given tag."
     data = get_series_overview(db.session, tagtext)
     if data is None:
-        flash(f"No books found with tag '{tagtext}'", "notice")
+        flash(t("No books found with tag") + f" '{tagtext}'", "notice")
         return redirect("/", 302)
     return render_template("book/series.html", **data)
 
@@ -454,11 +455,11 @@ def _import_youtube_video():
     srt_file = request.files.get("srt_file")
 
     if youtube_video_id(url) is None:
-        flash("Please enter a valid YouTube video URL.", "notice")
+        flash(t("Please enter a valid YouTube video URL."), "notice")
         return redirect("/book/import_webpage", 302)
 
     if srt_file is None or srt_file.filename == "":
-        flash("Please upload an SRT or VTT subtitle file.", "notice")
+        flash(t("Please upload an SRT or VTT subtitle file."), "notice")
         return redirect("/book/import_webpage", 302)
 
     try:
@@ -472,7 +473,7 @@ def _import_youtube_video():
         return redirect("/book/import_webpage", 302)
 
     if text.strip() == "":
-        flash("The subtitle file contains no text.", "notice")
+        flash(t("The subtitle file contains no text."), "notice")
         return redirect("/book/import_webpage", 302)
 
     b = Book()
@@ -504,11 +505,11 @@ def _import_bilibili_video():
 
     bvid, aid = bilibili_video_id(url)
     if bvid is None and aid is None:
-        flash("Please enter a valid Bilibili video URL.", "notice")
+        flash(t("Please enter a valid Bilibili video URL."), "notice")
         return redirect("/book/import_webpage", 302)
 
     if srt_file is None or srt_file.filename == "":
-        flash("Please upload an SRT or VTT subtitle file.", "notice")
+        flash(t("Please upload an SRT or VTT subtitle file."), "notice")
         return redirect("/book/import_webpage", 302)
 
     try:
@@ -522,7 +523,7 @@ def _import_bilibili_video():
         return redirect("/book/import_webpage", 302)
 
     if text.strip() == "":
-        flash("The subtitle file contains no text.", "notice")
+        flash(t("The subtitle file contains no text."), "notice")
         return redirect("/book/import_webpage", 302)
 
     b = Book()
@@ -602,7 +603,7 @@ def _import_mp3_audio():
             title = base or "MP3 audio"
     else:
         return _import_form_failure(
-            "Please provide an audio file (upload or an online URL)."
+            t("Please provide an audio file (upload or an online URL).")
         )
 
     # --- Subtitles: an uploaded file OR an online subtitle URL. ---
@@ -616,12 +617,12 @@ def _import_mp3_audio():
     except BookImportException as e:
         return _import_form_failure(e.message)
     except Exception as e:  # pylint: disable=broad-except
-        return _import_form_failure(f"Could not parse subtitle (error: {str(e)})")
+        return _import_form_failure(t("Could not parse subtitle") + f" (error: {str(e)})")
 
     if not (text and text.strip()):
         return _import_form_failure(
-            "Please provide subtitles (upload a file or an online URL), or tick "
-            "Auto-transcribe to generate them from the audio."
+            t("Please provide subtitles (upload a file or an online URL), or tick "
+            "Auto-transcribe to generate them from the audio.")
         )
 
     title = title[:200]
@@ -684,11 +685,11 @@ def _import_netease_music():
 
     song_id = netease_song_id(url)
     if song_id is None:
-        flash("Please enter a valid NetEase Cloud Music song URL.", "notice")
+        flash(t("Please enter a valid NetEase Cloud Music song URL."), "notice")
         return redirect("/book/import_webpage", 302)
 
     if not language_id:
-        flash("Please choose a language.", "notice")
+        flash(t("Please choose a language."), "notice")
         return redirect("/book/import_webpage", 302)
 
     try:
@@ -701,7 +702,7 @@ def _import_netease_music():
         return redirect("/book/import_webpage", 302)
 
     if not (text and text.strip()):
-        flash("The song's lyrics contain no text.", "notice")
+        flash(t("The song's lyrics contain no text."), "notice")
         return redirect("/book/import_webpage", 302)
 
     try:
@@ -712,8 +713,8 @@ def _import_netease_music():
         )
     except BookImportException as e:
         flash(
-            f"{e.message}  The song's audio could not be stored -- try "
-            "downloading it manually and importing it as an MP3 book.",
+            e.message + "  " + t("The song's audio could not be stored -- try "
+            "downloading it manually and importing it as an MP3 book."),
             "notice",
         )
         return redirect("/book/import_webpage", 302)
@@ -768,12 +769,12 @@ def _import_online_video():
     except BookImportException as e:
         return _import_form_failure(e.message)
     except Exception as e:  # pylint: disable=broad-except
-        return _import_form_failure(f"Could not parse subtitle (error: {str(e)})")
+        return _import_form_failure(t("Could not parse subtitle") + f" (error: {str(e)})")
 
     if not (text and text.strip()):
         return _import_form_failure(
-            "Please provide subtitles (upload a file or an online URL), or tick "
-            "Auto-transcribe to generate them from the video."
+            t("Please provide subtitles (upload a file or an online URL), or tick "
+            "Auto-transcribe to generate them from the video.")
         )
 
     # --- Media: uploaded video file OR online video URL. ---
@@ -798,7 +799,7 @@ def _import_online_video():
             title = base or "Online video"
     else:
         return _import_form_failure(
-            "Please provide a video (upload a file or an online URL)."
+            t("Please provide a video (upload a file or an online URL).")
         )
 
     title = title[:200]
@@ -839,11 +840,11 @@ def _import_mokuro_manga():
     title = (request.form.get("manga_title") or "").strip()
 
     if manga_file is None or manga_file.filename == "":
-        return _import_form_failure("Please upload a Mokuro manga archive (.zip or .cbz).")
+        return _import_form_failure(t("Please upload a Mokuro manga archive (.zip or .cbz)."))
 
     fname = (manga_file.filename or "").lower()
     if not fname.endswith((".zip", ".cbz")):
-        return _import_form_failure("Please upload a valid Mokuro manga archive (.zip or .cbz).")
+        return _import_form_failure(t("Please upload a valid Mokuro manga archive (.zip or .cbz)."))
 
     if not title:
         base = manga_file.filename or "Mokuro manga"
@@ -877,12 +878,12 @@ def _import_pdf():
     title = (request.form.get("pdf_title") or "").strip()
 
     if pdf_file is None or pdf_file.filename == "":
-        flash("Please upload a PDF file.", "notice")
+        flash(t("Please upload a PDF file."), "notice")
         return redirect("/book/import_webpage", 302)
 
     fname = (pdf_file.filename or "").lower()
     if not fname.endswith(".pdf"):
-        flash("Please upload a valid PDF file (.pdf).", "notice")
+        flash(t("Please upload a valid PDF file (.pdf)."), "notice")
         return redirect("/book/import_webpage", 302)
 
     if not title:
@@ -921,7 +922,7 @@ def import_epub_preview():
     epub_file = _epub_file_from_request()
     if epub_file is None:
         return jsonify(
-            {"success": False, "error": "Please upload a valid EPUB file (.epub)."}
+            {"success": False, "error": t("Please upload a valid EPUB file (.epub).")}
         )
     try:
         data = parse_epub(epub_file.stream)
@@ -948,11 +949,11 @@ def import_epub():
     epub_file = _epub_file_from_request()
     if epub_file is None:
         return jsonify(
-            {"success": False, "error": "Please upload a valid EPUB file (.epub)."}
+            {"success": False, "error": t("Please upload a valid EPUB file (.epub).")}
         )
     language_id = language_id_from(request.form.get("language_id"))
     if language_id is None:
-        return jsonify({"success": False, "error": "Please select a language."})
+        return jsonify({"success": False, "error": t("Please select a language.")})
     tags = _parse_tagify_tags(request.form.get("epub_tag", ""))
     title = (request.form.get("epub_title") or "").strip()
     selected = selected_chapter_indices(request.form.get("chapters"))
@@ -963,9 +964,9 @@ def import_epub():
     except BookImportException as e:
         return jsonify({"success": False, "error": e.message})
     if imported == 0:
-        msg = "No chapters were imported."
+        msg = t("No chapters were imported.")
         if last_error:
-            msg += f" Last error: {last_error}"
+            msg += " " + t("Last error") + f": {last_error}"
         return jsonify({"success": False, "error": msg})
     return jsonify(
         {
@@ -981,11 +982,11 @@ def _import_epub_direct():
     "Form-post EPUB import: create books for all chapters, then redirect."
     epub_file = _epub_file_from_request()
     if epub_file is None:
-        flash("Please upload a valid EPUB file (.epub).", "notice")
+        flash(t("Please upload a valid EPUB file (.epub)."), "notice")
         return redirect("/book/import_webpage", 302)
     language_id = language_id_from(request.form.get("language_id"))
     if language_id is None:
-        flash("Please select a language.", "notice")
+        flash(t("Please select a language."), "notice")
         return redirect("/book/import_webpage", 302)
     tags = _parse_tagify_tags(request.form.get("epub_tag", ""))
     title = (request.form.get("epub_title") or "").strip()
@@ -997,9 +998,9 @@ def _import_epub_direct():
         flash(e.message, "notice")
         return redirect("/book/import_webpage", 302)
     if imported == 0:
-        msg = "No chapters were imported."
+        msg = t("No chapters were imported.")
         if last_error:
-            msg += f" Last error: {last_error}"
+            msg += " " + t("Last error") + f": {last_error}"
         flash(msg, "notice")
         return redirect("/book/import_webpage", 302)
     if failed:

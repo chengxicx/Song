@@ -33,6 +33,7 @@ from sqlalchemy.event import listens_for
 from sqlalchemy.pool import NullPool, Pool
 
 from lute.config.app_config import AppConfig
+from lute import i18n as lute_i18n
 from lute.db import db
 from lute.db.setup.main import setup_db
 from lute.db.management import add_default_user_settings
@@ -213,6 +214,11 @@ def _add_base_routes(app, app_config):
                 "current_username": None,
                 "is_admin": False,
                 "can_manage_server": False,
+                # Pre-login there is no user scope, so i18n.t() serves
+                # English source strings (its fallback behavior).
+                "t": lute_i18n.t,
+                "i18n_lang": "en",
+                "i18n_dict_json": "{}",
             }
         us_repo = UserSettingRepository(db.session)
         bs = us_repo.get_backup_settings()
@@ -252,6 +258,9 @@ def _add_base_routes(app, app_config):
             # mode is on, and always available when it's off.  is_admin
             # alone can't express this: it is False in single-user mode.
             "can_manage_server": mu_permissions.is_admin_request(),
+            "t": lute_i18n.t,
+            "i18n_lang": lute_i18n.current_language(),
+            "i18n_dict_json": lute_i18n.translations_for_js(),
         }
         return ret
 

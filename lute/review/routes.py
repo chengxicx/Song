@@ -20,6 +20,7 @@ from lute.review import enqueue, scheduler, service
 from lute.review.forms import ReviewSettingsForm
 from lute.review.scheduler import SchedulerUnavailableError
 from lute.settings.current import refresh_global_settings
+from lute.i18n import t
 
 
 bp = Blueprint("review", __name__, url_prefix="/review")
@@ -79,7 +80,7 @@ def review_settings():
         enqueue.set_enabled_card_types(db.session, enabled)
         db.session.commit()
         refresh_global_settings(db.session)
-        flash("Review settings updated.", "success")
+        flash(t("Review settings updated."), "success")
         return redirect("/review/index", 302)
 
     enabled = enqueue.enabled_card_types(db.session)

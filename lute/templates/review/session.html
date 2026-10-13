@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Review session{% endblock %}
-{% block header %}Review{% endblock %}
+{% block title %}{{ t('Review session') }}{% endblock %}
+{% block header %}{{ t('Review') }}{% endblock %}
 
 {% block body %}
 
@@ -17,7 +17,7 @@
 <div id="review_session_container">
   <div class="rv-topbar">
     <div id="review_progress" class="rv-progress"></div>
-    <button class="btn btn-secondary" id="review_undo" hidden>Undo <kbd>Ctrl+Z</kbd></button>
+    <button class="btn btn-secondary" id="review_undo" hidden>{{ t('Undo') }} <kbd>Ctrl+Z</kbd></button>
   </div>
   <div id="review_card"></div>
 </div>
@@ -55,10 +55,10 @@
       if (!box) return;
       box.style.display = "block";
       box.innerHTML =
-        "<p>The review script did not load, so the session cannot start.</p>" +
+        "<p>" + I18N.t('The review script did not load, so the session cannot start.') + "</p>" +
         "<p class='rv-detail'>" + detail + "</p>" +
-        "<p>Reload the page (a hard reload clears a stale cache).</p>" +
-        "<p><a href='/review/index'>Back to review index</a></p>";
+        "<p>" + I18N.t('Reload the page (a hard reload clears a stale cache).') + "</p>" +
+        "<p><a href='/review/index'>" + I18N.t('Back to review index') + "</a></p>";
     }
 
     // Loading it by hand recovers a dropped or cache-mangled request --
