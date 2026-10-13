@@ -2,6 +2,7 @@
 Simple CLI commands.
 """
 
+import contextlib
 import json
 
 import click
@@ -16,9 +17,37 @@ from lute.cli.term_parent_backfill import (
     run_backfill,
     undo_backfill,
 )
+from lute.multiuser import context as mu_context
+from lute.multiuser import store as mu_store
 from lute.review import enqueue as review_enqueue
 
 bp = Blueprint("cli", __name__)
+
+
+def _user_scope_context(user_option):
+    """
+    The context manager a CLI command must run under.
+
+    Multi-user mode partitions databases per user, so a command that
+    touches the db must run inside an explicit user scope (same as the
+    request-time auth gate; without it the connection raises
+    "no user scope is set").  The user must be named explicitly -- the
+    CLI never guesses which account to write as.  Single-user mode keeps
+    the default (base database) scope, exactly as before.
+    """
+    if not mu_store.enabled():
+        if user_option:
+            print("Note: single-user mode; --user is ignored.")
+        return contextlib.nullcontext()
+    if not user_option:
+        names = ", ".join(u["username"] for u in mu_store.users())
+        raise click.UsageError(
+            "Multi-user mode is on: pass --user <name> "
+            + f"(existing users: {names or 'none'})."
+        )
+    if mu_store.get_user(user_option) is None:
+        raise click.UsageError(f"Unknown user: {user_option}")
+    return mu_context.user_scope(user_option)
 
 
 @bp.cli.command("hello")
@@ -159,6 +188,15 @@ def import_books_from_csv_cmd(language, file, tags, commit):
 """,
 )
 @click.option(
+    "--user",
+    "user_option",
+    default=None,
+    help="""
+    Multi-user mode only: the account whose database this command runs
+    against.  Required in multi-user mode; ignored in single-user mode.
+""",
+)
+@click.option(
     "--audit",
     default=None,
     help="""
@@ -173,7 +211,14 @@ def import_books_from_csv_cmd(language, file, tags, commit):
     help="Write the full plan as JSON to this path, for diffing runs.",
 )
 def parent_backfill_cmd(
-    language, commit, limit, new_parent_status, multi_token_policy, audit, json_path
+    language,
+    commit,
+    limit,
+    new_parent_status,
+    multi_token_policy,
+    user_option,
+    audit,
+    json_path,
 ):
     """
     Link terms to their dictionary form (lemma) parent.
@@ -183,19 +228,20 @@ def parent_backfill_cmd(
     links never sync statuses (WoSyncStatus stays 0), and no existing
     term's status is changed.
     """
-    result = run_backfill(
-        language,
-        commit=commit,
-        limit=limit,
-        new_parent_status=new_parent_status,
-        audit_path=audit,
-        multi_token_policy=multi_token_policy,
-    )
-    print(format_report(result))
-    if json_path:
-        with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(plan_as_dict(result), f, ensure_ascii=False, indent=1)
-        print("\nPlan written to %s" % json_path)
+    with _user_scope_context(user_option):
+        result = run_backfill(
+            language,
+            commit=commit,
+            limit=limit,
+            new_parent_status=new_parent_status,
+            audit_path=audit,
+            multi_token_policy=multi_token_policy,
+        )
+        print(format_report(result))
+        if json_path:
+            with open(json_path, "w", encoding="utf-8") as f:
+                json.dump(plan_as_dict(result), f, ensure_ascii=False, indent=1)
+            print("\nPlan written to %s" % json_path)
 
 
 @bp.cli.command("parent_backfill_undo")
@@ -213,7 +259,16 @@ def parent_backfill_cmd(
     references them.
 """,
 )
-def parent_backfill_undo_cmd(audit, commit, delete_created_terms):
+@click.option(
+    "--user",
+    "user_option",
+    default=None,
+    help="""
+    Multi-user mode only: the account whose database this command runs
+    against.  Required in multi-user mode; ignored in single-user mode.
+""",
+)
+def parent_backfill_undo_cmd(audit, commit, delete_created_terms, user_option):
     """
     Remove the links added by a parent_backfill --commit run.
 
@@ -221,16 +276,17 @@ def parent_backfill_undo_cmd(audit, commit, delete_created_terms):
     the run created are only removed with --delete-created-terms, and only
     when they have no other links, tags, images or translation.
     """
-    removed, terms_removed, terms_kept = undo_backfill(
-        audit, commit=commit, delete_created_terms=delete_created_terms
-    )
-    mode = "Removed" if commit else "Would remove"
-    print("%s %d link(s)." % (mode, removed))
-    if commit and delete_created_terms:
-        print(
-            "Parent terms: %d deleted, %d kept (still referenced)."
-            % (terms_removed, terms_kept)
+    with _user_scope_context(user_option):
+        removed, terms_removed, terms_kept = undo_backfill(
+            audit, commit=commit, delete_created_terms=delete_created_terms
         )
+        mode = "Removed" if commit else "Would remove"
+        print("%s %d link(s)." % (mode, removed))
+        if commit and delete_created_terms:
+            print(
+                "Parent terms: %d deleted, %d kept (still referenced)."
+                % (terms_removed, terms_kept)
+            )
 
 
 @bp.cli.command("review_sync")
