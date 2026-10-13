@@ -136,7 +136,7 @@ function lute_tagify_utils_setup_parent_tagify(
           if (hasMore <= 0)
             return '';
           return `<footer data-selector='tagify-suggestions-footer' class="${this.settings.classNames.dropdownFooter}">
-        (more items available, please refine your search.)</footer>`;
+        ${I18N.t('(more items available, please refine your search.)')}</footer>`;
         }
       },
 

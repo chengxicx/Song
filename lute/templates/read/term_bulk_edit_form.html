@@ -9,13 +9,13 @@
 
 <div id="term-form-container">
     <div style="margin-bottom: 1em;">
-      <i><span id="bulkUpdateCount">Updating terms</span></i>
+      <i><span id="bulkUpdateCount">{{ t('Updating terms') }}</span></i>
     </div>
     <form id="term-form" name="term_form" method="POST" action="/term/bulk_edit_from_reading_pane">
       <div id="term-bulk-form-fields">
       {% include 'term/_bulk_edit_form_fields.html' %}
       <div id="term-button-container">
-        <button id="btnsubmit" type="submit" class="btn btn-primary" onclick="return get_selected_word_ids();">Save</button>
+        <button id="btnsubmit" type="submit" class="btn btn-primary" onclick="return get_selected_word_ids();">{{ t('Save') }}</button>
       </div>
       <div id="term">
     </form>

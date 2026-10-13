@@ -244,14 +244,14 @@
       if (
         translationInput &&
         (!translationInput.value ||
-          translationInput.value === "Translating...")
+          translationInput.value === I18N.t("Translating..."))
       ) {
         if (_isFilling) continue;
 
         if (globalCache.trans[word]) {
           forceFill(translationInput, globalCache.trans[word]);
         } else {
-          forceFill(translationInput, "Translating...");
+          forceFill(translationInput, I18N.t("Translating..."));
           const sl = getCurrentLangCode();
           const tl = TL;
 
@@ -268,12 +268,12 @@
                   // user typed a translation while the request ran.
                   if (currentFormWord(doc) !== word) return;
                   if (freshTarget && freshTarget.value &&
-                      freshTarget.value !== "Translating...") return;
+                      freshTarget.value !== I18N.t("Translating...")) return;
                   forceFill(freshTarget, translated);
                 } else {
                   let freshTarget = translationBoxFor(doc);
                   if (currentFormWord(doc) === word &&
-                      freshTarget && freshTarget.value === "Translating...") {
+                      freshTarget && freshTarget.value === I18N.t("Translating...")) {
                     forceFill(freshTarget, "");
                   }
                 }
@@ -281,7 +281,7 @@
               .catch(function () {
                 let freshTarget = translationBoxFor(doc);
                 if (currentFormWord(doc) === word &&
-                    freshTarget && freshTarget.value === "Translating...") {
+                    freshTarget && freshTarget.value === I18N.t("Translating...")) {
                   forceFill(freshTarget, "");
                 }
               });
@@ -298,7 +298,7 @@
                 let freshTarget = translationBoxFor(doc);
                 if (currentFormWord(doc) !== word) return;
                 if (freshTarget && freshTarget.value &&
-                    freshTarget.value !== "Translating...") return;
+                    freshTarget.value !== I18N.t("Translating...")) return;
                 forceFill(freshTarget, gloss);
                 return;
               }

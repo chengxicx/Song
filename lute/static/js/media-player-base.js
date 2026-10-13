@@ -149,7 +149,7 @@
       if (show) {
         if (!ytBufferingVisible && ytPlayerReady) {
           ytBufferingVisible = true;
-          els.loading.textContent = "Buffering...";
+          els.loading.textContent = I18N.t("Buffering...");
           els.loading.style.display = "block";
         }
       } else if (ytBufferingVisible) {
@@ -423,7 +423,7 @@
         var ts = document.createElement("span");
         ts.className = "yt-transcript-ts";
         ts.textContent = ytFmtTime(cue.start);
-        ts.title = "Jump to " + ytFmtTime(cue.start);
+        ts.title = I18N.t("Jump to ") + ytFmtTime(cue.start);
 
         var txt = document.createElement("span");
         txt.className = "yt-transcript-text";

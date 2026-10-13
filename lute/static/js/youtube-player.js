@@ -149,7 +149,7 @@
     if (!videoId) {
       if (api.els.loading) {
         api.els.loading.textContent =
-          "Unable to load the YouTube player: no video id.";
+          I18N.t("Unable to load the YouTube player: no video id.");
       }
       return false;
     }
@@ -364,18 +364,18 @@
       handleError: function () {
         if (player.els.loading) {
           player.els.loading.textContent = USE_AUDIO_BACKEND
-            ? "Unable to play this audio file. The transcript below is still available."
-            : "Unable to play this video. The transcript below is still available.";
+            ? I18N.t("Unable to play this audio file. The transcript below is still available.")
+            : I18N.t("Unable to play this video. The transcript below is still available.");
           player.els.loading.style.display = "block";
         }
       },
 
       notReadyMessage: function () {
         return USE_AUDIO_BACKEND
-          ? "Unable to load the audio player. The transcript below is still available."
+          ? I18N.t("Unable to load the audio player. The transcript below is still available.")
           : USE_VIDEO_BACKEND
-            ? "Unable to load the video player. The transcript below is still available."
-            : "Unable to load the YouTube player. The transcript below is still available.";
+            ? I18N.t("Unable to load the video player. The transcript below is still available.")
+            : I18N.t("Unable to load the YouTube player. The transcript below is still available.");
       },
 
       // If subtitle colors may be out of sync across cues (bulk status

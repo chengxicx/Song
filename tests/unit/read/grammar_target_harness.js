@@ -22,6 +22,12 @@ const modPath = process.argv[2];
 
 /* ---------- stub elements ---------- */
 
+
+/* The reading page injects window.I18N via base.html; the harness runs
+   the module bare in Node, so provide the identity fallback it uses. */
+globalThis.LUTE_I18N = {};
+globalThis.I18N = { t: (k) => k };
+
 class El {
   constructor(tag, text) {
     this.tagName = (tag || "").toUpperCase();

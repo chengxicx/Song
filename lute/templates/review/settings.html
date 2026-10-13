@@ -1,27 +1,27 @@
 {% extends 'base.html' %}
 
-{% block title %}Review settings{% endblock %}
-{% block header %}Review{% endblock %}
+{% block title %}{{ t('Review settings') }}{% endblock %}
+{% block header %}{{ t('Review') }}{% endblock %}
 
 {% block body %}
 
 <div id="review_fsrs_status" class="review-status" data-page-node-id="VSR8hEtkhs1CGbiLP53rgU">
   {% if fsrs_status.installed %}
-  <span data-page-node-id="fwPFce2ROGhZDZyIPuHASr">Scheduler: FSRS (fsrs package {{ fsrs_status.version }}).</span>
+  <span data-page-node-id="fwPFce2ROGhZDZyIPuHASr">{{ t('Scheduler: FSRS (fsrs package') }} {{ fsrs_status.version }}{{ t(').') }}</span>
   {% else %}
-  <span data-page-node-id="TkFSE4dxKKu5gRcaMB0qw0">Scheduler: the <code data-page-node-id="XwcEIvRopQH6iUYvcwj2Xx">fsrs</code> package is not installed.
+  <span data-page-node-id="TkFSE4dxKKu5gRcaMB0qw0">{{ t('Scheduler: the <code>fsrs</code> package is not installed.') }}
     <button class="btn btn-secondary" id="btn_install_fsrs"
-            onclick="LuteReview.install_fsrs();" data-page-node-id="goFoCj3Ea4RTuccvalsxtC">Install</button>
-    <span class="review-hint" data-page-node-id="Qq2u4mQh4OUhiZyZH2dgOm">(needs Python 3.10+, installs {{ fsrs_status.pip_spec }})</span>
+            onclick="LuteReview.install_fsrs();" data-page-node-id="goFoCj3Ea4RTuccvalsxtC">{{ t('Install') }}</button>
+    <span class="review-hint" data-page-node-id="Qq2u4mQh4OUhiZyZH2dgOm">{{ t('(needs Python 3.10+, installs') }} {{ fsrs_status.pip_spec }}{{ t(')') }}</span>
   </span>
   {% endif %}
 </div>
 <div id="review_install_message" data-page-node-id="qeSBhvIaixGwRBLT8wnzbn"></div>
 
-<h3 data-page-node-id="d37U1eFm0iTMJol3hLv4Bv">Review settings</h3>
+<h3 data-page-node-id="d37U1eFm0iTMJol3hLv4Bv">{{ t('Review settings') }}</h3>
 <p class="review-hint" data-page-node-id="XSixWmd7uBwto67izCD30g">
-  These affect the whole review queue. Today's queue currently holds
-  <b data-page-node-id="3xqKNkVcMoP5p1lYekVGzy">{{ counts.due }}</b> due and <b data-page-node-id="D8mU8BGDCvJCrllq7bFLu2">{{ counts.new_remaining }}</b> new card(s).
+  {{ t("These affect the whole review queue. Today's queue currently holds") }}
+  <b data-page-node-id="3xqKNkVcMoP5p1lYekVGzy">{{ counts.due }}</b> {{ t('due and') }} <b data-page-node-id="D8mU8BGDCvJCrllq7bFLu2">{{ counts.new_remaining }}</b> {{ t('new card(s).') }}
 </p>
 
 {% for field_name, field_errors in form.errors.items() %}
@@ -39,9 +39,7 @@
       <td data-page-node-id="bzy4SBAtgB0flCZLBSNZlr">
         {{ form.review_desired_retention(class="form-control") }}
         <div class="review-hint" data-page-node-id="yXb7zO2gtTF42TmHydyfSc">
-          The share of cards FSRS expects you to still remember when they
-          come up, between 0.5 and 0.99. Higher means shorter intervals and
-          more reviews per day; 0.9 is the usual starting point.
+          {{ t('The share of cards FSRS expects you to still remember when they come up, between 0.5 and 0.99. Higher means shorter intervals and more reviews per day; 0.9 is the usual starting point.') }}
         </div>
       </td>
     </tr>
@@ -51,10 +49,9 @@
       <td data-page-node-id="s4OA509HAC07EEpUsXBarK">
         {{ form.review_max_new_per_day(class="form-control") }}
         <div class="review-hint" data-page-node-id="3a6yMFmPO6If46fg9fmIDk">
-          How many never-seen cards one day's sessions may introduce.
-          0 turns new cards off, so you only revise what is already queued.
+          {{ t("How many never-seen cards one day's sessions may introduce. 0 turns new cards off, so you only revise what is already queued.") }}
           {% if counts.new_allowed_today == 0 and counts.max_new_per_day > 0 %}
-          <b data-page-node-id="iAuKVyjnqtc9VZLo4AZAUO">You have already used today's allowance.</b>
+          <b data-page-node-id="iAuKVyjnqtc9VZLo4AZAUO">{{ t("You have already used today's allowance.") }}</b>
           {% endif %}
         </div>
       </td>
@@ -65,10 +62,7 @@
       <td>
         {{ form.review_max_shadowing_per_day(class="form-control") }}
         <div class="review-hint">
-          Shadowing cards have you read a real sentence aloud and score the
-          recording, so they take tens of seconds each -- this caps how many
-          one day's sessions serve, due or new, on top of the new-card limit
-          above.  0 serves none without disabling the card type.
+          {{ t("Shadowing cards have you read a real sentence aloud and score the recording, so they take tens of seconds each -- this caps how many one day's sessions serve, due or new, on top of the new-card limit above.  0 serves none without disabling the card type.") }}
         </div>
       </td>
     </tr>
@@ -78,43 +72,33 @@
       <td>
         {{ form.review_speak_cards(class="form-control") }}
         <div class="review-hint">
-          Pronounce the term with text-to-speech when a card's answer is
-          revealed, in the language of that card's term. Nothing is read out
-          on the front, so the word is not given away before you recall it.
-          The speaker button on the card works either way, so this only turns
-          off the automatic reading.
+          {{ t("Pronounce the term with text-to-speech when a card's answer is revealed, in the language of that card's term. Nothing is read out on the front, so the word is not given away before you recall it. The speaker button on the card works either way, so this only turns off the automatic reading.") }}
         </div>
       </td>
     </tr>
 
     <tr>
-      <td>Card types</td>
+      <td>{{ t('Card types') }}</td>
       <td>
         {{ form.card_recognition }} {{ form.card_recognition.label }}<br>
         {{ form.card_cloze }} {{ form.card_cloze.label }}<br>
         {{ form.card_shadowing }} {{ form.card_shadowing.label }}
         <div class="review-hint">
-          Which card types new terms get when they enter the queue.
-          Turning a type off does not remove or disable cards already
-          in the queue: they keep their scheduling history.
-          Shadowing needs a transcription engine on the server
-          (SenseVoice or whisper, see Settings); where none is available
-          the card falls back to read-and-self-grade.
+          {{ t('Which card types new terms get when they enter the queue. Turning a type off does not remove or disable cards already in the queue: they keep their scheduling history. Shadowing needs a transcription engine on the server (SenseVoice or whisper, see Settings); where none is available the card falls back to read-and-self-grade.') }}
         </div>
       </td>
     </tr>
   </table>
 
   <div class="form-action-row" data-page-node-id="SrrL7nTE0WGX0ZXGcCULqI">
-    <button type="submit" class="btn btn-primary" data-page-node-id="fWCyLEN91tHwTAO3GpegGs">Save</button>
+    <button type="submit" class="btn btn-primary" data-page-node-id="fWCyLEN91tHwTAO3GpegGs">{{ t('Save') }}</button>
     <button class="btn btn-secondary"
-            onclick="window.location = '{{ url_for('review.review_index') }}'; return false;" data-page-node-id="J6AOiwM6CP6EkVHzbdl0do">Cancel</button>
+            onclick="window.location = '{{ url_for('review.review_index') }}'; return false;" data-page-node-id="J6AOiwM6CP6EkVHzbdl0do">{{ t('Cancel') }}</button>
   </div>
 </form>
 
 <p class="review-hint" data-page-node-id="m2Op0ReqVHGEAbz50WK7is">
-  Cards already in the queue keep their scheduling history whatever you
-  change here; the new values apply from the next card you grade.
+  {{ t('Cards already in the queue keep their scheduling history whatever you change here; the new values apply from the next card you grade.') }}
 </p>
 
 {% endblock %}

@@ -54,6 +54,7 @@ from lute.read.render.grammar_analysis_ar import analyze_arabic
 from lute.read.render.grammar_levels import filter_hidden_grammar
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
+from lute.i18n import t
 from lute.dict import service as dict_service
 from lute.dict import gloss_format
 from lute.term.model import Repository
@@ -745,7 +746,7 @@ def read(bookid):
     """
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
 
     page_num = 1
@@ -775,7 +776,7 @@ def read_page(bookid, pagenum):
     """
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
 
     pagenum = book.page_in_range(pagenum)
@@ -789,7 +790,7 @@ def peek_page(bookid, pagenum):
     """
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
 
     pagenum = book.page_in_range(pagenum)
@@ -832,11 +833,11 @@ def delete_page(bookid, pagenum):
     """
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
 
     if len(book.texts) == 1:
-        flash("Cannot delete only page in book.")
+        flash(t("Cannot delete only page in book."))
     else:
         book.remove_page(pagenum)
         db.session.add(book)
@@ -1095,7 +1096,7 @@ def start_reading(bookid, pagenum):
     "Called by ajax.  Update the text.start_date, and render page."
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
     service = Service(db.session)
     if (book.book_type or "") == "manga":
@@ -1136,7 +1137,7 @@ def refresh_page(bookid, pagenum):
     "Refreshes the page content, but doesn't set the text's start_date."
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
     return render_page_fragment(book, pagenum, track_page_open=False)
 
@@ -1300,8 +1301,8 @@ def shadowing_transcribe():
         return (
             jsonify(
                 {
-                    "error": "No transcription engine available "
-                    "(install SenseVoice or whisper in Settings)."
+                    "error": t("No transcription engine available "
+                    "(install SenseVoice or whisper in Settings).")
                 }
             ),
             400,
@@ -1644,11 +1645,11 @@ def edit_page(bookid, pagenum):
         db.session.commit()
         if status == "mismatch":
             flash(
-                "Saved, but the subtitles were not updated: this page no "
+                t("Saved, but the subtitles were not updated: this page no "
                 "longer has the same number of lines as the subtitle cues "
                 "it covers (a line was added, removed, merged or split), or "
                 "its text has drifted from the subtitles.  Keep one line "
-                "per subtitle line, or re-import the subtitle file.",
+                "per subtitle line, or re-import the subtitle file."),
                 "notice",
             )
         return redirect(f"/read/{book.id}", 302)

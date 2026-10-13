@@ -902,7 +902,7 @@
       const ts = document.createElement("span");
       ts.className = "yt-transcript-ts";
       ts.textContent = ttsFmtTime(cue.start);
-      ts.title = "Jump to " + ttsFmtTime(cue.start);
+      ts.title = I18N.t("Jump to ") + ttsFmtTime(cue.start);
 
       const txt = document.createElement("span");
       txt.className = "yt-transcript-text";
@@ -993,7 +993,7 @@
       opt.className = "tts-voice-option";
       opt.setAttribute("role", "option");
       opt.dataset.voiceName = voice.name;
-      opt.textContent = "[" + voice.lang + "] " + voice.name;
+      opt.textContent = I18N.t("[") + voice.lang + I18N.t("] ") + voice.name;
       if (voice.name === currentName) opt.classList.add("selected");
       opt.addEventListener("click", function (e) {
         e.stopPropagation();
@@ -1007,7 +1007,7 @@
     // button is icon-only, so the title tooltip is the only place
     // the voice name is shown).
     if (currentName && ttsVoiceBtn) {
-      ttsVoiceBtn.title = "Voice: " + ttsShortVoiceName(currentName);
+      ttsVoiceBtn.title = I18N.t("Voice: ") + ttsShortVoiceName(currentName);
     }
 
     // Whenever the list is (re)built, center the currently-used voice.
@@ -1047,7 +1047,7 @@
     if (_voiceWaitStart == null) _voiceWaitStart = Date.now();
     const waited = Date.now() - _voiceWaitStart;
     if (waited < VOICE_TIMEOUT_MS) {
-      el.textContent = "Loading voices\u2026";
+      el.textContent = I18N.t("Loading voices\u2026");
       el.classList.remove("tts-voice-retry");
       el.setAttribute("role", "status");
     } else {
@@ -1055,7 +1055,7 @@
       // after a fresh interaction, so show the real state + Retry instead
       // of an eternal spinner.
       el.textContent =
-        "Voice list unavailable on this browser. Tap to retry.";
+        I18N.t("Voice list unavailable on this browser. Tap to retry.");
       el.classList.add("tts-voice-retry");
       el.setAttribute("role", "button");
 
@@ -1069,7 +1069,7 @@
         def.className = "tts-voice-option tts-voice-device-default";
         def.setAttribute("role", "option");
         def.dataset.voiceName = DEVICE_DEFAULT_VOICE.name;
-        def.textContent = "[default] Use device default voice";
+        def.textContent = I18N.t("[default] Use device default voice");
         def.addEventListener("click", function (e) {
           e.stopPropagation();
           ttsSelectVoice(DEVICE_DEFAULT_VOICE);
@@ -1110,8 +1110,8 @@
   }
 
   function ttsShortVoiceName(fullName) {
-    if (!fullName) return "Voice";
-    if (fullName === DEVICE_DEFAULT_VOICE.name) return "Device default";
+    if (!fullName) return I18N.t("Voice");
+    if (fullName === DEVICE_DEFAULT_VOICE.name) return I18N.t("Device default");
     // Trim common noise: "Microsoft ... Online (Natural) ..." -> "...".
     let s = fullName
       .replace(/\s*\(Natural\)\s*/gi, " ")
@@ -1120,7 +1120,7 @@
       .replace(/Google\s+/gi, "")
       .trim();
     if (s.length > 18) s = s.slice(0, 16) + "…";
-    return s || "Voice";
+    return s || I18N.t("Voice");
   }
 
   function ttsSelectVoice(voice) {

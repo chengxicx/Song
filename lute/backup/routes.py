@@ -22,6 +22,7 @@ from flask import (
 from lute.db import db
 from lute.models.repositories import UserSettingRepository
 from lute.backup.service import Service
+from lute.i18n import t
 
 
 bp = Blueprint("backup", __name__, url_prefix="/backup")
@@ -89,7 +90,7 @@ def do_backup():
     is_manual = backuptype.lower() == "manual"
     try:
         f = service.create_backup(c, settings, is_manual=is_manual)
-        flash(f"Backup created: {f}", "notice")
+        flash(t("Backup created") + f": {f}", "notice")
         return jsonify(f)
     except Exception as e:  # pylint: disable=broad-exception-caught
         tb = traceback.format_exc()
@@ -135,12 +136,12 @@ def restore_backup():
     """
 
     if "backup_file" not in request.files:
-        flash("No file selected", "error")
+        flash(t("No file selected"), "error")
         return redirect("/backup/index")
 
     f = request.files["backup_file"]
     if f.filename == "":
-        flash("No file selected", "error")
+        flash(t("No file selected"), "error")
         return redirect("/backup/index")
 
     # Save uploaded file to temp location
@@ -152,7 +153,7 @@ def restore_backup():
     try:
         return _do_restore(filepath)
     except Exception as e:  # pylint: disable=broad-except-caught
-        flash(f"Restore failed: {str(e)}", "error")
+        flash(t("Restore failed") + f": {str(e)}", "error")
         return redirect("/backup/index")
     finally:
         # Clean up temp file
@@ -168,11 +169,11 @@ def restore_backup_from_file(filename):
     settings = _get_settings()
     filepath = os.path.join(settings.backup_dir, filename)
     if not os.path.exists(filepath):
-        flash(f"Backup file not found: {filename}", "error")
+        flash(t("Backup file not found") + f": {filename}", "error")
         return redirect("/backup/index")
 
     try:
         return _do_restore(filepath)
     except Exception as e:  # pylint: disable=broad-except-caught
-        flash(f"Restore failed: {str(e)}", "error")
+        flash(t("Restore failed") + f": {str(e)}", "error")
         return redirect("/backup/index")

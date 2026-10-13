@@ -28,6 +28,12 @@ const modPath = process.argv[2];
 
 /* ---------- fake layout ---------- */
 
+
+/* The reading page injects window.I18N via base.html; the harness runs
+   the module bare in Node, so provide the identity fallback it uses. */
+globalThis.LUTE_I18N = {};
+globalThis.I18N = { t: (k) => k };
+
 const CHAR_W = 10;
 const LINE_TOP = 50;
 const LINE_H = 20;

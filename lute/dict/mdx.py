@@ -14,10 +14,9 @@ schemes (Encrypted=1/3/"Yes", and the regcode-keyed files that still
 claim Encrypted=No) are NOT supported -- the free dictionaries from
 mdict.org are almost all unencrypted or export-locked only.
 
-The phone's copy of this reader predates the Encrypted=2 support and
-will still refuse an export-locked .mdx imported on the device itself;
-that does not matter for dictionaries converted on the server, which
-the phone downloads as SQLite.
+The Encrypted=2 transform is the same one the phone's parser undoes
+(``lib/core/dict/mdx_crypto.dart``, ported from the same references), so
+the two readers agree on which files open.
 
 Usage::
 

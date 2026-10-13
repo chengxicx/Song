@@ -26,6 +26,7 @@ from functools import wraps
 from flask import flash, jsonify, redirect, session
 
 from lute.multiuser import store
+from lute.i18n import t
 
 
 def is_admin_request():
@@ -59,7 +60,7 @@ def admin_only_if_multiuser(view):
     def wrapped(*args, **kwargs):
         if is_admin_request():
             return view(*args, **kwargs)
-        flash("Only an admin can change this.")
+        flash(t("Only an admin can change this."))
         return redirect("/")
 
     return wrapped
@@ -76,6 +77,6 @@ def admin_only_if_multiuser_json(view):
     def wrapped(*args, **kwargs):
         if is_admin_request():
             return view(*args, **kwargs)
-        return _deny_json("Only an admin can change this.")
+        return _deny_json(t("Only an admin can change this."))
 
     return wrapped

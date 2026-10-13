@@ -44,18 +44,18 @@ window.LuteReview = (function () {
     undo: null,
   };
 
-  const RATING_LABELS = { 1: "Again", 2: "Hard", 3: "Good", 4: "Easy" };
+  const RATING_LABELS = { 1: I18N.t("Again"), 2: I18N.t("Hard"), 3: I18N.t("Good"), 4: I18N.t("Easy") };
 
   const PROMPTS = {
-    recognition: "Recall the meaning",
-    cloze: "Fill in the blank",
-    shadowing: "Read the sentence aloud",
+    recognition: I18N.t("Recall the meaning"),
+    cloze: I18N.t("Fill in the blank"),
+    shadowing: I18N.t("Read the sentence aloud"),
   };
 
   const CARD_TYPE_LABELS = {
-    recognition: "Recognition",
-    cloze: "Cloze",
-    shadowing: "Shadowing",
+    recognition: I18N.t("Recognition"),
+    cloze: I18N.t("Cloze"),
+    shadowing: I18N.t("Shadowing"),
   };
 
   // Score -> suggested FSRS grade.  Advisory only: the buttons stay
@@ -96,7 +96,7 @@ window.LuteReview = (function () {
     if (box) {
       box.style.display = "block";
       box.innerHTML = `<p>${esc(err.error || err)}</p>
-        <p><a href="/review/index">Back to review index</a></p>`;
+        <p><a href="/review/index">${I18N.t('Back to review index')}</a></p>`;
     }
     if (card) {
       card.style.display = "none";
@@ -124,8 +124,8 @@ window.LuteReview = (function () {
     "</svg>";
 
   function speak_button_html() {
-    return `<button type="button" class="rv-speak" title="Speak (pronounce the term)"
-              aria-label="Pronounce the term">${SPEAKER_SVG}</button>`;
+    return `<button type="button" class="rv-speak" title="${I18N.t('Speak (pronounce the term)')}"
+              aria-label="${I18N.t('Pronounce the term')}">${SPEAKER_SVG}</button>`;
   }
 
   // Speak the term of the card on screen.  tts.js is loaded with defer
@@ -213,7 +213,7 @@ window.LuteReview = (function () {
 
   async function install_fsrs() {
     const msg = el("review_install_message");
-    if (msg) msg.textContent = "Installing the fsrs package ...";
+    if (msg) msg.textContent = I18N.t("Installing the fsrs package ...");
     try {
       const result = await post_json("/review/scheduler/install");
       if (msg) msg.textContent = result.message;
@@ -221,7 +221,7 @@ window.LuteReview = (function () {
         setTimeout(() => window.location.reload(), 1500);
       }
     } catch (err) {
-      if (msg) msg.textContent = `Install failed: ${err.error || err}`;
+      if (msg) msg.textContent = I18N.t("Install failed: ") + (err.error || err);
     }
   }
 
@@ -235,15 +235,15 @@ window.LuteReview = (function () {
     const bits = [];
     if (c.new_remaining > 0 && !c.new_allowed_today) {
       bits.push(
-        `${c.new_remaining} new cards are waiting, but today's limit of ${c.max_new_per_day} is used up`
+        c.new_remaining + ' ' + I18N.t("new cards are waiting, but today's limit of") + ' ' + c.max_new_per_day + ' ' + I18N.t('is used up')
       );
     }
     if (c.due > 0) {
-      bits.push(`${c.due} cards are due`);
+      bits.push(c.due + ' ' + I18N.t('cards are due'));
     }
-    const why = bits.length > 0 ? ` ${bits.join("; ")}.` : "";
-    return `<p class="rv-done">Nothing to review right now.${why}
-      <a href="/review/index">Back to review index</a></p>`;
+    const why = bits.length > 0 ? ' ' + bits.join('; ') + I18N.t('.') : "";
+    return `<p class="rv-done">${I18N.t('Nothing to review right now.')}${why}
+      <a href="/review/index">${I18N.t('Back to review index')}</a></p>`;
   }
 
   async function start_session() {
@@ -252,7 +252,7 @@ window.LuteReview = (function () {
     // which reads as "the session is broken".
     const card = el("review_card");
     if (card) {
-      card.innerHTML = '<p class="rv-done">Loading your cards ...</p>';
+      card.innerHTML = '<p class="rv-done">' + I18N.t('Loading your cards ...') + '</p>';
     }
     try {
       const payload = await post_json("/review/start");
@@ -283,7 +283,7 @@ window.LuteReview = (function () {
     btn.hidden = false;
     const label = RATING_LABELS[state.undo.rating] || "";
     const term = state.undo.term_text || "";
-    btn.title = `Reverse the last grade (${term}${label ? ", " + label : ""})`;
+    btn.title = I18N.t('Reverse the last grade (') + term + (label ? I18N.t(', ') + label : "") + I18N.t(')');
   }
 
   async function undo() {
@@ -306,7 +306,7 @@ window.LuteReview = (function () {
     } catch (err) {
       if (btn) btn.disabled = false;
       const msg = el("review_progress");
-      if (msg) msg.textContent = `Undo failed: ${err.error || err}`;
+      if (msg) msg.textContent = I18N.t("Undo failed: ") + (err.error || err);
     }
   }
 
@@ -329,15 +329,15 @@ window.LuteReview = (function () {
     // so only cloze gets the typed-answer input and Check button.
     const typing =
       c.card_type === "cloze"
-        ? `<input type="text" id="review_typing" class="rv-typing" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="your answer">`
+        ? `<input type="text" id="review_typing" class="rv-typing" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${I18N.t('your answer')}">`
         : "";
     const check =
       c.card_type === "cloze"
-        ? '<button class="btn btn-primary" id="review_check">Check</button>'
+        ? '<button class="btn btn-primary" id="review_check">' + I18N.t('Check') + '</button>'
         : "";
     const rec =
       c.card_type === "shadowing"
-        ? '<button class="btn btn-primary" id="review_rec_btn" title="Record / stop">&#9679; Record <span id="review_rec_time"></span></button>'
+        ? '<button class="btn btn-primary" id="review_rec_btn" title="' + I18N.t('Record / stop') + '">&#9679; ' + I18N.t('Record') + ' <span id="review_rec_time"></span></button>'
         : "";
     return `
       <div class="rv-card">
@@ -350,7 +350,7 @@ window.LuteReview = (function () {
         <div class="rv-actions">
           ${check}
           ${rec}
-          <button class="btn btn-secondary" id="review_reveal">Show answer
+          <button class="btn btn-secondary" id="review_reveal">${I18N.t('Show answer')}
             <kbd>Space</kbd></button>
         </div>
         <div id="review_shadow_result" class="rv-shadow-result"></div>
@@ -440,15 +440,15 @@ window.LuteReview = (function () {
         ? shadowing_suggested_rating(shadowing.score)
         : null;
     const ratings = [
-      [1, "Again", c.intervals ? c.intervals.again : ""],
-      [3, "Good", c.intervals ? c.intervals.good : ""],
+      [1, I18N.t("Again"), c.intervals ? c.intervals.again : ""],
+      [3, I18N.t("Good"), c.intervals ? c.intervals.good : ""],
     ];
     return ratings
       .map(([rating, label, interval], i) => {
         const iv = interval ? ` (${interval})` : "";
         const hint =
           rating === suggested
-            ? ' title="The take score suggests this grade -- your call"'
+            ? ' title="' + I18N.t('The take score suggests this grade -- your call') + '"'
             : "";
         return `<button class="rv-grade rv-grade-${rating}${rating === suggested ? " rv-grade-suggested" : ""}" data-rating="${rating}"${hint}>
                   <span class="rv-grade-key">${i + 1}</span>
@@ -517,12 +517,12 @@ window.LuteReview = (function () {
       answer.innerHTML = back_html(
         c,
         result.correct
-          ? { ok: true, text: "Correct" }
-          : { ok: false, text: `Not quite -- the answer is ${result.answer}` }
+          ? { ok: true, text: I18N.t("Correct") }
+          : { ok: false, text: I18N.t("Not quite -- the answer is") + " " + result.answer }
       );
       answer.hidden = false;
       const grades = el("review_grades");
-      const next_label = result.correct ? "Next" : "Next (marked Again)";
+      const next_label = result.correct ? I18N.t("Next") : I18N.t("Next (marked Again)");
       grades.innerHTML = `<button class="btn btn-primary" id="review_next">${next_label} <kbd>Space</kbd></button>`;
       grades.hidden = false;
       el("review_next").addEventListener("click", () => advance());
@@ -558,7 +558,7 @@ window.LuteReview = (function () {
       owed_speak = false;
       el("review_progress").innerHTML = "";
       el("review_card").innerHTML =
-        '<p class="rv-done">Session done.  <a href="/review/index">Back to review index</a></p>';
+        '<p class="rv-done">' + I18N.t('Session done.') + '  <a href="/review/index">' + I18N.t('Back to review index') + '</a></p>';
       return;
     }
     show_current();
@@ -595,7 +595,7 @@ window.LuteReview = (function () {
       shadowing.timer = null;
     }
     if (shadowing.recBtn) {
-      shadowing.recBtn.innerHTML = "&#9679; Record <span id=\"review_rec_time\"></span>";
+      shadowing.recBtn.innerHTML = "&#9679; " + I18N.t("Record") + " <span id=\"review_rec_time\"></span>";
     }
   }
 
@@ -647,7 +647,7 @@ window.LuteReview = (function () {
       if (cls) tok.classList.add(cls);
       const heard = st === 1 ? fuzzySpoken[i] : st === 0 ? missSpoken[i] : null;
       if (heard != null) {
-        tok.title = `heard: ${heard}`;
+        tok.title = I18N.t("heard: ") + heard;
       }
     });
   }
@@ -670,16 +670,16 @@ window.LuteReview = (function () {
       }
     });
     if (!missed.length) return "";
-    return (
-      '<div class="rv-shadow-words">Add a stumbled word to your learning words: ' +
-      missed
-        .map(
-          (t) =>
-            `<span class="rv-shadow-chip">${esc(t)}<button type="button" class="rv-shadow-add" data-word="${esc(t)}" data-lang="${c.language_id || ""}" title="Add to your learning words">+</button></span>`
-        )
-        .join(" ") +
-      "</div>"
-    );
+  return (
+    '<div class="rv-shadow-words">' + I18N.t('Add a stumbled word to your learning words:') + ' ' +
+    missed
+      .map(
+        (t) =>
+          `<span class="rv-shadow-chip">${esc(t)}<button type="button" class="rv-shadow-add" data-word="${esc(t)}" data-lang="${c.language_id || ""}" title="${I18N.t('Add to your learning words')}">+</button></span>`
+      )
+      .join(" ") +
+    "</div>"
+  );
   }
 
   async function shadowing_mark_word(btn) {
@@ -693,10 +693,10 @@ window.LuteReview = (function () {
       btn.textContent = res.outcome === "created" || res.outcome === "promoted" ? "✓" : "·";
       btn.title =
         {
-          created: "added",
-          promoted: "added",
-          learning: "already learning",
-          known: "known — left alone",
+          created: I18N.t("added"),
+          promoted: I18N.t("added"),
+          learning: I18N.t("already learning"),
+          known: I18N.t("known — left alone"),
           invalid: "?",
         }[res.outcome] || res.outcome;
     } catch (err) {
@@ -711,17 +711,17 @@ window.LuteReview = (function () {
     const canRecord = typeof LuteRecorder !== "undefined" && LuteRecorder.canRecord();
     if (canRecord && c.transcribe_available === false) {
       shadowing_render_status(
-        "No transcription engine on the server (install SenseVoice or whisper in Settings) -- read the sentence aloud on your own, then self-grade.",
+        I18N.t("No transcription engine on the server (install SenseVoice or whisper in Settings) -- read the sentence aloud on your own, then self-grade."),
         false
       );
     } else if (canRecord && !(c.sentence_tokens || []).length) {
       shadowing_render_status(
-        "This sentence has no scorable words -- read it aloud on your own, then self-grade.",
+        I18N.t("This sentence has no scorable words -- read it aloud on your own, then self-grade."),
         false
       );
     } else if (!canRecord) {
       shadowing_render_status(
-        "Microphone recording needs a secure context (localhost or HTTPS) and a browser with MediaRecorder support -- read the sentence aloud on your own, then self-grade.",
+        I18N.t("Microphone recording needs a secure context (localhost or HTTPS) and a browser with MediaRecorder support -- read the sentence aloud on your own, then self-grade."),
         false
       );
     }
@@ -782,18 +782,18 @@ window.LuteReview = (function () {
     shadowing.recorder = rec;
     shadowing.score = null; // a fresh take replaces any earlier one
     if (recBtn) {
-      recBtn.innerHTML = "&#9632; Stop <span id=\"review_rec_time\"></span>";
+      recBtn.innerHTML = "&#9632; " + I18N.t("Stop") + " <span id=\"review_rec_time\"></span>";
     }
     const t0 = Date.now();
     shadowing.timer = setInterval(() => {
       const t = el("review_rec_time");
       if (t) t.textContent = Math.floor((Date.now() - t0) / 1000) + "s";
     }, 250);
-    shadowing_render_status("Recording…", false);
+    shadowing_render_status(I18N.t("Recording…"), false);
   }
 
   async function shadowing_score_take(c, blob) {
-    shadowing_render_status("Transcribing…", false);
+    shadowing_render_status(I18N.t("Transcribing…"), false);
     try {
       const outcome = await LuteRecorder.scoreTake({
         blob,
@@ -804,8 +804,8 @@ window.LuteReview = (function () {
         onProgress: (state, secs) => {
           const label =
             state === "loading_model"
-              ? `Loading the speech model… ${secs}s (first run downloads it)`
-              : `Transcribing… ${secs}s`;
+              ? I18N.t("Loading the speech model… ") + secs + "s " + I18N.t("(first run downloads it)")
+              : I18N.t("Transcribing… ") + secs + "s";
           shadowing_render_status(label, false);
         },
       });
@@ -817,7 +817,7 @@ window.LuteReview = (function () {
       shadowing.score = d.score != null ? Number(d.score) : null;
       shadowing_paint_verdicts(c, d);
       shadowing_render_status(
-        `Score ${shadowing.score == null ? "--" : shadowing.score}%` +
+        I18N.t("Score ") + (shadowing.score == null ? "--" : shadowing.score) + "%" +
           (d.language_note ? " -- " + d.language_note : ""),
         false
       );
@@ -832,7 +832,7 @@ window.LuteReview = (function () {
       // auto-reveal the card the take belonged to.
       if (state.current === c && state.mode === "question") reveal(c);
     } catch (err) {
-      shadowing_render_status("Network error: " + err, true);
+      shadowing_render_status(I18N.t("Network error: ") + err, true);
     }
   }
 

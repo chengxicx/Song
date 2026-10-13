@@ -28,7 +28,7 @@
     </tr>
 
     <tr>
-      <td>Dictionaries</td>
+      <td>{{ t('Dictionaries') }}</td>
       <td>
         <div id="dictionary_entities">
           {#
@@ -64,7 +64,7 @@
             <select class="dict-uri form-control-narrower"
                     id="{{ dictionary.dicturi.id }}-local"
                     name="{{ dictionary.dicturi.name }}"
-                    title="Dictionaries installed on this server (Settings &gt; Local dictionaries)"
+                    title="{{ t('Dictionaries installed on this server (Settings &gt; Local dictionaries)') }}"
                     {% if not dict_is_local %}disabled hidden{% endif %}>
               {% for f in dict_pool %}
               <option value="{{ f.filename }}"
@@ -75,26 +75,26 @@
               {# The file this row points at is gone from the pool: keep it
                  selectable so opening the page and saving does not
                  silently drop the language's dictionary. #}
-              <option value="{{ dictionary.dicturi.data }}" selected>(not installed) {{ dictionary.dicturi.data }}</option>
+              <option value="{{ dictionary.dicturi.data }}" selected>{{ t('(not installed)') }} {{ dictionary.dicturi.data }}</option>
               {% endif %}
             </select>
             {% endif %}
             {{ dictionary.is_active }}
             <label class="dict-hidden-toggle" style="white-space: nowrap;"
-                   title="Keep this dictionary but hide its tab from the reading page">
-              {{ dictionary.is_hidden }} <span style="font-size:0.85em;">Hide</span>
+                   title="{{ t('Keep this dictionary but hide its tab from the reading page') }}">
+              {{ dictionary.is_hidden }} <span style="font-size:0.85em;">{{ t('Hide') }}</span>
             </label>
             {{ dictionary.sort_order }}
-            <span class="test-dict-entity" title="Test dictionary" style="margin-left: 20px">
+            <span class="test-dict-entity" title="{{ t('Test dictionary') }}" style="margin-left: 20px">
               <img src="{{ vstatic('icn/external.png') }}">
             </span>
-            <span class="remove-dict-entity" title="Remove dictionary">
+            <span class="remove-dict-entity" title="{{ t('Remove dictionary') }}">
               <img src="{{ vstatic('icn/minus-button.png') }}">
             </span>
           </div>
           {% endfor %}
         </div>
-        <span id="add-dict-entity" title="Add dictionary">
+        <span id="add-dict-entity" title="{{ t('Add dictionary') }}">
           <img src="{{ vstatic('icn/plus-button.png') }}">
         </span>
       </td>
@@ -109,22 +109,16 @@
     ---------------------------------------------------------------------- #}
     <tr>
       <td colspan="2">
-        <h3 style="margin-top:14px; margin-bottom:6px;">Local dictionaries (MDX)</h3>
+        <h3 style="margin-top:14px; margin-bottom:6px;">{{ t('Local dictionaries (MDX)') }}</h3>
       </td>
     </tr>
     <tr>
       <td style="vertical-align: top;">
         <div style="color:#666; font-size:0.85em; max-width:24em;">
           {% if dict_pool_files %}
-          Add rows of type <b>Local</b> to the dictionary list above.  The
-          row's URL becomes a dropdown of the dictionaries installed on
-          this server, the tab shows in the list's order, and &mdash; if the box
-          below is checked &mdash; the first matching entry also appears in
-          the term popup for words Lute has no translation for yet.
+          {{ t("Add rows of type <b>Local</b> to the dictionary list above.  The row's URL becomes a dropdown of the dictionaries installed on this server, the tab shows in the list's order, and — if the box below is checked — the first matching entry also appears in the term popup for words Lute has no translation for yet.") }}
           {% else %}
-          No dictionary has been imported on this server yet.  Add one in
-          <a href="/settings/index">Settings</a>, then add rows of type
-          <b>Local</b> to the dictionary list above.
+          {{ t('No dictionary has been imported on this server yet.  Add one in <a href="/settings/index">Settings</a>, then add rows of type <b>Local</b> to the dictionary list above.') }}
           {% endif %}
         </div>
       </td>
@@ -142,8 +136,7 @@
       <td style="vertical-align: top;">
         {{ form.term_popup_show_dict_gloss.label(class="form-control-label") }}
         <div style="color:#666; font-size:0.85em; max-width:24em;">
-          Adds the definition to the popup as well (first local dictionary
-          with an entry wins).  The dictionary tabs are unaffected.
+          {{ t('Adds the definition to the popup as well (first local dictionary with an entry wins).  The dictionary tabs are unaffected.') }}
         </div>
       </td>
       <td>{{ form.term_popup_show_dict_gloss() }}</td>
@@ -152,9 +145,7 @@
       <td style="vertical-align: top;">
         {{ form.term_translation_source.label(class="form-control-label") }}
         <div style="color:#666; font-size:0.85em; max-width:24em;">
-          What auto-fills a new term's translation.  <b>Local dictionary</b>
-          tries this language's Local dictionaries in tab order, and falls
-          back to online translation when none has an entry.
+          {{ t("What auto-fills a new term's translation.  <b>Local dictionary</b> tries this language's Local dictionaries in tab order, and falls back to online translation when none has an entry.") }}
         </div>
       </td>
       <td>{{ form.term_translation_source(class="form-control") }}</td>
@@ -181,16 +172,14 @@
     {% if form.hidden_grammar_levels.choices %}
     <tr>
       <td colspan="2">
-        <h3 style="margin-top:14px; margin-bottom:6px;">Grammar panel: groups to hide</h3>
+        <h3 style="margin-top:14px; margin-bottom:6px;">{{ t('Grammar panel: groups to hide') }}</h3>
       </td>
     </tr>
     <tr>
       <td style="vertical-align: top;">
         {{ form.hidden_grammar_levels.label(class="form-control-label") }}
         <div style="color:#666; font-size:0.85em; max-width:24em;">
-          Checked groups disappear from the Analyze grammar panel for this
-          language.  Hiding a level also hides the aggregate rows tagged
-          with it &mdash; JLPT N5 covers both Basic forms and Particles.
+          {{ t('Checked groups disappear from the Analyze grammar panel for this language.  Hiding a level also hides the aggregate rows tagged with it — JLPT N5 covers both Basic forms and Particles.') }}
         </div>
       </td>
       <td>{{ form.hidden_grammar_levels() }}</td>
@@ -215,7 +204,7 @@
         <img
           id="about_kiwi_tokenizer_mode" style="margin-right:10px;"
           src="{{ vstatic('icn/question-balloon.png') }}"
-          title="Click for details"
+          title="{{ t('Click for details') }}"
           onclick="document.getElementById('kiwi_tokenizer_mode_help').style.display = document.getElementById('kiwi_tokenizer_mode_help').style.display === 'none' ? 'block' : 'none';"
           />
         <blockquote id="kiwi_tokenizer_mode_help" style="width:60%; display: none;">
@@ -243,7 +232,7 @@
                   <img
                     id="about_kiwi_stemming" style="margin-right:10px;"
                     src="{{ vstatic('icn/question-balloon.png') }}"
-                    title="Click for details"
+                    title="{{ t('Click for details') }}"
                     onclick="document.getElementById('kiwi_stemming_help').style.display = document.getElementById('kiwi_stemming_help').style.display === 'none' ? 'block' : 'none';"
                     />
                   <blockquote id="kiwi_stemming_help" style="width:55%; display: none;">
@@ -260,7 +249,7 @@
                   <img
                     id="about_kiwi_filter_particles" style="margin-right:10px;"
                     src="{{ vstatic('icn/question-balloon.png') }}"
-                    title="Click for details"
+                    title="{{ t('Click for details') }}"
                     onclick="document.getElementById('kiwi_filter_particles_help').style.display = document.getElementById('kiwi_filter_particles_help').style.display === 'none' ? 'block' : 'none';"
                     />
                   <blockquote id="kiwi_filter_particles_help" style="width:55%; display: none;">
@@ -277,7 +266,7 @@
                   <img
                     id="about_kiwi_join_compound_nouns" style="margin-right:10px;"
                     src="{{ vstatic('icn/question-balloon.png') }}"
-                    title="Click for details"
+                    title="{{ t('Click for details') }}"
                     onclick="document.getElementById('kiwi_join_compound_nouns_help').style.display = document.getElementById('kiwi_join_compound_nouns_help').style.display === 'none' ? 'block' : 'none';"
                     />
                   <blockquote id="kiwi_join_compound_nouns_help" style="width:55%; display: none;">
@@ -320,7 +309,7 @@
     let dirty = false;
     function confirm_leave_page(event) {
       if (dirty) {
-        event.returnValue = "Are you sure you want to leave this page without saving it? If you do all progress will be lost."
+        event.returnValue = I18N.t('Are you sure you want to leave this page without saving it? If you do all progress will be lost.')
         event.preventDefault();
       }
     }
@@ -401,7 +390,7 @@
         window.removeEventListener("beforeunload", confirm_leave_page);
 
         // Use custom delete confirmation
-        if (!confirm('WARNING: deleting a language deletes all its books and defined terms.  Are you *absolutely* sure you want to delete this item?')) {
+        if (!confirm(I18N.t('WARNING: deleting a language deletes all its books and defined terms.  Are you *absolutely* sure you want to delete this item?'))) {
           event.preventDefault();
         }
       });
@@ -432,7 +421,7 @@
     $("#add-dict-entity").click(function() {
       let templateInput = $('.dict_entry input[type="text"][value="__TEMPLATE__"]');
       if (templateInput.length == 0) {
-        alert("Can't find __TEMPLATE__ input to create dictionary ...");
+        alert(I18N.t("Can't find __TEMPLATE__ input to create dictionary ..."));
         return;
       }
       templateInput = $(templateInput[0]);
@@ -477,14 +466,13 @@
       const content = `<html>
 <head>
 <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
-<title>Dictionary test</title>
+<title>${I18N.t('Dictionary test')}</title>
 </head>
 
 <body>
 <div class="container">
-<h2>Embedded dictionary test.</h2>
-<p>If you see the expected content, this dictionary can be embedded;
-if not, change the type to "Pop-up window".</p>
+<h2>${I18N.t('Embedded dictionary test.')}</h2>
+<p>${I18N.t('If you see the expected content, this dictionary can be embedded; if not, change the type to "Pop-up window".')}</p>
 <hr />
 <iframe
     name="dictframe"
@@ -495,7 +483,7 @@ if not, change the type to "Pop-up window".</p>
     style="height: 100%; width: 100%"
     frameborder="0"
   >
-    Frame support required.
+    ${I18N.t('Frame support required.')}
 </iframe>
 </div>
 </body>
@@ -528,7 +516,7 @@ if not, change the type to "Pop-up window".</p>
         // server route that serves one local dictionary's entry.
         const langid = {{ language.id or 0 }};
         if (!langid) {
-          alert('Save the language first, then test its Local dictionaries.');
+          alert(I18N.t('Save the language first, then test its Local dictionaries.'));
           break;
         }
         test_embedded_dict_lookup(`/read/localdict/${langid}/${encodeURIComponent(dicturi)}/test`);
@@ -555,15 +543,15 @@ if not, change the type to "Pop-up window".</p>
 
 {% if language.id %}
 <div class="form-action-row">
-  <button id="submit" type="submit" class="btn btn-primary" form="edit-lang">Save</button>
+  <button id="submit" type="submit" class="btn btn-primary" form="edit-lang">{{ t('Save') }}</button>
   <form id="delete-lang" method="post" action="/language/delete/{{ language.id }}">
-    <button type="submit" class="btn btn-danger">Delete</button>
+    <button type="submit" class="btn btn-danger">{{ t('Delete') }}</button>
   </form>
-  <button type="button" class="btn btn-secondary" onclick="window.location = '{{ url_for('language.index') }}'">Cancel</button>
+  <button type="button" class="btn btn-secondary" onclick="window.location = '{{ url_for('language.index') }}'">{{ t('Cancel') }}</button>
 </div>
 {% else %}
 <div class="form-action-row">
-  <button id="submit" type="submit" class="btn btn-primary" form="edit-lang">Save</button>
-  <button type="button" class="btn btn-secondary" onclick="window.location = '{{ url_for('language.index') }}'">Cancel</button>
+  <button id="submit" type="submit" class="btn btn-primary" form="edit-lang">{{ t('Save') }}</button>
+  <button type="button" class="btn btn-secondary" onclick="window.location = '{{ url_for('language.index') }}'">{{ t('Cancel') }}</button>
 </div>
 {% endif %}
