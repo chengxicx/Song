@@ -83,6 +83,9 @@ class Language(
     _word_characters = db.Column("LgRegexpWordCharacters", db.String(500))
     right_to_left = db.Column("LgRightToLeft", db.Boolean)
     show_romanization = db.Column("LgShowRomanization", db.Boolean)
+    # Furigana display on the reading page (Japanese readings above
+    # kanji words).  Only acted on for Japanese-capable parsers.
+    show_furigana = db.Column("LgShowFurigana", db.Boolean)
     parser_type = db.Column("LgParserType", db.String(20))
     is_active = db.Column("LgIsActive", db.Boolean, default=True)
 
@@ -147,6 +150,7 @@ class Language(
         self.word_characters = "a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ"
         self.right_to_left = False
         self.show_romanization = False
+        self.show_furigana = False
         self.parser_type = "spacedel"
         self.dictionaries = []
         self.is_active = True
@@ -291,6 +295,7 @@ class Language(
             dd["active"] = d.is_active
             ret["dictionaries"].append(dd)
         ret["show_romanization"] = self.show_romanization
+        ret["show_furigana"] = self.show_furigana
         ret["right_to_left"] = self.right_to_left
         ret["parser_type"] = self.parser_type
         ret["character_substitutions"] = self.character_substitutions
@@ -323,6 +328,7 @@ class Language(
         mappings = {
             "name": "name",
             "show_romanization": "show_romanization",
+            "show_furigana": "show_furigana",
             "right_to_left": "right_to_left",
             "parser_type": "parser_type",
             "character_substitutions": "character_substitutions",

@@ -153,7 +153,7 @@
 
     {% set _kiwi_fields = ('kiwi_tokenizer_mode', 'kiwi_stemming', 'kiwi_filter_particles', 'kiwi_join_compound_nouns') %}
     {# Fields rendered by a hand-written block below, not by the loop. #}
-    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'term_translation_source') %}
+    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'term_translation_source', 'show_furigana') %}
     {% for field in form %}
     {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields and field.name not in _custom_fields %}
     <tr>
@@ -162,6 +162,23 @@
     </tr>
     {% endif %}
     {% endfor %}
+
+    {# --- Furigana above words (Japanese only). -----------------------------
+       The readings come from the parser (Sudachi / MeCab), so the toggle
+       only means something for Japanese-capable parsers; for anything
+       else the row disappears, like the Kiwi section below.
+    ---------------------------------------------------------------------- #}
+    {% if language is defined and language is not none and language.parser_type in ('japanese_sudachi', 'japanese') %}
+    <tr>
+      <td style="vertical-align: top;">
+        {{ form.show_furigana.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          {{ t('Draw kana readings above kanji words while reading.  The readings follow the Pronunciation characters preference (Settings > Preferences); when that is unset, words show plain.') }}
+        </div>
+      </td>
+      <td>{{ form.show_furigana() }}</td>
+    </tr>
+    {% endif %}
 
     {# --- Grammar panel: groups to hide. -----------------------------------
        The choices depend on the language's grammar taxonomy (JLPT N5..N1,
