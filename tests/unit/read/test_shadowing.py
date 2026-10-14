@@ -912,16 +912,10 @@ def test_supports_readings_by_parser_type():
     assert shadowing.supports_readings(
         _FakeLanguage([], parser_type="japanese_sudachi")
     )
-    assert shadowing.supports_readings(
-        _FakeLanguage([], parser_type="lute_mandarin")
-    )
-    assert shadowing.supports_readings(
-        _FakeLanguage([], parser_type="lute_cantonese")
-    )
+    assert shadowing.supports_readings(_FakeLanguage([], parser_type="lute_mandarin"))
+    assert shadowing.supports_readings(_FakeLanguage([], parser_type="lute_cantonese"))
     assert shadowing.supports_readings(_FakeLanguage([], parser_type="thai"))
-    assert shadowing.supports_readings(
-        _FakeLanguage([], parser_type="lute_thai")
-    )
+    assert shadowing.supports_readings(_FakeLanguage([], parser_type="lute_thai"))
     assert not shadowing.supports_readings(_FakeLanguage([], parser_type="spacedel"))
     assert not shadowing.supports_readings(_FakeLanguage([], parser_type="korean"))
     assert not shadowing.supports_readings(None)
@@ -936,7 +930,9 @@ def test_supports_readings_classical_chinese_excluded():
 
 def test_annotate_tokens_mandarin_pinyin_readings():
     "The lute-mandarin plugin's pinyin answers become furigana readings."
-    lang = _FakeLanguage([], parser_type="lute_mandarin", readings={"银行": "yín háng", "吗": "ma"})
+    lang = _FakeLanguage(
+        [], parser_type="lute_mandarin", readings={"银行": "yín háng", "吗": "ma"}
+    )
     annotated = shadowing.annotate_tokens(["银行", "吗"], lang)
     assert annotated == [
         {"text": "银行", "reading": "yín háng"},
@@ -953,9 +949,47 @@ def test_annotate_tokens_cantonese_jyutping_readings():
 
 def test_annotate_tokens_thai_rtgs_readings():
     "The lute-thai plugin's RTGS romanization answers become furigana readings."
-    lang = _FakeLanguage([], parser_type="lute_thai", readings={"สวัสดี": "sawatdi"})
+    lang = _FakeLanguage([], parser_type="lute_thai", readings={"สวัสดี": "sàwàtdi"})
     annotated = shadowing.annotate_tokens(["สวัสดี"], lang)
-    assert annotated == [{"text": "สวัสดี", "reading": "sawatdi"}]
+    assert annotated == [{"text": "สวัสดี", "reading": "sàwàtdi"}]
+
+
+class _FakeThaiParser(_FakeParser):
+    "Duck-typed Thai parser: RTGS readings plus digit-toned sound keys."
+
+    def __init__(self, keys):
+        super().__init__()
+        self.keys = keys
+
+    def get_reading_key(self, text):
+        return self.keys.get(text)
+
+
+def test_make_sound_fn_thai_uses_reading_key():
+    """
+    Thai now gets the sound rescue: a misread is judged on the parser's
+    digit-toned RTGS key (ครับ -> khrap4), not on the surface spelling.
+    """
+    lang = _FakeLanguage([], parser_type="lute_thai")
+    lang._parser = _FakeThaiParser(
+        {"\u0e04\u0e23\u0e31\u0e1a": "khrap4", "\u0e04\u0e31\u0e1a": "krap4"}
+    )
+    sound = shadowing._make_sound_fn(lang)
+    assert sound is not None, "thai gets a sound fn"
+    assert sound("\u0e04\u0e23\u0e31\u0e1a") == ["khrap4"]
+    assert sound("\u0e04\u0e31\u0e1a") == ["krap4"]
+
+
+def test_make_sound_fn_thai_without_key_returns_empty():
+    """
+    An old Thai plugin without get_reading_key gets no rescue: the key
+    path answers [] and the surface diff is unchanged, exactly as
+    before the enhancement.
+    """
+    lang = _FakeLanguage([], parser_type="lute_thai")
+    sound = shadowing._make_sound_fn(lang)
+    assert sound is not None, "thai gets a sound fn"
+    assert sound("\u0e04\u0e23\u0e31\u0e1a") == []
 
 
 def test_annotate_tokens_chinese_has_no_context_parse():

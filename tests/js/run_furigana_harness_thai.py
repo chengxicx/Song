@@ -79,9 +79,9 @@ def main():
 
         # --- 2. every Thai word gets exactly one ruby ---
         for text, reading in (
-            ("สวัสดี", "sawatdi"),
-            ("ครับ", "khrap"),
-            ("บ้าน", "ban"),
+            ("สวัสดี", "sàwàtdi"),
+            ("ครับ", "khráp"),
+            ("บ้าน", "bân"),
             ("แมว", "maeo"),
         ):
             st = word_state(page, text)
@@ -137,14 +137,17 @@ def main():
         )
         page.wait_for_timeout(300)
         st = word_state(page, "บ้าน")
-        check("failed request leaves the word unannotated",
-              st["ruby_count"] == 0 and not st["marked"], " state=%r" % (st,))
+        check(
+            "failed request leaves the word unannotated",
+            st["ruby_count"] == 0 and not st["marked"],
+            " state=%r" % (st,),
+        )
         page.evaluate("window.__fetch_fail = false; window.lute_furigana_annotate();")
         page.wait_for_timeout(300)
         st = word_state(page, "บ้าน")
         check(
             "a later pass retries and annotates",
-            st["ruby_count"] == 1 and st["base"] == "บ้าน" and st["reading"] == "ban",
+            st["ruby_count"] == 1 and st["base"] == "บ้าน" and st["reading"] == "bân",
             " state=%r" % (st,),
         )
         browser.close()
