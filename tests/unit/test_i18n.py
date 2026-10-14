@@ -3,6 +3,7 @@ lute.i18n unit tests: dictionary loading, fallback, and language switching.
 """
 
 import json
+import re
 
 import pytest
 
@@ -121,5 +122,84 @@ def test_rendered_page_uses_translations(app, app_context):
         html = resp.data.decode("utf-8")
         assert "设置" in html, "translated settings heading present"
         assert "Backup" not in html or "备份" in html, "translated section heading"
+    finally:
+        current_settings().pop("ui_language", None)
+
+
+def _html_without_scripts(html):
+    "Drop <script> blocks (the LUTE_I18N payload contains every English key)."
+    return re.sub(r"<script[^>]*>.*?</script>", "", html, flags=re.DOTALL)
+
+
+def test_settings_form_labels_and_choices_are_translated(app, app_context):
+    """
+    WTForms labels and SelectField choices on /settings render in the
+    UI language.
+
+    These strings live in lute/settings/forms.py, not in the template,
+    so they are wrapped in lazy_t() and resolved at render time.  A
+    regression here silently shows English labels on a Chinese page.
+    """
+    client = app.test_client()
+    client.get("/")
+    from lute.settings.current import current_settings
+
+    current_settings()["ui_language"] = "zh"
+    try:
+        resp = client.get("/settings/index")
+        assert resp.status_code == 200
+        html = _html_without_scripts(resp.data.decode("utf-8"))
+        # Field labels (English source -> Chinese).
+        for label in ("备份目录", "启用备份", "界面语言", "自定义样式", "悬停时发音"):
+            assert label in html, f"translated label missing: {label}"
+        for english in (
+            "Backup directory",
+            "Backup Enabled",
+            "UI language",
+            "Custom styles",
+            "Pronounce word on hover",
+        ):
+            assert english not in html, f"English label leaked: {english}"
+        # Select choices.
+        for choice in ("自动检测", "片假名", "罗马字"):
+            assert choice in html, f"translated choice missing: {choice}"
+        assert "Auto-detect" not in html, "English choice leaked"
+    finally:
+        current_settings().pop("ui_language", None)
+
+
+def test_shortcuts_page_descriptions_are_translated(app, app_context):
+    "The shortcuts page translates its hotkey descriptions and categories."
+    client = app.test_client()
+    client.get("/")
+    from lute.settings.current import current_settings
+
+    current_settings()["ui_language"] = "zh"
+    try:
+        resp = client.get("/settings/shortcuts")
+        assert resp.status_code == 200
+        html = _html_without_scripts(resp.data.decode("utf-8"))
+        for text in ("复制当前单词所在句子", "切换到下一个主题", "将状态设为 1", "导航"):
+            assert text in html, f"translated hotkey desc missing: {text}"
+        assert "Copy the sentence of the current word" not in html
+        assert "Navigation" not in html, "English category leaked"
+    finally:
+        current_settings().pop("ui_language", None)
+
+
+def test_lazy_t_falls_back_to_english_outside_a_request():
+    "lazy_t resolves to the English source when no language context exists."
+    proxy = i18n.lazy_t("Settings")
+    assert str(proxy) == "Settings"
+    assert "Settings" in proxy.__html__()
+
+
+def test_lazy_t_uses_current_language(app_context):
+    "lazy_t resolves through t(), so it follows ui_language."
+    from lute.settings.current import current_settings
+
+    current_settings()["ui_language"] = "ja"
+    try:
+        assert str(i18n.lazy_t("Settings")) == "設定"
     finally:
         current_settings().pop("ui_language", None)

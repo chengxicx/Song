@@ -155,7 +155,7 @@ def categorized_hotkeys():
     ]
     if set(ordered_keys) != set(y.keys()):
         raise RuntimeError("ordered_keys doesn't match expected")
-    ret = {k: [h["hotkey"] for h in y[k]] for k in ordered_keys}
+    ret = {t(k): [h["hotkey"] for h in y[k]] for k in ordered_keys}
     return ret
 
 

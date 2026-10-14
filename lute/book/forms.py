@@ -19,6 +19,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms.widgets import ListWidget, CheckboxInput
 
 from lute.book.types import selectable_type_choices, subtitle_book_types
+from lute.i18n import lazy_t
 
 # Global configuration for allowed audio files
 ALLOWED_AUDIO_EXTENSIONS = [
@@ -356,7 +357,7 @@ class BookSettingsForm(FlaskForm):
     """
 
     book_series_tags = SelectMultipleField(
-        "Book Sets tags",
+        lazy_t("Book Sets tags"),
         choices=[],
         widget=ListWidget(prefix_label=False),
         option_widget=CheckboxInput(),

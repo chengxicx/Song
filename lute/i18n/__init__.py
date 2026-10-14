@@ -9,6 +9,10 @@ routes.  The lookup uses the English source as the key; anything
 missing falls back to the English source, so an incomplete dictionary
 degrades gracefully.
 
+Strings that are defined before a request exists -- WTForms field
+labels, SelectField choices, render_kw titles -- are wrapped in
+lazy_t(...) instead, which resolves t() when the value is rendered.
+
 The language is the per-user setting "ui_language" ("en", "zh", "ja",
 "ko"; default "en"), stored in the settings table and cached in
 lute.settings.current like every other user setting.
@@ -18,7 +22,7 @@ import json
 import os
 import threading
 
-from markupsafe import Markup
+from markupsafe import Markup, escape
 
 # code -> (code, native label shown in the settings dropdown).
 UI_LANGUAGES = [
@@ -87,6 +91,39 @@ def t(key, lang=None):
     if lang == "en":
         return Markup(key)
     return Markup(_load(lang).get(key, key))
+
+
+class _LazyTranslation:
+    """
+    A translation that resolves when it is rendered, not when it is defined.
+
+    WTForms field labels, SelectField choice lists and render_kw titles
+    are built at class-definition time (module import), long before any
+    request -- t() there would either fail for lack of an app context or
+    freeze the language at import time.  This proxy stores the English
+    source key and calls t() from __str__/__html__, which run inside the
+    request that renders the form, so the current user's ui_language
+    applies.  Outside a request it degrades to English, like t() itself.
+    """
+
+    def __init__(self, key):
+        self.key = key
+
+    def __str__(self):
+        return str(t(self.key))
+
+    def __html__(self):
+        # Labels and choice texts are plain text, not markup: escape the
+        # resolved translation so it renders as text.
+        return escape(str(t(self.key)))
+
+    def __repr__(self):
+        return f"_LazyTranslation({self.key!r})"
+
+
+def lazy_t(key):
+    "Wrap an English source string for translation at render time."
+    return _LazyTranslation(key)
 
 
 def translations_for_js(lang=None):
