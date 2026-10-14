@@ -819,11 +819,15 @@
         // Hover pronunciation (same as the main text #thetext): speak
         // the hovered word while playback is stopped or paused.  The
         // shared engine in tts.js is resolved at event time because
-        // tts.js loads after this script.
+        // tts.js loads after this script; so is
+        // luteSpokenTextForWordSpan, which keeps a furigana <rt>
+        // reading out of the utterance ("普通", not "普通ふつう").
         t.on("mouseover", ".word", function () {
           if (window.luteHoverSpeakStart)
             window.luteHoverSpeakStart(
-              this.innerText || this.textContent || "",
+              (window.luteSpokenTextForWordSpan
+                ? window.luteSpokenTextForWordSpan(this)
+                : this.textContent) || "",
               function () { return ytPlaying; }
             );
         });

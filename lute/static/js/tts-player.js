@@ -157,7 +157,10 @@
       b.remove();
     });
 
-    const fullText = cleanSentenceText(clone.textContent || "");
+    // ttsPlainText (tts.js) strips the furigana <rt> readings -- they
+    // are part of textContent and would be spoken after each word.
+    // clone itself keeps the ruby: it supplies the cue's display html.
+    const fullText = cleanSentenceText(ttsPlainText(clone));
     if (!fullText) return [];
 
     // The sentence's own children, the injected 🔊 button filtered
@@ -198,9 +201,12 @@
     let runningLen = 0;
     for (let i = 0; i < allChildren.length; i++) {
       const c = allChildren[i];
-      const t = c.nodeType === 3
-        ? (c.textContent || "").replace(/\s+/g, "")
-        : ((c.textContent || "").replace(/\s+/g, ""));
+      // Measure the speakable length: a furigana <rt> reading is part
+      // of textContent but is not spoken, so counting it would skew
+      // every split decision on a ruby-annotated page.
+      const t = (c.nodeType === 3
+        ? (c.textContent || "")
+        : ttsPlainText(c)).replace(/\s+/g, "");
       runningLen += t.length;
       if (BREAK_RE.test(c.textContent || "") && runningLen >= MIN_SUBCUE_CHARS) {
         splitIndices.push(i);
@@ -226,7 +232,7 @@
         tmp.appendChild(c.cloneNode(true));
       });
       out.push({
-        text: cleanSentenceText(tmp.textContent || ""),
+        text: cleanSentenceText(ttsPlainText(tmp)),
         html: tmp.innerHTML,
         // The clause's own nodes in the reading text (elements only;
         // bare whitespace text nodes are of no use downstream).
@@ -863,10 +869,11 @@
       t.on("mouseout", ".word", hover_out);
       // Hover pronunciation, same as the main text (#thetext): speak
       // the hovered word while playback is stopped or paused, never
-      // while the player is reading a cue.
+      // while the player is reading a cue.  spokenTextForWordSpan
+      // (tts.js) keeps a furigana <rt> reading out of the utterance.
       t.on("mouseover", ".word", function () {
         luteHoverSpeakStart(
-          this.innerText || this.textContent || "",
+          spokenTextForWordSpan(this),
           function () { return ttsPlaying; }
         );
       });
