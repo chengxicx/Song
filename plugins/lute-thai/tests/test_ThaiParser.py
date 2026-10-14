@@ -89,13 +89,63 @@ def test_carriage_returns_treated_as_reverse_p_character(thai):
     assert_tokens_equals(s, thai, expected)
 
 
+def test_get_reading_rtgs_cases():
+    """
+    get_reading returns the RTGS romanization used as the reading
+    above a Thai word.  Syllable boundaries are not marked: the
+    reading is drawn as one rt per word.
+    """
+    p = ThaiParser()
+    cases = [
+        ("สวัสดี", "sawatdi"),
+        ("ครับ", "khrap"),
+        ("น้ำตก", "namtok"),
+        ("ประเทศไทย", "prathetthai"),
+        ("กรุงเทพมหานคร", "krungthepmahankhon"),
+        ("โรงเรียน", "rongrian"),
+        ("หนังสือ", "nangsue"),
+        ("คอมพิวเตอร์", "khomphiwtoe"),
+        ("วิทยาศาสตร์", "witthayasat"),
+        ("มหาวิทยาลัย", "mahawitthayalai"),
+        ("อาหาร", "ahan"),
+        ("ผู้หญิง", "phuying"),
+        ("เร็ว", "reo"),
+        ("แมว", "maeo"),
+        ("เดือน", "duean"),
+        ("เครื่องบิน", "khrueangbin"),
+        ("เกาะ", "ko"),
+        ("หนึ่ง", "nueng"),
+        ("ยืน", "yuen"),
+        ("ตื่น", "tuen"),
+        ("ข้าวเหนียว", "khaoniao"),
+        ("สวัสดีปีใหม่", "sawatdipimai"),
+    ]
+    for text, expected in cases:
+        assert p.get_reading(text) == expected, text
+
+
+def test_get_reading_returns_none_for_non_thai():
+    """
+    Text with no romanizable Thai character (latin script, digits,
+    punctuation) has no reading: the caller shows the word plain,
+    exactly as a language without readings.
+    """
+    p = ThaiParser()
+    for text in ["", "abc", "123", "!!!", "こんにちは", "3.14", "  "]:
+        assert p.get_reading(text) is None, text
+
+
+def test_get_reading_returns_none_for_uncovered_shapes():
+    """
+    A shape the rules do not cover yields None rather than a wrong
+    reading, so the word is shown plain instead of misleading: ๆ
+    repeats the syllable before it and there is none here.
+    """
+    p = ThaiParser()
+    assert p.get_reading("ๆ") is None
+
+
 def test_importing_the_parser_does_not_import_pythainlp():
-    """
-    The app imports every parser plugin at start-up
-    (lute.parse.registry), so the heavy dependency must stay out of
-    the module import: importing pythainlp alone costs ~220MB of
-    resident memory.
-    """
     code = (
         "import sys;"
         "import lute_thai_parser.parser;"

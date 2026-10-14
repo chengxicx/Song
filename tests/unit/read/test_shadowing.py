@@ -907,7 +907,7 @@ def test_annotate_tokens_non_japanese_ignores_full_text():
 
 
 def test_supports_readings_by_parser_type():
-    "Only parsers with a readings source count (Japanese, Mandarin, Cantonese)."
+    "Only parsers with a readings source count (Japanese, Mandarin, Cantonese, Thai)."
     assert shadowing.supports_readings(_FakeLanguage([], parser_type="japanese"))
     assert shadowing.supports_readings(
         _FakeLanguage([], parser_type="japanese_sudachi")
@@ -917,6 +917,10 @@ def test_supports_readings_by_parser_type():
     )
     assert shadowing.supports_readings(
         _FakeLanguage([], parser_type="lute_cantonese")
+    )
+    assert shadowing.supports_readings(_FakeLanguage([], parser_type="thai"))
+    assert shadowing.supports_readings(
+        _FakeLanguage([], parser_type="lute_thai")
     )
     assert not shadowing.supports_readings(_FakeLanguage([], parser_type="spacedel"))
     assert not shadowing.supports_readings(_FakeLanguage([], parser_type="korean"))
@@ -945,6 +949,13 @@ def test_annotate_tokens_cantonese_jyutping_readings():
     lang = _FakeLanguage([], parser_type="lute_cantonese", readings={"你好": "nei5 hou2"})
     annotated = shadowing.annotate_tokens(["你好"], lang)
     assert annotated == [{"text": "你好", "reading": "nei5 hou2"}]
+
+
+def test_annotate_tokens_thai_rtgs_readings():
+    "The lute-thai plugin's RTGS romanization answers become furigana readings."
+    lang = _FakeLanguage([], parser_type="lute_thai", readings={"สวัสดี": "sawatdi"})
+    annotated = shadowing.annotate_tokens(["สวัสดี"], lang)
+    assert annotated == [{"text": "สวัสดี", "reading": "sawatdi"}]
 
 
 def test_annotate_tokens_chinese_has_no_context_parse():
