@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>furigana harness (Thai)</title>
+<script>
+  // Reading-page config, normally injected by read/index.html.
+  // script "thai": Thai is not a Han script but hides its pronunciation,
+  // so every Thai word gets a reading.
+  window.LUTE_FURIGANA = { enabled: true, langId: 20, script: "thai" };
+  // htmx present so lute-furigana.js registers its afterSwap listener.
+  window.htmx = {};
+  window.__fetch_calls = 0;
+  window.__fetch_fail = false;
+  window.__READINGS = {
+    "สวัสดี": "sawatdi",
+    "ครับ": "khrap",
+    "บ้าน": "ban",
+    "แมว": "maeo",
+    " ": null,
+    "!": null,
+  };
+  window.fetch = function (url, opts) {
+    window.__fetch_calls++;
+    const body = JSON.parse(opts.body);
+    const fail = window.__fetch_fail;
+    return new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        if (fail) {
+          reject(new Error("network down"));
+          return;
+        }
+        const tokens = body.tokens.map(function (t) {
+          return { text: t, reading: window.__READINGS[t] || null };
+        });
+        resolve({
+          ok: true,
+          json: function () { return Promise.resolve({ tokens: tokens }); },
+        });
+      }, 150);
+    });
+  };
+</script>
+</head>
+<body>
+<div id="thetext">
+  <p>
+    <span class="textsentence" id="sent_1">
+      <span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="สวัสดี">สวัสดี</span>
+      <span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="ครับ">ครับ</span>
+    </span>
+  </p>
+  <p>
+    <span class="textsentence" id="sent_2">
+      <span class="textitem click word" data-paragraph-id="2" data-sentence-id="2" data-text="บ้าน">บ้าน</span>
+      <span class="textitem click word" data-paragraph-id="2" data-sentence-id="2" data-text="แมว">แมว</span>
+      <span class="textitem">!</span>
+    </span>
+  </p>
+</div>
+<script src="../../lute/static/js/lute-furigana.js"></script>
+</body>
+</html>

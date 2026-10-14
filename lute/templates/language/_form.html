@@ -163,18 +163,19 @@
     {% endif %}
     {% endfor %}
 
-    {# --- Furigana above words (Japanese, Mandarin, Cantonese). ------------
+    {# --- Furigana above words (Japanese, Mandarin, Cantonese, Thai). -----
        The readings come from the parser (Sudachi / MeCab kana, the
        lute-mandarin plugin's pinyin, the lute-cantonese plugin's
-       jyutping), so the toggle only means something for those parsers;
-       for anything else the row disappears, like the Kiwi section below.
+       jyutping, the lute-thai plugin's RTGS romanization), so the
+       toggle only means something for those parsers; for anything else
+       the row disappears, like the Kiwi section below.
     ---------------------------------------------------------------------- #}
-    {% if language is defined and language is not none and language.parser_type in ('japanese_sudachi', 'japanese', 'lute_mandarin', 'lute_cantonese') %}
+    {% if language is defined and language is not none and language.parser_type in ('japanese_sudachi', 'japanese', 'lute_mandarin', 'lute_cantonese', 'thai', 'lute_thai') %}
     <tr>
       <td style="vertical-align: top;">
         {{ form.show_furigana.label(class="form-control-label") }}
         <div style="color:#666; font-size:0.85em; max-width:24em;">
-          {{ t('Draw pronunciation readings above words while reading (kana for Japanese, pinyin for Mandarin, jyutping for Cantonese).  Japanese readings follow the Pronunciation characters preference (Settings > Preferences); when that is unset, words show plain.') }}
+          {{ t('Draw pronunciation readings above words while reading (kana for Japanese, pinyin for Mandarin, jyutping for Cantonese, RTGS romanization for Thai).  Japanese readings follow the Pronunciation characters preference (Settings > Preferences); when that is unset, words show plain.') }}
         </div>
       </td>
       <td>{{ form.show_furigana() }}</td>

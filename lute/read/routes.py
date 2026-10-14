@@ -80,6 +80,17 @@ from lute.db import db
 
 bp = Blueprint("read", __name__, url_prefix="/read")
 
+
+def _furigana_script(lang):
+    """
+    The script flag handed to the furigana front-end: "thai" for Thai
+    (every word gets a reading, the script shows no pronunciation of
+    its own), "han" for the Han-script languages (only words bearing
+    Han characters get one -- kana, hangul and Latin already show
+    their own pronunciation).
+    """
+    return "thai" if is_thai_language(lang) else "han"
+
 # Module-level cache for subtitle word HTML, keyed by (book id, srt_data).
 # The tokenization of all cues (parser parse + term lookup + Jinja
 # render per word) is expensive (10-20s for long videos).  The result
@@ -711,6 +722,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         lang_id=lang.id,
         lang_code=get_lang_code_for(lang),
         show_furigana=bool(lang.show_furigana) and shadowing.supports_readings(lang),
+        furigana_script=_furigana_script(lang),
         translate_target_lang=(lang.translate_target_lang or ""),
         term_translation_source=(lang.term_translation_source or "online"),
         track_page_open=track_page_open,
