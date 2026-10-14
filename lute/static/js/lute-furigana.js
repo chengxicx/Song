@@ -2,15 +2,18 @@
  *
  * Enabled per language (Language > "Show furigana above words"), and only
  * for parsers that can supply readings -- Japanese (kana via Sudachi/
- * MeCab), Mandarin (pinyin) and Cantonese (jyutping) via their plugins;
- * the flag reaches us via LUTE_FURIGANA in read/index.html.  Readings
- * come from the same endpoint the shadowing panel uses
- * (/read/shadowing/readings), which pairs each token with the
+ * MeCab), Mandarin (pinyin), Cantonese (jyutping) and Thai (RTGS
+ * romanization) via their plugins; the flag reaches us via LUTE_FURIGANA
+ * in read/index.html.  Readings come from the same endpoint the shadowing
+ * panel uses (/read/shadowing/readings), which pairs each token with the
  * contextual reading of the sentence it sits in (Japanese 一つ reads
  * ひとつ, not いち + つ).  Every Han-character-bearing word span gets
- * its display text wrapped in <ruby>text<rt>reading</rt></ruby>;
- * words without Han characters (kana, hangul, Latin text) are left
- * alone -- they already show their own pronunciation.
+ * its display text wrapped in <ruby>text<rt>reading</rt></ruby>; words
+ * without Han characters (kana, hangul, Latin text) are left alone --
+ * they already show their own pronunciation.  Thai is not a Han script
+ * but it hides its pronunciation just as completely, so with
+ * LUTE_FURIGANA.script === "thai" every Thai word gets a reading
+ * instead.
  */
 (function () {
   "use strict";
@@ -18,7 +21,7 @@
   const CONFIG =
     typeof LUTE_FURIGANA !== "undefined"
       ? LUTE_FURIGANA
-      : { enabled: false, langId: 0 };
+      : { enabled: false, langId: 0, script: "han" };
 
   // Spans claimed by an in-flight request.  Claiming is synchronous, at
   // collection time: annotate() has several entry points that can fire
@@ -30,16 +33,26 @@
   // word was wrapped again.
   const in_flight = new Set();
 
-  // Furigana exists to make kanji readable; a word without kanji
-  // (聞こえ's kana is already visible, トントン is all katakana) needs no
-  // reading above it.
+  // Furigana exists to make an opaque script readable; a word without
+  // kanji (聞こえ's kana is already visible, トントン is all katakana)
+  // needs no reading above it.  Thai has no kanji but hides its
+  // pronunciation just as thoroughly, so there every word counts.
   function has_kanji(text) {
     return /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/.test(text);
   }
 
+  function has_thai(text) {
+    return /[\u0e00-\u0e7f]/.test(text);
+  }
+
+  function needs_reading(text) {
+    if (CONFIG.script === "thai") return has_thai(text);
+    return has_kanji(text);
+  }
+
   function wrap_ruby(sp, text, reading) {
     if (!reading || reading === text) return;
-    if (!has_kanji(text)) return;
+    if (!needs_reading(text)) return;
     if (sp.querySelector("ruby")) return;
     const ruby = document.createElement("ruby");
     ruby.appendChild(document.createTextNode(text));

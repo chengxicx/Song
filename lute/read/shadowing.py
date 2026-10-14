@@ -40,6 +40,7 @@ from lute.read.render.grammar_analysis import (
     is_cantonese_language,
     is_japanese_language,
     is_mandarin_chinese_language,
+    is_thai_language,
 )
 
 # Per-word verdicts, parallel to the sentence's word spans.
@@ -226,14 +227,16 @@ def supports_readings(language):
     """
     True when the language's parser can supply pronunciation readings,
     i.e. drawing furigana above words is meaningful: Japanese (kana via
-    Sudachi/MeCab), Mandarin (pinyin) and Cantonese (jyutping) via the
-    plugin parsers.  Other languages' scripts already show their own
-    pronunciation, so a reading above the word adds nothing.
+    Sudachi/MeCab), Mandarin (pinyin), Cantonese (jyutping) and Thai
+    (RTGS romanization) via the plugin parsers.  Other languages'
+    scripts already show their own pronunciation, so a reading above
+    the word adds nothing.
     """
     return (
         is_japanese_language(language)
         or is_mandarin_chinese_language(language)
         or is_cantonese_language(language)
+        or is_thai_language(language)
     )
 
 

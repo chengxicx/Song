@@ -68,9 +68,22 @@ class ThaiParser(AbstractParser):
             tokens.append(t)
         return tokens
 
-    def get_reading(self, text: str):  # pylint: disable=unused-argument
+    def get_reading(self, text: str):
         """
-        Get the pronunciation for the given text.  For most
-        languages, this can't be automated.
+        Get the RTGS (Royal Thai General System of Transcription)
+        romanization for the given text, used as the reading above a
+        Thai word.
+
+        Returns None when the text carries no romanizable Thai
+        characters (punctuation, latin script, digits) or when the
+        rules do not cover its shape -- the caller then shows the word
+        plain, exactly as a language without readings.
         """
-        return None
+        # Imported lazily: the romanizer is pure python and cheap, but
+        # keeping it out of module import time means the plugin still
+        # loads when the app only needs the tokenizer.
+        from lute_thai_parser.romanize import (  # pylint: disable=import-outside-toplevel
+            romanize,
+        )
+
+        return romanize(text)

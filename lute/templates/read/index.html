@@ -67,9 +67,11 @@
   // online as fallback.
   var LUTE_TERM_FILL = { source: {{ term_translation_source|tojson }}, langId: {{ lang_id }} };
   // Furigana above reading-page words (per-language toggle; see
-  // lute-furigana.js).  False unless the language is Japanese with the
-  // language's "show furigana" box checked.
-  var LUTE_FURIGANA = { enabled: {{ show_furigana | tojson }}, langId: {{ lang_id }} };
+  // lute-furigana.js).  False unless the language has a readings source
+  // (Japanese, Mandarin, Cantonese, Thai) with the language's "show
+  // furigana" box checked.  script picks the word-selection rule:
+  // "thai" annotates every Thai word, "han" only Han-bearing ones.
+  var LUTE_FURIGANA = { enabled: {{ show_furigana | tojson }}, langId: {{ lang_id }}, script: {{ furigana_script | tojson }} };
 </script>
 
 
