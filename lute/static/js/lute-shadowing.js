@@ -79,6 +79,20 @@ function shadowingSentences() {
     : [];
 }
 
+/* A furigana <rt> reading is part of textContent but is not text to
+   read, send, or match: on a ruby-annotated page 普通's span reads
+   "普通ふつう" and every consumer would double the word.  Same strip as
+   tts.js's ttsPlainText. */
+function shadowingPlainText(node) {
+  if (!node) return "";
+  if (node.nodeType === 3) return node.textContent || "";
+  const clone = node.cloneNode(true);
+  if (clone.querySelectorAll) {
+    clone.querySelectorAll("rt, rp").forEach(function (el) { el.remove(); });
+  }
+  return clone.textContent || "";
+}
+
 function shadowingLineText(el) {
   const clone = el.cloneNode(true);
   clone
@@ -86,7 +100,9 @@ function shadowingLineText(el) {
     .forEach(function (b) {
       b.remove();
     });
-  return (clone.textContent || "").replace(/[\s\u200b]+/g, "");
+  // Must match the player's cue text, which has the readings stripped
+  // (tts-player.js ttsSplitSentenceIntoCues).
+  return (shadowingPlainText(clone) || "").replace(/[\s\u200b]+/g, "");
 }
 
 function shadowingLinesForCue(index, text) {
@@ -165,7 +181,7 @@ function shadowingUnitFromEl(el, src) {
     lines: [el],
     spans: spans,
     texts: spans.map(shadowingTokenText),
-    fullText: (clone.textContent || "")
+    fullText: (shadowingPlainText(clone) || "")
       .replace(/\u200B/g, "")
       .replace(/🔊/g, "")
       .trim(),
@@ -192,7 +208,7 @@ function shadowingUnitFromLines(lines, src) {
     clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
       b.remove();
     });
-    fullText += (fullText ? "\n" : "") + clone.textContent;
+    fullText += (fullText ? "\n" : "") + (shadowingPlainText(clone) || "");
   });
   const langSpan = spans[0];
   return {
@@ -218,7 +234,7 @@ function shadowingUnitFromCueNodes(nodes, src) {
   const spans = [];
   let fullText = "";
   (nodes || []).forEach(function (n) {
-    fullText += n.textContent || "";
+    fullText += shadowingPlainText(n) || "";
     if (n.nodeType === 1 && shadowingCollectable(n)) spans.push(n);
   });
   if (!spans.length) return null;
