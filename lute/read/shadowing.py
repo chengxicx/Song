@@ -805,6 +805,12 @@ def _make_sound_fn(language):
     readings -- jyutping for Cantonese, pinyin for Mandarin -- so 你 read
     as 李 (nei5/lei5) is the misread it sounds like, not a skipped word.
 
+    Thai groups with them: its keys are surface Thai too, and a
+    differently spelled misread of the same word shares nothing.  The
+    rescue goes through the parser's get_reading_key, the digit-toned
+    RTGS form (ครับ -> khrap4), which compares byte for byte with the
+    toned keys _normalize_reading already produces.
+
     The parser may offer several readings per token (get_readings): a
     dictionary's single pick can be the wrong sense of a polyphone (阿
     filed under o1, while the name prefix is aa3), which would score a
@@ -812,14 +818,29 @@ def _make_sound_fn(language):
     most similar candidate; with no get_readings, the plain
     get_reading answer is the only candidate.
     """
-    if not _is_chinese_language(language):
+    if not _is_chinese_language(language) and not is_thai_language(language):
         return None
     parser = language.parser
     readings_of = getattr(parser, "get_readings", None)
+    # Only Thai answers a key today; an old Thai plugin without the
+    # method keeps its former (no-rescue) behaviour because the key
+    # path answers [] and the surface diff is unchanged.
+    reading_key_of = (
+        getattr(parser, "get_reading_key", None) if is_thai_language(language) else None
+    )
 
     def sound(token):
         token = _clean_token(token)
         if not token:
+            return []
+        if reading_key_of is not None:
+            try:
+                raw = reading_key_of(token)
+            except Exception:  # pylint: disable=broad-exception-caught
+                raw = None
+            if raw:
+                key = _normalize_reading(raw)
+                return [key] if key else []
             return []
         if readings_of is not None:
             try:
@@ -1024,8 +1045,9 @@ def compare_tokens(
                         ).ratio()
                         exact_sound = ratio >= 1.0
             elif ratio < threshold and sound_of is not None:
-                # A Chinese misread is a different character, so the
-                # surface forms share nothing; re-judge the pair on the
+                # A Chinese misread is a different character and a Thai
+                # one a differently spelled homophone, so the surface
+                # forms share nothing; re-judge the pair on the parser's
                 # romanization before calling it a skip.  Pairs are
                 # judged on their most similar readings: the dictionary
                 # pick can be the wrong polyphone sense (阿 o1 vs the

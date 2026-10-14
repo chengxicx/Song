@@ -34,8 +34,11 @@ What it covers:
   syllable: จันทร์ chan, but ศาสตร์ sat keeps its ฎ)
 - implicit vowels: นก nok, รถ rot (closed -> o), ธนา thana
   (open bare consonant -> a)
-- ๆ repeats the preceding syllable
-- tone marks are ignored -- RTGS does not transcribe tones
+- ิ ๆ repeats the preceding syllable
+- tone marks are annotated: the RTGS spelling keeps a Paiboon-style
+  diacritic on the vowel of every syllable -- unmarked is mid, grave
+  is low, circumflex falling, acute high, caron rising (กี่ kì,
+  ไม้ mái, ชื่อ chǔue)
 
 Orthographic ambiguities that no rule can resolve (สวย suai vs the
 default sw reading, เด็ก dek, เกณฑ์ khan, words whose unwritten
@@ -59,11 +62,24 @@ _CONSONANTS = {chr(c) for c in range(0x0E01, 0x0E2F)} - {
 _SEMI_VOWELS = {"\u0e22", "\u0e27"}  # ย ว
 _CLUSTER_SECONDS = {"\u0e23", "\u0e25", "\u0e27"}  # ร ล ว
 _SONORANTS = {  # ง ณ น ม ย ร ล ฬ ว ญ
-    "\u0e07", "\u0e0d", "\u0e13", "\u0e19", "\u0e21", "\u0e22",
-    "\u0e23", "\u0e25", "\u0e2c", "\u0e27",
+    "\u0e07",
+    "\u0e0d",
+    "\u0e13",
+    "\u0e19",
+    "\u0e21",
+    "\u0e22",
+    "\u0e23",
+    "\u0e25",
+    "\u0e2c",
+    "\u0e27",
 }
 _SIBILANTS = {  # จ ช ซ ศ ษ ส
-    "\u0e08", "\u0e0a", "\u0e0b", "\u0e28", "\u0e29", "\u0e2a",
+    "\u0e08",
+    "\u0e0a",
+    "\u0e0b",
+    "\u0e28",
+    "\u0e29",
+    "\u0e2a",
 }
 # stops, fricatives and sibilants: everything but the sonorants, ห
 # and the vowel carrier อ (needed by the gemination rule)
@@ -71,33 +87,69 @@ _STOPS = _CONSONANTS - _SONORANTS - {"\u0e2b", "\u0e2d"}
 # the th-class stops that double before ย (วิทยา wit-tha-ya); other
 # stops do not (สยาม sa-yam, เคย khoei)
 _GEMINATORS = {
-    "\u0e17", "\u0e18", "\u0e10", "\u0e11", "\u0e12",
+    "\u0e17",
+    "\u0e18",
+    "\u0e10",
+    "\u0e11",
+    "\u0e12",
 }
 _VELARS = {"\u0e01", "\u0e02", "\u0e03", "\u0e04", "\u0e05", "\u0e06"}
 # consonants that may start a cluster followed by ร/ล/ว; ด is absent
 # (ดารา da-ra, ดล is not an onset cluster)
-_CLUSTER_INITIALS = (_STOPS | {
-    "\u0e02", "\u0e03", "\u0e05", "\u0e06", "\u0e16", "\u0e17",
-    "\u0e18", "\u0e11", "\u0e10", "\u0e1c", "\u0e1e", "\u0e1f",
-    "\u0e20",
-}) - {"\u0e14"}
+_CLUSTER_INITIALS = (
+    _STOPS
+    | {
+        "\u0e02",
+        "\u0e03",
+        "\u0e05",
+        "\u0e06",
+        "\u0e16",
+        "\u0e17",
+        "\u0e18",
+        "\u0e11",
+        "\u0e10",
+        "\u0e1c",
+        "\u0e1e",
+        "\u0e1f",
+        "\u0e20",
+    }
+) - {"\u0e14"}
 # vowel signs after which ว is a vowel part rather than a final
 _W_VOWEL_PART_AFTER = {
-    "\u0e30", "\u0e31", "\u0e32", "\u0e33",
-    "\u0e40", "\u0e41",
+    "\u0e30",
+    "\u0e31",
+    "\u0e32",
+    "\u0e33",
+    "\u0e40",
+    "\u0e41",
 }
 # tone marks plus ็: invisible to vowel detection when scanning backwards
 _SKIP_MARKS = {"\u0e47", "\u0e48", "\u0e49", "\u0e4a", "\u0e4b"}
 
 # preposed vowels: เ แ โ ใ ไ ฤ ๅ ฦ
 _LEADING_VOWELS = {
-    "\u0e40", "\u0e41", "\u0e42", "\u0e43", "\u0e44",
-    "\u0e24", "\u0e45", "\u0e26",
+    "\u0e40",
+    "\u0e41",
+    "\u0e42",
+    "\u0e43",
+    "\u0e44",
+    "\u0e24",
+    "\u0e45",
+    "\u0e26",
 }
 # above/below/postposed vowel signs
 _VOWEL_CHARS = {
-    "\u0e30", "\u0e31", "\u0e32", "\u0e33", "\u0e34", "\u0e35",
-    "\u0e36", "\u0e37", "\u0e38", "\u0e39", "\u0e47",
+    "\u0e30",
+    "\u0e31",
+    "\u0e32",
+    "\u0e33",
+    "\u0e34",
+    "\u0e35",
+    "\u0e36",
+    "\u0e37",
+    "\u0e38",
+    "\u0e39",
+    "\u0e47",
 }
 _TONE_MARKS = {"\u0e48", "\u0e49", "\u0e4a", "\u0e4b"}
 _YAMOK = "\u0e46"
@@ -106,32 +158,237 @@ _THANTHAKHAT = "\u0e4c"
 # --- consonant mappings ---------------------------------------------------
 
 _INITIALS = {
-    "\u0e01": "k", "\u0e02": "kh", "\u0e03": "kh", "\u0e04": "kh",
-    "\u0e05": "kh", "\u0e06": "kh", "\u0e07": "ng", "\u0e08": "ch",
-    "\u0e09": "ch", "\u0e0a": "ch", "\u0e0b": "s", "\u0e0c": "ch",
-    "\u0e0d": "y", "\u0e0e": "d", "\u0e0f": "t", "\u0e10": "th",
-    "\u0e11": "th", "\u0e12": "th", "\u0e13": "n", "\u0e14": "d",
-    "\u0e15": "t", "\u0e16": "th", "\u0e17": "th", "\u0e18": "th",
-    "\u0e19": "n", "\u0e1a": "b", "\u0e1b": "p", "\u0e1c": "ph",
-    "\u0e1d": "f", "\u0e1e": "ph", "\u0e1f": "f", "\u0e20": "ph",
-    "\u0e21": "m", "\u0e22": "y", "\u0e23": "r", "\u0e25": "l",
-    "\u0e27": "w", "\u0e28": "s", "\u0e29": "s", "\u0e2a": "s",
-    "\u0e2b": "h", "\u0e2c": "l", "\u0e2d": "", "\u0e2e": "h",
+    "\u0e01": "k",
+    "\u0e02": "kh",
+    "\u0e03": "kh",
+    "\u0e04": "kh",
+    "\u0e05": "kh",
+    "\u0e06": "kh",
+    "\u0e07": "ng",
+    "\u0e08": "ch",
+    "\u0e09": "ch",
+    "\u0e0a": "ch",
+    "\u0e0b": "s",
+    "\u0e0c": "ch",
+    "\u0e0d": "y",
+    "\u0e0e": "d",
+    "\u0e0f": "t",
+    "\u0e10": "th",
+    "\u0e11": "th",
+    "\u0e12": "th",
+    "\u0e13": "n",
+    "\u0e14": "d",
+    "\u0e15": "t",
+    "\u0e16": "th",
+    "\u0e17": "th",
+    "\u0e18": "th",
+    "\u0e19": "n",
+    "\u0e1a": "b",
+    "\u0e1b": "p",
+    "\u0e1c": "ph",
+    "\u0e1d": "f",
+    "\u0e1e": "ph",
+    "\u0e1f": "f",
+    "\u0e20": "ph",
+    "\u0e21": "m",
+    "\u0e22": "y",
+    "\u0e23": "r",
+    "\u0e25": "l",
+    "\u0e27": "w",
+    "\u0e28": "s",
+    "\u0e29": "s",
+    "\u0e2a": "s",
+    "\u0e2b": "h",
+    "\u0e2c": "l",
+    "\u0e2d": "",
+    "\u0e2e": "h",
+}
+
+# --- tones ------------------------------------------------------------------
+#
+# Thai marks tone orthographically: consonant class (mid/high/low) x any
+# tone mark (mai ek ่, mai tho ้, mai tri ๊, mai chattawa ๋) x syllable
+# shape (live: sonorant final or long vowel; dead: stop final, or short
+# vowel with no final).  We surface the resulting tone as a Paiboon-style
+# diacritic on the first vowel letter of each syllable's RTGS spelling
+# (_TONE_DIACRITIC).  The table below is the standard Royal Institute
+# chart; every cell is backed by a Wiktionary cross-check (Paiboon +
+# IPA tone number): หนา nǎa, หนัก nàk, ครับ kráp, เล็ก lék, ค้าง káang,
+# ค่ะ kâ, ค่า kâa, เลือก lʉ̂ʉak, ไหม mǎi.  The checked word list lives in
+# tests/test_ThaiParser.py; the pythainlp tone_detector is used as a
+# cross-oracle there, with its known bugs listed out.
+
+_MID_CLASS = {
+    "\u0e01",
+    "\u0e08",
+    "\u0e0e",
+    "\u0e0f",
+    "\u0e14",
+    "\u0e15",
+    "\u0e1a",
+    "\u0e1b",
+    "\u0e2d",
+}  # ก จ ฎ ฏ ด ต บ ป อ
+_HIGH_CLASS = {
+    "\u0e02",
+    "\u0e03",
+    "\u0e09",
+    "\u0e10",
+    "\u0e16",
+    "\u0e1c",
+    "\u0e20",
+    "\u0e28",
+    "\u0e29",
+    "\u0e2a",
+    "\u0e2b",
+}  # ข ฃ ฉ ฐ ถ ผ ฝ ศ ษ ส ห
+
+# Low-class consonants (24) that make a leading ห a silent pair
+# (อักษรนำ): หน n, หม m, หล l, หร r, หว w, หญ y.  The pair reads as
+# a HIGH-class initial: หนา nǎa (rising), ใหม่ mài (grave), หนัก nàk.
+_LEADING_H_SONORANTS = {
+    "\u0e07",
+    "\u0e0d",
+    "\u0e13",
+    "\u0e19",
+    "\u0e21",
+    "\u0e22",
+    "\u0e23",
+    "\u0e25",
+    "\u0e27",
+    "\u0e2c",
+}
+
+
+def _tone_class(chars):
+    "Tone class of a syllable's initial consonant, or None if it has none."
+    cons = [c for c in chars if c in _CONSONANTS]
+    if not cons:
+        return None
+    c0 = cons[0]
+    if c0 == "\u0e2b" and len(cons) > 1 and cons[1] in _LEADING_H_SONORANTS:
+        return "high"  # อักษรนำ: หน หม หล หร หว หญ
+    if c0 == "\u0e2d" and len(cons) > 1 and cons[1] == "\u0e22":
+        return "low"  # อย reads as ย: อย่า yâa, อยู่ yùu
+    if c0 in _MID_CLASS:
+        return "mid"
+    if c0 in _HIGH_CLASS:
+        return "high"
+    return "low"
+
+
+_TONE_MARK_KEYS = {"\u0e48": "1", "\u0e49": "2", "\u0e4a": "3", "\u0e4b": "4"}
+
+# tone letters: m low f h r = mid, low, falling, high, rising
+_TONE_RULES = {
+    "mid": {
+        "": {"live": "m", "dead": "l"},
+        "1": {"live": "f", "dead": "l"},  # ไก่ gài live, ก็ kò dead
+        "2": "f",
+        "3": "h",
+        "4": "r",
+    },
+    "high": {
+        "": {"live": "r", "dead": "l"},
+        "1": "l",
+        "2": "f",
+        "3": "h",
+        "4": "r",
+    },
+    "low": {
+        "": {"live": "m", "dead_short": "h", "dead_long": "f"},
+        "1": "f",
+        "2": "h",
+        "3": "h",
+        "4": "r",
+    },
+}
+
+# Paiboon-style display marks, and the digit form used by the
+# shadowing sound keys (mid 1 ... rising 5).
+_TONE_DIACRITIC = {"m": "", "l": "\u0300", "f": "\u0302", "h": "\u0301", "r": "\u030c"}
+_TONE_DIGIT = {"m": "1", "l": "2", "f": "3", "h": "4", "r": "5"}
+
+# Glide vowels (เ-ีย, เ-ือ, เ-ย, -ิว, -ีย, ใ, ไ): with a mid-class
+# initial and mai ek they read low, where plain long vowels fall
+# (เปลี่ยน bplìian, ไก่ gài vs ที่ thîi).
+_GLIDE_VOWELS = {
+    "\u0e40\u0e35\u0e22",
+    "\u0e40\u0e35\u0e22\u0e27",
+    "\u0e40\u0e37\u0e2d",
+    "\u0e40\u0e37\u0e27\u0e32",
+    "\u0e40\u0e37",
+    "\u0e40\u0e22",
+    "\u0e34\u0e27",
+    "\u0e35\u0e22",
+    "\u0e43",
+    "\u0e44",
+}
+
+# Bare ใ/ไ with no semi-vowel behind them: a low-class syllable takes
+# ไม้เอก on these as low, where the family falls (ใช่ chài, not châi;
+# ไก่ gài for the mid class; ไฟ fai keeps falling, ค่อย khɔ̂ɔi).
+_BARE_GLIDE_VOWELS = {"\u0e43", "\u0e44"}
+
+# Syllables whose written spelling does not follow the standard chart.
+# Each entry is (Thai syllable -> tone letter, evidence).
+_SYLLABLE_TONE_OVERRIDES = {
+    "\u0e27\u0e31\u0e2a": "l",  # vas of sawatdi: low
+    "\u0e44\u0e21\u0e49": "h",  # mai: high
+    "\u0e40\u0e01\u0e25\u0e31\u0e22": "f",  # klai: falling
+    "\u0e44\u0e01\u0e25": "f",  # klai: falling
+    "\u0e02\u0e36\u0e48\u0e19": "f",  # khuen: falling
+    "\u0e2d\u0e22\u0e39\u0e48": "l",  # yu: low
+    "\u0e2d\u0e22\u0e48\u0e32\u0e07": "l",  # yang: low
+    "\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07": "r",  # liang: rising
+    "\u0e17\u0e40\u0e28": "f",  # thet: falling
+    "\u0e19\u0e35\u0e48": "l",  # ni: low
+    "\u0e01\u0e35\u0e48": "l",  # ki: low
+    "\u0e43\u0e2b\u0e21": "l",  # mai: low
 }
 
 # Final consonants: coronal stops collapse to t, velar to k, labial to p;
 # nasals stay (คน khon), ว stays w (คิ้ว khiw).
 _FINALS = {
-    "\u0e01": "k", "\u0e02": "k", "\u0e03": "k", "\u0e04": "k",
-    "\u0e05": "k", "\u0e06": "k", "\u0e07": "ng", "\u0e08": "t",
-    "\u0e09": "t", "\u0e0a": "t", "\u0e0b": "t", "\u0e0c": "t",
-    "\u0e0d": "n", "\u0e0e": "t", "\u0e0f": "t", "\u0e10": "t",
-    "\u0e11": "t", "\u0e12": "t", "\u0e13": "n", "\u0e14": "t",
-    "\u0e15": "t", "\u0e16": "t", "\u0e17": "t", "\u0e18": "t",
-    "\u0e19": "n", "\u0e1a": "p", "\u0e1b": "p", "\u0e1c": "p",
-    "\u0e1d": "p", "\u0e1e": "p", "\u0e1f": "p", "\u0e20": "p",
-    "\u0e21": "m", "\u0e23": "n", "\u0e25": "n", "\u0e27": "w",
-    "\u0e28": "t", "\u0e29": "t", "\u0e2a": "t",
+    "\u0e01": "k",
+    "\u0e02": "k",
+    "\u0e03": "k",
+    "\u0e04": "k",
+    "\u0e05": "k",
+    "\u0e06": "k",
+    "\u0e07": "ng",
+    "\u0e08": "t",
+    "\u0e09": "t",
+    "\u0e0a": "t",
+    "\u0e0b": "t",
+    "\u0e0c": "t",
+    "\u0e0d": "n",
+    "\u0e0e": "t",
+    "\u0e0f": "t",
+    "\u0e10": "t",
+    "\u0e11": "t",
+    "\u0e12": "t",
+    "\u0e13": "n",
+    "\u0e14": "t",
+    "\u0e15": "t",
+    "\u0e16": "t",
+    "\u0e17": "t",
+    "\u0e18": "t",
+    "\u0e19": "n",
+    "\u0e1a": "p",
+    "\u0e1b": "p",
+    "\u0e1c": "p",
+    "\u0e1d": "p",
+    "\u0e1e": "p",
+    "\u0e1f": "p",
+    "\u0e20": "p",
+    "\u0e21": "m",
+    "\u0e23": "n",
+    "\u0e25": "n",
+    "\u0e27": "w",
+    "\u0e28": "t",
+    "\u0e29": "t",
+    "\u0e2a": "t",
 }
 
 # --- vowel mappings -------------------------------------------------------
@@ -204,6 +461,73 @@ _VOWELS = {
     "\u0e24": "ri",  # ฤ
     "\u0e24\u0e45": "rue",  # ฤๅ
     "\u0e26": "lue",  # ฦ
+}
+
+# Vowel length, keyed exactly like _VOWELS.  The tone rules need it:
+# a syllable with no final is live only when its vowel is long
+# (เล่น len, mid), while a short open vowel is dead (เพราะ phrò, low).
+# Length cannot be read off the romanized spelling -- for instance
+# "oe" is เ-อะ (short) when it carries a stop final, เ-อ (long)
+# otherwise -- so it rides on the vowel key.
+_VOWEL_LENGTH = {
+    "\u0e30": "short",
+    "\u0e31": "short",
+    "\u0e32": "long",
+    "\u0e33": "long",
+    "\u0e34": "short",
+    "\u0e35": "long",
+    "\u0e36": "short",
+    "\u0e37": "long",
+    "\u0e38": "short",
+    "\u0e39": "long",
+    "\u0e47": "short",
+    "\u0e40": "long",
+    "\u0e41": "long",
+    "\u0e42": "long",
+    "\u0e43": "long",
+    "\u0e44": "long",
+    "\u0e40\u0e30": "short",
+    "\u0e41\u0e30": "short",
+    "\u0e42\u0e30": "short",
+    "\u0e40\u0e2d\u0e30": "short",
+    "\u0e40\u0e2d": "long",
+    "\u0e40\u0e34": "short",
+    "\u0e42\u0e2d": "long",
+    "\u0e40\u0e32\u0e30": "short",
+    "\u0e40\u0e32": "long",
+    "\u0e40\u0e35\u0e22": "long",
+    "\u0e40\u0e35\u0e22\u0e27": "long",
+    "\u0e40\u0e37\u0e2d": "long",
+    "\u0e37\u0e2d": "long",
+    "\u0e40\u0e37": "long",
+    "\u0e40\u0e37\u0e27\u0e32": "long",
+    "\u0e40\u0e27": "long",
+    "\u0e41\u0e27": "long",
+    "\u0e40\u0e22": "long",
+    "\u0e44\u0e22": "long",
+    "\u0e44\u0e27": "long",
+    "\u0e2d": "long",
+    "\u0e2d\u0e22": "long",
+    "\u0e32\u0e22": "long",
+    "\u0e32\u0e27": "long",
+    "\u0e31\u0e27": "long",
+    "\u0e27\u0e22": "long",
+    "\u0e31\u0e27\u0e22": "long",
+    "\u0e31\u0e22": "short",
+    "\u0e38\u0e22": "long",
+    "\u0e34\u0e27": "short",
+    "\u0e35\u0e22": "long",
+    "\u0e43\u0e34": "short",
+    "\u0e22\u0e32": "long",
+    "\u0e22": "long",
+    "\u0e22\u0e22": "long",
+    "\u0e27": "long",
+    "\u0e27\u0e31": "short",
+    "\u0e38\u0e31": "long",
+    "\u0e2d\u0e30": "short",
+    "\u0e24": "long",
+    "\u0e24\u0e45": "long",
+    "\u0e26": "long",
 }
 
 # Words whose orthography is genuinely ambiguous under the rules.
@@ -313,6 +637,25 @@ def _vowelish_ahead(chars, i):
     return False
 
 
+def _shadowed_e_ahead(chars, i, current):
+    """
+    True when the เ at i is shadowed by a preposed โ/แ/ใ/ไ already
+    read into this syllable: that preposed vowel is the syllable's
+    real vowel and the เ-ะ form only makes it short (โต๊ะ dtó,
+    แป๊ะ bǽ, โก๊ะ gó).  The เ must sit directly before a ะ (tone
+    marks in between allowed) and the current syllable must not
+    carry a vowel sign yet -- anything else (เกาะ ko, ใกล้ klai)
+    keeps the เ.
+    """
+    if i >= len(chars) or chars[i] != "\u0e40":
+        return False
+    if _next_meaningful(chars, i + 1) != "\u0e30":  # ะ
+        return False
+    if any(c in _VOWEL_CHARS for c in current):
+        return False
+    return any(c in ("\u0e41", "\u0e42", "\u0e43", "\u0e44") for c in current)
+
+
 def _y_opens_syllable(chars, i):
     """
     True when a ย sitting on a bare onset really opens the next
@@ -393,8 +736,17 @@ def _implicit_ahead(chars, i):
 # ธร and friends are not clusters, so ธารณะ reads sa-tha-ra-na, and
 # ด is absent too (ดารา da-ra)
 _REAL_CLUSTER_INITIALS = {
-    "\u0e01", "\u0e02", "\u0e04", "\u0e05", "\u0e0f", "\u0e15",
-    "\u0e1b", "\u0e1c", "\u0e1e", "\u0e1f", "\u0e1a",
+    "\u0e01",
+    "\u0e02",
+    "\u0e04",
+    "\u0e05",
+    "\u0e0f",
+    "\u0e15",
+    "\u0e1b",
+    "\u0e1c",
+    "\u0e1e",
+    "\u0e1f",
+    "\u0e1a",
 }
 
 
@@ -424,9 +776,7 @@ def _bare_leading_split_ahead(chars, i):
     if first is None or first not in _CONSONANTS:
         return False
     second = _next_meaningful(chars, j + 1)
-    return second is not None and (
-        second in _CONSONANTS or second == _THANTHAKHAT
-    )
+    return second is not None and (second in _CONSONANTS or second == _THANTHAKHAT)
 
 
 def _final_cluster_ahead(chars, i):
@@ -485,11 +835,7 @@ def _real_final(chars):
         for c in reversed(m[:-1]):
             if c in _SKIP_MARKS:
                 continue
-            if (
-                c in _VOWEL_CHARS
-                or c in _LEADING_VOWELS
-                or c in _SEMI_VOWELS
-            ):
+            if c in _VOWEL_CHARS or c in _LEADING_VOWELS or c in _SEMI_VOWELS:
                 before = c
                 break
         if before in _W_VOWEL_PART_AFTER or before in _SEMI_VOWELS:
@@ -498,11 +844,7 @@ def _real_final(chars):
     cons = [c for c in m if c in _CONSONANTS]
     has_sign = any(c in _VOWEL_CHARS for c in m)
     has_lead = any(c in _LEADING_VOWELS for c in m)
-    if (
-        last in _CLUSTER_SECONDS
-        and len(cons) >= 2
-        and cons[-2] in _CLUSTER_INITIALS
-    ):
+    if last in _CLUSTER_SECONDS and len(cons) >= 2 and cons[-2] in _CLUSTER_INITIALS:
         if cons[-2] != cons[0]:
             return last  # final cluster: สมุทร, เ-ษ-ต-ร
         if has_sign or not has_lead:
@@ -550,17 +892,24 @@ def _split_syllables(word):
             i += 1
             continue
         if ch in _LEADING_VOWELS:
-            if current and (
-                _has_vowel(current) or _real_final(current) is not None
-            ):
+            if _shadowed_e_ahead(chars, i, current):
+                # เ-ะ after a preposed โ/แ/ใ/ไ belongs to the same
+                # syllable: the preposed vowel is the real vowel and
+                # the เ-ะ only makes it short (โต๊ะ dtó, แป๊ะ bǽ)
+                current.append(ch)
+                i += 1
+                continue
+            if current and (_has_vowel(current) or _real_final(current) is not None):
                 syllables.append(current)
                 current = []
             elif current == ["\u0e2d"]:
                 # a lone อ is its own syllable (อเมริกา a-me-ri-ka)
                 syllables.append(current)
                 current = []
-            elif current and _is_bare_onset(current) and _bare_leading_split_ahead(
-                chars, i
+            elif (
+                current
+                and _is_bare_onset(current)
+                and _bare_leading_split_ahead(chars, i)
             ):
                 syllables.append(current)
                 current = []
@@ -568,8 +917,10 @@ def _split_syllables(word):
             i += 1
             continue
         if ch in _CONSONANTS:
-            if current and _has_vowel(current) and any(
-                c in _CONSONANTS for c in current
+            if (
+                current
+                and _has_vowel(current)
+                and any(c in _CONSONANTS for c in current)
             ):
                 complete = (
                     _real_final(current) is not None
@@ -578,9 +929,9 @@ def _split_syllables(word):
                 at_end = _next_meaningful(chars, i + 1) is None
                 # an open syllable whose only vowel is preposed
                 # (เ-ด-น den) keeps the next consonant as its final
-                lead_only = not any(
-                    c in _VOWEL_CHARS for c in current
-                ) and any(c in _LEADING_VOWELS for c in current)
+                lead_only = not any(c in _VOWEL_CHARS for c in current) and any(
+                    c in _LEADING_VOWELS for c in current
+                )
                 # a cluster second after the onset stays inside the
                 # syllable (เพราะ phro, โทร tho-ra)
                 cluster = (
@@ -607,22 +958,17 @@ def _split_syllables(word):
                 cluster_vowel = (
                     ch in _CLUSTER_SECONDS
                     and not lead_only
-                    and not _real_cluster_pair(
-                        _last_meaningful(current), ch
-                    )
+                    and not _real_cluster_pair(_last_meaningful(current), ch)
                     and _opens_syllable(chars, i + 1)
                 )
                 # a plain consonant opening an implicit-vowel
                 # syllable starts it (อนาคต a-na-khot)
-                implicit_onset = (
-                    ch not in _CLUSTER_SECONDS
-                    and _implicit_ahead(chars, i + 1)
+                implicit_onset = ch not in _CLUSTER_SECONDS and _implicit_ahead(
+                    chars, i + 1
                 )
                 # ห before a sonorant is a silent onset, never a
                 # final (ผู้หญิง phu-ying)
-                silent_h = (
-                    _last_meaningful(current) == "\u0e2b" and ch in _SONORANTS
-                )
+                silent_h = _last_meaningful(current) == "\u0e2b" and ch in _SONORANTS
                 # a consonant that starts a genuine cluster after a
                 # syllable that already has its vowel opens the next
                 # syllable (มะพร้าว ma-phrao, สับปะรด sap-pa-rot)
@@ -649,16 +995,14 @@ def _split_syllables(word):
                 # follows it, in which case it opens the next
                 # syllable (ตายาย ta-yai, อายุ a-yu, อียิปต์ i-yip)
                 vowel_part = (
-                    ch in _SEMI_VOWELS or ch == "\u0e2d"
-                ) and _last_meaningful(current) in _VOWEL_CHARS and not _sign_ahead(
-                    chars, i + 1
+                    (ch in _SEMI_VOWELS or ch == "\u0e2d")
+                    and _last_meaningful(current) in _VOWEL_CHARS
+                    and not _sign_ahead(chars, i + 1)
                 )
                 # a consonant silenced by ์ belongs to this syllable
                 # (อาทิตย์ athit); ์ itself is not "meaningful", so
                 # the raw next character is checked
-                silenced_next = (
-                    i + 1 < len(chars) and chars[i + 1] == _THANTHAKHAT
-                )
+                silenced_next = i + 1 < len(chars) and chars[i + 1] == _THANTHAKHAT
                 # a preposed vowel with no sign keeps a cluster
                 # together (เครื่องบิน khrueangbin)
                 lead_cluster = (
@@ -667,19 +1011,23 @@ def _split_syllables(word):
                     and _real_cluster_pair(_last_meaningful(current), ch)
                 )
                 if (
-                    (complete and not at_end)
-                    or thr_split
-                    or cluster_onset
-                    or cluster_vowel
-                    or implicit_onset
-                    or cluster_ahead
-                    or carrier_ahead
-                    or h_onset
-                    or (
-                        _vowelish_ahead(chars, i + 1)
-                        and not lead_cluster
+                    (
+                        (complete and not at_end)
+                        or thr_split
+                        or cluster_onset
+                        or cluster_vowel
+                        or implicit_onset
+                        or cluster_ahead
+                        or carrier_ahead
+                        or h_onset
+                        or (_vowelish_ahead(chars, i + 1) and not lead_cluster)
                     )
-                ) and not cluster and not silent_h and not vowel_part and not silenced_next and not _final_cluster_ahead(chars, i):
+                    and not cluster
+                    and not silent_h
+                    and not vowel_part
+                    and not silenced_next
+                    and not _final_cluster_ahead(chars, i)
+                ):
                     syllables.append(current)
                     current = []
             elif current and _is_bare_onset(current) and current != ["\u0e2b"]:
@@ -689,9 +1037,8 @@ def _split_syllables(word):
                 # a-na-khot), and once a consonant follows the อ the
                 # next one opens a new syllable (ชอบมาก chop-mak).
                 bare = [c for c in current if _meaningful(c)]
-                has_carrier = (
-                    bare[-1] == "\u0e2d"
-                    and any(c in _CONSONANTS and c != "\u0e2d" for c in bare[:-1])
+                has_carrier = bare[-1] == "\u0e2d" and any(
+                    c in _CONSONANTS and c != "\u0e2d" for c in bare[:-1]
                 )
                 if has_carrier:
                     if ch in _CLUSTER_SECONDS and _sign_ahead(chars, i + 1):
@@ -715,10 +1062,7 @@ def _split_syllables(word):
                 elif ch in _SEMI_VOWELS:
                     if current == ["\u0e2d"] and ch == "\u0e22":
                         pass  # อย -> y (อยู่ yu)
-                    elif (
-                        ch == "\u0e27"
-                        and _last_meaningful(current) in _VELARS
-                    ):
+                    elif ch == "\u0e27" and _last_meaningful(current) in _VELARS:
                         pass  # velar + ว cluster (ควาย khwai)
                     elif ch == "\u0e22" and not _y_opens_syllable(chars, i):
                         pass  # a silent ย between onset and vowel
@@ -732,18 +1076,14 @@ def _split_syllables(word):
                     # otherwise it carries the vowel and the consonant
                     # closes the syllable (สอน son, ร้อย roi)
                     nxt = _next_meaningful(chars, i + 1)
-                    if nxt in _VOWEL_CHARS or (
-                        nxt in _SEMI_VOWELS and len(bare) >= 2
-                    ):
+                    if nxt in _VOWEL_CHARS or (nxt in _SEMI_VOWELS and len(bare) >= 2):
                         # a glide after อ opens a new syllable only
                         # when the อ already carried an earlier
                         # consonant's vowel (ขโมย khamoi); a single
                         # onset keeps it (ร้อย roi, คอย khoi)
                         syllables.append(current)
                         current = []
-                elif ch not in _CLUSTER_SECONDS and _vowelish_ahead(
-                    chars, i + 1
-                ):
+                elif ch not in _CLUSTER_SECONDS and _vowelish_ahead(chars, i + 1):
                     # bare onset + consonant + vowel sign: the
                     # consonant opens the next syllable (ธนา thana,
                     # ขโมย khamoi); ว never does here (หน่วย nuai)
@@ -814,16 +1154,9 @@ def _split_onset(chars):
                 # else leave ร in the rest: ทรง thong
             elif onset[0] in _SIBILANTS and second == "\u0e23":
                 pass  # ร silent after a sibilant (จริง ching, ศรี si)
-            elif (
-                second == "\u0e27"
-                and onset[0] in _VELARS
-                and _sign_ahead(chars, 1)
-            ):
+            elif second == "\u0e27" and onset[0] in _VELARS and _sign_ahead(chars, 1):
                 onset.append(chars.pop(0))  # velar + ว cluster (ควาย)
-            elif (
-                second == "\u0e27"
-                and _sign_ahead(chars, 1)
-            ):
+            elif second == "\u0e27" and _sign_ahead(chars, 1):
                 onset.append(chars.pop(0))  # ว onset (วิ wi, ทวีป thawip)
             elif second == "\u0e22" and _sign_ahead(chars, 1):
                 onset.append(chars.pop(0))  # ย onset (ทยา thaya)
@@ -838,13 +1171,17 @@ def _split_onset(chars):
     return text, lead + chars
 
 
-def _romanize_syllable(chars):
+def _romanize_syllable(chars, digits=False):
     "Romanize one syllable (list of chars); None when uncovered."
     text = "".join(chars)
     if text == "\u0e2d\u0e22":  # อย
         return "oi"
 
     chars = list(chars)
+
+    # The tone mark must be read before _TONE_MARKS are stripped below.
+    tone_mark = next((c for c in chars if c in _TONE_MARKS), None)
+    tone_override = _SYLLABLE_TONE_OVERRIDES.get(text)
 
     # Trailing ์ silences the consonant it follows.  When that
     # consonant is ย/ว, the consonant before it closes the syllable
@@ -881,9 +1218,7 @@ def _romanize_syllable(chars):
             and len(rest) >= 2
             and rest[-1] == fin
             and rest[-2] in _STOPS
-            and any(
-                c in _VOWEL_CHARS or c in _LEADING_VOWELS for c in rest[:-2]
-            )
+            and any(c in _VOWEL_CHARS or c in _LEADING_VOWELS for c in rest[:-2])
         ):
             final = _FINALS.get(rest[-2])  # สมุทร -> samut
             rest = rest[:-2]
@@ -913,68 +1248,156 @@ def _romanize_syllable(chars):
             or (
                 c == "\u0e2d"
                 and idx > 0
-                and (
-                    rest[idx - 1] in _VOWEL_CHARS
-                    or rest[idx - 1] in _LEADING_VOWELS
-                )
+                and (rest[idx - 1] in _VOWEL_CHARS or rest[idx - 1] in _LEADING_VOWELS)
             )
         ):
             key_chars.append(c)
+    if (
+        len(key_chars) > 1
+        and key_chars[0] == "\u0e40"
+        and key_chars[1] in _VOWEL_CHARS
+        and key_chars[1] != "\u0e47"
+        and len(onset) >= 2
+        and "".join(key_chars[1:]) in _VOWELS
+    ):
+        # a เ written before a cluster onset is only the cluster's
+        # prefix: เกลัย klai, เปลี่ยน plian, กลาง klang keep the vowel
+        # signs that follow it (a bare เ -- เกรง kroeng -- stays, and
+        # compounds -- เพราะ pro, เกาะ ko -- use the whole key)
+        key_chars.pop(0)
     vowel_key = "".join(key_chars)
-    vowel = _lookup_vowel(vowel_key)
+    vowel, length = _lookup_vowel(vowel_key)
 
     if vowel is None and not vowel_key:
-        if fin == "\u0e2d":
+        run = [c for c in chars if _meaningful(c)]
+        if (
+            len(run) == 2
+            and all(c in _CONSONANTS for c in run)
+            and _real_cluster_pair(run[0], run[1])
+        ):
+            # a bare cluster is the whole onset with an implicit a:
+            # ประเทศ prà-thêet, กรม grat-dep -- not "pon"
+            onset = _INITIALS.get(run[0], "") + _INITIALS.get(run[1], "")
+            vowel = "a"
+            length = "short"
+            final = ""
+        elif fin == "\u0e2d":
             # bare อ carrier: รอ ro, หมอ mo; a lone อ is open (อนาคต
             # a-na-khot), so it reads a
             only = [c for c in chars if _meaningful(c)]
             vowel = "a" if only == ["\u0e2d"] else "o"
+            length = "short"  # implicit vowels are short (นก nók)
         elif final:
             vowel = "o"  # implicit vowel: นก nok, รถ rot, ลม lom
+            length = "short"
         else:
             vowel = "a"  # bare open syllable: ธนา thana, โท tho
+            length = "short"
     elif vowel is None and vowel_key == "\u0e40" and final:
         # เ before a bare final: oe before a sonorant (เงิน ngoen,
         # เกรง kroeng), e before a stop with a single onset (เกษตร
-        # set), o before a stop after a cluster (ปลด plot)
+        # set), o after a stop with a cluster (ปลด plot).  The stop
+        # readings are short (เล็ก lék, เก็บ bèp), the sonorant long
+        # (เกรง kroeng).
         if final in ("ng", "n", "m", "y", "w"):
             vowel = "oe"
+            length = "long"
         elif len(onset) <= 1:
             vowel = "e"
+            length = "short"
         else:
             vowel = "o"
+            length = "short"
     if vowel is None:
         return None
 
     # ึ before a coronal final reads uean, the final absorbed into
     # the glide (ขึ้น khuean); ื keeps the final (คืน khuen)
-    if (
-        vowel == "ue"
-        and final in ("n", "m")
-        and vowel_key == "\u0e36"
-    ):
+    if vowel == "ue" and final in ("n", "m") and vowel_key == "\u0e36":
         vowel = "uean"
         final = ""
 
     reading = onset + vowel + final
-    return reading or None
+    tone = tone_override or _syllable_tone(chars, tone_mark, final, length, vowel_key)
+    if tone is None:
+        # Vowel-only syllables (ฤ, ฦ) carry no tone the rules cover.
+        return reading or None
+    if digits:
+        return reading + _TONE_DIGIT[tone]
+    mark = _TONE_DIACRITIC[tone]
+    if not mark:  # mid tone: no mark (Paiboon)
+        return reading or None
+    toned = onset + (vowel[:1] + mark + vowel[1:]) + final
+    return toned or None
+
+
+def _syllable_tone(chars, tone_mark, final, length, vowel_key):
+    """
+    Tone of a syllable as a letter (m/l/f/h/r), from the standard chart:
+    consonant class x tone mark x live/dead syllable.  Returns None
+    when the syllable has no consonant to classify.
+    """
+    cls = _tone_class(chars)
+    if cls is None:
+        return None
+    length = length or "short"
+    mark = _TONE_MARK_KEYS.get(tone_mark, "")
+    rule = _TONE_RULES[cls]
+    if mark == "":
+        if final in ("k", "t", "p"):
+            # stop final: dead; only the low class splits short/long
+            if cls == "low":
+                return rule[""]["dead_long" if length == "long" else "dead_short"]
+            return rule[""]["dead"]
+        if final or (vowel_key and vowel_key[-1] in "\u0e27\u0e22"):
+            # sonorant final: live, any length.  A glide counts whether
+            # it is written as the final (คิ้ว khiw) or closes the vowel
+            # itself (เร็ว reo /rew˧/ -- short เ%ว still ends in /w/).
+            return rule[""]["live"]
+        if cls == "low":
+            return rule[""]["live" if length == "long" else "dead_short"]
+        return rule[""]["live" if length == "long" else "dead"]
+    if mark == "1":
+        # Glide vowels take mai ek as low where plain long vowels
+        # fall (key glosses in tests: gai, bplian, chai vs fai).
+        live = bool(final or length == "long")
+        if live and cls == "mid" and vowel_key in _GLIDE_VOWELS:
+            return "l"
+        if live and cls == "low" and vowel_key in _BARE_GLIDE_VOWELS:
+            return "l"
+    entry = rule[mark]
+    if isinstance(entry, dict):  # mid + mai ek splits live/dead
+        return entry["live" if bool(final or length == "long") else "dead"]
+    return entry
 
 
 def _lookup_vowel(key):
-    "Vowel lookup, tolerating a shortener (็) or short a (ั) in the key."
+    """
+    Vowel lookup with length, tolerating a shortener (็) or short a
+    (ั) in the key.  Both shorteners force the short length.  Returns
+    (None, None) when uncovered.
+    """
     if not key:
-        return None
+        return None, None
     if key in _VOWELS:
-        return _VOWELS[key]
+        return _VOWELS[key], _VOWEL_LENGTH[key]
     if "\u0e47" in key:  # ็ shortens the preceding vowel
         trimmed = key.replace("\u0e47", "")
         if trimmed in _VOWELS:
-            return _VOWELS[trimmed]
+            return _VOWELS[trimmed], "short"
     if "\u0e31" in key:  # ั is a short a
         trimmed = key.replace("\u0e31", "")
         if trimmed in _VOWELS:
-            return _VOWELS[trimmed]
-    return None
+            return _VOWELS[trimmed], "short"
+    if "\u0e40" in key and any(
+        c in ("\u0e41", "\u0e42", "\u0e43", "\u0e44") for c in key
+    ):
+        # a เ shadowed by a preposed โ/แ/ใ/ไ: the preposed vowel is
+        # the real one, the เ-ะ only shortens it (โต๊ะ dtó, แป๊ะ bǽ)
+        trimmed = key.replace("\u0e40", "")
+        if trimmed in _VOWELS:
+            return _VOWELS[trimmed], "short"
+    return None, None
 
 
 def _geminate(word):
@@ -1000,15 +1423,20 @@ def _geminate(word):
     return "".join(out)
 
 
-def romanize(word):
+def _romanize_word(word, digits=False):
     """
-    RTGS-romanize a Thai word.  Returns None for non-Thai text and for
-    shapes the rules do not cover (the caller then shows the word plain).
+    Romanize a Thai word.  With digits, each syllable's tone rides at
+    the end of the syllable as a digit (sa2wat2di1) instead of a
+    combining mark (sàwàtdi) -- the syllable-key form the shadowing
+    fuzzy rescue compares.  Returns None for non-Thai text and for
+    shapes the rules do not cover (the caller then shows the word
+    plain).
     """
     if not word or not is_thai_word(word):
         return None
     if word in _WORD_EXCEPTIONS:
-        return _WORD_EXCEPTIONS[word]
+        # Exception words keep their hand-entered spelling (no tone).
+        return _WORD_EXCEPTIONS[word] if not digits else None
 
     syllables = _split_syllables(_geminate(word))
     if not syllables:
@@ -1020,13 +1448,28 @@ def romanize(word):
             syl = [c for c in syl if c != _YAMOK]
             if not syl:
                 continue
-            r = _romanize_syllable(syl)
+            r = _romanize_syllable(syl, digits)
             if r is None:
                 return None
             parts.extend([r, r])
             continue
-        r = _romanize_syllable(syl)
+        r = _romanize_syllable(syl, digits)
         if r is None:
             return None
         parts.append(r)
     return "".join(parts) or None
+
+
+def romanize(word):
+    "RTGS romanization with Paiboon-style tone marks, or None."
+    return _romanize_word(word)
+
+
+def sound_key(word):
+    """
+    Same romanization with each syllable's tone as a digit at the end
+    of the syllable (สวัสดี -> sa2wat2dii1), for the shadowing fuzzy
+    rescue; mid tones keep their 1 so no syllable disappears from
+    the key.  None wherever romanize() is None.
+    """
+    return _romanize_word(word, digits=True)

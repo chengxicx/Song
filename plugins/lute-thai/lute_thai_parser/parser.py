@@ -72,7 +72,9 @@ class ThaiParser(AbstractParser):
         """
         Get the RTGS (Royal Thai General System of Transcription)
         romanization for the given text, used as the reading above a
-        Thai word.
+        Thai word.  Each syllable carries a Paiboon-style tone mark:
+        unmarked is mid, grave low, circumflex falling, acute high,
+        caron rising (สวัสดี -> sàwàtdi).
 
         Returns None when the text carries no romanizable Thai
         characters (punctuation, latin script, digits) or when the
@@ -87,3 +89,15 @@ class ThaiParser(AbstractParser):
         )
 
         return romanize(text)
+
+    def get_reading_key(self, text: str):
+        """
+        Reading with each syllable's tone as a digit at the syllable's
+        end (สวัสดี -> sa2wat2di1) -- the shape the shadowing fuzzy
+        rescue splits into syllables.  None wherever get_reading is.
+        """
+        from lute_thai_parser.romanize import (  # pylint: disable=import-outside-toplevel
+            sound_key,
+        )
+
+        return sound_key(text)
