@@ -454,6 +454,47 @@
       .trim();
   }
 
+  // Speakable text from a rendered reading-page node.
+  //
+  // lute-furigana.js wraps Han-script words in
+  // <ruby>word<rt>reading</rt></ruby>, and an <rt> reading counts as
+  // text: innerText / textContent of 普通's span is "普通ふつう".  A TTS
+  // engine speaks that as the word twice -- once from the kanji, once
+  // from the kana -- so anything that speaks DOM text (hover
+  // pronunciation, the sentence 🔊, the player's cues) has to strip the
+  // readings first.  The reading is pronunciation, not text to read;
+  // the term's own reading is preferred anyway once the term popup has
+  // cached it (see speakTermText).
+  function ttsPlainText(node) {
+    if (!node) return "";
+    if (node.nodeType === 3) return node.textContent || "";
+    const clone = node.cloneNode(true);
+    if (clone.querySelectorAll) {
+      clone.querySelectorAll("rt, rp").forEach(function (el) { el.remove(); });
+    }
+    return clone.textContent || "";
+  }
+
+  // What to speak for a hovered word span.  A split piece renders only
+  // its own column's fragment; speak the whole word the pieces share
+  // (data-tts-text, see textitem.html).  data-text is the parser's
+  // canonical token and never carries a furigana reading, so it is
+  // preferred over the rendered text -- falling back to raw innerText
+  // here would speak "普通ふつう".  The rt-stripped rendered text is
+  // the last resort for nodes without either attribute.  Shared with
+  // the player subtitles (tts-player.js / media-player-base.js), which
+  // resolve it on window at event time.
+  function spokenTextForWordSpan(wordSpan) {
+    return (
+      wordSpan.getAttribute("data-tts-text") ||
+      (wordSpan.dataset.text
+        ? wordSpan.dataset.text.replace(/\u200B/g, "")
+        : "") ||
+      ttsPlainText(wordSpan)
+    );
+  }
+  window.luteSpokenTextForWordSpan = spokenTextForWordSpan;
+
   // ------------------------------------------------------------------
   // 4. Sentence 🔊 button injection
   // ------------------------------------------------------------------
@@ -590,15 +631,8 @@
     textDiv.addEventListener("mouseover", function (e) {
       const wordSpan = e.target.closest("span.word, span[id^=\"w\"]");
       if (!wordSpan) return;
-      // A split piece renders only its own column's fragment; speak the
-      // whole word the pieces share (data-tts-text, see textitem.html).
-      const spoken =
-        wordSpan.getAttribute("data-tts-text") ||
-        wordSpan.innerText ||
-        wordSpan.textContent ||
-        "";
       luteHoverSpeakStart(
-        spoken,
+        spokenTextForWordSpan(wordSpan),
         function () { return ttsPlaying; },
         hoverReadingFor(wordSpan)
       );
@@ -625,8 +659,10 @@
       const icon = tempRow.querySelector(".lute-sentence-play-btn");
       if (icon) icon.remove();
 
+      // ttsPlainText drops the furigana <rt> readings, which would
+      // otherwise be spoken right after each word ("普通ふつう").
       const cleanSentence = cleanSentenceText(
-        tempRow.innerText || tempRow.textContent || ""
+        ttsPlainText(tempRow)
       );
       if (cleanSentence) {
         // Stop the full player if it's running so the hover/sentence
