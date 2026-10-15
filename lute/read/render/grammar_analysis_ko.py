@@ -1250,3 +1250,58 @@ def analyze_korean(page_text, display_lang="en"):
         )
         matched.append(out)
     return matched
+
+
+# ---- library export --------------------------------------------------
+#
+# The /grammar page lists the whole corpus at once, where the panel lists
+# only what the current page happens to contain.  Mirrors the Japanese
+# engine's export (grammar_analysis_ja.library_entries) so both languages
+# render through one template.
+
+# The three bands grammar_ko.json uses, easiest first.  Same vocabulary as
+# grammar_levels.hideable_grammar_groups.
+_LIBRARY_LEVEL_RANK = {"TOPIK 1-2": 0, "TOPIK 3-4": 1, "TOPIK 5-6": 2}
+
+
+def _library_entry(rule, display_lang):
+    "One rule as a library row, display-ready (see the Japanese analogue)."
+    entry = {
+        "key": rule["key"],
+        "name": rule["pattern"],
+        "level": rule["level"],
+        "desc": _desc(rule, display_lang),
+        "examples": list(rule.get("examples") or []),
+        "skipped": False,
+    }
+    formation = _enrichment(rule, "formation", display_lang)
+    if formation:
+        entry["formation"] = formation
+    notes = _enrichment(rule, "formation_notes", display_lang)
+    if notes:
+        entry["notes"] = notes
+    reference = rule.get("reference")
+    if reference:
+        text = _reference_text(reference, display_lang)
+        if text:
+            entry["reference"] = {"japanese": reference["korean"], "text": text}
+    return entry
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Korean grammar library, in TOPIK band order (1-2 -> 5-6).
+
+    Built on first use like the rules themselves, so an app start-up with
+    no Korean books does not pay for the Kiwi instance.  Every rule the
+    matcher can fire is included: unlike the Japanese corpus there is no
+    reviewed "reference only" subset.
+    """
+    rules = _KO_RULES + _get_data_rules() + _get_pattern_rules()
+    entries = [_library_entry(rule, display_lang) for rule in rules]
+    ordered = sorted(
+        enumerate(entries),
+        key=lambda pair: (_LIBRARY_LEVEL_RANK.get(pair[1]["level"], 9), pair[0]),
+    )
+    return [entry for _, entry in ordered]
+

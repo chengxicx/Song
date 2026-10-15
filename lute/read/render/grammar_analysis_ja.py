@@ -1705,6 +1705,18 @@ def _make_data_rule(
         "meaning": item.get("meaning_en") or "",
         "meaning_zh": _ZH_BY_ID.get(entry_id, ""),
         "meaning_ko": _KO_BY_ID.get(entry_id, ""),
+        # The long explanation, register and cross-links the curated rows
+        # carry but the panel never showed.  `related` holds upstream entry
+        # ids; _related_entries resolves them to keys/names below.  The
+        # entry id itself is kept because the rule key is slugged, so it is
+        # no longer recoverable from the key alone.
+        "entry_id": entry_id,
+        "meaning_detailed": item.get("meaning_detailed") or "",
+        "formality": item.get("formality") or "",
+        "related": list(item.get("related") or []),
+        # n3.json lists an alternate spelling beside the main pattern
+        # (〜つつある / 〜つつ); recorded but unused by the matcher.
+        "pattern_alt": item.get("pattern_alt") or "",
         "formation": item.get("formation") or "",
         # Chinese wording for the 接续 / 注意点 / 例句译文 of the English-only
         # vendored rows (see _load_zh_enrichment); empty for the merged
@@ -1934,6 +1946,48 @@ def _get_all_rules():
         if _all_rules_cache is None:
             _all_rules_cache = _N5_RULES + _CONSTRUCTION_RULES + _get_data_rules()
         return _all_rules_cache
+
+
+# The curated rows' `related` field names upstream entry ids, which differ
+# from the rules' own `key` (slugged), so following a cross-link needs both
+# an id -> rule lookup and a display name.  Built once, lazily, beside the
+# rules it is derived from.
+_related_index_cache = None
+
+
+def _get_related_index():
+    "{entry id: {key, name, level}} over the curated rows, memoised."
+    global _related_index_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _related_index_cache is None:
+            index = {}
+            for rule in _get_data_rules():
+                entry_id = rule.get("entry_id")
+                if entry_id and entry_id not in index:
+                    index[entry_id] = {
+                        "key": rule["key"],
+                        "name": rule["pattern"],
+                        "level": rule["level"],
+                    }
+            _related_index_cache = index
+        return _related_index_cache
+
+
+def _related_entries(rule):
+    """
+    The rule's `related` ids resolved to {id, key, name, level}, in order.
+
+    Ids the corpus does not define are dropped rather than rendered as a
+    dangling link: the curated files are hand-maintained, and a typo there
+    must not put a dead anchor on the page.
+    """
+    index = _get_related_index()
+    out = []
+    for entry_id in rule.get("related") or []:
+        info = index.get(entry_id)
+        if info:
+            out.append({"id": entry_id, **info})
+    return out
 
 
 # Korean descriptions for the hand-written rules (data rules get theirs
@@ -2335,6 +2389,24 @@ def analyze_japanese(page_text, display_lang="en"):
                     "desc": _desc(rule, display_lang),
                     "examples": [],
                 }
+                # Register (neutral / formal / casual) -- shipped as the raw
+                # upstream token; the front end maps it to the display
+                # language, so no translation table is needed here.
+                formality = (rule.get("formality") or "").strip()
+                if formality:
+                    entry["formality"] = formality
+                # The long explanation is English prose with no zh/ko
+                # translation in the data, so it is emitted only for an
+                # English panel -- a zh/ko panel must never show English.
+                detailed = (rule.get("meaning_detailed") or "").strip()
+                if detailed and display_lang == "en":
+                    entry["meaning_detailed"] = detailed
+                # Cross-links to the other points this one is contrasted
+                # with.  The names are Japanese fragments, so they are shown
+                # in every display language.
+                related = _related_entries(rule)
+                if related:
+                    entry["related"] = related
                 # Panel-enrichment fields (formation line, folded reference
                 # block); only emitted when the underlying entry carries
                 # them *in the display language* -- hand-written rules and
@@ -2403,3 +2475,71 @@ def analyze_japanese(page_text, display_lang="en"):
             }
         )
     return _merge_same_name(matched)
+
+
+# ---- library export --------------------------------------------------
+#
+# The /grammar page lists the whole corpus at once, where the panel lists
+# only what the current page happens to contain.  Same display fields as
+# the panel entries (minus the page-specific match offsets), so the page
+# can reuse the panel's markup and CSS.
+
+
+def _library_entry(rule, display_lang):
+    """
+    One curated rule as a library row, display-ready.
+
+    Every rule is included -- even the ones the matcher skips -- because a
+    skipped row is still a grammar point a reader may want to look up; the
+    ``skipped`` flag lets the page mark it as reference-only instead of
+    hiding it.  ``examples`` stays plain strings: the library has no page
+    text to highlight, so the match offsets the panel computes are
+    irrelevant here.
+    """
+    entry = {
+        "key": rule["key"],
+        "name": rule["pattern"],
+        "level": rule["level"],
+        "desc": _desc(rule, display_lang),
+        "examples": [s for s in rule.get("examples") or [] if s],
+        "skipped": bool(rule.get("skipped")),
+    }
+    formation = _enrichment(rule, "formation", display_lang)
+    if formation:
+        entry["formation"] = formation
+    notes = _enrichment(rule, "formation_notes", display_lang)
+    if notes:
+        entry["notes"] = notes
+    reference = rule.get("reference")
+    if reference:
+        text = _reference_text(reference, rule, display_lang)
+        if text:
+            entry["reference"] = {"japanese": reference["japanese"], "text": text}
+    formality = (rule.get("formality") or "").strip()
+    if formality:
+        entry["formality"] = formality
+    detailed = (rule.get("meaning_detailed") or "").strip()
+    if detailed and display_lang == "en":
+        entry["meaning_detailed"] = detailed
+    related = _related_entries(rule)
+    if related:
+        entry["related"] = related
+    return entry
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Japanese grammar library, in level order (N5 -> N1).
+
+    Built on first use like the rules themselves, so an app start-up with
+    no Japanese books does not pay for the Sudachi dictionary.  Within a
+    level the hand-written basics come first: they are listed before the
+    curated rows in the source order, and the sort is stable.
+    """
+    rules = _N5_RULES + _CONSTRUCTION_RULES + _get_data_rules()
+    entries = [_library_entry(rule, display_lang) for rule in rules]
+    ordered = sorted(
+        enumerate(entries), key=lambda pair: (_LEVEL_RANK.get(pair[1]["level"], 9), pair[0])
+    )
+    return [entry for _, entry in ordered]
+
