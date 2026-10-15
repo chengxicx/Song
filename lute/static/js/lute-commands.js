@@ -383,10 +383,17 @@ function open_grammar_analysis(opts) {
   }
 
   function header() {
+    // The library index for this book's language -- the way to find a
+    // grammar point the current page does not happen to contain.
+    const langid = $("#lang_id").val();
+    const library = langid
+      ? '<a class="grammar-analysis-panel__library" href="/grammar/' + encodeURIComponent(langid) + '">' + I18N.t('Grammar library') + '</a>'
+      : "";
     return (
       '<div class="grammar-analysis-panel__header">' +
       '<span class="grammar-analysis-panel__title">' + I18N.t('Grammar Analysis') + '</span>' +
       '<span id="grammar-count" class="grammar-analysis-panel__badge">…</span>' +
+      library +
       '<button type="button" class="grammar-analysis-panel__close" aria-label="' + I18N.t('Close') + '">&times;</button>' +
       "</div>"
     );
@@ -482,13 +489,34 @@ function open_grammar_analysis(opts) {
           return g.key === "basic_forms" || g.key === "basic_particles";
         }
 
+        // Register of the grammar point, as the curated rows record it
+        // (neutral / formal / casual).  The token is untranslated in the
+        // data, so it is labelled here; an unknown value shows nothing
+        // rather than a raw English word under a translated heading.
+        const FORMALITY_LABEL = {
+          neutral: I18N.t("neutral"),
+          formal: I18N.t("formal"),
+          casual: I18N.t("casual"),
+        };
+
         function itemHtml(g, withLevelChip) {
           const fold = isAggregate(g);
           const level =
             withLevelChip && g.level
               ? '<span class="grammar-item__level">' + escapeHtml(g.level) + "</span>"
               : "";
+          const formality = FORMALITY_LABEL[g.formality]
+            ? '<span class="grammar-item__formality">' +
+              escapeHtml(FORMALITY_LABEL[g.formality]) +
+              "</span>"
+            : "";
           const desc = g.desc ? '<div class="grammar-item__desc">' + escapeHtml(g.desc) + "</div>" : "";
+          // The long explanation, English-only in the data: the backend
+          // emits it for an English panel and omits it otherwise (see
+          // analyze_japanese), so whatever arrives here is displayable.
+          const detailed = g.meaning_detailed
+            ? '<div class="grammar-item__detail">' + escapeHtml(g.meaning_detailed) + "</div>"
+            : "";
           const formation = g.formation
             ? '<div class="grammar-item__formation">' + escapeHtml(g.formation) + "</div>"
             : "";
@@ -525,6 +553,28 @@ function open_grammar_analysis(opts) {
               ? '<details class="grammar-item__more"><summary>' + moreLabel + "</summary>" +
                 ref + notes + "</details>"
               : "";
+          // Cross-links into the grammar library, anchored on the other
+          // point's key so the click lands on that card (#hash).
+          const langidForRelated = $("#lang_id").val();
+          const related =
+            g.related && g.related.length && langidForRelated
+              ? '<div class="grammar-item__related">' +
+                '<span class="grammar-item__related-label">' + I18N.t("Related grammar") + "</span>" +
+                g.related
+                  .map(function (r) {
+                    return (
+                      '<a class="grammar-item__related-link" href="/grammar/' +
+                      encodeURIComponent(langidForRelated) +
+                      "#" +
+                      encodeURIComponent(r.key || "") +
+                      '">' +
+                      escapeHtml(r.name) +
+                      "</a>"
+                    );
+                  })
+                  .join("") +
+                "</div>"
+              : "";
           return (
             '<div class="grammar-item grammar-item--' +
             escapeHtml(levelClass(g.level)) +
@@ -536,12 +586,15 @@ function open_grammar_analysis(opts) {
             '<div class="grammar-item__head"' + (fold ? ' role="button"' : "") + ">" +
             level +
             '<span class="grammar-item__name">' + escapeHtml(g.name) + "</span>" +
+            formality +
             (fold ? '<span class="grammar-item__fold" aria-hidden="true">&#9656;</span>' : "") +
             "</div>" +
             formation +
             desc +
+            detailed +
             '<div class="grammar-item__examples">' + examples + "</div>" +
             more +
+            related +
             "</div>"
           );
         }

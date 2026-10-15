@@ -184,3 +184,45 @@ def test_reference_offsets_outside_the_sentence_are_ignored():
     assert out["has_refex"], out["html"]
     assert out["marks"] == []
     assert sentence in out["refex"], out["refex"]
+
+
+def test_formality_chip_renders_when_present_and_is_omitted_otherwise():
+    """
+    The register (neutral / formal / casual) is an optional chip beside the
+    name; a row without one must not leave an empty badge behind.
+    """
+    out = _render([_entry(formality="formal")])
+    assert out["formality"] == "formal"
+    assert _render([_entry()])["formality"] is None
+
+
+def test_curated_detail_renders_when_present_and_is_omitted_otherwise():
+    "The long explanation is optional; absent means no empty block."
+    out = _render([_entry(meaning_detailed="A longer curated explanation.")])
+    assert out["detail"] == "A longer curated explanation."
+    assert _render([_entry()])["detail"] is None
+
+
+def test_related_links_render_as_library_deep_links():
+    """
+    Each cross-link opens the grammar library on the other point's card, so
+    the href must be /grammar/<langid>#<key> and the label the point's name.
+    """
+    out = _render(
+        [
+            _entry(
+                related=[
+                    {"id": "kara-from", "key": "ds_particle-kara-from", "name": "〜から", "level": "N5"}
+                ]
+            )
+        ]
+    )
+    assert out["related"] == [
+        {"href": "/grammar/1#ds_particle-kara-from", "name": "〜から"}
+    ]
+
+
+def test_no_related_renders_no_block():
+    "A row with no cross-links leaves the related block out entirely."
+    assert _render([_entry()])["related"] == []
+

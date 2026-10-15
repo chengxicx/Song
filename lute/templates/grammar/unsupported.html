@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ t('Grammar library') }} — {{ language.name }}{% endblock %}
+{% block header %}{{ t('Grammar library') }}{% endblock %}
+
+{% block body %}
+
+<div class="grammar-library grammar-library--empty">
+  <h2>{{ language.name }}</h2>
+  <p>{{ t('This language has no grammar library.') }}</p>
+  <p>{{ t('Its grammar panel falls back to a generic rule library, which has no browsable list of grammar points.') }}</p>
+  <p><a href="/grammar/">{{ t('All languages') }}</a></p>
+</div>
+
+{% endblock %}

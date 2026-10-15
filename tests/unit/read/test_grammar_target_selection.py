@@ -175,7 +175,7 @@ def test_a_closed_panel_is_never_painted_into(commands):
 
 def test_every_card_carries_a_stable_key(commands):
     "The active card must be nameable without depending on group order."
-    body = _after(commands, "function itemHtml(g, withLevelChip) {", 3000)
+    body = _after(commands, "function itemHtml(g, withLevelChip) {", 5000)
     assert 'data-grammar-key="' in body
 
 
