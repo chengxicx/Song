@@ -1434,6 +1434,9 @@ h4
 
 span.flashtextcopy {
     background-color: yellow !important;
+    /* Same dark-ink rule as .newmultiterm: the flash is yellow in every
+       theme, dark themes would show white-on-yellow. */
+    color: #1c1b1f !important;
 }
 
 span.status0 {
@@ -1866,6 +1869,19 @@ img
 .newmultiterm
 {
     background: yellow !important;
+    /* The yellow marker background is theme-independent, but the word ink
+       is not: in the dark themes --font-color is near-white, and white
+       glyphs on yellow are unreadable (2026-10-16 feedback).  Pin the
+       selected words to dark ink and let the furigana rt follow --
+       it sits on the same yellow box. */
+    color: #1c1b1f !important;
+}
+
+div#thetext span.textitem.newmultiterm rt,
+div#thetext.manga-text-container span.textitem.newmultiterm rt
+{
+    color: #1c1b1f !important;
+    opacity: 0.75;
 }
 
 
