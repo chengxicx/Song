@@ -51,10 +51,22 @@ def test_empty_when_the_table_is_missing(empty_db, spanish, monkeypatch):
 
 def test_summary_and_daily_series(empty_db, spanish):
     "The summary aggregates the period; the daily series averages per day."
-    today = _utcnow()
-    _attempt(spanish, score=80, created=today - timedelta(hours=1))
-    _attempt(spanish, score=60, created=today - timedelta(hours=2))
-    _attempt(spanish, score=100, created=today - timedelta(days=10))
+    # Fixed mid-day local clock times, not offsets from now: seeds relative
+    # to now straddle local midnight whenever the suite runs between 00:00
+    # and 02:00, splitting the two attempts into two daily buckets and
+    # making this test fail on the wall clock alone.  Yesterday's mid-day
+    # is used when "today 08:00" has not happened yet.
+    local_now = datetime.now().astimezone()
+    day = local_now if local_now.hour >= 8 else local_now - timedelta(days=1)
+
+    def _at_local(hour):
+        "Naive UTC instant of `day` at `hour` local time."
+        local_dt = day.replace(hour=hour, minute=0, second=0, microsecond=0)
+        return local_dt.astimezone(timezone.utc).replace(tzinfo=None)
+
+    _attempt(spanish, score=80, created=_at_local(8))
+    _attempt(spanish, score=60, created=_at_local(9))
+    _attempt(spanish, score=100, created=_utcnow() - timedelta(days=10))
 
     data = get_shadowing_stats(db.session, period="7days")
 
