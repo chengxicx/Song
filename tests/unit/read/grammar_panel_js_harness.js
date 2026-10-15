@@ -161,6 +161,15 @@ process.stdout.write(
     ),
     formation: firstMatch(/grammar-item__formation">([\s\S]*?)<\/div>/),
     notes: firstMatch(/grammar-item__notes">([\s\S]*?)<\/div>/),
+    // The register chip, the curated long explanation, and the cross-links
+    // into the grammar library -- all optional, so a row may show none.
+    formality: firstMatch(/grammar-item__formality">([\s\S]*?)<\/span>/),
+    detail: firstMatch(/grammar-item__detail">([\s\S]*?)<\/div>/),
+    related: [
+      ...html.matchAll(
+        /grammar-item__related-link" href="([^"]*)">([\s\S]*?)<\/a>/g
+      ),
+    ].map((m) => ({ href: m[1], name: m[2] })),
     more_label: firstMatch(/<summary>([\s\S]*?)<\/summary>/),
     item_count: (html.match(/class="grammar-item /g) || []).length,
     // The term form's Grammar button marks the card it jumped to, and tests

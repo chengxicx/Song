@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ t('Grammar library') }} — {{ language.name }}{% endblock %}
+{% block header %}{{ t('Grammar library') }}{% endblock %}
+
+{% block body %}
+
+<div class="grammar-library" data-language-id="{{ language.id }}">
+
+  <div class="grammar-library__bar">
+    <h2 class="grammar-library__language">{{ language.name }}</h2>
+    <input id="grammar-library-search" type="search" autocomplete="off"
+           placeholder="{{ t('Search grammar points') }}"
+           aria-label="{{ t('Search grammar points') }}">
+  </div>
+
+  {# Level inventory, not progress: the corpus merges several sources and
+     repeats points across levels, so it is not a completion denominator
+     (see lute/grammar/routes.py).  Each entry is also the jump link. #}
+  <div class="grammar-library__levels">
+    {% for level, counts in level_counts.items() %}
+    <a class="grammar-library__level" href="#level-{{ level|replace(' ', '-') }}">
+      <span class="grammar-library__level-name">{{ level }}</span>
+      <span class="grammar-library__stat"><b>{{ counts.matchable }}</b> {{ t('matchable') }}</span>
+      {% if counts.reference %}
+      <span class="grammar-library__stat grammar-library__stat--quiet">{{ t('reference only') }} <b>{{ counts.reference }}</b></span>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+
+  <div id="grammar-library-empty" class="grammar-library__empty" hidden>
+    {{ t('No grammar points match your search.') }}
+  </div>
+
+  {% for level, counts in level_counts.items() %}
+  <section class="grammar-library__section grammar-group grammar-group--{{ level_class(level) }}"
+           id="level-{{ level|replace(' ', '-') }}" aria-labelledby="level-{{ level|replace(' ', '-') }}-head">
+    <h3 class="grammar-library__section-head" id="level-{{ level|replace(' ', '-') }}-head">
+      <span class="grammar-group__level">{{ level }}</span>
+      <span class="grammar-group__count">{{ counts.total }}</span>
+    </h3>
+
+    {% for e in entries if e.level == level %}
+    <article class="grammar-item grammar-item--{{ level_class(e.level) }}{% if e.skipped %} grammar-item--reference{% endif %}"
+             id="{{ e.key }}"
+             data-search="{{ (e.name ~ ' ' ~ e.desc ~ ' ' ~ (e.formation or ''))|lower }}">
+      <div class="grammar-item__head">
+        <span class="grammar-item__level">{{ e.level }}</span>
+        <span class="grammar-item__name">{{ e.name }}</span>
+        {% if e.formality %}
+        <span class="grammar-item__formality">{{ t(e.formality) }}</span>
+        {% endif %}
+        {% if e.skipped %}
+        <span class="grammar-item__reference-tag">{{ t('reference only') }}</span>
+        {% endif %}
+      </div>
+
+      {% if e.formation %}<div class="grammar-item__formation">{{ e.formation }}</div>{% endif %}
+      <div class="grammar-item__desc">{{ e.desc }}</div>
+      {% if e.meaning_detailed %}<div class="grammar-item__detail">{{ e.meaning_detailed }}</div>{% endif %}
+
+      {% if e.examples %}
+      <div class="grammar-item__examples">
+        {% for sentence in e.examples %}
+        <div class="grammar-item__example">{{ sentence }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if e.reference or e.notes %}
+      <details class="grammar-item__more">
+        <summary>{{ t('Reference · notes') }}</summary>
+        {% if e.reference %}
+        <div class="grammar-item__refex">
+          {{ e.reference.japanese }}
+          <div class="grammar-item__reftr">{{ e.reference.text }}</div>
+        </div>
+        {% endif %}
+        {% if e.notes %}<div class="grammar-item__notes">{{ e.notes }}</div>{% endif %}
+      </details>
+      {% endif %}
+
+      {% if e.related %}
+      <div class="grammar-item__related">
+        <span class="grammar-item__related-label">{{ t('Related grammar') }}</span>
+        {% for rel in e.related %}
+        <a class="grammar-item__related-link" href="#{{ rel.key }}">{{ rel.name }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </section>
+  {% endfor %}
+
+  <p class="grammar-library__foot">
+    <a href="/grammar/">{{ t('All languages') }}</a>
+  </p>
+</div>
+
+<script>
+  // Client-side name/meaning/formation filter over the cards above.  Every
+  // card carries its searchable text in data-search, so the filter never
+  // has to read the rendered markup.
+  (function () {
+    var root = document.querySelector(".grammar-library");
+    if (!root) return;
+    var input = root.querySelector("#grammar-library-search");
+    var items = Array.prototype.slice.call(root.querySelectorAll(".grammar-item"));
+    var sections = Array.prototype.slice.call(
+      root.querySelectorAll(".grammar-library__section")
+    );
+    var empty = root.querySelector("#grammar-library-empty");
+    function apply() {
+      var query = input.value.trim().toLowerCase();
+      var shown = 0;
+      items.forEach(function (card) {
+        var text = card.getAttribute("data-search") || "";
+        var match = !query || text.indexOf(query) !== -1;
+        card.hidden = !match;
+        if (match) shown += 1;
+      });
+      sections.forEach(function (section) {
+        section.hidden = section.querySelectorAll(".grammar-item:not([hidden])").length === 0;
+      });
+      if (empty) empty.hidden = shown !== 0;
+    }
+    input.addEventListener("input", apply);
+  })();
+</script>
+
+{% endblock %}
