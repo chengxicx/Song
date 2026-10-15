@@ -113,6 +113,13 @@ const sentenceNode = new FakeEl("span");
 sentenceNode.classes.add("textsentence");
 sentenceNode.textContent = "AAA。BBB。";
 sentenceNode.qaAll[".textitem"] = [cell1, cell2];
+// grammarVisibleText walks the node's text nodes (skipping rt/rp), so the
+// sentence's visible text comes from its text nodes, not textContent --
+// mirror the real DOM where the sentence's text lives in the cells.
+sentenceNode.textNodes = [
+  { data: "AAA。", cell: cell1 },
+  { data: "BBB。", cell: cell2 },
+];
 
 const textRoot = new FakeEl("div");
 textRoot.qaAll[".textsentence"] = [sentenceNode];

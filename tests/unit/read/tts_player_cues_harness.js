@@ -221,7 +221,27 @@ class FakeEl {
   }
   querySelectorAll(sel) {
     // Supports the shapes lute-shadowing.js uses: ".class",
-    // "span.textitem", "span.word[data-lang-id]".
+    // "span.textitem", "span.word[data-lang-id]" -- plus comma-separated
+    // lists ("rt, rp", as shadowingPlainText and ttsPlainText use),
+    // returned deduped in first-seen order.
+    const alts = String(sel)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (alts.length <= 1) return this._querySelectorAllOne(alts[0] || sel);
+    const seen = new Set();
+    const out = [];
+    for (const alt of alts) {
+      for (const el of this._querySelectorAllOne(alt)) {
+        if (!seen.has(el)) {
+          seen.add(el);
+          out.push(el);
+        }
+      }
+    }
+    return out;
+  }
+  _querySelectorAllOne(sel) {
     const m = sel.match(/^(?:([\w-]+))?(?:\.([\w-]+))?(?:\[([\w-]+)(?:="?([^"]*)"?)?\])?$/);
     const tag = m && m[1] ? m[1].toUpperCase() : null;
     const cls = m && m[2] ? m[2] : null;
@@ -410,6 +430,23 @@ function fetch() {
 }
 
 /* ---------- module loading ---------- */
+
+/* tts-player.js resolves ttsPlainText on the window at event time --
+   it is defined inside tts.js, which this harness does not load.
+   Mirror the real one (clone, drop rt/rp, return textContent) so cue
+   text stays reading-free exactly like production.  Each tag is
+   queried separately: the FakeEl selector regex is single-selector. */
+global.ttsPlainText = function (node) {
+  if (!node) return "";
+  if (node.nodeType === 3) return node.textContent || "";
+  const clone = node.cloneNode(true);
+  if (clone.querySelectorAll) {
+    ["rt", "rp"].forEach(function (sel) {
+      clone.querySelectorAll(sel).forEach(function (el) { el.remove(); });
+    });
+  }
+  return clone.textContent || "";
+};
 
 let lastExports = null;
 function __EXPORT__(obj) {

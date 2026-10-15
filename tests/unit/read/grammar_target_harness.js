@@ -94,7 +94,25 @@ global.document = {
   createElement: (t) => new El(t),
   addEventListener: () => {},
   body: new El("body"),
+  // grammarVisibleText collects a node's visible text through a
+  // TreeWalker that skips rt/rp.  The stub elements have no children,
+  // so one pseudo text node carrying the element's own textContent is
+  // exactly the visible text of everything in this harness.
+  createTreeWalker: (root) => {
+    const textNode = { data: root.textContent || "", parentNode: root };
+    let done = false;
+    return {
+      nextNode() {
+        if (done) return null;
+        done = true;
+        return textNode;
+      },
+    };
+  },
 };
+// Constants the walker's acceptNode filter reads (FILTER_REJECT on rt/rp
+// ancestors; the stub never produces those, so accepting is faithful).
+global.NodeFilter = { SHOW_TEXT: 4, FILTER_ACCEPT: 1, FILTER_REJECT: 2, FILTER_SKIP: 3 };
 global.window = { addEventListener: () => {}, removeEventListener: () => {} };
 
 eval(fs.readFileSync(modPath, "utf8")); // eslint-disable-line no-eval
