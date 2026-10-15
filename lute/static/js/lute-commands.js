@@ -186,6 +186,34 @@ function grammarCleanText(t) {
     .normalize("NFC");
 }
 
+// textContent minus <rt>/<rp>: furigana wraps a word's display text in
+// <ruby>base<rt>reading</rt></ruby>, and plain textContent flattens the
+// reading into the sentence ("動く" became "動くうごく").  The ring pipeline
+// must index the text the reader actually sees -- the base characters -- so
+// every collector below (page snippet, run cells, per-node text, the
+// cellCharRects walker) reads through this instead of raw textContent.
+// Otherwise offsets stay self-consistent (both sides equally polluted) but
+// land inside rt nodes, whose client rects render up in the ruby row: the
+// amber ring ends up circling the reading instead of the word.
+function grammarVisibleText(el) {
+  var out = "";
+  var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+    acceptNode: function (n) {
+      var p = n.parentNode;
+      while (p && p !== el) {
+        if (p.nodeType === 1 && (p.tagName === "RT" || p.tagName === "RP")) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        p = p.parentNode;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  var n;
+  while ((n = walker.nextNode())) out += n.data;
+  return out;
+}
+
 // All .textitem cells of a node run, with their cleaned text and offsets
 // inside the run's concatenated text.
 function grammarRunCells(nodes) {
@@ -194,10 +222,10 @@ function grammarRunCells(nodes) {
     var items = n.querySelectorAll(".textitem");
     if (items.length) {
       items.forEach(function (it) {
-        cells.push({ el: it, t: grammarCleanText(it.textContent) });
+        cells.push({ el: it, t: grammarCleanText(grammarVisibleText(it)) });
       });
     } else {
-      cells.push({ el: n, t: grammarCleanText(n.textContent) });
+      cells.push({ el: n, t: grammarCleanText(grammarVisibleText(n)) });
     }
   });
   return cells;
@@ -281,7 +309,7 @@ function open_grammar_analysis(opts) {
     // collapsing the whole page into one pseudo-sentence.
     snippet = Array.from(theText.querySelectorAll(":scope > p"))
       .filter(function (p) { return p.style.display !== "none" && p.textContent; })
-      .map(function (p) { return p.textContent; })
+      .map(function (p) { return grammarVisibleText(p); })
       .join("\n");
   }
   const url = `/read/grammar_analysis/${bookid}/${pagenum}` +
@@ -755,7 +783,21 @@ function open_grammar_analysis(opts) {
         function cellCharRects(el, a, b) {
           var pieces = [];
           var total = 0;
-          var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+          // Same filter as grammarVisibleText: skip rt/rp so the pieces here
+          // index exactly the text grammarRunCells collected for this cell.
+          var filter = {
+            acceptNode: function (n) {
+              var p = n.parentNode;
+              while (p && p !== el) {
+                if (p.nodeType === 1 && (p.tagName === "RT" || p.tagName === "RP")) {
+                  return NodeFilter.FILTER_REJECT;
+                }
+                p = p.parentNode;
+              }
+              return NodeFilter.FILTER_ACCEPT;
+            }
+          };
+          var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, filter);
           var n;
           while ((n = walker.nextNode())) {
             var t = grammarCleanText(n.data);
@@ -845,7 +887,7 @@ function open_grammar_analysis(opts) {
           phraseNodes = textRoot.querySelectorAll(".textrow, p");
         }
         var sentences = Array.prototype.slice.call(phraseNodes).map(function (el) {
-          return { el: el, t: stripText(el.textContent) };
+          return { el: el, t: stripText(grammarVisibleText(el)) };
         });
 
         // Ring the example sentence only (blue outline) and draw one amber
