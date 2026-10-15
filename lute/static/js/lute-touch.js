@@ -551,7 +551,10 @@ let _get_textitems_text = function(textitemspans) {
   };
   const paras = _partition_by_paragraph_id(textitemspans);
   const paratexts = Object.entries(paras).map(([pid, spans]) => {
-    let ptext = spans.map(s => $(s).text()).join('');
+    // grammarVisibleText (lute-commands.js) drops <rt>/<rp>: a furigana'd
+    // span's .text() flattens the reading into the sentence ("体が" became
+    // "体からだが"), polluting sentence translation, copy, and Anki export.
+    let ptext = spans.map(s => grammarVisibleText(s)).join('');
     return ptext.replace(/\u200B/g, '');
   });
   return paratexts.join('\n').trim();
