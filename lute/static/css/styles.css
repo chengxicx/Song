@@ -4896,6 +4896,14 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 }
 
 .grammar-analysis-panel__badge {
+    /* A pill never splits its own text.  The header is a single flex row and
+       the control and the library link both take a fixed slice of it, so the
+       badge is squeezed to 75px on a half-width pane (1280x720) -- without
+       this it breaks "2 points" across two lines inside the rounded border,
+       which reads as a rendering bug.  It is the title that gives way
+       instead. */
+    flex: none;
+    white-space: nowrap;
     font-size: 0.85em;
     font-weight: 700;
     color: var(--g-accent);
@@ -4934,6 +4942,46 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 }
 .grammar-analysis-panel__library:hover {
     background: var(--g-accent-soft);
+}
+
+/* Header control (left of the library link) switching the panel between the
+   current sentence's grammar and every grammar point on the screen. */
+.grammar-analysis-panel__page {
+    flex: none;
+    font: inherit;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--g-accent);
+    background: transparent;
+    border: 1px solid var(--g-accent-line);
+    border-radius: 999px;
+    padding: 1px 9px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.grammar-analysis-panel__page:hover {
+    background: var(--g-accent-soft);
+}
+.grammar-analysis-panel__page--active {
+    background: var(--g-accent-soft);
+    border-color: var(--g-accent);
+}
+
+/* Narrowing the panel to one sentence hides the cards (and their level
+   groups) that sentence does not use, without dropping them from the DOM --
+   the header's page control just un-hides them again. */
+.grammar-item--filtered-out,
+.grammar-group--filtered-out {
+    display: none;
+}
+
+/* Shown instead of the cards when the narrowed sentence carries no known
+   grammar point. */
+.grammar-analysis-panel__filter-empty {
+    padding: 26px 12px;
+    text-align: center;
+    color: color-mix(in srgb, var(--font-color, #000) 55%, transparent);
+    font-size: 0.98em;
 }
 
 .grammar-analysis-panel__body {
