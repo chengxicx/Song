@@ -90,6 +90,20 @@ def test_overview_reports_reading_progress(app_context, english):
     assert _progress() == 100
 
 
+def test_overview_natural_title_order(app_context, english):
+    """
+    Titles sort naturally: "Ep 2" before "Ep 10" (lexicographic SQL
+    ordering would put "Ep 10" first), so after reading episode 1 the
+    continue target is episode 2, not episode 10.
+    """
+    b1 = _mk_tagged_book("Ep 1", ["Erin"], english, read=True)
+    b2 = _mk_tagged_book("Ep 2", ["Erin"], english)
+    b10 = _mk_tagged_book("Ep 10", ["Erin"], english)
+    vm = get_series_overview(db.session, "Erin")
+    assert [b["BkTitle"] for b in vm["books"]] == ["Ep 1", "Ep 2", "Ep 10"]
+    assert vm["continue_id"] == b2.id, "continue points at Ep 2, not Ep 10"
+
+
 def test_overview_returns_none_for_unknown_tag(app_context, _erin_books):
     assert get_series_overview(db.session, "no-such-tag") is None
 
