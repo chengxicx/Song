@@ -389,8 +389,16 @@ function open_grammar_analysis(opts) {
     const library = langid
       ? '<a class="grammar-analysis-panel__library" href="/grammar/' + encodeURIComponent(langid) + '">' + I18N.t('Grammar library') + '</a>'
       : "";
+    // The page control sits at the top-left of the header: it switches
+    // between the grammar of the one sentence the panel was opened from and
+    // every point this screen contains.
+    const page =
+      '<button type="button" class="grammar-analysis-panel__page">' +
+      I18N.t('Current page grammar') +
+      '</button>';
     return (
       '<div class="grammar-analysis-panel__header">' +
+      page +
       '<span class="grammar-analysis-panel__title">' + I18N.t('Grammar Analysis') + '</span>' +
       '<span id="grammar-count" class="grammar-analysis-panel__badge">…</span>' +
       library +
@@ -423,7 +431,81 @@ function open_grammar_analysis(opts) {
     panel[0].style.fontSize = window.convertPixelsToRem(clamp(gfs, 8, 60)) + "rem";
   }
 
-  panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+  // The panel's narrow/widen switch over the already-rendered cards.  The
+  // term form's Grammar button narrows the panel to the grammar of the one
+  // sentence the reader was in; the header's page control widens it back to
+  // every point the current screen contains.  Both act on the rendered DOM,
+  // so switching is instant and never re-runs the backend analysis.
+  //   sentenceFilter      the sentence the panel is narrowed to (null = all)
+  //   filterableSentence  remembered after widening, so the control toggles
+  //                       back without a fresh analysis
+  //   renderedCards       element <-> data pairing for each rendered card
+  var sentenceFilter = null;
+  var filterableSentence = null;
+  var renderedCards = [];
+
+  function refreshPanelVisibility() {
+    var root = panel[0];
+    if (!root || typeof root.querySelectorAll !== "function") return;
+    Array.prototype.forEach.call(
+      root.querySelectorAll(".grammar-group"),
+      function (grp) {
+        var any = grp.querySelector(
+          ".grammar-item:not(.grammar-item--filtered-out)"
+        );
+        grp.classList.toggle("grammar-group--filtered-out", !any);
+      }
+    );
+    var visible = root.querySelectorAll(
+      ".grammar-item:not(.grammar-item--filtered-out)"
+    ).length;
+    panel.find("#grammar-count").text(
+      visible + (visible === 1 ? I18N.t(' point') : I18N.t(' points'))
+    );
+    var empty = root.querySelector(".grammar-analysis-panel__filter-empty");
+    if (empty) empty.hidden = !(sentenceFilter && visible === 0);
+  }
+
+  function filterToSentence(sentence) {
+    sentenceFilter = sentence;
+    renderedCards.forEach(function (card) {
+      var keep = !!(
+        card.rec &&
+        card.rec.examples.some(function (ex) {
+          return ex.nodes.indexOf(sentence) !== -1;
+        })
+      );
+      card.el.classList.toggle("grammar-item--filtered-out", !keep);
+    });
+    refreshPanelVisibility();
+  }
+
+  function showPageGrammar() {
+    sentenceFilter = null;
+    renderedCards.forEach(function (card) {
+      card.el.classList.remove("grammar-item--filtered-out");
+    });
+    refreshPanelVisibility();
+  }
+
+  function syncPageControl() {
+    var root = panel[0];
+    if (!root || typeof root.querySelector !== "function") return;
+    var btn = root.querySelector(".grammar-analysis-panel__page");
+    if (btn) btn.classList.toggle("grammar-analysis-panel__page--active", !sentenceFilter);
+  }
+
+  function bindPanelControls() {
+    panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+    panel.find(".grammar-analysis-panel__page").on("click", function () {
+      if (sentenceFilter) showPageGrammar();
+      else if (filterableSentence) filterToSentence(filterableSentence);
+      syncPageControl();
+    });
+    syncPageControl();
+  }
+
+  bindPanelControls();
 
   // The panel can be closed while this request is in flight -- clicking a
   // word does it, and the term form re-posts LuteTermFormOpened when it
@@ -656,13 +738,18 @@ function open_grammar_analysis(opts) {
             );
           })
           .join("");
-        bodyHtml = '<div class="grammar-analysis-panel__body">' + items + "</div>";
+        bodyHtml =
+          '<div class="grammar-analysis-panel__body">' +
+          items +
+          '<div class="grammar-analysis-panel__filter-empty" hidden>' +
+          I18N.t('No known grammar points for this sentence.') +
+          "</div></div>";
       }
       panel.html(header() + bodyHtml);
       panel.find("#grammar-count").text(
         data.length + (data.length === 1 ? I18N.t(' point') : I18N.t(' points'))
       );
-      panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+      bindPanelControls();
 
       // Cross-highlight: hovering a grammar entry on the right draws a blue
       // ring around the whole example sentence and an amber glow around the
@@ -1046,10 +1133,16 @@ function open_grammar_analysis(opts) {
         // One record per rendered card, in DOM order, so the auto-select
         // below can ask "which card matches the sentence I came from?".
         var boundItems = [];
+        // Registered under its element so the header's page control can map a
+        // card back to its data (rec stays null when a card has no analysable
+        // entry, which the narrow switch treats as never matching).
+        var cards = [];
         Array.prototype.forEach.call(
           panel[0].querySelectorAll(".grammar-item"),
           function (item, itemIdx) {
             var g = dataItems[itemIdx];
+            var card = { el: item, rec: null };
+            cards.push(card);
             // Fold toggle for the aggregated rows (see itemHtml): the click
             // does not need the row's data, so it is bound even if the data
             // pairing below ever fails.
@@ -1063,6 +1156,7 @@ function open_grammar_analysis(opts) {
             }
             if (!g) return;
             var rec = { itemEl: item, examples: [] };
+            card.rec = rec;
             boundItems.push(rec);
             var exampleEls = item.querySelectorAll(".grammar-item__example");
 
@@ -1118,16 +1212,20 @@ function open_grammar_analysis(opts) {
             }
           }
         );
+        renderedCards = cards;
 
-        // The term form's Grammar button: jump straight to the card for the
-        // sentence the reader was in, and pin its rings so the highlight
-        // stays put.  Nothing to do when the sentence carries no known
-        // grammar -- the panel then reads exactly as it did before.
+        // The term form's Grammar button narrows the panel to the grammar of
+        // the sentence the reader was in, and jumps to -- and pins -- its
+        // card.  The header's page control lifts that narrowing again, so the
+        // sentence is remembered even when it carries no known grammar (the
+        // panel then shows the "nothing for this sentence" state).
         if (targetWordEl && targetWordEl.isConnected) {
           var targetSentence = grammarTargetSentence(targetWordEl);
           var picked = targetSentence
             ? grammarPickTarget(boundItems, targetSentence, targetWordEl)
             : null;
+          filterableSentence = targetSentence;
+          if (targetSentence) filterToSentence(targetSentence);
           if (picked) {
             // A collapsed aggregate row hides its examples (display:none),
             // and getClientRects() on hidden cells is empty, so the rings
@@ -1136,13 +1234,14 @@ function open_grammar_analysis(opts) {
             setPinned(picked.runs, picked.itemEl);
             picked.itemEl.scrollIntoView({ block: "nearest" });
           }
+          syncPageControl();
         }
       }
     })
     .fail(function () {
       if (panelIsGone()) return;
       panel.html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">' + I18N.t('Analysis failed. Please try again.') + '</div></div>');
-      panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+      bindPanelControls();
     });
 }
 

@@ -118,8 +118,11 @@ def test_the_auto_selection_is_pinned_and_scrolled_to(commands):
     rings are pinned, and a collapsed aggregate row is opened first (its
     hidden examples have no client rects, so the rings would be invisible).
     """
-    # The per-card loop records what the selection needs...
-    binding = _after(commands, "var boundItems = [];", 900)
+    # The per-card loop records what the selection needs.  The window has to
+    # clear the loop's own bookkeeping above the push -- the header control's
+    # card registry (and its comment) sits between the marker and the push,
+    # which is what a 900-char window stopped reaching.
+    binding = _after(commands, "var boundItems = [];", 1600)
     assert "boundItems.push(rec)" in binding
     assert "rec.examples.push({ runs: runs, nodes: nodes })" in commands
 
@@ -130,6 +133,78 @@ def test_the_auto_selection_is_pinned_and_scrolled_to(commands):
     assert 'classList.remove("grammar-item--collapsed")' in body
     assert "setPinned(picked.runs, picked.itemEl)" in body
     assert "scrollIntoView" in body
+
+
+def test_the_page_control_narrows_the_panel_to_one_sentence(commands):
+    """
+    The panel opens narrowed to the sentence the term form came from, and the
+    header's page control widens it back to every point on the screen.  Both
+    act on the cards already in the DOM -- switching is instant and must not
+    re-run the backend analysis -- so losing the narrowing leaves a control
+    that silently does nothing.
+    """
+    # The card registry the control filters has to be filled from the same
+    # loop that binds the cards, after every card is in it.
+    assert "renderedCards = cards;" in commands
+    assert "card.rec = rec;" in commands
+
+    body = _after(commands, "function filterToSentence(sentence) {", 700)
+    # Membership is decided on the resolved sentence element, exactly as the
+    # jump's own pick does, so a phrase split across nodes still counts.
+    assert "ex.nodes.indexOf(sentence) !== -1" in body
+    assert 'card.el.classList.toggle("grammar-item--filtered-out", !keep);' in body
+
+    # A toggle: widen when narrowed, narrow again once widened.
+    click = _after(commands, "if (sentenceFilter) showPageGrammar();", 200)
+    assert "else if (filterableSentence) filterToSentence(filterableSentence);" in click
+
+    # ...and the narrowing is actually applied on open, from the same
+    # sentence the jump resolved.  The sentence is remembered even when it
+    # carries no known grammar, so the control can still toggle back.
+    opened = _after(commands, "if (targetWordEl && targetWordEl.isConnected) {", 800)
+    assert "filterableSentence = targetSentence;" in opened
+    assert "if (targetSentence) filterToSentence(targetSentence);" in opened
+
+    # No request anywhere in the switch: it is pure DOM work.
+    switch = commands[
+        commands.index("function refreshPanelVisibility() {") : commands.index(
+            "bindPanelControls();"
+        )
+    ]
+    assert "getJSON" not in switch
+    # ...and the count badge follows the narrowing rather than the payload.
+    assert 'panel.find("#grammar-count").text(' in switch
+
+
+def test_the_page_control_is_wired_in_every_panel_state(commands):
+    """
+    The header is re-rendered three times -- the initial "Analyzing…" one, the
+    rendered panel, and the failure state -- and the control is re-bound with
+    it each time.  Binding it in only some of them leaves a dead button that
+    errors nowhere, which is the same silent shape as the close button's own
+    three call sites.
+    """
+    header_body = _after(commands, "function header() {", 900)
+    assert "grammar-analysis-panel__page" in header_body
+    assert "I18N.t('Current page grammar')" in header_body
+
+    assert commands.count("bindPanelControls();") == 3
+    bind_body = _after(commands, "function bindPanelControls() {", 400)
+    assert 'panel.find(".grammar-analysis-panel__page").on("click"' in bind_body
+    assert 'panel.find(".grammar-analysis-panel__close").on(' in bind_body
+
+
+def test_an_empty_narrowing_explains_itself(commands):
+    """
+    A sentence can carry no known grammar point, and a narrowed panel then has
+    nothing to show.  An empty body reads as a broken panel, so the empty
+    state is rendered up front and un-hidden only for that case -- and the
+    level groups that lost every card go with it, so no bare header is left
+    standing over nothing.
+    """
+    assert 'classList.toggle("grammar-group--filtered-out", !any)' in commands
+    assert "empty.hidden = !(sentenceFilter && visible === 0)" in commands
+    assert "I18N.t('No known grammar points for this sentence.')" in commands
 
 
 def test_hover_out_restores_the_pin_instead_of_clearing_it(commands):
