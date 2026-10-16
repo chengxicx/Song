@@ -27,10 +27,22 @@ class ParsedToken:
         ParsedToken.cls_sentence_number = 0
         ParsedToken.cls_order = 0
 
-    def __init__(self, token: str, is_word: bool, is_end_of_sentence: bool = False):
+    def __init__(
+        self, token: str, is_word: bool, is_end_of_sentence: bool = False, pos=None
+    ):
         self.token = token
         self.is_word = is_word
         self.is_end_of_sentence = is_end_of_sentence
+
+        # The parser's part-of-speech tuple for this token, or None when
+        # the parser has no POS to offer (MeCab exposes only a numeric
+        # id).  It is carried on the token so that a term created from
+        # an already-parsed page can be tagged later without re-parsing
+        # the word on its own -- which would give a different answer,
+        # because POS is context sensitive (出そう is 五段-サ行 /
+        # 意志推量形 in 「声を出そうとしましたが」 but 下一段-ダ行 /
+        # 連用形-一般 on its own).
+        self.pos = pos
 
         ParsedToken.cls_order += 1
         self.order = ParsedToken.cls_order
@@ -140,6 +152,19 @@ class AbstractParser(ABC):
         """
         Get the dictionary/lemma form of the given text.
         For most languages, this returns the text as-is.
+        """
+        return None
+
+    def get_pos_tag(self, pos):  # pylint: disable=unused-argument
+        """
+        The term tag to derive from a parsed token's POS, or None.
+
+        None means "this parser has no opinion", and the term simply
+        never gets an automatic tag: most languages have no POS here,
+        and MeCab exposes only a numeric id.  Parsers that can answer
+        also decide what is worth tagging -- see
+        JapaneseSudachiParser.get_pos_tag, which skips particles,
+        auxiliaries and affixes.
         """
         return None
 

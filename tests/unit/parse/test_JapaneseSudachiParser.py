@@ -329,3 +329,75 @@ def test_parsed_tokens_carry_text_and_flags(app_context):
     assert [t.token for t in toks] == ["元気", "です", "。", "¶"]
     # 。 is in the language's sentence-splitting set, ¶ always ends one.
     assert [t.is_end_of_sentence for t in toks] == [False, False, True, True]
+
+
+# ---- POS on tokens (used to auto-tag terms) ----
+
+_SENTENCE = "「あなたは何者ですか」とわたしは声を出そうとしましたが、音になりません。"
+
+
+def test_parsed_tokens_carry_pos(app_context):
+    "POS rides along on the token so a term can be tagged later."
+    p = _make_parser()
+    toks = p.get_parsed_tokens(_SENTENCE, _japanese_language())
+    by_text = {t.token: t for t in toks}
+
+    assert by_text["出そう"].pos == (
+        "動詞",
+        "非自立可能",
+        "*",
+        "*",
+        "五段-サ行",
+        "意志推量形",
+    )
+    assert by_text["は"].pos[0] == "助詞"
+    # The paragraph sentinel is not a parsed morpheme.
+    assert by_text["¶"].pos is None
+
+
+def test_get_pos_tag_reads_the_context_not_the_isolated_surface(app_context):
+    """
+    Why POS is stored on the term rather than recomputed at save time:
+    the bare string 出そう is not the same word as the 出そう in
+    「声を出そうとしましたが」, and Sudachi answers differently for each.
+    """
+    p = _make_parser()
+    lang = _japanese_language()
+
+    in_sentence = next(
+        t for t in p.get_parsed_tokens(_SENTENCE, lang) if t.token == "出そう"
+    )
+    assert p.get_pos_tag(in_sentence.pos) == "動詞/非自立可能/五段-サ行/意志推量形"
+
+    # On its own, Sudachi splits 出 + そう and calls 出 a 下一段-ダ行 verb.
+    isolated = p.get_parsed_tokens("出そう", lang)
+    assert [t.token for t in isolated] == ["出", "そう", "¶"]
+    assert p.get_pos_tag(isolated[0].pos) == "動詞/一般/下一段-ダ行/連用形-一般"
+
+
+def test_get_pos_tag_skips_particles_auxiliaries_and_affixes(app_context):
+    """
+    Roughly half of all tokens in running text are 助詞 or 助動詞
+    (JLPT corpus: 32.0% and 15.0%), and the reading page creates a term
+    for every clickable one of them -- so tagging them would bury the
+    tags a learner curates.
+    """
+    p = _make_parser()
+    toks = p.get_parsed_tokens(_SENTENCE, _japanese_language())
+    bound = ("助詞", "助動詞", "接尾辞", "接頭辞")
+    skipped = [t for t in toks if t.pos and t.pos[0] in bound]
+    assert skipped, "expected the sentence to contain particles"
+
+    for t in skipped:
+        assert p.get_pos_tag(t.pos) is None, t.token
+
+    for t in toks:
+        if t.pos and t.pos[0] not in bound + ("補助記号", "記号"):
+            assert p.get_pos_tag(t.pos) is not None, t.token
+
+
+def test_get_pos_tag_is_none_without_a_pos(app_context):
+    "Parsers that hand over nothing get no tag rather than a crash."
+    p = _make_parser()
+    assert p.get_pos_tag(None) is None
+    assert p.get_pos_tag(()) is None
