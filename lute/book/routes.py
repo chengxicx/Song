@@ -617,12 +617,16 @@ def _import_mp3_audio():
     except BookImportException as e:
         return _import_form_failure(e.message)
     except Exception as e:  # pylint: disable=broad-except
-        return _import_form_failure(t("Could not parse subtitle") + f" (error: {str(e)})")
+        return _import_form_failure(
+            t("Could not parse subtitle") + f" (error: {str(e)})"
+        )
 
     if not (text and text.strip()):
         return _import_form_failure(
-            t("Please provide subtitles (upload a file or an online URL), or tick "
-            "Auto-transcribe to generate them from the audio.")
+            t(
+                "Please provide subtitles (upload a file or an online URL), or tick "
+                "Auto-transcribe to generate them from the audio."
+            )
         )
 
     title = title[:200]
@@ -713,8 +717,12 @@ def _import_netease_music():
         )
     except BookImportException as e:
         flash(
-            e.message + "  " + t("The song's audio could not be stored -- try "
-            "downloading it manually and importing it as an MP3 book."),
+            e.message
+            + "  "
+            + t(
+                "The song's audio could not be stored -- try "
+                "downloading it manually and importing it as an MP3 book."
+            ),
             "notice",
         )
         return redirect("/book/import_webpage", 302)
@@ -769,12 +777,16 @@ def _import_online_video():
     except BookImportException as e:
         return _import_form_failure(e.message)
     except Exception as e:  # pylint: disable=broad-except
-        return _import_form_failure(t("Could not parse subtitle") + f" (error: {str(e)})")
+        return _import_form_failure(
+            t("Could not parse subtitle") + f" (error: {str(e)})"
+        )
 
     if not (text and text.strip()):
         return _import_form_failure(
-            t("Please provide subtitles (upload a file or an online URL), or tick "
-            "Auto-transcribe to generate them from the video.")
+            t(
+                "Please provide subtitles (upload a file or an online URL), or tick "
+                "Auto-transcribe to generate them from the video."
+            )
         )
 
     # --- Media: uploaded video file OR online video URL. ---
@@ -840,11 +852,15 @@ def _import_mokuro_manga():
     title = (request.form.get("manga_title") or "").strip()
 
     if manga_file is None or manga_file.filename == "":
-        return _import_form_failure(t("Please upload a Mokuro manga archive (.zip or .cbz)."))
+        return _import_form_failure(
+            t("Please upload a Mokuro manga archive (.zip or .cbz).")
+        )
 
     fname = (manga_file.filename or "").lower()
     if not fname.endswith((".zip", ".cbz")):
-        return _import_form_failure(t("Please upload a valid Mokuro manga archive (.zip or .cbz)."))
+        return _import_form_failure(
+            t("Please upload a valid Mokuro manga archive (.zip or .cbz).")
+        )
 
     if not title:
         base = manga_file.filename or "Mokuro manga"

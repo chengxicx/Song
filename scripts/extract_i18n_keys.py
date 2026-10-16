@@ -80,9 +80,13 @@ def main():
             for k in missing:
                 d[k] = ""
             save_dict(lang, d)
-        print(f"{lang}: {len(keys)} keys used, {len(missing)} missing, {len(stale)} unused in dict")
+        print(
+            f"{lang}: {len(keys)} keys used, {len(missing)} missing, {len(stale)} unused in dict"
+        )
         if stale:
-            print(f"  {lang} unused keys: {stale[:20]}{'...' if len(stale) > 20 else ''}")
+            print(
+                f"  {lang} unused keys: {stale[:20]}{'...' if len(stale) > 20 else ''}"
+            )
     if not write:
         print(f"\ntotal distinct keys: {len(keys)}")
 

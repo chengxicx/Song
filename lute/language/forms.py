@@ -210,7 +210,9 @@ class LanguageForm(FlaskForm):
         # A Local row's URL is a file name in the server's dictionary
         # pool, not a web URL: it round-trips into filesystem paths, so
         # it is held to the pool's own name rules.
-        from lute.dict.service import is_pool_name  # pylint: disable=import-outside-toplevel
+        from lute.dict.service import (
+            is_pool_name,
+        )  # pylint: disable=import-outside-toplevel
 
         for d in self.dictionaries.data:
             if d.get("dicttype", "") == "localdict" and not is_pool_name(

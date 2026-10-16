@@ -16,7 +16,9 @@ def _local_dict_tab_entry(lang, d):
     Flask app (static folder), and importing it at module load time
     would make lute.models depend on lute.dict at import time.
     """
-    from lute.dict import service as dict_service  # pylint: disable=import-outside-toplevel
+    from lute.dict import (
+        service as dict_service,
+    )  # pylint: disable=import-outside-toplevel
 
     filename = d.dicturi
     if not dict_service.is_pool_name(filename) or not dict_service.is_installed(

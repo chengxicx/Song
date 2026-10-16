@@ -39,10 +39,7 @@ _SHADOWING_JS = os.path.join(_STATIC_JS, "lute-shadowing.js")
 
 # 故乡, 鲁迅 -- the sentence that motivated this: 68 characters, read
 # straight through it is ~12 s with nowhere to stop.
-LONG_CJK = (
-    "时候既然是深冬；渐近故乡时，天气又阴晦了，冷风吹进船舱中，呜呜的响，"
-    "从蓬隙向外一望，苍黄的天底下，远近横著几个萧索的荒村，没有一些活气。"
-)
+LONG_CJK = "时候既然是深冬；渐近故乡时，天气又阴晦了，冷风吹进船舱中，呜呜的响，" "从蓬隙向外一望，苍黄的天底下，远近横著几个萧索的荒村，没有一些活气。"
 SHORT_CJK = "我的心禁不住悲凉起来了。"
 
 EXPECTED_CLAUSES = [
@@ -81,9 +78,7 @@ def _two_sentence_scenario(steps):
 
 def test_a_long_cjk_sentence_becomes_clause_cues():
     "The long sentence is cut at its punctuation; the short one stays whole."
-    results = _run(
-        _two_sentence_scenario([{"build": True}, {"state": True}])
-    )
+    results = _run(_two_sentence_scenario([{"build": True}, {"state": True}]))
     cues = results[-1]["state"]["cues"]
     assert [c["text"] for c in cues] == EXPECTED_CLAUSES + [SHORT_CJK]
     # Every clause of the long sentence but the last is followed by a
@@ -108,9 +103,7 @@ def test_a_long_cjk_sentence_becomes_clause_cues():
 def test_playback_holds_a_rest_between_clauses_not_between_sentences():
     "The rest is audible inside the sentence, and absent across sentences."
     results = _run(
-        _two_sentence_scenario(
-            [{"play": True}, {"flush_all": True}, {"state": True}]
-        )
+        _two_sentence_scenario([{"play": True}, {"flush_all": True}, {"state": True}])
     )
     state = results[-1]["state"]
     assert [s["text"] for s in state["spoken"]] == EXPECTED_CLAUSES + [SHORT_CJK]
@@ -122,9 +115,7 @@ def test_playback_holds_a_rest_between_clauses_not_between_sentences():
 def test_cue_events_fire_per_clause_with_the_clause_spans():
     "Shadowing's hooks see one event per clause, spans handed over."
     results = _run(
-        _two_sentence_scenario(
-            [{"play": True}, {"flush_all": True}, {"state": True}]
-        )
+        _two_sentence_scenario([{"play": True}, {"flush_all": True}, {"state": True}])
     )
     events = results[-1]["state"]["events"]
     changed = [e for e in events if e["type"] == "lute:cue-changed"]
@@ -210,7 +201,12 @@ def test_a_latin_sentence_splits_at_punctuation_with_a_longer_minimum():
                     )
                 }
             ],
-            "steps": [{"build": True}, {"play": True}, {"flush_all": True}, {"state": True}],
+            "steps": [
+                {"build": True},
+                {"play": True},
+                {"flush_all": True},
+                {"state": True},
+            ],
         }
     )
     state = results[-1]["state"]

@@ -164,9 +164,7 @@ def hotkey_descriptions():
     Get hotkeys and descriptions.  Used by routes.
     """
     y = yaml.safe_load(_ALL_HOTKEY_DATA)
-    return {
-        key["hotkey"]: t(key["desc"]) for group in y.values() for key in group
-    }
+    return {key["hotkey"]: t(key["desc"]) for group in y.values() for key in group}
 
 
 if __name__ == "__main__":
