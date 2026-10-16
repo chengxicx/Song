@@ -1144,6 +1144,118 @@ def test_import_page_video_form_offers_auto_transcribe(app, client, english):
     assert body.count('<option value="sensevoice"') == 2
 
 
+def test_apply_reference_text_replaces_the_words_and_keeps_the_timing():
+    """
+    The recognizer's names are wrong ('チョさん'), the pasted text is
+    right ('張さん'): the book must say 張さん and still carry the cue
+    times the recognizer measured.
+    """
+    cues = json.dumps(
+        [
+            {"start": 91.0, "end": 96.0, "text": "李さんやチョさんのおかげで"},
+            {"start": 96.0, "end": 101.0, "text": "新郎新父にあんなにお酒を飲ませるとは"},
+        ],
+        ensure_ascii=False,
+    )
+    text, cues_json = whisper_transcribe.apply_reference_text(
+        cues, "李さんや張さんのおかげで\n新郎新婦にあんなにお酒を飲ませるとは"
+    )
+
+    assert "張さん" in text and "新郎新婦" in text
+    assert "チョさん" not in text and "新郎新父" not in text
+    parsed = json.loads(cues_json)
+    assert parsed[0]["start"] == 91.0
+    assert parsed[-1]["end"] == 101.0
+
+
+def test_apply_reference_text_rejects_text_that_is_not_this_recording():
+    "Guessing here would write a book whose subtitles jump around."
+    cues = json.dumps(
+        [{"start": 0.0, "end": 3.0, "text": "全然違う内容がここにあります"}],
+        ensure_ascii=False,
+    )
+    with pytest.raises(RuntimeError, match="does not match"):
+        whisper_transcribe.apply_reference_text(cues, "まったく別の文章です")
+
+
+def test_prepare_uses_the_reference_text_for_the_book(
+    app, app_context, client, english
+):
+    "The import page's reference-text box drives the alignment."
+
+    def _fake_cues(audio_path, lang_code, progress_cb=None):
+        return (
+            "李さんやチョさんのおかげで",
+            json.dumps(
+                [{"start": 0.0, "end": 4.0, "text": "李さんやチョさんのおかげで"}],
+                ensure_ascii=False,
+            ),
+        )
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(sensevoice, "installed", return_value=True), patch.object(
+        sensevoice, "ensure_model_downloaded"
+    ), patch.object(
+        sensevoice, "transcribe_to_cues", side_effect=_fake_cues
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "whisper_model": "sensevoice",
+                "mp3_file": (io.BytesIO(b"fake audio bytes"), "ref.mp3"),
+                "mp3_source_text": "李さんや張さんのおかげで",
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    book = db.session.get(DBBook, status["book_id"])
+    book_text = "".join(t.text for t in book.texts)
+    assert "張さん" in book_text
+    assert "チョさん" not in book_text
+
+
+def test_prepare_reports_a_reference_text_that_does_not_match(
+    app, app_context, client, english
+):
+    "A mismatched transcript must fail loudly, not produce a wrong book."
+
+    def _fake_cues(audio_path, lang_code, progress_cb=None):
+        return (
+            "全然違う内容",
+            json.dumps(
+                [{"start": 0.0, "end": 3.0, "text": "全然違う内容"}],
+                ensure_ascii=False,
+            ),
+        )
+
+    with patch.object(
+        whisper_transcribe, "whisper_status", return_value={"installed": True}
+    ), patch.object(sensevoice, "installed", return_value=True), patch.object(
+        sensevoice, "ensure_model_downloaded"
+    ), patch.object(
+        sensevoice, "transcribe_to_cues", side_effect=_fake_cues
+    ):
+        resp = client.post(
+            "/book/whisper/prepare",
+            data={
+                "language_id": str(english.id),
+                "whisper_model": "sensevoice",
+                "mp3_file": (io.BytesIO(b"fake audio bytes"), "ref.mp3"),
+                "mp3_source_text": "まったく別の文章です",
+            },
+            content_type="multipart/form-data",
+        )
+        status = _wait_for_terminal(resp.get_json()["task_id"])
+
+    assert status["state"] == "error"
+    assert "does not match" in (status["error"] or "")
+
+
 def test_import_page_inline_js_parses(app, client, tmp_path):
     """
     Every inline script on the import page must parse.

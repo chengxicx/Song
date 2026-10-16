@@ -113,6 +113,11 @@
     </select>
     <button type="button" id="retranscribe_btn" class="btn btn-secondary">{{ t('Re-transcribe') }}</button>
   </div>
+  <div class="retranscribe-row" style="margin-top: 8px; align-items: flex-start;">
+    <label for="retranscribe_source_text">{{ t('Reference text (optional)') }}</label>
+    <textarea id="retranscribe_source_text" rows="3" class="form-control" style="flex: 1 1 320px;"></textarea>
+  </div>
+  <div class="formfieldcomment">{{ t("Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty to re-transcribe plainly.") }}</div>
   <div id="retranscribe_progress" style="display: none;">
     <div class="retranscribe-track"><div id="retranscribe_bar"></div></div>
     <div id="retranscribe_status"></div>
@@ -137,6 +142,7 @@
     const panel = document.getElementById('retranscribe_progress');
     const bar = document.getElementById('retranscribe_bar');
     const status = document.getElementById('retranscribe_status');
+    const sourceText = document.getElementById('retranscribe_source_text');
     let startedAt = null;
 
     const fmt = function (secs) {
@@ -205,7 +211,10 @@
       fetch('/book/whisper/retranscribe/{{ book.id }}', {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        body: new URLSearchParams({ whisper_model: modelSel.value })
+        body: new URLSearchParams({
+          whisper_model: modelSel.value,
+          source_text: sourceText ? sourceText.value : ''
+        })
       })
         .then(r => r.json().then(d => ({ ok: r.ok, d })))
         .then(({ ok, d }) => {
