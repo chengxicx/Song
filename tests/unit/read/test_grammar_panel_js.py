@@ -205,8 +205,8 @@ def test_curated_detail_renders_when_present_and_is_omitted_otherwise():
 
 def test_related_links_render_as_library_deep_links():
     """
-    Each cross-link opens the grammar library on the other point's card, so
-    the href must be /grammar/<langid>#<key> and the label the point's name.
+    Each cross-link opens the other point's own library page, so the href
+    must be /grammar/<langid>/<key> and the label the point's name.
     """
     out = _render(
         [
@@ -218,7 +218,7 @@ def test_related_links_render_as_library_deep_links():
         ]
     )
     assert out["related"] == [
-        {"href": "/grammar/1#ds_particle-kara-from", "name": "〜から"}
+        {"href": "/grammar/1/ds_particle-kara-from", "name": "〜から"}
     ]
 
 

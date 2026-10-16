@@ -4830,7 +4830,8 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
    panel and on the library page's own wrapper (see lute/grammar), which
    reuses the same card markup outside the reading pane. */
 .grammar-analysis-panel,
-.grammar-library {
+.grammar-library,
+.grammar-detail {
     --g-card: color-mix(in srgb, var(--font-color, #000) 4%, transparent);
     --g-card-border: color-mix(in srgb, var(--font-color, #000) 10%, transparent);
     --g-text-2: color-mix(in srgb, var(--font-color, #000) 64%, transparent);
@@ -5224,12 +5225,14 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 }
 
 /* ==============================================================
-   Grammar library page (lute/grammar): the reading panel's cards
-   rendered as a standalone, level-grouped, searchable list.  It
-   reuses .grammar-item / .grammar-group as-is; only the page chrome
-   and the "reference only" variant are declared here.
+   Grammar library pages (lute/grammar): a compact, one-level-at-a-time
+   index of the whole corpus, each row linking to the point's own full
+   card.  The corpus is ~1400 points, so rendering every card on the
+   index would be unscannable; the card markup is reused on the detail
+   page instead.  Only the page chrome is declared here.
    ============================================================== */
-.grammar-library {
+.grammar-library,
+.grammar-detail {
     max-width: 820px;
     margin: 0 auto;
     padding: 0 16px 48px;
@@ -5269,12 +5272,13 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     border-color: var(--g-accent-line);
 }
 
-/* Level inventory (not progress) plus the jump links into each section. */
+/* Level pills: the level switch, and the inventory readout (not
+   progress -- see lute/grammar/routes.py). */
 .grammar-library__levels {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 18px;
+    margin-bottom: 12px;
 }
 
 .grammar-library__level {
@@ -5292,6 +5296,11 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 .grammar-library__level:hover {
     border-color: var(--g-accent-line);
     background: color-mix(in srgb, var(--g-accent-soft) 40%, var(--g-card));
+}
+.grammar-library__level.is-active {
+    border-color: var(--g-accent-line);
+    background: color-mix(in srgb, var(--g-accent-soft) 45%, var(--g-card));
+    box-shadow: inset 0 0 0 1px var(--g-accent-line);
 }
 
 .grammar-library__level-name {
@@ -5312,25 +5321,85 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     opacity: 0.72;
 }
 
-.grammar-library__section {
-    margin-bottom: 22px;
+/* What the current level holds: inventory, not a progress denominator. */
+.grammar-library__inventory {
+    margin: 0 0 10px;
+    font-size: 0.9em;
+    color: var(--g-text-2);
+}
+.grammar-library__inventory b {
+    color: var(--font-color, #000);
 }
 
-/* The panel's scroll-margin (42px) clears its own sticky level header;
-   the library has no sticky header, so deep links land closer to the top. */
-.grammar-library .grammar-item {
-    scroll-margin-top: 12px;
+/* The index rows: one line each, so a whole level scans at a glance. */
+.grammar-library__rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--g-rule);
 }
 
-/* Static level header: the jump pills up top already go to each level,
-   so unlike the panel's group head nothing here needs to stick. */
-.grammar-library__section-head {
+.grammar-row {
+    border-bottom: 1px solid var(--g-rule);
+}
+.grammar-row[hidden] {
+    display: none;
+}
+
+.grammar-row__link {
     display: flex;
     align-items: baseline;
-    gap: 8px;
-    margin: 0 0 10px;
-    padding: 6px 0 4px;
-    border-bottom: 1px solid var(--g-rule);
+    gap: 10px;
+    padding: 8px 6px;
+    color: inherit;
+    text-decoration: none;
+}
+.grammar-row__link:hover {
+    background: color-mix(in srgb, var(--g-accent-soft) 35%, transparent);
+}
+
+.grammar-row__index {
+    flex: none;
+    min-width: 2.2em;
+    text-align: right;
+    font-size: 0.78em;
+    color: var(--g-text-2);
+    font-variant-numeric: tabular-nums;
+}
+
+.grammar-row__name {
+    flex: none;
+    font-weight: 700;
+    color: var(--g-accent);
+    white-space: nowrap;
+}
+
+/* One line only: long meanings truncate rather than wrap, so the list
+   stays scannable. */
+.grammar-row__desc {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.92em;
+    color: var(--g-text-2);
+}
+
+.grammar-row__formality,
+.grammar-row__tag {
+    flex: none;
+    font-size: 0.72em;
+    color: var(--g-text-2);
+    border: 1px solid var(--g-card-border);
+    border-radius: 6px;
+    padding: 0 5px;
+    white-space: nowrap;
+}
+
+/* Reference-only rows keep their colour demoted but stay in the list. */
+.grammar-row--reference .grammar-row__name {
+    color: var(--g-text-2);
 }
 
 .grammar-library__empty {
@@ -5342,6 +5411,39 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 .grammar-library__foot {
     margin-top: 28px;
     font-size: 0.9em;
+}
+
+/* Detail page: the top bar, the position readout and the prev/next walk. */
+.grammar-detail__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.grammar-detail__back {
+    font-size: 0.92em;
+}
+
+.grammar-detail__position {
+    font-size: 0.85em;
+    color: var(--g-text-2);
+    font-variant-numeric: tabular-nums;
+}
+
+.grammar-detail__nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 20px;
+}
+.grammar-detail__nav a {
+    max-width: 48%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Language picker (/grammar/) and the no-library notice. */
@@ -5392,19 +5494,12 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     white-space: nowrap;
 }
 
-/* The card a #fragment deep link (from the panel's "Related grammar", or
-   a related link on another card) points at: highlight so the landing is
-   obvious. */
-.grammar-library .grammar-item:target {
+/* The card a #fragment points at (a stale deep link, or the point the
+   reader landed on): highlight so the landing is obvious. */
+.grammar-item:target {
     border-color: var(--g-accent-line);
     background-color: color-mix(in srgb, var(--g-accent-soft) 40%, var(--g-card));
     box-shadow: 0 0 0 2px var(--g-accent-line);
-}
-
-/* The section wrapper is display:flex (.grammar-group), which would beat
-   the browser's [hidden] default, so the search filter must hide it here. */
-.grammar-library__section[hidden] {
-    display: none;
 }
 
 /* ==============================================================

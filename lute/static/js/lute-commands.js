@@ -565,7 +565,7 @@ function open_grammar_analysis(opts) {
                     return (
                       '<a class="grammar-item__related-link" href="/grammar/' +
                       encodeURIComponent(langidForRelated) +
-                      "#" +
+                      "/" +
                       encodeURIComponent(r.key || "") +
                       '">' +
                       escapeHtml(r.name) +
