@@ -1304,4 +1304,3 @@ def library_entries(display_lang="en"):
         key=lambda pair: (_LIBRARY_LEVEL_RANK.get(pair[1]["level"], 9), pair[0]),
     )
     return [entry for _, entry in ordered]
-

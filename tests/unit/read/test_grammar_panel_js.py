@@ -212,7 +212,12 @@ def test_related_links_render_as_library_deep_links():
         [
             _entry(
                 related=[
-                    {"id": "kara-from", "key": "ds_particle-kara-from", "name": "〜から", "level": "N5"}
+                    {
+                        "id": "kara-from",
+                        "key": "ds_particle-kara-from",
+                        "name": "〜から",
+                        "level": "N5",
+                    }
                 ]
             )
         ]
@@ -225,4 +230,3 @@ def test_related_links_render_as_library_deep_links():
 def test_no_related_renders_no_block():
     "A row with no cross-links leaves the related block out entirely."
     assert _render([_entry()])["related"] == []
-

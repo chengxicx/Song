@@ -48,8 +48,9 @@ def main():
 
         def center(sel):
             return page.eval_on_selector(
-                sel, "e => { const r = e.getBoundingClientRect();"
-                " return {x: r.x + r.width/2, y: r.y + r.height/2}; }"
+                sel,
+                "e => { const r = e.getBoundingClientRect();"
+                " return {x: r.x + r.width/2, y: r.y + r.height/2}; }",
             )
 
         # --- 1. click a split piece -> edit form for the whole word ---
@@ -70,9 +71,7 @@ def main():
         )
         check(
             "the clicked piece is marked data-split-piece",
-            page.eval_on_selector(
-                "#ID-1-0", "e => e.hasAttribute('data-split-piece')"
-            ),
+            page.eval_on_selector("#ID-1-0", "e => e.hasAttribute('data-split-piece')"),
         )
 
         # --- 2. click a normal word is unchanged ---

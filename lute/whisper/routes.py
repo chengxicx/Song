@@ -67,15 +67,15 @@ def _engine_error(model_size, language):
         from lute.book import sensevoice
 
         if not sensevoice.installed():
-            return (
-                t("SenseVoice isn't installed on this server yet "
-                "-- set it up under Settings -> Whisper (auto-subtitles).")
+            return t(
+                "SenseVoice isn't installed on this server yet "
+                "-- set it up under Settings -> Whisper (auto-subtitles)."
             )
         if sensevoice.lang_code_for(language) is None:
-            return (
-                t("SenseVoice transcribes Chinese, Cantonese, "
+            return t(
+                "SenseVoice transcribes Chinese, Cantonese, "
                 "English, Japanese and Korean only -- pick a whisper "
-                "model for this language.")
+                "model for this language."
             )
     elif not whisper_transcribe.whisper_status()["installed"]:
         return t("faster-whisper is not installed yet.")
@@ -136,8 +136,10 @@ def whisper_prepare():
         return (
             jsonify(
                 {
-                    "error": t("A transcription or model download is already "
-                    "running -- please wait for it to finish.")
+                    "error": t(
+                        "A transcription or model download is already "
+                        "running -- please wait for it to finish."
+                    )
                 }
             ),
             409,
@@ -254,8 +256,10 @@ def whisper_retranscribe(bookid):
         return (
             jsonify(
                 {
-                    "error": t("A transcription or model download is already "
-                    "running -- please wait for it to finish.")
+                    "error": t(
+                        "A transcription or model download is already "
+                        "running -- please wait for it to finish."
+                    )
                 }
             ),
             409,
@@ -341,8 +345,10 @@ def whisper_download_model():
         return (
             jsonify(
                 {
-                    "error": t("A transcription or model download is already "
-                    "running -- please wait for it to finish.")
+                    "error": t(
+                        "A transcription or model download is already "
+                        "running -- please wait for it to finish."
+                    )
                 }
             ),
             409,
@@ -407,8 +413,10 @@ def whisper_delete_model():
         return (
             jsonify(
                 {
-                    "error": t("A transcription or model download is already "
-                    "running -- please wait for it to finish.")
+                    "error": t(
+                        "A transcription or model download is already "
+                        "running -- please wait for it to finish."
+                    )
                 }
             ),
             409,

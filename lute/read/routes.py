@@ -91,6 +91,7 @@ def _furigana_script(lang):
     """
     return "thai" if is_thai_language(lang) else "han"
 
+
 # Module-level cache for subtitle word HTML, keyed by (book id, srt_data).
 # The tokenization of all cues (parser parse + term lookup + Jinja
 # render per word) is expensive (10-20s for long videos).  The result
@@ -1314,8 +1315,10 @@ def shadowing_transcribe():
         return (
             jsonify(
                 {
-                    "error": t("No transcription engine available "
-                    "(install SenseVoice or whisper in Settings).")
+                    "error": t(
+                        "No transcription engine available "
+                        "(install SenseVoice or whisper in Settings)."
+                    )
                 }
             ),
             400,
@@ -1658,11 +1661,13 @@ def edit_page(bookid, pagenum):
         db.session.commit()
         if status == "mismatch":
             flash(
-                t("Saved, but the subtitles were not updated: this page no "
-                "longer has the same number of lines as the subtitle cues "
-                "it covers (a line was added, removed, merged or split), or "
-                "its text has drifted from the subtitles.  Keep one line "
-                "per subtitle line, or re-import the subtitle file."),
+                t(
+                    "Saved, but the subtitles were not updated: this page no "
+                    "longer has the same number of lines as the subtitle cues "
+                    "it covers (a line was added, removed, merged or split), or "
+                    "its text has drifted from the subtitles.  Keep one line "
+                    "per subtitle line, or re-import the subtitle file."
+                ),
                 "notice",
             )
         return redirect(f"/read/{book.id}", 302)

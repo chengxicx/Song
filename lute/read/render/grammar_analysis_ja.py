@@ -2539,7 +2539,7 @@ def library_entries(display_lang="en"):
     rules = _N5_RULES + _CONSTRUCTION_RULES + _get_data_rules()
     entries = [_library_entry(rule, display_lang) for rule in rules]
     ordered = sorted(
-        enumerate(entries), key=lambda pair: (_LEVEL_RANK.get(pair[1]["level"], 9), pair[0])
+        enumerate(entries),
+        key=lambda pair: (_LEVEL_RANK.get(pair[1]["level"], 9), pair[0]),
     )
     return [entry for _, entry in ordered]
-

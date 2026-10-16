@@ -129,8 +129,11 @@ def main():
         page.evaluate("window.__fetch_calls = 0; window.lute_furigana_annotate();")
         page.wait_for_timeout(200)
         calls = page.evaluate("window.__fetch_calls")
-        check("re-annotate over done content fires nothing", calls == 0,
-              " fetch_calls=%r" % (calls,))
+        check(
+            "re-annotate over done content fires nothing",
+            calls == 0,
+            " fetch_calls=%r" % (calls,),
+        )
 
         # --- 7. a failed request releases its claim and retries ---
         page.evaluate(
@@ -149,8 +152,11 @@ def main():
         )
         page.wait_for_timeout(300)
         st = word_state(page, "夜")
-        check("failed request leaves the word unannotated",
-              st["ruby_count"] == 0 and not st["marked"], " state=%r" % (st,))
+        check(
+            "failed request leaves the word unannotated",
+            st["ruby_count"] == 0 and not st["marked"],
+            " state=%r" % (st,),
+        )
         page.evaluate("window.__fetch_fail = false; window.lute_furigana_annotate();")
         page.wait_for_timeout(300)
         st = word_state(page, "夜")
