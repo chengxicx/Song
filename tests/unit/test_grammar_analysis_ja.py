@@ -448,6 +448,34 @@ def test_experience_point_reports_affirmative_and_negative_on_one_row():
     assert "一度も会ったことがない。" in sentences
 
 
+def test_experience_point_covers_the_spoken_ga_ellipsis():
+    """
+    見たことありますか / 見たことない is how 〜たことがある is actually spoken:
+    the が is dropped, and the derived spec required it outright, so those
+    pages had no row at all.  The retired hand-written たこと regex did cover
+    them -- along with every nominalization (転校したことです, 忘れたことに,
+    言ったことは), which is why it stays retired.  The anchors spec reads the
+    gap as the optional が (or も / は) and the tail as ある / ない, so the
+    ellipsis comes back and the nominalizations do not: their tail is
+    です / に / は / と / しか, never ある / ない.
+    """
+    for sentence in (
+        "上田：さっきの映画、見たことありますか。",
+        "そんな設定見たことないから、たぶん私の話に合わせて即興で考えてくれたんだ。",
+        "見たこともないはずなのに、懐かしいこの光景。",
+        "日本に行ったことはある。",
+    ):
+        assert "ds_ta-koto-ga-aru" in _keys(sentence), sentence
+    for sentence in (
+        "小学校三年生のころ、とても仲のいい友達がいました。転校したことです。",
+        "カバンを忘れたことに気づきました。",
+        "悔しいが母の言ったことは真実だった。",
+        "これは私にとって大事なことである。",
+        "お金に関することだけじゃない。",
+    ):
+        assert "ds_ta-koto-ga-aru" not in _keys(sentence), sentence
+
+
 def test_is_japanese_language_detection():
     "Language detection routes Japanese books to the Sudachi engine."
 

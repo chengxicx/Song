@@ -2328,6 +2328,36 @@ _SLOT_SPECS = {
         "あまりに・のあまり",
         [{"type": "regex", "re": re.compile("あまりに")}],
     ),
+    # --- たことがある: the spoken が-ellipsis -------------------------------
+    #
+    # 動詞 + た + こと + が + ある is the experience construction, and the
+    # derivation required the が outright -- so the way it is actually
+    # spoken, 見たことありますか / 見たことない, never fired.  The retired
+    # hand-written たこと regex did cover those, and covered every
+    # nominalization with them (転校したことです, 忘れたことに, 言ったことは),
+    # which is why it is gone; restoring the bare literal would bring all of
+    # that back.  Anchors instead: 動詞+た+こと, then at most one token, then
+    # ある/ない -- the gap is the が (or も / は) when it is spelled, and a
+    # nominalization never ends in ある/ない.  not_next で keeps out
+    # 〜たことである, the written judgement, which is not the experience
+    # reading; everything the entry's own examples carry (ことがあります,
+    # ことがありません) sits in the gap the spec allows.
+    "ta-koto-ga-aru": (
+        "ことがある",
+        [
+            {
+                "type": "anchors",
+                "before": [
+                    {"pos1": "動詞"},
+                    {"surface_in": ("た", "だ")},
+                    {"lemma": {"こと"}},
+                ],
+                "after": [{"lemma": {"ある", "ない", "ぬ"}}],
+                "maxgap": 1,
+                "not_next": {"surface_in": ("で",)},
+            },
+        ],
+    ),
 }
 
 # The て-form connective: Sudachi reports both the て of 知っ+て and the で of
