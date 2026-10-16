@@ -4969,9 +4969,16 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 
 /* Narrowing the panel to one sentence hides the cards (and their level
    groups) that sentence does not use, without dropping them from the DOM --
-   the header's page control just un-hides them again. */
-.grammar-item--filtered-out,
-.grammar-group--filtered-out {
+   the header's page control just un-hides them again.
+
+   Both selectors carry the panel scope on purpose.  Written bare,
+   `.grammar-group--filtered-out { display: none }` is a single-class selector
+   and so is the `.grammar-group { display: flex }` further down this file --
+   equal specificity, later declaration wins, and the level headers stayed
+   painted over the empty state while their cards vanished.  The extra class
+   makes the hiding win on specificity rather than on file order. */
+.grammar-analysis-panel .grammar-item--filtered-out,
+.grammar-analysis-panel .grammar-group--filtered-out {
     display: none;
 }
 
