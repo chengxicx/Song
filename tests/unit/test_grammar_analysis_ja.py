@@ -97,7 +97,7 @@ def test_particles_still_detected_when_alone():
         ("te_iru", "窓を開けました。"),  # past, no progressive ている
         ("te_kudasai", "窓を開けました。"),  # no ください
         ("tai", "これはたいへんです。"),  # たいへん, not desire 〜たい
-        ("ta_koto_ga_arimasu", "日本に行きました。"),  # no こと
+        ("ds_ta-koto-ga-aru", "日本に行きました。"),  # no こと
         ("mashou", "一緒に行きます。"),  # plain ます, not ましょう
         ("masen_ka", "一緒に行きましょう。"),  # ましょう, not ませんか
         ("te_wa_ikemasen", "写真を撮ってもいいです。"),  # permission, not prohibition
@@ -133,6 +133,255 @@ def test_the_guarded_literals_still_match_where_they_are_real():
     assert "ds_mono-dakara" in _keys("最近忙しいもので、連絡が遅くなりました。")
     assert "ds_node-cause" in _keys("雨が降っているので、中止します。")
     assert "ds_mono-dakara" in _keys("急いでいたものだから、挨拶もせずに帰ってしまった。")
+
+
+def test_mono_da_needs_a_predicate_in_front():
+    """
+    〜ものだ (advice / general truth) takes a predicate; the nominal readings
+    (名 + の / という / ような / その + ものだ) each have a row of their own,
+    and the bare ものだ literal claimed them all -- 試金石のようなものだ was
+    reported as 〜ものだ ("should"), 〜そのものだ / 〜というものだ as well.
+    What sits in front of もの separates them, so the spec says so.
+    """
+    for sentence in (
+        "これはいわば試金石のようなものだ。",
+        "彼は親切そのものだ。",
+        "困っている人を助けるのが友情というものだ。",
+        "彼に言えるのは「ごめん」ぐらいのものだ。",
+        "彼の成功は努力ゆえのものだ。",
+        "お金があれば幸せになれるというものではない。",
+        "まあまあの出来だが、自慢するほどのものではない。",
+        "私のものです。",
+        "こんなものだと思っていた。",
+    ):
+        assert "ds_monodamonodehanai" not in _keys(sentence), sentence
+    for sentence in (
+        "子供は元気なものだ。",
+        "時間が経つのは早いものだ。",
+        "昔はよくここで遊んだものだ。",
+        "中国の歴史を抜きにしては考えられないものだ。",
+        "つらくて大変な仕事だったろうに、よくできたものだ。",
+        "結婚式は呼ばれないと行かないが、葬式は呼ばれなくても行くものだ。",
+    ):
+        assert "ds_monodamonodehanai" in _keys(sentence), sentence
+
+
+def test_nasai_and_nasaru_split_on_the_masu_tail():
+    """
+    なさい is both the imperative of なさる ("食べなさい") and the 連用形
+    inside なさいます (なさい + ます, spelled the same), so each row's literal
+    claimed both readings and every なさい sentence carried two cards.  The
+    ます tail is the whole difference; なさって keeps the honorific row,
+    whose なさっ surface never spells なさい.
+    """
+    for sentence in ("早く起きなさい。", "宿題をしなさい。", "字を丁寧に書きなさい。"):
+        hits = _keys(sentence)
+        assert "ds_nasai-command" in hits, sentence
+        assert "ds_nasaru-honorific" not in hits, sentence
+    for sentence in ("社長は毎朝運動をなさいます。", "お客様は何をなさいますか。"):
+        hits = _keys(sentence)
+        assert "ds_nasaru-honorific" in hits, sentence
+        assert "ds_nasai-command" not in hits, sentence
+    assert "ds_nasaru-honorific" in _keys("社長はまだ帰国なさっていない。")
+
+
+def test_te_iru_and_de_iru_split_on_the_copula():
+    """
+    読んでいる is the verb's て-form + いる (〜ている); 元気でいる is the
+    copula's て-form + いる (〜でいる).  The で looks the same, its part of
+    speech does not -- 助詞,接続助詞 vs 助動詞 -- and both rows claimed both
+    shapes (22 sentences had two cards).  おる covers the humble でおり.
+    """
+    for sentence in ("本を読んでいる。", "給料のほとんどをつぎ込んでいる。"):
+        hits = _keys(sentence)
+        assert "te_iru" in hits, sentence
+        assert "ds_deiru" not in hits, sentence
+    for sentence in ("元気でいる。", "こう「オタク」でいるのはよくないよ。"):
+        hits = _keys(sentence)
+        assert "ds_deiru" in hits, sentence
+        assert "te_iru" not in hits, sentence
+    assert "ds_deiru" in _keys("おかげさまで、ずっと元気でおり、何の不自由もありません。")
+
+
+def test_gotoku_and_yokatta_fold_into_their_full_rows():
+    """
+    ごとく is the 連体形 of ごとし, and ばよかった is one formation of the
+    〜ばよかった・とよかった row: each surviving row's spec already claims
+    every sentence the narrower row claimed, so the narrower row is silent.
+    """
+    gotoku = _keys("汗が滝のごとく流れてきた。")
+    assert "ds_gotoshi" in gotoku and "ds_gotoku-as-if" not in gotoku
+    yokatta = _keys("もっと勉強すればよかった。")
+    assert "ds_bayokatatarayokatatoyokata" in yokatta
+    assert "ds_ba-yokatta" not in yokatta
+
+
+def test_arou_tomo_needs_the_volitional():
+    """
+    〜あろうとも ("no matter what") is volitional + とも; the row's bare とも
+    literal claimed the 接尾辞 reading as well (男女とも, 2日とも), which is
+    the 〜とも row's point.
+    """
+    for sentence in ("何があろうとも、諦めない。", "どうあろうとも、私は自分の道を歩む。"):
+        assert "ds_aro-u-tomo" in _keys(sentence), sentence
+    for sentence in ("試合で男女とも決勝に進出した。", "2日とも必ず学校に来てください。"):
+        hits = _keys(sentence)
+        assert "ds_tomo" in hits, sentence
+        assert "ds_aro-u-tomo" not in hits, sentence
+
+
+def test_shika_and_shikanai_split_on_the_verb():
+    """
+    名 + しか + negative is 〜しか ("only"); 動詞 + しかない is 〜しかない
+    ("no choice but to").  Both rows' literals claimed both shapes -- 歩く
+    しかない showed 〜しか and 〜しかない, 100円しかない too.
+    """
+    for sentence in ("お金が100円しかない。", "日本語しか話せません。", "一部分でしかない。"):
+        hits = _keys(sentence)
+        assert "ds_shika-nai" in hits, sentence
+        assert "ds_shikanai" not in hits, sentence
+    for sentence in ("歩くしかない。", "やるしかない。"):
+        hits = _keys(sentence)
+        assert "ds_shikanai" in hits, sentence
+        assert "ds_shika-nai" not in hits, sentence
+    assert "ds_shika-nai" not in _keys("しかし、誰もいません。")
+
+
+def test_deshouka_gets_its_own_row():
+    """
+    〜だろうか・でしょうか teaches both forms, but bare でしょうか is a point of
+    its own (the polite ですか / ますか) with a row that glosses it as such;
+    each row claimed both, so one sentence carried two cards.
+    """
+    for sentence in ("ご両親はお元気でしょうか。", "はい、何でしょうか。"):
+        hits = _keys(sentence)
+        assert "ds_deshiyouka" in hits, sentence
+        assert "ds_daroukadeshiyouka" not in hits, sentence
+    for sentence in ("ぼくで大丈夫だろうか。", "この問題、どうにか解決できないものだろうか。"):
+        assert "ds_daroukadeshiyouka" in _keys(sentence), sentence
+
+
+def test_naru_needs_the_attributive_form():
+    """
+    〜なる ("健全なる精神") is the classical 連体形 of the copula, and only
+    the 連体形 spells なる.  Its [助動詞 + lemma なり] spec also matched the
+    conditional なら and the なら of ならでは / のみならず, so every なら
+    reported the なる row too.
+    """
+    assert "ds_naru" in _keys("健全なる精神は健全なる身体に宿る。")
+    for sentence in ("この味は日本ならではだ。", "この問題は日本のみならず、世界中で議論されている。"):
+        hits = _keys(sentence)
+        assert "ds_naru" not in hits, sentence
+        assert "ds_nara-conditional" in hits, sentence
+
+
+def test_shidai_splits_on_the_token_in_front():
+    """
+    名 + 次第で / 次第だ is 视…而定 ("気分次第だ"); 動詞 + 次第だ / 次第です
+    is the formal 原委 ("差し上げた次第です").  Three rows shared 次第 and the
+    same sentence carried two or three cards; the token in front of 次第
+    tells the readings apart.  shidai-de (次第で・次第では) folds into
+    dehaniyoteda, which claims the same sentences.
+    """
+    for sentence in ("天気次第で、予定を変更する。", "結果次第では、再検討も必要だ。", "気分次第だ。"):
+        hits = _keys(sentence)
+        assert "ds_dehaniyoteda" in hits, sentence
+        assert "ds_mat-8c61a1" not in hits, sentence
+        assert "ds_shidai-de" not in hits, sentence
+    for sentence in ("差し上げた次第です。", "申し上げる次第でございます。"):
+        hits = _keys(sentence)
+        assert "ds_mat-8c61a1" in hits, sentence
+        assert "ds_dehaniyoteda" not in hits, sentence
+
+
+def test_nishitemo_goes_to_the_plain_row():
+    """
+    にしても is claimed by three entries, each of which also teaches a
+    distinctive sibling (にしたら / にしたって).  The shared form goes to the
+    N3 即使 row; each N2 row keeps only its own sibling.
+    """
+    for sentence in ("失敗するにしても、挑戦するべきだ。", "どちらにしても、結果は同じだ。"):
+        hits = _keys(sentence)
+        assert "ds_ni-shitemo-even" in hits, sentence
+        assert "ds_nishitaranisurebanishitemo" not in hits, sentence
+        assert "ds_nishitatenishitemo" not in hits, sentence
+    assert "ds_nishitaranisurebanishitemo" in _keys("私にしたら、そう思いませんよ。")
+    assert "ds_nishitatenishitemo" in _keys("だれにしたって怒るだろう。")
+
+
+def test_same_construction_book_twins_are_silent():
+    """
+    Each silenced row's spec is a subset of the row that stays: にたえる
+    takes the same に + たえる spec as its twin, 向けの / 向きだ are spellings
+    of the fuller 向け / 向き rows.
+    """
+    for key in ("ds_nitaerutaenai", "ds_kedakenikeno", "ds_kidakinikino"):
+        assert key not in _keys("彼のスピーチは聞くにたえないものだった。"), key
+    assert "ds_nitaerunitaenai" in _keys("彼のスピーチは聞くにたえないものだった。")
+    muke = _keys("子供向けの本を買いました。")
+    assert "ds_muke-targeted-for" in muke and "ds_kedakenikeno" not in muke
+    muki = _keys("夏向きの服地。")
+    assert "ds_muki-suitable-for" in muki and "ds_kidakinikino" not in muki
+
+
+def test_naratomokaku_stays_with_the_hand_written_row():
+    """
+    Hand-written nara_tomo_kaku reports ならともかく; the N2 data row claims
+    both はともかく and ならともかく, so the same sentence carried two cards.
+    The data row keeps はともかく, which its own examples spell.
+    """
+    hits = _keys("値段ならともかく、味は正直期待できない。")
+    assert "nara_tomo_kaku" in hits
+    assert "ds_hatomokakutoshitenaratomokakutoshite" not in hits
+    other = _keys("この店の料理は、味はともかく量は多い。")
+    assert "ds_hatomokakutoshitenaratomokakutoshite" in other
+
+
+def test_no_amari_keeps_the_n2_row():
+    """
+    のあまり ("驚きのあまり") is the N2 〜あまり row's own reading; the N3
+    row's のあまり literal reported the same sentences again.  The N3 row
+    keeps あまりに (あまりに寒い), which the N2 row does not claim.
+    """
+    hits = _keys("驚きのあまり、言葉を失った。")
+    assert "ds_amari-too-much" in hits
+    assert "ds_amarininoamarini" not in hits
+    assert "ds_amarininoamarini" in _keys("あまりに寒い。")
+
+
+def test_shidai_row_keeps_only_the_as_soon_as_reading():
+    """
+    The two 〜次第 rows (same display name, folded into one) carried a bare
+    anchored 次第 regex, which claimed every 次第 in the language -- the
+    视…而定 sentences (結果次第で / 気分次第だ), the formal 原委 (差し上げた
+    次第です) and the adverb 次第に.  What is left is V ます-stem + 次第 at a
+    clause break, so the tail is the discriminator.
+    """
+    for sentence in ("着き次第、電話します。", "部長が到着次第、会議を始めましょう。"):
+        assert "ds_shidai-depending" in _keys(sentence), sentence
+    for sentence in ("結果次第で、計画を変える。", "気分次第だ。", "差し上げた次第です。"):
+        hits = _keys(sentence)
+        assert "ds_shidai-depending" not in hits, sentence
+        assert "ds_mat-2cf646" not in hits, sentence
+    assert "ds_dehaniyoteda" in _keys("結果次第で、計画を変える。")
+    assert "ds_mat-8c61a1" in _keys("差し上げた次第です。")
+    # 次第に ("gradually") is an adverb, not this construction.
+    assert "ds_shidai-depending" not in _keys("次第に雨が強くなった。")
+
+
+def test_amarinai_keeps_off_the_degree_reading():
+    """
+    〜あまり〜ない is the "not very" reading (あまり + a predicate + negative);
+    あまり**に** is the other degree reading -- あまりに寒くて外に出られない
+    ("so cold that ...", its own row) -- and the gapped spec bridged straight
+    across it.  The guard looks at the token right after the あまり anchor.
+    """
+    for sentence in ("この料理はあまりおいしくない。", "これはあまりいい物ではありません。", "時間はあまりない。"):
+        assert "ds_amarinai" in _keys(sentence), sentence
+    for sentence in ("あまりに寒くて、外に出られない。", "気にするあまりに、夜眠れなくなってしまった。"):
+        hits = _keys(sentence)
+        assert "ds_amarinai" not in hits, sentence
+        assert "ds_amarininoamarini" in hits, sentence
 
 
 def test_subtitle_line_ending_in_match_does_not_overflow():
@@ -175,11 +424,28 @@ def test_multiline_example_never_spans_the_line_break():
 def test_analysis_return_shape():
     "Return entries have the fields the front-end panel renders."
     results = analyze_japanese("日本に行ったことがあります。")
-    entry = next(e for e in results if e["key"] == "ta_koto_ga_arimasu")
-    assert entry["level"] == "N5"
+    entry = next(e for e in results if e["key"] == "ds_ta-koto-ga-aru")
+    assert entry["level"] == "N4"
     assert entry["name"]
     assert entry["desc"]
     assert entry["examples"][0]["sentence"]
+
+
+def test_experience_point_reports_affirmative_and_negative_on_one_row():
+    """
+    〜たことがあります (the old hand-written N5 row) and 〜ことがある (the N4
+    data entry) are one grammar point: the data row reports both readings,
+    the affirmative via its own fragment and the negative through
+    _FRAGMENT_ALIASES (ことがない).  The loose hand-written row -- a bare
+    たこと regex that also fired on nominalized 言ったこと -- stays retired.
+    """
+    results = analyze_japanese("日本に行ったことがあります。一度も会ったことがない。")
+    keys = [e["key"] for e in results]
+    assert "ds_ta-koto-ga-aru" in keys
+    assert "ta_koto_ga_arimasu" not in keys
+    entry = next(e for e in results if e["key"] == "ds_ta-koto-ga-aru")
+    sentences = [ex["sentence"] for ex in entry["examples"]]
+    assert "一度も会ったことがない。" in sentences
 
 
 def test_is_japanese_language_detection():
@@ -434,6 +700,57 @@ def test_reported_sentence_now_matches_grammar():
         assert ex["sentence"][m["start"] : m["end"]] == "でしょう"
 
 
+def test_nodarou_covers_the_spoken_contraction():
+    """
+    〜んだろう / 〜んででしょう is how 〜のだろう / 〜のでしょう is actually said,
+    and five of the entry's six examples are the contracted form -- the bare
+    のだろう literal never matched any of them.  The ん must be the copula's
+    助詞: the question word なんでしょう keeps its ん inside one なん token,
+    and the ん of 〜てくださいませんでしょうが is the negative 助動詞, so
+    neither is claimed.  The の branch is token-anchored for the mirror
+    reason -- the の inside もの (〜ものだろうか) is part of the noun.
+    """
+    for sentence in (
+        "おれは、なんでこんなにばかなんだろう。",
+        "田中さんは部屋に入ったまま、出てきません。どうしたんでしょう。",
+        "雨なんだろうか。",
+        "昨日のパーティーはどうだったんでしょう。",
+    ):
+        assert "ds_nodarounodeshiyou" in _keys(sentence), sentence
+    for sentence in (
+        "なんでしょう。",
+        "暇だったら山田さんのオートバイを見てやってくださいませんでしょうか。",
+        "この問題、どうにか解決できないものだろうか。",
+    ):
+        assert "ds_nodarounodeshiyou" not in _keys(sentence), sentence
+
+
+def test_you_ka_to_omou_needs_its_volitional():
+    """
+    〜ようかと思う is the volitional question ("I'm wondering whether to"),
+    and it belongs to its own row: the plain 〜と思う row must not claim it.
+    The か question mark sits between the volitional and the と, so the
+    plain row's exclusion needs the three-character ようか / おうか
+    lookbehind -- and the row itself needs the whole 思う surface family,
+    or 買おうか思います (span かと思い) would be owned by nobody.
+    """
+    for sentence in (
+        "留学しようかと思っています。",
+        "会社を辞めようかと思っている。",
+        "新しいパソコンを買おうかと思う。",
+        "今の仕事をやめようかと思っている。",
+    ):
+        assert "ds_toutohawanai" not in _keys(sentence), sentence
+        assert "ds_you-ka-to-omou" in _keys(sentence), sentence
+    # Near neighbours that spell the same かと思う without a volitional.
+    for sentence in (
+        "来たんじゃないかと思うけど。",
+        "リーさんは、日本人かと思うほどぺらぺら日本語を話している。",
+        "晴れたかと思うと、雨が降り出した。",
+    ):
+        assert "ds_you-ka-to-omou" not in _keys(sentence), sentence
+
+
 def test_same_name_rows_are_merged():
     """
     Several rules can carry one surface form (から as "because" and 〜てから as
@@ -679,7 +996,49 @@ def test_duplicate_ids_are_library_entries():
 
     library = load_library()
     assert _DUPLICATE_IDS <= set(library), sorted(_DUPLICATE_IDS - set(library))
-    assert len(_DUPLICATE_IDS) == 118, "changing the list is a review, not a patch"
+    # 123: + koto-nominalizer and teoku-7dcaca (2026-10-16).  koto-nominalizer
+    # was silenced only by the retired hand-written たこと literal containing
+    # こと; a bare-こと row duplicates the ことがある/ことにする family and the
+    # word popup.  teoku-7dcaca is the N4 material ておく row under the
+    # jkindrix te-oku row.
+    # + 限り family (2026-10-16 overlap audit): kagiri-as-long-as (N3
+    # conditional 限り) under rihanairiha, ni-kagiri (N2 に限り notice) under
+    # niru-071752, kagiri-da-emotional (N2 限りだ) under rida -- the five
+    # readings themselves are separated per row in _SLOT_SPECS.
+    # + ところ family (2026-10-16 overlap audit): ta-tokoro-de (N2 material
+    # たところで) under takaorode, tokoro-wo (N1 material ところを) under
+    # tokoroo, to-itta-tokoro-da (N1 material といったところだ) under
+    # toiutokorodatoitatokoro, and tokorodata (N1 ところだった) under
+    # tokorodata-df8a13 (N3) -- the same point listed in two books.  The
+    # ところ readings themselves are separated per row in _SLOT_SPECS.
+    # + てやる/てもらう family (2026-10-16 overlap audit): teyaru (N3 てやる)
+    # and te-ageru-favor-given (N4 material てあげる) under the N4 merged row
+    # teyaruteagerutesashiageru, temorau (N3 てもらう),
+    # te-morau-request-favor (N4 material てもらう) and
+    # te-itadaku-polite-favor-received (N4 material いただく) under
+    # temorauteitadaku.
+    # + もの family (2026-10-16 overlap audit): mono-da-general (N3 material
+    # ものだ) under monodamonodehanai (N2 jkindrix); the もの readings are
+    # separated per row in _SLOT_SPECS.
+    # + nodarounodeshiyou-9ec170 (2026-10-16 overlap audit): the hash twin of
+    # nodarounodeshiyou -- same 〜のだろう / のでしょう point listed twice in
+    # one merge.
+    # + to-omou (N4 material と思う) under toutohawanai, mat-e459cf (N3 向け)
+    # under muke-targeted-for, mat-d26c40 (N3 向き) under muki-suitable-for.
+    # + containing-form pairs (2026-10-16 overlap audit, second pass): oni,
+    # okomete, nishite-8d1c26, oniganinate, wo-yogi-naku-sareru,
+    # wa-tomokaku, made-mo-nai, nitsukinitsukimashite,
+    # ni-kakawarazu-regardless, kaimonaku, mat-510d37,
+    # toshitaratosurutotosureba and ka-no-you-ni -- each silenced row's spec
+    # is a strict subset of the row that stays (を機にして contains を機に,
+    # つきまして contains つき ...), so the survivor already claims every
+    # sentence the silenced one did.
+    # + same-surface different-reading pairs (2026-10-16 overlap audit,
+    # second pass): gotoku-as-if (ごとく is the 連体形 of ごとし) and
+    # ba-yokatta (one formation of 〜ばよかった・とよかった).
+    # + same-construction book twins (2026-10-16 overlap audit, third pass):
+    # shidai-de, nitaerutaenai, kedakenikeno, kidakinikino.
+    assert len(_DUPLICATE_IDS) == 156, "changing the list is a review, not a patch"
     assert not (_DUPLICATE_IDS & _VOCAB_IDS), "an id lives in exactly one list"
 
 
@@ -803,6 +1162,37 @@ def test_te_kudasai_covers_the_de_form():
     assert "ds_te-kudasai-request" not in _keys("読んでください。")
 
 
+def test_te_kudasai_leaves_the_honorific_alone():
+    """
+    V-て + くださいました / くださいます is the honorific "kindly did for me"
+    (くださる row), not the request 〜てください.  The token after the bare
+    ください is what tells them apart, so the request spec excludes a ます
+    tail with not_next -- a regex lookahead could not have kept 見せてください
+    (one verb token) while dropping やらせてください (せる as its own token),
+    which the 動詞 requirement of the token spec does for free.
+    """
+    for sentence in (
+        "あの方は弟を車でうちまで送ってやってくださいました。",
+        "そちらの人がわたしの荷物を持ってくださいました。",
+        "昨日、先生のお子さんが東京を案内してくださいました。",
+        "来週から、田中先生が息子に英語を教えてやってくださいます。",
+    ):
+        assert "te_kudasai" not in _keys(sentence), sentence
+        assert "ds_kudasaru-honorific-verb" in _keys(sentence), sentence
+    # The request itself is untouched, ませ tail included.
+    for sentence in (
+        "すみませんが、辞書を貸してくださいませんか。",
+        "見せてください。",
+        "やらせてください。",
+    ):
+        if sentence == "やらせてください。":
+            # causative request: owned by the 〜させてください row, not here
+            assert "te_kudasai" not in _keys(sentence), sentence
+            assert "ds_sete-kudasai" in _keys(sentence), sentence
+        else:
+            assert "te_kudasai" in _keys(sentence), sentence
+
+
 def test_nai_de_kudasai_needs_its_nai():
     """
     〜ないでください is "please don't", and the ない is the whole difference:
@@ -872,9 +1262,14 @@ _FORMATION_NAMED = {
     # いざ〜となると, 〜にかかわらず), so no derived fragment is ever a
     # substring of it and the headline falls back to the formation text,
     # which repeats the same construction (〜に/のあまり(に), となると/…).
-    "amarininoamarini",
+    # (amarininoamarini left this set on 2026-10-16: its headline now comes
+    # from _SLOT_SPECS, which the loop above skips.)
     "izatonarutoizatonarebaizatonatara",
     "nikakawarazunihakakawarinaku",
+    # 2026-10-16: _FRAGMENT_OVERRIDES names the row after the contiguous
+    # ことながら, which the pattern ("Noun + の + こと + ながら") spells with
+    # separators and thus never contains as a substring.
+    "koto-nagara",
 }
 
 
