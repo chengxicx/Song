@@ -5233,7 +5233,6 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
    ============================================================== */
 .grammar-library,
 .grammar-detail {
-    max-width: 820px;
     margin: 0 auto;
     padding: 0 16px 48px;
     color: var(--font-color, #000);
@@ -5242,24 +5241,68 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     font-size: 15px;
 }
 
+/* The library is a full-screen-wide grid (like hanabira.org's grammar
+   list); only the point's own page stays a readable column. */
+.grammar-detail {
+    max-width: 820px;
+}
+
 .grammar-library__bar {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 12px;
+    padding: 4px 0 10px;
 }
 
 .grammar-library__language {
     margin: 0;
-    flex: none;
-    font-size: 1.3em;
+    font-size: 1.35em;
     font-weight: 700;
 }
 
+.grammar-library__total {
+    color: var(--g-text-2);
+    font-size: 0.9em;
+}
+
+/* /grammar now lands on the current language directly, so the way to
+   another language's library lives on the page, not one level up. */
+.grammar-library__switch {
+    margin-left: auto;
+    color: var(--g-text-2);
+    font-size: 0.85em;
+    text-decoration: none;
+    border: 1px solid var(--g-card-border);
+    border-radius: 999px;
+    padding: 2px 12px;
+}
+.grammar-library__switch:hover {
+    color: var(--font-color, #000);
+    border-color: var(--g-accent-line);
+}
+
+/* Sticky toolbar: the search filters across all levels, the pills jump
+   between them, and both stay reachable down a ~1400-card page.  The
+   fixed height is what lets the sticky level heads below sit just under
+   it at any window width. */
+.grammar-library__toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 2px;
+    background: color-mix(in srgb, var(--background-color, #fff) 94%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--g-rule);
+}
+
 #grammar-library-search {
-    flex: 1 1 200px;
-    min-width: 160px;
+    flex: 1 1 auto;
+    min-width: 0;
     padding: 6px 10px;
     font-size: 0.95em;
     color: inherit;
@@ -5272,13 +5315,20 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     border-color: var(--g-accent-line);
 }
 
-/* Level pills: the level switch, and the inventory readout (not
-   progress -- see lute/grammar/routes.py). */
+/* Level pills: the jump between levels, and the inventory readout (not
+   progress -- see lute/grammar/routes.py).  Each pill carries its own
+   level's accent via the grammar-group--Nx token class.  They scroll
+   instead of wrapping, keeping the toolbar one row tall. */
 .grammar-library__levels {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 6px;
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.grammar-library__levels::-webkit-scrollbar {
+    display: none;
 }
 
 .grammar-library__level {
@@ -5286,21 +5336,16 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     align-items: baseline;
     gap: 6px;
     padding: 4px 10px;
-    border: 1px solid var(--g-card-border);
+    border: 1px solid color-mix(in srgb, var(--g-accent) 45%, transparent);
     border-radius: 999px;
-    background: var(--g-card);
+    background: color-mix(in srgb, var(--g-accent) 10%, transparent);
     color: inherit;
     text-decoration: none;
     font-size: 0.85em;
+    white-space: nowrap;
 }
 .grammar-library__level:hover {
-    border-color: var(--g-accent-line);
-    background: color-mix(in srgb, var(--g-accent-soft) 40%, var(--g-card));
-}
-.grammar-library__level.is-active {
-    border-color: var(--g-accent-line);
-    background: color-mix(in srgb, var(--g-accent-soft) 45%, var(--g-card));
-    box-shadow: inset 0 0 0 1px var(--g-accent-line);
+    background: color-mix(in srgb, var(--g-accent) 22%, transparent);
 }
 
 .grammar-library__level-name {
@@ -5320,86 +5365,92 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 .grammar-library__stat--quiet {
     opacity: 0.72;
 }
-
-/* What the current level holds: inventory, not a progress denominator. */
-.grammar-library__inventory {
-    margin: 0 0 10px;
-    font-size: 0.9em;
-    color: var(--g-text-2);
-}
-.grammar-library__inventory b {
-    color: var(--font-color, #000);
+/* Narrow screens drop the per-pill stats first, then the pills scroll. */
+@media (max-width: 900px) {
+    .grammar-library__stat {
+        display: none;
+    }
 }
 
-/* The index rows: one line each, so a whole level scans at a glance. */
-.grammar-library__rows {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border-top: 1px solid var(--g-rule);
+/* The level sections reuse the reading panel's group styles; on this
+   page the heads stick just below the toolbar instead of the panel's
+   own top, and a pill jump must not land the head under the toolbar. */
+.grammar-library .grammar-group {
+    scroll-margin-top: 96px;
+    padding-bottom: 14px;
+}
+.grammar-library .grammar-group__head {
+    top: 48px;
+}
+.grammar-group__count--quiet {
+    opacity: 0.72;
 }
 
-.grammar-row {
-    border-bottom: 1px solid var(--g-rule);
-}
-.grammar-row[hidden] {
-    display: none;
+/* Full-screen card grid (hanabira.org's grammar list): as many columns
+   as fit, each card one grammar point -- name plus a single meaning
+   line, tags riding at the end of it. */
+.grammar-library__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+    gap: 8px;
 }
 
-.grammar-row__link {
+.grammar-library__card {
     display: flex;
-    align-items: baseline;
-    gap: 10px;
-    padding: 8px 6px;
+    flex-direction: column;
+    gap: 1px;
+    padding: 6px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--g-card-border);
+    border-left: 3px solid var(--g-accent);
+    background: var(--g-card);
     color: inherit;
     text-decoration: none;
+    transition: border-color 0.12s ease, background-color 0.12s ease;
 }
-.grammar-row__link:hover {
-    background: color-mix(in srgb, var(--g-accent-soft) 35%, transparent);
-}
-
-.grammar-row__index {
-    flex: none;
-    min-width: 2.2em;
-    text-align: right;
-    font-size: 0.78em;
-    color: var(--g-text-2);
-    font-variant-numeric: tabular-nums;
+.grammar-library__card:hover {
+    border-color: var(--g-accent-line);
+    background: color-mix(in srgb, var(--g-accent) 16%, var(--g-card));
 }
 
-.grammar-row__name {
-    flex: none;
+.grammar-library__card-name {
     font-weight: 700;
     color: var(--g-accent);
-    white-space: nowrap;
+    font-size: 0.98em;
+    line-height: 1.3;
 }
 
-/* One line only: long meanings truncate rather than wrap, so the list
-   stays scannable. */
-.grammar-row__desc {
+/* One compact line: the meaning fills whatever the tags leave. */
+.grammar-library__card-desc {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+}
+.grammar-library__card-meaning {
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.92em;
     color: var(--g-text-2);
+    font-size: 0.84em;
+    line-height: 1.35;
 }
 
-.grammar-row__formality,
-.grammar-row__tag {
+.grammar-library__card-tag {
     flex: none;
-    font-size: 0.72em;
+    font-size: 0.68em;
+    line-height: 1.5;
     color: var(--g-text-2);
     border: 1px solid var(--g-card-border);
-    border-radius: 6px;
-    padding: 0 5px;
+    border-radius: 999px;
+    padding: 0 6px;
     white-space: nowrap;
 }
-
-/* Reference-only rows keep their colour demoted but stay in the list. */
-.grammar-row--reference .grammar-row__name {
-    color: var(--g-text-2);
+.grammar-library__card-tag--ref {
+    color: var(--g-accent);
+    border-color: var(--g-accent-line);
 }
 
 .grammar-library__empty {

@@ -13,7 +13,7 @@
 
   <div class="grammar-detail__bar">
     <a class="grammar-detail__back"
-       href="{{ url_for('grammar.library', langid=language.id, level=entry.level) }}">← {{ t('Back to the list') }}</a>
+       href="{{ url_for('grammar.library', langid=language.id) }}">← {{ t('Back to the list') }}</a>
     <span class="grammar-detail__position">{{ entry.level }} · {{ position }}/{{ level_total }}</span>
   </div>
 
@@ -80,7 +80,7 @@
   </nav>
 
   <p class="grammar-library__foot">
-    <a href="{{ url_for('grammar.library', langid=language.id, level=entry.level) }}">{{ t('All levels') }}</a>
+    <a href="{{ url_for('grammar.library', langid=language.id) }}">{{ t('All levels') }}</a>
   </p>
 </div>
 
