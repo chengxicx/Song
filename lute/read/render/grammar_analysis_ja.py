@@ -1316,6 +1316,74 @@ _SLOT_SPECS = {
             }
         ],
     ),
+    # ように has two readings and a bare literal cannot tell them apart: the
+    # *purpose* marker ("so that / in order to", 聞こえるように / 忘れないように)
+    # and the *resemblance* marker ("like ___", 氷のように冷たい).  The
+    # derivation produced an unanchored `ように` regex for the purpose entry, so
+    # 氷の**ように**冷たい手です was reported as 为了……；以便 -- the gloss of a
+    # construction that sentence does not contain.
+    #
+    # What separates them is the left context, and it is load-bearing: a purpose
+    # ように takes a verb / ない / な / adjective in front of it, the resemblance
+    # reading takes 名詞 + の (or a demonstrative 様).  So the purpose entry is
+    # matched on the token run よう + に -- Sudachi splits ように into よう
+    # (形状詞,助動詞語幹) + に (助動詞,連用形-ニ) -- and the left context is
+    # reviewed in _NOT_AFTER below.
+    #
+    # The n4 entry 〜ように ("purpose / wish") needs no guard of its own: it is
+    # in _DUPLICATE_IDS (its row would shadow this one), so it never fires.
+    "you-ni-purpose": (
+        "ように",
+        [{"type": "tokens", "conds": [{"surface": "よう"}, {"surface": "に"}]}],
+    ),
+    # The reading the entry above must not claim, as its own library row
+    # (you-ni-resemblance): the 比況助動詞 in its 連用形 / 連体形, which the
+    # 終止形-only 〜ようだ row cannot see at all.  Guarding the purpose entry
+    # alone would only delete the row -- the panel would then say nothing about
+    # a construction the sentence is made of.
+    #
+    # Three specs, disjoint by left context:
+    #
+    #   1. 名詞 + の + ように / ような -- the simile proper.  The run starts at
+    #      the noun, so the highlight covers the whole 氷のように.
+    #   2. この / その / あの / どの + ように / ような -- the demonstrative 様.
+    #   3. a bare ような -- the 連体形 after a predicate (人の手ではないような
+    #      手, 何も知らないような顔), which is neither a noun + の nor a
+    #      demonstrative.  `not_after` keeps it off the two contexts above so
+    #      the three specs cannot both claim one ような.
+    #
+    # ように after a *predicate* (雨が降るように見える) is deliberately not
+    # claimed here: it is ambiguous with the purpose reading (雨が降るように
+    # 祈る) and the purpose entry owns it.
+    "you-ni-resemblance": (
+        "のように・のような",
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "名詞"},
+                    {"surface": "の"},
+                    {"surface": "よう"},
+                    {"surface_in": ("に", "な")},
+                ],
+            },
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface_in": ("この", "その", "あの", "どの")},
+                    {"surface": "よう"},
+                    {"surface_in": ("に", "な")},
+                ],
+            },
+            {
+                "type": "tokens",
+                "conds": [{"surface": "よう"}, {"surface": "な"}],
+                "not_after": {
+                    "surface_in": ("の", "この", "その", "あの", "どの"),
+                },
+            },
+        ],
+    ),
 }
 
 # The て-form connective: Sudachi reports both the て of 知っ+て and the で of
@@ -1334,10 +1402,24 @@ _TE_CONNECTIVE = {"pos1": "助詞", "pos2": "接続助詞", "surface_in": ("て"
 # claim them.  The auxiliary's own part of speech cannot be used instead: 行き /
 # 来 / あり are 動詞,非自立可能 too, so nothing about the auxiliary separates it
 # from 行き -- what precedes it does.
+#
+# The left context that makes a ように a *resemblance* rather than a purpose:
+# 名詞 + の ("like a hand", 氷のように冷たい) and the demonstrative 様
+# (この / その / あの / どの + ように, "like this").  A purpose ように instead
+# takes a verb / ない / な / adjective in front of it, which is every other
+# token, so the exclusion is written as the marked cases.  See _SLOT_SPECS.
+_YOU_NI_RESEMBLANCE_BEFORE = {
+    "surface_in": ("の", "この", "その", "あの", "どの"),
+}
+
 _NOT_AFTER = {
     "masu-polite-verb": _TE_CONNECTIVE,
     "mashita-polite-past-verb": _TE_CONNECTIVE,
     "masendeshita-polite-past-negative-verb": _TE_CONNECTIVE,
+    # 〜ように is the purpose marker only when what precedes it is a predicate;
+    # after 名詞 + の (or a demonstrative) it is the resemblance marker, which
+    # has its own entry (you-ni-resemblance).
+    "you-ni-purpose": _YOU_NI_RESEMBLANCE_BEFORE,
 }
 
 # Widest 〜 gap tolerated between the two anchors of a gapped construction

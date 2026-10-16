@@ -607,6 +607,59 @@
   ]
  },
  {
+  "id": "you-ni-resemblance",
+  "pattern": "名詞 + の + ように / のような（この・その + ように / ような も）",
+  "level": "N3",
+  "meaning_en": "like / as (resemblance) — Noun + の + ように",
+  "meaning_detailed": "比况（比喻）：把某事物比作另一事物。这是比况助动词「ようだ」的连用形「ように」与连体形「ような」。「名詞 + の + ように」修饰后面的动词或形容词（氷のように冷たい「像冰一样冷」），「名詞 + の + ような」修饰名词（氷のような手「像冰一样的手」）；「この・その + ように／ような」是同一用法的指示形。",
+  "formation": "名詞 + の + ように（＋動詞・形容詞）／名詞 + の + ような（＋名詞）／この・その・あの・どの + ように・ような／（述語）＋ ような",
+  "formation_notes": [
+   "与目的用法「〜ように」区分：目的用法前面接动词（忘れないように「为了不忘记」），比况用法前面接「名詞 + の」。",
+   "不表示目的，只表示比喻——与「〜ために」无关。",
+   "书面语体可用 ごとく / ごとき，更口语的说法是 みたいに。",
+   "「この・その・あの・どの + ように／ような」是同一比况用法的指示形（「像这样／那样」）。",
+   "「（述語）+ ような」是连体形，修饰后面的名词（何も知らないような顔「好像什么都不知道的表情」）。"
+  ],
+  "formality": "neutral",
+  "related": [
+   "you-ni-purpose",
+   "you-da-appearance",
+   "mitaida"
+  ],
+  "examples": [
+   {
+    "japanese": "氷のように冷たい手です。",
+    "english": "",
+    "chinese": "像冰一样冰冷的手。"
+   },
+   {
+    "japanese": "彼は子供のように笑った。",
+    "english": "",
+    "chinese": "他像孩子一样笑了。"
+   },
+   {
+    "japanese": "まるで夢のような話だ。",
+    "english": "",
+    "chinese": "简直是像梦一样的故事。"
+   },
+   {
+    "japanese": "雪のように白い肌。",
+    "english": "",
+    "chinese": "像雪一样白的肌肤。"
+   },
+   {
+    "japanese": "このように書いてください。",
+    "english": "",
+    "chinese": "请像这样写。"
+   },
+   {
+    "japanese": "彼は何も知らないような顔をしている。",
+    "english": "",
+    "chinese": "他一脸好像什么都不知道的样子。"
+   }
+  ]
+ },
+ {
   "id": "noni-although",
   "pattern": "Plain form + のに",
   "level": "N3",
@@ -6623,9 +6676,9 @@
   "id": "marudenoyouda",
   "pattern": "まるで～のようだ",
   "level": "N3",
-  "meaning_en": "为了～",
+  "meaning_en": "just like / as if (simile)",
   "meaning_detailed": "简直就像…一样（表示比喻）",
-  "formation": "表示目的",
+  "formation": "まるで + 名詞 + の + ようだ",
   "formation_notes": [],
   "formality": "neutral",
   "related": [],
