@@ -52,11 +52,34 @@ class ThaiParser(AbstractParser):
         tokens = []
         pattern = f"[{language.word_characters}]"
         whitespace_regex = r"[ \t]+"
+
+        # Spaces do double duty in Thai, and the text's own style
+        # decides which role they play.  Traditionally written Thai
+        # puts spaces only between sentences (there is no full stop),
+        # so a space ends one.  LingQ-style stories, though, are
+        # "word-spaced": every word is separated by a space and one
+        # line is one sentence.  Treating those spaces as sentence
+        # ends shatters the text into one sentence per word -- every
+        # word got its own .textsentence, its own 🔊 button, and the
+        # sentence translate / grammar panel saw single words.  So
+        # measure the space density once per text: when most words
+        # are followed by a space, spaces are word separators and
+        # only newlines and sentence punctuation (ฯ ! ?) end a
+        # sentence.  Traditional text (spaces rare) keeps the old
+        # behaviour.
+        word_count = sum(1 for w in words if re.match(pattern, w))
+        space_count = sum(1 for w in words if re.match(whitespace_regex, w))
+        spaces_are_word_separators = (
+            word_count > 0 and space_count / word_count >= 0.5
+        )
+
         for word in words:
             is_word_char = re.match(pattern, word) is not None
             is_whitespace = re.match(whitespace_regex, word) is not None
             is_split_sentence = word in language.regexp_split_sentences
-            is_end_of_sentence = is_split_sentence or is_whitespace
+            is_end_of_sentence = is_split_sentence or (
+                is_whitespace and not spaces_are_word_separators
+            )
             if is_end_of_sentence:
                 is_word_char = False
             if word == "\n":

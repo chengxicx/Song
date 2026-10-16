@@ -89,6 +89,63 @@ def test_carriage_returns_treated_as_reverse_p_character(thai):
     assert_tokens_equals(s, thai, expected)
 
 
+def _sentence_groups(text, lang):
+    """
+    Parse text and return the tokens grouped into sentences
+    (a new group starts after each end-of-sentence token).
+    """
+    p = ThaiParser()
+    groups, cur = [], []
+    for t in p.get_parsed_tokens(text, lang):
+        cur.append(t)
+        if t.is_end_of_sentence:
+            groups.append(cur)
+            cur = []
+    if cur:
+        groups.append(cur)
+    return groups
+
+
+def test_word_spaced_text_one_sentence_per_line(thai):
+    """
+    LingQ-style "word-spaced" Thai (every word separated by a space,
+    one line = one sentence) must NOT become one sentence per word:
+    the space density marks spaces as word separators, so only the
+    newline ends a sentence.  Regression: book 545 rendered one
+    .textsentence (and one 🔊 button) per word.
+    """
+    # First two lines of LingQ Mini Stories 1a as stored in the DB.
+    s = "ไมค์ ตื่นนอน ตอน หก โมงเช้า ทุกวัน\nเขา ทำ อาหารเช้า และ ดื่ม กาแฟ หนึ่ง ถ้วย"
+
+    groups = _sentence_groups(s, thai)
+
+    assert len(groups) == 2, [str(t) for g in groups for t in g]
+    # Line 1 ends with the paragraph mark; line 2 has no trailing
+    # newline, so it stays an open (no-EOS) straggler group.
+    assert groups[0][-1].token == "¶", [str(t) for t in groups[0]]
+    assert groups[1][-1].token == "ถ้วย", [str(t) for t in groups[1]]
+    for group in groups:
+        for t in group:
+            assert not (t.token.strip() == "" and t.is_end_of_sentence), (
+                f"space marked as EOS: {[str(x) for x in group]}"
+            )
+
+
+def test_traditional_spaced_text_still_splits_on_spaces(thai):
+    """
+    Traditionally written Thai (spaces only between sentences) keeps
+    the old behaviour: a space ends a sentence, because the space
+    density is far below the word-separator threshold.
+    """
+    s = "สวัสดีทุกคน ฉันเรียนภาษาไทยมา2เดือนแล้ว"
+
+    groups = _sentence_groups(s, thai)
+
+    assert len(groups) == 2, [str(t) for g in groups for t in g]
+    assert groups[0][-1].token == " "
+    assert groups[0][-1].is_end_of_sentence
+
+
 def test_get_reading_rtgs_cases():
     """
     get_reading returns the RTGS romanization used as the reading
