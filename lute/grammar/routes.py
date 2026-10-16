@@ -12,7 +12,7 @@ language is served by the generic regex rules, which carry no point-level
 library, so /grammar/<langid> explains that instead of 404ing.
 """
 
-from flask import Blueprint, abort, render_template
+from flask import Blueprint, abort, redirect, render_template, request, url_for
 
 from lute.db import db
 from lute.models.language import Language
@@ -99,7 +99,15 @@ def index():
 
 @bp.route("/<int:langid>")
 def library(langid):
-    "The grammar library for one language, or an explanation page."
+    """
+    One level of one language's grammar library.
+
+    The corpus runs to ~1400 points, so rendering them all as full cards
+    makes an unscannable page (and a heavy one).  Like hanabira.org's
+    grammar list, the index shows a single level at a time (?level=, the
+    first level by default) as compact one-line rows, each linking to the
+    point's own page.  The level pills double as the inventory readout.
+    """
     language = LanguageRepository(db.session).find(langid)
     if language is None:
         abort(404)
@@ -109,10 +117,63 @@ def library(langid):
         return render_template("grammar/unsupported.html", language=language)
 
     entries = engine.library_entries(_display_lang(language))
+    counts = _level_counts(entries)
+    levels = list(counts) or ["N"]
+
+    current = request.args.get("level", "")
+    if current not in counts:
+        current = levels[0]
+    rows = [e for e in entries if e["level"] == current]
+
     return render_template(
         "grammar/library.html",
         language=language,
-        entries=entries,
-        level_counts=_level_counts(entries),
+        levels=levels,
+        level_counts=counts,
+        current_level=current,
+        rows=rows,
+        matchable=counts[current]["matchable"],
+        reference=counts[current]["reference"],
+        level_class=_level_class,
+    )
+
+
+@bp.route("/<int:langid>/<key>")
+def detail(langid, key):
+    """
+    One grammar point's page: the full card the index rows link to.
+
+    Walking the level with prev/next keeps the reader in the list they
+    came from.  An unknown key (or a language with no library) falls back
+    to the index rather than 404 -- the index's hash redirect and stale
+    bookmarks both land here.
+    """
+    language = LanguageRepository(db.session).find(langid)
+    if language is None:
+        abort(404)
+
+    engine = _library_engine(language)
+    if engine is None:
+        return redirect(url_for("grammar.library", langid=langid))
+
+    entries = engine.library_entries(_display_lang(language))
+    index_of = {e["key"]: i for i, e in enumerate(entries)}
+    i = index_of.get(key)
+    if i is None:
+        return redirect(url_for("grammar.library", langid=langid))
+
+    entry = entries[i]
+    # Prev/next stay inside the point's own level (the index is per level).
+    siblings = [j for j, e in enumerate(entries) if e["level"] == entry["level"]]
+    pos = siblings.index(i)
+
+    return render_template(
+        "grammar/detail.html",
+        language=language,
+        entry=entry,
+        prev_entry=entries[siblings[pos - 1]] if pos > 0 else None,
+        next_entry=entries[siblings[pos + 1]] if pos < len(siblings) - 1 else None,
+        position=pos + 1,
+        level_total=len(siblings),
         level_class=_level_class,
     )
