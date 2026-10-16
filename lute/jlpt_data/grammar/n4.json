@@ -6699,5 +6699,40 @@
     "chinese": "世界人口一直在增加。"
    }
   ]
+ },
+ {
+  "id": "nakya-nakucha",
+  "pattern": "V ない-stem + なきゃ / なくちゃ",
+  "level": "N4",
+  "meaning_en": "have to (casual contraction)",
+  "meaning_detailed": "〜なきゃ and 〜なくちゃ are the spoken contractions of 〜なければ (いけない/ならない): 'have to X'. The closing いけない is often dropped in speech.",
+  "formation": "動詞ない形語幹 + なきゃ/なくちゃ (+ いけない・ならない)",
+  "formation_notes": [
+   "行かなきゃ = 行かなければ(いけない)."
+  ],
+  "formality": "casual",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "早く行かなきゃ。",
+    "english": "I have to go soon.",
+    "chinese": "我得早点走了。"
+   },
+   {
+    "japanese": "宿題をやらなくちゃいけない。",
+    "english": "I have to do my homework.",
+    "chinese": "我必须做作业。"
+   },
+   {
+    "japanese": "もう帰らなくちゃ。",
+    "english": "I've got to head home now.",
+    "chinese": "我得回去了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
  }
 ]

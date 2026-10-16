@@ -9882,5 +9882,584 @@
     "chinese": "在馆内参观的时候请不要拍照片或摄影。"
    }
   ]
+ },
+ {
+  "id": "kanaa",
+  "pattern": "〜かなあ（短形 かな）",
+  "level": "N3",
+  "meaning_en": "I wonder / maybe (musing)",
+  "meaning_detailed": "〜かなあ voices a wondering question to oneself: 'I wonder if X'. The あ stretches the musing; かな is the short form. Casual.",
+  "formation": "普通形 + かなあ / かな",
+  "formation_notes": [
+   "だ/です is dropped before it: 行くかなあ."
+  ],
+  "formality": "casual",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "明日は晴れるかなあ。",
+    "english": "I wonder if it will be sunny tomorrow.",
+    "chinese": "明天会晴吗。"
+   },
+   {
+    "japanese": "彼は来てくれるかなあ。",
+    "english": "I wonder if he'll come.",
+    "chinese": "他会来吗。"
+   },
+   {
+    "japanese": "このケーキ、おいしいかなあ。",
+    "english": "I wonder if this cake is tasty.",
+    "chinese": "这个蛋糕好不好吃呢。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "sukoshimo-nai",
+  "pattern": "少しも + negative",
+  "level": "N3",
+  "meaning_en": "not a bit / not at all",
+  "meaning_detailed": "すこしも + negative strengthens total negation: 'not in the slightest'. Written-spoken emphatic frame.",
+  "formation": "すこしも + 否定形",
+  "formation_notes": [
+   "Frame adverb: only with negatives."
+  ],
+  "formality": "neutral",
+  "related": [
+   "mattaku-nai",
+   "kesshite-nai"
+  ],
+  "examples": [
+   {
+    "japanese": "彼は少しも反省していない。",
+    "english": "He is not the least bit remorseful.",
+    "chinese": "他一点也不反省。"
+   },
+   {
+    "japanese": "少しも疲れていません。",
+    "english": "I am not tired at all.",
+    "chinese": "我一点也不累。"
+   },
+   {
+    "japanese": "その噂は少しも真実ではない。",
+    "english": "That rumour is not true in the slightest.",
+    "chinese": "那个传闻丝毫没有真实性。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "sete-kudasai",
+  "pattern": "V + させてください / せてください",
+  "level": "N3",
+  "meaning_en": "please let me do X",
+  "meaning_detailed": "〜させてください asks for permission or volunteers to do X oneself: 'please let me do X'. せてください is the spoken short causative.",
+  "formation": "動詞使役形 + てください / せてください",
+  "formation_notes": [
+   "Volunteering, not just requesting: 私がやりますという意思。"
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "この仕事をやらせてください。",
+    "english": "Please let me do this job.",
+    "chinese": "请让我来做这项工作。"
+   },
+   {
+    "japanese": "少し考えさせてください。",
+    "english": "Please let me think about it a little.",
+    "chinese": "请让我考虑一下。"
+   },
+   {
+    "japanese": "私に言わせてください。",
+    "english": "Please let me say it.",
+    "chinese": "请让我来说。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "soretomo",
+  "pattern": "A + それとも + B",
+  "level": "N3",
+  "meaning_en": "or (between alternatives in questions)",
+  "meaning_detailed": "それとも links two alternatives inside a question: 'or'. Contrasts with それから (and then) and それで (so).",
+  "formation": "A（ですか）。それとも、B（ですか）。",
+  "formation_notes": [
+   "Only in questions offering a choice."
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "コーヒーにしますか、それとも紅茶にしますか。",
+    "english": "Will you have coffee, or tea?",
+    "chinese": "你要咖啡，还是红茶？"
+   },
+   {
+    "japanese": "行くの？それとも行かないの？",
+    "english": "Are you going, or not?",
+    "chinese": "你去，还是不去？"
+   },
+   {
+    "japanese": "彼は先生ですか、それとも学生ですか。",
+    "english": "Is he a teacher, or a student?",
+    "chinese": "他是老师，还是学生？"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "dake-shika",
+  "pattern": "Noun + だけしか + negative",
+  "level": "N3",
+  "meaning_en": "only X (and it's not enough)",
+  "meaning_detailed": "〜だけしか + negative underlines how small the amount is: 'only X at most'. The だけ adds the speaker's sense of insufficiency to plain しか〜ない.",
+  "formation": "名詞・数量詞 + だけしか + 否定形",
+  "formation_notes": [
+   "Stronger scarcity feel than しか alone."
+  ],
+  "formality": "neutral",
+  "related": [
+   "shika-nai"
+  ],
+  "examples": [
+   {
+    "japanese": "財布には百円だけしかない。",
+    "english": "There's only a hundred yen in my wallet.",
+    "chinese": "钱包里只有一百日元而已。"
+   },
+   {
+    "japanese": "あの人とは一度だけしか会っていない。",
+    "english": "I have met that person only once.",
+    "chinese": "那个人我只见过一次。"
+   },
+   {
+    "japanese": "あと一週間だけしか残っていない。",
+    "english": "Only one week remains.",
+    "chinese": "只剩下一周了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "chatta-jatta",
+  "pattern": "〜ちゃった / 〜じゃった",
+  "level": "N3",
+  "meaning_en": "casual contraction of てしまった/でしまった",
+  "meaning_detailed": "〜ちゃった (after て) and 〜じゃった (after で) are the colloquial contractions of てしまった/でしまった, marking completion — often with regret or unintended result.",
+  "formation": "動詞て形 → ちゃった / で形 → じゃった",
+  "formation_notes": [
+   "ちゃう/じゃう for non-past; regret nuance common."
+  ],
+  "formality": "casual",
+  "related": [
+   "teshimau"
+  ],
+  "examples": [
+   {
+    "japanese": "宿題を忘れちゃった。",
+    "english": "I (regrettably) forgot my homework.",
+    "chinese": "我把作业给忘了。"
+   },
+   {
+    "japanese": "財布を落としちゃった。",
+    "english": "I went and dropped my wallet.",
+    "chinese": "我把钱包弄丢了。"
+   },
+   {
+    "japanese": "牛乳、全部飲んじゃった。",
+    "english": "I ended up drinking all the milk.",
+    "chinese": "牛奶我全给喝完了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "tsumari",
+  "pattern": "つまり、〜",
+  "level": "N3",
+  "meaning_en": "in other words / that is to say",
+  "meaning_detailed": "つまり rephrases or pinpoints the essence of what was just said: 'in other words', 'that is'. All-register connector.",
+  "formation": "つまり、〜(言い換え・要約)。",
+  "formation_notes": [
+   "会話では結論の確認にも使う。"
+  ],
+  "formality": "neutral",
+  "related": [
+   "sunawachi",
+   "yousuru-ni"
+  ],
+  "examples": [
+   {
+    "japanese": "彼は私の母の弟、つまり叔父です。",
+    "english": "He is my mother's younger brother — in other words, my uncle.",
+    "chinese": "他是我母亲的弟弟，也就是我的舅舅。"
+   },
+   {
+    "japanese": "つまり、君は何も知らなかったということだ。",
+    "english": "In other words, you knew nothing.",
+    "chinese": "也就是说，你什么都不知道。"
+   },
+   {
+    "japanese": "安いということは、つまり品質が悪いということだ。",
+    "english": "Cheap means, in other words, poor quality.",
+    "chinese": "便宜，也就是说品质差。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "nazenara",
+  "pattern": "なぜなら、〜(から)だ",
+  "level": "N3",
+  "meaning_en": "because / the reason being",
+  "meaning_detailed": "なぜなら fronts the reason for the preceding statement: 'because', 'that is because'. Pairs with からだ/ためだ to close the loop.",
+  "formation": "前文。なぜなら、〜からだ/ためだ。",
+  "formation_notes": [
+   "書き言葉寄り。会話では だって/から."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼を信じる。なぜなら、彼は一度もうそをついたことがないからだ。",
+    "english": "I trust him, because he has never lied.",
+    "chinese": "我相信他，因为他从没撒过谎。"
+   },
+   {
+    "japanese": "私は行かない。なぜなら、用がないからです。",
+    "english": "I'm not going, because I have no business there.",
+    "chinese": "我不去，因为没有事。"
+   },
+   {
+    "japanese": "なぜなら、それは間違っているからだ。",
+    "english": "Because it is wrong.",
+    "chinese": "因为那是错的。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "masu-you-ni",
+  "pattern": "V + ますように (祈願)",
+  "level": "N3",
+  "meaning_en": "may X happen (wish / prayer)",
+  "meaning_detailed": "〜ように at the end of a sentence voices a wish or prayer: 'may X', 'I hope X'. The verb is often in ます形 + ように in set wishes.",
+  "formation": "動詞辞書形 + ように / 〜しますように",
+  "formation_notes": [
+   "Ema and speech wishes: 合格しますように."
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "合格しますように。",
+    "english": "May I pass (the exam).",
+    "chinese": "愿我能合格。"
+   },
+   {
+    "japanese": "早く元気になりますように。",
+    "english": "I hope you get well soon.",
+    "chinese": "祝你早日康复。"
+   },
+   {
+    "japanese": "平和が続きますように。",
+    "english": "May peace continue.",
+    "chinese": "愿和平长久。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "mattaku-nai",
+  "pattern": "まったく + negative",
+  "level": "N3",
+  "meaning_en": "completely not / not at all",
+  "meaning_detailed": "まったく + negative denies totally: 'not at all', 'absolutely not'. Also used alone as まったく！ of exasperation.",
+  "formation": "まったく + 否定形",
+  "formation_notes": [
+   "Frame adverb: pairs with negatives."
+  ],
+  "formality": "neutral",
+  "related": [
+   "sukoshimo-nai",
+   "kesshite-nai"
+  ],
+  "examples": [
+   {
+    "japanese": "まったく分かりません。",
+    "english": "I don't understand at all.",
+    "chinese": "我完全不明白。"
+   },
+   {
+    "japanese": "彼はまったく反省していない。",
+    "english": "He shows absolutely no remorse.",
+    "chinese": "他完全没有反省。"
+   },
+   {
+    "japanese": "まったく問題ありません。",
+    "english": "There is no problem whatsoever.",
+    "chinese": "完全没有问题。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "mettani-nai",
+  "pattern": "めったに + negative",
+  "level": "N3",
+  "meaning_en": "rarely / seldom",
+  "meaning_detailed": "めったに + negative marks very low frequency: 'rarely', 'hardly ever'. Frame adverb.",
+  "formation": "めったに + 否定形",
+  "formation_notes": [
+   "Positive use rare except fixed めったにない (rare)."
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼とはめったに会いません。",
+    "english": "I rarely see him.",
+    "chinese": "我很少见到他。"
+   },
+   {
+    "japanese": "ここではめったに雪が降らない。",
+    "english": "It hardly ever snows here.",
+    "chinese": "这里很少下雪。"
+   },
+   {
+    "japanese": "めったにないチャンスだ。",
+    "english": "It's a rare opportunity.",
+    "chinese": "这是难得的机会。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "moshi-moshimo",
+  "pattern": "もし / もしも",
+  "level": "N3",
+  "meaning_en": "if (hypothetical)",
+  "meaning_detailed": "もし/もしも flags the clause as hypothetical and pairs with たら/ば/なら: 'if (by any chance)'. もしも adds a shade of lower probability.",
+  "formation": "もし（も） + たら/ば/なら",
+  "formation_notes": [
+   "Adverb; the conditional form carries the grammar."
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "もし雨が降ったら、試合は中止だ。",
+    "english": "If it rains, the match will be cancelled.",
+    "chinese": "如果下雨，比赛就取消。"
+   },
+   {
+    "japanese": "もしもお金があったら、世界旅行をしたい。",
+    "english": "If only I had the money, I'd travel the world.",
+    "chinese": "如果有钱的话，我想环游世界。"
+   },
+   {
+    "japanese": "もし時間があったら、手伝ってください。",
+    "english": "If you have time, please help me.",
+    "chinese": "如果有时间的话，请帮帮我。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "you-to-shinai",
+  "pattern": "V volitional + としない",
+  "level": "N3",
+  "meaning_en": "won't do X / refuses to X",
+  "meaning_detailed": "〜ようとしない negates volition — a person refusing or a thing refusing to behave: 'won't X', 'shows no sign of X-ing'.",
+  "formation": "動詞意向形 + としない / ともしない",
+  "formation_notes": [
+   "無生物にも使う: ドアが開こうとしない."
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼は話を聞こうとしない。",
+    "english": "He won't listen to what I say.",
+    "chinese": "他不肯听我说话。"
+   },
+   {
+    "japanese": "このドアは開こうとしない。",
+    "english": "This door just won't open.",
+    "chinese": "这扇门怎么都打不开。"
+   },
+   {
+    "japanese": "子供が勉強しようとしない。",
+    "english": "The child refuses to study.",
+    "chinese": "孩子不肯学习。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "kesshite-nai",
+  "pattern": "決して + negative",
+  "level": "N3",
+  "meaning_en": "never / by no means",
+  "meaning_detailed": "決して + negative is emphatic absolute negation, often with resolve or warning: 'never', 'on no account'. Frame adverb.",
+  "formation": "決して + 否定形",
+  "formation_notes": [
+   "Frame adverb; strong, formal-leaning."
+  ],
+  "formality": "neutral",
+  "related": [
+   "mattaku-nai"
+  ],
+  "examples": [
+   {
+    "japanese": "決して忘れません。",
+    "english": "I will never forget.",
+    "chinese": "我绝不会忘记。"
+   },
+   {
+    "japanese": "彼は決してうそをつかない。",
+    "english": "He never lies.",
+    "chinese": "他从不说谎。"
+   },
+   {
+    "japanese": "決して無理をしないでください。",
+    "english": "Please on no account overdo it.",
+    "chinese": "请千万不要勉强自己。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "sono-ue",
+  "pattern": "Sentence + その上",
+  "level": "N3",
+  "meaning_en": "moreover / on top of that",
+  "meaning_detailed": "その上 adds a further point in the same direction as the previous statement: 'moreover', 'what is more'. Written-leaning connector.",
+  "formation": "前文。その上、〜(追加事実)。",
+  "formation_notes": [
+   "プラスにもマイナスにも使える累加の接続詞。"
+  ],
+  "formality": "formal",
+  "related": [
+   "omake-ni"
+  ],
+  "examples": [
+   {
+    "japanese": "彼は頭がいい。その上、性格もいい。",
+    "english": "He is smart. Moreover, he has a good personality.",
+    "chinese": "他很聪明，而且性格也好。"
+   },
+   {
+    "japanese": "この店は安い。その上、おいしい。",
+    "english": "This shop is cheap, and on top of that, delicious.",
+    "chinese": "这家店便宜，而且还好吃。"
+   },
+   {
+    "japanese": "雨が降った。その上、風も強くなった。",
+    "english": "It rained, and moreover the wind grew stronger.",
+    "chinese": "下了雨，而且风也变大了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "juu-throughout",
+  "pattern": "Noun + じゅう",
+  "level": "N3",
+  "meaning_en": "all through X / throughout X",
+  "meaning_detailed": "〜じゅう extends the noun over its whole span: 一日じゅう 'all day long', 日本じゅう 'all over Japan'. Contrasts with ちゅう 'in the middle of (doing)'.",
+  "formation": "時間・範囲の名詞 + じゅう",
+  "formation_notes": [
+   "ちゅう = during an activity; じゅう = the whole span."
+  ],
+  "formality": "neutral",
+  "related": [
+   "chuu-during"
+  ],
+  "examples": [
+   {
+    "japanese": "一日じゅう寝ていた。",
+    "english": "I slept all day long.",
+    "chinese": "我睡了一整天。"
+   },
+   {
+    "japanese": "日本じゅうを旅行したい。",
+    "english": "I want to travel all over Japan.",
+    "chinese": "我想游遍全日本。"
+   },
+   {
+    "japanese": "一年中じゅう忙しい。",
+    "english": "I'm busy all year round.",
+    "chinese": "一整年都很忙。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
  }
 ]
