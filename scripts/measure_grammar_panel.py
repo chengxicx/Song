@@ -25,6 +25,11 @@ Usage::
 ``--json`` prints the same numbers machine-readably, so two runs diff with a
 one-liner instead of the eye.
 
+``--engine`` picks the grammar engine (default ``ja``).  ``ru`` measures the
+Russian engine against a Russian page dump; it needs pymorphy3 installed::
+
+    python -m scripts.measure_grammar_panel --engine ru --corpus /tmp/ru_corpus.hex
+
 Sampling a database is the first ``--limit`` pages of the matching books in
 book/page order -- deterministic, so two runs compare like with like.
 """
@@ -40,7 +45,34 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from lute.read.render import grammar_analysis_ja as G  # noqa: E402
+from lute.read.render import grammar_analysis_ja as JA  # noqa: E402
+
+# Engine name -> (analyze_fn, all_rules_fn).  The non-Japanese engines are
+# imported lazily: grammar_analysis_ru needs pymorphy3, and the default
+# (Japanese) run must keep working on a base install without it.
+_ENGINE_FNS = {}
+
+
+def engine_functions(name):
+    "analyze_fn / rules_fn for one engine key."
+    if name in _ENGINE_FNS:
+        return _ENGINE_FNS[name]
+    if name == "ru":
+        from lute.read.render import grammar_analysis_ru as RU  # noqa: E402
+
+        pair = (RU.analyze_russian, RU._get_all_rules)
+    elif name == "ja":
+        pair = (JA.analyze_japanese, JA._get_all_rules)
+    else:  # argparse restricts this, so it is a programming error
+        raise ValueError(f"unknown engine: {name}")
+    _ENGINE_FNS[name] = pair
+    return pair
+
+
+def _label(rule, key):
+    "Panel display name for a rule dict (Japanese 'pattern' vs 'name')."
+    rule = rule or {}
+    return rule.get("pattern") or rule.get("name") or key
 
 # Lute marks term boundaries with a zero-width space.  It is not text and the
 # panel would see it as part of a word, so drop it on the way in.
@@ -99,14 +131,14 @@ def _stats(values):
     }
 
 
-def measure(pages):
+def measure(pages, analyze_fn):
     """Panel state over a corpus: per-page counts, per-rule page share."""
     per_rule = collections.Counter()
     counts = []
     sizes = []
     dup_pages = 0
     for page in pages:
-        entries = G.analyze_japanese(page, display_lang="zh")
+        entries = analyze_fn(page, display_lang="zh")
         counts.append(len(entries))
         sizes.append(len(json.dumps(entries, ensure_ascii=False).encode("utf-8")))
         if len(entries) != len({e["name"] for e in entries}):
@@ -124,7 +156,7 @@ def measure(pages):
     }
 
 
-def report(state, top, keys):
+def report(state, top, keys, rules_fn):
     "Human-readable panel state."
     per_page = state["entries_per_page"]
     size = state["response_bytes"]
@@ -141,7 +173,7 @@ def report(state, top, keys):
         % (state["duplicate_name_pages_pct"], state["entries"])
     )
 
-    index = {r["key"]: r for r in G._get_all_rules()}
+    index = {r["key"]: r for r in rules_fn()}
     share = state["page_share"]
 
     if keys:
@@ -154,7 +186,7 @@ def report(state, top, keys):
             note = "  (静默/不出行)" if rule.get("skipped") else ""
             print(
                 "  %6.1f%%  %-26s %s%s"
-                % (share.get(key, 0.0), rule.get("pattern", "?")[:26], key, note)
+                % (share.get(key, 0.0), _label(rule, "?")[:26], key, note)
             )
 
     print()
@@ -169,7 +201,7 @@ def report(state, top, keys):
             % (
                 pct,
                 (rule or {}).get("level", "?"),
-                (rule or {}).get("pattern", key)[:26],
+                _label(rule, key)[:26],
                 key,
             )
         )
@@ -189,6 +221,12 @@ def main():
     ap.add_argument(
         "--plain", action="store_true", help="--corpus is plain text, not hex"
     )
+    ap.add_argument(
+        "--engine",
+        default="ja",
+        choices=("ja", "ru"),
+        help="grammar engine to measure (ja needs nothing extra, ru needs pymorphy3)",
+    )
     ap.add_argument("--language", default="Japanese", help="--db language name")
     ap.add_argument("--limit", type=int, default=400, help="--db page limit")
     ap.add_argument("--top", type=int, default=15, help="rows to list by page share")
@@ -196,6 +234,7 @@ def main():
     ap.add_argument("--json", action="store_true", help="machine-readable output")
     args = ap.parse_args()
 
+    analyze_fn, rules_fn = engine_functions(args.engine)
     pages = (
         load_corpus(args.corpus, plain=args.plain)
         if args.corpus
@@ -205,12 +244,13 @@ def main():
         print("no pages found", file=sys.stderr)
         return 1
 
-    state = measure(pages)
+    state = measure(pages, analyze_fn)
+    state["engine"] = args.engine
     if args.json:
         json.dump(state, sys.stdout, ensure_ascii=False, indent=2)
         print()
     else:
-        report(state, args.top, args.keys)
+        report(state, args.top, args.keys, rules_fn)
     return 0
 
 

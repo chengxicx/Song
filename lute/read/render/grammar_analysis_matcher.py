@@ -108,11 +108,30 @@ def _is_punct(token):
     return (token.get("pos") or "") in _PUNCT_POS
 
 
-def _morph_subset_any(token, feats):
-    "True if any reading of the token carries all the given features."
-    morphs = [token.get("morph") or {}]
-    morphs.extend(p.get("morph") or {} for p in token.get("parses", []))
-    return any(all(m.get(k) == v for k, v in feats.items()) for m in morphs)
+def _morph_subset_any(token, feats, min_score=0.0):
+    """
+    True if a reading of the token carries all the given features.
+
+    ``min_score`` gates the reading by its analyser confidence.  It defaults
+    to 0.0, which keeps every existing rule behaving exactly as before.  A
+    rule that asks for it is asking for an *unambiguous* reading.
+
+    That matters for engines whose analyser has no context disambiguation
+    and will happily rank a fabricated reading first: pymorphy3 reads
+    ``рублей`` (a genitive plural noun) as ``рублеть`` in the imperative at
+    score 0.561, above the noun's 0.410 -- so no "is it the top reading"
+    test can filter it, only a confidence floor can.  Genuine imperatives
+    (``давайте``, ``иди``, ``скажите``) all score at or above 0.99.
+    """
+    best = token.get("score", 1.0) or 1.0
+    readings = [(token.get("morph") or {}, best)]
+    readings.extend(
+        (p.get("morph") or {}, p.get("score", 0.0)) for p in token.get("parses", [])
+    )
+    return any(
+        score >= min_score and all(m.get(k) == v for k, v in feats.items())
+        for m, score in readings
+    )
 
 
 # A POS reading counts only when it is a significant reading of the word,
@@ -149,9 +168,13 @@ def _match_condition(cond, token):
             return False
     if "pos_in" in cond and not _pos_match_any(token, set(cond["pos_in"])):
         return False
-    if "morph" in cond and not _morph_subset_any(token, cond["morph"]):
+    if "morph" in cond and not _morph_subset_any(
+        token, cond["morph"], cond.get("min_score", 0.0)
+    ):
         return False
-    if "morph_not" in cond and _morph_subset_any(token, cond["morph_not"]):
+    if "morph_not" in cond and _morph_subset_any(
+        token, cond["morph_not"], cond.get("min_score", 0.0)
+    ):
         return False
     return True
 
