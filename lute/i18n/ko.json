@@ -839,5 +839,10 @@
   "— the Analyze grammar menu uses the full engine on this language.": " — 문법 분석 메뉴는 이 언어에서 전체 엔진을 사용합니다.",
   "— the grammar panel will fall back to the basic rules.": " — 문법 패널은 기본 규칙으로 폴백합니다.",
   "…": "…",
-  "… this can take a few minutes.": "… 몇 분 정도 걸릴 수 있습니다."
+  "… this can take a few minutes.": "… 몇 분 정도 걸릴 수 있습니다.",
+  "Reference text": "참조 텍스트",
+  "Optional: paste the text being read": "선택: 낭독하는 본문을 붙여넣기",
+  "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty for plain transcription.": "이 녹음에서 읽는 본문(예: 교과서课文)을 붙여넣으세요. 자막은 제공한 텍스트를 사용하고 음성 인식은 시간축만 담당합니다——인명과 동음이의어도 정확해집니다. 비우면 일반 전사만 진행합니다.",
+  "Reference text (optional)": "참조 텍스트(선택)",
+  "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty to re-transcribe plainly.": "이 녹음에서 읽는 본문(예: 교과서课文)을 붙여넣으세요. 자막은 제공한 텍스트를 사용하고 음성 인식은 시간축만 담당합니다——인명과 동음이의어도 정확해집니다. 비우면 일반 전사를 다시 진행합니다."
 }

@@ -839,5 +839,10 @@
   "— the Analyze grammar menu uses the full engine on this language.": "——语法分析菜单在该语言上使用完整引擎。",
   "— the grammar panel will fall back to the basic rules.": "——语法面板将回退到基础规则。",
   "…": "…",
-  "… this can take a few minutes.": "……这可能需要几分钟。"
+  "… this can take a few minutes.": "……这可能需要几分钟。",
+  "Reference text": "参考文本",
+  "Optional: paste the text being read": "可选：粘贴朗读的原文",
+  "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty for plain transcription.": "粘贴这段录音朗读的原文（例如课文）。字幕将直接使用你提供的文本，语音识别只负责时间轴——人名和同音字都能完全正确。留空则只做普通转写。",
+  "Reference text (optional)": "参考文本（可选）",
+  "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty to re-transcribe plainly.": "粘贴这段录音朗读的原文（例如课文）。字幕将直接使用你提供的文本，语音识别只负责时间轴——人名和同音字都能完全正确。留空则重新做普通转写。"
 }

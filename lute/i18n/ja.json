@@ -839,5 +839,10 @@
   "— the Analyze grammar menu uses the full engine on this language.": " — 文法解析メニューはこの言語で完全なエンジンを使用します。",
   "— the grammar panel will fall back to the basic rules.": " — 文法パネルは基本ルールにフォールバックします。",
   "…": "…",
-  "… this can take a few minutes.": "……数分かかる場合があります。"
+  "… this can take a few minutes.": "……数分かかる場合があります。",
+  "Reference text": "参照テキスト",
+  "Optional: paste the text being read": "任意：読み上げている本文を貼り付け",
+  "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty for plain transcription.": "この音声で読み上げている本文（教科書の課文など）を貼り付けてください。字幕はあなたのテキストを使い、音声認識はタイミングだけを担当します——人名や同音異義語も正確になります。空欄なら通常の文字起こしのみ行います。",
+  "Reference text (optional)": "参照テキスト（任意）",
+  "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty to re-transcribe plainly.": "この音声で読み上げている本文（教科書の課文など）を貼り付けてください。字幕はあなたのテキストを使い、音声認識はタイミングだけを担当します——人名や同音異義語も正確になります。空欄なら通常の文字起こしをやり直します。"
 }

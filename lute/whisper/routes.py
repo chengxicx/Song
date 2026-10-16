@@ -92,6 +92,7 @@ TRANSCRIBE_IMPORT_TYPES = {
         "url": "mp3_url",
         "title": "mp3_title",
         "tag": "mp3_tag",
+        "source_text": "mp3_source_text",
         "extensions": ALLOWED_AUDIO_EXTENSIONS,
         "extension_error": AUDIO_VALIDATION_MSG,
         "source_label": "audio",
@@ -102,6 +103,7 @@ TRANSCRIBE_IMPORT_TYPES = {
         "url": "video_url",
         "title": "video_title",
         "tag": "video_tag",
+        "source_text": "video_source_text",
         "extensions": ALLOWED_VIDEO_EXTENSIONS,
         "extension_error": VIDEO_VALIDATION_MSG,
         "source_label": "video",
@@ -125,12 +127,16 @@ def whisper_prepare():
 
     Takes the media form's fields (import_type, language_id, file or
     URL, title, tags) plus whisper_model ("sensevoice", or a whisper
-    size).  The media is saved to a temp file within this request (the
-    upload stream cannot outlive it), and a daemon thread transcribes it
-    and imports the book; the page polls /whisper/status/<task_id> until
-    the book id comes back.  import_type picks which form's field names
-    are read and which book type is created ("mp3" -> HTML5 audio,
-    "video" -> HTML5 video); it defaults to mp3.
+    size) and, optionally, the form's source_text -- the user's own
+    transcript of the recording, which then supplies the book's text
+    while transcription supplies only the timing (see
+    whisper_transcribe.apply_reference_text).  The media is saved to a
+    temp file within this request (the upload stream cannot outlive it),
+    and a daemon thread transcribes it and imports the book; the page
+    polls /whisper/status/<task_id> until the book id comes back.
+    import_type picks which form's field names are read and which book
+    type is created ("mp3" -> HTML5 audio, "video" -> HTML5 video); it
+    defaults to mp3.
     """
     if whisper_transcribe.has_running_task():
         return (
@@ -169,6 +175,11 @@ def whisper_prepare():
     engine_error = _engine_error(model_size, language)
     if engine_error:
         return jsonify({"error": engine_error}), 400
+
+    # Optional: the user's transcript of the recording.  When present the
+    # recognizer supplies only the timing, so names and homophones come
+    # out exactly as written.
+    reference_text = (request.form.get(spec["source_text"]) or "").strip() or None
 
     temppath = current_app.env_config.temppath
     os.makedirs(temppath, exist_ok=True)
@@ -235,6 +246,7 @@ def whisper_prepare():
         },
         media_url=media_url,
         username=get_current_user(),
+        reference_text=reference_text,
     )
     return jsonify({"task_id": task_id})
 
@@ -286,6 +298,9 @@ def whisper_retranscribe(bookid):
     if engine_error:
         return jsonify({"error": engine_error}), 400
 
+    # Optional: the user's transcript, same as on the import page.
+    reference_text = (request.form.get("source_text") or "").strip() or None
+
     temppath = current_app.env_config.temppath
     os.makedirs(temppath, exist_ok=True)
 
@@ -323,6 +338,7 @@ def whisper_retranscribe(bookid):
         username=get_current_user(),
         retranscribe_book_id=bookid,
         temp_audio=temp_audio,
+        reference_text=reference_text,
     )
     return jsonify({"task_id": task_id})
 

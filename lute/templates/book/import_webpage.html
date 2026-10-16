@@ -298,6 +298,13 @@
       </div>
     </div>
     <div class="irow">
+      <label class="ilbl" for="mp3_source_text">{{ t('Reference text') }}</label>
+      <div class="ictrl">
+        <textarea id="mp3_source_text" name="mp3_source_text" rows="3" placeholder="{{ t('Optional: paste the text being read') }}"></textarea>
+        <div class="formfieldcomment">{{ t("Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty for plain transcription.") }}</div>
+      </div>
+    </div>
+    <div class="irow">
       <label class="ilbl" for="mp3_tag">{{ t('Tags') }}</label>
       <div class="ictrl">
         <input type="text" id="mp3_tag" name="mp3_tag" class="form-control">
@@ -403,6 +410,13 @@
           <span id="video_status_text" class="import-status-text"></span>
           <div class="import-progress-track"><div class="import-progress-bar" id="video_progress_bar"></div></div>
         </span>
+      </div>
+    </div>
+    <div class="irow">
+      <label class="ilbl" for="video_source_text">{{ t('Reference text') }}</label>
+      <div class="ictrl">
+        <textarea id="video_source_text" name="video_source_text" rows="3" placeholder="{{ t('Optional: paste the text being read') }}"></textarea>
+        <div class="formfieldcomment">{{ t("Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty for plain transcription.") }}</div>
       </div>
     </div>
     <div class="irow">
