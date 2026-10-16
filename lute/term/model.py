@@ -8,12 +8,13 @@ them in the database.
 import re
 import sqlalchemy
 
-from lute.models.term import Term as DBTerm, TermTag
+from lute.models.term import Term as DBTerm, Status, TermTag
 from lute.models.repositories import (
     LanguageRepository,
     TermRepository,
     TermTagRepository,
 )
+from lute.term import pos_tags
 
 
 class Term:  # pylint: disable=too-many-instance-attributes
@@ -301,6 +302,11 @@ class Repository:
             t = term_repo.find_by_spec(spec) or DBTerm()
             t.language = spec.language
 
+        # The automatic POS tag is applied once, when a term stops being
+        # "unknown", so read both of those before they are overwritten.
+        was_unknown = t.status == Status.UNKNOWN
+        pos_tag = self._auto_pos_tag(t)
+
         t.text = term.text
         t.original_text = term.text
         t.status = term.status
@@ -349,7 +355,37 @@ class Repository:
             else:
                 t.status = p.status
 
+        # Tag the term from the POS the page parse recorded for it, the
+        # first time it is saved as something other than "unknown".
+        #
+        # Deliberately last: _find_or_create_parent() copies this term's
+        # tags onto a brand new parent, and a parent is a different word
+        # with a different POS -- the tag belongs to 出そう, not to 出す.
+        #
+        # Also deliberately one-shot.  A term that is already known is
+        # never re-tagged, so a user who deletes the tag keeps it
+        # deleted.
+        if pos_tag is not None and was_unknown and t.status != Status.UNKNOWN:
+            if pos_tag not in {tt.text for tt in t.term_tags}:
+                t.add_term_tag(tt_repo.find_or_create_by_text(pos_tag))
+
         return t
+
+    def _auto_pos_tag(self, dbt):
+        """
+        The tag to derive from a term's stored POS, or None.
+
+        The parser decides, not this method: it is the parser that knows
+        a 助詞 from a 動詞, and most parsers have no POS to offer at all
+        (AbstractParser.get_pos_tag returns None).
+
+        Terms that were typed into a form by hand, and terms that
+        predate migration 20261016_add_term_pos.sql, have no stored POS
+        and are simply never auto-tagged.
+        """
+        if not dbt.pos or dbt.language is None:
+            return None
+        return dbt.language.parser.get_pos_tag(pos_tags.text_to_pos(dbt.pos))
 
     def _find_or_create_parent(self, pt, language, term, termtags) -> DBTerm:
         p = self._find_by_spec(language.id, pt)

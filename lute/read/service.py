@@ -19,6 +19,7 @@ from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.read import manga_columns
 from lute.term.model import Repository
+from lute.term import pos_tags
 from lute.utils.manga_images import image_path_for_page
 
 # from lute.utils.debug_helpers import DebugTimer
@@ -631,9 +632,10 @@ class Service:
 
         # Plain data captured up front: after a rollback the unsaved
         # Term objects are detached, so the recovery path must not read
-        # anything off them.
+        # anything off them.  pos comes along so a rebuilt term keeps
+        # the POS the page parse gave it.
         sources = {
-            key: (tis[0].term.language, tis[0].term.text)
+            key: (tis[0].term.language, tis[0].term.text, tis[0].term.pos)
             for key, tis in pending.items()
         }
 
@@ -645,7 +647,7 @@ class Service:
             except IntegrityError:
                 self.session.rollback()
                 for key, tis in pending.items():
-                    language, text = sources[key]
+                    language, text, pos_text = sources[key]
                     existing = (
                         self.session.query(Term)
                         .filter(
@@ -658,7 +660,9 @@ class Service:
                         for ti in tis:
                             ti.term = existing
                     else:
-                        rebuilt = Term.create_term_no_parsing(language, text)
+                        rebuilt = Term.create_term_no_parsing(
+                            language, text, pos_tags.text_to_pos(pos_text)
+                        )
                         rebuilt.status = 0
                         for ti in tis:
                             ti.term = rebuilt

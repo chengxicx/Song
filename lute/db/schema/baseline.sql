@@ -77,7 +77,7 @@ INSERT INTO statuses VALUES(98,'Ignored','I');
 INSERT INTO statuses VALUES(99,'Well Known','W');
 CREATE TABLE IF NOT EXISTS "tags" (
 	"TgID" INTEGER NOT NULL  ,
-	"TgText" VARCHAR(20) NOT NULL  ,
+	"TgText" VARCHAR(50) NOT NULL  ,
 	"TgComment" VARCHAR(200) NOT NULL DEFAULT '' ,
 	PRIMARY KEY ("TgID")
 );
