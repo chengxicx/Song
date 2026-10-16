@@ -155,31 +155,93 @@ def test_index_lists_languages_with_a_corpus(japanese, korean, generic, app_cont
     assert 'href="/grammar/%d"' % generic.id not in body
 
 
-def test_language_page_renders_the_library(japanese, app_context, client):
-    "The library page carries its chrome, inventory bar, cards and anchors."
-    resp = client.get(f"/grammar/{japanese.id}")
-    assert resp.status_code == 200
-    body = resp.get_data(as_text=True)
+def _ja_entries():
+    _need_sudachi()
+    return ja.library_entries("en")
 
-    # Page chrome: the search box and the "back to all languages" link.
+
+def _rows_of(body, level_entries):
+    "The rendered compact rows must number exactly the level's entries."
+    assert body.count('<li class="grammar-row') == len(level_entries)
+
+
+def test_library_index_shows_one_level_as_compact_rows(japanese, app_context, client):
+    """
+    The index must not render the whole ~1400-point corpus as full cards:
+    it shows a single level (the first by default) as one-line rows, each
+    linking to the point's own page.
+    """
+    entries = _ja_entries()
+    n5 = [e for e in entries if e["level"] == "N5"]
+    body = client.get(f"/grammar/{japanese.id}").get_data(as_text=True)
+
+    # Page chrome: search box, "all languages" link, inventory line.
     assert 'id="grammar-library-search"' in body
     assert 'href="/grammar/"' in body
-    # Inventory bar (list, not progress): a level jump link carrying the
-    # matchable count, with the reference-only half alongside it.
-    assert 'href="#level-N5"' in body
-    assert "grammar-library__stat" in body
+    assert "grammar-library__inventory" in body
     assert "grammar-library__stat--quiet" in body
-    # A level section and its card, anchored by the entry key so the page
-    # supports the panel's #key deep links.
-    assert 'id="level-N5"' in body
-    assert 'id="ds_' in body
-    assert 'data-search="' in body
-    # Cross-links inside the page target the other card's anchor.
-    assert 'class="grammar-item__related-link" href="#ds_' in body
-    # No "studied"/progress filter scaffolding slipped in.
+
+    # Exactly one level's rows, and far fewer than the whole corpus.
+    _rows_of(body, n5)
+    assert len(n5) < len(entries)
+
+    # Rows are compact, not the full card (no formation/examples inline),
+    # and they link to the detail route instead of an in-page anchor.
+    assert "grammar-item__formation" not in body
+    assert 'class="grammar-row__link" href="/grammar/' in body
+
+    # The level pills switch level server-side; the current one is marked.
+    assert "level=N4" in body
+    assert "is-active" in body
+
+    # No progress/"studied" filter scaffolding slipped in.
     assert "grammar-library__usage" not in body
     assert "★" not in body
 
+
+def test_library_index_level_param_selects_that_level(japanese, app_context, client):
+    entries = _ja_entries()
+    n1 = [e for e in entries if e["level"] == "N1"]
+    body = client.get(f"/grammar/{japanese.id}?level=N1").get_data(as_text=True)
+    _rows_of(body, n1)
+
+
+def test_library_index_falls_back_on_an_unknown_level(japanese, app_context, client):
+    entries = _ja_entries()
+    n5 = [e for e in entries if e["level"] == "N5"]
+    body = client.get(f"/grammar/{japanese.id}?level=ZZ").get_data(as_text=True)
+    _rows_of(body, n5)
+
+
+def test_detail_page_renders_the_full_card_and_navigation(japanese, app_context, client):
+    """
+    The card the index hides lives on the point's own page, with a back
+    link to its level and prev/next to walk it.
+    """
+    entries = _ja_entries()
+    entry = next(e for e in entries if e["key"] == "ds_particle-made-until")
+    body = client.get(f"/grammar/{japanese.id}/{entry['key']}").get_data(as_text=True)
+
+    assert "grammar-item__formation" in body
+    assert "grammar-item__examples" in body
+    assert "grammar-item__related" in body
+    assert "grammar-detail__position" in body
+    assert f"level={entry['level']}" in body  # the back link keeps the level
+    assert "grammar-detail__prev" in body or "grammar-detail__next" in body
+    # The cross-link is the other point's page, not a dead in-page anchor.
+    assert "grammar-item__related-link" in body
+    rel = entry["related"][0]
+    assert f'/grammar/{japanese.id}/{rel["key"]}' in body
+
+
+def test_detail_unknown_key_redirects_to_the_index(japanese, app_context, client):
+    resp = client.get(f"/grammar/{japanese.id}/no-such-key")
+    assert resp.status_code == 302
+    assert resp.headers["Location"].endswith(f"/grammar/{japanese.id}")
+
+
+def test_detail_for_a_corpusless_language_redirects(generic, app_context, client):
+    assert client.get(f"/grammar/{generic.id}/anything").status_code == 302
 
 
 def test_corpusless_language_explains_instead_of_404(generic, app_context, client):
@@ -189,14 +251,17 @@ def test_corpusless_language_explains_instead_of_404(generic, app_context, clien
 
 
 def test_korean_language_page_renders_its_library(korean, app_context, client):
-    "The Korean corpus renders too; TOPIK bands become section anchors."
+    "The Korean corpus renders too, one level at a time."
     pytest.importorskip("kiwipiepy")
-    resp = client.get(f"/grammar/{korean.id}")
-    assert resp.status_code == 200
-    body = resp.get_data(as_text=True)
-    assert "grammar-library__section" in body
-    # A level whose name carries a space must still make a valid anchor id.
-    assert 'id="level-TOPIK-1-2"' in body
+    from lute.read.render import grammar_analysis_ko as ko  # pylint: disable=import-outside-toplevel
+
+    entries = ko.library_entries("en")
+    first_level = entries[0]["level"]
+    body = client.get(f"/grammar/{korean.id}").get_data(as_text=True)
+    _rows_of(body, [e for e in entries if e["level"] == first_level])
+    assert "TOPIK 1-2" in body
+    assert "is-active" in body
+
 
 
 def test_unknown_language_is_404(client):
