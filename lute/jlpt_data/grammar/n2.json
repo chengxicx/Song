@@ -10493,5 +10493,682 @@
     "chinese": "山田先生告诉了我们前段时间住院时的事:“做手术之前,连水都不能喝。实在太痛苦了。”"
    }
   ]
+ },
+ {
+  "id": "omake-ni",
+  "pattern": "Sentence + おまけに",
+  "level": "N2",
+  "meaning_en": "what's more (and worse) / on top of that",
+  "meaning_detailed": "おまけに adds a further aggravating (occasionally amusing) fact: 'what's worse', 'on top of that'. Sentence-initial connector.",
+  "formation": "前文。おまけに、〜。",
+  "formation_notes": [
+   "Usually negative addition; light criticism allowed."
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "道に迷った。おまけに、雨まで降ってきた。",
+    "english": "I got lost. On top of that, it even started raining.",
+    "chinese": "迷路了，而且天还下起雨来。"
+   },
+   {
+    "japanese": "財布を忘れた。おまけに携帯の電池も切れた。",
+    "english": "I forgot my wallet, and what's worse, my phone died too.",
+    "chinese": "忘了带钱包，更糟的是手机还没电了。"
+   },
+   {
+    "japanese": "彼は遅刻した。おまけに宿題も忘れていた。",
+    "english": "He was late, and on top of that had forgotten his homework.",
+    "chinese": "他迟到了，而且还忘了作业。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "sunawachi",
+  "pattern": "A + すなわち + B",
+  "level": "N2",
+  "meaning_en": "namely / that is to say",
+  "meaning_detailed": "すなわち restates A more precisely as B: 'namely', 'i.e.'. Formal written connector; also marks logical conclusion.",
+  "formation": "A、すなわち B。/ つまり・言い換えると に近い",
+  "formation_notes": [
+   "つまり is the everyday counterpart."
+  ],
+  "formality": "formal",
+  "related": [
+   "tsumari"
+  ],
+  "examples": [
+   {
+    "japanese": "父の兄、すなわち伯父が来た。",
+    "english": "My father's older brother — namely, my uncle — came.",
+    "chinese": "父亲的哥哥，也就是伯父来了。"
+   },
+   {
+    "japanese": "彼の趣味はゲーム、すなわちインドア派だ。",
+    "english": "His hobby is games — that is, he's an indoor type.",
+    "chinese": "他的爱好是游戏，也就是说是个宅家派。"
+   },
+   {
+    "japanese": "明日、すなわち12月1日に提出してください。",
+    "english": "Please submit tomorrow, i.e. December 1st.",
+    "chinese": "请在明天，也就是12月1日提交。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "souieba",
+  "pattern": "そういえば、〜",
+  "level": "N2",
+  "meaning_en": "now that you mention it / come to think of it",
+  "meaning_detailed": "そういえば voices a sudden recollection triggered by the conversation: 'come to think of it'. Sentence-initial, spoken.",
+  "formation": "そういえば、〜。",
+  "formation_notes": [
+   "Signals the speaker just remembered something."
+  ],
+  "formality": "casual",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "そういえば、彼は今日休みだった。",
+    "english": "Come to think of it, he was off today.",
+    "chinese": "说起来，他今天休息。"
+   },
+   {
+    "japanese": "そういえば、鍵をどこに置いたかな。",
+    "english": "Now that I think of it, where did I put the keys?",
+    "chinese": "对了，我把钥匙放哪儿了呢。"
+   },
+   {
+    "japanese": "そういえば、あの映画、もう公開されたの？",
+    "english": "Speaking of which, has that movie been released yet?",
+    "chinese": "说起来，那部电影已经上映了吗？"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "sokode",
+  "pattern": "Sentence + そこで",
+  "level": "N2",
+  "meaning_en": "so / therefore (taking action)",
+  "meaning_detailed": "そこで introduces the action taken in response to the previous situation: 'so', 'thereupon'. The following clause is a decision or measure, not a mere consequence.",
+  "formation": "前文(状況)。そこで、〜(対応・行動)。",
+  "formation_notes": [
+   "後項は意志的な行動。単なる結果には使わない。"
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "電車が止まった。そこで、タクシーで行くことにした。",
+    "english": "The train stopped. So I decided to go by taxi.",
+    "chinese": "电车停了，于是我决定坐出租车去。"
+   },
+   {
+    "japanese": "分からないことがあった。そこで、先生に聞いた。",
+    "english": "There was something I didn't understand, so I asked the teacher.",
+    "chinese": "有不懂的地方，于是去问了老师。"
+   },
+   {
+    "japanese": "お金が足りない。そこで、アルバイトを始めた。",
+    "english": "I was short of money, so I started a part-time job.",
+    "chinese": "钱不够，于是开始打工。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "sorenanoni",
+  "pattern": "Sentence + それなのに",
+  "level": "N2",
+  "meaning_en": "nevertheless / in spite of that",
+  "meaning_detailed": "それなのに introduces an outcome that contradicts what the previous sentence leads you to expect: 'and yet', 'in spite of that'. Often carries complaint or disappointment.",
+  "formation": "前文。それなのに、〜(予想に反する結果)。",
+  "formation_notes": [
+   "不平・残念の気持ちを伴いやすい。"
+  ],
+  "formality": "neutral",
+  "related": [
+   "noni"
+  ],
+  "examples": [
+   {
+    "japanese": "彼は毎日練習した。それなのに、試合に負けた。",
+    "english": "He practised every day. And yet he lost the match.",
+    "chinese": "他每天练习，尽管如此还是输了比赛。"
+   },
+   {
+    "japanese": "何度も注意した。それなのに、また同じミスをした。",
+    "english": "I warned him many times, yet he made the same mistake again.",
+    "chinese": "提醒了好多次，可他还是犯了同样的错误。"
+   },
+   {
+    "japanese": "薬を飲んだ。それなのに、熱が下がらない。",
+    "english": "I took the medicine, but the fever won't come down.",
+    "chinese": "吃了药，可烧还是不退。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "sorenara",
+  "pattern": "Sentence + それなら",
+  "level": "N2",
+  "meaning_en": "if that's the case / then",
+  "meaning_detailed": "それなら picks up the interlocutor's statement as the premise and draws a suggestion or conclusion: 'in that case', 'then'.",
+  "formation": "相手の発言。それなら、〜(提案・結論)。",
+  "formation_notes": [
+   "なら/じゃあ are the shorter spoken variants."
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "「明日は暇だ。」「それなら、映画でも見に行こう。」",
+    "english": "'I'm free tomorrow.' 'Then let's go see a movie or something.'",
+    "chinese": "“明天我有空。”“那样的话，去看个电影吧。”"
+   },
+   {
+    "japanese": "「彼は来ない。」「それなら、私たちだけで始めよう。」",
+    "english": "'He's not coming.' 'In that case, let's start without him.'",
+    "chinese": "“他不来了。”“既然这样，我们自己开始吧。”"
+   },
+   {
+    "japanese": "「忙しいの？」「それなら、手伝うよ。」",
+    "english": "'Are you busy?' 'Then I'll help you.'",
+    "chinese": "“你忙吗？”“那我来帮你吧。”"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "sorewasouto",
+  "pattern": "それはそうと、〜",
+  "level": "N2",
+  "meaning_en": "by the way / changing the subject",
+  "meaning_detailed": "それはそうと deliberately shifts to a new topic: 'be that as it may, (changing the subject)'. Spoken connector.",
+  "formation": "それはそうと、〜(新しい話題)。",
+  "formation_notes": [
+   "Polite topic switch; ところで is close."
+  ],
+  "formality": "casual",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "それはそうと、明日の会議の準備はできた？",
+    "english": "By the way, are you ready for tomorrow's meeting?",
+    "chinese": "对了，明天会议的准备做好了吗？"
+   },
+   {
+    "japanese": "それはそうと、最近あの人に会った？",
+    "english": "Changing the subject — have you seen him lately?",
+    "chinese": "话说回来，最近见到那个人了吗？"
+   },
+   {
+    "japanese": "それはそうと、昼ご飯はもう食べた？",
+    "english": "By the way, have you had lunch yet?",
+    "chinese": "对了，午饭吃了吗？"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "chinamini",
+  "pattern": "ちなみに、〜",
+  "level": "N2",
+  "meaning_en": "incidentally / for your reference",
+  "meaning_detailed": "ちなみに appends supplementary information loosely related to the topic: 'incidentally', 'FYI'. Neutral connector.",
+  "formation": "ちなみに、〜(補足情報)。",
+  "formation_notes": [
+   "Adds reference info, not a new main topic."
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "ちなみに、明日は祝日です。",
+    "english": "Incidentally, tomorrow is a holiday.",
+    "chinese": "顺便一提，明天是节假日。"
+   },
+   {
+    "japanese": "ちなみに、この店は現金しか使えないよ。",
+    "english": "For your reference, this shop only takes cash.",
+    "chinese": "顺带说一句，这家店只能用现金。"
+   },
+   {
+    "japanese": "ちなみに、彼は私の従兄です。",
+    "english": "Incidentally, he is my cousin.",
+    "chinese": "顺便说一下，他是我的表哥。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "yousuru-ni",
+  "pattern": "要するに、〜",
+  "level": "N2",
+  "meaning_en": "in short / to sum up",
+  "meaning_detailed": "要するに compresses the preceding discussion into its essence: 'in short', 'the point is'. Sentence-initial.",
+  "formation": "前文(説明)。要するに、〜(要点)。",
+  "formation_notes": [
+   "結論を一言で言い換える接続詞。"
+  ],
+  "formality": "formal",
+  "related": [
+   "tsumari"
+  ],
+  "examples": [
+   {
+    "japanese": "要するに、準備不足が失敗の原因だ。",
+    "english": "In short, lack of preparation caused the failure.",
+    "chinese": "总之，准备不足是失败的原因。"
+   },
+   {
+    "japanese": "彼の話を要するに、「もっと頑張れ」ということだ。",
+    "english": "To sum up his talk: 'work harder'.",
+    "chinese": "他的话总结起来就是“再加把劲”。"
+   },
+   {
+    "japanese": "要するに、時間がないということですね。",
+    "english": "In short, you mean there is no time, right?",
+    "chinese": "总而言之，就是没有时间了，对吧。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "wo-hajime-toshite",
+  "pattern": "Noun + をはじめとして / をはじめ",
+  "level": "N2",
+  "meaning_en": "starting with X / including X",
+  "meaning_detailed": "〜をはじめとして names X as the leading representative of a larger set: 'starting with X', 'X above all'. Formal.",
+  "formation": "名詞 + をはじめとして / をはじめ",
+  "formation_notes": [
+   "を筆頭に is the stronger cousin."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "社長をはじめとして、全員が出席した。",
+    "english": "Everyone attended, starting with the company president.",
+    "chinese": "以社长为首，全员出席了。"
+   },
+   {
+    "japanese": "東京をはじめ、大都市で問題になっている。",
+    "english": "It is a problem in big cities, starting with Tokyo.",
+    "chinese": "以东京为首，各大城市都存在这个问题。"
+   },
+   {
+    "japanese": "彼をはじめとして、多くの人が賛成した。",
+    "english": "Many people, starting with him, agreed.",
+    "chinese": "以他为首的许多人都表示赞成。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "ka-no-you-da",
+  "pattern": "かのようだ / かのように / かのような（まるで 呼应）",
+  "level": "N2",
+  "meaning_en": "as if / as though (literary)",
+  "meaning_detailed": "〜かのようだ likens the situation to something that is not actually the case: 'as if X'. Literary; often framed by まるで.",
+  "formation": "普通形 + かのようだ / かのように / かのような + 名詞",
+  "formation_notes": [
+   "ようだ alone loses the hypothetical flavour."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "まるで夢かのような一日だった。",
+    "english": "It was a day as if in a dream.",
+    "chinese": "那是仿佛做梦一般的一天。"
+   },
+   {
+    "japanese": "彼は何も知らないかのように振る舞った。",
+    "english": "He behaved as though he knew nothing.",
+    "chinese": "他装出一副一无所知的样子。"
+   },
+   {
+    "japanese": "時間が止まったかのようだ。",
+    "english": "It is as if time has stopped.",
+    "chinese": "仿佛时间停止了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "ta-ka-to-omottara",
+  "pattern": "V た + かと思ったら",
+  "level": "N2",
+  "meaning_en": "just when X happened, then Y (unexpected)",
+  "meaning_detailed": "〜たかと思ったら describes one event immediately followed by an unexpected next one: 'no sooner had X than Y', 'just when I thought X'.",
+  "formation": "動詞た形 + かと思ったら",
+  "formation_notes": [
+   "後項は意外な展開。主語が同じでも違ってもよい。"
+  ],
+  "formality": "neutral",
+  "related": [
+   "ka-to-omoikiya"
+  ],
+  "examples": [
+   {
+    "japanese": "空が晴れたかと思ったら、すぐ曇ってきた。",
+    "english": "Just when the sky cleared, it clouded over again right away.",
+    "chinese": "天刚放晴，马上又阴了。"
+   },
+   {
+    "japanese": "泣き出したかと思ったら、もう笑っている。",
+    "english": "She burst into tears, and the next moment she was laughing.",
+    "chinese": "刚哭起来，转眼又笑了。"
+   },
+   {
+    "japanese": "家に着いたかと思ったら、また出かけた。",
+    "english": "No sooner had he got home than he went out again.",
+    "chinese": "刚到家，又出门了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "nai-mono-ka",
+  "pattern": "V ない + ものか",
+  "level": "N2",
+  "meaning_en": "I wish I could (but it seems impossible)",
+  "meaning_detailed": "〜ないものか expresses a frustrated wish for something hard to realise: 'if only it could', often with どうにか/なんとか. Close to ないものだろうか, slightly more spoken.",
+  "formation": "動詞ない形 + ものか",
+  "formation_notes": [
+   "ものかな adds a softer self-address."
+  ],
+  "formality": "neutral",
+  "related": [
+   "nai-mono-darou-ka"
+  ],
+  "examples": [
+   {
+    "japanese": "どうにか間に合わないものか。",
+    "english": "I wish I could somehow make it in time.",
+    "chinese": "就不能想办法赶上吗。"
+   },
+   {
+    "japanese": "一度でいいから会えないものか。",
+    "english": "If only I could meet him just once.",
+    "chinese": "哪怕只见一次也好，就不能见到他吗。"
+   },
+   {
+    "japanese": "もっと早く来られないものか。",
+    "english": "Couldn't you come any earlier?",
+    "chinese": "就不能再早点来吗。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "ni-yori",
+  "pattern": "Noun + により",
+  "level": "N2",
+  "meaning_en": "due to / by means of (written)",
+  "meaning_detailed": "〜により marks cause, means, or basis in formal writing: 'due to X', 'by X'. The stiffer written variant of によって.",
+  "formation": "名詞 + により / によりますと",
+  "formation_notes": [
+   "によると is the hearsay variant: 'according to'."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "不注意により、事故が起きた。",
+    "english": "The accident occurred due to carelessness.",
+    "chinese": "由于疏忽发生了事故。"
+   },
+   {
+    "japanese": "結果は調査方法により異なる。",
+    "english": "The results differ depending on the survey method.",
+    "chinese": "结果因调查方法而异。"
+   },
+   {
+    "japanese": "規則により、入場が制限されている。",
+    "english": "Entry is restricted by regulation.",
+    "chinese": "根据规定，入场受到限制。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "ni-kagiri",
+  "pattern": "Noun + に限り",
+  "level": "N2",
+  "meaning_en": "limited to X (written notice)",
+  "meaning_detailed": "〜に限り confines the statement strictly to X: 'limited to X', 'only X'. Standard on signs, tickets, and notices.",
+  "formation": "名詞 + に限り",
+  "formation_notes": [
+   "告示・注意書きの文体。話し言葉では だけ。"
+  ],
+  "formality": "formal",
+  "related": [
+   "ni-kagitta-koto-dewa-nai"
+  ],
+  "examples": [
+   {
+    "japanese": "会員に限り、特典が受けられる。",
+    "english": "Only members can receive the benefit.",
+    "chinese": "仅限会员可以享受优惠。"
+   },
+   {
+    "japanese": "本日に限り、全品半額です。",
+    "english": "Today only, everything is half price.",
+    "chinese": "仅限今天，全场半价。"
+   },
+   {
+    "japanese": "先着100名に限り、プレゼントを配布する。",
+    "english": "Gifts will be given only to the first 100 arrivals.",
+    "chinese": "仅限前100名发放赠品。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "no-mo-mottomo-da",
+  "pattern": "〜のももっともだ",
+  "level": "N2",
+  "meaning_en": "it's only natural that / no wonder",
+  "meaning_detailed": "〜のももっともだ concedes the reaction or judgement is reasonable: 'no wonder X', 'X is quite understandable'. Written.",
+  "formation": "普通形 + のももっともだ / のも当然だ",
+  "formation_notes": [
+   "もっともだ stands alone as agreement: 'fair point'."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼が怒るのももっともだ。",
+    "english": "It's only natural that he got angry.",
+    "chinese": "他生气也是理所当然的。"
+   },
+   {
+    "japanese": "失敗して落ち込むのももっともだ。",
+    "english": "Feeling down after a failure is understandable.",
+    "chinese": "失败了会消沉也是人之常情。"
+   },
+   {
+    "japanese": "その発言に批判が集まるのももっともだ。",
+    "english": "It is no wonder that remark drew criticism.",
+    "chinese": "那番言论招来批评也是难怪的。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "no-ue-de-wa",
+  "pattern": "Noun の + 上では",
+  "level": "N2",
+  "meaning_en": "in terms of X / on X (as a matter of)",
+  "meaning_detailed": "〜の上では restricts the domain of judgement: 'in terms of X', 'on paper'. Typical pairs: 計画の上では, 理論の上では.",
+  "formation": "名詞 + の上では",
+  "formation_notes": [
+   "上で without は marks 'after doing'; don't confuse."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "計画の上では完璧だが、実際は難しい。",
+    "english": "It's perfect on paper, but difficult in practice.",
+    "chinese": "从计划上看很完美，但实际很难。"
+   },
+   {
+    "japanese": "法律の上では問題ない。",
+    "english": "There is no problem in terms of the law.",
+    "chinese": "在法律上没有问题。"
+   },
+   {
+    "japanese": "理論の上では可能だ。",
+    "english": "It is possible in theory.",
+    "chinese": "从理论上讲是可能的。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "no-shita-de",
+  "pattern": "Noun の + 下で",
+  "level": "N2",
+  "meaning_en": "under X (rule / guidance / name)",
+  "meaning_detailed": "〜の下で situates the action under an authority, condition, or principle: 'under X'. Written; concrete spatial 'under' is の下に.",
+  "formation": "名詞 + の下で",
+  "formation_notes": [
+   "指導の下で・法律の下で・〜の名の下で."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "新しい社長の下で、会社は変わった。",
+    "english": "Under the new president, the company changed.",
+    "chinese": "在新社长的领导下，公司发生了变化。"
+   },
+   {
+    "japanese": "先生の指導の下で、研究を進めた。",
+    "english": "I pursued the research under the teacher's guidance.",
+    "chinese": "在老师的指导下推进了研究。"
+   },
+   {
+    "japanese": "法律の下で、すべての人は平等だ。",
+    "english": "Under the law, all people are equal.",
+    "chinese": "在法律之下，人人平等。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "mo-douzen-da",
+  "pattern": "Noun + も同然だ",
+  "level": "N2",
+  "meaning_en": "as good as X / tantamount to X",
+  "meaning_detailed": "〜も同然だ equates the situation in effect with X: 'it is as good as X'. Common with ただも同然 (practically free).",
+  "formation": "名詞 + も同然だ",
+  "formation_notes": [
+   "名詞に付き効果上の等価を述べる。"
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "あんなに安い値段なら、ただも同然だ。",
+    "english": "At such a cheap price, it's as good as free.",
+    "chinese": "那么便宜的价格，等于白送。"
+   },
+   {
+    "japanese": "彼の態度は、辞職も同然だ。",
+    "english": "His attitude is tantamount to resignation.",
+    "chinese": "他的态度等同于辞职。"
+   },
+   {
+    "japanese": "こんなにボロボロでは、捨てたも同然だ。",
+    "english": "This worn out, it's as good as thrown away.",
+    "chinese": "破成这样，跟扔掉没什么两样。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
  }
 ]
