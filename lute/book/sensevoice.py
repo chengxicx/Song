@@ -61,6 +61,20 @@ VAD_MIN_SILENCE_SECONDS = 0.6
 VAD_MIN_SPEECH_SECONDS = 0.4
 VAD_MAX_SPEECH_SECONDS = 30
 
+# A VAD boundary lands slightly *after* the start of speech -- the
+# detector needs a moment of evidence before it fires -- so a sentence's
+# first syllable can fall outside the segment and the recognizer never
+# hears it (prod: '例のプロジェクト' from audio saying '李さん例の
+# プロジェクト').  Gluing a little silence onto both ends of the audio
+# fed to the recognizer recovers those onsets without touching the cue's
+# own start/end.
+#
+# Capped at half the minimum silence gap: neighbouring segments share
+# that gap, one half each, so anything larger would make them overlap and
+# the recognizer would hear the neighbour's words a second time.  See
+# _segment_pad_seconds.
+VAD_SEGMENT_PAD_SECONDS = 0.3
+
 # Cached OfflineRecognizer: one instance, keyed by language code.
 _RECOG = None
 _RECOG_LANG = None
@@ -332,7 +346,12 @@ def transcribe_clip(audio_path, lang_code):
         stream = rec.create_stream()
         stream.accept_waveform(sr, samples)
         rec.decode_stream(stream)
-        text = (stream.result.text or "").strip()
+        # SenseVoice separates Japanese/Chinese words with spaces; drop
+        # them so shadowing's text comparison sees the same string the
+        # user would type.  (shadowing uses this return value.)
+        from lute.book.whisper_transcribe import strip_word_spaces
+
+        text = strip_word_spaces((stream.result.text or "").strip(), lang_code)
     logger.info(
         "sensevoice: transcribed %.1fs clip (language=%r) -> %r",
         duration,
@@ -340,6 +359,17 @@ def transcribe_clip(audio_path, lang_code):
         text[:80],
     )
     return text, duration
+
+
+def _segment_pad_seconds():
+    """
+    How much silence to glue onto each segment fed to the recognizer.
+
+    Capped at half the minimum silence gap: two neighbouring segments
+    share that gap, and anything larger would make them overlap, so the
+    recognizer would transcribe the neighbour's words a second time.
+    """
+    return min(VAD_SEGMENT_PAD_SECONDS, VAD_MIN_SILENCE_SECONDS / 2)
 
 
 def transcribe_to_cues(audio_path, lang_code, progress_cb=None):
@@ -361,10 +391,14 @@ def transcribe_to_cues(audio_path, lang_code, progress_cb=None):
     """
     import json
 
+    import numpy as np  # pylint: disable=import-error,import-outside-toplevel
     import sherpa_onnx  # pylint: disable=import-error,import-outside-toplevel
+
+    from lute.book.whisper_transcribe import strip_word_spaces
 
     sr = 16000
     rec = _recognizer(lang_code)
+    pad_samples = int(_segment_pad_seconds() * sr)
 
     duration = _container_duration_secs(audio_path)
 
@@ -384,11 +418,25 @@ def transcribe_to_cues(audio_path, lang_code, progress_cb=None):
         seg_samples = segment.samples
         if not len(seg_samples):
             return
+        spoken_secs = len(seg_samples) / sr
+        if pad_samples:
+            # See VAD_SEGMENT_PAD_SECONDS: a boundary sits slightly after
+            # the real onset, so silence is glued on both ends of the
+            # audio handed to the recognizer.  The cue's own start/end
+            # stay the raw VAD values, so neither the timeline nor the
+            # pause-based punctuation shifts.
+            seg_samples = np.concatenate(
+                [
+                    np.zeros(pad_samples, dtype=np.float32),
+                    seg_samples,
+                    np.zeros(pad_samples, dtype=np.float32),
+                ]
+            )
         stream = rec.create_stream()
         stream.accept_waveform(sr, seg_samples)
         rec.decode_stream(stream)
-        text = (stream.result.text or "").strip()
-        end = start + len(seg_samples) / sr
+        text = strip_word_spaces((stream.result.text or "").strip(), lang_code)
+        end = start + spoken_secs
         if text:
             cues.append({"start": round(start, 3), "end": round(end, 3), "text": text})
         if progress_cb is not None and duration > 0:

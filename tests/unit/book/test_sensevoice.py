@@ -171,6 +171,24 @@ def test_transcribe_clip_returns_text_and_duration(model_dir_tmp):
     assert os.path.exists(wav)
 
 
+def test_transcribe_clip_strips_japanese_word_spaces(monkeypatch):
+    "Shadowing compares this text, so the spaces must go."
+    try:
+        import numpy as np
+    except ImportError:
+        pytest.skip("numpy not installed")
+
+    monkeypatch.setattr(
+        sensevoice,
+        "_decode_16k_mono",
+        lambda _p: (16000, np.zeros(16000, dtype=np.float32), 1.0),
+    )
+    with patch.object(sensevoice, "_recognizer", return_value=_FakeRecognizer(" こん にち は。")):
+        text, duration = sensevoice.transcribe_clip("whatever.wav", "ja")
+    assert text == "こんにちは。"
+    assert duration == 1.0
+
+
 # ---------------------------------------------------------------------
 # Streaming audiobook transcription (sherpa_onnx stubbed at sys.modules)
 # ---------------------------------------------------------------------
@@ -343,6 +361,88 @@ def test_transcribe_to_cues_short_pause_marks_clause(model_dir_tmp, monkeypatch)
     # 4.8-6 flush tail, which gets the final sentence mark.
     assert [c["text"] for c in cues] == ["seg 1、", "seg 2、", "seg 3。"]
     assert text == "seg 1、\nseg 2、\nseg 3。"
+
+
+def test_strip_word_spaces_only_for_languages_written_without_them():
+    """
+    SenseVoice pads Japanese/Chinese with spaces ("させ て もらいま
+    した"), which is noise there and breaks exact comparison; Korean and
+    English use spaces and must keep them.
+    """
+    from lute.book.whisper_transcribe import strip_word_spaces
+
+    assert strip_word_spaces("させ て もらいま した", "ja") == "させてもらいました"
+    assert strip_word_spaces("中国 式 に し ましょう", "zh") == "中国式にしましょう"
+    assert strip_word_spaces("中国\u3000式", "yue") == "中国式"
+    assert strip_word_spaces("hello world", "en") == "hello world"
+    assert strip_word_spaces("안녕 하세요", "ko") == "안녕 하세요"
+
+
+def test_segment_padding_never_exceeds_half_the_silence_gap(monkeypatch):
+    """
+    Padding must stay <= min_silence / 2 or two neighbouring segments
+    would overlap in the audio fed to the recognizer, transcribing the
+    neighbour's words twice.
+    """
+    assert sensevoice._segment_pad_seconds() == 0.3  # 0.6 / 2
+    monkeypatch.setattr(sensevoice, "VAD_SEGMENT_PAD_SECONDS", 5.0)
+    assert (
+        sensevoice._segment_pad_seconds()
+        == sensevoice.VAD_MIN_SILENCE_SECONDS / 2
+    )
+
+
+class _RecordingRecognizer:
+    "Records the sample count handed to it, so padding is measurable."
+
+    def __init__(self):
+        self.lengths = []
+
+    def create_stream(self):
+        return _RecordingStream(self.lengths)
+
+    def decode_stream(self, _stream):
+        pass
+
+
+class _RecordingStream:
+    def __init__(self, lengths):
+        self.lengths = lengths
+        self.result = type("R", (), {"text": "ことば"})()
+
+    def accept_waveform(self, _sr, samples):
+        self.lengths.append(len(samples))
+
+
+def test_segments_are_padded_before_recognition(model_dir_tmp, monkeypatch):
+    """
+    The VAD boundary sits after the real onset, so each segment is fed
+    with a little silence glued on both ends; the cue timeline itself is
+    untouched (asserted in the punctuation test below).
+    """
+    try:
+        import numpy  # noqa: F401
+        import av  # noqa: F401
+    except ImportError:
+        pytest.skip("PyAV/numpy not installed")
+
+    model_dir_tmp.mkdir()
+    wav = model_dir_tmp / "book.wav"
+    _write_wav(str(wav), 3)
+
+    _install_fake_sherpa(monkeypatch)
+    rec = _RecordingRecognizer()
+    with patch.object(sensevoice, "_recognizer", return_value=rec):
+        text, cues_json = sensevoice.transcribe_to_cues(str(wav), "ja")
+
+    pad = int(sensevoice._segment_pad_seconds() * 16000)
+    assert pad == 4800
+    # Fake VAD emits 2 s of speech per segment.
+    assert rec.lengths == [2 * 16000 + 2 * pad]
+    cues = json.loads(cues_json)
+    # Raw boundaries, not padded ones: 0.0 - 2.0.
+    assert cues[0]["start"] == 0.0
+    assert cues[0]["end"] == 2.0
 
 
 def test_drop_wordless_cues_keeps_words_and_drops_punctuation():

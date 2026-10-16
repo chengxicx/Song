@@ -14,6 +14,7 @@ import importlib.util
 import json
 import logging
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -345,6 +346,8 @@ def transcribe_to_cues(
 
     punctuate_cues(cues, lang_code)
     drop_wordless_cues(cues)
+    for c in cues:
+        c["text"] = strip_word_spaces(c["text"], lang_code)
     text = "\n".join(c["text"] for c in cues if c["text"])
     return text, json.dumps(cues, ensure_ascii=False)
 
@@ -391,6 +394,28 @@ def drop_wordless_cues(cues):
     """
     cues[:] = [c for c in cues if c["text"] and not _is_wordless(c["text"])]
     return cues
+
+
+# SenseVoice separates Japanese/Chinese words with spaces ("させ て
+# もらいま した"), which is noise for languages written without them and
+# breaks any exact text comparison (shadowing scoring).  Korean and
+# English are written with spaces, so they are left alone.  Whisper cues
+# never carry these spaces; this is applied to both engines for one
+# consistent rule.
+_NO_SPACE_LANGS = {"ja", "zh", "yue"}
+
+# A run of spaces touching a CJK character on either side is a
+# SenseVoice artifact.  Spaces between two non-CJK characters are left
+# alone, so "iPhone 15" survives.
+_CJK = r"\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uff66-\uff9d"
+_CJK_ADJACENT_SPACE = re.compile(rf"(?<=[{_CJK}])[ \u3000]+|[ \u3000]+(?=[{_CJK}])")
+
+
+def strip_word_spaces(text, lang_code):
+    "Drop the word-separating spaces SenseVoice adds to CJK text."
+    if (lang_code or "").lower() not in _NO_SPACE_LANGS:
+        return text
+    return _CJK_ADJACENT_SPACE.sub("", text).strip()
 
 
 def punctuate_cues(cues, lang_code):
