@@ -49,6 +49,18 @@ MODEL_IDLE_TIMEOUT_SECONDS = 15 * 60
 # The silero VAD must be fed small pieces: see transcribe_to_cues.
 VAD_FEED_SECS = 0.5
 
+# VAD segmentation thresholds (seconds).  Deliberately looser than the
+# silero defaults of 0.25 / 0.25 / 20: at 0.25 s of silence the VAD cuts
+# a spoken sentence in half, and SenseVoice recognises one segment at a
+# time with no context from its neighbours, so half-sentences come back
+# as fragments and hallucinations.  Measured on prod (single 157 s
+# textbook mp3, same audio, same 8 s runtime for both settings):
+#   0.25 / 0.25 / 20  ->  65 cues, fragments ('。', 'はい？') throughout
+#   0.60 / 0.40 / 30  ->  32 cues, whole sentences
+VAD_MIN_SILENCE_SECONDS = 0.6
+VAD_MIN_SPEECH_SECONDS = 0.4
+VAD_MAX_SPEECH_SECONDS = 30
+
 # Cached OfflineRecognizer: one instance, keyed by language code.
 _RECOG = None
 _RECOG_LANG = None
@@ -359,9 +371,9 @@ def transcribe_to_cues(audio_path, lang_code, progress_cb=None):
     paths = model_paths()
     cfg = sherpa_onnx.VadModelConfig()
     cfg.silero_vad.model = paths["vad"]
-    cfg.silero_vad.min_silence_duration = 0.25
-    cfg.silero_vad.min_speech_duration = 0.25
-    cfg.silero_vad.max_speech_duration = 20
+    cfg.silero_vad.min_silence_duration = VAD_MIN_SILENCE_SECONDS
+    cfg.silero_vad.min_speech_duration = VAD_MIN_SPEECH_SECONDS
+    cfg.silero_vad.max_speech_duration = VAD_MAX_SPEECH_SECONDS
     cfg.sample_rate = sr
     vad = sherpa_onnx.VoiceActivityDetector(cfg, buffer_size_in_seconds=120)
 
@@ -403,10 +415,13 @@ def transcribe_to_cues(audio_path, lang_code, progress_cb=None):
 
     # SenseVoice emits almost no punctuation for Japanese/Chinese; the
     # VAD pauses stand in for clause/sentence ends (shared with the
-    # whisper engine, whose cues keep their own marks).
-    from lute.book.whisper_transcribe import punctuate_cues
+    # whisper engine, whose cues keep their own marks).  Punctuation-only
+    # cues -- the recognizer's answer for silence, breaths and page turns
+    # -- are dropped: they show up as stray '。' lines in the reader.
+    from lute.book.whisper_transcribe import drop_wordless_cues, punctuate_cues
 
     punctuate_cues(cues, lang_code)
+    drop_wordless_cues(cues)
     text = "\n".join(c["text"] for c in cues)
     return text, json.dumps(cues, ensure_ascii=False)
 

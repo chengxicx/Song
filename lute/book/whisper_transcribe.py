@@ -344,6 +344,7 @@ def transcribe_to_cues(
                 progress_cb(min(99, int(seg.end / duration * 100)))
 
     punctuate_cues(cues, lang_code)
+    drop_wordless_cues(cues)
     text = "\n".join(c["text"] for c in cues if c["text"])
     return text, json.dumps(cues, ensure_ascii=False)
 
@@ -364,6 +365,32 @@ _CUE_SENTENCE_MARKS = {"ja": "。", "zh": "。", "yue": "。"}
 _CUE_CLAUSE_MARKS = {"ja": "、", "zh": "、", "yue": "、"}
 
 _CUE_ALREADY_TERMINAL = "。．.、，,！!？?…」』）)]"
+
+
+# Characters that carry no words on their own.  A cue built only from
+# these is noise, not speech.  Deliberately limited to punctuation and
+# whitespace: anything else (♪, digits, letters) might be real content.
+_WORDLESS_CHARS = set("。．.、，,！!？?…‥「」『』（）()［］【】〈〉《》 \u3000-—～~")
+
+
+def _is_wordless(text):
+    "True when text contains no letter, digit, kana or kanji at all."
+    return all(ch in _WORDLESS_CHARS for ch in text)
+
+
+def drop_wordless_cues(cues):
+    """
+    In place: remove cues whose text has no words.
+
+    A punctuation-only cue ('。', '？') is the recognition of a breath, a
+    page turn or background music, and renders in the reader as a stray
+    line of punctuation.  Both engines can produce them -- silero's
+    min_speech_duration only says the *audio* was long enough, not that
+    it held speech, and whisper's vad_filter has the same gap.  Dropping
+    them is safe: a real cue always has at least one word character.
+    """
+    cues[:] = [c for c in cues if c["text"] and not _is_wordless(c["text"])]
+    return cues
 
 
 def punctuate_cues(cues, lang_code):
