@@ -38,6 +38,7 @@ _RULE_SENTENCES = {
     "ru_dolzhen_byl": "Я должен был позвонить вчера.",
     "ru_chut_ne": "Она чуть не упала.",
     "ru_stoilo_kak": "Стоило прийти, как пошёл дождь.",
+    "ru_stoit_kak": "Стоит свернуть вправо, как увидеть здание.",
     "ru_v_techenie": "Он работал в течение трёх часов.",
     "ru_double_neg": "Я никогда не видел моря.",
     "ru_kak_ni": "Как ни старайся, не получится.",
@@ -112,3 +113,61 @@ def test_is_russian_language_detects_by_name():
 def test_rules_are_loaded():
     "The rule set is populated."
     assert len(_RU_RULES) >= 10
+
+
+# ---- golden examples ----------------------------------------------------
+#
+# tests/unit/grammar/ru_golden.json holds textbook sentences that each
+# hand-written rule must keep matching.  The sentences came out of a local
+# textbook extraction, so they are real prose rather than invented examples,
+# and a change that narrows a rule enough to lose them fails here.
+
+import json  # noqa: E402
+import os  # noqa: E402
+import re  # noqa: E402
+
+_GOLDEN_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "grammar", "ru_golden.json"
+)
+
+
+def _golden():
+    if not os.path.exists(_GOLDEN_PATH):
+        pytest.skip("no ru golden set yet")
+    with open(_GOLDEN_PATH, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def test_golden_examples_fire_their_rule():
+    "Every golden sentence must still be recognised by its own rule."
+    golden = _golden()
+    assert golden, "golden set is empty"
+    for key, entry in golden.items():
+        for ex in entry["examples"]:
+            hits = _keys(ex["ru"])
+            assert key in hits, f"{key} lost its golden sentence: {ex['ru']!r}"
+
+
+def test_golden_sentences_are_clean_russian():
+    """
+    No combining accents and no Latin look-alike vowels.
+
+    The extraction keeps the stress marks the print edition uses, and OCR
+    renders some stressed Cyrillic vowels as Latin letters with a precomposed
+    accent (е́ typed as é, U+00E9).  Both break tokenisation, and a literal
+    carrying either one never matches ordinary Russian text, so the stored
+    sentences must be free of them.
+    """
+    suspect = re.compile(
+        r"[\u0300-\u036f\u00c0-\u00ff]"  # combining marks, Latin-1 accents
+    )
+    for key, entry in _golden().items():
+        for ex in entry["examples"]:
+            bad = suspect.findall(ex["ru"])
+            assert not bad, f"{key}: {bad} in {ex['ru']!r}"
+
+
+def test_stoit_kak_needs_the_infinitive():
+    "стоит … как only matches with an infinitive after стоит."
+    assert "ru_stoit_kak" in _keys("Стоит свернуть вправо, как увидеть здание.")
+    assert "ru_stoit_kak" not in _keys("Он стоит на улице, как статуя.")

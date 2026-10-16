@@ -11,11 +11,15 @@ pymorphy3 is imported lazily so the base install works without it; the
 route falls back to the generic rule library on ImportError.
 """
 
+import json
+import os
 import re
+import threading
 
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
     make_rule,
+    match_rule,
     spec_lemma,
     spec_morph,
     spec_pos,
@@ -25,6 +29,15 @@ from lute.read.render.grammar_analysis_matcher import (
 _MORPH = None
 
 _WORD_RE = re.compile(r"\w+", re.UNICODE)
+
+# Adjectival endings a Russian participle can carry (full and short forms of
+# -щий / -вший / -нный / -тый / -мый).  Used to keep the participle rule off
+# the ordinary verb and noun forms pymorphy3 mis-tags as PRTF/PRTS.
+_PARTICIPLE_RE = re.compile(
+    r"[а-яё]*"
+    r"(?:щ|вш|нн|т|м|ем|им)"
+    r"(?:ий|ый|ой|ая|яя|ое|ее|ые|ие|ого|его|ому|ему|ым|им|ых|их|ом|ем|а|о|ы|и)"
+)
 
 # pymorphy3 gramemes surfaced to the matcher, keyed like the spaCy morph
 # dicts (UPPER-CASE category, OpenCorpora grameme value).
@@ -185,7 +198,19 @@ _RU_RULES = [
         "Imperative (-те form, читайте)",
         "A1",
         "the command form of the verb (читайте, сядьте).",
-        {"seq": [{"pos_in": ["VERB"], "morph": {"Mood": "impr"}}]},
+        # pymorphy3 has no context disambiguation and RANKS a fabricated
+        # imperative reading first for ordinary nouns and adjectives:
+        # рублей (genitive plural of рубль) comes back as рублеть/impr at
+        # 0.561, above the noun reading's 0.410.  A top-reading test cannot
+        # filter that, so the rule asks for an unambiguous reading instead.
+        # Genuine imperatives are unambiguous here: давайте 0.996, иди /
+        # скажите / читайте / делай 1.0, while every fabricated one lands
+        # between 0.13 and 0.56.
+        {
+            "seq": [
+                {"pos_in": ["VERB"], "morph": {"Mood": "impr"}, "min_score": 0.9}
+            ]
+        },
         zh="命令式（читайте / сядьте）：表示命令或请求。",
     ),
     # ---- A2 ----
@@ -313,7 +338,21 @@ _RU_RULES = [
         "Participles (-щий / -вший / -мый)",
         "B1",
         "verbal adjectives: читающий, прочитавший, читаемый.",
-        {"seq": [spec_pos("PRTF", "PRTS")]},
+        # A bare PRTF/PRTS tag is not enough.  pymorphy3 tags non-participles
+        # as participles with a top-ranked reading -- поиграем and граждан
+        # come back as short PRTS, and будет as a short PRTS too -- so a
+        # POS test alone fires on ordinary verb and noun forms (58% of the
+        # corpus pages).  A participle is an adjective in form, so the rule
+        # also requires an adjectival ending; that is what actually
+        # separates указанный / читающий from поиграем / граждан.
+        {
+            "seq": [
+                {
+                    "pos_in": ["PRTF", "PRTS"],
+                    "surface_re": _PARTICIPLE_RE,
+                }
+            ]
+        },
         zh="形动词（-щий/-вший/-мый）：动词性的形容词（читающий 正在读的）。",
     ),
     make_rule(
@@ -468,7 +507,170 @@ _RU_RULES = [
         },
         zh="чем …, тем …：越……越……（чем больше, тем лучше）。",
     ),
+    make_rule(
+        "ru_stoit_kak",
+        "стоит + infinitive ..., как ...",
+        "B2",
+        "one only has to ... and: стоит свернуть вправо, как увидеть здание.",
+        # The infinitive anchor is what makes this specific.  Without it the
+        # rule fires on the ordinary verb стоит ("stands"): "Он стоит на
+        # улице, как статуя" matched it in a trial of the negative set, and
+        # with spec_pos("INFN") it does not.
+        {
+            "left": [spec_surface("стоит"), spec_pos("INFN")],
+            "right": [spec_surface("как")],
+            "min_gap": 0,
+            "max_gap": 8,
+        },
+        zh="стоит + 不定式 …, как …：只要……就……（стоит свернуть вправо, как увидеть здание）。",
+    ),
 ]
+
+
+# ---- data-driven rules -------------------------------------------------
+#
+# Rows merged from a local grammar-point extraction land in
+# jlpt_data/grammar_ru.json.  The matcher for each row is derived from its
+# `focus` list -- the word forms the point is stated with, e.g.
+# ["у", "меня", "есть"].  Two candidate specs are built, one on those
+# surface forms and one on their lemmas, because Russian inflection cuts
+# both ways: an example may carry a form whose lemma a lemma-match needs,
+# and pymorphy3's context-free reading sometimes gives a different normal
+# form than the surface.
+#
+# Every candidate is then validated against the row's own example sentences
+# with the SAME matcher the panel runs, and a row whose specs fire on none
+# of its examples is dropped -- so a mis-derived focus can never report a
+# false positive.  A one-word focus is kept only when the word is long
+# enough to be specific (a bare `у` would fire on every page).
+#
+# Focus literals are stripped of stress marks (U+0300-036F) first: the
+# source text keeps them, and `\w` does not match a combining acute, so an
+# accented literal fragments at the accent and never matches anything.
+
+_STRESS_RE = re.compile(r"[\u0300-\u036f]")
+
+# key -> the examples a data rule was validated against (tests re-run this).
+_RU_RULE_EXAMPLES = {}
+
+
+def _strip_stress(text):
+    "Drop combining accents (U+0300-036F); they break tokenisation."
+    return _STRESS_RE.sub("", text or "")
+
+
+def _norm_name(name):
+    "Fold a rule name for the hand-written / data-layer overlap check."
+    return re.sub(r"[^0-9a-z\u0400-\u04FF]+", "", _strip_stress(name or "").lower())
+
+
+_HANDWRITTEN_NORMS = {_norm_name(r["name"]) for r in _RU_RULES}
+
+_DATA_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_ru.json",
+    )
+)
+
+
+def _focus_words(focus):
+    words = []
+    for f in focus or []:
+        w = _strip_stress(f).strip().lower()
+        if w:
+            words.append(w)
+    return words
+
+
+def _focus_specs(focus):
+    "Candidate matcher specs derived from one row's focus list."
+    words = _focus_words(focus)
+    if not words:
+        return []
+    if len(words) == 1 and len(words[0]) < 4:
+        return []  # a bare short word fires everywhere -- never specific
+    return [
+        {"seq": [spec_surface(w) for w in words]},
+        {"seq": [spec_lemma(w) for w in words]},
+    ]
+
+
+def _flash(spec, examples):
+    "True when spec fires on at least one of the row's example sentences."
+    for sentence in examples:
+        text = _strip_stress(sentence)
+        if match_rule({"match": spec}, _tokens_for(text), text):
+            return True
+    return False
+
+
+def _load_data_rules():
+    """
+    Rules for the merged grammar-point rows (jlpt_data/grammar_ru.json).
+
+    Specs are derived from each row's `focus` and kept only when they match
+    at least one of the row's own examples, so the derivation can never
+    invent a matcher the data does not support.  Those examples are recorded
+    in _RU_RULE_EXAMPLES for the tests to re-run.
+    """
+    if not os.path.exists(_DATA_PATH):
+        return []
+    with open(_DATA_PATH, encoding="utf-8") as fh:
+        entries = json.load(fh)
+    rules = []
+    for item in entries:
+        name = item.get("name") or ""
+        if not name or _norm_name(name) in _HANDWRITTEN_NORMS:
+            continue  # already covered precisely by a hand-written rule
+        examples = [e for e in (_strip_stress(x) for x in item.get("examples") or []) if e]
+        if not examples:
+            continue
+        validated = [s for s in _focus_specs(item.get("focus")) if _flash(s, examples)]
+        if not validated:
+            continue
+        key = item.get("key") or name
+        _RU_RULE_EXAMPLES[key] = examples
+        rules.append(
+            make_rule(
+                key,
+                name,
+                item.get("level") or "B1",
+                (item.get("meaning") or "").strip() or name,
+                {"any_of": validated} if len(validated) > 1 else validated[0],
+                zh=item.get("zh") or None,
+            )
+        )
+    return rules
+
+
+# The data rules are built on first use, not at import: _load_data_rules()
+# tokenizes the rows' examples, and this module is imported at app start-up
+# (lute/read/routes.py).  Same reasoning as the Korean engine.
+_rules_lock = threading.RLock()
+_data_rules_cache = None
+_all_rules_cache = None
+
+
+def _get_data_rules():
+    "The data-driven rules, built on first use and memoised."
+    global _data_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _data_rules_cache is None:
+            _data_rules_cache = _load_data_rules()
+        return _data_rules_cache
+
+
+def _get_all_rules():
+    "Hand-written plus data-driven rules, built and memoised on first use."
+    global _all_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _all_rules_cache is None:
+            _all_rules_cache = _RU_RULES + _get_data_rules()
+        return _all_rules_cache
 
 
 def analyze_russian(page_text, display_lang="en"):
@@ -478,4 +680,4 @@ def analyze_russian(page_text, display_lang="en"):
     Returns a list of dicts:
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
-    return analyze_tokens(page_text, _RU_RULES, _tokens_for, display_lang)
+    return analyze_tokens(page_text, _get_all_rules(), _tokens_for, display_lang)
