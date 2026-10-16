@@ -206,6 +206,11 @@ function toggle_book_type_display(e) {
 }
 
 let render_book_title = function ( data, type, row, meta ) {
+  // Sorting/filtering must use the plain title, never the rendered HTML
+  // (the <a href="/read/<bkid>"> id would otherwise dominate the sort).
+  if (type === 'sort' || type === 'filter') {
+    return String(row['SeriesTag'] || row['BkTitle'] || '');
+  }
   // Series aggregate row: link to the series overview page.
   if (row['SeriesTag']) {
     const tag = encodeURIComponent(row['SeriesTag']);
