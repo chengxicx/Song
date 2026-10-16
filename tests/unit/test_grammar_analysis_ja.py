@@ -218,7 +218,7 @@ def test_full_jlpt_library_is_loaded():
     by_level = {
         lvl: len([r for r in _DATA_RULES if r["level"] == lvl]) for lvl in _ALL_LEVELS
     }
-    assert by_level == {"N5": 141, "N4": 186, "N3": 359, "N2": 354, "N1": 335}, by_level
+    assert by_level == {"N5": 141, "N4": 186, "N3": 360, "N2": 354, "N1": 335}, by_level
     # The great majority of entries must be usable matchers rather than
     # skipped: entries only get skipped for good reason (see _load_level).
     active = [r for r in _DATA_RULES if not r["skipped"]]
@@ -974,6 +974,91 @@ def test_not_after_is_wired_into_the_specs():
         assert token_specs, rid
         assert all(s.get("not_after") == cond for s in token_specs), rid
     assert _TE_CONNECTIVE["pos2"] == "接続助詞"
+
+
+# --- ように: purpose vs. resemblance (see _SLOT_SPECS / _NOT_AFTER) ----------
+#
+# ように has two readings and a bare literal cannot tell them apart: the purpose
+# marker (忘れないように, "so I don't forget") and the resemblance marker
+# (氷のように冷たい, "cold as ice").  The derived matcher for the purpose entry
+# was an unanchored `ように` regex, so it claimed every ように in the text --
+# 人の手ではないような、氷のように冷たい手です。 came back as 〜ように with the
+# gloss 为了……；以便 ("in order to"), which is not what that sentence says.
+# What separates the two is the left context: 名詞 + の (or この / その ... +
+# ように) marks the resemblance, a predicate marks the purpose.
+
+
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        "氷のように冷たい手です。",
+        "彼は子供のように笑った。",
+        "まるで夢のような話だ。",
+        "このように書いてください。",
+        "このような場合はどうしますか。",
+        "そのような話は聞いたことがない。",
+        # 連体形 after a predicate: neither 名詞 + の nor a demonstrative, so it
+        # is the third spec of the resemblance entry (see _SLOT_SPECS).
+        "人の手ではないような手です。",
+        "彼は何も知らないような顔をしている。",
+    ],
+)
+def test_resemblance_youni_is_not_reported_as_the_purpose_marker(sentence):
+    "名詞 + の + ように / ような and the 連体形 are 比况, and have their own row."
+    hits = _keys(sentence)
+    assert "ds_you-ni-resemblance" in hits, sentence
+    assert "ds_you-ni-purpose" not in hits, sentence
+
+
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        "忘れないようにメモしておく。",
+        "よく聞こえるように大きい声で話してください。",
+        "日本語が話せるように毎日練習している。",
+        "弟さんの病気が治るように祈っています。",
+    ],
+)
+def test_purpose_youni_still_reports(sentence):
+    "The left-context guard must not swallow the construction it guards."
+    hits = _keys(sentence)
+    assert "ds_you-ni-purpose" in hits, sentence
+    assert "ds_you-ni-resemblance" not in hits, sentence
+
+
+def test_reported_sentence_gets_the_resemblance_row():
+    "The sentence from the bug report, end to end: 氷のように, not 为了……；以便."
+    sentence = "人の手ではないような、氷のように冷たい手です。"
+    hits = {e["key"]: e for e in analyze_japanese(sentence, display_lang="zh")}
+    assert "ds_you-ni-purpose" not in hits
+    assert "ds_you-ni-resemblance" in hits
+    ex = hits["ds_you-ni-resemblance"]["examples"][0]
+    assert ex["sentence"] == sentence
+    # Both halves of the 比況助動詞: the 連体形 after ない, and the 連用形
+    # after the noun.  The panel sorts and merges the ranges itself.
+    marked = sorted(ex["sentence"][m["start"] : m["end"]] for m in ex["matches"])
+    assert marked == ["ような", "氷のように"]
+
+
+def test_resemblance_rentaikei_does_not_claim_nara():
+    """
+    ようなら is its own N2 entry (〜ようなら, "if it looks like"), and Sudachi
+    reads it as よう + なら -- not よう + な -- so the bare ような spec of the
+    resemblance entry must not also claim it.
+    """
+    hits = _keys("雨が降るようなら、中止します。")
+    assert "ds_you-nara-if-looks" in hits
+    assert "ds_you-ni-resemblance" not in hits
+
+
+def test_you_da_keeps_the_terminative():
+    """
+    The 終止形 ようだ row is untouched by the resemblance work: it still owns
+    ようだ (including after a noun), which the resemblance entry does not claim.
+    """
+    for sentence in ("事務所のようだ。", "誰もいないようだ。"):
+        assert "ds_you-da-appearance" in _keys(sentence), sentence
+        assert "ds_you-ni-resemblance" not in _keys(sentence), sentence
 
 
 def test_korean_display_language_switches_desc():
