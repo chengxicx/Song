@@ -14,6 +14,7 @@ library, so /grammar/<langid> explains that instead of 404ing.
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
 
+import lute.utils.formutils
 from lute.db import db
 from lute.models.language import Language
 from lute.models.repositories import LanguageRepository
@@ -89,9 +90,32 @@ def _level_counts(entries):
 
 @bp.route("/")
 def index():
-    "Pick a language whose grammar corpus can be browsed."
+    """
+    The grammar library of the language the user is studying.
+
+    The menu item jumps straight there: the reader already picked their
+    language when they started reading, so a chooser page would just
+    re-ask a question the settings already answer.  ``?pick=1`` (the
+    "Switch language" link on a library page) opens the list of
+    languages that carry a corpus, which is also the fallback when the
+    current language has none (only Japanese/Korean do).
+    """
+    if request.args.get("pick") != "1":
+        current_id = lute.utils.formutils.valid_current_language_id(db.session)
+        current = (
+            db.session.query(Language)
+            .filter(Language.id == current_id)
+            .first()  # pylint: disable=no-member
+            if current_id
+            else None
+        )
+        if current is not None and _library_engine(current) is not None:
+            return redirect(url_for("grammar.library", langid=current.id))
+
     languages = (
-        db.session.query(Language).order_by(Language.name).all()  # pylint: disable=no-member
+        db.session.query(Language)
+        .order_by(Language.name)
+        .all()  # pylint: disable=no-member
     )
     browsable = [lang for lang in languages if _library_engine(lang)]
     return render_template("grammar/index.html", languages=browsable)
@@ -100,13 +124,14 @@ def index():
 @bp.route("/<int:langid>")
 def library(langid):
     """
-    One level of one language's grammar library.
+    One language's grammar library: every level on one page.
 
-    The corpus runs to ~1400 points, so rendering them all as full cards
-    makes an unscannable page (and a heavy one).  Like hanabira.org's
-    grammar list, the index shows a single level at a time (?level=, the
-    first level by default) as compact one-line rows, each linking to the
-    point's own page.  The level pills double as the inventory readout.
+    The corpus runs to ~1400 points.  Like hanabira.org's grammar list,
+    the page is a full-width grid of compact cards grouped by level
+    (N5 -> N1), each card linking to the point's own page, with the
+    sticky toolbar's search filtering across all levels at once.  A
+    legacy ``?level=`` query is accepted and ignored: every level is
+    already on the page.
     """
     language = LanguageRepository(db.session).find(langid)
     if language is None:
@@ -120,20 +145,22 @@ def library(langid):
     counts = _level_counts(entries)
     levels = list(counts) or ["N"]
 
-    current = request.args.get("level", "")
-    if current not in counts:
-        current = levels[0]
-    rows = [e for e in entries if e["level"] == current]
+    sections = [
+        {
+            "level": level,
+            "rows": [e for e in entries if e["level"] == level],
+            "total": counts[level]["total"],
+            "matchable": counts[level]["matchable"],
+            "reference": counts[level]["reference"],
+        }
+        for level in levels
+    ]
 
     return render_template(
         "grammar/library.html",
         language=language,
-        levels=levels,
-        level_counts=counts,
-        current_level=current,
-        rows=rows,
-        matchable=counts[current]["matchable"],
-        reference=counts[current]["reference"],
+        sections=sections,
+        total=sum(s["total"] for s in sections),
         level_class=_level_class,
     )
 

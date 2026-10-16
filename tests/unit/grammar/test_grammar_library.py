@@ -145,8 +145,14 @@ def test_level_counts_split_matchable_and_reference():
 # ---- routes ---------------------------------------------------------
 
 
-def test_index_lists_languages_with_a_corpus(japanese, korean, generic, app_context, client):
-    resp = client.get("/grammar/")
+def test_index_lists_languages_with_a_corpus(
+    japanese, korean, generic, app_context, client
+):
+    """
+    ?pick=1 opens the list of languages with a corpus (the fallback when
+    the current language has none); a corpus-less language is not listed.
+    """
+    resp = client.get("/grammar/?pick=1")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
     assert "Japanese" in body
@@ -155,68 +161,105 @@ def test_index_lists_languages_with_a_corpus(japanese, korean, generic, app_cont
     assert 'href="/grammar/%d"' % generic.id not in body
 
 
+def _set_current_language(lang_id):
+    "Point the user setting at a language, as the settings page would."
+    from lute.models.repositories import (
+        UserSettingRepository,
+    )  # pylint: disable=import-outside-toplevel
+
+    repo = UserSettingRepository(db.session)
+    repo.set_value("current_language_id", lang_id)
+    db.session.commit()
+
+
+def test_index_redirects_to_the_current_language(
+    japanese, korean, generic, app_context, client
+):
+    """
+    /grammar lands on the language the user is studying -- the reader
+    already picked it when they started reading, so no chooser page.
+    """
+    _set_current_language(japanese.id)
+    resp = client.get("/grammar/")
+    assert resp.status_code == 302
+    assert resp.headers["Location"].endswith(f"/grammar/{japanese.id}")
+
+
+def test_index_falls_back_to_the_list_when_current_language_has_no_corpus(
+    generic, app_context, client
+):
+    """
+    Only Japanese/Korean carry a browsable corpus; any other current
+    language still gets the language list instead of a redirect loop.
+    """
+    _set_current_language(generic.id)
+    resp = client.get("/grammar/")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "Japanese" not in body
+    assert "Korean" not in body
+
+
 def _ja_entries():
     _need_sudachi()
     return ja.library_entries("en")
 
 
-def _rows_of(body, level_entries):
-    "The rendered compact rows must number exactly the level's entries."
-    assert body.count('<li class="grammar-row') == len(level_entries)
+def _cards_of(body, level_entries):
+    "The rendered compact cards must number exactly the level's entries."
+    assert body.count('class="grammar-library__card"') == len(level_entries)
 
 
-def test_library_index_shows_one_level_as_compact_rows(japanese, app_context, client):
+def test_library_index_shows_every_level_as_compact_cards(
+    japanese, app_context, client
+):
     """
-    The index must not render the whole ~1400-point corpus as full cards:
-    it shows a single level (the first by default) as one-line rows, each
-    linking to the point's own page.
+    The whole corpus renders on one full-width page (hanabira.org
+    style): every level as its own section of compact cards, the sticky
+    toolbar carrying the cross-level search and the level jump.
     """
     entries = _ja_entries()
-    n5 = [e for e in entries if e["level"] == "N5"]
     body = client.get(f"/grammar/{japanese.id}").get_data(as_text=True)
 
-    # Page chrome: search box, "all languages" link, inventory line.
+    # Page chrome: search box, switch-language link, one section per level.
     assert 'id="grammar-library-search"' in body
-    assert 'href="/grammar/"' in body
-    assert "grammar-library__inventory" in body
-    assert "grammar-library__stat--quiet" in body
+    assert "grammar-library__toolbar" in body
+    assert "grammar-library__switch" in body
+    for level in ("N5", "N4", "N3", "N2", "N1"):
+        assert f'id="level-{level}"' in body
+        assert f'href="#level-{level}"' in body
 
-    # Exactly one level's rows, and far fewer than the whole corpus.
-    _rows_of(body, n5)
-    assert len(n5) < len(entries)
+    # Every level's cards, not just the first level's.
+    _cards_of(body, entries)
+    assert len(entries) > len([e for e in entries if e["level"] == "N5"])
 
-    # Rows are compact, not the full card (no formation/examples inline),
-    # and they link to the detail route instead of an in-page anchor.
+    # Cards are compact, not the full detail card (no formation/examples
+    # inline), and they link to the detail route.
     assert "grammar-item__formation" not in body
-    assert 'class="grammar-row__link" href="/grammar/' in body
+    assert 'class="grammar-library__card" href="/grammar/' in body
 
-    # The level pills switch level server-side; the current one is marked.
-    assert "level=N4" in body
-    assert "is-active" in body
+    # No server-side level switching left: all pills are plain anchors.
+    assert "level=N4" not in body
+    assert "is-active" not in body
 
     # No progress/"studied" filter scaffolding slipped in.
     assert "grammar-library__usage" not in body
     assert "★" not in body
 
 
-def test_library_index_level_param_selects_that_level(japanese, app_context, client):
+def test_library_index_ignores_a_legacy_level_param(japanese, app_context, client):
+    "?level= predates the all-levels page; it is accepted and ignored."
     entries = _ja_entries()
-    n1 = [e for e in entries if e["level"] == "N1"]
     body = client.get(f"/grammar/{japanese.id}?level=N1").get_data(as_text=True)
-    _rows_of(body, n1)
+    _cards_of(body, entries)
 
 
-def test_library_index_falls_back_on_an_unknown_level(japanese, app_context, client):
-    entries = _ja_entries()
-    n5 = [e for e in entries if e["level"] == "N5"]
-    body = client.get(f"/grammar/{japanese.id}?level=ZZ").get_data(as_text=True)
-    _rows_of(body, n5)
-
-
-def test_detail_page_renders_the_full_card_and_navigation(japanese, app_context, client):
+def test_detail_page_renders_the_full_card_and_navigation(
+    japanese, app_context, client
+):
     """
     The card the index hides lives on the point's own page, with a back
-    link to its level and prev/next to walk it.
+    link to the whole library and prev/next to walk its level.
     """
     entries = _ja_entries()
     entry = next(e for e in entries if e["key"] == "ds_particle-made-until")
@@ -226,7 +269,8 @@ def test_detail_page_renders_the_full_card_and_navigation(japanese, app_context,
     assert "grammar-item__examples" in body
     assert "grammar-item__related" in body
     assert "grammar-detail__position" in body
-    assert f"level={entry['level']}" in body  # the back link keeps the level
+    # The back link goes to the (now all-levels) library, not a level view.
+    assert f'href="/grammar/{japanese.id}"' in body
     assert "grammar-detail__prev" in body or "grammar-detail__next" in body
     # The cross-link is the other point's page, not a dead in-page anchor.
     assert "grammar-item__related-link" in body
@@ -251,17 +295,17 @@ def test_corpusless_language_explains_instead_of_404(generic, app_context, clien
 
 
 def test_korean_language_page_renders_its_library(korean, app_context, client):
-    "The Korean corpus renders too, one level at a time."
+    "The Korean corpus renders too -- every TOPIK band on the one page."
     pytest.importorskip("kiwipiepy")
-    from lute.read.render import grammar_analysis_ko as ko  # pylint: disable=import-outside-toplevel
+    from lute.read.render import (
+        grammar_analysis_ko as ko,
+    )  # pylint: disable=import-outside-toplevel
 
     entries = ko.library_entries("en")
-    first_level = entries[0]["level"]
     body = client.get(f"/grammar/{korean.id}").get_data(as_text=True)
-    _rows_of(body, [e for e in entries if e["level"] == first_level])
+    _cards_of(body, entries)
     assert "TOPIK 1-2" in body
-    assert "is-active" in body
-
+    assert 'id="level-TOPIK 1-2"' in body
 
 
 def test_unknown_language_is_404(client):
@@ -282,4 +326,3 @@ def test_reading_page_links_into_the_library(japanese, app_context, client):
     body = client.get(f"/read/{book.id}").get_data(as_text=True)
     assert f'href="/grammar/{japanese.id}"' in body
     assert 'id="lang_id"' in body
-
