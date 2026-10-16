@@ -468,6 +468,37 @@ def _safe_remove(path):
         pass
 
 
+def apply_reference_text(cues_json, reference_text):
+    """
+    Replace the transcription's words with the caller's transcript.
+
+    The recognizer is kept strictly for timing: its cues are aligned
+    against the supplied text, sentence by sentence, and the book's text
+    becomes the supplied text.  This is what makes a textbook import
+    exact -- the recognizer mis-hears names and homophones ('チョさん'
+    for 張さん) and clips a word onset now and then, none of which can
+    reach the reader once the text comes from the book itself.
+
+    Returns (text, cues_json).  Raises RuntimeError when the text and the
+    audio agree too little for the alignment to mean anything -- better
+    to tell the user than to write a book whose subtitles jump around.
+    """
+    from lute.book import text_align
+
+    aligned, ratio = text_align.align_cues_to_reference(
+        json.loads(cues_json), reference_text
+    )
+    if aligned is None or ratio < text_align.MIN_MATCH_RATIO:
+        raise RuntimeError(
+            "The reference text does not match this recording closely "
+            f"enough ({ratio * 100:.0f}% similar; {text_align.MIN_MATCH_RATIO * 100:.0f}% "
+            "is the minimum).  Check that it is the text of this audio, or "
+            "leave it empty to keep the plain transcription."
+        )
+    text = "\n".join(c["text"] for c in aligned)
+    return text, json.dumps(aligned, ensure_ascii=False)
+
+
 def start_task(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     app,
     audio_path,
@@ -478,6 +509,7 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
     username=None,
     retranscribe_book_id=None,
     temp_audio=True,
+    reference_text=None,
 ):
     """
     Register and launch a background transcription task.
@@ -497,7 +529,10 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
     text and cues instead of creating one (edit page re-transcribe);
     temp_audio says whether audio_path is a disposable temp file (an
     upload or URL download) or the book's own stored audio, which must
-    survive the task.  Returns the task_id.
+    survive the task.  reference_text is the user's transcript of the
+    recording, if they supplied one: transcription then supplies only
+    the timing and the text comes from that transcript (see
+    apply_reference_text).  Returns the task_id.
     """
     task_id = uuid.uuid4().hex
     _set_state(task_id, "queued", message="Queued.")
@@ -520,6 +555,7 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
             username,
             retranscribe_book_id,
             temp_audio,
+            reference_text,
         ),
         daemon=True,
     )
@@ -538,6 +574,7 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
     username,
     retranscribe_book_id=None,
     temp_audio=True,
+    reference_text=None,
 ):
     """
     Thread body: transcribe, then import (or update) the book.
@@ -612,6 +649,10 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
                     )
                 if not (text and text.strip()):
                     raise RuntimeError("The transcription produced no text.")
+                if reference_text and reference_text.strip():
+                    # The user pasted the text being read: keep only the
+                    # timing from the recognizer (see apply_reference_text).
+                    text, cues_json = apply_reference_text(cues_json, reference_text)
 
                 if retranscribe_book_id is not None:
                     # Re-transcribe (edit page): replace the existing

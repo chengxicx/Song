@@ -183,7 +183,9 @@ def test_transcribe_clip_strips_japanese_word_spaces(monkeypatch):
         "_decode_16k_mono",
         lambda _p: (16000, np.zeros(16000, dtype=np.float32), 1.0),
     )
-    with patch.object(sensevoice, "_recognizer", return_value=_FakeRecognizer(" こん にち は。")):
+    with patch.object(
+        sensevoice, "_recognizer", return_value=_FakeRecognizer(" こん にち は。")
+    ):
         text, duration = sensevoice.transcribe_clip("whatever.wav", "ja")
     assert text == "こんにちは。"
     assert duration == 1.0
@@ -386,10 +388,7 @@ def test_segment_padding_never_exceeds_half_the_silence_gap(monkeypatch):
     """
     assert sensevoice._segment_pad_seconds() == 0.3  # 0.6 / 2
     monkeypatch.setattr(sensevoice, "VAD_SEGMENT_PAD_SECONDS", 5.0)
-    assert (
-        sensevoice._segment_pad_seconds()
-        == sensevoice.VAD_MIN_SILENCE_SECONDS / 2
-    )
+    assert sensevoice._segment_pad_seconds() == sensevoice.VAD_MIN_SILENCE_SECONDS / 2
 
 
 class _RecordingRecognizer:
@@ -591,9 +590,7 @@ def test_punctuation_only_cues_are_dropped(model_dir_tmp, monkeypatch):
     _write_wav(str(wav), 7)
 
     _install_fake_sherpa(monkeypatch)
-    with patch.object(
-        sensevoice, "_recognizer", return_value=_WordlessRecognizer()
-    ):
+    with patch.object(sensevoice, "_recognizer", return_value=_WordlessRecognizer()):
         text, cues_json = sensevoice.transcribe_to_cues(str(wav), "ja")
 
     cues = json.loads(cues_json)
