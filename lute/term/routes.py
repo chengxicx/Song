@@ -732,9 +732,7 @@ def sync_terms():
         wparents = parents_by_wid.get(wid, [])
         digest.update(
             f"{wid}\x1f{wtext}\x1f{wtrans or ''}\x1f{wrom or ''}\x1f"
-            f"{wstatus or 0}\x1f{wlgid}\x1f{'|'.join(wparents)}\x1e".encode(
-                "utf-8"
-            )
+            f"{wstatus or 0}\x1f{wlgid}\x1f{'|'.join(wparents)}\x1e".encode("utf-8")
         )
         terms.append(
             {

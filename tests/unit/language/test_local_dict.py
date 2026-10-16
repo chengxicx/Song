@@ -308,7 +308,9 @@ def test_the_dropdown_labels_name_the_dictionary(client, app_context, pool):
     mangled ASCII stand-in nobody recognises.
     """
     _touch(pool, "moji-b4-c7-ca-e9.db")
-    with open(os.path.join(pool, "moji-b4-c7-ca-e9.db.json"), "w", encoding="utf-8") as f:
+    with open(
+        os.path.join(pool, "moji-b4-c7-ca-e9.db.json"), "w", encoding="utf-8"
+    ) as f:
         json.dump({"title": "MOJi辞書", "entries": 107314, "terms": 251874}, f)
     lang = _fresh_language("Dropdown Label")
     _add_local_row(lang, "moji-b4-c7-ca-e9.db")
@@ -383,7 +385,10 @@ def test_a_failed_save_keeps_the_row_in_dropdown_state(client, app_context, pool
         _edit_url(lang),
         data=_form_data(
             lang,
-            **{"dictionaries-0-dicttype": "localdict", "dictionaries-0-dicturi": "../escape"},
+            **{
+                "dictionaries-0-dicttype": "localdict",
+                "dictionaries-0-dicturi": "../escape",
+            },
         ),
     )
 

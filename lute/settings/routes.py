@@ -202,9 +202,12 @@ def set_key_value(key, value):
         # posting a setting this build does not define (e.g. a stale
         # cached page).  Answer with a plain failure rather than letting
         # the lookup raise a 500.
-        return jsonify(
-            {"result": "failure", "message": t("Unknown setting") + f": {key}"}
-        ), 404
+        return (
+            jsonify(
+                {"result": "failure", "message": t("Unknown setting") + f": {key}"}
+            ),
+            404,
+        )
     try:
         repo.set_value(key, value)
         result = {"result": "success", "message": "OK"}

@@ -228,9 +228,7 @@ def test_the_lookup_endpoint_uses_the_term_reading(
     db.session.add(term)
     db.session.commit()
 
-    data = client.get(
-        f"/read/localdict_lookup/{japanese.id}/{quote('楽しい')}"
-    ).get_json()
+    data = client.get(f"/read/localdict_lookup/{japanese.id}/{quote('楽しい')}").get_json()
 
     assert "愉快yúkuài" in data["gloss"]
 
@@ -302,9 +300,7 @@ def test_the_named_tab_frame_refuses_an_out_of_pool_name(
 
     # A name with a separator never even routes (werkzeug 404s the
     # traversal); a malformed name routes but matches no pool file.
-    resp = client.get(
-        f"/read/localdict/{japanese.id}/..%2Fescape/{quote('たのしい')}"
-    )
+    resp = client.get(f"/read/localdict/{japanese.id}/..%2Fescape/{quote('たのしい')}")
     assert resp.status_code == 404
 
     html = client.get(
@@ -331,9 +327,7 @@ def test_the_local_tab_frame_uses_the_term_reading(
     assert "愉快yúkuài" in html
 
 
-def test_xref_links_carry_their_reading(
-    client, app, app_context, dict_dirs, japanese
-):
+def test_xref_links_carry_their_reading(client, app, app_context, dict_dirs, japanese):
     "The rendered See-also links pass the reading back as a query param."
     _import(
         app,
@@ -343,9 +337,9 @@ def test_xref_links_carry_their_reading(
     )
     _use(japanese, service.DB_FILENAME)
 
-    html = client.get(
-        f"/read/localdict/{japanese.id}/{quote('ありがとう')}"
-    ).data.decode("utf-8")
+    html = client.get(f"/read/localdict/{japanese.id}/{quote('ありがとう')}").data.decode(
+        "utf-8"
+    )
 
     assert "ld-xref" in html
     assert "?reading=" in html
@@ -366,9 +360,9 @@ def test_an_xref_click_resolves_the_homograph(
     )
     _use(japanese, service.DB_FILENAME)
 
-    plain = client.get(
-        f"/read/localdict/{japanese.id}/{quote('下')}"
-    ).data.decode("utf-8")
+    plain = client.get(f"/read/localdict/{japanese.id}/{quote('下')}").data.decode(
+        "utf-8"
+    )
     clicked = client.get(
         f"/read/localdict/{japanese.id}/{quote('下')}?reading=か"
     ).data.decode("utf-8")

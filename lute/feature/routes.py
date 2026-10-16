@@ -216,7 +216,10 @@ def upload_install():
             except zipfile.BadZipFile:
                 return (
                     jsonify(
-                        {"ok": False, "message": t("Uploaded file is not a valid .zip.")}
+                        {
+                            "ok": False,
+                            "message": t("Uploaded file is not a valid .zip."),
+                        }
                     ),
                     400,
                 )

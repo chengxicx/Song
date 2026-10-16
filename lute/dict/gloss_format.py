@@ -95,7 +95,9 @@ def parse_gloss(gloss):
 
         match = _XREF_RE.match(line)
         if match is not None:
-            blocks.append({"t": "xref", "text": match.group(1), "reading": match.group(2)})
+            blocks.append(
+                {"t": "xref", "text": match.group(1), "reading": match.group(2)}
+            )
             pending_example = None
             i += 1
             continue
@@ -147,11 +149,7 @@ def parse_gloss(gloss):
             pending_example = block
             i += 1
             continue
-        elif (
-            len(line) > _NOTE_MIN_CHARS
-            and "（" not in line
-            and "(" not in line
-        ):
+        elif len(line) > _NOTE_MIN_CHARS and "（" not in line and "(" not in line:
             blocks.append({"t": "note", "text": line})
             pending_example = None
             i += 1

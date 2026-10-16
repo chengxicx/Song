@@ -104,18 +104,11 @@ def test_homograph_lookup_prefers_the_reading_qualified_key(
     _static, scratch = dict_dirs
     _import(app, scratch, build_mdx(HOMOGRAPH_ENTRIES))
 
-    assert (
-        service.lookup("下", "か", prefer_reading=True) == "下级。（位が下のもの。）"
-    )
+    assert service.lookup("下", "か", prefer_reading=True) == "下级。（位が下のもの。）"
     # Accent mark: the composite key is tried as-is and accent-stripped.
-    assert (
-        service.lookup("下", "もと②", prefer_reading=True)
-        == "下面。（物の下部。）"
-    )
+    assert service.lookup("下", "もと②", prefer_reading=True) == "下面。（物の下部。）"
     # No reading-qualified key for this reading: falls back to the bare term.
-    assert (
-        service.lookup("下", "しも", prefer_reading=True) == "See also: 下【か】"
-    )
+    assert service.lookup("下", "しも", prefer_reading=True) == "See also: 下【か】"
 
 
 def test_homograph_candidates_put_the_bare_term_last():

@@ -40,7 +40,10 @@ def test_t_falls_back_to_english_for_unknown_key():
 
 def test_t_keeps_html_in_keys_renderable():
     "Dictionary values may carry the templates' original inline HTML."
-    val = i18n.t("<b>A (shortest)</b> — finest granularity, breaks compounds into smallest units.", lang="zh")
+    val = i18n.t(
+        "<b>A (shortest)</b> — finest granularity, breaks compounds into smallest units.",
+        lang="zh",
+    )
     assert "<b>" in val
 
 
