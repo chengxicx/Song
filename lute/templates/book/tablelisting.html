@@ -200,6 +200,15 @@
     // state.  localStorage keeps the instant per-browser fallback.
     var _saveTimer = null;
     var _pendingStateJson = null;
+    // Natural sort for the title column: episode numbers compare
+    // numerically, so "2." sorts before "10." (same as the series page).
+    var natural_collator = new Intl.Collator([], { numeric: true, sensitivity: 'base' });
+    $.fn.dataTable.ext.type.order['natural-asc'] = function (a, b) {
+      return natural_collator.compare(String(a), String(b));
+    };
+    $.fn.dataTable.ext.type.order['natural-desc'] = function (a, b) {
+      return natural_collator.compare(String(b), String(a));
+    };
     book_listing_table = $('#booktable').DataTable({
       layout: {
         topStart: [
@@ -311,7 +320,7 @@
       search: { search: initial_search },
       columns: [
         { name: "BookType", className: "col-type", width: "4%", data: "BookType", searchable: false, render: render_book_type },
-        { name: "BkTitle", className: "col-title", width: "24%", data: "BkTitle", render: render_book_title },
+        { name: "BkTitle", className: "col-title", width: "24%", data: "BkTitle", type: "natural", render: render_book_title },
         { name: "LgName", className: "col-lang", width: "8%", data: "LgName" },
         { name: "TagList", className: "col-tags", width: "15%", data: "TagList", render: render_tag_list },
         { name: "ProgressPercent", className: "col-progress", width: "8%", data: "ProgressPercent", searchable: false, render: render_book_progress },

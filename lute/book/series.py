@@ -6,6 +6,7 @@ title order with a continue-reading shortcut.
 """
 
 import json
+import re
 
 from lute.book.stats import get_difficulty_label
 from lute.db import db
@@ -98,6 +99,19 @@ ORDER BY b.BkArchived, b.BkTitle COLLATE NOCASE
 """
 
 
+def _natural_title_key(title):
+    """
+    Sort key treating embedded numbers as numbers, so episode titles
+    order "1.", "2.", "10." instead of lexicographic "1.", "10.", "2.".
+    re.split with a capture group alternates text/digit chunks, so key
+    positions are type-consistent across titles.
+    """
+    return [
+        int(p) if p.isdigit() else p.casefold()
+        for p in re.split(r"(\d+)", title or "")
+    ]
+
+
 def progress_percent(page_num, page_count, read_page_count, is_completed):
     """
     Percentage of a book that has been read, 0-100.
@@ -125,6 +139,9 @@ def get_series_overview(session, tagtext):
     the home book table's row shape), plus a few display-only fields.
     """
     rows = session.execute(db.text(_SERIES_BOOKS_SQL), {"tagtext": tagtext}).fetchall()
+    # The SQL ORDER BY is lexicographic ("10." < "2."); re-sort naturally
+    # so the continue target and no-JS fallback follow episode order.
+    rows = sorted(rows, key=lambda r: (r.BkArchived, _natural_title_key(r.BkTitle)))
     if len(rows) == 0:
         return None
 
