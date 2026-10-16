@@ -41,6 +41,10 @@ LANG_MAP = {
     "ko": ("Korean", "LingQ韩语小故事"),
     "ru": ("Russian", "LingQ俄语小故事"),
     "yue": ("Cantonese Chinese", "LingQ粤语小故事"),
+    "en": ("English", "LingQ英语小故事"),
+    "fr": ("French", "LingQ法语小故事"),
+    "es": ("Spanish", "LingQ西班牙语小故事"),
+    "th": ("Thai", "LingQ泰语小故事"),
 }
 
 _HEADER_RE = re.compile(r"^==\s+(.+?)\s+==$")
