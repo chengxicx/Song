@@ -300,7 +300,7 @@
   "Import": "导入",
   "Import Terms": "导入词条",
   "Import a Bilibili video with its subtitle (SRT / VTT). The subtitles become the book text so you can look up words while the video plays.": "导入 B 站视频及其字幕（SRT / VTT）。字幕会成为书本文本，播放视频时可以查词。",
-  "Import a Mokuro manga archive — generated with <a href=\"https://github.com/kha-white/mokuro\" target=\"_blank\" rel=\"noreferrer\">mokuro</a> — as a .zip / .cbz file. (Sample: <code>hanabira_manga_01.mokuro</code> packaged as a zip.)": "导入用 <a href=\"https://github.com/kha-white/mokuro\" target=\"_blank\" rel=\"noreferrer\">mokuro</a> 生成的漫画压缩包，格式为 .zip / .cbz。（示例：<code>hanabira_manga_01.mokuro</code> 打包成的 zip。）",
+  "Import a Mokuro manga archive — generated with <a href=\"https://github.com/kha-white/mokuro\" target=\"_blank\" rel=\"noreferrer\">mokuro</a> — as a .zip / .cbz file. (Sample: <code>manga_sample_01.mokuro</code> packaged as a zip.)": "导入用 <a href=\"https://github.com/kha-white/mokuro\" target=\"_blank\" rel=\"noreferrer\">mokuro</a> 生成的漫画压缩包，格式为 .zip / .cbz。（示例：<code>manga_sample_01.mokuro</code> 打包成的 zip。）",
   "Import a PDF file. The original PDF is shown unchanged, but the words become clickable so you can look them up and highlight them while reading.": "导入 PDF 文件。原样显示 PDF，但其中的文字可点击，阅读时可以查词和标记。",
   "Import a YouTube video with its subtitle (SRT / VTT). The subtitles become the book text so you can look up words while the video plays.": "导入 YouTube 视频及其字幕（SRT / VTT）。字幕会成为书本文本，播放视频时可以查词。",
   "Import a song from NetEase Cloud Music: the audio is downloaded to your library and its LRC lyrics become the book text, synced line by line with playback. VIP / copyright-restricted songs require logging in via Settings first.": "从网易云音乐导入歌曲：音频下载到资料库，LRC 歌词成为书本文本并逐行与播放同步。VIP / 版权受限歌曲需先在设置中登录。",

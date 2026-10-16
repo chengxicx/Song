@@ -33,15 +33,12 @@ private-authors/private-authors, private-press 2014), transcribed into
 - These entries are a derivative of the CC BY-SA 4.0 data ecosystem and are
   distributed under **CC BY-SA 4.0** as well.
 
-### hanabira-referenced gap-fill entries (65 entries, 2026-10-16)
+### Coverage-audit gap-fill entries (65 entries, 2026-10-16)
 
-65 further entries written for this project after a coverage audit against the
-**hanabira.org** grammar list (https://hanabira.org/japanese/grammarlist, data
-at `backend/express/json_data/grammar_ja_JLPT_N{1..5}.json` in
-https://github.com/tristcoil/hanabira.org — MIT-licensed code, CC-licensed
-in-house content).  The audit compared point names only; every `meaning`,
-`formation`, and example sentence here is written for this project.  The
-`sources` field of each such entry records the cross-check.
+65 further entries written for this project after a coverage audit against a
+public JLPT grammar list.  The audit compared point names only; every
+`meaning`, `formation`, and example sentence here is written for this project.
+The `sources` field of each such entry records the cross-check.
 
 - Counts: N1 29, N2 19, N3 16, N4 1 (total 65; three audited candidates —
   それが sentence connector, 〜っぱい, からの — were deliberately dropped

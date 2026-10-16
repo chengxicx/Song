@@ -214,9 +214,9 @@ def test_library_index_shows_every_level_as_compact_cards(
     japanese, app_context, client
 ):
     """
-    The whole corpus renders on one full-width page (hanabira.org
-    style): every level as its own section of compact cards, the sticky
-    toolbar carrying the cross-level search and the level jump.
+    The whole corpus renders on one full-width page: every level as its
+    own section of compact cards, the sticky toolbar carrying the
+    cross-level search and the level jump.
     """
     entries = _ja_entries()
     body = client.get(f"/grammar/{japanese.id}").get_data(as_text=True)
