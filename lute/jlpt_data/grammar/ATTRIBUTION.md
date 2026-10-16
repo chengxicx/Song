@@ -33,6 +33,23 @@ private-authors/private-authors, private-press 2014), transcribed into
 - These entries are a derivative of the CC BY-SA 4.0 data ecosystem and are
   distributed under **CC BY-SA 4.0** as well.
 
+### hanabira-referenced gap-fill entries (65 entries, 2026-10-16)
+
+65 further entries written for this project after a coverage audit against the
+**hanabira.org** grammar list (https://hanabira.org/japanese/grammarlist, data
+at `backend/express/json_data/grammar_ja_JLPT_N{1..5}.json` in
+https://github.com/tristcoil/hanabira.org — MIT-licensed code, CC-licensed
+in-house content).  The audit compared point names only; every `meaning`,
+`formation`, and example sentence here is written for this project.  The
+`sources` field of each such entry records the cross-check.
+
+- Counts: N1 29, N2 19, N3 16, N4 1 (total 65; three audited candidates —
+  それが sentence connector, 〜っぱい, からの — were deliberately dropped
+  because their literal fragments would false-positive on common unrelated
+  text).
+- Same matching pipeline as above: specs derived from `pattern` at load time
+  and validated against each entry's own examples.
+
 Entries whose construction jkindrix already carries (or that are bare
 vocabulary) are listed in `_VOCAB_IDS` / `_DUPLICATE_IDS` inside
 `lute/read/render/grammar_analysis_ja.py` and never fire; the merged
@@ -46,7 +63,7 @@ rules.  Nothing in this directory is hand-tuned per entry.
 
 ## `zh.json`
 
-Simplified-Chinese glosses for all 1310 entries above, keyed by the upstream
+Simplified-Chinese glosses for all 1375 entries above, keyed by the upstream
 `id`.  Written for this project (Song), so the reading-page grammar panel can
 describe points in Chinese; the glosses for the jkindrix 595 are a derivative
 of the CC BY-SA 4.0 data above and are distributed under the same license.
@@ -99,7 +116,7 @@ distributed under CC BY-SA 4.0 as well.
 
 ## `ko.json`
 
-Korean glosses for all 1310 entries, mirroring `zh.json` (한국어 display
+Korean glosses for all 1375 entries, mirroring `zh.json` (한국어 display
 language of the panel).  Same license terms as `zh.json`.
 
 ## N5 hand-written rules

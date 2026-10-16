@@ -218,7 +218,7 @@ def test_full_jlpt_library_is_loaded():
     by_level = {
         lvl: len([r for r in _DATA_RULES if r["level"] == lvl]) for lvl in _ALL_LEVELS
     }
-    assert by_level == {"N5": 141, "N4": 185, "N3": 343, "N2": 335, "N1": 306}, by_level
+    assert by_level == {"N5": 141, "N4": 186, "N3": 359, "N2": 354, "N1": 335}, by_level
     # The great majority of entries must be usable matchers rather than
     # skipped: entries only get skipped for good reason (see _load_level).
     active = [r for r in _DATA_RULES if not r["skipped"]]

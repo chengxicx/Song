@@ -9474,5 +9474,1035 @@
     "chinese": "怎么样?这件和服您喜欢吗?"
    }
   ]
+ },
+ {
+  "id": "kara-aru",
+  "pattern": "Quantity + からある",
+  "level": "N1",
+  "meaning_en": "as much as / no less than (large quantity)",
+  "meaning_detailed": "〜からある attaches to a quantity (weight, length, money, headcount) to stress that it reaches at least that much, usually implying the amount is remarkably large. Written, formal style.",
+  "formation": "Quantity + からある",
+  "formation_notes": [
+   "Emphasises a large quantity: 'a full X'.",
+   "Common with キロ, トン, 万円, 人.",
+   "Written register; speech prefers もある."
+  ],
+  "formality": "formal",
+  "related": [
+   "kara-no"
+  ],
+  "examples": [
+   {
+    "japanese": "この象は5トンからある。",
+    "english": "This elephant weighs a full five tons.",
+    "chinese": "这头大象足有5吨重。"
+   },
+   {
+    "japanese": "彼は100万円からある借金を抱えている。",
+    "english": "He carries debts of no less than a million yen.",
+    "chinese": "他背负着多达100万日元的债务。"
+   },
+   {
+    "japanese": "身長2メートルからある選手が現れた。",
+    "english": "A player standing a good two meters tall showed up.",
+    "chinese": "出现了一位身高足有2米的选手。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "kara-iwasereba",
+  "pattern": "Noun + から言わせれば/から言わせてもらえば",
+  "level": "N1",
+  "meaning_en": "if you ask X / as X would put it",
+  "meaning_detailed": "〜から言わせれば presents the opinion of the named person: 'if X were to say it', 'as X would put it'. Used to quote a stance, often critically.",
+  "formation": "人 + から言わせれば / から言わせてもらえば",
+  "formation_notes": [
+   "The named noun is the holder of the opinion being quoted."
+  ],
+  "formality": "formal",
+  "related": [
+   "ni-iwasereba"
+  ],
+  "examples": [
+   {
+    "japanese": "彼から言わせれば、全部僕の責任だということになる。",
+    "english": "If you let him say it, it's all my fault.",
+    "chinese": "照他的说法，全是我的责任。"
+   },
+   {
+    "japanese": "私から言わせてもらえば、その計画は無理がある。",
+    "english": "If you ask me, that plan is unreasonable.",
+    "chinese": "让我来说的话，那个计划行不通。"
+   },
+   {
+    "japanese": "母から言わせれば、私はまだ子供らしい。",
+    "english": "As my mother would put it, I'm still a child.",
+    "chinese": "照我母亲的说法，我还是个孩子。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "koso-sure",
+  "pattern": "V dict + こそすれ",
+  "level": "N1",
+  "meaning_en": "X indeed, but (not the expected opposite)",
+  "meaning_detailed": "Vるこそすれ concedes that X is true while denying what would normally contrast with it: 'he may well do X, but he certainly doesn't Y'. Literary, formal.",
+  "formation": "動詞辞書形 + こそすれ + 否定系の後項",
+  "formation_notes": [
+   "Literary; the following clause denies the contrasting action.",
+   "Fixed frame: X こそすれ Y (ない)."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼は感謝こそすれ、文句は言わなかった。",
+    "english": "Far from complaining, he was nothing but grateful.",
+    "chinese": "他只有感激，绝没有怨言。"
+   },
+   {
+    "japanese": "褒められこそすれ、怒られることはない。",
+    "english": "You may well be praised, but you will never be scolded.",
+    "chinese": "只会被表扬，不会被批评。"
+   },
+   {
+    "japanese": "この仕事は楽しみこそすれ、苦にはならない。",
+    "english": "This job is nothing but enjoyable, never a burden.",
+    "chinese": "这份工作只有乐趣，谈不上辛苦。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "dake-dewa-sumanai",
+  "pattern": "Noun / V dict + だけではすまない",
+  "level": "N1",
+  "meaning_en": "won't be settled by just X",
+  "meaning_detailed": "〜だけではすまない says that doing merely X is not enough to settle the matter — consequences or further action are unavoidable.",
+  "formation": "動詞辞書形・名詞 + だけではすまない",
+  "formation_notes": [
+   "Often about responsibility: 謝るだけではすまない."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "ミスを謝るだけではすまないだろう。",
+    "english": "Just apologising for the mistake won't be enough.",
+    "chinese": "光道歉是解决不了这个失误的。"
+   },
+   {
+    "japanese": "遅刻しただけではすまない失態だった。",
+    "english": "It was a blunder that went beyond mere lateness.",
+    "chinese": "那是一场光是迟到还不足以收场的失态。"
+   },
+   {
+    "japanese": "被害はお金を払うだけではすまない。",
+    "english": "The damage cannot be settled just by paying money.",
+    "chinese": "损失不是光赔钱就能了结的。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "towa-kurabemono-ni-naranai",
+  "pattern": "Noun + とは比べものにならない",
+  "level": "N1",
+  "meaning_en": "no comparison with / can't hold a candle to",
+  "meaning_detailed": "〜とは比べものにならない states that something is utterly incomparable with the noun — the gap is too large to compare.",
+  "formation": "名詞 + とは比べものにならない",
+  "formation_notes": [
+   "Stronger than 〜と比べられない: the gap is absolute."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼の実力とは比べものにならない。",
+    "english": "It is no comparison with his ability.",
+    "chinese": "跟他的实力根本无法相比。"
+   },
+   {
+    "japanese": "昔の携帯電話は今のスマホとは比べものにならない。",
+    "english": "Old cell phones can't compare with today's smartphones.",
+    "chinese": "以前的老手机跟现在的智能手机完全没法比。"
+   },
+   {
+    "japanese": "この店のラーメンは他とは比べものにならない美味しさだ。",
+    "english": "This shop's ramen is incomparably delicious.",
+    "chinese": "这家店的拉面好吃得别家无法相比。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "tomo-naru-to",
+  "pattern": "Noun + ともなると",
+  "level": "N1",
+  "meaning_en": "once you reach X / when it comes to X (status)",
+  "meaning_detailed": "Noun ともなると marks a status, rank, or stage: once someone or something reaches it, a notable change or consequence follows.",
+  "formation": "名詞(身分・段階・時期) + ともなると",
+  "formation_notes": [
+   "Typical with 部長, 社会人, 当日 etc."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "部長ともなると、責任が重い。",
+    "english": "Once you become a department head, the responsibility is heavy.",
+    "chinese": "一旦当上部长，责任就重了。"
+   },
+   {
+    "japanese": "社会人ともなると、自分で判断しなければならない。",
+    "english": "Once you are a working adult, you must decide for yourself.",
+    "chinese": "一旦踏入社会，就必须自己作判断。"
+   },
+   {
+    "japanese": "試合当日ともなると、緊張してくる。",
+    "english": "When the day of the match comes, you get nervous.",
+    "chinese": "一到比赛当天就会紧张起来。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "nashi-dewa-nai",
+  "pattern": "Noun + なしでは / なしには + negative",
+  "level": "N1",
+  "meaning_en": "cannot ... without X",
+  "meaning_detailed": "〜なしでは〜ない states that without X the latter clause is impossible: 'there is no Y without X'. Written, formal.",
+  "formation": "名詞 + なしでは/なしには + 否定形",
+  "formation_notes": [
+   "Written equivalent of 〜がないとできない."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "努力なしでは成功はない。",
+    "english": "There is no success without effort.",
+    "chinese": "没有努力就没有成功。"
+   },
+   {
+    "japanese": "君の協力なしにはこの仕事は完成しない。",
+    "english": "This job cannot be completed without your cooperation.",
+    "chinese": "没有你的协助，这项工作无法完成。"
+   },
+   {
+    "japanese": "愛なしでは生きていけない。",
+    "english": "I cannot live without love.",
+    "chinese": "没有爱就活不下去。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "ni-sura",
+  "pattern": "Noun + にすら",
+  "level": "N1",
+  "meaning_en": "not even X / even X (literary emphasis)",
+  "meaning_detailed": "〜にすら is the literary counterpart of にさえ/にも, singling out an extreme example: 'even X', or with a negative 'not even X'.",
+  "formation": "名詞 + にすら",
+  "formation_notes": [
+   "Literary; spoken Japanese prefers にさえ or さえ."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼の名前にすら覚えがない。",
+    "english": "I don't even recall his name.",
+    "chinese": "我连他的名字都不记得。"
+   },
+   {
+    "japanese": "夢にすら見なかった成功だ。",
+    "english": "A success I did not see even in my dreams.",
+    "chinese": "这是连做梦都没想到的成功。"
+   },
+   {
+    "japanese": "その事実は家族にすら話していない。",
+    "english": "I haven't told that fact even to my family.",
+    "chinese": "那件事我连家人都没告诉。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "ni-iwasereba",
+  "pattern": "Noun + に言わせれば",
+  "level": "N1",
+  "meaning_en": "if you ask X / as X would put it",
+  "meaning_detailed": "〜に言わせれば voices the named person's view: 'if you let X say it'. Nearly interchangeable with から言わせれば.",
+  "formation": "人 + に言わせれば",
+  "formation_notes": [
+   "Quotes a stance, often with critical distance."
+  ],
+  "formality": "formal",
+  "related": [
+   "kara-iwasereba"
+  ],
+  "examples": [
+   {
+    "japanese": "彼に言わせれば、すべては運のせいだ。",
+    "english": "If you ask him, everything is luck's fault.",
+    "chinese": "照他说，一切都是运气的问题。"
+   },
+   {
+    "japanese": "父に言わせれば、今の若者は甘いということになる。",
+    "english": "As my father would put it, young people today are soft.",
+    "chinese": "照父亲的说法，现在的年轻人太娇气。"
+   },
+   {
+    "japanese": "先生に言わせれば、私の作文はまだまだだ。",
+    "english": "If you let the teacher say it, my essay still has a long way to go.",
+    "chinese": "照老师的说法，我的作文还差得远。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "ni-kagitta-koto-dewa-nai",
+  "pattern": "Noun + に限ったことではない / に限ったことでもない",
+  "level": "N1",
+  "meaning_en": "not limited to X",
+  "meaning_detailed": "〜に限ったことではない says the issue is not confined to X; it applies more broadly. Formal, written.",
+  "formation": "名詞 + に限ったことではない / に限ったことでもない",
+  "formation_notes": [
+   "Common in commentary: 日本に限ったことではない."
+  ],
+  "formality": "formal",
+  "related": [
+   "ni-kagiri"
+  ],
+  "examples": [
+   {
+    "japanese": "この問題は日本に限ったことではない。",
+    "english": "This problem is not limited to Japan.",
+    "chinese": "这个问题不只限于日本。"
+   },
+   {
+    "japanese": "失敗は君に限ったことでもない。",
+    "english": "Failure is not something only you experience.",
+    "chinese": "失败也不是只有你才会遇到的事。"
+   },
+   {
+    "japanese": "それは若者に限ったことではなく、高齢者にも見られる。",
+    "english": "That is not limited to the young; it is seen among the elderly too.",
+    "chinese": "那不只是年轻人的事，在老年人身上也看得到。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "nuita-nuite",
+  "pattern": "Noun + ぬいた / ぬいて + Noun",
+  "level": "N1",
+  "meaning_en": "excluding X / skipping X",
+  "meaning_detailed": "〜ぬいた/ぬいて removes X from consideration: 'without X', 'leaving out X'. Written style; 抜きで is the spoken cousin.",
+  "formation": "名詞 + ぬいた + 名詞 / 名詞 + ぬいて",
+  "formation_notes": [
+   "ぬいた modifies a noun directly: 彼をぬいたチーム."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "前置きはぬいて、本題に入ろう。",
+    "english": "Skipping the preliminaries, let's get to the point.",
+    "chinese": "跳过开场白，直接进入正题吧。"
+   },
+   {
+    "japanese": "彼をぬいたチームは考えられない。",
+    "english": "A team without him is unthinkable.",
+    "chinese": "没有他的队伍是无法想象的。"
+   },
+   {
+    "japanese": "朝食をぬいて出かけた。",
+    "english": "I went out skipping breakfast.",
+    "chinese": "没吃早饭就出门了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "kirai-ga-aru",
+  "pattern": "Noun の / V dict + 嫌いがある",
+  "level": "N1",
+  "meaning_en": "has a (negative) tendency to",
+  "meaning_detailed": "〜嫌いがある points out an undesirable tendency: 'has a tendency to X', 'is apt to X'. Always critical or cautionary.",
+  "formation": "名詞 + の / 動詞辞書形 + 嫌いがある",
+  "formation_notes": [
+   "Only for undesirable tendencies; 傾向がある is neutral."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼は物事を悲観的に考える嫌いがある。",
+    "english": "He tends to think about things pessimistically.",
+    "chinese": "他有把事情往悲观想的倾向。"
+   },
+   {
+    "japanese": "この地域は地震が多い嫌いがある。",
+    "english": "This region is prone to earthquakes.",
+    "chinese": "这个地区有地震多发的倾向。"
+   },
+   {
+    "japanese": "彼の話は誇張される嫌いがある。",
+    "english": "His stories tend to be exaggerated.",
+    "chinese": "他的话有夸张的毛病。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "no-temae",
+  "pattern": "Noun の + 手前",
+  "level": "N1",
+  "meaning_en": "out of consideration for / in view of (appearances)",
+  "meaning_detailed": "〜の手前 gives the social consideration that forces the action: 'with X watching', 'for the sake of appearances before X'.",
+  "formation": "名詞 + の手前 / 動詞た + 手前",
+  "formation_notes": [
+   "Motivation is social pressure or face, not logic."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "皆に宣言した手前、今さらやめられない。",
+    "english": "Having declared it to everyone, I can't quit now.",
+    "chinese": "已经向大家宣布了，碍于这个现在不能放弃。"
+   },
+   {
+    "japanese": "会社の信用の手前、この問題は隠せない。",
+    "english": "Given the company's reputation, we cannot hide this problem.",
+    "chinese": "顾及公司的信誉，这个问题不能隐瞒。"
+   },
+   {
+    "japanese": "親の手前、いい子でいなければならなかった。",
+    "english": "For my parents' sake, I had to behave well.",
+    "chinese": "碍于父母的情面，我不得不做个乖孩子。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "wa-dou-de-are",
+  "pattern": "Noun + はどうであれ",
+  "level": "N1",
+  "meaning_en": "whatever X may be / regardless of X",
+  "meaning_detailed": "〜はどうであれ sets X aside as irrelevant to the main judgement: 'whatever X is', 'be that as it may'. Formal, written.",
+  "formation": "名詞 + はどうであれ / はどうであろうと",
+  "formation_notes": [
+   "Synonymous with はともあれ, slightly more formal."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "理由はどうであれ、遅刻は認められない。",
+    "english": "Whatever the reason, lateness is not acceptable.",
+    "chinese": "无论理由是什么，迟到都不被允许。"
+   },
+   {
+    "japanese": "結果はどうであれ、最後までやり抜く。",
+    "english": "Whatever the result, I will see it through.",
+    "chinese": "不管结果如何，我都会坚持到底。"
+   },
+   {
+    "japanese": "過去はどうであれ、これからが大切だ。",
+    "english": "Whatever the past was, what matters is what comes next.",
+    "chinese": "无论过去怎样，重要的是今后。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "mo-aimatte",
+  "pattern": "Noun + も相まって",
+  "level": "N1",
+  "meaning_en": "combined with / coupled with X",
+  "meaning_detailed": "〜も相まって adds a contributing factor: 'coupled with X', 'X combining with ...'. Written register, common in news analysis.",
+  "formation": "名詞 + も相まって",
+  "formation_notes": [
+   "Both factors jointly produce the (often notable) result."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "不況も相まって、売上が大幅に減った。",
+    "english": "Coupled with the recession, sales dropped sharply.",
+    "chinese": "加上经济不景气，销售额大幅下降。"
+   },
+   {
+    "japanese": "幸運も相まって、彼は一躍有名になった。",
+    "english": "Combined with good luck, he became famous overnight.",
+    "chinese": "加上运气好，他一举成名。"
+   },
+   {
+    "japanese": "経験と才能が相まって、見事な成果を上げた。",
+    "english": "Experience combined with talent produced splendid results.",
+    "chinese": "经验与才能相结合，取得了出色的成果。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "wo-oite-hoka-ni-nai",
+  "pattern": "Noun + をおいて他に + negative",
+  "level": "N1",
+  "meaning_en": "no one/nothing but X",
+  "meaning_detailed": "〜をおいて他に〜ない declares X the only candidate: 'apart from X there is nothing/no one'. Formal, often for praise or emphasis.",
+  "formation": "Noun + をおいて他に + negative predicate",
+  "formation_notes": [
+   "Classic frame: Xをおいて他にいない/ない."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "この仕事を任せられるのは、彼をおいて他にいない。",
+    "english": "There is no one but him to entrust with this job.",
+    "chinese": "能托付这项工作的，除了他没有别人。"
+   },
+   {
+    "japanese": "解決できるのは、この方法をおいて他にない。",
+    "english": "There is no way to solve it other than this method.",
+    "chinese": "能解决的只有这个办法。"
+   },
+   {
+    "japanese": "彼女をおいて他に適任者はいないだろう。",
+    "english": "There would be no better candidate than her.",
+    "chinese": "除了她之外没有更合适的人选了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "wo-zentei-to-shite",
+  "pattern": "Noun + を前提として / を前提にして",
+  "level": "N1",
+  "meaning_en": "on the premise of X",
+  "meaning_detailed": "〜を前提として builds the plan or judgement on X as a precondition: 'on the premise of X', 'assuming X'. Formal.",
+  "formation": "名詞 + を前提として / を前提にして",
+  "formation_notes": [
+   "を前提に(して) also common; 前提で is the terse variant."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "参加費無料を前提として、計画を立てた。",
+    "english": "We made the plan on the premise that participation is free.",
+    "chinese": "以参加免费为前提制定了计划。"
+   },
+   {
+    "japanese": "相手の協力を前提にしてはいけない。",
+    "english": "You must not take the other party's cooperation as a given.",
+    "chinese": "不能把对方的协助当作前提。"
+   },
+   {
+    "japanese": "安全を前提として作業を進める。",
+    "english": "We proceed with the work on the premise of safety.",
+    "chinese": "以安全为前提推进作业。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "wo-sakai-ni-shite",
+  "pattern": "Noun を境にして",
+  "level": "N1",
+  "meaning_en": "with X as the turning point",
+  "meaning_detailed": "〜を境にして marks X as the boundary after which things changed: 'from X onwards', 'with X as the dividing line'. Written.",
+  "formation": "Noun + を境にして / を境に",
+  "formation_notes": [
+   "Describes a before/after change of state."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "結婚を境にして、彼の生活は一変した。",
+    "english": "With marriage as the turning point, his life changed completely.",
+    "chinese": "以结婚为界，他的生活完全变了。"
+   },
+   {
+    "japanese": "その事件を境に、町の様子が変わった。",
+    "english": "The town changed from that incident onwards.",
+    "chinese": "以那次事件为界，镇上的面貌变了。"
+   },
+   {
+    "japanese": "1990年を境にして、産業構造が変化した。",
+    "english": "With 1990 as the dividing line, the industrial structure changed.",
+    "chinese": "以1990年为分界，产业结构发生了变化。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "wo-ki-ni-shite",
+  "pattern": "Noun を機にして",
+  "level": "N1",
+  "meaning_en": "taking X as an opportunity",
+  "meaning_detailed": "〜を機にして presents X as the occasion that triggered a change: 'on the occasion of X', 'taking X as a chance'. Formal.",
+  "formation": "Noun + を機にして / を機に",
+  "formation_notes": [
+   "Often life events: 転職, 結婚, 病気, 卒業."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "転職を機にして、英語の勉強を始めた。",
+    "english": "Taking the job change as an opportunity, I started studying English.",
+    "chinese": "以换工作为契机，我开始学英语。"
+   },
+   {
+    "japanese": "引っ越しを機に、古い家具を処分した。",
+    "english": "On the occasion of moving, I disposed of the old furniture.",
+    "chinese": "趁搬家的机会，处理了旧家具。"
+   },
+   {
+    "japanese": "病気を機にして、タバコをやめた。",
+    "english": "Taking the illness as a cue, I quit smoking.",
+    "chinese": "以生病为契机戒了烟。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "nai-mono-darou-ka",
+  "pattern": "V ない + ものだろうか",
+  "level": "N1",
+  "meaning_en": "can't we somehow ...? (wishful)",
+  "meaning_detailed": "〜ないものだろうか voices a strong wish that something hard to achieve could happen: 'couldn't it possibly ...?'. Rhetorical, often with どうにか/なんとか.",
+  "formation": "動詞ない形 + ものだろうか / ものか",
+  "formation_notes": [
+   "Spoken variant: ないものか(な)."
+  ],
+  "formality": "formal",
+  "related": [
+   "nai-mono-ka"
+  ],
+  "examples": [
+   {
+    "japanese": "この問題、どうにか解決できないものだろうか。",
+    "english": "Couldn't this problem somehow be solved?",
+    "chinese": "这个问题就不能想办法解决吗。"
+   },
+   {
+    "japanese": "もっと安くならないものだろうか。",
+    "english": "Couldn't it be any cheaper?",
+    "chinese": "就不能再便宜一点吗。"
+   },
+   {
+    "japanese": "彼に会えないものだろうかとずっと思っている。",
+    "english": "I have long been wishing I could somehow meet him.",
+    "chinese": "我一直想难道就见不到他吗。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "mo-shinai-de",
+  "pattern": "Noun + もしないで / V もしないで",
+  "level": "N1",
+  "meaning_en": "without even doing X",
+  "meaning_detailed": "〜もしないで reproaches that the action was done without even performing X (the minimum expected): 'without even X-ing'.",
+  "formation": "名詞 + もしないで / 動詞ます形 + もしないで",
+  "formation_notes": [
+   "Critical tone: 挨拶もしないで, 連絡もしないで."
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼は挨拶もしないで部屋に入った。",
+    "english": "He entered the room without even greeting us.",
+    "chinese": "他连招呼都不打就进了房间。"
+   },
+   {
+    "japanese": "連絡もしないで休むとは何事だ。",
+    "english": "Taking a day off without even contacting us — what is that about?",
+    "chinese": "连通知都不通知就休息，这算怎么回事。"
+   },
+   {
+    "japanese": "相談もしないで勝手に決めた。",
+    "english": "He decided on his own without even consulting anyone.",
+    "chinese": "他连商量都不商量就擅自决定了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "ka-to-omoikiya",
+  "pattern": "〜かと思いきや",
+  "level": "N1",
+  "meaning_en": "just when I thought X, (surprisingly) Y",
+  "meaning_detailed": "〜かと思いきや cancels the expectation just formed: 'I thought X, but (to my surprise) Y'. The twist follows immediately.",
+  "formation": "普通形 + かと思いきや",
+  "formation_notes": [
+   "Casual-written; close to かと思ったら but with stronger surprise."
+  ],
+  "formality": "neutral",
+  "related": [
+   "ta-ka-to-omottara"
+  ],
+  "examples": [
+   {
+    "japanese": "雨が止んだかと思いきや、また降り出した。",
+    "english": "Just when I thought the rain had stopped, it started again.",
+    "chinese": "刚以为雨停了，谁知又下起来了。"
+   },
+   {
+    "japanese": "合格したかと思いきや、結果は不合格だった。",
+    "english": "I thought I had passed — but the result was a fail.",
+    "chinese": "本以为合格了，没想到结果是不合格。"
+   },
+   {
+    "japanese": "寝たかと思いきや、すぐに起きてしまった。",
+    "english": "I thought he had fallen asleep, but he woke right up again.",
+    "chinese": "刚以为他睡着了，结果马上又醒了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "zu-ni-sunda",
+  "pattern": "V ない-stem + ずにすんだ/ずに済んだ",
+  "level": "N1",
+  "meaning_en": "got away without doing X",
+  "meaning_detailed": "〜ずにすんだ reports relief that something unpleasant was avoided: 'I managed without doing X', 'I was spared X'. Casual-written cousin of ないですんだ.",
+  "formation": "動詞ない形語幹 + ずにすんだ / ずに済んだ",
+  "formation_notes": [
+   "する→せずにすんだ."
+  ],
+  "formality": "neutral",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "傘を持ってきたので、濡れずにすんだ。",
+    "english": "I brought an umbrella, so I got away without getting wet.",
+    "chinese": "因为带了伞，没被淋湿就过去了。"
+   },
+   {
+    "japanese": "彼のおかげで残業せずに済んだ。",
+    "english": "Thanks to him, I was spared overtime.",
+    "chinese": "托他的福，不用加班就解决了。"
+   },
+   {
+    "japanese": "電車が遅れて、会議に出ずにすんだ。",
+    "english": "The train delay got me out of attending the meeting.",
+    "chinese": "因为电车晚点，没去开会就应付过去了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "darou-to-nakarou-to",
+  "pattern": "Noun + だろうとなかろうと",
+  "level": "N1",
+  "meaning_en": "whether X is the case or not",
+  "meaning_detailed": "〜だろうとなかろうと dismisses both possibilities as irrelevant: 'whether it is X or not'. Very formal, literary.",
+  "formation": "名詞 + だろうとなかろうと / であろうとなかろうと",
+  "formation_notes": [
+   "Frame: AだろうとAなかろうと + (same conclusion)."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "本当だろうとなかろうと、確認する必要がある。",
+    "english": "Whether it is true or not, we need to verify.",
+    "chinese": "不管是真是假，都有必要确认。"
+   },
+   {
+    "japanese": "好きだろうとなかろうと、食べなければならない。",
+    "english": "Like it or not, you have to eat it.",
+    "chinese": "不管喜不喜欢，都必须吃。"
+   },
+   {
+    "japanese": "可能だろうとなかろうと、やってみる価値はある。",
+    "english": "Possible or not, it is worth trying.",
+    "chinese": "不管可不可能，都值得一试。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "to-ittara-arya-shinai",
+  "pattern": "Noun + といったらありゃしない",
+  "level": "N1",
+  "meaning_en": "absolutely / indescribably (displeased)",
+  "meaning_detailed": "〜といったらありゃしない vents strong displeasure: 'X is simply unspeakable'. The spoken blunt cousin of といったらない.",
+  "formation": "名詞 + といったらありゃしない",
+  "formation_notes": [
+   "Rough masculine speech; といったらない is neutral."
+  ],
+  "formality": "casual",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼の無責任さといったらありゃしない。",
+    "english": "His irresponsibility is simply beyond words.",
+    "chinese": "他那不负责任的样子简直没法说。"
+   },
+   {
+    "japanese": "あの店の汚さといったらありゃしない。",
+    "english": "The filth of that shop is indescribable.",
+    "chinese": "那家店的脏简直没法形容。"
+   },
+   {
+    "japanese": "朝の電車の混雑といったらありゃしない。",
+    "english": "The morning train crowding is just awful.",
+    "chinese": "早班电车的拥挤别提有多厉害了。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "to-mirareru",
+  "pattern": "〜とみられる/とみられている",
+  "level": "N1",
+  "meaning_en": "it is believed that / is thought to be",
+  "meaning_detailed": "〜とみられる reports an expert or official judgement: 'it is believed that', 'X is suspected to be'. News-report register.",
+  "formation": "普通形 + とみられる / とみられている",
+  "formation_notes": [
+   "Journalistic; と考えられる is its analytic twin."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "火事の原因は漏電とみられている。",
+    "english": "The fire is believed to have been caused by an electrical leak.",
+    "chinese": "火灾原因被认为是漏电。"
+   },
+   {
+    "japanese": "彼は次期社長とみられている。",
+    "english": "He is seen as the next company president.",
+    "chinese": "他被认为是下一任社长。"
+   },
+   {
+    "japanese": "この病気は遺伝とみられる。",
+    "english": "This disease is thought to be hereditary.",
+    "chinese": "这种病被认为与遗传有关。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "no-wa-gurai-no-mono-da",
+  "pattern": "Plain form + のは + Noun + ぐらいのものだ",
+  "level": "N1",
+  "meaning_en": "the most X is merely Y",
+  "meaning_detailed": "〜のは〜ぐらいのものだ caps the extent at Y: 'the most that can be said is Y', 'it's merely Y'. Downplays or sets an upper bound.",
+  "formation": "普通形 + のは + 数量・動詞 + ぐらいのものだ",
+  "formation_notes": [
+   "Downplaying; くらいのものだ spelling also common."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "私にできるのは、祈るぐらいのものだ。",
+    "english": "All I can do is merely pray.",
+    "chinese": "我能做的顶多也就是祈祷罢了。"
+   },
+   {
+    "japanese": "残ったのは数人ぐらいのものだ。",
+    "english": "Only a handful of people remained.",
+    "chinese": "剩下的充其量只有几个人。"
+   },
+   {
+    "japanese": "彼に言えるのは「ごめん」ぐらいのものだ。",
+    "english": "All I can say to him is a mere 'sorry'.",
+    "chinese": "对他能说的顶多也就是一句“对不起”。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "butta-butte",
+  "pattern": "Noun + ぶった/ぶって",
+  "level": "N1",
+  "meaning_en": "to pretend / put on airs of X",
+  "meaning_detailed": "〜ぶった/ぶって accuses someone of acting like X: 'to play the X', 'to put on X airs'. Critical, spoken-written.",
+  "formation": "名詞 + ぶった/ぶって (+ 名詞/述語)",
+  "formation_notes": [
+   "知ったかぶる, 上品ぶる, 強がる系の派生."
+  ],
+  "formality": "casual",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼は大金持ちぶっているが、実は貧乏だ。",
+    "english": "He acts like a millionaire, but he's actually broke.",
+    "chinese": "他装成大款，其实穷得很。"
+   },
+   {
+    "japanese": "知ったかぶった態度はやめなさい。",
+    "english": "Stop pretending you know everything.",
+    "chinese": "别摆出一副什么都知道的样子。"
+   },
+   {
+    "japanese": "上品ぶっても無駄だよ。",
+    "english": "No use putting on refined airs.",
+    "chinese": "装高雅也没用。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
+ },
+ {
+  "id": "to-iwan-bakari",
+  "pattern": "〜と言わんばかりに/の",
+  "level": "N1",
+  "meaning_en": "as if to say X",
+  "meaning_detailed": "〜と言わんばかり describes an attitude or expression that all but says X out loud: 'as if to say X'. Written.",
+  "formation": "発言内容 + と言わんばかりに / と言わんばかりの + 名詞",
+  "formation_notes": [
+   "に adverbial, の before nouns: と言わんばかりの表情."
+  ],
+  "formality": "formal",
+  "related": [],
+  "examples": [
+   {
+    "japanese": "彼は「やめろ」と言わんばかりの表情だった。",
+    "english": "His expression said 'stop it' as clearly as words.",
+    "chinese": "他的表情简直像在说“住手”。"
+   },
+   {
+    "japanese": "子供は「もっと」と言わんばかりに手を伸ばした。",
+    "english": "The child reached out as if to say 'more'.",
+    "chinese": "孩子伸出手，仿佛在说“还要”。"
+   },
+   {
+    "japanese": "彼女は怒りを言わんばかりにドアを閉めた。",
+    "english": "She shut the door as if venting her anger.",
+    "chinese": "她砰地关上门，像是在发泄怒气。"
+   }
+  ],
+  "review_status": "draft",
+  "sources": [
+   "General Japanese grammar knowledge (non-copyrightable facts).",
+   "Form inventory cross-checked against hanabira.org grammar list (https://hanabira.org/japanese/grammarlist)."
+  ]
  }
 ]
