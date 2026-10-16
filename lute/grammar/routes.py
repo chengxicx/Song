@@ -126,12 +126,11 @@ def library(langid):
     """
     One language's grammar library: every level on one page.
 
-    The corpus runs to ~1400 points.  Like hanabira.org's grammar list,
-    the page is a full-width grid of compact cards grouped by level
-    (N5 -> N1), each card linking to the point's own page, with the
-    sticky toolbar's search filtering across all levels at once.  A
-    legacy ``?level=`` query is accepted and ignored: every level is
-    already on the page.
+    The corpus runs to ~1400 points.  The page is a full-width grid of
+    compact cards grouped by level (N5 -> N1), each card linking to the
+    point's own page, with the sticky toolbar's search filtering across
+    all levels at once.  A legacy ``?level=`` query is accepted and
+    ignored: every level is already on the page.
     """
     language = LanguageRepository(db.session).find(langid)
     if language is None:
