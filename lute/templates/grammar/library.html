@@ -5,11 +5,11 @@
 
 {% block body %}
 
-{# The whole corpus on one page, using the full screen width (like
-   hanabira.org's grammar list): compact cards grouped by level, the
-   sticky toolbar's search filtering across every level at once.  Each
-   card links to the point's own page.  The accent hue of a level rides
-   on its section (grammar-group--N5 ...), so cards and pills pick it up. #}
+{# The whole corpus on one page, using the full screen width: compact
+   cards grouped by level, the sticky toolbar's search filtering across
+   every level at once.  Each card links to the point's own page.  The
+   accent hue of a level rides on its section (grammar-group--N5 ...),
+   so cards and pills pick it up. #}
 <div class="grammar-library" data-language-id="{{ language.id }}"
      data-base="{{ url_for('grammar.library', langid=language.id) }}">
 

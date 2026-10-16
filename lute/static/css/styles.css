@@ -5241,8 +5241,8 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     font-size: 15px;
 }
 
-/* The library is a full-screen-wide grid (like hanabira.org's grammar
-   list); only the point's own page stays a readable column. */
+/* The library is a full-screen-wide grid; only the point's own page
+   stays a readable column. */
 .grammar-detail {
     max-width: 820px;
 }
@@ -5386,9 +5386,9 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     opacity: 0.72;
 }
 
-/* Full-screen card grid (hanabira.org's grammar list): as many columns
-   as fit, each card one grammar point -- name plus a single meaning
-   line, tags riding at the end of it. */
+/* Full-screen card grid: as many columns as fit, each card one grammar
+   point -- name plus a single meaning line, tags riding at the end of
+   it. */
 .grammar-library__grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
