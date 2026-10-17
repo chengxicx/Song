@@ -547,21 +547,36 @@ function open_grammar_analysis(opts) {
           });
           return html + escapeHtml(s.slice(pos));
         }
-        // JLPT levels (Japanese/Korean engines) and CEFR levels (European
-        // engines); a response speaks one scale or the other, so the group
-        // order picks the scale the data uses.
+        // JLPT levels (Japanese engine), CEFR levels (European engines) and
+        // TOPIK bands (Korean engine); a response speaks one scale or the
+        // other, so the group order picks the scale the data uses.
         const JLPT_LEVELS = ["N5", "N4", "N3", "N2", "N1"];
         const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
+        const TOPIK_LEVELS = ["TOPIK 1-2", "TOPIK 3-4", "TOPIK 5-6"];
         const LEVELS = data.some(function (g) {
           return JLPT_LEVELS.indexOf(g.level) !== -1;
         })
           ? JLPT_LEVELS
+          : data.some(function (g) {
+              return TOPIK_LEVELS.indexOf(g.level) !== -1;
+            })
+          ? TOPIK_LEVELS
           : CEFR_LEVELS;
 
+        // The TOPIK strings carry a space, which cannot ride in a class
+        // name, so each band maps to its own token (same mapping and
+        // accents as the library pages, see grammar/routes.py).
+        const TOPIK_CLASSES = {
+          "TOPIK 1-2": "TOPIK12",
+          "TOPIK 3-4": "TOPIK34",
+          "TOPIK 5-6": "TOPIK56",
+        };
+
         function levelClass(lvl) {
-          return JLPT_LEVELS.indexOf(lvl) === -1 && CEFR_LEVELS.indexOf(lvl) === -1
-            ? "N"
-            : lvl;
+          if (JLPT_LEVELS.indexOf(lvl) !== -1 || CEFR_LEVELS.indexOf(lvl) !== -1) {
+            return lvl;
+          }
+          return TOPIK_CLASSES[lvl] || "N";
         }
 
         // The two aggregated buckets ("Basic forms: …", "Particles: …") fire

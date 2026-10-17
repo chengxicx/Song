@@ -230,3 +230,24 @@ def test_related_links_render_as_library_deep_links():
 def test_no_related_renders_no_block():
     "A row with no cross-links leaves the related block out entirely."
     assert _render([_entry()])["related"] == []
+
+
+def test_topik_bands_ride_their_own_accent_tokens_and_order():
+    """
+    The Korean bands' raw strings carry a space, so the panel maps each to
+    a class-safe token (TOPIK12/34/56) -- the same mapping and accents the
+    library pages use, so a band reads as one hue in both places.  The
+    level grouping must also sort the bands easiest-first even when the
+    payload's match order is reversed.
+    """
+    out = _render(
+        [
+            _entry(level="TOPIK 5-6", key="kgm_a__000001"),
+            _entry(level="TOPIK 3-4", key="kgm_b__000002"),
+            _entry(level="TOPIK 1-2", key="kgm_c__000003"),
+        ]
+    )
+    assert "grammar-group--TOPIK56" in out["html"], out["html"][:400]
+    assert "grammar-item--TOPIK34" in out["html"], out["html"][:400]
+    assert "grammar-group--TOPIK12" in out["html"], out["html"][:400]
+    assert out["keys"] == ["kgm_c__000003", "kgm_b__000002", "kgm_a__000001"]

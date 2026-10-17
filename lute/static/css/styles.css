@@ -4875,6 +4875,12 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 .grammar-item--C1, .grammar-group--C1 { --g-accent: #845ef7; }
 .grammar-item--C2, .grammar-group--C2 { --g-accent: #e64980; }
 
+/* Korean TOPIK bands, easy -> hard (tokens from grammar/routes.py --
+   the raw "TOPIK 1-2" strings carry a space, so the classes do not). */
+.grammar-item--TOPIK12, .grammar-group--TOPIK12 { --g-accent: #37b24d; }
+.grammar-item--TOPIK34, .grammar-group--TOPIK34 { --g-accent: #f08c00; }
+.grammar-item--TOPIK56, .grammar-group--TOPIK56 { --g-accent: #e64980; }
+
 .grammar-analysis-panel__header {
     display: flex;
     align-items: center;
