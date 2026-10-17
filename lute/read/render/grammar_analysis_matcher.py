@@ -754,6 +754,39 @@ def desc_for_rule(rule, display_lang):
     return _desc(rule, display_lang)
 
 
+def example_gloss(example, display_lang):
+    """
+    The translation to print under an example, in the display language.
+
+    An engine stores its examples with whatever translations the corpus
+    carries -- Spanish as ``{"es", "en", "zh"}``, Russian as
+    ``{"ru", "zh"}``, Japanese as ``{"japanese", "english", "chinese"}``
+    -- so the field names differ per language.  Each engine therefore
+    resolves its own rows (see the per-engine ``_example_gloss``); this
+    shared helper covers the common ``{"<lang>", "en", "zh", "ko"}``
+    shape and is what the library-page exporters use.
+
+    A missing translation stays empty rather than falling back to English
+    under a Chinese or Korean heading: the front end hides an empty gloss,
+    which is honest, while a wrong-language one is not.
+    """
+    if not isinstance(example, dict):
+        return ""
+    if display_lang == "zh":
+        return (example.get("zh") or example.get("chinese") or "").strip()
+    if display_lang == "ko":
+        return (example.get("ko") or "").strip()
+    return (example.get("en") or example.get("english") or "").strip()
+
+
+def reference_gloss(reference, display_lang):
+    """
+    Translation for a rule's folded reference example, in the display
+    language, or "" when the corpus carries none for it.
+    """
+    return example_gloss(reference, display_lang)
+
+
 # ---- analysis driver ---------------------------------------------------
 
 
@@ -790,6 +823,21 @@ def analyze_tokens(page_text, rules, tokens_for_sentence, display_lang):
                     "desc": _desc(rule, display_lang),
                     "examples": [],
                 }
+                # The entry's own curated example and its translation, for
+                # the panel's folded reference block.  Optional: only the
+                # engines that carry one on their rules emit it, so the
+                # block simply disappears for the rest.  The translation is
+                # resolved here, in the display language, rather than in
+                # the front end -- the same rule the engines follow for
+                # `desc`, so a zh panel never sees an English gloss.
+                reference = rule.get("reference")
+                if reference:
+                    text = reference_gloss(reference, display_lang)
+                    if text:
+                        entry["reference"] = {
+                            "sentence": (reference.get("sentence") or "").strip(),
+                            "text": text,
+                        }
                 by_key[rule["key"]] = entry
                 order.append(rule["key"])
             if len(entry["examples"]) >= _EXAMPLE_CAP:

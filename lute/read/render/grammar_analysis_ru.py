@@ -820,8 +820,36 @@ def _load_data_rules():
         rule["formation"] = (item.get("formation") or "").strip()
         rule["notes"] = (item.get("notes") or "").strip()
         rule["examples"] = pairs
+        # The panel's folded reference block: the row's own example with
+        # its Chinese gloss, so a reader sees a translated sentence rather
+        # than only the description.  The library page shows every example,
+        # so this is the panel's single curated one.
+        rule["reference"] = _first_glossed(pairs)
         rules.append(rule)
     return rules
+
+
+def _first_glossed(pairs):
+    """
+    The first example that carries a translation, shaped for the panel.
+
+    ``sentence`` is the field the front end reads first (the Japanese
+    engine ships ``japanese`` instead and the front end accepts both).
+    Every translation the example carries is kept, not just the Chinese
+    one: the shared ``reference_gloss`` resolves it in the panel's display
+    language, so an English panel gets the English gloss rather than
+    nothing.
+    """
+    for pair in pairs:
+        if not (pair.get("zh") or pair.get("en") or pair.get("ko")):
+            continue
+        reference = {"sentence": pair["ru"]}
+        for field in ("zh", "en", "ko"):
+            value = (pair.get(field) or "").strip()
+            if value:
+                reference[field] = value
+        return reference
+    return None
 
 
 # The data rules are built on first use, not at import: _load_data_rules()
@@ -842,11 +870,29 @@ def _get_data_rules():
 
 
 def _get_all_rules():
-    "Hand-written plus data-driven rules, built and memoised on first use."
+    """
+    Hand-written plus data-driven rules, built and memoised on first use.
+
+    The hand-written rules carry their example sentence inline and their
+    translations in the golden set, so the panel's folded reference block
+    is attached here -- once, for both the panel and the library page.
+    """
     global _all_rules_cache  # pylint: disable=global-statement
     with _rules_lock:
         if _all_rules_cache is None:
             _all_rules_cache = _RU_RULES + _get_data_rules()
+            golden = _golden_examples()
+            for rule in _all_rules_cache:
+                if rule.get("reference"):
+                    continue  # data rows already carry their own
+                examples = rule.get("examples") or golden.get(rule["key"]) or []
+                if examples:
+                    rule["reference"] = _first_glossed(
+                        [
+                            e if isinstance(e, dict) else {"ru": e}
+                            for e in examples
+                        ]
+                    )
         return _all_rules_cache
 
 

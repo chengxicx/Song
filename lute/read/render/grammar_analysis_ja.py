@@ -2798,7 +2798,21 @@ def _make_data_rule(
         # normalize to one string so the panel can drop it in verbatim.
         "formation_notes": _notes_text(item.get("formation_notes")),
         "reference": reference,
+        # The matcher only ever needs the Japanese sentence, but the
+        # library page prints a translation under it, so the full rows are
+        # kept alongside.  ``examples`` used to be flattened to bare
+        # sentences here, which is why the /grammar pages showed Japanese
+        # with no gloss while the Spanish and Russian ones showed one.
         "examples": [e["japanese"] for e in item.get("examples") or []],
+        "example_rows": [
+            {
+                "japanese": (e.get("japanese") or "").strip(),
+                "english": (e.get("english") or "").strip(),
+                "chinese": (e.get("chinese") or "").strip(),
+            }
+            for e in item.get("examples") or []
+            if (e.get("japanese") or "").strip()
+        ],
         # "patterns" is what the matcher reads, so an empty list is how a
         # skipped rule stays silent.  "derived" keeps whatever the derivation
         # did produce, for introspection: scripts/screen_grammar_library.py
@@ -3574,6 +3588,48 @@ def analyze_japanese(page_text, display_lang="en"):
 # can reuse the panel's markup and CSS.
 
 
+def _example_gloss(row, display_lang):
+    """
+    The translation for one example row, in the display language.
+
+    The curated data carries English and/or Chinese per sentence, so a
+    Chinese panel reads ``chinese`` and an English one reads ``english``.
+    A Korean panel gets the enrichment translation when the row has one
+    (``reference_ko`` holds the gloss of the *reference* sentence, which
+    is the one the panel shows, so it is used as the Korean gloss here);
+    otherwise the gloss stays empty and the template shows no gloss line.
+
+    A missing translation is never back-filled from the other language:
+    an English gloss under a Chinese heading is worse than none.
+    """
+    if display_lang == "ko":
+        return (row.get("ko") or "").strip()
+    if display_lang == "zh":
+        return (row.get("chinese") or "").strip()
+    return (row.get("english") or "").strip()
+
+
+def _example_rows(rule, display_lang):
+    """
+    The rule's examples as display rows.
+
+    Data rows ship ``example_rows`` (japanese + english + chinese), so
+    they come back as ``{"text", "tr"}``.  The hand-written basics carry
+    bare sentences with no translation anywhere, so they stay plain
+    strings -- the template renders that shape too.
+    """
+    rows = []
+    for row in rule.get("example_rows") or []:
+        text = (row.get("japanese") or "").strip()
+        if not text:
+            continue
+        tr = _example_gloss(row, display_lang)
+        rows.append({"text": text, "tr": tr} if tr else text)
+    if rows:
+        return rows
+    return [s for s in rule.get("examples") or [] if s]
+
+
 def _library_entry(rule, display_lang):
     """
     One curated rule as a library row, display-ready.
@@ -3581,16 +3637,21 @@ def _library_entry(rule, display_lang):
     Every rule is included -- even the ones the matcher skips -- because a
     skipped row is still a grammar point a reader may want to look up; the
     ``skipped`` flag lets the page mark it as reference-only instead of
-    hiding it.  ``examples`` stays plain strings: the library has no page
-    text to highlight, so the match offsets the panel computes are
-    irrelevant here.
+    hiding it.
+
+    ``examples`` comes back as ``{"text", "tr"}`` rows where the corpus
+    carries a translation, and as a plain string where it does not (the
+    hand-written basics, and the rows the enrichment files never covered).
+    The template renders both shapes, so a missing gloss simply shows no
+    gloss line rather than an empty one.  The library has no page text to
+    highlight, so the match offsets the panel computes are irrelevant here.
     """
     entry = {
         "key": rule["key"],
         "name": rule["pattern"],
         "level": rule["level"],
         "desc": _desc(rule, display_lang),
-        "examples": [s for s in rule.get("examples") or [] if s],
+        "examples": _example_rows(rule, display_lang),
         "skipped": bool(rule.get("skipped")),
     }
     formation = _enrichment(rule, "formation", display_lang)
