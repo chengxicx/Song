@@ -75,3 +75,53 @@ def test_each_hiding_modifier_out_specifies_its_base_class():
                 f"{part!r} is a single-class selector, so a later "
                 f"`{part.split('--')[0]} {{ display: ... }}` beats it"
             )
+
+
+# ---- the header's scope group ------------------------------------------
+#
+# The scope buttons read as one segmented control: a shared rounded frame
+# with a divider between the segments.  Written as three independent pills
+# it reads as three unrelated actions, which is what it used to be.
+
+_SCOPE = ".grammar-analysis-panel__scope"
+
+
+def _rule_body(css, selector):
+    "The declarations of the first rule whose selector is exactly selector."
+    for sel, body in _rules(css):
+        if sel.strip() == selector:
+            return body
+    return None
+
+
+def test_the_scope_group_is_one_framed_control():
+    css = _css()
+    group = _rule_body(css, ".grammar-analysis-panel__scopes")
+    assert group is not None, "the scope group rule is gone"
+    # A segmented control: the frame owns the border and the rounding, and
+    # the segments sit inside it without their own outline.
+    assert "border" in group, group
+    assert "border-radius" in group, group
+    assert "display: inline-flex" in group, group
+
+    segment = _rule_body(css, _SCOPE)
+    assert segment is not None, "the scope segment rule is gone"
+    assert "border: 0" in segment or "border:0" in segment, segment
+
+
+def test_scope_segments_are_separated_by_a_divider():
+    "The segments need a visible boundary, drawn by the neighbour's border."
+    css = _css()
+    divider = _rule_body(
+        css, ".grammar-analysis-panel__scope + .grammar-analysis-panel__scope"
+    )
+    assert divider is not None, "the segment divider rule is gone"
+    assert "border-left" in divider, divider
+
+
+def test_the_active_scope_is_visually_marked():
+    "Without a distinct active state the reader cannot tell which scope is on."
+    css = _css()
+    active = _rule_body(css, ".grammar-analysis-panel__scope--active")
+    assert active is not None, "the active-scope rule is gone"
+    assert "background" in active, active
