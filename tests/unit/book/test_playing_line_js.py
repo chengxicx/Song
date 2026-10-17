@@ -232,3 +232,69 @@ def test_a_sentence_a_page_turn_dropped_clears_the_mark():
     )
     assert results[0]["marked"] == [{"para": 2, "sentence": 0, "text": "Tengo"}]
     assert results[-1]["marked"] == []
+
+
+# A page the furigana has annotated: a word with a reading is rendered
+# <ruby>word<rt>reading</rt></ruby> (lute-furigana.js), so the line's
+# textContent is the word and its reading run together.
+RUBY_PARAGRAPHS = [
+    # One sentence, given as a token list: a {base, reading} token is a
+    # furigana'd word, a string is plain text.
+    [
+        [
+            {"base": "間", "reading": "あいだ"},
+            "は本当",
+            {"base": "事", "reading": "こと"},
+            "です。",
+        ]
+    ],
+    [["うん？"]],
+]
+
+
+def test_a_furigana_reading_is_not_part_of_the_line():
+    """
+    The mark must survive furigana.  A bare textContent flattens the
+    reading into the sentence ("間" reads "間あいだ"), so the line never
+    equals its cue text and the underline is dropped -- on every line
+    holding a reading, which is why it survives the first sentence or two
+    (no kanji, no ruby) and disappears once the readings land.  Measured
+    on production: 10 of 28 lines still matched with readings in, 28 of
+    28 without.
+    """
+    results = _run_steps(
+        [{"set_cue_index": [0, "間は本当事です。"]}],
+        paragraphs=RUBY_PARAGRAPHS,
+        cue_map=[0, 1],
+    )
+    assert results[-1]["marked"] == [
+        {"para": 0, "sentence": None, "text": "間は本当事です。"}
+    ]
+
+
+def test_the_text_fallback_ignores_furigana_too():
+    "Same answer without the map: the cue text is matched against the lines."
+    results = _run_steps(
+        [{"set_cue_index": [1, "間は本当事です。"]}],
+        paragraphs=RUBY_PARAGRAPHS,
+        cue_map=None,
+    )
+    assert results[-1]["marked"] == [
+        {"para": 0, "sentence": None, "text": "間は本当事です。"}
+    ]
+
+
+def test_a_line_without_readings_still_matches_beside_ruby_lines():
+    "Kana-only lines carry no ruby; they keep matching their cues."
+    results = _run_steps(
+        [
+            {"set_cue_index": [0, "間は本当事です。"]},
+            {"set_cue_index": [1, "うん？"]},
+        ],
+        paragraphs=RUBY_PARAGRAPHS,
+        cue_map=[0, 1],
+    )
+    assert [r["marked"] for r in results] == [
+        [{"para": 0, "sentence": None, "text": "間は本当事です。"}],
+        [{"para": 1, "sentence": None, "text": "うん？"}],
+    ]

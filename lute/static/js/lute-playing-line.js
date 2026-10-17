@@ -52,7 +52,29 @@
     for (var i = 0; i < btns.length; i++) {
       btns[i].parentNode.removeChild(btns[i]);
     }
-    return norm(clone.textContent);
+    return norm(visibleText(clone));
+  }
+
+  // Furigana is not part of the line: a word with a reading is rendered
+  // <ruby>word<rt>reading</rt></ruby>, and a bare textContent flattens the
+  // reading into the sentence ("間" reads "間あいだ"), so the line no
+  // longer equals its cue text and the mark is dropped -- on every line
+  // holding a reading, which is why the underline survives the first
+  // sentence or two (no kanji, no ruby) and then disappears for good as
+  // the readings land.  grammarVisibleText (lute-commands.js) walks the
+  // text nodes and skips <rt>/<rp>; it is the same helper the sentence
+  // and grammar collectors read through.  Local fallback: this file
+  // loads before lute-commands.js.
+  function visibleText(el) {
+    if (typeof grammarVisibleText === "function") {
+      return grammarVisibleText(el);
+    }
+    var clone = el.cloneNode(true);
+    var readings = clone.querySelectorAll("rt, rp");
+    for (var i = 0; i < readings.length; i++) {
+      readings[i].parentNode.removeChild(readings[i]);
+    }
+    return clone.textContent;
   }
 
   function clear() {

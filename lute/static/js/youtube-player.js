@@ -421,6 +421,10 @@
     api.buildTranscript();
     api.bindControls();
     api.bindSubtitleInteractions();
+    // Settle the strip's height (from the book's cues) before the reading
+    // page loads its text and re-flows it into screen groups: the text
+    // below the player is fit to the space the strip leaves it.
+    api.syncStripHeight();
     api.bindKeys();
     api.bindStatusUpdates();
     api.bindNotReadyFallback();
