@@ -431,12 +431,13 @@ _golden_cache = None
 
 def _golden_examples():
     """
-    Curated example sentences for the hand-written rules (key -> [es, ...]).
+    Curated example sentences for the hand-written rules.
 
-    The golden set is the single store of these examples: the tests re-run
-    every sentence through its own rule, and the library serves the same
-    sentences to readers, so the page can never show a point whose matcher
-    does not actually recognise it.
+    Keyed ``key -> [{"es", "en", "zh", "ko"}, ...]``.  The golden set is the
+    single store of these examples: the tests re-run every sentence through
+    its own rule, and the library serves the same sentences to readers, so
+    the page can never show a point whose matcher does not actually
+    recognise it.
     """
     global _golden_cache  # pylint: disable=global-statement
     with _golden_lock:
@@ -445,30 +446,54 @@ def _golden_examples():
             if os.path.exists(_GOLDEN_PATH):
                 with open(_GOLDEN_PATH, encoding="utf-8") as fh:
                     for key, entry in json.load(fh).items():
-                        sentences = [
-                            e.get("es") or "" for e in entry.get("examples") or []
+                        examples[key] = [
+                            e
+                            for e in entry.get("examples") or []
+                            if (e.get("es") or "").strip()
                         ]
-                        examples[key] = [s.strip() for s in sentences if s.strip()]
             _golden_cache = examples
         return _golden_cache
 
 
-def _library_entry(rule, display_lang):
+def _example_gloss(example, display_lang):
+    """
+    The translation to print under an example, in the display language.
+
+    The golden set carries all three; a missing one stays empty rather than
+    falling back to English under a Chinese or Korean heading.
+    """
+    if display_lang == "zh":
+        return (example.get("zh") or "").strip()
+    if display_lang == "ko":
+        return (example.get("ko") or "").strip()
+    return (example.get("en") or "").strip()
+
+
+def _library_entry(rule, display_lang, examples):
     """
     One rule as a library row, display-ready (see the Japanese analogue).
 
-    Examples stay plain strings: the library has no page text to
-    highlight, so the match offsets the panel computes are irrelevant here.
+    Each example comes back as ``{"text", "tr"}``: the Spanish sentence and
+    its translation for the display language.  The library has no page text
+    to highlight, so the match offsets the panel computes are irrelevant
+    here.
     """
     desc = rule.get("desc") or rule["name"]
     if display_lang == "zh" and (rule.get("zh") or "").strip():
         desc = rule["zh"]
+    rows = []
+    for example in examples:
+        if isinstance(example, str):
+            example = {"es": example}
+        text = (example.get("es") or "").strip()
+        if text:
+            rows.append({"text": text, "tr": _example_gloss(example, display_lang)})
     return {
         "key": rule["key"],
         "name": rule["name"],
         "level": rule["level"],
         "desc": desc,
-        "examples": list(rule.get("examples") or []),
+        "examples": rows,
         "skipped": False,
     }
 
@@ -478,10 +503,8 @@ def library_entries(display_lang="en"):
     golden = _golden_examples()
     entries = []
     for rule in _ES_RULES:
-        if not rule.get("examples"):
-            rule = dict(rule)
-            rule["examples"] = golden.get(rule["key"]) or []
-        entries.append(_library_entry(rule, display_lang))
+        examples = rule.get("examples") or golden.get(rule["key"]) or []
+        entries.append(_library_entry(rule, display_lang, examples))
     ordered = sorted(
         enumerate(entries),
         key=lambda pair: (
