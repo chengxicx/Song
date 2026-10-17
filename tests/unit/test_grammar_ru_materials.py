@@ -251,3 +251,64 @@ def test_generalisation_does_not_spill_to_other_constructions():
         assert not ru.match_rule(rule, ru._tokens_for(text), text), (
             f"{rule['key']} fires on {sentence!r} -- over-generalised"
         )
+
+
+# ---- the panel's folded reference block ---------------------------------
+#
+# The panel shows a rule's own curated example with its translation, so a
+# reader sees a translated sentence instead of only the description.  The
+# Japanese engine had this and Russian did not; the shared matcher now
+# carries it for any engine whose rules ship one.
+
+
+def test_russian_rules_carry_a_reference_with_a_gloss():
+    "Every rule that has a translated example exposes one for the panel."
+    rules = ru._get_all_rules()
+    with_ref = [r for r in rules if r.get("reference")]
+    assert with_ref, "no rule carries a reference block"
+    # The data rows all have one; the hand-written rules that have a golden
+    # example have one too.  Only a rule with no example anywhere lacks it.
+    for rule in with_ref:
+        reference = rule["reference"]
+        assert (reference.get("sentence") or "").strip(), rule["key"]
+        assert any(
+            (reference.get(f) or "").strip() for f in ("zh", "en", "ko")
+        ), f"{rule['key']} has a reference with no translation"
+
+
+def test_reference_gloss_follows_the_display_language():
+    "The gloss is resolved in the panel's language, never back-filled."
+    from lute.read.render.grammar_analysis_matcher import reference_gloss
+
+    reference = {
+        "sentence": "Деньги не могут тебя сделать счастливым.",
+        "zh": "金钱并不能使你幸福。",
+        "en": "Money can't make you happy.",
+        "ko": "돈이 너를 행복하게 만들 수는 없다.",
+    }
+    assert reference_gloss(reference, "zh").startswith("金钱")
+    assert reference_gloss(reference, "en").startswith("Money")
+    assert reference_gloss(reference, "ko").startswith("돈이")
+
+
+def test_reference_gloss_stays_empty_when_the_language_is_missing():
+    "A missing translation is empty, not the other language's text."
+    from lute.read.render.grammar_analysis_matcher import reference_gloss
+
+    zh_only = {"sentence": "Весна. Ночь. Тишина.", "zh": "春天。夜。一片寂静。"}
+    assert reference_gloss(zh_only, "zh") == "春天。夜。一片寂静。"
+    assert reference_gloss(zh_only, "en") == ""
+    assert reference_gloss(zh_only, "ko") == ""
+
+
+def test_panel_emits_the_reference_block():
+    "The panel entry carries the reference so the front end can fold it."
+    sentence = "Карина на работе несчастна, потому что у неё есть кошка."
+    for entry in ru.analyze_russian(sentence, display_lang="zh"):
+        if entry["key"] == "ru_u_menya":
+            reference = entry.get("reference")
+            assert reference, "panel entry carries no reference block"
+            assert reference["sentence"].strip()
+            assert reference["text"].strip()
+            return
+    raise AssertionError("ru_u_menya did not fire on the probe sentence")

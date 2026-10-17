@@ -1851,3 +1851,78 @@ def test_merged_material_rows_stay_visible_in_chinese():
     results = analyze_japanese("".join(rule["examples"][:2]), display_lang="zh")
     entry = next(e for e in results if e["key"] == rule["key"])
     assert entry["reference"]["text"] == rule["reference"]["chinese"]
+
+
+# ---- library-page example translations ---------------------------------
+#
+# The /grammar page prints a translation under each example for the
+# languages whose corpus carries one.  The rows were being flattened to
+# bare Japanese sentences at rule-construction time, so the page showed
+# none at all -- while the Spanish and Russian pages showed one.
+
+
+def test_library_rows_carry_the_translation_their_corpus_has():
+    "A zh row shows the Chinese gloss; an en row shows the English one."
+    rows = [
+        e
+        for e in grammar_ja.library_entries("zh")
+        if any(isinstance(x, dict) and (x.get("tr") or "").strip() for x in e["examples"])
+    ]
+    assert rows, "no library row carries a translated example in Chinese"
+    for entry in rows:
+        for example in entry["examples"]:
+            if isinstance(example, dict):
+                assert (example.get("text") or "").strip(), entry["key"]
+                assert (example.get("tr") or "").strip(), entry["key"]
+
+    en_rows = [
+        e
+        for e in grammar_ja.library_entries("en")
+        if any(isinstance(x, dict) and (x.get("tr") or "").strip() for x in e["examples"])
+    ]
+    assert en_rows, "no library row carries a translated example in English"
+
+
+def test_library_gloss_is_never_the_other_language():
+    """
+    A row whose only translation is Chinese must not show English under a
+    Chinese heading, nor Chinese under an English one.
+    """
+    for entry in grammar_ja.library_entries("zh"):
+        for example in entry["examples"]:
+            if not isinstance(example, dict):
+                continue
+            # The Japanese text itself is the giveaway: an English gloss on
+            # a row whose example_rows carry no English is a back-fill.
+            row = next(
+                (
+                    r
+                    for r in _ALL_RULES
+                    if r["key"] == entry["key"] and r.get("example_rows")
+                ),
+                None,
+            )
+            if row is None:
+                continue
+            source = next(
+                (r for r in row["example_rows"] if r["japanese"] == example["text"]),
+                None,
+            )
+            if source and not (source.get("chinese") or "").strip():
+                assert not example.get("tr"), (
+                    f"{entry['key']} shows a Chinese gloss with no Chinese in "
+                    "the corpus"
+                )
+
+
+def test_hand_written_basics_stay_plain_sentences():
+    """
+    The N5 basics carry no translation anywhere, so they stay bare strings
+    rather than becoming {"text", "tr": ""} rows.
+    """
+    for entry in grammar_ja.library_entries("zh"):
+        for example in entry["examples"]:
+            if isinstance(example, dict):
+                assert (example.get("tr") or "").strip(), (
+                    f"{entry['key']} emits an empty gloss row"
+                )
