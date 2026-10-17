@@ -1,12 +1,12 @@
 """
-Spanish grammar point detection (spaCy es_core_news_sm).
+Spanish grammar point detection (spaCy es_core_news_md).
 
 Mirrors the English engine: sentences are split, tokenised with lemma +
 POS + morphological features, and token-aware rules recognise grammar
-constructions.  The sm model tags mood/tense reliably inside a sentence
-context but fumbles isolated words, the simple future and imperatives, so
-rules anchor on context (e.g. a trigger + que + subjunctive) and the
-future is covered by the "ir a + infinitive" periphrasis.
+constructions.  The md model beats the sm one on real sentences (+2pp
+rule hits, correctly tags subjunctive forms the sm model miscast as
+nouns) and is faster; imperatives still need care, so rules anchor on
+context (e.g. a trigger + que + subjunctive).
 
 spaCy and the model are imported lazily so the base install works without
 them; the route falls back to the generic rule library on ImportError.
@@ -22,7 +22,7 @@ from lute.read.render.grammar_analysis_matcher import (
     spec_surface,
 )
 
-_tokens_for = make_spacy_tokenizer("es_core_news_sm")
+_tokens_for = make_spacy_tokenizer("es_core_news_md")
 
 
 # ---- rules -------------------------------------------------------------
@@ -222,6 +222,19 @@ _ES_RULES = [
         "hypothetical or polite: compraría = I would buy.",
         {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Cnd"}}]},
         zh="条件式（compraría 等）：假设或礼貌表达。",
+    ),
+    make_rule(
+        "es_futuro",
+        "Simple future (comprará)",
+        "B1",
+        "the -ré/-rá/-remos future: a prediction, promise or probability "
+        "about what is yet to come: vendrá mañana.",
+        {
+            "seq": [
+                {"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Ind", "Tense": "Fut"}}
+            ]
+        },
+        zh="简单将来时（-ré/-rá/-remos）：对将来的预测/承诺/推测（vendrá 明天会来）。",
     ),
     make_rule(
         "es_present_perfect",
