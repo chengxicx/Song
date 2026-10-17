@@ -347,8 +347,12 @@ def test_panel_entry_omits_english_detail_in_zh_but_keeps_chips():
 def test_level_class_maps_to_the_card_token():
     assert _level_class("N5") == "N5"
     assert _level_class("N1") == "N1"
-    # TOPIK bands and any other level fall back to the neutral accent.
-    assert _level_class("TOPIK 1-2") == "N"
+    # TOPIK bands ride their own token/accent (the raw strings carry a
+    # space, so the class names do not); anything else stays neutral.
+    assert _level_class("TOPIK 1-2") == "TOPIK12"
+    assert _level_class("TOPIK 3-4") == "TOPIK34"
+    assert _level_class("TOPIK 5-6") == "TOPIK56"
+    assert _level_class("XX") == "N"
 
 
 def test_level_counts_split_matchable_and_reference():

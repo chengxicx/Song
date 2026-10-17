@@ -21,6 +21,7 @@ from lute.db import db
 from lute.models.language import Language
 from lute.models.repositories import LanguageRepository
 from lute.read.render.grammar_analysis import (
+    is_french_language,
     is_japanese_language,
     is_korean_language,
     is_russian_language,
@@ -35,6 +36,11 @@ bp = Blueprint("grammar", __name__, url_prefix="/grammar")
 _JLPT_LEVELS = ("N5", "N4", "N3", "N2", "N1")
 _CEFR_LEVELS = ("A1", "A2", "B1", "B2", "C1", "C2")
 _LEVELS = _JLPT_LEVELS + _CEFR_LEVELS
+
+# Korean's TOPIK bands.  The raw level strings contain a space, which
+# cannot ride in a class name, so each band maps to its own token and
+# accent (see the grammar-item--TOPIK* rules in styles.css).
+_TOPIK_CLASSES = {"TOPIK 1-2": "TOPIK12", "TOPIK 3-4": "TOPIK34", "TOPIK 5-6": "TOPIK56"}
 
 
 def _library_engine(language):
@@ -72,6 +78,13 @@ def _library_engine(language):
             return grammar_analysis_es
         except ImportError:
             return None
+    if is_french_language(language):
+        try:
+            from lute.read.render import grammar_analysis_fr
+
+            return grammar_analysis_fr
+        except ImportError:
+            return None
     if is_thai_language(language):
         # The Thai library is pure data (jlpt_data/grammar_th.json) and
         # needs no tokenizer, so it is browsable even without pythainlp --
@@ -89,7 +102,9 @@ def _display_lang(language):
 
 def _level_class(level):
     "CSS token for a level, matching the reading panel's card classes."
-    return level if level in _LEVELS else "N"
+    if level in _LEVELS:
+        return level
+    return _TOPIK_CLASSES.get(level, "N")
 
 
 def _level_counts(entries):

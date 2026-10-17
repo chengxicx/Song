@@ -48,7 +48,9 @@
     {% endif %}
 
     {% if entry.reference or entry.notes %}
-    <details class="grammar-item__more">
+    {# The detail page is the full card and has room, so the reference
+       block starts expanded; the reader can still fold it away. #}
+    <details class="grammar-item__more" open>
       <summary>{{ t('Reference · notes') }}</summary>
       {% if entry.reference %}
       <div class="grammar-item__refex">
