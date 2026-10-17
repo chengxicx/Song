@@ -75,6 +75,20 @@ def _fr_entries(display_lang="en"):
     return fr.library_entries(display_lang)
 
 
+def _de_entries(display_lang="en"):
+    """
+    library_entries() for German.
+
+    Same shape as the French corpus: hand-written rules plus merged
+    material rows, both validated against spaCy tokenisations of their
+    own examples, so the German model has to be installed.
+    """
+    pytest.importorskip("spacy")
+    pytest.importorskip("de_core_news_sm")
+    de = pytest.importorskip("lute.read.render.grammar_analysis_de")
+    return de.library_entries(display_lang)
+
+
 # ---- entry builders -------------------------------------------------
 
 
@@ -125,13 +139,102 @@ def test_es_entries_are_cefr_ordered_and_unique():
     assert len({e["key"] for e in entries}) == len(entries)
 
 
-def test_ru_es_entries_carry_the_core_fields():
-    "Both corpora speak the same entry shape the templates render."
-    for entries in (_ru_entries("en"), _es_entries("en")):
+def test_fr_entries_are_cefr_ordered_and_unique():
+    "Same CEFR order discipline as the Spanish corpus."
+    entries = _fr_entries("en")
+    assert entries
+    assert all(e["level"] in _CEFR_RANK for e in entries)
+    ranks = [_CEFR_RANK[e["level"]] for e in entries]
+    assert ranks == sorted(ranks)
+    assert len({e["key"] for e in entries}) == len(entries)
+
+
+def test_de_entries_are_cefr_ordered_and_unique():
+    "Same CEFR order discipline as the French corpus."
+    entries = _de_entries("en")
+    assert entries
+    assert all(e["level"] in _CEFR_RANK for e in entries)
+    ranks = [_CEFR_RANK[e["level"]] for e in entries]
+    assert ranks == sorted(ranks)
+    assert len({e["key"] for e in entries}) == len(entries)
+
+
+def test_de_entries_carry_the_core_fields():
+    """
+    Every German point renders with a name, a description and examples.
+
+    A row with no example would render an empty card: the detail page has
+    nothing else to show, so the reader cannot tell the point from a stub.
+    """
+    for e in _de_entries("en"):
+        assert e["key"] and e["name"] and e["level"] and e["desc"]
+        assert e["examples"], f"no examples for {e['key']}"
+        for row in e["examples"]:
+            assert row["text"].strip(), f"empty example text in {e['key']}"
+
+
+def test_de_entries_span_the_whole_cefr_scale():
+    """
+    German grades from A1 to C2, and every band must actually be populated.
+
+    A corpus that quietly stops at B2 looks complete but teaches half the
+    grammar the engine can recognise.
+    """
+    levels = {e["level"] for e in _de_entries("en")}
+    assert levels == set(_CEFR_RANK), f"missing CEFR bands: {set(_CEFR_RANK) - levels}"
+
+
+def test_de_entries_switch_description_language():
+    "Chinese display prefers the zh gloss over the English one."
+    zh = {e["key"]: e for e in _de_entries("zh")}
+    en = {e["key"]: e for e in _de_entries("en")}
+    switched = [k for k in zh if zh[k]["desc"] != en[k]["desc"]]
+    assert switched, "zh display produced no different descriptions"
+
+
+def test_ru_es_fr_entries_carry_the_core_fields():
+    "All three corpora speak the same entry shape the templates render."
+    for entries in (_ru_entries("en"), _es_entries("en"), _fr_entries("en")):
         for e in entries:
             assert e["key"] and e["name"] and e["level"]
             assert isinstance(e["examples"], list)
             assert e["skipped"] is False
+
+
+def test_fr_examples_carry_every_display_language():
+    """
+    Each golden sentence ships a translation in every display language the
+    app offers, so the detail page never falls back to English under a
+    Chinese or Korean heading.
+    """
+    fr = pytest.importorskip("lute.read.render.grammar_analysis_fr")
+    golden = fr._golden_examples()  # pylint: disable=protected-access
+    assert golden, "no golden set"
+    bare = [
+        f"{key}: {ex.get('fr')} [{field}]"
+        for key, rows in golden.items()
+        for ex in rows
+        for field in ("fr", "zh", "en", "ko")
+        if not (ex.get(field) or "").strip()
+    ]
+    assert bare == [], f"examples missing a translation: {bare}"
+
+
+def test_fr_library_examples_switch_the_gloss():
+    """
+    The sentence stays French in every display language; only the line
+    under it changes.
+    """
+    by_lang = {lang: _fr_entries(lang) for lang in ("en", "zh", "ko")}
+    key = next(e["key"] for e in by_lang["en"] if e["examples"])
+    rows = {
+        lang: next(e for e in entries if e["key"] == key)["examples"]
+        for lang, entries in by_lang.items()
+    }
+    texts = {lang: [r["text"] for r in rows[lang]] for lang in rows}
+    assert texts["en"] == texts["zh"] == texts["ko"], "the sentence must not change"
+    for lang in ("en", "zh", "ko"):
+        assert all(r["tr"] for r in rows[lang]), f"{key}: empty {lang} gloss"
 
 
 def test_es_examples_carry_every_display_language():
@@ -558,6 +661,19 @@ def test_spanish_language_page_renders_its_library(spanish, app_context, client)
     row = first["examples"][0]
     assert row["text"] in detail
     # The gloss sits in its own span, not glued to the sentence.
+    assert "grammar-item__example-tr" in detail
+    assert str(markupsafe.escape(row["tr"])) in detail
+
+
+def test_french_language_page_renders_its_library(french, app_context, client):
+    "The French rule set renders too, golden examples and gloss on the cards."
+    entries = _fr_entries("en")
+    body = client.get(f"/grammar/{french.id}").get_data(as_text=True)
+    _cards_of(body, entries)
+    first = next(e for e in entries if e["examples"])
+    detail = client.get(f"/grammar/{french.id}/{first['key']}").get_data(as_text=True)
+    row = first["examples"][0]
+    assert row["text"] in detail
     assert "grammar-item__example-tr" in detail
     assert str(markupsafe.escape(row["tr"])) in detail
 

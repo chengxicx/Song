@@ -38,7 +38,32 @@ _RULE_SENTENCES = {
     "de_je_desto": "Je mehr, desto besser.",
     "de_zwar": "Es ist zwar schön, aber teuer.",
     "de_indem": "Man lernt, indem man übt.",
+    "de_genitiv": "Wegen des Regens bleiben wir zu Hause.",
+    "de_komparativ": "Der Saal ist größer als das Klassenzimmer.",
+    "de_superlativ": "Mein Sohn ist am ältesten.",
+    "de_relativsatz": "Die Nachbarin, die dort wohnt, ist freundlich.",
+    "de_doppel_infinitiv": "Er lässt das Auto reparieren.",
+    "de_doppelobjekt": "Ich gebe ihm das Buch.",
+    "de_modal_perfekt": "Viele Leute haben schwimmen können.",
+    "de_zeitangabe": "Heute gehe ich zum Park.",
+    "de_hauptsatzkoord": "Der Hund ist krank, und die Katze ist alt.",
 }
+
+
+def test_every_hand_written_rule_has_a_test_sentence():
+    """
+    No rule may ship without a sentence that proves it fires.
+
+    A rule nobody exercises is a rule whose matcher can rot unnoticed --
+    the German engine lost nine golden sentences to exactly that before
+    the set was pinned.
+    """
+    written = {r["key"] for r in _DE_RULES}
+    assert written == set(_RULE_SENTENCES), (
+        "rules without a test sentence: "
+        f"{sorted(written - set(_RULE_SENTENCES))}; "
+        f"sentences without a rule: {sorted(set(_RULE_SENTENCES) - written)}"
+    )
 
 
 def test_each_rule_matches_its_sentence():
