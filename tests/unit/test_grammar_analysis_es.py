@@ -127,16 +127,25 @@ def test_rules_are_loaded():
 
 # ---- golden examples ----------------------------------------------------
 #
-# tests/unit/grammar/es_golden.json holds textbook sentences that each
+# lute/jlpt_data/grammar_es_golden.json holds textbook sentences that each
 # hand-written rule must keep matching.  The sentences came out of a local
 # textbook extraction, so they are real prose rather than invented examples,
-# and a change that narrows a rule enough to lose them fails here.
+# and a change that narrows a rule enough to lose them fails here.  The file
+# lives beside the grammar library because the /grammar page serves the same
+# sentences as each point's examples.
 
 import json  # noqa: E402
 import os  # noqa: E402
 
-_GOLDEN_PATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "grammar", "es_golden.json"
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "lute",
+        "jlpt_data",
+        "grammar_es_golden.json",
+    )
 )
 
 
