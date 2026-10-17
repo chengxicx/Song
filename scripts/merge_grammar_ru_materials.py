@@ -25,8 +25,11 @@ Field mapping
            which makes the row ``verb``
   key      ``rgm_<name>__<md5-6>`` -- stable across re-runs, so the merge
            is idempotent
-  formation / notes
+    formation / notes
            the material's formation line and notes, verbatim
+    slug   the material's original ``pattern``, verbatim -- the coverage
+           audit's raw-pattern lookup key, so a material entry whose
+           pattern is a Chinese description still maps to its row
 
 Usage::
 
@@ -54,7 +57,15 @@ _MATERIAL_FILES = ("units.json",)
 
 # The panel fields the merge carries from the material, as (row field,
 # material field).  ``backfill`` uses the same list so a re-run repairs both.
-_PANEL_FIELDS = (("formation", "formation"), ("notes", "notes"))
+# ``slug`` carries the material's original ``pattern``: rows are stored under
+# their Russian headword, and without the pattern the coverage audit cannot
+# match a material entry whose pattern is a Chinese description back to the
+# row it produced -- it would re-report it missing forever.
+_PANEL_FIELDS = (
+    ("formation", "formation"),
+    ("notes", "notes"),
+    ("slug", "pattern"),
+)
 
 # A pattern that carries one of these markers governs a verb; everything
 # else stays the conservative default.
@@ -100,6 +111,20 @@ def load_missing():
     path = os.path.join(MATERIALS, "audit_ru_missing.json")
     if not os.path.exists(path):
         return None
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def load_engine_covered():
+    """
+    Patterns a hand-written rule already fires on (the audit's baseline
+    report).  A missing report can go stale -- written before a hand-written
+    rule landed -- so the merge re-checks against it and skips those
+    patterns: merging one would put two panel rows on the same point.
+    """
+    path = os.path.join(MATERIALS, "audit_ru_engine_covered.json")
+    if not os.path.exists(path):
+        return {}
     with open(path, encoding="utf-8") as fh:
         return json.load(fh)
 
@@ -172,7 +197,7 @@ def build_rows(missing, taken_keys, taken_names):
             {
                 "key": key,
                 "name": name,
-                "slug": "",
+                "slug": (pattern or "").strip(),
                 "meaning": (meta.get("meaning_en") or "").strip(),
                 "type": derive_type(pattern),
                 "examples": [
@@ -232,6 +257,14 @@ def main():
         return 0
 
     tk, tn = existing(entries)
+    engine_covered = load_engine_covered()
+    stale = [p for p in missing if p in engine_covered]
+    for p in stale:
+        del missing[p]
+    if stale:
+        print(f"skipped {len(stale)} stale pattern(s): now hand-written-covered")
+        for p in stale[:5]:
+            print(f"  - {p}")
     rows, skipped = build_rows(missing, tk, tn)
     print(f"new rows: {len(rows)}  skipped: {len(skipped)}")
     for p, why in skipped:

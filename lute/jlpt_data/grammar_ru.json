@@ -1,0 +1,1670 @@
+[
+ {
+  "key": "rgm_Стоитлиписать__63779e",
+  "name": "Стоит ли писать",
+  "slug": "Стоит ли + 不定式（值不值得做）",
+  "meaning": "стóит ли with an infinitive asks whether it is worth doing something.",
+  "type": "verb",
+  "examples": [
+   "Стоит ли писать первой парню?"
+  ],
+  "example_zh": [
+   "应不应该先给小伙子写信？"
+  ],
+  "focus": [
+   "Стоит",
+   "ли",
+   "писать"
+  ],
+  "zh": "стóит ли 加不定式，表示“值不值得做某事”。",
+  "level": "B2",
+  "formation": "стоит ли + 不定式",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Бытьсчастливым__0dffff",
+  "name": "Быть счастливым",
+  "slug": "быть + 形容词第五格（长尾）",
+  "meaning": "'Byt'' + instrumental long-form adjective forms a compound predicate.",
+  "type": "composite",
+  "examples": [
+   "Быть счастливым — свойство присущее человеку."
+  ],
+  "example_zh": [
+   "感受幸福是一个人固有的属性。"
+  ],
+  "focus": [
+   "Быть",
+   "счастливым",
+   "свойство",
+   "присущее"
+  ],
+  "zh": "быть + 长尾形容词第五格，作静词性合成谓语。",
+  "level": "B2",
+  "formation": "быть + 长尾形容词第五格，作静词性合成谓语",
+  "notes": ""
+ },
+ {
+  "key": "rgm_в15разавышена56превышают__30574f",
+  "name": "в 1,5 раза выше / на 56% превышают",
+  "slug": "в N раза выше / на N% превышать（……）",
+  "meaning": "Multiples use 'v + numeral + raza'; percentages use 'na + numeral + protsentov'.",
+  "type": "composite",
+  "examples": [
+   "Зарплаты региональных чиновников в 1,5 раза выше, чем у сограждан.",
+   "Зарплаты региональных чиновников на 56% превышают средний уровень зарплат по стране, а сразу в 12 регионах чиновники вдвое богаче своих 3eMISKOB."
+  ],
+  "example_zh": [
+   "地方官员的工资比同胞高一半。",
+   "地方官员的工资比国内平均工资水平高56%，共有12个区的官员们比同乡富裕一倍。"
+  ],
+  "focus": [
+   "Зарплаты",
+   "региональных",
+   "чиновников",
+   "выше",
+   "сограждан"
+  ],
+  "zh": "倍数用 в + 数词 + рáза 表示；百分比用 на + 数词 + процéнтов 表示。",
+  "level": "B2",
+  "formation": "比较级前用 в + 数词 + раза ；выше/превышать 配合 на + 数词 + процентов 表百分比",
+  "notes": ""
+ },
+ {
+  "key": "rgm_взятьвжёны__bd1191",
+  "name": "взять в жёны",
+  "slug": "взять в жёны（…）",
+  "meaning": "The collocation 'vzyat' v zheny' means to take someone as a wife.",
+  "type": "composite",
+  "examples": [
+   "Любой мужчина просто мечтает взять в жёны разумную женщину."
+  ],
+  "example_zh": [
+   "任何一个男人其实都幻想着娶一个理智的女人为妻。"
+  ],
+  "focus": [
+   "мужчина",
+   "взять",
+   "жёны"
+  ],
+  "zh": "固定搭配 взять в жёны 表示“娶某人为妻”。",
+  "level": "B1",
+  "formation": "взять + кого（）+ в жёны，в жёны 为固定第四格形式",
+  "notes": "同类结构：взять в ученики、взять в помощники。"
+ },
+ {
+  "key": "rgm_выневеселы__8cd592",
+  "name": "вы не веселы",
+  "slug": "вы 指一个人时动词用复数、短尾用复数",
+  "meaning": "When 'vy' addresses one person, verbs and short adjectives take plural forms.",
+  "type": "composite",
+  "examples": [
+   "Почему вы не веселы?"
+  ],
+  "example_zh": [
+   "您怎么不高兴？"
+  ],
+  "focus": [
+   "Почему",
+   "вы",
+   "не",
+   "веселы"
+  ],
+  "zh": "вы 指称对方一个人时，动词变位用复数形式，短尾形容词也用复数形式。",
+  "level": "A2",
+  "formation": "вы 指称一个人时，动词变位用复数形式，短尾形容词也用复数形式",
+  "notes": "长尾形容词与 вы 连用时用单数，性依实际性别而定。"
+ },
+ {
+  "key": "rgm_долее__69ae86",
+  "name": "долее",
+  "slug": "долее 等以 -ее 结尾的比较级形式（书面语）",
+  "meaning": "Comparative forms in -ee are now mostly bookish or fixed.",
+  "type": "composite",
+  "examples": [
+   "Долее так продолжаться не может."
+  ],
+  "example_zh": [
+   "再不能这样下去了。"
+  ],
+  "focus": [
+   "Долее",
+   "так",
+   "продолжаться",
+   "может"
+  ],
+  "zh": "以 -ее 结尾的比较级形式现今多用于书面语或一些固定格式中。",
+  "level": "B2",
+  "formation": "以 -ее 结尾的单一式比较级现今多用于书面语或固定格式",
+  "notes": ""
+ },
+ {
+  "key": "rgm_унасестьтакиелюди__14c745",
+  "name": "у нас есть такие люди",
+  "slug": "есть 表强调存在",
+  "meaning": "Using the present-tense form есть usually conveys emphasis.",
+  "type": "composite",
+  "examples": [
+   "У нас, действительно, есть такие бесчувственные люди."
+  ],
+  "example_zh": [
+   "我们这儿确实有这种绝情的人。"
+  ],
+  "focus": [
+   "действительно",
+   "есть",
+   "бесчувственные"
+  ],
+  "zh": "使用现在时形式 есть 多表示强调意义。",
+  "level": "B1",
+  "formation": "使用现在时形式 есть",
+  "notes": ""
+ },
+ {
+  "key": "rgm_живутзагородом__236908",
+  "name": "живут за городом",
+  "slug": "за + 第五格表示地点（在……后面/外面）",
+  "meaning": "за with the instrumental expresses location behind or beyond something.",
+  "type": "composite",
+  "examples": [
+   "Его родители живут за городом."
+  ],
+  "example_zh": [
+   "他的父母住在城郊。"
+  ],
+  "focus": [
+   "живут",
+   "городом"
+  ],
+  "zh": "за 与名词第五格连用表示地点意义：在……后（外）。",
+  "level": "A2",
+  "formation": "за + 名词第五格（表地点）",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Этовсёиззатебя__a2a655",
+  "name": "Это всё из-за тебя",
+  "slug": "из-за + 第二格表示原因（对某人的责怪）",
+  "meaning": "из-за with the genitive states a cause about which the speaker is dissatisfied or reproachful; it also combines with personal nouns and pronouns.",
+  "type": "composite",
+  "examples": [
+   "Это всё из-за тебя."
+  ],
+  "example_zh": [
+   "这一切都怪你。"
+  ],
+  "focus": [
+   "Это",
+   "всё",
+   "из-за",
+   "тебя"
+  ],
+  "zh": "из-за 加第二格主要表明说话人对引起不良后果的原因所持的不满以至谴责态度，还可与表人名词及人称代词连用表示对某人的责怪。",
+  "level": "B1",
+  "formation": "из-за + 名词/人称代词第二格",
+  "notes": "表责怪人时不能用其他前置词替换。"
+ },
+ {
+  "key": "rgm_какбудтолучше__61e159",
+  "name": "как будто лучше",
+  "slug": "как будто（）",
+  "meaning": "как будто marks a comparison of an uncertain kind ('as if').",
+  "type": "composite",
+  "examples": [
+   "Доктор, мне сегодня как будто лучше."
+  ],
+  "example_zh": [
+   "医生，我今天好像好一些。"
+  ],
+  "focus": [
+   "сегодня",
+   "как",
+   "будто",
+   "лучше"
+  ],
+  "zh": "как будто 表示不确定的比较意义，相当于“好像”。",
+  "level": "B1",
+  "formation": "как будто + 比较级/谓语（表比较意义）",
+  "notes": "同类语气词：слóвно, рóвно。"
+ },
+ {
+  "key": "rgm_мирныймировоймир__1d931d",
+  "name": "мирный — мировой — мир",
+  "slug": "мирный 由关系形容词转指性质（爱好和平的、温和的）",
+  "meaning": "'Mirny' (peaceful, gentle) and 'mirovoy' (world) diverge in meaning.",
+  "type": "composite",
+  "examples": [
+   "Внешне я мирный ангел, а внутри я первостатейная стерва."
+  ],
+  "example_zh": [
+   "外表上我是和平天使，而内里我是头号大坏蛋。"
+  ],
+  "focus": [
+   "Внешне",
+   "мирный",
+   "ангел",
+   "внутри"
+  ],
+  "zh": "同根形容词 мирный 表“和平的、温和的”，мировой 表“世界的”，意义分化。",
+  "level": "B2",
+  "formation": "同根形容词 мирный（、） мировой（）",
+  "notes": "注意：不说 мирный враг，应说 враг мира。"
+ },
+ {
+  "key": "rgm_закрытнаремонт__3feb8e",
+  "name": "закрыт на ремонт",
+  "slug": "на + 第四格表示行为目的",
+  "meaning": "на with the accusative expresses the purpose of an action or state.",
+  "type": "composite",
+  "examples": [
+   "Магазин закрыт на ремонт."
+  ],
+  "example_zh": [
+   "商店停业维修。"
+  ],
+  "focus": [
+   "закрыт",
+   "ремонт"
+  ],
+  "zh": "на 与第四格连用可表示行为目的。",
+  "level": "B1",
+  "formation": "на + 第四格（表目的）",
+  "notes": ""
+ },
+ {
+  "key": "rgm_вернутьсянасвоюРодину__4060e4",
+  "name": "вернуться на свою Родину",
+  "slug": "на свою Родину（）",
+  "meaning": "'Vernut'sya na svoyu Rodinu' means to return to one's homeland.",
+  "type": "composite",
+  "examples": [
+   "Мы всего лишь хотим вернуться на свою историческую Родину."
+  ],
+  "example_zh": [
+   "我们不过是想要回到自己历史上的祖国而已。"
+  ],
+  "focus": [
+   "всего",
+   "лишь",
+   "хотим",
+   "вернуться",
+   "свою"
+  ],
+  "zh": "вернуться на + свой 的第四格 + Родина，表示“回到自己的祖国”。",
+  "level": "B1",
+  "formation": "вернуться на + свой 的第四格 + 名词，表示回到自己的祖国",
+  "notes": ""
+ },
+ {
+  "key": "rgm_неменееполезнычем__a3b928",
+  "name": "не менее полезны, чем",
+  "slug": "не менее + 短尾形容词 + чем",
+  "meaning": "A compound comparative may appear in the short form with 'chem'.",
+  "type": "composite",
+  "examples": [
+   "Косточки граната не менее полезны, чем сам фрукт."
+  ],
+  "example_zh": [
+   "石榴核并不比水果本身好处少。"
+  ],
+  "focus": [
+   "Косточки",
+   "граната",
+   "менее",
+   "полезны",
+   "фрукт"
+  ],
+  "zh": "复合式比较级可用短尾形式，比较对象借助 чем 表示。",
+  "level": "B2",
+  "formation": "复合式比较级可用短尾形式，比较对象借 чем 表示",
+  "notes": ""
+ },
+ {
+  "key": "rgm_посубботамивоскресеньям__fd5499",
+  "name": "по субботам и воскресеньям",
+  "slug": "по + 第三格复数表示每逢……",
+  "meaning": "по with the dative plural expresses regular repetition.",
+  "type": "composite",
+  "examples": [
+   "Теперь у нас два выходных дня — отдыхаем по субботам и воскресеньям."
+  ],
+  "example_zh": [
+   "现在我们是双休日——每周六周日休息。"
+  ],
+  "focus": [
+   "отдыхаем",
+   "субботам"
+  ],
+  "zh": "по 与名词第三格复数连用表示时间意义：每当……。",
+  "level": "A2",
+  "formation": "по + 名词第三格复数（表时间）",
+  "notes": ""
+ },
+ {
+  "key": "rgm_происходятпонедоразумению__d47fde",
+  "name": "происходят по недоразумению",
+  "slug": "по + 第三格表示原因（由于误会）",
+  "meaning": "по with the dative expresses cause, has a narrow range and occurs mainly in official style, usually for undesirable results.",
+  "type": "composite",
+  "examples": [
+   "Многие случаи развода происходят по недоразумению."
+  ],
+  "example_zh": [
+   "很多离婚的情况是由于误会而发生的。"
+  ],
+  "focus": [
+   "случаи",
+   "развода",
+   "недоразумению"
+  ],
+  "zh": "по 加第三格与抽象名词连用表示原因，搭配范围较窄，多用来说明引起不良后果的原因，一般用于事务性公文语体。",
+  "level": "B2",
+  "formation": "по + 抽象名词第三格",
+  "notes": "同类搭配：по болезни, по ошибке, по небрежности 等。"
+ },
+ {
+  "key": "rgm_плывутпотечению__1ad879",
+  "name": "плывут по течению",
+  "slug": "по + 第三格表示沿着/顺着",
+  "meaning": "по with the dative expresses movement along or over a surface.",
+  "type": "composite",
+  "examples": [
+   "Корабли и пароходы плывут по течению йли против течения."
+  ],
+  "example_zh": [
+   "大小船只顺流或逆流行驶着。"
+  ],
+  "focus": [
+   "плывут",
+   "течению"
+  ],
+  "zh": "по 与名词第三格连用表示“沿着……”。",
+  "level": "A2",
+  "formation": "по + 名词第三格（表地点/方向）",
+  "notes": ""
+ },
+ {
+  "key": "rgm_самапосебе__2b848c",
+  "name": "сама по себе",
+  "slug": "по себе（/）",
+  "meaning": "'Po sebe' is a set phrase meaning 'on one's own terms'.",
+  "type": "composite",
+  "examples": [
+   "Я иду теперь сама по себе, и не враг тебе, и не друг тебе."
+  ],
+  "example_zh": [
+   "我现在特立独行，与你非敌非友。"
+  ],
+  "focus": [
+   "иду",
+   "сама",
+   "по",
+   "себе",
+   "враг"
+  ],
+  "zh": "по + себя 的第三格构成固定表达 по себе，表示“按自己的方式、独自”。",
+  "level": "B2",
+  "formation": "по + себя 第三格，构成固定表达 по себе",
+  "notes": ""
+ },
+ {
+  "key": "rgm_покупка__5d1b78",
+  "name": "покупка",
+  "slug": "покупка 单数表购买行为本身",
+  "meaning": "The singular 'pokupka' denotes the act of buying.",
+  "type": "composite",
+  "examples": [
+   "Половину стипендии он тратит на покупку книг."
+  ],
+  "example_zh": [
+   "他把一半奖学金都花在买书上。"
+  ],
+  "focus": [
+   "Половину",
+   "стипендии",
+   "тратит",
+   "покупку"
+  ],
+  "zh": "покупка 用单数表示“购买”这一行为本身。",
+  "level": "B2",
+  "formation": "表示“买东西”这一行为时用单数；表示买到的多件东西时用复数",
+  "notes": ""
+ },
+ {
+  "key": "rgm_похожнаотца__eaa633",
+  "name": "похож на отца",
+  "slug": "похож на + 第四格",
+  "meaning": "'Pokhozh na' + accusative means 'resembles'.",
+  "type": "composite",
+  "examples": [
+   "Сын похож на своего отца."
+  ],
+  "example_zh": [
+   "儿子像自己父亲。"
+  ],
+  "focus": [
+   "Сын",
+   "похож",
+   "своего",
+   "отца"
+  ],
+  "zh": "похож 后接 на + 第四格，表示“像……”。",
+  "level": "A2",
+  "formation": "похож（） на + 第四格，表示“像…”。",
+  "notes": ""
+ },
+ {
+  "key": "rgm_правонатруд__8129ef",
+  "name": "право на труд",
+  "slug": "право 单数（抽象的权利）",
+  "meaning": "'Pravo na' + accusative expresses a right to something.",
+  "type": "composite",
+  "examples": [
+   "Граждане имеют право на труд, на образование и на отдых."
+  ],
+  "example_zh": [
+   "公民享有劳动、受教育和休息的权利。"
+  ],
+  "focus": [
+   "Граждане",
+   "имеют",
+   "право",
+   "труд"
+  ],
+  "zh": "право + на + 第四格，表示享有某种权利。",
+  "level": "A2",
+  "formation": "право + на + 第四格，表示享有某种抽象权利",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Снепривычкибываеточеньтяжело__a3560e",
+  "name": "С непривычки бывает очень тяжело",
+  "slug": "с + 第二格表示原因（由于不习惯）",
+  "meaning": "с with the genitive expresses cause and may form synonyms with от.",
+  "type": "composite",
+  "examples": [
+   "С непривычки что бывает? С непривычки бывает очень тяжело!"
+  ],
+  "example_zh": [
+   "由于不习惯会发生什么事情？由于不习惯会感到很难受！"
+  ],
+  "focus": [
+   "непривычки",
+   "бывает",
+   "тяжело"
+  ],
+  "zh": "с 加第二格表示原因，可与 от 构成同义结构。",
+  "level": "B2",
+  "formation": "с + 表习惯/状态的名词第二格",
+  "notes": "比较 от непривычки。"
+ },
+ {
+  "key": "rgm_водитсвоюмашину__d80e30",
+  "name": "водит свою машину",
+  "slug": "свой 表示与主语的领属关系",
+  "meaning": "'Svoy' marks possession by the subject of the sentence.",
+  "type": "composite",
+  "examples": [
+   "Он водит свою машину.",
+   "Он водит ero машину."
+  ],
+  "example_zh": [
+   "他开着自己的车。",
+   "他开着他的车（可能是另一个人的车）。"
+  ],
+  "focus": [
+   "водит",
+   "свою",
+   "машину"
+  ],
+  "zh": "свой 表示它所说明的事物与句中主语（主体）的领属关系。",
+  "level": "B1",
+  "formation": "свой 表示所说明的事物与句中主语或主体的领属关系",
+  "notes": "第三人称主语时，свой 与 его/её/их 意义不同。"
+ },
+ {
+  "key": "rgm_специалистпоРоссии__acc595",
+  "name": "специалист по России",
+  "slug": "специалист по + 第三格（某方面的专家）",
+  "meaning": "по with the dative marks the field of expertise.",
+  "type": "composite",
+  "examples": [
+   "Он преподаёт русский язык, в то же время он специалист по России."
+  ],
+  "example_zh": [
+   "他教俄语，同时又是个俄罗斯问题专家。"
+  ],
+  "focus": [
+   "преподаёт",
+   "специалист",
+   "России"
+  ],
+  "zh": "по 与第三格连用表示方面意义，（某方面的）专家。",
+  "level": "B1",
+  "formation": "специалист + по + 名词第三格",
+  "notes": ""
+ },
+ {
+  "key": "rgm_считаетсебясчастливым__59a291",
+  "name": "считает себя счастливым",
+  "slug": "считать себя + 第五格",
+  "meaning": "'Schitat' sebya' + instrumental means to consider oneself something.",
+  "type": "composite",
+  "examples": [
+   "Ни один человек не счастлив, пока он не считает себя счастливым."
+  ],
+  "example_zh": [
+   "没有一个人在认为自己是幸福的人之前是幸福的。"
+  ],
+  "focus": [
+   "один",
+   "человек",
+   "счастлив",
+   "считает"
+  ],
+  "zh": "считать себя + 第五格，表示“认为自己是…”。",
+  "level": "B2",
+  "formation": "считать кого/себя + 第五格，表示“认为…是…”",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Каковприветтаковиответ__bee2a9",
+  "name": "Каков привет, таков и ответ.",
+  "slug": "таков （каков..., таков...）",
+  "meaning": "'Takov' is predicative only, common in 'kakov..., takov...'.",
+  "type": "composite",
+  "examples": [
+   "Каков привет, таков и ответ."
+  ],
+  "example_zh": [
+   "礼尚往来。"
+  ],
+  "focus": [
+   "Каков",
+   "привет",
+   "таков",
+   "ответ"
+  ],
+  "zh": "такóв 只能用作表语，常见于 какóв..., такóв... 结构。",
+  "level": "B2",
+  "formation": "таков 只能作表语，常用于 каков..., таков... 结构",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Уосладлинныеуши__9d36a9",
+  "name": "У осла длинные уши",
+  "slug": "у + 第二格表示“有”（某物有什么）",
+  "meaning": "у with the genitive plus a nominative noun expresses possession or a characteristic.",
+  "type": "composite",
+  "examples": [
+   "У осла длинные уши."
+  ],
+  "example_zh": [
+   "驴有一对长耳朵。"
+  ],
+  "focus": [
+   "У",
+   "осла",
+   "уши"
+  ],
+  "zh": "у 加第二格与第一格名词连用，表示某人（某物）具有某事物或某特征。",
+  "level": "A1",
+  "formation": "у + 名词第二格 + 名词第一格",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Ктотостучитвдверь__4cb354",
+  "name": "Кто-то стучит в дверь.",
+  "slug": "不定代词 -то（）",
+  "meaning": "Pronouns in '-to' refer to someone or something known to exist but unspecified.",
+  "type": "composite",
+  "examples": [
+   "Кто-то стучит в дверь."
+  ],
+  "example_zh": [
+   "有人敲门。"
+  ],
+  "focus": [
+   "Кто-то",
+   "стучит",
+   "дверь"
+  ],
+  "zh": "带 -то 的不定代词表示说话人知道有某人、某事物，但不确切知道究竟是哪一个。",
+  "level": "B1",
+  "formation": "带 -то 的不定代词表示知道有某人/某物，但不确切知道究竟是哪一个",
+  "notes": "同类：ктó-то、чтó-то、какóй-то、чей-то。"
+ },
+ {
+  "key": "rgm_хорошоплавает__dc8c2a",
+  "name": "хорошо плавает",
+  "slug": "不定向动词表示善于/会做某运动",
+  "meaning": "Non-directional motion verbs express the general ability to perform the action.",
+  "type": "composite",
+  "examples": [
+   "Он хорошо плавает."
+  ],
+  "example_zh": [
+   "他游泳游得很好。"
+  ],
+  "focus": [
+   "хорошо",
+   "плавает"
+  ],
+  "zh": "不定向动词表示事物本身具有的（擅长做某运动的）能力或习性。",
+  "level": "A2",
+  "formation": "不定向动词 плыть→плавать 的现在时",
+  "notes": ""
+ },
+ {
+  "key": "rgm_многоводы__0eef6c",
+  "name": "много воды",
+  "slug": "不定量数词 много + 物质名词/抽象名词",
+  "meaning": "Indefinite numerals combine with mass, collective and abstract nouns in the genitive.",
+  "type": "composite",
+  "examples": [
+   "А нужно ли пить много воды?"
+  ],
+  "example_zh": [
+   "可需要喝很多水吗？"
+  ],
+  "focus": [
+   "нужно",
+   "пить",
+   "много",
+   "воды"
+  ],
+  "zh": "不定量数词可与物质名词、集合名词、抽象名词连用，名词用第二格形式。",
+  "level": "A2",
+  "formation": "不定量数词可与物质名词、集合名词、抽象名词连用，名词用第二格",
+  "notes": ""
+ },
+ {
+  "key": "rgm_неуспеваюготовить__12601a",
+  "name": "не успеваю готовить",
+  "slug": "与 успевать 连用时不定式两体皆可",
+  "meaning": "With the imperfective forms of such verbs, either aspect of the infinitive is possible.",
+  "type": "composite",
+  "examples": [
+   "Что делать, если не успеваю готовить домашнее задание?"
+  ],
+  "example_zh": [
+   "如果来不及做家庭作业，那怎么办呢？"
+  ],
+  "focus": [
+   "делать",
+   "успеваю",
+   "готовить",
+   "домашнее",
+   "задание"
+  ],
+  "zh": "与 успевáть、удавáться、забывáть 等未完成体形式连用时，不定式两体形式均可。",
+  "level": "B2",
+  "formation": "与上述动词的未完成体形式 успевать、удаваться、забывать 连用时，不定式两体形式均可",
+  "notes": ""
+ },
+ {
+  "key": "rgm_длинныйихуденький__6789dc",
+  "name": "длинный и худенький",
+  "slug": "与不能构成短尾形式的形容词连用时用长尾形式",
+  "meaning": "Adjectives with no short form (e.g. 'khudenkiy') appear only in the long form.",
+  "type": "composite",
+  "examples": [
+   "Этот мужчина длинный и худенький."
+  ],
+  "example_zh": [
+   "这个男子又高又瘦。"
+  ],
+  "focus": [
+   "Этот",
+   "мужчина",
+   "длинный",
+   "худенький"
+  ],
+  "zh": "худенький 等不能构成短尾形式的性质形容词只能用长尾形式。",
+  "level": "B2",
+  "formation": "худенький 等不能构成短尾形式的性质形容词只能用长尾形式",
+  "notes": ""
+ },
+ {
+  "key": "rgm_портфелейподешевле__73fb45",
+  "name": "портфелей подешевле",
+  "slug": "二格比较级 подешевле（）",
+  "meaning": "A comparative with a genitive noun expresses a wish for something somewhat more/less so.",
+  "type": "composite",
+  "examples": [
+   "Нет ли у вас портфелей подешевле?"
+  ],
+  "example_zh": [
+   "你们这儿有便宜些的包吗？"
+  ],
+  "focus": [
+   "Нет",
+   "портфелей",
+   "подешевле"
+  ],
+  "zh": "名词二格与比较级连用，表示想要（更）怎样一些的事物。",
+  "level": "A2",
+  "formation": "名词二格 + 性质副词/形容词比较级",
+  "notes": ""
+ },
+ {
+  "key": "rgm_никакихсловнезнаешь__109f25",
+  "name": "никаких слов не знаешь",
+  "slug": "加强否定结构 ни...не 中名词用第二格",
+  "meaning": "In the emphatic negation 'ni... ne', the noun is always genitive.",
+  "type": "composite",
+  "examples": [
+   "Ты кроме \"Ага\" никаких слов не знаешь?"
+  ],
+  "example_zh": [
+   "你除了“啊哈”之外，再就什么词都不知道了吗？"
+  ],
+  "focus": [
+   "кроме",
+   "никаких",
+   "слов",
+   "знаешь"
+  ],
+  "zh": "在 не + ни 的加强否定结构中，名词永远用第二格形式。",
+  "level": "B2",
+  "formation": "“не + ни…”，",
+  "notes": ""
+ },
+ {
+  "key": "rgm_куклакукол__23737a",
+  "name": "кукла — кукол",
+  "slug": "动物名词第四格同第二格（复数）",
+  "meaning": "In the plural, animate nouns have an accusative identical to the genitive.",
+  "type": "composite",
+  "examples": [
+   "Театр кукол — страна ожившей сказки! Кукол дёргают за нитки."
+  ],
+  "example_zh": [
+   "木偶剧院是热闹的童话国度。木偶是用线拉着的。"
+  ],
+  "focus": [
+   "Театр",
+   "кукол",
+   "кукол",
+   "дёргают"
+  ],
+  "zh": "复数时，无论阳性、阴性还是中性，动物名词第四格均与第二格同形。",
+  "level": "B1",
+  "formation": "复数时所有动物名词第四格均与第二格同形",
+  "notes": "кýкла 虽是非生物，但按动物名词变格。"
+ },
+ {
+  "key": "rgm_несмеешьпродолжатьнастаивать__c1e32c",
+  "name": "не смеешь продолжать настаивать",
+  "slug": "动词性合成谓语（助动词 + 不定式）",
+  "meaning": "A verbal compound predicate consists of an auxiliary verb and an infinitive.",
+  "type": "verb",
+  "examples": [
+   "Ты не смеешь продолжать настаивать на свойх взглядах."
+  ],
+  "example_zh": [
+   "你没有胆量继续坚持自己的观点。"
+  ],
+  "focus": [
+   "смеешь",
+   "продолжать",
+   "настаивать"
+  ],
+  "zh": "动词性合成谓语由助动词和动词不定式两部分构成，助动词表语法意义，不定式表主要词汇意义。",
+  "level": "B2",
+  "formation": "助动词变位形式 + 不定式",
+  "notes": ""
+ },
+ {
+  "key": "rgm_тысячастопервуюстраницу__6b26d2",
+  "name": "тысяча сто первую страницу",
+  "slug": "合成顺序数词（只有末位数词变格）",
+  "meaning": "Ordinal numerals agree with nouns; in compound ordinals only the last part declines.",
+  "type": "composite",
+  "examples": [
+   "Я читаю тысяча сто первую страницу.",
+   "Мы живём в двести двадцать второй комнате."
+  ],
+  "example_zh": [
+   "我正读第一千一百零一页。",
+   "我们住在第222号房间。"
+  ],
+  "focus": [
+   "читаю",
+   "тысяча",
+   "сто",
+   "первую",
+   "страницу"
+  ],
+  "zh": "顺序数词要与名词在性、数、格上一致；合成顺序数词变格时只有最后一个数词变化。",
+  "level": "B1",
+  "formation": "顺序数词与名词在性、数、格上一致；合成顺序数词只变最后一个数词",
+  "notes": ""
+ },
+ {
+  "key": "rgm_нистудентамнипреподавателям__4fdb2e",
+  "name": "ни студентам, ни преподавателям",
+  "slug": "否定联合连接词 ни ... ни ...",
+  "meaning": "The repeated conjunction ни ... ни ... joins negated homogeneous members.",
+  "type": "composite",
+  "examples": [
+   "Ни студентам, ни преподавателям ни за что платить не надо."
+  ],
+  "example_zh": [
+   "不论学生还是教师，不论买什么都无须付钱。"
+  ],
+  "focus": [
+   "студентам",
+   "преподавателям",
+   "платить"
+  ],
+  "zh": "叠用连接词 ни…ни… 连接同等的否定成分，表示“既不……也不……”。",
+  "level": "B2",
+  "formation": "ни + 同等成分 ... ни + 同等成分（只连接否定句）",
+  "notes": "ни…ни… 只用来连接否定句。"
+ },
+ {
+  "key": "rgm_недаютходу__d0bdd9",
+  "name": "не дают ходу",
+  "slug": "固定搭配 дать ходу（、）",
+  "meaning": "The idiom 'dat' khodu' means to let someone advance.",
+  "type": "composite",
+  "examples": [
+   "Почему меня считают вторым сортом и не дают ходу?"
+  ],
+  "example_zh": [
+   "为什么认为我是二等货色，不给我升职？"
+  ],
+  "focus": [
+   "Почему",
+   "считают",
+   "вторым",
+   "ходу"
+  ],
+  "zh": "固定搭配 дать хóду 表示“让…晋升、放行”，否定式为 не дать хóду。",
+  "level": "B2",
+  "formation": "固定搭配 дать/не дать ходу кому，",
+  "notes": ""
+ },
+ {
+  "key": "rgm_вближайшеевремя__9ed6e8",
+  "name": "в ближайшее время",
+  "slug": "复合式最高级 ближайший 作定语",
+  "meaning": "A superlative attribute may be formed with 'samy' or a single-word superlative.",
+  "type": "composite",
+  "examples": [
+   "Эту работу необходимо выполнить в ближайшее время."
+  ],
+  "example_zh": [
+   "这项工作应尽快完成。"
+  ],
+  "focus": [
+   "Эту",
+   "работу",
+   "необходимо",
+   "выполнить",
+   "ближайшее"
+  ],
+  "zh": "形容词最高级可作定语，如 в ближайшее время（在最近的时间内）。",
+  "level": "B2",
+  "formation": "在形容词原级前加 самый 构成复合式最高级；有单一式最高级的形容词也可用其长尾形式作定语",
+  "notes": ""
+ },
+ {
+  "key": "rgm_болеепростойчемпервый__1ccd3b",
+  "name": "более простой, чем первый",
+  "slug": "复合式比较级 + чем（）",
+  "meaning": "The compound comparative uses 'che moins' plus a nominative comparand.",
+  "type": "composite",
+  "examples": [
+   "Второй вариант решения более простой, чем первый.",
+   "Климат Марса более суров, чем климат Земли."
+  ],
+  "example_zh": [
+   "第二个解决方案比第一个简单。",
+   "火星的气候比地球的气候更严酷。"
+  ],
+  "focus": [
+   "Второй",
+   "вариант",
+   "более",
+   "простой",
+   "первый"
+  ],
+  "zh": "более/менее + 形容词原级构成复合式比较级，比较对象借 чем 与第一格连用。",
+  "level": "B2",
+  "formation": "более/менее + 形容词原级构成复合式比较级，比较对象借 чем 用第一格",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Кудатыидёшь__1a5352",
+  "name": "Куда ты идёшь?",
+  "slug": "定向动词 идти 表示朝一定方向进行",
+  "meaning": "A directional verb of motion denotes movement in one definite direction at a given moment.",
+  "type": "composite",
+  "examples": [
+   "Куда ты идёшь? — Я иду в магазин."
+  ],
+  "example_zh": [
+   "“你去哪儿？”“我去商店。”"
+  ],
+  "focus": [
+   "идёшь",
+   "иду"
+  ],
+  "zh": "定向动词表示某一时刻朝一定方向进行的运动。",
+  "level": "A1",
+  "formation": "定向动词 идти 的现在时",
+  "notes": "句中不一定出现表示方向的词语。"
+ },
+ {
+  "key": "rgm_Плывётлисточек__a6222c",
+  "name": "Плывёт листочек",
+  "slug": "定向动词 плыть（/）",
+  "meaning": "плыть describes movement in a definite direction on water.",
+  "type": "composite",
+  "examples": [
+   "Плывёт листочек по воде. Волна его качает."
+  ],
+  "example_zh": [
+   "一片树叶在水上漂。波浪在使它摇晃。"
+  ],
+  "focus": [
+   "Плывёт",
+   "листочек"
+  ],
+  "zh": "плыть 表示在水上朝一定方向的漂动或游动。",
+  "level": "A1",
+  "formation": "定向动词 плыть",
+  "notes": ""
+ },
+ {
+  "key": "rgm_платьедлинное__34c38e",
+  "name": "платье длинное",
+  "slug": "形容词长尾形式表持久特征",
+  "meaning": "The long form expresses a lasting or inherent quality.",
+  "type": "composite",
+  "examples": [
+   "Если платье длинное, лучше подшить йли обрезать."
+  ],
+  "example_zh": [
+   "如果连衣裙长，最好在下面缝上或剪掉一些。"
+  ],
+  "focus": [
+   "Если",
+   "платье",
+   "длинное",
+   "подшить"
+  ],
+  "zh": "长尾形式表示持久的或固有的特征，既可以作定语，也可以作表语。",
+  "level": "A2",
+  "formation": "长尾形式表示持久的或固有的特征，可作定语或表语",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Покрайнеймере__b24a7a",
+  "name": "По крайней мере, ...",
+  "slug": "插入语 по крайней мере（）",
+  "meaning": "Parenthetical phrases like по крáйней мéре limit or qualify the statement.",
+  "type": "composite",
+  "examples": [
+   "По крайней мере, я теперь знаю, где они живут."
+  ],
+  "example_zh": [
+   "至少我现在知道他们在哪里住。"
+  ],
+  "focus": [
+   "крайней",
+   "знаю",
+   "живут"
+  ],
+  "zh": "по крáйней мéре（至少）、в знáчительной стéпени 等插入语表示在某种程度上或程度上的限定。",
+  "level": "B2",
+  "formation": "по крайней мере / в значительной степени / по обукновению 等作插入语",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Мыслюследовательносуществую__2ed6a5",
+  "name": "Мыслю, следовательно, существую.",
+  "slug": "插入语 следовательно（）",
+  "meaning": "Parenthetical words like слéдовательно, во-пéрвых mark the logical relation of the statement.",
+  "type": "composite",
+  "examples": [
+   "Мыслю, следовательно, существую."
+  ],
+  "example_zh": [
+   "我思故我在。"
+  ],
+  "focus": [
+   "Мыслю",
+   "следовательно",
+   "существую"
+  ],
+  "zh": "слéдовательно、во-пéрвых、стáло быть、наоборóт 等插入语表示说话内容在言语中的地位或相互关系。",
+  "level": "B2",
+  "formation": "во-первых / следовательно / стало быть / наоборот 等作插入语，用逗号隔开",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Каретумнекарету__57d096",
+  "name": "Карету мне, карету",
+  "slug": "无动词祈使句（名词第四格表示动作涉及的事物）",
+  "meaning": "A verbless imperative sentence may consist of a noun in the accusative naming the object wanted.",
+  "type": "composite",
+  "examples": [
+   "Карету мне, карету!"
+  ],
+  "example_zh": [
+   "给我准备马车，马车！"
+  ],
+  "focus": [
+   "Карету",
+   "мне",
+   "карету"
+  ],
+  "zh": "无动词祈使句的结构成分可以是名词不带前置词的第四格，表示动作涉及的是什么事物。",
+  "level": "B1",
+  "formation": "名词不带前置词的第四格",
+  "notes": ""
+ },
+ {
+  "key": "rgm_нервут__b93e45",
+  "name": "не рвут",
+  "slug": "未完成体不定人称句表示禁止/不该发生",
+  "meaning": "A negated imperfective verb in the third-person plural expresses a general prohibition.",
+  "type": "composite",
+  "examples": [
+   "В саду не рвут цветы."
+  ],
+  "example_zh": [
+   "花园里不许折花。"
+  ],
+  "focus": [
+   "не",
+   "рвут"
+  ],
+  "zh": "未完成体动词用复数第三人称（不定人称形式）加否定词，表示不许发生某行为。",
+  "level": "B1",
+  "formation": "не + 未完成体动词复数第三人称（不定人称形式）",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Невключать__82b983",
+  "name": "Не включать",
+  "slug": "未完成体不定式否定（表示不应该、不需要）",
+  "meaning": "A negated imperfective infinitive expresses that an action should not or need not be performed.",
+  "type": "composite",
+  "examples": [
+   "Не включать магнитофон, ребенок спит."
+  ],
+  "example_zh": [
+   "别开录音机，孩子在睡觉。"
+  ],
+  "focus": [
+   "Не",
+   "включать"
+  ],
+  "zh": "未完成体不定式加否定词表示不应该或不需要做某事。",
+  "level": "B1",
+  "formation": "не + 未完成体不定式（常与 не надо, не следует, нельзя 等连用）",
+  "notes": "常与 не нáдо, не слéдует, не стóит, нельзá 连用。"
+ },
+ {
+  "key": "rgm_разтызанят__359fab",
+  "name": "раз ты занят, ...",
+  "slug": "条件状语从属句：连接词 раз（、）",
+  "meaning": "Раз marks a real, already realized condition, translated as 'since'.",
+  "type": "composite",
+  "examples": [
+   "Зачем мне ждать тебя, раз ты очень занят?"
+  ],
+  "example_zh": [
+   "既然你很忙，我还等你干什么？"
+  ],
+  "focus": [
+   "ждать",
+   "раз",
+   "занят"
+  ],
+  "zh": "连接词 раз 表示已经实现的、现实的（真实）条件，译为“既然”，句中动词多用现在时和过去时。",
+  "level": "B2",
+  "formation": "раз 表示已经实现的、现实的（真实）条件，可译为“既然”",
+  "notes": "与 éсли（真实可能实现的条件）、éсли бы（虚拟条件）相区别。"
+ },
+ {
+  "key": "rgm_Разто__e148f0",
+  "name": "Раз ..., то ...",
+  "slug": "条件状语从属句：连接词 раз（）",
+  "meaning": "Clauses with раз state a real, already fulfilled condition, translated as 'since'.",
+  "type": "composite",
+  "examples": [
+   "Раз решено зимовать в лесу, то благоустраиваться надо прочно и обстоятельно."
+  ],
+  "example_zh": [
+   "既然决定在森林里过冬，那么所使用的各种设备都要结实可靠。"
+  ],
+  "focus": [
+   "решено",
+   "зимовать",
+   "обстоятельно"
+  ],
+  "zh": "带连接词 раз 的从属句所表示的条件是实际存在的、真实的或已经实现的，可译为“既然”。",
+  "level": "B2",
+  "formation": "раз 表示实际存在的、已经实现的真实条件，主句中常用 то 呼应",
+  "notes": ""
+ },
+ {
+  "key": "rgm_тяжелеечемнужно__591c2e",
+  "name": "тяжелее, чем нужно",
+  "slug": "比较级 + чем нужно（）",
+  "meaning": "A comparative plus 'chem nuzhno' means 'more than necessary'.",
+  "type": "composite",
+  "examples": [
+   "Твоё письмо тяжелее, чем нужно."
+  ],
+  "example_zh": [
+   "你的信超重了。"
+  ],
+  "focus": [
+   "Твоё",
+   "письмо",
+   "тяжелее",
+   "нужно"
+  ],
+  "zh": "比较级 + чем нужно 表示“比所需的更……”。",
+  "level": "B2",
+  "formation": "比较级 + чем нужно，“…”，чем 后可用 нужно",
+  "notes": ""
+ },
+ {
+  "key": "rgm_надо__7afb10",
+  "name": "надо + 名词二格",
+  "slug": "状态词直接带补语（第二格/第四格）",
+  "meaning": "Certain predicative state words take a noun object directly, in the genitive or accusative.",
+  "type": "composite",
+  "examples": [
+   "Детям надо любви, внимания."
+  ],
+  "example_zh": [
+   "孩子们需要关爱。"
+  ],
+  "focus": [
+   "Детям",
+   "надо",
+   "любви"
+  ],
+  "zh": "有些状态词可以直接带名词补语，抽象事物或部分意义用第二格，具体表人名词多用第四格。",
+  "level": "B1",
+  "formation": "（надо, нужно, больно, видно, слышно, жаль, довольно, достаточно 等）+ 名词第二格或第四格",
+  "notes": "被支配的名词用第二格，看作直接补语。"
+ },
+ {
+  "key": "rgm_Плохобольноиобидно__e49b2b",
+  "name": "Плохо, больно и обидно",
+  "slug": "状态词（谓语副词）独自作无人称句主要成分",
+  "meaning": "A predicative adverb can alone form the main part of an impersonal sentence, expressing a physical or emotional state.",
+  "type": "composite",
+  "examples": [
+   "Плохо, больно и обидно."
+  ],
+  "example_zh": [
+   "心情不好，感到痛心和遗憾。"
+  ],
+  "focus": [
+   "Плохо",
+   "больно",
+   "обидно"
+  ],
+  "zh": "状态词可在句中独自做单部无人称句的主要成分，表示生理、心理等方面的状态。",
+  "level": "B1",
+  "formation": "状态词单独作单部无人称句的主要成分",
+  "notes": ""
+ },
+ {
+  "key": "rgm_ПрекрасныйврачЧехов__4a1ed6",
+  "name": "Прекрасный врач, Чехов ...",
+  "slug": "独立同位语（取得原因、让步意义）",
+  "meaning": "An apposition is set off when it gives additional specification or acquires causal or concessive meaning.",
+  "type": "composite",
+  "examples": [
+   "Прекрасный врач, Чехов заботливо и умело лечйл людей."
+  ],
+  "example_zh": [
+   "因为契诃夫是一个极好的医生，他关切地、用高超的医术为人们治病。"
+  ],
+  "focus": [
+   "Прекрасный",
+   "врач",
+   "Чехов"
+  ],
+  "zh": "同位语位于主导词之后起补充说明作用，或取得原因、让步等状语意义时，要独立。",
+  "level": "B2",
+  "formation": "同位语位于主导词后起确切说明作用，或取得原因、让步等状语意义时独立",
+  "notes": "同位语说明人称代词或在专有名词之后时也要独立。"
+ },
+ {
+  "key": "rgm_непишунини__80b331",
+  "name": "не пишу ни ... ни ...",
+  "slug": "直接补语：及物动词被否定时名词转用第二格",
+  "meaning": "When a transitive verb is negated, its direct object may shift to the genitive.",
+  "type": "composite",
+  "examples": [
+   "Я не пишу ни своей биографии, ни свойх достижений."
+  ],
+  "example_zh": [
+   "我既不写自传，也不写自己的成就。"
+  ],
+  "focus": [
+   "не",
+   "пишу",
+   "ни"
+  ],
+  "zh": "及物动词被否定时，其直接补语名词可能转用第二格形式。",
+  "level": "B1",
+  "formation": "及物动词被否定时，直接补语名词改用第二格形式",
+  "notes": "与 ни 连用时补语名词必须用第二格。"
+ },
+ {
+  "key": "rgm_СоснаДвеберёзы__a7018a",
+  "name": "Сосна. Две берёзы.",
+  "slug": "称名句（单部句，只出现一个主要成分）",
+  "meaning": "A nominative (naming) sentence consists of a noun in the nominative and describes a static picture without a verb.",
+  "type": "composite",
+  "examples": [
+   "Сосна. Две берёзы."
+  ],
+  "example_zh": [
+   "松树。两棵白桦树。"
+  ],
+  "focus": [
+   "Сосна",
+   "Две",
+   "берёзы"
+  ],
+  "zh": "称名句用来描写自然景物等静态画面，不需要动词做谓语。",
+  "level": "B1",
+  "formation": "名词第一格（称名形式），不需要动词谓语",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Мнелет__76e3ef",
+  "name": "Мне ... лет",
+  "slug": "第三格表示状态主体（年龄）",
+  "meaning": "Age is expressed with the person in the dative and 'let' after a numeral.",
+  "type": "composite",
+  "examples": [
+   "Моему дедушке 85 лет."
+  ],
+  "example_zh": [
+   "我祖父85岁。"
+  ],
+  "focus": [
+   "Моему",
+   "дедушке",
+   "лет"
+  ],
+  "zh": "表示年龄时，主体用第三格，后接数词 + лет。",
+  "level": "A1",
+  "formation": "表示年龄时，人用第三格，数词 + 名词 лет（）",
+  "notes": ""
+ },
+ {
+  "key": "rgm_тихимголосом__f1393a",
+  "name": "тихим голосом",
+  "slug": "第五格表示行为方式",
+  "meaning": "The instrumental case marks the manner of an action.",
+  "type": "composite",
+  "examples": [
+   "Она говорит тихим голосом."
+  ],
+  "example_zh": [
+   "她低声地说着。"
+  ],
+  "focus": [
+   "Она",
+   "говорит",
+   "тихим",
+   "голосом"
+  ],
+  "zh": "表示行为方式的名词用第五格，作状语。",
+  "level": "A2",
+  "formation": "表示行为方式的工具格名词用第五格，作状语",
+  "notes": ""
+ },
+ {
+  "key": "rgm_раннейвесной__535a6a",
+  "name": "ранней весной",
+  "slug": "第五格表示行为时间",
+  "meaning": "The instrumental case can mark the time of an action.",
+  "type": "composite",
+  "examples": [
+   "Ранней весной мы собираем цветы."
+  ],
+  "example_zh": [
+   "早春时节我们采集鲜花。"
+  ],
+  "focus": [
+   "Ранней",
+   "весной",
+   "собираем",
+   "цветы"
+  ],
+  "zh": "表示行为发生时间的名词用第五格，作时间状语。",
+  "level": "A2",
+  "formation": "表示行为发生时间的名词用第五格，作时间状语",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Бухгалтероченьсерьёзна__fccad5",
+  "name": "Бухгалтер очень серьёзна",
+  "slug": "表人名词指女人时谓语用阴性形式",
+  "meaning": "When a noun with only a masculine form denotes a woman, the predicate may agree in the feminine.",
+  "type": "composite",
+  "examples": [
+   "Бухгалтер очень серьёзна."
+  ],
+  "example_zh": [
+   "女会计很认真。"
+  ],
+  "focus": [
+   "Бухгалтер",
+   "очень",
+   "серьёзна"
+  ],
+  "zh": "当只有阳性形式（无相应阴性形式）的表人名词表示女人作主语时，谓语（动词过去时及表语）可以用阴性形式。",
+  "level": "B2",
+  "formation": "只有阳性形式的名词 + 谓语阴性形式",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Трудностиэтоничего__8a5a76",
+  "name": "Трудности — это ничего",
+  "slug": "表语用副词/代词",
+  "meaning": "The nominal part of the predicate can be an adverb or pronoun.",
+  "type": "composite",
+  "examples": [
+   "Трудности — это ничего."
+  ],
+  "example_zh": [
+   "困难这不算什么。"
+  ],
+  "focus": [
+   "Трудности",
+   "это",
+   "ничего"
+  ],
+  "zh": "表语可以由副词、代词等充当。",
+  "level": "B1",
+  "formation": "系词（零位）+ 副词或代词",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Егономердвадщатьодин__1cecad",
+  "name": "Его номер — двадщать один",
+  "slug": "表语用数词",
+  "meaning": "The nominal part of the predicate can be a numeral.",
+  "type": "composite",
+  "examples": [
+   "Его номер — двадщать один."
+  ],
+  "example_zh": [
+   "他的号是21。"
+  ],
+  "focus": [
+   "номер",
+   "двадщать",
+   "один"
+  ],
+  "zh": "表语可以由数词充当。",
+  "level": "A2",
+  "formation": "系词（零位）+ 数词",
+  "notes": "有时数词也可带前置词来充当表语。"
+ },
+ {
+  "key": "rgm_посадитьвсаду__2222f0",
+  "name": "посадить в саду ...",
+  "slug": "词序：带前置词的间接格名词状语位于动词之后（正装）",
+  "meaning": "Prepositional-case adverbials normally follow the verb, which is the neutral word order.",
+  "type": "composite",
+  "examples": [
+   "Хочу посадить в саду уже довольно крупные декоративные деревья и кустарники, но когда это лучше селать весной, осенью, йли зимой?"
+  ],
+  "example_zh": [
+   "我想要在花园里栽上已经长得很大的观赏树和灌木，但什么时候栽好呢——春天、秋天或者冬天？"
+  ],
+  "focus": [
+   "посадить",
+   "деревья",
+   "зимой"
+  ],
+  "zh": "由带前置词的名词间接格形式表示的状语，通常位于动词之后，是正装词序；如果具有性质特征意义或动作方式意义，则可位于动词之前。",
+  "level": "B2",
+  "formation": "由带前置词的名词间接格形式表示的状语，通常位于动词之后，是正装词序",
+  "notes": ""
+ },
+ {
+  "key": "rgm_двоечасовдвоеочков__4edd34",
+  "name": "двое часов / двое очков",
+  "slug": "集合数词 + 只用复数或成对事物的名词",
+  "meaning": "Collective numerals combine with plural-only and paired-object nouns.",
+  "type": "composite",
+  "examples": [
+   "У меня двое часов, у брата трое часов, а у сестры целых четверо.",
+   "У меня двое очков."
+  ],
+  "example_zh": [
+   "我有两块表，哥哥有三块表，而姐姐有整整四块。",
+   "我有两副眼镜。"
+  ],
+  "focus": [
+   "меня",
+   "двое",
+   "часов",
+   "трое"
+  ],
+  "zh": "集合数词可与只有复数形式或表示由两部分构成的事物的名词连用，名词用复数二格。",
+  "level": "B1",
+  "formation": "集合数词与只有复数形式或表示由两部分构成的事物的名词连用",
+  "notes": "двóе очков = две пары очков。"
+ },
+ {
+  "key": "rgm_Всемытроеодно__e99ea3",
+  "name": "Все мы трое — одно.",
+  "slug": "集合数词与人称代词连用（我们俩/三人一起）",
+  "meaning": "A personal pronoun plus a collective numeral as subject means 'we, the N of us, together'.",
+  "type": "composite",
+  "examples": [
+   "Все мы трое — одно."
+  ],
+  "example_zh": [
+   "我们三人是一个整体。"
+  ],
+  "focus": [
+   "Все",
+   "мы",
+   "трое",
+   "одно"
+  ],
+  "zh": "人称代词与集合数词连用作主语，等于说“我们（几人）一起”。",
+  "level": "B2",
+  "formation": "人称代词与集合数词连用作主语，相当于“我们几人一起”",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Неужелиэтоправда__467169",
+  "name": "Неужели это правда",
+  "slug": "（Неужели）",
+  "meaning": "One-word sentences with неужéли, рáзве, да, нет express a question.",
+  "type": "composite",
+  "examples": [
+   "Неужели это правда?! Это, словно сладкий сон! Неужели, неужели?!"
+  ],
+  "example_zh": [
+   "难道这是真的？这就像一场甜蜜的梦！真的吗？真的吗？！"
+  ],
+  "focus": [
+   "Неужели",
+   "правда",
+   "сладкий"
+  ],
+  "zh": "独词句可通过疑问语调用 неужéли、рáзве、да、нет 等表示疑问意义。",
+  "level": "B2",
+  "formation": "借助疑问语调由 Неужели 等词构成",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Скольковременисейчас__384e26",
+  "name": "Сколько времени сейчас?",
+  "slug": "（Сколько времени сейчас?）",
+  "meaning": "To ask the time, use 'Skol'ko vremeni seychas?'",
+  "type": "composite",
+  "examples": [
+   "Сколько времени сейчас?"
+  ],
+  "example_zh": [
+   "现在是什么时候了？"
+  ],
+  "focus": [
+   "Сколько",
+   "времени",
+   "сейчас"
+  ],
+  "zh": "询问现在几点用 Скóлько врéмени сейчáс? 或 Котóрый час?",
+  "level": "A1",
+  "formation": "问“现在几点”用 Сколько времени сейчас? 或 Который час?",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Стопнисместа__5ac10c",
+  "name": "Стоп, ни с места",
+  "slug": "（Стоп）",
+  "meaning": "A one-word sentence with words like стоп, вон, тсс, марш expresses an imperative.",
+  "type": "composite",
+  "examples": [
+   "Стоп, ни с места!"
+  ],
+  "example_zh": [
+   "站住！不准动！"
+  ],
+  "focus": [
+   "Стоп",
+   "ни",
+   "места"
+  ],
+  "zh": "独词句可由单个数词性感叹词构成，用 стоп、вон、тсс、марш 等表示祈使意义。",
+  "level": "B1",
+  "formation": "由单个词（语气词/感叹词）构成",
+  "notes": "表示祈使常用的词还有 айдá, вон, караýл, тсс, марш 等。"
+ },
+ {
+  "key": "rgm_высшаяступень__e87506",
+  "name": "высшая ступень",
+  "slug": "（высшая ступень）",
+  "meaning": "A superlative attribute agrees with the noun it modifies.",
+  "type": "composite",
+  "examples": [
+   "Мышление — высшая ступень человеческого познания."
+  ],
+  "example_zh": [
+   "思考是人类认知的更高阶段。"
+  ],
+  "focus": [
+   "Мышление",
+   "высшая",
+   "ступень",
+   "познания"
+  ],
+  "zh": "最高级作定语时，其性、数、格与被修饰的名词一致。",
+  "level": "B2",
+  "formation": "单一式最高级作定语时，性、数、格与被修饰名词一致",
+  "notes": ""
+ },
+ {
+  "key": "rgm_Менязнобит__449908",
+  "name": "Меня знобит",
+  "slug": "（знобит）",
+  "meaning": "Impersonal verbs of physical sensation take the person affected in the accusative.",
+  "type": "composite",
+  "examples": [
+   "Меня постоянно знобит, особенно по вечерам."
+  ],
+  "example_zh": [
+   "我老是觉得发冷，特别是在晚上。"
+  ],
+  "focus": [
+   "Меня",
+   "знобит",
+   "вечерам"
+  ],
+  "zh": "表示生理状态的无人称动词，其主体用第四格形式。",
+  "level": "B1",
+  "formation": "无人称动词 + 第四格主体",
+  "notes": "同类动词：тошни́т（恶心）、рвёт（呕吐）等。"
+ },
+ {
+  "key": "rgm_Добротаона__9ce4a2",
+  "name": "Доброта — она ...",
+  "slug": "（именительный темы）",
+  "meaning": "A preposed nominative noun introduces the topic, resumed by a pronoun in the following clause.",
+  "type": "composite",
+  "examples": [
+   "Доброта — она превыше всех благ."
+  ],
+  "example_zh": [
+   "善良，它超过一切财富。"
+  ],
+  "focus": [
+   "Доброта",
+   "она",
+   "превыше"
+  ],
+  "zh": "用作话题的名词第一格并不表示现实存在，只为提起注意，其后用代词复指并进行具体叙述。",
+  "level": "B2",
+  "formation": "前置名词第一格 + （он/она/оно）+ 具体叙述",
+  "notes": "要与称名句区分：这种名词一格后一定有复指代词。"
+ },
+ {
+  "key": "rgm_ВеснаНочьТишина__e6b7eb",
+  "name": "Весна. Ночь. Тишина.",
+  "slug": "（номинативные предложения）",
+  "meaning": "Nominative sentences assert the existence of things or phenomena, their main part being a nominative noun.",
+  "type": "composite",
+  "examples": [
+   "Весна. Ночь. Тишина."
+  ],
+  "example_zh": [
+   "春天。夜。一片寂静。"
+  ],
+  "focus": [
+   "Весна",
+   "Ночь",
+   "Тишина"
+  ],
+  "zh": "称名句主要表示事物或现象的存在，主要成分由名词（代词、数词）第一格充当，只有肯定形式，只用于现在时。",
+  "level": "A2",
+  "formation": "名词（代词、数词）第一格作主要成分，只有肯定形式，只用于现在时",
+  "notes": "常用于描写环境、时间及状态。"
+ },
+ {
+  "key": "rgm_Летомранорассветает__3b644f",
+  "name": "Летом рано рассветает",
+  "slug": "（рассветает）",
+  "meaning": "Impersonal verbs of this type describe natural phenomena or their effect on the body.",
+  "type": "composite",
+  "examples": [
+   "Летом рано рассветает."
+  ],
+  "example_zh": [
+   "夏天天亮得早。"
+  ],
+  "focus": [
+   "Летом",
+   "рано",
+   "рассветает"
+  ],
+  "zh": "这类没有人称意义的动词通过无人称形式揭示自然现象或自然力对人体的作用。",
+  "level": "A2",
+  "formation": "没有人称意义的动词，现在时借用单数第三人称",
+  "notes": "同类动词：светáет, темнéет, морóзит, дожди́т 等。"
+ }
+]

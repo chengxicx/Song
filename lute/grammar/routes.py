@@ -7,9 +7,11 @@ yet is invisible.  These pages list the whole corpus per language -- the
 curated bases, the level of each point, the wording, the cross-links --
 so the library can be browsed and searched like any other reference.
 
-Only the Japanese and Korean engines have such a corpus; every other
-language is served by the generic regex rules, which carry no point-level
-library, so /grammar/<langid> explains that instead of 404ing.
+Only some engines have such a corpus (Japanese and Korean the curated
+bases, Russian and Spanish the hand-written rule sets, Thai a corpus
+written for this project against a standard Thai reference outline); every
+other language is served by the generic regex rules, which carry no
+point-level library, so /grammar/<langid> explains that instead of 404ing.
 """
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
@@ -21,6 +23,9 @@ from lute.models.repositories import LanguageRepository
 from lute.read.render.grammar_analysis import (
     is_japanese_language,
     is_korean_language,
+    is_russian_language,
+    is_spanish_language,
+    is_thai_language,
 )
 
 bp = Blueprint("grammar", __name__, url_prefix="/grammar")
@@ -28,17 +33,19 @@ bp = Blueprint("grammar", __name__, url_prefix="/grammar")
 # Levels carried by the corpora; anything else is drawn with the neutral
 # accent (see the panel's own levelClass in static/js/lute-commands.js).
 _JLPT_LEVELS = ("N5", "N4", "N3", "N2", "N1")
+_CEFR_LEVELS = ("A1", "A2", "B1", "B2", "C1", "C2")
+_LEVELS = _JLPT_LEVELS + _CEFR_LEVELS
 
 
 def _library_engine(language):
     """
     The engine module holding the language's grammar corpus, or None.
 
-    Imported lazily: both engines are optional extras (sudachi /
-    kiwipiepy may not be installed), so a top-level import would make the
-    whole app fail to start for a user who reads only other languages.
-    If the tokenizer is missing the import raises, and the language
-    simply has no browsable library.
+    Imported lazily: the engines are optional extras (sudachi / kiwipiepy /
+    pymorphy3 / spaCy may not be installed), so a top-level import would
+    make the whole app fail to start for a user who reads only other
+    languages.  If the tokenizer is missing the import raises, and the
+    language simply has no browsable library.
     """
     if is_japanese_language(language):
         from lute.read.render import grammar_analysis_ja
@@ -47,9 +54,31 @@ def _library_engine(language):
     if is_korean_language(language):
         try:
             from lute.read.render import grammar_analysis_ko
+
+            return grammar_analysis_ko
         except ImportError:
             return None
-        return grammar_analysis_ko
+    if is_russian_language(language):
+        try:
+            from lute.read.render import grammar_analysis_ru
+
+            return grammar_analysis_ru
+        except ImportError:
+            return None
+    if is_spanish_language(language):
+        try:
+            from lute.read.render import grammar_analysis_es
+
+            return grammar_analysis_es
+        except ImportError:
+            return None
+    if is_thai_language(language):
+        # The Thai library is pure data (jlpt_data/grammar_th.json) and
+        # needs no tokenizer, so it is browsable even without pythainlp --
+        # only the reading panel's matcher needs the parser.
+        from lute.read.render import grammar_analysis_th
+
+        return grammar_analysis_th
     return None
 
 
@@ -60,7 +89,7 @@ def _display_lang(language):
 
 def _level_class(level):
     "CSS token for a level, matching the reading panel's card classes."
-    return level if level in _JLPT_LEVELS else "N"
+    return level if level in _LEVELS else "N"
 
 
 def _level_counts(entries):
@@ -95,10 +124,10 @@ def index():
 
     The menu item jumps straight there: the reader already picked their
     language when they started reading, so a chooser page would just
-    re-ask a question the settings already answer.  ``?pick=1`` (the
+    re-ask a question the settings already answer.      ``?pick=1`` (the
     "Switch language" link on a library page) opens the list of
     languages that carry a corpus, which is also the fallback when the
-    current language has none (only Japanese/Korean do).
+    current language has none (only the corpus-bearing engines do).
     """
     if request.args.get("pick") != "1":
         current_id = lute.utils.formutils.valid_current_language_id(db.session)
@@ -126,7 +155,8 @@ def library(langid):
     """
     One language's grammar library: every level on one page.
 
-    The corpus runs to ~1400 points.  The page is a full-width grid of
+    The largest corpus (Japanese) runs to ~1400 points.  The page is a
+    full-width grid of
     compact cards grouped by level (N5 -> N1), each card linking to the
     point's own page, with the sticky toolbar's search filtering across
     all levels at once.  A legacy ``?level=`` query is accepted and

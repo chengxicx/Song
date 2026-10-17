@@ -206,11 +206,7 @@ _RU_RULES = [
         # Genuine imperatives are unambiguous here: давайте 0.996, иди /
         # скажите / читайте / делай 1.0, while every fabricated one lands
         # between 0.13 and 0.56.
-        {
-            "seq": [
-                {"pos_in": ["VERB"], "morph": {"Mood": "impr"}, "min_score": 0.9}
-            ]
-        },
+        {"seq": [{"pos_in": ["VERB"], "morph": {"Mood": "impr"}, "min_score": 0.9}]},
         zh="命令式（читайте / сядьте）：表示命令或请求。",
     ),
     # ---- A2 ----
@@ -626,7 +622,9 @@ def _load_data_rules():
         name = item.get("name") or ""
         if not name or _norm_name(name) in _HANDWRITTEN_NORMS:
             continue  # already covered precisely by a hand-written rule
-        examples = [e for e in (_strip_stress(x) for x in item.get("examples") or []) if e]
+        examples = [
+            e for e in (_strip_stress(x) for x in item.get("examples") or []) if e
+        ]
         if not examples:
             continue
         validated = [s for s in _focus_specs(item.get("focus")) if _flash(s, examples)]
@@ -634,16 +632,20 @@ def _load_data_rules():
             continue
         key = item.get("key") or name
         _RU_RULE_EXAMPLES[key] = examples
-        rules.append(
-            make_rule(
-                key,
-                name,
-                item.get("level") or "B1",
-                (item.get("meaning") or "").strip() or name,
-                {"any_of": validated} if len(validated) > 1 else validated[0],
-                zh=item.get("zh") or None,
-            )
+        rule = make_rule(
+            key,
+            name,
+            item.get("level") or "B1",
+            (item.get("meaning") or "").strip() or name,
+            {"any_of": validated} if len(validated) > 1 else validated[0],
+            zh=item.get("zh") or None,
         )
+        # Library-page fields (the /grammar detail card renders them when
+        # present); the panel ignores keys it does not read.
+        rule["formation"] = (item.get("formation") or "").strip()
+        rule["notes"] = (item.get("notes") or "").strip()
+        rule["examples"] = examples
+        rules.append(rule)
     return rules
 
 
@@ -681,3 +683,105 @@ def analyze_russian(page_text, display_lang="en"):
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
     return analyze_tokens(page_text, _get_all_rules(), _tokens_for, display_lang)
+
+
+# ---- library export ----------------------------------------------------
+#
+# The /grammar page lists the whole corpus at once, where the panel lists
+# only what the current page happens to contain.  Same display fields as
+# the panel entries (minus the page-specific match offsets), so the page
+# can reuse the panel's markup and CSS.
+
+_CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"]
+
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_ru_golden.json",
+    )
+)
+
+_golden_cache = None
+
+
+def _golden_examples():
+    """
+    Curated example sentences for the hand-written rules (key -> [ru, ...]).
+
+    The golden set is the single store of these examples: the tests re-run
+    every sentence through its own rule, and the library serves the same
+    sentences to readers, so the page can never show a point whose matcher
+    does not actually recognise it.
+    """
+    global _golden_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _golden_cache is None:
+            examples = {}
+            if os.path.exists(_GOLDEN_PATH):
+                with open(_GOLDEN_PATH, encoding="utf-8") as fh:
+                    for key, entry in json.load(fh).items():
+                        sentences = [
+                            _strip_stress(e.get("ru") or "")
+                            for e in entry.get("examples") or []
+                        ]
+                        examples[key] = [s for s in sentences if s]
+            _golden_cache = examples
+        return _golden_cache
+
+
+def _library_entry(rule, display_lang):
+    """
+    One rule as a library row, display-ready (see the Japanese analogue).
+
+    Examples stay plain strings: the library has no page text to
+    highlight, so the match offsets the panel computes are irrelevant here.
+    """
+    desc = rule.get("desc") or rule["name"]
+    if display_lang == "zh" and (rule.get("zh") or "").strip():
+        desc = rule["zh"]
+    entry = {
+        "key": rule["key"],
+        "name": rule["name"],
+        "level": rule["level"],
+        "desc": desc,
+        "examples": list(rule.get("examples") or []),
+        "skipped": False,
+    }
+    for field in ("formation", "notes"):
+        value = (rule.get(field) or "").strip()
+        if value:
+            entry[field] = value
+    return entry
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Russian grammar library, in CEFR order (A1 -> C2).
+
+    Built on first use like the rules themselves, so an app start-up with
+    no Russian books does not pay for the pymorphy3 instance.  Hand-written
+    rules take their examples from the golden set; the merged data rows
+    carry their own.
+    """
+    golden = _golden_examples()
+    rules = []
+    for rule in _RU_RULES:
+        if not rule.get("examples"):
+            rule = dict(rule)
+            rule["examples"] = golden.get(rule["key"]) or []
+        rules.append(rule)
+    rules += _get_data_rules()
+    entries = [_library_entry(r, display_lang) for r in rules]
+    ordered = sorted(
+        enumerate(entries),
+        key=lambda pair: (
+            _CEFR_ORDER.index(pair[1]["level"])
+            if pair[1]["level"] in _CEFR_ORDER
+            else 9,
+            pair[0],
+        ),
+    )
+    return [entry for _, entry in ordered]

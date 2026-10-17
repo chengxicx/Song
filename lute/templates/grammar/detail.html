@@ -37,7 +37,10 @@
     {% if entry.examples %}
     <div class="grammar-item__examples">
       {% for sentence in entry.examples %}
-      <div class="grammar-item__example">{{ sentence }}</div>
+      {#  An example may carry a second-language gloss after "／";
+          it is shown on its own line rather than inline.  #}
+      {% set parts = sentence.split(' ／ ') %}
+      <div class="grammar-item__example">{{ parts[0] }}{% if parts | length > 1 %}<span class="grammar-item__example-zh">{{ parts[1] }}</span>{% endif %}</div>
       {% endfor %}
     </div>
     {% endif %}

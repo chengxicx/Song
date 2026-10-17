@@ -399,3 +399,96 @@ def analyze_spanish(page_text, display_lang="en"):
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
     return analyze_tokens(page_text, _ES_RULES, _tokens_for, display_lang)
+
+
+# ---- library export ----------------------------------------------------
+#
+# The /grammar page lists the whole corpus at once, where the panel lists
+# only what the current page happens to contain.  Same display fields as
+# the panel entries (minus the page-specific match offsets), so the page
+# can reuse the panel's markup and CSS.  The Spanish corpus is the
+# hand-written rules only -- there is no merged data layer yet.
+
+import json  # noqa: E402
+import os  # noqa: E402
+import threading  # noqa: E402
+
+_CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"]
+
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_es_golden.json",
+    )
+)
+
+_golden_lock = threading.Lock()
+_golden_cache = None
+
+
+def _golden_examples():
+    """
+    Curated example sentences for the hand-written rules (key -> [es, ...]).
+
+    The golden set is the single store of these examples: the tests re-run
+    every sentence through its own rule, and the library serves the same
+    sentences to readers, so the page can never show a point whose matcher
+    does not actually recognise it.
+    """
+    global _golden_cache  # pylint: disable=global-statement
+    with _golden_lock:
+        if _golden_cache is None:
+            examples = {}
+            if os.path.exists(_GOLDEN_PATH):
+                with open(_GOLDEN_PATH, encoding="utf-8") as fh:
+                    for key, entry in json.load(fh).items():
+                        sentences = [
+                            e.get("es") or "" for e in entry.get("examples") or []
+                        ]
+                        examples[key] = [s.strip() for s in sentences if s.strip()]
+            _golden_cache = examples
+        return _golden_cache
+
+
+def _library_entry(rule, display_lang):
+    """
+    One rule as a library row, display-ready (see the Japanese analogue).
+
+    Examples stay plain strings: the library has no page text to
+    highlight, so the match offsets the panel computes are irrelevant here.
+    """
+    desc = rule.get("desc") or rule["name"]
+    if display_lang == "zh" and (rule.get("zh") or "").strip():
+        desc = rule["zh"]
+    return {
+        "key": rule["key"],
+        "name": rule["name"],
+        "level": rule["level"],
+        "desc": desc,
+        "examples": list(rule.get("examples") or []),
+        "skipped": False,
+    }
+
+
+def library_entries(display_lang="en"):
+    "The whole Spanish grammar library, in CEFR order (A1 -> C2)."
+    golden = _golden_examples()
+    entries = []
+    for rule in _ES_RULES:
+        if not rule.get("examples"):
+            rule = dict(rule)
+            rule["examples"] = golden.get(rule["key"]) or []
+        entries.append(_library_entry(rule, display_lang))
+    ordered = sorted(
+        enumerate(entries),
+        key=lambda pair: (
+            _CEFR_ORDER.index(pair[1]["level"])
+            if pair[1]["level"] in _CEFR_ORDER
+            else 9,
+            pair[0],
+        ),
+    )
+    return [entry for _, entry in ordered]
