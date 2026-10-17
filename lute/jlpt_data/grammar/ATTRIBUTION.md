@@ -182,3 +182,47 @@ kimchi snapshot above under a different name (`A/V-거니와`, `V-지 그래요?
 then a bug in the coverage audit's containment test was found to be hiding real
 gaps, and fixing it surfaced 26 more points plus one re-merge, taking the total
 to 63.
+
+## `../grammar_th.json` — 286 entries (2026-10-17)
+
+The Thai grammar library: one row per grammar point.  The inventory was
+assembled from the section outline of a standard reference grammar of Thai
+(the `section` field keeps that outline's numbering, so a card can be traced
+to where the point is described; `topic` is the coarse area — verb, particle,
+question, …).  Point names, `formation` lines and the English and Chinese
+glosses were written for this project; the `examples` are the short
+illustrative sentences carried by the reference materials themselves (a few
+words each, at most three per row), kept as citation-style illustrations of
+the pattern.  Each example string is `"thai · romanisation — english ／ 中文"`:
+the Chinese after the ` ／ ` is a translation written for this project and is
+rendered on its own line by `templates/grammar/detail.html`.
+
+- Levels are CEFR bands (A1–C1) used as a display approximation.  Thai has no
+  JLPT/TOPIK-style grading, so the corpus is an inventory, not a graded
+  syllabus: the bands say "core / intermediate / advanced", nothing more.
+- A row fires when one of its `focus` literals occurs in the sentence — see
+  `_get_corpus_rules()` in `lute/read/render/grammar_analysis_th.py`.  The
+  match runs over the sentence text rather than over tokens, because Thai is
+  written without word spaces and the tokenizer splits fixed expressions.
+- A row whose triggers are already owned by a hand-written rule carries no
+  rule of its own (`focus_all` keeps the literals so the library can still
+  report it as matchable); a row with no usable literal is shown as
+  "reference only".
+- `grammar_th.json` is the source of truth and is maintained by hand; there is
+  no generator that rebuilds it from a source file.
+
+### Chapter 16 — `section` 16.1–16.11, 11 rows
+
+The first pass covered the outline above.  A second reference grammar of Thai
+was then read for **coverage only**: it is transcribed in a romanised
+phonetic script rather than Thai script, so it supplied no example sentences,
+but its inventory of minor form-classes could be checked against the corpus.
+Everything it lists as a distinct form-class turned out to be already covered
+by chapters 3–15 except for the eleven points below, which were written for
+this project (Thai script, romanisation, English and Chinese glosses, and the
+example sentences are new):
+
+    ด้วยกัน · เดี๋ยวนี้ · จนกว่า · จนถึง · ทันที · ทีเดียว
+    ถึงจะ · ตามที่ · เนื่องจาก · การที่ · กระทั่ง
+
+Chapter 16 is therefore an addition to the outline, not a transcription of it.

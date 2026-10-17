@@ -1,5 +1,5 @@
 """
-Thai grammar point detection (pythainlp).
+Thai grammar point detection (pythainlp) and the Thai grammar library.
 
 Thai is analytic: no inflection, so unlike the European engines the rules
 match particle and function-word tokens rather than morphological
@@ -7,10 +7,25 @@ features.  pythainlp word_tokenize splits the text into words; whitespace
 tokens are dropped (Thai spaces separate clauses, not words) and token
 offsets are recovered by scanning forward in the original sentence.
 
+Two layers of rules:
+
+  * ``_TH_RULES`` -- a handful of hand-written rules for shapes the corpus
+    cannot state as a literal (a frame such as สามารถ ... ได้, the น่า
+    prefix).  These stay token-based.
+  * the corpus in ``jlpt_data/grammar_th.json`` -- one row per grammar
+    point, keyed to the section number of the reference outline it came
+    from (see ATTRIBUTION.md).  A row fires when one of its ``focus``
+    literals occurs in the sentence.  The match runs over the sentence
+    text rather than over tokens: pythainlp glues function words to their
+    neighbours (มาจาก, ทางขวา, ไปเสียแล้ว), so token-exact matching would
+    miss the particles a reader most wants flagged.
+
 pythainlp is imported lazily so the base install works without it; the
 route falls back to the generic rule library on ImportError.
 """
 
+import json
+import os
 import re
 
 from lute.read.render.grammar_analysis_matcher import (
@@ -348,6 +363,159 @@ _TH_RULES = [
 ]
 
 
+# ---- corpus ------------------------------------------------------------
+#
+# The grammar library in jlpt_data/grammar_th.json, one row per grammar
+# point.  `section` keeps the point's number in the outline the corpus was
+# written against, so a card can be traced back to where it is described.
+# `topic` is the coarse area (verb, particle, question, ...), for grouping.
+# Rows carry CEFR bands as a display approximation -- Thai has no
+# JLPT/TOPIK-style grading.
+
+_CORPUS_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_th.json",
+    )
+)
+
+_CORPUS = None
+_CORPUS_RULES = None
+
+
+def _corpus():
+    "The corpus rows, loaded once (empty list if the file is missing)."
+    global _CORPUS  # pylint: disable=global-statement
+    if _CORPUS is None:
+        if os.path.exists(_CORPUS_PATH):
+            with open(_CORPUS_PATH, encoding="utf-8") as fh:
+                _CORPUS = json.load(fh)
+        else:
+            _CORPUS = []
+    return _CORPUS
+
+
+def _hand_surfaces():
+    """
+    Every literal the hand-written rules already match.
+
+    The corpus rows whose only trigger is one of these are covered by a
+    hand rule, so they must not build a second rule for the same text --
+    the panel would then show the same sentence under two cards.
+    """
+    found = set()
+
+    def walk(spec):
+        if isinstance(spec, dict):
+            found.update(spec.get("surface_in") or ())
+            for key in ("seq", "left", "right", "any_of"):
+                for sub in spec.get(key) or ():
+                    walk(sub)
+        elif isinstance(spec, (list, tuple)):
+            for sub in spec:
+                walk(sub)
+
+    for rule in _TH_RULES:
+        walk(rule["match"])
+    return found
+
+
+_HAND_SURFACES = _hand_surfaces()
+_HAND_KEYS = {r["key"] for r in _TH_RULES}
+
+
+def _corpus_match(foci):
+    """
+    The match shape for one corpus row: a regex over the sentence text.
+
+    Not token-exact.  pythainlp glues function words to their neighbours
+    (มาจาก, ทางขวา, ตารางเมตร, ไปเสียแล้ว), so a token-exact spec silently
+    misses exactly the high-frequency particles a reader wants flagged.
+    The cost is that a literal can also turn up inside an unrelated word
+    (นัก inside หนัก); the corpus avoids that by not listing literals that
+    are far more often the ordinary word -- see ``_TOO_COMMON`` in the
+    corpus build notes -- and the reading panel treats a hit as a hint.
+    """
+    pattern = re.compile(
+        "|".join(re.escape(f) for f in sorted(foci, key=len, reverse=True))
+    )
+    return {"type": "regex", "re": pattern}
+
+
+def _get_corpus_rules():
+    """
+    Matcher rules derived from the corpus, built on first use.
+
+    One rule per row, an alternation of its focus literals (longest first,
+    so ไม่มีใคร wins over ไม่มี when both belong to the row).  Pure data:
+    no tokenizer is needed to build these, so the library stays browsable
+    when pythainlp is not installed.
+    """
+    global _CORPUS_RULES  # pylint: disable=global-statement
+    if _CORPUS_RULES is None:
+        rules = []
+        for item in _corpus():
+            foci = [f for f in item.get("focus") or () if f]
+            if not foci or item["key"] in _HAND_KEYS:
+                continue
+            rules.append(
+                make_rule(
+                    item["key"],
+                    item["name"],
+                    item["level"],
+                    item.get("en") or item["name"],
+                    _corpus_match(foci),
+                    zh=item.get("zh"),
+                )
+            )
+        _CORPUS_RULES = rules
+    return _CORPUS_RULES
+
+
+def _matchable(item):
+    """
+    True if this row can be reported on a page: either it carries its own
+    focus literals, or a hand-written rule already matches one of them.
+    """
+    if item.get("focus"):
+        return True
+    return any(f in _HAND_SURFACES for f in item.get("focus_all") or ())
+
+
+# ---- library export ----------------------------------------------------
+#
+# Mirrors the Japanese/Korean engines' export so every language renders
+# through the same template (see lute/grammar/routes.py).
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Thai grammar library, in CEFR order (A1 -> C1).
+
+    The corpus is stored already ordered by level then section number, so
+    the rows come back in the order the book teaches them within a band.
+    """
+    entries = []
+    for item in _corpus():
+        desc = item.get("zh") if display_lang == "zh" else item.get("en")
+        entry = {
+            "key": item["key"],
+            "name": item["name"],
+            "level": item["level"],
+            "desc": desc or item.get("en") or "",
+            "examples": list(item.get("examples") or ()),
+            "skipped": not _matchable(item),
+        }
+        formation = (item.get("formation") or "").strip()
+        if formation:
+            entry["formation"] = formation
+        entries.append(entry)
+    return entries
+
+
 def analyze_thai(page_text, display_lang="en"):
     """
     Analyze a page of Thai text for grammar points.
@@ -355,4 +523,5 @@ def analyze_thai(page_text, display_lang="en"):
     Returns a list of dicts:
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
-    return analyze_tokens(page_text, _TH_RULES, _tokens_for, display_lang)
+    rules = _TH_RULES + _get_corpus_rules()
+    return analyze_tokens(page_text, rules, _tokens_for, display_lang)

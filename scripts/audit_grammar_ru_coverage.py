@@ -189,12 +189,32 @@ def _index_by_focus(entries):
     return idx
 
 
-def _match(pattern, entries, idx, by_name, focus_idx):
+def _index_by_slug(entries):
+    """
+    Exact index of the library's `slug` literals (the merged rows' original
+    material patterns).
+
+    A row is stored under its Russian headword, so a material entry whose
+    pattern is a Chinese description cannot match it by name or focus; the
+    merge records the original pattern in `slug` precisely so this index can
+    close the loop.  Deliberately exact raw-string equality: the pattern is
+    the merge's own key, so nothing fuzzy is needed.
+    """
+    idx = collections.defaultdict(set)
+    for key, e in entries.items():
+        slug = (e.get("slug") or "").strip()
+        if slug:
+            idx[slug].add(key)
+    return idx
+
+
+def _match(pattern, entries, idx, by_name, focus_idx, slug_idx):
     """
     Return (kind, [library_keys]) for one material pattern.
 
-    Lookup order, first hit wins: alias -> exact -> contain -> focus -> core.
-    Only the *material* direction of containment counts (``a in c``): a
+    Lookup order, first hit wins: alias -> slug -> exact -> contain ->
+    focus -> core.  Only the *material* direction of containment counts
+    (``a in c``): a
     material sometimes names a point more narrowly than the library does, so
     the material's form sits inside a longer library name.
 
@@ -210,6 +230,9 @@ def _match(pattern, entries, idx, by_name, focus_idx):
     alias = _EXPLICIT_MATCH.get(pattern)
     if alias is not None and alias in by_name:
         return "covered", sorted(by_name[alias])
+    slug_hits = slug_idx.get((pattern or "").strip())
+    if slug_hits:
+        return "covered", sorted(slug_hits)
     alts = _alts(pattern)
     if not alts:
         return "missing", []
@@ -276,8 +299,10 @@ def _engine_baseline():
         try:
             from lute.read.render import grammar_analysis_ru as ru
         except ImportError as exc:  # pragma: no cover - environment dependent
-            print(f"note: ru engine unavailable ({exc}); hand-written "
-                  "baseline NOT checked -- covered points may look like gaps")
+            print(
+                f"note: ru engine unavailable ({exc}); hand-written "
+                "baseline NOT checked -- covered points may look like gaps"
+            )
             _ENGINE_BASELINE = {}
         else:
             _ENGINE_BASELINE = {r["key"]: r["name"] for r in ru._RU_RULES}
@@ -308,6 +333,7 @@ def run(write=True, print_summary=False):
     entries = _load_library()
     idx = _index_by_core(entries)
     focus_idx = _index_by_focus(entries)
+    slug_idx = _index_by_slug(entries)
     by_name = collections.defaultdict(list)
     for key, e in entries.items():
         by_name[e.get("name", "")].append(key)
@@ -324,7 +350,9 @@ def run(write=True, print_summary=False):
             kind, keys = "covered", engine_keys
             engine_covered[e["pattern"]] = engine_keys
         else:
-            kind, keys = _match(e["pattern"], entries, idx, by_name, focus_idx)
+            kind, keys = _match(
+                e["pattern"], entries, idx, by_name, focus_idx, slug_idx
+            )
         if kind == "covered":
             n_covered += 1
             for k in keys:

@@ -23,6 +23,7 @@ from tests.utils import make_book
 
 _JA_RANK = {"N5": 0, "N4": 1, "N3": 2, "N2": 3, "N1": 4}
 _KO_RANK = {"TOPIK 1-2": 0, "TOPIK 3-4": 1, "TOPIK 5-6": 2}
+_CEFR_RANK = {"A1": 0, "A2": 1, "B1": 2, "B2": 3, "C1": 4, "C2": 5}
 
 
 def _need_sudachi():
@@ -34,6 +35,30 @@ def _ko_entries(display_lang="en"):
     "library_entries() for Korean, skipping when kiwipiepy is absent."
     ko = pytest.importorskip("lute.read.render.grammar_analysis_ko")
     return ko.library_entries(display_lang)
+
+
+def _ru_entries(display_lang="en"):
+    """
+    library_entries() for Russian.
+
+    The merged data rules validate themselves against pymorphy3
+    tokenisations of their own examples, so the corpus needs it.
+    """
+    pytest.importorskip("pymorphy3")
+    ru = pytest.importorskip("lute.read.render.grammar_analysis_ru")
+    return ru.library_entries(display_lang)
+
+
+def _es_entries(display_lang="en"):
+    """
+    library_entries() for Spanish.
+
+    The Spanish corpus is the hand-written rules and their golden
+    examples -- no tokeniser is touched, so it renders even without
+    spaCy installed.
+    """
+    es = pytest.importorskip("lute.read.render.grammar_analysis_es")
+    return es.library_entries(display_lang)
 
 
 # ---- entry builders -------------------------------------------------
@@ -64,6 +89,64 @@ def test_ko_entries_are_level_ordered_and_unique():
     ranks = [_KO_RANK[e["level"]] for e in entries]
     assert ranks == sorted(ranks)
     assert len({e["key"] for e in entries}) == len(entries)
+
+
+def test_ru_entries_are_cefr_ordered_and_unique():
+    "A1 first, C2 last (stable within a level), and every key unique."
+    entries = _ru_entries("en")
+    assert entries
+    assert all(e["level"] in _CEFR_RANK for e in entries)
+    ranks = [_CEFR_RANK[e["level"]] for e in entries]
+    assert ranks == sorted(ranks)
+    assert len({e["key"] for e in entries}) == len(entries)
+
+
+def test_es_entries_are_cefr_ordered_and_unique():
+    "Same CEFR order discipline as the Russian corpus."
+    entries = _es_entries("en")
+    assert entries
+    assert all(e["level"] in _CEFR_RANK for e in entries)
+    ranks = [_CEFR_RANK[e["level"]] for e in entries]
+    assert ranks == sorted(ranks)
+    assert len({e["key"] for e in entries}) == len(entries)
+
+
+def test_ru_es_entries_carry_the_core_fields():
+    "Both corpora speak the same entry shape the templates render."
+    for entries in (_ru_entries("en"), _es_entries("en")):
+        for e in entries:
+            assert e["key"] and e["name"] and e["level"]
+            assert isinstance(e["examples"], list)
+            assert e["skipped"] is False
+
+
+def test_ru_entries_have_examples_from_their_own_store():
+    """
+    Hand-written rules quote their golden sentences, data rows their merged
+    examples -- a library card never renders without at least the point's
+    own prose unless the corpus genuinely has none for it.
+    """
+    entries = _ru_entries("en")
+    with_examples = [e for e in entries if e["examples"]]
+    assert with_examples, "no library entry carries examples"
+    bare = [e["key"] for e in entries if not e["examples"]]
+    assert len(bare) < len(entries) / 4, f"too many example-less rows: {bare}"
+
+
+def test_ru_data_rows_carry_formation_from_the_library():
+    "The merged rows quote the textbook's formation line on their card."
+    entries = _ru_entries("en")
+    assert any(e.get("formation") for e in entries)
+
+
+def test_ru_es_zh_display_uses_the_rule_gloss():
+    "The zh panel language swaps the description where a gloss exists."
+    for get in (_ru_entries, _es_entries):
+        en = get("en")
+        zh = get("zh")
+        by_key = {e["key"]: e for e in zh}
+        swapped = [e["key"] for e in en if by_key[e["key"]]["desc"] != e["desc"]]
+        assert swapped, f"{get.__name__}: no description was translated"
 
 
 def test_reference_only_rows_are_kept_not_dropped():
@@ -306,6 +389,29 @@ def test_korean_language_page_renders_its_library(korean, app_context, client):
     _cards_of(body, entries)
     assert "TOPIK 1-2" in body
     assert 'id="level-TOPIK 1-2"' in body
+
+
+def test_russian_language_page_renders_its_library(russian, app_context, client):
+    "The Russian corpus renders on CEFR sections, cards matching entries."
+    entries = _ru_entries("en")
+    body = client.get(f"/grammar/{russian.id}").get_data(as_text=True)
+    _cards_of(body, entries)
+    assert "A1" in body
+    assert 'id="level-A1"' in body
+    # A data row's formation line reaches its detail card.
+    formed = next(e for e in entries if e.get("formation"))
+    detail = client.get(f"/grammar/{russian.id}/{formed['key']}").get_data(as_text=True)
+    assert "grammar-item__formation" in detail
+
+
+def test_spanish_language_page_renders_its_library(spanish, app_context, client):
+    "The Spanish rule set renders too, golden examples on the cards."
+    entries = _es_entries("en")
+    body = client.get(f"/grammar/{spanish.id}").get_data(as_text=True)
+    _cards_of(body, entries)
+    first = next(e for e in entries if e["examples"])
+    detail = client.get(f"/grammar/{spanish.id}/{first['key']}").get_data(as_text=True)
+    assert first["examples"][0] in detail
 
 
 def test_unknown_language_is_404(client):

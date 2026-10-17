@@ -1,0 +1,5518 @@
+[
+ {
+  "key": "th-proper-names-personal",
+  "name": "คุณ + ชื่อ",
+  "level": "A1",
+  "en": "Khun before a given name; Thais address each other by given name, not surname.",
+  "zh": "คุณ + 名字：尊称，泰国人按名而非姓称呼。",
+  "formation": "คุณ + ชื่อต้น (ไม่ใช้ชื่อสกุล) · kun + chêu",
+  "section": "3.1.1",
+  "topic": "noun-phrase",
+  "examples": []
+ },
+ {
+  "key": "th-proper-names-place",
+  "name": "ประเภทสถานที่ + ชื่อเฉพาะ",
+  "level": "A1",
+  "en": "The type of place comes first and the proper name after it.",
+  "zh": "地点类型词在前、专名在后：จังหวัดนครพนม（那空拍侬府）。",
+  "formation": "คำบอกประเภท + ชื่อเฉพาะ (ยกเว้น จุฬาลงกรณ์มหาวิทยาลัย) · bprà-pâyte sà-tǎan-têe + chêu jà-pór",
+  "section": "3.1.2",
+  "topic": "noun-phrase",
+  "examples": [
+   "จังหวัดนครพนม · jung-wùt na-korn pa-nom — Nakhorn Phanom Province ／ 那空拍侬府",
+   "ภาคอีสาน · pâhk ee-sǎhn — North Eastern Region ／ 东北部地区",
+   "แม่น้ำเจ้าพระยา · mâir náhm jâo pra-yah — Chao Phraya River ／ 昭披耶河（湄南河）"
+  ]
+ },
+ {
+  "key": "th-nouns-invariant",
+  "name": "คำนามรูปเดียว",
+  "level": "A1",
+  "en": "Nouns never inflect: no plural suffix, no gender, no case.",
+  "zh": "名词不标数、不分性、不变格：เพื่อน 可指一个或几个朋友。",
+  "formation": "คำนามรูปเดียว + จำนวน/ลักษณนาม เมื่อต้องระบุพจน์ · kam-nahm rôop die-o",
+  "section": "3.2",
+  "topic": "noun-phrase",
+  "examples": [
+   "ผมไปกับเพื่อน · pǒm bpai gùp pêu-un — I went with a friend/friends. ／ 我和朋友一起去了（一个或几个朋友）",
+   "ผมไปกับเพื่อนสองคน · pǒm bpai gùp pêu-un sǒrng kon — I went with two friends. ／ 我和两个朋友一起去了",
+   "ผมไปกับเพื่อนหลายคน · pǒm bpai gùp pêu-un lǎi kon — I went with several friends. ／ 我和好几个朋友一起去了"
+  ]
+ },
+ {
+  "key": "th-classifier-basics",
+  "name": "คำนาม + ลักษณนาม",
+  "level": "A1",
+  "en": "A classifier is obligatory whenever a noun is counted or pointed at.",
+  "zh": "量词：计数或指称名词时必须加量词。",
+  "formation": "N + จำนวน/指示词 + CLF · kam-nahm + lák-sà-nà-nahm",
+  "section": "3.4",
+  "topic": "noun-phrase",
+  "examples": [
+   "เพื่อนสองคน · pêu-un sǒrng kon — two friends (friends – two – classifier) ／ 两个朋友（名词–数词–量词）",
+   "หมาห้าตัว · mǎh hâh dtoo-a — five dogs (dogs – five – classifier) ／ 五只狗",
+   "หนังสือสิบเล่ม · núng-sěu sìp lêm — ten books (books – ten – classifier) ／ 十本书"
+  ]
+ },
+ {
+  "key": "th-word-order-num-clf",
+  "name": "คำนาม + จำนวน + ลักษณนาม",
+  "level": "A1",
+  "en": "Number then classifier, both after the noun.",
+  "zh": "名词 + 数词 + 量词：หนังสือสองเล่ม（两本书）。",
+  "formation": "N + จำนวน + CLF · kam-nahm + jam-nuan + lák-sà-nà-nahm",
+  "section": "3.5.1",
+  "topic": "noun-phrase",
+  "examples": [
+   "ลูกสามคน · lôok sǎhm kon — three children ／ 三个孩子",
+   "บ้านสี่หลัง · bâhn sèe lǔng — four houses ／ 四栋房子",
+   "หนังสือหกเล่ม · núng-sěu hòk lêm — six books ／ 六本书"
+  ]
+ },
+ {
+  "key": "th-word-order-quant-clf",
+  "name": "คำนาม + คำบอกปริมาณ + ลักษณนาม",
+  "level": "A1",
+  "en": "Quantifiers such as หลาย, บาง, ทุก also take a classifier.",
+  "zh": "名词 + 数量词 + 量词：เพื่อนหลายคน（好几个朋友）。",
+  "formation": "N + ปริมาณ + CLF · kam-nahm + kam-bòrk bpà-ri-mahn",
+  "section": "3.5.2",
+  "topic": "noun-phrase",
+  "examples": [
+   "ฝรั่งบางคน · fa-rùng bahng kon — some ‘farangs’ (Westerners) ／ 某些西方人",
+   "ปลาทุกชนิด · bplah tÓOk cha-nít — every kind of fish ／ 各种鱼",
+   "จดหมายไม่กี่ฉบับ · jòt-mǎi: mâi gèe cha-bùp — not many letters ／ 没几封信"
+  ]
+ },
+ {
+  "key": "th-word-order-dem",
+  "name": "คำนาม + ลักษณนาม + นี้/นั้น",
+  "level": "A1",
+  "en": "Demonstratives follow the classifier, not the noun.",
+  "zh": "名词 + 量词 + 指示词：หนังสือเล่มนี้（这本书）。",
+  "formation": "N + CLF + นี้/นั้น/โน้น · kam-nahm + lák-sà-nà-nahm + née/nán",
+  "section": "3.5.4",
+  "topic": "noun-phrase",
+  "examples": [
+   "หนังสือเล่มนี้ · núng-sěu lêm née — this book ／ 这本书",
+   "เสื้อตัวนั้น · sêu-a dtoo-a nún — that shirt ／ 那件上衣",
+   "บ้านหลังโน้น · bâhn lǔng nóhn — that house over there ／ 那边那栋房子"
+  ]
+ },
+ {
+  "key": "th-word-order-num-clf-dem",
+  "name": "คำนาม + จำนวน + ลักษณนาม + นี้/นั้น",
+  "level": "A1",
+  "en": "Number, classifier, then demonstrative.",
+  "zh": "名词 + 数词 + 量词 + 指示词：หนังสือสองเล่มนี้（这两本书）。",
+  "formation": "N + จำนวน + CLF + DEM · kam-nahm + jam-nuan + lák-sà-nà-nahm + née",
+  "section": "3.5.5",
+  "topic": "noun-phrase",
+  "examples": [
+   "ลูกสามคนนี้ · lôok sǎhm kon née — these three children ／ 这三个孩子",
+   "เสื้อสองตัวนั้น · sêu-a sǒrng dtoo-a nún — those two shirts ／ 那两件上衣"
+  ]
+ },
+ {
+  "key": "th-word-order-adj",
+  "name": "คำนาม + คำคุณศัพท์",
+  "level": "A1",
+  "en": "Adjectives follow the noun; no copula is needed.",
+  "zh": "形容词在名词之后，不用系词：บ้านใหญ่（大房子）。",
+  "formation": "N + ADJ · kam-nahm + kam-kun-ná-sàp",
+  "section": "3.5.6",
+  "topic": "noun-phrase",
+  "examples": [
+   "อาหารเผ็ด · ah-hǎhn pèt — spicy food ／ 辣的食物",
+   "หนังสือเก่า · núng-sěu gào — an old book ／ 旧书",
+   "บ้านใหญ่ · bâhn yài — a big house ／ 大房子"
+  ]
+ },
+ {
+  "key": "th-noun-noun-type",
+  "name": "คำนาม + คำนาม (แสดงชนิด)",
+  "level": "A1",
+  "en": "A second noun narrows the first: น้ำส้ม 'orange juice'.",
+  "zh": "名 + 名：后一名限定前一名（น้ำส้ม 橙汁）。",
+  "formation": "N1 + N2 · kam-nahm + kam-nahm",
+  "section": "3.5.11",
+  "topic": "noun-phrase",
+  "examples": [
+   "ตำรวจผู้สอบสวน · dtum-ròo-ut pôo sòrp sǒo-un — the investigating police officer (policeman – one who – investigate) ／ 负责侦查的警察",
+   "ข้าราชการชั้นผู้ใหญ่ · kâh-râht-cha-gahn chún pôo yài — a high-ranking civil servant (civil servant – rank – senior person) ／ 高级公务员"
+  ]
+ },
+ {
+  "key": "th-possessive-khong",
+  "name": "คำนาม + (ของ) + เจ้าของ",
+  "level": "A1",
+  "en": "Possession is noun + ของ + owner; ของ drops with kin terms.",
+  "zh": "所属：名词 + ของ + 所有者，亲属词可省 ของ。",
+  "formation": "N + (ของ) + เจ้าของ · kam-nahm + (kǒrng) + jâo-kǒrng",
+  "section": "3.5.12",
+  "topic": "noun-phrase",
+  "examples": [
+   "บ้าน(ของ)ฉัน · bâhn (kǒrng) chún — my house ／ 我的家",
+   "ลูก(ของ)เขา · lôok (kǒrng) káo — his child ／ 他的孩子"
+  ],
+  "focus": [
+   "ของ"
+  ],
+  "focus_all": [
+   "ของ"
+  ]
+ },
+ {
+  "key": "th_pronouns",
+  "name": "ผม / ฉัน / คุณ / เขา / เรา",
+  "level": "A1",
+  "en": "Pronouns encode the speaker's gender and the relative status of the two parties.",
+  "zh": "人称代词随性别与地位变化：ผม（男我）/ ฉัน（女我）/ คุณ（您）。",
+  "formation": "สรรพนาม + คำกริยา · pǒm / chǎn / kun / káo / rao",
+  "section": "4.1",
+  "topic": "pronoun",
+  "examples": [
+   "ผมชอบเขา · pǒm chôrp káo — I like him. ／ 我喜欢他",
+   "เขาชอบผม · káo chôrp pǒm — He likes me. ／ 他喜欢我",
+   "เราสามคน · raw sǎhm kon — the three of us ／ 我们三个"
+  ],
+  "focus_all": [
+   "ผม",
+   "ฉัน",
+   "คุณ",
+   "เขา",
+   "เรา",
+   "เธอ"
+  ]
+ },
+ {
+  "key": "th-pronouns-kin",
+  "name": "พ่อ / แม่ / ลูก / พี่ / น้อง",
+  "level": "A1",
+  "en": "Kin terms stand in for I and you inside the family.",
+  "zh": "亲属称谓代人称：พ่อ（父→我）/ ลูก（孩子→你）。",
+  "formation": "คำญาติ + คำกริยา · pôr / mâir / lôok / pêe / nórng",
+  "section": "4.1.2",
+  "topic": "pronoun",
+  "examples": [
+   "พ่อไม่ชอบ · pôr mâi chôrp — I (father speaking) don’t like it. ／ （父亲自称）我不喜欢",
+   "ลูกไปไหน · lôok bpai nǎi? — Where are you (parent addressing child) going? ／ （对孩子说）你要去哪儿？"
+  ]
+ },
+ {
+  "key": "th-possessive-pronoun",
+  "name": "ของ + สรรพนาม",
+  "level": "A1",
+  "en": "ของ + pronoun = mine, yours; the bare pronoun also works.",
+  "zh": "ของ + 代词：我的/你的（ของผม）。",
+  "formation": "ของ + PRON · kǒrng + sàp-pá-nahm",
+  "section": "4.5",
+  "topic": "pronoun",
+  "examples": [
+   "ของฉัน · kǒrng chún — Mine. ／ 我的",
+   "ของคุณสวย · kǒrng kOOn sǒo-ay — Yours is pretty. ／ 你的（那个）很漂亮",
+   "รถนั้นของเขา · rót nún kǒrng káo — That car is his. ／ 那辆车是他的"
+  ]
+ },
+ {
+  "key": "th-demonstrative",
+  "name": "นี้ / นั้น / โน้น",
+  "level": "A1",
+  "en": "นี้ near, นั้น mid-distance, โน้น far; they follow noun or classifier.",
+  "zh": "指示代词：นี้ 这 / นั้น 那 / โน้ม 那（远）。",
+  "formation": "N + (CLF) + นี้/นั้น/โน้น · née / nán / nóhn",
+  "section": "4.6",
+  "topic": "pronoun",
+  "examples": [
+   "นี่ไม่สวย · nêe mâi sǒo-ay — This one isn’t pretty. ／ 这个不好看",
+   "โน่นของใคร · nôhn kǒrng krai? — Whose is that one over there? ／ 那边那个是谁的？",
+   "นี่ยังไง · nêe yung-ngai — Here you are (when giving someone something). ／ 给您（递东西时说）"
+  ],
+  "focus": [
+   "นี้",
+   "นั้น",
+   "โน้น",
+   "นี่",
+   "นั่น",
+   "โน่น"
+  ],
+  "focus_all": [
+   "นี้",
+   "นั้น",
+   "โน้น",
+   "นี่",
+   "นั่น",
+   "โน่น"
+  ]
+ },
+ {
+  "key": "th-interrogative-pronoun",
+  "name": "ใคร / อะไร / ที่ไหน / เมื่อไหร่",
+  "level": "A1",
+  "en": "The wh-word sits where the answer would sit; word order does not invert.",
+  "zh": "疑问代词位置不变，与答案同位置。",
+  "formation": "WH + กริยา · krai / a-rai / têe-nǎi / mêu-a-rài",
+  "section": "4.7",
+  "topic": "pronoun",
+  "examples": [],
+  "focus_all": [
+   "ใคร",
+   "อะไร",
+   "ที่ไหน",
+   "เมื่อไหร่",
+   "ทำไม"
+  ]
+ },
+ {
+  "key": "th-copula-bpen",
+  "name": "เป็น",
+  "level": "A1",
+  "en": "เป็น links a subject to the class it belongs to, or states ability and origin.",
+  "zh": "เป็น：表示“属于某类/是”（เขาเป็นครู 他是老师）。",
+  "formation": "S + เป็น + N/ADJ · bpen",
+  "section": "5.1.1",
+  "topic": "verb",
+  "examples": [
+   "เขาไม่ใช่คนอเมริกัน · káo mâi châi kon a-may-ri-gun — He isn’t American. ／ 他不是美国人",
+   "ไม่ใช่ผม · mâi châi pǒm — It wasn’t me. ／ 不是我",
+   "เขาไม่ได้เป็นเพื่อน · káo mâi dâi bpen pêu-un — He’s not a friend. ／ 他不是朋友"
+  ],
+  "focus_all": [
+   "เป็น"
+  ]
+ },
+ {
+  "key": "th-copula-keu",
+  "name": "คือ",
+  "level": "A1",
+  "en": "คือ equates two noun phrases: 'that is, namely'.",
+  "zh": "คือ：等同、就是（นี่คือ… 这就是……）。",
+  "formation": "A คือ B · keu",
+  "section": "5.1.2",
+  "topic": "verb",
+  "examples": [
+   "สามบวกสี่คือเจ็ด · sǎhm bòo-uk sèe keu: jèt — Three plus four is seven. ／ 三加四等于七",
+   "มีปัญหาสามอย่างคือ . . . · mee bpun-hǎh sǎhm yàhng keu: . . . — There are three problems, namely . . . ／ 有三个问题，即……",
+   "คำเมืองคือภาษาที่คนเชียงใหม่พูด · kum meu-ung keu: pah-sǎh têe kon chee-ung mài pôot — ‘Kham Muang’ is the language people speak in Chiangmai. ／ “Kham Muang”是清迈人说的语言"
+  ],
+  "focus_all": [
+   "คือ"
+  ]
+ },
+ {
+  "key": "th_have",
+  "name": "มี",
+  "level": "A1",
+  "en": "มี = have, own, or 'there is'.",
+  "zh": "มี：有、存在（มีรถ 有车）。",
+  "formation": "S + มี + N · mee",
+  "section": "5.1.3",
+  "topic": "verb",
+  "examples": [
+   "มีนักเรียนสี่ร้อยคน · mee núk ree-un sèe róy kon — There are four hundred pupils. ／ 有四百名学生",
+   "ไม่มีเวลา · mâi mee way-lah — There isn’t time. ／ 没有时间",
+   "คนไทยที่พูดภาษาฝรั่งเศสได้ดีมีน้อย · kon tai têe pôot pah-sǎh fa-rùng-sàyt dâi: dee mee nóy — There are few Thais who can speak French well. ／ 法语说得好的泰国人很少"
+  ],
+  "focus_all": [
+   "มี"
+  ]
+ },
+ {
+  "key": "th-location-yoo",
+  "name": "อยู่",
+  "level": "A1",
+  "en": "อยู่ states where someone or something is.",
+  "zh": "อยู่：在（某处）（เขาอยู่บ้าน 他在家）。",
+  "formation": "S + อยู่ + สถานที่ · yòo",
+  "section": "5.1.4",
+  "topic": "verb",
+  "examples": [
+   "บ้านคุณอยู่ที่ไหน · bâhn kOOn yòo têe nǎi? — Where is your house? ／ 你家在哪儿？",
+   "อยู่ในตู้เย็น · yòo nai dtôo yen — It’s in the fridge. ／ 在冰箱里"
+  ],
+  "focus_all": [
+   "อยู่"
+  ]
+ },
+ {
+  "key": "th-stative-verbs",
+  "name": "คำกริยาแสดงสภาพ",
+  "level": "A1",
+  "en": "Adjectives are verbs in Thai: they take ไม่, แล้ว and ได้ like any verb.",
+  "zh": "形容词即动词：可直接受 ไม่/แล้ว/ได้ 修饰（ไม่ดี 不好）。",
+  "formation": "ADJ ใช้เป็นกริยาได้ · kam-grì-yah sà-dairng sà-pâhp",
+  "section": "5.2",
+  "topic": "verb",
+  "examples": [
+   "บ้านเล็ก · bâhn lék — a small house / The house is small. ／ 小房子／房子小",
+   "เสื้อสวย · sêu-a sǒo-ay — a pretty shirt (top, blouse) / The shirt (top, blouse) is pretty. ／ 漂亮的衣服／衣服漂亮",
+   "อาหารแพง · ah-hǎhn pairng — expensive food / The food is expensive. ／ 贵的东西／饭菜贵"
+  ]
+ },
+ {
+  "key": "th_can",
+  "name": "กริยา + ได้",
+  "level": "A1",
+  "en": "ได้ after the verb marks ability or permission.",
+  "zh": "ได้ 在动词后：能够、可以（ทำได้ 做得到）。",
+  "formation": "V + ได้ · grì-yah + dâi",
+  "section": "5.6.2.1",
+  "topic": "verb",
+  "examples": [
+   "เรากลับมาพรุ่งนี้ได้ · rao glùp mah prÔOng née dâi: — We can come back tomorrow. ／ 我们明天可以回来",
+   "ผมช่วยเขาไม่ได้ · pǒm chôo-ay káo mâi dâi: — I can’t help her. ／ 我帮不了她",
+   "ขอยืมรถคุณได้ไหม · kǒr yeu:m rót kOOn dâi: mái? — Can I borrow your car? ／ 能借一下你的车吗？"
+  ],
+  "focus_all": [
+   "ได้"
+  ]
+ },
+ {
+  "key": "th_want",
+  "name": "อยาก / ต้องการ",
+  "level": "A1",
+  "en": "อยาก + verb 'want to'; ต้องการ 'want, need' takes a noun or a clause.",
+  "zh": "อยาก + 动词 想要做；ต้องการ 需要。",
+  "formation": "อยาก + V · yàhk / dtôrng-gahn",
+  "section": "5.6.5",
+  "topic": "verb",
+  "examples": [
+   "ฉันอยากจะกลับบ้าน · chún yàhk ja glùp bâhn — I’d like to go home. ／ 我想回家",
+   "อยากไปดูหนังไหม · yàhk bpai doo nǔng mai? — Do you want to go and see a film? ／ 想去看电影吗？",
+   "ฉันไม่อยากไปกินตามร้าน · chún mâi yàhk bpai gin dtahm ráhn — I don’t want to go and eat in a restaurant. ／ 我不想下馆子吃"
+  ],
+  "focus_all": [
+   "อยาก",
+   "ต้องการ"
+  ]
+ },
+ {
+  "key": "th_future",
+  "name": "จะ + กริยา",
+  "level": "A1",
+  "en": "จะ before the verb marks future or intention.",
+  "zh": "จะ + 动词：将来、打算（จะไป 要去）。",
+  "formation": "จะ + V · jà + grì-yah",
+  "section": "5.7.1",
+  "topic": "verb",
+  "examples": [
+   "พรุ่งนี้ผมจะไม่มาทำงาน · prÔOng née pǒm ja mâi mah tum ngahn — Tomorrow I’m not coming in to work. ／ 明天我不来上班",
+   "สิ้นปีเราจะกลับไปต่างประเทศ · sîn bpee rao ja glùp bpai dtàhng bpra-tâyt — At the end of the year we’ll go back overseas. ／ 年底我们要回国",
+   "เขาจะจัดงานเลี้ยงเมื่อไร · káo ja jùt ngahn lée-ung mêu-rài? — When will they organise the party? ／ 他们什么时候办宴会？"
+  ],
+  "focus_all": [
+   "จะ"
+  ]
+ },
+ {
+  "key": "th_completive",
+  "name": "กริยา + แล้ว",
+  "level": "A1",
+  "en": "แล้ว marks a completed action or a changed state.",
+  "zh": "แล้ว：完成或状态变化（กินแล้ว 吃过了）。",
+  "formation": "V + แล้ว · grì-yah + láir-o",
+  "section": "5.7.2",
+  "topic": "verb",
+  "examples": [
+   "เขาไปทำงานแล้ว · káo bpai tum ngahn láir-o — He has gone to work. ／ 他去上班了",
+   "เรากินข้าวแล้ว · rao gin kâo: láir-o — We have eaten already. ／ 我们吃过饭了",
+   "รถเมล์มาแล้ว · rót may mah láir-o — The bus has arrived / Here comes the bus. ／ 公交车来了"
+  ],
+  "focus_all": [
+   "แล้ว"
+  ]
+ },
+ {
+  "key": "th_progressive",
+  "name": "กำลัง + กริยา (+ อยู่)",
+  "level": "A1",
+  "en": "กำลัง before and/or อยู่ after the verb marks an ongoing action.",
+  "zh": "กำลัง…(อยู่)：正在……（กำลังอ่าน 正在读）。",
+  "formation": "กำลัง + V (+ อยู่) · gum-lung + grì-yah",
+  "section": "5.7.3",
+  "topic": "verb",
+  "examples": [
+   "ฉันกำลังอ่านหนังสืออยู่ · chún gum-lung àhn núng-sěu yòo — I am/was reading. ／ 我正在看书",
+   "เรากำลังกินข้าว · rao gum-lung gin kâo: — We are/were eating. ／ 我们正在吃饭",
+   "เขาดูทีวีอยู่ · káo doo tee-wee yòo — He is/was watching TV. ／ 他正在看电视"
+  ],
+  "focus_all": [
+   "กำลัง"
+  ]
+ },
+ {
+  "key": "th-comparative-kwa",
+  "name": "A + คำคุณศัพท์ + กว่า + B",
+  "level": "A1",
+  "en": "กว่า after the adjective marks the comparative.",
+  "zh": "A + 形容词 + กว่า + B：比……（ใหญ่กว่า 更大）。",
+  "formation": "A + ADJ + กว่า + B · kà-yaai + gwàh",
+  "section": "6.5.1",
+  "topic": "adjective",
+  "examples": [
+   "ไกลกว่านิดหน่อย · glai gwàh nít-nòy — a little bit further ／ 远一点点",
+   "แพงกว่าสองเท่า · pairng gwàh sǒrng tâo — twice as expensive ／ 贵一倍（两倍价钱）"
+  ],
+  "focus": [
+   "กว่า"
+  ],
+  "focus_all": [
+   "กว่า"
+  ]
+ },
+ {
+  "key": "th-adverb-manner",
+  "name": "กริยา + คำคุณศัพท์",
+  "level": "A1",
+  "en": "An adjective after the verb works as an adverb: พูดช้า 'speak slowly'.",
+  "zh": "形容词直接作状语：พูดช้า（说慢）。",
+  "formation": "V + ADJ · grì-yah + kun-ná-sàp",
+  "section": "7.1.1",
+  "topic": "adverb",
+  "examples": [
+   "เขาเดินช้า · káo dern cháh — He walks slowly. ／ 他走得慢",
+   "คุณพูดชัด · kOOn pôot chút — You speak clearly. ／ 你说得清楚",
+   "คุณขับรถเร็ว · kOOn kùp rót ray-o — You drive quickly. ／ 你开车快"
+  ]
+ },
+ {
+  "key": "th-adverb-time",
+  "name": "คำวิเศษณ์บอกเวลา",
+  "level": "A1",
+  "en": "Time adverbs sit at the start or end of the clause.",
+  "zh": "时间副词放句首或句尾（วันนี้ 今天）。",
+  "formation": "TIME + ประโยค / ประโยค + TIME · kam-wí-sàirn bòrk wela",
+  "section": "7.4",
+  "topic": "adverb",
+  "examples": [
+   "ตอนนี้เขาไม่ว่าง · dtorn née káo mâi wâhng — He is not free at the moment. ／ 他现在没空",
+   "เมื่อก่อนฉันไม่ชอบ · mêu-a gòrn chún mâi chôrp — Before, I did not like it. ／ 以前我不喜欢",
+   "ผมจะไปเยี่ยมวันหลัง · pǒm ja bpai yêe-um wun lǔng — I’ll go to visit her another day. ／ 我改天去拜访"
+  ],
+  "focus": [
+   "วันนี้",
+   "พรุ่งนี้",
+   "เมื่อวาน"
+  ],
+  "focus_all": [
+   "วันนี้",
+   "พรุ่งนี้",
+   "เมื่อวาน"
+  ]
+ },
+ {
+  "key": "th-adverb-frequency",
+  "name": "คำวิเศษณ์บอกความถี่",
+  "level": "A1",
+  "en": "Frequency words (บ่อย, ทุกวัน, ไม่เคย) sit before or after the verb.",
+  "zh": "频率副词：บ่อย 经常 / ทุกวัน 每天 / ไม่เคย 从不。",
+  "formation": "(ไม่) + V + บ่อย / ทุกวัน · kam-wí-sàirn bòrk kwam-têe",
+  "section": "7.5",
+  "topic": "adverb",
+  "examples": [
+   "เราไปเที่ยวเมืองไทยบ่อย ๆ · rao bpai têe-o meu-ung tai bòy bòy — We visit Thailand often. ／ 我们常去泰国玩",
+   "เขาทำอาหารเผ็ดเสมอ · káo tum ah-hǎhn pèt sa-měr — She always makes spicy food. ／ 她总是做辣菜",
+   "ฉันไปดูหนังเป็นระยะ ๆ · chún bpai doo nǔng bpen ra-yá ra-yá — I go to the cinema occasionally. ／ 我偶尔去看电影"
+  ],
+  "focus": [
+   "บ่อย",
+   "ทุกวัน",
+   "ไม่เคย"
+  ],
+  "focus_all": [
+   "บ่อย",
+   "ทุกวัน",
+   "ไม่เคย"
+  ]
+ },
+ {
+  "key": "th-location-tee-yoo",
+  "name": "ที่ / อยู่",
+  "level": "A1",
+  "en": "ที่ names the place, อยู่ states presence there.",
+  "zh": "ที่ 处所名词 / อยู่ 位于：อยู่ที่บ้าน（在家）。",
+  "formation": "อยู่ + ที่ + สถานที่ · têe / yòo",
+  "section": "8.1",
+  "topic": "preposition",
+  "examples": [
+   "อยู่ที่นี่ · yòo têe nêe — Here it is / It’s here. ／ 在这儿",
+   "บ้านอยู่ที่โน่น · bâhn yòo têe nôhn — The house is over there. ／ 房子在那边",
+   "ฉันอยู่เมืองไทยนาน · chún yòo meu-ung tai nahn — I have lived in Thailand a long time. ／ 我在泰国住很久了"
+  ],
+  "focus_all": [
+   "ที่",
+   "อยู่"
+  ]
+ },
+ {
+  "key": "th-prep-thang",
+  "name": "ทาง + ซ้าย/ขวา",
+  "level": "A1",
+  "en": "ทาง 'side' with ซ้าย/ขวา: ทางซ้าย 'on the left'.",
+  "zh": "ทาง + ซ้าย/ขวา：左边/右边。",
+  "formation": "ทาง + ซ้าย/ขวา · tahng + sáai/kwǎh",
+  "section": "8.1.3",
+  "topic": "preposition",
+  "examples": [
+   "อยู่ทางขวา · yòo tahng kwǎh — It’s on the right. ／ 在右边",
+   "อยู่ทางซ้ายมือ · yòo tahng sái: meu: — It’s on the left-hand side. ／ 在左手边"
+  ],
+  "focus": [
+   "ทาง",
+   "ซ้าย",
+   "ขวา"
+  ],
+  "focus_all": [
+   "ทาง",
+   "ซ้าย",
+   "ขวา"
+  ]
+ },
+ {
+  "key": "th-prep-gup-duai",
+  "name": "กับ / ด้วย",
+  "level": "A1",
+  "en": "กับ 'with (a person)', ด้วย 'with (a tool), also'.",
+  "zh": "กับ 和（人）/ ด้วย 用（工具）、也。",
+  "formation": "V + กับ/ด้วย + N · gùp / dûai",
+  "section": "8.5",
+  "topic": "preposition",
+  "examples": [
+   "ฉันไปกับเพื่อน · chún bpai gùp pêu-un — I went with a friend. ／ 我和朋友一起去了",
+   "เขาเคยมาเมืองไทยด้วยทุน AFS · káo ker-ee mah meu-ung tai dôo-ay tOOn AFS — He’s been to Thailand with/on an AFS scholarship. ／ 他曾拿 AFS 奖学金来过泰国",
+   "เธอใช้ไม้ตีผัว · ter chái mái: dtee pǒo-a — She hit her husband with a stick. ／ 她用棍子打丈夫"
+  ],
+  "focus": [
+   "กับ"
+  ],
+  "focus_all": [
+   "กับ",
+   "ด้วย"
+  ]
+ },
+ {
+  "key": "th-prep-jak",
+  "name": "จาก",
+  "level": "A1",
+  "en": "จาก 'from' marks source, origin or cause.",
+  "zh": "จาก：从、来自。",
+  "formation": "V + จาก + N · jàhk",
+  "section": "8.6",
+  "topic": "preposition",
+  "examples": [
+   "เขามาจากเชียงใหม่ · káo mah jàhk chee-ung mài — He comes from Chiangmai. ／ 他从清迈来",
+   "ฉันได้จดหมายจากแม่ · chún dâi jòt-mǎi: jàhk mâir — I got a letter from my mother. ／ 我收到妈妈的信",
+   "เรานั่งรถเมล์จากหัวหินไปกรุงเทพ ฯ · rao nûng rót may jàhk hǒo-a hǐn bpai grOOng-tâyp — We went from Hua Hin to Bangkok by bus. ／ 我们从华欣坐大巴去曼谷"
+  ],
+  "focus": [
+   "จาก"
+  ],
+  "focus_all": [
+   "จาก"
+  ]
+ },
+ {
+  "key": "th_because",
+  "name": "เพราะ / เพราะว่า",
+  "level": "A1",
+  "en": "เพราะ(ว่า) 'because'; เพราะฉะนั้น/ดังนั้น 'therefore'.",
+  "zh": "เพราะ(ว่า) 因为；ดังนั้น 所以。",
+  "formation": "เพราะ(ว่า) + CLAUSE · prór / prór wâh",
+  "section": "9.2.2",
+  "topic": "clause",
+  "examples": [
+   "การที่ผมไม่ได้บอกเขาตรงไปตรงมาก็เพราะว่าผมกลัว · gahn têe pǒm mâi dâi bòrk káo dtrong bpai dtrong mah gôr prór wâh pǒm gloo-a — The fact that I didn’t tell him frankly was because I was scared. ／ 我没直接告诉他，是因为我害怕",
+   "การที่คนขับรถวิ่งหนีก็คงเพราะว่าเขาเมา · gahn têe kon kùp rót wîng něe gôr kong prór wâh káo mao — The fact that the driver ran away was probably because he was drunk. ／ 司机逃跑，大概是因为喝醉了",
+   "ที่ผมพูดอย่างนั้นก็เพราะว่าโกรธ · têe pǒm pôot yàhng nún gôr prór wâh gròht — The fact that I spoke like that was because I was angry. ／ 我那样说是因为生气"
+  ],
+  "focus_all": [
+   "เพราะ",
+   "เพราะว่า",
+   "เพราะฉะนั้น",
+   "ดังนั้น"
+  ]
+ },
+ {
+  "key": "th-imperative",
+  "name": "กริยา + (คำลงท้าย)",
+  "level": "A1",
+  "en": "Bare verb is the imperative; particles soften or harden it.",
+  "zh": "祈使：光杆动词即可；靠句尾语气词调节语气。",
+  "formation": "V + (สิ/หน่อย/ครับ) · grì-yah + kam-long-táai",
+  "section": "9.4",
+  "topic": "clause",
+  "examples": [
+   "จงตอบคำถาม · jong dtòrp kum tǎhm — Answer the (following) questions. ／ 请回答下列问题"
+  ],
+  "focus": [
+   "สิ",
+   "หน่อย"
+  ],
+  "focus_all": [
+   "สิ",
+   "หน่อย"
+  ]
+ },
+ {
+  "key": "th-question-particle",
+  "name": "ไหม / หรือ / เปล่า",
+  "level": "A1",
+  "en": "Sentence-final particles turn a statement into a yes/no question.",
+  "zh": "疑问语气词：ไหม / หรือ / เปล่า 放句尾构成一般疑问句。",
+  "formation": "CLAUSE + ไหม/หรือ/เปล่า · mái / rěu / bplào",
+  "section": "10.1",
+  "topic": "particle",
+  "examples": [],
+  "focus_all": [
+   "ไหม",
+   "หรือ",
+   "เปล่า"
+  ]
+ },
+ {
+  "key": "th_polite",
+  "name": "ครับ / ค่ะ / คะ",
+  "level": "A1",
+  "en": "ครับ for a male speaker, ค่ะ in statements and คะ in questions for a female speaker.",
+  "zh": "礼貌词：ครับ（男）/ ค่ะ（女，陈述）/ คะ（女，提问）。",
+  "formation": "CLAUSE + ครับ/ค่ะ/คะ · krúp / kâ / ká",
+  "section": "10.2",
+  "topic": "particle",
+  "examples": [
+   "ไปไหนครับ · bpai nǎi krúp? — Where are you going? (male asking) ／ 您去哪儿？（男性问）",
+   "อร่อยไหมคะ · a-ròy mái ká? — Is it tasty? (female asking) ／ 好吃吗？（女性问）",
+   "คุณแม่ขา · kOOn mâir kǎh? — Mummy? (daughter speaking) ／ 妈妈？（女儿呼唤）"
+  ],
+  "focus_all": [
+   "ครับ",
+   "ค่ะ",
+   "คะ"
+  ]
+ },
+ {
+  "key": "th-particle-krup",
+  "name": "ครับ",
+  "level": "A1",
+  "en": "ครับ closes a male speaker's statement, answer or request.",
+  "zh": "ครับ：男性句尾礼貌词。",
+  "formation": "CLAUSE + ครับ · krúp",
+  "section": "10.2.1",
+  "topic": "particle",
+  "examples": [],
+  "focus_all": [
+   "ครับ"
+  ]
+ },
+ {
+  "key": "th-particle-kha-q",
+  "name": "คะ",
+  "level": "A1",
+  "en": "คะ closes a female speaker's question.",
+  "zh": "คะ：女性疑问句尾。",
+  "formation": "CLAUSE + คะ · ká",
+  "section": "10.2.3",
+  "topic": "particle",
+  "examples": [],
+  "focus_all": [
+   "คะ"
+  ]
+ },
+ {
+  "key": "th-particle-kha",
+  "name": "ค่ะ",
+  "level": "A1",
+  "en": "ค่ะ closes a female speaker's statement.",
+  "zh": "ค่ะ：女性陈述句尾。",
+  "formation": "CLAUSE + ค่ะ · kâ",
+  "section": "10.2.4",
+  "topic": "particle",
+  "examples": [],
+  "focus_all": [
+   "ค่ะ"
+  ]
+ },
+ {
+  "key": "th-particle-na",
+  "name": "นะ",
+  "level": "A1",
+  "en": "นะ softens a statement into a friendly reminder or suggestion.",
+  "zh": "นะ：柔化语气，提醒、建议。",
+  "formation": "CLAUSE + นะ · ná",
+  "section": "10.3.4",
+  "topic": "particle",
+  "examples": [
+   "ไปละนะ · bpai lá ná — I’m going now, OK? ／ 我走了哦",
+   "ฉันไม่ว่านะ · chún mâi wâh ná — I don’t mind, OK? ／ 我不介意哦",
+   "อย่าบอกเธอนะ · yàh bòrk ter ná — Don’t tell her, OK? ／ 别告诉她哦"
+  ],
+  "focus_all": [
+   "นะ"
+  ]
+ },
+ {
+  "key": "th-particle-noi",
+  "name": "หน่อย",
+  "level": "A1",
+  "en": "หน่อย 'a little', used to soften requests and imperatives.",
+  "zh": "หน่อย：请……一下（缓和请求）。",
+  "formation": "V + หน่อย · nòy",
+  "section": "10.3.6",
+  "topic": "particle",
+  "examples": [
+   "พูดช้า ๆ หน่อยได้ไหม · pôot cháh cháh nòy dâi mái? — Could you speak slowly, please? ／ 能说慢一点吗？",
+   "ขอดูหน่อย · kǒr doo nòy — Could I have a look, please? ／ 请让我看一下",
+   "ช่วยปิดทีวีหน่อย · chôo-ay bpìt tee wee nòy — Please turn the TV off. ／ 请把电视关掉"
+  ],
+  "focus_all": [
+   "หน่อย"
+  ]
+ },
+ {
+  "key": "th_negation",
+  "name": "ไม่ + กริยา/คำคุณศัพท์",
+  "level": "A1",
+  "en": "ไม่ before a verb or adjective negates it.",
+  "zh": "ไม่ 放在动词/形容词前表示否定。",
+  "formation": "ไม่ + V/ADJ · mâi + grì-yah",
+  "section": "11.1",
+  "topic": "negation",
+  "examples": [
+   "ฉันไม่ไป · chún mâi bpai — I’m not going. ／ 我不去",
+   "อาหารไม่อร่อย · ah-hǎhn mâi a-ròy — The food isn’t tasty. ／ 饭菜不好吃",
+   "ผมไม่เปลี่ยนแปลง · pǒm mâi bplèe-un bplairng — I’m not changing. ／ 我不改变"
+  ],
+  "focus_all": [
+   "ไม่"
+  ]
+ },
+ {
+  "key": "th-mai-chai",
+  "name": "ไม่ใช่ + คำนาม",
+  "level": "A1",
+  "en": "ไม่ใช่ negates a noun: 'is not (that thing)'.",
+  "zh": "ไม่ใช่ + 名词：不是……。",
+  "formation": "ไม่ใช่ + N · mâi châi + kam-nahm",
+  "section": "11.5",
+  "topic": "negation",
+  "examples": [
+   "นี่ไม่ใช่บ้านเขา · nêe mâi châi bâhn káo — This isn’t his house. ／ 这不是他家",
+   "ฉันเป็นครูไม่ใช่หมอ · chún bpen kroo mâi châi mǒr — I’m a teacher, not a doctor. ／ 我是老师，不是医生",
+   "เขาไม่ใช่เพื่อน · káo mâi châi pêu-un — He’s not a friend. ／ 他不是朋友"
+  ],
+  "focus": [
+   "ไม่ใช่"
+  ],
+  "focus_all": [
+   "ไม่ใช่"
+  ]
+ },
+ {
+  "key": "th-mai-mee",
+  "name": "ไม่มี",
+  "level": "A1",
+  "en": "ไม่มี negates มี: 'there is no, do not have'.",
+  "zh": "ไม่มี：没有。",
+  "formation": "ไม่มี + N · mâi mee",
+  "section": "11.6",
+  "topic": "negation",
+  "examples": [
+   "ไม่มีรถเมล์ · mâi mee rót may — There aren’t any buses. ／ 没有公交车",
+   "ไม่มีเพื่อนมาเยี่ยมฉัน · mâi mee pêu-un mah yêe-um chún — No friends came to visit me. ／ 没有朋友来看我",
+   "ไม่มีใครรู้ · mâi mee krai róo — No one knows. ／ 没人知道"
+  ],
+  "focus": [
+   "ไม่มี"
+  ],
+  "focus_all": [
+   "ไม่มี"
+  ]
+ },
+ {
+  "key": "th-negative-imperative",
+  "name": "อย่า + กริยา",
+  "level": "A1",
+  "en": "อย่า 'don't' before the verb forbids an action.",
+  "zh": "อย่า + 动词：别、不要。",
+  "formation": "อย่า + V · yàh + grì-yah",
+  "section": "11.8",
+  "topic": "negation",
+  "examples": [
+   "อย่าเพิ่งปิดแอร์นะ · yàh pêrng bpìt air ná — Don’t turn the air-conditioning off just yet, OK? ／ 先别关空调哦",
+   "อย่าเพิ่งบอกเขานะ · yàh pêrng bòrk káo ná — Don’t tell him just yet, OK? ／ 先别告诉他哦",
+   "อย่าเพิ่ง · yàh pêrng — Not now! ／ 先别（急着）"
+  ],
+  "focus": [
+   "อย่า"
+  ],
+  "focus_all": [
+   "อย่า"
+  ]
+ },
+ {
+  "key": "th-saying-no",
+  "name": "ไม่ใช่ / ไม่มี / ไม่ได้ / ไม่เป็นไร",
+  "level": "A1",
+  "en": "Four ways to refuse: ไม่ใช่ 'not that', ไม่มี 'don't have', ไม่ได้ 'can't', ไม่เป็นไร 'never mind'.",
+  "zh": "四种“不”：ไม่ใช่ 不是 / ไม่มี 没有 / ไม่ได้ 不行 / ไม่เป็นไร 没关系。",
+  "formation": "ไม่ใช่/ไม่มี/ไม่ได้/ไม่เป็นไร · mâi châi / mâi mee",
+  "section": "11.12",
+  "topic": "negation",
+  "examples": [
+   "น่าเบื่อมากไหม · nâh bèu-a mâhk mái? — Was it very boring? ／ 很无聊吗？"
+  ],
+  "focus": [
+   "ไม่เป็นไร"
+  ],
+  "focus_all": [
+   "ไม่เป็นไร"
+  ]
+ },
+ {
+  "key": "th-yesno-basics",
+  "name": "ประโยคคำถามแบบใช่/ไม่ใช่",
+  "level": "A1",
+  "en": "Yes/no questions keep the statement order and add a final particle.",
+  "zh": "一般疑问句：语序不变，句尾加语气词。",
+  "formation": "CLAUSE + ไหม/หรือ/เปล่า · bprà-yohk kam-tǎam",
+  "section": "12.1",
+  "topic": "question",
+  "examples": [
+   "อาหารญี่ปุ่นแพง อาหารญี่ปุ่นแพงไหม · ah-hǎhn yêe-bpÒOn pairng ah-hǎhn yêe-bpÒOn pairng mái? — Japanese food is expensive. Is Japanese food expensive? ／ 日本菜很贵。日本菜贵吗？",
+   "เขาเป็นเพื่อน เขาเป็นเพื่อนใช่ไหม · káo bpen pêu-un káo bpen pêu-un châi mái? — He’s a friend. He’s a friend, isn’t he? ／ 他是朋友。他是朋友吧？"
+  ],
+  "focus_all": [
+   "ไหม"
+  ]
+ },
+ {
+  "key": "th_yesno",
+  "name": "... ไหม / มั้ย",
+  "level": "A1",
+  "en": "ไหม (มั้ย colloquial) is the neutral yes/no question particle.",
+  "zh": "ไหม/มั้ย：最常用的一般疑问句尾。",
+  "formation": "CLAUSE + ไหม/มั้ย · mái / mái",
+  "section": "12.1.1",
+  "topic": "question",
+  "examples": [
+   "อยากไปดูหนังไหม · yàhk bpai doo nǔng mái? — Would you like to go and see a film? ／ 想去看电影吗？"
+  ]
+ },
+ {
+  "key": "th-question-reu",
+  "name": "... หรือ",
+  "level": "A1",
+  "en": "หรือ asks a yes/no question with a hint of surprise or doubt.",
+  "zh": "หรือ：带惊讶、确认意味的疑问。",
+  "formation": "CLAUSE + หรือ · rěu",
+  "section": "12.1.2",
+  "topic": "question",
+  "examples": [
+   "เขาชอบหรือ · káo chôrp lěr? — He likes it, does he? ／ 他喜欢？（带确认口气）"
+  ],
+  "focus_all": [
+   "หรือ"
+  ]
+ },
+ {
+  "key": "th-question-chai-mai",
+  "name": "... ใช่ไหม",
+  "level": "A1",
+  "en": "ใช่ไหม 'right?' seeks agreement with an assumption.",
+  "zh": "ใช่ไหม：对吧？（寻求认同）。",
+  "formation": "CLAUSE + ใช่ไหม · châi mái",
+  "section": "12.1.3",
+  "topic": "question",
+  "examples": [
+   "แม่เป็นคนไทยใช่ไหม · mâir bpen kon tai châi mái? — Your mother is Thai, isn’t she? ／ 你妈妈是泰国人吧？"
+  ],
+  "focus": [
+   "ใช่ไหม"
+  ],
+  "focus_all": [
+   "ใช่ไหม"
+  ]
+ },
+ {
+  "key": "th-question-reu-plao",
+  "name": "... หรือเปล่า",
+  "level": "A1",
+  "en": "หรือเปล่า 'or not?' — a slightly more insistent yes/no question.",
+  "zh": "หรือเปล่า：……还是不是？（更追问）。",
+  "formation": "CLAUSE + หรือเปล่า · rěu bplào",
+  "section": "12.1.5",
+  "topic": "question",
+  "examples": [
+   "คุณจะไปหรือเปล่า · kOOn ja bpai réu bplào:? — Are you going or not? ／ 你去不去？",
+   "เขาเบื่อหรือเปล่า · káo bèu-a réu bplào:? — Is he bored or not? ／ 他厌烦了吗？",
+   "คุณบอกเขาหรือเปล่า · kOOn bòrk káo réu bplào:? — Did you tell him (or not)? ／ 你告诉他了吗？"
+  ]
+ },
+ {
+  "key": "th-q-who",
+  "name": "ใคร",
+  "level": "A1",
+  "en": "ใคร 'who' sits in the position of the answer.",
+  "zh": "ใคร：谁（位置同答案）。",
+  "formation": "ใคร + V / V + ใคร · krai",
+  "section": "12.2.1",
+  "topic": "question",
+  "examples": [
+   "คุณไปกับใคร · kOOn bpai gùp krai? — Who are you going with? ／ 你和谁一起去？",
+   "ใครสอน · krai sǒrn? — Who taught you? ／ 谁教的？"
+  ],
+  "focus_all": [
+   "ใคร"
+  ]
+ },
+ {
+  "key": "th-q-whose",
+  "name": "ของใคร",
+  "level": "A1",
+  "en": "ของใคร 'whose'.",
+  "zh": "ของใคร：谁的。",
+  "formation": "N + ของใคร · kǒrng krai",
+  "section": "12.2.2",
+  "topic": "question",
+  "examples": [
+   "บ้าน(ของ)ใคร · bâhn (kǒrng) krai? — Whose house? ／ 谁的家？",
+   "นี่ของใคร · nêe kǒrng krai? — Whose is this? ／ 这是谁的？"
+  ],
+  "focus": [
+   "ของใคร"
+  ],
+  "focus_all": [
+   "ของใคร"
+  ]
+ },
+ {
+  "key": "th-q-what",
+  "name": "อะไร",
+  "level": "A1",
+  "en": "อะไร 'what', normally clause-final.",
+  "zh": "อะไร：什么（多在句尾）。",
+  "formation": "V + อะไร · a-rai",
+  "section": "12.2.3",
+  "topic": "question",
+  "examples": [
+   "เขาชื่ออะไร · káo chêu a-rai? — What’s her name? ／ 她叫什么名字？",
+   "คุณทำอะไรอยู่ · kOOn tum a-rai yòo? — What are you doing? ／ 你在做什么？",
+   "คุณซื้ออะไรมา · kOOn séu: a-rai mah? — What did you buy? ／ 你买了什么？"
+  ],
+  "focus_all": [
+   "อะไร"
+  ]
+ },
+ {
+  "key": "th-q-which",
+  "name": "ไหน / อันไหน",
+  "level": "A1",
+  "en": "ไหน / อันไหน 'which (one)'.",
+  "zh": "ไหน / อันไหน：哪个。",
+  "formation": "N + ไหน / อันไหน · nǎi / an nǎi",
+  "section": "12.2.4",
+  "topic": "question",
+  "examples": [
+   "เอาหนังสือเล่มไหน · ao núng-sěu lêm nǎi? — Which book do you want? ／ 要哪本书？",
+   "คุณคุยกับคนไหน · kOOn koo-ee gùp kon nǎi? — Which person did you chat with? ／ 你和哪个人聊？",
+   "เขากลับวันไหน · káo glùp wun nǎi? — Which day is he returning? ／ 他哪天回来？"
+  ],
+  "focus": [
+   "อันไหน"
+  ],
+  "focus_all": [
+   "ไหน",
+   "อันไหน"
+  ]
+ },
+ {
+  "key": "th-q-where",
+  "name": "ที่ไหน",
+  "level": "A1",
+  "en": "ที่ไหน 'where'.",
+  "zh": "ที่ไหน：哪里。",
+  "formation": "V + ที่ไหน · têe nǎi",
+  "section": "12.2.5",
+  "topic": "question",
+  "examples": [
+   "คุณพักอยู่ที่ไหน · kOOn púk yòo têe nǎi? — Where are you staying? ／ 你住在哪儿？",
+   "เขาเกิดที่ไหน · káo gèrt têe nǎi? — Where was he born? ／ 他在哪儿出生？",
+   "ไปไหน · bpai nǎi? — Where are you going? ／ 去哪儿？"
+  ],
+  "focus_all": [
+   "ที่ไหน"
+  ]
+ },
+ {
+  "key": "th-q-when",
+  "name": "เมื่อไหร่",
+  "level": "A1",
+  "en": "เมื่อไหร่ 'when'.",
+  "zh": "เมื่อไหร่：什么时候。",
+  "formation": "V + เมื่อไหร่ · mêu-a rài",
+  "section": "12.2.6",
+  "topic": "question",
+  "examples": [
+   "คุณกลับเมื่อไร · kOOn glùp mêu-rài? — When are you returning? ／ 你什么时候回来？",
+   "คุณจะบอกเขาเมื่อไร · kOOn ja bòrk káo mêu-rài? — When are you going to tell him? ／ 你什么时候告诉他？",
+   "เมื่อไรคุณจะบอกเขา · mêu-rài kOOn ja bòrk káo? — When are you going to tell her? ／ 你什么时候告诉她？"
+  ],
+  "focus_all": [
+   "เมื่อไหร่",
+   "เมื่อไร"
+  ]
+ },
+ {
+  "key": "th-q-why",
+  "name": "ทำไม",
+  "level": "A1",
+  "en": "ทำไม 'why'; the answer takes เพราะ.",
+  "zh": "ทำไม：为什么（答句用 เพราะ）。",
+  "formation": "ทำไม + CLAUSE · tum-mai",
+  "section": "12.2.7",
+  "topic": "question",
+  "examples": [
+   "ทำไมถึงซื้อ · tum-mai těung séu:? — Why did you buy it? ／ 为什么买？",
+   "ทำไมเขาถึงไม่กิน · tum-mai káo těung mâi gin? — Why didn’t he eat it? ／ 他为什么不吃？",
+   "บอกทำไม · bòrk tum-mai? — Why did you tell her? ／ 为什么告诉她？"
+  ],
+  "focus_all": [
+   "ทำไม"
+  ]
+ },
+ {
+  "key": "th-q-how-manner",
+  "name": "อย่างไร",
+  "level": "A1",
+  "en": "อย่างไร 'how, in what way' (ไง colloquial).",
+  "zh": "อย่างไร：怎样、如何（口语 ไง）。",
+  "formation": "V + อย่างไร · yàhng-rai",
+  "section": "12.2.8",
+  "topic": "question",
+  "examples": [
+   "กินอย่างไร · gin yung-ngai? — How do you eat it? ／ 怎么吃？",
+   "เขียนอย่างไร · kěe-un yung-ngai? — How do you write it? ／ 怎么写？",
+   "เป็นอย่างไร · bpen ngai? — How are things? ／ 怎么样？"
+  ],
+  "focus": [
+   "อย่างไร"
+  ],
+  "focus_all": [
+   "อย่างไร"
+  ]
+ },
+ {
+  "key": "th-q-how-much",
+  "name": "เท่าไหร่",
+  "level": "A1",
+  "en": "เท่าไหร่ 'how much' (price, amount).",
+  "zh": "เท่าไหร่：多少（价格、数量）。",
+  "formation": "N + เท่าไหร่ · tâo rài",
+  "section": "12.2.10",
+  "topic": "question",
+  "examples": [
+   "นี่เท่าไหร่ · nêe tâo-rài? — How much is this? ／ 这个多少钱？",
+   "คุณซื้อเท่าไหร่ · kOOn séu: tâo-rài? — How much did you buy it for? ／ 你多少钱买的？",
+   "เขาขายบ้านเท่าไหร่ · káo kǎi: bâhn tâo-rài? — How much did they sell the house for? ／ 他们的房子卖了多少钱？"
+  ],
+  "focus_all": [
+   "เท่าไหร่"
+  ]
+ },
+ {
+  "key": "th-q-how-many",
+  "name": "กี่ + ลักษณนาม",
+  "level": "A1",
+  "en": "กี่ + classifier 'how many'.",
+  "zh": "กี่ + 量词：多少个。",
+  "formation": "กี่ + CLF · gèe",
+  "section": "12.2.11",
+  "topic": "question",
+  "examples": [
+   "เอากาแฟกี่ถ้วย · ao gah-fair gèe tôo-ay? — How many cups of coffee do you want? ／ 要几杯咖啡？",
+   "มีลูกกี่คน · mee lôok gèe kon? — How many children do you have? ／ 有几个孩子？",
+   "ไปกี่วัน · bpai gèe wun? — How many days are you going for? ／ 去几天？"
+  ],
+  "focus_all": [
+   "กี่"
+  ]
+ },
+ {
+  "key": "th-cardinal-numbers",
+  "name": "เลขจำนวนนับ",
+  "level": "A1",
+  "en": "Cardinals 1-10: หนึ่ง สอง สาม สี่ ห้า หก เจ็ด แปด เก้า สิบ.",
+  "zh": "基数词：หนึ่ง 1 … สิบ 10；十一 = สิบเอ็ด。",
+  "formation": "จำนวน + CLF · náyk jam-nuan náp",
+  "section": "13.1",
+  "topic": "quantity",
+  "examples": [
+   "432,925 สี่แสนสามหมื่นสองพันเก้าร้อยยี่สิบห้า · sèe sǎirn sǎhm mèu:n sǒrng pun gâo: róy yêe-sìp hâh — When a cardinal number occurs with a noun, the appropriate classifier must also be used (3.5.1, 3.5.5, 3.5.8). ／ 四十三万二千九百二十五"
+  ]
+ },
+ {
+  "key": "th-ordinal-thi",
+  "name": "ที่ + จำนวน",
+  "level": "A1",
+  "en": "Ordinals: ที่ + number, or classifier + ที่ + number.",
+  "zh": "序数：ที่ + 数词（ที่หนึ่ง 第一）。",
+  "formation": "ที่ + จำนวน · têe + jam-nuan",
+  "section": "13.3",
+  "topic": "quantity",
+  "examples": [
+   "รางวัลที่หนึ่ง · rahng-wun têe nèung — the first (top) prize ／ 一等奖",
+   "รางวัล(ครั้ง)แรก · rahng-wun (krúng) râirk — the inaugural prize ／ 首届奖",
+   "ทีแรกฉันไม่ชอบเขา · tee râirk chún mâi chôrp káo — At first I didn’t like him. ／ 起初我不喜欢他"
+  ],
+  "focus": [
+   "ที่หนึ่ง",
+   "ที่สอง",
+   "ที่สาม"
+  ],
+  "focus_all": [
+   "ที่หนึ่ง",
+   "ที่สอง",
+   "ที่สาม"
+  ]
+ },
+ {
+  "key": "th-quantifiers",
+  "name": "ทุก / บาง / หลาย / มาก",
+  "level": "A1",
+  "en": "Quantifiers: ทุก 'every', บาง 'some', หลาย 'several', มาก 'much'.",
+  "zh": "量词：ทุก 每 / บาง 某些 / หลาย 许多 / มาก 多。",
+  "formation": "QUANT + (CLF) + N · túk / bahng / lǎi",
+  "section": "13.12",
+  "topic": "quantity",
+  "examples": [
+   "งานแต่ละชิ้น · ah-hǎhn dtàir la chín — each piece of work ／ 每一项工作",
+   "ช่วงเวลาหลายเดือน · chôo-ung way-lah lǎi: deu-un — a period of several/many months ／ 好几个月的时间",
+   "อาหารบางอย่าง · ah-hǎhn bahng yàhng — some kinds of food ／ 某些种类的食物"
+  ],
+  "focus": [
+   "ทุก",
+   "บาง",
+   "หลาย",
+   "มาก"
+  ],
+  "focus_all": [
+   "ทุก",
+   "บาง",
+   "หลาย",
+   "มาก"
+  ]
+ },
+ {
+  "key": "th-days",
+  "name": "วัน + ชื่อวัน",
+  "level": "A1",
+  "en": "Days of the week are วัน + planet name: วันจันทร์ Monday.",
+  "zh": "星期：วัน + 星球名（วันจันทร์ 周一）。",
+  "formation": "วัน + จันทร์/อังคาร/พุธ… · wan + chêu wan",
+  "section": "14.1",
+  "topic": "time",
+  "examples": [
+   "เราจะกลับมาวันพุธ · rao ja glùp mah wun pÓOt — We’ll be back on Wednesday. ／ 我们星期三回来",
+   "วันเสาร์(วัน)อาทิตย์ไปเที่ยวที่ไหนบ้าง · wun sǎo (wun) ah-tít bpai têe-o têe nǎi bâhng? — Where did you go at the weekend? ／ 周末去了哪些地方玩？"
+  ],
+  "focus": [
+   "วันจันทร์",
+   "วันอังคาร",
+   "วันพุธ",
+   "วันพฤหัสบดี",
+   "วันศุกร์",
+   "วันเสาร์",
+   "วันอาทิตย์"
+  ],
+  "focus_all": [
+   "วันจันทร์",
+   "วันอังคาร",
+   "วันพุธ",
+   "วันพฤหัสบดี",
+   "วันศุกร์",
+   "วันเสาร์",
+   "วันอาทิตย์"
+  ]
+ },
+ {
+  "key": "th-parts-of-day",
+  "name": "ตอนเช้า / ตอนบ่าย / ตอนเย็น",
+  "level": "A1",
+  "en": "Parts of the day: เช้า morning, สาย late morning, บ่าย afternoon, เย็น evening, ค่ำ/กลางคืน night.",
+  "zh": "一天中的时段：เช้า 早 / สาย 上午晚些 / บ่าย 下午 / เย็น 傍晚 / กลางคืน 夜里。",
+  "formation": "ตอน + ช่วงเวลา · dton cháo",
+  "section": "14.2",
+  "topic": "time",
+  "examples": [
+   "เรานัดพบกันตอนเย็น · rao nút póp gun dtorn yen — We’ve arranged to meet in the evening. ／ 我们约在傍晚见",
+   "ตอนบ่ายฉันไม่ว่าง · dtorn bài: chún mâi wâhng — I’m not free in the afternoon. ／ 我下午没空",
+   "ไปเช้ากลับเย็น · bpai cháo: glùp yen — We’ll go in the morning and return in the evening. ／ 早上去，晚上回"
+  ],
+  "focus": [
+   "ตอนเช้า",
+   "ตอนบ่าย",
+   "ตอนเย็น",
+   "กลางคืน"
+  ],
+  "focus_all": [
+   "ตอนเช้า",
+   "ตอนบ่าย",
+   "ตอนเย็น",
+   "กลางคืน"
+  ]
+ },
+ {
+  "key": "th-months",
+  "name": "เดือน + ชื่อเดือน",
+  "level": "A1",
+  "en": "Months are เดือน + the zodiac name: เดือนมกราคม January.",
+  "zh": "月份：เดือน + 星座名（เดือนมกราคม 一月）。",
+  "formation": "เดือน + ชื่อเดือน · deuan + chêu deuan",
+  "section": "14.3",
+  "topic": "time",
+  "examples": [
+   "เขาไปเดือนสิงหาฯ · káo bpai deu-un sǐng-hǎh — He’s going in August. ／ 他八月去"
+  ],
+  "focus": [
+   "เดือน"
+  ],
+  "focus_all": [
+   "เดือน"
+  ]
+ },
+ {
+  "key": "th-years",
+  "name": "ปี",
+  "level": "A1",
+  "en": "ปี 'year'; the Buddhist Era is 543 ahead of the Christian year.",
+  "zh": "ปี：年；佛历比公历多 543 年。",
+  "formation": "ปี + จำนวน · bpee",
+  "section": "14.4",
+  "topic": "time",
+  "examples": [
+   "เขาแต่งงาน(ใน)ปี ๒๕๔๑ · káo dtàirng ngahn (nai) bpee sǒrng pun hâh róy sèe-sìp èt — He got married in 2541 (1998). ／ 他 2541 年（1998）结婚"
+  ],
+  "focus": [
+   "ปี"
+  ],
+  "focus_all": [
+   "ปี"
+  ]
+ },
+ {
+  "key": "th-dates",
+  "name": "วันที่ + จำนวน + เดือน + ปี",
+  "level": "A1",
+  "en": "Dates: วันที่ + day + month + year.",
+  "zh": "日期：วันที่ + 日 + 月 + 年。",
+  "formation": "วันที่ + จำนวน + เดือน + ปี · wan têe + jam-nuan",
+  "section": "14.5",
+  "topic": "time",
+  "examples": [
+   "วันที่ ๑๔ ตุลาฯ (2516) · wun têe sìp-sèe dtOO-lah (sǒrng pun hâh róy sìp hòk) — 14 October (2516) ／ 2516 年（1973）10 月 14 日",
+   "วันที่ ๑๕ เดือนหน้า · wun têe sìp-hâh deu-un nâh — The 15th of next month. ／ 下个月 15 号",
+   "วันนี้(เป็น)วันที่เท่าไหร่ · wun née (bpen) wun têe tâo-rài? — What is the date today? ／ 今天几号？"
+  ],
+  "focus": [
+   "วันที่"
+  ],
+  "focus_all": [
+   "วันที่"
+  ]
+ },
+ {
+  "key": "th-seasons",
+  "name": "ฤดู",
+  "level": "A1",
+  "en": "Seasons: ฤดูร้อน hot, ฤดูฝน rainy, ฤดูหนาว cool.",
+  "zh": "季节：ฤดูร้อน 热季 / ฤดูฝน 雨季 / ฤดูหนาว 凉季。",
+  "formation": "ฤดู + ร้อน/ฝน/หนาว · réu-doo",
+  "section": "14.6",
+  "topic": "time",
+  "examples": [],
+  "focus": [
+   "ฤดู",
+   "ฤดูร้อน",
+   "ฤดูฝน",
+   "ฤดูหนาว"
+  ],
+  "focus_all": [
+   "ฤดู",
+   "ฤดูร้อน",
+   "ฤดูฝน",
+   "ฤดูหนาว"
+  ]
+ },
+ {
+  "key": "th-today-tomorrow",
+  "name": "วันนี้ / พรุ่งนี้ / เมื่อวาน",
+  "level": "A1",
+  "en": "วันนี้ today, พรุ่งนี้ tomorrow, เมื่อวาน(นี้) yesterday.",
+  "zh": "วันนี้ 今天 / พรุ่งนี้ 明天 / เมื่อวาน 昨天。",
+  "formation": "วันนี้/พรุ่งนี้/เมื่อวาน · wan née / prûng née",
+  "section": "14.7.1",
+  "topic": "time",
+  "examples": [],
+  "focus_all": [
+   "วันนี้",
+   "พรุ่งนี้",
+   "เมื่อวาน"
+  ]
+ },
+ {
+  "key": "th-this-next-last",
+  "name": "นี้ / หน้า / ที่แล้ว",
+  "level": "A1",
+  "en": "นี้ 'this', หน้า 'next', ที่แล้ว 'last' after a time noun.",
+  "zh": "นี้ 这 / หน้า 下 / ที่แล้ว 上（时间名词后）。",
+  "formation": "N(เวลา) + นี้/หน้า/ที่แล้ว · née / nâh / têe láir-o",
+  "section": "14.7.2",
+  "topic": "time",
+  "examples": [],
+  "focus": [
+   "ที่แล้ว",
+   "หน้า"
+  ],
+  "focus_all": [
+   "ที่แล้ว",
+   "หน้า"
+  ]
+ },
+ {
+  "key": "th-clock-hours",
+  "name": "... โมง / ... นาฬิกา",
+  "level": "A1",
+  "en": "Hours: โมง in colloquial counting, นาฬิกา in the full form.",
+  "zh": "钟点：โมง（口语）/ นาฬิกา（正式）。",
+  "formation": "จำนวน + โมง/นาฬิกา · mohng / na-lí-gah",
+  "section": "14.8.1",
+  "topic": "time",
+  "examples": [],
+  "focus": [
+   "โมง",
+   "นาฬิกา"
+  ],
+  "focus_all": [
+   "โมง",
+   "นาฬิกา"
+  ]
+ },
+ {
+  "key": "th-half-hour",
+  "name": "ครึ่ง",
+  "level": "A1",
+  "en": "ครึ่ง 'half': ครึ่งชั่วโมง 'half an hour', บ่ายโมงครึ่ง '1:30 pm'.",
+  "zh": "ครึ่ง：半（บ่ายโมงครึ่ง 下午一点半）。",
+  "formation": "จำนวน + ครึ่ง · krêung",
+  "section": "14.8.2",
+  "topic": "time",
+  "examples": [],
+  "focus": [
+   "ครึ่ง"
+  ],
+  "focus_all": [
+   "ครึ่ง"
+  ]
+ },
+ {
+  "key": "th-asking-time",
+  "name": "กี่โมง / นานเท่าไหร่",
+  "level": "A1",
+  "en": "กี่โมง 'what time', นานเท่าไหร่ 'how long'.",
+  "zh": "กี่โมง 几点 / นานเท่าไหร่ 多久。",
+  "formation": "กี่โมง / นาน + เท่าไหร่ · gèe mohng",
+  "section": "14.8.5",
+  "topic": "time",
+  "examples": [
+   "รถออกกี่โมง · rót òrk gèe mohng? — What time does the bus leave? ／ 车几点开？",
+   "ใช้เวลากี่ชั่วโมง · chái way-lah gèe chôo-a mohng? — How many hours does it take? ／ 要几个小时？",
+   "ใช้เวลาเดินทางกี่ชั่วโมง · chái way-lah dern tahng gèe chôo-a mohng? — How many hours does the journey take? ／ 路上要几个小时？"
+  ],
+  "focus": [
+   "กี่โมง",
+   "นานเท่าไหร่"
+  ],
+  "focus_all": [
+   "กี่โมง",
+   "นานเท่าไหร่"
+  ]
+ },
+ {
+  "key": "th-politeness",
+  "name": "ความสุภาพ",
+  "level": "A1",
+  "en": "Politeness rides on the final particle and on pronoun choice, not on verb forms.",
+  "zh": "礼貌靠句尾语气词与人称选择，不靠动词变形。",
+  "formation": "ครับ/ค่ะ + สรรพนามที่เหมาะสม · kwam sù-pâhp",
+  "section": "15.1",
+  "topic": "speech",
+  "examples": [],
+  "focus_all": [
+   "ครับ",
+   "ค่ะ"
+  ]
+ },
+ {
+  "key": "th-thanks",
+  "name": "ขอบคุณ / ขอบใจ",
+  "level": "A1",
+  "en": "ขอบคุณ is neutral-polite, ขอบใจ casual to an inferior or peer.",
+  "zh": "ขอบคุณ 谢谢（通用）/ ขอบใจ 多谢（随意）。",
+  "formation": "ขอบคุณ + คน · kòrp-kun / kòrp jai",
+  "section": "15.2",
+  "topic": "speech",
+  "examples": [
+   "ขอบพระคุณ · kòrp-pra-kOOn — Thank you (especially polite and to superiors). ／ 谢谢您（对上级，非常客气）",
+   "ขอบใจ · kòrp-jai — Thank you (to children and subordinates). ／ 谢啦（对小孩、晚辈）",
+   "ขอบคุณที่บอกล่วงหน้า · kòrp-kOOn têe bòrk lôo-ung nâh — Thank you for telling me in advance. ／ 谢谢你提前告诉我"
+  ],
+  "focus": [
+   "ขอบคุณ",
+   "ขอบใจ"
+  ],
+  "focus_all": [
+   "ขอบคุณ",
+   "ขอบใจ"
+  ]
+ },
+ {
+  "key": "th-apologies",
+  "name": "ขอโทษ / ขออภัย",
+  "level": "A1",
+  "en": "ขอโทษ 'sorry, excuse me'; ขออภัย formal.",
+  "zh": "ขอโทษ 对不起 / ขออภัย 抱歉（正式）。",
+  "formation": "ขอโทษ + คน · kǒr tôht",
+  "section": "15.3",
+  "topic": "speech",
+  "examples": [
+   "ขออภัย · kǒr a-pai — Sorry; please excuse me (formal). ／ 抱歉（正式）",
+   "ขอประทานโทษ · kǒr bpra-tahn tôht — Sorry; please excuse me (very formal). ／ 恕罪（极正式）",
+   "(ขอ)โทษที · (kǒr) ’tôht tee — Sorry. ／ 不好意思"
+  ],
+  "focus": [
+   "ขอโทษ",
+   "ขออภัย"
+  ],
+  "focus_all": [
+   "ขอโทษ",
+   "ขออภัย"
+  ]
+ },
+ {
+  "key": "th-greetings",
+  "name": "สวัสดี / ลาก่อน",
+  "level": "A1",
+  "en": "สวัสดี hello (ครับ/ค่ะ closes it), ลาก่อน goodbye.",
+  "zh": "สวัสดี 你好 / ลาก่อน 再见。",
+  "formation": "สวัสดี(ครับ/ค่ะ) · sà-wàt-dee / lah gòrn",
+  "section": "15.6.1",
+  "topic": "speech",
+  "examples": [
+   "ไปไหน · bpai nǎi? — Hello (casual). (lit. Where are you going?) ／ 你好（随口，字面“去哪儿”）",
+   "ไปไหนมา · bpai nǎi mah? — Hello (casual). (lit. Where have you been?) ／ 你好（随口，字面“从哪儿来”）",
+   "ทานข้าวหรือยัง · tahn kâo: réu yung? — Hello (informal, polite). (lit. Have you eaten yet?) ／ 你好（熟人，字面“吃饭了吗”）"
+  ],
+  "focus": [
+   "สวัสดี",
+   "ลาก่อน"
+  ],
+  "focus_all": [
+   "สวัสดี",
+   "ลาก่อน"
+  ]
+ },
+ {
+  "key": "th-loanwords",
+  "name": "คำยืม",
+  "level": "A2",
+  "en": "Formal register prefers Pali-Sanskrit borrowings, everyday speech the native word.",
+  "zh": "借词分层：正式场合用巴利/梵语借词，日常用本族词（ผัว ↔ สามี）。",
+  "formation": "คำไทย ↔ คำยืม (หัว ↔ ศีรษะ) · kam yeum",
+  "section": "3.3.1",
+  "topic": "noun-phrase",
+  "examples": []
+ },
+ {
+  "key": "th-compound-noun",
+  "name": "คำหลัก + คำนามขยาย",
+  "level": "A2",
+  "en": "Compound nouns: head noun first, modifying noun after.",
+  "zh": "复合名词：中心词在前、修饰名词在后。",
+  "formation": "N1 + N2 (N2 ขยาย N1) · kam-làk + kam-nahm kà-yaai",
+  "section": "3.3.2.1",
+  "topic": "noun-phrase",
+  "examples": []
+ },
+ {
+  "key": "th-compound-noun-verb",
+  "name": "คำหลัก + คำกริยาขยาย",
+  "level": "A2",
+  "en": "A verb after the head noun describes what it does or is for.",
+  "zh": "中心词 + 动词：用动词说明中心词（รถไฟ 火车）。",
+  "formation": "N + V (V ขยาย N) · kam-làk + kam-grì-yah kà-yaai",
+  "section": "3.3.2.2",
+  "topic": "noun-phrase",
+  "examples": []
+ },
+ {
+  "key": "th-prefix-nak",
+  "name": "นัก + คำกริยา/คำนาม",
+  "level": "A2",
+  "en": "นัก- forms agent nouns, mostly professions.",
+  "zh": "นัก + 动词/名词：表示从业者（นักเรียน 学生、นักร้อง 歌手）。",
+  "formation": "นัก + V/N · nák + kam-grì-yah",
+  "section": "3.3.3.1",
+  "topic": "noun-phrase",
+  "examples": [],
+  "focus_all": [
+   "นัก"
+  ]
+ },
+ {
+  "key": "th-head-bai",
+  "name": "ใบ + คำกริยา",
+  "level": "A2",
+  "en": "ใบ- 'sheet, document' heads the names of papers and licences.",
+  "zh": "ใบ + 动词：证件、票据类（ใบขับขี่ 驾照）。",
+  "formation": "ใบ + V/N · bai + kam-grì-yah",
+  "section": "3.3.3.3",
+  "topic": "noun-phrase",
+  "examples": []
+ },
+ {
+  "key": "th-prefix-rong",
+  "name": "โรง + คำนาม/คำกริยา",
+  "level": "A2",
+  "en": "โรง- 'building' heads place names: โรงพยาบาล, โรงเรียน.",
+  "zh": "โรง + 名词/动词：场所建筑（โรงเรียน 学校）。",
+  "formation": "โรง + N/V · rohng + kam-nahm",
+  "section": "3.3.3.4",
+  "topic": "noun-phrase",
+  "examples": [],
+  "focus": [
+   "โรง"
+  ],
+  "focus_all": [
+   "โรง"
+  ]
+ },
+ {
+  "key": "th-prefix-kan",
+  "name": "การ + คำกริยา/คำนาม",
+  "level": "A2",
+  "en": "การ- nominalises a verb into the action itself; with a noun it means 'matters of'.",
+  "zh": "การ + 动词：使动词名词化（การเรียน 学习）；加名词表示事务。",
+  "formation": "การ + V/N · gahn + kam-grì-yah",
+  "section": "3.3.3.5",
+  "topic": "noun-phrase",
+  "examples": [
+   "การเดินทาง gahn dern tahng (dern tahng to travel) · travel — The pattern gahn + VERB in many instances corresponds to the English gerund, or verbal noun, and it occurs commonly in written Thai: ／ การ + 动词 这一句式在很多情况下相当于英语的动名词（verbal noun），在书面泰语里很常见",
+   "กินตามร้านอาหารแพง · gin dtahm ráhn ah-hǎhn pairng — Eating in restaurants is expensive. ／ 在餐馆吃饭很贵",
+   "เรียนหนังสือไม่สนุก · ree-un núng-sěu mâi sa-nÒOk — Studying is not fun. ／ 读书不好玩"
+  ],
+  "focus": [
+   "การ"
+  ],
+  "focus_all": [
+   "การ"
+  ]
+ },
+ {
+  "key": "th-prefix-khwam",
+  "name": "ความ + คำกริยา/คำคุณศัพท์",
+  "level": "A2",
+  "en": "ความ- forms abstract nouns from verbs and adjectives.",
+  "zh": "ความ + 动词/形容词：构成抽象名词（ความรัก 爱）。",
+  "formation": "ความ + V/ADJ · kwahm + kam-grì-yah",
+  "section": "3.3.3.6",
+  "topic": "noun-phrase",
+  "examples": [],
+  "focus": [
+   "ความ"
+  ],
+  "focus_all": [
+   "ความ"
+  ]
+ },
+ {
+  "key": "th-word-order-ordinal",
+  "name": "คำนาม + ลักษณนาม + ที่ + จำนวน",
+  "level": "A2",
+  "en": "Ordinals are classifier + ที่ + number.",
+  "zh": "名词 + 量词 + ที่ + 数词：คนที่สอง（第二个人）。",
+  "formation": "N + CLF + ที่ + จำนวน · kam-nahm + lák-sà-nà-nahm + têe + jam-nuan",
+  "section": "3.5.3",
+  "topic": "noun-phrase",
+  "examples": [
+   "ลูกคนที่สาม · lôok kon têe sǎhm — the third child ／ 第三个孩子",
+   "บ้านหลังที่สอง · bâhn lǔng têe sǒrng — the second house ／ 第二栋房子",
+   "หนังสือเล่มแรก · núng-sěu lêm râirk — the first book ／ 第一本书"
+  ]
+ },
+ {
+  "key": "th-word-order-adj-clf-dem",
+  "name": "คำนาม + คำคุณศัพท์ + ลักษณนาม + 指示词",
+  "level": "A2",
+  "en": "The adjective stays by the noun; classifier and demonstrative close the phrase.",
+  "zh": "名 + 形 + 量 + 指示：บ้านหลังใหญ่หลังนั้น。",
+  "formation": "N + ADJ + CLF + DEM · kam-nahm + kun-ná-sàp + lák-sà-nà-nahm + née",
+  "section": "3.5.7",
+  "topic": "noun-phrase",
+  "examples": [
+   "หนังสือเก่าเล่มนั้น · núng-sěu gào lêm nún — that old book ／ 那本旧书",
+   "บ้านใหญ่หลังนั้น · bâhn yài lǔng nún — that big house ／ 那栋大房子"
+  ]
+ },
+ {
+  "key": "th-word-order-adj-num-clf",
+  "name": "คำนาม + คำคุณศัพท์ + จำนวน + ลักษณนาม",
+  "level": "A2",
+  "en": "Full order: noun, adjective, number, classifier.",
+  "zh": "名 + 形 + 数 + 量：เด็กตัวเล็กสองคน（两个小孩）。",
+  "formation": "N + ADJ + จำนวน + CLF · kam-nahm + kun-ná-sàp + jam-nuan + lák-sà-nà-nahm",
+  "section": "3.5.8",
+  "topic": "noun-phrase",
+  "examples": [
+   "หนังสือเก่าสองเล่ม(นี้) · núng-sěu gào sǒrng lêm (née) — (these) two old books ／ （这）两本旧书",
+   "บ้านใหญ่ห้าหลัง(นั้น) · bâhn yài hâh lǔng (nún) — (those) five big houses ／ （那）五栋大房子"
+  ]
+ },
+ {
+  "key": "th-pronouns-more",
+  "name": "กู / มึง / ท่าน / มัน",
+  "level": "A2",
+  "en": "Familiar or blunt variants: กู/มึง are intimate or rude, ท่าน respectful.",
+  "zh": "更多人称：กู/มึง（极熟或粗鲁）、ท่าน（敬称）、มัน（它/贬称）。",
+  "formation": "สรรพนามตามระดับภาษา · goo / meung / tâan / man",
+  "section": "4.1.1",
+  "topic": "pronoun",
+  "examples": [],
+  "focus": [
+   "กู",
+   "มึง",
+   "ท่าน"
+  ],
+  "focus_all": [
+   "กู",
+   "มึง",
+   "ท่าน"
+  ]
+ },
+ {
+  "key": "th-pronouns-names",
+  "name": "ชื่อ + ครับ/ค่ะ",
+  "level": "A2",
+  "en": "A personal name replaces the pronoun; the final particle marks the speaker.",
+  "zh": "用名字代替“我/你”，句尾加礼貌词。",
+  "formation": "ชื่อ + กริยา + ครับ/ค่ะ · chêu + krúp/kâ",
+  "section": "4.1.3",
+  "topic": "pronoun",
+  "examples": [
+   "ต้อยไม่ทราบค่ะ · dtôy mâi sâhp kâ — I (Toi speaking) don’t know. ／ 我（自称“小兑”）不知道。",
+   "คุณสุวรรณีว่างไหม · kOOn sÒO-wun-nee wâhng mái? — Are you (addressing Suwannee) free? ／ （称呼素婉妮）你有空吗？",
+   "คุณอ้วนกลับบ้านแล้ว · kOOn ôo-un glùp bâhn láir-o — Khun Uan has gone home. ／ 阿温先生已经回家了。"
+  ]
+ },
+ {
+  "key": "th-pronouns-occupation",
+  "name": "ครู / หมอ / อาจารย์",
+  "level": "A2",
+  "en": "Occupational terms work as I/you between professionals.",
+  "zh": "职业称谓代替人称：ครู（老师→我）。",
+  "formation": "คำบอกอาชีพ + กริยา · kroo / mǒr / ah-jahn",
+  "section": "4.1.4",
+  "topic": "pronoun",
+  "examples": [
+   "เมื่อเช้าวันนี้ คุณพ่อเธอโทรศัพท์มาถึงครู · mêu-a cháo: wun née kOOn pôr ter toh-ra-sùp mah těung kroo — Earlier this morning your father telephoned me. (teacher speaking) ／ 今天早上你父亲给我打过电话。（老师自称）",
+   "ขอหมอดูหน่อย . . . หมอว่าไม่เป็นอะไรมาก · kǒr mǒr doo nòy . . . mǒr wâh mâi bpen a-rai mâhk — Let me have a look . . . I don’t think it’s anything very much/serious. (doctor speaking) ／ 我看看……我看没什么大不了的。（医生自称）",
+   "คุณหมออยู่ไหมคะ · kOOn mǒr yòo mái ká? — Is the doctor in? ／ 医生在吗？"
+  ]
+ },
+ {
+  "key": "th-reflexive",
+  "name": "ตัวเอง / ตนเอง",
+  "level": "A2",
+  "en": "'oneself'; follows the verb or replaces the object.",
+  "zh": "反身代词 ตัวเอง/ตนเอง：自己。",
+  "formation": "กริยา + ตัวเอง · dtua-eng / dton-eng",
+  "section": "4.2",
+  "topic": "pronoun",
+  "examples": [
+   "ผมซ่อมรถด้วยตัวเอง · pǒm sôrm rót dôo-ay dtoo-a ayng — I mended the car by myself. ／ 我自己修好了车。",
+   "เราทำด้วยตัวเอง · rao tum dôo-ay dtoo-a ayng — We did it by ourselves. ／ 我们自己做的。",
+   "เขาเรียนด้วยตนเอง · káo ree-un dôo-ay dton ayng — He studied by himself. ／ 他自学。"
+  ],
+  "focus": [
+   "ตัวเอง",
+   "ตนเอง"
+  ],
+  "focus_all": [
+   "ตัวเอง",
+   "ตนเอง"
+  ]
+ },
+ {
+  "key": "th-emphatic-eng-pre",
+  "name": "สรรพนาม + เอง + กริยา",
+  "level": "A2",
+  "en": "เอง straight after the pronoun stresses 'X himself'.",
+  "zh": "代词 + เอง + 动词：强调“亲自”。",
+  "formation": "PRON + เอง + V · sàp-pá-nahm + eng + grì-yah",
+  "section": "4.3.1",
+  "topic": "pronoun",
+  "examples": [
+   "ผมเองทำ · pǒm ayng tum — I myself did it. ／ 我亲自做的。"
+  ]
+ },
+ {
+  "key": "th-emphatic-eng-post",
+  "name": "กริยา + เอง",
+  "level": "A2",
+  "en": "เอง after the verb means 'on one's own'.",
+  "zh": "动词 + เอง：自己（独自）做。",
+  "formation": "V + เอง · grì-yah + eng",
+  "section": "4.3.2",
+  "topic": "pronoun",
+  "examples": [
+   "ผมทำเอง · pǒm tum ayng — I did it myself. ／ 是我自己做的。"
+  ]
+ },
+ {
+  "key": "th-emphatic-dtua",
+  "name": "ตัว + สรรพนาม + เอง",
+  "level": "A2",
+  "en": "ตัว...เอง is the strongest 'in person'.",
+  "zh": "ตัว + 代词 + เอง：亲自、本人（更强）。",
+  "formation": "ตัว + PRON + เอง · dtua + sàp-pá-nahm + eng",
+  "section": "4.3.4",
+  "topic": "pronoun",
+  "examples": [
+   "ตัวผมเองทำ · dtoo-a pǒm ayng tum — I myself did it. ／ 我亲自做的。",
+   "วันนี้เอง · wun née ayng — this very day ／ 就是今天",
+   "เดี๋ยวนี้เอง · děe-o née ayng — this very moment, right now ／ 就是现在这一刻"
+  ]
+ },
+ {
+  "key": "th_each_other",
+  "name": "กัน / กันและกัน",
+  "level": "A2",
+  "en": "กัน after a verb makes the action reciprocal.",
+  "zh": "กัน：互相（รักกัน 相爱）。",
+  "formation": "V + กัน · gan / gan láe gan",
+  "section": "4.4",
+  "topic": "pronoun",
+  "examples": [
+   "เขารักกัน · káo rúk gun — They love each other. ／ 他们彼此相爱。",
+   "เราต้องช่วยกัน · rao dtôrng chôo-ay gun — We must help one another. ／ 我们必须互相帮助。"
+  ],
+  "focus_all": [
+   "กัน",
+   "กันและกัน"
+  ]
+ },
+ {
+  "key": "th-indef-person",
+  "name": "ใครบ้าง / ไม่มีใคร",
+  "level": "A2",
+  "en": "ใครบ้าง 'somebody', ไม่มีใคร 'nobody'.",
+  "zh": "ใครบ้าง 某人；ไม่มีใคร 没人。",
+  "formation": "WH + บ้าง / ไม่มี + WH · krai bâhng / mâi mee krai",
+  "section": "4.8.1",
+  "topic": "pronoun",
+  "examples": [
+   "ผมคุยกับใครคนหนึ่ง · pǒm koo-ee gùp krai kon nèung — I chatted to somebody. ／ 我跟某个人聊过。",
+   "ฉันไม่ได้พบใคร · chún mâi dâi póp krai — I didn’t meet anybody. ／ 我没见到任何人。",
+   "มีใครจะกินไหม · mee krai ja gin mái? — Is anybody going to eat? ／ 有人要吃吗？"
+  ],
+  "focus": [
+   "ไม่มีใคร",
+   "ใครบ้าง"
+  ],
+  "focus_all": [
+   "ไม่มีใคร",
+   "ใครบ้าง"
+  ]
+ },
+ {
+  "key": "th-indef-thing",
+  "name": "อะไรบ้าง / ไม่มีอะไร",
+  "level": "A2",
+  "en": "อะไรบ้าง 'something', ไม่มีอะไร 'nothing'.",
+  "zh": "อะไรบ้าง 某物；ไม่มีอะไร 没什么。",
+  "formation": "WH + บ้าง / ไม่มี + WH · a-rai bâhng / mâi mee a-rai",
+  "section": "4.8.2",
+  "topic": "pronoun",
+  "examples": [
+   "เขาอยากซื้ออะไรบางอย่าง · káo yàhk séu a-rai bahng yàhng — She wants to buy something. ／ 她想买点东西。",
+   "คุณอยากกินอะไรไหม · kOOn yàhk gin a-rai mái? — Do you want to eat anything? ／ 你想吃点什么吗？",
+   "ผมไม่ได้พูดอะไร · pǒm mâi dâi pôot a-rai — I didn’t say anything. ／ 我什么都没说。"
+  ],
+  "focus": [
+   "ไม่มีอะไร",
+   "อะไรบ้าง"
+  ],
+  "focus_all": [
+   "ไม่มีอะไร",
+   "อะไรบ้าง"
+  ]
+ },
+ {
+  "key": "th-indef-place",
+  "name": "ที่ไหนบ้าง / ไม่มีที่ไหน",
+  "level": "A2",
+  "en": "ที่ไหนบ้าง 'somewhere', ไม่มีที่ไหน 'nowhere'.",
+  "zh": "ที่ไหนบ้าง 某处；ไม่มีที่ไหน 无处。",
+  "formation": "WH + บ้าง / ไม่มี + WH · têe-nǎi bâhng / mâi mee têe-nǎi",
+  "section": "4.8.4",
+  "topic": "pronoun",
+  "examples": [
+   "ฉันอยากไปอยู่ที่ไหนที่เงียบ ๆ · chún yàhk bpai yòo têe nǎi têe ngêe-up ngêe-up — I want to go and live somewhere quietish. ／ 我想去一个安静点的地方住。",
+   "วางไว้ที่ไหนที่สะดวก · wahng wái têe nǎi têe sa-dòo-uk — Put it down somewhere convenient. ／ 放在方便的地方。",
+   "อยากไปไหนไหม · yàhk bpai nǎi mái? — Do you want to go anywhere? ／ 你想去哪儿吗？"
+  ],
+  "focus": [
+   "ไม่มีที่ไหน",
+   "ที่ไหนบ้าง"
+  ],
+  "focus_all": [
+   "ไม่มีที่ไหน",
+   "ที่ไหนบ้าง"
+  ]
+ },
+ {
+  "key": "th-indef-gor-dai",
+  "name": "ใครก็ได้ / อะไรก็ได้",
+  "level": "A2",
+  "en": "wh-word + ก็ได้ = 'anyone / anything at all'.",
+  "zh": "疑问词 + ก็ได้：任何……都行。",
+  "formation": "WH + ก็ได้ · krai gôr dâi / a-rai gôr dâi",
+  "section": "4.8.7",
+  "topic": "pronoun",
+  "examples": [
+   "สั่งอะไรก็ได้ · sùng a-rai gôr dâi: — Order whatever you like. ／ 随便点什么都可以。",
+   "บอกใครก็ได้ · bòrk krai gôr dâi: — Tell whoever you like. ／ 告诉谁都行。",
+   "เราพบกันเมื่อไรก็ได้ · rao póp gun mêu-rài gôr dâi: — We’ll meet whenever you like. ／ 我们什么时候见面都行。"
+  ],
+  "focus": [
+   "ก็ได้"
+  ],
+  "focus_all": [
+   "ก็ได้"
+  ]
+ },
+ {
+  "key": "th-modal-probability",
+  "name": "อาจ / คง / น่าจะ",
+  "level": "A2",
+  "en": "Degrees of probability: อาจ 'may', คง 'probably', น่าจะ 'should'.",
+  "zh": "可能性：อาจ 可能 / คง 大概 / น่าจะ 应该。",
+  "formation": "ADV + V · àht / kong / nâ jà",
+  "section": "5.6.1",
+  "topic": "verb",
+  "examples": [
+   "เราอาจ(จะ)ไปดูหนัง · rao àht (ja) bpai doo nǔng — We may go to see a movie. ／ 我们也许去看电影。",
+   "เขาคง(จะ)ไม่มา · káo kong (ja) mâi mah — He probably won’t come. ／ 他大概不会来。"
+  ],
+  "focus": [
+   "อาจ",
+   "คง",
+   "น่าจะ"
+  ],
+  "focus_all": [
+   "อาจ",
+   "คง",
+   "น่าจะ"
+  ]
+ },
+ {
+  "key": "th-able-bpen",
+  "name": "กริยา + เป็น",
+  "level": "A2",
+  "en": "เป็น after the verb means 'know how to'.",
+  "zh": "เป็น 在动词后：会、懂得（พูดเป็น 会说）。",
+  "formation": "V + เป็น · grì-yah + bpen",
+  "section": "5.6.2.2",
+  "topic": "verb",
+  "examples": [
+   "เขาเล่นกีตาร์เป็น · káo lên gee-dtah bpen — He can play the guitar. ／ 他会弹吉他。",
+   "ผมทำอาหารไม่เป็น · pǒm tum ah-hǎhn mâi bpen — I can’t cook. ／ 我不会做饭。",
+   "คุณขับรถเป็นไหม · kOOn kùp rót bpen mái? — Can you drive? ／ 你会开车吗？"
+  ],
+  "focus_all": [
+   "เป็น"
+  ]
+ },
+ {
+  "key": "th_should_must",
+  "name": "ต้อง / จำเป็น",
+  "level": "A2",
+  "en": "ต้อง 'must', จำเป็น 'be necessary'.",
+  "zh": "ต้อง 必须 / จำเป็น 必要。",
+  "formation": "ต้อง + V · dtôrng / jam-bpen",
+  "section": "5.6.3",
+  "topic": "verb",
+  "examples": [
+   "คุณต้องช่วยเขาหน่อยนะ · kOOn dtôrng chôo-ay káo nòy ná — You must help him a bit, OK? ／ 你得帮他一下，好吗？",
+   "คุณต้องการพูดกับใคร · kOOn dtôrng-gahn pôot gùp krai? — Who do you want / need to speak to? ／ 你要跟谁说话？",
+   "จำเป็นต้องทำให้เสร็จวันนี้หรือเปล่า · jum-bpen dtôrng tum hâi sèt wun née réu bplào:? — Is it necessary to finish it today? ／ 今天一定要做完吗？"
+  ],
+  "focus": [
+   "จำเป็น"
+  ],
+  "focus_all": [
+   "ต้อง",
+   "จำเป็น"
+  ]
+ },
+ {
+  "key": "th-obligation",
+  "name": "ควร /  ought",
+  "level": "A2",
+  "en": "ควร 'should' states a recommendation or moral obligation.",
+  "zh": "ควร：应该（ควรไป 该去）。",
+  "formation": "ควร + V · kuan",
+  "section": "5.6.4",
+  "topic": "verb",
+  "examples": [
+   "คุณควรจะบอกผมล่วงหน้า · kOOn koo-un ja bòrk pǒm lôo-ung nâh — You should’ve told me in advance. ／ 你该事先告诉我的。",
+   "เราไม่น่าจะกลับดึก · rao mâi nâh ja glùp dèuk — We ought not to return late. ／ 我们不该回来得太晚。"
+  ],
+  "focus_all": [
+   "ควร"
+  ]
+ },
+ {
+  "key": "th-about-to",
+  "name": "กำลังจะ + กริยา",
+  "level": "A2",
+  "en": "กำลังจะ marks an action about to happen.",
+  "zh": "กำลังจะ：即将、快要。",
+  "formation": "กำลังจะ + V · gum-lung jà + grì-yah",
+  "section": "5.7.4",
+  "topic": "verb",
+  "examples": [
+   "แม่กำลังจะเตรียมอาหาร · mâir gum-lung ja dtree-um ah-hǎhn — Mum is/was about to prepare the food. ／ 妈妈正要准备饭菜。",
+   "เรากำลังจะไปตลาด · rao gum-lung ja bpai dta-làht — We are/were about to go to the market. ／ 我们正要去市场。",
+   "ผมกำลังจะหิว · pǒm gum-lung ja hěw — I am/was getting hungry. ／ 我快要饿了。"
+  ],
+  "focus": [
+   "กำลังจะ"
+  ],
+  "focus_all": [
+   "กำลังจะ"
+  ]
+ },
+ {
+  "key": "th-just-happened",
+  "name": "เพิ่ง + กริยา",
+  "level": "A2",
+  "en": "เพิ่ง marks an action that has just happened.",
+  "zh": "เพิ่ง：刚刚（เพิ่งมา 刚来）。",
+  "formation": "เพิ่ง + V · pêrng + grì-yah",
+  "section": "5.7.5",
+  "topic": "verb",
+  "examples": [
+   "เขาเพิ่งซื้อรถใหม่ · káo pêrng séu: rót mài — He has just bought a new car. ／ 他刚买了新车。",
+   "ผมเพิ่งเห็นเขาเมื่อกี้นี้เอง · pǒm pêrng hěn káo mêu-a gêe née ayng — I have just seen him, just a moment ago. ／ 我刚才才见过他。",
+   "คุณเพิ่งรู้หรือ · kOOn pêrng róo lěr? — You’ve only just found out, right? ／ 你才知道啊？"
+  ],
+  "focus": [
+   "เพิ่ง"
+  ],
+  "focus_all": [
+   "เพิ่ง"
+  ]
+ },
+ {
+  "key": "th_ever",
+  "name": "เคย + กริยา",
+  "level": "A2",
+  "en": "เคย marks past experience: 'have ever done'.",
+  "zh": "เคย + 动词：曾经……过。",
+  "formation": "เคย + V · ker-ee + grì-yah",
+  "section": "5.7.6",
+  "topic": "verb",
+  "examples": [
+   "ฉันเคยไปเที่ยวเชียงใหม่ · chún ker-ee bpai têe-o chee-ung-mài — I’ve been to/visited Chiangmai. ／ 我去过清迈。",
+   "ผมเคยดูแล้ว · pǒm ker-ee doo láir-o — I’ve seen it already. ／ 我已经看过了。",
+   "เราเคยอยู่ที่กรุงเทพ ฯ · rao ker-ee yòo têe grOOng-tâyp — We used to live in Bangkok. ／ 我们以前住在曼谷。"
+  ],
+  "focus_all": [
+   "เคย"
+  ]
+ },
+ {
+  "key": "th-negative-past",
+  "name": "ไม่ได้ + กริยา",
+  "level": "A2",
+  "en": "ไม่ได้ before the verb negates a past action or a possibility.",
+  "zh": "ไม่ได้ + 动词：没（做）、不能。",
+  "formation": "ไม่ได้ + V · mâi dâi + grì-yah",
+  "section": "5.7.7",
+  "topic": "verb",
+  "examples": [
+   "เราไม่ได้ไป · rao mâi dâi bpai — We didn’t go. ／ 我们没去。",
+   "ฉันไม่ได้บอกเขา · chún mâi dâi bòrk káo — I didn’t tell him. ／ 我没告诉他。"
+  ],
+  "focus": [
+   "ไม่ได้"
+  ],
+  "focus_all": [
+   "ไม่ได้"
+  ]
+ },
+ {
+  "key": "th-complement-wah",
+  "name": "กริยา + ว่า + ประโยค",
+  "level": "A2",
+  "en": "ว่า introduces what is said, thought or perceived.",
+  "zh": "ว่า 引导引语：คิดว่า（认为）、บอกว่า（说）。",
+  "formation": "V + ว่า + CLAUSE · grì-yah + wâh + bprà-yohk",
+  "section": "5.9",
+  "topic": "verb",
+  "examples": [
+   "คิดว่าจะกลับพรุ่งนี้ · kít wâh ja glùp prÔOng née — I think (that) I’ll return tomorrow. ／ 我想明天回来。",
+   "หวังว่าจะไม่เผ็ดเกินไป · wǔng wâh ja mâi pèt gern bpai — I hope (that) it’s not too spicy. ／ 希望不要太辣。",
+   "รู้สึกว่า น่าเบื่อไหม · róo-sèuk wâh nâh bèu-a mái? — Did you feel (that) it was boring? ／ 你觉得无聊吗？"
+  ],
+  "focus": [
+   "ว่า"
+  ],
+  "focus_all": [
+   "ว่า"
+  ]
+ },
+ {
+  "key": "th-causative-hai",
+  "name": "ให้ + (กรรม) + กริยา",
+  "level": "A2",
+  "en": "ให้ with a person and a verb = 'let / have someone do'.",
+  "zh": "ให้ + 人 + 动词：让某人做。",
+  "formation": "S + ให้ + O + V · hâi + grì-yah",
+  "section": "5.11.2",
+  "topic": "verb",
+  "examples": [
+   "แม่ให้ผมเรียนบัญชี · mâir hâi pǒm ree-un bun-chee — My mother had me study accountancy. ／ 妈妈让我学会计。",
+   "เขาให้ฉันกลับมาเดือนหน้า · káo hâi chún glùp mah deu-un nâh — They got me to come back next month. ／ 他们让我下个月回来。",
+   "พ่อไม่ให้ลูกกลับบ้านดึก · pôr mâi hâi lôok glùp bâhn dèuk — The father doesn’t let his children come home late. ／ 父亲不许孩子晚回家。"
+  ],
+  "focus_all": [
+   "ให้"
+  ]
+ },
+ {
+  "key": "th_give",
+  "name": "ให้ (กรรมตรง/กรรมรอง)",
+  "level": "A2",
+  "en": "ให้ takes the thing first and the recipient second, or the recipient with แก่.",
+  "zh": "ให้：给；直接宾语在前、接受者在后（ให้เงินเขา）。",
+  "formation": "V + สิ่งของ + ผู้รับ · hâi",
+  "section": "5.12",
+  "topic": "verb",
+  "examples": [
+   "ฉันให้หนังสือ (แก่) เขา · chún hâi núng-sěu: (gàir) káo — I gave him the book. ／ 我把书给了他。",
+   "พ่อไม่ยอมให้เงิน (แก่) ลูก · pôr mâi yorm hâi ngern (gàir) lôok — The father refuses to give his children any money. ／ 父亲不肯给孩子钱。",
+   "คุณให้อาหารหมาหรือยัง · kOOn hâi ah-hǎhn mǎh réu yung? — Have you fed the dog yet? ／ 你喂狗了吗？"
+  ],
+  "focus_all": [
+   "ให้"
+  ]
+ },
+ {
+  "key": "th-compound-adjective",
+  "name": "คำคุณศัพท์ผสม",
+  "level": "A2",
+  "en": "Two words form one adjective: ใจดี 'kind', สวยงาม 'beautiful'.",
+  "zh": "形容词复合：ใจดี（心好）、สวยงาม（美丽）。",
+  "formation": "คำ + คำ · kun-ná-sàp pà-sǒm",
+  "section": "6.1",
+  "topic": "adjective",
+  "examples": []
+ },
+ {
+  "key": "th-adj-modifier-pre",
+  "name": "คำขยาย + คำคุณศัพท์",
+  "level": "A2",
+  "en": "The modifier stands before the adjective: ดีมาก 'very good' is after, สีแดง 'red' before.",
+  "zh": "修饰语在形容词前：สีแดง（红色）。",
+  "formation": "MOD + ADJ · kam-kà-yaai + kun-ná-sàp",
+  "section": "6.2.1",
+  "topic": "adjective",
+  "examples": [
+   "เป็นครอบครัวที่มีฐานะค่อนข้าง(จะ)ดี · bpen krôrp-kroo-a têe mee tǎh-ná kôrn kâhng (ja) dee — They were a rather well-off family. ／ 他们家算是相当宽裕的。",
+   "บ้านไม่ค่อยใหญ่เท่าไหร่ · bâhn mâi kôy yài tâo-rài — The house isn’t very big. ／ 房子不怎么大。"
+  ],
+  "focus": [
+   "ค่อนข้าง",
+   "ออกจะ"
+  ],
+  "focus_all": [
+   "มาก",
+   "ค่อนข้าง",
+   "ออกจะ"
+  ]
+ },
+ {
+  "key": "th-adj-modifier-post",
+  "name": "คำคุณศัพท์ + คำขยาย",
+  "level": "A2",
+  "en": "Degree words follow the adjective: ดีมาก, ใหญ่ที่สุด.",
+  "zh": "程度词在形容词后：ดีมาก（很好）、ใหญ่ที่สุด（最大）。",
+  "formation": "ADJ + MOD · kun-ná-sàp + kam-kà-yaai",
+  "section": "6.2.2",
+  "topic": "adjective",
+  "examples": [
+   "ค่อนข้างจะแพงไปหน่อย · kôrn kâhng ja pairng bpai nòy — a little too much on the expensive side ／ 有点偏贵",
+   "สนุกมากทีเดียว · sa-nÒOk mâhk tee dee-o — It was really a lot of fun. ／ 非常有意思。",
+   "กินข้าวมากพอสมควร · gin kâo: mâhk por sǒm-koo-un — We had quite enough to eat. ／ 吃得相当饱。"
+  ],
+  "focus": [
+   "ที่สุด",
+   "เกินไป",
+   "จริงๆ"
+  ],
+  "focus_all": [
+   "มาก",
+   "ที่สุด",
+   "เกินไป",
+   "จริงๆ"
+  ]
+ },
+ {
+  "key": "th-intensifier-colour",
+  "name": "สี + คำขยาย",
+  "level": "A2",
+  "en": "Colour intensifiers repeat the colour or add เข้ม/อ่อน: แดงเข้ม dark red.",
+  "zh": "颜色的深浅：แดงเข้ม（深红）、แดงอ่อน（浅红）。",
+  "formation": "สี + เข้ม/อ่อน · sěe + kam-kà-yaai",
+  "section": "6.3.2",
+  "topic": "adjective",
+  "examples": [],
+  "focus": [
+   "เข้ม",
+   "อ่อน"
+  ],
+  "focus_all": [
+   "เข้ม",
+   "อ่อน"
+  ]
+ },
+ {
+  "key": "th-reduplication",
+  "name": "คำคุณศัพท์ + ๆ",
+  "level": "A2",
+  "en": "Repeating an adjective with ๆ softens or intensifies it.",
+  "zh": "形容词重叠 + ๆ：略微、有点（ช้า ๆ 慢慢地）。",
+  "formation": "ADJ + ๆ · kun-ná-sàp + ๆ",
+  "section": "6.4.1",
+  "topic": "adjective",
+  "examples": []
+ },
+ {
+  "key": "th-equal-tao-gup",
+  "name": "A + ADJ + เท่า(กับ) + B",
+  "level": "A2",
+  "en": "เท่ากับ marks equality of degree.",
+  "zh": "เท่า(กับ)：和……一样（สูงเท่ากัน 一样高）。",
+  "formation": "A + ADJ + เท่า + B · tâo gùp",
+  "section": "6.5.2.1",
+  "topic": "adjective",
+  "examples": [
+   "นครพนมอยู่ห่างกรุงเทพฯ เท่ากับหนองคาย · na-korn pa-nom yòo hàhng grOOng-tâyp tâo gùp nǒrng-kai: — Nakhorn Phanom is as far away from Bangkok as Nongkhai. ／ 那空拍侬离曼谷和廊开一样远。",
+   "ไปเที่ยวภาคใต้สนุกเท่าๆ กับภาคเหนือ · bpai têe-o pâhk dtâi: sa-nÒOk tâo tâo gùp pâhk něu-a — Taking a trip to the South was as much fun as the North. ／ 去南部玩和去北部一样有意思。",
+   "บ้านหลังใหม่ใหญ่พอๆ กับหลังเก่า · bâhn lǔng mài yài por por gùp lǔng gào — The new house is as big as the old one. ／ 新房子和旧房子一样大。"
+  ],
+  "focus": [
+   "เท่า",
+   "เท่ากับ"
+  ],
+  "focus_all": [
+   "เท่า",
+   "เท่ากับ"
+  ]
+ },
+ {
+  "key": "th-similar-meuan",
+  "name": "A + ADJ + เหมือน + B",
+  "level": "A2",
+  "en": "เหมือน 'like, same as' compares two things directly.",
+  "zh": "เหมือน：像、和……一样。",
+  "formation": "A + ADJ + เหมือน + B · mĕuan",
+  "section": "6.5.2.3",
+  "topic": "adjective",
+  "examples": [
+   "ลูกชายขยันเหมือนพ่อ · lôok chai: ka-yǔn měu-un pôr — The son is hard-working like his father. ／ 儿子像父亲一样勤快。",
+   "เขาชอบพูดซ้ำไปซ้ำมาเหมือนครู · káo chôrp pôot súm bpai súm mah měu-un kroo — He always repeats himself like a teacher. ／ 他像老师一样老爱重复。",
+   "พี่กับน้องสวยเหมือนกัน · pêe gùp nórng sǒo-ay měu-un gun — The older sister and younger sister are as beautiful as each other. ／ 姐姐和妹妹一样漂亮。"
+  ],
+  "focus": [
+   "เหมือน"
+  ],
+  "focus_all": [
+   "เหมือน"
+  ]
+ },
+ {
+  "key": "th-comparison-question",
+  "name": "A + ADJ + กว่า + B + ไหม",
+  "level": "A2",
+  "en": "Yes/no comparison: 'is A more ... than B?'.",
+  "zh": "比较疑问：A + 形容词 + กว่า + B + ไหม。",
+  "formation": "ADJ + กว่า + B + ไหม · gwàh ... mái",
+  "section": "6.5.3",
+  "topic": "adjective",
+  "examples": [
+   "ที่ไหนไกลกว่ากัน · têe nǎi glai gwàh gun? — Which is further? ／ 哪个更远？",
+   "ใครเก่งกว่ากัน · krai gèng gwàh gun? — Who is the cleverer? ／ 谁更能干？",
+   "เล่มไหนถูกกว่ากัน · lêm nǎi tòok gwàh gun? — Which book is cheaper? ／ 哪本书更便宜？"
+  ],
+  "focus": [
+   "กว่าไหม"
+  ],
+  "focus_all": [
+   "กว่าไหม"
+  ]
+ },
+ {
+  "key": "th-comparison-negative",
+  "name": "ไม่ + ADJ + เท่า",
+  "level": "A2",
+  "en": "Negative comparison: 'not as ... as'.",
+  "zh": "否定比较：ไม่ + 形容词 + เท่า（不如……那么）。",
+  "formation": "ไม่ + ADJ + เท่า · mâi + tâo",
+  "section": "6.5.4",
+  "topic": "adjective",
+  "examples": [
+   "แกงเขียวหวานร้านนี้สู้ของแม่ไม่ได้ · gairng kěe-o wǎhn ráhn née sôo kǒrng mâir mâi dâi: — The green curry at this restaurant isn’t as good as Mum’s. ／ 这家店的绿咖喱比不上妈妈做的。",
+   "ระบอบการรักษาพยาบาลสู้ที่โน้นไม่ได้ · ra-bòrp gahn rúk-sǎh pa-yah-bahn sôo têe nóhn mâi dâi: — Hospital treatment isn’t as good as over there. ／ 医疗制度比不上那边。"
+  ],
+  "focus": [
+   "ไม่เท่า"
+  ],
+  "focus_all": [
+   "ไม่เท่า"
+  ]
+ },
+ {
+  "key": "th-superlative",
+  "name": "ADJ + ที่สุด",
+  "level": "A2",
+  "en": "ที่สุด after the adjective marks the superlative.",
+  "zh": "ที่สุด：最……（ดีที่สุด 最好）。",
+  "formation": "ADJ + ที่สุด · têe sùt",
+  "section": "6.5.6",
+  "topic": "adjective",
+  "examples": [
+   "เธอเป็นนักร้องดังที่สุดของไทย · ter bpen núk rórng dung têe sÒOt kǒrng tai — She is Thailand’s most famous singer. ／ 她是泰国最有名的歌手。",
+   "อันไหนถูกที่สุด · un nǎi tòok têe sÒOt? — Which is the cheapest one? ／ 哪个最便宜？",
+   "ไม่บอกดีที่สุด · mâi bòrk dee têe sÒOt — Best not to tell. ／ 最好别说。"
+  ],
+  "focus_all": [
+   "ที่สุด"
+  ]
+ },
+ {
+  "key": "th-adverb-reduplicated",
+  "name": "กริยา + คำคุณศัพท์ + ๆ",
+  "level": "A2",
+  "en": "A reduplicated adjective describes the manner: เดินช้า ๆ.",
+  "zh": "重叠形容词作状语：เดินช้า ๆ（慢慢走）。",
+  "formation": "V + ADJ + ๆ · grì-yah + kun-ná-sàp + ๆ",
+  "section": "7.1.2",
+  "topic": "adverb",
+  "examples": [
+   "เขาซื้อถูก ๆ · káo séu: tòok tòok — He bought cheap(ish)ly. ／ 他买得很便宜。",
+   "เขาเดินช้า ๆ · káo dern cháh cháh — He walks slow(ish)ly. ／ 他走得很慢。",
+   "บ้านอยู่ใกล้ๆ · bâhn yòo glâi glâi — My house is nearby. ／ 我家在附近。"
+  ]
+ },
+ {
+  "key": "th-adverb-yang",
+  "name": "กริยา + อย่าง + คำ",
+  "level": "A2",
+  "en": "อย่าง turns a word into a manner adverb: อย่างระวัง 'carefully'.",
+  "zh": "อย่าง + 词：构成方式副词（อย่างระวัง 小心地）。",
+  "formation": "V + อย่าง + X · grì-yah + yàhng",
+  "section": "7.1.3.1",
+  "topic": "adverb",
+  "examples": [
+   "เขาพูดอย่างไม่สุภาพ · káo pôot yàhng mâi sÒO-pâhp — He spoke impolitely. ／ 他说话不礼貌。",
+   "เขายิ้มอย่างมีความสุข · káo yím yàhng mee kwahm sÒOk — She smiled happily. ／ 她幸福地笑了。",
+   "ปัจจุบันเริ่มมีการแข่งขันอย่างเป็นทางการมากกว่าเมื่อก่อน · bpùt-jOO-bun née rêrm mee gahn kàirng kǔn yàhng bpen tahng gahn mâhk gwàh mêu-a gòrn — Nowadays there are beginning to be more formal competitions than in the past. ／ 如今开始有比过去更多的正式比赛。"
+  ],
+  "focus": [
+   "อย่าง"
+  ],
+  "focus_all": [
+   "อย่าง"
+  ]
+ },
+ {
+  "key": "th-adverb-modification",
+  "name": "คำวิเศษณ์ + คำขยาย",
+  "level": "A2",
+  "en": "Adverbs take the same degree modifiers as adjectives.",
+  "zh": "副词也用 มาก/ที่สุด 等修饰。",
+  "formation": "ADV + มาก/ที่สุด · kam-wí-sàirn + kam-kà-yaai",
+  "section": "7.2",
+  "topic": "adverb",
+  "examples": [
+   "ผมเรียนไม่เก่ง · pǒm ree-un mâi gèng — I don’t do well in my studies. ／ 我学习不好。",
+   "เขาพูดไม่ค่อยชัด · káo pôot mâi kôy chút — He doesn’t speak very clearly. ／ 他说得不太清楚。",
+   "ทำอาหารไทยค่อนข้างจะยุ่งยาก · tum a-hǎhn tai kôrn kâhng ja yÔOng yâhk — Cooking Thai food is rather complicated. ／ 做泰国菜相当麻烦。"
+  ],
+  "focus_all": [
+   "มาก"
+  ]
+ },
+ {
+  "key": "th-adverb-degree",
+  "name": "คำวิเศษณ์บอกระดับ",
+  "level": "A2",
+  "en": "Degree adverbs: ค่อนข้าง, พอ, มาก, เลย.",
+  "zh": "程度副词：ค่อนข้าง 相当 / พอ 还算 / มาก 很。",
+  "formation": "ADV + ADJ · kam-wí-sàirn bòrk rá-dàp",
+  "section": "7.6",
+  "topic": "adverb",
+  "examples": [
+   "เขาเมามาก · káo mao mâhk — He’s really drunk. ／ 他醉得很厉害。",
+   "ฉันหิวนิดหน่อย · chún hěw nít-nòy — I’m a bit hungry. ／ 我有点饿。",
+   "ทนหน่อยนะ · ton nòy ná — Be a little patient! ／ 忍耐一下！"
+  ],
+  "focus": [
+   "พอ",
+   "เลย"
+  ],
+  "focus_all": [
+   "ค่อนข้าง",
+   "พอ",
+   "เลย"
+  ]
+ },
+ {
+  "key": "th-prep-dtrong",
+  "name": "ตรง + คำบุพบท",
+  "level": "A2",
+  "en": "ตรง 'right at' combines with a position word: ตรงหน้า, ตรงข้าม.",
+  "zh": "ตรง + 方位词：正对着（ตรงข้าม 对面）。",
+  "formation": "ตรง + บุพบท · dtrong + kam-bùp-pà-bòt",
+  "section": "8.1.1",
+  "topic": "preposition",
+  "examples": [
+   "อยู่ในรถ · yòo nai rót — It’s in the car. ／ 在车里。",
+   "จอดหลังบ้านได้ไหม · jòrt lǔng bâhn dâi mái? — Can I park behind the house? ／ 可以停在房子后面吗？",
+   "อยู่ข้างนอก · yòo kûng nôrk — It’s outside. ／ 在外面。"
+  ],
+  "focus": [
+   "ตรง"
+  ],
+  "focus_all": [
+   "ตรง"
+  ]
+ },
+ {
+  "key": "th-prep-bpai",
+  "name": "ไป + คำบุพบท",
+  "level": "A2",
+  "en": "ไป plus a preposition extends motion toward a place: ไปใน, ไปที่.",
+  "zh": "ไป + 介词：往……去（ไปที่…）。",
+  "formation": "ไป + บุพบท · bpai + kam-bùp-pà-bòt",
+  "section": "8.1.2",
+  "topic": "preposition",
+  "examples": [
+   "ภายในเจ็ดวัน · pai: nai jèt wun — within seven days ／ 七天之内",
+   "ภายใต้อิทธิพลของเขา · pai: dtâi: ìt-tí-pon kǒrng káo — under his influence ／ 在他的影响之下",
+   "ความสัมพันธ์ภายนอก · kwahm sǔm-pun pai: nôrk — external relations ／ 对外关系"
+  ],
+  "focus_all": [
+   "ไป"
+  ]
+ },
+ {
+  "key": "th-prepositions-bare",
+  "name": "บุพบทไม่ต้องมีคำนำ",
+  "level": "A2",
+  "en": "Bare position words work as prepositions: หน้า, หลัง, ใต้, บน.",
+  "zh": "方位词直接作介词：หน้า 前面 / หลัง 后面 / ใต้ 下面 / บน 上面。",
+  "formation": "N + หน้า/หลัง/บน/ใต้ · bùp-pà-bòt",
+  "section": "8.1.4",
+  "topic": "preposition",
+  "examples": [
+   "ไปรษณีย์อยู่ตรงข้ามวัด · bprai-sa-nee yòo dtrong kâhm wút — The post office is opposite a temple. ／ 邮局在寺庙对面。",
+   "เดินไปตามถนนใหญ่จนถึงสี่แยก · dern bpai dtahm ta-non yài jon těung sèe yâirk — Walk along the main road until you reach the crossroads. ／ 沿着大路一直走到十字路口。",
+   "เพื่อนเช่าบ้านอยู่ริมคลองรังสิต · pêu-un châo bâhn yòo rim klorng rung-sìt — My friend is renting a house on the edge of Khlong Rangsit/Rangsit Canal. ／ 朋友在兰实运河边租了房子。"
+  ],
+  "focus": [
+   "หลัง",
+   "บน",
+   "ใต้",
+   "ใน"
+  ],
+  "focus_all": [
+   "หน้า",
+   "หลัง",
+   "บน",
+   "ใต้",
+   "ใน"
+  ]
+ },
+ {
+  "key": "th-prep-to",
+  "name": "ถึง / ไปยัง / แก่",
+  "level": "A2",
+  "en": "'to': ถึง marks arrival, ไปยัง direction, แก่ a formal recipient.",
+  "zh": "“到/向”：ถึง 到达 / ไปยัง 朝向 / แก่ 给予（正式）。",
+  "formation": "V + ถึง/ไปยัง + สถานที่ · těung / bpai yang / gàir",
+  "section": "8.2",
+  "topic": "preposition",
+  "examples": [
+   "ผมเดินทางไปเมืองไทย · pǒm dern tahng bpai meu-ung tai — I travelled to Thailand. ／ 我去泰国旅行。",
+   "เขาให้หนังสือฉัน · káo hâi núng-sěu: chún — He gave the book to me. ／ 他把书给了我。",
+   "ฉันอยากจะพูดกับเขา · chún yàhk ja pôot gùp káo — I’d like to speak to him. ／ 我想跟他说句话。"
+  ],
+  "focus": [
+   "ถึง",
+   "ไปยัง",
+   "แก่"
+  ],
+  "focus_all": [
+   "ถึง",
+   "ไปยัง",
+   "แก่"
+  ]
+ },
+ {
+  "key": "th-prep-for-hai",
+  "name": "ให้ (เพื่อผู้รับ)",
+  "level": "A2",
+  "en": "ให้ before a person marks the beneficiary of the action.",
+  "zh": "ให้ + 人：为某人（ซื้อของให้แม่ 给妈妈买东西）。",
+  "formation": "V + O + ให้ + คน · hâi",
+  "section": "8.3.1",
+  "topic": "preposition",
+  "examples": [
+   "เขาซื้อหนังสือให้ฉัน · káo séu: núng-sěu: hâi chún — He bought a book for me. ／ 他给我买了本书。",
+   "ผมจะบอก(เขา)ให้(คุณ) · pǒm ja bòrk (káo) hâi (kOOn) — I’ll tell him for you. ／ 我替你告诉他。",
+   "ช่วยใส่กล่องกลับบ้านให้(ฉัน)ด้วย · chôo-ay sài glòrng glùp bâhn hâi (chún) dôo-ay — Please put it in a take-away box for me. ／ 请帮我装进打包盒。"
+  ],
+  "focus_all": [
+   "ให้"
+  ]
+ },
+ {
+  "key": "th-prep-purpose-peua",
+  "name": "เพื่อ",
+  "level": "A2",
+  "en": "เพื่อ marks purpose or the beneficiary of a formal act.",
+  "zh": "เพื่อ：为了、为（目的）。",
+  "formation": "เพื่อ + N/V · pêu-a",
+  "section": "8.3.2",
+  "topic": "preposition",
+  "examples": [
+   "ทุกสิ่งทุกอย่างผมทำเพื่อคุณ · tÓOk sìng tÓOk yàhng pǒm tum pêu-a kOOn — Everything I do is for you. ／ 我做的一切都是为了你。",
+   "ฉันทำงานเพื่ออนาคตของเรา · chún tum ngahn pêu-a a-nah-kót kǒrng rao — I am working for our future. ／ 我为我们的未来工作。",
+   "เขาเสียสละตัวเองเพื่อประเทศชาติ · káo sěe-a sa-là dtoo-a ayng pêu-a bpra-tâyt châht — He sacrificed himself for the nation. ／ 他为国牺牲了自己。"
+  ],
+  "focus_all": [
+   "เพื่อ"
+  ]
+ },
+ {
+  "key": "th-prep-samrap",
+  "name": "สำหรับ",
+  "level": "A2",
+  "en": "สำหรับ 'for, as regards' introduces the intended user or purpose.",
+  "zh": "สำหรับ：供……用、对于。",
+  "formation": "สำหรับ + N · sǔm-rùp",
+  "section": "8.3.3",
+  "topic": "preposition",
+  "examples": [
+   "นี่สำหรับคุณ · nêe sǔm-rùp kOOn — This is for you. ／ 这是给你的。",
+   "สำหรับอาหารเย็นเราจะไปกินข้างนอก · sǔm-rùp ah-hǎhn yen rao ja bpai gin kûng nôrk — As far as the evening meal is concerned, we will eat out. ／ 至于晚饭，我们出去吃。"
+  ],
+  "focus": [
+   "สำหรับ"
+  ],
+  "focus_all": [
+   "สำหรับ"
+  ]
+ },
+ {
+  "key": "th-word-order-topic",
+  "name": "ประธาน + กริยา + กรรม / ยกหัวข้อ",
+  "level": "A2",
+  "en": "Basic SVO; a fronted element becomes the topic, often closed by นั้น/นี่.",
+  "zh": "基本语序 SVO；前置成分作话题（那……的话）。",
+  "formation": "S + V + O / TOPIC + S + V · bprà-taan + grì-yah + gam",
+  "section": "9.1",
+  "topic": "clause",
+  "examples": [
+   "พ่อ ซื้อ รถ · pôr séu: rót — Father bought a car ／ 父亲买了一辆车。",
+   "ฉัน รัก คุณ · chún rúk kOOn — I love you ／ 我爱你。",
+   "พ่อเขาซื้อรถ · pôr káo séu: rót — (father – he – buy – car) ／ 父亲他买了车。（父—他—买—车）"
+  ],
+  "focus_all": [
+   "นั้น",
+   "นี่"
+  ]
+ },
+ {
+  "key": "th_if",
+  "name": "ถ้า / หาก",
+  "level": "A2",
+  "en": "ถ้า introduces the condition; the result often opens with ก็.",
+  "zh": "ถ้า/หาก：如果（结果句常用 ก็ 呼应）。",
+  "formation": "ถ้า + CLAUSE, (ก็) + CLAUSE · tâh / hàhk",
+  "section": "9.2.1",
+  "topic": "clause",
+  "examples": [
+   "ถ้า(หากว่า)ฝนตกฉันก็ไม่ไป · tâh (hàhk wâh) fǒn dtòk chún gôr mâi bpai — If it rains, I’m not going / If it had rained, I wouldn’t have gone, etc. ／ 如果下雨，我就不去／要是当时下雨，我就不会去了。",
+   "ฝนตกฉัน(ก็)ไม่ไป · fǒn dtòk chún (gôr) mâi bpai — If it rains, I’m not going / If it had rained, I wouldn’t have gone, etc. ／ 下雨我就不去／下雨我就不会去了。",
+   "ไม่มีกิจห้ามเข้า · mâi mee gìt hâhm kâo — (not – have – business – forbidden – to enter) ／ 无事莫入。（无—事—禁—入）"
+  ],
+  "focus_all": [
+   "ถ้า",
+   "หาก"
+  ]
+ },
+ {
+  "key": "th_in_order_to",
+  "name": "เพื่อ / เพื่อที่จะ",
+  "level": "A2",
+  "en": "เพื่อ(ที่จะ) introduces a purpose clause.",
+  "zh": "เพื่อ(ที่จะ)：为了……。",
+  "formation": "เพื่อ(ที่จะ) + CLAUSE · pêu-a / pêu-a têe jà",
+  "section": "9.2.4",
+  "topic": "clause",
+  "examples": [
+   "เขากินอาหารถูก ๆ เพื่อ(ที่)จะประหยัดเงิน · káo gin ah-hǎhn tòok tòok pêu-a (têe) ja bpra-yùt ngern — He eats cheap food in order to economise. ／ 他为了省钱吃便宜的饭菜。",
+   "ผมทำอย่างนั้นเพื่อ(ที่)จะช่วยเพื่อน · pǒm tum yàhng nún pêu-a (têe) ja chôo-ay pêu-un — I did that in order to help a friend. ／ 我那样做是为了帮朋友。",
+   "เราจะเดินทางกลางคืนเพื่อจะได้ไม่เสียเวลา · rao ja dern thang glahng keu:n pêu-a ja dâi mâi sěe-a way-lah — We’ll travel overnight so as not to waste time. ／ 我们夜里赶路，免得浪费时间。"
+  ],
+  "focus_all": [
+   "เพื่อ"
+  ]
+ },
+ {
+  "key": "th_when",
+  "name": "เมื่อ / ตอน(ที่) / พอ",
+  "level": "A2",
+  "en": "Time clauses: เมื่อ 'when', ตอน(ที่) 'at the time that', พอ 'as soon as'.",
+  "zh": "时间从句：เมื่อ 当 / ตอนที่ 在……时 / พอ 一……就。",
+  "formation": "เมื่อ/ตอนที่/พอ + CLAUSE · mêu-a / dton / por",
+  "section": "9.2.7",
+  "topic": "clause",
+  "examples": [
+   "พอนั่งลงหน้าทีวีปุ๊บก็หลับ · por nûng long nâh tee wee bpÓOp gôr lùp — No sooner does he sit down in front of the TV than he falls asleep. ／ 他刚在电视前一坐下就睡着了。",
+   "กินปุ๊บอิ่มปั๊บ · gin bpÓOp ìm bpúp — As soon as I (start to) eat, I feel full. ／ 我一吃就饱。",
+   "เมื่อเรียนจบแล้ว ฉันก็ไปสมัครงานเป็นครู · mêu-a ree-un jòp láir-o chún gôr bpai sa-mùk ngahn bpen kroo — When I graduated, I went and applied for a job as a teacher. ／ 我毕业以后就去应聘当老师。"
+  ],
+  "focus_all": [
+   "เมื่อ",
+   "ตอน",
+   "ตอนที่",
+   "พอ"
+  ]
+ },
+ {
+  "key": "th-reported-speech",
+  "name": "ว่า + คำพูด (คำพูดโดยตรง/โดยอ้อม)",
+  "level": "A2",
+  "en": "Direct speech quotes; indirect speech drops the quote and keeps ว่า.",
+  "zh": "引语：直接引语加 “ ”；间接引语用 ว่า 引导。",
+  "formation": "V + ว่า + CLAUSE · wâh",
+  "section": "9.3",
+  "topic": "clause",
+  "examples": [
+   "เขาบอกว่า (เขา)จะไม่ไป · káo bòrk wâh (káo) ja mâi bpai — He said that he’s not going. ／ 他说他不去。",
+   "เขาบอกว่า (ผม)จะไม่ไป · káo bòrk wâh (pǒm) ja mâi bpai — He said, ‘I’m not going.’ ／ 他说：“我不去。”"
+  ],
+  "focus_all": [
+   "ว่า"
+  ]
+ },
+ {
+  "key": "th-exemplification",
+  "name": "เช่น / อย่าง",
+  "level": "A2",
+  "en": "เช่น 'such as', อย่าง 'like'.",
+  "zh": "เช่น 例如 / อย่าง 像……那样。",
+  "formation": "เช่น + N · chèn / yàhng",
+  "section": "9.5",
+  "topic": "clause",
+  "examples": [
+   "ต้องทำหลายอย่างเช่นซักผ้าหุงข้าวตัดหญ้าเป็นต้น · dtôrng tum lǎi: yàhng chên súk pâh hǑOng kâo: dtùt yâh bpen dtôn — I have to do lots of things, such as washing, cooking and cutting the grass. ／ 要做很多事，比如洗衣服、做饭、割草等等。",
+   "ขอยกตัวอย่างหนึ่ง · kǒr yók dtoo-a yàhng nèung — Let me give an example. ／ 我举个例子。"
+  ],
+  "focus": [
+   "เช่น"
+  ],
+  "focus_all": [
+   "เช่น"
+  ]
+ },
+ {
+  "key": "th-particle-krup-pom",
+  "name": "ครับผม",
+  "level": "A2",
+  "en": "ครับผม is extra-polite or a crisp acknowledgement, common in service and military speech.",
+  "zh": "ครับผม：更恭敬的应答（服务、军警用语）。",
+  "formation": "ครับผม · krúp pǒm",
+  "section": "10.2.2",
+  "topic": "particle",
+  "examples": [],
+  "focus": [
+   "ครับผม"
+  ],
+  "focus_all": [
+   "ครับผม"
+  ]
+ },
+ {
+  "key": "th-particle-duai",
+  "name": "ด้วย",
+  "level": "A2",
+  "en": "ด้วย 'too, also', or a soft 'please' in a request.",
+  "zh": "ด้วย：也 / 请（请求时缓和语气）。",
+  "formation": "CLAUSE + ด้วย · dûai",
+  "section": "10.3.1",
+  "topic": "particle",
+  "examples": [
+   "ขอโทษด้วย · kǒr-tôht dôo-ay — Sorry! ／ 对不起！",
+   "เช็คบิลด้วย · chék bin dôo-ay — Can I have the bill, please? ／ 请结账。",
+   "ช่วยด้วย · chôo-ay dôo-ay — Help! ／ 救命！"
+  ],
+  "focus_all": [
+   "ด้วย"
+  ]
+ },
+ {
+  "key": "th-particle-la-falling",
+  "name": "l่ะ",
+  "level": "A2",
+  "en": "ล่ะ asks 'and ...?' or presses for an answer.",
+  "zh": "ล่ะ：那么……呢？（追问）。",
+  "formation": "CLAUSE + ล่ะ · lâ",
+  "section": "10.3.3",
+  "topic": "particle",
+  "examples": [
+   "ทำไมล่ะ · tum-mai lâ? — Why? ／ 为什么呀？",
+   "ไปไหนล่ะ · bpai nǎi lâ? — Where are you going? ／ 你去哪儿呀？",
+   "ทำไมต้องไปบอกเขาล่ะ · tum-mai dtôrng bpai bòrk káo lâ? — Why on earth did you have to go and tell her? ／ 你干嘛非要去告诉她呀？"
+  ],
+  "focus": [
+   "ล่ะ"
+  ],
+  "focus_all": [
+   "ล่ะ"
+  ]
+ },
+ {
+  "key": "th-particle-si",
+  "name": "สิ / ซิ",
+  "level": "A2",
+  "en": "สิ urges or insists: 'go on, do it'.",
+  "zh": "สิ/ซิ：催促、坚持“就……吧”。",
+  "formation": "V + สิ/ซิ · sì / sí",
+  "section": "10.3.9",
+  "topic": "particle",
+  "examples": [
+   "เชิญนั่งซิคะ · chern nûng sí ká — Please sit down. ／ 请坐吧。",
+   "ดูซิครับ · doo sí krúp — Look!, Take a look! ／ 你看呀！",
+   "พูดอีกทีซิคะ · pôot èek tee sí ká — Please say that again. ／ 请再说一遍。"
+  ],
+  "focus": [
+   "ซิ"
+  ],
+  "focus_all": [
+   "สิ",
+   "ซิ"
+  ]
+ },
+ {
+  "key": "th-particle-ter",
+  "name": "เถอะ / เถิด",
+  "level": "A2",
+  "en": "เถอะ 'let's, go ahead'; เถิด is its literary form.",
+  "zh": "เถอะ 吧（提议、放任）/ เถิด 书面形。",
+  "formation": "V + เถอะ/เถิด · tèr / tèrt",
+  "section": "10.3.10",
+  "topic": "particle",
+  "examples": [
+   "กลับบ้านเถอะ ดึกแล้ว · glùp bâhn tèr dèuk láir-o — You’d better go home. It’s late. ／ 回家吧，太晚了。",
+   "ไปกินกันเถอะ · bpai gin gun tèr — Let’s go and eat. ／ 我们去吃饭吧。",
+   "เดี๋ยวเหอะ · děe-o hèr — Steady on!/Not so fast! ／ 慢着！"
+  ],
+  "focus": [
+   "เถอะ",
+   "เถิด"
+  ],
+  "focus_all": [
+   "เถอะ",
+   "เถิด"
+  ]
+ },
+ {
+  "key": "th-neg-aux-pre",
+  "name": "ไม่ + กริยาช่วย + กริยา",
+  "level": "A2",
+  "en": "ไม่ before the auxiliary negates the whole modal phrase: ไม่ต้องไป.",
+  "zh": "ไม่ + 助动词 + 动词：ไม่ต้องไป（不用去）。",
+  "formation": "ไม่ + AUX + V · mâi + grì-yah chûai",
+  "section": "11.3.1",
+  "topic": "negation",
+  "examples": [
+   "คุณไม่ต้องบอกเขา · kOOn mâi dtôrng bòrk káo — There’s no need to tell him. / You don’t have to tell him. ／ 你不必告诉他。",
+   "ฉันไม่เคยกิน · chún mâi ker-ee gin — I’ve never eaten it. ／ 我从没吃过。",
+   "คุณไม่ควร(จะ)ซื้อ · kOOn mâi koo-un (ja) séu: — You shouldn’t have bought it. ／ 你不该买的。"
+  ],
+  "focus": [
+   "ไม่ต้อง",
+   "ไม่อยาก"
+  ],
+  "focus_all": [
+   "ไม่ต้อง",
+   "ไม่อยาก",
+   "ไม่เคย"
+  ]
+ },
+ {
+  "key": "th-mai-dai-action",
+  "name": "ไม่ได้ + กริยา (อดีต)",
+  "level": "A2",
+  "en": "ไม่ได้ before an action verb says the action did not happen.",
+  "zh": "ไม่ได้ + 动词：没做成（ไม่ได้ไป 没去）。",
+  "formation": "ไม่ได้ + V · mâi dâi + grì-yah",
+  "section": "11.4.1",
+  "topic": "negation",
+  "examples": [
+   "เพื่อนไม่ได้มา · pêu-un mâi dâi mah — My friend didn’t come. ／ 朋友没来。",
+   "เราไม่ได้ซื้อ · rao mâi dâi séu: — We didn’t buy it. ／ 我们没买。",
+   "เขาไม่ได้บอก · káo mâi dâi bòrk — He didn’t say. ／ 他没说。"
+  ]
+ },
+ {
+  "key": "th-mai-dai-chue-bpen",
+  "name": "ไม่ได้ชื่อ / ไม่ได้เป็น",
+  "level": "A2",
+  "en": "ไม่ได้ negates ชื่อ 'be named' and เป็น 'be' in past contexts.",
+  "zh": "ไม่ได้ + ชื่อ/เป็น：否定“叫……/是……”。",
+  "formation": "ไม่ได้ + ชื่อ/เป็น · mâi dâi chêu / mâi dâi bpen",
+  "section": "11.4.3",
+  "topic": "negation",
+  "examples": [
+   "เขาไม่ได้ชื่อต๋อย · káo mâi dâi chêu dtǒy — Her name isn’t Toi. ／ 她不叫小兑。",
+   "ผมไม่ได้เป็นคนอเมริกัน · pǒm mâi dâi bpen kon a-may-ri-gun — I’m not an American. ／ 我不是美国人。"
+  ],
+  "focus": [
+   "ไม่ได้ชื่อ"
+  ],
+  "focus_all": [
+   "ไม่ได้ชื่อ"
+  ]
+ },
+ {
+  "key": "th-negative-question",
+  "name": "ไม่...หรือ / ไม่...ไหม",
+  "level": "A2",
+  "en": "A negative question expects confirmation: 'isn't it ...?'.",
+  "zh": "否定疑问：期待对方认同（ไม่ไปหรือ 不去吗？）。",
+  "formation": "ไม่ + V + หรือ/ไหม · mâi ... rěu",
+  "section": "11.10",
+  "topic": "negation",
+  "examples": [
+   "คุณไม่ซื้อหรือ · kOOn mâi séu: lěr? — You’re not buying it, right? ／ 你不买是吧？",
+   "คุณไม่รู้ใช่ไหม · kOOn mâi róo châi mái? — You don’t know, right? ／ 你不知道对吧？",
+   "นี่รถของคุณไม่ใช่หรือ · nêe rót kǒrng kOOn mâi châi lěr? — This is your car, isn’t it? ／ 这是你的车，不是吗？"
+  ]
+ },
+ {
+  "key": "th-negative-idioms",
+  "name": "ไม่ค่อย / ไม่เคย / ไม่ต้อง",
+  "level": "A2",
+  "en": "ไม่ค่อย 'not really', ไม่เคย 'never have', ไม่ต้อง 'no need'.",
+  "zh": "ไม่ค่อย 不太 / ไม่เคย 从不 / ไม่ต้อง 不用。",
+  "formation": "ไม่ + ADV/AUX · mâi kôy / mâi ker-ee",
+  "section": "11.13",
+  "topic": "negation",
+  "examples": [
+   "เขาพูดไม่เป็นเรื่อง เขาเป็นคนไม่เอาไหน · káo pôot mâi bpen rêu-ung káo bpen kon mâi ao nǎi — He’s talking nonsense. He’s a good-for-nothing. ／ 他说话不着调，是个不成器的人。"
+  ],
+  "focus": [
+   "ไม่ค่อย"
+  ],
+  "focus_all": [
+   "ไม่ค่อย",
+   "ไม่เคย",
+   "ไม่ต้อง"
+  ]
+ },
+ {
+  "key": "th-question-na",
+  "name": "... นะ",
+  "level": "A2",
+  "en": "นะ as a question particle checks or reminds.",
+  "zh": "นะ：确认、提醒式的疑问。",
+  "formation": "CLAUSE + นะ · ná",
+  "section": "12.1.4",
+  "topic": "question",
+  "examples": [
+   "วันนี้ร้อนนะ · wun née rórn ná? — It’s hot today, isn’t it? ／ 今天好热啊。"
+  ],
+  "focus_all": [
+   "นะ"
+  ]
+ },
+ {
+  "key": "th-question-lair-o-yung",
+  "name": "... แล้วหรือยัง",
+  "level": "A2",
+  "en": "'Have you ... yet?' — แล้ว or หรือยัง closes the question.",
+  "zh": "แล้วหรือยัง：……了吗？（询问是否已完成）。",
+  "formation": "V + แล้วหรือยัง · rěu yang",
+  "section": "12.1.6",
+  "topic": "question",
+  "examples": [
+   "กินข้าว(แล้ว)หรือยัง · gin kâo: (láir-o) réu yung? — Have you eaten yet? ／ 吃饭了吗？",
+   "พอ(แล้ว)หรือยัง · por (láir-o) réu yung? — Is that enough? ／ 够了吗？",
+   "คุณแต่งงาน(แล้ว)หรือยัง · kOOn dtàirng ngahn (láir-o) réu yung? — Are you married? ／ 你结婚了吗？"
+  ],
+  "focus": [
+   "หรือยัง",
+   "แล้วยัง"
+  ],
+  "focus_all": [
+   "หรือยัง",
+   "แล้วยัง"
+  ]
+ },
+ {
+  "key": "th-q-how-degree",
+  "name": "แค่ไหน",
+  "level": "A2",
+  "en": "แค่ไหน 'to what extent'.",
+  "zh": "แค่ไหน：到什么程度。",
+  "formation": "ADJ + แค่ไหน · kâir nǎi",
+  "section": "12.2.9",
+  "topic": "question",
+  "examples": [
+   "คุณไปนานเท่าไหร่ · kOOn bpai nahn tâo-rài? — How long are you going for? ／ 你去多久？",
+   "หนักเท่าไหร่ · nùk tâo-rài? — How heavy is it? ／ 多重？",
+   "สูงเท่าไหร่ · sǒong tâo-rài? — How tall is it? ／ 多高？"
+  ],
+  "focus": [
+   "แค่ไหน"
+  ],
+  "focus_all": [
+   "แค่ไหน"
+  ]
+ },
+ {
+  "key": "th-q-dee",
+  "name": "... ดี",
+  "level": "A2",
+  "en": "ดี after a wh-word asks for a recommendation: ไปไหนดี 'where should we go?'.",
+  "zh": "疑问词 + ดี：……才好呢？（征询建议）。",
+  "formation": "WH + ดี · dee",
+  "section": "12.2.12",
+  "topic": "question",
+  "examples": [
+   "กินอะไรดี · gin a-rai dee? — What shall I/we eat? ／ 吃点什么好呢？",
+   "ไปเมื่อไรดี · bpai mêu-rài dee? — When shall I/we go? ／ 什么时候去好呢？",
+   "ทำอย่างไรดี · tum yung-ngai dee? — What shall I/we do? ／ 怎么办呢？"
+  ],
+  "focus_all": [
+   "ดี"
+  ]
+ },
+ {
+  "key": "th-q-bang",
+  "name": "... บ้าง",
+  "level": "A2",
+  "en": "บ้าง makes the question open-ended: 'what sort of things ...?'.",
+  "zh": "บ้าง：……些什么（开放列举）。",
+  "formation": "WH + บ้าง · bâhng",
+  "section": "12.2.13",
+  "topic": "question",
+  "examples": [
+   "เขาซื้ออะไรบ้าง · káo séu: a-rai bâhng? — What (plural) did he buy? ／ 他买了些什么？",
+   "เจอใครบ้าง · jer krai bâhng? — Who (plural) did you meet? ／ 你见到了哪些人？",
+   "คุณไปเที่ยวที่ไหนบ้าง · kOOn bpai têe-o têe nǎi bâhng? — Where (plural) did you go? ／ 你去了哪些地方？"
+  ],
+  "focus": [
+   "บ้าง"
+  ],
+  "focus_all": [
+   "บ้าง"
+  ]
+ },
+ {
+  "key": "th-q-la",
+  "name": "แล้ว ... ล่ะ",
+  "level": "A2",
+  "en": "แล้ว...ล่ะ 'and what about ...?'.",
+  "zh": "แล้ว…ล่ะ：那……呢？",
+  "formation": "แล้ว + X + ล่ะ · ráir-o ... lâ",
+  "section": "12.2.14",
+  "topic": "question",
+  "examples": [
+   "แล้วคุณล่ะ · láir-o kOOn lâ? — And how/what about you? ／ 那你呢？",
+   "แล้วเพื่อนล่ะ · láir-o pêu-un lâ? — And how/what about your friend? ／ 那朋友呢？",
+   "แล้วพรุ่งนี้ล่ะ · láir-o prÔOng née lâ? — And how/what about tomorrow? ／ 那明天呢？"
+  ],
+  "focus_all": [
+   "ล่ะ"
+  ]
+ },
+ {
+  "key": "th-alternative-question",
+  "name": "A หรือ B",
+  "level": "A2",
+  "en": "หรือ between two options: 'A or B?'.",
+  "zh": "选择疑问：A หรือ B（A 还是 B）。",
+  "formation": "A หรือ B · rěu",
+  "section": "12.3",
+  "topic": "question",
+  "examples": [
+   "ไปดูหนังหรือกลับบ้าน · bpai doo nǔng réu glùp bâhn? — Shall we see a film or go home? ／ 去看电影还是回家？",
+   "เอาน้ำชาหรือกาแฟ · ao núm chah réu gah-fair? — Do you want tea or coffee? ／ 要茶还是咖啡？",
+   "ไปไม่ไป · bpai mâi bpai? — Are you going or not? (lit. go – not – go) ／ 去不去？"
+  ],
+  "focus_all": [
+   "หรือ"
+  ]
+ },
+ {
+  "key": "th-numbers-suk-dtung",
+  "name": "สอง / ทั้งสอง",
+  "level": "A2",
+  "en": "ทั้งสอง 'both', ทั้ง...ทั้ง 'both ... and'.",
+  "zh": "ทั้งสอง 两者都 / ทั้ง…ทั้ง 既…又…。",
+  "formation": "ทั้งสอง + CLF · sǒrng / táng sǒrng",
+  "section": "13.2",
+  "topic": "quantity",
+  "examples": [
+   "ผมจะไปสักห้าวัน · pǒm ja bpai sùk hâh wun — I’m going for five days or so. ／ 我去五天左右。",
+   "เราคุยกันสักชั่วโมงเท่านั้น · rao koo-ee gun sùk chôo-a-mohng tâo-nún — We chatted for just an hour. ／ 我们只聊了一个小时。",
+   "เขาอยากมีลูกสักคนสองคน · káo yàhk mee lôok sùk kon sǒrng kon — They would like to have a child or two. ／ 他们想要一两个孩子。"
+  ],
+  "focus": [
+   "ทั้งสอง"
+  ],
+  "focus_all": [
+   "ทั้งสอง",
+   "ทั้ง"
+  ]
+ },
+ {
+  "key": "th-times-count",
+  "name": "ครั้ง / ที",
+  "level": "A2",
+  "en": "'once, twice': ครั้ง or ที as the counter of occurrences.",
+  "zh": "ครั้ง/ที：次数（สองครั้ง 两次）。",
+  "formation": "จำนวน + ครั้ง/ที · kráng / tee",
+  "section": "13.5",
+  "topic": "quantity",
+  "examples": [],
+  "focus": [
+   "ครั้ง",
+   "ที"
+  ],
+  "focus_all": [
+   "ครั้ง",
+   "ที"
+  ]
+ },
+ {
+  "key": "th-percent",
+  "name": "เปอร์เซ็นต์",
+  "level": "A2",
+  "en": "เปอร์เซ็นต์ 'percent'.",
+  "zh": "百分比：เปอร์เซ็นต์。",
+  "formation": "จำนวน + เปอร์เซ็นต์ · ber-sen",
+  "section": "13.6.3",
+  "topic": "quantity",
+  "examples": [
+   "ประชาชนห้าสิบเปอร์เซ็นต์ · bpra-chah-chon hâh-sìp bper-sen — Fify per cent of the people ／ 百分之五十的民众",
+   "อัตราดอกเบี้ยร้อยละสองจุดห้า · ùt-dtrah dòrk bêe-a róy la sǒrng jÒOt hâh — 2.5% interest rate ／ 百分之二点五的利率"
+  ],
+  "focus": [
+   "เปอร์เซ็นต์"
+  ],
+  "focus_all": [
+   "เปอร์เซ็นต์"
+  ]
+ },
+ {
+  "key": "th-multiples",
+  "name": "เท่า",
+  "level": "A2",
+  "en": "เท่า 'times as much': สองเท่า 'twice as much'.",
+  "zh": "倍数：สองเท่า（两倍）。",
+  "formation": "จำนวน + เท่า · tâo",
+  "section": "13.6.4",
+  "topic": "quantity",
+  "examples": [
+   "ใหญ่กว่าสามเท่า · yài gwàh sǎhm tâo — three times bigger ／ 大三倍",
+   "สนุกกว่าพันเท่า · sa-nÒOk gwàh pun tâo — a thousand times more fun ／ 好玩一千倍"
+  ],
+  "focus_all": [
+   "เท่า"
+  ]
+ },
+ {
+  "key": "th-measurements",
+  "name": "หน่วยวัด",
+  "level": "A2",
+  "en": "Measure words of quantity: กิโล, เมตร, ลิตร.",
+  "zh": "度量单位：กิโล 公斤 / เมตร 米 / ลิตร 升。",
+  "formation": "จำนวน + หน่วย · nùai wát",
+  "section": "13.9",
+  "topic": "quantity",
+  "examples": [
+   "ยาวเจ็ดนิ้ว · yao: jèt néw — seven inches long ／ 七英寸长",
+   "หนักห้าสิบกิโล · nùk hâh-sìp gi-loh — fifty kilos in weight ／ 五十公斤重",
+   "สิบตารางเมตร · sìp dtah-rahng máyt — ten square metres ／ 十平方米"
+  ],
+  "focus": [
+   "กิโล",
+   "เมตร",
+   "ลิตร"
+  ],
+  "focus_all": [
+   "กิโล",
+   "เมตร",
+   "ลิตร"
+  ]
+ },
+ {
+  "key": "th-distances",
+  "name": "ระยะทาง",
+  "level": "A2",
+  "en": "Distance expressions: ห่าง 'away', ไกล 'far'.",
+  "zh": "距离：ห่าง 相距 / ไกล 远。",
+  "formation": "ห่าง + จำนวน · rá-yá tahng",
+  "section": "13.10",
+  "topic": "quantity",
+  "examples": [
+   "หัวหินอยู่ไกลจากกรุงเทพฯสองร้อยกิโลเมตร · hǒo-a hǐn yòo glai jàhk grOOng-tâyp sǒrng róy gi-loh-mét — Hua Hin is 200 kilometres from Bangkok. ／ 华欣离曼谷两百公里。",
+   "ไปรษณีย์อยู่ห่างจากบ้านไม่กี่นาที · bprai-sa-nee yòo hàhng jàhk bâhn mâi gèe nah-tee — The post office is a few minutes from my house. ／ 邮局离我家只有几分钟。"
+  ],
+  "focus": [
+   "ห่าง",
+   "ไกล"
+  ],
+  "focus_all": [
+   "ห่าง",
+   "ไกล"
+  ]
+ },
+ {
+  "key": "th-negative-quantification",
+  "name": "ไม่...สัก / ไม่มี...เลย",
+  "level": "A2",
+  "en": "Negative quantification: ไม่...สัก 'not a single', ไม่มี...เลย 'none at all'.",
+  "zh": "否定数量：ไม่…สัก 一个也… / ไม่มี…เลย 一点也没有。",
+  "formation": "ไม่ + V + สัก + CLF · mâi ... sák",
+  "section": "13.13",
+  "topic": "quantity",
+  "examples": [
+   "ไม่มีโอกาส · mâi mee oh-gàht — There’s no opportunity. ／ 没有机会。",
+   "ไม่มีน้ำปลา · mâi mee núm bplah — There’s no fish sauce. ／ 没有鱼露。"
+  ],
+  "focus": [
+   "สัก"
+  ],
+  "focus_all": [
+   "สัก",
+   "เลย"
+  ]
+ },
+ {
+  "key": "th-approximation",
+  "name": "ประมาณ / ราว / เกือบ",
+  "level": "A2",
+  "en": "Approximation: ประมาณ 'about', ราว 'around', เกือบ 'almost'.",
+  "zh": "约数：ประมาณ 大约 / ราว 左右 / เกือบ 将近。",
+  "formation": "ประมาณ + จำนวน · bprà-mahn / rao",
+  "section": "13.14",
+  "topic": "quantity",
+  "examples": [
+   "นักท่องเที่ยวประมาณร้อยคน · núk tôrng têe-o bpra-mahn róy kon — about 100 tourists ／ 大约一百名游客",
+   "ราวหกชั่วโมง · rao: hòk chôo-a mohng — about six hours ／ 大约六小时",
+   "สองสามวัน · sǒrng sǎhm wun — two or three days ／ 两三天"
+  ],
+  "focus": [
+   "ประมาณ",
+   "ราว"
+  ],
+  "focus_all": [
+   "ประมาณ",
+   "ราว",
+   "เกือบ"
+  ]
+ },
+ {
+  "key": "th-only",
+  "name": "เท่านั้น / แค่",
+  "level": "A2",
+  "en": "'Only': เท่านั้น after the noun, แค่ before it.",
+  "zh": "只有：เท่านั้น（在后）/ แค่（在前）。",
+  "formation": "N + เท่านั้น / แค่ + N · tâo nán / kâir",
+  "section": "13.15",
+  "topic": "quantity",
+  "examples": [
+   "เขามีลูกสองคนเท่านั้น · káo mee lôok sǒrng kon tâo-nún — They only have two children. ／ 他们只有两个孩子。",
+   "เขามีเพื่อนสนิทคนเดียวเท่านั้น · káo mee pêu-un sa-nìt kon dee-o tâo-nún — He has only one close friend. ／ 他只有一个好朋友。",
+   "เงินเหลือเพียงสี่ร้อยบาท(เท่านั้น) · ngern lěu-a pee-ung sèe róy bàht (tâo-nún) — There are only four hundred baht left. ／ 只剩下四百铢。"
+  ],
+  "focus": [
+   "เท่านั้น",
+   "แค่"
+  ],
+  "focus_all": [
+   "เท่านั้น",
+   "แค่"
+  ]
+ },
+ {
+  "key": "th-more-than-mak",
+  "name": "มากกว่า",
+  "level": "A2",
+  "en": "มากกว่า 'more than' compares two quantities.",
+  "zh": "มากกว่า：多于、超过。",
+  "formation": "A + มากกว่า + B · mâhk gwàh",
+  "section": "13.16.3",
+  "topic": "quantity",
+  "examples": [
+   "หนังสือมากกว่าสิบห้าเล่ม · núng-sěu: mâhk gwàh sìp hâh lêm — more than fifteen books ／ 十五本以上",
+   "เขากินเบียร์มากกว่าหกขวด · káo gin bee-a mâhk gwàh hòk kòo-ut — He drank more than six bottles of beer. ／ 他喝了六瓶以上啤酒。",
+   "นักเรียนเกิน(กว่า)สามสิบห้าคน · núk ree-un gern (gwàh) sǎhm-sìp hâh kon — more than thirty pupils ／ 超过三十五个学生"
+  ],
+  "focus": [
+   "มากกว่า"
+  ],
+  "focus_all": [
+   "มากกว่า"
+  ]
+ },
+ {
+  "key": "th-less-than",
+  "name": "น้อยกว่า",
+  "level": "A2",
+  "en": "น้อยกว่า 'less than'.",
+  "zh": "น้อยกว่า：少于。",
+  "formation": "A + น้อยกว่า + B · nóy gwàh",
+  "section": "13.17",
+  "topic": "quantity",
+  "examples": [
+   "ผู้ใหญ่น้อยกว่าสิบคน · pôo-yài nóy gwàh sìp kon — less than ten adults ／ 不到十个大人",
+   "เขาพูดน้อยกว่าห้านาที · káo pôot nóy gwàh hâh nah-tee — He spoke for less than five minutes. ／ 他说了不到五分钟。",
+   "เขาได้เงินเดือนไม่ถึงหมื่นบาท · káo dâi ngern deu-un mâi těung mèu:n bàht — He gets a monthly salary of less than 10,000 baht. ／ 他月薪不到一万铢。"
+  ],
+  "focus": [
+   "น้อยกว่า"
+  ],
+  "focus_all": [
+   "น้อยกว่า"
+  ]
+ },
+ {
+  "key": "th-during-rawang",
+  "name": "ระหว่าง",
+  "level": "A2",
+  "en": "ระหว่าง 'during, between'.",
+  "zh": "ระหว่าง：在……期间、之间。",
+  "formation": "ระหว่าง + N · rá-wàhng",
+  "section": "14.7.3.2",
+  "topic": "time",
+  "examples": [
+   "ระหว่างเดือนเมษาฯ · ra-wàhng deu-un may-sǎh — during April ／ 四月间"
+  ],
+  "focus": [
+   "ระหว่าง"
+  ],
+  "focus_all": [
+   "ระหว่าง"
+  ]
+ },
+ {
+  "key": "th-middle-glahng",
+  "name": "กลาง + เวลา",
+  "level": "A2",
+  "en": "กลาง 'middle of': กลางเดือน, กลางคืน.",
+  "zh": "กลาง：……之中（กลางเดือน 月中）。",
+  "formation": "กลาง + เวลา · glahng",
+  "section": "14.7.3.3",
+  "topic": "time",
+  "examples": [
+   "กลางเดือนหน้า · glahng deu-un nâh — the middle of next month ／ 下个月中旬"
+  ],
+  "focus": [
+   "กลางเดือน",
+   "กลางปี"
+  ],
+  "focus_all": [
+   "กลางเดือน",
+   "กลางปี"
+  ]
+ },
+ {
+  "key": "th-ago",
+  "name": "... ที่แล้ว / เมื่อ ... ที่แล้ว",
+  "level": "A2",
+  "en": "'ago': time + ที่แล้ว, or เมื่อ + time + ที่แล้ว.",
+  "zh": "……以前：时间 + ที่แล้ว。",
+  "formation": "เวลา + ที่แล้ว · têe láir-o",
+  "section": "14.7.4.1",
+  "topic": "time",
+  "examples": [
+   "(เมื่อ)ห้าปีก่อน · (mêu-a) hâh bpee gòrn — five years ago ／ 五年前",
+   "(เมื่อ)เจ็ดเดือนที่แล้ว · (mêu-a) jèt deu-un têe láir-o — seven months ago ／ 七个月前",
+   "(เมื่อ)สามวันมาแล้ว · (mêu-a) sǎhm wun mah láir-o — three days ago ／ 三天前"
+  ],
+  "focus_all": [
+   "ที่แล้ว"
+  ]
+ },
+ {
+  "key": "th-in-time-ek",
+  "name": "อีก + เวลา",
+  "level": "A2",
+  "en": "อีก 'in another ...' for future spans: อีกสองวัน 'in two days'.",
+  "zh": "อีก + 时间：再过……（อีกสองวัน 再过两天）。",
+  "formation": "อีก + เวลา · èek",
+  "section": "14.7.4.2",
+  "topic": "time",
+  "examples": [
+   "อีกหกวัน · èek hòk wun — in six days’ time ／ 再过六天"
+  ],
+  "focus": [
+   "อีก"
+  ],
+  "focus_all": [
+   "อีก"
+  ]
+ },
+ {
+  "key": "th-within-nai",
+  "name": "ใน / ภายใน",
+  "level": "A2",
+  "en": "ใน 'in, within'; ภายใน 'within (a deadline)'.",
+  "zh": "ใน/ภายใน：在……之内。",
+  "formation": "ใน + เวลา · nai / pnai",
+  "section": "14.7.4.3",
+  "topic": "time",
+  "examples": [
+   "ภายในสามเดือน · pai: nai sǎhm deu-un — within three months ／ 三个月之内"
+  ],
+  "focus": [
+   "ภายใน"
+  ],
+  "focus_all": [
+   "ใน",
+   "ภายใน"
+  ]
+ },
+ {
+  "key": "th-since-dtung",
+  "name": "ตั้งแต่",
+  "level": "A2",
+  "en": "ตั้งแต่ 'since, from ... on'.",
+  "zh": "ตั้งแต่：自从、从……起。",
+  "formation": "ตั้งแต่ + เวลา · dtâng dtàir",
+  "section": "14.7.4.4",
+  "topic": "time",
+  "examples": [
+   "ตั้งแต่เมื่อวาน · dtûng-dtàir mêu-a wahn — since yesterday ／ 从昨天起"
+  ],
+  "focus": [
+   "ตั้งแต่"
+  ],
+  "focus_all": [
+   "ตั้งแต่"
+  ]
+ },
+ {
+  "key": "th-duration",
+  "name": "เป็นเวลา / นาน",
+  "level": "A2",
+  "en": "Duration: เป็นเวลา + span, or นาน 'for a long time'.",
+  "zh": "时长：เป็นเวลา + 时段 / นาน 很久。",
+  "formation": "V + เป็นเวลา + จำนวน · bpen wela / nahn",
+  "section": "14.7.5",
+  "topic": "time",
+  "examples": [
+   "ผมไปสองอาทิตย์ · pǒm bpai sǒrng ah-tít — I’m going for two weeks. ／ 我去两个星期。",
+   "เธอเรียนภาษาไทยสามปี · ter ree-un pah-sǎh tai sǎhm bpee — She studied Thai for three years. ／ 她学了三年泰语。",
+   "เขาจะเรียนที่มหาวิทยาลัยเป็นเวลาสามปี · káo ja ree-un têe ma-hǎh-wít-ta-yah-lai bpen way-lah sǎhm bpee — He will study at university for three years. ／ 他要在大学读三年。"
+  ],
+  "focus": [
+   "เป็นเวลา",
+   "นาน"
+  ],
+  "focus_all": [
+   "เป็นเวลา",
+   "นาน"
+  ]
+ },
+ {
+  "key": "th-quarter-minutes",
+  "name": "15 นาที / 45 นาที",
+  "level": "A2",
+  "en": "Quarter hours are said with นาที: 15 นาที, 45 นาที.",
+  "zh": "刻钟用 นาที：15 นาที（一刻）/ 45 นาที（三刻）。",
+  "formation": "จำนวน + นาที · ná-tee",
+  "section": "14.8.3",
+  "topic": "time",
+  "examples": [],
+  "focus": [
+   "นาที"
+  ],
+  "focus_all": [
+   "นาที"
+  ]
+ },
+ {
+  "key": "th-request-info",
+  "name": "ขอถาม / ขอทราบ",
+  "level": "A2",
+  "en": "Asking for information politely: ขอถามหน่อย, ขอทราบว่า.",
+  "zh": "询问：ขอถามหน่อย（请问一下）。",
+  "formation": "ขอ + V + หน่อย · kǒr tǎam",
+  "section": "15.4.1",
+  "topic": "speech",
+  "examples": [],
+  "focus": [
+   "ขอถาม",
+   "ขอทราบ"
+  ],
+  "focus_all": [
+   "ขอถาม",
+   "ขอทราบ"
+  ]
+ },
+ {
+  "key": "th-request-thing",
+  "name": "ขอ + สิ่งของ",
+  "level": "A2",
+  "en": "ขอ + noun 'may I have ...'.",
+  "zh": "ขอ + 名词：请给我……。",
+  "formation": "ขอ + N + หน่อย · kǒr + sìng-kǒrng",
+  "section": "15.4.2",
+  "topic": "speech",
+  "examples": [
+   "ขอน้ำเปล่าสองแก้ว(ได้ไหม) · kǒr náhm bplào sǒrng gâir-o (dâi: mái?) — Can I have two glasses of water, please? ／ 请给我两杯白水（可以吗）？",
+   "ขอน้ำหน่อย(ได้ไหม) · kǒr náhm nòy (dâi: mái?) — Can I have some water, please? ／ 请给我点水（可以吗）？",
+   "ขอข้าวหน่อย(ได้ไหม) · kǒr kâo: nòy (dâi: mái?) — Can I have some rice, please? ／ 请给我点饭（可以吗）？"
+  ],
+  "focus": [
+   "ขอ"
+  ],
+  "focus_all": [
+   "ขอ"
+  ]
+ },
+ {
+  "key": "th-request-self",
+  "name": "ขอ + กริยา (ทำเอง)",
+  "level": "A2",
+  "en": "ขอ + verb 'may I (do it)'.",
+  "zh": "ขอ + 动词：请让我……。",
+  "formation": "ขอ + V · kǒr + grì-yah",
+  "section": "15.4.3",
+  "topic": "speech",
+  "examples": [
+   "ขอดูหน่อย · kǒr doo nòy — Can I have a look, please? ／ 请让我看一下。",
+   "ขอพูดกับคุณต๋อยหน่อยได้ไหม · kǒr pôot gùp kOOn dtǒy nòy dâi: mái? — Could I speak to Khun Toi, please? ／ 我可以跟小兑先生说句话吗？"
+  ],
+  "focus_all": [
+   "ขอ"
+  ]
+ },
+ {
+  "key": "th-request-other",
+  "name": "ช่วย / กรุณา / ได้โปรด",
+  "level": "A2",
+  "en": "ช่วย 'please help/do', กรุณา formal, ได้โปรด pleading.",
+  "zh": "ช่วย 请（帮忙）/ กรุณา 敬请（正式）/ ได้โปรด 恳请。",
+  "formation": "ช่วย/กรุณา + V · chûai / gà-rú-na",
+  "section": "15.4.4",
+  "topic": "speech",
+  "examples": [
+   "ช่วยบอกเขาด้วยนะ · chôo-ay bòrk káo dôo-ay ná — Could you tell him, please? ／ 麻烦你告诉他一下。",
+   "ช่วยปิดประตูหน่อยได้ไหม · chôo-ay bpìt bpra-dtoo nòy dâi: mái? — Could you close the door, please? ／ 麻烦你把门关上好吗？",
+   "ช่วยปิดทีวีให้หน่อย · chôo-ay bpìt tee wee hâi nòy — Please turn the TV off (for me). ／ 麻烦帮我关一下电视。"
+  ],
+  "focus": [
+   "ช่วย",
+   "กรุณา",
+   "ได้โปรด"
+  ],
+  "focus_all": [
+   "ช่วย",
+   "กรุณา",
+   "ได้โปรด"
+  ]
+ },
+ {
+  "key": "th-request-negative",
+  "name": "อย่า / ไม่ต้อง",
+  "level": "A2",
+  "en": "Requests not to do something: อย่า + verb, or ไม่ต้อง 'no need'.",
+  "zh": "请求不要：อย่า + 动词 / ไม่ต้อง 不用。",
+  "formation": "อย่า + V · yàh / mâi dtôrng",
+  "section": "15.4.5",
+  "topic": "speech",
+  "examples": [
+   "ไม่ต้องปิดประตูนะ · mâi dtôrng bpìt bpra-dtoo ná — There’s no need to shut the door. ／ 不用关门。",
+   "ช่วยอย่าปิดประตูนะ · chôo-ay yàh bpìt bpra-dtoo ná — Please don’t shut the door. ／ 请不要关门。",
+   "กรุณาอย่าปิดประตูนะ · ga-rOO-nah yàh bpìt bpra-dtoo ná — Please don’t shut the door. ／ 请不要关门。"
+  ],
+  "focus_all": [
+   "อย่า",
+   "ไม่ต้อง"
+  ]
+ },
+ {
+  "key": "th-invitation",
+  "name": "ไป...กันเถอะ / เชิญ",
+  "level": "A2",
+  "en": "Invitations: ...กันเถอะ 'let's', เชิญ 'please come/do'.",
+  "zh": "邀请：…กันเถอะ（我们一起……吧）/ เชิญ 请。",
+  "formation": "V + กันเถอะ · bpai ... gan tèr",
+  "section": "15.4.6",
+  "topic": "speech",
+  "examples": [],
+  "focus": [
+   "กันเถอะ",
+   "เชิญ"
+  ],
+  "focus_all": [
+   "กันเถอะ",
+   "เชิญ"
+  ]
+ },
+ {
+  "key": "th-uncertainty",
+  "name": "ไม่แน่ใจ / คงจะ",
+  "level": "A2",
+  "en": "Expressing uncertainty: ไม่แน่ใจ 'not sure', คงจะ 'probably'.",
+  "zh": "不确定：ไม่แน่ใจ 不确定 / คงจะ 大概。",
+  "formation": "ไม่แน่ใจ(ว่า) + CLAUSE · mâi nâir jai",
+  "section": "15.5.1",
+  "topic": "speech",
+  "examples": [
+   "เขาไม่รู้จักผม · káo mâi róo-jùk pǒm — He doesn’t know me. ／ 他不认识我。",
+   "ไม่รู้จักคำว่า . . . · mâi róo-jùk kum wâh . . . — I don’t know the word . . . ／ 我不认识……这个词。",
+   "ผมไม่แน่(ใจ) · pǒm mâi nâir (jai) — I’m not sure. ／ 我不太确定。"
+  ],
+  "focus": [
+   "ไม่แน่ใจ",
+   "คงจะ"
+  ],
+  "focus_all": [
+   "ไม่แน่ใจ",
+   "คงจะ"
+  ]
+ },
+ {
+  "key": "th-not-understand",
+  "name": "ไม่เข้าใจ / ฟังไม่ทัน",
+  "level": "A2",
+  "en": "ไม่เข้าใจ 'don't understand', ฟังไม่ทัน 'can't follow what was said'.",
+  "zh": "听不懂：ไม่เข้าใจ / ฟังไม่ทัน（跟不上）。",
+  "formation": "ไม่เข้าใจ + CLAUSE · mâi kâo jai",
+  "section": "15.5.2",
+  "topic": "speech",
+  "examples": [
+   "ผมไม่เข้าใจ · pǒm mâi kâo jai — I don’t understand. ／ 我不明白。",
+   "เขาไม่รู้เรื่อง · káo mâi róo rêu-ung — He doesn’t understand. ／ 他不懂。",
+   "เขาไม่เข้าใจว่าทำไมผมจึงไม่สนใจ · káo mâi kâo jai wâh tum-mai pǒm jeung mâi sǒn jai — He doesn’t understand why I wasn’t interested. ／ 他不明白我为什么没兴趣。"
+  ],
+  "focus": [
+   "ไม่เข้าใจ",
+   "ฟังไม่ทัน"
+  ],
+  "focus_all": [
+   "ไม่เข้าใจ",
+   "ฟังไม่ทัน"
+  ]
+ },
+ {
+  "key": "th-ask-repeat",
+  "name": "พูดอีกครั้ง / พูดช้า ๆ",
+  "level": "A2",
+  "en": "Asking to repeat: พูดอีกครั้ง, พูดช้า ๆ, สะกดให้ฟังหน่อย.",
+  "zh": "请重复：พูดอีกครั้ง / พูดช้า ๆ（说慢点）/ สะกดให้ฟังหน่อย（请拼一下）。",
+  "formation": "V + อีกครั้ง · pôot èek kráng",
+  "section": "15.5.3",
+  "topic": "speech",
+  "examples": [
+   "พูดอีกทีได้ไหม · pôot èek tee dâi: mái? — Could you say that again? ／ 能再说一遍吗？",
+   "พูดช้าๆหน่อยได้ไหม · pôot cháh cháh nòy dâi: mái? — Could you speak slowly, please? ／ 能说慢一点吗？",
+   ". . . หมายความว่าอะไร · . . . mǎi: kwahm wâh a-rai? — What does . . . mean? ／ ……是什么意思？"
+  ],
+  "focus": [
+   "พูดอีกครั้ง",
+   "พูดช้าๆ"
+  ],
+  "focus_all": [
+   "พูดอีกครั้ง",
+   "พูดช้าๆ"
+  ]
+ },
+ {
+  "key": "th-asking-about-people",
+  "name": "ชื่ออะไร / มาจากไหน",
+  "level": "A2",
+  "en": "Finding out about someone: ชื่ออะไร, มาจากไหน, อายุเท่าไหร่.",
+  "zh": "问对方情况：ชื่ออะไร（叫什么）/ มาจากไหน（从哪来）/ อายุเท่าไหร่（多大）。",
+  "formation": "ชื่อ + อะไร · chêu a-rai",
+  "section": "15.6.2",
+  "topic": "speech",
+  "examples": [
+   "คุณชื่ออะไร · kOOn chêu a-rai? — What’s your (first) name? ／ 你叫什么名字？",
+   "คุณนามสกุลอะไร · kOOn nahm sa-gOOn a-rai? — What’s your surname? ／ 你姓什么？",
+   "คุณเป็นคนชาติอะไร · kOOn bpen kon châht a-rai? — What nationality are you? ／ 你是哪国人？"
+  ],
+  "focus": [
+   "ชื่ออะไร",
+   "มาจากไหน",
+   "อายุเท่าไหร่"
+  ],
+  "focus_all": [
+   "ชื่ออะไร",
+   "มาจากไหน",
+   "อายุเท่าไหร่"
+  ]
+ },
+ {
+  "key": "th-congratulations",
+  "name": "ยินดีด้วย / เสียใจด้วย",
+  "level": "A2",
+  "en": "ยินดีด้วย 'congratulations', เสียใจด้วย 'condolences'.",
+  "zh": "ยินดีด้วย 恭喜 / เสียใจด้วย 节哀。",
+  "formation": "ยินดีด้วย / เสียใจด้วย · yin-dee dûai",
+  "section": "15.6.3",
+  "topic": "speech",
+  "examples": [
+   "ขอแสดงความยินดี (ด้วยนะ) · kǒr sa-dairng kwahm yin dee (dôo-ay ná) — Congratulations! ／ 恭喜（你）！",
+   "ขอแสดงความเสียใจ (ด้วยนะ) · kǒr sa-dairng kwahm sěe-a jai (dôo-ay ná) — I’d like to express my regret/sympathy. ／ （向你）表示慰问。"
+  ],
+  "focus": [
+   "ยินดีด้วย",
+   "เสียใจด้วย"
+  ],
+  "focus_all": [
+   "ยินดีด้วย",
+   "เสียใจด้วย"
+  ]
+ },
+ {
+  "key": "th-together-duai-kan",
+  "name": "ด้วยกัน",
+  "level": "A2",
+  "en": "Together, jointly: follows a verb, 'with each other'.",
+  "zh": "「ด้วยกัน」：一起、共同，放在动词后。",
+  "formation": "กริยา + ด้วยกัน · dôo-ay gun",
+  "section": "16.1",
+  "topic": "adverb",
+  "focus": [
+   "ด้วยกัน"
+  ],
+  "examples": [
+   "เราทำงานด้วยกันมาสามปี · rao tum ngahn dôo-ay gun mah sǎhm bpee — We have worked together for three years. ／ 我们一起工作了三年。",
+   "มากินข้าวด้วยกันสิ · mah gin kâo: dôo-ay gun sì — Come and eat with us. ／ 来一起吃饭吧。"
+  ]
+ },
+ {
+  "key": "th-right-now-diao-nee",
+  "name": "เดี๋ยวนี้",
+  "level": "A2",
+  "en": "Right now, these days: present time, often set against the past.",
+  "zh": "「เดี๋ยวนี้」：现在、如今（常与过去对比）。",
+  "formation": "เดี๋ยวนี้ · děe-o née",
+  "section": "16.2",
+  "topic": "time",
+  "focus": [
+   "เดี๋ยวนี้"
+  ],
+  "examples": [
+   "เดี๋ยวนี้เขาอยู่กรุงเทพฯ · děe-o née káo yòo grOOng-tâyp — These days he lives in Bangkok. ／ 现在他住在曼谷。",
+   "ทำเดี๋ยวนี้เลย · tum děe-o née ler-ee — Do it right now. ／ 现在就做。"
+  ]
+ },
+ {
+  "key": "th-prefix-pu",
+  "name": "ผู้ + คำกริยา",
+  "level": "B1",
+  "en": "ผู้- 'one who ...', the formal agent prefix.",
+  "zh": "ผู้ + 动词：……者（正式/书面）。",
+  "formation": "ผู้ + V · pôo + kam-grì-yah",
+  "section": "3.3.3.2",
+  "topic": "noun-phrase",
+  "examples": [],
+  "focus": [
+   "ผู้"
+  ],
+  "focus_all": [
+   "ผู้"
+  ]
+ },
+ {
+  "key": "th-nominalizer-thi",
+  "name": "ที่ + คำกริยา",
+  "level": "B1",
+  "en": "ที่- plus a verb names the person, place or thing that does it.",
+  "zh": "ที่ + 动词：……的人/地方/东西（ที่อยู่ 地址）。",
+  "formation": "ที่ + V · têe + kam-grì-yah",
+  "section": "3.3.3.7",
+  "topic": "noun-phrase",
+  "examples": []
+ },
+ {
+  "key": "th-coordinate-compound",
+  "name": "คำซ้อน",
+  "level": "B1",
+  "en": "Two near-synonyms joined into one word.",
+  "zh": "并列复合：两个近义字并列（บ้านเรือน 房屋）。",
+  "formation": "คำ + คำ (ความหมายใกล้กัน) · kam sórn",
+  "section": "3.3.4",
+  "topic": "noun-phrase",
+  "examples": []
+ },
+ {
+  "key": "th-word-order-adj-clf-ord",
+  "name": "คำนาม + คำคุณศัพท์ + ลักษณนาม + ที่ + จำนวน",
+  "level": "B1",
+  "en": "The ordinal closes the phrase after adjective and classifier.",
+  "zh": "名 + 形 + 量 + ที่ + 数：第二个大的房间。",
+  "formation": "N + ADJ + CLF + ที่ + จำนวน · kam-nahm + kun-ná-sàp + lák-sà-nà-nahm + têe + jam-nuan",
+  "section": "3.5.9",
+  "topic": "noun-phrase",
+  "examples": [
+   "หนังไทยเรื่องที่สอง · nǔng tai rêu-ung têe sǒrng — the second Thai movie ／ 第二部泰国电影",
+   "บ้านใหญ่หลังที่สาม · bâhn yài lǔng têe sǎhm — the third big house ／ 第三栋大房子"
+  ]
+ },
+ {
+  "key": "th-word-order-clf-adj",
+  "name": "คำนาม + ลักษณนาม + คำคุณศัพท์",
+  "level": "B1",
+  "en": "The adjective may also follow the classifier, where it reads predicatively.",
+  "zh": "形容词也可放在量词之后，此时更像谓语。",
+  "formation": "N + CLF + ADJ · kam-nahm + lák-sà-nà-nahm + kun-ná-sàp",
+  "section": "3.5.10",
+  "topic": "noun-phrase",
+  "examples": [
+   "เสื้อตัวใหม่ · sêu-a dtoo-a mài — the new shirt ／ 新衬衫",
+   "หนังสือเล่มเก่า · núng-sěu lêm gào — the old book ／ 旧书"
+  ]
+ },
+ {
+  "key": "th-emphatic-bpen-kon",
+  "name": "สรรพนาม + เอง + เป็นคน + กริยา",
+  "level": "B1",
+  "en": "Emphatic self-description: 'X himself is the kind of person who ...'.",
+  "zh": "代词 + เอง + เป็นคน + 动词：强调“本人就是……的人”。",
+  "formation": "PRON + เอง + เป็นคน + V · sàp-pá-nahm + eng + bpen kon + grì-yah",
+  "section": "4.3.3",
+  "topic": "pronoun",
+  "examples": [
+   "ผมเองเป็นคนทำ · pǒm ayng bpen kon tum — I myself was the one who did it. ／ 是我本人做的。"
+  ]
+ },
+ {
+  "key": "th-indef-whenever",
+  "name": "เมื่อไหร่...ก็ / ทุกครั้งที่",
+  "level": "B1",
+  "en": "'whenever': เมื่อไหร่...ก็ or ทุกครั้งที่.",
+  "zh": "每当：เมื่อไหร่…ก็ / ทุกครั้งที่。",
+  "formation": "WH + ก็ / ทุกครั้งที่ + CLAUSE · mêu-a-rài ... gôr / túk kráng têe",
+  "section": "4.8.3",
+  "topic": "pronoun",
+  "examples": [
+   "กินเมื่อไรก็ท้องเสีย · gin mêu-rài gôr tórng sěe-a — Whenever I eat it, I get diarrhoea. ／ 我一吃就拉肚子。",
+   "เมื่อไรว่างก็โทรมาหา · mêu-rài wâhng gôr toh mah hǎh — Whenever you are free, phone me. ／ 你有空就给我打电话。"
+  ],
+  "focus": [
+   "ทุกครั้งที่"
+  ],
+  "focus_all": [
+   "ทุกครั้งที่"
+  ]
+ },
+ {
+  "key": "th-indef-whichever",
+  "name": "อันไหนก็ / ไหนก็",
+  "level": "B1",
+  "en": "wh-word + ก็ = 'whichever'.",
+  "zh": "疑问词 + ก็：无论哪个。",
+  "formation": "WH + ก็ · an-nǎi gôr / nǎi gôr",
+  "section": "4.8.5",
+  "topic": "pronoun",
+  "examples": [
+   "ผมจะซื้ออันไหนก็ได้ที่ไม่แพง · pǒm ja séu: un nǎi gôr dâi: têe mâi pairng — I’ll buy whichever one is not expensive. ／ 哪个不贵我就买哪个。"
+  ],
+  "focus": [
+   "ไหนก็"
+  ],
+  "focus_all": [
+   "ไหนก็"
+  ]
+ },
+ {
+  "key": "th-indef-however",
+  "name": "อย่างไรก็",
+  "level": "B1",
+  "en": "อย่างไรก็ 'however, in any case'.",
+  "zh": "อย่างไรก็：无论如何。",
+  "formation": "อย่างไร + ก็ · yàhng-rai gôr",
+  "section": "4.8.6",
+  "topic": "pronoun",
+  "examples": [
+   "ทำอย่างไรก็พลาดทุกที · tum yung-ngai gôr plâht tÓOk tee — However I do it, I always get it wrong. ／ 我怎么做每次都做错。"
+  ],
+  "focus": [
+   "อย่างไรก็"
+  ],
+  "focus_all": [
+   "อย่างไรก็"
+  ]
+ },
+ {
+  "key": "th-relative-pronoun",
+  "name": "ที่ / ซึ่ง / อัน",
+  "level": "B1",
+  "en": "ที่ links a clause to a noun; ซึ่ง is the written variant; อัน refers to things.",
+  "zh": "关系代词 ที่/ซึ่ง/อัน：คนที่มา（来的人）。",
+  "formation": "N + ที่/ซึ่ง + CLAUSE · têe / sêung / an",
+  "section": "4.9",
+  "topic": "pronoun",
+  "examples": [
+   "เขาเป็นคนที่ไว้ใจไม่ได้ · káo bpen kon têe wái jai mâi dâi: — He is a person who you can’t trust. ／ 他是个靠不住的人。",
+   "บ้านที่เขาอยู่เล็ก · bâhn têe káo yòo lék — The house where they live is small. ／ 他们住的房子很小。",
+   "กล้วยที่เขาซื้อแพง · glôo-ay têe káo séu: pairng — The bananas which she bought are expensive. ／ 她买的香蕉很贵。"
+  ],
+  "focus": [
+   "ซึ่ง",
+   "อัน"
+  ],
+  "focus_all": [
+   "ซึ่ง",
+   "อัน"
+  ]
+ },
+ {
+  "key": "th-verb-noun-compound",
+  "name": "กริยา + คำนาม",
+  "level": "B1",
+  "en": "Verb plus object fuses into one word: ทำงาน 'to work'.",
+  "zh": "动宾复合：กริยา + คำนาม（ทำงาน 工作）。",
+  "formation": "V + N · grì-yah + kam-nahm",
+  "section": "5.3.1",
+  "topic": "verb",
+  "examples": []
+ },
+ {
+  "key": "th-noun-verb-compound",
+  "name": "คำนาม + กริยา",
+  "level": "B1",
+  "en": "Noun plus verb fuses: ใจดี 'kind-hearted'.",
+  "zh": "名动复合：ใจดี（心地好）。",
+  "formation": "N + V · kam-nahm + grì-yah",
+  "section": "5.3.2",
+  "topic": "verb",
+  "examples": []
+ },
+ {
+  "key": "th-verb-verb-compound",
+  "name": "กริยา + กริยา",
+  "level": "B1",
+  "en": "Two verbs in series form one compound meaning.",
+  "zh": "动动复合：เดินดู（走着看）。",
+  "formation": "V1 + V2 · grì-yah + grì-yah",
+  "section": "5.3.3",
+  "topic": "verb",
+  "examples": [
+   "ผมไม่เปรียบเทียบ · pǒm mâi bprèe-up têe-up — I’m not making any comparisons. ／ 我不作比较。"
+  ]
+ },
+ {
+  "key": "th-resultative",
+  "name": "กริยา + กริยาบอกผล",
+  "level": "B1",
+  "en": "A second verb states the result: กินอิ่ม 'eat until full'.",
+  "zh": "结果补语：第二动词表示结果（กินอิ่ม 吃饱）。",
+  "formation": "V + ผลลัพธ์ · grì-yah + grì-yah bòrk pǒn",
+  "section": "5.4",
+  "topic": "verb",
+  "examples": [
+   "ฉันทำอาหารเสร็จแล้ว · chún tum ah-hǎhn sèt láir-o — I’ve finished cooking. ／ 我做完饭了。",
+   "เขาอ่านหนังสือจบแล้ว · káo àhn núng-sěu jòp láir-o — He’s finished the book. ／ 他把书读完了。",
+   "ผมใช้เงินหมดแล้ว · pǒm chái ngern mòt láir-o — I’ve spent all my money. ／ 我把钱花光了。"
+  ]
+ },
+ {
+  "key": "th-directional",
+  "name": "กริยา + ไป/มา/เข้า/ออก/ขึ้น/ลง",
+  "level": "B1",
+  "en": "Directional verbs after the main verb show the direction of the action.",
+  "zh": "趋向动词：ไป/มา/เข้า/ออก/ขึ้น/ลง 表示方向。",
+  "formation": "V + ทิศทาง · grì-yah + bpai/mah/kâo/òrk/kêun/long",
+  "section": "5.5",
+  "topic": "verb",
+  "examples": [
+   "เราย้ายมาอยู่กรุงเทพ ฯ ตั้งแต่ฉันยังเด็ก · rao yái: mah yòo grOOng-tâyp dtûng-dtàir chún yung dèk — We moved (here) to Bangkok when I was still a child. ／ 我小时候我们就搬到曼谷住了。",
+   "วันเสาร์หน้าเราจะขับรถไปหัวหิน · wun sǎo nâh rao ja kùp rót bpai hǒo-hǐn — Next Saturday we’ll drive to Hua Hin. ／ 下星期六我们开车去华欣。",
+   "พรุ่งนี้เขาจะเอาหนังสือมาให้ดู · prÔOng née káo ja ao núng-sěu mah hâi doo — Tomorrow he’ll bring the book to show me. ／ 明天他会把书带来给我看。"
+  ],
+  "focus_all": [
+   "ไป",
+   "มา",
+   "เข้า",
+   "ออก",
+   "ขึ้น",
+   "ลง"
+  ]
+ },
+ {
+  "key": "th-able-wai",
+  "name": "กริยา + ไหว",
+  "level": "B1",
+  "en": "ไหว sets a limit the action can still bear: เดินไหว 'can manage the walk'.",
+  "zh": "ไหว：承受得住（กินไม่ไหว 吃不下）。",
+  "formation": "V + (ไม่) + ไหว · grì-yah + wǎi",
+  "section": "5.6.2.3",
+  "topic": "verb",
+  "examples": [
+   "ไม่ค่อยไกลเท่าไหร่ คิดว่าคงเดินไหว · mâi kôy glai tâo-rài kít wâh kong dern wǎi — It’s not very far. I think we can walk. ／ 不太远，我想走得动。",
+   "อิ่มมากแล้ว ฉันกินไม่ไหว · ìm mâhk láir-o chún gin mâi wǎi — I’m really full. I can’t eat it. ／ 我已经很饱了，吃不下了。",
+   "ระวังหนักนะ ยกไหวไหม · ra-wung nùk ná yók wǎi mái? — Be careful, it’s heavy. Can you lift it? ／ 小心，很重。你抬得动吗？"
+  ],
+  "focus": [
+   "ไหว"
+  ],
+  "focus_all": [
+   "ไหว"
+  ]
+ },
+ {
+  "key": "th-past-continuous",
+  "name": "กริยา + มา + (ได้) + เวลา + แล้ว",
+  "level": "B1",
+  "en": "มา plus a time span plus แล้ว states how long an action has gone on.",
+  "zh": "มา + 时段 + แล้ว：已经……（多久）了。",
+  "formation": "V + มา + (ได้) + TIME + แล้ว · grì-yah + mah + wela + láir-o",
+  "section": "5.7.8",
+  "topic": "verb",
+  "examples": [
+   "เรานั่งรถไฟมา(ได้)สองชั่วโมงแล้ว · rao nûng rót fai mah (dâi:) sǒrng chôo-a mohng láir-o — We have been sitting on the train for two hours. ／ 我们在火车上已经坐了两个小时。",
+   "เขาเรียนภาษาไทยมา(ได้)หลายปีแล้ว · káo ree-un pah-sǎh tai mah (dâi:) lǎi: bpee láir-o — He has been studying Thai for many years. ／ 他学泰语已经学了好多年了。"
+  ],
+  "focus_all": [
+   "มา"
+  ]
+ },
+ {
+  "key": "th-change-of-state",
+  "name": "กริยาแสดงสภาพ + ขึ้น/ลง",
+  "level": "B1",
+  "en": "ขึ้น 'more/up', ลง 'less/down' mark a change of degree.",
+  "zh": "ขึ้น 变得更… / ลง 变得不那么…",
+  "formation": "ADJ + ขึ้น/ลง · grì-yah + kêun/long",
+  "section": "5.7.9",
+  "topic": "verb",
+  "examples": [],
+  "focus_all": [
+   "ขึ้น",
+   "ลง"
+  ]
+ },
+ {
+  "key": "th-keep-wai",
+  "name": "กริยา + ไว้",
+  "level": "B1",
+  "en": "ไว้ means the result of the action is kept in place.",
+  "zh": "ไว้：保持动作的结果（จองไว้ 预订好）。",
+  "formation": "V + ไว้ · grì-yah + wái",
+  "section": "5.7.10",
+  "topic": "verb",
+  "examples": [
+   "ฝากของไว้ที่นี่ได้ไหม · fàhk kǒrng wái têe nêe dâi mái? — Can I leave my things here? ／ 东西可以放在这儿吗？",
+   "เราจองตั๋วไว้แล้ว · rao jorng dtǒo-a wái láir-o — We’ve booked tickets already. ／ 我们已经订好票了。",
+   "เราต้องนั่งตามที่ที่เขาจัดไว้ให้ · rao dtôrng nûng dtahm têe têe káo jùt wái hâi — We had to sit in the places they’d arranged for us. ／ 我们得坐在他们安排好的位子上。"
+  ],
+  "focus": [
+   "ไว้"
+  ],
+  "focus_all": [
+   "ไว้"
+  ]
+ },
+ {
+  "key": "th-take-ao",
+  "name": "กริยา + เอา",
+  "level": "B1",
+  "en": "เอา after the verb marks doing something for one's own benefit or taking away.",
+  "zh": "เอา：为自己而做、拿走。",
+  "formation": "V + เอา · grì-yah + ao",
+  "section": "5.7.11",
+  "topic": "verb",
+  "examples": [
+   "ผมเตรียมเอาไว้แล้ว · pǒm dtree-um ao wái láir-o — I’ve prepared things. ／ 我已经准备好了。",
+   "คุณเก็บเอาไว้แล้วใช่ไหม · kOOn gèp ao wái láir-o châi mái? — You’ve kept it, right? ／ 你留着了吧？",
+   "ฉันคิดเอาเอง · chún kít ao ayng — I thought so myself. ／ 我自己这么想的。"
+  ],
+  "focus": [
+   "เอา"
+  ],
+  "focus_all": [
+   "เอา"
+  ]
+ },
+ {
+  "key": "th_passive",
+  "name": "ถูก / โดน",
+  "level": "B1",
+  "en": "ถูก is the neutral passive; โดน implies something unpleasant.",
+  "zh": "ถูก 中性被动 / โดน 遭受不愉快的被动。",
+  "formation": "S + ถูก/โดน + V · tòok / dohn",
+  "section": "5.8",
+  "topic": "verb",
+  "examples": [
+   "ฉันถูกยุงกัด · chún tòok yOOng gùt — I’ve been bitten by a mosquito. ／ 我被蚊子咬了。",
+   "มาลีถูกรถชน · mah-lee tòok rót chon — Malee was hit by a car. ／ 玛莉被车撞了。",
+   "เขาถูกตำรวจจับ · káo tòok dtum-ròo-ut jùp — He was arrested by a policeman. ／ 他被警察抓了。"
+  ],
+  "focus_all": [
+   "ถูก",
+   "โดน"
+  ]
+ },
+ {
+  "key": "th-emotion-tee",
+  "name": "กริยาอารมณ์ + ที่ + ประโยค",
+  "level": "B1",
+  "en": "Verbs of emotion take a ที่-clause naming the cause.",
+  "zh": "情绪动词 + ที่ + 从句：ดีใจที่…（高兴于……）。",
+  "formation": "V(อารมณ์) + ที่ + CLAUSE · grì-yah + têe",
+  "section": "5.10",
+  "topic": "verb",
+  "examples": [
+   "ผมดีใจที่ไม่ได้ไป · pǒm dee jai têe mâi dâi bpai — I’m pleased (that) I didn’t go. ／ 我很高兴我没去。",
+   "เขาโกรธที่ฉันซื้อ · káo gròht têe chún séu: — He was angry (that) I bought it. ／ 他为我买了这东西而生气。",
+   "เราเสียใจที่หน้าร้อนผ่านไปเสียแล้ว · rao sěe-a jai têe nâh rórn pàhn bpai sá láir-o — We’re sorry that the hot season is over. ／ 我们为热季过去而惋惜。"
+  ]
+ },
+ {
+  "key": "th-causative-tum",
+  "name": "ทำ + (กรรม) + กริยา",
+  "level": "B1",
+  "en": "ทำ plus an object and a verb: 'make something do'.",
+  "zh": "ทำ + 宾语 + 动词：使……（发生）。",
+  "formation": "S + ทำ + O + V · tum + grì-yah",
+  "section": "5.11.1",
+  "topic": "verb",
+  "examples": [
+   "เขาทำถ้วยตก · káo tum tôo-ay dtòk — She dropped the cup. ／ 她把杯子弄掉了。",
+   "ฉันทำหนังสือหาย · chún tum núng-sěu: hǎi: — I’ve lost the book. ／ 我把书弄丢了。"
+  ],
+  "focus_all": [
+   "ทำ"
+  ]
+ },
+ {
+  "key": "th-causative-tum-hai",
+  "name": "ทำให้ + (กรรม) + กริยา",
+  "level": "B1",
+  "en": "ทำให้ 'cause to be/become' takes an object and a result.",
+  "zh": "ทำให้：使得、导致。",
+  "formation": "S + ทำให้ + O + V · tum hâi + grì-yah",
+  "section": "5.11.3",
+  "topic": "verb",
+  "examples": [
+   "เจ้าหน้าที่ทำให้ผมต้องเสียเวลามาก · jâo nâh-têe tum hâi pǒm dtôrng sěe-a way-lah mâhk — The official made me waste a lot of time. ／ 那位工作人员让我浪费了很多时间。",
+   "เสียงชื่นชมเหล่านี้ทำให้เธอรู้สึกปลาบปลื้มและมีกำลังใจ · sěe-ung chêu:n chom lào née tum hâi ter róo-sèuk bplàhp bplêu:m láir mee gum-lung jai — These admiring voices made her feel overjoyed and gave her encouragement. ／ 这些赞美声让她感到欣喜，也给了她鼓励。",
+   "อากาศอุ่น ๆ ทำให้เขารู้สึกว่าสุขภาพค่อยๆ ดีขึ้น · ah-gàht ÒOn ÒOn tum hâi káo róo-sèuk wâh sÒOk-ka-pâhp kôy kôy dee kêun — The warm weather made her feel that her health was gradually improving. ／ 温暖的天气让她觉得身体在慢慢好起来。"
+  ],
+  "focus": [
+   "ทำให้"
+  ],
+  "focus_all": [
+   "ทำให้"
+  ]
+ },
+ {
+  "key": "th-serial-verbs",
+  "name": "กริยาเรียง",
+  "level": "B1",
+  "en": "Verbs chain in sequence without any connector: ไปซื้อของ 'go buy things'.",
+  "zh": "动词连用：不用连词直接排列（ไปซื้อของ 去买东西）。",
+  "formation": "V1 + V2 + V3 · grì-yah riang",
+  "section": "5.13",
+  "topic": "verb",
+  "examples": [
+   "เขารีบวิ่งหนีไป · káo rêep wîng něe bpai — (he – hurry – run – flee – go) ／ 他赶紧跑掉了。（他—赶快—跑—逃—去）",
+   "เขาออกไปซื้อมาทำกินที่บ้าน · káo òrk bpai séu: mah tum gin têe bâhn — (he – exit – go – buy – come – make – eat – at home) ／ 他出去买了东西回家做饭吃。（他—出—去—买—来—做—吃—在家）",
+   "พอเอ่ยปากอยากได้อะไร คนในครอบครัวจะรีบซื้อหามาให้ · por èr-ee bpàhk yàhk dâi a-rai kon nai krôrp-kroo-a ja rêep séu: hǎh mah hâi — (when – open – mouth – want to – get – something – someone – in – family – would – hurry – buy – seek – come – for/give) ／ 一开口说想要什么，家里人就会赶紧买来给他。（当—开口—想—得到—什么—人—在—家—会—赶紧—买—找—来—给）"
+  ]
+ },
+ {
+  "key": "th-intensifier-general",
+  "name": "คำขยายเพิ่มความ (มาก/จริง ๆ/เหลือเกิน)",
+  "level": "B1",
+  "en": "Intensifiers scale upward: มาก, จริง ๆ, เหลือเกิน, ที่สุด.",
+  "zh": "程度加强：มาก / จริง ๆ / เหลือเกิน。",
+  "formation": "ADJ + มาก/จริง ๆ/เหลือเกิน · kam-kà-yaai",
+  "section": "6.3.1",
+  "topic": "adjective",
+  "examples": [],
+  "focus": [
+   "เหลือเกิน"
+  ],
+  "focus_all": [
+   "เหลือเกิน"
+  ]
+ },
+ {
+  "key": "th-intensifier-taste",
+  "name": "รส + คำขยาย",
+  "level": "B1",
+  "en": "Taste intensifiers: หวานมาก, เปรี้ยวจัด.",
+  "zh": "味道强度：หวานจัด（极甜）、เปรี้ยวมาก。",
+  "formation": "ADJ(รส) + จัด/มาก · rót + kam-kà-yaai",
+  "section": "6.3.3",
+  "topic": "adjective",
+  "examples": [],
+  "focus": [
+   "จัด"
+  ],
+  "focus_all": [
+   "จัด"
+  ]
+ },
+ {
+  "key": "th-equal-tao-kan",
+  "name": "A + กับ + B + ADJ + เท่ากัน",
+  "level": "B1",
+  "en": "With กับ the adjective follows and เท่ากัน closes: 'A and B are equally ...'.",
+  "zh": "กับ … เท่ากัน：A 和 B 一样……。",
+  "formation": "A + กับ + B + ADJ + เท่ากัน · gùp + kan",
+  "section": "6.5.2.2",
+  "topic": "adjective",
+  "examples": [
+   "นครพนมกับหนองคาย อยู่ห่างกรุงเทพฯ เท่ากัน · na-korn pa-nom gùp nǒrng-kai: yòo hàhng grOOng-tâyp tâo gun — Nakhorn Phanom and Nongkhai are equally far away from Bangkok. ／ 那空拍侬和廊开离曼谷一样远。",
+   "พี่กับน้องสวยพอๆ กัน · pêe gùp nórng sǒo-ay por por gun — The older sister and the younger sister are equally beautiful. ／ 姐姐和妹妹一样漂亮。"
+  ],
+  "focus": [
+   "เท่ากัน"
+  ],
+  "focus_all": [
+   "เท่ากัน"
+  ]
+ },
+ {
+  "key": "th-not-inferior",
+  "name": "A + ADJ + ไม่แพ้ + B",
+  "level": "B1",
+  "en": "ไม่แพ้ 'not inferior to' says X is just as ADJ as Y.",
+  "zh": "ไม่แพ้：不输给、一样……（不逊于）。",
+  "formation": "A + ADJ + ไม่แพ้ + B · mâi pâir",
+  "section": "6.5.2.4",
+  "topic": "adjective",
+  "examples": [
+   "ภาคอีสานสวยไม่แพ้ภาคเหนือ · pâhk ěe-sǎhn sǒo-ay mâi páir pâhk něu-a — The North East (region) is just as beautiful as the North. ／ 东北部一点也不比北部逊色（一样美）。",
+   "ลูกสาวปากร้ายไม่แพ้แม่ · lôok sǎo: bpàhk rái: mâi páir mâir — The daughter is just as sharp-tongued as her mother. ／ 女儿嘴厉害，一点也不输给妈妈。",
+   "ฝรั่งคนนั้นร้องเพลงลูกทุ่งไม่แพ้คนไทย · fa-rùng kon nún rórng playng lôok tÔOng mâi páir kon tai — That farang sings luk tung (Thai folk songs) songs just as well as a Thai. ／ 那个老外唱乡村歌（luk tung）一点也不比泰国人差。"
+  ],
+  "focus": [
+   "ไม่แพ้"
+  ],
+  "focus_all": [
+   "ไม่แพ้"
+  ]
+ },
+ {
+  "key": "th-excessive",
+  "name": "ADJ + เกินไป",
+  "level": "B1",
+  "en": "เกินไป 'too ...', beyond the acceptable degree.",
+  "zh": "เกินไป：过于……（แพงเกินไป 太贵）。",
+  "formation": "ADJ + เกินไป · gern bpai",
+  "section": "6.5.5",
+  "topic": "adjective",
+  "examples": [
+   "แพง(เกิน)ไป · pairng (gern) bpai — It’s too expensive. ／ 太贵了。",
+   "ไกล(เกิน)ไป · glai (gern) bpai — It’s too far. ／ 太远了。",
+   "รองเท้าคับ(เกิน)ไป · rorng táo: kúp (gern) bpai — The shoes are too tight. ／ 鞋子太紧了。"
+  ],
+  "focus_all": [
+   "เกินไป"
+  ]
+ },
+ {
+  "key": "th-adverb-phrase",
+  "name": "กริยา + วลีวิเศษณ์",
+  "level": "B1",
+  "en": "A whole phrase can modify the verb: ทำงานอย่างมีความสุข.",
+  "zh": "状语短语：ทำงานอย่างมีความสุข（愉快地工作）。",
+  "formation": "V + วลี · grì-yah + wá-lee",
+  "section": "7.1.3",
+  "topic": "adverb",
+  "examples": []
+ },
+ {
+  "key": "th-adverb-doy",
+  "name": "กริยา + โดย + วลี",
+  "level": "B1",
+  "en": "โดย introduces the means or manner of the action.",
+  "zh": "โดย：以……方式、通过。",
+  "formation": "V + โดย + วลี · doy",
+  "section": "7.1.3.2",
+  "topic": "adverb",
+  "examples": [
+   "เขาพูดเสียงน่าเกลียดโดยไม่รู้ตัว · káo pôot sěe-ung nâh glèe-ut doy-ee mâi róo dtoo-a — He spoke in an unpleasant-sounding voice without realising it. ／ 他不知不觉地用难听的声音说话。",
+   "เขาสามารถซ่อมได้โดยไม่ยาก · káo sǎh-mâht sôrm dâi doy-ee mâi yâhk — He was able to repair it without difficulty. ／ 他毫不费力就修好了。",
+   "เขาไปจีบน้องของเพื่อนโดยเปิดเผย · káo bpai jèep nórng kǒrng pêu-un doy-ee bpèrt pěr-ee — He openly pursued his friend’s younger sister. ／ 他公开去追朋友的妹妹。"
+  ],
+  "focus": [
+   "โดย"
+  ],
+  "focus_all": [
+   "โดย"
+  ]
+ },
+ {
+  "key": "th-adverb-duai",
+  "name": "กริยา + ด้วย + คำนาม",
+  "level": "B1",
+  "en": "ด้วย plus a noun names the instrument or the accompanying circumstance.",
+  "zh": "ด้วย + 名词：用……、带着……。",
+  "formation": "V + ด้วย + N · dûai",
+  "section": "7.1.3.3",
+  "topic": "adverb",
+  "examples": [
+   "เขาทำงานด้วยความยากลำบาก · káo tum ngahn dôo-ay kwahm yâhk lum-bàhk — He worked with difficulty. ／ 他艰难地工作。",
+   "เธอดูหนังด้วยความตั้งใจ · ter doo nǔng dôo-ay kwahm dtûng jai — She watched the film intently. ／ 她专心地看着电影。"
+  ],
+  "focus_all": [
+   "ด้วย"
+  ]
+ },
+ {
+  "key": "th-adverb-bpen",
+  "name": "กริยา + เป็น + คำนาม",
+  "level": "B1",
+  "en": "เป็น + noun describes the manner: พูดเป็นทางการ 'speak formally'.",
+  "zh": "เป็น + 名词：以……的方式（พูดเป็นทางการ 正式地说）。",
+  "formation": "V + เป็น + N · bpen",
+  "section": "7.1.3.4",
+  "topic": "adverb",
+  "examples": [
+   "เขาจ่ายเงินเป็นวัน ๆ · káo jài: ngern bpen wun wun — They pay daily. ／ 他按天付钱。",
+   "เขาแบ่งเป็นชิ้นเล็ก ๆ · káo bàirng bpen chín lék lék — She divided it into small pieces. ／ 她把它分成小块。",
+   "เขาสนใจประเทศจีนเป็นพิเศษ · káo sǒn jai bpra-tâyt jeen bpen pí-sàyt — He is especially interested in China. ／ 他对中国特别感兴趣。"
+  ],
+  "focus_all": [
+   "เป็น"
+  ]
+ },
+ {
+  "key": "th-adverb-dai",
+  "name": "กริยา + ได้ + คำคุณศัพท์",
+  "level": "B1",
+  "en": "ได้ plus an adjective says how well the action is done.",
+  "zh": "V + ได้ + 形容词：做得……（พูดได้ดี 说得好）。",
+  "formation": "V + ได้ + ADJ · grì-yah + dâi + kun-ná-sàp",
+  "section": "7.1.4",
+  "topic": "adverb",
+  "examples": [
+   "เขาพูดได้คล่อง · káo pôot dâi: klôrng — He speaks fluently. ／ 他说得很流利。",
+   "คุณเขียนได้สวย · kOOn kěe-un dâi: sǒo-ay — You write nicely. ／ 你字写得漂亮。",
+   "เขาน่าจะทำได้ดีกว่านี้ · káo nâh ja tum dâi: dee gwàh née — He ought to be able to do better than this. ／ 他应该能做得比这更好。"
+  ],
+  "focus_all": [
+   "ได้"
+  ]
+ },
+ {
+  "key": "th-adverb-hai",
+  "name": "กริยา + ให้ + คำคุณศัพท์",
+  "level": "B1",
+  "en": "ให้ plus an adjective states the manner aimed at: พูดให้ชัด.",
+  "zh": "V + ให้ + 形容词：说得清楚。",
+  "formation": "V + ให้ + ADJ · grì-yah + hâi + kun-ná-sàp",
+  "section": "7.1.5",
+  "topic": "adverb",
+  "examples": [
+   "กินให้หมด · gin hâi mòt — Eat everything up! ／ 全吃光！",
+   "ทำให้เสร็จ · tum hâi sèt — Finish it off! ／ 做完它！",
+   "แต่งตัวให้เรียบร้อย · dtàirng dtoo-a hâi rêe-up-róy — Dress respectably! ／ 穿整齐点！"
+  ],
+  "focus_all": [
+   "ให้"
+  ]
+ },
+ {
+  "key": "th-adverb-equal",
+  "name": "กริยา + เท่ากัน",
+  "level": "B1",
+  "en": "Equal manner: 'both do it equally'.",
+  "zh": "同等程度：กริยา + เท่ากัน。",
+  "formation": "V + ADJ + เท่ากัน · grì-yah + tâo gan",
+  "section": "7.3.1",
+  "topic": "adverb",
+  "examples": [],
+  "focus_all": [
+   "เท่ากัน"
+  ]
+ },
+ {
+  "key": "th-adverb-equal-tao",
+  "name": "X + V + ADJ + เท่ากับ + Y",
+  "level": "B1",
+  "en": "Equal manner with an explicit second party: 'X does it as ADJ as Y'.",
+  "zh": "เท่ากับ：和……一样（程度）。",
+  "formation": "X + V + ADJ + เท่ากับ + Y · tâo gùp",
+  "section": "7.3.1.1",
+  "topic": "adverb",
+  "examples": [],
+  "focus_all": [
+   "เท่ากับ"
+  ]
+ },
+ {
+  "key": "th-adverb-equal-kan",
+  "name": "X + กับ + Y + V + ADJ + เท่ากัน",
+  "level": "B1",
+  "en": "Both parties are fronted and เท่ากัน closes: 'X and Y do it equally'.",
+  "zh": "X กับ Y … เท่ากัน：两者程度相同。",
+  "formation": "X + กับ + Y + V + ADJ + เท่ากัน · gùp + kan",
+  "section": "7.3.1.2",
+  "topic": "adverb",
+  "examples": [],
+  "focus_all": [
+   "เท่ากัน"
+  ]
+ },
+ {
+  "key": "th-adverb-equal-meuan",
+  "name": "X + V + ADJ + เหมือน + Y",
+  "level": "B1",
+  "en": "เหมือน compares manner: 'does it like Y does'.",
+  "zh": "เหมือน：像……那样。",
+  "formation": "X + V + ADJ + เหมือน + Y · mĕuan",
+  "section": "7.3.1.3",
+  "topic": "adverb",
+  "examples": [
+   "ลูกสาวแต่งตัวสวยเหมือนดาราหนัง · lôok sǎo: dtàirng dtoo-a sǒo-ay měu-un dah-rah nǔng — Her daughter dresses as beautifully as a film star. ／ 她女儿打扮得像电影明星一样漂亮。",
+   "เธอทำกับข้าวอร่อยเหมือนแม่ครัวมืออาชีพ · ter tum gùp kâo a-ròy měu-un mâir kroo-a meu: ah-chêep — She cooks as tasty dishes as a professional chef. ／ 她做的菜像专业厨师一样好吃。"
+  ],
+  "focus_all": [
+   "เหมือน"
+  ]
+ },
+ {
+  "key": "th-adverb-excessive",
+  "name": "กริยา + เกินไป",
+  "level": "B1",
+  "en": "Doing something to excess.",
+  "zh": "过度：กริยา + เกินไป。",
+  "formation": "V + เกินไป · grì-yah + gern bpai",
+  "section": "7.3.2",
+  "topic": "adverb",
+  "examples": [
+   "เขาหมดความอดทนเร็ว(เกิน)ไป · káo mòt kwahm òt ton ray-o (gern) bpai — He loses patience too quickly. ／ 他太容易失去耐心。",
+   "ไม่ต้องพยายามมาก(เกิน)ไป · mâi dtôrng pa-yah-yahm mâhk (gern) bpai — There’s no need to try too hard. ／ 不必太使劲。"
+  ],
+  "focus_all": [
+   "เกินไป"
+  ]
+ },
+ {
+  "key": "th-adverb-superlative",
+  "name": "กริยา + ที่สุด",
+  "level": "B1",
+  "en": "Superlative manner: 'does it the most'.",
+  "zh": "最高程度：กริยา + ที่สุด。",
+  "formation": "V + ที่สุด · grì-yah + têe sùt",
+  "section": "7.3.3",
+  "topic": "adverb",
+  "examples": [
+   "เธอร้องเพลงฝรั่งเพราะที่สุด · ter rórng playng fa-rùng pró’ têe sÒOt — She sings Western songs the best. ／ 她唱西洋歌唱得最好。",
+   "พี่มาลีทำส้มตำอร่อยที่สุด · pêe mah-lee tum sôm dtum a-ròy têe sÒOt — Malee makes the tastiest papaya salad. ／ 玛莉做的凉拌木瓜丝最好吃。"
+  ],
+  "focus_all": [
+   "ที่สุด"
+  ]
+ },
+ {
+  "key": "th-as-as-possible",
+  "name": "กริยา + ให้ + ADJ + ที่สุด",
+  "level": "B1",
+  "en": "'as ... as possible': ให้ + adjective + ที่สุด.",
+  "zh": "尽可能……：ให้ + 形容词 + ที่สุด。",
+  "formation": "V + ให้ + ADJ + ที่สุด · hâi + têe sùt",
+  "section": "7.3.4",
+  "topic": "adverb",
+  "examples": [],
+  "focus_all": [
+   "ที่สุด"
+  ]
+ },
+ {
+  "key": "th-as-adj-as-possible",
+  "name": "กริยา + อย่าง + ADJ + ที่สุด + ที่จะ",
+  "level": "B1",
+  "en": "'as ADJ as possible': อย่าง + adjective + ที่สุด (+ ที่จะ + adjective).",
+  "zh": "尽可能……地：อย่าง + 形容词 + ที่สุด。",
+  "formation": "V + อย่าง + ADJ + ที่สุด · yàhng + têe sùt",
+  "section": "7.3.4.1",
+  "topic": "adverb",
+  "examples": [
+   "เขาวิ่งอย่างเร็วที่สุด(เท่า)ที่จะเร็วได้ · káo wîng yàhng ray-o (tâo) têe sÒOt têe ja ray-o dâi — He ran as quickly as possible ／ 他尽可能快地跑。"
+  ],
+  "focus_all": [
+   "ที่สุด"
+  ]
+ },
+ {
+  "key": "th-as-adj-as-one-can",
+  "name": "กริยา + อย่าง + ADJ + ที่สุด + เท่าที่จะทำได้",
+  "level": "B1",
+  "en": "The full frame adds เท่าที่จะทำได้ 'as far as one can'.",
+  "zh": "加 เท่าที่จะทำได้：尽己所能地……。",
+  "formation": "V + อย่าง + ADJ + ที่สุด + เท่าที่จะทำได้ · tâo têe jà tum dâi",
+  "section": "7.3.4.2",
+  "topic": "adverb",
+  "examples": [
+   "ผมจะทำอย่างดีที่สุด(เท่า)ที่จะทำได้ · pǒm ja tum yàhng dee têe sÒOt (tâo) têe ja tum dâi — I shall do it as well as possible. ／ 我会尽可能做好。"
+  ],
+  "focus": [
+   "เท่าที่จะทำได้"
+  ],
+  "focus_all": [
+   "เท่าที่จะทำได้"
+  ]
+ },
+ {
+  "key": "th-prep-suan",
+  "name": "ส่วน",
+  "level": "B1",
+  "en": "ส่วน 'as for, regarding' topicalises a contrast.",
+  "zh": "ส่วน：至于、至于说（对比）。",
+  "formation": "ส่วน + N + ประโยค · sòo-un",
+  "section": "8.3.4",
+  "topic": "preposition",
+  "examples": [
+   "ส่วนผมคิดว่าไม่ดีเลย · sòo-un pǒm kít wâh mâi dee ler-ee — As for me, I don’t think it is good at all. ／ 至于我，我觉得一点都不好。",
+   "ผมเรียนภาษาไทยมาสามปีแล้ว · pǒm ree-un pah-sǎh tai mah sǎhm bpee láir-o — I have been studying Thai for three years. ／ 我学泰语已经三年了。",
+   "เราไปสองวันเท่านั้น · rao bpai sǒrng wun tâo-nún — We are only going for three days. ／ 我们只去两天。"
+  ],
+  "focus": [
+   "ส่วน"
+  ],
+  "focus_all": [
+   "ส่วน"
+  ]
+ },
+ {
+  "key": "th-prep-doi",
+  "name": "โดย",
+  "level": "B1",
+  "en": "โดย marks means or agent: โดยรถไฟ 'by train'.",
+  "zh": "โดย：用、通过（โดยสาร 乘）。",
+  "formation": "โดย + N · doy",
+  "section": "8.4",
+  "topic": "preposition",
+  "examples": [
+   "คุณทำด้วยมือหรือ · kOOn tum dôo-ay meu: lěr? — You did it by hand, then? ／ 你是用手做的呀？",
+   "เขาเขียนด้วยความยากลำบาก · káo kěe-un dôo-ay kwahm yâhk lum-bàhk — He writes with difficulty. ／ 他写得很吃力。",
+   "ฉันนั่งรถเมล์ไปเชียงใหม่ · chún nûng rót may bpai chee-ung mài — I went to Chiangmai by bus. ／ 我坐公共汽车去清迈。"
+  ],
+  "focus_all": [
+   "โดย"
+  ]
+ },
+ {
+  "key": "th_concessive",
+  "name": "แม้ว่า / ถึงแม้",
+  "level": "B1",
+  "en": "แม้ว่า/ถึงแม้ 'although', usually paired with แต่ or ก็.",
+  "zh": "แม้ว่า/ถึงแม้：虽然（常与 แต่ 呼应）。",
+  "formation": "แม้ว่า + CLAUSE, แต่ + CLAUSE · máir wâh / těung máir",
+  "section": "9.2.3",
+  "topic": "clause",
+  "examples": [
+   "(ถึง)แม้ว่าฉันใส่น้ำปลาเยอะแต่ยังไม่อร่อย · (těung) máir wâh chún sài núm bplah yér dtàir yung mâi a-ròy — Although I put a lot of fish sauce in, it still doesn’t taste good. ／ 虽然我放了很多鱼露，还是不好吃。",
+   "ทั้ง ๆ ที่ฝนยังตกหนักอยู่แต่เรา(ก็)ยังคิดจะไป · túng túng têe fǒn yung dtòk nùk yòo dtàir rao (gôr) yung kít ja bpai — Although it’s still raining heavily, we’re still planning to go. ／ 尽管雨还下得很大，我们还是打算去。",
+   "ไม่ว่าจะแพงแค่ไหน(ก็)ยังรู้สึกคุ้ม · mâi wâh ja pairng kâir nǎi gôr yung róo-sèuk kÓOm — Regardless of how expensive it was, I still think it was worth it. ／ 不管多贵，还是觉得值。"
+  ],
+  "focus_all": [
+   "แม้ว่า",
+   "ถึงแม้",
+   "แม้"
+  ]
+ },
+ {
+  "key": "th-apart-from",
+  "name": "นอกจาก",
+  "level": "B1",
+  "en": "นอกจาก 'apart from', often with นอกจากนี้ 'moreover'.",
+  "zh": "นอกจาก：除了……（还有）。",
+  "formation": "นอกจาก + N/CLAUSE · nôrk jàhk",
+  "section": "9.2.5",
+  "topic": "clause",
+  "examples": [
+   "นอกจากเชียงใหม่แล้วเรายังไปเที่ยวลำปางด้วย · nôrk jàhk chee-ung mài láir-o rao yung bpai têe-o lum-bpahng dôo-ay — Apart from Chiangmai, we went to Lampang. ／ 除了清迈，我们还去了南邦。",
+   "นอกจากจะกินน้ำมันเยอะแล้วค่าซ่อมยังแพงด้วย · nôrk jàhk ja gin núm mun yér láir-o kâh sôrm yung pairng dôo-ay — Apart from using a lot of petrol, the repair costs are expensive too. ／ 除了费油，修理费也贵。",
+   "นอกจากนั้นแล้วยังมีสาเหตุอีกหลายอย่าง · nôrk jàhk nún láir-o yung mee sǎh-hàyt èek lǎi: yàhng — Apart from that, there are many other reasons. ／ 除此之外，还有很多其他原因。"
+  ],
+  "focus": [
+   "นอกจาก"
+  ],
+  "focus_all": [
+   "นอกจาก"
+  ]
+ },
+ {
+  "key": "th-exclamation",
+  "name": "จริง ๆ / เหลือเกิน",
+  "level": "B1",
+  "en": "Exclamatory degree words: จริง ๆ, เหลือเกิน, ที่สุด.",
+  "zh": "感叹程度：จริง ๆ 真……/ เหลือเกิน 太……了。",
+  "formation": "ADJ + จริง ๆ/เหลือเกิน · jing jing / lěu-a gern",
+  "section": "9.6",
+  "topic": "clause",
+  "examples": [],
+  "focus_all": [
+   "จริงๆ",
+   "เหลือเกิน"
+  ]
+ },
+ {
+  "key": "th-particle-khaa",
+  "name": "ขา",
+  "level": "B1",
+  "en": "ขา is a gentle, drawn-out 'yes?' or respectful acknowledgement from a woman.",
+  "zh": "ขา：女性柔和的应答“是/在”。",
+  "formation": "CLAUSE + ขา · kǎh",
+  "section": "10.2.5",
+  "topic": "particle",
+  "examples": [],
+  "focus": [
+   "ขา"
+  ],
+  "focus_all": [
+   "ขา"
+  ]
+ },
+ {
+  "key": "th-particle-ha",
+  "name": "ฮะ",
+  "level": "B1",
+  "en": "ฮะ is a light, casual polite particle, mostly male.",
+  "zh": "ฮะ：轻快的口语礼貌词（多为男性）。",
+  "formation": "CLAUSE + ฮะ · há",
+  "section": "10.2.6",
+  "topic": "particle",
+  "examples": [],
+  "focus": [
+   "ฮะ"
+  ],
+  "focus_all": [
+   "ฮะ"
+  ]
+ },
+ {
+  "key": "th-particle-haa",
+  "name": "ฮ่ะ",
+  "level": "B1",
+  "en": "ฮ่ะ adds mild insistence or self-justification.",
+  "zh": "ฮ่ะ：略带强调、辩解的语气。",
+  "formation": "CLAUSE + ฮ่ะ · hâ",
+  "section": "10.2.7",
+  "topic": "particle",
+  "examples": [],
+  "focus": [
+   "ฮ่ะ"
+  ],
+  "focus_all": [
+   "ฮ่ะ"
+  ]
+ },
+ {
+  "key": "th-particle-ja-rising",
+  "name": "จ๊ะ",
+  "level": "B1",
+  "en": "จ๊ะ is an older speaker's affectionate particle to a younger person.",
+  "zh": "จ๊ะ：长辈对晚辈的亲切语气。",
+  "formation": "CLAUSE + จ๊ะ · já",
+  "section": "10.2.8",
+  "topic": "particle",
+  "examples": [],
+  "focus": [
+   "จ๊ะ"
+  ],
+  "focus_all": [
+   "จ๊ะ"
+  ]
+ },
+ {
+  "key": "th-particle-ja",
+  "name": "จ้ะ",
+  "level": "B1",
+  "en": "จ้ะ is the statement counterpart of จ๊ะ, warm but not deferential.",
+  "zh": "จ้ะ：亲切的陈述语气（长辈对晚辈）。",
+  "formation": "CLAUSE + จ้ะ · jâ",
+  "section": "10.2.9",
+  "topic": "particle",
+  "examples": [],
+  "focus": [
+   "จ้ะ"
+  ],
+  "focus_all": [
+   "จ้ะ"
+  ]
+ },
+ {
+  "key": "th-particle-wa",
+  "name": "วะ / ว่ะ / โว้ย",
+  "level": "B1",
+  "en": "Rough particles among close friends; offensive to strangers or superiors.",
+  "zh": "วะ/ว่ะ/โว้ย：极随便或粗鲁，只对密友。",
+  "formation": "CLAUSE + วะ/ว่ะ/โว้ย · wá / wâ / wóy",
+  "section": "10.2.11",
+  "topic": "particle",
+  "examples": [],
+  "focus": [
+   "วะ",
+   "ว่ะ",
+   "โว้ย"
+  ],
+  "focus_all": [
+   "วะ",
+   "ว่ะ",
+   "โว้ย"
+  ]
+ },
+ {
+  "key": "th-particle-la",
+  "name": "ละ",
+  "level": "B1",
+  "en": "ละ marks 'in that case, then' or leaves something unsaid.",
+  "zh": "ละ：那就……（承接、留白）。",
+  "formation": "CLAUSE + ละ · lá",
+  "section": "10.3.2",
+  "topic": "particle",
+  "examples": [
+   "พอละดีละ · por lá dee lá — That’s enough. That’s fine. ／ 够了。行了。",
+   "ถูกละ เอาละ · tòok lá ao lá — That’s right/correct. OK!; Right, then! ／ 对啦。那就这样吧。",
+   "ผมกลับบ้านละ · pǒm glùp bâhn lá — I’m going home. ／ 我回家啦。"
+  ],
+  "focus": [
+   "ละ"
+  ],
+  "focus_all": [
+   "ละ"
+  ]
+ },
+ {
+  "key": "th-particle-no",
+  "name": "น่ะ / น่า",
+  "level": "B1",
+  "en": "น่ะ draws attention; น่า expresses admiration or 'how ...!'.",
+  "zh": "น่ะ 提示 / น่า 感叹“真……啊”。",
+  "formation": "CLAUSE + น่ะ/น่า · nâ / nâh",
+  "section": "10.3.5",
+  "topic": "particle",
+  "examples": [
+   "อย่าไปน่า · yàh bpai nâh — Oh, come on, don’t go. ／ 别去嘛。",
+   "ผู้หญิงน่ะก็เป็นอย่างนั้น · pôo-yǐng nâ gôr bpen yàhng nún — Women, right, are like that. ／ 女人嘛，就是这样。",
+   "ตอนครูสอนอยู่น่ะ ผมฟังไม่รู้เรื่องเลย · dtorn kroo sǒrn yòo nâ pǒm fung mâi róo rêu-ung ler-ee — When the teacher is teaching, right, I don’t understand a word. ／ 老师讲课的时候啊，我一句都听不懂。"
+  ],
+  "focus": [
+   "น่ะ"
+  ],
+  "focus_all": [
+   "น่ะ",
+   "น่า"
+  ]
+ },
+ {
+  "key": "th-particle-ngai",
+  "name": "ไง",
+  "level": "B1",
+  "en": "ไง is the casual form of อย่างไร, often 'of course, that's how'.",
+  "zh": "ไง：อย่างไร 的口语形，表“当然/就是这样”。",
+  "formation": "CLAUSE + ไง · ngai",
+  "section": "10.3.7",
+  "topic": "particle",
+  "examples": [
+   "เขาไม่ยอมฆ่ามัน · káo mâi yorm kâh mun — He wouldn’t kill it. ／ 他不肯杀它。",
+   "เสื้อฉันหายไปไหน · sêu-a chún hǎi: bpai nǎi? — Where’s my shirt disappeared to? ／ 我的衬衫跑哪儿去了？"
+  ],
+  "focus": [
+   "ไง"
+  ],
+  "focus_all": [
+   "ไง"
+  ]
+ },
+ {
+  "key": "th-particle-rok",
+  "name": "หรอก",
+  "level": "B1",
+  "en": "หรอก softens a negation or a contradiction.",
+  "zh": "หรอก：加强否定的口气（并不……）。",
+  "formation": "ไม่ + ... + หรอก · ròrk",
+  "section": "10.3.8",
+  "topic": "particle",
+  "examples": [
+   "ไม่ต้องหรอก · mâi dtôrng ròrk — There’s no need. (when declining an offer) ／ 不用了。",
+   "แพงครับ · pairng krúp — It’s expensive. ／ 很贵。",
+   "ก็จริงหรอก · gôr jing lòrk — That’s true (but . . .) ／ 确实是这样（不过……）"
+  ],
+  "focus": [
+   "หรอก"
+  ],
+  "focus_all": [
+   "หรอก"
+  ]
+ },
+ {
+  "key": "th-negate-resultative",
+  "name": "กริยา + ไม่ + ผล",
+  "level": "B1",
+  "en": "With resultative verbs ไม่ sits between the two verbs: กินไม่หมด.",
+  "zh": "结果补语否定：ไม่ 插在两个动词之间（กินไม่หมด 吃不完）。",
+  "formation": "V1 + ไม่ + V2 · grì-yah + mâi + pǒn",
+  "section": "11.2",
+  "topic": "negation",
+  "examples": [
+   "เรานอนไม่หลับ · rao norn mâi lùp — We didn’t sleep. ／ 我们睡不着。",
+   "เขาหาไม่เจอ · káo hǎh mâi jer — He can’t find it. ／ 他找不到。",
+   "ฉันคิดไม่ออก · chún kít mâi òrk — I can’t work it out. ／ 我想不出来。"
+  ],
+  "focus": [
+   "ไม่หมด",
+   "ไม่ทัน",
+   "ไม่ไหว"
+  ],
+  "focus_all": [
+   "ไม่หมด",
+   "ไม่ทัน",
+   "ไม่ไหว"
+  ]
+ },
+ {
+  "key": "th-neg-aux-mid",
+  "name": "กริยาช่วย + ไม่ + กริยา",
+  "level": "B1",
+  "en": "The negative falls inside the modal: อาจไม่มา 'may not come'.",
+  "zh": "助动词 + ไม่ + 动词：อาจไม่มา（可能不来）。",
+  "formation": "AUX + ไม่ + V · grì-yah chûai + mâi",
+  "section": "11.3.2",
+  "topic": "negation",
+  "examples": [
+   "ผมอาจจะไม่ไป · pǒm àht ja mâi bpai — I might not go. ／ 我可能不去。",
+   "คุณต้องไม่บอกเขา · kOOn dtôrng mâi bòrk káo — You must not tell him. ／ 你不许告诉他。",
+   "คุณคงจะไม่สนใจ · kOOn kong ca mâi sǒn jai — You probably won’t be interested. ／ 你大概不会感兴趣。"
+  ],
+  "focus": [
+   "อาจไม่",
+   "คงไม่"
+  ],
+  "focus_all": [
+   "อาจไม่",
+   "คงไม่"
+  ]
+ },
+ {
+  "key": "th-neg-aux-post",
+  "name": "กริยา + ไม่ + กริยาช่วย",
+  "level": "B1",
+  "en": "Some auxiliaries negate after the verb: ไปไม่ทัน 'not in time'.",
+  "zh": "动词 + ไม่ + 助动词：ไปไม่ทัน（来不及去）。",
+  "formation": "V + ไม่ + AUX · grì-yah + mâi + chûai",
+  "section": "11.3.3",
+  "topic": "negation",
+  "examples": [
+   "เขาพูดไทยไม่ เป็น · káo pôot tai mâi bpen — He can’t speak Thai. ／ 他不会说泰语。",
+   "คุณไปไม่ได้ · kOOn bpai mâi dâi: — You can’t go. ／ 你不能去。",
+   "ฉันทนไม่ไหว · chún ton mâi wǎi — I can’t stand it. ／ 我受不了。"
+  ]
+ },
+ {
+  "key": "th-mai-dai-assumption",
+  "name": "ไม่ได้ + กริยา (ปฏิเสธข้อสันนิษฐาน)",
+  "level": "B1",
+  "en": "ไม่ได้ contradicts what the listener assumed happened.",
+  "zh": "ไม่ได้ 用来反驳对方的假设。",
+  "formation": "ไม่ได้ + V · mâi dâi + grì-yah",
+  "section": "11.4.2",
+  "topic": "negation",
+  "examples": [
+   "บ้านอยู่กรุงเทพฯหรือ · bâhn yòo grOOng-tâyp lěr? — Your house is in Bangkok, then? ／ 你家在曼谷吧？",
+   "เขาเป็นแฟนหรือ · káo bpen fairn lěr? — She’s your girlfriend, then? ／ 她是你女朋友吧？",
+   "คุณสอนภาษาอังกฤษหรือ · kOOn sǒrn pah-sǎh ung-grìt lěr? — You taught English, then? ／ 你教英语的吧？"
+  ]
+ },
+ {
+  "key": "th-negative-degree",
+  "name": "ไม่ + ... + เลย/มาก/นัก",
+  "level": "B1",
+  "en": "Degree words after a negative: เลย 'at all', นัก 'much'.",
+  "zh": "否定程度：เลย 完全 / นัก 很（ไม่ดีเลย 一点也不好）。",
+  "formation": "ไม่ + V + เลย/นัก · mâi ... ley",
+  "section": "11.7",
+  "topic": "negation",
+  "examples": [
+   "ฉันไม่ชอบเลย · chún mâi chôrp ler-ee — I don’t like it at all. ／ 我一点也不喜欢。",
+   "เขาไม่มาแน่ · káo mâi mah nâir — He’s not coming for sure. ／ 他肯定不会来。",
+   "เราไม่ไป เด็ดขาด · rao mâi bpai dèt kàht — We’re absolutely not going. ／ 我们绝对不去。"
+  ],
+  "focus_all": [
+   "เลย",
+   "นัก"
+  ]
+ },
+ {
+  "key": "th-neg-causative-hai",
+  "name": "ไม่ + ให้ + คน + กริยา",
+  "level": "B1",
+  "en": "ไม่ให้ 'not let, refuse to let someone do'.",
+  "zh": "ไม่ให้ + 人 + 动词：不让某人做。",
+  "formation": "ไม่ + ให้ + O + V · mâi + hâi",
+  "section": "11.9.2",
+  "topic": "negation",
+  "examples": [
+   "เขาไม่ให้ภรรยาทำงาน · káo mâi hâi pun-ra-yah tum ngahn — He doesn’t let his wife work. ／ 他不让妻子工作。",
+   "พ่อไม่ให้ลูกกลับบ้านดึก · pôr mâi hâi lôok glùp bâhn dèuk — The father doesn’t let his children come home late. ／ 父亲不许孩子晚回家。",
+   "เราไม่ให้แมวเข้าบ้าน · rao mâi hâi mair-o kâo bâhn — We don’t let the cat come inside the house. ／ 我们不让猫进屋。"
+  ],
+  "focus": [
+   "ไม่ให้"
+  ],
+  "focus_all": [
+   "ไม่ให้"
+  ]
+ },
+ {
+  "key": "th-negative-conditional",
+  "name": "ถ้าไม่...ก็",
+  "level": "B1",
+  "en": "ถ้าไม่ 'if not', with ก็ in the result.",
+  "zh": "ถ้าไม่…ก็：如果不……就……。",
+  "formation": "ถ้าไม่ + V, ก็ + V · tâh mâi ... gôr",
+  "section": "11.11",
+  "topic": "negation",
+  "examples": [
+   "ไม่อย่างนั้นเราจะไปรับ · mâi yàhng nún rao ja bpai rúp — Otherwise we’ll go and pick her up. ／ 不然我们就去接她。",
+   "มิฉะนั้นผมไม่ไป · mí-chà-nún pǒm mâi bpai — Otherwise I’m not going. ／ 否则我不去。",
+   "ไม่อยากไปก็ไม่ต้อง · mâi yàhk bpai gôr mâi dtôrng — If you don’t want to go, you don’t have to. ／ 不想去就不必去。"
+  ],
+  "focus": [
+   "ถ้าไม่"
+  ],
+  "focus_all": [
+   "ถ้าไม่"
+  ]
+ },
+ {
+  "key": "th-question-ja-yung",
+  "name": "จะ ... หรือยัง",
+  "level": "B1",
+  "en": "'Are you going to ... yet?' — จะ up front, หรือยัง at the end.",
+  "zh": "จะ…หรือยัง：打算……了吗？",
+  "formation": "จะ + V + หรือยัง · jà ... rěu yang",
+  "section": "12.1.7",
+  "topic": "question",
+  "examples": [
+   "จะกินหรือยัง · ja gin réu yung? — Are you ready to eat yet? ／ 要吃了吗？",
+   "จะกลับบ้านหรือยัง · ja glùp bâhn réu yung? — Are you ready to go home yet? ／ 要回家了吗？"
+  ]
+ },
+ {
+  "key": "th-indirect-question",
+  "name": "ถามว่า / ไม่ทราบว่า",
+  "level": "B1",
+  "en": "Indirect questions keep the wh-word in place after ว่า.",
+  "zh": "间接疑问：ว่า 之后保留疑问词原位置。",
+  "formation": "ถามว่า + WH + CLAUSE · tǎam wâh",
+  "section": "12.4",
+  "topic": "question",
+  "examples": [
+   "จะกลับคืนนี้ไหม · ja glùp keu:n née mái? — Will you be back tonight? ／ 今晚回来吗？",
+   "เขาถามว่า จะกลับคืนนี้ไหม · káo tǎhm wâh ja glùp keu:n née mái? — He asked if I’d be back tonight. ／ 他问我今晚回不回来。",
+   "มีแฟนหรือยัง · mee fairn réu yung? — Do you have a boyfriend? ／ 你有男朋友了吗？"
+  ],
+  "focus": [
+   "ถามว่า",
+   "ไม่ทราบว่า"
+  ],
+  "focus_all": [
+   "ถามว่า",
+   "ไม่ทราบว่า"
+  ]
+ },
+ {
+  "key": "th-fractions",
+  "name": "เศษ / ส่วน",
+  "level": "B1",
+  "en": "Fractions: เศษ (numerator) over ส่วน (denominator).",
+  "zh": "分数：เศษ/ส่วน（三分之一）。",
+  "formation": "เศษ + จำนวน + ส่วน + จำนวน · sàyt / sòo-un",
+  "section": "13.6.1",
+  "topic": "quantity",
+  "examples": [
+   "ประชาชนสามในสี่ · bpra-chah-chon sǎhm nai sèe — three quarters of the population ／ 四分之三的民众",
+   "เหล้าครึ่งขวด · lâo krêung kòo-ut — half a bottle of whisky ／ 半瓶威士忌",
+   "ครึ่งวัน · krêung wun — half a day ／ 半天"
+  ],
+  "focus": [
+   "เศษ"
+  ],
+  "focus_all": [
+   "เศษ",
+   "ส่วน"
+  ]
+ },
+ {
+  "key": "th-decimals",
+  "name": "จุด",
+  "level": "B1",
+  "en": "จุด 'point' introduces decimals: 3.5 = สามจุดห้า.",
+  "zh": "小数点：จุด（3.5 = สามจุดห้า）。",
+  "formation": "จำนวน + จุด + จำนวน · jùt",
+  "section": "13.6.2",
+  "topic": "quantity",
+  "examples": [
+   "สี่จุดห้า · sèe jÒOt hâh — 4.5 ／ 四点五",
+   "ยาวหกจุดห้าสามนิ้ว · yao: hòk jÒOt hâh sǎhm néw — 6.53 inches long ／ 六点五三英寸长"
+  ],
+  "focus": [
+   "จุด"
+  ],
+  "focus_all": [
+   "จุด"
+  ]
+ },
+ {
+  "key": "th-collective-numbers",
+  "name": "รวม / ทั้งหมด",
+  "level": "B1",
+  "en": "Collective totals: รวม 'in total', ทั้งหมด 'all of it'.",
+  "zh": "合计：รวม 总共 / ทั้งหมด 全部。",
+  "formation": "รวม + จำนวน · ruam / táng mòt",
+  "section": "13.7",
+  "topic": "quantity",
+  "examples": [
+   "รองเท้าสามคู่ · rorng táo: sǎhm kôo — three pairs of shoes ／ 三双鞋",
+   "ไข่ครึ่งโหล · kài krêung lǒh — half a dozen eggs ／ 半打鸡蛋"
+  ],
+  "focus": [
+   "รวม",
+   "ทั้งหมด"
+  ],
+  "focus_all": [
+   "รวม",
+   "ทั้งหมด"
+  ]
+ },
+ {
+  "key": "th-per-distribution",
+  "name": "ละ / ต่อ",
+  "level": "B1",
+  "en": "'per': ละ for price and rate, ต่อ for time and ratio.",
+  "zh": "每：ละ（价格、比率）/ ต่อ（时间、比例）。",
+  "formation": "จำนวน + ละ/ต่อ + หน่วย · lá / dtòr",
+  "section": "13.11",
+  "topic": "quantity",
+  "examples": [
+   "คนละห้าร้อยบาท · kon la hâh róy bàht — 500 baht per person ／ 每人五百铢",
+   "อาทิตย์ละหกครั้ง · ah-tít la hòk krúng — six times a week ／ 每星期六次",
+   "โลละเท่าไหร่ · loh la tâo-rài? — How much per kilo? ／ 一公斤多少钱？"
+  ],
+  "focus": [
+   "ต่อ"
+  ],
+  "focus_all": [
+   "ละ",
+   "ต่อ"
+  ]
+ },
+ {
+  "key": "th-more-than-1",
+  "name": "N + จำนวน + กว่า + CLF",
+  "level": "B1",
+  "en": "'More than N of them': number + กว่า + classifier.",
+  "zh": "超过：数词 + กว่า + 量词。",
+  "formation": "N + จำนวน + กว่า + CLF · jam-nuan + gwàh",
+  "section": "13.16.1",
+  "topic": "quantity",
+  "examples": [
+   "เธอมีรองเท้าร้อยกว่าคู่ · ter mee rorng táo: róy gwàh kôo — She owns more than a hundred pairs of shoes. ／ 她有一百多双鞋。",
+   "ฉันได้เงินเดือนสองหมื่นกว่าบาท · chún dâi ngern deu-un sǒrng mèu:n gwàh bàht — I get a monthly salary of more than 20,000 baht. ／ 我月薪两万多铢。",
+   "เราเดินทางยี่สิบกว่าชั่วโมง · rao dern tahng yêe-sìp gwàh chôo-a mohng — We travelled for more than twenty hours. ／ 我们走了二十多个小时。"
+  ],
+  "focus_all": [
+   "กว่า"
+  ]
+ },
+ {
+  "key": "th-more-than-2",
+  "name": "N + กว่า + จำนวน + CLF",
+  "level": "B1",
+  "en": "กว่า before the number: 'over N'.",
+  "zh": "กว่า + 数词 + 量词：超过……个。",
+  "formation": "N + กว่า + จำนวน + CLF · gwàh + jam-nuan",
+  "section": "13.16.2",
+  "topic": "quantity",
+  "examples": [
+   "ประชาชนที่เดินขบวนต่อต้านสงครามมีกว่าเจ็ดแสนคน · bpra-chah-chon têe dern ka-boo-un dtòr dtâhn sǒng-krahm mee gwàh jèt sǎirn kon — More than 700,000 people demonstrated against the war. ／ 参加反战游行的民众超过七十万人。",
+   "เขาซื้อบ้านกว่าห้าสิบล้าน · káo séu: bâhn gwàh hâh sìp láhn — He bought a house for more than 50 million. ／ 他买房子花了五千多万。"
+  ]
+ },
+ {
+  "key": "th-more-than-up",
+  "name": "N + จำนวน + CLF + ขึ้นไป",
+  "level": "B1",
+  "en": "ขึ้นไป 'and upward' closes a minimum.",
+  "zh": "ขึ้นไป：……以上。",
+  "formation": "จำนวน + CLF + ขึ้นไป · kêun bpai",
+  "section": "13.16.4",
+  "topic": "quantity",
+  "examples": [
+   "ฉันรอสองชั่วโมงกว่า · chún ror sǒrng chôo-a mohng gwàh — I waited over two hours. ／ 我等了两个多小时。",
+   "บ่ายสี่โมงกว่า ๆ · bài: sèe mohng gwa gwàh — a little after 4 p.m. ／ 下午四点过一点",
+   "เขากินเบียร์สองขวดกว่า · káo gin bee-a sǒrng kòo-ut gwàh — He has drunk over two bottles of beer (but not as many as three). ／ 他喝了两瓶多啤酒（不到三瓶）。"
+  ],
+  "focus": [
+   "ขึ้นไป"
+  ],
+  "focus_all": [
+   "ขึ้นไป"
+  ]
+ },
+ {
+  "key": "th-as-many-as",
+  "name": "ถึง",
+  "level": "B1",
+  "en": "ถึง before a number stresses 'as many as'.",
+  "zh": "ถึง + 数词：多达、竟有。",
+  "formation": "ถึง + จำนวน · těung",
+  "section": "13.18",
+  "topic": "quantity",
+  "examples": [
+   "มีคนสมัครถึงพันคน · mee kon sa-mùk těung pun kon — There were as many as a thousand applicants. ／ 报名的人多达一千。"
+  ],
+  "focus_all": [
+   "ถึง"
+  ]
+ },
+ {
+  "key": "th-beginning-dton",
+  "name": "ต้น + เวลา",
+  "level": "B1",
+  "en": "ต้น 'beginning of' a period: ต้นเดือน.",
+  "zh": "ต้น：……之初（ต้นเดือน 月初）。",
+  "formation": "ต้น + เวลา · dtôhn",
+  "section": "14.7.3.1",
+  "topic": "time",
+  "examples": [
+   "ต้นปีที่แล้ว · dtôn bpee têe láir-o — the beginning of last year ／ 去年年初"
+  ],
+  "focus": [
+   "ต้นเดือน",
+   "ต้นปี"
+  ],
+  "focus_all": [
+   "ต้นเดือน",
+   "ต้นปี"
+  ]
+ },
+ {
+  "key": "th-end-sin-bplai",
+  "name": "ปลาย / สิ้น + เวลา",
+  "level": "B1",
+  "en": "ปลาย 'end of a period', สิ้น 'end, expiry'.",
+  "zh": "ปลาย 末 / สิ้น 结束（ปลายเดือน 月底）。",
+  "formation": "ปลาย/สิ้น + เวลา · bplaai / sîn",
+  "section": "14.7.3.4",
+  "topic": "time",
+  "examples": [],
+  "focus": [
+   "ปลาย",
+   "สิ้น"
+  ],
+  "focus_all": [
+   "ปลาย",
+   "สิ้น"
+  ]
+ },
+ {
+  "key": "th-24-hour-clock",
+  "name": "ระบบ 24 ชั่วโมง",
+  "level": "B1",
+  "en": "The 24-hour clock adds นาฬิกา: 13 นาฬิกา.",
+  "zh": "24 小时制：13 นาฬิกา（13 点）。",
+  "formation": "จำนวน + นาฬิกา · rá-bòp",
+  "section": "14.8.4",
+  "topic": "time",
+  "examples": [],
+  "focus_all": [
+   "นาฬิกา"
+  ]
+ },
+ {
+  "key": "th-telephone",
+  "name": "สวัสดีครับ/ค่ะ + พูดกับ",
+  "level": "B1",
+  "en": "Phone conventions: answer with สวัสดี + particle, ask for someone with ขอสาย.",
+  "zh": "电话用语：接听 สวัสดี + 礼貌词；找人 ขอสาย。",
+  "formation": "สวัสดี + ครับ/ค่ะ · sà-wàt-dee",
+  "section": "15.6.4",
+  "topic": "speech",
+  "examples": [
+   "ขอพูดกับ . . . หน่อยได้ไหม · kǒr pôot gùp . . . nòy dâi mái? — Could I speak to . . . , please? ／ 请找……听电话。",
+   "คุณ . . . อยู่ไหม · kOOn . . . yòo mái? — Is Khun . . . there? ／ ……先生在吗？",
+   "ช่วยพูดดังๆหน่อยได้ไหม · chôo-ay pôot dung dung nòy dâi: mái? — Could you speak up a little, please? ／ 能说大声一点吗？"
+  ],
+  "focus": [
+   "ขอสาย",
+   "ไม่ว่าง"
+  ],
+  "focus_all": [
+   "ขอสาย",
+   "ไม่ว่าง"
+  ]
+ },
+ {
+  "key": "th-until-jon-kwa",
+  "name": "จนกว่า",
+  "level": "B1",
+  "en": "Until: the point in time that must be reached before the main clause holds.",
+  "zh": "「จนกว่า」：直到……为止，主句动作持续到某个时点。",
+  "formation": "ประโยค + จนกว่า + ประโยค · jon-gwàh",
+  "section": "16.3",
+  "topic": "clause",
+  "focus": [
+   "จนกว่า"
+  ],
+  "examples": [
+   "รออยู่ที่นี่จนกว่าเขาจะมา · ror yòo têe nêe jon-gwàh káo ja mah — Wait here until he comes. ／ 在这儿等到他来。",
+   "ผมจะรอจนกว่าคุณจะพร้อม · pǒm ja ror jon-gwàh kOOn ja prórn — I'll wait until you're ready. ／ 我会等到你准备好。"
+  ]
+ },
+ {
+  "key": "th-until-reach-jon-teung",
+  "name": "จนถึง",
+  "level": "B1",
+  "en": "Up to, as far as: the end point of a stretch of time or space.",
+  "zh": "「จนถึง」：直到（某时/某处），表示时间或空间的终点。",
+  "formation": "จน + ถึง · jon těung",
+  "section": "16.4",
+  "topic": "preposition",
+  "focus": [
+   "จนถึง"
+  ],
+  "examples": [
+   "ร้านเปิดตั้งแต่เก้าโมงเช้าจนถึงห้าโมงเย็น · ráhn bpèrt dtûng-dtàir gâo mohng cháo jon těung hâh mohng yen — The shop opens from nine in the morning until five in the afternoon. ／ 商店从早上九点开到下午五点。",
+   "เดินตรงไปจนถึงสี่แยก · dern dtrong bpai jon těung sèe yâirk — Walk straight on as far as the crossroads. ／ 一直走到十字路口。"
+  ]
+ },
+ {
+  "key": "th-immediately-tan-tee",
+  "name": "ทันที",
+  "level": "B1",
+  "en": "Immediately, at once; ทันทีที่ 'as soon as'.",
+  "zh": "「ทันที」：立刻、马上；「ทันทีที่」＝一……就……",
+  "formation": "กริยา + ทันที (ที่) · tun-tee",
+  "section": "16.5",
+  "topic": "adverb",
+  "focus": [
+   "ทันที"
+  ],
+  "examples": [
+   "เขาออกไปทันที · káo òrk bpai tun-tee — He left at once. ／ 他马上就出去了。",
+   "โทรหาฉันทันทีที่ถึงบ้าน · toh hǎh chún tun-tee têe těung bâhn — Phone me as soon as you get home. ／ 一到家就给我打电话。"
+  ]
+ },
+ {
+  "key": "th-very-tee-diao",
+  "name": "ทีเดียว",
+  "level": "B1",
+  "en": "Really, very much: a strong degree marker after an adjective, more emphatic than มาก.",
+  "zh": "「ทีเดียว」：非常、实在（程度比 มาก 更强，偏口语）。",
+  "formation": "คำคุณศัพท์ + มากทีเดียว · mâhk tee dee-o",
+  "section": "16.6",
+  "topic": "adverb",
+  "focus": [
+   "ทีเดียว"
+  ],
+  "examples": [
+   "วันนี้ร้อนมากทีเดียว · wun née rórn mâhk tee dee-o — It's really very hot today. ／ 今天实在很热。",
+   "อาหารร้านนี้อร่อยมากทีเดียว · ah-hǎan ráhn née a-ròy mâhk tee dee-o — The food here is really delicious. ／ 这家店的菜实在很好吃。"
+  ]
+ },
+ {
+  "key": "th-even-if-teung-ja",
+  "name": "ถึงจะ",
+  "level": "B1",
+  "en": "Even if: a concessive, usually answered by ก็ in the main clause.",
+  "zh": "「ถึงจะ」：即使、就算，让步连词，主句常用 ก็。",
+  "formation": "ถึงจะ + ประโยค + ก็ · těung ja",
+  "section": "16.7",
+  "topic": "clause",
+  "focus": [
+   "ถึงจะ"
+  ],
+  "examples": [
+   "ถึงจะแพงผมก็จะซื้อ · těung ja pairng pǒm gôr ja séu: — Even if it's expensive, I'll buy it. ／ 即使贵，我也要买。",
+   "ถึงจะเหนื่อยเขาก็ไม่หยุด · těung ja nèu-ay káo gôr mâi yùt — Even when he's tired he doesn't stop. ／ 就算累，他也不停下。"
+  ]
+ },
+ {
+  "key": "th-as-according-dtam-tee",
+  "name": "ตามที่",
+  "level": "B1",
+  "en": "As, according to: a clause that something follows or matches.",
+  "zh": "「ตามที่」：按照……、正如……所说。",
+  "formation": "ตามที่ + ประโยค · dtahm têe",
+  "section": "16.8",
+  "topic": "clause",
+  "focus": [
+   "ตามที่"
+  ],
+  "examples": [
+   "ทำตามที่ผมบอก · tum dtahm têe pǒm bòrk — Do as I told you. ／ 按我说的做。",
+   "ตามที่คุณพูดเมื่อกี้ เรื่องนี้สำคัญมาก · dtahm têe kOOn pôot mêu-a gêe rêu-ung née sǔm-kan mâhk — As you said just now, this matter is very important. ／ 正如你刚才所说，这件事很重要。"
+  ]
+ },
+ {
+  "key": "th-disposal",
+  "name": "กริยา + เสีย/ซะ",
+  "level": "B2",
+  "en": "เสีย/ซะ adds completion with a sense of loss, mistake or finality.",
+  "zh": "เสีย/ซะ：动作完成且带遗憾、了结语气。",
+  "formation": "V + เสีย/ซะ · grì-yah + sěe-a/sá",
+  "section": "5.7.12",
+  "topic": "verb",
+  "examples": [
+   "เขามาสายไปเสียแล้ว · káo mah sǎi: bpai sá láir-o — He came too late. ／ 他来得太晚了。",
+   "ฉันลืมไปเสียแล้ว · chún leu:m bpai sá láir-o — I’ve forgotten. ／ 我忘掉了。",
+   "กินเสียลูก · gin sěe-a lôok — Eat up, now. (mother to child) ／ 快吃掉吧。（母亲对孩子）"
+  ],
+  "focus": [
+   "เสีย",
+   "ซะ"
+  ],
+  "focus_all": [
+   "เสีย",
+   "ซะ"
+  ]
+ },
+ {
+  "key": "th-reduplication-tone",
+  "name": "คำซ้ำเปลี่ยนเสียง",
+  "level": "B2",
+  "en": "Repetition with a tone change gives a vivid, idiomatic degree.",
+  "zh": "变调重叠：更生动、口语化的程度表达。",
+  "formation": "ADJ + ADJ(เปลี่ยนเสียง) · kam sáhm",
+  "section": "6.4.2",
+  "topic": "adjective",
+  "examples": []
+ },
+ {
+  "key": "th-the-more",
+  "name": "ยิ่ง...ยิ่ง",
+  "level": "B2",
+  "en": "'the more ... the more ...': ยิ่ง + X + ยิ่ง + Y.",
+  "zh": "越……越……：ยิ่ง…ยิ่ง…",
+  "formation": "ยิ่ง + X + ยิ่ง + Y · yêung ... yêung",
+  "section": "9.2.6",
+  "topic": "clause",
+  "examples": [
+   "ยิ่งฟังก็ยิ่งไม่เข้าใจ · yîng fung gôr yîng mâi kâo jai — The more I listen, the more I don’t understand/the less I understand. ／ 越听越不明白。"
+  ],
+  "focus": [
+   "ยิ่ง"
+  ],
+  "focus_all": [
+   "ยิ่ง"
+  ]
+ },
+ {
+  "key": "th-particle-jam",
+  "name": "จ๋า",
+  "level": "B2",
+  "en": "จ๋า is coaxing or intimate, used to children and lovers.",
+  "zh": "จ๋า：哄劝、亲昵（对孩子、爱人）。",
+  "formation": "CLAUSE + จ๋า · jǎh",
+  "section": "10.2.10",
+  "topic": "particle",
+  "examples": [],
+  "focus": [
+   "จ๋า"
+  ],
+  "focus_all": [
+   "จ๋า"
+  ]
+ },
+ {
+  "key": "th-particle-ya",
+  "name": "ยะ / ย่ะ",
+  "level": "B2",
+  "en": "Assertive or confrontational particles, typically female.",
+  "zh": "ยะ/ย่ะ：女性强硬、挑衅语气。",
+  "formation": "CLAUSE + ยะ/ย่ะ · yá / yâ",
+  "section": "10.2.12",
+  "topic": "particle",
+  "examples": [],
+  "focus": [
+   "ยะ",
+   "ย่ะ"
+  ],
+  "focus_all": [
+   "ยะ",
+   "ย่ะ"
+  ]
+ },
+ {
+  "key": "th-particle-tee",
+  "name": "ที",
+  "level": "B2",
+  "en": "ที 'just for once', often in a complaint or a plea.",
+  "zh": "ที：就……一次吧（抱怨、请求）。",
+  "formation": "V + ที · tee",
+  "section": "10.3.11",
+  "topic": "particle",
+  "examples": [
+   "ขอโทษที · kǒr-tôht tee — Sorry! ／ 对不起啊！",
+   "ขอพูดที · kǒr pôot tee — Can I say something/get a word in? ／ 我说一句啊。",
+   "ช่วยปิดทีวีที · chôo-ay bpìt tee wee tee — Please turn the TV off. ／ 帮忙把电视关一下。"
+  ],
+  "focus_all": [
+   "ที"
+  ]
+ },
+ {
+  "key": "th-neg-causative-tum",
+  "name": "ไม่ + ทำ + กรรม + กริยา",
+  "level": "B2",
+  "en": "ไม่ทำ...ให้ negates causing something to happen.",
+  "zh": "ไม่ + ทำ + 宾语 + 动词：不让……发生。",
+  "formation": "ไม่ + ทำ + O + V · mâi + tum",
+  "section": "11.9.1",
+  "topic": "negation",
+  "examples": [
+   "ขอยืมหน่อย จะไม่ทำเสีย · kǒr yeu:m nòy ja mâi tum sěe-a — Can I borrow it? I won’t damage it. ／ 借我用一下，我不会弄坏的。",
+   "ผมไม่ได้ทำแตกครับ · pǒm mâi dâi tum dtàirk krúp — I didn’t break it. ／ 不是我打碎的。"
+  ]
+ },
+ {
+  "key": "th-neg-causative-verb-hai",
+  "name": "กริยา + ไม่ให้ + คน + กริยา",
+  "level": "B2",
+  "en": "A specifying verb plus ไม่ให้: บอกไม่ให้ไป 'tell someone not to go'.",
+  "zh": "动词 + ไม่ให้：交代不让……。",
+  "formation": "V + ไม่ให้ + O + V · grì-yah + mâi hâi",
+  "section": "11.9.3",
+  "topic": "negation",
+  "examples": [
+   "เขาบอกไม่ให้ฉันใช้เงินมาก · káo bòrk mâi hâi chún chái ngern mâhk — He told me not to spend a lot of money. ／ 他叫我别多花钱。",
+   "เมียเตือนไม่ให้กลับบ้านดึก · mee-a dtèu-un mâi hâi káo glùp bâhn dèuk — His wife warned him not to come home late. ／ 他妻子提醒他别晚回家。",
+   "พ่อห้ามไม่ให้ฉันกินเหล้า · pôr hâhm mâi hâi chún gin lâo — My father forbids me to drink alcohol. ／ 父亲不许我喝酒。"
+  ]
+ },
+ {
+  "key": "th-neg-causative-verb-hai-pos",
+  "name": "ไม่ + กริยา + ให้ + คน + กริยา",
+  "level": "B2",
+  "en": "ไม่ before the specifying verb but ให้ stays positive: ไม่บอกให้ไป.",
+  "zh": "ไม่ + 动词 + ให้：没让……（否定落在动词上）。",
+  "formation": "ไม่ + V + ให้ + O + V · mâi + grì-yah + hâi",
+  "section": "11.9.4",
+  "topic": "negation",
+  "examples": [
+   "แม่ไม่อนุญาตให้ลูกไปดูหนัง · mâir mâi a-nÓO-yâht hâi lôok bpai doo nǔng — The mother doesn’t allow her children to go to see films. ／ 母亲不许孩子去看电影。",
+   "ฉันไม่ยอมให้เขาทำอย่างนั้น · chún mâi yorm hâi káo tum yàhng nún — I don’t let him do that. ／ 我不许他那样做。",
+   "เขาไม่ได้เตือนให้ระวังขโมย · káo mâi dâi dteu-un hâi rao ra-wung ka-moy-ee — He didn’t warn us to watch out for burglars. ／ 他没提醒我们防小偷。"
+  ]
+ },
+ {
+  "key": "th-neg-causative-tum-hai",
+  "name": "ไม่ + ทำให้ + กรรม + กริยา",
+  "level": "B2",
+  "en": "ไม่ทำให้ 'does not cause (someone) to be ...'.",
+  "zh": "ไม่ทำให้：不使……（发生）。",
+  "formation": "ไม่ + ทำให้ + O + V · mâi + tum hâi",
+  "section": "11.9.5",
+  "topic": "negation",
+  "examples": [
+   "แต่กลับไปอยู่บ้านเกิดไม่ได้ทำให้เธอมีความสุขมากขึ้น · dtàir glùp bpai yòo bâhn gèrt mâi dâi tum hâi ter mee kwahm sÒOk mâhk kêun — But going back to live in her place of birth did not make her happier. ／ 可是回到故乡去住并没有让她更幸福。",
+   "ที่ต้องไป ๆ มา ๆ บ่อย ๆ อย่างนี้ ไม่ได้ทำให้ฉันเดือดร้อน · têe dtôrng bpai bpai mah mah bòy bòy yàhng née mâi dâi tum hâi chún dèu-ut rórn — The fact that I have to go back and forth often like this doesn’t make things difficult for me. ／ 这样经常来回跑，并没有让我为难。"
+  ],
+  "focus": [
+   "ไม่ทำให้"
+  ],
+  "focus_all": [
+   "ไม่ทำให้"
+  ]
+ },
+ {
+  "key": "th-average",
+  "name": "เฉลี่ย",
+  "level": "B2",
+  "en": "เฉลี่ย 'on average'.",
+  "zh": "平均：เฉลี่ย。",
+  "formation": "เฉลี่ย + จำนวน · chà-lìa",
+  "section": "13.6.5",
+  "topic": "quantity",
+  "examples": [
+   "เงินเดือนเฉลี่ยสำหรับงานประเภทนี้คือ ๒-๓๐,๐๐๐ บาท · ngern deu-un cha-lèe-a sǔm-rùp ngahn bpra-pâyt née keu: sǒrng těung sǎhm meu:n bàht — The average salary for this kind of work is 20–30,000 baht per month. ／ 这类工作的平均月薪是两万到三万铢。",
+   "ต้องทำงานกลางคืนเดือนละสี่วันโดยเฉลี่ย · dtôrng tum ngahn glahng keu:n deu-un la sèe wun doy-ee cha-lèe-a — She has to work four nights a month on average. ／ 平均每月要上四个夜班。",
+   "ฝีมือปานกลาง · fěe meu: bpahn glahng — average (moderate) skill ／ 中等水平"
+  ],
+  "focus": [
+   "เฉลี่ย"
+  ],
+  "focus_all": [
+   "เฉลี่ย"
+  ]
+ },
+ {
+  "key": "th-number-idioms",
+  "name": "สำนวนเกี่ยวกับตัวเลข",
+  "level": "B2",
+  "en": "Fixed number idioms: หนึ่งใจเดียว, สองมือ.",
+  "zh": "数字惯用语：如 หนึ่งใจเดียว（一心一意）。",
+  "formation": "สำนวน · sǎm-nuan",
+  "section": "13.8",
+  "topic": "quantity",
+  "examples": [
+   "แสนไกล · sǎirn glai — extremely far ／ 极远",
+   "แสนจะสนุก · sǎirn ja sa-nÒOk — ever such fun ／ 特别好玩",
+   "ร้อยแปดคำที่คนไทยมักใช้ผิด · róy bpàirt kum têe kon tai múk chái pìt — ‘108 words which Thais tend to use incorrectly’ (book title) ／ “泰国人常误用的一百零八个词”（书名）"
+  ]
+ },
+ {
+  "key": "th-owing-to-neuang-jak",
+  "name": "เนื่องจาก",
+  "level": "B2",
+  "en": "Owing to, because of: a formal causal connector placed before the reason.",
+  "zh": "「เนื่องจาก」：由于、因为，书面/正式的因果连词。",
+  "formation": "เนื่องจาก + สาเหตุ · nêuang-jàhk",
+  "section": "16.9",
+  "topic": "clause",
+  "focus": [
+   "เนื่องจาก"
+  ],
+  "examples": [
+   "เที่ยวบินล่าช้าเนื่องจากอากาศไม่ดี · têe-o bin lâh-cháh nêuang-jàhk ah-gàht mâi dee — The flight was delayed owing to bad weather. ／ 由于天气不好，航班延误了。",
+   "เนื่องจากฝนตกหนัก เราจึงเลื่อนการเดินทาง · nêuang-jàhk fǒn dtòk nùk rao jeung léuan gahn dern tahng — Because it rained heavily, we postponed the trip. ／ 由于下大雨，我们推迟了行程。"
+  ]
+ },
+ {
+  "key": "th-the-fact-that-kan-tee",
+  "name": "การที่ + ประโยค",
+  "level": "B2",
+  "en": "The fact that: turns a whole clause into a noun phrase so it can be a subject.",
+  "zh": "「การที่ + 句子」：把整句名词化作主语，意为「……这件事」。",
+  "formation": "การที่ + ประโยค · gahn têe",
+  "section": "16.10",
+  "topic": "clause",
+  "focus": [
+   "การที่"
+  ],
+  "examples": [
+   "การที่เขาไม่มาทำให้เราเสียใจ · gahn têe káo mâi mah tum hâi rao sěe-a jai — The fact that he didn't come made us sad. ／ 他没来这件事让我们很难过。",
+   "การที่คุณพูดความจริงเป็นสิ่งที่ดี · gahn têe kOOn pôot kwahm jing bpen sìng têe dee — That you told the truth is a good thing. ／ 你说出真相，这是好事。"
+  ]
+ },
+ {
+  "key": "th-even-krathang",
+  "name": "กระทั่ง",
+  "level": "B2",
+  "en": "Even, as far as: a literary-flavoured 'even', stronger than แม้แต่.",
+  "zh": "「กระทั่ง」：甚至、直到（偏书面）。",
+  "formation": "กระทั่ง + คำนาม/ประโยค · grà-tùng",
+  "section": "16.11",
+  "topic": "adverb",
+  "focus": [
+   "กระทั่ง"
+  ],
+  "examples": [
+   "เขาไม่พูดกับใครกระทั่งเพื่อนสนิท · káo mâi pôot gùp krai grà-tùng pêu-un sa-nìt — He talks to no one, not even close friends. ／ 他谁也不跟说话，连好朋友也不。"
+  ]
+ },
+ {
+  "key": "th-pronouns-sacred",
+  "name": "พระคุณเจ้า / ใต้ฝ่าละอองธุลีพระบาท",
+  "level": "C1",
+  "en": "The sacred pronoun set for monks and the monarch; closed and highly formal.",
+  "zh": "僧侣与王室专用代词，极度正式。",
+  "formation": "สรรพนามเฉพาะ + กริยา · prá-kun jâo / dtâi fàh",
+  "section": "4.1.5",
+  "topic": "pronoun",
+  "examples": [
+   "ข้าพระพุทธเจ้า · kâh pra-pÓOt-ta-jâo — I (to King) ／ 臣／奴婢（对国王自称）",
+   "ใต้ฝ่าละอองธุลีพระบาท · dtâi fàh la-orng tÓO-lee pra-bàht — you (to King) ／ 陛下（对国王的尊称）",
+   "ใต้ฝ่าละอองพระบาท · dtâi fàh la-orng pra-bàht — you (to high-ranking royalty) ／ 殿下（对高级王族的尊称）"
+  ]
+ },
+ {
+  "key": "th-particle-royal",
+  "name": "พ่ะย่ะค่ะ / เพคะ",
+  "level": "C1",
+  "en": "Royal particles used when addressing the monarch.",
+  "zh": "พ่ะย่ะค่ะ/เพคะ：王室专用敬语。",
+  "formation": "CLAUSE + พ่ะย่ะค่ะ/เพคะ · pâ-yâ-kâ / pay-ká",
+  "section": "10.2.13",
+  "topic": "particle",
+  "examples": [],
+  "focus": [
+   "พ่ะย่ะค่ะ",
+   "เพคะ"
+  ],
+  "focus_all": [
+   "พ่ะย่ะค่ะ",
+   "เพคะ"
+  ]
+ },
+ {
+  "key": "th-literary-negative",
+  "name": "มิ / หา...ไม่",
+  "level": "C1",
+  "en": "Literary negatives: มิ in formal prose, หา...ไม่ in proverbs and verse.",
+  "zh": "书面否定：มิ（正式）/ หา…ไม่（谚语、韵文）。",
+  "formation": "มิ + V / หา + V + ไม่ · mí / hǎh ... mâi",
+  "section": "11.14",
+  "topic": "negation",
+  "examples": [
+   "เขาทำโดยมิได้หวังประโยชน์อะไร · káo tum doy-ee mí dâi wǔng bpra-yòht a-rai — He did it without hoping for any benefit. ／ 他做这事并非图什么好处。",
+   "จะเรียกว่าอย่างอื่นให้โก้หร่านกว่านี้หาได้ไม่ · ja rêe-uk wâh yàhng èun hâi gôh ràhn gwàh née hǎh dâi mâi — You couldn’t call it anything fancier than this. ／ 再没有比这更气派的叫法了。"
+  ],
+  "focus": [
+   "มิ"
+  ],
+  "focus_all": [
+   "มิ",
+   "หา"
+  ]
+ },
+ {
+  "key": "th-sanskrit-numbers",
+  "name": "เลขบาลี-สันสกฤต",
+  "level": "C1",
+  "en": "Sanskrit numerals in formal compounds: เอก, โท, ตรี.",
+  "zh": "梵语数词：เอก 一 / โท 二 / ตรี 三（正式复合词）。",
+  "formation": "เอก/โท/ตรี + N · náyk bah-lee",
+  "section": "13.4",
+  "topic": "quantity",
+  "examples": []
+ }
+]
