@@ -1,0 +1,207 @@
+{
+ "es_ser_de": {
+  "name": "ser + de (origin / material)",
+  "examples": [
+   {"es": "La calefacción de mi casa es de gas natural.", "zh": "我家的供暖是天然气的。"},
+   {"es": "El reloj era de fabricación china.", "zh": "这块表是中国制造的。"}
+  ]
+ },
+ "es_estar_en": {
+  "name": "estar + en (location)",
+  "examples": [
+   {"es": "Está en el otro edificio.", "zh": "他在另一栋楼里。"}
+  ]
+ },
+ "es_hay": {
+  "name": "hay / había + noun",
+  "examples": [
+   {"es": "Aquí hay una carta de Juan.", "zh": "这儿有一封胡安的信。"},
+   {"es": "No había barco en el puerto.", "zh": "港口里没有船。"}
+  ]
+ },
+ "es_gustar": {
+  "name": "gustar-type verb + indirect object",
+  "examples": [
+   {"es": "A María le gusta el cine.", "zh": "玛丽亚喜欢看电影。"},
+   {"es": "Me duele mucho la cabeza.", "zh": "我头疼得厉害。"}
+  ]
+ },
+ "es_wh_questions": {
+  "name": "Question words (qué, cómo, dónde...)",
+  "examples": [
+   {"es": "¿Qué le sucede a la niña?", "zh": "这女孩怎么了？"},
+   {"es": "¿Dónde conoció a su novia?", "zh": "他是在哪儿认识他女朋友的？"}
+  ]
+ },
+ "es_preterite": {
+  "name": "Preterite (comió)",
+  "examples": [
+   {"es": "Él me habló de su asunto.", "zh": "他跟我谈了他的事。"},
+   {"es": "Cambió el asiento con él.", "zh": "我跟他换了座位。"}
+  ]
+ },
+ "es_imperfect": {
+  "name": "Imperfect (comía / vivía)",
+  "examples": [
+   {"es": "Leía a la luz de la vela.", "zh": "他以前就着烛光看书。"},
+   {"es": "Podía llamar a la puerta.", "zh": "他（那时）可以去敲门。"}
+  ]
+ },
+ "es_ir_a": {
+  "name": "ir a + infinitive (future)",
+  "examples": [
+   {"es": "Va a secar la ropa al sol.", "zh": "他要把衣服拿到太阳底下去晒。"},
+   {"es": "Cuando nieve, iré a esquiar.", "zh": "一下雪我就去滑雪。"}
+  ]
+ },
+ "es_tener_que": {
+  "name": "tener que + infinitive",
+  "examples": [
+   {"es": "He tenido que coger el autobús.", "zh": "我只好坐了公共汽车。"},
+   {"es": "Tengo que ir, pase lo que pase.", "zh": "不管发生什么我都得去。"}
+  ]
+ },
+ "es_acabar_de": {
+  "name": "acabar de + infinitive",
+  "examples": [
+   {"es": "El chico acaba de llegar.", "zh": "男孩刚到。"},
+   {"es": "Acabo de recibir un telegrama.", "zh": "我刚收到一份电报。"}
+  ]
+ },
+ "es_para_inf": {
+  "name": "para + infinitive (purpose)",
+  "examples": [
+   {"es": "No tenemos tiempo para ir al cine.", "zh": "我们没有时间去电影院。"},
+   {"es": "Fue al campo para hacerse curar.", "zh": "他到乡下治病去了。"}
+  ]
+ },
+ "es_desde_hace": {
+  "name": "desde hace (duration up to now)",
+  "examples": [
+   {"es": "Trabajo aquí desde hace dos meses.", "zh": "我在这儿工作已经两个月了。"},
+   {"es": "Bebe solo leche desde hace tres días.", "zh": "他三天以来只喝牛奶。"}
+  ]
+ },
+ "es_mas_que": {
+  "name": "más ... que (comparison)",
+  "examples": [
+   {"es": "Más vale prevenir que curar.", "zh": "预防胜于治疗。"},
+   {"es": "Tradujo menos páginas que yo.", "zh": "他翻译的页数比我少。"}
+  ]
+ },
+ "es_tan_como": {
+  "name": "tan + adjective + como",
+  "examples": [
+   {"es": "Enrique es tan listo como Pedro.", "zh": "恩里克和佩德罗一样聪明。"},
+   {"es": "Juan toca el piano tan bien como Rebeca.", "zh": "胡安钢琴弹得跟丽贝卡一样好。"}
+  ]
+ },
+ "es_le": {
+  "name": "Indirect object pronoun (le / les)",
+  "examples": [
+   {"es": "Le queda mucho por hacer.", "zh": "他还有很多要做的事。"},
+   {"es": "A María le gusta el cine.", "zh": "玛丽亚喜欢看电影。"}
+  ]
+ },
+ "es_subj_present": {
+  "name": "Present subjunctive",
+  "examples": [
+   {"es": "No creo que esté ya aquí.", "zh": "我不认为他已经在这儿了。"},
+   {"es": "Me interesa que leas esto.", "zh": "我感兴趣的是你读读这个。"}
+  ]
+ },
+ "es_conditional": {
+  "name": "Conditional (habría / compraría)",
+  "examples": [
+   {"es": "Sin él no podría hacer nada.", "zh": "没有他我什么也干不成。"},
+   {"es": "Me gustaría ir con usted.", "zh": "我愿意跟您一起去。"}
+  ]
+ },
+ "es_futuro": {
+  "name": "Simple future (comprará)",
+  "examples": [
+   {"es": "Juan vendrá hoy a mi casa.", "zh": "胡安今天会来我家。"},
+   {"es": "El sol te secará la piel.", "zh": "太阳会把你的皮肤晒干的。"}
+  ]
+ },
+ "es_present_perfect": {
+  "name": "Present perfect: he + participle",
+  "examples": [
+   {"es": "Me han regalado un reloj.", "zh": "别人送了我一块表。"},
+   {"es": "No ha aprobado el examen.", "zh": "他考试没及格。"}
+  ]
+ },
+ "es_pluperfect": {
+  "name": "Pluperfect: había + participle",
+  "examples": [
+   {"es": "Había llovido toda la noche.", "zh": "下了一整夜的雨。"},
+   {"es": "El pobre niño se había perdido.", "zh": "可怜的孩子迷路了。"}
+  ]
+ },
+ "es_si_conditional": {
+  "name": "si + past subjunctive, conditional",
+  "examples": [
+   {"es": "Si Juan estuviera aquí, nos ayudaría.", "zh": "要是胡安在这儿，他会帮我们的。"},
+   {"es": "Si tuviera su teléfono, podría llamarle.", "zh": "要是我有他的电话，就能给他打了。"}
+  ]
+ },
+ "es_subj_past": {
+  "name": "Imperfect subjunctive (-ra / -se)",
+  "examples": [
+   {"es": "Si fuera a París, cogería el avión.", "zh": "如果我去巴黎，就坐飞机去。"},
+   {"es": "Si terminara pronto, me iría a casa.", "zh": "要是早点儿完事，我就回家了。"}
+  ]
+ },
+ "es_subj_pluperfect": {
+  "name": "Pluperfect subjunctive: hubiera + participle",
+  "examples": [
+   {"es": "Si hubiera venido, se lo habría dicho.", "zh": "要是他来了，我早就告诉他了。"}
+  ]
+ },
+ "es_conditional_perfect": {
+  "name": "Conditional perfect: habría + participle",
+  "examples": [
+   {"es": "Nos dijo que habría cenado a las seis.", "zh": "他说他六点钟就吃完晚饭了。"},
+   {"es": "¿No habrías dejado solos a los niños?", "zh": "你总不会把孩子们单独扔下吧？"}
+  ]
+ },
+ "es_se": {
+  "name": "se constructions (reflexive / passive / impersonal)",
+  "examples": [
+   {"es": "Se acostumbra uno a todo.", "zh": "人对什么都会习惯的。"},
+   {"es": "Se burlaron de la señora.", "zh": "他们嘲笑那位夫人。"}
+  ]
+ },
+ "es_como_si": {
+  "name": "como si + subjunctive",
+  "examples": [
+   {"es": "Cerró los ojos, como si no quisiera verme.", "zh": "他闭上眼睛，好像不愿意见我。"},
+   {"es": "Andas tan despacio como si fueras un enfermo.", "zh": "你走得这么慢，好像生病似的。"}
+  ]
+ },
+ "es_llevar_gerund": {
+  "name": "llevar + time + gerund",
+  "examples": [
+   {"es": "El cura lleva predicando media hora.", "zh": "神父已经布道半小时了。"},
+   {"es": "Llevaba construyendo la casa dos años.", "zh": "那房子他已经盖了两年了。"}
+  ]
+ },
+ "es_de_haber": {
+  "name": "de haber + participle (inverted condition)",
+  "examples": [
+   {"es": "De haber favorecido el tiempo, los árboles estarían más altos.", "zh": "要是天气好，树会长得更高。"}
+  ]
+ },
+ "es_por_mas_que": {
+  "name": "por más que + subjunctive",
+  "examples": [
+   {"es": "Por más que lloró, no logró ablandarle.", "zh": "她哭也没能把他说软了。"}
+  ]
+ },
+ "es_no_es_que": {
+  "name": "no es que + subjunctive",
+  "examples": [
+   {"es": "No es que no puedan oír.", "zh": "并不是他们听不见。"}
+  ]
+ }
+}

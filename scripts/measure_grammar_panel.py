@@ -61,6 +61,10 @@ def engine_functions(name):
         from lute.read.render import grammar_analysis_ru as RU  # noqa: E402
 
         pair = (RU.analyze_russian, RU._get_all_rules)
+    elif name == "es":
+        from lute.read.render import grammar_analysis_es as ES  # noqa: E402
+
+        pair = (ES.analyze_spanish, lambda: ES._ES_RULES)
     elif name == "ja":
         pair = (JA.analyze_japanese, JA._get_all_rules)
     else:  # argparse restricts this, so it is a programming error
@@ -224,8 +228,9 @@ def main():
     ap.add_argument(
         "--engine",
         default="ja",
-        choices=("ja", "ru"),
-        help="grammar engine to measure (ja needs nothing extra, ru needs pymorphy3)",
+        choices=("ja", "ru", "es"),
+        help="grammar engine to measure (ja needs nothing extra, ru needs "
+        "pymorphy3, es needs spacy + es_core_news_md)",
     )
     ap.add_argument("--language", default="Japanese", help="--db language name")
     ap.add_argument("--limit", type=int, default=400, help="--db page limit")
