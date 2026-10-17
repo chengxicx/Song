@@ -18,6 +18,7 @@ import threading
 
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
+    desc_for_rule,
     make_rule,
     match_rule,
     spec_lemma,
@@ -622,9 +623,18 @@ def _load_data_rules():
         name = item.get("name") or ""
         if not name or _norm_name(name) in _HANDWRITTEN_NORMS:
             continue  # already covered precisely by a hand-written rule
-        examples = [
-            e for e in (_strip_stress(x) for x in item.get("examples") or []) if e
-        ]
+        # The row's examples carry a parallel Chinese gloss in `example_zh`;
+        # pair them up so the library can print a translation, and keep the
+        # plain sentences for the matcher validation below.
+        glosses = item.get("example_zh") or []
+        pairs = []
+        for index, raw in enumerate(item.get("examples") or []):
+            text = _strip_stress(raw or "").strip()
+            if not text:
+                continue
+            gloss = glosses[index] if index < len(glosses) else ""
+            pairs.append({"ru": text, "zh": (gloss or "").strip()})
+        examples = [pair["ru"] for pair in pairs]
         if not examples:
             continue
         validated = [s for s in _focus_specs(item.get("focus")) if _flash(s, examples)]
@@ -640,11 +650,14 @@ def _load_data_rules():
             {"any_of": validated} if len(validated) > 1 else validated[0],
             zh=item.get("zh") or None,
         )
+        ko = (item.get("meaning_ko") or "").strip()
+        if ko:
+            rule["ko"] = ko
         # Library-page fields (the /grammar detail card renders them when
         # present); the panel ignores keys it does not read.
         rule["formation"] = (item.get("formation") or "").strip()
         rule["notes"] = (item.get("notes") or "").strip()
-        rule["examples"] = examples
+        rule["examples"] = pairs
         rules.append(rule)
     return rules
 
@@ -709,12 +722,13 @@ _golden_cache = None
 
 def _golden_examples():
     """
-    Curated example sentences for the hand-written rules (key -> [ru, ...]).
+    Curated example sentences for the hand-written rules.
 
-    The golden set is the single store of these examples: the tests re-run
-    every sentence through its own rule, and the library serves the same
-    sentences to readers, so the page can never show a point whose matcher
-    does not actually recognise it.
+    Keyed ``key -> [{"ru", "en", "zh", "ko"}, ...]``.  The golden set is the
+    single store of these examples: the tests re-run every sentence through
+    its own rule, and the library serves the same sentences to readers, so
+    the page can never show a point whose matcher does not actually
+    recognise it.
     """
     global _golden_cache  # pylint: disable=global-statement
     with _rules_lock:
@@ -723,31 +737,52 @@ def _golden_examples():
             if os.path.exists(_GOLDEN_PATH):
                 with open(_GOLDEN_PATH, encoding="utf-8") as fh:
                     for key, entry in json.load(fh).items():
-                        sentences = [
-                            _strip_stress(e.get("ru") or "")
+                        examples[key] = [
+                            e
                             for e in entry.get("examples") or []
+                            if (e.get("ru") or "").strip()
                         ]
-                        examples[key] = [s for s in sentences if s]
             _golden_cache = examples
         return _golden_cache
 
 
-def _library_entry(rule, display_lang):
+def _example_gloss(example, display_lang):
+    """
+    The translation to print under an example, in the display language.
+
+    The golden set carries all three; a missing one stays empty rather than
+    falling back to English under a Chinese or Korean heading.
+    """
+    if display_lang == "zh":
+        return (example.get("zh") or "").strip()
+    if display_lang == "ko":
+        return (example.get("ko") or "").strip()
+    return (example.get("en") or "").strip()
+
+
+def _library_entry(rule, display_lang, examples):
     """
     One rule as a library row, display-ready (see the Japanese analogue).
 
-    Examples stay plain strings: the library has no page text to
+    Each example comes back as ``{"text", "tr"}``: the Russian sentence with
+    the stress marks stripped, plus its translation for the display
+    language.  Rows merged in from the data file are still plain strings, so
+    both shapes have to be accepted.  The library has no page text to
     highlight, so the match offsets the panel computes are irrelevant here.
     """
-    desc = rule.get("desc") or rule["name"]
-    if display_lang == "zh" and (rule.get("zh") or "").strip():
-        desc = rule["zh"]
+    rows = []
+    for example in examples:
+        if isinstance(example, str):
+            example = {"ru": example}
+        text = _strip_stress(example.get("ru") or "").strip()
+        if text:
+            rows.append({"text": text, "tr": _example_gloss(example, display_lang)})
     entry = {
         "key": rule["key"],
         "name": rule["name"],
         "level": rule["level"],
-        "desc": desc,
-        "examples": list(rule.get("examples") or []),
+        "desc": desc_for_rule(rule, display_lang) or rule["name"],
+        "examples": rows,
         "skipped": False,
     }
     for field in ("formation", "notes"):
@@ -767,14 +802,12 @@ def library_entries(display_lang="en"):
     carry their own.
     """
     golden = _golden_examples()
-    rules = []
+    entries = []
     for rule in _RU_RULES:
-        if not rule.get("examples"):
-            rule = dict(rule)
-            rule["examples"] = golden.get(rule["key"]) or []
-        rules.append(rule)
-    rules += _get_data_rules()
-    entries = [_library_entry(r, display_lang) for r in rules]
+        examples = rule.get("examples") or golden.get(rule["key"]) or []
+        entries.append(_library_entry(rule, display_lang, examples))
+    for rule in _get_data_rules():
+        entries.append(_library_entry(rule, display_lang, rule.get("examples") or []))
     ordered = sorted(
         enumerate(entries),
         key=lambda pair: (

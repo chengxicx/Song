@@ -14,6 +14,7 @@ them; the route falls back to the generic rule library on ImportError.
 
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
+    desc_for_rule,
     make_rule,
     make_spacy_tokenizer,
     spec_lemma,
@@ -477,10 +478,12 @@ def _library_entry(rule, display_lang, examples):
     its translation for the display language.  The library has no page text
     to highlight, so the match offsets the panel computes are irrelevant
     here.
+
+    The description resolves through the same table the panel uses, so a
+    Korean reader gets the Korean ``desc`` that ``_KO_BY_KEY`` already
+    carries instead of the English one.
     """
-    desc = rule.get("desc") or rule["name"]
-    if display_lang == "zh" and (rule.get("zh") or "").strip():
-        desc = rule["zh"]
+    desc = desc_for_rule(rule, display_lang) or rule["name"]
     rows = []
     for example in examples:
         if isinstance(example, str):

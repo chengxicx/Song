@@ -62,6 +62,19 @@ def _es_entries(display_lang="en"):
     return es.library_entries(display_lang)
 
 
+def _fr_entries(display_lang="en"):
+    """
+    library_entries() for French.
+
+    The data rules validate their specs against spaCy tokenisations of
+    their own examples, so the corpus needs the French model.
+    """
+    pytest.importorskip("spacy")
+    pytest.importorskip("fr_core_news_sm")
+    fr = pytest.importorskip("lute.read.render.grammar_analysis_fr")
+    return fr.library_entries(display_lang)
+
+
 # ---- entry builders -------------------------------------------------
 
 
@@ -171,6 +184,80 @@ def test_th_library_examples_split_the_corpus_gloss():
         assert rows, "no Thai examples"
         assert all(" ／ " not in r["text"] for r in rows), "gloss left in the text"
         assert all(bool(r["tr"]) is want_gloss for r in rows), f"{lang}: wrong gloss"
+
+
+def test_ru_examples_carry_every_display_language():
+    """
+    Same contract as the Spanish set: each golden sentence ships a
+    translation in every display language the app offers.
+    """
+    ru = pytest.importorskip("lute.read.render.grammar_analysis_ru")
+    golden = ru._golden_examples()  # pylint: disable=protected-access
+    assert golden, "no golden set"
+    bare = [
+        f"{key}: {ex.get('ru')} [{field}]"
+        for key, rows in golden.items()
+        for ex in rows
+        for field in ("ru", "zh", "en", "ko")
+        if not (ex.get(field) or "").strip()
+    ]
+    assert bare == [], f"examples missing a translation: {bare}"
+
+
+def test_ru_library_examples_switch_the_gloss():
+    """
+    The sentence stays Russian in every display language; only the line
+    under it changes, and the stress marks stay stripped.
+    """
+    by_lang = {lang: _ru_entries(lang) for lang in ("en", "zh", "ko")}
+    key = next(e["key"] for e in by_lang["en"] if e["examples"])
+    rows = {
+        lang: next(e for e in entries if e["key"] == key)["examples"]
+        for lang, entries in by_lang.items()
+    }
+    texts = {lang: [r["text"] for r in rows[lang]] for lang in rows}
+    assert texts["en"] == texts["zh"] == texts["ko"], "the sentence must not change"
+    for lang in ("en", "zh", "ko"):
+        assert all(r["tr"] for r in rows[lang]), f"{key}: empty {lang} gloss"
+    first = {rows[lang][0]["tr"] for lang in rows}
+    assert len(first) == 3, f"{key}: the three glosses should differ, got {first}"
+
+
+def test_ru_data_rows_quote_their_chinese_gloss():
+    """
+    The merged rows keep a parallel Chinese translation in `example_zh`;
+    the card prints it under the sentence instead of dropping it.
+    """
+    entries = _ru_entries("zh")
+    data = [e for e in entries if e["key"].startswith("rgm_")]
+    assert data, "no data rows in the library"
+    assert any(r["tr"] for e in data for r in e["examples"]), "gloss never used"
+    english = {e["key"]: e for e in _ru_entries("en")}
+    for entry in data:
+        assert all(
+            not r["tr"] for r in english[entry["key"]]["examples"]
+        ), f"{entry['key']}: the Chinese gloss leaked into the English page"
+
+
+def test_library_descriptions_switch_to_korean():
+    """
+    The /grammar page resolves a rule's description through the same table
+    the panel uses, so a Korean reader never gets Korean example lines
+    under an English heading.
+    """
+    matcher = pytest.importorskip("lute.read.render.grammar_analysis_matcher")
+    for name, entries_for in (("es", _es_entries), ("ru", _ru_entries)):
+        english = {e["key"]: e["desc"] for e in entries_for("en")}
+        korean = {e["key"]: e["desc"] for e in entries_for("ko")}
+        assert set(english) == set(korean), f"{name}: key set changed with the language"
+        covered = [
+            k for k in english if k in matcher._KO_BY_KEY
+        ]  # pylint: disable=protected-access
+        assert covered, f"{name}: no rule resolves a Korean description"
+        untranslated = [k for k in covered if korean[k] == english[k]]
+        assert (
+            untranslated == []
+        ), f"{name}: English description under ko: {untranslated}"
 
 
 def test_ru_entries_have_examples_from_their_own_store():
@@ -469,6 +556,23 @@ def test_spanish_language_page_renders_its_library(spanish, app_context, client)
     # The gloss sits in its own span, not glued to the sentence.
     assert "grammar-item__example-tr" in detail
     assert str(markupsafe.escape(row["tr"])) in detail
+
+
+def test_korean_page_shows_korean_descriptions(spanish, app_context, client):
+    """
+    The page resolves each description through the display language, so the
+    Korean reader sees the Korean heading above the Korean example line --
+    not an English heading above Korean prose.
+    """
+    spanish.grammar_translate_lang = "ko"
+    db.session.commit()
+    entries = _es_entries("ko")
+    english = {e["key"]: e["desc"] for e in _es_entries("en")}
+    first = next(e for e in entries if e["examples"])
+    body = client.get(f"/grammar/{spanish.id}/{first['key']}").get_data(as_text=True)
+    assert str(markupsafe.escape(first["desc"])) in body
+    assert str(markupsafe.escape(english[first["key"]])) not in body
+    assert str(markupsafe.escape(first["examples"][0]["tr"])) in body
 
 
 def test_unknown_language_is_404(client):
