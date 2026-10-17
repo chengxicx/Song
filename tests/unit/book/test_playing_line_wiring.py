@@ -198,3 +198,67 @@ def test_the_tts_player_marks_and_clears_the_sentence():
     assert "LutePlayingLine.clear()" in _function_body(
         js, "ttsDeactivateCue"
     ), "the mark must come off when the TTS player stops"
+
+
+# ---------------------------------------------------------------------
+# The subtitle strip's height.
+#
+# The strip sits in the flow above the reading text, which the page
+# re-flows to fill the space left over (read/index.html
+# _splitToScreens on a ResizeObserver watching #thetext).  A cue that
+# wraps onto a second line must not make the strip taller than a
+# one-line cue, or the text below is re-paginated on every other
+# sentence -- measured on an MP3 book: the strip went 63px -> 114px and
+# the text moved 51px.
+
+
+_CSS = os.path.join(os.path.dirname(lute.__file__), "static", "css", "player-styles.css")
+
+YT_PLAYERS = [os.path.join(_STATIC_JS, "youtube-player.js"),
+              os.path.join(_STATIC_JS, "bilibili-player.js")]
+
+
+def test_the_player_reserves_the_strip_height():
+    """
+    The shared engine publishes a reserved height for the strip and the
+    reading page's players apply it before the text is re-flowed -- an
+    engine that measures but nothing that publishes (or the reverse) is
+    a fix that silently does nothing.
+    """
+    js = _read(MEDIA_JS)
+    sync = _function_body(js, "ytSyncStripHeight")
+    assert "--yt-subtitle-reserve" in sync, (
+        "ytSyncStripHeight must publish the reserved height as"
+        " --yt-subtitle-reserve"
+    )
+    assert "ytSyncStripHeight()" in _function_body(js, "ytActivateCue"), (
+        "each cue activation must keep the strip's height settled"
+    )
+    for path in YT_PLAYERS:
+        name = os.path.basename(path)
+        assert "api.syncStripHeight()" in _read(path), (
+            f"{name} must apply the strip's reserved height at init, or"
+            " the reading page is first laid out for a strip height that"
+            " changes as soon as playback starts"
+        )
+
+
+def test_the_stylesheet_uses_the_reserved_height():
+    """
+    The reserve is a min-height on the strip: a cue taller than anything
+    measured still grows the strip instead of being cut off, and the
+    mobile mini-bar rules (one non-wrapping line) keep their own height.
+    """
+    css = _read(_CSS)
+    base = css[css.index(".yt-scrolling-subtitle {") :]
+    base = base[: base.index("}")]
+    assert "min-height: var(--yt-subtitle-reserve," in base, (
+        "the strip's min-height must come from --yt-subtitle-reserve"
+    )
+    # The collapsed mobile mini-bar keeps its fixed height: its strip is
+    # one line that cannot wrap, so it has nothing to reserve.
+    mini = css[css.index(".yt-scrolling-subtitle {\n    order: -1;") :]
+    mini = mini[: mini.index("}")]
+    assert "min-height: 2.75rem" in mini and "--yt-subtitle-reserve" not in mini, (
+        "the mobile mini-bar must keep its own fixed height"
+    )
