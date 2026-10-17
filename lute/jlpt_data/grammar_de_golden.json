@@ -1,0 +1,514 @@
+{
+ "de_es_gibt": {
+  "examples": [
+   {
+    "de": "Es gibt einen Park in der Nähe.",
+    "en": "There is a park nearby.",
+    "zh": "附近有一个公园。",
+    "ko": "근처에 공원이 하나 있다."
+   },
+   {
+    "de": "Gibt es hier einen Bahnhof?",
+    "en": "Is there a railway station here?",
+    "zh": "这里有火车站吗？",
+    "ko": "여기에는 역이 있니?"
+   }
+  ]
+ },
+ "de_modals": {
+  "examples": [
+   {
+    "de": "Ich kann heute leider nicht kommen.",
+    "en": "Unfortunately I cannot come today.",
+    "zh": "我今天恐怕来不了。",
+    "ko": "오늘은YP 못 갈 것 같다."
+   },
+   {
+    "de": "Wir müssen noch vieles erledigen.",
+    "en": "We still have a lot to do.",
+    "zh": "我们还得做完很多事。",
+    "ko": "우에게는 아직 할 일이 많다."
+   }
+  ]
+ },
+ "de_negation": {
+  "examples": [
+   {
+    "de": "Sie hat keine Zeit für uns.",
+    "en": "She has no time for us.",
+    "zh": "她没有时间陪我们。",
+    "ko": "그녀는 우리에게 쓸 시간이 없다."
+   },
+   {
+    "de": "Der Zug fährt heute nicht ab.",
+    "en": "The train does not depart today.",
+    "zh": "火车今天不开。",
+    "ko": "그 기차는 오늘 출발하지 않는다."
+   }
+  ]
+ },
+ "de_questions": {
+  "examples": [
+   {
+    "de": "Wann kommt der Zug nach Berlin?",
+    "en": "When does the train to Berlin arrive?",
+    "zh": "去柏林的火车什么时候到？",
+    "ko": "베를린행 기차는 언제 오니?"
+   },
+   {
+    "de": "Wo hast du das Buch gefunden?",
+    "en": "Where did you find the book?",
+    "zh": "你在哪里找到这本书的？",
+    "ko": "너는 그 책을 어디서 찾았니?"
+   }
+  ]
+ },
+ "de_possessives": {
+  "examples": [
+   {
+    "de": "Mein Bruder arbeitet in einer großen Firma.",
+    "en": "My brother works for a large company.",
+    "zh": "我哥哥在一家大公司工作。",
+    "ko": "내 형은 큰 회사에서 일한다."
+   },
+   {
+    "de": "Ihre Kinder gehen schon in die Schule.",
+    "en": "Her children already go to school.",
+    "zh": "她的孩子们已经上学了。",
+    "ko": "그녀의 아이들은 이미 학교에 다닌다."
+   }
+  ]
+ },
+ "de_perfekt": {
+  "examples": [
+   {
+    "de": "Wir haben das Essen noch nicht bestellt.",
+    "en": "We have not ordered the food yet.",
+    "zh": "我们还没点餐。",
+    "ko": "우리는 아직 음식도 주문하지 않았다."
+   },
+   {
+    "de": "Sie ist gestern mit dem Zug nach Hause gefahren.",
+    "en": "She travelled home by train yesterday.",
+    "zh": "她昨天坐火车回家了。",
+    "ko": "그녀는 어제 기차를 타고 집에 갔다."
+   }
+  ]
+ },
+ "de_praeteritum": {
+  "examples": [
+   {
+    "de": "Als Kind war ich oft am Fluss.",
+    "en": "As a child I was often at the river.",
+    "zh": "小时候我常在河边。",
+    "ko": "어린 시절에 나는 자주 강가에 있었다."
+   },
+   {
+    "de": "Er hatte den ganzen Tag an dem Bericht gearbeitet.",
+    "en": "He had worked on the report all day.",
+    "zh": "他一整天都在写那份报告。",
+    "ko": "그는 하루종일 그 보고서를 작성하고 있었다."
+   }
+  ]
+ },
+ "de_futur1": {
+  "examples": [
+   {
+    "de": "Nächste Woche werden wir in ein neues Haus ziehen.",
+    "en": "Next week we will move into a new house.",
+    "zh": "下周我们要搬进新房子。",
+    "ko": "다음 주에 우리는 새 집으로 이사한다."
+   },
+   {
+    "de": "Er wird sicher müde sein.",
+    "en": "He will surely be tired.",
+    "zh": "他肯定累了。",
+    "ko": "그는 surely 피곤할 것이다."
+   }
+  ]
+ },
+ "de_akku": {
+  "examples": [
+   {
+    "de": "Ich kaufe heute einen neuen Computer.",
+    "en": "I am buying a new computer today.",
+    "zh": "我今天要买一台新电脑。",
+    "ko": "나는 오늘 새 컴퓨터를 산다."
+   },
+   {
+    "de": "Wir suchen den richtigen Schlüssel für die Tür.",
+    "en": "We are looking for the right key for the door.",
+    "zh": "我们在找这扇门的正确钥匙。",
+    "ko": "우리는 그 문에 맞는 열쇠를 찾고 있다."
+   }
+  ]
+ },
+ "de_dativ": {
+  "examples": [
+   {
+    "de": "Ich schenke meiner Schwester eine Blume.",
+    "en": "I am giving my sister a flower.",
+    "zh": "我送妹妹一朵花。",
+    "ko": "나는 여동생에게 꽃 한 송이를 준다."
+   },
+   {
+    "de": "Wir gehen mit der Straßenbahn ins Büro.",
+    "en": "We are going to the office by tram.",
+    "zh": "我们坐电车去办公室。",
+    "ko": "우리는 전차를 타고 사무실에 간다."
+   }
+  ]
+ },
+ "de_zu_inf": {
+  "examples": [
+   {
+    "de": "Er versucht, die schwierige Aufgabe zu lösen.",
+    "en": "He is trying to solve the difficult task.",
+    "zh": "他试着解决这个难的任务。",
+    "ko": "그는 어려운 과제를 풀려고 애쓰고 있다."
+   },
+   {
+    "de": "Die Kinder freuen sich, den Film zu sehen.",
+    "en": "The children look forward to seeing the film.",
+    "zh": "孩子们期待着看电影。",
+    "ko": "아이들은 그 영화를 보는 것을 기대한다."
+   }
+  ]
+ },
+ "de_als": {
+  "examples": [
+   {
+    "de": "Meine Schwester ist älter als ich.",
+    "en": "My sister is older than I am.",
+    "zh": "我姐姐比我大。",
+    "ko": "내 여동생은 나보다 나이가 많다."
+   },
+   {
+    "de": "Als ich klein war, hatten wir einen Hund.",
+    "en": "When I was small, we had a dog.",
+    "zh": "我小时候，我们养过一条狗。",
+    "ko": "내가 어렸을 때 우리는 개를 한 마리 키웠다."
+   }
+  ]
+ },
+ "de_gern": {
+  "examples": [
+   {
+    "de": "Meine Kinder schwimmen sehr gern im Sommer.",
+    "en": "My children really like swimming in summer.",
+    "zh": "我的孩子们夏天很喜欢游泳。",
+    "ko": "내 아이들은 여름에 수영하는 것을 아주 좋아한다."
+   },
+   {
+    "de": "Am liebsten trinke ich morgens Kaffee.",
+    "en": "Most of all I like drinking coffee in the morning.",
+    "zh": "我最喜欢早上喝咖啡。",
+    "ko": "나는 아침에 커피를 마시는 것을 가장 좋아한다."
+   }
+  ]
+ },
+ "de_reflexive": {
+  "examples": [
+   {
+    "de": "Nach der Arbeit dusche ich mich immer kalt.",
+    "en": "After work I always take a cold shower.",
+    "zh": "下班后我总是洗冷水澡。",
+    "ko": "퇴근 후 나는 항상 찬물로 샤워한다."
+   },
+   {
+    "de": "Habt ihr euch schon für die Reise entschieden?",
+    "en": "Have you already decided about the trip?",
+    "zh": "你们已经决定去旅行了吗？",
+    "ko": "너희는 여행에 대해 이미 결정했니?"
+   }
+  ]
+ },
+ "de_weil": {
+  "examples": [
+   {
+    "de": "Wir bleiben zu Hause, weil es stark regnet.",
+    "en": "We are staying at home because it is raining heavily.",
+    "zh": "因为雨下得很大，我们待在家里。",
+    "ko": "비가 세차게 오므로 우리는 집에 있는다."
+   },
+   {
+    "de": "Obwohl es spät war, haben wir weitergearbeitet.",
+    "en": "Although it was late, we kept working.",
+    "zh": "虽然已经很晚了，我们还是继续工作了。",
+    "ko": "늦었지만 우리는 계속 일했다."
+   }
+  ]
+ },
+ "de_werden_passiv": {
+  "examples": [
+   {
+    "de": "Das Haus wird gerade gebaut.",
+    "en": "The house is being built right now.",
+    "zh": "这栋房子正在建造中。",
+    "ko": "그 집은 지금 짓고 있다."
+   },
+   {
+    "de": "Die Rechnung wurde schon bezahlt.",
+    "en": "The bill has already been paid.",
+    "zh": "账单已经付过了。",
+    "ko": "그账单은 이미 치렀다."
+   }
+  ]
+ },
+ "de_konjunktiv2": {
+  "examples": [
+   {
+    "de": "An deiner Stelle würde ich sofort absagen.",
+    "en": "In your place I would decline immediately.",
+    "zh": "换作是我，我会马上拒绝。",
+    "ko": "네 자리라면 나는 즉시 거절하겠다."
+   },
+   {
+    "de": "Wenn ich mehr Zeit hätte, würde ich einen Kurs machen.",
+    "en": "If I had more time, I would take a course.",
+    "zh": "如果我有更多时间，我会去上一门课。",
+    "ko": "내가 시간이 더 많으면 강좌를 들을 것이다."
+   }
+  ]
+ },
+ "de_seit": {
+  "examples": [
+   {
+    "de": "Ich wohne seit drei Jahren in Berlin.",
+    "en": "I have been living in Berlin for three years.",
+    "zh": "我在柏林住了三年了。",
+    "ko": "나는 3년째 베를린에 살고 있다."
+   },
+   {
+    "de": "Seitdem sind wir nicht mehr in das alte Haus gegangen.",
+    "en": "We have not been to the old house since then.",
+    "zh": "从那以后我们就没再去过老房子。",
+    "ko": "그 이후 우리는 오래된 집에 가지 않았다."
+   }
+  ]
+ },
+ "de_ob": {
+  "examples": [
+   {
+    "de": "Ich weiß nicht, ob die Bibliothek heute geöffnet hat.",
+    "en": "I do not know whether the library was open today.",
+    "zh": "我不知道图书馆今天有没有开门。",
+    "ko": "나는 도서관이 오늘 문을 열었는지 모른다."
+   },
+   {
+    "de": "Sie fragte, ob wir mit dem Zug fahren.",
+    "en": "She asked whether we are travelling by train.",
+    "zh": "她问我们是否坐火车去。",
+    "ko": "그녀는 우리가 기차로 가는지 물었다."
+   }
+  ]
+ },
+ "de_trotz": {
+  "examples": [
+   {
+    "de": "Trotz des Regens kamen wir pünktlich an.",
+    "en": "Despite the rain we arrived on time.",
+    "zh": "尽管下雨，我们还是准时到了。",
+    "ko": "비에도 불구하고 우리는 제시간에 도착했다."
+   },
+   {
+    "de": "Die Aufgabe war schwer; trotzdem hat er sie gelöst.",
+    "en": "The task was hard; nevertheless he solved it.",
+    "zh": "任务很难；尽管如此他还是做出来了。",
+    "ko": "그 과제는 어려웠지만 그는 그래도 해결했다."
+   }
+  ]
+ },
+ "de_je_desto": {
+  "examples": [
+   {
+    "de": "Je mehr wir üben, desto sicherer werden wir.",
+    "en": "The more we practise, the more confident we become.",
+    "zh": "我们练得越多，就越有把握。",
+    "ko": "우리가 연습할수록 우리는 더 자신감을 갖는다."
+   },
+   {
+    "de": "Je später du kommst, desto dunkler wird es.",
+    "en": "The later you come, the darker it gets.",
+    "zh": "你来得越晚，天就越黑。",
+    "ko": "너는 늦게 올수록 더 어두워진다."
+   }
+  ]
+ },
+ "de_zwar": {
+  "examples": [
+   {
+    "de": "Der Mantel ist zwar teuer, aber sehr warm.",
+    "en": "The coat is expensive, but very warm.",
+    "zh": "这件大衣虽然贵，但很暖和。",
+    "ko": "그 외투는 비싸지만 아주 따뜻하다."
+   },
+   {
+    "de": "Der Bus hatte jedoch keine Verspätung.",
+    "en": "However, the bus was not delayed.",
+    "zh": "不过公交车没有晚点。",
+    "ko": "그러나 그 버스는 지연되지 않았다."
+   }
+  ]
+ },
+ "de_indem": {
+  "examples": [
+   {
+    "de": "Man lernt gut, indem man täglich übt.",
+    "en": "You learn well by practising every day.",
+    "zh": "每天练习就能学得好。",
+    "ko": "매일 연습하면 잘 배운다."
+   },
+   {
+    "de": "Er überzeugte sie, indem er ihr half.",
+    "en": "He convinced her by helping her.",
+    "zh": "他通过帮助她说服了她。",
+    "ko": "그는 그녀를 도움함으로써 설득했다."
+   }
+  ]
+ },
+ "de_genitiv": {
+  "examples": [
+   {
+    "de": "Wegen des Regens bleiben alle zu Hause.",
+    "en": "Because of the rain everyone stays at home.",
+    "zh": "因为下雨，大家都待在家里。",
+    "ko": "비 때문에 모두 집에 있는다."
+   },
+   {
+    "de": "Die Farbe des Himmels ist heute schön.",
+    "en": "The colour of the sky is beautiful today.",
+    "zh": "今天天空的颜色很美。",
+    "ko": "오늘 하늘의 색은 아름답다."
+   }
+  ]
+ },
+ "de_komparativ": {
+  "examples": [
+   {
+    "de": "Meine Schwester ist älter als ich.",
+    "en": "My sister is older than I am.",
+    "zh": "我姐姐比我大。",
+    "ko": "내 여동생은 나보다 나이가 많다."
+   },
+   {
+    "de": "Diese Straße ist breiter als die alte.",
+    "en": "This street is wider than the old one.",
+    "zh": "这条街比原来那条宽。",
+    "ko": "이 거리는 옛 거리보다 넓다."
+   }
+  ]
+ },
+ "de_superlativ": {
+  "examples": [
+   {
+    "de": "Die Universität ist am größten.",
+    "en": "The university is the largest.",
+    "zh": "这所大学最大。",
+    "ko": "그 대학교가 가장 크다."
+   },
+   {
+    "de": "Der Professor spricht am besten.",
+    "en": "The professor speaks the best.",
+    "zh": "这位教授讲得最好。",
+    "ko": "그 교수가 가장 잘 말한다."
+   }
+  ]
+ },
+ "de_relativsatz": {
+  "examples": [
+   {
+    "de": "Der Mann, den ich gestern gesehen habe, ist mein Bruder.",
+    "en": "The man I saw yesterday is my brother.",
+    "zh": "我昨天看见的那个男人是我哥哥。",
+    "ko": "어제 내가 본 그 남자는 내 형이다."
+   },
+   {
+    "de": "Die Frau, die dort wohnt, ist meine Tante.",
+    "en": "The woman who lives there is my aunt.",
+    "zh": "住在那里的女士是我姑姑。",
+    "ko": "거기 사는 그 여자는 내 숙모이다."
+   }
+  ]
+ },
+ "de_doppel_infinitiv": {
+  "examples": [
+   {
+    "de": "Ich sehe ihn die Straße überqueren.",
+    "en": "I watch him cross the street.",
+    "zh": "我看着他过马路。",
+    "ko": "나는 그가 길을 건너는 것을 본다."
+   },
+   {
+    "de": "Er lässt das Auto reparieren.",
+    "en": "He is having the car repaired.",
+    "zh": "他让人修车。",
+    "ko": "그는 그 자동차를 수리시킨다."
+   }
+  ]
+ },
+ "de_doppelobjekt": {
+  "examples": [
+   {
+    "de": "Ich gebe ihm das Buch.",
+    "en": "I give him the book.",
+    "zh": "我把这本书给他。",
+    "ko": "나는 그에게 그 책을 준다."
+   },
+   {
+    "de": "Wir bringen ihnen Deutsch bei.",
+    "en": "We are teaching them German.",
+    "zh": "我们教他们德语。",
+    "ko": "우리는 그들에게德어를 가르친다."
+   }
+  ]
+ },
+ "de_modal_perfekt": {
+  "examples": [
+   {
+    "de": "Viele Leute haben schwimmen können.",
+    "en": "Many people were able to swim.",
+    "zh": "很多人会游泳。",
+    "ko": "많은 사람이 수영할 수 있었다."
+   },
+   {
+    "de": "Du hast wirklich kommen müssen.",
+    "en": "You really had to come.",
+    "zh": "你确实非来不可。",
+    "ko": "너는 정말 와야만 했다."
+   }
+  ]
+ },
+ "de_zeitangabe": {
+  "examples": [
+   {
+    "de": "Heute gehe ich zum Park.",
+    "en": "Today I am going to the park.",
+    "zh": "今天我去公园。",
+    "ko": "오늘 나는 공원에 간다."
+   },
+   {
+    "de": "Das Konzert ist morgen.",
+    "en": "The concert is tomorrow.",
+    "zh": "音乐会是明天。",
+    "ko": "콘서트는 내일이다."
+   }
+  ]
+ },
+ "de_hauptsatzkoord": {
+  "examples": [
+   {
+    "de": "Der Hund ist krank, und die Katze ist alt.",
+    "en": "The dog is sick and the cat is old.",
+    "zh": "狗病了，猫老了。",
+    "ko": "개는 아프고 고양이는 나이들었다."
+   },
+   {
+    "de": "Das Wetter ist schön, aber wir bleiben zu Hause.",
+    "en": "The weather is nice but we are staying at home.",
+    "zh": "天气很好，但我们待在家里。",
+    "ko": "날씨가 좋지만 우리는 집에 있는다."
+   }
+  ]
+ }
+}

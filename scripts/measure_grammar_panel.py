@@ -65,6 +65,14 @@ def engine_functions(name):
         from lute.read.render import grammar_analysis_es as ES  # noqa: E402
 
         pair = (ES.analyze_spanish, lambda: ES._ES_RULES)
+    elif name == "fr":
+        from lute.read.render import grammar_analysis_fr as FR  # noqa: E402
+
+        pair = (FR.analyze_french, FR._get_all_rules)
+    elif name == "de":
+        from lute.read.render import grammar_analysis_de as DE  # noqa: E402
+
+        pair = (DE.analyze_german, DE._get_all_rules)
     elif name == "ja":
         pair = (JA.analyze_japanese, JA._get_all_rules)
     else:  # argparse restricts this, so it is a programming error
@@ -77,6 +85,7 @@ def _label(rule, key):
     "Panel display name for a rule dict (Japanese 'pattern' vs 'name')."
     rule = rule or {}
     return rule.get("pattern") or rule.get("name") or key
+
 
 # Lute marks term boundaries with a zero-width space.  It is not text and the
 # panel would see it as part of a word, so drop it on the way in.
@@ -228,9 +237,10 @@ def main():
     ap.add_argument(
         "--engine",
         default="ja",
-        choices=("ja", "ru", "es"),
+        choices=("ja", "ru", "es", "fr", "de"),
         help="grammar engine to measure (ja needs nothing extra, ru needs "
-        "pymorphy3, es needs spacy + es_core_news_md)",
+        "pymorphy3, es needs spacy + es_core_news_md, fr needs spacy + "
+        "fr_core_news_sm)",
     )
     ap.add_argument("--language", default="Japanese", help="--db language name")
     ap.add_argument("--limit", type=int, default=400, help="--db page limit")

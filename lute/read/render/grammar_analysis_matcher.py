@@ -35,7 +35,10 @@ A rule's "match" is one of
 * {"any_of": [<match>, ...]}        first-shape alternation
 
 An optional rule-level "not_after" spec vetoes matches whose nearest
-left-hand non-punctuation neighbour satisfies it.
+left-hand non-punctuation neighbour satisfies it; "followed_by" and
+"not_followed_by" do the same on the right-hand side (the latter over the
+next three non-punctuation tokens), so homographs that differ only in what
+follows can be told apart.
 """
 
 import re
@@ -156,6 +159,10 @@ def _match_condition(cond, token):
     "True if a single spec matches a single token."
     if cond.get("any"):
         return True
+    if "any_of" in cond:
+        # Token-level alternation: context conditions often need "det or a
+        # numeral", which no single keyed spec can express (keys are ANDed).
+        return any(_match_condition(sub, token) for sub in cond["any_of"])
     surface = (token.get("surface") or "").lower()
     if "surface_in" in cond and surface not in cond["surface_in"]:
         return False
@@ -259,6 +266,25 @@ def _left_neighbour(tokens, start):
     return None
 
 
+# How far a trailing-context veto looks ahead, in non-punctuation tokens.
+# French restrictive "ne ... que 'cinq étudiants'" has no finite verb within
+# four words, while the homographic complementizer introduces a clause whose
+# own verb may sit fourth ("pourvu que le directeur lui donne ..."), so the
+# window has to cover that far to tell the two apart.
+_TRAIL_WINDOW = 4
+
+
+def _right_window(tokens, end, count):
+    "Up to count non-punctuation tokens after index end (reading order)."
+    out = []
+    j = end
+    while j < len(tokens) and len(out) < count:
+        if not _is_punct(tokens[j]):
+            out.append(tokens[j])
+        j += 1
+    return out
+
+
 def match_rule(rule, tokens, sentence_text):
     """
     Character (start, end) spans of sentence_text matched by one rule.
@@ -276,6 +302,14 @@ def match_rule(rule, tokens, sentence_text):
             neighbour = _left_neighbour(tokens, start)
             veto = neighbour is not None and _match_condition(
                 rule["not_after"], neighbour
+            )
+        if not veto and rule.get("followed_by"):
+            nxt = _right_window(tokens, end, 1)
+            veto = nxt is None or not _match_condition(rule["followed_by"], nxt[0])
+        if not veto and rule.get("not_followed_by"):
+            veto = any(
+                _match_condition(rule["not_followed_by"], tok)
+                for tok in _right_window(tokens, end, _TRAIL_WINDOW)
             )
         if not veto and end > start:
             last = tokens[end - 1]
@@ -315,13 +349,33 @@ def spec_morph(**features):
     return {"morph": features}
 
 
-def make_rule(key, name, level, desc, match, zh=None, not_after=None):
-    "Build one engine rule dict."
+def make_rule(
+    key,
+    name,
+    level,
+    desc,
+    match,
+    zh=None,
+    not_after=None,
+    followed_by=None,
+    not_followed_by=None,
+):
+    """
+    Build one engine rule dict.
+
+    The two context keys mirror `not_after` on the right-hand side:
+    `followed_by` *requires* the next non-punctuation token to match, and
+    `not_followed_by` vetoes the hit when any of the next three does.
+    """
     r = {"key": key, "name": name, "level": level, "desc": desc, "match": match}
     if zh:
         r["zh"] = zh
     if not_after:
         r["not_after"] = not_after
+    if followed_by:
+        r["followed_by"] = followed_by
+    if not_followed_by:
+        r["not_followed_by"] = not_followed_by
     return r
 
 

@@ -1,0 +1,363 @@
+[
+ {
+  "key": "fgm_deplusenplusmoreandmore__25cb39",
+  "name": "de plus en plus (more and more)",
+  "slug": "de plus en plus",
+  "meaning": "more and more; an ongoing increase",
+  "type": "composite",
+  "examples": [
+   "De plus en plus de gens travaillent à domicile.",
+   "Son français devient de plus en plus fluide."
+  ],
+  "example_zh": [
+   "越来越多的人在家工作。",
+   "他的法语说得越来越流利。"
+  ],
+  "focus": [
+   "de",
+   "plus",
+   "en",
+   "plus"
+  ],
+  "zh": "越来越……",
+  "level": "B1",
+  "formation": "de plus en plus + adj / adv / de + nom",
+  "notes": "对比 de moins en moins（越来越少）。后接形容词或副词表示程度递进，接 de + 名词表示数量递进。"
+ },
+ {
+  "key": "fgm_afindeinfinitifinorderto__791008",
+  "name": "afin de + infinitif (in order to)",
+  "slug": "afin de + infinitif",
+  "meaning": "in order to (formal purpose)",
+  "type": "composite",
+  "examples": [
+   "Elle travaille afin de réussir."
+  ],
+  "example_zh": [
+   "她为了成功而努力工作。"
+  ],
+  "focus": [
+   "afin",
+   "de"
+  ],
+  "zh": "为了……（书面语目的）",
+  "level": "B2",
+  "formation": "afin de + infinitif",
+  "notes": "书面语；口语多用 pour + infinitif。后接从句时用 afin que + 虚拟式。"
+ },
+ {
+  "key": "fgm_cesontthoseare__845992",
+  "name": "ce sont (those are)",
+  "slug": "ce sont",
+  "meaning": "those are / they are (plural of c'est)",
+  "type": "composite",
+  "examples": [
+   "Ce sont mes parents.",
+   "À qui sont ces livres? Ce sont à nous."
+  ],
+  "example_zh": [
+   "这是我的父母。",
+   "这些书是谁的？是我们的。"
+  ],
+  "focus": [
+   "ce",
+   "sont"
+  ],
+  "zh": "这些是/那些是（c'est 的复数）",
+  "level": "A1",
+  "formation": "ce sont + nom pluriel",
+  "notes": "复数指认；口语中常用 c'est 代替（c'est mes parents）。"
+ },
+ {
+  "key": "fgm_pendantqueindicatifwhile__abe8c0",
+  "name": "pendant que + indicatif (while)",
+  "slug": "pendant que + indicatif",
+  "meaning": "while (simultaneous actions)",
+  "type": "composite",
+  "examples": [
+   "Il lisait pendant qu'elle écrivait."
+  ],
+  "example_zh": [
+   "他读书时她在写字。"
+  ],
+  "focus": [
+   "pendant",
+   "que"
+  ],
+  "zh": "当……的时候（同时进行）",
+  "level": "B1",
+  "formation": "pendant que + indicatif",
+  "notes": "两个同时进行的动作；直陈式，不接虚拟式。"
+ },
+ {
+  "key": "fgm_voixpassiveaétéparticipepassépassivevoice__e50d40",
+  "name": "voix passive: a été + participe passé (passive voice)",
+  "slug": "voix passive: a été + participe passé",
+  "meaning": "passive voice in the compound past: was/were done",
+  "type": "composite",
+  "examples": [
+   "Le vaccin contre la rage a été découvert par Pasteur.",
+   "La fin du match a été sifflée par l'arbitre.",
+   "Catherine a été invitée à dîner par Bernard.",
+   "Au cours de la réunion, divers points de vue ont été exprimés."
+  ],
+  "example_zh": [
+   "狂犬病疫苗是巴斯德发现的。",
+   "比赛结束的哨声由裁判吹响。",
+   "卡特琳被贝尔纳邀请去吃晚饭。",
+   "会上各种观点都得到了表达。"
+  ],
+  "focus": [
+   "a",
+   "été"
+  ],
+  "zh": "被动语态（复合过去时）：被……",
+  "level": "B1",
+  "formation": "sujet + avoir + été + participe passé (+ par + agent)",
+  "notes": "复合过去时的被动式。现在时被动（est + 分词）与 être 助动词的复合过去时（il est allé）表面同形，为避免误报不单列。"
+ },
+ {
+  "key": "fgm_jusquàcequesubjonctifuntil__e1ed85",
+  "name": "jusqu'à ce que + subjonctif (until)",
+  "slug": "jusqu'à ce que + subjonctif",
+  "meaning": "until (with the subjunctive in the subordinate clause)",
+  "type": "composite",
+  "examples": [
+   "Restez couché jusqu'à ce que la fièvre soit tombée.",
+   "Caroline, reste ici jusqu'à ce que je revienne te chercher !",
+   "Il a décidé de rester en exil jusqu'à ce que la situation change."
+  ],
+  "example_zh": [
+   "躺到烧退为止。",
+   "卡罗琳，待在这儿直到我回来接你！",
+   "他决定留在流亡地直到局势变化。"
+  ],
+  "focus": [
+   "jusqu'",
+   "à",
+   "ce",
+   "que"
+  ],
+  "zh": "直到……为止（从句用虚拟式）",
+  "level": "B1",
+  "formation": "jusqu'à ce que + subjonctif",
+  "notes": "时间连词短语，从句一律用虚拟式。"
+ },
+ {
+  "key": "fgm_troppourtooto__3af9b1",
+  "name": "trop ... pour (too ... to)",
+  "slug": "trop ... pour",
+  "meaning": "too ... to / too ... for",
+  "type": "composite",
+  "examples": [
+   "C'est un bébé trop fragile pour aller à la crèche.",
+   "Ces chaussures sont beaucoup trop petites pour moi.",
+   "Il a fait remarquer qu'il était trop tôt pour partir."
+  ],
+  "example_zh": [
+   "这孩子太娇弱，还不能上托儿所。",
+   "这双鞋对我来说小得太多。",
+   "他指出现在出发还太早。"
+  ],
+  "focus": [
+   "trop",
+   "...",
+   "pour"
+  ],
+  "zh": "太……以至于不能／对……来说太……",
+  "level": "A2",
+  "formation": "trop + adj / adv + pour + nom / infinitif",
+  "notes": "程度过量：trop 与 pour 之间通常是形容词或副词。"
+ },
+ {
+  "key": "fgm_chaquechacuneacheveryone__9cd84d",
+  "name": "chaque / chacun (each / everyone)",
+  "slug": "chaque / chacun",
+  "meaning": "each / each one, everyone",
+  "type": "composite",
+  "examples": [
+   "Le train circule chaque jour entre les deux villes.",
+   "Lors d'un championnat, chaque skieur porte un casque.",
+   "Chacun a donné son avis sur le projet."
+  ],
+  "example_zh": [
+   "列车每天往返于两座城市之间。",
+   "锦标赛期间每位滑雪者都戴头盔。",
+   "每个人对这个项目都发表了自己的意见。"
+  ],
+  "focus": [
+   "chaque/chacun"
+  ],
+  "zh": "每个／各自，人人",
+  "level": "A1",
+  "formation": "chaque + nom singulier ; chacun (pronom)",
+  "notes": "chaque 是限定词，后接单数名词；chacun 是代词，可单独使用或后接 de + nom。"
+ },
+ {
+  "key": "fgm_aufuretàmesureasgradually__06390a",
+  "name": "au fur et à mesure (as / gradually)",
+  "slug": "au fur et à mesure",
+  "meaning": "as something progresses; gradually",
+  "type": "composite",
+  "examples": [
+   "Au fur et à mesure que le temps passait, il oubliait sa douleur.",
+   "Il progresse au fur et à mesure des leçons."
+  ],
+  "example_zh": [
+   "随着时间流逝，他渐渐忘记了伤痛。",
+   "他随着课程推进不断进步。"
+  ],
+  "focus": [
+   "au",
+   "fur",
+   "et",
+   "à",
+   "mesure"
+  ],
+  "zh": "随着……；逐步地",
+  "level": "B2",
+  "formation": "au fur et à mesure de + nom / que + phrase",
+  "notes": "后接名词用 de，后接从句用 que（从句用直陈式）。也作副词短语 au fur et à mesure 单独使用。"
+ },
+ {
+  "key": "fgm_ilyaduréeago__ac5114",
+  "name": "il y a + durée (ago)",
+  "slug": "il y a + durée (ago)",
+  "meaning": "ago (a past time distance)",
+  "type": "composite",
+  "examples": [
+   "Il est parti il y a quatre jours.",
+   "Il y a dix ans, à cet endroit-là, il n'y avait pas d'immeubles.",
+   "Patrick était en Espagne avec toute sa famille il y a deux mois."
+  ],
+  "example_zh": [
+   "他是四天前走的。",
+   "十年前，那个地方还没有高楼。",
+   "帕特里克两个月前和家人一起在西班牙。"
+  ],
+  "focus": [
+   "il",
+   "y",
+   "a",
+   "...",
+   "ans/mois/jours/heures/semaines/minutes/siècles"
+  ],
+  "zh": "……之前（过去的时间距离）",
+  "level": "A2",
+  "formation": "il y a + durée + (que), 谓语用过去时",
+  "notes": "与表示存在的 il y a（有）同形：后接时间词表示『……之前』。对比 depuis + 现在时（延续至今）。"
+ },
+ {
+  "key": "fgm_aucunaucunenonone__84bc2a",
+  "name": "aucun / aucune (no / none)",
+  "slug": "aucun / aucune",
+  "meaning": "no, not any / none (negative determiner and pronoun)",
+  "type": "composite",
+  "examples": [
+   "Je n'ai aucun ami à qui demander conseil.",
+   "Aucun ne me plaisait !"
+  ],
+  "example_zh": [
+   "我没有任何可以请教的朋友。",
+   "没有一个让我喜欢！"
+  ],
+  "focus": [
+   "aucun/aucune"
+  ],
+  "zh": "没有任何……／一个也没有",
+  "level": "A2",
+  "formation": "ne ... aucun(e) + nom singulier ; aucun(e) + de + nom",
+  "notes": "与 ne 连用构成强调否定；作代词时后接 de + 复数名词（aucun de mes amis）。"
+ },
+ {
+  "key": "fgm_peutêtremaybe__0ae9ba",
+  "name": "peut-être (maybe)",
+  "slug": "peut-être",
+  "meaning": "maybe, perhaps (adverb)",
+  "type": "composite",
+  "examples": [
+   "Peut-être qu'elle est à vendre.",
+   "Peut-être viendra-t-il demain."
+  ],
+  "example_zh": [
+   "也许它在出售。",
+   "也许他明天会来。"
+  ],
+  "focus": [
+   "peut-être"
+  ],
+  "zh": "也许，可能",
+  "level": "A2",
+  "formation": "peut-être + phrase ; phrase, peut-être.",
+  "notes": "副词；句首时主谓可倒装（Peut-être viendra-t-il demain）。口语常用 peut-être que + 直陈式。"
+ },
+ {
+  "key": "fgm_cependanttoutefoisnéanmoinshowever__c8c8ec",
+  "name": "cependant / toutefois / néanmoins (however)",
+  "slug": "cependant / toutefois / néanmoins",
+  "meaning": "however, nevertheless (formal connectives)",
+  "type": "composite",
+  "examples": [
+   "La situation économique reste difficile, toutefois des progrès ont été réalisés.",
+   "Cependant, rien n'est perdu."
+  ],
+  "example_zh": [
+   "经济形势依然困难，不过已取得进展。",
+   "然而，什么都没有失去。"
+  ],
+  "focus": [
+   "cependant/toutefois/néanmoins"
+  ],
+  "zh": "然而，不过（书面语转折）",
+  "level": "B2",
+  "formation": "phrase, cependant / toutefois / néanmoins + phrase",
+  "notes": "书面语转折连接词，比 mais 正式；可位于句首、句中或句尾。"
+ },
+ {
+  "key": "fgm_demêmequejustas__a90998",
+  "name": "de même que (just as)",
+  "slug": "de même que",
+  "meaning": "just as / the same way as",
+  "type": "composite",
+  "examples": [
+   "De même que le sport entretient le corps, la lecture entretient l'esprit.",
+   "De même que ses parents, elle adore la musique."
+  ],
+  "example_zh": [
+   "正如运动保养身体，阅读滋养心灵。",
+   "和她的父母一样，她热爱音乐。"
+  ],
+  "focus": [
+   "de",
+   "même",
+   "que"
+  ],
+  "zh": "正如……一样",
+  "level": "B2",
+  "formation": "de même que + phrase, ... ; ... de même que ...",
+  "notes": "比较连词，引出同类情况；呼应的后半句常用 de même 开头。"
+ },
+ {
+  "key": "fgm_ainsiqueaswellas__c563f4",
+  "name": "ainsi que (as well as)",
+  "slug": "ainsi que",
+  "meaning": "as well as / just as",
+  "type": "composite",
+  "examples": [
+   "Il a visité le Louvre ainsi que le musée d'Orsay.",
+   "Georges, ainsi que toute sa famille, est très musicien."
+  ],
+  "example_zh": [
+   "他参观了卢浮宫和奥赛博物馆。",
+   "乔治和他的全家都很懂音乐。"
+  ],
+  "focus": [
+   "ainsi",
+   "que"
+  ],
+  "zh": "以及；正如",
+  "level": "B1",
+  "formation": "A ainsi que B (列举) ; ainsi que + phrase (比较)",
+  "notes": "列举时相当于 et aussi（以及）；引出从句时表示方式比较（正如）。"
+ }
+]

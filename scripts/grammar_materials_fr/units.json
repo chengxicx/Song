@@ -1,0 +1,386 @@
+[
+ {
+  "pattern": "de plus en plus",
+  "name_fr": "de plus en plus (more and more)",
+  "meaning_en": "more and more; an ongoing increase",
+  "meaning_zh": "越来越……",
+  "level": "B1",
+  "focus": [
+   "de",
+   "plus",
+   "en",
+   "plus"
+  ],
+  "formation": "de plus en plus + adj / adv / de + nom",
+  "notes": "对比 de moins en moins（越来越少）。后接形容词或副词表示程度递进，接 de + 名词表示数量递进。",
+  "examples": [
+   {
+    "french": "De plus en plus de gens travaillent à domicile.",
+    "chinese": "越来越多的人在家工作。"
+   },
+   {
+    "french": "Son français devient de plus en plus fluide.",
+    "chinese": "他的法语说得越来越流利。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "afin de + infinitif",
+  "name_fr": "afin de + infinitif (in order to)",
+  "meaning_en": "in order to (formal purpose)",
+  "meaning_zh": "为了……（书面语目的）",
+  "level": "B2",
+  "focus": [
+   "afin",
+   "de"
+  ],
+  "formation": "afin de + infinitif",
+  "notes": "书面语；口语多用 pour + infinitif。后接从句时用 afin que + 虚拟式。",
+  "examples": [
+   {
+    "french": "Elle travaille afin de réussir.",
+    "chinese": "她为了成功而努力工作。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "ce sont",
+  "name_fr": "ce sont (those are)",
+  "meaning_en": "those are / they are (plural of c'est)",
+  "meaning_zh": "这些是/那些是（c'est 的复数）",
+  "level": "A1",
+  "focus": [
+   "ce",
+   "sont"
+  ],
+  "formation": "ce sont + nom pluriel",
+  "notes": "复数指认；口语中常用 c'est 代替（c'est mes parents）。",
+  "examples": [
+   {
+    "french": "Ce sont mes parents.",
+    "chinese": "这是我的父母。"
+   },
+   {
+    "french": "À qui sont ces livres? Ce sont à nous.",
+    "chinese": "这些书是谁的？是我们的。"
+   }
+  ],
+  "source": "corpus-a"
+ },
+ {
+  "pattern": "pendant que + indicatif",
+  "name_fr": "pendant que + indicatif (while)",
+  "meaning_en": "while (simultaneous actions)",
+  "meaning_zh": "当……的时候（同时进行）",
+  "level": "B1",
+  "focus": [
+   "pendant",
+   "que"
+  ],
+  "formation": "pendant que + indicatif",
+  "notes": "两个同时进行的动作；直陈式，不接虚拟式。",
+  "examples": [
+   {
+    "french": "Il lisait pendant qu'elle écrivait.",
+    "chinese": "他读书时她在写字。"
+   }
+  ],
+  "source": "corpus-a"
+ },
+ {
+  "pattern": "voix passive: a été + participe passé",
+  "name_fr": "voix passive: a été + participe passé (passive voice)",
+  "meaning_en": "passive voice in the compound past: was/were done",
+  "meaning_zh": "被动语态（复合过去时）：被……",
+  "level": "B1",
+  "focus": [
+   "a",
+   "été"
+  ],
+  "formation": "sujet + avoir + été + participe passé (+ par + agent)",
+  "notes": "复合过去时的被动式。现在时被动（est + 分词）与 être 助动词的复合过去时（il est allé）表面同形，为避免误报不单列。",
+  "examples": [
+   {
+    "french": "Le vaccin contre la rage a été découvert par Pasteur.",
+    "chinese": "狂犬病疫苗是巴斯德发现的。"
+   },
+   {
+    "french": "La fin du match a été sifflée par l'arbitre.",
+    "chinese": "比赛结束的哨声由裁判吹响。"
+   },
+   {
+    "french": "Catherine a été invitée à dîner par Bernard.",
+    "chinese": "卡特琳被贝尔纳邀请去吃晚饭。"
+   },
+   {
+    "french": "Au cours de la réunion, divers points de vue ont été exprimés.",
+    "chinese": "会上各种观点都得到了表达。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "jusqu'à ce que + subjonctif",
+  "name_fr": "jusqu'à ce que + subjonctif (until)",
+  "meaning_en": "until (with the subjunctive in the subordinate clause)",
+  "meaning_zh": "直到……为止（从句用虚拟式）",
+  "level": "B1",
+  "focus": [
+   "jusqu'",
+   "à",
+   "ce",
+   "que"
+  ],
+  "formation": "jusqu'à ce que + subjonctif",
+  "notes": "时间连词短语，从句一律用虚拟式。",
+  "examples": [
+   {
+    "french": "Restez couché jusqu'à ce que la fièvre soit tombée.",
+    "chinese": "躺到烧退为止。"
+   },
+   {
+    "french": "Caroline, reste ici jusqu'à ce que je revienne te chercher !",
+    "chinese": "卡罗琳，待在这儿直到我回来接你！"
+   },
+   {
+    "french": "Il a décidé de rester en exil jusqu'à ce que la situation change.",
+    "chinese": "他决定留在流亡地直到局势变化。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "trop ... pour",
+  "name_fr": "trop ... pour (too ... to)",
+  "meaning_en": "too ... to / too ... for",
+  "meaning_zh": "太……以至于不能／对……来说太……",
+  "level": "A2",
+  "focus": [
+   "trop",
+   "...",
+   "pour"
+  ],
+  "formation": "trop + adj / adv + pour + nom / infinitif",
+  "notes": "程度过量：trop 与 pour 之间通常是形容词或副词。",
+  "examples": [
+   {
+    "french": "C'est un bébé trop fragile pour aller à la crèche.",
+    "chinese": "这孩子太娇弱，还不能上托儿所。"
+   },
+   {
+    "french": "Ces chaussures sont beaucoup trop petites pour moi.",
+    "chinese": "这双鞋对我来说小得太多。"
+   },
+   {
+    "french": "Il a fait remarquer qu'il était trop tôt pour partir.",
+    "chinese": "他指出现在出发还太早。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "chaque / chacun",
+  "name_fr": "chaque / chacun (each / everyone)",
+  "meaning_en": "each / each one, everyone",
+  "meaning_zh": "每个／各自，人人",
+  "level": "A1",
+  "focus": [
+   "chaque/chacun"
+  ],
+  "formation": "chaque + nom singulier ; chacun (pronom)",
+  "notes": "chaque 是限定词，后接单数名词；chacun 是代词，可单独使用或后接 de + nom。",
+  "examples": [
+   {
+    "french": "Le train circule chaque jour entre les deux villes.",
+    "chinese": "列车每天往返于两座城市之间。"
+   },
+   {
+    "french": "Lors d'un championnat, chaque skieur porte un casque.",
+    "chinese": "锦标赛期间每位滑雪者都戴头盔。"
+   },
+   {
+    "french": "Chacun a donné son avis sur le projet.",
+    "chinese": "每个人对这个项目都发表了自己的意见。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "au fur et à mesure",
+  "name_fr": "au fur et à mesure (as / gradually)",
+  "meaning_en": "as something progresses; gradually",
+  "meaning_zh": "随着……；逐步地",
+  "level": "B2",
+  "focus": [
+   "au",
+   "fur",
+   "et",
+   "à",
+   "mesure"
+  ],
+  "formation": "au fur et à mesure de + nom / que + phrase",
+  "notes": "后接名词用 de，后接从句用 que（从句用直陈式）。也作副词短语 au fur et à mesure 单独使用。",
+  "examples": [
+   {
+    "french": "Au fur et à mesure que le temps passait, il oubliait sa douleur.",
+    "chinese": "随着时间流逝，他渐渐忘记了伤痛。"
+   },
+   {
+    "french": "Il progresse au fur et à mesure des leçons.",
+    "chinese": "他随着课程推进不断进步。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "il y a + durée (ago)",
+  "name_fr": "il y a + durée (ago)",
+  "meaning_en": "ago (a past time distance)",
+  "meaning_zh": "……之前（过去的时间距离）",
+  "level": "A2",
+  "focus": [
+   "il",
+   "y",
+   "a",
+   "...",
+   "ans/mois/jours/heures/semaines/minutes/siècles"
+  ],
+  "formation": "il y a + durée + (que), 谓语用过去时",
+  "notes": "与表示存在的 il y a（有）同形：后接时间词表示『……之前』。对比 depuis + 现在时（延续至今）。",
+  "examples": [
+   {
+    "french": "Il est parti il y a quatre jours.",
+    "chinese": "他是四天前走的。"
+   },
+   {
+    "french": "Il y a dix ans, à cet endroit-là, il n'y avait pas d'immeubles.",
+    "chinese": "十年前，那个地方还没有高楼。"
+   },
+   {
+    "french": "Patrick était en Espagne avec toute sa famille il y a deux mois.",
+    "chinese": "帕特里克两个月前和家人一起在西班牙。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "aucun / aucune",
+  "name_fr": "aucun / aucune (no / none)",
+  "meaning_en": "no, not any / none (negative determiner and pronoun)",
+  "meaning_zh": "没有任何……／一个也没有",
+  "level": "A2",
+  "focus": [
+   "aucun/aucune"
+  ],
+  "formation": "ne ... aucun(e) + nom singulier ; aucun(e) + de + nom",
+  "notes": "与 ne 连用构成强调否定；作代词时后接 de + 复数名词（aucun de mes amis）。",
+  "examples": [
+   {
+    "french": "Je n'ai aucun ami à qui demander conseil.",
+    "chinese": "我没有任何可以请教的朋友。"
+   },
+   {
+    "french": "Aucun ne me plaisait !",
+    "chinese": "没有一个让我喜欢！"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "peut-être",
+  "name_fr": "peut-être (maybe)",
+  "meaning_en": "maybe, perhaps (adverb)",
+  "meaning_zh": "也许，可能",
+  "level": "A2",
+  "focus": [
+   "peut-être"
+  ],
+  "formation": "peut-être + phrase ; phrase, peut-être.",
+  "notes": "副词；句首时主谓可倒装（Peut-être viendra-t-il demain）。口语常用 peut-être que + 直陈式。",
+  "examples": [
+   {
+    "french": "Peut-être qu'elle est à vendre.",
+    "chinese": "也许它在出售。"
+   },
+   {
+    "french": "Peut-être viendra-t-il demain.",
+    "chinese": "也许他明天会来。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "cependant / toutefois / néanmoins",
+  "name_fr": "cependant / toutefois / néanmoins (however)",
+  "meaning_en": "however, nevertheless (formal connectives)",
+  "meaning_zh": "然而，不过（书面语转折）",
+  "level": "B2",
+  "focus": [
+   "cependant/toutefois/néanmoins"
+  ],
+  "formation": "phrase, cependant / toutefois / néanmoins + phrase",
+  "notes": "书面语转折连接词，比 mais 正式；可位于句首、句中或句尾。",
+  "examples": [
+   {
+    "french": "La situation économique reste difficile, toutefois des progrès ont été réalisés.",
+    "chinese": "经济形势依然困难，不过已取得进展。"
+   },
+   {
+    "french": "Cependant, rien n'est perdu.",
+    "chinese": "然而，什么都没有失去。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "de même que",
+  "name_fr": "de même que (just as)",
+  "meaning_en": "just as / the same way as",
+  "meaning_zh": "正如……一样",
+  "level": "B2",
+  "focus": [
+   "de",
+   "même",
+   "que"
+  ],
+  "formation": "de même que + phrase, ... ; ... de même que ...",
+  "notes": "比较连词，引出同类情况；呼应的后半句常用 de même 开头。",
+  "examples": [
+   {
+    "french": "De même que le sport entretient le corps, la lecture entretient l'esprit.",
+    "chinese": "正如运动保养身体，阅读滋养心灵。"
+   },
+   {
+    "french": "De même que ses parents, elle adore la musique.",
+    "chinese": "和她的父母一样，她热爱音乐。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "ainsi que",
+  "name_fr": "ainsi que (as well as)",
+  "meaning_en": "as well as / just as",
+  "meaning_zh": "以及；正如",
+  "level": "B1",
+  "focus": [
+   "ainsi",
+   "que"
+  ],
+  "formation": "A ainsi que B (列举) ; ainsi que + phrase (比较)",
+  "notes": "列举时相当于 et aussi（以及）；引出从句时表示方式比较（正如）。",
+  "examples": [
+   {
+    "french": "Il a visité le Louvre ainsi que le musée d'Orsay.",
+    "chinese": "他参观了卢浮宫和奥赛博物馆。"
+   },
+   {
+    "french": "Georges, ainsi que toute sa famille, est très musicien.",
+    "chinese": "乔治和他的全家都很懂音乐。"
+   }
+  ],
+  "source": "corpus-b"
+ }
+]
