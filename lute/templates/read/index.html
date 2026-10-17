@@ -816,7 +816,23 @@
     // is swapped in and laid out (fonts/status classes are applied above).
     // Fixed pages (manga / PDF) are re-fitted to the pane by the same
     // call -- see the manga branch of _splitToScreens.
-    requestAnimationFrame(_splitToScreens);
+    //
+    // On the initial load, put the reader back on the sub-screen they
+    // were reading (see _storedScreenFor).  The stored value is read
+    // HERE, before the split: the split's own _renderScreen would save
+    // screen 0 over it.  Applied after the split, clamped to whatever
+    // screen count the current layout produced.
+    const storedScreen = initial ? _storedScreenFor(actualPage) : null;
+    requestAnimationFrame(() => {
+      _splitToScreens();
+      if (storedScreen !== null &&
+          storedScreen > 0 &&
+          storedScreen !== curScreen &&
+          subScreens.length > 1) {
+        curScreen = Math.min(storedScreen, subScreens.length - 1);
+        _renderScreen();
+      }
+    });
 
     if (initial) {
       prepareTextInteractions();
@@ -1203,6 +1219,43 @@
     _fitMangaPage();
   }
 
+  // ---- Sub-screen position across reloads ------------------------------
+  // Fit-to-screen books split a page into sub-screens, and every re-split
+  // re-derives curScreen from scratch -- so a browser reload landed the
+  // reader back on the page's first screen even though the Lute page
+  // itself was remembered server-side (current_tx_id).  The screen the
+  // reader is on is kept per book + page in localStorage, and restored on
+  // the initial load only: page turns keep their own semantics (forward
+  // -> first screen, backward -> the screen left forward,
+  // see _fwdFromPages), and re-flows keep their anchor.
+  function _screenStorageKey() {
+    return "lute-reading-screen-" + ($("#book_id").val() || "0");
+  }
+
+  function _saveScreenPosition() {
+    // Only meaningful where sub-screens exist; manga/pdf pages and
+    // scrolling mode have none (_renderScreen returns before this).
+    if (!subScreens.length) return;
+    try {
+      localStorage.setItem(
+        _screenStorageKey(),
+        JSON.stringify({
+          page: parseInt($("#page_num").val(), 10) || 1,
+          screen: curScreen,
+        })
+      );
+    } catch (e) { /* storage unavailable (private mode etc.) */ }
+  }
+
+  function _storedScreenFor(page) {
+    try {
+      const v = JSON.parse(localStorage.getItem(_screenStorageKey()) || "null");
+      return v && v.page === page ? v.screen : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   // anchor, when given, is a <p> already inside the (re-swapped) #thetext
   // that should stay on screen: after re-splitting, curScreen is restored
   // to the group containing it instead of jumping back to screen 0.
@@ -1393,6 +1446,7 @@
     _updateSideArrows();
     set_page_fraction();
     _updateSliderProgress();
+    _saveScreenPosition();
 
     // If the grammar-analysis pane is open, refresh it whenever the
     // visible sub-screen (or the Lute page) changes, so the panel always
