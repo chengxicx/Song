@@ -386,6 +386,7 @@ _KO_BY_KEY = {
     "es_le": "간접목적 대명사 le/les는 '그/그들에게'의 뜻으로 gustar류와도 쓰임.",
     "es_subj_present": "현재 접속법으로 의지·감정·의심·필요의 표현 뒤에 쓰임(quiero que).",
     "es_conditional": "조건법(compraría)으로 가정이나 정중한 표현을 나타냄.",
+    "es_futuro": "단순미래(-ré/-rá/-remos)로 앞으로의 예측·약속·추측을 나타냄(vendrá mañana).",
     "es_present_perfect": "현재완료(he + 과거분사)로 현재와 연결된 과거 동작을 나타냄(he comido).",
     "es_pluperfect": "과거완료(había + 과거분사)로 두 과거 중 더 이른 동작을 나타냄.",
     "es_si_conditional": "si + 과거접속법, 조건법으로 비현실적인 가정을 나타냄(Si tuviera, compraría).",
@@ -429,6 +430,7 @@ _KO_BY_KEY = {
     "ru_kak_ni": "как ни는 '아무리 ~해도'의 양보를 나타냄.",
     "ru_edva_li": "едва ли / вряд ли는 '~일 리 없다'의 의심을 나타냄.",
     "ru_chem_tem": "чем ... , тем ...로 '~하면 할수록' 상관 비교를 나타냄.",
+    "ru_stoit_kak": "стоит + 부정사 ..., как ...로 '~하기만 하면 곧'을 나타냄(стоит свернуть вправо, как ...).",
     # ---- French ----
     "fr_il_y_a": "il y a는 '~이 있다'를 나타내며 과거는 il y avait.",
     "fr_estceque": "est-ce que는 평서문을 예/아니오 의문문으로 바꿈.",
@@ -653,12 +655,23 @@ _KO_BY_KEY = {
 def _desc(rule, display_lang):
     "Description for a rule in the requested display language."
     if display_lang == "ko":
-        ko = _KO_BY_KEY.get(rule.get("key"))
+        ko = _KO_BY_KEY.get(rule.get("key")) or (rule.get("ko") or "").strip()
         if ko:
             return ko
     if display_lang == "zh" and rule.get("zh"):
         return rule["zh"]
     return rule["desc"]
+
+
+def desc_for_rule(rule, display_lang):
+    """
+    Public alias of :func:`_desc` for the library-page exporters.
+
+    The /grammar page lists rules the panel never saw on a page, so it has
+    to resolve the description the same way the panel does -- otherwise a
+    Korean reader gets Korean example translations under English headings.
+    """
+    return _desc(rule, display_lang)
 
 
 # ---- analysis driver ---------------------------------------------------

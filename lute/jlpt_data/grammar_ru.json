@@ -4,6 +4,7 @@
   "name": "Стоит ли писать",
   "slug": "Стоит ли + 不定式（值不值得做）",
   "meaning": "стóит ли with an infinitive asks whether it is worth doing something.",
+  "meaning_ko": "стóит ли + 부정사로 '~할 가치가 있는지'를 묻는 표현.",
   "type": "verb",
   "examples": [
    "Стоит ли писать первой парню?"
@@ -26,6 +27,7 @@
   "name": "Быть счастливым",
   "slug": "быть + 形容词第五格（长尾）",
   "meaning": "'Byt'' + instrumental long-form adjective forms a compound predicate.",
+  "meaning_ko": "быть + 조격 형용사로 복합 술어를 만듦(быть счастливым).",
   "type": "composite",
   "examples": [
    "Быть счастливым — свойство присущее человеку."
@@ -97,6 +99,7 @@
   "name": "вы не веселы",
   "slug": "вы 指一个人时动词用复数、短尾用复数",
   "meaning": "When 'vy' addresses one person, verbs and short adjectives take plural forms.",
+  "meaning_ko": "한 사람을 존대할 때 동사와 단어 형용사는 복수형을 씀(вы не веселы).",
   "type": "composite",
   "examples": [
    "Почему вы не веселы?"
@@ -209,6 +212,7 @@
   "name": "как будто лучше",
   "slug": "как будто（）",
   "meaning": "как будто marks a comparison of an uncertain kind ('as if').",
+  "meaning_ko": "как будто는 확실하지 않은 비교('마치 ~인 듯')를 나타냄.",
   "type": "composite",
   "examples": [
    "Доктор, мне сегодня как будто лучше."
@@ -503,6 +507,7 @@
   "name": "водит свою машину",
   "slug": "свой 表示与主语的领属关系",
   "meaning": "'Svoy' marks possession by the subject of the sentence.",
+  "meaning_ko": "свой는 문장 주어의 소유를 나타내는 대명사 형용사.",
   "type": "composite",
   "examples": [
    "Он водит свою машину.",
@@ -639,6 +644,7 @@
   "name": "хорошо плавает",
   "slug": "不定向动词表示善于/会做某运动",
   "meaning": "Non-directional motion verbs express the general ability to perform the action.",
+  "meaning_ko": "무방향 이동동사는 그 행위를 할 수 있는 일반적 능력을 나타냄.",
   "type": "composite",
   "examples": [
    "Он хорошо плавает."
@@ -798,6 +804,7 @@
   "name": "не смеешь продолжать настаивать",
   "slug": "动词性合成谓语（助动词 + 不定式）",
   "meaning": "A verbal compound predicate consists of an auxiliary verb and an infinitive.",
+  "meaning_ko": "동사 복합 술어는 조동사 + 부정사로 이루어짐.",
   "type": "verb",
   "examples": [
    "Ты не смеешь продолжать настаивать на свойх взглядах."
@@ -820,6 +827,7 @@
   "name": "тысяча сто первую страницу",
   "slug": "合成顺序数词（只有末位数词变格）",
   "meaning": "Ordinal numerals agree with nouns; in compound ordinals only the last part declines.",
+  "meaning_ko": "서수는 명사와 일치하며, 복합 서수는 마지막 부분만 변화함.",
   "type": "composite",
   "examples": [
    "Я читаю тысяча сто первую страницу.",
@@ -962,6 +970,7 @@
   "name": "Плывёт листочек",
   "slug": "定向动词 плыть（/）",
   "meaning": "плыть describes movement in a definite direction on water.",
+  "meaning_ko": "плыть는 물 위에서 일정한 방향으로 움직이는 것을 나타냄.",
   "type": "composite",
   "examples": [
    "Плывёт листочек по воде. Волна его качает."
@@ -1028,6 +1037,7 @@
   "name": "Мыслю, следовательно, существую.",
   "slug": "插入语 следовательно（）",
   "meaning": "Parenthetical words like слéдовательно, во-пéрвых mark the logical relation of the statement.",
+  "meaning_ko": "слéдовательно, во-пéрвых 같은 삽입어는 진술의 논리적 관계를 표시함.",
   "type": "composite",
   "examples": [
    "Мыслю, следовательно, существую."
@@ -1050,6 +1060,7 @@
   "name": "Карету мне, карету",
   "slug": "无动词祈使句（名词第四格表示动作涉及的事物）",
   "meaning": "A verbless imperative sentence may consist of a noun in the accusative naming the object wanted.",
+  "meaning_ko": "동사 없는 명령문은 원하는 대상을 대격 명사로 제시할 수 있음(Карету мне).",
   "type": "composite",
   "examples": [
    "Карету мне, карету!"
@@ -1072,6 +1083,7 @@
   "name": "не рвут",
   "slug": "未完成体不定人称句表示禁止/不该发生",
   "meaning": "A negated imperfective verb in the third-person plural expresses a general prohibition.",
+  "meaning_ko": "부정된 미완료체 3인칭 복수형은 일반적인 금지를 나타냄(не рвут).",
   "type": "composite",
   "examples": [
    "В саду не рвут цветы."
@@ -1093,6 +1105,7 @@
   "name": "Не включать",
   "slug": "未完成体不定式否定（表示不应该、不需要）",
   "meaning": "A negated imperfective infinitive expresses that an action should not or need not be performed.",
+  "meaning_ko": "부정된 미완료체 부정사는 '~하지 말 것, 할 필요 없음'을 나타냄.",
   "type": "composite",
   "examples": [
    "Не включать магнитофон, ребенок спит."
@@ -1181,6 +1194,7 @@
   "name": "надо + 名词二格",
   "slug": "状态词直接带补语（第二格/第四格）",
   "meaning": "Certain predicative state words take a noun object directly, in the genitive or accusative.",
+  "meaning_ko": "надо 같은 상태 서술어는 속격·대격의 명사를 직접 취함.",
   "type": "composite",
   "examples": [
    "Детям надо любви, внимания."
@@ -1225,6 +1239,7 @@
   "name": "Прекрасный врач, Чехов ...",
   "slug": "独立同位语（取得原因、让步意义）",
   "meaning": "An apposition is set off when it gives additional specification or acquires causal or concessive meaning.",
+  "meaning_ko": "동격어는 부가 설명이나 원인·양보의 의미를 지닐 때 쉼표로 분리됨.",
   "type": "composite",
   "examples": [
    "Прекрасный врач, Чехов заботливо и умело лечйл людей."
@@ -1247,6 +1262,7 @@
   "name": "не пишу ни ... ни ...",
   "slug": "直接补语：及物动词被否定时名词转用第二格",
   "meaning": "When a transitive verb is negated, its direct object may shift to the genitive.",
+  "meaning_ko": "타동사가 부정되면 직접 목적어가 속격으로 바뀔 수 있음.",
   "type": "composite",
   "examples": [
    "Я не пишу ни своей биографии, ни свойх достижений."
@@ -1269,6 +1285,7 @@
   "name": "Сосна. Две берёзы.",
   "slug": "称名句（单部句，只出现一个主要成分）",
   "meaning": "A nominative (naming) sentence consists of a noun in the nominative and describes a static picture without a verb.",
+  "meaning_ko": "주격(명명)문은 주격 명사만으로 정적인 장면을 서술하며 동사가 없음.",
   "type": "composite",
   "examples": [
    "Сосна. Две берёзы."
@@ -1313,6 +1330,7 @@
   "name": "тихим голосом",
   "slug": "第五格表示行为方式",
   "meaning": "The instrumental case marks the manner of an action.",
+  "meaning_ko": "조격은 행위의 방식이나 수단을 나타냄(тихим голосом).",
   "type": "composite",
   "examples": [
    "Она говорит тихим голосом."
@@ -1359,6 +1377,7 @@
   "name": "Бухгалтер очень серьёзна",
   "slug": "表人名词指女人时谓语用阴性形式",
   "meaning": "When a noun with only a masculine form denotes a woman, the predicate may agree in the feminine.",
+  "meaning_ko": "남성형만 있는 명사가 여성을 가리킬 때 술어는 여성형으로 일치할 수 있음.",
   "type": "composite",
   "examples": [
    "Бухгалтер очень серьёзна."
@@ -1381,6 +1400,7 @@
   "name": "Трудности — это ничего",
   "slug": "表语用副词/代词",
   "meaning": "The nominal part of the predicate can be an adverb or pronoun.",
+  "meaning_ko": "술어의 명사부는 부사나 대명사일 수 있음(Трудности — это ничего).",
   "type": "composite",
   "examples": [
    "Трудности — это ничего."
@@ -1403,6 +1423,7 @@
   "name": "Его номер — двадщать один",
   "slug": "表语用数词",
   "meaning": "The nominal part of the predicate can be a numeral.",
+  "meaning_ko": "술어의 명사부는 수사일 수 있음(Его номер — двадцать один).",
   "type": "composite",
   "examples": [
    "Его номер — двадщать один."
@@ -1472,6 +1493,7 @@
   "name": "Все мы трое — одно.",
   "slug": "集合数词与人称代词连用（我们俩/三人一起）",
   "meaning": "A personal pronoun plus a collective numeral as subject means 'we, the N of us, together'.",
+  "meaning_ko": "인칭대명사 + 집합수사가 주어가 되면 '우리 N명 모두 함께'를 뜻함.",
   "type": "composite",
   "examples": [
    "Все мы трое — одно."
@@ -1517,6 +1539,7 @@
   "name": "Сколько времени сейчас?",
   "slug": "（Сколько времени сейчас?）",
   "meaning": "To ask the time, use 'Skol'ko vremeni seychas?'",
+  "meaning_ko": "시간을 물을 때는 Сколько времени сейчас?를 씀.",
   "type": "composite",
   "examples": [
    "Сколько времени сейчас?"
@@ -1606,6 +1629,7 @@
   "name": "Доброта — она ...",
   "slug": "（именительный темы）",
   "meaning": "A preposed nominative noun introduces the topic, resumed by a pronoun in the following clause.",
+  "meaning_ko": "앞선 주격 명사가 화제를 제시하고 뒤 절에서 대명사로 받음(Доброта — она ...).",
   "type": "composite",
   "examples": [
    "Доброта — она превыше всех благ."
@@ -1628,6 +1652,7 @@
   "name": "Весна. Ночь. Тишина.",
   "slug": "（номинативные предложения）",
   "meaning": "Nominative sentences assert the existence of things or phenomena, their main part being a nominative noun.",
+  "meaning_ko": "주격문은 사물·현상의 존재를 단정하며 중심은 주격 명사임(Весна. Ночь. Тишина.).",
   "type": "composite",
   "examples": [
    "Весна. Ночь. Тишина."
@@ -1650,6 +1675,7 @@
   "name": "Летом рано рассветает",
   "slug": "（рассветает）",
   "meaning": "Impersonal verbs of this type describe natural phenomena or their effect on the body.",
+  "meaning_ko": "이런 비인칭 동사는 자연 현상이나 신체에 미치는 영향을 서술함.",
   "type": "composite",
   "examples": [
    "Летом рано рассветает."
