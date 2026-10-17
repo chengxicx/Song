@@ -382,6 +382,26 @@ function open_grammar_analysis(opts) {
     if (btm) btm.classList.add("open-dict");
   }
 
+  // The panel's sentence-narrowing state.  Declared before the header is
+  // built because the header renders the sentence button only when a
+  // sentence is available, and `var` hoisting would otherwise leave it
+  // undefined at that point -- the button would never appear.
+  //   sentenceFilter      the sentence the panel is narrowed to (null = all)
+  //   filterableSentence  remembered after widening, so the control toggles
+  //                       back without a fresh analysis
+  //   renderedCards       element <-> data pairing for each rendered card
+  var sentenceFilter = null;
+  var filterableSentence = null;
+  var renderedCards = [];
+  // Which text the panel is currently showing: "sentence", "page" or
+  // "book".  Switching to a wider scope re-runs the backend analysis, so
+  // the last fetched rows are kept to render the new scope from.
+  var scope = "page";
+  var lastResults = null;
+  // The page scope's rows, kept while the book scope is showing, so
+  // switching back re-renders rather than re-fetches.
+  var pageResults = null;
+
   function header() {
     // The library index for this book's language -- the way to find a
     // grammar point the current page does not happen to contain.
@@ -389,16 +409,38 @@ function open_grammar_analysis(opts) {
     const library = langid
       ? '<a class="grammar-analysis-panel__library" href="/grammar/' + encodeURIComponent(langid) + '">' + I18N.t('Grammar library') + '</a>'
       : "";
-    // The page control sits at the top-left of the header: it switches
-    // between the grammar of the one sentence the panel was opened from and
-    // every point this screen contains.
-    const page =
-      '<button type="button" class="grammar-analysis-panel__page">' +
-      I18N.t('Current page grammar') +
-      '</button>';
+    // The scope controls sit at the top-left of the header as one group.
+    // They answer "how much text am I looking at": the sentence the panel
+    // was opened from, the screen, or the whole book.  The panel title
+    // already says "grammar", so each button carries only its own scope
+    // word -- three buttons reading "... grammar" each was noise.
+    //
+    // The sentence button only exists when the panel was opened from a
+    // sentence (the reading menu's entry has no target).  The book button
+    // is hidden for manga and PDF, whose pages carry no running text: the
+    // backend would rebuild each page from its OCR blocks, which is a lot
+    // of work for a scope nobody asked for on a picture book.
+    const fixedPage = typeof LUTE_BOOK_TYPE !== "undefined" &&
+      (LUTE_BOOK_TYPE === "manga" || LUTE_BOOK_TYPE === "pdf");
+    const scopeGroup =
+      '<span class="grammar-analysis-panel__scopes">' +
+      (filterableSentence
+        ? '<button type="button" class="grammar-analysis-panel__scope" data-scope="sentence">' +
+          I18N.t("This sentence") +
+          "</button>"
+        : "") +
+      '<button type="button" class="grammar-analysis-panel__scope" data-scope="page">' +
+      I18N.t("This page") +
+      "</button>" +
+      (fixedPage
+        ? ""
+        : '<button type="button" class="grammar-analysis-panel__scope" data-scope="book">' +
+          I18N.t("This book") +
+          "</button>") +
+      "</span>";
     return (
       '<div class="grammar-analysis-panel__header">' +
-      page +
+      scopeGroup +
       '<span class="grammar-analysis-panel__title">' + I18N.t('Grammar Analysis') + '</span>' +
       '<span id="grammar-count" class="grammar-analysis-panel__badge">…</span>' +
       library +
@@ -436,13 +478,7 @@ function open_grammar_analysis(opts) {
   // sentence the reader was in; the header's page control widens it back to
   // every point the current screen contains.  Both act on the rendered DOM,
   // so switching is instant and never re-runs the backend analysis.
-  //   sentenceFilter      the sentence the panel is narrowed to (null = all)
-  //   filterableSentence  remembered after widening, so the control toggles
-  //                       back without a fresh analysis
-  //   renderedCards       element <-> data pairing for each rendered card
-  var sentenceFilter = null;
-  var filterableSentence = null;
-  var renderedCards = [];
+  // The state itself is declared above, before the header is built.
 
   function refreshPanelVisibility() {
     var root = panel[0];
@@ -488,21 +524,56 @@ function open_grammar_analysis(opts) {
     refreshPanelVisibility();
   }
 
-  function syncPageControl() {
+  function syncScopeControl() {
     var root = panel[0];
-    if (!root || typeof root.querySelector !== "function") return;
-    var btn = root.querySelector(".grammar-analysis-panel__page");
-    if (btn) btn.classList.toggle("grammar-analysis-panel__page--active", !sentenceFilter);
+    if (!root || typeof root.querySelectorAll !== "function") return;
+    var buttons = root.querySelectorAll(".grammar-analysis-panel__scope");
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.classList.toggle(
+        "grammar-analysis-panel__scope--active",
+        btn.getAttribute("data-scope") === scope
+      );
+    });
   }
 
   function bindPanelControls() {
     panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
-    panel.find(".grammar-analysis-panel__page").on("click", function () {
-      if (sentenceFilter) showPageGrammar();
-      else if (filterableSentence) filterToSentence(filterableSentence);
-      syncPageControl();
+    // Three scopes, three behaviours:
+    //   sentence -- narrow the already-rendered rows to the one sentence,
+    //               purely in the DOM (instant, no request)
+    //   page     -- the current screen's grammar; also instant, it is what
+    //               the panel opened with
+    //   book     -- a wider text, so it needs a fresh analysis
+    panel.find(".grammar-analysis-panel__scope").on("click", function () {
+      var next = this.getAttribute("data-scope");
+      if (next === scope) return;
+      if (next === "sentence") {
+        if (!filterableSentence) return;
+        scope = "sentence";
+        filterToSentence(filterableSentence);
+      } else if (next === "page") {
+        scope = "page";
+        // Coming back from "book" has to re-render the page's own rows:
+        // the book's response replaced them.  When the panel is still on
+        // the page scope (the reader only narrowed it to a sentence) the
+        // rows are already the page's, so lifting the filter is enough.
+        if (pageResults) {
+          lastResults = pageResults;
+          pageResults = null;
+          renderResults(lastResults);
+        } else {
+          showPageGrammar();
+        }
+      } else {
+        scope = "book";
+        // The sentence filter is meaningless over a whole book, and the
+        // rows are about to be replaced anyway.
+        sentenceFilter = null;
+        fetchBookScope();
+      }
+      syncScopeControl();
     });
-    syncPageControl();
+    syncScopeControl();
   }
 
   bindPanelControls();
@@ -517,13 +588,48 @@ function open_grammar_analysis(opts) {
     return !panel[0].isConnected;
   }
 
-  $.getJSON(url)
-    .done(function (data) {
-      if (panelIsGone()) return;
-      let bodyHtml;
-      if (!data || data.length === 0) {
-        bodyHtml = '<div class="grammar-analysis-panel__state">' + I18N.t('No known grammar points detected on this page.') + '</div>';
-      } else {
+  // Fetch a scope's rows and render them.  The "page" scope is what the
+  // panel opened with, so it reuses the response already in hand; "book"
+  // asks the backend for the whole book's text.  Rendering itself lives in
+  // the request callback below and is shared by both paths.
+  function fetchBookScope() {
+    const bookUrl = `/read/grammar_analysis/${bookid}/${pagenum}?scope=book`;
+    panel
+      .find(".grammar-analysis-panel__body")
+      .html(
+        '<div class="grammar-analysis-panel__state">' +
+          I18N.t("Analyzing…") +
+          "</div>"
+      );
+    $.getJSON(bookUrl)
+      .done(function (data) {
+        if (panelIsGone()) return;
+        // Keep the page's rows so switching back re-renders them instead
+        // of re-fetching: the book's response is about to replace them.
+        pageResults = lastResults;
+        lastResults = data;
+        renderResults(data);
+      })
+      .fail(function () {
+        if (panelIsGone()) return;
+        panel
+          .find(".grammar-analysis-panel__body")
+          .html(
+            '<div class="grammar-analysis-panel__state">' +
+              I18N.t("Analysis failed. Please try again.") +
+              "</div>"
+          );
+      });
+  }
+
+  // Render the rows the backend returned into the panel.  Split out of the
+  // request's callback so switching scope to "book" can re-render from its
+  // own response with the same code.
+  function renderResults(data) {
+    let bodyHtml;
+    if (!data || data.length === 0) {
+      bodyHtml = '<div class="grammar-analysis-panel__state">' + I18N.t('No known grammar points detected on this page.') + '</div>';
+    } else {
         // Render one example sentence, wrapping the backend-reported matched
         // words (exact character offsets) in <mark>.
         function renderExample(ex) {
@@ -645,9 +751,15 @@ function open_grammar_analysis(opts) {
             : "";
           const cjk = /[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]/.test(g.desc || "");
           const moreLabel = cjk ? "参考例句 · 注意点" : I18N.t("Reference · notes");
+          // The reference block starts expanded.  The panel owns a whole
+          // column of the reader, so there is room for the translated
+          // example without a click -- and it is the only place a reader
+          // sees a sentence with its gloss, since the page's own examples
+          // are the reading text itself.  The grammar detail page has
+          // expanded it for the same reason.
           const more =
             ref || notes
-              ? '<details class="grammar-item__more"><summary>' + moreLabel + "</summary>" +
+              ? '<details class="grammar-item__more" open><summary>' + moreLabel + "</summary>" +
                 ref + notes + "</details>"
               : "";
           // Cross-links into the grammar library, anchored on the other
@@ -1249,9 +1361,18 @@ function open_grammar_analysis(opts) {
             setPinned(picked.runs, picked.itemEl);
             picked.itemEl.scrollIntoView({ block: "nearest" });
           }
-          syncPageControl();
+          syncScopeControl();
         }
       }
+  }
+
+  // The panel's own request.  Rendered from the response on arrival, and
+  // again whenever the scope changes (see fetchBookScope).
+  $.getJSON(url)
+    .done(function (data) {
+      if (panelIsGone()) return;
+      lastResults = data;
+      renderResults(data);
     })
     .fail(function () {
       if (panelIsGone()) return;

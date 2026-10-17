@@ -154,9 +154,14 @@ def test_the_page_control_narrows_the_panel_to_one_sentence(commands):
     assert "ex.nodes.indexOf(sentence) !== -1" in body
     assert 'card.el.classList.toggle("grammar-item--filtered-out", !keep);' in body
 
-    # A toggle: widen when narrowed, narrow again once widened.
-    click = _after(commands, "if (sentenceFilter) showPageGrammar();", 200)
-    assert "else if (filterableSentence) filterToSentence(filterableSentence);" in click
+    # A three-way scope switch: the sentence scope narrows, the page scope
+    # widens, and neither re-runs the backend analysis (only the book scope
+    # does, because it is a different text).
+    click = _after(commands, 'panel.find(".grammar-analysis-panel__scope").on("click"', 1400)
+    assert 'if (next === "sentence")' in click
+    assert "filterToSentence(filterableSentence)" in click
+    assert 'if (next === "page")' in click
+    assert "showPageGrammar()" in click
 
     # ...and the narrowing is actually applied on open, from the same
     # sentence the jump resolved.  The sentence is remembered even when it
@@ -176,21 +181,28 @@ def test_the_page_control_narrows_the_panel_to_one_sentence(commands):
     assert 'panel.find("#grammar-count").text(' in switch
 
 
-def test_the_page_control_is_wired_in_every_panel_state(commands):
+def test_the_scope_control_is_wired_in_every_panel_state(commands):
     """
     The header is re-rendered three times -- the initial "Analyzing…" one, the
     rendered panel, and the failure state -- and the control is re-bound with
     it each time.  Binding it in only some of them leaves a dead button that
     errors nowhere, which is the same silent shape as the close button's own
     three call sites.
+
+    The control used to be one "Current page grammar" button; it is now a
+    group of scope buttons (sentence / page / book), so the assertion names
+    the group and its handler rather than the old single class.
     """
-    header_body = _after(commands, "function header() {", 900)
-    assert "grammar-analysis-panel__page" in header_body
-    assert "I18N.t('Current page grammar')" in header_body
+    header_body = _after(commands, "function header() {", 2600)
+    assert "grammar-analysis-panel__scope" in header_body
+    assert "grammar-analysis-panel__scopes" in header_body
+    # The three scope words, without a redundant "grammar" on each.
+    for scope in ("This sentence", "This page", "This book"):
+        assert f'I18N.t("{scope}")' in header_body, scope
 
     assert commands.count("bindPanelControls();") == 3
-    bind_body = _after(commands, "function bindPanelControls() {", 400)
-    assert 'panel.find(".grammar-analysis-panel__page").on("click"' in bind_body
+    bind_body = _after(commands, "function bindPanelControls() {", 900)
+    assert 'panel.find(".grammar-analysis-panel__scope").on("click"' in bind_body
     assert 'panel.find(".grammar-analysis-panel__close").on(' in bind_body
 
 
@@ -243,9 +255,13 @@ def test_a_closed_panel_is_never_painted_into(commands):
     once it has rendered.  The ring layer is appended to document.body, so
     an unguarded callback paints rings for a panel that no longer exists:
     stray boxes with no panel to hover and no way to clear them.
+
+    Two requests can now be in flight (the page's and the book's), so the
+    guard has to appear on both success and failure paths of each: four
+    call sites rather than the original two.
     """
     assert "return !panel[0].isConnected;" in commands
-    assert commands.count("if (panelIsGone()) return;") == 2
+    assert commands.count("if (panelIsGone()) return;") == 4
 
 
 def test_every_card_carries_a_stable_key(commands):

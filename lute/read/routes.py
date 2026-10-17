@@ -102,6 +102,24 @@ def _furigana_script(lang):
 _yt_subtitle_words_cache = {}
 
 
+# Whole-book grammar analyses, keyed by (user scope, book id, text identity,
+# display language, hidden levels).  A book-wide pass tokenises every page,
+# which is seconds of CPU, and the reader flips between the page and book
+# scopes -- so the answer is worth keeping.  Keyed on the *text* rather than
+# the book alone, so an edited page misses instead of serving a stale
+# analysis.  Bounded, because a big library would otherwise grow it without
+# limit; the oldest entry is dropped on overflow.
+_book_grammar_cache = {}
+_BOOK_GRAMMAR_CACHE_MAX = 8
+
+
+def _remember_book_grammar(key, results):
+    "Store one whole-book analysis, evicting the oldest entry on overflow."
+    if len(_book_grammar_cache) >= _BOOK_GRAMMAR_CACHE_MAX:
+        _book_grammar_cache.pop(next(iter(_book_grammar_cache)), None)
+    _book_grammar_cache[key] = results
+
+
 def _subtitle_cache_key(book_id, srt_data):
     "Cache key scoped per user: book ids differ between user dbs."
     return (current_scope_key(), book_id, srt_data)
@@ -1196,13 +1214,19 @@ def empty():
 @bp.route("/grammar_analysis/<int:bookid>/<int:pagenum>", methods=["GET"])
 def grammar_analysis(bookid, pagenum):
     """
-    Analyze the grammar points on the current reading page.
+    Analyze the grammar points on the current reading page -- or the book.
 
     Reads the page's original text and returns JSON:
       [{ "name", "level", "desc", "examples": [{"sentence", "matches"}] }]
 
     "matches" lists the exact substrings matched inside each example
     sentence, so the reader can highlight the grammar words.
+
+    ``?scope=book`` analyses every page of the book instead of the one
+    screen, which is how the panel's "whole book" control answers "what
+    grammar does this book actually use".  It is the same analysis over a
+    longer text, so the engine choice and the hidden-level filtering below
+    apply unchanged.
 
     Japanese books use the Sudachi-based POS-aware engine; other
     languages fall back to the regex-based rule library.
@@ -1215,7 +1239,14 @@ def grammar_analysis(bookid, pagenum):
     # current sub-screen when the client supplies its text, falling back to
     # the whole page otherwise.
     snippet = request.args.get("text", "")
-    if snippet.strip():
+    scope = (request.args.get("scope", "") or "").strip().lower()
+    if scope == "book":
+        # Whole book: every page joined by a newline, so a page boundary
+        # never glues two sentences into one pseudo-sentence.  The engine
+        # caps the examples it reports per point, so a long book costs one
+        # pass over more text, not a bigger response.
+        page_text = "\n".join(t.text or "" for t in book.texts)
+    elif snippet.strip():
         page_text = snippet
     else:
         # Manga pages store no page text -- the words live in the .mokuro
@@ -1243,6 +1274,19 @@ def grammar_analysis(bookid, pagenum):
     # forms", "Particles").  Applied to whatever the engine returns, so
     # every engine honours it without knowing about the setting.
     hidden = set(getattr(lang, "hidden_grammar_levels", []) or [])
+    # A whole-book pass is seconds of work (every page tokenised), and the
+    # reader flips between the page and book scopes, so the result is
+    # memoised.  Keyed on the resolved text plus the two settings that
+    # change the answer -- never on the book id alone, since an edited page
+    # has to invalidate its own entry rather than serve a stale analysis.
+    cache_key = None
+    if scope == "book":
+        # Scoped per user like the subtitle cache: book ids are per-user db.
+        cache_key = (current_scope_key(), bookid, len(page_text),
+                     hash(page_text), display, tuple(sorted(hidden)))
+        cached = _book_grammar_cache.get(cache_key)
+        if cached is not None:
+            return jsonify(cached)
     # Every engine runs on optional heavy dependencies (Sudachi, Kiwi,
     # spaCy models, pymorphy3, pythainlp, pyarabic); when one is missing,
     # fall back to the generic regex rule library instead of failing
@@ -1273,13 +1317,19 @@ def grammar_analysis(bookid, pagenum):
                     extra,
                 )
                 break
-            return jsonify(filter_hidden_grammar(results, hidden))
+            filtered = filter_hidden_grammar(results, hidden)
+            if cache_key is not None:
+                _remember_book_grammar(cache_key, filtered)
+            return jsonify(filtered)
     render_service = RenderService(db.session)
     paragraphs = render_service.get_paragraphs(page_text, lang)
     sentences = [
         "".join(ti.text for ti in sentence) for para in paragraphs for sentence in para
     ]
-    return jsonify(filter_hidden_grammar(analyze_grammar(sentences), hidden))
+    filtered = filter_hidden_grammar(analyze_grammar(sentences), hidden)
+    if cache_key is not None:
+        _remember_book_grammar(cache_key, filtered)
+    return jsonify(filtered)
 
 
 @bp.route("/shadowing/transcribe", methods=["POST"])
