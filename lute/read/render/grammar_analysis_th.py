@@ -491,6 +491,23 @@ def _matchable(item):
 # through the same template (see lute/grammar/routes.py).
 
 
+# The corpus writes each example as "thai · romanisation — english ／ 中文";
+# the Chinese after this separator is the only translation it carries.
+_GLOSS_SEP = " ／ "
+
+
+def _example_row(sentence, display_lang):
+    """
+    One corpus example as ``{"text", "tr"}``.
+
+    The English is part of the sentence line itself, so ``text`` is already
+    bilingual for an English display language; the Chinese after the
+    separator is shown only when Chinese is the display language.
+    """
+    text, _, gloss = sentence.partition(_GLOSS_SEP)
+    return {"text": text, "tr": gloss.strip() if display_lang == "zh" else ""}
+
+
 def library_entries(display_lang="en"):
     """
     The whole Thai grammar library, in CEFR order (A1 -> C1).
@@ -506,7 +523,9 @@ def library_entries(display_lang="en"):
             "name": item["name"],
             "level": item["level"],
             "desc": desc or item.get("en") or "",
-            "examples": list(item.get("examples") or ()),
+            "examples": [
+                _example_row(s, display_lang) for s in item.get("examples") or ()
+            ],
             "skipped": not _matchable(item),
         }
         formation = (item.get("formation") or "").strip()

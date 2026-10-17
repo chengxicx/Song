@@ -14,6 +14,7 @@ ImportError, so the data-rich assertions need the parser installed;
 `_need_sudachi` / `_need_kiwipiepy` gate those.
 """
 
+import markupsafe
 import pytest
 
 from lute.db import db
@@ -118,6 +119,58 @@ def test_ru_es_entries_carry_the_core_fields():
             assert e["key"] and e["name"] and e["level"]
             assert isinstance(e["examples"], list)
             assert e["skipped"] is False
+
+
+def test_es_examples_carry_every_display_language():
+    """
+    Each golden sentence ships a translation in every display language the
+    app offers, so the detail page never falls back to English under a
+    Chinese or Korean heading.
+    """
+    es = pytest.importorskip("lute.read.render.grammar_analysis_es")
+    golden = es._golden_examples()  # pylint: disable=protected-access
+    assert golden, "no golden set"
+    bare = [
+        f"{key}: {ex.get('es')} [{field}]"
+        for key, rows in golden.items()
+        for ex in rows
+        for field in ("es", "zh", "en", "ko")
+        if not (ex.get(field) or "").strip()
+    ]
+    assert bare == [], f"examples missing a translation: {bare}"
+
+
+def test_es_library_examples_switch_the_gloss():
+    """
+    The sentence stays Spanish in every display language; only the line
+    under it changes.
+    """
+    by_lang = {lang: _es_entries(lang) for lang in ("en", "zh", "ko")}
+    key = next(e["key"] for e in by_lang["en"] if e["examples"])
+    rows = {
+        lang: next(e for e in entries if e["key"] == key)["examples"]
+        for lang, entries in by_lang.items()
+    }
+    texts = {lang: [r["text"] for r in rows[lang]] for lang in rows}
+    assert texts["en"] == texts["zh"] == texts["ko"], "the sentence must not change"
+    for lang in ("en", "zh", "ko"):
+        assert all(r["tr"] for r in rows[lang]), f"{key}: empty {lang} gloss"
+    first = {rows[lang][0]["tr"] for lang in rows}
+    assert len(first) == 3, f"{key}: the three glosses should differ, got {first}"
+
+
+def test_th_library_examples_split_the_corpus_gloss():
+    """
+    Thai stores "thai · roman — english ／ 中文" in one string; the library
+    hands the template {"text", "tr"} so the Chinese becomes its own line
+    and stays hidden when Chinese is not the display language.
+    """
+    th = pytest.importorskip("lute.read.render.grammar_analysis_th")
+    for lang, want_gloss in (("en", False), ("zh", True)):
+        rows = [r for e in th.library_entries(lang) for r in e["examples"]]
+        assert rows, "no Thai examples"
+        assert all(" ／ " not in r["text"] for r in rows), "gloss left in the text"
+        assert all(bool(r["tr"]) is want_gloss for r in rows), f"{lang}: wrong gloss"
 
 
 def test_ru_entries_have_examples_from_their_own_store():
@@ -405,13 +458,17 @@ def test_russian_language_page_renders_its_library(russian, app_context, client)
 
 
 def test_spanish_language_page_renders_its_library(spanish, app_context, client):
-    "The Spanish rule set renders too, golden examples on the cards."
+    "The Spanish rule set renders too, golden examples and gloss on the cards."
     entries = _es_entries("en")
     body = client.get(f"/grammar/{spanish.id}").get_data(as_text=True)
     _cards_of(body, entries)
     first = next(e for e in entries if e["examples"])
     detail = client.get(f"/grammar/{spanish.id}/{first['key']}").get_data(as_text=True)
-    assert first["examples"][0] in detail
+    row = first["examples"][0]
+    assert row["text"] in detail
+    # The gloss sits in its own span, not glued to the sentence.
+    assert "grammar-item__example-tr" in detail
+    assert str(markupsafe.escape(row["tr"])) in detail
 
 
 def test_unknown_language_is_404(client):
