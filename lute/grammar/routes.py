@@ -8,10 +8,11 @@ curated bases, the level of each point, the wording, the cross-links --
 so the library can be browsed and searched like any other reference.
 
 Only some engines have such a corpus (Japanese and Korean the curated
-bases, Russian and Spanish the hand-written rule sets, Thai a corpus
-written for this project against a standard Thai reference outline); every
-other language is served by the generic regex rules, which carry no
-point-level library, so /grammar/<langid> explains that instead of 404ing.
+bases, Russian, Spanish, French and German the hand-written rule sets
+plus their merged material rows, Thai a corpus written for this project
+against a standard Thai reference outline); every other language is
+served by the generic regex rules, which carry no point-level library,
+so /grammar/<langid> explains that instead of 404ing.
 """
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
@@ -22,6 +23,7 @@ from lute.models.language import Language
 from lute.models.repositories import LanguageRepository
 from lute.read.render.grammar_analysis import (
     is_french_language,
+    is_german_language,
     is_japanese_language,
     is_korean_language,
     is_russian_language,
@@ -83,6 +85,13 @@ def _library_engine(language):
             from lute.read.render import grammar_analysis_fr
 
             return grammar_analysis_fr
+        except ImportError:
+            return None
+    if is_german_language(language):
+        try:
+            from lute.read.render import grammar_analysis_de
+
+            return grammar_analysis_de
         except ImportError:
             return None
     if is_thai_language(language):

@@ -1,0 +1,631 @@
+{
+ "fr_il_y_a": {
+  "name": "il y a (there is / there are)",
+  "examples": [
+   {
+    "fr": "Il y a un chat sur le canapé.",
+    "en": "There is a cat on the sofa.",
+    "zh": "沙发上有一只猫。",
+    "ko": "소파 위에 고양이가 한 마리 있다."
+   },
+   {
+    "fr": "Il y a cinquante kilomètres d'ici à Paris.",
+    "en": "It is fifty kilometres from here to Paris.",
+    "zh": "从这里到巴黎有五十公里。",
+    "ko": "여기서 파리까지 50킬로미터다."
+   }
+  ]
+ },
+ "fr_estceque": {
+  "name": "est-ce que (question)",
+  "examples": [
+   {
+    "fr": "Est-ce que vous habitez à New York?",
+    "en": "Do you live in New York?",
+    "zh": "您住在纽约吗？",
+    "ko": "뉴욕에 사십니까?"
+   },
+   {
+    "fr": "Est-ce que tu sors ce soir?",
+    "en": "Are you going out tonight?",
+    "zh": "你今晚出去吗？",
+    "ko": "오늘 밤에 나가니?"
+   }
+  ]
+ },
+ "fr_c_est": {
+  "name": "c'est (it is)",
+  "examples": [
+   {
+    "fr": "C'est du fromage de chèvre.",
+    "en": "It is goat cheese.",
+    "zh": "这是山羊奶酪。",
+    "ko": "이것은 염소 치즈다."
+   },
+   {
+    "fr": "Tiens, tiens, c'est étrange...",
+    "en": "Well, well, that's strange...",
+    "zh": "哟，真奇怪……",
+    "ko": "이런, 참 이상하네…"
+   }
+  ]
+ },
+ "fr_wh_questions": {
+  "name": "Question words (quand, comment, pourquoi...)",
+  "examples": [
+   {
+    "fr": "Combien de langues parles-tu?",
+    "en": "How many languages do you speak?",
+    "zh": "你会说几种语言？",
+    "ko": "너는 몇 개 언어를 말하니?"
+   }
+  ]
+ },
+ "fr_negation": {
+  "name": "ne ... pas / plus / jamais",
+  "examples": [
+   {
+    "fr": "Elle ne travaille pas le lundi.",
+    "en": "She does not work on Mondays.",
+    "zh": "她周一不工作。",
+    "ko": "그녀는 월요일에는 일하지 않는다."
+   },
+   {
+    "fr": "Tu ne voyages jamais en hiver.",
+    "en": "You never travel in winter.",
+    "zh": "你冬天从不旅行。",
+    "ko": "너는 겨울에는 결코 여행하지 않는다."
+   }
+  ]
+ },
+ "fr_possessives": {
+  "name": "Possessive adjectives (mon, ton, son...)",
+  "examples": [
+   {
+    "fr": "Elle annule son voyage au Brésil.",
+    "en": "She cancels her trip to Brazil.",
+    "zh": "她取消了去巴西的旅行。",
+    "ko": "그녀는 브라질 여행을 취소한다."
+   },
+   {
+    "fr": "Vous exprimez vos opinions.",
+    "en": "You express your opinions.",
+    "zh": "你们表达自己的意见。",
+    "ko": "여러분은 자신의 의견을 표현한다."
+   }
+  ]
+ },
+ "fr_demo": {
+  "name": "Demonstrative adjectives (ce, cette, ces)",
+  "examples": [
+   {
+    "fr": "D'habitude, j'achète la viande dans cette boucherie.",
+    "en": "Usually I buy meat at this butcher shop.",
+    "zh": "我通常在这家肉店买肉。",
+    "ko": "보통 나는 이 정육점에서 고기를 산다."
+   }
+  ]
+ },
+ "fr_futur_proche": {
+  "name": "Futur proche: aller + infinitive",
+  "examples": [
+   {
+    "fr": "Je vais acheter une voiture en mai.",
+    "en": "I am going to buy a car in May.",
+    "zh": "我五月要买一辆车。",
+    "ko": "나는 5월에 자동차를 살 것이다."
+   },
+   {
+    "fr": "Elle va apprendre le chinois.",
+    "en": "She is going to learn Chinese.",
+    "zh": "她要学中文。",
+    "ko": "그녀는 중국어를 배울 것이다."
+   }
+  ]
+ },
+ "fr_passe_compose": {
+  "name": "Passé composé: avoir/être + participle",
+  "examples": [
+   {
+    "fr": "Il a fondu en larmes quand il a appris la nouvelle.",
+    "en": "He burst into tears when he heard the news.",
+    "zh": "听到消息他泪如雨下。",
+    "ko": "그는 소식을 듣고 눈물을 쏟았다."
+   },
+   {
+    "fr": "Nous avons fini le projet la semaine dernière.",
+    "en": "We finished the project last week.",
+    "zh": "我们上周完成了项目。",
+    "ko": "우리는 지난주에 프로젝트를 끝냈다."
+   }
+  ]
+ },
+ "fr_imparfait": {
+  "name": "Imparfait (était / jouait)",
+  "examples": [
+   {
+    "fr": "Les rues étaient embouteillées.",
+    "en": "The streets were jammed with traffic.",
+    "zh": "当时街道交通堵塞。",
+    "ko": "당시 거리는 교통 체증으로 막혀 있었다."
+   }
+  ]
+ },
+ "fr_futur_simple": {
+  "name": "Futur simple (sera / irai)",
+  "examples": [
+   {
+    "fr": "Elle vous préviendra dès qu'elle aura les résultats.",
+    "en": "She will let you know as soon as she has the results.",
+    "zh": "她一出结果就通知您。",
+    "ko": "그녀는 결과가 나오는 대로 여러분에게 알릴 것이다."
+   },
+   {
+    "fr": "Aussitôt qu'il arrivera, nous partirons.",
+    "en": "As soon as he arrives, we will leave.",
+    "zh": "他一到，我们就出发。",
+    "ko": "그가 도착하자마자 우리는 떠날 것이다."
+   }
+  ]
+ },
+ "fr_modals": {
+  "name": "pouvoir / vouloir / devoir + infinitive",
+  "examples": [
+   {
+    "fr": "Je peux vous donner des renseignements?",
+    "en": "May I give you some information?",
+    "zh": "我能给您提供些信息吗？",
+    "ko": "정보를 좀 드릴까요?"
+   },
+   {
+    "fr": "Chloé veut aller aux États-Unis.",
+    "en": "Chloé wants to go to the United States.",
+    "zh": "克洛艾想去美国。",
+    "ko": "클로에는 미국에 가고 싶어 한다."
+   }
+  ]
+ },
+ "fr_comparative": {
+  "name": "plus / moins / aussi ... que",
+  "examples": [
+   {
+    "fr": "Caroline est plus intelligente que lui.",
+    "en": "Caroline is smarter than him.",
+    "zh": "卡罗琳比他聪明。",
+    "ko": "캐롤린은 그보다 머리가 좋다."
+   },
+   {
+    "fr": "Il court plus vite que toi.",
+    "en": "He runs faster than you.",
+    "zh": "他跑得比你快。",
+    "ko": "그는 너보다 더 빨리 달린다."
+   }
+  ]
+ },
+ "fr_partitif": {
+  "name": "Partitive articles (du, de la, des)",
+  "examples": [
+   {
+    "fr": "Elle commande de l'eau et du vin.",
+    "en": "She orders water and wine.",
+    "zh": "她点了水和葡萄酒。",
+    "ko": "그녀는 물과 포도주를 주문한다."
+   },
+   {
+    "fr": "En Espagne, on mange des tapas.",
+    "en": "In Spain, people eat tapas.",
+    "zh": "在西班牙人们吃塔帕斯。",
+    "ko": "스페인에서는 타파스를 먹는다."
+   }
+  ]
+ },
+ "fr_imperatif": {
+  "name": "Impératif (command form)",
+  "examples": [
+   {
+    "fr": "Épelez votre nom, s'il vous plaît.",
+    "en": "Spell your name, please.",
+    "zh": "请拼一下您的名字。",
+    "ko": "이름의 철자를 말씀해 주십시오."
+   }
+  ]
+ },
+ "fr_pronominal": {
+  "name": "Pronominal verbs (se lever, se souvenir)",
+  "examples": [
+   {
+    "fr": "Tous les jours, le soleil se lève.",
+    "en": "Every day the sun rises.",
+    "zh": "太阳每天升起。",
+    "ko": "매일 해가 뜬다."
+   }
+  ]
+ },
+ "fr_venir_de": {
+  "name": "venir de + infinitive (recent past)",
+  "examples": [
+   {
+    "fr": "Elle vient de vendre sa voiture.",
+    "en": "She has just sold her car.",
+    "zh": "她刚卖了自己的车。",
+    "ko": "그녀는 방금 자기 차를 팔았다."
+   },
+   {
+    "fr": "La police vient de révéler le secret.",
+    "en": "The police have just revealed the secret.",
+    "zh": "警方刚透露了秘密。",
+    "ko": "경찰이 방금 그 비밀을 밝혔다."
+   }
+  ]
+ },
+ "fr_depuis": {
+  "name": "depuis + present tense",
+  "examples": [
+   {
+    "fr": "Depuis quand habitez-vous à Montpellier?",
+    "en": "Since when have you been living in Montpellier?",
+    "zh": "您从什么时候起住在蒙彼利埃？",
+    "ko": "언제부터 몽펠리에에 사십니까?"
+   }
+  ]
+ },
+ "fr_relative": {
+  "name": "Relative pronouns (qui / dont / où)",
+  "examples": [
+   {
+    "fr": "Je ne sais pas où il est.",
+    "en": "I don't know where he is.",
+    "zh": "我不知道他在哪儿。",
+    "ko": "나는 그가 어디 있는지 모른다."
+   },
+   {
+    "fr": "La femme qui parle est ma sœur.",
+    "en": "The woman who is speaking is my sister.",
+    "zh": "正在说话的那位女士是我姐姐。",
+    "ko": "말하고 있는 그 여성은 내 누니다."
+   }
+  ]
+ },
+ "fr_subjonctif": {
+  "name": "Subjunctive (il faut que + subjonctif)",
+  "examples": [
+   {
+    "fr": "Je ne crois pas que Daniel soit coupable.",
+    "en": "I don't believe Daniel is guilty.",
+    "zh": "我不认为丹尼尔有罪。",
+    "ko": "다니엘이 유죄라고는 생각하지 않는다."
+   },
+   {
+    "fr": "Ils sont déçus que le cours soit annulé.",
+    "en": "They are disappointed that the class is cancelled.",
+    "zh": "课程被取消了，他们很失望。",
+    "ko": "수업이 취소되어 그들은 실망하고 있다."
+   }
+  ]
+ },
+ "fr_il_faut": {
+  "name": "il faut (necessity)",
+  "examples": [
+   {
+    "fr": "Il faut que vous commenciez vos recherches dès que possible.",
+    "en": "You must start your research as soon as possible.",
+    "zh": "你们必须尽早开始研究。",
+    "ko": "여러분은 가능한 한 빨리 연구를 시작해야 한다."
+   }
+  ]
+ },
+ "fr_conditionnel": {
+  "name": "Conditionnel (voudrais / aimerait)",
+  "examples": [
+   {
+    "fr": "Dans un monde idéal, il n'y aurait pas de guerres.",
+    "en": "In an ideal world, there would be no wars.",
+    "zh": "在理想世界里就不会有战争了。",
+    "ko": "이상적인 세계에서는 전쟁이 없을 것이다."
+   }
+  ]
+ },
+ "fr_ce_que": {
+  "name": "ce qui / ce que (what)",
+  "examples": [
+   {
+    "fr": "Elle ne comprend pas ce dont il a peur.",
+    "en": "She doesn't understand what he is afraid of.",
+    "zh": "她不明白他在怕什么。",
+    "ko": "그녀는 그가 무엇을 두려워하는지 이해하지 못한다."
+   },
+   {
+    "fr": "J'aimerais savoir ce qui lui plairait.",
+    "en": "I would like to know what would please him.",
+    "zh": "我想知道什么会让他喜欢。",
+    "ko": "그를 기쁘게 할 것이 무엇인지 알고 싶다."
+   }
+  ]
+ },
+ "fr_y_en": {
+  "name": "Clitic pronouns y / en",
+  "examples": [
+   {
+    "fr": "Vous ne devez pas y aller.",
+    "en": "You must not go there.",
+    "zh": "您不应该去那里。",
+    "ko": "거기에 가서는 안 됩니다."
+   },
+   {
+    "fr": "Il n'y a plus rien dans le frigo.",
+    "en": "There is nothing left in the fridge.",
+    "zh": "冰箱里什么都没有了。",
+    "ko": "냉장고에는 이제 아무것도 없다."
+   }
+  ]
+ },
+ "fr_sans_inf": {
+  "name": "sans + infinitive",
+  "examples": [
+   {
+    "fr": "Elle est partie sans dire au revoir.",
+    "en": "She left without saying goodbye.",
+    "zh": "她没道别就走了。",
+    "ko": "그녀는 작별 인사도 없이 떠났다."
+   }
+  ]
+ },
+ "fr_superlatif": {
+  "name": "Superlative (le plus / le moins)",
+  "examples": [
+   {
+    "fr": "C'est le plus grand spectacle du monde.",
+    "en": "It is the greatest show on earth.",
+    "zh": "这是世界上最棒的演出。",
+    "ko": "이것은 세상에서 가장 훌륭한 쇼다."
+   },
+   {
+    "fr": "C'est l'endroit le moins ennuyeux de toute la ville.",
+    "en": "It is the least boring place in the whole city.",
+    "zh": "这是全城最不无聊的地方。",
+    "ko": "이곳은 도시 전체에서 가장 지루하지 않은 곳이다."
+   }
+  ]
+ },
+ "fr_avant_de": {
+  "name": "avant de + infinitive",
+  "examples": [
+   {
+    "fr": "Il devrait réfléchir avant de parler.",
+    "en": "He should think before speaking.",
+    "zh": "他应该三思而后行。",
+    "ko": "그는 말하기 전에 생각해야 한다."
+   }
+  ]
+ },
+ "fr_si_conditionnel": {
+  "name": "si + imparfait, conditionnel",
+  "examples": [
+   {
+    "fr": "Si je vendais mon appartement, je pourrais acheter cette maison.",
+    "en": "If I sold my flat, I could buy this house.",
+    "zh": "如果我把公寓卖了，就能买下这座房子。",
+    "ko": "내 아파트를 팔면 이 집을 살 수 있을 텐데."
+   },
+   {
+    "fr": "Si tu étais moins égoïste, tu aurais plus d'amis.",
+    "en": "If you were less selfish, you would have more friends.",
+    "zh": "如果你不那么自私，你会有更多朋友。",
+    "ko": "네가 덜 이기적이었다면 친구가 더 많았을 것이다."
+   }
+  ]
+ },
+ "fr_gerondif": {
+  "name": "en + participe présent (gérondif)",
+  "examples": [
+   {
+    "fr": "Il a réussi en travaillant dur.",
+    "en": "He succeeded by working hard.",
+    "zh": "他靠努力工作取得了成功。",
+    "ko": "그는 열심히 일함으로써 성공했다."
+   }
+  ]
+ },
+ "fr_subjonctif_passe": {
+  "name": "Past subjunctive (ait fini / soit parti)",
+  "examples": [
+   {
+    "fr": "Nous sommes ravis qu'elle ait gagné la médaille d'or.",
+    "en": "We are delighted that she won the gold medal.",
+    "zh": "我们很高兴她获得了金牌。",
+    "ko": "우리는 그녀가 금메달을 따서 기쁘다."
+   },
+   {
+    "fr": "Elle a peur qu'il ait eu un accident de moto.",
+    "en": "She is afraid that he has had a motorcycle accident.",
+    "zh": "她担心他出了摩托车事故。",
+    "ko": "그녀는 그가 오토바이 사고를 냈을까 봐 걱정한다."
+   }
+  ]
+ },
+ "fr_plus_que_parfait": {
+  "name": "Plus-que-parfait (avait fini)",
+  "examples": [
+   {
+    "fr": "Il n'avait pas pu les joindre.",
+    "en": "He had not been able to reach them.",
+    "zh": "他没能联系上他们。",
+    "ko": "그는 그들에게 연락할 수 없었다."
+   },
+   {
+    "fr": "Elle a eu une réaction allergique au médicament qu'elle avait pris.",
+    "en": "She had an allergic reaction to the medicine she had taken.",
+    "zh": "她对之前服用的药物产生了过敏反应。",
+    "ko": "그녀는 먹었던 약에 알레르기 반응을 일으켰다."
+   }
+  ]
+ },
+ "fr_apres_avoir": {
+  "name": "après avoir / après être + participle",
+  "examples": [
+   {
+    "fr": "Elle se lave les mains après avoir décortiqué les crevettes.",
+    "en": "She washes her hands after shelling the shrimp.",
+    "zh": "剥完虾后她洗了手。",
+    "ko": "새우 껍질을 까고 나서 그녀는 손을 씻는다."
+   }
+  ]
+ },
+ "fr_futur_anterieur": {
+  "name": "Futur antérieur (aura fini)",
+  "examples": [
+   {
+    "fr": "Elle vous téléphonera dès qu'elle aura fini son roman.",
+    "en": "She will phone you as soon as she has finished her novel.",
+    "zh": "她写完小说就给您打电话。",
+    "ko": "그녀는 소설을 다 쓰는 대로 전화할 것이다."
+   }
+  ]
+ },
+ "fr_passe_simple": {
+  "name": "Passé simple (literary past)",
+  "examples": [
+   {
+    "fr": "Il fut surpris par notre réaction.",
+    "en": "He was surprised by our reaction.",
+    "zh": "他对我们的反应感到惊讶。",
+    "ko": "그는 우리의 반응에 놀랐다."
+   }
+  ]
+ },
+ "fr_inversion": {
+  "name": "Question by inversion (Parlez-vous...?)",
+  "examples": [
+   {
+    "fr": "Comprenez-vous la question?",
+    "en": "Do you understand the question?",
+    "zh": "您明白这个问题吗？",
+    "ko": "질문을 이해하십니까?"
+   },
+   {
+    "fr": "Voyage-t-il souvent en Europe?",
+    "en": "Does he travel often in Europe?",
+    "zh": "他经常去欧洲旅行吗？",
+    "ko": "그는 유럽을 자주 여행하니?"
+   }
+  ]
+ },
+ "fr_pendant": {
+  "name": "pendant + duration",
+  "examples": [
+   {
+    "fr": "Il a habité pendant cinq ans à Londres.",
+    "en": "He lived in London for five years.",
+    "zh": "他在伦敦住了五年。",
+    "ko": "그는 5년 동안 런던에 살았다."
+   },
+   {
+    "fr": "Nous avons voyagé pendant un mois en Italie.",
+    "en": "We travelled for a month in Italy.",
+    "zh": "我们在意大利旅行了一个月。",
+    "ko": "우리는 한 달 동안 이탈리아를 여행했다."
+   }
+  ]
+ },
+ "fr_faire_causatif": {
+  "name": "faire + infinitive (causative)",
+  "examples": [
+   {
+    "fr": "Il fait réparer la télévision.",
+    "en": "He is having the television repaired.",
+    "zh": "他（让人）修理电视。",
+    "ko": "그는 텔레비전을 수리시킨다."
+   },
+   {
+    "fr": "Vous faites laver la voiture.",
+    "en": "You are having the car washed.",
+    "zh": "你们（让人）洗车。",
+    "ko": "여러분은 차를 세차시킨다."
+   }
+  ]
+ },
+ "fr_des_que": {
+  "name": "dès que / aussitôt que (as soon as)",
+  "examples": [
+   {
+    "fr": "Je t'écrirai dès que je serai à Rio.",
+    "en": "I will write to you as soon as I am in Rio.",
+    "zh": "我一到里约就给你写信。",
+    "ko": "리오에 도착하자마자 너에게 편지를 쓸 것이다."
+   },
+   {
+    "fr": "Téléphonez-lui aussitôt que possible!",
+    "en": "Phone him as soon as possible!",
+    "zh": "请尽快给他打电话！",
+    "ko": "가능한 한 빨리 그에게 전화하십시오!"
+   }
+  ]
+ },
+ "fr_pour_que": {
+  "name": "pour que + subjunctive (purpose)",
+  "examples": [
+   {
+    "fr": "Je t'explique pour que tu comprennes.",
+    "en": "I explain so that you understand.",
+    "zh": "我解释给你听，好让你明白。",
+    "ko": "네가 이해하도록 설명해 주겠다."
+   }
+  ]
+ },
+ "fr_bien_que": {
+  "name": "bien que + subjunctive (concession)",
+  "examples": [
+   {
+    "fr": "Bien qu'il soit fatigué, il lit le journal.",
+    "en": "Although he is tired, he reads the newspaper.",
+    "zh": "尽管他很累，他还是读报纸。",
+    "ko": "비록 그는 피곤하지만 신문을 읽는다."
+   },
+   {
+    "fr": "Bien qu'il fasse quelques fautes, son français est très bon.",
+    "en": "Although he makes a few mistakes, his French is very good.",
+    "zh": "尽管他会犯一些错误，他的法语还是很好。",
+    "ko": "비록 그는 몇 가지 실수를 하지만 프랑스어는 아주 좋다."
+   }
+  ]
+ },
+ "fr_comme_si": {
+  "name": "comme si + imparfait (as if)",
+  "examples": [
+   {
+    "fr": "Il agit comme si tout était facile.",
+    "en": "He acts as if everything were easy.",
+    "zh": "他表现得好像一切都很简单。",
+    "ko": "그는 마치 모든 것이 쉬운 것처럼 행동한다."
+   }
+  ]
+ },
+ "fr_a_moins_que": {
+  "name": "à moins que + subjunctive (unless)",
+  "examples": [
+   {
+    "fr": "À moins qu'il ne pleuve, nous sortirons.",
+    "en": "Unless it rains, we will go out.",
+    "zh": "除非下雨，否则我们会出去。",
+    "ko": "비가 오지 않는 한 우리는 나갈 것이다."
+   }
+  ]
+ },
+ "fr_ne_que": {
+  "name": "ne ... que (only)",
+  "examples": [
+   {
+    "fr": "Il n'y a que cinq étudiants dans la classe.",
+    "en": "There are only five students in the class.",
+    "zh": "教室里只有五个学生。",
+    "ko": "교실에는 학생이 다섯 명뿐이다."
+   },
+   {
+    "fr": "Je ne mange que des légumes le soir.",
+    "en": "I only eat vegetables in the evening.",
+    "zh": "我晚上只吃蔬菜。",
+    "ko": "나는 저녁에 채소만 먹는다."
+   }
+  ]
+ }
+}

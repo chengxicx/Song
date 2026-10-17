@@ -1,0 +1,432 @@
+[
+ {
+  "key": "dgm_wegentrotzGenitiv__ba1413",
+  "name": "wegen / trotz + Genitiv",
+  "slug": "Wegen / Trotz + Genitiv",
+  "meaning": "because of / despite + genitive",
+  "type": "composite",
+  "examples": [
+   "Wegen des Regens bleiben alle zu Hause.",
+   "Trotz des Wetters wollte sie nicht Tennis spielen."
+  ],
+  "example_zh": [
+   "因为下雨，大家都待在家里。",
+   "尽管天气不好，她还是不想打网球。"
+  ],
+  "focus": [
+   "wegen",
+   "des"
+  ],
+  "zh": "wegen / trotz + 第二格（表原因、让步）",
+  "level": "B1",
+  "formation": "wegen / trotz / aufgrund + des + 名词(第二格)",
+  "notes": "这类介词后面的名词一律用第二格：wegen des Regens（阴性名词 des + -s）。"
+ },
+ {
+  "key": "dgm_amsten__0ded3d",
+  "name": "am + -sten（最高级）",
+  "slug": "am + -sten",
+  "meaning": "superlative with am + -sten",
+  "type": "composite",
+  "examples": [
+   "Mein Sohn ist am ältesten.",
+   "Meine Tochter ist am ältesten."
+  ],
+  "example_zh": [
+   "我儿子年纪最大。",
+   "我女儿年纪最大。"
+  ],
+  "focus": [
+   "am",
+   "ältesten"
+  ],
+  "zh": "am + 形容词加 -sten 构成最高级",
+  "level": "B1",
+  "formation": "am / eine + 形容词最高级(-ste / -sten / -ster)",
+  "notes": "作状语用 am + 第三格最高级（am besten），作定语用 -ste 形式（die beste Lösung）。"
+ },
+ {
+  "key": "dgm_als__e667a7",
+  "name": "比较级 + als",
+  "slug": "Komparativ + als",
+  "meaning": "comparative with -er and als",
+  "type": "composite",
+  "examples": [
+   "Das Gymnasium ist größer als die Grundschule.",
+   "Der Saal ist größer als das Klassenzimmer."
+  ],
+  "example_zh": [
+   "文理中学比小学大。",
+   "礼堂比教室大。"
+  ],
+  "focus": [
+   "größer",
+   "als"
+  ],
+  "zh": "比较级：形容词加 -er，后接 als",
+  "level": "B1",
+  "formation": "形容词 + -er + als",
+  "notes": "德语比较级一律用 als 引导，不用英文的 than。"
+ },
+ {
+  "key": "dgm_mussgebautwerden__e77728",
+  "name": "情态动词被动（muss gebaut werden）",
+  "slug": "Passiv mit Modalverb",
+  "meaning": "passive with a modal",
+  "type": "composite",
+  "examples": [
+   "Das Haus muss gebaut werden.",
+   "Die Rechnung muss bezahlt werden."
+  ],
+  "example_zh": [
+   "这栋房子必须建起来。",
+   "账单必须付清。"
+  ],
+  "focus": [
+   "werden"
+  ],
+  "zh": "情态动词 + werden + 分词",
+  "level": "B1",
+  "formation": "Modal + Partizip II + werden",
+  "notes": "情态动词变成被动时，被动不定式整体后移：Das Haus muss gebaut werden。"
+ },
+ {
+  "key": "dgm_ist__b6a109",
+  "name": "状态被动（ist + 分词）",
+  "slug": "Zustandspassiv (ist + Partizip)",
+  "meaning": "stative passive with sein + participle",
+  "type": "composite",
+  "examples": [
+   "Das Haus ist gebaut.",
+   "Die Brücke ist gebaut."
+  ],
+  "example_zh": [
+   "房子已经建好了。",
+   "桥已经建好了。"
+  ],
+  "focus": [
+   "ist",
+   "gebaut"
+  ],
+  "zh": "用 sein 的状态被动，表示结果状态",
+  "level": "B2",
+  "formation": "sein + Partizip II",
+  "notes": "若动作已完成并留下结果状态，用 sein 而不用 werden：Die Tür ist geschlossen。"
+ },
+ {
+  "key": "dgm_eineneine__ce5b76",
+  "name": "不定第四格（einen / eine）",
+  "slug": "unbestimmter Akkusativ",
+  "meaning": "indefinite accusative endings",
+  "type": "composite",
+  "examples": [
+   "Ich suche einen guten Arzt.",
+   "Wir kaufen eine neue Wohnung."
+  ],
+  "example_zh": [
+   "我在找一位好医生。",
+   "我们买一套新公寓。"
+  ],
+  "focus": [
+   "einen"
+  ],
+  "zh": "阳性/阴性不定冠词在第四格要变形（einen / eine）",
+  "level": "A1",
+  "formation": "einen (阳性) / eine (阴性) / ein (中性)",
+  "notes": "定冠词第四格：der→den、die→die、das→das；不定冠词第四格：ein→einen/eine/ein。"
+ },
+ {
+  "key": "dgm_indieBerge__b40aed",
+  "name": "可分介词 + 第四格（in die Berge）",
+  "slug": "Wechselpräposition Akkusativ",
+  "meaning": "two-way preposition with accusative (movement)",
+  "type": "composite",
+  "examples": [
+   "Wir fahren in die Berge.",
+   "Sie gehen heute in die Berge."
+  ],
+  "example_zh": [
+   "我们到山里去。",
+   "他们今天到山里去。"
+  ],
+  "focus": [
+   "in",
+   "die",
+   "Berge"
+  ],
+  "zh": "可分介词接第四格表示移动方向",
+  "level": "A2",
+  "formation": "in / an / auf / über / unter / vor / zwischen + Akkusativ",
+  "notes": "同一介词接第三格表示位置（in der Stadt 城里），接第四格表示方向（in die Stadt 去城里）。"
+ },
+ {
+  "key": "dgm_x__84a786",
+  "name": "固定搭配介词 + 第三格",
+  "slug": "Präposition + Dativ (in der Stadt)",
+  "meaning": "preposition + dative (location)",
+  "type": "composite",
+  "examples": [
+   "Sie arbeitet in der Stadt.",
+   "Meine Schwester wohnt in der Stadt."
+  ],
+  "example_zh": [
+   "她在城里工作。",
+   "我姐姐住在城里。"
+  ],
+  "focus": [
+   "in",
+   "der",
+   "Stadt"
+  ],
+  "zh": "表示地点的介词短语接第三格",
+  "level": "A2",
+  "formation": "in / an / auf / bei / mit / nach / seit / von / zu + Dativ",
+  "notes": "有方向含义的介词（in/auf/zu/von）接第三格时是固定用法：in der Stadt arbeiten。"
+ },
+ {
+  "key": "dgm_hatgekonnt__dfb077",
+  "name": "完成时里的情态动词（hat gekonnt）",
+  "slug": "Perfekt mit Modalverb",
+  "meaning": "modal in the perfect keeps the infinitive",
+  "type": "composite",
+  "examples": [
+   "Viele Leute haben schwimmen können.",
+   "Die Schüler haben schwimmen können."
+  ],
+  "example_zh": [
+   "很多人会游泳。",
+   "学生们会游泳。"
+  ],
+  "focus": [
+   "haben",
+   "schwimmen",
+   "können"
+  ],
+  "zh": "情态动词的完成时保留原形，不用分词",
+  "level": "B2",
+  "formation": "haben / sein + Modal + Infinitiv",
+  "notes": "这是德语学习者最常错的地方：说成 *hat gekonnt* 是错的，正确是 hat können。"
+ },
+ {
+  "key": "dgm_sehenhörenlassen__21f79a",
+  "name": "双不定式（sehen / hören / lassen）",
+  "slug": "Doppelinfinitiv (sehen / lassen)",
+  "meaning": "double infinitive after perception and causation verbs",
+  "type": "composite",
+  "examples": [
+   "Ich sehe sie im Garten arbeiten.",
+   "Wir hören den Mann Gitarre spielen."
+  ],
+  "example_zh": [
+   "我看见她在花园里干活。",
+   "我们听见那个男人弹吉他。"
+  ],
+  "focus": [
+   "sehen"
+  ],
+  "zh": "感官/使役动词后接双不定式",
+  "level": "B2",
+  "formation": "sehen / hören / lassen / fühlen + Infinitiv（留在句尾）",
+  "notes": "两个不定式都在句尾：Ich sehe ihn kommen。 lassen 还可以拆成 lassen + zu + Infinitiv。"
+ },
+ {
+  "key": "dgm_umohnezu__39943a",
+  "name": "不定式从句（um / ohne + zu）",
+  "slug": "Infinitivsatz mit um / ohne",
+  "meaning": "infinitive clauses with um / ohne",
+  "type": "composite",
+  "examples": [
+   "Sie geht nach Hause, ohne dafür zu bezahlen.",
+   "Er lernt Russisch, um in Moskau zu arbeiten."
+  ],
+  "example_zh": [
+   "她回家却不付钱。",
+   "他学俄语，以便在莫斯科工作。"
+  ],
+  "focus": [
+   "ohne"
+  ],
+  "zh": "用 zu 不定式表达目的或方式",
+  "level": "B2",
+  "formation": "um ... zu / ohne ... zu / anstatt ... zu + Infinitiv",
+  "notes": "同一个主句动词只能带一个 zu；主句动词若在句尾，不定式从句的 zu 也在句尾。"
+ },
+ {
+  "key": "dgm_I__997ddd",
+  "name": "虚拟式 I（间接引语）",
+  "slug": "Konjunktiv I (berichtete, dass ... sei)",
+  "meaning": "Konjunktiv I for indirect speech",
+  "type": "composite",
+  "examples": [
+   "Der Reporter berichtete, dass niemand die Rede verstehe.",
+   "Der Reporter berichtete, dass die alte Frau gestorben sei."
+  ],
+  "example_zh": [
+   "记者报道说没有人听懂演讲。",
+   "记者报道说那位老妇人去世了。"
+  ],
+  "focus": [
+   "dass"
+  ],
+  "zh": "转述他人话时用虚拟式 I",
+  "level": "C1",
+  "formation": "berichten / fragen, dass + 主语 + 虚拟式 I（sei/habe/werde）",
+  "notes": "Konjunktiv I 的形式（sei/seien/habe/werde）在当代口语中常被 Konjunktiv II 替代。"
+ },
+ {
+  "key": "dgm_IIwürdehättewäre__5df1e3",
+  "name": "虚拟式 II（würde / hätte / wäre）",
+  "slug": "Konjunktiv II (würde / hätte / wäre)",
+  "meaning": "Konjunktiv II for unreal conditions and politeness",
+  "type": "composite",
+  "examples": [
+   "An deiner Stelle würde ich sofort absagen.",
+   "Wenn ich mehr Zeit hätte, würde ich einen Kurs machen."
+  ],
+  "example_zh": [
+   "换作是我，我会马上拒绝。",
+   "如果我有更多时间，我会去上一门课。"
+  ],
+  "focus": [
+   "würde"
+  ],
+  "zh": "虚拟式 II：非现实假设与礼貌请求",
+  "level": "B1",
+  "formation": "würde + Infinitiv / hätte + Infinitiv / wäre + Infinitiv",
+  "notes": "hätte/wäre/könnte 用动词过去式加 -te；其他动词多用 würde + 原形。"
+ },
+ {
+  "key": "dgm_welcherwelchewelches__66cd5b",
+  "name": "关系从句（welcher / welche / welches）",
+  "slug": "Relativsatz mit welch-",
+  "meaning": "relative clauses with welch- and preposition + -r",
+  "type": "composite",
+  "examples": [
+   "Die Nachbarin, die dort wohnt, ist freundlich.",
+   "Die Kollegin, die hier wohnt, ist freundlich."
+  ],
+  "example_zh": [
+   "住在那里的女邻居很和善。",
+   "住在这里的女同事很和善。"
+  ],
+  "focus": [
+   "wohnt",
+   "ist"
+  ],
+  "zh": "关系从句：关系代词承担被修饰名词的格",
+  "level": "B2",
+  "formation": "der/die/das/welcher/welche/welches + 谓语动词（句尾）",
+  "notes": "介词 +关系代词要加尾附音 -r：der/die/das（关系到介词后时）→ dem/denen/deren。"
+ },
+ {
+  "key": "dgm_wartenaufdenkenan__883512",
+  "name": "带可分介词的动词（warten auf / denken an）",
+  "slug": "Verben mit Wechselpräposition (warten auf)",
+  "meaning": "separable verbs with their prefix at the clause end",
+  "type": "composite",
+  "examples": [
+   "Ich warte seit einer Stunde auf den Bus.",
+   "Wir freuen uns auf deinen Besuch."
+  ],
+  "example_zh": [
+   "我等公交车已经一个小时了。",
+   "我们很期待你的来访。"
+  ],
+  "focus": [
+   "warten"
+  ],
+  "zh": "可分动词的前缀后置到句尾",
+  "level": "A2",
+  "formation": "warten auf / sich freuen auf / denken an / sich interessieren für",
+  "notes": "前缀在句末，时态与情态动词仍变位在第二位：Ich warte auf dich。"
+ },
+ {
+  "key": "dgm_sichfreuenüber__2e382a",
+  "name": "反身动词（sich freuen über）",
+  "slug": "Reflexives Verb (sich freuen)",
+  "meaning": "reflexive verbs with sich",
+  "type": "composite",
+  "examples": [
+   "Ich freue mich über deine Einladung.",
+   "Wir interessieren uns für alte Möbel."
+  ],
+  "example_zh": [
+   "我很高兴收到你的邀请。",
+   "我们对旧家具感兴趣。"
+  ],
+  "focus": [
+   "sich"
+  ],
+  "zh": "德语大量动词是反身动词，须带 sich",
+  "level": "A2",
+  "formation": "sich + Verb（sich freuen / sich beeilen / sich interessieren）",
+  "notes": "反身代词随格变化：ich freue mich（第四格）、ich freue mich über ihn（第三格）。"
+ },
+ {
+  "key": "dgm_derdritteamdritten__fb7e45",
+  "name": "序数词（der dritte / am dritten）",
+  "slug": "Ordinalzahlen (der dritte)",
+  "meaning": "ordinal numbers and ordinal adverbs",
+  "type": "composite",
+  "examples": [
+   "Der dritte Mai ist ein Feiertag.",
+   "Wir treffen uns am zwanzigsten Mai."
+  ],
+  "example_zh": [
+   "五月三日是假日。",
+   "我们五月二十日见面。"
+  ],
+  "focus": [
+   "dritte"
+  ],
+  "zh": "序数词：1-19 加 -te，20 以上加 -ste",
+  "level": "A2",
+  "formation": "der/die/das + 序数词（zweiter/dritte/vierte ... zwanzigste）",
+  "notes": "1-3 的序数词不规则：erste/zweite/dritte（缩写 1./2./3.）；20 以上以 -zig 结尾的加 -ste。"
+ },
+ {
+  "key": "dgm_umneunUhr__7b4bb3",
+  "name": "钟点表达（um neun Uhr）",
+  "slug": "Uhrzeit (um neun Uhr)",
+  "meaning": "telling the time with Uhr",
+  "type": "composite",
+  "examples": [
+   "Der Zug fährt um neun Uhr ab.",
+   "Der Film beginnt um neun Uhr."
+  ],
+  "example_zh": [
+   "火车九点发车。",
+   "电影九点开始。"
+  ],
+  "focus": [
+   "neun",
+   "Uhr"
+  ],
+  "zh": "钟点用 Uhr，点钟用 vor/nach",
+  "level": "A1",
+  "formation": "um + 时间 + Uhr（缩写）/ vor halb / nach halb",
+  "notes": "整点直接用数字（um neun Uhr）；半点用 vor/nach + halb：halb neun = 8:30。"
+ },
+ {
+  "key": "dgm_keinkeineZeit__902781",
+  "name": "用 kein 的否定（keine Zeit）",
+  "slug": "Verneinung mit kein (keine Zeit)",
+  "meaning": "negating a noun with kein",
+  "type": "composite",
+  "examples": [
+   "Ich habe keine Zeit für dich.",
+   "Wir haben am Freitag keine Prüfung."
+  ],
+  "example_zh": [
+   "我没有时间陪你。",
+   "我们周五没有考试。"
+  ],
+  "focus": [
+   "keine"
+  ],
+  "zh": "否定名词用 kein / keine，不用 nicht",
+  "level": "A1",
+  "formation": "kein（阴性 keine / 第四格 keinen / 第三格 keinem）",
+  "notes": "nicht 否定动词、形容词和整句；kein 否定带冠词或零冠词的名词。"
+ }
+]
