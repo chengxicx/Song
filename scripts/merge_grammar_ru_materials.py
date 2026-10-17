@@ -52,8 +52,12 @@ LIBRARY = os.path.join(BASE, "lute", "jlpt_data", "grammar_ru.json")
 # Patterns that merely recombine two points which are merged separately.
 _SKIP_PATTERNS = set()
 
-# The material file, in the order the audit walks it.
-_MATERIAL_FILES = ("units.json",)
+# The material files, in the order the audit walks them.  More than one
+# because the corpus is built from more than one source; ``units.json`` is
+# the first extraction, ``units_ref.json`` a later one.  ``load_materials``
+# keys by the merged name, so a point both files describe is claimed by the
+# first one and never duplicated.
+_MATERIAL_FILES = ("units.json", "units_ref.json")
 
 # The panel fields the merge carries from the material, as (row field,
 # material field).  ``backfill`` uses the same list so a re-run repairs both.

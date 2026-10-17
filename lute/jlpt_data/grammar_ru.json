@@ -1692,5 +1692,930 @@
   "level": "A2",
   "formation": "没有人称意义的动词，现在时借用单数第三人称",
   "notes": "同类动词：светáет, темнéет, морóзит, дожди́т 等。"
+ },
+ {
+  "key": "rgm_вprepositionalвтуночьвэтоутро__c99599",
+  "name": "в + prepositional: в ту ночь, в это утро",
+  "slug": "в + 前置格（一夜／一个早上等特定时段）",
+  "meaning": "в + prepositional with parts of a day points to a particular such period: в ту ночь 'that night'.",
+  "type": "composite",
+  "examples": [
+   "в ту ночь",
+   "в это воскресное утро"
+  ],
+  "example_zh": [
+   "那天夜里",
+   "那个星期天的早上"
+  ],
+  "focus": [
+   "в",
+   "ту",
+   "ночь"
+  ],
+  "zh": "в 接前置格与表示一天某段时间的名词连用，指明是「哪一个」这样的时段：в ту ночь（那天夜里）、в это воскресное утро（那个星期天的早上）。",
+  "level": "A2",
+  "formation": "в + 名词前置格（в ту ночь, в это воскресное утро）",
+  "notes": "对比不带限定的 ночью（夜里）用第五格；表示反复出现用 по + 第三格（по ночам 每到夜里）。"
+ },
+ {
+  "key": "rgm_вprepositionalвмирноевремявзимнийсезон__56044d",
+  "name": "в + prepositional: в мирное время, в зимний сезон",
+  "slug": "в + 前置格（泛指一段时期、季节、年代）",
+  "meaning": "в + prepositional is used with general time expressions: в мирное время 'in peace time', в зимний сезон 'in the winter season'.",
+  "type": "composite",
+  "examples": [
+   "в мирное время",
+   "в зимний сезон",
+   "в старину"
+  ],
+  "example_zh": [
+   "在和平时期",
+   "在冬季",
+   "在古时候、在从前"
+  ],
+  "focus": [
+   "в",
+   "мирное",
+   "время"
+  ],
+  "zh": "v 接前置格与一般性的时间、季节、时代名词连用：в мирное время（和平时期）、в зимний сезон（冬季）、в старину（古时候）。",
+  "level": "A2",
+  "formation": "в + 名词前置格（в мирное время, в зимний сезон, в старину）",
+  "notes": "同类：в нашу эпоху（在我们这个时代）；对比 на этой неделе（有明确限定的周）。"
+ },
+ {
+  "key": "rgm_вprepositionalвмайскиепраздники__eccacb",
+  "name": "в + prepositional: в майские праздники",
+  "slug": "в + 前置格（节日名称之一：五一假期）",
+  "meaning": "The names of some festivals combine with в + prepositional: в майские праздники 'at the May festivities'.",
+  "type": "composite",
+  "examples": [
+   "в майские праздники"
+  ],
+  "example_zh": [
+   "在五一假期期间"
+  ],
+  "focus": [
+   "в",
+   "майские",
+   "праздники"
+  ],
+  "zh": "部分节日名称用 в + 前置格：в майские праздники（五一假期期间）。",
+  "level": "A2",
+  "formation": "в + 名词前置格（в майские праздники）",
+  "notes": "并非所有节日都用 в：на Рождество（圣诞节）用 на + 前置格。"
+ },
+ {
+  "key": "rgm_вaccusativeпогода__5a7a9c",
+  "name": "в + accusative: погода",
+  "slug": "в + 第四格（天气：在什么样的天气里）",
+  "meaning": "в + accusative is used to describe the weather: в плохую погоду 'in bad weather'.",
+  "type": "composite",
+  "examples": [
+   "в плохую погоду"
+  ],
+  "example_zh": [
+   "在坏天气里、天气恶劣时"
+  ],
+  "focus": [
+   "в",
+   "погоду"
+  ],
+  "zh": "描述天气时用 в + 第四格：в плохую погоду（天气不好时）；同类还有 в жару（炎热时）、в дождь（下雨时），均为第四格。",
+  "level": "A2",
+  "formation": "в + 名词第四格（в плохую погоду）",
+  "notes": "对比 в + 前置格表示天气所处的时段（в зимний сезон 在冬季）。"
+ },
+ {
+  "key": "rgm_вглубьgenitive__4697ac",
+  "name": "вглубь + genitive",
+  "slug": "вглубь + 第二格（向深处去）",
+  "meaning": "вглубь + genitive denotes movement into the depths of a space: вглубь лесов 'into the heart of the forest'.",
+  "type": "composite",
+  "examples": [
+   "вглубь лесов",
+   "вглубь материка"
+  ],
+  "example_zh": [
+   "到森林深处去",
+   "深入大陆腹地"
+  ],
+  "focus": [
+   "вглубь",
+   "лесов"
+  ],
+  "zh": "вглубь 接第二格表示深入到某空间的深处：вглубь лесов（进入森林深处）、вглубь материка（进入大陆腹地）。",
+  "level": "B1",
+  "formation": "вглубь + 名词第二格（вглубь лесов）",
+  "notes": "对比 вдоль + 第二格（沿着……）、поперёк + 第二格（横过……）、по + 第三格（沿着表面）。"
+ },
+ {
+  "key": "rgm_заinstrumentalзамужемзакем__4f6433",
+  "name": "за + instrumental: замужем за кем",
+  "slug": "за + 第五格（замужем за + 第五格：嫁给）",
+  "meaning": "за + instrumental is used in the expression замужем за + instrumental, 'to be married to'.",
+  "type": "composite",
+  "examples": [
+   "Она замужем за русским"
+  ],
+  "example_zh": [
+   "她嫁给了俄罗斯人"
+  ],
+  "focus": [
+   "за",
+   "русским"
+  ],
+  "zh": "за 接第五格用于 «замужем за кем»（嫁给某人）：她嫁给了俄罗斯人。",
+  "level": "B1",
+  "formation": "за + 名词第五格（Она замужем за русским）",
+  "notes": "对应 выйти замуж за + 第四格（嫁给），比较 с + 第五格「和……一起」。"
+ },
+ {
+  "key": "rgm_междуinstrumental__cbe87e",
+  "name": "между + instrumental",
+  "slug": "между + 第五格（在两者之间）",
+  "meaning": "между + instrumental denotes a position or time between two objects or points: между обедом и ужином 'between lunch and dinner'.",
+  "type": "composite",
+  "examples": [
+   "между обедом и ужином"
+  ],
+  "example_zh": [
+   "在午饭和晚饭之间（他休息了一会儿）"
+  ],
+  "focus": [
+   "между",
+   "обедом"
+  ],
+  "zh": "между 接第五格表示处在两者之间，可指空间也可指时间：между обедом и ужином（在午饭和晚饭之间，他休息了一下）。",
+  "level": "A2",
+  "formation": "между + 名词第五格（между обедом и ужином）",
+  "notes": "对比 среди + 第二格（在……环境之中），两者都表「在中间」但搭配不同。"
+ },
+ {
+  "key": "rgm_наслучайесли__1395fa",
+  "name": "на случай если",
+  "slug": "на случай если：以防万一",
+  "meaning": "на случай is followed by a conditional clause introduced by если, forming a set phrase meaning 'just in case'.",
+  "type": "composite",
+  "examples": [
+   "на случай если"
+  ],
+  "example_zh": [
+   "万一……的话；以防万一。"
+  ],
+  "focus": [
+   "на",
+   "случай",
+   "если"
+  ],
+  "zh": "на случай 后接 если 引导的条件从句，构成『以防万一』的固定说法。",
+  "level": "B2",
+  "formation": "на случай + если 引导的条件从句",
+  "notes": "同义固定短语：на всякий случай。条件连接词还有 раз（已由口语转入书面语）、коли/коль（口语、旧体）、коль скоро（论辩语气）。"
+ },
+ {
+  "key": "rgm_ненадоинфинитив__4bad81",
+  "name": "не надо + инфинитив",
+  "slug": "не надо / не нужно / не следует + 未完成体不定式（表示不宜、无必要）",
+  "meaning": "The imperfective infinitive combines with adverbs and impersonal expressions implying the inadvisability of an action or denying its necessity.",
+  "type": "composite",
+  "examples": [
+   "не надо",
+   "не нужно",
+   "не следует"
+  ],
+  "example_zh": [
+   "不必（做）",
+   "没必要（做）",
+   "不应该（做）"
+  ],
+  "focus": [
+   "не",
+   "надо"
+  ],
+  "zh": "не надо、не нужно、не следует、не стоит 等后面接未完成体不定式，表示某事不宜做、没有必要。",
+  "level": "B2",
+  "formation": "否定副词或短谓语副词（не надо、не нужно、не следует、не стоит）＋未完成体不定式",
+  "notes": "не стоит ‘做了也没用’；нельзя + 未完成体＝不许／不可以，нельзя + 完成体＝不可能。"
+ },
+ {
+  "key": "rgm_ненужноненадородительныйсрсимпприконкретномпредмете__ceabd0",
+  "name": "не нужно / не надо + родительный (ср. с им. п. при конкретном предмете)",
+  "slug": "не нужно / не надо + 第二格（泛指）对比 主格（特指）",
+  "meaning": "The impersonal construction не надо, не нужно takes the genitive in a general statement, whereas a specific object appears in the nominative.",
+  "type": "composite",
+  "examples": [
+   "Помощи не нужно",
+   "Ваша помощь не нужна"
+  ],
+  "example_zh": [
+   "不需要帮助",
+   "你的帮助用不上"
+  ],
+  "focus": [
+   "не",
+   "нужно"
+  ],
+  "zh": "泛指说不需要什么时用 не нужно / не надо + 第二格；特指某一具体东西时用主格加否定。",
+  "level": "B2",
+  "formation": "Помощи не нужно（не нужно + 第二格，泛指）；Ваша помощь не нужна（主格 + не нужна，特指）",
+  "notes": "对比第二格与主格：Помощи не нужно（泛指，不需要帮助）— Ваша помощь не нужна（特指，你这份帮助不需要）。"
+ },
+ {
+  "key": "rgm_неразниразу__e64358",
+  "name": "не раз / ни разу",
+  "slug": "не раз 与 ни разу：否定形式反而表示肯定（否极泰来）",
+  "meaning": "не раз, literally 'not once', idiomatically means more than once, whereas ни разу means not once at all.",
+  "type": "composite",
+  "examples": [
+   "Ни разу",
+   "не раз"
+  ],
+  "example_zh": [
+   "一次也没有。",
+   "不止一次。"
+  ],
+  "focus": [
+   "ни",
+   "разу"
+  ],
+  "zh": "не раз 字面是『不是一次』，实际却表示『不止一次』；ни разу 则表示『一次也没有』。",
+  "level": "B2",
+  "formation": "не + раз（不止一次）；ни разу（一次也没有）",
+  "notes": "同类：ничуть（一点也不）、не намного（强不了多少）。"
+ },
+ {
+  "key": "rgm_инфинитивпосленехочу__1fd01f",
+  "name": "инфинитив после не хочу",
+  "slug": "не хочу / нет желания / не думаю + 不定式",
+  "meaning": "Infinitives of either aspect are used after не хочу etc., the imperfective being preferred after a categorical negative and virtually compulsory after the impersonal reflexive не хотеться; a perfective infinitive here may denote an action taken unintentionally.",
+  "type": "verb",
+  "examples": [
+   "не хочу",
+   "нет желания",
+   "я не думаю"
+  ],
+  "example_zh": [
+   "我不想……",
+   "我没有……的意愿",
+   "我并不打算……"
+  ],
+  "focus": [
+   "не",
+   "хочу"
+  ],
+  "zh": "не хочу 等结构后两种体的不定式都能用，但彻底否定时偏好未完成体；无主语的 не хочется 后面几乎只能用未完成体。接完成体时，则表示某个动作并非有意为之。",
+  "level": "B1",
+  "formation": "表示“不想、不打算”的结构后两种体的不定式都能用，但彻底否定时优先未完成体；无主语的 не хочется 几乎只能配未完成体",
+  "notes": "Домой уходить (impf.) не хочется «我们不想回家」。"
+ },
+ {
+  "key": "rgm_Передinstrumental__711825",
+  "name": "Перед + instrumental",
+  "slug": "перед + 第五格（位于……前面）",
+  "meaning": "перед + instrumental denotes position in front of something: перед домом 'in front of the house'.",
+  "type": "composite",
+  "examples": [
+   "перед домом"
+  ],
+  "example_zh": [
+   "在房子前面"
+  ],
+  "focus": [
+   "перед",
+   "домом"
+  ],
+  "zh": "перед 接第五格表示位于某人或某物的前面：перед домом（在房子前面）。",
+  "level": "A2",
+  "formation": "перед + 名词第五格（перед домом）",
+  "notes": "对比 за + 第五格（在……之后）、напротив + 第二格（在……对面）；двигаться вперёд 用动词本身。"
+ },
+ {
+  "key": "rgm_померетогокак__166d81",
+  "name": "по мере того как",
+  "slug": "по мере того как：随着……（按比例、程度）",
+  "meaning": "По мере того как expresses proportion, 'as, in proportion as', and links two actions or processes advancing in parallel.",
+  "type": "composite",
+  "examples": [
+   "по мере того как"
+  ],
+  "example_zh": [
+   "随着……；越……越……"
+  ],
+  "focus": [
+   "по",
+   "мере",
+   "того",
+   "как"
+  ],
+  "zh": "по мере того как 表示比例和程度，意为『随着……，越……越……』，连接两个并行推进的过程。",
+  "level": "B2",
+  "formation": "по мере того, как + 从句",
+  "notes": "同类递进结构：чем…тем…（越……越……）；как вдруг 表示突然打断主句中正在进行的动作。"
+ },
+ {
+  "key": "rgm_поверхgenitive__909628",
+  "name": "поверх + genitive",
+  "slug": "поверх + 第二格（在某物之上、盖在……外面）",
+  "meaning": "поверх + genitive means 'over', i.e. on top of another object: поверх рубашки 'over his shirt'.",
+  "type": "composite",
+  "examples": [
+   "поверх рубашки"
+  ],
+  "example_zh": [
+   "在衬衫外面（他把毛衣穿在衬衫外面）"
+  ],
+  "focus": [
+   "поверх",
+   "рубашки"
+  ],
+  "zh": "поверх 接第二格表示「在……之上」，即压在外层：поверх рубашки（把毛衣穿在衬衫外面）。",
+  "level": "B1",
+  "formation": "поверх + 名词第二格（поверх рубашки）",
+  "notes": "对比 над + 第五格（表示空间位置「在……上方」，不涉及覆盖关系）。"
+ },
+ {
+  "key": "rgm_противнапротивgenitive__d20b95",
+  "name": "против / напротив + genitive",
+  "slug": "против + 第二格（与……相对、逆着）",
+  "meaning": "против and напротив mean 'opposite' and combine with verbs of state and movement: против часовой стрелки 'anti-clockwise'.",
+  "type": "composite",
+  "examples": [
+   "против течения",
+   "против часовой стрелки"
+  ],
+  "example_zh": [
+   "逆流（游泳）",
+   "逆时针"
+  ],
+  "focus": [
+   "против",
+   "течения"
+  ],
+  "zh": "против / напротив 接第二格表示「与……相对、相反」，常与状态和运动动词连用：против течения（逆流而上）、против часовой стрелки（逆时针）。",
+  "level": "B1",
+  "formation": "против + 名词第二格（против течения）",
+  "notes": "同类第二格前置词：напротив（对面）、посред（经由）、вдоль（沿着）、мимо（路过）、вокруг（周围）。"
+ },
+ {
+  "key": "rgm_сgenitiveсгорысодворасморяснеба__b2b023",
+  "name": "с + genitive: с горы, со двора, с моря, с неба",
+  "slug": "с + 第二格（地点：从高处／从某处下来）",
+  "meaning": "с + genitive, rather than от + genitive, is used with a number of places of origin: с горы 'downhill', со двора 'from the yard'.",
+  "type": "composite",
+  "examples": [
+   "с горы",
+   "со двора",
+   "с моря"
+  ],
+  "example_zh": [
+   "从山上下来；下坡",
+   "从院子里出来",
+   "从海上（登陆）"
+  ],
+  "focus": [
+   "с",
+   "горы"
+  ],
+  "zh": "表示从某些地点出来时用 с + 第二格，而不是 от + 第二格：с горы（从山上下来）、со двора（从院子里）、с моря（从海上）、с неба（从天上）。",
+  "level": "B1",
+  "formation": "с + 名词第二格（с горы, со двора, с моря）",
+  "notes": "同类：с неба（从天上）；对比 от дома（从家里）、от горы（来自那座山）。"
+ },
+ {
+  "key": "rgm_сgenitiveначаловремени__18b388",
+  "name": "с + genitive: начало времени",
+  "slug": "с + 第二格（时间的起点：自……以来）",
+  "meaning": "с + genitive denotes the starting point in time: с тех пор 'since then'.",
+  "type": "composite",
+  "examples": [
+   "с тех пор",
+   "с минуты на минуту",
+   "с часу на час"
+  ],
+  "example_zh": [
+   "从那以后、从此",
+   "随时、眼看就要",
+   "时时刻刻、一会儿比一会儿"
+  ],
+  "focus": [
+   "с",
+   "тех",
+   "пор"
+  ],
+  "zh": "с 接第二格表示时间的起点，即「自……以来、从……起」：с тех пор（从那以后）、с минуты на минуту（随时、眼看就要）、с часу на час（时时刻刻）。",
+  "level": "B1",
+  "formation": "с + 名词第二格（с тех пор, с минуты на минуту）",
+  "notes": "与 до + 第二格（时间的终点）配对，构成 с … до … 的起止结构。"
+ },
+ {
+  "key": "rgm_средиgenitive__757f30",
+  "name": "среди + genitive",
+  "slug": "средь + 第二格（在……之中、处于……环境里）",
+  "meaning": "среди + genitive places an event within its surrounding environment: средь бела дня 'in broad daylight'.",
+  "type": "composite",
+  "examples": [
+   "средь бела дня"
+  ],
+  "example_zh": [
+   "在大白天、光天化日之下"
+  ],
+  "focus": [
+   "средь",
+   "бела",
+   "дня"
+  ],
+  "zh": "средь 接第二格表示「在……之中、在……的环境之下」，常用于成语和书面语：средь бела дня（大白天、光天化日之下）。",
+  "level": "B1",
+  "formation": "средь + 名词第二格（средь бела дня）",
+  "notes": "书面语中也用 среди（среди ночи 在半夜里）；同类第二格前置词：посред（经由）、вокруг（周围）、мимо（路过）。"
+ },
+ {
+  "key": "rgm_чемтем__a4150f",
+  "name": "чем ... , тем ...",
+  "slug": "чем…тем… 双重比较结构，表示「越…越…」",
+  "meaning": "Constructions of the type 'the bigger the better' are rendered by чем . . ., тем . . .",
+  "type": "composite",
+  "examples": [
+   "Тем лучше"
+  ],
+  "example_zh": [
+   "那可更好"
+  ],
+  "focus": [
+   "Тем",
+   "лучше"
+  ],
+  "zh": "「越……越……」这类结构用 чем…тем… 表示，第二个比较级的含义由语境决定。",
+  "level": "B2",
+  "formation": "чем + 比较级, тем + 比较级；两个比较级可以对应，也可以由语境决定",
+  "notes": ""
+ },
+ {
+  "key": "rgm_черезaccusative__0f1f5a",
+  "name": "через + accusative",
+  "slug": "через + 第四格（穿过、从一边到另一边）",
+  "meaning": "через means 'through', 'across', 'from one side to the other', often with a verb prefixed пере-.",
+  "type": "composite",
+  "examples": [
+   "перебежать через дорогу"
+  ],
+  "example_zh": [
+   "跑过马路"
+  ],
+  "focus": [
+   "через",
+   "дорогу"
+  ],
+  "zh": "через 接第四格表示「穿过、从一边到另一边」，也常与带前缀 пере- 的动词连用：перебежать через дорогу（跑过马路）。",
+  "level": "A2",
+  "formation": "через + 名词第四格（через дорогу）",
+  "notes": "сквозь + 第四格也表「穿过」，但强调过程有阻力、困难（сквозь лес 穿过树林）。"
+ },
+ {
+  "key": "rgm_ввидувследствиевсилутогочто__7838c3",
+  "name": "ввиду / вследствие / в силу того, что",
+  "slug": "书面语因果复合连接词：前置词 + того, что",
+  "meaning": "The formal causal connectives ввиду того, что, вследствие того, что and в силу того, что belong to written style; благодаря тому, что goes with favourable causes, из-за того, что with unfavourable ones, and оттого, что with involuntary causes.",
+  "type": "composite",
+  "examples": [
+   "Ввиду того, что",
+   "вследствие того, что",
+   "в силу того, что"
+  ],
+  "example_zh": [
+   "鉴于……",
+   "由于……",
+   "基于……"
+  ],
+  "focus": [
+   "Ввиду",
+   "того",
+   "что"
+  ],
+  "zh": "ввиду того, что、вследствие того, что、в силу того, что 属书面语因果连接词；благодаря тому, что 多与有利原因搭配，из-за того, что 多与不利原因搭配，оттого, что 表示非自愿的原因。",
+  "level": "C1",
+  "formation": "ввиду / вследствие / в силу + того, что + 从句",
+  "notes": "口语中常用 потому что；书面语因果连接词后面的从句要用完整的语法形式。"
+ },
+ {
+  "key": "rgm_приставкасоответствующийпредлог__25fb66",
+  "name": "приставка + соответствующий предлог",
+  "slug": "动词前缀与同形前置词相对应（от-…от、при-…к）",
+  "meaning": "Prefixes are important elements in Russian word formation, and most of them are associated with particular prepositions, which the verb then governs.",
+  "type": "composite",
+  "examples": [
+   "отвязать от",
+   "привязать к"
+  ],
+  "example_zh": [
+   "解开（与……的）连接",
+   "拴到……上"
+  ],
+  "focus": [
+   "отвязать",
+   "от"
+  ],
+  "zh": "动词前缀是俄语构词的重要手段；多数前缀与某个同形前置词相对应，动词本身也支配这个前置词，如 отвязать от、привязать к。",
+  "level": "B2",
+  "formation": "多数动词前缀与某个前置词同形，并支配该前置词：отвязать от（与……解开）、привязать к（拴到……上）",
+  "notes": "有的前缀只出现在完成体里；同一个词根最多可附加十几个前缀，各自带来不同的意义。"
+ },
+ {
+  "key": "rgm_единственноеилимножественноечислоприперечислении__fe1cfa",
+  "name": "единственное или множественное число при перечислении",
+  "slug": "单数形容词只限定并列名词中的第一个；要兼指所有名词则用复数",
+  "meaning": "A singular adjective relates only to the first of the nouns named; a plural adjective is used if it relates to all the nouns named.",
+  "type": "composite",
+  "examples": [
+   "каменный дом и гараж",
+   "каменные дом и гараж"
+  ],
+  "example_zh": [
+   "石砌的房子和车库（只有房子是石头的）",
+   "石砌的房子和石砌的车库"
+  ],
+  "focus": [
+   "каменный",
+   "дом",
+   "гараж"
+  ],
+  "zh": "单数形容词只修饰并列名词中的第一个；若该性质同时属于所有被列举的名词，形容词必须用复数。",
+  "level": "B1",
+  "formation": "каменный дом и гараж（形容词只管第一个名词）；каменные дом и гараж（形容词管两个名词）",
+  "notes": ""
+ },
+ {
+  "key": "rgm_единственноечислоприперечислениисуществительных__607bd2",
+  "name": "единственное число при перечислении существительных",
+  "slug": "单数形容词（代词）明显泛指后面所有并列名词时，只与第一个名词一致",
+  "meaning": "A singular adjective or pronoun may be used if it is obvious that it relates to all the nouns named; it then agrees with the first of them.",
+  "type": "composite",
+  "examples": [
+   "написать свою фамилию, имя и отчество"
+  ],
+  "example_zh": [
+   "写下自己的姓、名和父称"
+  ],
+  "focus": [
+   "свою",
+   "фамилию",
+   "имя",
+   "отчество"
+  ],
+  "zh": "当单数形容词或代词明显泛指后面列举的全部名词时，它只与第一个名词保持一致（性、数）。",
+  "level": "B2",
+  "formation": "形容词（单数，性数取第一个名词） + 名词₁ + и / или + 名词₂ …",
+  "notes": "若要明确表示该性质同样属于第二个名词，形容词就要改用复数。"
+ },
+ {
+  "key": "rgm_аппозицияназваниегородаирекисклоняетсявместесродовымсловом__5fcdd3",
+  "name": "аппозиция: название города и реки склоняется вместе с родовым словом",
+  "slug": "同位语中城市名、河流名与前面的普通名词一起变格",
+  "meaning": "In referring to the names of Russian towns and rivers both the generic term and the proper name decline; foreign town names decline as well.",
+  "type": "composite",
+  "examples": [
+   "городе Москве",
+   "реке Днепре",
+   "городе Париже"
+  ],
+  "example_zh": [
+   "在莫斯科市",
+   "在第聂伯河上",
+   "在巴黎市"
+  ],
+  "focus": [
+   "городе",
+   "Москве"
+  ],
+  "zh": "提到俄罗斯城镇和河流时，普通名词和地名一起变格；外国城镇名也同样变格。",
+  "level": "B2",
+  "formation": "в городе Москве（в городе + 地名第二格）；на реке Днепре（на реке + 地名第二格）",
+  "notes": "河流名同此：реке Северный Донец（第聂伯河东岸那条河上）。对比：不是城镇和河流的其他地名只变格普通名词。"
+ },
+ {
+  "key": "rgm_суффикснный__142aab",
+  "name": "суффикс -н- (-ный)",
+  "slug": "名词加后缀 -н- 构成形容词（-н- 前 г, к, х, ц, л 发生辅音交替）",
+  "meaning": "Unlike English, Russian adjectives derive from nouns mainly by suffixation; the commonest suffix is -н-, before which г, к, х, ц and л undergo mutation.",
+  "type": "composite",
+  "examples": [
+   "чайная чашка",
+   "комнатная температура",
+   "местный наркоз"
+  ],
+  "example_zh": [
+   "茶杯",
+   "室温",
+   "局部麻醉"
+  ],
+  "focus": [
+   "чайная",
+   "чашка"
+  ],
+  "zh": "俄语形容词主要由名词加后缀构成，最常见的后缀是 -н-；在 -н- 之前 г、к、х、ц、л 等辅音要发生交替（г→ж, к→с, х→ш, ц→ц）。",
+  "level": "B1",
+  "formation": "名词 + -н- + 形容词后缀（-ный / -ная / -ное / -ные）；在 -н- 之前 г→ж, к→с, х→ш, ц→ц, л→л 交替",
+  "notes": "另有两个常见后缀：-ск-（多来自专名、地名）与 -ов-/-ев-（来自 роза、нейлон、звук 等）。"
+ },
+ {
+  "key": "rgm_звательныйпадежвыражаетсяименительным__c9893a",
+  "name": "звательный падеж выражается именительным",
+  "slug": "呼格用主格形式表示",
+  "meaning": "Russian has no distinct vocative: vocative meanings are expressed by the nominative. Relics of the former vocative survive only in certain ecclesiastical terms, now used as exclamations.",
+  "type": "composite",
+  "examples": [
+   "Иван Фёдорович!",
+   "Боже мой!"
+  ],
+  "example_zh": [
+   "伊万·费多罗维奇！",
+   "我的天哪！"
+  ],
+  "focus": [
+   "Иван",
+   "Фёдорович"
+  ],
+  "zh": "俄语没有独立的呼格，呼称用主格表示；旧呼格只残留在一些教会用语里，现在多作感叹语。",
+  "level": "B2",
+  "formation": "呼格 = 主格：Иван Фёдорович!（名字+父称不变格）；教会用语作感叹语：Боже мой!",
+  "notes": "口语中还常见把称呼截短的呼语形式（由名字、昵称截短而来）。"
+ },
+ {
+  "key": "rgm_творительныйвзначлениифункциииорудия__a10f21",
+  "name": "творительный в значлении функции и орудия",
+  "slug": "工具、功能第五格：表示动作所用的工具、材料、器官",
+  "meaning": "A noun is placed in the instrumental case to denote that the object it represents is being used to perform a function.",
+  "type": "composite",
+  "examples": [
+   "горячей водой"
+  ],
+  "example_zh": [
+   "用热水（洗）"
+  ],
+  "focus": [
+   "горячей",
+   "водой"
+  ],
+  "zh": "表示动作所借助的工具、材料或身体器官时，名词用第五格。",
+  "level": "B1",
+  "formation": "动词 + 名词第五格：мыться водой, писать ручкой, рубить топором",
+  "notes": "同类：писать пером（用钢笔写）、рубить топором（用斧子砍）。"
+ },
+ {
+  "key": "rgm_суффиксыоватыйеватый__4b0982",
+  "name": "суффиксы -оватый / -еватый",
+  "slug": "形容词加 -оватый/-еватый 表示「有点…」「略带…」的减弱与评价色彩",
+  "meaning": "These diminutives are formed only from certain adjectives and acquire an evaluative nuance, mitigating the quality expressed.",
+  "type": "composite",
+  "examples": [
+   "дороговатая квартира",
+   "холодноватая погода"
+  ],
+  "example_zh": [
+   "挺贵的房子",
+   "有点凉的天气"
+  ],
+  "focus": [
+   "дороговатая",
+   "квартира"
+  ],
+  "zh": "这种弱化形式只能由一部分形容词构成，表示「有点、略微」，并带有评价色彩。",
+  "level": "B2",
+  "formation": "形容词 + -оватый / -еватый（阳性 -оватый，阴性 -оватая，中性 -оватое，复数 -оватые）；并非所有形容词都能构成",
+  "notes": "如 старый → староватый、глупый → глуповатый 可以构成，而 молодой、умный 不能；口语中再加 -еньк- 可达最强表情色彩（глуховатенький）。"
+ },
+ {
+  "key": "rgm_краткоеприлагательноепредложныйоборот__66942d",
+  "name": "краткое прилагательное + предложный оборот",
+  "slug": "性质被前置词短语限定（划定范围）时，形容词用短尾形式",
+  "meaning": "The short form is also used when the quality expressed by the adjective is delimited by a prepositional phrase.",
+  "type": "composite",
+  "examples": [
+   "хром на (правую ногу)"
+  ],
+  "example_zh": [
+   "右腿有点跛"
+  ],
+  "focus": [
+   "хром",
+   "на"
+  ],
+  "zh": "当形容词所表示的性质被一个前置词短语限定、划出范围时，要用短尾形式。",
+  "level": "B2",
+  "formation": "形容词短尾 + 前置词短语，如 хром на + ногу；短语把该性质限制在一定范围内",
+  "notes": "常见同类短语：способен к（擅长）、по форме（在形状上）。"
+ },
+ {
+  "key": "rgm_глаголысдательнымиодноимённыесуществительные__384ccc",
+  "name": "глаголы с дательным и одноимённые существительные",
+  "slug": "支配第三格的动词，及其同源名词也接第三格",
+  "meaning": "Verbs such as помогать, вредить, верить, радоваться, принадлежать take the dative; many verbal and other nouns cognate with them (обучение, помощь, угроза, сочувствие) also take the dative.",
+  "type": "composite",
+  "examples": [
+   "русскому языку",
+   "чужому горю"
+  ],
+  "example_zh": [
+   "俄语（俄语的学习、教学）",
+   "对别人的痛苦（表示同情）"
+  ],
+  "focus": [
+   "русскому",
+   "языку"
+  ],
+  "zh": "помогать、вредить、верить、радоваться、принадлежать 等动词接第三格；与它们同源的名词（学习、帮助、威胁、同情）也接第三格。",
+  "level": "B1",
+  "formation": "помогать（кому? 第三格）、радоваться（чему? 第三格）；обучение（чему?）、сочувствие（кому?）、угроза（кому?）同样接第三格",
+  "notes": "同类名词：помощь, содействие, угроза, подражание。"
+ },
+ {
+  "key": "rgm_творительныйвобстоятельствеобразаипути__ec6750",
+  "name": "творительный в обстоятельстве образа и пути",
+  "slug": "方式第五格：表示动作的方式方法、经过的路径",
+  "meaning": "The instrumental is used to denote movement through space or time, the route covered in a journey, and the manner in which an action is performed.",
+  "type": "composite",
+  "examples": [
+   "сухим путём",
+   "своей дорогой"
+  ],
+  "example_zh": [
+   "从陆路（走旱路）",
+   "各走各的路、按自己的方式"
+  ],
+  "focus": [
+   "сухим",
+   "путём"
+  ],
+  "zh": "第五格可表示经过的路线（路径）以及动作进行的方式方法。",
+  "level": "B1",
+  "formation": "第五格表方式/路径：сухим путём（从陆路）、своей дорогой（按自己的路子）",
+  "notes": "表时间同样用第五格：третьим днём（每隔三天）。"
+ },
+ {
+  "key": "rgm_приставкинаиу__a88046",
+  "name": "приставки на- и у-",
+  "slug": "某些前缀与特定语义场绑定（на- 与印刷书写绘画，у- 与感知）",
+  "meaning": "Prefix choice is not always arbitrary: some prefixes are tied to particular meanings, e.g. на- with printing, writing and drawing, у- with verbs of perception.",
+  "type": "composite",
+  "examples": [
+   "на печатать, на писать, на рисовать",
+   "у видеть, у знать, у слышать"
+  ],
+  "example_zh": [
+   "印、书写、绘画（加 на- 构成完成体）",
+   "看清、了解、听清（加 у- 构成完成体）"
+  ],
+  "focus": [
+   "на",
+   "печатать"
+  ],
+  "zh": "前缀的选择并非完全随意：有些前缀与特定意义绑定，如 на- 常配印刷、书写、绘画类动词，у- 常配看、听、知等感知类动词。",
+  "level": "B2",
+  "formation": "на- + 印刷、书写、绘画类动词（на печатать, на писать, на рисовать）；у- + 感知类动词（у видеть, у знать, у слышать）",
+  "notes": "同类还有 в- 用于放入、под- 用于接触表面等。"
+ },
+ {
+  "key": "rgm_другдругавзаимновозвратноеместоимение__f0a4ed",
+  "name": "друг друга (взаимно-возвратное местоимение)",
+  "slug": "相互代词 друг друга：друг 不变，后一部分按前置词变格，前置词置于中间",
+  "meaning": "The reciprocal pronoun has an invariable first part and a second part governed by the verb, adjective or preposition; the preposition stands in the middle, between the two parts. Only singular forms are used.",
+  "type": "composite",
+  "examples": [
+   "вблизѝ дрỳг друга",
+   "благодаря дрỳг другу",
+   "навстречу дрỳг другу"
+  ],
+  "example_zh": [
+   "彼此靠近。",
+   "多亏了彼此。",
+   "相向而行，迎面相遇。"
+  ],
+  "focus": [
+   "вблизѝ",
+   "дрỳг",
+   "друга"
+  ],
+  "zh": "相互代词由不变格的前一半和受动词、形容词、前置词支配的后一半组成；前置词插在两半之间。这类代词只有单数形式，没有复数。",
+  "level": "B2",
+  "formation": "前置词（不变格）+ друг（不变格）+ 第二部分按前置词要求变格：друг друга / друг другу",
+  "notes": "某些次级前置词也把 друг 放在中间：вопреки дрỳг другу（与彼此相反）。друг друга 还可作定语表示『彼此的』。"
+ },
+ {
+  "key": "rgm_сравнительнаястепеньвролинаречия__b786c9",
+  "name": "сравнительная степень в роли наречия",
+  "slug": "短尾比较级可作副词用；与形容词比较级的区别只在于句法功能",
+  "meaning": "Many short-form comparatives also function as adverbs; the distinction between comparative adjective and comparative adverb is syntactic only.",
+  "type": "composite",
+  "examples": [
+   "Эта книга интереснее , чем та",
+   "Эта книга написана интереснее , чем та"
+  ],
+  "example_zh": [
+   "这本书比那本有意思",
+   "这本书写得比那本有意思"
+  ],
+  "focus": [
+   "написана",
+   "интереснее",
+   "чем"
+  ],
+  "zh": "许多短尾比较级也可以作副词用；它与形容词比较级的区别只体现在句法上——作状语还是作表语。",
+  "level": "B2",
+  "formation": "短尾比较级本身不变形；作副词时修饰动词，作形容词时作表语",
+  "notes": "短尾比较级还可以用作插入语。"
+ },
+ {
+  "key": "rgm_немыт__19d72a",
+  "name": "не мыт",
+  "slug": "短形被动分词的中性形式作无人称谓语（多用于否定）",
+  "meaning": "The neuter short forms of the perfective passive participles of certain verbs can be used impersonally; imperfective participles of this type are found in colloquial speech, mainly in the negative.",
+  "type": "composite",
+  "examples": [
+   "не мыт",
+   "не глажено"
+  ],
+  "example_zh": [
+   "（地板）没有擦过。",
+   "（衣服）没有熨过。"
+  ],
+  "focus": [
+   "не",
+   "мыт"
+  ],
+  "zh": "某些完成体被动分词的中性短形可以作无人称谓语，主语被省略；未完成体分词的这种用法只出现在口语中，而且多用于否定式。",
+  "level": "C1",
+  "formation": "某些完成体被动分词的中性短形可单独作谓语、不带主语（пол не мыт）；未完成体中这种用法只见于口语，且多出现在否定式里",
+  "notes": "肯定形式也有，但较少见，须按具体动词的意义理解。"
+ },
+ {
+  "key": "rgm_вкакомгодувдвухтысячномгоду__c0941a",
+  "name": "в каком году? — в двухтысячном году",
+  "slug": "问『在哪一年』：в + 序数词（前置格）",
+  "meaning": "The question В каком году? 'in which year?' is answered by the preposition в followed by the ordinal in the prepositional case.",
+  "type": "composite",
+  "examples": [
+   "в тысяча девятисотом году",
+   "в тысяча девятьсот пятидесятом году",
+   "в две тысячи пятнадцатом году"
+  ],
+  "example_zh": [
+   "在 1900 年。",
+   "在 1950 年。",
+   "在 2015 年。"
+  ],
+  "focus": [
+   "в",
+   "тысяча",
+   "году"
+  ],
+  "zh": "问『在哪一年』用前置词 в 加序数词的前置格形式。",
+  "level": "A2",
+  "formation": "前置词 в + 形容词性序数词或序数短语（前置格）",
+  "notes": "同类说法：в этом году、в прошлом году、в будущем году。"
+ },
+ {
+  "key": "rgm_Какойгоддвухтысячныйгод__c9cee8",
+  "name": "Какой год? — двухтысячный год",
+  "slug": "问年份 Какой год?：用形容词性序数词 + год（主格）回答",
+  "meaning": "The question Какой год? 'Which year is it?' is answered by an ordinal in its adjectival form followed by год in the nominative.",
+  "type": "composite",
+  "examples": [
+   "двухтысячный год"
+  ],
+  "example_zh": [
+   "现在是 2000 年。"
+  ],
+  "focus": [
+   "двухтысячный",
+   "год"
+  ],
+  "zh": "问『是哪一年』用 Какой год?，回答时用形容词性序数词加主格 год，如 двухтысячный год（2000 年）。",
+  "level": "A2",
+  "formation": "形容词性序数词（或由数词构成的形容词）作定语 + год 主格",
+  "notes": "问日期用 Какое число?，答以中性序数词（主格）+ 月名（属格）；问『几号』用 Какого числа?。"
+ },
+ {
+  "key": "rgm_аппозициясклоняетсятолькородовоеслово__1b1ba0",
+  "name": "аппозиция: склоняется только родовое слово",
+  "slug": "非城镇、非河流的地名作同位语：只变格普通名词，地名保持原形",
+  "meaning": "With place names other than those of towns and rivers it is normal to decline only the generic term, leaving the proper name undeclined.",
+  "type": "composite",
+  "examples": [
+   "города Мэнстон",
+   "Одесса и Новороссийск"
+  ],
+  "example_zh": [
+   "在曼斯顿镇",
+   "（航次）在敖德萨和诺沃罗西斯克两个港口之间"
+  ],
+  "focus": [
+   "города",
+   "Мэнстон"
+  ],
+  "zh": "除城镇名和河流名外，其他地名作同位语时只变前面的普通名词（город、порт 等），地名本身不变格。",
+  "level": "B2",
+  "formation": "у города Мэнстон（у города 变格，地名不变）；между портами Одесса и Новороссийск（портами 变格）",
+  "notes": "同类：в деревне, на озере, в графстве, на острове, из порта；只有省去普通名词时，地名才变格。"
  }
 ]
