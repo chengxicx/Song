@@ -232,7 +232,7 @@ _ENGINE_REQUIREMENTS = [
     ("Mandarin Chinese", is_mandarin_chinese_language, (), "chinese"),
     ("Cantonese", is_cantonese_language, (), "cantonese"),
     ("English", is_english_language, ("spacy", "en_core_web_sm"), "english"),
-    ("Spanish", is_spanish_language, ("spacy", "es_core_news_sm"), "spanish"),
+    ("Spanish", is_spanish_language, ("spacy", "es_core_news_md"), "spanish"),
     ("Russian", is_russian_language, ("pymorphy3",), "russian"),
     ("French", is_french_language, ("spacy", "fr_core_news_sm"), "french"),
     ("German", is_german_language, ("spacy", "de_core_news_sm"), "german"),
@@ -253,7 +253,7 @@ _ENGINE_INSTALL_SPECS = {
     ],
     "spanish": [
         "spacy>=3.8.0,<3.8.4",
-        "es-core-news-sm@https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl",
+        "es-core-news-md@https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl",
     ],
     "french": [
         "spacy>=3.8.0,<3.8.4",
