@@ -529,17 +529,33 @@ _RU_RULES = [
 # Rows merged from a local grammar-point extraction land in
 # jlpt_data/grammar_ru.json.  The matcher for each row is derived from its
 # `focus` list -- the word forms the point is stated with, e.g.
-# ["у", "меня", "есть"].  Two candidate specs are built, one on those
-# surface forms and one on their lemmas, because Russian inflection cuts
-# both ways: an example may carry a form whose lemma a lemma-match needs,
-# and pymorphy3's context-free reading sometimes gives a different normal
-# form than the surface.
+# ["у", "меня", "есть"].
 #
-# Every candidate is then validated against the row's own example sentences
-# with the SAME matcher the panel runs, and a row whose specs fire on none
-# of its examples is dropped -- so a mis-derived focus can never report a
-# false positive.  A one-word focus is kept only when the word is long
-# enough to be specific (a bare `у` would fire on every page).
+# Three families of spec are built, because Russian inflection cuts both
+# ways and a literal spec is pinned to one surface form:
+#
+#   1. a literal `seq` on the surface forms -- narrowest, matches only the
+#      book's own phrasing ("между обедом");
+#   2. a literal `seq` on the lemmas -- for the case where pymorphy3's
+#      context-free normal form differs from the surface;
+#   3. an **inflected** `seq` that keeps function words literal and replaces
+#      every inflected word with its POS plus the features a grammar point
+#      actually turns on.  This is what makes a row about "между +
+#      instrumental" fire on "между друзьями": the literal spec cannot,
+#      since it is pinned to one noun form.
+#
+# A gapped `left/right` spec is the **last resort**, and only when nothing
+# contiguous matched: a focus whose words do not sit next to each other
+# ("мужчина ... жёны") cannot fire a seq at all, and those rows were being
+# dropped silently.  It is a fallback rather than an addition because it is
+# wider -- offered unconditionally it would loosen rows that are already
+# tight.
+#
+# Every candidate is validated against the row's own example sentences with
+# the SAME matcher the panel runs, and a row whose specs fire on none of its
+# examples is dropped -- so a mis-derived focus can never report a false
+# positive.  A one-word focus is kept only when the word is long enough to
+# be specific (a bare `у` would fire on every page).
 #
 # Focus literals are stripped of stress marks (U+0300-036F) first: the
 # source text keeps them, and `\w` does not match a combining acute, so an
@@ -549,6 +565,24 @@ _STRESS_RE = re.compile(r"[\u0300-\u036f]")
 
 # key -> the examples a data rule was validated against (tests re-run this).
 _RU_RULE_EXAMPLES = {}
+
+# The morph features a grammar point turns on.  Case is the whole point of
+# a preposition row ("между + instrumental"), and tense/person/mood carry
+# the verb points; number and gender are deliberately dropped, since the
+# same construction legitimately spans them ("между обедом" and "между
+# друзьями" are the same rule).
+#
+# ⚠️ The keys are capitalised because that is how ``_gramemes`` stores them
+# (``Tense``, ``Case``), and a lowercase key silently filters everything out
+# -- leaving an **empty** ``{"morph": {}}`` spec, and an empty morph subset
+# matches *every* token.  That single case mistake turned the whole data
+# layer into noise: one phrase fired 15 unrelated rules.
+_POINT_FEATURES = ("Case", "Tense", "Person", "Mood", "Voice", "Aspect")
+
+# A compound focus word ("из-за", "в течение") is tokenised into its parts
+# by _WORD_RE, so a single literal spec for it could never match: the
+# matcher compares spec to token, and there is no "из-за" token.
+_COMPOUND_RE = re.compile(r"[-‐‑]")
 
 
 def _strip_stress(text):
@@ -583,17 +617,145 @@ def _focus_words(focus):
     return words
 
 
-def _focus_specs(focus):
-    "Candidate matcher specs derived from one row's focus list."
+def _literal_specs(words, lemma=False):
+    """
+    Literal seq over the focus words.
+
+    A compound focus word is split on its hyphen, because ``_WORD_RE``
+    tokenises "из-за" into two tokens and a single spec for it could never
+    match anything.
+    """
+    specs = []
+    for w in words:
+        parts = [p for p in _COMPOUND_RE.split(w) if p]
+        if len(parts) > 1:
+            specs.extend(spec_lemma(p) if lemma else spec_surface(p) for p in parts)
+        else:
+            specs.append(spec_lemma(w) if lemma else spec_surface(w))
+    return {"seq": specs}
+
+
+def _inflected_specs(words, examples):
+    """
+    Case-only seq that keeps function words literal.
+
+    The reading of a word differs by sentence, so one candidate per example
+    is produced and the caller keeps whichever the matcher actually fires.
+    A word pymorphy3 reports with an empty morph is a function word (a
+    preposition, conjunction or particle carries no case of its own) and is
+    kept literal; everything else is replaced by the features a grammar
+    point turns on.
+
+    ⚠️ The POS is deliberately **not** kept.  "между + instrumental" is the
+    same rule whether the instrumental is a noun ("между обедом"), an
+    adjective ("между русским"), a pronoun ("между нами") or a numeral
+    ("между двух огней"); pinning the POS drops three of the four.  Case
+    alone is what the construction actually turns on.
+
+    ⚠️ A spec is only offered when the focus keeps **at least one literal
+    anchor**.  A row whose focus is all content words ("чайная чашка",
+    "Весна. Ночь. Тишина.") would otherwise degrade to a bare case sequence
+    with nothing to pin it, and a bare ``{"morph": {"Case": "accs"}}`` fires
+    on every accusative token in the page -- that mistake took the panel
+    from a median of 6 to 17 entries per page.  The function-word anchor is
+    what makes the generalisation safe.
+
+    A focus word missing from the sentence falls back to the literal spec,
+    so a row still gets a candidate rather than silently losing one.
+    """
+    out = []
+    for sentence in examples:
+        text = _strip_stress(sentence)
+        tokens = _tokens_for(text)
+        by_surface = {}
+        for tok in tokens:
+            by_surface.setdefault(tok["surface"].lower(), tok)
+        seq = []
+        anchored = 0
+        for w in words:
+            tok = by_surface.get(w)
+            point = None
+            if tok is not None and tok["morph"]:
+                point = {k: tok["morph"][k] for k in _POINT_FEATURES
+                         if k in tok["morph"]}
+            if point:
+                seq.append({"morph": point})
+            else:
+                # Function word (no case of its own), a word whose morph
+                # carries no point feature at all, or a compound whose parts
+                # the surface index cannot see: keep it literal.  Never emit
+                # an empty {"morph": {}} -- an empty subset matches any
+                # token, so the spec would fire on everything.
+                literals = [spec_surface(p) for p in _COMPOUND_RE.split(w) if p]
+                anchored += len(literals)
+                seq.extend(literals)
+        # Only a spec with a literal anchor is specific enough to publish.
+        if seq and anchored:
+            out.append({"seq": seq})
+    return out
+
+
+def _gapped_specs(words, examples):
+    """
+    Gapped spec for a focus whose words do not sit next to each other.
+
+    The anchors are the **first and last** focus words, not the closest
+    pair.  A row stated as "мужчина ... жёны" has "взять" and "жёны" only
+    one word apart, but the grammar point spans the whole phrase, and
+    pinning just the tight pair throws away what makes the row recognisable
+    -- it also produced nonsense anchors when a word repeats, since the
+    first occurrence of "кто-то" is "кто", not the pair the row means.
+
+    Only reached when nothing contiguous matched (see _row_specs), so it
+    never loosens a row that a literal spec already covers.
+    """
+    first = next((p for w in words[:1] for p in _COMPOUND_RE.split(w) if p), None)
+    last = next((p for p in reversed(_COMPOUND_RE.split(words[-1])) if p), None)
+    if not first or not last:
+        return []
+    for sentence in examples:
+        text = _strip_stress(sentence)
+        surfaces = [t["surface"].lower() for t in _tokens_for(text)]
+        if first in surfaces and last in surfaces:
+            gap = surfaces.index(last) - surfaces.index(first) - 1
+            return [
+                {
+                    "left": [spec_surface(first)],
+                    "right": [spec_surface(last)],
+                    "min_gap": 0,
+                    # Slack for a different sentence, but nowhere near the
+                    # default 8: the point is to stay near the span the book
+                    # actually wrote.
+                    "max_gap": min(gap + 2, 8),
+                }
+            ]
+    return []
+
+
+def _row_specs(focus, examples):
+    """
+    The matcher specs for one library row.
+
+    Literal first (narrowest), then the inflected variants that generalise
+    across the noun forms a construction takes, then -- only if nothing
+    contiguous fired -- a gapped fallback.  Each candidate is checked with
+    the same matcher the panel runs, so a spec the data does not support
+    never reaches a reader.
+    """
     words = _focus_words(focus)
     if not words:
         return []
     if len(words) == 1 and len(words[0]) < 4:
         return []  # a bare short word fires everywhere -- never specific
-    return [
-        {"seq": [spec_surface(w) for w in words]},
-        {"seq": [spec_lemma(w) for w in words]},
+    candidates = [
+        _literal_specs(words),
+        _literal_specs(words, lemma=True),
     ]
+    candidates.extend(_inflected_specs(words, examples))
+    live = [s for s in candidates if _flash(s, examples)]
+    if live:
+        return live
+    return [s for s in _gapped_specs(words, examples) if _flash(s, examples)]
 
 
 def _flash(spec, examples):
@@ -637,7 +799,7 @@ def _load_data_rules():
         examples = [pair["ru"] for pair in pairs]
         if not examples:
             continue
-        validated = [s for s in _focus_specs(item.get("focus")) if _flash(s, examples)]
+        validated = _row_specs(item.get("focus"), examples)
         if not validated:
             continue
         key = item.get("key") or name
