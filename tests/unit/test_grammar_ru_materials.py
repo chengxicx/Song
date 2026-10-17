@@ -123,3 +123,131 @@ def test_hand_written_rules_are_the_baseline():
     "The hand-written rules are the baseline; the data layer only adds to them."
     assert len(ru._RU_RULES) >= 29
     assert len(ru._get_all_rules()) >= len(ru._RU_RULES)
+
+
+# ---- the inflected spec family -----------------------------------------
+#
+# A literal spec is pinned to one surface form, so a row about "между +
+# instrumental" stated as "между обедом" could never fire on "между
+# друзьями".  The engine therefore also derives a case-only spec that keeps
+# function words literal.  These tests pin that behaviour down, because two
+# separate mistakes in the first attempt made the whole data layer unusable
+# and neither showed up as a failure -- only as a panel that fired on
+# everything.
+
+
+def _seq_lists(match):
+    """
+    Every spec list inside a match shape, recursing into any_of.
+
+    Returns the seq lists as-is (each a list of leaf specs); a gapped
+    left/right shape contributes its two anchor lists joined, since both
+    sides are subject to the same "must be specific" argument.
+    """
+    if "any_of" in match:
+        out = []
+        for alt in match["any_of"]:
+            out.extend(_seq_lists(alt))
+        return out
+    if "seq" in match:
+        return [list(match["seq"])]
+    if "left" in match or "right" in match:
+        return [list(match.get("left") or []) + list(match.get("right") or [])]
+    return []
+
+
+def _leaf_specs(match):
+    "Every leaf spec in a (possibly any_of-nested) match shape."
+    return [spec for seq in _seq_lists(match) for spec in seq]
+
+
+def test_no_spec_carries_an_empty_morph_subset():
+    """
+    An empty ``{"morph": {}}`` is a subset of everything, so it matches any
+    token.  A lowercase feature key silently produced exactly that, and the
+    panel jumped from a median of 6 to 17 entries per page.
+    """
+    for rule in ru._get_all_rules():
+        for spec in _leaf_specs(rule["match"]):
+            assert spec.get("morph") != {}, (
+                f"{rule['key']} carries an empty morph subset -- it fires on "
+                "every token"
+            )
+
+
+def test_inflected_specs_keep_a_literal_anchor():
+    """
+    A case-only spec with nothing literal to pin it fires on every token of
+    that case.  Rows whose focus is all content words must stay literal --
+    that mistake took the panel from a median of 8 to 17 entries per page.
+    """
+    for rule in ru._get_data_rules():
+        for seq in _seq_lists(rule["match"]):
+            has_morph = any("morph" in s for s in seq)
+            has_literal = any(
+                "surface_in" in s or "lemma_in" in s for s in seq
+            )
+            if has_morph:
+                assert has_literal, (
+                    f"{rule['key']} has a bare case spec with no literal "
+                    "anchor -- it fires on any token of that case"
+                )
+
+
+def test_compound_focus_words_are_split_for_the_tokenizer():
+    """
+    "из-за" is tokenised into two tokens, so a single spec for it can never
+    match.  The derived spec must offer the parts.
+    """
+    for rule in ru._get_data_rules():
+        for spec in _leaf_specs(rule["match"]):
+            for surface in spec.get("surface_in", []):
+                assert "-" not in surface, (
+                    f"{rule['key']} keeps a hyphenated literal {surface!r} "
+                    "that the tokenizer can never produce"
+                )
+
+
+def _row_by_prefix(prefix):
+    "The one data rule whose key starts with prefix, or an assertion error."
+    keys = [r["key"] for r in ru._get_data_rules() if r["key"].startswith(prefix)]
+    assert keys, f"no row with key prefix {prefix!r} in the library"
+    for rule in ru._get_all_rules():
+        if rule["key"] == keys[0]:
+            return rule
+    raise AssertionError(f"derived rule {keys[0]} is missing")
+
+
+def test_inflected_spec_generalises_across_noun_forms():
+    """
+    The point of the family: one construction, many noun forms.  "между +
+    instrumental" must fire on a plural and on a pronoun, not only on the
+    noun form the book happened to use.
+    """
+    rule = _row_by_prefix("rgm_междуinstrumental__")
+    for sentence in ("между обедом", "между друзьями", "между нами"):
+        text = ru._strip_stress(sentence)
+        assert ru.match_rule(rule, ru._tokens_for(text), text), (
+            f"{rule['key']} does not fire on {sentence!r}"
+        )
+
+
+def test_literal_specs_still_fire_on_the_book_phrasing():
+    "The narrow literal family is kept alongside the generalised one."
+    rule = _row_by_prefix("rgm_междуinstrumental__")
+    text = ru._strip_stress("между обедом")
+    assert ru.match_rule(rule, ru._tokens_for(text), text)
+
+
+def test_generalisation_does_not_spill_to_other_constructions():
+    """
+    The counterpart guard: generalising must not make one construction fire
+    on a different one.  "между + instrumental" is instrumental; a genitive
+    phrase must not be caught by it.
+    """
+    rule = _row_by_prefix("rgm_междуinstrumental__")
+    for sentence in ("между друзей", "около дома", "перед обедом"):
+        text = ru._strip_stress(sentence)
+        assert not ru.match_rule(rule, ru._tokens_for(text), text), (
+            f"{rule['key']} fires on {sentence!r} -- over-generalised"
+        )
