@@ -4950,27 +4950,47 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     background: var(--g-accent-soft);
 }
 
-/* Header control (left of the library link) switching the panel between the
-   current sentence's grammar and every grammar point on the screen. */
-.grammar-analysis-panel__page {
+/* The scope controls sit at the top-left of the header as one group.  They
+   answer "how much text am I looking at" -- the sentence the panel was
+   opened from, the screen, or the whole book -- so they read as one
+   segmented control rather than three unrelated pills.
+
+   The panel title already says "grammar", so each button carries only its
+   own scope word.  Three buttons reading "... grammar" each was noise. */
+.grammar-analysis-panel__scopes {
+    display: inline-flex;
     flex: none;
+    border: 1px solid var(--g-accent-line);
+    border-radius: 999px;
+    overflow: hidden;
+    background: transparent;
+}
+
+.grammar-analysis-panel__scope {
     font: inherit;
     font-size: 0.85em;
     font-weight: 600;
     color: var(--g-accent);
     background: transparent;
-    border: 1px solid var(--g-accent-line);
-    border-radius: 999px;
-    padding: 1px 9px;
+    border: 0;
+    padding: 2px 11px;
     white-space: nowrap;
     cursor: pointer;
 }
-.grammar-analysis-panel__page:hover {
+
+/* The divider between the segments is drawn by the neighbour's border, so
+   the first segment stays clean. */
+.grammar-analysis-panel__scope + .grammar-analysis-panel__scope {
+    border-left: 1px solid var(--g-accent-line);
+}
+
+.grammar-analysis-panel__scope:hover {
     background: var(--g-accent-soft);
 }
-.grammar-analysis-panel__page--active {
+
+.grammar-analysis-panel__scope--active {
     background: var(--g-accent-soft);
-    border-color: var(--g-accent);
+    color: var(--g-accent);
 }
 
 /* Narrowing the panel to one sentence hides the cards (and their level
