@@ -51,7 +51,12 @@ import sys
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MATERIALS_DIR = os.path.join(BASE, "scripts", "grammar_materials_ru")
-MATERIALS_PATH = os.path.join(MATERIALS_DIR, "units.json")
+# Every material file, in the order the audit walks them.  More than one
+# because the corpus is built from more than one source: ``units.json`` is
+# the first extraction, ``units_ref.json`` a later one.  The audit treats
+# them as one pool -- a point either source covers is covered.
+MATERIALS_FILES = ("units.json", "units_ref.json")
+MATERIALS_PATH = os.path.join(MATERIALS_DIR, MATERIALS_FILES[0])
 LIBRARY_PATH = os.path.join(BASE, "lute", "jlpt_data", "grammar_ru.json")
 
 # Slot descriptors a pattern may use to name the word class a point
@@ -150,12 +155,25 @@ def _load_library():
 
 
 def _load_materials():
-    "Every material entry; empty while the material file is not generated yet."
-    if not os.path.exists(MATERIALS_PATH):
-        print(f"note: {MATERIALS_PATH} not found -- 0 material entries")
-        return []
-    with open(MATERIALS_PATH, encoding="utf-8") as fh:
-        return json.load(fh)
+    """Every material entry across all material files; empty while none exist.
+
+    Entries are tagged with their source file so a gap report says which
+    extraction it came from -- the files were produced by different
+    pipelines and that is worth knowing when a row looks wrong.
+    """
+    out = []
+    for fname in MATERIALS_FILES:
+        path = os.path.join(MATERIALS_DIR, fname)
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8") as fh:
+            for meta in json.load(fh):
+                meta = dict(meta)
+                meta["_file"] = fname
+                out.append(meta)
+    if not out:
+        print(f"note: no material files under {MATERIALS_DIR} -- 0 entries")
+    return out
 
 
 def _index_by_core(entries):
@@ -376,7 +394,7 @@ def run(write=True, print_summary=False):
                     )
                     supplementable[k]["from"].append(
                         {
-                            "material": os.path.basename(MATERIALS_PATH),
+                            "material": e.get("_file", MATERIALS_FILES[0]),
                             "pattern": e["pattern"],
                         }
                     )
@@ -404,6 +422,7 @@ def run(write=True, print_summary=False):
                 "focus": e.get("focus") or [],
                 "notes": e.get("notes"),
                 "source": e.get("source"),
+                "material": e.get("_file", MATERIALS_FILES[0]),
             }
     reports = {
         "audit_ru_missing.json": missing,
