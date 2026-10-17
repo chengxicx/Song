@@ -11,6 +11,8 @@
    - media -> transcript/subtitle syncing (highlight + smooth-center)
    - transcript -> media seeking on line click
    - the word-span subtitle with click-to-lookup behaviour
+   - one subtitle-strip height for the book, so the reading text below the
+     player is not re-flowed whenever a cue wraps onto a second line
 
    Data (cues, words, bookId, ...) is injected by the player templates
    via window.LUTE_YT_DATA.
@@ -317,6 +319,7 @@
         window.requestAnimationFrame(function () {
           var overflow = els.subtitle.scrollWidth - els.subtitle.clientWidth;
           ytMarqueeOverflow = ytIsRtl ? 0 : Math.max(0, overflow);
+          ytSyncStripHeight();
         });
         // Inherit the reading-page word status colors.  The subtitle
         // word spans are injected after add_status_classes() has already
@@ -406,6 +409,115 @@
       var dur = Math.max(0.5, (cue.end || 0) - (cue.start || 0));
       var progress = Math.min(1, Math.max(0, (t - cue.start) / dur));
       els.subtitle.scrollLeft = ytMarqueeOverflow * progress;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Subtitle strip height                                               */
+    /* ------------------------------------------------------------------ */
+
+    /* The strip shows one cue at a time, in the flow above the reading
+       text -- which the page re-flows to fill whatever space is left over
+       (read/index.html _splitToScreens, on a ResizeObserver watching
+       #thetext).  So a cue that wraps onto a second line must not make the
+       strip taller than a one-line cue: every height change re-paginates
+       the text below it, which the reader sees as the whole page jumping.
+       Measured on an MP3 book: the strip went 63px -> 114px and the text
+       moved 51px, on every other sentence.
+
+       The strip is therefore given one height for the book -- the tallest
+       cue's -- instead of following the cue it happens to be showing.
+       That height is measured off-screen (the strip only ever holds one
+       cue) and published as the --yt-subtitle-reserve custom property,
+       which the stylesheet uses as the strip's min-height.  min-height,
+       not height, so a cue taller than anything measured still grows the
+       strip rather than being cut off -- and the mobile mini-bar rules
+       (one non-wrapping line) override it without knowing it exists. */
+
+    // How many of the book's longest cues to measure.  Line count tracks
+    // length, so the longest ones are the tall ones; measuring all of them
+    // would be a layout pass per cue, and a bounded sample plus the growth
+    // below is the same answer for a fraction of the work.
+    var YT_STRIP_SAMPLE = 120;
+
+    var ytStripReserve = 0;
+    var ytStripKey = null;
+
+    // The word spans the subtitle shows for a cue, or its plain text
+    // before that HTML has been fetched (ytLoadSubtitleWords).  Both lay
+    // out the same: the stylesheet pins .word to the strip's own font.
+    function ytCueSubtitleHtml(idx) {
+      if (WORDS[idx]) return WORDS[idx];
+      return CUES[idx] ? ytEscapeHtml(CUES[idx].text || "") : "";
+    }
+
+    // The strip's own metrics: the height a cue may occupy (its CSS
+    // max-height -- longer cues scroll, so reserving more would only make
+    // the strip taller than its stylesheet allows) and the font size its
+    // line height follows.
+    function ytStripMetrics() {
+      var cs = window.getComputedStyle(els.subtitle);
+      var cap = parseFloat(cs.maxHeight);
+      return { cap: isFinite(cap) && cap > 0 ? cap : 0, font: cs.fontSize };
+    }
+
+    // The book's longest cues by length, capped at YT_STRIP_SAMPLE.
+    function ytStripSampleIndices() {
+      var idx = [];
+      for (var i = 0; i < CUES.length; i++) idx.push(i);
+      if (idx.length > YT_STRIP_SAMPLE) {
+        idx.sort(function (a, b) {
+          return (CUES[b].text || "").length - (CUES[a].text || "").length;
+        });
+        idx.length = YT_STRIP_SAMPLE;
+      }
+      return idx;
+    }
+
+    // Height the strip needs for the tallest of `indices`, measured at the
+    // strip's own width (what wraps depends on it).  The probe keeps the
+    // inner's id on purpose: the stylesheet sizes the strip's text through
+    // it (font size, padding, line height) and the measurement has to see
+    // the same box the real cue will occupy.
+    function ytMeasureStripHeight(width, indices) {
+      var probe = els.subtitle.cloneNode(false);
+      probe.style.cssText =
+        "position:fixed;left:-10000px;top:0;visibility:hidden;" +
+        "width:" + width + "px;height:auto;max-height:none;overflow:visible;";
+      els.subtitle.parentNode.appendChild(probe);
+      var tallest = 0;
+      for (var i = 0; i < indices.length; i++) {
+        probe.innerHTML = ytCueSubtitleHtml(indices[i]);
+        if (probe.scrollHeight > tallest) tallest = probe.scrollHeight;
+      }
+      probe.parentNode.removeChild(probe);
+      var cap = ytStripMetrics().cap;
+      return cap && tallest > cap ? cap : tallest;
+    }
+
+    // Publish the reserved height.  Called when the strip is about to be
+    // shown (init) and on every cue, because the answer depends on the
+    // strip's width and font (a resize, a zoom, a font-size change) -- the
+    // measurement only reruns when one of those changes.
+    function ytSyncStripHeight() {
+      if (!els.subtitle || !CUES.length) return;
+      var box = els.subtitle.parentNode;
+      if (!box) return;
+      var width = els.subtitle.clientWidth;
+      if (!width) return;
+      var metrics = ytStripMetrics();
+      var key = width + "x" + metrics.font;
+      if (key !== ytStripKey) {
+        ytStripKey = key;
+        ytStripReserve = ytMeasureStripHeight(width, ytStripSampleIndices());
+      }
+      // A cue taller than every one measured (the sample missed it, or
+      // the book is mostly one script and this cue is another): hold the
+      // strip at that height from here on rather than resize per cue.
+      var live = Math.min(els.subtitle.scrollHeight, metrics.cap || Infinity);
+      if (live > ytStripReserve) ytStripReserve = live;
+      if (ytStripReserve > 0) {
+        box.style.setProperty("--yt-subtitle-reserve", ytStripReserve + "px");
+      }
     }
 
     /* ------------------------------------------------------------------ */
@@ -1020,6 +1132,7 @@
       buildTranscript: buildTranscript,
       bindControls: bindControls,
       bindSubtitleInteractions: bindSubtitleInteractions,
+      syncStripHeight: ytSyncStripHeight,
       bindKeys: bindKeys,
       bindStatusUpdates: bindStatusUpdates,
       bindNotReadyFallback: bindNotReadyFallback,
