@@ -21,6 +21,13 @@ Guards (both idempotent):
             skipped: the loader would drop it anyway, and two panel rows
             on the same point are worse than one
 
+``--write`` refreshes as well as appends: the library is a pure function of
+the materials (same keys, same order), so a row whose ``focus`` or wording
+changed in the source file is rewritten in place instead of being left at
+its old content.  A row that no longer has a material entry is reported as
+stale and left alone -- dropping a published grammar point is a decision,
+not a side effect of a merge.
+
 Usage::
 
     python -m scripts.merge_grammar_fr_materials            # report only
@@ -161,19 +168,39 @@ def main():
     if not materials:
         print(f"no materials at {MATERIALS_PATH}")
         return 1
-    taken_keys = {e["key"] for e in entries}
-    taken_names = {e["name"] for e in entries}
-    rows, skipped = build_rows(materials, taken_keys, taken_names)
-    print(f"new rows: {len(rows)}  skipped: {len(skipped)}")
+    # Both dedupe sets start empty: the rebuild is the full library, and the
+    # merge step below decides what is new against the file on disk.
+    rows, skipped = build_rows(materials, set(), set())
+    position = {entry["key"]: i for i, entry in enumerate(entries)}
+    new = [r for r in rows if r["key"] not in position]
+    updated = [
+        r for r in rows if r["key"] in position and entries[position[r["key"]]] != r
+    ]
+    stale = [k for k in position if k not in {r["key"] for r in rows}]
+    print(
+        f"materials: {len(rows)} rows  new: {len(new)}  "
+        f"updated: {len(updated)}  stale: {len(stale)}  skipped: {len(skipped)}"
+    )
     for name, why in skipped:
         print(f"  - {name} ({why})")
+    for key in stale:
+        print(f"  ! {key}: no material entry derives it (left in place)")
+    for row in updated:
+        print(f"  ~ {row['key']}")
     if not args.write:
         print("(dry run: pass --write)")
         return 0
-    entries.extend(rows)
+    for row in rows:
+        if row["key"] in position:
+            entries[position[row["key"]]] = row
+        else:
+            position[row["key"]] = len(entries)
+            entries.append(row)
     with open(LIBRARY, "w", encoding="utf-8") as fh:
         json.dump(entries, fh, ensure_ascii=False, indent=1)
-    print(f"{LIBRARY}: now {len(entries)} rows (+{len(rows)})")
+    print(
+        f"{LIBRARY}: now {len(entries)} rows (+{len(new)} new, ~{len(updated)} updated)"
+    )
     return 0
 
 

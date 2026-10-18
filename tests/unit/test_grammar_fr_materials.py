@@ -146,3 +146,122 @@ def test_hand_written_rules_are_the_baseline():
     "The hand-written rules are the baseline; the data layer only adds to them."
     assert len(fr._FR_RULES) >= 34
     assert len(fr._get_all_rules()) >= len(fr._FR_RULES)
+
+
+def _data_rule(needle):
+    "The one merged row whose name contains needle."
+    for rule in fr._get_data_rules():
+        if needle in rule["name"]:
+            return rule
+    raise AssertionError(f"no merged row named like {needle!r}")
+
+
+def test_duplicate_rule_list_matches_the_overlap_audit():
+    """
+    The panel's silence list must equal what the overlap audit derives.
+
+    Pinning the list to the audit -- rather than to a hand-maintained
+    guess -- means growing the library re-derives it, and a row that
+    stops being a duplicate fails here instead of silently suppressing
+    a point the panel should report.  It is empty while the audit finds
+    no same-span duplicate: the 2026-10-19 round fixed its one candidate
+    by narrowing the row (see the passive row's notes) instead.
+    """
+    from scripts import audit_grammar_fr_overlaps as audit
+
+    _by_key, cands = audit.candidates()
+    derived = {key for key, _decision in cands}
+    assert derived == set(fr._DUPLICATE_RULE_IDS)  # pylint: disable=protected-access
+
+
+@needs_library
+@needs_materials
+def test_library_is_a_pure_function_of_the_materials():
+    """
+    The library must be exactly what the merge derives from the materials.
+
+    ``--write`` refreshes as well as appends, so a row whose ``focus`` or
+    wording changed upstream is rewritten in place.  This pins that
+    invariant: a hand-edited library row (or a merge that never ran)
+    fails here instead of silently serving the old matcher.  The other
+    direction is not pinned -- a freshly written material row that has
+    not been merged yet is normal work in progress.
+    """
+    from scripts import merge_grammar_fr_materials as merge
+
+    with open(MATERIALS, encoding="utf-8") as fh:
+        materials = json.load(fh)
+    rows, _skipped = merge.build_rows(materials, set(), set())
+    derived = {r["key"]: r for r in rows}
+    for entry in _library():
+        if not entry["key"].startswith("fgm_"):
+            continue
+        assert entry["key"] in derived, f"library row without material: {entry['key']}"
+        assert entry == derived[entry["key"]], f"drifted from materials: {entry['key']}"
+
+
+def test_passive_row_requires_an_explicit_agent():
+    """
+    The compound-past passive row fires only with a par agent.
+
+    "a été + adjective" ("elle a été malade") is the passé composé of
+    être, not a passive, and it collided with the hand-written
+    passé-composé rule on the identical span; requiring par keeps the
+    row to what its name claims.  Agentless passives ("le film a été
+    tourné en 2020") stay unmatched -- the documented trade-off in the
+    row's notes, under-matching rather than a false row.
+    """
+    row = _data_rule("passive")
+    fires = (
+        "Le vaccin contre la rage a été découvert par Pasteur.",
+        "Les livres ont été traduits par Marie.",
+    )
+    silent = (
+        "Elle a été malade toute la semaine.",
+        "J'ai été content de te voir.",
+        "Le film a été tourné en 2020.",
+    )
+    for sentence in fires:
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(row, fr._tokens_for(text), text), sentence
+    for sentence in silent:
+        text = fr._norm_text(sentence)
+        assert not fr.match_rule(row, fr._tokens_for(text), text), sentence
+    # The hand-written passé composé still reports both readings: the
+    # passive row's span is now the whole construction, so the two are
+    # nested reports rather than the same span twice.
+    passe = next(r for r in fr._FR_RULES if r["key"] == "fr_passe_compose")
+    for sentence in ("Elle a été malade toute la semaine.", "Il a été élu par les habitants."):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(passe, fr._tokens_for(text), text), sentence
+
+
+def test_modals_do_not_fire_on_sentence_initial_peut_etre():
+    """
+    A capitalised sentence-initial "Peut-être" must not read as pouvoir.
+
+    spaCy splits that one form into Peut / - / être, so the modal rule
+    used to fire on the adverb (mid-sentence lowercase "peut-être" stays
+    a single token and never matched).  The stray hyphen sits strictly
+    inside the hit, which the rule's not_inside vetoes.
+    """
+    modals = next(r for r in fr._FR_RULES if r["key"] == "fr_modals")
+    silent = (
+        "Peut-être viendra-t-il demain.",
+        "Peut-être partir maintenant ?",
+        "Il a dit : Peut-être est-il malade.",
+    )
+    for sentence in silent:
+        text = fr._norm_text(sentence)
+        assert not fr.match_rule(modals, fr._tokens_for(text), text), sentence
+    # The veto is the hyphen, not the modal: ordinary readings still fire,
+    # including one whose span contains a different hyphenated token.
+    fires = (
+        "Il peut venir ce soir.",
+        "Il peut être puni.",
+        "Elle peut, paraît-il, être en retard.",
+        "Il peut attendre vingt-six ans.",
+    )
+    for sentence in fires:
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(modals, fr._tokens_for(text), text), sentence
