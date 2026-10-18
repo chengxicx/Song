@@ -566,18 +566,28 @@ _STRESS_RE = re.compile(r"[\u0300-\u036f]")
 # key -> the examples a data rule was validated against (tests re-run this).
 _RU_RULE_EXAMPLES = {}
 
-# The morph features a grammar point turns on.  Case is the whole point of
-# a preposition row ("между + instrumental"), and tense/person/mood carry
-# the verb points; number and gender are deliberately dropped, since the
-# same construction legitimately spans them ("между обедом" and "между
-# друзьями" are the same rule).
+# The morph feature the generalised spec turns on: **case**, and only case.
 #
-# ⚠️ The keys are capitalised because that is how ``_gramemes`` stores them
-# (``Tense``, ``Case``), and a lowercase key silently filters everything out
-# -- leaving an **empty** ``{"morph": {}}`` spec, and an empty morph subset
-# matches *every* token.  That single case mistake turned the whole data
-# layer into noise: one phrase fired 15 unrelated rules.
-_POINT_FEATURES = ("Case", "Tense", "Person", "Mood", "Voice", "Aspect")
+# A preposition row ("между + instrumental") is stated in the book with one
+# noun form ("между обедом") but governs every form of that case, so the
+# derivation replaces the noun with a case-only spec and keeps the preposition
+# literal.  That is what makes "между друзьями" and "между нами" fire the same
+# row as "между обедом".
+#
+# ⚠️ Verb-side features must NOT generalise.  ``Tense``/``Person``/``Mood``/
+# ``Aspect``/``Voice`` look symmetric but are not: a focus word that is a
+# predicate ("надо") or an infinitive ("включать") yields a spec like
+# ``["не", {Tense: "pres"}]`` -- "не + any present-tense word" -- which is not
+# a construction, it is every negated present verb in the page.  Those rows
+# fired on nearly the whole example corpus (не надо / Не включать collided
+# with ru_past, ru_deepricastie and nine other rules at once).  A row whose
+# content word is not nominal keeps its literal spec instead.
+#
+# ⚠️ The key is capitalised because that is how ``_gramemes`` stores it
+# (``Case``); a lowercase key silently filters everything out -- leaving an
+# **empty** ``{"morph": {}}`` spec, and an empty morph subset matches *every*
+# token.  That mistake once made one phrase fire 15 unrelated rules.
+_POINT_FEATURES = ("Case",)
 
 # A compound focus word ("из-за", "в течение") is tokenised into its parts
 # by _WORD_RE, so a single literal spec for it could never match: the
@@ -596,6 +606,53 @@ def _norm_name(name):
 
 
 _HANDWRITTEN_NORMS = {_norm_name(r["name"]) for r in _RU_RULES}
+
+# Merged rows whose derived matcher reports the *same span* as another rule,
+# so the panel would print one construction twice.  The rows stay in the
+# library (they are real points); only the duplicate panel entry is dropped.
+#
+# The list is derived, not guessed: ``scripts.audit_grammar_ru_overlaps``
+# runs every rule over the union of all rules' own example sentences and
+# reports the pairs that share a near-identical span on at least two
+# sentences.  A pair seen once is an accident of that one sentence and is
+# not listed.
+#
+# The cause is the generalisation in ``_inflected_specs``: a row stated with
+# one noun ("в + 前置格", focus ``в, доме``) derives ``в + <any
+# prepositional>``, which is exactly the hand-written ``ru_prep_loct``.  When
+# the row's whole point is a form the hand-written rule already reports, the
+# row teaches nothing new -- it only adds a second entry on the same phrase.
+_DUPLICATE_RULE_IDS = frozenset(
+    {
+        # ---- в / на + case: all collapse to ru_prep_loct (77 sentences
+        # each).  Their nouns are prepositional ("в опере", "в доме"), so the
+        # generalisation is "в + any prepositional" and ru_prep_loct owns it.
+        "rgm_в__4a64de",  # в + 前置格（钟点的整点半：半小时后）
+        "rgm_в__68f693",  # в + 前置格（作品、活动的内容所在）
+        "rgm_в__844b92",  # в + 前置格（建筑物内部：在……房子里）
+        "rgm_в__a74438",  # в + 前置格（过程的阶段：开始、中间、结束；过去、现在、将来）
+        "rgm_вотношениипоотношениюк__ab49d0",  # в отношении + 第二格 / по отношению к + 第三格
+        "rgm_врезультате__53598d",  # в результате + 第二格
+        "rgm_всамомделенасамомделеvs__8c86d8",  # в самом деле 与 на самом деле
+        # в + accusative: the same collision on the accusative side.
+        "rgm_в__4bb7ae",  # в + 第四格（天气：在什么样的天气里）
+        "rgm_в__6e0f02",  # в + 第四格（星期几：在星期……）
+        # The в + prepositional *time* rows state one time word each ("в
+        # майские праздники") but derive the same "в + any prepositional"
+        # spec, so they collide with each other; the first is kept.
+        "rgm_в__2a9d77",  # в + 前置格（节日名称之一：五一假期）
+        "rgm_в__e155d1",  # в + 前置格（泛指一段时期、季节、年代）
+        # ---- с + instrumental: ru_s_ablt owns the form.
+        "rgm_с__bd98c7",  # с + 第五格（对某人严厉、严厉相待）
+        "rgm_с__b3beea",  # с + 第二格（地点：从高处／从某处下来）
+        # ---- genitive prepositions ru_gen_preps already lists (including
+        # около), so the derived "prep + genitive" spec is a duplicate.
+        "rgm_без__6181f0",  # без + 第二格（差几到几点）
+        "rgm_около__c3e310",  # около + 第二格（近似数量：与计量单位搭配）
+        "rgm_дотогокак__68c943",  # 时间连接词 до того как 及其加长变体
+        "rgm_x__76d0b7",  # 简缩句（谓语缺位，表示运动/位移）
+    }
+)
 
 _DATA_PATH = os.path.normpath(
     os.path.join(
@@ -767,7 +824,7 @@ def _flash(spec, examples):
     return False
 
 
-def _load_data_rules():
+def _load_data_rules(include_silenced=False):
     """
     Rules for the merged grammar-point rows (jlpt_data/grammar_ru.json).
 
@@ -775,6 +832,11 @@ def _load_data_rules():
     at least one of the row's own examples, so the derivation can never
     invent a matcher the data does not support.  Those examples are recorded
     in _RU_RULE_EXAMPLES for the tests to re-run.
+
+    ``include_silenced`` is for the audit, not the panel: a row listed in
+    ``_DUPLICATE_RULE_IDS`` is normally dropped here so the panel never
+    reports it, and the audit needs the *un*deduped set to re-derive that list
+    at all.
     """
     if not os.path.exists(_DATA_PATH):
         return []
@@ -785,6 +847,9 @@ def _load_data_rules():
         name = item.get("name") or ""
         if not name or _norm_name(name) in _HANDWRITTEN_NORMS:
             continue  # already covered precisely by a hand-written rule
+        silenced = item.get("key") in _DUPLICATE_RULE_IDS
+        if silenced and not include_silenced:
+            continue  # its matcher reports a span another rule already reports
         # The row's examples carry a parallel Chinese gloss in `example_zh`;
         # pair them up so the library can print a translation, and keep the
         # plain sentences for the matcher validation below.
