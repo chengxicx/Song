@@ -12,7 +12,6 @@ import json
 import time
 
 from lute.db import db
-from lute.dict import service
 
 from tests.unit.dict.mdx_fixture import build_mdx
 
@@ -20,6 +19,9 @@ ENTRIES = [
     ("たのしい", "<div>楽しい<br/>愉快yúkuài</div>"),
     ("箱", "<div>はこ<br/>箱子</div>"),
 ]
+
+# A neutral pool file name -- no name is special on the server any more.
+DICT = "test_dict.db"
 
 
 def _post_mdx(client, content, filename="fixture.mdx", name=None):
@@ -49,7 +51,9 @@ def test_status_before_any_import(client, dict_dirs):  # pylint: disable=unused-
 
     assert body["result"] == "success"
     assert body["dictionaries"] == []
-    assert body["default_filename"] == service.DB_FILENAME
+    # No file is singled out for the phone any more: the app builds each
+    # download URL from the list it gets here.
+    assert "default_filename" not in body
 
 
 def test_import_requires_a_file(client, dict_dirs):  # pylint: disable=unused-argument
@@ -119,23 +123,24 @@ def test_import_publishes_under_the_given_name(
 
     pool = _pool(client)
     assert [d["filename"] for d in pool] == ["ja_zh_shogakukan_v2.db"]
-    # The phone's own file, so the card marks it.
-    assert pool[0]["is_default"] is True
+    # The name is whatever the uploader chose -- it carries no meaning
+    # beyond being this dictionary's identity in the pool.
+    assert "is_default" not in pool[0]
 
 
-def test_the_pool_lists_the_phones_file_first(
+def test_the_pool_is_listed_alphabetically(
     client, dict_dirs
 ):  # pylint: disable=unused-argument
-    for name in ("ko_zh_basic.db", service.DB_FILENAME, "aa_other.db"):
+    for name in ("ko_zh_basic.db", DICT, "aa_other.db"):
         task_id = json.loads(_post_mdx(client, build_mdx(ENTRIES), name=name).data)[
             "task_id"
         ]
         _wait_for_import(client, task_id)
 
     assert [d["filename"] for d in _pool(client)] == [
-        service.DB_FILENAME,
         "aa_other.db",
         "ko_zh_basic.db",
+        DICT,
     ]
 
 
@@ -234,8 +239,9 @@ def test_the_settings_page_offers_the_import_card(
     assert 'id="dict_settings_import"' in html
     assert 'id="dict_settings_name"' in html
     assert "dict-settings.js" in html
-    # The name the phone's default download URL expects.
-    assert service.DB_FILENAME in html
+    # The copy names no special file: the pool is whatever got imported,
+    # and the phone lists it rather than fetching one fixed name.
+    assert "every .db in there joins the pool" in html
 
 
 def test_a_broken_file_reports_the_error(

@@ -31,7 +31,9 @@
     <span class="new-word-badge {{ difficulty_color }}" title="{{ difficulty_description }}">{{ difficulty_label }}</span>
   </div>
   <div class="series-summary-continue">
-    <a class="series-continue-btn" href="/read/{{ continue_id }}" title="{{ t('Open the first unread book in this series') }}">&#9654; {{ t('Continue:') }} {{ continue_title }}</a>
+    {# The label ellipsizes when the title doesn't fit (see .series-continue-btn
+       in styles.css), so the tooltip carries the untruncated title. #}
+    <a class="series-continue-btn" href="/read/{{ continue_id }}" title="{{ t('Open the first unread book in this series') }}: {{ continue_title }}">&#9654; {{ t('Continue:') }} {{ continue_title }}</a>
   </div>
 </div>
 

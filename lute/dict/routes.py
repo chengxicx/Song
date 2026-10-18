@@ -41,11 +41,17 @@ def _languages_using(name):
 
 @bp.route("/status", methods=["GET"])
 def get_status():
-    "Every dictionary in the pool, and what is in each."
+    """
+    Every dictionary in the pool, and what is in each.
+
+    No file is singled out: clients -- the settings card, the language
+    form, the phone app's download list -- present the whole list and
+    the reader picks.  (There used to be a ``default_filename`` here for
+    the phone's fixed URL; the phone now builds each URL from the list.)
+    """
     return jsonify(
         {
             "result": "success",
-            "default_filename": service.DB_FILENAME,
             "dictionaries": service.list_installed(),
         }
     )
