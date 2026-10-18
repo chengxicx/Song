@@ -273,6 +273,21 @@ def fixture_arabic(app_context):
     return _get_test_language("Arabic")
 
 
+@pytest.fixture(name="cantonese")
+def fixture_cantonese(app_context):
+    return _get_test_language("Cantonese Chinese")
+
+
+@pytest.fixture(name="italian")
+def fixture_italian(app_context):
+    return _get_test_language("Italian")
+
+
+@pytest.fixture(name="portuguese")
+def fixture_portuguese(app_context):
+    return _get_test_language("Portuguese")
+
+
 @pytest.fixture(name="mandarin")
 def fixture_mandarin(app_context):
     return _get_test_language("Mandarin Chinese")

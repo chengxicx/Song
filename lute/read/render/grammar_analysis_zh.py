@@ -16,6 +16,7 @@ import re
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
     make_rule,
+    rule_library_entries,
     spec_surface,
 )
 
@@ -381,3 +382,16 @@ def analyze_chinese(page_text, display_lang="en"):
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
     return analyze_tokens(page_text, _ZH_RULES, _tokens_for, display_lang)
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Mandarin grammar library, in CEFR order (A1 -> C2).
+
+    The corpus is the hand-written rule set itself.  A Chinese reader
+    (display language ``zh``) gets each rule's Chinese ``zh`` wording,
+    which is why the rules carry one next to the English description.
+    No examples: the rule set was written without any, and the module
+    needs no tokenizer to be listed.
+    """
+    return rule_library_entries(_ZH_RULES, display_lang)
