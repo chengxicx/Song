@@ -212,15 +212,33 @@ _ES_RULES = [
         "Preterite (comió)",
         "A2",
         "a completed past action with clear start/end: comí, comió, fueron.",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Tense": "Past"}}]},
+        {
+            "seq": [
+                {
+                    "pos_in": ["VERB", "AUX"],
+                    "morph": {"Tense": "Past", "VerbForm": "Fin", "Mood": "Ind"},
+                }
+            ]
+        },
         zh="简单过去时（comió 等）：过去完成的动作，有起点/终点。",
+        # The tagger reads the command "dame" (and "hazlo") as an indicative
+        # past form; a sentence cannot open with a preterite that has no
+        # subject, so first position belongs to the imperative rule.
+        not_at_start_with=spec_surface(*_IMPERATIVE_START),
     ),
     make_rule(
         "es_imperfect",
         "Imperfect (comía / vivía)",
         "A2",
         "an ongoing or repeated past action, or a past description: vivía, era, cantaba.",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Tense": "Imp"}}]},
+        {
+            "seq": [
+                {
+                    "pos_in": ["VERB", "AUX"],
+                    "morph": {"Tense": "Imp", "VerbForm": "Fin", "Mood": "Ind"},
+                }
+            ]
+        },
         zh="未完成过去时（vivía / cantaba / era）：过去 ongoing、习惯或背景描写。",
     ),
     make_rule(
@@ -277,6 +295,11 @@ _ES_RULES = [
             "max_gap": 4,
         },
         zh="más/menos … que：比……更/更不……。",
+        # "menos mal que" is a fixed B1 construction with its own row; the
+        # filler between the anchors is what tells it apart from a
+        # comparison.  "más vale que" is deliberately *not* vetoed: the
+        # construction is a real comparison ("más vale prevenir que curar").
+        not_inside=spec_surface("mal"),
     ),
     make_rule(
         "es_tan_como",
@@ -533,6 +556,28 @@ _DATA_PATH = os.path.normpath(
     )
 )
 
+# Rows that would report the same span as another rule on the same sentence,
+# so the panel must show only one of them.  The row stays in grammar_es.json
+# and on the library page; `_get_all_rules` is what the panel reads, and it
+# drops these.
+#
+# The audit's first run found five colliding pairs and four were precision
+# bugs in the rows themselves -- "por + infinitivo" firing on "acabó por
+# aceptar", "tanto ... como" firing on "tan despacio como" through the lemma
+# of *tan*, "nada / nadie / nunca" re-reporting *tampoco*, "si + indicativo"
+# accepting the subjunctive -- so those were narrowed in their material rows
+# instead of being hidden here.  What is left is a row whose point the broad
+# hand-written comparison already reports on the same words.
+_DUPLICATE_RULE_IDS = frozenset(
+    {
+        # "más vale que + subjuntivo" vs the hand-written más/menos ... que:
+        # both match "más vale que"; the idiom is a comparison, and the
+        # hand-written rule also carries "más vale prevenir que curar", so
+        # the rule keeps the span and the row stays a library entry only.
+        "esm_másvalequesubjuntivo__e5fdf7",  # x2, dupe of es_mas_que
+    }
+)
+
 
 def _focus_words(focus):
     words = []
@@ -545,24 +590,54 @@ def _focus_words(focus):
 
 def _focus_vetoes(focus):
     """
-    The "!word" entries of a focus list, as right-context vetoes.
+    The "!word" entries of a focus list, as context vetoes.
 
-    A row whose construction collides with a longer one needs to say so:
-    temporal *mientras* would otherwise fire on every *mientras que* (which
-    is its own contrastive row), so the row's focus is
-    ``["mientras", "!que"]``.  The veto is checked against the three tokens
-    after the match, like ``make_rule(not_followed_by=...)``.
+    A row whose construction collides with a longer one needs to say so, and
+    where the veto sits in the focus list says which side it guards:
+
+    * before the first real word -- the token *left* of the match
+      (``not_after``).  "en tanto que" would otherwise fire the
+      ``tanto ... que`` row, so that row reads ``["!en", "tanto", ..., "que"]``.
+    * after the last real word -- the three tokens *right* of the match
+      (``not_followed_by``).  Temporal *mientras* would otherwise fire on
+      every *mientras que*, so its focus is ``["mientras", "!que"]``.
+    * between two real words -- any token *inside* the match
+      (``not_inside``).  ``hace falta que`` is not "hace + time + que", so
+      that row's focus is ``["hace", "!falta", "...", "que"]``: the veto
+      sits inside the span and the gap is checked for it.
+
+    Returns a dict of rule keys (possibly empty), ready to splat into
+    ``make_rule`` / the rule dict the validator builds.
+
+    A veto word matches inflections as well as the surface spelled in the
+    list: "por + infinitivo" must stop firing after *acabó*, and "acabó" is
+    not written in anybody's focus list, so ``!acabar/estar`` matches by
+    lemma as well.
     """
-    vetoes = []
-    for w in _focus_words(focus):
-        if not w.startswith("!") or len(w) < 2:
+    words = _focus_words(focus)
+    real = [i for i, w in enumerate(words) if not w.startswith("!")]
+    if not real:
+        return {}
+    first, last = real[0], real[-1]
+    slots = {"not_after": [], "not_inside": [], "not_followed_by": []}
+    for i, word in enumerate(words):
+        if not word.startswith("!") or len(word) < 2:
             continue
-        vetoes.append(spec_surface(*w[1:].split("/")))
-    if not vetoes:
-        return None
-    if len(vetoes) == 1:
-        return vetoes[0]
-    return {"any_of": vetoes}
+        if i < first:
+            slot = "not_after"
+        elif i > last:
+            slot = "not_followed_by"
+        else:
+            slot = "not_inside"
+        alternatives = word[1:].split("/")
+        slots[slot].append(
+            {"any_of": [spec_surface(*alternatives), spec_lemma(*alternatives)]}
+        )
+    return {
+        key: (specs[0] if len(specs) == 1 else {"any_of": specs})
+        for key, specs in slots.items()
+        if specs
+    }
 
 
 def _focus_condition(word, lemma):
@@ -573,10 +648,11 @@ def _focus_condition(word, lemma):
     row talk about word classes the literal vocabulary cannot spell out:
     ``"a/b"`` marks surface alternatives (always surfaces -- a slash list is
     an explicit form list), a ``§``-prefixed token names a token class
-    (``§inf``, ``§ger``, ``§part``, ``§verb``, ``§noun``, ``§adj``, ``§subj``,
-    ``§subj2``), and every other word is matched as a surface in the first
-    variant and as a lemma in the second -- so ``volver a + §inf`` also fires
-    on *volvió a llamar*, where the surface list cannot cover every form.
+    (``§inf``, ``§ger``, ``§part``, ``§verb``, ``§ind``, ``§noun``, ``§adj``,
+    ``§subj``, ``§subj2``), and every other word is matched as a surface in
+    the first variant and as a lemma in the second -- so ``volver a + §inf``
+    also fires on *volvió a llamar*, where the surface list cannot cover
+    every form.
     """
     if word.startswith("§"):
         return _TOKEN_CLASSES.get(word, spec_pos("X"))
@@ -610,6 +686,7 @@ _TOKEN_CLASSES = {
     "§ger": spec_morph(VerbForm="Ger"),
     "§part": spec_morph(VerbForm="Part"),
     "§verb": spec_pos("VERB", "AUX"),
+    "§ind": spec_morph(VerbForm="Fin", Mood="Ind"),
     "§noun": spec_pos("NOUN", "PROPN"),
     "§adj": spec_pos("ADJ"),
     "§subj": spec_morph(Mood="Sub"),
@@ -626,8 +703,18 @@ def _focus_specs(focus):
     alternatives.  A bare function word (para, como, que, por, con, sin)
     never stands alone -- it fires on half the corpus -- so a single word
     shorter than five characters is dropped unless it carries alternatives.
+
+    Every row is emitted twice -- once matching surfaces and once matching
+    lemmas -- because a row lists base forms ("volver") while the text has
+    inflected ones ("volvió").  A leading "=" on a focus word turns that
+    second variant off for the whole row: "tanto/tanta/tantos/tantas" is
+    already exhaustive, and matching by lemma is what would make "tan"
+    (lemma *tanto*) fire the quantitative row that belongs to the
+    hand-written tan + adjective + como rule.
     """
-    words = [w for w in _focus_words(focus) if not w.startswith("!")]
+    raw = _focus_words(focus)
+    surface_only = any(w.startswith("=") for w in raw)
+    words = [w.lstrip("=") for w in raw if not w.startswith("!")]
     if not words:
         return []
     if words.count("...") == 1:
@@ -636,7 +723,7 @@ def _focus_specs(focus):
         if not left_w or not right_w:
             return []
         specs = []
-        for lemma in (False, True):
+        for lemma in (False,) if surface_only else (False, True):
             spec = {
                 "left": _focus_run(left_w, lemma),
                 "right": _focus_run(right_w, lemma),
@@ -652,7 +739,7 @@ def _focus_specs(focus):
         return []  # a bare short word fires everywhere -- never specific
     specs = [{"seq": _focus_run(words, False)}]
     lemma_spec = {"seq": _focus_run(words, True)}
-    if lemma_spec != specs[0]:
+    if lemma_spec != specs[0] and not surface_only:
         specs.append(lemma_spec)
     return specs
 
@@ -661,13 +748,11 @@ def _flash(spec, examples, vetoes=None):
     """
     True when spec fires on at least one of the row's example sentences.
 
-    The veto is part of the test: a spec that only fires in the context the
-    row excludes (temporal *mientras* inside *mientras que*) must not count
-    as validated, or the row would ship an example it cannot actually mark.
+    The vetoes are part of the test: a spec that only fires in the context
+    the row excludes (temporal *mientras* inside *mientras que*) must not
+    count as validated, or the row would ship an example it cannot mark.
     """
-    rule = {"match": spec}
-    if vetoes:
-        rule["not_followed_by"] = vetoes
+    rule = {"match": spec, **(vetoes or {})}
     for sentence in examples:
         text = (sentence or "").strip()
         if text and match_rule(rule, _tokens_for(text), text):
@@ -681,6 +766,11 @@ def _load_data_rules():
 
     Specs are derived from each row's `focus` and kept only when they match
     at least one of the row's own examples.
+
+    Every validated row is returned, including the ones listed in
+    ``_DUPLICATE_RULE_IDS``: the library page shows all of them, and
+    ``_get_all_rules`` is where the panel drops the duplicates (the audit
+    also needs the *un*deduped set to re-derive that list at all).
     """
     if not os.path.exists(_DATA_PATH):
         return []
@@ -728,7 +818,7 @@ def _load_data_rules():
             (item.get("meaning") or "").strip() or name,
             {"any_of": validated} if len(validated) > 1 else validated[0],
             zh=item.get("zh") or None,
-            not_followed_by=vetoes,
+            **vetoes,
         )
         # Library-page fields (the /grammar detail card renders them when
         # present); the panel ignores keys it does not read.
@@ -757,11 +847,21 @@ def _get_data_rules():
 
 
 def _get_all_rules():
-    "Hand-written rules plus the validated data layer, built on first use."
+    """
+    Hand-written rules plus the validated data layer, built on first use.
+
+    ``_DUPLICATE_RULE_IDS`` is dropped here rather than in the loader so the
+    library page (which reads ``_get_data_rules``) and the overlap audit keep
+    seeing every row.
+    """
     global _all_rules_cache  # pylint: disable=global-statement
     with _rules_lock:
         if _all_rules_cache is None:
-            _all_rules_cache = list(_ES_RULES) + _get_data_rules()
+            _all_rules_cache = list(_ES_RULES) + [
+                rule
+                for rule in _get_data_rules()
+                if rule["key"] not in _DUPLICATE_RULE_IDS
+            ]
         return _all_rules_cache
 
 

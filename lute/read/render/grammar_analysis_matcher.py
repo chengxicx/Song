@@ -42,6 +42,13 @@ follows can be told apart.  "at_start" requires the match to open the
 sentence, which is how a word that only reads as a command in first
 position (Spanish "toma", "mira") is told apart from the same word used
 declaratively, where a subject or an auxiliary normally precedes it.
+
+Two more vetoes cover constructions that are wider than the span they are
+confused with: "not_inside" rejects a hit when any token *between* the
+span's ends satisfies the spec (the filler that turns "hace ... que" into
+"hace falta que"), and "not_at_start_with" rejects a hit that opens the
+sentence when its first token satisfies the spec (the command "dame",
+which the tagger also reads as a preterite form).
 """
 
 import re
@@ -308,6 +315,15 @@ def match_rule(rule, tokens, sentence_text):
             veto = neighbour is not None and _match_condition(
                 rule["not_after"], neighbour
             )
+        if not veto and rule.get("not_at_start_with"):
+            veto = _left_neighbour(tokens, start) is None and _match_condition(
+                rule["not_at_start_with"], tokens[start]
+            )
+        if not veto and rule.get("not_inside"):
+            veto = any(
+                _match_condition(rule["not_inside"], tok)
+                for tok in tokens[start + 1 : end - 1]
+            )
         if not veto and rule.get("followed_by"):
             nxt = _right_window(tokens, end, 1)
             veto = nxt is None or not _match_condition(rule["followed_by"], nxt[0])
@@ -365,6 +381,8 @@ def make_rule(
     followed_by=None,
     not_followed_by=None,
     at_start=False,
+    not_at_start_with=None,
+    not_inside=None,
 ):
     """
     Build one engine rule dict.
@@ -372,7 +390,9 @@ def make_rule(
     The two context keys mirror `not_after` on the right-hand side:
     `followed_by` *requires* the next non-punctuation token to match, and
     `not_followed_by` vetoes the hit when any of the next three does.
-    `at_start` keeps only hits that open the sentence.
+    `at_start` keeps only hits that open the sentence; `not_at_start_with`
+    drops a sentence-opening hit whose first token matches the spec.
+    `not_inside` drops a hit when a token inside its span matches the spec.
     """
     r = {"key": key, "name": name, "level": level, "desc": desc, "match": match}
     if zh:
@@ -385,6 +405,10 @@ def make_rule(
         r["not_followed_by"] = not_followed_by
     if at_start:
         r["at_start"] = True
+    if not_at_start_with:
+        r["not_at_start_with"] = not_at_start_with
+    if not_inside:
+        r["not_inside"] = not_inside
     return r
 
 
