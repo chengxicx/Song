@@ -248,6 +248,29 @@
    }
   ]
  },
+ "es_imperativo": {
+  "name": "Affirmative imperative (haz, pon, dame)",
+  "examples": [
+   {
+    "es": "Dame el periódico, por favor.",
+    "zh": "请把报纸给我。",
+    "en": "Give me the newspaper, please.",
+    "ko": "신문 좀 주세요."
+   },
+   {
+    "es": "Dime qué te pasa.",
+    "zh": "告诉我你怎么了。",
+    "en": "Tell me what's wrong with you.",
+    "ko": "무슨 일인지 말해 봐."
+   },
+   {
+    "es": "Hazlo ahora mismo.",
+    "zh": "现在就做。",
+    "en": "Do it right now.",
+    "ko": "지금 당장 해."
+   }
+  ]
+ },
  "es_subj_present": {
   "name": "Present subjunctive",
   "examples": [

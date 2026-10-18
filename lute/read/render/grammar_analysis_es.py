@@ -6,7 +6,8 @@ POS + morphological features, and token-aware rules recognise grammar
 constructions.  The md model beats the sm one on real sentences (+2pp
 rule hits, correctly tags subjunctive forms the sm model miscast as
 nouns) and is faster; imperatives still need care, so rules anchor on
-context (e.g. a trigger + que + subjunctive).
+context (a trigger + que + subjunctive, a command form opening the
+sentence) rather than trusting the mood tag.
 
 spaCy and the model are imported lazily so the base install works without
 them; the route falls back to the generic rule library on ImportError.
@@ -39,6 +40,92 @@ _tokens_for = make_spacy_tokenizer("es_core_news_md")
 # (Ind/Sub/Imp/Cnd), Tense (Pres/Past/Imp/Fut) and VerbForm (Fin/Inf/Part).
 
 _INF = spec_morph(VerbForm="Inf")
+
+# The affirmative imperative.  The model tags Mood=Imp only sporadically:
+# it labels "Mira", "Cállate" and "Oiga" correctly but reads "Habla",
+# "Haz", "Dime" and "Dame" as indicative and "Pon" as an infinitive, so a
+# mood-based rule (the French engine's approach) would miss most real
+# commands here.  Instead the rule lists the imperative forms themselves.
+# A bare command is homographic with other forms ("toma" = he takes,
+# "mira" = he looks, "di" = I gave) and Spanish drops the subject
+# pronoun, so position does the disambiguating: a sentence that *opens*
+# with one of these words is a command, while the declarative reading
+# needs a subject, an auxiliary or a conjunction in front of it.  The
+# enclitic forms (dame, hazlo, siéntate) cannot be anything else, since
+# no finite form takes a pronoun, and they are what dialogue actually
+# uses.
+_IMPERATIVE_START = (
+    # tú
+    "haz",
+    "pon",
+    "ven",
+    "di",
+    "mira",
+    "escucha",
+    "espera",
+    "perdona",
+    "disculpa",
+    "toma",
+    "fíjate",
+    "acuérdate",
+    # usted / ustedes
+    "oiga",
+    "mire",
+    "diga",
+    "deje",
+    "pase",
+    "salga",
+    "baje",
+    "compre",
+    "tome",
+    "cuente",
+    "aproveche",
+    "disculpe",
+    "diríjase",
+    "prepárese",
+    # verb + enclitic pronoun
+    "dame",
+    "dime",
+    "dígame",
+    "dígale",
+    "dímelo",
+    "dámelo",
+    "hazme",
+    "hazlo",
+    "ponte",
+    "vete",
+    "vámonos",
+    "siéntate",
+    "siéntese",
+    "siéntense",
+    "levántate",
+    "levántese",
+    "póngase",
+    "cállate",
+    "pásame",
+    "páseme",
+    "escúchame",
+    "escúcheme",
+    "óigame",
+    "mírame",
+    "míreme",
+    "sígame",
+    "cuéntame",
+    "espérame",
+    "espéreme",
+    "ayúdame",
+    "ayúdeme",
+    "déjame",
+    "déjeme",
+    "déjalo",
+    "olvídalo",
+    "llámame",
+    "enséñame",
+    "mándame",
+    "pídeme",
+    "prepárame",
+    "discúlpeme",
+)
 
 _ES_RULES = [
     # ---- A1 ----
@@ -207,6 +294,18 @@ _ES_RULES = [
         "(se lo doy).",
         {"seq": [{"surface_in": ["le", "les"], "morph": {"Case": "Dat"}}]},
         zh="间接宾语代词 le/les（给他/她/他们），常与 gustar 类动词、se 连用。",
+    ),
+    make_rule(
+        "es_imperativo",
+        "Affirmative imperative (haz, pon, dame)",
+        "A2",
+        "a command to tú or usted: Hazlo ahora, Dame el libro, Siéntese, por "
+        "favor.  The mood tag is unreliable, so this counts the command "
+        "forms that open a sentence instead.",
+        {"seq": [spec_surface(*_IMPERATIVE_START)]},
+        zh="肯定命令式（tú/usted）：Hazlo（做吧）、Dame（给我）、Siéntese（请坐）。"
+        "带代词时连写（dímelo / siéntate），与第三人称同形的词形只看句首。",
+        at_start=True,
     ),
     # ---- B1 ----
     make_rule(
