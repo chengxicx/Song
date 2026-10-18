@@ -79,6 +79,57 @@ def test_preterite_and_imperfect_are_distinct():
     assert "es_imperfect" in keys
 
 
+def test_preterite_ignores_participles():
+    """
+    A participle carries Tense=Past too, so the rule has to ask for a
+    finite indicative form: "ha pasado" is the present perfect, not a
+    preterite, and the panel used to report both on the same word.
+    """
+    keys = _keys("Ha pasado examen.")
+    assert "es_present_perfect" in keys
+    assert "es_preterite" not in keys
+    # The finite form still fires.
+    assert "es_preterite" in _keys("Ayer comió paella.")
+
+
+def test_imperfect_ignores_the_imperfect_subjunctive():
+    """
+    "entrase" is Tense=Imp but Mood=Sub -- the imperfect-subjunctive rule
+    owns it, and the imperfect indicative rule must not double-report it.
+    """
+    keys = _keys("Abrí la ventana para que entrase el aire fresco.")
+    assert "es_subj_past" in keys
+    assert "es_imperfect" not in keys
+    assert "es_imperfect" in _keys("Cuando era niño, vivía en Madrid.")
+
+
+def test_preterite_lets_the_command_keep_first_position():
+    """
+    The tagger reads "Dame" and "Hazlo" as past indicative forms.
+
+    A sentence cannot open with a preterite that has no subject, so first
+    position belongs to the imperative rule; a preterite behind a pronoun
+    ("te di") keeps its own reading.
+    """
+    keys = _keys("Dame el periódico, por favor.")
+    assert "es_imperativo" in keys
+    assert "es_preterite" not in keys
+    assert "es_imperativo" in _keys("Hazlo ahora mismo.")
+    assert "es_preterite" not in _keys("Hazlo ahora mismo.")
+    assert "es_preterite" in _keys("Ayer te di el libro.")
+
+
+def test_mas_que_ignores_the_fixed_phrase():
+    """
+    "menos mal que" is a B1 construction of its own; the filler between the
+    comparison anchors is what tells the two apart.  ("más vale que" keeps
+    the comparison reading: it is the idiom *más vale prevenir que curar*.)
+    """
+    assert "es_mas_que" not in _keys("Menos mal que llegaste.")
+    assert "es_mas_que" in _keys("Más vale prevenir que curar.")
+    assert "es_mas_que" in _keys("Este libro es más interesante que aquel.")
+
+
 def test_affirmative_imperative_needs_first_position():
     """
     The affirmative imperative keys on a command form opening the

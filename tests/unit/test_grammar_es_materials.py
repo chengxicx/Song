@@ -258,13 +258,103 @@ def test_focus_vetoes_exclude_the_longer_construction():
     specs = es._focus_specs(focus)  # pylint: disable=protected-access
     vetoes = es._focus_vetoes(focus)  # pylint: disable=protected-access
     assert specs and vetoes
-    rule = {"match": specs[0], "not_followed_by": vetoes}
+    rule = {"match": specs[0], **vetoes}
     temporal = "Mientras estudiaba, sonó el teléfono."
     contrastive = "Yo prefiero el té, mientras que ella prefiere el café."
     assert es.match_rule(rule, es._tokens_for(temporal), temporal)
     assert not es.match_rule(rule, es._tokens_for(contrastive), contrastive)
     # The veto token itself is never part of the sequence.
     assert all("que" not in c.get("surface_in", []) for c in specs[0]["seq"])
+
+
+def test_veto_side_is_where_the_marker_sits():
+    """
+    A "!word" before the focus words guards the left, one inside the span
+    guards the gap, one after the words guards the right.
+
+    Three rows need three different sides: *en tanto que* is the "tanto …
+    que" row with an *en* in front, *hace falta que* is the "hace … que" row
+    with a filler inside, *mientras que* is the temporal row with a word
+    after it.  One "right-side only" rule cannot express all three.
+    """
+    left = es._focus_vetoes(
+        ["!en", "tanto", "...", "que"]
+    )  # pylint: disable=protected-access
+    inside = es._focus_vetoes(  # pylint: disable=protected-access
+        ["hace", "!falta", "...", "que"]
+    )
+    right = es._focus_vetoes(["mientras", "!que"])  # pylint: disable=protected-access
+    assert set(left) == {"not_after"}
+    assert set(inside) == {"not_inside"}
+    assert set(right) == {"not_followed_by"}
+
+    tanto_specs = es._focus_specs(  # pylint: disable=protected-access
+        ["!en", "tanto", "...", "que"]
+    )
+    rule = {"match": tanto_specs[0], **left}
+    consecutive = "Trabajó tanto que enfermó."
+    concessive = "En tanto que escritor, opina distinto."
+    assert es.match_rule(rule, es._tokens_for(consecutive), consecutive)
+    assert not es.match_rule(rule, es._tokens_for(concessive), concessive)
+
+    hace_specs = es._focus_specs(  # pylint: disable=protected-access
+        ["hace", "!falta", "...", "que"]
+    )
+    rule = {"match": hace_specs[0], **inside}
+    duration = "Hace tres años que vivo aquí."
+    need = "Hace falta que todos colaboren."
+    assert es.match_rule(rule, es._tokens_for(duration), duration)
+    assert not es.match_rule(rule, es._tokens_for(need), need)
+
+
+def test_vetoes_match_inflections():
+    """
+    A veto word matches the lemma too, so ``!acabar/estar`` covers *acabó*.
+
+    "por + infinitivo" reports cause; after a periphrasis verb the "por" is
+    part of "acabar por / estar por", which are their own rows.  The focus
+    cannot list every inflected form, so the veto has to see lemmas.
+    """
+    vetoes = es._focus_vetoes(
+        ["!acabar/estar", "por", "§inf"]
+    )  # pylint: disable=protected-access
+    specs = es._focus_specs(  # pylint: disable=protected-access
+        ["!acabar/estar", "por", "§inf"]
+    )
+    rule = {"match": specs[0], **vetoes}
+    cause = "Se esfuerza por agradar a todo el mundo."
+    periphrasis = "Acabó por aceptar la oferta."
+    assert es.match_rule(rule, es._tokens_for(cause), cause)
+    assert not es.match_rule(rule, es._tokens_for(periphrasis), periphrasis)
+
+
+def test_surface_only_focus_skips_the_lemma_variant():
+    """
+    A leading "=" keeps the lemma variant out of a row whose list is complete.
+
+    "tanto/tanta/tantos/tantas" covers every form of the quantifier, and the
+    lemma of *tan* is also *tanto* -- so the lemma variant would make the
+    quantitative row fire on "tan despacio como", which belongs to the
+    hand-written tan + adjective + como rule.
+    """
+    surface_only = es._focus_specs(  # pylint: disable=protected-access
+        ["=tanto/tanta/tantos/tantas", "...", "como"]
+    )
+    with_lemma = es._focus_specs(  # pylint: disable=protected-access
+        ["tanto/tanta/tantos/tantas", "...", "como"]
+    )
+    assert len(surface_only) == 1
+    assert len(with_lemma) == 2
+    quantitative = "Yo no tengo tantos hermanos como Pepe."
+    equative = "Andas tan despacio como si fueras un enfermo."
+    assert any(
+        es.match_rule({"match": s}, es._tokens_for(quantitative), quantitative)
+        for s in surface_only
+    )
+    assert not any(
+        es.match_rule({"match": s}, es._tokens_for(equative), equative)
+        for s in surface_only
+    )
 
 
 def test_focus_alternatives_match_inflected_forms():
@@ -319,3 +409,81 @@ def test_library_renders_without_the_tokeniser(monkeypatch):
     entries = es.library_entries("en")
     assert entries, "the hand-written corpus disappeared with the tokenizer"
     assert not [e for e in entries if e["key"].startswith("esm_")]
+
+
+def _data_rule(needle):
+    "The one merged rule whose name contains needle."
+    for rule in es._get_data_rules():  # pylint: disable=protected-access
+        if needle in rule["name"]:
+            return rule
+    raise AssertionError(f"no merged row named like {needle!r}")
+
+
+@needs_library
+def test_si_indicativo_rejects_the_subjunctive():
+    """
+    "si + indicativo" must not report the unreal conditional.
+
+    Its focus used to be "si + §verb", which accepted *Si fuera a París* --
+    exactly the clause the imperfect-subjunctive row owns.
+    """
+    rule = _data_rule("si + indicativo")
+    real = "Si llueve, no saldremos."
+    unreal = "Si fuera a París, cogería el avión."
+    assert es.match_rule(rule, es._tokens_for(real), real)
+    assert not es.match_rule(rule, es._tokens_for(unreal), unreal)
+
+
+@needs_library
+def test_negative_word_row_leaves_tampoco_to_the_a1_row():
+    """
+    "nada / nadie / nunca" is this row's list; *tampoco* belongs to A1.
+
+    Both rows matched the word *tampoco* on the same span, and silencing
+    either one would have dropped real coverage (nada/nadie/nunca from the
+    A2 row, también from the A1 row).  The division of labour is by word
+    instead.
+    """
+    rule = _data_rule("nada / nadie / nunca")
+    nada = "No dijo nada."
+    tampoco = "Yo tampoco puedo venir."
+    assert es.match_rule(rule, es._tokens_for(nada), nada)
+    assert not es.match_rule(rule, es._tokens_for(tampoco), tampoco)
+
+
+@needs_library
+@needs_materials
+def test_duplicate_rule_list_matches_the_overlap_audit():
+    """
+    The panel's silence list must equal what the overlap audit derives.
+
+    A merged row whose generalisation reports the same span as another rule
+    would print one construction twice, so the row is dropped from the panel
+    (it stays in the library).  Pinning the list to the audit -- rather than
+    to a hand-maintained guess -- means growing the library re-derives it, and
+    a stale entry fails here instead of silently suppressing a row that is no
+    longer a duplicate.
+    """
+    from scripts import audit_grammar_es_overlaps as audit
+
+    _by_key, cands = audit.candidates()
+    derived = {key for key, _decision in cands}
+    assert derived == set(es._DUPLICATE_RULE_IDS)  # pylint: disable=protected-access
+
+
+@needs_library
+def test_silenced_rows_leave_the_panel_but_stay_in_the_library(monkeypatch):
+    """
+    Silence is a panel decision, not a content removal.
+
+    The library page and the audit both read the full data layer, so a row
+    listed in ``_DUPLICATE_RULE_IDS`` keeps its entry (and its examples)
+    while the reader's panel stops reporting it twice.
+    """
+    key = es._get_data_rules()[0]["key"]  # pylint: disable=protected-access
+    monkeypatch.setattr(es, "_DUPLICATE_RULE_IDS", frozenset({key}))
+    monkeypatch.setattr(es, "_all_rules_cache", None)
+    panel = {rule["key"] for rule in es._get_all_rules()}
+    library = {entry["key"] for entry in es.library_entries("en")}
+    assert key not in panel
+    assert key in library
