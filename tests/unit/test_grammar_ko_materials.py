@@ -314,6 +314,124 @@ def test_matches_point_at_the_construction():
     assert "기가 무섭게" in example["sentence"][m["start"] : m["end"]]
 
 
+# ---- overlap audit / panel silence --------------------------------------
+
+
+def test_duplicate_rule_list_matches_the_overlap_audit():
+    """
+    The panel's silence list must equal what the overlap audit derives.
+
+    A row whose matcher reports the same span as another rule on the same
+    sentence would print one construction twice, so the panel drops it (it
+    stays in the library).  Pinning the list to the audit -- rather than to
+    a hand-maintained guess -- means growing the library re-derives it, and
+    a stale entry fails here instead of silently suppressing a row that is
+    no longer a duplicate.
+    """
+    from scripts import audit_grammar_ko_overlaps as audit
+
+    _by_key, cands = audit.candidates()
+    derived = {key for key, _decision in cands}
+    assert derived == set(ko._DUPLICATE_RULE_IDS)
+
+
+def test_silenced_rows_leave_the_panel_but_stay_in_the_library():
+    "Silence is a panel decision, not a content removal."
+    assert ko._DUPLICATE_RULE_IDS <= {e["key"] for e in _library()}
+    panel = {rule["key"] for rule in ko._panel_rules()}
+    assert not (ko._DUPLICATE_RULE_IDS & panel)
+    assert ko._DUPLICATE_RULE_IDS <= {r["key"] for r in ko.library_entries("zh")}
+
+
+# ---- focus-literal precision --------------------------------------------
+
+
+def _data_rule(key):
+    return next(r for r in ko._get_data_rules() if r["key"] == key)
+
+
+def _fires(rule, sentence):
+    return bool(ko._match_spans(rule, ko._tokens_for(sentence), sentence))
+
+
+def test_a_literal_never_fires_as_the_tail_of_a_longer_one():
+    """
+    Korean stacks morphemes at the end of an 어절, so 거나 is both -거나 and
+    the tail of -다거나, and 에다가's marked tail 다가 is also the -다가 of
+    -려다가.  A plain alternation reports both rows on the same span, so a
+    literal is guarded by a lookbehind for every longer literal that ends
+    with it -- the pool is the whole library, so a merged row tightens the
+    rows it nests inside without anyone editing them.
+    """
+    assert _fires(_data_rule("verb_거나__choice"), "저는 주말에 책을 읽거나 영화를 봐요.")
+    tail = "다솜은 친구랑 통화한다거나 좋아하는 웹툰을 정주행한다거나 하는 것으로 스트레스를 푼다."
+    assert not _fires(_data_rule("verb_거나__choice"), tail)
+    assert _fires(
+        _data_rule("verb_거니__past-acknowledgment"), "내가 잘못했거니 후회가 남았어요."
+    )
+    figured = "첫번째 책이 좋아서 두번째 책도 좋겠거니 하고 샀는데, 읽어보니까 별로더라고요."
+    assert not _fires(_data_rule("verb_거니__past-acknowledgment"), figured)
+    assert _fires(_data_rule("noun_에다가__onto-into"), "그릇에다가 밥을 담았어요.")
+    about_to = "그 영화를 DVD 대여점에서 빌려 보려다가 텔레비전에서 오늘 방영한다는 것을 알았다."
+    assert not _fires(_data_rule("noun_에다가__onto-into"), about_to)
+
+
+def test_라서_fires_on_the_copula_but_not_on_a_verb_ending():
+    """
+    라서 is the copula's ending (이 + 라서) and also the tail of 모르 + 어서
+    and 따르 + 어서.  Kiwi reports a contracted stem's ending as starting
+    inside the stem, so the literal is only trusted on a morpheme boundary.
+    """
+    rule = _data_rule("verb_이라서_라서__reason-or-cause")
+    for sentence in (
+        "어머니 생신이라서 고향에 가야 돼요.",
+        "제가 임산부라서 그러는데 이 자리에 앉아도 될까요?",
+        "달리기 시합이 아니라서 제가 달리고 싶은 속도로 달릴 수 있어요.",
+    ):
+        assert _fires(rule, sentence), sentence
+    for sentence in (
+        "한국말을 몰라서 실수한 적이 있어요.",
+        "가격에 따라서 사람들의 선택이 달라져요.",
+    ):
+        assert not _fires(rule, sentence), sentence
+
+
+def test_a_focus_literal_the_name_does_not_explain_is_dropped():
+    """
+    The Kimchi <f> marks are the authors'; the name is the point.  The 에
+    rows mark whole verbs (갑니다 / 가서 / 있어요) beside the particle, and
+    a matcher built from those marks fires on every sentence ending in
+    them -- the 에다가 row likewise marks its own tail 다가.  A literal is
+    kept only when the row's own name explains it, in the raw string or in
+    one of the literal's Kiwi morphemes (which is what keeps 수정됐어요
+    alive for 되다 and 찍을까요 for (으)ㄹ까).
+    """
+    keys = {rule["key"] for rule in ko._get_data_rules()}
+    assert "noun_에__direction" not in keys
+    assert "noun_에__location" not in keys
+    assert _data_rule("noun_에다가__onto-into")["patterns"][0]["re"].pattern == (
+        r"에다가(?!\S)"
+    )
+    # The contracted forms the name spells survive the filter.
+    for key in ("noun_되다__to-become", "verb_을까_ㄹ까__suggestion"):
+        assert _data_rule(key)["patterns"][0]["re"].pattern, key
+
+
+def test_whole_word_focus_no_longer_reports_a_grammar_point():
+    """
+    The rows the filter dropped used to fire on sentences that carry no
+    grammar point at all: any sentence ending in -어요 (the 에-location
+    row marked 있어요) was reported as the 에 point.
+    """
+    for sentence in (
+        "오늘 날씨가 정말 좋아요.",
+        "친구가 아파서 학교에 안 왔어요.",
+        "내일은 친구를 만나러 서울에 갑니다.",
+    ):
+        names = {e["name"] for e in ko.analyze_korean(sentence, "zh")}
+        assert "에" not in names, (sentence, names)
+
+
 def test_matches_carry_no_padding_whitespace():
     """
     A span must not swallow the gap before the next token.  The token
