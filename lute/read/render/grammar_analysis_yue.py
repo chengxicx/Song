@@ -14,6 +14,7 @@ import re
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
     make_rule,
+    rule_library_entries,
     spec_surface,
 )
 
@@ -263,3 +264,15 @@ def analyze_cantonese(page_text, display_lang="en"):
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
     return analyze_tokens(page_text, _YUE_RULES, _tokens_for, display_lang)
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Cantonese grammar library, in CEFR order (A1 -> C2).
+
+    The corpus is the hand-written rule set itself -- the particles and
+    frames the panel can fire, listed for browsing.  No examples (the
+    rule set was written without any) and no tokenizer needed to list
+    them; the module is pure data.
+    """
+    return rule_library_entries(_YUE_RULES, display_lang)

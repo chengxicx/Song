@@ -7,12 +7,14 @@ yet is invisible.  These pages list the whole corpus per language -- the
 curated bases, the level of each point, the wording, the cross-links --
 so the library can be browsed and searched like any other reference.
 
-Only some engines have such a corpus (Japanese and Korean the curated
+Only some engines have such a corpus: Japanese and Korean the curated
 bases, Russian, Spanish, French and German the hand-written rule sets
 plus their merged material rows, Thai a corpus written for this project
-against a standard Thai reference outline); every other language is
-served by the generic regex rules, which carry no point-level library,
-so /grammar/<langid> explains that instead of 404ing.
+against a standard Thai reference outline, and English, Mandarin,
+Cantonese, Arabic, Italian and Portuguese their hand-written rule sets
+(no example sentences yet).  Every other language is served by the
+generic regex rules, which carry no point-level library, so
+/grammar/<langid> explains that instead of 404ing.
 """
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
@@ -22,10 +24,16 @@ from lute.db import db
 from lute.models.language import Language
 from lute.models.repositories import LanguageRepository
 from lute.read.render.grammar_analysis import (
+    is_arabic_language,
+    is_cantonese_language,
+    is_english_language,
     is_french_language,
     is_german_language,
+    is_italian_language,
     is_japanese_language,
     is_korean_language,
+    is_mandarin_chinese_language,
+    is_portuguese_language,
     is_russian_language,
     is_spanish_language,
     is_thai_language,
@@ -101,6 +109,34 @@ def _library_engine(language):
         from lute.read.render import grammar_analysis_th
 
         return grammar_analysis_th
+    # The six rule-set-only engines: importing them is dependency-free
+    # (the spaCy / pyarabic tokenizers load lazily, on first analysis),
+    # so their library renders even when the parser is not installed --
+    # only the reading panel's matcher would need it.
+    if is_english_language(language):
+        from lute.read.render import grammar_analysis_en
+
+        return grammar_analysis_en
+    if is_mandarin_chinese_language(language):
+        from lute.read.render import grammar_analysis_zh
+
+        return grammar_analysis_zh
+    if is_cantonese_language(language):
+        from lute.read.render import grammar_analysis_yue
+
+        return grammar_analysis_yue
+    if is_arabic_language(language):
+        from lute.read.render import grammar_analysis_ar
+
+        return grammar_analysis_ar
+    if is_italian_language(language):
+        from lute.read.render import grammar_analysis_it
+
+        return grammar_analysis_it
+    if is_portuguese_language(language):
+        from lute.read.render import grammar_analysis_pt
+
+        return grammar_analysis_pt
     return None
 
 

@@ -14,6 +14,8 @@ ImportError, so the data-rich assertions need the parser installed;
 `_need_sudachi` / `_need_kiwipiepy` gate those.
 """
 
+import importlib
+
 import markupsafe
 import pytest
 
@@ -188,6 +190,91 @@ def test_de_entries_switch_description_language():
     "Chinese display prefers the zh gloss over the English one."
     zh = {e["key"]: e for e in _de_entries("zh")}
     en = {e["key"]: e for e in _de_entries("en")}
+    switched = [k for k in zh if zh[k]["desc"] != en[k]["desc"]]
+    assert switched, "zh display produced no different descriptions"
+
+
+# ---- the rule-set-only engines (en / zh / yue / ar / it / pt) ----------
+#
+# Their corpus is the hand-written rule set itself: every rule the panel
+# can fire is a browsable row, and the rows carry no examples (the rule
+# sets were written without any).  Importing a module is dependency-free
+# -- the spaCy / pyarabic tokenizers load lazily -- so these tests need
+# no parser installed.
+
+_RULESET_MODULES = (
+    "grammar_analysis_en",
+    "grammar_analysis_zh",
+    "grammar_analysis_yue",
+    "grammar_analysis_ar",
+    "grammar_analysis_it",
+    "grammar_analysis_pt",
+)
+
+_RULESET_RULE_ATTRS = {
+    "grammar_analysis_en": "_EN_RULES",
+    "grammar_analysis_zh": "_ZH_RULES",
+    "grammar_analysis_yue": "_YUE_RULES",
+    "grammar_analysis_ar": "_AR_RULES",
+    "grammar_analysis_it": "_IT_RULES",
+    "grammar_analysis_pt": "_PT_RULES",
+}
+
+
+def _ruleset_engine(module_name):
+    module = importlib.import_module("lute.read.render." + module_name)
+    return module, getattr(module, _RULESET_RULE_ATTRS[module_name])
+
+
+@pytest.mark.parametrize("module_name", _RULESET_MODULES)
+def test_ruleset_entries_are_cefr_ordered_and_unique(module_name):
+    "Same CEFR order discipline as the Spanish corpus."
+    module, _ = _ruleset_engine(module_name)
+    entries = module.library_entries("en")
+    assert entries
+    assert all(e["level"] in _CEFR_RANK for e in entries)
+    ranks = [_CEFR_RANK[e["level"]] for e in entries]
+    assert ranks == sorted(ranks)
+    assert len({e["key"] for e in entries}) == len(entries)
+
+
+@pytest.mark.parametrize("module_name", _RULESET_MODULES)
+def test_ruleset_entries_list_exactly_the_panel_rules(module_name):
+    """
+    The browsable list is the rule set itself: no row the panel can never
+    fire, and no panel rule missing from the page.
+
+    Both directions matter -- a phantom row is a dead link, and a missing
+    one hides a point the reader just met on the page from the library.
+    """
+    module, rules = _ruleset_engine(module_name)
+    entries = module.library_entries("en")
+    assert {e["key"] for e in entries} == {r["key"] for r in rules}
+
+
+@pytest.mark.parametrize("module_name", _RULESET_MODULES)
+def test_ruleset_entries_carry_the_core_fields(module_name):
+    """
+    Every rule renders with a name and a description, and no examples.
+
+    These rule sets carry no example sentences, so the rows come back
+    with an empty list and the detail template hides the example block:
+    an empty examples section would read like a stub.  Nothing is
+    reference-only -- every rule is something the matcher can fire.
+    """
+    module, _ = _ruleset_engine(module_name)
+    for e in module.library_entries("en"):
+        assert e["key"] and e["name"] and e["level"] and e["desc"]
+        assert e["examples"] == []
+        assert e["skipped"] is False
+
+
+@pytest.mark.parametrize("module_name", _RULESET_MODULES)
+def test_ruleset_entries_switch_description_language(module_name):
+    "Chinese display prefers the zh wording over the English one."
+    module, _ = _ruleset_engine(module_name)
+    zh = {e["key"]: e for e in module.library_entries("zh")}
+    en = {e["key"]: e for e in module.library_entries("en")}
     switched = [k for k in zh if zh[k]["desc"] != en[k]["desc"]]
     assert switched, "zh display produced no different descriptions"
 
@@ -676,6 +763,45 @@ def test_french_language_page_renders_its_library(french, app_context, client):
     assert row["text"] in detail
     assert "grammar-item__example-tr" in detail
     assert str(markupsafe.escape(row["tr"])) in detail
+
+
+_RULESET_LANGUAGES = (
+    ("english", "grammar_analysis_en"),
+    ("mandarin", "grammar_analysis_zh"),
+    ("cantonese", "grammar_analysis_yue"),
+    ("arabic", "grammar_analysis_ar"),
+    ("italian", "grammar_analysis_it"),
+    ("portuguese", "grammar_analysis_pt"),
+)
+
+
+@pytest.mark.parametrize("fixture_name,module_name", _RULESET_LANGUAGES)
+def test_ruleset_language_page_renders_its_library(
+    request, fixture_name, module_name, app_context, client
+):
+    """
+    The six rule-set-only languages render the same page shape as the
+    data-rich corpora: one compact card per rule, a detail page behind
+    each, and the language listed on the pick page.
+
+    No parser is needed for any of this -- the engines' tokenizers load
+    lazily, so the library renders on an install without them.
+    """
+    language = request.getfixturevalue(fixture_name)
+    module, _ = _ruleset_engine(module_name)
+    entries = module.library_entries("en")
+    body = client.get(f"/grammar/{language.id}").get_data(as_text=True)
+    _cards_of(body, entries)
+    assert f'href="/grammar/{language.id}"' in client.get(
+        "/grammar/?pick=1"
+    ).get_data(as_text=True)
+
+    # A card opens its point's page: description in, examples out (these
+    # corpora carry none, and the template hides the block).
+    first = entries[0]
+    detail = client.get(f"/grammar/{language.id}/{first['key']}").get_data(as_text=True)
+    assert "grammar-item__desc" in detail
+    assert "grammar-item__examples" not in detail
 
 
 def test_korean_page_shows_korean_descriptions(spanish, app_context, client):

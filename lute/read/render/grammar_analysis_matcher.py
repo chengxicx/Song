@@ -821,6 +821,48 @@ def reference_gloss(reference, display_lang):
     return example_gloss(reference, display_lang)
 
 
+# ---- library export ----------------------------------------------------
+#
+# The /grammar page lists the whole corpus at once, where the panel lists
+# only what the current page happens to contain.  The engines with a data
+# layer (ja/ko/ru/es/fr/de/th) each build their own rows, because their
+# rows carry examples, levels and enrichment the shared shape does not
+# cover; the engines whose corpus *is* their hand-written rule set share
+# the exporter below.
+
+_CEFR_ORDER = ("A1", "A2", "B1", "B2", "C1", "C2")
+
+
+def rule_library_entries(rules, display_lang="en"):
+    """
+    Export a hand-written rule list as browsable library rows.
+
+    Every rule becomes a row -- these rule sets have no reference-only
+    rows, so nothing is flagged ``skipped`` -- ordered by CEFR band and
+    stable within a band (the order the rules are written in, which is
+    the teaching order).  The rows carry no examples: the rule sets that
+    use this exporter were written without any, and the detail template
+    hides an empty example block rather than rendering an empty one.
+    """
+    entries = [
+        {
+            "key": rule["key"],
+            "name": rule["name"],
+            "level": rule["level"],
+            "desc": desc_for_rule(rule, display_lang),
+            "examples": [],
+            "skipped": False,
+        }
+        for rule in rules
+    ]
+    return sorted(
+        entries,
+        key=lambda e: _CEFR_ORDER.index(e["level"])
+        if e["level"] in _CEFR_ORDER
+        else len(_CEFR_ORDER),
+    )
+
+
 # ---- analysis driver ---------------------------------------------------
 
 
