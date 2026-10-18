@@ -38,7 +38,10 @@ An optional rule-level "not_after" spec vetoes matches whose nearest
 left-hand non-punctuation neighbour satisfies it; "followed_by" and
 "not_followed_by" do the same on the right-hand side (the latter over the
 next three non-punctuation tokens), so homographs that differ only in what
-follows can be told apart.
+follows can be told apart.  "at_start" requires the match to open the
+sentence, which is how a word that only reads as a command in first
+position (Spanish "toma", "mira") is told apart from the same word used
+declaratively, where a subject or an auxiliary normally precedes it.
 """
 
 import re
@@ -298,7 +301,9 @@ def match_rule(rule, tokens, sentence_text):
     offsets = [t["idx"] for t in tokens]
     for start, end in runs:
         veto = False
-        if rule.get("not_after"):
+        if rule.get("at_start") and _left_neighbour(tokens, start) is not None:
+            veto = True
+        if not veto and rule.get("not_after"):
             neighbour = _left_neighbour(tokens, start)
             veto = neighbour is not None and _match_condition(
                 rule["not_after"], neighbour
@@ -359,6 +364,7 @@ def make_rule(
     not_after=None,
     followed_by=None,
     not_followed_by=None,
+    at_start=False,
 ):
     """
     Build one engine rule dict.
@@ -366,6 +372,7 @@ def make_rule(
     The two context keys mirror `not_after` on the right-hand side:
     `followed_by` *requires* the next non-punctuation token to match, and
     `not_followed_by` vetoes the hit when any of the next three does.
+    `at_start` keeps only hits that open the sentence.
     """
     r = {"key": key, "name": name, "level": level, "desc": desc, "match": match}
     if zh:
@@ -376,6 +383,8 @@ def make_rule(
         r["followed_by"] = followed_by
     if not_followed_by:
         r["not_followed_by"] = not_followed_by
+    if at_start:
+        r["at_start"] = True
     return r
 
 
@@ -438,6 +447,7 @@ _KO_BY_KEY = {
     "es_mas_que": "más/menos ... que로 '~보다 더/덜' 비교를 나타냄.",
     "es_tan_como": "tan + 형용사 + como로 '만큼 ~한' 동등 비교를 나타냄.",
     "es_le": "간접목적 대명사 le/les는 '그/그들에게'의 뜻으로 gustar류와도 쓰임.",
+    "es_imperativo": "긍정 명령형: 동사가 문장 첫머리에 오면 명령이 되며(Hazlo ahora, Dame el libro), 대명사가 붙으면 dímelo처럼 한 단어로 씀.",
     "es_subj_present": "현재 접속법으로 의지·감정·의심·필요의 표현 뒤에 쓰임(quiero que).",
     "es_conditional": "조건법(compraría)으로 가정이나 정중한 표현을 나타냄.",
     "es_futuro": "단순미래(-ré/-rá/-remos)로 앞으로의 예측·약속·추측을 나타냄(vendrá mañana).",
