@@ -16,6 +16,7 @@ from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
     make_rule,
     make_spacy_tokenizer,
+    rule_library_entries,
     spec_lemma,
     spec_morph,
     spec_pos,
@@ -313,3 +314,14 @@ def analyze_italian(page_text, display_lang="en"):
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
     return analyze_tokens(page_text, _IT_RULES, _tokens_for, display_lang)
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Italian grammar library, in CEFR order (A1 -> C1).
+
+    The corpus is the hand-written rule set itself.  No examples (the
+    rules were written without any); the spaCy model loads lazily, on
+    first analysis, so the list renders without it.
+    """
+    return rule_library_entries(_IT_RULES, display_lang)

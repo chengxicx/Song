@@ -22,6 +22,7 @@ import re
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
     make_rule,
+    rule_library_entries,
     spec_surface,
 )
 
@@ -323,3 +324,15 @@ def analyze_arabic(page_text, display_lang="en"):
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
     return analyze_tokens(page_text, _AR_RULES, _tokens_for_page, display_lang)
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Arabic grammar library, in CEFR order (A1 -> C1).
+
+    The corpus is the hand-written rule set itself.  No examples (the
+    rules were written without any) and no tokenizer needed to list
+    them: pyarabic is only touched when a page is analysed, never to
+    read the rule list.
+    """
+    return rule_library_entries(_AR_RULES, display_lang)
