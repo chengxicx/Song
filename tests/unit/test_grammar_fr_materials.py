@@ -265,3 +265,82 @@ def test_modals_do_not_fire_on_sentence_initial_peut_etre():
     for sentence in fires:
         text = fr._norm_text(sentence)
         assert fr.match_rule(modals, fr._tokens_for(text), text), sentence
+
+
+def test_object_pronoun_row_needs_a_subject_before_it():
+    """
+    The direct-object row is anchored on "subject pronoun + pronoun".
+
+    le / la / les / l' are also articles, and the French model tags them as
+    such ("Il la voit" comes back as DET + NOUN), so a bare form is not a
+    usable signal.  What is unambiguous is the *pair*: a determiner can
+    never follow a subject pronoun, so "je le", "il l'" only occur when the
+    second word is the object pronoun.
+    """
+    row = _data_rule("objets directs")
+    fires = (
+        "Je le fais exprès.",
+        "Il connaissait Ève depuis deux ans quand il l'a épousée.",
+        "Nous les avons vus hier.",
+    )
+    silent = (
+        "Le livre est sur la table.",
+        "Elle lit les journaux du matin.",
+        "C'est la maison de mon frère.",
+    )
+    for sentence in fires:
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(row, fr._tokens_for(text), text), sentence
+    for sentence in silent:
+        text = fr._norm_text(sentence)
+        assert not fr.match_rule(row, fr._tokens_for(text), text), sentence
+
+
+def test_possessive_rows_leave_le_leur_to_the_indirect_object():
+    """
+    "le leur" is two local readings, and only the indirect one is matched.
+
+    The sequence le / la / les + leur is either the possessive pronoun
+    ("la leur") or a direct + indirect object pair ("le leur donner").
+    The possessive row lists mien / tien / sien / nôtre / vôtre only, so
+    the ambiguous form stays with the pronoun-order row instead of being
+    reported by both.
+    """
+    possessive = _data_rule("possessifs")
+    order = _data_rule("le lui, le leur")
+    fires = (
+        "Notre maison est plus petite que la vôtre.",
+        "Mon père travaille à l'hôpital, et le tien?",
+    )
+    for sentence in fires:
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(possessive, fr._tokens_for(text), text), sentence
+    ambiguous = "Elle va le leur emprunter."
+    text = fr._norm_text(ambiguous)
+    assert not fr.match_rule(possessive, fr._tokens_for(text), text)
+    assert fr.match_rule(order, fr._tokens_for(text), text)
+
+
+def test_negation_splits_personne_and_rien_off_the_general_rule():
+    """
+    personne / rien belong to their own rows, not to ne ... pas/plus/jamais.
+
+    The hand-written rule used to list them among its second words, which
+    made it report the same span as the dedicated rows.  Narrowing it to
+    the words its name claims keeps both readings distinct, and neither
+    point loses its highlight: each dedicated row covers the same span.
+    """
+    negation = next(r for r in fr._FR_RULES if r["key"] == "fr_negation")
+    personne = _data_rule("personne (nobody)")
+    rien = _data_rule("rien (nothing)")
+    for sentence in ("Je ne connais personne ici.", "Je n'ai vu personne."):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(personne, fr._tokens_for(text), text), sentence
+        assert not fr.match_rule(negation, fr._tokens_for(text), text), sentence
+    for sentence in ("Ça ne veut rien dire.", "Je n'ai rien dit."):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(rien, fr._tokens_for(text), text), sentence
+        assert not fr.match_rule(negation, fr._tokens_for(text), text), sentence
+    for sentence in ("Elle ne travaille pas le lundi.", "Tu ne voyages jamais en hiver."):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(negation, fr._tokens_for(text), text), sentence

@@ -97,13 +97,14 @@ _FR_RULES = [
         "ne before the verb, the second word after it: je ne sais pas.",
         {
             "left": [spec_surface("ne", "n'")],
-            "right": [
-                spec_surface("pas", "plus", "jamais", "rien", "personne", "aucun")
-            ],
+            # rien / personne are deliberately absent: each has its own data
+            # row ("ne ... rien", "ne ... personne") on exactly this span, and
+            # naming them here would claim those points twice.
+            "right": [spec_surface("pas", "plus", "jamais", "aucun")],
             "min_gap": 1,
             "max_gap": 5,
         },
-        zh="否定圈：ne + 动词 + pas/plus/jamais/rien。",
+        zh="否定圈：ne + 动词 + pas/plus/jamais。",
     ),
     make_rule(
         "fr_ne_que",
