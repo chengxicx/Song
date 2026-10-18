@@ -493,6 +493,7 @@
   "meaning_zh": "por + 原形动词：因为、为了（原因或努力）",
   "level": "A2",
   "focus": [
+   "!acabar/estar",
    "por",
    "§inf"
   ],
@@ -634,7 +635,7 @@
   "meaning_zh": "tanto … como …：和……一样多",
   "level": "A2",
   "focus": [
-   "tanto/tanta/tantos/tantas",
+   "=tanto/tanta/tantos/tantas",
    "...",
    "como"
   ],

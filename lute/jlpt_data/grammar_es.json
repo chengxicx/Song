@@ -481,6 +481,7 @@
    "我没告诉你，是不想让你难受。"
   ],
   "focus": [
+   "!acabar/estar",
    "por",
    "§inf"
   ],
@@ -616,7 +617,7 @@
    "我玩得和路易莎一样开心。"
   ],
   "focus": [
-   "tanto/tanta/tantos/tantas",
+   "=tanto/tanta/tantos/tantas",
    "...",
    "como"
   ],
@@ -1596,12 +1597,12 @@
    "我从没去过墨西哥。"
   ],
   "focus": [
-   "nada/nadie/nunca/tampoco"
+   "nada/nadie/nunca"
   ],
   "zh": "否定词 nada / nadie / nunca / tampoco",
   "level": "A2",
   "formation": "否定词可置于动词后（前面保留 no）或句首（不再加 no）",
-  "notes": "西班牙语允许双重否定：No dijo nada（他什么都没说）。否定词放句首时去掉 no：Nada dijo。"
+  "notes": "西班牙语允许双重否定：No dijo nada（他什么都没说）。否定词放句首时去掉 no：Nada dijo。tampoco 归 A1 的 también / tampoco 那条报告，这里不再重复匹配。"
  },
  {
   "key": "esm_perosinocontraste__aea07f",
@@ -1687,6 +1688,7 @@
   ],
   "focus": [
    "hace",
+   "!falta",
    "...",
    "que"
   ],
@@ -3207,6 +3209,7 @@
    "我饿得等不下去了。"
   ],
   "focus": [
+   "!en",
    "tanto",
    "...",
    "que"
@@ -3302,7 +3305,7 @@
   ],
   "focus": [
    "si",
-   "§verb"
+   "§ind"
   ],
   "zh": "si + 陈述式：真实条件（如果……）",
   "level": "A2",

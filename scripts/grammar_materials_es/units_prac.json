@@ -152,6 +152,7 @@
   "meaning_zh": "tanto … que …：如此……以至于",
   "level": "A2",
   "focus": [
+   "!en",
    "tanto",
    "...",
    "que"
@@ -251,7 +252,7 @@
   "level": "A2",
   "focus": [
    "si",
-   "§verb"
+   "§ind"
   ],
   "formation": "si + 陈述式现在时, 主句（现在/将来/命令）",
   "notes": "真实条件用陈述式；假设（si + 虚拟式过去时）表不可能的情况，两者别混。",
