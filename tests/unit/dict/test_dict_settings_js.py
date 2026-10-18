@@ -3,7 +3,7 @@ The settings page's "Local dictionaries (MDX)" card (static/js/dict-settings.js)
 
 The card is the only consumer of the /dict endpoints' JSON, and the field
 names are a contract: the Python side sends `dictionaries[].filename`,
-`.title`, `.entries`, `.size_mb`, `.source`, `.url`, `.is_default`, plus
+`.title`, `.entries`, `.size_mb`, `.source`, `.url`, plus
 `task_id`, `state`, `processed`, `error`, `dictionary.entries` and the
 remove payload's `result`/`removed`.  Rename one on either side and
 nothing throws -- the card renders blank, or the progress poll never
@@ -34,7 +34,6 @@ INSTALLED = {
     "installed": True,
     "filename": "ja_zh_shogakukan_v2.db",
     "url": "/static/dict/ja_zh_shogakukan_v2.db",
-    "is_default": True,
     "size_mb": 42.5,
     "modified": "2026-10-11 18:40",
     "source": "shogakukan_v2.mdx",
@@ -48,7 +47,6 @@ BARE = {
     "installed": True,
     "filename": "ko_zh_basic.db",
     "url": "/static/dict/ko_zh_basic.db",
-    "is_default": False,
     "size_mb": 12.0,
     "modified": "2026-10-11 18:40",
     "source": None,
@@ -121,12 +119,16 @@ def test_render_lists_every_dictionary_in_the_pool():
     assert 'href="/static/dict/ja_zh_shogakukan_v2.db"' in html
 
 
-def test_render_marks_the_phones_default_file():
+def test_render_marks_no_dictionary_as_special():
+    """
+    The pool has no privileged file: the phone app builds every download
+    URL from this list, so nothing here is labelled "the default".
+    """
     dom = _run({"scenario": "render", "dictionaries": [INSTALLED, BARE]})["dom"]
     html = dom["dict_settings_list"]["html"]
 
-    assert html.count("phone default") == 1
-    assert "phone default" in html.split("ko_zh_basic.db")[0]
+    assert "phone default" not in html
+    assert "default" not in html.lower()
 
 
 def test_render_says_so_when_the_pool_is_empty():

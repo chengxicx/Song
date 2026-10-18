@@ -362,7 +362,7 @@
     </tr>
     <tr>
       <td>
-        {{ t('Show a definition for words Lute has no translation for yet — the word you have never studied.  Import an MDX (MDict) dictionary once and this server converts it into a lookup file.  Each language then picks one of them on its own settings page, and the phone app downloads') }} <code>{{ dict_filename }}</code> {{ t('to work offline.') }}
+        {{ t('Show a definition for words Lute has no translation for yet — the word you have never studied.  Import an MDX (MDict) dictionary once and this server converts it into a lookup file.  The pool below is what clients choose from: each language picks one on its own settings page, and the phone app lists the same pool so you can download any of them for offline use.') }}
       </td>
       <td>
         <div id="dict_settings_list">{{ t('Checking…') }}</div>
@@ -374,7 +374,7 @@
                   onclick="DictSettings.importSelected(); return false;">{{ t('Import') }}</button>
         </div>
         <div style="font-size: 0.85em; color: #666; margin-top: 6px;">
-          {{ t('Up to 200 MB through the browser.  For a bigger dictionary, run <code>tools/mdx_to_sqlite.py <file.mdx> <out.db></code> on the server and put the result in the dictionary folder.  Name it') }} <code>{{ dict_filename }}</code> {{ t('to serve the phone app with no setup.') }}
+          {{ t('Up to 200 MB through the browser.  For a bigger dictionary, run <code>tools/mdx_to_sqlite.py <file.mdx> <out.db></code> on the server and put the result in the dictionary folder — every .db in there joins the pool, on the web and on the phone alike, under whatever name you gave it.') }}
         </div>
         <div id="dict_settings_msg" style="margin-top: 6px;"></div>
       </td>

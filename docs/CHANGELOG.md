@@ -36,8 +36,9 @@ Feature changes:
   popup (per language, "Show dictionary definitions in the term popup", on by
   default; the old global "Show local dictionary definitions" setting is
   gone) and in a "Local" tab at the head of the dictionary strip below the
-  reading page.  Naming a file `ja_zh_shogakukan_v2.db` keeps the phone app's
-  default download URL working with no setup.  A dictionary can also be built
+  reading page.  No file name is special: the phone app lists the same pool
+  and downloads whichever entry you tap, and the settings card badges none of
+  them.  A dictionary can also be built
   ahead of time with `python tools/mdx_to_sqlite.py <file.mdx> <out.db>`.
   MDict 1.2/2.0 files are supported with no block compression, zlib or LZO1X,
   in UTF-8, UTF-16 or GB18030, including the export-locked ones

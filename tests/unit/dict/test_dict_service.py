@@ -15,6 +15,10 @@ ENTRIES = [
     ("箱", "<div>はこ<br/>箱子</div>"),
 ]
 
+# A neutral pool file name: nothing in the service privileges a
+# particular name any more, so tests just need one that is theirs.
+DICT = "test_dict.db"
+
 
 def _wait(task_id, timeout=10.0):
     "Poll an import task until it reaches a terminal state."
@@ -162,7 +166,7 @@ def test_status_reports_the_installed_dictionary(app, app_context, dict_dirs):
     info = service.status()
 
     assert info["installed"] is True
-    assert info["filename"] == service.DB_FILENAME
+    assert info["filename"] == "fixture.db"
     assert info["title"] == "Fixture"
     assert info["source"] == "fixture.mdx"
     assert info["entries"] == len(ENTRIES)
@@ -170,7 +174,10 @@ def test_status_reports_the_installed_dictionary(app, app_context, dict_dirs):
     # the published file is there and its size was reported.
     assert info["size_mb"] is not None
     assert os.path.getsize(service.db_path()) > 0
-    assert info["url"].endswith(f"/static/dict/{service.DB_FILENAME}")
+    assert info["url"].endswith("/static/dict/fixture.db")
+    # No file is singled out as "the" dictionary: there is no badge for
+    # a client to render, because there is no fixed name to badge.
+    assert "is_default" not in info
 
 
 def test_remove_deletes_the_dictionary(app, app_context, dict_dirs):
@@ -243,27 +250,46 @@ def test_lookup_candidates_are_deduplicated():
 
 def test_a_second_dictionary_is_a_separate_file(app, app_context, dict_dirs):
     _static, scratch = dict_dirs
-    _import(app, scratch, build_mdx(ENTRIES), target=service.DB_FILENAME)
+    _import(app, scratch, build_mdx(ENTRIES), target=DICT)
     other = [("안녕", "<div>你好</div>")]
     _import(app, scratch, build_mdx(other), name="ko.mdx", target="ko_zh_basic.db")
 
     # Each lookup only ever sees its own file.
-    assert service.lookup("たのしい") == "楽しい\n愉快yúkuài"
+    assert service.lookup("たのしい", None, DICT) == "楽しい\n愉快yúkuài"
     assert service.lookup("たのしい", None, "ko_zh_basic.db") is None
     assert service.lookup("안녕", None, "ko_zh_basic.db") == "你好"
-    assert service.lookup("안녕") is None
+    assert service.lookup("안녕", None, DICT) is None
 
 
-def test_list_installed_puts_the_phones_file_first(app, app_context, dict_dirs):
+def test_list_installed_is_alphabetical(app, app_context, dict_dirs):
+    "No file is first because of its name -- only because of its letters."
     _static, scratch = dict_dirs
     assert service.list_installed() == []
 
-    for target in ("zz_other.db", service.DB_FILENAME, "aa_other.db"):
+    for target in ("zz_other.db", DICT, "aa_other.db"):
         _import(app, scratch, build_mdx(ENTRIES), name="fixture.mdx", target=target)
 
     names = [d["filename"] for d in service.list_installed()]
-    assert names == [service.DB_FILENAME, "aa_other.db", "zz_other.db"]
-    assert service.list_installed()[0]["is_default"] is True
+    assert names == ["aa_other.db", DICT, "zz_other.db"]
+
+
+def test_a_caller_that_names_no_file_gets_the_first_one(
+    app, app_context, dict_dirs
+):
+    """
+    ``None`` means "the pool's first entry" -- a stable fallback, not a
+    privileged file.  Before this, ``None`` meant a hard-coded name the
+    phone app's download URL pointed at.
+    """
+    _static, scratch = dict_dirs
+    assert service.default_name() is None
+    assert service.status()["installed"] is False
+
+    _import(app, scratch, build_mdx(ENTRIES), target="zz_other.db")
+    assert service.default_name() == "zz_other.db"
+    _import(app, scratch, build_mdx(ENTRIES), name="b.mdx", target="aa_other.db")
+    assert service.default_name() == "aa_other.db"
+    assert service.status()["filename"] == "aa_other.db"
 
 
 def test_list_installed_ignores_files_that_are_not_dictionaries(
@@ -276,7 +302,7 @@ def test_list_installed_ignores_files_that_are_not_dictionaries(
     ) as f:
         f.write("not a dictionary")
 
-    assert [d["filename"] for d in service.list_installed()] == [service.DB_FILENAME]
+    assert [d["filename"] for d in service.list_installed()] == ["fixture.db"]
 
 
 def test_remove_only_touches_the_named_dictionary(app, app_context, dict_dirs):
@@ -294,7 +320,7 @@ def test_an_unusable_name_never_touches_a_file(app_context, dict_dirs):
     """
     The name is stored per language and comes back through a form, so a
     bad one must resolve to "no dictionary" -- not to a path outside the
-    pool, and not to the default file.
+    pool, and not to some other file that happens to be in it.
     """
     for bad in ("../secret.db", "/etc/passwd", ".hidden.db", "a/b.db", "a.txt"):
         assert service.is_pool_name(bad) is False, bad

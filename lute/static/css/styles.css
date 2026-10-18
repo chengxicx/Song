@@ -4362,13 +4362,28 @@ div#termimagesearch span img {
 }
 .series-summary-continue {
     margin-left: auto;
+    /* A chapter's full title can be wider than the summary panel -- e.g.
+       "1. LingQ Mini Stories, 1a - Михаил работает по-новому, часть 1".
+       The flex item's content-based minimum would keep it at max-content
+       width and push the button past the panel's right edge, so allow it
+       to shrink (min-width: 0) and cap it at the line width. */
+    min-width: 0;
+    max-width: 100%;
 }
 /* !important is required: the themes' `a:link` color override also uses
    it (e.g. Default's #0a84ff), which turned the label blue-on-blue. */
 .series-summary a.series-continue-btn,
 a.series-continue-btn:link,
 a.series-continue-btn:visited {
-    display: inline-block;
+    /* Block + max-width so the one-line label ellipsizes when the panel
+       is narrower than the book title (the full title is in the tooltip);
+       box-sizing keeps the padding inside that cap. */
+    display: block;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     background-color: #2b6cb0;
     color: #fff !important;
     padding: 8px 16px;
