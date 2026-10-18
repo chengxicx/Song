@@ -108,13 +108,15 @@
    "会上各种观点都得到了表达。"
   ],
   "focus": [
-   "a",
-   "été"
+   "a/ont",
+   "été",
+   "...",
+   "par"
   ],
   "zh": "被动语态（复合过去时）：被……",
   "level": "B1",
   "formation": "sujet + avoir + été + participe passé (+ par + agent)",
-  "notes": "复合过去时的被动式。现在时被动（est + 分词）与 être 助动词的复合过去时（il est allé）表面同形，为避免误报不单列。"
+  "notes": "复合过去时的被动式。匹配要求显式代理 par：a été + 形容词/表语（elle a été malade）不是被动，与 avoir/être + 分词 的过去时规则同跨度双报；无代理被动（le film a été tourné）暂不匹配，宁可欠命中。现在时被动（est + 分词）与 être 助动词的复合过去时（il est allé）表面同形，为避免误报不单列。"
  },
  {
   "key": "fgm_jusquàcequesubjonctifuntil__e1ed85",
