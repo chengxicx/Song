@@ -4,7 +4,7 @@
  * Runs the real lute/static/js/dict-settings.js against a stub DOM,
  * fetch and XMLHttpRequest.  What needs pinning is the contract with
  * lute/dict/routes.py: the card reads `dictionaries[].filename`,
- * `.title`, `.entries`, `.size_mb`, `.source`, `.url`, `.is_default`,
+ * `.title`, `.entries`, `.size_mb`, `.source`, `.url`,
  * plus `task_id`, `state`, `processed`, `error`, `dictionary.entries`
  * and the remove payload's `result`/`removed`/`message`.  A renamed
  * field on either side does not throw -- it renders an empty card, or a

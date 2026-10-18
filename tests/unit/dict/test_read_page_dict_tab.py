@@ -25,6 +25,9 @@ ENTRIES = [
     ("ひさしぶり", "<div>久し振り<br/>好久不见</div>"),
 ]
 
+# A neutral pool file name -- no name is special on the server any more.
+DICT = "test_dict.db"
+
 
 def _import(app, scratch, entries=ENTRIES, name="fixture.mdx", target=None):
     "Publish a fixture dictionary and wait for it."
@@ -90,7 +93,7 @@ def test_no_local_tab_when_the_language_has_no_local_row(
     offered the Japanese dictionary again, which is what the rows
     replace.
     """
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
     book = _make_book(japanese)
 
     assert "/read/localdict/" not in _term_dicts_json(client, book)
@@ -112,8 +115,8 @@ def test_the_local_dictionary_can_be_the_first_tab(
     client, app, app_context, dict_dirs, japanese
 ):
     "A Local row at sort order 0 opens the strip (the offline-capable tab)."
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
-    _use(japanese, service.DB_FILENAME, order=0)
+    _import(app, dict_dirs[1], target=DICT)
+    _use(japanese, DICT, order=0)
     book = _make_book(japanese)
 
     dicts = _term_dicts_json(client, book)
@@ -129,13 +132,13 @@ def test_the_local_dictionary_can_be_the_first_tab(
 def test_the_local_tab_url_carries_the_language_file_and_placeholder(
     client, app, app_context, dict_dirs, japanese
 ):
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
-    _use(japanese, service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
+    _use(japanese, DICT)
     book = _make_book(japanese)
 
     dicts = _term_dicts_json(client, book)
 
-    assert f"/read/localdict/{japanese.id}/{service.DB_FILENAME}/[LUTE]" in dicts
+    assert f"/read/localdict/{japanese.id}/{DICT}/[LUTE]" in dicts
 
 
 def test_local_tabs_follow_the_row_order(client, app, app_context, dict_dirs, japanese):
@@ -143,7 +146,7 @@ def test_local_tabs_follow_the_row_order(client, app, app_context, dict_dirs, ja
     Several local dictionaries per language, positioned by drag-and-drop
     like the online tabs: order 0 opens the strip, order 99 trails it.
     """
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
     _import(
         app,
         dict_dirs[1],
@@ -151,13 +154,13 @@ def test_local_tabs_follow_the_row_order(client, app, app_context, dict_dirs, ja
         name="second.mdx",
         target="second.db",
     )
-    _use(japanese, service.DB_FILENAME, order=0)
+    _use(japanese, DICT, order=0)
     _use(japanese, "second.db", order=99)
     book = _make_book(japanese)
 
     dicts = _term_dicts_json(client, book)
 
-    first = dicts.index(f"/read/localdict/{japanese.id}/{service.DB_FILENAME}/")
+    first = dicts.index(f"/read/localdict/{japanese.id}/{DICT}/")
     online = dicts.index("jisho.org")
     second = dicts.index(f"/read/localdict/{japanese.id}/second.db/")
     assert first < online < second
@@ -166,9 +169,9 @@ def test_local_tabs_follow_the_row_order(client, app, app_context, dict_dirs, ja
 def test_a_hidden_local_row_offers_no_tab(
     client, app, app_context, dict_dirs, japanese
 ):
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
     # The relationship sorts by sort_order, so keep the row object.
-    row = _use(japanese, service.DB_FILENAME)
+    row = _use(japanese, DICT)
     row.is_hidden = True
     db.session.commit()
     book = _make_book(japanese)
@@ -182,8 +185,8 @@ def test_a_hidden_local_row_offers_no_tab(
 def test_the_lookup_endpoint_returns_the_gloss(
     client, app, app_context, dict_dirs, japanese
 ):
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
-    _use(japanese, service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
+    _use(japanese, DICT)
 
     data = client.get(
         f"/read/localdict_lookup/{japanese.id}/{quote('たのしい')}"
@@ -221,8 +224,8 @@ def test_the_lookup_endpoint_uses_the_term_reading(
     client, app, app_context, dict_dirs, japanese
 ):
     "A kanji spelling finds the kana-keyed entry, same as the Local tab."
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
-    _use(japanese, service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
+    _use(japanese, DICT)
     term = Term(japanese, "楽しい")
     term.romanization = "たのしい"
     db.session.add(term)
@@ -237,8 +240,8 @@ def test_the_lookup_endpoint_returns_null_for_an_unknown_word(
     client, app, app_context, dict_dirs, japanese
 ):
     "No entry: gloss null, the caller falls back to online translation."
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
-    _use(japanese, service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
+    _use(japanese, DICT)
 
     data = client.get(
         f"/read/localdict_lookup/{japanese.id}/{quote('存在しない')}"
@@ -253,8 +256,8 @@ def test_the_lookup_endpoint_returns_null_for_an_unknown_word(
 def test_the_local_tab_frame_shows_the_gloss(
     client, app, app_context, dict_dirs, japanese
 ):
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
-    _use(japanese, service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
+    _use(japanese, DICT)
 
     html = client.get(f"/read/localdict/{japanese.id}/{quote('たのしい')}").data.decode(
         "utf-8"
@@ -269,7 +272,7 @@ def test_the_named_tab_frame_serves_that_one_dictionary(
     client, app, app_context, dict_dirs, japanese
 ):
     "The 3-segment URL names the pool file, so each tab reads its own db."
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
     _import(
         app,
         dict_dirs[1],
@@ -277,11 +280,11 @@ def test_the_named_tab_frame_serves_that_one_dictionary(
         name="second.mdx",
         target="second.db",
     )
-    _use(japanese, service.DB_FILENAME, order=0)
+    _use(japanese, DICT, order=0)
     _use(japanese, "second.db", order=1)
 
     first = client.get(
-        f"/read/localdict/{japanese.id}/{service.DB_FILENAME}/{quote('たのしい')}"
+        f"/read/localdict/{japanese.id}/{DICT}/{quote('たのしい')}"
     ).data.decode("utf-8")
     second = client.get(
         f"/read/localdict/{japanese.id}/second.db/{quote('たのしい')}"
@@ -313,8 +316,8 @@ def test_the_local_tab_frame_uses_the_term_reading(
     client, app, app_context, dict_dirs, japanese
 ):
     "A kanji spelling finds the kana-keyed entry through the reading."
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
-    _use(japanese, service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
+    _use(japanese, DICT)
     term = Term(japanese, "楽しい")
     term.romanization = "たのしい"
     db.session.add(term)
@@ -333,9 +336,9 @@ def test_xref_links_carry_their_reading(client, app, app_context, dict_dirs, jap
         app,
         dict_dirs[1],
         entries=[("ありがとう", "<div>See also: 有り難う【ありがとう②】</div>")],
-        target=service.DB_FILENAME,
+        target=DICT,
     )
-    _use(japanese, service.DB_FILENAME)
+    _use(japanese, DICT)
 
     html = client.get(f"/read/localdict/{japanese.id}/{quote('ありがとう')}").data.decode(
         "utf-8"
@@ -356,9 +359,9 @@ def test_an_xref_click_resolves_the_homograph(
             ("下", "<div>See also: 下【か】</div>"),
             ("下【か】", "<div>下级。（位が下のもの。）</div>"),
         ],
-        target=service.DB_FILENAME,
+        target=DICT,
     )
-    _use(japanese, service.DB_FILENAME)
+    _use(japanese, DICT)
 
     plain = client.get(f"/read/localdict/{japanese.id}/{quote('下')}").data.decode(
         "utf-8"
@@ -397,8 +400,8 @@ def test_the_frame_reads_the_languages_own_dictionaries(
 def test_the_local_tab_frame_says_so_for_an_unknown_word(
     client, app, app_context, dict_dirs, japanese
 ):
-    _import(app, dict_dirs[1], target=service.DB_FILENAME)
-    _use(japanese, service.DB_FILENAME)
+    _import(app, dict_dirs[1], target=DICT)
+    _use(japanese, DICT)
 
     html = client.get(f"/read/localdict/{japanese.id}/{quote('存在しない')}").data.decode(
         "utf-8"
@@ -416,9 +419,9 @@ def test_the_local_tab_frame_escapes_the_gloss(
         dict_dirs[1],
         entries=[("あぶない", "<div>&lt;script&gt;alert(1)&lt;/script&gt;</div>")],
         name="html.mdx",
-        target=service.DB_FILENAME,
+        target=DICT,
     )
-    _use(japanese, service.DB_FILENAME)
+    _use(japanese, DICT)
 
     html = client.get(f"/read/localdict/{japanese.id}/{quote('あぶない')}").data.decode(
         "utf-8"
@@ -441,9 +444,9 @@ def test_the_frame_drops_the_duplicated_headword_line(
         dict_dirs[1],
         entries=[("終わり", "<div>終わり【おわり◎】<br/>名<br/>终，终了。</div>")],
         name="shogakukan.mdx",
-        target=service.DB_FILENAME,
+        target=DICT,
     )
-    _use(japanese, service.DB_FILENAME)
+    _use(japanese, DICT)
 
     html = client.get(f"/read/localdict/{japanese.id}/{quote('終わり')}").data.decode(
         "utf-8"
@@ -467,9 +470,9 @@ def test_the_frame_keeps_an_entry_found_through_its_reading(
         dict_dirs[1],
         entries=[("おわり", "<div>終わり【おわり◎】<br/>名<br/>终，终了。</div>")],
         name="kana.mdx",
-        target=service.DB_FILENAME,
+        target=DICT,
     )
-    _use(japanese, service.DB_FILENAME)
+    _use(japanese, DICT)
 
     html = client.get(f"/read/localdict/{japanese.id}/{quote('おわり')}").data.decode(
         "utf-8"

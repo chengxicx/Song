@@ -44,12 +44,14 @@ def _import(app, scratch, entries=ENTRIES, name="fixture.mdx", target=None):
     raise AssertionError("import never finished")
 
 
-def _use(language, filename=service.DB_FILENAME, gloss=True):
+def _use(language, filename=None, gloss=True):
     "Give the language a Local dictionary row, and set the popup switch."
     d = LanguageDictionary()
     d.usefor = "terms"
     d.dicttype = "localdict"
-    d.dicturi = filename
+    # None = whatever _import() just published (the pool's only file in
+    # these tests); a language row always stores a concrete name.
+    d.dicturi = filename or service.default_name()
     d.is_active = True
     d.sort_order = 0
     language.dictionaries.append(d)

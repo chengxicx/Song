@@ -15,21 +15,25 @@ MdxReader.clean_definition), so neither client has to strip HTML.
 Every converted file lives in one folder inside the static folder -- a
 *pool* of dictionaries, since a server can serve more than one language:
 
-    <static>/dict/ja_zh_shogakukan_v2.db
-    /static/dict/ja_zh_shogakukan_v2.db
+    <static>/dict/<name>.db
+    /static/dict/<name>.db
 
-The name ``ja_zh_shogakukan_v2.db`` is special only in that it is the
-file the phone's default download URL points at, so a phone pointed at
-this server picks that one up with no configuration.  Any other
-``*.db`` in the folder is usable too; a language uses any of them via
-'localdict' rows in its dictionary list (``LanguageDictionary`` with
-``dicttype == "localdict"``, the dicturi holding the file name), and a
-language with no such rows has no local dictionary.
+Nothing here privileges one file over another: the pool is whatever was
+imported, and every client lists it and chooses.  A language uses any of
+them via 'localdict' rows in its dictionary list
+(``LanguageDictionary`` with ``dicttype == "localdict"``, the dicturi
+holding the file name); the phone app fetches the same list and
+downloads whichever entry the reader taps; a language with no such rows
+has no local dictionary.
+
+A caller that names no file (``None``) gets the pool's first entry
+alphabetically.  That is a stable fallback for tests and for old call
+sites -- never a file name anybody hard-codes into a URL.
 
 Every function here takes the file name as its last argument, and
-``None`` means "the default one" -- the phone's file.  The name always
-comes from a language row or a form field, so it is validated before it
-is joined onto the folder (see ``_is_pool_name``).
+``None`` means "the first one in the pool".  The name always comes from
+a language row or a form field, so it is validated before it is joined
+onto the folder (see ``is_pool_name``).
 
 Lookups open the file read-only, per call: a few sub-milliseconds of
 sqlite3 setup against a user-driven popup, in exchange for never holding
@@ -53,14 +57,6 @@ from lute.dict import importer
 # Re-exported: the definition cap is the importer's, but it is part of
 # what this module promises about the published dictionary.
 from lute.dict.importer import MAX_DEFINITION_CHARS  # pylint: disable=unused-import
-
-# The default dictionary's file name -- the one the phone app's
-# dictionary URL uses (DictRepository.urlOnServer in LuteForMobile), so
-# having it in the pool means the phone works with no setup at all.
-# Other dictionaries may sit beside it; this one is what a caller gets
-# when it does not name one.  A dictionary's real identity (title,
-# entry count, where it came from) is in its metadata sidecar.
-DB_FILENAME = "ja_zh_shogakukan_v2.db"
 
 DICT_SUBDIR = "dict"
 
@@ -108,16 +104,41 @@ def is_pool_name(name):
     )
 
 
+def _pool_names():
+    "Every usable .db file name in the pool, alphabetically.  Never raises."
+    try:
+        names = [n for n in os.listdir(dict_dir()) if n.endswith(".db")]
+    except OSError:
+        return []
+    return sorted((n for n in names if is_pool_name(n)), key=str.lower)
+
+
+def default_name():
+    """
+    The file a caller gets when it does not name one: the pool's first
+    entry, or None when the pool is empty.
+
+    Deliberately *not* a fixed name.  There is no "the phone's
+    dictionary" here any more: the phone lists the pool and downloads
+    whichever file the reader chooses, so no client needs this to be a
+    particular file.  Callers that pass ``None`` (old code, tests) just
+    need something deterministic.
+    """
+    names = _pool_names()
+    return names[0] if names else None
+
+
 def resolve_name(filename):
     """
     The pool file name a caller means, or None when it is not a usable
-    name.  ``None`` means the default dictionary -- the phone's file --
-    but "" does *not*: an empty name is the value a language row holds
-    when it has no dictionary, and falling back to the default there is
-    exactly the bug the per-language setting exists to fix.
+    name.  ``None`` means "the pool's first entry" (see
+    :func:`default_name`), but "" does *not*: an empty name is the value
+    a language row holds when it has no dictionary, and falling back to
+    something else there is exactly the bug the per-language setting
+    exists to fix.
     """
     if filename is None:
-        return DB_FILENAME
+        return default_name()
     return filename if is_pool_name(filename) else None
 
 
@@ -190,7 +211,6 @@ def status(filename=None):
         "installed": False,
         "filename": name if name is not None else filename,
         "url": download_url(filename),
-        "is_default": name == DB_FILENAME,
         "size_mb": None,
         "modified": None,
         "source": None,
@@ -218,20 +238,14 @@ def status(filename=None):
 
 def list_installed():
     """
-    Every dictionary in the pool, the phone's default file first and the
-    rest alphabetically.
+    Every dictionary in the pool, alphabetically.
 
-    This is what the language form's dropdown is built from, so a
-    dictionary that was dropped into the folder by hand (the CLI path in
-    tools/mdx_to_sqlite.py) shows up with no extra bookkeeping.
+    This is what the language form's dropdown, the settings card and the
+    phone app's download list are built from, so a dictionary dropped
+    into the folder by hand (the CLI path in tools/mdx_to_sqlite.py)
+    shows up with no extra bookkeeping.
     """
-    try:
-        names = [n for n in os.listdir(dict_dir()) if n.endswith(".db")]
-    except OSError:
-        return []
-    names = [n for n in names if is_pool_name(n)]
-    names.sort(key=lambda n: (n != DB_FILENAME, n.lower()))
-    return [status(n) for n in names]
+    return [status(n) for n in _pool_names()]
 
 
 def remove(filename=None):
@@ -327,9 +341,9 @@ def lookup(term, reading=None, filename=None, prefer_reading=False):
     gloss.
 
     ``filename`` is the language's ``local_dict``.  A caller that has a
-    language in hand must pass it -- falling back to the default
-    dictionary is how the *old* single-dictionary code ended up serving
-    the Japanese dictionary under a Korean book.
+    language in hand must pass it -- falling back to "some other
+    dictionary in the pool" is how the *old* single-dictionary code
+    ended up serving the Japanese dictionary under a Korean book.
 
     ``prefer_reading``: the reading is known to pick out one specific
     entry (a clicked cross-reference), so reading-qualified keys are
@@ -499,15 +513,21 @@ def _run_import(app, task_id, mdx_path, source_name, filename=None):
 def start_import(app, mdx_path, source_name, filename=None):
     """
     Convert the MDX at ``mdx_path`` in the background into the pool
-    dictionary ``filename`` (the default one when None), and return the
-    task_id.  The caller owns ``mdx_path``: the task deletes it when it
-    finishes, successfully or not.
+    dictionary ``filename``, and return the task_id.  The caller owns
+    ``mdx_path``: the task deletes it when it finishes, successfully or
+    not.
+
+    A missing ``filename`` is derived from the .mdx name
+    (:func:`suggested_filename`) rather than resolved against the pool:
+    a file that does not exist yet cannot mean "whichever one is first".
 
     An existing dictionary of the same name is left alone until the
     conversion succeeds (importer.convert builds beside the target and
     renames), so re-importing never leaves a language with no
     dictionary to read.
     """
+    if filename is None:
+        filename = suggested_filename(source_name)
     if resolve_name(filename) is None:
         raise ValueError(f"Not a dictionary file name: {filename!r}")
     purge_finished_tasks()

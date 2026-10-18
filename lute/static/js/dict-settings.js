@@ -5,8 +5,7 @@
  *
  * Four endpoints (see lute/dict/routes.py):
  *
- *   GET  /dict/status                  -> {result, default_filename,
- *                                           dictionaries: [{...}, ...]}
+ *   GET  /dict/status                  -> {result, dictionaries: [{...}]}
  *   POST /dict/import                  -> {result, task_id, source, filename}
  *   GET  /dict/import_status/<task_id> -> {result, state, processed, error,
  *                                           dictionary}
@@ -114,12 +113,6 @@ const DictSettings = (function () {
       '<div style="border-top: 1px solid #ddd; padding: 6px 0;">',
       "<b>" + _esc(d.title || name) + "</b>",
     ];
-    if (d.is_default) {
-      parts.push(
-        ' <span style="font-size: 0.8em; border: 1px solid #999;' +
-      ' border-radius: 3px; padding: 0 4px;">' + I18N.t("phone default") + "</span>"
-    );
-    }
     parts.push(
       '<div style="font-size: 0.85em; color: #666;">' + _esc(name) +
       (facts ? " \u00b7 " + _esc(facts) : "") + "</div>"

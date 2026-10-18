@@ -20,6 +20,9 @@ from lute.db import db
 from lute.dict import service
 from lute.models.language import Language, LanguageDictionary
 
+# A neutral pool file name -- no name is special on the server any more.
+DICT = "test_dict.db"
+
 
 @pytest.fixture(name="pool")
 def fixture_pool(app, monkeypatch):
@@ -205,14 +208,14 @@ def _form_data(language, **overrides):
 
 
 def test_the_edit_page_shows_the_local_section(client, app_context, pool, japanese):
-    _touch(pool, service.DB_FILENAME)
+    _touch(pool, DICT)
     japanese.term_translation_source = "local_dict"
     db.session.commit()
 
     html = client.get(_edit_url(japanese)).data.decode("utf-8")
 
     assert "Local dictionaries (MDX)" in html
-    assert "ja_zh_shogakukan_v2.db" in html, "datalist should suggest pool files"
+    assert DICT in html, "datalist should suggest pool files"
     assert 'name="term_popup_show_dict_gloss"' in html
     assert 'name="term_translation_source"' in html
     assert "local_dict_position" not in html, "superseded by the row order"
@@ -274,7 +277,7 @@ def test_the_switch_is_checked_on_by_default(client, app_context, pool, japanese
 def test_an_existing_local_row_is_a_dropdown_with_its_file_selected(
     client, app_context, pool
 ):
-    _touch(pool, "ko_zh_basic.db", service.DB_FILENAME)
+    _touch(pool, "ko_zh_basic.db", DICT)
     lang = _fresh_language("Dropdown Local")
     _add_local_row(lang, "ko_zh_basic.db")
 
@@ -330,7 +333,7 @@ def test_a_local_row_pointing_at_a_missing_file_keeps_it_selectable(
     The file is gone from the pool: the row still shows it, so opening
     the page and saving does not silently drop the dictionary.
     """
-    _touch(pool, service.DB_FILENAME)
+    _touch(pool, DICT)
     lang = _fresh_language("Dropdown Stale")
     _add_local_row(lang, "gone_from_the_pool.db")
 
@@ -361,7 +364,7 @@ def test_the_new_language_page_renders_the_dropdown_pair(client, app_context, po
     disabled on the dropdown, so a row cloned from it starts as an
     online URL input and the swap has a dropdown to switch to.
     """
-    _touch(pool, service.DB_FILENAME)
+    _touch(pool, DICT)
 
     html = client.get("/language/new").data.decode("utf-8")
 
