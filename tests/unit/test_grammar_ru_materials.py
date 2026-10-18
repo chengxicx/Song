@@ -66,6 +66,26 @@ def test_library_keys_do_not_shadow_hand_written_rules():
     assert not written & {r["key"] for r in _library()}
 
 
+@needs_library
+@needs_materials
+def test_duplicate_rule_list_matches_the_overlap_audit():
+    """
+    The panel's silence list must equal what the overlap audit derives.
+
+    A merged row whose generalisation reports the same span as another rule
+    would print one construction twice, so the row is dropped from the panel
+    (it stays in the library).  Pinning the list to the audit -- rather than
+    to a hand-maintained guess -- means growing the library re-derives it, and
+    a stale entry fails here instead of silently suppressing a row that is no
+    longer a duplicate.
+    """
+    from scripts import audit_grammar_ru_overlaps as audit
+
+    _by_key, cands = audit.candidates()
+    derived = {key for key, _decision in cands}
+    assert derived == set(ru._DUPLICATE_RULE_IDS)
+
+
 @needs_materials
 def test_material_sources_are_opaque_tags():
     "The extraction source must never be recorded as a readable name."
@@ -194,6 +214,27 @@ def test_inflected_specs_keep_a_literal_anchor():
                 )
 
 
+def test_generalised_specs_turn_on_case_only():
+    """
+    Only a *case* may be generalised away from the row's stated form.
+
+    A preposition row ("между + instrumental") is the reason the inflected
+    family exists, and case is what it turns on.  Generalising a verb-side
+    feature instead yields specs like ``["не", {Tense: "pres"}]`` -- "не +
+    any present word" -- which is not a construction but every negated
+    present verb in the page.  Those rows fired on nearly the whole example
+    corpus, so a non-``Case`` morph subset here is a bug, not a design choice.
+    """
+    for rule in ru._get_data_rules():
+        for spec in _leaf_specs(rule["match"]):
+            morph = spec.get("morph")
+            if morph:
+                assert set(morph) == {"Case"}, (
+                    f"{rule['key']} generalises {sorted(morph)} -- only a case "
+                    "is a construction; a verb-side feature is not"
+                )
+
+
 def test_compound_focus_words_are_split_for_the_tokenizer():
     """
     "из-за" is tokenised into two tokens, so a single spec for it can never
@@ -224,7 +265,7 @@ def test_inflected_spec_generalises_across_noun_forms():
     instrumental" must fire on a plural and on a pronoun, not only on the
     noun form the book happened to use.
     """
-    rule = _row_by_prefix("rgm_междуinstrumental__")
+    rule = _row_by_prefix("rgm_между__")
     for sentence in ("между обедом", "между друзьями", "между нами"):
         text = ru._strip_stress(sentence)
         assert ru.match_rule(rule, ru._tokens_for(text), text), (
@@ -234,7 +275,7 @@ def test_inflected_spec_generalises_across_noun_forms():
 
 def test_literal_specs_still_fire_on_the_book_phrasing():
     "The narrow literal family is kept alongside the generalised one."
-    rule = _row_by_prefix("rgm_междуinstrumental__")
+    rule = _row_by_prefix("rgm_между__")
     text = ru._strip_stress("между обедом")
     assert ru.match_rule(rule, ru._tokens_for(text), text)
 
@@ -245,7 +286,7 @@ def test_generalisation_does_not_spill_to_other_constructions():
     on a different one.  "между + instrumental" is instrumental; a genitive
     phrase must not be caught by it.
     """
-    rule = _row_by_prefix("rgm_междуinstrumental__")
+    rule = _row_by_prefix("rgm_между__")
     for sentence in ("между друзей", "около дома", "перед обедом"):
         text = ru._strip_stress(sentence)
         assert not ru.match_rule(rule, ru._tokens_for(text), text), (

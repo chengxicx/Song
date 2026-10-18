@@ -327,8 +327,51 @@ def _engine_baseline():
     return _ENGINE_BASELINE
 
 
+# Hand-written rules that describe a **broad morphological category** rather
+# than one grammar point, and therefore may never serve as coverage
+# evidence.  They fire on almost any Russian sentence -- a past-tense verb,
+# a ``в/на`` + prepositional phrase, a reflexive verb -- so a hit on one
+# example says nothing about whether the *material's* point is the rule's
+# point.  Measured over the 620 material entries (2026-10-18): ``ru_past``
+# alone claimed 272 of them, ``ru_prep_loct`` 131, ``ru_sya`` 105, and that
+# suppression is why the library held only 114 rows while 493 were called
+# "covered".  A material entry about, say, the singular/plural meaning shift
+# of an abstract noun is not covered by ``ru_past`` just because one of its
+# example sentences happens to be past tense.
+#
+# The remaining rules carry a *point* (у меня есть, чтобы, чем…тем, …), and a
+# hit on one of those is real evidence: merging such a row would put two
+# panel rows on one point, which is the duplication this check exists to
+# prevent.
+_BROAD_ENGINE_KEYS = frozenset(
+    {
+        "ru_past",
+        "ru_prep_loct",
+        "ru_sya",
+        "ru_future",
+        "ru_gen_preps",
+        "ru_motion_prefixes",
+        "ru_imperative",
+        "ru_pricastie",
+        "ru_deepricastie",
+        "ru_s_ablt",
+        "ru_o_loct",
+        "ru_k_dat",
+        "ru_nums_2_4",
+        "ru_nums_5",
+        "ru_modal_inf",
+    }
+)
+
+
 def _engine_hits(entry):
-    "Hand-written rule keys that fire on this material entry's own examples."
+    """
+    Point-bearing hand-written rule keys that fire on this entry's examples.
+
+    Broad morphological rules are excluded: see ``_BROAD_ENGINE_KEYS``.  What
+    is left is evidence that the engine *already has this point*, which is
+    the only thing that may suppress a material row.
+    """
     baseline = _engine_baseline()
     if not baseline:
         return []
@@ -342,8 +385,9 @@ def _engine_hits(entry):
         if not sentence:
             continue
         for found in analyze_russian(sentence, display_lang="en"):
-            if found["key"] in baseline:
-                hits.add(found["key"])
+            key = found["key"]
+            if key in baseline and key not in _BROAD_ENGINE_KEYS:
+                hits.add(key)
     return sorted(hits)
 
 

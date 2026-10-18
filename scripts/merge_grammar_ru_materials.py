@@ -9,8 +9,9 @@ entry to ``lute/jlpt_data/grammar_ru.json``:
 
 Field mapping
 -------------
-  name     the material's Russian headword (``name_ru``), falling back to
-           the raw ``pattern`` when no headword is given
+  name     the material's grammar ``pattern`` (the point: "бросить + 不定式"),
+           falling back to the raw ``name_ru`` headword when it has none --
+           see ``row_name``
   meaning  the material's English gloss
   zh       the material's Chinese gloss
   level    the material's CEFR band (e.g. ``A1``), ``B1`` when absent
@@ -30,6 +31,12 @@ Field mapping
     slug   the material's original ``pattern``, verbatim -- the coverage
            audit's raw-pattern lookup key, so a material entry whose
            pattern is a Chinese description still maps to its row
+
+An older merge stored a row under the material's ``name_ru`` headword -- an
+example sentence for one source ("я бросил курить"), an English-classed point
+name for the other ("между + instrumental") -- while still recording its
+``pattern`` in ``slug``.  ``normalise_names`` repairs those rows to the same
+rule the rest of the library follows: the pattern is the name.
 
 Usage::
 
@@ -76,9 +83,26 @@ _PANEL_FIELDS = (
 _INFINITIVE_MARKERS = ("-ть", "+ 不定式")
 
 
-def row_name(meta):
-    "The name a material row is merged under: its Russian headword or pattern."
-    return (meta.get("name_ru") or "").strip() or (meta.get("pattern") or "").strip()
+def row_name(meta, pattern=None):
+    """
+    The name a material row is merged under: its grammar pattern, else its
+    Russian headword.
+
+    ``pattern`` names the *point* ("бросить + 不定式", "в + 数词 + часа +
+    时段名"); ``name_ru`` is the extraction's example or headword ("я бросил
+    курить", "в 4 часа утра").  Storing the row under the example turned the
+    panel's heading into a sentence the reader is also shown as the example,
+    so the pattern leads and the headword is the fallback for entries the
+    extraction left without one.
+
+    The caller passes ``pattern`` explicitly when the entry came from the
+    audit's gap report: that report uses the pattern as its dict *key* and
+    drops the field, so ``meta`` alone would silently fall back to the
+    headword and undo exactly this fix.
+    """
+    if pattern is None:
+        pattern = meta.get("pattern")
+    return (pattern or "").strip() or (meta.get("name_ru") or "").strip()
 
 
 def derive_type(pattern):
@@ -178,6 +202,35 @@ def backfill(entries, materials_by_name):
     return filled
 
 
+def normalise_names(entries):
+    """
+    Name every row after its pattern, the way ``build_rows`` does.
+
+    A row merged by the older script carries its ``name_ru`` headword in
+    ``name`` and the material's pattern in ``slug``; the two disagree on
+    exactly those rows.  Since the name is the panel heading and the key is
+    derived from it, the repair is to move the pattern into ``name`` and
+    re-key the row -- leaving the old key behind would strand the row under a
+    name nothing else in the library uses.
+
+    Idempotent: a row already named after its pattern is left alone, so this
+    reports nothing on a second run.  Returns the (old key, new key) pairs
+    changed.
+    """
+    renamed = []
+    for e in entries:
+        if not e["key"].startswith("rgm_"):
+            continue
+        pattern = (e.get("slug") or "").strip()
+        if not pattern or pattern == (e.get("name") or "").strip():
+            continue
+        old = e["key"]
+        e["name"] = pattern
+        e["key"] = make_key(pattern)
+        renamed.append((old, e["key"]))
+    return renamed
+
+
 def existing(entries):
     return {e["key"] for e in entries}, {e["name"] for e in entries}
 
@@ -188,7 +241,7 @@ def build_rows(missing, taken_keys, taken_names):
         if pattern in _SKIP_PATTERNS:
             skipped.append((pattern, "review page"))
             continue
-        name = row_name(meta) or (pattern or "").strip()
+        name = row_name(meta, pattern)
         if not name:
             skipped.append((pattern, "no name"))
             continue
@@ -232,6 +285,13 @@ def main():
     # Repair first, so the run reports the panel fields either way: a
     # back-fill only touches rows that already exist, while a fresh merge
     # needs the audit report.
+    renamed = normalise_names(entries)
+    print(f"rows renamed to their pattern: {len(renamed)}")
+    for old, new in renamed[:10]:
+        print(f"  {old} -> {new}")
+    if len(renamed) > 10:
+        print(f"  ... and {len(renamed) - 10} more")
+
     filled = backfill(entries, materials_by_name)
     print(f"panel fields back-filled: {len(filled)}")
     for key, field in filled[:10]:
@@ -239,23 +299,25 @@ def main():
     if len(filled) > 10:
         print(f"  ... and {len(filled) - 10} more")
 
+    repaired = bool(renamed or filled)
+
     missing = load_missing()
     if missing is None:
         print("no audit_ru_missing.json yet -- run scripts.audit_grammar_ru_coverage")
-        if args.write and filled:
+        if args.write and repaired:
             with open(LIBRARY, "w", encoding="utf-8") as fh:
                 json.dump(entries, fh, ensure_ascii=False, indent=1)
-            print(f"{LIBRARY}: back-fill written")
+            print(f"{LIBRARY}: repair written")
         return 1
     if not missing:
         print("audit_ru_missing.json is empty -- nothing to merge")
         if args.write:
-            if filled:
+            if repaired:
                 with open(LIBRARY, "w", encoding="utf-8") as fh:
                     json.dump(entries, fh, ensure_ascii=False, indent=1)
-                print(f"{LIBRARY}: back-fill written")
+                print(f"{LIBRARY}: repair written")
             else:
-                print("(nothing to write: no new rows, no back-fill)")
+                print("(nothing to write: no new rows, no repair)")
         else:
             print("(dry run: pass --write)")
         return 0
