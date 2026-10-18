@@ -1,18 +1,43 @@
 """Merge German grammar materials into the built-in German library.
 
-Reads ``scripts/grammar_materials_de/units.json`` (one array of curated
-material entries) and appends one row per entry to
-``lute/jlpt_data/grammar_de.json``:
+Reads the curated material files under ``scripts/grammar_materials_de/``
+(``units.json`` -- the first extraction -- then ``units_ref.json``, a later
+one) and appends one row per entry to ``lute/jlpt_data/grammar_de.json``:
 
     key, name, slug, meaning, type, examples, example_zh, focus, zh,
     level, formation, notes
 
+Field mapping
+-------------
+  name     the material's grammar ``pattern`` (the point: "Wegen / Trotz +
+           Genitiv"), falling back to the raw ``name_de`` headword when it
+           has none -- see ``row_name``
+  meaning  the material's English gloss
+  zh       the material's Chinese gloss
+  level    the material's CEFR band (e.g. ``A1``), ``B1`` when absent
+  examples the example sentences, verbatim German (list of strings);
+           ``example_zh`` carries the parallel Chinese translations
+  focus    the material's ``focus`` literals, verbatim.  The German data
+           layer derives its matcher from this field, so it must be
+           preserved rather than emptied -- an empty ``focus`` silently
+           disables matching for the row
+  type     kept deliberately coarse: always ``composite``
+  key      ``dgm_<name>__<md5-6>`` -- stable across re-runs, so the merge
+           is idempotent
+    formation / notes
+           the material's formation line and notes, verbatim
+    slug   the material's original ``pattern``, verbatim
+
 The runtime data layer (``grammar_analysis_de._load_data_rules``) derives
 each row's matcher from ``focus`` and keeps it only when the derived spec
 fires on the row's own examples, so this merge never has to trust a stale
-spec.  A row whose focus cannot be validated on its examples still lands
-in the data file, but the panel will drop it silently -- the merge warns
-about it when spaCy + the German model are importable.
+spec.  A row whose focus cannot be validated on its examples still lands in
+the data file, but the panel will drop it silently -- the merge warns about
+it when spaCy + the German model are importable.
+
+An older merge stored a row under the material's ``name_de`` headword while
+recording its ``pattern`` in ``slug``; ``normalise_names`` repairs those
+rows to the rule the rest of the library follows: the pattern is the name.
 
 Guards (both idempotent):
   * key     ``dgm_<stem>__<md5-6>`` -- stable across re-runs
@@ -22,8 +47,9 @@ Guards (both idempotent):
 
 Usage::
 
-    python -m scripts.merge_grammar_de_materials            # report only
-    python -m scripts.merge_grammar_de_materials --write    # apply
+    python -m scripts.merge_grammar_de_materials                 # report only
+    python -m scripts.merge_grammar_de_materials --write         # apply
+    python -m scripts.merge_grammar_de_materials --file X.json   # one fragment
 """
 
 import argparse
@@ -34,14 +60,33 @@ import re
 import sys
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MATERIALS_PATH = os.path.join(BASE, "scripts", "grammar_materials_de", "units.json")
+MATERIALS_DIR = os.path.join(BASE, "scripts", "grammar_materials_de")
 LIBRARY = os.path.join(BASE, "lute", "jlpt_data", "grammar_de.json")
+
+# The material files, in the order the merge walks them.  More than one
+# because the corpus is built from more than one source; ``units.json`` is
+# the first extraction, ``units_ref.json`` a later one.  First wins on a
+# name collision, so a point both files describe is never duplicated.
+_MATERIAL_FILES = ("units.json", "units_ref.json")
 
 
 def make_key(name):
     stem = re.sub(r"[^0-9A-Za-zÀ-ſ]+", "", name)
     h = hashlib.md5(name.encode("utf-8")).hexdigest()[:6]
     return f"dgm_{stem or 'x'}__{h}"
+
+
+def row_name(meta):
+    """
+    The name a material row is merged under: its grammar pattern, else its
+    German headword.
+
+    ``pattern`` names the *point* ("Wegen / Trotz + Genitiv"); ``name_de`` is
+    the extraction's headword ("wegen / trotz + Genitiv").  Storing the row
+    under the pattern makes the name the same string the rest of the library
+    uses, which is what the Russian library settled on too.
+    """
+    return (meta.get("pattern") or "").strip() or (meta.get("name_de") or "").strip()
 
 
 def load_library():
@@ -53,12 +98,16 @@ def load_library():
         return json.load(fh)
 
 
-def load_materials():
+def load_materials(files=None):
     "Every material entry, in file order."
-    if not os.path.exists(MATERIALS_PATH):
-        return []
-    with open(MATERIALS_PATH, encoding="utf-8") as fh:
-        return json.load(fh)
+    entries = []
+    for fname in files or _MATERIAL_FILES:
+        path = fname if os.path.isabs(fname) else os.path.join(MATERIALS_DIR, fname)
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8") as fh:
+            entries.extend(json.load(fh))
+    return entries
 
 
 def _handwritten_norms():
@@ -101,11 +150,39 @@ def validate_row(meta, examples):
         return None
 
 
+def normalise_names(entries):
+    """
+    Name every row after its pattern, the way ``build_rows`` does.
+
+    A row merged by the older script carries its ``name_de`` headword in
+    ``name`` and the material's pattern in ``slug``; the two disagree on
+    exactly those rows (they differ only in case).  Since the name is the
+    panel heading and the key is derived from it, the repair is to move the
+    pattern into ``name`` and re-key the row.
+
+    Idempotent: a row already named after its pattern is left alone, so this
+    reports nothing on a second run.  Returns the (old key, new key) pairs
+    changed.
+    """
+    renamed = []
+    for e in entries:
+        if not e["key"].startswith("dgm_"):
+            continue
+        pattern = (e.get("slug") or "").strip()
+        if not pattern or pattern == (e.get("name") or "").strip():
+            continue
+        old = e["key"]
+        e["name"] = pattern
+        e["key"] = make_key(pattern)
+        renamed.append((old, e["key"]))
+    return renamed
+
+
 def build_rows(materials, taken_keys, taken_names):
     norm_name, handwritten = _handwritten_norms()
     rows, skipped = [], []
     for meta in materials:
-        name = (meta.get("name_de") or meta.get("pattern") or "").strip()
+        name = row_name(meta)
         if not name:
             skipped.append((meta.get("pattern") or "?", "no name"))
             continue
@@ -153,12 +230,28 @@ def build_rows(materials, taken_keys, taken_names):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--write", action="store_true")
+    ap.add_argument(
+        "--file",
+        action="append",
+        default=None,
+        help="material file(s) to read instead of the default pair",
+    )
     args = ap.parse_args()
     entries = load_library()
-    materials = load_materials()
+    materials = load_materials(args.file)
     if not materials:
-        print(f"no materials at {MATERIALS_PATH}")
+        print(f"no materials under {MATERIALS_DIR}")
         return 1
+
+    # Repair first: a fresh merge needs the material files, and the repair
+    # must land either way, so it runs before the new rows are built.
+    renamed = normalise_names(entries)
+    print(f"rows renamed to their pattern: {len(renamed)}")
+    for old, new in renamed[:10]:
+        print(f"  {old} -> {new}")
+    if len(renamed) > 10:
+        print(f"  ... and {len(renamed) - 10} more")
+
     taken_keys = {e["key"] for e in entries}
     taken_names = {e["name"] for e in entries}
     rows, skipped = build_rows(materials, taken_keys, taken_names)
