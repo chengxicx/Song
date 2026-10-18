@@ -851,5 +851,236 @@
   "level": "B2",
   "formation": "être (conjugué) + sur le point de + infinitif",
   "notes": "比 aller + 不定式更强调「这一刻就要发生」，常用于过去时叙述（J'étais sur le point de partir quand...）。"
+ },
+ {
+  "key": "fgm_parcequebecause__ee1c7f",
+  "name": "parce que (because)",
+  "slug": "parce que",
+  "meaning": "cause: because, for the reason that",
+  "type": "composite",
+  "examples": [
+   "Je reste à la maison parce qu'il pleut.",
+   "Elle est partie parce qu'elle était fatiguée."
+  ],
+  "example_zh": [
+   "因为下雨，我待在家里。",
+   "她走了，因为她累了。"
+  ],
+  "focus": [
+   "parce",
+   "que"
+  ],
+  "zh": "原因连词「因为」",
+  "level": "A1",
+  "formation": "parce que + indicatif",
+  "notes": "回答 pourquoi 的标准形式，后接直陈式。元音前缩合成 parce qu'（parce qu'il pleut）。口语里也和 parce que 一起用作省略回答：— Pourquoi? — Parce que."
+ },
+ {
+  "key": "fgm_àcausedebecauseof__7fbfb1",
+  "name": "à cause de (because of)",
+  "slug": "à cause de + nom",
+  "meaning": "cause with a noun, usually a negative one",
+  "type": "composite",
+  "examples": [
+   "Nous ne pouvons aller à Lyon à cause de la grève.",
+   "Le match a été annulé à cause de la pluie."
+  ],
+  "example_zh": [
+   "由于罢工，我们去不了里昂。",
+   "比赛因为下雨取消了。"
+  ],
+  "focus": [
+   "à",
+   "cause",
+   "de"
+  ],
+  "zh": "「由于、因为」（后接名词，多指负面原因）",
+  "level": "A2",
+  "formation": "à cause de + nom",
+  "notes": "后接名词或代词（à cause de moi），不能接从句。多用于不好的原因；正面的功劳用 grâce à。"
+ },
+ {
+  "key": "fgm_grâceàthanksto__ec7df8",
+  "name": "grâce à (thanks to)",
+  "slug": "grâce à + nom",
+  "meaning": "positive cause: thanks to",
+  "type": "composite",
+  "examples": [
+   "Grâce à ton aide, j'ai réussi à trouver un emploi.",
+   "Grâce à ce traitement, il va beaucoup mieux."
+  ],
+  "example_zh": [
+   "多亏你的帮助，我找到了工作。",
+   "多亏了这种治疗，他好多了。"
+  ],
+  "focus": [
+   "grâce",
+   "à"
+  ],
+  "zh": "「多亏、幸亏」（后接名词，多指正面原因）",
+  "level": "B1",
+  "formation": "grâce à + nom",
+  "notes": "与 à cause de 同一个语法位置，但只用于带来好结果的原因。后接从句用 grâce au fait que。"
+ },
+ {
+  "key": "fgm_aulieudeinsteadof__b64a56",
+  "name": "au lieu de (instead of)",
+  "slug": "au lieu de + infinitif / nom",
+  "meaning": "substitution: instead of",
+  "type": "composite",
+  "examples": [
+   "Si on sortait au lieu de regarder la télévision?",
+   "Nous avons préféré faire une marche au lieu d'aller au cinéma."
+  ],
+  "example_zh": [
+   "我们出去走走，别看电视了好吗？",
+   "我们宁愿去散步，也不愿去看电影。"
+  ],
+  "focus": [
+   "au",
+   "lieu",
+   "de"
+  ],
+  "zh": "「代替、而不」（au lieu de）",
+  "level": "B1",
+  "formation": "au lieu de + infinitif / nom",
+  "notes": "两个动作按同一主语对比：Il regarde la télé au lieu de travailler。后接从句用 au lieu que + 虚拟式（少用）。"
+ },
+ {
+  "key": "fgm_malgrédespite__c5b3f1",
+  "name": "malgré (despite)",
+  "slug": "malgré + nom",
+  "meaning": "concession with a noun: despite, in spite of",
+  "type": "composite",
+  "examples": [
+   "Nous sommes partis malgré la neige et le verglas.",
+   "C'est un homme plein d'humour malgré les apparences."
+  ],
+  "example_zh": [
+   "尽管下雪结冰，我们还是出发了。",
+   "尽管外表如此，他其实很有幽默感。"
+  ],
+  "focus": [
+   "malgré"
+  ],
+  "zh": "让步介词「尽管」（malgré + 名词）",
+  "level": "B1",
+  "formation": "malgré + nom",
+  "notes": "后接名词或代词（malgré lui 不由自主地），不能接从句——从句要用 bien que / quoique + 虚拟式。与 malgré tout（尽管如此）区分。"
+ },
+ {
+  "key": "fgm_tandisquewhereas__623630",
+  "name": "tandis que (whereas)",
+  "slug": "tandis que",
+  "meaning": "contrast: whereas, while on the other hand",
+  "type": "composite",
+  "examples": [
+   "Elle a l'air jeune tandis que son amie a l'air âgée.",
+   "Tandis que je préparais le dîner, il lisait le journal."
+  ],
+  "example_zh": [
+   "她看起来很年轻，而她的朋友显得年纪大。",
+   "我在准备晚饭的时候，他在看报纸。"
+  ],
+  "focus": [
+   "tandis",
+   "que"
+  ],
+  "zh": "对比连词「而、然而」",
+  "level": "B1",
+  "formation": "tandis que + indicatif",
+  "notes": "两件事并列对照，语气比 alors que 更书面。也可以表示同时（tandis qu'il dormait）。"
+ },
+ {
+  "key": "fgm_alorsquewhilewhereas__8c0b11",
+  "name": "alors que (while / whereas)",
+  "slug": "alors que",
+  "meaning": "contrast or simultaneity: whereas, while",
+  "type": "composite",
+  "examples": [
+   "Alors que je dormais, le téléphone a sonné.",
+   "Il est parti alors que je le lui avais déconseillé."
+  ],
+  "example_zh": [
+   "我正在睡觉的时候，电话响了。",
+   "我劝过他别去，他还是走了。"
+  ],
+  "focus": [
+   "alors",
+   "que"
+  ],
+  "zh": "「而、却」／「当……的时候」",
+  "level": "B1",
+  "formation": "alors que + indicatif",
+  "notes": "既表示时间上的同时，也表示对比（常带「却」的意味）。后接事实用直陈式；假设性对比用 alors que + 条件式。"
+ },
+ {
+  "key": "fgm_avantquesubjonctifbefore__125fb6",
+  "name": "avant que + subjonctif (before)",
+  "slug": "avant que + subjonctif",
+  "meaning": "time clause with a different subject: before",
+  "type": "composite",
+  "examples": [
+   "Rentrons avant qu'il ne pleuve.",
+   "Prévenez-moi avant que la réunion ne commence."
+  ],
+  "example_zh": [
+   "我们趁还没下雨回去吧。",
+   "会议开始前请通知我。"
+  ],
+  "focus": [
+   "avant",
+   "que"
+  ],
+  "zh": "「在……之前」（avant que + 虚拟式）",
+  "level": "B1",
+  "formation": "avant que + subjonctif（常加赘词 ne）",
+  "notes": "主语不同时用 avant que + 虚拟式；同一主语用 avant de + 不定式（avant de partir）。书面语常在动词前加赘词 ne，不表示否定。"
+ },
+ {
+  "key": "fgm_sansquesubjonctifwithout__45884b",
+  "name": "sans que + subjonctif (without)",
+  "slug": "sans que + subjonctif",
+  "meaning": "without: sans que + subjunctive, different subject",
+  "type": "composite",
+  "examples": [
+   "Il l'a fait sans que sa femme le sache.",
+   "Elle entre dans la chambre sans que personne ne s'en rende compte."
+  ],
+  "example_zh": [
+   "他做这件事没让妻子知道。",
+   "她走进房间，谁都没察觉。"
+  ],
+  "focus": [
+   "sans",
+   "que"
+  ],
+  "zh": "「没有……」（sans que + 虚拟式）",
+  "level": "B2",
+  "formation": "sans que + subjonctif",
+  "notes": "同一主语用 sans + 不定式（sans le savoir）；主语不同才用 sans que，后接虚拟式，也常加赘词 ne。"
+ },
+ {
+  "key": "fgm_telquesuchas__af50e8",
+  "name": "tel que (such as)",
+  "slug": "tel que / tels que",
+  "meaning": "such as, like: introducing examples or a comparison",
+  "type": "composite",
+  "examples": [
+   "J'adore les sports tels que le golf et le tennis.",
+   "Il peint le paysage tel qu'il est."
+  ],
+  "example_zh": [
+   "我喜欢高尔夫、网球这类运动。",
+   "他如实描绘风景。"
+  ],
+  "focus": [
+   "tel",
+   "que"
+  ],
+  "zh": "「像……这样的」（tel que）",
+  "level": "B1",
+  "formation": "tel / telle / tels / telles + que",
+  "notes": "性数与被修饰的名词一致（les sports tels que...）。也可表示「正如」：tel qu'il est（就像他本来的样子）。"
  }
 ]
