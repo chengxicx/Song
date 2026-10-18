@@ -1,0 +1,2957 @@
+[
+ {
+  "key": "esm_estargerundio__c7144f",
+  "name": "estar + gerundio",
+  "slug": "estar + gerundio",
+  "meaning": "progressive: an action in progress",
+  "type": "composite",
+  "examples": [
+   "Estoy tomando un curso sobre Egipto.",
+   "Está lloviendo a cántaros y vengo hecho una sopa."
+  ],
+  "example_zh": [
+   "我正在上一个关于埃及的课程。",
+   "正下着倾盆大雨，我来的时候浑身湿透了。"
+  ],
+  "focus": [
+   "estoy/estás/está/estamos/estáis/están",
+   "§ger"
+  ],
+  "zh": "estar + 副动词：正在进行",
+  "level": "A1",
+  "formation": "estar 变位 + 副动词（-ando / -iendo）",
+  "notes": "强调『此刻正在进行』：Estoy tomando un curso。与简单现在时（陈述习惯）相对。"
+ },
+ {
+  "key": "esm_hayqueinfinitivo__fb8102",
+  "name": "hay que + infinitivo",
+  "slug": "hay que + infinitivo",
+  "meaning": "impersonal obligation: one must",
+  "type": "composite",
+  "examples": [
+   "Hay que superar las dificultades.",
+   "Hay que prestar atención a este problema."
+  ],
+  "example_zh": [
+   "必须克服困难。",
+   "要注意这个问题。"
+  ],
+  "focus": [
+   "hay",
+   "que",
+   "§inf"
+  ],
+  "zh": "hay que + 原形动词：必须、应该（无人称）",
+  "level": "A1",
+  "formation": "hay que + 原形动词（无主语）",
+  "notes": "只用于无人称的『该做某事』，不指向具体的人；指具体人时用 tener que。"
+ },
+ {
+  "key": "esm_tambiéntampoco__9b287f",
+  "name": "también / tampoco",
+  "slug": "también / tampoco",
+  "meaning": "also / neither",
+  "type": "composite",
+  "examples": [
+   "Yo tampoco puedo venir.",
+   "También yo lo sé hacer."
+  ],
+  "example_zh": [
+   "我也不能来。",
+   "我也会做。"
+  ],
+  "focus": [
+   "también/tampoco"
+  ],
+  "zh": "也 / 也不",
+  "level": "A1",
+  "formation": "también 用于肯定句；tampoco 用于否定句",
+  "notes": "tampoco 本身已含否定，句子里不要再加 no。"
+ },
+ {
+  "key": "esm_porquecausa__4dac7f",
+  "name": "porque (causa)",
+  "slug": "porque",
+  "meaning": "because",
+  "type": "composite",
+  "examples": [
+   "No podemos esperar porque tenemos poco tiempo.",
+   "Está contento porque ha pasado examen."
+  ],
+  "example_zh": [
+   "我们不能等了，因为时间不多。",
+   "他考完试了，所以很开心。"
+  ],
+  "focus": [
+   "porque"
+  ],
+  "zh": "因为",
+  "level": "A1",
+  "formation": "主句 + porque + 原因从句",
+  "notes": "回答 ¿por qué?（为什么）。别与 por qué / por que / porqué 混用。"
+ },
+ {
+  "key": "esm_muchomuchamuchosmuchassustantivo__93ee5a",
+  "name": "mucho / mucha / muchos / muchas + sustantivo",
+  "slug": "mucho + sustantivo",
+  "meaning": "much / many + noun (agrees in gender and number)",
+  "type": "composite",
+  "examples": [
+   "Muchos países europeos son democracias.",
+   "No gasté mucho dinero."
+  ],
+  "example_zh": [
+   "许多欧洲国家是民主国家。",
+   "我没花多少钱。"
+  ],
+  "focus": [
+   "mucho/mucha/muchos/muchas",
+   "§noun"
+  ],
+  "zh": "mucho/a/os/as + 名词：很多",
+  "level": "A1",
+  "formation": "mucho 随名词变性数 + 名词",
+  "notes": "修饰名词时与名词一致（mucha agua / muchos libros）；修饰动词用 mucho 不变（trabaja mucho）。"
+ },
+ {
+  "key": "esm_muyadjetivo__09c71f",
+  "name": "muy + adjetivo",
+  "slug": "muy + adjetivo",
+  "meaning": "very + adjective",
+  "type": "composite",
+  "examples": [
+   "Mi amigo es un profesor muy trabajador.",
+   "Las elecciones han sido muy reñidas."
+  ],
+  "example_zh": [
+   "我朋友是一位非常勤奋的老师。",
+   "这次选举竞争非常激烈。"
+  ],
+  "focus": [
+   "muy",
+   "§adj"
+  ],
+  "zh": "muy + 形容词：很、非常",
+  "level": "A1",
+  "formation": "muy + 形容词 / 副词",
+  "notes": "muy 只修饰形容词或副词，不修饰动词；修饰动词用 mucho（trabaja mucho，不是 trabaja muy）。"
+ },
+ {
+  "key": "esm_quererinfinitivo__bb2a22",
+  "name": "querer + infinitivo",
+  "slug": "querer + infinitivo",
+  "meaning": "to want (to do something)",
+  "type": "composite",
+  "examples": [
+   "No quiere sacrificar su libertad de acción.",
+   "Sí, quiere aceptar."
+  ],
+  "example_zh": [
+   "他不想牺牲自己的行动自由。",
+   "是的，他愿意接受。"
+  ],
+  "focus": [
+   "quiero/quieres/quiere/queremos/quieren",
+   "§inf"
+  ],
+  "zh": "querer + 原形动词：想要做某事",
+  "level": "A1",
+  "formation": "querer 变位 + 原形动词",
+  "notes": "词干变音 e→ie（quiero / quieres / quiere）；nosotros 形式不变音（queremos）。"
+ },
+ {
+  "key": "esm_poderinfinitivo__2743fd",
+  "name": "poder + infinitivo",
+  "slug": "poder + infinitivo",
+  "meaning": "can / to be able to",
+  "type": "composite",
+  "examples": [
+   "Sin la permisión del superior no puedo abandonar el puesto de trabajo.",
+   "No puedo fumar."
+  ],
+  "example_zh": [
+   "没有上级允许，我不能离开工作岗位。",
+   "我不能抽烟。"
+  ],
+  "focus": [
+   "puedo/puedes/puede/podemos/pueden",
+   "§inf"
+  ],
+  "zh": "poder + 原形动词：能够、可以",
+  "level": "A1",
+  "formation": "poder 变位 + 原形动词",
+  "notes": "o→ue 变音（puedo / puedes / puede）；否定 no poder + 原形动词表示『不能』。"
+ },
+ {
+  "key": "esm_dejardeinfinitivo__18fd5b",
+  "name": "dejar de + infinitivo",
+  "slug": "dejar de + infinitivo",
+  "meaning": "to stop doing something",
+  "type": "composite",
+  "examples": [
+   "Deja de trabajar.",
+   "Tan pronto como deja de trabajar empieza a cantar."
+  ],
+  "example_zh": [
+   "他停止工作了。",
+   "他一下班就开始唱歌。"
+  ],
+  "focus": [
+   "dejar/dejo/deja/dejamos/dejan",
+   "de",
+   "§inf"
+  ],
+  "zh": "dejar de + 原形动词：停止、不再",
+  "level": "A2",
+  "formation": "dejar de + 原形动词",
+  "notes": "与 dejar（留下、让）区分：dejar de 是『中断某动作』，dejar 单独用是『留下/允许』。"
+ },
+ {
+  "key": "esm_empezarainfinitivo__c377ba",
+  "name": "empezar a + infinitivo",
+  "slug": "empezar a + infinitivo",
+  "meaning": "to begin to do something",
+  "type": "composite",
+  "examples": [
+   "Empiezan a dudar del cajero.",
+   "Empieza a pasear de un lado otro."
+  ],
+  "example_zh": [
+   "他们开始怀疑那个出纳。",
+   "他开始来回踱步。"
+  ],
+  "focus": [
+   "empezar/empiezo/empieza/empezamos/empiezan",
+   "a",
+   "§inf"
+  ],
+  "zh": "empezar a + 原形动词：开始做某事",
+  "level": "A2",
+  "formation": "empezar a + 原形动词（e→ie 变音）",
+  "notes": "与 comenzar a 同义；介词固定用 a。"
+ },
+ {
+  "key": "esm_solerinfinitivo__9e049e",
+  "name": "soler + infinitivo",
+  "slug": "soler + infinitivo",
+  "meaning": "to usually do something (habitual)",
+  "type": "composite",
+  "examples": [
+   "Suele venir por la tarde.",
+   "Los comerciantes suelen ser trabajadores por cuenta propia."
+  ],
+  "example_zh": [
+   "他通常下午来。",
+   "商人通常是自营业者。"
+  ],
+  "focus": [
+   "soler/suelo/suele/solíamos/suelen",
+   "§inf"
+  ],
+  "zh": "soler + 原形动词：惯常、通常",
+  "level": "A2",
+  "formation": "soler 变位（o→ue）+ 原形动词",
+  "notes": "表示习惯性动作，相当于『通常/往往』；只有现在时与未完成过去时常用。"
+ },
+ {
+  "key": "esm_seguirgerundio__931b80",
+  "name": "seguir + gerundio",
+  "slug": "seguir + gerundio",
+  "meaning": "to keep on doing something",
+  "type": "composite",
+  "examples": [
+   "Sigo trabajando en el banco.",
+   "Siguen viviendo en el campo."
+  ],
+  "example_zh": [
+   "我还在银行工作。",
+   "他们仍然住在乡下。"
+  ],
+  "focus": [
+   "seguir/sigo/sigue/seguimos/siguen",
+   "§ger"
+  ],
+  "zh": "seguir + 副动词：继续做某事",
+  "level": "A2",
+  "formation": "seguir 变位（e→i）+ 副动词",
+  "notes": "与 continuar + 副动词同义。seguir 的副动词形式不变，只变助动词。"
+ },
+ {
+  "key": "esm_deberinfinitivo__70e199",
+  "name": "deber + infinitivo",
+  "slug": "deber + infinitivo",
+  "meaning": "must / should (moral obligation)",
+  "type": "composite",
+  "examples": [
+   "La honestidad debe ser una virtud esencial en una persona.",
+   "Se lo debe comunicar cuanto antes."
+  ],
+  "example_zh": [
+   "诚实应当是人的一项基本美德。",
+   "他应该尽快把这件事通知他。"
+  ],
+  "focus": [
+   "deber/debo/debe/debemos/deben",
+   "§inf"
+  ],
+  "zh": "deber + 原形动词：应该、必须",
+  "level": "A2",
+  "formation": "deber + 原形动词",
+  "notes": "deber + 原形动词＝应该；deber de + 原形动词＝推测（大概）。别把两者混用。"
+ },
+ {
+  "key": "esm_tenerganasdeinfinitivo__8308c4",
+  "name": "tener ganas de + infinitivo",
+  "slug": "tener ganas de + infinitivo",
+  "meaning": "to feel like doing something",
+  "type": "composite",
+  "examples": [
+   "Tengo ganas de dormir.",
+   "José quiere ser gerente, no tiene ganas de trabajar."
+  ],
+  "example_zh": [
+   "我很想睡觉。",
+   "何塞想当经理，却不想干活。"
+  ],
+  "focus": [
+   "tengo/tienes/tiene/tenemos/tienen",
+   "ganas",
+   "de",
+   "§inf"
+  ],
+  "zh": "tener ganas de + 原形动词：很想做某事",
+  "level": "A2",
+  "formation": "tener ganas de + 原形动词",
+  "notes": "ganas 用复数；否定 no tener ganas de 表示『没心情做』。"
+ },
+ {
+  "key": "esm_seloselaselosselas__8d2c71",
+  "name": "se lo / se la / se los / se las",
+  "slug": "se lo / se la (pronombre doble)",
+  "meaning": "double object pronouns: to give it to him",
+  "type": "composite",
+  "examples": [
+   "Se lo quiero decir yo mismo.",
+   "Se la explico."
+  ],
+  "example_zh": [
+   "我想亲口把这件事告诉他。",
+   "我给他解释这件事。"
+  ],
+  "focus": [
+   "se",
+   "lo/la/los/las",
+   "§verb"
+  ],
+  "zh": "se + lo/la/los/las：双宾语代词",
+  "level": "A2",
+  "formation": "间接宾语 le/les + 直接宾语 lo/la/los/las → le/les 变 se",
+  "notes": "两个第三人称代词相遇时，间接宾语 le/les 一律变 se：se lo doy（我把它给他）。"
+ },
+ {
+  "key": "esm_melotelonoslo__f60189",
+  "name": "me lo / te lo / nos lo",
+  "slug": "me lo / te lo / nos lo",
+  "meaning": "double object pronouns with a first/second person indirect object",
+  "type": "composite",
+  "examples": [
+   "Me lo agradeció con sonrisa.",
+   "No te lo dije, por ahorrarte disgusto."
+  ],
+  "example_zh": [
+   "他笑着向我道谢。",
+   "我没告诉你，是为了免得你不高兴。"
+  ],
+  "focus": [
+   "me/te/nos",
+   "lo/la/los/las",
+   "§verb"
+  ],
+  "zh": "me/te/nos + lo/la/los/las：第一、二人称双代词",
+  "level": "A2",
+  "formation": "me/te/nos + lo/la/los/las + 动词",
+  "notes": "顺序固定：间接宾语在前、直接宾语在后，紧贴动词（可置于变位动词前或原形动词后）。"
+ },
+ {
+  "key": "esm_alinfinitivo__fcefb5",
+  "name": "al + infinitivo",
+  "slug": "al + infinitivo",
+  "meaning": "on doing something (simultaneous / immediate past)",
+  "type": "composite",
+  "examples": [
+   "Al llegar al despacho, leí fax del día anterior.",
+   "Al pasar la lista saltó mi nombre."
+  ],
+  "example_zh": [
+   "一到办公室，我就读了前一天的传真。",
+   "点名时叫到了我的名字。"
+  ],
+  "focus": [
+   "al",
+   "§inf"
+  ],
+  "zh": "al + 原形动词：一……就、在……的时候",
+  "level": "A2",
+  "formation": "al + 原形动词（= a + el + 原形动词）",
+  "notes": "主语与主句一致：Al llegar a casa, me llamó（到家时他给我打了电话）。"
+ },
+ {
+  "key": "esm_antesdeinfinitivo__5a0ab2",
+  "name": "antes de + infinitivo",
+  "slug": "antes de + infinitivo",
+  "meaning": "before doing something",
+  "type": "composite",
+  "examples": [
+   "Antes de hacer nada, debes lavarte las manos.",
+   "Le estoy diciendo a usted que antes de hacer nada lo piense dos veces."
+  ],
+  "example_zh": [
+   "做什么之前，你得先洗手。",
+   "我是在跟您说，做什么之前都要三思。"
+  ],
+  "focus": [
+   "antes",
+   "de",
+   "§inf"
+  ],
+  "zh": "antes de + 原形动词：在……之前",
+  "level": "A2",
+  "formation": "antes de + 原形动词（主语一致时）",
+  "notes": "主语不同时必须用 antes de que + 虚拟式。"
+ },
+ {
+  "key": "esm_despuésdeinfinitivo__04a962",
+  "name": "después de + infinitivo",
+  "slug": "después de + infinitivo",
+  "meaning": "after doing something",
+  "type": "composite",
+  "examples": [
+   "¿Se ducha usted alguna vez después de comer?",
+   "Después de comer, fuimos a París."
+  ],
+  "example_zh": [
+   "您有时候饭后洗澡吗？",
+   "吃完饭我们就去了巴黎。"
+  ],
+  "focus": [
+   "después",
+   "de",
+   "§inf"
+  ],
+  "zh": "después de + 原形动词：在……之后",
+  "level": "A2",
+  "formation": "después de + 原形动词（主语一致时）",
+  "notes": "主语不一致时用 después de que + 陈述式（或虚拟式指将来）。"
+ },
+ {
+  "key": "esm_sininfinitivo__3f5227",
+  "name": "sin + infinitivo",
+  "slug": "sin + infinitivo",
+  "meaning": "without doing something",
+  "type": "composite",
+  "examples": [
+   "Nos entendemos sin hablar.",
+   "La cigarra canta sin cesar."
+  ],
+  "example_zh": [
+   "我们不用说话就能互相理解。",
+   "蝉不停地叫。"
+  ],
+  "focus": [
+   "sin",
+   "§inf"
+  ],
+  "zh": "sin + 原形动词：不……、没有……就",
+  "level": "A2",
+  "formation": "sin + 原形动词（主语一致时）",
+  "notes": "主语不同时用 sin que + 虚拟式；sin 后也可接名词（sin dinero）。"
+ },
+ {
+  "key": "esm_porinfinitivo__532320",
+  "name": "por + infinitivo",
+  "slug": "por + infinitivo (causa)",
+  "meaning": "for / because of doing something",
+  "type": "composite",
+  "examples": [
+   "Se esfuerza por agradar a todo el mundo.",
+   "No te lo dije, por ahorrarte disgusto."
+  ],
+  "example_zh": [
+   "他努力让所有人都满意。",
+   "我没告诉你，是不想让你难受。"
+  ],
+  "focus": [
+   "por",
+   "§inf"
+  ],
+  "zh": "por + 原形动词：因为、为了（原因或努力）",
+  "level": "A2",
+  "formation": "por + 原形动词",
+  "notes": "表示原因或『努力去做』：se esfuerza por agradar。表目的用 para + 原形动词。"
+ },
+ {
+  "key": "esm_durante__a08645",
+  "name": "durante",
+  "slug": "durante",
+  "meaning": "during / for (a period)",
+  "type": "composite",
+  "examples": [
+   "Durante la huelga pararon todas las máquinas de la fábrica.",
+   "Durante varios días estuvo enfermo."
+  ],
+  "example_zh": [
+   "罢工期间工厂所有机器都停了。",
+   "他病了好几天。"
+  ],
+  "focus": [
+   "durante"
+  ],
+  "zh": "durante：在……期间",
+  "level": "A2",
+  "formation": "durante + 名词 / 时间段",
+  "notes": "后接时间段表示持续多久；不能与 hace（……以前）混用。"
+ },
+ {
+  "key": "esm_según__c3ed8d",
+  "name": "según",
+  "slug": "según",
+  "meaning": "according to / depending on",
+  "type": "composite",
+  "examples": [
+   "Según el periódico, ayer hubo tres accidentes en la ciudad.",
+   "Te pagaremos según lo que trabajes."
+  ],
+  "example_zh": [
+   "据报纸说，昨天城里发生了三起事故。",
+   "我们按你的工作量付钱。"
+  ],
+  "focus": [
+   "según"
+  ],
+  "zh": "según：根据、按照",
+  "level": "A2",
+  "formation": "según + 名词 / 从句",
+  "notes": "según 后接人称代词时用主格（según tú，不用 según ti）。"
+ },
+ {
+  "key": "esm_contra__a83f0f",
+  "name": "contra",
+  "slug": "contra",
+  "meaning": "against",
+  "type": "composite",
+  "examples": [
+   "Aseguró su casa contra el incendio.",
+   "El alcanfor defiende las ropas contra la polilla."
+  ],
+  "example_zh": [
+   "他给房子保了火灾险。",
+   "樟脑能防止衣物被虫蛀。"
+  ],
+  "focus": [
+   "contra"
+  ],
+  "zh": "contra：反对、对着、抵御",
+  "level": "A2",
+  "formation": "contra + 名词 / 代词",
+  "notes": "表对抗、抵御或方向相反；与 en contra de 同义，后者更强调『持反对立场』。"
+ },
+ {
+  "key": "esm_hacia__f7e183",
+  "name": "hacia",
+  "slug": "hacia",
+  "meaning": "towards",
+  "type": "composite",
+  "examples": [
+   "Tiene mucho odio hacia ella.",
+   "Yendo hacia tu casa me encontré con un amigo."
+  ],
+  "example_zh": [
+   "他对她怀有深深的恨意。",
+   "去你家的路上我碰到了一个朋友。"
+  ],
+  "focus": [
+   "hacia"
+  ],
+  "zh": "hacia：朝向、对于",
+  "level": "A2",
+  "formation": "hacia + 名词 / 代词",
+  "notes": "表方向（hacia el centro）或态度对象（odio hacia ella）；方向更笼统，不像 a 那样强调终点。"
+ },
+ {
+  "key": "esm_desdehasta__794b03",
+  "name": "desde ... hasta",
+  "slug": "desde ... hasta",
+  "meaning": "from ... to (time or place)",
+  "type": "composite",
+  "examples": [
+   "Anduvimos desde el amanecer hasta bien entrada la noche.",
+   "Desde 1955 hasta 1973 viví en Beijing."
+  ],
+  "example_zh": [
+   "我们从黎明一直走到深夜。",
+   "从 1955 年到 1973 年我住在北京。"
+  ],
+  "focus": [
+   "desde",
+   "...",
+   "hasta"
+  ],
+  "zh": "desde … hasta …：从……到……",
+  "level": "A2",
+  "formation": "desde + 起点 + hasta + 终点",
+  "notes": "时间和空间都可用；口语里常用 de ... a ... 替代。"
+ },
+ {
+  "key": "esm_tantocomo__3aa4d1",
+  "name": "tanto ... como",
+  "slug": "tanto ... como",
+  "meaning": "as much as (equal comparison)",
+  "type": "composite",
+  "examples": [
+   "Yo no tengo tantos hermanos como Pepe.",
+   "Me divierto tanto como Luisa."
+  ],
+  "example_zh": [
+   "我没有佩佩那么多兄弟。",
+   "我玩得和路易莎一样开心。"
+  ],
+  "focus": [
+   "tanto/tanta/tantos/tantas",
+   "...",
+   "como"
+  ],
+  "zh": "tanto … como …：和……一样多",
+  "level": "A2",
+  "formation": "tanto/a/os/as + 名词 + como；动词后用 tanto como",
+  "notes": "修饰名词时 tanto 随名词变性数（tantos hermanos como）；修饰动词或形容词时用 tanto como。"
+ },
+ {
+  "key": "esm_ellaloslasmásadjetivosuperlativo__d9be95",
+  "name": "el / la / los / las más + adjetivo (superlativo)",
+  "slug": "el / la más + adjetivo",
+  "meaning": "the most ... (superlative)",
+  "type": "composite",
+  "examples": [
+   "José es el más aplicado estudiante de su grupo.",
+   "Luis es el más alto entre los alumnos de su clase."
+  ],
+  "example_zh": [
+   "何塞是他小组里最用功的学生。",
+   "路易斯是班里学生中最高的。"
+  ],
+  "focus": [
+   "el/la/los/las",
+   "más",
+   "§adj"
+  ],
+  "zh": "el/la/los/las más + 形容词：最……",
+  "level": "A2",
+  "formation": "定冠词 + más + 形容词（+ de / entre）",
+  "notes": "最高级要带定冠词且与名词一致；范围用 de 或 entre 引出。"
+ },
+ {
+  "key": "esm_aunqueconcesiva__b40c8e",
+  "name": "aunque (concesiva)",
+  "slug": "aunque",
+  "meaning": "although / even if",
+  "type": "composite",
+  "examples": [
+   "Trabajaremos aunque haga mucho frío.",
+   "Aunque tiene frío, no se pone el abrigo."
+  ],
+  "example_zh": [
+   "即使天很冷，我们也照干。",
+   "他明明很冷，却不穿大衣。"
+  ],
+  "focus": [
+   "aunque"
+  ],
+  "zh": "aunque：虽然、即使",
+  "level": "B1",
+  "formation": "aunque + 陈述式（已知事实）/ 虚拟式（假设）",
+  "notes": "陈述式指已知事实（aunque llueve），虚拟式指假设或『即使』（aunque llueva）。"
+ },
+ {
+  "key": "esm_tanprontocomo__f351ef",
+  "name": "tan pronto como",
+  "slug": "tan pronto como",
+  "meaning": "as soon as",
+  "type": "composite",
+  "examples": [
+   "Tan pronto como amaneció, fuimos a trabajar al campo.",
+   "Tan pronto como llega a casa se pone la bata."
+  ],
+  "example_zh": [
+   "天一亮我们就下地干活了。",
+   "他一到家就换上便袍。"
+  ],
+  "focus": [
+   "tan",
+   "pronto",
+   "como"
+  ],
+  "zh": "tan pronto como：一……就",
+  "level": "B1",
+  "formation": "tan pronto como + 陈述式（过去/现在）/ 虚拟式（将来）",
+  "notes": "指将来未发生的事时用虚拟式（tan pronto como llegue）。"
+ },
+ {
+  "key": "esm_puestoque__8ae6f6",
+  "name": "puesto que",
+  "slug": "puesto que",
+  "meaning": "since / given that (cause)",
+  "type": "composite",
+  "examples": [
+   "No hace falta que te lo diga puesto que ya lo sabes.",
+   "Puesto que es tu gusto, hazlo así."
+  ],
+  "example_zh": [
+   "既然你都已经知道了，我就不必说了。",
+   "既然你喜欢，就这么做吧。"
+  ],
+  "focus": [
+   "puesto",
+   "que"
+  ],
+  "zh": "puesto que：既然、因为",
+  "level": "B1",
+  "formation": "puesto que + 陈述式",
+  "notes": "书面语色彩强于 porque，多用于已知或显而易见的原因。"
+ },
+ {
+  "key": "esm_apesardeque__b07b14",
+  "name": "a pesar de (+ que)",
+  "slug": "a pesar de",
+  "meaning": "in spite of / despite",
+  "type": "composite",
+  "examples": [
+   "Saldremos, a pesar de que llueva.",
+   "A pesar de lo avanzado de la hora, seguía despierto."
+  ],
+  "example_zh": [
+   "即使下雨我们也要出门。",
+   "尽管时间已经很晚，他仍然醒着。"
+  ],
+  "focus": [
+   "a",
+   "pesar",
+   "de"
+  ],
+  "zh": "a pesar de：尽管",
+  "level": "B1",
+  "formation": "a pesar de + 名词 / 原形动词；a pesar de que + 陈述式（或虚拟式指将来）",
+  "notes": "后接从句时必须加 que；a pesar de 后不能直接跟句子。"
+ },
+ {
+  "key": "esm_sinembargo__389cf9",
+  "name": "sin embargo",
+  "slug": "sin embargo",
+  "meaning": "however / nevertheless",
+  "type": "composite",
+  "examples": [
+   "Tengo mucho trabajo, sin embargo, te dedicaré un rato.",
+   "Nos dieron, sin embargo, unas buenas entradas."
+  ],
+  "example_zh": [
+   "我工作很多，不过还是会抽点时间给你。",
+   "不过他们给了我们几张好票。"
+  ],
+  "focus": [
+   "sin",
+   "embargo"
+  ],
+  "zh": "sin embargo：然而、尽管如此",
+  "level": "B1",
+  "formation": "sin embargo（可置于句首、句中，逗号隔开）",
+  "notes": "转折连词，语气比 pero 正式；后面不能直接接 pero。"
+ },
+ {
+  "key": "esm_porlotanto__fc7807",
+  "name": "por lo tanto",
+  "slug": "por lo tanto",
+  "meaning": "therefore",
+  "type": "composite",
+  "examples": [
+   "La cosa está decidida, por lo tanto, es inútil que insistas.",
+   "No estudió; por lo tanto, suspendió el examen."
+  ],
+  "example_zh": [
+   "事情已经定了，所以你再坚持也没用。",
+   "他没学习，因此考试没及格。"
+  ],
+  "focus": [
+   "por",
+   "lo",
+   "tanto"
+  ],
+  "zh": "por lo tanto：因此、所以",
+  "level": "B1",
+  "formation": "por lo tanto（句首或句中，逗号隔开）",
+  "notes": "表结论，与 por consiguiente 同义；与 por tanto 可互换（后者更简短）。"
+ },
+ {
+  "key": "esm_poreso__833bd8",
+  "name": "por eso",
+  "slug": "por eso",
+  "meaning": "that is why / so",
+  "type": "composite",
+  "examples": [
+   "No te disgustes por eso.",
+   "Llegó tarde, por eso perdió el tren."
+  ],
+  "example_zh": [
+   "别为这个不高兴。",
+   "他迟到了，所以没赶上火车。"
+  ],
+  "focus": [
+   "por",
+   "eso"
+  ],
+  "zh": "por eso：所以、因此",
+  "level": "B1",
+  "formation": "por eso + 结果",
+  "notes": "口语最常用的因果连接；指代前文整件事（= por esa razón）。"
+ },
+ {
+  "key": "esm_ademásde__5e7f74",
+  "name": "además (de)",
+  "slug": "además",
+  "meaning": "besides / moreover",
+  "type": "composite",
+  "examples": [
+   "Además de ponerle una multa, le quitaron el carné.",
+   "Estudia, levántate temprano, haz la casa y, además, trabaja."
+  ],
+  "example_zh": [
+   "除了罚款，他们还吊销了他的驾照。",
+   "他要学习、早起、做家务，而且还要上班。"
+  ],
+  "focus": [
+   "además"
+  ],
+  "zh": "además：而且、此外；además de：除……之外",
+  "level": "B1",
+  "formation": "además（独立使用）；además de + 名词/原形动词",
+  "notes": "递进连接；además de 后接名词或原形动词，接从句要加 que。"
+ },
+ {
+  "key": "esm_asíque__831708",
+  "name": "así que",
+  "slug": "así que",
+  "meaning": "so / therefore (result)",
+  "type": "composite",
+  "examples": [
+   "Esta tarde no habrá trabajo, así que no vengas.",
+   "No había nadie, así que me fui."
+  ],
+  "example_zh": [
+   "今天下午没活儿了，所以你别来了。",
+   "一个人也没有，于是我就走了。"
+  ],
+  "focus": [
+   "así",
+   "que"
+  ],
+  "zh": "así que：所以、于是",
+  "level": "B1",
+  "formation": "así que + 结果从句",
+  "notes": "口语化的结果连接词，与 de modo que 近似但更随便。"
+ },
+ {
+  "key": "esm_demodoque__a46ab1",
+  "name": "de modo que",
+  "slug": "de modo que",
+  "meaning": "so that / in such a way that",
+  "type": "composite",
+  "examples": [
+   "Se oye ruido dentro de la casa, de modo que debe de haber alguien.",
+   "Habló claro, de modo que todos le entendieron."
+  ],
+  "example_zh": [
+   "屋里传来声响，所以肯定有人在。",
+   "他讲得很清楚，所以大家都听懂了。"
+  ],
+  "focus": [
+   "de",
+   "modo",
+   "que"
+  ],
+  "zh": "de modo que：因此；以便",
+  "level": "B1",
+  "formation": "de modo que + 陈述式（结果）/ 虚拟式（目的）",
+  "notes": "表结果用陈述式（debe de haber alguien），表目的用虚拟式，与 de manera que 同义。"
+ },
+ {
+  "key": "esm_paraquesubjuntivo__8759b6",
+  "name": "para que + subjuntivo",
+  "slug": "para que + subjuntivo",
+  "meaning": "so that (purpose, different subjects)",
+  "type": "composite",
+  "examples": [
+   "Abrí la ventana para que entrase el aire fresco.",
+   "Te he comprado un reloj para que sepas la hora."
+  ],
+  "example_zh": [
+   "我打开窗户，好让新鲜空气进来。",
+   "我给你买了块表，好让你知道时间。"
+  ],
+  "focus": [
+   "para",
+   "que",
+   "§subj"
+  ],
+  "zh": "para que + 虚拟式：为了（让）……",
+  "level": "B1",
+  "formation": "para que + 虚拟式（主从句主语不同）",
+  "notes": "主语一致时用 para + 原形动词；主语不同才用 para que + 虚拟式。"
+ },
+ {
+  "key": "esm_antesdequesubjuntivo__1c992b",
+  "name": "antes de que + subjuntivo",
+  "slug": "antes de que + subjuntivo",
+  "meaning": "before (something happens), with a different subject",
+  "type": "composite",
+  "examples": [
+   "Vámonos antes de que empiece a llover.",
+   "Me marcho antes de que llegue."
+  ],
+  "example_zh": [
+   "趁还没下雨，我们走吧。",
+   "我趁他还没到就先走了。"
+  ],
+  "focus": [
+   "antes",
+   "de",
+   "que",
+   "§subj"
+  ],
+  "zh": "antes de que + 虚拟式：在……之前（主语不同）",
+  "level": "B1",
+  "formation": "antes de que + 虚拟式（必须用虚拟式）",
+  "notes": "无论指现在还是过去，antes de que 后面一律用虚拟式。"
+ },
+ {
+  "key": "esm_despuésdeque__2b775f",
+  "name": "después de que",
+  "slug": "después de que",
+  "meaning": "after (something happens)",
+  "type": "composite",
+  "examples": [
+   "Después de que mi esposa regrese del viaje, te invitaremos a comer.",
+   "Después de que llegó, nos pusimos a trabajar."
+  ],
+  "example_zh": [
+   "等我妻子旅行回来，我们请你吃饭。",
+   "他到了之后，我们就开始干活。"
+  ],
+  "focus": [
+   "después",
+   "de",
+   "que"
+  ],
+  "zh": "después de que：在……之后",
+  "level": "B1",
+  "formation": "después de que + 陈述式（已发生）/ 虚拟式（将来）",
+  "notes": "主语一致时更常用 después de + 原形动词；指将来未发生的事可用虚拟式。"
+ },
+ {
+  "key": "esm_cuandosubjuntivofuturo__4f4935",
+  "name": "cuando + subjuntivo (futuro)",
+  "slug": "cuando + subjuntivo",
+  "meaning": "when (referring to a future event)",
+  "type": "composite",
+  "examples": [
+   "Cuando llegue la demás gente, nos iremos.",
+   "Cuando tenga tiempo, iré al cine."
+  ],
+  "example_zh": [
+   "等其他人到了，我们就走。",
+   "等我有时间就去看电影。"
+  ],
+  "focus": [
+   "cuando",
+   "§subj"
+  ],
+  "zh": "cuando + 虚拟式：指将来发生时",
+  "level": "B1",
+  "formation": "cuando + 虚拟式（指将来/未发生）",
+  "notes": "西班牙语不用 cuando + 将来时；指将来的事一律用虚拟式现在时。"
+ },
+ {
+  "key": "esm_ojalásubjuntivo__1db183",
+  "name": "ojalá (+ subjuntivo)",
+  "slug": "ojalá",
+  "meaning": "I wish / if only",
+  "type": "composite",
+  "examples": [
+   "Ojalá llegue hoy.",
+   "¡Ojalá lo consiga!"
+  ],
+  "example_zh": [
+   "但愿他今天能到。",
+   "但愿他能办成！"
+  ],
+  "focus": [
+   "ojalá"
+  ],
+  "zh": "ojalá：但愿、希望",
+  "level": "B1",
+  "formation": "ojalá + 虚拟式现在时（将来愿望）/ 虚拟式过去时（不可能的愿望）",
+  "notes": "来自阿拉伯语『愿真主愿意』，后面必须用虚拟式。"
+ },
+ {
+  "key": "esm_quizáquizássubjuntivo__503b95",
+  "name": "quizá / quizás (+ subjuntivo)",
+  "slug": "quizá / quizás",
+  "meaning": "perhaps / maybe",
+  "type": "composite",
+  "examples": [
+   "Quizá llueva mañana.",
+   "Quizá llegue tu padre esta tarde."
+  ],
+  "example_zh": [
+   "明天也许会下雨。",
+   "你父亲今天下午也许到。"
+  ],
+  "focus": [
+   "quizá/quizás"
+  ],
+  "zh": "quizá / quizás：也许",
+  "level": "B1",
+  "formation": "quizá(s) + 虚拟式（更常见）/ 陈述式（较确定）",
+  "notes": "置于句首时多接虚拟式；置于句末或表示较大把握时可用陈述式。"
+ },
+ {
+  "key": "esm_talvezsubjuntivo__10a40b",
+  "name": "tal vez (+ subjuntivo)",
+  "slug": "tal vez",
+  "meaning": "maybe / perhaps",
+  "type": "composite",
+  "examples": [
+   "Tal vez lo sepa.",
+   "Tal vez lo conozcas."
+  ],
+  "example_zh": [
+   "他也许知道这事。",
+   "你也许认识他。"
+  ],
+  "focus": [
+   "tal",
+   "vez"
+  ],
+  "zh": "tal vez：或许",
+  "level": "B1",
+  "formation": "tal vez + 虚拟式（不确定）/ 陈述式（较确定）",
+  "notes": "与 quizá 用法相同，后置时更倾向陈述式（lo conozcas / lo conoces 都可）。"
+ },
+ {
+  "key": "esm_esposiblequesubjuntivo__4abb27",
+  "name": "es posible que + subjuntivo",
+  "slug": "es posible que + subjuntivo",
+  "meaning": "it is possible that",
+  "type": "composite",
+  "examples": [
+   "Es posible que funcione bien.",
+   "Es posible que consiga el empleo."
+  ],
+  "example_zh": [
+   "这也许能行得通。",
+   "他有可能拿到那份工作。"
+  ],
+  "focus": [
+   "es",
+   "posible",
+   "que"
+  ],
+  "zh": "es posible que + 虚拟式：有可能……",
+  "level": "B1",
+  "formation": "es posible que + 虚拟式",
+  "notes": "同类触发语：es probable que、puede que、es difícil que，后面都用虚拟式。"
+ },
+ {
+  "key": "esm_esnecesarioquesubjuntivo__0502c2",
+  "name": "es necesario que + subjuntivo",
+  "slug": "es necesario que + subjuntivo",
+  "meaning": "it is necessary that",
+  "type": "composite",
+  "examples": [
+   "Es necesario que estudien más.",
+   "Es necesario que estudies la gramática."
+  ],
+  "example_zh": [
+   "他们需要多学习。",
+   "你必须学语法。"
+  ],
+  "focus": [
+   "es",
+   "necesario",
+   "que"
+  ],
+  "zh": "es necesario que + 虚拟式：有必要……",
+  "level": "B1",
+  "formation": "es necesario que + 虚拟式",
+  "notes": "必要性/评价类无人称表达（es importante / es mejor / hace falta que）都用虚拟式。"
+ },
+ {
+  "key": "esm_mealegrodequesubjuntivo__571bc9",
+  "name": "me alegro de que + subjuntivo",
+  "slug": "me alegro de que + subjuntivo",
+  "meaning": "I am glad that (emotion trigger)",
+  "type": "composite",
+  "examples": [
+   "Me alegro de que no llueva.",
+   "Me alegro de que estéis bien."
+  ],
+  "example_zh": [
+   "我很高兴没下雨。",
+   "我很高兴你们都好好的。"
+  ],
+  "focus": [
+   "alegro",
+   "de",
+   "que"
+  ],
+  "zh": "me alegro de que + 虚拟式：我很高兴……",
+  "level": "B1",
+  "formation": "情感动词 + de que + 虚拟式",
+  "notes": "情感类触发（me alegro / siento / me molesta / me extraña）后面用虚拟式。"
+ },
+ {
+  "key": "esm_nocreoquesubjuntivo__85cb68",
+  "name": "no creo que + subjuntivo",
+  "slug": "no creo que + subjuntivo",
+  "meaning": "I don't think that (negated opinion)",
+  "type": "composite",
+  "examples": [
+   "No creo que lo hagas.",
+   "No creo que lo logres."
+  ],
+  "example_zh": [
+   "我不信你会这么做。",
+   "我觉得你办不到。"
+  ],
+  "focus": [
+   "no",
+   "creo",
+   "que"
+  ],
+  "zh": "no creo que + 虚拟式：我认为……不",
+  "level": "B1",
+  "formation": "否定意见动词 + que + 虚拟式",
+  "notes": "creo que 用陈述式，但 no creo que 用虚拟式；同类：no pienso que、no me parece que。"
+ },
+ {
+  "key": "esm_dudoquesubjuntivo__219c5c",
+  "name": "dudo que + subjuntivo",
+  "slug": "dudo que + subjuntivo",
+  "meaning": "I doubt that",
+  "type": "composite",
+  "examples": [
+   "Dudo que pueda a esta hora.",
+   "Dudo que venga."
+  ],
+  "example_zh": [
+   "我怀疑这个点他能来。",
+   "我不太相信他会来。"
+  ],
+  "focus": [
+   "dudo",
+   "que"
+  ],
+  "zh": "dudo que + 虚拟式：我怀疑……",
+  "level": "B1",
+  "formation": "dudar que + 虚拟式",
+  "notes": "肯定形式 dudo que 用虚拟式；no dudo que 表确信时用陈述式。"
+ },
+ {
+  "key": "esm_quienquienesrelativo__5f5f29",
+  "name": "quien / quienes (relativo)",
+  "slug": "quien / quienes (relativo)",
+  "meaning": "who / whom (relative pronoun, people only)",
+  "type": "composite",
+  "examples": [
+   "Habla con quien quieras.",
+   "No es de ti de quien me quejo, de tu cuñado."
+  ],
+  "example_zh": [
+   "你想跟谁说话就跟谁说。",
+   "我抱怨的不是你，是你姐夫。"
+  ],
+  "focus": [
+   "quien/quienes"
+  ],
+  "zh": "quien / quienes：关系代词（指人）",
+  "level": "B1",
+  "formation": "先行词（人）+ quien/quienes + 从句；或句首指『谁……』",
+  "notes": "只能指人；介词后用 quien（con quien hablo）；句首 quien 常含『凡是……的人』。"
+ },
+ {
+  "key": "esm_cuyocuyacuyoscuyas__98f854",
+  "name": "cuyo / cuya / cuyos / cuyas",
+  "slug": "cuyo / cuya",
+  "meaning": "whose (possessive relative)",
+  "type": "composite",
+  "examples": [
+   "Estoy leyendo una novela cuyo autor es mexicano.",
+   "Allá está el abogado cuyas señas te di."
+  ],
+  "example_zh": [
+   "我正在读一本作者是墨西哥人的小说。",
+   "那位就是我给过你地址的律师。"
+  ],
+  "focus": [
+   "cuyo/cuya/cuyos/cuyas"
+  ],
+  "zh": "cuyo/a/os/as：……的（关系形容词）",
+  "level": "B1",
+  "formation": "先行词 + cuyo/a/os/as + 名词",
+  "notes": "与后面的名词性数一致，而不是与先行词一致；cuyo 前不再加冠词。"
+ },
+ {
+  "key": "esm_elcuallacualloscualeslascuales__4f9a41",
+  "name": "el cual / la cual / los cuales / las cuales",
+  "slug": "el cual / la cual",
+  "meaning": "which / who (formal relative pronoun)",
+  "type": "composite",
+  "examples": [
+   "La mesa a la cual diste barniz está en la sala.",
+   "Vi una mesa vieja debajo de la cual encontré una llave."
+  ],
+  "example_zh": [
+   "你上过漆的那张桌子在客厅里。",
+   "我看见一张旧桌子，在它下面找到了一把钥匙。"
+  ],
+  "focus": [
+   "el/la",
+   "cual"
+  ],
+  "zh": "el cual / la cual：关系代词（较正式）",
+  "level": "B1",
+  "formation": "先行词 + 定冠词 + cual（+ 前置介词）",
+  "notes": "冠词与先行词性数一致；介词后或隔得远时用它比 que 清楚。"
+ },
+ {
+  "key": "esm_serparticipiovozpasiva__0329be",
+  "name": "ser + participio (voz pasiva)",
+  "slug": "ser + participio (pasiva)",
+  "meaning": "passive voice with ser",
+  "type": "composite",
+  "examples": [
+   "La casa fue destruida por el fuego.",
+   "La carta no fue recibida por el interesado."
+  ],
+  "example_zh": [
+   "那栋房子被大火烧毁了。",
+   "当事人没有收到那封信。"
+  ],
+  "focus": [
+   "fue/fueron",
+   "§part"
+  ],
+  "zh": "ser + 过去分词：被动语态",
+  "level": "B1",
+  "formation": "ser 变位 + 过去分词（+ por + 施事者）",
+  "notes": "过去分词与主语性数一致（La casa fue destruida）；口语中更常用 se 被动。"
+ },
+ {
+  "key": "esm_estarparticipioestadoresultante__58c91e",
+  "name": "estar + participio (estado resultante)",
+  "slug": "estar + participio",
+  "meaning": "resultant state after an action",
+  "type": "composite",
+  "examples": [
+   "Las aceras están destrozadas.",
+   "Está agotado porque madruga una bestiada."
+  ],
+  "example_zh": [
+   "人行道被弄得破烂不堪。",
+   "他累坏了，因为他起得太早。"
+  ],
+  "focus": [
+   "está/están/estaba/estaban",
+   "§part"
+  ],
+  "zh": "estar + 过去分词：表示结果状态",
+  "level": "B1",
+  "formation": "estar 变位 + 过去分词（与主语性数一致）",
+  "notes": "ser + 分词讲动作（被……），estar + 分词讲结果状态（已经……了）：La puerta fue cerrada / La puerta está cerrada。"
+ },
+ {
+  "key": "esm_irgerundioprogresogradual__e3590f",
+  "name": "ir + gerundio (progreso gradual)",
+  "slug": "ir + gerundio",
+  "meaning": "to be gradually doing something",
+  "type": "composite",
+  "examples": [
+   "Va mejorando de aspecto.",
+   "Iban entrando uno por uno."
+  ],
+  "example_zh": [
+   "他的气色渐渐好起来了。",
+   "他们一个接一个地走进来。"
+  ],
+  "focus": [
+   "voy/vas/va/vamos/van/iba/iban",
+   "§ger"
+  ],
+  "zh": "ir + 副动词：渐渐、逐步地",
+  "level": "B1",
+  "formation": "ir 变位 + 副动词",
+  "notes": "强调逐渐推进（va mejorando 越来越好），区别于 estar + 副动词（正在做）。"
+ },
+ {
+  "key": "esm_siemprequesubjuntivo__e0c988",
+  "name": "siempre que (+ subjuntivo)",
+  "slug": "siempre que",
+  "meaning": "as long as / whenever",
+  "type": "composite",
+  "examples": [
+   "Siempre que tú también estés conforme, acepto la propuesta.",
+   "Los dos trataban ese asunto siempre que se veían."
+  ],
+  "example_zh": [
+   "只要你也没意见，我就接受这个提议。",
+   "两人每次见面都谈这件事。"
+  ],
+  "focus": [
+   "siempre",
+   "que"
+  ],
+  "zh": "siempre que：只要；每当",
+  "level": "B2",
+  "formation": "siempre que + 虚拟式（条件）/ 陈述式（每当）",
+  "notes": "表条件时用虚拟式（siempre que estés conforme），表习惯性『每当』可用陈述式。"
+ },
+ {
+  "key": "esm_afindequesubjuntivo__c84524",
+  "name": "a fin de que + subjuntivo",
+  "slug": "a fin de que + subjuntivo",
+  "meaning": "so that / in order that (formal)",
+  "type": "composite",
+  "examples": [
+   "He venido a fin de que me informes de lo ocurrido.",
+   "Los técnicos trabajarán a fin de que el oleoducto funcione pronto."
+  ],
+  "example_zh": [
+   "我来是为了让你把发生的事告诉我。",
+   "技术人员会努力让输油管道尽快投入使用。"
+  ],
+  "focus": [
+   "a",
+   "fin",
+   "de",
+   "que"
+  ],
+  "zh": "a fin de que + 虚拟式：为了（让）……",
+  "level": "B2",
+  "formation": "a fin de que + 虚拟式（主语不同）",
+  "notes": "书面语，比 para que 正式；主语一致时用 a fin de + 原形动词。"
+ },
+ {
+  "key": "esm_encambio__51afb7",
+  "name": "en cambio",
+  "slug": "en cambio",
+  "meaning": "on the other hand / by contrast",
+  "type": "composite",
+  "examples": [
+   "Es muy prudente; en cambio, su hermano es un alocado.",
+   "A mí me gusta el cine; en cambio, ella prefiere el teatro."
+  ],
+  "example_zh": [
+   "他很谨慎；相反，他弟弟却是个莽撞鬼。",
+   "我喜欢电影，而她却更喜欢戏剧。"
+  ],
+  "focus": [
+   "en",
+   "cambio"
+  ],
+  "zh": "en cambio：相反、另一方面",
+  "level": "B2",
+  "formation": "en cambio（逗号隔开，置于对比句前）",
+  "notes": "表对照，而非单纯转折；与 por el contrario 近义。"
+ },
+ {
+  "key": "esm_dadoque__8cf1e9",
+  "name": "dado que",
+  "slug": "dado que",
+  "meaning": "given that / since",
+  "type": "composite",
+  "examples": [
+   "Dado que te interesa la colocación, ven a verme el martes.",
+   "Dado que no había plazas, tuvimos que esperar."
+  ],
+  "example_zh": [
+   "既然你对这个职位感兴趣，周二来找我。",
+   "鉴于没有名额，我们只好等。"
+  ],
+  "focus": [
+   "dado",
+   "que"
+  ],
+  "zh": "dado que：鉴于、既然",
+  "level": "B2",
+  "formation": "dado que + 陈述式",
+  "notes": "书面语因果连接，语气客观；常出现在论说文里。"
+ },
+ {
+  "key": "esm_sibien__1205db",
+  "name": "si bien",
+  "slug": "si bien",
+  "meaning": "although / while (formal concession)",
+  "type": "composite",
+  "examples": [
+   "Si bien no es todo lo que esperaba, me doy por contento.",
+   "Si bien es caro, merece la pena."
+  ],
+  "example_zh": [
+   "虽然这不是我期待的全部，我也满意了。",
+   "虽然贵，但值得。"
+  ],
+  "focus": [
+   "si",
+   "bien"
+  ],
+  "zh": "si bien：虽然、尽管（书面）",
+  "level": "B2",
+  "formation": "si bien + 陈述式",
+  "notes": "书面让步，相当于 aunque 的正式版；别与 si = 如果 混淆。"
+ },
+ {
+  "key": "esm_encuantoa__775a9e",
+  "name": "en cuanto a",
+  "slug": "en cuanto a",
+  "meaning": "as for / regarding",
+  "type": "composite",
+  "examples": [
+   "En cuanto a Juan, me parece buen chico.",
+   "En cuanto a los precios, no hay ningún problema."
+  ],
+  "example_zh": [
+   "至于胡安，我觉得他是个好小伙。",
+   "至于价格，没有任何问题。"
+  ],
+  "focus": [
+   "en",
+   "cuanto",
+   "a"
+  ],
+  "zh": "en cuanto a：至于、关于",
+  "level": "B2",
+  "formation": "en cuanto a + 名词 / 代词",
+  "notes": "话题转换用语，与『as soon as』的 en cuanto 不是一回事。"
+ },
+ {
+  "key": "esm_envezde__51c2ed",
+  "name": "en vez de",
+  "slug": "en vez de",
+  "meaning": "instead of",
+  "type": "composite",
+  "examples": [
+   "No me he dado cuenta y he comprado sal gorda en vez de sal fina.",
+   "Prefiero tomar té en vez de café."
+  ],
+  "example_zh": [
+   "我没注意，买成了粗盐而不是细盐。",
+   "我宁愿喝茶而不是咖啡。"
+  ],
+  "focus": [
+   "en",
+   "vez",
+   "de"
+  ],
+  "zh": "en vez de：而不是、代替",
+  "level": "B2",
+  "formation": "en vez de + 名词 / 原形动词",
+  "notes": "与 en lugar de 同义；后接从句要改成 en vez de que + 虚拟式（少用）。"
+ },
+ {
+  "key": "esm_asícomo__e1f757",
+  "name": "así como",
+  "slug": "así como",
+  "meaning": "as well as / just as",
+  "type": "composite",
+  "examples": [
+   "Así como yo no me meto en tus asuntos, tampoco quiero que tú te metas en los míos.",
+   "Ha visitado España, así como Francia e Italia."
+  ],
+  "example_zh": [
+   "正如我不插手你的事，我也不希望你插手我的。",
+   "他去过西班牙，以及法国和意大利。"
+  ],
+  "focus": [
+   "así",
+   "como"
+  ],
+  "zh": "así como：以及；正如",
+  "level": "B2",
+  "formation": "A, así como B（并列）；Así como + 从句, 主句（对比）",
+  "notes": "连接并列成分时相当于 y también；句首时表『正如……』的对照。"
+ },
+ {
+  "key": "esm_nini__816372",
+  "name": "ni ... ni",
+  "slug": "ni ... ni",
+  "meaning": "neither ... nor",
+  "type": "composite",
+  "examples": [
+   "Ni mi mujer ni mi hija lo deben saber.",
+   "Ni la amistad, ni las dádivas, ni las promesas pudieron vencerle."
+  ],
+  "example_zh": [
+   "这件事我妻子和女儿都不该知道。",
+   "无论是友情、馈赠还是承诺，都没能打动他。"
+  ],
+  "focus": [
+   "ni",
+   "...",
+   "ni"
+  ],
+  "zh": "ni … ni …：既不……也不……",
+  "level": "B2",
+  "formation": "ni + A + ni + B（可叠加多项）",
+  "notes": "句首用 Ni…ni 时不再加 no；句中已否定时用 ni 代替 y no。"
+ },
+ {
+  "key": "esm_decirlahorasonlas__66c1ed",
+  "name": "decir la hora (son las ...)",
+  "slug": "son las ... (decir la hora)",
+  "meaning": "telling the time",
+  "type": "composite",
+  "examples": [
+   "Son las seis y media.",
+   "Son las ocho y cuarto."
+  ],
+  "example_zh": [
+   "现在六点半。",
+   "现在八点一刻。"
+  ],
+  "focus": [
+   "son",
+   "las"
+  ],
+  "zh": "说时间：son las + 钟点",
+  "level": "A1",
+  "formation": "Son las + 数字 + y/menos + 分钟；1 点用 Es la una",
+  "notes": "只有凌晨 1 点用单数 Es la una，其余用复数 Son las。问句：¿Qué hora es?"
+ },
+ {
+  "key": "esm_hacersustantivoeltiempo__5aa63f",
+  "name": "hacer + sustantivo (el tiempo)",
+  "slug": "hacer + sustantivo (el tiempo)",
+  "meaning": "weather with hacer",
+  "type": "composite",
+  "examples": [
+   "¿Hace frío en Alaska?",
+   "Hace mucho calor en verano."
+  ],
+  "example_zh": [
+   "阿拉斯加冷吗？",
+   "夏天很热。"
+  ],
+  "focus": [
+   "hace",
+   "frío/calor/sol/viento"
+  ],
+  "zh": "天气：hace + 名词",
+  "level": "A1",
+  "formation": "hace + frío / calor / sol / viento / buen tiempo",
+  "notes": "天气用无人称 hacer，主语只能是第三人称单数：hace frío。不用 ser/estar。"
+ },
+ {
+  "key": "esm_tenerañoslaedad__edc794",
+  "name": "tener ... años (la edad)",
+  "slug": "tener ... años",
+  "meaning": "to be ... years old",
+  "type": "composite",
+  "examples": [
+   "Mi hermana tiene veinte años.",
+   "¿Cuántos años tienes?"
+  ],
+  "example_zh": [
+   "我妹妹二十岁。",
+   "你多大了？"
+  ],
+  "focus": [
+   "tengo/tienes/tiene/tenemos/tienen",
+   "...",
+   "años"
+  ],
+  "zh": "年龄：tener + 数字 + años",
+  "level": "A1",
+  "formation": "tener 变位 + 数字 + años",
+  "notes": "年龄用 tener 不用 ser：Tengo veinte años（不是 soy veinte）。问：¿Cuántos años tienes?"
+ },
+ {
+  "key": "esm_nadanadienuncatampoco__945ac1",
+  "name": "nada / nadie / nunca / tampoco",
+  "slug": "nada / nadie / nunca",
+  "meaning": "negative words",
+  "type": "composite",
+  "examples": [
+   "No dijo nada.",
+   "Nunca he estado en México."
+  ],
+  "example_zh": [
+   "他什么都没说。",
+   "我从没去过墨西哥。"
+  ],
+  "focus": [
+   "nada/nadie/nunca/tampoco"
+  ],
+  "zh": "否定词 nada / nadie / nunca / tampoco",
+  "level": "A2",
+  "formation": "否定词可置于动词后（前面保留 no）或句首（不再加 no）",
+  "notes": "西班牙语允许双重否定：No dijo nada（他什么都没说）。否定词放句首时去掉 no：Nada dijo。"
+ },
+ {
+  "key": "esm_perosinocontraste__aea07f",
+  "name": "pero / sino (contraste)",
+  "slug": "pero / sino",
+  "meaning": "but (contrast)",
+  "type": "composite",
+  "examples": [
+   "José nunca fue rico, pero sí feliz.",
+   "No es tonto, sino perezoso."
+  ],
+  "example_zh": [
+   "何塞从没富过，但很幸福。",
+   "他不是笨，而是懒。"
+  ],
+  "focus": [
+   "pero/sino"
+  ],
+  "zh": "转折 pero / sino",
+  "level": "A2",
+  "formation": "pero + 并列成分；sino + 被否定的对立项",
+  "notes": "sino 只用在否定句后，纠正被否定的事实：No es tonto, sino perezoso。否定句后接完整从句时用 sino que。"
+ },
+ {
+  "key": "esm_quéadjetivosustantivoexclamación__97f53b",
+  "name": "¡qué + adjetivo / sustantivo! (exclamación)",
+  "slug": "¡Qué + adjetivo!",
+  "meaning": "exclamations with qué",
+  "type": "composite",
+  "examples": [
+   "¡Qué bonito es tu pueblo!",
+   "¡Qué raro!"
+  ],
+  "example_zh": [
+   "你的小镇真漂亮！",
+   "真奇怪！"
+  ],
+  "focus": [
+   "qué",
+   "§adj"
+  ],
+  "zh": "感叹句 ¡qué + 形容词/名词!",
+  "level": "A2",
+  "formation": "¡Qué + 形容词/名词 (+ más + 形容词)!",
+  "notes": "qué 带重音符号；名词前可加 más 加强语气：¡Qué vida más aburrida!"
+ },
+ {
+  "key": "esm_loadjetivosustantivación__5414ad",
+  "name": "lo + adjetivo (sustantivación)",
+  "slug": "lo + adjetivo",
+  "meaning": "the + adjective, as an abstract noun",
+  "type": "composite",
+  "examples": [
+   "Lo importante es participar.",
+   "No sabes lo difícil que es."
+  ],
+  "example_zh": [
+   "重要的是参与。",
+   "你不知道这有多难。"
+  ],
+  "focus": [
+   "lo",
+   "§adj"
+  ],
+  "zh": "中性冠词 lo + 形容词：……的事物",
+  "level": "A2",
+  "formation": "lo + 阳性单数形容词 → 抽象名词",
+  "notes": "lo importante（重要的东西）、lo mejor（最好的部分）。与 lo que 连用可引导从句。"
+ },
+ {
+  "key": "esm_hacetiempoque__47598c",
+  "name": "hace + tiempo + que",
+  "slug": "hace ... que",
+  "meaning": "duration up to now (hace ... que)",
+  "type": "composite",
+  "examples": [
+   "Hace tres años que vivo aquí.",
+   "Hace dos meses que vivo aquí."
+  ],
+  "example_zh": [
+   "我在这里住了三年了。",
+   "我在这里住了两个月了。"
+  ],
+  "focus": [
+   "hace",
+   "...",
+   "que"
+  ],
+  "zh": "hace + 时间 + que：已经……多久",
+  "level": "A2",
+  "formation": "hace + 时间段 + que + 现在时（持续至今）",
+  "notes": "也可说 Vivo aquí hace tres años（动词在前、hace 在后）。若动词用简单过去时，则指『……以前』。"
+ },
+ {
+  "key": "esm_elimperativonegativonosubjuntivo__b71310",
+  "name": "el imperativo negativo (no + subjuntivo)",
+  "slug": "no + subjuntivo (imperativo negativo)",
+  "meaning": "negative commands (no + present subjunctive)",
+  "type": "composite",
+  "examples": [
+   "No me lo digas.",
+   "No lo hagas así."
+  ],
+  "example_zh": [
+   "别告诉我。",
+   "别这么做。"
+  ],
+  "focus": [
+   "no",
+   "...",
+   "§subj2"
+  ],
+  "zh": "否定命令：no + 虚拟式现在时",
+  "level": "B1",
+  "formation": "no + 虚拟式现在时（第二人称单数 digas / 复数 digáis；usted 用 diga）",
+  "notes": "否定命令一律改用虚拟式，代词前置：No me lo digas。肯定命令则用命令式本身（tú 用第三人称单数 habla，usted 用 hable），代词后贴：dímelo。"
+ },
+ {
+  "key": "esm_volverainfinitivo__b636ce",
+  "name": "volver a + infinitivo",
+  "slug": "volver a + infinitivo",
+  "meaning": "to do something again",
+  "type": "composite",
+  "examples": [
+   "Volvió a llamar dos horas después.",
+   "Volverá a intentarlo."
+  ],
+  "example_zh": [
+   "两小时后他又打了一次电话。",
+   "他会再试一次。"
+  ],
+  "focus": [
+   "volver/vuelvo/vuelve/volvemos/vuelven",
+   "a",
+   "§inf"
+  ],
+  "zh": "volver a + 原形动词：再一次",
+  "level": "B1",
+  "formation": "volver (o→ue) + a + 原形动词",
+  "notes": "表示重复动作，比 otra vez 更书面；volver 本身是『回来』，加 a + 原形动词才是『再次』。"
+ },
+ {
+  "key": "esm_ponerseainfinitivo__4149ab",
+  "name": "ponerse a + infinitivo",
+  "slug": "ponerse a + infinitivo",
+  "meaning": "to start doing something (abruptly)",
+  "type": "composite",
+  "examples": [
+   "Se puso a llover a media tarde.",
+   "Me pongo a estudiar en cuanto ceno."
+  ],
+  "example_zh": [
+   "下午过半开始下起雨来。",
+   "我一吃完晚饭就开始学习。"
+  ],
+  "focus": [
+   "se/me/te/nos",
+   "puso/pongo/pones/pone/ponemos/ponen",
+   "a",
+   "§inf"
+  ],
+  "zh": "ponerse a + 原形动词：开始（动手）做",
+  "level": "B1",
+  "formation": "ponerse (自复) + a + 原形动词",
+  "notes": "强调『动手/突然开始』，比 empezar a 更口语；自复代词随主语变化。"
+ },
+ {
+  "key": "esm_terminardeinfinitivo__c92181",
+  "name": "terminar de + infinitivo",
+  "slug": "terminar de + infinitivo",
+  "meaning": "to finish doing something",
+  "type": "composite",
+  "examples": [
+   "Terminó de leer el libro anoche.",
+   "Terminamos de trabajar tarde."
+  ],
+  "example_zh": [
+   "他昨晚把那本书读完了。",
+   "我们工作到很晚才结束。"
+  ],
+  "focus": [
+   "terminar/termino/termina/terminamos/terminan",
+   "de",
+   "§inf"
+  ],
+  "zh": "terminar de + 原形动词：做完某事",
+  "level": "B1",
+  "formation": "terminar de + 原形动词",
+  "notes": "与 acabar de 区分：terminar de 是『做完』，acabar de 是『刚刚做完』。"
+ },
+ {
+  "key": "esm_venirgerundio__41a98e",
+  "name": "venir + gerundio",
+  "slug": "venir + gerundio",
+  "meaning": "to have been doing something for a while",
+  "type": "composite",
+  "examples": [
+   "Viene estudiando español desde los diez años.",
+   "Me vengo preguntando por qué no escribe."
+  ],
+  "example_zh": [
+   "他从十岁起一直在学西班牙语。",
+   "我一直纳闷他为什么不写信。"
+  ],
+  "focus": [
+   "viene/vienen/venía/venían",
+   "§ger"
+  ],
+  "zh": "venir + 副动词：一直（从过去持续）",
+  "level": "B1",
+  "formation": "venir 变位 + 副动词",
+  "notes": "表示从过去某点持续到现在的动作，比 llevar + 副动词更强调延续；venir 只变位，副动词不变。"
+ },
+ {
+  "key": "esm_deberdeinfinitivoconjetura__fe8eb4",
+  "name": "deber de + infinitivo (conjetura)",
+  "slug": "deber de + infinitivo",
+  "meaning": "must (probability)",
+  "type": "composite",
+  "examples": [
+   "Debe de estar durmiendo.",
+   "Deben de ser las cinco."
+  ],
+  "example_zh": [
+   "他大概在睡觉。",
+   "现在想必五点了。"
+  ],
+  "focus": [
+   "debe/deben/debemos",
+   "de",
+   "§inf"
+  ],
+  "zh": "deber de + 原形动词：大概、想必",
+  "level": "B1",
+  "formation": "deber de + 原形动词",
+  "notes": "deber + 原形动词＝应该（义务）；deber de + 原形动词＝推测。口语里常省略 de，但书面要区分。"
+ },
+ {
+  "key": "esm_haberdeinfinitivo__26ae20",
+  "name": "haber de + infinitivo",
+  "slug": "haber de + infinitivo",
+  "meaning": "formal obligation / future necessity",
+  "type": "composite",
+  "examples": [
+   "He de terminar esto hoy.",
+   "Habrá de decidirlo mañana."
+  ],
+  "example_zh": [
+   "我今天必须把这件事做完。",
+   "他明天得做决定。"
+  ],
+  "focus": [
+   "he/has/ha/hemos/han",
+   "de",
+   "§inf"
+  ],
+  "zh": "haber de + 原形动词：须得、将要（书面）",
+  "level": "B1",
+  "formation": "haber 变位 + de + 原形动词",
+  "notes": "书面或文学语体，表义务或注定；口语里用 tener que。注意 haber 在此不作助动词。"
+ },
+ {
+  "key": "esm_elmíolatuyaposesivostónicos__19a64c",
+  "name": "el mío / la tuya (posesivos tónicos)",
+  "slug": "el mío / la tuya",
+  "meaning": "mine / yours (stressed possessives)",
+  "type": "composite",
+  "examples": [
+   "Mi libro está aquí; el tuyo está ahí.",
+   "Los suyos llegaron tarde."
+  ],
+  "example_zh": [
+   "我的书在这儿，你的在那儿。",
+   "他们的那些人来晚了。"
+  ],
+  "focus": [
+   "el/la",
+   "mío/mía/tuyo/tuya/suyo/suya"
+  ],
+  "zh": "重读物主代词 el mío / la tuya",
+  "level": "B1",
+  "formation": "定冠词 + mío/mía/míos/mías（tuyo, suyo, nuestro, vuestro）",
+  "notes": "重读形式代替名词，冠词不可省：el mío（我的那个）。与名词前的短形式 mi/tu/su 区分。"
+ },
+ {
+  "key": "esm_loquerelativoneutro__6de48d",
+  "name": "lo que (relativo neutro)",
+  "slug": "lo que",
+  "meaning": "what / the thing that",
+  "type": "composite",
+  "examples": [
+   "Lo que me gusta es la música.",
+   "No entiendo lo que dices."
+  ],
+  "example_zh": [
+   "我喜欢的是音乐。",
+   "我不明白你说的话。"
+  ],
+  "focus": [
+   "lo",
+   "que"
+  ],
+  "zh": "lo que：……的东西（中性关系代词）",
+  "level": "B1",
+  "formation": "lo que + 从句；或 主句 + lo que",
+  "notes": "指代前面整件事或抽象概念，无先行词；与 el que/la que（指人/物）不同。"
+ },
+ {
+  "key": "esm_sinquesubjuntivo__0cd5e7",
+  "name": "sin que + subjuntivo",
+  "slug": "sin que + subjuntivo",
+  "meaning": "without (someone) doing something",
+  "type": "composite",
+  "examples": [
+   "La señora salió de la fiesta sin que la viéramos.",
+   "Lo hice sin que nadie me viera."
+  ],
+  "example_zh": [
+   "那位女士离开聚会时我们都没看见。",
+   "我做这事时没人看见。"
+  ],
+  "focus": [
+   "sin",
+   "que",
+   "...",
+   "§subj"
+  ],
+  "zh": "sin que + 虚拟式：而……没有",
+  "level": "B1",
+  "formation": "sin que + 虚拟式（主从句主语不同）",
+  "notes": "主语一致时用 sin + 原形动词；主语不同必须用 sin que + 虚拟式。"
+ },
+ {
+  "key": "esm_semeseteverboaccióninvoluntaria__f35b27",
+  "name": "se me / se te + verbo (acción involuntaria)",
+  "slug": "se me / se te (acciones involuntarias)",
+  "meaning": "unplanned occurrences with se + indirect object",
+  "type": "composite",
+  "examples": [
+   "Se nos olvidó traer los refrescos.",
+   "¿Se te perdieron las llaves?"
+  ],
+  "example_zh": [
+   "我们忘了带饮料。",
+   "你钥匙丢了吗？"
+  ],
+  "focus": [
+   "se",
+   "me/te/le/nos/os/les",
+   "§verb"
+  ],
+  "zh": "se me / se te + 动词：意外发生（非本意）",
+  "level": "B1",
+  "formation": "se + 与格代词 + 动词（第三人称）",
+  "notes": "表示『不小心/不由自主要发生』：Se me olvidó（我忘了）。与格代词指受影响的人，动词与事物一致。"
+ },
+ {
+  "key": "esm_cadavezmásmenos__2ea65c",
+  "name": "cada vez más / menos",
+  "slug": "cada vez más",
+  "meaning": "more and more / less and less",
+  "type": "composite",
+  "examples": [
+   "El español se habla cada vez más.",
+   "Está cada vez mejor."
+  ],
+  "example_zh": [
+   "说西班牙语的人越来越多。",
+   "他越来越好了。"
+  ],
+  "focus": [
+   "cada",
+   "vez",
+   "más"
+  ],
+  "zh": "cada vez más / menos：越来越……",
+  "level": "B1",
+  "formation": "cada vez + más/menos + 形容词/副词；cada vez más + 名词",
+  "notes": "表示渐进变化；完成体变化也可说 cada vez mejor/peor。"
+ },
+ {
+  "key": "esm_hastaquesubjuntivo__0a18f1",
+  "name": "hasta que (+ subjuntivo)",
+  "slug": "hasta que + subjuntivo",
+  "meaning": "until (something happens)",
+  "type": "composite",
+  "examples": [
+   "Espera hasta que llegue.",
+   "No te vayas hasta que termine."
+  ],
+  "example_zh": [
+   "等到他来。",
+   "等我做完再走。"
+  ],
+  "focus": [
+   "hasta",
+   "que"
+  ],
+  "zh": "hasta que：直到……（指将来用虚拟式）",
+  "level": "B1",
+  "formation": "hasta que + 陈述式（已发生）/ 虚拟式（指将来）",
+  "notes": "指将来未发生的事用虚拟式：Espera hasta que llegue。已发生的事实用陈述式。"
+ },
+ {
+  "key": "esm_alomejorindicativo__1ffc64",
+  "name": "a lo mejor (+ indicativo)",
+  "slug": "a lo mejor",
+  "meaning": "maybe (with the indicative)",
+  "type": "composite",
+  "examples": [
+   "A lo mejor viene mañana.",
+   "A lo mejor no lo sabe."
+  ],
+  "example_zh": [
+   "他也许明天来。",
+   "他也许不知道这件事。"
+  ],
+  "focus": [
+   "a",
+   "lo",
+   "mejor"
+  ],
+  "zh": "a lo mejor：也许（接陈述式）",
+  "level": "B1",
+  "formation": "a lo mejor + 陈述式",
+  "notes": "口语常用，与 quizá/tal vez 不同：a lo mejor 后面用陈述式，不用虚拟式。"
+ },
+ {
+  "key": "esm_amenosquesubjuntivo__112cf0",
+  "name": "a menos que + subjuntivo",
+  "slug": "a menos que + subjuntivo",
+  "meaning": "unless",
+  "type": "composite",
+  "examples": [
+   "No saldremos a menos que deje de llover.",
+   "No lo sabrás a menos que lo leas."
+  ],
+  "example_zh": [
+   "除非雨停，否则我们不出门。",
+   "除非你读，否则你不会知道。"
+  ],
+  "focus": [
+   "a",
+   "menos",
+   "que"
+  ],
+  "zh": "a menos que + 虚拟式：除非",
+  "level": "B2",
+  "formation": "a menos que + 虚拟式（永远）",
+  "notes": "同义：a no ser que、salvo que，后面一律虚拟式。"
+ },
+ {
+  "key": "esm_contaldequesubjuntivo__bd7619",
+  "name": "con tal de que + subjuntivo",
+  "slug": "con tal de que + subjuntivo",
+  "meaning": "as long as / provided that",
+  "type": "composite",
+  "examples": [
+   "Te lo presto con tal de que me lo devuelvas.",
+   "Iré con tal de que no llueva."
+  ],
+  "example_zh": [
+   "只要你归还，我就借给你。",
+   "只要不下雨我就去。"
+  ],
+  "focus": [
+   "con",
+   "tal",
+   "de",
+   "que"
+  ],
+  "zh": "con tal de que + 虚拟式：只要",
+  "level": "B2",
+  "formation": "con tal de que + 虚拟式（主语不同）；主语一致用 con tal de + 原形动词",
+  "notes": "表示必要条件，语气比 si 更强；口语也说 con tal que。"
+ },
+ {
+  "key": "esm_siempreycuandosubjuntivo__106510",
+  "name": "siempre y cuando (+ subjuntivo)",
+  "slug": "siempre y cuando",
+  "meaning": "as long as",
+  "type": "composite",
+  "examples": [
+   "Iremos siempre y cuando no llueva.",
+   "Te apoyo siempre y cuando seas sincero."
+  ],
+  "example_zh": [
+   "只要不下雨我们就去。",
+   "只要你坦诚，我就支持你。"
+  ],
+  "focus": [
+   "siempre",
+   "y",
+   "cuando"
+  ],
+  "zh": "siempre y cuando：只要（条件）",
+  "level": "B2",
+  "formation": "siempre y cuando + 虚拟式",
+  "notes": "与 siempre que 同义，但语气更强调『前提』；后面必须虚拟式。"
+ },
+ {
+  "key": "esm_acondicióndequesubjuntivo__dcc930",
+  "name": "a condición de que + subjuntivo",
+  "slug": "a condición de que",
+  "meaning": "on condition that",
+  "type": "composite",
+  "examples": [
+   "Te ayudo a condición de que estudies.",
+   "Se lo diré a condición de que no se lo cuentes a nadie."
+  ],
+  "example_zh": [
+   "只要你学习，我就帮你。",
+   "我可以告诉他，条件是你别跟任何人说。"
+  ],
+  "focus": [
+   "a",
+   "condición",
+   "de",
+   "que"
+  ],
+  "zh": "a condición de que + 虚拟式：条件是……",
+  "level": "B2",
+  "formation": "a condición de que + 虚拟式",
+  "notes": "书面语条件句，语气正式；同义 a cambio de que。"
+ },
+ {
+  "key": "esm_encasodequesubjuntivo__779334",
+  "name": "en caso de que + subjuntivo",
+  "slug": "en caso de que + subjuntivo",
+  "meaning": "in case (that)",
+  "type": "composite",
+  "examples": [
+   "En caso de que llegue tarde, avísame.",
+   "Llévate dinero en caso de que lo necesites."
+  ],
+  "example_zh": [
+   "万一他来晚了，告诉我。",
+   "带点钱，以防需要。"
+  ],
+  "focus": [
+   "en",
+   "caso",
+   "de",
+   "que"
+  ],
+  "zh": "en caso de que + 虚拟式：万一、如果",
+  "level": "B2",
+  "formation": "en caso de que + 虚拟式；en caso de + 名词/原形动词",
+  "notes": "表示可能性较低的条件；后接名词时省掉 que（en caso de emergencia）。"
+ },
+ {
+  "key": "esm_porsiindicativosubjuntivo__3444e9",
+  "name": "por si (+ indicativo / subjuntivo)",
+  "slug": "por si",
+  "meaning": "in case",
+  "type": "composite",
+  "examples": [
+   "Llévate el paraguas por si llueve.",
+   "Lo digo por si acaso."
+  ],
+  "example_zh": [
+   "带上伞，以防下雨。",
+   "我不过是防个万一才说的。"
+  ],
+  "focus": [
+   "por",
+   "si"
+  ],
+  "zh": "por si：以防、万一",
+  "level": "B2",
+  "formation": "por si + 陈述式（可能发生）；por si acaso 单独使用",
+  "notes": "与 en caso de que（+虚拟式）区分：por si 后面通常用陈述式。"
+ },
+ {
+  "key": "esm_deahíquesubjuntivo__83f3ff",
+  "name": "de ahí que + subjuntivo",
+  "slug": "de ahí que + subjuntivo",
+  "meaning": "hence / that is why",
+  "type": "composite",
+  "examples": [
+   "No estudió; de ahí que suspendiera.",
+   "Llovió toda la noche, de ahí que el río esté tan crecido."
+  ],
+  "example_zh": [
+   "他没学习，所以说他没及格。",
+   "下了一夜雨，所以河水才涨得这么高。"
+  ],
+  "focus": [
+   "de",
+   "ahí",
+   "que"
+  ],
+  "zh": "de ahí que + 虚拟式：因此、所以说",
+  "level": "B2",
+  "formation": "de ahí que + 虚拟式",
+  "notes": "书面因果连接，后接虚拟式是固定要求；口语常说 por eso。"
+ },
+ {
+  "key": "esm_pormuchoquesubjuntivo__5ef2b5",
+  "name": "por mucho que + subjuntivo",
+  "slug": "por mucho que + subjuntivo",
+  "meaning": "however much",
+  "type": "composite",
+  "examples": [
+   "Por mucho que insistas, no cambiaré de idea.",
+   "Por mucho que lo intento, no lo entiendo."
+  ],
+  "example_zh": [
+   "不管你多坚持，我都不会改变主意。",
+   "不管我怎么努力，都弄不懂。"
+  ],
+  "focus": [
+   "por",
+   "mucho",
+   "que"
+  ],
+  "zh": "por mucho que + 虚拟式：无论多么……",
+  "level": "B2",
+  "formation": "por mucho que + 虚拟式（让步）",
+  "notes": "与 por más que 同义；也可说 por muy + 形容词 + que。"
+ },
+ {
+  "key": "esm_auncuandosubjuntivo__ad1709",
+  "name": "aun cuando (+ subjuntivo)",
+  "slug": "aun cuando",
+  "meaning": "even when / even though",
+  "type": "composite",
+  "examples": [
+   "Aun cuando llueva, iremos.",
+   "Aun cuando esté cansado, sigue trabajando."
+  ],
+  "example_zh": [
+   "即使下雨我们也去。",
+   "尽管他很累，还是继续工作。"
+  ],
+  "focus": [
+   "aun",
+   "cuando"
+  ],
+  "zh": "aun cuando：即使、尽管",
+  "level": "B2",
+  "formation": "aun cuando + 虚拟式（假设）/ 陈述式（事实）",
+  "notes": "aun（无重音）＝即使；aún（带重音）＝还、仍然。这是最常考的差别。"
+ },
+ {
+  "key": "esm_mientrasquecontraste__1400c0",
+  "name": "mientras que (contraste)",
+  "slug": "mientras que",
+  "meaning": "whereas",
+  "type": "composite",
+  "examples": [
+   "Yo prefiero el té, mientras que ella prefiere el café.",
+   "Él estudia, mientras que su hermano trabaja."
+  ],
+  "example_zh": [
+   "我更喜欢茶，而她更喜欢咖啡。",
+   "他在读书，而他弟弟在工作。"
+  ],
+  "focus": [
+   "mientras",
+   "que"
+  ],
+  "zh": "mientras que：而、然而（对比）",
+  "level": "B2",
+  "formation": "mientras que + 陈述式，表对比",
+  "notes": "表时间『当……时』用 mientras（不加 que）；mientras que 专门表对比。"
+ },
+ {
+  "key": "esm_nosolosinotambién__70613b",
+  "name": "no solo ... sino también",
+  "slug": "no solo ... sino también",
+  "meaning": "not only ... but also",
+  "type": "composite",
+  "examples": [
+   "No solo estudia, sino también trabaja.",
+   "Habla no solo inglés sino también francés."
+  ],
+  "example_zh": [
+   "他不仅读书，还工作。",
+   "他不仅会说英语，还会说法语。"
+  ],
+  "focus": [
+   "no",
+   "solo",
+   "...",
+   "sino"
+  ],
+  "zh": "no solo … sino también：不仅……而且",
+  "level": "B2",
+  "formation": "no solo + A + sino también + B",
+  "notes": "连接平行成分；sino 在否定后纠正，también 加强递进。"
+ },
+ {
+  "key": "esm_másvalequesubjuntivo__e5fdf7",
+  "name": "más vale que + subjuntivo",
+  "slug": "más vale que + subjuntivo",
+  "meaning": "it is better that / you had better",
+  "type": "composite",
+  "examples": [
+   "Más vale que te vayas ahora.",
+   "Más vale que no digas nada."
+  ],
+  "example_zh": [
+   "你最好现在就走。",
+   "你最好什么都别说。"
+  ],
+  "focus": [
+   "más",
+   "vale",
+   "que"
+  ],
+  "zh": "más vale que + 虚拟式：最好……",
+  "level": "B2",
+  "formation": "más vale que + 虚拟式；más vale + 原形动词",
+  "notes": "劝告/警告语气，比 es mejor que 更强烈；más vale tarde que nunca 是固定说法。"
+ },
+ {
+  "key": "esm_hacefaltaquesubjuntivo__3c7b4e",
+  "name": "hace falta que + subjuntivo",
+  "slug": "hace falta que + subjuntivo",
+  "meaning": "it is necessary that",
+  "type": "composite",
+  "examples": [
+   "Hace falta que todos colaboren.",
+   "Hace falta que traigas tu pasaporte."
+  ],
+  "example_zh": [
+   "需要大家通力合作。",
+   "你需要带上护照。"
+  ],
+  "focus": [
+   "hace",
+   "falta",
+   "que"
+  ],
+  "zh": "hace falta que + 虚拟式：需要、有必要",
+  "level": "B2",
+  "formation": "hace falta que + 虚拟式；hace falta + 名词/原形动词",
+  "notes": "无人称必要性表达，与 es necesario que 同义但更口语。"
+ },
+ {
+  "key": "esm_cuantomásmás__cdc553",
+  "name": "cuanto más ... más",
+  "slug": "cuanto más ... más",
+  "meaning": "the more ... the more",
+  "type": "composite",
+  "examples": [
+   "Cuanto más estudias, más aprendes.",
+   "Cuanto más lo pienso, menos me gusta."
+  ],
+  "example_zh": [
+   "你学得越多，学到的就越多。",
+   "越想我越不喜欢。"
+  ],
+  "focus": [
+   "cuanto",
+   "más"
+  ],
+  "zh": "cuanto más … más …：越……越……",
+  "level": "C1",
+  "formation": "Cuanto más + 动词/形容词, más/menos + 结果",
+  "notes": "两个分句都用比较级；cuanto 不带重音（重音 cuánto 是疑问词）。"
+ },
+ {
+  "key": "esm_comosubjuntivocondición__273c3c",
+  "name": "como + subjuntivo (condición)",
+  "slug": "como + subjuntivo",
+  "meaning": "if (with the subjunctive, threatening condition)",
+  "type": "composite",
+  "examples": [
+   "Como no llegues a tiempo, nos vamos sin ti.",
+   "Como no estudies, vas a suspender."
+  ],
+  "example_zh": [
+   "你要是不能准时到，我们就自己走了。",
+   "你要是不学习，就会不及格。"
+  ],
+  "focus": [
+   "como",
+   "...",
+   "§subj"
+  ],
+  "zh": "como + 虚拟式：要是……（带警告的条件）",
+  "level": "C1",
+  "formation": "Como + 虚拟式, 主句（结果）",
+  "notes": "口语警示句：Como no llegues a tiempo, nos vamos sin ti。语气比 si 更强硬。"
+ },
+ {
+  "key": "esm_nobienencuanto__80138d",
+  "name": "no bien (en cuanto)",
+  "slug": "no bien",
+  "meaning": "no sooner ... than",
+  "type": "composite",
+  "examples": [
+   "No bien llegó, empezó a trabajar.",
+   "No bien amaneció, salimos."
+  ],
+  "example_zh": [
+   "他刚一到就开始工作。",
+   "天刚一亮我们就出发了。"
+  ],
+  "focus": [
+   "no",
+   "bien"
+  ],
+  "zh": "no bien：刚一……就",
+  "level": "C1",
+  "formation": "No bien + 动词, 主句",
+  "notes": "书面时间连接，等于 en cuanto / tan pronto como；注意不是『不好』。"
+ },
+ {
+  "key": "esm_denoserpor__437f8a",
+  "name": "de no ser por",
+  "slug": "de no ser por",
+  "meaning": "if it were not for",
+  "type": "composite",
+  "examples": [
+   "De no ser por ti, no estaría aquí.",
+   "De no ser por el médico, se habría muerto."
+  ],
+  "example_zh": [
+   "要不是你，我就不会在这里。",
+   "要不是那位医生，他早就死了。"
+  ],
+  "focus": [
+   "de",
+   "no",
+   "ser",
+   "por"
+  ],
+  "zh": "de no ser por：要不是因为",
+  "level": "C1",
+  "formation": "De no ser por + 名词/代词, 主句（虚拟或条件式）",
+  "notes": "书面虚拟条件，等于 si no fuera por；主句常用条件式。"
+ },
+ {
+  "key": "esm_enlamedidaenque__df6cf1",
+  "name": "en la medida en que",
+  "slug": "en la medida en que",
+  "meaning": "to the extent that",
+  "type": "composite",
+  "examples": [
+   "En la medida en que estudies, mejorarás.",
+   "El problema crece en la medida en que nadie lo atiende."
+  ],
+  "example_zh": [
+   "你学的程度决定你进步的程度。",
+   "越没人处理，问题就越大。"
+  ],
+  "focus": [
+   "en",
+   "la",
+   "medida"
+  ],
+  "zh": "en la medida en que：在……程度上、随着",
+  "level": "C1",
+  "formation": "en la medida en que + 陈述式",
+  "notes": "书面语，表程度相关或递进；论说文常用。"
+ },
+ {
+  "key": "esm_porconsiguiente__7972f4",
+  "name": "por consiguiente",
+  "slug": "por consiguiente",
+  "meaning": "consequently",
+  "type": "composite",
+  "examples": [
+   "No estudió; por consiguiente, suspendió.",
+   "Llegó tarde; por consiguiente, no entró."
+  ],
+  "example_zh": [
+   "他没学习，因此没及格。",
+   "他来晚了，因此没能进场。"
+  ],
+  "focus": [
+   "por",
+   "consiguiente"
+  ],
+  "zh": "por consiguiente：因此、所以（书面）",
+  "level": "C1",
+  "formation": "por consiguiente（逗号隔开，置于结果句前）",
+  "notes": "正式书面因果连接，与 por lo tanto 同义但更书面。"
+ },
+ {
+  "key": "esm_noobstante__203406",
+  "name": "no obstante",
+  "slug": "no obstante",
+  "meaning": "nevertheless",
+  "type": "composite",
+  "examples": [
+   "No obstante, decidió continuar.",
+   "Era caro; no obstante, lo compró."
+  ],
+  "example_zh": [
+   "尽管如此，他还是决定继续。",
+   "那东西很贵，但他还是买了。"
+  ],
+  "focus": [
+   "no",
+   "obstante"
+  ],
+  "zh": "no obstante：尽管如此、然而",
+  "level": "C1",
+  "formation": "no obstante（可置句首或句中，逗号隔开）",
+  "notes": "书面转折，比 sin embargo 更正式；也可说 no obstante que（少用）。"
+ },
+ {
+  "key": "esm_aunasí__39a438",
+  "name": "aun así",
+  "slug": "aun así",
+  "meaning": "even so",
+  "type": "composite",
+  "examples": [
+   "Estaba cansado; aun así, terminó el trabajo.",
+   "Aun así, no me convence."
+  ],
+  "example_zh": [
+   "他很累，即便如此还是把工作做完了。",
+   "即便如此，我还是不放心。"
+  ],
+  "focus": [
+   "aun",
+   "así"
+  ],
+  "zh": "aun así：即便如此",
+  "level": "C1",
+  "formation": "aun así（句首或分句末）",
+  "notes": "aun 不带重音；表『即使这样』的让步转折，常与 pero 连用。"
+ },
+ {
+  "key": "esm_entantoque__ab85df",
+  "name": "en tanto que",
+  "slug": "en tanto que",
+  "meaning": "while / inasmuch as",
+  "type": "composite",
+  "examples": [
+   "En tanto que tú descansas, yo trabajo.",
+   "En tanto que escritor, opina distinto."
+  ],
+  "example_zh": [
+   "你休息的时候我却在工作。",
+   "作为作家，他的看法不同。"
+  ],
+  "focus": [
+   "en",
+   "tanto",
+   "que"
+  ],
+  "zh": "en tanto que：而；作为……",
+  "level": "C1",
+  "formation": "en tanto que + 陈述式（对比或身份）",
+  "notes": "既可表对比（相当于 mientras que），也可表身份（作为……）。"
+ },
+ {
+  "key": "esm_conobjetodeque__dddb70",
+  "name": "con objeto de (+ que)",
+  "slug": "con objeto de",
+  "meaning": "with the aim of",
+  "type": "composite",
+  "examples": [
+   "Se reunieron con objeto de llegar a un acuerdo.",
+   "Lo dijo con objeto de ayudarte."
+  ],
+  "example_zh": [
+   "他们开会是为了达成协议。",
+   "他说这话是为了帮你。"
+  ],
+  "focus": [
+   "con",
+   "objeto",
+   "de"
+  ],
+  "zh": "con objeto de：为了（书面）",
+  "level": "C1",
+  "formation": "con objeto de + 原形动词；con objeto de que + 虚拟式",
+  "notes": "正式书面目的表达，与 con el fin de、a fin de 同义。"
+ },
+ {
+  "key": "esm_nofueraquesubjuntivo__917fab",
+  "name": "no fuera que + subjuntivo",
+  "slug": "no fuera que",
+  "meaning": "lest",
+  "type": "composite",
+  "examples": [
+   "Cállate, no fuera que te oyeran.",
+   "Vine temprano, no fuera que se marcharan."
+  ],
+  "example_zh": [
+   "小声点，免得被人听见。",
+   "我来得早，唯恐他们走了。"
+  ],
+  "focus": [
+   "no",
+   "fuera",
+   "que"
+  ],
+  "zh": "no fuera que + 虚拟式：免得、唯恐",
+  "level": "C2",
+  "formation": "主句 + no fuera que + 虚拟式",
+  "notes": "书面警示，等于 no sea que；后面必须虚拟式。"
+ },
+ {
+  "key": "esm_ooalternativa__c9619e",
+  "name": "o ... o (alternativa)",
+  "slug": "o ... o",
+  "meaning": "either ... or",
+  "type": "composite",
+  "examples": [
+   "O vienes o te quedas.",
+   "O estudias o trabajas."
+  ],
+  "example_zh": [
+   "你要么来，要么留下。",
+   "你要么读书，要么工作。"
+  ],
+  "focus": [
+   "o",
+   "...",
+   "o"
+  ],
+  "zh": "o … o …：要么……要么",
+  "level": "A1",
+  "formation": "o + A + o + B",
+  "notes": "并列选择；o 在元音 o 开头的词前改写成 u（uno u otro）。"
+ },
+ {
+  "key": "esm_demasiadoadjetivoadverbio__4a143d",
+  "name": "demasiado + adjetivo / adverbio",
+  "slug": "demasiado + adjetivo",
+  "meaning": "too (excessively)",
+  "type": "composite",
+  "examples": [
+   "Ud. maneja demasiado rápido.",
+   "Esta casa es demasiado cara."
+  ],
+  "example_zh": [
+   "您开得太快了。",
+   "这房子太贵了。"
+  ],
+  "focus": [
+   "demasiado/demasiada/demasiados/demasiadas"
+  ],
+  "zh": "demasiado + 形容词/副词：太……",
+  "level": "A2",
+  "formation": "demasiado + 形容词/副词（性数随名词）",
+  "notes": "表示『过度』，带负面评价；中性程度用 muy（muy caro 只是『很贵』，demasiado caro 是『贵得过分』）。"
+ },
+ {
+  "key": "esm_bastanteadjetivoadverbio__0fcf34",
+  "name": "bastante + adjetivo / adverbio",
+  "slug": "bastante + adjetivo",
+  "meaning": "quite / fairly",
+  "type": "composite",
+  "examples": [
+   "Tu español es bastante bueno.",
+   "El examen fue bastante difícil."
+  ],
+  "example_zh": [
+   "你的西班牙语相当不错。",
+   "考试挺难的。"
+  ],
+  "focus": [
+   "bastante"
+  ],
+  "zh": "bastante + 形容词/副词：相当、挺",
+  "level": "A2",
+  "formation": "bastante + 形容词/副词；bastante + 名词（不变）",
+  "notes": "比 muy 弱、比 un poco 强；修饰名词时不变性数（bastante dinero）。"
+ },
+ {
+  "key": "esm_unpocodesustantivo__d974d9",
+  "name": "un poco de + sustantivo",
+  "slug": "un poco de + sustantivo",
+  "meaning": "a little (of)",
+  "type": "composite",
+  "examples": [
+   "Sé un poco de español.",
+   "¿Quieres un poco de agua?"
+  ],
+  "example_zh": [
+   "我懂一点西班牙语。",
+   "你要点水吗？"
+  ],
+  "focus": [
+   "un",
+   "poco",
+   "de"
+  ],
+  "zh": "un poco de + 名词：一点……",
+  "level": "A2",
+  "formation": "un poco de + 不可数名词；修饰形容词用 un poco + adj",
+  "notes": "后接名词要加 de（un poco de agua）；直接修饰形容词时不加（un poco tarde）。"
+ },
+ {
+  "key": "esm_igualdeadjetivoque__0e14a2",
+  "name": "igual de + adjetivo + que",
+  "slug": "igual de + adjetivo + que",
+  "meaning": "just as ... as",
+  "type": "composite",
+  "examples": [
+   "Es igual de alto que su padre.",
+   "Hoy estás igual de guapa que ayer."
+  ],
+  "example_zh": [
+   "他和他父亲一样高。",
+   "你今天和昨天一样漂亮。"
+  ],
+  "focus": [
+   "igual",
+   "de",
+   "§adj"
+  ],
+  "zh": "igual de + 形容词 + que：和……一样",
+  "level": "A2",
+  "formation": "igual de + 形容词 + que",
+  "notes": "与 tan ... como 同义，但语气更强调『一模一样』；igual 不变性数。"
+ },
+ {
+  "key": "esm_lomismoque__8abf6a",
+  "name": "lo mismo que",
+  "slug": "lo mismo que",
+  "meaning": "the same as",
+  "type": "composite",
+  "examples": [
+   "Un viejo amigo no es lo mismo que un amigo viejo.",
+   "Pienso lo mismo que tú."
+  ],
+  "example_zh": [
+   "老朋友和『上了年纪的朋友』不是一回事。",
+   "我想的和你一样。"
+  ],
+  "focus": [
+   "lo",
+   "mismo",
+   "que"
+  ],
+  "zh": "lo mismo que：和……一样的东西/事",
+  "level": "A2",
+  "formation": "lo mismo que + 名词/从句",
+  "notes": "中性形式，指『同样的事』；指人/物时用 el mismo / la misma。"
+ },
+ {
+  "key": "esm_tantoqueconsecuencia__7838e5",
+  "name": "tanto ... que (consecuencia)",
+  "slug": "tanto ... que",
+  "meaning": "so much that",
+  "type": "composite",
+  "examples": [
+   "Trabajó tanto que enfermó.",
+   "Tengo tanta hambre que no puedo esperar."
+  ],
+  "example_zh": [
+   "他工作得太拼，结果病倒了。",
+   "我饿得等不下去了。"
+  ],
+  "focus": [
+   "tanto",
+   "...",
+   "que"
+  ],
+  "zh": "tanto … que …：如此……以至于",
+  "level": "A2",
+  "formation": "动词 + tanto que + 结果；tanto/a/os/as + 名词 + que",
+  "notes": "修饰动词用 tanto（不变）；修饰名词随名词变性数（tanta gente que…）。"
+ },
+ {
+  "key": "esm_tanadjetivoque__5122ef",
+  "name": "tan + adjetivo + que",
+  "slug": "tan + adjetivo + que",
+  "meaning": "so ... that",
+  "type": "composite",
+  "examples": [
+   "Era tan tarde que nos fuimos.",
+   "Habla tan rápido que no lo entiendo."
+  ],
+  "example_zh": [
+   "太晚了，我们就走了。",
+   "他说得太快，我听不懂。"
+  ],
+  "focus": [
+   "tan",
+   "§adj",
+   "que"
+  ],
+  "zh": "tan + 形容词 + que：如此……以至于",
+  "level": "A2",
+  "formation": "tan + 形容词/副词 + que + 结果",
+  "notes": "与 tanto ... que 分工：tan 修饰形容词/副词，tanto 修饰动词或名词。"
+ },
+ {
+  "key": "esm_primerodespuésorden__efe959",
+  "name": "primero ... después (orden)",
+  "slug": "primero ... después",
+  "meaning": "first ... then",
+  "type": "composite",
+  "examples": [
+   "Primero desayuno, después salgo a correr.",
+   "Primero estudiaremos, después iremos al cine."
+  ],
+  "example_zh": [
+   "我先吃早饭，然后出去跑步。",
+   "我们先学习，然后去看电影。"
+  ],
+  "focus": [
+   "primero",
+   "...",
+   "después"
+  ],
+  "zh": "primero … después：先……然后",
+  "level": "A2",
+  "formation": "primero + 动作, después + 动作",
+  "notes": "叙述顺序；也可用 luego、más tarde 替换 después。"
+ },
+ {
+  "key": "esm_algúnningúnsustantivo__8268ed",
+  "name": "algún / ningún (+ sustantivo)",
+  "slug": "algún / ningún",
+  "meaning": "some / no (before a masculine singular noun)",
+  "type": "composite",
+  "examples": [
+   "Algún día lo entenderás.",
+   "No tengo ninguna duda."
+  ],
+  "example_zh": [
+   "总有一天你会明白。",
+   "我毫无疑问。"
+  ],
+  "focus": [
+   "algún/alguna/algunos/algunas/ningún/ninguna"
+  ],
+  "zh": "algún / ningún：某个 / 没有任何",
+  "level": "A2",
+  "formation": "algún/ningún + 阳性单数名词（短形式，来自 alguno/ninguno）",
+  "notes": "阳性单数名词前用 algún/ningún；ninguno 在动词后仍保留 no（No tengo ninguna duda）。"
+ },
+ {
+  "key": "esm_siindicativocondiciónreal__faa005",
+  "name": "si + indicativo (condición real)",
+  "slug": "si + indicativo",
+  "meaning": "if + present indicative (real condition)",
+  "type": "composite",
+  "examples": [
+   "Si llueve, no saldremos.",
+   "Si tienes tiempo, llámame."
+  ],
+  "example_zh": [
+   "如果下雨，我们就不出门。",
+   "你要是有时间就给我打电话。"
+  ],
+  "focus": [
+   "si",
+   "§verb"
+  ],
+  "zh": "si + 陈述式：真实条件（如果……）",
+  "level": "A2",
+  "formation": "si + 陈述式现在时, 主句（现在/将来/命令）",
+  "notes": "真实条件用陈述式；假设（si + 虚拟式过去时）表不可能的情况，两者别混。"
+ },
+ {
+  "key": "esm_estarapuntodeinfinitivo__1adfeb",
+  "name": "estar a punto de + infinitivo",
+  "slug": "estar a punto de + infinitivo",
+  "meaning": "to be about to do something",
+  "type": "composite",
+  "examples": [
+   "El tren está a punto de salir.",
+   "Estuve a punto de caerme."
+  ],
+  "example_zh": [
+   "火车就要开了。",
+   "我差点摔倒。"
+  ],
+  "focus": [
+   "a",
+   "punto",
+   "de",
+   "§inf"
+  ],
+  "zh": "estar a punto de + 原形动词：正要、差点",
+  "level": "B1",
+  "formation": "estar 变位 + a punto de + 原形动词",
+  "notes": "表示即将发生；用于过去时可表『差点就……』（Estuve a punto de caerme）。"
+ },
+ {
+  "key": "esm_puedequesubjuntivo__95973c",
+  "name": "puede que + subjuntivo",
+  "slug": "puede que + subjuntivo",
+  "meaning": "it may be that / maybe",
+  "type": "composite",
+  "examples": [
+   "Puede que llueva esta tarde.",
+   "Puede que no venga."
+  ],
+  "example_zh": [
+   "今天下午可能会下雨。",
+   "他可能不来了。"
+  ],
+  "focus": [
+   "puede",
+   "que"
+  ],
+  "zh": "puede que + 虚拟式：可能……",
+  "level": "B1",
+  "formation": "puede que + 虚拟式（无人称，puede 不变）",
+  "notes": "与 es posible que 同义，更口语；也可以说 puede ser que。"
+ },
+ {
+  "key": "esm_menosmalque__3053b2",
+  "name": "menos mal que",
+  "slug": "menos mal que",
+  "meaning": "it's a good thing that / thank goodness",
+  "type": "composite",
+  "examples": [
+   "Menos mal que llegaste.",
+   "Menos mal que no había nadie."
+  ],
+  "example_zh": [
+   "幸好你来了。",
+   "还好当时没人。"
+  ],
+  "focus": [
+   "menos",
+   "mal",
+   "que"
+  ],
+  "zh": "menos mal que：还好、幸好",
+  "level": "B1",
+  "formation": "menos mal que + 陈述式",
+  "notes": "表示对已发生事实的庆幸；单独说 ¡Menos mal! 也可以。"
+ },
+ {
+  "key": "esm_esqueexplicación__fa4b44",
+  "name": "es que ... (explicación)",
+  "slug": "es que ...",
+  "meaning": "the thing is ... (justification)",
+  "type": "composite",
+  "examples": [
+   "No voy, es que no tengo tiempo.",
+   "Es que no me avisaron."
+  ],
+  "example_zh": [
+   "我不去，因为我没时间。",
+   "是因为没人通知我。"
+  ],
+  "focus": [
+   "es",
+   "que"
+  ],
+  "zh": "es que …：是因为……（解释、辩解）",
+  "level": "B1",
+  "formation": "es que + 陈述式（常置于句首或作补充说明）",
+  "notes": "口语里用来引出理由或辩解，语气比 porque 更委婉；不能单独回答问题。"
+ }
+]
