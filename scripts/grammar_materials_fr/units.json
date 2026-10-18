@@ -895,5 +895,246 @@
    }
   ],
   "source": "corpus-pmp"
+ },
+ {
+  "pattern": "parce que",
+  "name_fr": "parce que (because)",
+  "meaning_en": "cause: because, for the reason that",
+  "meaning_zh": "原因连词「因为」",
+  "level": "A1",
+  "focus": [
+   "parce",
+   "que"
+  ],
+  "formation": "parce que + indicatif",
+  "notes": "回答 pourquoi 的标准形式，后接直陈式。元音前缩合成 parce qu'（parce qu'il pleut）。口语里也和 parce que 一起用作省略回答：— Pourquoi? — Parce que.",
+  "examples": [
+   {
+    "french": "Je reste à la maison parce qu'il pleut.",
+    "chinese": "因为下雨，我待在家里。"
+   },
+   {
+    "french": "Elle est partie parce qu'elle était fatiguée.",
+    "chinese": "她走了，因为她累了。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "à cause de + nom",
+  "name_fr": "à cause de (because of)",
+  "meaning_en": "cause with a noun, usually a negative one",
+  "meaning_zh": "「由于、因为」（后接名词，多指负面原因）",
+  "level": "A2",
+  "focus": [
+   "à",
+   "cause",
+   "de"
+  ],
+  "formation": "à cause de + nom",
+  "notes": "后接名词或代词（à cause de moi），不能接从句。多用于不好的原因；正面的功劳用 grâce à。",
+  "examples": [
+   {
+    "french": "Nous ne pouvons aller à Lyon à cause de la grève.",
+    "chinese": "由于罢工，我们去不了里昂。"
+   },
+   {
+    "french": "Le match a été annulé à cause de la pluie.",
+    "chinese": "比赛因为下雨取消了。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "grâce à + nom",
+  "name_fr": "grâce à (thanks to)",
+  "meaning_en": "positive cause: thanks to",
+  "meaning_zh": "「多亏、幸亏」（后接名词，多指正面原因）",
+  "level": "B1",
+  "focus": [
+   "grâce",
+   "à"
+  ],
+  "formation": "grâce à + nom",
+  "notes": "与 à cause de 同一个语法位置，但只用于带来好结果的原因。后接从句用 grâce au fait que。",
+  "examples": [
+   {
+    "french": "Grâce à ton aide, j'ai réussi à trouver un emploi.",
+    "chinese": "多亏你的帮助，我找到了工作。"
+   },
+   {
+    "french": "Grâce à ce traitement, il va beaucoup mieux.",
+    "chinese": "多亏了这种治疗，他好多了。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "au lieu de + infinitif / nom",
+  "name_fr": "au lieu de (instead of)",
+  "meaning_en": "substitution: instead of",
+  "meaning_zh": "「代替、而不」（au lieu de）",
+  "level": "B1",
+  "focus": [
+   "au",
+   "lieu",
+   "de"
+  ],
+  "formation": "au lieu de + infinitif / nom",
+  "notes": "两个动作按同一主语对比：Il regarde la télé au lieu de travailler。后接从句用 au lieu que + 虚拟式（少用）。",
+  "examples": [
+   {
+    "french": "Si on sortait au lieu de regarder la télévision?",
+    "chinese": "我们出去走走，别看电视了好吗？"
+   },
+   {
+    "french": "Nous avons préféré faire une marche au lieu d'aller au cinéma.",
+    "chinese": "我们宁愿去散步，也不愿去看电影。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "malgré + nom",
+  "name_fr": "malgré (despite)",
+  "meaning_en": "concession with a noun: despite, in spite of",
+  "meaning_zh": "让步介词「尽管」（malgré + 名词）",
+  "level": "B1",
+  "focus": [
+   "malgré"
+  ],
+  "formation": "malgré + nom",
+  "notes": "后接名词或代词（malgré lui 不由自主地），不能接从句——从句要用 bien que / quoique + 虚拟式。与 malgré tout（尽管如此）区分。",
+  "examples": [
+   {
+    "french": "Nous sommes partis malgré la neige et le verglas.",
+    "chinese": "尽管下雪结冰，我们还是出发了。"
+   },
+   {
+    "french": "C'est un homme plein d'humour malgré les apparences.",
+    "chinese": "尽管外表如此，他其实很有幽默感。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "tandis que",
+  "name_fr": "tandis que (whereas)",
+  "meaning_en": "contrast: whereas, while on the other hand",
+  "meaning_zh": "对比连词「而、然而」",
+  "level": "B1",
+  "focus": [
+   "tandis",
+   "que"
+  ],
+  "formation": "tandis que + indicatif",
+  "notes": "两件事并列对照，语气比 alors que 更书面。也可以表示同时（tandis qu'il dormait）。",
+  "examples": [
+   {
+    "french": "Elle a l'air jeune tandis que son amie a l'air âgée.",
+    "chinese": "她看起来很年轻，而她的朋友显得年纪大。"
+   },
+   {
+    "french": "Tandis que je préparais le dîner, il lisait le journal.",
+    "chinese": "我在准备晚饭的时候，他在看报纸。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "alors que",
+  "name_fr": "alors que (while / whereas)",
+  "meaning_en": "contrast or simultaneity: whereas, while",
+  "meaning_zh": "「而、却」／「当……的时候」",
+  "level": "B1",
+  "focus": [
+   "alors",
+   "que"
+  ],
+  "formation": "alors que + indicatif",
+  "notes": "既表示时间上的同时，也表示对比（常带「却」的意味）。后接事实用直陈式；假设性对比用 alors que + 条件式。",
+  "examples": [
+   {
+    "french": "Alors que je dormais, le téléphone a sonné.",
+    "chinese": "我正在睡觉的时候，电话响了。"
+   },
+   {
+    "french": "Il est parti alors que je le lui avais déconseillé.",
+    "chinese": "我劝过他别去，他还是走了。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "avant que + subjonctif",
+  "name_fr": "avant que + subjonctif (before)",
+  "meaning_en": "time clause with a different subject: before",
+  "meaning_zh": "「在……之前」（avant que + 虚拟式）",
+  "level": "B1",
+  "focus": [
+   "avant",
+   "que"
+  ],
+  "formation": "avant que + subjonctif（常加赘词 ne）",
+  "notes": "主语不同时用 avant que + 虚拟式；同一主语用 avant de + 不定式（avant de partir）。书面语常在动词前加赘词 ne，不表示否定。",
+  "examples": [
+   {
+    "french": "Rentrons avant qu'il ne pleuve.",
+    "chinese": "我们趁还没下雨回去吧。"
+   },
+   {
+    "french": "Prévenez-moi avant que la réunion ne commence.",
+    "chinese": "会议开始前请通知我。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "sans que + subjonctif",
+  "name_fr": "sans que + subjonctif (without)",
+  "meaning_en": "without: sans que + subjunctive, different subject",
+  "meaning_zh": "「没有……」（sans que + 虚拟式）",
+  "level": "B2",
+  "focus": [
+   "sans",
+   "que"
+  ],
+  "formation": "sans que + subjonctif",
+  "notes": "同一主语用 sans + 不定式（sans le savoir）；主语不同才用 sans que，后接虚拟式，也常加赘词 ne。",
+  "examples": [
+   {
+    "french": "Il l'a fait sans que sa femme le sache.",
+    "chinese": "他做这件事没让妻子知道。"
+   },
+   {
+    "french": "Elle entre dans la chambre sans que personne ne s'en rende compte.",
+    "chinese": "她走进房间，谁都没察觉。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "tel que / tels que",
+  "name_fr": "tel que (such as)",
+  "meaning_en": "such as, like: introducing examples or a comparison",
+  "meaning_zh": "「像……这样的」（tel que）",
+  "level": "B1",
+  "focus": [
+   "tel",
+   "que"
+  ],
+  "formation": "tel / telle / tels / telles + que",
+  "notes": "性数与被修饰的名词一致（les sports tels que...）。也可表示「正如」：tel qu'il est（就像他本来的样子）。",
+  "examples": [
+   {
+    "french": "J'adore les sports tels que le golf et le tennis.",
+    "chinese": "我喜欢高尔夫、网球这类运动。"
+   },
+   {
+    "french": "Il peint le paysage tel qu'il est.",
+    "chinese": "他如实描绘风景。"
+   }
+  ],
+  "source": "corpus-pmp"
  }
 ]
