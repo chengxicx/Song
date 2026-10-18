@@ -239,8 +239,32 @@ def test_library_covers_the_advanced_bands():
     The advanced material batch exists to fill the empty top of the scale --
     without these rows the /grammar page stops at B2.
     """
-    levels = {r["level"] for r in _library()}
+    rows = _library()
+    levels = {r["level"] for r in rows}
     assert {"C1", "C2"} <= levels, f"advanced bands missing: {sorted(levels)}"
+    c2 = [r for r in rows if r["level"] == "C2"]
+    assert len(c2) >= 3, f"only {len(c2)} C2 rows"
+
+
+def test_focus_vetoes_exclude_the_longer_construction():
+    """
+    "!word" keeps a row off the longer construction it collides with.
+
+    Temporal *mientras* and contrastive *mientras que* are two rows; without
+    the veto both would fire on the second and the panel would show the same
+    words under two points.
+    """
+    focus = ["mientras", "!que"]
+    specs = es._focus_specs(focus)  # pylint: disable=protected-access
+    vetoes = es._focus_vetoes(focus)  # pylint: disable=protected-access
+    assert specs and vetoes
+    rule = {"match": specs[0], "not_followed_by": vetoes}
+    temporal = "Mientras estudiaba, sonó el teléfono."
+    contrastive = "Yo prefiero el té, mientras que ella prefiere el café."
+    assert es.match_rule(rule, es._tokens_for(temporal), temporal)
+    assert not es.match_rule(rule, es._tokens_for(contrastive), contrastive)
+    # The veto token itself is never part of the sequence.
+    assert all("que" not in c.get("surface_in", []) for c in specs[0]["seq"])
 
 
 def test_focus_alternatives_match_inflected_forms():

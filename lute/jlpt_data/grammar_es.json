@@ -2603,6 +2603,456 @@
   "notes": "书面警示，等于 no sea que；后面必须虚拟式。"
  },
  {
+  "key": "esm_mientrastemporal__16cb3d",
+  "name": "mientras (temporal)",
+  "slug": "mientras (temporal)",
+  "meaning": "while (two actions at the same time)",
+  "type": "composite",
+  "examples": [
+   "A veces, mientras estudio me gusta comer una merienda.",
+   "Mientras estudiaba, sonó el teléfono."
+  ],
+  "example_zh": [
+   "有时候我学习的时候喜欢吃点东西。",
+   "我正在学习的时候，电话响了。"
+  ],
+  "focus": [
+   "mientras",
+   "!que"
+  ],
+  "zh": "mientras：当……的时候（同时）",
+  "level": "B1",
+  "formation": "mientras + 陈述式（两个动作同时进行）",
+  "notes": "表『当……时』；与 mientras que（对比『而』）区分，后者是单独一条规则，这里用 !que 排除。"
+ },
+ {
+  "key": "esm_nisiquiera__f61e54",
+  "name": "ni siquiera",
+  "slug": "ni siquiera",
+  "meaning": "not even",
+  "type": "composite",
+  "examples": [
+   "No me gusta tragar píldoras, ni siquiera aspirinas.",
+   "Ni siquiera me saludó."
+  ],
+  "example_zh": [
+   "我不喜欢吃药片，连阿司匹林都不吃。",
+   "他连招呼都没跟我打。"
+  ],
+  "focus": [
+   "ni",
+   "siquiera"
+  ],
+  "zh": "ni siquiera：连……都不",
+  "level": "B1",
+  "formation": "ni siquiera + 成分；句首时不再加 no",
+  "notes": "在否定句里加强语气；放句首时句子里不能再用 no（Ni siquiera me saludó）。"
+ },
+ {
+  "key": "esm_apenas__a96767",
+  "name": "apenas",
+  "slug": "apenas",
+  "meaning": "hardly / as soon as",
+  "type": "composite",
+  "examples": [
+   "Apenas llegó, empezó a hablar.",
+   "Apenas consiguió el puesto."
+  ],
+  "example_zh": [
+   "他刚一到就开始讲话。",
+   "他好不容易才拿到那个职位。"
+  ],
+  "focus": [
+   "apenas"
+  ],
+  "zh": "apenas：几乎不；刚一……就",
+  "level": "B1",
+  "formation": "apenas + 动词（两种含义按语境区分）",
+  "notes": "① 『刚一……就』：Apenas llegó, empezó a hablar；② 『几乎不、勉强』：Apenas consiguió el puesto。"
+ },
+ {
+  "key": "esm_cuantoantes__664c34",
+  "name": "cuanto antes",
+  "slug": "cuanto antes",
+  "meaning": "as soon as possible",
+  "type": "composite",
+  "examples": [
+   "Ven cuanto antes.",
+   "Cuanto antes lo hagas, mejor."
+  ],
+  "example_zh": [
+   "你尽早来。",
+   "你越早做越好。"
+  ],
+  "focus": [
+   "cuanto",
+   "antes"
+  ],
+  "zh": "cuanto antes：尽早",
+  "level": "B2",
+  "formation": "cuanto antes（+ 动词）；完整式 cuanto antes …, mejor",
+  "notes": "cuanto 不带重音；『越早越好』说 cuanto antes, mejor。"
+ },
+ {
+  "key": "esm_demaneraque__0858eb",
+  "name": "de manera que",
+  "slug": "de manera que",
+  "meaning": "so that / in such a way that",
+  "type": "composite",
+  "examples": [
+   "Habló despacio, de manera que todos le entendieron.",
+   "Se preparó de manera que no fallara."
+  ],
+  "example_zh": [
+   "他说得很慢，所以大家都听懂了。",
+   "他做了准备，以免出错。"
+  ],
+  "focus": [
+   "de",
+   "manera",
+   "que"
+  ],
+  "zh": "de manera que：因此；以便",
+  "level": "B2",
+  "formation": "de manera que + 陈述式（结果）/ 虚拟式（目的）",
+  "notes": "与 de modo que 同义；结果用陈述式，目的用虚拟式。"
+ },
+ {
+  "key": "esm_afindeinfinitivo__4790d0",
+  "name": "a fin de + infinitivo",
+  "slug": "a fin de + infinitivo",
+  "meaning": "in order to",
+  "type": "composite",
+  "examples": [
+   "Se reunieron a fin de discutir el plan.",
+   "Estudia a fin de aprobar el examen."
+  ],
+  "example_zh": [
+   "他们开会是为了讨论计划。",
+   "他学习是为了通过考试。"
+  ],
+  "focus": [
+   "a",
+   "fin",
+   "de",
+   "§inf"
+  ],
+  "zh": "a fin de + 原形动词：为了",
+  "level": "B2",
+  "formation": "a fin de + 原形动词（主语一致）",
+  "notes": "书面目的表达；主语不同要用 a fin de que + 虚拟式（另有单独一条）。"
+ },
+ {
+  "key": "esm_conelfindeque__5ba615",
+  "name": "con el fin de (+ que)",
+  "slug": "con el fin de",
+  "meaning": "with the aim of",
+  "type": "composite",
+  "examples": [
+   "Ahorra con el fin de comprar una casa.",
+   "Se lo dijo con el fin de ayudarte."
+  ],
+  "example_zh": [
+   "他攒钱是为了买房子。",
+   "他说这话是为了帮你。"
+  ],
+  "focus": [
+   "con",
+   "el",
+   "fin",
+   "de"
+  ],
+  "zh": "con el fin de：为了（正式）",
+  "level": "C1",
+  "formation": "con el fin de + 原形动词；con el fin de que + 虚拟式",
+  "notes": "与 con objeto de、a fin de 同义，公文/论说文常用。"
+ },
+ {
+  "key": "esm_acabarporinfinitivo__b0d578",
+  "name": "acabar por + infinitivo",
+  "slug": "acabar por + infinitivo",
+  "meaning": "to end up doing something",
+  "type": "composite",
+  "examples": [
+   "Acabó por aceptar la oferta.",
+   "Siempre acaba por aceptar."
+  ],
+  "example_zh": [
+   "他最终还是接受了这个提议。",
+   "他最后总是会接受。"
+  ],
+  "focus": [
+   "acabar/acabo/acaba/acaban/acabó",
+   "por",
+   "§inf"
+  ],
+  "zh": "acabar por + 原形动词：最终、终于",
+  "level": "B2",
+  "formation": "acabar por + 原形动词",
+  "notes": "强调最终结果；与 acabar de + 原形动词（刚刚做完）完全不同。"
+ },
+ {
+  "key": "esm_venirainfinitivo__380d37",
+  "name": "venir a + infinitivo",
+  "slug": "venir a + infinitivo",
+  "meaning": "to amount to / to come to",
+  "type": "composite",
+  "examples": [
+   "Esto viene a costar lo mismo.",
+   "Viene a decir que no."
+  ],
+  "example_zh": [
+   "这差不多是同样的价钱。",
+   "他等于是在说不。"
+  ],
+  "focus": [
+   "viene/vienen/venía/venían",
+   "a",
+   "§inf"
+  ],
+  "zh": "venir a + 原形动词：相当于、等于是",
+  "level": "B2",
+  "formation": "venir a + 原形动词（venir a ser / venir a decir）",
+  "notes": "用来折算或解释，等于『差不多就是』；不是『来做什么』的实义用法。"
+ },
+ {
+  "key": "esm_tenerparticipio__b332a7",
+  "name": "tener + participio",
+  "slug": "tener + participio",
+  "meaning": "to have something done (resultative)",
+  "type": "composite",
+  "examples": [
+   "Tengo escrito el informe.",
+   "Tienen preparada la cena."
+  ],
+  "example_zh": [
+   "报告我已经写好了。",
+   "晚饭他们已经准备好了。"
+  ],
+  "focus": [
+   "tengo/tiene/tienen/tenemos",
+   "§part"
+  ],
+  "zh": "tener + 过去分词：已经做完（结果留存）",
+  "level": "B2",
+  "formation": "tener + 过去分词（与宾语性数一致）",
+  "notes": "强调动作完成、结果仍在：Tengo escrito el informe。与 haber + 分词（完成时）不同，后者不表结果状态。"
+ },
+ {
+  "key": "esm_estarparainfinitivo__4f262e",
+  "name": "estar para + infinitivo",
+  "slug": "estar para + infinitivo",
+  "meaning": "to be about to (on the verge of)",
+  "type": "composite",
+  "examples": [
+   "El tren está para salir.",
+   "Estamos para salir."
+  ],
+  "example_zh": [
+   "火车就要开了。",
+   "我们正要出门。"
+  ],
+  "focus": [
+   "está/están/estaba/estamos/estar",
+   "para",
+   "§inf"
+  ],
+  "zh": "estar para + 原形动词：即将、正要",
+  "level": "C1",
+  "formation": "estar para + 原形动词",
+  "notes": "强调临界状态；与 estar por + 原形动词（还没做）形成对照。"
+ },
+ {
+  "key": "esm_estarporinfinitivo__ac2f02",
+  "name": "estar por + infinitivo",
+  "slug": "estar por + infinitivo",
+  "meaning": "to be still to be done",
+  "type": "composite",
+  "examples": [
+   "La casa está por limpiar.",
+   "Está por llegar."
+  ],
+  "example_zh": [
+   "房子还没打扫。",
+   "他还没到。"
+  ],
+  "focus": [
+   "está/están/estaba/estamos/estar",
+   "por",
+   "§inf"
+  ],
+  "zh": "estar por + 原形动词：还没做、有待",
+  "level": "C1",
+  "formation": "estar por + 原形动词",
+  "notes": "标准用法是『尚未完成』；与 estar para（即将）不要混。拉美部分地区把 estar por 也用作『即将』。"
+ },
+ {
+  "key": "esm_porpoco__187798",
+  "name": "por poco",
+  "slug": "por poco",
+  "meaning": "almost / nearly",
+  "type": "composite",
+  "examples": [
+   "Por poco me caigo.",
+   "Por poco no llegamos a tiempo."
+  ],
+  "example_zh": [
+   "我差点摔倒。",
+   "我们差点没赶上。"
+  ],
+  "focus": [
+   "por",
+   "poco"
+  ],
+  "zh": "por poco：差点",
+  "level": "B2",
+  "formation": "por poco + 动词；por poco no + 动词 = 差点没",
+  "notes": "注意否定式反义：por poco no llegamos 是『我们差点没赶上』（其实赶上了）。"
+ },
+ {
+  "key": "esm_antepreposiciónculta__6790c1",
+  "name": "ante (preposición culta)",
+  "slug": "ante",
+  "meaning": "before / in the face of",
+  "type": "composite",
+  "examples": [
+   "Defiende a sus clientes ante el tribunal.",
+   "Ante Dios, digo la verdad."
+  ],
+  "example_zh": [
+   "他在法庭上为当事人辩护。",
+   "在上帝面前，我说的是真话。"
+  ],
+  "focus": [
+   "ante",
+   "...",
+   "§noun"
+  ],
+  "zh": "ante：面对、在……面前（书面）",
+  "level": "C1",
+  "formation": "ante + 名词（多为抽象名词或重要场合）",
+  "notes": "书面色彩强；日常『在……前面』用 delante de，『面对问题』也可用 frente a。"
+ },
+ {
+  "key": "esm_envirtudde__b3670e",
+  "name": "en virtud de",
+  "slug": "en virtud de",
+  "meaning": "by virtue of / under",
+  "type": "composite",
+  "examples": [
+   "En virtud de la ley, no puede salir.",
+   "Se aprobó en virtud de un acuerdo previo."
+  ],
+  "example_zh": [
+   "依据法律，他不能出境。",
+   "依据先前的协议，这事通过了。"
+  ],
+  "focus": [
+   "en",
+   "virtud",
+   "de"
+  ],
+  "zh": "en virtud de：依据、由于（公文）",
+  "level": "C2",
+  "formation": "en virtud de + 名词",
+  "notes": "法律、公文语体；日常说 según 或 debido a。"
+ },
+ {
+  "key": "esm_enarasde__f012d5",
+  "name": "en aras de",
+  "slug": "en aras de",
+  "meaning": "for the sake of",
+  "type": "composite",
+  "examples": [
+   "Lo hizo en aras de la paz.",
+   "Trabajan en aras de un futuro mejor."
+  ],
+  "example_zh": [
+   "他这么做是为了和平。",
+   "他们为一个更好的未来而努力。"
+  ],
+  "focus": [
+   "en",
+   "aras",
+   "de"
+  ],
+  "zh": "en aras de：为了（崇高目标）",
+  "level": "C2",
+  "formation": "en aras de + 抽象名词",
+  "notes": "书面语，多与 paz、progreso、libertad 等抽象名词搭配；不用于具体物件。"
+ },
+ {
+  "key": "esm_sopenade__680cad",
+  "name": "so pena de",
+  "slug": "so pena de",
+  "meaning": "on pain of / under penalty of",
+  "type": "composite",
+  "examples": [
+   "Debe declararlo, so pena de perder la ciudadanía.",
+   "Calló, so pena de empeorarlo."
+  ],
+  "example_zh": [
+   "他必须申报，否则会失去国籍。",
+   "他闭口不言，免得把事情弄得更糟。"
+  ],
+  "focus": [
+   "so",
+   "pena",
+   "de"
+  ],
+  "zh": "so pena de：否则将（受罚）",
+  "level": "C2",
+  "formation": "so pena de + 名词 / 原形动词",
+  "notes": "法律威胁语气；so 是古前置词，只在 so pena de、so capa de 这类固定搭配里存活。"
+ },
+ {
+  "key": "esm_merceda__13924a",
+  "name": "merced a",
+  "slug": "merced a",
+  "meaning": "thanks to",
+  "type": "composite",
+  "examples": [
+   "Merced a su ayuda, terminamos a tiempo.",
+   "Merced a la tecnología, todo es más rápido."
+  ],
+  "example_zh": [
+   "多亏他帮忙，我们按时完成了。",
+   "凭借技术，一切都更快了。"
+  ],
+  "focus": [
+   "merced",
+   "a"
+  ],
+  "zh": "merced a：多亏、凭借（书面）",
+  "level": "C2",
+  "formation": "merced a + 名词",
+  "notes": "与 gracias a 同义但更文；merced 在这里不表示『恩惠』这个名词义。"
+ },
+ {
+  "key": "esm_afuerde__f1da03",
+  "name": "a fuer de",
+  "slug": "a fuer de",
+  "meaning": "by dint of / as befits",
+  "type": "composite",
+  "examples": [
+   "A fuer de sincero, te diré que no.",
+   "A fuer de repetirlo, acabó creyéndolo."
+  ],
+  "example_zh": [
+   "老实说，我得告诉你不行。",
+   "他反复说，最后自己都信了。"
+  ],
+  "focus": [
+   "a",
+   "fuer",
+   "de"
+  ],
+  "zh": "a fuer de：由于、凭着一贯的……（古旧书面）",
+  "level": "C2",
+  "formation": "a fuer de + 形容词/名词",
+  "notes": "文学语体，现代口语不用；a fuer de sincero = 老实说。"
+ },
+ {
   "key": "esm_ooalternativa__c9619e",
   "name": "o ... o (alternativa)",
   "slug": "o ... o",
