@@ -867,13 +867,54 @@ def _flash(spec, examples):
 
 _DE_RULE_EXAMPLES = {}
 
+# Rows whose derived matcher reports a span another rule already reports on
+# the same sentence -- the panel would show two entries for one point.
+# ``scripts.audit_grammar_de_overlaps`` re-derives this list (IoU >= 0.6 on
+# at least two sentences); the rows stay in the library, only the *panel*
+# silences them.
+_DUPLICATE_RULE_IDS = frozenset(
+    {
+        # ---- case/agreement rows collapse to the hand-written broad form
+        # (de_akku reports the article, the row reports the same article);
+        # hits = shared example sentences in the audit corpus.
+        "dgm_unbestimmterAkkusativ__72f1f8",  # x8, dupe of de_akku
+        "dgm_VerneinungmitkeinkeineZeit__dba616",  # x5, dupe of de_akku
+        "dgm_Indefinitpronomenjederjederweißdas__1c0860",  # x2, dupe of de_akku
+        # ---- adjectival participles: de_relativsatz already reports the
+        # whole noun phrase the row narrows to.
+        "dgm_AdjektivdeklinationnachbestimmtemArtikeldaskleineKind__5fdb74",  # x2
+        "dgm_PartizipPräsensalsAdjektivdasschlafendeKind__c414a2",  # x2
+        # ---- comparison forms (komparativ / superlativ own the pattern).
+        "dgm_Komparativals__baed3e",  # x2, dupe of de_komparativ
+        "dgm_unregelmäßigeSteigerunggutbesserambesten__bba551",  # x2
+        "dgm_amsten__1bc4de",  # x2, dupe of de_superlativ
+        # ---- verb periphrases already covered by a hand-written rule.
+        "dgm_PassivmitModalverb__233e10",  # x6, dupe of de_praeteritum
+        "dgm_PerfektmitModalverb__ee8ba1",  # x2, dupe of de_modal_perfekt
+        "dgm_ZustandspassivistPartizip__cb5c46",  # x3, dupe of de_perfekt
+        "dgm_ReflexivesVerbsichfreuen__337920",  # x12, dupe of de_reflexive
+        # ---- clause connectors.
+        "dgm_nichtsondernKorrektur__f37c91",  # x3, dupe of de_hauptsatzkoord
+        "dgm_währendstattGenitiv__139366",  # x2, dupe of de_weil
+        # ---- two merged rows deriving the same spec: the earlier in library
+        # order is kept (the panel ordering would have dropped the later one).
+        "dgm_DemonstrativadjektivdiesenManndieseFrauen__4a26ee",  # x2
+        "dgm_InfinitivalsNomendasLesen__d55cdb",  # x2
+    }
+)
 
-def _load_data_rules():
+
+def _load_data_rules(include_silenced=False):
     """
     Rules for the merged grammar-point rows (jlpt_data/grammar_de.json).
 
     Specs are derived from each row's `focus` and kept only when they match
     at least one of the row's own examples.
+
+    ``include_silenced`` is for the audit, not the panel: a row listed in
+    ``_DUPLICATE_RULE_IDS`` is normally dropped here so the panel never
+    reports it, and the audit needs the *un*deduped set to re-derive that
+    list at all.
     """
     if not os.path.exists(_DATA_PATH):
         return []
@@ -884,6 +925,9 @@ def _load_data_rules():
         name = item.get("name") or ""
         if not name or _norm_name(name) in _HANDWRITTEN_NORMS:
             continue  # already covered precisely by a hand-written rule
+        silenced = item.get("key") in _DUPLICATE_RULE_IDS
+        if silenced and not include_silenced:
+            continue  # its matcher reports a span another rule already reports
         examples = [e for e in (_norm_text(x) for x in item.get("examples") or []) if e]
         if not examples:
             continue

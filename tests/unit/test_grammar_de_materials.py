@@ -34,7 +34,11 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.normpath(os.path.join(_HERE, "..", ".."))
 LIBRARY = os.path.join(_ROOT, "lute", "jlpt_data", "grammar_de.json")
 GOLDEN = os.path.join(_ROOT, "lute", "jlpt_data", "grammar_de_golden.json")
-MATERIALS = os.path.join(_ROOT, "scripts", "grammar_materials_de", "units.json")
+MATERIALS_DIR = os.path.join(_ROOT, "scripts", "grammar_materials_de")
+MATERIALS = os.path.join(MATERIALS_DIR, "units.json")
+# Both extractions: ``units.json`` is the first, ``units_ref.json`` a later
+# one.  Every material file's ``source`` tag is checked, not just the first.
+MATERIAL_FILES = ("units.json", "units_ref.json")
 
 needs_library = pytest.mark.skipif(
     not os.path.exists(LIBRARY), reason="no de grammar library yet"
@@ -76,17 +80,41 @@ def test_library_keys_do_not_shadow_hand_written_rules():
     assert not written & {r["key"] for r in _library()}
 
 
+@needs_library
+@needs_materials
+def test_duplicate_rule_list_matches_the_overlap_audit():
+    """
+    The panel's silence list must equal what the overlap audit derives.
+
+    A merged row whose generalisation reports the same span as another rule
+    would print one construction twice, so the row is dropped from the panel
+    (it stays in the library).  Pinning the list to the audit -- rather than
+    to a hand-maintained guess -- means growing the library re-derives it, and
+    a stale entry fails here instead of silently suppressing a row that is no
+    longer a duplicate.
+    """
+    from scripts import audit_grammar_de_overlaps as audit
+
+    _by_key, cands = audit.candidates()
+    derived = {key for key, _decision in cands}
+    assert derived == set(de._DUPLICATE_RULE_IDS)
+
+
 @needs_materials
 def test_material_sources_are_opaque_tags():
     "The extraction source must never be recorded as a readable name."
-    with open(MATERIALS, encoding="utf-8") as fh:
-        rows = json.load(fh)
-    for row in rows:
-        src = (row.get("source") or "").strip()
-        assert src, f"missing source tag: {row.get('pattern')}"
-        assert re.fullmatch(
-            r"[a-z0-9][a-z0-9_-]*", src
-        ), f"source tag is not an opaque token: {src!r}"
+    for fname in MATERIAL_FILES:
+        path = os.path.join(MATERIALS_DIR, fname)
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8") as fh:
+            rows = json.load(fh)
+        for row in rows:
+            src = (row.get("source") or "").strip()
+            assert src, f"missing source tag: {row.get('pattern')}"
+            assert re.fullmatch(
+                r"[a-z0-9][a-z0-9_-]*", src
+            ), f"source tag is not an opaque token: {src!r}"
 
 
 @needs_golden
@@ -106,9 +134,9 @@ def test_golden_sentences_fire_on_their_own_rule():
         spec = rules[key]["match"]
         for example in examples:
             text = de._norm_text(example["de"])
-            assert de.match_rule({"match": spec}, de._tokens_for(text), text), (
-                f"golden sentence does not fire on {key}: {example['de']}"
-            )
+            assert de.match_rule(
+                {"match": spec}, de._tokens_for(text), text
+            ), f"golden sentence does not fire on {key}: {example['de']}"
 
 
 @needs_golden
@@ -130,9 +158,9 @@ def test_golden_examples_carry_every_translation():
     for key, examples in de._golden_examples().items():
         for example in examples:
             for lang in ("de", "en", "zh", "ko"):
-                assert (example.get(lang) or "").strip(), (
-                    f"{key}: example missing {lang}: {example.get('de')}"
-                )
+                assert (
+                    example.get(lang) or ""
+                ).strip(), f"{key}: example missing {lang}: {example.get('de')}"
 
 
 @needs_library
