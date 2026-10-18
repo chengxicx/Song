@@ -722,5 +722,178 @@
    }
   ],
   "source": "corpus-pmp"
+ },
+ {
+  "pattern": "être en train de + infinitif",
+  "name_fr": "être en train de + infinitif (to be doing)",
+  "meaning_en": "progressive: to be in the middle of doing something",
+  "meaning_zh": "正在做某事（进行体）",
+  "level": "A2",
+  "focus": [
+   "en",
+   "train",
+   "de/d'"
+  ],
+  "formation": "être (conjugué) + en train de + infinitif",
+  "notes": "强调「此刻正在进行」，替代不了普通现在时（Je lis 也可以表示正在读），只在需要突出进行时才用。de 在元音前缩合成 d'（en train d'écrire）。",
+  "examples": [
+   {
+    "french": "Nous étions en train de manger.",
+    "chinese": "我们当时正在吃饭。"
+   },
+   {
+    "french": "Je suis en train d'écrire une lettre.",
+    "chinese": "我正在写一封信。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "quelque chose",
+  "name_fr": "quelque chose (something)",
+  "meaning_en": "indefinite pronoun: something, anything",
+  "meaning_zh": "不定代词「某事、某物」",
+  "level": "A2",
+  "focus": [
+   "quelque",
+   "chose"
+  ],
+  "formation": "quelque chose (de + adjectif masculin)",
+  "notes": "永远写作两个词；后接形容词要用 de（quelque chose de bizarre）。否定句和疑问句中不变成 rien。",
+  "examples": [
+   {
+    "french": "J'ai quelque chose à vous dire.",
+    "chinese": "我有件事要跟您说。"
+   },
+   {
+    "french": "Y a-t-il quelque chose que je puisse faire pour vous?",
+    "chinese": "有什么我能帮您做的吗？"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "quelqu'un",
+  "name_fr": "quelqu'un (someone)",
+  "meaning_en": "indefinite pronoun: someone, anyone",
+  "meaning_zh": "不定代词「某人」",
+  "level": "A2",
+  "focus": [
+   "quelqu'",
+   "un"
+  ],
+  "formation": "quelqu'un / quelqu'une",
+  "notes": "只指人，阳性单数形式最常用；阴性 quelqu'une 少用。代词式用法 quelqu'un de + 形容词（quelqu'un de gentil）。",
+  "examples": [
+   {
+    "french": "Quelqu'un m'a appelé.",
+    "chinese": "有人给我打过电话。"
+   },
+   {
+    "french": "Quelqu'un est venu pendant ton absence.",
+    "chinese": "你不在的时候有人来过。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "tout le monde",
+  "name_fr": "tout le monde (everyone)",
+  "meaning_en": "everyone, everybody (takes a third-person singular verb)",
+  "meaning_zh": "所有人（谓语用第三人称单数）",
+  "level": "A1",
+  "focus": [
+   "tout",
+   "le",
+   "monde"
+  ],
+  "formation": "tout le monde + verbe au singulier",
+  "notes": "形式上是单数，动词跟第三人称单数（Tout le monde est parti）。代词回指用 il / elle，不用 ils。",
+  "examples": [
+   {
+    "french": "Tout le monde travaille.",
+    "chinese": "大家都在工作。"
+   },
+   {
+    "french": "C'est normal que tout le monde veuille être heureux.",
+    "chinese": "每个人都想幸福，这很正常。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "la plupart de + nom",
+  "name_fr": "la plupart de (most of)",
+  "meaning_en": "most of: la plupart de + definite article / pronoun",
+  "meaning_zh": "大多数（la plupart de）",
+  "level": "B1",
+  "focus": [
+   "la",
+   "plupart",
+   "de/des/du"
+  ],
+  "formation": "la plupart de + les / des / du + nom",
+  "notes": "后接名词时必须有定冠词或主有形容词（la plupart des gens / de mes amis），不能说 la plupart gens。谓语用复数。",
+  "examples": [
+   {
+    "french": "La plupart des Français prennent leurs vacances en juillet et en août.",
+    "chinese": "大多数法国人在七八月休假。"
+   },
+   {
+    "french": "La plupart du temps, il rentre à pied.",
+    "chinese": "多数时候他步行回家。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "beaucoup de + nom",
+  "name_fr": "beaucoup de (a lot of)",
+  "meaning_en": "quantity: a lot of, many, much",
+  "meaning_zh": "数量副词「很多」（beaucoup de）",
+  "level": "A1",
+  "focus": [
+   "beaucoup",
+   "de"
+  ],
+  "formation": "beaucoup de + nom（不加冠词）",
+  "notes": "肯定句用 beaucoup de；否定句和疑问句更常用 pas beaucoup de / combien de。与 très 区分：très 修饰形容词副词，beaucoup 修饰动词或名词。",
+  "examples": [
+   {
+    "french": "Elle fait beaucoup de bruit.",
+    "chinese": "她弄出很大动静。"
+   },
+   {
+    "french": "Quand je voyage, j'emporte toujours beaucoup de vêtements.",
+    "chinese": "我旅行时总带着很多衣服。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "être sur le point de + infinitif",
+  "name_fr": "être sur le point de + infinitif (about to)",
+  "meaning_en": "to be about to do something",
+  "meaning_zh": "正要、即将（être sur le point de）",
+  "level": "B2",
+  "focus": [
+   "sur",
+   "le",
+   "point",
+   "de"
+  ],
+  "formation": "être (conjugué) + sur le point de + infinitif",
+  "notes": "比 aller + 不定式更强调「这一刻就要发生」，常用于过去时叙述（J'étais sur le point de partir quand...）。",
+  "examples": [
+   {
+    "french": "Il est sur le point de partir.",
+    "chinese": "他快要走了。"
+   },
+   {
+    "french": "J'étais sur le point de t'appeler quand tu es arrivé.",
+    "chinese": "你到的时候我正要给你打电话。"
+   }
+  ],
+  "source": "corpus-pmp"
  }
 ]
