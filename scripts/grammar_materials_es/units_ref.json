@@ -1,0 +1,1139 @@
+[
+ {
+  "pattern": "son las ... (decir la hora)",
+  "name_es": "decir la hora (son las ...)",
+  "meaning_en": "telling the time",
+  "meaning_zh": "说时间：son las + 钟点",
+  "level": "A1",
+  "focus": [
+   "son",
+   "las"
+  ],
+  "formation": "Son las + 数字 + y/menos + 分钟；1 点用 Es la una",
+  "notes": "只有凌晨 1 点用单数 Es la una，其余用复数 Son las。问句：¿Qué hora es?",
+  "examples": [
+   {
+    "spanish": "Son las seis y media.",
+    "chinese": "现在六点半。"
+   },
+   {
+    "spanish": "Son las ocho y cuarto.",
+    "chinese": "现在八点一刻。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "hacer + sustantivo (el tiempo)",
+  "name_es": "hacer + sustantivo (el tiempo)",
+  "meaning_en": "weather with hacer",
+  "meaning_zh": "天气：hace + 名词",
+  "level": "A1",
+  "focus": [
+   "hace",
+   "frío/calor/sol/viento"
+  ],
+  "formation": "hace + frío / calor / sol / viento / buen tiempo",
+  "notes": "天气用无人称 hacer，主语只能是第三人称单数：hace frío。不用 ser/estar。",
+  "examples": [
+   {
+    "spanish": "¿Hace frío en Alaska?",
+    "chinese": "阿拉斯加冷吗？"
+   },
+   {
+    "spanish": "Hace mucho calor en verano.",
+    "chinese": "夏天很热。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "tener ... años",
+  "name_es": "tener ... años (la edad)",
+  "meaning_en": "to be ... years old",
+  "meaning_zh": "年龄：tener + 数字 + años",
+  "level": "A1",
+  "focus": [
+   "tengo/tienes/tiene/tenemos/tienen",
+   "...",
+   "años"
+  ],
+  "formation": "tener 变位 + 数字 + años",
+  "notes": "年龄用 tener 不用 ser：Tengo veinte años（不是 soy veinte）。问：¿Cuántos años tienes?",
+  "examples": [
+   {
+    "spanish": "Mi hermana tiene veinte años.",
+    "chinese": "我妹妹二十岁。"
+   },
+   {
+    "spanish": "¿Cuántos años tienes?",
+    "chinese": "你多大了？"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "nada / nadie / nunca",
+  "name_es": "nada / nadie / nunca / tampoco",
+  "meaning_en": "negative words",
+  "meaning_zh": "否定词 nada / nadie / nunca / tampoco",
+  "level": "A2",
+  "focus": [
+   "nada/nadie/nunca/tampoco"
+  ],
+  "formation": "否定词可置于动词后（前面保留 no）或句首（不再加 no）",
+  "notes": "西班牙语允许双重否定：No dijo nada（他什么都没说）。否定词放句首时去掉 no：Nada dijo。",
+  "examples": [
+   {
+    "spanish": "No dijo nada.",
+    "chinese": "他什么都没说。"
+   },
+   {
+    "spanish": "Nunca he estado en México.",
+    "chinese": "我从没去过墨西哥。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "pero / sino",
+  "name_es": "pero / sino (contraste)",
+  "meaning_en": "but (contrast)",
+  "meaning_zh": "转折 pero / sino",
+  "level": "A2",
+  "focus": [
+   "pero/sino"
+  ],
+  "formation": "pero + 并列成分；sino + 被否定的对立项",
+  "notes": "sino 只用在否定句后，纠正被否定的事实：No es tonto, sino perezoso。否定句后接完整从句时用 sino que。",
+  "examples": [
+   {
+    "spanish": "José nunca fue rico, pero sí feliz.",
+    "chinese": "何塞从没富过，但很幸福。"
+   },
+   {
+    "spanish": "No es tonto, sino perezoso.",
+    "chinese": "他不是笨，而是懒。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "¡Qué + adjetivo!",
+  "name_es": "¡qué + adjetivo / sustantivo! (exclamación)",
+  "meaning_en": "exclamations with qué",
+  "meaning_zh": "感叹句 ¡qué + 形容词/名词!",
+  "level": "A2",
+  "focus": [
+   "qué",
+   "§adj"
+  ],
+  "formation": "¡Qué + 形容词/名词 (+ más + 形容词)!",
+  "notes": "qué 带重音符号；名词前可加 más 加强语气：¡Qué vida más aburrida!",
+  "examples": [
+   {
+    "spanish": "¡Qué bonito es tu pueblo!",
+    "chinese": "你的小镇真漂亮！"
+   },
+   {
+    "spanish": "¡Qué raro!",
+    "chinese": "真奇怪！"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "lo + adjetivo",
+  "name_es": "lo + adjetivo (sustantivación)",
+  "meaning_en": "the + adjective, as an abstract noun",
+  "meaning_zh": "中性冠词 lo + 形容词：……的事物",
+  "level": "A2",
+  "focus": [
+   "lo",
+   "§adj"
+  ],
+  "formation": "lo + 阳性单数形容词 → 抽象名词",
+  "notes": "lo importante（重要的东西）、lo mejor（最好的部分）。与 lo que 连用可引导从句。",
+  "examples": [
+   {
+    "spanish": "Lo importante es participar.",
+    "chinese": "重要的是参与。"
+   },
+   {
+    "spanish": "No sabes lo difícil que es.",
+    "chinese": "你不知道这有多难。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "hace ... que",
+  "name_es": "hace + tiempo + que",
+  "meaning_en": "duration up to now (hace ... que)",
+  "meaning_zh": "hace + 时间 + que：已经……多久",
+  "level": "A2",
+  "focus": [
+   "hace",
+   "...",
+   "que"
+  ],
+  "formation": "hace + 时间段 + que + 现在时（持续至今）",
+  "notes": "也可说 Vivo aquí hace tres años（动词在前、hace 在后）。若动词用简单过去时，则指『……以前』。",
+  "examples": [
+   {
+    "spanish": "Hace tres años que vivo aquí.",
+    "chinese": "我在这里住了三年了。"
+   },
+   {
+    "spanish": "Hace dos meses que vivo aquí.",
+    "chinese": "我在这里住了两个月了。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "no + subjuntivo (imperativo negativo)",
+  "name_es": "el imperativo negativo (no + subjuntivo)",
+  "meaning_en": "negative commands (no + present subjunctive)",
+  "meaning_zh": "否定命令：no + 虚拟式现在时",
+  "level": "B1",
+  "focus": [
+   "no",
+   "...",
+   "§subj2"
+  ],
+  "formation": "no + 虚拟式现在时（第二人称单数 digas / 复数 digáis；usted 用 diga）",
+  "notes": "否定命令一律改用虚拟式，代词前置：No me lo digas。肯定命令则用命令式本身（tú 用第三人称单数 habla，usted 用 hable），代词后贴：dímelo。",
+  "examples": [
+   {
+    "spanish": "No me lo digas.",
+    "chinese": "别告诉我。"
+   },
+   {
+    "spanish": "No lo hagas así.",
+    "chinese": "别这么做。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "volver a + infinitivo",
+  "name_es": "volver a + infinitivo",
+  "meaning_en": "to do something again",
+  "meaning_zh": "volver a + 原形动词：再一次",
+  "level": "B1",
+  "focus": [
+   "volver/vuelvo/vuelve/volvemos/vuelven",
+   "a",
+   "§inf"
+  ],
+  "formation": "volver (o→ue) + a + 原形动词",
+  "notes": "表示重复动作，比 otra vez 更书面；volver 本身是『回来』，加 a + 原形动词才是『再次』。",
+  "examples": [
+   {
+    "spanish": "Volvió a llamar dos horas después.",
+    "chinese": "两小时后他又打了一次电话。"
+   },
+   {
+    "spanish": "Volverá a intentarlo.",
+    "chinese": "他会再试一次。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "ponerse a + infinitivo",
+  "name_es": "ponerse a + infinitivo",
+  "meaning_en": "to start doing something (abruptly)",
+  "meaning_zh": "ponerse a + 原形动词：开始（动手）做",
+  "level": "B1",
+  "focus": [
+   "se/me/te/nos",
+   "puso/pongo/pones/pone/ponemos/ponen",
+   "a",
+   "§inf"
+  ],
+  "formation": "ponerse (自复) + a + 原形动词",
+  "notes": "强调『动手/突然开始』，比 empezar a 更口语；自复代词随主语变化。",
+  "examples": [
+   {
+    "spanish": "Se puso a llover a media tarde.",
+    "chinese": "下午过半开始下起雨来。"
+   },
+   {
+    "spanish": "Me pongo a estudiar en cuanto ceno.",
+    "chinese": "我一吃完晚饭就开始学习。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "terminar de + infinitivo",
+  "name_es": "terminar de + infinitivo",
+  "meaning_en": "to finish doing something",
+  "meaning_zh": "terminar de + 原形动词：做完某事",
+  "level": "B1",
+  "focus": [
+   "terminar/termino/termina/terminamos/terminan",
+   "de",
+   "§inf"
+  ],
+  "formation": "terminar de + 原形动词",
+  "notes": "与 acabar de 区分：terminar de 是『做完』，acabar de 是『刚刚做完』。",
+  "examples": [
+   {
+    "spanish": "Terminó de leer el libro anoche.",
+    "chinese": "他昨晚把那本书读完了。"
+   },
+   {
+    "spanish": "Terminamos de trabajar tarde.",
+    "chinese": "我们工作到很晚才结束。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "venir + gerundio",
+  "name_es": "venir + gerundio",
+  "meaning_en": "to have been doing something for a while",
+  "meaning_zh": "venir + 副动词：一直（从过去持续）",
+  "level": "B1",
+  "focus": [
+   "viene/vienen/venía/venían",
+   "§ger"
+  ],
+  "formation": "venir 变位 + 副动词",
+  "notes": "表示从过去某点持续到现在的动作，比 llevar + 副动词更强调延续；venir 只变位，副动词不变。",
+  "examples": [
+   {
+    "spanish": "Viene estudiando español desde los diez años.",
+    "chinese": "他从十岁起一直在学西班牙语。"
+   },
+   {
+    "spanish": "Me vengo preguntando por qué no escribe.",
+    "chinese": "我一直纳闷他为什么不写信。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "deber de + infinitivo",
+  "name_es": "deber de + infinitivo (conjetura)",
+  "meaning_en": "must (probability)",
+  "meaning_zh": "deber de + 原形动词：大概、想必",
+  "level": "B1",
+  "focus": [
+   "debe/deben/debemos",
+   "de",
+   "§inf"
+  ],
+  "formation": "deber de + 原形动词",
+  "notes": "deber + 原形动词＝应该（义务）；deber de + 原形动词＝推测。口语里常省略 de，但书面要区分。",
+  "examples": [
+   {
+    "spanish": "Debe de estar durmiendo.",
+    "chinese": "他大概在睡觉。"
+   },
+   {
+    "spanish": "Deben de ser las cinco.",
+    "chinese": "现在想必五点了。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "haber de + infinitivo",
+  "name_es": "haber de + infinitivo",
+  "meaning_en": "formal obligation / future necessity",
+  "meaning_zh": "haber de + 原形动词：须得、将要（书面）",
+  "level": "B1",
+  "focus": [
+   "he/has/ha/hemos/han",
+   "de",
+   "§inf"
+  ],
+  "formation": "haber 变位 + de + 原形动词",
+  "notes": "书面或文学语体，表义务或注定；口语里用 tener que。注意 haber 在此不作助动词。",
+  "examples": [
+   {
+    "spanish": "He de terminar esto hoy.",
+    "chinese": "我今天必须把这件事做完。"
+   },
+   {
+    "spanish": "Habrá de decidirlo mañana.",
+    "chinese": "他明天得做决定。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "el mío / la tuya",
+  "name_es": "el mío / la tuya (posesivos tónicos)",
+  "meaning_en": "mine / yours (stressed possessives)",
+  "meaning_zh": "重读物主代词 el mío / la tuya",
+  "level": "B1",
+  "focus": [
+   "el/la",
+   "mío/mía/tuyo/tuya/suyo/suya"
+  ],
+  "formation": "定冠词 + mío/mía/míos/mías（tuyo, suyo, nuestro, vuestro）",
+  "notes": "重读形式代替名词，冠词不可省：el mío（我的那个）。与名词前的短形式 mi/tu/su 区分。",
+  "examples": [
+   {
+    "spanish": "Mi libro está aquí; el tuyo está ahí.",
+    "chinese": "我的书在这儿，你的在那儿。"
+   },
+   {
+    "spanish": "Los suyos llegaron tarde.",
+    "chinese": "他们的那些人来晚了。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "lo que",
+  "name_es": "lo que (relativo neutro)",
+  "meaning_en": "what / the thing that",
+  "meaning_zh": "lo que：……的东西（中性关系代词）",
+  "level": "B1",
+  "focus": [
+   "lo",
+   "que"
+  ],
+  "formation": "lo que + 从句；或 主句 + lo que",
+  "notes": "指代前面整件事或抽象概念，无先行词；与 el que/la que（指人/物）不同。",
+  "examples": [
+   {
+    "spanish": "Lo que me gusta es la música.",
+    "chinese": "我喜欢的是音乐。"
+   },
+   {
+    "spanish": "No entiendo lo que dices.",
+    "chinese": "我不明白你说的话。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "sin que + subjuntivo",
+  "name_es": "sin que + subjuntivo",
+  "meaning_en": "without (someone) doing something",
+  "meaning_zh": "sin que + 虚拟式：而……没有",
+  "level": "B1",
+  "focus": [
+   "sin",
+   "que",
+   "...",
+   "§subj"
+  ],
+  "formation": "sin que + 虚拟式（主从句主语不同）",
+  "notes": "主语一致时用 sin + 原形动词；主语不同必须用 sin que + 虚拟式。",
+  "examples": [
+   {
+    "spanish": "La señora salió de la fiesta sin que la viéramos.",
+    "chinese": "那位女士离开聚会时我们都没看见。"
+   },
+   {
+    "spanish": "Lo hice sin que nadie me viera.",
+    "chinese": "我做这事时没人看见。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "se me / se te (acciones involuntarias)",
+  "name_es": "se me / se te + verbo (acción involuntaria)",
+  "meaning_en": "unplanned occurrences with se + indirect object",
+  "meaning_zh": "se me / se te + 动词：意外发生（非本意）",
+  "level": "B1",
+  "focus": [
+   "se",
+   "me/te/le/nos/os/les",
+   "§verb"
+  ],
+  "formation": "se + 与格代词 + 动词（第三人称）",
+  "notes": "表示『不小心/不由自主要发生』：Se me olvidó（我忘了）。与格代词指受影响的人，动词与事物一致。",
+  "examples": [
+   {
+    "spanish": "Se nos olvidó traer los refrescos.",
+    "chinese": "我们忘了带饮料。"
+   },
+   {
+    "spanish": "¿Se te perdieron las llaves?",
+    "chinese": "你钥匙丢了吗？"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "cada vez más",
+  "name_es": "cada vez más / menos",
+  "meaning_en": "more and more / less and less",
+  "meaning_zh": "cada vez más / menos：越来越……",
+  "level": "B1",
+  "focus": [
+   "cada",
+   "vez",
+   "más"
+  ],
+  "formation": "cada vez + más/menos + 形容词/副词；cada vez más + 名词",
+  "notes": "表示渐进变化；完成体变化也可说 cada vez mejor/peor。",
+  "examples": [
+   {
+    "spanish": "El español se habla cada vez más.",
+    "chinese": "说西班牙语的人越来越多。"
+   },
+   {
+    "spanish": "Está cada vez mejor.",
+    "chinese": "他越来越好了。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "hasta que + subjuntivo",
+  "name_es": "hasta que (+ subjuntivo)",
+  "meaning_en": "until (something happens)",
+  "meaning_zh": "hasta que：直到……（指将来用虚拟式）",
+  "level": "B1",
+  "focus": [
+   "hasta",
+   "que"
+  ],
+  "formation": "hasta que + 陈述式（已发生）/ 虚拟式（指将来）",
+  "notes": "指将来未发生的事用虚拟式：Espera hasta que llegue。已发生的事实用陈述式。",
+  "examples": [
+   {
+    "spanish": "Espera hasta que llegue.",
+    "chinese": "等到他来。"
+   },
+   {
+    "spanish": "No te vayas hasta que termine.",
+    "chinese": "等我做完再走。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "a lo mejor",
+  "name_es": "a lo mejor (+ indicativo)",
+  "meaning_en": "maybe (with the indicative)",
+  "meaning_zh": "a lo mejor：也许（接陈述式）",
+  "level": "B1",
+  "focus": [
+   "a",
+   "lo",
+   "mejor"
+  ],
+  "formation": "a lo mejor + 陈述式",
+  "notes": "口语常用，与 quizá/tal vez 不同：a lo mejor 后面用陈述式，不用虚拟式。",
+  "examples": [
+   {
+    "spanish": "A lo mejor viene mañana.",
+    "chinese": "他也许明天来。"
+   },
+   {
+    "spanish": "A lo mejor no lo sabe.",
+    "chinese": "他也许不知道这件事。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "a menos que + subjuntivo",
+  "name_es": "a menos que + subjuntivo",
+  "meaning_en": "unless",
+  "meaning_zh": "a menos que + 虚拟式：除非",
+  "level": "B2",
+  "focus": [
+   "a",
+   "menos",
+   "que"
+  ],
+  "formation": "a menos que + 虚拟式（永远）",
+  "notes": "同义：a no ser que、salvo que，后面一律虚拟式。",
+  "examples": [
+   {
+    "spanish": "No saldremos a menos que deje de llover.",
+    "chinese": "除非雨停，否则我们不出门。"
+   },
+   {
+    "spanish": "No lo sabrás a menos que lo leas.",
+    "chinese": "除非你读，否则你不会知道。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "con tal de que + subjuntivo",
+  "name_es": "con tal de que + subjuntivo",
+  "meaning_en": "as long as / provided that",
+  "meaning_zh": "con tal de que + 虚拟式：只要",
+  "level": "B2",
+  "focus": [
+   "con",
+   "tal",
+   "de",
+   "que"
+  ],
+  "formation": "con tal de que + 虚拟式（主语不同）；主语一致用 con tal de + 原形动词",
+  "notes": "表示必要条件，语气比 si 更强；口语也说 con tal que。",
+  "examples": [
+   {
+    "spanish": "Te lo presto con tal de que me lo devuelvas.",
+    "chinese": "只要你归还，我就借给你。"
+   },
+   {
+    "spanish": "Iré con tal de que no llueva.",
+    "chinese": "只要不下雨我就去。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "siempre y cuando",
+  "name_es": "siempre y cuando (+ subjuntivo)",
+  "meaning_en": "as long as",
+  "meaning_zh": "siempre y cuando：只要（条件）",
+  "level": "B2",
+  "focus": [
+   "siempre",
+   "y",
+   "cuando"
+  ],
+  "formation": "siempre y cuando + 虚拟式",
+  "notes": "与 siempre que 同义，但语气更强调『前提』；后面必须虚拟式。",
+  "examples": [
+   {
+    "spanish": "Iremos siempre y cuando no llueva.",
+    "chinese": "只要不下雨我们就去。"
+   },
+   {
+    "spanish": "Te apoyo siempre y cuando seas sincero.",
+    "chinese": "只要你坦诚，我就支持你。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "a condición de que",
+  "name_es": "a condición de que + subjuntivo",
+  "meaning_en": "on condition that",
+  "meaning_zh": "a condición de que + 虚拟式：条件是……",
+  "level": "B2",
+  "focus": [
+   "a",
+   "condición",
+   "de",
+   "que"
+  ],
+  "formation": "a condición de que + 虚拟式",
+  "notes": "书面语条件句，语气正式；同义 a cambio de que。",
+  "examples": [
+   {
+    "spanish": "Te ayudo a condición de que estudies.",
+    "chinese": "只要你学习，我就帮你。"
+   },
+   {
+    "spanish": "Se lo diré a condición de que no se lo cuentes a nadie.",
+    "chinese": "我可以告诉他，条件是你别跟任何人说。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "en caso de que + subjuntivo",
+  "name_es": "en caso de que + subjuntivo",
+  "meaning_en": "in case (that)",
+  "meaning_zh": "en caso de que + 虚拟式：万一、如果",
+  "level": "B2",
+  "focus": [
+   "en",
+   "caso",
+   "de",
+   "que"
+  ],
+  "formation": "en caso de que + 虚拟式；en caso de + 名词/原形动词",
+  "notes": "表示可能性较低的条件；后接名词时省掉 que（en caso de emergencia）。",
+  "examples": [
+   {
+    "spanish": "En caso de que llegue tarde, avísame.",
+    "chinese": "万一他来晚了，告诉我。"
+   },
+   {
+    "spanish": "Llévate dinero en caso de que lo necesites.",
+    "chinese": "带点钱，以防需要。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "por si",
+  "name_es": "por si (+ indicativo / subjuntivo)",
+  "meaning_en": "in case",
+  "meaning_zh": "por si：以防、万一",
+  "level": "B2",
+  "focus": [
+   "por",
+   "si"
+  ],
+  "formation": "por si + 陈述式（可能发生）；por si acaso 单独使用",
+  "notes": "与 en caso de que（+虚拟式）区分：por si 后面通常用陈述式。",
+  "examples": [
+   {
+    "spanish": "Llévate el paraguas por si llueve.",
+    "chinese": "带上伞，以防下雨。"
+   },
+   {
+    "spanish": "Lo digo por si acaso.",
+    "chinese": "我不过是防个万一才说的。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "de ahí que + subjuntivo",
+  "name_es": "de ahí que + subjuntivo",
+  "meaning_en": "hence / that is why",
+  "meaning_zh": "de ahí que + 虚拟式：因此、所以说",
+  "level": "B2",
+  "focus": [
+   "de",
+   "ahí",
+   "que"
+  ],
+  "formation": "de ahí que + 虚拟式",
+  "notes": "书面因果连接，后接虚拟式是固定要求；口语常说 por eso。",
+  "examples": [
+   {
+    "spanish": "No estudió; de ahí que suspendiera.",
+    "chinese": "他没学习，所以说他没及格。"
+   },
+   {
+    "spanish": "Llovió toda la noche, de ahí que el río esté tan crecido.",
+    "chinese": "下了一夜雨，所以河水才涨得这么高。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "por mucho que + subjuntivo",
+  "name_es": "por mucho que + subjuntivo",
+  "meaning_en": "however much",
+  "meaning_zh": "por mucho que + 虚拟式：无论多么……",
+  "level": "B2",
+  "focus": [
+   "por",
+   "mucho",
+   "que"
+  ],
+  "formation": "por mucho que + 虚拟式（让步）",
+  "notes": "与 por más que 同义；也可说 por muy + 形容词 + que。",
+  "examples": [
+   {
+    "spanish": "Por mucho que insistas, no cambiaré de idea.",
+    "chinese": "不管你多坚持，我都不会改变主意。"
+   },
+   {
+    "spanish": "Por mucho que lo intento, no lo entiendo.",
+    "chinese": "不管我怎么努力，都弄不懂。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "aun cuando",
+  "name_es": "aun cuando (+ subjuntivo)",
+  "meaning_en": "even when / even though",
+  "meaning_zh": "aun cuando：即使、尽管",
+  "level": "B2",
+  "focus": [
+   "aun",
+   "cuando"
+  ],
+  "formation": "aun cuando + 虚拟式（假设）/ 陈述式（事实）",
+  "notes": "aun（无重音）＝即使；aún（带重音）＝还、仍然。这是最常考的差别。",
+  "examples": [
+   {
+    "spanish": "Aun cuando llueva, iremos.",
+    "chinese": "即使下雨我们也去。"
+   },
+   {
+    "spanish": "Aun cuando esté cansado, sigue trabajando.",
+    "chinese": "尽管他很累，还是继续工作。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "mientras que",
+  "name_es": "mientras que (contraste)",
+  "meaning_en": "whereas",
+  "meaning_zh": "mientras que：而、然而（对比）",
+  "level": "B2",
+  "focus": [
+   "mientras",
+   "que"
+  ],
+  "formation": "mientras que + 陈述式，表对比",
+  "notes": "表时间『当……时』用 mientras（不加 que）；mientras que 专门表对比。",
+  "examples": [
+   {
+    "spanish": "Yo prefiero el té, mientras que ella prefiere el café.",
+    "chinese": "我更喜欢茶，而她更喜欢咖啡。"
+   },
+   {
+    "spanish": "Él estudia, mientras que su hermano trabaja.",
+    "chinese": "他在读书，而他弟弟在工作。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "no solo ... sino también",
+  "name_es": "no solo ... sino también",
+  "meaning_en": "not only ... but also",
+  "meaning_zh": "no solo … sino también：不仅……而且",
+  "level": "B2",
+  "focus": [
+   "no",
+   "solo",
+   "...",
+   "sino"
+  ],
+  "formation": "no solo + A + sino también + B",
+  "notes": "连接平行成分；sino 在否定后纠正，también 加强递进。",
+  "examples": [
+   {
+    "spanish": "No solo estudia, sino también trabaja.",
+    "chinese": "他不仅读书，还工作。"
+   },
+   {
+    "spanish": "Habla no solo inglés sino también francés.",
+    "chinese": "他不仅会说英语，还会说法语。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "más vale que + subjuntivo",
+  "name_es": "más vale que + subjuntivo",
+  "meaning_en": "it is better that / you had better",
+  "meaning_zh": "más vale que + 虚拟式：最好……",
+  "level": "B2",
+  "focus": [
+   "más",
+   "vale",
+   "que"
+  ],
+  "formation": "más vale que + 虚拟式；más vale + 原形动词",
+  "notes": "劝告/警告语气，比 es mejor que 更强烈；más vale tarde que nunca 是固定说法。",
+  "examples": [
+   {
+    "spanish": "Más vale que te vayas ahora.",
+    "chinese": "你最好现在就走。"
+   },
+   {
+    "spanish": "Más vale que no digas nada.",
+    "chinese": "你最好什么都别说。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "hace falta que + subjuntivo",
+  "name_es": "hace falta que + subjuntivo",
+  "meaning_en": "it is necessary that",
+  "meaning_zh": "hace falta que + 虚拟式：需要、有必要",
+  "level": "B2",
+  "focus": [
+   "hace",
+   "falta",
+   "que"
+  ],
+  "formation": "hace falta que + 虚拟式；hace falta + 名词/原形动词",
+  "notes": "无人称必要性表达，与 es necesario que 同义但更口语。",
+  "examples": [
+   {
+    "spanish": "Hace falta que todos colaboren.",
+    "chinese": "需要大家通力合作。"
+   },
+   {
+    "spanish": "Hace falta que traigas tu pasaporte.",
+    "chinese": "你需要带上护照。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "cuanto más ... más",
+  "name_es": "cuanto más ... más",
+  "meaning_en": "the more ... the more",
+  "meaning_zh": "cuanto más … más …：越……越……",
+  "level": "C1",
+  "focus": [
+   "cuanto",
+   "más"
+  ],
+  "formation": "Cuanto más + 动词/形容词, más/menos + 结果",
+  "notes": "两个分句都用比较级；cuanto 不带重音（重音 cuánto 是疑问词）。",
+  "examples": [
+   {
+    "spanish": "Cuanto más estudias, más aprendes.",
+    "chinese": "你学得越多，学到的就越多。"
+   },
+   {
+    "spanish": "Cuanto más lo pienso, menos me gusta.",
+    "chinese": "越想我越不喜欢。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "como + subjuntivo",
+  "name_es": "como + subjuntivo (condición)",
+  "meaning_en": "if (with the subjunctive, threatening condition)",
+  "meaning_zh": "como + 虚拟式：要是……（带警告的条件）",
+  "level": "C1",
+  "focus": [
+   "como",
+   "...",
+   "§subj"
+  ],
+  "formation": "Como + 虚拟式, 主句（结果）",
+  "notes": "口语警示句：Como no llegues a tiempo, nos vamos sin ti。语气比 si 更强硬。",
+  "examples": [
+   {
+    "spanish": "Como no llegues a tiempo, nos vamos sin ti.",
+    "chinese": "你要是不能准时到，我们就自己走了。"
+   },
+   {
+    "spanish": "Como no estudies, vas a suspender.",
+    "chinese": "你要是不学习，就会不及格。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "no bien",
+  "name_es": "no bien (en cuanto)",
+  "meaning_en": "no sooner ... than",
+  "meaning_zh": "no bien：刚一……就",
+  "level": "C1",
+  "focus": [
+   "no",
+   "bien"
+  ],
+  "formation": "No bien + 动词, 主句",
+  "notes": "书面时间连接，等于 en cuanto / tan pronto como；注意不是『不好』。",
+  "examples": [
+   {
+    "spanish": "No bien llegó, empezó a trabajar.",
+    "chinese": "他刚一到就开始工作。"
+   },
+   {
+    "spanish": "No bien amaneció, salimos.",
+    "chinese": "天刚一亮我们就出发了。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "de no ser por",
+  "name_es": "de no ser por",
+  "meaning_en": "if it were not for",
+  "meaning_zh": "de no ser por：要不是因为",
+  "level": "C1",
+  "focus": [
+   "de",
+   "no",
+   "ser",
+   "por"
+  ],
+  "formation": "De no ser por + 名词/代词, 主句（虚拟或条件式）",
+  "notes": "书面虚拟条件，等于 si no fuera por；主句常用条件式。",
+  "examples": [
+   {
+    "spanish": "De no ser por ti, no estaría aquí.",
+    "chinese": "要不是你，我就不会在这里。"
+   },
+   {
+    "spanish": "De no ser por el médico, se habría muerto.",
+    "chinese": "要不是那位医生，他早就死了。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "en la medida en que",
+  "name_es": "en la medida en que",
+  "meaning_en": "to the extent that",
+  "meaning_zh": "en la medida en que：在……程度上、随着",
+  "level": "C1",
+  "focus": [
+   "en",
+   "la",
+   "medida"
+  ],
+  "formation": "en la medida en que + 陈述式",
+  "notes": "书面语，表程度相关或递进；论说文常用。",
+  "examples": [
+   {
+    "spanish": "En la medida en que estudies, mejorarás.",
+    "chinese": "你学的程度决定你进步的程度。"
+   },
+   {
+    "spanish": "El problema crece en la medida en que nadie lo atiende.",
+    "chinese": "越没人处理，问题就越大。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "por consiguiente",
+  "name_es": "por consiguiente",
+  "meaning_en": "consequently",
+  "meaning_zh": "por consiguiente：因此、所以（书面）",
+  "level": "C1",
+  "focus": [
+   "por",
+   "consiguiente"
+  ],
+  "formation": "por consiguiente（逗号隔开，置于结果句前）",
+  "notes": "正式书面因果连接，与 por lo tanto 同义但更书面。",
+  "examples": [
+   {
+    "spanish": "No estudió; por consiguiente, suspendió.",
+    "chinese": "他没学习，因此没及格。"
+   },
+   {
+    "spanish": "Llegó tarde; por consiguiente, no entró.",
+    "chinese": "他来晚了，因此没能进场。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "no obstante",
+  "name_es": "no obstante",
+  "meaning_en": "nevertheless",
+  "meaning_zh": "no obstante：尽管如此、然而",
+  "level": "C1",
+  "focus": [
+   "no",
+   "obstante"
+  ],
+  "formation": "no obstante（可置句首或句中，逗号隔开）",
+  "notes": "书面转折，比 sin embargo 更正式；也可说 no obstante que（少用）。",
+  "examples": [
+   {
+    "spanish": "No obstante, decidió continuar.",
+    "chinese": "尽管如此，他还是决定继续。"
+   },
+   {
+    "spanish": "Era caro; no obstante, lo compró.",
+    "chinese": "那东西很贵，但他还是买了。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "aun así",
+  "name_es": "aun así",
+  "meaning_en": "even so",
+  "meaning_zh": "aun así：即便如此",
+  "level": "C1",
+  "focus": [
+   "aun",
+   "así"
+  ],
+  "formation": "aun así（句首或分句末）",
+  "notes": "aun 不带重音；表『即使这样』的让步转折，常与 pero 连用。",
+  "examples": [
+   {
+    "spanish": "Estaba cansado; aun así, terminó el trabajo.",
+    "chinese": "他很累，即便如此还是把工作做完了。"
+   },
+   {
+    "spanish": "Aun así, no me convence.",
+    "chinese": "即便如此，我还是不放心。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "en tanto que",
+  "name_es": "en tanto que",
+  "meaning_en": "while / inasmuch as",
+  "meaning_zh": "en tanto que：而；作为……",
+  "level": "C1",
+  "focus": [
+   "en",
+   "tanto",
+   "que"
+  ],
+  "formation": "en tanto que + 陈述式（对比或身份）",
+  "notes": "既可表对比（相当于 mientras que），也可表身份（作为……）。",
+  "examples": [
+   {
+    "spanish": "En tanto que tú descansas, yo trabajo.",
+    "chinese": "你休息的时候我却在工作。"
+   },
+   {
+    "spanish": "En tanto que escritor, opina distinto.",
+    "chinese": "作为作家，他的看法不同。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "con objeto de",
+  "name_es": "con objeto de (+ que)",
+  "meaning_en": "with the aim of",
+  "meaning_zh": "con objeto de：为了（书面）",
+  "level": "C1",
+  "focus": [
+   "con",
+   "objeto",
+   "de"
+  ],
+  "formation": "con objeto de + 原形动词；con objeto de que + 虚拟式",
+  "notes": "正式书面目的表达，与 con el fin de、a fin de 同义。",
+  "examples": [
+   {
+    "spanish": "Se reunieron con objeto de llegar a un acuerdo.",
+    "chinese": "他们开会是为了达成协议。"
+   },
+   {
+    "spanish": "Lo dijo con objeto de ayudarte.",
+    "chinese": "他说这话是为了帮你。"
+   }
+  ],
+  "source": "es-ref-1"
+ },
+ {
+  "pattern": "no fuera que",
+  "name_es": "no fuera que + subjuntivo",
+  "meaning_en": "lest",
+  "meaning_zh": "no fuera que + 虚拟式：免得、唯恐",
+  "level": "C2",
+  "focus": [
+   "no",
+   "fuera",
+   "que"
+  ],
+  "formation": "主句 + no fuera que + 虚拟式",
+  "notes": "书面警示，等于 no sea que；后面必须虚拟式。",
+  "examples": [
+   {
+    "spanish": "Cállate, no fuera que te oyeran.",
+    "chinese": "小声点，免得被人听见。"
+   },
+   {
+    "spanish": "Vine temprano, no fuera que se marcharan.",
+    "chinese": "我来得早，唯恐他们走了。"
+   }
+  ],
+  "source": "es-ref-1"
+ }
+]
