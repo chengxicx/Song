@@ -444,6 +444,28 @@ def _focus_words(focus):
     return words
 
 
+def _focus_vetoes(focus):
+    """
+    The "!word" entries of a focus list, as right-context vetoes.
+
+    A row whose construction collides with a longer one needs to say so:
+    temporal *mientras* would otherwise fire on every *mientras que* (which
+    is its own contrastive row), so the row's focus is
+    ``["mientras", "!que"]``.  The veto is checked against the three tokens
+    after the match, like ``make_rule(not_followed_by=...)``.
+    """
+    vetoes = []
+    for w in _focus_words(focus):
+        if not w.startswith("!") or len(w) < 2:
+            continue
+        vetoes.append(spec_surface(*w[1:].split("/")))
+    if not vetoes:
+        return None
+    if len(vetoes) == 1:
+        return vetoes[0]
+    return {"any_of": vetoes}
+
+
 def _focus_condition(word, lemma):
     """
     One focus word as a token condition.
@@ -506,7 +528,7 @@ def _focus_specs(focus):
     never stands alone -- it fires on half the corpus -- so a single word
     shorter than five characters is dropped unless it carries alternatives.
     """
-    words = _focus_words(focus)
+    words = [w for w in _focus_words(focus) if not w.startswith("!")]
     if not words:
         return []
     if words.count("...") == 1:
@@ -536,11 +558,20 @@ def _focus_specs(focus):
     return specs
 
 
-def _flash(spec, examples):
-    "True when spec fires on at least one of the row's example sentences."
+def _flash(spec, examples, vetoes=None):
+    """
+    True when spec fires on at least one of the row's example sentences.
+
+    The veto is part of the test: a spec that only fires in the context the
+    row excludes (temporal *mientras* inside *mientras que*) must not count
+    as validated, or the row would ship an example it cannot actually mark.
+    """
+    rule = {"match": spec}
+    if vetoes:
+        rule["not_followed_by"] = vetoes
     for sentence in examples:
         text = (sentence or "").strip()
-        if text and match_rule({"match": spec}, _tokens_for(text), text):
+        if text and match_rule(rule, _tokens_for(text), text):
             return True
     return False
 
@@ -566,9 +597,12 @@ def _load_data_rules():
         ]
         if not examples:
             continue
+        vetoes = _focus_vetoes(item.get("focus"))
         try:
             validated = [
-                s for s in _focus_specs(item.get("focus")) if _flash(s, examples)
+                s
+                for s in _focus_specs(item.get("focus"))
+                if _flash(s, examples, vetoes)
             ]
         except ImportError:
             # spaCy or the Spanish model is not installed: nothing can be
@@ -595,6 +629,7 @@ def _load_data_rules():
             (item.get("meaning") or "").strip() or name,
             {"any_of": validated} if len(validated) > 1 else validated[0],
             zh=item.get("zh") or None,
+            not_followed_by=vetoes,
         )
         # Library-page fields (the /grammar detail card renders them when
         # present); the panel ignores keys it does not read.
