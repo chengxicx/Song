@@ -384,5 +384,343 @@
    }
   ],
   "source": "corpus-b"
+ },
+ {
+  "pattern": "pronom objet direct + verbe",
+  "name_fr": "pronoms objets directs (le, la, les)",
+  "meaning_en": "direct object pronouns: it / them, replacing a noun already mentioned",
+  "meaning_zh": "直接宾语代词 le / la / les（代替已提到的名词）",
+  "level": "A1",
+  "focus": [
+   "je/tu/il/elle/on/nous/vous/ils/elles",
+   "le/la/les/l'"
+  ],
+  "formation": "sujet + le / la / les (+ l' devant voyelle) + verbe conjugué",
+  "notes": "代词放在变位动词前；元音开头缩合成 l'（Je l'ai vu）。复合时态放在助动词前。le / la / les 同时也是冠词，所以本行按「主语代词 + 代词」的相邻形式判定，单看一个 le 判不出来。",
+  "examples": [
+   {
+    "french": "Je le fais exprès.",
+    "chinese": "我是故意的。"
+   },
+   {
+    "french": "Il connaissait Ève depuis deux ans quand il l'a épousée.",
+    "chinese": "他认识伊芙两年之后才娶了她。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "pronom objet indirect + verbe",
+  "name_fr": "pronoms objets indirects (lui, leur)",
+  "meaning_en": "indirect object pronouns: to him / her / them (lui, leur)",
+  "meaning_zh": "间接宾语代词 lui / leur（代替 à + 人）",
+  "level": "A1",
+  "focus": [
+   "je/tu/il/elle/on/nous/vous/ils/elles",
+   "lui/leur"
+  ],
+  "formation": "sujet + lui / leur + verbe",
+  "notes": "代替 à + 人：à Marie → lui，à mes parents → leur。只用于人和动物；事物用 y（penser à qch → y penser）。",
+  "examples": [
+   {
+    "french": "Vous lui direz bonjour de ma part.",
+    "chinese": "请代我向他问好。"
+   },
+   {
+    "french": "J'obéis à mes parents. Je leur obéis.",
+    "chinese": "我听父母的话。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "le / la / les + lui / leur",
+  "name_fr": "ordre des pronoms objets (le lui, le leur)",
+  "meaning_en": "order of two object pronouns: direct before indirect",
+  "meaning_zh": "宾语代词顺序：直接宾语在前，间接宾语在后",
+  "level": "A2",
+  "focus": [
+   "le/la/les",
+   "lui/leur"
+  ],
+  "formation": "le / la / les + lui / leur + verbe",
+  "notes": "两个代词同时出现时顺序固定：me / te / se / nous / vous → le / la / les → lui / leur → y → en。⚠️ le leur 与主有代词 le leur 同形，本行按间接宾语读。",
+  "examples": [
+   {
+    "french": "La vendeuse la lui rend.",
+    "chinese": "女售货员把它还给他。"
+   },
+   {
+    "french": "On le lui a volé.",
+    "chinese": "有人把它从他那儿偷走了。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "me / te / se + le / la",
+  "name_fr": "ordre des pronoms objets (me le, te le)",
+  "meaning_en": "order of two object pronouns: first/second person comes first",
+  "meaning_zh": "宾语代词顺序：一、二人称在前（me le / te le）",
+  "level": "B1",
+  "focus": [
+   "me/te/se",
+   "le/la/lui/leur"
+  ],
+  "formation": "me / te / se + le / la / les + verbe",
+  "notes": "顺序链的第一位：me / te / se / nous / vous 永远排在最前，然后才是 le / la / les。",
+  "examples": [
+   {
+    "french": "Tu aurais pu me le dire plus tôt.",
+    "chinese": "你本可以早点告诉我。"
+   },
+   {
+    "french": "Elle te le donne.",
+    "chinese": "她把它给你。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "préposition + pronom disjoint",
+  "name_fr": "pronoms disjoints (moi, toi, lui...)",
+  "meaning_en": "stressed / disjunctive pronouns after a preposition",
+  "meaning_zh": "重读代词（介词后：chez moi, avec lui）",
+  "level": "A2",
+  "focus": [
+   "chez/avec/pour/sans",
+   "moi/toi/lui/elle/nous/vous/eux/elles"
+  ],
+  "formation": "préposition + moi / toi / lui / elle / nous / vous / eux / elles",
+  "notes": "重读代词用在介词后（chez moi, avec lui, pour elle）、强调和省略回答（— Qui? — Lui.）。与主语代词 je / tu 不同形。",
+  "examples": [
+   {
+    "french": "Je suis d'accord avec toi.",
+    "chinese": "我同意你。"
+   },
+   {
+    "french": "Qu'est-ce que je ferais sans toi?",
+    "chinese": "没有你我该怎么办？"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "le / la / les + mien / tien / sien",
+  "name_fr": "pronoms possessifs (le mien, le tien...)",
+  "meaning_en": "possessive pronouns: mine, yours, his/hers",
+  "meaning_zh": "主有代词（le mien / le tien / le sien...）",
+  "level": "A2",
+  "focus": [
+   "le/la/les",
+   "mien/tien/sien/nôtre/vôtre"
+  ],
+  "formation": "le / la / les + mien / tien / sien / nôtre / vôtre (+ leur)",
+  "notes": "性数与被替代的名词一致：le mien / la mienne / les miens。⚠️ 本行只判定 mien / tien / sien / nôtre / vôtre 五种：le leur 与间接宾语代词同形（le leur donner），留空避免误判。",
+  "examples": [
+   {
+    "french": "Notre maison est plus petite que la vôtre.",
+    "chinese": "我们的房子比你们的小。"
+   },
+   {
+    "french": "Mon père travaille à l'hôpital, et le tien?",
+    "chinese": "我父亲在医院工作，你父亲呢？"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "celui / celle / ceux / celles",
+  "name_fr": "pronoms démonstratifs (celui, celle...)",
+  "meaning_en": "demonstrative pronouns: the one(s)",
+  "meaning_zh": "指示代词（celui / celle / ceux / celles）",
+  "level": "A2",
+  "focus": [
+   "celui/celle/ceux/celles"
+  ],
+  "formation": "celui / celle / ceux / celles + -ci / -là / de / qui / que / dont",
+  "notes": "代替「前面提到的那个」：celui que j'ai acheté（我买的那个）。加 -ci 指近、-là 指远。与指示形容词 ce / cette 区分：后者必须带名词。",
+  "examples": [
+   {
+    "french": "Ce café est plus mauvais que celui que j'ai acheté hier.",
+    "chinese": "这杯咖啡比我昨天买的那杯难喝。"
+   },
+   {
+    "french": "C'est celui-là que je veux.",
+    "chinese": "我要的就是那一个。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "ne + verbe + personne",
+  "name_fr": "ne ... personne (nobody)",
+  "meaning_en": "negation with personne: nobody, not anybody",
+  "meaning_zh": "否定：ne ... personne（没有人）",
+  "level": "A2",
+  "focus": [
+   "ne/n'",
+   "...",
+   "personne"
+  ],
+  "formation": "ne + verbe + personne",
+  "notes": "personne 作否定代词时与 ne 呼应，意为「没有人」，位置在动词后（复合时态在助动词后分词前）。作名词时意为「人」，不带否定（une personne）。",
+  "examples": [
+   {
+    "french": "Je ne connais personne ici.",
+    "chinese": "我在这儿谁也不认识。"
+   },
+   {
+    "french": "Je n'ai vu personne.",
+    "chinese": "我一个人也没看见。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "ne + verbe + rien",
+  "name_fr": "ne ... rien (nothing)",
+  "meaning_en": "negation with rien: nothing, not anything",
+  "meaning_zh": "否定：ne ... rien（什么也不）",
+  "level": "A2",
+  "focus": [
+   "ne/n'",
+   "...",
+   "rien"
+  ],
+  "formation": "ne + verbe + rien",
+  "notes": "rien 在复合时态里放在助动词和分词之间（Je n'ai rien vu），不能像 personne 那样放到句末。",
+  "examples": [
+   {
+    "french": "Ça ne veut rien dire.",
+    "chinese": "这毫无意义。"
+   },
+   {
+    "french": "Je n'ai rien dit.",
+    "chinese": "我什么也没说。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "ne + verbe + ni A ni B",
+  "name_fr": "ne ... ni ... ni (neither ... nor)",
+  "meaning_en": "negation with ni ... ni: neither ... nor",
+  "meaning_zh": "否定：ne ... ni ... ni（既不……也不……）",
+  "level": "B1",
+  "focus": [
+   "ni",
+   "...",
+   "ni"
+  ],
+  "formation": "ne + verbe + ni + nom + ni + nom",
+  "notes": "连接两个被否定的成分；不定冠词和部分冠词在 ni 后省略（ni du pain ni du vin → ni pain ni vin）。",
+  "examples": [
+   {
+    "french": "Il n'aime ni le vin ni la bière.",
+    "chinese": "他既不喜欢葡萄酒，也不喜欢啤酒。"
+   },
+   {
+    "french": "Je n'ai ni faim ni soif.",
+    "chinese": "我又不饿也不渴。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "moi non plus",
+  "name_fr": "non plus (neither / not either)",
+  "meaning_en": "not either: agreeing with a negative statement",
+  "meaning_zh": "否定句的「也不」（moi non plus）",
+  "level": "B1",
+  "focus": [
+   "non",
+   "plus"
+  ],
+  "formation": "moi / toi / lui / elle / nous / vous / eux / elles + non plus",
+  "notes": "否定句的附和用 non plus，肯定句用 aussi。也可紧跟在句尾：Je ne peux pas le comprendre non plus。",
+  "examples": [
+   {
+    "french": "Je n'ai pas faim. – Moi non plus.",
+    "chinese": "我不饿。——我也不饿。"
+   },
+   {
+    "french": "Je ne peux pas le comprendre non plus.",
+    "chinese": "我也无法理解这一点。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "lequel / laquelle / auquel / duquel",
+  "name_fr": "pronoms relatifs composés (lequel, auquel, duquel)",
+  "meaning_en": "compound relative pronouns: which / of which, with à and de contracted",
+  "meaning_zh": "复合关系代词（lequel / auquel / duquel）",
+  "level": "B2",
+  "focus": [
+   "lequel/laquelle/lesquels/lesquelles/auquel/duquel"
+  ],
+  "formation": "lequel / laquelle / lesquels / lesquelles；à + lequel → auquel / auxquels / auxquelles；de + lequel → duquel / desquels",
+  "notes": "用于「介词 + 事物」的关系从句，指人时多用 qui（l'homme à qui je parle）。也可作疑问代词：Lequel des deux?",
+  "examples": [
+   {
+    "french": "Le village dans lequel il habite est en Hongrie.",
+    "chinese": "他住的那个村庄在匈牙利。"
+   },
+   {
+    "french": "Il y a deux congrès. Auquel allez-vous assister?",
+    "chinese": "有两个会议，您要参加哪一个？"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "avoir beau + infinitif",
+  "name_fr": "avoir beau + infinitif (however much)",
+  "meaning_en": "avoir beau + infinitive: however much / in vain",
+  "meaning_zh": "avoir beau + 不定式（徒劳、尽管）",
+  "level": "B2",
+  "focus": [
+   "avoir",
+   "beau"
+  ],
+  "formation": "avoir beau + infinitif（avoir 随人称变位，beau 不变）",
+  "notes": "表示「白费力气、尽管」：Il a beau dormir, il est toujours fatigué。后句常用 mais / 却引出相反结果。",
+  "examples": [
+   {
+    "french": "Il a beau dormir, il est toujours fatigué.",
+    "chinese": "他怎么睡都还是累。"
+   },
+   {
+    "french": "Elle aura beau essayer, ce sera inutile.",
+    "chinese": "她再怎么试也是白费。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "n'importe qui / quoi / quand / où",
+  "name_fr": "n'importe qui / quoi / quand / où (anyone, anything...)",
+  "meaning_en": "n'importe + interrogative word: anyone, anything, anywhere, whenever",
+  "meaning_zh": "n'importe + 疑问词（谁/什么/哪里/何时，随便……）",
+  "level": "B2",
+  "focus": [
+   "n'",
+   "importe",
+   "qui/quoi/quand/où"
+  ],
+  "formation": "n'importe + qui / quoi / quand / où / comment / lequel",
+  "notes": "表示「任何一个、随便哪个」：n'importe qui（谁都可以）、n'importe quoi（随便什么，也指「胡说八道」）。",
+  "examples": [
+   {
+    "french": "N'importe qui peut faire cela.",
+    "chinese": "谁都能做这件事。"
+   },
+   {
+    "french": "Il ferait n'importe quoi pour réussir.",
+    "chinese": "为了成功他什么都干得出来。"
+   }
+  ],
+  "source": "corpus-pmp"
  }
 ]
