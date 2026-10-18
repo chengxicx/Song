@@ -5,7 +5,12 @@ import pytest
 pytest.importorskip("spacy")
 pytest.importorskip("es_core_news_md")
 
-from lute.read.render.grammar_analysis_es import _ES_RULES, analyze_spanish
+from lute.read.render.grammar_analysis_es import _ES_RULES, _tokens_for, analyze_spanish
+from lute.read.render.grammar_analysis_matcher import (
+    make_rule,
+    match_rule,
+    spec_surface,
+)
 from lute.read.render.grammar_analysis import is_spanish_language
 
 
@@ -30,6 +35,7 @@ _RULE_SENTENCES = {
     "es_mas_que": "Este libro es más interesante que aquel.",
     "es_tan_como": "Es tan alto como su hermano.",
     "es_le": "Le gusta el café por la mañana.",
+    "es_imperativo": "Dame el periódico.",
     "es_subj_present": "Quiero que vengas.",
     "es_conditional": "Yo compraría esa casa.",
     "es_futuro": "Mañana comprará el pan.",
@@ -71,6 +77,37 @@ def test_preterite_and_imperfect_are_distinct():
     keys = _keys(text)
     assert "es_preterite" in keys
     assert "es_imperfect" in keys
+
+
+def test_affirmative_imperative_needs_first_position():
+    """
+    The affirmative imperative keys on a command form opening the
+    sentence: the model tags Mood=Imp only sporadically, and "toma" /
+    "mira" / "di" are also ordinary indicative forms, so position is what
+    tells the two readings apart.
+    """
+    assert "es_imperativo" in _keys("Dame el periódico.")
+    assert "es_imperativo" in _keys("Hazlo ahora mismo.")
+    assert "es_imperativo" in _keys("Siéntese, por favor.")
+    # The same surfaces used declaratively keep their own reading.
+    assert "es_imperativo" not in _keys("El niño toma la sopa.")
+    assert "es_imperativo" not in _keys("Pedro mira a ella.")
+    assert "es_imperativo" not in _keys("Habla francés e inglés.")
+
+
+def test_at_start_vetoes_a_later_hit():
+    "A rule marked at_start reports only hits that open the sentence."
+    rule = make_rule(
+        "probe",
+        "probe",
+        "A2",
+        "probe",
+        {"seq": [spec_surface("toma")]},
+        at_start=True,
+    )
+    assert match_rule(rule, _tokens_for("Toma la sopa."), "Toma la sopa.")
+    later = "El niño toma la sopa."
+    assert not match_rule(rule, _tokens_for(later), later)
 
 
 def test_display_language_switches_desc():
