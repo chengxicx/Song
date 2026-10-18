@@ -81,6 +81,13 @@ _FR_RULES = [
         "A1",
         "quand/comment/pourquoi/combien/où/qui ask for information.",
         {"seq": [spec_surface("quand", "comment", "pourquoi", "combien", "où", "qui")]},
+        # qui / où are both interrogative and relative ("La femme qui
+        # parle", "la ville où j'habite"), and telling the two apart needs
+        # the parse, not the token: a not_after on the noun before the
+        # word would also veto "Ce jour-là, quand es-tu parti ?".  The
+        # overlap with fr_relative is therefore left in place -- the
+        # audit reports it as a hand-written pair and leaves it, like the
+        # other engines' broad rules.
         zh="特殊疑问词 quand/comment/pourquoi/combien/où/qui。",
     ),
     make_rule(
@@ -245,6 +252,14 @@ _FR_RULES = [
             "min_gap": 0,
             "max_gap": 5,
         },
+        # A capitalised sentence-initial "Peut-être" is tokenised as
+        # Peut / - / être, so the modal reads as pouvoir + infinitive and
+        # the row fires on the adverb (mid-sentence lowercase "peut-être"
+        # stays one token, lemma "peut-être", and never matches).  The
+        # stray hyphen sits strictly inside the hit, which not_inside
+        # sees; no other modal span contains a bare hyphen -- "vingt-six"
+        # and "paraît-il" tokenise whole or as "-il".
+        not_inside=spec_surface("-"),
         zh="情态动词 pouvoir/vouloir/devoir + 原形：能/想/必须。",
     ),
     make_rule(
@@ -574,12 +589,26 @@ _FR_RULES = [
 ]
 
 
+# Rows the reading panel silences: the page never shows them, but the
+# library page and the overlap audit still do -- a silenced row is real
+# material, just a point another rule already reports on the same span.
+# Re-derived by scripts/audit_grammar_fr_overlaps.py whenever the library
+# grows; empty while the audit finds no same-span duplicate worth
+# dropping (the 2026-10-19 round fixed the one candidate by narrowing the
+# row instead -- see the passive row's notes in grammar_fr.json).
+_DUPLICATE_RULE_IDS = frozenset()
+
+
 def _get_all_rules():
     "Hand-written plus data-driven rules, built and memoised on first use."
     global _all_rules_cache  # pylint: disable=global-statement
     with _rules_lock:
         if _all_rules_cache is None:
-            _all_rules_cache = list(_FR_RULES) + _get_data_rules()
+            _all_rules_cache = list(_FR_RULES) + [
+                rule
+                for rule in _get_data_rules()
+                if rule["key"] not in _DUPLICATE_RULE_IDS
+            ]
         return _all_rules_cache
 
 
