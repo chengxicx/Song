@@ -12,11 +12,17 @@ spaCy and the model are imported lazily so the base install works without
 them; the route falls back to the generic rule library on ImportError.
 """
 
+import json
+import os
+import re
+import threading
+
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
     desc_for_rule,
     make_rule,
     make_spacy_tokenizer,
+    match_rule,
     spec_lemma,
     spec_morph,
     spec_pos,
@@ -399,20 +405,236 @@ def analyze_spanish(page_text, display_lang="en"):
     Returns a list of dicts:
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
-    return analyze_tokens(page_text, _ES_RULES, _tokens_for, display_lang)
+    rules = _get_all_rules()
+    return analyze_tokens(page_text, rules, _tokens_for, display_lang)
+
+
+# ---- data layer (grammar_es.json) ---------------------------------------
+#
+# Merged material rows become rules whose matcher specs are derived from the
+# row's `focus` words and kept only when they fire on the row's own example
+# sentences, so a stale spec can never enter the panel silently.  Mirrors the
+# French / Russian engines.
+
+
+def _norm_name(name):
+    "Fold a rule name for the hand-written / data-layer overlap check."
+    return re.sub(r"[^0-9a-zà-ÿ]+", "", (name or "").lower())
+
+
+_HANDWRITTEN_NORMS = {_norm_name(r["name"]) for r in _ES_RULES}
+
+_DATA_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_es.json",
+    )
+)
+
+
+def _focus_words(focus):
+    words = []
+    for f in focus or []:
+        w = (f or "").strip().lower()
+        if w:
+            words.append(w)
+    return words
+
+
+def _focus_condition(word, lemma):
+    """
+    One focus word as a token condition.
+
+    Three shorthands keep the material rows declarative while still letting a
+    row talk about word classes the literal vocabulary cannot spell out:
+    ``"a/b"`` marks surface alternatives (always surfaces -- a slash list is
+    an explicit form list), a ``§``-prefixed token names a token class
+    (``§inf``, ``§ger``, ``§part``, ``§verb``, ``§noun``, ``§adj``, ``§subj``,
+    ``§subj2``), and every other word is matched as a surface in the first
+    variant and as a lemma in the second -- so ``volver a + §inf`` also fires
+    on *volvió a llamar*, where the surface list cannot cover every form.
+    """
+    if word.startswith("§"):
+        return _TOKEN_CLASSES.get(word, spec_pos("X"))
+    if "/" in word:
+        alts = word.split("/")
+        if lemma:
+            # The list mixes forms and base forms ("volver/vuelvo/vuelve"):
+            # the lemma variant lets *volvió* match an alternative the list
+            # spells only in the infinitive.
+            return {"any_of": [spec_surface(*alts), spec_lemma(*alts)]}
+        return spec_surface(*alts)
+    return spec_lemma(word) if lemma else spec_surface(word)
+
+
+def _focus_run(words, lemma):
+    "The conditions for one run of adjacent focus words."
+    return [_focus_condition(w, lemma) for w in words]
+
+
+# Token classes a focus list may name after "§".  Anything unknown falls back
+# to a spec no token matches, so a typo drops the row instead of matching
+# everything (the opposite failure is silent and much worse).
+#
+# Note there is deliberately no "§imp": es_core_news_md tags the imperative
+# mood inconsistently (Escriba as Imp, Hable as Sub, Vengan as Ind), so a mood
+# spec would miss most commands.  The one reliable command shape is the
+# negative one -- "no + present subjunctive, second person" -- which is
+# "§subj2".
+_TOKEN_CLASSES = {
+    "§inf": spec_morph(VerbForm="Inf"),
+    "§ger": spec_morph(VerbForm="Ger"),
+    "§part": spec_morph(VerbForm="Part"),
+    "§verb": spec_pos("VERB", "AUX"),
+    "§noun": spec_pos("NOUN", "PROPN"),
+    "§adj": spec_pos("ADJ"),
+    "§subj": spec_morph(Mood="Sub"),
+    "§subj2": spec_morph(Mood="Sub", Person="2"),
+}
+
+
+def _focus_specs(focus):
+    """
+    Candidate matcher specs derived from one row's focus list.
+
+    Focus vocabulary: plain words match adjacently (seq); one "..." marks a
+    bounded gap (left/right, up to 4 words); an "a/b" slash marks surface
+    alternatives.  A bare function word (para, como, que, por, con, sin)
+    never stands alone -- it fires on half the corpus -- so a single word
+    shorter than five characters is dropped unless it carries alternatives.
+    """
+    words = _focus_words(focus)
+    if not words:
+        return []
+    if words.count("...") == 1:
+        i = words.index("...")
+        left_w, right_w = words[:i], words[i + 1 :]
+        if not left_w or not right_w:
+            return []
+        specs = []
+        for lemma in (False, True):
+            spec = {
+                "left": _focus_run(left_w, lemma),
+                "right": _focus_run(right_w, lemma),
+                "min_gap": 0,
+                "max_gap": 4,
+            }
+            if spec not in specs:
+                specs.append(spec)
+        return specs
+    if "..." in words:
+        return []  # at most one gap anchor pair is expressible
+    if len(words) == 1 and len(words[0]) < 5 and "/" not in words[0]:
+        return []  # a bare short word fires everywhere -- never specific
+    specs = [{"seq": _focus_run(words, False)}]
+    lemma_spec = {"seq": _focus_run(words, True)}
+    if lemma_spec != specs[0]:
+        specs.append(lemma_spec)
+    return specs
+
+
+def _flash(spec, examples):
+    "True when spec fires on at least one of the row's example sentences."
+    for sentence in examples:
+        text = (sentence or "").strip()
+        if text and match_rule({"match": spec}, _tokens_for(text), text):
+            return True
+    return False
+
+
+def _load_data_rules():
+    """
+    Rules for the merged grammar-point rows (jlpt_data/grammar_es.json).
+
+    Specs are derived from each row's `focus` and kept only when they match
+    at least one of the row's own examples.
+    """
+    if not os.path.exists(_DATA_PATH):
+        return []
+    with open(_DATA_PATH, encoding="utf-8") as fh:
+        entries = json.load(fh)
+    rules = []
+    for item in entries:
+        name = item.get("name") or ""
+        if not name or _norm_name(name) in _HANDWRITTEN_NORMS:
+            continue  # already covered precisely by a hand-written rule
+        examples = [
+            e.strip() for e in (item.get("examples") or []) if (e or "").strip()
+        ]
+        if not examples:
+            continue
+        try:
+            validated = [
+                s for s in _focus_specs(item.get("focus")) if _flash(s, examples)
+            ]
+        except ImportError:
+            # spaCy or the Spanish model is not installed: nothing can be
+            # validated, and an unvalidated matcher is exactly what this
+            # layer refuses to ship.  The /grammar page still renders the
+            # hand-written rules, which need no tokeniser.
+            return []
+        if not validated:
+            continue
+        key = item.get("key") or name
+        zh_examples = [z for z in (item.get("example_zh") or []) if z]
+        # Pair each example with its Chinese gloss when the material carries
+        # one, so the library detail card can show a translation line.
+        if len(zh_examples) == len(examples):
+            library_examples = [
+                {"es": ex, "zh": z} for ex, z in zip(examples, zh_examples)
+            ]
+        else:
+            library_examples = list(examples)
+        rule = make_rule(
+            key,
+            name,
+            item.get("level") or "B1",
+            (item.get("meaning") or "").strip() or name,
+            {"any_of": validated} if len(validated) > 1 else validated[0],
+            zh=item.get("zh") or None,
+        )
+        # Library-page fields (the /grammar detail card renders them when
+        # present); the panel ignores keys it does not read.
+        rule["formation"] = (item.get("formation") or "").strip()
+        rule["notes"] = (item.get("notes") or "").strip()
+        rule["examples"] = library_examples
+        rules.append(rule)
+    return rules
+
+
+# The data rules are built on first use, not at import: _load_data_rules()
+# tokenizes the rows' examples, and this module is imported at app start-up
+# (lute/read/routes.py).
+_rules_lock = threading.RLock()
+_data_rules_cache = None
+_all_rules_cache = None
+
+
+def _get_data_rules():
+    "The data-driven rules, built on first use and memoised."
+    global _data_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _data_rules_cache is None:
+            _data_rules_cache = _load_data_rules()
+        return _data_rules_cache
+
+
+def _get_all_rules():
+    "Hand-written rules plus the validated data layer, built on first use."
+    global _all_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _all_rules_cache is None:
+            _all_rules_cache = list(_ES_RULES) + _get_data_rules()
+        return _all_rules_cache
 
 
 # ---- library export ----------------------------------------------------
 #
 # The /grammar page lists the whole corpus at once, where the panel lists
-# only what the current page happens to contain.  Same display fields as
-# the panel entries (minus the page-specific match offsets), so the page
-# can reuse the panel's markup and CSS.  The Spanish corpus is the
-# hand-written rules only -- there is no merged data layer yet.
-
-import json  # noqa: E402
-import os  # noqa: E402
-import threading  # noqa: E402
+# only what the current page happens to contain.
 
 _CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"]
 
@@ -491,7 +713,7 @@ def _library_entry(rule, display_lang, examples):
         text = (example.get("es") or "").strip()
         if text:
             rows.append({"text": text, "tr": _example_gloss(example, display_lang)})
-    return {
+    entry = {
         "key": rule["key"],
         "name": rule["name"],
         "level": rule["level"],
@@ -499,15 +721,29 @@ def _library_entry(rule, display_lang, examples):
         "examples": rows,
         "skipped": False,
     }
+    for field in ("formation", "notes"):
+        value = (rule.get(field) or "").strip()
+        if value:
+            entry[field] = value
+    return entry
 
 
 def library_entries(display_lang="en"):
-    "The whole Spanish grammar library, in CEFR order (A1 -> C2)."
+    """
+    The whole Spanish grammar library, in CEFR order (A1 -> C2).
+
+    Built on first use like the rules themselves, so an app start-up with
+    no Spanish books does not pay for the spaCy model.  Hand-written rules
+    take their examples from the golden set; the merged data rows carry
+    their own.
+    """
     golden = _golden_examples()
-    entries = []
+    rules = []
     for rule in _ES_RULES:
         examples = rule.get("examples") or golden.get(rule["key"]) or []
-        entries.append(_library_entry(rule, display_lang, examples))
+        rules.append((rule, examples))
+    rules += [(rule, rule.get("examples") or []) for rule in _get_data_rules()]
+    entries = [_library_entry(r, display_lang, ex) for r, ex in rules]
     ordered = sorted(
         enumerate(entries),
         key=lambda pair: (

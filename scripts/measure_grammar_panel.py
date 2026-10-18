@@ -64,7 +64,7 @@ def engine_functions(name):
     elif name == "es":
         from lute.read.render import grammar_analysis_es as ES  # noqa: E402
 
-        pair = (ES.analyze_spanish, lambda: ES._ES_RULES)
+        pair = (ES.analyze_spanish, ES._get_all_rules)
     elif name == "fr":
         from lute.read.render import grammar_analysis_fr as FR  # noqa: E402
 
