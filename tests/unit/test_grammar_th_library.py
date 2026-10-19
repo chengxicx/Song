@@ -114,13 +114,16 @@ def _occurs_at_boundary(sentence, literal, mode):
     Whether the sentence uses the literal in a way the row may match.
 
     A row's literal is only evidence of the construction when it sits where
-    the row says it may: as a whole word, or at the start of one.
+    the row says it may: as a whole word, at the start of one, or opening
+    one that continues past it ("prefix" -- นัก- inside นักเรียน).
     """
     starts, ends = _token_offsets(sentence)
     for hit in re.finditer(re.escape(literal), sentence):
         if hit.start() not in starts:
             continue
         if mode == "start" or hit.end() in ends:
+            return True
+        if mode == "prefix" and hit.end() not in ends:
             return True
     return False
 
@@ -192,13 +195,15 @@ def test_unrelated_text_does_not_raise_the_noisy_rows():
 # The corpus regex runs over raw text, so a short literal also turns up
 # inside longer words.  Every rule now says where its literal may sit:
 # whole token for particles (ขา, สิ, ที), token start for prefixes and
-# compound heads (ความ, นัก, ฤดู, เท่า).
+# compound heads (ความ, ฤดู, เท่า), and a stricter "prefix" -- start a
+# token *and* run on into it -- for morphemes that never stand alone
+# (นัก-, ผู้-, ความ-, โรง-).
 
 
 def test_boundary_values_are_known():
-    "Only the two documented modes, and only where the row has a literal."
+    "Only the documented modes, and only where the row has a literal."
     for row in corpus():
-        assert row.get("boundary") in (None, "token", "start"), row["key"]
+        assert row.get("boundary") in (None, "token", "start", "prefix"), row["key"]
         if row.get("boundary"):
             assert row.get("focus"), row["key"]
 
@@ -246,6 +251,25 @@ def test_prefix_rows_still_match_the_first_element_of_a_compound():
     for sentence, key in cases:
         keys = {c["key"] for c in th.analyze_thai(sentence, "en")}
         assert key in keys, f"{key} lost on {sentence}"
+
+
+def test_agent_prefix_ignores_the_same_spelling_standing_alone():
+    """
+    บ่อยนัก "not at all" is one word นัก on its own; นักเรียน is the prefix
+    inside a longer one.  Found in production: a real page fired the
+    นัก- card on บ่อยนัก, where the prefix reading is the wrong one.
+    """
+    try:
+        th._tokenizer()  # pylint: disable=protected-access
+    except ImportError:
+        pytest.skip("pythainlp is not installed")
+
+    for sentence in ("ผมไม่ค่อยไปงานเลี้ยงบ่อยนัก", "ไม่ค่อยดีนัก"):
+        keys = {c["key"] for c in th.analyze_thai(sentence, "en")}
+        assert "th-prefix-nak" not in keys, sentence
+    assert "th-prefix-nak" in {
+        c["key"] for c in th.analyze_thai("เขาเป็นนักร้องที่มีชื่อเสียง", "en")
+    }
 
 
 def test_boundary_is_opt_in_for_regex_specs():

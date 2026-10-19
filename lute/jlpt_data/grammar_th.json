@@ -1636,7 +1636,7 @@
   "focus": [
    "นัก"
   ],
-  "boundary": "start"
+  "boundary": "prefix"
  },
  {
   "key": "th-head-bai",
@@ -1673,7 +1673,7 @@
   "focus_all": [
    "โรง"
   ],
-  "boundary": "start"
+  "boundary": "prefix"
  },
  {
   "key": "th-prefix-kan",
@@ -1716,7 +1716,7 @@
   "focus_all": [
    "ความ"
   ],
-  "boundary": "start"
+  "boundary": "prefix"
  },
  {
   "key": "th-word-order-ordinal",
@@ -3783,7 +3783,7 @@
   "focus_all": [
    "ผู้"
   ],
-  "boundary": "start"
+  "boundary": "prefix"
  },
  {
   "key": "th-nominalizer-thi",
