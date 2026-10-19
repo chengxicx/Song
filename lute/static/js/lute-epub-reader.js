@@ -45,6 +45,9 @@
   // sentence play buttons tts.js injects.
   const SKIP_SELECTOR = "rt, rp, script, style, .lute-sentence-play-btn";
 
+  // The <link> this module owns in <head> for the current book.
+  const STYLESHEET_ID = "lute-epub-stylesheet";
+
   // Block containers whose inline content is split into
   // .textsentence spans (see wrapSentences).
   const BLOCK_TAGS = new Set([
@@ -58,10 +61,38 @@
     return WHITESPACE.test(ch);
   }
 
+  /**
+   * Put the book's scoped stylesheet in the document.
+   *
+   * The chapter arrives as an innerHTML swap into #thetext, and a
+   * <link> carried at the top of that fragment does not survive it --
+   * the chapter rendered with none of the book's own styling, which is
+   * the one thing reader mode exists to keep.  The URL rides on the
+   * container as data-epub-css instead, and the <link> is created here.
+   *
+   * One element is reused for every chapter: a book's chapters share a
+   * stylesheet, and switching books just points it at the new one.
+   */
+  function ensureStylesheet(root) {
+    const href = root.dataset.epubCss;
+    if (!href) return;
+    let link = document.getElementById(STYLESHEET_ID);
+    if (link && link.getAttribute("href") === href) return;
+    if (!link) {
+      link = document.createElement("link");
+      link.id = STYLESHEET_ID;
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    link.setAttribute("href", href);
+  }
+
   function mount(root) {
     if (!root || root.dataset.epubMounted) return;
     const dataNode = document.getElementById("lute-epub-tokens");
     if (!dataNode) return;
+
+    ensureStylesheet(root);
 
     let tokens;
     try {

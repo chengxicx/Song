@@ -80,6 +80,15 @@ def main():
                   return w ? {text: w.textContent, cls: w.className} : null;
                 })(),
                 sentenceIds: sentences.map(s => s.getAttribute('data-sentence-id')),
+                stylesheet: (() => {
+                  const links = document.querySelectorAll(
+                    'link#lute-epub-stylesheet');
+                  return {
+                    count: links.length,
+                    href: links.length ? links[0].getAttribute('href') : null,
+                    inHead: links.length ? links[0].parentElement.tagName : null,
+                  };
+                })(),
               };
             }"""
         )
@@ -87,6 +96,15 @@ def main():
         check("no page errors", not errors, " %s" % errors[:1])
         check("chapter mounted", state["mounted"] == "1", " %s" % state["mounted"])
         check("no mismatch reported", state["mismatch"] is None, " %s" % state["mismatch"])
+        # A <link> inside the swapped fragment is dropped by innerHTML,
+        # so the book's stylesheet is added to <head> by the mount.
+        check(
+            "the chapter's stylesheet is added to <head>",
+            state["stylesheet"]["count"] == 1
+            and state["stylesheet"]["inHead"] == "HEAD"
+            and state["stylesheet"]["href"] == "/static/epub/fixture/lute.css",
+            " %s" % (state["stylesheet"],),
+        )
         check(
             "chapter text preserved exactly",
             state["text"] == state["original"],

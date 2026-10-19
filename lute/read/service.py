@@ -7,7 +7,7 @@ import re
 from collections import defaultdict
 from datetime import datetime
 import functools
-from flask import current_app
+from flask import current_app, url_for
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import StaleDataError
 from lute.models.term import Term, Status
@@ -1116,7 +1116,7 @@ class Service:
         return {
             "page_num": pagenum,
             "chapter_html": chapter_html,
-            "css_path": css_path_for(epub_path),
+            "css_url": url_for("static", filename=css_path_for(epub_path)),
             "tokens": tokens,
             "substitutions": subs,
         }
