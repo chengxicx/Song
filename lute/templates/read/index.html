@@ -30,6 +30,10 @@
   window.dispatchEvent(new Event("pdfjs-ready"));
 </script>
 <script type="text/javascript" src="{{ vstatic('js/pdf-reader.js') }}" charset="utf-8" defer></script>
+{% elif book_type == "epub" %}
+{# Reader mode: word spans are injected into the chapter's own markup,
+   so the reader keeps the book's layout (see lute-epub-reader.js). #}
+<script type="text/javascript" src="{{ vstatic('js/lute-epub-reader.js') }}" charset="utf-8" defer></script>
 {% endif %}
 <script type="text/javascript" src="{{ vstatic('js/resize.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/text-options.js') }}" charset="utf-8" defer></script>
@@ -148,7 +152,7 @@
   {% endif %}
 
   <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
-  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %} class="{% if book_type == 'manga' %}manga-text-container{% elif book_type == 'pdf' %}pdf-text-container{% endif %}">
+  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %} class="{% if book_type == 'manga' %}manga-text-container{% elif book_type == 'pdf' %}pdf-text-container{% elif book_type == 'epub' %}epub-text-container{% endif %}">
     ...
   </div>
 
@@ -261,7 +265,7 @@
     // there as a fixed overlay once the page is scrolled to the bottom.
     if (theText) {
       let mid;
-      if (typeof _videoScrollMode === "function" && _videoScrollMode()) {
+      if (typeof _scrollMode === "function" && _scrollMode()) {
         mid = Math.round(window.innerHeight / 2);
       } else {
         const tr = theText.getBoundingClientRect();
@@ -335,6 +339,7 @@
 
   window.addEventListener("scrollend", function(e) {
     scrollYBeforeReload = window.scrollY;
+    _saveEpubScroll();
   });
 
   /**
@@ -560,6 +565,7 @@
 
   window.addEventListener("beforeunload", function() {
     _updateStartDateIfNeeded();
+    _saveEpubScroll();
     LutePopups.close_all_popups();
   });
 
@@ -810,7 +816,10 @@
     set_page_fraction();
     set_footer_control_visibility();
     show_hide_title(actualPage);
-    $("html, body").animate({ scrollTop: 0 });
+    // Reader-mode EPUB chapters restore their own scroll position
+    // below; scrolling them to the top here would also fight that
+    // restore (this is a JS animation, not an instant jump).
+    if (!_epubScrollMode()) $("html, body").animate({ scrollTop: 0 });
 
     // Re-flow the page into screen-height groups now that the content
     // is swapped in and laid out (fonts/status classes are applied above).
@@ -825,6 +834,7 @@
     const storedScreen = initial ? _storedScreenFor(actualPage) : null;
     requestAnimationFrame(() => {
       _splitToScreens();
+      if (initial) _restoreEpubScroll();
       if (storedScreen !== null &&
           storedScreen > 0 &&
           storedScreen !== curScreen &&
@@ -1035,11 +1045,20 @@
                 || t.classList.contains("pdf-text-container"));
   };
 
+  // Reader-mode EPUB chapters are one continuously scrolling page per
+  // chapter (one Lute page per chapter), so there is nothing to
+  // sub-paginate: the whole page scrolls, like a media book in
+  // scrolling mode.
+  function _epubScrollMode() {
+    const t = document.getElementById("thetext");
+    return !!t && t.classList.contains("epub-text-container");
+  }
+
   // Video / YouTube / Bilibili books read in a plain scrolling pane by
   // default; the fit-to-screen arrow paging is used only while
   // audio-only mode is active (the player toggles .yt-audio-mode on
   // its container).
-  const _videoScrollMode = () => {
+  function _videoScrollMode() {
     if (typeof LUTE_BOOK_TYPE === "undefined") return false;
     if (
       LUTE_BOOK_TYPE !== "youtube" &&
@@ -1049,7 +1068,14 @@
       return false;
     const c = document.querySelector(".youtube-player-container");
     return !c || !c.classList.contains("yt-audio-mode");
-  };
+  }
+
+  // Anything that reads as a plain scrolling document rather than a
+  // fit-to-screen paged one: media books outside audio-only mode, and
+  // reader-mode EPUB chapters.
+  function _scrollMode() {
+    return _videoScrollMode() || _epubScrollMode();
+  }
 
   // In scrolling mode the side page arrows would otherwise hover
   // mid-viewport over the flowing text for the whole page.  Instead,
@@ -1061,7 +1087,7 @@
   // enable_page_nav_links path still unhides them for fixed pages).
   function _updateScrollModeArrows() {
     if (!navSidePrev || !navSideNext) return;
-    if (typeof _videoScrollMode !== "function" || !_videoScrollMode()) return;
+    if (typeof _scrollMode !== "function" || !_scrollMode()) return;
     const doc = document.documentElement;
     const maxScroll = Math.max(0, doc.scrollHeight - window.innerHeight);
     const atBottom = window.scrollY >= maxScroll - 60;
@@ -1080,7 +1106,7 @@
   // skips this helper.
   function _updateSideArrows() {
     if (!navSidePrev || !navSideNext) return;
-    if (typeof _videoScrollMode === "function" && _videoScrollMode()) return;
+    if (typeof _scrollMode === "function" && _scrollMode()) return;
     const pagenum = parseInt($("#page_num").val());
     const atFirstScreen =
       pagenum <= 1 && (subScreens.length === 0 || curScreen === 0);
@@ -1256,6 +1282,34 @@
     }
   }
 
+  // ---- Reader-mode EPUB scroll position ------------------------------
+  // One chapter is one Lute page, so the sub-screen machinery has
+  // nothing to remember here; the reader's place *inside* the chapter
+  // is the document scroll offset, kept per book (a book is a chapter).
+  function _epubScrollKey() {
+    return "lute-epub-scroll-" + ($("#book_id").val() || "0");
+  }
+
+  function _restoreEpubScroll() {
+    if (!_epubScrollMode()) return;
+    const y = parseFloat(localStorage.getItem(_epubScrollKey()));
+    if (!Number.isFinite(y) || y <= 0) return;
+    // One more frame: the chapter's images may still be settling, and
+    // scrolling to a y the document does not have yet would clamp.
+    requestAnimationFrame(function () {
+      window.scrollTo(0, y);
+    });
+  }
+
+  function _saveEpubScroll() {
+    if (!_epubScrollMode()) return;
+    try {
+      localStorage.setItem(_epubScrollKey(), String(Math.round(window.scrollY)));
+    } catch (e) {
+      /* storage unavailable (private mode etc.) */
+    }
+  }
+
   // anchor, when given, is a <p> already inside the (re-swapped) #thetext
   // that should stay on screen: after re-splitting, curScreen is restored
   // to the group containing it instead of jumping back to screen 0.
@@ -1286,7 +1340,7 @@
       _fitMangaPage();
       return;
     }
-    if (_videoScrollMode()) {
+    if (_scrollMode()) {
       // Scrolling mode: show every paragraph and let the whole page
       // scroll naturally (see the .video-scroll-mode CSS rules).  The
       // reading-end controls still appear on the book's last page.

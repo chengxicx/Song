@@ -1,0 +1,28 @@
+{# One reader-mode EPUB chapter: the chapter's own (sanitised) markup,
+   with Lute word spans injected into its text nodes by
+   lute-epub-reader.js.  The chapter keeps the book's layout -- that is
+   the point of reader mode -- so its scoped stylesheet is loaded here;
+   everything else about the page is the normal reading screen. #}
+<link rel="stylesheet" href="{{ url_for('static', filename=css_path) }}">
+
+<div id="epub-chapter">{{ chapter_html | safe }}</div>
+
+{# The token stream, in render order.  Each entry is
+   [display_text, wo_id, status, sentence_number, paragraph_number];
+   0 / -1 mean "not a word".  Embedded rather than fetched: the
+   fragment arrives with one request, and the front end must not render
+   the chapter before it can align the two streams. #}
+<script type="application/json" id="lute-epub-tokens">{{ tokens | tojson }}</script>
+
+<script>
+  // Inject the word spans into the chapter's text nodes, then hand over
+  // to the normal reading-page pipeline: status colours, cursor
+  // restore, furigana.  restore_*, not reset_cursor_marker() -- see
+  // read/page_content.html.
+  if (window.EpubReader) {
+    window.EpubReader.mount(document.getElementById("epub-chapter"));
+  }
+  parent.add_status_classes();
+  parent.restore_cursor_marker();
+  if (parent.lute_furigana_annotate) parent.lute_furigana_annotate();
+</script>

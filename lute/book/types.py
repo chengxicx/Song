@@ -175,7 +175,9 @@ BOOK_TYPES = {
         "paths": (
             '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>'
         ),
-        "stored": False,
+        # Reader-mode EPUB chapters are stored with book_type "epub";
+        # a plain-text EPUB import stays "" (the type alias "text").
+        "stored": True,
         "import_type": True,
         "selectable": False,
         "subtitle": False,

@@ -80,6 +80,13 @@ class Book(
     #   imported PDF file, e.g. "pdf/<uuid>/file.pdf".
     pdf_path = db.Column("BkPdfPath", db.String)
 
+    # EPUB reader-mode book fields (see migration 20261019_add_book_epub_field.sql).
+    # epub_path is the relative path under the static folder of the
+    #   chapter's reader-ready HTML, e.g. "epub/<uuid>/ch/003.html".
+    #   Like manga/pdf, the page text is not what gets displayed: the
+    #   reading screen injects word spans into this markup.
+    epub_path = db.Column("BkEpubPath", db.String)
+
     language = db.relationship("Language")
     texts = db.relationship(
         "Text",

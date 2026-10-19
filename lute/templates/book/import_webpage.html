@@ -98,6 +98,18 @@
     font-size: .85rem; color: var(--font-color, #444); cursor: pointer; user-select: none;
   }
 
+  /* Reader-mode switch: a labelled checkbox plus one line of help, so
+     the difference from the default (plain-text) import is visible
+     without a tooltip. */
+  .epub-reader-toggle {
+    display: flex; align-items: center; gap: .4rem;
+    font-size: .9rem; color: var(--font-color, #222); cursor: pointer; user-select: none;
+  }
+  .epub-reader-hint {
+    margin-top: .25rem; font-size: .8rem; line-height: 1.35;
+    color: var(--font-color, #888); opacity: .85;
+  }
+
   .epub-preview-meta { font-size: .92rem; color: var(--font-color, #222); margin-bottom: .8rem; }
   .epub-chapter-tools { display: flex; align-items: center; gap: 1rem; margin-bottom: .4rem; }
   .epub-chapter-list {
@@ -546,6 +558,18 @@
         <input type="text" id="epub_tag" name="epub_tag" class="form-control">
       </div>
     </div>
+    <div class="irow">
+      <label class="ilbl">{{ t('Reading mode') }}</label>
+      <div class="ictrl">
+        <label class="epub-reader-toggle">
+          <input type="checkbox" id="epub_reader_mode" name="epub_reader_mode" value="1">
+          {{ t('Keep the chapter’s original layout and images') }}
+        </label>
+        <div class="epub-reader-hint">
+          {{ t('Lute’s word lookups are added on top of the rendered chapter. A chapter becomes one continuously scrolling page, so progress is tracked per chapter instead of per page.') }}
+        </div>
+      </div>
+    </div>
   </div>
   <div class="import-actions">
     <input type="hidden" name="import_type" value="epub">
@@ -870,6 +894,9 @@
       fd.append('epub_title', $('#epub_title').val());
       fd.append('epub_tag', $('#epub_tag').val() || '');
       fd.append('chapters', JSON.stringify(selected));
+      if ($('#epub_reader_mode').prop('checked')) {
+        fd.append('epub_reader_mode', '1');
+      }
       fetch('/book/import/epub', { method: 'POST', body: fd })
         .then(r => r.json())
         .then(data => {
