@@ -180,6 +180,31 @@ def test_missing_package_falls_back_to_the_old_static_location(
         os.replace(legacy, package)
 
 
+def test_chapter_stylesheet_rides_on_the_container(
+    app, app_context, english, client, tmp_path
+):
+    """
+    The fragment is swapped into #thetext with innerHTML, and a <link>
+    at its top does not survive that swap -- the chapter rendered with
+    none of the book's styling.  The URL therefore travels on the
+    container as data-epub-css and lute-epub-reader.js creates the
+    <link> in <head>.
+    """
+    book = _import_reader_book(app, client, english, tmp_path)
+    fragment = client.get(f"/read/start_reading/{book.id}/1").get_data(as_text=True)
+
+    soup = BeautifulSoup(fragment, "html.parser")
+    container = soup.find(id="epub-chapter")
+    assert container is not None
+    href = container.get("data-epub-css")
+    assert href and href.endswith("/lute.css")
+    assert href.startswith("/static/epub/")
+    assert soup.find("link") is None, "a <link> in the fragment would be dropped"
+
+    # And the URL it names really is served.
+    assert client.get(href).status_code == 200
+
+
 def test_reader_mode_reading_page_renders_chapter_container(
     app, app_context, english, client, tmp_path
 ):

@@ -1,11 +1,15 @@
 {# One reader-mode EPUB chapter: the chapter's own (sanitised) markup,
    with Lute word spans injected into its text nodes by
    lute-epub-reader.js.  The chapter keeps the book's layout -- that is
-   the point of reader mode -- so its scoped stylesheet is loaded here;
-   everything else about the page is the normal reading screen. #}
-<link rel="stylesheet" href="{{ url_for('static', filename=css_path) }}">
+   the point of reader mode -- so its scoped stylesheet has to be in the
+   document.
 
-<div id="epub-chapter">{{ chapter_html | safe }}</div>
+   The stylesheet URL rides on the container as a data attribute rather
+   than a <link> here: this fragment is swapped into #thetext with
+   innerHTML, and a <link> at the top of a fragment does not survive
+   that (the chapter rendered unstyled for exactly that reason).
+   lute-epub-reader.js adds the <link> to <head> when it mounts. #}
+<div id="epub-chapter" data-epub-css="{{ css_url }}">{{ chapter_html | safe }}</div>
 
 {# The token stream, in render order.  Each entry is
    [display_text, wo_id, status, sentence_number, paragraph_number];
