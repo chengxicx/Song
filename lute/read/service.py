@@ -18,6 +18,7 @@ from lute.dict import service as dict_service
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.read import manga_columns
+from lute.book.epub_extract import css_path_for
 from lute.term.model import Repository
 from lute.term import pos_tags
 from lute.utils.manga_images import image_path_for_page
@@ -256,6 +257,32 @@ def _manga_page_items(blocks):
         for line_items in block["line_items"]
         for ti in line_items
     ]
+
+
+def _epub_token(ti):
+    """
+    One token of a reader-mode EPUB chapter, as the front end needs it.
+
+    A compact array instead of a dict: a chapter can hold thousands of
+    tokens and the whole list is embedded in the page.
+
+    [display_text, wo_id, status, sentence_number, paragraph_number]
+
+    wo_id is 0 and status -1 for non-word items (punctuation, spaces).
+    display_text is exactly what a text page would render, so the front
+    end can concatenate the list and match it against the chapter's
+    text nodes character by character.
+    """
+    if ti.is_word:
+        status = -1 if ti.wo_status is None else ti.wo_status
+        return [
+            ti.html_display_text,
+            ti.wo_id or 0,
+            status,
+            ti.sentence_number,
+            ti.paragraph_number,
+        ]
+    return [ti.html_display_text, 0, -1, ti.sentence_number, ti.paragraph_number]
 
 
 # A converted dictionary entry is the headword, the part of speech,
@@ -1045,6 +1072,43 @@ class Service:
         items = _pdf_page_items(word_contexts)
         self._save_new_rendered_terms(items)
         return self._mark_rendered_page_unknowns_known(dbbook, items, finalize)
+
+    def epub_page_context(self, dbbook, pagenum, track_page_open=False):
+        """
+        Build the render context for one reader-mode EPUB chapter: the
+        chapter's sanitised HTML, its scoped stylesheet, and the token
+        stream the front end aligns to the chapter's text nodes.
+
+        Returns None if the book has no extracted chapter at that page.
+        """
+        epub_path = (dbbook.epub_path or "").strip("/")
+        if not epub_path or not 1 <= pagenum <= dbbook.page_count:
+            return None
+        chapter_file = os.path.join(current_app.static_folder, epub_path)
+        if not os.path.isfile(chapter_file):
+            return None
+
+        # Same bookkeeping as a text page: page-open tracking, sentence
+        # loading (word counts), and saving new status-0 terms so every
+        # rendered word already has its data-wid.
+        paragraphs = self._get_reading_data(dbbook, pagenum, track_page_open)
+
+        with open(chapter_file, encoding="utf-8") as f:
+            chapter_html = f.read()
+
+        tokens = [
+            _epub_token(ti)
+            for para in paragraphs
+            for sentence in para
+            for ti in sentence
+        ]
+
+        return {
+            "page_num": pagenum,
+            "chapter_html": chapter_html,
+            "css_path": css_path_for(epub_path),
+            "tokens": tokens,
+        }
 
     def _save_new_rendered_terms(self, items):
         """

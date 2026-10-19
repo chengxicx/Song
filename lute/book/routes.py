@@ -973,9 +973,10 @@ def import_epub():
     tags = _parse_tagify_tags(request.form.get("epub_tag", ""))
     title = (request.form.get("epub_title") or "").strip()
     selected = selected_chapter_indices(request.form.get("chapters"))
+    reader_mode = _truthy_form_value(request.form.get("epub_reader_mode"))
     try:
         imported, failed, book_title, last_error = import_epub_chapters(
-            epub_file, title, language_id, tags, selected
+            epub_file, title, language_id, tags, selected, reader_mode
         )
     except BookImportException as e:
         return jsonify({"success": False, "error": e.message})
@@ -1006,9 +1007,10 @@ def _import_epub_direct():
         return redirect("/book/import_webpage", 302)
     tags = _parse_tagify_tags(request.form.get("epub_tag", ""))
     title = (request.form.get("epub_title") or "").strip()
+    reader_mode = _truthy_form_value(request.form.get("epub_reader_mode"))
     try:
         imported, failed, book_title, last_error = import_epub_chapters(
-            epub_file, title, language_id, tags, None
+            epub_file, title, language_id, tags, None, reader_mode
         )
     except BookImportException as e:
         flash(e.message, "notice")
@@ -1032,6 +1034,11 @@ def _epub_file_from_request():
     if not (f.filename or "").lower().endswith(".epub"):
         return None
     return f
+
+
+def _truthy_form_value(raw):
+    "True for the values an HTML checkbox submits when it is checked."
+    return (raw or "").strip().lower() in ("1", "on", "true", "yes")
 
 
 @bp.route("/archive/<int:bookid>", methods=["POST"])

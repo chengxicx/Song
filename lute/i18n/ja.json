@@ -843,5 +843,8 @@
   "Optional: paste the text being read": "任意：読み上げている本文を貼り付け",
   "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty for plain transcription.": "この音声で読み上げている本文（教科書の課文など）を貼り付けてください。字幕はあなたのテキストを使い、音声認識はタイミングだけを担当します——人名や同音異義語も正確になります。空欄なら通常の文字起こしのみ行います。",
   "Reference text (optional)": "参照テキスト（任意）",
-  "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty to re-transcribe plainly.": "この音声で読み上げている本文（教科書の課文など）を貼り付けてください。字幕はあなたのテキストを使い、音声認識はタイミングだけを担当します——人名や同音異義語も正確になります。空欄なら通常の文字起こしをやり直します。"
+  "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty to re-transcribe plainly.": "この音声で読み上げている本文（教科書の課文など）を貼り付けてください。字幕はあなたのテキストを使い、音声認識はタイミングだけを担当します——人名や同音異義語も正確になります。空欄なら通常の文字起こしをやり直します。",
+  "Reading mode": "閲覧モード",
+  "Keep the chapter’s original layout and images": "章の元のレイアウトと画像を保持する",
+  "Lute’s word lookups are added on top of the rendered chapter. A chapter becomes one continuously scrolling page, so progress is tracked per chapter instead of per page.": "再現した章の上に Lute の語句検索を重ねます。1 章がそのまま 1 つの連続スクロールページになるため、進捗はページ単位ではなく章単位で記録されます。"
 }

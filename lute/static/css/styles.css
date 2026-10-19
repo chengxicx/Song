@@ -1280,7 +1280,62 @@ div#thetext.manga-text-container::-webkit-scrollbar {
     display: none;                  /* Chrome/Safari/Edge */
 }
 
-div#thetext p {
+/* ---- Reader-mode EPUB ---------------------------------------------
+   The chapter keeps the book's own markup and styles (scoped to
+   .epub-body at import time, see book/epub_css.py).  These rules only
+   add what the scoping cannot know about: the container's role in the
+   reading page.  They are deliberately id-anchored so a book stylesheet
+   scoped to `.epub-body ...` cannot override them. */
+div#thetext .epub-body {
+    /* Absolute-positioned decorations in EPUB CSS must resolve against
+       the chapter, not the page, and a book's z-index must never paint
+       over the reader's chrome. */
+    position: relative;
+    isolation: isolate;
+    /* A readable measure; the reading pane can be very wide. */
+    max-width: 46rem;
+    margin: 0 auto;
+    overflow-wrap: break-word;
+}
+
+div#thetext .epub-body img,
+div#thetext .epub-body svg,
+div#thetext .epub-body video,
+div#thetext .epub-body table {
+    max-width: 100%;
+    height: auto;
+}
+
+div#thetext .epub-body pre {
+    white-space: pre-wrap;
+}
+
+/* Sentence wrappers are injected around the book's own inline markup,
+   so they must never introduce a box of their own. */
+div#thetext .epub-body span.textsentence {
+    display: inline;
+}
+
+/* The injected spans must not bring the text page's fixed metrics with
+   them.  A text page has no inline text of its own -- every glyph is a
+   sized textitem, and the run between two of them is deliberately
+   collapsed to zero -- but a chapter *does* have real text: the spaces
+   between words are ordinary text nodes, so `font-size: 0%` would erase
+   every gap and print the chapter as one long word.  For the same
+   reason a word must not be pinned to the reader's 20px default: a
+   chapter's headings, asides and footnotes carry their own sizes.
+   Scaling `.epub-body` (text-options.js) is what resizes the text. */
+div#thetext.epub-text-container span.textsentence,
+div#thetext.epub-text-container span.textitem {
+    font-size: inherit;
+}
+
+/* Text-book pages render one <p> per paragraph directly inside
+   #thetext, and every character of it is a sized textitem span: the
+   paragraph itself must not add its own type size.  Scoped to direct
+   children so reader-mode EPUB chapters (whose <p>s are the book's own,
+   with real inline text) keep their typography. */
+div#thetext > p {
     line-height: 1.25;
     margin-top: 1em;
     margin-bottom: 1em;

@@ -843,5 +843,8 @@
   "Optional: paste the text being read": "선택: 낭독하는 본문을 붙여넣기",
   "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty for plain transcription.": "이 녹음에서 읽는 본문(예: 교과서课文)을 붙여넣으세요. 자막은 제공한 텍스트를 사용하고 음성 인식은 시간축만 담당합니다——인명과 동음이의어도 정확해집니다. 비우면 일반 전사만 진행합니다.",
   "Reference text (optional)": "참조 텍스트(선택)",
-  "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty to re-transcribe plainly.": "이 녹음에서 읽는 본문(예: 교과서课文)을 붙여넣으세요. 자막은 제공한 텍스트를 사용하고 음성 인식은 시간축만 담당합니다——인명과 동음이의어도 정확해집니다. 비우면 일반 전사를 다시 진행합니다."
+  "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty to re-transcribe plainly.": "이 녹음에서 읽는 본문(예: 교과서课文)을 붙여넣으세요. 자막은 제공한 텍스트를 사용하고 음성 인식은 시간축만 담당합니다——인명과 동음이의어도 정확해집니다. 비우면 일반 전사를 다시 진행합니다.",
+  "Reading mode": "보기 모드",
+  "Keep the chapter’s original layout and images": "장의 원래 레이아웃과 이미지 유지",
+  "Lute’s word lookups are added on top of the rendered chapter. A chapter becomes one continuously scrolling page, so progress is tracked per chapter instead of per page.": "재현된 장 위에 Lute의 단어 조회를 덧입힙니다. 한 장이 하나의 연속 스크롤 페이지가 되므로 진행률은 페이지가 아니라 장 단위로 기록됩니다."
 }

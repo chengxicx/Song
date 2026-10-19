@@ -8,16 +8,20 @@ that opens on the series overview page.
 """
 
 import json
+from io import BytesIO
+
+from flask import current_app
 
 from lute.db import db
 from lute.book.model import Book
 from lute.book.service import Service as BookService
 from lute.book.epub_parser import parse_epub, chapter_book_title
+from lute.book.epub_extract import extract_epub_package
 from lute.models.repositories import UserSettingRepository
 
 
 def import_epub_chapters(
-    epub_file, title, language_id, tags, selected_indices=None
+    epub_file, title, language_id, tags, selected_indices=None, reader_mode=False
 ):  # pylint: disable=too-many-locals
     """
     Create one book per chapter of the EPUB.
@@ -26,9 +30,16 @@ def import_epub_chapters(
     werkzeug FileStorage).  When selected_indices is a list, only
     those chapter indices are imported; None imports every chapter.
 
+    reader_mode keeps the chapter markup: each book is stored as
+    book_type "epub" with the chapter's sanitised HTML (and the
+    chapter's own CSS) extracted under static/epub/<uuid>/, and its
+    single page is the whole chapter -- the reading screen injects word
+    spans into that markup instead of rendering the flattened text.
+
     Returns (imported_count, failed_count, book_title, last_error).
     """
-    data = parse_epub(epub_file.stream)
+    raw = epub_file.stream.read()
+    data = parse_epub(BytesIO(raw))
     book_title = (
         (title or "").strip() or data.title or _filename_base(epub_file.filename)
     )
@@ -39,6 +50,10 @@ def import_epub_chapters(
     if selected_indices is not None:
         wanted = set(selected_indices)
         chapters = [c for c in chapters if c.index in wanted]
+
+    extracted = None
+    if reader_mode and chapters:
+        extracted = extract_epub_package(raw, chapters, current_app.static_folder)
 
     svc = BookService()
     imported = 0
@@ -52,6 +67,17 @@ def import_epub_chapters(
         )
         b.source_uri = epub_file.filename
         b.text = c.text
+        if extracted is not None:
+            chapter = extracted.chapters.get(c.index)
+            if chapter is None:
+                failed += 1
+                last_error = f"Chapter {c.index + 1} could not be extracted."
+                continue
+            b.book_type = "epub"
+            b.epub_path = chapter["html"]
+            # Text from the sanitised markup, so the token stream the
+            # reading screen builds matches the DOM it injects into.
+            b.text = chapter["text"]
         b.book_tags = chapter_tags
         b.threshold_page_tokens = 250
         b.split_by = "paragraphs"
