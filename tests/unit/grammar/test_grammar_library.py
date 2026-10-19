@@ -410,7 +410,8 @@ def test_merged_corpora_translate_every_example(lang):
     back-filled from ``scripts/grammar_materials_<lang>/example_en.json``
     because those corpora shipped none, which left the default English page
     quoting bare sentences while the Chinese page translated them.  Korean
-    is deliberately not pinned here: it is still golden-only.
+    is a different shape and has its own check below; these four also stay
+    golden-only for it.
     """
     module = importlib.import_module("lute.read.render.grammar_analysis_" + lang)
     for display in ("en", "zh"):
@@ -419,6 +420,30 @@ def test_merged_corpora_translate_every_example(lang):
         bare = [row for row in rows if not (isinstance(row, dict) and row.get("tr"))]
         assert bare == [], f"{lang}/{display}: {len(bare)} examples without a gloss"
         assert all(row["text"].strip() for row in rows)
+
+
+def test_korean_library_translates_every_example():
+    """
+    Korean glosses arrive in two rounds, and both halves are pinned here.
+
+    The keyed material filled ``example_zh[0]`` for every row -- enough for
+    the panel, which quotes one 参考例句 -- while the library page shows
+    *every* sentence a row ships, so the second and third examples were
+    still bare Korean under a Chinese heading.  The sentence map
+    (``scripts/grammar_materials_ko/zh_example_sentences*.json``) fills
+    those, keyed by the Korean sentence itself so a translation can never
+    land on the wrong one.
+    """
+    ko = importlib.import_module("lute.read.render.grammar_analysis_ko")
+    try:
+        ko._get_tokenizer()  # pylint: disable=protected-access
+    except ImportError:
+        pytest.skip("the Korean parser is not installed")
+    for display in ("zh", "en"):
+        rows = [row for e in ko.library_entries(display) for row in e["examples"]]
+        assert rows, f"ko/{display}: no examples"
+        bare = [row for row in rows if not (isinstance(row, dict) and row.get("tr"))]
+        assert bare == [], f"ko/{display}: {len(bare)} examples without a gloss"
 
 
 @pytest.mark.parametrize("lang", ("es", "fr", "de", "ru"))
