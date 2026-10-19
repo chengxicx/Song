@@ -1082,5 +1082,215 @@
   "level": "B1",
   "formation": "tel / telle / tels / telles + que",
   "notes": "性数与被修饰的名词一致（les sports tels que...）。也可表示「正如」：tel qu'il est（就像他本来的样子）。"
+ },
+ {
+  "key": "fgm_puisquesinceas__861271",
+  "name": "puisque (since, as)",
+  "slug": "puisque",
+  "meaning": "cause the listener is assumed to know already: since, as",
+  "type": "composite",
+  "examples": [
+   "Il n'y a rien d'extraordinaire à ce qu'ils se ressemblent puisqu'ils sont cousins.",
+   "Je ne pourrai pas assister à la conférence puisque je serai en vacances."
+  ],
+  "example_zh": [
+   "既然他们是表兄弟，长得像一点也不奇怪。",
+   "既然我那时候在度假，就没法参加会议了。"
+  ],
+  "focus": [
+   "puisque"
+  ],
+  "zh": "「既然、既然因为」（puisque）",
+  "level": "A2",
+  "formation": "puisque / puisqu' + proposition",
+  "notes": "与 parce que 的分工：parce que 提供对方不知道的原因，puisque 的原因在说话人看来是双方共知的，所以常放句首。元音前缩合成 puisqu'（puisqu'il part）。"
+ },
+ {
+  "key": "fgm_desortequesothatwiththeresultthat__183cad",
+  "name": "de sorte que (so that, with the result that)",
+  "slug": "de sorte que",
+  "meaning": "consequence: with the result that; purpose when followed by the subjunctive",
+  "type": "composite",
+  "examples": [
+   "Puis la crise est arrivée, de sorte que les prix des maisons sont devenus de nouveau abordables.",
+   "Il a préféré retirer son argent de la banque, de sorte qu'il puisse investir dans la pierre."
+  ],
+  "example_zh": [
+   "接着危机来了，房价因此又变得可负担。",
+   "他宁愿把钱从银行取出来，好投资房产。"
+  ],
+  "focus": [
+   "de",
+   "sorte",
+   "que/qu'"
+  ],
+  "zh": "「以至于、结果」（de sorte que）",
+  "level": "B1",
+  "formation": "de sorte que + indicatif（结果）／ + subjonctif（目的）",
+  "notes": "表结果用直陈式：de sorte que les prix sont devenus…；表目的（为了让……）用虚拟式：de sorte qu'il puisse…。"
+ },
+ {
+  "key": "fgm_aucasoùconditionnelincase__e25292",
+  "name": "au cas où + conditionnel (in case)",
+  "slug": "au cas où + conditionnel",
+  "meaning": "in case: a hypothesis that takes the conditional, not the indicative",
+  "type": "composite",
+  "examples": [
+   "Au cas où vous auriez perdu votre montre, vous pourriez emprunter la mienne.",
+   "Au cas où il pleuvrait, prends un parapluie."
+  ],
+  "example_zh": [
+   "万一您的手表丢了，可以借我的。",
+   "万一下雨，带把伞。"
+  ],
+  "focus": [
+   "au",
+   "cas",
+   "où"
+  ],
+  "zh": "「万一……的话」（au cas où + 条件式）",
+  "level": "B1",
+  "formation": "au cas où + conditionnel",
+  "notes": "后面只能跟条件式，不能跟直陈式或虚拟式：au cas où vous auriez perdu…。au cas où 本身已经含「如果」，不要再加 si。"
+ },
+ {
+  "key": "fgm_pourvuquesubjonctifprovidedthatIdohope__c57d83",
+  "name": "pourvu que + subjonctif (provided that / I do hope)",
+  "slug": "pourvu que + subjonctif",
+  "meaning": "provided that; also an exclamative wish",
+  "type": "composite",
+  "examples": [
+   "Pourvu qu'il fasse beau demain !",
+   "Pourvu que ça dure !"
+  ],
+  "example_zh": [
+   "但愿明天天气好！",
+   "但愿这能持续下去！"
+  ],
+  "focus": [
+   "pourvu",
+   "que/qu'"
+  ],
+  "zh": "「只要……就好／但愿」（pourvu que + 虚拟式）",
+  "level": "B1",
+  "formation": "pourvu que + subjonctif",
+  "notes": "两个用法：① 条件「只要」，等于 à condition que；② 感叹愿望「但愿」，常单独成句：Pourvu qu'il fasse beau !"
+ },
+ {
+  "key": "fgm_quelquesoitwhatever__6bc6ef",
+  "name": "quel que soit (whatever)",
+  "slug": "quel que soit",
+  "meaning": "whatever: quel agrees with the noun, then que + subjunctive of être",
+  "type": "composite",
+  "examples": [
+   "Quelle que soit la difficulté, il faut la surmonter.",
+   "Les vrais accros de la nicotine ne s'arrêtent pas de fumer, quel que soit le risque pour la santé."
+  ],
+  "example_zh": [
+   "无论困难多大，都必须克服。",
+   "真正的尼古丁成瘾者不管健康风险多大都不会戒烟。"
+  ],
+  "focus": [
+   "quel/quelle",
+   "que",
+   "soit/soient"
+  ],
+  "zh": "「无论……」（quel / quelle que soit）",
+  "level": "B2",
+  "formation": "quel / quelle / quels / quelles + que + soit / soient",
+  "notes": "quel 与被修饰的名词性数一致，名词可以插在中间：quel que soit le risque、quelles que soient les difficultés。"
+ },
+ {
+  "key": "fgm_discoursindirectditquereportedstatement__9773f5",
+  "name": "discours indirect: dit que (reported statement)",
+  "slug": "dire que (discours indirect)",
+  "meaning": "reported speech: dire que + a clause whose tense shifts back one step",
+  "type": "composite",
+  "examples": [
+   "On m'a dit que tu étais malade.",
+   "Tu ne m'avais pas dit que tu avais un frère."
+  ],
+  "example_zh": [
+   "有人告诉我你病了。",
+   "你没跟我说过你有个兄弟。"
+  ],
+  "focus": [
+   "dit",
+   "que/qu'"
+  ],
+  "zh": "间接引语·陈述：dire que + 从句（时态后移）",
+  "level": "B1",
+  "formation": "dire que + proposition；主句过去时 ⇒ 从句时态后移",
+  "notes": "直接引语 « Je suis malade » → Il a dit qu'il était malade。注意区分 « c'est plus facile à dire qu'à faire »：那里是 dire + qu'à，不是 dire que。"
+ },
+ {
+  "key": "fgm_discoursindirectdemandersireportedquestion__53cf78",
+  "name": "discours indirect: demander si (reported question)",
+  "slug": "demander si (discours indirect)",
+  "meaning": "reported yes/no question: demander si + clause",
+  "type": "composite",
+  "examples": [
+   "Ils m'ont demandé si j'irais à la soirée.",
+   "Je me demande si je trouverai un travail."
+  ],
+  "example_zh": [
+   "他们问我是否去参加晚会。",
+   "我在想能不能找到工作。"
+  ],
+  "focus": [
+   "demander/demandé/demande/demandent",
+   "si"
+  ],
+  "zh": "间接引语·是非问：demander si + 从句",
+  "level": "B1",
+  "formation": "demander si + proposition",
+  "notes": "直接引语 « Est-ce que tu viendras ? » → Il m'a demandé si je viendrais。原本有疑问词（quand, où, comment）时保留疑问词，不用 si。"
+ },
+ {
+  "key": "fgm_discoursindirectdemanderdeinfinitifreportedrequest__172e6f",
+  "name": "discours indirect: demander de + infinitif (reported request)",
+  "slug": "demander de + infinitif",
+  "meaning": "reported request or command: demander à qqn de + infinitive",
+  "type": "composite",
+  "examples": [
+   "Il m'a demandé de ne pas être en retard.",
+   "Elle nous a demandé de ne rien dire."
+  ],
+  "example_zh": [
+   "他让我别迟到。",
+   "她让我们什么都别说。"
+  ],
+  "focus": [
+   "demander/demandé/demande/demandent",
+   "de/d'"
+  ],
+  "zh": "间接引语·请求：demander à qqn de + 不定式",
+  "level": "B1",
+  "formation": "demander à qqn de + infinitif",
+  "notes": "与 dire à qqn de + inf 同型；否定放在不定式前：demander de ne pas faire。间接引语里命令式改写用这一结构。⚠️ 已知边界：demander de l'argent（要钱）这类 de + 冠词不是本结构，表层规则无法区分，会误报。"
+ },
+ {
+  "key": "fgm_àpartirdefromstartingfrom__c88b30",
+  "name": "à partir de (from, starting from)",
+  "slug": "à partir de",
+  "meaning": "from a point in time or space onwards",
+  "type": "composite",
+  "examples": [
+   "Le restaurant sera fermé à partir de demain.",
+   "Les magasins sont ouverts à partir de neuf heures."
+  ],
+  "example_zh": [
+   "餐厅从明天起关门。",
+   "商店从九点起开门。"
+  ],
+  "focus": [
+   "à",
+   "partir",
+   "de"
+  ],
+  "zh": "「从……起」（à partir de）",
+  "level": "A2",
+  "formation": "à partir de + nom / date",
+  "notes": "时间和空间都能用。与 depuis 的分工：depuis 强调从过去持续到现在，à partir de 只标起点，句子可以是将来时。"
  }
 ]
