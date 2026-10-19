@@ -111,6 +111,34 @@ the CC BY-SA 4.0 source above and is distributed under the same license; the
 material half is a derivative of the CC BY-SA 4.0 data ecosystem and is
 distributed under CC BY-SA 4.0 as well.
 
+## `ko_enrichment.json`
+
+Korean wording for the same three fields, extended to *every* entry rather
+than the jkindrix 595 — the panel's Korean display language needs a gloss on
+the merged material rows too, and those ship only `chinese`.  Shape as above;
+1310 of the 1375 entries carry a `formation` line and all 1310 carry the
+notes block, while 1304 sentences carry a translation.  The sentences are
+keyed by the Japanese sentence, so an index shift can never mis-assign one.
+Written for this project (Song), distributed under **CC BY-SA 4.0**.
+
+## `en_enrichment.json`
+
+English wording for the merged material rows' example sentences, keyed by the
+upstream `id`:
+
+```json
+{"atodeatoha": {"examples": {"毎日、晩ご飯のあとで、…テレビを見ます。": "Every day after dinner I watch TV …"}}}
+```
+
+The mirror image of `zh_enrichment.json`.  The 595 vendored rows ship
+`english` on every example, but the 715 merged material rows were transcribed
+from Chinese-language study materials and carry only `chinese`, so the
+English panel quoted 2025 bare Japanese sentences (the Chinese panel was
+already complete).  Only `examples` is present — the `formation` and notes
+columns of those rows are already English.  Translations are written for this
+project (Song) and distributed under **CC BY-SA 4.0**, as a derivative of the
+data ecosystem above.
+
 ## `ko.json`
 
 Korean glosses for all 1375 entries, mirroring `zh.json` (한국어 display

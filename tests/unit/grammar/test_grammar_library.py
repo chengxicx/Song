@@ -446,6 +446,29 @@ def test_korean_library_translates_every_example():
         assert bare == [], f"ko/{display}: {len(bare)} examples without a gloss"
 
 
+@pytest.mark.parametrize("display", ("en", "zh"))
+def test_japanese_library_translates_every_example(display):
+    """
+    The English and Chinese panels quote every sentence, not just the first.
+
+    ``n{1..5}.json`` (the vendored rows) ship ``english``, but the merged
+    material rows were written for a Chinese reader and carry only
+    ``chinese``, so the English panel used to fall back to bare Japanese on
+    2025 sentences.  ``en_enrichment.json`` fills those, keyed by the
+    Japanese sentence itself, and ``ko_enrichment.json`` does the same for
+    Korean -- which is still partial, so it is not asserted here.
+
+    The hand-written rules' golden sentences are a separate store; they are
+    pinned by ``test_golden_sentences_carry_a_display_gloss``.
+    """
+    for entry in ja.library_entries(display):
+        for row in entry["examples"]:
+            assert isinstance(row, dict) and row.get("tr"), (
+                f"ja/{display}: bare example on {entry['key']}: "
+                f"{row if isinstance(row, str) else row['text']}"
+            )
+
+
 @pytest.mark.parametrize("lang", ("es", "fr", "de", "ru"))
 def test_example_material_still_lines_up_with_the_corpus(lang):
     """

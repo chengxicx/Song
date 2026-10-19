@@ -18,6 +18,8 @@ Rules come from two places:
   ``zh.json`` beside them holds this project's Chinese glosses, keyed by the
   upstream entry id, and ``zh_enrichment.json`` the Chinese wording for the
   rows' 接续 / 注意点 / 参考例句译文 (the vendored files stay verbatim).
+  ``ko_enrichment.json`` and ``en_enrichment.json`` do the same for the
+  Korean and English display languages.
 
 Matcher specs are *derived* from each entry's descriptive pattern and
 validated against that entry's own examples -- see ``_load_level``.
@@ -2763,6 +2765,27 @@ def _load_ko_enrichment():
 _KO_ENRICH = _load_ko_enrichment()
 
 
+def _load_en_enrichment():
+    """
+    English wording for the data rows' examples, keyed by data entry id:
+    ``{"examples": {<jp>: <en>}}``.
+
+    The mirror image of the two files above.  The vendored jkindrix rows
+    ship ``english`` on every example, but the merged material rows carry
+    only ``chinese`` -- they were written for a Chinese reader -- so the
+    English panel quoted 2025 bare Japanese sentences.  Keyed by the
+    Japanese sentence, so an index shift can never mis-assign one.
+    """
+    path = os.path.join(_DATA_DIR, "en_enrichment.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+_EN_ENRICH = _load_en_enrichment()
+
+
 def _notes_text(notes):
     "Formation notes in one display string; list or scalar, or '' when absent."
     if not notes:
@@ -2820,6 +2843,7 @@ def _make_data_rule(
     entry_id = item.get("id") or ""
     enrichment = _ZH_ENRICH.get(entry_id) or {}
     ko_enrichment = _KO_ENRICH.get(entry_id) or {}
+    en_enrichment = _EN_ENRICH.get(entry_id) or {}
     reference = _curated_reference(item, None if skipped else specs)
     return {
         "key": "ds_" + _slug(item.get("id") or f"{level}-{idx}"),
@@ -2875,14 +2899,19 @@ def _make_data_rule(
         # One row per sentence, with the translation for each display
         # language filled in from wherever the corpus carries it: the
         # vendored rows have ``english``, the merged material rows have
-        # ``chinese``, and the two enrichment files carry the *other* one
-        # plus Korean for both.  Both are keyed by the Japanese sentence
-        # itself, so a library update that inserts a row can never shift a
+        # ``chinese``, and the three enrichment files carry the *other*
+        # ones.  All of them are keyed by the Japanese sentence itself, so
+        # a library update that inserts a row can never shift a
         # translation onto another sentence.
         "example_rows": [
             {
                 "japanese": (e.get("japanese") or "").strip(),
-                "english": (e.get("english") or "").strip(),
+                "english": (
+                    (e.get("english") or "").strip()
+                    or (en_enrichment.get("examples") or {}).get(
+                        (e.get("japanese") or "").strip(), ""
+                    )
+                ).strip(),
                 "chinese": (
                     (e.get("chinese") or "").strip()
                     or (enrichment.get("examples") or {}).get(

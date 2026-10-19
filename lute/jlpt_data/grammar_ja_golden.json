@@ -14,13 +14,13 @@
   "examples": [
    {
     "chinese": "到底要不要说出事实?我在走廊里一边徘徊,一边考虑着这个问题。",
-    "english": "",
+    "english": "I paced back and forth in the corridor, wondering whether to tell the truth or not.",
     "japanese": "事実を言おうか言うまいかと、廊下を行きつ戻りつ考えた。",
     "ko": "사실을 말할까 말까 하며 복도를 오가며 생각했다."
    },
    {
     "chinese": "和客人你一杯我一杯地喝酒。",
-    "english": "",
+    "english": "The customer and I kept urging each other on, and we drank sake.",
     "japanese": "お客さんと勧めつ勧められつで、お酒を飲んだ。",
     "ko": ""
    }
@@ -105,7 +105,7 @@
    },
    {
     "chinese": "有件事我想求您，现在有空吗？",
-    "english": "",
+    "english": "I have a small favour to ask — is now a good time?",
     "japanese": "ちょっとお願いしたいんですが、今ご都合がよろしいですか。",
     "ko": "부탁드리고 싶은 게 있는데, 지금 괜찮으세요?"
    }
@@ -212,13 +212,13 @@
   "examples": [
    {
     "chinese": "因为是小感冒,所以不是大医院也行,请介绍一家给我。",
-    "english": "",
+    "english": "It is only a slight cold, so it need not be a big hospital — please recommend one.",
     "japanese": "軽い風邪ですから、大きな病院でなくてもいいから、一つ紹介してください。",
     "ko": "가벼운 감기니까 큰 병원이 아니어도 되니, 한 군데 소개해 주세요."
    },
    {
     "chinese": "明天不带教科书来也行。",
-    "english": "",
+    "english": "You need not bring your textbook tomorrow.",
     "japanese": "明日はテキストを持って来なくてもいいです。",
     "ko": ""
    }
@@ -229,13 +229,13 @@
   "examples": [
    {
     "chinese": "如果要是晚到一些的话倒也罢了,可你连招呼也不打一声就不来上班,真是岂有此理。",
-    "english": "",
+    "english": "Being late is one thing, but absence without leave is utterly unacceptable.",
     "japanese": "遅刻ならともかく、無断欠勤などもってのほかだ。",
     "ko": ""
    },
    {
     "chinese": "如果是程序设计那倒另当别论,连办公自动化软件的操作都不懂也太落伍了吧。",
-    "english": "",
+    "english": "Program design aside, not even being able to use office software means you are far behind the times.",
     "japanese": "プログラムの設計ならともかくとして、ソフトの「OA」もできないとは、時代の流れにずいぶん遅れているね。",
     "ko": ""
    }
@@ -269,7 +269,7 @@
    },
    {
     "chinese": "A：咖啡和红茶，你喜欢喝哪种？B：我喜欢喝咖啡。",
-    "english": "",
+    "english": "A: \"Which do you like better, coffee or tea?\" B: \"I like coffee better.\"",
     "japanese": "A 「コーヒーと紅茶とどちらが好きですか。」 B 「コーヒーのほうが好きです。」",
     "ko": "A \"커피와 홍차 중 어느 쪽을 좋아합니까?\" B \"커피 쪽을 좋아합니다.\""
    }
@@ -303,7 +303,7 @@
    },
    {
     "chinese": "因为发生了事故，所以电车停了。",
-    "english": "",
+    "english": "Because there was an accident, the trains have stopped.",
     "japanese": "事故があったために、電車が止まっている。",
     "ko": "사고가 일어났기 때문에 전차가 멈춰 있다."
    }
@@ -348,7 +348,7 @@
   "examples": [
    {
     "chinese": "A：我可以拍照片吗？B：这里不可以拍照片。",
-    "english": "",
+    "english": "A: \"May I take photographs?\" B: \"You must not take them here.\"",
     "japanese": "A 「写真を撮ってもいいですか。」 B 「ここでは撮ってはいけません。」",
     "ko": ""
    },
@@ -422,7 +422,7 @@
    },
    {
     "chinese": "因为工作还没有做完，即使想回也不能回。",
-    "english": "",
+    "english": "The work isn't finished, so even if I want to go home, I can't.",
     "japanese": "仕事が終わらないから、帰ろうにも帰れない。",
     "ko": "일이 끝나지 않아서 돌아가자니 돌아갈 수도 없다."
    }
