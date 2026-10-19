@@ -20,14 +20,26 @@
  * refinement: one bad EPUB (exotic entities, a stylesheet-only block)
  * falls back to plain chapter text instead of mis-wrapping words.
  *
- * Whitespace is deliberately tested against an explicit ASCII set:
- * JavaScript's \s also matches U+3000 (ideographic space), which is real
- * Japanese text and a token of its own on the server.
+ * Whitespace is skipped on both sides, and by the same definition:
+ * Unicode whitespace, not just ASCII.  The extractor collapses ASCII
+ * runs but *strips* a block's edges (which takes the U+00A0 a book uses
+ * for indentation with it), so the two streams disagree about how many
+ * spaces sit at a paragraph's start; they agree about everything else.
+ * "The same on both sides" is what keeps an ideographic space (U+3000)
+ * from costing a word its span -- it is whitespace here, and a token of
+ * its own there, and neither side needs it to line up.
+ *
+ * The token stream is not the chapter's literal text either: the
+ * language parser normalises it first (`’` -> `'`, `...` -> `…`, ...).
+ * The chapter's text nodes get the same replacements before the two
+ * streams are compared, so the spans carry the normalised form every
+ * other Lute book stores, and the chapter is put back if they still
+ * disagree.
  */
 (function () {
   "use strict";
 
-  const ASCII_WS = /[\t\n\v\f\r ]/;
+  const WHITESPACE = /\s/;
   // Never descend into these: ruby readings (already stripped
   // server-side, but a stray one must not desync the stream), and the
   // sentence play buttons tts.js injects.
@@ -42,8 +54,8 @@
     "body",
   ]);
 
-  function isAsciiWs(ch) {
-    return ASCII_WS.test(ch);
+  function isWhitespace(ch) {
+    return WHITESPACE.test(ch);
   }
 
   function mount(root) {
@@ -60,6 +72,8 @@
     }
     if (!tokens.length) return;
 
+    const undoSubstitutions = applySubstitutions(root);
+
     const nodes = collectTextNodes(root);
     if (!nodes.length) return;
 
@@ -67,6 +81,7 @@
     const ranges = tokenCharRanges(tokens);
     const mismatch = compareStreams(chars, ranges);
     if (mismatch !== null) {
+      if (undoSubstitutions) undoSubstitutions();
       // Keep the chapter readable; just without word interactions.
       console.warn(
         "epub-reader: token stream does not match the chapter markup at " +
@@ -86,6 +101,51 @@
   /* ------------------------------------------------------------------
    * Reading the DOM
    * ------------------------------------------------------------------ */
+
+  /**
+   * Apply the language parser's character replacements to the
+   * chapter's text nodes.
+   *
+   * The token stream was produced from the normalised text, and the
+   * chapter still carries the book's own characters -- `don’t` with a
+   * curved apostrophe, `...` for an ellipsis -- so the two never line up
+   * until the same replacements run here.  Doing it to the text nodes
+   * (rather than mapping around it) also means the spans show, look up
+   * and speak the same text as every other Lute book, which stores the
+   * normalised form: a curved apostrophe would otherwise create a
+   * second term alongside the straight one already in the dictionary.
+   *
+   * Pair-major order matters: the server replaces over the whole text,
+   * so `...` -> `…` must be tried before `..` -> `‥`.
+   */
+  function applySubstitutions(root) {
+    const dataNode = document.getElementById("lute-epub-substitutions");
+    if (!dataNode) return null;
+    let pairs;
+    try {
+      pairs = JSON.parse(dataNode.textContent || "[]");
+    } catch (err) {
+      return null;
+    }
+    if (!pairs.length) return null;
+
+    const nodes = collectTextNodes(root);
+    const original = new Map();
+    for (const [from, to] of pairs) {
+      // An empty `from` would splice between every character.
+      if (!from) continue;
+      for (const node of nodes) {
+        if (node.nodeValue.indexOf(from) === -1) continue;
+        if (!original.has(node)) original.set(node, node.nodeValue);
+        node.nodeValue = node.nodeValue.split(from).join(to);
+      }
+    }
+    // The chapter must stay exactly as the book has it when the streams
+    // turn out not to match, so the caller can put it back.
+    return () => {
+      for (const [node, value] of original) node.nodeValue = value;
+    };
+  }
 
   function collectTextNodes(root) {
     const out = [];
@@ -115,7 +175,7 @@
       const text = node.nodeValue;
       let cu = 0;
       for (const ch of text) {
-        if (!isAsciiWs(ch)) chars.push({ node, cu, ch });
+        if (!isWhitespace(ch)) chars.push({ node, cu, ch });
         cu += ch.length;
       }
     }
@@ -129,7 +189,7 @@
       const start = stream.length;
       const text = tokens[i][0] || "";
       for (const ch of text) {
-        if (!isAsciiWs(ch)) stream.push(ch);
+        if (!isWhitespace(ch)) stream.push(ch);
       }
       ranges.push([start, stream.length]);
     }

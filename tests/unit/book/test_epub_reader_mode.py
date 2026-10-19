@@ -32,6 +32,8 @@ CHAPTER = """<html><head>
 <h2>Chapter</h2>
 <p onclick="alert(1)">Hello <em>world</em>, again.</p>
 <p>Second paragraph.</p>
+<p>She called it ‘the show’ and left...</p>
+<p>&nbsp;&nbsp;Indented with a no-break space.</p>
 <p><ruby>漢字<rt>かんじ</rt></ruby>です。</p>
 <p><img src="images/pic.png" alt=""/></p>
 </body></html>"""
@@ -128,8 +130,18 @@ def test_token_stream_matches_the_chapter_dom(
     """
     The invariant the front end depends on: concatenated token text and
     the chapter's rendered text are the same character sequence, once
-    ASCII whitespace is ignored.
+    the language's character substitutions are applied and whitespace is
+    ignored.
+
+    The substitutions matter: the parser normalises the text before
+    tokenizing (a curved apostrophe becomes a straight one so the book's
+    word matches the dictionary's), while the chapter keeps the book's
+    own characters.  The page ships the table so the front end can apply
+    it -- this test fails if the two ever drift apart.
     """
+    english.character_substitutions = "’='|...=…"
+    db.session.add(english)
+
     book = _import_reader_book(app, client, english, tmp_path)
     fragment = client.get(f"/read/start_reading/{book.id}/1").get_data(as_text=True)
 
@@ -139,22 +151,66 @@ def test_token_stream_matches_the_chapter_dom(
     tokens = json.loads(data.string or "[]")
     assert tokens, "chapter tokens were produced"
 
+    subs_data = soup.find("script", {"id": "lute-epub-substitutions"})
+    assert subs_data is not None, "the substitution table is shipped too"
+    subs = json.loads(subs_data.string or "[]")
+    assert ["’", "'"] in subs and ["...", "…"] in subs
+
+    def normalised(s):
+        for frm, to in subs:
+            s = s.replace(frm, to)
+        return s
+
+    def bare(s):
+        return "".join(ch for ch in s if not ch.isspace())
+
     dom_text = soup.find(id="epub-chapter").get_text("")
     html_path = os.path.join(str(tmp_path), book.epub_path)
     file_text = BeautifulSoup(
         open(html_path, encoding="utf-8").read(), "html.parser"
     ).get_text("")
 
-    def bare(s):
-        return "".join(ch for ch in s if ch not in " \t\n\v\f\r")
-
-    assert bare("".join(t[0] for t in tokens)) == bare(file_text)
+    assert bare("".join(t[0] for t in tokens)) == bare(normalised(file_text))
     assert bare(dom_text) == bare(file_text), "fragment renders the stored chapter"
+    # The chapter itself keeps the book's typography; only the alignment
+    # sees the normalised form.
+    assert "‘the show’" in file_text and "..." in file_text
 
     words = [t for t in tokens if t[1]]
     assert words, "words are tokenized"
     assert all(len(t) == 5 for t in tokens), "order/sentence/paragraph are present"
     assert any(t[2] == 0 for t in words), "new words have status 0"
+    assert "the" in [t[0] for t in words], "words on both sides of a curly quote parse"
+
+
+def test_parser_reports_the_substitutions_it_applies_to_text(
+    app, app_context, english
+):
+    """
+    text_substitutions() has to describe what the parser really does:
+    the alignment trusts it, and the parser and the report are written
+    in different places.
+    """
+    english.character_substitutions = "’='|...=…"
+    parser = english.parser
+    pairs = parser.text_substitutions(english)
+    assert pairs == [
+        ("\u200b", ""),
+        ("’", "'"),
+        ("...", "…"),
+        ("{", "["),
+        ("}", "]"),
+    ]
+
+    # Applying them must reproduce the tokenizer's view of the text.
+    text = "it’s ‘quoted’ {x} ... \u200bend"
+    normalised = text
+    for frm, to in pairs:
+        normalised = normalised.replace(frm, to)
+    strip_ws = lambda s: "".join(ch for ch in s if not ch.isspace())
+    tokens = english.get_parsed_tokens(text)
+    assert strip_ws("".join(t.token for t in tokens)) == strip_ws(normalised)
+    assert "…" in "".join(t.token for t in tokens), "the ellipsis is normalised"
 
 
 def test_reader_mode_off_keeps_plain_text_import(

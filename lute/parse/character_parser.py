@@ -12,7 +12,7 @@ Includes classes:
 
 import re
 from typing import List
-from lute.parse.base import ParsedToken, AbstractParser
+from lute.parse.base import ParsedToken, AbstractParser, character_substitution_pairs
 
 
 class ClassicalChineseParser(AbstractParser):
@@ -60,3 +60,7 @@ class ClassicalChineseParser(AbstractParser):
             tokens.append(p)
 
         return tokens
+
+    def text_substitutions(self, language):
+        "Replacements applied before tokenizing, in order."
+        return character_substitution_pairs(language) + [("{", "["), ("}", "]")]
