@@ -214,18 +214,53 @@ def test_every_panel_rule_has_a_translated_reference():
 
 
 def test_panel_reference_carries_the_gloss_for_the_display_language():
-    "A Chinese panel gets the Chinese gloss, and no other language's."
+    "A Chinese panel gets the Chinese gloss and an English one the English."
     zh = {e["key"]: e for e in analyze_arabic("لا أعرف.", "zh")}
     assert zh["ar_neg_la"]["reference"]["sentence"] == "لا أعرف."
     assert zh["ar_neg_la"]["reference"]["text"] == "我不知道。"
-    # Arabic carries no English gloss yet, so the English panel hides the
-    # block rather than printing Chinese under an English heading.
     en = {e["key"]: e for e in analyze_arabic("لا أعرف.", "en")}
-    assert "reference" not in en["ar_neg_la"]
+    assert en["ar_neg_la"]["reference"]["text"] == "I do not know."
 
 
 def test_panel_reference_does_not_mutate_the_rule_list():
     "The module-level rules stay exactly as written in the source."
     AR._get_all_rules()
     assert not [rule for rule in _AR_RULES if "reference" in rule]
+
+
+# ---- both glosses ------------------------------------------------------
+#
+# The corpus carries Chinese and English for every example.  A language
+# with only one of them silently loses its gloss line for whoever reads in
+# the other display language, which is exactly how the Arabic library read
+# before the English back-fill.
+
+
+def test_every_data_row_carries_both_glosses():
+    "Chinese and English, on every example, index-aligned with the sentence."
+    for rule in AR._get_data_rules():
+        for example in rule["examples"]:
+            assert example.get("zh"), rule["key"]
+            assert example.get("en"), rule["key"]
+
+
+def test_every_golden_example_carries_both_glosses():
+    "The hand-written rules' curated sentences are glossed both ways too."
+    for key, examples in AR._golden_examples().items():
+        for example in examples:
+            assert (example.get("zh") or "").strip(), key
+            assert (example.get("en") or "").strip(), key
+
+
+def test_library_entries_gloss_in_either_display_language():
+    "No example row may reach the page without its translation."
+    for lang in ("zh", "en"):
+        blank = [
+            entry["key"]
+            for entry in AR.library_entries(lang)
+            for ex in entry["examples"]
+            if not isinstance(ex, dict) or not ex.get("tr")
+        ]
+        assert not blank, f"{lang} rows with no translation: {blank}"
+
 
