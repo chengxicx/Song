@@ -532,7 +532,8 @@
    "บ่อย",
    "ทุกวัน",
    "ไม่เคย"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-location-tee-yoo",
@@ -575,7 +576,8 @@
    "ทาง",
    "ซ้าย",
    "ขวา"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-prep-gup-duai",
@@ -1222,7 +1224,8 @@
    "บาง",
    "หลาย",
    "มาก"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-days",
@@ -1367,7 +1370,8 @@
    "ฤดูร้อน",
    "ฤดูฝน",
    "ฤดูหนาว"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-today-tomorrow",
@@ -1628,7 +1632,11 @@
   ],
   "focus_all": [
    "นัก"
-  ]
+  ],
+  "focus": [
+   "นัก"
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-head-bai",
@@ -1664,7 +1672,8 @@
   ],
   "focus_all": [
    "โรง"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-prefix-kan",
@@ -1706,7 +1715,8 @@
   ],
   "focus_all": [
    "ความ"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-word-order-ordinal",
@@ -2040,7 +2050,8 @@
   "focus_all": [
    "ต้อง",
    "จำเป็น"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-obligation",
@@ -2319,7 +2330,8 @@
   "focus_all": [
    "เท่า",
    "เท่ากับ"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-similar-meuan",
@@ -2340,7 +2352,8 @@
   ],
   "focus_all": [
    "เหมือน"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-comparison-question",
@@ -3769,7 +3782,8 @@
   ],
   "focus_all": [
    "ผู้"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-nominalizer-thi",
@@ -4101,7 +4115,8 @@
   ],
   "focus_all": [
    "เอา"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th_passive",
@@ -4324,7 +4339,8 @@
   ],
   "focus_all": [
    "โดย"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-adverb-duai",
@@ -4629,7 +4645,8 @@
   ],
   "focus_all": [
    "นอกจาก"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-exclamation",
@@ -5230,7 +5247,8 @@
   "focus_all": [
    "ปลาย",
    "สิ้น"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-24-hour-clock",
@@ -5321,7 +5339,8 @@
   "examples": [
    "เขาออกไปทันที · káo òrk bpai tun-tee — He left at once. ／ 他马上就出去了。",
    "โทรหาฉันทันทีที่ถึงบ้าน · toh hǎh chún tun-tee têe těung bâhn — Phone me as soon as you get home. ／ 一到家就给我打电话。"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-very-tee-diao",
@@ -5395,7 +5414,8 @@
   "focus_all": [
    "เสีย",
    "ซะ"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-reduplication-tone",
@@ -5697,7 +5717,8 @@
   "focus_all": [
    "มิ",
    "หา"
-  ]
+  ],
+  "boundary": "start"
  },
  {
   "key": "th-sanskrit-numbers",

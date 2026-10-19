@@ -428,22 +428,33 @@ _HAND_SURFACES = _hand_surfaces()
 _HAND_KEYS = {r["key"] for r in _TH_RULES}
 
 
-def _corpus_match(foci):
+# How a corpus literal may sit in the text.  "token" requires the hit to
+# cover a whole token: สิ must not be read out of สิบ, nor ขา out of ขาย.
+# "start" requires only a token start, for morphemes that are prefixes or
+# the first element of a compound (ความ in ความรัก, นัก in นักเรียน).
+_BOUNDARY_TOKEN = "token"
+_BOUNDARY_START = "start"
+_DEFAULT_BOUNDARY = _BOUNDARY_TOKEN
+
+
+def _corpus_match(foci, boundary=None):
     """
     The match shape for one corpus row: a regex over the sentence text.
 
-    Not token-exact.  pythainlp glues function words to their neighbours
-    (มาจาก, ทางขวา, ตารางเมตร, ไปเสียแล้ว), so a token-exact spec silently
+    Not token-exact: pythainlp glues function words to their neighbours
+    (มาจาก, ทางขวา, ตารางเมตร), so a purely token-indexed spec silently
     misses exactly the high-frequency particles a reader wants flagged.
-    The cost is that a literal can also turn up inside an unrelated word
-    (นัก inside หนัก); the corpus avoids that by not listing literals that
-    are far more often the ordinary word -- see ``_TOO_COMMON`` in the
-    corpus build notes -- and the reading panel treats a hit as a hint.
+    The regex is therefore run over the raw text, but its hits are filtered
+    by ``boundary`` -- matching a bare substring made ขา fire inside ขาย and
+    สิ inside สิบ, which is noise rather than a hint.
     """
     pattern = re.compile(
         "|".join(re.escape(f) for f in sorted(foci, key=len, reverse=True))
     )
-    return {"type": "regex", "re": pattern}
+    spec = {"type": "regex", "re": pattern}
+    if boundary:
+        spec["boundary"] = boundary
+    return spec
 
 
 def _get_corpus_rules():
@@ -454,6 +465,8 @@ def _get_corpus_rules():
     so ไม่มีใคร wins over ไม่มี when both belong to the row).  Pure data:
     no tokenizer is needed to build these, so the library stays browsable
     when pythainlp is not installed.
+
+    A row may name its own ``boundary``; the rest default to whole-token.
     """
     global _CORPUS_RULES  # pylint: disable=global-statement
     if _CORPUS_RULES is None:
@@ -467,7 +480,7 @@ def _get_corpus_rules():
                 item["name"],
                 item["level"],
                 item.get("en") or item["name"],
-                _corpus_match(foci),
+                _corpus_match(foci, item.get("boundary") or _DEFAULT_BOUNDARY),
                 zh=item.get("zh"),
             )
             reference = _first_reference(item.get("examples") or ())
