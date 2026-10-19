@@ -14,6 +14,12 @@
    the chapter before it can align the two streams. #}
 <script type="application/json" id="lute-epub-tokens">{{ tokens | tojson }}</script>
 
+{# What the language's parser did to the text before tokenizing it:
+   [[from, to], ...].  The chapter still shows the book's own characters
+   (`’`, `...`), the tokens are the normalised ones, so the two only
+   line up after the same replacements are applied here. #}
+<script type="application/json" id="lute-epub-substitutions">{{ substitutions | tojson }}</script>
+
 <script>
   // Inject the word spans into the chapter's text nodes, then hand over
   // to the normal reading-page pipeline: status colours, cursor

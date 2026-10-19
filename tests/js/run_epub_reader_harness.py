@@ -13,8 +13,14 @@ Checks, against the real static/js/lute-epub-reader.js:
      TTS -- so a drag cannot splice the halves into a new term;
   4. sentences are wrapped in .textsentence, including several
      sentences inside one paragraph;
-  5. a token stream that does not match the markup leaves the chapter
-     untouched (failure-soft), reporting where the streams diverged.
+  5. the language parser's character substitutions are applied to the
+     chapter before aligning -- a book's ‘the show’ and "..." must line
+     up with the tokenizer's 'the show' and "…" -- while a
+     no-break-space or ideographic-space indent does not cost the
+     chapter its spans;
+  6. a token stream that does not match the markup leaves the chapter
+     untouched -- substitutions undone, no spans -- reporting where the
+     streams diverged.
 
 Run:  ./venv/bin/python tests/js/run_epub_reader_harness.py
 """
@@ -129,10 +135,42 @@ def main():
             " %s" % (state["sentenceTexts"],),
         )
 
+        subs = page.evaluate("() => window.__runSubstitutions()")
+        check(
+            "curly quotes and a tight ellipsis still align",
+            subs["mounted"] == "1" and subs["mismatch"] is None,
+            " mounted=%s mismatch=%s" % (subs["mounted"], subs["mismatch"]),
+        )
+        check(
+            "the chapter shows the parser's characters",
+            "'the show' was over…" in subs["text"],
+            " %r" % subs["text"][:80],
+        )
+        check(
+            "an indented paragraph keeps its indent on screen",
+            "\u00a0\u00a0Star" in subs["text"] and "\u3000Indented" in subs["text"],
+            " %r" % subs["text"][:80],
+        )
+        check(
+            "words on both sides of a curly quote become spans",
+            subs["words"] == ["the", "show", "was", "over", "Star", "Indented"],
+            " %s" % (subs["words"],),
+        )
+        check(
+            "punctuation around the words gets its own spans",
+            subs["spans"] == 9,  # six words, two quotes, the ellipsis
+            " %d" % subs["spans"],
+        )
+
         mismatch = page.evaluate("() => window.__runMismatch()")
         check("mismatch is detected", mismatch["offset"] is not None, " %s" % mismatch)
         check("mismatch leaves no spans", mismatch["spans"] == 0, " %s" % mismatch)
         check("mismatch leaves the text intact", mismatch["textIntact"] is True)
+        check(
+            "mismatch undoes the substitutions too",
+            mismatch["subsIntact"] is True,
+            " %s" % mismatch,
+        )
 
         browser.close()
 

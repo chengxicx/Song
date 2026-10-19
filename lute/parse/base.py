@@ -69,6 +69,24 @@ class ParsedToken:
         return f'<"{self.token}" ({attrs})>'
 
 
+def character_substitution_pairs(language):
+    """
+    Parse `language.character_substitutions` ("´='|’='|...=…") into
+    [(from, to), ...].
+
+    This is the list a parser applies before tokenizing, so that a curved
+    apostrophe in the book and a straight one in the dictionary are the
+    same word.  It is shared here because every parser that uses the
+    setting must report the same pairs through text_substitutions().
+    """
+    pairs = []
+    for replacement in (language.character_substitutions or "").split("|"):
+        fromto = replacement.strip().split("=")
+        if len(fromto) >= 2:
+            pairs.append((fromto[0].strip(), fromto[1].strip()))
+    return pairs
+
+
 class AbstractParser(ABC):
     """
     Abstract parser, inherited from by all parsers.
@@ -129,6 +147,21 @@ class AbstractParser(ABC):
         """
         Get an array of ParsedTokens from the input text for the given language.
         """
+
+    def text_substitutions(self, language):  # pylint: disable=unused-argument
+        """
+        Literal replacements applied to the text before it is tokenized,
+        in the order they are applied.
+
+        The token stream is what the reader renders, so for most books
+        this never surfaces: the tokens are the text.  Reader-mode EPUB
+        renders the chapter's own HTML instead, and the two only line up
+        if the chapter's text nodes have had the same replacements
+        applied -- so the parser has to be able to say what it did.
+        Returns [(from, to), ...], empty for a parser that tokenizes the
+        text as given.
+        """
+        return []
 
     def get_reading(self, text: str):  # pylint: disable=unused-argument
         """
