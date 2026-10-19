@@ -21,6 +21,7 @@ from lute.read.render.grammar_analysis_matcher import (
     make_rule,
     make_spacy_tokenizer,
     match_rule,
+    paired_examples,
     spec_lemma,
     spec_morph,
     spec_pos,
@@ -936,15 +937,11 @@ def _load_data_rules(include_silenced=False):
             continue
         key = item.get("key") or name
         _DE_RULE_EXAMPLES[key] = examples
-        zh_examples = [z for z in (item.get("example_zh") or []) if z]
-        # Pair each example with its Chinese gloss when the material carries
-        # one, so the library detail card can show a translation line.
-        if len(zh_examples) == len(examples):
-            library_examples = [
-                {"de": ex, "zh": z} for ex, z in zip(examples, zh_examples)
-            ]
-        else:
-            library_examples = list(examples)
+        # Pair each example with its translations (Chinese from the merged
+        # material, English from the authored back-fill), so the library
+        # detail card can show a translation line for every display
+        # language.
+        library_examples = paired_examples("de", examples, item)
         rule = make_rule(
             key,
             name,

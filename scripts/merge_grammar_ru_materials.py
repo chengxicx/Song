@@ -51,6 +51,9 @@ import os
 import re
 import sys
 
+from scripts.grammar_example_glosses import attach as attach_glosses
+from scripts.grammar_example_glosses import load as load_glosses
+
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MATERIALS = os.path.join(BASE, "scripts", "grammar_materials_ru")
 MATERIALS_PATH = os.path.join(MATERIALS, "units.json")
@@ -236,6 +239,7 @@ def existing(entries):
 
 
 def build_rows(missing, taken_keys, taken_names):
+    glosses = load_glosses("ru")
     rows, skipped = [], []
     for pattern, meta in sorted(missing.items()):
         if pattern in _SKIP_PATTERNS:
@@ -251,24 +255,27 @@ def build_rows(missing, taken_keys, taken_names):
             continue
         raw = meta.get("examples") or []
         rows.append(
-            {
-                "key": key,
-                "name": name,
-                "slug": (pattern or "").strip(),
-                "meaning": (meta.get("meaning_en") or "").strip(),
-                "type": derive_type(pattern),
-                "examples": [
-                    e.get("russian", "").strip() for e in raw if e.get("russian")
-                ],
-                "example_zh": [
-                    e.get("chinese", "").strip() for e in raw if e.get("russian")
-                ],
-                "focus": list(meta.get("focus") or []),
-                "zh": (meta.get("meaning_zh") or "").strip(),
-                "level": meta.get("level") or "B1",
-                "formation": (meta.get("formation") or "").strip(),
-                "notes": (meta.get("notes") or "").strip(),
-            }
+            attach_glosses(
+                {
+                    "key": key,
+                    "name": name,
+                    "slug": (pattern or "").strip(),
+                    "meaning": (meta.get("meaning_en") or "").strip(),
+                    "type": derive_type(pattern),
+                    "examples": [
+                        e.get("russian", "").strip() for e in raw if e.get("russian")
+                    ],
+                    "example_zh": [
+                        e.get("chinese", "").strip() for e in raw if e.get("russian")
+                    ],
+                    "focus": list(meta.get("focus") or []),
+                    "zh": (meta.get("meaning_zh") or "").strip(),
+                    "level": meta.get("level") or "B1",
+                    "formation": (meta.get("formation") or "").strip(),
+                    "notes": (meta.get("notes") or "").strip(),
+                },
+                glosses,
+            )
         )
         taken_keys.add(key)
         taken_names.add(name)

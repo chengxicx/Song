@@ -1,0 +1,482 @@
+{
+  "dgm_WegenTrotzGenitiv__4f0bb6": [
+    ["Wegen des Regens bleiben alle zu Hause.", "Because of the rain, everyone is staying at home."],
+    ["Trotz des Wetters wollte sie nicht Tennis spielen.", "Despite the weather, she did not want to play tennis."]
+  ],
+  "dgm_amsten__1bc4de": [
+    ["Mein Sohn ist am ältesten.", "My son is the oldest."],
+    ["Meine Tochter ist am ältesten.", "My daughter is the oldest."]
+  ],
+  "dgm_Komparativals__baed3e": [
+    ["Das Gymnasium ist größer als die Grundschule.", "The grammar school is bigger than the primary school."],
+    ["Der Saal ist größer als das Klassenzimmer.", "The hall is bigger than the classroom."]
+  ],
+  "dgm_PassivmitModalverb__233e10": [
+    ["Das Haus muss gebaut werden.", "The house has to be built."],
+    ["Die Rechnung muss bezahlt werden.", "The bill has to be paid."]
+  ],
+  "dgm_ZustandspassivistPartizip__cb5c46": [
+    ["Das Haus ist gebaut.", "The house has been built."],
+    ["Die Brücke ist gebaut.", "The bridge has been built."]
+  ],
+  "dgm_unbestimmterAkkusativ__72f1f8": [
+    ["Ich suche einen guten Arzt.", "I am looking for a good doctor."],
+    ["Wir kaufen eine neue Wohnung.", "We are buying a new flat."]
+  ],
+  "dgm_WechselpräpositionAkkusativ__b97017": [
+    ["Wir fahren in die Berge.", "We are driving into the mountains."],
+    ["Sie gehen heute in die Berge.", "They are going into the mountains today."]
+  ],
+  "dgm_PräpositionDativinderStadt__32d17b": [
+    ["Sie arbeitet in der Stadt.", "She works in the town."],
+    ["Meine Schwester wohnt in der Stadt.", "My sister lives in the town."]
+  ],
+  "dgm_PerfektmitModalverb__ee8ba1": [
+    ["Viele Leute haben schwimmen können.", "Many people were able to swim."],
+    ["Die Schüler haben schwimmen können.", "The pupils were able to swim."]
+  ],
+  "dgm_Doppelinfinitivsehenlassen__705dda": [
+    ["Ich sehe sie im Garten arbeiten.", "I see her working in the garden."],
+    ["Wir hören den Mann Gitarre spielen.", "We hear the man playing the guitar."]
+  ],
+  "dgm_Infinitivsatzmitumohne__b26c8a": [
+    ["Sie geht nach Hause, ohne dafür zu bezahlen.", "She goes home without paying for it."],
+    ["Er lernt Russisch, um in Moskau zu arbeiten.", "He is learning Russian in order to work in Moscow."]
+  ],
+  "dgm_KonjunktivIberichtetedasssei__a27580": [
+    ["Der Reporter berichtete, dass niemand die Rede verstehe.", "The reporter reported that nobody understood the speech."],
+    ["Der Reporter berichtete, dass die alte Frau gestorben sei.", "The reporter reported that the old woman had died."]
+  ],
+  "dgm_KonjunktivIIwürdehättewäre__7929d1": [
+    ["An deiner Stelle würde ich sofort absagen.", "If I were you, I would cancel right away."],
+    ["Wenn ich mehr Zeit hätte, würde ich einen Kurs machen.", "If I had more time, I would take a course."]
+  ],
+  "dgm_Relativsatzmitwelch__a72fac": [
+    ["Die Nachbarin, die dort wohnt, ist freundlich.", "The neighbour who lives there is friendly."],
+    ["Die Kollegin, die hier wohnt, ist freundlich.", "The colleague who lives here is friendly."]
+  ],
+  "dgm_VerbenmitWechselpräpositionwartenauf__b444d1": [
+    ["Ich warte seit einer Stunde auf den Bus.", "I have been waiting for the bus for an hour."],
+    ["Wir freuen uns auf deinen Besuch.", "We are looking forward to your visit."]
+  ],
+  "dgm_ReflexivesVerbsichfreuen__337920": [
+    ["Ich freue mich über deine Einladung.", "I am delighted about your invitation."],
+    ["Wir interessieren uns für alte Möbel.", "We are interested in old furniture."]
+  ],
+  "dgm_Ordinalzahlenderdritte__97ec68": [
+    ["Der dritte Mai ist ein Feiertag.", "The third of May is a public holiday."],
+    ["Wir treffen uns am zwanzigsten Mai.", "We are meeting on the twentieth of May."]
+  ],
+  "dgm_UhrzeitumneunUhr__331724": [
+    ["Der Zug fährt um neun Uhr ab.", "The train leaves at nine o'clock."],
+    ["Der Film beginnt um neun Uhr.", "The film starts at nine o'clock."]
+  ],
+  "dgm_VerneinungmitkeinkeineZeit__dba616": [
+    ["Ich habe keine Zeit für dich.", "I have no time for you."],
+    ["Wir haben am Freitag keine Prüfung.", "We have no exam on Friday."]
+  ],
+  "dgm_BestimmterArtikelmaskulinesNomenderLehrer__e19eba": [
+    ["Der Lehrer ist jung.", "The teacher is young."],
+    ["Der Mann ist krank.", "The man is ill."]
+  ],
+  "dgm_BestimmterArtikelfemininesNomendieFrau__504ee6": [
+    ["Die Frau singt.", "The woman is singing."],
+    ["Die Dame ist freundlich.", "The lady is friendly."]
+  ],
+  "dgm_BestimmterArtikelneutralesNomendasKind__bb9b83": [
+    ["Das Kind hat nichts genommen.", "The child did not take anything."],
+    ["Das Mädchen ist klein.", "The girl is small."]
+  ],
+  "dgm_MaskulineEndungenerenellingderMantel__e416a3": [
+    ["Der Mantel hängt hier.", "The coat is hanging here."],
+    ["Der Wagen der Herren steht dort.", "The gentlemen's car is parked over there."]
+  ],
+  "dgm_MaskulineFremdendungenistentorderStudent__0357a3": [
+    ["Der Student kommt aus Berlin.", "The student comes from Berlin."],
+    ["Der Professor ist sehr beliebt.", "The professor is very popular."]
+  ],
+  "dgm_FeminineEndungenungheitkeitschaftiondieWohnung__3d6134": [
+    ["Die Wohnung ist modern.", "The flat is modern."],
+    ["Die Krankheit ist gefährlich.", "The illness is dangerous."]
+  ],
+  "dgm_FemininePersonenbezeichnungaufindieLehrerin__c92516": [
+    ["Die Lehrerin ist intelligent.", "The teacher is intelligent."],
+    ["Die Köchin kocht gut.", "The cook cooks well."]
+  ],
+  "dgm_NeutraleVerkleinerungchenleindasMädchen__67699b": [
+    ["Das Mädchen fährt nicht heim.", "The girl is not going home."],
+    ["Das Büchlein liegt hier.", "The little book is lying here."]
+  ],
+  "dgm_NeutraleFremdendungenmentumtumdasMuseum__1afbde": [
+    ["Das Museum wurde von der Klasse besucht.", "The museum was visited by the class."],
+    ["Das Medikament hat ihm geholfen.", "The medicine helped him."]
+  ],
+  "dgm_NominalisierterInfinitivistneutrumdasLesen__1a9bed": [
+    ["Das Lesen und Schreiben lernte er zu Hause.", "He learned to read and write at home."],
+    ["Das Lachen des Kindes ist ansteckend.", "The child's laughter is contagious."]
+  ],
+  "dgm_TageMonateJahreszeitenHimmelsrichtungenmaskulinderSommer__91e4b9": [
+    ["Der Sommer ist eine warme Jahreszeit.", "Summer is a warm season."],
+    ["Der Montag ist der erste Wochentag.", "Monday is the first day of the week."]
+  ],
+  "dgm_PluralIunverändertoderUmlautdieMäntel__66e7ae": [
+    ["Die Mäntel sind neu.", "The coats are new."],
+    ["Die Mädchen sind hübsch.", "The girls are pretty."]
+  ],
+  "dgm_PluralIIEndungedieNächte__fe4a62": [
+    ["Die Nächte sind kalt.", "The nights are cold."],
+    ["Die Tage sind kurz.", "The days are short."]
+  ],
+  "dgm_PluralIIIEndungerdieKinder__529b25": [
+    ["Die Kinder jener Frauen sind krank.", "Those women's children are ill."],
+    ["Die Häuser sind teuer.", "The houses are expensive."]
+  ],
+  "dgm_PluralIVEndungnendieWohnungen__93d704": [
+    ["Die Wohnungen sind kalt.", "The flats are cold."],
+    ["Die Frauen arbeiten hier.", "The women work here."]
+  ],
+  "dgm_PluralVEndungsdieAutos__63671f": [
+    ["Die Autos sind neu.", "The cars are new."],
+    ["Die Hotels sind teuer.", "The hotels are expensive."]
+  ],
+  "dgm_SchwacheNomennDeklinationdenStudenten__0b036e": [
+    ["Wir sehen den Studenten.", "We see the student."],
+    ["Das Wort wurde von dem Studenten buchstabiert.", "The word was spelled out by the student."]
+  ],
+  "dgm_DativPluralaufnmitdenKindern__106905": [
+    ["Wir haben den Kindern geholfen.", "We helped the children."],
+    ["Sie spielt mit den Kindern.", "She is playing with the children."]
+  ],
+  "dgm_GenitivNomenEndungsesdesDoktors__d50f3d": [
+    ["Das Auto des Doktors ist kaputt.", "The doctor's car is broken."],
+    ["Die Farbe des Himmels ist blau.", "The colour of the sky is blue."]
+  ],
+  "dgm_derWörterdieserjederwelcherdieserMann__d1b33a": [
+    ["Dieser Mann ist alt.", "This man is old."],
+    ["Welcher Junge ist dein Bruder?", "Which boy is your brother?"]
+  ],
+  "dgm_KörperteileKleidungmitbestimmtemArtikelsichdieHändewaschen__55aa96": [
+    ["Sie wäscht sich die Hände.", "She is washing her hands."],
+    ["Er zieht sich den Mantel an.", "He is putting on his coat."]
+  ],
+  "dgm_BerufNationalitätohneArtikelnachseinSieistEngländerin__6f46d5": [
+    ["Sie ist Engländerin.", "She is English."],
+    ["Er ist Lehrer.", "He is a teacher."]
+  ],
+  "dgm_PräpositionenmitAkkusativdurchfürgegenohneum__b70f4c": [
+    ["Wir wandern durch die Stadt.", "We are hiking through the town."],
+    ["Das Auto fährt durch die Stadt.", "The car drives through the town."]
+  ],
+  "dgm_PräpositionenmitDativausbeimitnachseitvonzu__7090ac": [
+    ["Ich fahre mit dem Zug nach Berlin.", "I am going to Berlin by train."],
+    ["Er kommt mit dem Bus.", "He is coming by bus."]
+  ],
+  "dgm_WechselpräpositionDativwo__556fd6": [
+    ["Die Bücher liegen auf dem Tisch.", "The books are lying on the table."],
+    ["Die Katze sitzt auf dem Sofa.", "The cat is sitting on the sofa."]
+  ],
+  "dgm_WechselpräpositionAkkusativwohin__8adefb": [
+    ["Ich lege das Buch auf den Tisch.", "I put the book on the table."],
+    ["Er stellt die Flasche auf den Tisch.", "He puts the bottle on the table."]
+  ],
+  "dgm_währendstattGenitiv__139366": [
+    ["Während des Regens bleiben wir zu Hause.", "During the rain we stay at home."],
+    ["Während des Unterrichts darf man nicht sprechen.", "You must not talk during the lesson."]
+  ],
+  "dgm_Verschmelzungzumzurzudemder__81882a": [
+    ["Ich gehe zum Arzt.", "I am going to the doctor."],
+    ["Sie geht zur Schule.", "She is going to school."]
+  ],
+  "dgm_Verschmelzungimaminsvombeim__60edf6": [
+    ["Im Winter ist es kalt.", "In winter it is cold."],
+    ["Am Wochenende schlafe ich lange.", "At the weekend I sleep late."]
+  ],
+  "dgm_wowovonwovonfragtnacheinerSache__094564": [
+    ["Wovon sprichst du?", "What are you talking about?"],
+    ["Wovon träumst du?", "What are you dreaming about?"]
+  ],
+  "dgm_PräpositionPersonalpronomenmitihmfürsie__3530ae": [
+    ["Ich fahre mit ihm in die Stadt.", "I am going into town with him."],
+    ["Ich spiele mit ihm Schach.", "I am playing chess with him."]
+  ],
+  "dgm_nachgestelltePräpositiondieStraßeentlang__43dd79": [
+    ["Das Auto fährt die Straße entlang.", "The car drives along the street."],
+    ["Wir gehen die Straße entlang.", "We walk along the street."]
+  ],
+  "dgm_PersonalpronomenimAkkusativmichdichihn__ca33cb": [
+    ["Er kennt mich und dich.", "He knows me and you."],
+    ["Sie besucht mich und dich.", "She visits me and you."]
+  ],
+  "dgm_PersonalpronomenimDativmirdirihm__778dfd": [
+    ["Er hilft mir und dir.", "He helps me and you."],
+    ["Das Buch gehört mir und dir.", "The book belongs to me and you."]
+  ],
+  "dgm_StellungderPronomenobjekteesihm__22707b": [
+    ["Ich gebe es ihm.", "I give it to him."],
+    ["Sie schickt es ihm.", "She sends it to him."]
+  ],
+  "dgm_VerbPräpositionsichinteressierenfür__0bc7b4": [
+    ["Er interessiert sich für Musik.", "He is interested in music."],
+    ["Sie interessiert sich für alte Möbel.", "She is interested in old furniture."]
+  ],
+  "dgm_dadaraufdarandavon__6b5e80": [
+    ["Ich warte darauf und denke daran.", "I am waiting for it and thinking about it."],
+    ["Sie freut sich darauf, aber denkt auch daran.", "She is looking forward to it, but she is also thinking about it."]
+  ],
+  "dgm_ReflexivpronomenimDativsichdieHändewaschen__5186b5": [
+    ["Ich wasche mir die Hände.", "I wash my hands."],
+    ["Er wäscht mir die Hände.", "He washes my hands."]
+  ],
+  "dgm_Possessivpronomendasistmeins__459047": [
+    ["Das ist meins.", "That is mine."],
+    ["Dieses Auto ist meins.", "This car is mine."]
+  ],
+  "dgm_Demonstrativpronomendieserdiese__42ef5c": [
+    ["Dieser ist zu teuer.", "This one is too expensive."],
+    ["Diese gefällt mir nicht.", "I do not like this one."]
+  ],
+  "dgm_Indefinitpronomenmanjemandniemand__e882f1": [
+    ["Man sagt, jemand hat gelogen.", "They say someone lied."],
+    ["Man fragte jemand nach dem Weg.", "Someone was asked for directions."]
+  ],
+  "dgm_Indefinitpronomenjederjederweißdas__1c0860": [
+    ["Jeder weiß das.", "Everyone knows that."],
+    ["Jeder kann das lernen.", "Everyone can learn that."]
+  ],
+  "dgm_Relativpronomenwoworaufdusitzt__1a7f9a": [
+    ["Der Stuhl, worauf du sitzt, ist alt.", "The chair you are sitting on is old."],
+    ["Die Bank, worauf du sitzt, ist neu.", "The bench you are sitting on is new."]
+  ],
+  "dgm_Reziprokpronomeneinander__fde3f9": [
+    ["Sie helfen einander.", "They help each other."],
+    ["Wir kennen einander gut.", "We know each other well."]
+  ],
+  "dgm_DemonstrativadjektivdiesenManndieseFrauen__4a26ee": [
+    ["Kennst du diesen Mann?", "Do you know this man?"],
+    ["Wir haben diesen Mann gesehen.", "We saw this man."]
+  ],
+  "dgm_AdjektivdeklinationnachbestimmtemArtikeldaskleineKind__5fdb74": [
+    ["Das kleine Kind spielt im Garten.", "The small child is playing in the garden."],
+    ["Das kleine Kind schläft.", "The small child is asleep."]
+  ],
+  "dgm_AdjektivdeklinationnachunbestimmtemArtikeleinkleinesKind__a8b139": [
+    ["Ein kleines Kind spielt dort.", "A small child is playing over there."],
+    ["Ein kleines Kind lacht.", "A small child is laughing."]
+  ],
+  "dgm_AdjektivdeklinationohneArtikelkleineKinder__628357": [
+    ["Kleine Kinder spielen gern.", "Small children like playing."],
+    ["Kleine Kinder lernen schnell.", "Small children learn quickly."]
+  ],
+  "dgm_PartizipPräsensalsAdjektivdasschlafendeKind__c414a2": [
+    ["Das schlafende Kind liegt im Bett.", "The sleeping child is lying in bed."],
+    ["Das schlafende Kind ist süß.", "The sleeping child is cute."]
+  ],
+  "dgm_PartizipPerfektalsAdjektivdiegeschlosseneTür__2c5eb5": [
+    ["Die geschlossene Tür ist alt.", "The closed door is old."],
+    ["Ich sehe die geschlossene Tür.", "I see the closed door."]
+  ],
+  "dgm_nominalisiertesAdjektivetwasNeues__f84908": [
+    ["Ich habe etwas Neues gelernt.", "I learned something new."],
+    ["Er hat etwas Neues gekauft.", "He bought something new."]
+  ],
+  "dgm_prädikativesAdjektivistgroß__fc4961": [
+    ["Das Haus ist groß.", "The house is big."],
+    ["Der Baum ist groß.", "The tree is big."]
+  ],
+  "dgm_unregelmäßigeSteigerunggutbesserambesten__bba551": [
+    ["Der Kuchen schmeckt besser als das Brot.", "The cake tastes better than the bread."],
+    ["Sie spielt besser als ich.", "She plays better than I do."]
+  ],
+  "dgm_AdverbdesOrteshierdort__25e09f": [
+    ["Meine Bücher liegen hier, deine liegen dort.", "My books are here, yours are there."],
+    ["Die Wagen stehen hier, die Teller stehen dort.", "The cars are here, the plates are there."]
+  ],
+  "dgm_AdverbderZeitmanchmaloft__3a1464": [
+    ["Wir gehen manchmal ins Kino.", "We sometimes go to the cinema."],
+    ["Er kommt manchmal zu spät.", "He sometimes comes too late."]
+  ],
+  "dgm_PositiondesAdverbsZeitvorOrt__92b35f": [
+    ["Ich gehe heute nach Hause.", "I am going home today."],
+    ["Wir fahren heute nach Berlin.", "We are going to Berlin today."]
+  ],
+  "dgm_ZahlenübereineMillionalsNomeneineMillion__930f1f": [
+    ["Eine Million Menschen leben in dieser Stadt.", "A million people live in this city."],
+    ["Das kostet eine Milliarde Euro.", "That costs a billion euros."]
+  ],
+  "dgm_BruchzahlenaufeleinViertel__13e4ab": [
+    ["Ein Viertel der Klasse fehlt heute.", "A quarter of the class is absent today."],
+    ["Ich habe ein Drittel gegessen.", "I ate a third of it."]
+  ],
+  "dgm_amWochentagTageszeitamMontag__7e248c": [
+    ["Kommst du am Montag an?", "Are you arriving on Monday?"],
+    ["Meistens ist er am Abend müde.", "He is usually tired in the evening."]
+  ],
+  "dgm_imMonatJahreszeitimJuli__3a17d6": [
+    ["Ich fliege im Juli nach Frankfurt.", "I am flying to Frankfurt in July."],
+    ["Im Sommer fahren wir ans Meer.", "In summer we go to the sea."]
+  ],
+  "dgm_vorDativZeitvordemJetztvoreinerWoche__a9fb1f": [
+    ["Vor einer Woche war er in Kanada.", "A week ago he was in Canada."],
+    ["Sie besuchte uns vor vierzehn Tagen.", "She visited us a fortnight ago."]
+  ],
+  "dgm_nachDativnachdemEssen__97efda": [
+    ["Nach dem Essen gehen wir spazieren.", "After the meal we go for a walk."],
+    ["Nach dem Unterricht fahre ich nach Hause.", "After the lesson I go home."]
+  ],
+  "dgm_ZeitdauerimAkkusativeinenTag__0ba3fa": [
+    ["Ich bleibe einen Tag dort.", "I am staying there for a day."],
+    ["Er arbeitet den ganzen Abend.", "He works all evening."]
+  ],
+  "dgm_UnbestimmteZeitimGenitiveinesTages__993c94": [
+    ["Eines Tages kaufte er ein Auto.", "One day he bought a car."],
+    ["Eines Abends wurde er krank.", "One evening he fell ill."]
+  ],
+  "dgm_Personalendungenichedustert__d393fd": [
+    ["Du lernst Deutsch, und ich lerne Englisch.", "You are learning German, and I am learning English."],
+    ["Er spielt Fußball, und wir spielen Tennis.", "He plays football, and we play tennis."]
+  ],
+  "dgm_AnrededuSieformellundinformell__00940e": [
+    ["Wie heißen Sie, Frau Müller?", "What is your name, Mrs Müller?"],
+    ["Wie heißt du, mein Junge?", "What is your name, my boy?"]
+  ],
+  "dgm_VokalwechselimPräsensduliesterfährt__b0fdde": [
+    ["Du liest die Zeitung, und er liest ein Buch.", "You are reading the newspaper, and he is reading a book."],
+    ["Du fährst nach Berlin, und sie fährt nach Bonn.", "You are going to Berlin, and she is going to Bonn."]
+  ],
+  "dgm_PräsensmitZukunftsbedeutungMorgenfahreich__36c469": [
+    ["Morgen fahre ich nach Berlin.", "Tomorrow I am going to Berlin."],
+    ["Nächste Woche beginnt der Kurs.", "The course starts next week."]
+  ],
+  "dgm_PartizipIIgearbeitetgelaufen__083c68": [
+    ["Ich habe gearbeitet.", "I have worked."],
+    ["Er ist schnell gelaufen.", "He ran fast."]
+  ],
+  "dgm_Plusquamperfekthattegegessenwargegangen__f68e97": [
+    ["Nachdem er gegessen hatte, ging er spazieren.", "After he had eaten, he went for a walk."],
+    ["Sie war schon abgefahren, als ich ankam.", "She had already left when I arrived."]
+  ],
+  "dgm_FuturIIwerdenPartiziphaben__919b7e": [
+    ["Wir werden es wohl gehört haben.", "We will probably have heard about it."],
+    ["Bis morgen werde ich die Arbeit gemacht haben.", "By tomorrow I will have finished the work."]
+  ],
+  "dgm_UntrennbarePräfixeverbeer__d8df4b": [
+    ["Er versteht die Frage nicht.", "He does not understand the question."],
+    ["Sie besucht ihre Großmutter jeden Sonntag.", "She visits her grandmother every Sunday."]
+  ],
+  "dgm_TrennbarePräfixeaufanausamSatzende__27af4b": [
+    ["Er steht jeden Morgen früh auf.", "He gets up early every morning."],
+    ["Die Züge kommen pünktlich an.", "The trains arrive on time."]
+  ],
+  "dgm_VerbenmitDativhelfendankengefallen__e6ab4e": [
+    ["Ich helfe meinem Bruder bei den Hausaufgaben.", "I help my brother with his homework."],
+    ["Das Buch gefällt mir sehr gut.", "I like the book very much."]
+  ],
+  "dgm_Präpositionalobjektdenkenansprechenüber__90eab8": [
+    ["Ich denke oft an dich.", "I often think of you."],
+    ["Wir sprechen über das Problem.", "We are talking about the problem."]
+  ],
+  "dgm_ModalverbenimPräteritumkonntemusste__c1dcdd": [
+    ["Ich konnte gestern nicht kommen.", "I could not come yesterday."],
+    ["Er musste lange warten.", "He had to wait a long time."]
+  ],
+  "dgm_InfinitivalsNomendasLesen__d55cdb": [
+    ["Das Lesen macht ihm Freude.", "Reading gives him pleasure."],
+    ["Beim Essen sprechen wir nicht.", "We do not talk while eating."]
+  ],
+  "dgm_PartizipienalsAdjektivedergekaufteWagen__a75843": [
+    ["Der gekaufte Wagen ist sehr alt.", "The car that was bought is very old."],
+    ["Die singenden Kinder sind glücklich.", "The singing children are happy."]
+  ],
+  "dgm_ImperativKommKommenSie__33e686": [
+    ["Kommen Sie bitte morgen wieder!", "Please come back tomorrow!"],
+    ["Mach die Tür zu!", "Close the door!"]
+  ],
+  "dgm_PassivimPerfektistworden__c4fbf7": [
+    ["Das Haus ist gebaut worden.", "The house has been built."],
+    ["Die Rechnung ist gestern bezahlt worden.", "The bill was paid yesterday."]
+  ],
+  "dgm_Passiversatzmitmanmankann__2e75f8": [
+    ["Man kann das Problem leicht lösen.", "The problem can be solved easily."],
+    ["Man baut hier ein neues Krankenhaus.", "A new hospital is being built here."]
+  ],
+  "dgm_kennenwissenkönnenChoosingthecorrectverb__f4764b": [
+    ["Ich weiß nicht, wo er wohnt.", "I do not know where he lives."],
+    ["Kennst du meinen Bruder?", "Do you know my brother?"]
+  ],
+  "dgm_liegenlegenLageundBewegung__41e2ca": [
+    ["Das Buch liegt auf dem Tisch.", "The book is lying on the table."],
+    ["Ich lege das Buch auf den Tisch.", "I put the book on the table."]
+  ],
+  "dgm_lassensichlassenInfinitiv__bb26ca": [
+    ["Das lässt sich leicht erklären.", "That can be explained easily."],
+    ["Ich lasse das Auto reparieren.", "I am having the car repaired."]
+  ],
+  "dgm_nichtamSatzendeIchverstehedasnicht__5043ac": [
+    ["Ich verstehe das nicht.", "I do not understand that."],
+    ["Er kommt heute nicht.", "He is not coming today."]
+  ],
+  "dgm_nichtsondernKorrektur__f37c91": [
+    ["Er ist nicht mein Bruder, sondern mein Cousin.", "He is not my brother but my cousin."],
+    ["Wir sind nicht in Deutschland, sondern wir sind in Spanien.", "We are not in Germany, we are in Spain."]
+  ],
+  "dgm_jadochAntwortaufeineNegativfrage__9a560b": [
+    ["Kommst du nicht mit? Doch, ich komme mit.", "Are you not coming along? Yes, I am coming along."],
+    ["Hast du keinen Hunger? Doch, ich habe Hunger.", "Are you not hungry? Yes, I am hungry."]
+  ],
+  "dgm_brauchennichtzuInfinitiv__6c479e": [
+    ["Du brauchst den Roman nicht zu lesen.", "You do not need to read the novel."],
+    ["Du brauchst Herbert nicht zu helfen.", "You do not need to help Herbert."]
+  ],
+  "dgm_keinNegationsartikelvorNomen__8772bf": [
+    ["Ich habe keinen Freund.", "I have no friend."],
+    ["Die Kinder tranken keinen Wein.", "The children drank no wine."]
+  ],
+  "dgm_nichtsniemandNegativpronomen__644be0": [
+    ["Ich habe nichts gesagt.", "I said nothing."],
+    ["Niemand hat das gewusst.", "Nobody knew that."]
+  ],
+  "dgm_JaNeinFrageInversionKommstdumit__f0b48a": [
+    ["Kommst du heute mit?", "Are you coming along today?"],
+    ["Hast du Zeit?", "Do you have time?"]
+  ],
+  "dgm_WFragemitPräpositionWoraufWomit__d14f00": [
+    ["Worauf sollen die Bücher liegen?", "What should the books lie on?"],
+    ["Womit fährst du in die Stadt?", "How are you getting into town?"]
+  ],
+  "dgm_Frageadverbienwohinwoherwo__cb48f0": [
+    ["Woher kommen die Kinder?", "Where do the children come from?"],
+    ["Wohin gehst du?", "Where are you going?"]
+  ],
+  "dgm_Interrogativpronomenwerwenwem__99f704": [
+    ["Wen hast du gesehen?", "Whom did you see?"],
+    ["Wem gehört diese Tasche?", "Whose bag is this?"]
+  ],
+  "dgm_welchwasfüreinFrageadjektiv__27dad5": [
+    ["Welches Buch möchtest du lesen?", "Which book would you like to read?"],
+    ["Was für ein Auto ist das?", "What kind of car is that?"]
+  ],
+  "dgm_WortstellungVerbanzweiterStelleHeutegeheich__3db598": [
+    ["Heute gehe ich ins Kino.", "Today I am going to the cinema."],
+    ["Am Montag fährt mein Bruder nach Hamburg.", "On Monday my brother is going to Hamburg."]
+  ],
+  "dgm_nebenordnendeKonjunktionenaberdennsondern__636532": [
+    ["Ich möchte kommen, aber ich habe keine Zeit.", "I would like to come, but I have no time."],
+    ["Sie ist nicht müde, sondern sie ist krank.", "She is not tired, she is ill."]
+  ],
+  "dgm_alswennwanntemporaleKonjunktionen__4fcf9b": [
+    ["Als ihre Mutter ins Zimmer kam, las sie ein Buch.", "When her mother came into the room, she was reading a book."],
+    ["Wenn ich Zeit habe, besuche ich meine Tante.", "When I have time, I visit my aunt."]
+  ],
+  "dgm_KonditionalsatzmitdannWenndann__465ab3": [
+    ["Wenn du kommst, dann bringe ich einen Kuchen mit.", "If you come, I will bring a cake."],
+    ["Wenn es morgen regnet, bleiben wir zu Hause.", "If it rains tomorrow, we will stay at home."]
+  ],
+  "dgm_HauptsatznachNebensatzVerbanersterStelle__0f6123": [
+    ["Wenn es morgen regnet, bleiben wir zu Hause.", "If it rains tomorrow, we will stay at home."],
+    ["Obwohl es kalt war, gingen wir spazieren.", "Although it was cold, we went for a walk."]
+  ],
+  "dgm_StellungderObjektePronomenvorNomen__3d43c3": [
+    ["Ich gebe es dem Mann.", "I give it to the man."],
+    ["Ich gebe ihm das Buch.", "I give him the book."]
+  ]
+}

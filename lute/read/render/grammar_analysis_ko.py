@@ -37,6 +37,8 @@ import re
 import threading
 import unicodedata
 
+from lute.read.render.grammar_analysis_matcher import load_golden
+
 # ---- tokenizer -------------------------------------------------------
 
 _tokenizer = None
@@ -335,7 +337,11 @@ _KO_RULES = [
         "ko_eunikka",
         "-(으)니까",
         "because; since (reason)",
-        [{"type": "tokens", "conds": [{"surface": "니까", "pos": "EC"}]}],
+        # Kiwi keeps the epenthetic 으 inside the ending after a consonant
+        # stem (없으니까, 많으니까), so requiring the bare 니까 missed every
+        # adjective and every ㄹ-less consonant stem -- half the uses of the
+        # pattern.  Both spellings are the same ending.
+        [{"type": "tokens", "conds": [{"surface": ("니까", "으니까"), "pos": "EC"}]}],
         zh="因为……；由于……",
         ko="이유나 근거를 나타내는 연결 어미.",
     ),
@@ -596,10 +602,33 @@ def _panel_fields(key, item, specs, examples, tokenised):
 
 # Compatibility jamo that can close a syllable, with their coda index.
 _JAMO_CODA = {
-    "ㄱ": 1, "ㄲ": 2, "ㄳ": 3, "ㄴ": 4, "ㄵ": 5, "ㄶ": 6, "ㄷ": 7, "ㄹ": 8,
-    "ㄺ": 9, "ㄻ": 10, "ㄼ": 11, "ㄽ": 12, "ㄾ": 13, "ㄿ": 14, "ㅀ": 15,
-    "ㅁ": 16, "ㅂ": 17, "ㅄ": 18, "ㅅ": 19, "ㅆ": 20, "ㅇ": 21, "ㅈ": 22,
-    "ㅊ": 23, "ㅋ": 24, "ㅌ": 25, "ㅍ": 26, "ㅎ": 27,
+    "ㄱ": 1,
+    "ㄲ": 2,
+    "ㄳ": 3,
+    "ㄴ": 4,
+    "ㄵ": 5,
+    "ㄶ": 6,
+    "ㄷ": 7,
+    "ㄹ": 8,
+    "ㄺ": 9,
+    "ㄻ": 10,
+    "ㄼ": 11,
+    "ㄽ": 12,
+    "ㄾ": 13,
+    "ㄿ": 14,
+    "ㅀ": 15,
+    "ㅁ": 16,
+    "ㅂ": 17,
+    "ㅄ": 18,
+    "ㅅ": 19,
+    "ㅆ": 20,
+    "ㅇ": 21,
+    "ㅈ": 22,
+    "ㅊ": 23,
+    "ㅋ": 24,
+    "ㅌ": 25,
+    "ㅍ": 26,
+    "ㅎ": 27,
 }
 
 # The allomorph a pattern name spells with its optional group, as it can
@@ -771,9 +800,7 @@ def _load_data_rules():
             if len(focus) >= 2 and _literal_is_the_point(focus, forms)
         ]
         if literals:
-            kept[item.get("key") or name] = sorted(
-                set(literals), key=len, reverse=True
-            )
+            kept[item.get("key") or name] = sorted(set(literals), key=len, reverse=True)
 
     # Pass 2 -- every surviving literal in the library is a tail-guard
     # source for the shorter ones, so the pool is collected up front.
@@ -1542,41 +1569,67 @@ def analyze_korean(page_text, display_lang="en"):
 # grammar_levels.hideable_grammar_groups.
 _LIBRARY_LEVEL_RANK = {"TOPIK 1-2": 0, "TOPIK 3-4": 1, "TOPIK 5-6": 2}
 
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_ko_golden.json",
+    )
+)
 
-def _example_rows(rule, display_lang):
+
+def _golden_examples():
+    """
+    Curated example sentences for the hand-written rules, keyed by rule key.
+
+    Shape ``key -> [{"text", "en", "zh", "ko"}, ...]``, the same store the
+    tests re-run through each rule.  Written by hand rather than mined from
+    the corpus: the curated rows that fire on these twelve beginner points
+    are long and off-topic, so they make poor illustrations.
+    """
+    return load_golden(_GOLDEN_PATH)
+
+
+def _example_rows(rule, display_lang, examples=None):
     """
     The rule's examples as display rows.
 
-    The data rules carry {korean, chinese, english} rows, so they come back
-    as {"text", "tr"}; the hand-written rules carry no examples at all and
-    yield an empty list.  A row with no translation in the display language
-    stays a plain string -- an English gloss under a Chinese heading would
-    be worse than no gloss, the same rule the Japanese export follows.
+    The data rules carry {korean, chinese, english} rows; a golden row
+    carries the shared {text, en, zh, ko} shape.  Both come back as
+    {"text", "tr"} where a translation exists for the display language and
+    as a plain sentence where it does not -- an English gloss under a
+    Chinese heading would be worse than no gloss, the same rule the
+    Japanese export follows.  The Korean panel gets no gloss: the sentence
+    already is Korean.
     """
     rows = []
-    for row in rule.get("examples") or []:
-        korean = (row.get("korean") if isinstance(row, dict) else row) or ""
-        korean = korean.strip()
+    for row in examples if examples is not None else rule.get("examples") or []:
+        if isinstance(row, dict):
+            korean = (row.get("korean") or row.get("text") or "").strip()
+        else:
+            korean = (row or "").strip()
         if not korean:
             continue
         tr = ""
         if isinstance(row, dict) and display_lang != "ko":
             if display_lang == "zh":
-                tr = (row.get("chinese") or "").strip()
+                tr = (row.get("chinese") or row.get("zh") or "").strip()
             else:
-                tr = (row.get("english") or "").strip()
+                tr = (row.get("english") or row.get("en") or "").strip()
         rows.append({"text": korean, "tr": tr} if tr else korean)
     return rows
 
 
-def _library_entry(rule, display_lang):
+def _library_entry(rule, display_lang, examples=None):
     "One rule as a library row, display-ready (see the Japanese analogue)."
     entry = {
         "key": rule["key"],
         "name": rule["pattern"],
         "level": rule["level"],
         "desc": _desc(rule, display_lang),
-        "examples": _example_rows(rule, display_lang),
+        "examples": _example_rows(rule, display_lang, examples),
         "skipped": False,
     }
     formation = _enrichment(rule, "formation", display_lang)
@@ -1601,9 +1654,14 @@ def library_entries(display_lang="en"):
     no Korean books does not pay for the Kiwi instance.  Every rule the
     matcher can fire is included: unlike the Japanese corpus there is no
     reviewed "reference only" subset.
+
+    The hand-written basics take their examples from the golden set
+    (``grammar_ko_golden.json``); the curated rows carry their own.
     """
-    rules = _KO_RULES + _get_data_rules() + _get_pattern_rules()
-    entries = [_library_entry(rule, display_lang) for rule in rules]
+    golden = _golden_examples()
+    rules = [(rule, golden.get(rule["key"])) for rule in _KO_RULES]
+    rules += [(rule, None) for rule in _get_data_rules() + _get_pattern_rules()]
+    entries = [_library_entry(rule, display_lang, examples) for rule, examples in rules]
     ordered = sorted(
         enumerate(entries),
         key=lambda pair: (_LIBRARY_LEVEL_RANK.get(pair[1]["level"], 9), pair[0]),

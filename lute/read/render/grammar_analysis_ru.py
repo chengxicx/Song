@@ -21,6 +21,7 @@ from lute.read.render.grammar_analysis_matcher import (
     desc_for_rule,
     make_rule,
     match_rule,
+    paired_examples,
     spec_lemma,
     spec_morph,
     spec_pos,
@@ -733,8 +734,9 @@ def _inflected_specs(words, examples):
             tok = by_surface.get(w)
             point = None
             if tok is not None and tok["morph"]:
-                point = {k: tok["morph"][k] for k in _POINT_FEATURES
-                         if k in tok["morph"]}
+                point = {
+                    k: tok["morph"][k] for k in _POINT_FEATURES if k in tok["morph"]
+                }
             if point:
                 seq.append({"morph": point})
             else:
@@ -850,18 +852,16 @@ def _load_data_rules(include_silenced=False):
         silenced = item.get("key") in _DUPLICATE_RULE_IDS
         if silenced and not include_silenced:
             continue  # its matcher reports a span another rule already reports
-        # The row's examples carry a parallel Chinese gloss in `example_zh`;
+        # The row's examples carry parallel gloss lists (`example_zh` from
+        # the merged material, `example_en` from the authored back-fill);
         # pair them up so the library can print a translation, and keep the
         # plain sentences for the matcher validation below.
-        glosses = item.get("example_zh") or []
-        pairs = []
-        for index, raw in enumerate(item.get("examples") or []):
+        texts = []
+        for raw in item.get("examples") or []:
             text = _strip_stress(raw or "").strip()
-            if not text:
-                continue
-            gloss = glosses[index] if index < len(glosses) else ""
-            pairs.append({"ru": text, "zh": (gloss or "").strip()})
-        examples = [pair["ru"] for pair in pairs]
+            if text:
+                texts.append(text)
+        examples = texts
         if not examples:
             continue
         validated = _row_specs(item.get("focus"), examples)
@@ -869,6 +869,7 @@ def _load_data_rules(include_silenced=False):
             continue
         key = item.get("key") or name
         _RU_RULE_EXAMPLES[key] = examples
+        library_examples = paired_examples("ru", examples, item)
         rule = make_rule(
             key,
             name,
@@ -884,12 +885,12 @@ def _load_data_rules(include_silenced=False):
         # present); the panel ignores keys it does not read.
         rule["formation"] = (item.get("formation") or "").strip()
         rule["notes"] = (item.get("notes") or "").strip()
-        rule["examples"] = pairs
+        rule["examples"] = library_examples
         # The panel's folded reference block: the row's own example with
         # its Chinese gloss, so a reader sees a translated sentence rather
         # than only the description.  The library page shows every example,
         # so this is the panel's single curated one.
-        rule["reference"] = _first_glossed(pairs)
+        rule["reference"] = _first_glossed(library_examples)
         rules.append(rule)
     return rules
 
@@ -953,10 +954,7 @@ def _get_all_rules():
                 examples = rule.get("examples") or golden.get(rule["key"]) or []
                 if examples:
                     rule["reference"] = _first_glossed(
-                        [
-                            e if isinstance(e, dict) else {"ru": e}
-                            for e in examples
-                        ]
+                        [e if isinstance(e, dict) else {"ru": e} for e in examples]
                     )
         return _all_rules_cache
 

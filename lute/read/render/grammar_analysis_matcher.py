@@ -51,7 +51,10 @@ sentence when its first token satisfies the spec (the command "dame",
 which the tagger also reads as a preterite form).
 """
 
+import json
+import os
 import re
+import threading
 
 _PUNCT_POS = {"PUNCT", "SYM"}
 
@@ -813,6 +816,37 @@ def example_gloss(example, display_lang):
     return (example.get("en") or example.get("english") or "").strip()
 
 
+def paired_examples(own_field, texts, row):
+    """
+    A corpus row's examples as dicts carrying whichever glosses it has.
+
+    The Spanish / French / German / Russian corpora store the sentences as a
+    bare list plus parallel gloss lists (``example_zh``, ``example_en``,
+    ``example_ko``).  Pairing them here keeps every engine's loader on one
+    rule: a gloss list that does not line up with the sentences is dropped
+    whole rather than applied to the wrong ones, and a row with no glosses
+    at all keeps returning plain strings so nothing downstream sees a
+    dict it does not need.
+    """
+    lists = {}
+    for field in ("zh", "en", "ko"):
+        values = [
+            str(value or "").strip() for value in (row.get("example_" + field) or [])
+        ]
+        if len(values) == len(texts):
+            lists[field] = values
+    if not lists:
+        return list(texts)
+    paired = []
+    for index, text in enumerate(texts):
+        entry = {own_field: text}
+        for field, values in lists.items():
+            if values[index]:
+                entry[field] = values[index]
+        paired.append(entry)
+    return paired
+
+
 def reference_gloss(reference, display_lang):
     """
     Translation for a rule's folded reference example, in the display
@@ -832,29 +866,82 @@ def reference_gloss(reference, display_lang):
 
 _CEFR_ORDER = ("A1", "A2", "B1", "B2", "C1", "C2")
 
+_golden_lock = threading.Lock()
+_golden_cache = {}
 
-def rule_library_entries(rules, display_lang="en"):
+
+def load_golden(path):
+    """
+    Curated example sentences from one golden file, keyed by rule key.
+
+    A golden file is ``{rule key: {"name": ..., "examples": [...]}}`` where
+    an example carries the sentence in the language's own field plus
+    whatever translations it has (``en`` / ``zh`` / ``ko``).  The loader
+    keeps only examples with a sentence in the engine's own field -- a row
+    whose text field is empty is a data error, and shipping it would show
+    a blank example on the library page.
+
+    Missing file means "no golden set for this engine", which is the normal
+    state for a rule set that was written without examples.
+    """
+    with _golden_lock:
+        if path not in _golden_cache:
+            examples = {}
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as fh:
+                    for key, entry in json.load(fh).items():
+                        rows = [
+                            example
+                            for example in entry.get("examples") or []
+                            if (example.get("text") or "").strip()
+                        ]
+                        if rows:
+                            examples[key] = rows
+            _golden_cache[path] = examples
+        return _golden_cache[path]
+
+
+def rule_library_entries(rules, display_lang="en", examples_by_key=None):
     """
     Export a hand-written rule list as browsable library rows.
 
     Every rule becomes a row -- these rule sets have no reference-only
     rows, so nothing is flagged ``skipped`` -- ordered by CEFR band and
     stable within a band (the order the rules are written in, which is
-    the teaching order).  The rows carry no examples: the rule sets that
-    use this exporter were written without any, and the detail template
-    hides an empty example block rather than rendering an empty one.
+    the teaching order).
+
+    ``examples_by_key`` optionally supplies curated sentences per rule key,
+    the ``{key: [{"<lang>", "en", "zh", "ko"}, ...]}`` shape a golden set
+    uses.  Each becomes a ``{"text", "tr"}`` row with the translation for
+    the display language, or a bare sentence where the set carries none for
+    it.  A rule set with no golden file simply passes nothing and its rows
+    stay example-less, as before.
     """
-    entries = [
-        {
-            "key": rule["key"],
-            "name": rule["name"],
-            "level": rule["level"],
-            "desc": desc_for_rule(rule, display_lang),
-            "examples": [],
-            "skipped": False,
-        }
-        for rule in rules
-    ]
+    examples_by_key = examples_by_key or {}
+    entries = []
+    for rule in rules:
+        rows = []
+        for example in examples_by_key.get(rule["key"]) or []:
+            if isinstance(example, dict):
+                text = (example.get("text") or "").strip()
+                if not text:
+                    continue
+                tr = example_gloss(example, display_lang)
+                rows.append({"text": text, "tr": tr} if tr else text)
+            else:
+                text = (example or "").strip()
+                if text:
+                    rows.append(text)
+        entries.append(
+            {
+                "key": rule["key"],
+                "name": rule["name"],
+                "level": rule["level"],
+                "desc": desc_for_rule(rule, display_lang),
+                "examples": rows,
+                "skipped": False,
+            }
+        )
     return sorted(
         entries,
         key=lambda e: _CEFR_ORDER.index(e["level"])
