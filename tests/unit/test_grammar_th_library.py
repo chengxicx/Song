@@ -11,10 +11,12 @@ still renders a card, so only this check catches it.
 
 import json
 import os
+import re
 
 import pytest
 
 from lute.read.render import grammar_analysis_th as th
+from lute.read.render.grammar_analysis_matcher import match_rule, make_rule
 
 LEVELS = {"A1", "A2", "B1", "B2", "C1", "C2"}
 TOPICS = {
@@ -98,12 +100,41 @@ def test_levels_are_ordered_easiest_first():
     assert ranks == sorted(ranks)
 
 
+def _token_offsets(sentence):
+    "Character offsets where tokens start and end, from the engine's tokens."
+    starts, ends = set(), set()
+    for token in th._tokens_for(sentence):  # pylint: disable=protected-access
+        starts.add(token["idx"])
+        ends.add(token["idx"] + len(token["surface"]))
+    return starts, ends
+
+
+def _occurs_at_boundary(sentence, literal, mode):
+    """
+    Whether the sentence uses the literal in a way the row may match.
+
+    A row's literal is only evidence of the construction when it sits where
+    the row says it may: as a whole word, or at the start of one.
+    """
+    starts, ends = _token_offsets(sentence)
+    for hit in re.finditer(re.escape(literal), sentence):
+        if hit.start() not in starts:
+            continue
+        if mode == "start" or hit.end() in ends:
+            return True
+    return False
+
+
 def test_each_row_fires_on_an_example_that_contains_its_literal():
     """
     A row whose literal is visibly present in one of the sentences stored
     beside it must be reported on that sentence.  Guards the loader: a
     rule built from the wrong field, or dropped as a duplicate key, would
     leave the library card in place but never fire it.
+
+    "Present" respects the row's boundary mode: a literal that only turns
+    up inside a longer word (ขา inside ขาย) is not an occurrence, and the
+    rule is right not to fire on it.
     """
     try:
         th._tokenizer()  # pylint: disable=protected-access
@@ -119,10 +150,14 @@ def test_each_row_fires_on_an_example_that_contains_its_literal():
             continue
         if not row.get("focus") or not row.get("examples"):
             continue
+        mode = row.get("boundary") or "token"
         sentences = [
             ex.split(" · ")[0]
             for ex in row["examples"]
-            if any(literal in ex.split(" · ")[0] for literal in row["focus"])
+            if any(
+                _occurs_at_boundary(ex.split(" · ")[0], literal, mode)
+                for literal in row["focus"]
+            )
         ]
         if not sentences:
             continue
@@ -150,6 +185,79 @@ def test_unrelated_text_does_not_raise_the_noisy_rows():
     keys = {c["key"] for c in th.analyze_thai("เขาเป็นครูที่โรงเรียน", "en")}
     assert "th_passive" not in keys
     assert "th_yesno" not in keys
+
+
+# ---- word-boundary mode ------------------------------------------------
+#
+# The corpus regex runs over raw text, so a short literal also turns up
+# inside longer words.  Every rule now says where its literal may sit:
+# whole token for particles (ขา, สิ, ที), token start for prefixes and
+# compound heads (ความ, นัก, ฤดู, เท่า).
+
+
+def test_boundary_values_are_known():
+    "Only the two documented modes, and only where the row has a literal."
+    for row in corpus():
+        assert row.get("boundary") in (None, "token", "start"), row["key"]
+        if row.get("boundary"):
+            assert row.get("focus"), row["key"]
+
+
+def test_particle_literals_do_not_match_inside_longer_words():
+    """
+    Each pair is the same characters: once as the particle, once buried in
+    a longer word that merely contains it.  Only the first may fire.
+    """
+    try:
+        th._tokenizer()  # pylint: disable=protected-access
+    except ImportError:
+        pytest.skip("pythainlp is not installed")
+
+    buried = [
+        ("ผมขายของที่ตลาด", "th-particle-khaa", "ขา inside ขาย"),
+        ("สิบสองโมง", "th-imperative", "สิ inside สิบ"),
+        ("ทีมนี้เก่งมาก", "th-times-count", "ที inside ทีม"),
+        ("ของฉันอยู่ไหน", "th-request-thing", "ขอ inside ของ"),
+    ]
+    for sentence, key, why in buried:
+        keys = {c["key"] for c in th.analyze_thai(sentence, "en")}
+        assert key not in keys, f"{why} fired {key} on {sentence}"
+
+    assert "th-particle-khaa" in {c["key"] for c in th.analyze_thai("คุณแม่ขา", "en")}
+    assert "th-imperative" in {c["key"] for c in th.analyze_thai("นั่งลงหน่อย", "en")}
+
+
+def test_prefix_rows_still_match_the_first_element_of_a_compound():
+    """
+    The boundary must not cost recall where the literal legitimately opens
+    a longer word: ความรัก, นักเรียน and ฤดูฝน are all one token.
+    """
+    try:
+        th._tokenizer()  # pylint: disable=protected-access
+    except ImportError:
+        pytest.skip("pythainlp is not installed")
+
+    cases = [
+        ("ความรักเป็นสิ่งสวยงาม", "th-prefix-khwam"),
+        ("นักเรียนคนนี้ขยัน", "th-prefix-nak"),
+        ("ฤดูฝนฝนตกทุกวัน", "th-seasons"),
+        ("เขาเก่งเท่ากับพี่ชาย", "th-equal-tao-gup"),
+    ]
+    for sentence, key in cases:
+        keys = {c["key"] for c in th.analyze_thai(sentence, "en")}
+        assert key in keys, f"{key} lost on {sentence}"
+
+
+def test_boundary_is_opt_in_for_regex_specs():
+    """
+    Other engines share the matcher and pass no boundary, so their raw
+    substring behaviour has to stay exactly as it was.
+    """
+    rule = make_rule(
+        "probe", "probe", "A1", "", {"type": "regex", "re": re.compile("ขา")}
+    )
+    spans = match_rule(rule, th._tokens_for("ผมขายของ"), "ผมขายของ")
+    assert spans == [(2, 4)], spans
 
 
 def test_a_short_sentence_stays_readable():
