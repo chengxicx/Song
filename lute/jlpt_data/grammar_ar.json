@@ -13,6 +13,10 @@
    "他只读了两本书。",
    "无论你去摩洛哥多少次，你都只会遇到慷慨的人民。"
   ],
+  "example_en": [
+   "He read only two books.",
+   "However often you travel to Morocco, you will find only generous people."
+  ],
   "focus": [
    "إلا"
   ],
@@ -35,6 +39,10 @@
    "所有学生都到了，只有一个学生除外。",
    "所有女教师都到了，只有一位女教师除外。"
   ],
+  "example_en": [
+   "The students came, all except one.",
+   "All the teachers arrived except one."
+  ],
   "focus": [
    "ما",
    "عدا"
@@ -55,6 +63,9 @@
   ],
   "example_zh": [
    "女教师看到了所有学生，只有一个学生除外。"
+  ],
+  "example_en": [
+   "The teacher saw the students, except one."
   ],
   "focus": [
    "عدا"
@@ -78,6 +89,10 @@
    "我只喝咖啡。",
    "除了哈立德，学生们都到了。"
   ],
+  "example_en": [
+   "I drink coffee, nothing else.",
+   "The students came apart from Khalid."
+  ],
   "focus": [
    "غير"
   ],
@@ -100,6 +115,10 @@
    "所有学生都出发了，只有一个学生除外。",
    "他们参观了所有大学，除了阿勒颇大学。"
   ],
+  "example_en": [
+   "All the students left except one.",
+   "They visited the universities except Aleppo University."
+  ],
   "focus": [
    "سوى"
   ],
@@ -119,6 +138,9 @@
   ],
   "example_zh": [
    "女教师看到了所有学生，只有一个学生除外。"
+  ],
+  "example_en": [
+   "The teacher saw all the students except one."
   ],
   "focus": [
    "ما",
@@ -140,6 +162,9 @@
   ],
   "example_zh": [
    "除了一个经理，所有经理都到了。"
+  ],
+  "example_en": [
+   "The managers came, except one."
   ],
   "focus": [
    "حاشا"
@@ -163,6 +188,10 @@
    "除了一个学生，所有学生都到了。",
    "她进了所有教室，只有一个教室除外。"
   ],
+  "example_en": [
+   "All the students came, except one student.",
+   "She entered every classroom except one."
+  ],
   "focus": [
    "باستثناء"
   ],
@@ -185,6 +214,10 @@
    "莱拉，你出生在全家搬到贝鲁特之前。",
    "萨尔玛，你是被叫去面试的吗？"
   ],
+  "example_en": [
+   "Layla, you had been born before the family moved to Beirut.",
+   "Salma, were you called in for an interview?"
+  ],
   "focus": [
    "يا"
   ],
@@ -205,6 +238,9 @@
   "example_zh": [
    "孩子们啊，你们是希望的麦穗。"
   ],
+  "example_en": [
+   "O children, you are the ears of hope."
+  ],
   "focus": [
    "أيها"
   ],
@@ -224,6 +260,9 @@
   ],
   "example_zh": [
    "女公民同胞们，投票是每个男女公民的权利。"
+  ],
+  "example_en": [
+   "Fellow citizen, voting is the right of every citizen, man or woman."
   ],
   "focus": [
    "أيتها"
@@ -247,6 +286,10 @@
    "要不是钱，国家就不会进步。",
    "要不是总统出席，各方就不会达成一致。"
   ],
+  "example_en": [
+   "Without money the country would not have progressed.",
+   "Had the president not attended, the parties would not have agreed."
+  ],
   "focus": [
    "لولا"
   ],
@@ -269,6 +312,10 @@
    "无论你去摩洛哥多少次，都会遇到慷慨的人民。",
    "无论他们的话多长，也伤不到任何人。"
   ],
+  "example_en": [
+   "However often you travel to Morocco, you will find generous people.",
+   "However long their tongues are, they harm no one."
+  ],
   "focus": [
    "مهما"
   ],
@@ -288,6 +335,9 @@
   ],
   "example_zh": [
    "无论你去哪里，我都能找到朋友。"
+  ],
+  "example_en": [
+   "Wherever you go, I find a friend."
   ],
   "focus": [
    "أينما"
@@ -309,6 +359,9 @@
   "example_zh": [
    "无论她走到哪里，人们都投以赞赏的目光。"
   ],
+  "example_en": [
+   "Wherever she goes, people look at her with admiration."
+  ],
   "focus": [
    "حيثما"
   ],
@@ -328,6 +381,9 @@
   ],
   "example_zh": [
    "无论你怎么做，都会有结果。"
+  ],
+  "example_en": [
+   "However you work, you get a result."
   ],
   "focus": [
    "كيفما"
@@ -349,6 +405,9 @@
   "example_zh": [
    "我读书的时候，弟弟在花园里玩。"
   ],
+  "example_en": [
+   "I read a book while my brother was playing in the garden."
+  ],
   "focus": [
    "بينما"
   ],
@@ -368,6 +427,9 @@
   ],
   "example_zh": [
    "艾哈迈德学医，而他弟弟学工程。"
+  ],
+  "example_en": [
+   "Ahmed studies medicine, whereas his brother studies engineering."
   ],
   "focus": [
    "في",
@@ -389,6 +451,9 @@
   ],
   "example_zh": [
    "尽管生病，经理仍继续工作。"
+  ],
+  "example_en": [
+   "Although he was ill, the manager kept working."
   ],
   "focus": [
    "على",
@@ -412,6 +477,9 @@
   "example_zh": [
    "尽管很累，他还是完成了工作。"
   ],
+  "example_en": [
+   "Despite his fatigue, he finished the work."
+  ],
   "focus": [
    "بالرغم",
    "من"
@@ -433,6 +501,9 @@
   "example_zh": [
    "我为了工作而出行。"
   ],
+  "example_en": [
+   "I travelled for the sake of work."
+  ],
   "focus": [
    "من",
    "أجل"
@@ -453,6 +524,9 @@
   ],
   "example_zh": [
    "他为了求知而来。"
+  ],
+  "example_en": [
+   "He came for the sake of knowledge."
   ],
   "focus": [
    "لأجل"
@@ -476,6 +550,10 @@
    "由于疏忽，他考试不及格。",
    "别说你迟到了是因为堵车。"
   ],
+  "example_en": [
+   "Because of his negligence he failed the exam.",
+   "Do not say you are late because of the traffic."
+  ],
   "focus": [
    "بسبب"
   ],
@@ -496,6 +574,9 @@
   "example_zh": [
    "我离开黎巴嫩不是因为恐惧，而是为了和孩子们在一起。"
   ],
+  "example_en": [
+   "I did not leave Lebanon out of fear, but to be with my children."
+  ],
   "focus": [
    "نتيجة"
   ],
@@ -515,6 +596,9 @@
   ],
   "example_zh": [
    "我的美国女性朋友们学阿拉伯语，是为了能和丈夫的阿拉伯家庭交谈。"
+  ],
+  "example_en": [
+   "My American friends study Arabic so that they can talk with their Arab husbands' families."
   ],
   "focus": [
    "لكي"
@@ -538,6 +622,10 @@
    "艾哈迈德被请求到公司任职。",
    "两名学生被召去服兵役。"
   ],
+  "example_en": [
+   "Ahmed was requested so that he would be employed at the company.",
+   "The two students were called up so that they could serve in the army."
+  ],
   "focus": [
    "كي"
   ],
@@ -557,6 +645,9 @@
   ],
   "example_zh": [
    "这部电影非常好。"
+  ],
+  "example_en": [
+   "The film is very beautiful."
   ],
   "focus": [
    "جدا"
@@ -580,6 +671,10 @@
    "朋友们参加完聚会回来，吃了也喝了很多。",
    "我朋友在国内旅行期间，在很多古城停留。"
   ],
+  "example_en": [
+   "The friends came back from the party having eaten and drunk a lot.",
+   "During my friend's visit to the country, he stopped often in the historic cities."
+  ],
   "focus": [
    "كثيرا"
   ],
@@ -599,6 +694,9 @@
   ],
   "example_zh": [
    "妈妈的发型依然整整齐齐，强风没能弄乱它。"
+  ],
+  "example_en": [
+   "My mother's hairstyle is still perfectly set; the strong breezes have not disturbed it."
   ],
   "focus": [
    "تماما"
@@ -622,6 +720,10 @@
    "阿拉伯家庭的孩子比美国家庭多。",
    "法蒂玛的裙子比萨米娅的更粉。"
   ],
+  "example_en": [
+   "The Arab family has more children than the American family.",
+   "Fatima's dress is pinker than Samia's."
+  ],
   "focus": [
    "أكثر",
    "من"
@@ -642,6 +744,9 @@
   ],
   "example_zh": [
    "学生人数少于教师人数。"
+  ],
+  "example_en": [
+   "The number of students is smaller than the number of teachers."
   ],
   "focus": [
    "أقل",
@@ -666,6 +771,10 @@
    "我现在，无论如何，明白了这个道理。",
    "我不能去上课，因为我现在在写作业。"
   ],
+  "example_en": [
+   "I now, in any case, understand this wisdom.",
+   "I cannot come to the lecture because I am writing my homework now."
+  ],
   "focus": [
    "الآن"
   ],
@@ -688,6 +797,10 @@
    "很明显天气总是在变。",
    "他总是反复说阿拉伯语很容易。"
   ],
+  "example_en": [
+   "It is clear that the weather is always changing.",
+   "He always repeats that Arabic is easy."
+  ],
   "focus": [
    "دائما"
   ],
@@ -707,6 +820,9 @@
   ],
   "example_zh": [
    "我从没去过那里。"
+  ],
+  "example_en": [
+   "I have never gone there."
   ],
   "focus": [
    "أبدا"
@@ -728,6 +844,9 @@
   "example_zh": [
    "我通常起得很早。"
   ],
+  "example_en": [
+   "I usually wake up early."
+  ],
   "focus": [
    "غالبا"
   ],
@@ -747,6 +866,9 @@
   ],
   "example_zh": [
    "我有时在图书馆读书。"
+  ],
+  "example_en": [
+   "Sometimes I read in the library."
   ],
   "focus": [
    "أحيانا"
@@ -768,6 +890,9 @@
   "example_zh": [
    "我马上回来。"
   ],
+  "example_en": [
+   "I will come back at once."
+  ],
   "focus": [
    "فورا"
   ],
@@ -787,6 +912,9 @@
   ],
   "example_zh": [
    "工程师们将在一年后建好新楼。"
+  ],
+  "example_en": [
+   "The engineers will build the new building in a year."
   ],
   "focus": [
    "بعد"
@@ -808,6 +936,9 @@
   "example_zh": [
    "在病人被送进来之前，女医生已经到了医院。"
   ],
+  "example_en": [
+   "The doctor had reached the hospital before the patient was admitted."
+  ],
   "focus": [
    "قبل"
   ],
@@ -828,6 +959,9 @@
   "example_zh": [
    "自从那名学生获奖以来，我们多次谈到他。"
   ],
+  "example_en": [
+   "We have talked about him a lot since the student won the prize."
+  ],
   "focus": [
    "منذ"
   ],
@@ -847,6 +981,9 @@
   ],
   "example_zh": [
    "在会见学生期间，校长谈到了大学的困扰。"
+  ],
+  "example_en": [
+   "During the university president's meeting with the students, he spoke about the university's problems."
   ],
   "focus": [
    "خلال"
@@ -870,6 +1007,10 @@
    "玛丽亚姆、哈拉和萨哈尔在教室前面。",
    "从屋前经过的人问了地址。"
   ],
+  "example_en": [
+   "Mariam, Hala and Sahar are in front of the class.",
+   "The passer-by in front of the house asked for the address."
+  ],
   "focus": [
    "أمام"
   ],
@@ -889,6 +1030,9 @@
   ],
   "example_zh": [
    "男孩坐在门后。"
+  ],
+  "example_en": [
+   "The boy sat behind the door."
   ],
   "focus": [
    "خلف"
@@ -910,6 +1054,9 @@
   "example_zh": [
    "经理谈了这个问题。"
   ],
+  "example_en": [
+   "The manager talked about the problem."
+  ],
   "focus": [
    "حول"
   ],
@@ -929,6 +1076,9 @@
   ],
   "example_zh": [
    "我祖父住在城里。"
+  ],
+  "example_en": [
+   "My grandfather lives inside the city."
   ],
   "focus": [
    "داخل"
@@ -950,6 +1100,9 @@
   "example_zh": [
    "孩子们在屋外玩。"
   ],
+  "example_en": [
+   "The children played outside the house."
+  ],
   "focus": [
    "خارج"
   ],
@@ -969,6 +1122,9 @@
   ],
   "example_zh": [
    "艾哈迈德有一本新书。"
+  ],
+  "example_en": [
+   "Ahmed has a new book."
   ],
   "focus": [
    "لدى"
@@ -990,6 +1146,9 @@
   "example_zh": [
    "天气变冷了。"
   ],
+  "example_en": [
+   "The weather has turned cold."
+  ],
   "focus": [
    "أصبح/أصبحت/أصبحوا"
   ],
@@ -1009,6 +1168,9 @@
   ],
   "example_zh": [
    "学生在图书馆待到晚上。"
+  ],
+  "example_en": [
+   "The student stayed in the library until the evening."
   ],
   "focus": [
    "ظل/ظلت/ظلوا"
@@ -1030,6 +1192,9 @@
   "example_zh": [
    "长途旅行之后，旅客整夜疲惫。"
   ],
+  "example_en": [
+   "The traveller spent the night tired after a long journey."
+  ],
   "focus": [
    "بات/باتت"
   ],
@@ -1050,6 +1215,9 @@
   "example_zh": [
    "这位老师成了校长。"
   ],
+  "example_en": [
+   "The teacher became the school principal."
+  ],
   "focus": [
    "صار/صارت"
   ],
@@ -1069,6 +1237,9 @@
   ],
   "example_zh": [
    "冬天天气仍然冷。"
+  ],
+  "example_en": [
+   "The weather is still cold in winter."
   ],
   "focus": [
    "ما",
@@ -1091,6 +1262,9 @@
   "example_zh": [
    "孩子吓得差点哭出来。"
   ],
+  "example_en": [
+   "The child almost cried from fear."
+  ],
   "focus": [
    "كاد/كادت/يكاد"
   ],
@@ -1110,6 +1284,9 @@
   ],
   "example_zh": [
    "球队差点赢得比赛。"
+  ],
+  "example_en": [
+   "The team was on the verge of winning the match."
   ],
   "focus": [
    "أوشك/يوشك"
@@ -1131,6 +1308,9 @@
   "example_zh": [
    "但愿明天天气好转。"
   ],
+  "example_en": [
+   "May the weather improve tomorrow."
+  ],
   "focus": [
    "عسى"
   ],
@@ -1150,6 +1330,9 @@
   ],
   "example_zh": [
    "这篇文章必须登在报纸上。"
+  ],
+  "example_en": [
+   "This article must be published in the newspaper."
   ],
   "focus": [
    "يجب",
@@ -1172,6 +1355,9 @@
   "example_zh": [
    "我们应当遵守法律。"
   ],
+  "example_en": [
+   "We ought to respect the laws."
+  ],
   "focus": [
    "ينبغي",
    "أن"
@@ -1192,6 +1378,9 @@
   ],
   "example_zh": [
    "我们必须从错误中学习。"
+  ],
+  "example_en": [
+   "We must learn from our mistakes."
   ],
   "focus": [
    "لا",
@@ -1215,6 +1404,9 @@
   "example_zh": [
    "他明天可能来。"
   ],
+  "example_en": [
+   "It is possible that he will come tomorrow."
+  ],
   "focus": [
    "من",
    "الممكن",
@@ -1237,6 +1429,9 @@
   "example_zh": [
    "他即将启程去开罗。"
   ],
+  "example_en": [
+   "He is about to travel to Cairo."
+  ],
   "focus": [
    "على",
    "وشك"
@@ -1257,6 +1452,9 @@
   ],
   "example_zh": [
    "他不仅是学生，还是老师。"
+  ],
+  "example_en": [
+   "He is not only a student but also a teacher."
   ],
   "focus": [
    "ليس",
@@ -1279,6 +1477,9 @@
   "example_zh": [
    "他们只看了一部电影。"
   ],
+  "example_en": [
+   "They watched only one film."
+  ],
   "focus": [
    "ما",
    "...",
@@ -1300,6 +1501,9 @@
   ],
   "example_zh": [
    "他一到就开始工作。"
+  ],
+  "example_en": [
+   "As soon as he arrived, he began work."
   ],
   "focus": [
    "بمجرد",
@@ -1324,6 +1528,10 @@
    "金字塔不过是一位追求永生的要人的豪华陵墓，正如多数人所想。",
    "阿拉伯语也是一门丰富的语言。"
   ],
+  "example_en": [
+   "The pyramid is merely a sumptuous tomb for an important person seeking immortality, as most people think.",
+   "Arabic is also a rich language."
+  ],
   "focus": [
    "كما"
   ],
@@ -1343,6 +1551,9 @@
   ],
   "example_zh": [
    "他忽然想以旅行为借口，从哪儿来回哪儿去！"
+  ],
+  "example_en": [
+   "It occurred to him to plead the excuse of travel and return whence he came!"
   ],
   "focus": [
    "حيث"
@@ -1364,6 +1575,9 @@
   "example_zh": [
    "千万别撒谎。"
   ],
+  "example_en": [
+   "Beware of lying."
+  ],
   "focus": [
    "إياك"
   ],
@@ -1383,6 +1597,9 @@
   ],
   "example_zh": [
    "撒谎的人真差劲。"
+  ],
+  "example_en": [
+   "Wretched is the man who lies."
   ],
   "focus": [
    "بئس"
@@ -1404,6 +1621,9 @@
   "example_zh": [
    "我见了经理本人。"
   ],
+  "example_en": [
+   "I met the manager himself."
+  ],
   "focus": [
    "نفس/نفسه/نفسي"
   ],
@@ -1423,6 +1643,9 @@
   ],
   "example_zh": [
    "他大部分时间都坐在办公室里。"
+  ],
+  "example_en": [
+   "He was sitting in his office most of the time."
   ],
   "focus": [
    "معظم"
@@ -1446,6 +1669,10 @@
    "两个学生都合格。",
    "两个女学生都很用功。"
   ],
+  "example_en": [
+   "Both students passed.",
+   "Both students are diligent."
+  ],
   "focus": [
    "كلا/كلتا"
   ],
@@ -1467,6 +1694,10 @@
   "example_zh": [
    "我朋友会见了几位访客。",
    "我们和几位女职员谈过。"
+  ],
+  "example_en": [
+   "My friend met several visitors.",
+   "We spoke with several employees."
   ],
   "focus": [
    "عدة"
@@ -1490,6 +1721,10 @@
    "我们走在拥挤的街道上。",
    "我早上工作。"
   ],
+  "example_en": [
+   "We walked in the crowded streets.",
+   "I work in the morning."
+  ],
   "focus": [
    "في"
   ],
@@ -1511,6 +1746,10 @@
   "example_zh": [
    "我从开罗旅行到亚历山大。",
    "这是最大的教训之一。"
+  ],
+  "example_en": [
+   "I travelled from Cairo to Alexandria.",
+   "This is one of the greatest lessons."
   ],
   "focus": [
    "من"
@@ -1534,6 +1773,10 @@
    "书在桌子上。",
    "你必须学习。"
   ],
+  "example_en": [
+   "The book is on the table.",
+   "You must study."
+  ],
   "focus": [
    "على"
   ],
@@ -1555,6 +1798,10 @@
   "example_zh": [
    "我去了图书馆。",
    "他去了贝鲁特。"
+  ],
+  "example_en": [
+   "I went to the library.",
+   "He travelled to Beirut."
   ],
   "focus": [
    "إلى"
@@ -1578,6 +1825,10 @@
    "他谈了自己的问题。",
    "他在图书馆找一本书。"
   ],
+  "example_en": [
+   "He talked about his problem.",
+   "He looked for a book in the library."
+  ],
   "focus": [
    "عن"
   ],
@@ -1599,6 +1850,10 @@
   "example_zh": [
    "我和朋友一起旅行。",
    "他常和朋友在咖啡馆聚会。"
+  ],
+  "example_en": [
+   "I travelled with my friend.",
+   "He used to meet his friends in the café."
   ],
   "focus": [
    "مع"
@@ -1622,6 +1877,10 @@
    "他进来，然后坐下。",
    "我们先放水，然后加糖。"
   ],
+  "example_en": [
+   "He came in, then sat down.",
+   "We put in the water, then add the sugar."
+  ],
   "focus": [
    "ثم"
   ],
@@ -1644,6 +1903,10 @@
    "我喝茶或咖啡。",
    "选这个或那个。"
   ],
+  "example_en": [
+   "I drink tea or coffee.",
+   "Choose this or that."
+  ],
   "focus": [
    "أو"
   ],
@@ -1664,6 +1927,9 @@
   "example_zh": [
    "我朋友在国内旅行期间，在很多古城停留。"
   ],
+  "example_en": [
+   "During my friend's visit to the country, he stopped often in the historic cities."
+  ],
   "focus": [
    "أثناء"
   ],
@@ -1683,6 +1949,9 @@
   ],
   "example_zh": [
    "我们反对战争。"
+  ],
+  "example_en": [
+   "We are against the war."
   ],
   "focus": [
    "ضد"
@@ -1706,6 +1975,10 @@
    "他朝北方旅行。",
    "来了大约二十个学生。"
   ],
+  "example_en": [
+   "He travelled towards the north.",
+   "About twenty students came."
+  ],
   "focus": [
    "نحو"
   ],
@@ -1725,6 +1998,9 @@
   ],
   "example_zh": [
    "按计划，我们明天开始。"
+  ],
+  "example_en": [
+   "According to the plan, we start tomorrow."
   ],
   "focus": [
    "حسب"
