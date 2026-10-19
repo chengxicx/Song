@@ -20,6 +20,7 @@ import os
 from bs4 import BeautifulSoup
 
 from lute.book.epub_css import scope_css
+from lute.book.epub_extract import css_path_for
 from lute.db import db
 from lute.models.book import Book as DBBook
 from tests.utils import make_epub
@@ -68,8 +69,14 @@ def _post(client, epub, **fields):
 
 
 def _import_reader_book(app, client, english, tmp_path):
-    "Import in reader mode with the static folder isolated to tmp_path."
-    app.static_folder = str(tmp_path)
+    """
+    Import in reader mode with the package root isolated to tmp_path.
+
+    The root is a config value, not app.static_folder: extracted
+    packages are user data and belong next to the database, where a
+    backup and a restore will actually find them.
+    """
+    app.config["EPUB_STATIC_ROOT"] = str(tmp_path / "static")
     resp = _post(
         client,
         _epub_bytes(),
@@ -81,6 +88,11 @@ def _import_reader_book(app, client, english, tmp_path):
     assert resp.get_json()["success"] is True, resp.get_json()
     book = db.session.query(DBBook).filter(DBBook.title.like("Reader Book%")).one()
     return book
+
+
+def _package_path(app, epub_path):
+    "Absolute path of an extracted file, from its stored BkEpubPath."
+    return os.path.join(app.config["EPUB_STATIC_ROOT"], epub_path)
 
 
 def test_reader_mode_import_is_one_page_with_chapter_markup(
@@ -95,7 +107,7 @@ def test_reader_mode_import_is_one_page_with_chapter_markup(
     assert "Hello world, again." in page_text
     assert "かんじ" not in page_text, "rt readings are not text"
 
-    html_path = os.path.join(str(tmp_path), book.epub_path)
+    html_path = _package_path(app, book.epub_path)
     assert os.path.isfile(html_path)
     html = open(html_path, encoding="utf-8").read()
     assert 'class="epub-body novel"' in html
@@ -106,11 +118,66 @@ def test_reader_mode_import_is_one_page_with_chapter_markup(
     # Relative asset URLs point at the extracted copy.
     assert '/static/epub/' in html and "/OEBPS/images/pic.png" in html
 
-    css_path = os.path.join(str(tmp_path), "epub", book.epub_path.split("/")[1], "lute.css")
+    css_path = _package_path(app, css_path_for(book.epub_path))
     assert os.path.isfile(css_path)
     css = open(css_path, encoding="utf-8").read()
     assert ".epub-body" in css
     assert "@page" not in css, "print-only rules are dropped"
+    # The package is not in the code tree.
+    assert not os.path.exists(
+        os.path.join(app.static_folder, book.epub_path)
+    ), "the extracted chapter must not live under the static folder"
+
+
+def test_chapter_assets_are_served_from_the_data_directory(
+    app, app_context, english, client, tmp_path
+):
+    """
+    The chapter is fetched from /static/epub/..., but the file comes
+    from EPUB_STATIC_ROOT.  The URL is kept because the stored chapter
+    markup already carries that prefix; what matters is that the path
+    resolves into the data directory, which a restore replaces together
+    with the database, and not into the code tree.
+    """
+    book = _import_reader_book(app, client, english, tmp_path)
+
+    chapter = client.get("/static/" + book.epub_path)
+    assert chapter.status_code == 200
+    assert "epub-body" in chapter.get_data(as_text=True)
+
+    css = client.get("/static/" + css_path_for(book.epub_path))
+    assert css.status_code == 200
+    assert ".epub-body" in css.get_data(as_text=True)
+
+    # Nothing is left behind in the code tree.
+    assert not os.path.exists(os.path.join(app.static_folder, book.epub_path))
+
+
+def test_missing_package_falls_back_to_the_old_static_location(
+    app, app_context, english, client, tmp_path
+):
+    """
+    Books imported before the move keep working between an upgrade and
+    the relocation step: the data directory misses, the old location
+    answers.
+    """
+    book = _import_reader_book(app, client, english, tmp_path)
+    package = os.path.join(app.config["EPUB_STATIC_ROOT"], book.epub_path)
+    # A stand-in for the old code-tree location, so the test never
+    # writes into the repository.
+    old_static = app.static_folder
+    app.static_folder = str(tmp_path / "code_static")
+    legacy = os.path.join(app.static_folder, book.epub_path)
+    os.makedirs(os.path.dirname(legacy), exist_ok=True)
+    os.replace(package, legacy)
+    try:
+        resp = client.get("/static/" + book.epub_path)
+        assert resp.status_code == 200
+        assert "epub-body" in resp.get_data(as_text=True)
+        assert not os.path.exists(package)
+    finally:
+        app.static_folder = old_static
+        os.replace(legacy, package)
 
 
 def test_reader_mode_reading_page_renders_chapter_container(
@@ -165,7 +232,7 @@ def test_token_stream_matches_the_chapter_dom(
         return "".join(ch for ch in s if not ch.isspace())
 
     dom_text = soup.find(id="epub-chapter").get_text("")
-    html_path = os.path.join(str(tmp_path), book.epub_path)
+    html_path = _package_path(app, book.epub_path)
     file_text = BeautifulSoup(
         open(html_path, encoding="utf-8").read(), "html.parser"
     ).get_text("")
@@ -217,7 +284,7 @@ def test_reader_mode_off_keeps_plain_text_import(
     app, app_context, english, client, tmp_path
 ):
     "Without the switch, the import is unchanged: plain text, no chapter files."
-    app.static_folder = str(tmp_path)
+    app.config["EPUB_STATIC_ROOT"] = str(tmp_path / "static")
     resp = _post(
         client,
         _epub_bytes(),
@@ -229,7 +296,7 @@ def test_reader_mode_off_keeps_plain_text_import(
     book = db.session.query(DBBook).filter(DBBook.title.like("Plain Book%")).one()
     assert book.book_type == ""
     assert book.epub_path is None
-    assert not os.path.exists(os.path.join(str(tmp_path), "epub"))
+    assert not os.path.exists(os.path.join(str(tmp_path), "static", "epub"))
 
 
 def test_scope_css_rewrites_document_selectors():

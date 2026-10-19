@@ -32,9 +32,12 @@ def import_epub_chapters(
 
     reader_mode keeps the chapter markup: each book is stored as
     book_type "epub" with the chapter's sanitised HTML (and the
-    chapter's own CSS) extracted under static/epub/<uuid>/, and its
-    single page is the whole chapter -- the reading screen injects word
-    spans into that markup instead of rendering the flattened text.
+    chapter's own CSS) extracted under
+    <EPUB_STATIC_ROOT>/epub/<uuid>/ -- in the data directory, so the
+    package is covered by a database backup rather than living in the
+    code tree.  Its single page is the whole chapter: the reading
+    screen injects word spans into that markup instead of rendering the
+    flattened text.
 
     Returns (imported_count, failed_count, book_title, last_error).
     """
@@ -53,7 +56,9 @@ def import_epub_chapters(
 
     extracted = None
     if reader_mode and chapters:
-        extracted = extract_epub_package(raw, chapters, current_app.static_folder)
+        extracted = extract_epub_package(
+            raw, chapters, current_app.config["EPUB_STATIC_ROOT"]
+        )
 
     svc = BookService()
     imported = 0
