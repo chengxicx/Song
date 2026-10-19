@@ -193,3 +193,39 @@ def test_every_library_row_has_an_example():
     "A row with no example reads like a stub, so every row must carry one."
     blank = [e["key"] for e in AR.library_entries("zh") if not e["examples"]]
     assert not blank, f"rows without examples: {blank}"
+
+
+# ---- panel reference block ---------------------------------------------
+#
+# The panel shows the page's own sentences, which carry no translation, so
+# every card folds out one curated example with its gloss.  Both layers
+# have to supply it: the data rows from their own example list, the
+# hand-written rules from the golden set.
+
+
+def test_every_panel_rule_has_a_translated_reference():
+    "No card may ship without a translated example under it."
+    missing = [
+        rule["key"]
+        for rule in AR._get_all_rules()
+        if not (rule.get("reference") or {}).get("zh")
+    ]
+    assert not missing, f"rules with no Chinese reference example: {missing}"
+
+
+def test_panel_reference_carries_the_gloss_for_the_display_language():
+    "A Chinese panel gets the Chinese gloss, and no other language's."
+    zh = {e["key"]: e for e in analyze_arabic("لا أعرف.", "zh")}
+    assert zh["ar_neg_la"]["reference"]["sentence"] == "لا أعرف."
+    assert zh["ar_neg_la"]["reference"]["text"] == "我不知道。"
+    # Arabic carries no English gloss yet, so the English panel hides the
+    # block rather than printing Chinese under an English heading.
+    en = {e["key"]: e for e in analyze_arabic("لا أعرف.", "en")}
+    assert "reference" not in en["ar_neg_la"]
+
+
+def test_panel_reference_does_not_mutate_the_rule_list():
+    "The module-level rules stay exactly as written in the source."
+    AR._get_all_rules()
+    assert not [rule for rule in _AR_RULES if "reference" in rule]
+
