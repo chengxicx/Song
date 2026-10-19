@@ -300,16 +300,16 @@
  "th_polite": {
   "examples": [
    {
-    "en": "Don’t tell her, OK?",
+    "en": "My name is Somchai. (male speaker)",
     "ko": "",
-    "text": "อย่าบอกเธอนะ",
-    "zh": "别告诉她哦"
+    "text": "ผมชื่อสมชายครับ",
+    "zh": "我叫颂猜。（男性）"
    },
    {
-    "en": "I (Toi speaking) don’t know.",
+    "en": "What is your name? (female speaker)",
     "ko": "",
-    "text": "ต้อยไม่ทราบค่ะ",
-    "zh": "我（自称“小兑”）不知道。"
+    "text": "คุณชื่ออะไรคะ",
+    "zh": "您叫什么名字？（女性）"
    }
   ],
   "name": "Polite particles (ครับ / ค่ะ / นะ)"
@@ -430,16 +430,16 @@
  "th_yesno": {
   "examples": [
    {
-    "en": "Are you going or not?",
+    "en": "Are you well?",
     "ko": "",
-    "text": "คุณจะไปหรือเปล่า",
-    "zh": "你去不去？"
+    "text": "คุณสบายดีไหม",
+    "zh": "你好吗？"
    },
    {
-    "en": "Is he bored or not?",
+    "en": "Are you eating, or not?",
     "ko": "",
-    "text": "เขาเบื่อหรือเปล่า",
-    "zh": "他厌烦了吗？"
+    "text": "คุณกินข้าวหรือเปล่า",
+    "zh": "你吃饭了没有？"
    }
   ],
   "name": "ไหม / ไหมคะ (yes-no question)"

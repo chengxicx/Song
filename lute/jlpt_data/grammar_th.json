@@ -8,7 +8,11 @@
   "formation": "คุณ + ชื่อต้น (ไม่ใช้ชื่อสกุล) · kun + chêu",
   "section": "3.1.1",
   "topic": "noun-phrase",
-  "examples": []
+  "examples": [
+   "คุณสมชาย · kun sǒm-chaai — Mr Somchai (khun + given name, never the surname) ／ 颂猜先生（คุณ + 名，不接姓）",
+   "คุณมาลี · kun mah-lee — Ms Malee ／ 玛丽女士",
+   "สวัสดีครับคุณสมชาย · sà-wàt-dee krúp kun sǒm-chaai — Hello, Mr Somchai. ／ 颂猜先生，您好。"
+  ]
  },
  {
   "key": "th-proper-names-place",
@@ -255,7 +259,11 @@
   "formation": "WH + กริยา · krai / a-rai / têe-nǎi / mêu-a-rài",
   "section": "4.7",
   "topic": "pronoun",
-  "examples": [],
+  "examples": [
+   "คุณชื่ออะไร · kun chêu a-rai — What is your name? (you – name – what) ／ 你叫什么名字？（你–名字–什么）",
+   "คุณไปที่ไหน · kun bpai têe-nǎi — Where are you going? ／ 你去哪儿？",
+   "ทำไมคุณไม่มา · tam-mai kun mâi mah — Why didn't you come? ／ 你为什么没来？"
+  ],
   "focus_all": [
    "ใคร",
    "อะไร",
@@ -663,7 +671,11 @@
   "formation": "CLAUSE + ไหม/หรือ/เปล่า · mái / rěu / bplào",
   "section": "10.1",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "คุณสบายดีไหม · kun sà-baai dee mái — Are you well? ／ 你好吗？",
+   "คุณกินข้าวหรือเปล่า · kun gin kâao rěu bplào — Are you eating, or not? ／ 你吃饭了没有？",
+   "ไปหรือยัง · bpai rěu yang — Have you gone yet? ／ 你去了吗？"
+  ],
   "focus_all": [
    "ไหม",
    "หรือ",
@@ -699,7 +711,11 @@
   "formation": "CLAUSE + ครับ · krúp",
   "section": "10.2.1",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "สวัสดีครับ · sà-wàt-dee krúp — Hello. (male speaker) ／ 你好。（男性）",
+   "ขอบคุณครับ · kòp-kun krúp — Thank you. (male speaker) ／ 谢谢。（男性）",
+   "ผมชื่อสมชายครับ · pǒm chêu sǒm-chaai krúp — My name is Somchai. (male speaker) ／ 我叫颂猜。（男性）"
+  ],
   "focus_all": [
    "ครับ"
   ]
@@ -713,7 +729,10 @@
   "formation": "CLAUSE + คะ · ká",
   "section": "10.2.3",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "คุณชื่ออะไรคะ · kun chêu a-rai ká — What is your name? (female speaker) ／ 您叫什么名字？（女性）",
+   "ไปไหนคะ · bpai nǎi ká — Where are you going? (female speaker) ／ 去哪儿呀？（女性）"
+  ],
   "focus_all": [
    "คะ"
   ]
@@ -727,7 +746,10 @@
   "formation": "CLAUSE + ค่ะ · kâ",
   "section": "10.2.4",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "สวัสดีค่ะ · sà-wàt-dee kâ — Hello. (female speaker) ／ 你好。（女性）",
+   "ดิฉันชื่อมาลีค่ะ · dì-chǎn chêu mah-lee kâ — My name is Malee. (female speaker) ／ 我叫玛丽。（女性）"
+  ],
   "focus_all": [
    "ค่ะ"
   ]
@@ -1329,7 +1351,11 @@
   "formation": "ฤดู + ร้อน/ฝน/หนาว · réu-doo",
   "section": "14.6",
   "topic": "time",
-  "examples": [],
+  "examples": [
+   "เมืองไทยมีสามฤดู · meuang tai mee sǎhm réu-doo — Thailand has three seasons. ／ 泰国有三个季节。",
+   "ฤดูฝนฝนตกทุกวัน · réu-doo fǒn fǒn dtòk túk wan — In the rainy season it rains every day. ／ 雨季每天都下雨。",
+   "ฤดูหนาวอากาศเย็น · réu-doo nǎao aa-gàat yen — In the cool season the weather is cold. ／ 凉季天气凉爽。"
+  ],
   "focus": [
    "ฤดู",
    "ฤดูร้อน",
@@ -1352,7 +1378,11 @@
   "formation": "วันนี้/พรุ่งนี้/เมื่อวาน · wan née / prûng née",
   "section": "14.7.1",
   "topic": "time",
-  "examples": [],
+  "examples": [
+   "วันนี้อากาศดี · wan née aa-gàat dee — The weather is good today. ／ 今天天气好。",
+   "พรุ่งนี้ผมจะไปเชียงใหม่ · prûng née pǒm ja bpai chiang-mài — Tomorrow I will go to Chiang Mai. ／ 明天我要去清迈。",
+   "เมื่อวานผมไปตลาด · meûa-waan pǒm bpai dtà-làat — Yesterday I went to the market. ／ 昨天我去了市场。"
+  ],
   "focus_all": [
    "วันนี้",
    "พรุ่งนี้",
@@ -1368,7 +1398,11 @@
   "formation": "N(เวลา) + นี้/หน้า/ที่แล้ว · née / nâh / têe láir-o",
   "section": "14.7.2",
   "topic": "time",
-  "examples": [],
+  "examples": [
+   "เดือนนี้ · deuan née — this month ／ 这个月",
+   "เดือนหน้า · deuan nâh — next month ／ 下个月",
+   "เดือนที่แล้ว · deuan têe láir-o — last month ／ 上个月"
+  ],
   "focus": [
    "ที่แล้ว",
    "หน้า"
@@ -1387,7 +1421,11 @@
   "formation": "จำนวน + โมง/นาฬิกา · mohng / na-lí-gah",
   "section": "14.8.1",
   "topic": "time",
-  "examples": [],
+  "examples": [
+   "ตอนนี้กี่โมง · dton née gèe mohng — What time is it now? ／ 现在几点？",
+   "บ่ายสองโมง · bàai sǒrng mohng — two o'clock in the afternoon ／ 下午两点",
+   "เก้าโมงเช้า · gâo mohng cháo — nine in the morning ／ 早上九点"
+  ],
   "focus": [
    "โมง",
    "นาฬิกา"
@@ -1406,7 +1444,11 @@
   "formation": "จำนวน + ครึ่ง · krêung",
   "section": "14.8.2",
   "topic": "time",
-  "examples": [],
+  "examples": [
+   "ครึ่งชั่วโมง · krêung chûa-mohng — half an hour ／ 半小时",
+   "บ่ายโมงครึ่ง · bàai mohng krêung — half past one in the afternoon ／ 下午一点半",
+   "รอสักครึ่งชั่วโมง · ror sàk krêung chûa-mohng — Wait about half an hour. ／ 等半小时左右。"
+  ],
   "focus": [
    "ครึ่ง"
   ],
@@ -1446,7 +1488,11 @@
   "formation": "ครับ/ค่ะ + สรรพนามที่เหมาะสม · kwam sù-pâhp",
   "section": "15.1",
   "topic": "speech",
-  "examples": [],
+  "examples": [
+   "ขอบคุณครับ · kòp-kun krúp — Thank you. (male, polite) ／ 谢谢。（男性，礼貌）",
+   "ขอโทษค่ะ · kǒr-tôht kâ — Excuse me. (female, polite) ／ 对不起。（女性，礼貌）",
+   "เชิญครับ · chern krúp — Please, go ahead. (male, polite) ／ 请。（男性，礼貌）"
+  ],
   "focus_all": [
    "ครับ",
    "ค่ะ"
@@ -1530,7 +1576,11 @@
   "formation": "คำไทย ↔ คำยืม (หัว ↔ ศีรษะ) · kam yeum",
   "section": "3.3.1",
   "topic": "noun-phrase",
-  "examples": []
+  "examples": [
+   "ศีรษะ · sěe-sà — head (formal, Pali-Sanskrit) ／ 头（正式，巴利-梵语借词）",
+   "หัว · hǔa — head (everyday) ／ 头（日常口语）",
+   "ผัว ↔ สามี · pǔa ↔ sǎh-mee — husband, colloquial versus formal ／ 丈夫：口语 ↔ 正式"
+  ]
  },
  {
   "key": "th-compound-noun",
@@ -1541,7 +1591,11 @@
   "formation": "N1 + N2 (N2 ขยาย N1) · kam-làk + kam-nahm kà-yaai",
   "section": "3.3.2.1",
   "topic": "noun-phrase",
-  "examples": []
+  "examples": [
+   "รถไฟ · rót-fai — train (vehicle + fire) ／ 火车（车 + 火）",
+   "น้ำแข็ง · náhm-kǎeng — ice (water + hard) ／ 冰（水 + 硬）",
+   "ข้าวผัด · kâao pàt — fried rice (rice + stir-fry) ／ 炒饭（饭 + 炒）"
+  ]
  },
  {
   "key": "th-compound-noun-verb",
@@ -1552,7 +1606,11 @@
   "formation": "N + V (V ขยาย N) · kam-làk + kam-grì-yah kà-yaai",
   "section": "3.3.2.2",
   "topic": "noun-phrase",
-  "examples": []
+  "examples": [
+   "เครื่องบิน · krêuang bin — aeroplane (machine + fly) ／ 飞机（机器 + 飞）",
+   "ตู้เย็น · dtôo yen — refrigerator (cabinet + cold) ／ 冰箱（柜 + 冷）",
+   "รองเท้า · rong-táo — shoes (support + foot) ／ 鞋（承 + 脚）"
+  ]
  },
  {
   "key": "th-prefix-nak",
@@ -1563,7 +1621,11 @@
   "formation": "นัก + V/N · nák + kam-grì-yah",
   "section": "3.3.3.1",
   "topic": "noun-phrase",
-  "examples": [],
+  "examples": [
+   "นักเรียน · nák-rian — student ／ 学生",
+   "นักร้อง · nák-róng — singer ／ 歌手",
+   "นักท่องเที่ยว · nák tông-tîe-o — tourist ／ 游客"
+  ],
   "focus_all": [
    "นัก"
   ]
@@ -1577,7 +1639,11 @@
   "formation": "ใบ + V/N · bai + kam-grì-yah",
   "section": "3.3.3.3",
   "topic": "noun-phrase",
-  "examples": []
+  "examples": [
+   "ใบขับขี่ · bai kàp-kèe — driving licence ／ 驾照",
+   "ใบเสร็จ · bai sèt — receipt ／ 收据",
+   "ใบไม้ · bai mái — leaf ／ 树叶"
+  ]
  },
  {
   "key": "th-prefix-rong",
@@ -1588,7 +1654,11 @@
   "formation": "โรง + N/V · rohng + kam-nahm",
   "section": "3.3.3.4",
   "topic": "noun-phrase",
-  "examples": [],
+  "examples": [
+   "โรงพยาบาล · rohng pá-yaa-bahn — hospital ／ 医院",
+   "โรงเรียน · rohng rian — school ／ 学校",
+   "โรงแรม · rohng raem — hotel ／ 酒店"
+  ],
   "focus": [
    "โรง"
   ],
@@ -1626,7 +1696,11 @@
   "formation": "ความ + V/ADJ · kwahm + kam-grì-yah",
   "section": "3.3.3.6",
   "topic": "noun-phrase",
-  "examples": [],
+  "examples": [
+   "ความรัก · kwahm rák — love ／ 爱",
+   "ความสุข · kwahm sùk — happiness ／ 幸福",
+   "ความจริง · kwahm jing — truth ／ 真实"
+  ],
   "focus": [
    "ความ"
   ],
@@ -1686,7 +1760,11 @@
   "formation": "สรรพนามตามระดับภาษา · goo / meung / tâan / man",
   "section": "4.1.1",
   "topic": "pronoun",
-  "examples": [],
+  "examples": [
+   "กูไม่รู้ · goo mâi róo — I don't know. (very informal, rude to strangers) ／ 我不知道。（极随便，对生人失礼）",
+   "มึงไปไหน · meung bpai nǎi — Where are you going? (blunt) ／ 你去哪儿？（不客气）",
+   "ท่านจะมาถึงเมื่อไหร่ · tâan ja mah těung meûa-rài — When will you arrive? (respectful) ／ 您什么时候到？（敬称）"
+  ],
   "focus": [
    "กู",
    "มึง",
@@ -2127,7 +2205,11 @@
   "formation": "คำ + คำ · kun-ná-sàp pà-sǒm",
   "section": "6.1",
   "topic": "adjective",
-  "examples": []
+  "examples": [
+   "ใจดี · jai dee — kind (heart + good) ／ 善良（心 + 好）",
+   "สวยงาม · sǔay ngaam — beautiful ／ 美丽",
+   "ขี้เกียจ · kêe gìat — lazy ／ 懒惰"
+  ]
  },
  {
   "key": "th-adj-modifier-pre",
@@ -2187,7 +2269,11 @@
   "formation": "สี + เข้ม/อ่อน · sěe + kam-kà-yaai",
   "section": "6.3.2",
   "topic": "adjective",
-  "examples": [],
+  "examples": [
+   "แดงเข้ม · daeng kêm — dark red ／ 深红",
+   "แดงอ่อน · daeng òn — light red ／ 浅红",
+   "ฟ้าเข้ม · fáh kêm — deep blue ／ 深蓝"
+  ],
   "focus": [
    "เข้ม",
    "อ่อน"
@@ -2206,7 +2292,11 @@
   "formation": "ADJ + ๆ · kun-ná-sàp + ๆ",
   "section": "6.4.1",
   "topic": "adjective",
-  "examples": []
+  "examples": [
+   "ช้า ๆ · cháa cháa — slowly ／ 慢慢地",
+   "เร็ว ๆ · reo reo — quickly ／ 快快地",
+   "เด็ก ๆ · dèk dèk — children, the kids ／ 孩子们"
+  ]
  },
  {
   "key": "th-equal-tao-gup",
@@ -2660,7 +2750,10 @@
   "formation": "ครับผม · krúp pǒm",
   "section": "10.2.2",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "ครับผม · krúp pǒm — Yes, sir. (extra-polite) ／ 是，先生。（更恭敬）",
+   "รับทราบครับผม · ráp sâap krúp pǒm — Understood, sir. ／ 明白，长官。"
+  ],
   "focus": [
    "ครับผม"
   ],
@@ -3013,7 +3106,11 @@
   "formation": "จำนวน + ครั้ง/ที · kráng / tee",
   "section": "13.5",
   "topic": "quantity",
-  "examples": [],
+  "examples": [
+   "สองครั้ง · sǒrng kráng — twice ／ 两次",
+   "ผมไปเชียงใหม่สามครั้ง · pǒm bpai chiang-mài sǎhm kráng — I have been to Chiang Mai three times. ／ 我去过清迈三次。",
+   "ลองอีกที · long èek tee — try once more ／ 再试一次"
+  ],
   "focus": [
    "ครั้ง",
    "ที"
@@ -3365,7 +3462,11 @@
   "formation": "จำนวน + นาที · ná-tee",
   "section": "14.8.3",
   "topic": "time",
-  "examples": [],
+  "examples": [
+   "สิบห้านาที · sìp hâh ná-tee — fifteen minutes ／ 十五分钟",
+   "สี่สิบห้านาที · sèe sìp hâh ná-tee — forty-five minutes ／ 四十五分钟",
+   "รออีกสิบนาที · ror èek sìp ná-tee — wait another ten minutes ／ 再等十分钟"
+  ],
   "focus": [
    "นาที"
   ],
@@ -3382,7 +3483,10 @@
   "formation": "ขอ + V + หน่อย · kǒr tǎam",
   "section": "15.4.1",
   "topic": "speech",
-  "examples": [],
+  "examples": [
+   "ขอถามหน่อยครับ · kǒr tǎam nòi krúp — May I ask something? ／ 请问一下。",
+   "ขอทราบชื่อคุณได้ไหม · kǒr sâap chêu kun dâi mái — May I have your name? ／ 请问您贵姓？"
+  ],
   "focus": [
    "ขอถาม",
    "ขอทราบ"
@@ -3483,7 +3587,10 @@
   "formation": "V + กันเถอะ · bpai ... gan tèr",
   "section": "15.4.6",
   "topic": "speech",
-  "examples": [],
+  "examples": [
+   "ไปกินข้าวกันเถอะ · bpai gin kâao gan tèr — Let's go and eat. ／ 我们去吃饭吧。",
+   "เชิญนั่งครับ · chern nâng krúp — Please have a seat. ／ 请坐。"
+  ],
   "focus": [
    "กันเถอะ",
    "เชิญ"
@@ -3652,7 +3759,11 @@
   "formation": "ผู้ + V · pôo + kam-grì-yah",
   "section": "3.3.3.2",
   "topic": "noun-phrase",
-  "examples": [],
+  "examples": [
+   "ผู้จัดการ · pôo jàt-gahn — manager ／ 经理",
+   "ผู้โดยสาร · pôo doi-sǎan — passenger ／ 乘客",
+   "ผู้หญิง · pôo yǐng — woman ／ 女人"
+  ],
   "focus": [
    "ผู้"
   ],
@@ -3669,7 +3780,11 @@
   "formation": "ที่ + V · têe + kam-grì-yah",
   "section": "3.3.3.7",
   "topic": "noun-phrase",
-  "examples": []
+  "examples": [
+   "ที่อยู่ · têe yòo — address ／ 地址",
+   "ที่นั่ง · têe nâng — seat ／ 座位",
+   "ที่ทำงาน · têe tam-ngaan — workplace ／ 工作单位"
+  ]
  },
  {
   "key": "th-coordinate-compound",
@@ -3680,7 +3795,11 @@
   "formation": "คำ + คำ (ความหมายใกล้กัน) · kam sórn",
   "section": "3.3.4",
   "topic": "noun-phrase",
-  "examples": []
+  "examples": [
+   "บ้านเรือน · bâhn reuan — houses, dwellings ／ 房屋",
+   "ใหญ่โต · yài dtoh — big and grand ／ 巨大",
+   "รวดเร็ว · rûat reo — quick, speedy ／ 迅速"
+  ]
  },
  {
   "key": "th-word-order-adj-clf-ord",
@@ -3813,7 +3932,11 @@
   "formation": "V + N · grì-yah + kam-nahm",
   "section": "5.3.1",
   "topic": "verb",
-  "examples": []
+  "examples": [
+   "ทำงาน · tam-ngaan — to work ／ 工作",
+   "กินข้าว · gin kâao — to eat a meal ／ 吃饭",
+   "ดูหนัง · doo nǎng — to watch a film ／ 看电影"
+  ]
  },
  {
   "key": "th-noun-verb-compound",
@@ -3824,7 +3947,11 @@
   "formation": "N + V · kam-nahm + grì-yah",
   "section": "5.3.2",
   "topic": "verb",
-  "examples": []
+  "examples": [
+   "ใจดี · jai dee — kind-hearted ／ 心好、善良",
+   "น้ำตก · náhm dtòk — waterfall (water + fall) ／ 瀑布（水 + 落）",
+   "ไฟไหม้ · fai mâi — a fire, a blaze ／ 火灾"
+  ]
  },
  {
   "key": "th-verb-verb-compound",
@@ -3924,7 +4051,11 @@
   "formation": "ADJ + ขึ้น/ลง · grì-yah + kêun/long",
   "section": "5.7.9",
   "topic": "verb",
-  "examples": [],
+  "examples": [
+   "ดีขึ้น · dee kêun — better than before ／ 好起来了",
+   "แพงขึ้น · paeng kêun — more expensive ／ 变贵了",
+   "น้อยลง · nói long — less than before ／ 变少了"
+  ],
   "focus_all": [
    "ขึ้น",
    "ลง"
@@ -4068,7 +4199,11 @@
   "formation": "ADJ + มาก/จริง ๆ/เหลือเกิน · kam-kà-yaai",
   "section": "6.3.1",
   "topic": "adjective",
-  "examples": [],
+  "examples": [
+   "อร่อยมาก · a-ròi mâak — very tasty ／ 很好吃",
+   "ดีจริง ๆ · dee jing jing — really good ／ 真好",
+   "สวยเหลือเกิน · sǔay lěua-gern — extremely beautiful ／ 漂亮极了"
+  ],
   "focus": [
    "เหลือเกิน"
   ],
@@ -4085,7 +4220,11 @@
   "formation": "ADJ(รส) + จัด/มาก · rót + kam-kà-yaai",
   "section": "6.3.3",
   "topic": "adjective",
-  "examples": [],
+  "examples": [
+   "หวานมาก · wǎan mâak — very sweet ／ 很甜",
+   "หวานจัด · wǎan jàt — extremely sweet ／ 极甜",
+   "เปรี้ยวจัด · bprîe-o jàt — extremely sour ／ 极酸"
+  ],
   "focus": [
    "จัด"
   ],
@@ -4161,7 +4300,10 @@
   "formation": "V + วลี · grì-yah + wá-lee",
   "section": "7.1.3",
   "topic": "adverb",
-  "examples": []
+  "examples": [
+   "เขาทำงานอย่างมีความสุข · kǎo tam-ngaan yàang mee kwahm sùk — He works happily. ／ 他愉快地工作。",
+   "พูดอย่างช้า ๆ · pôot yàang cháa cháa — speak slowly ／ 慢慢地说"
+  ]
  },
  {
   "key": "th-adverb-doy",
@@ -4264,7 +4406,10 @@
   "formation": "V + ADJ + เท่ากัน · grì-yah + tâo gan",
   "section": "7.3.1",
   "topic": "adverb",
-  "examples": [],
+  "examples": [
+   "เราเก่งเท่ากัน · rao gèng tâo gan — We are equally good. ／ 我们一样厉害。",
+   "เด็กสองคนสูงเท่ากัน · dèk sǒrng kon sǔung tâo gan — The two children are the same height. ／ 两个孩子一样高。"
+  ],
   "focus_all": [
    "เท่ากัน"
   ]
@@ -4278,7 +4423,10 @@
   "formation": "X + V + ADJ + เท่ากับ + Y · tâo gùp",
   "section": "7.3.1.1",
   "topic": "adverb",
-  "examples": [],
+  "examples": [
+   "ผมสูงเท่ากับพี่ชาย · pǒm sǔung tâo gùp pêe-chaai — I am as tall as my older brother. ／ 我和我哥哥一样高。",
+   "วันนี้ร้อนเท่ากับเมื่อวาน · wan née róhn tâo gùp meûa-waan — Today is as hot as yesterday. ／ 今天和昨天一样热。"
+  ],
   "focus_all": [
    "เท่ากับ"
   ]
@@ -4292,7 +4440,10 @@
   "formation": "X + กับ + Y + V + ADJ + เท่ากัน · gùp + kan",
   "section": "7.3.1.2",
   "topic": "adverb",
-  "examples": [],
+  "examples": [
+   "สมชายกับมาลีเก่งเท่ากัน · sǒm-chaai gùp mah-lee gèng tâo gan — Somchai and Malee are equally good. ／ 颂猜和玛丽一样厉害。",
+   "รถสองคันวิ่งเร็วเท่ากัน · rót sǒrng kan wîng reo tâo gan — The two cars run equally fast. ／ 两辆车跑得一样快。"
+  ],
   "focus_all": [
    "เท่ากัน"
   ]
@@ -4357,7 +4508,10 @@
   "formation": "V + ให้ + ADJ + ที่สุด · hâi + têe sùt",
   "section": "7.3.4",
   "topic": "adverb",
-  "examples": [],
+  "examples": [
+   "ทำให้ดีที่สุด · tam hâi dee têe sùt — Do it as well as you can. ／ 尽量做好。",
+   "ไปให้เร็วที่สุด · bpai hâi reo têe sùt — Go as fast as you can. ／ 尽快去。"
+  ],
   "focus_all": [
    "ที่สุด"
   ]
@@ -4486,7 +4640,10 @@
   "formation": "ADJ + จริง ๆ/เหลือเกิน · jing jing / lěu-a gern",
   "section": "9.6",
   "topic": "clause",
-  "examples": [],
+  "examples": [
+   "น่ารักจริง ๆ · nâa rák jing jing — So cute! ／ 真可爱！",
+   "ร้อนเหลือเกิน · róhn lěua-gern — It's unbearably hot! ／ 热得受不了！"
+  ],
   "focus_all": [
    "จริงๆ",
    "เหลือเกิน"
@@ -4501,7 +4658,10 @@
   "formation": "CLAUSE + ขา · kǎh",
   "section": "10.2.5",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "ขา มานี่หน่อย · kǎh, mah nêe nòi — Yes? Come here a moment. ／ 哎？过来一下。",
+   "คุณแม่ขา · kun mâe kǎh — Mother dear. ／ 妈妈（亲昵的呼唤）。"
+  ],
   "focus": [
    "ขา"
   ],
@@ -4518,7 +4678,10 @@
   "formation": "CLAUSE + ฮะ · há",
   "section": "10.2.6",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "ฮะ มีอะไรครับ · há, mee a-rai krúp — Yes? What is it? ／ 嗯，有什么事？",
+   "ไปไหนมาฮะ · bpai nǎi mah há — Where have you been? (light, casual) ／ 你去哪儿了呀？（轻松口语）"
+  ],
   "focus": [
    "ฮะ"
   ],
@@ -4535,7 +4698,10 @@
   "formation": "CLAUSE + ฮ่ะ · hâ",
   "section": "10.2.7",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "ไม่ได้ตั้งใจฮ่ะ · mâi dâi dtâng-jai hâ — I didn't mean it, really. ／ 我不是故意的啦。",
+   "ก็มันจริงฮ่ะ · gôr man jing hâ — Well, it's true! ／ 本来就是真的嘛！"
+  ],
   "focus": [
    "ฮ่ะ"
   ],
@@ -4552,7 +4718,10 @@
   "formation": "CLAUSE + จ๊ะ · já",
   "section": "10.2.8",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "กินข้าวหรือยังจ๊ะ · gin kâao rěu yang já — Have you eaten yet, dear? ／ 吃饭了吗，孩子？",
+   "ไปไหนมาจ๊ะ · bpai nǎi mah já — Where have you been, little one? ／ 小家伙去哪儿了呀？"
+  ],
   "focus": [
    "จ๊ะ"
   ],
@@ -4569,7 +4738,10 @@
   "formation": "CLAUSE + จ้ะ · jâ",
   "section": "10.2.9",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "จ้ะ แม่จะมา · jâ, mâe ja mah — Yes, Mum is coming. ／ 好，妈妈就来。",
+   "นั่งลงก่อนจ้ะ · nâng long gòn jâ — Sit down first, dear. ／ 先坐下吧，孩子。"
+  ],
   "focus": [
    "จ้ะ"
   ],
@@ -4586,7 +4758,10 @@
   "formation": "CLAUSE + วะ/ว่ะ/โว้ย · wá / wâ / wóy",
   "section": "10.2.11",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "ไปไหนมาวะ · bpai nǎi mah wá — Where have you been? (rough) ／ 你去哪儿了？（粗鲁）",
+   "ไม่รู้ว่ะ · mâi róo wâ — Dunno. (blunt) ／ 不知道。（不客气）"
+  ],
   "focus": [
    "วะ",
    "ว่ะ",
@@ -5043,7 +5218,11 @@
   "formation": "ปลาย/สิ้น + เวลา · bplaai / sîn",
   "section": "14.7.3.4",
   "topic": "time",
-  "examples": [],
+  "examples": [
+   "ปลายเดือน · bplaai deuan — the end of the month ／ 月底",
+   "สิ้นปี · sîn bpée — the end of the year ／ 年底",
+   "ปลายสัปดาห์ · bplaai sàp-dah — the weekend, the end of the week ／ 周末"
+  ],
   "focus": [
    "ปลาย",
    "สิ้น"
@@ -5062,7 +5241,10 @@
   "formation": "จำนวน + นาฬิกา · rá-bòp",
   "section": "14.8.4",
   "topic": "time",
-  "examples": [],
+  "examples": [
+   "สิบแปดนาฬิกาสามสิบนาที · sìp bpàet na-lí-gah sǎhm sìp ná-tee — 18:30 ／ 十八点三十分",
+   "รถไฟออกสิบเก้านาฬิกา · rót-fai òk sìp gâo na-lí-gah — The train leaves at 19:00. ／ 火车十九点开。"
+  ],
   "focus_all": [
    "นาฬิกา"
   ]
@@ -5224,7 +5406,11 @@
   "formation": "ADJ + ADJ(เปลี่ยนเสียง) · kam sáhm",
   "section": "6.4.2",
   "topic": "adjective",
-  "examples": []
+  "examples": [
+   "ดี๊ดี · dee-dée — really good (the repeat takes a high tone) ／ 好得很（重叠字变调）",
+   "อร่อยมั่ก ๆ · a-ròi mâk mâk — super tasty (playful, casual) ／ 超级好吃（口语戏谑）",
+   "แดงแจ๋ · daeng jǎe — vivid, glaring red ／ 鲜红夺目"
+  ]
  },
  {
   "key": "th-the-more",
@@ -5254,7 +5440,10 @@
   "formation": "CLAUSE + จ๋า · jǎh",
   "section": "10.2.10",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "แม่จ๋า · mâe jǎh — Mum! (coaxing) ／ 妈妈呀～（哄劝）",
+   "ที่รักจ๋า · têe rák jǎh — Darling! ／ 亲爱的～"
+  ],
   "focus": [
    "จ๋า"
   ],
@@ -5271,7 +5460,10 @@
   "formation": "CLAUSE + ยะ/ย่ะ · yá / yâ",
   "section": "10.2.12",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "จะทำไมยะ · ja tam-mai yá — So what are you going to do about it? ／ 那你想怎样？",
+   "รู้แล้วย่ะ · róo láew yâ — I know already! (assertive) ／ 我已经知道了！（强硬）"
+  ],
   "focus": [
    "ยะ",
    "ย่ะ"
@@ -5473,7 +5665,10 @@
   "formation": "CLAUSE + พ่ะย่ะค่ะ/เพคะ · pâ-yâ-kâ / pay-ká",
   "section": "10.2.13",
   "topic": "particle",
-  "examples": [],
+  "examples": [
+   "พ่ะย่ะค่ะ ฝ่าบาท · pâ-yâ-kâ fàa-bàat — Yes, Your Majesty. (male speaker) ／ 遵命，陛下。（男性）",
+   "เพคะ ฝ่าบาท · pay-ká fàa-bàat — Yes, Your Majesty. (female speaker) ／ 是，陛下。（女性）"
+  ],
   "focus": [
    "พ่ะย่ะค่ะ",
    "เพคะ"
@@ -5513,6 +5708,10 @@
   "formation": "เอก/โท/ตรี + N · náyk bah-lee",
   "section": "13.4",
   "topic": "quantity",
-  "examples": []
+  "examples": [
+   "เอกสาร · èek-gà-sǎan — document (เอก 'one' + สาร) ／ 文件（เอก 一 + สาร 书）",
+   "ตรีโกณ · dtree-gohn — trigonometry, 'three angles' ／ 三角（ตรี 三 + โกณ 角）",
+   "จตุรัส · jà-dtù-rát — square, plaza (จตุ 'four') ／ 广场、方形（จตุ 四）"
+  ]
  }
 ]
