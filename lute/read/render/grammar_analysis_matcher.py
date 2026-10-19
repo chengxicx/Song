@@ -280,8 +280,11 @@ def _regex_spans(match, sentence_text, tokens=None):
 
     ``boundary`` on the spec filters those spans: ``"token"`` keeps only a
     hit that covers a whole token, ``"start"`` only one that begins at a
-    token start (a prefix or the first element of a compound).  Without it
-    the raw substring hit is kept, which is what the non-Thai engines use.
+    token start (a prefix or the first element of a compound), and
+    ``"prefix"`` only one that begins a token *and* continues into it --
+    for morphemes that never stand alone, such as the agent prefix นัก-
+    (นักเรียน yes, บ่อยนัก "not at all" no).  Without a boundary the raw
+    substring hit is kept, which is what the non-Thai engines use.
     """
     if "re" in match:
         spans = [m.span() for m in match["re"].finditer(sentence_text) if m.group(0)]
@@ -292,6 +295,8 @@ def _regex_spans(match, sentence_text, tokens=None):
                 spans = [(s, e) for s, e in spans if s in starts and e in ends]
             elif boundary == "start":
                 spans = [(s, e) for s, e in spans if s in starts]
+            elif boundary == "prefix":
+                spans = [(s, e) for s, e in spans if s in starts and e not in ends]
         return spans
     if "any_of" in match:
         out = []
