@@ -169,6 +169,18 @@ def test_a_short_sentence_stays_readable():
     assert 3 <= len(cards) <= 15, [c["key"] for c in cards]
 
 
+def test_every_library_card_shows_an_example():
+    """
+    A card with no sentence teaches the name and nothing else.  The corpus
+    shipped fifty-five such rows until they were written; this keeps the
+    next row from arriving bare.
+    """
+    blank = [
+        entry["key"] for entry in th.library_entries("zh") if not entry["examples"]
+    ]
+    assert not blank, f"cards with no example: {blank}"
+
+
 # ---- panel reference block ---------------------------------------------
 #
 # The panel's examples are the page's own sentences, so the translation a
@@ -188,20 +200,19 @@ def test_reference_line_is_split_into_its_three_parts():
     }
 
 
-def test_every_panel_rule_with_an_example_carries_a_translated_reference():
+def test_every_panel_rule_carries_a_translated_reference():
     """
     Corpus rows cite their first example; hand-written rules cite the
-    golden one.  A row with no example at all has nothing to cite and is
-    the only kind allowed to go without.
+    golden one.  Every card now has one of the two, so none may go without.
     """
-    rows = {row["key"]: row for row in corpus()}
     missing = []
-    for rule in th._hand_rules() + th._get_corpus_rules():  # pylint: disable=protected-access
-        row = rows.get(rule["key"])
-        if row is not None and not row.get("examples"):
-            continue
+    for rule in (
+        th._hand_rules() + th._get_corpus_rules()
+    ):  # pylint: disable=protected-access
         reference = rule.get("reference") or {}
-        if not (reference.get("sentence") and reference.get("en") and reference.get("zh")):
+        if not (
+            reference.get("sentence") and reference.get("en") and reference.get("zh")
+        ):
             missing.append(rule["key"])
     assert missing == [], f"cards with no translated example: {missing}"
 
@@ -212,4 +223,3 @@ def test_panel_shows_the_gloss_in_the_display_language():
     en = {c["key"]: c for c in th.analyze_thai("ผมชอบเขา", "en")}
     assert zh["th_pronouns"]["reference"]["text"] == "我喜欢他"
     assert en["th_pronouns"]["reference"]["text"] == "I like him."
-

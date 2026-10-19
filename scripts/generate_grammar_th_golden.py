@@ -19,6 +19,12 @@ Selection, per rule:
     not win;
   * at most two per rule, translated ones first, no sentence reused.
 
+Two exceptions are pinned by sentence text (``_PINNED``).  The ranking is
+greedy and order-sensitive, so a row that gains examples near the top of
+the corpus can outrank a better one further down -- and the length proxy
+below mistakes a short but complete sentence (ผมชอบเขา) for a phrase.  A
+pin keeps the curated sentence and is verified like any other.
+
 Three rules have no firing example at all in the corpus -- ``th_both``,
 ``th_almost`` and ``th_formal_concessive`` -- so their sentences are
 written here.
@@ -131,6 +137,18 @@ _AUTHORED = {
 }
 
 
+# Sentences a rule must keep, given as the corpus text.  Both rules below
+# are illustrated by the rows that teach them, but those sentences were
+# being displaced: the corpus says "ผมชอบเขา" and "คุณทำอะไรอยู่", which are
+# short enough for the length proxy to read as phrases, so any later row
+# that gained a longer example sharing one literal won the slot.  Pinning
+# states the choice once; the matcher still has to agree.
+_PINNED = {
+    "th_pronouns": ["ผมชอบเขา", "เขาชอบผม"],
+    "th_questions": ["คุณทำอะไรอยู่", "คุณซื้ออะไรมา"],
+}
+
+
 def _parse(line):
     "One corpus example line -> {thai, roman, en, zh}."
     text, _, zh = line.partition(th._GLOSS_SEP)  # pylint: disable=protected-access
@@ -184,12 +202,29 @@ def _is_sentence(parsed):
     return len(parsed["thai"]) >= 12
 
 
+def _golden_row(parsed):
+    "One parsed corpus line as a golden example row."
+    return {
+        "text": parsed["thai"],
+        "en": parsed["en"],
+        "zh": parsed["zh"],
+        "ko": "",
+    }
+
+
 def collect():
     "The golden set, the rules with no example, and the sentences that miss."
     corpus = th._corpus()  # pylint: disable=protected-access
     golden = {}
     used = set()
     failures = []
+    pinned = {text for texts in _PINNED.values() for text in texts}
+    by_text = {}
+    for item in corpus:
+        for line in item.get("examples") or ():
+            parsed = _parse(line)
+            if parsed["thai"]:
+                by_text.setdefault(parsed["thai"], parsed)
     for rule in th._TH_RULES:
         if rule["key"] in _AUTHORED:
             # Authored rows are checked exactly like derived ones: a sentence
@@ -206,6 +241,18 @@ def collect():
                 golden[rule["key"]] = {"name": rule["name"], "examples": rows}
                 used.update(row["text"] for row in rows)
             continue
+        chosen = []
+        for text in _PINNED.get(rule["key"], ()):
+            parsed = by_text.get(text)
+            if parsed is None:
+                failures.append(f"{rule['key']}: pinned text not in the corpus: {text}")
+            elif text in used:
+                failures.append(f"{rule['key']}: pinned text taken earlier: {text}")
+            elif not match_rule(rule, th._tokens_for(text), text):
+                failures.append(f"{rule['key']}: does not fire on pinned {text}")
+            else:
+                chosen.append(_golden_row(parsed))
+                used.add(text)
         literals = _rule_literals(rule)
         candidates = []
         for order, item in enumerate(corpus):
@@ -213,7 +260,7 @@ def collect():
             for line in item.get("examples") or ():
                 parsed = _parse(line)
                 thai = parsed["thai"]
-                if not thai or thai in used:
+                if not thai or thai in used or thai in pinned:
                     continue
                 if not match_rule(rule, th._tokens_for(thai), thai):
                     continue
@@ -232,18 +279,11 @@ def collect():
         # "also" rule), and a golden example that teaches the wrong reading
         # is worse than none.
         candidates = [pair for pair in candidates if pair[0][1] == 0]
-        chosen = [
-            {
-                "text": parsed["thai"],
-                "en": parsed["en"],
-                "zh": parsed["zh"],
-                "ko": "",
-            }
-            for _score, parsed in candidates[:MAX_PER_RULE]
-        ]
+        for _score, parsed in candidates[: MAX_PER_RULE - len(chosen)]:
+            chosen.append(_golden_row(parsed))
+            used.add(parsed["thai"])
         if chosen:
             golden[rule["key"]] = {"name": rule["name"], "examples": chosen}
-            used.update(row["text"] for row in chosen)
         elif rule["key"] in _AUTHORED:
             golden[rule["key"]] = {
                 "name": rule["name"],
