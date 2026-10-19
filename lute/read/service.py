@@ -1103,11 +1103,21 @@ class Service:
             for ti in sentence
         ]
 
+        # The tokens come from the text *after* the parser's character
+        # substitutions (`’` -> `'`, `...` -> `…`, ZWSP dropped, ...),
+        # while the chapter's markup still has the book's originals.
+        # The front end applies these to the chapter before aligning, so
+        # the two streams are comparable; a word's term text is then the
+        # same one every other Lute book produces.
+        lang = dbbook.language
+        subs = [list(pair) for pair in lang.parser.text_substitutions(lang)]
+
         return {
             "page_num": pagenum,
             "chapter_html": chapter_html,
             "css_path": css_path_for(epub_path),
             "tokens": tokens,
+            "substitutions": subs,
         }
 
     def _save_new_rendered_terms(self, items):
