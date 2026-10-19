@@ -101,16 +101,12 @@ def test_golden_sentences_are_not_filed_under_two_rules():
 @needs_golden
 def test_golden_sentences_carry_a_display_gloss():
     """
-    The Chinese and Korean panels read a gloss under the example.
+    Every panel reads a gloss under every golden example.
 
-    ``zh_enrichment.json`` / ``ko_enrichment.json`` translate the curated
-    rows per sentence; a golden sentence that reaches neither has to come
-    from a row neither file covers, so a small remainder is expected but a
-    sudden collapse means the enrichment keys drifted from the library.
-
-    English has no such remainder: the vendored rows ship it and
-    ``en_enrichment.json`` covers the merged material rows, so every golden
-    sentence is glossed in English and the panel never quotes bare Japanese.
+    ``zh_enrichment.json`` / ``ko_enrichment.json`` / ``en_enrichment.json``
+    translate the curated rows per sentence, so a golden sentence with no
+    gloss in some language means the enrichment keys drifted from the
+    library -- the panel would then quote bare Japanese.
     """
     golden = ja._golden_examples()
     sentences = [e for examples in golden.values() for e in examples]
@@ -120,11 +116,7 @@ def test_golden_sentences_carry_a_display_gloss():
     with_ko = sum(1 for e in sentences if (e.get("ko") or "").strip())
     assert with_en == len(sentences), "golden sentences without an English gloss"
     assert with_zh == len(sentences), "golden sentences without a Chinese gloss"
-    # ko_enrichment.json covers the vendored (English) rows, which is about
-    # half the library; the merged material rows are Chinese-only there.
-    assert (
-        with_ko >= len(sentences) * 0.4
-    ), f"only {with_ko}/{len(sentences)} golden sentences carry a Korean gloss"
+    assert with_ko == len(sentences), "golden sentences without a Korean gloss"
 
 
 @needs_golden

@@ -446,17 +446,21 @@ def test_korean_library_translates_every_example():
         assert bare == [], f"ko/{display}: {len(bare)} examples without a gloss"
 
 
-@pytest.mark.parametrize("display", ("en", "zh"))
+@pytest.mark.parametrize("display", ("en", "zh", "ko"))
 def test_japanese_library_translates_every_example(display):
     """
-    The English and Chinese panels quote every sentence, not just the first.
+    Every display language quotes every sentence, not just the first.
 
     ``n{1..5}.json`` (the vendored rows) ship ``english``, but the merged
     material rows were written for a Chinese reader and carry only
     ``chinese``, so the English panel used to fall back to bare Japanese on
     2025 sentences.  ``en_enrichment.json`` fills those, keyed by the
     Japanese sentence itself, and ``ko_enrichment.json`` does the same for
-    Korean -- which is still partial, so it is not asserted here.
+    the Korean panel (2692 sentences that had no Korean at all).
+
+    A sentence shared by two entries has to be filled under both entry ids:
+    the panel looks the gloss up by entry id, so filling only the first
+    owner leaves the second one bare even though the translation exists.
 
     The hand-written rules' golden sentences are a separate store; they are
     pinned by ``test_golden_sentences_carry_a_display_gloss``.
