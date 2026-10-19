@@ -1,0 +1,447 @@
+{
+ "th_almost": {
+  "examples": [
+   {
+    "en": "I almost missed the bus.",
+    "ko": "나는 하마터면 차를 놓칠 뻔했다.",
+    "text": "ฉันเกือบตกรถ",
+    "zh": "我差点没赶上车。"
+   }
+  ],
+  "name": "เกือบ (almost)"
+ },
+ "th_also": {
+  "examples": [
+   {
+    "en": "I am going too.",
+    "ko": "나도 간다.",
+    "text": "ฉันก็ไปด้วย",
+    "zh": "我也去。"
+   },
+   {
+    "en": "He agrees as well.",
+    "ko": "그도 동의한다.",
+    "text": "เขาก็เห็นด้วยเหมือนกัน",
+    "zh": "他也同意。"
+   }
+  ],
+  "name": "ด้วย / ก็ (also / too)"
+ },
+ "th_and_or": {
+  "examples": [
+   {
+    "en": "You’re not buying it, right?",
+    "ko": "",
+    "text": "คุณไม่ซื้อหรือ",
+    "zh": "你不买是吧？"
+   },
+   {
+    "en": "This is your car, isn’t it?",
+    "ko": "",
+    "text": "นี่รถของคุณไม่ใช่หรือ",
+    "zh": "这是你的车，不是吗？"
+   }
+  ],
+  "name": "และ / หรือ / แต่ (and / or / but)"
+ },
+ "th_because": {
+  "examples": [
+   {
+    "en": "The fact that the driver ran away was probably because he was drunk.",
+    "ko": "",
+    "text": "การที่คนขับรถวิ่งหนีก็คงเพราะว่าเขาเมา",
+    "zh": "司机逃跑，大概是因为喝醉了"
+   }
+  ],
+  "name": "เพราะ / เพราะว่า (because)"
+ },
+ "th_both": {
+  "examples": [
+   {
+    "en": "He is both capable and hard-working.",
+    "ko": "그는 능숙하기도 하고 부지런하기도 하다.",
+    "text": "เขาทั้งเก่งและขยัน",
+    "zh": "他既能干又勤奋。"
+   }
+  ],
+  "name": "ทั้ง ... และ (both ... and)"
+ },
+ "th_can": {
+  "examples": [
+   {
+    "en": "He can swim.",
+    "ko": "그는 수영할 수 있다.",
+    "text": "เขาสามารถว่ายน้ำได้",
+    "zh": "他会游泳。"
+   },
+   {
+    "en": "You can pay by card.",
+    "ko": "카드로 결제할 수 있다.",
+    "text": "คุณสามารถจ่ายด้วยบัตรได้",
+    "zh": "你可以用卡支付。"
+   }
+  ],
+  "name": "สามารถ ... ได้ (can)"
+ },
+ "th_completive": {
+  "examples": [
+   {
+    "en": "The bus has arrived / Here comes the bus.",
+    "ko": "",
+    "text": "รถเมล์มาแล้ว",
+    "zh": "公交车来了"
+   },
+   {
+    "en": "He has gone to work.",
+    "ko": "",
+    "text": "เขาไปทำงานแล้ว",
+    "zh": "他去上班了"
+   }
+  ],
+  "name": "แล้ว (already / completive)"
+ },
+ "th_concessive": {
+  "examples": [
+   {
+    "en": "Although I put a lot of fish sauce in, it still doesn’t taste good.",
+    "ko": "",
+    "text": "(ถึง)แม้ว่าฉันใส่น้ำปลาเยอะแต่ยังไม่อร่อย",
+    "zh": "虽然我放了很多鱼露，还是不好吃。"
+   }
+  ],
+  "name": "แม้ว่า / ถึงแม้ (although)"
+ },
+ "th_copula": {
+  "examples": [
+   {
+    "en": "Three plus four is seven.",
+    "ko": "",
+    "text": "สามบวกสี่คือเจ็ด",
+    "zh": "三加四等于七"
+   },
+   {
+    "en": "There are three problems, namely . . .",
+    "ko": "",
+    "text": "มีปัญหาสามอย่างคือ . . .",
+    "zh": "有三个问题，即……"
+   }
+  ],
+  "name": "เป็น / อยู่ / คือ (to be)"
+ },
+ "th_each_other": {
+  "examples": [
+   {
+    "en": "They love each other.",
+    "ko": "",
+    "text": "เขารักกัน",
+    "zh": "他们彼此相爱。"
+   }
+  ],
+  "name": "กัน (each other)"
+ },
+ "th_ever": {
+  "examples": [
+   {
+    "en": "We used to live in Bangkok.",
+    "ko": "",
+    "text": "เราเคยอยู่ที่กรุงเทพ ฯ",
+    "zh": "我们以前住在曼谷。"
+   },
+   {
+    "en": "I’ve been to/visited Chiangmai.",
+    "ko": "",
+    "text": "ฉันเคยไปเที่ยวเชียงใหม่",
+    "zh": "我去过清迈。"
+   }
+  ],
+  "name": "เคย (ever / once)"
+ },
+ "th_formal_concessive": {
+  "examples": [
+   {
+    "en": "It rained hard; however, we still went.",
+    "ko": "비가 많이 왔지만, 그럼에도 우리는 갔다.",
+    "text": "ฝนตกหนัก อย่างไรก็ตาม เรายังไปกัน",
+    "zh": "雨下得很大，然而我们还是去了。"
+   }
+  ],
+  "name": "อย่างไรก็ตาม (however)"
+ },
+ "th_future": {
+  "examples": [
+   {
+    "en": "Tomorrow I’m not coming in to work.",
+    "ko": "",
+    "text": "พรุ่งนี้ผมจะไม่มาทำงาน",
+    "zh": "明天我不来上班"
+   },
+   {
+    "en": "When will they organise the party?",
+    "ko": "",
+    "text": "เขาจะจัดงานเลี้ยงเมื่อไร",
+    "zh": "他们什么时候办宴会？"
+   }
+  ],
+  "name": "จะ (future)"
+ },
+ "th_give": {
+  "examples": [
+   {
+    "en": "My mother had me study accountancy.",
+    "ko": "",
+    "text": "แม่ให้ผมเรียนบัญชี",
+    "zh": "妈妈让我学会计。"
+   },
+   {
+    "en": "The father doesn’t let his children come home late.",
+    "ko": "",
+    "text": "พ่อไม่ให้ลูกกลับบ้านดึก",
+    "zh": "父亲不许孩子晚回家。"
+   }
+  ],
+  "name": "ให้ (give / let / for)"
+ },
+ "th_have": {
+  "examples": [
+   {
+    "en": "There are four hundred pupils.",
+    "ko": "",
+    "text": "มีนักเรียนสี่ร้อยคน",
+    "zh": "有四百名学生"
+   },
+   {
+    "en": "There are few Thais who can speak French well.",
+    "ko": "",
+    "text": "คนไทยที่พูดภาษาฝรั่งเศสได้ดีมีน้อย",
+    "zh": "法语说得好的泰国人很少"
+   }
+  ],
+  "name": "มี (have / there is)"
+ },
+ "th_if": {
+  "examples": [
+   {
+    "en": "If it rains, I’m not going / If it had rained, I wouldn’t have gone, etc.",
+    "ko": "",
+    "text": "ถ้า(หากว่า)ฝนตกฉันก็ไม่ไป",
+    "zh": "如果下雨，我就不去／要是当时下雨，我就不会去了。"
+   }
+  ],
+  "name": "ถ้า / หาก (if)"
+ },
+ "th_in_order_to": {
+  "examples": [
+   {
+    "en": "I am working for our future.",
+    "ko": "",
+    "text": "ฉันทำงานเพื่ออนาคตของเรา",
+    "zh": "我为我们的未来工作。"
+   },
+   {
+    "en": "Everything I do is for you.",
+    "ko": "",
+    "text": "ทุกสิ่งทุกอย่างผมทำเพื่อคุณ",
+    "zh": "我做的一切都是为了你。"
+   }
+  ],
+  "name": "เพื่อ (in order to)"
+ },
+ "th_na_worth": {
+  "examples": [
+   {
+    "en": "This film is very interesting.",
+    "ko": "이 영화는 아주 흥미롭다.",
+    "text": "หนังเรื่องนี้น่าสนใจมาก",
+    "zh": "这部电影很有意思。"
+   },
+   {
+    "en": "The food at this shop looks delicious.",
+    "ko": "이 가게 음식은 맛있어 보인다.",
+    "text": "อาหารร้านนี้อร่อยน่ากิน",
+    "zh": "这家店的食物看起来很好吃。"
+   }
+  ],
+  "name": "น่า + verb (worth / looks)"
+ },
+ "th_negation": {
+  "examples": [
+   {
+    "en": "The food isn’t tasty.",
+    "ko": "",
+    "text": "อาหารไม่อร่อย",
+    "zh": "饭菜不好吃"
+   },
+   {
+    "en": "I’m not changing.",
+    "ko": "",
+    "text": "ผมไม่เปลี่ยนแปลง",
+    "zh": "我不改变"
+   }
+  ],
+  "name": "ไม่ (not)"
+ },
+ "th_passive": {
+  "examples": [
+   {
+    "en": "I’ve been bitten by a mosquito.",
+    "ko": "",
+    "text": "ฉันถูกยุงกัด",
+    "zh": "我被蚊子咬了。"
+   },
+   {
+    "en": "He was arrested by a policeman.",
+    "ko": "",
+    "text": "เขาถูกตำรวจจับ",
+    "zh": "他被警察抓了。"
+   }
+  ],
+  "name": "ถูก / โดน (passive)"
+ },
+ "th_polite": {
+  "examples": [
+   {
+    "en": "Don’t tell her, OK?",
+    "ko": "",
+    "text": "อย่าบอกเธอนะ",
+    "zh": "别告诉她哦"
+   },
+   {
+    "en": "I (Toi speaking) don’t know.",
+    "ko": "",
+    "text": "ต้อยไม่ทราบค่ะ",
+    "zh": "我（自称“小兑”）不知道。"
+   }
+  ],
+  "name": "Polite particles (ครับ / ค่ะ / นะ)"
+ },
+ "th_progressive": {
+  "examples": [
+   {
+    "en": "We are/were eating.",
+    "ko": "",
+    "text": "เรากำลังกินข้าว",
+    "zh": "我们正在吃饭"
+   },
+   {
+    "en": "I am/was reading.",
+    "ko": "",
+    "text": "ฉันกำลังอ่านหนังสืออยู่",
+    "zh": "我正在看书"
+   }
+  ],
+  "name": "กำลัง / อยู่ (progressive)"
+ },
+ "th_pronouns": {
+  "examples": [
+   {
+    "en": "I like him.",
+    "ko": "",
+    "text": "ผมชอบเขา",
+    "zh": "我喜欢他"
+   },
+   {
+    "en": "He likes me.",
+    "ko": "",
+    "text": "เขาชอบผม",
+    "zh": "他喜欢我"
+   }
+  ],
+  "name": "Pronouns (ผม / ฉัน / คุณ / เขา)"
+ },
+ "th_questions": {
+  "examples": [
+   {
+    "en": "What are you doing?",
+    "ko": "",
+    "text": "คุณทำอะไรอยู่",
+    "zh": "你在做什么？"
+   },
+   {
+    "en": "What did you buy?",
+    "ko": "",
+    "text": "คุณซื้ออะไรมา",
+    "zh": "你买了什么？"
+   }
+  ],
+  "name": "Question words (อะไร / ที่ไหน / ใคร / ทำไม)"
+ },
+ "th_should_must": {
+  "examples": [
+   {
+    "en": "You must help him a bit, OK?",
+    "ko": "",
+    "text": "คุณต้องช่วยเขาหน่อยนะ",
+    "zh": "你得帮他一下，好吗？"
+   }
+  ],
+  "name": "ควร / ต้อง (should / must)"
+ },
+ "th_thi": {
+  "examples": [
+   {
+    "en": "The person standing over there is my teacher.",
+    "ko": "저기 서 있는 사람이 내 선생님이다.",
+    "text": "คนที่ยืนอยู่ตรงนั้นเป็นครูของฉัน",
+    "zh": "站在那里的那个人是我的老师。"
+   },
+   {
+    "en": "This is the book I bought yesterday.",
+    "ko": "이것은 내가 어제 산 책이다.",
+    "text": "นี่คือหนังสือที่ฉันซื้อเมื่อวาน",
+    "zh": "这是我昨天买的书。"
+   }
+  ],
+  "name": "ที่ (relativizer / nominalizer)"
+ },
+ "th_want": {
+  "examples": [
+   {
+    "en": "Do you want to go and see a film?",
+    "ko": "",
+    "text": "อยากไปดูหนังไหม",
+    "zh": "想去看电影吗？"
+   },
+   {
+    "en": "I’d like to go home.",
+    "ko": "",
+    "text": "ฉันอยากจะกลับบ้าน",
+    "zh": "我想回家"
+   }
+  ],
+  "name": "อยาก / ต้องการ (want)"
+ },
+ "th_when": {
+  "examples": [
+   {
+    "en": "When I graduated, I went and applied for a job as a teacher.",
+    "ko": "",
+    "text": "เมื่อเรียนจบแล้ว ฉันก็ไปสมัครงานเป็นครู",
+    "zh": "我毕业以后就去应聘当老师。"
+   },
+   {
+    "en": "five years ago",
+    "ko": "",
+    "text": "(เมื่อ)ห้าปีก่อน",
+    "zh": "五年前"
+   }
+  ],
+  "name": "เมื่อ / ตอนที่ (when)"
+ },
+ "th_yesno": {
+  "examples": [
+   {
+    "en": "Are you going or not?",
+    "ko": "",
+    "text": "คุณจะไปหรือเปล่า",
+    "zh": "你去不去？"
+   },
+   {
+    "en": "Is he bored or not?",
+    "ko": "",
+    "text": "เขาเบื่อหรือเปล่า",
+    "zh": "他厌烦了吗？"
+   }
+  ],
+  "name": "ไหม / ไหมคะ (yes-no question)"
+ }
+}

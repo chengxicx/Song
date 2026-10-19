@@ -79,7 +79,14 @@ def test_every_example_carries_a_chinese_gloss():
 def test_library_entries_use_the_display_language():
     zh = th.library_entries("zh")
     en = th.library_entries("en")
-    assert len(zh) == len(corpus())
+    corpus_keys = {row["key"] for row in corpus()}
+    hand_keys = {r["key"] for r in th._TH_RULES}  # pylint: disable=protected-access
+    # The library is the corpus plus the hand-written rules the corpus does
+    # not cover -- never a silent extra card, and never a missing one.
+    extra = {entry["key"] for entry in en} - corpus_keys
+    assert extra == hand_keys - corpus_keys
+    assert corpus_keys <= {entry["key"] for entry in en}
+    assert len(zh) == len(en) == len(corpus()) + len(extra)
     assert zh[0]["desc"] != en[0]["desc"]
     assert any("\u4e00" <= ch <= "\u9fff" for ch in zh[0]["desc"])
     assert all(entry["level"] in LEVELS for entry in zh)

@@ -38,8 +38,9 @@
     <div class="grammar-item__examples">
       {% for ex in entry.examples %}
       {#  A row is {"text", "tr"} where the corpus carries a translation
-          (Spanish, Thai); the Japanese / Korean / Russian rows are still
-          plain sentences with no gloss.  The gloss goes on its own line. #}
+          (every language except Cantonese / English / Italian / Portuguese
+          / Arabic, whose rule sets were written without examples).  The
+          gloss goes on its own line. #}
       {% set text = ex.text if ex is mapping else ex %}
       {% set tr = ex.tr if ex is mapping else '' %}
       <div class="grammar-item__example">{{ text }}{% if tr %}<span class="grammar-item__example-tr">{{ tr }}</span>{% endif %}</div>

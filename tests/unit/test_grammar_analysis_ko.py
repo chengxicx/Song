@@ -291,6 +291,13 @@ def test_vendored_reference_is_highlightable_where_possible():
     matchable example -- the Chinese panel reads the translation, the
     missing mark is cosmetic.  The guard below just pins the machinery:
     wherever the chosen example IS matchable the offsets are present.
+
+    The floor is a mass-regression canary, not a contract: the count moves
+    with the Kiwi model (169 on kiwipiepy 0.23.2, 170 on the release the
+    floor was written against) and this file skips wherever the optional
+    ``korean`` extra is absent, which is every CI run.  A floor pinned to
+    the exact observed value therefore goes stale silently -- it sits a
+    few below on purpose.
     """
     rules = [r for r in _DATA_RULES if r["reference"]]
     highlightable = 0
@@ -299,7 +306,7 @@ def test_vendored_reference_is_highlightable_where_possible():
         spans = grammar_ko._match_spans(rule, grammar_ko._tokens_for(korean), korean)
         if spans:
             highlightable += 1
-    assert highlightable >= 170, f"only {highlightable} references highlightable"
+    assert highlightable >= 165, f"only {highlightable} references highlightable"
 
 
 def test_panel_references_are_marked_or_bare_never_half_marked():
@@ -376,3 +383,57 @@ def test_vendored_reference_shows_on_both_translation_panels():
         assert not re.search(r"[A-Za-z]{3,}", zh["reference"]["text"]), rule["key"]
         verified += 1
     assert verified >= 100, f"only {verified} zh references verified end to end"
+
+
+# ---- the hand-written rules' spec dialect ------------------------------
+
+
+def test_rule_specs_speak_the_korean_dialect():
+    """
+    A hand-written rule's conditions use ``surface`` / ``lemma`` / ``pos``.
+
+    The Korean engine has its own matcher; the shared one's ``surface_in`` /
+    ``pos_in`` keys are simply not read here, so a condition written in that
+    dialect degrades to "any token with that POS" and the rule fires on every
+    sentence ending in it (〜(으)니까 once matched every connective ending).
+    The failure is invisible without this check: the rule still fires on its
+    own examples, it just also fires on everything else.
+    """
+    allowed = {"surface", "lemma", "pos", "any"}
+    bad = []
+    for rule in grammar_ko._KO_RULES:
+        for spec in rule.get("patterns") or []:
+            if spec.get("type") != "tokens":
+                continue
+            for cond in spec.get("conds") or []:
+                unknown = set(cond) - allowed
+                if unknown:
+                    bad.append((rule["key"], sorted(unknown)))
+    assert bad == [], f"conditions in the shared matcher's dialect: {bad}"
+
+
+def test_eunikka_covers_both_stem_spellings_and_nothing_else():
+    """
+    Kiwi keeps the epenthetic 으 after a consonant stem (없으니까, 많으니까),
+    so requiring the bare 니까 surface missed every adjective and every
+    consonant stem -- half the uses of the pattern.  Both spellings are the
+    same ending; nothing else is.
+    """
+    rule = next(r for r in grammar_ko._KO_RULES if r["key"] == "ko_eunikka")
+    for sentence in (
+        "비가 오니까 우산을 써요.",
+        "없으니까 힘들어요.",
+        "많으니까 나눠 주세요.",
+    ):
+        assert grammar_ko._match_spans(  # pylint: disable=protected-access
+            rule, grammar_ko._tokens_for(sentence), sentence
+        ), sentence
+    for sentence in (
+        "그는 부자건만 행복하지 않다.",
+        "책을 읽거나 자요.",
+        "오늘은 좀 바쁜데...",
+        "학교에 가요.",
+    ):
+        assert not grammar_ko._match_spans(  # pylint: disable=protected-access
+            rule, grammar_ko._tokens_for(sentence), sentence
+        ), sentence

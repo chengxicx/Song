@@ -30,6 +30,7 @@ import re
 
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
+    load_golden,
     make_rule,
     spec_surface,
 )
@@ -508,31 +509,133 @@ def _example_row(sentence, display_lang):
     return {"text": text, "tr": gloss.strip() if display_lang == "zh" else ""}
 
 
+def _golden_gloss(row, display_lang):
+    """
+    The translation to print under a golden example, or "".
+
+    Golden rows carry the three glosses as separate fields (``en`` /
+    ``zh`` / ``ko``) rather than inline in the sentence line, so the
+    display language picks one directly.  A missing one stays empty -- the
+    template then shows no gloss line.
+    """
+    if display_lang == "zh":
+        return (row.get("zh") or "").strip()
+    if display_lang == "ko":
+        return (row.get("ko") or "").strip()
+    return (row.get("en") or "").strip()
+
+
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_th_golden.json",
+    )
+)
+
+
+def _golden_examples():
+    """
+    Curated examples for the hand-written rules, keyed by rule key.
+
+    The Thai corpus rows and the hand-written rules share keys for the
+    twenty rules the corpus was written to cover; the remaining nine are
+    rule-only.  Where a golden row exists it wins, because its sentences
+    were checked to show *this* construction rather than another reading
+    of the same word (ถูก "cheap" vs the passive).
+    """
+    return load_golden(_GOLDEN_PATH)
+
+
 def library_entries(display_lang="en"):
     """
     The whole Thai grammar library, in CEFR order (A1 -> C1).
 
     The corpus is stored already ordered by level then section number, so
     the rows come back in the order the book teaches them within a band.
+    A row with a golden entry shows the golden sentences instead of its
+    corpus examples.
+
+    Nine hand-written rules (ที่, สามารถ, ทั้ง...ทั้ง, เกือบ, อย่างไรก็ตาม,
+    ...) have no corpus row of their own -- the corpus covers the other
+    twenty -- so they are merged in from the rule list, each one at the end
+    of its own level band.  Without that they were matchable in the reader
+    but absent from the library, which is the one place a learner browses
+    what the engine knows.
     """
+    golden = _golden_examples()
     entries = []
+    corpus_keys = set()
     for item in _corpus():
+        corpus_keys.add(item["key"])
         desc = item.get("zh") if display_lang == "zh" else item.get("en")
+        curated = golden.get(item["key"])
+        if curated:
+            examples = [
+                {"text": row["text"], "tr": _golden_gloss(row, display_lang)}
+                if _golden_gloss(row, display_lang)
+                else row["text"]
+                for row in curated
+            ]
+        else:
+            examples = [
+                _example_row(s, display_lang) for s in item.get("examples") or ()
+            ]
         entry = {
             "key": item["key"],
             "name": item["name"],
             "level": item["level"],
             "desc": desc or item.get("en") or "",
-            "examples": [
-                _example_row(s, display_lang) for s in item.get("examples") or ()
-            ],
+            "examples": examples,
             "skipped": not _matchable(item),
         }
         formation = (item.get("formation") or "").strip()
         if formation:
             entry["formation"] = formation
         entries.append(entry)
+
+    for rule in _TH_RULES:
+        if rule["key"] in corpus_keys:
+            continue
+        curated = golden.get(rule["key"]) or []
+        entry = {
+            "key": rule["key"],
+            "name": rule["name"],
+            "level": rule["level"],
+            "desc": (rule.get("zh") if display_lang == "zh" else rule["desc"])
+            or rule["desc"],
+            "examples": [
+                {"text": row["text"], "tr": _golden_gloss(row, display_lang)}
+                if _golden_gloss(row, display_lang)
+                else row["text"]
+                for row in curated
+            ],
+            "skipped": False,
+        }
+        _insert_by_level(entries, entry)
     return entries
+
+
+def _insert_by_level(entries, entry):
+    """
+    Put ``entry`` at the end of its own level band, in place.
+
+    The list is the page's order *and* the detail page's prev/next chain,
+    so it has to stay CEFR-ordered; appending the nine rule-only cards
+    after the last C1 row left them behind the whole library (and made the
+    "levels are ordered easiest first" check fail).  A level with no corpus
+    rows at all -- not the case today -- falls back to appending.
+    """
+    last = None
+    for index, existing in enumerate(entries):
+        if existing["level"] == entry["level"]:
+            last = index
+    if last is None:
+        entries.append(entry)
+    else:
+        entries.insert(last + 1, entry)
 
 
 def analyze_thai(page_text, display_lang="en"):

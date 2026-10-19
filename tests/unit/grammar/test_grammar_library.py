@@ -15,6 +15,7 @@ ImportError, so the data-rich assertions need the parser installed;
 """
 
 import importlib
+import os
 
 import markupsafe
 import pytest
@@ -255,17 +256,25 @@ def test_ruleset_entries_list_exactly_the_panel_rules(module_name):
 @pytest.mark.parametrize("module_name", _RULESET_MODULES)
 def test_ruleset_entries_carry_the_core_fields(module_name):
     """
-    Every rule renders with a name and a description, and no examples.
+    Every rule renders with a name and a description.
 
-    These rule sets carry no example sentences, so the rows come back
-    with an empty list and the detail template hides the example block:
-    an empty examples section would read like a stub.  Nothing is
-    reference-only -- every rule is something the matcher can fire.
+    A rule set written without examples comes back with an empty list and
+    the detail template hides the example block: an empty examples section
+    would read like a stub.  Mandarin now ships a curated golden set, so
+    its rows carry ``{"text", "tr"}`` rows instead -- both shapes are fine,
+    a blank sentence is not.  Nothing is reference-only: every rule is
+    something the matcher can fire.
     """
     module, _ = _ruleset_engine(module_name)
+    has_golden = os.path.exists(getattr(module, "_GOLDEN_PATH", ""))
     for e in module.library_entries("en"):
         assert e["key"] and e["name"] and e["level"] and e["desc"]
-        assert e["examples"] == []
+        assert isinstance(e["examples"], list)
+        if not has_golden:
+            assert e["examples"] == []
+        for example in e["examples"]:
+            text = example["text"] if isinstance(example, dict) else example
+            assert text.strip(), f"{e['key']}: blank example"
         assert e["skipped"] is False
 
 
@@ -367,13 +376,69 @@ def test_th_library_examples_split_the_corpus_gloss():
     Thai stores "thai · roman — english ／ 中文" in one string; the library
     hands the template {"text", "tr"} so the Chinese becomes its own line
     and stays hidden when Chinese is not the display language.
+
+    A row that quotes a golden sentence instead carries its glosses as
+    separate fields, so it shows the English half on the English page --
+    the Chinese-only rule binds the corpus-shaped rows, not those.
     """
     th = pytest.importorskip("lute.read.render.grammar_analysis_th")
+    golden = th._golden_examples()
+    assert golden, "no golden set"
     for lang, want_gloss in (("en", False), ("zh", True)):
-        rows = [r for e in th.library_entries(lang) for r in e["examples"]]
-        assert rows, "no Thai examples"
-        assert all(" ／ " not in r["text"] for r in rows), "gloss left in the text"
-        assert all(bool(r["tr"]) is want_gloss for r in rows), f"{lang}: wrong gloss"
+        entries = th.library_entries(lang)
+        corpus_rows = [
+            r for e in entries if e["key"] not in golden for r in e["examples"]
+        ]
+        assert corpus_rows, "no corpus-shaped Thai examples"
+        assert all(" ／ " not in r["text"] for r in corpus_rows), "gloss left in text"
+        assert all(bool(r["tr"]) is want_gloss for r in corpus_rows), f"{lang}: gloss"
+        golden_rows = [r for e in entries if e["key"] in golden for r in e["examples"]]
+        assert golden_rows, "no golden Thai examples"
+        assert all(
+            isinstance(r, dict) and r["tr"] for r in golden_rows
+        ), f"{lang}: golden row without a gloss"
+        assert all(" ／ " not in r["text"] for r in golden_rows)
+
+
+@pytest.mark.parametrize("lang", ("es", "fr", "de", "ru"))
+def test_merged_corpora_translate_every_example(lang):
+    """
+    Every example in the four merged corpora carries a gloss in the default
+    display language and in Chinese.
+
+    Chinese comes from the merged material (``example_zh``); English was
+    back-filled from ``scripts/grammar_materials_<lang>/example_en.json``
+    because those corpora shipped none, which left the default English page
+    quoting bare sentences while the Chinese page translated them.  Korean
+    is deliberately not pinned here: it is still golden-only.
+    """
+    module = importlib.import_module("lute.read.render.grammar_analysis_" + lang)
+    for display in ("en", "zh"):
+        rows = [row for e in module.library_entries(display) for row in e["examples"]]
+        assert rows, f"{lang}: no examples"
+        bare = [row for row in rows if not (isinstance(row, dict) and row.get("tr"))]
+        assert bare == [], f"{lang}/{display}: {len(bare)} examples without a gloss"
+        assert all(row["text"].strip() for row in rows)
+
+
+@pytest.mark.parametrize("lang", ("es", "fr", "de", "ru"))
+def test_example_material_still_lines_up_with_the_corpus(lang):
+    """
+    The authored gloss material still pairs with every corpus row.
+
+    The back-fill is positional, so a corpus edit that reorders or rewrites
+    an example would silently attach the wrong translation.  Running the
+    same planner the writer uses turns that into a red test instead.
+    """
+    backfill = pytest.importorskip("scripts.backfill_grammar_example_glosses")
+    rows = backfill.load(backfill.CORPUS.format(lang=lang))
+    material, duplicates = backfill.load_material(
+        backfill.MATERIAL.format(lang=lang, field="en")
+    )
+    assert duplicates == []
+    _, _, mismatched, uncovered = backfill.plan(rows, material, "en")
+    assert mismatched == []
+    assert uncovered == 0, f"{lang}: {uncovered} rows have no material"
 
 
 def test_ru_examples_carry_every_display_language():
@@ -415,8 +480,9 @@ def test_ru_library_examples_switch_the_gloss():
 
 def test_ru_data_rows_quote_their_chinese_gloss():
     """
-    The merged rows keep a parallel Chinese translation in `example_zh`;
-    the card prints it under the sentence instead of dropping it.
+    The merged rows keep a parallel Chinese translation in `example_zh`; the
+    card prints it under the sentence instead of dropping it, and the
+    English page prints its own English half rather than that Chinese one.
     """
     entries = _ru_entries("zh")
     data = [e for e in entries if e["key"].startswith("rgm_")]
@@ -424,9 +490,14 @@ def test_ru_data_rows_quote_their_chinese_gloss():
     assert any(r["tr"] for e in data for r in e["examples"]), "gloss never used"
     english = {e["key"]: e for e in _ru_entries("en")}
     for entry in data:
-        assert all(
-            not r["tr"] for r in english[entry["key"]]["examples"]
-        ), f"{entry['key']}: the Chinese gloss leaked into the English page"
+        zh_rows = entry["examples"]
+        en_rows = english[entry["key"]]["examples"]
+        assert all(r["tr"] for r in en_rows), f"{entry['key']}: empty English gloss"
+        for zh_row, en_row in zip(zh_rows, en_rows):
+            assert zh_row["text"] == en_row["text"]
+            assert (
+                zh_row["tr"] != en_row["tr"]
+            ), f"{entry['key']}: the Chinese gloss leaked into the English page"
 
 
 def test_library_descriptions_switch_to_korean():
@@ -792,16 +863,23 @@ def test_ruleset_language_page_renders_its_library(
     entries = module.library_entries("en")
     body = client.get(f"/grammar/{language.id}").get_data(as_text=True)
     _cards_of(body, entries)
-    assert f'href="/grammar/{language.id}"' in client.get(
-        "/grammar/?pick=1"
-    ).get_data(as_text=True)
+    assert f'href="/grammar/{language.id}"' in client.get("/grammar/?pick=1").get_data(
+        as_text=True
+    )
 
-    # A card opens its point's page: description in, examples out (these
-    # corpora carry none, and the template hides the block).
-    first = entries[0]
+    # A card opens its point's page: the description always, and the
+    # example block only when the corpus has one (the template hides an
+    # empty block rather than rendering a stub).
+    first = next((e for e in entries if e["examples"]), entries[0])
     detail = client.get(f"/grammar/{language.id}/{first['key']}").get_data(as_text=True)
     assert "grammar-item__desc" in detail
-    assert "grammar-item__examples" not in detail
+    if first["examples"]:
+        assert "grammar-item__examples" in detail
+        example = first["examples"][0]
+        text = example["text"] if isinstance(example, dict) else example
+        assert str(markupsafe.escape(text)) in detail
+    else:
+        assert "grammar-item__examples" not in detail
 
 
 def test_korean_page_shows_korean_descriptions(spanish, app_context, client):
