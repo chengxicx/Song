@@ -181,7 +181,8 @@ def test_arabic_grammar_analysis_uses_ar_engine(client, empty_db, arabic):
     keys = {g["key"] for g in data}
     assert "ar_questions" in keys
     assert "ar_kana" in keys
-    assert "ar_al" in keys
+    # A merged data-layer row fires here too (على, from grammar_ar.json).
+    assert any(k.startswith("agm_") for k in keys)
     for g in data:
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
 

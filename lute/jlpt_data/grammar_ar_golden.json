@@ -1,0 +1,194 @@
+{
+ "ar_questions": {
+  "examples": [
+   {
+    "arabic": "هل أنت هنا؟",
+    "zh": "你在这儿吗？"
+   }
+  ]
+ },
+ "ar_prep_pron": {
+  "examples": [
+   {
+    "arabic": "وضعت الكتاب عليها.",
+    "zh": "我把书放在它上面。"
+   }
+  ]
+ },
+ "ar_demonstratives": {
+  "examples": [
+   {
+    "arabic": "هذا الكتاب جديد.",
+    "zh": "这本书是新的。"
+   }
+  ]
+ },
+ "ar_neg_la": {
+  "examples": [
+   {
+    "arabic": "لا أعرف.",
+    "zh": "我不知道。"
+   }
+  ]
+ },
+ "ar_kana": {
+  "examples": [
+   {
+    "arabic": "كان الجو جميلاً.",
+    "zh": "天气很好。"
+   }
+  ]
+ },
+ "ar_pronouns": {
+  "examples": [
+   {
+    "arabic": "أنا طالب.",
+    "zh": "我是学生。"
+   }
+  ]
+ },
+ "ar_but": {
+  "examples": [
+   {
+    "arabic": "أردت الذهاب لكنه كان مشغولاً.",
+    "zh": "我想去，但他很忙。"
+   }
+  ]
+ },
+ "ar_because": {
+  "examples": [
+   {
+    "arabic": "بقيت في البيت لأن المطر كان غزيراً.",
+    "zh": "我留在家里，因为雨很大。"
+   }
+  ]
+ },
+ "ar_when": {
+  "examples": [
+   {
+    "arabic": "عندما وصلنا بدأ الحفل.",
+    "zh": "我们到达时，晚会开始了。"
+   }
+  ]
+ },
+ "ar_sawfa": {
+  "examples": [
+   {
+    "arabic": "سوف أذهب إلى السوق.",
+    "zh": "我将去市场。"
+   }
+  ]
+ },
+ "ar_also": {
+  "examples": [
+   {
+    "arabic": "جاء علي أيضاً.",
+    "zh": "阿里也来了。"
+   }
+  ]
+ },
+ "ar_every": {
+  "examples": [
+   {
+    "arabic": "كل الطلاب حاضرون.",
+    "zh": "所有学生都到了。"
+   }
+  ]
+ },
+ "ar_anna": {
+  "examples": [
+   {
+    "arabic": "قال إنه سيأتي.",
+    "zh": "他说他会来。"
+   }
+  ]
+ },
+ "ar_if": {
+  "examples": [
+   {
+    "arabic": "لو كان عندي وقت، سافرت.",
+    "zh": "如果我有时间，我就去了。"
+   }
+  ]
+ },
+ "ar_lan_lam": {
+  "examples": [
+   {
+    "arabic": "لم يذهب.",
+    "zh": "他没去。"
+   }
+  ]
+ },
+ "ar_relative": {
+  "examples": [
+   {
+    "arabic": "الرجل الذي رأيته هناك.",
+    "zh": "我在那里见到的那个男人。"
+   }
+  ]
+ },
+ "ar_qad": {
+  "examples": [
+   {
+    "arabic": "قد انتهى العمل.",
+    "zh": "工作已经结束了。"
+   }
+  ]
+ },
+ "ar_suffix_ha": {
+  "examples": [
+   {
+    "arabic": "كتابها على الطاولة.",
+    "zh": "她的书在桌上。"
+   }
+  ]
+ },
+ "ar_suffix_plural": {
+  "examples": [
+   {
+    "arabic": "هذا بيتهم.",
+    "zh": "这是他们的家。"
+   }
+  ]
+ },
+ "ar_hatta": {
+  "examples": [
+   {
+    "arabic": "انتظر حتى جاء.",
+    "zh": "他一直等到他来。"
+   }
+  ]
+ },
+ "ar_laysa": {
+  "examples": [
+   {
+    "arabic": "ليس صعباً.",
+    "zh": "不难。"
+   }
+  ]
+ },
+ "ar_wish": {
+  "examples": [
+   {
+    "arabic": "ليت عندي وقتاً.",
+    "zh": "但愿我有时间。"
+   }
+  ]
+ },
+ "ar_kullama": {
+  "examples": [
+   {
+    "arabic": "كلما كبر تحسن.",
+    "zh": "他越长大越优秀。"
+   }
+  ]
+ },
+ "ar_lam_yakun": {
+  "examples": [
+   {
+    "arabic": "لم يكن هناك أحد.",
+    "zh": "那里没有一个人。"
+   }
+  ]
+ }
+}

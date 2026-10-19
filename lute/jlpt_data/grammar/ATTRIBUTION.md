@@ -259,3 +259,39 @@ example sentences are new):
     ถึงจะ · ตามที่ · เนื่องจาก · การที่ · กระทั่ง
 
 Chapter 16 is therefore an addition to the outline, not a transcription of it.
+
+# Arabic grammar data
+
+## `../grammar_ar.json` — 83 entries (2026-10-19)
+
+The Arabic grammar library: one row per point, built from the section
+outline of three reference grammars of Arabic — two modern-standard
+teaching grammars and one classical نحو primer.  Only the outline (which
+points a course teaches, and in what order) was taken from them; the row
+wording, the Chinese glosses and the `focus` sequences were written for
+this project.  Book titles are deliberately not recorded here.
+
+- Every row is anchored on literal word forms.  `pyarabic` ships no
+  part-of-speech tagger, so a `focus` list is a surface sequence, with at
+  most one bounded gap (`"..."`) or an `a/b` alternative set — never a
+  `§`-style word-class slot.  Points that need case or mood analysis
+  (الإعراب endings, أوزان الصرف, الحال / التمييز / البدل) are out of scope
+  and are not rows: without a tagger their spans cannot be validated.
+- Examples come from two places.  Where a reference text carries a clean
+  sentence for the point, that sentence is lifted as-is (vocalisation
+  included, after dropping lines that are paradigm notation or a page
+  fragment).  The remaining rows are illustrated with sentences written
+  for this project on the point the reference describes.  Every row is
+  re-checked through the engine matcher on its own examples by
+  `scripts/merge_grammar_ar_materials.py`, so a row whose `focus` never
+  fires on its examples cannot reach the panel.
+- Levels are CEFR bands (A1–C2) used as a display approximation; Arabic has
+  no JLPT/TOPIK-style grading.
+- `units.json` under `scripts/grammar_materials_ar/` is the source of
+  truth.  `grammar_ar.json` is rebuilt from it with
+  `python -m scripts.merge_grammar_ar_materials --write` (the rebuild is a
+  pure function of the materials; do not hand-edit the JSON).
+- `scripts/audit_grammar_ar_overlaps.py` re-derives
+  `grammar_analysis_ar._DUPLICATE_RULE_IDS` when the library grows; the
+  suffixed-pronoun rules (`ـها`, `ـهم/ـكم/ـنا`) exclude the particles they
+  would otherwise double-report.

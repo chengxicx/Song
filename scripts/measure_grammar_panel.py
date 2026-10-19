@@ -80,6 +80,10 @@ def engine_functions(name):
             KO.analyze_korean,
             lambda: KO._get_all_rules() + KO._get_pattern_rules(),
         )
+    elif name == "ar":
+        from lute.read.render import grammar_analysis_ar as AR  # noqa: E402
+
+        pair = (AR.analyze_arabic, AR._get_all_rules)
     elif name == "ja":
         pair = (JA.analyze_japanese, JA._get_all_rules)
     else:  # argparse restricts this, so it is a programming error
@@ -244,7 +248,7 @@ def main():
     ap.add_argument(
         "--engine",
         default="ja",
-        choices=("ja", "ru", "es", "fr", "de", "ko"),
+        choices=("ja", "ru", "es", "fr", "de", "ko", "ar"),
         help="grammar engine to measure (ja needs nothing extra, ru needs "
         "pymorphy3, es needs spacy + es_core_news_md, fr needs spacy + "
         "fr_core_news_sm, ko needs kiwipiepy)",
