@@ -1355,5 +1355,182 @@
    }
   ],
   "source": "corpus-essential"
+ },
+ {
+  "pattern": "après que + indicatif",
+  "name_fr": "après que + indicatif (after)",
+  "meaning_en": "after: a finished event, taking the indicative in careful usage",
+  "meaning_zh": "「在……之后」（après que + 直陈式）",
+  "level": "B1",
+  "focus": [
+   "après",
+   "que/qu'"
+  ],
+  "formation": "après que + indicatif（书面语也用虚拟式，属争议用法）",
+  "notes": "传统语法要求直陈式，因为从句说的是已发生的事实：après qu'il est rentré。口语和部分书面语会用虚拟式，被视为可接受但有争议。与 avant que 相反——后者必须用虚拟式。",
+  "examples": [
+   {
+    "french": "Nous lui avons parlé après qu'il est rentré.",
+    "chinese": "他回来之后我们跟他谈过。"
+   },
+   {
+    "french": "Après qu'il aura fini son rapport, il le présentera.",
+    "chinese": "他写完报告后会来汇报。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "maintenant que",
+  "name_fr": "maintenant que (now that)",
+  "meaning_en": "now that: a cause that has just become true",
+  "meaning_zh": "「既然现在……」（maintenant que）",
+  "level": "B1",
+  "focus": [
+   "maintenant",
+   "que/qu'"
+  ],
+  "formation": "maintenant que + indicatif",
+  "notes": "表示「现在既然已经……」，从句用直陈式。和 puisque 的区别：maintenant que 强调时间上的转变（以前不是这样）。",
+  "examples": [
+   {
+    "french": "Maintenant qu'elle connait les règles, elle ne commettra plus la faute.",
+    "chinese": "既然她现在懂了规则，就不会再犯这个错了。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "à force de + infinitif",
+  "name_fr": "à force de + infinitif (by dint of)",
+  "meaning_en": "by dint of, through repeated action: the cause is repetition",
+  "meaning_zh": "「由于反复……、靠着不断地……」（à force de + 不定式）",
+  "level": "B1",
+  "focus": [
+   "à",
+   "force",
+   "de"
+  ],
+  "formation": "à force de + infinitif / nom",
+  "notes": "强调原因的重复或持续：à force de bavarder（聊着聊着）。后接不定式或名词，不接从句。",
+  "examples": [
+   {
+    "french": "À force de bavarder, on n'a pas vu le temps passer.",
+    "chinese": "聊着聊着，我们都没发觉时间过去了。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "quant à + nom",
+  "name_fr": "quant à (as for)",
+  "meaning_en": "as for, regarding: topicalises a noun or pronoun",
+  "meaning_zh": "「至于……」（quant à）",
+  "level": "B1",
+  "focus": [
+   "quant",
+   "à/aux"
+  ],
+  "formation": "quant à / quant aux + nom ou pronom tonique",
+  "notes": "用于转换话题，后接名词或重读代词：quant à moi, quant à lui。与 en ce qui concerne 同义，更书面。",
+  "examples": [
+   {
+    "french": "Quant à moi, je pense que c'est une bonne idée.",
+    "chinese": "至于我，我觉得这是个好主意。"
+   },
+   {
+    "french": "Quant aux risques de malaria en France, je pense que c'est exagéré.",
+    "chinese": "至于法国疟疾的风险，我觉得是夸大其词。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "en dépit de + nom",
+  "name_fr": "en dépit de (in spite of)",
+  "meaning_en": "in spite of: a bookish synonym of malgré",
+  "meaning_zh": "「尽管、不顾」（en dépit de）",
+  "level": "B2",
+  "focus": [
+   "en",
+   "dépit",
+   "de/du"
+  ],
+  "formation": "en dépit de + nom",
+  "notes": "比 malgré 更书面，两者都接名词、都不能接从句。en dépit du bon sens（违背常理）是固定搭配。",
+  "examples": [
+   {
+    "french": "Elle agit en dépit du bon sens.",
+    "chinese": "她的做法违背常理。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "assez de + nom",
+  "name_fr": "assez de (enough)",
+  "meaning_en": "enough: a quantity adverb that takes de before the noun",
+  "meaning_zh": "「足够的……」（assez de + 名词）",
+  "level": "A2",
+  "focus": [
+   "assez",
+   "de/d'"
+  ],
+  "formation": "assez de + nom（不再加冠词）",
+  "notes": "数量副词后直接 de，不加冠词：assez de temps，不是 assez du temps。修饰形容词或动词时不加 de：assez grand、assez vite。",
+  "examples": [
+   {
+    "french": "Y a-t-il assez de place dans votre voiture pour cinq personnes ?",
+    "chinese": "您的车里坐得下五个人吗？"
+   },
+   {
+    "french": "Nous n'avons pas assez de temps pour peindre les quatre murs de la pièce.",
+    "chinese": "我们没足够的时间刷完这间屋子的四面墙。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "peu de + nom",
+  "name_fr": "peu de (little, few)",
+  "meaning_en": "little / few: a quantity adverb that takes de before the noun",
+  "meaning_zh": "「很少的……」（peu de + 名词）",
+  "level": "A2",
+  "focus": [
+   "peu",
+   "de/d'"
+  ],
+  "formation": "peu de + nom（不加冠词）",
+  "notes": "peu de 表示量少，可数不可数都用：peu de monde、peu d'argent。un peu de 表示「一点」，语气正面，注意区分。",
+  "examples": [
+   {
+    "french": "Il y avait peu de monde.",
+    "chinese": "人很少。"
+   },
+   {
+    "french": "Nous connaissons un peu de russe.",
+    "chinese": "我们懂一点俄语。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "selon + nom",
+  "name_fr": "selon (according to)",
+  "meaning_en": "according to: introduces the source of a statement",
+  "meaning_zh": "「根据……」（selon）",
+  "level": "A2",
+  "focus": [
+   "selon"
+  ],
+  "formation": "selon + nom（不加冠词的情况多）",
+  "notes": "引出消息来源：selon la météo、selon moi。与 d'après 同义，selon 更正式。注意 selon que + 从句 是另一个结构。",
+  "examples": [
+   {
+    "french": "Selon la météo, il va neiger.",
+    "chinese": "据天气预报，要下雪了。"
+   }
+  ],
+  "source": "corpus-essential"
  }
 ]

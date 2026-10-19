@@ -1292,5 +1292,182 @@
   "level": "A2",
   "formation": "à partir de + nom / date",
   "notes": "时间和空间都能用。与 depuis 的分工：depuis 强调从过去持续到现在，à partir de 只标起点，句子可以是将来时。"
+ },
+ {
+  "key": "fgm_aprèsqueindicatifafter__c3ffa2",
+  "name": "après que + indicatif (after)",
+  "slug": "après que + indicatif",
+  "meaning": "after: a finished event, taking the indicative in careful usage",
+  "type": "composite",
+  "examples": [
+   "Nous lui avons parlé après qu'il est rentré.",
+   "Après qu'il aura fini son rapport, il le présentera."
+  ],
+  "example_zh": [
+   "他回来之后我们跟他谈过。",
+   "他写完报告后会来汇报。"
+  ],
+  "focus": [
+   "après",
+   "que/qu'"
+  ],
+  "zh": "「在……之后」（après que + 直陈式）",
+  "level": "B1",
+  "formation": "après que + indicatif（书面语也用虚拟式，属争议用法）",
+  "notes": "传统语法要求直陈式，因为从句说的是已发生的事实：après qu'il est rentré。口语和部分书面语会用虚拟式，被视为可接受但有争议。与 avant que 相反——后者必须用虚拟式。"
+ },
+ {
+  "key": "fgm_maintenantquenowthat__00ac2e",
+  "name": "maintenant que (now that)",
+  "slug": "maintenant que",
+  "meaning": "now that: a cause that has just become true",
+  "type": "composite",
+  "examples": [
+   "Maintenant qu'elle connait les règles, elle ne commettra plus la faute."
+  ],
+  "example_zh": [
+   "既然她现在懂了规则，就不会再犯这个错了。"
+  ],
+  "focus": [
+   "maintenant",
+   "que/qu'"
+  ],
+  "zh": "「既然现在……」（maintenant que）",
+  "level": "B1",
+  "formation": "maintenant que + indicatif",
+  "notes": "表示「现在既然已经……」，从句用直陈式。和 puisque 的区别：maintenant que 强调时间上的转变（以前不是这样）。"
+ },
+ {
+  "key": "fgm_àforcedeinfinitifbydintof__c14c1f",
+  "name": "à force de + infinitif (by dint of)",
+  "slug": "à force de + infinitif",
+  "meaning": "by dint of, through repeated action: the cause is repetition",
+  "type": "composite",
+  "examples": [
+   "À force de bavarder, on n'a pas vu le temps passer."
+  ],
+  "example_zh": [
+   "聊着聊着，我们都没发觉时间过去了。"
+  ],
+  "focus": [
+   "à",
+   "force",
+   "de"
+  ],
+  "zh": "「由于反复……、靠着不断地……」（à force de + 不定式）",
+  "level": "B1",
+  "formation": "à force de + infinitif / nom",
+  "notes": "强调原因的重复或持续：à force de bavarder（聊着聊着）。后接不定式或名词，不接从句。"
+ },
+ {
+  "key": "fgm_quantàasfor__074468",
+  "name": "quant à (as for)",
+  "slug": "quant à + nom",
+  "meaning": "as for, regarding: topicalises a noun or pronoun",
+  "type": "composite",
+  "examples": [
+   "Quant à moi, je pense que c'est une bonne idée.",
+   "Quant aux risques de malaria en France, je pense que c'est exagéré."
+  ],
+  "example_zh": [
+   "至于我，我觉得这是个好主意。",
+   "至于法国疟疾的风险，我觉得是夸大其词。"
+  ],
+  "focus": [
+   "quant",
+   "à/aux"
+  ],
+  "zh": "「至于……」（quant à）",
+  "level": "B1",
+  "formation": "quant à / quant aux + nom ou pronom tonique",
+  "notes": "用于转换话题，后接名词或重读代词：quant à moi, quant à lui。与 en ce qui concerne 同义，更书面。"
+ },
+ {
+  "key": "fgm_endépitdeinspiteof__220858",
+  "name": "en dépit de (in spite of)",
+  "slug": "en dépit de + nom",
+  "meaning": "in spite of: a bookish synonym of malgré",
+  "type": "composite",
+  "examples": [
+   "Elle agit en dépit du bon sens."
+  ],
+  "example_zh": [
+   "她的做法违背常理。"
+  ],
+  "focus": [
+   "en",
+   "dépit",
+   "de/du"
+  ],
+  "zh": "「尽管、不顾」（en dépit de）",
+  "level": "B2",
+  "formation": "en dépit de + nom",
+  "notes": "比 malgré 更书面，两者都接名词、都不能接从句。en dépit du bon sens（违背常理）是固定搭配。"
+ },
+ {
+  "key": "fgm_assezdeenough__1d2714",
+  "name": "assez de (enough)",
+  "slug": "assez de + nom",
+  "meaning": "enough: a quantity adverb that takes de before the noun",
+  "type": "composite",
+  "examples": [
+   "Y a-t-il assez de place dans votre voiture pour cinq personnes ?",
+   "Nous n'avons pas assez de temps pour peindre les quatre murs de la pièce."
+  ],
+  "example_zh": [
+   "您的车里坐得下五个人吗？",
+   "我们没足够的时间刷完这间屋子的四面墙。"
+  ],
+  "focus": [
+   "assez",
+   "de/d'"
+  ],
+  "zh": "「足够的……」（assez de + 名词）",
+  "level": "A2",
+  "formation": "assez de + nom（不再加冠词）",
+  "notes": "数量副词后直接 de，不加冠词：assez de temps，不是 assez du temps。修饰形容词或动词时不加 de：assez grand、assez vite。"
+ },
+ {
+  "key": "fgm_peudelittlefew__5c37cf",
+  "name": "peu de (little, few)",
+  "slug": "peu de + nom",
+  "meaning": "little / few: a quantity adverb that takes de before the noun",
+  "type": "composite",
+  "examples": [
+   "Il y avait peu de monde.",
+   "Nous connaissons un peu de russe."
+  ],
+  "example_zh": [
+   "人很少。",
+   "我们懂一点俄语。"
+  ],
+  "focus": [
+   "peu",
+   "de/d'"
+  ],
+  "zh": "「很少的……」（peu de + 名词）",
+  "level": "A2",
+  "formation": "peu de + nom（不加冠词）",
+  "notes": "peu de 表示量少，可数不可数都用：peu de monde、peu d'argent。un peu de 表示「一点」，语气正面，注意区分。"
+ },
+ {
+  "key": "fgm_selonaccordingto__c1b8d1",
+  "name": "selon (according to)",
+  "slug": "selon + nom",
+  "meaning": "according to: introduces the source of a statement",
+  "type": "composite",
+  "examples": [
+   "Selon la météo, il va neiger."
+  ],
+  "example_zh": [
+   "据天气预报，要下雪了。"
+  ],
+  "focus": [
+   "selon"
+  ],
+  "zh": "「根据……」（selon）",
+  "level": "A2",
+  "formation": "selon + nom（不加冠词的情况多）",
+  "notes": "引出消息来源：selon la météo、selon moi。与 d'après 同义，selon 更正式。注意 selon que + 从句 是另一个结构。"
  }
 ]
