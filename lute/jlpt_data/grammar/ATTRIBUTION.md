@@ -116,9 +116,14 @@ distributed under CC BY-SA 4.0 as well.
 Korean wording for the same three fields, extended to *every* entry rather
 than the jkindrix 595 — the panel's Korean display language needs a gloss on
 the merged material rows too, and those ship only `chinese`.  Shape as above;
-1310 of the 1375 entries carry a `formation` line and all 1310 carry the
-notes block, while 1304 sentences carry a translation.  The sentences are
-keyed by the Japanese sentence, so an index shift can never mis-assign one.
+1310 of the 1376 entries carry a `formation` line and all 1310 carry the
+notes block, while **all 4007 sentences carry a translation** — the same
+sentences `zh_enrichment.json` and `en_enrichment.json` cover, so the Korean
+panel never quotes bare Japanese.  The 66 entries with `examples` only are
+the merged material rows, whose `formation` and notes are already covered by
+the Chinese file.  The sentences are keyed by the Japanese sentence, so an
+index shift can never mis-assign one; a sentence shared by two entries is
+stored under both ids, because the panel looks the gloss up by entry id.
 Written for this project (Song), distributed under **CC BY-SA 4.0**.
 
 ## `en_enrichment.json`
