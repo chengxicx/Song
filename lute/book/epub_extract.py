@@ -8,7 +8,9 @@ looks like the book (images, tables, verse, inline styling) while still
 getting Lute's lookups, status colours, multi-word selection and TTS.
 
 This module writes everything the reading screen needs under
-`static/epub/<uuid>/`:
+`<EPUB_STATIC_ROOT>/epub/<uuid>/` -- `<datapath>/static/epub/<uuid>/`
+on a real install, i.e. beside the databases rather than inside the
+code tree, so a data backup carries it:
 
     ch/<index>.html   one chapter, sanitised, URLs rewritten, wrapped in
                       the `.epub-body` scope element
@@ -79,7 +81,8 @@ class EpubExtract:
     "The extracted package: where it lives and what each chapter became."
 
     def __init__(self, root, chapters, css_path):
-        # All paths are relative to the static folder.
+        # All paths are relative to EPUB_STATIC_ROOT (the data
+        # directory's static root), which is what BkEpubPath stores.
         self.root = root
         self.css_path = css_path
         # chapter index -> {"html": rel path, "text": sanitised text}
@@ -98,8 +101,11 @@ def css_path_for(chapter_html_path):
 
 def extract_epub_package(data, chapters, static_root):
     """
-    Write `data` (the whole .epub file) into static/epub/<uuid>/.
+    Write `data` (the whole .epub file) into <static_root>/epub/<uuid>/.
 
+    `static_root` is the data directory's static root
+    (EPUB_STATIC_ROOT), never the application's own static folder: the
+    extracted package is user data and has to sit where a backup looks.
     `chapters` are the EpubChapter objects being imported (they carry
     the archive path of their content document).  Returns an
     EpubExtract.  Raises BookImportException when the archive cannot be
