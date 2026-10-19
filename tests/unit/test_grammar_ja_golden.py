@@ -107,12 +107,18 @@ def test_golden_sentences_carry_a_display_gloss():
     rows per sentence; a golden sentence that reaches neither has to come
     from a row neither file covers, so a small remainder is expected but a
     sudden collapse means the enrichment keys drifted from the library.
+
+    English has no such remainder: the vendored rows ship it and
+    ``en_enrichment.json`` covers the merged material rows, so every golden
+    sentence is glossed in English and the panel never quotes bare Japanese.
     """
     golden = ja._golden_examples()
     sentences = [e for examples in golden.values() for e in examples]
     assert sentences, "golden set is empty"
+    with_en = sum(1 for e in sentences if (e.get("english") or "").strip())
     with_zh = sum(1 for e in sentences if (e.get("chinese") or "").strip())
     with_ko = sum(1 for e in sentences if (e.get("ko") or "").strip())
+    assert with_en == len(sentences), "golden sentences without an English gloss"
     assert with_zh == len(sentences), "golden sentences without a Chinese gloss"
     # ko_enrichment.json covers the vendored (English) rows, which is about
     # half the library; the merged material rows are Chinese-only there.
