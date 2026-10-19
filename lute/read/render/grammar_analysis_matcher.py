@@ -254,17 +254,49 @@ def _token_runs(match, tokens):
     return runs
 
 
-def _regex_spans(match, sentence_text):
+def _token_bounds(tokens):
+    """
+    The character offsets where tokens start and end.
+
+    A literal regex is matched against the raw sentence, so it also lands
+    inside longer words: Thai สิ "imperative particle" is a substring of
+    สิบ "ten", and ขา of ขาย "to sell".  These sets let a spec ask for a
+    match that respects the token boundaries the engine already computed.
+    """
+    starts, ends = set(), set()
+    for tok in tokens:
+        start = tok.get("idx")
+        if start is None:
+            continue
+        starts.add(start)
+        ends.add(start + len(tok.get("surface") or ""))
+    return starts, ends
+
+
+def _regex_spans(match, sentence_text, tokens=None):
     """
     Character spans for {'re': ...} match shapes, collected recursively so
     a regex alternative inside {"any_of": [...]} counts too.
+
+    ``boundary`` on the spec filters those spans: ``"token"`` keeps only a
+    hit that covers a whole token, ``"start"`` only one that begins at a
+    token start (a prefix or the first element of a compound).  Without it
+    the raw substring hit is kept, which is what the non-Thai engines use.
     """
     if "re" in match:
-        return [m.span() for m in match["re"].finditer(sentence_text) if m.group(0)]
+        spans = [m.span() for m in match["re"].finditer(sentence_text) if m.group(0)]
+        boundary = match.get("boundary")
+        if boundary and tokens:
+            starts, ends = _token_bounds(tokens)
+            if boundary == "token":
+                spans = [(s, e) for s, e in spans if s in starts and e in ends]
+            elif boundary == "start":
+                spans = [(s, e) for s, e in spans if s in starts]
+        return spans
     if "any_of" in match:
         out = []
         for alt in match["any_of"]:
-            out.extend(_regex_spans(alt, sentence_text))
+            out.extend(_regex_spans(alt, sentence_text, tokens))
         return out
     return []
 
@@ -342,7 +374,7 @@ def match_rule(rule, tokens, sentence_text):
             char_end = last.get("end") or offsets[end - 1] + len(last["surface"])
             spans.append((offsets[start], char_end))
     # Literal regex recognisers (top-level or nested in any_of).
-    spans.extend(_regex_spans(match, sentence_text))
+    spans.extend(_regex_spans(match, sentence_text, tokens))
     # Drop duplicate / contained spans, keep reading order.
     spans = sorted(set(spans))
     merged = []
