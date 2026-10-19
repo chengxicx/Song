@@ -432,6 +432,32 @@ def _flash(spec, examples):
     return False
 
 
+def _first_glossed(pairs):
+    """
+    The first example that carries a translation, shaped for the panel.
+
+    ``sentence`` is the field the front end reads first.  Every translation
+    the example carries is kept, not only the Chinese one: the shared
+    ``reference_gloss`` resolves whichever the panel's display language
+    asks for, so an English panel is not served a Chinese gloss.
+    """
+    for pair in pairs:
+        if not isinstance(pair, dict):
+            continue
+        if not (pair.get("zh") or pair.get("en") or pair.get("ko")):
+            continue
+        sentence = (pair.get("arabic") or "").strip()
+        if not sentence:
+            continue
+        reference = {"sentence": sentence}
+        for field in ("zh", "en", "ko"):
+            value = (pair.get(field) or "").strip()
+            if value:
+                reference[field] = value
+        return reference
+    return None
+
+
 def _load_data_rules():
     """
     Rules for the merged grammar-point rows (jlpt_data/grammar_ar.json).
@@ -471,6 +497,10 @@ def _load_data_rules():
         rule["formation"] = (item.get("formation") or "").strip()
         rule["notes"] = (item.get("notes") or "").strip()
         rule["examples"] = library_examples
+        # The panel's folded reference block: the row's own example with its
+        # gloss, so a reader sees a translated sentence and not only the
+        # rule description above it.
+        rule["reference"] = _first_glossed(library_examples)
         rules.append(rule)
     return rules
 
@@ -493,15 +523,30 @@ def _get_data_rules():
 
 
 def _get_all_rules():
-    "Hand-written plus data-driven rules, built and memoised on first use."
+    """
+    Hand-written plus data-driven rules, built and memoised on first use.
+
+    The hand-written rules keep their illustrative sentence in the golden
+    set, so their panel reference block is attached here -- on a copy, so
+    the module-level rule list stays exactly as written.
+    """
     global _all_rules_cache  # pylint: disable=global-statement
     with _rules_lock:
         if _all_rules_cache is None:
-            _all_rules_cache = list(_AR_RULES) + [
+            golden = _golden_examples()
+            combined = []
+            for rule in _AR_RULES:
+                if not rule.get("reference"):
+                    reference = _first_glossed(golden.get(rule["key"]) or [])
+                    if reference:
+                        rule = dict(rule, reference=reference)
+                combined.append(rule)
+            combined += [
                 rule
                 for rule in _get_data_rules()
                 if rule["key"] not in _DUPLICATE_RULE_IDS
             ]
+            _all_rules_cache = combined
         return _all_rules_cache
 
 
