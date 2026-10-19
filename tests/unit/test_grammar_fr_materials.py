@@ -344,3 +344,80 @@ def test_negation_splits_personne_and_rien_off_the_general_rule():
     for sentence in ("Elle ne travaille pas le lundi.", "Tu ne voyages jamais en hiver."):
         text = fr._norm_text(sentence)
         assert fr.match_rule(negation, fr._tokens_for(text), text), sentence
+
+
+def test_reported_speech_rows_do_not_cross_fire():
+    """
+    The three indirect-speech rows share the verb demander but not the frame.
+
+    demander si introduces a yes/no question, demander de + infinitive a
+    request, and dit que a statement.  The trap is "dire qu'à": in
+    "c'est plus facile à dire qu'à faire" the sequence dire + qu' is not a
+    reported clause, so the statement row must stay off it.
+    """
+    dit = _data_rule("dit que")
+    si = _data_rule("demander si")
+    de = _data_rule("demander de")
+    for sentence in ("On m'a dit que tu étais malade.", "Il a dit qu'il partait."):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(dit, fr._tokens_for(text), text), sentence
+    idiom = "C'est plus facile à dire qu'à faire."
+    text = fr._norm_text(idiom)
+    assert not fr.match_rule(dit, fr._tokens_for(text), text)
+    for sentence in ("Ils m'ont demandé si j'irais à la soirée.",):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(si, fr._tokens_for(text), text), sentence
+        assert not fr.match_rule(de, fr._tokens_for(text), text), sentence
+    for sentence in ("Il m'a demandé de ne pas être en retard.",):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(de, fr._tokens_for(text), text), sentence
+        assert not fr.match_rule(si, fr._tokens_for(text), text), sentence
+
+
+def test_quel_que_soit_needs_the_whole_three_word_frame():
+    """
+    quel / quelle only count when the subjunctive frame closes behind them.
+
+    quel on its own is an interrogative or exclamative adjective ("Quel
+    est le risque ?"), so the row is built on the full quel + que + soit
+    sequence and the agreement variants ride on the first slot.
+    """
+    row = _data_rule("quel que soit")
+    fires = (
+        "Quelle que soit la difficulté, il faut la surmonter.",
+        "Les vrais accros ne s'arrêtent pas de fumer, quel que soit le risque.",
+    )
+    for sentence in fires:
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(row, fr._tokens_for(text), text), sentence
+    silent = (
+        "Quel est le risque pour la santé ?",
+        "Quelle belle journée !",
+        "Quoi que tu fasses, dis-le-moi.",
+    )
+    for sentence in silent:
+        text = fr._norm_text(sentence)
+        assert not fr.match_rule(row, fr._tokens_for(text), text), sentence
+
+
+def test_a_partir_de_stays_off_depuis():
+    """
+    Both translate as "from", but only one of them reaches the present.
+
+    depuis measures an ongoing stretch (depuis deux ans + present), while
+    à partir de just marks a starting point and lives happily in the
+    future.  Mixing them would put the wrong label on half the sentences.
+    """
+    row = _data_rule("à partir de")
+    for sentence in (
+        "Le restaurant sera fermé à partir de demain.",
+        "Les magasins sont ouverts à partir de neuf heures.",
+    ):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(row, fr._tokens_for(text), text), sentence
+    for sentence in (
+        "J'habite ici depuis deux ans.",
+        "Il travaille depuis le matin.",
+    ):
+        text = fr._norm_text(sentence)
+        assert not fr.match_rule(row, fr._tokens_for(text), text), sentence
