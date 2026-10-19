@@ -19,6 +19,7 @@ from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.read import manga_columns
 from lute.book.epub_extract import css_path_for
+from lute.book import epub_paths
 from lute.term.model import Repository
 from lute.term import pos_tags
 from lute.utils.manga_images import image_path_for_page
@@ -1084,8 +1085,8 @@ class Service:
         epub_path = (dbbook.epub_path or "").strip("/")
         if not epub_path or not 1 <= pagenum <= dbbook.page_count:
             return None
-        chapter_file = os.path.join(current_app.static_folder, epub_path)
-        if not os.path.isfile(chapter_file):
+        chapter_file = epub_paths.located(current_app, epub_path)
+        if chapter_file is None:
             return None
 
         # Same bookkeeping as a text page: page-open tracking, sentence

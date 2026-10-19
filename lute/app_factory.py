@@ -26,11 +26,13 @@ from flask import (
     has_request_context,
     make_response,
     send_from_directory,
+    send_file,
     jsonify,
     url_for,
 )
 from sqlalchemy.event import listens_for
 from sqlalchemy.pool import NullPool, Pool
+from werkzeug.exceptions import NotFound
 
 from lute.config.app_config import AppConfig
 from lute import i18n as lute_i18n
@@ -44,6 +46,7 @@ import lute
 import lute.utils.formutils
 from lute.utils import static_assets
 from lute.book import types as book_types
+from lute.book import epub_paths
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
 from lute.parse import plugin_installer
@@ -503,6 +506,13 @@ def _create_app(app_config, extra_config):
             "poolclass": NullPool,
         },
         "DATAPATH": app_config.datapath,
+        # Reader-mode EPUB packages are written under
+        # <EPUB_STATIC_ROOT>/epub/<uuid>/, i.e. beside the databases
+        # they belong to rather than inside app.static_folder.  The
+        # static folder is code: `git clean` removes it, and no data
+        # backup covers it, so a restore used to leave every
+        # reader-mode book pointing at files that were no longer there.
+        "EPUB_STATIC_ROOT": os.path.join(app_config.datapath, "static"),
         # ref https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
         # Don't track mods.
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
@@ -813,6 +823,21 @@ def _create_app(app_config, extra_config):
     #   blueprints / menu items / settings tiles they register.
     app.register_blueprint(feature_bp)
     load_feature_plugins(app)
+
+    # Reader-mode EPUB chapters, stylesheets and assets.  They live in
+    # the data directory (see EPUB_STATIC_ROOT) but keep their original
+    # /static/epub/ URL: chapters imported before the move already have
+    # that prefix baked into their rewritten src/href attributes and
+    # scoped stylesheet, so changing it would break every existing book.
+    # A path that is not in the data directory yet is looked for in the
+    # old location, which keeps a server working between an upgrade and
+    # the relocation step in deploy.sh.
+    @app.route("/static/epub/<path:filename>")
+    def epub_asset(filename):
+        target = epub_paths.located(current_app, filename)
+        if target is None:
+            raise NotFound()
+        return send_file(target, conditional=True)
 
     return app
 
