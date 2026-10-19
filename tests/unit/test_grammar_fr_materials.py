@@ -421,3 +421,64 @@ def test_a_partir_de_stays_off_depuis():
     ):
         text = fr._norm_text(sentence)
         assert not fr.match_rule(row, fr._tokens_for(text), text), sentence
+
+
+def test_apres_que_stays_off_apres_avoir():
+    """
+    après que takes a clause; après + infinitive passé is a different point.
+
+    "Après avoir mangé" is the compound past infinitive, already covered by
+    the hand-written après avoir / après être rule, so the clause row must
+    not reach it -- which is why the second focus word is que/qu' and not a
+    bare après.
+    """
+    row = _data_rule("après que")
+    for sentence in (
+        "Nous lui avons parlé après qu'il est rentré.",
+        "Après qu'il aura fini son rapport, il le présentera.",
+    ):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(row, fr._tokens_for(text), text), sentence
+    text = fr._norm_text("Après avoir mangé, il est parti.")
+    assert not fr.match_rule(row, fr._tokens_for(text), text)
+
+
+def test_quant_a_covers_the_contracted_plural():
+    """
+    quant à + les contracts to quant aux, so both surfaces are in the row.
+
+    A bare "quant" is not the expression: quantité / quantième start with
+    the same letters and must not be labelled as "as for".
+    """
+    row = _data_rule("quant à")
+    for sentence in (
+        "Quant à moi, je pense que c'est une bonne idée.",
+        "Quant aux risques de malaria, je pense que c'est exagéré.",
+    ):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(row, fr._tokens_for(text), text), sentence
+    text = fr._norm_text("La quantité de sucre est élevée.")
+    assert not fr.match_rule(row, fr._tokens_for(text), text)
+
+
+def test_quantity_adverbs_take_de_without_an_article():
+    """
+    assez / peu only quantify a noun through de (or d' before a vowel).
+
+    Used adverbially -- "il est assez grand", "il travaille peu" -- there is
+    no de, and no noun to quantify, so the row stays off.  "un peu de" does
+    fire: it is the same de + noun frame with a softer quantity.
+    """
+    assez = _data_rule("assez de")
+    peu = _data_rule("peu de")
+    for sentence in ("Y a-t-il assez de place ?", "Avez-vous assez d'argent ?"):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(assez, fr._tokens_for(text), text), sentence
+    for sentence in ("Il est assez grand.", "Elle court assez vite."):
+        text = fr._norm_text(sentence)
+        assert not fr.match_rule(assez, fr._tokens_for(text), text), sentence
+    for sentence in ("Il y avait peu de monde.", "Nous connaissons un peu de russe."):
+        text = fr._norm_text(sentence)
+        assert fr.match_rule(peu, fr._tokens_for(text), text), sentence
+    text = fr._norm_text("Il travaille peu.")
+    assert not fr.match_rule(peu, fr._tokens_for(text), text)
