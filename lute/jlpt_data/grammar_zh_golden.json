@@ -1,0 +1,665 @@
+{
+ "zh_ba_q": {
+  "examples": [
+   {
+    "en": "Let us go; it is getting late.",
+    "ko": "우리 가자, 시간이 늦었어.",
+    "text": "我们走吧，时间不早了。",
+    "zh": ""
+   },
+   {
+    "en": "Hurry up; everyone is waiting for you.",
+    "ko": "어서 해, 모두 기다리고 있어.",
+    "text": "快点儿吧，大家都等你呢。",
+    "zh": ""
+   }
+  ],
+  "name": "吧 (suggestion)"
+ },
+ "zh_ba_sentence": {
+  "examples": [
+   {
+    "en": "I have finished my homework.",
+    "ko": "나는 숙제를 다 했다.",
+    "text": "我把作业做完了。",
+    "zh": ""
+   },
+   {
+    "en": "Please put the milk in the fridge.",
+    "ko": "우유를 냉장고에 넣어 주세요.",
+    "text": "请把牛奶放在冰箱里。",
+    "zh": ""
+   }
+  ],
+  "name": "把 sentence (disposal)"
+ },
+ "zh_bei_sentence": {
+  "examples": [
+   {
+    "en": "My phone was stolen by a thief.",
+    "ko": "내 휴대폰을 도둑맞았다.",
+    "text": "我的手机被小偷偷了。",
+    "zh": ""
+   },
+   {
+    "en": "The problem was finally solved.",
+    "ko": "그 문제는 마침내 해결되었다.",
+    "text": "这个问题终于被解决了。",
+    "zh": ""
+   }
+  ],
+  "name": "被 sentence (passive)"
+ },
+ "zh_bibi": {
+  "examples": [
+   {
+    "en": "He is a head taller than me.",
+    "ko": "그는 나보다 머리 하나 더 크다.",
+    "text": "他比我高一个头。",
+    "zh": ""
+   },
+   {
+    "en": "This winter is colder than last year's.",
+    "ko": "올해 겨울은 작년보다 춥다.",
+    "text": "今年的冬天比去年冷。",
+    "zh": ""
+   }
+  ],
+  "name": "比 (than)"
+ },
+ "zh_bijing": {
+  "examples": [
+   {
+    "en": "He is still young after all; do not ask too much.",
+    "ko": "그는 아직 어리니까 너무 많이 요구하지 마.",
+    "text": "毕竟他还小，别要求太高。",
+    "zh": ""
+   },
+   {
+    "en": "Anyway the road is not far; let us walk.",
+    "ko": "어차피 길도 멀지 않으니 걸어 가자.",
+    "text": "反正路也不远，我们走着去吧。",
+    "zh": ""
+   }
+  ],
+  "name": "毕竟 / 反正 (after all / anyway)"
+ },
+ "zh_bu": {
+  "examples": [
+   {
+    "en": "I am not going to the office today.",
+    "ko": "나는 오늘 회사에 가지 않는다.",
+    "text": "我今天不去公司。",
+    "zh": ""
+   },
+   {
+    "en": "This problem is not hard; think again.",
+    "ko": "이 문제는 어렵지 않으니 다시 생각해 봐.",
+    "text": "这道题不难，你再想想。",
+    "zh": ""
+   }
+  ],
+  "name": "不 (negation)"
+ },
+ "zh_cai_jiu": {
+  "examples": [
+   {
+    "en": "He got up as early as five.",
+    "ko": "그는 다섯 시에 일어났다.",
+    "text": "他五点就起床了。",
+    "zh": ""
+   },
+   {
+    "en": "I waited until eight before he came.",
+    "ko": "나는 여덟 시까지 기다렸다, 그제서야 그가 왔다.",
+    "text": "我等到八点，他才来。",
+    "zh": ""
+   }
+  ],
+  "name": "才 / 就 (timing)"
+ },
+ "zh_chule": {
+  "examples": [
+   {
+    "en": "Everyone has arrived except Xiao Wang.",
+    "ko": "샤오왕을 제외하고 모두 도착했다.",
+    "text": "除了小王，其他人都到了。",
+    "zh": ""
+   },
+   {
+    "en": "Besides English, he also studies French.",
+    "ko": "영어 외에 그는 프랑스어도 배운다.",
+    "text": "除了英语，他还学法语。",
+    "zh": ""
+   }
+  ],
+  "name": "除了 (except / besides)"
+ },
+ "zh_erqie": {
+  "examples": [
+   {
+    "en": "This film is long, and boring besides.",
+    "ko": "이 영화는 길고, 게다가 지루하다.",
+    "text": "这部电影很长，而且很无聊。",
+    "zh": ""
+   },
+   {
+    "en": "He agreed and signed on the spot.",
+    "ko": "그는 동의했고, 자리에서 바로 서명했다.",
+    "text": "他同意了，并且当场签了字。",
+    "zh": ""
+   }
+  ],
+  "name": "而且 / 并且 (moreover)"
+ },
+ "zh_ershi": {
+  "examples": [
+   {
+    "en": "It looks simple, yet doing it is hard.",
+    "ko": "보기에는 간단하지만 실제로 하기는 어렵다.",
+    "text": "看起来很简单，然而做起来很难。",
+    "zh": ""
+   },
+   {
+    "en": "He is very young, yet very sensible.",
+    "ko": "그는 나이가 어린데도 아주 영리하다.",
+    "text": "他年纪很小，却很懂事。",
+    "zh": ""
+   }
+  ],
+  "name": "然而 / 却 (however)"
+ },
+ "zh_ge": {
+  "examples": [
+   {
+    "en": "I have only one question.",
+    "ko": "나는 질문이 하나 있어.",
+    "text": "我只有一个问题。",
+    "zh": ""
+   },
+   {
+    "en": "Please give me three apples.",
+    "ko": "사과 세 개 주세요.",
+    "text": "请给我三个苹果。",
+    "zh": ""
+   }
+  ],
+  "name": "个 (common measure word)"
+ },
+ "zh_geng_zui": {
+  "examples": [
+   {
+    "en": "This shirt looks better than that one.",
+    "ko": "이 옷이 저것보다 더 예쁘다.",
+    "text": "这件衣服比那件更好看。",
+    "zh": ""
+   },
+   {
+    "en": "He is my best friend.",
+    "ko": "그는 내 가장 친한 친구다.",
+    "text": "他是我最好的朋友。",
+    "zh": ""
+   }
+  ],
+  "name": "更 / 最 (comparison)"
+ },
+ "zh_genju": {
+  "examples": [
+   {
+    "en": "According to the forecast it will snow tomorrow.",
+    "ko": "일기 예보에 따르면 내일 눈이 온다.",
+    "text": "根据天气预报，明天有雪。",
+    "zh": ""
+   },
+   {
+    "en": "According to the rules, latecomers must sign in.",
+    "ko": "규정에 따라 지각자는 등록해야 한다.",
+    "text": "按照规定，迟到的人要登记。",
+    "zh": ""
+   }
+  ],
+  "name": "根据 / 按照 (according to)"
+ },
+ "zh_guo": {
+  "examples": [
+   {
+    "en": "I have been to China three times.",
+    "ko": "나는 중국에 세 번 가 봤다.",
+    "text": "我去过中国三次。",
+    "zh": ""
+   },
+   {
+    "en": "I have seen this film; I do not want to see it again.",
+    "ko": "이 영화는 봤기 때문에 다시 보고 싶지 않다.",
+    "text": "这部电影我看过，不想再看了。",
+    "zh": ""
+   }
+  ],
+  "name": "过 (past experience)"
+ },
+ "zh_hai": {
+  "examples": [
+   {
+    "en": "It is so late and he is still working.",
+    "ko": "이렇게 늦었는데 그는 아직 일하고 있다.",
+    "text": "这么晚了，他还在工作。",
+    "zh": ""
+   },
+   {
+    "en": "Besides English, he can also speak Japanese.",
+    "ko": "영어 외에 그는 일본어도 할 줄 안다.",
+    "text": "除了英语，他还会说日语。",
+    "zh": ""
+   }
+  ],
+  "name": "还 (still / also)"
+ },
+ "zh_hekuang": {
+  "examples": [
+   {
+    "en": "Even adults can do it well, let alone children.",
+    "ko": "어른도 다 잘하는데 하물며 아이야.",
+    "text": "大人都会做好，何况是孩子。",
+    "zh": ""
+   },
+   {
+    "en": "The road is long, and besides it is getting late.",
+    "ko": "길은 멀고, 게다가 날도 저물었다.",
+    "text": "这条路很远，况且天又晚了。",
+    "zh": ""
+   }
+  ],
+  "name": "何况 / 况且 (moreover)"
+ },
+ "zh_jingran": {
+  "examples": [
+   {
+    "en": "He actually got such an easy question wrong.",
+    "ko": "그는 이렇게 쉬운 문제를 틀렸다.",
+    "text": "这么简单的题，他居然做错了。",
+    "zh": ""
+   },
+   {
+    "en": "Unexpectedly, he came alone.",
+    "ko": "설마 그가 혼자 올 줄은 몰랐다.",
+    "text": "没想到他竟然一个人来了。",
+    "zh": ""
+   }
+  ],
+  "name": "竟然 / 居然 (unexpectedly)"
+ },
+ "zh_le": {
+  "examples": [
+   {
+    "en": "I bought a book yesterday.",
+    "ko": "나는 어제 책을 한 권 샀다.",
+    "text": "我昨天买了一本书。",
+    "zh": ""
+   },
+   {
+    "en": "It has turned cold; time to put on a coat.",
+    "ko": "날씨가 추워졌으니 외투를 입을 때다.",
+    "text": "天气冷了，该穿外套了。",
+    "zh": ""
+   }
+  ],
+  "name": "了 (completed action)"
+ },
+ "zh_ma": {
+  "examples": [
+   {
+    "en": "Are you free tomorrow?",
+    "ko": "내일 시간 있어?",
+    "text": "你明天有空吗？",
+    "zh": ""
+   },
+   {
+    "en": "Is this your decision?",
+    "ko": "이것이 네 결정이야?",
+    "text": "这就是你的决定吗？",
+    "zh": ""
+   }
+  ],
+  "name": "吗 (yes-no question)"
+ },
+ "zh_mei": {
+  "examples": [
+   {
+    "en": "I have not eaten breakfast yet.",
+    "ko": "나는 아직 아침을 먹지 않았다.",
+    "text": "我还没吃早饭。",
+    "zh": ""
+   },
+   {
+    "en": "He did not come to class yesterday.",
+    "ko": "그는 어제 수업에 오지 않았다.",
+    "text": "他昨天没有来上课。",
+    "zh": ""
+   }
+  ],
+  "name": "没 / 没有 (past negation)"
+ },
+ "zh_nanyi": {
+  "examples": [
+   {
+    "en": "This problem must be addressed as soon as possible.",
+    "ko": "이 문제는 가능한 한 빨리 해결해야 한다.",
+    "text": "这个问题必须尽快加以解决。",
+    "zh": ""
+   },
+   {
+    "en": "His behaviour is hard to understand.",
+    "ko": "그의 행동은 이해하기 어렵다.",
+    "text": "他的行为让人难以理解。",
+    "zh": ""
+   }
+  ],
+  "name": "加以 / 予以 / 难以 (formal verb framing)"
+ },
+ "zh_ne": {
+  "examples": [
+   {
+    "en": "I am fine, and you?",
+    "ko": "나는 잘 지내, 너는?",
+    "text": "我很好，你呢？",
+    "zh": ""
+   },
+   {
+    "en": "He is sleeping.",
+    "ko": "그는 자고 있어.",
+    "text": "他正在睡觉呢。",
+    "zh": ""
+   }
+  ],
+  "name": "呢 (and you? / ongoing)"
+ },
+ "zh_question_words": {
+  "examples": [
+   {
+    "en": "What are you looking for?",
+    "ko": "무엇을 찾고 있어?",
+    "text": "你在找什么？",
+    "zh": ""
+   },
+   {
+    "en": "How should this sentence be translated?",
+    "ko": "이 문장은 어떻게 번역해야 해?",
+    "text": "这句话该怎么翻译？",
+    "zh": ""
+   }
+  ],
+  "name": "Question words (什么 / 哪 / 谁 / 怎么)"
+ },
+ "zh_rang_jiao": {
+  "examples": [
+   {
+    "en": "The teacher asked me to read the text.",
+    "ko": "선생님이 나에게 본문을 읽게 했다.",
+    "text": "老师让我念课文。",
+    "zh": ""
+   },
+   {
+    "en": "My hat was blown away by the wind.",
+    "ko": "내 모자는 바람에 날려갔다.",
+    "text": "我的帽子叫风吹跑了。",
+    "zh": ""
+   }
+  ],
+  "name": "让 / 叫 (causative / passive)"
+ },
+ "zh_ruguo": {
+  "examples": [
+   {
+    "en": "If it does not rain tomorrow, we will go climbing.",
+    "ko": "내일 비가 오지 않으면 우리는 등산하러 갈 거야.",
+    "text": "如果明天不下雨，我们就去爬山。",
+    "zh": ""
+   },
+   {
+    "en": "If we had left ten minutes earlier, we would not have been late.",
+    "ko": "십 분만 더 일찍 떠났다면 늦지 않았을 거야.",
+    "text": "要是早走十分钟，就不会迟到了。",
+    "zh": ""
+   }
+  ],
+  "name": "如果 / 要是 (if)"
+ },
+ "zh_shenzhi": {
+  "examples": [
+   {
+    "en": "He was so busy he even forgot to eat.",
+    "ko": "그는 너무 바빠서 밥 먹는 것조차 잊었다.",
+    "text": "他忙得甚至忘了吃饭。",
+    "zh": ""
+   },
+   {
+    "en": "Even the teacher has never seen this word.",
+    "ko": "이 단어는 선생님조차 본 적이 없다.",
+    "text": "这个词甚至连老师都没见过。",
+    "zh": ""
+   }
+  ],
+  "name": "甚至 (even)"
+ },
+ "zh_shi_de": {
+  "examples": [
+   {
+    "en": "It was yesterday that I arrived in Shanghai.",
+    "ko": "나는 어제 상하이에 도착했다.",
+    "text": "我是昨天到的上海。",
+    "zh": ""
+   },
+   {
+    "en": "This book was given to me by a friend.",
+    "ko": "이 책은 친구가 나에게 준 것이다.",
+    "text": "这本书是朋友送给我的。",
+    "zh": ""
+   }
+  ],
+  "name": "是 ... 的 (emphasis frame)"
+ },
+ "zh_wulun": {
+  "examples": [
+   {
+    "en": "However busy he is, he always exercises.",
+    "ko": "아무리 바빠도 그는 늘 운동을 한다.",
+    "text": "不管多忙，他都要锻炼身体。",
+    "zh": ""
+   },
+   {
+    "en": "Whatever difficulties we meet, we cannot give up.",
+    "ko": "무슨 어려움을 만나도 우리는 포기하면 안 된다.",
+    "text": "无论遇到什么困难，我们都不能放弃。",
+    "zh": ""
+   }
+  ],
+  "name": "无论 / 不管 (regardless)"
+ },
+ "zh_ye_dou": {
+  "examples": [
+   {
+    "en": "We all want to go too.",
+    "ko": "우리도 모두 가고 싶어.",
+    "text": "我们也都想去。",
+    "zh": ""
+   },
+   {
+    "en": "This problem is so hard nobody can do it.",
+    "ko": "이 문제는 너무 어려워서 아무도 못 한다.",
+    "text": "这道题太难了，谁都不会。",
+    "zh": ""
+   }
+  ],
+  "name": "也 / 都 (also / all)"
+ },
+ "zh_yibian_yibian": {
+  "examples": [
+   {
+    "en": "He talks on the phone while walking.",
+    "ko": "그는 걸으면서 전화를 한다.",
+    "text": "他一边走路一边打电话。",
+    "zh": ""
+   },
+   {
+    "en": "I like cooking while listening to music.",
+    "ko": "나는 음악을 들으면서 요리하는 것을 좋아한다.",
+    "text": "我喜欢一边听音乐一边做饭。",
+    "zh": ""
+   }
+  ],
+  "name": "一边 ... 一边 ..."
+ },
+ "zh_yijing": {
+  "examples": [
+   {
+    "en": "I have already eaten; take your time.",
+    "ko": "나는 이미 밥을 먹었으니 천천히 먹어.",
+    "text": "我已经吃过饭了，你们慢慢吃。",
+    "zh": ""
+   },
+   {
+    "en": "The film has already started; hurry in.",
+    "ko": "영화가 이미 시작했으니 어서 들어가.",
+    "text": "电影已经开始了，快点进去吧。",
+    "zh": ""
+   }
+  ],
+  "name": "已经 (already)"
+ },
+ "zh_yimian": {
+  "examples": [
+   {
+    "en": "Please write the address clearly, so it is not misdelivered.",
+    "ko": "주소를 분명히 적어서 잘못 배달되지 않게 하세요.",
+    "text": "请把地址写清楚，以免寄错。",
+    "zh": ""
+   },
+   {
+    "en": "Leave early so you do not miss the train.",
+    "ko": "일찍 출발해서 기차를 놓치지 마세요.",
+    "text": "早点儿出发，以免赶不上火车。",
+    "zh": ""
+   }
+  ],
+  "name": "以免 (lest / so as to avoid)"
+ },
+ "zh_yinwei_suoyi": {
+  "examples": [
+   {
+    "en": "Because it rained, we did not go to the park.",
+    "ko": "비가 왔기 때문에 우리는 공원에 가지 않았다.",
+    "text": "因为下雨了，所以我们没去公园。",
+    "zh": ""
+   },
+   {
+    "en": "He did not come to class because he was ill.",
+    "ko": "그는 아팠기 때문에 수업에 오지 않았다.",
+    "text": "他没来上课，因为他生病了。",
+    "zh": ""
+   }
+  ],
+  "name": "因为 / 所以 (because / so)"
+ },
+ "zh_yizhi": {
+  "examples": [
+   {
+    "en": "He read so absorbed that he forgot the time.",
+    "ko": "그는 너무 빠져들어서 시간을 잊었다.",
+    "text": "他读得入了迷，以致忘了时间。",
+    "zh": ""
+   },
+   {
+    "en": "It rained so hard that the match had to be cancelled.",
+    "ko": "비가 너무 많이 와서 경기가 취소되었다.",
+    "text": "雨下得太大了，以至比赛被迫取消。",
+    "zh": ""
+   }
+  ],
+  "name": "以至 / 以致 (so that / resulting in)"
+ },
+ "zh_yueyue": {
+  "examples": [
+   {
+    "en": "The rain is falling harder and harder.",
+    "ko": "비가 점점 더 세게 내린다.",
+    "text": "雨越下越大。",
+    "zh": ""
+   },
+   {
+    "en": "The more I listen, the more I think you are right.",
+    "ko": "들을수록 네 말이 맞는 것 같아.",
+    "text": "我越听越觉得你说得对。",
+    "zh": ""
+   }
+  ],
+  "name": "越 ... 越 ... (the more ... the more)"
+ },
+ "zh_zai": {
+  "examples": [
+   {
+    "en": "Mum is cooking in the kitchen.",
+    "ko": "엄마가 부엌에서 요리하고 계셔.",
+    "text": "妈妈在厨房做饭。",
+    "zh": ""
+   },
+   {
+    "en": "My book is on the table.",
+    "ko": "내 책은 책상 위에 있다.",
+    "text": "我的书在桌子上。",
+    "zh": ""
+   }
+  ],
+  "name": "在 (at / doing)"
+ },
+ "zh_zhe": {
+  "examples": [
+   {
+    "en": "A note is stuck to the door.",
+    "ko": "문에 쪽지가 붙어 있다.",
+    "text": "门上贴着一张纸条。",
+    "zh": ""
+   },
+   {
+    "en": "He greeted me with a smile.",
+    "ko": "그는 웃으며 나에게 인사했다.",
+    "text": "他笑着跟我打招呼。",
+    "zh": ""
+   }
+  ],
+  "name": "着 (ongoing / state)"
+ },
+ "zh_zhengzai": {
+  "examples": [
+   {
+    "en": "He is in a meeting and cannot take the call.",
+    "ko": "그는 회의 중이라 전화를 받을 수 없다.",
+    "text": "他正在开会，不能接电话。",
+    "zh": ""
+   },
+   {
+    "en": "Mum is cooking; let us wait.",
+    "ko": "엄마가 요리 중이니 기다리자.",
+    "text": "妈妈正在做饭，我们等等吧。",
+    "zh": ""
+   }
+  ],
+  "name": "正在 (right now)"
+ },
+ "zh_zhiqian_zhihou": {
+  "examples": [
+   {
+    "en": "Before coming to China I could not speak a word of it.",
+    "ko": "중국에 오기 전에는 중국어를 한 마디도 못 했다.",
+    "text": "来中国以前，我一句中文都不会。",
+    "zh": ""
+   },
+   {
+    "en": "After class, let us go and play ball.",
+    "ko": "수업이 끝난 뒤에 우리 공 치러 가자.",
+    "text": "下课以后，我们去打球吧。",
+    "zh": ""
+   }
+  ],
+  "name": "以前 / 以后 / 之前 / 之后 (before / after)"
+ }
+}

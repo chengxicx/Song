@@ -20,7 +20,11 @@
   "zh": "estar + 副动词：正在进行",
   "level": "A1",
   "formation": "estar 变位 + 副动词（-ando / -iendo）",
-  "notes": "强调『此刻正在进行』：Estoy tomando un curso。与简单现在时（陈述习惯）相对。"
+  "notes": "强调『此刻正在进行』：Estoy tomando un curso。与简单现在时（陈述习惯）相对。",
+  "example_en": [
+   "I am taking a course on Egypt.",
+   "It is pouring with rain and I am soaked through."
+  ]
  },
  {
   "key": "esm_hayqueinfinitivo__fb8102",
@@ -44,7 +48,11 @@
   "zh": "hay que + 原形动词：必须、应该（无人称）",
   "level": "A1",
   "formation": "hay que + 原形动词（无主语）",
-  "notes": "只用于无人称的『该做某事』，不指向具体的人；指具体人时用 tener que。"
+  "notes": "只用于无人称的『该做某事』，不指向具体的人；指具体人时用 tener que。",
+  "example_en": [
+   "Difficulties have to be overcome.",
+   "Attention must be paid to this problem."
+  ]
  },
  {
   "key": "esm_tambiéntampoco__9b287f",
@@ -66,7 +74,11 @@
   "zh": "也 / 也不",
   "level": "A1",
   "formation": "también 用于肯定句；tampoco 用于否定句",
-  "notes": "tampoco 本身已含否定，句子里不要再加 no。"
+  "notes": "tampoco 本身已含否定，句子里不要再加 no。",
+  "example_en": [
+   "I cannot come either.",
+   "I can do it too."
+  ]
  },
  {
   "key": "esm_porquecausa__4dac7f",
@@ -88,7 +100,11 @@
   "zh": "因为",
   "level": "A1",
   "formation": "主句 + porque + 原因从句",
-  "notes": "回答 ¿por qué?（为什么）。别与 por qué / por que / porqué 混用。"
+  "notes": "回答 ¿por qué?（为什么）。别与 por qué / por que / porqué 混用。",
+  "example_en": [
+   "We cannot wait because we have little time.",
+   "He is pleased because he has passed the exam."
+  ]
  },
  {
   "key": "esm_muchomuchamuchosmuchassustantivo__93ee5a",
@@ -111,7 +127,11 @@
   "zh": "mucho/a/os/as + 名词：很多",
   "level": "A1",
   "formation": "mucho 随名词变性数 + 名词",
-  "notes": "修饰名词时与名词一致（mucha agua / muchos libros）；修饰动词用 mucho 不变（trabaja mucho）。"
+  "notes": "修饰名词时与名词一致（mucha agua / muchos libros）；修饰动词用 mucho 不变（trabaja mucho）。",
+  "example_en": [
+   "Many European countries are democracies.",
+   "I did not spend much money."
+  ]
  },
  {
   "key": "esm_muyadjetivo__09c71f",
@@ -134,7 +154,11 @@
   "zh": "muy + 形容词：很、非常",
   "level": "A1",
   "formation": "muy + 形容词 / 副词",
-  "notes": "muy 只修饰形容词或副词，不修饰动词；修饰动词用 mucho（trabaja mucho，不是 trabaja muy）。"
+  "notes": "muy 只修饰形容词或副词，不修饰动词；修饰动词用 mucho（trabaja mucho，不是 trabaja muy）。",
+  "example_en": [
+   "My friend is a very hard-working teacher.",
+   "The elections were very closely fought."
+  ]
  },
  {
   "key": "esm_quererinfinitivo__bb2a22",
@@ -157,7 +181,11 @@
   "zh": "querer + 原形动词：想要做某事",
   "level": "A1",
   "formation": "querer 变位 + 原形动词",
-  "notes": "词干变音 e→ie（quiero / quieres / quiere）；nosotros 形式不变音（queremos）。"
+  "notes": "词干变音 e→ie（quiero / quieres / quiere）；nosotros 形式不变音（queremos）。",
+  "example_en": [
+   "He does not want to sacrifice his freedom of action.",
+   "Yes, he is willing to accept."
+  ]
  },
  {
   "key": "esm_poderinfinitivo__2743fd",
@@ -180,7 +208,11 @@
   "zh": "poder + 原形动词：能够、可以",
   "level": "A1",
   "formation": "poder 变位 + 原形动词",
-  "notes": "o→ue 变音（puedo / puedes / puede）；否定 no poder + 原形动词表示『不能』。"
+  "notes": "o→ue 变音（puedo / puedes / puede）；否定 no poder + 原形动词表示『不能』。",
+  "example_en": [
+   "Without my superior's permission I cannot leave my post.",
+   "I cannot smoke."
+  ]
  },
  {
   "key": "esm_dejardeinfinitivo__18fd5b",
@@ -204,7 +236,11 @@
   "zh": "dejar de + 原形动词：停止、不再",
   "level": "A2",
   "formation": "dejar de + 原形动词",
-  "notes": "与 dejar（留下、让）区分：dejar de 是『中断某动作』，dejar 单独用是『留下/允许』。"
+  "notes": "与 dejar（留下、让）区分：dejar de 是『中断某动作』，dejar 单独用是『留下/允许』。",
+  "example_en": [
+   "He stops working.",
+   "As soon as he stops working he starts singing."
+  ]
  },
  {
   "key": "esm_empezarainfinitivo__c377ba",
@@ -228,7 +264,11 @@
   "zh": "empezar a + 原形动词：开始做某事",
   "level": "A2",
   "formation": "empezar a + 原形动词（e→ie 变音）",
-  "notes": "与 comenzar a 同义；介词固定用 a。"
+  "notes": "与 comenzar a 同义；介词固定用 a。",
+  "example_en": [
+   "They begin to doubt the cashier.",
+   "He begins to pace up and down."
+  ]
  },
  {
   "key": "esm_solerinfinitivo__9e049e",
@@ -251,7 +291,11 @@
   "zh": "soler + 原形动词：惯常、通常",
   "level": "A2",
   "formation": "soler 变位（o→ue）+ 原形动词",
-  "notes": "表示习惯性动作，相当于『通常/往往』；只有现在时与未完成过去时常用。"
+  "notes": "表示习惯性动作，相当于『通常/往往』；只有现在时与未完成过去时常用。",
+  "example_en": [
+   "He usually comes in the afternoon.",
+   "Traders are usually self-employed."
+  ]
  },
  {
   "key": "esm_seguirgerundio__931b80",
@@ -274,7 +318,11 @@
   "zh": "seguir + 副动词：继续做某事",
   "level": "A2",
   "formation": "seguir 变位（e→i）+ 副动词",
-  "notes": "与 continuar + 副动词同义。seguir 的副动词形式不变，只变助动词。"
+  "notes": "与 continuar + 副动词同义。seguir 的副动词形式不变，只变助动词。",
+  "example_en": [
+   "I am still working at the bank.",
+   "They still live in the countryside."
+  ]
  },
  {
   "key": "esm_deberinfinitivo__70e199",
@@ -297,7 +345,11 @@
   "zh": "deber + 原形动词：应该、必须",
   "level": "A2",
   "formation": "deber + 原形动词",
-  "notes": "deber + 原形动词＝应该；deber de + 原形动词＝推测（大概）。别把两者混用。"
+  "notes": "deber + 原形动词＝应该；deber de + 原形动词＝推测（大概）。别把两者混用。",
+  "example_en": [
+   "Honesty should be an essential virtue in a person.",
+   "He should tell him as soon as possible."
+  ]
  },
  {
   "key": "esm_tenerganasdeinfinitivo__8308c4",
@@ -322,7 +374,11 @@
   "zh": "tener ganas de + 原形动词：很想做某事",
   "level": "A2",
   "formation": "tener ganas de + 原形动词",
-  "notes": "ganas 用复数；否定 no tener ganas de 表示『没心情做』。"
+  "notes": "ganas 用复数；否定 no tener ganas de 表示『没心情做』。",
+  "example_en": [
+   "I really want to sleep.",
+   "José wants to be a manager but does not feel like working."
+  ]
  },
  {
   "key": "esm_seloselaselosselas__8d2c71",
@@ -346,7 +402,11 @@
   "zh": "se + lo/la/los/las：双宾语代词",
   "level": "A2",
   "formation": "间接宾语 le/les + 直接宾语 lo/la/los/las → le/les 变 se",
-  "notes": "两个第三人称代词相遇时，间接宾语 le/les 一律变 se：se lo doy（我把它给他）。"
+  "notes": "两个第三人称代词相遇时，间接宾语 le/les 一律变 se：se lo doy（我把它给他）。",
+  "example_en": [
+   "I want to tell him so myself.",
+   "I explain it to him."
+  ]
  },
  {
   "key": "esm_melotelonoslo__f60189",
@@ -370,7 +430,11 @@
   "zh": "me/te/nos + lo/la/los/las：第一、二人称双代词",
   "level": "A2",
   "formation": "me/te/nos + lo/la/los/las + 动词",
-  "notes": "顺序固定：间接宾语在前、直接宾语在后，紧贴动词（可置于变位动词前或原形动词后）。"
+  "notes": "顺序固定：间接宾语在前、直接宾语在后，紧贴动词（可置于变位动词前或原形动词后）。",
+  "example_en": [
+   "He thanked me for it with a smile.",
+   "I did not tell you, to spare you the annoyance."
+  ]
  },
  {
   "key": "esm_alinfinitivo__fcefb5",
@@ -393,7 +457,11 @@
   "zh": "al + 原形动词：一……就、在……的时候",
   "level": "A2",
   "formation": "al + 原形动词（= a + el + 原形动词）",
-  "notes": "主语与主句一致：Al llegar a casa, me llamó（到家时他给我打了电话）。"
+  "notes": "主语与主句一致：Al llegar a casa, me llamó（到家时他给我打了电话）。",
+  "example_en": [
+   "On arriving at the office, I read the previous day's fax.",
+   "When the roll was called, my name came up."
+  ]
  },
  {
   "key": "esm_antesdeinfinitivo__5a0ab2",
@@ -417,7 +485,11 @@
   "zh": "antes de + 原形动词：在……之前",
   "level": "A2",
   "formation": "antes de + 原形动词（主语一致时）",
-  "notes": "主语不同时必须用 antes de que + 虚拟式。"
+  "notes": "主语不同时必须用 antes de que + 虚拟式。",
+  "example_en": [
+   "Before doing anything, you must wash your hands.",
+   "I am telling you to think twice before doing anything."
+  ]
  },
  {
   "key": "esm_despuésdeinfinitivo__04a962",
@@ -441,7 +513,11 @@
   "zh": "después de + 原形动词：在……之后",
   "level": "A2",
   "formation": "después de + 原形动词（主语一致时）",
-  "notes": "主语不一致时用 después de que + 陈述式（或虚拟式指将来）。"
+  "notes": "主语不一致时用 después de que + 陈述式（或虚拟式指将来）。",
+  "example_en": [
+   "Do you ever take a shower after eating?",
+   "After eating, we went to Paris."
+  ]
  },
  {
   "key": "esm_sininfinitivo__3f5227",
@@ -464,7 +540,11 @@
   "zh": "sin + 原形动词：不……、没有……就",
   "level": "A2",
   "formation": "sin + 原形动词（主语一致时）",
-  "notes": "主语不同时用 sin que + 虚拟式；sin 后也可接名词（sin dinero）。"
+  "notes": "主语不同时用 sin que + 虚拟式；sin 后也可接名词（sin dinero）。",
+  "example_en": [
+   "We understand each other without speaking.",
+   "The cicada sings without stopping."
+  ]
  },
  {
   "key": "esm_porinfinitivo__532320",
@@ -488,7 +568,11 @@
   "zh": "por + 原形动词：因为、为了（原因或努力）",
   "level": "A2",
   "formation": "por + 原形动词",
-  "notes": "表示原因或『努力去做』：se esfuerza por agradar。表目的用 para + 原形动词。"
+  "notes": "表示原因或『努力去做』：se esfuerza por agradar。表目的用 para + 原形动词。",
+  "example_en": [
+   "He tries hard to please everyone.",
+   "I did not tell you, to spare you the upset."
+  ]
  },
  {
   "key": "esm_durante__a08645",
@@ -510,7 +594,11 @@
   "zh": "durante：在……期间",
   "level": "A2",
   "formation": "durante + 名词 / 时间段",
-  "notes": "后接时间段表示持续多久；不能与 hace（……以前）混用。"
+  "notes": "后接时间段表示持续多久；不能与 hace（……以前）混用。",
+  "example_en": [
+   "During the strike all the factory machines stopped.",
+   "He was ill for several days."
+  ]
  },
  {
   "key": "esm_según__c3ed8d",
@@ -532,7 +620,11 @@
   "zh": "según：根据、按照",
   "level": "A2",
   "formation": "según + 名词 / 从句",
-  "notes": "según 后接人称代词时用主格（según tú，不用 según ti）。"
+  "notes": "según 后接人称代词时用主格（según tú，不用 según ti）。",
+  "example_en": [
+   "According to the newspaper, there were three accidents in the city yesterday.",
+   "We will pay you according to how much you work."
+  ]
  },
  {
   "key": "esm_contra__a83f0f",
@@ -554,7 +646,11 @@
   "zh": "contra：反对、对着、抵御",
   "level": "A2",
   "formation": "contra + 名词 / 代词",
-  "notes": "表对抗、抵御或方向相反；与 en contra de 同义，后者更强调『持反对立场』。"
+  "notes": "表对抗、抵御或方向相反；与 en contra de 同义，后者更强调『持反对立场』。",
+  "example_en": [
+   "He insured his house against fire.",
+   "Camphor protects clothes against moths."
+  ]
  },
  {
   "key": "esm_hacia__f7e183",
@@ -576,7 +672,11 @@
   "zh": "hacia：朝向、对于",
   "level": "A2",
   "formation": "hacia + 名词 / 代词",
-  "notes": "表方向（hacia el centro）或态度对象（odio hacia ella）；方向更笼统，不像 a 那样强调终点。"
+  "notes": "表方向（hacia el centro）或态度对象（odio hacia ella）；方向更笼统，不像 a 那样强调终点。",
+  "example_en": [
+   "He feels great hatred towards her.",
+   "On my way to your house I ran into a friend."
+  ]
  },
  {
   "key": "esm_desdehasta__794b03",
@@ -600,7 +700,11 @@
   "zh": "desde … hasta …：从……到……",
   "level": "A2",
   "formation": "desde + 起点 + hasta + 终点",
-  "notes": "时间和空间都可用；口语里常用 de ... a ... 替代。"
+  "notes": "时间和空间都可用；口语里常用 de ... a ... 替代。",
+  "example_en": [
+   "We walked from dawn until well into the night.",
+   "From 1955 to 1973 I lived in Beijing."
+  ]
  },
  {
   "key": "esm_tantocomo__3aa4d1",
@@ -624,7 +728,11 @@
   "zh": "tanto … como …：和……一样多",
   "level": "A2",
   "formation": "tanto/a/os/as + 名词 + como；动词后用 tanto como",
-  "notes": "修饰名词时 tanto 随名词变性数（tantos hermanos como）；修饰动词或形容词时用 tanto como。"
+  "notes": "修饰名词时 tanto 随名词变性数（tantos hermanos como）；修饰动词或形容词时用 tanto como。",
+  "example_en": [
+   "I do not have as many brothers as Pepe.",
+   "I have as much fun as Luisa."
+  ]
  },
  {
   "key": "esm_ellaloslasmásadjetivosuperlativo__d9be95",
@@ -648,7 +756,11 @@
   "zh": "el/la/los/las más + 形容词：最……",
   "level": "A2",
   "formation": "定冠词 + más + 形容词（+ de / entre）",
-  "notes": "最高级要带定冠词且与名词一致；范围用 de 或 entre 引出。"
+  "notes": "最高级要带定冠词且与名词一致；范围用 de 或 entre 引出。",
+  "example_en": [
+   "José is the most diligent student in his group.",
+   "Luis is the tallest of the pupils in his class."
+  ]
  },
  {
   "key": "esm_aunqueconcesiva__b40c8e",
@@ -670,7 +782,11 @@
   "zh": "aunque：虽然、即使",
   "level": "B1",
   "formation": "aunque + 陈述式（已知事实）/ 虚拟式（假设）",
-  "notes": "陈述式指已知事实（aunque llueve），虚拟式指假设或『即使』（aunque llueva）。"
+  "notes": "陈述式指已知事实（aunque llueve），虚拟式指假设或『即使』（aunque llueva）。",
+  "example_en": [
+   "We will work even if it is very cold.",
+   "Although he is cold, he does not put his coat on."
+  ]
  },
  {
   "key": "esm_tanprontocomo__f351ef",
@@ -694,7 +810,11 @@
   "zh": "tan pronto como：一……就",
   "level": "B1",
   "formation": "tan pronto como + 陈述式（过去/现在）/ 虚拟式（将来）",
-  "notes": "指将来未发生的事时用虚拟式（tan pronto como llegue）。"
+  "notes": "指将来未发生的事时用虚拟式（tan pronto como llegue）。",
+  "example_en": [
+   "As soon as it was light, we went to work in the fields.",
+   "As soon as he gets home he puts on his dressing gown."
+  ]
  },
  {
   "key": "esm_puestoque__8ae6f6",
@@ -717,7 +837,11 @@
   "zh": "puesto que：既然、因为",
   "level": "B1",
   "formation": "puesto que + 陈述式",
-  "notes": "书面语色彩强于 porque，多用于已知或显而易见的原因。"
+  "notes": "书面语色彩强于 porque，多用于已知或显而易见的原因。",
+  "example_en": [
+   "There is no need for me to tell you, since you already know.",
+   "Since that is what you like, do it that way."
+  ]
  },
  {
   "key": "esm_apesardeque__b07b14",
@@ -741,7 +865,11 @@
   "zh": "a pesar de：尽管",
   "level": "B1",
   "formation": "a pesar de + 名词 / 原形动词；a pesar de que + 陈述式（或虚拟式指将来）",
-  "notes": "后接从句时必须加 que；a pesar de 后不能直接跟句子。"
+  "notes": "后接从句时必须加 que；a pesar de 后不能直接跟句子。",
+  "example_en": [
+   "We will go out even if it rains.",
+   "Despite the late hour, he was still awake."
+  ]
  },
  {
   "key": "esm_sinembargo__389cf9",
@@ -764,7 +892,11 @@
   "zh": "sin embargo：然而、尽管如此",
   "level": "B1",
   "formation": "sin embargo（可置于句首、句中，逗号隔开）",
-  "notes": "转折连词，语气比 pero 正式；后面不能直接接 pero。"
+  "notes": "转折连词，语气比 pero 正式；后面不能直接接 pero。",
+  "example_en": [
+   "I have a lot of work; however, I will give you a little time.",
+   "They did give us some good tickets, however."
+  ]
  },
  {
   "key": "esm_porlotanto__fc7807",
@@ -788,7 +920,11 @@
   "zh": "por lo tanto：因此、所以",
   "level": "B1",
   "formation": "por lo tanto（句首或句中，逗号隔开）",
-  "notes": "表结论，与 por consiguiente 同义；与 por tanto 可互换（后者更简短）。"
+  "notes": "表结论，与 por consiguiente 同义；与 por tanto 可互换（后者更简短）。",
+  "example_en": [
+   "The matter is settled, so it is pointless to insist.",
+   "He did not study; therefore he failed the exam."
+  ]
  },
  {
   "key": "esm_poreso__833bd8",
@@ -811,7 +947,11 @@
   "zh": "por eso：所以、因此",
   "level": "B1",
   "formation": "por eso + 结果",
-  "notes": "口语最常用的因果连接；指代前文整件事（= por esa razón）。"
+  "notes": "口语最常用的因果连接；指代前文整件事（= por esa razón）。",
+  "example_en": [
+   "Do not get upset about that.",
+   "He arrived late, so he missed the train."
+  ]
  },
  {
   "key": "esm_ademásde__5e7f74",
@@ -833,7 +973,11 @@
   "zh": "además：而且、此外；además de：除……之外",
   "level": "B1",
   "formation": "además（独立使用）；además de + 名词/原形动词",
-  "notes": "递进连接；además de 后接名词或原形动词，接从句要加 que。"
+  "notes": "递进连接；además de 后接名词或原形动词，接从句要加 que。",
+  "example_en": [
+   "Besides fining him, they took away his licence.",
+   "He studies, gets up early, does the housework and on top of that works."
+  ]
  },
  {
   "key": "esm_asíque__831708",
@@ -856,7 +1000,11 @@
   "zh": "así que：所以、于是",
   "level": "B1",
   "formation": "así que + 结果从句",
-  "notes": "口语化的结果连接词，与 de modo que 近似但更随便。"
+  "notes": "口语化的结果连接词，与 de modo que 近似但更随便。",
+  "example_en": [
+   "There will be no work this afternoon, so do not come.",
+   "There was nobody there, so I left."
+  ]
  },
  {
   "key": "esm_demodoque__a46ab1",
@@ -880,7 +1028,11 @@
   "zh": "de modo que：因此；以便",
   "level": "B1",
   "formation": "de modo que + 陈述式（结果）/ 虚拟式（目的）",
-  "notes": "表结果用陈述式（debe de haber alguien），表目的用虚拟式，与 de manera que 同义。"
+  "notes": "表结果用陈述式（debe de haber alguien），表目的用虚拟式，与 de manera que 同义。",
+  "example_en": [
+   "Noise can be heard inside the house, so there must be someone there.",
+   "He spoke clearly, so everyone understood him."
+  ]
  },
  {
   "key": "esm_paraquesubjuntivo__8759b6",
@@ -904,7 +1056,11 @@
   "zh": "para que + 虚拟式：为了（让）……",
   "level": "B1",
   "formation": "para que + 虚拟式（主从句主语不同）",
-  "notes": "主语一致时用 para + 原形动词；主语不同才用 para que + 虚拟式。"
+  "notes": "主语一致时用 para + 原形动词；主语不同才用 para que + 虚拟式。",
+  "example_en": [
+   "I opened the window so that the fresh air would come in.",
+   "I have bought you a watch so that you know the time."
+  ]
  },
  {
   "key": "esm_antesdequesubjuntivo__1c992b",
@@ -929,7 +1085,11 @@
   "zh": "antes de que + 虚拟式：在……之前（主语不同）",
   "level": "B1",
   "formation": "antes de que + 虚拟式（必须用虚拟式）",
-  "notes": "无论指现在还是过去，antes de que 后面一律用虚拟式。"
+  "notes": "无论指现在还是过去，antes de que 后面一律用虚拟式。",
+  "example_en": [
+   "Let us go before it starts to rain.",
+   "I am leaving before he arrives."
+  ]
  },
  {
   "key": "esm_despuésdeque__2b775f",
@@ -953,7 +1113,11 @@
   "zh": "después de que：在……之后",
   "level": "B1",
   "formation": "después de que + 陈述式（已发生）/ 虚拟式（将来）",
-  "notes": "主语一致时更常用 después de + 原形动词；指将来未发生的事可用虚拟式。"
+  "notes": "主语一致时更常用 después de + 原形动词；指将来未发生的事可用虚拟式。",
+  "example_en": [
+   "After my wife comes back from her trip, we will invite you to lunch.",
+   "After he arrived, we got down to work."
+  ]
  },
  {
   "key": "esm_cuandosubjuntivofuturo__4f4935",
@@ -976,7 +1140,11 @@
   "zh": "cuando + 虚拟式：指将来发生时",
   "level": "B1",
   "formation": "cuando + 虚拟式（指将来/未发生）",
-  "notes": "西班牙语不用 cuando + 将来时；指将来的事一律用虚拟式现在时。"
+  "notes": "西班牙语不用 cuando + 将来时；指将来的事一律用虚拟式现在时。",
+  "example_en": [
+   "When the others arrive, we will leave.",
+   "When I have time, I will go to the cinema."
+  ]
  },
  {
   "key": "esm_ojalásubjuntivo__1db183",
@@ -998,7 +1166,11 @@
   "zh": "ojalá：但愿、希望",
   "level": "B1",
   "formation": "ojalá + 虚拟式现在时（将来愿望）/ 虚拟式过去时（不可能的愿望）",
-  "notes": "来自阿拉伯语『愿真主愿意』，后面必须用虚拟式。"
+  "notes": "来自阿拉伯语『愿真主愿意』，后面必须用虚拟式。",
+  "example_en": [
+   "I hope he arrives today.",
+   "I hope he manages it!"
+  ]
  },
  {
   "key": "esm_quizáquizássubjuntivo__503b95",
@@ -1020,7 +1192,11 @@
   "zh": "quizá / quizás：也许",
   "level": "B1",
   "formation": "quizá(s) + 虚拟式（更常见）/ 陈述式（较确定）",
-  "notes": "置于句首时多接虚拟式；置于句末或表示较大把握时可用陈述式。"
+  "notes": "置于句首时多接虚拟式；置于句末或表示较大把握时可用陈述式。",
+  "example_en": [
+   "It may rain tomorrow.",
+   "Your father may arrive this afternoon."
+  ]
  },
  {
   "key": "esm_talvezsubjuntivo__10a40b",
@@ -1043,7 +1219,11 @@
   "zh": "tal vez：或许",
   "level": "B1",
   "formation": "tal vez + 虚拟式（不确定）/ 陈述式（较确定）",
-  "notes": "与 quizá 用法相同，后置时更倾向陈述式（lo conozcas / lo conoces 都可）。"
+  "notes": "与 quizá 用法相同，后置时更倾向陈述式（lo conozcas / lo conoces 都可）。",
+  "example_en": [
+   "Perhaps he knows about it.",
+   "Perhaps you know him."
+  ]
  },
  {
   "key": "esm_esposiblequesubjuntivo__4abb27",
@@ -1067,7 +1247,11 @@
   "zh": "es posible que + 虚拟式：有可能……",
   "level": "B1",
   "formation": "es posible que + 虚拟式",
-  "notes": "同类触发语：es probable que、puede que、es difícil que，后面都用虚拟式。"
+  "notes": "同类触发语：es probable que、puede que、es difícil que，后面都用虚拟式。",
+  "example_en": [
+   "It may well work.",
+   "It is possible that he will get the job."
+  ]
  },
  {
   "key": "esm_esnecesarioquesubjuntivo__0502c2",
@@ -1091,7 +1275,11 @@
   "zh": "es necesario que + 虚拟式：有必要……",
   "level": "B1",
   "formation": "es necesario que + 虚拟式",
-  "notes": "必要性/评价类无人称表达（es importante / es mejor / hace falta que）都用虚拟式。"
+  "notes": "必要性/评价类无人称表达（es importante / es mejor / hace falta que）都用虚拟式。",
+  "example_en": [
+   "They need to study more.",
+   "You must study the grammar."
+  ]
  },
  {
   "key": "esm_mealegrodequesubjuntivo__571bc9",
@@ -1115,7 +1303,11 @@
   "zh": "me alegro de que + 虚拟式：我很高兴……",
   "level": "B1",
   "formation": "情感动词 + de que + 虚拟式",
-  "notes": "情感类触发（me alegro / siento / me molesta / me extraña）后面用虚拟式。"
+  "notes": "情感类触发（me alegro / siento / me molesta / me extraña）后面用虚拟式。",
+  "example_en": [
+   "I am glad it is not raining.",
+   "I am glad you are all well."
+  ]
  },
  {
   "key": "esm_nocreoquesubjuntivo__85cb68",
@@ -1139,7 +1331,11 @@
   "zh": "no creo que + 虚拟式：我认为……不",
   "level": "B1",
   "formation": "否定意见动词 + que + 虚拟式",
-  "notes": "creo que 用陈述式，但 no creo que 用虚拟式；同类：no pienso que、no me parece que。"
+  "notes": "creo que 用陈述式，但 no creo que 用虚拟式；同类：no pienso que、no me parece que。",
+  "example_en": [
+   "I do not believe you will do it.",
+   "I do not think you will manage it."
+  ]
  },
  {
   "key": "esm_dudoquesubjuntivo__219c5c",
@@ -1162,7 +1358,11 @@
   "zh": "dudo que + 虚拟式：我怀疑……",
   "level": "B1",
   "formation": "dudar que + 虚拟式",
-  "notes": "肯定形式 dudo que 用虚拟式；no dudo que 表确信时用陈述式。"
+  "notes": "肯定形式 dudo que 用虚拟式；no dudo que 表确信时用陈述式。",
+  "example_en": [
+   "I doubt he can come at this hour.",
+   "I doubt he will come."
+  ]
  },
  {
   "key": "esm_quienquienesrelativo__5f5f29",
@@ -1184,7 +1384,11 @@
   "zh": "quien / quienes：关系代词（指人）",
   "level": "B1",
   "formation": "先行词（人）+ quien/quienes + 从句；或句首指『谁……』",
-  "notes": "只能指人；介词后用 quien（con quien hablo）；句首 quien 常含『凡是……的人』。"
+  "notes": "只能指人；介词后用 quien（con quien hablo）；句首 quien 常含『凡是……的人』。",
+  "example_en": [
+   "Talk to whoever you like.",
+   "It is not you I am complaining about, it is your brother-in-law."
+  ]
  },
  {
   "key": "esm_cuyocuyacuyoscuyas__98f854",
@@ -1206,7 +1410,11 @@
   "zh": "cuyo/a/os/as：……的（关系形容词）",
   "level": "B1",
   "formation": "先行词 + cuyo/a/os/as + 名词",
-  "notes": "与后面的名词性数一致，而不是与先行词一致；cuyo 前不再加冠词。"
+  "notes": "与后面的名词性数一致，而不是与先行词一致；cuyo 前不再加冠词。",
+  "example_en": [
+   "I am reading a novel whose author is Mexican.",
+   "There is the lawyer whose address I gave you."
+  ]
  },
  {
   "key": "esm_elcuallacualloscualeslascuales__4f9a41",
@@ -1229,7 +1437,11 @@
   "zh": "el cual / la cual：关系代词（较正式）",
   "level": "B1",
   "formation": "先行词 + 定冠词 + cual（+ 前置介词）",
-  "notes": "冠词与先行词性数一致；介词后或隔得远时用它比 que 清楚。"
+  "notes": "冠词与先行词性数一致；介词后或隔得远时用它比 que 清楚。",
+  "example_en": [
+   "The table you varnished is in the living room.",
+   "I saw an old table under which I found a key."
+  ]
  },
  {
   "key": "esm_serparticipiovozpasiva__0329be",
@@ -1252,7 +1464,11 @@
   "zh": "ser + 过去分词：被动语态",
   "level": "B1",
   "formation": "ser 变位 + 过去分词（+ por + 施事者）",
-  "notes": "过去分词与主语性数一致（La casa fue destruida）；口语中更常用 se 被动。"
+  "notes": "过去分词与主语性数一致（La casa fue destruida）；口语中更常用 se 被动。",
+  "example_en": [
+   "The house was destroyed by the fire.",
+   "The letter was not received by the person concerned."
+  ]
  },
  {
   "key": "esm_estarparticipioestadoresultante__58c91e",
@@ -1275,7 +1491,11 @@
   "zh": "estar + 过去分词：表示结果状态",
   "level": "B1",
   "formation": "estar 变位 + 过去分词（与主语性数一致）",
-  "notes": "ser + 分词讲动作（被……），estar + 分词讲结果状态（已经……了）：La puerta fue cerrada / La puerta está cerrada。"
+  "notes": "ser + 分词讲动作（被……），estar + 分词讲结果状态（已经……了）：La puerta fue cerrada / La puerta está cerrada。",
+  "example_en": [
+   "The pavements are in ruins.",
+   "He is exhausted because he gets up at some ungodly hour."
+  ]
  },
  {
   "key": "esm_irgerundioprogresogradual__e3590f",
@@ -1298,7 +1518,11 @@
   "zh": "ir + 副动词：渐渐、逐步地",
   "level": "B1",
   "formation": "ir 变位 + 副动词",
-  "notes": "强调逐渐推进（va mejorando 越来越好），区别于 estar + 副动词（正在做）。"
+  "notes": "强调逐渐推进（va mejorando 越来越好），区别于 estar + 副动词（正在做）。",
+  "example_en": [
+   "He is gradually looking better.",
+   "They came in one by one."
+  ]
  },
  {
   "key": "esm_siemprequesubjuntivo__e0c988",
@@ -1321,7 +1545,11 @@
   "zh": "siempre que：只要；每当",
   "level": "B2",
   "formation": "siempre que + 虚拟式（条件）/ 陈述式（每当）",
-  "notes": "表条件时用虚拟式（siempre que estés conforme），表习惯性『每当』可用陈述式。"
+  "notes": "表条件时用虚拟式（siempre que estés conforme），表习惯性『每当』可用陈述式。",
+  "example_en": [
+   "As long as you agree too, I accept the proposal.",
+   "The two of them discussed that matter whenever they met."
+  ]
  },
  {
   "key": "esm_afindequesubjuntivo__c84524",
@@ -1346,7 +1574,11 @@
   "zh": "a fin de que + 虚拟式：为了（让）……",
   "level": "B2",
   "formation": "a fin de que + 虚拟式（主语不同）",
-  "notes": "书面语，比 para que 正式；主语一致时用 a fin de + 原形动词。"
+  "notes": "书面语，比 para que 正式；主语一致时用 a fin de + 原形动词。",
+  "example_en": [
+   "I have come so that you can tell me what happened.",
+   "The technicians will work so that the pipeline is running soon."
+  ]
  },
  {
   "key": "esm_encambio__51afb7",
@@ -1369,7 +1601,11 @@
   "zh": "en cambio：相反、另一方面",
   "level": "B2",
   "formation": "en cambio（逗号隔开，置于对比句前）",
-  "notes": "表对照，而非单纯转折；与 por el contrario 近义。"
+  "notes": "表对照，而非单纯转折；与 por el contrario 近义。",
+  "example_en": [
+   "He is very cautious; his brother, on the other hand, is reckless.",
+   "I like the cinema; she, on the other hand, prefers the theatre."
+  ]
  },
  {
   "key": "esm_dadoque__8cf1e9",
@@ -1392,7 +1628,11 @@
   "zh": "dado que：鉴于、既然",
   "level": "B2",
   "formation": "dado que + 陈述式",
-  "notes": "书面语因果连接，语气客观；常出现在论说文里。"
+  "notes": "书面语因果连接，语气客观；常出现在论说文里。",
+  "example_en": [
+   "Since you are interested in the position, come and see me on Tuesday.",
+   "Since there were no places left, we had to wait."
+  ]
  },
  {
   "key": "esm_sibien__1205db",
@@ -1415,7 +1655,11 @@
   "zh": "si bien：虽然、尽管（书面）",
   "level": "B2",
   "formation": "si bien + 陈述式",
-  "notes": "书面让步，相当于 aunque 的正式版；别与 si = 如果 混淆。"
+  "notes": "书面让步，相当于 aunque 的正式版；别与 si = 如果 混淆。",
+  "example_en": [
+   "Although it is not all I was hoping for, I am satisfied.",
+   "Although it is expensive, it is worth it."
+  ]
  },
  {
   "key": "esm_encuantoa__775a9e",
@@ -1439,7 +1683,11 @@
   "zh": "en cuanto a：至于、关于",
   "level": "B2",
   "formation": "en cuanto a + 名词 / 代词",
-  "notes": "话题转换用语，与『as soon as』的 en cuanto 不是一回事。"
+  "notes": "话题转换用语，与『as soon as』的 en cuanto 不是一回事。",
+  "example_en": [
+   "As for Juan, he seems a good lad to me.",
+   "As for the prices, there is no problem at all."
+  ]
  },
  {
   "key": "esm_envezde__51c2ed",
@@ -1463,7 +1711,11 @@
   "zh": "en vez de：而不是、代替",
   "level": "B2",
   "formation": "en vez de + 名词 / 原形动词",
-  "notes": "与 en lugar de 同义；后接从句要改成 en vez de que + 虚拟式（少用）。"
+  "notes": "与 en lugar de 同义；后接从句要改成 en vez de que + 虚拟式（少用）。",
+  "example_en": [
+   "I did not notice and I bought coarse salt instead of fine salt.",
+   "I would rather have tea instead of coffee."
+  ]
  },
  {
   "key": "esm_asícomo__e1f757",
@@ -1486,7 +1738,11 @@
   "zh": "así como：以及；正如",
   "level": "B2",
   "formation": "A, así como B（并列）；Así como + 从句, 主句（对比）",
-  "notes": "连接并列成分时相当于 y también；句首时表『正如……』的对照。"
+  "notes": "连接并列成分时相当于 y también；句首时表『正如……』的对照。",
+  "example_en": [
+   "Just as I do not meddle in your affairs, I do not want you meddling in mine either.",
+   "He has visited Spain, as well as France and Italy."
+  ]
  },
  {
   "key": "esm_nini__816372",
@@ -1510,7 +1766,11 @@
   "zh": "ni … ni …：既不……也不……",
   "level": "B2",
   "formation": "ni + A + ni + B（可叠加多项）",
-  "notes": "句首用 Ni…ni 时不再加 no；句中已否定时用 ni 代替 y no。"
+  "notes": "句首用 Ni…ni 时不再加 no；句中已否定时用 ni 代替 y no。",
+  "example_en": [
+   "Neither my wife nor my daughter should know about it.",
+   "Neither friendship, nor gifts, nor promises could win him over."
+  ]
  },
  {
   "key": "esm_decirlahorasonlas__66c1ed",
@@ -1533,7 +1793,11 @@
   "zh": "说时间：son las + 钟点",
   "level": "A1",
   "formation": "Son las + 数字 + y/menos + 分钟；1 点用 Es la una",
-  "notes": "只有凌晨 1 点用单数 Es la una，其余用复数 Son las。问句：¿Qué hora es?"
+  "notes": "只有凌晨 1 点用单数 Es la una，其余用复数 Son las。问句：¿Qué hora es?",
+  "example_en": [
+   "It is half past six.",
+   "It is a quarter past eight."
+  ]
  },
  {
   "key": "esm_hacersustantivoeltiempo__5aa63f",
@@ -1556,7 +1820,11 @@
   "zh": "天气：hace + 名词",
   "level": "A1",
   "formation": "hace + frío / calor / sol / viento / buen tiempo",
-  "notes": "天气用无人称 hacer，主语只能是第三人称单数：hace frío。不用 ser/estar。"
+  "notes": "天气用无人称 hacer，主语只能是第三人称单数：hace frío。不用 ser/estar。",
+  "example_en": [
+   "Is it cold in Alaska?",
+   "It is very hot in summer."
+  ]
  },
  {
   "key": "esm_tenerañoslaedad__edc794",
@@ -1580,7 +1848,11 @@
   "zh": "年龄：tener + 数字 + años",
   "level": "A1",
   "formation": "tener 变位 + 数字 + años",
-  "notes": "年龄用 tener 不用 ser：Tengo veinte años（不是 soy veinte）。问：¿Cuántos años tienes?"
+  "notes": "年龄用 tener 不用 ser：Tengo veinte años（不是 soy veinte）。问：¿Cuántos años tienes?",
+  "example_en": [
+   "My sister is twenty years old.",
+   "How old are you?"
+  ]
  },
  {
   "key": "esm_nadanadienuncatampoco__945ac1",
@@ -1602,7 +1874,11 @@
   "zh": "否定词 nada / nadie / nunca / tampoco",
   "level": "A2",
   "formation": "否定词可置于动词后（前面保留 no）或句首（不再加 no）",
-  "notes": "西班牙语允许双重否定：No dijo nada（他什么都没说）。否定词放句首时去掉 no：Nada dijo。tampoco 归 A1 的 también / tampoco 那条报告，这里不再重复匹配。"
+  "notes": "西班牙语允许双重否定：No dijo nada（他什么都没说）。否定词放句首时去掉 no：Nada dijo。tampoco 归 A1 的 también / tampoco 那条报告，这里不再重复匹配。",
+  "example_en": [
+   "He said nothing.",
+   "I have never been to Mexico."
+  ]
  },
  {
   "key": "esm_perosinocontraste__aea07f",
@@ -1624,7 +1900,11 @@
   "zh": "转折 pero / sino",
   "level": "A2",
   "formation": "pero + 并列成分；sino + 被否定的对立项",
-  "notes": "sino 只用在否定句后，纠正被否定的事实：No es tonto, sino perezoso。否定句后接完整从句时用 sino que。"
+  "notes": "sino 只用在否定句后，纠正被否定的事实：No es tonto, sino perezoso。否定句后接完整从句时用 sino que。",
+  "example_en": [
+   "José was never rich, but he was happy.",
+   "He is not stupid, he is lazy."
+  ]
  },
  {
   "key": "esm_quéadjetivosustantivoexclamación__97f53b",
@@ -1647,7 +1927,11 @@
   "zh": "感叹句 ¡qué + 形容词/名词!",
   "level": "A2",
   "formation": "¡Qué + 形容词/名词 (+ más + 形容词)!",
-  "notes": "qué 带重音符号；名词前可加 más 加强语气：¡Qué vida más aburrida!"
+  "notes": "qué 带重音符号；名词前可加 más 加强语气：¡Qué vida más aburrida!",
+  "example_en": [
+   "How lovely your village is!",
+   "How strange!"
+  ]
  },
  {
   "key": "esm_loadjetivosustantivación__5414ad",
@@ -1670,7 +1954,11 @@
   "zh": "中性冠词 lo + 形容词：……的事物",
   "level": "A2",
   "formation": "lo + 阳性单数形容词 → 抽象名词",
-  "notes": "lo importante（重要的东西）、lo mejor（最好的部分）。与 lo que 连用可引导从句。"
+  "notes": "lo importante（重要的东西）、lo mejor（最好的部分）。与 lo que 连用可引导从句。",
+  "example_en": [
+   "The important thing is to take part.",
+   "You do not know how difficult it is."
+  ]
  },
  {
   "key": "esm_hacetiempoque__47598c",
@@ -1695,7 +1983,11 @@
   "zh": "hace + 时间 + que：已经……多久",
   "level": "A2",
   "formation": "hace + 时间段 + que + 现在时（持续至今）",
-  "notes": "也可说 Vivo aquí hace tres años（动词在前、hace 在后）。若动词用简单过去时，则指『……以前』。"
+  "notes": "也可说 Vivo aquí hace tres años（动词在前、hace 在后）。若动词用简单过去时，则指『……以前』。",
+  "example_en": [
+   "I have been living here for three years.",
+   "I have been living here for two months."
+  ]
  },
  {
   "key": "esm_elimperativonegativonosubjuntivo__b71310",
@@ -1719,7 +2011,11 @@
   "zh": "否定命令：no + 虚拟式现在时",
   "level": "B1",
   "formation": "no + 虚拟式现在时（第二人称单数 digas / 复数 digáis；usted 用 diga）",
-  "notes": "否定命令一律改用虚拟式，代词前置：No me lo digas。肯定命令则用命令式本身（tú 用第三人称单数 habla，usted 用 hable），代词后贴：dímelo。"
+  "notes": "否定命令一律改用虚拟式，代词前置：No me lo digas。肯定命令则用命令式本身（tú 用第三人称单数 habla，usted 用 hable），代词后贴：dímelo。",
+  "example_en": [
+   "Do not tell me.",
+   "Do not do it like that."
+  ]
  },
  {
   "key": "esm_volverainfinitivo__b636ce",
@@ -1743,7 +2039,11 @@
   "zh": "volver a + 原形动词：再一次",
   "level": "B1",
   "formation": "volver (o→ue) + a + 原形动词",
-  "notes": "表示重复动作，比 otra vez 更书面；volver 本身是『回来』，加 a + 原形动词才是『再次』。"
+  "notes": "表示重复动作，比 otra vez 更书面；volver 本身是『回来』，加 a + 原形动词才是『再次』。",
+  "example_en": [
+   "He called again two hours later.",
+   "He will try again."
+  ]
  },
  {
   "key": "esm_ponerseainfinitivo__4149ab",
@@ -1768,7 +2068,11 @@
   "zh": "ponerse a + 原形动词：开始（动手）做",
   "level": "B1",
   "formation": "ponerse (自复) + a + 原形动词",
-  "notes": "强调『动手/突然开始』，比 empezar a 更口语；自复代词随主语变化。"
+  "notes": "强调『动手/突然开始』，比 empezar a 更口语；自复代词随主语变化。",
+  "example_en": [
+   "It started to rain in the middle of the afternoon.",
+   "I start studying as soon as I have had dinner."
+  ]
  },
  {
   "key": "esm_terminardeinfinitivo__c92181",
@@ -1792,7 +2096,11 @@
   "zh": "terminar de + 原形动词：做完某事",
   "level": "B1",
   "formation": "terminar de + 原形动词",
-  "notes": "与 acabar de 区分：terminar de 是『做完』，acabar de 是『刚刚做完』。"
+  "notes": "与 acabar de 区分：terminar de 是『做完』，acabar de 是『刚刚做完』。",
+  "example_en": [
+   "He finished reading the book last night.",
+   "We finished work late."
+  ]
  },
  {
   "key": "esm_venirgerundio__41a98e",
@@ -1815,7 +2123,11 @@
   "zh": "venir + 副动词：一直（从过去持续）",
   "level": "B1",
   "formation": "venir 变位 + 副动词",
-  "notes": "表示从过去某点持续到现在的动作，比 llevar + 副动词更强调延续；venir 只变位，副动词不变。"
+  "notes": "表示从过去某点持续到现在的动作，比 llevar + 副动词更强调延续；venir 只变位，副动词不变。",
+  "example_en": [
+   "He has been studying Spanish since he was ten.",
+   "I keep wondering why he does not write."
+  ]
  },
  {
   "key": "esm_deberdeinfinitivoconjetura__fe8eb4",
@@ -1839,7 +2151,11 @@
   "zh": "deber de + 原形动词：大概、想必",
   "level": "B1",
   "formation": "deber de + 原形动词",
-  "notes": "deber + 原形动词＝应该（义务）；deber de + 原形动词＝推测。口语里常省略 de，但书面要区分。"
+  "notes": "deber + 原形动词＝应该（义务）；deber de + 原形动词＝推测。口语里常省略 de，但书面要区分。",
+  "example_en": [
+   "He must be sleeping.",
+   "It must be five o'clock."
+  ]
  },
  {
   "key": "esm_haberdeinfinitivo__26ae20",
@@ -1863,7 +2179,11 @@
   "zh": "haber de + 原形动词：须得、将要（书面）",
   "level": "B1",
   "formation": "haber 变位 + de + 原形动词",
-  "notes": "书面或文学语体，表义务或注定；口语里用 tener que。注意 haber 在此不作助动词。"
+  "notes": "书面或文学语体，表义务或注定；口语里用 tener que。注意 haber 在此不作助动词。",
+  "example_en": [
+   "I must finish this today.",
+   "He will have to decide tomorrow."
+  ]
  },
  {
   "key": "esm_elmíolatuyaposesivostónicos__19a64c",
@@ -1886,7 +2206,11 @@
   "zh": "重读物主代词 el mío / la tuya",
   "level": "B1",
   "formation": "定冠词 + mío/mía/míos/mías（tuyo, suyo, nuestro, vuestro）",
-  "notes": "重读形式代替名词，冠词不可省：el mío（我的那个）。与名词前的短形式 mi/tu/su 区分。"
+  "notes": "重读形式代替名词，冠词不可省：el mío（我的那个）。与名词前的短形式 mi/tu/su 区分。",
+  "example_en": [
+   "My book is here; yours is there.",
+   "Theirs arrived late."
+  ]
  },
  {
   "key": "esm_loquerelativoneutro__6de48d",
@@ -1909,7 +2233,11 @@
   "zh": "lo que：……的东西（中性关系代词）",
   "level": "B1",
   "formation": "lo que + 从句；或 主句 + lo que",
-  "notes": "指代前面整件事或抽象概念，无先行词；与 el que/la que（指人/物）不同。"
+  "notes": "指代前面整件事或抽象概念，无先行词；与 el que/la que（指人/物）不同。",
+  "example_en": [
+   "What I like is music.",
+   "I do not understand what you are saying."
+  ]
  },
  {
   "key": "esm_sinquesubjuntivo__0cd5e7",
@@ -1934,7 +2262,11 @@
   "zh": "sin que + 虚拟式：而……没有",
   "level": "B1",
   "formation": "sin que + 虚拟式（主从句主语不同）",
-  "notes": "主语一致时用 sin + 原形动词；主语不同必须用 sin que + 虚拟式。"
+  "notes": "主语一致时用 sin + 原形动词；主语不同必须用 sin que + 虚拟式。",
+  "example_en": [
+   "The lady left the party without our seeing her.",
+   "I did it without anyone seeing me."
+  ]
  },
  {
   "key": "esm_semeseteverboaccióninvoluntaria__f35b27",
@@ -1958,7 +2290,11 @@
   "zh": "se me / se te + 动词：意外发生（非本意）",
   "level": "B1",
   "formation": "se + 与格代词 + 动词（第三人称）",
-  "notes": "表示『不小心/不由自主要发生』：Se me olvidó（我忘了）。与格代词指受影响的人，动词与事物一致。"
+  "notes": "表示『不小心/不由自主要发生』：Se me olvidó（我忘了）。与格代词指受影响的人，动词与事物一致。",
+  "example_en": [
+   "We forgot to bring the soft drinks.",
+   "Did you lose your keys?"
+  ]
  },
  {
   "key": "esm_cadavezmásmenos__2ea65c",
@@ -1982,7 +2318,11 @@
   "zh": "cada vez más / menos：越来越……",
   "level": "B1",
   "formation": "cada vez + más/menos + 形容词/副词；cada vez más + 名词",
-  "notes": "表示渐进变化；完成体变化也可说 cada vez mejor/peor。"
+  "notes": "表示渐进变化；完成体变化也可说 cada vez mejor/peor。",
+  "example_en": [
+   "Spanish is spoken more and more.",
+   "He is getting better and better."
+  ]
  },
  {
   "key": "esm_hastaquesubjuntivo__0a18f1",
@@ -2005,7 +2345,11 @@
   "zh": "hasta que：直到……（指将来用虚拟式）",
   "level": "B1",
   "formation": "hasta que + 陈述式（已发生）/ 虚拟式（指将来）",
-  "notes": "指将来未发生的事用虚拟式：Espera hasta que llegue。已发生的事实用陈述式。"
+  "notes": "指将来未发生的事用虚拟式：Espera hasta que llegue。已发生的事实用陈述式。",
+  "example_en": [
+   "Wait until he arrives.",
+   "Do not leave until I have finished."
+  ]
  },
  {
   "key": "esm_alomejorindicativo__1ffc64",
@@ -2029,7 +2373,11 @@
   "zh": "a lo mejor：也许（接陈述式）",
   "level": "B1",
   "formation": "a lo mejor + 陈述式",
-  "notes": "口语常用，与 quizá/tal vez 不同：a lo mejor 后面用陈述式，不用虚拟式。"
+  "notes": "口语常用，与 quizá/tal vez 不同：a lo mejor 后面用陈述式，不用虚拟式。",
+  "example_en": [
+   "Maybe he will come tomorrow.",
+   "Maybe he does not know about it."
+  ]
  },
  {
   "key": "esm_amenosquesubjuntivo__112cf0",
@@ -2053,7 +2401,11 @@
   "zh": "a menos que + 虚拟式：除非",
   "level": "B2",
   "formation": "a menos que + 虚拟式（永远）",
-  "notes": "同义：a no ser que、salvo que，后面一律虚拟式。"
+  "notes": "同义：a no ser que、salvo que，后面一律虚拟式。",
+  "example_en": [
+   "We will not go out unless it stops raining.",
+   "You will not know unless you read it."
+  ]
  },
  {
   "key": "esm_contaldequesubjuntivo__bd7619",
@@ -2078,7 +2430,11 @@
   "zh": "con tal de que + 虚拟式：只要",
   "level": "B2",
   "formation": "con tal de que + 虚拟式（主语不同）；主语一致用 con tal de + 原形动词",
-  "notes": "表示必要条件，语气比 si 更强；口语也说 con tal que。"
+  "notes": "表示必要条件，语气比 si 更强；口语也说 con tal que。",
+  "example_en": [
+   "I will lend it to you as long as you give it back.",
+   "I will go as long as it does not rain."
+  ]
  },
  {
   "key": "esm_siempreycuandosubjuntivo__106510",
@@ -2102,7 +2458,11 @@
   "zh": "siempre y cuando：只要（条件）",
   "level": "B2",
   "formation": "siempre y cuando + 虚拟式",
-  "notes": "与 siempre que 同义，但语气更强调『前提』；后面必须虚拟式。"
+  "notes": "与 siempre que 同义，但语气更强调『前提』；后面必须虚拟式。",
+  "example_en": [
+   "We will go as long as it does not rain.",
+   "I support you as long as you are honest."
+  ]
  },
  {
   "key": "esm_acondicióndequesubjuntivo__dcc930",
@@ -2127,7 +2487,11 @@
   "zh": "a condición de que + 虚拟式：条件是……",
   "level": "B2",
   "formation": "a condición de que + 虚拟式",
-  "notes": "书面语条件句，语气正式；同义 a cambio de que。"
+  "notes": "书面语条件句，语气正式；同义 a cambio de que。",
+  "example_en": [
+   "I will help you on condition that you study.",
+   "I will tell him on condition that you do not tell anyone."
+  ]
  },
  {
   "key": "esm_encasodequesubjuntivo__779334",
@@ -2152,7 +2516,11 @@
   "zh": "en caso de que + 虚拟式：万一、如果",
   "level": "B2",
   "formation": "en caso de que + 虚拟式；en caso de + 名词/原形动词",
-  "notes": "表示可能性较低的条件；后接名词时省掉 que（en caso de emergencia）。"
+  "notes": "表示可能性较低的条件；后接名词时省掉 que（en caso de emergencia）。",
+  "example_en": [
+   "In case he arrives late, let me know.",
+   "Take some money in case you need it."
+  ]
  },
  {
   "key": "esm_porsiindicativosubjuntivo__3444e9",
@@ -2175,7 +2543,11 @@
   "zh": "por si：以防、万一",
   "level": "B2",
   "formation": "por si + 陈述式（可能发生）；por si acaso 单独使用",
-  "notes": "与 en caso de que（+虚拟式）区分：por si 后面通常用陈述式。"
+  "notes": "与 en caso de que（+虚拟式）区分：por si 后面通常用陈述式。",
+  "example_en": [
+   "Take the umbrella in case it rains.",
+   "I am saying it just in case."
+  ]
  },
  {
   "key": "esm_deahíquesubjuntivo__83f3ff",
@@ -2199,7 +2571,11 @@
   "zh": "de ahí que + 虚拟式：因此、所以说",
   "level": "B2",
   "formation": "de ahí que + 虚拟式",
-  "notes": "书面因果连接，后接虚拟式是固定要求；口语常说 por eso。"
+  "notes": "书面因果连接，后接虚拟式是固定要求；口语常说 por eso。",
+  "example_en": [
+   "He did not study; that is why he failed.",
+   "It rained all night, which is why the river is so high."
+  ]
  },
  {
   "key": "esm_pormuchoquesubjuntivo__5ef2b5",
@@ -2223,7 +2599,11 @@
   "zh": "por mucho que + 虚拟式：无论多么……",
   "level": "B2",
   "formation": "por mucho que + 虚拟式（让步）",
-  "notes": "与 por más que 同义；也可说 por muy + 形容词 + que。"
+  "notes": "与 por más que 同义；也可说 por muy + 形容词 + que。",
+  "example_en": [
+   "However much you insist, I will not change my mind.",
+   "However hard I try, I do not understand it."
+  ]
  },
  {
   "key": "esm_auncuandosubjuntivo__ad1709",
@@ -2246,7 +2626,11 @@
   "zh": "aun cuando：即使、尽管",
   "level": "B2",
   "formation": "aun cuando + 虚拟式（假设）/ 陈述式（事实）",
-  "notes": "aun（无重音）＝即使；aún（带重音）＝还、仍然。这是最常考的差别。"
+  "notes": "aun（无重音）＝即使；aún（带重音）＝还、仍然。这是最常考的差别。",
+  "example_en": [
+   "Even if it rains, we will go.",
+   "Even though he is tired, he keeps working."
+  ]
  },
  {
   "key": "esm_mientrasquecontraste__1400c0",
@@ -2269,7 +2653,11 @@
   "zh": "mientras que：而、然而（对比）",
   "level": "B2",
   "formation": "mientras que + 陈述式，表对比",
-  "notes": "表时间『当……时』用 mientras（不加 que）；mientras que 专门表对比。"
+  "notes": "表时间『当……时』用 mientras（不加 que）；mientras que 专门表对比。",
+  "example_en": [
+   "I prefer tea, whereas she prefers coffee.",
+   "He studies, whereas his brother works."
+  ]
  },
  {
   "key": "esm_nosolosinotambién__70613b",
@@ -2294,7 +2682,11 @@
   "zh": "no solo … sino también：不仅……而且",
   "level": "B2",
   "formation": "no solo + A + sino también + B",
-  "notes": "连接平行成分；sino 在否定后纠正，también 加强递进。"
+  "notes": "连接平行成分；sino 在否定后纠正，también 加强递进。",
+  "example_en": [
+   "He not only studies but also works.",
+   "He speaks not only English but also French."
+  ]
  },
  {
   "key": "esm_másvalequesubjuntivo__e5fdf7",
@@ -2318,7 +2710,11 @@
   "zh": "más vale que + 虚拟式：最好……",
   "level": "B2",
   "formation": "más vale que + 虚拟式；más vale + 原形动词",
-  "notes": "劝告/警告语气，比 es mejor que 更强烈；más vale tarde que nunca 是固定说法。"
+  "notes": "劝告/警告语气，比 es mejor que 更强烈；más vale tarde que nunca 是固定说法。",
+  "example_en": [
+   "You had better go now.",
+   "You had better not say anything."
+  ]
  },
  {
   "key": "esm_hacefaltaquesubjuntivo__3c7b4e",
@@ -2342,7 +2738,11 @@
   "zh": "hace falta que + 虚拟式：需要、有必要",
   "level": "B2",
   "formation": "hace falta que + 虚拟式；hace falta + 名词/原形动词",
-  "notes": "无人称必要性表达，与 es necesario que 同义但更口语。"
+  "notes": "无人称必要性表达，与 es necesario que 同义但更口语。",
+  "example_en": [
+   "Everyone needs to cooperate.",
+   "You need to bring your passport."
+  ]
  },
  {
   "key": "esm_cuantomásmás__cdc553",
@@ -2365,7 +2765,11 @@
   "zh": "cuanto más … más …：越……越……",
   "level": "C1",
   "formation": "Cuanto más + 动词/形容词, más/menos + 结果",
-  "notes": "两个分句都用比较级；cuanto 不带重音（重音 cuánto 是疑问词）。"
+  "notes": "两个分句都用比较级；cuanto 不带重音（重音 cuánto 是疑问词）。",
+  "example_en": [
+   "The more you study, the more you learn.",
+   "The more I think about it, the less I like it."
+  ]
  },
  {
   "key": "esm_comosubjuntivocondición__273c3c",
@@ -2389,7 +2793,11 @@
   "zh": "como + 虚拟式：要是……（带警告的条件）",
   "level": "C1",
   "formation": "Como + 虚拟式, 主句（结果）",
-  "notes": "口语警示句：Como no llegues a tiempo, nos vamos sin ti。语气比 si 更强硬。"
+  "notes": "口语警示句：Como no llegues a tiempo, nos vamos sin ti。语气比 si 更强硬。",
+  "example_en": [
+   "If you do not arrive on time, we are going without you.",
+   "If you do not study, you are going to fail."
+  ]
  },
  {
   "key": "esm_nobienencuanto__80138d",
@@ -2412,7 +2820,11 @@
   "zh": "no bien：刚一……就",
   "level": "C1",
   "formation": "No bien + 动词, 主句",
-  "notes": "书面时间连接，等于 en cuanto / tan pronto como；注意不是『不好』。"
+  "notes": "书面时间连接，等于 en cuanto / tan pronto como；注意不是『不好』。",
+  "example_en": [
+   "As soon as he arrived, he started working.",
+   "As soon as it was light, we set off."
+  ]
  },
  {
   "key": "esm_denoserpor__437f8a",
@@ -2437,7 +2849,11 @@
   "zh": "de no ser por：要不是因为",
   "level": "C1",
   "formation": "De no ser por + 名词/代词, 主句（虚拟或条件式）",
-  "notes": "书面虚拟条件，等于 si no fuera por；主句常用条件式。"
+  "notes": "书面虚拟条件，等于 si no fuera por；主句常用条件式。",
+  "example_en": [
+   "If it were not for you, I would not be here.",
+   "If it had not been for the doctor, he would have died."
+  ]
  },
  {
   "key": "esm_enlamedidaenque__df6cf1",
@@ -2461,7 +2877,11 @@
   "zh": "en la medida en que：在……程度上、随着",
   "level": "C1",
   "formation": "en la medida en que + 陈述式",
-  "notes": "书面语，表程度相关或递进；论说文常用。"
+  "notes": "书面语，表程度相关或递进；论说文常用。",
+  "example_en": [
+   "To the extent that you study, you will improve.",
+   "The problem grows to the extent that nobody deals with it."
+  ]
  },
  {
   "key": "esm_porconsiguiente__7972f4",
@@ -2484,7 +2904,11 @@
   "zh": "por consiguiente：因此、所以（书面）",
   "level": "C1",
   "formation": "por consiguiente（逗号隔开，置于结果句前）",
-  "notes": "正式书面因果连接，与 por lo tanto 同义但更书面。"
+  "notes": "正式书面因果连接，与 por lo tanto 同义但更书面。",
+  "example_en": [
+   "He did not study; consequently, he failed.",
+   "He arrived late; consequently, he did not get in."
+  ]
  },
  {
   "key": "esm_noobstante__203406",
@@ -2507,7 +2931,11 @@
   "zh": "no obstante：尽管如此、然而",
   "level": "C1",
   "formation": "no obstante（可置句首或句中，逗号隔开）",
-  "notes": "书面转折，比 sin embargo 更正式；也可说 no obstante que（少用）。"
+  "notes": "书面转折，比 sin embargo 更正式；也可说 no obstante que（少用）。",
+  "example_en": [
+   "Nevertheless, he decided to go on.",
+   "It was expensive; nevertheless, he bought it."
+  ]
  },
  {
   "key": "esm_aunasí__39a438",
@@ -2530,7 +2958,11 @@
   "zh": "aun así：即便如此",
   "level": "C1",
   "formation": "aun así（句首或分句末）",
-  "notes": "aun 不带重音；表『即使这样』的让步转折，常与 pero 连用。"
+  "notes": "aun 不带重音；表『即使这样』的让步转折，常与 pero 连用。",
+  "example_en": [
+   "He was tired; even so, he finished the work.",
+   "Even so, I am not convinced."
+  ]
  },
  {
   "key": "esm_entantoque__ab85df",
@@ -2554,7 +2986,11 @@
   "zh": "en tanto que：而；作为……",
   "level": "C1",
   "formation": "en tanto que + 陈述式（对比或身份）",
-  "notes": "既可表对比（相当于 mientras que），也可表身份（作为……）。"
+  "notes": "既可表对比（相当于 mientras que），也可表身份（作为……）。",
+  "example_en": [
+   "While you rest, I work.",
+   "As a writer, he takes a different view."
+  ]
  },
  {
   "key": "esm_conobjetodeque__dddb70",
@@ -2578,7 +3014,11 @@
   "zh": "con objeto de：为了（书面）",
   "level": "C1",
   "formation": "con objeto de + 原形动词；con objeto de que + 虚拟式",
-  "notes": "正式书面目的表达，与 con el fin de、a fin de 同义。"
+  "notes": "正式书面目的表达，与 con el fin de、a fin de 同义。",
+  "example_en": [
+   "They met in order to reach an agreement.",
+   "He said it in order to help you."
+  ]
  },
  {
   "key": "esm_nofueraquesubjuntivo__917fab",
@@ -2602,7 +3042,11 @@
   "zh": "no fuera que + 虚拟式：免得、唯恐",
   "level": "C2",
   "formation": "主句 + no fuera que + 虚拟式",
-  "notes": "书面警示，等于 no sea que；后面必须虚拟式。"
+  "notes": "书面警示，等于 no sea que；后面必须虚拟式。",
+  "example_en": [
+   "Be quiet, in case someone heard you.",
+   "I came early, in case they had left."
+  ]
  },
  {
   "key": "esm_mientrastemporal__16cb3d",
@@ -2625,7 +3069,11 @@
   "zh": "mientras：当……的时候（同时）",
   "level": "B1",
   "formation": "mientras + 陈述式（两个动作同时进行）",
-  "notes": "表『当……时』；与 mientras que（对比『而』）区分，后者是单独一条规则，这里用 !que 排除。"
+  "notes": "表『当……时』；与 mientras que（对比『而』）区分，后者是单独一条规则，这里用 !que 排除。",
+  "example_en": [
+   "Sometimes I like to have a snack while I study.",
+   "While I was studying, the phone rang."
+  ]
  },
  {
   "key": "esm_nisiquiera__f61e54",
@@ -2648,7 +3096,11 @@
   "zh": "ni siquiera：连……都不",
   "level": "B1",
   "formation": "ni siquiera + 成分；句首时不再加 no",
-  "notes": "在否定句里加强语气；放句首时句子里不能再用 no（Ni siquiera me saludó）。"
+  "notes": "在否定句里加强语气；放句首时句子里不能再用 no（Ni siquiera me saludó）。",
+  "example_en": [
+   "I do not like swallowing pills, not even aspirin.",
+   "He did not even greet me."
+  ]
  },
  {
   "key": "esm_apenas__a96767",
@@ -2670,7 +3122,11 @@
   "zh": "apenas：几乎不；刚一……就",
   "level": "B1",
   "formation": "apenas + 动词（两种含义按语境区分）",
-  "notes": "① 『刚一……就』：Apenas llegó, empezó a hablar；② 『几乎不、勉强』：Apenas consiguió el puesto。"
+  "notes": "① 『刚一……就』：Apenas llegó, empezó a hablar；② 『几乎不、勉强』：Apenas consiguió el puesto。",
+  "example_en": [
+   "He had hardly arrived when he started talking.",
+   "He barely managed to get the position."
+  ]
  },
  {
   "key": "esm_cuantoantes__664c34",
@@ -2693,7 +3149,11 @@
   "zh": "cuanto antes：尽早",
   "level": "B2",
   "formation": "cuanto antes（+ 动词）；完整式 cuanto antes …, mejor",
-  "notes": "cuanto 不带重音；『越早越好』说 cuanto antes, mejor。"
+  "notes": "cuanto 不带重音；『越早越好』说 cuanto antes, mejor。",
+  "example_en": [
+   "Come as soon as you can.",
+   "The sooner you do it, the better."
+  ]
  },
  {
   "key": "esm_demaneraque__0858eb",
@@ -2717,7 +3177,11 @@
   "zh": "de manera que：因此；以便",
   "level": "B2",
   "formation": "de manera que + 陈述式（结果）/ 虚拟式（目的）",
-  "notes": "与 de modo que 同义；结果用陈述式，目的用虚拟式。"
+  "notes": "与 de modo que 同义；结果用陈述式，目的用虚拟式。",
+  "example_en": [
+   "He spoke slowly, so that everyone understood him.",
+   "He prepared in such a way that it would not fail."
+  ]
  },
  {
   "key": "esm_afindeinfinitivo__4790d0",
@@ -2742,7 +3206,11 @@
   "zh": "a fin de + 原形动词：为了",
   "level": "B2",
   "formation": "a fin de + 原形动词（主语一致）",
-  "notes": "书面目的表达；主语不同要用 a fin de que + 虚拟式（另有单独一条）。"
+  "notes": "书面目的表达；主语不同要用 a fin de que + 虚拟式（另有单独一条）。",
+  "example_en": [
+   "They met in order to discuss the plan.",
+   "He studies in order to pass the exam."
+  ]
  },
  {
   "key": "esm_conelfindeque__5ba615",
@@ -2767,7 +3235,11 @@
   "zh": "con el fin de：为了（正式）",
   "level": "C1",
   "formation": "con el fin de + 原形动词；con el fin de que + 虚拟式",
-  "notes": "与 con objeto de、a fin de 同义，公文/论说文常用。"
+  "notes": "与 con objeto de、a fin de 同义，公文/论说文常用。",
+  "example_en": [
+   "He saves in order to buy a house.",
+   "He said it with the aim of helping you."
+  ]
  },
  {
   "key": "esm_acabarporinfinitivo__b0d578",
@@ -2791,7 +3263,11 @@
   "zh": "acabar por + 原形动词：最终、终于",
   "level": "B2",
   "formation": "acabar por + 原形动词",
-  "notes": "强调最终结果；与 acabar de + 原形动词（刚刚做完）完全不同。"
+  "notes": "强调最终结果；与 acabar de + 原形动词（刚刚做完）完全不同。",
+  "example_en": [
+   "He ended up accepting the offer.",
+   "He always ends up accepting."
+  ]
  },
  {
   "key": "esm_venirainfinitivo__380d37",
@@ -2815,7 +3291,11 @@
   "zh": "venir a + 原形动词：相当于、等于是",
   "level": "B2",
   "formation": "venir a + 原形动词（venir a ser / venir a decir）",
-  "notes": "用来折算或解释，等于『差不多就是』；不是『来做什么』的实义用法。"
+  "notes": "用来折算或解释，等于『差不多就是』；不是『来做什么』的实义用法。",
+  "example_en": [
+   "This comes to cost about the same.",
+   "He is more or less saying no."
+  ]
  },
  {
   "key": "esm_tenerparticipio__b332a7",
@@ -2838,7 +3318,11 @@
   "zh": "tener + 过去分词：已经做完（结果留存）",
   "level": "B2",
   "formation": "tener + 过去分词（与宾语性数一致）",
-  "notes": "强调动作完成、结果仍在：Tengo escrito el informe。与 haber + 分词（完成时）不同，后者不表结果状态。"
+  "notes": "强调动作完成、结果仍在：Tengo escrito el informe。与 haber + 分词（完成时）不同，后者不表结果状态。",
+  "example_en": [
+   "I have the report written.",
+   "They have dinner ready."
+  ]
  },
  {
   "key": "esm_estarparainfinitivo__4f262e",
@@ -2862,7 +3346,11 @@
   "zh": "estar para + 原形动词：即将、正要",
   "level": "C1",
   "formation": "estar para + 原形动词",
-  "notes": "强调临界状态；与 estar por + 原形动词（还没做）形成对照。"
+  "notes": "强调临界状态；与 estar por + 原形动词（还没做）形成对照。",
+  "example_en": [
+   "The train is about to leave.",
+   "We are about to go out."
+  ]
  },
  {
   "key": "esm_estarporinfinitivo__ac2f02",
@@ -2886,7 +3374,11 @@
   "zh": "estar por + 原形动词：还没做、有待",
   "level": "C1",
   "formation": "estar por + 原形动词",
-  "notes": "标准用法是『尚未完成』；与 estar para（即将）不要混。拉美部分地区把 estar por 也用作『即将』。"
+  "notes": "标准用法是『尚未完成』；与 estar para（即将）不要混。拉美部分地区把 estar por 也用作『即将』。",
+  "example_en": [
+   "The house has yet to be cleaned.",
+   "He has yet to arrive."
+  ]
  },
  {
   "key": "esm_porpoco__187798",
@@ -2909,7 +3401,11 @@
   "zh": "por poco：差点",
   "level": "B2",
   "formation": "por poco + 动词；por poco no + 动词 = 差点没",
-  "notes": "注意否定式反义：por poco no llegamos 是『我们差点没赶上』（其实赶上了）。"
+  "notes": "注意否定式反义：por poco no llegamos 是『我们差点没赶上』（其实赶上了）。",
+  "example_en": [
+   "I almost fell.",
+   "We very nearly did not arrive in time."
+  ]
  },
  {
   "key": "esm_antepreposiciónculta__6790c1",
@@ -2933,7 +3429,11 @@
   "zh": "ante：面对、在……面前（书面）",
   "level": "C1",
   "formation": "ante + 名词（多为抽象名词或重要场合）",
-  "notes": "书面色彩强；日常『在……前面』用 delante de，『面对问题』也可用 frente a。"
+  "notes": "书面色彩强；日常『在……前面』用 delante de，『面对问题』也可用 frente a。",
+  "example_en": [
+   "He defends his clients before the court.",
+   "Before God, I am telling the truth."
+  ]
  },
  {
   "key": "esm_envirtudde__b3670e",
@@ -2957,7 +3457,11 @@
   "zh": "en virtud de：依据、由于（公文）",
   "level": "C2",
   "formation": "en virtud de + 名词",
-  "notes": "法律、公文语体；日常说 según 或 debido a。"
+  "notes": "法律、公文语体；日常说 según 或 debido a。",
+  "example_en": [
+   "By virtue of the law, he cannot leave.",
+   "It was approved by virtue of a prior agreement."
+  ]
  },
  {
   "key": "esm_enarasde__f012d5",
@@ -2981,7 +3485,11 @@
   "zh": "en aras de：为了（崇高目标）",
   "level": "C2",
   "formation": "en aras de + 抽象名词",
-  "notes": "书面语，多与 paz、progreso、libertad 等抽象名词搭配；不用于具体物件。"
+  "notes": "书面语，多与 paz、progreso、libertad 等抽象名词搭配；不用于具体物件。",
+  "example_en": [
+   "He did it for the sake of peace.",
+   "They work for the sake of a better future."
+  ]
  },
  {
   "key": "esm_sopenade__680cad",
@@ -3005,7 +3513,11 @@
   "zh": "so pena de：否则将（受罚）",
   "level": "C2",
   "formation": "so pena de + 名词 / 原形动词",
-  "notes": "法律威胁语气；so 是古前置词，只在 so pena de、so capa de 这类固定搭配里存活。"
+  "notes": "法律威胁语气；so 是古前置词，只在 so pena de、so capa de 这类固定搭配里存活。",
+  "example_en": [
+   "He must declare it, on pain of losing his citizenship.",
+   "He kept quiet, on pain of making it worse."
+  ]
  },
  {
   "key": "esm_merceda__13924a",
@@ -3028,7 +3540,11 @@
   "zh": "merced a：多亏、凭借（书面）",
   "level": "C2",
   "formation": "merced a + 名词",
-  "notes": "与 gracias a 同义但更文；merced 在这里不表示『恩惠』这个名词义。"
+  "notes": "与 gracias a 同义但更文；merced 在这里不表示『恩惠』这个名词义。",
+  "example_en": [
+   "Thanks to his help, we finished on time.",
+   "Thanks to technology, everything is faster."
+  ]
  },
  {
   "key": "esm_afuerde__f1da03",
@@ -3052,7 +3568,11 @@
   "zh": "a fuer de：由于、凭着一贯的……（古旧书面）",
   "level": "C2",
   "formation": "a fuer de + 形容词/名词",
-  "notes": "文学语体，现代口语不用；a fuer de sincero = 老实说。"
+  "notes": "文学语体，现代口语不用；a fuer de sincero = 老实说。",
+  "example_en": [
+   "To be honest with you, I will say no.",
+   "By dint of repeating it, he ended up believing it."
+  ]
  },
  {
   "key": "esm_ooalternativa__c9619e",
@@ -3076,7 +3596,11 @@
   "zh": "o … o …：要么……要么",
   "level": "A1",
   "formation": "o + A + o + B",
-  "notes": "并列选择；o 在元音 o 开头的词前改写成 u（uno u otro）。"
+  "notes": "并列选择；o 在元音 o 开头的词前改写成 u（uno u otro）。",
+  "example_en": [
+   "Either you come or you stay.",
+   "Either you study or you work."
+  ]
  },
  {
   "key": "esm_demasiadoadjetivoadverbio__4a143d",
@@ -3098,7 +3622,11 @@
   "zh": "demasiado + 形容词/副词：太……",
   "level": "A2",
   "formation": "demasiado + 形容词/副词（性数随名词）",
-  "notes": "表示『过度』，带负面评价；中性程度用 muy（muy caro 只是『很贵』，demasiado caro 是『贵得过分』）。"
+  "notes": "表示『过度』，带负面评价；中性程度用 muy（muy caro 只是『很贵』，demasiado caro 是『贵得过分』）。",
+  "example_en": [
+   "You drive too fast.",
+   "This house is too expensive."
+  ]
  },
  {
   "key": "esm_bastanteadjetivoadverbio__0fcf34",
@@ -3120,7 +3648,11 @@
   "zh": "bastante + 形容词/副词：相当、挺",
   "level": "A2",
   "formation": "bastante + 形容词/副词；bastante + 名词（不变）",
-  "notes": "比 muy 弱、比 un poco 强；修饰名词时不变性数（bastante dinero）。"
+  "notes": "比 muy 弱、比 un poco 强；修饰名词时不变性数（bastante dinero）。",
+  "example_en": [
+   "Your Spanish is quite good.",
+   "The exam was fairly difficult."
+  ]
  },
  {
   "key": "esm_unpocodesustantivo__d974d9",
@@ -3144,7 +3676,11 @@
   "zh": "un poco de + 名词：一点……",
   "level": "A2",
   "formation": "un poco de + 不可数名词；修饰形容词用 un poco + adj",
-  "notes": "后接名词要加 de（un poco de agua）；直接修饰形容词时不加（un poco tarde）。"
+  "notes": "后接名词要加 de（un poco de agua）；直接修饰形容词时不加（un poco tarde）。",
+  "example_en": [
+   "I know a little Spanish.",
+   "Do you want a little water?"
+  ]
  },
  {
   "key": "esm_igualdeadjetivoque__0e14a2",
@@ -3168,7 +3704,11 @@
   "zh": "igual de + 形容词 + que：和……一样",
   "level": "A2",
   "formation": "igual de + 形容词 + que",
-  "notes": "与 tan ... como 同义，但语气更强调『一模一样』；igual 不变性数。"
+  "notes": "与 tan ... como 同义，但语气更强调『一模一样』；igual 不变性数。",
+  "example_en": [
+   "He is as tall as his father.",
+   "Today you are as pretty as yesterday."
+  ]
  },
  {
   "key": "esm_lomismoque__8abf6a",
@@ -3192,7 +3732,11 @@
   "zh": "lo mismo que：和……一样的东西/事",
   "level": "A2",
   "formation": "lo mismo que + 名词/从句",
-  "notes": "中性形式，指『同样的事』；指人/物时用 el mismo / la misma。"
+  "notes": "中性形式，指『同样的事』；指人/物时用 el mismo / la misma。",
+  "example_en": [
+   "An old friend is not the same as a friend who is old.",
+   "I think the same as you."
+  ]
  },
  {
   "key": "esm_tantoqueconsecuencia__7838e5",
@@ -3217,7 +3761,11 @@
   "zh": "tanto … que …：如此……以至于",
   "level": "A2",
   "formation": "动词 + tanto que + 结果；tanto/a/os/as + 名词 + que",
-  "notes": "修饰动词用 tanto（不变）；修饰名词随名词变性数（tanta gente que…）。"
+  "notes": "修饰动词用 tanto（不变）；修饰名词随名词变性数（tanta gente que…）。",
+  "example_en": [
+   "He worked so hard that he fell ill.",
+   "I am so hungry that I cannot wait."
+  ]
  },
  {
   "key": "esm_tanadjetivoque__5122ef",
@@ -3241,7 +3789,11 @@
   "zh": "tan + 形容词 + que：如此……以至于",
   "level": "A2",
   "formation": "tan + 形容词/副词 + que + 结果",
-  "notes": "与 tanto ... que 分工：tan 修饰形容词/副词，tanto 修饰动词或名词。"
+  "notes": "与 tanto ... que 分工：tan 修饰形容词/副词，tanto 修饰动词或名词。",
+  "example_en": [
+   "It was so late that we left.",
+   "He speaks so fast that I do not understand him."
+  ]
  },
  {
   "key": "esm_primerodespuésorden__efe959",
@@ -3265,7 +3817,11 @@
   "zh": "primero … después：先……然后",
   "level": "A2",
   "formation": "primero + 动作, después + 动作",
-  "notes": "叙述顺序；也可用 luego、más tarde 替换 después。"
+  "notes": "叙述顺序；也可用 luego、más tarde 替换 después。",
+  "example_en": [
+   "First I have breakfast, then I go running.",
+   "First we will study, then we will go to the cinema."
+  ]
  },
  {
   "key": "esm_algúnningúnsustantivo__8268ed",
@@ -3287,7 +3843,11 @@
   "zh": "algún / ningún：某个 / 没有任何",
   "level": "A2",
   "formation": "algún/ningún + 阳性单数名词（短形式，来自 alguno/ninguno）",
-  "notes": "阳性单数名词前用 algún/ningún；ninguno 在动词后仍保留 no（No tengo ninguna duda）。"
+  "notes": "阳性单数名词前用 algún/ningún；ninguno 在动词后仍保留 no（No tengo ninguna duda）。",
+  "example_en": [
+   "Some day you will understand it.",
+   "I have no doubt at all."
+  ]
  },
  {
   "key": "esm_siindicativocondiciónreal__faa005",
@@ -3310,7 +3870,11 @@
   "zh": "si + 陈述式：真实条件（如果……）",
   "level": "A2",
   "formation": "si + 陈述式现在时, 主句（现在/将来/命令）",
-  "notes": "真实条件用陈述式；假设（si + 虚拟式过去时）表不可能的情况，两者别混。"
+  "notes": "真实条件用陈述式；假设（si + 虚拟式过去时）表不可能的情况，两者别混。",
+  "example_en": [
+   "If it rains, we will not go out.",
+   "If you have time, call me."
+  ]
  },
  {
   "key": "esm_estarapuntodeinfinitivo__1adfeb",
@@ -3335,7 +3899,11 @@
   "zh": "estar a punto de + 原形动词：正要、差点",
   "level": "B1",
   "formation": "estar 变位 + a punto de + 原形动词",
-  "notes": "表示即将发生；用于过去时可表『差点就……』（Estuve a punto de caerme）。"
+  "notes": "表示即将发生；用于过去时可表『差点就……』（Estuve a punto de caerme）。",
+  "example_en": [
+   "The train is about to leave.",
+   "I was about to fall."
+  ]
  },
  {
   "key": "esm_puedequesubjuntivo__95973c",
@@ -3358,7 +3926,11 @@
   "zh": "puede que + 虚拟式：可能……",
   "level": "B1",
   "formation": "puede que + 虚拟式（无人称，puede 不变）",
-  "notes": "与 es posible que 同义，更口语；也可以说 puede ser que。"
+  "notes": "与 es posible que 同义，更口语；也可以说 puede ser que。",
+  "example_en": [
+   "It may rain this afternoon.",
+   "He may not come."
+  ]
  },
  {
   "key": "esm_menosmalque__3053b2",
@@ -3382,7 +3954,11 @@
   "zh": "menos mal que：还好、幸好",
   "level": "B1",
   "formation": "menos mal que + 陈述式",
-  "notes": "表示对已发生事实的庆幸；单独说 ¡Menos mal! 也可以。"
+  "notes": "表示对已发生事实的庆幸；单独说 ¡Menos mal! 也可以。",
+  "example_en": [
+   "Thank goodness you arrived.",
+   "Just as well there was nobody there."
+  ]
  },
  {
   "key": "esm_esqueexplicación__fa4b44",
@@ -3405,6 +3981,10 @@
   "zh": "es que …：是因为……（解释、辩解）",
   "level": "B1",
   "formation": "es que + 陈述式（常置于句首或作补充说明）",
-  "notes": "口语里用来引出理由或辩解，语气比 porque 更委婉；不能单独回答问题。"
+  "notes": "口语里用来引出理由或辩解，语气比 porque 更委婉；不能单独回答问题。",
+  "example_en": [
+   "I am not going, it is just that I have no time.",
+   "The thing is, nobody told me."
+  ]
  }
 ]

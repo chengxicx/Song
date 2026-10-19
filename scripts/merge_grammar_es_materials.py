@@ -45,6 +45,9 @@ import os
 import re
 import sys
 
+from scripts.grammar_example_glosses import attach as attach_glosses
+from scripts.grammar_example_glosses import load as load_glosses
+
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MATERIALS_DIR = os.path.join(BASE, "scripts", "grammar_materials_es")
 LIBRARY = os.path.join(BASE, "lute", "jlpt_data", "grammar_es.json")
@@ -129,6 +132,7 @@ def validate_row(meta, examples):
 
 def build_rows(materials, taken_keys, taken_names):
     norm_name, handwritten = _handwritten_norms()
+    glosses = load_glosses("es")
     rows, skipped = [], []
     for meta in materials:
         name = (meta.get("name_es") or meta.get("pattern") or "").strip()
@@ -152,22 +156,25 @@ def build_rows(materials, taken_keys, taken_names):
             skipped.append((name, "focus spec never fires on its examples"))
             continue
         rows.append(
-            {
-                "key": key,
-                "name": name,
-                "slug": (meta.get("pattern") or "").strip(),
-                "meaning": (meta.get("meaning_en") or "").strip(),
-                "type": "composite",
-                "examples": examples,
-                "example_zh": [
-                    e.get("chinese", "").strip() for e in raw if e.get("spanish")
-                ],
-                "focus": list(meta.get("focus") or []),
-                "zh": (meta.get("meaning_zh") or "").strip(),
-                "level": meta.get("level") or "B1",
-                "formation": (meta.get("formation") or "").strip(),
-                "notes": (meta.get("notes") or "").strip(),
-            }
+            attach_glosses(
+                {
+                    "key": key,
+                    "name": name,
+                    "slug": (meta.get("pattern") or "").strip(),
+                    "meaning": (meta.get("meaning_en") or "").strip(),
+                    "type": "composite",
+                    "examples": examples,
+                    "example_zh": [
+                        e.get("chinese", "").strip() for e in raw if e.get("spanish")
+                    ],
+                    "focus": list(meta.get("focus") or []),
+                    "zh": (meta.get("meaning_zh") or "").strip(),
+                    "level": meta.get("level") or "B1",
+                    "formation": (meta.get("formation") or "").strip(),
+                    "notes": (meta.get("notes") or "").strip(),
+                },
+                glosses,
+            )
         )
         if ok is None:
             print(f"  ? {name}: spec unvalidated (spaCy missing) -- runtime re-checks")

@@ -1,0 +1,449 @@
+{
+ "a_nari_b_nari": {
+  "examples": [
+   {
+    "chinese": "打电话也好发邮件也好，请联系我。",
+    "english": "Contact me by phone or email, whichever.",
+    "japanese": "電話するなりメールするなり、連絡してください。",
+    "ko": "전화를 하든 메일을 하든 연락해 주세요."
+   }
+  ],
+  "name": "〜なり〜なり"
+ },
+ "a_tsu_b_tsu": {
+  "examples": [
+   {
+    "chinese": "到底要不要说出事实?我在走廊里一边徘徊,一边考虑着这个问题。",
+    "english": "",
+    "japanese": "事実を言おうか言うまいかと、廊下を行きつ戻りつ考えた。",
+    "ko": "사실을 말할까 말까 하며 복도를 오가며 생각했다."
+   },
+   {
+    "chinese": "和客人你一杯我一杯地喝酒。",
+    "english": "",
+    "japanese": "お客さんと勧めつ勧められつで、お酒を飲んだ。",
+    "ko": ""
+   }
+  ],
+  "name": "〜つ〜つ"
+ },
+ "ba_hodo": {
+  "examples": [
+   {
+    "chinese": "日语越学越有意思。",
+    "english": "The more you study Japanese, the more interesting it gets.",
+    "japanese": "日本語は勉強すればするほど面白くなる。",
+    "ko": "일본어는 공부하면 할수록 재미있어진다."
+   },
+   {
+    "chinese": "这本书越读越能理解。",
+    "english": "The more you read this book, the more you understand.",
+    "japanese": "この本は読めば読むほど理解できる。",
+    "ko": ""
+   }
+  ],
+  "name": "〜ば〜ほど"
+ },
+ "de_place_means": {
+  "examples": [
+   {
+    "chinese": "坐公交车去学校。",
+    "english": "I go to school by bus.",
+    "japanese": "バスで学校に行きます。",
+    "ko": "버스로 학교에 갑니다."
+   },
+   {
+    "chinese": "在图书馆学习。",
+    "english": "I study at the library.",
+    "japanese": "図書館で勉強します。",
+    "ko": ""
+   }
+  ],
+  "name": "〜で（place/means）"
+ },
+ "de_wa_arimasen": {
+  "examples": [
+   {
+    "chinese": "这不是笔。",
+    "english": "This is not a pen.",
+    "japanese": "これはペンではありません。",
+    "ko": "이것은 펜이 아닙니다."
+   },
+   {
+    "chinese": "他不是日本人。",
+    "english": "He is not Japanese.",
+    "japanese": "彼は日本人じゃありません。",
+    "ko": ""
+   }
+  ],
+  "name": "〜ではありません"
+ },
+ "deshita": {
+  "examples": [
+   {
+    "chinese": "昨天是星期天。",
+    "english": "Yesterday was Sunday.",
+    "japanese": "昨日は日曜日でした。",
+    "ko": "어제는 일요일이었습니다."
+   },
+   {
+    "chinese": "老师当时身体很好。",
+    "english": "The teacher was well.",
+    "japanese": "先生は元気でした。",
+    "ko": ""
+   }
+  ],
+  "name": "〜でした"
+ },
+ "ga_but": {
+  "examples": [
+   {
+    "chinese": "这本书很难，但很有趣。",
+    "english": "This book is difficult, but it's interesting.",
+    "japanese": "この本は難しいですが、面白いです。",
+    "ko": ""
+   },
+   {
+    "chinese": "有件事我想求您，现在有空吗？",
+    "english": "",
+    "japanese": "ちょっとお願いしたいんですが、今ご都合がよろしいですか。",
+    "ko": "부탁드리고 싶은 게 있는데, 지금 괜찮으세요?"
+   }
+  ],
+  "name": "〜が（but）"
+ },
+ "ga_imasu_arimasu": {
+  "examples": [
+   {
+    "chinese": "桌子上有一本书。",
+    "english": "There is a book on the desk.",
+    "japanese": "机の上に本があります。",
+    "ko": ""
+   },
+   {
+    "chinese": "我从星期一到星期五有课。",
+    "english": "I have school from Monday to Friday.",
+    "japanese": "月曜日から金曜日まで学校があります。",
+    "ko": ""
+   }
+  ],
+  "name": "〜がいます / 〜があります"
+ },
+ "kara_reason": {
+  "examples": [
+   {
+    "chinese": "因为没有时间，所以我要快点。",
+    "english": "Because I don't have time, I'll hurry.",
+    "japanese": "時間がないから、急ぎます。",
+    "ko": "시간이 없으니까 서둘러야겠어요."
+   },
+   {
+    "chinese": "因为很热，请把窗户打开。",
+    "english": "Because it's hot, please open the window.",
+    "japanese": "暑いから、窓を開けてください。",
+    "ko": ""
+   }
+  ],
+  "name": "〜から"
+ },
+ "masen_ka": {
+  "examples": [
+   {
+    "chinese": "要不要一起看电影？",
+    "english": "Would you like to watch a movie together?",
+    "japanese": "一緒に映画を見ませんか。",
+    "ko": "같이 영화를 보지 않을래요?"
+   },
+   {
+    "chinese": "要不要去公园？",
+    "english": "Shall we go to the park?",
+    "japanese": "公園に行きませんか。",
+    "ko": ""
+   }
+  ],
+  "name": "〜ませんか"
+ },
+ "mashou": {
+  "examples": [
+   {
+    "chinese": "我们一起去吧。",
+    "english": "Let's go together.",
+    "japanese": "一緒に行きましょう。",
+    "ko": "같이 갑시다."
+   },
+   {
+    "chinese": "我们休息一下吧。",
+    "english": "Let's take a break.",
+    "japanese": "休みましょう。",
+    "ko": ""
+   }
+  ],
+  "name": "〜ましょう"
+ },
+ "mo_ba_mo": {
+  "examples": [
+   {
+    "chinese": "忙是忙，但也很快乐。",
+    "english": "It is busy, but it is also fun.",
+    "japanese": "忙しくもあれば、楽しくもある。",
+    "ko": "바쁘기도 하지만 즐겁기도 하다."
+   }
+  ],
+  "name": "〜も〜ば〜も"
+ },
+ "nakereba_narimasen": {
+  "examples": [
+   {
+    "chinese": "明天必须早起。",
+    "english": "I have to wake up early tomorrow.",
+    "japanese": "明日、早く起きなければなりません。",
+    "ko": "내일은 일찍 일어나야 합니다."
+   },
+   {
+    "chinese": "我必须在周末前提交报告。",
+    "english": "I have to submit the report by the end of this week.",
+    "japanese": "レポートを今週中に出さなければなりません。",
+    "ko": ""
+   }
+  ],
+  "name": "〜なければなりません / 〜なくてはいけません"
+ },
+ "nakute_mo_ii_desu": {
+  "examples": [
+   {
+    "chinese": "因为是小感冒,所以不是大医院也行,请介绍一家给我。",
+    "english": "",
+    "japanese": "軽い風邪ですから、大きな病院でなくてもいいから、一つ紹介してください。",
+    "ko": "가벼운 감기니까 큰 병원이 아니어도 되니, 한 군데 소개해 주세요."
+   },
+   {
+    "chinese": "明天不带教科书来也行。",
+    "english": "",
+    "japanese": "明日はテキストを持って来なくてもいいです。",
+    "ko": ""
+   }
+  ],
+  "name": "〜なくてもいいです"
+ },
+ "nara_tomo_kaku": {
+  "examples": [
+   {
+    "chinese": "如果要是晚到一些的话倒也罢了,可你连招呼也不打一声就不来上班,真是岂有此理。",
+    "english": "",
+    "japanese": "遅刻ならともかく、無断欠勤などもってのほかだ。",
+    "ko": ""
+   },
+   {
+    "chinese": "如果是程序设计那倒另当别论,连办公自动化软件的操作都不懂也太落伍了吧。",
+    "english": "",
+    "japanese": "プログラムの設計ならともかくとして、ソフトの「OA」もできないとは、時代の流れにずいぶん遅れているね。",
+    "ko": ""
+   }
+  ],
+  "name": "〜ならともかく"
+ },
+ "ni_time_destination": {
+  "examples": [
+   {
+    "chinese": "我给朋友写信。",
+    "english": "I write a letter to my friend.",
+    "japanese": "友だちに手紙を書きます。",
+    "ko": "친구에게 편지를 씁니다."
+   },
+   {
+    "chinese": "我去东京。",
+    "english": "I go to Tokyo.",
+    "japanese": "東京に行きます。",
+    "ko": ""
+   }
+  ],
+  "name": "〜に（time/destination）"
+ },
+ "suki_kirai": {
+  "examples": [
+   {
+    "chinese": "比起咖啡，我更喜欢茶。",
+    "english": "I like tea more than coffee.",
+    "japanese": "コーヒーよりお茶のほうが好きです。",
+    "ko": ""
+   },
+   {
+    "chinese": "A：咖啡和红茶，你喜欢喝哪种？B：我喜欢喝咖啡。",
+    "english": "",
+    "japanese": "A 「コーヒーと紅茶とどちらが好きですか。」 B 「コーヒーのほうが好きです。」",
+    "ko": "A \"커피와 홍차 중 어느 쪽을 좋아합니까?\" B \"커피 쪽을 좋아합니다.\""
+   }
+  ],
+  "name": "〜が好きです / 〜が嫌いです"
+ },
+ "tai": {
+  "examples": [
+   {
+    "chinese": "我想去日本。",
+    "english": "I want to go to Japan.",
+    "japanese": "日本に行きたいです。",
+    "ko": "일본에 가고 싶습니다."
+   },
+   {
+    "chinese": "我想喝水。（简体）",
+    "english": "I want to drink water. (plain)",
+    "japanese": "水が飲みたい。",
+    "ko": ""
+   }
+  ],
+  "name": "〜たい"
+ },
+ "te_iru": {
+  "examples": [
+   {
+    "chinese": "不学习，光顾着玩。",
+    "english": "I was playing instead of studying.",
+    "japanese": "勉強しないで、遊んでいた。",
+    "ko": ""
+   },
+   {
+    "chinese": "因为发生了事故，所以电车停了。",
+    "english": "",
+    "japanese": "事故があったために、電車が止まっている。",
+    "ko": "사고가 일어났기 때문에 전차가 멈춰 있다."
+   }
+  ],
+  "name": "〜ている"
+ },
+ "te_kudasai": {
+  "examples": [
+   {
+    "chinese": "请用日语说。",
+    "english": "Please speak in Japanese.",
+    "japanese": "日本語で話してください。",
+    "ko": ""
+   },
+   {
+    "chinese": "请说慢一点。",
+    "english": "Please speak slowly.",
+    "japanese": "ゆっくり話してください。",
+    "ko": "천천히 말씀해 주세요."
+   }
+  ],
+  "name": "〜てください"
+ },
+ "te_mo_ii_desu": {
+  "examples": [
+   {
+    "chinese": "你不必付钱。（简体）",
+    "english": "You don't have to pay. (plain)",
+    "japanese": "お金を払わなくてもいい。",
+    "ko": ""
+   },
+   {
+    "chinese": "你不必全部吃完。",
+    "english": "You don't have to eat it all.",
+    "japanese": "全部食べなくてもいいですよ。",
+    "ko": ""
+   }
+  ],
+  "name": "〜てもいいです"
+ },
+ "te_wa_ikemasen": {
+  "examples": [
+   {
+    "chinese": "A：我可以拍照片吗？B：这里不可以拍照片。",
+    "english": "",
+    "japanese": "A 「写真を撮ってもいいですか。」 B 「ここでは撮ってはいけません。」",
+    "ko": ""
+   },
+   {
+    "chinese": "这里不可以吸烟。",
+    "english": "You must not smoke here.",
+    "japanese": "ここでタバコを吸ってはいけません。",
+    "ko": "여기서 담배를 피워서는 안 됩니다."
+   }
+  ],
+  "name": "〜てはいけません"
+ },
+ "to_and_with": {
+  "examples": [
+   {
+    "chinese": "我和朋友一起看了电影。",
+    "english": "I watched a movie together with a friend.",
+    "japanese": "友達と一緒に映画を見ました。",
+    "ko": "친구와 함께 영화를 봤습니다."
+   },
+   {
+    "chinese": "我想和家人一起去日本。",
+    "english": "I want to go to Japan together with my family.",
+    "japanese": "家族と一緒に日本へ行きたい。",
+    "ko": ""
+   }
+  ],
+  "name": "〜と（and/with）"
+ },
+ "to_ii_to_ii": {
+  "examples": [
+   {
+    "chinese": "不分昼夜地一直工作。",
+    "english": "Day and night alike, he kept working.",
+    "japanese": "昼といわず夜といわず、働き続けた。",
+    "ko": "낮이란 밤이란 가릴 것 없이 일을 계속했다."
+   },
+   {
+    "chinese": "无论手还是脸，全是泥。",
+    "english": "His hands, his face — everywhere was covered in mud.",
+    "japanese": "手といわず顔といわず、泥だらけだった。",
+    "ko": ""
+   }
+  ],
+  "name": "〜といい〜といい / 〜といわず〜といわず"
+ },
+ "volitional_mai": {
+  "examples": [
+   {
+    "chinese": "去也好不去也好，都由你。",
+    "english": "Whether you go or not, it's up to you.",
+    "japanese": "行こうと行くまいと、あなたの自由だ。",
+    "ko": "가든 가지 않든 너의 자유다."
+   },
+   {
+    "chinese": "下不下雨，我们都要出发。",
+    "english": "Rain or no rain, we're leaving.",
+    "japanese": "雨が降ろうと降るまいと、出発する。",
+    "ko": ""
+   }
+  ],
+  "name": "〜（よ）うが〜まいが / 〜（よ）うと〜まいと"
+ },
+ "volitional_ni_mo_nai": {
+  "examples": [
+   {
+    "chinese": "这是一种想说也说不出口的处境。",
+    "english": "It's a situation where I can't speak even if I wanted to.",
+    "japanese": "言おうにも言えない状況だ。",
+    "ko": "말하자니 말할 수 없는 상황이다."
+   },
+   {
+    "chinese": "因为工作还没有做完，即使想回也不能回。",
+    "english": "",
+    "japanese": "仕事が終わらないから、帰ろうにも帰れない。",
+    "ko": "일이 끝나지 않아서 돌아가자니 돌아갈 수도 없다."
+   }
+  ],
+  "name": "〜ようにも〜ない"
+ },
+ "wo_object": {
+  "examples": [
+   {
+    "chinese": "我读书。",
+    "english": "I read a book.",
+    "japanese": "本を読みます。",
+    "ko": "책을 읽습니다."
+   },
+   {
+    "chinese": "我喝水。",
+    "english": "I drink water.",
+    "japanese": "水を飲みます。",
+    "ko": ""
+   }
+  ],
+  "name": "〜を（object particle）"
+ }
+}

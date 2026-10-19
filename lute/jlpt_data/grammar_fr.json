@@ -22,7 +22,11 @@
   "zh": "越来越……",
   "level": "B1",
   "formation": "de plus en plus + adj / adv / de + nom",
-  "notes": "对比 de moins en moins（越来越少）。后接形容词或副词表示程度递进，接 de + 名词表示数量递进。"
+  "notes": "对比 de moins en moins（越来越少）。后接形容词或副词表示程度递进，接 de + 名词表示数量递进。",
+  "example_en": [
+   "More and more people work from home.",
+   "His French is becoming more and more fluent."
+  ]
  },
  {
   "key": "fgm_afindeinfinitifinorderto__791008",
@@ -43,7 +47,10 @@
   "zh": "为了……（书面语目的）",
   "level": "B2",
   "formation": "afin de + infinitif",
-  "notes": "书面语；口语多用 pour + infinitif。后接从句时用 afin que + 虚拟式。"
+  "notes": "书面语；口语多用 pour + infinitif。后接从句时用 afin que + 虚拟式。",
+  "example_en": [
+   "She works hard in order to succeed."
+  ]
  },
  {
   "key": "fgm_cesontthoseare__845992",
@@ -66,7 +73,11 @@
   "zh": "这些是/那些是（c'est 的复数）",
   "level": "A1",
   "formation": "ce sont + nom pluriel",
-  "notes": "复数指认；口语中常用 c'est 代替（c'est mes parents）。"
+  "notes": "复数指认；口语中常用 c'est 代替（c'est mes parents）。",
+  "example_en": [
+   "These are my parents.",
+   "Whose books are these? They are ours."
+  ]
  },
  {
   "key": "fgm_pendantqueindicatifwhile__abe8c0",
@@ -87,7 +98,10 @@
   "zh": "当……的时候（同时进行）",
   "level": "B1",
   "formation": "pendant que + indicatif",
-  "notes": "两个同时进行的动作；直陈式，不接虚拟式。"
+  "notes": "两个同时进行的动作；直陈式，不接虚拟式。",
+  "example_en": [
+   "He was reading while she was writing."
+  ]
  },
  {
   "key": "fgm_voixpassiveaétéparticipepassépassivevoice__e50d40",
@@ -116,7 +130,13 @@
   "zh": "被动语态（复合过去时）：被……",
   "level": "B1",
   "formation": "sujet + avoir + été + participe passé (+ par + agent)",
-  "notes": "复合过去时的被动式。匹配要求显式代理 par：a été + 形容词/表语（elle a été malade）不是被动，与 avoir/être + 分词 的过去时规则同跨度双报；无代理被动（le film a été tourné）暂不匹配，宁可欠命中。现在时被动（est + 分词）与 être 助动词的复合过去时（il est allé）表面同形，为避免误报不单列。"
+  "notes": "复合过去时的被动式。匹配要求显式代理 par：a été + 形容词/表语（elle a été malade）不是被动，与 avoir/être + 分词 的过去时规则同跨度双报；无代理被动（le film a été tourné）暂不匹配，宁可欠命中。现在时被动（est + 分词）与 être 助动词的复合过去时（il est allé）表面同形，为避免误报不单列。",
+  "example_en": [
+   "The rabies vaccine was discovered by Pasteur.",
+   "The end of the match was whistled by the referee.",
+   "Catherine was invited to dinner by Bernard.",
+   "During the meeting, various points of view were expressed."
+  ]
  },
  {
   "key": "fgm_jusquàcequesubjonctifuntil__e1ed85",
@@ -143,7 +163,12 @@
   "zh": "直到……为止（从句用虚拟式）",
   "level": "B1",
   "formation": "jusqu'à ce que + subjonctif",
-  "notes": "时间连词短语，从句一律用虚拟式。"
+  "notes": "时间连词短语，从句一律用虚拟式。",
+  "example_en": [
+   "Stay in bed until the fever has gone down.",
+   "Caroline, stay here until I come back to get you!",
+   "He decided to stay in exile until the situation changes."
+  ]
  },
  {
   "key": "fgm_troppourtooto__3af9b1",
@@ -169,7 +194,12 @@
   "zh": "太……以至于不能／对……来说太……",
   "level": "A2",
   "formation": "trop + adj / adv + pour + nom / infinitif",
-  "notes": "程度过量：trop 与 pour 之间通常是形容词或副词。"
+  "notes": "程度过量：trop 与 pour 之间通常是形容词或副词。",
+  "example_en": [
+   "He is a baby too fragile to go to nursery.",
+   "These shoes are much too small for me.",
+   "He pointed out that it was too early to leave."
+  ]
  },
  {
   "key": "fgm_chaquechacuneacheveryone__9cd84d",
@@ -193,7 +223,12 @@
   "zh": "每个／各自，人人",
   "level": "A1",
   "formation": "chaque + nom singulier ; chacun (pronom)",
-  "notes": "chaque 是限定词，后接单数名词；chacun 是代词，可单独使用或后接 de + nom。"
+  "notes": "chaque 是限定词，后接单数名词；chacun 是代词，可单独使用或后接 de + nom。",
+  "example_en": [
+   "The train runs every day between the two towns.",
+   "In a championship, every skier wears a helmet.",
+   "Everyone gave their opinion on the project."
+  ]
  },
  {
   "key": "fgm_aufuretàmesureasgradually__06390a",
@@ -219,7 +254,11 @@
   "zh": "随着……；逐步地",
   "level": "B2",
   "formation": "au fur et à mesure de + nom / que + phrase",
-  "notes": "后接名词用 de，后接从句用 que（从句用直陈式）。也作副词短语 au fur et à mesure 单独使用。"
+  "notes": "后接名词用 de，后接从句用 que（从句用直陈式）。也作副词短语 au fur et à mesure 单独使用。",
+  "example_en": [
+   "As time went by, he gradually forgot his pain.",
+   "He progresses lesson by lesson."
+  ]
  },
  {
   "key": "fgm_ilyaduréeago__ac5114",
@@ -247,7 +286,12 @@
   "zh": "……之前（过去的时间距离）",
   "level": "A2",
   "formation": "il y a + durée + (que), 谓语用过去时",
-  "notes": "与表示存在的 il y a（有）同形：后接时间词表示『……之前』。对比 depuis + 现在时（延续至今）。"
+  "notes": "与表示存在的 il y a（有）同形：后接时间词表示『……之前』。对比 depuis + 现在时（延续至今）。",
+  "example_en": [
+   "He left four days ago.",
+   "Ten years ago there were no buildings in that spot.",
+   "Patrick was in Spain with his whole family two months ago."
+  ]
  },
  {
   "key": "fgm_aucunaucunenonone__84bc2a",
@@ -269,7 +313,11 @@
   "zh": "没有任何……／一个也没有",
   "level": "A2",
   "formation": "ne ... aucun(e) + nom singulier ; aucun(e) + de + nom",
-  "notes": "与 ne 连用构成强调否定；作代词时后接 de + 复数名词（aucun de mes amis）。"
+  "notes": "与 ne 连用构成强调否定；作代词时后接 de + 复数名词（aucun de mes amis）。",
+  "example_en": [
+   "I have no friend to ask for advice.",
+   "None of them appealed to me!"
+  ]
  },
  {
   "key": "fgm_peutêtremaybe__0ae9ba",
@@ -291,7 +339,11 @@
   "zh": "也许，可能",
   "level": "A2",
   "formation": "peut-être + phrase ; phrase, peut-être.",
-  "notes": "副词；句首时主谓可倒装（Peut-être viendra-t-il demain）。口语常用 peut-être que + 直陈式。"
+  "notes": "副词；句首时主谓可倒装（Peut-être viendra-t-il demain）。口语常用 peut-être que + 直陈式。",
+  "example_en": [
+   "Maybe it is for sale.",
+   "Maybe he will come tomorrow."
+  ]
  },
  {
   "key": "fgm_cependanttoutefoisnéanmoinshowever__c8c8ec",
@@ -313,7 +365,11 @@
   "zh": "然而，不过（书面语转折）",
   "level": "B2",
   "formation": "phrase, cependant / toutefois / néanmoins + phrase",
-  "notes": "书面语转折连接词，比 mais 正式；可位于句首、句中或句尾。"
+  "notes": "书面语转折连接词，比 mais 正式；可位于句首、句中或句尾。",
+  "example_en": [
+   "The economic situation remains difficult, however progress has been made.",
+   "However, nothing is lost."
+  ]
  },
  {
   "key": "fgm_demêmequejustas__a90998",
@@ -337,7 +393,11 @@
   "zh": "正如……一样",
   "level": "B2",
   "formation": "de même que + phrase, ... ; ... de même que ...",
-  "notes": "比较连词，引出同类情况；呼应的后半句常用 de même 开头。"
+  "notes": "比较连词，引出同类情况；呼应的后半句常用 de même 开头。",
+  "example_en": [
+   "Just as sport keeps the body fit, reading keeps the mind sharp.",
+   "Just like her parents, she loves music."
+  ]
  },
  {
   "key": "fgm_ainsiqueaswellas__c563f4",
@@ -360,7 +420,11 @@
   "zh": "以及；正如",
   "level": "B1",
   "formation": "A ainsi que B (列举) ; ainsi que + phrase (比较)",
-  "notes": "列举时相当于 et aussi（以及）；引出从句时表示方式比较（正如）。"
+  "notes": "列举时相当于 et aussi（以及）；引出从句时表示方式比较（正如）。",
+  "example_en": [
+   "He visited the Louvre as well as the Musée d'Orsay.",
+   "Georges, as well as his whole family, is very musical."
+  ]
  },
  {
   "key": "fgm_pronomsobjetsdirectslelales__8ec342",
@@ -383,7 +447,11 @@
   "zh": "直接宾语代词 le / la / les（代替已提到的名词）",
   "level": "A1",
   "formation": "sujet + le / la / les (+ l' devant voyelle) + verbe conjugué",
-  "notes": "代词放在变位动词前；元音开头缩合成 l'（Je l'ai vu）。复合时态放在助动词前。le / la / les 同时也是冠词，所以本行按「主语代词 + 代词」的相邻形式判定，单看一个 le 判不出来。"
+  "notes": "代词放在变位动词前；元音开头缩合成 l'（Je l'ai vu）。复合时态放在助动词前。le / la / les 同时也是冠词，所以本行按「主语代词 + 代词」的相邻形式判定，单看一个 le 判不出来。",
+  "example_en": [
+   "I do it on purpose.",
+   "He had known Ève for two years when he married her."
+  ]
  },
  {
   "key": "fgm_pronomsobjetsindirectsluileur__80382e",
@@ -406,7 +474,11 @@
   "zh": "间接宾语代词 lui / leur（代替 à + 人）",
   "level": "A1",
   "formation": "sujet + lui / leur + verbe",
-  "notes": "代替 à + 人：à Marie → lui，à mes parents → leur。只用于人和动物；事物用 y（penser à qch → y penser）。"
+  "notes": "代替 à + 人：à Marie → lui，à mes parents → leur。只用于人和动物；事物用 y（penser à qch → y penser）。",
+  "example_en": [
+   "Please say hello to him from me.",
+   "I obey my parents. I obey them."
+  ]
  },
  {
   "key": "fgm_ordredespronomsobjetsleluileleur__1f43da",
@@ -429,7 +501,11 @@
   "zh": "宾语代词顺序：直接宾语在前，间接宾语在后",
   "level": "A2",
   "formation": "le / la / les + lui / leur + verbe",
-  "notes": "两个代词同时出现时顺序固定：me / te / se / nous / vous → le / la / les → lui / leur → y → en。⚠️ le leur 与主有代词 le leur 同形，本行按间接宾语读。"
+  "notes": "两个代词同时出现时顺序固定：me / te / se / nous / vous → le / la / les → lui / leur → y → en。⚠️ le leur 与主有代词 le leur 同形，本行按间接宾语读。",
+  "example_en": [
+   "The shop assistant gives it back to him.",
+   "Someone stole it from him."
+  ]
  },
  {
   "key": "fgm_ordredespronomsobjetsmeletele__38b99d",
@@ -452,7 +528,11 @@
   "zh": "宾语代词顺序：一、二人称在前（me le / te le）",
   "level": "B1",
   "formation": "me / te / se + le / la / les + verbe",
-  "notes": "顺序链的第一位：me / te / se / nous / vous 永远排在最前，然后才是 le / la / les。"
+  "notes": "顺序链的第一位：me / te / se / nous / vous 永远排在最前，然后才是 le / la / les。",
+  "example_en": [
+   "You could have told me earlier.",
+   "She gives it to you."
+  ]
  },
  {
   "key": "fgm_pronomsdisjointsmoitoilui__e93982",
@@ -475,7 +555,11 @@
   "zh": "重读代词（介词后：chez moi, avec lui）",
   "level": "A2",
   "formation": "préposition + moi / toi / lui / elle / nous / vous / eux / elles",
-  "notes": "重读代词用在介词后（chez moi, avec lui, pour elle）、强调和省略回答（— Qui? — Lui.）。与主语代词 je / tu 不同形。"
+  "notes": "重读代词用在介词后（chez moi, avec lui, pour elle）、强调和省略回答（— Qui? — Lui.）。与主语代词 je / tu 不同形。",
+  "example_en": [
+   "I agree with you.",
+   "What would I do without you?"
+  ]
  },
  {
   "key": "fgm_pronomspossessifslemienletien__562340",
@@ -498,7 +582,11 @@
   "zh": "主有代词（le mien / le tien / le sien...）",
   "level": "A2",
   "formation": "le / la / les + mien / tien / sien / nôtre / vôtre (+ leur)",
-  "notes": "性数与被替代的名词一致：le mien / la mienne / les miens。⚠️ 本行只判定 mien / tien / sien / nôtre / vôtre 五种：le leur 与间接宾语代词同形（le leur donner），留空避免误判。"
+  "notes": "性数与被替代的名词一致：le mien / la mienne / les miens。⚠️ 本行只判定 mien / tien / sien / nôtre / vôtre 五种：le leur 与间接宾语代词同形（le leur donner），留空避免误判。",
+  "example_en": [
+   "Our house is smaller than yours.",
+   "My father works at the hospital, and yours?"
+  ]
  },
  {
   "key": "fgm_pronomsdémonstratifsceluicelle__38e625",
@@ -520,7 +608,11 @@
   "zh": "指示代词（celui / celle / ceux / celles）",
   "level": "A2",
   "formation": "celui / celle / ceux / celles + -ci / -là / de / qui / que / dont",
-  "notes": "代替「前面提到的那个」：celui que j'ai acheté（我买的那个）。加 -ci 指近、-là 指远。与指示形容词 ce / cette 区分：后者必须带名词。"
+  "notes": "代替「前面提到的那个」：celui que j'ai acheté（我买的那个）。加 -ci 指近、-là 指远。与指示形容词 ce / cette 区分：后者必须带名词。",
+  "example_en": [
+   "This coffee is worse than the one I bought yesterday.",
+   "That is the one I want."
+  ]
  },
  {
   "key": "fgm_nepersonnenobody__9b4b70",
@@ -544,7 +636,11 @@
   "zh": "否定：ne ... personne（没有人）",
   "level": "A2",
   "formation": "ne + verbe + personne",
-  "notes": "personne 作否定代词时与 ne 呼应，意为「没有人」，位置在动词后（复合时态在助动词后分词前）。作名词时意为「人」，不带否定（une personne）。"
+  "notes": "personne 作否定代词时与 ne 呼应，意为「没有人」，位置在动词后（复合时态在助动词后分词前）。作名词时意为「人」，不带否定（une personne）。",
+  "example_en": [
+   "I know nobody here.",
+   "I saw nobody."
+  ]
  },
  {
   "key": "fgm_neriennothing__e91986",
@@ -568,7 +664,11 @@
   "zh": "否定：ne ... rien（什么也不）",
   "level": "A2",
   "formation": "ne + verbe + rien",
-  "notes": "rien 在复合时态里放在助动词和分词之间（Je n'ai rien vu），不能像 personne 那样放到句末。"
+  "notes": "rien 在复合时态里放在助动词和分词之间（Je n'ai rien vu），不能像 personne 那样放到句末。",
+  "example_en": [
+   "That means nothing.",
+   "I said nothing."
+  ]
  },
  {
   "key": "fgm_neninineithernor__3dd710",
@@ -592,7 +692,11 @@
   "zh": "否定：ne ... ni ... ni（既不……也不……）",
   "level": "B1",
   "formation": "ne + verbe + ni + nom + ni + nom",
-  "notes": "连接两个被否定的成分；不定冠词和部分冠词在 ni 后省略（ni du pain ni du vin → ni pain ni vin）。"
+  "notes": "连接两个被否定的成分；不定冠词和部分冠词在 ni 后省略（ni du pain ni du vin → ni pain ni vin）。",
+  "example_en": [
+   "He likes neither wine nor beer.",
+   "I am neither hungry nor thirsty."
+  ]
  },
  {
   "key": "fgm_nonplusneithernoteither__18de57",
@@ -615,7 +719,11 @@
   "zh": "否定句的「也不」（moi non plus）",
   "level": "B1",
   "formation": "moi / toi / lui / elle / nous / vous / eux / elles + non plus",
-  "notes": "否定句的附和用 non plus，肯定句用 aussi。也可紧跟在句尾：Je ne peux pas le comprendre non plus。"
+  "notes": "否定句的附和用 non plus，肯定句用 aussi。也可紧跟在句尾：Je ne peux pas le comprendre non plus。",
+  "example_en": [
+   "I am not hungry. – Neither am I.",
+   "I cannot understand that either."
+  ]
  },
  {
   "key": "fgm_pronomsrelatifscomposéslequelauquelduquel__bebcf6",
@@ -637,7 +745,11 @@
   "zh": "复合关系代词（lequel / auquel / duquel）",
   "level": "B2",
   "formation": "lequel / laquelle / lesquels / lesquelles；à + lequel → auquel / auxquels / auxquelles；de + lequel → duquel / desquels",
-  "notes": "用于「介词 + 事物」的关系从句，指人时多用 qui（l'homme à qui je parle）。也可作疑问代词：Lequel des deux?"
+  "notes": "用于「介词 + 事物」的关系从句，指人时多用 qui（l'homme à qui je parle）。也可作疑问代词：Lequel des deux?",
+  "example_en": [
+   "The village in which he lives is in Hungary.",
+   "There are two conferences. Which one are you going to attend?"
+  ]
  },
  {
   "key": "fgm_avoirbeauinfinitifhowevermuch__462298",
@@ -660,7 +772,11 @@
   "zh": "avoir beau + 不定式（徒劳、尽管）",
   "level": "B2",
   "formation": "avoir beau + infinitif（avoir 随人称变位，beau 不变）",
-  "notes": "表示「白费力气、尽管」：Il a beau dormir, il est toujours fatigué。后句常用 mais / 却引出相反结果。"
+  "notes": "表示「白费力气、尽管」：Il a beau dormir, il est toujours fatigué。后句常用 mais / 却引出相反结果。",
+  "example_en": [
+   "However much he sleeps, he is always tired.",
+   "However hard she tries, it will be useless."
+  ]
  },
  {
   "key": "fgm_nimportequiquoiquandoùanyoneanything__b04579",
@@ -684,7 +800,11 @@
   "zh": "n'importe + 疑问词（谁/什么/哪里/何时，随便……）",
   "level": "B2",
   "formation": "n'importe + qui / quoi / quand / où / comment / lequel",
-  "notes": "表示「任何一个、随便哪个」：n'importe qui（谁都可以）、n'importe quoi（随便什么，也指「胡说八道」）。"
+  "notes": "表示「任何一个、随便哪个」：n'importe qui（谁都可以）、n'importe quoi（随便什么，也指「胡说八道」）。",
+  "example_en": [
+   "Anyone can do that.",
+   "He would do anything to succeed."
+  ]
  },
  {
   "key": "fgm_êtreentraindeinfinitiftobedoing__f1782c",
@@ -708,7 +828,11 @@
   "zh": "正在做某事（进行体）",
   "level": "A2",
   "formation": "être (conjugué) + en train de + infinitif",
-  "notes": "强调「此刻正在进行」，替代不了普通现在时（Je lis 也可以表示正在读），只在需要突出进行时才用。de 在元音前缩合成 d'（en train d'écrire）。"
+  "notes": "强调「此刻正在进行」，替代不了普通现在时（Je lis 也可以表示正在读），只在需要突出进行时才用。de 在元音前缩合成 d'（en train d'écrire）。",
+  "example_en": [
+   "We were in the middle of eating.",
+   "I am in the middle of writing a letter."
+  ]
  },
  {
   "key": "fgm_quelquechosesomething__3b85ca",
@@ -731,7 +855,11 @@
   "zh": "不定代词「某事、某物」",
   "level": "A2",
   "formation": "quelque chose (de + adjectif masculin)",
-  "notes": "永远写作两个词；后接形容词要用 de（quelque chose de bizarre）。否定句和疑问句中不变成 rien。"
+  "notes": "永远写作两个词；后接形容词要用 de（quelque chose de bizarre）。否定句和疑问句中不变成 rien。",
+  "example_en": [
+   "I have something to tell you.",
+   "Is there something I can do for you?"
+  ]
  },
  {
   "key": "fgm_quelquunsomeone__a838d4",
@@ -754,7 +882,11 @@
   "zh": "不定代词「某人」",
   "level": "A2",
   "formation": "quelqu'un / quelqu'une",
-  "notes": "只指人，阳性单数形式最常用；阴性 quelqu'une 少用。代词式用法 quelqu'un de + 形容词（quelqu'un de gentil）。"
+  "notes": "只指人，阳性单数形式最常用；阴性 quelqu'une 少用。代词式用法 quelqu'un de + 形容词（quelqu'un de gentil）。",
+  "example_en": [
+   "Someone called me.",
+   "Someone came while you were away."
+  ]
  },
  {
   "key": "fgm_toutlemondeeveryone__85a407",
@@ -778,7 +910,11 @@
   "zh": "所有人（谓语用第三人称单数）",
   "level": "A1",
   "formation": "tout le monde + verbe au singulier",
-  "notes": "形式上是单数，动词跟第三人称单数（Tout le monde est parti）。代词回指用 il / elle，不用 ils。"
+  "notes": "形式上是单数，动词跟第三人称单数（Tout le monde est parti）。代词回指用 il / elle，不用 ils。",
+  "example_en": [
+   "Everyone is working.",
+   "It is normal that everyone wants to be happy."
+  ]
  },
  {
   "key": "fgm_laplupartdemostof__f030c7",
@@ -802,7 +938,11 @@
   "zh": "大多数（la plupart de）",
   "level": "B1",
   "formation": "la plupart de + les / des / du + nom",
-  "notes": "后接名词时必须有定冠词或主有形容词（la plupart des gens / de mes amis），不能说 la plupart gens。谓语用复数。"
+  "notes": "后接名词时必须有定冠词或主有形容词（la plupart des gens / de mes amis），不能说 la plupart gens。谓语用复数。",
+  "example_en": [
+   "Most French people take their holidays in July and August.",
+   "Most of the time he walks home."
+  ]
  },
  {
   "key": "fgm_beaucoupdealotof__2e1080",
@@ -825,7 +965,11 @@
   "zh": "数量副词「很多」（beaucoup de）",
   "level": "A1",
   "formation": "beaucoup de + nom（不加冠词）",
-  "notes": "肯定句用 beaucoup de；否定句和疑问句更常用 pas beaucoup de / combien de。与 très 区分：très 修饰形容词副词，beaucoup 修饰动词或名词。"
+  "notes": "肯定句用 beaucoup de；否定句和疑问句更常用 pas beaucoup de / combien de。与 très 区分：très 修饰形容词副词，beaucoup 修饰动词或名词。",
+  "example_en": [
+   "She makes a lot of noise.",
+   "When I travel I always take a lot of clothes."
+  ]
  },
  {
   "key": "fgm_êtresurlepointdeinfinitifaboutto__044b15",
@@ -850,7 +994,11 @@
   "zh": "正要、即将（être sur le point de）",
   "level": "B2",
   "formation": "être (conjugué) + sur le point de + infinitif",
-  "notes": "比 aller + 不定式更强调「这一刻就要发生」，常用于过去时叙述（J'étais sur le point de partir quand...）。"
+  "notes": "比 aller + 不定式更强调「这一刻就要发生」，常用于过去时叙述（J'étais sur le point de partir quand...）。",
+  "example_en": [
+   "He is about to leave.",
+   "I was about to call you when you arrived."
+  ]
  },
  {
   "key": "fgm_parcequebecause__ee1c7f",
@@ -873,7 +1021,11 @@
   "zh": "原因连词「因为」",
   "level": "A1",
   "formation": "parce que + indicatif",
-  "notes": "回答 pourquoi 的标准形式，后接直陈式。元音前缩合成 parce qu'（parce qu'il pleut）。口语里也和 parce que 一起用作省略回答：— Pourquoi? — Parce que."
+  "notes": "回答 pourquoi 的标准形式，后接直陈式。元音前缩合成 parce qu'（parce qu'il pleut）。口语里也和 parce que 一起用作省略回答：— Pourquoi? — Parce que.",
+  "example_en": [
+   "I am staying at home because it is raining.",
+   "She left because she was tired."
+  ]
  },
  {
   "key": "fgm_àcausedebecauseof__7fbfb1",
@@ -897,7 +1049,11 @@
   "zh": "「由于、因为」（后接名词，多指负面原因）",
   "level": "A2",
   "formation": "à cause de + nom",
-  "notes": "后接名词或代词（à cause de moi），不能接从句。多用于不好的原因；正面的功劳用 grâce à。"
+  "notes": "后接名词或代词（à cause de moi），不能接从句。多用于不好的原因；正面的功劳用 grâce à。",
+  "example_en": [
+   "We cannot go to Lyon because of the strike.",
+   "The match was cancelled because of the rain."
+  ]
  },
  {
   "key": "fgm_grâceàthanksto__ec7df8",
@@ -920,7 +1076,11 @@
   "zh": "「多亏、幸亏」（后接名词，多指正面原因）",
   "level": "B1",
   "formation": "grâce à + nom",
-  "notes": "与 à cause de 同一个语法位置，但只用于带来好结果的原因。后接从句用 grâce au fait que。"
+  "notes": "与 à cause de 同一个语法位置，但只用于带来好结果的原因。后接从句用 grâce au fait que。",
+  "example_en": [
+   "Thanks to your help, I managed to find a job.",
+   "Thanks to this treatment, he is much better."
+  ]
  },
  {
   "key": "fgm_aulieudeinsteadof__b64a56",
@@ -944,7 +1104,11 @@
   "zh": "「代替、而不」（au lieu de）",
   "level": "B1",
   "formation": "au lieu de + infinitif / nom",
-  "notes": "两个动作按同一主语对比：Il regarde la télé au lieu de travailler。后接从句用 au lieu que + 虚拟式（少用）。"
+  "notes": "两个动作按同一主语对比：Il regarde la télé au lieu de travailler。后接从句用 au lieu que + 虚拟式（少用）。",
+  "example_en": [
+   "Shall we go out instead of watching television?",
+   "We preferred to go for a walk instead of going to the cinema."
+  ]
  },
  {
   "key": "fgm_malgrédespite__c5b3f1",
@@ -966,7 +1130,11 @@
   "zh": "让步介词「尽管」（malgré + 名词）",
   "level": "B1",
   "formation": "malgré + nom",
-  "notes": "后接名词或代词（malgré lui 不由自主地），不能接从句——从句要用 bien que / quoique + 虚拟式。与 malgré tout（尽管如此）区分。"
+  "notes": "后接名词或代词（malgré lui 不由自主地），不能接从句——从句要用 bien que / quoique + 虚拟式。与 malgré tout（尽管如此）区分。",
+  "example_en": [
+   "We set off despite the snow and the ice.",
+   "He is a man full of humour despite appearances."
+  ]
  },
  {
   "key": "fgm_tandisquewhereas__623630",
@@ -989,7 +1157,11 @@
   "zh": "对比连词「而、然而」",
   "level": "B1",
   "formation": "tandis que + indicatif",
-  "notes": "两件事并列对照，语气比 alors que 更书面。也可以表示同时（tandis qu'il dormait）。"
+  "notes": "两件事并列对照，语气比 alors que 更书面。也可以表示同时（tandis qu'il dormait）。",
+  "example_en": [
+   "She looks young, whereas her friend looks old.",
+   "While I was preparing dinner, he was reading the paper."
+  ]
  },
  {
   "key": "fgm_alorsquewhilewhereas__8c0b11",
@@ -1012,7 +1184,11 @@
   "zh": "「而、却」／「当……的时候」",
   "level": "B1",
   "formation": "alors que + indicatif",
-  "notes": "既表示时间上的同时，也表示对比（常带「却」的意味）。后接事实用直陈式；假设性对比用 alors que + 条件式。"
+  "notes": "既表示时间上的同时，也表示对比（常带「却」的意味）。后接事实用直陈式；假设性对比用 alors que + 条件式。",
+  "example_en": [
+   "While I was asleep, the phone rang.",
+   "He left even though I had advised him against it."
+  ]
  },
  {
   "key": "fgm_avantquesubjonctifbefore__125fb6",
@@ -1035,7 +1211,11 @@
   "zh": "「在……之前」（avant que + 虚拟式）",
   "level": "B1",
   "formation": "avant que + subjonctif（常加赘词 ne）",
-  "notes": "主语不同时用 avant que + 虚拟式；同一主语用 avant de + 不定式（avant de partir）。书面语常在动词前加赘词 ne，不表示否定。"
+  "notes": "主语不同时用 avant que + 虚拟式；同一主语用 avant de + 不定式（avant de partir）。书面语常在动词前加赘词 ne，不表示否定。",
+  "example_en": [
+   "Let us go home before it rains.",
+   "Let me know before the meeting starts."
+  ]
  },
  {
   "key": "fgm_sansquesubjonctifwithout__45884b",
@@ -1058,7 +1238,11 @@
   "zh": "「没有……」（sans que + 虚拟式）",
   "level": "B2",
   "formation": "sans que + subjonctif",
-  "notes": "同一主语用 sans + 不定式（sans le savoir）；主语不同才用 sans que，后接虚拟式，也常加赘词 ne。"
+  "notes": "同一主语用 sans + 不定式（sans le savoir）；主语不同才用 sans que，后接虚拟式，也常加赘词 ne。",
+  "example_en": [
+   "He did it without his wife knowing.",
+   "She walks into the room without anyone noticing."
+  ]
  },
  {
   "key": "fgm_telquesuchas__af50e8",
@@ -1081,7 +1265,11 @@
   "zh": "「像……这样的」（tel que）",
   "level": "B1",
   "formation": "tel / telle / tels / telles + que",
-  "notes": "性数与被修饰的名词一致（les sports tels que...）。也可表示「正如」：tel qu'il est（就像他本来的样子）。"
+  "notes": "性数与被修饰的名词一致（les sports tels que...）。也可表示「正如」：tel qu'il est（就像他本来的样子）。",
+  "example_en": [
+   "I love sports such as golf and tennis.",
+   "He paints the landscape as it is."
+  ]
  },
  {
   "key": "fgm_puisquesinceas__861271",
@@ -1103,7 +1291,11 @@
   "zh": "「既然、既然因为」（puisque）",
   "level": "A2",
   "formation": "puisque / puisqu' + proposition",
-  "notes": "与 parce que 的分工：parce que 提供对方不知道的原因，puisque 的原因在说话人看来是双方共知的，所以常放句首。元音前缩合成 puisqu'（puisqu'il part）。"
+  "notes": "与 parce que 的分工：parce que 提供对方不知道的原因，puisque 的原因在说话人看来是双方共知的，所以常放句首。元音前缩合成 puisqu'（puisqu'il part）。",
+  "example_en": [
+   "There is nothing surprising about them looking alike, since they are cousins.",
+   "I will not be able to attend the lecture, since I will be on holiday."
+  ]
  },
  {
   "key": "fgm_desortequesothatwiththeresultthat__183cad",
@@ -1127,7 +1319,11 @@
   "zh": "「以至于、结果」（de sorte que）",
   "level": "B1",
   "formation": "de sorte que + indicatif（结果）／ + subjonctif（目的）",
-  "notes": "表结果用直陈式：de sorte que les prix sont devenus…；表目的（为了让……）用虚拟式：de sorte qu'il puisse…。"
+  "notes": "表结果用直陈式：de sorte que les prix sont devenus…；表目的（为了让……）用虚拟式：de sorte qu'il puisse…。",
+  "example_en": [
+   "Then the crisis came, so that house prices became affordable again.",
+   "He preferred to take his money out of the bank so that he could invest in property."
+  ]
  },
  {
   "key": "fgm_aucasoùconditionnelincase__e25292",
@@ -1151,7 +1347,11 @@
   "zh": "「万一……的话」（au cas où + 条件式）",
   "level": "B1",
   "formation": "au cas où + conditionnel",
-  "notes": "后面只能跟条件式，不能跟直陈式或虚拟式：au cas où vous auriez perdu…。au cas où 本身已经含「如果」，不要再加 si。"
+  "notes": "后面只能跟条件式，不能跟直陈式或虚拟式：au cas où vous auriez perdu…。au cas où 本身已经含「如果」，不要再加 si。",
+  "example_en": [
+   "In case you have lost your watch, you could borrow mine.",
+   "In case it rains, take an umbrella."
+  ]
  },
  {
   "key": "fgm_pourvuquesubjonctifprovidedthatIdohope__c57d83",
@@ -1174,7 +1374,11 @@
   "zh": "「只要……就好／但愿」（pourvu que + 虚拟式）",
   "level": "B1",
   "formation": "pourvu que + subjonctif",
-  "notes": "两个用法：① 条件「只要」，等于 à condition que；② 感叹愿望「但愿」，常单独成句：Pourvu qu'il fasse beau !"
+  "notes": "两个用法：① 条件「只要」，等于 à condition que；② 感叹愿望「但愿」，常单独成句：Pourvu qu'il fasse beau !",
+  "example_en": [
+   "Let us hope the weather is fine tomorrow!",
+   "Let us hope it lasts!"
+  ]
  },
  {
   "key": "fgm_quelquesoitwhatever__6bc6ef",
@@ -1198,7 +1402,11 @@
   "zh": "「无论……」（quel / quelle que soit）",
   "level": "B2",
   "formation": "quel / quelle / quels / quelles + que + soit / soient",
-  "notes": "quel 与被修饰的名词性数一致，名词可以插在中间：quel que soit le risque、quelles que soient les difficultés。"
+  "notes": "quel 与被修饰的名词性数一致，名词可以插在中间：quel que soit le risque、quelles que soient les difficultés。",
+  "example_en": [
+   "Whatever the difficulty, it has to be overcome.",
+   "Real nicotine addicts do not stop smoking, whatever the health risk."
+  ]
  },
  {
   "key": "fgm_discoursindirectditquereportedstatement__9773f5",
@@ -1221,7 +1429,11 @@
   "zh": "间接引语·陈述：dire que + 从句（时态后移）",
   "level": "B1",
   "formation": "dire que + proposition；主句过去时 ⇒ 从句时态后移",
-  "notes": "直接引语 « Je suis malade » → Il a dit qu'il était malade。注意区分 « c'est plus facile à dire qu'à faire »：那里是 dire + qu'à，不是 dire que。"
+  "notes": "直接引语 « Je suis malade » → Il a dit qu'il était malade。注意区分 « c'est plus facile à dire qu'à faire »：那里是 dire + qu'à，不是 dire que。",
+  "example_en": [
+   "I was told that you were ill.",
+   "You had not told me that you had a brother."
+  ]
  },
  {
   "key": "fgm_discoursindirectdemandersireportedquestion__53cf78",
@@ -1244,7 +1456,11 @@
   "zh": "间接引语·是非问：demander si + 从句",
   "level": "B1",
   "formation": "demander si + proposition",
-  "notes": "直接引语 « Est-ce que tu viendras ? » → Il m'a demandé si je viendrais。原本有疑问词（quand, où, comment）时保留疑问词，不用 si。"
+  "notes": "直接引语 « Est-ce que tu viendras ? » → Il m'a demandé si je viendrais。原本有疑问词（quand, où, comment）时保留疑问词，不用 si。",
+  "example_en": [
+   "They asked me whether I would go to the party.",
+   "I wonder whether I will find a job."
+  ]
  },
  {
   "key": "fgm_discoursindirectdemanderdeinfinitifreportedrequest__172e6f",
@@ -1267,7 +1483,11 @@
   "zh": "间接引语·请求：demander à qqn de + 不定式",
   "level": "B1",
   "formation": "demander à qqn de + infinitif",
-  "notes": "与 dire à qqn de + inf 同型；否定放在不定式前：demander de ne pas faire。间接引语里命令式改写用这一结构。⚠️ 已知边界：demander de l'argent（要钱）这类 de + 冠词不是本结构，表层规则无法区分，会误报。"
+  "notes": "与 dire à qqn de + inf 同型；否定放在不定式前：demander de ne pas faire。间接引语里命令式改写用这一结构。⚠️ 已知边界：demander de l'argent（要钱）这类 de + 冠词不是本结构，表层规则无法区分，会误报。",
+  "example_en": [
+   "He asked me not to be late.",
+   "She asked us not to say anything."
+  ]
  },
  {
   "key": "fgm_àpartirdefromstartingfrom__c88b30",
@@ -1291,7 +1511,11 @@
   "zh": "「从……起」（à partir de）",
   "level": "A2",
   "formation": "à partir de + nom / date",
-  "notes": "时间和空间都能用。与 depuis 的分工：depuis 强调从过去持续到现在，à partir de 只标起点，句子可以是将来时。"
+  "notes": "时间和空间都能用。与 depuis 的分工：depuis 强调从过去持续到现在，à partir de 只标起点，句子可以是将来时。",
+  "example_en": [
+   "The restaurant will be closed from tomorrow.",
+   "The shops are open from nine o'clock."
+  ]
  },
  {
   "key": "fgm_aprèsqueindicatifafter__c3ffa2",
@@ -1314,7 +1538,11 @@
   "zh": "「在……之后」（après que + 直陈式）",
   "level": "B1",
   "formation": "après que + indicatif（书面语也用虚拟式，属争议用法）",
-  "notes": "传统语法要求直陈式，因为从句说的是已发生的事实：après qu'il est rentré。口语和部分书面语会用虚拟式，被视为可接受但有争议。与 avant que 相反——后者必须用虚拟式。"
+  "notes": "传统语法要求直陈式，因为从句说的是已发生的事实：après qu'il est rentré。口语和部分书面语会用虚拟式，被视为可接受但有争议。与 avant que 相反——后者必须用虚拟式。",
+  "example_en": [
+   "We spoke to him after he came home.",
+   "After he has finished his report, he will present it."
+  ]
  },
  {
   "key": "fgm_maintenantquenowthat__00ac2e",
@@ -1335,7 +1563,10 @@
   "zh": "「既然现在……」（maintenant que）",
   "level": "B1",
   "formation": "maintenant que + indicatif",
-  "notes": "表示「现在既然已经……」，从句用直陈式。和 puisque 的区别：maintenant que 强调时间上的转变（以前不是这样）。"
+  "notes": "表示「现在既然已经……」，从句用直陈式。和 puisque 的区别：maintenant que 强调时间上的转变（以前不是这样）。",
+  "example_en": [
+   "Now that she knows the rules, she will not make the mistake again."
+  ]
  },
  {
   "key": "fgm_àforcedeinfinitifbydintof__c14c1f",
@@ -1357,7 +1588,10 @@
   "zh": "「由于反复……、靠着不断地……」（à force de + 不定式）",
   "level": "B1",
   "formation": "à force de + infinitif / nom",
-  "notes": "强调原因的重复或持续：à force de bavarder（聊着聊着）。后接不定式或名词，不接从句。"
+  "notes": "强调原因的重复或持续：à force de bavarder（聊着聊着）。后接不定式或名词，不接从句。",
+  "example_en": [
+   "We chatted so much that we did not notice the time passing."
+  ]
  },
  {
   "key": "fgm_quantàasfor__074468",
@@ -1380,7 +1614,11 @@
   "zh": "「至于……」（quant à）",
   "level": "B1",
   "formation": "quant à / quant aux + nom ou pronom tonique",
-  "notes": "用于转换话题，后接名词或重读代词：quant à moi, quant à lui。与 en ce qui concerne 同义，更书面。"
+  "notes": "用于转换话题，后接名词或重读代词：quant à moi, quant à lui。与 en ce qui concerne 同义，更书面。",
+  "example_en": [
+   "As for me, I think it is a good idea.",
+   "As for the risk of malaria in France, I think it is exaggerated."
+  ]
  },
  {
   "key": "fgm_endépitdeinspiteof__220858",
@@ -1402,7 +1640,10 @@
   "zh": "「尽管、不顾」（en dépit de）",
   "level": "B2",
   "formation": "en dépit de + nom",
-  "notes": "比 malgré 更书面，两者都接名词、都不能接从句。en dépit du bon sens（违背常理）是固定搭配。"
+  "notes": "比 malgré 更书面，两者都接名词、都不能接从句。en dépit du bon sens（违背常理）是固定搭配。",
+  "example_en": [
+   "She acts in defiance of common sense."
+  ]
  },
  {
   "key": "fgm_assezdeenough__1d2714",
@@ -1425,7 +1666,11 @@
   "zh": "「足够的……」（assez de + 名词）",
   "level": "A2",
   "formation": "assez de + nom（不再加冠词）",
-  "notes": "数量副词后直接 de，不加冠词：assez de temps，不是 assez du temps。修饰形容词或动词时不加 de：assez grand、assez vite。"
+  "notes": "数量副词后直接 de，不加冠词：assez de temps，不是 assez du temps。修饰形容词或动词时不加 de：assez grand、assez vite。",
+  "example_en": [
+   "Is there enough room in your car for five people?",
+   "We do not have enough time to paint all four walls of the room."
+  ]
  },
  {
   "key": "fgm_peudelittlefew__5c37cf",
@@ -1448,7 +1693,11 @@
   "zh": "「很少的……」（peu de + 名词）",
   "level": "A2",
   "formation": "peu de + nom（不加冠词）",
-  "notes": "peu de 表示量少，可数不可数都用：peu de monde、peu d'argent。un peu de 表示「一点」，语气正面，注意区分。"
+  "notes": "peu de 表示量少，可数不可数都用：peu de monde、peu d'argent。un peu de 表示「一点」，语气正面，注意区分。",
+  "example_en": [
+   "There were few people.",
+   "We know a little Russian."
+  ]
  },
  {
   "key": "fgm_selonaccordingto__c1b8d1",
@@ -1468,6 +1717,9 @@
   "zh": "「根据……」（selon）",
   "level": "A2",
   "formation": "selon + nom（不加冠词的情况多）",
-  "notes": "引出消息来源：selon la météo、selon moi。与 d'après 同义，selon 更正式。注意 selon que + 从句 是另一个结构。"
+  "notes": "引出消息来源：selon la météo、selon moi。与 d'après 同义，selon 更正式。注意 selon que + 从句 是另一个结构。",
+  "example_en": [
+   "According to the weather forecast, it is going to snow."
+  ]
  }
 ]

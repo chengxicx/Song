@@ -1907,15 +1907,11 @@ _SLOT_SPECS = {
             # of them, so nothing the entry's own examples do is lost.
             {
                 "type": "regex",
-                "re": re.compile(
-                    "(?<!その)(?<!いう)(?<!ような)(?<!の)(?<!んな)ものだ(?!から)"
-                ),
+                "re": re.compile("(?<!その)(?<!いう)(?<!ような)(?<!の)(?<!んな)ものだ(?!から)"),
             },
             {
                 "type": "regex",
-                "re": re.compile(
-                    "(?<!その)(?<!いう)(?<!ような)(?<!の)(?<!んな)ものではない"
-                ),
+                "re": re.compile("(?<!その)(?<!いう)(?<!ような)(?<!の)(?<!んな)ものではない"),
             },
         ],
     ),
@@ -1988,9 +1984,7 @@ _SLOT_SPECS = {
             # so the two-character one sails past it.
             {
                 "type": "regex",
-                "re": re.compile(
-                    r"(?<!よう|おう|たい)(?<!ようか|おうか)(?:と思う|と思い|と思っ|と思わ)"
-                ),
+                "re": re.compile(r"(?<!よう|おう|たい)(?<!ようか|おうか)(?:と思う|と思い|と思っ|と思わ)"),
             },
             # とは思わない / とは思っていない / とは思いませんでした.
             {
@@ -2355,6 +2349,80 @@ _SLOT_SPECS = {
                 "after": [{"lemma": {"ある", "ない", "ぬ"}}],
                 "maxgap": 1,
                 "not_next": {"surface_in": ("で",)},
+            },
+        ],
+    ),
+    # ---- reference-only rows recovered as matchable -----------------------
+    #
+    # These rows describe real constructions but yielded no fragment: their
+    # pattern is "<placeholder> + <short kana>" (〜末, 〜際, 〜折, お〜くだ
+    # さい), and the one-kana floor in _jp_fragments drops the literal.  They
+    # were listed as reference-only, i.e. a reader could browse them but the
+    # reader never flagged them.  Each spec below is reviewed, validated
+    # against the entry's own examples at load time, and deliberately narrow:
+    # the pattern requires the particle or the preceding の/た that makes the
+    # literal distinctive, so 際 is not found inside 実際 and 折 is not found
+    # inside 折り紙.
+    #
+    # The measured share of the corpus' example sentences each one reaches
+    # is 0.1-1.0%, i.e. the same order as the existing reviewed slots.
+    "location-nouns-ue-shita": (
+        "の上・の下・の前…",
+        [
+            {
+                "type": "regex",
+                "re": re.compile(r"の(?:上|下|中|前|後ろ|横|隣|間)(?:に|で|へ)"),
+            }
+        ],
+    ),
+    "aida-ni": (
+        "間（に）",
+        [
+            {"type": "regex", "re": re.compile(r"の間(?:に|は|、)")},
+            {"type": "regex", "re": re.compile(r"(?:ている|ていた)間")},
+        ],
+    ),
+    # The three below take the V-た form, which is voiced (…だ) on voiced
+    # stems: 悩んだ末, 読んだ際, 行った折.  Matching only た silently dropped
+    # half of the real uses.
+    "sue-ni-after": (
+        "末（に）",
+        [{"type": "regex", "re": re.compile(r"(?:[ただ]|の)末(?:に|は|、)")}],
+    ),
+    "sai-ni": (
+        "際（に）",
+        [{"type": "regex", "re": re.compile(r"(?:の|る|[ただ])際(?:に|は|、)")}],
+    ),
+    "ori-ni": (
+        "折（に）",
+        [{"type": "regex", "re": re.compile(r"(?:の|る|[ただ])折(?:に|は|、)")}],
+    ),
+    "o-v-kudasai-polite-honor": (
+        "お…ください",
+        [
+            # Token-based, not a regex over the text: Sudachi keeps the ご of
+            # ご飯 ("rice") fused into the noun, so requiring a *standalone*
+            # お/ご is what keeps ご飯をください ("please give me rice") out
+            # while お待ちください / ご注意ください (お + 待ち + ください) fire.
+            {
+                "type": "anchors",
+                "before": [{"surface_in": ("お", "ご")}],
+                "after": [{"surface": "ください"}],
+                "maxgap": 3,
+            },
+        ],
+    ),
+    "humble-o-suru": (
+        "お…する",
+        [
+            # お + <stem> + し + ます / する.  Anchoring on し + ます as a run
+            # is what separates the humble form (お貸しします) from a plain
+            # sentence that merely opens with お (お茶を飲みます).
+            {
+                "type": "anchors",
+                "before": [{"surface_in": ("お", "ご")}],
+                "after": [{"surface": "し"}, {"surface": "ます"}],
+                "maxgap": 2,
             },
         ],
     ),
@@ -2804,11 +2872,26 @@ def _make_data_rule(
         # sentences here, which is why the /grammar pages showed Japanese
         # with no gloss while the Spanish and Russian ones showed one.
         "examples": [e["japanese"] for e in item.get("examples") or []],
+        # One row per sentence, with the translation for each display
+        # language filled in from wherever the corpus carries it: the
+        # vendored rows have ``english``, the merged material rows have
+        # ``chinese``, and the two enrichment files carry the *other* one
+        # plus Korean for both.  Both are keyed by the Japanese sentence
+        # itself, so a library update that inserts a row can never shift a
+        # translation onto another sentence.
         "example_rows": [
             {
                 "japanese": (e.get("japanese") or "").strip(),
                 "english": (e.get("english") or "").strip(),
-                "chinese": (e.get("chinese") or "").strip(),
+                "chinese": (
+                    (e.get("chinese") or "").strip()
+                    or (enrichment.get("examples") or {}).get(
+                        (e.get("japanese") or "").strip(), ""
+                    )
+                ).strip(),
+                "ko": (ko_enrichment.get("examples") or {})
+                .get((e.get("japanese") or "").strip(), "")
+                .strip(),
             }
             for e in item.get("examples") or []
             if (e.get("japanese") or "").strip()
@@ -3587,6 +3670,46 @@ def analyze_japanese(page_text, display_lang="en"):
 # the panel entries (minus the page-specific match offsets), so the page
 # can reuse the panel's markup and CSS.
 
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_ja_golden.json",
+    )
+)
+
+_golden_lock = threading.Lock()
+_golden_cache = None
+
+
+def _golden_examples():
+    """
+    Curated example sentences for the hand-written rules, keyed by rule key.
+
+    Shape ``key -> [{"japanese", "english", "chinese", "ko"}, ...]``, the
+    same store the tests re-run through each rule.  Built from the
+    curated library rows by ``scripts/generate_grammar_ja_golden.py``, so
+    the sentences are the corpus' own rather than invented here, and the
+    Korean gloss comes from the same per-sentence enrichment table the
+    data rows use.
+    """
+    global _golden_cache  # pylint: disable=global-statement
+    with _golden_lock:
+        if _golden_cache is None:
+            examples = {}
+            if os.path.exists(_GOLDEN_PATH):
+                with open(_GOLDEN_PATH, encoding="utf-8") as fh:
+                    for key, entry in json.load(fh).items():
+                        examples[key] = [
+                            e
+                            for e in entry.get("examples") or []
+                            if (e.get("japanese") or "").strip()
+                        ]
+            _golden_cache = examples
+        return _golden_cache
+
 
 def _example_gloss(row, display_lang):
     """
@@ -3594,10 +3717,10 @@ def _example_gloss(row, display_lang):
 
     The curated data carries English and/or Chinese per sentence, so a
     Chinese panel reads ``chinese`` and an English one reads ``english``.
-    A Korean panel gets the enrichment translation when the row has one
-    (``reference_ko`` holds the gloss of the *reference* sentence, which
-    is the one the panel shows, so it is used as the Korean gloss here);
-    otherwise the gloss stays empty and the template shows no gloss line.
+    A Korean panel reads ``ko``, which ``ko_enrichment.json`` supplies per
+    sentence (``reference_ko`` holds the gloss of the *reference* sentence
+    only, so it is not enough here).  Any of the three stays empty and the
+    template shows no gloss line rather than the wrong language.
 
     A missing translation is never back-filled from the other language:
     an English gloss under a Chinese heading is worse than none.
@@ -3609,28 +3732,35 @@ def _example_gloss(row, display_lang):
     return (row.get("english") or "").strip()
 
 
-def _example_rows(rule, display_lang):
+def _example_rows(rule, display_lang, examples=None):
     """
     The rule's examples as display rows.
 
-    Data rows ship ``example_rows`` (japanese + english + chinese), so
-    they come back as ``{"text", "tr"}``.  The hand-written basics carry
-    bare sentences with no translation anywhere, so they stay plain
-    strings -- the template renders that shape too.
+    ``examples`` overrides what the rule itself carries: the hand-written
+    basics take their sentences from the golden set, the data rows ship
+    ``example_rows`` (japanese + english + chinese + ko).  Either way a row
+    comes back as ``{"text", "tr"}`` where a translation exists for the
+    display language and as a plain string where it does not -- the
+    template renders both shapes.
     """
+    if examples is None:
+        examples = rule.get("example_rows") or rule.get("examples") or []
     rows = []
-    for row in rule.get("example_rows") or []:
-        text = (row.get("japanese") or "").strip()
-        if not text:
-            continue
-        tr = _example_gloss(row, display_lang)
-        rows.append({"text": text, "tr": tr} if tr else text)
-    if rows:
-        return rows
-    return [s for s in rule.get("examples") or [] if s]
+    for row in examples:
+        if isinstance(row, dict):
+            text = (row.get("japanese") or "").strip()
+            if not text:
+                continue
+            tr = _example_gloss(row, display_lang)
+            rows.append({"text": text, "tr": tr} if tr else text)
+        else:
+            text = (row or "").strip()
+            if text:
+                rows.append(text)
+    return rows
 
 
-def _library_entry(rule, display_lang):
+def _library_entry(rule, display_lang, examples=None):
     """
     One curated rule as a library row, display-ready.
 
@@ -3640,10 +3770,10 @@ def _library_entry(rule, display_lang):
     hiding it.
 
     ``examples`` comes back as ``{"text", "tr"}`` rows where the corpus
-    carries a translation, and as a plain string where it does not (the
-    hand-written basics, and the rows the enrichment files never covered).
-    The template renders both shapes, so a missing gloss simply shows no
-    gloss line rather than an empty one.  The library has no page text to
+    carries a translation for the display language, and as a plain string
+    where it does not (the rows the enrichment files never covered).  The
+    template renders both shapes, so a missing gloss simply shows no gloss
+    line rather than an empty one.  The library has no page text to
     highlight, so the match offsets the panel computes are irrelevant here.
     """
     entry = {
@@ -3651,7 +3781,7 @@ def _library_entry(rule, display_lang):
         "name": rule["pattern"],
         "level": rule["level"],
         "desc": _desc(rule, display_lang),
-        "examples": _example_rows(rule, display_lang),
+        "examples": _example_rows(rule, display_lang, examples),
         "skipped": bool(rule.get("skipped")),
     }
     formation = _enrichment(rule, "formation", display_lang)
@@ -3685,9 +3815,20 @@ def library_entries(display_lang="en"):
     no Japanese books does not pay for the Sudachi dictionary.  Within a
     level the hand-written basics come first: they are listed before the
     curated rows in the source order, and the sort is stable.
+
+    The hand-written basics take their example sentences from the golden
+    set (``grammar_ja_golden.json``); the curated rows carry their own.
     """
-    rules = _N5_RULES + _CONSTRUCTION_RULES + _get_data_rules()
-    entries = [_library_entry(rule, display_lang) for rule in rules]
+    golden = _golden_examples()
+    rules = [
+        (rule, golden.get(rule["key"]) or rule.get("examples") or [])
+        for rule in _N5_RULES + _CONSTRUCTION_RULES
+    ]
+    rules += [
+        (rule, rule.get("example_rows") or rule.get("examples") or [])
+        for rule in _get_data_rules()
+    ]
+    entries = [_library_entry(rule, display_lang, examples) for rule, examples in rules]
     ordered = sorted(
         enumerate(entries),
         key=lambda pair: (_LEVEL_RANK.get(pair[1]["level"], 9), pair[0]),

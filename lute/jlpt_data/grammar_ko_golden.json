@@ -1,0 +1,206 @@
+{
+ "ko_aeo_juda": {
+  "examples": [
+   {
+    "en": "Please open the door for me.",
+    "ko": "",
+    "text": "문을 좀 열어 주세요.",
+    "zh": "请帮我开一下门。"
+   },
+   {
+    "en": "The teacher corrected my pronunciation for me.",
+    "ko": "",
+    "text": "선생님이 발음을 고쳐 주셨어요.",
+    "zh": "老师帮我纠正了发音。"
+   }
+  ],
+  "name": "-아/어 주다"
+ },
+ "ko_aeo_seo": {
+  "examples": [
+   {
+    "en": "It was raining, so I bought an umbrella.",
+    "ko": "",
+    "text": "비가 와서 우산을 샀어요.",
+    "zh": "因为下雨，所以买了伞。"
+   },
+   {
+    "en": "I was so tired that I went to bed early.",
+    "ko": "",
+    "text": "너무 피곤해서 일찍 잤어요.",
+    "zh": "太累了，所以早睡了。"
+   }
+  ],
+  "name": "-아/어서"
+ },
+ "ko_copula_polite": {
+  "examples": [
+   {
+    "en": "I am a student.",
+    "ko": "",
+    "text": "저는 학생이에요.",
+    "zh": "我是学生。"
+   },
+   {
+    "en": "This is my book.",
+    "ko": "",
+    "text": "이것은 제 책입니다.",
+    "zh": "这是我的书。"
+   }
+  ],
+  "name": "-입니다 / -이에요"
+ },
+ "ko_eumyon": {
+  "examples": [
+   {
+    "en": "If it rains, I will stay at home.",
+    "ko": "",
+    "text": "비가 오면 집에 있을 거예요.",
+    "zh": "如果下雨，我就待在家。"
+   },
+   {
+    "en": "If you have time, shall we have coffee together?",
+    "ko": "",
+    "text": "시간이 있으면 같이 커피를 마실까요?",
+    "zh": "如果有时间，一起喝杯咖啡好吗？"
+   }
+  ],
+  "name": "-(으)면"
+ },
+ "ko_eunikka": {
+  "examples": [
+   {
+    "en": "Since it is raining, take an umbrella.",
+    "ko": "",
+    "text": "비가 오니까 우산을 가져가세요.",
+    "zh": "因为在下雨，带把伞吧。"
+   },
+   {
+    "en": "You have an exam tomorrow, so go to bed early today.",
+    "ko": "",
+    "text": "내일 시험이 있으니까 오늘은 일찍 자세요.",
+    "zh": "明天有考试，今天早点睡吧。"
+   }
+  ],
+  "name": "-(으)니까"
+ },
+ "ko_geo_future": {
+  "examples": [
+   {
+    "en": "I am going to Busan tomorrow.",
+    "ko": "",
+    "text": "저는 내일 부산에 갈 거예요.",
+    "zh": "我明天要去釜山。"
+   },
+   {
+    "en": "I will rest at home this weekend.",
+    "ko": "",
+    "text": "주말에는 집에서 쉴 거예요.",
+    "zh": "周末我要在家休息。"
+   }
+  ],
+  "name": "-(으)ㄹ 거예요"
+ },
+ "ko_gi_jeone": {
+  "examples": [
+   {
+    "en": "Wash your hands before eating.",
+    "ko": "",
+    "text": "밥을 먹기 전에 손을 씻으세요.",
+    "zh": "吃饭前先洗手。"
+   },
+   {
+    "en": "I learned Korean before coming to Korea.",
+    "ko": "",
+    "text": "한국에 오기 전에 한국어를 배웠어요.",
+    "zh": "来韩国之前学了韩语。"
+   }
+  ],
+  "name": "-기 전에"
+ },
+ "ko_go_issda": {
+  "examples": [
+   {
+    "en": "It is raining right now.",
+    "ko": "",
+    "text": "지금 비가 오고 있어요.",
+    "zh": "现在正在下雨。"
+   },
+   {
+    "en": "My younger sibling is doing homework in the room.",
+    "ko": "",
+    "text": "동생은 방에서 숙제를 하고 있어요.",
+    "zh": "弟弟正在房间里做作业。"
+   }
+  ],
+  "name": "-고 있다"
+ },
+ "ko_go_sipda": {
+  "examples": [
+   {
+    "en": "I want to go to Korea.",
+    "ko": "",
+    "text": "저는 한국에 가고 싶어요.",
+    "zh": "我想去韩国。"
+   },
+   {
+    "en": "What do you want to eat?",
+    "ko": "",
+    "text": "무엇을 먹고 싶어요?",
+    "zh": "你想吃什么？"
+   }
+  ],
+  "name": "-고 싶다"
+ },
+ "ko_ji_anhda": {
+  "examples": [
+   {
+    "en": "It is not cold today.",
+    "ko": "",
+    "text": "오늘은 춥지 않아요.",
+    "zh": "今天不冷。"
+   },
+   {
+    "en": "That person does not drink.",
+    "ko": "",
+    "text": "그 사람은 술을 마시지 않습니다.",
+    "zh": "那个人不喝酒。"
+   }
+  ],
+  "name": "-지 않다"
+ },
+ "ko_jung_ida": {
+  "examples": [
+   {
+    "en": "I am in a meeting right now.",
+    "ko": "",
+    "text": "지금 회의 중입니다.",
+    "zh": "现在正在开会。"
+   },
+   {
+    "en": "I am in the middle of reading a book.",
+    "ko": "",
+    "text": "책을 읽는 중이에요.",
+    "zh": "正在看书。"
+   }
+  ],
+  "name": "-는 중이다"
+ },
+ "ko_su_issda": {
+  "examples": [
+   {
+    "en": "I can speak a little Korean.",
+    "ko": "",
+    "text": "저는 한국어를 조금 말할 수 있어요.",
+    "zh": "我会说一点韩语。"
+   },
+   {
+    "en": "I have no time today, so I cannot go.",
+    "ko": "",
+    "text": "오늘은 시간이 없어서 갈 수 없어요.",
+    "zh": "今天没时间，去不了。"
+   }
+  ],
+  "name": "-(으)ㄹ 수 있다/없다"
+ }
+}
