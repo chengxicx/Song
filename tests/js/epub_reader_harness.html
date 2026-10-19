@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>EPUB reader harness</title>
+<style>
+  body { margin: 0; padding: 20px; font-family: serif; }
+  #thetext { padding: 0 3.4rem 1.5rem; }
+</style>
+</head>
+<body>
+
+<div id="thetext">
+<div id="epub-chapter"><div class="epub-body">
+  <h2>Chapter</h2>
+  <p>Hello <em>world</em>, again.</p>
+  <p>第二段落です。</p>
+  <p>See <em>Hel</em>lo there.</p>
+  <p>One. Two.</p>
+</div></div>
+</div>
+
+<!-- The token stream, exactly as read/epub_page.html embeds it:
+     [display_text, wo_id, status, sentence, paragraph].  Whitespace
+     tokens are present but carry no characters to match; the "Hello"
+     in "See Hel|lo there." is one token that has to be cut into two
+     spans. -->
+<script type="application/json" id="lute-epub-tokens">[
+["Chapter",101,0,0,0],
+["Hello",102,0,0,1],[" ",0,-1,0,1],["world",103,0,0,1],[",",0,-1,0,1],[" ",0,-1,0,1],["again",104,0,0,1],[".",0,-1,0,1],
+["第二段落",105,0,1,2],["です",106,0,1,2],["。",0,-1,1,2],
+["See",107,0,2,3],[" ",0,-1,2,3],["Hello",108,0,2,3],[" ",0,-1,2,3],["there",109,0,2,3],[".",0,-1,2,3],
+["One",110,0,3,4],[".",0,-1,3,4],[" ",0,-1,3,4],["Two",111,0,4,4],[".",0,-1,4,4]
+]</script>
+
+<script src="../../lute/static/js/lute-epub-reader.js"></script>
+<script>
+  window.__originalText = document.getElementById("epub-chapter").textContent;
+  window.__chapterInner = document.getElementById("epub-chapter").innerHTML;
+
+  window.EpubReader.mount(document.getElementById("epub-chapter"));
+
+  // A token stream that does not match the markup must leave the
+  // chapter readable and untouched (see the mismatch branch in
+  // lute-epub-reader.js).  Returns the reported mismatch offset.
+  window.__runMismatch = function () {
+    var host = document.createElement("div");
+    host.id = "mismatch-chapter";
+    host.innerHTML = window.__chapterInner;
+    document.body.appendChild(host);
+
+    var data = document.getElementById("lute-epub-tokens");
+    var saved = data.textContent;
+    data.textContent = JSON.stringify([
+      ["Chapter", 101, 0, 0, 0],
+      ["Nope", 0, -1, 0, 1]
+    ]);
+    window.EpubReader.mount(host);
+    data.textContent = saved;
+
+    return {
+      offset: host.getAttribute("data-epub-mismatch"),
+      spans: host.querySelectorAll("span.textitem").length,
+      textIntact: host.textContent === window.__originalText,
+    };
+  };
+</script>
+
+</body>
+</html>

@@ -75,12 +75,16 @@ def _flattened_text(el):
 
 
 class EpubChapter:
-    "One chapter: 0-based position, its title, and its text."
+    "One chapter: 0-based position, its title, its text, and its zip path."
 
-    def __init__(self, index, title, text):
+    def __init__(self, index, title, text, path=None):
         self.index = index
         self.title = title
         self.text = text
+        # Zip-root-relative path of the chapter's content document, e.g.
+        # "OEBPS/text/chapter01.xhtml".  Used by the reader-mode import
+        # to write the chapter's markup next to its (rewritten) assets.
+        self.path = path
 
 
 class EpubBookData:
@@ -306,7 +310,7 @@ def _chapters(
             continue
         frag = (item["href"] or "").partition("#")[2]
         title = _chapter_title(soup, zip_path, frag, toc_map, len(chapters))
-        chapters.append(EpubChapter(len(chapters), title, text))
+        chapters.append(EpubChapter(len(chapters), title, text, zip_path))
     return chapters
 
 

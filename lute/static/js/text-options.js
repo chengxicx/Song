@@ -45,6 +45,22 @@ function incrementFontSize(delta) {
     localStorage.setItem(GF_KEY, newGfs);
     return;
   }
+  // Reader-mode EPUB chapters bring their own typography, and the
+  // whitespace between tokens has no span of its own: stamping a size
+  // on every span would leave the gaps at the container's size.  Scale
+  // the whole chapter container instead, which also keeps the book's
+  // relative sizes (headings, footnotes) intact.
+  const epubBody = theText ? theText.querySelector(".epub-body") : null;
+  if (epubBody) {
+    const s = window.getComputedStyle(epubBody);
+    const fontDefault = parseFloat(s.fontSize);
+    const fontSize = getFromLocalStorage("fontSize", fontDefault);
+    const newSize = clamp(fontSize + delta, 1, 50);
+    epubBody.style.fontSize = `${convertPixelsToRem(newSize)}rem`;
+    localStorage.setItem("fontSize", newSize);
+    return;
+  }
+
   // Manga text items size themselves with container-query units (cqw)
   // against the page image; the reading-pane font controls must not
   // override those, so exclude any item inside a manga block.  PDF page
@@ -139,6 +155,13 @@ function setColumnCount(num) {
   // multicol container.
   if (theText && (theText.classList.contains("manga-text-container")
                || theText.classList.contains("pdf-text-container"))) {
+    theText.style.columnCount = "auto";
+    return;
+  }
+  // Reader-mode EPUB chapters scroll continuously: multicol would
+  // fragment the chapter into columns inside a scrolling pane and the
+  // book's own layout already decides how the text flows.
+  if (theText && theText.classList.contains("epub-text-container")) {
     theText.style.columnCount = "auto";
     return;
   }

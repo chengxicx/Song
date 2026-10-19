@@ -102,6 +102,12 @@ class Book:  # pylint: disable=too-many-instance-attributes
         self.pdf_path = None
         self.pdf_page_count = None
 
+        # EPUB reader-mode fields.
+        # epub_path is the relative path under the static folder of the
+        # chapter's reader-ready HTML, e.g. "epub/<uuid>/ch/003.html".
+        # Reader-mode books hold the whole chapter as a single page.
+        self.epub_path = None
+
         self.threshold_page_tokens = 250
         self.split_by = "paragraphs"
 
@@ -303,6 +309,15 @@ class Repository:
                 b = DBBook(book.title, lang)
                 for index in range(page_count):
                     _ = DBText(b, "", index + 1)
+            elif book.book_type == "epub":
+                # Reader-mode EPUB books are one chapter each: the whole
+                # chapter is a single page that scrolls continuously, so
+                # progress is recorded per chapter (per book) instead of
+                # per 250-token page.  The page text is still the parsed
+                # chapter text -- word counts, stats, search and the
+                # grammar panel all read it.
+                b = DBBook(book.title, lang)
+                _ = DBText(b, (book.text or "").strip(), 1)
             else:
                 pages = self._split_pages(book, lang)
                 b = DBBook(book.title, lang)
@@ -346,6 +361,7 @@ class Repository:
         b.manga_path = book.manga_path
         b.manga_data = book.manga_data
         b.pdf_path = book.pdf_path
+        b.epub_path = book.epub_path
 
         btr = BookTagRepository(self.session)
         booktags = []
@@ -380,5 +396,6 @@ class Repository:
         b.manga_path = dbbook.manga_path
         b.manga_data = dbbook.manga_data
         b.pdf_path = dbbook.pdf_path
+        b.epub_path = dbbook.epub_path
         b.book_tags = [t.text for t in dbbook.book_tags]
         return b
