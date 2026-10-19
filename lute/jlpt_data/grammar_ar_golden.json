@@ -3,7 +3,8 @@
   "examples": [
    {
     "arabic": "هل أنت هنا؟",
-    "zh": "你在这儿吗？"
+    "zh": "你在这儿吗？",
+    "en": "Are you here?"
    }
   ]
  },
@@ -11,7 +12,8 @@
   "examples": [
    {
     "arabic": "وضعت الكتاب عليها.",
-    "zh": "我把书放在它上面。"
+    "zh": "我把书放在它上面。",
+    "en": "I put the book on it."
    }
   ]
  },
@@ -19,7 +21,8 @@
   "examples": [
    {
     "arabic": "هذا الكتاب جديد.",
-    "zh": "这本书是新的。"
+    "zh": "这本书是新的。",
+    "en": "This book is new."
    }
   ]
  },
@@ -27,7 +30,8 @@
   "examples": [
    {
     "arabic": "لا أعرف.",
-    "zh": "我不知道。"
+    "zh": "我不知道。",
+    "en": "I do not know."
    }
   ]
  },
@@ -35,7 +39,8 @@
   "examples": [
    {
     "arabic": "كان الجو جميلاً.",
-    "zh": "天气很好。"
+    "zh": "天气很好。",
+    "en": "The weather was lovely."
    }
   ]
  },
@@ -43,7 +48,8 @@
   "examples": [
    {
     "arabic": "أنا طالب.",
-    "zh": "我是学生。"
+    "zh": "我是学生。",
+    "en": "I am a student."
    }
   ]
  },
@@ -51,7 +57,8 @@
   "examples": [
    {
     "arabic": "أردت الذهاب لكنه كان مشغولاً.",
-    "zh": "我想去，但他很忙。"
+    "zh": "我想去，但他很忙。",
+    "en": "I wanted to go, but he was busy."
    }
   ]
  },
@@ -59,7 +66,8 @@
   "examples": [
    {
     "arabic": "بقيت في البيت لأن المطر كان غزيراً.",
-    "zh": "我留在家里，因为雨很大。"
+    "zh": "我留在家里，因为雨很大。",
+    "en": "I stayed at home because the rain was heavy."
    }
   ]
  },
@@ -67,7 +75,8 @@
   "examples": [
    {
     "arabic": "عندما وصلنا بدأ الحفل.",
-    "zh": "我们到达时，晚会开始了。"
+    "zh": "我们到达时，晚会开始了。",
+    "en": "When we arrived, the party began."
    }
   ]
  },
@@ -75,7 +84,8 @@
   "examples": [
    {
     "arabic": "سوف أذهب إلى السوق.",
-    "zh": "我将去市场。"
+    "zh": "我将去市场。",
+    "en": "I will go to the market."
    }
   ]
  },
@@ -83,7 +93,8 @@
   "examples": [
    {
     "arabic": "جاء علي أيضاً.",
-    "zh": "阿里也来了。"
+    "zh": "阿里也来了。",
+    "en": "Ali came too."
    }
   ]
  },
@@ -91,7 +102,8 @@
   "examples": [
    {
     "arabic": "كل الطلاب حاضرون.",
-    "zh": "所有学生都到了。"
+    "zh": "所有学生都到了。",
+    "en": "All the students are present."
    }
   ]
  },
@@ -99,7 +111,8 @@
   "examples": [
    {
     "arabic": "قال إنه سيأتي.",
-    "zh": "他说他会来。"
+    "zh": "他说他会来。",
+    "en": "He said that he would come."
    }
   ]
  },
@@ -107,7 +120,8 @@
   "examples": [
    {
     "arabic": "لو كان عندي وقت، سافرت.",
-    "zh": "如果我有时间，我就去了。"
+    "zh": "如果我有时间，我就去了。",
+    "en": "If I had had time, I would have travelled."
    }
   ]
  },
@@ -115,7 +129,8 @@
   "examples": [
    {
     "arabic": "لم يذهب.",
-    "zh": "他没去。"
+    "zh": "他没去。",
+    "en": "He did not go."
    }
   ]
  },
@@ -123,7 +138,8 @@
   "examples": [
    {
     "arabic": "الرجل الذي رأيته هناك.",
-    "zh": "我在那里见到的那个男人。"
+    "zh": "我在那里见到的那个男人。",
+    "en": "The man whom I saw there."
    }
   ]
  },
@@ -131,7 +147,8 @@
   "examples": [
    {
     "arabic": "قد انتهى العمل.",
-    "zh": "工作已经结束了。"
+    "zh": "工作已经结束了。",
+    "en": "The work has already finished."
    }
   ]
  },
@@ -139,7 +156,8 @@
   "examples": [
    {
     "arabic": "كتابها على الطاولة.",
-    "zh": "她的书在桌上。"
+    "zh": "她的书在桌上。",
+    "en": "Her book is on the table."
    }
   ]
  },
@@ -147,7 +165,8 @@
   "examples": [
    {
     "arabic": "هذا بيتهم.",
-    "zh": "这是他们的家。"
+    "zh": "这是他们的家。",
+    "en": "This is their house."
    }
   ]
  },
@@ -155,7 +174,8 @@
   "examples": [
    {
     "arabic": "انتظر حتى جاء.",
-    "zh": "他一直等到他来。"
+    "zh": "他一直等到他来。",
+    "en": "He waited until he came."
    }
   ]
  },
@@ -163,7 +183,8 @@
   "examples": [
    {
     "arabic": "ليس صعباً.",
-    "zh": "不难。"
+    "zh": "不难。",
+    "en": "It is not difficult."
    }
   ]
  },
@@ -171,7 +192,8 @@
   "examples": [
    {
     "arabic": "ليت عندي وقتاً.",
-    "zh": "但愿我有时间。"
+    "zh": "但愿我有时间。",
+    "en": "If only I had time."
    }
   ]
  },
@@ -179,7 +201,8 @@
   "examples": [
    {
     "arabic": "كلما كبر تحسن.",
-    "zh": "他越长大越优秀。"
+    "zh": "他越长大越优秀。",
+    "en": "The older he grows, the better he becomes."
    }
   ]
  },
@@ -187,7 +210,8 @@
   "examples": [
    {
     "arabic": "لم يكن هناك أحد.",
-    "zh": "那里没有一个人。"
+    "zh": "那里没有一个人。",
+    "en": "There was no one there."
    }
   ]
  }

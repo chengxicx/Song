@@ -462,16 +462,18 @@ def _get_corpus_rules():
             foci = [f for f in item.get("focus") or () if f]
             if not foci or item["key"] in _HAND_KEYS:
                 continue
-            rules.append(
-                make_rule(
-                    item["key"],
-                    item["name"],
-                    item["level"],
-                    item.get("en") or item["name"],
-                    _corpus_match(foci),
-                    zh=item.get("zh"),
-                )
+            rule = make_rule(
+                item["key"],
+                item["name"],
+                item["level"],
+                item.get("en") or item["name"],
+                _corpus_match(foci),
+                zh=item.get("zh"),
             )
+            reference = _first_reference(item.get("examples") or ())
+            if reference:
+                rule["reference"] = reference
+            rules.append(rule)
         _CORPUS_RULES = rules
     return _CORPUS_RULES
 
@@ -484,6 +486,74 @@ def _matchable(item):
     if item.get("focus"):
         return True
     return any(f in _HAND_SURFACES for f in item.get("focus_all") or ())
+
+
+# ---- panel reference block ---------------------------------------------
+#
+# The panel's own examples are the page's sentences, which carry no
+# translation, so each card folds out one curated example with its gloss.
+# Thai needs no second translation store for this: the corpus already
+# writes every example as "thai · romanisation — english ／ 中文", so the
+# reference block is a parse of the line, not new prose.
+
+
+def _reference_from_line(line):
+    """
+    One corpus example line as the panel's ``{sentence, en, zh}`` block.
+
+    Returns None for a line with nothing before the romanisation -- an
+    empty sentence would render an empty block.
+    """
+    head, _, zh = line.partition(_GLOSS_SEP)
+    thai, _, tail = head.partition(" · ")
+    _, _, en = tail.partition(" — ")
+    sentence = thai.strip()
+    if not sentence:
+        return None
+    reference = {"sentence": sentence}
+    if en.strip():
+        reference["en"] = en.strip()
+    if zh.strip():
+        reference["zh"] = zh.strip()
+    return reference
+
+
+def _first_reference(lines):
+    "The first line that parses, as a reference block."
+    for line in lines:
+        reference = _reference_from_line(line)
+        if reference:
+            return reference
+    return None
+
+
+_HAND_RULES = None
+
+
+def _hand_rules():
+    """
+    The hand-written rules, each with its golden example as the panel's
+    reference block.
+
+    Built once, on copies: the module-level rule list stays exactly as
+    written (the library export and the tests read it directly).
+    """
+    global _HAND_RULES  # pylint: disable=global-statement
+    if _HAND_RULES is None:
+        golden = _golden_examples()
+        rules = []
+        for rule in _TH_RULES:
+            rows = [row for row in golden.get(rule["key"]) or [] if row.get("text")]
+            if rows:
+                reference = {"sentence": rows[0]["text"].strip()}
+                for field in ("en", "zh", "ko"):
+                    value = (rows[0].get(field) or "").strip()
+                    if value:
+                        reference[field] = value
+                rule = dict(rule, reference=reference)
+            rules.append(rule)
+        _HAND_RULES = rules
+    return _HAND_RULES
 
 
 # ---- library export ----------------------------------------------------
@@ -645,5 +715,5 @@ def analyze_thai(page_text, display_lang="en"):
     Returns a list of dicts:
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
-    rules = _TH_RULES + _get_corpus_rules()
+    rules = _hand_rules() + _get_corpus_rules()
     return analyze_tokens(page_text, rules, _tokens_for, display_lang)

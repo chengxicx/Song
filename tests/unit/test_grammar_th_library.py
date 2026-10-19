@@ -167,3 +167,49 @@ def test_a_short_sentence_stays_readable():
         "ผมไม่ไปทำงานเพราะฝนตกหนัก ฉันกำลังอ่านหนังสือที่ซื้อไว้เมื่อวานนี้", "en"
     )
     assert 3 <= len(cards) <= 15, [c["key"] for c in cards]
+
+
+# ---- panel reference block ---------------------------------------------
+#
+# The panel's examples are the page's own sentences, so the translation a
+# reader sees comes from the folded reference block.  Thai builds it by
+# parsing the corpus line rather than storing the glosses twice.
+
+
+def test_reference_line_is_split_into_its_three_parts():
+    "The reference sentence is the Thai text alone, not the whole line."
+    reference = th._reference_from_line(  # pylint: disable=protected-access
+        "ผมไปกับเพื่อน · pǒm bpai gùp pêu-un — I went with a friend. ／ 我和朋友一起去了"
+    )
+    assert reference == {
+        "sentence": "ผมไปกับเพื่อน",
+        "en": "I went with a friend.",
+        "zh": "我和朋友一起去了",
+    }
+
+
+def test_every_panel_rule_with_an_example_carries_a_translated_reference():
+    """
+    Corpus rows cite their first example; hand-written rules cite the
+    golden one.  A row with no example at all has nothing to cite and is
+    the only kind allowed to go without.
+    """
+    rows = {row["key"]: row for row in corpus()}
+    missing = []
+    for rule in th._hand_rules() + th._get_corpus_rules():  # pylint: disable=protected-access
+        row = rows.get(rule["key"])
+        if row is not None and not row.get("examples"):
+            continue
+        reference = rule.get("reference") or {}
+        if not (reference.get("sentence") and reference.get("en") and reference.get("zh")):
+            missing.append(rule["key"])
+    assert missing == [], f"cards with no translated example: {missing}"
+
+
+def test_panel_shows_the_gloss_in_the_display_language():
+    "Chinese panel gets the Chinese gloss, English panel the English one."
+    zh = {c["key"]: c for c in th.analyze_thai("ผมชอบเขา", "zh")}
+    en = {c["key"]: c for c in th.analyze_thai("ผมชอบเขา", "en")}
+    assert zh["th_pronouns"]["reference"]["text"] == "我喜欢他"
+    assert en["th_pronouns"]["reference"]["text"] == "I like him."
+
