@@ -202,12 +202,16 @@ def test_de_entries_switch_description_language():
 # sets were written without any).  Importing a module is dependency-free
 # -- the spaCy / pyarabic tokenizers load lazily -- so these tests need
 # no parser installed.
+#
+# The Arabic engine is deliberately absent: it grew a merged data layer
+# (grammar_ar.json) whose rows carry their own examples, so its library is
+# the union of the hand-written rules and those rows.  Its two directions
+# are covered in tests/unit/test_grammar_analysis_ar.py instead.
 
 _RULESET_MODULES = (
     "grammar_analysis_en",
     "grammar_analysis_zh",
     "grammar_analysis_yue",
-    "grammar_analysis_ar",
     "grammar_analysis_it",
     "grammar_analysis_pt",
 )

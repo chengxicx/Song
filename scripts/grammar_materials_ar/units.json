@@ -1,0 +1,1708 @@
+[
+ {
+  "pattern": "إلاّ",
+  "name_ar": "الاستثناء بإلاّ (exception with illa)",
+  "meaning_en": "exception with illa",
+  "meaning_zh": "إلاّ：除……之外。肯定句里例外名词用宾格；否定句里可主格可宾格。",
+  "level": "B1",
+  "focus": [
+   "إلا"
+  ],
+  "formation": "اسم منصوب بعد إلاّ في الجملة الموجبة",
+  "notes": "否定句（ما/لم/لن/ليس + إلاّ）里例外名词可为宾格或主格，取决于是不是被排除在外的成分。",
+  "examples": [
+   {
+    "arabic": "لم يقرأ إلا كتابين.",
+    "chinese": "他只读了两本书。"
+   },
+   {
+    "arabic": "مهما تسافر إلى المغرب فلن تجد إلا شعبا كريما.",
+    "chinese": "无论你去摩洛哥多少次，你都只会遇到慷慨的人民。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "ما عدا",
+  "name_ar": "الاستثناء بما عدا (exception with maa 'adaa)",
+  "meaning_en": "exception with maa 'adaa",
+  "meaning_zh": "ما عدا：除了……（后接宾格名词）。",
+  "level": "B1",
+  "focus": [
+   "ما",
+   "عدا"
+  ],
+  "formation": "ما عدا + اسم منصوب",
+  "notes": "与 عدا 同义；ما 只是装饰性的，不改变格。",
+  "examples": [
+   {
+    "arabic": "حضر الطلاب ما عدا طالبا واحدا.",
+    "chinese": "所有学生都到了，只有一个学生除外。"
+   },
+   {
+    "arabic": "وصلت كل المدرسات ما عدا مدرسة واحدة.",
+    "chinese": "所有女教师都到了，只有一位女教师除外。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "عدا",
+  "name_ar": "الاستثناء بعدا (exception with 'adaa)",
+  "meaning_en": "exception with 'adaa",
+  "meaning_zh": "عدا：除……之外（动词用法，后接宾格）。",
+  "level": "B1",
+  "focus": [
+   "عدا"
+  ],
+  "formation": "عدا + اسم منصوب",
+  "notes": "既可作动词（例外名词作宾语），也可作介词（例外名词作属格）。",
+  "examples": [
+   {
+    "arabic": "شاهدت المعلمة الطلاب عدا طالبا واحدا.",
+    "chinese": "女教师看到了所有学生，只有一个学生除外。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "غير",
+  "name_ar": "الاسم النافي غير (the negative noun ghayr)",
+  "meaning_en": "the negative noun ghayr",
+  "meaning_zh": "غير：不是……；除……之外。作 إضافة 的第一名词，后接属格。",
+  "level": "B1",
+  "focus": [
+   "غير"
+  ],
+  "formation": "غير + اسم مجرور (الإضافة)",
+  "notes": "肯定句里 غير 自身是宾格；在否定句里随句法地位变化。与 سوى 同义。",
+  "examples": [
+   {
+    "arabic": "أشرب القهوة لا غير.",
+    "chinese": "我只喝咖啡。"
+   },
+   {
+    "arabic": "حضر الطلاب غير خالد.",
+    "chinese": "除了哈立德，学生们都到了。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "سوى",
+  "name_ar": "الاسم النافي سوى (the negative noun siwaa)",
+  "meaning_en": "the negative noun siwaa",
+  "meaning_zh": "سوى：除……之外（不变格，后接属格）。",
+  "level": "B1",
+  "focus": [
+   "سوى"
+  ],
+  "formation": "سوى + اسم مجرور",
+  "notes": "可接接尾代词：سواه / سواها。",
+  "examples": [
+   {
+    "arabic": "سافر كل الطلاب سوى طالب واحد.",
+    "chinese": "所有学生都出发了，只有一个学生除外。"
+   },
+   {
+    "arabic": "زاروا الجامعات سوى جامعة حلب.",
+    "chinese": "他们参观了所有大学，除了阿勒颇大学。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "ما خلا",
+  "name_ar": "الاستثناء بما خلا (exception with maa khalā)",
+  "meaning_en": "exception with maa khalā",
+  "meaning_zh": "ما خلا：除了……（后接宾格）。",
+  "level": "B2",
+  "focus": [
+   "ما",
+   "خلا"
+  ],
+  "formation": "ما خلا + اسم منصوب",
+  "notes": "书面语色彩，常见于正式叙述。",
+  "examples": [
+   {
+    "arabic": "شاهدت المعلمة كل الطلاب ما خلا طالبا واحدا.",
+    "chinese": "女教师看到了所有学生，只有一个学生除外。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "حاشا",
+  "name_ar": "الاستثناء بحاشا (exception with haashaa)",
+  "meaning_en": "exception with haashaa",
+  "meaning_zh": "حاشا：唯独……除外（古典色彩）。",
+  "level": "C1",
+  "focus": [
+   "حاشا"
+  ],
+  "formation": "حاشا + اسم مجرور أو منصوب",
+  "notes": "多见于古典文本，现代散文少见。",
+  "examples": [
+   {
+    "arabic": "حضر المديرون حاشا مديرا.",
+    "chinese": "除了一个经理，所有经理都到了。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "باستثناء",
+  "name_ar": "الاستثناء باستثناء (exception with bi-istithnaa')",
+  "meaning_en": "exception with bi-istithnaa'",
+  "meaning_zh": "باستثناء：除……之外（介词短语，后接属格）。",
+  "level": "B1",
+  "focus": [
+   "باستثناء"
+  ],
+  "formation": "باستثناء + اسم مجرور",
+  "notes": "由 بـ + استثناء 构成，肯定句和否定句都可用。",
+  "examples": [
+   {
+    "arabic": "حضر كل الطلاب باستثناء طالب واحد.",
+    "chinese": "除了一个学生，所有学生都到了。"
+   },
+   {
+    "arabic": "دخلت كل الصفوف باستثناء صف واحد.",
+    "chinese": "她进了所有教室，只有一个教室除外。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "يا (النداء)",
+  "name_ar": "يا النداء (vocative yaa)",
+  "meaning_en": "vocative yaa",
+  "meaning_zh": "يا：呼唤词，直接称呼某人。",
+  "level": "A1",
+  "focus": [
+   "يا"
+  ],
+  "formation": "يا + اسم مرفوع / منصوب (المضاف)",
+  "notes": "专有名词直接接；普通名词作呼语时用主格去 تنوين；إضافة 结构的第一名词用宾格。",
+  "examples": [
+   {
+    "arabic": "يا ليلى، كنت قد ولدت قبل انتقال العائلة إلى بيروت.",
+    "chinese": "莱拉，你出生在全家搬到贝鲁特之前。"
+   },
+   {
+    "arabic": "يا سلمى، هل نوديت حتى تقابلي؟",
+    "chinese": "萨尔玛，你是被叫去面试的吗？"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أيها",
+  "name_ar": "أيها في النداء (vocative ayyuhaa)",
+  "meaning_en": "vocative ayyuhaa",
+  "meaning_zh": "أيها：各位……（阳性/混合群体，后接带 ال 的名词，主格）。",
+  "level": "B2",
+  "focus": [
+   "أيها"
+  ],
+  "formation": "يا أيها + اسم معرفة بالـ (مرفوع)",
+  "notes": "演讲、广播电视开场常用。阴性用 أيتها。",
+  "examples": [
+   {
+    "arabic": "يا أيها الأطفال، أنتم سنابل الآمال.",
+    "chinese": "孩子们啊，你们是希望的麦穗。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أيتها",
+  "name_ar": "أيتها في النداء (vocative ayyatuhaa)",
+  "meaning_en": "vocative ayyatuhaa",
+  "meaning_zh": "أيتها：各位（女性）……。",
+  "level": "B2",
+  "focus": [
+   "أيتها"
+  ],
+  "formation": "يا أيتها + اسم معرفة بالـ (مرفوع)",
+  "notes": "与 أيها 分工按性别。",
+  "examples": [
+   {
+    "arabic": "أيتها الأخت المواطنة، التصويت حق لكل مواطن ومواطنة.",
+    "chinese": "女公民同胞们，投票是每个男女公民的权利。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "لولا",
+  "name_ar": "لولا الشرطية (counterfactual lulaa)",
+  "meaning_en": "counterfactual lulaa",
+  "meaning_zh": "لولا：要不是……（与事实相反的假设，后接 لـ 引导的结果句）。",
+  "level": "B2",
+  "focus": [
+   "لولا"
+  ],
+  "formation": "لولا + اسم ، لـ + نتيجة",
+  "notes": "表达「要不是 A，就 B 了」，与 لو 的虚拟不同：لولا 后接名词，لو 后接动词。",
+  "examples": [
+   {
+    "arabic": "لولا المال لما تقدمت البلاد.",
+    "chinese": "要不是钱，国家就不会进步。"
+   },
+   {
+    "arabic": "لولا حضور الرئيس لما اتفقت الأطراف.",
+    "chinese": "要不是总统出席，各方就不会达成一致。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "مهما",
+  "name_ar": "مهما الشرطية (conditional mahmaa)",
+  "meaning_en": "conditional mahmaa",
+  "meaning_zh": "مهما：无论什么……（后接切格动词）。",
+  "level": "B2",
+  "focus": [
+   "مهما"
+  ],
+  "formation": "مهما + فعل مضارع مجزوم",
+  "notes": "指非人类事物；指人用 من。",
+  "examples": [
+   {
+    "arabic": "مهما تسافر إلى المغرب فسوف تجد شعبا كريما.",
+    "chinese": "无论你去摩洛哥多少次，都会遇到慷慨的人民。"
+   },
+   {
+    "arabic": "مهما طالت ألسنتهم لا يضرون أحدا.",
+    "chinese": "无论他们的话多长，也伤不到任何人。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أينما",
+  "name_ar": "أينما الشرطية (conditional aynamaa)",
+  "meaning_en": "conditional aynamaa",
+  "meaning_zh": "أينما：无论哪里……（أين + ما）。",
+  "level": "B2",
+  "focus": [
+   "أينما"
+  ],
+  "formation": "أينما + فعل مضارع مجزوم",
+  "notes": "两个分句的动词都用切格式。",
+  "examples": [
+   {
+    "arabic": "أينما تذهب أجد صديقا.",
+    "chinese": "无论你去哪里，我都能找到朋友。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "حيثما",
+  "name_ar": "حيثما الشرطية (conditional haythumaa)",
+  "meaning_en": "conditional haythumaa",
+  "meaning_zh": "حيثما：无论何处……（حيث + ما）。",
+  "level": "B2",
+  "focus": [
+   "حيثما"
+  ],
+  "formation": "حيثما + فعل مضارع مجزوم",
+  "notes": "比 أينما 更书面。",
+  "examples": [
+   {
+    "arabic": "ينظر إليها نظرة إعجاب حيثما ذهبت.",
+    "chinese": "无论她走到哪里，人们都投以赞赏的目光。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "كيفما",
+  "name_ar": "كيفما الشرطية (conditional kayfamaa)",
+  "meaning_en": "conditional kayfamaa",
+  "meaning_zh": "كيفما：无论怎样……。",
+  "level": "C1",
+  "focus": [
+   "كيفما"
+  ],
+  "formation": "كيفما + فعل مضارع مجزوم",
+  "notes": "使用频率低于 مهما / أينما。",
+  "examples": [
+   {
+    "arabic": "كيفما تعمل تجد نتيجة.",
+    "chinese": "无论你怎么做，都会有结果。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "بينما",
+  "name_ar": "بينما (while, whereas)",
+  "meaning_en": "while, whereas",
+  "meaning_zh": "بينما：当……的时候；而（对比）。",
+  "level": "B1",
+  "focus": [
+   "بينما"
+  ],
+  "formation": "بينما + جملة اسمية أو فعلية",
+  "notes": "既可表同时（时间），也可表对比（而）。",
+  "examples": [
+   {
+    "arabic": "قرأت كتابا بينما كان أخي يلعب في الحديقة.",
+    "chinese": "我读书的时候，弟弟在花园里玩。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "في حين",
+  "name_ar": "في حين (whereas)",
+  "meaning_en": "whereas",
+  "meaning_zh": "في حين：而……、与此同时（对比）。",
+  "level": "B2",
+  "focus": [
+   "في",
+   "حين"
+  ],
+  "formation": "في حين أن / في حين + جملة",
+  "notes": "比 بينما 更正式，常与 أن 连用。",
+  "examples": [
+   {
+    "arabic": "أحمد يدرس الطب، في حين يدرس أخوه الهندسة.",
+    "chinese": "艾哈迈德学医，而他弟弟学工程。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "على الرغم من",
+  "name_ar": "على الرغم من (despite)",
+  "meaning_en": "despite",
+  "meaning_zh": "على الرغم من：尽管……（后接属格名词）。",
+  "level": "B1",
+  "focus": [
+   "على",
+   "الرغم",
+   "من"
+  ],
+  "formation": "على الرغم من + اسم مجرور",
+  "notes": "另形 بالرغم من，意义相同。",
+  "examples": [
+   {
+    "arabic": "على الرغم من أنه كان مريضا، استمر المدير في عمله.",
+    "chinese": "尽管生病，经理仍继续工作。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "بالرغم من",
+  "name_ar": "بالرغم من (despite)",
+  "meaning_en": "despite",
+  "meaning_zh": "بالرغم من：尽管……（= على الرغم من）。",
+  "level": "B1",
+  "focus": [
+   "بالرغم",
+   "من"
+  ],
+  "formation": "بالرغم من + اسم مجرور",
+  "notes": "口语和书面都常见。",
+  "examples": [
+   {
+    "arabic": "بالرغم من تعبه، أكمل العمل.",
+    "chinese": "尽管很累，他还是完成了工作。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "من أجل",
+  "name_ar": "من أجل (for the sake of)",
+  "meaning_en": "for the sake of",
+  "meaning_zh": "من أجل：为了……（后接属格）。",
+  "level": "A2",
+  "focus": [
+   "من",
+   "أجل"
+  ],
+  "formation": "من أجل + اسم مجرور / من أجل أن + فعل منصوب",
+  "notes": "表示目的；لأجل 更短，意义相同。",
+  "examples": [
+   {
+    "arabic": "سافرت من أجل العمل.",
+    "chinese": "我为了工作而出行。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "لأجل",
+  "name_ar": "لأجل (for the sake of)",
+  "meaning_en": "for the sake of",
+  "meaning_zh": "لأجل：为了……（لـ + أجل）。",
+  "level": "B1",
+  "focus": [
+   "لأجل"
+  ],
+  "formation": "لأجل + اسم مجرور",
+  "notes": "比 من أجل 紧凑，多见于书面语。",
+  "examples": [
+   {
+    "arabic": "جاء لأجل العلم.",
+    "chinese": "他为了求知而来。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "بسبب",
+  "name_ar": "بسبب (because of)",
+  "meaning_en": "because of",
+  "meaning_zh": "بسبب：由于……（后接属格）。",
+  "level": "A2",
+  "focus": [
+   "بسبب"
+  ],
+  "formation": "بسبب + اسم مجرور",
+  "notes": "表原因，不用于引导从句；从句用 لأن。",
+  "examples": [
+   {
+    "arabic": "بسبب إهماله فشل في الامتحان.",
+    "chinese": "由于疏忽，他考试不及格。"
+   },
+   {
+    "arabic": "لا تقول أنت متأخر بسبب الزحمة.",
+    "chinese": "别说你迟到了是因为堵车。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "نتيجة لـ",
+  "name_ar": "نتيجة (as a result, outcome)",
+  "meaning_en": "as a result, outcome",
+  "meaning_zh": "نتيجة：结果；由于……（نتيجة لـ + 属格）。",
+  "level": "B2",
+  "focus": [
+   "نتيجة"
+  ],
+  "formation": "نتيجة لـ + اسم مجرور",
+  "notes": "书面语，多用于因果叙述；单独用时表「结果」。",
+  "examples": [
+   {
+    "arabic": "لم أترك لبنان نتيجة الخوف، بل لأكون مع أولادي.",
+    "chinese": "我离开黎巴嫩不是因为恐惧，而是为了和孩子们在一起。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "لكي",
+  "name_ar": "لكي (in order to)",
+  "meaning_en": "in order to",
+  "meaning_zh": "لكي：为了……（后接虚拟式动词）。",
+  "level": "B1",
+  "focus": [
+   "لكي"
+  ],
+  "formation": "لكي + فعل مضارع منصوب",
+  "notes": "目的从句；主语可同可不同。",
+  "examples": [
+   {
+    "arabic": "تدرس صديقاتي الأمريكيات العربية لكي يتكلمن مع أسر أزواجهن العرب.",
+    "chinese": "我的美国女性朋友们学阿拉伯语，是为了能和丈夫的阿拉伯家庭交谈。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "كي",
+  "name_ar": "كي (so that)",
+  "meaning_en": "so that",
+  "meaning_zh": "كي：以便……（古典色彩，后接虚拟式）。",
+  "level": "B2",
+  "focus": [
+   "كي"
+  ],
+  "formation": "كي + فعل مضارع منصوب",
+  "notes": "现代散文多用 لكي 或 حتى。",
+  "examples": [
+   {
+    "arabic": "طلب أحمد كي يوظف في الشركة.",
+    "chinese": "艾哈迈德被请求到公司任职。"
+   },
+   {
+    "arabic": "دعي الطالبان كي يستخدما في الجيش.",
+    "chinese": "两名学生被召去服兵役。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "جدًا",
+  "name_ar": "جدًا (very)",
+  "meaning_en": "very",
+  "meaning_zh": "جدًا：非常（放在被修饰词之后）。",
+  "level": "A2",
+  "focus": [
+   "جدا"
+  ],
+  "formation": "صفة / ظرف + جدًا",
+  "notes": "永远后置，不能说 جدا جميل。",
+  "examples": [
+   {
+    "arabic": "الفيلم جميل جدا.",
+    "chinese": "这部电影非常好。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "كثيرًا",
+  "name_ar": "كثيرًا (a lot, often)",
+  "meaning_en": "a lot, often",
+  "meaning_zh": "كثيرًا：很多、经常（动词后作绝对宾语或状语）。",
+  "level": "A2",
+  "focus": [
+   "كثيرا"
+  ],
+  "formation": "فعل + كثيرًا",
+  "notes": "与名词 كثير（许多）区别：作状语时带 تنوين 宾格。",
+  "examples": [
+   {
+    "arabic": "عاد الأصدقاء من الحفلة وقد أكلوا وشربوا كثيرا.",
+    "chinese": "朋友们参加完聚会回来，吃了也喝了很多。"
+   },
+   {
+    "arabic": "أثناء زيارة صديقي البلاد توقف كثيرا في المدن الأثرية.",
+    "chinese": "我朋友在国内旅行期间，在很多古城停留。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "تمامًا",
+  "name_ar": "تمامًا (completely)",
+  "meaning_en": "completely",
+  "meaning_zh": "تمامًا：完全地。",
+  "level": "B1",
+  "focus": [
+   "تماما"
+  ],
+  "formation": "صفة / فعل + تمامًا",
+  "notes": "强调程度到底，常与否定连用（ليس تمامًا）。",
+  "examples": [
+   {
+    "arabic": "مازالت تسريحة أمي مصففة تماما لم تعبث بها الأنسام القوية.",
+    "chinese": "妈妈的发型依然整整齐齐，强风没能弄乱它。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أكثر من",
+  "name_ar": "أكثر من (more than)",
+  "meaning_en": "more than",
+  "meaning_zh": "أكثر من：超过……；比……更（比较级 + من）。",
+  "level": "A2",
+  "focus": [
+   "أكثر",
+   "من"
+  ],
+  "formation": "أكثر من + اسم مجرور",
+  "notes": "比较级用 أفعل + من；أكثر من 也可表数量「多于」。",
+  "examples": [
+   {
+    "arabic": "العائلة العربية أكثر من العائلة الأمريكية أطفالا.",
+    "chinese": "阿拉伯家庭的孩子比美国家庭多。"
+   },
+   {
+    "arabic": "ثوب فاطمة زهري أكثر من ثوب سامية.",
+    "chinese": "法蒂玛的裙子比萨米娅的更粉。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أقل من",
+  "name_ar": "أقل من (less than)",
+  "meaning_en": "less than",
+  "meaning_zh": "أقل من：少于……；不如……。",
+  "level": "A2",
+  "focus": [
+   "أقل",
+   "من"
+  ],
+  "formation": "أقل من + اسم مجرور",
+  "notes": "与 أكثر من 对称。",
+  "examples": [
+   {
+    "arabic": "عدد الطلاب أقل من عدد المعلمين.",
+    "chinese": "学生人数少于教师人数。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "الآن",
+  "name_ar": "الآن (now)",
+  "meaning_en": "now",
+  "meaning_zh": "الآن：现在、此刻。",
+  "level": "A1",
+  "focus": [
+   "الآن"
+  ],
+  "formation": "ظرف زمان مبني",
+  "notes": "可单独成句（الآن؟），也常与 حتى 连用（حتى الآن 直到现在）。",
+  "examples": [
+   {
+    "arabic": "أنا الآن، على أي حال، أدرك هذه الحكمة.",
+    "chinese": "我现在，无论如何，明白了这个道理。"
+   },
+   {
+    "arabic": "لا أستطيع الحضور إلى المحاضرة لأني أكتب واجبي الآن.",
+    "chinese": "我不能去上课，因为我现在在写作业。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "دائمًا",
+  "name_ar": "دائمًا (always)",
+  "meaning_en": "always",
+  "meaning_zh": "دائمًا：总是、一直。",
+  "level": "A2",
+  "focus": [
+   "دائما"
+  ],
+  "formation": "ظرف زمان (مفعول فيه)",
+  "notes": "常与现在时连用表习惯。",
+  "examples": [
+   {
+    "arabic": "من الواضح أن الطقس يتغير دائما.",
+    "chinese": "很明显天气总是在变。"
+   },
+   {
+    "arabic": "دائما يكرر القول إن العربية سهلة.",
+    "chinese": "他总是反复说阿拉伯语很容易。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أبدًا",
+  "name_ar": "أبدًا (never, ever)",
+  "meaning_en": "never, ever",
+  "meaning_zh": "أبدًا：从不（多与否定连用）；永远。",
+  "level": "A2",
+  "focus": [
+   "أبدا"
+  ],
+  "formation": "ما / لا + فعل + أبدًا",
+  "notes": "لن أفعل ذلك أبدًا = 我永远不会做那件事。",
+  "examples": [
+   {
+    "arabic": "لم أذهب إلى هناك أبدا.",
+    "chinese": "我从没去过那里。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "غالبًا",
+  "name_ar": "غالبًا (usually, often)",
+  "meaning_en": "usually, often",
+  "meaning_zh": "غالبًا：通常、多半。",
+  "level": "B1",
+  "focus": [
+   "غالبا"
+  ],
+  "formation": "ظرف تكرر",
+  "notes": "频率副词序列：دائمًا > غالبًا > أحيانًا > نادرًا。",
+  "examples": [
+   {
+    "arabic": "غالبا ما أستيقظ مبكرا.",
+    "chinese": "我通常起得很早。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أحيانًا",
+  "name_ar": "أحيانًا (sometimes)",
+  "meaning_en": "sometimes",
+  "meaning_zh": "أحيانًا：有时。",
+  "level": "B1",
+  "focus": [
+   "أحيانا"
+  ],
+  "formation": "ظرف تكرر (جمع حين)",
+  "notes": "原形 حين（时候）的复数，作频率副词。",
+  "examples": [
+   {
+    "arabic": "أحيانا أقرأ في المكتبة.",
+    "chinese": "我有时在图书馆读书。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "فورًا",
+  "name_ar": "فورًا (immediately)",
+  "meaning_en": "immediately",
+  "meaning_zh": "فورًا：立刻、马上。",
+  "level": "B1",
+  "focus": [
+   "فورا"
+  ],
+  "formation": "فعل + فورًا",
+  "notes": "同义表达 في الحال / حالًا。",
+  "examples": [
+   {
+    "arabic": "سأعود فورا.",
+    "chinese": "我马上回来。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "بعد",
+  "name_ar": "بعد (after)",
+  "meaning_en": "after",
+  "meaning_zh": "بعد：在……之后（后接属格）。",
+  "level": "A1",
+  "focus": [
+   "بعد"
+  ],
+  "formation": "بعد + اسم مجرور / بعد أن + جملة",
+  "notes": "与 قبل 相对；بعد 也可作时间副词「后来」。",
+  "examples": [
+   {
+    "arabic": "سيبني المهندسون البناء الجديد بعد سنة.",
+    "chinese": "工程师们将在一年后建好新楼。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "قبل",
+  "name_ar": "قبل (before)",
+  "meaning_en": "before",
+  "meaning_zh": "قبل：在……之前（后接属格）。",
+  "level": "A1",
+  "focus": [
+   "قبل"
+  ],
+  "formation": "قبل + اسم مجرور / قبل أن + جملة",
+  "notes": "与 بعد 相对。",
+  "examples": [
+   {
+    "arabic": "كانت الطبيبة قد وصلت إلى المستشفى قبل إدخال المريض.",
+    "chinese": "在病人被送进来之前，女医生已经到了医院。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "منذ",
+  "name_ar": "منذ (since)",
+  "meaning_en": "since",
+  "meaning_zh": "منذ：自从……（后接时间点或时长）。",
+  "level": "A2",
+  "focus": [
+   "منذ"
+  ],
+  "formation": "منذ + اسم / منذ أن + جملة",
+  "notes": "منذ سنة = 一年以来；منذ أن سافر = 自从他走后。",
+  "examples": [
+   {
+    "arabic": "تكلمنا عنه كثيرا منذ نيل الطالب الجائزة.",
+    "chinese": "自从那名学生获奖以来，我们多次谈到他。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "خلال",
+  "name_ar": "خلال (during, within)",
+  "meaning_en": "during, within",
+  "meaning_zh": "خلال：在……期间；在……之内。",
+  "level": "B1",
+  "focus": [
+   "خلال"
+  ],
+  "formation": "خلال + اسم مجرور",
+  "notes": "خلال أسبوع 既可是「一周之内」也可是「一周期间」。",
+  "examples": [
+   {
+    "arabic": "خلال لقاء الرئيس الطلاب تحدث عن هموم الجامعة.",
+    "chinese": "在会见学生期间，校长谈到了大学的困扰。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أمام",
+  "name_ar": "أمام (in front of)",
+  "meaning_en": "in front of",
+  "meaning_zh": "أمام：在……前面。",
+  "level": "A1",
+  "focus": [
+   "أمام"
+  ],
+  "formation": "أمام + اسم مجرور",
+  "notes": "与 خلف 相对；也可作名词「前面」。",
+  "examples": [
+   {
+    "arabic": "مريم وهالة وسحر أمام الصف.",
+    "chinese": "玛丽亚姆、哈拉和萨哈尔在教室前面。"
+   },
+   {
+    "arabic": "المار أمام البيت سأل عن العنوان.",
+    "chinese": "从屋前经过的人问了地址。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "خلف",
+  "name_ar": "خلف (behind)",
+  "meaning_en": "behind",
+  "meaning_zh": "خلف：在……后面。",
+  "level": "A1",
+  "focus": [
+   "خلف"
+  ],
+  "formation": "خلف + اسم مجرور",
+  "notes": "与 أمام 相对。",
+  "examples": [
+   {
+    "arabic": "جلس الولد خلف الباب.",
+    "chinese": "男孩坐在门后。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "حول",
+  "name_ar": "حول (around, about)",
+  "meaning_en": "around, about",
+  "meaning_zh": "حول：在……周围；关于。",
+  "level": "B1",
+  "focus": [
+   "حول"
+  ],
+  "formation": "حول + اسم مجرور",
+  "notes": "حول العالم = 世界各地；بحث حول = 关于……的研究。",
+  "examples": [
+   {
+    "arabic": "تحدث المدير حول المشكلة.",
+    "chinese": "经理谈了这个问题。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "داخل",
+  "name_ar": "داخل (inside)",
+  "meaning_en": "inside",
+  "meaning_zh": "داخل：在……里面。",
+  "level": "A2",
+  "focus": [
+   "داخل"
+  ],
+  "formation": "داخل + اسم مجرور",
+  "notes": "反义 خارج。",
+  "examples": [
+   {
+    "arabic": "يعيش جدي داخل المدينة.",
+    "chinese": "我祖父住在城里。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "خارج",
+  "name_ar": "خارج (outside)",
+  "meaning_en": "outside",
+  "meaning_zh": "خارج：在……外面。",
+  "level": "A2",
+  "focus": [
+   "خارج"
+  ],
+  "formation": "خارج + اسم مجرور",
+  "notes": "反义 داخل。",
+  "examples": [
+   {
+    "arabic": "لعب الأطفال خارج البيت.",
+    "chinese": "孩子们在屋外玩。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "لدى",
+  "name_ar": "لدى (at, with)",
+  "meaning_en": "at, with",
+  "meaning_zh": "لدى：在……那里；拥有（= عند 的书面形式）。",
+  "level": "B1",
+  "focus": [
+   "لدى"
+  ],
+  "formation": "لدى + اسم مجرور",
+  "notes": "لديّ كتاب = 我有一本书。",
+  "examples": [
+   {
+    "arabic": "لدى أحمد كتاب جديد.",
+    "chinese": "艾哈迈德有一本新书。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أصبح",
+  "name_ar": "أصبح (to become)",
+  "meaning_en": "to become",
+  "meaning_zh": "أصبح：变成、成为（كان 的姐妹，表语主格）。",
+  "level": "A2",
+  "focus": [
+   "أصبح/أصبحت/أصبحوا"
+  ],
+  "formation": "أصبح + اسم + خبر منصوب",
+  "notes": "أصبح 也表「到了早上」，注意语境。",
+  "examples": [
+   {
+    "arabic": "أصبح الطقس باردا.",
+    "chinese": "天气变冷了。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "ظلّ",
+  "name_ar": "ظل (to remain)",
+  "meaning_en": "to remain",
+  "meaning_zh": "ظلّ：仍然是、一直（كان 的姐妹）。",
+  "level": "B1",
+  "focus": [
+   "ظل/ظلت/ظلوا"
+  ],
+  "formation": "ظل + اسم + خبر منصوب",
+  "notes": "后接名词时可与 بقي 互换。",
+  "examples": [
+   {
+    "arabic": "ظل الطالب في المكتبة حتى المساء.",
+    "chinese": "学生在图书馆待到晚上。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "بات",
+  "name_ar": "بات (to become, to spend the night)",
+  "meaning_en": "to become, to spend the night",
+  "meaning_zh": "بات：变得（多指夜间状态）；过夜。",
+  "level": "B1",
+  "focus": [
+   "بات/باتت"
+  ],
+  "formation": "بات + اسم + خبر منصوب",
+  "notes": "بات يفعل 表持续动作（过去惯常）。",
+  "examples": [
+   {
+    "arabic": "بات المسافر متعبا بعد رحلة طويلة.",
+    "chinese": "长途旅行之后，旅客整夜疲惫。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "صار",
+  "name_ar": "صار (to become)",
+  "meaning_en": "to become",
+  "meaning_zh": "صار：变成（= أصبح）。",
+  "level": "B1",
+  "focus": [
+   "صار/صارت"
+  ],
+  "formation": "صار + اسم + خبر منصوب",
+  "notes": "强调转变的结果。",
+  "examples": [
+   {
+    "arabic": "صار الأستاذ مديرا للمدرسة.",
+    "chinese": "这位老师成了校长。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "ما زال",
+  "name_ar": "ما زال (still)",
+  "meaning_en": "still",
+  "meaning_zh": "ما زال / لا يزال：仍然、依旧。",
+  "level": "B1",
+  "focus": [
+   "ما",
+   "زال"
+  ],
+  "formation": "ما زال + اسم + خبر منصوب",
+  "notes": "必须与否定词连用（ما / لا / لم）；肯定形式已废弃。",
+  "examples": [
+   {
+    "arabic": "ما زال الجو باردا في الشتاء.",
+    "chinese": "冬天天气仍然冷。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "كاد",
+  "name_ar": "كاد (to be about to)",
+  "meaning_en": "to be about to",
+  "meaning_zh": "كاد：几乎要、险些（后接 أن + 虚拟式）。",
+  "level": "B2",
+  "focus": [
+   "كاد/كادت/يكاد"
+  ],
+  "formation": "كاد + اسم + أن + فعل منصوب",
+  "notes": "否定形式 ما كاد … حتى 表「刚一……就」。",
+  "examples": [
+   {
+    "arabic": "كاد الطفل يبكي من الخوف.",
+    "chinese": "孩子吓得差点哭出来。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أوشك",
+  "name_ar": "أوشك (to be on the verge of)",
+  "meaning_en": "to be on the verge of",
+  "meaning_zh": "أوشك：快要……（أوشك أن + 虚拟式）。",
+  "level": "B2",
+  "focus": [
+   "أوشك/يوشك"
+  ],
+  "formation": "أوشك + اسم + أن + فعل منصوب",
+  "notes": "与 كاد 近义，更书面。",
+  "examples": [
+   {
+    "arabic": "أوشك الفريق أن يفوز بالمباراة.",
+    "chinese": "球队差点赢得比赛。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "عسى",
+  "name_ar": "عسى (may, perhaps)",
+  "meaning_en": "may, perhaps",
+  "meaning_zh": "عسى：也许、但愿（عسى أن + 虚拟式）。",
+  "level": "B2",
+  "focus": [
+   "عسى"
+  ],
+  "formation": "عسى + أن + فعل منصوب",
+  "notes": "表希望或推测，古典色彩较浓。",
+  "examples": [
+   {
+    "arabic": "عسى أن يتحسن الطقس غدا.",
+    "chinese": "但愿明天天气好转。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "يجب أن",
+  "name_ar": "يجب أن (must)",
+  "meaning_en": "must",
+  "meaning_zh": "يجب أن：必须……（后接虚拟式）。",
+  "level": "A2",
+  "focus": [
+   "يجب",
+   "أن"
+  ],
+  "formation": "يجب أن + فعل مضارع منصوب",
+  "notes": "无人称用法：يجب عليّ أن = 我必须。",
+  "examples": [
+   {
+    "arabic": "يجب أن تنشر هذه المقالة في الجريدة.",
+    "chinese": "这篇文章必须登在报纸上。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "ينبغي أن",
+  "name_ar": "ينبغي أن (ought to)",
+  "meaning_en": "ought to",
+  "meaning_zh": "ينبغي أن：应当……（比 يجب 委婉）。",
+  "level": "B1",
+  "focus": [
+   "ينبغي",
+   "أن"
+  ],
+  "formation": "ينبغي أن + فعل مضارع منصوب",
+  "notes": "书面语，规范、建议语气。",
+  "examples": [
+   {
+    "arabic": "ينبغي أن نحترم القوانين.",
+    "chinese": "我们应当遵守法律。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "لا بد أن",
+  "name_ar": "لا بد أن (it must be that)",
+  "meaning_en": "it must be that",
+  "meaning_zh": "لا بد أن：必定……、非……不可。",
+  "level": "B1",
+  "focus": [
+   "لا",
+   "بد",
+   "أن"
+  ],
+  "formation": "لا بد أن + فعل مضارع منصوب",
+  "notes": "لا بد 本身是「不可避免」的名词短语。",
+  "examples": [
+   {
+    "arabic": "لا بد أن نتعلم من أخطائنا.",
+    "chinese": "我们必须从错误中学习。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "من الممكن أن",
+  "name_ar": "من الممكن أن (it is possible that)",
+  "meaning_en": "it is possible that",
+  "meaning_zh": "من الممكن أن：有可能……。",
+  "level": "B1",
+  "focus": [
+   "من",
+   "الممكن",
+   "أن"
+  ],
+  "formation": "من الممكن أن + فعل مضارع منصوب",
+  "notes": "同义 يمكن أن；否定 من غير الممكن。",
+  "examples": [
+   {
+    "arabic": "من الممكن أن يأتي غدا.",
+    "chinese": "他明天可能来。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "على وشك",
+  "name_ar": "على وشك (on the verge of)",
+  "meaning_en": "on the verge of",
+  "meaning_zh": "على وشك：即将……（على وشك أن + 虚拟式）。",
+  "level": "B2",
+  "focus": [
+   "على",
+   "وشك"
+  ],
+  "formation": "على وشك + أن + فعل منصوب",
+  "notes": "与 كاد / أوشك 同义。",
+  "examples": [
+   {
+    "arabic": "هو على وشك أن يسافر إلى القاهرة.",
+    "chinese": "他即将启程去开罗。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "ليس فقط",
+  "name_ar": "ليس فقط … بل (not only … but also)",
+  "meaning_en": "not only … but also",
+  "meaning_zh": "ليس فقط … بل：不仅……而且……。",
+  "level": "B2",
+  "focus": [
+   "ليس",
+   "فقط"
+  ],
+  "formation": "ليس فقط + X بل + Y",
+  "notes": "后半句常接 بل 或 ولكن أيضًا。",
+  "examples": [
+   {
+    "arabic": "ليس فقط طالبا بل معلما أيضا.",
+    "chinese": "他不仅是学生，还是老师。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "ما … إلا",
+  "name_ar": "ما … إلا (only)",
+  "meaning_en": "only",
+  "meaning_zh": "ما … إلا：只……、不过……（限定）。",
+  "level": "B2",
+  "focus": [
+   "ما",
+   "...",
+   "إلا"
+  ],
+  "formation": "ما + فعل + إلا + اسم",
+  "notes": "ما 是否定，إلا 是例外，两者合起来表「只」。",
+  "examples": [
+   {
+    "arabic": "ما شاهدوا إلا فلما واحدا.",
+    "chinese": "他们只看了一部电影。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "بمجرد أن",
+  "name_ar": "بمجرد أن (as soon as)",
+  "meaning_en": "as soon as",
+  "meaning_zh": "بمجرد أن：一……就……。",
+  "level": "B2",
+  "focus": [
+   "بمجرد",
+   "أن"
+  ],
+  "formation": "بمجرد أن + فعل ماضٍ",
+  "notes": "后接完成式动词，表两个动作紧接。",
+  "examples": [
+   {
+    "arabic": "بمجرد أن وصل، بدأ العمل.",
+    "chinese": "他一到就开始工作。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "كما",
+  "name_ar": "كما (as, just as)",
+  "meaning_en": "as, just as",
+  "meaning_zh": "كما：正如……；也……。",
+  "level": "A2",
+  "focus": [
+   "كما"
+  ],
+  "formation": "كما + جملة / كما أن",
+  "notes": "比较与类推的连接词；كما أن 后接名词句。",
+  "examples": [
+   {
+    "arabic": "الهرم مجرد قبر فخم لشخص مهم ينشد الخلود، كما يظن معظم الناس.",
+    "chinese": "金字塔不过是一位追求永生的要人的豪华陵墓，正如多数人所想。"
+   },
+   {
+    "arabic": "كما أن العربية لغة غنية.",
+    "chinese": "阿拉伯语也是一门丰富的语言。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "حيث",
+  "name_ar": "حيث (where, since)",
+  "meaning_en": "where, since",
+  "meaning_zh": "حيث：在那里；因为、鉴于（书面连接词）。",
+  "level": "B1",
+  "focus": [
+   "حيث"
+  ],
+  "formation": "حيث + جملة",
+  "notes": "书面语中常表原因，相当于 إذ。",
+  "examples": [
+   {
+    "arabic": "خطر له أن يتذرع بحجة السفر، والرجوع من حيث أتى!",
+    "chinese": "他忽然想以旅行为借口，从哪儿来回哪儿去！"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "إياك (التحذير)",
+  "name_ar": "التحذير بإياك (warning with iyyaaka)",
+  "meaning_en": "warning with iyyaaka",
+  "meaning_zh": "إياك…：千万别……（警告句式）。",
+  "level": "B2",
+  "focus": [
+   "إياك"
+  ],
+  "formation": "إياك + و + المصدر / الفعل",
+  "notes": "إياك 是宾格分离代词，用于警示；常与 و 连写（إياك والكذب）。",
+  "examples": [
+   {
+    "arabic": "إياك والكذب.",
+    "chinese": "千万别撒谎。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "بئس",
+  "name_ar": "بئس (how awful)",
+  "meaning_en": "how awful",
+  "meaning_zh": "بئس：……真糟糕（贬义评价动词，与 نعم 相对）。",
+  "level": "B2",
+  "focus": [
+   "بئس"
+  ],
+  "formation": "بئس + اسم مرفوع",
+  "notes": "نعم / بئس 是固化的评价动词，后接主格名词。",
+  "examples": [
+   {
+    "arabic": "بئس الرجل من يكذب.",
+    "chinese": "撒谎的人真差劲。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "نفس",
+  "name_ar": "نفس (self, same)",
+  "meaning_en": "self, same",
+  "meaning_zh": "نفس：亲自、本身（强调）；同一个。",
+  "level": "B2",
+  "focus": [
+   "نفس/نفسه/نفسي"
+  ],
+  "formation": "نفس + ضمير / نفس + اسم",
+  "notes": "نفسي = 我自己；نفس الكتاب = 同一本书。也作名词「呼吸、灵魂」。",
+  "examples": [
+   {
+    "arabic": "قابلت المدير نفسه.",
+    "chinese": "我见了经理本人。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "معظم",
+  "name_ar": "معظم (most of)",
+  "meaning_en": "most of",
+  "meaning_zh": "معظم：大多数……（后接属格）。",
+  "level": "B1",
+  "focus": [
+   "معظم"
+  ],
+  "formation": "معظم + اسم مجرور",
+  "notes": "书面语，与 أغلب 同义。",
+  "examples": [
+   {
+    "arabic": "كان يجلس في مكتبه معظم الوقت.",
+    "chinese": "他大部分时间都坐在办公室里。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "كلا / كلتا",
+  "name_ar": "كلا وكلتا (both)",
+  "meaning_en": "both",
+  "meaning_zh": "كلا / كلتا：两者都（后接属格；كلا 阳性，كلتا 阴性）。",
+  "level": "B2",
+  "focus": [
+   "كلا/كلتا"
+  ],
+  "formation": "كلا / كلتا + اسم مجرور",
+  "notes": "接代词时写作 كلاهما / كلتاهما。",
+  "examples": [
+   {
+    "arabic": "كلا الطالبين ناجح.",
+    "chinese": "两个学生都合格。"
+   },
+   {
+    "arabic": "كلتا الطالبتين مجتهدتان.",
+    "chinese": "两个女学生都很用功。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "عدة",
+  "name_ar": "عدة (several, a number of)",
+  "meaning_en": "several, a number of",
+  "meaning_zh": "عدة：若干、好几个（后接属格）。",
+  "level": "B2",
+  "focus": [
+   "عدة"
+  ],
+  "formation": "عدة + اسم مجرور (جمع)",
+  "notes": "不确定的小数量，比 بعض 更强调「数个」。",
+  "examples": [
+   {
+    "arabic": "قابل صديقي عدة زوار.",
+    "chinese": "我朋友会见了几位访客。"
+   },
+   {
+    "arabic": "تكلمنا مع عدة موظفات.",
+    "chinese": "我们和几位女职员谈过。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "في",
+  "name_ar": "في (in, at)",
+  "meaning_en": "in, at",
+  "meaning_zh": "في：在……里；在（时间）。后接属格。",
+  "level": "A1",
+  "focus": [
+   "في"
+  ],
+  "formation": "في + اسم مجرور",
+  "notes": "表地点、时间或状态：في البيت（在家里）、في الصباح（早上）。",
+  "examples": [
+   {
+    "arabic": "مشينا في الشوارع المزدحمة.",
+    "chinese": "我们走在拥挤的街道上。"
+   },
+   {
+    "arabic": "أعمل في الصباح.",
+    "chinese": "我早上工作。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "من",
+  "name_ar": "من (from, of)",
+  "meaning_en": "from, of",
+  "meaning_zh": "من：从……；属于；用于比较（比……）。",
+  "level": "A1",
+  "focus": [
+   "من"
+  ],
+  "formation": "من + اسم مجرور",
+  "notes": "من + 属格也可表「某些」：من الناس（人们当中）。比较级后用 من 引出比较对象。",
+  "examples": [
+   {
+    "arabic": "سافرت من القاهرة إلى الإسكندرية.",
+    "chinese": "我从开罗旅行到亚历山大。"
+   },
+   {
+    "arabic": "هذا من أعظم العبر.",
+    "chinese": "这是最大的教训之一。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "على",
+  "name_ar": "على (on, upon)",
+  "meaning_en": "on, upon",
+  "meaning_zh": "على：在……上面；对……（有义务）。",
+  "level": "A1",
+  "focus": [
+   "على"
+  ],
+  "formation": "على + اسم مجرور",
+  "notes": "على 也构成义务：عليك أن（你必须）。",
+  "examples": [
+   {
+    "arabic": "الكتاب على الطاولة.",
+    "chinese": "书在桌子上。"
+   },
+   {
+    "arabic": "عليك أن تدرس.",
+    "chinese": "你必须学习。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "إلى",
+  "name_ar": "إلى (to, towards)",
+  "meaning_en": "to, towards",
+  "meaning_zh": "إلى：到……、向……；直到。",
+  "level": "A1",
+  "focus": [
+   "إلى"
+  ],
+  "formation": "إلى + اسم مجرور",
+  "notes": "方向与终点；与 حتى 的区别：حتى 含「直到……为止」的界限义。",
+  "examples": [
+   {
+    "arabic": "ذهبت إلى المكتبة.",
+    "chinese": "我去了图书馆。"
+   },
+   {
+    "arabic": "سافر إلى بيروت.",
+    "chinese": "他去了贝鲁特。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "عن",
+  "name_ar": "عن (about, away from)",
+  "meaning_en": "about, away from",
+  "meaning_zh": "عن：关于……；离开、代替。",
+  "level": "A2",
+  "focus": [
+   "عن"
+  ],
+  "formation": "عن + اسم مجرور",
+  "notes": "تحدث عن（谈论）、بحث عن（寻找）、بدلا عن（代替）。",
+  "examples": [
+   {
+    "arabic": "تحدث عن مشكلته.",
+    "chinese": "他谈了自己的问题。"
+   },
+   {
+    "arabic": "بحث عن كتاب في المكتبة.",
+    "chinese": "他在图书馆找一本书。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "مع",
+  "name_ar": "مع (with)",
+  "meaning_en": "with",
+  "meaning_zh": "مع：和……一起；尽管。",
+  "level": "A2",
+  "focus": [
+   "مع"
+  ],
+  "formation": "مع + اسم مجرور",
+  "notes": "مع أن = 尽管；مع ذلك = 尽管如此。",
+  "examples": [
+   {
+    "arabic": "سافرت مع صديقي.",
+    "chinese": "我和朋友一起旅行。"
+   },
+   {
+    "arabic": "كان يجتمع في المقهى مع أصدقائه.",
+    "chinese": "他常和朋友在咖啡馆聚会。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "ثم",
+  "name_ar": "ثم (then, afterwards)",
+  "meaning_en": "then, afterwards",
+  "meaning_zh": "ثم：然后（表先后顺序，比 و 更强调次第）。",
+  "level": "A2",
+  "focus": [
+   "ثم"
+  ],
+  "formation": "ثم + جملة",
+  "notes": "与 فـ 不同：ثم 允许时间间隔，فـ 表紧接。",
+  "examples": [
+   {
+    "arabic": "دخل ثم جلس.",
+    "chinese": "他进来，然后坐下。"
+   },
+   {
+    "arabic": "نضع الماء ثم نضيف السكر.",
+    "chinese": "我们先放水，然后加糖。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أو",
+  "name_ar": "أو (or)",
+  "meaning_en": "or",
+  "meaning_zh": "أو：或者；或者（疑问中选择）。",
+  "level": "A2",
+  "focus": [
+   "أو"
+  ],
+  "formation": "أو + مفرد أو جملة",
+  "notes": "أم 用于疑问句的选择（أ... أم），أو 用于陈述句。",
+  "examples": [
+   {
+    "arabic": "أشرب الشاي أو القهوة.",
+    "chinese": "我喝茶或咖啡。"
+   },
+   {
+    "arabic": "اختر هذا أو ذاك.",
+    "chinese": "选这个或那个。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "أثناء",
+  "name_ar": "أثناء (during)",
+  "meaning_en": "during",
+  "meaning_zh": "أثناء：在……期间（= خلال）。",
+  "level": "B1",
+  "focus": [
+   "أثناء"
+  ],
+  "formation": "أثناء + اسم مجرور",
+  "notes": "书面语，与 خلال 近义；أثناء ذلك = 与此同时。",
+  "examples": [
+   {
+    "arabic": "أثناء زيارة صديقي البلاد توقف كثيرا في المدن الأثرية.",
+    "chinese": "我朋友在国内旅行期间，在很多古城停留。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "ضد",
+  "name_ar": "ضد (against)",
+  "meaning_en": "against",
+  "meaning_zh": "ضد：反对……；对抗。",
+  "level": "B1",
+  "focus": [
+   "ضد"
+  ],
+  "formation": "ضد + اسم مجرور",
+  "notes": "也作名词「对立面」：العكس والضد。",
+  "examples": [
+   {
+    "arabic": "نحن ضد الحرب.",
+    "chinese": "我们反对战争。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "نحو",
+  "name_ar": "نحو (towards, about)",
+  "meaning_en": "towards, about",
+  "meaning_zh": "نحو：朝向……；大约（数量）；关于。",
+  "level": "B1",
+  "focus": [
+   "نحو"
+  ],
+  "formation": "نحو + اسم مجرور",
+  "notes": "表约数时与 حوالي 同义。",
+  "examples": [
+   {
+    "arabic": "سافر نحو الشمال.",
+    "chinese": "他朝北方旅行。"
+   },
+   {
+    "arabic": "جاء نحو عشرين طالبا.",
+    "chinese": "来了大约二十个学生。"
+   }
+  ],
+  "source": "ref1"
+ },
+ {
+  "pattern": "حسب",
+  "name_ar": "حسب (according to)",
+  "meaning_en": "according to",
+  "meaning_zh": "حسب：根据……；按照。",
+  "level": "B2",
+  "focus": [
+   "حسب"
+  ],
+  "formation": "حسب + اسم مجرور",
+  "notes": "حسب ما = 根据……（后接从句）。",
+  "examples": [
+   {
+    "arabic": "حسب الخطة، نبدأ غدا.",
+    "chinese": "按计划，我们明天开始。"
+   }
+  ],
+  "source": "ref1"
+ }
+]
