@@ -111,22 +111,30 @@ def split_sentences(text):
 # host: freeze then reload grew RSS by ~50 MB instead of returning it).
 # _reclaim() below hands them back.  What comes back is the model, not the
 # runtime: spaCy/thinc/numpy are ~90 MB of imported modules and stay.
+#
+# The arenas also fill up without any model being released, because every
+# request thread gets its own: on the production host, eight grammar-panel
+# requests took RSS from 216 MB to 303 MB and it stayed there for the next
+# eight -- not a leak (the engine itself is flat over repeated runs), just
+# per-thread slack.  trim_arenas() sweeps that up occasionally.
 _SPACY_IDLE_SECONDS = 900
+_TRIM_INTERVAL_SECONDS = 300
 
 _MODELS = {}
 _MODELS_LOCK = threading.Lock()
+_last_trim = 0.0
+_trim_lock = threading.Lock()
 
 
-def _reclaim():
+def _trim():
     """
-    Return the freed pipeline's pages to the OS.
+    Ask the allocator to return its empty pages to the OS.
 
-    gc.collect() first: spaCy's Language/Pipe objects carry reference
-    cycles that plain refcounting leaves behind.  Then malloc_trim(0),
-    which releases the emptied glibc arenas -- imported lazily and its
-    absence tolerated, so this is a no-op off glibc (macOS development).
+    malloc_trim walks every arena, not just the calling thread's, which
+    is why it can reclaim slack the other request threads accumulated.
+    Imported lazily and its absence tolerated, so this is a no-op off
+    glibc (macOS development).
     """
-    gc.collect()
     try:
         # pylint: disable-next=import-outside-toplevel
         import ctypes
@@ -134,6 +142,31 @@ def _reclaim():
         ctypes.CDLL("libc.so.6").malloc_trim(0)
     except (OSError, AttributeError):
         pass
+
+
+def _reclaim():
+    "Give back a just-freed pipeline: break its cycles, then trim."
+    gc.collect()
+    _trim()
+
+
+def trim_arenas(interval_seconds=_TRIM_INTERVAL_SECONDS):
+    """
+    Trim the arenas, but at most once per interval; True if it ran.
+
+    Called from the read blueprint's per-request hook.  Nothing needs
+    collecting -- Python's own generational GC already handled that --
+    so this is malloc_trim alone: no full gc.collect() pause on a heap
+    this size, ten or so milliseconds once per interval.
+    """
+    global _last_trim  # pylint: disable=global-statement
+    now = time.monotonic()
+    with _trim_lock:
+        if now - _last_trim < interval_seconds:
+            return False
+        _last_trim = now
+    _trim()
+    return True
 
 
 class _ModelHolder:
