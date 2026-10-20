@@ -20,6 +20,17 @@ Feature changes:
   French, German, Italian, Portuguese, Thai, Arabic, Mandarin, Cantonese)
   show authored Korean descriptions, and the Japanese engine explains
   every curated JLPT entry in Korean (ko.json, mirroring zh.json).
+* Grammar engines now give their memory back.  A language's spaCy model is
+  loaded once (two requests racing on the first click used to load two
+  copies), released immediately when the language is frozen, and released
+  after 15 minutes idle -- the read blueprint checks on each request, so
+  reading Japanese for a week no longer keeps the English model resident.
+  A released model reloads transparently on the next grammar analysis;
+  thawing a language preloads nothing.  Before this, opening the grammar
+  panel once pinned that model (40-200 MB) for the life of the process.
+  Freezing a language whose engine rides on the reading page's own parser
+  (Japanese/Sudachi, Korean/Kiwi) releases nothing, on purpose: those
+  tokenizers are needed for ordinary reading.
 * Shadowing shows what was heard for a miss too, not just a near-miss: a
   word the engine heard as something unrelated now carries the same
   "→ heard" readout the orange marker already had, so a learner can see

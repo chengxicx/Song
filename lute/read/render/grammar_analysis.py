@@ -17,6 +17,8 @@ import re
 import subprocess
 import sys
 
+from lute.read.render.grammar_analysis_matcher import release_spacy_model
+
 
 # Japanese is identified by its configured parser type (MeCab or Sudachi)
 # or by its language name.
@@ -325,6 +327,42 @@ _PARSER_SHIPPED_ENGINES = [
     ("Japanese", "Sudachi", is_japanese_language),
     ("Korean", "Kiwi", is_korean_language),
 ]
+
+
+def spacy_model_for(language):
+    """
+    The spaCy pipeline serving this language, or None.
+
+    Read out of _ENGINE_REQUIREMENTS rather than a second table, so the
+    model name lives in exactly one place: for the spaCy engines the deps
+    tuple is ("spacy", "<model>") and the model is its second entry.
+    Japanese/Korean/Chinese/Cantonese/Thai/Arabic/Russian have no spaCy
+    pipeline and return None.
+    """
+    if language is None:
+        return None
+    for _label, detect, deps, _extra in _ENGINE_REQUIREMENTS:
+        if detect(language):
+            return deps[1] if len(deps) > 1 and deps[0] == "spacy" else None
+    return None
+
+
+def release_grammar_engine(language):
+    """
+    Give back a language's grammar-engine memory; True if one was dropped.
+
+    Called when a language is frozen.  Only the spaCy engines hold
+    anything releasable: Russian's pymorphy3 dictionaries are small, the
+    Chinese/Cantonese engines are pure regex, and the Japanese/Korean
+    tokenizers belong to the reading page's parser, which must stay
+    loaded for normal reading -- freeing those would trade a panel's
+    memory for a several-hundred-MB dictionary reload on the next page
+    turn.
+    """
+    model = spacy_model_for(language)
+    if model is None:
+        return False
+    return release_spacy_model(model)
 
 
 def grammar_engine_note(language):
