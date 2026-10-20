@@ -133,6 +133,32 @@ def test_releasing_something_not_loaded_is_a_no_op(fake_spacy):
     assert matcher.release_spacy_model("xx_absent") is False
 
 
+def test_release_hands_the_pages_back(monkeypatch, fake_spacy):
+    """
+    Dropping the reference is not enough on glibc -- the freed pages stay
+    in the process's arenas, so a freeze/reload cycle grows RSS instead of
+    returning it.  A real release must follow up with the reclaim step.
+    """
+    trims = []
+    monkeypatch.setattr(matcher, "_reclaim", lambda: trims.append(1))
+
+    matcher.make_spacy_tokenizer("xx_test_model")("a")
+    assert trims == []
+
+    assert matcher.release_spacy_model("xx_test_model") is True
+    assert trims == [1]
+
+    # Nothing was resident, so there is nothing to reclaim: a no-op release
+    # must not pay for a collection pause.
+    assert matcher.release_spacy_model("xx_test_model") is False
+    assert trims == [1]
+
+
+def test_reclaim_survives_a_host_without_glibc():
+    "No libc.so.6 off Linux; the reclaim step must be a no-op, not a crash."
+    matcher._reclaim()
+
+
 def test_idle_sweep_drops_the_cold_model_only(fake_spacy):
     cold = matcher.make_spacy_tokenizer("xx_cold")
     warm = matcher.make_spacy_tokenizer("xx_warm")
