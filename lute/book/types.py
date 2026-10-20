@@ -169,7 +169,7 @@ BOOK_TYPES = {
         "player": None,
     },
     "epub": {
-        "label": "EPUB",
+        "label": "EPUB / MOBI / AZW3",
         "short": "EPUB",
         "color": "#d6336c",
         "paths": (
@@ -177,6 +177,8 @@ BOOK_TYPES = {
         ),
         # Reader-mode EPUB chapters are stored with book_type "epub";
         # a plain-text EPUB import stays "" (the type alias "text").
+        # Kindle files (MOBI / AZW3) are converted to EPUB before import
+        # (lute.book.kindle_parser), so they share this import type.
         "stored": True,
         "import_type": True,
         "selectable": False,

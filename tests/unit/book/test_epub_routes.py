@@ -13,6 +13,7 @@ import urllib.parse
 from lute.db import db
 from lute.models.book import Book as DBBook
 from lute.models.repositories import UserSettingRepository
+from tests.unit.book.kindle_builder import build_kf8, build_mobi6
 from tests.utils import make_epub, make_epub_xhtml
 
 
@@ -203,3 +204,53 @@ def test_import_requires_language(app, app_context, english):
     assert data["success"] is False
     assert "language" in data["error"].lower()
     assert _all_books() == []
+
+
+def _kindle_bytes():
+    "A 2-chapter AZW3 file built from the KF8 container layout."
+    return build_kf8(
+        title="Kindle Book",
+        author="Kindle Author",
+        chapters=[("One", ["kindle text"]), ("Two", ["more text"])],
+    )
+
+
+def test_kindle_preview_is_served_by_the_epub_routes(app, app_context, english):
+    "An .azw3 upload previews through the same endpoint as an EPUB."
+    client = app.test_client()
+    resp = client.post(
+        "/book/import/epub/preview",
+        data={"epub_file": (io.BytesIO(_kindle_bytes()), "route.azw3")},
+        content_type="multipart/form-data",
+    )
+    data = resp.get_json()
+    assert data["success"] is True
+    assert data["title"] == "Kindle Book"
+    assert [c["title"] for c in data["chapters"]] == ["One", "Two"]
+    assert _all_books() == []
+
+
+def test_mobi_form_post_imports_chapters(app, app_context, english):
+    "A direct (no preview) MOBI upload creates one book per section."
+    mobi = build_mobi6(
+        title="Mobi Route Book",
+        sections=[
+            "<html><body><h2>First</h2><p>first text</p></body></html>",
+            "<html><body><h2>Second</h2><p>second text</p></body></html>",
+        ],
+    )
+    client = app.test_client()
+    resp = client.post(
+        "/book/import_webpage",
+        data={
+            "import_type": "epub",
+            "epub_file": (io.BytesIO(mobi), "route.mobi"),
+            "language_id": str(english.id),
+            "epub_title": "Mobi Route Book",
+        },
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"].endswith(urllib.parse.quote("Mobi Route Book"))
+    titles = sorted(b.title for b in _all_books())
+    assert titles == ["Mobi Route Book 01 - First", "Mobi Route Book 02 - Second"]
