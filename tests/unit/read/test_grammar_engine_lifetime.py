@@ -159,6 +159,66 @@ def test_reclaim_survives_a_host_without_glibc():
     matcher._reclaim()
 
 
+# ---- periodic arena trim ----------------------------------------------
+
+
+def test_trim_runs_once_per_interval(monkeypatch):
+    """
+    Per-request hook, so it must be free until the interval is up: one
+    timestamp comparison per request, a trim at most every few minutes.
+    """
+    trims = []
+    monkeypatch.setattr(matcher, "_trim", lambda: trims.append(1))
+    monkeypatch.setattr(matcher, "_last_trim", 0.0)
+
+    assert matcher.trim_arenas(600) is True
+    assert trims == [1]
+
+    assert matcher.trim_arenas(600) is False
+    assert trims == [1]
+
+    # Pretend the interval elapsed.
+    monkeypatch.setattr(matcher, "_last_trim", 0.0)
+    assert matcher.trim_arenas(600) is True
+    assert trims == [1, 1]
+
+
+def test_trim_needs_no_model_and_collects_nothing(monkeypatch):
+    """
+    The periodic trim is not a release: nothing was dropped, so it skips
+    the full gc.collect() pause and only asks malloc for its pages back.
+    """
+    calls = []
+    monkeypatch.setattr(matcher.gc, "collect", lambda: calls.append("gc"))
+    monkeypatch.setattr(matcher, "_trim", lambda: calls.append("trim"))
+    monkeypatch.setattr(matcher, "_last_trim", 0.0)
+
+    assert matcher.trim_arenas(600) is True
+    assert calls == ["trim"]
+
+
+def test_release_still_collects_before_trimming(monkeypatch, fake_spacy):
+    "A release does need the collection: spaCy's pipelines carry cycles."
+    calls = []
+    monkeypatch.setattr(matcher.gc, "collect", lambda: calls.append("gc"))
+    monkeypatch.setattr(matcher, "_trim", lambda: calls.append("trim"))
+
+    matcher.make_spacy_tokenizer("xx_test_model")("a")
+    assert matcher.release_spacy_model("xx_test_model") is True
+    assert calls == ["gc", "trim"]
+
+
+def test_read_request_trims_the_arenas(app, client, monkeypatch):
+    "The read blueprint's hook is what keeps RSS from ratcheting up."
+    trims = []
+    monkeypatch.setattr(matcher, "_trim", lambda: trims.append(1))
+    monkeypatch.setattr(matcher, "_last_trim", 0.0)
+
+    client.get("/read/empty")
+
+    assert trims == [1]
+
+
 def test_idle_sweep_drops_the_cold_model_only(fake_spacy):
     cold = matcher.make_spacy_tokenizer("xx_cold")
     warm = matcher.make_spacy_tokenizer("xx_warm")
