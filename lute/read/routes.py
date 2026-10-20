@@ -51,7 +51,10 @@ from lute.read.render.grammar_analysis_it import analyze_italian
 from lute.read.render.grammar_analysis_pt import analyze_portuguese
 from lute.read.render.grammar_analysis_th import analyze_thai
 from lute.read.render.grammar_analysis_ar import analyze_arabic
-from lute.read.render.grammar_analysis_matcher import release_idle_spacy_models
+from lute.read.render.grammar_analysis_matcher import (
+    release_idle_spacy_models,
+    trim_arenas,
+)
 from lute.read.render.grammar_levels import filter_hidden_grammar
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
@@ -93,8 +96,16 @@ def _release_idle_grammar_models():
     releases it at once; this hook covers the case where nothing was
     frozen -- reading Japanese for a week should not keep the English
     model loaded.  One timestamp comparison per request.
+
+    The second call trims the malloc arenas.  Nothing was released, but
+    every request thread has its own arena and they hold the pages a
+    heavy analysis freed: measured on the production host, grammar-panel
+    requests took RSS from 216 MB to 303 MB and it stayed there.  Also
+    one timestamp comparison per request; the trim itself runs at most
+    once every five minutes.
     """
     release_idle_spacy_models()
+    trim_arenas()
 
 
 def _furigana_script(lang):
