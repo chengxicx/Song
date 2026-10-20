@@ -55,6 +55,7 @@ import json
 import os
 import re
 import threading
+import time
 
 _PUNCT_POS = {"PUNCT", "SYM"}
 
@@ -81,7 +82,77 @@ def split_sentences(text):
     return [p.strip() for p in parts if p and p.strip()]
 
 
-# ---- spaCy tokenizer factory ------------------------------------------
+# ---- spaCy model lifetime ---------------------------------------------
+#
+# A loaded pipeline is 40-200 MB, and until now the only reference to it
+# lived inside the closure returned by make_spacy_tokenizer: once a user
+# opened the grammar panel for a language, that model stayed resident for
+# the rest of the process, even after switching to another language's
+# books or freezing the language.  Six spaCy engines means that adds up.
+#
+# The lifetime is explicit now:
+#
+# * loaded lazily, once, under a per-model lock -- two threads hitting the
+#   panel for the first time used to run spacy.load() twice;
+# * released when idle for _SPACY_IDLE_SECONDS (swept by the read
+#   blueprint's before_request) and immediately when the language is
+#   frozen (language.toggle_active);
+# * a released model reloads transparently on the next analysis.
+#
+# Releasing while a call is in flight is safe: _tokens_for reads the
+# pipeline into a local before using it, so that object survives the call
+# and only the *next* call pays the reload.  Dropping the reference is
+# enough -- spaCy's runtime modules are left imported on purpose, since
+# unloading a thinc C extension by hand is a good way to segfault.
+_SPACY_IDLE_SECONDS = 900
+
+_MODELS = {}
+_MODELS_LOCK = threading.Lock()
+
+
+class _ModelHolder:
+    "Process-wide holder for one spaCy pipeline, with an idle timestamp."
+
+    def __init__(self, model_name):
+        self.model_name = model_name
+        self.nlp = None
+        self.last_used = 0.0
+        self.load_lock = threading.Lock()
+
+    def get(self):
+        "Return the pipeline, loading it on first use."
+        nlp = self.nlp
+        if nlp is not None:
+            self.last_used = time.monotonic()
+            return nlp
+        with self.load_lock:
+            if self.nlp is None:
+                # pylint: disable-next=import-outside-toplevel
+                import spacy
+
+                self.nlp = spacy.load(
+                    self.model_name, exclude=["parser", "senter", "ner"]
+                )
+            self.last_used = time.monotonic()
+            return self.nlp
+
+    def drop(self):
+        "Forget the pipeline; True if one was loaded.  The next get() reloads."
+        with self.load_lock:
+            had_one = self.nlp is not None
+            self.nlp = None
+            self.last_used = 0.0
+            return had_one
+
+
+def _holder(model_name):
+    "The holder for a model, created on first mention."
+    with _MODELS_LOCK:
+        holder = _MODELS.get(model_name)
+        if holder is None:
+            holder = _ModelHolder(model_name)
+            _MODELS[model_name] = holder
+        return holder
 
 
 def make_spacy_tokenizer(model_name):
@@ -92,16 +163,17 @@ def make_spacy_tokenizer(model_name):
     Returns _tokens_for(sentence) -> list of token dicts.  spaCy is
     imported on first use, so importing this module works without it;
     the route falls back to the generic rule library on ImportError.
+
+    The pipeline itself lives in a module-level holder keyed by model
+    name, so other modules can release it (see release_spacy_model).
     """
-    nlp = None
+    holder = _holder(model_name)
 
     def _tokens_for(sentence):
         "Tokenize a sentence; return a list of token dicts."
-        nonlocal nlp
-        if nlp is None:
-            import spacy  # pylint: disable=import-outside-toplevel
-
-            nlp = spacy.load(model_name, exclude=["parser", "senter", "ner"])
+        # Local reference: a concurrent release may clear the holder
+        # between here and the call, and this call must still complete.
+        nlp = holder.get()
         doc = nlp(sentence)
         return [
             {
@@ -114,7 +186,43 @@ def make_spacy_tokenizer(model_name):
             for t in doc
         ]
 
+    _tokens_for.spacy_model = model_name
     return _tokens_for
+
+
+def release_spacy_model(model_name):
+    """
+    Drop one loaded pipeline; True if one was actually resident.
+
+    The next grammar analysis that needs it reloads it.  A model that was
+    registered but never loaded returns False, so callers can tell a real
+    release from a no-op.
+    """
+    holder = _MODELS.get(model_name)
+    if holder is None:
+        return False
+    return holder.drop()
+
+
+def loaded_spacy_models():
+    "Names of the pipelines currently resident, for tests and diagnostics."
+    return sorted(name for name, h in _MODELS.items() if h.nlp is not None)
+
+
+def release_idle_spacy_models(idle_seconds=_SPACY_IDLE_SECONDS):
+    """
+    Drop every pipeline idle for at least idle_seconds; return their names.
+
+    Cheap enough for a per-request hook: one dictionary walk over at most
+    one entry per engine.
+    """
+    now = time.monotonic()
+    dropped = []
+    for name, holder in list(_MODELS.items()):
+        if holder.nlp is not None and now - holder.last_used >= idle_seconds:
+            if holder.drop():
+                dropped.append(name)
+    return dropped
 
 
 # ---- condition matching ----------------------------------------------

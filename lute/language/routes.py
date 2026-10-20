@@ -315,6 +315,18 @@ def toggle_active(langid):
     if language.is_active:
         flash(f"Language '{language.name}' activated.", "success")
     else:
+        # Freezing means "I'm done with this language for now", so give
+        # back its grammar engine's memory instead of leaving a spaCy
+        # pipeline resident until the process restarts.  Thawing does
+        # NOT preload: the model comes back on the first grammar
+        # analysis, so un-freezing five languages costs nothing.
+        # The model is process-wide, so in multi-user mode this can also
+        # drop one another reader is using -- harmless, they simply pay
+        # the reload on their next panel.
+        if grammar_analysis.release_grammar_engine(language):
+            current_app.logger.info(
+                "Froze '%s'; released its grammar engine model.", language.name
+            )
         flash(f"Language '{language.name}' frozen.", "info")
     return redirect(url_for("language.index"))
 
