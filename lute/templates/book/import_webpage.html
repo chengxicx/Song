@@ -528,7 +528,7 @@
 </form>
 
 <form id="epub-form" class="import-form" action="/book/import_webpage" method="post" enctype="multipart/form-data" style="display: none;">
-  <p class="import-desc">{{ t('Import an EPUB as a series — each chapter becomes its own book, tagged with the book title, and shown as one aggregated row on the home page. Leave "Preview & confirm" checked to review and select chapters before importing.') }}</p>
+  <p class="import-desc">{{ t('Import an EPUB, MOBI or AZW3 e-book as a series — each chapter becomes its own book, tagged with the book title, and shown as one aggregated row on the home page. Leave "Preview & confirm" checked to review and select chapters before importing.') }}</p>
   <div class="iform">
     <div class="irow">
       <label class="ilbl" for="epub-language">{{ t('Language') }}</label>
@@ -547,9 +547,9 @@
       </div>
     </div>
     <div class="irow">
-      <label class="ilbl" for="epub_file">{{ t('EPUB file') }}</label>
+      <label class="ilbl" for="epub_file">{{ t('EPUB / MOBI / AZW3 file') }}</label>
       <div class="ictrl">
-        <input type="file" id="epub_file" name="epub_file" accept=".epub">
+        <input type="file" id="epub_file" name="epub_file" accept=".epub,.mobi,.azw,.azw3,.prc">
       </div>
     </div>
     <div class="irow">

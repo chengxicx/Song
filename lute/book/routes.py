@@ -5,6 +5,7 @@
 import json
 import os
 import urllib.parse
+from io import BytesIO
 from flask import (
     Blueprint,
     request,
@@ -44,7 +45,9 @@ from lute.book.epub_import import (
     import_epub_chapters,
     language_id_from,
     selected_chapter_indices,
+    read_ebook_bytes,
 )
+from lute.book.kindle_parser import KINDLE_EXTENSIONS
 from lute.book.forms import (
     NewBookForm,
     EditBookForm,
@@ -930,18 +933,17 @@ def _import_pdf():
 @bp.route("/import/epub/preview", methods=["POST"])
 def import_epub_preview():
     """
-    Parse an uploaded EPUB and return its metadata and chapter titles.
+    Parse an uploaded EPUB / Kindle e-book and return metadata and chapter titles.
 
     This is the "preview and confirm" step: nothing is written to the
     database; the client re-uploads the file on confirmation.
     """
-    epub_file = _epub_file_from_request()
-    if epub_file is None:
-        return jsonify(
-            {"success": False, "error": t("Please upload a valid EPUB file (.epub).")}
-        )
+    ebook_file = _ebook_file_from_request()
+    if ebook_file is None:
+        return jsonify({"success": False, "error": t(_EBOOK_UPLOAD_ERROR)})
     try:
-        data = parse_epub(epub_file.stream)
+        raw = read_ebook_bytes(ebook_file.filename, ebook_file.stream)
+        data = parse_epub(BytesIO(raw))
     except BookImportException as e:
         return jsonify({"success": False, "error": e.message})
     return jsonify(
@@ -957,16 +959,14 @@ def import_epub_preview():
 @bp.route("/import/epub", methods=["POST"])
 def import_epub():
     """
-    Create one book per chapter from the uploaded EPUB.
+    Create one book per chapter from the uploaded EPUB / Kindle e-book.
 
     Used by the preview flow (JSON response); the client re-uploads the
     file along with the selected chapter indices.
     """
-    epub_file = _epub_file_from_request()
-    if epub_file is None:
-        return jsonify(
-            {"success": False, "error": t("Please upload a valid EPUB file (.epub).")}
-        )
+    ebook_file = _ebook_file_from_request()
+    if ebook_file is None:
+        return jsonify({"success": False, "error": t(_EBOOK_UPLOAD_ERROR)})
     language_id = language_id_from(request.form.get("language_id"))
     if language_id is None:
         return jsonify({"success": False, "error": t("Please select a language.")})
@@ -976,7 +976,7 @@ def import_epub():
     reader_mode = _truthy_form_value(request.form.get("epub_reader_mode"))
     try:
         imported, failed, book_title, last_error = import_epub_chapters(
-            epub_file, title, language_id, tags, selected, reader_mode
+            ebook_file, title, language_id, tags, selected, reader_mode
         )
     except BookImportException as e:
         return jsonify({"success": False, "error": e.message})
@@ -996,10 +996,10 @@ def import_epub():
 
 
 def _import_epub_direct():
-    "Form-post EPUB import: create books for all chapters, then redirect."
-    epub_file = _epub_file_from_request()
-    if epub_file is None:
-        flash(t("Please upload a valid EPUB file (.epub)."), "notice")
+    "Form-post EPUB / Kindle import: create books for all chapters, then redirect."
+    ebook_file = _ebook_file_from_request()
+    if ebook_file is None:
+        flash(t(_EBOOK_UPLOAD_ERROR), "notice")
         return redirect("/book/import_webpage", 302)
     language_id = language_id_from(request.form.get("language_id"))
     if language_id is None:
@@ -1010,7 +1010,7 @@ def _import_epub_direct():
     reader_mode = _truthy_form_value(request.form.get("epub_reader_mode"))
     try:
         imported, failed, book_title, last_error = import_epub_chapters(
-            epub_file, title, language_id, tags, None, reader_mode
+            ebook_file, title, language_id, tags, None, reader_mode
         )
     except BookImportException as e:
         flash(e.message, "notice")
@@ -1026,12 +1026,17 @@ def _import_epub_direct():
     return redirect(f"/book/series/{urllib.parse.quote(book_title)}", 302)
 
 
-def _epub_file_from_request():
-    "Get the uploaded EPUB file field, or None when missing/invalid."
+_EBOOK_EXTENSIONS = (".epub",) + KINDLE_EXTENSIONS
+_EBOOK_UPLOAD_ERROR = "Please upload a valid EPUB, MOBI or AZW3 file."
+
+
+def _ebook_file_from_request():
+    "Get the uploaded e-book file field, or None when missing/invalid."
     f = request.files.get("epub_file")
     if f is None or f.filename == "":
         return None
-    if not (f.filename or "").lower().endswith(".epub"):
+    name = (f.filename or "").lower()
+    if not name.endswith(_EBOOK_EXTENSIONS):
         return None
     return f
 
