@@ -51,6 +51,7 @@ from lute.read.render.grammar_analysis_it import analyze_italian
 from lute.read.render.grammar_analysis_pt import analyze_portuguese
 from lute.read.render.grammar_analysis_th import analyze_thai
 from lute.read.render.grammar_analysis_ar import analyze_arabic
+from lute.read.render.grammar_analysis_matcher import release_idle_spacy_models
 from lute.read.render.grammar_levels import filter_hidden_grammar
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
@@ -79,6 +80,21 @@ from lute.db import db
 
 
 bp = Blueprint("read", __name__, url_prefix="/read")
+
+
+@bp.before_request
+def _release_idle_grammar_models():
+    """
+    Give back grammar-engine memory that has gone unused.
+
+    A language's spaCy pipeline used to stay resident for the life of the
+    process once the grammar panel had been opened for it (see
+    grammar_analysis_matcher's lifetime note).  Freezing the language
+    releases it at once; this hook covers the case where nothing was
+    frozen -- reading Japanese for a week should not keep the English
+    model loaded.  One timestamp comparison per request.
+    """
+    release_idle_spacy_models()
 
 
 def _furigana_script(lang):
