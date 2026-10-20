@@ -51,6 +51,7 @@ sentence when its first token satisfies the spec (the command "dame",
 which the tagger also reads as a preterite form).
 """
 
+import gc
 import json
 import os
 import re
@@ -104,10 +105,35 @@ def split_sentences(text):
 # and only the *next* call pays the reload.  Dropping the reference is
 # enough -- spaCy's runtime modules are left imported on purpose, since
 # unloading a thinc C extension by hand is a good way to segfault.
+#
+# Dropping the reference alone does NOT lower RSS: the freed pages land in
+# the process's malloc arenas and stay there (measured on the production
+# host: freeze then reload grew RSS by ~50 MB instead of returning it).
+# _reclaim() below hands them back.  What comes back is the model, not the
+# runtime: spaCy/thinc/numpy are ~90 MB of imported modules and stay.
 _SPACY_IDLE_SECONDS = 900
 
 _MODELS = {}
 _MODELS_LOCK = threading.Lock()
+
+
+def _reclaim():
+    """
+    Return the freed pipeline's pages to the OS.
+
+    gc.collect() first: spaCy's Language/Pipe objects carry reference
+    cycles that plain refcounting leaves behind.  Then malloc_trim(0),
+    which releases the emptied glibc arenas -- imported lazily and its
+    absence tolerated, so this is a no-op off glibc (macOS development).
+    """
+    gc.collect()
+    try:
+        # pylint: disable-next=import-outside-toplevel
+        import ctypes
+
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+    except (OSError, AttributeError):
+        pass
 
 
 class _ModelHolder:
@@ -201,7 +227,15 @@ def release_spacy_model(model_name):
     holder = _MODELS.get(model_name)
     if holder is None:
         return False
-    return holder.drop()
+    return _release_holder(holder)
+
+
+def _release_holder(holder):
+    "Drop a holder's pipeline and give its pages back; True if it had one."
+    if not holder.drop():
+        return False
+    _reclaim()
+    return True
 
 
 def loaded_spacy_models():
@@ -220,7 +254,7 @@ def release_idle_spacy_models(idle_seconds=_SPACY_IDLE_SECONDS):
     dropped = []
     for name, holder in list(_MODELS.items()):
         if holder.nlp is not None and now - holder.last_used >= idle_seconds:
-            if holder.drop():
+            if _release_holder(holder):
                 dropped.append(name)
     return dropped
 
