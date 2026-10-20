@@ -27,10 +27,21 @@ Feature changes:
   reading Japanese for a week no longer keeps the English model resident.
   A released model reloads transparently on the next grammar analysis;
   thawing a language preloads nothing.  Before this, opening the grammar
-  panel once pinned that model (40-200 MB) for the life of the process.
-  Freezing a language whose engine rides on the reading page's own parser
+  panel once pinned that model for the life of the process.  Freezing a
+  language whose engine rides on the reading page's own parser
   (Japanese/Sudachi, Korean/Kiwi) releases nothing, on purpose: those
-  tokenizers are needed for ordinary reading.
+  tokenizers are needed for ordinary reading.  Releasing drops the
+  pipeline and then hands the freed pages back to the OS (a bare
+  dereference leaves them in the process's malloc arenas: on the
+  production host that turned every freeze/reload cycle into ~50 MB of
+  growth instead of a release).  Measured there, freezing English returns
+  ~31 MB; spaCy's own imported modules (~90 MB, shared by all six
+  engines) stay resident, since unloading a thinc C extension by hand is
+  a good way to segfault.  The read page also asks the allocator to hand
+  back its free pages every five minutes: each request thread has its own
+  malloc arena, and a page-wide analysis leaves them holding memory that
+  nothing was going to release (measured: eight panel requests took the
+  process from 216 MB to 303 MB, where it then stayed).
 * Shadowing shows what was heard for a miss too, not just a near-miss: a
   word the engine heard as something unrelated now carries the same
   "→ heard" readout the orange marker already had, so a learner can see
@@ -60,6 +71,14 @@ Feature changes:
   at conversion, so a dictionary that leans on them (the New Century one
   redirects 62% of its headwords) reads normally instead of showing the raw
   redirect text.
+* The EPUB import also takes Kindle files: MOBI, AZW and AZW3 are converted
+  to an EPUB in memory (`lute/book/kindle_parser.py`, standard library only),
+  so the chapter preview, series tagging and reader mode work exactly as they
+  do for EPUB.  All three text compressions are decoded (none, PalmDOC LZ77,
+  HUFF/CDIC), a combo file is read from its KF8 part, metadata comes from
+  EXTH, and images are carried into the converted pack.  DRM-protected books
+  are rejected with a clear message instead of failing obscurely.  The
+  single-book "Text file" upload accepts the same extensions.
 
 Bugfixes:
 

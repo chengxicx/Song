@@ -536,6 +536,10 @@ class FileTextExtraction:
         handlers = {
             ".txt": self._get_textfile_content,
             ".epub": self._get_epub_content,
+            ".mobi": self._get_kindle_content,
+            ".azw": self._get_kindle_content,
+            ".azw3": self._get_kindle_content,
+            ".prc": self._get_kindle_content,
             ".pdf": self._get_pdf_content,
             ".srt": self._get_srt_content,
             ".vtt": self._get_vtt_content,
@@ -602,6 +606,19 @@ class FileTextExtraction:
             msg = f"Could not parse {filename} (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
         return content
+
+    def _get_kindle_content(self, filename, filestream):
+        """
+        Get the content of a MOBI / AZW / AZW3 file as a single string.
+
+        Kindle formats are converted to EPUB in memory first (the parser
+        imports BookImportException from this module, so the import is
+        local to avoid a cycle).
+        """
+        from lute.book.kindle_parser import kindle_to_epub
+
+        epub_bytes = kindle_to_epub(filestream.read())
+        return self._get_epub_content(filename, BytesIO(epub_bytes))
 
     def _get_pdf_content(self, filename, filestream):
         "Get content as a single string from a PDF file using PyPDF2."

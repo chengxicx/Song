@@ -5,6 +5,10 @@ Chapter books are tagged 'EPUB' (plus any extra tags) and the book
 title, and the book title is auto-added to the book_series_tags
 setting, so the home page aggregates the chapters into a series row
 that opens on the series overview page.
+
+Kindle files (MOBI / AZW / AZW3) go through the same path: they are
+converted to EPUB bytes by lute.book.kindle_parser first, so chapter
+splitting, preview and reader mode all behave identically.
 """
 
 import json
@@ -17,7 +21,21 @@ from lute.book.model import Book
 from lute.book.service import Service as BookService
 from lute.book.epub_parser import parse_epub, chapter_book_title
 from lute.book.epub_extract import extract_epub_package
+from lute.book.kindle_parser import is_kindle_ebook, kindle_to_epub
 from lute.models.repositories import UserSettingRepository
+
+
+def read_ebook_bytes(filename, stream):
+    """
+    Read an uploaded e-book, converting Kindle formats to EPUB bytes.
+
+    Raises BookImportException for Kindle files that are encrypted or
+    damaged, with the parser's user-facing message.
+    """
+    raw = stream.read()
+    if is_kindle_ebook(filename, raw):
+        return kindle_to_epub(raw)
+    return raw
 
 
 def import_epub_chapters(
@@ -41,7 +59,7 @@ def import_epub_chapters(
 
     Returns (imported_count, failed_count, book_title, last_error).
     """
-    raw = epub_file.stream.read()
+    raw = read_ebook_bytes(epub_file.filename, epub_file.stream)
     data = parse_epub(BytesIO(raw))
     book_title = (
         (title or "").strip() or data.title or _filename_base(epub_file.filename)
