@@ -3,6 +3,20 @@
 
 Feature changes:
 
+* The grammar match ring is legible in the day themes.  Hovering a grammar
+  entry rings the words that entry matched inside the reading text, and
+  that ring was a fixed translucent amber (#ffd65a at 90%) -- loud on the
+  dark themes it was drawn for, but about 1.2:1 against the paper
+  backgrounds, i.e. a 2px line that vanished at the very moment the
+  learner was looking at it.  The colour is now a token
+  (--grammar-match-color): a deep amber by default, ~3.2:1 on the day
+  themes' paper and still ~5.7:1 on near-black, so a theme that never sets
+  it stays legible either way.  Default, Dark_slate, Dusk and Night
+  override it back to the bright amber, so dark-mode users see no change.
+  The mark on the matched words inside the grammar panel's example
+  sentences is derived from the same token instead of carrying its own
+  copy of the amber, so the reading-text ring and the panel mark can no
+  longer drift apart.
 * Shadowing no longer scores a correctly read word as a miss when the
   engine re-cut it into separate morphemes.  The page's tier of words is
   what the learner reads -- one term, としました -- while the

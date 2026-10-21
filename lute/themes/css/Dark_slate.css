@@ -13,6 +13,9 @@ body {
   --font-color: #c4c8ce;
   --dark-grey: #333333;
 
+  /* 语法匹配环：暗底上保留亮琥珀（styles.css 的默认深琥珀是给纸色主题的）。 */
+  --grammar-match-color: rgba(255, 214, 90, 0.9);
+
   --form-border-color: var(--light-grey);
 
   background-color: var(--background-color); /* dark grey paper */
