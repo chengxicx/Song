@@ -3,6 +3,19 @@
 
 Feature changes:
 
+* Shadowing no longer scores a correctly read word as a miss when the
+  engine re-cut it into separate morphemes.  The page's tier of words is
+  what the learner reads -- one term, としました -- while the
+  transcription is tokenized into morphemes, と + し + まし + た, and
+  when an unrelated word sat in front of them the 1:1 pairing handed
+  that word to としました and pushed the four morphemes that actually
+  spell it into "also heard": a word said exactly right scored zero,
+  with a readout claiming the learner had said the unrelated word
+  instead.  A run of still-unpaired transcribed tokens whose keys join
+  to exactly the word's key is now the word, said as-is, and the token
+  the pairing had borrowed for it moves to "also heard", where it
+  belongs.  Exact joins only: a word the engine heard differently stays
+  a miss.
 * Shadowing no longer scores a kana word half credit when the engine
   writes it as kanji.  Japanese is judged on readings, and a kanji's
   reading is a fixed dictionary field: a sentence printing わたし in kana
