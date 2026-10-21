@@ -60,13 +60,22 @@ class _FakeParsedToken:
 class _FakeParser:
     "Duck-typed parser: fixed readings + plain lowercase."
 
-    def __init__(self, readings=None, multi_readings=None, context_readings=None):
+    def __init__(
+        self,
+        readings=None,
+        multi_readings=None,
+        context_readings=None,
+        normalized_forms=None,
+    ):
         self.readings = readings or {}
         self.multi_readings = multi_readings or {}
         # [(surface, reading-or-None)] a get_context_readings call answers,
         # or None to simulate a parser without contextual readings.
         self.context_readings = context_readings
         self.context_calls = []
+        # surface -> dictionary's normalized spelling, or None to
+        # simulate a parser with no such normalization.
+        self.normalized_forms = normalized_forms
 
     def get_reading(self, text):
         return self.readings.get(text)
@@ -77,6 +86,11 @@ class _FakeParser:
     def get_context_readings(self, text):
         self.context_calls.append(text)
         return self.context_readings
+
+    def get_normalized_form(self, text):
+        if self.normalized_forms is None:
+            return None
+        return self.normalized_forms.get(text)
 
     def get_lowercase(self, text):
         return text.lower()
@@ -92,10 +106,13 @@ class _FakeLanguage:
         readings=None,
         multi_readings=None,
         context_readings=None,
+        normalized_forms=None,
     ):
         self.parser_type = parser_type
         self.spoken_tokens = spoken_tokens
-        self._parser = _FakeParser(readings, multi_readings, context_readings)
+        self._parser = _FakeParser(
+            readings, multi_readings, context_readings, normalized_forms
+        )
 
     @property
     def parser(self):
@@ -632,6 +649,73 @@ def test_japanese_heard_side_also_reads_in_context():
     res = shadowing.compare_tokens(["私", "は"], "私は", lang, original_full_text="私は")
     assert res["statuses"] == [2, 2]
     assert res["score"] == 100
+
+
+def test_japanese_kana_word_written_as_kanji_by_the_engine_is_a_match():
+    """
+    The sentence prints わたし in kana and SenseVoice answers 私.
+
+    A kanji's reading is a fixed dictionary field and 私 is filed at
+    わたくし, which sits 0.857 from わたし: a half-credit misread that no
+    amount of correct reading can avoid, because the kana is what the
+    learner was told to say.  Both spellings normalize to 私, so the
+    word was said right.
+    """
+    lang = _FakeLanguage(
+        ["私", "は"],
+        parser_type="japanese",
+        readings={"私": "わたくし", "わたし": "わたし"},
+        normalized_forms={"わたし": "私"},
+    )
+    res = shadowing.compare_tokens(
+        ["わたし", "は"], "私は", lang, original_full_text="わたしは"
+    )
+    assert res["statuses"] == [2, 2]
+    assert res["spoken_for_fuzzy"] == {}
+    # The panel annotates the heard word with this, not with 私's own
+    # dictionary reading (わたくし).
+    assert res["spoken_kana"] == {0: "わたし"}
+    assert res["score"] == 100
+
+
+def test_japanese_two_kanji_forms_are_still_judged_on_their_readings():
+    """
+    The rescue covers a kana sentence word only.
+
+    A kanji the book printed must still be read the way the book's
+    sentence reads it, so 一日 read as ついたち stays a misread even
+    though both sides normalize to 一日.
+    """
+    lang = _FakeLanguage(
+        ["ついたち"],
+        parser_type="japanese",
+        readings={"一日": "いちにち", "ついたち": "ついたち"},
+        normalized_forms={"一日": "一日"},
+    )
+    res = shadowing.compare_tokens(["一日"], "ついたち", lang, original_full_text="一日")
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "ついたち"}
+
+
+def test_japanese_kana_transcription_is_judged_by_sound():
+    """
+    A kana transcription is a transcript of the sound itself.
+
+    わたし heard as わたくし is a different word form the learner really
+    said, not the engine's choice of spelling, so normalizing both to 私
+    must not turn it into a match.
+    """
+    lang = _FakeLanguage(
+        ["わたくし"],
+        parser_type="japanese",
+        readings={"わたし": "わたし", "わたくし": "わたくし"},
+        normalized_forms={"わたし": "私", "わたくし": "私"},
+    )
+    res = shadowing.compare_tokens(
+        ["わたし"], "わたくし", lang, original_full_text="わたし"
+    )
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "わたくし"}
 
 
 def test_japanese_word_inside_glued_heard_chunk_is_a_match():
@@ -1342,6 +1426,63 @@ def test_route_hears_kana_in_the_book_script(app, app_context, client, japanese)
     assert body["score"] == 100
 
 
+def test_route_reads_the_heard_kanji_as_the_sentence_s_kana(
+    app, app_context, client, japanese
+):
+    """
+    Regression from a real Japanese take.  The sentence prints わたし in
+    kana; SenseVoice answered 私, and the "heard" line annotated it with
+    私's dictionary reading わたくし -- a reading the learner never
+    produced, on a word that now scores as said.  The furigana (and the
+    reading the panel speaks) must be the kana from the sentence.
+    """
+    from lute.settings.current import current_settings
+
+    if not shadowing.is_japanese_language(japanese):
+        pytest.skip("the test database's Japanese language is unavailable")
+    if japanese.parser.get_normalized_form("わたし") is None:
+        pytest.skip("Japanese parser is not Sudachi; no normalized form")
+
+    current_settings()["japanese_reading"] = "hiragana"
+
+    def _fake_sv(audio_path, lang_code):
+        assert lang_code == "ja"
+        return "私は学生です", 4.0
+
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(sensevoice, "available", return_value=True), patch.object(
+        sensevoice, "ensure_model_downloaded"
+    ), patch.object(
+        sensevoice, "transcribe_clip", side_effect=_fake_sv
+    ):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(japanese.id),
+                "tokens": json.dumps(["わたし", "は", "学生", "です"]),
+                "full_text": "わたしは学生です",
+                "audio": (io.BytesIO(b"fake webm bytes"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        status = _wait_for_task(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    body = status["result"]
+    # The transcription stays what the engine returned ...
+    assert body["transcription"] == "私は学生です"
+    # ... the word is the one that was said ...
+    assert body["statuses"] == [2, 2, 2, 2]
+    assert body["score"] == 100
+    # ... and its furigana is the sentence's kana, not 私's わたくし.
+    heard = {t["text"]: t["reading"] for t in body["transcription_tokens"]}
+    assert heard["私"] == "わたし"
+    # Words the sentence prints in kanji keep their own readings.
+    assert heard["学生"] == "がくせい"
+
+
 def test_route_chinese_matches_across_simplified_traditional(app, app_context, client):
     """
     SenseVoice emits simplified Han even for Cantonese; the diff folds
@@ -1573,6 +1714,25 @@ def test_readings_route_japanese_reads_in_context(app, client, japanese):
     assert [t["text"] for t in out] == tokens
     by_text = {t["text"]: t["reading"] for t in out}
     assert by_text["一つ"] == "ひとつ"
+
+
+def test_sudachi_normalized_form_folds_kana_onto_kanji(app_context, japanese):
+    """
+    The cross-script rescue rests on the dictionary's normalized
+    spelling, which must collapse a kana word onto the kanji it is filed
+    under without merging words that only sound alike.
+    """
+    parser = japanese.parser
+    if parser.get_normalized_form("わたし") is None:
+        pytest.skip("Japanese parser is not Sudachi; no normalized form")
+
+    assert parser.get_normalized_form("わたし") == "私"
+    assert parser.get_normalized_form("あたし") == "私"
+    # Already its normalized form: nothing to report.
+    assert parser.get_normalized_form("私") is None
+    # Homophones keep their own spellings, so they can never be confused.
+    assert parser.get_normalized_form("箸") is None
+    assert parser.get_normalized_form("橋") is None
 
 
 def test_route_unknown_model_falls_back_to_default(app, app_context, client, english):

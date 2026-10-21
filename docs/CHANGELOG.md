@@ -3,6 +3,26 @@
 
 Feature changes:
 
+* Shadowing no longer scores a kana word half credit when the engine
+  writes it as kanji.  Japanese is judged on readings, and a kanji's
+  reading is a fixed dictionary field: a sentence printing わたし in kana
+  comes back from SenseVoice as 私, whose reading is わたくし -- 0.857
+  away from わたし, above the near-miss threshold, so a flawless reading
+  of the printed kana could never turn green, however the learner
+  pronounced it.  The two spellings are one word, so a pair is now also
+  compared on Sudachi's normalized form -- わたし/あたし/わたくし all
+  file under 私, while homophones such as 箸/橋/端 keep their own
+  spellings -- and the same word is a match.  The rescue applies only to
+  a kana sentence word against a kanji transcription: two kanji forms
+  stay judged on their readings (一日 read as ついたち is a real
+  misread), and a kana transcription is a transcript of the sound, which
+  the reading comparison already measures.  The "heard" line no longer
+  annotates such a word with the kanji's own dictionary reading either:
+  私 used to come back labelled わたくし, a reading the learner never
+  said, and now carries the kana the sentence prints (in whatever script
+  the japanese_reading setting asks for, so it matches the rest of the
+  line).  Parsers without a normalized form (MeCab) behave exactly as
+  before.
 * Grammar analysis panel for English, Spanish, Russian, French, German, Italian,
   Portuguese, Thai, Arabic, Mandarin Chinese and Cantonese, graded with CEFR
   levels (A1-C2), following the Japanese/Korean engines.  The engines need
