@@ -718,6 +718,48 @@ def test_japanese_kana_transcription_is_judged_by_sound():
     assert res["spoken_for_fuzzy"] == {0: "わたくし"}
 
 
+def test_japanese_word_the_engine_cut_into_morphemes_is_a_match():
+    """
+    One word on the page, several morphemes in the transcription.
+
+    The page's term としました comes back from the parser as と + し +
+    まし + た, and because the engine's 向こう (the tail of a misheard
+    振り向こう) sat in front of them, the positional pairing handed
+    向こう to としました and pushed the four morphemes that spell it
+    into "also heard" -- a correctly said word scored as a miss, with a
+    readout claiming the learner said 向こう instead.
+    """
+    lang = _FakeLanguage(
+        ["私", "は", "振い", "向こう", "と", "し", "まし", "た"],
+        parser_type="japanese",
+        readings={
+            "私": "わたし",
+            "は": "は",
+            "振り向こう": "ふりむこう",
+            "振い": "ふるい",
+            "向こう": "むこう",
+            "としました": "としました",
+            "と": "と",
+            "し": "し",
+            "まし": "まし",
+            "た": "た",
+        },
+    )
+    res = shadowing.compare_tokens(
+        ["わたし", "は", "振り向こう", "としました"],
+        "私は振い向こうとしました",
+        lang,
+        original_full_text="わたしは振り向こうとしました",
+    )
+    assert res["statuses"] == [2, 2, 0, 2]
+    # The word's positional counterpart was the engine's extra, not the
+    # word: it moves to "also heard" rather than reporting that the
+    # learner said 向こう in place of としました.
+    assert res["spoken_for_miss"] == {2: "振い"}
+    assert res["extras"] == ["向こう"]
+    assert res["score"] == 75
+
+
 def test_japanese_word_inside_glued_heard_chunk_is_a_match():
     """
     The engine transcribed こうやま as the non-word chunk 紅う山 (reading

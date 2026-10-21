@@ -1187,6 +1187,9 @@ def compare_tokens(
         # least attempted.  Verbatim claims are tracked per spoken token
         # so two left-behind words cannot share the same characters.
         claimed = {j: [] for j in range(j1, j2)}
+        # Spoken tokens a left-behind word was re-cut out of: they are
+        # part of a word now, so they are not "also heard" material.
+        recut_from = set()
         for k in range(i1, i2):
             orig_index = scored[k]
             if statuses[orig_index] != STATUS_MISS:
@@ -1245,9 +1248,45 @@ def compare_tokens(
                         break
                 if hit:
                     break
+            if statuses[orig_index] != STATUS_MISS:
+                continue
+            # The engine can also re-cut one sentence word into several
+            # morphemes of its own: the page's term としました comes back
+            # as と + し + まし + た.  A run of still-unpaired spoken
+            # tokens whose keys join to exactly this word's key is the
+            # word, spoken as-is.  Only the unpaired tail is considered:
+            # a token the positional pairing already gave to another
+            # word belongs to that word.  Exact join only -- a run that
+            # merely sounds close is the near-miss pass's business.
+            for start in range(si + n, j2):
+                if start in recut_from:
+                    continue
+                joined = ""
+                for end in range(start, j2):
+                    joined += spoken_keys[end]
+                    if len(joined) > len(okey):
+                        break
+                    if end <= start or joined != okey:
+                        continue
+                    if any(j in recut_from for j in range(start, end + 1)):
+                        break
+                    statuses[orig_index] = STATUS_MATCH
+                    recut_from.update(range(start, end + 1))
+                    # The positional pairing handed this word a
+                    # counterpart; that token is material the engine
+                    # added, not the word itself, so it joins the
+                    # "also heard" list instead of the word's readout.
+                    dropped = result["spoken_for_miss"].pop(orig_index, None)
+                    if dropped is not None:
+                        result["extras"].append(dropped)
+                    break
+                if statuses[orig_index] != STATUS_MISS:
+                    break
 
         # Spoken tokens without an original counterpart are extras.
-        result["extras"].extend(spoken[si + n : j2])
+        result["extras"].extend(
+            spoken[j] for j in range(si + n, j2) if j not in recut_from
+        )
 
     matcher = difflib.SequenceMatcher(a=keyed, b=spoken_keys, autojunk=False)
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
