@@ -693,7 +693,7 @@
   "Toggle highlights": "切换高亮",
   "Too many failed attempts.  Try again in a minute.": "失败次数过多。请一分钟后再试。",
   "Total activities:": "总活动数：",
-  "Transcript": "转录文本",
+  "Transcript": "字幕",
   "Transcription engine: SenseVoice is fastest for Chinese, Cantonese, English, Japanese and Korean; whisper covers every other language (base = fastest, medium = most accurate). The model downloads automatically on the first transcription.": "转写引擎：SenseVoice 对中、粤、英、日、韩最快；whisper 覆盖其余语言（base = 最快，medium = 最准）。模型会在首次转写时自动下载。",
   "Translate": "翻译",
   "Translate page": "翻译整页",
