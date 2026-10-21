@@ -935,8 +935,9 @@
   // Resolve which voice the player is currently using, and keep that
   // choice stored: explicit button choice > saved per-language choice >
   // recommended voice for the current language. A saved name that this
-  // device no longer offers is dropped so the recommendation can take
-  // over instead of leaving the dropdown without a highlighted row.
+  // device no longer offers -- or that cannot speak at all (a remote
+  // "Google ..." voice, see isSpeakableVoice) -- is dropped so the
+  // recommendation can take over instead of leaving playback silent.
   // Returns the effective current voice name ("" when none).
   function ttsResolveCurrentVoice(voices) {
     let name =
@@ -946,7 +947,7 @@
     if (
       name &&
       name !== DEVICE_DEFAULT_VOICE.name &&
-      !voices.some(function (v) { return v.name === name; })
+      !voices.some(function (v) { return v.name === name && isSpeakableVoice(v); })
     ) {
       name = "";
       globalCache.selectedVoice = "";
@@ -989,13 +990,20 @@
     // leftover placeholder state so the real list renders below.
     _voiceWaitStart = null;
 
-    const currentName = ttsResolveCurrentVoice(voices);
+    // Hide the voices that can never produce sound (see isSpeakableVoice):
+    // picking one used to leave the reader silent with nothing to report.
+    // If the filter would empty the list, keep everything so the menu
+    // doesn't render as a blank box.
+    const spokenVoices = voices.filter(isSpeakableVoice);
+    const listedVoices = spokenVoices.length ? spokenVoices : voices;
+
+    const currentName = ttsResolveCurrentVoice(listedVoices);
 
     // Group voices by language for easier scanning.
-    voices.sort(function (a, b) { return a.lang.localeCompare(b.lang); });
+    listedVoices.sort(function (a, b) { return a.lang.localeCompare(b.lang); });
 
     ttsVoiceDropdown.innerHTML = "";
-    voices.forEach(function (voice) {
+    listedVoices.forEach(function (voice) {
       const opt = document.createElement("div");
       opt.className = "tts-voice-option";
       opt.setAttribute("role", "option");

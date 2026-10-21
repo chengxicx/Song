@@ -147,8 +147,39 @@
   // the user started some other speech mid-sequence and stop queueing.
   let speakEpoch = 0;
 
+  // Whether a voice can actually produce sound.
+  //
+  // The one exception to "every listed voice speaks" is Chrome's remote
+  // "Google <language>" voices: Chrome removed remote synthesis in M71
+  // but the names stayed in getVoices(), and speak() with one neither
+  // plays a sound nor fires onstart / onend / onerror -- the reader just
+  // goes silent, with no error to report.
+  //
+  // localService === false is NOT a reason to skip a voice on its own:
+  // Edge's far better "Microsoft ... Online (Natural)" voices are remote
+  // too, yet they work (and on Windows they are often the ONLY voices
+  // for a given language).  So the exclusion is deliberately narrowed to
+  // remote *Google* voices.  Google's TTS voices on Android/ChromeOS are
+  // local (localService true) and keep working.  Browsers that don't
+  // define localService at all (Safari) never match this test.
+  const _DEAD_REMOTE_VOICE_RE = /^google\b/i;
+
+  function isSpeakableVoice(v) {
+    if (!v) return false;
+    if (v.localService === false && _DEAD_REMOTE_VOICE_RE.test(v.name)) {
+      return false;
+    }
+    return true;
+  }
+
   function selectBestVoiceForLang(voices, targetLang) {
     if (!voices || voices.length === 0) return null;
+    // Never auto-pick a voice that cannot speak -- on macOS Chrome the
+    // preferred "Google <language>" entry is one of these, which is why
+    // the reader used to be silent while a bare speechSynthesis.speak()
+    // (no explicit voice) worked fine.
+    voices = voices.filter(isSpeakableVoice);
+    if (voices.length === 0) return null;
     const normLang = function (s) { return (s || "").toLowerCase(); };
     const target = normLang(targetLang);
     if (!target) return null;
@@ -185,6 +216,10 @@
     return matched[0];
   }
 
+  // The explicitly chosen voice, if this device still offers it and it
+  // can actually speak.  A remembered remote ("Google ...") voice is
+  // deliberately ignored here -- it would silence every utterance -- so
+  // callers fall through to selectBestVoiceForLang and get a local one.
   function getSelectedVoice() {
     if (!("speechSynthesis" in window)) return null;
 
@@ -192,7 +227,7 @@
     if (voiceSelect && voiceSelect.dataset.voiceName) {
       const voices = window.speechSynthesis.getVoices();
       const found = voices.find(function (v) {
-        return v.name === voiceSelect.dataset.voiceName;
+        return v.name === voiceSelect.dataset.voiceName && isSpeakableVoice(v);
       });
       if (found) return found;
     }
@@ -200,7 +235,7 @@
     if (globalCache.selectedVoice) {
       const voices = window.speechSynthesis.getVoices();
       const found = voices.find(function (v) {
-        return v.name === globalCache.selectedVoice;
+        return v.name === globalCache.selectedVoice && isSpeakableVoice(v);
       });
       if (found) return found;
     }
