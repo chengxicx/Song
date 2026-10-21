@@ -32,6 +32,10 @@ body {
   --panel-bg: #2c2c2e;            /* 悬浮卡片/表格底色 */
   --font-color: #e5e5ea;           /* 文本亮灰/白 */
 
+  /* 语法匹配环（见 styles.css 的 .grammar-word-ring）：深色主题沿用
+     亮琥珀 -- styles.css 的默认值是给纸色主题的深琥珀，那在暗底上会发闷。 */
+  --grammar-match-color: rgba(255, 214, 90, 0.9);
+
   /* 表单控件：输入框复用面板底色，不另造新色阶 */
   --input-bg: #2c2c2e;
   --input-fg: #f2f2f7;                 /* 与本主题其它控件文字一致 */
