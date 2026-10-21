@@ -590,6 +590,47 @@ class JapaneseSudachiParser(AbstractParser):
             return None
         return ret
 
+    def get_normalized_form(self, text: str):
+        """
+        The spelling the dictionary files this text under.
+
+        Sudachi's normalized_form is an orthography normalization, not a
+        reading: it folds the kana spellings of a word onto the kanji it
+        is filed under (わたし -> 私, あたし -> 私, わたくし -> 私,
+        ぼく -> 僕) and leaves genuinely different words alone (箸, 橋
+        and 端 each stay themselves).  That makes it the right question
+        to ask when a kana word and a kanji word might be the same word
+        -- see lute.read.shadowing._same_word_across_script, which needs
+        it to stop a kanji-izing ASR from grading a correctly read kana
+        word against another of the kanji's readings.
+
+        None when nothing changes (the text is already its normalized
+        form) or when the parse leaves nothing behind, matching
+        get_reading/get_lemma.
+        """
+        zws = "\u200B"
+        text = text.replace(zws, "")
+
+        if not text.strip():
+            return None
+
+        dict_type = self._get_dict_setting()
+        mode = self._get_mode_setting()
+        tok = self._build_tokenizer(dict_type)
+        split_mode = self._get_split_mode(mode)
+
+        parts = []
+        for m in tok.tokenize(text, mode=split_mode):
+            surface = m.surface()
+            if not surface:
+                continue
+            parts.append(m.normalized_form() or surface)
+
+        ret = "".join(parts).strip()
+        if ret in ("", text.strip()):
+            return None
+        return ret
+
     def content_token_count(self, text: str) -> int:
         """
         Number of content-word tokens (自立語) in the given text.

@@ -390,6 +390,53 @@ def _is_kana_only(token):
     return bool(token) and _KANA_ONLY_RE.match(token) is not None
 
 
+# Any kanji, including the 々 iteration mark: the side that carries one
+# is the side the parser had to look up a reading for.
+_KANJI_RE = re.compile(r"[\u4E00-\u9FFF\u3005]")
+
+
+def _has_kanji(token):
+    "True if the token contains a kanji character."
+    return _KANJI_RE.search(token or "") is not None
+
+
+def _same_word_across_script(original_token, spoken_token, language):
+    """
+    True when the engine spelled a kana word as its usual kanji.
+
+    Japanese is scored on readings, and a kanji's reading is a fixed
+    dictionary field: SenseVoice answering the book's わたし with 私
+    hands the diff ワタクシ, which sits 0.857 away from わたし -- above
+    the near-miss threshold, so a flawless reading of the printed kana
+    still scores half.  The two tokens are the same word, so compare
+    the dictionary's normalized spelling instead of the sound (see
+    parser.get_normalized_form: わたし/あたし/わたくし all file under 私,
+    while 箸/橋/端 keep their own spellings).
+
+    Only a kana sentence token against a kanji transcription qualifies.
+    The kana side proves what the learner was told to say, so the kanji
+    is the engine's own spelling choice for that sound.  Two kanji
+    tokens stay judged on their readings (一日 as ついたち is a real
+    misread), and a kana transcription is a transcript of the sound,
+    which is exactly what the reading comparison already measures.
+    """
+    if not is_japanese_language(language):
+        return False
+    raw_original = _clean_token(original_token)
+    raw_spoken = _clean_token(spoken_token)
+    if not (_is_kana_only(raw_original) and _has_kanji(raw_spoken)):
+        return False
+    normalized = getattr(language.parser, "get_normalized_form", None)
+    if normalized is None:
+        return False
+    try:
+        original_form = normalized(raw_original) or raw_original
+        spoken_form = normalized(raw_spoken) or raw_spoken
+    except Exception:  # pylint: disable=broad-exception-caught
+        return False
+    return bool(original_form) and original_form == spoken_form
+
+
 def _kana_script_restorer(original_tokens, language):
     """
     Return token -> token, re-rendering the transcription's kana in the
@@ -429,6 +476,28 @@ def _kana_script_restorer(original_tokens, language):
         return token
 
     return restore
+
+
+def _reading_in_the_lines_script(reading, kana):
+    """
+    The sentence's kana, rendered the way the panel's other readings are.
+
+    The reading a token already carried decides: a katakana reading means
+    the japanese_reading setting asks for katakana, a latin one for
+    romaji.  Without this the one corrected word would sit in a script of
+    its own, in the middle of a line of furigana drawn in another.
+    """
+    kana = (kana or "").strip()
+    if not kana:
+        return None
+    current = (reading or "").strip()
+    if current and _is_kana_only(current):
+        if current == jaconv.hira2kata(current):
+            return jaconv.hira2kata(kana)
+        return jaconv.kata2hira(kana)
+    if current and current.isascii():
+        return jaconv.kata2alphabet(jaconv.hira2kata(kana))
+    return jaconv.kata2hira(kana)
 
 
 # Unvoiced base of each voiced kana.  ASR very commonly swaps voicing
@@ -894,6 +963,13 @@ def compare_tokens(
         were too far apart to count as a near-miss: the word was
         attempted, so the panel can still show what was heard.  A word
         that was never spoken at all has no counterpart and no entry.
+      "spoken_kana": {spoken index: sentence's kana token}, for a spoken
+        word that scored as a match because the sentence prints it in
+        kana and the engine wrote it in kanji (see
+        _same_word_across_script).  The kanji's own dictionary reading is
+        a different one -- 私 is filed at わたくし -- so the panel must
+        show the kana the learner actually said instead of annotating
+        the word with a reading nobody produced.
       "extras": [spoken tokens that aren't part of the sentence],
       "matched": int, "fuzzy": int, "total": int,
       "spoken_count": int, "score": 0-100,
@@ -908,6 +984,7 @@ def compare_tokens(
         "statuses": statuses,
         "spoken_for_fuzzy": {},
         "spoken_for_miss": {},
+        "spoken_kana": {},
         "extras": [],
         "matched": 0,
         "fuzzy": 0,
@@ -1018,6 +1095,17 @@ def compare_tokens(
             if okey in skey and ((is_japanese and len(okey) > 1) or (is_zh and okey)):
                 statuses[scored[oi + k]] = STATUS_MATCH
                 continue
+            # The engine kanji-ized a word the book prints in kana, so
+            # the two keys hold different valid readings of one word
+            # (わたし vs 私's わたくし); the word itself was said right.
+            if _same_word_across_script(
+                original_tokens[scored[oi + k]], spoken[si + k], language
+            ):
+                statuses[scored[oi + k]] = STATUS_MATCH
+                result["spoken_kana"][si + k] = _clean_token(
+                    original_tokens[scored[oi + k]]
+                )
+                continue
             threshold = FUZZY_MATCH_RATIO_JA if is_japanese else FUZZY_MATCH_RATIO
             # A rescue can prove the sound was said exactly (a homophone
             # transcription, or the cognate written in the wrong script);
@@ -1109,6 +1197,15 @@ def compare_tokens(
                 skey = spoken_keys[j]
                 if not skey:
                     continue
+                if _same_word_across_script(
+                    original_tokens[orig_index], spoken[j], language
+                ):
+                    statuses[orig_index] = STATUS_MATCH
+                    result["spoken_for_miss"].pop(orig_index, None)
+                    result["spoken_kana"][j] = _clean_token(
+                        original_tokens[orig_index]
+                    )
+                    break
                 hit = False
                 if len(okey) > 1 or (is_zh and okey):
                     # A multi-char key, or any Chinese one: a Han
@@ -1466,6 +1563,21 @@ def _run_task(
                 "tokens_per_minute": rate,
                 "token_kind": "morpheme" if is_japanese_language(lang) else "word",
             }
+            # A word the engine wrote in kanji for a kana word in the
+            # sentence was scored against that kana (see
+            # _same_word_across_script), so annotate it with the kana the
+            # learner actually said.  The kanji's own dictionary reading
+            # would label 私 as わたくし -- a reading nobody produced, and
+            # the one that used to cost the word half credit.  Tokens
+            # without a reading carry none on purpose (the japanese_reading
+            # setting is off), so they stay unannotated.
+            for index, kana in comparison["spoken_kana"].items():
+                if 0 <= index < len(result["transcription_tokens"]):
+                    entry = result["transcription_tokens"][index]
+                    if entry["reading"]:
+                        entry["reading"] = _reading_in_the_lines_script(
+                            entry["reading"], kana
+                        )
             _set_task(task_id, "finished", result=result)
             # The take is history: persist it (best-effort -- a failed
             # write must not turn a scored take into an error page).

@@ -188,6 +188,22 @@ class AbstractParser(ABC):
         """
         return None
 
+    def get_normalized_form(self, text: str):  # pylint: disable=unused-argument
+        """
+        The dictionary's orthography-normalized form of the given text.
+
+        Unlike get_lemma (which keeps the reading: わたし stays わたし),
+        this is the spelling the dictionary files a word under, so it
+        collapses kana spellings onto their usual kanji (わたし ->
+        私, ぼく -> 僕) without merging words that merely sound alike
+        (はし stays はし; 箸, 橋 and 端 stay themselves).  Callers use it
+        to ask "same word?", never "same pronunciation?".
+
+        For most languages, this returns None: there is no such
+        normalization to apply.
+        """
+        return None
+
     def get_pos_tag(self, pos):  # pylint: disable=unused-argument
         """
         The term tag to derive from a parsed token's POS, or None.
