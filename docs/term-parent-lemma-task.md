@@ -321,3 +321,32 @@ ssh root@172.236.226.132 'cd /opt/lute && ./venv/bin/flask --app lute.app_factor
   生产 ja 用的是 Sudachi，所以不影响本次；将来若要支持 MeCab，补一个同构方法即可。
 - 那两个 sync 后门（列表内联编辑 ParentText、批量 `Set parent`）未收紧，只写进了交付说明。
 
+## P5 — 非日语语言（`lute/term/lemma_provider.py`）
+
+**动机**：`LuteOrg/lute-lemma` 是一个 2023 年的离线脚本，把「词形 → 词典形」写成 Lute 的词条导入 CSV。
+它的逻辑是 P2 的严格子集（没有过滤、没有审计、没有回滚），**唯一多出来的是 stanza 的 60+ 语言覆盖**。
+而 stanza 要 torch（1-2GB），对阅读器来说不划算 —— 同样的覆盖面用**已经装好的**语法引擎就够了。
+
+**做法**：不改 `AbstractParser.get_lemma()` 的签名（`SpaceDelimitedParser` 一个实例服务 60 个语言，
+拿不到 language 参数；改签名会破 `plugins/lute-korean` 这个独立发布的包）。改成在 parser 外面包一层
+`lemma_provider_for(language)`，由 `parent_backfill` 调用：
+
+| 顺序 | 来源 | 覆盖 | 依赖 |
+| --- | --- | --- | --- |
+| 1 | parser 自己的 `get_lemma()` + `content_token_count()` | ja（Sudachi） | 已有 |
+| 2 | spaCy pipeline 的 `token.lemma_`（复用语法面板的 `make_spacy_tokenizer`） | en / es / fr / de / it / pt | `pyproject.toml` 已有 extra |
+| 3 | pymorphy3 的 `normal_form` | ru | 已有 extra |
+
+**不加任何新依赖**；extra 没装 ⇒ provider 返回 `None` ⇒ CLI 明确拒绝（不静默产出空计划）。
+
+**边界**：
+- 仍不支持：韩语（插件有 `get_lemma` 但没 `content_token_count`，要动独立包）、泰语、阿拉伯语、中文、
+  粤语，以及只有语言定义的那 ~60 个语言。
+- 空格分隔语言的 `content_token_count` = **按空白切词数**，语义与 Sudachi 的同名方法**不同**
+  （那个数的是内容词素）。它唯一的职责是「必须是单词」这道门；拼接式 lemma 在空格分隔语言里不可能出现。
+- 多词 term 一律返回 `None`（`select_links` 本来也会挡），不猜拼接结果。
+- `lute/term/model.py` 的 `find_or_new()` **未接**（仍是 P3）：手动建词路径会顺手造父词并继承子词状态。
+
+**验收**：`tests/unit/cli/test_term_parent_backfill_spacedel.py` 复刻 lute-lemma README 的西班牙语 demo
+（同样 10 个词），断言产出的 6 条链接与它 README 完全一致：
+`coches→coche, perras→perra, perros→perro, vives/vivimos/vivieron→vivir`，且 `muchacho/muchacha/vez` 不产生链接。
