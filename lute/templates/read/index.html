@@ -769,6 +769,8 @@
     luteStartReadingDone = false;
     reset_cursor();
     const bookid = $('#book_id').val();
+    // Read before the swap: _finishPageSwap is what writes #page_num.
+    const pagenumNow = parseInt($('#page_num').val());
     const actualPage = getActualPage(p);
 
     updateReadSlider(actualPage);
@@ -781,7 +783,18 @@
 
     // Remember which page we asked for so the afterSwap handler can
     // update the UI without parsing the URL.
-    _pendingNav = { actualPage: actualPage, initial: initial_page_load, ...(extra || {}) };
+    //
+    // keepScreen: the refetch is of the page already on screen, so the
+    // reader must stay on their sub-screen instead of being rewound to the
+    // page's first one (see _finishPageSwap).  Two ways to get here with the
+    // same page: the end-of-book checkmark asks for "this page, +0", and a
+    // move past either end of the book clamps back onto it.
+    _pendingNav = {
+      actualPage: actualPage,
+      initial: initial_page_load,
+      keepScreen: actualPage === pagenumNow,
+      ...(extra || {}),
+    };
     htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
   }
 
@@ -799,7 +812,7 @@
 
   // Post-swap bookkeeping for the reading text.  Also used by HTMX-driven
   // status updates (see lute.js post_bulk_update).
-  function _finishPageSwap(actualPage, initial) {
+  function _finishPageSwap(actualPage, initial, nav) {
     luteStartReadingDone = true;
     // The swapped-in content replaces the page the existing sub-screen
     // groups were measured on, and curScreen indexes into them: drop both
@@ -831,7 +844,17 @@
     // HERE, before the split: the split's own _renderScreen would save
     // screen 0 over it.  Applied after the split, clamped to whatever
     // screen count the current layout produced.
-    const storedScreen = initial ? _storedScreenFor(actualPage) : null;
+    //
+    // nav.keepScreen asks for the same restore on a same-page refetch.
+    // Re-fetching the page you are already on is not a navigation -- the
+    // end-of-book checkmark finishes the current screen and a move clamped
+    // at either end of the book lands back on the same page -- so rewinding
+    // to the first sub-screen would throw away the reader's place (and,
+    // because the split's _renderScreen saves the position, persist that
+    // rewind as their place).
+    const keepScreen = !!(nav && nav.keepScreen);
+    const storedScreen =
+      initial || keepScreen ? _storedScreenFor(actualPage) : null;
     requestAnimationFrame(() => {
       _splitToScreens();
       if (initial) _restoreEpubScroll();
@@ -874,7 +897,7 @@
     // Page navigation (goto_relative_page).
     if (_pendingNav) {
       const nav = _pendingNav;
-      _finishPageSwap(nav.actualPage, nav.initial);
+      _finishPageSwap(nav.actualPage, nav.initial, nav);
       // Backward crossing onto a page the reader previously left forward:
       // _finishPageSwap's rAF splits the page (curScreen = 0); this second
       // rAF runs right after it and restores the last sub-screen, so the

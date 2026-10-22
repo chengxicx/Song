@@ -571,6 +571,34 @@ def test_pdf_page_done_route_marks_page_known(app, client, app_context, english)
         shutil.rmtree(pdf_dir, ignore_errors=True)
 
 
+def test_same_page_refetch_keeps_sub_screen(app, client, app_context, english):
+    """
+    Refetching the page already on screen keeps the reader's sub-screen.
+
+    Finishing the last screen posts page_done with relative page 0, and the
+    follow-up refetch reset curScreen to 0: the reader was bounced back to
+    the page's first sub-screen, and -- because the split's _renderScreen
+    saves the position -- that rewind was persisted as their place.
+    goto_relative_page now flags the same-page case and _finishPageSwap
+    restores the stored sub-screen for it, as an initial load does.
+    """
+    b = Book()
+    b.title = "Refetch check"
+    b.language_id = english.id
+    b.text = "Hello cat. Another line here."
+    r = Repository(db.session)
+    dbbook = r.add(b)
+    r.commit()
+
+    resp = client.get(f"/read/{dbbook.id}")
+    assert resp.status_code == 200, "reading page renders"
+    body = resp.get_data(as_text=True)
+    assert "keepScreen: actualPage === pagenumNow" in body, "same-page flag set"
+    assert (
+        "initial || keepScreen ? _storedScreenFor(actualPage) : null" in body
+    ), "stored sub-screen honoured on a same-page refetch"
+
+
 def _render_items(text, language):
     "Tokenize text into TextItems, leaving its new terms unsaved."
     rs = RenderService(db.session)
