@@ -55,8 +55,13 @@ _GRAMEME_KEYS = (
 )
 
 
-def _morph_analyzer():
-    "Lazy, process-lifetime pymorphy3 analyzer."
+def morph_analyzer():
+    """
+    Lazy, process-lifetime pymorphy3 analyzer.
+
+    Public because the lemma backfill (lute/term/lemma_provider.py) uses
+    the same dictionary: one MorphAnalyzer per process, not two.
+    """
     global _MORPH
     if _MORPH is None:
         from pymorphy3 import MorphAnalyzer  # pylint: disable=import-outside-toplevel
@@ -77,7 +82,7 @@ def _gramemes(tag):
 
 def _tokens_for(sentence):
     "Tokenize a sentence; return a list of token dicts."
-    analyzer = _morph_analyzer()
+    analyzer = morph_analyzer()
     tokens = []
     for m in _WORD_RE.finditer(sentence):
         parses = analyzer.parse(m.group())

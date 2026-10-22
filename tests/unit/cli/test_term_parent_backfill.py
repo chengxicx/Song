@@ -260,10 +260,16 @@ def test_unknown_language_is_an_error(japanese):  # pylint: disable=unused-argum
         run_backfill("Klingon")
 
 
-def test_a_language_without_lemmas_is_an_error(spanish):
-    "Refuse rather than write thousands of nothing-links."
+def test_a_language_without_lemmas_is_an_error(thai):
+    """
+    Refuse rather than write thousands of nothing-links.
+
+    Spanish used to be the example here.  It has a lemma source now (the
+    spaCy grammar engine, see lute/term/lemma_provider.py), so the
+    example has to be a language with no source at all.
+    """
     with pytest.raises(TermParentBackfillError):
-        run_backfill("Spanish")
+        run_backfill("Thai")
 
 
 def test_audit_log_records_what_was_written(japanese, tmp_path):

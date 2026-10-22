@@ -150,7 +150,7 @@ def import_books_from_csv_cmd(language, file, tags, commit):
 @click.option(
     "--language",
     required=True,
-    help="Name of the language to process, e.g. Japanese.",
+    help="Name of the language to process, e.g. Japanese or Spanish.",
 )
 @click.option(
     "--commit",
