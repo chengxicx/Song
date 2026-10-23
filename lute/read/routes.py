@@ -6,7 +6,6 @@ import gzip
 import json
 import math
 import os
-import unicodedata
 import uuid
 from flask import (
     Blueprint,
@@ -22,40 +21,20 @@ from flask import (
 from lute.read.service import Service
 from lute.read.render.service import Service as RenderService
 from lute.read import shadowing
-from lute.read.render.grammar_analysis import (
-    analyze as analyze_grammar,
-    is_japanese_language,
-    is_korean_language,
-    is_mandarin_chinese_language,
-    is_cantonese_language,
-    is_english_language,
-    is_spanish_language,
-    is_russian_language,
-    is_french_language,
-    is_german_language,
-    is_italian_language,
-    is_portuguese_language,
-    is_thai_language,
-    is_arabic_language,
-)
-from lute.read.render.grammar_analysis_ja import analyze_japanese
-from lute.read.render.grammar_analysis_ko import analyze_korean
-from lute.read.render.grammar_analysis_zh import analyze_chinese
-from lute.read.render.grammar_analysis_yue import analyze_cantonese
-from lute.read.render.grammar_analysis_en import analyze_english
-from lute.read.render.grammar_analysis_es import analyze_spanish
-from lute.read.render.grammar_analysis_ru import analyze_russian
-from lute.read.render.grammar_analysis_fr import analyze_french
-from lute.read.render.grammar_analysis_de import analyze_german
-from lute.read.render.grammar_analysis_it import analyze_italian
-from lute.read.render.grammar_analysis_pt import analyze_portuguese
-from lute.read.render.grammar_analysis_th import analyze_thai
-from lute.read.render.grammar_analysis_ar import analyze_arabic
+from lute.read.render.grammar_analysis import is_thai_language
 from lute.read.render.grammar_analysis_matcher import (
     release_idle_spacy_models,
     trim_arenas,
 )
 from lute.read.render.grammar_levels import filter_hidden_grammar
+from lute.read.grammar_analysis_service import (
+    analyze_text,
+    book_grammar_text,
+    clean_grammar_text,
+    display_lang_for,
+    text_hash,
+)
+from lute.read import grammar_precompute
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
 from lute.i18n import t
@@ -130,12 +109,13 @@ _yt_subtitle_words_cache = {}
 
 
 # Whole-book grammar analyses, keyed by (user scope, book id, text identity,
-# display language, hidden levels).  A book-wide pass tokenises every page,
-# which is seconds of CPU, and the reader flips between the page and book
-# scopes -- so the answer is worth keeping.  Keyed on the *text* rather than
-# the book alone, so an edited page misses instead of serving a stale
-# analysis.  Bounded, because a big library would otherwise grow it without
-# limit; the oldest entry is dropped on overflow.
+# display language).  The database row (lute/read/grammar_precompute.py) is
+# the durable copy; this is only the last-few-books shortcut in front of it.
+# Keyed on the *text* rather than the book alone, so an edited page misses
+# instead of serving a stale analysis, and the value is the engine's raw
+# output -- the hidden-level filter is applied per request, so toggling a
+# hidden level never recomputes.  Bounded, because a big library would
+# otherwise grow it without limit; the oldest entry is dropped on overflow.
 _book_grammar_cache = {}
 _BOOK_GRAMMAR_CACHE_MAX = 8
 
@@ -1332,13 +1312,46 @@ def grammar_analysis(bookid, pagenum):
     # the whole page otherwise.
     snippet = request.args.get("text", "")
     scope = (request.args.get("scope", "") or "").strip().lower()
+    # Levels / groups this language hides in the panel -- an advanced
+    # reader drops N5, or just the two frequent aggregate rows ("Basic
+    # forms", "Particles").  Applied to whatever the engine returns, so
+    # every engine honours it without knowing about the setting.  It is
+    # applied at read time only: the cached whole-book analysis is stored
+    # unfiltered, so hiding a level never costs a recompute.
+    hidden = set(getattr(lang, "hidden_grammar_levels", []) or [])
+
     if scope == "book":
-        # Whole book: every page joined by a newline, so a page boundary
-        # never glues two sentences into one pseudo-sentence.  The engine
-        # caps the examples it reports per point, so a long book costs one
-        # pass over more text, not a bigger response.
-        page_text = "\n".join(t.text or "" for t in book.texts)
-    elif snippet.strip():
+        # A whole-book pass is seconds of work, so it is precomputed in the
+        # background at import time and stored per text identity.  A fresh
+        # row answers instantly; an unanalysed book is handed to the worker
+        # instead of blocking this request, and the panel polls until it is
+        # ready (see static/js/lute-commands.js).
+        page_text = book_grammar_text(book)
+        display = display_lang_for(lang)
+        digest = text_hash(page_text)
+        # Scoped per user like the subtitle cache: book ids are per-user db.
+        cache_key = (current_scope_key(), bookid, digest, display)
+        cached = _book_grammar_cache.get(cache_key)
+        if cached is not None:
+            return jsonify(filter_hidden_grammar(cached, hidden))
+        stored = grammar_precompute.cached_results(bookid, digest, display)
+        if stored is not None:
+            _remember_book_grammar(cache_key, stored)
+            return jsonify(filter_hidden_grammar(stored, hidden))
+        state = grammar_precompute.schedule(get_current_user(), bookid, urgent=True)
+        if state in ("queued", "running"):
+            return jsonify({"state": "computing", "status": state}), 202
+        if state == "error":
+            return jsonify({"state": "error"}), 202
+        # Precompute is switched off, or this book is too long to precompute:
+        # pay for the analysis here, exactly as before, and keep the result
+        # so the next request is fast.
+        results = analyze_text(page_text, lang)
+        grammar_precompute.store_now(bookid, digest, display, results)
+        _remember_book_grammar(cache_key, results)
+        return jsonify(filter_hidden_grammar(results, hidden))
+
+    if snippet.strip():
         page_text = snippet
     else:
         # Manga pages store no page text -- the words live in the .mokuro
@@ -1347,81 +1360,8 @@ def grammar_analysis(bookid, pagenum):
         page_text = (
             manga_text if manga_text is not None else book.text_at_page(pagenum).text
         )
-    # The reader renders empty paragraphs as a zero-width-space placeholder
-    # and can inject the 🔊 audio marker into the text the client sends
-    # back; both are display artifacts, not grammar.  Strip them before
-    # analysis so no tokenizer/analyzer ever sees them (the Japanese and
-    # Korean engines do the same internally).
-    page_text = page_text.replace("\u200b", "").replace("🔊", "")
-    # Same reason, one step further: an imported book may store decomposed
-    # Hangul (e.g. "지" + U+11AF where the source had the single syllable
-    # "질").  An engine that tokenises such text reports offsets that fall
-    # inside a syllable, and the client -- which slices the sentence at
-    # those offsets -- then renders a half-character.  Composing once here
-    # keeps every engine's tokens, offsets and echoed sentence consistent.
-    page_text = unicodedata.normalize("NFC", page_text)
-    display = getattr(lang, "grammar_translate_lang", "") or "en"
-    # Levels / groups this language hides in the panel -- an advanced
-    # reader drops N5, or just the two frequent aggregate rows ("Basic
-    # forms", "Particles").  Applied to whatever the engine returns, so
-    # every engine honours it without knowing about the setting.
-    hidden = set(getattr(lang, "hidden_grammar_levels", []) or [])
-    # A whole-book pass is seconds of work (every page tokenised), and the
-    # reader flips between the page and book scopes, so the result is
-    # memoised.  Keyed on the resolved text plus the two settings that
-    # change the answer -- never on the book id alone, since an edited page
-    # has to invalidate its own entry rather than serve a stale analysis.
-    cache_key = None
-    if scope == "book":
-        # Scoped per user like the subtitle cache: book ids are per-user db.
-        cache_key = (current_scope_key(), bookid, len(page_text),
-                     hash(page_text), display, tuple(sorted(hidden)))
-        cached = _book_grammar_cache.get(cache_key)
-        if cached is not None:
-            return jsonify(cached)
-    # Every engine runs on optional heavy dependencies (Sudachi, Kiwi,
-    # spaCy models, pymorphy3, pythainlp, pyarabic); when one is missing,
-    # fall back to the generic regex rule library instead of failing
-    # the panel.
-    for detector, engine, extra in (
-        (is_japanese_language, analyze_japanese, "japanese-sudachi"),
-        (is_korean_language, analyze_korean, "korean"),
-        (is_mandarin_chinese_language, analyze_chinese, "chinese"),
-        (is_cantonese_language, analyze_cantonese, "cantonese"),
-        (is_english_language, analyze_english, "english"),
-        (is_spanish_language, analyze_spanish, "spanish"),
-        (is_russian_language, analyze_russian, "russian"),
-        (is_french_language, analyze_french, "french"),
-        (is_german_language, analyze_german, "german"),
-        (is_italian_language, analyze_italian, "italian"),
-        (is_portuguese_language, analyze_portuguese, "portuguese"),
-        (is_thai_language, analyze_thai, "thai"),
-        (is_arabic_language, analyze_arabic, "arabic"),
-    ):
-        if detector(lang):
-            try:
-                results = engine(page_text, display_lang=display)
-            except (ImportError, OSError):
-                current_app.logger.warning(
-                    "%s grammar engine not installed; using the basic regex rules. "
-                    'Run: pip install -e ".[%s]"',
-                    extra.capitalize(),
-                    extra,
-                )
-                break
-            filtered = filter_hidden_grammar(results, hidden)
-            if cache_key is not None:
-                _remember_book_grammar(cache_key, filtered)
-            return jsonify(filtered)
-    render_service = RenderService(db.session)
-    paragraphs = render_service.get_paragraphs(page_text, lang)
-    sentences = [
-        "".join(ti.text for ti in sentence) for para in paragraphs for sentence in para
-    ]
-    filtered = filter_hidden_grammar(analyze_grammar(sentences), hidden)
-    if cache_key is not None:
-        _remember_book_grammar(cache_key, filtered)
-    return jsonify(filtered)
+    page_text = clean_grammar_text(page_text)
+    return jsonify(filter_hidden_grammar(analyze_text(page_text, lang), hidden))
 
 
 @bp.route("/shadowing/transcribe", methods=["POST"])

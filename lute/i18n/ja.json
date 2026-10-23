@@ -849,5 +849,10 @@
   "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty to re-transcribe plainly.": "この音声で読み上げている本文（教科書の課文など）を貼り付けてください。字幕はあなたのテキストを使い、音声認識はタイミングだけを担当します——人名や同音異義語も正確になります。空欄なら通常の文字起こしをやり直します。",
   "Reading mode": "閲覧モード",
   "Keep the chapter’s original layout and images": "章の元のレイアウトと画像を保持する",
-  "Lute’s word lookups are added on top of the rendered chapter. A chapter becomes one continuously scrolling page, so progress is tracked per chapter instead of per page.": "再現した章の上に Lute の語句検索を重ねます。1 章がそのまま 1 つの連続スクロールページになるため、進捗はページ単位ではなく章単位で記録されます。"
+  "Lute’s word lookups are added on top of the rendered chapter. A chapter becomes one continuously scrolling page, so progress is tracked per chapter instead of per page.": "再現した章の上に Lute の語句検索を重ねます。1 章がそのまま 1 つの連続スクロールページになるため、進捗はページ単位ではなく章単位で記録されます。",
+  "Analyzing the whole book…": "書籍全体を分析しています…",
+  "Waiting for the background analysis to start…": "バックグラウンドでの分析開始を待っています…",
+  "It keeps running in the background, so you can keep reading.": "分析はバックグラウンドで続きます。読書はそのまま続けられます。",
+  "The whole-book analysis took too long. Please try again.": "書籍全体の分析に時間がかかりすぎました。しばらくしてからもう一度お試しください。",
+  "The whole-book analysis failed. Please try again.": "書籍全体の分析に失敗しました。しばらくしてからもう一度お試しください。"
 }

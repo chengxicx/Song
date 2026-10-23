@@ -872,6 +872,9 @@ class Service:
         new_pages = [DBText(dbbook, "", index + 1) for index in range(len(pages))]
         session.add_all(new_pages)
         session.commit()
+        # The replaced archive may have been imported as text elsewhere;
+        # a stale analysis would describe pages that no longer exist.
+        self._drop_grammar_cache(dbbook.id)
         return dbbook
 
     def extract_pdf(self, filename, filestream):
@@ -1172,4 +1175,44 @@ class Service:
             # word counts are correct.
             self.set_pdf_page_word_counts(dbbook)
         repo.commit()
+        self._queue_grammar_precompute(dbbook)
         return dbbook
+
+    def _queue_grammar_precompute(self, dbbook):
+        """
+        Warm the whole-book grammar cache for the reader's "This book" scope.
+
+        The analysis takes seconds for a real book, so it must not run here:
+        the background worker (lute/read/grammar_precompute.py) does it and
+        the panel gets a fast answer next time.  Never fails the import -- a
+        missing engine or a full queue only costs the reader the on-demand
+        analysis they used to get anyway.
+        """
+        try:
+            if dbbook.book_type in ("manga", "pdf"):
+                return  # the panel hides the book scope for these types
+            if not any((t.text or "").strip() for t in dbbook.texts):
+                return
+            # Imported here so importing this module does not drag the
+            # grammar engines (and their optional heavy dependencies) into
+            # every consumer of lute.book.service.
+            from lute.multiuser.context import get_current_user
+            from lute.read import grammar_precompute
+
+            grammar_precompute.schedule(get_current_user(), dbbook.id)
+        except Exception:  # noqa: BLE001 - precompute is never worth a failed import
+            current_app.logger.warning(
+                "grammar precompute not scheduled for book %s",
+                getattr(dbbook, "id", "?"),
+            )
+
+    def _drop_grammar_cache(self, book_id):
+        "Forget a book's whole-book grammar analysis (its content changed)."
+        try:
+            from lute.read import grammar_precompute
+
+            grammar_precompute.invalidate(book_id)
+        except Exception:  # noqa: BLE001
+            current_app.logger.warning(
+                "grammar cache not dropped for book %s", book_id
+            )

@@ -23,6 +23,7 @@ import pytest
 from lute.db import db
 from lute.models.book import Book, Text
 from lute.models.language import Language
+from lute.read import grammar_analysis_service as grammar_service
 from lute.read import routes as read_routes
 
 
@@ -54,11 +55,17 @@ def fixture_russian_book(app_context):
 @pytest.fixture(name="engine_calls")
 def fixture_engine_calls(monkeypatch):
     """
-    Replace the Russian engine with a recorder.
+    Replace the language engine with a recorder.
 
-    The route picks the engine through ``is_russian_language``, so both the
-    detector and the analyzer are patched; the recorder keeps the text it
-    was handed so a test can assert on it.
+    The route no longer dispatches the engines itself: ``analyze_text()``
+    picks one from the service module's ``_ENGINES`` table, so the table is
+    what has to be replaced -- patching a detector on ``read_routes`` would
+    leave the real Russian engine in the tuple and call nothing.
+
+    Precompute is switched off for the same reason the engine is faked:
+    these tests are about the text the route assembles and the cache around
+    it, and a real background worker would analyse the book from another
+    thread while the test counts calls.
     """
     calls = []
 
@@ -67,9 +74,13 @@ def fixture_engine_calls(monkeypatch):
         return [{"key": "k", "name": "n", "level": "A1", "desc": "d",
                  "examples": []}]
 
-    monkeypatch.setattr(read_routes, "is_russian_language", lambda _lang: True)
-    monkeypatch.setattr(read_routes, "analyze_russian", fake_engine)
+    monkeypatch.setattr(
+        grammar_service,
+        "_ENGINES",
+        ((lambda _lang: True, fake_engine, "russian"),),
+    )
     monkeypatch.setattr(read_routes, "filter_hidden_grammar", lambda r, _h: r)
+    monkeypatch.setenv("LUTE_GRAMMAR_PRECOMPUTE", "0")
     return calls
 
 
