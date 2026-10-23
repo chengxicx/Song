@@ -112,7 +112,10 @@ class UserSettingsForm(FlaskForm):
     tts_click_pronunciation = BooleanField(
         lazy_t("Pronounce word when clicked (term form opens)")
     )
-    tts_show_control_panel = BooleanField(lazy_t("Show TTS Player"))
+    # Master visibility of the reading page's player bar (audio track and
+    # TTS alike); the reading menu's "Player" switch writes the same
+    # setting, so the name stays readable on both surfaces.
+    tts_show_control_panel = BooleanField(lazy_t("Show player"))
     tts_show_sentence_buttons = BooleanField(lazy_t("Show 🔊 button on each sentence"))
 
     def validate_backup_dir(self, field):

@@ -1325,16 +1325,20 @@
      auto-pause toggle, lifted into the controls row via
      display:contents as an icon-only square, so line-by-line
      listening (play -> auto-pause -> step) needs no expand.  The
-     sheet re-shows the whole group (see .player-sheet-open rules). */
+     sheet re-shows the whole group (see .player-sheet-open rules).
+     The MP3 <-> TTS switch (.yt-mode-btn) stays out here too: it is a
+     source change, i.e. the same "continue listening" class of action
+     as play, and hiding it behind the expand chevron made the switch
+     undiscoverable on a phone. */
   .youtube-player-container:not(.player-sheet-open) .yt-controls-right {
     display: contents;
   }
 
-  .youtube-player-container:not(.player-sheet-open) .yt-controls-right > :not(#yt-autopause-btn) {
+  .youtube-player-container:not(.player-sheet-open) .yt-controls-right > :not(#yt-autopause-btn):not(.yt-mode-btn) {
     display: none !important;
   }
 
-  .youtube-player-container:not(.player-sheet-open) #yt-autopause-btn {
+  .youtube-player-container:not(.player-sheet-open) :is(#yt-autopause-btn, .yt-mode-btn) {
     flex: 0 0 auto;
     width: 30px;
     height: 30px;

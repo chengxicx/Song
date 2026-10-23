@@ -948,7 +948,7 @@ span.hamburger {
 
 #focus-container,
 #tap_sets_status-container,
-#tts-toggle-container,
+#player-toggle-container,
 #tts-sentence-buttons-toggle-container,
 #arrow_marks_known-container,
 #tap_haptics-container {
@@ -964,7 +964,7 @@ span.hamburger {
 
 #focus,
 #tap_sets_status,
-#tts-player-toggle,
+#player-toggle,
 #tts-sentence-buttons-toggle,
 #arrow_marks_known,
 #tap_haptics {
@@ -982,7 +982,7 @@ span.hamburger {
 
 #focus-container label,
 #tap_sets_status-container label,
-#tts-toggle-container label,
+#player-toggle-container label,
 #tts-sentence-buttons-toggle-container label,
 #arrow_marks_known-container label,
 #tap_haptics-container label {
@@ -1001,7 +1001,7 @@ span.hamburger {
 
 #focus::after,
 #tap_sets_status::after,
-#tts-player-toggle::after,
+#player-toggle::after,
 #tts-sentence-buttons-toggle::after,
 #arrow_marks_known::after,
 #tap_haptics::after {
@@ -1017,7 +1017,7 @@ span.hamburger {
 
 .focus-mode-active #focus::after,
 .tap_sets_status-active #tap_sets_status::after,
-.tts-player-active #tts-player-toggle::after,
+.player-active #player-toggle::after,
 .tts-sentence-buttons-active #tts-sentence-buttons-toggle::after,
 .arrow_marks_known-active #arrow_marks_known::after,
 .tap_haptics-active #tap_haptics::after {
@@ -1027,7 +1027,7 @@ span.hamburger {
 
 .focus-mode-active #focus,
 .tap_sets_status-active #tap_sets_status,
-.tts-player-active #tts-player-toggle,
+.player-active #player-toggle,
 .tts-sentence-buttons-active #tts-sentence-buttons-toggle,
 .arrow_marks_known-active #arrow_marks_known,
 .tap_haptics-active #tap_haptics {
@@ -1035,13 +1035,13 @@ span.hamburger {
     border-color: #40916c;
 }
 
-.tts-player-active #tts-player-toggle::after,
+.player-active #player-toggle::after,
 .tts-sentence-buttons-active #tts-sentence-buttons-toggle::after {
     transform: translate(100%, 0);
     background-color: #ffffff;
 }
 
-.tts-player-active #tts-player-toggle,
+.player-active #player-toggle,
 .tts-sentence-buttons-active #tts-sentence-buttons-toggle {
     background-color: #40916c;
     border-color: #40916c;
