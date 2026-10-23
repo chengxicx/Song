@@ -41,9 +41,11 @@
   <input type="checkbox" name="focus" id="focus" x-model="focusMode">
 </div>
 
-<div id="tts-toggle-container">
-  <label for="tts-player-toggle">{{ t('TTS Player') }}</label>
-  <input type="checkbox" name="tts-player-toggle" id="tts-player-toggle">
+{# Master on/off for every player bar on the page -- the audio / video
+   track and TTS read-aloud alike (see tts-ui.js). #}
+<div id="player-toggle-container">
+  <label for="player-toggle">{{ t('Player') }}</label>
+  <input type="checkbox" name="player-toggle" id="player-toggle">
 </div>
 
 <div id="tts-sentence-buttons-toggle-container">

@@ -418,6 +418,11 @@
     var api = player;
     if (!api.els.container) return;
 
+    // Hand the engine to the page: tts-ui.js uses it for the MP3 <-> TTS
+    // player switch (pause the track when the reader hands the book over
+    // to TTS read-aloud, see switchPlayerMode()).
+    window.LUTE_MEDIA_API = api;
+
     api.buildTranscript();
     api.bindControls();
     api.bindSubtitleInteractions();

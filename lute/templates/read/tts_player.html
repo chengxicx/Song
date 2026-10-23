@@ -63,6 +63,17 @@
         <svg viewBox="0 0 24 24" class="yt-icn"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path><path d="M9 9h2v6H9zM13 9h2v6h-2z"></path></svg>
         <span class="yt-toggle-label">{{ t('Auto-pause') }}</span>
       </button>
+      {% if has_media_player %}
+      {# Hand this book back to its MP3 / video track: hides the TTS player
+         and shows the media player (same MP3 <-> TTS switch as the mobile
+         reader; the choice is session-only, see tts-ui.js). #}
+      <button id="tts-mp3-mode-btn" class="audio-button yt-cue-btn yt-mode-btn" type="button"
+              title="{{ t('Switch to MP3 audio') }}">
+        <svg viewBox="0 0 24 24" class="yt-icn" aria-hidden="true">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+        </svg>
+      </button>
+      {% endif %}
       <button id="tts-transcript-btn" class="yt-transcript-btn">{{ t('Transcript') }}</button>
     </div>
     {# Mobile bottom mini-player expand chevron (player-dock.js); hidden
