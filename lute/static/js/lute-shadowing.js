@@ -403,12 +403,33 @@ function shadowingOnCueEnded(e) {
  * 4. Mode (player "Shadow" toggle)
  * ------------------------------------------------------------------ */
 
+/* Every "Shadow" toggle on the page.  A book with an audio track renders
+   two player bars -- the audio transport and the TTS read-aloud one --
+   and each carries its own copy of this button (read/youtube_player.html
+   and read/tts_player.html).  Only one bar is on screen at a time
+   (tts-ui.js applyPlayerMode), and which one that is depends on the mode
+   the reader is in, so both copies have to be live and both have to show
+   the mode.
+
+   Binding "the first one" is what broke this: getElementById on the TTS
+   id always wins, so once mp3 books started rendering a TTS bar too, the
+   listener followed the *hidden* copy and the button on the visible MP3
+   bar did nothing when clicked. */
+function shadowingButtons() {
+  return ["tts-shadowing-btn", "yt-shadowing-btn"]
+    .map(function (id) {
+      return document.getElementById(id);
+    })
+    .filter(function (el) {
+      return !!el;
+    });
+}
+
 function shadowingSetMode(on) {
   shadowingActive = on;
-  const btn =
-    document.getElementById("tts-shadowing-btn") ||
-    document.getElementById("yt-shadowing-btn");
-  if (btn) btn.classList.toggle("on", on);
+  shadowingButtons().forEach(function (btn) {
+    btn.classList.toggle("on", on);
+  });
 
   if (on) {
     shadowingOpenPanel();
@@ -1200,12 +1221,11 @@ function shadowingBoot() {
   window.addEventListener("lute:cue-changed", shadowingOnCueChanged);
   window.addEventListener("lute:cue-ended", shadowingOnCueEnded);
 
-  const btn =
-    document.getElementById("tts-shadowing-btn") ||
-    document.getElementById("yt-shadowing-btn");
-  if (btn) {
+  // Both bars' copies (see shadowingButtons): the one on the bar the
+  // reader is actually looking at must open the panel.
+  shadowingButtons().forEach(function (btn) {
     btn.addEventListener("click", shadowingToggleMode);
-  }
+  });
 }
 
 if (document.readyState === "loading") {

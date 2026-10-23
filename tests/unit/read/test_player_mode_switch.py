@@ -13,10 +13,29 @@ audio have nothing to switch to.
 """
 
 import json
+import os
 
+import lute
 from lute.book.model import Book
 from lute.book.service import Service as BookService
 from lute.db import db
+
+_SHADOWING_JS = os.path.join(
+    os.path.dirname(lute.__file__), "static", "js", "lute-shadowing.js"
+)
+
+
+def _read(path):
+    with open(path, encoding="utf-8") as f:
+        return f.read()
+
+
+def _function_body(js, signature):
+    "The source of `signature`, up to the next top-level function."
+    start = js.index(signature)
+    rest = js[start + len(signature) :]
+    end = rest.find("\nfunction ")
+    return rest if end < 0 else rest[:end]
 
 
 def _import_book(english, book_type="", audio_filename=None, source_uri=None):
@@ -91,6 +110,42 @@ def test_reading_menu_switch_is_a_player_toggle(app, app_context, client, englis
     assert 'id="player-toggle"' in content
     assert ">Player<" in content
     assert "tts-player-toggle" not in content
+
+
+def test_each_bar_carries_its_own_shadow_toggle(
+    app, app_context, client, english
+):
+    """
+    Shadowing has a button on both bars, because either one can be the
+    visible one.  This is the shape the JS below has to handle.
+    """
+    content = _content(
+        client, _import_book(english, "mp3", audio_filename="song.mp3")
+    )
+    assert 'id="yt-shadowing-btn"' in content
+    assert 'id="tts-shadowing-btn"' in content
+
+
+def test_the_shadow_toggle_works_on_the_visible_bar():
+    """
+    Binding "the first id that exists" left the click listener on the
+    hidden bar: getElementById(tts-shadowing-btn) always wins, and once
+    mp3 books started rendering a TTS bar too, that is the hidden one --
+    so the Shadow button on the visible MP3 bar did nothing at all.
+    Every copy has to be bound, and every copy has to show the mode.
+    """
+    js = _read(_SHADOWING_JS)
+    boot = _function_body(js, "function shadowingBoot()")
+    assert "shadowingButtons().forEach" in boot, (
+        "every bar's Shadow button must get the click listener"
+    )
+    setmode = _function_body(js, "function shadowingSetMode(on)")
+    assert "shadowingButtons().forEach" in setmode, (
+        "turning shadowing on/off must light up every bar's button"
+    )
+    # The single-element pattern is what broke it.
+    assert 'getElementById("tts-shadowing-btn") ||' not in boot
+    assert 'getElementById("tts-shadowing-btn") ||' not in setmode
 
 
 def test_youtube_book_has_no_tts_bar(app, app_context, client, english):
