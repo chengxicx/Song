@@ -166,6 +166,12 @@
     if (media) media.style.display = showMedia ? "" : "none";
     if (tts) tts.style.display = showTts ? "" : "none";
 
+    // The TTS strip reserves its height from its own width, so it can
+    // only measure once it is on screen (tts-player.js).
+    if (showTts && typeof ttsSyncStripHeight === "function") {
+      ttsSyncStripHeight();
+    }
+
     document.body.classList.toggle("player-active", playerVisible);
 
     // The sidebar checkbox is the same switch, so keep it in sync --
