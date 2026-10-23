@@ -1411,7 +1411,7 @@
       } catch (_) {}
     }
     // The container is rendered by the template but its visibility
-    // is controlled by the TTS Player toggle (reading_menu).  The
+    // is controlled by the Player toggle (reading_menu).  The
     // element itself is always present in the DOM so JS can find it.
     ttsBindControls();
     ttsBindSubtitleInteractions();

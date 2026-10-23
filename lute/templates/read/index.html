@@ -35,6 +35,14 @@
    so the reader keeps the book's layout (see lute-epub-reader.js). #}
 <script type="text/javascript" src="{{ vstatic('js/lute-epub-reader.js') }}" charset="utf-8" defer></script>
 {% endif %}
+{# A text book (or pdf / epub) that has an audio file attached renders
+   the unified media player too (see the body below), so it needs that
+   player's script -- the media book types above loaded it through their
+   own branch, this one does not. #}
+{% if book.audio_filename and book_type not in book_media_types
+      and book_type not in ('bilibili', 'manga') %}
+<script type="text/javascript" src="{{ vstatic('js/youtube-player.js') }}" charset="utf-8" defer></script>
+{% endif %}
 <script type="text/javascript" src="{{ vstatic('js/resize.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/text-options.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic_js('dict-tabs.js') }}" charset="utf-8"></script>
@@ -133,21 +141,39 @@
 
   </div>
 
+  {# has_media_player / has_tts_player tell each player template whether
+     the *other* player is on this page, so it can render the MP3 <-> TTS
+     switch button (see tts-ui.js).  Audio books (mp3 / netease) carry
+     both bars, exactly like the mobile reader, where an audio book can be
+     switched to TTS read-aloud.  Video books (youtube / video / bilibili)
+     have no TTS bar, and text books without audio have nothing to switch
+     to. #}
   {% if book_type in book_media_types %}
+  {# Audio-only books read their text from the subtitles, so TTS read-aloud
+     works on them; the video backends keep their own transport. #}
+  {% set has_tts_player = book_type in ('mp3', 'netease') %}
+  {% set has_media_player = has_tts_player %}
   {% include "read/youtube_player.html" %}
+  {% if has_tts_player %}
+  {% include "read/tts_player.html" %}
+  {% endif %}
   {% elif book_type == "bilibili" %}
+  {% set has_tts_player = false %}
   {% include "read/bilibili_player.html" %}
   {% elif book_type != "manga" %}
   {# Legacy text books that have an audio file attached play it through
      the unified media player, so mp3 files always use the new player
      (the old audio-player-container player was removed). #}
-  {% if book.audio_filename %}
+  {% set has_media_player = book.audio_filename %}
+  {% if has_media_player %}
+  {% set has_tts_player = true %}
   {% include "read/youtube_player.html" %}
   {% endif %}
   {# TTS player for text books: same UI / CSS classes as the YouTube / MP3
      player so the visual style, layout and responsive behaviour match.
-     Visibility is controlled by the TTS Player toggle (reading_menu), and
-     it is hidden by default whenever a media player is present (tts.js). #}
+     Visibility is controlled by the Player toggle (reading_menu), which
+     shows / hides every player bar, and an audio book starts on its track
+     with the TTS bar swapped in on demand (tts-ui.js). #}
   {% include "read/tts_player.html" %}
   {% endif %}
 

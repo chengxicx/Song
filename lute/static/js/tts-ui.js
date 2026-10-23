@@ -98,33 +98,135 @@
   }
 
   /* ================================================================
-     8. TTS toggles (sidebar quick controls)
+     8. Player toggles (sidebar quick controls)
      ================================================================ */
 
-  let ttsPlayerVisible = true;
+  // The sidebar "Player" switch is the master visibility control: off
+  // hides *every* player bar on the page (audio track, video transport
+  // and TTS read-aloud alike), on brings back whichever bar the reader
+  // was last using.
+  let playerVisible = true;
+  // The bar currently on screen when the player is visible (one of the
+  // PLAYER_MODE_* values); remembered so toggling the switch back on
+  // restores the same bar instead of guessing.
+  let currentPlayerMode = null;
   let ttsSentenceButtonsVisible = true;
 
-  function setTtsPlayerVisible(visible) {
-    ttsPlayerVisible = visible;
-    const toggle = document.getElementById("tts-player-toggle");
-    const container = document.body;
+  /* ------------------------------------------------------------------
+   * 8a. MP3 <-> TTS player mode
+   *
+   * Mirrors the mobile reader (features/reader/providers/
+   * player_mode_provider.dart): a book that has audio -- an mp3 / netease
+   * book, or a text book with an audio file attached -- can play either
+   * its track or TTS read-aloud of the text, but only one player bar is
+   * on screen at a time.  The bars are flex siblings of #thetext, so a
+   * second visible bar would stack and steal the text's height.  Each
+   * bar carries a button that hands over to the other
+   * (youtube_player.html / tts_player.html).
+   *
+   * The button switch is session-only and never persisted, so a reload
+   * starts from the book's own default (the audio player, when the book
+   * has audio).  The sidebar "Player" checkbox is the master on/off for
+   * both bars: it persists the reader's preference -- it writes the
+   * language setting -- and hiding it silences the book entirely.
+   * ------------------------------------------------------------------ */
 
-    if (ttsContainer) {
-      ttsContainer.style.display = visible ? "" : "none";
+  const PLAYER_MODE_MEDIA = "media";
+  const PLAYER_MODE_TTS = "tts";
+  // Page with no player bar at all (manga): nothing to show.
+  const PLAYER_MODE_OFF = "off";
+
+  function luteMediaPlayerContainer() {
+    return document.getElementById("yt-player-container");
+  }
+
+  function luteTtsPlayerContainer() {
+    if (!ttsContainer) {
+      ttsContainer = document.getElementById("tts-player-container");
     }
-    if (toggle) {
-      toggle.checked = visible;
-    }
-    if (container) {
-      if (visible) {
-        container.classList.add("tts-player-active");
-      } else {
-        container.classList.remove("tts-player-active");
-      }
+    return ttsContainer;
+  }
+
+  // Show exactly one player bar (none when the sidebar switch is off).
+  // `mode` is one of the PLAYER_MODE_* values; a mode the page cannot
+  // offer degrades to the other one.
+  function applyPlayerMode(mode, silent) {
+    const media = luteMediaPlayerContainer();
+    const tts = luteTtsPlayerContainer();
+
+    if (mode === PLAYER_MODE_MEDIA && !media) mode = PLAYER_MODE_TTS;
+    if (mode === PLAYER_MODE_TTS && !tts) {
+      mode = media ? PLAYER_MODE_MEDIA : PLAYER_MODE_OFF;
     }
 
+    currentPlayerMode = mode;
+
+    const showMedia = playerVisible && mode === PLAYER_MODE_MEDIA;
+    const showTts = playerVisible && mode === PLAYER_MODE_TTS;
+    if (media) media.style.display = showMedia ? "" : "none";
+    if (tts) tts.style.display = showTts ? "" : "none";
+
+    document.body.classList.toggle("player-active", playerVisible);
+
+    // The sidebar checkbox is the same switch, so keep it in sync --
+    // without persisting: this is the session's state, not a preference.
+    const toggle = document.getElementById("player-toggle");
+    if (toggle) toggle.checked = playerVisible;
+
+    // The reading pane re-flows around whichever bar is on screen
+    // (index.html re-splits the page into screens on this event).
+    if (!silent) {
+      try { window.dispatchEvent(new Event("lute:tts-ui-changed")); } catch (_) {}
+    }
+    return mode;
+  }
+
+  // Pause the audio / video track, if this page has one loaded.
+  function pauseMediaPlayer() {
+    const api = window.LUTE_MEDIA_API;
+    if (!api) return;
     try {
-      localStorage.setItem("ttsPlayerVisible", visible ? "1" : "0");
+      const p = api.player();
+      if (p && typeof p.pauseVideo === "function") p.pauseVideo();
+    } catch (_) {}
+  }
+
+  // Hand the book over to the other player: stop whatever is playing on
+  // the bar being left, like the mobile mode switch does (MP3 -> pause
+  // the track; TTS -> stop the read-aloud).  Neither side auto-plays.
+  function switchPlayerMode(mode) {
+    if (mode === PLAYER_MODE_TTS) {
+      pauseMediaPlayer();
+    } else if (typeof ttsStop === "function") {
+      try { ttsStop(); } catch (_) {}
+    }
+    applyPlayerMode(mode);
+  }
+
+  function setupPlayerModeSwitch() {
+    const toTts = document.getElementById("yt-tts-mode-btn");
+    if (toTts) {
+      toTts.addEventListener("click", function () {
+        switchPlayerMode(PLAYER_MODE_TTS);
+      });
+    }
+    const toMedia = document.getElementById("tts-mp3-mode-btn");
+    if (toMedia) {
+      toMedia.addEventListener("click", function () {
+        switchPlayerMode(PLAYER_MODE_MEDIA);
+      });
+    }
+  }
+
+  // Sidebar switch: show / hide the player bar(s) for the whole book.
+  function setPlayerVisible(visible) {
+    playerVisible = visible;
+
+    // Persisted, unlike the in-player mode buttons: the switch is the
+    // reader's preference (localStorage cache + language setting, which
+    // the settings page shows as "Show player").
+    try {
+      localStorage.setItem("playerVisible", visible ? "1" : "0");
     } catch (_) {}
 
     var val = visible ? "1" : "0";
@@ -132,14 +234,18 @@
       fetch("/settings/set/tts_show_control_panel/" + val, { method: "POST" });
     } catch (_) {}
 
-    try {
-      window.dispatchEvent(new Event("lute:tts-ui-changed"));
-    } catch (_) {}
-
-    // Stop playback when the player is hidden mid-stream.
-    if (!visible && (ttsPlaying || ttsPaused)) {
-      ttsStop();
+    // Hiding silences the book: leaving a track or read-aloud running
+    // with no visible transport is never what the reader wants.
+    if (!visible) {
+      pauseMediaPlayer();
+      if (typeof ttsStop === "function") {
+        try { ttsStop(); } catch (_) {}
+      }
     }
+
+    // Re-show the bar that was on screen before (the book's own default
+    // on first load); applyPlayerMode degrades if it is gone.
+    applyPlayerMode(currentPlayerMode || PLAYER_MODE_MEDIA);
   }
 
   function setTtsSentenceButtonsVisible(visible) {
@@ -180,27 +286,25 @@
     } catch (_) {}
   }
 
-  function setupTtsPlayerToggle() {
-    const toggle = document.getElementById("tts-player-toggle");
+  function setupPlayerToggle() {
+    const toggle = document.getElementById("player-toggle");
     if (!toggle) return;
 
-    // Detect YouTube / MP3 books: they render a dedicated
-    // .youtube-player-container player and the #book_audio_file hidden
-    // input is explicitly left empty (the Jinja template sets it to
-    // the empty string for youtube/mp3 types).
-    var isYouTubeOrMp3 = function () {
-      // The YouTube player is included for youtube/mp3 books; the TTS
-      // player is included for everything else.  When the YouTube
-      // player is present we hide the TTS player by default to avoid
-      // having two competing players on screen.
-      if (document.getElementById("yt-player-container")) return true;
-      var audioInput = document.getElementById("book_audio_file");
-      if (audioInput && (audioInput.value || "").trim() === "") {
-        if (document.getElementById("ytContainer")) return true;
-        if (typeof window.CUES !== "undefined") return true;
-      }
-      return false;
-    };
+    const media = luteMediaPlayerContainer();
+    const tts = luteTtsPlayerContainer();
+
+    // Nothing to show (manga): drop the row rather than leave a switch
+    // that can't do anything.
+    if (!media && !tts) {
+      const row = document.getElementById("player-toggle-container");
+      if (row) row.style.display = "none";
+      return;
+    }
+
+    // A book renders the media player (MP3 / video / youtube) when it has
+    // an audio file; the TTS bar is always rendered for text books, so
+    // its presence alone says nothing about what the reader should see.
+    const hasMediaPlayer = !!media;
 
     // PDF books are fixed-page readers: the player UI would cover the
     // page, so it starts hidden on every PDF load (the reading_menu
@@ -210,41 +314,56 @@
       return !!document.querySelector("#thetext.pdf-text-container");
     };
 
-    let saved = null;
+    // Saved preference: `savedVisible` is true / false / null (none yet),
+    // `savedMode` is only set when migrating the old TTS-only key.
+    let savedVisible = null;
+    let savedMode = null;
     try {
-      saved = localStorage.getItem("ttsPlayerVisible");
+      const val = localStorage.getItem("playerVisible");
+      if (val !== null) {
+        savedVisible = val !== "0";
+      } else {
+        // Pre-rename key: it meant "TTS bar shown", so on an audio book
+        // a "0" still meant a *visible* player (the media bar).  Only a
+        // text-only book's "0" was a real hide, and "1" means the reader
+        // was on TTS.
+        const legacy = localStorage.getItem("ttsPlayerVisible");
+        if (legacy !== null) {
+          if (legacy === "0" && !hasMediaPlayer) {
+            savedVisible = false;
+          } else {
+            savedVisible = true;
+            savedMode = legacy === "1" ? PLAYER_MODE_TTS : PLAYER_MODE_MEDIA;
+          }
+        }
+      }
     } catch (_) {}
 
-    var initialVisible;
+    // Default: the book's own player (MP3 when it has audio, TTS
+    // otherwise) -- same first-load behaviour as the mobile reader.
+    let initialVisible;
     if (isPdfBook()) {
       initialVisible = false;
-    } else if (saved !== null) {
-      initialVisible = saved !== "0";
-    } else if (isYouTubeOrMp3()) {
-      initialVisible = false;
+    } else if (savedVisible !== null) {
+      initialVisible = savedVisible;
+    } else if (hasMediaPlayer) {
+      initialVisible = true;
     } else {
       initialVisible = SETTINGS.showControlPanel;
     }
-    ttsPlayerVisible = initialVisible;
 
+    playerVisible = initialVisible;
     toggle.checked = initialVisible;
-    if (initialVisible) {
-      document.body.classList.add("tts-player-active");
-    } else {
-      document.body.classList.remove("tts-player-active");
-    }
-    // ttsContainer is cached by ttsCacheElements() (called from
-    // ttsInitPlayer()), which runs after this in boot().  Look it up
-    // here so the container is hidden on first paint even when the
-    // media player is present.
-    if (!ttsContainer) ttsContainer = document.getElementById("tts-player-container");
-    if (ttsContainer) {
-      ttsContainer.style.display = initialVisible ? "" : "none";
-    }
-
     toggle.addEventListener("change", function () {
-      setTtsPlayerVisible(toggle.checked);
+      setPlayerVisible(toggle.checked);
     });
+
+    // Silent: nothing has been laid out yet (the first page arrives via
+    // HTMX), so there is no re-flow to trigger.
+    applyPlayerMode(
+      savedMode || (hasMediaPlayer ? PLAYER_MODE_MEDIA : PLAYER_MODE_TTS),
+      true
+    );
   }
 
   function setupTtsSentenceButtonsToggle() {
@@ -344,8 +463,9 @@
    * ------------------------------------------------------------------ */
 
   function boot() {
-    setupTtsPlayerToggle();
+    setupPlayerToggle();
     setupTtsSentenceButtonsToggle();
+    setupPlayerModeSwitch();
 
     // Initialise the full TTS player if its container is on the page.
     // (For YouTube / MP3 books the container isn't rendered and we
