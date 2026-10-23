@@ -149,13 +149,20 @@ def test_the_worker_analyses_a_pending_book(app_context, book, monkeypatch):
     The worker body, run synchronously: a pending row is claimed, analysed
     with the shared text builder, and stored with the identity the read path
     compares against.
+
+    The fake reads the language it is handed, and that is the point of the
+    test: the worker releases the database connection before the long pass,
+    which expires whatever the session held, so the engine has to receive a
+    snapshot.  Handing over the ORM instance raises here instead of leaving
+    every book stored as a failure in production.
     """
     seen = []
-    monkeypatch.setattr(
-        precompute,
-        "analyze_text",
-        lambda page_text, lang: seen.append(page_text) or [{"key": "w"}],
-    )
+
+    def fake_engine_output(page_text, lang, display=None):
+        seen.append((page_text, lang.parser_type, lang.name, display))
+        return True, [{"key": "w"}]
+
+    monkeypatch.setattr(precompute, "engine_output", fake_engine_output)
     book_id = book.id
     precompute.store_now(book_id, "old-hash", "en", [])
     row = _row(book_id)
@@ -163,9 +170,7 @@ def test_the_worker_analyses_a_pending_book(app_context, book, monkeypatch):
     db.session.commit()
     # Taken before the worker runs: it releases the session before the
     # CPU-bound pass, which detaches (and expires) the fixture's book.
-    expected_hash = grammar_service.text_hash(
-        grammar_service.book_grammar_text(book)
-    )
+    expected_hash = grammar_service.text_hash(grammar_service.book_grammar_text(book))
 
     precompute._run_one(book_id)
 
@@ -174,12 +179,51 @@ def test_the_worker_analyses_a_pending_book(app_context, book, monkeypatch):
     assert json.loads(row.results) == [{"key": "w"}]
     assert row.text_hash == expected_hash
     assert len(seen) == 1
-    assert "Первая страница." in seen[0] and "Вторая страница." in seen[0]
+    page_text, parser_type, name, display = seen[0]
+    assert "Первая страница." in page_text and "Вторая страница." in page_text
+    assert parser_type == "spacedel"
+    assert name == "Russian"
+    assert display == "en"
+
+
+def test_the_worker_hands_the_regex_fallback_the_live_language(
+    app_context, book, monkeypatch
+):
+    """
+    The regex library renders paragraphs through the ORM, so the fallback
+    cannot use the snapshot: it has to re-read the language.  Storing the
+    snapshot's answer there would give a book a different analysis than the
+    same book analysed on demand.
+    """
+    monkeypatch.setattr(
+        precompute, "engine_output", lambda page_text, lang, display=None: (False, None)
+    )
+    seen = []
+
+    def fake_analyze(page_text, lang):
+        seen.append((lang.name, lang.parser_type))
+        return [{"key": "regex"}]
+
+    monkeypatch.setattr(precompute, "analyze_text", fake_analyze)
+    book_id = book.id
+    precompute.store_now(book_id, "old-hash", "en", [])
+    _row(book_id).status = "pending"
+    db.session.commit()
+
+    precompute._run_one(book_id)
+
+    row = _row(book_id)
+    assert row.status == GRAMMAR_STATUS_READY
+    assert json.loads(row.results) == [{"key": "regex"}]
+    assert seen == [("Russian", "spacedel")]
 
 
 def test_the_worker_leaves_a_book_it_cannot_claim_alone(app_context, book, monkeypatch):
     "Two processes can race for a book; only the one that flips it runs the engine."
     seen = []
+    monkeypatch.setattr(
+        precompute, "engine_output", lambda t, l, d=None: (True, seen.append(t) or [])
+    )
     monkeypatch.setattr(
         precompute, "analyze_text", lambda page_text, lang: seen.append(page_text)
     )
