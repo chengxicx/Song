@@ -47,6 +47,8 @@ from lute.read.grammar_analysis_service import (
     analyze_text,
     book_grammar_text,
     display_lang_for,
+    engine_output,
+    language_snapshot,
     rules_fingerprint,
     text_hash,
 )
@@ -181,6 +183,12 @@ def _claim(book_id):
     return claimed == 1
 
 
+def _language_of(book_id):
+    "The live Language for a book, for the paths that still need the ORM."
+    book = db.session.query(Book).filter(Book.id == book_id).first()
+    return None if book is None else book.language
+
+
 def _run_one(book_id):
     if not _claim(book_id):
         return
@@ -188,22 +196,32 @@ def _run_one(book_id):
     if book is None:
         _set_status(book_id, GRAMMAR_STATUS_SKIPPED, "book deleted")
         return
-    lang = book.language
+    # Everything the analysis reads out of the database is copied before the
+    # connection is released.  The pass below runs for tens of seconds on a
+    # whole book, so the session must not stay open that long -- and the
+    # commit that closes it expires the ORM instances, which would make any
+    # later attribute read raise.  A snapshot keeps the engine choice, and
+    # therefore the answer, identical to the request path.
+    snapshot = language_snapshot(book.language)
     work_text = book_grammar_text(book)
     digest = text_hash(work_text)
-    display = display_lang_for(lang)
+    display = display_lang_for(snapshot)
     rules = rules_fingerprint()
-    # Reading is done: release the connection before the CPU-bound pass.
-    # sqlite is in rollback-journal mode, so a long-lived reader blocks
-    # other writers for as long as the analysis runs.
+    # Reading is done: commit returns the connection, so a long analysis
+    # holds no sqlite reader while it runs.
     db.session.commit()
-    db.session.remove()
     try:
-        results = analyze_text(work_text, lang)
+        handled, results = engine_output(work_text, snapshot, display)
+        if not handled:
+            # No engine claims this language, or its optional dependency is
+            # missing: the regex fallback renders paragraphs through the
+            # ORM, so it re-reads instead of using the snapshot.  Slow, but
+            # it stores the same rows the request path would have returned.
+            results = analyze_text(work_text, _language_of(book_id))
         payload = json.dumps(results, ensure_ascii=False)
     except Exception as e:  # noqa: BLE001 - report, do not crash the worker
         logger.exception("grammar precompute: analysis failed for book %s", book_id)
-        db.session.remove()
+        db.session.rollback()
         _set_status(book_id, GRAMMAR_STATUS_ERROR, str(e)[:500])
         return
     row = _row(book_id)
