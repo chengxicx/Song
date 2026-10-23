@@ -39,6 +39,52 @@
    for every backend).
 */
 
+/* ----------------------------------------------------------------
+   Subtitle strip height, shared by every player bar on the page.
+
+   The strip shows one cue at a time, in the flow above the reading
+   text, and the text below is re-flowed to fill whatever space is left
+   (read/index.html _splitToScreens, on a ResizeObserver watching
+   #thetext).  So a cue that wraps onto a second line must not make the
+   strip taller than a one-line cue: every height change re-paginates
+   the text under it, which the reader sees as the whole page jumping.
+
+   Each player therefore measures the tallest cue it can show and
+   publishes it here; the strips inherit the largest of those values as
+   `--yt-subtitle-reserve` (player-styles.css uses it as the strip's
+   min-height).  Folding both into one number keeps the audio bar and
+   the TTS bar -- which a book with an audio file renders one at a time
+   in the same slot -- exactly the same size, so handing the book
+   between them does not resize the strip either.
+
+   The value is set on <body> because it has to reach both bars, and the
+   mobile dock only restyles them (player-dock.js): the bars stay where
+   they are in the DOM.
+   ---------------------------------------------------------------- */
+(function () {
+  "use strict";
+
+  var reserves = {};
+
+  window.LuteStripReserve = {
+    // `key` names the player ("media" / "tts"); `px` is the height its
+    // tallest cue needs, or 0 to withdraw it.
+    publish: function (key, px) {
+      reserves[key] = px > 0 ? Math.round(px * 10) / 10 : 0;
+      var max = 0;
+      for (var k in reserves) {
+        if (reserves[k] > max) max = reserves[k];
+      }
+      if (!document.body) return;
+      if (max > 0) {
+        document.body.style.setProperty("--yt-subtitle-reserve", max + "px");
+      } else {
+        document.body.style.removeProperty("--yt-subtitle-reserve");
+      }
+    },
+  };
+})();
+
 (function () {
   "use strict";
 
@@ -500,8 +546,7 @@
     // measurement only reruns when one of those changes.
     function ytSyncStripHeight() {
       if (!els.subtitle || !CUES.length) return;
-      var box = els.subtitle.parentNode;
-      if (!box) return;
+      if (!els.subtitle.parentNode) return;
       var width = els.subtitle.clientWidth;
       if (!width) return;
       var metrics = ytStripMetrics();
@@ -515,8 +560,10 @@
       // strip at that height from here on rather than resize per cue.
       var live = Math.min(els.subtitle.scrollHeight, metrics.cap || Infinity);
       if (live > ytStripReserve) ytStripReserve = live;
-      if (ytStripReserve > 0) {
-        box.style.setProperty("--yt-subtitle-reserve", ytStripReserve + "px");
+      if (ytStripReserve > 0 && window.LuteStripReserve) {
+        // Published through the shared registry, which the TTS bar also
+        // writes to: both strips then take the larger of the two.
+        window.LuteStripReserve.publish("media", ytStripReserve);
       }
     }
 

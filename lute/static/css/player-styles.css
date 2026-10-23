@@ -901,8 +901,10 @@
 }
 
 /* The current subtitle line.  It shows one cue at a time, so its height
-   is reserved for the book's tallest cue by media-player-base.js
-   (--yt-subtitle-reserve, in px): a cue that wraps onto a second line
+   is reserved for the book's tallest cue by the players themselves
+   (--yt-subtitle-reserve, in px: media-player-base.js / tts-player.js
+   publish it through the shared LuteStripReserve so the audio and TTS
+   strips end up the same size): a cue that wraps onto a second line
    must not resize the box, or the reading text below it -- which is
    re-flowed to fill the space left over -- is re-paginated under the
    reader on every other sentence.  The fallback keeps the strip at its

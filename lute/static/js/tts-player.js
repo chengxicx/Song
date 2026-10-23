@@ -304,6 +304,13 @@
     if (ttsDurationEl) ttsDurationEl.textContent = ttsFmtTime(ttsTotalDuration);
     if (ttsTimeline) ttsTimeline.max = ttsTotalDuration || 1000;
     ttsBuildTranscript();
+
+    // A new page's cues need a new reserved strip height (see
+    // ttsSyncStripHeight); the old page's is meaningless here.
+    ttsStripGen += 1;
+    ttsStripReserve = 0;
+    ttsStripKey = null;
+    ttsSyncStripHeight();
   }
 
   // Recompute cue start/end times after a rate change or after a cue
@@ -706,6 +713,97 @@
     return d.innerHTML;
   }
 
+  /* ---- Subtitle strip height ---------------------------------------
+     Mirrors the media player's measurement (media-player-base.js): the
+     TTS bar has its own strip element, so without a reserve of its own
+     it sat at the stylesheet fallback (54.4px) while the audio bar held
+     the book's tallest cue (99px on an audiobook) -- the two bars were
+     visibly different sizes, and the strip resized on every long
+     sentence, re-paginating the reading text below it (that text is
+     re-flowed to fill whatever space is left).
+
+     The height goes through the shared LuteStripReserve registry, so a
+     book that has both bars ends up with one height for both: handing
+     the book from the audio track to TTS does not resize the strip. */
+
+  var TTS_STRIP_SAMPLE = 120;
+  var ttsStripReserve = 0;
+  var ttsStripKey = null;
+  // Bumped whenever the cue list is rebuilt (a page turn): the reserve
+  // is per page, and the key below has to notice the new cue set.
+  var ttsStripGen = 0;
+
+  // The strip's own metrics: the height a cue may occupy (its CSS
+  // max-height -- longer cues scroll, so reserving more would only make
+  // the strip taller than its stylesheet allows) and the font size its
+  // line height follows.
+  function ttsStripMetrics() {
+    if (!ttsSubtitle) return { cap: 0, font: "" };
+    var cs = window.getComputedStyle(ttsSubtitle);
+    var cap = parseFloat(cs.maxHeight);
+    return { cap: isFinite(cap) && cap > 0 ? cap : 0, font: cs.fontSize };
+  }
+
+  // The page's longest cues by length, capped at TTS_STRIP_SAMPLE.
+  function ttsStripSampleIndices() {
+    var idx = [];
+    for (var i = 0; i < ttsCues.length; i++) idx.push(i);
+    if (idx.length > TTS_STRIP_SAMPLE) {
+      idx.sort(function (a, b) {
+        return (ttsCues[b].text || "").length - (ttsCues[a].text || "").length;
+      });
+      idx.length = TTS_STRIP_SAMPLE;
+    }
+    return idx;
+  }
+
+  // Height the strip needs for the tallest of `indices`, measured at the
+  // strip's own width (what wraps depends on it).  The probe keeps the
+  // inner's id on purpose: the stylesheet sizes the strip's text through
+  // it, and the measurement has to see the same box the real cue will
+  // occupy.
+  function ttsMeasureStripHeight(width, indices) {
+    if (!ttsSubtitle || !ttsSubtitle.parentNode) return 0;
+    var probe = ttsSubtitle.cloneNode(false);
+    probe.style.cssText =
+      "position:fixed;left:-10000px;top:0;visibility:hidden;" +
+      "width:" + width + "px;height:auto;max-height:none;overflow:visible;";
+    ttsSubtitle.parentNode.appendChild(probe);
+    var tallest = 0;
+    for (var i = 0; i < indices.length; i++) {
+      var cue = ttsCues[indices[i]];
+      probe.innerHTML = cue ? cue.html || ttsEscapeHtml(cue.text || "") : "";
+      if (probe.scrollHeight > tallest) tallest = probe.scrollHeight;
+    }
+    probe.parentNode.removeChild(probe);
+    var cap = ttsStripMetrics().cap;
+    return cap && tallest > cap ? cap : tallest;
+  }
+
+  // Publish the reserved height.  Called when the cue list is built, when
+  // the player bar is shown, and on every cue, because the answer depends
+  // on the strip's width and font (a resize, a zoom, a font-size change)
+  // and on the page's cue set -- the measurement only reruns when one of
+  // those changes.
+  function ttsSyncStripHeight() {
+    if (!ttsSubtitle || !ttsCues.length) return;
+    var width = ttsSubtitle.clientWidth;
+    if (!width) return; // hidden: there is nothing to measure against yet
+    var metrics = ttsStripMetrics();
+    var key = width + "x" + metrics.font + "x" + ttsStripGen;
+    if (key !== ttsStripKey) {
+      ttsStripKey = key;
+      ttsStripReserve = ttsMeasureStripHeight(width, ttsStripSampleIndices());
+    }
+    // A cue taller than every one measured (the sample missed it): hold
+    // the strip at that height from here on rather than resize per cue.
+    var live = Math.min(ttsSubtitle.scrollHeight, metrics.cap || Infinity);
+    if (live > ttsStripReserve) ttsStripReserve = live;
+    if (ttsStripReserve > 0 && window.LuteStripReserve) {
+      window.LuteStripReserve.publish("tts", ttsStripReserve);
+    }
+  }
+
   // Inject the current cue's word HTML into the scrolling subtitle,
   // apply status colors, and measure marquee overflow for the
   // horizontal scroll animation.
@@ -739,6 +837,8 @@
       window.requestAnimationFrame(function () {
         const overflow = ttsSubtitle.scrollWidth - ttsSubtitle.clientWidth;
         ttsMarqueeOverflow = ttsIsRtl ? 0 : Math.max(0, overflow);
+        // Keep the strip one height for the page (see above).
+        ttsSyncStripHeight();
       });
       ttsApplySubtitleStatusColors();
     }
