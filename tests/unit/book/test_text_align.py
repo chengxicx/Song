@@ -57,10 +57,10 @@ def test_reference_punctuation_is_kept_and_defines_the_sentences():
 
 def test_a_sentence_the_recognizer_missed_entirely_still_gets_a_time():
     """
-    It has no audio of its own to point at, so it is slotted just after
-    the previous sentence -- and crucially the cursor does not move, so
-    the *next* sentence is still located against the right audio instead
-    of being dragged along behind a phantom.
+    It has no audio of its own to point at, so its time is interpolated
+    between the sentences around it -- and crucially the cursor does not
+    move, so the *next* sentence is still located against the right audio
+    instead of being dragged along behind a phantom.
     """
     cues = [
         {"start": 0.0, "end": 2.0, "text": "前半の文"},
@@ -79,6 +79,63 @@ def test_a_sentence_the_recognizer_missed_entirely_still_gets_a_time():
     assert first["end"] == 2.0
     assert last["start"] == 10.0
     assert last["end"] == 12.0
+
+
+def test_a_shared_word_far_ahead_does_not_pull_the_timeline_forward():
+    """
+    A heading shares one word with a line 20 seconds later.  Accepting
+    that as a match jumps the cursor over the audio in between, and every
+    later sentence lands late -- the "subtitles drift further and further
+    behind" report (prod book 879).  A partial match like that must be
+    treated as no match at all.
+    """
+    cues = [
+        {"start": 0.0, "end": 2.0, "text": "最初の行です"},
+        {"start": 20.0, "end": 24.0, "text": "前回のメールで確認しました"},
+    ]
+    reference = "最初の行です\n###メール2\n前回のメールで確認しました"
+
+    aligned, _ratio = align_cues_to_reference(cues, reference)
+
+    assert _texts(aligned) == [
+        "最初の行です",
+        "###メール2",
+        "前回のメールで確認しました",
+    ]
+    # The heading has no audio: it belongs between the two lines, not on
+    # top of the second one's "メール".
+    assert aligned[1]["start"] < 20.0
+    assert aligned[1]["end"] <= 20.0
+    # The real sentence keeps its real time.
+    assert aligned[2]["start"] == 20.0
+    assert aligned[2]["end"] == 24.0
+
+
+def test_a_long_unmatched_run_does_not_run_past_the_recording():
+    """
+    Unmatched sentences used to be given a fixed 0.12 s per character,
+    which has no idea how much audio the run is standing in: enough of
+    them invented more time than the recording had and pushed the last
+    line past the end of the audio.  Interpolation keeps the run inside
+    the interval its neighbours anchor.
+    """
+    filler = "\n".join(["音声には出てこない行がここにあります"] * 15)
+    cues = [
+        {"start": 0.0, "end": 2.0, "text": "前半の文"},
+        {"start": 30.0, "end": 32.0, "text": "後半の文"},
+    ]
+    reference = f"前半の文\n{filler}\n後半の文"
+
+    aligned, _ratio = align_cues_to_reference(cues, reference)
+
+    assert aligned[0]["start"] == 0.0
+    assert aligned[-1]["start"] == 30.0
+    assert aligned[-1]["end"] == 32.0
+    for cue in aligned:
+        assert cue["end"] <= 32.0
+    # Nothing inside the run is squeezed to nothing.
+    for cue in aligned[1:-1]:
+        assert cue["end"] > cue["start"]
 
 
 def test_timeline_stays_monotonic_when_sentences_share_a_cue_character():
