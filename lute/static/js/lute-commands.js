@@ -332,6 +332,9 @@ function open_grammar_analysis(opts) {
   // (term-form + dictionary) state.  Exposed globally so clicking a word
   // (LuteTermFormOpened) can restore the default view.
   function closeGrammarAnalysis() {
+    // A whole-book poll belongs to this panel: leaving it running would
+    // keep re-rendering a panel that is no longer on the page.
+    stopBookPolling();
     // The per-open "click elsewhere" listener (see clearPinnedSelection) is a
     // closure over that panel's own state, and the panel element is the only
     // handle on it -- so unhook it here, before remove() drops the handle.
@@ -401,6 +404,11 @@ function open_grammar_analysis(opts) {
   // The page scope's rows, kept while the book scope is showing, so
   // switching back re-renders rather than re-fetches.
   var pageResults = null;
+  // The whole-book analysis runs in the background (the backend answers
+  // 202 "computing" instead of blocking), so the panel polls the same URL.
+  // The deadline keeps a book that never finishes from spinning forever.
+  var bookPollTimer = null;
+  var bookPollDeadline = 0;
 
   function header() {
     // The library index for this book's language -- the way to find a
@@ -549,9 +557,13 @@ function open_grammar_analysis(opts) {
       if (next === scope) return;
       if (next === "sentence") {
         if (!filterableSentence) return;
+        stopBookPolling();
+        bookPollDeadline = 0;
         scope = "sentence";
         filterToSentence(filterableSentence);
       } else if (next === "page") {
+        stopBookPolling();
+        bookPollDeadline = 0;
         scope = "page";
         // Coming back from "book" has to re-render the page's own rows:
         // the book's response replaced them.  When the panel is still on
@@ -569,6 +581,9 @@ function open_grammar_analysis(opts) {
         // The sentence filter is meaningless over a whole book, and the
         // rows are about to be replaced anyway.
         sentenceFilter = null;
+        // A click is a fresh attempt: give the background job a fresh
+        // polling window rather than inheriting an expired one.
+        bookPollDeadline = 0;
         fetchBookScope();
       }
       syncScopeControl();
@@ -588,22 +603,102 @@ function open_grammar_analysis(opts) {
     return !panel[0].isConnected;
   }
 
-  // Fetch a scope's rows and render them.  The "page" scope is what the
-  // panel opened with, so it reuses the response already in hand; "book"
-  // asks the backend for the whole book's text.  Rendering itself lives in
-  // the request callback below and is shared by both paths.
-  function fetchBookScope() {
-    const bookUrl = `/read/grammar_analysis/${bookid}/${pagenum}?scope=book`;
+  // Fetch the book scope's rows and render them.  The whole-book analysis
+  // is precomputed in the background, so an unanalysed book answers
+  // "computing" instead of holding the request open for half a minute: the
+  // panel paints a waiting state and polls this same URL until the rows are
+  // ready.  Polling is per-panel state, so every way out of the panel
+  // (close, widen, narrow) has to stop it.
+  function stopBookPolling() {
+    if (bookPollTimer) {
+      clearTimeout(bookPollTimer);
+      bookPollTimer = null;
+    }
+  }
+
+  function bookStateHtml(main, hint) {
+    return (
+      '<div class="grammar-analysis-panel__state">' +
+      "<div>" +
+      escapeHtml(main) +
+      "</div>" +
+      (hint
+        ? '<div class="grammar-analysis-panel__state-hint">' +
+          escapeHtml(hint) +
+          "</div>"
+        : "") +
+      "</div>"
+    );
+  }
+
+  function showBookRetry(message) {
+    stopBookPolling();
     panel
       .find(".grammar-analysis-panel__body")
       .html(
         '<div class="grammar-analysis-panel__state">' +
-          I18N.t("Analyzing…") +
-          "</div>"
+          "<div>" +
+          escapeHtml(message) +
+          "</div>" +
+          '<button type="button" class="grammar-analysis-panel__retry">' +
+          escapeHtml(I18N.t("Try again")) +
+          "</button></div>"
       );
+    panel.find(".grammar-analysis-panel__retry").on("click", function () {
+      bookPollDeadline = 0;
+      fetchBookScope();
+    });
+  }
+
+  function pollBookScope() {
+    stopBookPolling();
+    bookPollTimer = setTimeout(function () {
+      bookPollTimer = null;
+      if (panelIsGone() || scope !== "book") return;
+      if (Date.now() > bookPollDeadline) {
+        showBookRetry(
+          I18N.t("The whole-book analysis took too long. Please try again.")
+        );
+        return;
+      }
+      fetchBookScope();
+    }, 2000);
+  }
+
+  function fetchBookScope() {
+    const bookUrl = `/read/grammar_analysis/${bookid}/${pagenum}?scope=book`;
+    panel
+      .find(".grammar-analysis-panel__body")
+      .html(bookStateHtml(I18N.t("Analyzing the whole book…")));
     $.getJSON(bookUrl)
       .done(function (data) {
         if (panelIsGone()) return;
+        if (data && data.state === "computing") {
+          // First answer starts the clock; a poll does not extend it.
+          if (!bookPollDeadline) bookPollDeadline = Date.now() + 10 * 60 * 1000;
+          panel
+            .find(".grammar-analysis-panel__body")
+            .html(
+              bookStateHtml(
+                data.status === "queued"
+                  ? I18N.t("Waiting for the background analysis to start…")
+                  : I18N.t("Analyzing the whole book…"),
+                I18N.t(
+                  "It keeps running in the background, so you can keep reading."
+                )
+              )
+            );
+          pollBookScope();
+          return;
+        }
+        if (data && data.state === "error") {
+          showBookRetry(
+            I18N.t("The whole-book analysis failed. Please try again.")
+          );
+          return;
+        }
+        stopBookPolling();
+        bookPollDeadline = 0;
         // Keep the page's rows so switching back re-renders them instead
         // of re-fetching: the book's response is about to replace them.
         pageResults = lastResults;
@@ -612,20 +707,42 @@ function open_grammar_analysis(opts) {
       })
       .fail(function () {
         if (panelIsGone()) return;
-        panel
-          .find(".grammar-analysis-panel__body")
-          .html(
-            '<div class="grammar-analysis-panel__state">' +
-              I18N.t("Analysis failed. Please try again.") +
-              "</div>"
-          );
+        showBookRetry(I18N.t("Analysis failed. Please try again."));
       });
   }
 
   // Render the rows the backend returned into the panel.  Split out of the
   // request's callback so switching scope to "book" can re-render from its
   // own response with the same code.
-  function renderResults(data) {
+  // narrowToTarget: only the render that opens the panel (the term form's
+  // Grammar button) may narrow to the clicked word's sentence.  The word
+  // stays in this closure for the panel's whole life, so a later render
+  // cannot infer "the reader just came from that word": the book scope's
+  // examples come from every other page, have no nodes on this screen, and
+  // narrowing there filtered nearly every card away while the level headers
+  // still counted the whole payload ("This book: 1 point", N5: 10).
+  function renderResults(data, narrowToTarget) {
+    // Resolved before the header is built: header() renders the "This
+    // sentence" button only when a sentence is known, and syncScopeControl
+    // marks the active scope from `scope` -- both must see it on the first
+    // render, not whenever the next scope switch rebuilds the header.
+    var targetSentence = null;
+    if (
+      narrowToTarget &&
+      data &&
+      data.length &&
+      targetWordEl &&
+      targetWordEl.isConnected
+    ) {
+      targetSentence = grammarTargetSentence(targetWordEl);
+      if (targetSentence) {
+        filterableSentence = targetSentence;
+        // A book request may already be in flight (the reader switched
+        // scope while this response was on its way): do not claim the
+        // sentence scope for a render that is about to be replaced.
+        if (scope === "page") scope = "sentence";
+      }
+    }
     let bodyHtml;
     if (!data || data.length === 0) {
       bodyHtml = '<div class="grammar-analysis-panel__state">' + I18N.t('No known grammar points detected on this page.') + '</div>';
@@ -1341,18 +1458,19 @@ function open_grammar_analysis(opts) {
         );
         renderedCards = cards;
 
-        // The term form's Grammar button narrows the panel to the grammar of
-        // the sentence the reader was in, and jumps to -- and pins -- its
-        // card.  The header's page control lifts that narrowing again, so the
-        // sentence is remembered even when it carries no known grammar (the
-        // panel then shows the "nothing for this sentence" state).
-        if (targetWordEl && targetWordEl.isConnected) {
-          var targetSentence = grammarTargetSentence(targetWordEl);
-          var picked = targetSentence
-            ? grammarPickTarget(boundItems, targetSentence, targetWordEl)
-            : null;
-          filterableSentence = targetSentence;
-          if (targetSentence) filterToSentence(targetSentence);
+        // The opening render narrows the panel to the grammar of the
+        // sentence the reader was in, and jumps to -- and pins -- its card.
+        // Every other render passes narrowToTarget false, so widening the
+        // scope lifts the filter and the badge recounts the whole payload.
+        // The sentence is remembered even when it carries no known grammar
+        // (the panel then shows the "nothing for this sentence" state).
+        if (targetSentence) {
+          var picked = grammarPickTarget(
+            boundItems,
+            targetSentence,
+            targetWordEl
+          );
+          filterToSentence(targetSentence);
           if (picked) {
             // A collapsed aggregate row hides its examples (display:none),
             // and getClientRects() on hidden cells is empty, so the rings
@@ -1367,12 +1485,13 @@ function open_grammar_analysis(opts) {
   }
 
   // The panel's own request.  Rendered from the response on arrival, and
-  // again whenever the scope changes (see fetchBookScope).
+  // again whenever the scope changes (see fetchBookScope).  This is the one
+  // render allowed to narrow to the clicked word's sentence.
   $.getJSON(url)
     .done(function (data) {
       if (panelIsGone()) return;
       lastResults = data;
-      renderResults(data);
+      renderResults(data, true);
     })
     .fail(function () {
       if (panelIsGone()) return;

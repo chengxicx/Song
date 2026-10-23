@@ -979,6 +979,7 @@ def data_initialization(session, output_func=None):
         for userinfo in mu_store.users():
             with mu_context.user_scope(userinfo["username"]):
                 clean_data(session, outfunc)
+                _requeue_grammar_precompute(outfunc)
         return
 
     demosvc = DemoService(session)
@@ -989,3 +990,26 @@ def data_initialization(session, output_func=None):
     # TODO valid parsers: do parser check, mark valid as active, invalid as inactive.
 
     clean_data(session, outfunc)
+    _requeue_grammar_precompute(outfunc)
+
+
+def _requeue_grammar_precompute(outfunc):
+    """
+    Re-queue whole-book grammar analyses a previous process left behind.
+
+    The worker is a daemon thread, so a restart loses the queue and the
+    "running" claims both; without this the affected books sit at running
+    forever and the reader's panel waits for a result nobody is computing.
+    Never blocks startup on an optional cache warm-up.
+    """
+    try:
+        from lute.read import grammar_precompute
+
+        queued = grammar_precompute.requeue_interrupted()
+        if queued:
+            outfunc(f"Queued {queued} book(s) for grammar analysis.")
+    except Exception:  # noqa: BLE001 - startup must survive any cache problem
+        try:
+            current_app.logger.warning("could not re-queue grammar analyses")
+        except Exception:  # noqa: BLE001 - no app context at all
+            pass

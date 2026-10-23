@@ -33,6 +33,9 @@ def delete_all_data(session):
         # new table must be listed here or a wipe leaves it alive (the
         # lesson the reviewspecs survival taught).
         "delete from shadowattempts",
+        # Whole-book grammar analyses cascade on the book delete below, but
+        # every new table is listed here so a wipe cannot leave one alive.
+        "delete from bookgrammar",
         "delete from languages",
         "delete from tags",
         "delete from tags2",

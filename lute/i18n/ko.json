@@ -849,5 +849,10 @@
   "Paste the text that is read in this recording (for example the textbook passage). The subtitles then use your text, and speech recognition supplies only the timing -- so names and homophones come out exactly as written. Leave empty to re-transcribe plainly.": "이 녹음에서 읽는 본문(예: 교과서课文)을 붙여넣으세요. 자막은 제공한 텍스트를 사용하고 음성 인식은 시간축만 담당합니다——인명과 동음이의어도 정확해집니다. 비우면 일반 전사를 다시 진행합니다.",
   "Reading mode": "보기 모드",
   "Keep the chapter’s original layout and images": "장의 원래 레이아웃과 이미지 유지",
-  "Lute’s word lookups are added on top of the rendered chapter. A chapter becomes one continuously scrolling page, so progress is tracked per chapter instead of per page.": "재현된 장 위에 Lute의 단어 조회를 덧입힙니다. 한 장이 하나의 연속 스크롤 페이지가 되므로 진행률은 페이지가 아니라 장 단위로 기록됩니다."
+  "Lute’s word lookups are added on top of the rendered chapter. A chapter becomes one continuously scrolling page, so progress is tracked per chapter instead of per page.": "재현된 장 위에 Lute의 단어 조회를 덧입힙니다. 한 장이 하나의 연속 스크롤 페이지가 되므로 진행률은 페이지가 아니라 장 단위로 기록됩니다.",
+  "Analyzing the whole book…": "책 전체를 분석하는 중…",
+  "Waiting for the background analysis to start…": "백그라운드 분석이 시작되기를 기다리는 중…",
+  "It keeps running in the background, so you can keep reading.": "분석은 백그라운드에서 계속됩니다. 계속 읽으셔도 됩니다.",
+  "The whole-book analysis took too long. Please try again.": "책 전체 분석이 너무 오래 걸렸습니다. 잠시 후 다시 시도해 주세요.",
+  "The whole-book analysis failed. Please try again.": "책 전체 분석에 실패했습니다. 잠시 후 다시 시도해 주세요."
 }

@@ -456,3 +456,34 @@ class BookStats(db.Model):
     status_distribution = db.Column(db.String, nullable=True)
     manga_word_count = db.Column(db.Integer, nullable=True)
     stale = db.Column("BkStatsStale", db.Boolean, nullable=False, default=False)
+
+
+# The whole-book grammar analysis cache (see
+# lute/db/schema/migrations/20261024_create_bookgrammar.sql).  One row per
+# book, written by the background worker in
+# lute/read/grammar_precompute.py and read by the reader's grammar panel.
+#
+# BgResults is the engine's raw JSON array *before* the language's
+# hidden_grammar_levels filter: hiding a level is a display choice, and
+# must never cost a recompute.  Shape: the same list the
+# /read/grammar_analysis route returns --
+#   [{"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}]
+GRAMMAR_STATUS_PENDING = "pending"
+GRAMMAR_STATUS_RUNNING = "running"
+GRAMMAR_STATUS_READY = "ready"
+GRAMMAR_STATUS_ERROR = "error"
+GRAMMAR_STATUS_SKIPPED = "skipped"
+
+
+class BookGrammar(db.Model):
+    "Cached whole-book grammar analysis."
+    __tablename__ = "bookgrammar"
+
+    BkID = db.Column("BgBkID", db.Integer, db.ForeignKey("books.BkID", ondelete="CASCADE"), primary_key=True)
+    status = db.Column("BgStatus", db.String, nullable=False, default=GRAMMAR_STATUS_PENDING)
+    text_hash = db.Column("BgTextHash", db.String, nullable=True)
+    display = db.Column("BgDisplay", db.String, nullable=True)
+    rules = db.Column("BgRules", db.String, nullable=True)
+    results = db.Column("BgResults", db.String, nullable=True)
+    error = db.Column("BgError", db.String, nullable=True)
+    updated = db.Column("BgUpdated", db.DateTime, nullable=True)
