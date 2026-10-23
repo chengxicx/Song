@@ -19,6 +19,21 @@ ending halfway through itself.  Locating each sentence from the previous
 one's end keeps the result ordered and local, so a dropped or mis-heard
 sentence only affects its own timing.
 
+Two rules keep a run of unmatched sentences from dragging the rest of
+the book out of sync, which is what "subtitles drift further and further
+behind" actually is:
+
+* a sentence only anchors the timeline when most of *it* was found
+  (MIN_MATCH_COVERAGE).  A heading like "###メール2" shares "メール" with
+  some later line, and accepting that as a match jumps the cursor
+  seconds ahead of the audio -- every later sentence then lands late,
+  and the error compounds.  A weak match is treated as no match;
+* sentences with no anchor of their own get their time *interpolated*
+  between the two anchors around them, in proportion to their length,
+  rather than a fixed guess per character.  A guess has no idea how much
+  audio it is standing in: a run of them invents more (or less) time
+  than the recording has, and pushes everything after it off the audio.
+
 The overall similarity (difflib's ratio over the whole text) is returned
 for the caller's quality gate; see MIN_MATCH_RATIO.
 
@@ -52,6 +67,17 @@ _MAX_INTERNAL_GAP = 8
 # refusing to look back pushes a sentence onto the wrong audio -- once a
 # sentence is located late, every later one inherits the error.
 _CURSOR_SLACK = 8
+
+# How much of a sentence must be found before its position counts.
+# Below this the match is a shared word in the wrong place ("###メール2"
+# against "...前回のメールで..."): anchoring on it skips the audio in
+# between and leaves every later sentence late.
+MIN_MATCH_COVERAGE = 0.5
+
+# No cue is shorter than this.  Interpolation can otherwise produce a
+# zero-length cue where two anchors are adjacent, and a cue of no length
+# is never the current one, so its line is silently skipped.
+MIN_CUE_SECONDS = 0.35
 
 
 def _char_times(cues):
@@ -124,6 +150,11 @@ def _locate(asr_text, cursor, sentence):
     "李さんや張さんのおかげで" against "...李さんやチョさんのおかげで" the
     longest run is "さんのおかげで", which starts *inside* the sentence
     and would put its beginning several characters too late.
+
+    A span that covers less than MIN_MATCH_COVERAGE of the sentence is
+    reported as no span at all: that is a word the sentence happens to
+    share with a line somewhere ahead, not the sentence itself, and
+    anchoring on it throws away the audio in between.
     """
     if cursor >= len(asr_text) or not sentence:
         return cursor, cursor
@@ -136,11 +167,51 @@ def _locate(asr_text, cursor, sentence):
         return cursor, cursor
     start = search_from + matches[0][1]
     end = search_from + matches[0][2]
+    matched = matches[0][2] - matches[0][1]
     for op in matches[1:]:
         if op[1] - (end - search_from) > _MAX_INTERNAL_GAP:
             break
         end = search_from + op[2]
+        matched += op[2] - op[1]
+    if matched < len(sentence) * MIN_MATCH_COVERAGE:
+        return cursor, cursor
     return start, end
+
+
+def _interpolate_gaps(times, sentences, audio_end):
+    """
+    In place: give every None entry a span between its anchored
+    neighbours, proportional to its own length.
+
+    A run of sentences the recognizer did not produce has no audio of its
+    own to point at, but the audio *around* it is known: the previous
+    sentence's end and the next sentence's start.  Spreading that
+    interval by character count keeps the run inside the recording and,
+    crucially, leaves the next anchor exactly where the recognizer put
+    it -- a fixed per-character guess would instead invent a total that
+    has nothing to do with how long the run actually took, and push
+    everything after it out of sync.
+    """
+    count = len(times)
+    index = 0
+    while index < count:
+        if times[index] is not None:
+            index += 1
+            continue
+        run_end = index
+        while run_end < count and times[run_end] is None:
+            run_end += 1
+        gap_start = times[index - 1][1] if index > 0 else 0.0
+        gap_end = times[run_end][0] if run_end < count else audio_end
+        gap = max(0.0, gap_end - gap_start)
+        weights = [max(1, len(sentences[k][0])) for k in range(index, run_end)]
+        total = sum(weights)
+        cursor = gap_start
+        for k in range(index, run_end):
+            share = gap * weights[k - index] / total
+            times[k] = (cursor, cursor + share)
+            cursor += share
+        index = run_end
 
 
 def align_cues_to_reference(cues, reference):
@@ -153,6 +224,12 @@ def align_cues_to_reference(cues, reference):
     align (no reference, no cues, or not one character in common).  The
     caller decides whether the ratio is good enough to use; see
     MIN_MATCH_RATIO.
+
+    Two passes.  The first locates the sentences the recognizer actually
+    contains and turns those character spans into times; the second fills
+    the sentences in between, and any trailing ones, from the anchors
+    around them.  The timeline is then walked forwards once so it never
+    goes backwards and no cue is too short to be seen.
     """
     ref_text, sentences = _reference_sentences(reference)
     asr_text = "".join((cue.get("text") or "") for cue in cues or [])
@@ -166,28 +243,40 @@ def align_cues_to_reference(cues, reference):
     if ratio == 0.0:
         return None, 0.0
 
-    aligned = []
+    spans = []
     cursor = 0
-    previous_end = 0.0
     for sentence, _start_idx, _end_idx in sentences:
         span_start, span_end = _locate(asr_text, cursor, sentence)
         if span_end > span_start:
             cursor = max(cursor, span_end)
-            start = char_times[min(span_start, len(char_times) - 1)][0]
-            end = char_times[min(span_end, len(char_times)) - 1][1]
+            spans.append((span_start, span_end))
         else:
-            # Nothing of this sentence is in the audio at all: slot it
-            # just after the previous sentence and leave the cursor
-            # alone, so the *next* sentence is still located against the
-            # right audio rather than after a phantom.
-            start = previous_end
-            end = start + max(0.3, len(sentence) * 0.12)
+            # Nothing of this sentence is in the audio at all.  The
+            # cursor stays put, so the *next* sentence is still located
+            # against the right audio rather than after a phantom.
+            spans.append(None)
+
+    times = []
+    for span in spans:
+        if span is None:
+            times.append(None)
+            continue
+        start = char_times[min(span[0], len(char_times) - 1)][0]
+        end = char_times[min(span[1], len(char_times)) - 1][1]
+        times.append((start, end))
+    _interpolate_gaps(times, sentences, char_times[-1][1])
+
+    aligned = []
+    previous_end = 0.0
+    for (sentence, _start_idx, _end_idx), (start, end) in zip(sentences, times):
         # Keep the timeline monotonic: a sentence can land on the cue
         # character a previous one already claimed.
         if start < previous_end:
             start = previous_end
-        if end <= start:
-            end = start + max(0.3, len(sentence) * 0.12)
+        if end < start:
+            end = start
+        if end - start < MIN_CUE_SECONDS:
+            end = start + MIN_CUE_SECONDS
         aligned.append(
             {"start": round(start, 3), "end": round(end, 3), "text": sentence}
         )
