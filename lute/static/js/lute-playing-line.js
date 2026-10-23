@@ -98,6 +98,42 @@
     return Array.prototype.slice.call(div.querySelectorAll(":scope > p"));
   }
 
+  // The elements currently carrying the mark, so a caller can scroll or
+  // page the reader to what the player is reading (the readers' follow
+  // helper, LuteReaderFollow in read/index.html).  Empty when nothing is
+  // marked, which is what a cue outside the page being read looks like.
+  function markedEls() {
+    return marked.slice();
+  }
+
+  // Which page holds cue `index`, given the server's first-cue index of
+  // every page (window.LUTE_CUE_PAGE_STARTS, read/index.html).  Returns
+  // the 1-based page number, or 0 when there is no usable map or the
+  // index falls before the first page -- the reader then stays put
+  // rather than turning to a guessed page.
+  //
+  // A binary search, because an audiobook can have thousands of cues and
+  // this runs on every cue change.  `starts` is ascending by
+  // construction: a page's first line follows the previous page's, and
+  // cue indices are non-decreasing along the lines.
+  function pageOfCue(starts, index) {
+    if (!Array.isArray(starts) || starts.length === 0) return 0;
+    if (typeof index !== "number" || index < 0) return 0;
+    var lo = 0;
+    var hi = starts.length - 1;
+    var found = -1;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      if (starts[mid] <= index) {
+        found = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    return found < 0 ? 0 : found + 1;
+  }
+
   // Mark a specific element (the TTS player's sentence span).  A stale
   // element -- one detached by a page swap -- means there is nothing
   // left to mark, so the mark is dropped instead of leaking onto the
@@ -162,6 +198,8 @@
   window.LutePlayingLine = {
     setElement: setElement,
     setCueIndex: setCueIndex,
+    markedEls: markedEls,
+    pageOfCue: pageOfCue,
     clear: clear,
   };
 })();
