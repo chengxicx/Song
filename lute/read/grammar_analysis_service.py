@@ -14,6 +14,7 @@ import glob
 import hashlib
 import os
 import threading
+import types
 import unicodedata
 
 from flask import current_app
@@ -117,26 +118,70 @@ def display_lang_for(lang):
     return getattr(lang, "grammar_translate_lang", "") or "en"
 
 
+def language_snapshot(lang):
+    """
+    The fields the engine path reads, copied out of the ORM instance.
+
+    A whole-book pass runs for tens of seconds, so the worker releases its
+    database connection before starting it -- and that commit expires
+    whatever the session was holding, which makes every later attribute
+    read raise.  Copying the three fields first is what lets the analysis
+    run with no session at all: the detectors want ``name`` and
+    ``parser_type``, the descriptions want ``grammar_translate_lang``, and
+    nothing below this point needs the ORM object.
+    """
+    if lang is None:
+        return None
+    return types.SimpleNamespace(
+        name=getattr(lang, "name", None),
+        parser_type=getattr(lang, "parser_type", None),
+        grammar_translate_lang=getattr(lang, "grammar_translate_lang", None),
+    )
+
+
+def engine_output(text, lang, display=None):
+    """
+    ``(handled, results)`` from the language's own grammar engine.
+
+    ``handled`` is False when no engine claims the language, or when its
+    optional dependency is missing -- the caller then falls back to the
+    generic regex rules.  An engine that simply found nothing returns
+    ``(True, [])``, which must not be confused with either: caching "no
+    grammar in this book" as "no engine available" would replace the real
+    answer with a different one.
+    """
+    engine, extra = grammar_engine_for(lang)
+    if engine is None:
+        return False, None
+    if display is None:
+        display = display_lang_for(lang)
+    try:
+        return True, engine(text, display_lang=display)
+    except (ImportError, OSError):
+        current_app.logger.warning(
+            "%s grammar engine not installed; using the basic regex rules. "
+            'Run: pip install -e ".[%s]"',
+            extra.capitalize(),
+            extra,
+        )
+        return False, None
+
+
 def analyze_text(text, lang):
     """
-    Run the language's grammar engine over ``text``.
+    Run the language's grammar engine over ``text``, falling back to the
+    generic rule library when there is no engine for the language.
 
     Returns the engine's RAW output -- the language's hidden_grammar_levels
     filter is the caller's job.  Hiding a level is a display choice: the
     whole-book cache stores unfiltered rows so toggling it costs nothing.
     """
-    display = display_lang_for(lang)
-    engine, extra = grammar_engine_for(lang)
-    if engine is not None:
-        try:
-            return engine(text, display_lang=display)
-        except (ImportError, OSError):
-            current_app.logger.warning(
-                "%s grammar engine not installed; using the basic regex rules. "
-                'Run: pip install -e ".[%s]"',
-                extra.capitalize(),
-                extra,
-            )
+    handled, results = engine_output(text, lang, display_lang_for(lang))
+    if handled:
+        return results
+    # The regex library needs rendered paragraphs, which means the ORM
+    # object and a live session -- so this path is only used by callers
+    # that still hold one.
     render_service = RenderService(db.session)
     paragraphs = render_service.get_paragraphs(text, lang)
     sentences = [
