@@ -333,6 +333,9 @@
       // Underline this cue's line in the reading text, so the reader can
       // follow along in the page and not only in the subtitle above it.
       ytMarkPlayingLine(idx);
+      // ... then turn the page text to wherever that line is, when the
+      // playhead has left the page on screen.
+      ytFollowPlayhead(idx);
       // Single-line scrolling subtitle, reusing the reading-page word
       // spans.  If the word HTML hasn't been loaded yet (WORDS is
       // empty), fall back to the plain cue text so the user sees
@@ -419,6 +422,63 @@
           })
         );
       } catch (e) { /* no CustomEvent -- shadowing just won't follow */ }
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Following the playhead across the page text                         */
+    /*                                                                     */
+    /* An audio book's page text is one page's worth of cue lines; the      */
+    /* track runs over the whole book.  Left alone, playback walks off the  */
+    /* page after a minute or two and the underline simply stops being      */
+    /* drawn -- the reader has to turn the page by hand to keep reading     */
+    /* along.  So the cue that was just activated also moves the reader:    */
+    /* to the sub-screen holding its line (the page splits into screens),   */
+    /* and to the page holding its line (the book splits into pages).       */
+    /*                                                                     */
+    /* Both halves belong to the reading page -- LuteReaderFollow in        */
+    /* read/index.html, which owns curScreen / subScreens and the page      */
+    /* request.  It is absent on pages without a reader, hence the guards.  */
+    /* ------------------------------------------------------------------ */
+
+    // Show the sub-screen holding the line that is currently marked.
+    // Separate from ytFollowPlayhead because it must run again after a
+    // page turn: the swap lands on the new page's first screen, and the
+    // line may be on a later one.
+    function ytFollowScreen() {
+      var follow = window.LuteReaderFollow;
+      if (!follow || !follow.showLine) return;
+      if (!window.LutePlayingLine || !window.LutePlayingLine.markedEls) return;
+      var marked = window.LutePlayingLine.markedEls();
+      if (marked.length) follow.showLine(marked[0]);
+    }
+
+    function ytFollowPlayhead(idx) {
+      var follow = window.LuteReaderFollow;
+      // Only while playing.  Paging under a paused reader is not
+      // following anything, and the cue activated when the book opens
+      // (the seek to the saved position) would otherwise yank them from
+      // the page they deliberately opened.
+      if (!follow || !ytPlaying) return;
+      // Fixed pages (manga / pdf) and the scrolling views have no
+      // sub-screens and no page-per-cue text to follow.
+      if (!follow.active()) return;
+
+      ytFollowScreen();
+
+      // Which page this cue belongs to.  0 = no usable map (a text book,
+      // or a book whose page text has drifted from its cues): stay put
+      // rather than guess.
+      var page = follow.pageOfCue(idx);
+      if (!page || page === follow.currentPage()) return;
+
+      follow.requestPage(page, function () {
+        // The page was fetched for `idx`; if playback has moved on since
+        // (a slow network, a seek), the new cue will follow on its own.
+        if (ytCueIndex !== idx) return;
+        // The mark lived on the swapped-out text.
+        ytMarkPlayingLine(idx);
+        ytFollowScreen();
+      });
     }
 
     function ytDeactivateCue() {

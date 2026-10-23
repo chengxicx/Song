@@ -82,7 +82,14 @@
         }
 
         // Stop any playback before rebuilding -- the old cue indices
-        // are stale after #thetext is replaced.
+        // are stale after #thetext is replaced.  Unless this page turn
+        // was the player's own: ttsAdvance turns the page when it runs
+        // out of cues so the reading can carry on there, and leaves
+        // ttsContinueOnSwap set to be resumed on the new page's text.
+        // The reader's own page turns never set it, so they still stop
+        // playback as they always did.
+        const resume = ttsContinueOnSwap && ttsPlaying;
+        ttsContinueOnSwap = false;
         ttsCancelSpeech();
         ttsPlaying = false;
         ttsPaused = false;
@@ -92,6 +99,14 @@
         ttsBuildCues();
         // Re-apply status colours to the new subtitle word spans.
         ttsApplySubtitleStatusColors();
+        // A page with nothing to read (an empty page, a divider) ends
+        // the reading rather than leaving a silent player "playing".
+        if (resume && ttsCues.length > 0) {
+          ttsPlaying = true;
+          ttsPaused = false;
+          ttsUpdatePlayBtn();
+          ttsPlayCue(0);
+        }
       }, 150);
     });
     _textObserver.observe(textDiv, { childList: true });
