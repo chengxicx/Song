@@ -27,6 +27,7 @@ def test_wiping_db_clears_out_all_tables(app_context):
     delete_all_data(db.session)
     tables = [
         "books",
+        "bookgrammar",
         "bookstats",
         "booktags",
         "languages",

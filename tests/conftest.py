@@ -167,6 +167,19 @@ def _reset_memory_db(config):
         conn.close()
 
 
+@pytest.fixture(autouse=True)
+def _no_grammar_precompute(monkeypatch):
+    """
+    Tests never warm the whole-book grammar cache in the background.
+
+    The worker is a daemon thread: it would analyse books in the shared test
+    database while a test is asserting on its own data, and every
+    ``scope=book`` request would answer 202 "computing" instead of the
+    payload.  The precompute tests switch it back on for themselves.
+    """
+    monkeypatch.setenv("LUTE_GRAMMAR_PRECOMPUTE", "0")
+
+
 @pytest.fixture(name="app")
 def fixture_app():
     """

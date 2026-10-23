@@ -126,10 +126,17 @@ def test_the_auto_selection_is_pinned_and_scrolled_to(commands):
     assert "boundItems.push(rec)" in binding
     assert "rec.examples.push({ runs: runs, nodes: nodes })" in commands
 
-    # ...and the selection runs after every card is bound.
-    body = _after(commands, "if (targetWordEl && targetWordEl.isConnected) {", 800)
-    assert "grammarTargetSentence(targetWordEl)" in body
-    assert "grammarPickTarget(boundItems, targetSentence, targetWordEl)" in body
+    # The sentence is resolved before the header is built -- that is what
+    # puts the "This sentence" button on the first render -- and the pick
+    # itself runs after every card is bound.
+    resolved = _after(commands, "var targetSentence = null;", 500)
+    assert "narrowToTarget" in resolved
+    assert "grammarTargetSentence(targetWordEl)" in resolved
+
+    body = _after(commands, "var picked = ", 900)
+    assert "grammarPickTarget(" in body
+    assert "boundItems" in body
+    assert "targetSentence" in body
     assert 'classList.remove("grammar-item--collapsed")' in body
     assert "setPinned(picked.runs, picked.itemEl)" in body
     assert "scrollIntoView" in body
@@ -166,9 +173,17 @@ def test_the_page_control_narrows_the_panel_to_one_sentence(commands):
     # ...and the narrowing is actually applied on open, from the same
     # sentence the jump resolved.  The sentence is remembered even when it
     # carries no known grammar, so the control can still toggle back.
-    opened = _after(commands, "if (targetWordEl && targetWordEl.isConnected) {", 800)
+    opened = _after(commands, "var targetSentence = null;", 900)
+    assert "narrowToTarget" in opened
     assert "filterableSentence = targetSentence;" in opened
-    assert "if (targetSentence) filterToSentence(targetSentence);" in opened
+    # Claiming the sentence scope is what makes the "This page" control live
+    # from the first render: it used to stay "page" while the panel was
+    # already narrowed, so clicking it returned early and did nothing.
+    assert 'scope = "sentence";' in opened
+
+    # The filter itself needs the cards, so it lands after they are bound.
+    narrowed = _after(commands, "var picked = ", 600)
+    assert "filterToSentence(targetSentence)" in narrowed
 
     # No request anywhere in the switch: it is pure DOM work.
     switch = commands[
@@ -179,6 +194,51 @@ def test_the_page_control_narrows_the_panel_to_one_sentence(commands):
     assert "getJSON" not in switch
     # ...and the count badge follows the narrowing rather than the payload.
     assert 'panel.find("#grammar-count").text(' in switch
+
+
+def test_a_wider_scope_render_does_not_re_narrow_to_the_old_sentence(commands):
+    """
+    Only the render that opens the panel narrows to the clicked word's
+    sentence.  The word stays in the closure, and the book scope's examples
+    come from every other page -- they have no nodes on this screen, so
+    narrowing there filtered nearly every card away while the level headers
+    still counted the payload (the reported "This book: 1 point", N5: 10).
+    """
+    assert "function renderResults(data, narrowToTarget) {" in commands
+    # One flag, and the opening request is the only caller that passes it.
+    assert commands.count("renderResults(data, true)") == 1
+
+    # The book's own rows, and the page rows re-rendered on the way back,
+    # render without the flag.
+    book = _after(commands, "function fetchBookScope() {", 3000)
+    assert "renderResults(data);" in book
+    back = _after(commands, "if (pageResults) {", 300)
+    assert "renderResults(lastResults);" in back
+
+    # The old render-time test on the word alone is gone: the sentence is
+    # resolved only under the flag.
+    assert "if (targetWordEl && targetWordEl.isConnected) {" not in commands
+
+
+def test_the_book_scope_polls_while_the_background_analysis_runs(commands):
+    """
+    A whole-book analysis is precomputed in the background, so the request
+    answers "computing" instead of blocking for half a minute.  The panel
+    has to wait visibly and poll, and every way out of the panel has to stop
+    the poll: a timer left running re-renders a panel that is gone.
+    """
+    body = _after(commands, "function fetchBookScope() {", 3000)
+    assert 'data.state === "computing"' in body
+    assert "pollBookScope()" in body
+    assert 'data.state === "error"' in body
+
+    poll = _after(commands, "function pollBookScope() {", 500)
+    assert "setTimeout" in poll
+    assert 'scope !== "book"' in poll
+    assert "bookPollDeadline" in poll
+
+    close_body = _after(commands, "function closeGrammarAnalysis() {", 400)
+    assert "stopBookPolling()" in close_body
 
 
 def test_the_scope_control_is_wired_in_every_panel_state(commands):
