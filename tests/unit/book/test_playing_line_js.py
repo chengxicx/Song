@@ -56,11 +56,12 @@ def _run(payload):
     return json.loads(proc.stdout)["results"]
 
 
-def _run_steps(steps, paragraphs=None, cue_map=None):
+def _run_steps(steps, paragraphs=None, cue_map=None, cue_page_starts=None):
     return _run(
         {
             "paragraphs": PARAGRAPHS if paragraphs is None else paragraphs,
             "cue_map": cue_map,
+            "cue_page_starts": cue_page_starts,
             "steps": steps,
         }
     )
@@ -203,6 +204,54 @@ def test_a_repeated_line_marks_only_the_first():
         cue_map=None,
     )
     assert results[-1]["marked"] == [{"para": 0, "sentence": None, "text": "Hola."}]
+
+
+# ---------------------------------------------------------------------
+# Which page a cue lives on.
+#
+# The media players turn the page when the playhead leaves the page being
+# read, and they resolve "which page" from the first-cue index of every
+# page (window.LUTE_CUE_PAGE_STARTS).  An off-by-one here does not fail
+# loudly: the reader is simply sent one page short, or one page past.
+
+
+def _pages(steps, starts):
+    return [
+        r.get("page") for r in _run_steps(steps, cue_page_starts=starts)
+    ]
+
+
+def test_a_cue_resolves_to_the_page_holding_it():
+    # Page 1 holds cues 0-1, page 2 cues 2-4, page 3 cues 5-5.
+    starts = [0, 2, 5]
+    assert _pages(
+        [{"page_of_cue": i} for i in range(6)], starts
+    ) == [1, 1, 2, 2, 2, 3]
+
+
+def test_the_first_cue_of_a_page_resolves_to_that_page():
+    "The boundary belongs to the page it starts, not the one before it."
+    assert _pages([{"page_of_cue": 0}], [0, 3]) == [1]
+    assert _pages([{"page_of_cue": 3}], [0, 3]) == [2]
+
+
+def test_a_cue_before_the_first_page_stays_put():
+    """
+    A cue index the map doesn't cover (a book whose cues were rewritten)
+    gives 0, which the caller reads as "no page" -- it stays where it is
+    instead of turning to page 1 blind.
+    """
+    assert _pages([{"page_of_cue": 0}], [4, 9]) == [0]
+
+
+def test_a_book_without_a_map_never_turns_the_page():
+    assert _pages([{"page_of_cue": 0}, {"page_of_cue": 9}], None) == [0, 0]
+    assert _pages([{"page_of_cue": 0}], []) == [0]
+
+
+def test_a_negative_or_missing_cue_has_no_page():
+    "Playback with no cue yet (-1) must not page anywhere."
+    assert _pages([{"page_of_cue": -1}], [0, 3]) == [0]
 
 
 def test_the_tts_player_marks_the_sentence_it_passes():

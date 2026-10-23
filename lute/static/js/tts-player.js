@@ -58,6 +58,12 @@
   // check alone cannot do that, because pausing and replaying the SAME
   // cue leaves ttsCueIndex unchanged.
   let ttsPlayGen = 0;
+  // Consecutive cues that ended without a single sample being played.  A
+  // voice that reports an error before onstart is silent, so without this
+  // the reader sees the timeline walk through the page and hears nothing
+  // (see the onerror handler in ttsPlayCue).  Reset by any successful
+  // start; three in a row stops playback instead of spinning.
+  let ttsFailStreak = 0;
   let ttsPollTimer = null;
   // Voice-list load detection. On mobile browsers getVoices() can stay
   // empty for a long time (chromium populates it lazily), and
@@ -85,6 +91,12 @@
   };
   let ttsMarqueeOverflow = 0;
   let ttsIsRtl = false;
+  // Set when playback reached the end of this page's cues and turned the
+  // page to go on reading there.  The cue list is per page (built from
+  // #thetext), so the turn replaces it: tts-ui.js rebuilds it after the
+  // swap and, seeing this flag, starts the new page at its first cue
+  // instead of stopping.  Cleared by the rebuild, and by ttsStop().
+  let ttsContinueOnSwap = false;
   // HTML last injected into the subtitle. Used to skip redundant
   // rebuilds when the same cue repeats (e.g. single-sentence loop), so
   // that a hovered word and its open tooltip are left untouched.
@@ -95,6 +107,10 @@
   // jump backwards once real timing arrives.
   const CHAR_RATE_CJK = 0.18;   // ~360 chars/min for Japanese/Korean/Chinese
   const CHAR_RATE_OTHER = 0.07; // ~85 wpm for latin scripts (avg 5 chars/word)
+
+  // How long to wait for the page turned at the end of a page's cues to
+  // arrive before giving up and stopping (see ttsFollowToNextPage).
+  const TTS_PAGE_TURN_TIMEOUT_MS = 12000;
 
   function ttsFmtTime(secs) {
     if (!isFinite(secs) || secs < 0) secs = 0;
@@ -347,7 +363,7 @@
   // auto-pause, shadowing, prev/next -- on the clause, and the
   // TTS_PART_PAUSE_MS rest between a sentence's own cues is held by
   // ttsAdvance.
-  function ttsPlayCue(idx) {
+  function ttsPlayCue(idx, voiceOverride, retryCount) {
     if (idx < 0 || idx >= ttsCues.length) {
       ttsStop();
       return;
@@ -374,7 +390,9 @@
       const utterance = new SpeechSynthesisUtterance();
       utterance.text = cleanText;
 
-      let activeVoice = getSelectedVoice();
+      // voiceOverride is set only by the error retry below: the cue is
+      // being replayed on a local voice after a remote one failed.
+      let activeVoice = voiceOverride || getSelectedVoice();
       const voices = window.speechSynthesis.getVoices();
       const detectedLang = getCurrentLangCode();
       if (!activeVoice && voices.length > 0) {
@@ -422,8 +440,51 @@
         ttsVirtualTime = cue.end;
         ttsAdvance();
       };
-      utterance.onerror = function () {
+      // A voice that starts speaking proves it works; the failure streak
+      // below is only about voices that never make a sound at all.
+      utterance.onstart = function () {
+        ttsFailStreak = 0;
+      };
+      utterance.onerror = function (ev) {
         if (gen !== ttsPlayGen) return;
+        // A remote voice that fails plays nothing at all, and advancing
+        // would then walk silently through the whole page: the timeline
+        // moves and the reader hears nothing.  That is exactly what
+        // Edge's "Microsoft <name> Online (Natural)" voices do -- about
+        // two seconds after speak() they report "synthesis-failed".
+        // Remember the failure (so the rest of the page skips it), then
+        // replay this cue with the next best voice, which ends up being a
+        // local one once the natural voices are exhausted.
+        const err = ev && ev.error;
+        const failed =
+          err === "synthesis-failed" ||
+          err === "network" ||
+          err === "synthesis-unavailable" ||
+          err === "voice-unavailable" ||
+          err === "language-unavailable" ||
+          err === "audio-busy";
+        const isLocal = !!activeVoice && activeVoice.localService !== false;
+        const retries = retryCount || 0;
+        if (failed && !isLocal && retries < 3) {
+          markVoiceFailed(activeVoice && activeVoice.name);
+          ttsPlayCue(idx, undefined, retries + 1);
+          return;
+        }
+        ttsFailStreak += 1;
+        if (ttsFailStreak >= 3) {
+          // Nothing on this device can speak the book: stop instead of
+          // spinning the timeline through the whole page in silence.
+          try {
+            console.warn(
+              "TTS: no voice on this device can speak " +
+                (detectedLang || "this language") +
+                " (" + (err || "error") + "); playback stopped."
+            );
+          } catch (_) {}
+          ttsFailStreak = 0;
+          ttsStop();
+          return;
+        }
         ttsAdvance();
       };
 
@@ -505,6 +566,10 @@
     }
     const next = curIdx + 1;
     if (next >= ttsCues.length) {
+      // The page's cues are done.  The cues were built from this page's
+      // sentences, so going on means turning to the next page and
+      // starting again on its text -- see ttsFollowToNextPage.
+      if (ttsFollowToNextPage()) return;
       // End of stream.
       ttsStop();
       return;
@@ -524,9 +589,46 @@
     ttsPlayCue(next);
   }
 
+  // Turn to the next page so the reading can go on there, and leave
+  // ttsContinueOnSwap for the cue rebuild that follows the swap.
+  //
+  // Read-aloud used to stop at the bottom of every page, and the cues are
+  // per page (built from this page's .textsentence spans), so a long text
+  // was an endless page-flip exercise.  The reader's follow helper
+  // (LuteReaderFollow, read/index.html) turns the page; tts-ui.js sees the
+  // flag and starts the new page at its first cue.
+  //
+  // False when there is nothing to turn to -- no reader on the page, a
+  // page with nothing to page into (the last page clamps back onto
+  // itself and requestPage refuses a no-op turn), or a turn already in
+  // flight.  The caller then stops, exactly as it did before.
+  function ttsFollowToNextPage() {
+    const follow = window.LuteReaderFollow;
+    if (!follow || !follow.requestPage || !follow.active()) return false;
+    const from = follow.currentPage();
+    const gen = ttsPlayGen;
+    ttsContinueOnSwap = true;
+    if (!follow.requestPage(from + 1)) {
+      ttsContinueOnSwap = false;
+      return false;
+    }
+    // If the page never arrives (offline, server error) no rebuild
+    // happens and the player would sit in the playing state, silent.
+    setTimeout(function () {
+      // Bumped by the cancel that any resume / stop / pause performs.
+      if (gen !== ttsPlayGen) return;
+      if (!ttsContinueOnSwap) return;
+      ttsContinueOnSwap = false;
+      ttsStop();
+    }, TTS_PAGE_TURN_TIMEOUT_MS);
+    return true;
+  }
+
   function ttsTogglePlay() {
     if (ttsPlaying && !ttsPaused) {
-      // Pause: cancel speech but remember position.
+      // Pause: cancel speech but remember position.  A page turn waiting
+      // to resume must not undo the pause when it lands.
+      ttsContinueOnSwap = false;
       ttsPaused = true;
       ttsPlaying = false;
       ttsCancelSpeech();
@@ -557,6 +659,7 @@
 
   function ttsStop() {
     ttsCancelSpeech();
+    ttsContinueOnSwap = false;
     ttsPlaying = false;
     ttsPaused = false;
     ttsCueIndex = -1;
@@ -883,6 +986,14 @@
       return;
     }
     window.LutePlayingLine.setElement(sentences[cue.sentIdx] || null);
+    // Bring that sentence's sub-screen to the front.  A fit-to-screen
+    // page is split into several screens and the player reads all of its
+    // sentences, so the sentence being read is regularly on a screen the
+    // reader is not looking at -- the underline would move off screen and
+    // the reading would look like it had stopped.
+    if (window.LuteReaderFollow) {
+      window.LuteReaderFollow.showLine(sentences[cue.sentIdx] || null);
+    }
     // Shadowing practice area follows the playhead (lute-shadowing.js).
     // Same sentence-count guard: a stale sentIdx after a page swap must
     // not select a wrong sentence.  A clause cue also carries the

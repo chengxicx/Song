@@ -85,6 +85,11 @@
   // furigana" box checked.  script picks the word-selection rule:
   // "thai" annotates every Thai word, "han" only Han-bearing ones.
   var LUTE_FURIGANA = { enabled: {{ show_furigana | tojson }}, langId: {{ lang_id }}, script: {{ furigana_script | tojson }} };
+  // First cue index of every page (media books only; [] otherwise, and
+  // for books whose page text no longer lines up with the cues).  The
+  // players turn the page with it when the playhead leaves the page the
+  // reader is looking at -- see LuteReaderFollow below.
+  window.LUTE_CUE_PAGE_STARTS = {{ cue_page_starts | tojson }};
 </script>
 
 
@@ -827,6 +832,11 @@
   // Pending page-navigation state, consumed by the htmx:afterSwap handler.
   let _pendingNav = null;
 
+  // Player-follow page turn in flight (see LuteReaderFollow.requestPage),
+  // and the callbacks waiting for that page to be laid out.
+  let _followNavPending = false;
+  let _pageReadyWaiters = [];
+
   // Logical pages the reader has LEFT forward from their last sub-screen
   // (via the right arrow).  When the reader crosses back to such a page
   // with the left arrow, they expect to land on the sub-screen they left
@@ -891,6 +901,18 @@
         curScreen = Math.min(storedScreen, subScreens.length - 1);
         _renderScreen();
       }
+      // The page is laid out: a player that turned it to follow its
+      // playhead can now mark its line on the text it landed on.
+      _followNavPending = false;
+      const waiters = _pageReadyWaiters;
+      _pageReadyWaiters = [];
+      waiters.forEach((fn) => {
+        try {
+          fn();
+        } catch (err) {
+          /* a player's callback must not break the page swap */
+        }
+      });
     });
 
     if (initial) {
@@ -1565,10 +1587,100 @@
     }
   }
 
+  /* ---------------------------------------------------------------- */
+  /* Following the player                                              */
+  /*                                                                   */
+  /* While something is playing, the reader must see the text being     */
+  /* played.  Two things are needed, because the reader paginates on    */
+  /* two levels: a page splits into sub-screens (fit-to-screen), and    */
+  /* the book into pages.  So the players ask for                       */
+  /*                                                                   */
+  /*   showLine(el)         -- the sub-screen holding the marked line,  */
+  /*   pageOfCue(idx)       -- which page a media cue lives on,         */
+  /*   requestPage(p, cb)   -- turn the page, cb after it is laid out.  */
+  /*                                                                   */
+  /* These belong here rather than in a js/ file because they are the   */
+  /* same curScreen / subScreens bindings this script paginates with:   */
+  /* a helper next to them is one fewer place to keep in step.          */
+  /*                                                                   */
+  /* Follow is unconditional -- no toggle.  It is off where paging has  */
+  /* no meaning (manga / pdf fixed pages, the scrolling video and        */
+  /* reader-mode EPUB views), and does nothing while a page is still    */
+  /* loading (_followNavPending).                                      */
+  /* ---------------------------------------------------------------- */
+
+  window.LuteReaderFollow = {
+    // Whether following makes sense for what is on screen.  Evaluated
+    // per cue, not cached: a video book can switch to audio-only (and
+    // back) at any time, which changes the answer.
+    active: function () {
+      return !_isMangaReader() && !_scrollMode();
+    },
+
+    currentPage: function () {
+      return parseInt($("#page_num").val(), 10) || 1;
+    },
+
+    // Page holding cue `index`, 1-based, or 0 with no usable map.
+    pageOfCue: function (index) {
+      if (window.LutePlayingLine) {
+        return window.LutePlayingLine.pageOfCue
+          ? window.LutePlayingLine.pageOfCue(window.LUTE_CUE_PAGE_STARTS, index)
+          : 0;
+      }
+      return 0;
+    },
+
+    // Show the sub-screen holding `el` (a <p> of the reading text, or a
+    // span inside one).  When it is already on screen the render is
+    // skipped: _renderScreen also saves the position and may re-open the
+    // grammar pane, neither of which should happen on every cue.
+    showLine: function (el) {
+      if (!el || el.isConnected === false) return false;
+      const p = el.closest ? el.closest("p") : null;
+      if (!p || subScreens.length === 0) return false;
+      const gi = subScreens.findIndex((group) => group.includes(p));
+      if (gi < 0 || gi === curScreen) return false;
+      curScreen = gi;
+      _renderScreen();
+      return true;
+    },
+
+    // Turn to `page` (absolute).  `done` runs once the new page is in the
+    // DOM and split into sub-screens, so a caller can re-mark its line on
+    // the text it landed on -- marking before the split would mark a
+    // paragraph the split is about to hide again.
+    //
+    // Offsets go through goto_relative_page, NOT navigateNext: that one
+    // runs handle_page_done, which marks the reader's words as known
+    // when "arrow marks known" is on.  Following the player must not
+    // touch the reader's vocabulary.
+    //
+    // One turn at a time: a cue change per second would otherwise queue
+    // a page request each, and htmx would swap several pages in a row.
+    requestPage: function (page, done) {
+      if (_followNavPending) return false;
+      const wanted = parseInt(page, 10);
+      if (!wanted) return false;
+      const target = Math.max(1, Math.min(maxpage, wanted));
+      const now = this.currentPage();
+      if (target === now) return false;
+      _followNavPending = true;
+      // A failed fetch leaves _pendingNav set and no htmx:afterSwap ever
+      // arrives; without this the follow would stay locked for the whole
+      // session.  The caller's own timeout covers the playback side.
+      setTimeout(function () {
+        _followNavPending = false;
+      }, 15000);
+      if (typeof done === "function") _pageReadyWaiters.push(done);
+      goto_relative_page(target - now);
+      return true;
+    },
+  };
+
   // Move backward/forward; within a page prefer sub-screens before
   // crossing to the neighbouring Lute page.
-  function navigatePrev() {
-    if (!_isMangaReader() && subScreens.length && curScreen > 0) {
+  function navigatePrev() {    if (!_isMangaReader() && subScreens.length && curScreen > 0) {
       curScreen--;
       _renderScreen();
       return;

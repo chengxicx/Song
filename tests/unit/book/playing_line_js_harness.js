@@ -31,6 +31,8 @@
  *   {"set_sentence": [p, s]}             the TTS player's call
  *   {"set_sentence": [p, s], "detached": true}   ...on a span a page turn dropped
  *   {"clear": true}
+ *   {"page_of_cue": idx}                 which page holds that cue, given
+ *                                        "cue_page_starts" in the payload
  *
  * and the state of the mark after every step on stdout.
  */
@@ -224,6 +226,8 @@ const results = [];
 (input.steps || []).forEach((s, i) => {
   if (s.cue_map !== undefined) {
     global.window.LUTE_PAGE_CUE_MAP = s.cue_map;
+    results.push({ step: i, marked: marked() });
+    return;
   } else if (s.set_cue_index !== undefined) {
     helper.setCueIndex(s.set_cue_index[0], s.set_cue_index[1]);
   } else if (s.set_sentence !== undefined) {
@@ -233,6 +237,16 @@ const results = [];
     helper.setElement(el);
   } else if (s.clear) {
     helper.clear();
+  } else if (s.page_of_cue !== undefined) {
+    // Which page holds a cue, from the first-cue index of every page that
+    // the server ships (window.LUTE_CUE_PAGE_STARTS).  The page turn a
+    // player does when the playhead leaves the page being read is
+    // resolved here, so an off-by-one is a reader sent to the wrong page.
+    results.push({
+      step: i,
+      page: helper.pageOfCue(input.cue_page_starts, s.page_of_cue),
+    });
+    return;
   } else {
     throw new Error(`unknown step ${JSON.stringify(s)}`);
   }
