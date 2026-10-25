@@ -16,6 +16,7 @@ it to plain text, so it has two properties worth pinning down:
 import io
 import json
 import os
+import stat
 
 from bs4 import BeautifulSoup
 
@@ -93,6 +94,11 @@ def _import_reader_book(app, client, english, tmp_path):
 def _package_path(app, epub_path):
     "Absolute path of an extracted file, from its stored BkEpubPath."
     return os.path.join(app.config["EPUB_STATIC_ROOT"], epub_path)
+
+
+def _mode(path):
+    "Permission bits of an extracted file (0o644 expected for served ones)."
+    return stat.S_IMODE(os.stat(path).st_mode)
 
 
 def test_reader_mode_import_is_one_page_with_chapter_markup(
@@ -539,9 +545,18 @@ def test_ensure_orig_css_regenerates_for_old_packages(
     assert ensure_orig_css(app, book.epub_path) == rel
     regenerated = open(_package_path(app, rel), encoding="utf-8").read()
     assert "color: red" in regenerated
+    # nginx serves the package as another user, so the atomic write must
+    # not leave the file 0600 (a 403 in the browser, i.e. an unstyled
+    # chapter).
+    assert _mode(_package_path(app, rel)) == 0o644
 
     # Idempotent: the existing file is returned untouched.
     assert ensure_orig_css(app, book.epub_path) == rel
+
+    # A 0600 file written by an earlier build is repaired on render.
+    os.chmod(_package_path(app, rel), 0o600)
+    assert ensure_orig_css(app, book.epub_path) == rel
+    assert _mode(_package_path(app, rel)) == 0o644
 
     # Oldest package: no manifest either -- the scan path finds the
     # chapter documents and produces the same stylesheet.
