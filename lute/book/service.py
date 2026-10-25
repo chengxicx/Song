@@ -1230,7 +1230,11 @@ class Service:
         b = BookDataFromUrl()
         b.title = short_title
         b.source_uri = url
-        b.text = "\n\n".join(extracted_text)
+        # One line per paragraph, no blank line between them: the text
+        # parsers split paragraphs on a single newline, so a blank line
+        # would become an empty paragraph and show up as a gap in the
+        # reading page.
+        b.text = "\n".join(extracted_text)
         return b
 
     def import_book(self, book, session):  # pylint: disable=too-many-locals
