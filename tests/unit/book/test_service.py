@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from lute.db import db
 from lute.models.repositories import BookRepository
 from lute.book.model import Book
+from lute.book import service as book_service
 from lute.book.service import Service, webpage_block_text
 from tests.dbasserts import assert_sql_result
 from tests.utils import make_pdf_bytes
@@ -232,3 +233,21 @@ def test_webpage_block_text_falls_back_when_filtering_would_gut_the_page():
         "Paragraph one of a page that wraps everything in a form.",
         "Paragraph two of that same oddly-built page.",
     ]
+
+
+def test_book_data_from_url_puts_one_paragraph_per_line(monkeypatch):
+    "A blank line between paragraphs would parse into an empty paragraph."
+    html = b"<html><body><article><p>Uno.</p><p>Dos.</p></article></body></html>"
+
+    class _Response:
+        encoding = "utf-8"
+        content = html
+
+        def raise_for_status(self):
+            pass
+
+    monkeypatch.setattr(
+        book_service.requests, "get", lambda *_args, **_kwargs: _Response()
+    )
+    bd = book_service.Service().book_data_from_url("http://example.com/story")
+    assert bd.text == "Uno.\nDos.", f"got {bd.text!r}"
