@@ -50,7 +50,12 @@ function incrementFontSize(delta) {
   // on every span would leave the gaps at the container's size.  Scale
   // the whole chapter container instead, which also keeps the book's
   // relative sizes (headings, footnotes) intact.
-  const epubBody = theText ? theText.querySelector(".epub-body") : null;
+  // Fixed-layout chapters are pixel page boxes fitted to the pane by
+  // _fitMangaPage; their text must not be resized independently of the
+  // box or it overflows, so the zoom buttons are the control for them.
+  const epubBody = theText
+    ? theText.querySelector(".epub-body:not([data-epub-viewport])")
+    : null;
   if (epubBody) {
     const s = window.getComputedStyle(epubBody);
     const fontDefault = parseFloat(s.fontSize);
