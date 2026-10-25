@@ -56,7 +56,7 @@ from lute.book.service import (
     media_audio_url,
 )
 from lute.tts.routes import get_lang_code_for
-from lute.book.series import series_tag_for_book
+from lute.book.series import series_neighbours, series_tag_for_book
 from lute.book.types import subtitle_book_types
 from lute.db import db
 
@@ -781,6 +781,11 @@ def _render_book_page(book, pagenum, track_page_open=True):
         else ("video" if book_type == "video" else "audio")
     )
 
+    # The volumes on either side of this one in its book set: the reader's
+    # arrows run on into them at either end of the book (read/index.html,
+    # navigateNext / navigatePrev).
+    series = series_neighbours(db.session, book)
+
     return render_template(
         "read/index.html",
         hide_top_menu=True,
@@ -788,6 +793,8 @@ def _render_book_page(book, pagenum, track_page_open=True):
         html_title=book.title,
         book=book,
         series_tag=series_tag_for_book(db.session, book),
+        series_prev=series["prev"],
+        series_next=series["next"],
         sentence_dict_uris=lang.sentence_dict_uris,
         page_num=pagenum,
         page_count=book.page_count,
