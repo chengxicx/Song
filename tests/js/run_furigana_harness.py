@@ -15,7 +15,12 @@ Checks, against the real lute-furigana.js:
   4. a mixed word (聞こえ) keeps its reading;
   5. calling annotate again over annotated content is a no-op;
   6. a failed request releases its claim, so a later pass retries and
-     succeeds.
+     succeeds;
+  7. re-annotating the same tokens after a re-render (a term save) is
+     answered from the readings cache with no fetch, and the ruby lands
+     in a microtask of the calling task -- before any paint, so it does
+     not blink off;
+  8. a changed token set is a cache miss and fetches again.
 """
 
 import pathlib
@@ -164,6 +169,71 @@ def main():
             "a later pass retries and annotates",
             st["ruby_count"] == 1 and st["base"] == "夜" and st["reading"] == "よる",
             " state=%r" % (st,),
+        )
+
+        # --- 8. term-save re-render: cache hit, ruby lands in-task ---
+        # A term save re-renders the same page and re-annotates the same
+        # tokens (a status change does not re-tokenize).  The readings
+        # must come from the cache -- no fetch -- and land synchronously
+        # with the swap: a resolved promise's then runs in a microtask,
+        # before the browser can paint, so the ruby never blinks off.
+        # The re-rendered paragraph replicates the initial load's
+        # paragraph-1 payload exactly (same tokens, same order), which
+        # is what makes this a cache hit.
+        result = page.evaluate(
+            """() => {
+              const t = document.getElementById('thetext');
+              t.innerHTML =
+                '<p><span class="textsentence" id="sent_1">' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="音">音</span>' +
+                '<span class="textitem">が</span>' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="カサカサ">カサカサ</span>' +
+                '<span class="textitem">ました</span>' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="聞こえ">聞こえ</span>' +
+                '</span></p>';
+              window.__fetch_calls = 0;
+              window.lute_furigana_annotate();
+              return Promise.resolve().then(() => {
+                const sp = Array.from(t.querySelectorAll('span.word'))
+                  .find(s => s.getAttribute('data-text') === '音');
+                const ruby = sp && sp.querySelector('ruby');
+                const rt = ruby && ruby.querySelector('rt');
+                return {
+                  fetch_calls: window.__fetch_calls,
+                  ruby_in_microtask: !!(rt && rt.textContent === 'おと'
+                                        && ruby.firstChild.textContent === '音'),
+                  marked: !!(sp && sp.hasAttribute('data-furigana')),
+                };
+              });
+            }"""
+        )
+        check(
+            "a term-save re-render annotates from the cache without a fetch",
+            result["fetch_calls"] == 0 and result["ruby_in_microtask"]
+            and result["marked"],
+            " result=%r" % (result,),
+        )
+
+        # --- 9. a changed token set is a cache miss and does fetch ---
+        # Merging a multi-word term changes the tokens; the cache must
+        # not serve the old paragraph's payload for the new split.
+        result = page.evaluate(
+            """() => {
+              const t = document.getElementById('thetext');
+              t.innerHTML =
+                '<p><span class="textsentence" id="sent_1">' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="音">音</span>' +
+                '</span></p>';
+              window.__fetch_calls = 0;
+              window.lute_furigana_annotate();
+              return Promise.resolve().then(() => window.__fetch_calls);
+            }"""
+        )
+        page.wait_for_timeout(300)
+        check(
+            "a changed token set is a cache miss (fetches again)",
+            result == 1,
+            " fetch_calls=%r" % (result,),
         )
         browser.close()
 
