@@ -1754,9 +1754,12 @@ function post_bulk_update(updates) {
     anchor_ordinal: anchor_ordinal,
     anchor_id: anchor_id,
   };
+  // settle:0 keeps the fragment's script evaluation in the same task as
+  // the swap: htmx's default 20ms settle delay painted the raw
+  // (span-less) page for a frame before the word spans came back.
   htmx.ajax('POST', '/term/bulk_update_status', {
     target: '#thetext',
-    swap: 'innerHTML',
+    swap: 'innerHTML settle:0',
     values: payload,
   });
 }
