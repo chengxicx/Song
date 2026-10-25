@@ -1355,6 +1355,20 @@ div#thetext.epub-text-container span.textitem {
     font-size: inherit;
 }
 
+/* ...and neither may a theme.  Default / Default-Light pin an absolute
+   size on the reading page's paragraphs (`div#thetext p { font-size:
+   18px }`) because the text page's own paragraphs are zeroed and need a
+   baseline.  A chapter's paragraphs are the book's own, and the A+/A-
+   controls resize them by scaling `.epub-body`: a pinned size breaks
+   that inheritance, so the book's headings, indents and margins grow
+   with the control while the prose stands still (the container does
+   change, which reads as "the layout moved but the text did not").
+   id + class out-specifies the theme rule, so the themes stay as they
+   are: font family, colour, line height and margins still apply. */
+div#thetext.epub-text-container .epub-body p {
+    font-size: inherit;
+}
+
 /* ---- Reader-mode EPUB looks -----------------------------------------
    "original" and "night" render the chapter on a paper surface with
    the book's own palette (the keep-colours stylesheet,
