@@ -898,9 +898,24 @@ span.hamburger {
   gap: 0.2rem;
 }
 
-/* Only meaningful for manga books; hide it in text-book hamburgers. */
+/* Only meaningful for manga books; hide it in text-book hamburgers.
+   Reader-mode EPUB chapters zoom too (text and images together), so it
+   stays for them. */
 #reading_menu.not-manga .manga-zoom-btn-container {
-  display: none;
+    display: none;
+}
+
+/* Reader-mode EPUB look switcher: spans both grid columns, centered.
+   Only meaningful for epub books. */
+#reading_menu .epub-look-btn-container {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    gap: 0.2rem;
+}
+
+#reading_menu.not-epub .epub-look-btn-container {
+    display: none;
 }
 
 .reading_header_left {
@@ -1338,6 +1353,86 @@ div#thetext .epub-body span.textsentence {
 div#thetext.epub-text-container span.textsentence,
 div#thetext.epub-text-container span.textitem {
     font-size: inherit;
+}
+
+/* ---- Reader-mode EPUB looks -----------------------------------------
+   "original" and "night" render the chapter on a paper surface with
+   the book's own palette (the keep-colours stylesheet,
+   data-epub-orig-css).  The paper is painted on #epub-chapter -- NOT
+   id-anchored onto .epub-body -- so the book's own scoped
+   `.epub-body { background: ... }` rules still win over the default
+   white.  "theme" (no class) is the legacy look: theme background,
+   import-time colour dropping, 46rem column. */
+div#thetext.epub-text-container.epub-look-original #epub-chapter,
+div#thetext.epub-text-container.epub-look-night #epub-chapter {
+    background-color: #fff;
+    max-width: 60rem;
+    margin: 1rem auto;
+    padding: 2.4rem 2.8rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    border-radius: 2px;
+    box-sizing: border-box;
+}
+
+/* Inside the paper the chapter fills the sheet, not the 46rem reading
+   column: the book's own CSS decides the measure. */
+div#thetext.epub-text-container.epub-look-original .epub-body,
+div#thetext.epub-text-container.epub-look-night .epub-body {
+    max-width: none;
+    margin: 0;
+}
+
+/* Night: the whole chapter is inverted onto dark paper (the classic
+   e-reader night mode).  Images and videos are inverted back so photos
+   and art keep their colours.  The injected status-highlight spans are
+   NOT restored: their translucent tints read fine inverted, and
+   restoring their inherited text would put book-dark text on dark
+   paper. */
+div#thetext.epub-text-container.epub-look-night #epub-chapter {
+    background-color: #16161d;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+div#thetext.epub-text-container.epub-look-night .epub-body {
+    filter: invert(0.88) hue-rotate(180deg);
+    background-color: #fff;
+}
+
+div#thetext.epub-text-container.epub-look-night .epub-body img,
+div#thetext.epub-text-container.epub-look-night .epub-body svg,
+div#thetext.epub-text-container.epub-look-night .epub-body video {
+    filter: invert(0.88) hue-rotate(180deg);
+}
+
+/* ---- Fixed-layout EPUB chapters --------------------------------------
+   A picture-book chapter (.epub-body[data-epub-viewport]) is a
+   pixel-sized page box: the pane scrolls it like a PDF page (fit to
+   width x zoom is applied as inline width/height by _fitMangaPage).
+   The paper paints on a shrink-wrapped #epub-chapter so the page box
+   -- not the whole pane width -- reads as the sheet, and the book's
+   own page background (scoped .epub-body rules) covers it. */
+div#thetext.epub-fixed-container {
+    padding: 10px 0;
+    overflow: auto;
+    clip-path: none;
+    scrollbar-width: none;          /* Firefox */
+    -ms-overflow-style: none;       /* old Edge/IE */
+}
+
+div#thetext.epub-fixed-container::-webkit-scrollbar {
+    display: none;                  /* Chrome/Safari/Edge */
+}
+
+div#thetext.epub-fixed-container #epub-chapter {
+    width: fit-content;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    border-radius: 2px;
+}
+
+div#thetext.epub-fixed-container.epub-look-night #epub-chapter {
+    background-color: #16161d;
 }
 
 /* Text-book pages render one <p> per paragraph directly inside
@@ -2354,6 +2449,25 @@ div.code pre {
 
 .manga-zoom-in {
     background-image: url("/static/icn/manga-zoom-in.svg");
+}
+
+.epub-look-original {
+    background-image: url("/static/icn/epub-look-original.svg");
+}
+
+.epub-look-night {
+    background-image: url("/static/icn/epub-look-night.svg");
+}
+
+.epub-look-theme {
+    background-image: url("/static/icn/epub-look-theme.svg");
+}
+
+/* The active look button (and any future segmented control built the
+   same way): the border swap is enough on the white button fill. */
+.text-options-button.active {
+    border-color: #48505a;
+    background-color: #d5e9fa;
 }
 
 .manga-zoom-out {

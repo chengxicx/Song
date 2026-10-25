@@ -18,7 +18,7 @@ from lute.dict import service as dict_service
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.read import manga_columns
-from lute.book.epub_extract import css_path_for
+from lute.book.epub_extract import css_path_for, orig_css_path_for, ensure_orig_css
 from lute.book import epub_paths
 from lute.term.model import Repository
 from lute.term import pos_tags
@@ -1077,8 +1077,9 @@ class Service:
     def epub_page_context(self, dbbook, pagenum, track_page_open=False):
         """
         Build the render context for one reader-mode EPUB chapter: the
-        chapter's sanitised HTML, its scoped stylesheet, and the token
-        stream the front end aligns to the chapter's text nodes.
+        chapter's sanitised HTML, its scoped stylesheets (theme-following
+        and keep-colours), and the token stream the front end aligns to
+        the chapter's text nodes.
 
         Returns None if the book has no extracted chapter at that page.
         """
@@ -1113,10 +1114,19 @@ class Service:
         lang = dbbook.language
         subs = [list(pair) for pair in lang.parser.text_substitutions(lang)]
 
+        # The original-look variant of the scoped stylesheet: produced at
+        # import for new packages, regenerated from the extracted
+        # originals on demand for old ones.  None (theme URL reused)
+        # when the package is gone or the rebuild is impossible.
+        orig_rel = ensure_orig_css(current_app, epub_path)
+
         return {
             "page_num": pagenum,
             "chapter_html": chapter_html,
             "css_url": url_for("static", filename=css_path_for(epub_path)),
+            "orig_css_url": url_for("static", filename=orig_rel)
+            if orig_rel
+            else url_for("static", filename=css_path_for(epub_path)),
             "tokens": tokens,
             "substitutions": subs,
         }

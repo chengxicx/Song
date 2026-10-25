@@ -102,7 +102,7 @@ def build_tokens():
     return tokens
 
 
-def build_html():
+def build_html(theme_css_uri, orig_css_uri):
     """The generated harness page."""
     css = scope_css(BOOK_CSS, "", "/static/epub/x")
     tokens = build_tokens()
@@ -124,7 +124,9 @@ def build_html():
 <div style="height: 150px">a header, so the chapter does not start at the viewport top</div>
 <div id="read_pane_left">
   <div id="thetext" class="epub-text-container">
-    <div id="epub-chapter">{CHAPTER}</div>
+    <div id="epub-chapter"
+         data-epub-css="{theme_css_uri}"
+         data-epub-orig-css="{orig_css_uri}">{CHAPTER}</div>
     <script type="application/json" id="lute-epub-tokens">{json.dumps(tokens)}</script>
   </div>
   <div id="outside"><p>outside paragraph</p></div>
@@ -141,6 +143,9 @@ def build_html():
 <button class="manga-zoom-in"></button>
 <button class="manga-zoom-out"></button>
 <button class="manga-zoom-fit"></button>
+<button class="epub-look-original"></button>
+<button class="epub-look-night"></button>
+<button class="epub-look-theme"></button>
 
 <script>
 // Minimal stand-ins for the globals resize.js provides to
@@ -161,6 +166,9 @@ function getReadPaneWidthRatio() {{ return 0.35; }}
 function setMangaZoom() {{}}
 function resetMangaZoom() {{}}
 window._splitToScreens = function () {{ window.__splitCalls = (window.__splitCalls || 0) + 1; }};
+// The look tests start from the theme look so the pre-existing colour
+// checks keep describing the theme-following variant.
+localStorage.setItem("epubLookMode", "theme");
 </script>
 <script src="{(STATIC / 'js' / 'lute-epub-reader.js').as_uri()}"></script>
 <script>
@@ -188,8 +196,21 @@ def check(label, cond, detail=""):
 
 def main():
     tmpdir = pathlib.Path(tempfile.mkdtemp(prefix="epub-layout-"))
+    # Both scoped variants as real files, like the import writes them:
+    # lute.css follows the theme (unpainted colours dropped), the
+    # original-look variant keeps every colour.  The look tests switch
+    # between the two by swapping the <link>'s href, exactly like
+    # lute-epub-reader.js does on the reading page.
+    theme_css = tmpdir / "lute.css"
+    theme_css.write_text(scope_css(BOOK_CSS, "", "/static/epub/x"), encoding="utf-8")
+    orig_css = tmpdir / "lute-orig.css"
+    orig_css.write_text(
+        scope_css(BOOK_CSS, "", "/static/epub/x", keep_colors=True), encoding="utf-8"
+    )
     harness = tmpdir / "harness.html"
-    harness.write_text(build_html(), encoding="utf-8")
+    harness.write_text(
+        build_html(theme_css.as_uri(), orig_css.as_uri()), encoding="utf-8"
+    )
 
     with sync_playwright() as p:
         browser = p.chromium.launch(channel="msedge", headless=True)
@@ -409,6 +430,113 @@ def main():
             "words are in reading order in the DOM",
             hits["contiguous"],
             " %d words" % hits["count"],
+        )
+
+        # 10. look modes.  The reading menu switches between the
+        # theme-following stylesheet (colours dropped) and the
+        # keep-colours one on a paper surface; night additionally
+        # inverts the chapter and un-inverts its images.
+        def look_state():
+            return page.evaluate(
+                """() => {
+                  const thetext = document.getElementById('thetext');
+                  const link = document.getElementById('lute-epub-stylesheet');
+                  const chapter = document.getElementById('epub-chapter');
+                  const body = chapter.querySelector('.epub-body');
+                  const h2 = body.querySelector('h2');
+                  const img = body.querySelector('img');
+                  const cs = (el) => window.getComputedStyle(el);
+                  return {
+                    original: thetext.classList.contains('epub-look-original'),
+                    night: thetext.classList.contains('epub-look-night'),
+                    href: link ? link.getAttribute('href') : null,
+                    h2Color: cs(h2).color,
+                    paperBg: cs(chapter).backgroundColor,
+                    bodyFilter: cs(body).filter,
+                    imgFilter: cs(img).filter,
+                    stored: localStorage.getItem('epubLookMode'),
+                  };
+                }"""
+            )
+
+        page.evaluate("() => window.EpubReader.setLook('original')")
+        s = look_state()
+        check(
+            "original look: paper surface + keep-colours stylesheet",
+            s["original"] and not s["night"]
+            and (s["href"] or "").endswith("lute-orig.css")
+            and s["paperBg"] == "rgb(255, 255, 255)"
+            and s["h2Color"] == "rgb(0, 0, 0)",
+            " href=%s bg=%s h2=%s" % (s["href"], s["paperBg"], s["h2Color"]),
+        )
+
+        page.evaluate("() => window.EpubReader.setLook('night')")
+        s = look_state()
+        check(
+            "night look: dark paper, chapter inverted, images restored",
+            s["night"] and not s["original"]
+            and s["paperBg"] == "rgb(22, 22, 29)"
+            and "invert" in s["bodyFilter"]
+            and s["imgFilter"] != "none"
+            and "invert" in s["imgFilter"],
+            " bg=%s body=%s img=%s" % (s["paperBg"], s["bodyFilter"], s["imgFilter"]),
+        )
+
+        page.evaluate("() => window.EpubReader.setLook('theme')")
+        s = look_state()
+        check(
+            "theme look: no classes, dropped colours, theme stylesheet",
+            not s["original"] and not s["night"]
+            and (s["href"] or "").endswith("lute.css")
+            and s["h2Color"] == "rgb(230, 230, 230)"
+            and s["bodyFilter"] == "none"
+            and s["stored"] == "theme",
+            " href=%s h2=%s" % (s["href"], s["h2Color"]),
+        )
+
+        # 11. zoom.  The reading page applies the stored zoom with the
+        # CSS `zoom` property on the chapter container (index.html
+        # _applyEpubZoom, not loadable here).  Semantics this pins
+        # down: type scales exactly, and zoom-out shrinks images
+        # proportionally -- while zoom-in keeps images clamped to the
+        # reading column (max-width: 100% resolves against the local,
+        # zoom-divided width), which is the reflowable-book behaviour:
+        # the column widens to the pane, the images fill the column.
+        # A fixed-layout page box has no such clamp and scales whole.
+        zoom_effect = page.evaluate(
+            """() => {
+              const chapter = document.getElementById('epub-chapter');
+              const body = chapter.querySelector('.epub-body');
+              const img = body.querySelector('img');
+              const word = body.querySelector('p span.word');
+              const rect = (el) => el.getBoundingClientRect().width;
+              const before = { img: rect(img), word: rect(word) };
+              chapter.style.zoom = "0.8";
+              const shrunk = { img: rect(img), word: rect(word) };
+              chapter.style.zoom = "1.5";
+              const grown = { img: rect(img), word: rect(word),
+                              column: body.getBoundingClientRect().width };
+              chapter.style.zoom = "";
+              return {
+                imgOut: shrunk.img / before.img,
+                wordOut: shrunk.word / before.word,
+                wordIn: grown.word / before.word,
+                imgInWithinColumn: grown.img <= grown.column + 1,
+              };
+            }"""
+        )
+        check(
+            "zoom out scales text and images together",
+            abs(zoom_effect["imgOut"] - 0.8) < 0.05
+            and abs(zoom_effect["wordOut"] - 0.8) < 0.05,
+            " img x%.2f word x%.2f" % (zoom_effect["imgOut"], zoom_effect["wordOut"]),
+        )
+        check(
+            "zoom in scales the type, images stay fitted to the column",
+            abs(zoom_effect["wordIn"] - 1.5) < 0.05
+            and zoom_effect["imgInWithinColumn"],
+            " word x%.2f imgInColumn=%s"
+            % (zoom_effect["wordIn"], zoom_effect["imgInWithinColumn"]),
         )
 
         browser.close()

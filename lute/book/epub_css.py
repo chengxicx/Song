@@ -58,7 +58,7 @@ _LEAD_RE = re.compile(r"^(?::root|html|body)((?:\.[\w-]+|#[\w-]+|\[[^\]]*\])*)",
 _COMBINATOR_RE = re.compile(r"^\s*([>+~]?)\s*")
 
 
-def scope_css(css_text, base_dir, href_prefix, scope=".epub-body"):
+def scope_css(css_text, base_dir, href_prefix, scope=".epub-body", keep_colors=False):
     """
     Scope one stylesheet to `scope`.
 
@@ -66,14 +66,22 @@ def scope_css(css_text, base_dir, href_prefix, scope=".epub-body"):
     "OEBPS/styles"), href_prefix the static URL its file was extracted
     to (e.g. "/static/epub/<uuid>/OEBPS/styles"), so relative url()s can
     be resolved.  Returns CSS text.
+
+    keep_colors=True emits every colour declaration untouched: that is
+    the "original look" variant, rendered on the paper surface where the
+    book's own palette is readable.  The default (False) drops `color`
+    declarations on unpainted blocks (see _drop_unreadable_colors) for
+    the theme-following variant.
     """
     css = _COMMENT_RE.sub("", css_text or "")
     out = []
-    _emit_rules(css, 0, len(css), out, base_dir, href_prefix, scope)
+    _emit_rules(
+        css, 0, len(css), out, base_dir, href_prefix, scope, keep_colors
+    )
     return "\n".join(r for r in out if r.strip())
 
 
-def _emit_rules(css, start, end, out, base_dir, href_prefix, scope):
+def _emit_rules(css, start, end, out, base_dir, href_prefix, scope, keep_colors=False):
     "Walk a run of CSS (top level or a nested at-rule body)."
     i = start
     while i < end:
@@ -102,7 +110,9 @@ def _emit_rules(css, start, end, out, base_dir, href_prefix, scope):
             pass
         elif lowered.startswith(_NESTED_AT_RULES):
             inner = []
-            _emit_rules(body, 0, len(body), inner, base_dir, href_prefix, scope)
+            _emit_rules(
+                body, 0, len(body), inner, base_dir, href_prefix, scope, keep_colors
+            )
             if inner:
                 out.append(prelude + " {\n" + "\n".join(inner) + "\n}")
         elif lowered.startswith(_KEPT_AT_RULES):
@@ -111,7 +121,9 @@ def _emit_rules(css, start, end, out, base_dir, href_prefix, scope):
         else:
             selectors = _scope_selectors(prelude, scope)
             decls = (
-                _drop_unreadable_colors(
+                _rewrite_declarations(body, base_dir, href_prefix)
+                if keep_colors
+                else _drop_unreadable_colors(
                     _rewrite_declarations(body, base_dir, href_prefix)
                 )
                 if selectors
