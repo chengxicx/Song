@@ -45,6 +45,42 @@ class BookImportException(Exception):
 # downloaded locally (they are small and needed for word lookups).
 MEDIA_LOCAL_MAX_BYTES = 20 * 1024 * 1024  # 20 MB
 
+# Block-level tags that make up an imported article's text.
+_WEBPAGE_TEXT_TAGS = ("h1", "h2", "h3", "h4", "p")
+
+# Tags that hold the article's body.  A <header> inside one of these is
+# the article's own masthead (headline, standfirst) and is kept; a
+# <header> outside is the site's menu bar.
+_WEBPAGE_CONTENT_TAGS = ("article", "main")
+
+# Page furniture: never article text, wherever it sits.
+_WEBPAGE_CHROME_TAGS = ("nav", "aside", "dialog", "form", "menu", "noscript")
+
+# ARIA roles that mark page furniture.
+_WEBPAGE_CHROME_ROLES = (
+    "navigation",
+    "complementary",
+    "contentinfo",
+    "search",
+    "dialog",
+    "banner",
+    "menu",
+    "menubar",
+)
+
+# A block this long or shorter that is almost entirely link text is a
+# menu item, related-story card, or "download our app" button rather
+# than a sentence; longer fully-linked blocks are left alone because
+# some sites wrap whole paragraphs in an anchor.
+_WEBPAGE_LINK_BLOCK_MAX = 200
+_WEBPAGE_LINK_BLOCK_RATIO = 0.8
+
+# Text of an HTML element keeps the source's line breaks and indentation
+# ("<p>\n    Lorem\n  </p>"), which would add blank lines and leading
+# spaces to every imported paragraph, so runs of whitespace collapse to
+# a single space.
+_WS_RUN_RE = re.compile(r"\s+")
+
 
 @dataclass
 class BookDataFromUrl:
@@ -52,6 +88,100 @@ class BookDataFromUrl:
     title: str = None
     source_uri: str = None
     text: str = None
+
+
+def _block_text(element):
+    "Whitespace-normalized text of one block element."
+    return _WS_RUN_RE.sub(" ", element.text).strip()
+
+
+def _is_page_furniture(element):
+    """
+    True if the block sits in the page's furniture -- menus, sidebars,
+    site header/footer, forms, dialogs, hidden nodes -- and so isn't
+    article text.
+    """
+    ancestors = list(element.parents)
+    in_content = any(
+        p.name in _WEBPAGE_CONTENT_TAGS
+        or (p.get("role") or "").lower() == "main"
+        or p.get("itemprop") == "articleBody"
+        for p in ancestors
+    )
+    for parent in ancestors:
+        if parent.name in _WEBPAGE_CHROME_TAGS:
+            return True
+        # Footers are author bios, share buttons and tag lists even when
+        # they're inside the article; headers are only furniture when
+        # they belong to the page rather than to the article.
+        if parent.name == "footer":
+            return True
+        if parent.name == "header" and not in_content:
+            return True
+        if (parent.get("role") or "").lower() in _WEBPAGE_CHROME_ROLES:
+            return True
+        if (parent.get("aria-hidden") or "").lower() == "true":
+            return True
+        if parent.has_attr("hidden"):
+            return True
+    return False
+
+
+def _is_link_block(element, text):
+    "True for short blocks that are nothing but link text (nav/related/ad)."
+    if len(text) > _WEBPAGE_LINK_BLOCK_MAX:
+        return False
+    link_chars = sum(len(_block_text(a)) for a in element.find_all("a"))
+    # Related-story and product cards are often <a><div><h3>..</h3></div>
+    # </a>, i.e. the anchor wraps the block instead of sitting inside it.
+    for parent in element.parents:
+        if parent.name == "a":
+            link_chars = max(link_chars, len(_block_text(parent)))
+            break
+        if parent.name in ("p", "article", "main", "body"):
+            break
+    return link_chars >= _WEBPAGE_LINK_BLOCK_RATIO * len(text)
+
+
+def webpage_block_text(soup):
+    """
+    Article text of a parsed page, one entry per block, in document order.
+
+    Each block's text is whitespace-normalized (so a formatted source
+    page doesn't leave blank lines or indentation inside a paragraph),
+    blocks that are empty after that are dropped, a matched tag nested
+    inside another matched tag -- malformed markup such as a <h3> inside
+    a <p> -- is skipped because the outer block already holds its text,
+    and page furniture (menus, site header/footer, sidebars, related
+    story cards) is skipped so the imported book isn't padded with
+    navigation text.
+
+    If filtering leaves almost nothing -- a page that wraps everything
+    in a <form> or an unusual layout -- the unfiltered blocks are
+    returned, so an odd page loses no text.
+    """
+    blocks = []
+    for element in soup.find_all(_WEBPAGE_TEXT_TAGS):
+        if element.find_parent(_WEBPAGE_TEXT_TAGS):
+            continue
+        text = _block_text(element)
+        if text != "":
+            blocks.append((element, text))
+
+    kept = [
+        text
+        for element, text in blocks
+        if not _is_page_furniture(element) and not _is_link_block(element, text)
+    ]
+
+    # Guard: filtering must not gut the page.  If most of the text was
+    # dropped the markup is unusual (e.g. everything inside a <form>),
+    # so trust nothing and return the raw blocks.
+    total = sum(len(t) for _e, t in blocks)
+    if total > 0 and sum(len(t) for t in kept) < 0.5 * total:
+        return [t for _e, t in blocks]
+
+    return kept
 
 
 def youtube_video_id(url):
@@ -1086,12 +1216,9 @@ class Service:
             # Page is neither the declared charset nor UTF-8; let bs4
             # do its full (imperfect) detection as before.
             soup = BeautifulSoup(s, "html.parser")
-        extracted_text = []
-
-        # Add elements in order found.
-        for element in soup.descendants:
-            if element.name in ("h1", "h2", "h3", "h4", "p"):
-                extracted_text.append(element.text)
+        # Blocks in document order, whitespace-normalized so the
+        # imported text reads as one line per paragraph.
+        extracted_text = webpage_block_text(soup)
 
         title_node = soup.find("title")
         orig_title = (title_node.string if title_node else url) or url
