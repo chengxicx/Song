@@ -48,6 +48,13 @@
   // The <link> this module owns in <head> for the current book.
   const STYLESHEET_ID = "lute-epub-stylesheet";
 
+  // Look modes.  "original" (default) and "night" render the chapter
+  // on a paper surface with the book's own palette (the keep-colours
+  // stylesheet); "theme" is the legacy look that follows Lute's theme
+  // (colours on unpainted blocks dropped at import).
+  const LOOK_KEY = "epubLookMode";
+  const LOOKS = ["original", "night", "theme"];
+
   // Block containers whose inline content is split into
   // .textsentence spans (see wrapSentences).
   const BLOCK_TAGS = new Set([
@@ -61,20 +68,50 @@
     return WHITESPACE.test(ch);
   }
 
+  function currentLook() {
+    try {
+      const v = localStorage.getItem(LOOK_KEY);
+      return LOOKS.indexOf(v) >= 0 ? v : "original";
+    } catch (err) {
+      return "original";
+    }
+  }
+
+  /**
+   * Sync #thetext's look classes with the stored look mode.
+   *
+   * The classes are styled id-anchored in styles.css; the "theme" look
+   * has no class at all, so it is exactly the pre-paper rendering.
+   */
+  function applyLookClasses() {
+    const thetext = document.getElementById("thetext");
+    if (!thetext || !thetext.classList.contains("epub-text-container")) return;
+    const look = currentLook();
+    thetext.classList.toggle("epub-look-original", look === "original");
+    thetext.classList.toggle("epub-look-night", look === "night");
+  }
+
   /**
    * Put the book's scoped stylesheet in the document.
    *
    * The chapter arrives as an innerHTML swap into #thetext, and a
    * <link> carried at the top of that fragment does not survive it --
    * the chapter rendered with none of the book's own styling, which is
-   * the one thing reader mode exists to keep.  The URL rides on the
-   * container as data-epub-css instead, and the <link> is created here.
+   * the one thing reader mode exists to keep.  The URLs ride on the
+   * container as data attributes instead, and the <link> is created
+   * here.  Paper / night looks use the keep-colours variant
+   * (data-epub-orig-css; same URL as the theme one when the package
+   * could not provide one).
    *
    * One element is reused for every chapter: a book's chapters share a
    * stylesheet, and switching books just points it at the new one.
    */
   function ensureStylesheet(root) {
-    const href = root.dataset.epubCss;
+    const look = currentLook();
+    let href = root.dataset.epubCss;
+    if (look !== "theme" && root.dataset.epubOrigCss) {
+      href = root.dataset.epubOrigCss;
+    }
     if (!href) return;
     let link = document.getElementById(STYLESHEET_ID);
     if (link && link.getAttribute("href") === href) return;
@@ -87,12 +124,62 @@
     link.setAttribute("href", href);
   }
 
+  /**
+   * Switch the look mode and re-render: #thetext's classes, the active
+   * stylesheet, and the menu buttons' state all follow.  Called by the
+   * reading menu buttons.
+   */
+  function setLook(mode, root) {
+    const look = LOOKS.indexOf(mode) >= 0 ? mode : "original";
+    try {
+      localStorage.setItem(LOOK_KEY, look);
+    } catch (err) {
+      /* storage unavailable; the look still applies for this page */
+    }
+    const chapter = root || document.getElementById("epub-chapter");
+    applyLookClasses();
+    if (chapter) ensureStylesheet(chapter);
+    syncLookButtons();
+  }
+
+  /** Mark the active look button in the reading menu. */
+  function syncLookButtons() {
+    const look = currentLook();
+    LOOKS.forEach((name) => {
+      const btn = document.querySelector(`.epub-look-${name}`);
+      if (btn) btn.classList.toggle("active", name === look);
+    });
+  }
+
+  /**
+   * Tell the reading page whether this chapter is fixed-layout.
+   *
+   * A fixed-layout chapter (.epub-body[data-epub-viewport], e.g. a
+   * picture book) is rendered as a fixed-size page box fitted to the
+   * pane, like a PDF page; the flag class on #thetext switches the
+   * reading page's layout machinery (_isMangaReader, _fitMangaPage,
+   * scroll mode) over to that path.
+   */
+  function applyFixedFlag(root) {
+    const thetext = document.getElementById("thetext");
+    if (!thetext) return;
+    const fixed = !!root.querySelector(".epub-body[data-epub-viewport]");
+    thetext.classList.toggle("epub-fixed-container", fixed);
+  }
+
   function mount(root) {
     if (!root || root.dataset.epubMounted) return;
     const dataNode = document.getElementById("lute-epub-tokens");
     if (!dataNode) return;
 
+    applyLookClasses();
+    applyFixedFlag(root);
     ensureStylesheet(root);
+    // The reading page owns the zoom / page fit (localStorage keys,
+    // pane measurement); it is available on every reading page load.
+    if (typeof window._applyEpubZoom === "function") {
+      window._applyEpubZoom();
+    }
 
     let tokens;
     try {
@@ -437,5 +524,5 @@
     });
   }
 
-  window.EpubReader = { mount };
+  window.EpubReader = { mount, setLook, currentLook, syncLookButtons };
 })();

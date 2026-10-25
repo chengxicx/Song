@@ -13,8 +13,16 @@ on a real install, i.e. beside the databases rather than inside the
 code tree, so a data backup carries it:
 
     ch/<index>.html   one chapter, sanitised, URLs rewritten, wrapped in
-                      the `.epub-body` scope element
-    lute.css          every stylesheet of the book, scoped to `.epub-body`
+                      the `.epub-body` scope element (plus
+                      data-epub-viewport on fixed-layout chapters)
+    lute.css          every stylesheet of the book, scoped to `.epub-body`,
+                      text colours on unpainted blocks dropped (dark-theme
+                      safety) -- the theme-following variant
+    lute-orig.css     the same styles with every colour kept, for the
+                      paper-surface "original look" / night modes
+    chapters.json     each chapter's archive path + fixed-layout viewport,
+                      so lute-orig.css can be regenerated from the
+                      extracted originals later (ensure_orig_css)
     <assets...>       images / fonts / everything else, at their
                       original archive paths so relative references from
                       the chapter markup still resolve
@@ -25,10 +33,12 @@ sequence -- that is what lets the front end align tokens to text nodes
 by plain stream matching.
 """
 
+import json
 import os
 import posixpath
 import re
 import shutil
+import tempfile
 import uuid
 import zipfile
 from io import BytesIO
@@ -38,6 +48,7 @@ from bs4 import BeautifulSoup
 
 from lute.book.epub_css import scope_css
 from lute.book.epub_parser import _extract_text, _prep_soup  # internal reuse
+from lute.book import epub_paths
 from lute.book.service import BookImportException
 
 # Never written to disk: the container description and the mimetype
@@ -80,23 +91,34 @@ _INLINE_URL_RE = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.S | re.I)
 class EpubExtract:
     "The extracted package: where it lives and what each chapter became."
 
-    def __init__(self, root, chapters, css_path):
+    def __init__(self, root, chapters, css_path, orig_css_path=None):
         # All paths are relative to EPUB_STATIC_ROOT (the data
         # directory's static root), which is what BkEpubPath stores.
         self.root = root
         self.css_path = css_path
+        # The keep-colours variant of css_path, for the "original look"
+        # render modes (None when it could not be produced).
+        self.orig_css_path = orig_css_path
         # chapter index -> {"html": rel path, "text": sanitised text}
         self.chapters = chapters
 
 
-def css_path_for(chapter_html_path):
+def css_path_for(chapter_html_path, filename="lute.css"):
     """
     The scoped stylesheet that belongs to an extracted chapter
     ("epub/<uuid>/ch/003.html" -> "epub/<uuid>/lute.css").
     """
     return posixpath.join(
-        posixpath.dirname(posixpath.dirname(chapter_html_path)), "lute.css"
+        posixpath.dirname(posixpath.dirname(chapter_html_path)), filename
     )
+
+
+def orig_css_path_for(chapter_html_path):
+    """
+    The keep-colours variant of css_path_for
+    ("epub/<uuid>/ch/003.html" -> "epub/<uuid>/lute-orig.css").
+    """
+    return css_path_for(chapter_html_path, "lute-orig.css")
 
 
 def extract_epub_package(data, chapters, static_root):
@@ -110,6 +132,13 @@ def extract_epub_package(data, chapters, static_root):
     the archive path of their content document).  Returns an
     EpubExtract.  Raises BookImportException when the archive cannot be
     opened.
+
+    Two stylesheets are produced: lute.css (theme-following, text
+    colours on unpainted blocks dropped) and lute-orig.css (every
+    colour kept, for the paper-surface "original look" modes).
+    chapters.json records each chapter's archive path and fixed-layout
+    viewport so the original-look variant can be regenerated later
+    without the .epub file (see ensure_orig_css).
     """
     try:
         zf = zipfile.ZipFile(BytesIO(data))
@@ -124,21 +153,43 @@ def extract_epub_package(data, chapters, static_root):
         os.makedirs(os.path.join(root_abs, "ch"), exist_ok=True)
         try:
             name_map = _extract_members(zf, root_abs)
-            css_text, css_name = _collect_css(zf, name_map, chapters, root_rel)
+
+            def read_member_text(path):
+                return _decode(_read_member(zf, name_map, path))
+
+            chapter_paths = [c.path for c in chapters]
+            css_text = _collect_css(read_member_text, chapter_paths, root_rel, False)
+            orig_text = _collect_css(read_member_text, chapter_paths, root_rel, True)
+
             extracted = {}
+            manifest = []
             for chapter in chapters:
-                html_rel, text = _write_chapter(
+                html_rel, text, viewport = _write_chapter(
                     zf, name_map, chapter, root_abs, root_rel
                 )
                 extracted[chapter.index] = {"html": html_rel, "text": text}
-            css_rel = f"{root_rel}/{css_name}"
-            with open(os.path.join(root_abs, css_name), "w", encoding="utf-8") as f:
-                f.write(css_text)
+                manifest.append(
+                    {"index": chapter.index, "path": chapter.path, "viewport": viewport}
+                )
+            css_rel = f"{root_rel}/lute.css"
+            _write_text(root_abs, "lute.css", css_text)
+            orig_rel = None
+            if orig_text.strip():
+                orig_rel = f"{root_rel}/lute-orig.css"
+                _write_text(root_abs, "lute-orig.css", orig_text)
+            _write_text(
+                root_abs, "chapters.json", json.dumps(manifest, indent=2)
+            )
         except Exception:
             shutil.rmtree(root_abs, ignore_errors=True)
             raise
 
-    return EpubExtract(root_rel, extracted, css_rel)
+    return EpubExtract(root_rel, extracted, css_rel, orig_rel)
+
+
+def _write_text(root_abs, name, text):
+    with open(os.path.join(root_abs, name), "w", encoding="utf-8") as f:
+        f.write(text)
 
 
 def _safe_path(name):
@@ -213,21 +264,23 @@ def _decode(raw):
     return raw.decode("utf-8", errors="replace")
 
 
-def _collect_css(zf, name_map, chapters, root_rel):
+def _collect_css(read_text, chapter_paths, root_rel, keep_colors):
     """
     Gather every stylesheet the chapters reference, in document order,
-    and scope the lot into one file.
+    and scope the lot into one text block.
 
-    Returns (css_text, css_filename).  Linked stylesheets win over
-    inline <style> in the order they appear in each document.
+    `read_text(archive_rel_path)` returns the file's text or None --
+    from the zip at import time, from the extracted package on disk for
+    the lazy regeneration path.  Linked stylesheets win over inline
+    <style> in the order they appear in each document.
     """
     parts = []
     seen = set()
-    for chapter in chapters:
-        raw = _read_member(zf, name_map, chapter.path)
+    for chapter_path in chapter_paths:
+        raw = read_text(chapter_path)
         if raw is None:
             continue
-        soup = BeautifulSoup(_decode(raw), "html.parser")
+        soup = BeautifulSoup(raw, "html.parser")
         for node in soup.find_all(["link", "style"]):
             if node.name == "style":
                 text = node.get_text("") or ""
@@ -235,8 +288,9 @@ def _collect_css(zf, name_map, chapters, root_rel):
                     parts.append(
                         scope_css(
                             text,
-                            posixpath.dirname(chapter.path),
+                            posixpath.dirname(chapter_path),
                             f"/static/{root_rel}",
+                            keep_colors=keep_colors,
                         )
                     )
                 continue
@@ -247,28 +301,29 @@ def _collect_css(zf, name_map, chapters, root_rel):
             if href.startswith(("http:", "https:", "//", "data:")):
                 continue
             css_path = posixpath.normpath(
-                posixpath.join(posixpath.dirname(chapter.path), unquote(href))
+                posixpath.join(posixpath.dirname(chapter_path), unquote(href))
             )
             if css_path in seen:
                 continue
             seen.add(css_path)
-            css_raw = _read_member(zf, name_map, css_path)
+            css_raw = read_text(css_path)
             if css_raw is None:
                 continue
             parts.append(
                 scope_css(
-                    _decode(css_raw),
+                    css_raw,
                     posixpath.dirname(css_path),
                     f"/static/{root_rel}",
+                    keep_colors=keep_colors,
                 )
             )
-    return "\n\n".join(p for p in parts if p.strip()), "lute.css"
+    return "\n\n".join(p for p in parts if p.strip())
 
 
 def _write_chapter(zf, name_map, chapter, root_abs, root_rel):
     """
     Sanitise one chapter, write it to ch/<index>.html, and return
-    (relative path, sanitised text).
+    (relative path, sanitised text, fixed-layout viewport or None).
     """
     raw = _read_member(zf, name_map, chapter.path)
     if raw is None:
@@ -276,6 +331,9 @@ def _write_chapter(zf, name_map, chapter, root_abs, root_rel):
             f"Chapter {chapter.index + 1} is missing from the EPUB file."
         )
     soup = BeautifulSoup(_decode(raw), "html.parser")
+    # The viewport has to be read before _prep_soup drops <head>, where
+    # the meta lives.
+    viewport = _fixed_viewport(soup)
     # Drops script/style/head/template/svg/iframe/noscript and the ruby
     # annotations (rt/rp): readings are not part of the text the parser
     # tokenises, and leaving them in the DOM would desync the token
@@ -289,13 +347,46 @@ def _write_chapter(zf, name_map, chapter, root_abs, root_rel):
 
     text = _extract_text(soup)
     body_classes = _body_classes(soup)
-    wrapper = f'<div class="epub-body{(" " + body_classes) if body_classes else ""}">'
+    classes = "epub-body" + ((" " + body_classes) if body_classes else "")
+    if viewport:
+        classes += " epub-fixed"
+    wrapper = (
+        f'<div class="{classes}"'
+        + (f' data-epub-viewport="{viewport}"' if viewport else "")
+        + ">"
+    )
     html = wrapper + body.decode_contents() + "</div>"
 
     rel = f"ch/{chapter.index:03d}.html"
     with open(os.path.join(root_abs, *rel.split("/")), "w", encoding="utf-8") as f:
         f.write(html)
-    return f"{root_rel}/{rel}", text
+    return f"{root_rel}/{rel}", text, viewport
+
+
+# A viewport meta with both dimensions as plain pixel numbers marks a
+# fixed-layout page (EPUB FXL); `device-width` / percentages are the
+# reflowable spellings and never match.
+_VIEWPORT_RE = re.compile(
+    r"width\s*=\s*(\d+)\s*,\s*height\s*=\s*(\d+)\s*(?:,|$)"
+    r"|height\s*=\s*(\d+)\s*,\s*width\s*=\s*(\d+)\s*(?:,|$)",
+    re.I,
+)
+
+
+def _fixed_viewport(soup):
+    '"WxH" for a fixed-layout chapter document, else None.'
+    for meta in soup.find_all("meta"):
+        if (meta.get("name") or "").strip().lower() != "viewport":
+            continue
+        content = meta.get("content") or ""
+        m = _VIEWPORT_RE.search(content)
+        if not m:
+            continue
+        w = m.group(1) or m.group(4)
+        h = m.group(2) or m.group(3)
+        if int(w) > 0 and int(h) > 0:
+            return f"{w}x{h}"
+    return None
 
 
 def _body_classes(soup):
@@ -388,8 +479,110 @@ def _rewrite_srcset(value, base_dir, root_rel):
 
 
 def _rewrite_inline_url(match, base_dir, root_rel):
-    "url(...) inside a style attribute."
+    'url(...) inside a style attribute.'
     raw = (match.group(2) or "").strip()
     if not raw:
         return match.group(0)
     return f'url("{_rewrite_url(raw, base_dir, root_rel)}")'
+
+
+# ---------------------------------------------------------------------------
+# Lazy regeneration of lute-orig.css for packages extracted before the
+# original-look modes existed: the whole archive (original stylesheets
+# included) is on disk, so the variant can be rebuilt from it without
+# the .epub file.
+# ---------------------------------------------------------------------------
+
+_CONTENT_EXTS = (".xhtml", ".html", ".htm")
+
+
+def ensure_orig_css(app, stored_epub_path):
+    """
+    Return the static-relative path of the package's keep-colours
+    stylesheet ("epub/<uuid>/lute-orig.css"), creating it from the
+    extracted originals when the package only has lute.css.
+
+    Returns None when the package cannot be found; a failed rebuild
+    (unreadable manifest, no content files) still writes an empty
+    lute-orig.css so the attempt is not repeated on every page render.
+    """
+    chapter_file = epub_paths.located(app, stored_epub_path)
+    if chapter_file is None:
+        return None
+    root_abs = os.path.dirname(os.path.dirname(chapter_file))
+    orig_abs = os.path.join(root_abs, "lute-orig.css")
+    if os.path.isfile(orig_abs):
+        return posixpath.join("epub", os.path.basename(root_abs), "lute-orig.css")
+
+    root_rel = f"epub/{os.path.basename(root_abs)}"
+    chapter_paths = _manifest_chapter_paths(root_abs)
+    if chapter_paths is None:
+        chapter_paths = _scanned_chapter_paths(root_abs)
+
+    orig_text = ""
+    if chapter_paths:
+        orig_text = _collect_css(
+            lambda p: _read_extracted(root_abs, p), chapter_paths, root_rel, True
+        )
+
+    # Atomic: a concurrent page render may be doing the same rebuild.
+    fd, tmp = tempfile.mkstemp(dir=root_abs, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(orig_text)
+        os.replace(tmp, orig_abs)
+    except Exception:
+        os.unlink(tmp)
+        raise
+    return posixpath.join("epub", os.path.basename(root_abs), "lute-orig.css")
+
+
+def _read_extracted(root_abs, path):
+    "Text of one file of the extracted package, by archive-relative path."
+    rel = _safe_path(path)
+    if rel is None:
+        return None
+    target = os.path.join(root_abs, *rel.split("/"))
+    if not os.path.isfile(target):
+        return None
+    try:
+        with open(target, "rb") as f:
+            return _decode(f.read())
+    except OSError:
+        return None
+
+
+def _manifest_chapter_paths(root_abs):
+    "Source paths recorded by chapters.json, or None when there is none."
+    manifest = os.path.join(root_abs, "chapters.json")
+    if not os.path.isfile(manifest):
+        return None
+    try:
+        with open(manifest, encoding="utf-8") as f:
+            entries = json.load(f)
+        return [
+            e["path"] for e in entries if isinstance(e, dict) and e.get("path")
+        ]
+    except (ValueError, KeyError, TypeError, OSError):
+        return None
+
+
+def _scanned_chapter_paths(root_abs):
+    """
+    Every original content document of the package, for the oldest
+    packages that predate chapters.json.  The sanitised copies under
+    ch/ have rewritten URLs and must not be used as collection roots.
+    """
+    out = []
+    for dirpath, dirnames, filenames in os.walk(root_abs):
+        if os.path.basename(dirpath) == "ch":
+            dirnames[:] = []
+            continue
+        for name in filenames:
+            if name.lower().endswith(_CONTENT_EXTS):
+                out.append(
+                    os.path.relpath(os.path.join(dirpath, name), root_abs).replace(
+                        os.sep, "/"
+                    )
+                )
+    return sorted(out)

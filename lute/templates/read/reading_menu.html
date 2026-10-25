@@ -93,6 +93,15 @@
     <button class="text-options-button manga-zoom-in" title="{{ t('Zoom in page') }}"></button>
     <button class="text-options-button manga-zoom-fit" title="{{ t('Fit page to screen') }}"></button>
   </div>
+  {# Reader-mode EPUB look: paper surface with the book's own palette
+     (default), inverted night paper, or Lute's theme.  Only meaningful
+     for epub books; hidden via #reading_menu.not-epub (styles.css).
+     State is kept in localStorage by lute-epub-reader.js. #}
+  <div class="text-options-btn-container epub-look-btn-container">
+    <button class="text-options-button epub-look-original" title="{{ t('Original book look') }}"></button>
+    <button class="text-options-button epub-look-night" title="{{ t('Night mode') }}"></button>
+    <button class="text-options-button epub-look-theme" title="{{ t('Follow theme') }}"></button>
+  </div>
 </div>
 
 <ul>
@@ -269,5 +278,18 @@
     if (LUTE_USER_SETTINGS["use_ankiconnect"] == false) {
       $("#sendTermsToAnki").css('display', 'none');
     }
+    // Look-mode buttons (reader-mode EPUB only): the mode, its classes
+    // on #thetext and the active stylesheet are all managed by
+    // lute-epub-reader.js; the buttons only carry the click and their
+    // own active state.  syncLookButtons is called again on every
+    // setLook so the highlight follows.
+    ["original", "night", "theme"].forEach(function (mode) {
+      const btn = document.querySelector(".epub-look-" + mode);
+      if (!btn) return;
+      btn.addEventListener("click", function () {
+        if (window.EpubReader) window.EpubReader.setLook(mode);
+      });
+    });
+    if (window.EpubReader) window.EpubReader.syncLookButtons();
   });
 </script>

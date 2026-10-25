@@ -20,7 +20,7 @@ import os
 from bs4 import BeautifulSoup
 
 from lute.book.epub_css import scope_css
-from lute.book.epub_extract import css_path_for
+from lute.book.epub_extract import css_path_for, orig_css_path_for
 from lute.db import db
 from lute.models.book import Book as DBBook
 from tests.utils import make_epub
@@ -385,3 +385,174 @@ def test_scope_css_leaves_other_colour_properties_alone():
     "border-color and friends are not the text colour."
     css = scope_css("p { border-color: red; }", "OEBPS", "/static/epub/x")
     assert "border-color: red" in css
+
+
+def test_scope_css_keep_colors_variant_preserves_every_colour():
+    """
+    The original-look stylesheet keeps the book's palette whole: the
+    paper surface renders it as designed, so the invisible-text guard
+    (dropping unpainted `color`s for dark themes) must not run.
+    """
+    css = scope_css(
+        "p { color: #000; text-indent: 1em; }",
+        "OEBPS",
+        "/static/epub/x",
+        keep_colors=True,
+    )
+    assert "color: #000" in css
+    assert "text-indent: 1em" in css
+    # A block that is nothing but the colour survives too.
+    assert (
+        scope_css("p { color: #000; }", "OEBPS", "/static/epub/x", keep_colors=True)
+        .strip()
+        == ".epub-body p { color: #000; }"
+    )
+
+
+def test_reader_mode_import_writes_orig_stylesheet_and_manifest(
+    app, app_context, english, client, tmp_path
+):
+    """
+    The package carries two scoped stylesheets -- lute.css follows the
+    theme (unpainted colours dropped), lute-orig.css keeps them for the
+    paper / night looks -- plus chapters.json recording each chapter's
+    archive path, so the variant can be rebuilt later without the .epub.
+    """
+    book = _import_reader_book(app, client, english, tmp_path)
+
+    theme_css = open(
+        _package_path(app, css_path_for(book.epub_path)), encoding="utf-8"
+    ).read()
+    orig_css = open(
+        _package_path(app, orig_css_path_for(book.epub_path)), encoding="utf-8"
+    ).read()
+    # The chapter's inline style is `p { color: red; }` with no
+    # background: dropped for the theme, kept for the paper looks.
+    assert "color: red" not in theme_css
+    assert "color: red" in orig_css
+
+    manifest = json.load(
+        open(
+            _package_path(app, "epub/" + book.epub_path.split("/")[1] + "/chapters.json"),
+            encoding="utf-8",
+        )
+    )
+    assert manifest == [{"index": 0, "path": "OEBPS/ch1.xhtml", "viewport": None}]
+
+    # The reading fragment ships both URLs on the container.
+    fragment = client.get(f"/read/start_reading/{book.id}/1").get_data(as_text=True)
+    soup = BeautifulSoup(fragment, "html.parser")
+    container = soup.find(id="epub-chapter")
+    assert container.get("data-epub-css", "").endswith("/lute.css")
+    orig_href = container.get("data-epub-orig-css", "")
+    assert orig_href.endswith("/lute-orig.css")
+    assert client.get(orig_href).status_code == 200
+
+
+FIXED_CHAPTER = """<html><head>
+<meta name="viewport" content="width=768, height=1024"/>
+</head><body>
+<p style="position:absolute; left:10px; top:20px">Fixed page text.</p>
+</body></html>"""
+
+REFLOW_WITH_VIEWPORT_META = """<html><head>
+<meta name="viewport" content="width=device-width, height=device-height"/>
+</head><body><p>Reflows like a normal chapter.</p></body></html>"""
+
+
+def test_fixed_layout_chapter_gets_a_viewport_page_box(
+    app, app_context, english, client, tmp_path
+):
+    """
+    A fixed-layout chapter (pixel viewport meta, e.g. a picture book)
+    carries its page size on the wrapper so the reading screen can
+    render it as a fixed page box; device-width spellings stay reflow.
+    """
+    app.config["EPUB_STATIC_ROOT"] = str(tmp_path / "static")
+    epub = make_epub(
+        {
+            "OEBPS/fixed.xhtml": FIXED_CHAPTER,
+            "OEBPS/reflow.xhtml": REFLOW_WITH_VIEWPORT_META,
+        },
+        [("fixed", "fixed.xhtml"), ("reflow", "reflow.xhtml")],
+        title="Picture Book",
+        nav_href="nav.xhtml",
+        nav_entries=[("fixed.xhtml", "One"), ("reflow.xhtml", "Two")],
+    )
+    resp = _post(
+        client,
+        epub,
+        language_id=str(english.id),
+        epub_title="Picture Book",
+        epub_reader_mode="1",
+    )
+    assert resp.get_json()["success"] is True, resp.get_json()
+    books = (
+        db.session.query(DBBook)
+        .filter(DBBook.title.like("Picture Book%"))
+        .order_by(DBBook.title)
+        .all()
+    )
+    assert len(books) == 2
+
+    fixed = next(b for b in books if " 01 " in b.title)
+    reflow = next(b for b in books if " 02 " in b.title)
+
+    fixed_html = open(_package_path(app, fixed.epub_path), encoding="utf-8").read()
+    assert 'data-epub-viewport="768x1024"' in fixed_html
+    assert 'class="epub-body epub-fixed"' in fixed_html
+
+    reflow_html = open(_package_path(app, reflow.epub_path), encoding="utf-8").read()
+    assert "data-epub-viewport" not in reflow_html
+    assert "epub-fixed" not in reflow_html
+
+    manifest = json.load(
+        open(
+            _package_path(
+                app, "epub/" + fixed.epub_path.split("/")[1] + "/chapters.json"
+            ),
+            encoding="utf-8",
+        )
+    )
+    assert manifest == [
+        {"index": 0, "path": "OEBPS/fixed.xhtml", "viewport": "768x1024"},
+        {"index": 1, "path": "OEBPS/reflow.xhtml", "viewport": None},
+    ]
+
+
+def test_ensure_orig_css_regenerates_for_old_packages(
+    app, app_context, english, client, tmp_path
+):
+    """
+    Packages extracted before lute-orig.css existed get it rebuilt from
+    the extracted originals (the whole archive is on disk): with
+    chapters.json for exact collection, without it by scanning the
+    content documents.  A missing package reports None.
+    """
+    from lute.book.epub_extract import ensure_orig_css
+
+    book = _import_reader_book(app, client, english, tmp_path)
+    rel = orig_css_path_for(book.epub_path)
+
+    # Old package: no variant stylesheet, but the manifest is there.
+    os.remove(_package_path(app, rel))
+    assert ensure_orig_css(app, book.epub_path) == rel
+    regenerated = open(_package_path(app, rel), encoding="utf-8").read()
+    assert "color: red" in regenerated
+
+    # Idempotent: the existing file is returned untouched.
+    assert ensure_orig_css(app, book.epub_path) == rel
+
+    # Oldest package: no manifest either -- the scan path finds the
+    # chapter documents and produces the same stylesheet.
+    os.remove(_package_path(app, rel))
+    os.remove(
+        _package_path(
+            app, "epub/" + book.epub_path.split("/")[1] + "/chapters.json"
+        )
+    )
+    assert ensure_orig_css(app, book.epub_path) == rel
+    assert "color: red" in open(_package_path(app, rel), encoding="utf-8").read()
+
+    # A book pointing at nothing gets None, not a crash.
+    assert ensure_orig_css(app, "epub/deadbeef/ch/000.html") is None

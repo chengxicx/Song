@@ -99,7 +99,7 @@
 
 <div id="read_pane_left">
 
-  <div id="reading_menu"{% if book_type not in ('manga', 'pdf') %} class="not-manga"{% endif %}>
+  <div id="reading_menu" class="{% if book_type not in ('manga', 'pdf', 'epub') %}not-manga {% endif %}{{ 'not-epub' if book_type != 'epub' else '' }}">
     {% include "read/reading_menu.html" %}
   </div>
 
@@ -1109,20 +1109,25 @@
 
   // True for the manga and PDF readers: both show one fixed page with
   // %-positioned word overlays (no sub-screen splitting; the fit and
-  // zoom controls apply).
+  // zoom controls apply).  A fixed-layout EPUB chapter
+  // (.epub-fixed-container, set by lute-epub-reader.js on mount) is a
+  // pixel-sized page box and rides the same machinery.
   const _isMangaReader = () => {
     const t = document.getElementById("thetext");
     return !!t && (t.classList.contains("manga-text-container")
-                || t.classList.contains("pdf-text-container"));
+                || t.classList.contains("pdf-text-container")
+                || t.classList.contains("epub-fixed-container"));
   };
 
   // Reader-mode EPUB chapters are one continuously scrolling page per
   // chapter (one Lute page per chapter), so there is nothing to
   // sub-paginate: the whole page scrolls, like a media book in
-  // scrolling mode.
+  // scrolling mode.  Fixed-layout chapters use the fixed-page path
+  // instead (see _isMangaReader).
   function _epubScrollMode() {
     const t = document.getElementById("thetext");
-    return !!t && t.classList.contains("epub-text-container");
+    return !!t && t.classList.contains("epub-text-container")
+              && !t.classList.contains("epub-fixed-container");
   }
 
   // Video / YouTube / Bilibili books read in a plain scrolling pane by
@@ -1216,8 +1221,13 @@
     const wrap = theText;
     if (!wrap) return;
     const isPdf = wrap.classList.contains("pdf-text-container");
-    if (!isPdf && !wrap.classList.contains("manga-text-container")) return;
-    const page = wrap.querySelector(isPdf ? ".pdf-page" : ".manga-page");
+    const isEpubFixed = wrap.classList.contains("epub-fixed-container");
+    if (!isPdf && !isEpubFixed && !wrap.classList.contains("manga-text-container")) return;
+    const page = wrap.querySelector(
+      isPdf ? ".pdf-page"
+      : isEpubFixed ? ".epub-body[data-epub-viewport]"
+      : ".manga-page"
+    );
     if (!page) return;
     let natW, natH;
     let media = null;
@@ -1225,6 +1235,12 @@
       // PDF pages know their natural size from the document itself.
       natW = parseFloat(page.dataset.pageWidth);
       natH = parseFloat(page.dataset.pageHeight);
+    } else if (isEpubFixed) {
+      // Fixed-layout EPUB pages know theirs from the chapter's viewport
+      // meta ("WxH", recorded at import by lute/book/epub_extract.py).
+      const vp = (page.dataset.epubViewport || "").split("x");
+      natW = parseFloat(vp[0]);
+      natH = parseFloat(vp[1]);
     } else {
       media = wrap.querySelector(".manga-page-img");
       if (!media) return;
@@ -1259,16 +1275,23 @@
     const availW = wrap.clientWidth;
     const availH = wrap.clientHeight - padBottom;
     // Fit the page to the pane, then multiply by the user's zoom factor
-    // (1 = just fits); zoom > 1 enlarges the page (it then scrolls in the
-    // auto-overflow container), zoom < 1 shrinks it.  A PDF page only
-    // fits the width and scrolls vertically, like a normal PDF reader.
-    const fit = isPdf
+    // (1 = just fits); zoom > 1 enlarges the page (it then scrolls in
+    // the auto-overflow container), zoom < 1 shrinks it.  A PDF page and
+    // a fixed-layout EPUB page only fit the width and scroll
+    // vertically, like a normal PDF reader.
+    const fitWidthOnly = isPdf || isEpubFixed;
+    const fit = fitWidthOnly
       ? Math.min(1, availW / natW) || 1
       : Math.min(1, availW / natW, availH / natH) || 1;
     const zoom = _getMangaZoom();
     const scale = fit * zoom;
     const w = Math.max(10, Math.floor(natW * scale));
     const h = Math.max(10, Math.floor(natH * scale));
+    if (isEpubFixed) {
+      // The scoped-CSS default clamps .epub-body to a reading column;
+      // a fixed page is exactly its viewport size, nothing narrower.
+      page.style.maxWidth = "none";
+    }
     page.style.width = `${w}px`;
     page.style.height = `${h}px`;
     page.style.margin = "0 auto";
@@ -1280,27 +1303,75 @@
 
   const MANGA_ZOOM_STORAGE = "mangaZoom";
   const PDF_ZOOM_STORAGE = "pdfZoom";
+  const EPUB_ZOOM_STORAGE = "epubZoom";
   const MANGA_ZOOM_MIN = 0.5;
   const MANGA_ZOOM_MAX = 2.5;
+  const EPUB_ZOOM_MIN = 0.5;
+  const EPUB_ZOOM_MAX = 2.5;
+
+  // True on any reader-mode EPUB chapter (reflowing or fixed-layout).
+  function _isEpubReader() {
+    const t = document.getElementById("thetext");
+    return !!t && t.classList.contains("epub-text-container");
+  }
 
   // Manga and PDF keep independent zoom levels.
   function _zoomStorageKey() {
     const t = theText;
-    return t && t.classList.contains("pdf-text-container")
-      ? PDF_ZOOM_STORAGE
-      : MANGA_ZOOM_STORAGE;
+    if (t && t.classList.contains("pdf-text-container")) return PDF_ZOOM_STORAGE;
+    if (t && t.classList.contains("epub-text-container")) return EPUB_ZOOM_STORAGE;
+    return MANGA_ZOOM_STORAGE;
   }
 
   function _getMangaZoom() {
     const raw = parseFloat(localStorage.getItem(_zoomStorageKey()));
     if (!Number.isFinite(raw) || raw <= 0) return 1;
-    return clamp(raw, MANGA_ZOOM_MIN, MANGA_ZOOM_MAX);
+    const isEpub = theText && theText.classList.contains("epub-text-container");
+    return clamp(raw, isEpub ? EPUB_ZOOM_MIN : MANGA_ZOOM_MIN,
+                       isEpub ? EPUB_ZOOM_MAX : MANGA_ZOOM_MAX);
+  }
+
+  /**
+   * Apply the stored zoom to the current reader-mode EPUB chapter.
+   *
+   * A reflowing chapter zooms with the CSS `zoom` property on the
+   * chapter container: text *and* images scale together, and the
+   * browser re-flows the layout at the new size (unlike a transform,
+   * which would clip).  A fixed-layout chapter is a pixel-sized page
+   * box: its zoom is applied by the page fit (fit x zoom, see
+   * _fitMangaPage), so the container itself must not also be zoomed.
+   */
+  function _applyEpubZoom() {
+    if (!_isEpubReader()) return;
+    const chapter = document.getElementById("epub-chapter");
+    if (!chapter) return;
+    if (chapter.querySelector(".epub-body[data-epub-viewport]")) {
+      chapter.style.zoom = "";
+      _fitMangaPage();
+    } else {
+      chapter.style.zoom = String(_getEpubZoom());
+    }
+  }
+
+  function _getEpubZoom() {
+    const raw = parseFloat(localStorage.getItem(EPUB_ZOOM_STORAGE));
+    if (!Number.isFinite(raw) || raw <= 0) return 1;
+    return clamp(raw, EPUB_ZOOM_MIN, EPUB_ZOOM_MAX);
   }
 
   // Global handler wired up by text-options.js buttons (only meaningful on
-  // manga / PDF pages, where a fixed-page container is present).  delta is
-  // +1 for zoom-in, -1 for zoom-out; each step scales by ~1.2x.
+  // manga / PDF / reader-mode EPUB pages).  delta is +1 for zoom-in, -1
+  // for zoom-out; each step scales by ~1.2x.
   function setMangaZoom(delta) {
+    if (_isEpubReader()) {
+      localStorage.setItem(
+        EPUB_ZOOM_STORAGE,
+        String(Math.round(clamp(_getEpubZoom() * Math.pow(1.2, delta),
+                                EPUB_ZOOM_MIN, EPUB_ZOOM_MAX) * 100) / 100)
+      );
+      _applyEpubZoom();
+      return;
+    }
     if (!_isMangaReader()) return;
     const zoom = clamp(_getMangaZoom() * Math.pow(1.2, delta),
                        MANGA_ZOOM_MIN, MANGA_ZOOM_MAX);
@@ -1311,6 +1382,11 @@
   // Global handler for the "Fit page to screen" button: reset zoom to 1
   // (i.e. the pane-fit default) and re-fit.
   function resetMangaZoom() {
+    if (_isEpubReader()) {
+      localStorage.setItem(EPUB_ZOOM_STORAGE, "1");
+      _applyEpubZoom();
+      return;
+    }
     if (!_isMangaReader()) return;
     localStorage.setItem(_zoomStorageKey(), "1");
     _fitMangaPage();
@@ -1391,16 +1467,24 @@
     if (_isMangaReader()) {
       subScreens = [];
       curScreen = 0;
-      // Manga / pdf pages are single fixed pages, so there is nothing to
-      // split -- but the end-of-book button still belongs on the last
-      // page, where the next arrow stops navigating.  The last-screen
-      // class reserves the bottom strip it sits in, so it is toggled
-      // before the fit, which measures the pane's padding.
+      // Manga / pdf / fixed-EPUB pages are single fixed pages, so there
+      // is nothing to split -- but the end-of-book button still belongs
+      // on the last page, where the next arrow stops navigating.  The
+      // last-screen class reserves the bottom strip it sits in, so it
+      // is toggled before the fit, which measures the pane's padding.
       const _pn = parseInt($("#page_num").val());
       const _mp = parseInt($("#page_count").val());
       const _lastPage = _pn >= _mp;
       wrap.classList.toggle("last-screen", _lastPage);
       if (endBtn) endBtn.classList.toggle("hide", !_lastPage);
+      // A reader-mode EPUB book can mix fixed and reflowing chapters
+      // (rare, but legal): drop the scroll-mode classes a reflowing
+      // chapter added before its fixed page renders pane-scrolled.
+      wrap.classList.remove("video-scroll-mode");
+      ["read_pane_container", "read_pane_left"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("video-scroll-mode");
+      });
       // This is the single choke point every content change goes through
       // (page turn, term save, bulk status update, ResizeObserver
       // re-flow, ...).  The fixed page's pixel size is set inline by the
