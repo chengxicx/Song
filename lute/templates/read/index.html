@@ -532,8 +532,12 @@
 
       // HTMX: swap the refreshed fragment into #thetext.  Re-marking of
       // the previously-marked word happens in the htmx:afterSwap handler.
+      // settle:0 makes htmx evaluate the fragment's scripts in the same
+      // task as the swap instead of after its default 20ms settle delay:
+      // that delay painted the raw (span-less) chapter for a frame on
+      // every term save -- the reading area visibly flickered.
       _pendingTermFormReload = { marked_id, anchorOrdinal, term_text: savedTermText };
-      htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
+      htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML settle:0' });
     };
   };
 
@@ -820,13 +824,16 @@
     // page's first one (see _finishPageSwap).  Two ways to get here with the
     // same page: the end-of-book checkmark asks for "this page, +0", and a
     // move past either end of the book clamps back onto it.
+    // settle:0: same task as the swap -- a page turn must not paint the
+    // raw (span-less) chapter for a frame before the fragment's scripts
+    // re-inject the word spans (see the term-save swap above).
     _pendingNav = {
       actualPage: actualPage,
       initial: initial_page_load,
       keepScreen: actualPage === pagenumNow,
       ...(extra || {}),
     };
-    htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
+    htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML settle:0' });
   }
 
   // Pending page-navigation state, consumed by the htmx:afterSwap handler.
