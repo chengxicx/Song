@@ -63,6 +63,17 @@
     sp.appendChild(ruby);
   }
 
+  // Readings of already-annotated token batches, keyed by the exact
+  // request payload.  A term save re-renders the same page and calls
+  // annotate() over the same tokens; answering from the cache lets the
+  // ruby land in the same task as the swap (a resolved promise's then
+  // runs in a microtask, before the next paint) instead of the readings
+  // blinking off for the re-fetch round-trip.  In-memory only: a reload
+  // re-fetches, so a parser or settings change can never serve stale
+  // readings across sessions.
+  const reading_cache = new Map();
+  const READING_CACHE_MAX = 128;
+
   function annotate_paragraph(spans) {
     // Capture the display text up front: once a span is wrapped, its
     // textContent includes the reading, and dataset.text (the parser's
@@ -71,16 +82,29 @@
     const captured = spans.map((sp) => sp.textContent);
     const tokens = spans.map((sp) => sp.dataset.text || sp.textContent.trim());
     const full_text = tokens.join("");
-    return fetch("/read/shadowing/readings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        language_id: CONFIG.langId,
-        tokens: tokens,
-        full_text: full_text,
-      }),
-    })
-      .then((r) => (r.ok ? r.json() : null))
+    const key = `${CONFIG.langId}\u0000${JSON.stringify(tokens)}`;
+    let pending = reading_cache.get(key);
+    if (!pending) {
+      pending = fetch("/read/shadowing/readings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          language_id: CONFIG.langId,
+          tokens: tokens,
+          full_text: full_text,
+        }),
+      }).then((r) => (r.ok ? r.json() : null));
+      // Cache successful responses only, so a failed batch stays
+      // retriable; FIFO eviction keeps a long reading session bounded.
+      pending.then((data) => {
+        if (!data || !Array.isArray(data.tokens)) return;
+        if (reading_cache.size >= READING_CACHE_MAX) {
+          reading_cache.delete(reading_cache.keys().next().value);
+        }
+        reading_cache.set(key, pending);
+      });
+    }
+    return pending
       .then((data) => {
         if (!data || !Array.isArray(data.tokens)) return;
         spans.forEach((sp, i) => {
