@@ -130,6 +130,50 @@ def progress_percent(page_num, page_count, read_page_count, is_completed):
     return min(100, max(0, int(done * 100 / pages)))
 
 
+_SERIES_ROWS_SQL = """
+SELECT b.BkID AS BkID, b.BkTitle AS BkTitle, b.BkArchived AS BkArchived
+FROM books b
+INNER JOIN booktags bt ON bt.BtBkID = b.BkID
+INNER JOIN tags2 t2 ON t2.T2ID = bt.BtT2ID
+WHERE t2.T2Text = :tagtext
+"""
+
+
+def _ordered_series_rows(session, tagtext):
+    "Every book carrying the tag, in the overview page's display order."
+    rows = session.execute(db.text(_SERIES_ROWS_SQL), {"tagtext": tagtext}).fetchall()
+    # Same natural re-sort the overview does: the SQL ORDER BY would put
+    # "Ep 10" before "Ep 2".
+    return sorted(rows, key=lambda r: (r.BkArchived, _natural_title_key(r.BkTitle)))
+
+
+def series_neighbours(session, book):
+    """
+    The books on either side of `book` in its book set:
+    {"prev": {"id", "title"} | None, "next": ...}.
+
+    Ordering is the overview page's (non-archived first, then natural
+    title order), so the neighbours are the rows above and below this
+    one there.  Both are None when the book isn't part of a set -- the
+    reader then simply stops at either end of the book.
+    """
+    tagtext = series_tag_for_book(session, book)
+    if tagtext is None:
+        return {"prev": None, "next": None}
+    rows = _ordered_series_rows(session, tagtext)
+    idx = next((i for i, r in enumerate(rows) if r.BkID == book.id), None)
+    if idx is None:
+        return {"prev": None, "next": None}
+
+    def _entry(row):
+        return {"id": row.BkID, "title": row.BkTitle} if row is not None else None
+
+    return {
+        "prev": _entry(rows[idx - 1] if idx > 0 else None),
+        "next": _entry(rows[idx + 1] if idx + 1 < len(rows) else None),
+    }
+
+
 def get_series_overview(session, tagtext):
     """
     View model for the series page, or None if no books carry the tag.

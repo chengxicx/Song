@@ -63,6 +63,8 @@
     book_audio: <input id="book_audio_file" value="{% if book_type not in ('youtube', 'mp3') %}{{ book.audio_filename or '' }}{% endif %}">
     page_num: <input id="page_num" value="{{ page_num }}">
     page_count: <input id="page_count" value="{{ page_count }}">
+    series_next_book: <input id="series_next_book_id" value="{{ series_next.id if series_next else '' }}">
+    series_prev_book: <input id="series_prev_book_id" value="{{ series_prev.id if series_prev else '' }}">
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
     track_page_open: <input id="track_page_open" value="{{ track_page_open|lower }}">
     tts_lang: <input id="tts_lang" value="{{ lang_code }}">
@@ -670,6 +672,20 @@
     set_page_fraction();
   });
 
+  // The volumes on either side of this book in its book set, or 0.
+  // Written into the page by the server (read/routes.py) and read by
+  // navigateNext / navigatePrev, which run on into them at either end
+  // of the book.
+  function _nextSeriesBookId() {
+    const v = $("#series_next_book_id").val();
+    return v ? parseInt(v, 10) || 0 : 0;
+  }
+
+  function _prevSeriesBookId() {
+    const v = $("#series_prev_book_id").val();
+    return v ? parseInt(v, 10) || 0 : 0;
+  }
+
   // Enable page nav links, depending on page num.
   let enable_page_nav_links = function() {
     const pagenum = parseInt($('#page_num').val());
@@ -681,8 +697,10 @@
       else
         $(el_id).addClass(c);
     };
-    set_enable('#navPrev', pagenum > 1);
-    set_enable('#navNext', pagenum < maxpage);
+    // The ends of a book that belongs to a book set still have somewhere
+    // to go: the neighbouring volume.
+    set_enable('#navPrev', pagenum > 1 || _prevSeriesBookId() > 0);
+    set_enable('#navNext', pagenum < maxpage || _nextSeriesBookId() > 0);
     // Side arrows are kept visible for all book types (text, MP3, TTS),
     // so the previous/next navigation is always available.  They start
     // hidden in the markup, so clear the hide class here.  Re-layout
@@ -852,6 +870,11 @@
   // Entries are removed once restored (a page returned to is no longer
   // "pending").
   const _fwdFromPages = new Set();
+
+  // End of a book set's volume: the forward arrow is going to open the
+  // next book.  Guards against a double click firing the "page read"
+  // ping (and the navigation) twice.
+  let _seriesNavPending = false;
 
   // Post-swap bookkeeping for the reading text.  Also used by HTMX-driven
   // status updates (see lute.js post_bulk_update).
@@ -1177,24 +1200,31 @@
     const pagenum = parseInt($("#page_num").val());
     navSideNext.classList.toggle("hide", !atBottom);
     // The book's first page has no earlier page, so the left arrow is
-    // dead even at the bottom (same rule as the fit-to-screen arrows).
-    navSidePrev.classList.toggle("hide", !atBottom || pagenum <= 1);
+    // dead even at the bottom (same rule as the fit-to-screen arrows) --
+    // unless the book is part of a book set, where it opens the previous
+    // volume.
+    navSidePrev.classList.toggle(
+      "hide",
+      !atBottom || (pagenum <= 1 && _prevSeriesBookId() === 0)
+    );
     if (atBottom) _layout_side_nav();
   }
 
   // The book's very first screen (page 1, first sub-screen) has nothing
   // before it, so the left arrow is a dead control there: hide it.  On
   // later screens / pages it still works (sub-screen or page crossing),
-  // so it is shown again.  Scrolling mode owns both arrows itself and
-  // skips this helper.
+  // so it is shown again.  A book in a book set keeps it: it opens the
+  // previous volume from there.  Scrolling mode owns both arrows itself
+  // and skips this helper.
   function _updateSideArrows() {
     if (!navSidePrev || !navSideNext) return;
     if (typeof _scrollMode === "function" && _scrollMode()) return;
     const pagenum = parseInt($("#page_num").val());
     const atFirstScreen =
       pagenum <= 1 && (subScreens.length === 0 || curScreen === 0);
-    navSidePrev.classList.toggle("hide", atFirstScreen);
-    if (!atFirstScreen) _layout_side_nav();
+    const deadPrev = atFirstScreen && _prevSeriesBookId() === 0;
+    navSidePrev.classList.toggle("hide", deadPrev);
+    if (!deadPrev) _layout_side_nav();
   }
 
   // Keep the bottom-of-page arrow state in sync while the reader
@@ -1776,6 +1806,20 @@
       _renderScreen();
       return;
     }
+    // The very start of the book is the end of the reading -- or, in a
+    // book set, the end of the previous volume: the arrow opens that
+    // volume where the reader left off in it.  Nothing is marked read
+    // going backwards.
+    const pagenum = parseInt($("#page_num").val());
+    const atFirstSubscreen =
+      _isMangaReader() || subScreens.length === 0 || curScreen === 0;
+    if (pagenum <= 1 && atFirstSubscreen) {
+      const prevBook = _prevSeriesBookId();
+      if (prevBook) {
+        window.location.href = `/read/${prevBook}`;
+        return;
+      }
+    }
     const target = getActualPage(-1);
     // Crossing back onto a page the reader had left forward: land on its
     // last sub-screen (where they were) instead of its first.
@@ -1807,7 +1851,19 @@
     // On the last page's final screen this is the end of the reading.
     // Without this guard goto_relative_page(1) clamps back to maxpage and
     // re-loads the page, wrapping around to its first sub-screen.
-    if (pagenum >= maxpage && atLastSubscreen) return;
+    if (pagenum >= maxpage && atLastSubscreen) {
+      // ... unless the book belongs to a book set: the arrow then
+      // continues into the next volume, opening it where the reader
+      // left off in that book.
+      const nextBook = _nextSeriesBookId();
+      if (nextBook && !_seriesNavPending) {
+        _seriesNavPending = true;
+        // Mark this last page read first, exactly as a forward arrow
+        // does on any other page.
+        handle_page_done(arrowMarksKnown, 0, false, `/read/${nextBook}`);
+      }
+      return;
+    }
     // Leaving this page forward from its last sub-screen: remember it so
     // a later left-arrow crossing back restores the last sub-screen.
     if (!_isMangaReader() && subScreens.length) {
@@ -1857,7 +1913,9 @@
   }
 
   // Handle green checkmark in footer.
-  function handle_page_done(mark_rest_known = false, next_relative_page = 0, all_pages = false) {
+  // `next_url`, when given, replaces the relative page move with a jump to
+  // another book -- the next volume of a book set, see navigateNext.
+  function handle_page_done(mark_rest_known = false, next_relative_page = 0, all_pages = false, next_url = null) {
     const bookid = $('#book_id').val();
     const pagenum = parseInt($('#page_num').val());
     data = {
@@ -1866,14 +1924,24 @@
       restknown: mark_rest_known,
       allpages: all_pages
     };
-    $.ajax({
+    const req = $.ajax({
       type: 'post',
       url: '/read/page_done',
       data: JSON.stringify(data),
       contentType: "application/json; charset=utf-8"
-    }).done(function(d) {
-      goto_relative_page(next_relative_page);
     });
+    if (next_url) {
+      // Leaving this book either way: a failed "page read" ping must not
+      // strand the reader on a finished page.
+      req.always(function() {
+        window.location.href = next_url;
+      });
+    }
+    else {
+      req.done(function(d) {
+        goto_relative_page(next_relative_page);
+      });
+    }
   }
 
   function add_bookmark() {
