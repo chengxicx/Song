@@ -188,8 +188,31 @@ def extract_epub_package(data, chapters, static_root):
 
 
 def _write_text(root_abs, name, text):
-    with open(os.path.join(root_abs, name), "w", encoding="utf-8") as f:
+    path = os.path.join(root_abs, name)
+    with open(path, "w", encoding="utf-8") as f:
         f.write(text)
+    _make_readable(path)
+
+
+# The extracted package is served straight off the data directory by
+# nginx, as a different user, so its files have to be world-readable.
+# Files created the normal way get this from the umask; the atomic
+# writers (tempfile.mkstemp) create 0600 and would 403 in the browser.
+_DATA_FILE_MODE = 0o644
+
+
+def _make_readable(path):
+    """
+    Give an extracted file `_DATA_FILE_MODE`, unless it already has it.
+
+    A 0600 stylesheet is a 403 through nginx: the chapter then renders
+    with none of the book's styling, which looks like a broken import.
+    """
+    try:
+        if os.stat(path).st_mode & 0o444 != 0o444:
+            os.chmod(path, _DATA_FILE_MODE)
+    except OSError:
+        pass
 
 
 def _safe_path(name):
@@ -512,6 +535,8 @@ def ensure_orig_css(app, stored_epub_path):
     root_abs = os.path.dirname(os.path.dirname(chapter_file))
     orig_abs = os.path.join(root_abs, "lute-orig.css")
     if os.path.isfile(orig_abs):
+        # Repairs 0600 files left by an earlier build of this function.
+        _make_readable(orig_abs)
         return posixpath.join("epub", os.path.basename(root_abs), "lute-orig.css")
 
     root_rel = f"epub/{os.path.basename(root_abs)}"
@@ -526,10 +551,13 @@ def ensure_orig_css(app, stored_epub_path):
         )
 
     # Atomic: a concurrent page render may be doing the same rebuild.
+    # mkstemp makes the file 0600, and nginx (another user) has to serve
+    # it -- hence the chmod before it goes live.
     fd, tmp = tempfile.mkstemp(dir=root_abs, suffix=".tmp")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(orig_text)
+        os.chmod(tmp, _DATA_FILE_MODE)
         os.replace(tmp, orig_abs)
     except Exception:
         os.unlink(tmp)
