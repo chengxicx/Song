@@ -1465,10 +1465,16 @@ div#thetext.epub-text-container .epub-body p {
    id-anchored onto .epub-body -- so the book's own scoped
    `.epub-body { background: ... }` rules still win over the default
    white.  "theme" (no class) is the legacy look: theme background,
-   import-time colour dropping, 46rem column. */
+   import-time colour dropping, 46rem column.
+
+   The paper follows the theme.  A light theme leaves --paper-bg and
+   --paper-filter unset (white sheet, no filter); a dark theme sets
+   both (see themes/css/*.css) so "original" means dark paper with the
+   chapter inverted, the same trick the night look uses.  Night itself
+   is always dark, whatever the theme is. */
 div#thetext.epub-text-container.epub-look-original #epub-chapter,
 div#thetext.epub-text-container.epub-look-night #epub-chapter {
-    background-color: #fff;
+    background-color: var(--paper-bg, #fff);
     max-width: 60rem;
     margin: 1rem auto;
     padding: 2.4rem 2.8rem;
@@ -1507,21 +1513,21 @@ div#thetext.epub-text-container.epub-look-night .epub-body video {
     filter: invert(0.88) hue-rotate(180deg);
 }
 
-/* The paper looks must not inherit the UI theme's ink.
+/* The sheet's content is authored as light paper: dark ink, light status
+   chips.  That is the palette the book's own CSS and the status spans
+   are mixed for, and it is what "original" means in a light theme.
 
-   "Original" paints a white sheet, but a dark theme forces its own light
-   text onto the reading column (div#thetext p { color: #e5e5ea
-   !important }) and hands out status chips mixed for a dark surface.
-   On paper the result was near-white text on white -- readable only by
-   squinting.  The sheet is light whatever the UI theme is, so the
-   light-paper palette is pinned here: the same values Default-Light
-   uses, scoped to the sheet.  Night is left alone: it inverts the
-   chapter, so light ink is exactly what it wants.
+   A dark theme asks for dark paper instead.  The same block is then
+   inverted exactly like the night look (--paper-filter, set by the
+   theme), so the dark ink comes out light and the chips read as dark
+   badges with light text.  Keeping the ink dark *here* is what makes
+   the inversion work: letting the theme's own light ink through would
+   invert to near-black on near-black, which is the bug this replaced.
 
    The chip colours come from the --status-N-color tokens, which themes
    read through var(); pinning them on the container reaches every
    theme that tokenises.  The text colours are set per span because a
-   few dark themes hard-code their light ink instead of a token. */
+   few dark themes hard-code theirs instead of using a token. */
 div#thetext.epub-text-container.epub-look-original {
     color: #2c2a29;
     --status-0-color: #007aff;
@@ -1538,6 +1544,19 @@ div#thetext.epub-look-original p,
 div#thetext.epub-look-original li,
 div#thetext.epub-look-original blockquote {
     color: #2c2a29 !important;
+}
+
+/* Dark paper (dark themes): invert the chapter onto it, images and
+   videos back, exactly as the night look does.  A light theme leaves
+   --paper-filter unset, so this resolves to none and costs nothing. */
+div#thetext.epub-look-original .epub-body {
+    filter: var(--paper-filter, none);
+}
+
+div#thetext.epub-look-original .epub-body img,
+div#thetext.epub-look-original .epub-body svg,
+div#thetext.epub-look-original .epub-body video {
+    filter: var(--paper-filter, none);
 }
 
 div#thetext.epub-look-original span.status1 { color: #7c2d2b; }

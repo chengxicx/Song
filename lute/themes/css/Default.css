@@ -29,6 +29,10 @@ body {
   --status-99-color: #38924c;
 
   --background-color: #1c1c1e;      /* Apple 界面暗黑背景色 */
+  /* 阅读模式的「纸面」外观跟随主题：深色主题 = 深色纸 + 反相正文。
+     styles.css 的 .epub-look-original 读这两个 token，未设置就是白纸。 */
+  --paper-bg: #16161d;
+  --paper-filter: invert(0.88) hue-rotate(180deg);
   --panel-bg: #2c2c2e;            /* 悬浮卡片/表格底色 */
   --font-color: #e5e5ea;           /* 文本亮灰/白 */
 
