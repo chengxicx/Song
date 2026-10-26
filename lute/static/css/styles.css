@@ -1525,6 +1525,15 @@ div#thetext.epub-text-container.epub-look-night #epub-chapter {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
+/* Night fills the pane, not just the sheet.  The sheet keeps side
+   margins (narrow panes: 0.5rem each side, wider ones 1rem) so it reads
+   as a page -- and the pane behind it is the *theme's* colour, white
+   under a light theme.  That showed as white strips down both sides of
+   the dark paper, plus a white band wherever a short chapter ends. */
+div#thetext.epub-text-container.epub-look-night {
+    background-color: #16161d;
+}
+
 div#thetext.epub-text-container.epub-look-night .epub-body {
     filter: invert(0.88) hue-rotate(180deg);
     background-color: #fff;
