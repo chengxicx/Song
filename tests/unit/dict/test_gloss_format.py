@@ -6,7 +6,7 @@ production pool (MOJi辞書, sampled 2026-10-12 via the Local tab), so a
 rule change that would garble the actual dictionaries shows up here.
 """
 
-from lute.dict.gloss_format import parse_gloss
+from lute.dict.gloss_format import COMPACT_GLOSS_MAX_CHARS, compact_gloss, parse_gloss
 
 
 def types(blocks):
@@ -161,3 +161,202 @@ def test_unusual_text_degrades_to_senses_without_losing_any():
     assert [b["text"] for b in blocks] == ["a pleasant feeling", "giving pleasure"]
     assert all(b["t"] == "sense" for b in blocks)
     assert [b["n"] for b in blocks] == [1, 2]
+
+
+# --- English (Latin-script) dictionary entries ------------------------------
+#
+# The pool's Japanese rules key off kana; an English MDX entry used to
+# fall through all of them and render as an undifferentiated numbered
+# list -- phonetics, POS, examples and senses alike.  These pin the
+# English conventions on entries laid out the way Oxford/Learner's
+# style dictionaries flatten.
+
+
+def test_an_english_bilingual_entry_gets_phonetics_pos_senses_and_examples():
+    "word, as an Oxford-style 英汉双解 entry flattens."
+    gloss = "\n".join(
+        [
+            "/wɜːd/ ; NAmE /wɜːrd/",
+            "noun",
+            "1. 词；单词；字",
+            "a unit of language",
+            "2. 诺言；保证",
+            "a promise",
+            "He is a man of his word.",
+            "他是个说话算数的人。",
+            "See also: wordy",
+        ]
+    )
+    blocks = parse_gloss(gloss)
+
+    assert types(blocks) == [
+        "phonetic",
+        "pos",
+        "sense",
+        "sense",
+        "example",
+        "xref",
+    ]
+    assert blocks[0]["text"] == "/wɜːd/ ; NAmE /wɜːrd/"
+    assert blocks[1]["text"] == "noun"
+    assert blocks[2]["n"] == 1  # the source number is kept, not renumbered
+    assert blocks[2]["en"] == "a unit of language"  # the bilingual counterpart
+    assert blocks[3]["n"] == 2
+    assert blocks[3]["en"] == "a promise"
+    assert blocks[4]["text"] == "He is a man of his word."
+    assert blocks[4]["translation"] == "他是个说话算数的人。"
+    assert blocks[5] == {"t": "xref", "text": "wordy", "reading": None}
+
+
+def test_english_pos_lines_and_pos_prefixed_senses():
+    gloss = "\n".join(
+        [
+            "vt., vi.",
+            "n. 词；话语",
+            "adj（only before noun）",
+            "adj. 只作定语",
+            "verb [T]",
+        ]
+    )
+    blocks = parse_gloss(gloss)
+
+    assert types(blocks) == ["pos", "pos", "sense", "pos", "pos", "sense", "pos"]
+    assert blocks[0]["text"] == "vt., vi."
+    assert blocks[1]["text"] == "n."  # the prefix splits off as its badge
+    assert blocks[2]["text"] == "词；话语"
+    assert blocks[2]["n"] == 1
+    assert blocks[3]["text"] == "adj（only before noun）"  # label and all
+    assert blocks[4]["text"] == "adj."
+    assert blocks[5]["text"] == "只作定语"
+    assert blocks[6]["text"] == "verb [T]"  # Longman-style label
+
+
+def test_a_bracketed_phonetic_line_is_phonetics_too():
+    blocks = parse_gloss("[wɜːd]")
+    assert types(blocks) == ["phonetic"]
+
+    # Text around the groups that is not a variety label is a definition.
+    blocks = parse_gloss("either / or")
+    assert types(blocks) == ["sense"]
+
+
+def test_numbers_starting_a_definition_are_not_sense_numbers():
+    "1.5 million: the digit after the dot keeps it a plain definition."
+    blocks = parse_gloss("1.5 million")
+
+    assert types(blocks) == ["sense"]
+    assert blocks[0]["text"] == "1.5 million"
+
+
+def test_numbered_english_examples_pair_with_their_translations():
+    gloss = "\n".join(["1. He kept his word.", "他遵守了诺言。"])
+    blocks = parse_gloss(gloss)
+
+    assert types(blocks) == ["example"]
+    assert blocks[0]["text"] == "He kept his word."  # the marker comes off
+    assert blocks[0]["translation"] == "他遵守了诺言。"
+
+
+def test_an_english_counterpart_attaches_only_to_a_chinese_sense():
+    "英英 entries: English lines stay their own numbered senses."
+    gloss = "\n".join(
+        [
+            "1. to move something",
+            "2. to capture something",
+        ]
+    )
+    blocks = parse_gloss(gloss)
+
+    assert types(blocks) == ["sense", "sense"]
+    assert "en" not in blocks[0]
+    assert [b["n"] for b in blocks] == [1, 2]
+
+
+# --- compact_gloss: the entry as a term's translation -----------------------
+#
+# The term form's auto-fill saves this (see /read/localdict_lookup): a
+# translation holding the whole card -- examples and all -- makes every
+# popup and flashcard that shows it enormous.
+
+
+def test_compact_keeps_the_pos_and_senses_and_drops_the_examples():
+    "食べる again: the card's definitions, without its example tail."
+    gloss = "\n".join(
+        [
+            "他动·二类惯用语",
+            "他动·二类",
+            "吃。（飲食物をいただく。）",
+            "ご飯を食べる。",
+            "吃饭。",
+            "腹いっぱい食べた。",
+            "吃饱了。",
+            "生活。（生計を立てる。）",
+            "月給で食べる。",
+            "靠工资维持生活。",
+            "惯用语",
+            "食べてすぐ寝ると牛になる。／吃完饭马上躺下会变成牛。",
+        ]
+    )
+
+    assert compact_gloss(gloss) == (
+        "他动·二类\n吃。（飲食物をいただく。）\n生活。（生計を立てる。）"
+    )
+
+
+def test_compact_caps_the_total_length_with_an_ellipsis():
+    line = "第{}条长长的释义。（这一段说明文字没有任何含义，它在这里只是为了把每一条的长度撑到足以越过预算的程度。）"
+    gloss = "\n".join(line.format(c) for c in "一二三四五六")
+    line_len = len(line.format("一"))
+    assert (
+        2 * line_len < COMPACT_GLOSS_MAX_CHARS < 6 * line_len
+    ), "the fixture must straddle the budget for the test to mean anything"
+
+    compact = compact_gloss(gloss)
+
+    lines = compact.split("\n")
+    assert lines[-1] == "…", "the cut is visible"
+    assert "第六条" not in compact, "the senses past the budget are gone"
+    assert sum(len(ln) for ln in lines[:-1]) <= COMPACT_GLOSS_MAX_CHARS
+
+
+def test_compact_keeps_a_see_also_pointer():
+    gloss = "See also: 見開き【みひらき】"
+
+    assert compact_gloss(gloss) == "See also: 見開き【みひらき】"
+
+
+def test_compact_of_an_english_entry_keeps_the_chinese_definitions():
+    "word again: no phonetics, no English counterparts, no examples."
+    gloss = "\n".join(
+        [
+            "/wɜːd/ ; NAmE /wɜːrd/",
+            "noun",
+            "1. 词；单词；字",
+            "a unit of language",
+            "2. 诺言；保证",
+            "a promise",
+            "He is a man of his word.",
+            "他是个说话算数的人。",
+            "See also: wordy",
+        ]
+    )
+
+    assert compact_gloss(gloss) == (
+        "noun\n词；单词；字\n诺言；保证\nSee also: wordy"
+    )
+
+
+def test_compact_keeps_an_english_see_also_without_reading():
+    assert compact_gloss("See also: wordy") == "See also: wordy"
+
+
+def test_compact_falls_back_to_the_raw_lines_when_nothing_parses():
+    "A wall of examples still yields a definition rather than nothing."
+    gloss = "\n".join(["一番電車", "头班电车。", "執務時間", "办公时间。"])
+
+    assert compact_gloss(gloss) == gloss
+
+
+def test_compact_passes_an_empty_gloss_through():
+    assert compact_gloss(None) is None
+    assert compact_gloss("") == ""

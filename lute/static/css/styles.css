@@ -886,8 +886,76 @@ span.hamburger {
 }
 
 .text-options-btn-container {
-  padding: 0.2rem;
-  border-radius: 5px;
+    padding: 0.2rem;
+    border-radius: 5px;
+}
+
+/* Reader font picker: sits under the type controls, above the menu
+   items.  Centred like the toggle rows above it, and the select's own
+   width is what keeps the sidebar from growing: it is capped rather
+   than stretched to the longest family name, and min-width: 0 lets it
+   shrink again on narrow phones. */
+#reader-font-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+    margin: 0.2rem 0 0.8rem;
+}
+
+#reader-font-container label {
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+#reader-font {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 9.5rem;
+    padding: 0.2rem 0.3rem;
+    font-size: 13px;
+    color: #212529;
+    background-color: #ffffff;
+    border: 1px solid #d5e9fa;
+    border-radius: 5px;
+}
+
+#reader-font:hover {
+    background-color: #eef6fd;
+    cursor: pointer;
+}
+
+/* System-font loader.  Dressed as one of the menu items below it -- on
+   the narrow sidebar a full-width white button reads as a banner.  Only
+   Chromium desktop can enumerate the installed families at all (Local
+   Font Access API), so text-options.js reveals the button where it
+   exists; display: none has to be stated because the box rules below
+   would otherwise override the hidden attribute. */
+#reader-font-system {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1.6rem;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+#reader-font-system:hover {
+    background-color: #d5e9fa;
+}
+
+#reader-font-system[hidden] {
+    display: none;
+}
+
+#reader-font-system:disabled {
+    opacity: 0.5;
+    cursor: default;
 }
 
 /* Manga zoom row: span both grid columns and center the two buttons. */
@@ -1367,6 +1435,27 @@ div#thetext.epub-text-container span.textitem {
    are: font family, colour, line height and margins still apply. */
 div#thetext.epub-text-container .epub-body p {
     font-size: inherit;
+}
+
+/* ---- Reader font choice ---------------------------------------------
+   The "Font" picker in #reading_menu stamps --reader-font-stack on
+   #thetext and marks it data-reader-font (text-options.js).  Every
+   theme stylesheet pins the reading text's own font-family -- usually
+   with !important, e.g. `div#thetext p { font-family: Georgia ...
+   !important }` -- so the pick cannot ride on inheritance: it has to
+   out-specify the theme.  id + attribute is (1,1,n) against the
+   theme's (1,0,n) or (0,1,n), which wins over a plain *and* an
+   !important theme declaration.
+
+   :not() keeps code blocks on the book's monospace face -- an EPUB
+   chapter can carry its own <pre>/<code> styling and that difference
+   is meaningful.  Everything else (paragraphs, word spans, headings,
+   ruby, quotes) takes the chosen family.  Manga and PDF books never
+   get the attribute: their words are positioned over an image and
+   cannot reflow. */
+#thetext[data-reader-font],
+#thetext[data-reader-font] :not(pre):not(code):not(kbd):not(samp) {
+    font-family: var(--reader-font-stack) !important;
 }
 
 /* ---- Reader-mode EPUB looks -----------------------------------------

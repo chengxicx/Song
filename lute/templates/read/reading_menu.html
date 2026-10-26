@@ -104,6 +104,35 @@
   </div>
 </div>
 
+{# Reader font.  The theme stylesheets hard-code the reading text's
+   font-family, so a pick here is applied as an override on #thetext
+   (see "Reader font choice" in styles.css) rather than by inheritance.
+   The choices are per language -- see read/reader_fonts.py -- and each
+   option carries its full CSS stack in data-stack, which
+   text-options.js applies and remembers.  Manga/PDF text is positioned
+   over an image and cannot reflow, so those books get no picker. #}
+{% if book_type not in ('manga', 'pdf') %}
+<div id="reader-font-container" class="reader-font-container">
+  <label for="reader-font">{{ t('Font') }}</label>
+  <select id="reader-font" data-lang="{{ lang_code }}">
+    {% for choice in reader_fonts or [] %}
+    <option value="{{ choice.key }}"
+            data-stack="{{ choice.stack }}"
+            {% if choice.stack %}style="font-family: {{ choice.stack | safe }}"{% endif %}>{{ t(choice.label) }}</option>
+    {% endfor %}
+  </select>
+</div>
+{# System fonts.  A page cannot list the fonts installed on the
+   machine without asking -- it is a fingerprinting vector -- and only
+   Chromium's Local Font Access API has an asking mechanism at all
+   (Safari, Firefox and every mobile browser refuse).  The button starts
+   hidden and text-options.js reveals it only where queryLocalFonts
+   exists; everywhere else the preset list is the whole picker. #}
+<button id="reader-font-system" class="reader-font-system-btn" type="button" hidden>
+  {{ t('Browse system fonts') }}
+</button>
+{% endif %}
+
 <ul>
   {% if book.source_uri %}
   <li>

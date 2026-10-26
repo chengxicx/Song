@@ -25,6 +25,14 @@ ENTRIES = [
     ("ひさしぶり", "<div>久し振り<br/>好久不见</div>"),
 ]
 
+# An entry laid out like the pool's real cards: headword, part of
+# speech, one sense, then the example tail.
+CARD_ENTRY = (
+    "たのしい",
+    "<div>たのしい【たのしい◎】<br/>形<br/>快乐的。（楽しいこと。）<br/>"
+    "今日は楽しい。<br/>今天很快乐。<br/>明日も楽しい。<br/>明天也快乐。</div>",
+)
+
 # A neutral pool file name -- no name is special on the server any more.
 DICT = "test_dict.db"
 
@@ -231,7 +239,9 @@ def test_the_lookup_endpoint_uses_the_term_reading(
     db.session.add(term)
     db.session.commit()
 
-    data = client.get(f"/read/localdict_lookup/{japanese.id}/{quote('楽しい')}").get_json()
+    data = client.get(
+        f"/read/localdict_lookup/{japanese.id}/{quote('楽しい')}"
+    ).get_json()
 
     assert "愉快yúkuài" in data["gloss"]
 
@@ -247,7 +257,26 @@ def test_the_lookup_endpoint_returns_null_for_an_unknown_word(
         f"/read/localdict_lookup/{japanese.id}/{quote('存在しない')}"
     ).get_json()
 
-    assert data == {"gloss": None}
+    assert data == {"gloss": None, "compact": None}
+
+
+def test_the_lookup_endpoint_also_returns_the_compact_gloss(
+    client, app, app_context, dict_dirs, japanese
+):
+    """
+    The form's auto-fill saves ``compact``: the entry's definitions,
+    without the headword or the example tail that makes every popup and
+    flashcard showing the translation enormous.
+    """
+    _import(app, dict_dirs[1], entries=[CARD_ENTRY], name="card.mdx", target="card.db")
+    _use(japanese, "card.db")
+
+    data = client.get(
+        f"/read/localdict_lookup/{japanese.id}/{quote('たのしい')}"
+    ).get_json()
+
+    assert "今日は楽しい" in data["gloss"], "the full entry is the gloss"
+    assert data["compact"] == "形\n快乐的。（楽しいこと。）"
 
 
 # --- the frame the tab loads ------------------------------------------------
@@ -340,9 +369,9 @@ def test_xref_links_carry_their_reading(client, app, app_context, dict_dirs, jap
     )
     _use(japanese, DICT)
 
-    html = client.get(f"/read/localdict/{japanese.id}/{quote('ありがとう')}").data.decode(
-        "utf-8"
-    )
+    html = client.get(
+        f"/read/localdict/{japanese.id}/{quote('ありがとう')}"
+    ).data.decode("utf-8")
 
     assert "ld-xref" in html
     assert "?reading=" in html
@@ -403,9 +432,9 @@ def test_the_local_tab_frame_says_so_for_an_unknown_word(
     _import(app, dict_dirs[1], target=DICT)
     _use(japanese, DICT)
 
-    html = client.get(f"/read/localdict/{japanese.id}/{quote('存在しない')}").data.decode(
-        "utf-8"
-    )
+    html = client.get(
+        f"/read/localdict/{japanese.id}/{quote('存在しない')}"
+    ).data.decode("utf-8")
 
     assert "Not in the installed dictionary" in html
 

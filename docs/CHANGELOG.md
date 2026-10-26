@@ -3,6 +3,46 @@
 
 Feature changes:
 
+* English (Latin-script) dictionary entries render structured on the
+  reading page's Local tab, instead of every line -- phonetics, part of
+  speech, examples and definitions alike -- degrading to one numbered
+  list.  The gloss parser (gloss_format.parse_gloss, whose rules were
+  tuned on the pool's Japanese-Chinese dictionaries) now also reads the
+  conventions of English dictionaries: a /wɜːd/ ; NAmE /wɜːrd/ line is a
+  phonetic line shown quiet under the term, n. / vt., vi. / verb [T]
+  lines are POS badges (a POS prefix on a definition line, "n. 词；话语",
+  splits into badge + definition), "1." sense numbers the dictionary
+  itself printed are kept rather than renumbered ("1.5 million" is not a
+  number), See also:/参见 lines become cross-reference links without a
+  reading part, an English sentence followed by a Chinese line is an
+  example pair, and in a bilingual (英汉双解) entry the English line
+  under a numbered Chinese sense rides under it muted instead of taking
+  its own number.  Unmatched lines keep today's rendering, so a
+  dictionary with other conventions degrades no worse than before.
+  compact_gloss benefits in step (definitions only, no phonetics or
+  examples), which is what the term form's auto-fill saves.
+* LuteForMobile no longer answers an English (or any non-Japanese) word
+  with a Japanese entry from the pre-pool shared dictionaries.  A
+  language with no selected dictionary used to fall back to the old
+  active.db / ja_zh_shogakukan_v2.db files -- Japanese-Chinese
+  dictionaries -- so looking up "take" showed テイク【take】⇒テーク; the
+  fallback now serves Japanese books only (the book's language name is
+  passed down from the reader), and other languages report "dictionary
+  not installed" instead.
+* Sentence extraction keeps the spaces between words in the EPUB reader
+  and on PDF pages.  Translate-sentence, copy-sentence and the Anki
+  export all read the sentence from the marked word's spans -- joined
+  with '' -- but the EPUB reader gives only non-whitespace tokens a
+  span (the spaces stay raw text nodes in the chapter markup) and PDF
+  pages render each word as its own positioned box with nothing between
+  them, so an English sentence came out as "Hereisacat.".  The
+  paragraph's text is now read from the DOM between its first and last
+  span (a cloned range, furigana rt/rp and the per-sentence 🔊 button
+  dropped from the clone), which is identical on classic text pages and
+  picks the spaces back up in the reader; PDF pages carry a hidden
+  space span between word boxes the server saw a gap on.  Verified in
+  the browser: "The cat sat on the mat." reaches the sentence
+  dictionaries intact.
 * The grammar match ring is legible in the day themes.  Hovering a grammar
   entry rings the words that entry matched inside the reading text, and
   that ring was a fixed translucent amber (#ffd65a at 90%) -- loud on the

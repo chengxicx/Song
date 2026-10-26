@@ -571,3 +571,94 @@ def test_ensure_orig_css_regenerates_for_old_packages(
 
     # A book pointing at nothing gets None, not a crash.
     assert ensure_orig_css(app, "epub/deadbeef/ch/000.html") is None
+
+
+def test_epub_render_standalone_page(app, app_context, english, client, tmp_path):
+    """/read/epub_render serves a complete document for the mobile
+    WebView: the chapter markup, the token JSON, the reader script, and
+    the bridge -- none of the reading-page chrome."""
+    book = _import_reader_book(app, client, english, tmp_path)
+    resp = client.get(f"/read/epub_render/{book.id}/1")
+
+    assert resp.status_code == 200
+    html = resp.get_data(as_text=True)
+    soup = BeautifulSoup(html, "html.parser")
+    assert soup.find(id="epub-chapter") is not None
+    assert soup.find(id="lute-epub-tokens") is not None
+    assert soup.find(id="lute-epub-substitutions") is not None
+    assert "lute-epub-reader.js" in html
+    assert "LuteEpubBridge" in html
+    thetext = soup.find(id="thetext")
+    assert "epub-text-container" in (thetext.get("class") or [])
+    # Default look is "original" (the paper surface).
+    assert "epub-look-original" in (thetext.get("class") or [])
+    # The scoped stylesheet URL rides on the container as data
+    # attributes, exactly like the fragment.
+    container = soup.find(id="epub-chapter")
+    assert (container.get("data-epub-orig-css") or "").endswith("/lute-orig.css")
+
+
+def test_epub_render_look_and_furigana_params(
+    app, app_context, english, client, tmp_path
+):
+    """?look= pre-selects the look class (no flash of the wrong theme),
+    ?furigana= decides whether lute-furigana.js is on the page at all --
+    its annotate() ignores the enabled flag, so "off" must mean
+    "absent"."""
+    book = _import_reader_book(app, client, english, tmp_path)
+
+    night = client.get(
+        f"/read/epub_render/{book.id}/1?look=night"
+    ).get_data(as_text=True)
+    thetext = BeautifulSoup(night, "html.parser").find(id="thetext")
+    assert "epub-look-night" in (thetext.get("class") or [])
+
+    # Unknown look values fall back to original, never a broken page.
+    bogus = client.get(
+        f"/read/epub_render/{book.id}/1?look=sparkly"
+    ).get_data(as_text=True)
+    thetext = BeautifulSoup(bogus, "html.parser").find(id="thetext")
+    assert "epub-look-original" in (thetext.get("class") or [])
+
+    # English has no readings source, so by default the script is off;
+    # ?furigana=1 forces it on.  (The bridge's FURIGANA_SRC constant
+    # always names the URL, so this looks at real <script> srcs.)
+    def _has_furigana_script(html):
+        soup = BeautifulSoup(html, "html.parser")
+        return soup.find(
+            "script", src=lambda s: s and "lute-furigana.js" in s
+        ) is not None
+
+    default = client.get(f"/read/epub_render/{book.id}/1").get_data(as_text=True)
+    assert not _has_furigana_script(default)
+    forced = client.get(
+        f"/read/epub_render/{book.id}/1?furigana=1"
+    ).get_data(as_text=True)
+    assert _has_furigana_script(forced)
+    assert "LUTE_FURIGANA" in forced
+
+    # ?triple=1 arms the page-side triple-tap window (mark known);
+    # without it the second tap settles immediately.
+    plain = client.get(f"/read/epub_render/{book.id}/1").get_data(as_text=True)
+    assert "var tripleEnabled = false;" in plain
+    triple = client.get(
+        f"/read/epub_render/{book.id}/1?triple=1"
+    ).get_data(as_text=True)
+    assert "var tripleEnabled = true;" in triple
+
+
+def test_epub_render_rejects_non_epub_and_missing_pages(
+    app, app_context, english, client, tmp_path
+):
+    """/read/epub_render is for reader-mode EPUB books only: a plain
+    text book or an out-of-range page is a 404, not a broken render."""
+    from tests.utils import make_book
+
+    epub_book = _import_reader_book(app, client, english, tmp_path)
+    assert client.get(f"/read/epub_render/{epub_book.id}/99").status_code == 404
+    assert client.get(f"/read/epub_render/{epub_book.id + 1000}/1").status_code == 404
+
+    text_book = make_book("plain", "Some normal text.", english)
+    db.session.add(text_book)
+    db.session.commit()
+    assert client.get(f"/read/epub_render/{text_book.id}/1").status_code == 404
