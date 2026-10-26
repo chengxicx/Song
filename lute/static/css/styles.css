@@ -1543,8 +1543,14 @@ div#thetext.epub-text-container.epub-look-night .epub-body video {
    theme that tokenises.  The text colours are set per span because a
    few dark themes hard-code theirs instead of using a token. */
 div#thetext.epub-text-container.epub-look-original {
-    color: #2c2a29;
-    --status-0-color: #007aff;
+    color: #1c1b1f;
+    /* The unknown-word blue is authored for a white sheet.  On dark
+       paper the chapter is inverted, so the colour that reaches the eye
+       is filter(#007aff) = a middling #409dff.  A dark theme overrides
+       this token with the pre-inversion value that comes out light
+       (#003399 -> #98bfff), keeping new words the brightest thing on
+       the page instead of the dimmest. */
+    --status-0-color: var(--paper-status-0-color, #007aff);
     --status-1-color: #f7d2cf;
     --status-2-color: #fce8b3;
     --status-3-color: #d1ebd8;
@@ -1557,7 +1563,7 @@ div#thetext.epub-text-container.epub-look-original {
 div#thetext.epub-look-original p,
 div#thetext.epub-look-original li,
 div#thetext.epub-look-original blockquote {
-    color: #2c2a29 !important;
+    color: #1c1b1f !important;
 }
 
 /* Dark paper (dark themes): invert the chapter onto it, images and

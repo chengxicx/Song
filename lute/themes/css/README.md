@@ -48,6 +48,13 @@ sheet follows the theme:
   that forced its own light ink onto the reading column would invert to
   near-black on near-black.
 
+  It also sets `--paper-status-0-color`, the **pre-inversion** value for
+  the unknown-word colour: the light sheet's `#007aff` comes out of the
+  filter as a middling `#409dff`, so dark themes author `#003399` and
+  get `#98bfff` — new words stay the brightest thing on the page rather
+  than the dimmest.
+
+
 The night look is always dark, whatever the theme is.
 
 
