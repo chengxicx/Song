@@ -1481,6 +1481,13 @@ div#thetext.epub-text-container.epub-look-night #epub-chapter {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
     border-radius: 2px;
     box-sizing: border-box;
+    /* Short chapters (a table of contents, a copyright page) end
+       mid-screen, so the pane's own background shows below the sheet --
+       and that gap reads as "the page is cut off, there must be more to
+       scroll to".  The sheet fills the pane instead: 100% resolves
+       against #thetext, which is a flex item of a definite-height
+       column, so long chapters (already taller) are unaffected. */
+    min-height: calc(100% - 2rem);
 }
 
 /* Inside the paper the chapter fills the sheet, not the 46rem reading
@@ -1502,6 +1509,8 @@ div#thetext.epub-text-container.epub-look-night .epub-body {
     div#thetext.epub-text-container.epub-look-night #epub-chapter {
         margin: 0.5rem auto;
         padding: 1.2rem 1rem;
+        /* Matches the tightened margins above (2 x 0.5rem). */
+        min-height: calc(100% - 1rem);
     }
 }
 
