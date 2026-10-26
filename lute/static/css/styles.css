@@ -1507,6 +1507,45 @@ div#thetext.epub-text-container.epub-look-night .epub-body video {
     filter: invert(0.88) hue-rotate(180deg);
 }
 
+/* The paper looks must not inherit the UI theme's ink.
+
+   "Original" paints a white sheet, but a dark theme forces its own light
+   text onto the reading column (div#thetext p { color: #e5e5ea
+   !important }) and hands out status chips mixed for a dark surface.
+   On paper the result was near-white text on white -- readable only by
+   squinting.  The sheet is light whatever the UI theme is, so the
+   light-paper palette is pinned here: the same values Default-Light
+   uses, scoped to the sheet.  Night is left alone: it inverts the
+   chapter, so light ink is exactly what it wants.
+
+   The chip colours come from the --status-N-color tokens, which themes
+   read through var(); pinning them on the container reaches every
+   theme that tokenises.  The text colours are set per span because a
+   few dark themes hard-code their light ink instead of a token. */
+div#thetext.epub-text-container.epub-look-original {
+    color: #2c2a29;
+    --status-0-color: #007aff;
+    --status-1-color: #f7d2cf;
+    --status-2-color: #fce8b3;
+    --status-3-color: #d1ebd8;
+    --status-4-color: #d2e4f7;
+    --status-5-color: #e5d7f2;
+}
+
+/* Higher specificity than the theme's own div#thetext p rule, and
+   !important because that rule is !important too. */
+div#thetext.epub-look-original p,
+div#thetext.epub-look-original li,
+div#thetext.epub-look-original blockquote {
+    color: #2c2a29 !important;
+}
+
+div#thetext.epub-look-original span.status1 { color: #7c2d2b; }
+div#thetext.epub-look-original span.status2 { color: #7a5c14; }
+div#thetext.epub-look-original span.status3 { color: #1e5c3c; }
+div#thetext.epub-look-original span.status4 { color: #1b4a7a; }
+div#thetext.epub-look-original span.status5 { color: #4b2a6e; }
+
 /* ---- Fixed-layout EPUB chapters --------------------------------------
    A picture-book chapter (.epub-body[data-epub-viewport]) is a
    pixel-sized page box: the pane scrolls it like a PDF page (fit to
