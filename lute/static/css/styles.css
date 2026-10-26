@@ -1566,6 +1566,24 @@ div#thetext.epub-look-original blockquote {
     color: #1c1b1f !important;
 }
 
+/* Every token in the sheet is painted in the sheet's ink, not the
+   theme's: span.textitem carries `color: var(--font-color)`, so the
+   non-word tokens -- numbers, punctuation -- kept the UI theme's ink
+   while the words around them took the sheet's.  On an inverted dark
+   sheet that lands at ~#323236, which is why "19, 1966" read as a
+   smudge.  The status colours below re-assert themselves for the words
+   that have one (same specificity, later in the cascade). */
+div#thetext.epub-look-original span.textitem {
+    color: #1c1b1f;
+}
+
+div#thetext.epub-look-original span.status0 { color: var(--status-0-color); }
+div#thetext.epub-look-original span.status1 { color: #7c2d2b; }
+div#thetext.epub-look-original span.status2 { color: #7a5c14; }
+div#thetext.epub-look-original span.status3 { color: #1e5c3c; }
+div#thetext.epub-look-original span.status4 { color: #1b4a7a; }
+div#thetext.epub-look-original span.status5 { color: #4b2a6e; }
+
 /* Dark paper (dark themes): invert the chapter onto it, images and
    videos back, exactly as the night look does.  A light theme leaves
    --paper-filter unset, so this resolves to none and costs nothing. */
@@ -1578,12 +1596,6 @@ div#thetext.epub-look-original .epub-body svg,
 div#thetext.epub-look-original .epub-body video {
     filter: var(--paper-filter, none);
 }
-
-div#thetext.epub-look-original span.status1 { color: #7c2d2b; }
-div#thetext.epub-look-original span.status2 { color: #7a5c14; }
-div#thetext.epub-look-original span.status3 { color: #1e5c3c; }
-div#thetext.epub-look-original span.status4 { color: #1b4a7a; }
-div#thetext.epub-look-original span.status5 { color: #4b2a6e; }
 
 /* ---- Fixed-layout EPUB chapters --------------------------------------
    A picture-book chapter (.epub-body[data-epub-viewport]) is a
