@@ -1512,6 +1512,25 @@ div#thetext.epub-text-container.epub-look-night .epub-body {
         /* Matches the tightened margins above (2 x 0.5rem). */
         min-height: calc(100% - 1rem);
     }
+
+    /* The pane's own narrow-screen gutter is redundant here.  Under
+       980px `div#thetext` takes `padding: 0 1rem` plus
+       `clip-path: inset(0 1rem)`, and the sheet above takes another
+       1rem.  Both are painted in the look's paper colour, so they read
+       as one 32px band (measured: 128 physical px at dpr 4) and on a
+       360px viewport the paper starts 51.2px in -- 28% of the width
+       spent on margins, with the text column down to 257.6px.
+       The sheet already carries the page margin, so on a phone the
+       pane drops its share and the paper reaches the screen edges:
+       35.2px per side, 289.6px of text, i.e. +12% measure with the
+       "a page is a page" look intact.  Desktop keeps both, where the
+       roomy sheet needs the surrounding gutter. */
+    div#thetext.epub-text-container.epub-look-original,
+    div#thetext.epub-text-container.epub-look-night {
+        padding-left: 0;
+        padding-right: 0;
+        clip-path: none;
+    }
 }
 
 /* Night: the whole chapter is inverted onto dark paper (the classic
