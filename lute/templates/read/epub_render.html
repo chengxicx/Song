@@ -172,6 +172,27 @@
       });
     }
 
+    /* Re-assert every word's status in one pass.
+       A chapter served from the offline pack carries the status classes
+       it had when the pack was written, which can predate the reader's
+       current model (a word marked known after the pack was built).
+       setStatus above is selector-based -- applying it to a whole
+       chapter would be one subtree query per word -- so this walks the
+       spans once and looks each one up in the map. */
+    function setStatuses(map) {
+      if (!map) return;
+      document.querySelectorAll("#epub-chapter span.word").forEach(function (sp) {
+        var wid = sp.dataset.wid;
+        if (!wid || !Object.prototype.hasOwnProperty.call(map, wid)) return;
+        var cls = map[wid] || "";
+        Array.from(sp.classList).forEach(function (c) {
+          if (STATUS_RE.test(c) && c !== cls) sp.classList.remove(c);
+        });
+        if (cls) sp.classList.add(cls);
+        sp.dataset.statusClass = cls;
+      });
+    }
+
     /* ---- furigana ---- */
 
     var FURIGANA_SRC = {{ vstatic('js/lute-furigana.js') | tojson }};
@@ -401,6 +422,7 @@
 
     window.LuteEpubBridge = {
       setStatus: setStatus,
+      setStatuses: setStatuses,
       setLook: function (mode) {
         if (window.EpubReader && LOOKS.indexOf(mode) >= 0) {
           window.EpubReader.setLook(mode);
