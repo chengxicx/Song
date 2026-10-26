@@ -33,6 +33,9 @@ body {
      styles.css 的 .epub-look-original 读这两个 token，未设置就是白纸。 */
   --paper-bg: #16161d;
   --paper-filter: invert(0.88) hue-rotate(180deg);
+  /* 纸内正文是「反相」出来的：生词蓝要先写成深色，反相后才亮。
+     #003399 反相后约 #98bfff（styles.css 的 --paper-status-0-color）。 */
+  --paper-status-0-color: #003399;
   --panel-bg: #2c2c2e;            /* 悬浮卡片/表格底色 */
   --font-color: #e5e5ea;           /* 文本亮灰/白 */
 
