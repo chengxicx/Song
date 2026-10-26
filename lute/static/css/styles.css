@@ -1559,8 +1559,17 @@ div#thetext.epub-text-container.epub-look-night .epub-body video {
    The chip colours come from the --status-N-color tokens, which themes
    read through var(); pinning them on the container reaches every
    theme that tokenises.  The text colours are set per span because a
-   few dark themes hard-code theirs instead of using a token. */
-div#thetext.epub-text-container.epub-look-original {
+   few dark themes hard-code theirs instead of using a token.
+
+   The night look is the same story in reverse: it inverts the sheet
+   unconditionally, so it too needs the *light* palette underneath --
+   "always dark paper" means "always start from white paper".  It used
+   to take its ink from the theme, which under the bundled dark themes
+   (Default / Dusk / Night / Dark_slate all set a light --font-color)
+   inverted into #323236 on the #1f1f1f paper: 1.3:1, the chapter read
+   as a smudge.  Night therefore pins the very same palette. */
+div#thetext.epub-text-container.epub-look-original,
+div#thetext.epub-text-container.epub-look-night {
     color: #1c1b1f;
     /* The unknown-word blue is authored for a white sheet.  On dark
        paper the chapter is inverted, so the colour that reaches the eye
@@ -1580,7 +1589,10 @@ div#thetext.epub-text-container.epub-look-original {
    !important because that rule is !important too. */
 div#thetext.epub-look-original p,
 div#thetext.epub-look-original li,
-div#thetext.epub-look-original blockquote {
+div#thetext.epub-look-original blockquote,
+div#thetext.epub-look-night p,
+div#thetext.epub-look-night li,
+div#thetext.epub-look-night blockquote {
     color: #1c1b1f !important;
 }
 
@@ -1591,16 +1603,23 @@ div#thetext.epub-look-original blockquote {
    sheet that lands at ~#323236, which is why "19, 1966" read as a
    smudge.  The status colours below re-assert themselves for the words
    that have one (same specificity, later in the cascade). */
-div#thetext.epub-look-original span.textitem {
+div#thetext.epub-look-original span.textitem,
+div#thetext.epub-look-night span.textitem {
     color: #1c1b1f;
 }
 
-div#thetext.epub-look-original span.status0 { color: var(--status-0-color); }
-div#thetext.epub-look-original span.status1 { color: #7c2d2b; }
-div#thetext.epub-look-original span.status2 { color: #7a5c14; }
-div#thetext.epub-look-original span.status3 { color: #1e5c3c; }
-div#thetext.epub-look-original span.status4 { color: #1b4a7a; }
-div#thetext.epub-look-original span.status5 { color: #4b2a6e; }
+div#thetext.epub-look-original span.status0,
+div#thetext.epub-look-night span.status0 { color: var(--status-0-color); }
+div#thetext.epub-look-original span.status1,
+div#thetext.epub-look-night span.status1 { color: #7c2d2b; }
+div#thetext.epub-look-original span.status2,
+div#thetext.epub-look-night span.status2 { color: #7a5c14; }
+div#thetext.epub-look-original span.status3,
+div#thetext.epub-look-night span.status3 { color: #1e5c3c; }
+div#thetext.epub-look-original span.status4,
+div#thetext.epub-look-night span.status4 { color: #1b4a7a; }
+div#thetext.epub-look-original span.status5,
+div#thetext.epub-look-night span.status5 { color: #4b2a6e; }
 
 /* Dark paper (dark themes): invert the chapter onto it, images and
    videos back, exactly as the night look does.  A light theme leaves
