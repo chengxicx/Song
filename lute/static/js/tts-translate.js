@@ -89,7 +89,11 @@
       fetch(url).then(function (r) { return r.json(); }),
       5000
     ).then(function (data) {
-      return data && data.gloss ? data.gloss : "";
+      if (!data) return "";
+      // The fill saves the entry's definitions, not its whole card of
+      // example sentences (the reading page's Local tab keeps those) --
+      // the translation ends up on popups and flashcards.
+      return data.compact || data.gloss || "";
     }).catch(function () { return ""; });
   }
 

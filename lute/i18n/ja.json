@@ -857,5 +857,21 @@
   "Waiting for the background analysis to start…": "バックグラウンドでの分析開始を待っています…",
   "It keeps running in the background, so you can keep reading.": "分析はバックグラウンドで続きます。読書はそのまま続けられます。",
   "The whole-book analysis took too long. Please try again.": "書籍全体の分析に時間がかかりすぎました。しばらくしてからもう一度お試しください。",
-  "The whole-book analysis failed. Please try again.": "書籍全体の分析に失敗しました。しばらくしてからもう一度お試しください。"
+  "The whole-book analysis failed. Please try again.": "書籍全体の分析に失敗しました。しばらくしてからもう一度お試しください。",
+  "Font": "フォント",
+  "Theme default": "テーマの既定",
+  "Serif": "セリフ体",
+  "Sans-serif": "サンセリフ体",
+  "Mincho": "明朝体",
+  "Gothic": "ゴシック体",
+  "Round Gothic": "丸ゴシック体",
+  "Songti": "宋体",
+  "Heiti": "ゴシック体（黒体）",
+  "Kaiti": "楷書体",
+  "Yuanti": "丸ゴシック体（円体）",
+  "Myeongjo": "明朝体（韓国語）",
+  "Naskh": "ナスフ体",
+  "System fonts": "システムフォント",
+  "Browse system fonts": "システムフォントを読み込む",
+  "Could not read the system fonts": "システムフォントを読み込めませんでした"
 }

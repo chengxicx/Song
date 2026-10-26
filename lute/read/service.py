@@ -295,17 +295,35 @@ def _epub_token(ti):
 DICT_GLOSS_POPUP_MAX_LINES = 5
 
 
-def _popup_dict_gloss(gloss):
+def _popup_first_lines(text, max_lines=DICT_GLOSS_POPUP_MAX_LINES):
     """
-    The dictionary definition as the popup shows it: the first lines,
-    with a trailing "…" when more was cut.  None stays None.
+    A long block as the popup shows it: its first ``max_lines`` lines,
+    with a trailing "…" when more was cut.  Falsy input passes through
+    unchanged.
     """
-    if not gloss:
-        return gloss
-    lines = gloss.split("\n")
-    if len(lines) <= DICT_GLOSS_POPUP_MAX_LINES:
-        return gloss
-    return "\n".join([*lines[:DICT_GLOSS_POPUP_MAX_LINES], "…"])
+    if not text:
+        return text
+    lines = text.split("\n")
+    if len(lines) <= max_lines:
+        return text
+    return "\n".join([*lines[:max_lines], "…"])
+
+
+def _translation_carries(gloss, translation):
+    """
+    True when the term's translation already contains the dictionary
+    gloss -- the form's auto-fill copied the entry into it.  Compared
+    with all whitespace (and the zero-width token separators) removed,
+    so the fill's headword line and any rewrapping do not matter.
+    """
+    if not gloss or not translation:
+        return False
+    zws = "\u200b"
+
+    def norm(s):
+        return "".join(s.split()).replace(zws, "")
+
+    return norm(gloss) in norm(translation)
 
 
 class TermPopup:
@@ -316,7 +334,10 @@ class TermPopup:
         self.term = term
         self.term_text = self._clean(term.text)
         self.parents_text = ", ".join([self._clean(p.text) for p in term.parents])
-        self.translation = self._clean(term.translation)
+        # A many-line translation (the form's auto-fill once copied the
+        # dictionary's whole card into it) is capped like the dictionary
+        # gloss is -- the popup is a glance, the form holds the full text.
+        self.translation = self._clean(_popup_first_lines(term.translation))
         self.romanization = self._clean(term.romanization)
         self.tags = [tt.text for tt in term.term_tags]
         self.flash = self._clean(term.get_flash_message())
@@ -332,7 +353,7 @@ class TermPopup:
 
     def _clean(self, t):
         "Clean text for popup usage."
-        zws = "\u200B"
+        zws = "\u200b"
         ret = (t or "").strip()
         ret = ret.replace(zws, "")
         ret = ret.replace("\n", "<br />")
@@ -1024,6 +1045,13 @@ class Service:
         mw = rs.get_multiword_indexer(lang)
         word_contexts = []
         order = 0
+        # Right edge and line of the last word that produced a box, so the
+        # next word can tell whether a space separated them on the page.
+        # The reading screen renders each word as its own absolutely
+        # positioned box, so -- unlike text books -- no space token exists
+        # anywhere in the DOM; the hidden space span this drives (see
+        # pdf_page.html) is what sentence extraction copies with.
+        prev_geom = None
         for word in words:
             items = rs.get_textitems(word["text"], lang, mw)
             kept = []
@@ -1039,6 +1067,14 @@ class Service:
                 kept.append(it)
             if not kept:
                 continue
+            # A gap wider than a hairline kern on the same line means the
+            # extraction saw a space between the two words (a space glyph
+            # is 2-4pt in most fonts).
+            space_before = (
+                prev_geom is not None
+                and prev_geom["line"] == word["line"]
+                and word["x"] - prev_geom["right"] > 1.25
+            )
             # Estimated box in % of the page.  JavaScript refines this
             # against pdf.js geometry after rendering; without it the
             # words are still usable in roughly the right places.
@@ -1053,8 +1089,13 @@ class Service:
                     "box": box,
                     "items": kept,
                     "char_lens": [len(it.text) for it in kept],
+                    "space_before": space_before,
                 }
             )
+            prev_geom = {
+                "line": word["line"],
+                "right": word["x"] + word["width"],
+            }
 
         return page_width, page_height, word_contexts
 
@@ -1124,9 +1165,11 @@ class Service:
             "page_num": pagenum,
             "chapter_html": chapter_html,
             "css_url": url_for("static", filename=css_path_for(epub_path)),
-            "orig_css_url": url_for("static", filename=orig_rel)
-            if orig_rel
-            else url_for("static", filename=css_path_for(epub_path)),
+            "orig_css_url": (
+                url_for("static", filename=orig_rel)
+                if orig_rel
+                else url_for("static", filename=css_path_for(epub_path))
+            ),
             "tokens": tokens,
             "substitutions": subs,
         }
@@ -1212,9 +1255,13 @@ class Service:
                     # The entry's own headword line repeats the term
                     # and reading already shown above it, and the
                     # example-sentence tail is for the strip.
-                    t.dict_gloss = _popup_dict_gloss(
-                        dict_service.strip_duplicate_headword(gloss, term.text)
-                    )
+                    stripped = dict_service.strip_duplicate_headword(gloss, term.text)
+                    # A translation copied out of this same entry (the
+                    # form's auto-fill used to save the whole card) is
+                    # shown above already; the bordered copy below would
+                    # repeat it and double the card's height.
+                    if not _translation_carries(stripped, term.translation):
+                        t.dict_gloss = _popup_first_lines(stripped)
                     break
 
         if (

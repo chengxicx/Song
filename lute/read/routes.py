@@ -56,10 +56,10 @@ from lute.book.service import (
     media_audio_url,
 )
 from lute.tts.routes import get_lang_code_for
+from lute.read.reader_fonts import font_choices as reader_font_choices
 from lute.book.series import series_neighbours, series_tag_for_book
 from lute.book.types import subtitle_book_types
 from lute.db import db
-
 
 bp = Blueprint("read", __name__, url_prefix="/read")
 
@@ -781,6 +781,10 @@ def _render_book_page(book, pagenum, track_page_open=True):
         else ("video" if book_type == "video" else "audio")
     )
 
+    # The reading pane's font picker is per language: what counts as a
+    # serif face differs by script (see read/reader_fonts.py).
+    lang_code = get_lang_code_for(lang)
+
     # The volumes on either side of this one in its book set: the reader's
     # arrows run on into them at either end of the book (read/index.html,
     # navigateNext / navigatePrev).
@@ -800,7 +804,8 @@ def _render_book_page(book, pagenum, track_page_open=True):
         page_count=book.page_count,
         show_highlights=show_highlights,
         lang_id=lang.id,
-        lang_code=get_lang_code_for(lang),
+        lang_code=lang_code,
+        reader_fonts=reader_font_choices(lang_code),
         show_furigana=bool(lang.show_furigana) and shadowing.supports_readings(lang),
         furigana_script=_furigana_script(lang),
         translate_target_lang=(lang.translate_target_lang or ""),
@@ -1284,6 +1289,54 @@ def render_page_fragment(book, pagenum, track_page_open=False):
     )
 
 
+_EPUB_LOOKS = ("original", "night", "theme")
+
+
+@bp.route("/epub_render/<int:bookid>/<int:pagenum>", methods=["GET"])
+def epub_render(bookid, pagenum):
+    """
+    Standalone reader-mode EPUB chapter page for embedded WebViews
+    (LuteForMobile).
+
+    A lean full HTML document: the chapter markup, its scoped
+    stylesheets, EpubReader.mount and a small bridge script -- no
+    reading-page chrome.  The web reader keeps using the
+    /read/start_reading fragments; this page exists so a WebView gets
+    the same original-look rendering plus a JS bridge for native
+    interactions (word taps, status updates, look mode, zoom, scroll).
+
+    track_page_open is False: reading-session bookkeeping stays with
+    the caller's /read/start_reading request.
+    """
+    book = _find_book(bookid)
+    if book is None or (book.book_type or "") != "epub":
+        return f"No epub book matching id {bookid}.", 404
+    ctx = Service(db.session).epub_page_context(book, pagenum, False)
+    if ctx is None:
+        return f"Book {bookid} has no extracted chapter at page {pagenum}.", 404
+
+    look = request.args.get("look", "original")
+    if look not in _EPUB_LOOKS:
+        look = "original"
+    lang = book.language
+    furigana_arg = request.args.get("furigana")
+    if furigana_arg is None:
+        show_furigana = bool(lang.show_furigana) and shadowing.supports_readings(lang)
+    else:
+        show_furigana = furigana_arg == "1"
+    return render_template(
+        "read/epub_render.html",
+        look=look,
+        is_rtl=lang.right_to_left,
+        html_title=book.title,
+        lang_id=lang.id,
+        show_furigana=show_furigana,
+        furigana_script=_furigana_script(lang),
+        triple=request.args.get("triple") == "1",
+        **ctx,
+    )
+
+
 @bp.route("/empty", methods=["GET"])
 def empty():
     "Show an empty/blank page."
@@ -1712,9 +1765,15 @@ def local_dict_lookup(langid, text):
     The language's local dictionaries are tried in tab order; ``gloss``
     is null when none has an entry -- the caller falls back to online
     translation.  Nothing is created.
+
+    ``compact`` is the same entry reduced to its definitions (see
+    gloss_format.compact_gloss): the auto-fill saves that, not the
+    whole card -- a translation holding the entry's tail of example
+    sentences makes every popup and flashcard that shows it enormous.
     """
     lang = db.session.get(Language, langid)
-    return jsonify({"gloss": _local_gloss(lang, langid, text)})
+    gloss = _local_gloss(lang, langid, text)
+    return jsonify({"gloss": gloss, "compact": gloss_format.compact_gloss(gloss)})
 
 
 @bp.route("/flashcopied", methods=["GET"])

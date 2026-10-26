@@ -98,6 +98,13 @@
         color: var(--link-color, #4a90d9);
       }
 
+      /* Phonetic line (/wɜːd/ ; NAmE /wɜːrd/): quiet, between the term
+         and the senses -- information, not content. */
+      .ld-phonetic {
+        color: color-mix(in srgb, var(--font-color, #888) 62%, transparent);
+        font-size: 0.85rem;
+      }
+
       /* Section headers (惯用语 / 补充说明): a hairline and a label. */
       .ld-section {
         display: flex;
@@ -118,7 +125,9 @@
 
       /* Numbered senses.  The dictionaries carry no explicit numbers,
          so the parser assigns them per sense run; a hanging indent
-         keeps the wrapped lines aligned under the text. */
+         keeps the wrapped lines aligned under the text.  A bilingual
+         entry's English counterpart (a unit of language under 词；单词)
+         rides under the Chinese, muted like the example translations. */
       .ld-sense {
         display: flex;
         gap: 0.5rem;
@@ -132,6 +141,11 @@
         font-size: 0.82rem;
         line-height: 1.85;
         color: var(--link-color, #4a90d9);
+      }
+      .ld-sense-en {
+        color: color-mix(in srgb, var(--font-color, #888) 65%, transparent);
+        font-size: 0.85rem;
+        line-height: 1.5;
       }
 
       /* Example pairs: the Japanese line, then its translation under
@@ -214,12 +228,14 @@
         {% for b in blocks %}
           {% if b.t == 'pos' %}
         <span class="ld-pos">{{ b.text }}</span>
+          {% elif b.t == 'phonetic' %}
+        <div class="ld-phonetic">{{ b.text }}</div>
           {% elif b.t == 'section' %}
         <div class="ld-section">{{ b.text }}</div>
           {% elif b.t == 'headword' %}
         <div class="ld-headword">{{ b.text }}</div>
           {% elif b.t == 'sense' %}
-        <div class="ld-sense"><span class="ld-no">{{ b.n }}</span><span>{{ b.text }}</span></div>
+        <div class="ld-sense"><span class="ld-no">{{ b.n }}</span><span>{% if b.en %}<div class="ld-sense-text">{{ b.text }}</div><div class="ld-sense-en">{{ b.en }}</div>{% else %}{{ b.text }}{% endif %}</span></div>
           {% elif b.t == 'example' %}
         <div class="ld-example">
           <div class="ld-ex-ja">{{ b.text }}</div>
@@ -228,7 +244,7 @@
           {% elif b.t == 'note' %}
         <div class="ld-note">{{ b.text }}</div>
           {% elif b.t == 'xref' %}
-        <a class="ld-xref" href="/read/localdict/{{ langid }}/{{ b.text | urlencode }}?reading={{ b.reading | urlencode }}">→ {{ b.text }}<span class="ld-xref-reading"> 【{{ b.reading }}】</span></a>
+        <a class="ld-xref" href="/read/localdict/{{ langid }}/{{ b.text | urlencode }}{% if b.reading %}?reading={{ b.reading | urlencode }}{% endif %}">→ {{ b.text }}{% if b.reading %}<span class="ld-xref-reading"> 【{{ b.reading }}】</span>{% endif %}</a>
           {% else %}
         <div class="ld-plain">{{ b.text }}</div>
           {% endif %}

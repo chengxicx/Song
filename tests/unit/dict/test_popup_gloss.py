@@ -307,3 +307,47 @@ def test_the_popup_drops_the_duplicated_headword_line(
 
     assert "終わり【おわり◎】" not in gloss
     assert gloss.startswith("名\n")
+
+
+# --- a translation that holds a whole dictionary card ------------------------
+#
+# The form's auto-fill used to save the entire entry -- the example tail
+# included -- into the term's translation, so the popup rendered the full
+# card and then the capped dictionary copy of it below (see
+# tts-translate.js and /read/localdict_lookup).  The popup now caps the
+# translation like it always capped the gloss, and drops the bordered
+# copy when the translation is that same entry.
+
+
+def test_the_popup_clamps_a_translation_that_runs_long(app_context, japanese):
+    t = Term(japanese, "たのしい")
+    t.translation = "\n".join(f"line {i}" for i in range(12))
+    db.session.add(t)
+    db.session.commit()
+
+    d = _service().get_popup_data(t.id)
+
+    lines = d.translation.split("<br />")
+    assert len(lines) == DICT_GLOSS_POPUP_MAX_LINES + 1, "five lines and a '…'"
+    assert lines[-1] == "…", "the cut is visible"
+    assert lines[0] == "line 0", "the first lines stay"
+    assert "line 11" not in d.translation, "the tail is cut"
+
+
+def test_the_gloss_is_not_repeated_when_the_translation_is_the_entry(
+    app, app_context, dict_dirs, japanese
+):
+    _import(app, dict_dirs[1], entries=[LONG_ENTRY], name="long.mdx")
+    _use(japanese)
+    t = _owari_term(japanese)
+    gloss = service.lookup("終わり", "おわり", service.default_name())
+    assert gloss, "the fixture entry must be reachable through its reading"
+    t.translation = gloss  # exactly what the auto-fill used to save
+    db.session.add(t)
+    db.session.commit()
+
+    d = _service().get_popup_data(t.id)
+
+    assert d.dict_gloss is None, "the bordered copy of the entry is dropped"
+    assert "終，終了" in d.translation, "the translation still shows the senses"
+    assert d.translation.split("<br />")[-1] == "…", "and is capped"

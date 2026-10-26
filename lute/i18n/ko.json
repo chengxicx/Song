@@ -857,5 +857,21 @@
   "Waiting for the background analysis to start…": "백그라운드 분석이 시작되기를 기다리는 중…",
   "It keeps running in the background, so you can keep reading.": "분석은 백그라운드에서 계속됩니다. 계속 읽으셔도 됩니다.",
   "The whole-book analysis took too long. Please try again.": "책 전체 분석이 너무 오래 걸렸습니다. 잠시 후 다시 시도해 주세요.",
-  "The whole-book analysis failed. Please try again.": "책 전체 분석에 실패했습니다. 잠시 후 다시 시도해 주세요."
+  "The whole-book analysis failed. Please try again.": "책 전체 분석에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+  "Font": "글꼴",
+  "Theme default": "테마 기본",
+  "Serif": "세리프",
+  "Sans-serif": "산세리프",
+  "Mincho": "명조체",
+  "Gothic": "고딕체",
+  "Round Gothic": "둥근 고딕체",
+  "Songti": "송체",
+  "Heiti": "흑체",
+  "Kaiti": "해서체",
+  "Yuanti": "원체",
+  "Myeongjo": "명조체",
+  "Naskh": "나스흐체",
+  "System fonts": "시스템 글꼴",
+  "Browse system fonts": "시스템 글꼴 불러오기",
+  "Could not read the system fonts": "시스템 글꼴을 읽을 수 없습니다"
 }

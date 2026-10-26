@@ -44,6 +44,32 @@ CSS，词条由 `lute-epub-reader.js` 注入原文。此前章节渲染在 Lute 
 - **固定版式**：`#thetext.epub-fixed-container` 走 PDF 同款固定页机制
   （`_isMangaReader` / `_fitMangaPage` / 面板内滚动），每章一页。
 
+## 移动端独立渲染页（`/read/epub_render/<bookid>/<pagenum>`）
+
+LuteForMobile 的阅读器是原生 Flutter 渲染,不能跑网页版的 mount 流程;它用
+WebView 加载这个独立页获得同样的原书外观。页面是精简的完整 HTML 文档:
+
+- 结构与网页阅读页一致(`div#thetext.epub-text-container` + 外观 class +
+  `#epub-chapter` + 两个 JSON 节点),复用 `styles.css` 与
+  `lute-epub-reader.js`,`EpubReader.mount` 注入词条 span,流程与网页相同;
+- 用户主题 CSS(`/theme/current`)照常下发,`theme` 外观与网页一致;
+- 查询参数:`?look=original|night|theme` 预置外观(避免加载闪错主题)、
+  `?furigana=0|1` 覆盖语言的振假名默认(不传则跟随语言设置);
+- 振假名:`lute-furigana.js` 的 `annotate()` 不检查 `enabled`,所以"关"
+  必须"不加载脚本"——默认关时模板不输出该 `<script>`,开启由桥接动态注入;
+- 内联桥接脚本(`window.LuteEpubBridge`):
+  - `setStatus(wid, cls)` 更新词条状态色(单击/双击手势由 JS 时间窗区分后
+    经 `flutter_inappwebview.callHandler` 上报原生端);
+  - `setLook(mode)` / `setFurigana(on)` / `setZoom(f)` / `zoomIn` /
+    `zoomOut` / `resetZoom` / `restoreScroll(top)`;
+  - 固定版式适宽与缩放逻辑从 `read/index.html`(`_fitMangaPage` 的
+    epub-fixed 分支、`_applyEpubZoom`)**复制移植**,不与网页共享代码,
+    网页阅读页不受影响;
+  - 滚动位置经 `luteEpubScroll` 上报(`{top, max, fixed}`),由 App 持久化
+    并在加载后经 `restoreScroll` 恢复。
+
+网页阅读页(`/read/start_reading` 片段 + `read/index.html`)完全不变。
+
 ## 相关测试
 
 - `tests/unit/book/test_epub_reader_mode.py` —— keep_colors、双样式表、

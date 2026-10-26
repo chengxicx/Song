@@ -551,11 +551,23 @@ let _get_textitems_text = function(textitemspans) {
   };
   const paras = _partition_by_paragraph_id(textitemspans);
   const paratexts = Object.entries(paras).map(([pid, spans]) => {
-    // grammarVisibleText (lute-commands.js) drops <rt>/<rp>: a furigana'd
-    // span's .text() flattens the reading into the sentence ("体が" became
+    // The paragraph's text is the DOM between its first and last span, not
+    // just the spans concatenated.  On classic text pages every token,
+    // spaces included, is a span, so the two are the same -- but in the
+    // EPUB reader (and PDF pages) whitespace tokens get no span and the
+    // spaces between words live as raw text nodes outside any .textitem;
+    // joining only the span texts glued the words together ("Hereisacat.").
+    // <rt>/<rp> are dropped from the clone: a furigana'd span's flattened
+    // .text() reads the pronunciation into the sentence ("体が" became
     // "体からだが"), polluting sentence translation, copy, and Anki export.
-    let ptext = spans.map(s => grammarVisibleText(s)).join('');
-    return ptext.replace(/\u200B/g, '');
+    const range = document.createRange();
+    range.setStartBefore(spans[0]);
+    range.setEndAfter(spans[spans.length - 1]);
+    const frag = range.cloneContents();
+    // Furigana readings and the per-sentence 🔊 button injected by tts.js
+    // (skipped by the EpubReader's own text walk, see its SKIP_SELECTOR).
+    frag.querySelectorAll('rt, rp, .lute-sentence-play-btn').forEach(e => e.remove());
+    return frag.textContent.replace(/\u200B/g, '');
   });
   return paratexts.join('\n').trim();
 }

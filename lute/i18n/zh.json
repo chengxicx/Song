@@ -857,5 +857,21 @@
   "Waiting for the background analysis to start…": "正在等待后台开始分析…",
   "It keeps running in the background, so you can keep reading.": "后台仍在分析，你可以继续阅读。",
   "The whole-book analysis took too long. Please try again.": "整本书分析耗时过长，请稍后再试。",
-  "The whole-book analysis failed. Please try again.": "整本书分析失败，请稍后再试。"
+  "The whole-book analysis failed. Please try again.": "整本书分析失败，请稍后再试。",
+  "Font": "字体",
+  "Theme default": "主题默认",
+  "Serif": "衬线",
+  "Sans-serif": "无衬线",
+  "Mincho": "明朝体",
+  "Gothic": "黑体",
+  "Round Gothic": "丸黑体",
+  "Songti": "宋体",
+  "Heiti": "黑体",
+  "Kaiti": "楷体",
+  "Yuanti": "圆体",
+  "Myeongjo": "韩文明朝体",
+  "Naskh": "纳斯赫体",
+  "System fonts": "系统字体",
+  "Browse system fonts": "浏览系统字体",
+  "Could not read the system fonts": "无法读取系统字体"
 }
