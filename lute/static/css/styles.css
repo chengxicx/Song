@@ -1491,6 +1491,20 @@ div#thetext.epub-text-container.epub-look-night .epub-body {
     margin: 0;
 }
 
+/* Narrow panes (phones, and the mobile WebView, which is the main
+   reader for these books): the roomy sheet above spends 2.8rem of side
+   padding plus a 1rem outer margin, which on a ~360-470px viewport is
+   over a quarter of the width -- the text column ends up narrow and
+   swimming in blank.  Tighten the sheet instead of the book: its own
+   margins stay, so the chapter keeps its measure and its palette. */
+@media (max-width: 48rem) {
+    div#thetext.epub-text-container.epub-look-original #epub-chapter,
+    div#thetext.epub-text-container.epub-look-night #epub-chapter {
+        margin: 0.5rem auto;
+        padding: 1.2rem 1rem;
+    }
+}
+
 /* Night: the whole chapter is inverted onto dark paper (the classic
    e-reader night mode).  Images and videos are inverted back so photos
    and art keep their colours.  The injected status-highlight spans are
