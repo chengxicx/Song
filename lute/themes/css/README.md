@@ -32,6 +32,25 @@ To migrate a theme off `!important`:
    stylesheet (DataTables/Tagify) or a legacy theme-level global rule;
    leave a comment saying what the `!important` is fighting.
 
+## The reader-mode EPUB paper
+
+The "original" look paints a sheet for the book's own palette, and the
+sheet follows the theme:
+
+- A **light** theme sets nothing: the sheet is white and the chapter
+  renders as authored (`--paper-bg` falls back to `#fff`,
+  `--paper-filter` to `none`).
+- A **dark** theme sets `--paper-bg: #16161d` and
+  `--paper-filter: invert(0.88) hue-rotate(180deg)`, so the sheet is
+  dark and the chapter is inverted onto it exactly like the night look
+  (images and videos are inverted back).  The ink inside the sheet stays
+  dark in the CSS — the filter is what makes it light — because a theme
+  that forced its own light ink onto the reading column would invert to
+  near-black on near-black.
+
+The night look is always dark, whatever the theme is.
+
+
 Note: Default.css still carries many non-color rules (geometry,
 backdrop filters, DataTables control layout).  Those stay in the theme
 for now — moving them into styles.css would change the look of the

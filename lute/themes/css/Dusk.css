@@ -11,6 +11,9 @@ body {
   --status-99-color: #419252;
 
   --background-color: #48484a;
+  /* 纸面外观跟随主题：深色纸 + 反相正文（见 styles.css 的 .epub-look-original）。 */
+  --paper-bg: #16161d;
+  --paper-filter: invert(0.88) hue-rotate(180deg);
   --light-grey: #c4c8ce;
   --font-color: #EBEBEB;
   --dark-grey: #333333;
