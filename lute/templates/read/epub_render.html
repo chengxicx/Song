@@ -328,39 +328,73 @@
 
     /* ---- boot ---- */
 
+    /* The app veils the WebView until the chapter is mounted *and* its
+       status colours are painted.  Before that the document is the
+       book's own raw markup -- no word spans, no status colours -- which
+       reads as a broken page rather than a loading one, and the mount is
+       the one part of the load the app cannot observe on its own.
+
+       Report on every path, including the ones that bail out: a chapter
+       whose token stream does not match, or a document without the
+       container, must still lift the veil instead of leaving it up until
+       the app's timeout. */
+    function reportReady() {
+      try {
+        var bridge = window.flutter_inappwebview;
+        if (!bridge || typeof bridge.callHandler !== "function") return;
+        var c = chapter();
+        bridge.callHandler("luteEpubReady", {
+          ms: Math.round(window.performance ? performance.now() : 0),
+          mounted: !!(c && c.dataset.epubMounted),
+          mismatch: !!(c && c.dataset.epubMismatch)
+        });
+      } catch (err) {
+        // No app on the other end (plain browser): nothing to report to.
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
       var wrap = thetext();
       var c = chapter();
-      if (!wrap || !c) return;
-
-      if (!isFixed()) {
-        // Scrolling mode: the whole document scrolls (same class the
-        // web reading page adds -- it unhides overflow on #thetext).
-        wrap.classList.add("video-scroll-mode");
+      if (!wrap || !c) {
+        reportReady();
+        return;
       }
 
-      if (window.EpubReader) {
-        var look = {{ look | tojson }};
-        if (LOOKS.indexOf(look) < 0) look = "original";
-        // setLook persists to localStorage and applies the classes +
-        // stylesheet before mount reads them back.
-        window.EpubReader.setLook(look);
-        window.EpubReader.mount(c);
-      }
+      try {
+        if (!isFixed()) {
+          // Scrolling mode: the whole document scrolls (same class the
+          // web reading page adds -- it unhides overflow on #thetext).
+          wrap.classList.add("video-scroll-mode");
+        }
 
-      addStatusClasses();
-      // Explicit call, like read/epub_page.html's mount script: the
-      // deferred furigana script self-ran before this listener (before
-      // mount), so its pass found no spans.
-      if (furiganaLoaded &&
-          typeof window.lute_furigana_annotate === "function") {
-        window.lute_furigana_annotate();
+        if (window.EpubReader) {
+          var look = {{ look | tojson }};
+          if (LOOKS.indexOf(look) < 0) look = "original";
+          // setLook persists to localStorage and applies the classes +
+          // stylesheet before mount reads them back.
+          window.EpubReader.setLook(look);
+          window.EpubReader.mount(c);
+        }
+
+        addStatusClasses();
+        // Explicit call, like read/epub_page.html's mount script: the
+        // deferred furigana script self-ran before this listener (before
+        // mount), so its pass found no spans.
+        if (furiganaLoaded &&
+            typeof window.lute_furigana_annotate === "function") {
+          window.lute_furigana_annotate();
+        }
+        if (isFixed()) {
+          fitFixedPage();
+          wrap.addEventListener("scroll", onScroll, { passive: true });
+        }
+        reportScroll();
+      } finally {
+        // Also reached when a step above threw: the veil lifts and the
+        // reader can see whatever did render.
+        reportReady();
       }
-      if (isFixed()) {
-        fitFixedPage();
-        wrap.addEventListener("scroll", onScroll, { passive: true });
-      }
-      reportScroll();
     });
 
     /* ---- the app-facing bridge ---- */
