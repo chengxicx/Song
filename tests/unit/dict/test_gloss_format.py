@@ -303,7 +303,9 @@ def test_compact_keeps_the_pos_and_senses_and_drops_the_examples():
         ]
     )
 
-    assert compact_gloss(gloss) == ("他动·二类\n吃。（飲食物をいただく。）\n生活。（生計を立てる。）")
+    assert compact_gloss(gloss) == (
+        "他动·二类\n吃。（飲食物をいただく。）\n生活。（生計を立てる。）"
+    )
 
 
 def test_compact_caps_the_total_length_with_an_ellipsis():
@@ -602,7 +604,6 @@ def test_a_definition_glued_onto_an_examples_translation_becomes_a_sense():
     assert blocks[5]["en"].startswith("the fact of an idea")
 
 
-
 # --- Oxford's inline apparatus --------------------------------------------
 #
 # Beyond the markers, the Oxford conversion glues three more kinds of
@@ -891,19 +892,19 @@ def test_standard_korean_entry_keeps_its_own_numbers_and_bullets():
     blocks = parse_gloss(STANDARD_SARANG)
 
     assert types(blocks) == [
-        "section",   # I -- the homograph divider
+        "section",  # I -- the homograph divider
         "headword",  # 사랑1
-        "pos",       # [명사]
-        "sense",     # 1 아끼고...
-        "example",   # * 어머님의 ~.
-        "example",   # *나라와 겨레에 대한 ~.
-        "sense",     # 2 남녀가...
-        "example",   # * ~을 맺다(속삭이다).
-        "section",   # I I
+        "pos",  # [명사]
+        "sense",  # 1 아끼고...
+        "example",  # * 어머님의 ~.
+        "example",  # *나라와 겨레에 대한 ~.
+        "sense",  # 2 남녀가...
+        "example",  # * ~을 맺다(속삭이다).
+        "section",  # I I
         "headword",  # 사랑2 【舍廊】
-        "pos",       # [명사]
-        "sense",     # 바깥주인이... (a Hangul definition, not an example)
-        "xref",      # ⇔ 내실1
+        "pos",  # [명사]
+        "sense",  # 바깥주인이... (a Hangul definition, not an example)
+        "xref",  # ⇔ 내실1
     ]
     assert blocks[3]["n"] == 1
     assert blocks[3]["text"].startswith("아끼고")
@@ -921,11 +922,9 @@ def test_standard_korean_definition_line_is_a_sense_not_an_example():
 
 
 def test_korean_pos_badge_with_conjugation_type_stays_whole():
-    blocks = parse_gloss(
-        """가다1
+    blocks = parse_gloss("""가다1
 [자동사]〖거라불규칙/가거라〗
-1 	(이곳에서) 다른 곳으로 옮다(이동하다)."""
-    )
+1 	(이곳에서) 다른 곳으로 옮다(이동하다).""")
 
     assert blocks[0]["t"] == "headword"
     assert blocks[1] == {"t": "pos", "text": "[자동사]〖거라불규칙/가거라〗"}
@@ -958,3 +957,23 @@ def test_russian_entry_opens_with_a_pos_prefixed_translation():
     assert types(blocks) == ["pos", "sense", "sense", "sense"]
     assert blocks[0]["text"] == "名词"
     assert blocks[1] == {"t": "sense", "text": "书", "n": 1}
+
+
+# --- 西汉 (Spanish-Chinese) entries ------------------------------------------
+
+
+def test_a_spanish_gender_label_line_is_a_pos_badge():
+    blocks = parse_gloss("casa\nf.\n房子,家,家务,商号,社,所,顾主")
+
+    assert types(blocks) == ["sense", "pos", "sense"]
+    assert blocks[0]["text"] == "casa"
+    assert blocks[1] == {"t": "pos", "text": "f."}
+    assert blocks[2] == {"t": "sense", "text": "房子,家,家务,商号,社,所,顾主", "n": 1}
+
+
+def test_a_spanish_entry_after_headword_strip_is_a_pos_and_its_sense():
+    "The repeated headword lines come off in strip_duplicate_headword."
+    blocks = parse_gloss("f.\n房子,家,家务")
+
+    assert types(blocks) == ["pos", "sense"]
+    assert blocks[1] == {"t": "sense", "text": "房子,家,家务", "n": 1}

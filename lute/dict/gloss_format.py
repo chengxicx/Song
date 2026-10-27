@@ -109,9 +109,10 @@ _SLASH_PHONETIC_RE = re.compile(r"/[^/]+/")
 
 # A whole line of English part-of-speech abbreviations.  "and"/"或" are
 # fillers, not POS words, and at least one real abbreviation is required.
+# "f"/"m" are the gender labels the 西汉 dictionaries give a noun.
 _EN_POS_WORDS = frozenset(
     "n v vt vi adj adv art abbr aux conj interj int neg num prep pron "
-    "prefix suffix modal part det t i c u "
+    "prefix suffix modal part det t i c u f m "
     "noun verb adjective adverb article preposition conjunction pronoun "
     "interjection exclamation numeral auxiliary determiner particle "
     "abbreviation".split()
@@ -355,9 +356,7 @@ _DERIVED_MARK = "\U000025b8"  # ▸
 # conversion glued it onto.
 _IDIOM_MARK = "\U000025cf"  # ●
 
-_MARK_RE = re.compile(
-    f"([{_KEY_MARK}{_GUIDE_MARK}{_EXAMPLE_MARK}{_IDIOM_MARK}])"
-)
+_MARK_RE = re.compile(f"([{_KEY_MARK}{_GUIDE_MARK}{_EXAMPLE_MARK}{_IDIOM_MARK}])")
 _MARK_KINDS = {
     _KEY_MARK: "key",
     _GUIDE_MARK: "guide",
@@ -517,9 +516,7 @@ def _split_usage_notes(text, kind=None):
         notes.insert(0, f"See also: {match.group(1).strip()}")
         text = text[: match.start()].rstrip()
     return text, [
-        n
-        for n in notes
-        if n and not n.endswith(":") and not _is_vocabulary_list(n)
+        n for n in notes if n and not n.endswith(":") and not _is_vocabulary_list(n)
     ]
 
 
@@ -533,8 +530,7 @@ def _is_headword_line(text):
     """
     match = _PHONETIC_START_RE.search(text)
     return (
-        match is not None
-        and _PHONETIC_GROUP_RE.search(text[: match.start()]) is None
+        match is not None and _PHONETIC_GROUP_RE.search(text[: match.start()]) is None
     )
 
 
@@ -651,7 +647,10 @@ def _split_after_translation(text):
         leading = unlabelled[: first_zh.start()]
         if len(re.findall(r"[A-Za-z]{2,}", leading)) < 3:
             continue
-        if re.search(r"[\u3000-\u303f\uff01-\uff0f\uff1a-\uff20\uff3b-\uff40\uff5b-\uff65]", leading):
+        if re.search(
+            r"[\u3000-\u303f\uff01-\uff0f\uff1a-\uff20\uff3b-\uff40\uff5b-\uff65]",
+            leading,
+        ):
             # English inside a Chinese sentence ("mess about，set about
             # 等短语动词"), not the English definition of a new sense.
             continue
@@ -678,9 +677,7 @@ _INFLECTION_START_RE = re.compile(
 # ab·cuses BrE /…/ NAmE /…/ )".  Only the parenthetical, and only when
 # the plural form is what it opens with -- "suffix (in plural nouns …)"
 # is part of the suffix's gloss.
-_INFLECTION_PAREN_RE = re.compile(
-    r"\((?:feminine\s+[^,()]+,\s*)?plural\b[^()]*\)"
-)
+_INFLECTION_PAREN_RE = re.compile(r"\((?:feminine\s+[^,()]+,\s*)?plural\b[^()]*\)")
 # The table's last row is "-ing form <form> BrE /…/ NAmE /…/"; the NAmE
 # group is where the table stops and the definition starts.
 _TABLE_END_RE = re.compile(r"NAmE\s*/[^/]+/")
@@ -691,9 +688,7 @@ _TABLE_END_RE = re.compile(r"NAmE\s*/[^/]+/")
 # for the past tense. … [T] cannot/could not abide …").  It is guidance
 # about the word, not the word's meaning, and it runs until the next
 # sense opens ("[T]", "~ sth", a marker) or the entry ends.
-_HELP_RE = re.compile(
-    r"\s*HELP\b.*?(?=\s*(?:\[[A-Za-z]|~|◆|▸|➡|●|SYN\b)|$)", re.S
-)
+_HELP_RE = re.compile(r"\s*HELP\b.*?(?=\s*(?:\[[A-Za-z]|~|◆|▸|➡|●|SYN\b)|$)", re.S)
 
 
 def _strip_help_note(text):
@@ -847,9 +842,7 @@ _TRAILING_ENGLISH_MIN_CHARS = 20
 # A spelling or vocabulary list is a run of comma-separated short items
 # ("arid, climate, continental climate, equatorial, …").  No translation
 # ends that way; the list is a source appendix glued to it.
-_TRAILING_COMMA_LIST_RE = re.compile(
-    r"^(?:[A-Za-z][A-Za-z'\u2019\-]*\s*,?\s*){3,}"
-)
+_TRAILING_COMMA_LIST_RE = re.compile(r"^(?:[A-Za-z][A-Za-z'\u2019\-]*\s*,?\s*){3,}")
 
 
 def _is_appendix_list(tail):
@@ -873,10 +866,7 @@ def _trim_trailing_english(translation):
         tail = translation[match.start() :]
         if _is_appendix_list(tail):
             return head
-        if (
-            len(tail) >= _TRAILING_ENGLISH_MIN_CHARS
-            and _CJK_RE.search(tail) is None
-        ):
+        if len(tail) >= _TRAILING_ENGLISH_MIN_CHARS and _CJK_RE.search(tail) is None:
             return head
     return translation
 
