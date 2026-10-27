@@ -215,6 +215,30 @@ _ROMAN_LINE_RE = re.compile(r"^[IVXivx]{1,5}(?:\s+[IVXivx]{1,5})*$")
 _CJK_POS_PREFIX_RE = re.compile(r"^([名代动形副接连助词感叹]{1,2})[\s　]+(\S.*)$")
 
 
+# ---- German (汉德) dictionary conventions ----
+#
+# The 汉德大辞典 marks a part of speech with a bracketed German label
+# and follows each meaning with an example triple -- the Chinese
+# sentence, its pinyin, then the German translation:
+#
+#     学习
+#     [xue2 xi2]
+#     [ Substantiv ]
+#     Studium (n)
+#     我在大学学习中文。
+#     wo3 zai4 da4 xue2 xue2 xi2 zhong1 wen2 .
+#     Ich studiere an der Uni Sinologie.
+
+_DE_POS_RE = re.compile(
+    r"^\[\s*(Substantiv|Verb|Adjektiv|Adverb|Präposition|Konjunktion|"
+    r"Interjektion|Pronomen|Numeral|Numerale|Partikel)\s*\]$"
+)
+
+# A pinyin line: latin syllables with tone digits, no CJK anywhere.
+_PINYIN_LINE_RE = re.compile(r"^[A-Za-z0-9\s,;:\.\?\!…\-'\(\)]+$")
+_PINYIN_TONE_RE = re.compile(r"[a-z][1-5]\b")
+
+
 # ---- Russian dictionary conventions ----
 #
 # The 俄汉汉俄 dictionary ends an entry with one long line whose
@@ -1055,6 +1079,15 @@ def parse_gloss(gloss):
             i += 1
             continue
 
+        if _DE_POS_RE.match(line):
+            # "[ Substantiv ]" / "[ Verb ]": the 汉德大辞典's part of
+            # speech; the brackets are labels, not pronunciation.
+            blocks.append({"t": "pos", "text": line.strip("[] ").strip()})
+            sense_no = 0
+            pending_example = None
+            i += 1
+            continue
+
         if _ROMAN_LINE_RE.match(line):
             # 표준국어대사전 separates homographs with roman numerals
             # ("I", "I I"): a divider, not content.  Before the part-of-
@@ -1174,6 +1207,34 @@ def parse_gloss(gloss):
             pending_example = block
             i += 1
             continue
+        elif (
+            pending_example is None
+            and blocks
+            and blocks[-1]["t"] in ("sense", "pos")
+            and _CJK_RE.search(line)
+            and line.endswith(("。", "！", "？"))
+        ):
+            # 汉德: a Chinese sentence after a German meaning opens the
+            # entry's example triple; the pinyin line follows, then the
+            # German translation (pending below).  Translations arriving
+            # while an example is pending are untouched -- they are the
+            # naver dictionary's shape, not this one.
+            block = {"t": "example", "text": line}
+            blocks.append(block)
+            pending_example = block
+            i += 1
+            continue
+        elif (
+            pending_example is not None
+            and _PINYIN_LINE_RE.match(line) is not None
+            and _PINYIN_TONE_RE.search(line) is not None
+        ):
+            # The example's pinyin: a muted line of its own.  The
+            # example stays pending -- the German translation is the
+            # line that actually follows it.
+            blocks.append({"t": "note", "text": line})
+            i += 1
+            continue
         elif pending_example is not None:
             pending_example["translation"] = line
             pending_example = None
@@ -1278,9 +1339,14 @@ def _looks_like_kanji_example(line, following):
     """
     True for a kanji-only example line: short, no sentence-ending mark,
     and the next line is a kana-free translation that has one.
+
+    The line must actually carry CJK: a short latin line before a
+    Chinese sentence ("Studium (n)" in the 汉德大辞典) is that
+    dictionary's meaning, not an example.
     """
     return (
-        following is not None
+        _CJK_RE.search(line) is not None
+        and following is not None
         and len(line) <= _KANJI_EXAMPLE_MAX_CHARS
         and not line.endswith("。")
         and not _KANA_RE.search(following)

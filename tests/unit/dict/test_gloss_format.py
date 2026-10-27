@@ -977,3 +977,60 @@ def test_a_spanish_entry_after_headword_strip_is_a_pos_and_its_sense():
 
     assert types(blocks) == ["pos", "sense"]
     assert blocks[1] == {"t": "sense", "text": "房子,家,家务", "n": 1}
+
+
+# --- 汉德 (Chinese-German) entries -------------------------------------------
+
+
+HANDE_XUEXI = """学习
+[xue2 xi2]
+[ Substantiv ]
+Studium (n)
+我在大学学习中文。
+wo3 zai4 da4 xue2 xue2 xi2 zhong1 wen2 .
+Ich studiere an der Uni Sinologie.
+[ Verb ]
+<Psychologie> lernen
+活到老，学习到老。
+huo2 dao4 lao3 , xue2 xi2 dao4 lao3 .
+lebenslang lernen
+lernen; studieren"""
+
+
+def test_hande_entry_gets_german_pos_meanings_and_example_triples():
+    blocks = parse_gloss(HANDE_XUEXI)
+
+    assert types(blocks) == [
+        "sense",  # 学习 (dropped at lookup by strip_duplicate_headword)
+        "phonetic",  # [xue2 xi2]
+        "pos",  # Substantiv
+        "sense",  # Studium (n)
+        "example",  # 我在大学学习中文。
+        "note",  # the pinyin
+        "pos",  # Verb
+        "sense",  # <Psychologie> lernen
+        "example",  # 活到老，学习到老。
+        "note",  # the pinyin
+        "sense",  # lernen; studieren
+    ]
+    assert blocks[2]["text"] == "Substantiv"
+    assert blocks[4]["text"] == "我在大学学习中文。"
+    assert blocks[4]["translation"] == "Ich studiere an der Uni Sinologie."
+    assert blocks[5]["text"].startswith("wo3 zai4")
+    assert blocks[8]["translation"] == "lebenslang lernen"
+
+
+def test_a_short_latin_line_before_a_chinese_sentence_is_a_meaning():
+    '"Studium (n)" is the dictionary\'s German meaning, not a kanji example.'
+    blocks = parse_gloss("[ Substantiv ]\nStudium (n)\n我在大学学习中文。")
+
+    assert blocks[0] == {"t": "pos", "text": "Substantiv"}
+    assert blocks[1] == {"t": "sense", "text": "Studium (n)", "n": 1}
+    assert blocks[2]["t"] == "example"
+
+
+def test_a_hande_meaning_pair_runs_into_a_final_summary_sense():
+    "lernen; studieren after the example triple is the word's summary."
+    blocks = parse_gloss(HANDE_XUEXI)
+
+    assert blocks[-1] == {"t": "sense", "text": "lernen; studieren", "n": 2}
