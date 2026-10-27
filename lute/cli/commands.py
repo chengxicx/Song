@@ -11,6 +11,8 @@ from flask import Blueprint
 from lute.db import db
 from lute.cli.language_term_export import generate_language_file, generate_book_file
 from lute.cli.import_books import import_books_from_csv
+from lute.cli.epub_resplit import format_report as format_resplit_report
+from lute.cli.epub_resplit import run_resplit
 from lute.cli.term_parent_backfill import (
     format_report,
     plan_as_dict,
@@ -287,6 +289,49 @@ def parent_backfill_undo_cmd(audit, commit, delete_created_terms, user_option):
                 "Parent terms: %d deleted, %d kept (still referenced)."
                 % (terms_removed, terms_kept)
             )
+
+
+@bp.cli.command("epub_resplit")
+@click.option(
+    "--commit",
+    is_flag=True,
+    help="""
+    Write the split pages and rebuild the book's pages. If not set,
+    report only: nothing is written.
+""",
+)
+@click.option(
+    "--book",
+    "book_id",
+    type=int,
+    default=None,
+    help="Only this book id (a canary run).",
+)
+@click.option(
+    "--user",
+    "user_option",
+    default=None,
+    help="""
+    Multi-user mode only: the account whose database this command runs
+    against.  Required in multi-user mode; ignored in single-user mode.
+""",
+)
+def epub_resplit_cmd(commit, book_id, user_option):
+    """
+    Re-split reader-mode EPUB chapters imported before chapter splitting.
+
+    A chapter longer than epub_extract.PAGE_CHAR_BUDGET is normally
+    written as several pages at import; one imported before that is a
+    single page however long it is.  This re-splits it from the extracted
+    markup already on disk (the .epub file is not needed).
+
+    Page 1 keeps its row -- id, read date, bookmarks, progress pointer --
+    and term statuses are untouched: they live on the terms, not on the
+    pages.  Safe to re-run.
+    """
+    with _user_scope_context(user_option):
+        result = run_resplit(commit=commit, book_id=book_id)
+        print(format_resplit_report(result))
 
 
 @bp.cli.command("review_sync")
