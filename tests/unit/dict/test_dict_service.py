@@ -404,7 +404,10 @@ def test_strip_duplicate_headword_keeps_a_different_headword():
 def test_strip_duplicate_headword_keeps_a_first_line_with_content():
     "Not every definition opens with a bare headword."
     assert service.strip_duplicate_headword("箱は\n名\n箱子", "箱") == "箱は\n名\n箱子"
-    assert service.strip_duplicate_headword("終わりです。\n名", "終わり") == "終わりです。\n名"
+    assert (
+        service.strip_duplicate_headword("終わりです。\n名", "終わり")
+        == "終わりです。\n名"
+    )
 
 
 def test_strip_duplicate_headword_keeps_a_headword_only_entry():
@@ -414,7 +417,9 @@ def test_strip_duplicate_headword_keeps_a_headword_only_entry():
 
 def test_strip_duplicate_headword_ignores_zero_width_spaces():
     "Lute joins multi-token terms with one; a dictionary key never has it."
-    assert service.strip_duplicate_headword("たのしい\n愉快", "たの\u200bしい") == "愉快"
+    assert (
+        service.strip_duplicate_headword("たのしい\n愉快", "たの\u200bしい") == "愉快"
+    )
 
 
 def test_strip_duplicate_headword_passes_empty_input_through():
@@ -506,3 +511,12 @@ def test_a_dictionary_with_no_metadata_falls_back_to_its_file_name(
     _drop_pool_file(static_dir, "handmade.db")
 
     assert service.status("handmade.db")["title"] == "handmade.db"
+
+
+def test_repeated_headword_lines_all_come_off(app, app_context, dict_dirs):
+    "SCCS restates the headword twice; the card starts at the POS."
+    static_dir, _scratch = dict_dirs
+    _drop_pool_file(static_dir, "spanish-zh.db", {"title": "SCCS.mdx"})
+    gloss = "casa\ncasa\nf.\n房子,家,家务"
+
+    assert service.strip_duplicate_headword(gloss, "casa") == "f.\n房子,家,家务"

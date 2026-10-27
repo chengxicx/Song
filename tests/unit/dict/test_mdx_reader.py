@@ -125,7 +125,9 @@ def test_clean_definition_truncates():
 
 def test_clean_definition_truncates_between_words_and_sentences():
     "The card must never show half a word or half a sentence."
-    words = MdxReader.clean_definition("<div>" + "word " * 400 + "</div>", max_chars=100)
+    words = MdxReader.clean_definition(
+        "<div>" + "word " * 400 + "</div>", max_chars=100
+    )
     assert len(words) <= 100
     assert words.endswith("word")
 
@@ -189,3 +191,12 @@ def test_unsupported_encoding_is_rejected():
 def test_short_file_is_rejected():
     with pytest.raises(MdxError, match="too short"):
         MdxReader(b"abc")
+
+
+def test_literal_newline_escapes_become_real_line_breaks():
+    "MDict sources carry '\\n' as text; the card must not show it."
+    flat = MdxReader.clean_definition(
+        "<center>casa</center><br/>casa\\n\\nf.\\n\\n房子,家", max_chars=800
+    )
+
+    assert flat.split("\n") == ["casa", "casa", "f.", "房子,家"]

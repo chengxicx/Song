@@ -36,7 +36,6 @@ import zlib
 from lute.dict.lzo1x import lzo1x_decompress
 from lute.dict.mdx_decrypt import decrypt_key_info_block
 
-
 _TAG_RE = re.compile(r"<[^>]+>")
 _HEADER_TAG_RE = re.compile(r'([A-Za-z0-9_]+)="([^"]*)"', re.S)
 _BR_RE = re.compile(r"<br\s*/?>", re.I)
@@ -48,6 +47,13 @@ class MdxError(ValueError):
 
 
 _SENTENCE_BREAK_RE = re.compile(r"[.!?。！？；;…]")
+
+# MDict sources sometimes carry literal "\n" (and "\r\n") as *text* --
+# escapes the author wrote that MDict itself renders as line breaks
+# (the 简明西汉汉西词典 separates its headword, part of speech and
+# senses with them).  Left alone they surface on the card as a visible
+# "\n\n" between the entry's parts.
+_LITERAL_NEWLINE_RE = re.compile(r"\\r\\n|\\n|\\r")
 
 
 def _truncate_at_boundary(text, limit):
@@ -506,6 +512,7 @@ class MdxReader:  # pylint: disable=too-many-instance-attributes
         d = _BR_RE.sub("\n", html_text or "")
         d = _BLOCK_END_RE.sub("\n", d)
         d = _TAG_RE.sub("", d)
+        d = _LITERAL_NEWLINE_RE.sub("\n", d)
         for entity, char in (
             ("&lt;", "<"),
             ("&gt;", ">"),
