@@ -30,7 +30,7 @@ import os
 from bs4 import BeautifulSoup
 
 from lute.book import epub_paths
-from lute.book.epub_extract import PAGE_CHAR_BUDGET, _page_groups
+from lute.book.epub_extract import PAGE_CHAR_BUDGET, _page_layout, split_page_file
 from lute.book.epub_parser import _extract_text
 from lute.db import db
 from lute.models.book import Book as DBBook
@@ -230,5 +230,28 @@ def test_pictures_count_towards_a_page():
     body = BeautifulSoup(
         "<body>" + '<p><img src="a.png"/></p>' * 30 + "</body>", "html.parser"
     )
-    _wrappers, groups = _page_groups(body.body, PAGE_CHAR_BUDGET)
-    assert len(groups) > 1
+    pages = _page_layout(body.body, PAGE_CHAR_BUDGET)
+    assert len(pages) > 1
+
+
+def test_furniture_beside_one_big_wrapper_still_splits():
+    """
+    The shape a Google-Books conversion actually has: `.epub-body` holds a
+    hidden anchor div and then one div.main with every paragraph.  The
+    hidden div must not become a blank page of its own, and div.main --
+    which is *not* the only child -- must still split at its paragraphs.
+    """
+    html = (
+        '<div class="epub-body">'
+        '<div style="display:none;"><a id="GBS.0028.01"></a></div>'
+        '<div class="main">'
+        + "".join(f"<p>{p}</p>" for p in PARAGRAPHS)
+        + "</div></div>"
+    )
+    pages = split_page_file(html)
+
+    assert len(pages) > 1
+    assert all(text.strip() for _html, text in pages), "no page is blank"
+    assert "\n".join(text for _html, text in pages) == "\n".join(PARAGRAPHS)
+    for page_html, _text in pages:
+        assert 'class="main"' in page_html, "the book's wrapper comes with each page"

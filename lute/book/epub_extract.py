@@ -482,11 +482,11 @@ def _write_chapter(zf, name_map, chapter, root_abs, root_rel):
         + ">"
     )
 
-    wrappers, groups = [], [_significant_children(body)]
+    layout = [((), _significant_children(body))]
     if not viewport:
-        wrappers, groups = _page_groups(body, PAGE_CHAR_BUDGET)
+        layout = _page_layout(body, PAGE_CHAR_BUDGET)
 
-    if len(groups) <= 1:
+    if len(layout) <= 1:
         html = wrapper + body.decode_contents() + "</div>"
         rel = f"ch/{chapter.index:03d}.html"
         _write_text(root_abs, rel, html)
@@ -498,7 +498,7 @@ def _write_chapter(zf, name_map, chapter, root_abs, root_rel):
         }
 
     pages = []
-    for number, nodes in enumerate(groups, start=1):
+    for number, (wrappers, nodes) in enumerate(layout, start=1):
         html = _page_html(classes, viewport, wrappers, nodes)
         rel = (
             f"ch/{chapter.index:03d}.html"
@@ -552,58 +552,104 @@ def _can_unwrap(node, budget):
 
     A wrapper of blocks (the `div.calibre` / `div.chapter` every
     converter adds) is exactly what has to go; a paragraph, a table or a
-    figure is one unit and must keep its page.
+    figure is one unit and must keep its page.  A container with no
+    block-level child is a paragraph in disguise (a text run, a line of
+    spans and anchors): cutting between those would cut text in half, so
+    it keeps its page.
     """
     if node.name not in _PAGE_CONTAINERS:
         return False
     if _node_len(node) <= budget:
         return False
-    children = _significant_children(node)
-    if not children:
-        return False
-    # A wrapper of a single wrapper (`div.calibre > div.chapter`) is the
-    # commonest shape there is, so one child is enough to descend; what
-    # rules a node out is *inline* content, i.e. a paragraph in disguise.
-    return not any(
-        isinstance(child, NavigableString) or child.name in _INLINE_NAMES
-        for child in children
+    return any(
+        not isinstance(child, NavigableString) and child.name not in _INLINE_NAMES
+        for child in _significant_children(node)
     )
 
 
-def _page_groups(container, budget, depth=0):
+def _page_layout(container, budget, wrappers=(), depth=0):
     """
-    Split `container`'s content into pages.
+    Lay `container`'s content out as pages.
 
-    Returns (wrappers, groups): `wrappers` is the chain of grouping
-    elements every page has to be re-created inside, and `groups` is a
-    list of node lists, one per page.  A single child bigger than the
-    budget is descended into, so a book that wraps its whole body in one
-    div still splits at the paragraphs inside it.
+    Each page is (wrappers, nodes): the chain of grouping elements it has
+    to be re-created inside, and the nodes it holds.  An oversized
+    wrapper is descended into *wherever it sits*, so a body of
+    `div.hidden + div.main > p*` splits at the paragraphs inside
+    `div.main` instead of putting the whole chapter on one page.
     """
-    nodes = _significant_children(container)
-    if len(nodes) == 1 and depth < _MAX_UNWRAP_DEPTH:
-        if _can_unwrap(nodes[0], budget):
-            wrappers, groups = _page_groups(nodes[0], budget, depth + 1)
-            return [nodes[0]] + wrappers, groups
-    return [], _group_by_budget(nodes, budget)
-
-
-def _group_by_budget(nodes, budget):
-    "Greedy grouping: fill a page until the next node would overflow it."
-    groups = []
+    pages = []
     current = []
     size = 0
-    for node in nodes:
+
+    def flush():
+        nonlocal current, size
+        if current:
+            pages.append((wrappers, list(current)))
+        current = []
+        size = 0
+
+    for node in _significant_children(container):
+        if depth < _MAX_UNWRAP_DEPTH and _can_unwrap(node, budget):
+            flush()
+            pages.extend(_page_layout(node, budget, wrappers + (node,), depth + 1))
+            continue
         length = _node_len(node)
         if current and size + length > budget:
-            groups.append(current)
-            current = []
-            size = 0
+            flush()
         current.append(node)
         size += length
-    if current:
-        groups.append(current)
-    return groups
+    flush()
+    return _merge_pages(pages, budget)
+
+
+def _merge_pages(pages, budget):
+    """
+    Join neighbouring pages that can share one.
+
+    A descent leaves a partly-filled page behind and, more importantly,
+    leaves the converters' empty furniture (`<div style="display:none">`
+    anchors, stray `<br/>` blocks) as pages of their own -- a blank
+    screen the reader has to turn past.  Those are folded into a
+    neighbour; two pages with the same wrapper chain are joined when they
+    still fit together.
+    """
+    out = []
+    for page_wrappers, nodes in pages:
+        if not out:
+            out.append((page_wrappers, list(nodes)))
+            continue
+        prev_wrappers, prev_nodes = out[-1]
+        if not _has_content(prev_nodes):
+            # The furniture before a wrapper: it has no page of its own,
+            # and it has to go *inside* the wrapper that follows, so the
+            # merged page takes that wrapper chain.
+            out[-1] = (page_wrappers, prev_nodes + list(nodes))
+            continue
+        if not _has_content(nodes):
+            prev_nodes.extend(nodes)
+            continue
+        same_chain = prev_wrappers == page_wrappers
+        if same_chain and _nodes_len(prev_nodes) + _nodes_len(nodes) <= budget:
+            prev_nodes.extend(nodes)
+            continue
+        out.append((page_wrappers, list(nodes)))
+    return out
+
+
+def _nodes_len(nodes):
+    "What a page's nodes cost, in PAGE_CHAR_BUDGET units."
+    return sum(_node_len(n) for n in nodes)
+
+
+def _has_content(nodes):
+    "True if a page made of these nodes shows something: text or a picture."
+    for node in nodes:
+        if isinstance(node, NavigableString):
+            if str(node).strip():
+                return True
+        elif node.get_text().strip() or node.find(("img", "svg", "video")):
+            return True
+    return False
 
 
 def _page_html(classes, viewport, wrappers, nodes):
@@ -650,11 +696,11 @@ def split_page_file(html, budget=None):
         return [(html, _extract_text(soup))]
 
     classes = " ".join(root.get("class") or ["epub-body"])
-    wrappers, groups = _page_groups(root, budget)
-    if len(groups) <= 1:
+    layout = _page_layout(root, budget)
+    if len(layout) <= 1:
         return [(html, _extract_text(soup))]
     pages = []
-    for nodes in groups:
+    for wrappers, nodes in layout:
         page_html = _page_html(classes, None, wrappers, nodes)
         pages.append(
             (page_html, _extract_text(BeautifulSoup(page_html, "html.parser")))
