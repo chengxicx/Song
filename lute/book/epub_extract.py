@@ -627,6 +627,69 @@ def _page_html(classes, viewport, wrappers, nodes):
     return str(root)
 
 
+def split_page_file(html, budget=None):
+    """
+    Split an already-extracted chapter file into page fragments.
+
+    Returns a list of (html, text) in reading order: the file itself when
+    it fits on one page, otherwise one entry per page.  The import path
+    splits before writing (see _write_chapter); this is for the files
+    that were written before that existed -- an old chapter is one file
+    holding the whole thing, and this is what the epub_resplit backfill
+    turns into pages (it has the extracted markup, not the .epub).
+
+    A fixed-layout chapter is never split: it is one pixel-sized page
+    box, and the reading screen fits the whole thing.
+    """
+    budget = PAGE_CHAR_BUDGET if budget is None else budget
+    soup = BeautifulSoup(html, "html.parser")
+    root = soup.find(class_="epub-body")
+    if root is None:
+        return [(html, _extract_text(soup))]
+    if root.get("data-epub-viewport"):
+        return [(html, _extract_text(soup))]
+
+    classes = " ".join(root.get("class") or ["epub-body"])
+    wrappers, groups = _page_groups(root, budget)
+    if len(groups) <= 1:
+        return [(html, _extract_text(soup))]
+    pages = []
+    for nodes in groups:
+        page_html = _page_html(classes, None, wrappers, nodes)
+        pages.append(
+            (page_html, _extract_text(BeautifulSoup(page_html, "html.parser")))
+        )
+    return pages
+
+
+def write_page_files(root_abs, stored_path, pages, start=1):
+    """
+    Write `pages` (from split_page_file) beside `stored_path`.
+
+    `stored_path` is the chapter's stored path ("epub/<uuid>/ch/003.html");
+    page 1 overwrites it, so BkEpubPath keeps pointing at the chapter,
+    and the rest become siblings ("ch/003-002.html", ...).  `start` is
+    the number of the first entry, for writing a slice of the pages
+    (the backfill writes the extra pages first and page 1 last, so an
+    interrupted run cannot leave page 1 holding only its first split).
+    Returns the file names written, in order.
+    """
+    name = posixpath.basename((stored_path or "").strip("/"))
+    stem, ext = posixpath.splitext(name)
+    if not stem:
+        raise ValueError(f"Cannot derive page names from '{stored_path}'.")
+    # "epub/<uuid>/ch/003.html" -> "ch": the pages go beside the chapter.
+    parts = (stored_path or "").strip("/").split("/")
+    rel_dir = "/".join(parts[2:-1]) or "ch"
+    written = []
+    for offset, (page_html, _text) in enumerate(pages):
+        number = start + offset
+        page_name = name if number == 1 else f"{stem}-{number:03d}{ext}"
+        _write_text(root_abs, posixpath.join(rel_dir, page_name), page_html)
+        written.append(page_name)
+    return written
+
+
 # A viewport meta with both dimensions as plain pixel numbers marks a
 # fixed-layout page (EPUB FXL); `device-width` / percentages are the
 # reflowable spellings and never match.
