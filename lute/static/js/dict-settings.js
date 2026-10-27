@@ -78,7 +78,13 @@ const DictSettings = (function () {
     if (d.size_mb !== null && d.size_mb !== undefined) {
       parts.push(d.size_mb + " MB");
     }
-    if (d.source) parts.push(I18N.t("imported from ") + d.source);
+    // A dictionary the .mdx left untitled is named after the file it was
+    // built from (the server falls back to that), so the provenance
+    // would only repeat the title.
+    const source = d.source && d.title && d.source.indexOf(d.title) === 0
+      ? ""
+      : d.source;
+    if (source) parts.push(I18N.t("imported from ") + source);
     if (d.imported_at) parts.push(I18N.t("on ") + d.imported_at);
     return parts.join(" \u00b7 ");
   }
