@@ -200,3 +200,10 @@ def test_literal_newline_escapes_become_real_line_breaks():
     )
 
     assert flat.split("\n") == ["casa", "casa", "f.", "房子,家"]
+
+
+def test_mdict_anchor_markers_are_stripped():
+    "`1`headword`2` is hyperlink plumbing, not content."
+    flat = MdxReader.clean_definition("`1`bennkyou0【勉強】`2`<br>学习", max_chars=800)
+
+    assert flat == "bennkyou0【勉強】\n学习"

@@ -35,6 +35,12 @@ _BATCH_SIZE = 4000
 _REDIRECT_PREFIX = "@@@LINK="
 _REDIRECT_RE = re.compile(r"^@@@LINK=(.*)$", re.S)
 
+# Romanized-key dictionaries (the 小学館日中's "bennkyou0【勉強】") embed
+# the real headword in a trailing 【…】: lookups come in as the word
+# itself, never as the romanization, so the entry is keyed under both.
+_KEY_BRACKET_RE = re.compile(r"【([^【】]+)】\s*$")
+_KEY_HEADWORD_SCRIPT_RE = re.compile(r"[\u3040-\u30ff\u3400-\u9fff]")
+
 
 def _resolve_redirects(conn):
     """
@@ -154,6 +160,18 @@ def convert(  # pylint: disable=too-many-locals,too-many-statements
                         entry_rows.append((eid, text))
                     term_rows.append((word, eid))
                     terms += 1
+                    match = _KEY_BRACKET_RE.search(word)
+                    if match is not None:
+                        headword = match.group(1).strip()
+                        if (
+                            headword
+                            and headword != word
+                            and headword not in seen_words
+                            and _KEY_HEADWORD_SCRIPT_RE.search(headword)
+                        ):
+                            seen_words.add(headword)
+                            term_rows.append((headword, eid))
+                            terms += 1
                     if len(term_rows) >= _BATCH_SIZE:
                         flush()
                 flush()

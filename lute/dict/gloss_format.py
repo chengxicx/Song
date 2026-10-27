@@ -1069,6 +1069,18 @@ def parse_gloss(gloss):
             i += 1
             continue
 
+        if line.startswith("$"):
+            # 小学館日中: "$日本語の例文／中国語訳" -- both halves of the
+            # example on one line.
+            source, _, translation = line[1:].partition("／")
+            block = {"t": "example", "text": source.strip()}
+            if translation.strip():
+                block["translation"] = translation.strip()
+            blocks.append(block)
+            pending_example = None
+            i += 1
+            continue
+
         if _KO_POS_RE.match(line):
             # "[명사]" / "[자동사]〖거라불규칙/가거라〗": the standard
             # Korean dictionary's part of speech.  Before the phonetic
@@ -1147,6 +1159,22 @@ def parse_gloss(gloss):
             blocks.append(block)
             pending_example = block
             i += 1
+            continue
+
+        if (
+            _KANA_RE.search(line)
+            and not _CJK_RE.search(line)
+            and isinstance(next_line(), str)
+            and re.fullmatch(r"【[^】]+】", next_line())
+            and _CJK_RE.search(next_line())
+        ):
+            # 三省堂大辞林: the kana reading on one line, the kanji
+            # headword in 【…】 on the next -- one muted headword line.
+            # Without the merge the reading reads as an example whose
+            # translation is the headword.
+            blocks.append({"t": "headword", "text": f"{line}{next_line()}"})
+            pending_example = None
+            i += 2
             continue
 
         if _KANA_RE.search(line):
