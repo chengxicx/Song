@@ -34,6 +34,22 @@ their own conventions:
     他说话算数。                   Chinese is its translation
     See also: take             -> cross-reference (no reading part)
 
+Some dictionaries flatten to *one line per entry*: their source markup
+put each sense and example in an inline span, so no block-level tag ever
+produced a line break, and the markers the markup showed as icons are
+now characters in the middle of the text:
+
+    🔑  a new sense (or a new headword line, for another part of speech)
+    ➤   a guide word -- the label of the sense group that follows
+    ◆   an example
+    ◇   the start of a synonym study (prose about the group, not this
+        entry's meaning)
+    🔊  an audio button
+
+Left alone, such an entry is an 800-character wall.  _lines_and_hints
+splits it on those markers first, so the same rules below then see
+ordinary lines -- see the "marked glosses" section.
+
 Anything unmatched falls through to a plain line -- a dictionary with
 different conventions degrades to today's rendering, never worse.
 Per-dictionary profiles can refine the rules later without touching
@@ -136,9 +152,7 @@ def _is_en_pos(line):
     line = re.sub(r"[（(][^）)]*[）)]\s*$", "", line).rstrip(" .")
     # .strip("[]"): Longman-style grammatical labels, "verb [T]".
     tokens = [
-        t.rstrip(".").lower().strip("[]")
-        for t in re.split(r"[/,;·、&\s]+", line)
-        if t
+        t.rstrip(".").lower().strip("[]") for t in re.split(r"[/,;·、&\s]+", line) if t
     ]
     if not tokens:
         return False
@@ -167,6 +181,7 @@ def _is_en_sentence(line):
         and _EN_SENTENCE_RE.match(stripped) is not None
     )
 
+
 # Block types: xref, headword, pos, section, sense, example, note, plain.
 # sense blocks carry "n" (their number within the current run); example
 # blocks may carry "translation".
@@ -185,6 +200,154 @@ def _strip_section_suffix(line):
     return line
 
 
+# ---- Marked glosses -------------------------------------------------------
+#
+# See the module docstring: these are the entries that arrived as one
+# line with the source markup's icons left inline as characters.
+
+_KEY_MARK = "\U0001f511"  # 🔑
+_GUIDE_MARK = "\U000027a4"  # ➤
+_EXAMPLE_MARK = "\U000025c6"  # ◆
+_SYNONYM_MARK = "\U000025c7"  # ◇
+_AUDIO_MARK = "\U0001f50a"  # 🔊
+
+_MARK_RE = re.compile(f"([{_KEY_MARK}{_GUIDE_MARK}{_EXAMPLE_MARK}])")
+_MARK_KINDS = {_KEY_MARK: "key", _GUIDE_MARK: "guide", _EXAMPLE_MARK: "example"}
+
+# Where a bilingual line's translation starts: a Chinese character, or
+# the wide punctuation a translation opens with (（、《) while the
+# definition's own text does not.
+_ZH_START_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\u3001-\u303f\uff01-\uff60]")
+
+# A word-use study's list of related words is glued onto the last
+# example's translation ("参考书；儿童读物；馆藏书籍 author, book,
+# classic, ...").  Three or more comma-separated lowercase words at the
+# end are that list, not part of the translation.
+_TRAILING_WORD_LIST_RE = re.compile(
+    r"\s[a-z][a-z'\u00b7-]*(?:,\s+[a-z][a-z'\u00b7-]*){2,}\s*$"
+)
+
+# A headword line carries the pronunciation; the word itself is already
+# the card's heading, so the line starts at the first variety label.
+_PHONETIC_START_RE = re.compile(r"(?:BrE|NAmE|AmE)\s+/")
+
+# What a headword line ends with ("... adjective", "... indefinite
+# article").  Anything after it on that line is an inflection or the
+# word family, not the headword.  No trailing boundary: the dictionary
+# glues the conjugation table straight onto the label ("verbpresent
+# simple - I ..."), and that table is what has to go.
+_HEADWORD_POS_RE = re.compile(
+    r"\b(indefinite article|definite article|modal verb|auxiliary verb|"
+    r"adjective|adverb|preposition|pronoun|conjunction|exclamation|"
+    r"determiner|noun|verb|number)"
+)
+
+# A word family or inflection list is worth a muted line; anything
+# longer than this is prose that belongs to another entry.
+_HEADWORD_TAIL_MAX_CHARS = 60
+
+# A marked key this short with no translation is a word-family line
+# ("(≠ unhappy) happily adverb"), not a sense.
+_WORD_FAMILY_MAX_CHARS = 60
+
+
+def _segment_text(piece):
+    "One marker-delimited piece of a marked gloss, as display lines."
+    text = piece.replace(_AUDIO_MARK, "")
+    return [" ".join(line.split()) for line in text.split("\n") if line.strip()]
+
+
+def _headword_text(text):
+    "A headword segment as (phonetic line, word-family tail or '')."
+    match = _PHONETIC_START_RE.search(text)
+    if match is not None:
+        text = text[match.start() :]
+    match = _HEADWORD_POS_RE.search(text)
+    if match is None:
+        return text, ""
+    tail = text[match.end() :].strip()
+    head = text[: match.end()].strip()
+    return head, tail if len(tail) <= _HEADWORD_TAIL_MAX_CHARS else ""
+
+
+def _lines_and_hints(gloss):
+    """
+    The gloss as (lines, hints) -- hints are None for every line of an
+    ordinary, line-based gloss, so the rules below read it unchanged.
+
+    A marked gloss is split on its markers first: its single line
+    becomes the lines the same rules already understand, each tagged
+    with what its marker said it was.
+
+    Two of the marked entry's parts run on until the next sense and are
+    dropped: the synonym study (◇) and the HELP usage note.  Both are
+    prose *about* the word -- a list of neighbours, or when to use a
+    rather than an -- and showing them as senses or examples is what
+    made these entries unreadable.
+    """
+    lines = [ln.strip() for ln in gloss.split("\n") if ln.strip()]
+    if _KEY_MARK not in gloss:
+        return lines, [None] * len(lines)
+
+    out = []
+    kind = None
+    dropped = False
+    for piece in _MARK_RE.split(gloss):
+        if piece in _MARK_KINDS:
+            kind = _MARK_KINDS[piece]
+            if kind == "key":
+                dropped = False
+            continue
+        if dropped:
+            continue
+        if _SYNONYM_MARK in piece:
+            # Its first synonym is glued onto whatever came before it
+            # ("gladhappy"), so the leftover Latin run goes too.
+            piece = re.sub(
+                r"[A-Za-z][A-Za-z .,'\u2019\u00b7-]*$",
+                "",
+                piece.split(_SYNONYM_MARK)[0],
+            )
+            dropped = True
+        texts = _segment_text(piece)
+        if kind in ("example", "guide"):
+            # One marker, one item: anything after the first line is
+            # the entry's other material (a word-use study follows the
+            # last example of some entries).
+            texts = texts[:1]
+        for text in texts:
+            if kind == "key" and _PHONETIC_START_RE.search(text):
+                head, tail = _headword_text(text)
+                out.append(("headword", head))
+                if tail:
+                    out.append(("note", tail))
+                if "HELP" in text:
+                    dropped = True
+                continue
+            out.append((kind, text))
+    return [text for _, text in out], [kind for kind, _ in out]
+
+
+def _split_bilingual(text):
+    """
+    A bilingual line as (source-language part, translation or None),
+    split where the Chinese starts.
+
+    A marked gloss puts a sense's definition and its translation on one
+    line with no separator ("...can be spoken or written 单词；词；字"),
+    so the first Chinese character is the only boundary there is.  The
+    boundary is the first *Chinese* character in the wide sense: the
+    translation often opens with a full-width bracket the sense's own
+    text does not have ("（指已提到或易领会到的人或事物）"), and leaving
+    that bracket behind reads as a broken sentence.
+    """
+    match = _ZH_START_RE.search(text)
+    if match is None or match.start() == 0:
+        return text, None
+    translation = _TRAILING_WORD_LIST_RE.sub("", text[match.start() :]).strip()
+    return text[: match.start()].strip(), translation
+
+
 def parse_gloss(gloss):
     """
     The gloss's lines as structured blocks, in order.
@@ -195,7 +358,7 @@ def parse_gloss(gloss):
     """
     if not gloss:
         return []
-    lines = [ln.strip() for ln in gloss.split("\n") if ln.strip()]
+    lines, hints = _lines_and_hints(gloss)
     blocks = []
     sense_no = 0
     pending_example = None  # the example block still awaiting a translation
@@ -207,6 +370,60 @@ def parse_gloss(gloss):
     i = 0
     while i < len(lines):
         line = lines[i]
+        hint = hints[i]
+
+        if hint == "example":
+            source, translation = _split_bilingual(line)
+            block = {"t": "example", "text": source}
+            if translation:
+                block["translation"] = translation
+            blocks.append(block)
+            pending_example = None
+            i += 1
+            continue
+
+        if hint == "guide":
+            # The sense group's label (➤printed work 印刷品): a header,
+            # not a sense, and the senses below it start at 1 again.
+            blocks.append({"t": "section", "text": line})
+            sense_no = 0
+            pending_example = None
+            i += 1
+            continue
+
+        if hint == "headword":
+            blocks.append({"t": "headword", "text": line})
+            pending_example = None
+            i += 1
+            continue
+
+        if hint == "note":
+            blocks.append({"t": "note", "text": line})
+            pending_example = None
+            i += 1
+            continue
+
+        if hint == "key":
+            # A marked sense: the translation is the meaning, the
+            # source-language definition rides under it (the bilingual
+            # layout the popup already uses).  A short key with no
+            # translation is the dictionary's word-family line
+            # ("(≠ unhappy) happily adverb"), which is a cross-reference,
+            # not a sense.
+            source, translation = _split_bilingual(line)
+            if translation:
+                sense_no += 1
+                blocks.append(
+                    {"t": "sense", "text": translation, "en": source, "n": sense_no}
+                )
+            elif len(line) <= _WORD_FAMILY_MAX_CHARS:
+                blocks.append({"t": "note", "text": line})
+            else:
+                sense_no += 1
+                blocks.append({"t": "sense", "text": line, "n": sense_no})
+            pending_example = None
+            i += 1
+            continue
 
         match = _XREF_RE.match(line)
         if match is not None:
@@ -238,7 +455,13 @@ def parse_gloss(gloss):
             continue
 
         core = _strip_section_suffix(line)
-        pos_label = core if _is_pos(core) else (line if _is_en_pos(line) else None)
+        # "verb," / "noun," lead a multi-POS entry; the comma is the
+        # dictionary's list punctuation, not part of the label.
+        pos_label = (
+            core
+            if _is_pos(core)
+            else (line.rstrip(" ,;") if _is_en_pos(line) else None)
+        )
         if pos_label is not None:
             if not (
                 blocks and blocks[-1]["t"] == "pos" and blocks[-1]["text"] == pos_label
@@ -390,9 +613,7 @@ def compact_gloss(gloss, max_chars=COMPACT_GLOSS_MAX_CHARS):
         # Section headers (惯用语…) only announce the example groups
         # that follow them; with those dropped the header is noise.
         if b["t"] == "xref":
-            label = (
-                f"{b['text']}【{b['reading']}】" if b.get("reading") else b["text"]
-            )
+            label = f"{b['text']}【{b['reading']}】" if b.get("reading") else b["text"]
             lines.append(f"See also: {label}")
         elif b["t"] in ("pos", "sense"):
             lines.append(b["text"])
