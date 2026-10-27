@@ -309,6 +309,42 @@ def test_the_popup_drops_the_duplicated_headword_line(
     assert gloss.startswith("名\n")
 
 
+# --- a marked entry ----------------------------------------------------------
+#
+# The Oxford conversion leaves an entry as ONE line with its markup's
+# icons inline (see gloss_format's "marked glosses").  Fed to the popup
+# verbatim, that was the 800-character wall in the screenshot: every
+# sense, example and icon at once.  The popup lays the parsed blocks
+# out instead.
+
+MARKED_ENTRY = (
+    "subconscious",
+    "<div>sub·con·sciousBrE /ˌsʌbˈkɒnʃəs/NAmE /ˌsʌbˈkɑːnʃəs/ adjective"
+    " connected with a part of your mind that stores memories"
+    " 潜意识的；下意识的"
+    "◆a subconscious fear 下意识的恐惧"
+    "➡ compare conscious 🔊</div>",
+)
+
+
+def test_the_popup_breaks_a_marked_entry_into_lines_without_its_markers(
+    app, app_context, dict_dirs, japanese
+):
+    _import(app, dict_dirs[1], entries=[MARKED_ENTRY], name="ox.mdx")
+    _use(japanese)
+    t = Term(japanese, "subconscious")
+    db.session.add(t)
+    db.session.commit()
+
+    gloss = _service().get_popup_data(t.id).dict_gloss
+
+    assert gloss.split("\n")[0] == "潜意识的；下意识的"
+    assert "a subconscious fear" in gloss
+    for mark in ("🔑", "➤", "◆", "◇", "🔊", "➡", "▸"):
+        assert mark not in gloss, f"{mark} leaked into the popup"
+    assert "BrE" not in gloss, "the phonetics stay out of the popup"
+
+
 # --- a translation that holds a whole dictionary card ------------------------
 #
 # The form's auto-fill used to save the entire entry -- the example tail

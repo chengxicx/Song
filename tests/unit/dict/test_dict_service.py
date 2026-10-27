@@ -384,6 +384,14 @@ def test_strip_duplicate_headword_drops_a_bare_headword_line():
     assert service.strip_duplicate_headword(gloss, "たのしい") == "愉快yúkuài"
 
 
+def test_strip_duplicate_headword_drops_collins_frequency_stars():
+    "Collins appends its frequency stars to the headword line."
+    gloss = "happy★★★★☆\nADJ-GRADED\n高兴的;快乐的"
+    assert (
+        service.strip_duplicate_headword(gloss, "happy") == "ADJ-GRADED\n高兴的;快乐的"
+    )
+
+
 def test_strip_duplicate_headword_keeps_a_different_headword():
     """
     The kana spelling was looked up and the entry answers under its
@@ -462,6 +470,20 @@ def test_a_dictionary_keeps_its_own_title_when_it_has_one(app, app_context, dict
     _drop_pool_file(static_dir, "moji.db", {"title": "MOJi辞書", "source": "moji.mdx"})
 
     assert service.status("moji.db")["title"] == "MOJi辞書"
+
+
+def test_mdict_placeholder_title_falls_back_to_the_source_file(
+    app, app_context, dict_dirs
+):
+    '"Title (No HTML code allowed)" is MDict for "no title" -- not a name.'
+    static_dir, _scratch = dict_dirs
+    _drop_pool_file(
+        static_dir,
+        "thai-en-zh.db",
+        {"title": "Title (No HTML code allowed)", "source": "泰文释英及汉辞典.mdx"},
+    )
+
+    assert service.status("thai-en-zh.db")["title"] == "泰文释英及汉辞典"
 
 
 def test_a_percent_encoded_source_name_is_decoded(app, app_context, dict_dirs):

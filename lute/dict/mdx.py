@@ -47,6 +47,29 @@ class MdxError(ValueError):
     "A malformed or unsupported MDX file."
 
 
+_SENTENCE_BREAK_RE = re.compile(r"[.!?。！？；;…]")
+
+
+def _truncate_at_boundary(text, limit):
+    """
+    ``text`` cut near ``limit``, but never inside a word or a sentence.
+
+    Dictionary entries run far past what a card shows and the source
+    markup is flattened to lines here, so the cut prefers the last
+    complete line, then the last sentence end, and only then a space.
+    A single unbroken token still falls back to the hard cut.
+    """
+    window = text[:limit]
+    floor = limit // 3
+    cut = window.rfind("\n")
+    if cut < floor:
+        breaks = list(_SENTENCE_BREAK_RE.finditer(window))
+        cut = breaks[-1].end() if breaks else -1
+    if cut < floor:
+        cut = window.rfind(" ")
+    return text[: cut if cut > floor else limit].rstrip()
+
+
 class MdxReader:  # pylint: disable=too-many-instance-attributes
     """
     Random-access reader over an MDX file's bytes.
@@ -474,9 +497,11 @@ class MdxReader:  # pylint: disable=too-many-instance-attributes
         Flatten a definition's HTML to plain text.
 
         Line breaks are preserved, tags and entities are stripped, and
-        the result is truncated to ``max_chars`` -- the popup and the
+        the result is truncated near ``max_chars`` -- the popup and the
         phone's card only ever show a few lines, and dictionaries
-        routinely carry 10 KB of markup per entry.
+        routinely carry 10 KB of markup per entry.  The cut lands on a
+        line, sentence or word boundary (see _truncate_at_boundary), so
+        the last block never ends with half a word.
         """
         d = _BR_RE.sub("\n", html_text or "")
         d = _BLOCK_END_RE.sub("\n", d)
@@ -491,4 +516,6 @@ class MdxReader:  # pylint: disable=too-many-instance-attributes
             d = d.replace(entity, char)
         lines = [ln.strip() for ln in d.split("\n")]
         text = "\n".join(ln for ln in lines if ln)
-        return text[:max_chars] if len(text) > max_chars else text
+        if len(text) <= max_chars:
+            return text
+        return _truncate_at_boundary(text, max_chars)

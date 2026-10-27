@@ -123,6 +123,23 @@ def test_clean_definition_truncates():
     assert MdxReader.clean_definition("x" * 2000, max_chars=10) == "x" * 10
 
 
+def test_clean_definition_truncates_between_words_and_sentences():
+    "The card must never show half a word or half a sentence."
+    words = MdxReader.clean_definition("<div>" + "word " * 400 + "</div>", max_chars=100)
+    assert len(words) <= 100
+    assert words.endswith("word")
+
+    sentences = MdxReader.clean_definition(
+        "<div>" + "This is a sentence. " * 100 + "</div>", max_chars=100
+    )
+    assert sentences.endswith("sentence.")
+
+    lines = MdxReader.clean_definition(
+        "<br/>".join(["a line of the entry"] * 20), max_chars=60
+    )
+    assert lines.split("\n")[-1] == "a line of the entry"
+
+
 @pytest.mark.parametrize("encrypted", ["1", "3", "Yes"])
 def test_keyed_encryption_is_still_rejected(encrypted):
     """
