@@ -105,8 +105,13 @@ class Book:  # pylint: disable=too-many-instance-attributes
         # EPUB reader-mode fields.
         # epub_path is the relative path under the static folder of the
         # chapter's reader-ready HTML, e.g. "epub/<uuid>/ch/003.html".
-        # Reader-mode books hold the whole chapter as a single page.
+        # epub_page_texts is the transient list of the chapter's pages:
+        # a chapter too long for one page is split at import
+        # (epub_extract.PAGE_CHAR_BUDGET), and every page becomes a
+        # DBText row of its own.  None / empty means one page holding
+        # the whole chapter.
         self.epub_path = None
+        self.epub_page_texts = None
 
         self.threshold_page_tokens = 250
         self.split_by = "paragraphs"
@@ -310,14 +315,22 @@ class Repository:
                 for index in range(page_count):
                     _ = DBText(b, "", index + 1)
             elif book.book_type == "epub":
-                # Reader-mode EPUB books are one chapter each: the whole
-                # chapter is a single page that scrolls continuously, so
-                # progress is recorded per chapter (per book) instead of
-                # per 250-token page.  The page text is still the parsed
-                # chapter text -- word counts, stats, search and the
-                # grammar panel all read it.
+                # Reader-mode EPUB books keep the chapter's markup, and a
+                # chapter is one page that scrolls continuously -- unless
+                # it was too long for that (epub_extract split it into
+                # several files), in which case each split is a page here.
+                # A page's text is what the reading screen tokenises for
+                # that page, so it has to be that page's own text, not a
+                # slice of the chapter's: the front end aligns the tokens
+                # against the page's markup, character for character.
+                # Word counts, stats, search and the grammar panel all
+                # read the pages' text, so nothing else changes.
+                page_texts = [t for t in (book.epub_page_texts or [])]
+                if not page_texts:
+                    page_texts = [(book.text or "").strip()]
                 b = DBBook(book.title, lang)
-                _ = DBText(b, (book.text or "").strip(), 1)
+                for index, page_text in enumerate(page_texts):
+                    _ = DBText(b, (page_text or "").strip(), index + 1)
             else:
                 pages = self._split_pages(book, lang)
                 b = DBBook(book.title, lang)

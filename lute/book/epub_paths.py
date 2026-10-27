@@ -19,6 +19,7 @@ chapters; `located()` prefers the data directory.
 """
 
 import os
+import posixpath
 
 # Stored paths (`BkEpubPath`) are relative to the static root and start
 # with this segment: "epub/<uuid>/ch/000.html".
@@ -56,3 +57,22 @@ def located(app, stored_path):
         if os.path.isfile(candidate):
             return candidate
     return None
+
+
+def chapter_file(app, stored_path, pagenum=1):
+    """
+    Absolute path of one page of a reader-mode chapter, or None.
+
+    A chapter is one file ("epub/<uuid>/ch/003.html").  A chapter too
+    long to be one page was split at import, and its extra pages are
+    siblings named after it ("ch/003-002.html", "ch/003-003.html", ...);
+    the stored BkEpubPath still points at page 1, so nothing about the
+    book row changes and books imported before the split keep working
+    (they have one page, so pagenum is always 1).
+    """
+    if not pagenum or pagenum <= 1:
+        return located(app, stored_path)
+    stem, ext = posixpath.splitext((stored_path or "").strip("/"))
+    if not stem:
+        return None
+    return located(app, f"{stem}-{pagenum:03d}{ext}")

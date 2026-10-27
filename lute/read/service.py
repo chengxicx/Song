@@ -1117,17 +1117,21 @@ class Service:
 
     def epub_page_context(self, dbbook, pagenum, track_page_open=False):
         """
-        Build the render context for one reader-mode EPUB chapter: the
-        chapter's sanitised HTML, its scoped stylesheets (theme-following
+        Build the render context for one reader-mode EPUB page: the
+        page's sanitised HTML, its scoped stylesheets (theme-following
         and keep-colours), and the token stream the front end aligns to
-        the chapter's text nodes.
+        the page's text nodes.
+
+        A page is a whole chapter, or one split of a chapter that was too
+        long to be one page (epub_extract).  Either way the markup and
+        the token stream describe the same characters.
 
         Returns None if the book has no extracted chapter at that page.
         """
         epub_path = (dbbook.epub_path or "").strip("/")
         if not epub_path or not 1 <= pagenum <= dbbook.page_count:
             return None
-        chapter_file = epub_paths.located(current_app, epub_path)
+        chapter_file = epub_paths.chapter_file(current_app, epub_path, pagenum)
         if chapter_file is None:
             return None
 

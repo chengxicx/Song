@@ -290,25 +290,35 @@
     navSidePrev.style.left = `${Math.round(r.left + 8)}px`;
     navSideNext.style.left = `${Math.round(r.right - navSideNext.offsetWidth - 8)}px`;
 
-    // Vertically center the arrows on the reading article (#thetext),
-    // not on the screen.  The article sits below the header/player, so
-    // its middle differs from the viewport middle.  In media scrolling
-    // mode #thetext is the full flowing document (taller than the
-    // viewport), so center in the viewport instead -- the arrows appear
-    // there as a fixed overlay once the page is scrolled to the bottom.
-    if (theText) {
-      let mid;
-      if (typeof _scrollMode === "function" && _scrollMode()) {
-        mid = Math.round(window.innerHeight / 2);
-      } else {
-        const tr = theText.getBoundingClientRect();
-        mid = Math.round(tr.top + tr.height / 2);
-      }
-      navSidePrev.style.transform = "none";
-      navSideNext.style.transform = "none";
-      navSidePrev.style.top = `${mid - navSidePrev.offsetHeight / 2}px`;
-      navSideNext.style.top = `${mid - navSideNext.offsetHeight / 2}px`;
+    // Vertical centre.  In scrolling mode (media books, and every
+    // reflowing EPUB chapter) the arrows sit at the *viewport* centre,
+    // which is exactly what the CSS already says -- `top: 50%` plus
+    // `translateY(-50%)`.  So nothing is written here: the scroll
+    // handler used to call this on every frame once the reader reached
+    // the bottom of a chapter, and each call forced a synchronous layout
+    // of the whole chapter (one span per token, plus a filtered sheet)
+    // only to write back the value it already had.  The fixed arrows
+    // then painted a frame behind the scrolled text, which reads as a
+    // jitter under the cursor.  Clearing the inline values also undoes a
+    // fit-to-screen top when a page switches into scrolling mode.
+    if (!theText) return;
+    if (typeof _scrollMode === "function" && _scrollMode()) {
+      navSidePrev.style.top = "";
+      navSideNext.style.top = "";
+      navSidePrev.style.transform = "";
+      navSideNext.style.transform = "";
+      return;
     }
+
+    // Fit-to-screen: centre on the reading article (#thetext), not on the
+    // screen.  The article sits below the header/player, so its middle
+    // differs from the viewport middle.
+    const tr = theText.getBoundingClientRect();
+    const mid = Math.round(tr.top + tr.height / 2);
+    navSidePrev.style.transform = "none";
+    navSideNext.style.transform = "none";
+    navSidePrev.style.top = `${mid - navSidePrev.offsetHeight / 2}px`;
+    navSideNext.style.top = `${mid - navSideNext.offsetHeight / 2}px`;
   }
 
   // Fixes a dev-only "bug" where the right pane doesn't translate up
@@ -704,8 +714,9 @@
     // Side arrows are kept visible for all book types (text, MP3, TTS),
     // so the previous/next navigation is always available.  They start
     // hidden in the markup, so clear the hide class here.  Re-layout
-    // afterwards: while hidden their offsetWidth is 0, which would clamp
-    // them to the pane edge and let them overlap the divider.
+    // afterwards to place them against the current pane bounds -- the
+    // hidden state keeps the box measurable (styles.css,
+    // `.side-page-nav.hide`), so this is a placement, not a repair.
     $('#navSidePrev').removeClass('hide');
     $('#navSideNext').removeClass('hide');
     _layout_side_nav();
@@ -1149,8 +1160,9 @@
                 || t.classList.contains("epub-fixed-container"));
   };
 
-  // Reader-mode EPUB chapters are one continuously scrolling page per
-  // chapter (one Lute page per chapter), so there is nothing to
+  // Reader-mode EPUB pages scroll continuously (one Lute page per
+  // chapter, or per split of a chapter too long for one page -- see
+  // epub_extract.PAGE_CHAR_BUDGET), so there is nothing to
   // sub-paginate: the whole page scrolls, like a media book in
   // scrolling mode.  Fixed-layout chapters use the fixed-page path
   // instead (see _isMangaReader).
@@ -1191,12 +1203,30 @@
   // "continue to the next page" affordance.  Media book types manage
   // the arrows' visibility through this helper (the normal
   // enable_page_nav_links path still unhides them for fixed pages).
+  //
+  // Two thresholds, not one.  The bottom of a scrolling page is not a
+  // fixed distance: an EPUB chapter grows as its images and fonts
+  // arrive, and the last page adds the end-of-book strip
+  // (`#thetext.last-screen`).  With a single 60px test, any such change
+  // recomputed visibility at the boundary and the arrows blinked under
+  // the cursor.  Enter within ARROWS_ENTER_PX, leave only past
+  // ARROWS_EXIT_PX.
+  const ARROWS_ENTER_PX = 60;
+  const ARROWS_EXIT_PX = 140;
+  let _arrows_at_bottom = false;
+
   function _updateScrollModeArrows() {
     if (!navSidePrev || !navSideNext) return;
-    if (typeof _scrollMode !== "function" || !_scrollMode()) return;
+    if (typeof _scrollMode !== "function" || !_scrollMode()) {
+      _arrows_at_bottom = false;
+      return;
+    }
     const doc = document.documentElement;
     const maxScroll = Math.max(0, doc.scrollHeight - window.innerHeight);
-    const atBottom = window.scrollY >= maxScroll - 60;
+    const margin = _arrows_at_bottom ? ARROWS_EXIT_PX : ARROWS_ENTER_PX;
+    const atBottom = window.scrollY >= maxScroll - margin;
+    const changed = atBottom !== _arrows_at_bottom;
+    _arrows_at_bottom = atBottom;
     const pagenum = parseInt($("#page_num").val());
     navSideNext.classList.toggle("hide", !atBottom);
     // The book's first page has no earlier page, so the left arrow is
@@ -1207,7 +1237,11 @@
       "hide",
       !atBottom || (pagenum <= 1 && _prevSeriesBookId() === 0)
     );
-    if (atBottom) _layout_side_nav();
+    // Layout only on the transition.  The arrows are viewport-fixed, so
+    // their position does not depend on the scroll offset: laying them
+    // out per scroll frame was a forced synchronous reflow of the whole
+    // chapter for no change at all.
+    if (changed && atBottom) _layout_side_nav();
   }
 
   // The book's very first screen (page 1, first sub-screen) has nothing
@@ -1467,11 +1501,16 @@
   }
 
   // ---- Reader-mode EPUB scroll position ------------------------------
-  // One chapter is one Lute page, so the sub-screen machinery has
-  // nothing to remember here; the reader's place *inside* the chapter
-  // is the document scroll offset, kept per book (a book is a chapter).
+  // A reader-mode page is one chapter that scrolls continuously (a long
+  // chapter was split into several such pages at import), so the
+  // sub-screen machinery has nothing to remember here; the reader's
+  // place *inside* the page is the document scroll offset, kept per
+  // book **and page** -- per book alone would restore page 3's offset
+  // on page 1 after turning back.
   function _epubScrollKey() {
-    return "lute-epub-scroll-" + ($("#book_id").val() || "0");
+    const book = $("#book_id").val() || "0";
+    const page = $("#page_num").val() || "1";
+    return "lute-epub-scroll-" + book + "-" + page;
   }
 
   function _restoreEpubScroll() {
