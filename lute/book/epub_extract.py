@@ -14,7 +14,11 @@ code tree, so a data backup carries it:
 
     ch/<index>.html   one chapter, sanitised, URLs rewritten, wrapped in
                       the `.epub-body` scope element (plus
-                      data-epub-viewport on fixed-layout chapters)
+                      data-epub-viewport on fixed-layout chapters).  A
+                      reflowing chapter over PAGE_CHAR_BUDGET is written
+                      as several pages instead: ch/003.html,
+                      ch/003-002.html, ch/003-003.html, ...  (page 1 keeps
+                      the plain name, which is what BkEpubPath stores)
     lute.css          every stylesheet of the book, scoped to `.epub-body`,
                       text colours on unpainted blocks dropped (dark-theme
                       safety) -- the theme-following variant
@@ -44,7 +48,7 @@ import zipfile
 from io import BytesIO
 from urllib.parse import quote, unquote
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 
 from lute.book.epub_css import scope_css
 from lute.book.epub_parser import _extract_text, _prep_soup  # internal reuse
@@ -87,6 +91,94 @@ _MAX_TOTAL_BYTES = 512 * 1024 * 1024  # extracted-content cap (zip bomb guard)
 _SAFE_SCHEMES = ("http:", "https:", "mailto:", "tel:", "data:", "javascript:")
 _INLINE_URL_RE = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.S | re.I)
 
+# Characters per reader-mode page.
+#
+# A page is loaded and tokenised whole: the chapter's markup, one span
+# per token, plus the JSON token stream the front end aligns against the
+# DOM.  So a page's *size* is what the browser pays for -- open cost,
+# layout cost, and the cost of every reflow it takes part in.  Some
+# conversions put an entire book in one spine item, which used to mean
+# one page of tens of thousands of spans.
+#
+# Characters are a decent proxy for that cost whatever the script: a
+# CJK page ends up with about this many spans, a Latin page with fewer
+# (same characters, fewer words).  2000 is roughly a screenful of
+# Japanese and two of English.
+PAGE_CHAR_BUDGET = 2000
+
+# How many single-child wrappers a page split will look through before it
+# gives up and keeps the oversized node whole.  Real books nest two or
+# three (`div.calibre > div.chapter > div.section`).
+_MAX_UNWRAP_DEPTH = 8
+
+# What one picture counts as, in the same units as PAGE_CHAR_BUDGET.
+_PICTURE_WEIGHT = 200
+
+# Elements whose content is only ever other blocks, so a page boundary
+# inside them is invisible to the book's own CSS.  Anything else -- a
+# <p> of running text, a <figure> with its caption, a table -- is a
+# single unit: cutting it would change how the book renders, so an
+# oversized one keeps its page to itself.
+_PAGE_CONTAINERS = frozenset(
+    (
+        "body",
+        "div",
+        "section",
+        "article",
+        "aside",
+        "header",
+        "footer",
+        "main",
+        "nav",
+        "ul",
+        "ol",
+        "dl",
+        "blockquote",
+    )
+)
+
+# Inline content: a container holding these is a paragraph in disguise
+# (converters do wrap a run of text in a div), not a group of blocks.
+# Cutting such a div would cut a text run in half, so it keeps its page.
+# The consequence for pictures is deliberate: an image counts towards a
+# page only when it sits inside a block of its own (`<p><img/></p>`,
+# `div.page > img`, which is how converters emit them).  A bare <img>
+# child of a wrapper is left alone with its neighbours.
+_INLINE_NAMES = frozenset(
+    (
+        "a",
+        "abbr",
+        "b",
+        "bdi",
+        "bdo",
+        "br",
+        "cite",
+        "code",
+        "data",
+        "dfn",
+        "em",
+        "i",
+        "img",
+        "kbd",
+        "mark",
+        "q",
+        "rp",
+        "rt",
+        "ruby",
+        "s",
+        "samp",
+        "small",
+        "span",
+        "strong",
+        "sub",
+        "sup",
+        "time",
+        "u",
+        "var",
+        "wbr",
+    )
+)
+
 
 class EpubExtract:
     "The extracted package: where it lives and what each chapter became."
@@ -99,7 +191,8 @@ class EpubExtract:
         # The keep-colours variant of css_path, for the "original look"
         # render modes (None when it could not be produced).
         self.orig_css_path = orig_css_path
-        # chapter index -> {"html": rel path, "text": sanitised text}
+        # chapter index -> {"html": page 1's rel path, "text": sanitised
+        # chapter text, "viewport": ..., "pages": [{"html", "text"}]}
         self.chapters = chapters
 
 
@@ -164,12 +257,14 @@ def extract_epub_package(data, chapters, static_root):
             extracted = {}
             manifest = []
             for chapter in chapters:
-                html_rel, text, viewport = _write_chapter(
-                    zf, name_map, chapter, root_abs, root_rel
-                )
-                extracted[chapter.index] = {"html": html_rel, "text": text}
+                result = _write_chapter(zf, name_map, chapter, root_abs, root_rel)
+                extracted[chapter.index] = result
                 manifest.append(
-                    {"index": chapter.index, "path": chapter.path, "viewport": viewport}
+                    {
+                        "index": chapter.index,
+                        "path": chapter.path,
+                        "viewport": result["viewport"],
+                    }
                 )
             css_rel = f"{root_rel}/lute.css"
             _write_text(root_abs, "lute.css", css_text)
@@ -177,9 +272,7 @@ def extract_epub_package(data, chapters, static_root):
             if orig_text.strip():
                 orig_rel = f"{root_rel}/lute-orig.css"
                 _write_text(root_abs, "lute-orig.css", orig_text)
-            _write_text(
-                root_abs, "chapters.json", json.dumps(manifest, indent=2)
-            )
+            _write_text(root_abs, "chapters.json", json.dumps(manifest, indent=2))
         except Exception:
             shutil.rmtree(root_abs, ignore_errors=True)
             raise
@@ -345,8 +438,18 @@ def _collect_css(read_text, chapter_paths, root_rel, keep_colors):
 
 def _write_chapter(zf, name_map, chapter, root_abs, root_rel):
     """
-    Sanitise one chapter, write it to ch/<index>.html, and return
-    (relative path, sanitised text, fixed-layout viewport or None).
+    Sanitise one chapter, write it under ch/, and return
+
+        {"html": first page's path, "text": whole chapter's text,
+         "viewport": fixed-layout viewport or None,
+         "pages": [{"html": path, "text": text}, ...]}
+
+    A reflowing chapter over PAGE_CHAR_BUDGET is written as several
+    pages (ch/003.html, ch/003-002.html, ...) so the reading screen never
+    has to build a chapter-sized DOM; `html` is page 1's file, which is
+    what BkEpubPath stores, and the reader derives the rest from it (see
+    epub_paths.chapter_file).  Everything else -- a short chapter, a
+    fixed-layout page box -- is written exactly as before, one page.
     """
     raw = _read_member(zf, name_map, chapter.path)
     if raw is None:
@@ -378,12 +481,150 @@ def _write_chapter(zf, name_map, chapter, root_abs, root_rel):
         + (f' data-epub-viewport="{viewport}"' if viewport else "")
         + ">"
     )
-    html = wrapper + body.decode_contents() + "</div>"
 
-    rel = f"ch/{chapter.index:03d}.html"
-    with open(os.path.join(root_abs, *rel.split("/")), "w", encoding="utf-8") as f:
-        f.write(html)
-    return f"{root_rel}/{rel}", text, viewport
+    wrappers, groups = [], [_significant_children(body)]
+    if not viewport:
+        wrappers, groups = _page_groups(body, PAGE_CHAR_BUDGET)
+
+    if len(groups) <= 1:
+        html = wrapper + body.decode_contents() + "</div>"
+        rel = f"ch/{chapter.index:03d}.html"
+        _write_text(root_abs, rel, html)
+        return {
+            "html": f"{root_rel}/{rel}",
+            "text": text,
+            "viewport": viewport,
+            "pages": [{"html": f"{root_rel}/{rel}", "text": text}],
+        }
+
+    pages = []
+    for number, nodes in enumerate(groups, start=1):
+        html = _page_html(classes, viewport, wrappers, nodes)
+        rel = (
+            f"ch/{chapter.index:03d}.html"
+            if number == 1
+            else f"ch/{chapter.index:03d}-{number:03d}.html"
+        )
+        _write_text(root_abs, rel, html)
+        # The page's own text, extracted from its own markup: the server
+        # tokenises *this* text for the page, and the front end aligns
+        # those tokens against this markup.  Anything else (slicing the
+        # chapter's text, reusing the whole chapter's) would desync the
+        # two and cost the page its word spans.
+        page_soup = BeautifulSoup(html, "html.parser")
+        pages.append({"html": f"{root_rel}/{rel}", "text": _extract_text(page_soup)})
+
+    return {
+        "html": pages[0]["html"],
+        "text": text,
+        "viewport": viewport,
+        "pages": pages,
+    }
+
+
+def _significant_children(container):
+    "The container's child nodes that carry content: elements and non-blank text."
+    out = []
+    for child in container.children:
+        if isinstance(child, NavigableString):
+            if str(child).strip():
+                out.append(child)
+        else:
+            out.append(child)
+    return out
+
+
+def _node_len(node):
+    "Characters the node contributes, which is what PAGE_CHAR_BUDGET counts."
+    if isinstance(node, NavigableString):
+        return len(str(node))
+    # A picture costs a page about what a paragraph does, even though it
+    # contributes no characters -- a reflowing chapter can be nothing but
+    # images (a converted comic), and counting only text would leave one
+    # page holding all of them.
+    pictures = len(node.find_all(("img", "svg", "video")))
+    return len(node.get_text()) + _PICTURE_WEIGHT * pictures
+
+
+def _can_unwrap(node, budget):
+    """
+    True when `node` only groups blocks, so it can be split.
+
+    A wrapper of blocks (the `div.calibre` / `div.chapter` every
+    converter adds) is exactly what has to go; a paragraph, a table or a
+    figure is one unit and must keep its page.
+    """
+    if node.name not in _PAGE_CONTAINERS:
+        return False
+    if _node_len(node) <= budget:
+        return False
+    children = _significant_children(node)
+    if not children:
+        return False
+    # A wrapper of a single wrapper (`div.calibre > div.chapter`) is the
+    # commonest shape there is, so one child is enough to descend; what
+    # rules a node out is *inline* content, i.e. a paragraph in disguise.
+    return not any(
+        isinstance(child, NavigableString) or child.name in _INLINE_NAMES
+        for child in children
+    )
+
+
+def _page_groups(container, budget, depth=0):
+    """
+    Split `container`'s content into pages.
+
+    Returns (wrappers, groups): `wrappers` is the chain of grouping
+    elements every page has to be re-created inside, and `groups` is a
+    list of node lists, one per page.  A single child bigger than the
+    budget is descended into, so a book that wraps its whole body in one
+    div still splits at the paragraphs inside it.
+    """
+    nodes = _significant_children(container)
+    if len(nodes) == 1 and depth < _MAX_UNWRAP_DEPTH:
+        if _can_unwrap(nodes[0], budget):
+            wrappers, groups = _page_groups(nodes[0], budget, depth + 1)
+            return [nodes[0]] + wrappers, groups
+    return [], _group_by_budget(nodes, budget)
+
+
+def _group_by_budget(nodes, budget):
+    "Greedy grouping: fill a page until the next node would overflow it."
+    groups = []
+    current = []
+    size = 0
+    for node in nodes:
+        length = _node_len(node)
+        if current and size + length > budget:
+            groups.append(current)
+            current = []
+            size = 0
+        current.append(node)
+        size += length
+    if current:
+        groups.append(current)
+    return groups
+
+
+def _page_html(classes, viewport, wrappers, nodes):
+    "One page: the .epub-body wrapper, the grouping chain, then its nodes."
+    soup = BeautifulSoup("", "html.parser")
+    root = soup.new_tag("div")
+    root["class"] = classes.split(" ")
+    if viewport:
+        root["data-epub-viewport"] = viewport
+    soup.append(root)
+
+    target = root
+    for wrapper in wrappers:
+        clone = soup.new_tag(wrapper.name)
+        for key, value in wrapper.attrs.items():
+            clone[key] = " ".join(value) if isinstance(value, list) else value
+        target.append(clone)
+        target = clone
+    for node in nodes:
+        target.append(node.extract())
+    return str(root)
 
 
 # A viewport meta with both dimensions as plain pixel numbers marks a
@@ -502,7 +743,7 @@ def _rewrite_srcset(value, base_dir, root_rel):
 
 
 def _rewrite_inline_url(match, base_dir, root_rel):
-    'url(...) inside a style attribute.'
+    "url(...) inside a style attribute."
     raw = (match.group(2) or "").strip()
     if not raw:
         return match.group(0)
@@ -588,9 +829,7 @@ def _manifest_chapter_paths(root_abs):
     try:
         with open(manifest, encoding="utf-8") as f:
             entries = json.load(f)
-        return [
-            e["path"] for e in entries if isinstance(e, dict) and e.get("path")
-        ]
+        return [e["path"] for e in entries if isinstance(e, dict) and e.get("path")]
     except (ValueError, KeyError, TypeError, OSError):
         return None
 

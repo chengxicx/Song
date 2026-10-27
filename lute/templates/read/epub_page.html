@@ -1,8 +1,9 @@
-{# One reader-mode EPUB chapter: the chapter's own (sanitised) markup,
-   with Lute word spans injected into its text nodes by
-   lute-epub-reader.js.  The chapter keeps the book's layout -- that is
-   the point of reader mode -- so its scoped stylesheet has to be in the
-   document.
+{# One reader-mode EPUB page: the chapter's own (sanitised) markup, or
+   one split of a chapter that was too long to be a single page (see
+   epub_extract.PAGE_CHAR_BUDGET), with Lute word spans injected into its
+   text nodes by lute-epub-reader.js.  The chapter keeps the book's
+   layout -- that is the point of reader mode -- so its scoped stylesheet
+   has to be in the document.
 
    Two stylesheet URLs ride on the container as data attributes rather
    than a <link> here: this fragment is swapped into #thetext with

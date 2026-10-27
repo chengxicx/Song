@@ -53,9 +53,14 @@ def import_epub_chapters(
     chapter's own CSS) extracted under
     <EPUB_STATIC_ROOT>/epub/<uuid>/ -- in the data directory, so the
     package is covered by a database backup rather than living in the
-    code tree.  Its single page is the whole chapter: the reading
-    screen injects word spans into that markup instead of rendering the
-    flattened text.
+    code tree.  The reading screen injects word spans into that markup
+    instead of rendering the flattened text.
+
+    A chapter is normally one page, but a reflowing chapter longer than
+    epub_extract.PAGE_CHAR_BUDGET is written as several files and
+    imported as one page per file, so a page stays cheap to tokenise,
+    render and scroll.  Either way every page carries its own text, and
+    the reading screen pairs page N's tokens with page N's markup.
 
     Returns (imported_count, failed_count, book_title, last_error).
     """
@@ -101,6 +106,10 @@ def import_epub_chapters(
             # Text from the sanitised markup, so the token stream the
             # reading screen builds matches the DOM it injects into.
             b.text = chapter["text"]
+            # One page per split (a short chapter is a single page).  The
+            # chapter's own text above stays the whole thing: it is what
+            # the book listing and the stats report.
+            b.epub_page_texts = [p["text"] for p in chapter.get("pages") or []]
         b.book_tags = chapter_tags
         b.threshold_page_tokens = 250
         b.split_by = "paragraphs"

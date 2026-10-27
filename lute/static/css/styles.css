@@ -1286,6 +1286,28 @@ span.hamburger {
     background-color: rgba(128, 128, 128, 0.14);
 }
 
+/* Hidden, but still measurable.
+
+   The generic `.hide` rule is `display: none`, and these arrows' position
+   is written from JS using their own offsetWidth / offsetHeight.  While
+   hidden those read 0, so any layout pass that landed on a hidden arrow
+   (ResizeObserver on the pane, a window resize, the pane's class
+   MutationObserver) wrote a left/top half an arrow off -- and the next
+   pass snapped it back.  That is the "the arrow jitters when I reach for
+   it" report: the jump happens at the moment the pointer arrives,
+   because reaching the arrow is what changes its visibility.
+
+   Keeping the box in the layout costs nothing (the arrows are
+   `position: fixed`) and makes the measurement valid in every state.
+   Two classes so this out-ranks both `.hide` and `.side-page-nav:hover`,
+   and declared after the hover rule so a hidden arrow cannot light up. */
+.side-page-nav.hide {
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
 .side-page-nav svg {
     display: block;
 }
