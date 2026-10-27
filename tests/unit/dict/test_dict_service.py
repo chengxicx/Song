@@ -273,9 +273,7 @@ def test_list_installed_is_alphabetical(app, app_context, dict_dirs):
     assert names == ["aa_other.db", DICT, "zz_other.db"]
 
 
-def test_a_caller_that_names_no_file_gets_the_first_one(
-    app, app_context, dict_dirs
-):
+def test_a_caller_that_names_no_file_gets_the_first_one(app, app_context, dict_dirs):
     """
     ``None`` means "the pool's first entry" -- a stable fallback, not a
     privileged file.  Before this, ``None`` meant a hard-coded name the
@@ -416,3 +414,73 @@ def test_strip_duplicate_headword_passes_empty_input_through():
     assert service.strip_duplicate_headword("", "たのしい") == ""
     assert service.strip_duplicate_headword(" gloss\nmore", "") == " gloss\nmore"
     assert service.strip_duplicate_headword(" gloss\nmore", "\u200b") == " gloss\nmore"
+
+
+# ---------------------------------------------------------------------------
+# What a dictionary is called in a list.
+# ---------------------------------------------------------------------------
+#
+# The pool file name is derived from the .mdx name with everything but
+# ASCII collapsed to "-", so it is an identifier, not a name: the Oxford
+# dictionary in the production pool is 9-_V3.1.2.db, and a name that
+# arrived in another encoding is stored as its percent-encoded bytes.
+# The settings card and the language form list what status() reports.
+
+
+def _drop_pool_file(static_dir, name, metadata=None):
+    "Write an empty pool dictionary (and an optional sidecar)."
+    pool = os.path.join(static_dir, service.DICT_SUBDIR)
+    os.makedirs(pool, exist_ok=True)
+    with open(os.path.join(pool, name), "wb") as f:
+        f.write(b"")
+    if metadata is not None:
+        import json
+
+        with open(os.path.join(pool, f"{name}.json"), "w", encoding="utf-8") as f:
+            json.dump(metadata, f)
+
+
+def test_a_dictionary_without_a_title_is_named_after_its_source_file(
+    app, app_context, dict_dirs
+):
+    "The Oxford conversion carries no title; the .mdx name is the name."
+    static_dir, _scratch = dict_dirs
+    _drop_pool_file(
+        static_dir,
+        "9-_V3.1.2.db",
+        {"title": "", "source": "牛津高阶双解(第9版)_V3.1.2版.mdx", "entries": 54010},
+    )
+
+    info = service.status("9-_V3.1.2.db")
+
+    assert info["title"] == "牛津高阶双解(第9版)_V3.1.2版"
+    assert info["filename"] == "9-_V3.1.2.db", "the identifier is unchanged"
+
+
+def test_a_dictionary_keeps_its_own_title_when_it_has_one(app, app_context, dict_dirs):
+    static_dir, _scratch = dict_dirs
+    _drop_pool_file(static_dir, "moji.db", {"title": "MOJi辞書", "source": "moji.mdx"})
+
+    assert service.status("moji.db")["title"] == "MOJi辞書"
+
+
+def test_a_percent_encoded_source_name_is_decoded(app, app_context, dict_dirs):
+    "moji%b4%c7%ca%e9 is a GBK 辞書, not a name to show anybody."
+    static_dir, _scratch = dict_dirs
+    _drop_pool_file(
+        static_dir,
+        "moji-b4-c7.db",
+        {"title": "", "source": "moji%b4%c7%ca%e9:MOJi%b4%c7%95%f8.mdx"},
+    )
+
+    assert service.status("moji-b4-c7.db")["title"] == "moji辞书:MOJi辞書"
+
+
+def test_a_dictionary_with_no_metadata_falls_back_to_its_file_name(
+    app, app_context, dict_dirs
+):
+    "A file dropped in by hand (the CLI path) has no sidecar at all."
+    static_dir, _scratch = dict_dirs
+    _drop_pool_file(static_dir, "handmade.db")
+
+    assert service.status("handmade.db")["title"] == "handmade.db"

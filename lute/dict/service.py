@@ -46,6 +46,7 @@ import re
 import sqlite3
 import threading
 import time
+import urllib.parse
 import urllib.request
 import uuid
 from datetime import datetime
@@ -199,6 +200,52 @@ def _read_metadata(filename=None):
         return {}
 
 
+def _display_title(meta, filename):
+    """
+    What to call one dictionary in a list: its own title, else the name
+    of the .mdx it was built from, else its pool file name.
+
+    The pool file name is an identifier, not a name to show a reader:
+    it is the .mdx name with everything but ASCII collapsed to "-"
+    (see suggested_filename), so 牛津高阶双解(第9版)_V3.1.2版.mdx is
+    stored as 9-_V3.1.2.db, and a name the browser sent in another
+    encoding is stored as its percent-encoded bytes.  An .mdx whose
+    header carries no title (the Oxford conversion does not) would
+    otherwise be listed under that identifier -- which reads as
+    mojibake, and is what the settings card and the language form were
+    showing.
+    """
+    title = (meta.get("title") or "").strip()
+    if title:
+        return title
+    source = (meta.get("source") or "").strip()
+    stem = os.path.splitext(source)[0].strip()
+    if stem:
+        return _percent_decoded(stem)
+    return filename
+
+
+def _percent_decoded(name):
+    """
+    ``name`` with any percent-encoded bytes decoded, when they decode.
+
+    Some .mdx files reach the server with their names percent-encoded
+    and in the uploader's own encoding (moji%b4%c7%ca%e9:... is a GBK
+    辞書), which is unreadable as-is.  A name that does not decode is
+    returned unchanged: a mangled label beats a crash.
+    """
+    if "%" not in name:
+        return name
+    for encoding in ("utf-8", "gbk"):
+        try:
+            # errors="strict": unquote's default replacement character
+            # would make every attempt "succeed" and hand back mojibake.
+            return urllib.parse.unquote(name, encoding=encoding, errors="strict")
+        except (UnicodeDecodeError, LookupError):
+            continue
+    return name
+
+
 def status(filename=None):
     """
     What the settings page and the language form show about one
@@ -231,8 +278,9 @@ def status(filename=None):
     info["size_mb"] = round(stat.st_size / (1024 * 1024), 1)
     info["modified"] = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M")
     meta = _read_metadata(filename)
-    for key in ("source", "title", "entries", "terms", "imported_at"):
+    for key in ("source", "entries", "terms", "imported_at"):
         info[key] = meta.get(key)
+    info["title"] = _display_title(meta, name)
     return info
 
 
