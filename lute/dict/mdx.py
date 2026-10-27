@@ -55,6 +55,11 @@ _SENTENCE_BREAK_RE = re.compile(r"[.!?。！？；;…]")
 # "\n\n" between the entry's parts.
 _LITERAL_NEWLINE_RE = re.compile(r"\\r\\n|\\n|\\r")
 
+# MDict anchor markers ("`1`headword`2`"): hyperlink plumbing some
+# converters leave as text (the 小学館日中 wraps its headword line with
+# them).  They never carry meaning.
+_ANCHOR_MARK_RE = re.compile(r"`\d+`")
+
 
 def _truncate_at_boundary(text, limit):
     """
@@ -513,6 +518,7 @@ class MdxReader:  # pylint: disable=too-many-instance-attributes
         d = _BLOCK_END_RE.sub("\n", d)
         d = _TAG_RE.sub("", d)
         d = _LITERAL_NEWLINE_RE.sub("\n", d)
+        d = _ANCHOR_MARK_RE.sub("", d)
         for entity, char in (
             ("&lt;", "<"),
             ("&gt;", ">"),

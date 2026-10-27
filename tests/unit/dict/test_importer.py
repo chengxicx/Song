@@ -65,9 +65,12 @@ def test_redirect_resolves_to_the_targets_definition():
     ]
     folder, conn = _convert(entries)
     try:
+        # The 【見開き】 key's headword is expanded into a key of its
+        # own -- the kanji form gets a direct hit alongside the kana one.
         assert _definitions(conn) == [
             ("みひらき", "見開き\n左右两页"),
             ("みひらき【見開き】", "見開き\n左右两页"),
+            ("見開き", "見開き\n左右两页"),
         ]
     finally:
         conn.close()
@@ -179,3 +182,29 @@ def test_a_file_that_yields_nothing_is_rejected():
             convert(mdx_path, db_path)
     finally:
         shutil.rmtree(folder, ignore_errors=True)
+
+
+def test_a_romanized_bracket_key_is_also_keyed_under_its_headword():
+    "小学館日中 keys entries 'bennkyou0【勉強】' -- lookups come as 勉強."
+    folder, conn = _convert([("bennkyou0【勉強】", "学习\n用功"), ("紅", "红色")])
+
+    words = [w for (w,) in conn.execute("SELECT word FROM terms ORDER BY rowid")]
+    assert words == ["bennkyou0【勉強】", "勉強", "紅"]
+    assert (
+        conn.execute(
+            "SELECT def FROM entries WHERE eid=(SELECT eid FROM terms WHERE word='勉強')"
+        ).fetchone()[0]
+        == "学习\n用功"
+    )
+    conn.close()
+    shutil.rmtree(folder, ignore_errors=True)
+
+
+def test_a_bracket_key_without_script_letters_is_left_alone():
+    "Only real headwords expand; a latin bracket tail does not."
+    folder, conn = _convert([("note0【see also】", "参照")])
+
+    words = [w for (w,) in conn.execute("SELECT word FROM terms ORDER BY rowid")]
+    assert words == ["note0【see also】"]
+    conn.close()
+    shutil.rmtree(folder, ignore_errors=True)

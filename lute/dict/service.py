@@ -206,6 +206,11 @@ def _read_metadata(filename=None):
 # it under its pool file name.
 _MDICT_PLACEHOLDER_TITLE_RE = re.compile(r"^Title\s*\(", re.I)
 
+# The 小学館日中 leads with its romanized key ("beni0【紅】"): a leading
+# line that is nothing but an optional romaji run and the looked-up word
+# in 【…】 restates the term.
+_ROMAJI_BRACKET_HEADWORD_RE = re.compile(r"[A-Za-z0-9'\-]*【([^】]+)】")
+
 
 def _display_title(meta, filename):
     """
@@ -464,13 +469,15 @@ def strip_duplicate_headword(gloss, text):
     key = text.replace(_ZERO_WIDTH_SPACE, "").strip()
     if not key:
         return gloss
-    while True:
+    while lines:
         first = lines[0].replace(_ZERO_WIDTH_SPACE, "").strip()
-        if not first.startswith(key):
-            break
-        if _HEADWORD_LINE_REST_RE.fullmatch(first[len(key) :]) is None:
-            break
-        if not any(line.strip() for line in lines[1:]):
+        drops = first.startswith(key) and _HEADWORD_LINE_REST_RE.fullmatch(
+            first[len(key) :]
+        )
+        if not drops:
+            match = _ROMAJI_BRACKET_HEADWORD_RE.fullmatch(first)
+            drops = match is not None and match.group(1) == key
+        if not drops or not any(line.strip() for line in lines[1:]):
             break
         lines = lines[1:]
     return "\n".join(lines)

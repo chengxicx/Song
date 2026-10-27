@@ -520,3 +520,15 @@ def test_repeated_headword_lines_all_come_off(app, app_context, dict_dirs):
     gloss = "casa\ncasa\nf.\n房子,家,家务"
 
     assert service.strip_duplicate_headword(gloss, "casa") == "f.\n房子,家,家务"
+
+
+def test_a_romanized_bracket_headword_line_comes_off(app, app_context, dict_dirs):
+    "小学館日中 leads with 'bennkyou0【勉強】'; the card starts at the meaning."
+    static_dir, _scratch = dict_dirs
+    _drop_pool_file(static_dir, "shougakukan-jc.db", {"title": "小学館日中"})
+    gloss = "bennkyou0【勉強】\n（1）〔学習〕学习\n$一夜漬けの勉強／临阵磨枪"
+
+    assert (
+        service.strip_duplicate_headword(gloss, "勉強")
+        == "（1）〔学習〕学习\n$一夜漬けの勉強／临阵磨枪"
+    )

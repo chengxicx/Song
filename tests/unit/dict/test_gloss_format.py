@@ -1034,3 +1034,31 @@ def test_a_hande_meaning_pair_runs_into_a_final_summary_sense():
     blocks = parse_gloss(HANDE_XUEXI)
 
     assert blocks[-1] == {"t": "sense", "text": "lernen; studieren", "n": 2}
+
+
+# --- 三省堂大辞林 / 小学館日中 entries ---------------------------------------
+
+
+def test_daijirin_reading_pair_becomes_one_headword_line():
+    blocks = parse_gloss(
+        "べん－きょう―キヤウ　[0]\n【勉強】\n(名)スル(1)学問や技芸を学ぶこと。"
+    )
+
+    assert types(blocks) == ["headword", "sense"]
+    assert blocks[0]["text"] == "べん－きょう―キヤウ [0]【勉強】"
+    assert blocks[1]["text"].startswith("(名)スル")
+
+
+def test_shougakukan_dollar_examples_carry_both_halves():
+    blocks = parse_gloss(
+        "（1）〔学習〕学习\n$一夜漬けの勉強／临阵磨枪\n$化学を勉強する／学习化学."
+    )
+
+    assert types(blocks) == ["sense", "example", "example"]
+    assert blocks[1]["text"] == "一夜漬けの勉強"
+    assert blocks[1]["translation"] == "临阵磨枪"
+    assert blocks[2] == {
+        "t": "example",
+        "text": "化学を勉強する",
+        "translation": "学习化学.",
+    }
