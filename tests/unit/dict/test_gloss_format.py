@@ -298,9 +298,7 @@ def test_compact_keeps_the_pos_and_senses_and_drops_the_examples():
         ]
     )
 
-    assert compact_gloss(gloss) == (
-        "他动·二类\n吃。（飲食物をいただく。）\n生活。（生計を立てる。）"
-    )
+    assert compact_gloss(gloss) == ("他动·二类\n吃。（飲食物をいただく。）\n生活。（生計を立てる。）")
 
 
 def test_compact_caps_the_total_length_with_an_ellipsis():
@@ -341,9 +339,7 @@ def test_compact_of_an_english_entry_keeps_the_chinese_definitions():
         ]
     )
 
-    assert compact_gloss(gloss) == (
-        "noun\n词；单词；字\n诺言；保证\nSee also: wordy"
-    )
+    assert compact_gloss(gloss) == ("noun\n词；单词；字\n诺言；保证\nSee also: wordy")
 
 
 def test_compact_keeps_an_english_see_also_without_reading():
@@ -360,3 +356,152 @@ def test_compact_falls_back_to_the_raw_lines_when_nothing_parses():
 def test_compact_passes_an_empty_gloss_through():
     assert compact_gloss(None) is None
     assert compact_gloss("") == ""
+
+
+# ---------------------------------------------------------------------------
+# Marked glosses: the entries that arrive as ONE line, with the source
+# markup's icons left inline (the Oxford conversion in the pool).
+# ---------------------------------------------------------------------------
+
+# 牛津高阶双解, sampled 2026-10-27 through the Local tab.
+HAPPY = (
+    "🔑 happyBrE /ˈhæpi/NAmE /ˈhæpi/ adjective (hap·pier, hap·pi·est) happy adjective"
+    "🔑 (≠ unhappy) happily adverb"
+    "➤feeling/giving pleasure 感到／给予快乐"
+    "🔑 feeling or showing pleasure; pleased 感到（或显得）快乐的；高兴的"
+    "◆a happy smile/face快活的微笑／面容"
+    "◆You don't look very happy today.  你今天好像不太高兴。🔊🔊"
+    "gladhappy ◇ pleased ◇ delighted ◇ proud"
+    "These words all describe people feeling happy about sth. 以上各词均形容人感到高兴。"
+)
+
+THE = (
+    "🔑 theBrE /ðə/NAmE /ðə/ definite article"
+    "🔑 used to refer to sb/sth that has already been mentioned"
+    "（指已提到或易领会到的人或事物）"
+    "◆the Mona Lisa《蒙娜丽莎》"
+    "🔑 used to refer to sb/sth that is the only, normal or obvious one of their kind"
+    "（指独一无二的、正常的或不言而喻的人或事物）"
+)
+
+GIVE = (
+    "🔑 giveBrE /ɡɪv/NAmE /ɡɪv/ verbpresent simple - I / you / we / they give"
+    " BrE /ɡɪv/ NAmE /ɡɪv/past simple gave"
+    "➤hand/provide 交给；提供"
+    "🔑  [T] to hand sth to sb so that they can look at it 给；交给"
+    "◆~ sth to sb Give the letter to your mother when you've read it."
+    "  信看完后交给你母亲。"
+)
+
+A_ARTICLE = (
+    "🔑 aBrE /ə/NAmE /ə/ indefinite article"
+    " HELP The form  a  is used before consonant sounds and the form  an  before vowel"
+    " sounds. When saying abbreviations like 'FM' or 'UN', use  a  or  an."
+    "◆an FM radio U  is a vowel but begins with /j/ and so you say:"
+    "🔑 used before countable or singular nouns referring to people or things"
+    " （用于可数名词或单数名词前，表示未曾提到的）一（人、事、物）"
+)
+
+
+def test_a_marked_entry_becomes_a_headword_guide_word_senses_and_examples():
+    "The 800-character wall, split on the markers its markup left behind."
+    blocks = parse_gloss(HAPPY)
+
+    assert types(blocks) == [
+        "headword",
+        "note",
+        "note",
+        "section",
+        "sense",
+        "example",
+        "example",
+    ], "word-family lines are notes, ➤ is a header, ◆ are examples"
+    assert blocks[0]["text"] == "BrE /ˈhæpi/NAmE /ˈhæpi/ adjective"
+    assert blocks[3]["text"] == "feeling/giving pleasure 感到／给予快乐"
+    assert blocks[4] == {
+        "t": "sense",
+        "text": "感到（或显得）快乐的；高兴的",
+        "en": "feeling or showing pleasure; pleased",
+        "n": 1,
+    }
+    assert blocks[5]["text"] == "a happy smile/face"
+    assert blocks[5]["translation"] == "快活的微笑／面容"
+    assert blocks[6]["translation"] == "你今天好像不太高兴。"
+
+
+def test_the_markers_themselves_never_reach_the_rendered_text():
+    for gloss in (HAPPY, THE, GIVE, A_ARTICLE):
+        for block in parse_gloss(gloss):
+            shown = " ".join(
+                str(block.get(key) or "") for key in ("text", "en", "translation")
+            )
+            for mark in ("🔑", "➤", "◆", "◇", "🔊"):
+                assert mark not in shown, f"{mark} leaked into {block}"
+
+
+def test_a_sense_whose_translation_opens_with_a_wide_bracket_keeps_it():
+    "the first sense: （指已提到…） is the translation, not the definition."
+    blocks = parse_gloss(THE)
+    senses = [b for b in blocks if b["t"] == "sense"]
+
+    assert senses[0]["text"] == "（指已提到或易领会到的人或事物）"
+    assert senses[0]["en"] == (
+        "used to refer to sb/sth that has already been mentioned"
+    )
+    assert senses[0]["n"] == 1
+    assert senses[1]["n"] == 2, "numbering continues across the entry"
+
+
+def test_a_synonym_study_is_dropped_rather_than_shown_as_an_example():
+    "◇ starts prose about the synonym group, not this entry's meaning."
+    shown = " ".join(str(b.get("text") or "") for b in parse_gloss(HAPPY))
+
+    assert "pleased" not in shown
+    assert "以上各词" not in shown
+    assert "gladhappy" not in shown, "its first synonym is glued to the previous text"
+
+
+def test_a_help_usage_note_is_dropped_along_with_its_examples():
+    "HELP runs until the next sense: it is guidance, not the meaning."
+    blocks = parse_gloss(A_ARTICLE)
+
+    shown = " ".join(str(b.get("text") or "") for b in blocks)
+    assert "The form" not in shown
+    assert "FM radio" not in shown
+    assert [b["t"] for b in blocks] == ["headword", "sense"]
+    assert blocks[1]["text"].startswith("（用于可数名词或单数名词前")
+
+
+def test_a_short_key_without_a_translation_is_a_word_family_line_not_a_sense():
+    "happy's '🔑 (≠ unhappy) happily adverb' is a cross-reference."
+    blocks = parse_gloss(HAPPY)
+
+    assert blocks[2] == {"t": "note", "text": "(≠ unhappy) happily adverb"}
+
+
+def test_a_conjugation_table_glued_onto_the_pos_label_is_cut_off():
+    "give: 'verbpresent simple - I ...' -- only the label survives."
+    blocks = parse_gloss(GIVE)
+
+    assert blocks[0]["t"] == "headword"
+    assert blocks[0]["text"] == "BrE /ɡɪv/NAmE /ɡɪv/ verb"
+    assert "present simple" not in blocks[0]["text"]
+
+
+def test_a_marked_entry_still_compacts_to_its_chinese_definitions():
+    "The term form's auto-fill wants the meaning, not the examples."
+    assert compact_gloss(HAPPY) == "感到（或显得）快乐的；高兴的"
+
+
+def test_a_related_words_list_glued_onto_the_last_translation_is_dropped():
+    "book: the word-use study's list lands in the last example's translation."
+    gloss = (
+        "🔑 bookBrE /bʊk/NAmE /bʊk/ noun"
+        "🔑  [C] a set of printed pages 书；书籍"
+        "◆reference/children's/library books 参考书；儿童读物；馆藏书籍"
+        " author,  book,  classic,  critic,  drama"
+    )
+    blocks = parse_gloss(gloss)
+
+    assert blocks[-1]["t"] == "example"
+    assert blocks[-1]["translation"] == "参考书；儿童读物；馆藏书籍"
