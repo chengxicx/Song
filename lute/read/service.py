@@ -15,6 +15,7 @@ from lute.models.book import Text, WordsRead
 from lute.models.repositories import BookRepository, UserSettingRepository
 from lute.book.stats import Service as StatsService
 from lute.dict import service as dict_service
+from lute.dict import gloss_format
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.read import manga_columns
@@ -1265,7 +1266,9 @@ class Service:
                     # shown above already; the bordered copy below would
                     # repeat it and double the card's height.
                     if not _translation_carries(stripped, term.translation):
-                        t.dict_gloss = _popup_first_lines(stripped)
+                        t.dict_gloss = _popup_first_lines(
+                            gloss_format.popup_gloss(stripped)
+                        )
                     break
 
         if (

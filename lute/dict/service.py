@@ -200,6 +200,13 @@ def _read_metadata(filename=None):
         return {}
 
 
+# MDict's placeholder for "the author never set a title": converters
+# emit it verbatim into the header ("Title (No HTML code allowed)"), and
+# listing a dictionary under it is the same unreadable noise as listing
+# it under its pool file name.
+_MDICT_PLACEHOLDER_TITLE_RE = re.compile(r"^Title\s*\(", re.I)
+
+
 def _display_title(meta, filename):
     """
     What to call one dictionary in a list: its own title, else the name
@@ -216,7 +223,7 @@ def _display_title(meta, filename):
     showing.
     """
     title = (meta.get("title") or "").strip()
-    if title:
+    if title and _MDICT_PLACEHOLDER_TITLE_RE.match(title) is None:
         return title
     source = (meta.get("source") or "").strip()
     stem = os.path.splitext(source)[0].strip()
@@ -430,8 +437,9 @@ def lookup(term, reading=None, filename=None, prefer_reading=False):
 # A converted definition leads with the dictionary's own headword --
 # "目覚まし時計【めざましどけい⑤】" -- and every reader that shows a
 # gloss shows the looked-up word above it, so that line is pure
-# repetition there.  Only that exact line is ever dropped.
-_HEADWORD_LINE_REST_RE = re.compile(r"\s*(?:【[^】]*】)?\s*")
+# repetition there.  Only that exact line is ever dropped.  Collins
+# appends its frequency stars to the same line ("happy★★★★☆").
+_HEADWORD_LINE_REST_RE = re.compile(r"\s*(?:【[^】]*】)?\s*(?:[★☆]{3,})?\s*")
 
 
 def strip_duplicate_headword(gloss, text):

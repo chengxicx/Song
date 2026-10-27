@@ -6,7 +6,12 @@ production pool (MOJi辞書, sampled 2026-10-12 via the Local tab), so a
 rule change that would garble the actual dictionaries shows up here.
 """
 
-from lute.dict.gloss_format import COMPACT_GLOSS_MAX_CHARS, compact_gloss, parse_gloss
+from lute.dict.gloss_format import (
+    COMPACT_GLOSS_MAX_CHARS,
+    compact_gloss,
+    parse_gloss,
+    popup_gloss,
+)
 
 
 def types(blocks):
@@ -505,3 +510,451 @@ def test_a_related_words_list_glued_onto_the_last_translation_is_dropped():
 
     assert blocks[-1]["t"] == "example"
     assert blocks[-1]["translation"] == "参考书；儿童读物；馆藏书籍"
+
+
+# subconscious, as the Local tab served it: the entry has no 🔑 at all --
+# only its ◆ examples are marked -- so the headword, the phonetics, the
+# POS and the first definition arrived as one run.
+SUBCONSCIOUS = (
+    "1 sub·con·sciousBrE /ˌsʌbˈkɒnʃəs/NAmE /ˌsʌbˈkɑːnʃəs/ adjective"
+    " [usually before noun] connected with a part of your mind that stores"
+    " memories and makes you behave in a particular way 潜意识的；下意识的"
+    "◆a subconscious fear 下意识的恐惧"
+    "◆the subconscious mind 潜意识"
+    "➡ compare conscious ▸ sub·con·scious·lyBrE /ˌsʌbˈkɒnʃəsli/ adverb 下意识地"
+)
+
+
+def test_an_entry_with_no_key_marks_still_gets_its_headword_and_first_sense():
+    "subconscious: only ◆ is marked; the opening run used to be one sense."
+    blocks = parse_gloss(SUBCONSCIOUS)
+
+    assert types(blocks) == ["headword", "sense", "example", "example", "note", "note"]
+    assert blocks[0]["text"] == "BrE /ˌsʌbˈkɒnʃəs/NAmE /ˌsʌbˈkɑːnʃəs/ adjective"
+    assert blocks[1]["n"] == 1, "the definition is the entry's first sense"
+    assert blocks[1]["text"] == "潜意识的；下意识的"
+    assert blocks[1]["en"].startswith("[usually before noun] connected with")
+    assert blocks[2]["text"] == "a subconscious fear"
+    assert blocks[2]["translation"] == "下意识的恐惧"
+    assert blocks[4]["text"] == "compare conscious", "➡ is a note, not a sense tail"
+    assert "sub·con·scious·ly adverb" in blocks[5]["text"]
+    assert "/ˌsʌbˈkɒnʃəsli/" not in blocks[5]["text"], "the note drops the phonetics"
+
+
+def test_an_unmarked_entry_is_unchanged_by_the_headword_split():
+    "No markers at all: the rules below read the lines as they always did."
+    gloss = "a pleasant feeling\ngiving pleasure"
+    blocks = parse_gloss(gloss)
+
+    assert types(blocks) == ["sense", "sense"]
+    assert [b["text"] for b in blocks] == ["a pleasant feeling", "giving pleasure"]
+
+
+# echoes, as the Local tab served it: same as subconscious, with the
+# extra damage that senses 2 and 3 lost their marker entirely and were
+# glued onto the translations of the examples before them.
+ECHOES = (
+    "echoBrE /ˈekəʊ/NAmE /ˈekoʊ/ noun (plural echoes) the reflecting of"
+    " sound off a wall or inside a confined space so that a noise appears"
+    " to be repeated; a sound that is reflected back in this way 回响； 回声； 回音"
+    "◆There was an echo on the phone and I couldn't hear clearly."
+    " 电话里有回音，我听不清楚。 🔊🔊"
+    "◆The hills sent back a faint echo. 座座山丘传来微弱的回声。 🔊🔊"
+    "◆the echo of footsteps running down the corridor沿走廊跑的脚步声回声"
+    " the fact of an idea, event, etc. being like another and reminding"
+    " you of it; sth that reminds you of sth else 映现； 暗示； 启示； 反响"
+    "◆Yesterday's crash has grim echoes of previous disasters."
+    " 昨天的撞车事故使人想起之前那些令人痛心的灾难。 🔊🔊"
+    "an opinion or attitude that agrees with or repeats one already"
+    " expressed or thought 共鸣； 附和； 重复"
+    "◆His words were an echo of what she had heard many times before."
+    " 他的话她以往听过许多次。 🔊🔊"
+    "◆The speech found an echo"
+)
+
+
+def test_a_definition_glued_onto_an_examples_translation_becomes_a_sense():
+    "echoes: the English after a Chinese gloss is the next definition."
+    blocks = parse_gloss(ECHOES)
+
+    assert types(blocks) == [
+        "headword",
+        "sense",
+        "example",
+        "example",
+        "example",
+        "sense",
+        "example",
+        "sense",
+        "example",
+        "example",
+    ]
+    senses = [b for b in blocks if b["t"] == "sense"]
+    assert [b["text"] for b in senses] == [
+        "回响； 回声； 回音",
+        "映现； 暗示； 启示； 反响",
+        "共鸣； 附和； 重复",
+    ]
+    assert [b["n"] for b in senses] == [1, 2, 3]
+    # The cut lands between the example and the definition glued after
+    # its translation, so neither carries the other's text.
+    assert blocks[4]["translation"] == "沿走廊跑的脚步声回声"
+    assert blocks[5]["en"].startswith("the fact of an idea")
+
+
+
+# --- Oxford's inline apparatus --------------------------------------------
+#
+# Beyond the markers, the Oxford conversion glues three more kinds of
+# source material onto entries: the "~" sense patterns, the OPP
+# antonym pointer, and the topic/appendix lists.  Each used to land
+# inside a translation or replace the entry's own sense.
+
+ABLAZE = (
+    "ablazeBrE /əˈbleɪz/NAmE /əˈbleɪz/ adjective [not before noun]"
+    " burning quickly and strongly 猛烈燃烧"
+    "◆The whole building was soon ablaze.  整栋大楼很快就熊熊燃烧起来。🔊🔊"
+    "◆Cars and buses were  set ablaze  during the riot."
+    "  暴乱中许多轿车和公共汽车被纵火焚烧。🔊🔊"
+    "full of bright light or colours 闪耀；发光；明亮；色彩鲜艳"
+    "◆There were lights still ablaze as they drove up to the house."
+    "  他们驾车到屋前时，（屋内）灯火仍然通明。🔊🔊"
+    "◆~ with sth The trees were ablaze with the colours of autumn."
+    "  树木披上了绚丽的秋装。🔊🔊"
+    "~ (with sth) full of strong emotion or excitement 充满激情的；情绪激动的"
+    "◆He turned to her, his eyes ablaze with anger."
+    "  他转过身来，怒目圆睁瞪着她。🔊🔊"
+)
+
+
+def test_a_tilde_sense_pattern_after_a_translation_opens_a_new_sense():
+    "ablaze: the last sense's '~ (with sth)' was glued to an example."
+    blocks = parse_gloss(ABLAZE)
+
+    assert types(blocks) == [
+        "headword",
+        "sense",
+        "example",
+        "example",
+        "sense",
+        "example",
+        "example",
+        "sense",
+        "example",
+    ]
+    assert blocks[6]["translation"] == "树木披上了绚丽的秋装。"
+    assert blocks[7] == {
+        "t": "sense",
+        "text": "充满激情的；情绪激动的",
+        "en": "~ (with sth) full of strong emotion or excitement",
+        "n": 3,
+    }
+
+
+ABILITY = (
+    "🔑 abil·ityBrE /əˈbɪləti/NAmE /əˈbɪləti/ noun (plural abil·ities)"
+    " 🔑  [sing.] ~ to do sth the fact that sb/sth is able to do sth 能力"
+    "◆The system has the ability to run more than one program at the same time."
+    "  该系统能够同时运行一个以上的程序。🔊🔊"
+    "◆A gentle form of exercise will increase your ability to relax."
+    "  和缓的运动锻炼会提高自我放松的能力。🔊🔊 OPP inability"
+    " 🔑  [C, U] a level of skill or intelligence 才能；本领；才智"
+    "◆Almost everyone has some musical ability.  几乎人人都有一些音乐才能。🔊🔊"
+)
+
+
+def test_an_opposite_pointer_is_a_note_not_part_of_the_translation():
+    "ability: 'OPP inability' rides on the last example of a sense."
+    blocks = parse_gloss(ABILITY)
+
+    assert {"t": "note", "text": "OPP inability"} in blocks
+    assert blocks[3]["translation"] == "和缓的运动锻炼会提高自我放松的能力。"
+    assert all("OPP" not in b.get("translation", "") for b in blocks)
+
+
+def test_a_source_vocabulary_list_glued_to_a_translation_is_cut():
+    "airing cupboard: an appendix list follows the meaning, not the meaning."
+    gloss = (
+        "airing cupboardBrE /ˈeərɪŋ kʌbəd/NAmE /ˈerɪŋ kʌbərd/ noun (BrE)"
+        " a warm cupboard in which clean sheets, clothes, etc. are put to"
+        " make sure they are completely dry （烘干衣物的）烘柜"
+        "  Compound nouns with –ing forms airing cupboard, answering machine,"
+        " asking price, baking powder, betting shop, boarding school,"
+        " booking office, bowling alley, breathing space"
+    )
+    blocks = parse_gloss(gloss)
+
+    assert types(blocks) == ["headword", "sense"]
+    assert blocks[1]["text"] == "（烘干衣物的）烘柜"
+    assert "Compound nouns" not in blocks[1]["text"]
+
+
+ACTOR = (
+    "🔑 actorBrE /ˈæktə(r)/NAmE /ˈæktər/ noun"
+    "a person who performs on the stage, on television or in films/movies,"
+    " especially as a profession 演员 actor, ,  cinema,  dialogue,"
+    "  director,  dub,  film,  location,  scenario,  sound effect\n"
+    "actor,  audition,  body double,  cameo,  cast,  play,  role,  star,"
+    "  understudy\n"
+    "Masculine, feminine and ungendered form anchorman/\u200banchorwoman,"
+    " assemblyman/\u200bassemblywoman, businessman/\u200bbusinesswoman,"
+    " actor/\u200bactress, cameraman/\u200bcamerawoman,"
+    " chairman/\u200bchairwoman/\u200bchair, congressman/\u200bcongresswoman"
+)
+
+
+def test_a_marked_headword_line_keeps_the_definition_after_its_pos():
+    "actor: the first definition shared the run with the headword."
+    blocks = parse_gloss(ACTOR)
+
+    assert types(blocks) == ["headword", "sense"]
+    assert blocks[0]["text"] == "BrE /ˈæktə(r)/NAmE /ˈæktər/ noun"
+    assert blocks[1]["text"] == "演员"
+    assert blocks[1]["en"].startswith("a person who performs")
+
+
+def test_a_trailing_vocabulary_list_line_is_dropped():
+    "actor: 'Masculine, feminine and ungendered form …' is an appendix."
+    blocks = parse_gloss(ACTOR)
+
+    assert all("Masculine" not in b["text"] for b in blocks)
+
+
+# --- Collins: one line per sense, no block-level markup -------------------
+#
+# Collins flattens to "number[POS label] translation；definition" lines
+# with the examples underneath.  Without a profile the whole line was
+# a "note" and the entry showed no structure at all.
+
+
+def test_a_collins_entry_gets_pos_senses_and_example_pairs():
+    "accordion, as the Collins converter writes it."
+    gloss = "\n".join(
+        [
+            "accordion★☆☆☆☆",
+            "1[N-COUNT 可数名词] 手风琴；An accordion is a musical instrument"
+            " in the shape of a fairly large box.",
+        ]
+    )
+    blocks = parse_gloss(gloss)
+
+    assert types(blocks) == ["headword", "pos", "sense"]
+    assert blocks[0]["text"] == "accordion"  # the frequency stars come off
+    assert blocks[1]["text"] == "N-COUNT"
+    assert blocks[2] == {
+        "t": "sense",
+        "text": "手风琴",
+        "en": "An accordion is a musical instrument in the shape of a"
+        " fairly large box.",
+        "n": 1,
+    }
+
+
+COLLINS_HAPPY = "\n".join(
+    [
+        "happy★★★★☆",
+        "1[ADJ-GRADED 能被表示程度的副词或介词词组修饰的形容词]"
+        " 高兴的;快乐的；Someone who is happy has feelings of pleasure."
+        " [usu ADJ n]",
+        "Marina was a confident, happy child...",
+        "玛丽娜是个自信、快乐的孩子。",
+        "Her face relaxed into a happy smile.",
+        "她表情放松下来，露出快乐的微笑。",
+        "happilyAlbert leaned back happily and lit a cigarette.",
+        "艾伯特高兴地向后倚靠，点了根香烟。",
+        "2[ADJ-GRADED 同样的标签] 幸福的；A happy time is full of pleasant"
+        " experiences.",
+    ]
+)
+
+
+def test_collins_examples_pair_with_their_translations():
+    "happy: the English example lines and the Chinese lines under them."
+    blocks = parse_gloss(COLLINS_HAPPY)
+
+    examples = [b for b in blocks if b["t"] == "example"]
+    assert [b["text"] for b in examples] == [
+        "Marina was a confident, happy child...",
+        "Her face relaxed into a happy smile.",
+        "Albert leaned back happily and lit a cigarette.",
+    ]
+    assert examples[0]["translation"] == "玛丽娜是个自信、快乐的孩子。"
+    assert examples[2]["translation"] == "艾伯特高兴地向后倚靠，点了根香烟。"
+
+
+def test_a_collins_derived_word_glued_to_its_example_becomes_a_note():
+    "happy: 'happilyAlbert leaned back…' is a derived word plus example."
+    blocks = parse_gloss(COLLINS_HAPPY)
+
+    assert {"t": "note", "text": "happily"} in blocks
+    examples = [b for b in blocks if b["t"] == "example"]
+    assert examples[2]["text"].startswith("Albert leaned back happily")
+
+
+def test_collins_trailing_grammar_labels_stay_out_of_the_definition():
+    "happy: the source ends the definition with '[usu ADJ n]'."
+    blocks = parse_gloss(COLLINS_HAPPY)
+
+    assert blocks[2]["en"] == "Someone who is happy has feelings of pleasure."
+    assert blocks[-1]["n"] == 2  # the source number is kept
+
+
+def test_english_terms_inside_a_chinese_gloss_do_not_start_a_sense():
+    "about: 'about还常用在walk, drive等…' is one Chinese sentence."
+    gloss = (
+        "除下列用法外，about可用在一些动词、名词和形容词后引出附加信息。"
+        "about还常用在walk, drive等表示动作的动词后或mess about，set about"
+        " 等短语动词中，这类情况尤见于英国英语。"
+    )
+    blocks = parse_gloss(gloss)
+
+    assert len(blocks) == 1
+    assert blocks[0]["t"] == "note"
+
+
+# --- popup_gloss: the entry as the term popup shows it ----------------------
+#
+# The popup is a glance: one line per block, no markers, no headword or
+# phonetic chrome (the popup already names the term above it).
+
+
+def test_the_popup_gloss_lays_a_marked_entry_out_without_its_markers():
+    blocks = popup_gloss(SUBCONSCIOUS).split("\n")
+
+    assert blocks[0] == "潜意识的；下意识的"
+    assert blocks[1] == "a subconscious fear"
+    assert blocks[2] == "下意识的恐惧"
+    assert not any(mark in popup_gloss(SUBCONSCIOUS) for mark in ("🔑", "➡", "◆", "▸"))
+
+
+def test_the_popup_gloss_passes_a_gloss_that_parses_to_nothing_through():
+    assert popup_gloss("") == ""
+    assert popup_gloss(None) is None
+
+
+# ---------------------------------------------------------------------------
+# Korean (Hangul) dictionary entries: naver 韩汉 and 표준국어대사전
+# ---------------------------------------------------------------------------
+
+NAVER_GADA = """가다
+[동사]
+(1) 去 qù. 走 zǒu. 往 wǎng. 上 shàng. 赴 fù.
+도서관에 가다
+去图书馆
+(2) 上 shàng.
+내 아들은 내년에 학교에 간다
+我的儿子明年上学"""
+
+
+def test_naver_korean_entry_gets_pos_numbered_senses_and_example_pairs():
+    blocks = parse_gloss(NAVER_GADA)
+
+    assert types(blocks) == [
+        "headword",
+        "pos",
+        "sense",
+        "example",
+        "sense",
+        "example",
+    ]
+    assert blocks[2]["n"] == 1
+    assert blocks[2]["text"] == "去 qù. 走 zǒu. 往 wǎng. 上 shàng. 赴 fù."
+    assert blocks[3]["text"] == "도서관에 가다"
+    assert blocks[3]["translation"] == "去图书馆"
+    assert blocks[4]["n"] == 2
+    assert blocks[5]["translation"] == "我的儿子明年上学"
+
+
+def test_naver_hangul_example_is_not_an_english_counterpart():
+    "A Hangul line after a Chinese sense is an example, not the sense's 'en'."
+    blocks = parse_gloss(NAVER_GADA)
+
+    assert all("en" not in b for b in blocks)
+
+
+STANDARD_SARANG = """I
+사랑1
+[명사]
+1 	아끼고 위하는 정성스러운 마음, 또는 그러한 마음을 베푸는 일.
+* 어머님의 ~.
+*나라와 겨레에 대한 ~.
+2 	남녀가 서로 정을 들이어 애틋하게 그리는 마음, 또는 그러한 일.
+* ~을 맺다(속삭이다).
+I I
+사랑2 【舍廊】
+[명사]
+바깥주인이 거처하며 손님을 대접하는 곳. 곧 사랑채나 사랑방. = 객간.
+⇔ 내실1 (內室)1."""
+
+
+def test_standard_korean_entry_keeps_its_own_numbers_and_bullets():
+    blocks = parse_gloss(STANDARD_SARANG)
+
+    assert types(blocks) == [
+        "section",   # I -- the homograph divider
+        "headword",  # 사랑1
+        "pos",       # [명사]
+        "sense",     # 1 아끼고...
+        "example",   # * 어머님의 ~.
+        "example",   # *나라와 겨레에 대한 ~.
+        "sense",     # 2 남녀가...
+        "example",   # * ~을 맺다(속삭이다).
+        "section",   # I I
+        "headword",  # 사랑2 【舍廊】
+        "pos",       # [명사]
+        "sense",     # 바깥주인이... (a Hangul definition, not an example)
+        "xref",      # ⇔ 내실1
+    ]
+    assert blocks[3]["n"] == 1
+    assert blocks[3]["text"].startswith("아끼고")
+    assert blocks[6]["n"] == 2
+    assert blocks[12]["text"] == "내실1 (內室)1."
+
+
+def test_standard_korean_definition_line_is_a_sense_not_an_example():
+    "A long Hangul definition follows a POS badge; only naver examples pair."
+    blocks = parse_gloss(STANDARD_SARANG)
+
+    assert blocks[11]["t"] == "sense"
+    assert blocks[11]["n"] == 1
+    assert blocks[11]["text"].startswith("바깥주인이")
+
+
+def test_korean_pos_badge_with_conjugation_type_stays_whole():
+    blocks = parse_gloss(
+        """가다1
+[자동사]〖거라불규칙/가거라〗
+1 	(이곳에서) 다른 곳으로 옮다(이동하다)."""
+    )
+
+    assert blocks[0]["t"] == "headword"
+    assert blocks[1] == {"t": "pos", "text": "[자동사]〖거라불규칙/가거라〗"}
+    assert blocks[2]["t"] == "sense"
+
+
+# ---------------------------------------------------------------------------
+# Russian 俄汉汉俄: circled-number grammatical runs
+# ---------------------------------------------------------------------------
+
+
+def test_russian_circled_run_becomes_a_grammar_note_and_numbered_senses():
+    gloss = (
+        ", -а或-у，复дом`а〔阳〕⑴房子，房屋.  дерев`янный ～木头房."
+        " ⑵住宅，住所，家. разойт`ись по ～`ам各回各家."
+        " ⑶家，全家人；家务. всем ～ом 全家都到…去."
+    )
+    blocks = parse_gloss(gloss)
+
+    assert types(blocks) == ["note", "sense", "sense", "sense"]
+    assert blocks[0]["text"] == "-а或-у，复дом`а〔阳〕"
+    assert [b["n"] for b in blocks[1:]] == [1, 2, 3]
+    assert blocks[1]["text"].startswith("房子，房屋")
+
+
+def test_russian_entry_opens_with_a_pos_prefixed_translation():
+    gloss = "名词 书\n簿\n册"
+    blocks = parse_gloss(gloss)
+
+    assert types(blocks) == ["pos", "sense", "sense", "sense"]
+    assert blocks[0]["text"] == "名词"
+    assert blocks[1] == {"t": "sense", "text": "书", "n": 1}
