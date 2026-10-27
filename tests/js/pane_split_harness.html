@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>reading pane split harness</title>
+<!-- The real reader stylesheet: the split is a CSS-vs-inline-style fight,
+     so it has to be the production rules, not a mock. -->
+<link rel="stylesheet" href="../../lute/static/css/styles.css">
+</head>
+<body>
+<!-- The reading page's pane structure (read/index.html), trimmed to what
+     resize.js touches. -->
+<div id="read_pane_container">
+  <div id="read_pane_left">
+    <div id="reading-header">
+      <div class="reading_header_container"><span>header</span></div>
+    </div>
+    <div id="thetext"><p>Some reading text to give the pane a height.</p></div>
+  </div>
+  <div id="read_pane_right">
+    <div class="wordframecontainer">
+      <iframe name="wordframe" id="wordframeid" src="about:blank"
+              style="height: 35%; width: 100%"></iframe>
+    </div>
+    <div class="dictcontainer">
+      <div id="dicttabs">
+        <div id="dicttabslayout"></div>
+        <div id="dicttabsstatic"></div>
+      </div>
+      <div id="dictframes"></div>
+    </div>
+  </div>
+</div>
+<script>
+  // The reading page's own inline script provides these globals; resize.js
+  // reads them as free variables.
+  const mediaTablet = window.matchMedia("(max-width: 980px)");
+  const readPaneRight = document.getElementById("read_pane_right");
+  const readPaneLeft = document.getElementById("read_pane_left");
+  const readPaneContainer = document.getElementById("read_pane_container");
+  window.LUTE_HARNESS_READY = false;
+</script>
+<script src="../../lute/static/js/resize.js"></script>
+<script>
+  window.LUTE_HARNESS_READY = true;
+</script>
+</body>
+</html>
