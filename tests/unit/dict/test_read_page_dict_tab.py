@@ -239,9 +239,7 @@ def test_the_lookup_endpoint_uses_the_term_reading(
     db.session.add(term)
     db.session.commit()
 
-    data = client.get(
-        f"/read/localdict_lookup/{japanese.id}/{quote('楽しい')}"
-    ).get_json()
+    data = client.get(f"/read/localdict_lookup/{japanese.id}/{quote('楽しい')}").get_json()
 
     assert "愉快yúkuài" in data["gloss"]
 
@@ -369,9 +367,9 @@ def test_xref_links_carry_their_reading(client, app, app_context, dict_dirs, jap
     )
     _use(japanese, DICT)
 
-    html = client.get(
-        f"/read/localdict/{japanese.id}/{quote('ありがとう')}"
-    ).data.decode("utf-8")
+    html = client.get(f"/read/localdict/{japanese.id}/{quote('ありがとう')}").data.decode(
+        "utf-8"
+    )
 
     assert "ld-xref" in html
     assert "?reading=" in html
@@ -432,9 +430,9 @@ def test_the_local_tab_frame_says_so_for_an_unknown_word(
     _import(app, dict_dirs[1], target=DICT)
     _use(japanese, DICT)
 
-    html = client.get(
-        f"/read/localdict/{japanese.id}/{quote('存在しない')}"
-    ).data.decode("utf-8")
+    html = client.get(f"/read/localdict/{japanese.id}/{quote('存在しない')}").data.decode(
+        "utf-8"
+    )
 
     assert "Not in the installed dictionary" in html
 

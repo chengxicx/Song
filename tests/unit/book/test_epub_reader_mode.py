@@ -66,7 +66,9 @@ def _epub_bytes(title="Reader Book"):
 def _post(client, epub, **fields):
     data = {"epub_file": (io.BytesIO(epub), "reader.epub")}
     data.update(fields)
-    return client.post("/book/import/epub", data=data, content_type="multipart/form-data")
+    return client.post(
+        "/book/import/epub", data=data, content_type="multipart/form-data"
+    )
 
 
 def _import_reader_book(app, client, english, tmp_path):
@@ -122,7 +124,7 @@ def test_reader_mode_import_is_one_page_with_chapter_markup(
     assert "<rt" not in html, "ruby readings are stripped for token alignment"
     assert "漢字" in html
     # Relative asset URLs point at the extracted copy.
-    assert '/static/epub/' in html and "/OEBPS/images/pic.png" in html
+    assert "/static/epub/" in html and "/OEBPS/images/pic.png" in html
 
     css_path = _package_path(app, css_path_for(book.epub_path))
     assert os.path.isfile(css_path)
@@ -281,9 +283,7 @@ def test_token_stream_matches_the_chapter_dom(
     assert "the" in [t[0] for t in words], "words on both sides of a curly quote parse"
 
 
-def test_parser_reports_the_substitutions_it_applies_to_text(
-    app, app_context, english
-):
+def test_parser_reports_the_substitutions_it_applies_to_text(app, app_context, english):
     """
     text_substitutions() has to describe what the parser really does:
     the alignment trusts it, and the parser and the report are written
@@ -370,9 +370,7 @@ def test_scope_css_drops_a_colour_the_theme_would_hide():
 
 def test_scope_css_keeps_a_colour_the_block_paints_behind():
     "A block with its own background is the book's surface: leave it whole."
-    css = scope_css(
-        "p { color: #000; background: #fff; }", "OEBPS", "/static/epub/x"
-    )
+    css = scope_css("p { color: #000; background: #fff; }", "OEBPS", "/static/epub/x")
     assert "color: #000" in css and "background: #fff" in css
 
     # `background: transparent` paints nothing, so it is not a surface.
@@ -409,8 +407,9 @@ def test_scope_css_keep_colors_variant_preserves_every_colour():
     assert "text-indent: 1em" in css
     # A block that is nothing but the colour survives too.
     assert (
-        scope_css("p { color: #000; }", "OEBPS", "/static/epub/x", keep_colors=True)
-        .strip()
+        scope_css(
+            "p { color: #000; }", "OEBPS", "/static/epub/x", keep_colors=True
+        ).strip()
         == ".epub-body p { color: #000; }"
     )
 
@@ -439,7 +438,9 @@ def test_reader_mode_import_writes_orig_stylesheet_and_manifest(
 
     manifest = json.load(
         open(
-            _package_path(app, "epub/" + book.epub_path.split("/")[1] + "/chapters.json"),
+            _package_path(
+                app, "epub/" + book.epub_path.split("/")[1] + "/chapters.json"
+            ),
             encoding="utf-8",
         )
     )
@@ -562,9 +563,7 @@ def test_ensure_orig_css_regenerates_for_old_packages(
     # chapter documents and produces the same stylesheet.
     os.remove(_package_path(app, rel))
     os.remove(
-        _package_path(
-            app, "epub/" + book.epub_path.split("/")[1] + "/chapters.json"
-        )
+        _package_path(app, "epub/" + book.epub_path.split("/")[1] + "/chapters.json")
     )
     assert ensure_orig_css(app, book.epub_path) == rel
     assert "color: red" in open(_package_path(app, rel), encoding="utf-8").read()
@@ -607,16 +606,16 @@ def test_epub_render_look_and_furigana_params(
     "absent"."""
     book = _import_reader_book(app, client, english, tmp_path)
 
-    night = client.get(
-        f"/read/epub_render/{book.id}/1?look=night"
-    ).get_data(as_text=True)
+    night = client.get(f"/read/epub_render/{book.id}/1?look=night").get_data(
+        as_text=True
+    )
     thetext = BeautifulSoup(night, "html.parser").find(id="thetext")
     assert "epub-look-night" in (thetext.get("class") or [])
 
     # Unknown look values fall back to original, never a broken page.
-    bogus = client.get(
-        f"/read/epub_render/{book.id}/1?look=sparkly"
-    ).get_data(as_text=True)
+    bogus = client.get(f"/read/epub_render/{book.id}/1?look=sparkly").get_data(
+        as_text=True
+    )
     thetext = BeautifulSoup(bogus, "html.parser").find(id="thetext")
     assert "epub-look-original" in (thetext.get("class") or [])
 
@@ -625,15 +624,15 @@ def test_epub_render_look_and_furigana_params(
     # always names the URL, so this looks at real <script> srcs.)
     def _has_furigana_script(html):
         soup = BeautifulSoup(html, "html.parser")
-        return soup.find(
-            "script", src=lambda s: s and "lute-furigana.js" in s
-        ) is not None
+        return (
+            soup.find("script", src=lambda s: s and "lute-furigana.js" in s) is not None
+        )
 
     default = client.get(f"/read/epub_render/{book.id}/1").get_data(as_text=True)
     assert not _has_furigana_script(default)
-    forced = client.get(
-        f"/read/epub_render/{book.id}/1?furigana=1"
-    ).get_data(as_text=True)
+    forced = client.get(f"/read/epub_render/{book.id}/1?furigana=1").get_data(
+        as_text=True
+    )
     assert _has_furigana_script(forced)
     assert "LUTE_FURIGANA" in forced
 
@@ -641,9 +640,9 @@ def test_epub_render_look_and_furigana_params(
     # without it the second tap settles immediately.
     plain = client.get(f"/read/epub_render/{book.id}/1").get_data(as_text=True)
     assert "var tripleEnabled = false;" in plain
-    triple = client.get(
-        f"/read/epub_render/{book.id}/1?triple=1"
-    ).get_data(as_text=True)
+    triple = client.get(f"/read/epub_render/{book.id}/1?triple=1").get_data(
+        as_text=True
+    )
     assert "var tripleEnabled = true;" in triple
 
 

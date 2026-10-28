@@ -79,6 +79,7 @@ p { background: #eeeeee; color: #000; }
 h2 { font-size: 32px; color: #000; }
 """
 
+
 def chapter_text():
     "The chapter's rendered text -- what the token stream has to match."
     return BeautifulSoup(CHAPTER, "html.parser").get_text("")
@@ -322,8 +323,11 @@ def main():
         )
 
         # 6. spans are in the parent document
-        check("word spans were injected", state["wordCount"] > 0,
-              " %d" % state["wordCount"])
+        check(
+            "word spans were injected",
+            state["wordCount"] > 0,
+            " %d" % state["wordCount"],
+        )
         check("word spans live in the reading page", state["sameDocument"])
 
         # The book's own type sizes must survive the injected spans.
@@ -356,8 +360,11 @@ def main():
         )
 
         # 7. sentence wrappers stay inline
-        check("sentence wrappers stay inline", state["sentDisplay"] == "inline",
-              " %s" % state["sentDisplay"])
+        check(
+            "sentence wrappers stay inline",
+            state["sentDisplay"] == "inline",
+            " %s" % state["sentDisplay"],
+        )
 
         # 4. font size
         base = state["bodySize"]
@@ -408,8 +415,11 @@ def main():
         cols = page.evaluate(
             "() => getComputedStyle(document.getElementById('thetext')).columnCount"
         )
-        check("two-column is refused for a scrolling chapter", cols == "auto",
-              " column-count %s" % cols)
+        check(
+            "two-column is refused for a scrolling chapter",
+            cols == "auto",
+            " column-count %s" % cols,
+        )
 
         # 6b. delegated click reaches the word span
         page.click("span.word >> nth=0")
@@ -489,7 +499,8 @@ def main():
         s = look_state()
         check(
             "original look: paper surface + keep-colours stylesheet",
-            s["original"] and not s["night"]
+            s["original"]
+            and not s["night"]
             and (s["href"] or "").endswith("lute-orig.css")
             and s["paperBg"] == "rgb(255, 255, 255)"
             and s["h2Color"] == "rgb(0, 0, 0)",
@@ -500,7 +511,8 @@ def main():
         s = look_state()
         check(
             "night look: dark paper, chapter inverted, images restored",
-            s["night"] and not s["original"]
+            s["night"]
+            and not s["original"]
             and s["paperBg"] == "rgb(22, 22, 29)"
             and "invert" in s["bodyFilter"]
             and s["imgFilter"] != "none"
@@ -512,7 +524,8 @@ def main():
         s = look_state()
         check(
             "theme look: no classes, dropped colours, theme stylesheet",
-            not s["original"] and not s["night"]
+            not s["original"]
+            and not s["night"]
             and (s["href"] or "").endswith("lute.css")
             and s["h2Color"] == "rgb(230, 230, 230)"
             and s["bodyFilter"] == "none"

@@ -184,9 +184,9 @@ def test_golden_examples_match_their_rules():
         assert key in rules, f"golden key {key} has no rule"
         for example in examples:
             text = AR._normalise(example["arabic"])
-            assert AR.match_rule(rules[key], AR._tokens_for_page(text), text), (
-                f"{key} does not recognise its golden sentence: {example['arabic']}"
-            )
+            assert AR.match_rule(
+                rules[key], AR._tokens_for_page(text), text
+            ), f"{key} does not recognise its golden sentence: {example['arabic']}"
 
 
 def test_every_library_row_has_an_example():
@@ -262,5 +262,3 @@ def test_library_entries_gloss_in_either_display_language():
             if not isinstance(ex, dict) or not ex.get("tr")
         ]
         assert not blank, f"{lang} rows with no translation: {blank}"
-
-

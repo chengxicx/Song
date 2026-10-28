@@ -231,7 +231,10 @@ def test_passive_row_requires_an_explicit_agent():
     # passive row's span is now the whole construction, so the two are
     # nested reports rather than the same span twice.
     passe = next(r for r in fr._FR_RULES if r["key"] == "fr_passe_compose")
-    for sentence in ("Elle a été malade toute la semaine.", "Il a été élu par les habitants."):
+    for sentence in (
+        "Elle a été malade toute la semaine.",
+        "Il a été élu par les habitants.",
+    ):
         text = fr._norm_text(sentence)
         assert fr.match_rule(passe, fr._tokens_for(text), text), sentence
 
@@ -341,7 +344,10 @@ def test_negation_splits_personne_and_rien_off_the_general_rule():
         text = fr._norm_text(sentence)
         assert fr.match_rule(rien, fr._tokens_for(text), text), sentence
         assert not fr.match_rule(negation, fr._tokens_for(text), text), sentence
-    for sentence in ("Elle ne travaille pas le lundi.", "Tu ne voyages jamais en hiver."):
+    for sentence in (
+        "Elle ne travaille pas le lundi.",
+        "Tu ne voyages jamais en hiver.",
+    ):
         text = fr._norm_text(sentence)
         assert fr.match_rule(negation, fr._tokens_for(text), text), sentence
 

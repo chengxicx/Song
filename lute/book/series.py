@@ -107,8 +107,7 @@ def _natural_title_key(title):
     positions are type-consistent across titles.
     """
     return [
-        int(p) if p.isdigit() else p.casefold()
-        for p in re.split(r"(\d+)", title or "")
+        int(p) if p.isdigit() else p.casefold() for p in re.split(r"(\d+)", title or "")
     ]
 
 

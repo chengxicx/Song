@@ -303,9 +303,7 @@ def test_compact_keeps_the_pos_and_senses_and_drops_the_examples():
         ]
     )
 
-    assert compact_gloss(gloss) == (
-        "他动·二类\n吃。（飲食物をいただく。）\n生活。（生計を立てる。）"
-    )
+    assert compact_gloss(gloss) == ("他动·二类\n吃。（飲食物をいただく。）\n生活。（生計を立てる。）")
 
 
 def test_compact_caps_the_total_length_with_an_ellipsis():
@@ -763,8 +761,7 @@ COLLINS_HAPPY = "\n".join(
         "她表情放松下来，露出快乐的微笑。",
         "happilyAlbert leaned back happily and lit a cigarette.",
         "艾伯特高兴地向后倚靠，点了根香烟。",
-        "2[ADJ-GRADED 同样的标签] 幸福的；A happy time is full of pleasant"
-        " experiences.",
+        "2[ADJ-GRADED 同样的标签] 幸福的；A happy time is full of pleasant" " experiences.",
     ]
 )
 
@@ -922,9 +919,11 @@ def test_standard_korean_definition_line_is_a_sense_not_an_example():
 
 
 def test_korean_pos_badge_with_conjugation_type_stays_whole():
-    blocks = parse_gloss("""가다1
+    blocks = parse_gloss(
+        """가다1
 [자동사]〖거라불규칙/가거라〗
-1 	(이곳에서) 다른 곳으로 옮다(이동하다).""")
+1 	(이곳에서) 다른 곳으로 옮다(이동하다)."""
+    )
 
     assert blocks[0]["t"] == "headword"
     assert blocks[1] == {"t": "pos", "text": "[자동사]〖거라불규칙/가거라〗"}
@@ -1040,9 +1039,7 @@ def test_a_hande_meaning_pair_runs_into_a_final_summary_sense():
 
 
 def test_daijirin_reading_pair_becomes_one_headword_line():
-    blocks = parse_gloss(
-        "べん－きょう―キヤウ　[0]\n【勉強】\n(名)スル(1)学問や技芸を学ぶこと。"
-    )
+    blocks = parse_gloss("べん－きょう―キヤウ　[0]\n【勉強】\n(名)スル(1)学問や技芸を学ぶこと。")
 
     assert types(blocks) == ["headword", "sense"]
     assert blocks[0]["text"] == "べん－きょう―キヤウ [0]【勉強】"
@@ -1050,9 +1047,7 @@ def test_daijirin_reading_pair_becomes_one_headword_line():
 
 
 def test_shougakukan_dollar_examples_carry_both_halves():
-    blocks = parse_gloss(
-        "（1）〔学習〕学习\n$一夜漬けの勉強／临阵磨枪\n$化学を勉強する／学习化学."
-    )
+    blocks = parse_gloss("（1）〔学習〕学习\n$一夜漬けの勉強／临阵磨枪\n$化学を勉強する／学习化学.")
 
     assert types(blocks) == ["sense", "example", "example"]
     assert blocks[1]["text"] == "一夜漬けの勉強"

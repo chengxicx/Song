@@ -109,30 +109,39 @@ class KoreanParser(AbstractParser):
 
     # Kiwi POS tags that represent punctuation/symbols (non-word tokens).
     # Full tag list: https://github.com/bab2min/kiwipiepy#pos-tags
-    _SYMBOL_TAGS = frozenset({
-        "SF",  # Sentence-ending punctuation (. ! ?)
-        "SP",  # Space
-        "SS",  # Brackets / quotes
-        "SC",  # Comma / colon / etc.
-        "SE",  # Ellipsis
-        "SO",  # Connector (dash, etc.)
-        "SY",  # Other symbols
-        "SW",  # Other symbols / emojis
-    })
+    _SYMBOL_TAGS = frozenset(
+        {
+            "SF",  # Sentence-ending punctuation (. ! ?)
+            "SP",  # Space
+            "SS",  # Brackets / quotes
+            "SC",  # Comma / colon / etc.
+            "SE",  # Ellipsis
+            "SO",  # Connector (dash, etc.)
+            "SY",  # Other symbols
+            "SW",  # Other symbols / emojis
+        }
+    )
 
     # POS tag prefixes for bound morphemes (조사 / 어미).
     _BOUND_POS_PREFIXES = (
-        "J",   # 조사 (particles): JKS, JKC, JKG, JKO, JKB, JKV, JKQ, JX, JC
-        "E",   # 어미 (endings): EP, EF, EC, ETN, ETM
+        "J",  # 조사 (particles): JKS, JKC, JKG, JKO, JKB, JKV, JKQ, JX, JC
+        "E",  # 어미 (endings): EP, EF, EC, ETN, ETM
     )
 
     # Tags considered 'nouns' for compound-noun merging.
-    _NOUN_TAGS = frozenset({
-        "NNG", "NNP", "NNB", "NNBC", "NR", "NP",  # pure Korean nouns / counters
-        "SN",  # numbers
-        "SL",  # foreign words (mostly English)
-        "SH",  # Chinese character / hanja
-    })
+    _NOUN_TAGS = frozenset(
+        {
+            "NNG",
+            "NNP",
+            "NNB",
+            "NNBC",
+            "NR",
+            "NP",  # pure Korean nouns / counters
+            "SN",  # numbers
+            "SL",  # foreign words (mostly English)
+            "SH",  # Chinese character / hanja
+        }
+    )
 
     # Tags that are 'predicate heads' -> when lemma mode is on, we replace
     # the predicate morpheme surface with its lemma form.
@@ -141,18 +150,27 @@ class KoreanParser(AbstractParser):
     # followed immediately by XSV (하) or XSA (되/하) it forms a predicate
     # compound together, so we treat the (XR/NNG + XSV/XSA) pair as a single
     # logical predicate head.
-    _PREDICATE_TAGS = frozenset({
-        "VV", "VA", "VX", "VCP", "VCN",  # verbs / adjectives / copulas
-        "XSV", "XSA",                     # verbal / adjectival suffixes (하되…)
-    })
+    _PREDICATE_TAGS = frozenset(
+        {
+            "VV",
+            "VA",
+            "VX",
+            "VCP",
+            "VCN",  # verbs / adjectives / copulas
+            "XSV",
+            "XSA",  # verbal / adjectival suffixes (하되…)
+        }
+    )
 
     # Morphs that, when they appear immediately BEFORE an XSV/XSA, merge with
     # it to form a dictionary-form compound verb (e.g. 예상/NNG + 하/XSV + E*
     # → 예상하다).
-    _LIGHT_VERB_NOUN_PRE_TAGS = frozenset({
-        "XR",   # 依存名词 / Chinese character roots (e.g. 예상 -> 豫想)
-        "NNG",  # general nouns used before 하다 (독립 + 하다 = 독립하다)
-    })
+    _LIGHT_VERB_NOUN_PRE_TAGS = frozenset(
+        {
+            "XR",  # 依存名词 / Chinese character roots (e.g. 예상 -> 豫想)
+            "NNG",  # general nouns used before 하다 (독립 + 하다 = 독립하다)
+        }
+    )
 
     # Sentence-ending punctuation tags.
     _SENTENCE_END_TAGS = frozenset({"SF"})
@@ -272,12 +290,14 @@ class KoreanParser(AbstractParser):
 
         # --- 'eojeol' mode: the whole 어절 as stored in the original text. ---
         if mode == "eojeol":
-            surface = para[morphs[0].start:eojeol_end].rstrip()
+            surface = para[morphs[0].start : eojeol_end].rstrip()
             # The 'representative' morph is whatever the first non-symbol
             # morph is (so that sentence-end detection still fires via
             # the representative if the user uses SF as part of the
             # 어절, which shouldn't happen but we guard anyway).
-            rep = next((m for m in morphs if (m.tag or "") not in self._SYMBOL_TAGS), morphs[0])
+            rep = next(
+                (m for m in morphs if (m.tag or "") not in self._SYMBOL_TAGS), morphs[0]
+            )
             return [(surface, rep, rep)]
 
         # --- 'lemma' mode --------------------------------------------------
@@ -298,7 +318,7 @@ class KoreanParser(AbstractParser):
                     start = i
                     while i + 1 < n and self._is_noun_morph(morphs[i + 1]):
                         i += 1
-                    surface = "".join(x.form for x in morphs[start:i + 1])
+                    surface = "".join(x.form for x in morphs[start : i + 1])
                     out.append((surface, morphs[start], morphs[start]))
                     i += 1
                     continue
@@ -314,9 +334,11 @@ class KoreanParser(AbstractParser):
                 #      following endings into the same logical token.
 
                 # ---- Case B (light-verb compound) first ----------------
-                if ((m.tag or "") in self._LIGHT_VERB_NOUN_PRE_TAGS
-                        and i + 1 < n
-                        and (morphs[i + 1].tag or "") in ("XSV", "XSA")):
+                if (
+                    (m.tag or "") in self._LIGHT_VERB_NOUN_PRE_TAGS
+                    and i + 1 < n
+                    and (morphs[i + 1].tag or "") in ("XSV", "XSA")
+                ):
                     noun_morph = m
                     lv_suffix = morphs[i + 1]
                     # Predicate chain starts at the noun index i, but the
@@ -327,8 +349,9 @@ class KoreanParser(AbstractParser):
                     # Walk forward: extra predicate suffixes or endings.
                     while j + 1 < n:
                         nxt = morphs[j + 1]
-                        if (self._is_predicate_morph(nxt)
-                                or (nxt.tag or "").startswith("E")):
+                        if self._is_predicate_morph(nxt) or (nxt.tag or "").startswith(
+                            "E"
+                        ):
                             j += 1
                         else:
                             break
@@ -354,8 +377,9 @@ class KoreanParser(AbstractParser):
                     j = i
                     while j + 1 < n:
                         nxt = morphs[j + 1]
-                        if (self._is_predicate_morph(nxt)
-                                or (nxt.tag or "").startswith("E")):
+                        if self._is_predicate_morph(nxt) or (nxt.tag or "").startswith(
+                            "E"
+                        ):
                             j += 1
                         else:
                             break
@@ -392,7 +416,7 @@ class KoreanParser(AbstractParser):
                 # them into the last morpheme of the run.
                 i += 1
                 continue
-            text = para[m.start:end]
+            text = para[m.start : end]
             # Contracted ending: the stem's surface is longer than its
             # slice (위해 = 위하 + 여, 나섰고 = 나서 + 었), so absorb the
             # ending's characters into the stem to keep the word intact.
@@ -403,7 +427,7 @@ class KoreanParser(AbstractParser):
                 and m.form.startswith(text)
             ):
                 after = morphs[i + 2] if i + 2 < n else None
-                text = para[m.start:(after.start if after else eojeol_end)]
+                text = para[m.start : (after.start if after else eojeol_end)]
                 i += 1  # skip the absorbed ending below
             i += 1
             # The last slice of the 어절 reaches eojeol_end and may have
@@ -421,7 +445,7 @@ class KoreanParser(AbstractParser):
                 start = i
                 while i + 1 < sn and self._is_noun_morph(sliced[i + 1][1]):
                     i += 1
-                surface = "".join(x[0] for x in sliced[start:i + 1])
+                surface = "".join(x[0] for x in sliced[start : i + 1])
                 out.append((surface, sliced[start][1], sliced[start][1]))
                 i += 1
                 continue
@@ -440,8 +464,12 @@ class KoreanParser(AbstractParser):
 
         # Read the language settings once.
         self._mode = self._get_mode(language)
-        self._join_compound = self._bool_setting(language, "kiwi_join_compound_nouns", False)
-        self._filter_particles = self._bool_setting(language, "kiwi_filter_particles", False)
+        self._join_compound = self._bool_setting(
+            language, "kiwi_join_compound_nouns", False
+        )
+        self._filter_particles = self._bool_setting(
+            language, "kiwi_filter_particles", False
+        )
 
         # Build the set of sentence-ending characters from language settings.
         splitchar = ""
@@ -491,7 +519,9 @@ class KoreanParser(AbstractParser):
                     )
                     grouped = self._group_eojeol(morphs, para, eojeol_end)
                     for surface, rep_tag_morph, _rep_lemma_morph in grouped:
-                        is_word = self._is_word_morph(rep_tag_morph, self._filter_particles)
+                        is_word = self._is_word_morph(
+                            rep_tag_morph, self._filter_particles
+                        )
                         is_eos = (rep_tag_morph.tag in self._SENTENCE_END_TAGS) or any(
                             c in splitchar for c in surface
                         )
@@ -552,9 +582,11 @@ class KoreanParser(AbstractParser):
             m = result[i]
 
             # Light-verb compound: XR/NNG + XSV/XSA → merge + normalise 하→하다 etc.
-            if ((m.tag or "") in self._LIGHT_VERB_NOUN_PRE_TAGS
-                    and i + 1 < n
-                    and (result[i + 1].tag or "") in ("XSV", "XSA")):
+            if (
+                (m.tag or "") in self._LIGHT_VERB_NOUN_PRE_TAGS
+                and i + 1 < n
+                and (result[i + 1].tag or "") in ("XSV", "XSA")
+            ):
                 noun_lemma = getattr(m, "lemma", None) or m.form
                 noun_lemma = noun_lemma if noun_lemma != "*" else m.form
                 lv_suffix = result[i + 1]

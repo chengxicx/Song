@@ -216,17 +216,13 @@ def test_a_repeated_line_marks_only_the_first():
 
 
 def _pages(steps, starts):
-    return [
-        r.get("page") for r in _run_steps(steps, cue_page_starts=starts)
-    ]
+    return [r.get("page") for r in _run_steps(steps, cue_page_starts=starts)]
 
 
 def test_a_cue_resolves_to_the_page_holding_it():
     # Page 1 holds cues 0-1, page 2 cues 2-4, page 3 cues 5-5.
     starts = [0, 2, 5]
-    assert _pages(
-        [{"page_of_cue": i} for i in range(6)], starts
-    ) == [1, 1, 2, 2, 2, 3]
+    assert _pages([{"page_of_cue": i} for i in range(6)], starts) == [1, 1, 2, 2, 2, 3]
 
 
 def test_the_first_cue_of_a_page_resolves_to_that_page():
@@ -316,9 +312,7 @@ def test_a_furigana_reading_is_not_part_of_the_line():
         paragraphs=RUBY_PARAGRAPHS,
         cue_map=[0, 1],
     )
-    assert results[-1]["marked"] == [
-        {"para": 0, "sentence": None, "text": "間は本当事です。"}
-    ]
+    assert results[-1]["marked"] == [{"para": 0, "sentence": None, "text": "間は本当事です。"}]
 
 
 def test_the_text_fallback_ignores_furigana_too():
@@ -328,9 +322,7 @@ def test_the_text_fallback_ignores_furigana_too():
         paragraphs=RUBY_PARAGRAPHS,
         cue_map=None,
     )
-    assert results[-1]["marked"] == [
-        {"para": 0, "sentence": None, "text": "間は本当事です。"}
-    ]
+    assert results[-1]["marked"] == [{"para": 0, "sentence": None, "text": "間は本当事です。"}]
 
 
 def test_a_line_without_readings_still_matches_beside_ruby_lines():

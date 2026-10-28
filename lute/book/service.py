@@ -1344,6 +1344,4 @@ class Service:
 
             grammar_precompute.invalidate(book_id)
         except Exception:  # noqa: BLE001
-            current_app.logger.warning(
-                "grammar cache not dropped for book %s", book_id
-            )
+            current_app.logger.warning("grammar cache not dropped for book %s", book_id)
