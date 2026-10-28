@@ -17,7 +17,15 @@ COPY README_PyPi.md .
 COPY lute /lute
 ENV PIP_ROOT_USER_ACTION=ignore
 ENV FLIT_ROOT_INSTALL=1
-RUN pip install flit
+# flit_core 4.2.0 (released 2026-10-27) added a containment check on the
+# readme path, written as `resolved.startswith(directory + os.sep)`.  This
+# image keeps its project directory at the filesystem root -- every COPY
+# above lands in `/` -- so that comparison runs against `//` and a valid
+# readme is rejected:
+#   Readme path (README_PyPi.md) points outside the project directory
+# Nothing else in the image changes with the pin, so hold flit/flit_core
+# below 4.2 until upstream handles a root project directory.
+RUN pip install "flit<4.2" "flit_core<4.2"
 RUN flit install --only-deps --deps=production
 COPY lute/config/config.yml.docker /lute/config/config.yml
 
