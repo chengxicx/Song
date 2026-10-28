@@ -277,6 +277,7 @@ def test_boundary_is_opt_in_for_regex_specs():
     Other engines share the matcher and pass no boundary, so their raw
     substring behaviour has to stay exactly as it was.
     """
+    pytest.importorskip("pythainlp")  # _tokens_for tokenises through it
     rule = make_rule(
         "probe", "probe", "A1", "", {"type": "regex", "re": re.compile("ขา")}
     )
@@ -351,6 +352,7 @@ def test_every_panel_rule_carries_a_translated_reference():
 
 def test_panel_shows_the_gloss_in_the_display_language():
     "Chinese panel gets the Chinese gloss, English panel the English one."
+    pytest.importorskip("pythainlp")  # analyze_thai tokenises through it
     zh = {c["key"]: c for c in th.analyze_thai("ผมชอบเขา", "zh")}
     en = {c["key"]: c for c in th.analyze_thai("ผมชอบเขา", "en")}
     assert zh["th_pronouns"]["reference"]["text"] == "我喜欢他"
