@@ -147,8 +147,51 @@
   // the user started some other speech mid-sequence and stop queueing.
   let speakEpoch = 0;
 
+  // Whether a voice can actually produce sound.
+  //
+  // The one exception to "every listed voice speaks" is Chrome's remote
+  // "Google <language>" voices: Chrome removed remote synthesis in M71
+  // but the names stayed in getVoices(), and speak() with one neither
+  // plays a sound nor fires onstart / onend / onerror -- the reader just
+  // goes silent, with no error to report.
+  //
+  // localService === false is NOT a reason to skip a voice on its own:
+  // Edge's far better "Microsoft ... Online (Natural)" voices are remote
+  // too, yet they work (and on Windows they are often the ONLY voices
+  // for a given language).  So the exclusion is deliberately narrowed to
+  // remote *Google* voices.  Google's TTS voices on Android/ChromeOS are
+  // local (localService true) and keep working.  Browsers that don't
+  // define localService at all (Safari) never match this test.
+  const _DEAD_REMOTE_VOICE_RE = /^google\b/i;
+
+  function isSpeakableVoice(v) {
+    if (!v) return false;
+    if (v.localService === false && _DEAD_REMOTE_VOICE_RE.test(v.name)) {
+      return false;
+    }
+    return true;
+  }
+
+  // Voices that reported a synthesis error in this page.  A remote voice
+  // that fails is silent and takes a couple of seconds to fail, so
+  // retrying it on every sentence would leave a gap before each one --
+  // see speakNow() and tts-playcue's fallback.  Remembering the failure
+  // keeps the rest of the page on a working voice.  Cleared by a reload:
+  // a server-side outage may well be over by the next visit, and there
+  // is no other way to notice.
+  var _failedVoices = new Set();
+  function markVoiceFailed(name) {
+    if (name) _failedVoices.add(name);
+  }
+
   function selectBestVoiceForLang(voices, targetLang) {
     if (!voices || voices.length === 0) return null;
+    // Never auto-pick a voice that cannot speak -- on macOS Chrome the
+    // preferred "Google <language>" entry is one of these, which is why
+    // the reader used to be silent while a bare speechSynthesis.speak()
+    // (no explicit voice) worked fine.
+    voices = voices.filter(isSpeakableVoice);
+    if (voices.length === 0) return null;
     const normLang = function (s) { return (s || "").toLowerCase(); };
     const target = normLang(targetLang);
     if (!target) return null;
@@ -175,16 +218,47 @@
       });
     }
     if (matched.length === 0) return null;
+    // The natural / neural voices sound far better than the system ones,
+    // so they stay the default choice.  What is new here is the failure
+    // list: a remote voice that already reported a synthesis error on
+    // this page is not offered again (see _failedVoices), so the rest of
+    // the book is not spent waiting a couple of seconds per sentence for
+    // the same failure.
+    const alive = matched.filter(function (v) {
+      return !_failedVoices.has(v.name);
+    });
     const keywords = ["online", "natural", "neural", "google", "microsoft"];
     for (const kw of keywords) {
-      const found = matched.find(function (v) {
+      const found = alive.find(function (v) {
         return v.name.toLowerCase().includes(kw);
       });
       if (found) return found;
     }
-    return matched[0];
+    if (alive.length > 0) return alive[0];
+    // Everything for this language has failed at least once already:
+    // hand back a local voice rather than letting the engine pick its
+    // own default.
+    return selectLocalVoiceForLang(voices, targetLang);
   }
 
+  // The best local voice for a language, ignoring remote ones entirely.
+  // Used when a remote voice was in play and produced no sound: the cue
+  // is retried with this instead of being skipped in silence.
+  function selectLocalVoiceForLang(voices, targetLang) {
+    if (!voices || voices.length === 0) return null;
+    const target = (targetLang || "").toLowerCase().slice(0, 2);
+    if (!target) return null;
+    const local = voices.filter(function (v) {
+      return isSpeakableVoice(v) && v.localService !== false &&
+        (v.lang || "").toLowerCase().slice(0, 2) === target;
+    });
+    return local.length > 0 ? local[0] : null;
+  }
+
+  // The explicitly chosen voice, if this device still offers it and it
+  // can actually speak.  A remembered remote ("Google ...") voice is
+  // deliberately ignored here -- it would silence every utterance -- so
+  // callers fall through to selectBestVoiceForLang and get a local one.
   function getSelectedVoice() {
     if (!("speechSynthesis" in window)) return null;
 
@@ -192,17 +266,20 @@
     if (voiceSelect && voiceSelect.dataset.voiceName) {
       const voices = window.speechSynthesis.getVoices();
       const found = voices.find(function (v) {
-        return v.name === voiceSelect.dataset.voiceName;
+        return v.name === voiceSelect.dataset.voiceName && isSpeakableVoice(v);
       });
-      if (found) return found;
+      // A voice that already failed here is treated as "not chosen": the
+      // caller then falls through to selectBestVoiceForLang, which knows
+      // to skip it as well.
+      if (found && !_failedVoices.has(found.name)) return found;
     }
 
     if (globalCache.selectedVoice) {
       const voices = window.speechSynthesis.getVoices();
       const found = voices.find(function (v) {
-        return v.name === globalCache.selectedVoice;
+        return v.name === globalCache.selectedVoice && isSpeakableVoice(v);
       });
-      if (found) return found;
+      if (found && !_failedVoices.has(found.name)) return found;
     }
 
     return null;
@@ -216,15 +293,17 @@
   // the reading page's -- the review session speaks each card in its
   // own term's language (see lute-review.js).  The page's own detection
   // is the fallback.
-  function speakNow(cleanText, onStarted, langOverride, onEnded) {
-    let activeVoice = getSelectedVoice();
+  function speakNow(cleanText, onStarted, langOverride, onEnded, forceLocal, retryDepth) {
+    let activeVoice = forceLocal ? null : getSelectedVoice();
     const voices = window.speechSynthesis.getVoices();
     const detectedLang = langOverride || getCurrentLangCode();
 
     speakEpoch += 1;
     const epoch = speakEpoch;
 
-    if (!activeVoice && voices.length > 0) {
+    if (forceLocal) {
+      activeVoice = selectLocalVoiceForLang(voices, detectedLang);
+    } else if (!activeVoice && voices.length > 0) {
       activeVoice = selectBestVoiceForLang(voices, detectedLang);
     }
 
@@ -238,29 +317,64 @@
     }
     utterance.rate = globalSpeed;
 
+    // Tracked so the error path below can tell "never made a sound" from
+    // "failed part way through, at least one sample was played".
+    let started = false;
+
     // onStarted lets the caller (the sentence 🔊 button) drop its
     // "waiting" marker the moment sound actually begins, instead of
     // guessing how long the engine will take to warm up.
-    if (typeof onStarted === "function") {
-      utterance.onstart = function () {
+    utterance.onstart = function () {
+      started = true;
+      if (typeof onStarted === "function") {
         try { onStarted(); } catch (_) {}
-      };
-    }
+      }
+    };
     // onEnded lets a caller chain another utterance onto this one
     // (shadowing's "correct word, then what was heard").  A cancel()
     // also fires onend/onerror on the displaced utterance -- the epoch
     // check keeps a superseded speaker from chain-starting over the
     // speech that displaced it.
+    let chainEnded = null;
     if (typeof onEnded === "function") {
       let ended = false;
-      const fire = function () {
+      chainEnded = function () {
         if (ended || speakEpoch !== epoch) return;
         ended = true;
         try { onEnded(); } catch (_) {}
       };
-      utterance.onend = fire;
-      utterance.onerror = fire;
+      utterance.onend = chainEnded;
     }
+
+    // A remote voice that fails is completely silent: Edge's
+    // "Microsoft <name> Online (Natural)" answers speak() with
+    // "synthesis-failed" and plays nothing, so a tap on a word or a
+    // sentence 🔊 just looks broken.  Remember the failure, then retry
+    // with the next best voice -- another natural voice if the device has
+    // one, otherwise a local one.  A cancel/interrupt is not a failure
+    // (it means something newer took over), so only real synthesis
+    // errors are retried.
+    const isLocalVoice = !!activeVoice && activeVoice.localService !== false;
+    utterance.onerror = function (ev) {
+      if (started || speakEpoch !== epoch) return;
+      const err = ev && ev.error;
+      const failed =
+        err === "synthesis-failed" ||
+        err === "network" ||
+        err === "synthesis-unavailable" ||
+        err === "voice-unavailable" ||
+        err === "language-unavailable" ||
+        err === "audio-busy";
+      if (failed && !isLocalVoice) {
+        markVoiceFailed(activeVoice && activeVoice.name);
+        // Bumps speakEpoch, so the chained onEnded cannot double-fire.
+        // depth keeps a device where every voice fails from looping.
+        const next = typeof retryDepth === "number" ? retryDepth + 1 : 1;
+        speakNow(cleanText, onStarted, langOverride, onEnded, next >= 2, next);
+        return;
+      }
+      if (chainEnded) chainEnded();
+    };
 
     try {
       window.speechSynthesis.cancel();
@@ -454,6 +568,47 @@
       .trim();
   }
 
+  // Speakable text from a rendered reading-page node.
+  //
+  // lute-furigana.js wraps Han-script words in
+  // <ruby>word<rt>reading</rt></ruby>, and an <rt> reading counts as
+  // text: innerText / textContent of 普通's span is "普通ふつう".  A TTS
+  // engine speaks that as the word twice -- once from the kanji, once
+  // from the kana -- so anything that speaks DOM text (hover
+  // pronunciation, the sentence 🔊, the player's cues) has to strip the
+  // readings first.  The reading is pronunciation, not text to read;
+  // the term's own reading is preferred anyway once the term popup has
+  // cached it (see speakTermText).
+  function ttsPlainText(node) {
+    if (!node) return "";
+    if (node.nodeType === 3) return node.textContent || "";
+    const clone = node.cloneNode(true);
+    if (clone.querySelectorAll) {
+      clone.querySelectorAll("rt, rp").forEach(function (el) { el.remove(); });
+    }
+    return clone.textContent || "";
+  }
+
+  // What to speak for a hovered word span.  A split piece renders only
+  // its own column's fragment; speak the whole word the pieces share
+  // (data-tts-text, see textitem.html).  data-text is the parser's
+  // canonical token and never carries a furigana reading, so it is
+  // preferred over the rendered text -- falling back to raw innerText
+  // here would speak "普通ふつう".  The rt-stripped rendered text is
+  // the last resort for nodes without either attribute.  Shared with
+  // the player subtitles (tts-player.js / media-player-base.js), which
+  // resolve it on window at event time.
+  function spokenTextForWordSpan(wordSpan) {
+    return (
+      wordSpan.getAttribute("data-tts-text") ||
+      (wordSpan.dataset.text
+        ? wordSpan.dataset.text.replace(/\u200B/g, "")
+        : "") ||
+      ttsPlainText(wordSpan)
+    );
+  }
+  window.luteSpokenTextForWordSpan = spokenTextForWordSpan;
+
   // ------------------------------------------------------------------
   // 4. Sentence 🔊 button injection
   // ------------------------------------------------------------------
@@ -591,7 +746,7 @@
       const wordSpan = e.target.closest("span.word, span[id^=\"w\"]");
       if (!wordSpan) return;
       luteHoverSpeakStart(
-        wordSpan.innerText || wordSpan.textContent || "",
+        spokenTextForWordSpan(wordSpan),
         function () { return ttsPlaying; },
         hoverReadingFor(wordSpan)
       );
@@ -618,8 +773,10 @@
       const icon = tempRow.querySelector(".lute-sentence-play-btn");
       if (icon) icon.remove();
 
+      // ttsPlainText drops the furigana <rt> readings, which would
+      // otherwise be spoken right after each word ("普通ふつう").
       const cleanSentence = cleanSentenceText(
-        tempRow.innerText || tempRow.textContent || ""
+        ttsPlainText(tempRow)
       );
       if (cleanSentence) {
         // Stop the full player if it's running so the hover/sentence

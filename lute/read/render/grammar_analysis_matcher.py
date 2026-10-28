@@ -35,10 +35,28 @@ A rule's "match" is one of
 * {"any_of": [<match>, ...]}        first-shape alternation
 
 An optional rule-level "not_after" spec vetoes matches whose nearest
-left-hand non-punctuation neighbour satisfies it.
+left-hand non-punctuation neighbour satisfies it; "followed_by" and
+"not_followed_by" do the same on the right-hand side (the latter over the
+next three non-punctuation tokens), so homographs that differ only in what
+follows can be told apart.  "at_start" requires the match to open the
+sentence, which is how a word that only reads as a command in first
+position (Spanish "toma", "mira") is told apart from the same word used
+declaratively, where a subject or an auxiliary normally precedes it.
+
+Two more vetoes cover constructions that are wider than the span they are
+confused with: "not_inside" rejects a hit when any token *between* the
+span's ends satisfies the spec (the filler that turns "hace ... que" into
+"hace falta que"), and "not_at_start_with" rejects a hit that opens the
+sentence when its first token satisfies the spec (the command "dame",
+which the tagger also reads as a preterite form).
 """
 
+import gc
+import json
+import os
 import re
+import threading
+import time
 
 _PUNCT_POS = {"PUNCT", "SYM"}
 
@@ -65,6 +83,215 @@ def split_sentences(text):
     return [p.strip() for p in parts if p and p.strip()]
 
 
+# ---- spaCy model lifetime ---------------------------------------------
+#
+# A loaded pipeline is 40-200 MB, and until now the only reference to it
+# lived inside the closure returned by make_spacy_tokenizer: once a user
+# opened the grammar panel for a language, that model stayed resident for
+# the rest of the process, even after switching to another language's
+# books or freezing the language.  Six spaCy engines means that adds up.
+#
+# The lifetime is explicit now:
+#
+# * loaded lazily, once, under a per-model lock -- two threads hitting the
+#   panel for the first time used to run spacy.load() twice;
+# * released when idle for _SPACY_IDLE_SECONDS (swept by the read
+#   blueprint's before_request) and immediately when the language is
+#   frozen (language.toggle_active);
+# * a released model reloads transparently on the next analysis.
+#
+# Releasing while a call is in flight is safe: _tokens_for reads the
+# pipeline into a local before using it, so that object survives the call
+# and only the *next* call pays the reload.  Dropping the reference is
+# enough -- spaCy's runtime modules are left imported on purpose, since
+# unloading a thinc C extension by hand is a good way to segfault.
+#
+# Dropping the reference alone does NOT lower RSS: the freed pages land in
+# the process's malloc arenas and stay there (measured on the production
+# host: freeze then reload grew RSS by ~50 MB instead of returning it).
+# _reclaim() below hands them back.  What comes back is the model, not the
+# runtime: spaCy/thinc/numpy are ~90 MB of imported modules and stay.
+#
+# The arenas also fill up without any model being released, because every
+# request thread gets its own: on the production host, eight grammar-panel
+# requests took RSS from 216 MB to 303 MB and it stayed there for the next
+# eight -- not a leak (the engine itself is flat over repeated runs), just
+# per-thread slack.  trim_arenas() sweeps that up occasionally.
+_SPACY_IDLE_SECONDS = 900
+_TRIM_INTERVAL_SECONDS = 300
+
+_MODELS = {}
+_MODELS_LOCK = threading.Lock()
+_last_trim = 0.0
+_trim_lock = threading.Lock()
+
+
+def _trim():
+    """
+    Ask the allocator to return its empty pages to the OS.
+
+    malloc_trim walks every arena, not just the calling thread's, which
+    is why it can reclaim slack the other request threads accumulated.
+    Imported lazily and its absence tolerated, so this is a no-op off
+    glibc (macOS development).
+    """
+    try:
+        # pylint: disable-next=import-outside-toplevel
+        import ctypes
+
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+    except (OSError, AttributeError):
+        pass
+
+
+def _reclaim():
+    "Give back a just-freed pipeline: break its cycles, then trim."
+    gc.collect()
+    _trim()
+
+
+def trim_arenas(interval_seconds=_TRIM_INTERVAL_SECONDS):
+    """
+    Trim the arenas, but at most once per interval; True if it ran.
+
+    Called from the read blueprint's per-request hook.  Nothing needs
+    collecting -- Python's own generational GC already handled that --
+    so this is malloc_trim alone: no full gc.collect() pause on a heap
+    this size, ten or so milliseconds once per interval.
+    """
+    global _last_trim  # pylint: disable=global-statement
+    now = time.monotonic()
+    with _trim_lock:
+        if now - _last_trim < interval_seconds:
+            return False
+        _last_trim = now
+    _trim()
+    return True
+
+
+class _ModelHolder:
+    "Process-wide holder for one spaCy pipeline, with an idle timestamp."
+
+    def __init__(self, model_name):
+        self.model_name = model_name
+        self.nlp = None
+        self.last_used = 0.0
+        self.load_lock = threading.Lock()
+
+    def get(self):
+        "Return the pipeline, loading it on first use."
+        nlp = self.nlp
+        if nlp is not None:
+            self.last_used = time.monotonic()
+            return nlp
+        with self.load_lock:
+            if self.nlp is None:
+                # pylint: disable-next=import-outside-toplevel
+                import spacy
+
+                self.nlp = spacy.load(
+                    self.model_name, exclude=["parser", "senter", "ner"]
+                )
+            self.last_used = time.monotonic()
+            return self.nlp
+
+    def drop(self):
+        "Forget the pipeline; True if one was loaded.  The next get() reloads."
+        with self.load_lock:
+            had_one = self.nlp is not None
+            self.nlp = None
+            self.last_used = 0.0
+            return had_one
+
+
+def _holder(model_name):
+    "The holder for a model, created on first mention."
+    with _MODELS_LOCK:
+        holder = _MODELS.get(model_name)
+        if holder is None:
+            holder = _ModelHolder(model_name)
+            _MODELS[model_name] = holder
+        return holder
+
+
+def make_spacy_tokenizer(model_name):
+    """
+    Lazy spaCy tokenizer shared by the spaCy-based engines
+    (en/es/fr/de/it/pt), which differ only in the model name.
+
+    Returns _tokens_for(sentence) -> list of token dicts.  spaCy is
+    imported on first use, so importing this module works without it;
+    the route falls back to the generic rule library on ImportError.
+
+    The pipeline itself lives in a module-level holder keyed by model
+    name, so other modules can release it (see release_spacy_model).
+    """
+    holder = _holder(model_name)
+
+    def _tokens_for(sentence):
+        "Tokenize a sentence; return a list of token dicts."
+        # Local reference: a concurrent release may clear the holder
+        # between here and the call, and this call must still complete.
+        nlp = holder.get()
+        doc = nlp(sentence)
+        return [
+            {
+                "surface": t.text,
+                "lemma": t.lemma_,
+                "pos": t.pos_,
+                "morph": t.morph.to_dict(),
+                "idx": t.idx,
+            }
+            for t in doc
+        ]
+
+    _tokens_for.spacy_model = model_name
+    return _tokens_for
+
+
+def release_spacy_model(model_name):
+    """
+    Drop one loaded pipeline; True if one was actually resident.
+
+    The next grammar analysis that needs it reloads it.  A model that was
+    registered but never loaded returns False, so callers can tell a real
+    release from a no-op.
+    """
+    holder = _MODELS.get(model_name)
+    if holder is None:
+        return False
+    return _release_holder(holder)
+
+
+def _release_holder(holder):
+    "Drop a holder's pipeline and give its pages back; True if it had one."
+    if not holder.drop():
+        return False
+    _reclaim()
+    return True
+
+
+def loaded_spacy_models():
+    "Names of the pipelines currently resident, for tests and diagnostics."
+    return sorted(name for name, h in _MODELS.items() if h.nlp is not None)
+
+
+def release_idle_spacy_models(idle_seconds=_SPACY_IDLE_SECONDS):
+    """
+    Drop every pipeline idle for at least idle_seconds; return their names.
+
+    Cheap enough for a per-request hook: one dictionary walk over at most
+    one entry per engine.
+    """
+    now = time.monotonic()
+    dropped = []
+    for name, holder in list(_MODELS.items()):
+        if holder.nlp is not None and now - holder.last_used >= idle_seconds:
+            if _release_holder(holder):
+                dropped.append(name)
+    return dropped
+
+
 # ---- condition matching ----------------------------------------------
 
 
@@ -72,11 +299,30 @@ def _is_punct(token):
     return (token.get("pos") or "") in _PUNCT_POS
 
 
-def _morph_subset_any(token, feats):
-    "True if any reading of the token carries all the given features."
-    morphs = [token.get("morph") or {}]
-    morphs.extend(p.get("morph") or {} for p in token.get("parses", []))
-    return any(all(m.get(k) == v for k, v in feats.items()) for m in morphs)
+def _morph_subset_any(token, feats, min_score=0.0):
+    """
+    True if a reading of the token carries all the given features.
+
+    ``min_score`` gates the reading by its analyser confidence.  It defaults
+    to 0.0, which keeps every existing rule behaving exactly as before.  A
+    rule that asks for it is asking for an *unambiguous* reading.
+
+    That matters for engines whose analyser has no context disambiguation
+    and will happily rank a fabricated reading first: pymorphy3 reads
+    ``рублей`` (a genitive plural noun) as ``рублеть`` in the imperative at
+    score 0.561, above the noun's 0.410 -- so no "is it the top reading"
+    test can filter it, only a confidence floor can.  Genuine imperatives
+    (``давайте``, ``иди``, ``скажите``) all score at or above 0.99.
+    """
+    best = token.get("score", 1.0) or 1.0
+    readings = [(token.get("morph") or {}, best)]
+    readings.extend(
+        (p.get("morph") or {}, p.get("score", 0.0)) for p in token.get("parses", [])
+    )
+    return any(
+        score >= min_score and all(m.get(k) == v for k, v in feats.items())
+        for m, score in readings
+    )
 
 
 # A POS reading counts only when it is a significant reading of the word,
@@ -101,6 +347,10 @@ def _match_condition(cond, token):
     "True if a single spec matches a single token."
     if cond.get("any"):
         return True
+    if "any_of" in cond:
+        # Token-level alternation: context conditions often need "det or a
+        # numeral", which no single keyed spec can express (keys are ANDed).
+        return any(_match_condition(sub, token) for sub in cond["any_of"])
     surface = (token.get("surface") or "").lower()
     if "surface_in" in cond and surface not in cond["surface_in"]:
         return False
@@ -113,9 +363,13 @@ def _match_condition(cond, token):
             return False
     if "pos_in" in cond and not _pos_match_any(token, set(cond["pos_in"])):
         return False
-    if "morph" in cond and not _morph_subset_any(token, cond["morph"]):
+    if "morph" in cond and not _morph_subset_any(
+        token, cond["morph"], cond.get("min_score", 0.0)
+    ):
         return False
-    if "morph_not" in cond and _morph_subset_any(token, cond["morph_not"]):
+    if "morph_not" in cond and _morph_subset_any(
+        token, cond["morph_not"], cond.get("min_score", 0.0)
+    ):
         return False
     return True
 
@@ -175,17 +429,54 @@ def _token_runs(match, tokens):
     return runs
 
 
-def _regex_spans(match, sentence_text):
+def _token_bounds(tokens):
+    """
+    The character offsets where tokens start and end.
+
+    A literal regex is matched against the raw sentence, so it also lands
+    inside longer words: Thai สิ "imperative particle" is a substring of
+    สิบ "ten", and ขา of ขาย "to sell".  These sets let a spec ask for a
+    match that respects the token boundaries the engine already computed.
+    """
+    starts, ends = set(), set()
+    for tok in tokens:
+        start = tok.get("idx")
+        if start is None:
+            continue
+        starts.add(start)
+        ends.add(start + len(tok.get("surface") or ""))
+    return starts, ends
+
+
+def _regex_spans(match, sentence_text, tokens=None):
     """
     Character spans for {'re': ...} match shapes, collected recursively so
     a regex alternative inside {"any_of": [...]} counts too.
+
+    ``boundary`` on the spec filters those spans: ``"token"`` keeps only a
+    hit that covers a whole token, ``"start"`` only one that begins at a
+    token start (a prefix or the first element of a compound), and
+    ``"prefix"`` only one that begins a token *and* continues into it --
+    for morphemes that never stand alone, such as the agent prefix นัก-
+    (นักเรียน yes, บ่อยนัก "not at all" no).  Without a boundary the raw
+    substring hit is kept, which is what the non-Thai engines use.
     """
     if "re" in match:
-        return [m.span() for m in match["re"].finditer(sentence_text) if m.group(0)]
+        spans = [m.span() for m in match["re"].finditer(sentence_text) if m.group(0)]
+        boundary = match.get("boundary")
+        if boundary and tokens:
+            starts, ends = _token_bounds(tokens)
+            if boundary == "token":
+                spans = [(s, e) for s, e in spans if s in starts and e in ends]
+            elif boundary == "start":
+                spans = [(s, e) for s, e in spans if s in starts]
+            elif boundary == "prefix":
+                spans = [(s, e) for s, e in spans if s in starts and e not in ends]
+        return spans
     if "any_of" in match:
         out = []
         for alt in match["any_of"]:
-            out.extend(_regex_spans(alt, sentence_text))
+            out.extend(_regex_spans(alt, sentence_text, tokens))
         return out
     return []
 
@@ -198,6 +489,25 @@ def _left_neighbour(tokens, start):
             return tokens[j]
         j -= 1
     return None
+
+
+# How far a trailing-context veto looks ahead, in non-punctuation tokens.
+# French restrictive "ne ... que 'cinq étudiants'" has no finite verb within
+# four words, while the homographic complementizer introduces a clause whose
+# own verb may sit fourth ("pourvu que le directeur lui donne ..."), so the
+# window has to cover that far to tell the two apart.
+_TRAIL_WINDOW = 4
+
+
+def _right_window(tokens, end, count):
+    "Up to count non-punctuation tokens after index end (reading order)."
+    out = []
+    j = end
+    while j < len(tokens) and len(out) < count:
+        if not _is_punct(tokens[j]):
+            out.append(tokens[j])
+        j += 1
+    return out
 
 
 def match_rule(rule, tokens, sentence_text):
@@ -213,10 +523,29 @@ def match_rule(rule, tokens, sentence_text):
     offsets = [t["idx"] for t in tokens]
     for start, end in runs:
         veto = False
-        if rule.get("not_after"):
+        if rule.get("at_start") and _left_neighbour(tokens, start) is not None:
+            veto = True
+        if not veto and rule.get("not_after"):
             neighbour = _left_neighbour(tokens, start)
             veto = neighbour is not None and _match_condition(
                 rule["not_after"], neighbour
+            )
+        if not veto and rule.get("not_at_start_with"):
+            veto = _left_neighbour(tokens, start) is None and _match_condition(
+                rule["not_at_start_with"], tokens[start]
+            )
+        if not veto and rule.get("not_inside"):
+            veto = any(
+                _match_condition(rule["not_inside"], tok)
+                for tok in tokens[start + 1 : end - 1]
+            )
+        if not veto and rule.get("followed_by"):
+            nxt = _right_window(tokens, end, 1)
+            veto = nxt is None or not _match_condition(rule["followed_by"], nxt[0])
+        if not veto and rule.get("not_followed_by"):
+            veto = any(
+                _match_condition(rule["not_followed_by"], tok)
+                for tok in _right_window(tokens, end, _TRAIL_WINDOW)
             )
         if not veto and end > start:
             last = tokens[end - 1]
@@ -225,7 +554,7 @@ def match_rule(rule, tokens, sentence_text):
             char_end = last.get("end") or offsets[end - 1] + len(last["surface"])
             spans.append((offsets[start], char_end))
     # Literal regex recognisers (top-level or nested in any_of).
-    spans.extend(_regex_spans(match, sentence_text))
+    spans.extend(_regex_spans(match, sentence_text, tokens))
     # Drop duplicate / contained spans, keep reading order.
     spans = sorted(set(spans))
     merged = []
@@ -256,13 +585,45 @@ def spec_morph(**features):
     return {"morph": features}
 
 
-def make_rule(key, name, level, desc, match, zh=None, not_after=None):
-    "Build one engine rule dict."
+def make_rule(
+    key,
+    name,
+    level,
+    desc,
+    match,
+    zh=None,
+    not_after=None,
+    followed_by=None,
+    not_followed_by=None,
+    at_start=False,
+    not_at_start_with=None,
+    not_inside=None,
+):
+    """
+    Build one engine rule dict.
+
+    The two context keys mirror `not_after` on the right-hand side:
+    `followed_by` *requires* the next non-punctuation token to match, and
+    `not_followed_by` vetoes the hit when any of the next three does.
+    `at_start` keeps only hits that open the sentence; `not_at_start_with`
+    drops a sentence-opening hit whose first token matches the spec.
+    `not_inside` drops a hit when a token inside its span matches the spec.
+    """
     r = {"key": key, "name": name, "level": level, "desc": desc, "match": match}
     if zh:
         r["zh"] = zh
     if not_after:
         r["not_after"] = not_after
+    if followed_by:
+        r["followed_by"] = followed_by
+    if not_followed_by:
+        r["not_followed_by"] = not_followed_by
+    if at_start:
+        r["at_start"] = True
+    if not_at_start_with:
+        r["not_at_start_with"] = not_at_start_with
+    if not_inside:
+        r["not_inside"] = not_inside
     return r
 
 
@@ -325,8 +686,10 @@ _KO_BY_KEY = {
     "es_mas_que": "más/menos ... que로 '~보다 더/덜' 비교를 나타냄.",
     "es_tan_como": "tan + 형용사 + como로 '만큼 ~한' 동등 비교를 나타냄.",
     "es_le": "간접목적 대명사 le/les는 '그/그들에게'의 뜻으로 gustar류와도 쓰임.",
+    "es_imperativo": "긍정 명령형: 동사가 문장 첫머리에 오면 명령이 되며(Hazlo ahora, Dame el libro), 대명사가 붙으면 dímelo처럼 한 단어로 씀.",
     "es_subj_present": "현재 접속법으로 의지·감정·의심·필요의 표현 뒤에 쓰임(quiero que).",
     "es_conditional": "조건법(compraría)으로 가정이나 정중한 표현을 나타냄.",
+    "es_futuro": "단순미래(-ré/-rá/-remos)로 앞으로의 예측·약속·추측을 나타냄(vendrá mañana).",
     "es_present_perfect": "현재완료(he + 과거분사)로 현재와 연결된 과거 동작을 나타냄(he comido).",
     "es_pluperfect": "과거완료(había + 과거분사)로 두 과거 중 더 이른 동작을 나타냄.",
     "es_si_conditional": "si + 과거접속법, 조건법으로 비현실적인 가정을 나타냄(Si tuviera, compraría).",
@@ -370,6 +733,7 @@ _KO_BY_KEY = {
     "ru_kak_ni": "как ни는 '아무리 ~해도'의 양보를 나타냄.",
     "ru_edva_li": "едва ли / вряд ли는 '~일 리 없다'의 의심을 나타냄.",
     "ru_chem_tem": "чем ... , тем ...로 '~하면 할수록' 상관 비교를 나타냄.",
+    "ru_stoit_kak": "стоит + 부정사 ..., как ...로 '~하기만 하면 곧'을 나타냄(стоит свернуть вправо, как ...).",
     # ---- French ----
     "fr_il_y_a": "il y a는 '~이 있다'를 나타내며 과거는 il y avait.",
     "fr_estceque": "est-ce que는 평서문을 예/아니오 의문문으로 바꿈.",
@@ -397,6 +761,32 @@ _KO_BY_KEY = {
     "fr_subjonctif_passe": "과거 접속법으로 접속법 안의 선행 동작이나 비현실을 나타냄.",
     "fr_apres_avoir": "après avoir/être + 과거분사로 '~한 후에'를 나타냄.",
     "fr_passe_simple": "단순과거는 문어체 서사의 과거(il fit).",
+    "fr_ne_que": "제한 부정 ne ... que로 '오직 ~만'을 나타냄(il n'y a que cinq étudiants).",
+    "fr_demo": "지시형용사 ce/cet/cette/ces는 명사의 성·수에 일치함.",
+    "fr_partitif": "부분관사 du/de la/des로 불특정한 양을 나타냄(du pain).",
+    "fr_imperatif": "명령법(Parlez ! / Finis !)으로 지시나 명령을 나타냄.",
+    "fr_pronominal": "재귀동사 se + 동사로 자신에게 행해지는 동작을 나타냄(se lever).",
+    "fr_inversion": "주어-동사 도치로 의문문을 만듦(Voyage-t-il ?).",
+    "fr_superlatif": "최상급 le/la/les + plus/moins로 '가장 ~'을 나타냄.",
+    "fr_avant_de": "avant de + 부정사로 '~하기 전에'를 나타냄.",
+    "fr_plus_que_parfait": "대과거(avait fini)로 과거 어느 시점 이전의 완료를 나타냄.",
+    "fr_futur_anterieur": "전미래(aura fini)로 미래 시점까지의 완료를 나타냄.",
+    "fr_pendant": "pendant + 기간으로 '~동안(의 지속)'을 나타냄(depuis와 대비).",
+    "fr_faire_causatif": "사역 구문 faire + 부정사로 '~하게 하다/시키다'를 나타냄.",
+    "fr_des_que": "dès que / aussitôt que로 '~하자마자'를 나타냄.",
+    "fr_pour_que": "pour que + 접속법으로 목적 '~하기 위하여'를 나타냄.",
+    "fr_bien_que": "bien que + 접속법으로 양보 '비록 ~이지만'을 나타냄.",
+    "fr_comme_si": "comme si + 반과거로 '~인 것처럼'을 나타냄.",
+    "fr_a_moins_que": "à moins que + 접속법으로 '~하지 않는 한'을 나타냄.",
+    "de_genitiv": "속격(Genitiv: des/der/-es)은 소유를 나타내며 전치사 뒤에도 쓰임.",
+    "de_komparativ": "비교급은 어미 -er을 붙이고 als와 함께 씀(größer als).",
+    "de_superlativ": "최상급은 am + -sten 또는 -ste 형태로 나타냄(am größten).",
+    "de_relativsatz": "관계대명사는 선행사의 성·수·격을 따르며, 관계절 동사는 문장 끝에 감.",
+    "de_doppel_infinitiv": "지각·사역 동사는 완료시제에도 부정사를 유지함(ich habe ihn kommen sehen).",
+    "de_doppelobjekt": "geben 등의 동사는 간접목적어(여격 사람) + 직접목적어(대격 사물)를 취함.",
+    "de_modal_perfekt": "완료과거에서 조동사는 과거분사 대신 부정사를 유지함(hat ... gekonnt).",
+    "de_zeitangabe": "시간 부사(heute/morgen/gestern)는 활용하지 않고 문두에 자주 옴.",
+    "de_hauptsatzkoord": "und/aber/denn 등으로 연결된 주절은 어순을 유지한 채 병렬로 연결됨.",
     # ---- German ----
     "de_es_gibt": "es gibt + 대격으로 '~이 있다' 존재를 나타냄.",
     "de_modals": "활용된 조동사는 2위, 부정사는 문장 끝에 감(ich kann heute nicht kommen).",
@@ -594,12 +984,182 @@ _KO_BY_KEY = {
 def _desc(rule, display_lang):
     "Description for a rule in the requested display language."
     if display_lang == "ko":
-        ko = _KO_BY_KEY.get(rule.get("key"))
+        ko = _KO_BY_KEY.get(rule.get("key")) or (rule.get("ko") or "").strip()
         if ko:
             return ko
     if display_lang == "zh" and rule.get("zh"):
         return rule["zh"]
     return rule["desc"]
+
+
+def desc_for_rule(rule, display_lang):
+    """
+    Public alias of :func:`_desc` for the library-page exporters.
+
+    The /grammar page lists rules the panel never saw on a page, so it has
+    to resolve the description the same way the panel does -- otherwise a
+    Korean reader gets Korean example translations under English headings.
+    """
+    return _desc(rule, display_lang)
+
+
+def example_gloss(example, display_lang):
+    """
+    The translation to print under an example, in the display language.
+
+    An engine stores its examples with whatever translations the corpus
+    carries -- Spanish as ``{"es", "en", "zh"}``, Russian as
+    ``{"ru", "zh"}``, Japanese as ``{"japanese", "english", "chinese"}``
+    -- so the field names differ per language.  Each engine therefore
+    resolves its own rows (see the per-engine ``_example_gloss``); this
+    shared helper covers the common ``{"<lang>", "en", "zh", "ko"}``
+    shape and is what the library-page exporters use.
+
+    A missing translation stays empty rather than falling back to English
+    under a Chinese or Korean heading: the front end hides an empty gloss,
+    which is honest, while a wrong-language one is not.
+    """
+    if not isinstance(example, dict):
+        return ""
+    if display_lang == "zh":
+        return (example.get("zh") or example.get("chinese") or "").strip()
+    if display_lang == "ko":
+        return (example.get("ko") or "").strip()
+    return (example.get("en") or example.get("english") or "").strip()
+
+
+def paired_examples(own_field, texts, row):
+    """
+    A corpus row's examples as dicts carrying whichever glosses it has.
+
+    The Spanish / French / German / Russian corpora store the sentences as a
+    bare list plus parallel gloss lists (``example_zh``, ``example_en``,
+    ``example_ko``).  Pairing them here keeps every engine's loader on one
+    rule: a gloss list that does not line up with the sentences is dropped
+    whole rather than applied to the wrong ones, and a row with no glosses
+    at all keeps returning plain strings so nothing downstream sees a
+    dict it does not need.
+    """
+    lists = {}
+    for field in ("zh", "en", "ko"):
+        values = [
+            str(value or "").strip() for value in (row.get("example_" + field) or [])
+        ]
+        if len(values) == len(texts):
+            lists[field] = values
+    if not lists:
+        return list(texts)
+    paired = []
+    for index, text in enumerate(texts):
+        entry = {own_field: text}
+        for field, values in lists.items():
+            if values[index]:
+                entry[field] = values[index]
+        paired.append(entry)
+    return paired
+
+
+def reference_gloss(reference, display_lang):
+    """
+    Translation for a rule's folded reference example, in the display
+    language, or "" when the corpus carries none for it.
+    """
+    return example_gloss(reference, display_lang)
+
+
+# ---- library export ----------------------------------------------------
+#
+# The /grammar page lists the whole corpus at once, where the panel lists
+# only what the current page happens to contain.  The engines with a data
+# layer (ja/ko/ru/es/fr/de/th) each build their own rows, because their
+# rows carry examples, levels and enrichment the shared shape does not
+# cover; the engines whose corpus *is* their hand-written rule set share
+# the exporter below.
+
+_CEFR_ORDER = ("A1", "A2", "B1", "B2", "C1", "C2")
+
+_golden_lock = threading.Lock()
+_golden_cache = {}
+
+
+def load_golden(path):
+    """
+    Curated example sentences from one golden file, keyed by rule key.
+
+    A golden file is ``{rule key: {"name": ..., "examples": [...]}}`` where
+    an example carries the sentence in the language's own field plus
+    whatever translations it has (``en`` / ``zh`` / ``ko``).  The loader
+    keeps only examples with a sentence in the engine's own field -- a row
+    whose text field is empty is a data error, and shipping it would show
+    a blank example on the library page.
+
+    Missing file means "no golden set for this engine", which is the normal
+    state for a rule set that was written without examples.
+    """
+    with _golden_lock:
+        if path not in _golden_cache:
+            examples = {}
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as fh:
+                    for key, entry in json.load(fh).items():
+                        rows = [
+                            example
+                            for example in entry.get("examples") or []
+                            if (example.get("text") or "").strip()
+                        ]
+                        if rows:
+                            examples[key] = rows
+            _golden_cache[path] = examples
+        return _golden_cache[path]
+
+
+def rule_library_entries(rules, display_lang="en", examples_by_key=None):
+    """
+    Export a hand-written rule list as browsable library rows.
+
+    Every rule becomes a row -- these rule sets have no reference-only
+    rows, so nothing is flagged ``skipped`` -- ordered by CEFR band and
+    stable within a band (the order the rules are written in, which is
+    the teaching order).
+
+    ``examples_by_key`` optionally supplies curated sentences per rule key,
+    the ``{key: [{"<lang>", "en", "zh", "ko"}, ...]}`` shape a golden set
+    uses.  Each becomes a ``{"text", "tr"}`` row with the translation for
+    the display language, or a bare sentence where the set carries none for
+    it.  A rule set with no golden file simply passes nothing and its rows
+    stay example-less, as before.
+    """
+    examples_by_key = examples_by_key or {}
+    entries = []
+    for rule in rules:
+        rows = []
+        for example in examples_by_key.get(rule["key"]) or []:
+            if isinstance(example, dict):
+                text = (example.get("text") or "").strip()
+                if not text:
+                    continue
+                tr = example_gloss(example, display_lang)
+                rows.append({"text": text, "tr": tr} if tr else text)
+            else:
+                text = (example or "").strip()
+                if text:
+                    rows.append(text)
+        entries.append(
+            {
+                "key": rule["key"],
+                "name": rule["name"],
+                "level": rule["level"],
+                "desc": desc_for_rule(rule, display_lang),
+                "examples": rows,
+                "skipped": False,
+            }
+        )
+    return sorted(
+        entries,
+        key=lambda e: _CEFR_ORDER.index(e["level"])
+        if e["level"] in _CEFR_ORDER
+        else len(_CEFR_ORDER),
+    )
 
 
 # ---- analysis driver ---------------------------------------------------
@@ -638,6 +1198,21 @@ def analyze_tokens(page_text, rules, tokens_for_sentence, display_lang):
                     "desc": _desc(rule, display_lang),
                     "examples": [],
                 }
+                # The entry's own curated example and its translation, for
+                # the panel's folded reference block.  Optional: only the
+                # engines that carry one on their rules emit it, so the
+                # block simply disappears for the rest.  The translation is
+                # resolved here, in the display language, rather than in
+                # the front end -- the same rule the engines follow for
+                # `desc`, so a zh panel never sees an English gloss.
+                reference = rule.get("reference")
+                if reference:
+                    text = reference_gloss(reference, display_lang)
+                    if text:
+                        entry["reference"] = {
+                            "sentence": (reference.get("sentence") or "").strip(),
+                            "text": text,
+                        }
                 by_key[rule["key"]] = entry
                 order.append(rule["key"])
             if len(entry["examples"]) >= _EXAMPLE_CAP:

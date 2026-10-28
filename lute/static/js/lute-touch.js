@@ -551,8 +551,23 @@ let _get_textitems_text = function(textitemspans) {
   };
   const paras = _partition_by_paragraph_id(textitemspans);
   const paratexts = Object.entries(paras).map(([pid, spans]) => {
-    let ptext = spans.map(s => $(s).text()).join('');
-    return ptext.replace(/\u200B/g, '');
+    // The paragraph's text is the DOM between its first and last span, not
+    // just the spans concatenated.  On classic text pages every token,
+    // spaces included, is a span, so the two are the same -- but in the
+    // EPUB reader (and PDF pages) whitespace tokens get no span and the
+    // spaces between words live as raw text nodes outside any .textitem;
+    // joining only the span texts glued the words together ("Hereisacat.").
+    // <rt>/<rp> are dropped from the clone: a furigana'd span's flattened
+    // .text() reads the pronunciation into the sentence ("体が" became
+    // "体からだが"), polluting sentence translation, copy, and Anki export.
+    const range = document.createRange();
+    range.setStartBefore(spans[0]);
+    range.setEndAfter(spans[spans.length - 1]);
+    const frag = range.cloneContents();
+    // Furigana readings and the per-sentence 🔊 button injected by tts.js
+    // (skipped by the EpubReader's own text walk, see its SKIP_SELECTOR).
+    frag.querySelectorAll('rt, rp, .lute-sentence-play-btn').forEach(e => e.remove());
+    return frag.textContent.replace(/\u200B/g, '');
   });
   return paratexts.join('\n').trim();
 }
@@ -621,7 +636,7 @@ let copy_text_to_clipboard = function(textitemspans) {
   setTimeout(() => removeFlash(), 1000);
 
   const last_el = textitemspans[textitemspans.length - 1];
-  _show_element_message_tooltip(last_el, null, "Copied to clipboard.", 1000);
+  _show_element_message_tooltip(last_el, null, I18N.t('Copied to clipboard.'), 1000);
 }
 
 

@@ -14,6 +14,7 @@ Lute's other English UI.
 
 from flask import Blueprint, jsonify, render_template, request
 
+from lute.i18n import t
 from .registry import get_registry
 from . import installer
 
@@ -102,7 +103,7 @@ def install():
             jsonify(
                 {
                     "ok": False,
-                    "message": "Please enter a pip spec (name, path, or URL).",
+                    "message": t("Please enter a pip spec (name, path, or URL)."),
                 }
             ),
             400,
@@ -116,13 +117,15 @@ def upgrade():
     """Upgrade an installed plugin to its latest PyPI release."""
     name = (request.form.get("name") or "").strip()
     if not name:
-        return jsonify({"ok": False, "message": "Missing plugin name."}), 400
+        return jsonify({"ok": False, "message": t("Missing plugin name.")}), 400
     if name == "_demo":
         return (
             jsonify(
                 {
                     "ok": False,
-                    "message": "'_demo' is Lute's built-in marker and cannot be upgraded.",
+                    "message": t(
+                        "'_demo' is Lute's built-in marker and cannot be upgraded."
+                    ),
                 }
             ),
             400,
@@ -137,13 +140,15 @@ def uninstall():
     """Uninstall a plugin by its entry-point name."""
     name = (request.form.get("name") or "").strip()
     if not name:
-        return jsonify({"ok": False, "message": "Missing plugin name."}), 400
+        return jsonify({"ok": False, "message": t("Missing plugin name.")}), 400
     if name == "_demo":
         return (
             jsonify(
                 {
                     "ok": False,
-                    "message": "'_demo' is Lute's built-in marker and cannot be removed.",
+                    "message": t(
+                        "'_demo' is Lute's built-in marker and cannot be removed."
+                    ),
                 }
             ),
             400,
@@ -165,7 +170,7 @@ def upload_install():
     """
     files = request.files.getlist("files")
     if not files:
-        return jsonify({"ok": False, "message": "No files received."}), 400
+        return jsonify({"ok": False, "message": t("No files received.")}), 400
 
     import os
     import shutil
@@ -211,7 +216,10 @@ def upload_install():
             except zipfile.BadZipFile:
                 return (
                     jsonify(
-                        {"ok": False, "message": "Uploaded file is not a valid .zip."}
+                        {
+                            "ok": False,
+                            "message": t("Uploaded file is not a valid .zip."),
+                        }
                     ),
                     400,
                 )
@@ -226,7 +234,7 @@ def upload_install():
                 {
                     "ok": False,
                     "message": (
-                        "No pyproject.toml or setup.py found in the uploaded folder."
+                        t("No pyproject.toml or setup.py found in the uploaded folder.")
                     ),
                 }
             )

@@ -1,0 +1,451 @@
+[
+ {
+  "pattern": "Wegen / Trotz + Genitiv",
+  "name_de": "wegen / trotz + Genitiv",
+  "meaning_en": "because of / despite + genitive",
+  "meaning_zh": " wegen / trotz + 第二格（表原因、让步）",
+  "level": "B1",
+  "focus": [
+   "wegen",
+   "des"
+  ],
+  "formation": "wegen / trotz / aufgrund + des + 名词(第二格)",
+  "notes": "这类介词后面的名词一律用第二格：wegen des Regens（阴性名词 des + -s）。",
+  "examples": [
+   {
+    "german": "Wegen des Regens bleiben alle zu Hause.",
+    "chinese": "因为下雨，大家都待在家里。"
+   },
+   {
+    "german": "Trotz des Wetters wollte sie nicht Tennis spielen.",
+    "chinese": "尽管天气不好，她还是不想打网球。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "am + -sten",
+  "name_de": "am + -sten（最高级）",
+  "meaning_en": "superlative with am + -sten",
+  "meaning_zh": "am + 形容词加 -sten 构成最高级",
+  "level": "B1",
+  "focus": [
+   "am",
+   "ältesten"
+  ],
+  "formation": "am / eine + 形容词最高级(-ste / -sten / -ster)",
+  "notes": "作状语用 am + 第三格最高级（am besten），作定语用 -ste 形式（die beste Lösung）。",
+  "examples": [
+   {
+    "german": "Mein Sohn ist am ältesten.",
+    "chinese": "我儿子年纪最大。"
+   },
+   {
+    "german": "Meine Tochter ist am ältesten.",
+    "chinese": "我女儿年纪最大。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Komparativ + als",
+  "name_de": "比较级 + als",
+  "meaning_en": "comparative with -er and als",
+  "meaning_zh": "比较级：形容词加 -er，后接 als",
+  "level": "B1",
+  "focus": [
+   "größer",
+   "als"
+  ],
+  "formation": "形容词 + -er + als",
+  "notes": "德语比较级一律用 als 引导，不用英文的 than。",
+  "examples": [
+   {
+    "german": "Das Gymnasium ist größer als die Grundschule.",
+    "chinese": "文理中学比小学大。"
+   },
+   {
+    "german": "Der Saal ist größer als das Klassenzimmer.",
+    "chinese": "礼堂比教室大。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Passiv mit Modalverb",
+  "name_de": "情态动词被动（muss gebaut werden）",
+  "meaning_en": "passive with a modal",
+  "meaning_zh": "情态动词 + werden + 分词",
+  "level": "B1",
+  "focus": [
+   "werden"
+  ],
+  "formation": "Modal + Partizip II + werden",
+  "notes": "情态动词变成被动时，被动不定式整体后移：Das Haus muss gebaut werden。",
+  "examples": [
+   {
+    "german": "Das Haus muss gebaut werden.",
+    "chinese": "这栋房子必须建起来。"
+   },
+   {
+    "german": "Die Rechnung muss bezahlt werden.",
+    "chinese": "账单必须付清。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Zustandspassiv (ist + Partizip)",
+  "name_de": "状态被动（ist + 分词）",
+  "meaning_en": "stative passive with sein + participle",
+  "meaning_zh": "用 sein 的状态被动，表示结果状态",
+  "level": "B2",
+  "focus": [
+   "ist",
+   "gebaut"
+  ],
+  "formation": "sein + Partizip II",
+  "notes": "若动作已完成并留下结果状态，用 sein 而不用 werden：Die Tür ist geschlossen。",
+  "examples": [
+   {
+    "german": "Das Haus ist gebaut.",
+    "chinese": "房子已经建好了。"
+   },
+   {
+    "german": "Die Brücke ist gebaut.",
+    "chinese": "桥已经建好了。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "unbestimmter Akkusativ",
+  "name_de": "不定第四格（einen / eine）",
+  "meaning_en": "indefinite accusative endings",
+  "meaning_zh": "阳性/阴性不定冠词在第四格要变形（einen / eine）",
+  "level": "A1",
+  "focus": [
+   "einen"
+  ],
+  "formation": "einen (阳性) / eine (阴性) / ein (中性)",
+  "notes": "定冠词第四格：der→den、die→die、das→das；不定冠词第四格：ein→einen/eine/ein。",
+  "examples": [
+   {
+    "german": "Ich suche einen guten Arzt.",
+    "chinese": "我在找一位好医生。"
+   },
+   {
+    "german": "Wir kaufen eine neue Wohnung.",
+    "chinese": "我们买一套新公寓。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Wechselpräposition Akkusativ",
+  "name_de": "可分介词 + 第四格（in die Berge）",
+  "meaning_en": "two-way preposition with accusative (movement)",
+  "meaning_zh": "可分介词接第四格表示移动方向",
+  "level": "A2",
+  "focus": [
+   "in",
+   "die",
+   "Berge"
+  ],
+  "formation": "in / an / auf / über / unter / vor / zwischen + Akkusativ",
+  "notes": "同一介词接第三格表示位置（in der Stadt 城里），接第四格表示方向（in die Stadt 去城里）。",
+  "examples": [
+   {
+    "german": "Wir fahren in die Berge.",
+    "chinese": "我们到山里去。"
+   },
+   {
+    "german": "Sie gehen heute in die Berge.",
+    "chinese": "他们今天到山里去。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Präposition + Dativ (in der Stadt)",
+  "name_de": "固定搭配介词 + 第三格",
+  "meaning_en": "preposition + dative (location)",
+  "meaning_zh": "表示地点的介词短语接第三格",
+  "level": "A2",
+  "focus": [
+   "in",
+   "der",
+   "Stadt"
+  ],
+  "formation": "in / an / auf / bei / mit / nach / seit / von / zu + Dativ",
+  "notes": "有方向含义的介词（in/auf/zu/von）接第三格时是固定用法：in der Stadt arbeiten。",
+  "examples": [
+   {
+    "german": "Sie arbeitet in der Stadt.",
+    "chinese": "她在城里工作。"
+   },
+   {
+    "german": "Meine Schwester wohnt in der Stadt.",
+    "chinese": "我姐姐住在城里。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Perfekt mit Modalverb",
+  "name_de": "完成时里的情态动词（hat gekonnt）",
+  "meaning_en": "modal in the perfect keeps the infinitive",
+  "meaning_zh": "情态动词的完成时保留原形，不用分词",
+  "level": "B2",
+  "focus": [
+   "haben",
+   "schwimmen",
+   "können"
+  ],
+  "formation": "haben / sein + Modal + Infinitiv",
+  "notes": "这是德语学习者最常错的地方：说成 *hat gekonnt* 是错的，正确是 hat können。",
+  "examples": [
+   {
+    "german": "Viele Leute haben schwimmen können.",
+    "chinese": "很多人会游泳。"
+   },
+   {
+    "german": "Die Schüler haben schwimmen können.",
+    "chinese": "学生们会游泳。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Doppelinfinitiv (sehen / lassen)",
+  "name_de": "双不定式（sehen / hören / lassen）",
+  "meaning_en": "double infinitive after perception and causation verbs",
+  "meaning_zh": "感官/使役动词后接双不定式",
+  "level": "B2",
+  "focus": [
+   "sehen"
+  ],
+  "formation": "sehen / hören / lassen / fühlen + Infinitiv（留在句尾）",
+  "notes": "两个不定式都在句尾：Ich sehe ihn kommen。 lassen 还可以拆成 lassen + zu + Infinitiv。",
+  "examples": [
+   {
+    "german": "Ich sehe sie im Garten arbeiten.",
+    "chinese": "我看见她在花园里干活。"
+   },
+   {
+    "german": "Wir hören den Mann Gitarre spielen.",
+    "chinese": "我们听见那个男人弹吉他。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Infinitivsatz mit um / ohne",
+  "name_de": "不定式从句（um / ohne + zu）",
+  "meaning_en": "infinitive clauses with um / ohne",
+  "meaning_zh": "用 zu 不定式表达目的或方式",
+  "level": "B2",
+  "focus": [
+   "ohne"
+  ],
+  "formation": "um ... zu / ohne ... zu / anstatt ... zu + Infinitiv",
+  "notes": "同一个主句动词只能带一个 zu；主句动词若在句尾，不定式从句的 zu 也在句尾。",
+  "examples": [
+   {
+    "german": "Sie geht nach Hause, ohne dafür zu bezahlen.",
+    "chinese": "她回家却不付钱。"
+   },
+   {
+    "german": "Er lernt Russisch, um in Moskau zu arbeiten.",
+    "chinese": "他学俄语，以便在莫斯科工作。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Konjunktiv I (berichtete, dass ... sei)",
+  "name_de": "虚拟式 I（间接引语）",
+  "meaning_en": "Konjunktiv I for indirect speech",
+  "meaning_zh": "转述他人话时用虚拟式 I",
+  "level": "C1",
+  "focus": [
+   "dass"
+  ],
+  "formation": "berichten / fragen, dass + 主语 + 虚拟式 I（sei/habe/werde）",
+  "notes": "Konjunktiv I 的形式（sei/seien/habe/werde）在当代口语中常被 Konjunktiv II 替代。",
+  "examples": [
+   {
+    "german": "Der Reporter berichtete, dass niemand die Rede verstehe.",
+    "chinese": "记者报道说没有人听懂演讲。"
+   },
+   {
+    "german": "Der Reporter berichtete, dass die alte Frau gestorben sei.",
+    "chinese": "记者报道说那位老妇人去世了。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Konjunktiv II (würde / hätte / wäre)",
+  "name_de": "虚拟式 II（würde / hätte / wäre）",
+  "meaning_en": "Konjunktiv II for unreal conditions and politeness",
+  "meaning_zh": "虚拟式 II：非现实假设与礼貌请求",
+  "level": "B1",
+  "focus": [
+   "würde"
+  ],
+  "formation": "würde + Infinitiv / hätte + Infinitiv / wäre + Infinitiv",
+  "notes": "hätte/wäre/könnte 用动词过去式加 -te；其他动词多用 würde + 原形。",
+  "examples": [
+   {
+    "german": "An deiner Stelle würde ich sofort absagen.",
+    "chinese": "换作是我，我会马上拒绝。"
+   },
+   {
+    "german": "Wenn ich mehr Zeit hätte, würde ich einen Kurs machen.",
+    "chinese": "如果我有更多时间，我会去上一门课。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Relativsatz mit welch-",
+  "name_de": "关系从句（welcher / welche / welches）",
+  "meaning_en": "relative clauses with welch- and preposition + -r",
+  "meaning_zh": "关系从句：关系代词承担被修饰名词的格",
+  "level": "B2",
+  "focus": [
+   "wohnt",
+   "ist"
+  ],
+  "formation": "der/die/das/welcher/welche/welches + 谓语动词（句尾）",
+  "notes": "介词 +关系代词要加尾附音 -r：der/die/das（关系到介词后时）→ dem/denen/deren。",
+  "examples": [
+   {
+    "german": "Die Nachbarin, die dort wohnt, ist freundlich.",
+    "chinese": "住在那里的女邻居很和善。"
+   },
+   {
+    "german": "Die Kollegin, die hier wohnt, ist freundlich.",
+    "chinese": "住在这里的女同事很和善。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Verben mit Wechselpräposition (warten auf)",
+  "name_de": "带可分介词的动词（warten auf / denken an）",
+  "meaning_en": "separable verbs with their prefix at the clause end",
+  "meaning_zh": "可分动词的前缀后置到句尾",
+  "level": "A2",
+  "focus": [
+   "warten"
+  ],
+  "formation": "warten auf / sich freuen auf / denken an / sich interessieren für",
+  "notes": "前缀在句末，时态与情态动词仍变位在第二位：Ich warte auf dich。",
+  "examples": [
+   {
+    "german": "Ich warte seit einer Stunde auf den Bus.",
+    "chinese": "我等公交车已经一个小时了。"
+   },
+   {
+    "german": "Wir freuen uns auf deinen Besuch.",
+    "chinese": "我们很期待你的来访。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Reflexives Verb (sich freuen)",
+  "name_de": "反身动词（sich freuen über）",
+  "meaning_en": "reflexive verbs with sich",
+  "meaning_zh": "德语大量动词是反身动词，须带 sich",
+  "level": "A2",
+  "focus": [
+   "sich"
+  ],
+  "formation": "sich + Verb（sich freuen / sich beeilen / sich interessieren）",
+  "notes": "反身代词随格变化：ich freue mich（第四格）、ich freue mich über ihn（第三格）。",
+  "examples": [
+   {
+    "german": "Ich freue mich über deine Einladung.",
+    "chinese": "我很高兴收到你的邀请。"
+   },
+   {
+    "german": "Wir interessieren uns für alte Möbel.",
+    "chinese": "我们对旧家具感兴趣。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Ordinalzahlen (der dritte)",
+  "name_de": "序数词（der dritte / am dritten）",
+  "meaning_en": "ordinal numbers and ordinal adverbs",
+  "meaning_zh": "序数词：1-19 加 -te，20 以上加 -ste",
+  "level": "A2",
+  "focus": [
+   "dritte"
+  ],
+  "formation": "der/die/das + 序数词（zweiter/dritte/vierte ... zwanzigste）",
+  "notes": "1-3 的序数词不规则：erste/zweite/dritte（缩写 1./2./3.）；20 以上以 -zig 结尾的加 -ste。",
+  "examples": [
+   {
+    "german": "Der dritte Mai ist ein Feiertag.",
+    "chinese": "五月三日是假日。"
+   },
+   {
+    "german": "Wir treffen uns am zwanzigsten Mai.",
+    "chinese": "我们五月二十日见面。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Uhrzeit (um neun Uhr)",
+  "name_de": "钟点表达（um neun Uhr）",
+  "meaning_en": "telling the time with Uhr",
+  "meaning_zh": "钟点用 Uhr，点钟用 vor/nach",
+  "level": "A1",
+  "focus": [
+   "neun",
+   "Uhr"
+  ],
+  "formation": "um + 时间 + Uhr（缩写）/ vor halb / nach halb",
+  "notes": "整点直接用数字（um neun Uhr）；半点用 vor/nach + halb：halb neun = 8:30。",
+  "examples": [
+   {
+    "german": "Der Zug fährt um neun Uhr ab.",
+    "chinese": "火车九点发车。"
+   },
+   {
+    "german": "Der Film beginnt um neun Uhr.",
+    "chinese": "电影九点开始。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "Verneinung mit kein (keine Zeit)",
+  "name_de": "用 kein 的否定（keine Zeit）",
+  "meaning_en": "negating a noun with kein",
+  "meaning_zh": "否定名词用 kein / keine，不用 nicht",
+  "level": "A1",
+  "focus": [
+   "keine"
+  ],
+  "formation": "kein（阴性 keine / 第四格 keinen / 第三格 keinem）",
+  "notes": "nicht 否定动词、形容词和整句；kein 否定带冠词或零冠词的名词。",
+  "examples": [
+   {
+    "german": "Ich habe keine Zeit für dich.",
+    "chinese": "我没有时间陪你。"
+   },
+   {
+    "german": "Wir haben am Freitag keine Prüfung.",
+    "chinese": "我们周五没有考试。"
+   }
+  ],
+  "source": "core"
+ }
+]

@@ -1,0 +1,370 @@
+[
+ {
+  "pattern": "o ... o",
+  "name_es": "o ... o (alternativa)",
+  "meaning_en": "either ... or",
+  "meaning_zh": "o … o …：要么……要么",
+  "level": "A1",
+  "focus": [
+   "o",
+   "...",
+   "o"
+  ],
+  "formation": "o + A + o + B",
+  "notes": "并列选择；o 在元音 o 开头的词前改写成 u（uno u otro）。",
+  "examples": [
+   {
+    "spanish": "O vienes o te quedas.",
+    "chinese": "你要么来，要么留下。"
+   },
+   {
+    "spanish": "O estudias o trabajas.",
+    "chinese": "你要么读书，要么工作。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "demasiado + adjetivo",
+  "name_es": "demasiado + adjetivo / adverbio",
+  "meaning_en": "too (excessively)",
+  "meaning_zh": "demasiado + 形容词/副词：太……",
+  "level": "A2",
+  "focus": [
+   "demasiado/demasiada/demasiados/demasiadas"
+  ],
+  "formation": "demasiado + 形容词/副词（性数随名词）",
+  "notes": "表示『过度』，带负面评价；中性程度用 muy（muy caro 只是『很贵』，demasiado caro 是『贵得过分』）。",
+  "examples": [
+   {
+    "spanish": "Ud. maneja demasiado rápido.",
+    "chinese": "您开得太快了。"
+   },
+   {
+    "spanish": "Esta casa es demasiado cara.",
+    "chinese": "这房子太贵了。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "bastante + adjetivo",
+  "name_es": "bastante + adjetivo / adverbio",
+  "meaning_en": "quite / fairly",
+  "meaning_zh": "bastante + 形容词/副词：相当、挺",
+  "level": "A2",
+  "focus": [
+   "bastante"
+  ],
+  "formation": "bastante + 形容词/副词；bastante + 名词（不变）",
+  "notes": "比 muy 弱、比 un poco 强；修饰名词时不变性数（bastante dinero）。",
+  "examples": [
+   {
+    "spanish": "Tu español es bastante bueno.",
+    "chinese": "你的西班牙语相当不错。"
+   },
+   {
+    "spanish": "El examen fue bastante difícil.",
+    "chinese": "考试挺难的。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "un poco de + sustantivo",
+  "name_es": "un poco de + sustantivo",
+  "meaning_en": "a little (of)",
+  "meaning_zh": "un poco de + 名词：一点……",
+  "level": "A2",
+  "focus": [
+   "un",
+   "poco",
+   "de"
+  ],
+  "formation": "un poco de + 不可数名词；修饰形容词用 un poco + adj",
+  "notes": "后接名词要加 de（un poco de agua）；直接修饰形容词时不加（un poco tarde）。",
+  "examples": [
+   {
+    "spanish": "Sé un poco de español.",
+    "chinese": "我懂一点西班牙语。"
+   },
+   {
+    "spanish": "¿Quieres un poco de agua?",
+    "chinese": "你要点水吗？"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "igual de + adjetivo + que",
+  "name_es": "igual de + adjetivo + que",
+  "meaning_en": "just as ... as",
+  "meaning_zh": "igual de + 形容词 + que：和……一样",
+  "level": "A2",
+  "focus": [
+   "igual",
+   "de",
+   "§adj"
+  ],
+  "formation": "igual de + 形容词 + que",
+  "notes": "与 tan ... como 同义，但语气更强调『一模一样』；igual 不变性数。",
+  "examples": [
+   {
+    "spanish": "Es igual de alto que su padre.",
+    "chinese": "他和他父亲一样高。"
+   },
+   {
+    "spanish": "Hoy estás igual de guapa que ayer.",
+    "chinese": "你今天和昨天一样漂亮。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "lo mismo que",
+  "name_es": "lo mismo que",
+  "meaning_en": "the same as",
+  "meaning_zh": "lo mismo que：和……一样的东西/事",
+  "level": "A2",
+  "focus": [
+   "lo",
+   "mismo",
+   "que"
+  ],
+  "formation": "lo mismo que + 名词/从句",
+  "notes": "中性形式，指『同样的事』；指人/物时用 el mismo / la misma。",
+  "examples": [
+   {
+    "spanish": "Un viejo amigo no es lo mismo que un amigo viejo.",
+    "chinese": "老朋友和『上了年纪的朋友』不是一回事。"
+   },
+   {
+    "spanish": "Pienso lo mismo que tú.",
+    "chinese": "我想的和你一样。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "tanto ... que",
+  "name_es": "tanto ... que (consecuencia)",
+  "meaning_en": "so much that",
+  "meaning_zh": "tanto … que …：如此……以至于",
+  "level": "A2",
+  "focus": [
+   "!en",
+   "tanto",
+   "...",
+   "que"
+  ],
+  "formation": "动词 + tanto que + 结果；tanto/a/os/as + 名词 + que",
+  "notes": "修饰动词用 tanto（不变）；修饰名词随名词变性数（tanta gente que…）。",
+  "examples": [
+   {
+    "spanish": "Trabajó tanto que enfermó.",
+    "chinese": "他工作得太拼，结果病倒了。"
+   },
+   {
+    "spanish": "Tengo tanta hambre que no puedo esperar.",
+    "chinese": "我饿得等不下去了。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "tan + adjetivo + que",
+  "name_es": "tan + adjetivo + que",
+  "meaning_en": "so ... that",
+  "meaning_zh": "tan + 形容词 + que：如此……以至于",
+  "level": "A2",
+  "focus": [
+   "tan",
+   "§adj",
+   "que"
+  ],
+  "formation": "tan + 形容词/副词 + que + 结果",
+  "notes": "与 tanto ... que 分工：tan 修饰形容词/副词，tanto 修饰动词或名词。",
+  "examples": [
+   {
+    "spanish": "Era tan tarde que nos fuimos.",
+    "chinese": "太晚了，我们就走了。"
+   },
+   {
+    "spanish": "Habla tan rápido que no lo entiendo.",
+    "chinese": "他说得太快，我听不懂。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "primero ... después",
+  "name_es": "primero ... después (orden)",
+  "meaning_en": "first ... then",
+  "meaning_zh": "primero … después：先……然后",
+  "level": "A2",
+  "focus": [
+   "primero",
+   "...",
+   "después"
+  ],
+  "formation": "primero + 动作, después + 动作",
+  "notes": "叙述顺序；也可用 luego、más tarde 替换 después。",
+  "examples": [
+   {
+    "spanish": "Primero desayuno, después salgo a correr.",
+    "chinese": "我先吃早饭，然后出去跑步。"
+   },
+   {
+    "spanish": "Primero estudiaremos, después iremos al cine.",
+    "chinese": "我们先学习，然后去看电影。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "algún / ningún",
+  "name_es": "algún / ningún (+ sustantivo)",
+  "meaning_en": "some / no (before a masculine singular noun)",
+  "meaning_zh": "algún / ningún：某个 / 没有任何",
+  "level": "A2",
+  "focus": [
+   "algún/alguna/algunos/algunas/ningún/ninguna"
+  ],
+  "formation": "algún/ningún + 阳性单数名词（短形式，来自 alguno/ninguno）",
+  "notes": "阳性单数名词前用 algún/ningún；ninguno 在动词后仍保留 no（No tengo ninguna duda）。",
+  "examples": [
+   {
+    "spanish": "Algún día lo entenderás.",
+    "chinese": "总有一天你会明白。"
+   },
+   {
+    "spanish": "No tengo ninguna duda.",
+    "chinese": "我毫无疑问。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "si + indicativo",
+  "name_es": "si + indicativo (condición real)",
+  "meaning_en": "if + present indicative (real condition)",
+  "meaning_zh": "si + 陈述式：真实条件（如果……）",
+  "level": "A2",
+  "focus": [
+   "si",
+   "§ind"
+  ],
+  "formation": "si + 陈述式现在时, 主句（现在/将来/命令）",
+  "notes": "真实条件用陈述式；假设（si + 虚拟式过去时）表不可能的情况，两者别混。",
+  "examples": [
+   {
+    "spanish": "Si llueve, no saldremos.",
+    "chinese": "如果下雨，我们就不出门。"
+   },
+   {
+    "spanish": "Si tienes tiempo, llámame.",
+    "chinese": "你要是有时间就给我打电话。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "estar a punto de + infinitivo",
+  "name_es": "estar a punto de + infinitivo",
+  "meaning_en": "to be about to do something",
+  "meaning_zh": "estar a punto de + 原形动词：正要、差点",
+  "level": "B1",
+  "focus": [
+   "a",
+   "punto",
+   "de",
+   "§inf"
+  ],
+  "formation": "estar 变位 + a punto de + 原形动词",
+  "notes": "表示即将发生；用于过去时可表『差点就……』（Estuve a punto de caerme）。",
+  "examples": [
+   {
+    "spanish": "El tren está a punto de salir.",
+    "chinese": "火车就要开了。"
+   },
+   {
+    "spanish": "Estuve a punto de caerme.",
+    "chinese": "我差点摔倒。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "puede que + subjuntivo",
+  "name_es": "puede que + subjuntivo",
+  "meaning_en": "it may be that / maybe",
+  "meaning_zh": "puede que + 虚拟式：可能……",
+  "level": "B1",
+  "focus": [
+   "puede",
+   "que"
+  ],
+  "formation": "puede que + 虚拟式（无人称，puede 不变）",
+  "notes": "与 es posible que 同义，更口语；也可以说 puede ser que。",
+  "examples": [
+   {
+    "spanish": "Puede que llueva esta tarde.",
+    "chinese": "今天下午可能会下雨。"
+   },
+   {
+    "spanish": "Puede que no venga.",
+    "chinese": "他可能不来了。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "menos mal que",
+  "name_es": "menos mal que",
+  "meaning_en": "it's a good thing that / thank goodness",
+  "meaning_zh": "menos mal que：还好、幸好",
+  "level": "B1",
+  "focus": [
+   "menos",
+   "mal",
+   "que"
+  ],
+  "formation": "menos mal que + 陈述式",
+  "notes": "表示对已发生事实的庆幸；单独说 ¡Menos mal! 也可以。",
+  "examples": [
+   {
+    "spanish": "Menos mal que llegaste.",
+    "chinese": "幸好你来了。"
+   },
+   {
+    "spanish": "Menos mal que no había nadie.",
+    "chinese": "还好当时没人。"
+   }
+  ],
+  "source": "es-ref-2"
+ },
+ {
+  "pattern": "es que ...",
+  "name_es": "es que ... (explicación)",
+  "meaning_en": "the thing is ... (justification)",
+  "meaning_zh": "es que …：是因为……（解释、辩解）",
+  "level": "B1",
+  "focus": [
+   "es",
+   "que"
+  ],
+  "formation": "es que + 陈述式（常置于句首或作补充说明）",
+  "notes": "口语里用来引出理由或辩解，语气比 porque 更委婉；不能单独回答问题。",
+  "examples": [
+   {
+    "spanish": "No voy, es que no tengo tiempo.",
+    "chinese": "我不去，因为我没时间。"
+   },
+   {
+    "spanish": "Es que no me avisaron.",
+    "chinese": "是因为没人通知我。"
+   }
+  ],
+  "source": "es-ref-2"
+ }
+]

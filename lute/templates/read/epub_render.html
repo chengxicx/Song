@@ -1,0 +1,457 @@
+{# Standalone reader-mode EPUB chapter, for the LuteForMobile WebView.
+
+   The web reader swaps read/epub_page.html into read/index.html, whose
+   machinery (menus, cursor, furigana call) the fragment leans on.  This
+   page is the same chapter rendered as a complete document with none of
+   that chrome: EpubReader.mount injects the word spans exactly as on
+   the web, and a bridge script talks to the embedding app instead --
+   window.flutter_inappwebview.callHandler for taps and scroll, and
+   window.LuteEpubBridge for everything the app pushes down (status
+   colours, look mode, furigana, zoom, scroll restore).
+
+   The structural pieces are deliberately identical to the web reading
+   page -- div#thetext.epub-text-container, the epub-look-* classes, the
+   two JSON script nodes -- because both styles.css and
+   lute-epub-reader.js key on them.  FXL fitting and zoom are ported
+   from read/index.html (_fitMangaPage's epub-fixed branch and
+   _applyEpubZoom); they are copied, not shared, so the web reader's
+   own machinery stays untouched. #}
+<!DOCTYPE html>
+<html lang="{{ 'rtl' if is_rtl else 'ltr' }}">
+<head>
+  <meta charset="utf-8">
+  {# Zoom is driven by the app's buttons through LuteEpubBridge (like
+     the web reading menu), so the browser's own pinch / double-tap zoom
+     is off: a double-tap on a word is a status cycle, not a zoom. #}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>{{ html_title }}</title>
+  <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}">
+  {% if theme_css_hash %}
+  <link rel="stylesheet" type="text/css" href="/theme/current?v={{ theme_css_hash }}">
+  {% endif %}
+  <script type="text/javascript">
+    var LUTE_FURIGANA = { enabled: {{ show_furigana | tojson }}, langId: {{ lang_id }}, script: {{ furigana_script | tojson }} };
+  </script>
+  {# Only loaded when furigana starts on: the script self-annotates
+     unconditionally (its annotate() ignores LUTE_FURIGANA.enabled), so
+     "off" must mean "absent".  LuteEpubBridge.setFurigana(true) injects
+     it on demand, and its load-time self-annotate then finds the
+     already-mounted spans. #}
+  {% if show_furigana %}
+  <script type="text/javascript" src="{{ vstatic('js/lute-furigana.js') }}" charset="utf-8" defer></script>
+  {% endif %}
+  <script type="text/javascript" src="{{ vstatic('js/lute-epub-reader.js') }}" charset="utf-8" defer></script>
+  <style>
+    /* The reading page hangs #thetext in a flex column of the app
+       chrome; standalone the document itself is that column.  Reflow
+       chapters then scroll the whole document (video-scroll-mode), and
+       fixed-layout chapters scroll inside #thetext
+       (epub-fixed-container), both styled by styles.css. */
+    html, body { height: 100%; }
+    body { display: flex; flex-direction: column; }
+  </style>
+</head>
+<body>
+  <h1 id="thetexttitle" class="hide">{{ html_title }}</h1>
+  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %}class="epub-text-container{% if look == 'original' %} epub-look-original{% elif look == 'night' %} epub-look-night{% endif %}">
+    <div id="epub-chapter"
+         data-epub-css="{{ css_url }}"
+         data-epub-orig-css="{{ orig_css_url }}">{{ chapter_html | safe }}</div>
+  </div>
+
+  <script type="application/json" id="lute-epub-tokens">{{ tokens | tojson }}</script>
+  <script type="application/json" id="lute-epub-substitutions">{{ substitutions | tojson }}</script>
+
+  <script>
+  (function () {
+    "use strict";
+
+    var LOOKS = ["original", "night", "theme"];
+    var ZOOM_KEY = "epubZoom";
+    var ZOOM_MIN = 0.5;
+    var ZOOM_MAX = 2.5;
+
+    function clamp(v, lo, hi) {
+      return Math.min(hi, Math.max(lo, v));
+    }
+
+    function chapter() {
+      return document.getElementById("epub-chapter");
+    }
+
+    function thetext() {
+      return document.getElementById("thetext");
+    }
+
+    function isFixed() {
+      var c = chapter();
+      return !!(c && c.querySelector(".epub-body[data-epub-viewport]"));
+    }
+
+    function callFlutter(name, payload) {
+      if (window.flutter_inappwebview &&
+          window.flutter_inappwebview.callHandler) {
+        window.flutter_inappwebview.callHandler(name, payload);
+      }
+    }
+
+    /* ---- zoom / fixed-layout fit (ported from read/index.html) ---- */
+
+    function getZoom() {
+      var raw = parseFloat(localStorage.getItem(ZOOM_KEY));
+      if (!Number.isFinite(raw) || raw <= 0) return 1;
+      return clamp(raw, ZOOM_MIN, ZOOM_MAX);
+    }
+
+    function fitFixedPage() {
+      var wrap = thetext();
+      var page = wrap && wrap.querySelector(".epub-body[data-epub-viewport]");
+      if (!page) return;
+      var vp = (page.dataset.epubViewport || "").split("x");
+      var natW = parseFloat(vp[0]);
+      var natH = parseFloat(vp[1]);
+      if (!natW || !natH) return;
+      // A fixed-layout page only fits the width and scrolls
+      // vertically, like a normal PDF reader.
+      var fit = Math.min(1, wrap.clientWidth / natW) || 1;
+      var scale = fit * getZoom();
+      // The scoped-CSS default clamps .epub-body to a reading column;
+      // a fixed page is exactly its viewport size, nothing narrower.
+      page.style.maxWidth = "none";
+      page.style.transform = "none";
+      page.style.width = Math.max(10, Math.floor(natW * scale)) + "px";
+      page.style.height = Math.max(10, Math.floor(natH * scale)) + "px";
+      page.style.margin = "0 auto";
+    }
+
+    // mount() calls this itself when it exists (same hook the web
+    // reading page provides), so the chapter is already zoomed by the
+    // time its spans are injected.
+    window._applyEpubZoom = function () {
+      var c = chapter();
+      if (!c) return;
+      if (c.querySelector(".epub-body[data-epub-viewport]")) {
+        // A fixed-layout page zooms through the page fit, not the
+        // container: zooming both would double the scale.
+        c.style.zoom = "";
+        fitFixedPage();
+      } else {
+        c.style.zoom = String(getZoom());
+      }
+    };
+
+    window.addEventListener("resize", function () {
+      if (isFixed()) fitFixedPage();
+    });
+    // Fixed pages size themselves from the viewport; images and fonts
+    // settling after DOMContentLoaded can shift nothing here, but a
+    // late webfont can change the pane width rounding -- re-fit once
+    // the whole document (images included) has loaded.
+    window.addEventListener("load", function () {
+      if (isFixed()) fitFixedPage();
+    });
+
+    /* ---- status colours ---- */
+
+    var STATUS_RE = /^status\S*$/;
+
+    function addStatusClasses() {
+      document.querySelectorAll("#epub-chapter span.word").forEach(function (sp) {
+        var cls = sp.dataset.statusClass || "";
+        if (cls) sp.classList.add(cls);
+      });
+    }
+
+    function setStatus(wid, cls) {
+      document.querySelectorAll("#epub-chapter span.word" + wid).forEach(function (sp) {
+        Array.from(sp.classList).forEach(function (c) {
+          if (STATUS_RE.test(c) && c !== cls) sp.classList.remove(c);
+        });
+        if (cls) sp.classList.add(cls);
+        sp.dataset.statusClass = cls || "";
+      });
+    }
+
+    /* Re-assert every word's status in one pass.
+       A chapter served from the offline pack carries the status classes
+       it had when the pack was written, which can predate the reader's
+       current model (a word marked known after the pack was built).
+       setStatus above is selector-based -- applying it to a whole
+       chapter would be one subtree query per word -- so this walks the
+       spans once and looks each one up in the map. */
+    function setStatuses(map) {
+      if (!map) return;
+      document.querySelectorAll("#epub-chapter span.word").forEach(function (sp) {
+        var wid = sp.dataset.wid;
+        if (!wid || !Object.prototype.hasOwnProperty.call(map, wid)) return;
+        var cls = map[wid] || "";
+        Array.from(sp.classList).forEach(function (c) {
+          if (STATUS_RE.test(c) && c !== cls) sp.classList.remove(c);
+        });
+        if (cls) sp.classList.add(cls);
+        sp.dataset.statusClass = cls;
+      });
+    }
+
+    /* ---- furigana ---- */
+
+    var FURIGANA_SRC = {{ vstatic('js/lute-furigana.js') | tojson }};
+    var furiganaLoaded = {{ "true" if show_furigana else "false" }};
+
+    function stripFurigana() {
+      document.querySelectorAll("#epub-chapter span.word ruby").forEach(function (r) {
+        var parent = r.parentNode;
+        while (r.firstChild) {
+          if (r.firstChild.nodeName === "RT") r.removeChild(r.firstChild);
+          else parent.insertBefore(r.firstChild, r);
+        }
+        parent.removeChild(r);
+      });
+      // Clear the annotate-claimed marks so a later annotate() re-wraps.
+      document.querySelectorAll("#epub-chapter span.word[data-furigana]").forEach(function (sp) {
+        delete sp.dataset.furigana;
+      });
+      var wrap = thetext();
+      if (wrap) wrap.classList.remove("furigana-on");
+    }
+
+    function setFurigana(on) {
+      if (!on) {
+        stripFurigana();
+        return;
+      }
+      if (!furiganaLoaded) {
+        furiganaLoaded = true;
+        var s = document.createElement("script");
+        s.src = FURIGANA_SRC;
+        s.charset = "utf-8";
+        s.onload = function () {
+          if (typeof window.lute_furigana_annotate === "function") {
+            window.lute_furigana_annotate();
+          }
+        };
+        document.head.appendChild(s);
+      } else if (typeof window.lute_furigana_annotate === "function") {
+        window.lute_furigana_annotate();
+      }
+    }
+
+    /* ---- word taps: single = term card, double = status cycle,
+       triple (when enabled) = mark known ---- */
+
+    var TAP_WINDOW_MS = 300;
+    var tapTimer = null;
+    var lastTapSpan = null;
+    var tapCount = 0;
+    var tripleEnabled = {{ "true" if triple else "false" }};
+
+    function payloadOf(sp) {
+      return {
+        wid: parseInt(sp.dataset.wid || "0", 10),
+        text: sp.dataset.text || "",
+        sentenceId: parseInt(sp.dataset.sentenceId || "0", 10),
+        paragraphId: parseInt(sp.dataset.paragraphId || "0", 10),
+        order: parseInt(sp.dataset.order || "0", 10),
+        splitPiece: sp.dataset.splitPiece === "1",
+        ttsText: sp.dataset.ttsText || sp.dataset.text || ""
+      };
+    }
+
+    document.addEventListener("click", function (event) {
+      var sp = event.target.closest && event.target.closest("span.textitem.word");
+      if (!sp) return;
+      event.preventDefault();
+      if (tapTimer && sp === lastTapSpan) {
+        tapCount += 1;
+        clearTimeout(tapTimer);
+        if (tapCount >= 3 || !tripleEnabled) {
+          // Settled: the second tap when triple is off, or the third
+          // when it is on.
+          var name = tapCount >= 3 ? "luteEpubWordTripleTap"
+                                    : "luteEpubWordDoubleTap";
+          var payload = payloadOf(sp);
+          tapTimer = null;
+          lastTapSpan = null;
+          tapCount = 0;
+          callFlutter(name, payload);
+        } else {
+          // Second tap: hold the settlement one more window in case a
+          // third press lands on the same word.
+          var held = payloadOf(sp);
+          tapTimer = setTimeout(function () {
+            tapTimer = null;
+            lastTapSpan = null;
+            tapCount = 0;
+            callFlutter("luteEpubWordDoubleTap", held);
+          }, TAP_WINDOW_MS);
+        }
+      } else {
+        tapCount = 1;
+        lastTapSpan = sp;
+        if (tapTimer) clearTimeout(tapTimer);
+        var first = payloadOf(sp);
+        tapTimer = setTimeout(function () {
+          tapTimer = null;
+          lastTapSpan = null;
+          tapCount = 0;
+          callFlutter("luteEpubWordTap", first);
+        }, TAP_WINDOW_MS);
+      }
+    });
+
+    /* ---- scroll position ---- */
+
+    function scrollContainer() {
+      return isFixed() ? thetext() : window;
+    }
+
+    function reportScroll() {
+      var payload;
+      if (isFixed()) {
+        var wrap = thetext();
+        payload = {
+          top: wrap.scrollTop,
+          max: Math.max(0, wrap.scrollHeight - wrap.clientHeight),
+          fixed: true
+        };
+      } else {
+        var doc = document.documentElement;
+        payload = {
+          top: window.scrollY,
+          max: Math.max(0, doc.scrollHeight - window.innerHeight),
+          fixed: false
+        };
+      }
+      callFlutter("luteEpubScroll", payload);
+    }
+
+    var scrollRaf = 0;
+    function onScroll() {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(function () {
+        scrollRaf = 0;
+        reportScroll();
+      });
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    function restoreScroll(top) {
+      var y = parseFloat(top);
+      if (!Number.isFinite(y) || y <= 0) return;
+      // One more frame: the chapter's images may still be settling,
+      // and scrolling to a y the document does not have yet clamps.
+      requestAnimationFrame(function () {
+        var c = scrollContainer();
+        if (c === window) window.scrollTo(0, y);
+        else c.scrollTop = y;
+      });
+    }
+
+    /* ---- boot ---- */
+
+    /* The app veils the WebView until the chapter is mounted *and* its
+       status colours are painted.  Before that the document is the
+       book's own raw markup -- no word spans, no status colours -- which
+       reads as a broken page rather than a loading one, and the mount is
+       the one part of the load the app cannot observe on its own.
+
+       Report on every path, including the ones that bail out: a chapter
+       whose token stream does not match, or a document without the
+       container, must still lift the veil instead of leaving it up until
+       the app's timeout. */
+    function reportReady() {
+      try {
+        var bridge = window.flutter_inappwebview;
+        if (!bridge || typeof bridge.callHandler !== "function") return;
+        var c = chapter();
+        bridge.callHandler("luteEpubReady", {
+          ms: Math.round(window.performance ? performance.now() : 0),
+          mounted: !!(c && c.dataset.epubMounted),
+          mismatch: !!(c && c.dataset.epubMismatch)
+        });
+      } catch (err) {
+        // No app on the other end (plain browser): nothing to report to.
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var wrap = thetext();
+      var c = chapter();
+      if (!wrap || !c) {
+        reportReady();
+        return;
+      }
+
+      try {
+        if (!isFixed()) {
+          // Scrolling mode: the whole document scrolls (same class the
+          // web reading page adds -- it unhides overflow on #thetext).
+          wrap.classList.add("video-scroll-mode");
+        }
+
+        if (window.EpubReader) {
+          var look = {{ look | tojson }};
+          if (LOOKS.indexOf(look) < 0) look = "original";
+          // setLook persists to localStorage and applies the classes +
+          // stylesheet before mount reads them back.
+          window.EpubReader.setLook(look);
+          window.EpubReader.mount(c);
+        }
+
+        addStatusClasses();
+        // Explicit call, like read/epub_page.html's mount script: the
+        // deferred furigana script self-ran before this listener (before
+        // mount), so its pass found no spans.
+        if (furiganaLoaded &&
+            typeof window.lute_furigana_annotate === "function") {
+          window.lute_furigana_annotate();
+        }
+        if (isFixed()) {
+          fitFixedPage();
+          wrap.addEventListener("scroll", onScroll, { passive: true });
+        }
+        reportScroll();
+      } finally {
+        // Also reached when a step above threw: the veil lifts and the
+        // reader can see whatever did render.
+        reportReady();
+      }
+    });
+
+    /* ---- the app-facing bridge ---- */
+
+    window.LuteEpubBridge = {
+      setStatus: setStatus,
+      setStatuses: setStatuses,
+      setLook: function (mode) {
+        if (window.EpubReader && LOOKS.indexOf(mode) >= 0) {
+          window.EpubReader.setLook(mode);
+        }
+      },
+      setFurigana: setFurigana,
+      setZoom: function (factor) {
+        var f = parseFloat(factor);
+        if (!Number.isFinite(f)) return;
+        localStorage.setItem(ZOOM_KEY, String(clamp(f, ZOOM_MIN, ZOOM_MAX)));
+        window._applyEpubZoom();
+      },
+      zoomIn: function () {
+        this.setZoom(Math.round(getZoom() * 1.2 * 100) / 100);
+      },
+      zoomOut: function () {
+        this.setZoom(Math.round(getZoom() / 1.2 * 100) / 100);
+      },
+      resetZoom: function () {
+        localStorage.setItem(ZOOM_KEY, "1");
+        window._applyEpubZoom();
+      },
+      getZoom: function () {
+        return getZoom();
+      },
+      restoreScroll: restoreScroll,
+      reportScroll: reportScroll
+    };
+  })();
+  </script>
+</body>
+</html>

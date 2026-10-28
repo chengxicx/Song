@@ -26,13 +26,16 @@ from flask import (
     has_request_context,
     make_response,
     send_from_directory,
+    send_file,
     jsonify,
     url_for,
 )
 from sqlalchemy.event import listens_for
 from sqlalchemy.pool import NullPool, Pool
+from werkzeug.exceptions import NotFound
 
 from lute.config.app_config import AppConfig
+from lute import i18n as lute_i18n
 from lute.db import db
 from lute.db.setup.main import setup_db
 from lute.db.management import add_default_user_settings
@@ -43,6 +46,7 @@ import lute
 import lute.utils.formutils
 from lute.utils import static_assets
 from lute.book import types as book_types
+from lute.book import epub_paths
 
 from lute.parse.registry import init_parser_plugins, supported_parsers
 from lute.parse import plugin_installer
@@ -69,6 +73,8 @@ from lute.stats.service import get_reading_streak
 from lute.ankiexport.routes import bp as anki_bp
 from lute.book.routes import bp as book_bp
 from lute.bookmarks.routes import bp as bookmarks_bp
+from lute.dict.routes import bp as dict_bp
+from lute.grammar.routes import bp as grammar_bp
 from lute.language.routes import bp as language_bp
 from lute.multiuser.routes import bp as multiuser_bp
 from lute.term.routes import bp as term_bp
@@ -87,6 +93,7 @@ from lute.stats.routes import bp as stats_bp
 from lute.cli.commands import bp as cli_bp
 from lute.tts.routes import bp as tts_bp
 from lute.netease.routes import bp as netease_bp
+from lute.whisper.routes import bp as whisper_bp
 
 
 def _setup_app_dir(dirname, readme_content):
@@ -211,6 +218,11 @@ def _add_base_routes(app, app_config):
                 "current_username": None,
                 "is_admin": False,
                 "can_manage_server": False,
+                # Pre-login there is no user scope, so i18n.t() serves
+                # English source strings (its fallback behavior).
+                "t": lute_i18n.t,
+                "i18n_lang": "en",
+                "i18n_dict_json": "{}",
             }
         us_repo = UserSettingRepository(db.session)
         bs = us_repo.get_backup_settings()
@@ -250,6 +262,9 @@ def _add_base_routes(app, app_config):
             # mode is on, and always available when it's off.  is_admin
             # alone can't express this: it is False in single-user mode.
             "can_manage_server": mu_permissions.is_admin_request(),
+            "t": lute_i18n.t,
+            "i18n_lang": lute_i18n.current_language(),
+            "i18n_dict_json": lute_i18n.translations_for_js(),
         }
         return ret
 
@@ -392,24 +407,6 @@ def _add_base_routes(app, app_config):
         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
         return response
 
-    @app.route("/sw.js")
-    def service_worker():
-        "Serve the PWA service worker from root scope."
-        response = make_response(send_from_directory("static", "sw.js"))
-        response.headers["Content-Type"] = "application/javascript; charset=utf-8"
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        response.headers["Service-Worker-Allowed"] = "/"
-        return response
-
-    @app.route("/manifest.webmanifest")
-    @app.route("/manifest.json")
-    def pwa_manifest():
-        "Serve the PWA web manifest with the correct MIME type."
-        response = make_response(send_from_directory("static", "manifest.json"))
-        response.headers["Content-Type"] = "application/manifest+json; charset=utf-8"
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        return response
-
     @app.errorhandler(500)
     def _internal_server_error(e):  # pylint: disable=unused-argument
         """
@@ -509,6 +506,13 @@ def _create_app(app_config, extra_config):
             "poolclass": NullPool,
         },
         "DATAPATH": app_config.datapath,
+        # Reader-mode EPUB packages are written under
+        # <EPUB_STATIC_ROOT>/epub/<uuid>/, i.e. beside the databases
+        # they belong to rather than inside app.static_folder.  The
+        # static folder is code: `git clean` removes it, and no data
+        # backup covers it, so a restore used to leave every
+        # reader-mode book pointing at files that were no longer there.
+        "EPUB_STATIC_ROOT": os.path.join(app_config.datapath, "static"),
         # ref https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
         # Don't track mods.
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
@@ -691,19 +695,13 @@ def _create_app(app_config, extra_config):
             return
 
         path = request.path
-        # Static assets are excepted so they load before login.  /sw.js
-        # and the manifests are static files too, but they are served
-        # from root by their own routes rather than from /static/, so
-        # they have to be named here as well: gated, the service worker
-        # script and the manifest answer 302 to the login page, and a
-        # background service-worker update after the session expires
-        # fails -- leaving the browser on a stale worker.
+        # Static assets are excepted so they load before login.  The
+        # retired PWA endpoints (/sw.js, the web manifests) used to be
+        # listed here too; they are gone now, so like any other unknown
+        # path they fall through to the login redirect.
         public_paths = (
             "/login",
             "/favicon.ico",
-            "/sw.js",
-            "/manifest.webmanifest",
-            "/manifest.json",
         )
         if path in public_paths or path.startswith("/static/"):
             mu_context.set_current_user(None)
@@ -796,7 +794,10 @@ def _create_app(app_config, extra_config):
     app.register_blueprint(language_bp)
     app.register_blueprint(anki_bp)
     app.register_blueprint(book_bp)
+    app.register_blueprint(whisper_bp)
     app.register_blueprint(bookmarks_bp)
+    app.register_blueprint(dict_bp)
+    app.register_blueprint(grammar_bp)
     app.register_blueprint(term_bp)
     app.register_blueprint(termtag_bp)
     app.register_blueprint(read_bp)
@@ -822,6 +823,21 @@ def _create_app(app_config, extra_config):
     #   blueprints / menu items / settings tiles they register.
     app.register_blueprint(feature_bp)
     load_feature_plugins(app)
+
+    # Reader-mode EPUB chapters, stylesheets and assets.  They live in
+    # the data directory (see EPUB_STATIC_ROOT) but keep their original
+    # /static/epub/ URL: chapters imported before the move already have
+    # that prefix baked into their rewritten src/href attributes and
+    # scoped stylesheet, so changing it would break every existing book.
+    # A path that is not in the data directory yet is looked for in the
+    # old location, which keeps a server working between an upgrade and
+    # the relocation step in deploy.sh.
+    @app.route("/static/epub/<path:filename>")
+    def epub_asset(filename):
+        target = epub_paths.located(current_app, filename)
+        if target is None:
+            raise NotFound()
+        return send_file(target, conditional=True)
 
     return app
 
@@ -963,6 +979,7 @@ def data_initialization(session, output_func=None):
         for userinfo in mu_store.users():
             with mu_context.user_scope(userinfo["username"]):
                 clean_data(session, outfunc)
+                _requeue_grammar_precompute(outfunc)
         return
 
     demosvc = DemoService(session)
@@ -973,3 +990,26 @@ def data_initialization(session, output_func=None):
     # TODO valid parsers: do parser check, mark valid as active, invalid as inactive.
 
     clean_data(session, outfunc)
+    _requeue_grammar_precompute(outfunc)
+
+
+def _requeue_grammar_precompute(outfunc):
+    """
+    Re-queue whole-book grammar analyses a previous process left behind.
+
+    The worker is a daemon thread, so a restart loses the queue and the
+    "running" claims both; without this the affected books sit at running
+    forever and the reader's panel waits for a result nobody is computing.
+    Never blocks startup on an optional cache warm-up.
+    """
+    try:
+        from lute.read import grammar_precompute
+
+        queued = grammar_precompute.requeue_interrupted()
+        if queued:
+            outfunc(f"Queued {queued} book(s) for grammar analysis.")
+    except Exception:  # noqa: BLE001 - startup must survive any cache problem
+        try:
+            current_app.logger.warning("could not re-queue grammar analyses")
+        except Exception:  # noqa: BLE001 - no app context at all
+            pass

@@ -1,0 +1,1536 @@
+[
+ {
+  "pattern": "de plus en plus",
+  "name_fr": "de plus en plus (more and more)",
+  "meaning_en": "more and more; an ongoing increase",
+  "meaning_zh": "越来越……",
+  "level": "B1",
+  "focus": [
+   "de",
+   "plus",
+   "en",
+   "plus"
+  ],
+  "formation": "de plus en plus + adj / adv / de + nom",
+  "notes": "对比 de moins en moins（越来越少）。后接形容词或副词表示程度递进，接 de + 名词表示数量递进。",
+  "examples": [
+   {
+    "french": "De plus en plus de gens travaillent à domicile.",
+    "chinese": "越来越多的人在家工作。"
+   },
+   {
+    "french": "Son français devient de plus en plus fluide.",
+    "chinese": "他的法语说得越来越流利。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "afin de + infinitif",
+  "name_fr": "afin de + infinitif (in order to)",
+  "meaning_en": "in order to (formal purpose)",
+  "meaning_zh": "为了……（书面语目的）",
+  "level": "B2",
+  "focus": [
+   "afin",
+   "de"
+  ],
+  "formation": "afin de + infinitif",
+  "notes": "书面语；口语多用 pour + infinitif。后接从句时用 afin que + 虚拟式。",
+  "examples": [
+   {
+    "french": "Elle travaille afin de réussir.",
+    "chinese": "她为了成功而努力工作。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "ce sont",
+  "name_fr": "ce sont (those are)",
+  "meaning_en": "those are / they are (plural of c'est)",
+  "meaning_zh": "这些是/那些是（c'est 的复数）",
+  "level": "A1",
+  "focus": [
+   "ce",
+   "sont"
+  ],
+  "formation": "ce sont + nom pluriel",
+  "notes": "复数指认；口语中常用 c'est 代替（c'est mes parents）。",
+  "examples": [
+   {
+    "french": "Ce sont mes parents.",
+    "chinese": "这是我的父母。"
+   },
+   {
+    "french": "À qui sont ces livres? Ce sont à nous.",
+    "chinese": "这些书是谁的？是我们的。"
+   }
+  ],
+  "source": "corpus-a"
+ },
+ {
+  "pattern": "pendant que + indicatif",
+  "name_fr": "pendant que + indicatif (while)",
+  "meaning_en": "while (simultaneous actions)",
+  "meaning_zh": "当……的时候（同时进行）",
+  "level": "B1",
+  "focus": [
+   "pendant",
+   "que"
+  ],
+  "formation": "pendant que + indicatif",
+  "notes": "两个同时进行的动作；直陈式，不接虚拟式。",
+  "examples": [
+   {
+    "french": "Il lisait pendant qu'elle écrivait.",
+    "chinese": "他读书时她在写字。"
+   }
+  ],
+  "source": "corpus-a"
+ },
+ {
+  "pattern": "voix passive: a été + participe passé",
+  "name_fr": "voix passive: a été + participe passé (passive voice)",
+  "meaning_en": "passive voice in the compound past: was/were done",
+  "meaning_zh": "被动语态（复合过去时）：被……",
+  "level": "B1",
+  "focus": [
+   "a/ont",
+   "été",
+   "...",
+   "par"
+  ],
+  "formation": "sujet + avoir + été + participe passé (+ par + agent)",
+  "notes": "复合过去时的被动式。匹配要求显式代理 par：a été + 形容词/表语（elle a été malade）不是被动，与 avoir/être + 分词 的过去时规则同跨度双报；无代理被动（le film a été tourné）暂不匹配，宁可欠命中。现在时被动（est + 分词）与 être 助动词的复合过去时（il est allé）表面同形，为避免误报不单列。",
+  "examples": [
+   {
+    "french": "Le vaccin contre la rage a été découvert par Pasteur.",
+    "chinese": "狂犬病疫苗是巴斯德发现的。"
+   },
+   {
+    "french": "La fin du match a été sifflée par l'arbitre.",
+    "chinese": "比赛结束的哨声由裁判吹响。"
+   },
+   {
+    "french": "Catherine a été invitée à dîner par Bernard.",
+    "chinese": "卡特琳被贝尔纳邀请去吃晚饭。"
+   },
+   {
+    "french": "Au cours de la réunion, divers points de vue ont été exprimés.",
+    "chinese": "会上各种观点都得到了表达。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "jusqu'à ce que + subjonctif",
+  "name_fr": "jusqu'à ce que + subjonctif (until)",
+  "meaning_en": "until (with the subjunctive in the subordinate clause)",
+  "meaning_zh": "直到……为止（从句用虚拟式）",
+  "level": "B1",
+  "focus": [
+   "jusqu'",
+   "à",
+   "ce",
+   "que"
+  ],
+  "formation": "jusqu'à ce que + subjonctif",
+  "notes": "时间连词短语，从句一律用虚拟式。",
+  "examples": [
+   {
+    "french": "Restez couché jusqu'à ce que la fièvre soit tombée.",
+    "chinese": "躺到烧退为止。"
+   },
+   {
+    "french": "Caroline, reste ici jusqu'à ce que je revienne te chercher !",
+    "chinese": "卡罗琳，待在这儿直到我回来接你！"
+   },
+   {
+    "french": "Il a décidé de rester en exil jusqu'à ce que la situation change.",
+    "chinese": "他决定留在流亡地直到局势变化。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "trop ... pour",
+  "name_fr": "trop ... pour (too ... to)",
+  "meaning_en": "too ... to / too ... for",
+  "meaning_zh": "太……以至于不能／对……来说太……",
+  "level": "A2",
+  "focus": [
+   "trop",
+   "...",
+   "pour"
+  ],
+  "formation": "trop + adj / adv + pour + nom / infinitif",
+  "notes": "程度过量：trop 与 pour 之间通常是形容词或副词。",
+  "examples": [
+   {
+    "french": "C'est un bébé trop fragile pour aller à la crèche.",
+    "chinese": "这孩子太娇弱，还不能上托儿所。"
+   },
+   {
+    "french": "Ces chaussures sont beaucoup trop petites pour moi.",
+    "chinese": "这双鞋对我来说小得太多。"
+   },
+   {
+    "french": "Il a fait remarquer qu'il était trop tôt pour partir.",
+    "chinese": "他指出现在出发还太早。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "chaque / chacun",
+  "name_fr": "chaque / chacun (each / everyone)",
+  "meaning_en": "each / each one, everyone",
+  "meaning_zh": "每个／各自，人人",
+  "level": "A1",
+  "focus": [
+   "chaque/chacun"
+  ],
+  "formation": "chaque + nom singulier ; chacun (pronom)",
+  "notes": "chaque 是限定词，后接单数名词；chacun 是代词，可单独使用或后接 de + nom。",
+  "examples": [
+   {
+    "french": "Le train circule chaque jour entre les deux villes.",
+    "chinese": "列车每天往返于两座城市之间。"
+   },
+   {
+    "french": "Lors d'un championnat, chaque skieur porte un casque.",
+    "chinese": "锦标赛期间每位滑雪者都戴头盔。"
+   },
+   {
+    "french": "Chacun a donné son avis sur le projet.",
+    "chinese": "每个人对这个项目都发表了自己的意见。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "au fur et à mesure",
+  "name_fr": "au fur et à mesure (as / gradually)",
+  "meaning_en": "as something progresses; gradually",
+  "meaning_zh": "随着……；逐步地",
+  "level": "B2",
+  "focus": [
+   "au",
+   "fur",
+   "et",
+   "à",
+   "mesure"
+  ],
+  "formation": "au fur et à mesure de + nom / que + phrase",
+  "notes": "后接名词用 de，后接从句用 que（从句用直陈式）。也作副词短语 au fur et à mesure 单独使用。",
+  "examples": [
+   {
+    "french": "Au fur et à mesure que le temps passait, il oubliait sa douleur.",
+    "chinese": "随着时间流逝，他渐渐忘记了伤痛。"
+   },
+   {
+    "french": "Il progresse au fur et à mesure des leçons.",
+    "chinese": "他随着课程推进不断进步。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "il y a + durée (ago)",
+  "name_fr": "il y a + durée (ago)",
+  "meaning_en": "ago (a past time distance)",
+  "meaning_zh": "……之前（过去的时间距离）",
+  "level": "A2",
+  "focus": [
+   "il",
+   "y",
+   "a",
+   "...",
+   "ans/mois/jours/heures/semaines/minutes/siècles"
+  ],
+  "formation": "il y a + durée + (que), 谓语用过去时",
+  "notes": "与表示存在的 il y a（有）同形：后接时间词表示『……之前』。对比 depuis + 现在时（延续至今）。",
+  "examples": [
+   {
+    "french": "Il est parti il y a quatre jours.",
+    "chinese": "他是四天前走的。"
+   },
+   {
+    "french": "Il y a dix ans, à cet endroit-là, il n'y avait pas d'immeubles.",
+    "chinese": "十年前，那个地方还没有高楼。"
+   },
+   {
+    "french": "Patrick était en Espagne avec toute sa famille il y a deux mois.",
+    "chinese": "帕特里克两个月前和家人一起在西班牙。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "aucun / aucune",
+  "name_fr": "aucun / aucune (no / none)",
+  "meaning_en": "no, not any / none (negative determiner and pronoun)",
+  "meaning_zh": "没有任何……／一个也没有",
+  "level": "A2",
+  "focus": [
+   "aucun/aucune"
+  ],
+  "formation": "ne ... aucun(e) + nom singulier ; aucun(e) + de + nom",
+  "notes": "与 ne 连用构成强调否定；作代词时后接 de + 复数名词（aucun de mes amis）。",
+  "examples": [
+   {
+    "french": "Je n'ai aucun ami à qui demander conseil.",
+    "chinese": "我没有任何可以请教的朋友。"
+   },
+   {
+    "french": "Aucun ne me plaisait !",
+    "chinese": "没有一个让我喜欢！"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "peut-être",
+  "name_fr": "peut-être (maybe)",
+  "meaning_en": "maybe, perhaps (adverb)",
+  "meaning_zh": "也许，可能",
+  "level": "A2",
+  "focus": [
+   "peut-être"
+  ],
+  "formation": "peut-être + phrase ; phrase, peut-être.",
+  "notes": "副词；句首时主谓可倒装（Peut-être viendra-t-il demain）。口语常用 peut-être que + 直陈式。",
+  "examples": [
+   {
+    "french": "Peut-être qu'elle est à vendre.",
+    "chinese": "也许它在出售。"
+   },
+   {
+    "french": "Peut-être viendra-t-il demain.",
+    "chinese": "也许他明天会来。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "cependant / toutefois / néanmoins",
+  "name_fr": "cependant / toutefois / néanmoins (however)",
+  "meaning_en": "however, nevertheless (formal connectives)",
+  "meaning_zh": "然而，不过（书面语转折）",
+  "level": "B2",
+  "focus": [
+   "cependant/toutefois/néanmoins"
+  ],
+  "formation": "phrase, cependant / toutefois / néanmoins + phrase",
+  "notes": "书面语转折连接词，比 mais 正式；可位于句首、句中或句尾。",
+  "examples": [
+   {
+    "french": "La situation économique reste difficile, toutefois des progrès ont été réalisés.",
+    "chinese": "经济形势依然困难，不过已取得进展。"
+   },
+   {
+    "french": "Cependant, rien n'est perdu.",
+    "chinese": "然而，什么都没有失去。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "de même que",
+  "name_fr": "de même que (just as)",
+  "meaning_en": "just as / the same way as",
+  "meaning_zh": "正如……一样",
+  "level": "B2",
+  "focus": [
+   "de",
+   "même",
+   "que"
+  ],
+  "formation": "de même que + phrase, ... ; ... de même que ...",
+  "notes": "比较连词，引出同类情况；呼应的后半句常用 de même 开头。",
+  "examples": [
+   {
+    "french": "De même que le sport entretient le corps, la lecture entretient l'esprit.",
+    "chinese": "正如运动保养身体，阅读滋养心灵。"
+   },
+   {
+    "french": "De même que ses parents, elle adore la musique.",
+    "chinese": "和她的父母一样，她热爱音乐。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "ainsi que",
+  "name_fr": "ainsi que (as well as)",
+  "meaning_en": "as well as / just as",
+  "meaning_zh": "以及；正如",
+  "level": "B1",
+  "focus": [
+   "ainsi",
+   "que"
+  ],
+  "formation": "A ainsi que B (列举) ; ainsi que + phrase (比较)",
+  "notes": "列举时相当于 et aussi（以及）；引出从句时表示方式比较（正如）。",
+  "examples": [
+   {
+    "french": "Il a visité le Louvre ainsi que le musée d'Orsay.",
+    "chinese": "他参观了卢浮宫和奥赛博物馆。"
+   },
+   {
+    "french": "Georges, ainsi que toute sa famille, est très musicien.",
+    "chinese": "乔治和他的全家都很懂音乐。"
+   }
+  ],
+  "source": "corpus-b"
+ },
+ {
+  "pattern": "pronom objet direct + verbe",
+  "name_fr": "pronoms objets directs (le, la, les)",
+  "meaning_en": "direct object pronouns: it / them, replacing a noun already mentioned",
+  "meaning_zh": "直接宾语代词 le / la / les（代替已提到的名词）",
+  "level": "A1",
+  "focus": [
+   "je/tu/il/elle/on/nous/vous/ils/elles",
+   "le/la/les/l'"
+  ],
+  "formation": "sujet + le / la / les (+ l' devant voyelle) + verbe conjugué",
+  "notes": "代词放在变位动词前；元音开头缩合成 l'（Je l'ai vu）。复合时态放在助动词前。le / la / les 同时也是冠词，所以本行按「主语代词 + 代词」的相邻形式判定，单看一个 le 判不出来。",
+  "examples": [
+   {
+    "french": "Je le fais exprès.",
+    "chinese": "我是故意的。"
+   },
+   {
+    "french": "Il connaissait Ève depuis deux ans quand il l'a épousée.",
+    "chinese": "他认识伊芙两年之后才娶了她。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "pronom objet indirect + verbe",
+  "name_fr": "pronoms objets indirects (lui, leur)",
+  "meaning_en": "indirect object pronouns: to him / her / them (lui, leur)",
+  "meaning_zh": "间接宾语代词 lui / leur（代替 à + 人）",
+  "level": "A1",
+  "focus": [
+   "je/tu/il/elle/on/nous/vous/ils/elles",
+   "lui/leur"
+  ],
+  "formation": "sujet + lui / leur + verbe",
+  "notes": "代替 à + 人：à Marie → lui，à mes parents → leur。只用于人和动物；事物用 y（penser à qch → y penser）。",
+  "examples": [
+   {
+    "french": "Vous lui direz bonjour de ma part.",
+    "chinese": "请代我向他问好。"
+   },
+   {
+    "french": "J'obéis à mes parents. Je leur obéis.",
+    "chinese": "我听父母的话。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "le / la / les + lui / leur",
+  "name_fr": "ordre des pronoms objets (le lui, le leur)",
+  "meaning_en": "order of two object pronouns: direct before indirect",
+  "meaning_zh": "宾语代词顺序：直接宾语在前，间接宾语在后",
+  "level": "A2",
+  "focus": [
+   "le/la/les",
+   "lui/leur"
+  ],
+  "formation": "le / la / les + lui / leur + verbe",
+  "notes": "两个代词同时出现时顺序固定：me / te / se / nous / vous → le / la / les → lui / leur → y → en。⚠️ le leur 与主有代词 le leur 同形，本行按间接宾语读。",
+  "examples": [
+   {
+    "french": "La vendeuse la lui rend.",
+    "chinese": "女售货员把它还给他。"
+   },
+   {
+    "french": "On le lui a volé.",
+    "chinese": "有人把它从他那儿偷走了。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "me / te / se + le / la",
+  "name_fr": "ordre des pronoms objets (me le, te le)",
+  "meaning_en": "order of two object pronouns: first/second person comes first",
+  "meaning_zh": "宾语代词顺序：一、二人称在前（me le / te le）",
+  "level": "B1",
+  "focus": [
+   "me/te/se",
+   "le/la/lui/leur"
+  ],
+  "formation": "me / te / se + le / la / les + verbe",
+  "notes": "顺序链的第一位：me / te / se / nous / vous 永远排在最前，然后才是 le / la / les。",
+  "examples": [
+   {
+    "french": "Tu aurais pu me le dire plus tôt.",
+    "chinese": "你本可以早点告诉我。"
+   },
+   {
+    "french": "Elle te le donne.",
+    "chinese": "她把它给你。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "préposition + pronom disjoint",
+  "name_fr": "pronoms disjoints (moi, toi, lui...)",
+  "meaning_en": "stressed / disjunctive pronouns after a preposition",
+  "meaning_zh": "重读代词（介词后：chez moi, avec lui）",
+  "level": "A2",
+  "focus": [
+   "chez/avec/pour/sans",
+   "moi/toi/lui/elle/nous/vous/eux/elles"
+  ],
+  "formation": "préposition + moi / toi / lui / elle / nous / vous / eux / elles",
+  "notes": "重读代词用在介词后（chez moi, avec lui, pour elle）、强调和省略回答（— Qui? — Lui.）。与主语代词 je / tu 不同形。",
+  "examples": [
+   {
+    "french": "Je suis d'accord avec toi.",
+    "chinese": "我同意你。"
+   },
+   {
+    "french": "Qu'est-ce que je ferais sans toi?",
+    "chinese": "没有你我该怎么办？"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "le / la / les + mien / tien / sien",
+  "name_fr": "pronoms possessifs (le mien, le tien...)",
+  "meaning_en": "possessive pronouns: mine, yours, his/hers",
+  "meaning_zh": "主有代词（le mien / le tien / le sien...）",
+  "level": "A2",
+  "focus": [
+   "le/la/les",
+   "mien/tien/sien/nôtre/vôtre"
+  ],
+  "formation": "le / la / les + mien / tien / sien / nôtre / vôtre (+ leur)",
+  "notes": "性数与被替代的名词一致：le mien / la mienne / les miens。⚠️ 本行只判定 mien / tien / sien / nôtre / vôtre 五种：le leur 与间接宾语代词同形（le leur donner），留空避免误判。",
+  "examples": [
+   {
+    "french": "Notre maison est plus petite que la vôtre.",
+    "chinese": "我们的房子比你们的小。"
+   },
+   {
+    "french": "Mon père travaille à l'hôpital, et le tien?",
+    "chinese": "我父亲在医院工作，你父亲呢？"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "celui / celle / ceux / celles",
+  "name_fr": "pronoms démonstratifs (celui, celle...)",
+  "meaning_en": "demonstrative pronouns: the one(s)",
+  "meaning_zh": "指示代词（celui / celle / ceux / celles）",
+  "level": "A2",
+  "focus": [
+   "celui/celle/ceux/celles"
+  ],
+  "formation": "celui / celle / ceux / celles + -ci / -là / de / qui / que / dont",
+  "notes": "代替「前面提到的那个」：celui que j'ai acheté（我买的那个）。加 -ci 指近、-là 指远。与指示形容词 ce / cette 区分：后者必须带名词。",
+  "examples": [
+   {
+    "french": "Ce café est plus mauvais que celui que j'ai acheté hier.",
+    "chinese": "这杯咖啡比我昨天买的那杯难喝。"
+   },
+   {
+    "french": "C'est celui-là que je veux.",
+    "chinese": "我要的就是那一个。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "ne + verbe + personne",
+  "name_fr": "ne ... personne (nobody)",
+  "meaning_en": "negation with personne: nobody, not anybody",
+  "meaning_zh": "否定：ne ... personne（没有人）",
+  "level": "A2",
+  "focus": [
+   "ne/n'",
+   "...",
+   "personne"
+  ],
+  "formation": "ne + verbe + personne",
+  "notes": "personne 作否定代词时与 ne 呼应，意为「没有人」，位置在动词后（复合时态在助动词后分词前）。作名词时意为「人」，不带否定（une personne）。",
+  "examples": [
+   {
+    "french": "Je ne connais personne ici.",
+    "chinese": "我在这儿谁也不认识。"
+   },
+   {
+    "french": "Je n'ai vu personne.",
+    "chinese": "我一个人也没看见。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "ne + verbe + rien",
+  "name_fr": "ne ... rien (nothing)",
+  "meaning_en": "negation with rien: nothing, not anything",
+  "meaning_zh": "否定：ne ... rien（什么也不）",
+  "level": "A2",
+  "focus": [
+   "ne/n'",
+   "...",
+   "rien"
+  ],
+  "formation": "ne + verbe + rien",
+  "notes": "rien 在复合时态里放在助动词和分词之间（Je n'ai rien vu），不能像 personne 那样放到句末。",
+  "examples": [
+   {
+    "french": "Ça ne veut rien dire.",
+    "chinese": "这毫无意义。"
+   },
+   {
+    "french": "Je n'ai rien dit.",
+    "chinese": "我什么也没说。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "ne + verbe + ni A ni B",
+  "name_fr": "ne ... ni ... ni (neither ... nor)",
+  "meaning_en": "negation with ni ... ni: neither ... nor",
+  "meaning_zh": "否定：ne ... ni ... ni（既不……也不……）",
+  "level": "B1",
+  "focus": [
+   "ni",
+   "...",
+   "ni"
+  ],
+  "formation": "ne + verbe + ni + nom + ni + nom",
+  "notes": "连接两个被否定的成分；不定冠词和部分冠词在 ni 后省略（ni du pain ni du vin → ni pain ni vin）。",
+  "examples": [
+   {
+    "french": "Il n'aime ni le vin ni la bière.",
+    "chinese": "他既不喜欢葡萄酒，也不喜欢啤酒。"
+   },
+   {
+    "french": "Je n'ai ni faim ni soif.",
+    "chinese": "我又不饿也不渴。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "moi non plus",
+  "name_fr": "non plus (neither / not either)",
+  "meaning_en": "not either: agreeing with a negative statement",
+  "meaning_zh": "否定句的「也不」（moi non plus）",
+  "level": "B1",
+  "focus": [
+   "non",
+   "plus"
+  ],
+  "formation": "moi / toi / lui / elle / nous / vous / eux / elles + non plus",
+  "notes": "否定句的附和用 non plus，肯定句用 aussi。也可紧跟在句尾：Je ne peux pas le comprendre non plus。",
+  "examples": [
+   {
+    "french": "Je n'ai pas faim. – Moi non plus.",
+    "chinese": "我不饿。——我也不饿。"
+   },
+   {
+    "french": "Je ne peux pas le comprendre non plus.",
+    "chinese": "我也无法理解这一点。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "lequel / laquelle / auquel / duquel",
+  "name_fr": "pronoms relatifs composés (lequel, auquel, duquel)",
+  "meaning_en": "compound relative pronouns: which / of which, with à and de contracted",
+  "meaning_zh": "复合关系代词（lequel / auquel / duquel）",
+  "level": "B2",
+  "focus": [
+   "lequel/laquelle/lesquels/lesquelles/auquel/duquel"
+  ],
+  "formation": "lequel / laquelle / lesquels / lesquelles；à + lequel → auquel / auxquels / auxquelles；de + lequel → duquel / desquels",
+  "notes": "用于「介词 + 事物」的关系从句，指人时多用 qui（l'homme à qui je parle）。也可作疑问代词：Lequel des deux?",
+  "examples": [
+   {
+    "french": "Le village dans lequel il habite est en Hongrie.",
+    "chinese": "他住的那个村庄在匈牙利。"
+   },
+   {
+    "french": "Il y a deux congrès. Auquel allez-vous assister?",
+    "chinese": "有两个会议，您要参加哪一个？"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "avoir beau + infinitif",
+  "name_fr": "avoir beau + infinitif (however much)",
+  "meaning_en": "avoir beau + infinitive: however much / in vain",
+  "meaning_zh": "avoir beau + 不定式（徒劳、尽管）",
+  "level": "B2",
+  "focus": [
+   "avoir",
+   "beau"
+  ],
+  "formation": "avoir beau + infinitif（avoir 随人称变位，beau 不变）",
+  "notes": "表示「白费力气、尽管」：Il a beau dormir, il est toujours fatigué。后句常用 mais / 却引出相反结果。",
+  "examples": [
+   {
+    "french": "Il a beau dormir, il est toujours fatigué.",
+    "chinese": "他怎么睡都还是累。"
+   },
+   {
+    "french": "Elle aura beau essayer, ce sera inutile.",
+    "chinese": "她再怎么试也是白费。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "n'importe qui / quoi / quand / où",
+  "name_fr": "n'importe qui / quoi / quand / où (anyone, anything...)",
+  "meaning_en": "n'importe + interrogative word: anyone, anything, anywhere, whenever",
+  "meaning_zh": "n'importe + 疑问词（谁/什么/哪里/何时，随便……）",
+  "level": "B2",
+  "focus": [
+   "n'",
+   "importe",
+   "qui/quoi/quand/où"
+  ],
+  "formation": "n'importe + qui / quoi / quand / où / comment / lequel",
+  "notes": "表示「任何一个、随便哪个」：n'importe qui（谁都可以）、n'importe quoi（随便什么，也指「胡说八道」）。",
+  "examples": [
+   {
+    "french": "N'importe qui peut faire cela.",
+    "chinese": "谁都能做这件事。"
+   },
+   {
+    "french": "Il ferait n'importe quoi pour réussir.",
+    "chinese": "为了成功他什么都干得出来。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "être en train de + infinitif",
+  "name_fr": "être en train de + infinitif (to be doing)",
+  "meaning_en": "progressive: to be in the middle of doing something",
+  "meaning_zh": "正在做某事（进行体）",
+  "level": "A2",
+  "focus": [
+   "en",
+   "train",
+   "de/d'"
+  ],
+  "formation": "être (conjugué) + en train de + infinitif",
+  "notes": "强调「此刻正在进行」，替代不了普通现在时（Je lis 也可以表示正在读），只在需要突出进行时才用。de 在元音前缩合成 d'（en train d'écrire）。",
+  "examples": [
+   {
+    "french": "Nous étions en train de manger.",
+    "chinese": "我们当时正在吃饭。"
+   },
+   {
+    "french": "Je suis en train d'écrire une lettre.",
+    "chinese": "我正在写一封信。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "quelque chose",
+  "name_fr": "quelque chose (something)",
+  "meaning_en": "indefinite pronoun: something, anything",
+  "meaning_zh": "不定代词「某事、某物」",
+  "level": "A2",
+  "focus": [
+   "quelque",
+   "chose"
+  ],
+  "formation": "quelque chose (de + adjectif masculin)",
+  "notes": "永远写作两个词；后接形容词要用 de（quelque chose de bizarre）。否定句和疑问句中不变成 rien。",
+  "examples": [
+   {
+    "french": "J'ai quelque chose à vous dire.",
+    "chinese": "我有件事要跟您说。"
+   },
+   {
+    "french": "Y a-t-il quelque chose que je puisse faire pour vous?",
+    "chinese": "有什么我能帮您做的吗？"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "quelqu'un",
+  "name_fr": "quelqu'un (someone)",
+  "meaning_en": "indefinite pronoun: someone, anyone",
+  "meaning_zh": "不定代词「某人」",
+  "level": "A2",
+  "focus": [
+   "quelqu'",
+   "un"
+  ],
+  "formation": "quelqu'un / quelqu'une",
+  "notes": "只指人，阳性单数形式最常用；阴性 quelqu'une 少用。代词式用法 quelqu'un de + 形容词（quelqu'un de gentil）。",
+  "examples": [
+   {
+    "french": "Quelqu'un m'a appelé.",
+    "chinese": "有人给我打过电话。"
+   },
+   {
+    "french": "Quelqu'un est venu pendant ton absence.",
+    "chinese": "你不在的时候有人来过。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "tout le monde",
+  "name_fr": "tout le monde (everyone)",
+  "meaning_en": "everyone, everybody (takes a third-person singular verb)",
+  "meaning_zh": "所有人（谓语用第三人称单数）",
+  "level": "A1",
+  "focus": [
+   "tout",
+   "le",
+   "monde"
+  ],
+  "formation": "tout le monde + verbe au singulier",
+  "notes": "形式上是单数，动词跟第三人称单数（Tout le monde est parti）。代词回指用 il / elle，不用 ils。",
+  "examples": [
+   {
+    "french": "Tout le monde travaille.",
+    "chinese": "大家都在工作。"
+   },
+   {
+    "french": "C'est normal que tout le monde veuille être heureux.",
+    "chinese": "每个人都想幸福，这很正常。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "la plupart de + nom",
+  "name_fr": "la plupart de (most of)",
+  "meaning_en": "most of: la plupart de + definite article / pronoun",
+  "meaning_zh": "大多数（la plupart de）",
+  "level": "B1",
+  "focus": [
+   "la",
+   "plupart",
+   "de/des/du"
+  ],
+  "formation": "la plupart de + les / des / du + nom",
+  "notes": "后接名词时必须有定冠词或主有形容词（la plupart des gens / de mes amis），不能说 la plupart gens。谓语用复数。",
+  "examples": [
+   {
+    "french": "La plupart des Français prennent leurs vacances en juillet et en août.",
+    "chinese": "大多数法国人在七八月休假。"
+   },
+   {
+    "french": "La plupart du temps, il rentre à pied.",
+    "chinese": "多数时候他步行回家。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "beaucoup de + nom",
+  "name_fr": "beaucoup de (a lot of)",
+  "meaning_en": "quantity: a lot of, many, much",
+  "meaning_zh": "数量副词「很多」（beaucoup de）",
+  "level": "A1",
+  "focus": [
+   "beaucoup",
+   "de"
+  ],
+  "formation": "beaucoup de + nom（不加冠词）",
+  "notes": "肯定句用 beaucoup de；否定句和疑问句更常用 pas beaucoup de / combien de。与 très 区分：très 修饰形容词副词，beaucoup 修饰动词或名词。",
+  "examples": [
+   {
+    "french": "Elle fait beaucoup de bruit.",
+    "chinese": "她弄出很大动静。"
+   },
+   {
+    "french": "Quand je voyage, j'emporte toujours beaucoup de vêtements.",
+    "chinese": "我旅行时总带着很多衣服。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "être sur le point de + infinitif",
+  "name_fr": "être sur le point de + infinitif (about to)",
+  "meaning_en": "to be about to do something",
+  "meaning_zh": "正要、即将（être sur le point de）",
+  "level": "B2",
+  "focus": [
+   "sur",
+   "le",
+   "point",
+   "de"
+  ],
+  "formation": "être (conjugué) + sur le point de + infinitif",
+  "notes": "比 aller + 不定式更强调「这一刻就要发生」，常用于过去时叙述（J'étais sur le point de partir quand...）。",
+  "examples": [
+   {
+    "french": "Il est sur le point de partir.",
+    "chinese": "他快要走了。"
+   },
+   {
+    "french": "J'étais sur le point de t'appeler quand tu es arrivé.",
+    "chinese": "你到的时候我正要给你打电话。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "parce que",
+  "name_fr": "parce que (because)",
+  "meaning_en": "cause: because, for the reason that",
+  "meaning_zh": "原因连词「因为」",
+  "level": "A1",
+  "focus": [
+   "parce",
+   "que"
+  ],
+  "formation": "parce que + indicatif",
+  "notes": "回答 pourquoi 的标准形式，后接直陈式。元音前缩合成 parce qu'（parce qu'il pleut）。口语里也和 parce que 一起用作省略回答：— Pourquoi? — Parce que.",
+  "examples": [
+   {
+    "french": "Je reste à la maison parce qu'il pleut.",
+    "chinese": "因为下雨，我待在家里。"
+   },
+   {
+    "french": "Elle est partie parce qu'elle était fatiguée.",
+    "chinese": "她走了，因为她累了。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "à cause de + nom",
+  "name_fr": "à cause de (because of)",
+  "meaning_en": "cause with a noun, usually a negative one",
+  "meaning_zh": "「由于、因为」（后接名词，多指负面原因）",
+  "level": "A2",
+  "focus": [
+   "à",
+   "cause",
+   "de"
+  ],
+  "formation": "à cause de + nom",
+  "notes": "后接名词或代词（à cause de moi），不能接从句。多用于不好的原因；正面的功劳用 grâce à。",
+  "examples": [
+   {
+    "french": "Nous ne pouvons aller à Lyon à cause de la grève.",
+    "chinese": "由于罢工，我们去不了里昂。"
+   },
+   {
+    "french": "Le match a été annulé à cause de la pluie.",
+    "chinese": "比赛因为下雨取消了。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "grâce à + nom",
+  "name_fr": "grâce à (thanks to)",
+  "meaning_en": "positive cause: thanks to",
+  "meaning_zh": "「多亏、幸亏」（后接名词，多指正面原因）",
+  "level": "B1",
+  "focus": [
+   "grâce",
+   "à"
+  ],
+  "formation": "grâce à + nom",
+  "notes": "与 à cause de 同一个语法位置，但只用于带来好结果的原因。后接从句用 grâce au fait que。",
+  "examples": [
+   {
+    "french": "Grâce à ton aide, j'ai réussi à trouver un emploi.",
+    "chinese": "多亏你的帮助，我找到了工作。"
+   },
+   {
+    "french": "Grâce à ce traitement, il va beaucoup mieux.",
+    "chinese": "多亏了这种治疗，他好多了。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "au lieu de + infinitif / nom",
+  "name_fr": "au lieu de (instead of)",
+  "meaning_en": "substitution: instead of",
+  "meaning_zh": "「代替、而不」（au lieu de）",
+  "level": "B1",
+  "focus": [
+   "au",
+   "lieu",
+   "de"
+  ],
+  "formation": "au lieu de + infinitif / nom",
+  "notes": "两个动作按同一主语对比：Il regarde la télé au lieu de travailler。后接从句用 au lieu que + 虚拟式（少用）。",
+  "examples": [
+   {
+    "french": "Si on sortait au lieu de regarder la télévision?",
+    "chinese": "我们出去走走，别看电视了好吗？"
+   },
+   {
+    "french": "Nous avons préféré faire une marche au lieu d'aller au cinéma.",
+    "chinese": "我们宁愿去散步，也不愿去看电影。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "malgré + nom",
+  "name_fr": "malgré (despite)",
+  "meaning_en": "concession with a noun: despite, in spite of",
+  "meaning_zh": "让步介词「尽管」（malgré + 名词）",
+  "level": "B1",
+  "focus": [
+   "malgré"
+  ],
+  "formation": "malgré + nom",
+  "notes": "后接名词或代词（malgré lui 不由自主地），不能接从句——从句要用 bien que / quoique + 虚拟式。与 malgré tout（尽管如此）区分。",
+  "examples": [
+   {
+    "french": "Nous sommes partis malgré la neige et le verglas.",
+    "chinese": "尽管下雪结冰，我们还是出发了。"
+   },
+   {
+    "french": "C'est un homme plein d'humour malgré les apparences.",
+    "chinese": "尽管外表如此，他其实很有幽默感。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "tandis que",
+  "name_fr": "tandis que (whereas)",
+  "meaning_en": "contrast: whereas, while on the other hand",
+  "meaning_zh": "对比连词「而、然而」",
+  "level": "B1",
+  "focus": [
+   "tandis",
+   "que"
+  ],
+  "formation": "tandis que + indicatif",
+  "notes": "两件事并列对照，语气比 alors que 更书面。也可以表示同时（tandis qu'il dormait）。",
+  "examples": [
+   {
+    "french": "Elle a l'air jeune tandis que son amie a l'air âgée.",
+    "chinese": "她看起来很年轻，而她的朋友显得年纪大。"
+   },
+   {
+    "french": "Tandis que je préparais le dîner, il lisait le journal.",
+    "chinese": "我在准备晚饭的时候，他在看报纸。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "alors que",
+  "name_fr": "alors que (while / whereas)",
+  "meaning_en": "contrast or simultaneity: whereas, while",
+  "meaning_zh": "「而、却」／「当……的时候」",
+  "level": "B1",
+  "focus": [
+   "alors",
+   "que"
+  ],
+  "formation": "alors que + indicatif",
+  "notes": "既表示时间上的同时，也表示对比（常带「却」的意味）。后接事实用直陈式；假设性对比用 alors que + 条件式。",
+  "examples": [
+   {
+    "french": "Alors que je dormais, le téléphone a sonné.",
+    "chinese": "我正在睡觉的时候，电话响了。"
+   },
+   {
+    "french": "Il est parti alors que je le lui avais déconseillé.",
+    "chinese": "我劝过他别去，他还是走了。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "avant que + subjonctif",
+  "name_fr": "avant que + subjonctif (before)",
+  "meaning_en": "time clause with a different subject: before",
+  "meaning_zh": "「在……之前」（avant que + 虚拟式）",
+  "level": "B1",
+  "focus": [
+   "avant",
+   "que"
+  ],
+  "formation": "avant que + subjonctif（常加赘词 ne）",
+  "notes": "主语不同时用 avant que + 虚拟式；同一主语用 avant de + 不定式（avant de partir）。书面语常在动词前加赘词 ne，不表示否定。",
+  "examples": [
+   {
+    "french": "Rentrons avant qu'il ne pleuve.",
+    "chinese": "我们趁还没下雨回去吧。"
+   },
+   {
+    "french": "Prévenez-moi avant que la réunion ne commence.",
+    "chinese": "会议开始前请通知我。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "sans que + subjonctif",
+  "name_fr": "sans que + subjonctif (without)",
+  "meaning_en": "without: sans que + subjunctive, different subject",
+  "meaning_zh": "「没有……」（sans que + 虚拟式）",
+  "level": "B2",
+  "focus": [
+   "sans",
+   "que"
+  ],
+  "formation": "sans que + subjonctif",
+  "notes": "同一主语用 sans + 不定式（sans le savoir）；主语不同才用 sans que，后接虚拟式，也常加赘词 ne。",
+  "examples": [
+   {
+    "french": "Il l'a fait sans que sa femme le sache.",
+    "chinese": "他做这件事没让妻子知道。"
+   },
+   {
+    "french": "Elle entre dans la chambre sans que personne ne s'en rende compte.",
+    "chinese": "她走进房间，谁都没察觉。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "tel que / tels que",
+  "name_fr": "tel que (such as)",
+  "meaning_en": "such as, like: introducing examples or a comparison",
+  "meaning_zh": "「像……这样的」（tel que）",
+  "level": "B1",
+  "focus": [
+   "tel",
+   "que"
+  ],
+  "formation": "tel / telle / tels / telles + que",
+  "notes": "性数与被修饰的名词一致（les sports tels que...）。也可表示「正如」：tel qu'il est（就像他本来的样子）。",
+  "examples": [
+   {
+    "french": "J'adore les sports tels que le golf et le tennis.",
+    "chinese": "我喜欢高尔夫、网球这类运动。"
+   },
+   {
+    "french": "Il peint le paysage tel qu'il est.",
+    "chinese": "他如实描绘风景。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "puisque",
+  "name_fr": "puisque (since, as)",
+  "meaning_en": "cause the listener is assumed to know already: since, as",
+  "meaning_zh": "「既然、既然因为」（puisque）",
+  "level": "A2",
+  "focus": [
+   "puisque"
+  ],
+  "formation": "puisque / puisqu' + proposition",
+  "notes": "与 parce que 的分工：parce que 提供对方不知道的原因，puisque 的原因在说话人看来是双方共知的，所以常放句首。元音前缩合成 puisqu'（puisqu'il part）。",
+  "examples": [
+   {
+    "french": "Il n'y a rien d'extraordinaire à ce qu'ils se ressemblent puisqu'ils sont cousins.",
+    "chinese": "既然他们是表兄弟，长得像一点也不奇怪。"
+   },
+   {
+    "french": "Je ne pourrai pas assister à la conférence puisque je serai en vacances.",
+    "chinese": "既然我那时候在度假，就没法参加会议了。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "de sorte que",
+  "name_fr": "de sorte que (so that, with the result that)",
+  "meaning_en": "consequence: with the result that; purpose when followed by the subjunctive",
+  "meaning_zh": "「以至于、结果」（de sorte que）",
+  "level": "B1",
+  "focus": [
+   "de",
+   "sorte",
+   "que/qu'"
+  ],
+  "formation": "de sorte que + indicatif（结果）／ + subjonctif（目的）",
+  "notes": "表结果用直陈式：de sorte que les prix sont devenus…；表目的（为了让……）用虚拟式：de sorte qu'il puisse…。",
+  "examples": [
+   {
+    "french": "Puis la crise est arrivée, de sorte que les prix des maisons sont devenus de nouveau abordables.",
+    "chinese": "接着危机来了，房价因此又变得可负担。"
+   },
+   {
+    "french": "Il a préféré retirer son argent de la banque, de sorte qu'il puisse investir dans la pierre.",
+    "chinese": "他宁愿把钱从银行取出来，好投资房产。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "au cas où + conditionnel",
+  "name_fr": "au cas où + conditionnel (in case)",
+  "meaning_en": "in case: a hypothesis that takes the conditional, not the indicative",
+  "meaning_zh": "「万一……的话」（au cas où + 条件式）",
+  "level": "B1",
+  "focus": [
+   "au",
+   "cas",
+   "où"
+  ],
+  "formation": "au cas où + conditionnel",
+  "notes": "后面只能跟条件式，不能跟直陈式或虚拟式：au cas où vous auriez perdu…。au cas où 本身已经含「如果」，不要再加 si。",
+  "examples": [
+   {
+    "french": "Au cas où vous auriez perdu votre montre, vous pourriez emprunter la mienne.",
+    "chinese": "万一您的手表丢了，可以借我的。"
+   },
+   {
+    "french": "Au cas où il pleuvrait, prends un parapluie.",
+    "chinese": "万一下雨，带把伞。"
+   }
+  ],
+  "source": "corpus-booth"
+ },
+ {
+  "pattern": "pourvu que + subjonctif",
+  "name_fr": "pourvu que + subjonctif (provided that / I do hope)",
+  "meaning_en": "provided that; also an exclamative wish",
+  "meaning_zh": "「只要……就好／但愿」（pourvu que + 虚拟式）",
+  "level": "B1",
+  "focus": [
+   "pourvu",
+   "que/qu'"
+  ],
+  "formation": "pourvu que + subjonctif",
+  "notes": "两个用法：① 条件「只要」，等于 à condition que；② 感叹愿望「但愿」，常单独成句：Pourvu qu'il fasse beau !",
+  "examples": [
+   {
+    "french": "Pourvu qu'il fasse beau demain !",
+    "chinese": "但愿明天天气好！"
+   },
+   {
+    "french": "Pourvu que ça dure !",
+    "chinese": "但愿这能持续下去！"
+   }
+  ],
+  "source": "corpus-booth"
+ },
+ {
+  "pattern": "quel que soit",
+  "name_fr": "quel que soit (whatever)",
+  "meaning_en": "whatever: quel agrees with the noun, then que + subjunctive of être",
+  "meaning_zh": "「无论……」（quel / quelle que soit）",
+  "level": "B2",
+  "focus": [
+   "quel/quelle",
+   "que",
+   "soit/soient"
+  ],
+  "formation": "quel / quelle / quels / quelles + que + soit / soient",
+  "notes": "quel 与被修饰的名词性数一致，名词可以插在中间：quel que soit le risque、quelles que soient les difficultés。",
+  "examples": [
+   {
+    "french": "Quelle que soit la difficulté, il faut la surmonter.",
+    "chinese": "无论困难多大，都必须克服。"
+   },
+   {
+    "french": "Les vrais accros de la nicotine ne s'arrêtent pas de fumer, quel que soit le risque pour la santé.",
+    "chinese": "真正的尼古丁成瘾者不管健康风险多大都不会戒烟。"
+   }
+  ],
+  "source": "corpus-booth"
+ },
+ {
+  "pattern": "dire que (discours indirect)",
+  "name_fr": "discours indirect: dit que (reported statement)",
+  "meaning_en": "reported speech: dire que + a clause whose tense shifts back one step",
+  "meaning_zh": "间接引语·陈述：dire que + 从句（时态后移）",
+  "level": "B1",
+  "focus": [
+   "dit",
+   "que/qu'"
+  ],
+  "formation": "dire que + proposition；主句过去时 ⇒ 从句时态后移",
+  "notes": "直接引语 « Je suis malade » → Il a dit qu'il était malade。注意区分 « c'est plus facile à dire qu'à faire »：那里是 dire + qu'à，不是 dire que。",
+  "examples": [
+   {
+    "french": "On m'a dit que tu étais malade.",
+    "chinese": "有人告诉我你病了。"
+   },
+   {
+    "french": "Tu ne m'avais pas dit que tu avais un frère.",
+    "chinese": "你没跟我说过你有个兄弟。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "demander si (discours indirect)",
+  "name_fr": "discours indirect: demander si (reported question)",
+  "meaning_en": "reported yes/no question: demander si + clause",
+  "meaning_zh": "间接引语·是非问：demander si + 从句",
+  "level": "B1",
+  "focus": [
+   "demander/demandé/demande/demandent",
+   "si"
+  ],
+  "formation": "demander si + proposition",
+  "notes": "直接引语 « Est-ce que tu viendras ? » → Il m'a demandé si je viendrais。原本有疑问词（quand, où, comment）时保留疑问词，不用 si。",
+  "examples": [
+   {
+    "french": "Ils m'ont demandé si j'irais à la soirée.",
+    "chinese": "他们问我是否去参加晚会。"
+   },
+   {
+    "french": "Je me demande si je trouverai un travail.",
+    "chinese": "我在想能不能找到工作。"
+   }
+  ],
+  "source": "corpus-booth"
+ },
+ {
+  "pattern": "demander de + infinitif",
+  "name_fr": "discours indirect: demander de + infinitif (reported request)",
+  "meaning_en": "reported request or command: demander à qqn de + infinitive",
+  "meaning_zh": "间接引语·请求：demander à qqn de + 不定式",
+  "level": "B1",
+  "focus": [
+   "demander/demandé/demande/demandent",
+   "de/d'"
+  ],
+  "formation": "demander à qqn de + infinitif",
+  "notes": "与 dire à qqn de + inf 同型；否定放在不定式前：demander de ne pas faire。间接引语里命令式改写用这一结构。⚠️ 已知边界：demander de l'argent（要钱）这类 de + 冠词不是本结构，表层规则无法区分，会误报。",
+  "examples": [
+   {
+    "french": "Il m'a demandé de ne pas être en retard.",
+    "chinese": "他让我别迟到。"
+   },
+   {
+    "french": "Elle nous a demandé de ne rien dire.",
+    "chinese": "她让我们什么都别说。"
+   }
+  ],
+  "source": "corpus-pmp"
+ },
+ {
+  "pattern": "à partir de",
+  "name_fr": "à partir de (from, starting from)",
+  "meaning_en": "from a point in time or space onwards",
+  "meaning_zh": "「从……起」（à partir de）",
+  "level": "A2",
+  "focus": [
+   "à",
+   "partir",
+   "de"
+  ],
+  "formation": "à partir de + nom / date",
+  "notes": "时间和空间都能用。与 depuis 的分工：depuis 强调从过去持续到现在，à partir de 只标起点，句子可以是将来时。",
+  "examples": [
+   {
+    "french": "Le restaurant sera fermé à partir de demain.",
+    "chinese": "餐厅从明天起关门。"
+   },
+   {
+    "french": "Les magasins sont ouverts à partir de neuf heures.",
+    "chinese": "商店从九点起开门。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "après que + indicatif",
+  "name_fr": "après que + indicatif (after)",
+  "meaning_en": "after: a finished event, taking the indicative in careful usage",
+  "meaning_zh": "「在……之后」（après que + 直陈式）",
+  "level": "B1",
+  "focus": [
+   "après",
+   "que/qu'"
+  ],
+  "formation": "après que + indicatif（书面语也用虚拟式，属争议用法）",
+  "notes": "传统语法要求直陈式，因为从句说的是已发生的事实：après qu'il est rentré。口语和部分书面语会用虚拟式，被视为可接受但有争议。与 avant que 相反——后者必须用虚拟式。",
+  "examples": [
+   {
+    "french": "Nous lui avons parlé après qu'il est rentré.",
+    "chinese": "他回来之后我们跟他谈过。"
+   },
+   {
+    "french": "Après qu'il aura fini son rapport, il le présentera.",
+    "chinese": "他写完报告后会来汇报。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "maintenant que",
+  "name_fr": "maintenant que (now that)",
+  "meaning_en": "now that: a cause that has just become true",
+  "meaning_zh": "「既然现在……」（maintenant que）",
+  "level": "B1",
+  "focus": [
+   "maintenant",
+   "que/qu'"
+  ],
+  "formation": "maintenant que + indicatif",
+  "notes": "表示「现在既然已经……」，从句用直陈式。和 puisque 的区别：maintenant que 强调时间上的转变（以前不是这样）。",
+  "examples": [
+   {
+    "french": "Maintenant qu'elle connait les règles, elle ne commettra plus la faute.",
+    "chinese": "既然她现在懂了规则，就不会再犯这个错了。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "à force de + infinitif",
+  "name_fr": "à force de + infinitif (by dint of)",
+  "meaning_en": "by dint of, through repeated action: the cause is repetition",
+  "meaning_zh": "「由于反复……、靠着不断地……」（à force de + 不定式）",
+  "level": "B1",
+  "focus": [
+   "à",
+   "force",
+   "de"
+  ],
+  "formation": "à force de + infinitif / nom",
+  "notes": "强调原因的重复或持续：à force de bavarder（聊着聊着）。后接不定式或名词，不接从句。",
+  "examples": [
+   {
+    "french": "À force de bavarder, on n'a pas vu le temps passer.",
+    "chinese": "聊着聊着，我们都没发觉时间过去了。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "quant à + nom",
+  "name_fr": "quant à (as for)",
+  "meaning_en": "as for, regarding: topicalises a noun or pronoun",
+  "meaning_zh": "「至于……」（quant à）",
+  "level": "B1",
+  "focus": [
+   "quant",
+   "à/aux"
+  ],
+  "formation": "quant à / quant aux + nom ou pronom tonique",
+  "notes": "用于转换话题，后接名词或重读代词：quant à moi, quant à lui。与 en ce qui concerne 同义，更书面。",
+  "examples": [
+   {
+    "french": "Quant à moi, je pense que c'est une bonne idée.",
+    "chinese": "至于我，我觉得这是个好主意。"
+   },
+   {
+    "french": "Quant aux risques de malaria en France, je pense que c'est exagéré.",
+    "chinese": "至于法国疟疾的风险，我觉得是夸大其词。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "en dépit de + nom",
+  "name_fr": "en dépit de (in spite of)",
+  "meaning_en": "in spite of: a bookish synonym of malgré",
+  "meaning_zh": "「尽管、不顾」（en dépit de）",
+  "level": "B2",
+  "focus": [
+   "en",
+   "dépit",
+   "de/du"
+  ],
+  "formation": "en dépit de + nom",
+  "notes": "比 malgré 更书面，两者都接名词、都不能接从句。en dépit du bon sens（违背常理）是固定搭配。",
+  "examples": [
+   {
+    "french": "Elle agit en dépit du bon sens.",
+    "chinese": "她的做法违背常理。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "assez de + nom",
+  "name_fr": "assez de (enough)",
+  "meaning_en": "enough: a quantity adverb that takes de before the noun",
+  "meaning_zh": "「足够的……」（assez de + 名词）",
+  "level": "A2",
+  "focus": [
+   "assez",
+   "de/d'"
+  ],
+  "formation": "assez de + nom（不再加冠词）",
+  "notes": "数量副词后直接 de，不加冠词：assez de temps，不是 assez du temps。修饰形容词或动词时不加 de：assez grand、assez vite。",
+  "examples": [
+   {
+    "french": "Y a-t-il assez de place dans votre voiture pour cinq personnes ?",
+    "chinese": "您的车里坐得下五个人吗？"
+   },
+   {
+    "french": "Nous n'avons pas assez de temps pour peindre les quatre murs de la pièce.",
+    "chinese": "我们没足够的时间刷完这间屋子的四面墙。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "peu de + nom",
+  "name_fr": "peu de (little, few)",
+  "meaning_en": "little / few: a quantity adverb that takes de before the noun",
+  "meaning_zh": "「很少的……」（peu de + 名词）",
+  "level": "A2",
+  "focus": [
+   "peu",
+   "de/d'"
+  ],
+  "formation": "peu de + nom（不加冠词）",
+  "notes": "peu de 表示量少，可数不可数都用：peu de monde、peu d'argent。un peu de 表示「一点」，语气正面，注意区分。",
+  "examples": [
+   {
+    "french": "Il y avait peu de monde.",
+    "chinese": "人很少。"
+   },
+   {
+    "french": "Nous connaissons un peu de russe.",
+    "chinese": "我们懂一点俄语。"
+   }
+  ],
+  "source": "corpus-essential"
+ },
+ {
+  "pattern": "selon + nom",
+  "name_fr": "selon (according to)",
+  "meaning_en": "according to: introduces the source of a statement",
+  "meaning_zh": "「根据……」（selon）",
+  "level": "A2",
+  "focus": [
+   "selon"
+  ],
+  "formation": "selon + nom（不加冠词的情况多）",
+  "notes": "引出消息来源：selon la météo、selon moi。与 d'après 同义，selon 更正式。注意 selon que + 从句 是另一个结构。",
+  "examples": [
+   {
+    "french": "Selon la météo, il va neiger.",
+    "chinese": "据天气预报，要下雪了。"
+   }
+  ],
+  "source": "corpus-essential"
+ }
+]

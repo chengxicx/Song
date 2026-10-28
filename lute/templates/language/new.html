@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}New Language{% endblock %}
+{% block title %}{{ t('New Language') }}{% endblock %}
 
 {% block body %}
-<h2>Create new Language</h2>
+<h2>{{ t('Create new Language') }}</h2>
 
 <div id="predefined-lang-container">
-  <em>Load from predefined:</em>
+  <em>{{ t('Load from predefined:') }}</em>
   <select id="predefined">
     <option value="-">-</option>
     {% for p in predefined %}
     <option value="{{ p.name }}">{{ p.name }}</option>
     {% endfor %}
   </select>
-  <button class="btn btn-primary" onclick="location.href='/language/new/' + document.getElementById('predefined').value;">go</button>
+  <button class="btn btn-primary" onclick="location.href='/language/new/' + document.getElementById('predefined').value;">{{ t('go') }}</button>
 </div>
 
 {% include "language/_form.html" %}

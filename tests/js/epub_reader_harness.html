@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>EPUB reader harness</title>
+<style>
+  body { margin: 0; padding: 20px; font-family: serif; }
+  #thetext { padding: 0 3.4rem 1.5rem; }
+</style>
+</head>
+<body>
+
+<div id="thetext">
+<div id="epub-chapter" data-epub-css="/static/epub/fixture/lute.css"><div class="epub-body">
+  <h2>Chapter</h2>
+  <p>Hello <em>world</em>, again.</p>
+  <p>第二段落です。</p>
+  <p>See <em>Hel</em>lo there.</p>
+  <p>One. Two.</p>
+</div></div>
+</div>
+
+<!-- The token stream, exactly as read/epub_page.html embeds it:
+     [display_text, wo_id, status, sentence, paragraph].  Whitespace
+     tokens are present but carry no characters to match; the "Hello"
+     in "See Hel|lo there." is one token that has to be cut into two
+     spans. -->
+<script type="application/json" id="lute-epub-tokens">[
+["Chapter",101,0,0,0],
+["Hello",102,0,0,1],[" ",0,-1,0,1],["world",103,0,0,1],[",",0,-1,0,1],[" ",0,-1,0,1],["again",104,0,0,1],[".",0,-1,0,1],
+["第二段落",105,0,1,2],["です",106,0,1,2],["。",0,-1,1,2],
+["See",107,0,2,3],[" ",0,-1,2,3],["Hello",108,0,2,3],[" ",0,-1,2,3],["there",109,0,2,3],[".",0,-1,2,3],
+["One",110,0,3,4],[".",0,-1,3,4],[" ",0,-1,3,4],["Two",111,0,4,4],[".",0,-1,4,4]
+]</script>
+
+<!-- Empty for the fixture above: those tokens are the chapter's own
+     characters.  The substitution fixture below swaps in the table the
+     server ships for, say, English. -->
+<script type="application/json" id="lute-epub-substitutions">[]</script>
+
+<!-- A chapter as a real book writes it: curly quotes, a tight ellipsis,
+     a no-break-space indent and an ideographic-space indent.  The
+     parser normalises the first two before tokenizing and strips the
+     indents, so this is where the alignment has to hold up. -->
+<div id="subs-source" hidden><div class="epub-body">
+  <p>‘the show’ was over...</p>
+  <p>&nbsp;&nbsp;Star</p>
+  <p>　Indented</p>
+</div></div>
+
+<script src="../../lute/static/js/lute-epub-reader.js"></script>
+<script>
+  window.__originalText = document.getElementById("epub-chapter").textContent;
+  window.__chapterInner = document.getElementById("epub-chapter").innerHTML;
+
+  // What read/epub_page.html embeds for a language whose parser folds
+  // curly quotes and ellipses (English, for one).
+  window.__SUBS = [
+    ["\u200b", ""], ["´", "'"], ["`", "'"], ["’", "'"], ["‘", "'"],
+    ["...", "…"], ["..", "‥"], ["{", "["], ["}", "]"]
+  ];
+  // The same chapter after those replacements: the tokenizer's view.
+  window.__SUBS_TOKENS = [
+    [" '", 0, -1, 0, 0], ["the", 201, 0, 0, 0], [" ", 0, -1, 0, 0],
+    ["show", 202, 0, 0, 0], ["' ", 0, -1, 0, 0], ["was", 203, 0, 0, 0],
+    [" ", 0, -1, 0, 0], ["over", 204, 0, 0, 0], ["…", 0, -1, 0, 0],
+    ["Star", 205, 0, 1, 1],
+    ["　", 0, -1, 2, 2], ["Indented", 206, 0, 2, 2]
+  ];
+
+  window.EpubReader.mount(document.getElementById("epub-chapter"));
+
+  /** Mount a copy of the substitution fixture with the given tokens. */
+  function mountSubs(tokens) {
+    var host = document.createElement("div");
+    host.id = "subs-chapter";
+    host.innerHTML = document.getElementById("subs-source").innerHTML;
+
+    var subs = document.getElementById("lute-epub-substitutions");
+    var data = document.getElementById("lute-epub-tokens");
+    var savedSubs = subs.textContent;
+    var savedTokens = data.textContent;
+    subs.textContent = JSON.stringify(window.__SUBS);
+    data.textContent = JSON.stringify(tokens);
+
+    window.EpubReader.mount(host);
+
+    subs.textContent = savedSubs;
+    data.textContent = savedTokens;
+    return host;
+  }
+
+  window.__runSubstitutions = function () {
+    var host = mountSubs(window.__SUBS_TOKENS);
+    var out = {
+      mounted: host.getAttribute("data-epub-mounted"),
+      mismatch: host.getAttribute("data-epub-mismatch"),
+      text: host.textContent,
+      words: Array.from(host.querySelectorAll("span.word")).map(function (w) {
+        return w.textContent;
+      }),
+      spans: host.querySelectorAll("span.textitem").length,
+      sentences: Array.from(host.querySelectorAll(".textsentence")).map(
+        function (s) { return s.textContent.trim(); }
+      ),
+    };
+    host.remove();
+    return out;
+  };
+
+  // A token stream that does not match the markup must leave the
+  // chapter readable and untouched -- including undoing the
+  // substitutions, which are applied before the streams are compared.
+  // Returns the reported mismatch offset.
+  window.__runMismatch = function () {
+    var source = document.getElementById("subs-source");
+    var host = mountSubs([["Nope", 0, -1, 0, 0]]);
+    var out = {
+      offset: host.getAttribute("data-epub-mismatch"),
+      spans: host.querySelectorAll("span.textitem").length,
+      textIntact: host.textContent === source.textContent,
+      subsIntact: host.textContent.indexOf("‘the show’") !== -1
+        && host.textContent.indexOf("...") !== -1,
+    };
+    host.remove();
+    return out;
+  };
+</script>
+
+</body>
+</html>

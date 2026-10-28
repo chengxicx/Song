@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Reading &quot;{{ html_title }}&quot;{% endblock %}
+{% block title %}{{ t('Reading') }} &quot;{{ html_title }}&quot;{% endblock %}
 
 {% block body %}
 
@@ -30,6 +30,18 @@
   window.dispatchEvent(new Event("pdfjs-ready"));
 </script>
 <script type="text/javascript" src="{{ vstatic('js/pdf-reader.js') }}" charset="utf-8" defer></script>
+{% elif book_type == "epub" %}
+{# Reader mode: word spans are injected into the chapter's own markup,
+   so the reader keeps the book's layout (see lute-epub-reader.js). #}
+<script type="text/javascript" src="{{ vstatic('js/lute-epub-reader.js') }}" charset="utf-8" defer></script>
+{% endif %}
+{# A text book (or pdf / epub) that has an audio file attached renders
+   the unified media player too (see the body below), so it needs that
+   player's script -- the media book types above loaded it through their
+   own branch, this one does not. #}
+{% if book.audio_filename and book_type not in book_media_types
+      and book_type not in ('bilibili', 'manga') %}
+<script type="text/javascript" src="{{ vstatic('js/youtube-player.js') }}" charset="utf-8" defer></script>
 {% endif %}
 <script type="text/javascript" src="{{ vstatic('js/resize.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/text-options.js') }}" charset="utf-8" defer></script>
@@ -38,16 +50,21 @@
 <script type="text/javascript" src="{{ vstatic('js/tts-translate.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/tts-player.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/tts-ui.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/lute-recorder.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/lute-shadowing.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic('js/lute-furigana.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/player-dock.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
   <pre>
     lang_is_rtl: <input id="lang_is_rtl" value="{{ is_rtl }}">
     book_id: <input id="book_id" value="{{ book.id }}">
+    lang_id: <input id="lang_id" value="{{ lang_id }}">
     book_audio: <input id="book_audio_file" value="{% if book_type not in ('youtube', 'mp3') %}{{ book.audio_filename or '' }}{% endif %}">
     page_num: <input id="page_num" value="{{ page_num }}">
     page_count: <input id="page_count" value="{{ page_count }}">
+    series_next_book: <input id="series_next_book_id" value="{{ series_next.id if series_next else '' }}">
+    series_prev_book: <input id="series_prev_book_id" value="{{ series_prev.id if series_prev else '' }}">
     highlights: <span id="show_highlights">{{ show_highlights|lower }}</span>
     track_page_open: <input id="track_page_open" value="{{ track_page_open|lower }}">
     tts_lang: <input id="tts_lang" value="{{ lang_code }}">
@@ -60,6 +77,21 @@
   // is used in lute.js.
   var LUTE_SENTENCE_LOOKUP_DICTS = {{ sentence_dict_uris|safe }};
   var LUTE_BOOK_TYPE = {{ book_type|tojson }};
+  // What auto-fills a new term's translation (see tts-translate.js):
+  // 'online', or 'local_dict' = this language's local dictionary first,
+  // online as fallback.
+  var LUTE_TERM_FILL = { source: {{ term_translation_source|tojson }}, langId: {{ lang_id }} };
+  // Furigana above reading-page words (per-language toggle; see
+  // lute-furigana.js).  False unless the language has a readings source
+  // (Japanese, Mandarin, Cantonese, Thai) with the language's "show
+  // furigana" box checked.  script picks the word-selection rule:
+  // "thai" annotates every Thai word, "han" only Han-bearing ones.
+  var LUTE_FURIGANA = { enabled: {{ show_furigana | tojson }}, langId: {{ lang_id }}, script: {{ furigana_script | tojson }} };
+  // First cue index of every page (media books only; [] otherwise, and
+  // for books whose page text no longer lines up with the cues).  The
+  // players turn the page with it when the playhead leaves the page the
+  // reader is looking at -- see LuteReaderFollow below.
+  window.LUTE_CUE_PAGE_STARTS = {{ cue_page_starts | tojson }};
 </script>
 
 
@@ -69,7 +101,7 @@
 
 <div id="read_pane_left">
 
-  <div id="reading_menu"{% if book_type not in ('manga', 'pdf') %} class="not-manga"{% endif %}>
+  <div id="reading_menu" class="{% if book_type not in ('manga', 'pdf', 'epub') %}not-manga {% endif %}{{ 'not-epub' if book_type != 'epub' else '' }}">
     {% include "read/reading_menu.html" %}
   </div>
 
@@ -116,26 +148,44 @@
 
   </div>
 
+  {# has_media_player / has_tts_player tell each player template whether
+     the *other* player is on this page, so it can render the MP3 <-> TTS
+     switch button (see tts-ui.js).  Audio books (mp3 / netease) carry
+     both bars, exactly like the mobile reader, where an audio book can be
+     switched to TTS read-aloud.  Video books (youtube / video / bilibili)
+     have no TTS bar, and text books without audio have nothing to switch
+     to. #}
   {% if book_type in book_media_types %}
+  {# Audio-only books read their text from the subtitles, so TTS read-aloud
+     works on them; the video backends keep their own transport. #}
+  {% set has_tts_player = book_type in ('mp3', 'netease') %}
+  {% set has_media_player = has_tts_player %}
   {% include "read/youtube_player.html" %}
+  {% if has_tts_player %}
+  {% include "read/tts_player.html" %}
+  {% endif %}
   {% elif book_type == "bilibili" %}
+  {% set has_tts_player = false %}
   {% include "read/bilibili_player.html" %}
   {% elif book_type != "manga" %}
   {# Legacy text books that have an audio file attached play it through
      the unified media player, so mp3 files always use the new player
      (the old audio-player-container player was removed). #}
-  {% if book.audio_filename %}
+  {% set has_media_player = book.audio_filename %}
+  {% if has_media_player %}
+  {% set has_tts_player = true %}
   {% include "read/youtube_player.html" %}
   {% endif %}
   {# TTS player for text books: same UI / CSS classes as the YouTube / MP3
      player so the visual style, layout and responsive behaviour match.
-     Visibility is controlled by the TTS Player toggle (reading_menu), and
-     it is hidden by default whenever a media player is present (tts.js). #}
+     Visibility is controlled by the Player toggle (reading_menu), which
+     shows / hides every player bar, and an audio book starts on its track
+     with the TTS bar swapped in on demand (tts-ui.js). #}
   {% include "read/tts_player.html" %}
   {% endif %}
 
   <h1 id="thetexttitle" {% if is_rtl %}dir="rtl" {% endif %} class="hide">{{ book.title }}</h1>
-  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %} class="{% if book_type == 'manga' %}manga-text-container{% elif book_type == 'pdf' %}pdf-text-container{% endif %}">
+  <div id="thetext" {% if is_rtl %}dir="rtl" {% endif %} class="{% if book_type == 'manga' %}manga-text-container{% elif book_type == 'pdf' %}pdf-text-container{% elif book_type == 'epub' %}epub-text-container{% endif %}">
     ...
   </div>
 
@@ -152,15 +202,15 @@
     <button type="button" class="end-icon-btn known"
             id="endMarkRestAsKnown"
             onclick="handle_page_done(true, 0, END_OF_BOOK_MARKS_ALL_PAGES)"
-            title="Mark the remaining words on all pages of the book as known and finish the book">
+            title="{{ t('Mark the remaining words on all pages of the book as known and finish the book') }}">
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>
     </button>
     {% if series_tag %}
-    <a class="end-icon-btn toc" href="/book/series/{{ series_tag | urlencode }}" title="Back to book set: {{ series_tag }}">
+    <a class="end-icon-btn toc" href="/book/series/{{ series_tag | urlencode }}" title="{{ t('Back to book set:') }} {{ series_tag }}">
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/></svg>
     </a>
     {% else %}
-    <a class="end-icon-btn toc" href="/" title="Back to Home">
+    <a class="end-icon-btn toc" href="/" title="{{ t('Back to Home') }}">
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/></svg>
     </a>
     {% endif %}
@@ -180,7 +230,7 @@
     style="height: 35%; width: 100%"
     frameborder="0"
   >
-    Frame support required.
+    {{ t('Frame support required.') }}
   </iframe>
   </div>
   <div class="dictcontainer">
@@ -194,10 +244,10 @@
 
 </div>
 
-<div id="navSidePrev" class="side-page-nav hide" onclick="navigatePrev()" title="Go to previous page">
+<div id="navSidePrev" class="side-page-nav hide" onclick="navigatePrev()" title="{{ t('Go to previous page') }}">
   <svg viewBox="7.5 3.5 15 25" width="18" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>
 </div>
-<div id="navSideNext" class="side-page-nav hide" onclick="navigateNext()" title="Go to next page">
+<div id="navSideNext" class="side-page-nav hide" onclick="navigateNext()" title="{{ t('Go to next page') }}">
   <svg viewBox="7.5 3.5 15 25" width="18" height="30"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
 </div>
 
@@ -228,8 +278,8 @@
   const endMarkRestAsKnown = document.getElementById("endMarkRestAsKnown");
   if (endMarkRestAsKnown) {
     endMarkRestAsKnown.title = END_OF_BOOK_MARKS_ALL_PAGES
-      ? "Mark the remaining words on all pages of the book as known and finish the book"
-      : "Mark the remaining words on this page as known and finish the page";
+      ? I18N.t("Mark the remaining words on all pages of the book as known and finish the book")
+      : I18N.t("Mark the remaining words on this page as known and finish the page");
   }
 
   function _layout_side_nav() {
@@ -240,25 +290,35 @@
     navSidePrev.style.left = `${Math.round(r.left + 8)}px`;
     navSideNext.style.left = `${Math.round(r.right - navSideNext.offsetWidth - 8)}px`;
 
-    // Vertically center the arrows on the reading article (#thetext),
-    // not on the screen.  The article sits below the header/player, so
-    // its middle differs from the viewport middle.  In media scrolling
-    // mode #thetext is the full flowing document (taller than the
-    // viewport), so center in the viewport instead -- the arrows appear
-    // there as a fixed overlay once the page is scrolled to the bottom.
-    if (theText) {
-      let mid;
-      if (typeof _videoScrollMode === "function" && _videoScrollMode()) {
-        mid = Math.round(window.innerHeight / 2);
-      } else {
-        const tr = theText.getBoundingClientRect();
-        mid = Math.round(tr.top + tr.height / 2);
-      }
-      navSidePrev.style.transform = "none";
-      navSideNext.style.transform = "none";
-      navSidePrev.style.top = `${mid - navSidePrev.offsetHeight / 2}px`;
-      navSideNext.style.top = `${mid - navSideNext.offsetHeight / 2}px`;
+    // Vertical centre.  In scrolling mode (media books, and every
+    // reflowing EPUB chapter) the arrows sit at the *viewport* centre,
+    // which is exactly what the CSS already says -- `top: 50%` plus
+    // `translateY(-50%)`.  So nothing is written here: the scroll
+    // handler used to call this on every frame once the reader reached
+    // the bottom of a chapter, and each call forced a synchronous layout
+    // of the whole chapter (one span per token, plus a filtered sheet)
+    // only to write back the value it already had.  The fixed arrows
+    // then painted a frame behind the scrolled text, which reads as a
+    // jitter under the cursor.  Clearing the inline values also undoes a
+    // fit-to-screen top when a page switches into scrolling mode.
+    if (!theText) return;
+    if (typeof _scrollMode === "function" && _scrollMode()) {
+      navSidePrev.style.top = "";
+      navSideNext.style.top = "";
+      navSidePrev.style.transform = "";
+      navSideNext.style.transform = "";
+      return;
     }
+
+    // Fit-to-screen: centre on the reading article (#thetext), not on the
+    // screen.  The article sits below the header/player, so its middle
+    // differs from the viewport middle.
+    const tr = theText.getBoundingClientRect();
+    const mid = Math.round(tr.top + tr.height / 2);
+    navSidePrev.style.transform = "none";
+    navSideNext.style.transform = "none";
+    navSidePrev.style.top = `${mid - navSidePrev.offsetHeight / 2}px`;
+    navSideNext.style.top = `${mid - navSideNext.offsetHeight / 2}px`;
   }
 
   // Fixes a dev-only "bug" where the right pane doesn't translate up
@@ -322,6 +382,7 @@
 
   window.addEventListener("scrollend", function(e) {
     scrollYBeforeReload = window.scrollY;
+    _saveEpubScroll();
   });
 
   /**
@@ -483,8 +544,12 @@
 
       // HTMX: swap the refreshed fragment into #thetext.  Re-marking of
       // the previously-marked word happens in the htmx:afterSwap handler.
+      // settle:0 makes htmx evaluate the fragment's scripts in the same
+      // task as the swap instead of after its default 20ms settle delay:
+      // that delay painted the raw (span-less) chapter for a frame on
+      // every term save -- the reading area visibly flickered.
       _pendingTermFormReload = { marked_id, anchorOrdinal, term_text: savedTermText };
-      htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
+      htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML settle:0' });
     };
   };
 
@@ -547,6 +612,7 @@
 
   window.addEventListener("beforeunload", function() {
     _updateStartDateIfNeeded();
+    _saveEpubScroll();
     LutePopups.close_all_popups();
   });
 
@@ -616,6 +682,20 @@
     set_page_fraction();
   });
 
+  // The volumes on either side of this book in its book set, or 0.
+  // Written into the page by the server (read/routes.py) and read by
+  // navigateNext / navigatePrev, which run on into them at either end
+  // of the book.
+  function _nextSeriesBookId() {
+    const v = $("#series_next_book_id").val();
+    return v ? parseInt(v, 10) || 0 : 0;
+  }
+
+  function _prevSeriesBookId() {
+    const v = $("#series_prev_book_id").val();
+    return v ? parseInt(v, 10) || 0 : 0;
+  }
+
   // Enable page nav links, depending on page num.
   let enable_page_nav_links = function() {
     const pagenum = parseInt($('#page_num').val());
@@ -627,13 +707,16 @@
       else
         $(el_id).addClass(c);
     };
-    set_enable('#navPrev', pagenum > 1);
-    set_enable('#navNext', pagenum < maxpage);
+    // The ends of a book that belongs to a book set still have somewhere
+    // to go: the neighbouring volume.
+    set_enable('#navPrev', pagenum > 1 || _prevSeriesBookId() > 0);
+    set_enable('#navNext', pagenum < maxpage || _nextSeriesBookId() > 0);
     // Side arrows are kept visible for all book types (text, MP3, TTS),
     // so the previous/next navigation is always available.  They start
     // hidden in the markup, so clear the hide class here.  Re-layout
-    // afterwards: while hidden their offsetWidth is 0, which would clamp
-    // them to the pane edge and let them overlap the divider.
+    // afterwards to place them against the current pane bounds -- the
+    // hidden state keeps the box measurable (styles.css,
+    // `.side-page-nav.hide`), so this is a placement, not a repair.
     $('#navSidePrev').removeClass('hide');
     $('#navSideNext').removeClass('hide');
     _layout_side_nav();
@@ -750,6 +833,8 @@
     luteStartReadingDone = false;
     reset_cursor();
     const bookid = $('#book_id').val();
+    // Read before the swap: _finishPageSwap is what writes #page_num.
+    const pagenumNow = parseInt($('#page_num').val());
     const actualPage = getActualPage(p);
 
     updateReadSlider(actualPage);
@@ -762,12 +847,31 @@
 
     // Remember which page we asked for so the afterSwap handler can
     // update the UI without parsing the URL.
-    _pendingNav = { actualPage: actualPage, initial: initial_page_load, ...(extra || {}) };
-    htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML' });
+    //
+    // keepScreen: the refetch is of the page already on screen, so the
+    // reader must stay on their sub-screen instead of being rewound to the
+    // page's first one (see _finishPageSwap).  Two ways to get here with the
+    // same page: the end-of-book checkmark asks for "this page, +0", and a
+    // move past either end of the book clamps back onto it.
+    // settle:0: same task as the swap -- a page turn must not paint the
+    // raw (span-less) chapter for a frame before the fragment's scripts
+    // re-inject the word spans (see the term-save swap above).
+    _pendingNav = {
+      actualPage: actualPage,
+      initial: initial_page_load,
+      keepScreen: actualPage === pagenumNow,
+      ...(extra || {}),
+    };
+    htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML settle:0' });
   }
 
   // Pending page-navigation state, consumed by the htmx:afterSwap handler.
   let _pendingNav = null;
+
+  // Player-follow page turn in flight (see LuteReaderFollow.requestPage),
+  // and the callbacks waiting for that page to be laid out.
+  let _followNavPending = false;
+  let _pageReadyWaiters = [];
 
   // Logical pages the reader has LEFT forward from their last sub-screen
   // (via the right arrow).  When the reader crosses back to such a page
@@ -778,9 +882,14 @@
   // "pending").
   const _fwdFromPages = new Set();
 
+  // End of a book set's volume: the forward arrow is going to open the
+  // next book.  Guards against a double click firing the "page read"
+  // ping (and the navigation) twice.
+  let _seriesNavPending = false;
+
   // Post-swap bookkeeping for the reading text.  Also used by HTMX-driven
   // status updates (see lute.js post_bulk_update).
-  function _finishPageSwap(actualPage, initial) {
+  function _finishPageSwap(actualPage, initial, nav) {
     luteStartReadingDone = true;
     // The swapped-in content replaces the page the existing sub-screen
     // groups were measured on, and curScreen indexes into them: drop both
@@ -797,13 +906,55 @@
     set_page_fraction();
     set_footer_control_visibility();
     show_hide_title(actualPage);
-    $("html, body").animate({ scrollTop: 0 });
+    // Reader-mode EPUB chapters restore their own scroll position
+    // below; scrolling them to the top here would also fight that
+    // restore (this is a JS animation, not an instant jump).
+    if (!_epubScrollMode()) $("html, body").animate({ scrollTop: 0 });
 
     // Re-flow the page into screen-height groups now that the content
     // is swapped in and laid out (fonts/status classes are applied above).
     // Fixed pages (manga / PDF) are re-fitted to the pane by the same
     // call -- see the manga branch of _splitToScreens.
-    requestAnimationFrame(_splitToScreens);
+    //
+    // On the initial load, put the reader back on the sub-screen they
+    // were reading (see _storedScreenFor).  The stored value is read
+    // HERE, before the split: the split's own _renderScreen would save
+    // screen 0 over it.  Applied after the split, clamped to whatever
+    // screen count the current layout produced.
+    //
+    // nav.keepScreen asks for the same restore on a same-page refetch.
+    // Re-fetching the page you are already on is not a navigation -- the
+    // end-of-book checkmark finishes the current screen and a move clamped
+    // at either end of the book lands back on the same page -- so rewinding
+    // to the first sub-screen would throw away the reader's place (and,
+    // because the split's _renderScreen saves the position, persist that
+    // rewind as their place).
+    const keepScreen = !!(nav && nav.keepScreen);
+    const storedScreen =
+      initial || keepScreen ? _storedScreenFor(actualPage) : null;
+    requestAnimationFrame(() => {
+      _splitToScreens();
+      if (initial) _restoreEpubScroll();
+      if (storedScreen !== null &&
+          storedScreen > 0 &&
+          storedScreen !== curScreen &&
+          subScreens.length > 1) {
+        curScreen = Math.min(storedScreen, subScreens.length - 1);
+        _renderScreen();
+      }
+      // The page is laid out: a player that turned it to follow its
+      // playhead can now mark its line on the text it landed on.
+      _followNavPending = false;
+      const waiters = _pageReadyWaiters;
+      _pageReadyWaiters = [];
+      waiters.forEach((fn) => {
+        try {
+          fn();
+        } catch (err) {
+          /* a player's callback must not break the page swap */
+        }
+      });
+    });
 
     if (initial) {
       prepareTextInteractions();
@@ -835,7 +986,7 @@
     // Page navigation (goto_relative_page).
     if (_pendingNav) {
       const nav = _pendingNav;
-      _finishPageSwap(nav.actualPage, nav.initial);
+      _finishPageSwap(nav.actualPage, nav.initial, nav);
       // Backward crossing onto a page the reader previously left forward:
       // _finishPageSwap's rAF splits the page (curScreen = 0); this second
       // rAF runs right after it and restores the last sub-screen, so the
@@ -999,18 +1150,33 @@
 
   // True for the manga and PDF readers: both show one fixed page with
   // %-positioned word overlays (no sub-screen splitting; the fit and
-  // zoom controls apply).
+  // zoom controls apply).  A fixed-layout EPUB chapter
+  // (.epub-fixed-container, set by lute-epub-reader.js on mount) is a
+  // pixel-sized page box and rides the same machinery.
   const _isMangaReader = () => {
     const t = document.getElementById("thetext");
     return !!t && (t.classList.contains("manga-text-container")
-                || t.classList.contains("pdf-text-container"));
+                || t.classList.contains("pdf-text-container")
+                || t.classList.contains("epub-fixed-container"));
   };
+
+  // Reader-mode EPUB pages scroll continuously (one Lute page per
+  // chapter, or per split of a chapter too long for one page -- see
+  // epub_extract.PAGE_CHAR_BUDGET), so there is nothing to
+  // sub-paginate: the whole page scrolls, like a media book in
+  // scrolling mode.  Fixed-layout chapters use the fixed-page path
+  // instead (see _isMangaReader).
+  function _epubScrollMode() {
+    const t = document.getElementById("thetext");
+    return !!t && t.classList.contains("epub-text-container")
+              && !t.classList.contains("epub-fixed-container");
+  }
 
   // Video / YouTube / Bilibili books read in a plain scrolling pane by
   // default; the fit-to-screen arrow paging is used only while
   // audio-only mode is active (the player toggles .yt-audio-mode on
   // its container).
-  const _videoScrollMode = () => {
+  function _videoScrollMode() {
     if (typeof LUTE_BOOK_TYPE === "undefined") return false;
     if (
       LUTE_BOOK_TYPE !== "youtube" &&
@@ -1020,7 +1186,14 @@
       return false;
     const c = document.querySelector(".youtube-player-container");
     return !c || !c.classList.contains("yt-audio-mode");
-  };
+  }
+
+  // Anything that reads as a plain scrolling document rather than a
+  // fit-to-screen paged one: media books outside audio-only mode, and
+  // reader-mode EPUB chapters.
+  function _scrollMode() {
+    return _videoScrollMode() || _epubScrollMode();
+  }
 
   // In scrolling mode the side page arrows would otherwise hover
   // mid-viewport over the flowing text for the whole page.  Instead,
@@ -1030,33 +1203,62 @@
   // "continue to the next page" affordance.  Media book types manage
   // the arrows' visibility through this helper (the normal
   // enable_page_nav_links path still unhides them for fixed pages).
+  //
+  // Two thresholds, not one.  The bottom of a scrolling page is not a
+  // fixed distance: an EPUB chapter grows as its images and fonts
+  // arrive, and the last page adds the end-of-book strip
+  // (`#thetext.last-screen`).  With a single 60px test, any such change
+  // recomputed visibility at the boundary and the arrows blinked under
+  // the cursor.  Enter within ARROWS_ENTER_PX, leave only past
+  // ARROWS_EXIT_PX.
+  const ARROWS_ENTER_PX = 60;
+  const ARROWS_EXIT_PX = 140;
+  let _arrows_at_bottom = false;
+
   function _updateScrollModeArrows() {
     if (!navSidePrev || !navSideNext) return;
-    if (typeof _videoScrollMode !== "function" || !_videoScrollMode()) return;
+    if (typeof _scrollMode !== "function" || !_scrollMode()) {
+      _arrows_at_bottom = false;
+      return;
+    }
     const doc = document.documentElement;
     const maxScroll = Math.max(0, doc.scrollHeight - window.innerHeight);
-    const atBottom = window.scrollY >= maxScroll - 60;
+    const margin = _arrows_at_bottom ? ARROWS_EXIT_PX : ARROWS_ENTER_PX;
+    const atBottom = window.scrollY >= maxScroll - margin;
+    const changed = atBottom !== _arrows_at_bottom;
+    _arrows_at_bottom = atBottom;
     const pagenum = parseInt($("#page_num").val());
     navSideNext.classList.toggle("hide", !atBottom);
     // The book's first page has no earlier page, so the left arrow is
-    // dead even at the bottom (same rule as the fit-to-screen arrows).
-    navSidePrev.classList.toggle("hide", !atBottom || pagenum <= 1);
-    if (atBottom) _layout_side_nav();
+    // dead even at the bottom (same rule as the fit-to-screen arrows) --
+    // unless the book is part of a book set, where it opens the previous
+    // volume.
+    navSidePrev.classList.toggle(
+      "hide",
+      !atBottom || (pagenum <= 1 && _prevSeriesBookId() === 0)
+    );
+    // Layout only on the transition.  The arrows are viewport-fixed, so
+    // their position does not depend on the scroll offset: laying them
+    // out per scroll frame was a forced synchronous reflow of the whole
+    // chapter for no change at all.
+    if (changed && atBottom) _layout_side_nav();
   }
 
   // The book's very first screen (page 1, first sub-screen) has nothing
   // before it, so the left arrow is a dead control there: hide it.  On
   // later screens / pages it still works (sub-screen or page crossing),
-  // so it is shown again.  Scrolling mode owns both arrows itself and
-  // skips this helper.
+  // so it is shown again.  A book in a book set keeps it: it opens the
+  // previous volume from there.  Scrolling mode owns both arrows itself
+  // and skips this helper.
   function _updateSideArrows() {
     if (!navSidePrev || !navSideNext) return;
-    if (typeof _videoScrollMode === "function" && _videoScrollMode()) return;
+    if (typeof _scrollMode === "function" && _scrollMode()) return;
     const pagenum = parseInt($("#page_num").val());
     const atFirstScreen =
       pagenum <= 1 && (subScreens.length === 0 || curScreen === 0);
-    navSidePrev.classList.toggle("hide", atFirstScreen);
-    if (!atFirstScreen) _layout_side_nav();
+    const deadPrev = atFirstScreen && _prevSeriesBookId() === 0;
+    navSidePrev.classList.toggle("hide", deadPrev);
+    if (!deadPrev) _layout_side_nav();
   }
 
   // Keep the bottom-of-page arrow state in sync while the reader
@@ -1090,8 +1292,13 @@
     const wrap = theText;
     if (!wrap) return;
     const isPdf = wrap.classList.contains("pdf-text-container");
-    if (!isPdf && !wrap.classList.contains("manga-text-container")) return;
-    const page = wrap.querySelector(isPdf ? ".pdf-page" : ".manga-page");
+    const isEpubFixed = wrap.classList.contains("epub-fixed-container");
+    if (!isPdf && !isEpubFixed && !wrap.classList.contains("manga-text-container")) return;
+    const page = wrap.querySelector(
+      isPdf ? ".pdf-page"
+      : isEpubFixed ? ".epub-body[data-epub-viewport]"
+      : ".manga-page"
+    );
     if (!page) return;
     let natW, natH;
     let media = null;
@@ -1099,6 +1306,12 @@
       // PDF pages know their natural size from the document itself.
       natW = parseFloat(page.dataset.pageWidth);
       natH = parseFloat(page.dataset.pageHeight);
+    } else if (isEpubFixed) {
+      // Fixed-layout EPUB pages know theirs from the chapter's viewport
+      // meta ("WxH", recorded at import by lute/book/epub_extract.py).
+      const vp = (page.dataset.epubViewport || "").split("x");
+      natW = parseFloat(vp[0]);
+      natH = parseFloat(vp[1]);
     } else {
       media = wrap.querySelector(".manga-page-img");
       if (!media) return;
@@ -1133,16 +1346,23 @@
     const availW = wrap.clientWidth;
     const availH = wrap.clientHeight - padBottom;
     // Fit the page to the pane, then multiply by the user's zoom factor
-    // (1 = just fits); zoom > 1 enlarges the page (it then scrolls in the
-    // auto-overflow container), zoom < 1 shrinks it.  A PDF page only
-    // fits the width and scrolls vertically, like a normal PDF reader.
-    const fit = isPdf
+    // (1 = just fits); zoom > 1 enlarges the page (it then scrolls in
+    // the auto-overflow container), zoom < 1 shrinks it.  A PDF page and
+    // a fixed-layout EPUB page only fit the width and scroll
+    // vertically, like a normal PDF reader.
+    const fitWidthOnly = isPdf || isEpubFixed;
+    const fit = fitWidthOnly
       ? Math.min(1, availW / natW) || 1
       : Math.min(1, availW / natW, availH / natH) || 1;
     const zoom = _getMangaZoom();
     const scale = fit * zoom;
     const w = Math.max(10, Math.floor(natW * scale));
     const h = Math.max(10, Math.floor(natH * scale));
+    if (isEpubFixed) {
+      // The scoped-CSS default clamps .epub-body to a reading column;
+      // a fixed page is exactly its viewport size, nothing narrower.
+      page.style.maxWidth = "none";
+    }
     page.style.width = `${w}px`;
     page.style.height = `${h}px`;
     page.style.margin = "0 auto";
@@ -1154,27 +1374,75 @@
 
   const MANGA_ZOOM_STORAGE = "mangaZoom";
   const PDF_ZOOM_STORAGE = "pdfZoom";
+  const EPUB_ZOOM_STORAGE = "epubZoom";
   const MANGA_ZOOM_MIN = 0.5;
   const MANGA_ZOOM_MAX = 2.5;
+  const EPUB_ZOOM_MIN = 0.5;
+  const EPUB_ZOOM_MAX = 2.5;
+
+  // True on any reader-mode EPUB chapter (reflowing or fixed-layout).
+  function _isEpubReader() {
+    const t = document.getElementById("thetext");
+    return !!t && t.classList.contains("epub-text-container");
+  }
 
   // Manga and PDF keep independent zoom levels.
   function _zoomStorageKey() {
     const t = theText;
-    return t && t.classList.contains("pdf-text-container")
-      ? PDF_ZOOM_STORAGE
-      : MANGA_ZOOM_STORAGE;
+    if (t && t.classList.contains("pdf-text-container")) return PDF_ZOOM_STORAGE;
+    if (t && t.classList.contains("epub-text-container")) return EPUB_ZOOM_STORAGE;
+    return MANGA_ZOOM_STORAGE;
   }
 
   function _getMangaZoom() {
     const raw = parseFloat(localStorage.getItem(_zoomStorageKey()));
     if (!Number.isFinite(raw) || raw <= 0) return 1;
-    return clamp(raw, MANGA_ZOOM_MIN, MANGA_ZOOM_MAX);
+    const isEpub = theText && theText.classList.contains("epub-text-container");
+    return clamp(raw, isEpub ? EPUB_ZOOM_MIN : MANGA_ZOOM_MIN,
+                       isEpub ? EPUB_ZOOM_MAX : MANGA_ZOOM_MAX);
+  }
+
+  /**
+   * Apply the stored zoom to the current reader-mode EPUB chapter.
+   *
+   * A reflowing chapter zooms with the CSS `zoom` property on the
+   * chapter container: text *and* images scale together, and the
+   * browser re-flows the layout at the new size (unlike a transform,
+   * which would clip).  A fixed-layout chapter is a pixel-sized page
+   * box: its zoom is applied by the page fit (fit x zoom, see
+   * _fitMangaPage), so the container itself must not also be zoomed.
+   */
+  function _applyEpubZoom() {
+    if (!_isEpubReader()) return;
+    const chapter = document.getElementById("epub-chapter");
+    if (!chapter) return;
+    if (chapter.querySelector(".epub-body[data-epub-viewport]")) {
+      chapter.style.zoom = "";
+      _fitMangaPage();
+    } else {
+      chapter.style.zoom = String(_getEpubZoom());
+    }
+  }
+
+  function _getEpubZoom() {
+    const raw = parseFloat(localStorage.getItem(EPUB_ZOOM_STORAGE));
+    if (!Number.isFinite(raw) || raw <= 0) return 1;
+    return clamp(raw, EPUB_ZOOM_MIN, EPUB_ZOOM_MAX);
   }
 
   // Global handler wired up by text-options.js buttons (only meaningful on
-  // manga / PDF pages, where a fixed-page container is present).  delta is
-  // +1 for zoom-in, -1 for zoom-out; each step scales by ~1.2x.
+  // manga / PDF / reader-mode EPUB pages).  delta is +1 for zoom-in, -1
+  // for zoom-out; each step scales by ~1.2x.
   function setMangaZoom(delta) {
+    if (_isEpubReader()) {
+      localStorage.setItem(
+        EPUB_ZOOM_STORAGE,
+        String(Math.round(clamp(_getEpubZoom() * Math.pow(1.2, delta),
+                                EPUB_ZOOM_MIN, EPUB_ZOOM_MAX) * 100) / 100)
+      );
+      _applyEpubZoom();
+      return;
+    }
     if (!_isMangaReader()) return;
     const zoom = clamp(_getMangaZoom() * Math.pow(1.2, delta),
                        MANGA_ZOOM_MIN, MANGA_ZOOM_MAX);
@@ -1185,9 +1453,84 @@
   // Global handler for the "Fit page to screen" button: reset zoom to 1
   // (i.e. the pane-fit default) and re-fit.
   function resetMangaZoom() {
+    if (_isEpubReader()) {
+      localStorage.setItem(EPUB_ZOOM_STORAGE, "1");
+      _applyEpubZoom();
+      return;
+    }
     if (!_isMangaReader()) return;
     localStorage.setItem(_zoomStorageKey(), "1");
     _fitMangaPage();
+  }
+
+  // ---- Sub-screen position across reloads ------------------------------
+  // Fit-to-screen books split a page into sub-screens, and every re-split
+  // re-derives curScreen from scratch -- so a browser reload landed the
+  // reader back on the page's first screen even though the Lute page
+  // itself was remembered server-side (current_tx_id).  The screen the
+  // reader is on is kept per book + page in localStorage, and restored on
+  // the initial load only: page turns keep their own semantics (forward
+  // -> first screen, backward -> the screen left forward,
+  // see _fwdFromPages), and re-flows keep their anchor.
+  function _screenStorageKey() {
+    return "lute-reading-screen-" + ($("#book_id").val() || "0");
+  }
+
+  function _saveScreenPosition() {
+    // Only meaningful where sub-screens exist; manga/pdf pages and
+    // scrolling mode have none (_renderScreen returns before this).
+    if (!subScreens.length) return;
+    try {
+      localStorage.setItem(
+        _screenStorageKey(),
+        JSON.stringify({
+          page: parseInt($("#page_num").val(), 10) || 1,
+          screen: curScreen,
+        })
+      );
+    } catch (e) { /* storage unavailable (private mode etc.) */ }
+  }
+
+  function _storedScreenFor(page) {
+    try {
+      const v = JSON.parse(localStorage.getItem(_screenStorageKey()) || "null");
+      return v && v.page === page ? v.screen : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ---- Reader-mode EPUB scroll position ------------------------------
+  // A reader-mode page is one chapter that scrolls continuously (a long
+  // chapter was split into several such pages at import), so the
+  // sub-screen machinery has nothing to remember here; the reader's
+  // place *inside* the page is the document scroll offset, kept per
+  // book **and page** -- per book alone would restore page 3's offset
+  // on page 1 after turning back.
+  function _epubScrollKey() {
+    const book = $("#book_id").val() || "0";
+    const page = $("#page_num").val() || "1";
+    return "lute-epub-scroll-" + book + "-" + page;
+  }
+
+  function _restoreEpubScroll() {
+    if (!_epubScrollMode()) return;
+    const y = parseFloat(localStorage.getItem(_epubScrollKey()));
+    if (!Number.isFinite(y) || y <= 0) return;
+    // One more frame: the chapter's images may still be settling, and
+    // scrolling to a y the document does not have yet would clamp.
+    requestAnimationFrame(function () {
+      window.scrollTo(0, y);
+    });
+  }
+
+  function _saveEpubScroll() {
+    if (!_epubScrollMode()) return;
+    try {
+      localStorage.setItem(_epubScrollKey(), String(Math.round(window.scrollY)));
+    } catch (e) {
+      /* storage unavailable (private mode etc.) */
+    }
   }
 
   // anchor, when given, is a <p> already inside the (re-swapped) #thetext
@@ -1200,16 +1543,24 @@
     if (_isMangaReader()) {
       subScreens = [];
       curScreen = 0;
-      // Manga / pdf pages are single fixed pages, so there is nothing to
-      // split -- but the end-of-book button still belongs on the last
-      // page, where the next arrow stops navigating.  The last-screen
-      // class reserves the bottom strip it sits in, so it is toggled
-      // before the fit, which measures the pane's padding.
+      // Manga / pdf / fixed-EPUB pages are single fixed pages, so there
+      // is nothing to split -- but the end-of-book button still belongs
+      // on the last page, where the next arrow stops navigating.  The
+      // last-screen class reserves the bottom strip it sits in, so it
+      // is toggled before the fit, which measures the pane's padding.
       const _pn = parseInt($("#page_num").val());
       const _mp = parseInt($("#page_count").val());
       const _lastPage = _pn >= _mp;
       wrap.classList.toggle("last-screen", _lastPage);
       if (endBtn) endBtn.classList.toggle("hide", !_lastPage);
+      // A reader-mode EPUB book can mix fixed and reflowing chapters
+      // (rare, but legal): drop the scroll-mode classes a reflowing
+      // chapter added before its fixed page renders pane-scrolled.
+      wrap.classList.remove("video-scroll-mode");
+      ["read_pane_container", "read_pane_left"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("video-scroll-mode");
+      });
       // This is the single choke point every content change goes through
       // (page turn, term save, bulk status update, ResizeObserver
       // re-flow, ...).  The fixed page's pixel size is set inline by the
@@ -1220,7 +1571,7 @@
       _fitMangaPage();
       return;
     }
-    if (_videoScrollMode()) {
+    if (_scrollMode()) {
       // Scrolling mode: show every paragraph and let the whole page
       // scroll naturally (see the .video-scroll-mode CSS rules).  The
       // reading-end controls still appear on the book's last page.
@@ -1380,6 +1731,7 @@
     _updateSideArrows();
     set_page_fraction();
     _updateSliderProgress();
+    _saveScreenPosition();
 
     // If the grammar-analysis pane is open, refresh it whenever the
     // visible sub-screen (or the Lute page) changes, so the panel always
@@ -1395,13 +1747,117 @@
     }
   }
 
+  /* ---------------------------------------------------------------- */
+  /* Following the player                                              */
+  /*                                                                   */
+  /* While something is playing, the reader must see the text being     */
+  /* played.  Two things are needed, because the reader paginates on    */
+  /* two levels: a page splits into sub-screens (fit-to-screen), and    */
+  /* the book into pages.  So the players ask for                       */
+  /*                                                                   */
+  /*   showLine(el)         -- the sub-screen holding the marked line,  */
+  /*   pageOfCue(idx)       -- which page a media cue lives on,         */
+  /*   requestPage(p, cb)   -- turn the page, cb after it is laid out.  */
+  /*                                                                   */
+  /* These belong here rather than in a js/ file because they are the   */
+  /* same curScreen / subScreens bindings this script paginates with:   */
+  /* a helper next to them is one fewer place to keep in step.          */
+  /*                                                                   */
+  /* Follow is unconditional -- no toggle.  It is off where paging has  */
+  /* no meaning (manga / pdf fixed pages, the scrolling video and        */
+  /* reader-mode EPUB views), and does nothing while a page is still    */
+  /* loading (_followNavPending).                                      */
+  /* ---------------------------------------------------------------- */
+
+  window.LuteReaderFollow = {
+    // Whether following makes sense for what is on screen.  Evaluated
+    // per cue, not cached: a video book can switch to audio-only (and
+    // back) at any time, which changes the answer.
+    active: function () {
+      return !_isMangaReader() && !_scrollMode();
+    },
+
+    currentPage: function () {
+      return parseInt($("#page_num").val(), 10) || 1;
+    },
+
+    // Page holding cue `index`, 1-based, or 0 with no usable map.
+    pageOfCue: function (index) {
+      if (window.LutePlayingLine) {
+        return window.LutePlayingLine.pageOfCue
+          ? window.LutePlayingLine.pageOfCue(window.LUTE_CUE_PAGE_STARTS, index)
+          : 0;
+      }
+      return 0;
+    },
+
+    // Show the sub-screen holding `el` (a <p> of the reading text, or a
+    // span inside one).  When it is already on screen the render is
+    // skipped: _renderScreen also saves the position and may re-open the
+    // grammar pane, neither of which should happen on every cue.
+    showLine: function (el) {
+      if (!el || el.isConnected === false) return false;
+      const p = el.closest ? el.closest("p") : null;
+      if (!p || subScreens.length === 0) return false;
+      const gi = subScreens.findIndex((group) => group.includes(p));
+      if (gi < 0 || gi === curScreen) return false;
+      curScreen = gi;
+      _renderScreen();
+      return true;
+    },
+
+    // Turn to `page` (absolute).  `done` runs once the new page is in the
+    // DOM and split into sub-screens, so a caller can re-mark its line on
+    // the text it landed on -- marking before the split would mark a
+    // paragraph the split is about to hide again.
+    //
+    // Offsets go through goto_relative_page, NOT navigateNext: that one
+    // runs handle_page_done, which marks the reader's words as known
+    // when "arrow marks known" is on.  Following the player must not
+    // touch the reader's vocabulary.
+    //
+    // One turn at a time: a cue change per second would otherwise queue
+    // a page request each, and htmx would swap several pages in a row.
+    requestPage: function (page, done) {
+      if (_followNavPending) return false;
+      const wanted = parseInt(page, 10);
+      if (!wanted) return false;
+      const target = Math.max(1, Math.min(maxpage, wanted));
+      const now = this.currentPage();
+      if (target === now) return false;
+      _followNavPending = true;
+      // A failed fetch leaves _pendingNav set and no htmx:afterSwap ever
+      // arrives; without this the follow would stay locked for the whole
+      // session.  The caller's own timeout covers the playback side.
+      setTimeout(function () {
+        _followNavPending = false;
+      }, 15000);
+      if (typeof done === "function") _pageReadyWaiters.push(done);
+      goto_relative_page(target - now);
+      return true;
+    },
+  };
+
   // Move backward/forward; within a page prefer sub-screens before
   // crossing to the neighbouring Lute page.
-  function navigatePrev() {
-    if (!_isMangaReader() && subScreens.length && curScreen > 0) {
+  function navigatePrev() {    if (!_isMangaReader() && subScreens.length && curScreen > 0) {
       curScreen--;
       _renderScreen();
       return;
+    }
+    // The very start of the book is the end of the reading -- or, in a
+    // book set, the end of the previous volume: the arrow opens that
+    // volume where the reader left off in it.  Nothing is marked read
+    // going backwards.
+    const pagenum = parseInt($("#page_num").val());
+    const atFirstSubscreen =
+      _isMangaReader() || subScreens.length === 0 || curScreen === 0;
+    if (pagenum <= 1 && atFirstSubscreen) {
+      const prevBook = _prevSeriesBookId();
+      if (prevBook) {
+        window.location.href = `/read/${prevBook}`;
+        return;
+      }
     }
     const target = getActualPage(-1);
     // Crossing back onto a page the reader had left forward: land on its
@@ -1434,7 +1890,19 @@
     // On the last page's final screen this is the end of the reading.
     // Without this guard goto_relative_page(1) clamps back to maxpage and
     // re-loads the page, wrapping around to its first sub-screen.
-    if (pagenum >= maxpage && atLastSubscreen) return;
+    if (pagenum >= maxpage && atLastSubscreen) {
+      // ... unless the book belongs to a book set: the arrow then
+      // continues into the next volume, opening it where the reader
+      // left off in that book.
+      const nextBook = _nextSeriesBookId();
+      if (nextBook && !_seriesNavPending) {
+        _seriesNavPending = true;
+        // Mark this last page read first, exactly as a forward arrow
+        // does on any other page.
+        handle_page_done(arrowMarksKnown, 0, false, `/read/${nextBook}`);
+      }
+      return;
+    }
     // Leaving this page forward from its last sub-screen: remember it so
     // a later left-arrow crossing back restores the last sub-screen.
     if (!_isMangaReader() && subScreens.length) {
@@ -1475,8 +1943,8 @@
   function update_arrow_titles() {
     const on = localStorage.getItem("arrow_marks_known") === "true";
     const t = on
-      ? "Mark this screen as known and continue"
-      : "Go to next page";
+      ? I18N.t("Mark this screen as known and continue")
+      : I18N.t("Go to next page");
     ["navSideNext", "navNext"].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.title = t;
@@ -1484,7 +1952,9 @@
   }
 
   // Handle green checkmark in footer.
-  function handle_page_done(mark_rest_known = false, next_relative_page = 0, all_pages = false) {
+  // `next_url`, when given, replaces the relative page move with a jump to
+  // another book -- the next volume of a book set, see navigateNext.
+  function handle_page_done(mark_rest_known = false, next_relative_page = 0, all_pages = false, next_url = null) {
     const bookid = $('#book_id').val();
     const pagenum = parseInt($('#page_num').val());
     data = {
@@ -1493,20 +1963,30 @@
       restknown: mark_rest_known,
       allpages: all_pages
     };
-    $.ajax({
+    const req = $.ajax({
       type: 'post',
       url: '/read/page_done',
       data: JSON.stringify(data),
       contentType: "application/json; charset=utf-8"
-    }).done(function(d) {
-      goto_relative_page(next_relative_page);
     });
+    if (next_url) {
+      // Leaving this book either way: a failed "page read" ping must not
+      // strand the reader on a finished page.
+      req.always(function() {
+        window.location.href = next_url;
+      });
+    }
+    else {
+      req.done(function(d) {
+        goto_relative_page(next_relative_page);
+      });
+    }
   }
 
   function add_bookmark() {
     const book_id = document.querySelector('#book_id')?.value;
     const page_num = document.querySelector('#page_num')?.value;
-    let title = prompt(`Enter bookmark title, or Cancel to quit`);
+    let title = prompt(I18N.t('Enter bookmark title, or Cancel to quit'));
 
     if (!title)
       return;
@@ -1525,9 +2005,9 @@
       })
     }).then((resp) => resp.json()).then(json => {
       if (json?.success === true) {
-        alert(`Bookmark "${title}" added.`)
+        alert(`${I18N.t('Bookmark')} "${title}" ${I18N.t('added.')}`)
       } else {
-        alert(`Unable to add bookmark. ${json?.reason || "Unknown reason"}`)
+        alert(`${I18N.t('Unable to add bookmark.')} ${json?.reason || I18N.t('Unknown reason')}`)
       }
     })
   }
@@ -1560,7 +2040,7 @@
 
     notices.forEach(function (el) {
       el.style.cursor = "pointer";
-      el.title = "Dismiss";
+      el.title = I18N.t('Dismiss');
       el.addEventListener("click", dismiss_flash_notices);
     });
 

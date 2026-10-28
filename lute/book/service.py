@@ -45,6 +45,42 @@ class BookImportException(Exception):
 # downloaded locally (they are small and needed for word lookups).
 MEDIA_LOCAL_MAX_BYTES = 20 * 1024 * 1024  # 20 MB
 
+# Block-level tags that make up an imported article's text.
+_WEBPAGE_TEXT_TAGS = ("h1", "h2", "h3", "h4", "p")
+
+# Tags that hold the article's body.  A <header> inside one of these is
+# the article's own masthead (headline, standfirst) and is kept; a
+# <header> outside is the site's menu bar.
+_WEBPAGE_CONTENT_TAGS = ("article", "main")
+
+# Page furniture: never article text, wherever it sits.
+_WEBPAGE_CHROME_TAGS = ("nav", "aside", "dialog", "form", "menu", "noscript")
+
+# ARIA roles that mark page furniture.
+_WEBPAGE_CHROME_ROLES = (
+    "navigation",
+    "complementary",
+    "contentinfo",
+    "search",
+    "dialog",
+    "banner",
+    "menu",
+    "menubar",
+)
+
+# A block this long or shorter that is almost entirely link text is a
+# menu item, related-story card, or "download our app" button rather
+# than a sentence; longer fully-linked blocks are left alone because
+# some sites wrap whole paragraphs in an anchor.
+_WEBPAGE_LINK_BLOCK_MAX = 200
+_WEBPAGE_LINK_BLOCK_RATIO = 0.8
+
+# Text of an HTML element keeps the source's line breaks and indentation
+# ("<p>\n    Lorem\n  </p>"), which would add blank lines and leading
+# spaces to every imported paragraph, so runs of whitespace collapse to
+# a single space.
+_WS_RUN_RE = re.compile(r"\s+")
+
 
 @dataclass
 class BookDataFromUrl:
@@ -52,6 +88,100 @@ class BookDataFromUrl:
     title: str = None
     source_uri: str = None
     text: str = None
+
+
+def _block_text(element):
+    "Whitespace-normalized text of one block element."
+    return _WS_RUN_RE.sub(" ", element.text).strip()
+
+
+def _is_page_furniture(element):
+    """
+    True if the block sits in the page's furniture -- menus, sidebars,
+    site header/footer, forms, dialogs, hidden nodes -- and so isn't
+    article text.
+    """
+    ancestors = list(element.parents)
+    in_content = any(
+        p.name in _WEBPAGE_CONTENT_TAGS
+        or (p.get("role") or "").lower() == "main"
+        or p.get("itemprop") == "articleBody"
+        for p in ancestors
+    )
+    for parent in ancestors:
+        if parent.name in _WEBPAGE_CHROME_TAGS:
+            return True
+        # Footers are author bios, share buttons and tag lists even when
+        # they're inside the article; headers are only furniture when
+        # they belong to the page rather than to the article.
+        if parent.name == "footer":
+            return True
+        if parent.name == "header" and not in_content:
+            return True
+        if (parent.get("role") or "").lower() in _WEBPAGE_CHROME_ROLES:
+            return True
+        if (parent.get("aria-hidden") or "").lower() == "true":
+            return True
+        if parent.has_attr("hidden"):
+            return True
+    return False
+
+
+def _is_link_block(element, text):
+    "True for short blocks that are nothing but link text (nav/related/ad)."
+    if len(text) > _WEBPAGE_LINK_BLOCK_MAX:
+        return False
+    link_chars = sum(len(_block_text(a)) for a in element.find_all("a"))
+    # Related-story and product cards are often <a><div><h3>..</h3></div>
+    # </a>, i.e. the anchor wraps the block instead of sitting inside it.
+    for parent in element.parents:
+        if parent.name == "a":
+            link_chars = max(link_chars, len(_block_text(parent)))
+            break
+        if parent.name in ("p", "article", "main", "body"):
+            break
+    return link_chars >= _WEBPAGE_LINK_BLOCK_RATIO * len(text)
+
+
+def webpage_block_text(soup):
+    """
+    Article text of a parsed page, one entry per block, in document order.
+
+    Each block's text is whitespace-normalized (so a formatted source
+    page doesn't leave blank lines or indentation inside a paragraph),
+    blocks that are empty after that are dropped, a matched tag nested
+    inside another matched tag -- malformed markup such as a <h3> inside
+    a <p> -- is skipped because the outer block already holds its text,
+    and page furniture (menus, site header/footer, sidebars, related
+    story cards) is skipped so the imported book isn't padded with
+    navigation text.
+
+    If filtering leaves almost nothing -- a page that wraps everything
+    in a <form> or an unusual layout -- the unfiltered blocks are
+    returned, so an odd page loses no text.
+    """
+    blocks = []
+    for element in soup.find_all(_WEBPAGE_TEXT_TAGS):
+        if element.find_parent(_WEBPAGE_TEXT_TAGS):
+            continue
+        text = _block_text(element)
+        if text != "":
+            blocks.append((element, text))
+
+    kept = [
+        text
+        for element, text in blocks
+        if not _is_page_furniture(element) and not _is_link_block(element, text)
+    ]
+
+    # Guard: filtering must not gut the page.  If most of the text was
+    # dropped the markup is unusual (e.g. everything inside a <form>),
+    # so trust nothing and return the raw blocks.
+    total = sum(len(t) for _e, t in blocks)
+    if total > 0 and sum(len(t) for t in kept) < 0.5 * total:
+        return [t for _e, t in blocks]
+
+    return kept
 
 
 def youtube_video_id(url):
@@ -536,6 +666,10 @@ class FileTextExtraction:
         handlers = {
             ".txt": self._get_textfile_content,
             ".epub": self._get_epub_content,
+            ".mobi": self._get_kindle_content,
+            ".azw": self._get_kindle_content,
+            ".azw3": self._get_kindle_content,
+            ".prc": self._get_kindle_content,
             ".pdf": self._get_pdf_content,
             ".srt": self._get_srt_content,
             ".vtt": self._get_vtt_content,
@@ -602,6 +736,19 @@ class FileTextExtraction:
             msg = f"Could not parse {filename} (error: {str(e)})"
             raise BookImportException(message=msg, cause=e) from e
         return content
+
+    def _get_kindle_content(self, filename, filestream):
+        """
+        Get the content of a MOBI / AZW / AZW3 file as a single string.
+
+        Kindle formats are converted to EPUB in memory first (the parser
+        imports BookImportException from this module, so the import is
+        local to avoid a cycle).
+        """
+        from lute.book.kindle_parser import kindle_to_epub
+
+        epub_bytes = kindle_to_epub(filestream.read())
+        return self._get_epub_content(filename, BytesIO(epub_bytes))
 
     def _get_pdf_content(self, filename, filestream):
         "Get content as a single string from a PDF file using PyPDF2."
@@ -855,6 +1002,9 @@ class Service:
         new_pages = [DBText(dbbook, "", index + 1) for index in range(len(pages))]
         session.add_all(new_pages)
         session.commit()
+        # The replaced archive may have been imported as text elsewhere;
+        # a stale analysis would describe pages that no longer exist.
+        self._drop_grammar_cache(dbbook.id)
         return dbbook
 
     def extract_pdf(self, filename, filestream):
@@ -1066,12 +1216,9 @@ class Service:
             # Page is neither the declared charset nor UTF-8; let bs4
             # do its full (imperfect) detection as before.
             soup = BeautifulSoup(s, "html.parser")
-        extracted_text = []
-
-        # Add elements in order found.
-        for element in soup.descendants:
-            if element.name in ("h1", "h2", "h3", "h4", "p"):
-                extracted_text.append(element.text)
+        # Blocks in document order, whitespace-normalized so the
+        # imported text reads as one line per paragraph.
+        extracted_text = webpage_block_text(soup)
 
         title_node = soup.find("title")
         orig_title = (title_node.string if title_node else url) or url
@@ -1083,7 +1230,11 @@ class Service:
         b = BookDataFromUrl()
         b.title = short_title
         b.source_uri = url
-        b.text = "\n\n".join(extracted_text)
+        # One line per paragraph, no blank line between them: the text
+        # parsers split paragraphs on a single newline, so a blank line
+        # would become an empty paragraph and show up as a gap in the
+        # reading page.
+        b.text = "\n".join(extracted_text)
         return b
 
     def import_book(self, book, session):  # pylint: disable=too-many-locals
@@ -1155,4 +1306,44 @@ class Service:
             # word counts are correct.
             self.set_pdf_page_word_counts(dbbook)
         repo.commit()
+        self._queue_grammar_precompute(dbbook)
         return dbbook
+
+    def _queue_grammar_precompute(self, dbbook):
+        """
+        Warm the whole-book grammar cache for the reader's "This book" scope.
+
+        The analysis takes seconds for a real book, so it must not run here:
+        the background worker (lute/read/grammar_precompute.py) does it and
+        the panel gets a fast answer next time.  Never fails the import -- a
+        missing engine or a full queue only costs the reader the on-demand
+        analysis they used to get anyway.
+        """
+        try:
+            if dbbook.book_type in ("manga", "pdf"):
+                return  # the panel hides the book scope for these types
+            if not any((t.text or "").strip() for t in dbbook.texts):
+                return
+            # Imported here so importing this module does not drag the
+            # grammar engines (and their optional heavy dependencies) into
+            # every consumer of lute.book.service.
+            from lute.multiuser.context import get_current_user
+            from lute.read import grammar_precompute
+
+            grammar_precompute.schedule(get_current_user(), dbbook.id)
+        except Exception:  # noqa: BLE001 - precompute is never worth a failed import
+            current_app.logger.warning(
+                "grammar precompute not scheduled for book %s",
+                getattr(dbbook, "id", "?"),
+            )
+
+    def _drop_grammar_cache(self, book_id):
+        "Forget a book's whole-book grammar analysis (its content changed)."
+        try:
+            from lute.read import grammar_precompute
+
+            grammar_precompute.invalidate(book_id)
+        except Exception:  # noqa: BLE001
+            current_app.logger.warning(
+                "grammar cache not dropped for book %s", book_id
+            )

@@ -37,6 +37,8 @@ import re
 import threading
 import unicodedata
 
+from lute.read.render.grammar_analysis_matcher import load_golden
+
 # ---- tokenizer -------------------------------------------------------
 
 _tokenizer = None
@@ -162,12 +164,34 @@ def _token_offsets(tokens):
     return [t["start"] for t in tokens]
 
 
+def _regex_aligned(match, spec, tokens):
+    """
+    Does a regex match start on a morpheme boundary?  (Opt-in per spec.)
+
+    A literal that is the tail of a *contracted* verb form is ambiguous in
+    the raw text: 라서 is the copula's ending (이 + 라서) but also the tail
+    of 모르 + 어서 and 따르 + 어서.  Kiwi's morphemes tell the two apart,
+    but a contracted stem reports its ending as starting *inside* itself
+    -- 모르 spans the 몰라 and 어서 starts on the 라 -- so the test is that
+    no morpheme strictly contains the match's first character.  A literal
+    that legitimately spans a contracted stem -- 습니다만 is 슬 + ᆸ니다만
+    -- must not ask for this.
+    """
+    if not spec.get("aligned") or not tokens:
+        return True
+    start = match.start()
+    return not any(
+        token["start"] < start < token["start"] + len(token["surface"])
+        for token in tokens
+    )
+
+
 def _spec_spans(spec, tokens, sentence_text):
     "Character (start, end) ranges of sentence_text matched by one spec."
     spans = []
     if spec["type"] == "regex":
         for m in spec["re"].finditer(sentence_text):
-            if m.group(0):
+            if m.group(0) and _regex_aligned(m, spec, tokens):
                 spans.append(m.span())
     else:  # tokens
         offsets = _token_offsets(tokens)
@@ -227,6 +251,7 @@ def _rule(
     formation_notes="",
     formation_notes_zh="",
     reference=None,
+    examples=None,
 ):
     return {
         "key": key,
@@ -248,6 +273,11 @@ def _rule(
         "formation_notes": formation_notes,
         "formation_notes_zh": formation_notes_zh,
         "reference": reference,
+        # The library's example list, as {korean, chinese, english} rows.
+        # The panel quotes a single curated `reference`; the library page has
+        # room for all of them, and the vendored rows ship ~3 sentences each
+        # with their translations.  Empty for the hand-written rules.
+        "examples": list(examples or []),
     }
 
 
@@ -307,7 +337,11 @@ _KO_RULES = [
         "ko_eunikka",
         "-(으)니까",
         "because; since (reason)",
-        [{"type": "tokens", "conds": [{"surface": "니까", "pos": "EC"}]}],
+        # Kiwi keeps the epenthetic 으 inside the ending after a consonant
+        # stem (없으니까, 많으니까), so requiring the bare 니까 missed every
+        # adjective and every ㄹ-less consonant stem -- half the uses of the
+        # pattern.  Both spellings are the same ending.
+        [{"type": "tokens", "conds": [{"surface": ("니까", "으니까"), "pos": "EC"}]}],
         zh="因为……；由于……",
         ko="이유나 근거를 나타내는 연결 어미.",
     ),
@@ -511,6 +545,24 @@ def _translations(item):
     ]
 
 
+def _example_data(item):
+    """
+    The row's examples as index-aligned {korean, chinese, english} rows.
+
+    The library page shows every sentence the row ships, not only the one
+    the panel quotes as its 参考例句.  Sentences without any translation are
+    kept -- an unglossed example is still an example, and the template simply
+    omits the gloss line.
+    """
+    examples = [e.strip() for e in (item.get("examples") or []) if (e or "").strip()]
+    translations = _translations(item)
+    rows = []
+    for i, korean in enumerate(examples):
+        zh, en = translations[i] if i < len(translations) else ("", "")
+        rows.append({"korean": korean, "chinese": zh, "english": en})
+    return rows
+
+
 def _panel_fields(key, item, specs, examples, tokenised):
     """
     The optional panel blocks for one merged row, ready to splat into _rule.
@@ -532,29 +584,235 @@ def _panel_fields(key, item, specs, examples, tokenised):
     }
 
 
+# ---- focus-literal precision --------------------------------------------
+#
+# The Kimchi authors wrap the grammar morphemes of their example sentences
+# in <f>…</f>, and the generator copies those marks into each row's
+# `focus`; the row's matcher is the alternation of them.  What the authors
+# marked is therefore the panel's precision -- and they also mark whole
+# words: the 에 rows mark 갑니다 / 가서 / 있어요 beside the particle itself,
+# and the 에다가 row marks its own tail 다가.  Left alone those literals
+# fire on every sentence ending in -어요 or -다가.  Two mechanisms keep the
+# matcher to the point:
+#
+#   * a literal is kept only when the row's own name explains it (the
+#     Kimchi marks are the authors', the name is the point);
+#   * a literal never fires as the tail of a longer literal anywhere in
+#     the library -- 거나 stays silent inside -다거나, 에 inside 에게.
+
+# Compatibility jamo that can close a syllable, with their coda index.
+_JAMO_CODA = {
+    "ㄱ": 1,
+    "ㄲ": 2,
+    "ㄳ": 3,
+    "ㄴ": 4,
+    "ㄵ": 5,
+    "ㄶ": 6,
+    "ㄷ": 7,
+    "ㄹ": 8,
+    "ㄺ": 9,
+    "ㄻ": 10,
+    "ㄼ": 11,
+    "ㄽ": 12,
+    "ㄾ": 13,
+    "ㄿ": 14,
+    "ㅀ": 15,
+    "ㅁ": 16,
+    "ㅂ": 17,
+    "ㅄ": 18,
+    "ㅅ": 19,
+    "ㅆ": 20,
+    "ㅇ": 21,
+    "ㅈ": 22,
+    "ㅊ": 23,
+    "ㅋ": 24,
+    "ㅌ": 25,
+    "ㅍ": 26,
+    "ㅎ": 27,
+}
+
+# The allomorph a pattern name spells with its optional group, as it can
+# start a surface form: (으)ㄹ is 을 after a consonant and ㄹ after a vowel.
+_ALLOMORPH_TAILS = ("을", "은", "음", "읍", "ㄹ", "ㄴ", "ㅁ", "ㅂ")
+
+
+def _absorb(group, tail):
+    """
+    Contract an optional group into what follows it: (스)ㅂ니다 -> 습니다.
+
+    The (..) of a pattern name is a choice, and taking it changes the
+    syllable in front: 스 + ㅂ니다 is 습니다 (the ㅂ closes the 스) the way
+    으 + ㄹ까 is 을까.  A plain concatenation (스ㅂ니다) spells a form no
+    sentence ever uses, so the row would lose every literal it marks.
+    """
+    if not group or not tail:
+        return group + tail
+    code = ord(group[-1]) - 0xAC00
+    if not 0 <= code < 11172 or code % 28:
+        return group + tail  # not Hangul, or the syllable is already closed
+    coda = _JAMO_CODA.get(tail[0])
+    if coda is None:
+        return group + tail  # what follows starts with a vowel, not a jamo
+    onset, nucleus = divmod(code // 28, 21)
+    closed = chr(0xAC00 + 588 * onset + 28 * nucleus + coda)
+    return group[:-1] + closed + tail[1:]
+
+
+def _name_forms(name):
+    """
+    The row's point as the surface forms a sentence can spell it in.
+
+    "(이)라서" is written either way; "아/어 달다" is two words with a
+    choice in the first; "(으)ㄹ까" contracts to 을까 after a consonant, ㄹ까
+    after a vowel and 까 after a ㄹ-final stem (일 + ㄹ까 = 일까);
+    "(스)ㅂ니다" is 습니다 after a consonant and ㅂ니다 after a vowel;
+    "더라고(요)" drops its politeness syllable.  A focus literal is only
+    kept when one of these forms shows up in it, so the set has to cover
+    the spellings the books actually use.
+    """
+    out = set()
+
+    def expand(piece):
+        # An optional (..) group: emit the reading with and without it.
+        match = re.search(r"\(([^)]*)\)", piece)
+        if not match:
+            return {piece}
+        inner = match.group(1)
+        head, tail = piece[: match.start()], piece[match.end() :]
+        return expand(head + tail) | expand(head + _absorb(inner, tail))
+
+    for piece in expand((name or "").strip().lstrip("-－~〜")):
+        for chunk in re.split(r"[\s,、/]+", _PUNCT.sub("", piece)):
+            chunk = chunk.strip()
+            if not chunk:
+                continue
+            out.add(chunk)
+            for tail in ("다", "요"):
+                # A dictionary form is also its stem (당하다 -> 당하), and a
+                # (요) ending is also the bare ending (더라고(요) -> 더라).
+                if chunk.endswith(tail) and len(chunk) > 1:
+                    out.add(chunk[: -len(tail)])
+            # The (으)X allomorph also drops after a ㄹ-final stem, where
+            # the stem's own ㄹ closes the syllable: 일 + (으)ㄹ까 = 일까.
+            for prefix in _ALLOMORPH_TAILS:
+                if chunk.startswith(prefix) and len(chunk) > len(prefix):
+                    out.add(chunk[len(prefix) :])
+    return out
+
+
+def _fold(text):
+    "Compatibility jamo to Kiwi's conjoining form, so ㄴ and ᆫ compare equal."
+    return text.translate(_JAMO_FOLD)
+
+
+def _literal_is_the_point(literal, forms):
+    """
+    Does the row's own point show up in this focus literal?
+
+    Two readings, because a literal is a sentence fragment: the point can
+    sit in the raw string (다가 is the point of the 다가 row, 에다가 of the
+    에다가 row), or inside one of the literal's Kiwi morphemes, which is
+    what keeps a contracted form alive -- 수정됐어요 carries 되 (되다's
+    stem) and 출발할게요 carries ᆯ게요, whose ㄹ is the (으)ㄹ the name
+    spells.  Matching the morpheme rather than the raw string is also what
+    drops 갑니다 / 가서 / 있어요, which carry no morpheme of their row's
+    point at all.
+    """
+    folded_forms = [_fold(form) for form in forms]
+    folded_literal = _fold(literal)
+    if any(form in folded_literal for form in folded_forms):
+        return True
+    for token in _tokens_for(literal):
+        for text in (token["lemma"], token["surface"]):
+            folded = _fold(text)
+            if any(form in folded for form in folded_forms):
+                return True
+    return False
+
+
+# Literals whose only trustworthy reading is on a morpheme boundary.  라서
+# is the copula's ending (이 + 라서), but it is also the tail of 모르 + 어서
+# and 따르 + 어서, which a plain 라서(?!\S) reports as the (이)라서 point.
+# A literal that legitimately spans a contracted stem -- 습니다만 is 슬 +
+# ᆸ니다만 -- must NOT be listed here.
+_FOCUS_MORPHEME_ALIGNED = frozenset({"라서"})
+
+
+def _focus_regexes(literals, pool):
+    """
+    One regex spec for a row: its literals, longest first, each guarded.
+
+    Korean stacks morphemes at the end of an 어절, so a literal is often
+    both its own ending and the tail of a longer one: 거나 is -거나 and the
+    tail of -다거나 / -라거나, 에 is the particle and the tail of 에게.  A
+    plain alternation reports both rows on the same span, so every literal
+    is preceded by a lookbehind for each longer literal that ends with it.
+    The pool is the whole library, so a newly merged row tightens the rows
+    it nests inside without anyone editing them.
+    """
+    parts = []
+    aligned = False
+    for literal in literals:
+        guards = sorted(
+            {
+                other[: -len(literal)]
+                for other in pool
+                if len(other) > len(literal) and other.endswith(literal)
+            }
+        )
+        parts.append(
+            "".join(f"(?<!{re.escape(prefix)})" for prefix in guards)
+            + re.escape(literal)
+            + r"(?!\S)"
+        )
+        aligned = aligned or literal in _FOCUS_MORPHEME_ALIGNED
+    spec = {"type": "regex", "re": re.compile("|".join(parts))}
+    if aligned:
+        # At least one literal is the tail of a contracted verb form; see
+        # _FOCUS_MORPHEME_ALIGNED and _regex_aligned.
+        spec["aligned"] = True
+    return spec
+
+
 def _load_data_rules():
     if not os.path.exists(_DATA_PATH):
         return []
     with open(_DATA_PATH, encoding="utf-8") as fh:
         entries = json.load(fh)
-    rules = []
+
+    # Pass 1 -- the literals each row's own point explains.  A literal the
+    # name does not explain is dropped here rather than firing on every
+    # sentence that happens to end in it.
+    kept = {}
     for item in entries:
         name = item.get("name") or ""
         if _norm_name(name) in _HANDWRITTEN_NORMS:
             continue  # already covered precisely by a hand-written rule
-        # Single-Hangul foci are too noisy as regexes; drop them.  The
-        # rest are anchored at a so-called "word end" (followed by space /
-        # end of string), since Korean grammatical morphemes attach to the
-        # end of an 어절.  This avoids matching e.g. the 에 inside 이에요.
-        foci = sorted(
-            ((f + r"(?!\S)") for f in (item.get("focus") or []) if len(f) >= 2),
-            key=len,
-            reverse=True,
-        )
-        if not foci:
+        forms = _name_forms(name)
+        literals = [
+            focus
+            for focus in (item.get("focus") or [])
+            # Single-Hangul foci are too noisy as regexes; drop them.  The
+            # rest are anchored at a so-called "word end" (followed by
+            # space / end of string), since Korean grammatical morphemes
+            # attach to the end of an 어절.  This avoids matching e.g. the
+            # 에 inside 이에요.
+            if len(focus) >= 2 and _literal_is_the_point(focus, forms)
+        ]
+        if literals:
+            kept[item.get("key") or name] = sorted(set(literals), key=len, reverse=True)
+
+    # Pass 2 -- every surviving literal in the library is a tail-guard
+    # source for the shorter ones, so the pool is collected up front.
+    pool = {focus for literals in kept.values() for focus in literals}
+
+    rules = []
+    for item in entries:
+        key = item.get("key") or item.get("name") or ""
+        literals = kept.get(key)
+        if not literals:
             continue
-        alternation = re.compile("|".join(foci))
-        specs = [{"type": "regex", "re": alternation}]
+        specs = [_focus_regexes(literals, pool)]
         # kimchi ships a translation for every example; backfilled into
         # example_en, it gives the vendored rows a curated 参考例句 too.
         # The regex spec is passed so the chosen example is one this rule
@@ -564,15 +822,16 @@ def _load_data_rules():
         )
         rules.append(
             _rule(
-                item.get("key") or name,
-                name,
-                (item.get("meaning") or "").strip() or name,
+                key,
+                item.get("name") or "",
+                (item.get("meaning") or "").strip() or item.get("name") or "",
                 specs,
                 level=item.get("level")
                 or _LEVEL_BY_TYPE.get(item.get("type", ""), "TOPIK 3-4"),
                 zh=item.get("zh") or "",
                 ko=item.get("ko") or "",
                 reference=reference,
+                examples=_example_data(item),
             )
         )
     return rules
@@ -935,6 +1194,7 @@ def _load_pattern_rules():
                 zh=item.get("zh") or "",
                 ko=item.get("ko") or "",
                 **_panel_fields(key, item, validated, examples, tokenised),
+                examples=_example_data(item),
             )
         )
     return rules
@@ -964,6 +1224,36 @@ _rules_lock = threading.RLock()
 _data_rules_cache = None
 _all_rules_cache = None
 
+# Rows that would report the same span as another rule on the same sentence,
+# so the panel shows only one of them.  The row keeps its library entry (it
+# is real material) and only the reading panel drops it.
+# ``scripts.audit_grammar_ko_overlaps`` re-derives this list (IoU >= 0.6 on
+# at least two sentences); a new merged row that duplicates an existing point
+# shows up there, and ``test_duplicate_rule_list_matches_the_overlap_audit``
+# fails until it is listed.
+#
+# The three survivors of the first pass are the rows whose point another row
+# already reports on the very same span:
+#
+#   * kgm_도록하다 / kgm_아어가지고 -- the books spell out the whole
+#     construction (도록 하다, 아/어 가지고) while the vendored rows name
+#     the same morphemes (도록, 아/어 가지다) and highlight the same words;
+#   * 아어_달라고 -- -아/어 달다 and -아/어 달라고 are one ending, and both
+#     rows highlight exactly 달라고 (six shared sentences).
+#
+# The audit's *other* candidates were precision bugs, not duplicates, and
+# were fixed in the matcher instead: 거나 firing inside -다거나, 에다가's
+# tail 다가 firing on -려다가, 거니 inside -겠거니, 라서 on 모르 + 어서, and
+# the 에 rows' whole-word focus (갑니다 / 가서 / 있어요).  See the
+# focus-literal precision block above _load_data_rules.
+_DUPLICATE_RULE_IDS = frozenset(
+    {
+        "kgm_도록하다__f0c5de",
+        "kgm_아어가지고__49d9eb",
+        "아어_달라고__quote-favor-request",
+    }
+)
+
 
 def _get_data_rules():
     "The data-driven rules, built on first use and memoised."
@@ -981,6 +1271,22 @@ def _get_all_rules():
         if _all_rules_cache is None:
             _all_rules_cache = _KO_RULES + _get_data_rules()
         return _all_rules_cache
+
+
+def _panel_rules():
+    """
+    Every rule the reading panel may show, silenced duplicates removed.
+
+    The three sources are concatenated here rather than inside
+    ``_get_all_rules`` because the library page and the overlap audit both
+    need the *un*dropped set -- a silenced row still has to appear in the
+    library and has to stay visible to the audit, or the list could never be
+    re-derived.
+    """
+    rules = _get_all_rules() + _get_pattern_rules()
+    if not _DUPLICATE_RULE_IDS:
+        return rules
+    return [rule for rule in rules if rule["key"] not in _DUPLICATE_RULE_IDS]
 
 
 # ---- display ---------------------------------------------------------
@@ -1168,7 +1474,7 @@ def analyze_korean(page_text, display_lang="en"):
     # place.)
     page_text = unicodedata.normalize("NFC", page_text)
     sentences = _split_sentences(page_text)
-    rules = _get_all_rules() + _get_pattern_rules()
+    rules = _panel_rules()
     by_name = {}
     order = []
     for sentence in sentences:
@@ -1250,3 +1556,114 @@ def analyze_korean(page_text, display_lang="en"):
         )
         matched.append(out)
     return matched
+
+
+# ---- library export --------------------------------------------------
+#
+# The /grammar page lists the whole corpus at once, where the panel lists
+# only what the current page happens to contain.  Mirrors the Japanese
+# engine's export (grammar_analysis_ja.library_entries) so both languages
+# render through one template.
+
+# The three bands grammar_ko.json uses, easiest first.  Same vocabulary as
+# grammar_levels.hideable_grammar_groups.
+_LIBRARY_LEVEL_RANK = {"TOPIK 1-2": 0, "TOPIK 3-4": 1, "TOPIK 5-6": 2}
+
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_ko_golden.json",
+    )
+)
+
+
+def _golden_examples():
+    """
+    Curated example sentences for the hand-written rules, keyed by rule key.
+
+    Shape ``key -> [{"text", "en", "zh", "ko"}, ...]``, the same store the
+    tests re-run through each rule.  Written by hand rather than mined from
+    the corpus: the curated rows that fire on these twelve beginner points
+    are long and off-topic, so they make poor illustrations.
+    """
+    return load_golden(_GOLDEN_PATH)
+
+
+def _example_rows(rule, display_lang, examples=None):
+    """
+    The rule's examples as display rows.
+
+    The data rules carry {korean, chinese, english} rows; a golden row
+    carries the shared {text, en, zh, ko} shape.  Both come back as
+    {"text", "tr"} where a translation exists for the display language and
+    as a plain sentence where it does not -- an English gloss under a
+    Chinese heading would be worse than no gloss, the same rule the
+    Japanese export follows.  The Korean panel gets no gloss: the sentence
+    already is Korean.
+    """
+    rows = []
+    for row in examples if examples is not None else rule.get("examples") or []:
+        if isinstance(row, dict):
+            korean = (row.get("korean") or row.get("text") or "").strip()
+        else:
+            korean = (row or "").strip()
+        if not korean:
+            continue
+        tr = ""
+        if isinstance(row, dict) and display_lang != "ko":
+            if display_lang == "zh":
+                tr = (row.get("chinese") or row.get("zh") or "").strip()
+            else:
+                tr = (row.get("english") or row.get("en") or "").strip()
+        rows.append({"text": korean, "tr": tr} if tr else korean)
+    return rows
+
+
+def _library_entry(rule, display_lang, examples=None):
+    "One rule as a library row, display-ready (see the Japanese analogue)."
+    entry = {
+        "key": rule["key"],
+        "name": rule["pattern"],
+        "level": rule["level"],
+        "desc": _desc(rule, display_lang),
+        "examples": _example_rows(rule, display_lang, examples),
+        "skipped": False,
+    }
+    formation = _enrichment(rule, "formation", display_lang)
+    if formation:
+        entry["formation"] = formation
+    notes = _enrichment(rule, "formation_notes", display_lang)
+    if notes:
+        entry["notes"] = notes
+    reference = rule.get("reference")
+    if reference:
+        text = _reference_text(reference, display_lang)
+        if text:
+            entry["reference"] = {"japanese": reference["korean"], "text": text}
+    return entry
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Korean grammar library, in TOPIK band order (1-2 -> 5-6).
+
+    Built on first use like the rules themselves, so an app start-up with
+    no Korean books does not pay for the Kiwi instance.  Every rule the
+    matcher can fire is included: unlike the Japanese corpus there is no
+    reviewed "reference only" subset.
+
+    The hand-written basics take their examples from the golden set
+    (``grammar_ko_golden.json``); the curated rows carry their own.
+    """
+    golden = _golden_examples()
+    rules = [(rule, golden.get(rule["key"])) for rule in _KO_RULES]
+    rules += [(rule, None) for rule in _get_data_rules() + _get_pattern_rules()]
+    entries = [_library_entry(rule, display_lang, examples) for rule, examples in rules]
+    ordered = sorted(
+        enumerate(entries),
+        key=lambda pair: (_LIBRARY_LEVEL_RANK.get(pair[1]["level"], 9), pair[0]),
+    )
+    return [entry for _, entry in ordered]

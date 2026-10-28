@@ -11,11 +11,14 @@ Classical Chinese falls outside this engine's design (modern particles
 are rare there); the rules simply under-fire on such text.
 """
 
+import os
 import re
 
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
+    load_golden,
     make_rule,
+    rule_library_entries,
     spec_surface,
 )
 
@@ -381,3 +384,34 @@ def analyze_chinese(page_text, display_lang="en"):
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
     return analyze_tokens(page_text, _ZH_RULES, _tokens_for, display_lang)
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Mandarin grammar library, in CEFR order (A1 -> C2).
+
+    The corpus is the hand-written rule set itself.  A Chinese reader
+    (display language ``zh``) gets each rule's Chinese ``zh`` wording,
+    which is why the rules carry one next to the English description.
+
+    Example sentences come from the golden set
+    (``grammar_zh_golden.json``), each carrying an English and a Korean
+    gloss; the module still needs no tokenizer to be listed.
+    """
+    return rule_library_entries(_ZH_RULES, display_lang, _golden_examples())
+
+
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_zh_golden.json",
+    )
+)
+
+
+def _golden_examples():
+    "Curated examples for the hand-written rules, keyed by rule key."
+    return load_golden(_GOLDEN_PATH)

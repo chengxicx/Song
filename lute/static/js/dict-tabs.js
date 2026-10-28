@@ -153,7 +153,7 @@ class SentenceLookupButton extends GeneralLookupButton {
       iframe.setAttribute("src", `/term/sentences/${LookupButton.LANG_ID}/${t}`);
     };
 
-    super("sentences-btn", "Sentences", "See term usage", "dict-sentences-btn", handler);
+    super("sentences-btn", I18N.t("Sentences"), I18N.t("See term usage"), "dict-sentences-btn", handler);
   }
 }
 
@@ -173,7 +173,7 @@ class ImageLookupButton extends GeneralLookupButton {
       const text = LookupButton.TERM_FORM_CONTAINER.querySelector("#text").value;
       const lang_id = LookupButton.LANG_ID;
       if (lang_id == null || lang_id == '' || parseInt(lang_id) == 0 || text == null || text == '') {
-        alert('Please select a language and enter the term.');
+        alert(I18N.t('Please select a language and enter the term.'));
         return;
       }
       let use_text = text;
@@ -190,7 +190,7 @@ class ImageLookupButton extends GeneralLookupButton {
       iframe.setAttribute("src", url);
     };  // end handler
 
-    super("dict-image-btn", null, "Lookup images", "dict-image-btn", handler);
+    super("dict-image-btn", null, I18N.t("Lookup images"), "dict-image-btn", handler);
   }
 }
 
@@ -215,28 +215,40 @@ class DictButton extends LookupButton {
     }
 
     this.label = (dict.url.length <= 10) ? dict.url : (dict.url.slice(0, 10) + '...');
+    this.tooltip = this.label;
 
-    // If the URL is a real url, get icon and label.
+    // A dictionary served by Lute itself has a route for a URL, not a
+    // hostname, so there is nothing to shorten into a tab label and
+    // nothing to look up an icon by.  The server names those tabs
+    // (see _term_dicts_for in lute/read/routes.py).
     let fimg = null;
-    try {
-      const urlObj = new URL(dict.url);  // Throws if invalid.
-      const domain = urlObj.hostname;
-      this.label = domain.split("www.").splice(-1)[0];
-
-      // Self-hosted icon only (see LOCAL_DICT_FAVICONS).  A domain we
-      // don't ship an icon for, or a 404, just falls back to the text
-      // label -- never to a remote service.
-      if (LOCAL_DICT_FAVICONS.indexOf(domain) !== -1) {
-        fimg = document.createElement("img");
-        fimg.classList.add("dict-btn-fav-img");
-        fimg.onerror = () => {
-          fimg.onerror = null;
-          fimg.remove();
-        };
-        fimg.src = `/static/icn/dict/${domain}.png`;
-      }
+    if (dict.label) {
+      this.label = dict.label;
+      this.tooltip = dict.title || dict.label;
     }
-    catch(err) {}
+    else {
+      // If the URL is a real url, get icon and label.
+      try {
+        const urlObj = new URL(dict.url);  // Throws if invalid.
+        const domain = urlObj.hostname;
+        this.label = domain.split("www.").splice(-1)[0];
+        this.tooltip = this.label;
+
+        // Self-hosted icon only (see LOCAL_DICT_FAVICONS).  A domain we
+        // don't ship an icon for, or a 404, just falls back to the text
+        // label -- never to a remote service.
+        if (LOCAL_DICT_FAVICONS.indexOf(domain) !== -1) {
+          fimg = document.createElement("img");
+          fimg.classList.add("dict-btn-fav-img");
+          fimg.onerror = () => {
+            fimg.onerror = null;
+            fimg.remove();
+          };
+          fimg.src = `/static/icn/dict/${domain}.png`;
+        }
+      }
+      catch(err) {}
+    }
 
     this.btn.textContent = this.label;
 
@@ -246,7 +258,7 @@ class DictButton extends LookupButton {
       _deferDictIcon(fimg);
     }
 
-    this.btn.setAttribute("title", this.label);
+    this.btn.setAttribute("title", this.tooltip);
 
     this.isExternal = (dict.dicttype == "popuphtml");
     if (this.isExternal) {
@@ -370,7 +382,7 @@ function _create_dict_dropdown_div(buttons_in_list) {
   const btn = document.createElement("button");
   btn.classList.add("dict-btn", "dict-btn-select");
   btn.innerHTML = "&hellip; &#9660;"
-  btn.setAttribute("title", "More dictionaries");
+  btn.setAttribute("title", I18N.t("More dictionaries"));
   btn.addEventListener("click", (e) => {
     list_div.classList.toggle("dict-list-hide");
   });

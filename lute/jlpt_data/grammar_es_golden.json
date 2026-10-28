@@ -1,0 +1,505 @@
+{
+ "es_ser_de": {
+  "name": "ser + de (origin / material)",
+  "examples": [
+   {
+    "es": "La calefacción de mi casa es de gas natural.",
+    "zh": "我家的供暖是天然气的。",
+    "en": "My house's heating runs on natural gas.",
+    "ko": "우리 집 난방은 천연가스다."
+   },
+   {
+    "es": "El reloj era de fabricación china.",
+    "zh": "这块表是中国制造的。",
+    "en": "The watch was made in China.",
+    "ko": "그 시계는 중국제였다."
+   }
+  ]
+ },
+ "es_estar_en": {
+  "name": "estar + en (location)",
+  "examples": [
+   {
+    "es": "Está en el otro edificio.",
+    "zh": "他在另一栋楼里。",
+    "en": "He's in the other building.",
+    "ko": "그는 다른 건물에 있다."
+   }
+  ]
+ },
+ "es_hay": {
+  "name": "hay / había + noun",
+  "examples": [
+   {
+    "es": "Aquí hay una carta de Juan.",
+    "zh": "这儿有一封胡安的信。",
+    "en": "There's a letter from Juan here.",
+    "ko": "여기 후안이 보낸 편지가 한 통 있다."
+   },
+   {
+    "es": "No había barco en el puerto.",
+    "zh": "港口里没有船。",
+    "en": "There was no ship in the port.",
+    "ko": "항구에는 배가 없었다."
+   }
+  ]
+ },
+ "es_gustar": {
+  "name": "gustar-type verb + indirect object",
+  "examples": [
+   {
+    "es": "A María le gusta el cine.",
+    "zh": "玛丽亚喜欢看电影。",
+    "en": "María likes the cinema.",
+    "ko": "마리아는 영화를 좋아한다."
+   },
+   {
+    "es": "Me duele mucho la cabeza.",
+    "zh": "我头疼得厉害。",
+    "en": "I have a bad headache.",
+    "ko": "머리가 몹시 아프다."
+   }
+  ]
+ },
+ "es_wh_questions": {
+  "name": "Question words (qué, cómo, dónde...)",
+  "examples": [
+   {
+    "es": "¿Qué le sucede a la niña?",
+    "zh": "这女孩怎么了？",
+    "en": "What's wrong with the girl?",
+    "ko": "그 여자아이에게 무슨 일이 있나요?"
+   },
+   {
+    "es": "¿Dónde conoció a su novia?",
+    "zh": "他是在哪儿认识他女朋友的？",
+    "en": "Where did he meet his girlfriend?",
+    "ko": "그는 어디서 여자친구를 만났나요?"
+   }
+  ]
+ },
+ "es_preterite": {
+  "name": "Preterite (comió)",
+  "examples": [
+   {
+    "es": "Él me habló de su asunto.",
+    "zh": "他跟我谈了他的事。",
+    "en": "He told me about his business.",
+    "ko": "그는 나에게 자기 일을 이야기했다."
+   },
+   {
+    "es": "Cambió el asiento con él.",
+    "zh": "我跟他换了座位。",
+    "en": "I swapped seats with him.",
+    "ko": "나는 그와 자리를 바꿨다."
+   }
+  ]
+ },
+ "es_imperfect": {
+  "name": "Imperfect (comía / vivía)",
+  "examples": [
+   {
+    "es": "Leía a la luz de la vela.",
+    "zh": "他以前就着烛光看书。",
+    "en": "He used to read by candlelight.",
+    "ko": "그는 촛불 아래서 책을 읽곤 했다."
+   },
+   {
+    "es": "Podía llamar a la puerta.",
+    "zh": "他（那时）可以去敲门。",
+    "en": "He could knock at the door.",
+    "ko": "그는 그때 문을 두드릴 수 있었다."
+   }
+  ]
+ },
+ "es_ir_a": {
+  "name": "ir a + infinitive (future)",
+  "examples": [
+   {
+    "es": "Va a secar la ropa al sol.",
+    "zh": "他要把衣服拿到太阳底下去晒。",
+    "en": "He's going to dry the clothes in the sun.",
+    "ko": "그는 옷을 햇볕에 말릴 것이다."
+   },
+   {
+    "es": "Cuando nieve, iré a esquiar.",
+    "zh": "一下雪我就去滑雪。",
+    "en": "When it snows, I'll go skiing.",
+    "ko": "눈이 오면 스키를 타러 갈 것이다."
+   }
+  ]
+ },
+ "es_tener_que": {
+  "name": "tener que + infinitive",
+  "examples": [
+   {
+    "es": "He tenido que coger el autobús.",
+    "zh": "我只好坐了公共汽车。",
+    "en": "I had to take the bus.",
+    "ko": "나는 어쩔 수 없이 버스를 탔다."
+   },
+   {
+    "es": "Tengo que ir, pase lo que pase.",
+    "zh": "不管发生什么我都得去。",
+    "en": "I have to go, whatever happens.",
+    "ko": "무슨 일이 있어도 나는 가야 한다."
+   }
+  ]
+ },
+ "es_acabar_de": {
+  "name": "acabar de + infinitive",
+  "examples": [
+   {
+    "es": "El chico acaba de llegar.",
+    "zh": "男孩刚到。",
+    "en": "The boy has just arrived.",
+    "ko": "소년이 방금 도착했다."
+   },
+   {
+    "es": "Acabo de recibir un telegrama.",
+    "zh": "我刚收到一份电报。",
+    "en": "I've just received a telegram.",
+    "ko": "나는 방금 전보를 받았다."
+   }
+  ]
+ },
+ "es_para_inf": {
+  "name": "para + infinitive (purpose)",
+  "examples": [
+   {
+    "es": "No tenemos tiempo para ir al cine.",
+    "zh": "我们没有时间去电影院。",
+    "en": "We don't have time to go to the cinema.",
+    "ko": "우리는 영화관에 갈 시간이 없다."
+   },
+   {
+    "es": "Fue al campo para hacerse curar.",
+    "zh": "他到乡下治病去了。",
+    "en": "He went to the countryside to get treatment.",
+    "ko": "그는 시골에 가서 치료를 받았다."
+   }
+  ]
+ },
+ "es_desde_hace": {
+  "name": "desde hace (duration up to now)",
+  "examples": [
+   {
+    "es": "Trabajo aquí desde hace dos meses.",
+    "zh": "我在这儿工作已经两个月了。",
+    "en": "I've been working here for two months.",
+    "ko": "나는 여기서 일한 지 두 달이 되었다."
+   },
+   {
+    "es": "Bebe solo leche desde hace tres días.",
+    "zh": "他三天以来只喝牛奶。",
+    "en": "He has drunk nothing but milk for three days.",
+    "ko": "그는 사흘째 우유만 마시고 있다."
+   }
+  ]
+ },
+ "es_mas_que": {
+  "name": "más ... que (comparison)",
+  "examples": [
+   {
+    "es": "Más vale prevenir que curar.",
+    "zh": "预防胜于治疗。",
+    "en": "Prevention is better than cure.",
+    "ko": "예방이 치료보다 낫다."
+   },
+   {
+    "es": "Tradujo menos páginas que yo.",
+    "zh": "他翻译的页数比我少。",
+    "en": "He translated fewer pages than I did.",
+    "ko": "그는 나보다 적은 페이지를 번역했다."
+   }
+  ]
+ },
+ "es_tan_como": {
+  "name": "tan + adjective + como",
+  "examples": [
+   {
+    "es": "Enrique es tan listo como Pedro.",
+    "zh": "恩里克和佩德罗一样聪明。",
+    "en": "Enrique is as clever as Pedro.",
+    "ko": "엔리케는 페드로만큼 영리하다."
+   },
+   {
+    "es": "Juan toca el piano tan bien como Rebeca.",
+    "zh": "胡安钢琴弹得跟丽贝卡一样好。",
+    "en": "Juan plays the piano as well as Rebeca.",
+    "ko": "후안은 레베카만큼 피아노를 잘 친다."
+   }
+  ]
+ },
+ "es_le": {
+  "name": "Indirect object pronoun (le / les)",
+  "examples": [
+   {
+    "es": "Le queda mucho por hacer.",
+    "zh": "他还有很多要做的事。",
+    "en": "He still has a lot to do.",
+    "ko": "그에게는 아직 할 일이 많이 남아 있다."
+   },
+   {
+    "es": "A María le gusta el cine.",
+    "zh": "玛丽亚喜欢看电影。",
+    "en": "María likes the cinema.",
+    "ko": "마리아는 영화를 좋아한다."
+   }
+  ]
+ },
+ "es_imperativo": {
+  "name": "Affirmative imperative (haz, pon, dame)",
+  "examples": [
+   {
+    "es": "Dame el periódico, por favor.",
+    "zh": "请把报纸给我。",
+    "en": "Give me the newspaper, please.",
+    "ko": "신문 좀 주세요."
+   },
+   {
+    "es": "Dime qué te pasa.",
+    "zh": "告诉我你怎么了。",
+    "en": "Tell me what's wrong with you.",
+    "ko": "무슨 일인지 말해 봐."
+   },
+   {
+    "es": "Hazlo ahora mismo.",
+    "zh": "现在就做。",
+    "en": "Do it right now.",
+    "ko": "지금 당장 해."
+   }
+  ]
+ },
+ "es_subj_present": {
+  "name": "Present subjunctive",
+  "examples": [
+   {
+    "es": "No creo que esté ya aquí.",
+    "zh": "我不认为他已经在这儿了。",
+    "en": "I don't think he's here yet.",
+    "ko": "나는 그가 벌써 여기 있다고 생각하지 않는다."
+   },
+   {
+    "es": "Me interesa que leas esto.",
+    "zh": "我感兴趣的是你读读这个。",
+    "en": "I'm interested in your reading this.",
+    "ko": "나는 네가 이것을 읽는 것에 관심이 있다."
+   }
+  ]
+ },
+ "es_conditional": {
+  "name": "Conditional (habría / compraría)",
+  "examples": [
+   {
+    "es": "Sin él no podría hacer nada.",
+    "zh": "没有他我什么也干不成。",
+    "en": "Without him I couldn't do anything.",
+    "ko": "그가 없으면 나는 아무것도 할 수 없다."
+   },
+   {
+    "es": "Me gustaría ir con usted.",
+    "zh": "我愿意跟您一起去。",
+    "en": "I'd like to go with you.",
+    "ko": "저는 당신과 함께 가고 싶습니다."
+   }
+  ]
+ },
+ "es_futuro": {
+  "name": "Simple future (comprará)",
+  "examples": [
+   {
+    "es": "Juan vendrá hoy a mi casa.",
+    "zh": "胡安今天会来我家。",
+    "en": "Juan will come to my house today.",
+    "ko": "후안이 오늘 우리 집에 올 것이다."
+   },
+   {
+    "es": "El sol te secará la piel.",
+    "zh": "太阳会把你的皮肤晒干的。",
+    "en": "The sun will dry out your skin.",
+    "ko": "햇볕이 네 피부를 말릴 것이다."
+   }
+  ]
+ },
+ "es_present_perfect": {
+  "name": "Present perfect: he + participle",
+  "examples": [
+   {
+    "es": "Me han regalado un reloj.",
+    "zh": "别人送了我一块表。",
+    "en": "I've been given a watch.",
+    "ko": "누군가 나에게 시계를 선물했다."
+   },
+   {
+    "es": "No ha aprobado el examen.",
+    "zh": "他考试没及格。",
+    "en": "He hasn't passed the exam.",
+    "ko": "그는 시험에 합격하지 못했다."
+   }
+  ]
+ },
+ "es_pluperfect": {
+  "name": "Pluperfect: había + participle",
+  "examples": [
+   {
+    "es": "Había llovido toda la noche.",
+    "zh": "下了一整夜的雨。",
+    "en": "It had rained all night.",
+    "ko": "밤새 비가 내렸었다."
+   },
+   {
+    "es": "El pobre niño se había perdido.",
+    "zh": "可怜的孩子迷路了。",
+    "en": "The poor child had got lost.",
+    "ko": "불쌍한 아이는 길을 잃었었다."
+   }
+  ]
+ },
+ "es_si_conditional": {
+  "name": "si + past subjunctive, conditional",
+  "examples": [
+   {
+    "es": "Si Juan estuviera aquí, nos ayudaría.",
+    "zh": "要是胡安在这儿，他会帮我们的。",
+    "en": "If Juan were here, he would help us.",
+    "ko": "후안이 여기 있다면 우리를 도와줄 텐데."
+   },
+   {
+    "es": "Si tuviera su teléfono, podría llamarle.",
+    "zh": "要是我有他的电话，就能给他打了。",
+    "en": "If I had his phone number, I could call him.",
+    "ko": "그이 전화번호가 있다면 전화할 수 있을 텐데."
+   }
+  ]
+ },
+ "es_subj_past": {
+  "name": "Imperfect subjunctive (-ra / -se)",
+  "examples": [
+   {
+    "es": "Si fuera a París, cogería el avión.",
+    "zh": "如果我去巴黎，就坐飞机去。",
+    "en": "If I went to Paris, I'd fly.",
+    "ko": "파리에 간다면 비행기를 탈 것이다."
+   },
+   {
+    "es": "Si terminara pronto, me iría a casa.",
+    "zh": "要是早点儿完事，我就回家了。",
+    "en": "If I finished early, I'd go home.",
+    "ko": "일찍 끝나면 집에 갈 텐데."
+   }
+  ]
+ },
+ "es_subj_pluperfect": {
+  "name": "Pluperfect subjunctive: hubiera + participle",
+  "examples": [
+   {
+    "es": "Si hubiera venido, se lo habría dicho.",
+    "zh": "要是他来了，我早就告诉他了。",
+    "en": "If he had come, I would have told him.",
+    "ko": "그가 왔다면 나는 그에게 말했을 것이다."
+   }
+  ]
+ },
+ "es_conditional_perfect": {
+  "name": "Conditional perfect: habría + participle",
+  "examples": [
+   {
+    "es": "Nos dijo que habría cenado a las seis.",
+    "zh": "他说他六点钟就吃完晚饭了。",
+    "en": "He told us he would have eaten by six.",
+    "ko": "그는 우리에게 여섯 시면 저녁을 먹었을 거라고 말했다."
+   },
+   {
+    "es": "¿No habrías dejado solos a los niños?",
+    "zh": "你总不会把孩子们单独扔下吧？",
+    "en": "Surely you wouldn't have left the children alone?",
+    "ko": "설마 아이들만 남겨 두지는 않았겠지요?"
+   }
+  ]
+ },
+ "es_se": {
+  "name": "se constructions (reflexive / passive / impersonal)",
+  "examples": [
+   {
+    "es": "Se acostumbra uno a todo.",
+    "zh": "人对什么都会习惯的。",
+    "en": "One gets used to anything.",
+    "ko": "사람은 무엇이든 익숙해진다."
+   },
+   {
+    "es": "Se burlaron de la señora.",
+    "zh": "他们嘲笑那位夫人。",
+    "en": "They made fun of the lady.",
+    "ko": "그들은 그 부인을 놀렸다."
+   }
+  ]
+ },
+ "es_como_si": {
+  "name": "como si + subjunctive",
+  "examples": [
+   {
+    "es": "Cerró los ojos, como si no quisiera verme.",
+    "zh": "他闭上眼睛，好像不愿意见我。",
+    "en": "He closed his eyes as if he didn't want to see me.",
+    "ko": "그는 나를 보기 싫다는 듯이 눈을 감았다."
+   },
+   {
+    "es": "Andas tan despacio como si fueras un enfermo.",
+    "zh": "你走得这么慢，好像生病似的。",
+    "en": "You walk as slowly as if you were ill.",
+    "ko": "너는 마치 아픈 사람처럼 아주 느리게 걷는다."
+   }
+  ]
+ },
+ "es_llevar_gerund": {
+  "name": "llevar + time + gerund",
+  "examples": [
+   {
+    "es": "El cura lleva predicando media hora.",
+    "zh": "神父已经布道半小时了。",
+    "en": "The priest has been preaching for half an hour.",
+    "ko": "신부는 삼십 분째 설교하고 있다."
+   },
+   {
+    "es": "Llevaba construyendo la casa dos años.",
+    "zh": "那房子他已经盖了两年了。",
+    "en": "He had been building the house for two years.",
+    "ko": "그는 그 집을 이 년째 짓고 있었다."
+   }
+  ]
+ },
+ "es_de_haber": {
+  "name": "de haber + participle (inverted condition)",
+  "examples": [
+   {
+    "es": "De haber favorecido el tiempo, los árboles estarían más altos.",
+    "zh": "要是天气好，树会长得更高。",
+    "en": "Had the weather been favourable, the trees would be taller.",
+    "ko": "날씨가 좋았더라면 나무가 더 컸을 것이다."
+   }
+  ]
+ },
+ "es_por_mas_que": {
+  "name": "por más que + subjunctive",
+  "examples": [
+   {
+    "es": "Por más que lloró, no logró ablandarle.",
+    "zh": "她哭也没能把他说软了。",
+    "en": "However much she cried, she could not soften him.",
+    "ko": "그녀는 아무리 울어도 그를 무르게 만들지 못했다."
+   }
+  ]
+ },
+ "es_no_es_que": {
+  "name": "no es que + subjunctive",
+  "examples": [
+   {
+    "es": "No es que no puedan oír.",
+    "zh": "并不是他们听不见。",
+    "en": "It's not that they can't hear.",
+    "ko": "그들이 들을 수 없는 것은 아니다."
+   }
+  ]
+ }
+}

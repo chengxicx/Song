@@ -1,6 +1,6 @@
 {% if form.general_errors | length > 0 %}
 <div class="flash-notice-narrow">
-  <p>Errors:</p>
+  <p>{{ t('Errors:') }}</p>
   {% for msg in form.general_errors %}
   <p>{{ msg | safe }}</p>
   {% endfor %}
@@ -19,9 +19,7 @@
 </div>
 {% endfor %}
 
-<p>For notes on form usage, see
-  <a href="https://luteorg.github.io/lute-manual/usage/ankiexport/defining-exports.html">the user manual</a>.
-</p>
+<p>{{ t('For notes on form usage, see <a href="https://luteorg.github.io/lute-manual/usage/ankiexport/defining-exports.html">the user manual</a>.') }}</p>
   
 <form id="export_spec_form" method="POST">
   {{ form.hidden_tag() }}
@@ -73,11 +71,11 @@
   </table>
 
   <div class="form-action-row">
-    <button type="submit" class="btn btn-primary" onclick="set_anksettings_field(); return true;">Save</button>
-    <button id="btnCancel" class="btn btn-secondary" onclick="window.location = '{{ url_for('ankiexport.anki_index') }}'; return false;">Cancel</button>
+    <button type="submit" class="btn btn-primary" onclick="set_anksettings_field(); return true;">{{ t('Save') }}</button>
+    <button id="btnCancel" class="btn btn-secondary" onclick="window.location = '{{ url_for('ankiexport.anki_index') }}'; return false;">{{ t('Cancel') }}</button>
 
     {% if spec.id %}
-    <button id="btnDelete" class="btn btn-danger" onclick="confirm_delete({{ spec.id }}); return false;">Delete</button>
+    <button id="btnDelete" class="btn btn-danger" onclick="confirm_delete({{ spec.id }}); return false;">{{ t('Delete') }}</button>
     {% endif %}
   </div>
 
@@ -126,7 +124,7 @@
   function load_select(sel_id, sel_options, current_value) {
     const ntsel = $(sel_id);
     ntsel.empty();
-    ntsel.append(new Option("(select)", ""))
+    ntsel.append(new Option(I18N.t("(select)"), ""))
     sel_options.forEach(f => {
       ntsel.append(new Option(f, f));
     });
@@ -136,7 +134,7 @@
   function confirm_delete(spec_id) {
     if (spec_id == null)
       return;
-    if (!window.confirm("Delete export?"))
+    if (!window.confirm(I18N.t("Delete export?")))
       return;
     window.location = `/ankiexport/spec/delete/${spec_id}`;
   }

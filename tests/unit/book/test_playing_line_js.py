@@ -56,11 +56,12 @@ def _run(payload):
     return json.loads(proc.stdout)["results"]
 
 
-def _run_steps(steps, paragraphs=None, cue_map=None):
+def _run_steps(steps, paragraphs=None, cue_map=None, cue_page_starts=None):
     return _run(
         {
             "paragraphs": PARAGRAPHS if paragraphs is None else paragraphs,
             "cue_map": cue_map,
+            "cue_page_starts": cue_page_starts,
             "steps": steps,
         }
     )
@@ -205,6 +206,54 @@ def test_a_repeated_line_marks_only_the_first():
     assert results[-1]["marked"] == [{"para": 0, "sentence": None, "text": "Hola."}]
 
 
+# ---------------------------------------------------------------------
+# Which page a cue lives on.
+#
+# The media players turn the page when the playhead leaves the page being
+# read, and they resolve "which page" from the first-cue index of every
+# page (window.LUTE_CUE_PAGE_STARTS).  An off-by-one here does not fail
+# loudly: the reader is simply sent one page short, or one page past.
+
+
+def _pages(steps, starts):
+    return [
+        r.get("page") for r in _run_steps(steps, cue_page_starts=starts)
+    ]
+
+
+def test_a_cue_resolves_to_the_page_holding_it():
+    # Page 1 holds cues 0-1, page 2 cues 2-4, page 3 cues 5-5.
+    starts = [0, 2, 5]
+    assert _pages(
+        [{"page_of_cue": i} for i in range(6)], starts
+    ) == [1, 1, 2, 2, 2, 3]
+
+
+def test_the_first_cue_of_a_page_resolves_to_that_page():
+    "The boundary belongs to the page it starts, not the one before it."
+    assert _pages([{"page_of_cue": 0}], [0, 3]) == [1]
+    assert _pages([{"page_of_cue": 3}], [0, 3]) == [2]
+
+
+def test_a_cue_before_the_first_page_stays_put():
+    """
+    A cue index the map doesn't cover (a book whose cues were rewritten)
+    gives 0, which the caller reads as "no page" -- it stays where it is
+    instead of turning to page 1 blind.
+    """
+    assert _pages([{"page_of_cue": 0}], [4, 9]) == [0]
+
+
+def test_a_book_without_a_map_never_turns_the_page():
+    assert _pages([{"page_of_cue": 0}, {"page_of_cue": 9}], None) == [0, 0]
+    assert _pages([{"page_of_cue": 0}], []) == [0]
+
+
+def test_a_negative_or_missing_cue_has_no_page():
+    "Playback with no cue yet (-1) must not page anywhere."
+    assert _pages([{"page_of_cue": -1}], [0, 3]) == [0]
+
+
 def test_the_tts_player_marks_the_sentence_it_passes():
     """
     The TTS path hands over the span itself, so the mark goes on that
@@ -232,3 +281,69 @@ def test_a_sentence_a_page_turn_dropped_clears_the_mark():
     )
     assert results[0]["marked"] == [{"para": 2, "sentence": 0, "text": "Tengo"}]
     assert results[-1]["marked"] == []
+
+
+# A page the furigana has annotated: a word with a reading is rendered
+# <ruby>word<rt>reading</rt></ruby> (lute-furigana.js), so the line's
+# textContent is the word and its reading run together.
+RUBY_PARAGRAPHS = [
+    # One sentence, given as a token list: a {base, reading} token is a
+    # furigana'd word, a string is plain text.
+    [
+        [
+            {"base": "間", "reading": "あいだ"},
+            "は本当",
+            {"base": "事", "reading": "こと"},
+            "です。",
+        ]
+    ],
+    [["うん？"]],
+]
+
+
+def test_a_furigana_reading_is_not_part_of_the_line():
+    """
+    The mark must survive furigana.  A bare textContent flattens the
+    reading into the sentence ("間" reads "間あいだ"), so the line never
+    equals its cue text and the underline is dropped -- on every line
+    holding a reading, which is why it survives the first sentence or two
+    (no kanji, no ruby) and disappears once the readings land.  Measured
+    on production: 10 of 28 lines still matched with readings in, 28 of
+    28 without.
+    """
+    results = _run_steps(
+        [{"set_cue_index": [0, "間は本当事です。"]}],
+        paragraphs=RUBY_PARAGRAPHS,
+        cue_map=[0, 1],
+    )
+    assert results[-1]["marked"] == [
+        {"para": 0, "sentence": None, "text": "間は本当事です。"}
+    ]
+
+
+def test_the_text_fallback_ignores_furigana_too():
+    "Same answer without the map: the cue text is matched against the lines."
+    results = _run_steps(
+        [{"set_cue_index": [1, "間は本当事です。"]}],
+        paragraphs=RUBY_PARAGRAPHS,
+        cue_map=None,
+    )
+    assert results[-1]["marked"] == [
+        {"para": 0, "sentence": None, "text": "間は本当事です。"}
+    ]
+
+
+def test_a_line_without_readings_still_matches_beside_ruby_lines():
+    "Kana-only lines carry no ruby; they keep matching their cues."
+    results = _run_steps(
+        [
+            {"set_cue_index": [0, "間は本当事です。"]},
+            {"set_cue_index": [1, "うん？"]},
+        ],
+        paragraphs=RUBY_PARAGRAPHS,
+        cue_map=[0, 1],
+    )
+    assert [r["marked"] for r in results] == [
+        [{"para": 0, "sentence": None, "text": "間は本当事です。"}],
+        [{"para": 1, "sentence": None, "text": "うん？"}],
+    ]

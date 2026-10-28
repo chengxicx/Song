@@ -14,6 +14,7 @@ import importlib.util
 import json
 import logging
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -344,6 +345,9 @@ def transcribe_to_cues(
                 progress_cb(min(99, int(seg.end / duration * 100)))
 
     punctuate_cues(cues, lang_code)
+    drop_wordless_cues(cues)
+    for c in cues:
+        c["text"] = strip_word_spaces(c["text"], lang_code)
     text = "\n".join(c["text"] for c in cues if c["text"])
     return text, json.dumps(cues, ensure_ascii=False)
 
@@ -364,6 +368,54 @@ _CUE_SENTENCE_MARKS = {"ja": "。", "zh": "。", "yue": "。"}
 _CUE_CLAUSE_MARKS = {"ja": "、", "zh": "、", "yue": "、"}
 
 _CUE_ALREADY_TERMINAL = "。．.、，,！!？?…」』）)]"
+
+
+# Characters that carry no words on their own.  A cue built only from
+# these is noise, not speech.  Deliberately limited to punctuation and
+# whitespace: anything else (♪, digits, letters) might be real content.
+_WORDLESS_CHARS = set("。．.、，,！!？?…‥「」『』（）()［］【】〈〉《》 \u3000-—～~")
+
+
+def _is_wordless(text):
+    "True when text contains no letter, digit, kana or kanji at all."
+    return all(ch in _WORDLESS_CHARS for ch in text)
+
+
+def drop_wordless_cues(cues):
+    """
+    In place: remove cues whose text has no words.
+
+    A punctuation-only cue ('。', '？') is the recognition of a breath, a
+    page turn or background music, and renders in the reader as a stray
+    line of punctuation.  Both engines can produce them -- silero's
+    min_speech_duration only says the *audio* was long enough, not that
+    it held speech, and whisper's vad_filter has the same gap.  Dropping
+    them is safe: a real cue always has at least one word character.
+    """
+    cues[:] = [c for c in cues if c["text"] and not _is_wordless(c["text"])]
+    return cues
+
+
+# SenseVoice separates Japanese/Chinese words with spaces ("させ て
+# もらいま した"), which is noise for languages written without them and
+# breaks any exact text comparison (shadowing scoring).  Korean and
+# English are written with spaces, so they are left alone.  Whisper cues
+# never carry these spaces; this is applied to both engines for one
+# consistent rule.
+_NO_SPACE_LANGS = {"ja", "zh", "yue"}
+
+# A run of spaces touching a CJK character on either side is a
+# SenseVoice artifact.  Spaces between two non-CJK characters are left
+# alone, so "iPhone 15" survives.
+_CJK = r"\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uff66-\uff9d"
+_CJK_ADJACENT_SPACE = re.compile(rf"(?<=[{_CJK}])[ \u3000]+|[ \u3000]+(?=[{_CJK}])")
+
+
+def strip_word_spaces(text, lang_code):
+    "Drop the word-separating spaces SenseVoice adds to CJK text."
+    if (lang_code or "").lower() not in _NO_SPACE_LANGS:
+        return text
+    return _CJK_ADJACENT_SPACE.sub("", text).strip()
 
 
 def punctuate_cues(cues, lang_code):
@@ -416,6 +468,37 @@ def _safe_remove(path):
         pass
 
 
+def apply_reference_text(cues_json, reference_text):
+    """
+    Replace the transcription's words with the caller's transcript.
+
+    The recognizer is kept strictly for timing: its cues are aligned
+    against the supplied text, sentence by sentence, and the book's text
+    becomes the supplied text.  This is what makes a textbook import
+    exact -- the recognizer mis-hears names and homophones ('チョさん'
+    for 張さん) and clips a word onset now and then, none of which can
+    reach the reader once the text comes from the book itself.
+
+    Returns (text, cues_json).  Raises RuntimeError when the text and the
+    audio agree too little for the alignment to mean anything -- better
+    to tell the user than to write a book whose subtitles jump around.
+    """
+    from lute.book import text_align
+
+    aligned, ratio = text_align.align_cues_to_reference(
+        json.loads(cues_json), reference_text
+    )
+    if aligned is None or ratio < text_align.MIN_MATCH_RATIO:
+        raise RuntimeError(
+            "The reference text does not match this recording closely "
+            f"enough ({ratio * 100:.0f}% similar; {text_align.MIN_MATCH_RATIO * 100:.0f}% "
+            "is the minimum).  Check that it is the text of this audio, or "
+            "leave it empty to keep the plain transcription."
+        )
+    text = "\n".join(c["text"] for c in aligned)
+    return text, json.dumps(aligned, ensure_ascii=False)
+
+
 def start_task(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     app,
     audio_path,
@@ -426,6 +509,7 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
     username=None,
     retranscribe_book_id=None,
     temp_audio=True,
+    reference_text=None,
 ):
     """
     Register and launch a background transcription task.
@@ -445,7 +529,10 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
     text and cues instead of creating one (edit page re-transcribe);
     temp_audio says whether audio_path is a disposable temp file (an
     upload or URL download) or the book's own stored audio, which must
-    survive the task.  Returns the task_id.
+    survive the task.  reference_text is the user's transcript of the
+    recording, if they supplied one: transcription then supplies only
+    the timing and the text comes from that transcript (see
+    apply_reference_text).  Returns the task_id.
     """
     task_id = uuid.uuid4().hex
     _set_state(task_id, "queued", message="Queued.")
@@ -468,6 +555,7 @@ def start_task(  # pylint: disable=too-many-arguments,too-many-positional-argume
             username,
             retranscribe_book_id,
             temp_audio,
+            reference_text,
         ),
         daemon=True,
     )
@@ -486,6 +574,7 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
     username,
     retranscribe_book_id=None,
     temp_audio=True,
+    reference_text=None,
 ):
     """
     Thread body: transcribe, then import (or update) the book.
@@ -560,6 +649,10 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
                     )
                 if not (text and text.strip()):
                     raise RuntimeError("The transcription produced no text.")
+                if reference_text and reference_text.strip():
+                    # The user pasted the text being read: keep only the
+                    # timing from the recognizer (see apply_reference_text).
+                    text, cues_json = apply_reference_text(cues_json, reference_text)
 
                 if retranscribe_book_id is not None:
                     # Re-transcribe (edit page): replace the existing

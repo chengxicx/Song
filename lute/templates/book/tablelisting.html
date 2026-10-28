@@ -1,5 +1,5 @@
 <!-- The default language selector.  This is moved into the datatables toolbar during setup. -->
-<select id="defaultLanguageSelect" class="dataTables_filter" title="Default language">
+<select id="defaultLanguageSelect" class="dataTables_filter" title="{{ t('Default language') }}">
   {% for lang_choice in language_choices %}
     <option value="{{ lang_choice[0] }}">{{ lang_choice[1] }}</option>
   {% endfor %}
@@ -9,24 +9,24 @@
   <thead>
     <tr>
       <th style="text-align: left">
-        <span id="typeHeaderLabel">Type</span>
+        <span id="typeHeaderLabel">{{ t('Type') }}</span>
         <span id="activeTypeFilter" style="display:none;vertical-align:middle;">
-          <span id="activeTypeName"></span><a href="#" id="clearTypeFilter" style="margin-left:6px;text-decoration:none;vertical-align:middle;display:inline-flex;align-items:center;" title="Clear type filter">
+          <span id="activeTypeName"></span><a href="#" id="clearTypeFilter" style="margin-left:6px;text-decoration:none;vertical-align:middle;display:inline-flex;align-items:center;" title="{{ t('Clear type filter') }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </a>
         </span>
-        <a href="#" id="typeDisplayToggle" class="type-display-toggle" title="Show text labels" onclick="toggle_book_type_display(event)">
+        <a href="#" id="typeDisplayToggle" class="type-display-toggle" title="{{ t('Show text labels') }}" onclick="toggle_book_type_display(event)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4c6ef5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="2" y="6.5" width="20" height="11" rx="5.5"></rect>
             <circle cx="7.5" cy="12" r="2.4" fill="#4c6ef5" stroke="none"></circle>
           </svg>
         </a>
       </th>
-      <th style="text-align: left">Title
-        <a class="series-settings-gear" href="/book/settings" title="Configure Book Sets tags" onclick="event.stopPropagation();">
+      <th style="text-align: left">{{ t('Title') }}
+        <a class="series-settings-gear" href="/book/settings" title="{{ t('Configure Book Sets tags') }}" onclick="event.stopPropagation();">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4c6ef5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path>
             <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path>
@@ -34,11 +34,11 @@
           </svg>
         </a>
       </th>
-      <th style="text-align: left">Language</th>
+      <th style="text-align: left">{{ t('Language') }}</th>
       <th style="text-align: left">
-        <span id="tagsHeaderLabel">Tags</span>
+        <span id="tagsHeaderLabel">{{ t('Tags') }}</span>
         <span id="activeTagFilter" style="display:none;vertical-align:middle;">
-          <span id="activeTagName"></span><a href="#" id="clearTagFilter" style="margin-left:6px;text-decoration:none;vertical-align:middle;display:inline-flex;align-items:center;" title="Clear tag filter">
+          <span id="activeTagName"></span><a href="#" id="clearTagFilter" style="margin-left:6px;text-decoration:none;vertical-align:middle;display:inline-flex;align-items:center;" title="{{ t('Clear tag filter') }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -46,25 +46,25 @@
           </a>
         </span>
       </th>
-      <th style="text-align: left">Progress</th>
-      <th style="text-align: left">Word count</th>
-      <th style="text-align: left">Status
-        <a href="/refresh_all_stats" class="refresh" title="Refresh stats for all books"></a>
+      <th style="text-align: left">{{ t('Progress') }}</th>
+      <th style="text-align: left">{{ t('Word count') }}</th>
+      <th style="text-align: left">{{ t('Status') }}
+        <a href="/refresh_all_stats" class="refresh" title="{{ t('Refresh stats for all books') }}"></a>
       </th>
       <th style="text-align: left">
-        <span id="newWordHeaderLabel">New word</span>
+        <span id="newWordHeaderLabel">{{ t('New word') }}</span>
         <span id="activeNewWordFilter" style="display:none;vertical-align:middle;">
-          <span id="activeNewWordName"></span><a href="#" id="clearNewWordFilter" style="margin-left:6px;text-decoration:none;vertical-align:middle;display:inline-flex;align-items:center;" title="Clear new word filter">
+          <span id="activeNewWordName"></span><a href="#" id="clearNewWordFilter" style="margin-left:6px;text-decoration:none;vertical-align:middle;display:inline-flex;align-items:center;" title="{{ t('Clear new word filter') }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </a>
         </span>
-        <a href="/refresh_all_stats" class="refresh" title="Refresh new word stats for all books"></a>
+        <a href="/refresh_all_stats" class="refresh" title="{{ t('Refresh new word stats for all books') }}"></a>
       </th>
-      <th style="text-align: left">Last read</th>
-      <th style="text-align: left">Actions</th>
+      <th style="text-align: left">{{ t('Last read') }}</th>
+      <th style="text-align: left">{{ t('Actions') }}</th>
     </tr>
   </thead>
 </table>
@@ -73,7 +73,7 @@
 <div id="datatables_config_widget">
   <img
     src="{{ vstatic('icn/settings-gear-icon.svg') }}"
-    title="configuration"
+    title="{{ t('configuration') }}"
     id="datatables_config_toggle"
     style="width: 1rem"
     />
@@ -99,6 +99,11 @@
 <script type="text/javascript" src="{{ vstatic('vendor/dayjs/relativeTime.js') }}" defer charset="utf-8"></script>
 <script type="text/javascript" src="{{ vstatic('js/book-type-icons.js') }}" defer charset="utf-8"></script>
 <script type="text/javascript" src="{{ vstatic('js/book-listing-shared.js') }}" defer charset="utf-8"></script>
+{# ^ deferred, so it executes AFTER the inline script below, which defines
+   the real setTagFilter / setNewWordFilter / setTypeFilter.  Anything in
+   the shared file that declares those names at top level would clobber
+   them (it must provide guarded defaults instead) -- that is why the tag,
+   new-word and type click-filters once did nothing. #}
 <script>
   var thresholds = [
   { l: 's', r: 1 },
@@ -195,6 +200,15 @@
     // state.  localStorage keeps the instant per-browser fallback.
     var _saveTimer = null;
     var _pendingStateJson = null;
+    // Natural sort for the title column: episode numbers compare
+    // numerically, so "2." sorts before "10." (same as the series page).
+    var natural_collator = new Intl.Collator([], { numeric: true, sensitivity: 'base' });
+    $.fn.dataTable.ext.type.order['natural-asc'] = function (a, b) {
+      return natural_collator.compare(String(a), String(b));
+    };
+    $.fn.dataTable.ext.type.order['natural-desc'] = function (a, b) {
+      return natural_collator.compare(String(b), String(a));
+    };
     book_listing_table = $('#booktable').DataTable({
       layout: {
         topStart: [
@@ -208,7 +222,7 @@
           {
             info: {
               callback: function (s, start, end, max, total, result) {
-                return `${start} to ${end} of ${max}`;
+                return `${start} ${I18N.t('to')} ${end} ${I18N.t('of')} ${max}`;
               }
             }
           }
@@ -217,7 +231,7 @@
       },
       {% if status != 'Archived' %}
       "language": {
-            "emptyTable": "No books available. <a href='/book/new'>Create one?</a>"
+            "emptyTable": I18N.t("No books available. <a href='/book/new'>Create one?</a>")
       },
       {% endif %}
       responsive: false,
@@ -306,7 +320,7 @@
       search: { search: initial_search },
       columns: [
         { name: "BookType", className: "col-type", width: "4%", data: "BookType", searchable: false, render: render_book_type },
-        { name: "BkTitle", className: "col-title", width: "24%", data: "BkTitle", render: render_book_title },
+        { name: "BkTitle", className: "col-title", width: "24%", data: "BkTitle", type: "natural", render: render_book_title },
         { name: "LgName", className: "col-lang", width: "8%", data: "LgName" },
         { name: "TagList", className: "col-tags", width: "15%", data: "TagList", render: render_tag_list },
         { name: "ProgressPercent", className: "col-progress", width: "8%", data: "ProgressPercent", searchable: false, render: render_book_progress },
@@ -400,7 +414,7 @@
     } catch (err) { /* ignore */ }
     const typeToggle = document.getElementById('typeDisplayToggle');
     if (typeToggle && book_type_display_mode === 'text') {
-      typeToggle.title = 'Show icons';
+      typeToggle.title = I18N.t('Show icons');
     }
     const current_language_id = {{ current_language_id }};
     // Language filter is set up first, because its value
@@ -418,16 +432,16 @@
       // 索引取标签名会错位。因此这里用硬编码的列名 → 标签映射，
       // 完全脱离 DOM，确保标签与列索引一一对应。
       var columnLabels = {
-        BookType: 'Type',
-        BkTitle: 'Title',
-        LgName: 'Language',
-        TagList: 'Tags',
-        ProgressPercent: 'Progress',
-        WordCount: 'Word count',
-        UnknownPercent: 'Status',
-        NewWordPercent: 'New word',
-        LastOpenedDate: 'Last read',
-        Actions: 'Actions'
+        BookType: I18N.t('Type'),
+        BkTitle: I18N.t('Title'),
+        LgName: I18N.t('Language'),
+        TagList: I18N.t('Tags'),
+        ProgressPercent: I18N.t('Progress'),
+        WordCount: I18N.t('Word count'),
+        UnknownPercent: I18N.t('Status'),
+        NewWordPercent: I18N.t('New word'),
+        LastOpenedDate: I18N.t('Last read'),
+        Actions: I18N.t('Actions')
       };
       book_listing_table.columns().every(function() {
         var colIdx = this.index();
@@ -436,7 +450,7 @@
         var colSettings = book_listing_table.settings().init();
         var colName = colSettings.columns[colIdx].name;
         var title = columnLabels[colName] || colName;
-        if (title === 'Actions') return;
+        if (colName === 'Actions') return;
         var label = document.createElement('label');
         label.className = 'colvis-item';
         var cb = document.createElement('input');

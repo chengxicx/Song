@@ -11,12 +11,14 @@ rendered sentence spans the client sends back.
 """
 
 import difflib
+import json
 import logging
 import os
 import re
 import threading
 import time
 import uuid
+from datetime import datetime, timezone
 
 import jaconv
 
@@ -32,8 +34,14 @@ from lute.book.whisper_transcribe import (
 )
 from lute.db import db
 from lute.models.repositories import LanguageRepository
+from lute.models.shadowing import ShadowAttempt
 from lute.multiuser import context as mu_context
-from lute.read.render.grammar_analysis import is_japanese_language
+from lute.read.render.grammar_analysis import (
+    is_cantonese_language,
+    is_japanese_language,
+    is_mandarin_chinese_language,
+    is_thai_language,
+)
 
 # Per-word verdicts, parallel to the sentence's word spans.
 STATUS_MISS = 0  # never spoken (漏读)
@@ -53,6 +61,17 @@ FUZZY_MATCH_RATIO = 0.6
 # the half-credit "misread" verdict (with the heard word shown) rather
 # than a silent miss, so Japanese pairs near-match from 0.45 up.
 FUZZY_MATCH_RATIO_JA = 0.45
+
+
+def tokenize_for_diff(text, language):
+    """
+    The diff-side token list for a sentence the client has not rendered
+    itself: the review session has no reading page to collect data-text
+    word spans from, so the card's sentence is tokenized here, into the
+    same word-token space _spoken_tokens produces from transcriptions
+    (same parser, same cleaning, same punctuation guards).
+    """
+    return _spoken_tokens(text or "", language)
 
 
 def transcribe_clip(audio_path, lang_code, model_size=DEFAULT_MODEL_SIZE):
@@ -204,29 +223,49 @@ def _align_context_readings(tokens, morphs):
     return out
 
 
+def supports_readings(language):
+    """
+    True when the language's parser can supply pronunciation readings,
+    i.e. drawing furigana above words is meaningful: Japanese (kana via
+    Sudachi/MeCab), Mandarin (pinyin), Cantonese (jyutping) and Thai
+    (RTGS romanization) via the plugin parsers.  Other languages'
+    scripts already show their own pronunciation, so a reading above
+    the word adds nothing.
+    """
+    return (
+        is_japanese_language(language)
+        or is_mandarin_chinese_language(language)
+        or is_cantonese_language(language)
+        or is_thai_language(language)
+    )
+
+
 def annotate_tokens(tokens, language, full_text=None):
     """
-    Pair each token with its kana reading for the shadowing panel.
+    Pair each token with its pronunciation reading for the shadowing
+    panel.
 
-    Returns [{"text": surface, "reading": kana-or-None}, ...], parallel to
+    Returns [{"text": surface, "reading": reading-or-None}, ...], parallel to
     the input.  The panel draws the reading above the word (furigana) and
     speaks it when the word is tapped.
 
     When full_text (the whole sentence the tokens belong to) is given,
-    the parser reads it as one piece and the per-morpheme readings are
-    aligned onto the tokens, so readings follow the sentence's context
-    (一つ -> 一=ひと, not the isolated 一=いち).  Tokens that can't be
-    covered that way fall back to the per-token reading -- the same
-    source term lookups use.  Non-Japanese languages (and the
-    japanese_reading setting being off) yield reading=None, so the panel
-    simply shows the plain word.
+    the Japanese parser reads it as one piece and the per-morpheme
+    readings are aligned onto the tokens, so readings follow the
+    sentence's context (一つ -> 一=ひと, not the isolated 一=いち).
+    Tokens that can't be covered that way fall back to the per-token
+    reading -- the same source term lookups use.  Chinese parsers
+    (pinyin / jyutping) have no contextual parse, so they always answer
+    per token -- word-level input already resolves most polyphones
+    (银行 -> háng).  Languages without reading support yield
+    reading=None, so the panel simply shows the plain word.
     """
     cleaned = [{"text": _clean_token(t), "reading": None} for t in tokens]
-    if not is_japanese_language(language):
+    if not supports_readings(language):
         return cleaned
 
     parser = language.parser
-    if full_text:
+    if full_text and is_japanese_language(language):
         try:
             morphs = parser.get_context_readings(full_text)
         except Exception:  # pylint: disable=broad-exception-caught
@@ -351,6 +390,53 @@ def _is_kana_only(token):
     return bool(token) and _KANA_ONLY_RE.match(token) is not None
 
 
+# Any kanji, including the 々 iteration mark: the side that carries one
+# is the side the parser had to look up a reading for.
+_KANJI_RE = re.compile(r"[\u4E00-\u9FFF\u3005]")
+
+
+def _has_kanji(token):
+    "True if the token contains a kanji character."
+    return _KANJI_RE.search(token or "") is not None
+
+
+def _same_word_across_script(original_token, spoken_token, language):
+    """
+    True when the engine spelled a kana word as its usual kanji.
+
+    Japanese is scored on readings, and a kanji's reading is a fixed
+    dictionary field: SenseVoice answering the book's わたし with 私
+    hands the diff ワタクシ, which sits 0.857 away from わたし -- above
+    the near-miss threshold, so a flawless reading of the printed kana
+    still scores half.  The two tokens are the same word, so compare
+    the dictionary's normalized spelling instead of the sound (see
+    parser.get_normalized_form: わたし/あたし/わたくし all file under 私,
+    while 箸/橋/端 keep their own spellings).
+
+    Only a kana sentence token against a kanji transcription qualifies.
+    The kana side proves what the learner was told to say, so the kanji
+    is the engine's own spelling choice for that sound.  Two kanji
+    tokens stay judged on their readings (一日 as ついたち is a real
+    misread), and a kana transcription is a transcript of the sound,
+    which is exactly what the reading comparison already measures.
+    """
+    if not is_japanese_language(language):
+        return False
+    raw_original = _clean_token(original_token)
+    raw_spoken = _clean_token(spoken_token)
+    if not (_is_kana_only(raw_original) and _has_kanji(raw_spoken)):
+        return False
+    normalized = getattr(language.parser, "get_normalized_form", None)
+    if normalized is None:
+        return False
+    try:
+        original_form = normalized(raw_original) or raw_original
+        spoken_form = normalized(raw_spoken) or raw_spoken
+    except Exception:  # pylint: disable=broad-exception-caught
+        return False
+    return bool(original_form) and original_form == spoken_form
+
+
 def _kana_script_restorer(original_tokens, language):
     """
     Return token -> token, re-rendering the transcription's kana in the
@@ -392,6 +478,28 @@ def _kana_script_restorer(original_tokens, language):
     return restore
 
 
+def _reading_in_the_lines_script(reading, kana):
+    """
+    The sentence's kana, rendered the way the panel's other readings are.
+
+    The reading a token already carried decides: a katakana reading means
+    the japanese_reading setting asks for katakana, a latin one for
+    romaji.  Without this the one corrected word would sit in a script of
+    its own, in the middle of a line of furigana drawn in another.
+    """
+    kana = (kana or "").strip()
+    if not kana:
+        return None
+    current = (reading or "").strip()
+    if current and _is_kana_only(current):
+        if current == jaconv.hira2kata(current):
+            return jaconv.hira2kata(kana)
+        return jaconv.kata2hira(kana)
+    if current and current.isascii():
+        return jaconv.kata2alphabet(jaconv.hira2kata(kana))
+    return jaconv.kata2hira(kana)
+
+
 # Unvoiced base of each voiced kana.  ASR very commonly swaps voicing
 # on weak syllables (そうですか heard as そうです が); a key pair that
 # matches once the dakuten/handakuten marks are stripped is a near-miss
@@ -430,16 +538,189 @@ def _strip_dakuten(key):
     return "".join(_DAKUTEN_BASE.get(ch, ch) for ch in key)
 
 
+# Hangul leakage: SenseVoice trains Japanese and Korean on one model, and
+# a Japanese word whose sound has a Korean cognate can come back written
+# in hangul (先輩 せんぱい -> 선배).  Unicode composes every syllable from
+# its (initial, medial, final) jamo indices, so the Revised Romanization
+# needs no dictionary -- and the romaja can be matched against the romaji
+# of the kana reading in the fuzzy rescue.
+_HANGUL_RE = re.compile(r"[\uAC00-\uD7A3]")
+
+_HANGUL_INITIALS = (
+    "g",
+    "kk",
+    "n",
+    "d",
+    "tt",
+    "r",
+    "m",
+    "b",
+    "pp",
+    "s",
+    "ss",
+    "",
+    "j",
+    "jj",
+    "ch",
+    "k",
+    "t",
+    "p",
+    "h",
+)
+_HANGUL_MEDIALS = (
+    "a",
+    "ae",
+    "ya",
+    "yae",
+    "eo",
+    "e",
+    "yeo",
+    "ye",
+    "o",
+    "wa",
+    "wae",
+    "oe",
+    "yo",
+    "u",
+    "wo",
+    "we",
+    "wi",
+    "yu",
+    "eu",
+    "ui",
+    "i",
+)
+_HANGUL_FINALS = (
+    "",
+    "k",
+    "k",
+    "k",
+    "n",
+    "n",
+    "n",
+    "t",
+    "l",
+    "k",
+    "m",
+    "p",
+    "l",
+    "l",
+    "p",
+    "l",
+    "m",
+    "p",
+    "p",
+    "t",
+    "t",
+    "ng",
+    "t",
+    "t",
+    "k",
+    "t",
+    "p",
+    "t",
+)
+
+
+def _hangul_to_romaja(text):
+    "Hangul syllables -> Revised Romanization; other characters pass through."
+    if not _HANGUL_RE.search(text or ""):
+        return text or ""
+    out = []
+    for ch in text:
+        offset = ord(ch) - 0xAC00
+        if not 0 <= offset <= 11171:
+            out.append(ch)
+            continue
+        out.append(
+            _HANGUL_INITIALS[offset // 588]
+            + _HANGUL_MEDIALS[(offset % 588) // 28]
+            + _HANGUL_FINALS[offset % 28]
+        )
+    return "".join(out)
+
+
+# Simplified-text variants opencc's t2s table misses.  馀 is the standard
+# simplified variant of 餘 (余) -- the 鲁迅 sentence runs 二千馀里 -- while
+# the engines emit 余, and 妳 likewise for 你.  Same word, same sound:
+# without the fold a correctly-read character scores a near-miss at best
+# (same pinyin, different glyph).
+_ZH_VARIANT_FOLD = {"馀": "余", "妳": "你"}
+
+# Han numerals fold to their numeric VALUE on the Chinese diff keys:
+# SenseVoice's ITN answers 二千/二十 as 2000/20, and a correctly-read
+# number must not miss just because the glyphs differ.  Folding on value
+# rather than spelling also unifies the digit-by-digit year reading
+# (二〇二五) with the cardinal one (两千零二十五) -- both are 2025.  Runs
+# convert mechanically, not semantically: the 一 in 一直 becomes 1 on
+# both sides alike, so the keys still compare equal.
+_ZH_NUMERAL_RE = re.compile(r"[零〇一二三四五六七八九兩两十百千万萬亿億]+")
+_ZH_NUMERAL_DIGITS = {
+    "零": 0,
+    "〇": 0,
+    "一": 1,
+    "二": 2,
+    "兩": 2,
+    "两": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
+}
+_ZH_NUMERAL_UNITS = {
+    "十": 10,
+    "百": 100,
+    "千": 1000,
+    "万": 10000,
+    "萬": 10000,
+    "亿": 10**8,
+    "億": 10**8,
+}
+
+
+def _han_numeral_run_value(run):
+    """
+    The integer a run of Han numeral characters stands for.
+
+    Digits concatenate (二〇二五 -> 2025); units multiply the digits
+    before them and add into the running total (二千 -> 2000, 一千万 ->
+    10000000); a unit with no digits before it counts as one (十九 -> 19).
+    """
+    total, section, num = 0, 0, 0
+    for ch in run:
+        if ch in _ZH_NUMERAL_DIGITS:
+            num = num * 10 + _ZH_NUMERAL_DIGITS[ch]
+        else:
+            unit = _ZH_NUMERAL_UNITS[ch]
+            if unit >= 10000:
+                total = (total + section + num) * unit
+                section, num = 0, 0
+            else:
+                section += (num or 1) * unit
+                num = 0
+    return total + section + num
+
+
+def _zh_numeral_key(text):
+    "Replace every Han numeral run with its Arabic value."
+    return _ZH_NUMERAL_RE.sub(lambda m: str(_han_numeral_run_value(m.group())), text)
+
+
 def _make_key_fn(language):
     """
     Return token -> comparable diff key, with the parser resolved once.
 
     Japanese compares kana readings, so 良い read as いい still matches;
     Chinese languages fold both sides to simplified Han (see
-    _simplified_converter); everything else compares lowercased surface
-    forms.  When no reading is available (e.g. the japanese_reading
-    setting is unset) the surface form is used as-is -- folded to
-    hiragana, since a kana word is its own reading (see below).
+    _simplified_converter), then to the opencc-missing variants and the
+    values of Han numeral runs (see _ZH_VARIANT_FOLD and
+    _zh_numeral_key); everything else compares lowercased surface forms.
+    When no reading is available (e.g. the japanese_reading setting is
+    unset) the surface form is used as-is -- folded to hiragana, since a
+    kana word is its own reading (see below).
     """
     parser = language.parser
     t2s = _simplified_converter() if _is_chinese_language(language) else None
@@ -466,7 +747,11 @@ def _make_key_fn(language):
             out = parser.get_lowercase(token)
         except Exception:  # pylint: disable=broad-exception-caught
             out = token.lower()
-        return t2s.convert(out) if t2s is not None else out
+        if t2s is not None:
+            out = t2s.convert(out)
+            out = "".join(_ZH_VARIANT_FOLD.get(ch, ch) for ch in out)
+            out = _zh_numeral_key(out)
+        return out
 
     return key
 
@@ -589,6 +874,12 @@ def _make_sound_fn(language):
     readings -- jyutping for Cantonese, pinyin for Mandarin -- so 你 read
     as 李 (nei5/lei5) is the misread it sounds like, not a skipped word.
 
+    Thai groups with them: its keys are surface Thai too, and a
+    differently spelled misread of the same word shares nothing.  The
+    rescue goes through the parser's get_reading_key, the digit-toned
+    RTGS form (ครับ -> khrap4), which compares byte for byte with the
+    toned keys _normalize_reading already produces.
+
     The parser may offer several readings per token (get_readings): a
     dictionary's single pick can be the wrong sense of a polyphone (阿
     filed under o1, while the name prefix is aa3), which would score a
@@ -596,14 +887,29 @@ def _make_sound_fn(language):
     most similar candidate; with no get_readings, the plain
     get_reading answer is the only candidate.
     """
-    if not _is_chinese_language(language):
+    if not _is_chinese_language(language) and not is_thai_language(language):
         return None
     parser = language.parser
     readings_of = getattr(parser, "get_readings", None)
+    # Only Thai answers a key today; an old Thai plugin without the
+    # method keeps its former (no-rescue) behaviour because the key
+    # path answers [] and the surface diff is unchanged.
+    reading_key_of = (
+        getattr(parser, "get_reading_key", None) if is_thai_language(language) else None
+    )
 
     def sound(token):
         token = _clean_token(token)
         if not token:
+            return []
+        if reading_key_of is not None:
+            try:
+                raw = reading_key_of(token)
+            except Exception:  # pylint: disable=broad-exception-caught
+                raw = None
+            if raw:
+                key = _normalize_reading(raw)
+                return [key] if key else []
             return []
         if readings_of is not None:
             try:
@@ -657,6 +963,13 @@ def compare_tokens(
         were too far apart to count as a near-miss: the word was
         attempted, so the panel can still show what was heard.  A word
         that was never spoken at all has no counterpart and no entry.
+      "spoken_kana": {spoken index: sentence's kana token}, for a spoken
+        word that scored as a match because the sentence prints it in
+        kana and the engine wrote it in kanji (see
+        _same_word_across_script).  The kanji's own dictionary reading is
+        a different one -- 私 is filed at わたくし -- so the panel must
+        show the kana the learner actually said instead of annotating
+        the word with a reading nobody produced.
       "extras": [spoken tokens that aren't part of the sentence],
       "matched": int, "fuzzy": int, "total": int,
       "spoken_count": int, "score": 0-100,
@@ -671,6 +984,7 @@ def compare_tokens(
         "statuses": statuses,
         "spoken_for_fuzzy": {},
         "spoken_for_miss": {},
+        "spoken_kana": {},
         "extras": [],
         "matched": 0,
         "fuzzy": 0,
@@ -682,6 +996,7 @@ def compare_tokens(
     base_key_of = _make_key_fn(language)
     sound_of = _make_sound_fn(language)
     is_japanese = is_japanese_language(language)
+    is_zh = _is_chinese_language(language)
     spoken = (
         spoken_tokens
         if spoken_tokens is not None
@@ -769,15 +1084,34 @@ def compare_tokens(
         n = min(i2 - oi, j2 - si)
         for k in range(n):
             okey, skey = keyed[oi + k], spoken_keys[si + k]
-            if is_japanese and len(okey) > 1 and okey in skey:
-                # The heard chunk contains the word's kana verbatim: the
-                # word was said, with the engine gluing extra material
-                # around it (こうやま transcribed as the non-word 紅う山,
-                # whose reading あこうやま wraps the kana).  Said as-is,
-                # not a near-miss.
+            # The heard chunk contains the word's key verbatim: the word
+            # was said, with the engine gluing extra material around it
+            # (Japanese こうやま transcribed as the non-word 紅う山, whose
+            # reading wraps the kana; Chinese 馀里 answered as the
+            # parser's single token 余里, which wraps the single-char
+            # words).  A Han character is a whole word, so containment
+            # counts for it alone; a single Japanese mora is not, and a
+            # latin letter even less.
+            if okey in skey and ((is_japanese and len(okey) > 1) or (is_zh and okey)):
                 statuses[scored[oi + k]] = STATUS_MATCH
                 continue
+            # The engine kanji-ized a word the book prints in kana, so
+            # the two keys hold different valid readings of one word
+            # (わたし vs 私's わたくし); the word itself was said right.
+            if _same_word_across_script(
+                original_tokens[scored[oi + k]], spoken[si + k], language
+            ):
+                statuses[scored[oi + k]] = STATUS_MATCH
+                result["spoken_kana"][si + k] = _clean_token(
+                    original_tokens[scored[oi + k]]
+                )
+                continue
             threshold = FUZZY_MATCH_RATIO_JA if is_japanese else FUZZY_MATCH_RATIO
+            # A rescue can prove the sound was said exactly (a homophone
+            # transcription, or the cognate written in the wrong script);
+            # such a pair is a match, not the near-miss the rescues
+            # otherwise cap at.
+            exact_sound = False
             ratio = difflib.SequenceMatcher(None, okey, skey).ratio()
             if ratio < threshold and is_japanese:
                 # Voicing is the one difference a ratio of 0 hides:
@@ -787,13 +1121,28 @@ def compare_tokens(
                 ).ratio()
                 if voiced >= threshold:
                     ratio = voiced
+                if ratio < threshold and _HANGUL_RE.search(skey):
+                    # Korean leakage (see _hangul_to_romaja): the heard
+                    # form's romaja against the reading's romaji judges
+                    # 先輩 せんぱい heard as 선배 the near-miss it sounds
+                    # like (senpai vs seonbae), not a flat miss.
+                    romaji = jaconv.kana2alphabet(okey)
+                    if romaji:
+                        ratio = difflib.SequenceMatcher(
+                            None, romaji, _hangul_to_romaja(skey)
+                        ).ratio()
+                        exact_sound = ratio >= 1.0
             elif ratio < threshold and sound_of is not None:
-                # A Chinese misread is a different character, so the
-                # surface forms share nothing; re-judge the pair on the
+                # A Chinese misread is a different character and a Thai
+                # one a differently spelled homophone, so the surface
+                # forms share nothing; re-judge the pair on the parser's
                 # romanization before calling it a skip.  Pairs are
                 # judged on their most similar readings: the dictionary
                 # pick can be the wrong polyphone sense (阿 o1 vs the
-                # name-prefix aa3).
+                # name-prefix aa3).  An IDENTICAL reading is no
+                # near-miss at all: the engine cannot tell homophones
+                # apart (观潮 guan1chao2 answered as 官潮), so the sound
+                # was right.
                 best = 0.0
                 for oread in sound_of(original_tokens[scored[oi + k]]):
                     for sread in sound_of(spoken[si + k]):
@@ -802,10 +1151,24 @@ def compare_tokens(
                             best = voiced
                 if best >= threshold:
                     ratio = best
+                    exact_sound = best >= 1.0
+            if (
+                ratio < threshold
+                and okey.isdigit()
+                and skey.isdigit()
+                and (okey.startswith(skey) or skey.startswith(okey))
+            ):
+                # Partial numeric capture: the engine wrote 二 0 for a
+                # spoken 二千 -- some digits landed, some did not.  An
+                # attempt on the number, not a different word.
+                ratio = FUZZY_MATCH_RATIO
             if ratio >= threshold:
                 orig_index = scored[oi + k]
-                statuses[orig_index] = STATUS_FUZZY
-                result["spoken_for_fuzzy"][orig_index] = spoken[si + k]
+                if exact_sound:
+                    statuses[orig_index] = STATUS_MATCH
+                else:
+                    statuses[orig_index] = STATUS_FUZZY
+                    result["spoken_for_fuzzy"][orig_index] = spoken[si + k]
             else:
                 # Too far apart to be a near-miss, but the pair still has a
                 # counterpart: showing it tells the learner what they
@@ -824,6 +1187,9 @@ def compare_tokens(
         # least attempted.  Verbatim claims are tracked per spoken token
         # so two left-behind words cannot share the same characters.
         claimed = {j: [] for j in range(j1, j2)}
+        # Spoken tokens a left-behind word was re-cut out of: they are
+        # part of a word now, so they are not "also heard" material.
+        recut_from = set()
         for k in range(i1, i2):
             orig_index = scored[k]
             if statuses[orig_index] != STATUS_MISS:
@@ -834,8 +1200,20 @@ def compare_tokens(
                 skey = spoken_keys[j]
                 if not skey:
                     continue
+                if _same_word_across_script(
+                    original_tokens[orig_index], spoken[j], language
+                ):
+                    statuses[orig_index] = STATUS_MATCH
+                    result["spoken_for_miss"].pop(orig_index, None)
+                    result["spoken_kana"][j] = _clean_token(
+                        original_tokens[orig_index]
+                    )
+                    break
                 hit = False
-                if len(okey) > 1:
+                if len(okey) > 1 or (is_zh and okey):
+                    # A multi-char key, or any Chinese one: a Han
+                    # character is a whole word, so its verbatim
+                    # occurrence inside a glued chunk is the word said.
                     pos = skey.find(okey)
                     while pos != -1:
                         span = (pos, pos + len(okey))
@@ -870,9 +1248,45 @@ def compare_tokens(
                         break
                 if hit:
                     break
+            if statuses[orig_index] != STATUS_MISS:
+                continue
+            # The engine can also re-cut one sentence word into several
+            # morphemes of its own: the page's term としました comes back
+            # as と + し + まし + た.  A run of still-unpaired spoken
+            # tokens whose keys join to exactly this word's key is the
+            # word, spoken as-is.  Only the unpaired tail is considered:
+            # a token the positional pairing already gave to another
+            # word belongs to that word.  Exact join only -- a run that
+            # merely sounds close is the near-miss pass's business.
+            for start in range(si + n, j2):
+                if start in recut_from:
+                    continue
+                joined = ""
+                for end in range(start, j2):
+                    joined += spoken_keys[end]
+                    if len(joined) > len(okey):
+                        break
+                    if end <= start or joined != okey:
+                        continue
+                    if any(j in recut_from for j in range(start, end + 1)):
+                        break
+                    statuses[orig_index] = STATUS_MATCH
+                    recut_from.update(range(start, end + 1))
+                    # The positional pairing handed this word a
+                    # counterpart; that token is material the engine
+                    # added, not the word itself, so it joins the
+                    # "also heard" list instead of the word's readout.
+                    dropped = result["spoken_for_miss"].pop(orig_index, None)
+                    if dropped is not None:
+                        result["extras"].append(dropped)
+                    break
+                if statuses[orig_index] != STATUS_MISS:
+                    break
 
         # Spoken tokens without an original counterpart are extras.
-        result["extras"].extend(spoken[si + n : j2])
+        result["extras"].extend(
+            spoken[j] for j in range(si + n, j2) if j not in recut_from
+        )
 
     matcher = difflib.SequenceMatcher(a=keyed, b=spoken_keys, autojunk=False)
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
@@ -933,6 +1347,96 @@ def purge_finished_tasks():
             del _TASKS[tid]
 
 
+def transcription_available(language):
+    """
+    True when some engine can transcribe this language: SenseVoice for
+    its trained languages (zh/yue/en/ja/ko, installed AND model on
+    disk), faster-whisper otherwise and as the fallback.  The same
+    order _run_task uses, so a True here means a take will actually
+    score; the review queue gates its shadowing cards on it.
+    """
+    if sensevoice.lang_code_for(language) is not None and sensevoice.available():
+        return True
+    return whisper_status()["installed"]
+
+
+def persist_attempt(
+    language_id,
+    score,
+    source="read",
+    book_id=None,
+    sentence=None,
+    duration=None,
+    tokens_per_min=None,
+    engine=None,
+    tokens_statuses=None,
+):
+    """
+    Store one finished take.  Runs inside the caller's app context and
+    commits: the background task is the only writer and a failed write
+    must not lose the score it just computed -- the task result is
+    already stored when this runs.
+    """
+    attempt = ShadowAttempt(
+        language_id=language_id,
+        book_id=book_id,
+        source=source if source in ("read", "review") else "read",
+        sentence=sentence,
+        score=int(score or 0),
+        duration=duration,
+        tokens_per_min=tokens_per_min,
+        engine=engine,
+        tokens=json.dumps(tokens_statuses or [], ensure_ascii=False),
+        created=datetime.now(timezone.utc).replace(tzinfo=None),
+    )
+    db.session.add(attempt)
+    db.session.commit()
+
+
+def mark_word_for_review(session, language, text):
+    """
+    One click on a misread word: put it into the learning pile so the
+    review queue picks it up on the next sync.
+
+    A new or unknown (0) term becomes status 1 (learning -> auto-admitted
+    by lute.review.enqueue).  A word already in learning statuses 1-5 is
+    already queued material, so it is left alone; ignored (98) and
+    well-known (99) words are never demoted silently -- a misclick on a
+    name or a truly known word should not rewrite the user's text
+    highlighting -- and are reported as such.
+
+    Returns {"outcome": created|promoted|learning|known|invalid,
+    "term_id", "term_status"}.
+    """
+    from lute.term.model import (  # pylint: disable=import-outside-toplevel
+        Repository,
+    )
+
+    text = _clean_token(text)
+    if not text or not _has_word_chars(text):
+        return {"outcome": "invalid", "term_id": None, "term_status": None}
+
+    repo = Repository(session)
+    term = repo.find_or_new(language.id, text)
+    if term.id is None:
+        term.status = 1
+        outcome = "created"
+    elif term.status == 0:
+        term.status = 1
+        outcome = "promoted"
+    elif 1 <= term.status <= 5:
+        outcome = "learning"
+    else:
+        return {
+            "outcome": "known",
+            "term_id": term.id,
+            "term_status": term.status,
+        }
+    repo.add(term)
+    repo.commit()
+    return {"outcome": outcome, "term_id": term.id, "term_status": term.status}
+
+
 def start_task(
     app,
     audio_path,
@@ -941,6 +1445,8 @@ def start_task(
     model_size,
     username=None,
     full_text=None,
+    source="read",
+    book_id=None,
 ):
     """
     Register and launch a background scoring task.
@@ -950,7 +1456,9 @@ def start_task(
     re-enters that user's scope so its db access lands on the user's
     own sqlite file.  full_text is the sentence the tokens belong to
     (Japanese reads its keys in context -- see compare_tokens).
-    Returns the task_id.
+    source/book_id describe where the take came from ("read" page or
+    "review" card, and the book on the reading page) and land on the
+    persisted attempt.  Returns the task_id.
     """
     purge_finished_tasks()
     task_id = uuid.uuid4().hex
@@ -966,6 +1474,8 @@ def start_task(
             model_size,
             username,
             full_text,
+            source,
+            book_id,
         ),
         daemon=True,
     )
@@ -982,6 +1492,8 @@ def _run_task(
     model_size,
     username,
     full_text=None,
+    source="read",
+    book_id=None,
 ):
     "Thread body: transcribe, diff, store the result. Cleans its temp file."
     try:
@@ -1090,7 +1602,44 @@ def _run_task(
                 "tokens_per_minute": rate,
                 "token_kind": "morpheme" if is_japanese_language(lang) else "word",
             }
+            # A word the engine wrote in kanji for a kana word in the
+            # sentence was scored against that kana (see
+            # _same_word_across_script), so annotate it with the kana the
+            # learner actually said.  The kanji's own dictionary reading
+            # would label 私 as わたくし -- a reading nobody produced, and
+            # the one that used to cost the word half credit.  Tokens
+            # without a reading carry none on purpose (the japanese_reading
+            # setting is off), so they stay unannotated.
+            for index, kana in comparison["spoken_kana"].items():
+                if 0 <= index < len(result["transcription_tokens"]):
+                    entry = result["transcription_tokens"][index]
+                    if entry["reading"]:
+                        entry["reading"] = _reading_in_the_lines_script(
+                            entry["reading"], kana
+                        )
             _set_task(task_id, "finished", result=result)
+            # The take is history: persist it (best-effort -- a failed
+            # write must not turn a scored take into an error page).
+            try:
+                persist_attempt(
+                    language_id,
+                    comparison["score"],
+                    source=source,
+                    book_id=book_id,
+                    sentence=full_text or "".join(_clean_token(t) for t in tokens),
+                    duration=round(duration or 0.0, 2),
+                    tokens_per_min=rate,
+                    engine=engine,
+                    tokens_statuses=[
+                        {"text": restore_kana(t), "status": result["statuses"][i]}
+                        for i, t in enumerate(tokens)
+                    ],
+                )
+            except Exception:  # pylint: disable=broad-exception-caught
+                logging.getLogger(__name__).warning(
+                    "could not persist the shadowing attempt", exc_info=True
+                )
+                db.session.rollback()
     except Exception as e:  # pylint: disable=broad-exception-caught
         logging.getLogger(__name__).warning(
             "shadowing transcription task failed: %s", e

@@ -900,14 +900,23 @@
   display: none;
 }
 
-/* Single-line scrolling subtitle. */
+/* The current subtitle line.  It shows one cue at a time, so its height
+   is reserved for the book's tallest cue by the players themselves
+   (--yt-subtitle-reserve, in px: media-player-base.js / tts-player.js
+   publish it through the shared LuteStripReserve so the audio and TTS
+   strips end up the same size): a cue that wraps onto a second line
+   must not resize the box, or the reading text below it -- which is
+   re-flowed to fill the space left over -- is re-paginated under the
+   reader on every other sentence.  The fallback keeps the strip at its
+   old height for books the player knows nothing about.  The mobile
+   mini-bar rules further down override this (one line, no wrapping). */
 .yt-scrolling-subtitle {
   margin-top: 0.6rem;
   border: 1px solid #b9d6ef;
   border-radius: 5px;
   background-color: #fff;
   overflow: hidden;
-  min-height: 3.4rem;
+  min-height: var(--yt-subtitle-reserve, 3.4rem);
   display: flex;
   align-items: center;
   justify-content: stretch;
@@ -1166,8 +1175,11 @@
   text-overflow: ellipsis;
 }
 
+/* Hover uses a fixed light blue, NOT var(--yt-color-5): the dropdown
+   panel is hard-coded light (#fff bg, #333 text), but --yt-color-5
+   resolves to a dark color in dark themes -> dark-on-dark unreadable. */
 .tts-voice-option:hover {
-  background-color: var(--yt-color-5, #d6edff);
+  background-color: #d6edff;
 }
 
 /* Shown only while speechSynthesis has not yet reported its voices (common
@@ -1279,7 +1291,9 @@
 
   /* The scrolling subtitle becomes the mini-bar one-liner
      (full-dock variant only).  A fixed min-height keeps the line
-     breathing instead of hugging the text. */
+     breathing instead of hugging the text -- and it deliberately
+     ignores --yt-subtitle-reserve (media-player-base.js): this strip
+     is one non-wrapping line, so nothing can resize it. */
   .youtube-player-container:is(:not(:has(.yt-player-video-wrap)), .yt-audio-mode) .yt-scrolling-subtitle {
     order: -1;
     min-height: 2.75rem;
@@ -1313,16 +1327,20 @@
      auto-pause toggle, lifted into the controls row via
      display:contents as an icon-only square, so line-by-line
      listening (play -> auto-pause -> step) needs no expand.  The
-     sheet re-shows the whole group (see .player-sheet-open rules). */
+     sheet re-shows the whole group (see .player-sheet-open rules).
+     The MP3 <-> TTS switch (.yt-mode-btn) stays out here too: it is a
+     source change, i.e. the same "continue listening" class of action
+     as play, and hiding it behind the expand chevron made the switch
+     undiscoverable on a phone. */
   .youtube-player-container:not(.player-sheet-open) .yt-controls-right {
     display: contents;
   }
 
-  .youtube-player-container:not(.player-sheet-open) .yt-controls-right > :not(#yt-autopause-btn) {
+  .youtube-player-container:not(.player-sheet-open) .yt-controls-right > :not(#yt-autopause-btn):not(.yt-mode-btn) {
     display: none !important;
   }
 
-  .youtube-player-container:not(.player-sheet-open) #yt-autopause-btn {
+  .youtube-player-container:not(.player-sheet-open) :is(#yt-autopause-btn, .yt-mode-btn) {
     flex: 0 0 auto;
     width: 30px;
     height: 30px;
@@ -1437,9 +1455,11 @@
   }
 
   /* Subtitle box returns to full size inside the sheet.  Placed
-     after the collapsed rules: equal specificity, later wins. */
+     after the collapsed rules: equal specificity, later wins.  The
+     reserved height is measured by media-player-base.js at the
+     strip's current width and font, so it holds here too. */
   .youtube-player-container.player-sheet-open .yt-scrolling-subtitle {
-    min-height: 3.4rem;
+    min-height: var(--yt-subtitle-reserve, 3.4rem);
   }
 
   .youtube-player-container.player-sheet-open :is(#yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner) {

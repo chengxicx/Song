@@ -1,52 +1,37 @@
 """
-Spanish grammar point detection (spaCy es_core_news_sm).
+Spanish grammar point detection (spaCy es_core_news_md).
 
 Mirrors the English engine: sentences are split, tokenised with lemma +
 POS + morphological features, and token-aware rules recognise grammar
-constructions.  The sm model tags mood/tense reliably inside a sentence
-context but fumbles isolated words, the simple future and imperatives, so
-rules anchor on context (e.g. a trigger + que + subjunctive) and the
-future is covered by the "ir a + infinitive" periphrasis.
+constructions.  The md model beats the sm one on real sentences (+2pp
+rule hits, correctly tags subjunctive forms the sm model miscast as
+nouns) and is faster; imperatives still need care, so rules anchor on
+context (a trigger + que + subjunctive, a command form opening the
+sentence) rather than trusting the mood tag.
 
 spaCy and the model are imported lazily so the base install works without
 them; the route falls back to the generic rule library on ImportError.
 """
 
+import json
+import os
+import re
+import threading
+
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
+    desc_for_rule,
     make_rule,
+    make_spacy_tokenizer,
+    match_rule,
+    paired_examples,
     spec_lemma,
     spec_morph,
     spec_pos,
     spec_surface,
 )
 
-_NLP = None
-
-
-def _nlp():
-    "Lazy, process-lifetime spaCy pipeline."
-    global _NLP
-    if _NLP is None:
-        import spacy  # pylint: disable=import-outside-toplevel
-
-        _NLP = spacy.load("es_core_news_sm", exclude=["parser", "senter", "ner"])
-    return _NLP
-
-
-def _tokens_for(sentence):
-    "Tokenize a sentence; return a list of token dicts."
-    doc = _nlp()(sentence)
-    return [
-        {
-            "surface": t.text,
-            "lemma": t.lemma_,
-            "pos": t.pos_,
-            "morph": t.morph.to_dict(),
-            "idx": t.idx,
-        }
-        for t in doc
-    ]
+_tokens_for = make_spacy_tokenizer("es_core_news_md")
 
 
 # ---- rules -------------------------------------------------------------
@@ -56,6 +41,92 @@ def _tokens_for(sentence):
 # (Ind/Sub/Imp/Cnd), Tense (Pres/Past/Imp/Fut) and VerbForm (Fin/Inf/Part).
 
 _INF = spec_morph(VerbForm="Inf")
+
+# The affirmative imperative.  The model tags Mood=Imp only sporadically:
+# it labels "Mira", "Cállate" and "Oiga" correctly but reads "Habla",
+# "Haz", "Dime" and "Dame" as indicative and "Pon" as an infinitive, so a
+# mood-based rule (the French engine's approach) would miss most real
+# commands here.  Instead the rule lists the imperative forms themselves.
+# A bare command is homographic with other forms ("toma" = he takes,
+# "mira" = he looks, "di" = I gave) and Spanish drops the subject
+# pronoun, so position does the disambiguating: a sentence that *opens*
+# with one of these words is a command, while the declarative reading
+# needs a subject, an auxiliary or a conjunction in front of it.  The
+# enclitic forms (dame, hazlo, siéntate) cannot be anything else, since
+# no finite form takes a pronoun, and they are what dialogue actually
+# uses.
+_IMPERATIVE_START = (
+    # tú
+    "haz",
+    "pon",
+    "ven",
+    "di",
+    "mira",
+    "escucha",
+    "espera",
+    "perdona",
+    "disculpa",
+    "toma",
+    "fíjate",
+    "acuérdate",
+    # usted / ustedes
+    "oiga",
+    "mire",
+    "diga",
+    "deje",
+    "pase",
+    "salga",
+    "baje",
+    "compre",
+    "tome",
+    "cuente",
+    "aproveche",
+    "disculpe",
+    "diríjase",
+    "prepárese",
+    # verb + enclitic pronoun
+    "dame",
+    "dime",
+    "dígame",
+    "dígale",
+    "dímelo",
+    "dámelo",
+    "hazme",
+    "hazlo",
+    "ponte",
+    "vete",
+    "vámonos",
+    "siéntate",
+    "siéntese",
+    "siéntense",
+    "levántate",
+    "levántese",
+    "póngase",
+    "cállate",
+    "pásame",
+    "páseme",
+    "escúchame",
+    "escúcheme",
+    "óigame",
+    "mírame",
+    "míreme",
+    "sígame",
+    "cuéntame",
+    "espérame",
+    "espéreme",
+    "ayúdame",
+    "ayúdeme",
+    "déjame",
+    "déjeme",
+    "déjalo",
+    "olvídalo",
+    "llámame",
+    "enséñame",
+    "mándame",
+    "pídeme",
+    "prepárame",
+    "discúlpeme",
+)
 
 _ES_RULES = [
     # ---- A1 ----
@@ -142,15 +213,33 @@ _ES_RULES = [
         "Preterite (comió)",
         "A2",
         "a completed past action with clear start/end: comí, comió, fueron.",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Tense": "Past"}}]},
+        {
+            "seq": [
+                {
+                    "pos_in": ["VERB", "AUX"],
+                    "morph": {"Tense": "Past", "VerbForm": "Fin", "Mood": "Ind"},
+                }
+            ]
+        },
         zh="简单过去时（comió 等）：过去完成的动作，有起点/终点。",
+        # The tagger reads the command "dame" (and "hazlo") as an indicative
+        # past form; a sentence cannot open with a preterite that has no
+        # subject, so first position belongs to the imperative rule.
+        not_at_start_with=spec_surface(*_IMPERATIVE_START),
     ),
     make_rule(
         "es_imperfect",
         "Imperfect (comía / vivía)",
         "A2",
         "an ongoing or repeated past action, or a past description: vivía, era, cantaba.",
-        {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Tense": "Imp"}}]},
+        {
+            "seq": [
+                {
+                    "pos_in": ["VERB", "AUX"],
+                    "morph": {"Tense": "Imp", "VerbForm": "Fin", "Mood": "Ind"},
+                }
+            ]
+        },
         zh="未完成过去时（vivía / cantaba / era）：过去 ongoing、习惯或背景描写。",
     ),
     make_rule(
@@ -207,6 +296,11 @@ _ES_RULES = [
             "max_gap": 4,
         },
         zh="más/menos … que：比……更/更不……。",
+        # "menos mal que" is a fixed B1 construction with its own row; the
+        # filler between the anchors is what tells it apart from a
+        # comparison.  "más vale que" is deliberately *not* vetoed: the
+        # construction is a real comparison ("más vale prevenir que curar").
+        not_inside=spec_surface("mal"),
     ),
     make_rule(
         "es_tan_como",
@@ -224,6 +318,18 @@ _ES_RULES = [
         "(se lo doy).",
         {"seq": [{"surface_in": ["le", "les"], "morph": {"Case": "Dat"}}]},
         zh="间接宾语代词 le/les（给他/她/他们），常与 gustar 类动词、se 连用。",
+    ),
+    make_rule(
+        "es_imperativo",
+        "Affirmative imperative (haz, pon, dame)",
+        "A2",
+        "a command to tú or usted: Hazlo ahora, Dame el libro, Siéntese, por "
+        "favor.  The mood tag is unreliable, so this counts the command "
+        "forms that open a sentence instead.",
+        {"seq": [spec_surface(*_IMPERATIVE_START)]},
+        zh="肯定命令式（tú/usted）：Hazlo（做吧）、Dame（给我）、Siéntese（请坐）。"
+        "带代词时连写（dímelo / siéntate），与第三人称同形的词形只看句首。",
+        at_start=True,
     ),
     # ---- B1 ----
     make_rule(
@@ -246,6 +352,19 @@ _ES_RULES = [
         "hypothetical or polite: compraría = I would buy.",
         {"seq": [{"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Cnd"}}]},
         zh="条件式（compraría 等）：假设或礼貌表达。",
+    ),
+    make_rule(
+        "es_futuro",
+        "Simple future (comprará)",
+        "B1",
+        "the -ré/-rá/-remos future: a prediction, promise or probability "
+        "about what is yet to come: vendrá mañana.",
+        {
+            "seq": [
+                {"pos_in": ["VERB", "AUX"], "morph": {"Mood": "Ind", "Tense": "Fut"}}
+            ]
+        },
+        zh="简单将来时（-ré/-rá/-remos）：对将来的预测/承诺/推测（vendrá 明天会来）。",
     ),
     make_rule(
         "es_present_perfect",
@@ -409,4 +528,460 @@ def analyze_spanish(page_text, display_lang="en"):
     Returns a list of dicts:
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
-    return analyze_tokens(page_text, _ES_RULES, _tokens_for, display_lang)
+    rules = _get_all_rules()
+    return analyze_tokens(page_text, rules, _tokens_for, display_lang)
+
+
+# ---- data layer (grammar_es.json) ---------------------------------------
+#
+# Merged material rows become rules whose matcher specs are derived from the
+# row's `focus` words and kept only when they fire on the row's own example
+# sentences, so a stale spec can never enter the panel silently.  Mirrors the
+# French / Russian engines.
+
+
+def _norm_name(name):
+    "Fold a rule name for the hand-written / data-layer overlap check."
+    return re.sub(r"[^0-9a-zà-ÿ]+", "", (name or "").lower())
+
+
+_HANDWRITTEN_NORMS = {_norm_name(r["name"]) for r in _ES_RULES}
+
+_DATA_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_es.json",
+    )
+)
+
+# Rows that would report the same span as another rule on the same sentence,
+# so the panel must show only one of them.  The row stays in grammar_es.json
+# and on the library page; `_get_all_rules` is what the panel reads, and it
+# drops these.
+#
+# The audit's first run found five colliding pairs and four were precision
+# bugs in the rows themselves -- "por + infinitivo" firing on "acabó por
+# aceptar", "tanto ... como" firing on "tan despacio como" through the lemma
+# of *tan*, "nada / nadie / nunca" re-reporting *tampoco*, "si + indicativo"
+# accepting the subjunctive -- so those were narrowed in their material rows
+# instead of being hidden here.  What is left is a row whose point the broad
+# hand-written comparison already reports on the same words.
+_DUPLICATE_RULE_IDS = frozenset(
+    {
+        # "más vale que + subjuntivo" vs the hand-written más/menos ... que:
+        # both match "más vale que"; the idiom is a comparison, and the
+        # hand-written rule also carries "más vale prevenir que curar", so
+        # the rule keeps the span and the row stays a library entry only.
+        "esm_másvalequesubjuntivo__e5fdf7",  # x2, dupe of es_mas_que
+    }
+)
+
+
+def _focus_words(focus):
+    words = []
+    for f in focus or []:
+        w = (f or "").strip().lower()
+        if w:
+            words.append(w)
+    return words
+
+
+def _focus_vetoes(focus):
+    """
+    The "!word" entries of a focus list, as context vetoes.
+
+    A row whose construction collides with a longer one needs to say so, and
+    where the veto sits in the focus list says which side it guards:
+
+    * before the first real word -- the token *left* of the match
+      (``not_after``).  "en tanto que" would otherwise fire the
+      ``tanto ... que`` row, so that row reads ``["!en", "tanto", ..., "que"]``.
+    * after the last real word -- the three tokens *right* of the match
+      (``not_followed_by``).  Temporal *mientras* would otherwise fire on
+      every *mientras que*, so its focus is ``["mientras", "!que"]``.
+    * between two real words -- any token *inside* the match
+      (``not_inside``).  ``hace falta que`` is not "hace + time + que", so
+      that row's focus is ``["hace", "!falta", "...", "que"]``: the veto
+      sits inside the span and the gap is checked for it.
+
+    Returns a dict of rule keys (possibly empty), ready to splat into
+    ``make_rule`` / the rule dict the validator builds.
+
+    A veto word matches inflections as well as the surface spelled in the
+    list: "por + infinitivo" must stop firing after *acabó*, and "acabó" is
+    not written in anybody's focus list, so ``!acabar/estar`` matches by
+    lemma as well.
+    """
+    words = _focus_words(focus)
+    real = [i for i, w in enumerate(words) if not w.startswith("!")]
+    if not real:
+        return {}
+    first, last = real[0], real[-1]
+    slots = {"not_after": [], "not_inside": [], "not_followed_by": []}
+    for i, word in enumerate(words):
+        if not word.startswith("!") or len(word) < 2:
+            continue
+        if i < first:
+            slot = "not_after"
+        elif i > last:
+            slot = "not_followed_by"
+        else:
+            slot = "not_inside"
+        alternatives = word[1:].split("/")
+        slots[slot].append(
+            {"any_of": [spec_surface(*alternatives), spec_lemma(*alternatives)]}
+        )
+    return {
+        key: (specs[0] if len(specs) == 1 else {"any_of": specs})
+        for key, specs in slots.items()
+        if specs
+    }
+
+
+def _focus_condition(word, lemma):
+    """
+    One focus word as a token condition.
+
+    Three shorthands keep the material rows declarative while still letting a
+    row talk about word classes the literal vocabulary cannot spell out:
+    ``"a/b"`` marks surface alternatives (always surfaces -- a slash list is
+    an explicit form list), a ``§``-prefixed token names a token class
+    (``§inf``, ``§ger``, ``§part``, ``§verb``, ``§ind``, ``§noun``, ``§adj``,
+    ``§subj``, ``§subj2``), and every other word is matched as a surface in
+    the first variant and as a lemma in the second -- so ``volver a + §inf``
+    also fires on *volvió a llamar*, where the surface list cannot cover
+    every form.
+    """
+    if word.startswith("§"):
+        return _TOKEN_CLASSES.get(word, spec_pos("X"))
+    if "/" in word:
+        alts = word.split("/")
+        if lemma:
+            # The list mixes forms and base forms ("volver/vuelvo/vuelve"):
+            # the lemma variant lets *volvió* match an alternative the list
+            # spells only in the infinitive.
+            return {"any_of": [spec_surface(*alts), spec_lemma(*alts)]}
+        return spec_surface(*alts)
+    return spec_lemma(word) if lemma else spec_surface(word)
+
+
+def _focus_run(words, lemma):
+    "The conditions for one run of adjacent focus words."
+    return [_focus_condition(w, lemma) for w in words]
+
+
+# Token classes a focus list may name after "§".  Anything unknown falls back
+# to a spec no token matches, so a typo drops the row instead of matching
+# everything (the opposite failure is silent and much worse).
+#
+# Note there is deliberately no "§imp": es_core_news_md tags the imperative
+# mood inconsistently (Escriba as Imp, Hable as Sub, Vengan as Ind), so a mood
+# spec would miss most commands.  The one reliable command shape is the
+# negative one -- "no + present subjunctive, second person" -- which is
+# "§subj2".
+_TOKEN_CLASSES = {
+    "§inf": spec_morph(VerbForm="Inf"),
+    "§ger": spec_morph(VerbForm="Ger"),
+    "§part": spec_morph(VerbForm="Part"),
+    "§verb": spec_pos("VERB", "AUX"),
+    "§ind": spec_morph(VerbForm="Fin", Mood="Ind"),
+    "§noun": spec_pos("NOUN", "PROPN"),
+    "§adj": spec_pos("ADJ"),
+    "§subj": spec_morph(Mood="Sub"),
+    "§subj2": spec_morph(Mood="Sub", Person="2"),
+}
+
+
+def _focus_specs(focus):
+    """
+    Candidate matcher specs derived from one row's focus list.
+
+    Focus vocabulary: plain words match adjacently (seq); one "..." marks a
+    bounded gap (left/right, up to 4 words); an "a/b" slash marks surface
+    alternatives.  A bare function word (para, como, que, por, con, sin)
+    never stands alone -- it fires on half the corpus -- so a single word
+    shorter than five characters is dropped unless it carries alternatives.
+
+    Every row is emitted twice -- once matching surfaces and once matching
+    lemmas -- because a row lists base forms ("volver") while the text has
+    inflected ones ("volvió").  A leading "=" on a focus word turns that
+    second variant off for the whole row: "tanto/tanta/tantos/tantas" is
+    already exhaustive, and matching by lemma is what would make "tan"
+    (lemma *tanto*) fire the quantitative row that belongs to the
+    hand-written tan + adjective + como rule.
+    """
+    raw = _focus_words(focus)
+    surface_only = any(w.startswith("=") for w in raw)
+    words = [w.lstrip("=") for w in raw if not w.startswith("!")]
+    if not words:
+        return []
+    if words.count("...") == 1:
+        i = words.index("...")
+        left_w, right_w = words[:i], words[i + 1 :]
+        if not left_w or not right_w:
+            return []
+        specs = []
+        for lemma in (False,) if surface_only else (False, True):
+            spec = {
+                "left": _focus_run(left_w, lemma),
+                "right": _focus_run(right_w, lemma),
+                "min_gap": 0,
+                "max_gap": 4,
+            }
+            if spec not in specs:
+                specs.append(spec)
+        return specs
+    if "..." in words:
+        return []  # at most one gap anchor pair is expressible
+    if len(words) == 1 and len(words[0]) < 5 and "/" not in words[0]:
+        return []  # a bare short word fires everywhere -- never specific
+    specs = [{"seq": _focus_run(words, False)}]
+    lemma_spec = {"seq": _focus_run(words, True)}
+    if lemma_spec != specs[0] and not surface_only:
+        specs.append(lemma_spec)
+    return specs
+
+
+def _flash(spec, examples, vetoes=None):
+    """
+    True when spec fires on at least one of the row's example sentences.
+
+    The vetoes are part of the test: a spec that only fires in the context
+    the row excludes (temporal *mientras* inside *mientras que*) must not
+    count as validated, or the row would ship an example it cannot mark.
+    """
+    rule = {"match": spec, **(vetoes or {})}
+    for sentence in examples:
+        text = (sentence or "").strip()
+        if text and match_rule(rule, _tokens_for(text), text):
+            return True
+    return False
+
+
+def _load_data_rules():
+    """
+    Rules for the merged grammar-point rows (jlpt_data/grammar_es.json).
+
+    Specs are derived from each row's `focus` and kept only when they match
+    at least one of the row's own examples.
+
+    Every validated row is returned, including the ones listed in
+    ``_DUPLICATE_RULE_IDS``: the library page shows all of them, and
+    ``_get_all_rules`` is where the panel drops the duplicates (the audit
+    also needs the *un*deduped set to re-derive that list at all).
+    """
+    if not os.path.exists(_DATA_PATH):
+        return []
+    with open(_DATA_PATH, encoding="utf-8") as fh:
+        entries = json.load(fh)
+    rules = []
+    for item in entries:
+        name = item.get("name") or ""
+        if not name or _norm_name(name) in _HANDWRITTEN_NORMS:
+            continue  # already covered precisely by a hand-written rule
+        examples = [
+            e.strip() for e in (item.get("examples") or []) if (e or "").strip()
+        ]
+        if not examples:
+            continue
+        vetoes = _focus_vetoes(item.get("focus"))
+        try:
+            validated = [
+                s
+                for s in _focus_specs(item.get("focus"))
+                if _flash(s, examples, vetoes)
+            ]
+        except ImportError:
+            # spaCy or the Spanish model is not installed: nothing can be
+            # validated, and an unvalidated matcher is exactly what this
+            # layer refuses to ship.  The /grammar page still renders the
+            # hand-written rules, which need no tokeniser.
+            return []
+        if not validated:
+            continue
+        key = item.get("key") or name
+        # Pair each example with its translations (Chinese from the merged
+        # material, English from the authored back-fill), so the library
+        # detail card can show a translation line for every display
+        # language.
+        library_examples = paired_examples("es", examples, item)
+        rule = make_rule(
+            key,
+            name,
+            item.get("level") or "B1",
+            (item.get("meaning") or "").strip() or name,
+            {"any_of": validated} if len(validated) > 1 else validated[0],
+            zh=item.get("zh") or None,
+            **vetoes,
+        )
+        # Library-page fields (the /grammar detail card renders them when
+        # present); the panel ignores keys it does not read.
+        rule["formation"] = (item.get("formation") or "").strip()
+        rule["notes"] = (item.get("notes") or "").strip()
+        rule["examples"] = library_examples
+        rules.append(rule)
+    return rules
+
+
+# The data rules are built on first use, not at import: _load_data_rules()
+# tokenizes the rows' examples, and this module is imported at app start-up
+# (lute/read/routes.py).
+_rules_lock = threading.RLock()
+_data_rules_cache = None
+_all_rules_cache = None
+
+
+def _get_data_rules():
+    "The data-driven rules, built on first use and memoised."
+    global _data_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _data_rules_cache is None:
+            _data_rules_cache = _load_data_rules()
+        return _data_rules_cache
+
+
+def _get_all_rules():
+    """
+    Hand-written rules plus the validated data layer, built on first use.
+
+    ``_DUPLICATE_RULE_IDS`` is dropped here rather than in the loader so the
+    library page (which reads ``_get_data_rules``) and the overlap audit keep
+    seeing every row.
+    """
+    global _all_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _all_rules_cache is None:
+            _all_rules_cache = list(_ES_RULES) + [
+                rule
+                for rule in _get_data_rules()
+                if rule["key"] not in _DUPLICATE_RULE_IDS
+            ]
+        return _all_rules_cache
+
+
+# ---- library export ----------------------------------------------------
+#
+# The /grammar page lists the whole corpus at once, where the panel lists
+# only what the current page happens to contain.
+
+_CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"]
+
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_es_golden.json",
+    )
+)
+
+_golden_lock = threading.Lock()
+_golden_cache = None
+
+
+def _golden_examples():
+    """
+    Curated example sentences for the hand-written rules.
+
+    Keyed ``key -> [{"es", "en", "zh", "ko"}, ...]``.  The golden set is the
+    single store of these examples: the tests re-run every sentence through
+    its own rule, and the library serves the same sentences to readers, so
+    the page can never show a point whose matcher does not actually
+    recognise it.
+    """
+    global _golden_cache  # pylint: disable=global-statement
+    with _golden_lock:
+        if _golden_cache is None:
+            examples = {}
+            if os.path.exists(_GOLDEN_PATH):
+                with open(_GOLDEN_PATH, encoding="utf-8") as fh:
+                    for key, entry in json.load(fh).items():
+                        examples[key] = [
+                            e
+                            for e in entry.get("examples") or []
+                            if (e.get("es") or "").strip()
+                        ]
+            _golden_cache = examples
+        return _golden_cache
+
+
+def _example_gloss(example, display_lang):
+    """
+    The translation to print under an example, in the display language.
+
+    The golden set carries all three; a missing one stays empty rather than
+    falling back to English under a Chinese or Korean heading.
+    """
+    if display_lang == "zh":
+        return (example.get("zh") or "").strip()
+    if display_lang == "ko":
+        return (example.get("ko") or "").strip()
+    return (example.get("en") or "").strip()
+
+
+def _library_entry(rule, display_lang, examples):
+    """
+    One rule as a library row, display-ready (see the Japanese analogue).
+
+    Each example comes back as ``{"text", "tr"}``: the Spanish sentence and
+    its translation for the display language.  The library has no page text
+    to highlight, so the match offsets the panel computes are irrelevant
+    here.
+
+    The description resolves through the same table the panel uses, so a
+    Korean reader gets the Korean ``desc`` that ``_KO_BY_KEY`` already
+    carries instead of the English one.
+    """
+    desc = desc_for_rule(rule, display_lang) or rule["name"]
+    rows = []
+    for example in examples:
+        if isinstance(example, str):
+            example = {"es": example}
+        text = (example.get("es") or "").strip()
+        if text:
+            rows.append({"text": text, "tr": _example_gloss(example, display_lang)})
+    entry = {
+        "key": rule["key"],
+        "name": rule["name"],
+        "level": rule["level"],
+        "desc": desc,
+        "examples": rows,
+        "skipped": False,
+    }
+    for field in ("formation", "notes"):
+        value = (rule.get(field) or "").strip()
+        if value:
+            entry[field] = value
+    return entry
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Spanish grammar library, in CEFR order (A1 -> C2).
+
+    Built on first use like the rules themselves, so an app start-up with
+    no Spanish books does not pay for the spaCy model.  Hand-written rules
+    take their examples from the golden set; the merged data rows carry
+    their own.
+    """
+    golden = _golden_examples()
+    rules = []
+    for rule in _ES_RULES:
+        examples = rule.get("examples") or golden.get(rule["key"]) or []
+        rules.append((rule, examples))
+    rules += [(rule, rule.get("examples") or []) for rule in _get_data_rules()]
+    entries = [_library_entry(r, display_lang, ex) for r, ex in rules]
+    ordered = sorted(
+        enumerate(entries),
+        key=lambda pair: (
+            _CEFR_ORDER.index(pair[1]["level"])
+            if pair[1]["level"] in _CEFR_ORDER
+            else 9,
+            pair[0],
+        ),
+    )
+    return [entry for _, entry in ordered]

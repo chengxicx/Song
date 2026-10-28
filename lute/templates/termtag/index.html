@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 
-{% block title %}Term Tags{% endblock %}
-{% block header %}Term Tags{% endblock %}
+{% block title %}{{ t('Term Tags') }}{% endblock %}
+{% block header %}{{ t('Term Tags') }}{% endblock %}
 
 {% block body %}
 
 <div style="margin-top: 10px; margin-bottom: 10px;">
-  <a href="/termtag/new">Create new</a>
+  <a href="/termtag/new">{{ t('Create new') }}</a>
 </div>
 
 <table id="termtagtable" class="table dataTable stripe" style="table-layout:fixed;" >
   <thead>
     <tr>
-      <th>Tag</th>
-      <th>Comment</th>
-      <th>Term Count</th>
-      <th>Actions</th>
+      <th>{{ t('Tag') }}</th>
+      <th>{{ t('Comment') }}</th>
+      <th>{{ t('Term Count') }}</th>
+      <th>{{ t('Actions') }}</th>
     </tr>
   </thead>
 </table>
@@ -110,7 +110,7 @@
   let render_delete = function ( data, type, row, meta ) {
     // TODO zzfuture fix: security - add CSRF token
     const tgid = row['TgID'];
-    return `<span id="deltermtag${tgid}" onclick="confirm_delete(${tgid})"><img src="{{ vstatic('icn/minus-button.png') }}" title="Delete" /></span>`;
+    return `<span id="deltermtag${tgid}" onclick="confirm_delete(${tgid})"><img src="{{ vstatic('icn/minus-button.png') }}" title="${I18N.t('Delete')}" /></span>`;
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -124,7 +124,7 @@
   }
 
   function confirm_delete(termtagid) {
-    if (!confirm(`Deleting tag.  Click OK to proceed, or Cancel.`)) {
+    if (!confirm(I18N.t('Deleting tag.  Click OK to proceed, or Cancel.'))) {
       return;
     }
     do_action_post('delete', termtagid);

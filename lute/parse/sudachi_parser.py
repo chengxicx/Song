@@ -26,6 +26,7 @@ import jaconv
 
 from lute.parse.base import ParsedToken, AbstractParser
 from lute.settings.current import current_settings
+from lute.term import pos_tags
 
 
 class JapaneseSudachiParser(AbstractParser):
@@ -249,7 +250,7 @@ class JapaneseSudachiParser(AbstractParser):
                 pos = m.part_of_speech()
                 is_word = self._is_selectable_token(pos, surface)
                 is_eos = surface in language.regexp_split_sentences
-                tokens.append(ParsedToken(surface, is_word, is_eos))
+                tokens.append(ParsedToken(surface, is_word, is_eos, pos))
                 prev_end = m.end()
             # Trailing gap.
             if prev_end < len(para):
@@ -279,6 +280,20 @@ class JapaneseSudachiParser(AbstractParser):
     _BOUND_POS1 = {"助詞", "助動詞", "記号", "補助記号", "接尾辞", "接頭辞"}
     _SYMBOL_POS1 = {"記号", "補助記号"}
 
+    def _is_content_pos(self, pos: tuple) -> bool:
+        """
+        True if a POS is a content word, i.e. not one of the bound
+        grammatical morphemes in _BOUND_POS1.
+
+        Split out from _is_content_token because callers that have a
+        stored POS but no surface (see get_pos_tag) still need to make
+        the same call.
+        """
+        if not pos:
+            return False
+        pos1 = pos[0] if len(pos) > 0 else ""
+        return pos1 not in self._BOUND_POS1
+
     def _is_content_token(self, pos: tuple, surface: str) -> bool:
         """
         True if the token is a content word whose lemma should be kept
@@ -288,10 +303,7 @@ class JapaneseSudachiParser(AbstractParser):
         that conjugated forms don't resolve to broken parents (e.g.
         来た -> 来るた, 置いて -> 置くて).
         """
-        if not pos:
-            return False
-        pos1 = pos[0] if len(pos) > 0 else ""
-        if pos1 in self._BOUND_POS1:
+        if not self._is_content_pos(pos):
             return False
         # Whitespace / blank tokens.
         if surface.strip() == "":
@@ -318,6 +330,20 @@ class JapaneseSudachiParser(AbstractParser):
         if surface.strip() == "":
             return False
         return True
+
+    def get_pos_tag(self, pos):
+        """
+        The term tag for a token with this POS, or None.
+
+        Only content words are tagged.  Particles and auxiliaries make
+        up roughly half of all tokens in running text (measured on the
+        JLPT corpus: 助詞 32.0%, 助動詞 15.0%), and the reading page
+        creates a term for every clickable one of them, so tagging them
+        would bury the tags a learner actually curates.
+        """
+        if not self._is_content_pos(pos):
+            return None
+        return pos_tags.tag_from_pos(pos)
 
     # ---- reading ----
 
@@ -561,6 +587,47 @@ class JapaneseSudachiParser(AbstractParser):
 
         ret = "".join(lemmas).strip()
         if ret in ("", text):
+            return None
+        return ret
+
+    def get_normalized_form(self, text: str):
+        """
+        The spelling the dictionary files this text under.
+
+        Sudachi's normalized_form is an orthography normalization, not a
+        reading: it folds the kana spellings of a word onto the kanji it
+        is filed under (わたし -> 私, あたし -> 私, わたくし -> 私,
+        ぼく -> 僕) and leaves genuinely different words alone (箸, 橋
+        and 端 each stay themselves).  That makes it the right question
+        to ask when a kana word and a kanji word might be the same word
+        -- see lute.read.shadowing._same_word_across_script, which needs
+        it to stop a kanji-izing ASR from grading a correctly read kana
+        word against another of the kanji's readings.
+
+        None when nothing changes (the text is already its normalized
+        form) or when the parse leaves nothing behind, matching
+        get_reading/get_lemma.
+        """
+        zws = "\u200B"
+        text = text.replace(zws, "")
+
+        if not text.strip():
+            return None
+
+        dict_type = self._get_dict_setting()
+        mode = self._get_mode_setting()
+        tok = self._build_tokenizer(dict_type)
+        split_mode = self._get_split_mode(mode)
+
+        parts = []
+        for m in tok.tokenize(text, mode=split_mode):
+            surface = m.surface()
+            if not surface:
+                continue
+            parts.append(m.normalized_form() or surface)
+
+        ret = "".join(parts).strip()
+        if ret in ("", text.strip()):
             return None
         return ret
 

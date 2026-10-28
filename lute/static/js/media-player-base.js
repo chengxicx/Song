@@ -11,6 +11,8 @@
    - media -> transcript/subtitle syncing (highlight + smooth-center)
    - transcript -> media seeking on line click
    - the word-span subtitle with click-to-lookup behaviour
+   - one subtitle-strip height for the book, so the reading text below the
+     player is not re-flowed whenever a cue wraps onto a second line
 
    Data (cues, words, bookId, ...) is injected by the player templates
    via window.LUTE_YT_DATA.
@@ -36,6 +38,52 @@
    whether or not window.YT is loaded, so the fixed set below is used
    for every backend).
 */
+
+/* ----------------------------------------------------------------
+   Subtitle strip height, shared by every player bar on the page.
+
+   The strip shows one cue at a time, in the flow above the reading
+   text, and the text below is re-flowed to fill whatever space is left
+   (read/index.html _splitToScreens, on a ResizeObserver watching
+   #thetext).  So a cue that wraps onto a second line must not make the
+   strip taller than a one-line cue: every height change re-paginates
+   the text under it, which the reader sees as the whole page jumping.
+
+   Each player therefore measures the tallest cue it can show and
+   publishes it here; the strips inherit the largest of those values as
+   `--yt-subtitle-reserve` (player-styles.css uses it as the strip's
+   min-height).  Folding both into one number keeps the audio bar and
+   the TTS bar -- which a book with an audio file renders one at a time
+   in the same slot -- exactly the same size, so handing the book
+   between them does not resize the strip either.
+
+   The value is set on <body> because it has to reach both bars, and the
+   mobile dock only restyles them (player-dock.js): the bars stay where
+   they are in the DOM.
+   ---------------------------------------------------------------- */
+(function () {
+  "use strict";
+
+  var reserves = {};
+
+  window.LuteStripReserve = {
+    // `key` names the player ("media" / "tts"); `px` is the height its
+    // tallest cue needs, or 0 to withdraw it.
+    publish: function (key, px) {
+      reserves[key] = px > 0 ? Math.round(px * 10) / 10 : 0;
+      var max = 0;
+      for (var k in reserves) {
+        if (reserves[k] > max) max = reserves[k];
+      }
+      if (!document.body) return;
+      if (max > 0) {
+        document.body.style.setProperty("--yt-subtitle-reserve", max + "px");
+      } else {
+        document.body.style.removeProperty("--yt-subtitle-reserve");
+      }
+    },
+  };
+})();
 
 (function () {
   "use strict";
@@ -149,7 +197,7 @@
       if (show) {
         if (!ytBufferingVisible && ytPlayerReady) {
           ytBufferingVisible = true;
-          els.loading.textContent = "Buffering...";
+          els.loading.textContent = I18N.t("Buffering...");
           els.loading.style.display = "block";
         }
       } else if (ytBufferingVisible) {
@@ -285,6 +333,9 @@
       // Underline this cue's line in the reading text, so the reader can
       // follow along in the page and not only in the subtitle above it.
       ytMarkPlayingLine(idx);
+      // ... then turn the page text to wherever that line is, when the
+      // playhead has left the page on screen.
+      ytFollowPlayhead(idx);
       // Single-line scrolling subtitle, reusing the reading-page word
       // spans.  If the word HTML hasn't been loaded yet (WORDS is
       // empty), fall back to the plain cue text so the user sees
@@ -317,6 +368,7 @@
         window.requestAnimationFrame(function () {
           var overflow = els.subtitle.scrollWidth - els.subtitle.clientWidth;
           ytMarqueeOverflow = ytIsRtl ? 0 : Math.max(0, overflow);
+          ytSyncStripHeight();
         });
         // Inherit the reading-page word status colors.  The subtitle
         // word spans are injected after add_status_classes() has already
@@ -372,6 +424,63 @@
       } catch (e) { /* no CustomEvent -- shadowing just won't follow */ }
     }
 
+    /* ------------------------------------------------------------------ */
+    /* Following the playhead across the page text                         */
+    /*                                                                     */
+    /* An audio book's page text is one page's worth of cue lines; the      */
+    /* track runs over the whole book.  Left alone, playback walks off the  */
+    /* page after a minute or two and the underline simply stops being      */
+    /* drawn -- the reader has to turn the page by hand to keep reading     */
+    /* along.  So the cue that was just activated also moves the reader:    */
+    /* to the sub-screen holding its line (the page splits into screens),   */
+    /* and to the page holding its line (the book splits into pages).       */
+    /*                                                                     */
+    /* Both halves belong to the reading page -- LuteReaderFollow in        */
+    /* read/index.html, which owns curScreen / subScreens and the page      */
+    /* request.  It is absent on pages without a reader, hence the guards.  */
+    /* ------------------------------------------------------------------ */
+
+    // Show the sub-screen holding the line that is currently marked.
+    // Separate from ytFollowPlayhead because it must run again after a
+    // page turn: the swap lands on the new page's first screen, and the
+    // line may be on a later one.
+    function ytFollowScreen() {
+      var follow = window.LuteReaderFollow;
+      if (!follow || !follow.showLine) return;
+      if (!window.LutePlayingLine || !window.LutePlayingLine.markedEls) return;
+      var marked = window.LutePlayingLine.markedEls();
+      if (marked.length) follow.showLine(marked[0]);
+    }
+
+    function ytFollowPlayhead(idx) {
+      var follow = window.LuteReaderFollow;
+      // Only while playing.  Paging under a paused reader is not
+      // following anything, and the cue activated when the book opens
+      // (the seek to the saved position) would otherwise yank them from
+      // the page they deliberately opened.
+      if (!follow || !ytPlaying) return;
+      // Fixed pages (manga / pdf) and the scrolling views have no
+      // sub-screens and no page-per-cue text to follow.
+      if (!follow.active()) return;
+
+      ytFollowScreen();
+
+      // Which page this cue belongs to.  0 = no usable map (a text book,
+      // or a book whose page text has drifted from its cues): stay put
+      // rather than guess.
+      var page = follow.pageOfCue(idx);
+      if (!page || page === follow.currentPage()) return;
+
+      follow.requestPage(page, function () {
+        // The page was fetched for `idx`; if playback has moved on since
+        // (a slow network, a seek), the new cue will follow on its own.
+        if (ytCueIndex !== idx) return;
+        // The mark lived on the swapped-out text.
+        ytMarkPlayingLine(idx);
+        ytFollowScreen();
+      });
+    }
+
     function ytDeactivateCue() {
       try {
         window.dispatchEvent(
@@ -409,6 +518,116 @@
     }
 
     /* ------------------------------------------------------------------ */
+    /* Subtitle strip height                                               */
+    /* ------------------------------------------------------------------ */
+
+    /* The strip shows one cue at a time, in the flow above the reading
+       text -- which the page re-flows to fill whatever space is left over
+       (read/index.html _splitToScreens, on a ResizeObserver watching
+       #thetext).  So a cue that wraps onto a second line must not make the
+       strip taller than a one-line cue: every height change re-paginates
+       the text below it, which the reader sees as the whole page jumping.
+       Measured on an MP3 book: the strip went 63px -> 114px and the text
+       moved 51px, on every other sentence.
+
+       The strip is therefore given one height for the book -- the tallest
+       cue's -- instead of following the cue it happens to be showing.
+       That height is measured off-screen (the strip only ever holds one
+       cue) and published as the --yt-subtitle-reserve custom property,
+       which the stylesheet uses as the strip's min-height.  min-height,
+       not height, so a cue taller than anything measured still grows the
+       strip rather than being cut off -- and the mobile mini-bar rules
+       (one non-wrapping line) override it without knowing it exists. */
+
+    // How many of the book's longest cues to measure.  Line count tracks
+    // length, so the longest ones are the tall ones; measuring all of them
+    // would be a layout pass per cue, and a bounded sample plus the growth
+    // below is the same answer for a fraction of the work.
+    var YT_STRIP_SAMPLE = 120;
+
+    var ytStripReserve = 0;
+    var ytStripKey = null;
+
+    // The word spans the subtitle shows for a cue, or its plain text
+    // before that HTML has been fetched (ytLoadSubtitleWords).  Both lay
+    // out the same: the stylesheet pins .word to the strip's own font.
+    function ytCueSubtitleHtml(idx) {
+      if (WORDS[idx]) return WORDS[idx];
+      return CUES[idx] ? ytEscapeHtml(CUES[idx].text || "") : "";
+    }
+
+    // The strip's own metrics: the height a cue may occupy (its CSS
+    // max-height -- longer cues scroll, so reserving more would only make
+    // the strip taller than its stylesheet allows) and the font size its
+    // line height follows.
+    function ytStripMetrics() {
+      var cs = window.getComputedStyle(els.subtitle);
+      var cap = parseFloat(cs.maxHeight);
+      return { cap: isFinite(cap) && cap > 0 ? cap : 0, font: cs.fontSize };
+    }
+
+    // The book's longest cues by length, capped at YT_STRIP_SAMPLE.
+    function ytStripSampleIndices() {
+      var idx = [];
+      for (var i = 0; i < CUES.length; i++) idx.push(i);
+      if (idx.length > YT_STRIP_SAMPLE) {
+        idx.sort(function (a, b) {
+          return (CUES[b].text || "").length - (CUES[a].text || "").length;
+        });
+        idx.length = YT_STRIP_SAMPLE;
+      }
+      return idx;
+    }
+
+    // Height the strip needs for the tallest of `indices`, measured at the
+    // strip's own width (what wraps depends on it).  The probe keeps the
+    // inner's id on purpose: the stylesheet sizes the strip's text through
+    // it (font size, padding, line height) and the measurement has to see
+    // the same box the real cue will occupy.
+    function ytMeasureStripHeight(width, indices) {
+      var probe = els.subtitle.cloneNode(false);
+      probe.style.cssText =
+        "position:fixed;left:-10000px;top:0;visibility:hidden;" +
+        "width:" + width + "px;height:auto;max-height:none;overflow:visible;";
+      els.subtitle.parentNode.appendChild(probe);
+      var tallest = 0;
+      for (var i = 0; i < indices.length; i++) {
+        probe.innerHTML = ytCueSubtitleHtml(indices[i]);
+        if (probe.scrollHeight > tallest) tallest = probe.scrollHeight;
+      }
+      probe.parentNode.removeChild(probe);
+      var cap = ytStripMetrics().cap;
+      return cap && tallest > cap ? cap : tallest;
+    }
+
+    // Publish the reserved height.  Called when the strip is about to be
+    // shown (init) and on every cue, because the answer depends on the
+    // strip's width and font (a resize, a zoom, a font-size change) -- the
+    // measurement only reruns when one of those changes.
+    function ytSyncStripHeight() {
+      if (!els.subtitle || !CUES.length) return;
+      if (!els.subtitle.parentNode) return;
+      var width = els.subtitle.clientWidth;
+      if (!width) return;
+      var metrics = ytStripMetrics();
+      var key = width + "x" + metrics.font;
+      if (key !== ytStripKey) {
+        ytStripKey = key;
+        ytStripReserve = ytMeasureStripHeight(width, ytStripSampleIndices());
+      }
+      // A cue taller than every one measured (the sample missed it, or
+      // the book is mostly one script and this cue is another): hold the
+      // strip at that height from here on rather than resize per cue.
+      var live = Math.min(els.subtitle.scrollHeight, metrics.cap || Infinity);
+      if (live > ytStripReserve) ytStripReserve = live;
+      if (ytStripReserve > 0 && window.LuteStripReserve) {
+        // Published through the shared registry, which the TTS bar also
+        // writes to: both strips then take the larger of the two.
+        window.LuteStripReserve.publish("media", ytStripReserve);
+      }
+    }
+
+    /* ------------------------------------------------------------------ */
     /* Transcript panel                                                    */
     /* ------------------------------------------------------------------ */
 
@@ -423,7 +642,7 @@
         var ts = document.createElement("span");
         ts.className = "yt-transcript-ts";
         ts.textContent = ytFmtTime(cue.start);
-        ts.title = "Jump to " + ytFmtTime(cue.start);
+        ts.title = I18N.t("Jump to ") + ytFmtTime(cue.start);
 
         var txt = document.createElement("span");
         txt.className = "yt-transcript-text";
@@ -819,11 +1038,15 @@
         // Hover pronunciation (same as the main text #thetext): speak
         // the hovered word while playback is stopped or paused.  The
         // shared engine in tts.js is resolved at event time because
-        // tts.js loads after this script.
+        // tts.js loads after this script; so is
+        // luteSpokenTextForWordSpan, which keeps a furigana <rt>
+        // reading out of the utterance ("普通", not "普通ふつう").
         t.on("mouseover", ".word", function () {
           if (window.luteHoverSpeakStart)
             window.luteHoverSpeakStart(
-              this.innerText || this.textContent || "",
+              (window.luteSpokenTextForWordSpan
+                ? window.luteSpokenTextForWordSpan(this)
+                : this.textContent) || "",
               function () { return ytPlaying; }
             );
         });
@@ -1016,6 +1239,7 @@
       buildTranscript: buildTranscript,
       bindControls: bindControls,
       bindSubtitleInteractions: bindSubtitleInteractions,
+      syncStripHeight: ytSyncStripHeight,
       bindKeys: bindKeys,
       bindStatusUpdates: bindStatusUpdates,
       bindNotReadyFallback: bindNotReadyFallback,

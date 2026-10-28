@@ -37,19 +37,14 @@ let shadowingActive = false;
 let shadowingAuto = false;
 let shadowingBusy = false;
 let shadowingStartPending = false;
-let shadowingRecorder = null;
-let shadowingStream = null;
-let shadowingChunks = [];
+let shadowingRecorder = null; // the shared LuteRecorder capture in progress
 let shadowingRecording = false;
 let shadowingRecStart = 0;
 let shadowingRecTimer = null;
-let shadowingRecCapTimer = null;
 let shadowingUnit = null; // { lines, el, spans, texts, fullText, langId, src }
 let shadowingClickedWord = null; // word span the reader last opened a form on
 let shadowingLastCue = null; // last lute:cue-changed detail
 let shadowingHistory = [];
-let shadowingRecordingBlob = null;
-let shadowingRecordingUrl = null;
 
 const SHADOWING_MODEL_KEY = "shadowingModel";
 const SHADOWING_AUTO_KEY = "shadowingAuto";
@@ -84,6 +79,20 @@ function shadowingSentences() {
     : [];
 }
 
+/* A furigana <rt> reading is part of textContent but is not text to
+   read, send, or match: on a ruby-annotated page 普通's span reads
+   "普通ふつう" and every consumer would double the word.  Same strip as
+   tts.js's ttsPlainText. */
+function shadowingPlainText(node) {
+  if (!node) return "";
+  if (node.nodeType === 3) return node.textContent || "";
+  const clone = node.cloneNode(true);
+  if (clone.querySelectorAll) {
+    clone.querySelectorAll("rt, rp").forEach(function (el) { el.remove(); });
+  }
+  return clone.textContent || "";
+}
+
 function shadowingLineText(el) {
   const clone = el.cloneNode(true);
   clone
@@ -91,7 +100,9 @@ function shadowingLineText(el) {
     .forEach(function (b) {
       b.remove();
     });
-  return (clone.textContent || "").replace(/[\s\u200b]+/g, "");
+  // Must match the player's cue text, which has the readings stripped
+  // (tts-player.js ttsSplitSentenceIntoCues).
+  return (shadowingPlainText(clone) || "").replace(/[\s\u200b]+/g, "");
 }
 
 function shadowingLinesForCue(index, text) {
@@ -170,7 +181,7 @@ function shadowingUnitFromEl(el, src) {
     lines: [el],
     spans: spans,
     texts: spans.map(shadowingTokenText),
-    fullText: (clone.textContent || "")
+    fullText: (shadowingPlainText(clone) || "")
       .replace(/\u200B/g, "")
       .replace(/🔊/g, "")
       .trim(),
@@ -197,12 +208,44 @@ function shadowingUnitFromLines(lines, src) {
     clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
       b.remove();
     });
-    fullText += (fullText ? "\n" : "") + clone.textContent;
+    fullText += (fullText ? "\n" : "") + (shadowingPlainText(clone) || "");
   });
   const langSpan = spans[0];
   return {
     el: lines[0],
     lines: lines,
+    spans: spans,
+    texts: spans.map(shadowingTokenText),
+    fullText: fullText.replace(/\u200B/g, "").replace(/🔊/g, "").trim(),
+    langId: langSpan ? langSpan.getAttribute("data-lang-id") : "",
+    src: src || null,
+  };
+}
+
+/* The practice unit for the player's clause cues: a long sentence is
+   read (and looped, auto-paused, shadowed) one clause at a time, and
+   the TTS player hands over the clause's own nodes (the cue's spanEls).
+   Building the unit from those nodes keeps every mark on live, in-page
+   spans -- the verdict underlines land on exactly the words that were
+   read -- while the unit's el stays the .textsentence, so the
+   connectivity checks and prev/next navigation keep working as
+   before. */
+function shadowingUnitFromCueNodes(nodes, src) {
+  const spans = [];
+  let fullText = "";
+  (nodes || []).forEach(function (n) {
+    fullText += shadowingPlainText(n) || "";
+    if (n.nodeType === 1 && shadowingCollectable(n)) spans.push(n);
+  });
+  if (!spans.length) return null;
+  const langSpan =
+    spans.find(function (sp) {
+      return sp.getAttribute("data-lang-id") != null;
+    }) || null;
+  const el = spans[0].closest(".textsentence");
+  return {
+    el: el,
+    lines: el ? [el] : [],
     spans: spans,
     texts: spans.map(shadowingTokenText),
     fullText: fullText.replace(/\u200B/g, "").replace(/🔊/g, "").trim(),
@@ -299,6 +342,25 @@ function shadowingApplyCue(d) {
     if (!(d.sentenceCount > 0)) return false;
     const sents = shadowingSentences();
     if (sents.length !== d.sentenceCount) return false; // stale after page swap
+    // A long sentence's cue covers one clause of it; the player hands
+    // over the clause's own live nodes (spanEls), so practise the
+    // clause rather than the whole long sentence.  Falls back to the
+    // sentence when the cue carries no nodes (whole-sentence cue) or
+    // they are no longer on the page.
+    const nodes = (d.spanEls || []).filter(function (n) {
+      return n.isConnected;
+    });
+    if (nodes.length) {
+      const clause = shadowingUnitFromCueNodes(nodes, {
+        type: "tts",
+        sentIdx: d.sentIdx,
+        cueIndex: d.index,
+      });
+      if (clause) {
+        shadowingSetUnit(clause);
+        return true;
+      }
+    }
     const unit = shadowingUnitFromEl(
       sents[d.sentIdx] || null,
       { type: "tts", sentIdx: d.sentIdx, cueIndex: d.index }
@@ -341,12 +403,33 @@ function shadowingOnCueEnded(e) {
  * 4. Mode (player "Shadow" toggle)
  * ------------------------------------------------------------------ */
 
+/* Every "Shadow" toggle on the page.  A book with an audio track renders
+   two player bars -- the audio transport and the TTS read-aloud one --
+   and each carries its own copy of this button (read/youtube_player.html
+   and read/tts_player.html).  Only one bar is on screen at a time
+   (tts-ui.js applyPlayerMode), and which one that is depends on the mode
+   the reader is in, so both copies have to be live and both have to show
+   the mode.
+
+   Binding "the first one" is what broke this: getElementById on the TTS
+   id always wins, so once mp3 books started rendering a TTS bar too, the
+   listener followed the *hidden* copy and the button on the visible MP3
+   bar did nothing when clicked. */
+function shadowingButtons() {
+  return ["tts-shadowing-btn", "yt-shadowing-btn"]
+    .map(function (id) {
+      return document.getElementById(id);
+    })
+    .filter(function (el) {
+      return !!el;
+    });
+}
+
 function shadowingSetMode(on) {
   shadowingActive = on;
-  const btn =
-    document.getElementById("tts-shadowing-btn") ||
-    document.getElementById("yt-shadowing-btn");
-  if (btn) btn.classList.toggle("on", on);
+  shadowingButtons().forEach(function (btn) {
+    btn.classList.toggle("on", on);
+  });
 
   if (on) {
     shadowingOpenPanel();
@@ -456,24 +539,24 @@ function shadowingOpenPanel() {
   panel.className = "shadowing-panel";
   panel.innerHTML =
     '<div class="shadowing-panel__header">' +
-    '<span class="shadowing-panel__title">Shadowing</span>' +
+    '<span class="shadowing-panel__title">' + I18N.t('Shadowing') + '</span>' +
     '<button type="button" id="shadowing-auto-btn" class="shadowing-auto-btn"' +
-    ' title="Auto: record at every sentence end, score, then advance">Auto</button>' +
-    '<button type="button" class="shadowing-panel__close" aria-label="Close">&times;</button>' +
+    ' title="' + I18N.t('Auto: record at every sentence end, score, then advance') + '">' + I18N.t('Auto') + '</button>' +
+    '<button type="button" class="shadowing-panel__close" aria-label="' + I18N.t('Close') + '">&times;</button>' +
     "</div>" +
     '<div class="shadowing-panel__body">' +
     '<div id="shadowing-current" class="shadowing-current"></div>' +
     '<div class="shadowing-controls">' +
-    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="-1" title="Previous sentence">' +
+    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="-1" title="' + I18N.t('Previous sentence') + '">' +
     PREV_SVG +
     "</button>" +
-    '<button type="button" id="shadowing-listen-btn" class="shadowing-nav-btn" title="Listen to this sentence">' +
+    '<button type="button" id="shadowing-listen-btn" class="shadowing-nav-btn" title="' + I18N.t('Listen to this sentence') + '">' +
     SPEAKER_SVG +
     "</button>" +
-    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="1" title="Next sentence">' +
+    '<button type="button" class="shadowing-nav-btn" data-shadowing-nav="1" title="' + I18N.t('Next sentence') + '">' +
     NEXT_SVG +
     "</button>" +
-    '<button type="button" id="shadowing-rec-btn" class="shadowing-rec-btn" title="Record / stop">' +
+    '<button type="button" id="shadowing-rec-btn" class="shadowing-rec-btn" title="' + I18N.t('Record / stop') + '">' +
     MIC_SVG +
     '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>' +
     "</button>" +
@@ -596,7 +679,7 @@ function shadowingTokenHtml(text, reading, idx, cls) {
   if (reading) attrs += ' data-reading="' + shadowingEscapeHtml(reading) + '"';
   if (idx != null) attrs += ' data-idx="' + idx + '"';
   return (
-    "<span" + attrs + ' title="Click to hear this word">' + inner + "</span>"
+    "<span" + attrs + ' title="' + I18N.t('Click to hear this word') + '">' + inner + "</span>"
   );
 }
 
@@ -605,7 +688,7 @@ function shadowingRenderCurrent() {
   if (!box) return;
   if (!shadowingUnit) {
     box.innerHTML =
-      '<div class="shadowing-panel__state">Play the player, or pick a sentence with the arrows below.</div>';
+      '<div class="shadowing-panel__state">' + I18N.t('Play the player, or pick a sentence with the arrows below.') + '</div>';
     return;
   }
   const readings = shadowingUnit.readings || [];
@@ -653,6 +736,12 @@ function shadowingSpeakToken(tok, heardOnly) {
 }
 
 function shadowingOnPanelClick(e) {
+  const addBtn = e.target.closest ? e.target.closest(".shadow-word-add") : null;
+  if (addBtn) {
+    e.stopPropagation();
+    shadowingMarkWord(addBtn);
+    return;
+  }
   const tok =
     e.target && e.target.closest
       ? e.target.closest(".shadow-tok, .shadow-heard-tok")
@@ -664,11 +753,34 @@ function shadowingOnPanelClick(e) {
   shadowingSpeakToken(tok, Boolean(heardPart));
 }
 
+// Fire the mark-as-learning post for one stumbled word, replacing the
+// chip's + with the outcome.
+async function shadowingMarkWord(btn) {
+  if (!shadowingUnit || !shadowingUnit.langId || btn.disabled) return;
+  btn.disabled = true;
+  const word = btn.getAttribute("data-word") || "";
+  try {
+    const res = await LuteRecorder.markWord(shadowingUnit.langId, word);
+    const messages = {
+      created: I18N.t("added"),
+      promoted: I18N.t("added"),
+      learning: I18N.t("already learning"),
+      known: I18N.t("known — left alone"),
+      invalid: "?",
+    };
+    btn.textContent = res.outcome === "created" || res.outcome === "promoted" ? "✓" : "·";
+    btn.title = messages[res.outcome] || res.outcome;
+  } catch (err) {
+    btn.disabled = false;
+    btn.title = String(err);
+  }
+}
+
 function shadowingRenderResultIdle() {
   const box = document.getElementById("shadowing-result");
   if (!box) return;
   box.innerHTML =
-    '<div class="shadowing-result__hint">Record yourself reading the sentence to score it.</div>';
+    '<div class="shadowing-result__hint">' + I18N.t('Record yourself reading the sentence to score it.') + '</div>';
 }
 
 function shadowingRenderPanelMessage(msg, isError) {
@@ -697,7 +809,7 @@ function shadowingClearMarks(unit) {
     tok.classList.remove("shadow-ok", "shadow-fuzzy", "shadow-miss");
     if (tok.getAttribute("data-heard")) {
       tok.removeAttribute("data-heard");
-      tok.setAttribute("title", "Click to hear this word");
+      tok.setAttribute("title", I18N.t("Click to hear this word"));
     }
     tok.querySelectorAll(".shadow-tok__heard").forEach(function (h) {
       h.remove();
@@ -738,7 +850,7 @@ function shadowingPaintVerdicts(unit, data) {
         // word and the misheard one back to back (see
         // shadowingSpeakToken); the "→ heard" part speaks alone.
         tok.setAttribute("data-heard", heard);
-        tok.setAttribute("title", "Click: correct word, then what was heard");
+        tok.setAttribute("title", I18N.t("Click: correct word, then what was heard"));
         tok.insertAdjacentHTML(
           "beforeend",
           '<span class="shadow-tok__heard">→ ' +
@@ -755,7 +867,7 @@ function shadowingRenderResult(unit, data) {
   if (!box) return;
   const extras = data.extras || [];
   const isMorpheme = data.token_kind === "morpheme";
-  const kindLabel = isMorpheme ? "morphemes/min" : "words/min";
+  const kindLabel = isMorpheme ? I18N.t("morphemes/min") : I18N.t("words/min");
 
   let html = '<div class="shadowing-score">';
   html +=
@@ -804,13 +916,48 @@ function shadowingRenderResult(unit, data) {
   html += '<div class="shadowing-heard">' + heardHtml + "</div>";
   if (extras.length) {
     html +=
-      '<div class="shadowing-extras"><span class="shadowing-extras__label">Also heard</span> ' +
+      '<div class="shadowing-extras"><span class="shadowing-extras__label">' + I18N.t('Also heard') + '</span> ' +
       shadowingEscapeHtml(
         extras.join(isMorpheme ? "" : " ")
       ) +
       "</div>";
   }
+  html += shadowingMarkWordsHtml(unit, data);
   box.innerHTML = html;
+}
+
+// The words this take showed trouble with, as one-click adds to the
+// learning pile (status-1 terms are auto-admitted into the review
+// queue by themselves -- a stumble becomes tomorrow's review card).
+// Known words are not demoted by the server, and the response says so.
+function shadowingMarkWordsHtml(unit, data) {
+  if (!unit || !unit.langId) return "";
+  const statuses = data.statuses || [];
+  const seen = {};
+  const missed = [];
+  unit.texts.forEach(function (t, i) {
+    const st = i < statuses.length ? statuses[i] : 3;
+    if ((st === 0 || st === 1) && !seen[t]) {
+      seen[t] = true;
+      missed.push(t);
+    }
+  });
+  if (!missed.length) return "";
+  return (
+    '<div class="shadowing-words"><span class="shadowing-extras__label">' + I18N.t('Add a stumbled word to your learning words:') + '</span> ' +
+    missed
+      .map(function (t) {
+        return (
+          '<span class="shadow-word-chip">' +
+          shadowingEscapeHtml(t) +
+          '<button type="button" class="shadow-word-add" data-word="' +
+          shadowingEscapeHtml(t) +
+          '" title="' + I18N.t('Add to your learning words') + '">+</button></span>'
+        );
+      })
+      .join(" ") +
+    "</div>"
+  );
 }
 
 function shadowingRenderHistory() {
@@ -818,11 +965,11 @@ function shadowingRenderHistory() {
   if (!box) return;
   if (!shadowingHistory.length) {
     box.innerHTML =
-      '<div class="shadowing-history__empty">No attempts yet.</div>';
+      '<div class="shadowing-history__empty">' + I18N.t('No attempts yet.') + '</div>';
     return;
   }
   box.innerHTML =
-    '<div class="shadowing-history__head">This session</div>' +
+    '<div class="shadowing-history__head">' + I18N.t('This session') + '</div>' +
     shadowingHistory
       .slice(0, 30)
       .map(function (h) {
@@ -842,62 +989,31 @@ function shadowingRenderHistory() {
 }
 
 /* ------------------------------------------------------------------
- * 7. Recording (MediaRecorder), one capture at a time
+ * 7. Recording (shared LuteRecorder), one capture at a time
  * ------------------------------------------------------------------ */
-
-function shadowingCanRecord() {
-  return !!(
-    window.isSecureContext &&
-    navigator.mediaDevices &&
-    navigator.mediaDevices.getUserMedia &&
-    typeof MediaRecorder !== "undefined"
-  );
-}
-
-function shadowingPickMimeType() {
-  if (typeof MediaRecorder === "undefined") return "";
-  const candidates = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
-  for (let i = 0; i < candidates.length; i++) {
-    try {
-      if (MediaRecorder.isTypeSupported(candidates[i])) return candidates[i];
-    } catch (_) {}
-  }
-  return "";
-}
-
-function shadowingExtForMime(mime) {
-  mime = mime || "";
-  if (mime.indexOf("mp4") !== -1 || mime.indexOf("m4a") !== -1) return "mp4";
-  if (mime.indexOf("ogg") !== -1) return "ogg";
-  return "webm";
-}
-
-function shadowingPermissionMessage(err) {
-  if (err && (err.name === "NotAllowedError" || err.name === "SecurityError")) {
-    return "Microphone permission denied.  Allow microphone access for this site to use shadowing.";
-  }
-  if (err && err.name === "NotFoundError") {
-    return "No microphone found.";
-  }
-  return (
-    "Could not start recording" +
-    (err && err.message ? ": " + err.message : ".")
-  );
-}
-
-function shadowingTeardownStream() {
-  if (shadowingStream) {
-    shadowingStream.getTracks().forEach(function (t) {
-      try {
-        t.stop();
-      } catch (_) {}
-    });
-    shadowingStream = null;
-  }
-}
 
 function shadowingRecBtn() {
   return document.getElementById("shadowing-rec-btn");
+}
+
+// The reading page's book id, attached to the persisted attempt when
+// there is one (the review session's takes have no book and omit it).
+function shadowingCurrentBookId() {
+  const input = document.getElementById("book_id");
+  const v = input ? parseInt(input.value, 10) : NaN;
+  return Number.isFinite(v) ? v : null;
+}
+
+function shadowingResetRecButton() {
+  if (shadowingRecTimer) {
+    clearInterval(shadowingRecTimer);
+    shadowingRecTimer = null;
+  }
+  const btn = shadowingRecBtn();
+  if (btn) {
+    btn.classList.remove("recording");
+    btn.innerHTML = MIC_SVG + '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>';
+  }
 }
 
 async function shadowingStartRecording() {
@@ -908,123 +1024,56 @@ async function shadowingStartRecording() {
   if (!shadowingUnit || !shadowingUnit.el || !shadowingUnit.el.isConnected) {
     return;
   }
-  if (!shadowingCanRecord()) {
-    shadowingRenderPanelMessage(
-      "Microphone recording needs a secure context (open Lute on localhost or HTTPS) and a browser with MediaRecorder support.",
-      true
-    );
-    return;
-  }
 
-  // A second click during the getUserMedia await would otherwise start
-  // two captures; collapse it.
+  const unit = shadowingUnit; // captured: the cue may move while scoring
   shadowingStartPending = true;
-  try {
-    let stream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (err) {
-      shadowingRenderPanelMessage(shadowingPermissionMessage(err), true);
-      return;
-    }
-    shadowingStream = stream;
-    shadowingChunks = [];
-
-    const mime = shadowingPickMimeType();
-    let recorder;
-    try {
-      recorder = mime
-        ? new MediaRecorder(stream, { mimeType: mime })
-        : new MediaRecorder(stream);
-    } catch (err) {
-      shadowingTeardownStream();
-      shadowingRenderPanelMessage(shadowingPermissionMessage(err), true);
-      return;
-    }
-
-    shadowingRecorder = recorder;
-    shadowingRecording = true;
-    shadowingRecStart = Date.now();
-    recorder.ondataavailable = function (e) {
-      if (e.data && e.data.size > 0) shadowingChunks.push(e.data);
-    };
-    recorder.onstop = shadowingOnStop;
-
-    btn.classList.add("recording");
-    btn.innerHTML = STOP_SVG + '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>';
-    shadowingRecTimer = setInterval(function () {
-      const secs = Math.floor((Date.now() - shadowingRecStart) / 1000);
-      const el = document.getElementById("shadowing-rec-time");
-      if (el) el.textContent = secs + "s";
-    }, 250);
+  const rec = new LuteRecorder.Recorder({
     // Auto mode keeps hands free: cap the take so a forgotten stop
-    // cannot block the loop forever.
-    if (shadowingAuto) {
-      shadowingRecCapTimer = setTimeout(function () {
-        if (shadowingRecording) shadowingStopRecording();
-      }, SHADOWING_REC_CAP_MS);
-    }
-    recorder.start();
-  } finally {
-    shadowingStartPending = false;
-  }
+    // cannot block the loop forever.  Manual takes are uncapped.
+    capMs: shadowingAuto ? SHADOWING_REC_CAP_MS : 0,
+    onStop: function (blob) {
+      shadowingRecording = false;
+      shadowingRecorder = null;
+      shadowingResetRecButton();
+      shadowingSubmit(blob, unit);
+    },
+    onFail: function (msg) {
+      shadowingRecording = false;
+      shadowingRecorder = null;
+      shadowingResetRecButton();
+      shadowingRenderPanelMessage(msg, true);
+    },
+  });
+  const started = await rec.start();
+  shadowingStartPending = false;
+  if (!started) return; // onFail already rendered the reason
+
+  shadowingRecorder = rec;
+  shadowingRecording = true;
+  btn.classList.add("recording");
+  btn.innerHTML = STOP_SVG + '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>';
+  shadowingRecStart = Date.now();
+  shadowingRecTimer = setInterval(function () {
+    const secs = Math.floor((Date.now() - shadowingRecStart) / 1000);
+    const el = document.getElementById("shadowing-rec-time");
+    if (el) el.textContent = secs + "s";
+  }, 250);
 }
 
 function shadowingStopRecording() {
-  if (!shadowingRecording) return;
-  shadowingRecording = false;
-  if (shadowingRecTimer) {
-    clearInterval(shadowingRecTimer);
-    shadowingRecTimer = null;
-  }
-  if (shadowingRecCapTimer) {
-    clearTimeout(shadowingRecCapTimer);
-    shadowingRecCapTimer = null;
-  }
-  const btn = shadowingRecBtn();
-  if (btn) {
-    btn.classList.remove("recording");
-    btn.innerHTML = MIC_SVG + '<span id="shadowing-rec-time" class="shadowing-rec-time"></span>';
-  }
-  const rec = shadowingRecorder;
-  if (rec && rec.state === "recording") {
-    try {
-      rec.stop();
-    } catch (_) {
-      shadowingRecorder = null;
-      shadowingTeardownStream();
-    }
-  } else {
-    shadowingRecorder = null;
-    shadowingTeardownStream();
-  }
+  if (!shadowingRecording || !shadowingRecorder) return;
+  // The UI resets in the recorder's onStop callback.
+  shadowingRecorder.stop();
 }
 
 function shadowingCancelRecording() {
   // Leaving the mode mid-take: drop the capture without scoring it.
-  if (!shadowingRecording) {
-    shadowingTeardownStream();
-    return;
+  if (shadowingRecorder) {
+    shadowingRecorder.cancel();
   }
-  shadowingRecording = false;
-  if (shadowingRecTimer) {
-    clearInterval(shadowingRecTimer);
-    shadowingRecTimer = null;
-  }
-  if (shadowingRecCapTimer) {
-    clearTimeout(shadowingRecCapTimer);
-    shadowingRecCapTimer = null;
-  }
-  const rec = shadowingRecorder;
   shadowingRecorder = null;
-  if (rec) {
-    rec.onstop = null;
-    try {
-      if (rec.state !== "inactive") rec.stop();
-    } catch (_) {}
-  }
-  shadowingChunks = [];
-  shadowingTeardownStream();
+  shadowingRecording = false;
+  shadowingResetRecButton();
 }
 
 function shadowingToggleRecording() {
@@ -1035,25 +1084,6 @@ function shadowingToggleRecording() {
   }
 }
 
-function shadowingOnStop() {
-  const rec = shadowingRecorder;
-  const chunks = shadowingChunks;
-  const mime = rec ? rec.mimeType : "";
-  const unit = shadowingUnit; // captured: the cue may move while scoring
-
-  shadowingRecorder = null;
-  shadowingChunks = [];
-  shadowingTeardownStream();
-
-  const blob = new Blob(chunks, { type: mime || "audio/webm" });
-  if (!blob.size) {
-    shadowingRenderPanelMessage("The recording was empty — try again.", true);
-    return;
-  }
-  shadowingRecordingBlob = blob;
-  shadowingSubmit(blob, unit);
-}
-
 /* ------------------------------------------------------------------
  * 8. Submit + results
  * ------------------------------------------------------------------ */
@@ -1062,36 +1092,39 @@ async function shadowingSubmit(blob, unit) {
   if (!unit || !unit.texts.length) return;
   shadowingBusy = true;
   shadowingClearMarks(unit);
-  shadowingRenderPanelMessage("Transcribing…", false);
-
-  const fd = new FormData();
-  fd.append("audio", blob, "shadowing." + shadowingExtForMime(blob.type));
-  fd.append("language_id", unit.langId || "");
-  fd.append("tokens", JSON.stringify(unit.texts));
-  fd.append("model", shadowingGetModel());
+  shadowingRenderPanelMessage(I18N.t("Transcribing…"), false);
 
   try {
-    const resp = await fetch("/read/shadowing/transcribe", {
-      method: "POST",
-      body: fd,
+    const outcome = await LuteRecorder.scoreTake({
+      blob: blob,
+      languageId: unit.langId,
+      tokens: unit.texts,
+      fullText: unit.fullText,
+      model: shadowingGetModel(),
+      bookId: shadowingCurrentBookId(),
+      onProgress: function (state, secs) {
+        const el = document.getElementById("shadowing-result");
+        if (!el) return;
+        if (state === "loading_model") {
+          // Only the first take of a session waits here (the model is
+          // cached afterwards, per size), so say so rather than blaming
+          // the model for every slow transcription.
+          el.innerHTML =
+            '<div class="shadowing-panel__state">' + I18N.t('Loading the whisper model… ') +
+            secs +
+            "s" +
+            (secs > 20
+              ? I18N.t(" (first run downloads it, this can take minutes)")
+              : "") +
+            "</div>";
+        } else {
+          el.innerHTML =
+            '<div class="shadowing-panel__state">' + I18N.t('Transcribing… ') +
+            secs +
+            "s</div>";
+        }
+      },
     });
-    let data = {};
-    try {
-      data = await resp.json();
-    } catch (_) {}
-    if (!resp.ok) {
-      shadowingRenderPanelMessage(
-        data.error || "Request failed (" + resp.status + ")",
-        true
-      );
-      return;
-    }
-    if (!data.task_id) {
-      shadowingRenderPanelMessage("No task id returned by the server.", true);
-      return;
-    }
-
-    const outcome = await shadowingPollTask(data.task_id);
     if (outcome.state === "error") {
       shadowingRenderPanelMessage(outcome.error, true);
       return;
@@ -1113,67 +1146,10 @@ async function shadowingSubmit(blob, unit) {
 
     if (shadowingActive && shadowingAuto) shadowingAutoAdvance();
   } catch (err) {
-    shadowingRenderPanelMessage("Network error: " + err, true);
+    shadowingRenderPanelMessage(I18N.t("Network error: ") + err, true);
   } finally {
     shadowingBusy = false;
   }
-}
-
-// Poll a scoring task until it settles.  Transient network errors are
-// tolerated (the backend worker keeps running); the task is lost only
-// if the server restarted ("unknown").  First runs can take minutes --
-// the whisper model may be downloading on the server -- so the panel
-// shows the elapsed wait instead of failing.
-async function shadowingPollTask(taskId) {
-  const started = Date.now();
-  const MAX_MS = 10 * 60 * 1000;
-  while (Date.now() - started < MAX_MS) {
-    await new Promise(function (r) {
-      setTimeout(r, 1500);
-    });
-    let data;
-    try {
-      const resp = await fetch("/read/shadowing/status/" + taskId);
-      data = await resp.json();
-    } catch (_) {
-      continue;
-    }
-    if (data.state === "finished") {
-      return { state: "finished", result: data.result };
-    }
-    if (data.state === "error") {
-      return { state: "error", error: data.error || "Transcription failed." };
-    }
-    if (data.state === "unknown") {
-      return {
-        state: "error",
-        error: "The scoring task was lost (server restart?) — try again.",
-      };
-    }
-    const el = document.getElementById("shadowing-result");
-    if (el) {
-      const secs = Math.floor((Date.now() - started) / 1000);
-      if (data.state === "loading_model") {
-        // Only the first take of a session waits here (the model is
-        // cached afterwards, per size), so say so rather than blaming
-        // the model for every slow transcription.
-        el.innerHTML =
-          '<div class="shadowing-panel__state">Loading the whisper model… ' +
-          secs +
-          "s" +
-          (secs > 20
-            ? " (first run downloads it, this can take minutes)"
-            : "") +
-          "</div>";
-      } else {
-        el.innerHTML =
-          '<div class="shadowing-panel__state">Transcribing… ' +
-          secs +
-          "s</div>";
-      }
-    }
-  }
-  return { state: "error", error: "Transcription timed out." };
 }
 
 function shadowingAutoAdvance() {
@@ -1190,7 +1166,7 @@ function shadowingAutoAdvance() {
       ttsSeekToCue(next, true);
       return;
     }
-    shadowingRenderPanelMessage("End of the text — auto stopped.", false);
+    shadowingRenderPanelMessage(I18N.t("End of the text — auto stopped."), false);
     return;
   }
   const nextBtn = document.getElementById("yt-next-cue-btn");
@@ -1198,7 +1174,7 @@ function shadowingAutoAdvance() {
     nextBtn.click();
     return;
   }
-  shadowingRenderPanelMessage("No player cues to advance to.", true);
+  shadowingRenderPanelMessage(I18N.t("No player cues to advance to."), true);
 }
 
 /* ------------------------------------------------------------------
@@ -1245,12 +1221,11 @@ function shadowingBoot() {
   window.addEventListener("lute:cue-changed", shadowingOnCueChanged);
   window.addEventListener("lute:cue-ended", shadowingOnCueEnded);
 
-  const btn =
-    document.getElementById("tts-shadowing-btn") ||
-    document.getElementById("yt-shadowing-btn");
-  if (btn) {
+  // Both bars' copies (see shadowingButtons): the one on the bar the
+  // reader is actually looking at must open the panel.
+  shadowingButtons().forEach(function (btn) {
     btn.addEventListener("click", shadowingToggleMode);
-  }
+  });
 }
 
 if (document.readyState === "loading") {

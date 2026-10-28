@@ -17,38 +17,15 @@ import re
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
     make_rule,
+    make_spacy_tokenizer,
+    rule_library_entries,
     spec_lemma,
     spec_morph,
     spec_pos,
     spec_surface,
 )
 
-_NLP = None
-
-
-def _nlp():
-    "Lazy, process-lifetime spaCy pipeline."
-    global _NLP
-    if _NLP is None:
-        import spacy  # pylint: disable=import-outside-toplevel
-
-        _NLP = spacy.load("en_core_web_sm", exclude=["parser", "senter", "ner"])
-    return _NLP
-
-
-def _tokens_for(sentence):
-    "Tokenize a sentence; return a list of token dicts."
-    doc = _nlp()(sentence)
-    return [
-        {
-            "surface": t.text,
-            "lemma": t.lemma_,
-            "pos": t.pos_,
-            "morph": t.morph.to_dict(),
-            "idx": t.idx,
-        }
-        for t in doc
-    ]
+_tokens_for = make_spacy_tokenizer("en_core_web_sm")
 
 
 # ---- rules -------------------------------------------------------------
@@ -525,3 +502,16 @@ def analyze_english(page_text, display_lang="en"):
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
     return analyze_tokens(page_text, _EN_RULES, _tokens_for, display_lang)
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole English grammar library, in CEFR order (A1 -> C2).
+
+    The corpus is the hand-written rule set itself, so the browsable
+    list is exactly the points the panel can fire -- nothing extra to
+    maintain.  The rules carry no example sentences, so a row shows its
+    description alone; the module needs no tokenizer to be listed (the
+    spaCy model loads lazily, on first analysis).
+    """
+    return rule_library_entries(_EN_RULES, display_lang)

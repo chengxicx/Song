@@ -1,0 +1,494 @@
+{
+ "ru_by": {
+  "name": "Conditional with бы",
+  "examples": [
+   {
+    "ru": "Деньги не могут тебя сделать счастливым, пора бы уже это понять.",
+    "zh": "金钱并不能使你幸福，这一点也该明白了。",
+    "en": "Money can't make you happy; it's about time you understood that.",
+    "ko": "돈이 너를 행복하게 만들 수는 없다, 이제 그쯤은 깨달아야 한다."
+   },
+   {
+    "ru": "Никого не было, да и снег остался нетронутым. При таком снеге, если даже там кто-то недавно был, он бы оставил отчётливые следы.",
+    "zh": "一个人没来过，而且雪也没有被触碰过。在这样的雪地里，如果有人不久前来过的话，他就会留下清晰的足迹。",
+    "en": "There was no one, and the snow had been left untouched. With snow like that, even if someone had been there recently, he would have left clear tracks.",
+    "ko": "아무도 없었다, 게다가 눈도 그대로였다. 이런 눈 위라면 누군가 얼마 전에 다녀갔다 해도 뚜렷한 발자국을 남겼을 것이다."
+   },
+   {
+    "ru": "Правила пользования газом в быту простье и, казалось бы, элементарные.",
+    "zh": "日常生活中使用天然气的规则很简单，而且差不多就是基本知识。",
+    "en": "The rules for using gas at home are simple and, one would think, elementary.",
+    "ko": "일상에서 가스를 사용하는 규칙은 간단하고, 생각건대 기초적인 것이다."
+   }
+  ]
+ },
+ "ru_chem_tem": {
+  "name": "чем ... , тем ... (the ... the ...)",
+  "examples": [
+   {
+    "ru": "Чем больше времени вы проводите на коньках, тем лучше ваше тело привыкает балансировать.",
+    "zh": "您滑冰时间越长，您的身体越习惯于保持平衡。",
+    "en": "The more time you spend on skates, the better your body gets used to balancing.",
+    "ko": "스케이트를 타는 시간이 길수록 몸이 균형 잡는 데 더 익숙해진다."
+   }
+  ]
+ },
+ "ru_chtoby": {
+  "name": "чтобы (in order to / that)",
+  "examples": [
+   {
+    "ru": "На мой телефонный номер приходят смс сообщения, про всякое знакомство, о выигрышах и т.д., можно сделать так, чтобы они не приходили?",
+    "zh": "有一些短信发到我的电话里，关于各种各样交往的、关于赢钱中彩的等等，能不能让这些东西不发来呢？",
+    "en": "I keep getting text messages on my number -- about all sorts of acquaintances, about prize wins and so on; can it be arranged so they stop coming?",
+    "ko": "내 전화번호로 온갖 만남이나 당첨 안내 같은 문자메시지가 계속 온다. 이런 게 오지 않게 할 수 있을까?"
+   },
+   {
+    "ru": "Надо учиться играть терпеливо, до конца, чтобы побеждать такую команду. Здесь нужно было потерпеть, вот этого нам и не хватило.",
+    "zh": "应当学会耐心打比赛，要坚持到最后，以便能战胜这样一支球队。这里需要忍耐一下，而恰恰这一点我们做得不够。",
+    "en": "You have to learn to play patiently, right to the end, in order to beat a team like that. Here we needed to hold on, and that is exactly what we lacked.",
+    "ko": "그런 팀을 이기려면 끝까지 참고 경기하는 법을 배워야 한다. 여기서는 버텨야 했는데, 바로 그것이 우리에게 부족했다."
+   },
+   {
+    "ru": "Ночь темна, чтобы найти дорогу.",
+    "zh": "夜很黑，无法找到路。",
+    "en": "The night is too dark to find the way.",
+    "ko": "밤이 어두워 길을 찾을 수 없다."
+   }
+  ]
+ },
+ "ru_chut_ne": {
+  "name": "чуть не + perfective past (almost)",
+  "examples": [
+   {
+    "ru": "Он чуть не упал.",
+    "zh": "他差点儿摔倒了。",
+    "en": "He almost fell.",
+    "ko": "그는 하마터면 넘어질 뻔했다."
+   },
+   {
+    "ru": "Я с досады чуть не плачу.",
+    "zh": "我懊丧得差点要哭。",
+    "en": "I'm so vexed I could almost cry.",
+    "ko": "나는 분해서 하마터면 울 뻔했다."
+   }
+  ]
+ },
+ "ru_deepricastie": {
+  "name": "Adverbial participles (-я / -в)",
+  "examples": [
+   {
+    "ru": "Как красив этот город!",
+    "zh": "这座城市真美！",
+    "en": "How beautiful this city is!",
+    "ko": "이 도시는 정말 아름답다!"
+   },
+   {
+    "ru": "Нет несчастнее людей, которые живут ориентируясь на других.",
+    "zh": "没有比就指望别人活着的人更不幸的了。",
+    "en": "There is no one more unhappy than people who live by taking their cue from others.",
+    "ko": "남을 기준으로 살아가는 사람보다 불행한 사람은 없다."
+   },
+   {
+    "ru": "Собравшись с некоторыми средствами, он снова построил себе избу.",
+    "zh": "准备好一些钱，重新给自己盖了房子。",
+    "en": "Having scraped some money together, he built himself a hut again.",
+    "ko": "돈을 좀 모은 뒤 그는 다시 자기 오두막을 지었다."
+   }
+  ]
+ },
+ "ru_double_neg": {
+  "name": "никогда / никто + не (double negative)",
+  "examples": [
+   {
+    "ru": "Весь вечер Людмила смотрела телевизор, никуда не уходя.",
+    "zh": "柳德米拉看了一晚上电视，哪儿也没去。",
+    "en": "Lyudmila watched TV all evening without going anywhere.",
+    "ko": "류드밀라는 저녁 내내 어디 가지 않고 텔레비전을 봤다."
+   },
+   {
+    "ru": "Приди на пять минут раньше, и никто не будет возражать.",
+    "zh": "你早来五分钟的话，谁也不会反对。",
+    "en": "Come five minutes earlier and nobody will object.",
+    "ko": "오 분만 일찍 왔다면 아무도 반대하지 않았을 것이다."
+   },
+   {
+    "ru": "Я никогда не видел такую птицу.",
+    "zh": "我从来没见过这样的鸟。",
+    "en": "I've never seen a bird like that.",
+    "ko": "나는 그런 새를 본 적이 없다."
+   }
+  ]
+ },
+ "ru_edva_li": {
+  "name": "едва ли / вряд ли (doubt)",
+  "examples": [
+   {
+    "ru": "Вы счастливы? — Не скажете! Едва ли!",
+    "zh": "“您幸福吗？”“可不敢说！未必！”",
+    "en": "Are you happy? -- I wouldn't say so! Hardly!",
+    "ko": "행복하세요? -- 글쎄요! 그럴 리가요!"
+   }
+  ]
+ },
+ "ru_future": {
+  "name": "Future tense",
+  "examples": [
+   {
+    "ru": "Варить кукурузу необходимо в день покупки, тогда она получится наиболее нежной и мягкой, и сохранит свой уникальные полезные свойства.",
+    "zh": "玉米必须在买来的当天煮，此时煮出来的玉米又嫩又软，并能保存其独有的营养物质。",
+    "en": "Corn must be boiled on the day it is bought; that way it comes out tender and soft and keeps its own nutritional properties.",
+    "ko": "옥수수는 산 당일에 삶아야 한다. 그래야 가장 부드럽고 연하며 고유의 영양 성분을 지킬 수 있다."
+   },
+   {
+    "ru": "С нынешнего дня буду вести строгую запись своему доходу и расходу.",
+    "zh": "从今天起我要严格记下收支账目。",
+    "en": "From today on I'll keep a strict record of my income and expenditure.",
+    "ko": "오늘부터 나는 수입과 지출을 철저히 기록할 것이다."
+   },
+   {
+    "ru": "Те, кто читают книги, всегда будут управлять теми, кто смотрит телевизор.",
+    "zh": "那些读书的人总是要管理那些看电视的人。",
+    "en": "Those who read books will always govern those who watch television.",
+    "ko": "책을 읽는 사람은 언제나 텔레비전을 보는 사람을 다스릴 것이다."
+   }
+  ]
+ },
+ "ru_gen_preps": {
+  "name": "Genitive after без / для / до / из / от ...",
+  "examples": [
+   {
+    "ru": "Мы дошли до предела и двигаться дальше вперёд уже незачем.",
+    "zh": "我们到达了边界，继续前进是不必要了。",
+    "en": "We have reached the limit, and there is no point in going any further.",
+    "ko": "우리는 한계에 도달했고 더 나아갈 필요가 없다."
+   },
+   {
+    "ru": "Он решил собрать букетик цветов для своей мамы.",
+    "zh": "它决定为自己的妈妈采集一束花。",
+    "en": "He decided to pick a little bunch of flowers for his mother.",
+    "ko": "그는 어머니를 위해 작은 꽃다발을 꺾기로 했다."
+   },
+   {
+    "ru": "Самая первая забота для нас — всемерно развивать сельское хозяйство.",
+    "zh": "我们最迫切的任务就是大力发展农业。",
+    "en": "Our first and foremost concern is to develop agriculture in every possible way.",
+    "ko": "우리의 가장 시급한 일은 농업을 온 힘을 다해 발전시키는 것이다."
+   }
+  ]
+ },
+ "ru_imperative": {
+  "name": "Imperative (-те form, читайте)",
+  "examples": [
+   {
+    "ru": "Если вы не правы, признавайте это быстро и категорично.",
+    "zh": "如果是您不对，您就迅速地而且坚决地承认下来吧。",
+    "en": "If you are wrong, admit it quickly and categorically.",
+    "ko": "당신이 틀렸다면 빨리 그리고 단호하게 인정하십시오."
+   },
+   {
+    "ru": "Если уж сказал «Люблю», то будь добр любить до последнего вздоха.",
+    "zh": "如果说了“我爱你”，那就请你爱到最后一次呼吸。",
+    "en": "If you have said 'I love you', then kindly love to your last breath.",
+    "ko": "\"사랑해\"라고 말했다면, 마지막 숨까지 사랑하라."
+   },
+   {
+    "ru": "У мужа три пары брюк и все малы в поясе, за зиму набрал 8 см в талии.",
+    "zh": "我丈夫有三条裤子，都是腰带这儿瘦，他一冬天腰肥了8厘米。",
+    "en": "My husband has three pairs of trousers and they are all tight at the waist -- over the winter he put 8 cm on his waist.",
+    "ko": "남편은 바지가 세 벌인데 모두 허리가 작다. 겨울 동안 허리가 8센티미터나 늘었다."
+   }
+  ]
+ },
+ "ru_k_dat": {
+  "name": "к + dative (direction)",
+  "examples": [
+   {
+    "ru": "К обеду меня не ждите, я могу прийти только к четырём часам дня.",
+    "zh": "午饭别等我，我只能在下午四点前来。",
+    "en": "Don't wait for me for lunch; I can only come by four in the afternoon.",
+    "ko": "점심은 나를 기다리지 마세요. 나는 오후 네 시쯤에나 올 수 있습니다."
+   },
+   {
+    "ru": "Рубль будет снижаться к доллару в первой половине дня.",
+    "zh": "卢布兑美元将在上午贬值。",
+    "en": "The rouble will fall against the dollar in the morning.",
+    "ko": "루블은 오전에 달러 대비 하락할 것이다."
+   },
+   {
+    "ru": "Соперник у тебя будет сильный, к игре нужно подготовиться серьёзно.",
+    "zh": "你遇到的对手会很强，需要认真地做好比赛准备。",
+    "en": "Your opponent will be strong, so you need to prepare for the game seriously.",
+    "ko": "네 상대는 강할 테니 경기를 진지하게 준비해야 한다."
+   }
+  ]
+ },
+ "ru_modal_inf": {
+  "name": "можно / нужно / надо + infinitive",
+  "examples": [
+   {
+    "ru": "В распоряжении РБК daily оказался проект нового ГОСТа для розничной торговли, который должен вступить в силу в 2015 году.",
+    "zh": "俄罗斯商务会商传媒集团日报社手中有一份2015年将付诸实施的零售贸易新国标方案。",
+    "en": "RBC Daily has obtained a draft of the new state standard for retail trade, due to come into force in 2015.",
+    "ko": "RBC 데일리는 2015년에 시행될 예정인 소매 거래 신국가표준 초안을 입수했다."
+   },
+   {
+    "ru": "Интересно, а каким должен быть, правда, настоящий читатель?",
+    "zh": "令人感兴趣的是，说实话，一个真正的读者应该是怎么样的人呢？",
+    "en": "I wonder what a real reader should actually be like?",
+    "ko": "흥미롭군요, 그런데 정말 진짜 독자는 어떤 사람이어야 할까요?"
+   },
+   {
+    "ru": "Мы, студенты, должны помогать друг другу в сложных ситуациях.",
+    "zh": "我们作为大学生，应该在复杂的情况下互相帮助。",
+    "en": "We students must help one another in difficult situations.",
+    "ko": "우리 학생들은 어려운 상황에서 서로 도와야 한다."
+   }
+  ]
+ },
+ "ru_motion_prefixes": {
+  "name": "Prefixed motion verbs (при-/у-/по-...)",
+  "examples": [
+   {
+    "ru": "Компьютер — он давно уже вошёл в жизнь простых людей.",
+    "zh": "电脑，它早就已经进入了普通人的生活。",
+    "en": "The computer -- it entered ordinary people's lives long ago.",
+    "ko": "컴퓨터는 이미 오래전에 보통 사람들의 삶에 들어왔다."
+   },
+   {
+    "ru": "Мы дошли до предела и двигаться дальше вперёд уже незачем.",
+    "zh": "我们到达了边界，继续前进是不必要了。",
+    "en": "We have reached the limit, and there is no point in going any further.",
+    "ko": "우리는 한계에 도달했고 더 나아갈 필요가 없다."
+   },
+   {
+    "ru": "Первый, кому пришла в голову чудесная мысль о практическом применении электромагнитных волн, был великий русский учёный А.С.Попов.",
+    "zh": "第一个绝妙地想到实际运用电磁波的人是伟大的俄国科学家波波夫。",
+    "en": "The first person to hit on the wonderful idea of putting electromagnetic waves to practical use was the great Russian scientist A. S. Popov.",
+    "ko": "전자기파를 실제로 이용하자는 기발한 생각을 처음 떠올린 사람은 위대한 러시아 과학자 A. S. 포포프였다."
+   }
+  ]
+ },
+ "ru_nravitsya": {
+  "name": "мне нравится (like)",
+  "examples": [
+   {
+    "ru": "Проект этого инженера далеко не безупречный, и всё же он мне нравится.",
+    "zh": "这位工程师的方案远不是无可挑剔的，但我仍然喜欢这个方案。",
+    "en": "This engineer's design is far from flawless, and yet I like it.",
+    "ko": "이 기술자의 안은 결코 완벽하지 않지만 그래도 나는 이 안이 마음에 든다."
+   },
+   {
+    "ru": "Я делаю только то, что мне нравится, а не то, что делают все.",
+    "zh": "我只做我喜欢做的事情，而不是大家都在做的事情。",
+    "en": "I only do what I like, not what everyone else does.",
+    "ko": "나는 남들이 다 하는 일이 아니라 내가 좋아하는 일만 한다."
+   }
+  ]
+ },
+ "ru_nums_2_4": {
+  "name": "2–4 + genitive singular",
+  "examples": [
+   {
+    "ru": "22 июня в 4 часа утра, в то самое время, когда началась Великая Отечественная война, благовещенцы собрались на площади Победы ...",
+    "zh": "6月22日凌晨四点，在伟大的卫国战争开始的时刻，布拉戈维申斯克市市民聚集在了胜利广场……",
+    "en": "At four in the morning on 22 June, at the very hour the Great Patriotic War began, the people of Blagoveshchensk gathered in Victory Square ...",
+    "ko": "6월 22일 새벽 네 시, 위대한 조국전쟁이 시작된 바로 그 시각에 블라고베셴스크 시민들이 승리 광장에 모였다……"
+   },
+   {
+    "ru": "В первой корзине было в 3 раза больше ягод, чем во второй.",
+    "zh": "第一个篮子里的浆果比第二个篮子里多两倍。",
+    "en": "There were three times as many berries in the first basket as in the second.",
+    "ko": "첫 번째 바구니에는 두 번째 바구니보다 열매가 세 배 더 많았다."
+   },
+   {
+    "ru": "У мужа три пары брюк и все малы в поясе, за зиму набрал 8 см в талии.",
+    "zh": "我丈夫有三条裤子，都是腰带这儿瘦，他一冬天腰肥了8厘米。",
+    "en": "My husband has three pairs of trousers and they are all tight at the waist -- over the winter he put 8 cm on his waist.",
+    "ko": "남편은 바지가 세 벌인데 모두 허리가 작다. 겨울 동안 허리가 8센티미터나 늘었다."
+   }
+  ]
+ },
+ "ru_nums_5": {
+  "name": "5+ + genitive plural",
+  "examples": [
+   {
+    "ru": "В древних китайских письменных памятниках имеется много записей о жизни и обычаях народов, населявших в те далёкие времена территорию Средней Азии и Сибири.",
+    "zh": "在一些中国古代文献中有很多关于远古年代居住在中亚细亚和西伯利亚地区各族人民生活和习俗的记载。",
+    "en": "Ancient Chinese written records contain many accounts of the life and customs of the peoples who inhabited Central Asia and Siberia in those distant times.",
+    "ko": "고대 중국 문헌에는 그 먼 시절 중앙아시아와 시베리아 지역에 살던 여러 민족의 생활과 풍습에 관한 기록이 많이 있다."
+   },
+   {
+    "ru": "На нашем факультете работает десять преподавательниц.",
+    "zh": "我们系有10位女教师。",
+    "en": "Ten women teachers work in our faculty.",
+    "ko": "우리 학부에는 여성 교원이 열 명 있다."
+   },
+   {
+    "ru": "Он дал мне пять старых книг.",
+    "zh": "他给了我5本旧书。",
+    "en": "He gave me five old books.",
+    "ko": "그는 나에게 오래된 책 다섯 권을 주었다."
+   }
+  ]
+ },
+ "ru_o_loct": {
+  "name": "о / об + prepositional (about)",
+  "examples": [
+   {
+    "ru": "В древних китайских письменных памятниках имеется много записей о жизни и обычаях народов, населявших в те далёкие времена территорию Средней Азии и Сибири.",
+    "zh": "在一些中国古代文献中有很多关于远古年代居住在中亚细亚和西伯利亚地区各族人民生活和习俗的记载。",
+    "en": "Ancient Chinese written records contain many accounts of the life and customs of the peoples who inhabited Central Asia and Siberia in those distant times.",
+    "ko": "고대 중국 문헌에는 그 먼 시절 중앙아시아와 시베리아 지역에 살던 여러 민족의 생활과 풍습에 관한 기록이 많이 있다."
+   },
+   {
+    "ru": "О нем известно далеко за пределами района и области.",
+    "zh": "他在本区本州之外很远的地方都有名气。",
+    "en": "He is known far beyond the district and the region.",
+    "ko": "그는 이 구와 주를 훨씬 넘어서까지 알려져 있다."
+   },
+   {
+    "ru": "Первый, кому пришла в голову чудесная мысль о практическом применении электромагнитных волн, был великий русский учёный А.С.Попов.",
+    "zh": "第一个绝妙地想到实际运用电磁波的人是伟大的俄国科学家波波夫。",
+    "en": "The first person to hit on the wonderful idea of putting electromagnetic waves to practical use was the great Russian scientist A. S. Popov.",
+    "ko": "전자기파를 실제로 이용하자는 기발한 생각을 처음 떠올린 사람은 위대한 러시아 과학자 A. S. 포포프였다."
+   }
+  ]
+ },
+ "ru_past": {
+  "name": "Past tense (aspect matters)",
+  "examples": [
+   {
+    "ru": "Денёчек был замечательный.",
+    "zh": "这一天过得太美妙了。",
+    "en": "The day was a lovely one.",
+    "ko": "참 좋은 하루였다."
+   },
+   {
+    "ru": "Он решил собрать букетик цветов для своей мамы.",
+    "zh": "它决定为自己的妈妈采集一束花。",
+    "en": "He decided to pick a little bunch of flowers for his mother.",
+    "ko": "그는 어머니를 위해 작은 꽃다발을 꺾기로 했다."
+   },
+   {
+    "ru": "Первым исследователем Солнца стал знаменитый учёный Галилей.",
+    "zh": "著名的科学家伽利略成为太阳的第一位研究者。",
+    "en": "The famous scientist Galileo became the first researcher of the sun.",
+    "ko": "저명한 과학자 갈릴레오가 태양의 첫 연구자가 되었다."
+   }
+  ]
+ },
+ "ru_poka_ne": {
+  "name": "пока не (until)",
+  "examples": [
+   {
+    "ru": "Мы ждали, пока не пришла машина.",
+    "zh": "我们一直等到车来。",
+    "en": "We waited until the car came.",
+    "ko": "우리는 차가 올 때까지 기다렸다."
+   }
+  ]
+ },
+ "ru_prep_loct": {
+  "name": "в / на + prepositional case (location)",
+  "examples": [
+   {
+    "ru": "В проекте определены демократические права граждан.",
+    "zh": "草案中规定了公民的各项民主权利。",
+    "en": "The draft sets out the democratic rights of citizens.",
+    "ko": "초안에는 시민의 민주적 권리가 규정되어 있다."
+   },
+   {
+    "ru": "Добро пожаловать в Гёте-институт в Санкт-Петербурге.",
+    "zh": "热烈欢迎光临圣彼得堡歌德学院。",
+    "en": "Welcome to the Goethe Institute in St Petersburg.",
+    "ko": "상트페테르부르크 괴테 인스티투트에 오신 것을 환영합니다."
+   },
+   {
+    "ru": "Знаки на пути.",
+    "zh": "路上的标识。",
+    "en": "Signs along the way.",
+    "ko": "길 위의 표지들."
+   }
+  ]
+ },
+ "ru_pricastie": {
+  "name": "Participles (-щий / -вший / -мый)",
+  "examples": [
+   {
+    "ru": "В древних китайских письменных памятниках имеется много записей о жизни и обычаях народов, населявших в те далёкие времена территорию Средней Азии и Сибири.",
+    "zh": "在一些中国古代文献中有很多关于远古年代居住在中亚细亚和西伯利亚地区各族人民生活和习俗的记载。",
+    "en": "Ancient Chinese written records contain many accounts of the life and customs of the peoples who inhabited Central Asia and Siberia in those distant times.",
+    "ko": "고대 중국 문헌에는 그 먼 시절 중앙아시아와 시베리아 지역에 살던 여러 민족의 생활과 풍습에 관한 기록이 많이 있다."
+   },
+   {
+    "ru": "Книга «Тысяча сияющих солнц» глубоко тронула меня.",
+    "zh": "《一千个耀眼的太阳》这本书深深地打动了我。",
+    "en": "The book A Thousand Splendid Suns moved me deeply.",
+    "ko": "『천 개의 찬란한 태양』이라는 책이 나를 깊이 감동시켰다."
+   },
+   {
+    "ru": "Я долго подыскивал подходящее выражение, но не нашёл.",
+    "zh": "我费了很长时间找一个合适的说法，可是没找到。",
+    "en": "I searched a long time for a suitable expression but didn't find one.",
+    "ko": "나는 오랫동안 적당한 표현을 찾았지만 찾지 못했다."
+   }
+  ]
+ },
+ "ru_s_ablt": {
+  "name": "с + instrumental (together with)",
+  "examples": [
+   {
+    "ru": "Мать с одним сыном-пьяницей и тремя дочерями была в велйкой нужде.",
+    "zh": "母亲带着一个酒鬼儿子和三个女儿，生活极其贫困。",
+    "en": "The mother, with one drunken son and three daughters, was in great need.",
+    "ko": "어머니는 술주정뱅이 아들 하나와 딸 셋을 데리고 극도로 궁핍하게 살았다."
+   },
+   {
+    "ru": "Мы с братом совсем не похожи, характеры у нас очень разные.",
+    "zh": "我和弟弟完全不相像，我们的性格很不相同。",
+    "en": "My brother and I don't look alike at all; our characters are very different.",
+    "ko": "나와 동생은 전혀 닮지 않았고 성격도 아주 다르다."
+   },
+   {
+    "ru": "Собравшись с некоторыми средствами, он снова построил себе избу.",
+    "zh": "准备好一些钱，重新给自己盖了房子。",
+    "en": "Having scraped some money together, he built himself a hut again.",
+    "ko": "돈을 좀 모은 뒤 그는 다시 자기 오두막을 지었다."
+   }
+  ]
+ },
+ "ru_sya": {
+  "name": "-ся / -сь verbs (reflexive)",
+  "examples": [
+   {
+    "ru": "Алёшин обычай каждый вечер подводить итоги дня остался.",
+    "zh": "阿廖沙每晚总结一天工作的习惯保留下来了。",
+    "en": "Alyosha's habit of summing up the day every evening has stayed with him.",
+    "ko": "알료샤가 저녁마다 하루를 정리하던 습관은 그대로 남았다."
+   },
+   {
+    "ru": "В древних китайских письменных памятниках имеется много записей о жизни и обычаях народов, населявших в те далёкие времена территорию Средней Азии и Сибири.",
+    "zh": "在一些中国古代文献中有很多关于远古年代居住在中亚细亚和西伯利亚地区各族人民生活和习俗的记载。",
+    "en": "Ancient Chinese written records contain many accounts of the life and customs of the peoples who inhabited Central Asia and Siberia in those distant times.",
+    "ko": "고대 중국 문헌에는 그 먼 시절 중앙아시아와 시베리아 지역에 살던 여러 민족의 생활과 풍습에 관한 기록이 많이 있다."
+   },
+   {
+    "ru": "Варить кукурузу необходимо в день покупки, тогда она получится наиболее нежной и мягкой, и сохранит свой уникальные полезные свойства.",
+    "zh": "玉米必须在买来的当天煮，此时煮出来的玉米又嫩又软，并能保存其独有的营养物质。",
+    "en": "Corn must be boiled on the day it is bought; that way it comes out tender and soft and keeps its own nutritional properties.",
+    "ko": "옥수수는 산 당일에 삶아야 한다. 그래야 가장 부드럽고 연하며 고유의 영양 성분을 지킬 수 있다."
+   }
+  ]
+ },
+ "ru_u_menya": {
+  "name": "у меня есть (possession)",
+  "examples": [
+   {
+    "ru": "Соперник у тебя будет сильный, к игре нужно подготовиться серьёзно.",
+    "zh": "你遇到的对手会很强，需要认真地做好比赛准备。",
+    "en": "Your opponent will be strong, so you need to prepare for the game seriously.",
+    "ko": "네 상대는 강할 테니 경기를 진지하게 준비해야 한다."
+   }
+  ]
+ }
+}

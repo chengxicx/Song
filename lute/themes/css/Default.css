@@ -29,8 +29,19 @@ body {
   --status-99-color: #38924c;
 
   --background-color: #1c1c1e;      /* Apple 界面暗黑背景色 */
+  /* 阅读模式的「纸面」外观跟随主题：深色主题 = 深色纸 + 反相正文。
+     styles.css 的 .epub-look-original 读这两个 token，未设置就是白纸。 */
+  --paper-bg: #16161d;
+  --paper-filter: invert(0.88) hue-rotate(180deg);
+  /* 纸内正文是「反相」出来的：生词蓝要先写成深色，反相后才亮。
+     #003399 反相后约 #98bfff（styles.css 的 --paper-status-0-color）。 */
+  --paper-status-0-color: #003399;
   --panel-bg: #2c2c2e;            /* 悬浮卡片/表格底色 */
   --font-color: #e5e5ea;           /* 文本亮灰/白 */
+
+  /* 语法匹配环（见 styles.css 的 .grammar-word-ring）：深色主题沿用
+     亮琥珀 -- styles.css 的默认值是给纸色主题的深琥珀，那在暗底上会发闷。 */
+  --grammar-match-color: rgba(255, 214, 90, 0.9);
 
   /* 表单控件：输入框复用面板底色，不另造新色阶 */
   --input-bg: #2c2c2e;

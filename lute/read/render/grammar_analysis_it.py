@@ -15,38 +15,15 @@ import re
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
     make_rule,
+    make_spacy_tokenizer,
+    rule_library_entries,
     spec_lemma,
     spec_morph,
     spec_pos,
     spec_surface,
 )
 
-_NLP = None
-
-
-def _nlp():
-    "Lazy, process-lifetime spaCy pipeline."
-    global _NLP
-    if _NLP is None:
-        import spacy  # pylint: disable=import-outside-toplevel
-
-        _NLP = spacy.load("it_core_news_sm", exclude=["parser", "senter", "ner"])
-    return _NLP
-
-
-def _tokens_for(sentence):
-    "Tokenize a sentence; return a list of token dicts."
-    doc = _nlp()(sentence)
-    return [
-        {
-            "surface": t.text,
-            "lemma": t.lemma_,
-            "pos": t.pos_,
-            "morph": t.morph.to_dict(),
-            "idx": t.idx,
-        }
-        for t in doc
-    ]
+_tokens_for = make_spacy_tokenizer("it_core_news_sm")
 
 
 # ---- rules -------------------------------------------------------------
@@ -337,3 +314,14 @@ def analyze_italian(page_text, display_lang="en"):
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
     return analyze_tokens(page_text, _IT_RULES, _tokens_for, display_lang)
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Italian grammar library, in CEFR order (A1 -> C1).
+
+    The corpus is the hand-written rule set itself.  No examples (the
+    rules were written without any); the spaCy model loads lazily, on
+    first analysis, so the list renders without it.
+    """
+    return rule_library_entries(_IT_RULES, display_lang)

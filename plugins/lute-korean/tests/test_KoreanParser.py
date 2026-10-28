@@ -70,8 +70,11 @@ def test_default_morpheme_tokenization(parser, korean):
 
     ss = _surfaces(tokens)
     # kiwipiepy 0.23.x: 예상/NNG + 하/XSV + 었었/EP + 는데/EC + 먹/VV + 었/EP + 어/EF + ./SF
+    # (하 and 었었 share the same start offset: 했 = 하 + 었.)  Surfaces
+    # are sliced from the raw text by character position, so the EP
+    # morpheme displays as the contraction '했었', not its base form.
     assert "예상" in ss
-    assert "었었" in ss
+    assert "했었" in ss
     assert "는데" in ss
     assert "먹" in ss
     # Space between 어절 is a non-word token.
@@ -100,11 +103,11 @@ def test_eojeol_mode_keeps_whole_block(parser, korean):
     korean.kiwi_tokenizer_mode = "eojeol"
     tokens = parser.get_parsed_tokens("예상했었는데 먹었어.", korean)
     ss = _surfaces(tokens)
-    # Each 어절 becomes exactly one token.  Note kiwipiepy 0.23.x
-    # decomposes 했 into 하 + 었었 morphs, so the joined surface is
-    # '예상하었었는데' rather than the raw text - pinned to this
-    # kiwi version, like the cantonese plugin pins pycantonese.
-    assert ss == ["예상하었었는데", "먹었어."]
+    # Each 어절 becomes exactly one token, sliced from the raw text
+    # (never joined from kiwi's un-contracted forms, which would give
+    # the corrupted '예상하었었는데'), so the surface is the 어절 as
+    # written.
+    assert ss == ["예상했었는데", "먹었어."]
 
 
 def test_get_lemma_stemming(parser, korean):

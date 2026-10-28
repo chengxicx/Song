@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ t('Grammar library') }} — {{ language.name }}{% endblock %}
+{% block header %}{{ t('Grammar library') }}{% endblock %}
+
+{% block body %}
+
+{# The whole corpus on one page, using the full screen width: compact
+   cards grouped by level, the sticky toolbar's search filtering across
+   every level at once.  Each card links to the point's own page.  The
+   accent hue of a level rides on its section (grammar-group--N5 ...),
+   so cards and pills pick it up. #}
+<div class="grammar-library" data-language-id="{{ language.id }}"
+     data-base="{{ url_for('grammar.library', langid=language.id) }}">
+
+  <div class="grammar-library__bar">
+    <h2 class="grammar-library__language">{{ language.name }}</h2>
+    <span class="grammar-library__total">{{ total }} {{ t('grammar points') }}</span>
+    <a class="grammar-library__switch"
+       href="{{ url_for('grammar.index', pick=1) }}">{{ t('Switch language') }}</a>
+  </div>
+
+  {# Sticky, so both stay reachable down a ~1400-card page: the search
+     filters across all levels, the pills jump between them.  The pill
+     counts are inventory, not progress -- the corpus merges several
+     sources and repeats points across levels (see lute/grammar/routes.py). #}
+  <div class="grammar-library__toolbar">
+    <input id="grammar-library-search" type="search" autocomplete="off"
+           placeholder="{{ t('Search grammar points') }}"
+           aria-label="{{ t('Search grammar points') }}">
+    <nav class="grammar-library__levels">
+      {% for section in sections %}
+      <a class="grammar-library__level grammar-group--{{ level_class(section.level) }}"
+         href="#level-{{ section.level }}">
+        <span class="grammar-library__level-name">{{ section.level }}</span>
+        <span class="grammar-library__stat"><b>{{ section.matchable }}</b> {{ t('matchable') }}</span>
+        {% if section.reference %}
+        <span class="grammar-library__stat grammar-library__stat--quiet">{{ t('reference only') }} <b>{{ section.reference }}</b></span>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </nav>
+  </div>
+
+  {% for section in sections %}
+  <section class="grammar-group grammar-group--{{ level_class(section.level) }}"
+           id="level-{{ section.level }}">
+    <header class="grammar-group__head">
+      <span class="grammar-group__level">{{ section.level }}</span>
+      <span class="grammar-group__count">{{ section.total }} {{ t('grammar points') }}</span>
+      {% if section.reference %}
+      <span class="grammar-group__count grammar-group__count--quiet">{{ t('reference only') }}: {{ section.reference }}</span>
+      {% endif %}
+    </header>
+    <div class="grammar-library__grid">
+      {% for e in section.rows %}
+      <a class="grammar-library__card" href="{{ url_for('grammar.detail', langid=language.id, key=e.key) }}"
+         data-search="{{ (e.name ~ ' ' ~ e.desc ~ ' ' ~ (e.formation or ''))|lower }}">
+        <span class="grammar-library__card-name">{{ e.name }}</span>
+        <span class="grammar-library__card-desc">
+          <span class="grammar-library__card-meaning">{{ e.desc }}</span>
+          {% if e.skipped %}
+          <span class="grammar-library__card-tag grammar-library__card-tag--ref">{{ t('reference only') }}</span>
+          {% endif %}
+          {% if e.formality %}
+          <span class="grammar-library__card-tag">{{ t(e.formality) }}</span>
+          {% endif %}
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+
+  <div id="grammar-library-empty" class="grammar-library__empty" hidden>
+    {{ t('No grammar points match your search.') }}
+  </div>
+</div>
+
+<script>
+  (function () {
+    var root = document.querySelector(".grammar-library");
+    if (!root) return;
+
+    // Stale #key deep links (the old index anchored every card) land here:
+    // send them to the point's own page instead of a dead anchor.
+    if (location.hash.length > 1) {
+      location.replace(root.getAttribute("data-base") + "/" +
+        encodeURIComponent(location.hash.slice(1)));
+      return;
+    }
+
+    // Client-side name/meaning/formation filter over the cards.  Each
+    // card carries its searchable text in data-search, so the filter
+    // never reads the rendered markup.  A level whose every card is
+    // filtered out hides its whole section (head included).
+    var input = root.querySelector("#grammar-library-search");
+    var cards = Array.prototype.slice.call(root.querySelectorAll(".grammar-library__card"));
+    var sections = Array.prototype.slice.call(root.querySelectorAll(".grammar-group"));
+    var empty = root.querySelector("#grammar-library-empty");
+    function apply() {
+      var query = input.value.trim().toLowerCase();
+      var shown = 0;
+      cards.forEach(function (card) {
+        var text = card.getAttribute("data-search") || "";
+        var match = !query || text.indexOf(query) !== -1;
+        card.hidden = !match;
+        if (match) shown += 1;
+      });
+      sections.forEach(function (section) {
+        var visible = section.querySelectorAll(".grammar-library__card:not([hidden])").length;
+        section.hidden = visible === 0;
+      });
+      if (empty) empty.hidden = shown !== 0;
+    }
+    input.addEventListener("input", apply);
+  })();
+</script>
+
+{% endblock %}

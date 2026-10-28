@@ -221,7 +221,7 @@
       ytUseEmbedPlayer(api);
       if (!ytEmbedMode && api.els.loading) {
         api.els.loading.textContent =
-          "Unable to load the Bilibili player: no video stream available.";
+          I18N.t("Unable to load the Bilibili player: no video stream available.");
       }
       return;
     }
@@ -296,10 +296,10 @@
     if (api.els.loading) api.els.loading.style.display = "none";
     if (api.els.embedNotice) {
       api.els.embedNotice.textContent =
-        "Song cannot relay this video, so it is playing in Bilibili's embed " +
-        "player -- use that player's own controls. Subtitle sync " +
-        "(auto-scroll, loop, auto-pause) is not available in this mode; " +
-        "the transcript below still works.";
+        I18N.t("Song cannot relay this video, so it is playing in Bilibili's embed ") +
+        I18N.t("player -- use that player's own controls. Subtitle sync ") +
+        I18N.t("(auto-scroll, loop, auto-pause) is not available in this mode; ") +
+        I18N.t("the transcript below still works.");
       api.els.embedNotice.hidden = false;
     }
   }
@@ -308,7 +308,7 @@
     ytUseEmbedPlayer(api);
     if (api.els.loading && !ytEmbedMode) {
       api.els.loading.textContent =
-        "Unable to play this video. The transcript below is still available.";
+        I18N.t("Unable to play this video. The transcript below is still available.");
       api.els.loading.style.display = "block";
     }
   }
@@ -451,7 +451,7 @@
       },
 
       notReadyMessage: function () {
-        return "Unable to load the Bilibili player. The transcript below is still available.";
+        return I18N.t("Unable to load the Bilibili player. The transcript below is still available.");
       },
 
       // The in-place class refresh below must run synchronously at
@@ -472,6 +472,10 @@
     api.buildTranscript();
     api.bindControls();
     api.bindSubtitleInteractions();
+    // Settle the strip's height (from the book's cues) before the reading
+    // page loads its text and re-flows it into screen groups: the text
+    // below the player is fit to the space the strip leaves it.
+    api.syncStripHeight();
     api.bindKeys();
     api.bindStatusUpdates();
     api.bindNotReadyFallback();

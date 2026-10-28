@@ -19,6 +19,7 @@ from lute.models.repositories import (
     UserSettingRepository,
 )
 from lute.themes.service import Service as ThemeService
+from lute.i18n import t
 from lute.settings.forms import UserSettingsForm, UserShortcutsForm
 from lute.settings.current import refresh_global_settings
 from lute.settings.hotkey_data import categorized_hotkeys, hotkey_descriptions
@@ -59,6 +60,10 @@ def edit_settings():
         svc = ThemeService(db.session)
         form.current_theme.choices = svc.list_themes()
 
+    from lute.i18n import UI_LANGUAGES
+
+    form.ui_language.choices = UI_LANGUAGES
+
     ac = current_app.env_config
     if ac.is_docker:
         # User shouldn't change some things with docker.
@@ -85,7 +90,7 @@ def edit_settings():
         db.session.commit()
         refresh_global_settings(db.session)
 
-        flash("Settings updated", "success")
+        flash(t("Settings updated"), "success")
         return redirect("/")
 
     # Load current settings from the database
@@ -179,7 +184,7 @@ def set_key_value(key, value):
             jsonify(
                 {
                     "result": "failure",
-                    "message": f"Only an admin can change '{key}'.",
+                    "message": t("Only an admin can change") + f" '{key}'.",
                 }
             ),
             403,
@@ -192,7 +197,12 @@ def set_key_value(key, value):
         # posting a setting this build does not define (e.g. a stale
         # cached page).  Answer with a plain failure rather than letting
         # the lookup raise a 500.
-        return jsonify({"result": "failure", "message": f"Unknown setting: {key}"}), 404
+        return (
+            jsonify(
+                {"result": "failure", "message": t("Unknown setting") + f": {key}"}
+            ),
+            404,
+        )
     try:
         repo.set_value(key, value)
         result = {"result": "success", "message": "OK"}
@@ -235,7 +245,7 @@ def edit_shortcuts():
             repo.set_value(k, v)
         db.session.commit()
         refresh_global_settings(db.session)
-        flash("Shortcuts updated", "success")
+        flash(t("Shortcuts updated"), "success")
         return redirect("/")
 
     categorized_settings = _get_categorized_hotkeys()
@@ -256,9 +266,9 @@ def save_datatables_state():
     key = payload.get("key")
     value = payload.get("value")
     if not key:
-        return jsonify({"result": "failure", "message": "Missing key"}), 400
+        return jsonify({"result": "failure", "message": t("Missing key")}), 400
     if value is None:
-        return jsonify({"result": "failure", "message": "Missing value"}), 400
+        return jsonify({"result": "failure", "message": t("Missing value")}), 400
     repo = UserSettingRepository(db.session)
     try:
         # Prefix the key to avoid collisions with known setting keys.
@@ -279,7 +289,7 @@ def load_datatables_state(key):
     Returns { "value": "<json_string>" } or 404 if not found.
     """
     if not key:
-        return jsonify({"result": "failure", "message": "Missing key"}), 400
+        return jsonify({"result": "failure", "message": t("Missing key")}), 400
     repo = UserSettingRepository(db.session)
     value = repo.get_dynamic_value(f"dt_state_{key}")
     if value is None:

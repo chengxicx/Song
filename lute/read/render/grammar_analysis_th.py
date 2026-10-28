@@ -1,5 +1,5 @@
 """
-Thai grammar point detection (pythainlp).
+Thai grammar point detection (pythainlp) and the Thai grammar library.
 
 Thai is analytic: no inflection, so unlike the European engines the rules
 match particle and function-word tokens rather than morphological
@@ -7,14 +7,30 @@ features.  pythainlp word_tokenize splits the text into words; whitespace
 tokens are dropped (Thai spaces separate clauses, not words) and token
 offsets are recovered by scanning forward in the original sentence.
 
+Two layers of rules:
+
+  * ``_TH_RULES`` -- a handful of hand-written rules for shapes the corpus
+    cannot state as a literal (a frame such as สามารถ ... ได้, the น่า
+    prefix).  These stay token-based.
+  * the corpus in ``jlpt_data/grammar_th.json`` -- one row per grammar
+    point, keyed to the section number of the reference outline it came
+    from (see ATTRIBUTION.md).  A row fires when one of its ``focus``
+    literals occurs in the sentence.  The match runs over the sentence
+    text rather than over tokens: pythainlp glues function words to their
+    neighbours (มาจาก, ทางขวา, ไปเสียแล้ว), so token-exact matching would
+    miss the particles a reader most wants flagged.
+
 pythainlp is imported lazily so the base install works without it; the
 route falls back to the generic rule library on ImportError.
 """
 
+import json
+import os
 import re
 
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
+    load_golden,
     make_rule,
     spec_surface,
 )
@@ -348,6 +364,363 @@ _TH_RULES = [
 ]
 
 
+# ---- corpus ------------------------------------------------------------
+#
+# The grammar library in jlpt_data/grammar_th.json, one row per grammar
+# point.  `section` keeps the point's number in the outline the corpus was
+# written against, so a card can be traced back to where it is described.
+# `topic` is the coarse area (verb, particle, question, ...), for grouping.
+# Rows carry CEFR bands as a display approximation -- Thai has no
+# JLPT/TOPIK-style grading.
+
+_CORPUS_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_th.json",
+    )
+)
+
+_CORPUS = None
+_CORPUS_RULES = None
+
+
+def _corpus():
+    "The corpus rows, loaded once (empty list if the file is missing)."
+    global _CORPUS  # pylint: disable=global-statement
+    if _CORPUS is None:
+        if os.path.exists(_CORPUS_PATH):
+            with open(_CORPUS_PATH, encoding="utf-8") as fh:
+                _CORPUS = json.load(fh)
+        else:
+            _CORPUS = []
+    return _CORPUS
+
+
+def _hand_surfaces():
+    """
+    Every literal the hand-written rules already match.
+
+    The corpus rows whose only trigger is one of these are covered by a
+    hand rule, so they must not build a second rule for the same text --
+    the panel would then show the same sentence under two cards.
+    """
+    found = set()
+
+    def walk(spec):
+        if isinstance(spec, dict):
+            found.update(spec.get("surface_in") or ())
+            for key in ("seq", "left", "right", "any_of"):
+                for sub in spec.get(key) or ():
+                    walk(sub)
+        elif isinstance(spec, (list, tuple)):
+            for sub in spec:
+                walk(sub)
+
+    for rule in _TH_RULES:
+        walk(rule["match"])
+    return found
+
+
+_HAND_SURFACES = _hand_surfaces()
+_HAND_KEYS = {r["key"] for r in _TH_RULES}
+
+
+# How a corpus literal may sit in the text.  "token" requires the hit to
+# cover a whole token: สิ must not be read out of สิบ, nor ขา out of ขาย.
+# "start" requires only a token start, for morphemes that are prefixes or
+# the first element of a compound (ความ in ความรัก, นัก in นักเรียน).
+_BOUNDARY_TOKEN = "token"
+_BOUNDARY_START = "start"
+_DEFAULT_BOUNDARY = _BOUNDARY_TOKEN
+
+
+def _corpus_match(foci, boundary=None):
+    """
+    The match shape for one corpus row: a regex over the sentence text.
+
+    Not token-exact: pythainlp glues function words to their neighbours
+    (มาจาก, ทางขวา, ตารางเมตร), so a purely token-indexed spec silently
+    misses exactly the high-frequency particles a reader wants flagged.
+    The regex is therefore run over the raw text, but its hits are filtered
+    by ``boundary`` -- matching a bare substring made ขา fire inside ขาย and
+    สิ inside สิบ, which is noise rather than a hint.
+    """
+    pattern = re.compile(
+        "|".join(re.escape(f) for f in sorted(foci, key=len, reverse=True))
+    )
+    spec = {"type": "regex", "re": pattern}
+    if boundary:
+        spec["boundary"] = boundary
+    return spec
+
+
+def _get_corpus_rules():
+    """
+    Matcher rules derived from the corpus, built on first use.
+
+    One rule per row, an alternation of its focus literals (longest first,
+    so ไม่มีใคร wins over ไม่มี when both belong to the row).  Pure data:
+    no tokenizer is needed to build these, so the library stays browsable
+    when pythainlp is not installed.
+
+    A row may name its own ``boundary``; the rest default to whole-token.
+    """
+    global _CORPUS_RULES  # pylint: disable=global-statement
+    if _CORPUS_RULES is None:
+        rules = []
+        for item in _corpus():
+            foci = [f for f in item.get("focus") or () if f]
+            if not foci or item["key"] in _HAND_KEYS:
+                continue
+            rule = make_rule(
+                item["key"],
+                item["name"],
+                item["level"],
+                item.get("en") or item["name"],
+                _corpus_match(foci, item.get("boundary") or _DEFAULT_BOUNDARY),
+                zh=item.get("zh"),
+            )
+            reference = _first_reference(item.get("examples") or ())
+            if reference:
+                rule["reference"] = reference
+            rules.append(rule)
+        _CORPUS_RULES = rules
+    return _CORPUS_RULES
+
+
+def _matchable(item):
+    """
+    True if this row can be reported on a page: either it carries its own
+    focus literals, or a hand-written rule already matches one of them.
+    """
+    if item.get("focus"):
+        return True
+    return any(f in _HAND_SURFACES for f in item.get("focus_all") or ())
+
+
+# ---- panel reference block ---------------------------------------------
+#
+# The panel's own examples are the page's sentences, which carry no
+# translation, so each card folds out one curated example with its gloss.
+# Thai needs no second translation store for this: the corpus already
+# writes every example as "thai · romanisation — english ／ 中文", so the
+# reference block is a parse of the line, not new prose.
+
+
+def _reference_from_line(line):
+    """
+    One corpus example line as the panel's ``{sentence, en, zh}`` block.
+
+    Returns None for a line with nothing before the romanisation -- an
+    empty sentence would render an empty block.
+    """
+    head, _, zh = line.partition(_GLOSS_SEP)
+    thai, _, tail = head.partition(" · ")
+    _, _, en = tail.partition(" — ")
+    sentence = thai.strip()
+    if not sentence:
+        return None
+    reference = {"sentence": sentence}
+    if en.strip():
+        reference["en"] = en.strip()
+    if zh.strip():
+        reference["zh"] = zh.strip()
+    return reference
+
+
+def _first_reference(lines):
+    "The first line that parses, as a reference block."
+    for line in lines:
+        reference = _reference_from_line(line)
+        if reference:
+            return reference
+    return None
+
+
+_HAND_RULES = None
+
+
+def _hand_rules():
+    """
+    The hand-written rules, each with its golden example as the panel's
+    reference block.
+
+    Built once, on copies: the module-level rule list stays exactly as
+    written (the library export and the tests read it directly).
+    """
+    global _HAND_RULES  # pylint: disable=global-statement
+    if _HAND_RULES is None:
+        golden = _golden_examples()
+        rules = []
+        for rule in _TH_RULES:
+            rows = [row for row in golden.get(rule["key"]) or [] if row.get("text")]
+            if rows:
+                reference = {"sentence": rows[0]["text"].strip()}
+                for field in ("en", "zh", "ko"):
+                    value = (rows[0].get(field) or "").strip()
+                    if value:
+                        reference[field] = value
+                rule = dict(rule, reference=reference)
+            rules.append(rule)
+        _HAND_RULES = rules
+    return _HAND_RULES
+
+
+# ---- library export ----------------------------------------------------
+#
+# Mirrors the Japanese/Korean engines' export so every language renders
+# through the same template (see lute/grammar/routes.py).
+
+
+# The corpus writes each example as "thai · romanisation — english ／ 中文";
+# the Chinese after this separator is the only translation it carries.
+_GLOSS_SEP = " ／ "
+
+
+def _example_row(sentence, display_lang):
+    """
+    One corpus example as ``{"text", "tr"}``.
+
+    The English is part of the sentence line itself, so ``text`` is already
+    bilingual for an English display language; the Chinese after the
+    separator is shown only when Chinese is the display language.
+    """
+    text, _, gloss = sentence.partition(_GLOSS_SEP)
+    return {"text": text, "tr": gloss.strip() if display_lang == "zh" else ""}
+
+
+def _golden_gloss(row, display_lang):
+    """
+    The translation to print under a golden example, or "".
+
+    Golden rows carry the three glosses as separate fields (``en`` /
+    ``zh`` / ``ko``) rather than inline in the sentence line, so the
+    display language picks one directly.  A missing one stays empty -- the
+    template then shows no gloss line.
+    """
+    if display_lang == "zh":
+        return (row.get("zh") or "").strip()
+    if display_lang == "ko":
+        return (row.get("ko") or "").strip()
+    return (row.get("en") or "").strip()
+
+
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_th_golden.json",
+    )
+)
+
+
+def _golden_examples():
+    """
+    Curated examples for the hand-written rules, keyed by rule key.
+
+    The Thai corpus rows and the hand-written rules share keys for the
+    twenty rules the corpus was written to cover; the remaining nine are
+    rule-only.  Where a golden row exists it wins, because its sentences
+    were checked to show *this* construction rather than another reading
+    of the same word (ถูก "cheap" vs the passive).
+    """
+    return load_golden(_GOLDEN_PATH)
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Thai grammar library, in CEFR order (A1 -> C1).
+
+    The corpus is stored already ordered by level then section number, so
+    the rows come back in the order the book teaches them within a band.
+    A row with a golden entry shows the golden sentences instead of its
+    corpus examples.
+
+    Nine hand-written rules (ที่, สามารถ, ทั้ง...ทั้ง, เกือบ, อย่างไรก็ตาม,
+    ...) have no corpus row of their own -- the corpus covers the other
+    twenty -- so they are merged in from the rule list, each one at the end
+    of its own level band.  Without that they were matchable in the reader
+    but absent from the library, which is the one place a learner browses
+    what the engine knows.
+    """
+    golden = _golden_examples()
+    entries = []
+    corpus_keys = set()
+    for item in _corpus():
+        corpus_keys.add(item["key"])
+        desc = item.get("zh") if display_lang == "zh" else item.get("en")
+        curated = golden.get(item["key"])
+        if curated:
+            examples = [
+                {"text": row["text"], "tr": _golden_gloss(row, display_lang)}
+                if _golden_gloss(row, display_lang)
+                else row["text"]
+                for row in curated
+            ]
+        else:
+            examples = [
+                _example_row(s, display_lang) for s in item.get("examples") or ()
+            ]
+        entry = {
+            "key": item["key"],
+            "name": item["name"],
+            "level": item["level"],
+            "desc": desc or item.get("en") or "",
+            "examples": examples,
+            "skipped": not _matchable(item),
+        }
+        formation = (item.get("formation") or "").strip()
+        if formation:
+            entry["formation"] = formation
+        entries.append(entry)
+
+    for rule in _TH_RULES:
+        if rule["key"] in corpus_keys:
+            continue
+        curated = golden.get(rule["key"]) or []
+        entry = {
+            "key": rule["key"],
+            "name": rule["name"],
+            "level": rule["level"],
+            "desc": (rule.get("zh") if display_lang == "zh" else rule["desc"])
+            or rule["desc"],
+            "examples": [
+                {"text": row["text"], "tr": _golden_gloss(row, display_lang)}
+                if _golden_gloss(row, display_lang)
+                else row["text"]
+                for row in curated
+            ],
+            "skipped": False,
+        }
+        _insert_by_level(entries, entry)
+    return entries
+
+
+def _insert_by_level(entries, entry):
+    """
+    Put ``entry`` at the end of its own level band, in place.
+
+    The list is the page's order *and* the detail page's prev/next chain,
+    so it has to stay CEFR-ordered; appending the nine rule-only cards
+    after the last C1 row left them behind the whole library (and made the
+    "levels are ordered easiest first" check fail).  A level with no corpus
+    rows at all -- not the case today -- falls back to appending.
+    """
+    last = None
+    for index, existing in enumerate(entries):
+        if existing["level"] == entry["level"]:
+            last = index
+    if last is None:
+        entries.append(entry)
+    else:
+        entries.insert(last + 1, entry)
+
+
 def analyze_thai(page_text, display_lang="en"):
     """
     Analyze a page of Thai text for grammar points.
@@ -355,4 +728,5 @@ def analyze_thai(page_text, display_lang="en"):
     Returns a list of dicts:
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
-    return analyze_tokens(page_text, _TH_RULES, _tokens_for, display_lang)
+    rules = _hand_rules() + _get_corpus_rules()
+    return analyze_tokens(page_text, rules, _tokens_for, display_lang)

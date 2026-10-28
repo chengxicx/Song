@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ t('Grammar library') }}{% endblock %}
+{% block header %}{{ t('Grammar library') }}{% endblock %}
+
+{% block body %}
+
+<div class="grammar-library grammar-library--index">
+  {% if languages %}
+  <ul class="grammar-library__languages">
+    {% for language in languages %}
+    <li><a href="/grammar/{{ language.id }}">{{ language.name }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="grammar-library__empty">{{ t('No language with a grammar library yet.') }}</p>
+  {% endif %}
+</div>
+
+{% endblock %}

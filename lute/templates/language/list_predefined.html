@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}Predefined Languages{% endblock %}
+{% block title %}{{ t('Predefined Languages') }}{% endblock %}
 
-{% block header %}Predefined Languages{% endblock %}
+{% block header %}{{ t('Predefined Languages') }}{% endblock %}
 
 {% block body %}
 
@@ -10,7 +10,7 @@
 <table id="languagetable" class="table dataTable no-footer" style="margin: 0;">
   <thead>
     <tr>
-      <th>Language</th>
+      <th>{{ t('Language') }}</th>
     </tr>
   </thead>
   <tbody>
@@ -21,7 +21,7 @@
           {{ language.name }}
         </a>
         {% if not language.is_supported %}
-        <small>(parser plugin will be installed on first load)</small>
+        <small>{{ t('(parser plugin will be installed on first load)') }}</small>
         {% endif %}
       </td>
     </tr>
