@@ -23,7 +23,8 @@ from tests.utils import make_book
 
 
 @pytest.mark.parametrize(
-    "lang_code", ["ja", "zh", "yue", "ko", "ar", "th", "es", "fr", "de", "it", "pt", "en", "ru"]
+    "lang_code",
+    ["ja", "zh", "yue", "ko", "ar", "th", "es", "fr", "de", "it", "pt", "en", "ru"],
 )
 def test_first_choice_is_the_theme_default(lang_code):
     choices = font_choices(lang_code)
@@ -88,7 +89,9 @@ def test_callers_cannot_mutate_the_tables():
     assert "bogus" not in [c["key"] for c in font_choices("ja")]
 
 
-def test_the_sidebar_offers_the_book_languages_faces(japanese, app_context, client):  # pylint: disable=unused-argument
+def test_the_sidebar_offers_the_book_languages_faces(
+    japanese, app_context, client
+):  # pylint: disable=unused-argument
     """
     read/routes.py resolves the list from the *book's* language, so the
     rendered page must carry those faces and the stack the JS applies.
@@ -105,7 +108,9 @@ def test_the_sidebar_offers_the_book_languages_faces(japanese, app_context, clie
     assert 'id="reader-font-system"' in body
 
 
-def test_a_latin_language_book_gets_the_latin_pair(english, app_context, client):  # pylint: disable=unused-argument
+def test_a_latin_language_book_gets_the_latin_pair(
+    english, app_context, client
+):  # pylint: disable=unused-argument
     "No Mincho in a Spanish/English book: the list follows the language."
     book = make_book("Font picker", "Hello there.", english)
     db.session.add(book)

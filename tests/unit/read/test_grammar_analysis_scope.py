@@ -71,8 +71,7 @@ def fixture_engine_calls(monkeypatch):
 
     def fake_engine(text, display_lang="en"):
         calls.append(text)
-        return [{"key": "k", "name": "n", "level": "A1", "desc": "d",
-                 "examples": []}]
+        return [{"key": "k", "name": "n", "level": "A1", "desc": "d", "examples": []}]
 
     monkeypatch.setattr(
         grammar_service,

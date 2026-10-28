@@ -98,7 +98,9 @@ def audit_corpus():
     golden = fr._golden_examples()  # pylint: disable=protected-access
     for rule in rules:
         for entry in golden.get(rule["key"], []):
-            text = fr._norm_text((entry.get("fr") or "").strip())  # pylint: disable=protected-access
+            text = fr._norm_text(
+                (entry.get("fr") or "").strip()
+            )  # pylint: disable=protected-access
             if text:
                 sentences.add(text)
     return sorted(sentences)

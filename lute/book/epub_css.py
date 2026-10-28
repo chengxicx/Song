@@ -75,9 +75,7 @@ def scope_css(css_text, base_dir, href_prefix, scope=".epub-body", keep_colors=F
     """
     css = _COMMENT_RE.sub("", css_text or "")
     out = []
-    _emit_rules(
-        css, 0, len(css), out, base_dir, href_prefix, scope, keep_colors
-    )
+    _emit_rules(css, 0, len(css), out, base_dir, href_prefix, scope, keep_colors)
     return "\n".join(r for r in out if r.strip())
 
 
@@ -117,7 +115,12 @@ def _emit_rules(css, start, end, out, base_dir, href_prefix, scope, keep_colors=
                 out.append(prelude + " {\n" + "\n".join(inner) + "\n}")
         elif lowered.startswith(_KEPT_AT_RULES):
             # Declarations only: rewrite urls (fonts) but keep values.
-            out.append(prelude + " {" + _rewrite_declarations(body, base_dir, href_prefix) + "}")
+            out.append(
+                prelude
+                + " {"
+                + _rewrite_declarations(body, base_dir, href_prefix)
+                + "}"
+            )
         else:
             selectors = _scope_selectors(prelude, scope)
             decls = (
@@ -349,7 +352,6 @@ def _split_declarations(body):
         (seg.partition(":")[0].strip().lower() if ":" in seg else "", seg)
         for seg in segments
     ]
-
 
 
 def _rewrite_urls(text, base_dir, href_prefix):

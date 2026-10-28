@@ -126,9 +126,9 @@ def test_word_spaced_text_one_sentence_per_line(thai):
     assert groups[1][-1].token == "ถ้วย", [str(t) for t in groups[1]]
     for group in groups:
         for t in group:
-            assert not (t.token.strip() == "" and t.is_end_of_sentence), (
-                f"space marked as EOS: {[str(x) for x in group]}"
-            )
+            assert not (
+                t.token.strip() == "" and t.is_end_of_sentence
+            ), f"space marked as EOS: {[str(x) for x in group]}"
 
 
 def test_traditional_spaced_text_still_splits_on_spaces(thai):

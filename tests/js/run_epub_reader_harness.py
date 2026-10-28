@@ -95,7 +95,9 @@ def main():
 
         check("no page errors", not errors, " %s" % errors[:1])
         check("chapter mounted", state["mounted"] == "1", " %s" % state["mounted"])
-        check("no mismatch reported", state["mismatch"] is None, " %s" % state["mismatch"])
+        check(
+            "no mismatch reported", state["mismatch"] is None, " %s" % state["mismatch"]
+        )
         # A <link> inside the swapped fragment is dropped by innerHTML,
         # so the book's stylesheet is added to <head> by the mount.
         check(
@@ -110,13 +112,23 @@ def main():
             state["text"] == state["original"],
             " %r != %r" % (state["text"][:60], state["original"][:60]),
         )
-        check("12 word spans (one word cut in two)", state["wordCount"] == 12, " %d" % state["wordCount"])
+        check(
+            "12 word spans (one word cut in two)",
+            state["wordCount"] == 12,
+            " %d" % state["wordCount"],
+        )
         check("18 textitem spans", state["itemCount"] == 18, " %d" % state["itemCount"])
         check("every span has a unique data-order", state["uniqueOrders"])
-        check("all word spans carry data-wid", state["wordsMissingWid"] == 0,
-              " %d missing" % state["wordsMissingWid"])
-        check("all word spans carry a status class", state["wordsMissingStatus"] == 0,
-              " %d missing" % state["wordsMissingStatus"])
+        check(
+            "all word spans carry data-wid",
+            state["wordsMissingWid"] == 0,
+            " %d missing" % state["wordsMissingWid"],
+        )
+        check(
+            "all word spans carry a status class",
+            state["wordsMissingStatus"] == 0,
+            " %d missing" % state["wordsMissingStatus"],
+        )
         check(
             "first Hello is a normal word span",
             state["helloP1"] is not None
@@ -126,7 +138,11 @@ def main():
         )
 
         pieces = state["splitPieces"]
-        check("the cut word renders as two split pieces", len(pieces) == 2, " %d" % len(pieces))
+        check(
+            "the cut word renders as two split pieces",
+            len(pieces) == 2,
+            " %d" % len(pieces),
+        )
         check(
             "split pieces keep the whole word for TTS",
             [p["tts"] for p in pieces] == ["Hello", "Hello"],
@@ -143,13 +159,22 @@ def main():
             " %s" % (pieces,),
         )
 
-        check("six sentence wrappers", state["sentenceCount"] == 6,
-              " %d" % state["sentenceCount"])
+        check(
+            "six sentence wrappers",
+            state["sentenceCount"] == 6,
+            " %d" % state["sentenceCount"],
+        )
         check(
             "sentences hold their own text",
             state["sentenceTexts"]
-            == ["Chapter", "Hello world, again.", "第二段落です。",
-                "See Hello there.", "One.", "Two."],
+            == [
+                "Chapter",
+                "Hello world, again.",
+                "第二段落です。",
+                "See Hello there.",
+                "One.",
+                "Two.",
+            ],
             " %s" % (state["sentenceTexts"],),
         )
 

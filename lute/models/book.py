@@ -479,8 +479,15 @@ class BookGrammar(db.Model):
     "Cached whole-book grammar analysis."
     __tablename__ = "bookgrammar"
 
-    BkID = db.Column("BgBkID", db.Integer, db.ForeignKey("books.BkID", ondelete="CASCADE"), primary_key=True)
-    status = db.Column("BgStatus", db.String, nullable=False, default=GRAMMAR_STATUS_PENDING)
+    BkID = db.Column(
+        "BgBkID",
+        db.Integer,
+        db.ForeignKey("books.BkID", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    status = db.Column(
+        "BgStatus", db.String, nullable=False, default=GRAMMAR_STATUS_PENDING
+    )
     text_hash = db.Column("BgTextHash", db.String, nullable=True)
     display = db.Column("BgDisplay", db.String, nullable=True)
     rules = db.Column("BgRules", db.String, nullable=True)

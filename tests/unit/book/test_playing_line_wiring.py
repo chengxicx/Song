@@ -265,9 +265,9 @@ def test_the_reading_page_ships_the_page_starts():
     "Without the map the media side cannot tell which page a cue is on."
     assert "LUTE_CUE_PAGE_STARTS" in _read(INDEX_HTML)
     routes = _read(_ROUTES)
-    assert "cue_page_starts=_cue_page_starts(book)" in routes, (
-        "the reading page must be handed the per-page cue starts"
-    )
+    assert (
+        "cue_page_starts=_cue_page_starts(book)" in routes
+    ), "the reading page must be handed the per-page cue starts"
 
 
 def test_the_reading_page_exposes_the_follow_helper():
@@ -286,9 +286,9 @@ def test_the_reading_page_exposes_the_follow_helper():
 
 def test_the_media_player_follows_the_playhead():
     js = _read(MEDIA_JS)
-    assert "ytFollowPlayhead(idx)" in _function_body(js, "ytActivateCue"), (
-        "activating a cue must also move the page text to it"
-    )
+    assert "ytFollowPlayhead(idx)" in _function_body(
+        js, "ytActivateCue"
+    ), "activating a cue must also move the page text to it"
     follow = _function_body(js, "ytFollowPlayhead")
     assert "LuteReaderFollow" in follow
     assert "requestPage(" in follow
@@ -300,21 +300,21 @@ def test_the_media_player_follows_the_playhead():
 
 def test_the_tts_player_turns_the_page_and_resumes():
     js = _read(TTS_JS)
-    assert "ttsFollowToNextPage()" in _function_body(js, "ttsAdvance"), (
-        "running out of cues must try the next page before stopping"
-    )
+    assert "ttsFollowToNextPage()" in _function_body(
+        js, "ttsAdvance"
+    ), "running out of cues must try the next page before stopping"
     follow = _function_body(js, "ttsFollowToNextPage")
     assert "ttsContinueOnSwap = true" in follow
     assert "requestPage(" in follow
     # The cue list is per page, so the rebuild after the swap is what
     # resumes -- tts-ui.js owns that rebuild.
     ui = _read(TTS_UI_JS)
-    assert "ttsContinueOnSwap" in ui, (
-        "the cue rebuild must know a page turn is waiting to resume"
-    )
-    assert "ttsPlayCue(0)" in ui, (
-        "the rebuilt page's first cue is where the reading goes on"
-    )
+    assert (
+        "ttsContinueOnSwap" in ui
+    ), "the cue rebuild must know a page turn is waiting to resume"
+    assert (
+        "ttsPlayCue(0)" in ui
+    ), "the rebuilt page's first cue is where the reading goes on"
 
 
 # ---------------------------------------------------------------------
@@ -329,10 +329,14 @@ def test_the_tts_player_turns_the_page_and_resumes():
 # the text moved 51px.
 
 
-_CSS = os.path.join(os.path.dirname(lute.__file__), "static", "css", "player-styles.css")
+_CSS = os.path.join(
+    os.path.dirname(lute.__file__), "static", "css", "player-styles.css"
+)
 
-YT_PLAYERS = [os.path.join(_STATIC_JS, "youtube-player.js"),
-              os.path.join(_STATIC_JS, "bilibili-player.js")]
+YT_PLAYERS = [
+    os.path.join(_STATIC_JS, "youtube-player.js"),
+    os.path.join(_STATIC_JS, "bilibili-player.js"),
+]
 
 
 def test_the_player_reserves_the_strip_height():
@@ -353,14 +357,14 @@ def test_the_player_reserves_the_strip_height():
         "ytSyncStripHeight must publish the reserved height, or the strip"
         " falls back to the stylesheet's height and moves on every cue"
     )
-    registry = js[js.index("window.LuteStripReserve = {"):]
+    registry = js[js.index("window.LuteStripReserve = {") :]
     assert 'setProperty("--yt-subtitle-reserve"' in registry, (
         "the registry must write the reserved height as"
         " --yt-subtitle-reserve on <body>"
     )
-    assert "ytSyncStripHeight()" in _function_body(js, "ytActivateCue"), (
-        "each cue activation must keep the strip's height settled"
-    )
+    assert "ytSyncStripHeight()" in _function_body(
+        js, "ytActivateCue"
+    ), "each cue activation must keep the strip's height settled"
     for path in YT_PLAYERS:
         name = os.path.basename(path)
         assert "api.syncStripHeight()" in _read(path), (
@@ -379,13 +383,13 @@ def test_the_stylesheet_uses_the_reserved_height():
     css = _read(_CSS)
     base = css[css.index(".yt-scrolling-subtitle {") :]
     base = base[: base.index("}")]
-    assert "min-height: var(--yt-subtitle-reserve," in base, (
-        "the strip's min-height must come from --yt-subtitle-reserve"
-    )
+    assert (
+        "min-height: var(--yt-subtitle-reserve," in base
+    ), "the strip's min-height must come from --yt-subtitle-reserve"
     # The collapsed mobile mini-bar keeps its fixed height: its strip is
     # one line that cannot wrap, so it has nothing to reserve.
     mini = css[css.index(".yt-scrolling-subtitle {\n    order: -1;") :]
     mini = mini[: mini.index("}")]
-    assert "min-height: 2.75rem" in mini and "--yt-subtitle-reserve" not in mini, (
-        "the mobile mini-bar must keep its own fixed height"
-    )
+    assert (
+        "min-height: 2.75rem" in mini and "--yt-subtitle-reserve" not in mini
+    ), "the mobile mini-bar must keep its own fixed height"

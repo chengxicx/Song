@@ -94,9 +94,9 @@ def test_material_sources_are_opaque_tags():
     for row in rows:
         src = (row.get("source") or "").strip()
         assert src, f"missing source tag: {row.get('pattern')}"
-        assert re.fullmatch(r"[a-z0-9][a-z0-9_-]*", src), (
-            f"source tag is not an opaque token: {src!r}"
-        )
+        assert re.fullmatch(
+            r"[a-z0-9][a-z0-9_-]*", src
+        ), f"source tag is not an opaque token: {src!r}"
 
 
 @needs_materials
@@ -107,9 +107,9 @@ def test_example_lines_carry_no_combining_marks():
     for row in rows:
         for ex in row.get("examples") or []:
             text = ex.get("russian") if isinstance(ex, dict) else ex
-            assert not re.search(r"[\u0300-\u036f]", text or ""), (
-                f"combining accent left in: {text!r}"
-            )
+            assert not re.search(
+                r"[\u0300-\u036f]", text or ""
+            ), f"combining accent left in: {text!r}"
 
 
 @needs_materials
@@ -204,9 +204,7 @@ def test_inflected_specs_keep_a_literal_anchor():
     for rule in ru._get_data_rules():
         for seq in _seq_lists(rule["match"]):
             has_morph = any("morph" in s for s in seq)
-            has_literal = any(
-                "surface_in" in s or "lemma_in" in s for s in seq
-            )
+            has_literal = any("surface_in" in s or "lemma_in" in s for s in seq)
             if has_morph:
                 assert has_literal, (
                     f"{rule['key']} has a bare case spec with no literal "
@@ -268,9 +266,9 @@ def test_inflected_spec_generalises_across_noun_forms():
     rule = _row_by_prefix("rgm_между__")
     for sentence in ("между обедом", "между друзьями", "между нами"):
         text = ru._strip_stress(sentence)
-        assert ru.match_rule(rule, ru._tokens_for(text), text), (
-            f"{rule['key']} does not fire on {sentence!r}"
-        )
+        assert ru.match_rule(
+            rule, ru._tokens_for(text), text
+        ), f"{rule['key']} does not fire on {sentence!r}"
 
 
 def test_literal_specs_still_fire_on_the_book_phrasing():
@@ -289,9 +287,9 @@ def test_generalisation_does_not_spill_to_other_constructions():
     rule = _row_by_prefix("rgm_между__")
     for sentence in ("между друзей", "около дома", "перед обедом"):
         text = ru._strip_stress(sentence)
-        assert not ru.match_rule(rule, ru._tokens_for(text), text), (
-            f"{rule['key']} fires on {sentence!r} -- over-generalised"
-        )
+        assert not ru.match_rule(
+            rule, ru._tokens_for(text), text
+        ), f"{rule['key']} fires on {sentence!r} -- over-generalised"
 
 
 # ---- the panel's folded reference block ---------------------------------

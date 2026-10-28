@@ -382,6 +382,7 @@ def _handwritten_rule_norms():
             _HANDWRITTEN_NORMS = {_norm_name(r["name"]) for r in _AR_RULES}
         return _HANDWRITTEN_NORMS
 
+
 _DATA_PATH = os.path.normpath(
     os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
