@@ -229,15 +229,21 @@ def test_the_edit_page_says_so_when_the_pool_is_empty(
     assert "No dictionary has been imported on this server yet" in html
 
 
-def test_saving_a_local_row_stores_it(client, app_context, pool, japanese):
+def test_saving_a_local_row_stores_it(client, app_context, pool):
+    # Deliberately not the `japanese` fixture: the edit form's parser
+    # dropdown only offers parsers whose dependency is installed, and CI
+    # installs no MeCab/Sudachi, so a Japanese language fails form
+    # validation there and saves nothing.  This test is about the Local
+    # row, and a space-delimited language's parser is always available.
+    language = _fresh_language("Local Row Save")
     _touch(pool, "ko_zh_basic.db")
 
     client.post(
-        _edit_url(japanese),
-        data=_form_data(japanese, term_translation_source="local_dict"),
+        _edit_url(language),
+        data=_form_data(language, term_translation_source="local_dict"),
     )
 
-    reloaded = db.session.get(Language, japanese.id)
+    reloaded = db.session.get(Language, language.id)
     assert "ko_zh_basic.db" in reloaded.local_dict_files()
     assert reloaded.term_translation_source == "local_dict"
 

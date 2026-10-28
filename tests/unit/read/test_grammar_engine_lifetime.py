@@ -160,6 +160,11 @@ def test_reclaim_survives_a_host_without_glibc():
 
 
 # ---- periodic arena trim ----------------------------------------------
+#
+# `_last_trim` is pushed to -1e6 rather than 0.0 below: the guard is
+# `time.monotonic() - _last_trim < interval`, and monotonic() counts from
+# boot -- on a freshly started CI runner it can still be under the 600s
+# interval, so "0.0" did not mean "long ago" there.
 
 
 def test_trim_runs_once_per_interval(monkeypatch):
@@ -169,7 +174,7 @@ def test_trim_runs_once_per_interval(monkeypatch):
     """
     trims = []
     monkeypatch.setattr(matcher, "_trim", lambda: trims.append(1))
-    monkeypatch.setattr(matcher, "_last_trim", 0.0)
+    monkeypatch.setattr(matcher, "_last_trim", -1e6)
 
     assert matcher.trim_arenas(600) is True
     assert trims == [1]
@@ -178,7 +183,7 @@ def test_trim_runs_once_per_interval(monkeypatch):
     assert trims == [1]
 
     # Pretend the interval elapsed.
-    monkeypatch.setattr(matcher, "_last_trim", 0.0)
+    monkeypatch.setattr(matcher, "_last_trim", -1e6)
     assert matcher.trim_arenas(600) is True
     assert trims == [1, 1]
 
@@ -191,7 +196,7 @@ def test_trim_needs_no_model_and_collects_nothing(monkeypatch):
     calls = []
     monkeypatch.setattr(matcher.gc, "collect", lambda: calls.append("gc"))
     monkeypatch.setattr(matcher, "_trim", lambda: calls.append("trim"))
-    monkeypatch.setattr(matcher, "_last_trim", 0.0)
+    monkeypatch.setattr(matcher, "_last_trim", -1e6)
 
     assert matcher.trim_arenas(600) is True
     assert calls == ["trim"]
@@ -212,7 +217,7 @@ def test_read_request_trims_the_arenas(app, client, monkeypatch):
     "The read blueprint's hook is what keeps RSS from ratcheting up."
     trims = []
     monkeypatch.setattr(matcher, "_trim", lambda: trims.append(1))
-    monkeypatch.setattr(matcher, "_last_trim", 0.0)
+    monkeypatch.setattr(matcher, "_last_trim", -1e6)
 
     client.get("/read/empty")
 
