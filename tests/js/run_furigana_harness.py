@@ -209,7 +209,8 @@ def main():
         )
         check(
             "a term-save re-render annotates from the cache without a fetch",
-            result["fetch_calls"] == 0 and result["ruby_in_microtask"]
+            result["fetch_calls"] == 0
+            and result["ruby_in_microtask"]
             and result["marked"],
             " result=%r" % (result,),
         )

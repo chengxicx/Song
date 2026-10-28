@@ -1866,7 +1866,9 @@ def test_library_rows_carry_the_translation_their_corpus_has():
     rows = [
         e
         for e in grammar_ja.library_entries("zh")
-        if any(isinstance(x, dict) and (x.get("tr") or "").strip() for x in e["examples"])
+        if any(
+            isinstance(x, dict) and (x.get("tr") or "").strip() for x in e["examples"]
+        )
     ]
     assert rows, "no library row carries a translated example in Chinese"
     for entry in rows:
@@ -1878,7 +1880,9 @@ def test_library_rows_carry_the_translation_their_corpus_has():
     en_rows = [
         e
         for e in grammar_ja.library_entries("en")
-        if any(isinstance(x, dict) and (x.get("tr") or "").strip() for x in e["examples"])
+        if any(
+            isinstance(x, dict) and (x.get("tr") or "").strip() for x in e["examples"]
+        )
     ]
     assert en_rows, "no library row carries a translated example in English"
 
@@ -1923,6 +1927,6 @@ def test_hand_written_basics_stay_plain_sentences():
     for entry in grammar_ja.library_entries("zh"):
         for example in entry["examples"]:
             if isinstance(example, dict):
-                assert (example.get("tr") or "").strip(), (
-                    f"{entry['key']} emits an empty gloss row"
-                )
+                assert (
+                    example.get("tr") or ""
+                ).strip(), f"{entry['key']} emits an empty gloss row"

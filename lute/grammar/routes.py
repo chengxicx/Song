@@ -50,7 +50,11 @@ _LEVELS = _JLPT_LEVELS + _CEFR_LEVELS
 # Korean's TOPIK bands.  The raw level strings contain a space, which
 # cannot ride in a class name, so each band maps to its own token and
 # accent (see the grammar-item--TOPIK* rules in styles.css).
-_TOPIK_CLASSES = {"TOPIK 1-2": "TOPIK12", "TOPIK 3-4": "TOPIK34", "TOPIK 5-6": "TOPIK56"}
+_TOPIK_CLASSES = {
+    "TOPIK 1-2": "TOPIK12",
+    "TOPIK 3-4": "TOPIK34",
+    "TOPIK 5-6": "TOPIK56",
+}
 
 
 def _library_engine(language):

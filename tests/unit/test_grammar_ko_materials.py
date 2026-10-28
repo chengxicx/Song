@@ -366,9 +366,7 @@ def test_a_literal_never_fires_as_the_tail_of_a_longer_one():
     assert _fires(_data_rule("verb_거나__choice"), "저는 주말에 책을 읽거나 영화를 봐요.")
     tail = "다솜은 친구랑 통화한다거나 좋아하는 웹툰을 정주행한다거나 하는 것으로 스트레스를 푼다."
     assert not _fires(_data_rule("verb_거나__choice"), tail)
-    assert _fires(
-        _data_rule("verb_거니__past-acknowledgment"), "내가 잘못했거니 후회가 남았어요."
-    )
+    assert _fires(_data_rule("verb_거니__past-acknowledgment"), "내가 잘못했거니 후회가 남았어요.")
     figured = "첫번째 책이 좋아서 두번째 책도 좋겠거니 하고 샀는데, 읽어보니까 별로더라고요."
     assert not _fires(_data_rule("verb_거니__past-acknowledgment"), figured)
     assert _fires(_data_rule("noun_에다가__onto-into"), "그릇에다가 밥을 담았어요.")

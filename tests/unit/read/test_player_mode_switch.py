@@ -112,16 +112,12 @@ def test_reading_menu_switch_is_a_player_toggle(app, app_context, client, englis
     assert "tts-player-toggle" not in content
 
 
-def test_each_bar_carries_its_own_shadow_toggle(
-    app, app_context, client, english
-):
+def test_each_bar_carries_its_own_shadow_toggle(app, app_context, client, english):
     """
     Shadowing has a button on both bars, because either one can be the
     visible one.  This is the shape the JS below has to handle.
     """
-    content = _content(
-        client, _import_book(english, "mp3", audio_filename="song.mp3")
-    )
+    content = _content(client, _import_book(english, "mp3", audio_filename="song.mp3"))
     assert 'id="yt-shadowing-btn"' in content
     assert 'id="tts-shadowing-btn"' in content
 
@@ -136,13 +132,13 @@ def test_the_shadow_toggle_works_on_the_visible_bar():
     """
     js = _read(_SHADOWING_JS)
     boot = _function_body(js, "function shadowingBoot()")
-    assert "shadowingButtons().forEach" in boot, (
-        "every bar's Shadow button must get the click listener"
-    )
+    assert (
+        "shadowingButtons().forEach" in boot
+    ), "every bar's Shadow button must get the click listener"
     setmode = _function_body(js, "function shadowingSetMode(on)")
-    assert "shadowingButtons().forEach" in setmode, (
-        "turning shadowing on/off must light up every bar's button"
-    )
+    assert (
+        "shadowingButtons().forEach" in setmode
+    ), "turning shadowing on/off must light up every bar's button"
     # The single-element pattern is what broke it.
     assert 'getElementById("tts-shadowing-btn") ||' not in boot
     assert 'getElementById("tts-shadowing-btn") ||' not in setmode
@@ -165,4 +161,3 @@ def test_youtube_book_has_no_tts_bar(app, app_context, client, english):
     # ...but it still gets the player on/off switch: that one hides the
     # video transport too.
     assert 'id="player-toggle"' in content
-

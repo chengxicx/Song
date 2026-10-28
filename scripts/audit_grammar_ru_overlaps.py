@@ -105,7 +105,7 @@ def overlapping_pairs():
                 spans[rule["key"]] = found
         keys = sorted(spans)
         for i, a in enumerate(keys):
-            for b in keys[i + 1:]:
+            for b in keys[i + 1 :]:
                 if any(_iou(x, y) >= _IOU for x in spans[a] for y in spans[b]):
                     pairs[(a, b)].append(sentence)
     return by_key, pairs
@@ -162,7 +162,9 @@ def candidates(min_hits=_MIN_HITS):
         earlier = [
             (n, h)
             for n, h in graph[key].items()
-            if not is_hand(n) and n not in decisions and order.index(n) < order.index(key)
+            if not is_hand(n)
+            and n not in decisions
+            and order.index(n) < order.index(key)
         ]
         if earlier:
             n, h = max(earlier, key=lambda kv: kv[1])

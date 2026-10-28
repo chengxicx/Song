@@ -164,7 +164,9 @@ def test_the_page_control_narrows_the_panel_to_one_sentence(commands):
     # A three-way scope switch: the sentence scope narrows, the page scope
     # widens, and neither re-runs the backend analysis (only the book scope
     # does, because it is a different text).
-    click = _after(commands, 'panel.find(".grammar-analysis-panel__scope").on("click"', 1400)
+    click = _after(
+        commands, 'panel.find(".grammar-analysis-panel__scope").on("click"', 1400
+    )
     assert 'if (next === "sentence")' in click
     assert "filterToSentence(filterableSentence)" in click
     assert 'if (next === "page")' in click
