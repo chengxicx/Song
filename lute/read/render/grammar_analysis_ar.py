@@ -365,7 +365,22 @@ def _norm_name(name):
     return re.sub(r"[^0-9a-z\u0600-\u06FF]+", "", _normalise(name or "").lower())
 
 
-_HANDWRITTEN_NORMS = {_norm_name(r["name"]) for r in _AR_RULES}
+# Folded names of the hand-written rules, for the overlap check in
+# _load_data_rules.  Built on first use rather than at import: folding runs
+# through pyarabic, which lives in the optional `arabic` extra, and this
+# module is imported by app_factory on every start -- building the set at
+# module level made the whole app unstartable on an install without that
+# extra (CI's base-ci and no-mecab jobs install develop deps only).
+_HANDWRITTEN_NORMS = None
+
+
+def _handwritten_rule_norms():
+    "Folded hand-written rule names, built on first use and memoised."
+    global _HANDWRITTEN_NORMS  # pylint: disable=global-statement
+    with _rules_lock:
+        if _HANDWRITTEN_NORMS is None:
+            _HANDWRITTEN_NORMS = {_norm_name(r["name"]) for r in _AR_RULES}
+        return _HANDWRITTEN_NORMS
 
 _DATA_PATH = os.path.normpath(
     os.path.join(
@@ -472,7 +487,7 @@ def _load_data_rules():
     rules = []
     for item in entries:
         name = item.get("name") or ""
-        if not name or _norm_name(name) in _HANDWRITTEN_NORMS:
+        if not name or _norm_name(name) in _handwritten_rule_norms():
             continue  # already covered precisely by a hand-written rule
         examples = [e for e in (_normalise(x) for x in item.get("examples") or []) if e]
         if not examples:
