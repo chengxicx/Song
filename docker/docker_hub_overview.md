@@ -109,7 +109,7 @@ The Dockerfile used to build the images, and docs, are in `/docker` in that repo
 
 # Help
 
-If you encounter any issues or have questions, please check the [GitHub Issues](https://github.com/luteorg/lute-v3/issues) or join the [Discord](https://discord.gg/CzFUQP5m8u).
+If you encounter any issues or have questions, please check the [GitHub Issues](https://github.com/luteorg/lute-v3/issues) or join the [Discord](https://discord.gg/p7Pw5QtYyM).
 
 # License
 
