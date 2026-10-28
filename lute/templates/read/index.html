@@ -266,6 +266,11 @@
   let mouseY = 0;
   let scrollY = 0;
   let scrollYBeforeReload = 0;
+  // True from the moment a page turn is asked for until the new page has
+  // been laid out.  The term-save scroll restore below must stay out of
+  // the way for that window: its offset belongs to the page being
+  // replaced, not to the one arriving (see goto_relative_page).
+  let _pageTurnInFlight = false;
   const mediaTablet = window.matchMedia("(max-width: 980px)");
   const readPaneRight = document.getElementById("read_pane_right");
   const readPaneLeft = document.getElementById("read_pane_left");
@@ -591,7 +596,14 @@
   });
 
   document.addEventListener('DOMContentLoaded', function () {
+    // A term save re-swaps the page the reader is already on, and the
+    // swap loses the scroll offset; this puts them back where they were.
+    // A page TURN is the opposite case -- the offset belongs to the page
+    // being replaced, and restoring it opens the new page at that offset
+    // (for a scrolling EPUB chapter, at its bottom).  _pageTurnInFlight
+    // marks the difference.
     const theTextReloadObs = new MutationObserver((mutationList, observer) => {
+      if (_pageTurnInFlight) return;
       if (scrollYBeforeReload) window.scrollTo(0, scrollYBeforeReload);
     });
     
@@ -868,8 +880,21 @@
       actualPage: actualPage,
       initial: initial_page_load,
       keepScreen: actualPage === pagenumNow,
+      // backTo: turning back into a scrolling EPUB chapter continues from
+      // where the reader stopped on that page, so its offset is read NOW
+      // -- the swap itself can clamp the document, and the clamp would be
+      // saved over the stored value.
+      backTo:
+        p < 0 && actualPage !== pagenumNow ? _storedEpubScroll(actualPage) : null,
       ...(extra || {}),
     };
+    // A page turn (as opposed to a refetch of the page on screen): the
+    // scroll offset on the document belongs to the page being replaced,
+    // so it must not be carried over -- neither by the term-save restore
+    // nor by the browser keeping the offset through the swap.  See the
+    // MutationObserver in DOMContentLoaded and _finishPageSwap.
+    _pageTurnInFlight = !_pendingNav.keepScreen;
+    if (_pageTurnInFlight) scrollYBeforeReload = 0;
     htmx.ajax('GET', url, { target: '#thetext', swap: 'innerHTML settle:0' });
   }
 
@@ -942,7 +967,24 @@
       initial || keepScreen ? _storedScreenFor(actualPage) : null;
     requestAnimationFrame(() => {
       _splitToScreens();
-      if (initial) _restoreEpubScroll();
+      if (initial) {
+        _restoreEpubScroll();
+      } else if (_pageTurnInFlight && _epubScrollMode()) {
+        // A scrolling EPUB chapter keeps the document offset through the
+        // swap, and the reader turned the page from the BOTTOM of the
+        // chapter they left -- that is where the next arrow appears -- so
+        // without this the new chapter opens at that same offset, i.e. at
+        // its own bottom.  Land on the top of the page they turned to;
+        // going back lands on the place they stopped at instead.
+        window.scrollTo(0, nav && nav.backTo ? nav.backTo : 0);
+        scrollYBeforeReload = window.scrollY;
+        // The split above measured the arrows from the stale offset.
+        if (typeof _updateScrollModeArrows === "function")
+          _updateScrollModeArrows();
+      }
+      // From here on a mutation of #thetext is a reload of THIS page, so
+      // the term-save scroll restore is allowed to run again.
+      _pageTurnInFlight = false;
       if (storedScreen !== null &&
           storedScreen > 0 &&
           storedScreen !== curScreen &&
@@ -971,6 +1013,16 @@
 
   // Pending term-form reload state, consumed by the htmx:afterSwap handler.
   let _pendingTermFormReload = null;
+
+  // A page turn whose fetch failed never reaches htmx:afterSwap, and
+  // _pageTurnInFlight would stay set -- silently switching the term-save
+  // scroll restore (and the EPUB offset saving) off for the session.
+  ["htmx:sendError", "htmx:responseError", "htmx:timeout"].forEach(function (name) {
+    document.body.addEventListener(name, function () {
+      _pageTurnInFlight = false;
+      _pendingNav = null;
+    });
+  });
 
   document.body.addEventListener('htmx:afterSwap', function (e) {
     if (!e.target || e.target.id !== 'thetext') return;
@@ -1515,16 +1567,23 @@
   // place *inside* the page is the document scroll offset, kept per
   // book **and page** -- per book alone would restore page 3's offset
   // on page 1 after turning back.
-  function _epubScrollKey() {
+  function _epubScrollKey(page) {
     const book = $("#book_id").val() || "0";
-    const page = $("#page_num").val() || "1";
-    return "lute-epub-scroll-" + book + "-" + page;
+    const p = page == null ? $("#page_num").val() || "1" : page;
+    return "lute-epub-scroll-" + book + "-" + p;
+  }
+
+  // The stored offset for `page` (default: the page on screen), or null
+  // when the reader has never scrolled that page.
+  function _storedEpubScroll(page) {
+    if (!_epubScrollMode()) return null;
+    const y = parseFloat(localStorage.getItem(_epubScrollKey(page)));
+    return Number.isFinite(y) && y > 0 ? y : null;
   }
 
   function _restoreEpubScroll() {
-    if (!_epubScrollMode()) return;
-    const y = parseFloat(localStorage.getItem(_epubScrollKey()));
-    if (!Number.isFinite(y) || y <= 0) return;
+    const y = _storedEpubScroll();
+    if (y === null) return;
     // One more frame: the chapter's images may still be settling, and
     // scrolling to a y the document does not have yet would clamp.
     requestAnimationFrame(function () {
@@ -1534,6 +1593,10 @@
 
   function _saveEpubScroll() {
     if (!_epubScrollMode()) return;
+    // Mid page turn the offset on the document belongs to the page being
+    // replaced, and the swap can clamp it to the arriving page's height;
+    // either value would be saved under the wrong page's key.
+    if (_pageTurnInFlight) return;
     try {
       localStorage.setItem(_epubScrollKey(), String(Math.round(window.scrollY)));
     } catch (e) {
