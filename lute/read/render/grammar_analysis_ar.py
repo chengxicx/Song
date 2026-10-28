@@ -483,6 +483,15 @@ def _load_data_rules():
     """
     if not os.path.exists(_DATA_PATH):
         return []
+    # pyarabic lives in the optional `arabic` extra, and everything below
+    # folds names and examples through it.  Without it the library and the
+    # grammar page still render the hand-written rules (they need no
+    # tokenizer), so degrade to those instead of raising: app_factory
+    # imports this module on every start.
+    try:
+        import pyarabic.araby  # pylint: disable=import-outside-toplevel,unused-import
+    except ImportError:
+        return []
     with open(_DATA_PATH, encoding="utf-8") as fh:
         entries = json.load(fh)
     rules = []
