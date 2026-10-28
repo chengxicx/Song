@@ -1052,7 +1052,8 @@ class Service:
         # positioned box, so -- unlike text books -- no space token exists
         # anywhere in the DOM; the hidden space span this drives (see
         # pdf_page.html) is what sentence extraction copies with.
-        prev_geom = None
+        prev_line = None
+        prev_right = 0.0
         for word in words:
             items = rs.get_textitems(word["text"], lang, mw)
             kept = []
@@ -1072,9 +1073,9 @@ class Service:
             # extraction saw a space between the two words (a space glyph
             # is 2-4pt in most fonts).
             space_before = (
-                prev_geom is not None
-                and prev_geom["line"] == word["line"]
-                and word["x"] - prev_geom["right"] > 1.25
+                prev_line is not None
+                and prev_line == word["line"]
+                and word["x"] - prev_right > 1.25
             )
             # Estimated box in % of the page.  JavaScript refines this
             # against pdf.js geometry after rendering; without it the
@@ -1093,10 +1094,8 @@ class Service:
                     "space_before": space_before,
                 }
             )
-            prev_geom = {
-                "line": word["line"],
-                "right": word["x"] + word["width"],
-            }
+            prev_line = word["line"]
+            prev_right = word["x"] + word["width"]
 
         return page_width, page_height, word_contexts
 
