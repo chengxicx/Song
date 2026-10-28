@@ -80,11 +80,15 @@ def audit_corpus():
     sentences = set()
     for rule in _audit_rules():
         for example in rule.get("examples") or []:
-            text = (example.get("korean") if isinstance(example, dict) else example) or ""
+            text = (
+                example.get("korean") if isinstance(example, dict) else example
+            ) or ""
             text = text.strip()
             if text:
                 sentences.add(text)
-    for examples in ko._PATTERN_RULE_EXAMPLES.values():  # pylint: disable=protected-access
+    for (
+        examples
+    ) in ko._PATTERN_RULE_EXAMPLES.values():  # pylint: disable=protected-access
         for text in examples:
             text = (text or "").strip()
             if text:

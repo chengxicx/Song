@@ -387,9 +387,7 @@ def test_strip_duplicate_headword_drops_a_bare_headword_line():
 def test_strip_duplicate_headword_drops_collins_frequency_stars():
     "Collins appends its frequency stars to the headword line."
     gloss = "happy★★★★☆\nADJ-GRADED\n高兴的;快乐的"
-    assert (
-        service.strip_duplicate_headword(gloss, "happy") == "ADJ-GRADED\n高兴的;快乐的"
-    )
+    assert service.strip_duplicate_headword(gloss, "happy") == "ADJ-GRADED\n高兴的;快乐的"
 
 
 def test_strip_duplicate_headword_keeps_a_different_headword():
@@ -404,10 +402,7 @@ def test_strip_duplicate_headword_keeps_a_different_headword():
 def test_strip_duplicate_headword_keeps_a_first_line_with_content():
     "Not every definition opens with a bare headword."
     assert service.strip_duplicate_headword("箱は\n名\n箱子", "箱") == "箱は\n名\n箱子"
-    assert (
-        service.strip_duplicate_headword("終わりです。\n名", "終わり")
-        == "終わりです。\n名"
-    )
+    assert service.strip_duplicate_headword("終わりです。\n名", "終わり") == "終わりです。\n名"
 
 
 def test_strip_duplicate_headword_keeps_a_headword_only_entry():
@@ -417,9 +412,7 @@ def test_strip_duplicate_headword_keeps_a_headword_only_entry():
 
 def test_strip_duplicate_headword_ignores_zero_width_spaces():
     "Lute joins multi-token terms with one; a dictionary key never has it."
-    assert (
-        service.strip_duplicate_headword("たのしい\n愉快", "たの\u200bしい") == "愉快"
-    )
+    assert service.strip_duplicate_headword("たのしい\n愉快", "たの\u200bしい") == "愉快"
 
 
 def test_strip_duplicate_headword_passes_empty_input_through():
@@ -528,7 +521,4 @@ def test_a_romanized_bracket_headword_line_comes_off(app, app_context, dict_dirs
     _drop_pool_file(static_dir, "shougakukan-jc.db", {"title": "小学館日中"})
     gloss = "bennkyou0【勉強】\n（1）〔学習〕学习\n$一夜漬けの勉強／临阵磨枪"
 
-    assert (
-        service.strip_duplicate_headword(gloss, "勉強")
-        == "（1）〔学習〕学习\n$一夜漬けの勉強／临阵磨枪"
-    )
+    assert service.strip_duplicate_headword(gloss, "勉強") == "（1）〔学習〕学习\n$一夜漬けの勉強／临阵磨枪"

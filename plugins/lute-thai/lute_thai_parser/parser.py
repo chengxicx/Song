@@ -69,9 +69,7 @@ class ThaiParser(AbstractParser):
         # behaviour.
         word_count = sum(1 for w in words if re.match(pattern, w))
         space_count = sum(1 for w in words if re.match(whitespace_regex, w))
-        spaces_are_word_separators = (
-            word_count > 0 and space_count / word_count >= 0.5
-        )
+        spaces_are_word_separators = word_count > 0 and space_count / word_count >= 0.5
 
         for word in words:
             is_word_char = re.match(pattern, word) is not None

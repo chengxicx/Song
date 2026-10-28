@@ -667,9 +667,7 @@ def test_japanese_kana_word_written_as_kanji_by_the_engine_is_a_match():
         readings={"私": "わたくし", "わたし": "わたし"},
         normalized_forms={"わたし": "私"},
     )
-    res = shadowing.compare_tokens(
-        ["わたし", "は"], "私は", lang, original_full_text="わたしは"
-    )
+    res = shadowing.compare_tokens(["わたし", "は"], "私は", lang, original_full_text="わたしは")
     assert res["statuses"] == [2, 2]
     assert res["spoken_for_fuzzy"] == {}
     # The panel annotates the heard word with this, not with 私's own
@@ -711,9 +709,7 @@ def test_japanese_kana_transcription_is_judged_by_sound():
         readings={"わたし": "わたし", "わたくし": "わたくし"},
         normalized_forms={"わたし": "私", "わたくし": "私"},
     )
-    res = shadowing.compare_tokens(
-        ["わたし"], "わたくし", lang, original_full_text="わたし"
-    )
+    res = shadowing.compare_tokens(["わたし"], "わたくし", lang, original_full_text="わたし")
     assert res["statuses"] == [1]
     assert res["spoken_for_fuzzy"] == {0: "わたくし"}
 

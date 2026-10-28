@@ -133,9 +133,7 @@ def import_file(path, apply, limit):
         bo.source_uri = collection_url
         bo.book_tags = [series_tag]
         dbbook = service.import_book(bo, db.session)
-        print(
-            f"  + created BkID={dbbook.id} pages={len(dbbook.texts)}: {title}"
-        )
+        print(f"  + created BkID={dbbook.id} pages={len(dbbook.texts)}: {title}")
         created += 1
     return (created, skipped)
 

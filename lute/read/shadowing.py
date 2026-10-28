@@ -1205,9 +1205,7 @@ def compare_tokens(
                 ):
                     statuses[orig_index] = STATUS_MATCH
                     result["spoken_for_miss"].pop(orig_index, None)
-                    result["spoken_kana"][j] = _clean_token(
-                        original_tokens[orig_index]
-                    )
+                    result["spoken_kana"][j] = _clean_token(original_tokens[orig_index])
                     break
                 hit = False
                 if len(okey) > 1 or (is_zh and okey):
